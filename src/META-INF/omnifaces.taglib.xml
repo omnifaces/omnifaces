@@ -124,4 +124,25 @@
             <component-type>org.omnifaces.component.TreeInsertChildren</component-type>
         </component>
     </tag>
+    
+    <tag>
+    	<description>
+    		This component includes the output from a resource located at the given path. This path can
+    		not extend outside of the current Servlet context. A resource is either a Servlet or a JSP
+    		page.    	
+    	</description>
+        <tag-name>resourceInclude</tag-name>
+        <component>
+            <component-type>org.omnifaces.component.resourceinclude.ResourceInclude</component-type>
+        </component>
+         <attribute>
+            <description>A String specifying the pathname to the resource</description>
+            <name>path</name>
+            <required>true</required>
+            <type>java.lang.String</type>
+        </attribute>
+    </tag>
+    
+    
+    
 </facelet-taglib>
