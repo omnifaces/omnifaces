@@ -70,19 +70,19 @@ public final class EditableValueHolderStateHelper {
 	 * @param children An iterator with all child facets and components as obtained by
 	 * {@link UIComponentBase#getFacetsAndChildren()}.
 	 */
-    public static void save(FacesContext context, StateHelper stateHelper, Iterator<UIComponent> children) {
-    	while (children.hasNext()) {
-    		UIComponent child = children.next();
+	public static void save(FacesContext context, StateHelper stateHelper, Iterator<UIComponent> children) {
+		while (children.hasNext()) {
+			UIComponent child = children.next();
 
-    		if (child instanceof EditableValueHolder && !child.isTransient()) {
-                get(stateHelper, child.getClientId(context)).save((EditableValueHolder) child);
-    		}
+			if (child instanceof EditableValueHolder && !child.isTransient()) {
+				get(stateHelper, child.getClientId(context)).save((EditableValueHolder) child);
+			}
 
-    		if (child.getChildCount() > 0) {
-        		save(context, stateHelper, child.getFacetsAndChildren());
-    		}
-    	}
-    }
+			if (child.getChildCount() > 0) {
+				save(context, stateHelper, child.getFacetsAndChildren());
+			}
+		}
+	}
 
 	/**
 	 * Restore state of any {@link EditableValueHolder} children.
@@ -91,20 +91,20 @@ public final class EditableValueHolderStateHelper {
 	 * @param children An iterator with all child facets and components as obtained by
 	 * {@link UIComponentBase#getFacetsAndChildren()}.
 	 */
-    public static void restore(FacesContext context, StateHelper stateHelper, Iterator<UIComponent> children) {
-    	while (children.hasNext()) {
-    		UIComponent child = children.next();
+	public static void restore(FacesContext context, StateHelper stateHelper, Iterator<UIComponent> children) {
+		while (children.hasNext()) {
+			UIComponent child = children.next();
 
-    		if (child instanceof EditableValueHolder && !child.isTransient()) {
-    			child.setId(child.getId()); // This implicitly resets the cached client ID. See JSF spec 3.1.6.
-                get(stateHelper, child.getClientId(context)).restore((EditableValueHolder) child);
-    		}
+			if (child instanceof EditableValueHolder && !child.isTransient()) {
+				child.setId(child.getId()); // This implicitly resets the cached client ID. See JSF spec 3.1.6.
+				get(stateHelper, child.getClientId(context)).restore((EditableValueHolder) child);
+			}
 
-    		if (child.getChildCount() > 0) {
-        		restore(context, stateHelper, child.getFacetsAndChildren());
-    		}
-    	}
-    }
+			if (child.getChildCount() > 0) {
+				restore(context, stateHelper, child.getFacetsAndChildren());
+			}
+		}
+	}
 
 	/**
 	 * Returns the state helper of the {@link EditableValueHolder} child associated with the given client ID.
@@ -112,22 +112,22 @@ public final class EditableValueHolderStateHelper {
 	 * @param clientId The client ID of the {@link EditableValueHolder} child to return the state helper for.
 	 * @return The state helper of the {@link EditableValueHolder} child associated with the given client ID.
 	 */
-    @SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	public static EditableValueHolderStateHelper get(StateHelper stateHelper, String clientId) {
 		Map<String, EditableValueHolderStateHelper> childState =
 			(Map<String, EditableValueHolderStateHelper>) stateHelper.get(EditableValueHolderStateHelper.class);
-        EditableValueHolderStateHelper state = null;
+		EditableValueHolderStateHelper state = null;
 
 		if (childState != null) {
 			state = childState.get(clientId);
 		}
 
-        if (state == null) {
-            state = new EditableValueHolderStateHelper();
-            stateHelper.put(EditableValueHolderStateHelper.class, clientId, state);
-        }
+		if (state == null) {
+			state = new EditableValueHolderStateHelper();
+			stateHelper.put(EditableValueHolderStateHelper.class, clientId, state);
+		}
 
-        return state;
-    }
+		return state;
+	}
 
 }

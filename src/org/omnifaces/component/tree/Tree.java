@@ -115,9 +115,9 @@ public class Tree extends UINamingContainer {
 
 		if (currentModelNode != null) {
 			containerClientId = new StringBuilder(containerClientId)
-		    	.append(UINamingContainer.getSeparatorChar(context))
-		    	.append(currentModelNode.getIndex())
-		    	.toString();
+				.append(UINamingContainer.getSeparatorChar(context))
+				.append(currentModelNode.getIndex())
+				.toString();
 		}
 
 		return containerClientId;
@@ -152,21 +152,21 @@ public class Tree extends UINamingContainer {
 		super.setValueExpression(name, binding);
 	}
 
-    @Override
+	@Override
 	public void processDecodes(FacesContext context) {
 		validateHierarchy();
-    	process(context, PhaseId.APPLY_REQUEST_VALUES);
-    }
+		process(context, PhaseId.APPLY_REQUEST_VALUES);
+	}
 
-    @Override
+	@Override
 	public void processValidators(FacesContext context) {
-    	process(context, PhaseId.PROCESS_VALIDATIONS);
-    }
+		process(context, PhaseId.PROCESS_VALIDATIONS);
+	}
 
-    @Override
+	@Override
 	public void processUpdates(FacesContext context) {
-    	process(context, PhaseId.UPDATE_MODEL_VALUES);
-    }
+		process(context, PhaseId.UPDATE_MODEL_VALUES);
+	}
 
 	@Override
 	public void encodeAll(FacesContext context) throws IOException {
@@ -180,20 +180,20 @@ public class Tree extends UINamingContainer {
 	 * Set the root node and delegate the call to {@link #processTreeNode(FacesContext, PhaseId)}.
 	 * @param context The faces context to work with.
 	 * @param phaseId The current phase ID.
-     */
+	 */
 	private void process(FacesContext context, PhaseId phaseId) {
-        if (!isRendered()) {
-            return;
-        }
+		if (!isRendered()) {
+			return;
+		}
 
-        if (phaseId == PhaseId.APPLY_REQUEST_VALUES || phaseId == PhaseId.RENDER_RESPONSE) {
-            prepareNodes();
-            prepareModel();
-        }
+		if (phaseId == PhaseId.APPLY_REQUEST_VALUES || phaseId == PhaseId.RENDER_RESPONSE) {
+			prepareNodes();
+			prepareModel();
+		}
 
 		setCurrentModelNode(context, model);
 		processTreeNode(context, phaseId);
-        setCurrentModelNode(context, null);
+		setCurrentModelNode(context, null);
 	}
 
 	/**
@@ -206,8 +206,8 @@ public class Tree extends UINamingContainer {
 	 * @see TreeModel#getLevel()
 	 * @see TreeInsertChildren
 	 */
-    protected void processTreeNode(FacesContext context, PhaseId phaseId) {
-    	if (!currentModelNode.isLeaf()) {
+	protected void processTreeNode(FacesContext context, PhaseId phaseId) {
+		if (!currentModelNode.isLeaf()) {
 			TreeNode treeNode = nodes.get(currentModelNode.getLevel());
 
 			if (treeNode == null) {
@@ -220,7 +220,7 @@ public class Tree extends UINamingContainer {
 
 			treeNode.process(context, phaseId);
 		}
-    }
+	}
 
 	/**
 	 * Validate the component hierarchy.
@@ -312,7 +312,7 @@ public class Tree extends UINamingContainer {
 		return currentModelNode;
 	}
 
-    // Attribute getters/setters --------------------------------------------------------------------------------------
+	// Attribute getters/setters --------------------------------------------------------------------------------------
 
 	/**
 	 * Returns the tree model.

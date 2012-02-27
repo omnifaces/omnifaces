@@ -36,17 +36,17 @@ public class ListTreeModel<T> implements TreeModel<T> {
 	/**
 	 * Default constructor. It does nothing special.
 	 */
-    public ListTreeModel() {
-        // Just keep alive.
-    }
+	public ListTreeModel() {
+		// Just keep alive.
+	}
 
-    /**
-     * Convenience constructor which immediately sets the given data as wrapped data of the current tree node.
-     * @param data The wrapped data of current tree node.
-     */
-    public ListTreeModel(T data) {
-        this.data = data;
-    }
+	/**
+	 * Convenience constructor which immediately sets the given data as wrapped data of the current tree node.
+	 * @param data The wrapped data of current tree node.
+	 */
+	public ListTreeModel(T data) {
+		this.data = data;
+	}
 
 	// Mutators -------------------------------------------------------------------------------------------------------
 

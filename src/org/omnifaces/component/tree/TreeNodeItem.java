@@ -43,8 +43,8 @@ public class TreeNodeItem extends UIComponentBase {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
-    /** The standard component type. */
-    public static final String COMPONENT_TYPE = "org.omnifaces.component.tree.TreeNodeItem";
+	/** The standard component type. */
+	public static final String COMPONENT_TYPE = "org.omnifaces.component.tree.TreeNodeItem";
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
@@ -78,29 +78,29 @@ public class TreeNodeItem extends UIComponentBase {
 		return true;
 	}
 
-    @Override
-    public void processDecodes(FacesContext context) {
-    	validateHierarchy();
-        process(context, PhaseId.APPLY_REQUEST_VALUES);
-    }
+	@Override
+	public void processDecodes(FacesContext context) {
+		validateHierarchy();
+		process(context, PhaseId.APPLY_REQUEST_VALUES);
+	}
 
-    @Override
-    public void processValidators(FacesContext context) {
-        process(context, PhaseId.PROCESS_VALIDATIONS);
-    }
+	@Override
+	public void processValidators(FacesContext context) {
+		process(context, PhaseId.PROCESS_VALIDATIONS);
+	}
 
-    @Override
-    public void processUpdates(FacesContext context) {
-        process(context, PhaseId.UPDATE_MODEL_VALUES);
-    }
+	@Override
+	public void processUpdates(FacesContext context) {
+		process(context, PhaseId.UPDATE_MODEL_VALUES);
+	}
 
 	@Override
 	public void encodeAll(FacesContext context) throws IOException {
-    	validateHierarchy();
+		validateHierarchy();
 		process(context, PhaseId.RENDER_RESPONSE);
 	}
 
-    // Internal actions -----------------------------------------------------------------------------------------------
+	// Internal actions -----------------------------------------------------------------------------------------------
 
 	/**
 	 * Loop over children of the current model node, set the child as the current morel node and continue processing
@@ -109,32 +109,32 @@ public class TreeNodeItem extends UIComponentBase {
 	 * @param phaseId The current phase ID.
 	 * @see Tree#setCurrentModelNode(FacesContext, TreeModel)
 	 */
-    @SuppressWarnings({ "rawtypes", "unchecked" }) // For TreeModel. We don't care about its actual type anyway.
-    private void process(FacesContext context, PhaseId phaseId) {
+	@SuppressWarnings({ "rawtypes", "unchecked" }) // For TreeModel. We don't care about its actual type anyway.
+	private void process(FacesContext context, PhaseId phaseId) {
 		if (!isRendered() || getChildCount() == 0) {
 			return;
 		}
 
-    	Tree tree = Components.getClosestParent(this, Tree.class);
+		Tree tree = Components.getClosestParent(this, Tree.class);
 
 		for (TreeModel childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
-    		tree.setCurrentModelNode(context, childModelNode);
+			tree.setCurrentModelNode(context, childModelNode);
 
-            if (phaseId == PhaseId.APPLY_REQUEST_VALUES) {
-                super.processDecodes(context);
-            } else if (phaseId == PhaseId.PROCESS_VALIDATIONS) {
-            	super.processValidators(context);
-            } else if (phaseId == PhaseId.UPDATE_MODEL_VALUES) {
-            	super.processUpdates(context);
-            } else if (phaseId == PhaseId.RENDER_RESPONSE) {
-            	try {
-            		super.encodeChildren(context);
+			if (phaseId == PhaseId.APPLY_REQUEST_VALUES) {
+				super.processDecodes(context);
+			} else if (phaseId == PhaseId.PROCESS_VALIDATIONS) {
+				super.processValidators(context);
+			} else if (phaseId == PhaseId.UPDATE_MODEL_VALUES) {
+				super.processUpdates(context);
+			} else if (phaseId == PhaseId.RENDER_RESPONSE) {
+				try {
+					super.encodeChildren(context);
 				} catch (IOException e) {
 					throw new FacesException(e);
 				}
-            }
-        }
-    }
+			}
+		}
+	}
 
 	/**
 	 * Validate the component hierarchy.

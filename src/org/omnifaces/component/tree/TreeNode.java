@@ -41,8 +41,8 @@ public class TreeNode extends UIComponentBase {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
-    /** The standard component type. */
-    public static final String COMPONENT_TYPE = "org.omnifaces.component.tree.TreeNode";
+	/** The standard component type. */
+	public static final String COMPONENT_TYPE = "org.omnifaces.component.tree.TreeNode";
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
@@ -78,29 +78,29 @@ public class TreeNode extends UIComponentBase {
 		return true;
 	}
 
-    @Override
-    public void processDecodes(FacesContext context) {
-    	validateHierarchy();
-    	process(context, PhaseId.APPLY_REQUEST_VALUES);
-    }
+	@Override
+	public void processDecodes(FacesContext context) {
+		validateHierarchy();
+		process(context, PhaseId.APPLY_REQUEST_VALUES);
+	}
 
-    @Override
-    public void processValidators(FacesContext context) {
-    	process(context, PhaseId.PROCESS_VALIDATIONS);
-    }
+	@Override
+	public void processValidators(FacesContext context) {
+		process(context, PhaseId.PROCESS_VALIDATIONS);
+	}
 
-    @Override
-    public void processUpdates(FacesContext context) {
-    	process(context, PhaseId.UPDATE_MODEL_VALUES);
-    }
+	@Override
+	public void processUpdates(FacesContext context) {
+		process(context, PhaseId.UPDATE_MODEL_VALUES);
+	}
 
-    @Override
-    public void encodeAll(FacesContext context) throws IOException {
-    	validateHierarchy();
-    	process(context, PhaseId.RENDER_RESPONSE);
-    }
+	@Override
+	public void encodeAll(FacesContext context) throws IOException {
+		validateHierarchy();
+		process(context, PhaseId.RENDER_RESPONSE);
+	}
 
-    // Internal actions -----------------------------------------------------------------------------------------------
+	// Internal actions -----------------------------------------------------------------------------------------------
 
 	/**
 	 * This method is by design only called by {@link Tree#processTreeNode(FacesContext, PhaseId)}.
@@ -112,18 +112,18 @@ public class TreeNode extends UIComponentBase {
 		}
 
 		if (phaseId == PhaseId.APPLY_REQUEST_VALUES) {
-            super.processDecodes(context);
-        } else if (phaseId == PhaseId.PROCESS_VALIDATIONS) {
-        	super.processValidators(context);
-        } else if (phaseId == PhaseId.UPDATE_MODEL_VALUES) {
-        	super.processUpdates(context);
-        } else if (phaseId == PhaseId.RENDER_RESPONSE) {
-        	try {
-        		super.encodeChildren(context);
+			super.processDecodes(context);
+		} else if (phaseId == PhaseId.PROCESS_VALIDATIONS) {
+			super.processValidators(context);
+		} else if (phaseId == PhaseId.UPDATE_MODEL_VALUES) {
+			super.processUpdates(context);
+		} else if (phaseId == PhaseId.RENDER_RESPONSE) {
+			try {
+				super.encodeChildren(context);
 			} catch (IOException e) {
 				throw new FacesException(e);
 			}
-        }
+		}
 	}
 
 	/**

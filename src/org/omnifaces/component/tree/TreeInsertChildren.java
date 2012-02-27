@@ -36,8 +36,8 @@ public class TreeInsertChildren extends UIComponentBase {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
-    /** The standard component type. */
-    public static final String COMPONENT_TYPE = "org.omnifaces.component.tree.TreeInsertChildren";
+	/** The standard component type. */
+	public static final String COMPONENT_TYPE = "org.omnifaces.component.tree.TreeInsertChildren";
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
@@ -70,57 +70,57 @@ public class TreeInsertChildren extends UIComponentBase {
 		return false;
 	}
 
-    @Override
-    public void processDecodes(FacesContext context) {
-    	validateHierarchy();
-    	process(context, PhaseId.APPLY_REQUEST_VALUES);
-    }
+	@Override
+	public void processDecodes(FacesContext context) {
+		validateHierarchy();
+		process(context, PhaseId.APPLY_REQUEST_VALUES);
+	}
 
-    @Override
-    public void processValidators(FacesContext context) {
-    	process(context, PhaseId.PROCESS_VALIDATIONS);
-    }
+	@Override
+	public void processValidators(FacesContext context) {
+		process(context, PhaseId.PROCESS_VALIDATIONS);
+	}
 
-    @Override
-    public void processUpdates(FacesContext context) {
-    	process(context, PhaseId.UPDATE_MODEL_VALUES);
-    }
+	@Override
+	public void processUpdates(FacesContext context) {
+		process(context, PhaseId.UPDATE_MODEL_VALUES);
+	}
 
-    @Override
-    public void encodeAll(FacesContext context) throws IOException {
-    	validateHierarchy();
-    	process(context, PhaseId.RENDER_RESPONSE);
-    }
+	@Override
+	public void encodeAll(FacesContext context) throws IOException {
+		validateHierarchy();
+		process(context, PhaseId.RENDER_RESPONSE);
+	}
 
-    // Internal actions -----------------------------------------------------------------------------------------------
+	// Internal actions -----------------------------------------------------------------------------------------------
 
-    /**
-     * Delegate processing of the tree node to {@link Tree#processTreeNode(FacesContext, PhaseId)}.
-     * @see Tree#processTreeNode(FacesContext, PhaseId)
-     */
-    private void process(FacesContext context, PhaseId phaseId) {
-        Components.getClosestParent(this, Tree.class).processTreeNode(context, phaseId);
-    }
+	/**
+	 * Delegate processing of the tree node to {@link Tree#processTreeNode(FacesContext, PhaseId)}.
+	 * @see Tree#processTreeNode(FacesContext, PhaseId)
+	 */
+	private void process(FacesContext context, PhaseId phaseId) {
+		Components.getClosestParent(this, Tree.class).processTreeNode(context, phaseId);
+	}
 
 	/**
 	 * Validate the component hierarchy.
-     * @throws IllegalArgumentException When there is no parent of type {@link TreeNodeItem}, or when there are any
-     * children.
+	 * @throws IllegalArgumentException When there is no parent of type {@link TreeNodeItem}, or when there are any
+	 * children.
 	 */
 	private void validateHierarchy() {
-        if (Components.getClosestParent(this, TreeNodeItem.class) == null) {
-            throw new IllegalArgumentException(ERROR_INVALID_PARENT);
-        }
+		if (Components.getClosestParent(this, TreeNodeItem.class) == null) {
+			throw new IllegalArgumentException(ERROR_INVALID_PARENT);
+		}
 
-        if (getChildCount() > 0) {
-            StringBuilder childClassNames = new StringBuilder();
+		if (getChildCount() > 0) {
+			StringBuilder childClassNames = new StringBuilder();
 
-            for (UIComponent child : getChildren()) {
-                childClassNames.append(", ").append(child.getClass().getName());
-            }
+			for (UIComponent child : getChildren()) {
+				childClassNames.append(", ").append(child.getClass().getName());
+			}
 
-            throw new IllegalArgumentException(String.format(ERROR_CHILDREN_DISALLOWED, childClassNames.substring(2)));
-        }
+			throw new IllegalArgumentException(String.format(ERROR_CHILDREN_DISALLOWED, childClassNames.substring(2)));
+		}
 	}
 
 }

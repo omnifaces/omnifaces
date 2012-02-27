@@ -52,26 +52,26 @@ public final class Components {
 		return FacesContext.getCurrentInstance().getViewRoot().findComponent(expression);
 	}
 
-    /**
-     * Returns from the given component the closest parent of the given parent type, or <code>null</code> if none
-     * is found.
-     * @param <T> The generic parent type.
-     * @param component The component to return the closest parent of the given parent type for.
-     * @param parentType The parent type.
-     * @return From the given component the closest parent of the given parent type, or <code>null</code> if none
-     * is found.
-     */
-    public static <T extends UIComponent> T getClosestParent(UIComponent component, Class<T> parentType) {
-        UIComponent parent = component.getParent();
+	/**
+	 * Returns from the given component the closest parent of the given parent type, or <code>null</code> if none
+	 * is found.
+	 * @param <T> The generic parent type.
+	 * @param component The component to return the closest parent of the given parent type for.
+	 * @param parentType The parent type.
+	 * @return From the given component the closest parent of the given parent type, or <code>null</code> if none
+	 * is found.
+	 */
+	public static <T extends UIComponent> T getClosestParent(UIComponent component, Class<T> parentType) {
+		UIComponent parent = component.getParent();
 
-        while (parent != null && !parentType.isAssignableFrom(parent.getClass())) {
-            parent = parent.getParent();
-        }
+		while (parent != null && !parentType.isAssignableFrom(parent.getClass())) {
+			parent = parent.getParent();
+		}
 
-        return parentType.cast(parent);
-    }
+		return parentType.cast(parent);
+	}
 
-    /**
+	/**
 	 * Returns the converted/validated value of the given UIInput component without the need to know if the given
 	 * component has already been converted/validated or not. If the conversion/validation has failed for the UIInput
 	 * component, then this method will return <code>null</code>.
