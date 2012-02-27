@@ -17,24 +17,4 @@
     xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facesconfig_2_0.xsd"
     version="2.0"
 >
-    <component>
-        <component-type>org.omnifaces.component.Tree</component-type>
-        <component-class>org.omnifaces.component.tree.Tree</component-class>
-    </component>
-
-    <component>
-        <component-type>org.omnifaces.component.TreeNode</component-type>
-        <component-class>org.omnifaces.component.tree.TreeNode</component-class>
-    </component>
-
-    <component>
-        <component-type>org.omnifaces.component.TreeNodeItem</component-type>
-        <component-class>org.omnifaces.component.tree.TreeNodeItem</component-class>
-    </component>
-
-    <component>
-        <component-type>org.omnifaces.component.TreeInsertChildren</component-type>
-        <component-class>org.omnifaces.component.tree.TreeInsertChildren</component-class>
-    </component>
-
 </faces-config>

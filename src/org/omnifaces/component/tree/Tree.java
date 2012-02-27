@@ -14,22 +14,24 @@ package org.omnifaces.component.tree;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import javax.el.ValueExpression;
+import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UINamingContainer;
 import javax.faces.context.FacesContext;
+import javax.faces.event.PhaseId;
 import javax.faces.render.Renderer;
 
+import org.omnifaces.component.EditableValueHolderStateHelper;
 import org.omnifaces.model.tree.ListTreeModel;
 import org.omnifaces.model.tree.TreeModel;
 import org.omnifaces.util.Components;
+import org.omnifaces.util.Faces;
 
 /**
- * <strong>Tree</strong> is a {@link UIComponent} that supports data binding to a tree of data objects represented by
+ * <strong>Tree</strong> is an {@link UIComponent} that supports data binding to a tree of data objects represented by
  * a {@link TreeModel} instance, which is the current value of this component itself (typically established via a
  * {@link ValueExpression}). During iterative processing over the nodes of tree in the tree model, the object for the
  * current node is exposed as a request attribute under the key specified by the <code>var</code> attribute. The node
@@ -39,16 +41,37 @@ import org.omnifaces.util.Components;
  * <p>
  * This component does not have a renderer since it does not render any markup by itself. This allows the developers to
  * have full control over the markup of the tree by declaring the appropriate JSF components or HTML elements in the
- * markup.
+ * markup. Here is a basic usage example:
+ * <pre>
+ * &lt;o:tree value="#{bean.treeModel}" var="item" varNode="node"&gt;
+ *   &lt;o:treeNode&gt;
+ *     &lt;ul&gt;
+ *       &lt;o:treeNodeItem&gt;
+ *         &lt;li&gt;#{node.index} #{item.someProperty}&lt;/li&gt;
+ *         &lt;o:treeInsertChildren /&gt;
+ *       &lt;/o:treeNodeItem&gt;
+ *     &lt;/ul&gt;
+ *   &lt;/o:treeNode&gt;
+ * &lt;/o:tree&gt;
+ * </pre>
  *
  * @author Bauke Scholtz
  * @see TreeModel
  * @see TreeNode
- *
- * TODO: Implement processXxx() methods so that we can have UIInput components as children.
  */
-@SuppressWarnings({ "rawtypes", "unchecked" }) // For TreeModel. We don't care about its actual type anyway.
+@FacesComponent(Tree.COMPONENT_TYPE)
+@SuppressWarnings("rawtypes") // For TreeModel. We don't care about its actual type anyway.
 public class Tree extends UINamingContainer {
+
+	// TODO: Extract shared code of all Tree components to some abstract base class.
+
+	// Public constants -----------------------------------------------------------------------------------------------
+
+	/** The standard component type. */
+	public static final String COMPONENT_TYPE = "org.omnifaces.component.tree.Tree";
+
+	/** The standard component family. */
+	public static final String COMPONENT_FAMILY = "org.omnifaces.component.tree";
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
@@ -69,19 +92,11 @@ public class Tree extends UINamingContainer {
 		value, var, varNode;
 	}
 
-	// Public constants -----------------------------------------------------------------------------------------------
-
-	/** The standard component type. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.Tree";
-
-	/** The standard component family. */
-	public static final String COMPONENT_FAMILY = "org.omnifaces.component";
-
-	// Properties -----------------------------------------------------------------------------------------------------
+	// Variables ------------------------------------------------------------------------------------------------------
 
 	private TreeModel model;
-	private TreeModel currentModelNode;
 	private Map<Integer, TreeNode> nodes;
+	private TreeModel currentModelNode;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -99,7 +114,7 @@ public class Tree extends UINamingContainer {
 		String containerClientId = super.getContainerClientId(context);
 
 		if (currentModelNode != null) {
-	        return new StringBuilder(containerClientId)
+			containerClientId = new StringBuilder(containerClientId)
 		    	.append(UINamingContainer.getSeparatorChar(context))
 		    	.append(currentModelNode.getIndex())
 		    	.toString();
@@ -123,32 +138,96 @@ public class Tree extends UINamingContainer {
 	}
 
 	/**
-	 * An override which sets the model to <code>null</code> whenever the <code>value</code> attribute is been set and
-	 * checks if this isn't been invoked on <code>var</code> or <code>varNode</code> attribute. Finally it delegates to
-	 * the super method.
-	 * @throws IllegalArgumentException If this value expression is been set on <code>var</code> or <code>varNode</code>
-	 * attribute.
+	 * An override which checks if this isn't been invoked on <code>var</code> or <code>varNode</code> attribute.
+	 * Finally it delegates to the super method.
+	 * @throws IllegalArgumentException When this value expression is been set on <code>var</code> or
+	 * <code>varNode</code> attribute.
 	 */
 	@Override
 	public void setValueExpression(String name, ValueExpression binding) {
-		if ("value".equals(name)) {
-			this.model = null;
-		}
-		else if ("var".equals(name) || "varNode".equals(name)) {
+		if ("var".equals(name) || "varNode".equals(name)) {
 			throw new IllegalArgumentException(ERROR_EXPRESSION_DISALLOWED);
 		}
 
 		super.setValueExpression(name, binding);
 	}
 
-	/**
-	 * Checks if there are any children of {@link TreeNode} and collect them in a mapping by their level attribute.
-	 * @throws IllegalArgumentException When this component is nested in another {@link Tree}, or when there aren't any
-	 * children of type {@link TreeNode}, or when a child isn't of type {@link TreeNode} or when there are multiple
-	 * {@link TreeNode} children with the same level attribute.
-	 */
+    @Override
+	public void processDecodes(FacesContext context) {
+		validateHierarchy();
+    	process(context, PhaseId.APPLY_REQUEST_VALUES);
+    }
+
+    @Override
+	public void processValidators(FacesContext context) {
+    	process(context, PhaseId.PROCESS_VALIDATIONS);
+    }
+
+    @Override
+	public void processUpdates(FacesContext context) {
+    	process(context, PhaseId.UPDATE_MODEL_VALUES);
+    }
+
 	@Override
-	public void encodeBegin(FacesContext context) throws IOException {
+	public void encodeAll(FacesContext context) throws IOException {
+		validateHierarchy();
+		process(context, PhaseId.RENDER_RESPONSE);
+	}
+
+	// Internal actions -----------------------------------------------------------------------------------------------
+
+	/**
+	 * Set the root node and delegate the call to {@link #processTreeNode(FacesContext, PhaseId)}.
+	 * @param context The faces context to work with.
+	 * @param phaseId The current phase ID.
+     */
+	private void process(FacesContext context, PhaseId phaseId) {
+        if (!isRendered()) {
+            return;
+        }
+
+        if (phaseId == PhaseId.APPLY_REQUEST_VALUES || phaseId == PhaseId.RENDER_RESPONSE) {
+            prepareNodes();
+            prepareModel();
+        }
+
+		setCurrentModelNode(context, model);
+		processTreeNode(context, phaseId);
+        setCurrentModelNode(context, null);
+	}
+
+	/**
+	 * If the current model node isn't a leaf (i.e. it has any children), then obtain the {@link TreeNode} associated
+	 * with the level of the current model node. If it isn't null and is rendered, then process it according to the
+	 * rules of the given phase ID. This method is also called by {@link TreeInsertChildren}.
+	 * @param context The faces context to work with.
+	 * @param phaseId The current phase ID.
+	 * @see TreeModel#isLeaf()
+	 * @see TreeModel#getLevel()
+	 * @see TreeInsertChildren
+	 */
+    protected void processTreeNode(FacesContext context, PhaseId phaseId) {
+    	if (!currentModelNode.isLeaf()) {
+			TreeNode treeNode = nodes.get(currentModelNode.getLevel());
+
+			if (treeNode == null) {
+				treeNode = nodes.get(null);
+			}
+
+			if (treeNode == null) {
+				return;
+			}
+
+			treeNode.process(context, phaseId);
+		}
+    }
+
+	/**
+	 * Validate the component hierarchy.
+	 * @throws IllegalArgumentException When this component is nested in another {@link Tree}, or when there aren't any
+	 * children of type {@link TreeNode}.
+	 */
+	private void validateHierarchy() {
 		if (Components.getClosestParent(this, Tree.class) != null) {
 			throw new IllegalArgumentException(ERROR_NESTING_DISALLOWED);
 		}
@@ -156,7 +235,14 @@ public class Tree extends UINamingContainer {
 		if (getChildCount() == 0) {
 			throw new IllegalArgumentException(ERROR_NO_CHILDREN);
 		}
+	}
 
+	/**
+	 * Prepare the tree nodes by finding direct {@link TreeNode} children and collecting them by their level attribute.
+	 * @throws IllegalArgumentException When a direct child component isn't of type {@link TreeNode}, or when there are
+	 * multiple {@link TreeNode} components with the same level.
+	 */
+	private void prepareNodes() {
 		nodes = new HashMap<Integer, TreeNode>(getChildCount());
 
 		for (UIComponent child : getChildren()) {
@@ -166,84 +252,17 @@ public class Tree extends UINamingContainer {
 				if (nodes.put(node.getLevel(), node) != null) {
 					throw new IllegalArgumentException(String.format(ERROR_DUPLICATE_NODE, node.getLevel()));
 				}
-			}
-			else {
+			} else {
 				throw new IllegalArgumentException(String.format(ERROR_INVALID_CHILD, child.getClass().getName()));
 			}
 		}
-
-		super.encodeBegin(context);
 	}
 
 	/**
-	 * If this component is to be rendered, set the associated <code>var</code> and/or <code>varNode</code> values and
-	 * encode the current {@link TreeNode}.
-	 * @see #setCurrentModelNode(TreeModel)
-	 * @see #encodeTreeNode(FacesContext)
+	 * Prepare the tree model associated with the <code>value</code> attribute.
+	 * @throws IllegalArgumentException When the <code>value</code> isn't of type {@link TreeModel}.
 	 */
-	@Override
-	public void encodeChildren(FacesContext context) throws IOException {
-		if (!isRendered()) {
-			return;
-		}
-
-		setCurrentModelNode(getModel());
-		encodeTreeNode(context);
-		setCurrentModelNode(null);
-	}
-
-	// Internal actions -----------------------------------------------------------------------------------------------
-
-	/**
-	 * If the current model node isn't a leaf (i.e. it has any children), then obtain the {@link TreeNode} associated
-	 * with the level of the current model node. If it isn't null, then encode it.
-	 * @param context The faces context to work with.
-	 * @throws IOException If something fails at I/O level.
-	 * @see TreeModel#isLeaf()
-	 * @see TreeModel#getLevel()
-	 */
-	protected void encodeTreeNode(FacesContext context) throws IOException {
-		if (!currentModelNode.isLeaf()) {
-			TreeNode node = nodes.get(currentModelNode.getLevel());
-
-			if (node == null) {
-				node = nodes.get(null);
-			}
-
-			if (node != null) {
-				node.encodeChildren(context);
-			}
-		}
-	}
-
-	/**
-	 * For every child of the current model node, set the associated <code>var</code> and/or <code>varNode</code> values
-	 * and encode the children of the given {@link TreeNodeItem}.
-	 * @param context The faces context to work with.
-	 * @param treeNodeItem The tree node item to encode its children.
-	 * @throws IOException If something fails at I/O level.
-	 * @see #setCurrentModelNode(TreeModel)
-	 */
-	protected void encodeTreeNodeItem(FacesContext context, TreeNodeItem treeNodeItem) throws IOException {
-		for (TreeModel child : (List<TreeModel>) currentModelNode.getChildren()) {
-			setCurrentModelNode(child);
-			treeNodeItem.encodeChildren(context);
-			setCurrentModelNode(null);
-		}
-	}
-
-	// Internal getters/setters ---------------------------------------------------------------------------------------
-
-	/**
-	 * Returns the tree model associated with the <code>value</code> attribute.
-	 * @return The tree model associated with the <code>value</code> attribute.
-	 * @throws IllegalArgumentException If the tree model isn't of type {@link TreeModel}.
-	 */
-	private TreeModel getModel() {
-		if (model != null) {
-			return model;
-		}
-
+	private void prepareModel() {
 		Object value = getValue();
 
 		if (value == null) {
@@ -253,9 +272,9 @@ public class Tree extends UINamingContainer {
 		} else {
 			throw new IllegalArgumentException(String.format(ERROR_INVALID_MODEL, value.getClass()));
 		}
-
-		return model;
 	}
+
+	// Internal getters/setters ---------------------------------------------------------------------------------------
 
 	/**
 	 * Sets the current node of the tree model. Its wrapped data will be set as request attribute associated with the
@@ -263,9 +282,13 @@ public class Tree extends UINamingContainer {
 	 * <code>varNode</code> attribute, if any.
 	 * @param currentModelNode The current node of the tree model.
 	 */
-	private void setCurrentModelNode(TreeModel currentModelNode) {
+	protected void setCurrentModelNode(FacesContext context, TreeModel currentModelNode) {
+
+		// Save state of any child input fields of previous node before setting new model.
+		EditableValueHolderStateHelper.save(context, getStateHelper(), getFacetsAndChildren());
+
 		this.currentModelNode = currentModelNode;
-		Map<String, Object> requestMap = FacesContext.getCurrentInstance().getExternalContext().getRequestMap();
+		Map<String, Object> requestMap = Faces.getRequestMap();
 		String var = getVar();
 		String varNode = getVarNode();
 
@@ -277,25 +300,19 @@ public class Tree extends UINamingContainer {
 			requestMap.put(varNode, currentModelNode);
 		}
 
-		resetClientIds(getFacetsAndChildren());
+		// Restore any saved state of any child input fields of current node before continuing.
+		EditableValueHolderStateHelper.restore(context, getStateHelper(), getFacetsAndChildren());
 	}
-
-	// Helpers --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Reset the cached client IDs of any nested facets and children so that their client ID will be regenerated based
-	 * on {@link #getContainerClientId(FacesContext)} of the current tree component.
-	 * @param facetsAndChildren The iterator with all facets and children.
+	 * Returns the current node of the tree model.
+	 * @return The current node of the tree model.
 	 */
-	private void resetClientIds(Iterator<UIComponent> facetsAndChildren) {
-		while (facetsAndChildren.hasNext()) {
-			UIComponent child = facetsAndChildren.next();
-			child.setId(child.getId()); // This implicitly resets the cached client ID. See JSF spec 3.1.6.
-			resetClientIds(child.getFacetsAndChildren());
-		}
+	protected TreeModel getCurrentModelNode() {
+		return currentModelNode;
 	}
 
-	// Attribute getters/setters --------------------------------------------------------------------------------------
+    // Attribute getters/setters --------------------------------------------------------------------------------------
 
 	/**
 	 * Returns the tree model.
@@ -310,7 +327,6 @@ public class Tree extends UINamingContainer {
 	 * @param value The tree model.
 	 */
 	public void setValue(Object value) {
-		model = null;
 		getStateHelper().put(PropertyKeys.value, value);
 	}
 
@@ -324,7 +340,8 @@ public class Tree extends UINamingContainer {
 
 	/**
 	 * Sets the name of the request attribute which exposes the wrapped data of the current node of the tree model.
-	 * @param var The name of the request attribute which exposes the wrapped data of the current node of the tree model.
+	 * @param var The name of the request attribute which exposes the wrapped data of the current node of the tree
+	 * model.
 	 */
 	public void setVar(String var) {
 		getStateHelper().put(PropertyKeys.var, var);

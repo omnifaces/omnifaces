@@ -33,21 +33,23 @@ import javax.servlet.http.HttpServletResponseWrapper;
 /**
  * This component is used to catch the output from a Servlet resource and render it as output
  * to the JSF writer. In effect, this allows you to include both Servlets and JSP pages in e.g. Facelets.
- * 
+ *
  * @author Arjan Tijms
  *
  */
 @FacesComponent(ResourceInclude.COMPONENT_TYPE)
 public class ResourceInclude extends UIComponentBase {
-	
+
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.resourceinclude.ResourceInclude";
-	
+
 	public static final String COMPONENT_FAMILY = "org.omnifaces.component";
 
+	@Override
 	public String getFamily() {
 		return COMPONENT_FAMILY;
 	}
 
+	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
 		try {
 			ExternalContext externalContext = context.getExternalContext();
@@ -60,7 +62,7 @@ public class ResourceInclude extends UIComponentBase {
 			// Catch the resource's output.
 			CharResponseWrapper responseWrapper = new CharResponseWrapper(response);
 			requestDispatcher.include(request, responseWrapper);
-			
+
 			// Write the output from the resource to the JSF response writer.
 			context.getResponseWriter().write(responseWrapper.toString());
 		}
@@ -116,5 +118,5 @@ public class ResourceInclude extends UIComponentBase {
 		}
 
 	}
-	
+
 }
