@@ -12,17 +12,16 @@
  */
 package org.omnifaces.component.tree;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.el.ValueExpression;
 import javax.faces.component.FacesComponent;
+import javax.faces.component.NamingContainer;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UINamingContainer;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
-import javax.faces.render.Renderer;
 
 import org.omnifaces.component.EditableValueHolderStateHelper;
 import org.omnifaces.model.tree.ListTreeModel;
@@ -47,8 +46,10 @@ import org.omnifaces.util.Faces;
  *   &lt;o:treeNode&gt;
  *     &lt;ul&gt;
  *       &lt;o:treeNodeItem&gt;
- *         &lt;li&gt;#{node.index} #{item.someProperty}&lt;/li&gt;
- *         &lt;o:treeInsertChildren /&gt;
+ *         &lt;li&gt;
+ *           #{node.index} #{item.someProperty}
+ *           &lt;o:treeInsertChildren /&gt;
+ *         &lt;/li&gt;
  *       &lt;/o:treeNodeItem&gt;
  *     &lt;/ul&gt;
  *   &lt;/o:treeNode&gt;
@@ -61,17 +62,12 @@ import org.omnifaces.util.Faces;
  */
 @FacesComponent(Tree.COMPONENT_TYPE)
 @SuppressWarnings("rawtypes") // For TreeModel. We don't care about its actual type anyway.
-public class Tree extends UINamingContainer {
-
-	// TODO: Extract shared code of all Tree components to some abstract base class.
+public class Tree extends TreeFamily implements NamingContainer {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
 	/** The standard component type. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.tree.Tree";
-
-	/** The standard component family. */
-	public static final String COMPONENT_FAMILY = "org.omnifaces.component.tree";
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
@@ -89,6 +85,7 @@ public class Tree extends UINamingContainer {
 		"TreeNode with level '%s' is already declared. Choose a different level or remove it.";
 
 	private enum PropertyKeys {
+		// Cannot be uppercased. They have to exactly match the attribute names.
 		value, var, varNode;
 	}
 
@@ -97,15 +94,6 @@ public class Tree extends UINamingContainer {
 	private TreeModel model;
 	private Map<Integer, TreeNode> nodes;
 	private TreeModel currentModelNode;
-
-	// Constructors ---------------------------------------------------------------------------------------------------
-
-	/**
-	 * Construct a new {@link Tree} instance.
-	 */
-	public Tree() {
-		setRendererType(null); // This component doesn't render anything by itselves.
-	}
 
 	// UIComponent overrides ------------------------------------------------------------------------------------------
 
@@ -123,20 +111,6 @@ public class Tree extends UINamingContainer {
 		return containerClientId;
 	}
 
-	@Override
-	public String getFamily() {
-		return COMPONENT_FAMILY;
-	}
-
-	/**
-	 * Returns <code>true</code> even though this component doesn't have a {@link Renderer}, because we want to encode
-	 * all children anyway.
-	 */
-	@Override
-	public boolean getRendersChildren() {
-		return true;
-	}
-
 	/**
 	 * An override which checks if this isn't been invoked on <code>var</code> or <code>varNode</code> attribute.
 	 * Finally it delegates to the super method.
@@ -145,43 +119,38 @@ public class Tree extends UINamingContainer {
 	 */
 	@Override
 	public void setValueExpression(String name, ValueExpression binding) {
-		if ("var".equals(name) || "varNode".equals(name)) {
+		if (PropertyKeys.var.toString().equals(name) || PropertyKeys.varNode.toString().equals(name)) {
 			throw new IllegalArgumentException(ERROR_EXPRESSION_DISALLOWED);
 		}
 
 		super.setValueExpression(name, binding);
 	}
 
-	@Override
-	public void processDecodes(FacesContext context) {
-		validateHierarchy();
-		process(context, PhaseId.APPLY_REQUEST_VALUES);
-	}
+	// Actions --------------------------------------------------------------------------------------------------------
 
+	/**
+	 * Validate the component hierarchy.
+	 * @throws IllegalArgumentException When this component is nested in another {@link Tree}, or when there aren't any
+	 * children of type {@link TreeNode}.
+	 */
 	@Override
-	public void processValidators(FacesContext context) {
-		process(context, PhaseId.PROCESS_VALIDATIONS);
-	}
+	protected void validateHierarchy() {
+		if (Components.getClosestParent(this, Tree.class) != null) {
+			throw new IllegalArgumentException(ERROR_NESTING_DISALLOWED);
+		}
 
-	@Override
-	public void processUpdates(FacesContext context) {
-		process(context, PhaseId.UPDATE_MODEL_VALUES);
+		if (getChildCount() == 0) {
+			throw new IllegalArgumentException(ERROR_NO_CHILDREN);
+		}
 	}
-
-	@Override
-	public void encodeAll(FacesContext context) throws IOException {
-		validateHierarchy();
-		process(context, PhaseId.RENDER_RESPONSE);
-	}
-
-	// Internal actions -----------------------------------------------------------------------------------------------
 
 	/**
 	 * Set the root node and delegate the call to {@link #processTreeNode(FacesContext, PhaseId)}.
 	 * @param context The faces context to work with.
 	 * @param phaseId The current phase ID.
 	 */
-	private void process(FacesContext context, PhaseId phaseId) {
+	@Override
+	protected void process(FacesContext context, PhaseId phaseId) {
 		if (!isRendered()) {
 			return;
 		}
@@ -191,9 +160,12 @@ public class Tree extends UINamingContainer {
 			prepareModel();
 		}
 
-		setCurrentModelNode(context, model);
-		processTreeNode(context, phaseId);
-		setCurrentModelNode(context, null);
+		try {
+			setCurrentModelNode(context, model);
+			processTreeNode(context, phaseId);
+		} finally {
+			setCurrentModelNode(context, null);
+		}
 	}
 
 	/**
@@ -219,21 +191,6 @@ public class Tree extends UINamingContainer {
 			}
 
 			treeNode.process(context, phaseId);
-		}
-	}
-
-	/**
-	 * Validate the component hierarchy.
-	 * @throws IllegalArgumentException When this component is nested in another {@link Tree}, or when there aren't any
-	 * children of type {@link TreeNode}.
-	 */
-	private void validateHierarchy() {
-		if (Components.getClosestParent(this, Tree.class) != null) {
-			throw new IllegalArgumentException(ERROR_NESTING_DISALLOWED);
-		}
-
-		if (getChildCount() == 0) {
-			throw new IllegalArgumentException(ERROR_NO_CHILDREN);
 		}
 	}
 

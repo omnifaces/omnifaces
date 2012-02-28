@@ -30,14 +30,14 @@ public final class EditableValueHolderStateHelper {
 
 	// UIData and UIRepeat have a similar nested class. Too bad that they aren't publicly reuseable.
 
-	// Variables --------------------------------------------------------------------------------------------------
+	// Variables ------------------------------------------------------------------------------------------------------
 
 	private Object submittedValue;
 	private boolean valid;
 	private Object localValue;
 	private boolean localValueSet;
 
-	// Actions ----------------------------------------------------------------------------------------------------
+	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Save the state of the given {@link EditableValueHolder}.
@@ -67,7 +67,7 @@ public final class EditableValueHolderStateHelper {
 	 * Save state of any {@link EditableValueHolder} children.
 	 * @param context The faces context to work with.
 	 * @param stateHelper The state helper of the parent component.
-	 * @param children An iterator with all child facets and components as obtained by
+	 * @param children An iterator with all child facets and components of the parent component as obtained by
 	 * {@link UIComponentBase#getFacetsAndChildren()}.
 	 */
 	public static void save(FacesContext context, StateHelper stateHelper, Iterator<UIComponent> children) {
@@ -88,7 +88,7 @@ public final class EditableValueHolderStateHelper {
 	 * Restore state of any {@link EditableValueHolder} children.
 	 * @param context The faces context to work with.
 	 * @param stateHelper The state helper of the parent component.
-	 * @param children An iterator with all child facets and components as obtained by
+	 * @param children An iterator with all child facets and components of the parent component as obtained by
 	 * {@link UIComponentBase#getFacetsAndChildren()}.
 	 */
 	public static void restore(FacesContext context, StateHelper stateHelper, Iterator<UIComponent> children) {

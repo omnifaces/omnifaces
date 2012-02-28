@@ -12,15 +12,10 @@
  */
 package org.omnifaces.component.tree;
 
-import java.io.IOException;
-
-import javax.faces.FacesException;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponent;
-import javax.faces.component.UIComponentBase;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
-import javax.faces.render.Renderer;
 import javax.swing.tree.TreeModel;
 
 /**
@@ -37,7 +32,7 @@ import javax.swing.tree.TreeModel;
  * @see TreeNodeItem
  */
 @FacesComponent(TreeNode.COMPONENT_TYPE)
-public class TreeNode extends UIComponentBase {
+public class TreeNode extends TreeFamily {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
@@ -50,90 +45,34 @@ public class TreeNode extends UIComponentBase {
 		"TreeNode must have a direct parent of type Tree. Encountered parent of type '%s'.";
 
 	private enum PropertyKeys {
+		// Cannot be uppercased. They have to exactly match the attribute names.
 		level;
 	}
 
-	// Constructors ---------------------------------------------------------------------------------------------------
-
-	/**
-	 * Construct a new {@link TreeNode} instance.
-	 */
-	public TreeNode() {
-		setRendererType(null); // This component doesn't render anything by itselves.
-	}
-
-	// UIComponent overrides ------------------------------------------------------------------------------------------
-
-	@Override
-	public String getFamily() {
-		return Tree.COMPONENT_FAMILY;
-	}
-
-	/**
-	 * Returns <code>true</code> even though this component doesn't have a {@link Renderer}, because we want to encode
-	 * all children anyway.
-	 */
-	@Override
-	public boolean getRendersChildren() {
-		return true;
-	}
-
-	@Override
-	public void processDecodes(FacesContext context) {
-		validateHierarchy();
-		process(context, PhaseId.APPLY_REQUEST_VALUES);
-	}
-
-	@Override
-	public void processValidators(FacesContext context) {
-		process(context, PhaseId.PROCESS_VALIDATIONS);
-	}
-
-	@Override
-	public void processUpdates(FacesContext context) {
-		process(context, PhaseId.UPDATE_MODEL_VALUES);
-	}
-
-	@Override
-	public void encodeAll(FacesContext context) throws IOException {
-		validateHierarchy();
-		process(context, PhaseId.RENDER_RESPONSE);
-	}
-
-	// Internal actions -----------------------------------------------------------------------------------------------
-
-	/**
-	 * This method is by design only called by {@link Tree#processTreeNode(FacesContext, PhaseId)}.
-	 * @see Tree#processTreeNode(FacesContext, PhaseId)
-	 */
-	protected void process(FacesContext context, PhaseId phaseId) {
-		if (!isRendered()) {
-			return;
-		}
-
-		if (phaseId == PhaseId.APPLY_REQUEST_VALUES) {
-			super.processDecodes(context);
-		} else if (phaseId == PhaseId.PROCESS_VALIDATIONS) {
-			super.processValidators(context);
-		} else if (phaseId == PhaseId.UPDATE_MODEL_VALUES) {
-			super.processUpdates(context);
-		} else if (phaseId == PhaseId.RENDER_RESPONSE) {
-			try {
-				super.encodeChildren(context);
-			} catch (IOException e) {
-				throw new FacesException(e);
-			}
-		}
-	}
+	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Validate the component hierarchy.
 	 * @throws IllegalArgumentException When the direct parent component isn't of type {@link Tree}.
 	 */
-	private void validateHierarchy() {
+	@Override
+	protected void validateHierarchy() {
 		if (!(getParent() instanceof Tree)) {
 			throw new IllegalArgumentException(String.format(ERROR_INVALID_PARENT, getParent().getClass().getName()));
 		}
+	}
+
+	/**
+	 * This method is by design only called by {@link Tree#processTreeNode(FacesContext, PhaseId)}.
+	 * @see Tree#processTreeNode(FacesContext, PhaseId)
+	 */
+	@Override
+	protected void process(FacesContext context, PhaseId phaseId) {
+		if (!isRendered()) {
+			return;
+		}
+
+		processSuper(context, phaseId);
 	}
 
 	// Getters/setters ------------------------------------------------------------------------------------------------
