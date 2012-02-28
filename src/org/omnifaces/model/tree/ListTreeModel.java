@@ -14,6 +14,7 @@ package org.omnifaces.model.tree;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -28,25 +29,10 @@ public class ListTreeModel<T> implements TreeModel<T> {
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	private T data;
-	private TreeModel<T> parent;
-	private List<TreeModel<T>> children = new ArrayList<TreeModel<T>>();
-
-	// Constructors ---------------------------------------------------------------------------------------------------
-
-	/**
-	 * Default constructor. It does nothing special.
-	 */
-	public ListTreeModel() {
-		// Just keep alive.
-	}
-
-	/**
-	 * Convenience constructor which immediately sets the given data as wrapped data of the current tree node.
-	 * @param data The wrapped data of current tree node.
-	 */
-	public ListTreeModel(T data) {
-		this.data = data;
-	}
+	private ListTreeModel<T> parent;
+	private List<TreeModel<T>> children;
+	private List<TreeModel<T>> unmodifiableChildren;
+	private int index;
 
 	// Mutators -------------------------------------------------------------------------------------------------------
 
@@ -56,24 +42,17 @@ public class ListTreeModel<T> implements TreeModel<T> {
 	}
 
 	@Override
-	public void setParent(TreeModel<T> parent) {
-		this.parent = parent;
-	}
-
-	@Override
 	public TreeModel<T> addChild(T data) {
-		TreeModel<T> child = new ListTreeModel<T>(data);
-		child.setParent(this);
+		if (children == null) {
+			children = new ArrayList<TreeModel<T>>();
+		}
+
+		ListTreeModel<T> child = new ListTreeModel<T>();
+		child.data = data;
+		child.parent = this;
+		child.index = children.size();
 		children.add(child);
 		return child;
-	}
-
-	@Override
-	public void remove() {
-		if (parent != null) {
-			parent.getChildren().remove(this);
-			parent = null;
-		}
 	}
 
 	// Accessors ------------------------------------------------------------------------------------------------------
@@ -89,13 +68,24 @@ public class ListTreeModel<T> implements TreeModel<T> {
 	}
 
 	@Override
+	public int getChildCount() {
+		return children == null ? 0 : children.size();
+	}
+
+	@Override
 	public List<TreeModel<T>> getChildren() {
-		return children;
+		if (unmodifiableChildren == null && children == null) {
+			unmodifiableChildren = Collections.emptyList();
+		} else if (unmodifiableChildren == null || unmodifiableChildren.size() != children.size()) {
+			unmodifiableChildren = Collections.unmodifiableList(children);
+		}
+
+		return unmodifiableChildren;
 	}
 
 	@Override
 	public Iterator<TreeModel<T>> iterator() {
-		return children.iterator();
+		return getChildren().iterator();
 	}
 
 	@Override
@@ -105,7 +95,7 @@ public class ListTreeModel<T> implements TreeModel<T> {
 
 	@Override
 	public String getIndex() {
-		return parent == null ? null : (parent.getIndex() == null ? "" : parent.getIndex() + "_") + parent.getChildren().indexOf(this);
+		return parent == null ? null : (parent.getIndex() == null ? "" : parent.getIndex() + "_") + index;
 	}
 
 	// Checkers -------------------------------------------------------------------------------------------------------
@@ -117,17 +107,17 @@ public class ListTreeModel<T> implements TreeModel<T> {
 
 	@Override
 	public boolean isLeaf() {
-		return children.isEmpty();
+		return children == null;
 	}
 
 	@Override
 	public boolean isFirst() {
-		return parent != null && parent.getChildren().indexOf(this) == 0;
+		return parent != null && index == 0;
 	}
 
 	@Override
 	public boolean isLast() {
-		return parent != null && parent.getChildren().indexOf(this) + 1 == parent.getChildren().size();
+		return parent != null && index + 1 == parent.getChildCount();
 	}
 
 	// Object overrides -----------------------------------------------------------------------------------------------
@@ -161,7 +151,7 @@ public class ListTreeModel<T> implements TreeModel<T> {
 
 	@Override
 	public String toString() {
-		return data + "" + children;
+		return (data == null ? "" : data) + "" + (children == null ? "" : children);
 	}
 
 }

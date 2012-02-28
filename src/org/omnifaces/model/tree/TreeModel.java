@@ -35,21 +35,10 @@ public interface TreeModel<T> extends Iterable<TreeModel<T>> {
 	void setData(T data);
 
 	/**
-	 * Sets the parent of the current tree node.
-	 * @param parent The parent of current tree node.
-	 */
-	void setParent(TreeModel<T> parent);
-
-	/**
 	 * Creates and adds a child tree node with the given data to the current tree node and return it.
 	 * @return The newly created and added child tree node of the current tree node.
 	 */
 	TreeModel<T> addChild(T data);
-
-	/**
-	 * Removes the current tree node and all of its children from its parent, if any.
-	 */
-	void remove();
 
 	// Accessors ------------------------------------------------------------------------------------------------------
 
@@ -66,14 +55,22 @@ public interface TreeModel<T> extends Iterable<TreeModel<T>> {
 	TreeModel<T> getParent();
 
 	/**
-	 * Returns the child tree nodes of the current tree node.
-	 * @return The child tree nodes of the current tree node.
+	 * Returns the count of the children of the current tree node.
+	 * @return The count of the children of the current tree node.
+	 */
+	int getChildCount();
+
+	/**
+	 * Returns an unmodifiable list of all child tree nodes of the current tree node. Adding new children should be
+	 * done by the {@link #addChild(Object)} method. Adding/inserting/removing elements is not supported on the list.
+	 * @return An unmodifiable list of all child tree nodes of the current tree node.
 	 */
 	List<TreeModel<T>> getChildren();
 
 	/**
-	 * Returns an iterator over the children of the current tree node.
-	 * @return An iterator over the children of the current tree node.
+	 * Returns an unmodifiable iterator over the children of the current tree node. Adding/inserting/removing elements
+	 * is not supported on the iterator.
+	 * @return An unmodifiable iterator over the children of the current tree node.
 	 * @see Iterable
 	 */
 	@Override
