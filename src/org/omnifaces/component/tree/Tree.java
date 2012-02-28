@@ -27,7 +27,6 @@ import org.omnifaces.component.EditableValueHolderStateHelper;
 import org.omnifaces.model.tree.ListTreeModel;
 import org.omnifaces.model.tree.TreeModel;
 import org.omnifaces.util.Components;
-import org.omnifaces.util.Faces;
 
 /**
  * <strong>Tree</strong> is an {@link UIComponent} that supports data binding to a tree of data objects represented by
@@ -160,11 +159,13 @@ public class Tree extends TreeFamily implements NamingContainer {
 			prepareModel();
 		}
 
+		Object[] originalVars = captureOriginalVars(context);
+
 		try {
 			setCurrentModelNode(context, model);
 			processTreeNode(context, phaseId);
 		} finally {
-			setCurrentModelNode(context, null);
+			setVars(context, originalVars);
 		}
 	}
 
@@ -231,12 +232,53 @@ public class Tree extends TreeFamily implements NamingContainer {
 		}
 	}
 
+	/**
+	 * Capture the original values of the request attributes associated with the component attributes <code>var</code>
+	 * and <code>varNode</code>.
+	 * @param context The faces context to work with.
+	 * @return An object array with the two values.
+	 */
+	private Object[] captureOriginalVars(FacesContext context) {
+		Map<String, Object> requestMap = context.getExternalContext().getRequestMap();
+		String[] names = { getVar(), getVarNode() };
+		Object[] vars = new Object[names.length];
+
+		for (int i = 0; i < names.length; i++) {
+			if (names[i] != null) {
+				vars[i] = requestMap.get(names[i]);
+			}
+		}
+
+		return vars;
+	}
+
+	/**
+	 * Set the values associated with the <code>var</code> and <code>varNode</code> attributes.
+	 * @param context The faces context to work with.
+	 * @param vars An object array with the two values.
+	 */
+	private void setVars(FacesContext context, Object[] vars) {
+		Map<String, Object> requestMap = context.getExternalContext().getRequestMap();
+		String[] names = { getVar(), getVarNode() };
+
+		for (int i = 0; i < names.length; i++) {
+			if (names[i] != null) {
+				if (vars[i] != null) {
+					requestMap.put(names[i], vars[i]);
+				} else {
+					requestMap.remove(names[i]);
+				}
+			}
+		}
+	}
+
 	// Internal getters/setters ---------------------------------------------------------------------------------------
 
 	/**
 	 * Sets the current node of the tree model. Its wrapped data will be set as request attribute associated with the
 	 * <code>var</code> attribute, if any. The node itself will also be set as request attribute associated with the
 	 * <code>varNode</code> attribute, if any.
+	 * @param context The faces context to work with.
 	 * @param currentModelNode The current node of the tree model.
 	 */
 	protected void setCurrentModelNode(FacesContext context, TreeModel currentModelNode) {
@@ -245,17 +287,10 @@ public class Tree extends TreeFamily implements NamingContainer {
 		EditableValueHolderStateHelper.save(context, getStateHelper(), getFacetsAndChildren());
 
 		this.currentModelNode = currentModelNode;
-		Map<String, Object> requestMap = Faces.getRequestMap();
-		String var = getVar();
-		String varNode = getVarNode();
-
-		if (var != null) {
-			requestMap.put(var, currentModelNode != null ? currentModelNode.getData() : null);
-		}
-
-		if (varNode != null) {
-			requestMap.put(varNode, currentModelNode);
-		}
+		setVars(context, new Object[] {
+			currentModelNode != null ? currentModelNode.getData() : null,
+			currentModelNode
+		});
 
 		// Restore any saved state of any child input fields of current node before continuing.
 		EditableValueHolderStateHelper.restore(context, getStateHelper(), getFacetsAndChildren());

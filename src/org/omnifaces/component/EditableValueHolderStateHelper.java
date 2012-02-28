@@ -78,7 +78,7 @@ public final class EditableValueHolderStateHelper {
 				get(stateHelper, child.getClientId(context)).save((EditableValueHolder) child);
 			}
 
-			if (child.getChildCount() > 0) {
+			if (child.getFacetCount() > 0 || child.getChildCount() > 0) {
 				save(context, stateHelper, child.getFacetsAndChildren());
 			}
 		}
@@ -100,7 +100,7 @@ public final class EditableValueHolderStateHelper {
 				get(stateHelper, child.getClientId(context)).restore((EditableValueHolder) child);
 			}
 
-			if (child.getChildCount() > 0) {
+			if (child.getFacetCount() > 0 || child.getChildCount() > 0) {
 				restore(context, stateHelper, child.getFacetsAndChildren());
 			}
 		}
