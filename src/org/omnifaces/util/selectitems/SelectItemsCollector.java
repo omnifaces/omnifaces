@@ -119,13 +119,13 @@ public final class SelectItemsCollector {
 	
 	
 	/**
-	 * This method runs the algorithm expressed by a <code>SelectItems<code> component that uses the <code>var</code> iterator construct to generate
+	 * This method runs the algorithm expressed by a <code>UISelectItems<code> component that uses the <code>var</code> iterator construct to generate
 	 * a list of <code>SelectItem</code>s.
 	 * 
 	 * @param uiSelectItems
 	 * @param items
 	 * @param facesContext
-	 * @return
+	 * @return list of <code>SelectItem</code> obtained from the given parameters
 	 */
 	public static List<SelectItem> collectFromUISelectItemsIterator(FacesContext facesContext, UISelectItems uiSelectItems, Iterable<?> items) {
 		

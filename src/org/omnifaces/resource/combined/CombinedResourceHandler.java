@@ -29,7 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 
 /**
  * This {@link ResourceHandler} implementation recognizes combined resources based on the unique library name as
- * represented by <tt>{@value CombinedResourceHandler#LIBRARY_NAME}</tt> and takes care of streaming of them. The
+ * represented by <tt>{@value #LIBRARY_NAME}</tt> and takes care of streaming of them. The
  * webapp developer should make sure that this library name is never used for other libraries.
  * <p>
  * This handler must be registered as follows in <tt>faces-config.xml</tt>:

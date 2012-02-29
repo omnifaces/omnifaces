@@ -98,7 +98,7 @@ public final class Components {
 
 	/**
 	 * Returns whether the given editable value holder component has a submitted value.
-	 * @param input The editable value holder component to be checked.
+	 * @param component The editable value holder component to be checked.
 	 * @return <code>true</code> if the given editable value holder component has a submitted value, otherwise
 	 * <code>false</code>.
 	 */

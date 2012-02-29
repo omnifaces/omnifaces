@@ -76,7 +76,7 @@ public final class SelectItemsUtils {
 	 * 
 	 * @param context 
 	 * @param component the component with which {@link SelectItem} instances should be associated
-	 * @return 
+	 * @return List of all values hold by {@link SelectItem} instances
 	 */
 	public static List<Object> collectAllValuesFromSelectItems(FacesContext context, UIComponent component) {
 		List<Object> values = new ArrayList<Object>(); 

@@ -16,7 +16,8 @@ import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
-import javax.swing.tree.TreeModel;
+
+import org.omnifaces.model.tree.TreeModel;
 
 /**
  * <strong>TreeNode</strong> is an {@link UIComponent} that represents a single tree node within a parent
