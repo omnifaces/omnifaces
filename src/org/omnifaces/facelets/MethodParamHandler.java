@@ -45,6 +45,7 @@ public class MethodParamHandler extends TagHandler {
 		this.value = this.getRequiredAttribute("value");
 	}
 	
+	@Override
 	public void apply(FaceletContext ctx, UIComponent parent) throws IOException {
 		String nameStr = name.getValue(ctx);
 		

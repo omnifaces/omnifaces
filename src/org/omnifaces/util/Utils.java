@@ -10,34 +10,20 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.omnifaces.event;
-
-import javax.faces.event.PhaseEvent;
-import javax.faces.event.PhaseId;
-import javax.faces.event.PhaseListener;
+package org.omnifaces.util;
 
 /**
- * Default implementation for the PhaseListener interface.
+ * Collection of general utility methods that do not fit in one of the more specific classes. 
  * 
  * @author Arjan Tijms
+ *
  */
-public class DefaultPhaseListener implements PhaseListener {
+public final class Utils {
 	
-	private static final long serialVersionUID = -7252366571645029385L;
-	private	PhaseId phaseId;
-	
-	public DefaultPhaseListener(PhaseId phaseId) {
-		this.phaseId = phaseId;
-	}
+	private Utils() {}
 
-	@Override
-	public PhaseId getPhaseId() {
-		return phaseId;	
+	public static boolean isEmpty(String string) {
+		return string == null || string.isEmpty();
 	}
 	
-	@Override
-	public void afterPhase(PhaseEvent event) {}
-	
-	@Override
-	public void beforePhase(PhaseEvent event) {}
 }
