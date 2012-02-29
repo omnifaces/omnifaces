@@ -48,8 +48,9 @@ public final class Components {
 	 * @return The UI component matching the given client ID search expression.
 	 * @see UIComponent#findComponent(String)
 	 */
-	public static UIComponent findComponent(String expression) {
-		return FacesContext.getCurrentInstance().getViewRoot().findComponent(expression);
+	@SuppressWarnings("unchecked")
+	public static <T extends UIComponent> T findComponent(String expression) {
+		return (T) FacesContext.getCurrentInstance().getViewRoot().findComponent(expression);
 	}
 
 	/**
@@ -64,7 +65,7 @@ public final class Components {
 	public static <T extends UIComponent> T getClosestParent(UIComponent component, Class<T> parentType) {
 		UIComponent parent = component.getParent();
 
-		while (parent != null && !parentType.isAssignableFrom(parent.getClass())) {
+		while (parent != null && !parentType.isInstance(parent)) {
 			parent = parent.getParent();
 		}
 

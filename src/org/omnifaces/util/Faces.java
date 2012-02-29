@@ -40,7 +40,7 @@ import javax.servlet.http.HttpSession;
  * Do note that using the hierarchy is actually a better software design practice, but can lead to verbose code.
  * <p>
  * In addition, note that there's normally a small overhead in obtaining the thread local {@link FacesContext}. In case client code
- * needs to call methods in this class multiple times it's expected that performance will be slightly better if instead 
+ * needs to call methods in this class multiple times it's expected that performance will be slightly better if instead
  * the {@link FacesContext} is obtained once and the required methods called on that.
  *
  * @author Arjan Tijms, Bauke Scholtz
@@ -98,7 +98,8 @@ public final class Faces {
 		if (externalContext.getRequestPathInfo() == null) {
 			String path = externalContext.getRequestServletPath();
 			return path.substring(path.lastIndexOf('.'));
-		} else {
+		}
+		else {
 			return externalContext.getRequestServletPath();
 		}
 	}

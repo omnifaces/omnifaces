@@ -99,14 +99,18 @@ abstract class TreeFamily extends UIComponentBase {
 	protected void processSuper(FacesContext context, PhaseId phaseId) {
 		if (phaseId == PhaseId.APPLY_REQUEST_VALUES) {
 			super.processDecodes(context);
-		} else if (phaseId == PhaseId.PROCESS_VALIDATIONS) {
+		}
+		else if (phaseId == PhaseId.PROCESS_VALIDATIONS) {
 			super.processValidators(context);
-		} else if (phaseId == PhaseId.UPDATE_MODEL_VALUES) {
+		}
+		else if (phaseId == PhaseId.UPDATE_MODEL_VALUES) {
 			super.processUpdates(context);
-		} else if (phaseId == PhaseId.RENDER_RESPONSE) {
+		}
+		else if (phaseId == PhaseId.RENDER_RESPONSE) {
 			try {
 				super.encodeChildren(context);
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				throw new FacesException(e);
 			}
 		}

@@ -164,7 +164,8 @@ public class Tree extends TreeFamily implements NamingContainer {
 		try {
 			setCurrentModelNode(context, model);
 			processTreeNode(context, phaseId);
-		} finally {
+		}
+		finally {
 			setVars(context, originalVars);
 		}
 	}
@@ -210,7 +211,8 @@ public class Tree extends TreeFamily implements NamingContainer {
 				if (nodes.put(node.getLevel(), node) != null) {
 					throw new IllegalArgumentException(String.format(ERROR_DUPLICATE_NODE, node.getLevel()));
 				}
-			} else {
+			}
+			else {
 				throw new IllegalArgumentException(String.format(ERROR_INVALID_CHILD, child.getClass().getName()));
 			}
 		}
@@ -225,10 +227,12 @@ public class Tree extends TreeFamily implements NamingContainer {
 
 		if (value == null) {
 			model = new ListTreeModel();
-		} else if (value instanceof TreeModel) {
+		}
+		else if (value instanceof TreeModel) {
 			model = (TreeModel) value;
-		} else {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_MODEL, value.getClass()));
+		}
+		else {
+			throw new IllegalArgumentException(String.format(ERROR_INVALID_MODEL, value.getClass().getName()));
 		}
 	}
 
@@ -265,7 +269,8 @@ public class Tree extends TreeFamily implements NamingContainer {
 			if (names[i] != null) {
 				if (vars[i] != null) {
 					requestMap.put(names[i], vars[i]);
-				} else {
+				}
+				else {
 					requestMap.remove(names[i]);
 				}
 			}
