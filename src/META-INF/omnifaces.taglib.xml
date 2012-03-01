@@ -19,6 +19,8 @@
 >
 	<namespace>http://omnifaces.org/ui</namespace>
 
+	<!-- Tree ===================================================================================================== -->
+
 	<tag>
 		<description>
 			<![CDATA[
@@ -295,4 +297,370 @@
 			<type>java.lang.String</type>
 		</attribute>
 	</tag>
+
+	<!-- Validator ================================================================================================ -->
+
+	<tag>
+		<description>
+			<![CDATA[
+				<strong>ValidateAllOrNone</strong> validates validates if at least ALL of the given <code>UIInput</code>
+				components have been filled in or that NONE of the given <code>UIInput</code> components have been
+				filled in. The default message is
+				<blockquote>{0}: Please fill in all or none of those fields</blockquote>
+				<hr>
+				<h3>General usage of all multiple field validators</h3>
+				This validator must be placed inside the same <code>UIForm</code> as the <code>UIInput</code> components
+				in question. The <code>UIInput</code> components must be referenced by a space separated collection of
+				their client IDs in the <code>components</code> attribute. This validator can be placed anywhere in the
+				form, but keep in mind that the components will be validated in the order as they appear in the form.
+				So if this validator is been placed before all of the components, then it will be executed before any of
+				the component's own validators. If this validator fails, then the component's own validators will not be
+				fired. If this validator is been placed after all of the components, then it will be executed after any
+				of the component's own validators. If any of them fails, then this validator will not be exeucted. It
+				is not recommended to put this validator somewhere in between the referenced components as the resulting
+				behaviour may be confusing. Put this validator either before or after all of the components, depending
+				on how you would like to prioritize the validation.
+				<pre>
+				&lt;o:validateMultipleFields id="myId" components="foo bar baz" /&gt;
+				&lt;h:message for="myId" /&gt;
+				&lt;h:inputText id="foo" /&gt;
+				&lt;h:inputText id="bar" /&gt;
+				&lt;h:inputText id="baz" /&gt;
+				</pre>
+				In an invalidating case, all of the referenced components will be marked invalid and a faces message
+				will be added on the client ID of this validator component. The default message can be changed by the
+				<code>message</code> attribute. Any "{0}" placeholder in the message will be substituted with a comma
+				separated string of labels of the referenced input components.
+				<pre>
+				&lt;o:validateMultipleFields components="foo bar baz" message="All or none!" /&gt;
+				</pre>
+				The faces message can also be shown for all of the referenced components using
+				<code>showMessageFor="@all"</code>.
+				<pre>
+				&lt;o:validateMultipleFields components="foo bar baz" message="All or none!" showMessageFor="@all" /&gt;
+				&lt;h:inputText id="foo" /&gt;
+				&lt;h:message for="foo" /&gt;
+				&lt;h:inputText id="bar" /&gt;
+				&lt;h:message for="bar" /&gt;
+				&lt;h:inputText id="baz" /&gt;
+				&lt;h:message for="baz" /&gt;
+				</pre>
+				The <code>showMessageFor</code> attribute defaults to <code>@this</code>. Other values than 
+				<code>@this</code> or <code>@all</code> are not allowed.
+			]]>
+		</description>
+		<tag-name>validateAllOrNone</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.validator.ValidateAllOrNone</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent 
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or 
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The space separated collection of client IDs of UI input components to be validated.
+				]]>
+			</description>
+			<name>components</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The validator message to be shown on failure. Any "{0}" placeholder in the message will be
+					substituted with a comma separated string of labels of the referenced input components.
+				]]>
+			</description>
+			<name>message</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The identifier for which this validator should show the message. Defaults to "@this" which is the
+					validator component itself. Other available value is "@all" which will show the message for all of
+					the referenced components.
+				]]>
+			</description>
+			<name>showMessageFor</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<strong>ValidateOneOrMore</strong> validates if at least ONE of the given <code>UIInput</code>
+				components has been filled in. The default message is
+				<blockquote>{0}: Please fill in at least one of those fields</blockquote>
+				<p>
+				For general usage instructions, refer <code>validateAllOrNone</code> tag documentation.
+			]]>
+		</description>
+		<tag-name>validateOneOrMore</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.validator.ValidateOneOrMore</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent 
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or 
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The space separated collection of client IDs of UI input components to be validated.
+				]]>
+			</description>
+			<name>components</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The validator message to be shown on failure. Any "{0}" placeholder in the message will be
+					substituted with a comma separated string of labels of the referenced input components.
+				]]>
+			</description>
+			<name>message</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The identifier for which this validator should show the message. Defaults to "@this" which is the
+					validator component itself. Other available value is "@all" which will show the message for all of
+					the referenced components.
+				]]>
+			</description>
+			<name>showMessageFor</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<strong>ValidateEqual</strong> validates if ALL of the given <code>UIInput</code> components have the
+				same value. The default message is
+				<blockquote>{0}: Please fill in the same value for all of those fields</blockquote>
+				<p>
+				For general usage instructions, refer <code>validateAllOrNone</code> tag documentation.
+			]]>
+		</description>
+		<tag-name>validateEqual</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.validator.ValidateEqual</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent 
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or 
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The space separated collection of client IDs of UI input components to be validated.
+				]]>
+			</description>
+			<name>components</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The validator message to be shown on failure. Any "{0}" placeholder in the message will be
+					substituted with a comma separated string of labels of the referenced input components.
+				]]>
+			</description>
+			<name>message</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The identifier for which this validator should show the message. Defaults to "@this" which is the
+					validator component itself. Other available value is "@all" which will show the message for all of
+					the referenced components.
+				]]>
+			</description>
+			<name>showMessageFor</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<strong>ValidateUnique</strong> validates if ALL of the given <code>UIInput</code> components have an
+				unique value. The default message is
+				<blockquote>{0}: Please fill in an unique value for all of those fields</blockquote>
+				<p>
+				For general usage instructions, refer <code>validateAllOrNone</code> tag documentation.
+			]]>
+		</description>
+		<tag-name>validateUnique</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.validator.ValidateUnique</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent 
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or 
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The space separated collection of client IDs of UI input components to be validated.
+				]]>
+			</description>
+			<name>components</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The validator message to be shown on failure. Any "{0}" placeholder in the message will be
+					substituted with a comma separated string of labels of the referenced input components.
+				]]>
+			</description>
+			<name>message</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The identifier for which this validator should show the message. Defaults to "@this" which is the
+					validator component itself. Other available value is "@all" which will show the message for all of
+					the referenced components.
+				]]>
+			</description>
+			<name>showMessageFor</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+	</tag>
+
 </facelet-taglib>

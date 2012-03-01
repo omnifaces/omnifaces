@@ -73,18 +73,42 @@ public final class Components {
 	}
 
 	/**
-	 * Returns the converted/validated value of the given UIInput component without the need to know if the given
-	 * component has already been converted/validated or not. If the conversion/validation has failed for the UIInput
+	 * Returns whether the given UI input component is editable. That is when it is rendered, not disabled and not
+	 * readonly.
+	 * @param input The UI input component to be checked.
+	 * @return <code>true</code> if the given UI input component is editable.
+	 */
+	public static boolean isEditable(UIInput input) {
+		return input.isRendered()
+			&& !Boolean.TRUE.equals(input.getAttributes().get("disabled"))
+			&& !Boolean.TRUE.equals(input.getAttributes().get("readonly"));
+	}
+
+	/**
+	 * Returns the value of the <code>label</code> attribute associated with the given UI input component if any, else
+	 * the client ID. It never returns null.
+	 * @param component The UI input component for which the label is to be retrieved.
+	 * @return The value of the <code>label</code> attribute associated with the given UI input component if any, else
+	 * the client ID.
+	 */
+	public static String getLabel(UIInput input) {
+		Object label = input.getAttributes().get("label");
+		return (label != null) ? label.toString() : input.getClientId();
+	}
+
+	/**
+	 * Returns the converted/validated value of the given UI input component without the need to know if the given
+	 * component has already been converted/validated or not. If the conversion/validation has failed for the UI input
 	 * component, then this method will return <code>null</code>.
 	 * @param <T> The return type to cast the obtained value to.
-	 * @param input The UIInput component to obtain the converted/validated value for.
-	 * @return The converted/validated value of the given UIInput component.
+	 * @param input The UI input component to obtain the converted/validated value for.
+	 * @return The converted/validated value of the given UI input component.
 	 * @throws ClassCastException When T is of the wrong type.
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T getValue(UIInput input) {
 
-		// Components are validated/converted in order as they appear in the component tree. If isValid() returns true
+		// Components are converted/validated in order as they appear in the component tree. If isValid() returns true
 		// and getSubmittedValue() returns non-null, then it means that it has yet to be converted/validated by the
 		// validate() method before we can grab the value by getValue(). If isLocalValueSet() returns true, then it
 		// means that it's successfully been converted/validated and thus we can safely grab the value by getValue().
