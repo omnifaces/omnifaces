@@ -18,26 +18,31 @@ import javax.faces.event.PhaseListener;
 
 /**
  * Default implementation for the PhaseListener interface.
- * 
+ *
  * @author Arjan Tijms
  */
 public class DefaultPhaseListener implements PhaseListener {
-	
+
 	private static final long serialVersionUID = -7252366571645029385L;
 	private	PhaseId phaseId;
-	
+
 	public DefaultPhaseListener(PhaseId phaseId) {
 		this.phaseId = phaseId;
 	}
 
 	@Override
 	public PhaseId getPhaseId() {
-		return phaseId;	
+		return phaseId;
 	}
-	
+
 	@Override
-	public void afterPhase(PhaseEvent event) {}
-	
+	public void afterPhase(PhaseEvent event) {
+		// NOOP.
+	}
+
 	@Override
-	public void beforePhase(PhaseEvent event) {}
+	public void beforePhase(PhaseEvent event) {
+		// NOOP.
+	}
+
 }

@@ -24,7 +24,7 @@ import javax.faces.event.PhaseId;
  *
  * @author Bauke Scholtz
  */
-abstract class TreeFamily extends UIComponentBase {
+public abstract class TreeFamily extends UIComponentBase {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 

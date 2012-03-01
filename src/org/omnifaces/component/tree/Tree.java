@@ -71,7 +71,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	// Private constants ----------------------------------------------------------------------------------------------
 
 	private static final String ERROR_EXPRESSION_DISALLOWED =
-		"A value expression is disallowed on 'var' and 'varNode' attributes.";
+		"A value expression is disallowed on 'var' and 'varNode' attributes of Tree.";
 	private static final String ERROR_INVALID_MODEL =
 		"Tree accepts only model of type TreeModel. Encountered model of type '%s'.";
 	private static final String ERROR_NESTING_DISALLOWED =
