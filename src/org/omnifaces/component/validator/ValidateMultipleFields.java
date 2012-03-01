@@ -54,11 +54,11 @@ import org.omnifaces.util.Components;
  * attribute. Any "{0}" placeholder in the message will be substituted with a comma separated string of labels of the
  * referenced input components.
  * <pre>
- * &lt;o:validateAllOrNone components="foo bar baz" message="All or none!" /&gt;
+ * &lt;o:validateMultipleFields components="foo bar baz" message="{0} are wrong!" /&gt;
  * </pre>
  * The faces message can also be shown for all of the referenced components using <code>showMessageFor="@all"</code>.
  * <pre>
- * &lt;o:validateMultipleFields components="foo bar baz" message="All or none!" showMessageFor="@all" /&gt;
+ * &lt;o:validateMultipleFields components="foo bar baz" message="This is wrong!" showMessageFor="@all" /&gt;
  * &lt;h:inputText id="foo" /&gt;
  * &lt;h:message for="foo" /&gt;
  * &lt;h:inputText id="bar" /&gt;
