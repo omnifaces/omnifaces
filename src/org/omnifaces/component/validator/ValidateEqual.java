@@ -52,7 +52,7 @@ public class ValidateEqual extends ValidateMultipleFields {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Validate if all or none is filled in.
+	 * Validate if values are equal.
 	 */
 	@Override
 	protected boolean validateValues(FacesContext context, List<UIInput> inputs, List<Object> values) {
