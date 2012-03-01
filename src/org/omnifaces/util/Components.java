@@ -87,7 +87,7 @@ public final class Components {
 	/**
 	 * Returns the value of the <code>label</code> attribute associated with the given UI input component if any, else
 	 * the client ID. It never returns null.
-	 * @param component The UI input component for which the label is to be retrieved.
+	 * @param input The UI input component for which the label is to be retrieved.
 	 * @return The value of the <code>label</code> attribute associated with the given UI input component if any, else
 	 * the client ID.
 	 */
