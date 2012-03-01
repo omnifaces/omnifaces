@@ -44,13 +44,14 @@ public final class Components {
 
 	/**
 	 * Returns the UI component matching the given client ID search expression.
-	 * @param expression The client ID search expression.
+	 * @param clientId The client ID search expression.
 	 * @return The UI component matching the given client ID search expression.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see UIComponent#findComponent(String)
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends UIComponent> T findComponent(String expression) {
-		return (T) FacesContext.getCurrentInstance().getViewRoot().findComponent(expression);
+	public static <T extends UIComponent> T findComponent(String clientId) {
+		return (T) FacesContext.getCurrentInstance().getViewRoot().findComponent(clientId);
 	}
 
 	/**
@@ -97,27 +98,14 @@ public final class Components {
 	}
 
 	/**
-	 * Returns the converted/validated value of the given UI input component without the need to know if the given
-	 * component has already been converted/validated or not. If the conversion/validation has failed for the UI input
-	 * component, then this method will return <code>null</code>.
-	 * @param <T> The return type to cast the obtained value to.
-	 * @param input The UI input component to obtain the converted/validated value for.
-	 * @return The converted/validated value of the given UI input component.
-	 * @throws ClassCastException When T is of the wrong type.
+	 * Returns the value of the given editable value holder component without the need to know if the given component
+	 * has already been converted/validated or not.
+	 * @param component The editable value holder component to obtain the value for.
+	 * @return The value of the given editable value holder component.
 	 */
-	@SuppressWarnings("unchecked")
-	public static <T> T getValue(UIInput input) {
-
-		// Components are converted/validated in order as they appear in the component tree. If isValid() returns true
-		// and getSubmittedValue() returns non-null, then it means that it has yet to be converted/validated by the
-		// validate() method before we can grab the value by getValue(). If isLocalValueSet() returns true, then it
-		// means that it's successfully been converted/validated and thus we can safely grab the value by getValue().
-
-		if (input.isValid() && hasSubmittedValue(input)) {
-			input.validate(FacesContext.getCurrentInstance());
-		}
-
-		return input.isLocalValueSet() ? (T) input.getValue() : null;
+	public static Object getValue(EditableValueHolder component) {
+		Object submittedValue = component.getSubmittedValue();
+		return (submittedValue != null) ? submittedValue : component.getLocalValue();
 	}
 
 	/**

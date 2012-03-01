@@ -32,6 +32,7 @@ import org.omnifaces.util.Components;
  * {@link #validateValues(FacesContext, List, List)} method to perform the actual validation.
  * <hr>
  * <h3>General usage of all multiple field validators</h3>
+ * <p>
  * This validator must be placed inside the same <code>UIForm</code> as the <code>UIInput</code> components in question.
  * The <code>UIInput</code> components must be referenced by a space separated collection of their client IDs in the
  * <code>components</code> attribute. This validator can be placed anywhere in the form, but keep in mind that the
@@ -49,6 +50,7 @@ import org.omnifaces.util.Components;
  * &lt;h:inputText id="bar" /&gt;
  * &lt;h:inputText id="baz" /&gt;
  * </pre>
+ * <p>
  * In an invalidating case, all of the referenced components will be marked invalid and a faces message will be added
  * on the client ID of this validator component. The default message can be changed by the <code>message</code>
  * attribute. Any "{0}" placeholder in the message will be substituted with a comma separated string of labels of the
@@ -56,6 +58,7 @@ import org.omnifaces.util.Components;
  * <pre>
  * &lt;o:validateMultipleFields components="foo bar baz" message="{0} are wrong!" /&gt;
  * </pre>
+ * <p>
  * The faces message can also be shown for all of the referenced components using <code>showMessageFor="@all"</code>.
  * <pre>
  * &lt;o:validateMultipleFields components="foo bar baz" message="This is wrong!" showMessageFor="@all" /&gt;
@@ -66,12 +69,13 @@ import org.omnifaces.util.Components;
  * &lt;h:inputText id="baz" /&gt;
  * &lt;h:message for="baz" /&gt;
  * </pre>
+ * <p>
  * The <code>showMessageFor</code> attribute defaults to <code>@this</code>. Other values than <code>@this</code> or
  * <code>@all</code> are not allowed.
+ * <p>
+ * TODO: support for immediate="true".
  *
  * @author Bauke Scholtz
- *
- * TODO: support for immediate="true".
  */
 public abstract class ValidateMultipleFields extends ValidatorFamily {
 
@@ -137,9 +141,9 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	}
 
 	/**
-	 * Collect the components, if it is not empty, then delegate to {@link #validateValues(FacesContext, List, List)}
-	 * If it returns <code>false</code>, then mark all inputs and the faces context invalid and finally delegate to
-	 * {@link #showMessage(FacesContext, List)} to show the message.
+	 * Collect the components, if it is not empty, then collect their values and delegate to
+	 * {@link #validateValues(FacesContext, List, List)}. If it returns <code>false</code>, then mark all inputs and
+	 * the faces context invalid and finally delegate to {@link #showMessage(FacesContext, List)} to show the message.
 	 */
 	@Override
 	protected void validateComponents(FacesContext context) {
@@ -217,28 +221,28 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 		List<Object> values = new ArrayList<Object>(inputs.size());
 
 		for (UIInput input : inputs) {
-			Object submittedValue = input.getSubmittedValue();
-			values.add(submittedValue != null ? submittedValue : input.getLocalValue());
+			values.add(Components.getValue(input));
 		}
 
 		return values;
 	}
 
 	/**
-	 * Perform the validation on the collected input components and returns whether the validation is successful.
+	 * Perform the validation on the collected values of the input components and returns whether the validation is
+	 * successful.
 	 * @param context The faces context to work with.
-	 * @param components The input components to be validated.
+	 * @param components The input components whose values are to be validated.
 	 * @param values The values of the input components to be validated.
-	 * @return <code>true</code> is validation is successful, otherwise <code>false</code> (and thus show the message).
+	 * @return <code>true</code> if validation is successful, otherwise <code>false</code> (and thus show the message).
 	 */
 	protected abstract boolean validateValues(FacesContext context, List<UIInput> components, List<Object> values);
 
 	/**
 	 * Show the message at the desired place(s) depending on the value of the <code>showMessageFor</code> attribute.
-	 * <li><tt>@global</tt> (default): message will be added as a global message with <code>null</code> client ID.
+	 * <ul>
 	 * <li><tt>@this</tt>: message will be added to the <code>&lt;h:message&gt;</code> for this component.
 	 * <li><tt>@all</tt>: message will be added to all components as specified in <code>components</code> attribute.
-	 * <li>Otherwise the value will be treated as spaceseparated string of client IDs.
+	 * </ul>
 	 * @param context The faces context to work with.
 	 * @param inputs The validated input components.
 	 */

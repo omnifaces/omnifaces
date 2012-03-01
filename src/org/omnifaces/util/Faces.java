@@ -163,6 +163,7 @@ public final class Faces {
 	 * Returns the HTTP request attribute value associated with the given name.
 	 * @param name The HTTP request attribute name.
 	 * @return The HTTP request attribute value associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see ExternalContext#getRequestMap()
 	 */
 	@SuppressWarnings("unchecked")
@@ -268,8 +269,8 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the flash attribute map.
-	 * @return The flash attribute map.
+	 * Returns the flash scope.
+	 * @return The flash scope.
 	 * @see ExternalContext#getFlash()
 	 */
 	public static Flash getFlash() {
@@ -280,6 +281,7 @@ public final class Faces {
 	 * Returns the flash attribute value associated with the given name.
 	 * @param name The flash attribute name.
 	 * @return The flash attribute value associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see ExternalContext#getFlash()
 	 */
 	@SuppressWarnings("unchecked")
@@ -329,6 +331,7 @@ public final class Faces {
 	 * Returns the HTTP session attribute value associated with the given name.
 	 * @param name The HTTP session attribute name.
 	 * @return The HTTP session attribute value associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see ExternalContext#getSessionMap()
 	 */
 	@SuppressWarnings("unchecked")
@@ -368,6 +371,7 @@ public final class Faces {
 	 * Returns the application (servlet context) attribute value associated with the given name.
 	 * @param name The application (servlet context) attribute name.
 	 * @return The application (servlet context) attribute value associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see ExternalContext#getApplicationMap()
 	 */
 	@SuppressWarnings("unchecked")
@@ -447,7 +451,7 @@ public final class Faces {
 
 	/**
 	 * Returns an input stream for an application resource mapped to the specified path, if it exists; otherwise,
-	 * return null.
+	 * return <code>null</code>.
 	 * @param path The application resource path to return an input stream for.
 	 * @return An input stream for an application resource mapped to the specified path.
 	 * @see ExternalContext#getResourceAsStream(String)
@@ -457,10 +461,11 @@ public final class Faces {
 	}
 
 	/**
-	 * Evaluates the given expression and return it.
+	 * Programmatically evaluate the given EL expression and return the evaluated value.
 	 * @param <T> The expected return type.
-	 * @param expression The expression to be evaluated.
-	 * @return The evaluated expression.
+	 * @param expression The EL expression to be evaluated.
+	 * @return The evaluated value of the given EL expression.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see Application#evaluateExpressionGet(FacesContext, String, Class)
 	 */
 	@SuppressWarnings("unchecked")

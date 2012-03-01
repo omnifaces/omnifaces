@@ -12,7 +12,7 @@
  */
 package org.omnifaces.util.selectitems;
 
-import static org.omnifaces.util.Collections.isEmpty;
+import static org.omnifaces.util.Utils.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -27,29 +27,29 @@ import javax.faces.model.SelectItemGroup;
 
 /**
  * Collection of utility methods for working with {@link SelectItem} or data represented by them.
- * 
+ *
  * @author Arjan Tijm
  *
  */
 public final class SelectItemsUtils {
-	
+
 	private SelectItemsUtils() {}
-	
+
 	/**
 	 * Finds an object value in the {@link SelectItem} instances associated with the given component by means of matching its converted value with
 	 * the given string value.
-	 * 
+	 *
 	 * @param context
 	 * @param component the component with which {@link SelectItem}s should be associated that are used to search in.
 	 * @param value a string that should match the string representation of one of the values held by the {@link SelectItem}s.
 	 * @param converter the faces {@link Converter} used to generate String representations for the values held by the {@link SelectItem}s.
-	 * 
-	 * @return the Object representation of the value where its string representation matches the input value. 
+	 *
+	 * @return the Object representation of the value where its string representation matches the input value.
 	 */
 	public static Object findValueByStringConversion(FacesContext context, UIComponent component, String value, Converter converter) {
-		return findValueByStringConversion(context, component, SelectItemsCollector.collectFromParent(context, component).iterator(), value, converter);		
+		return findValueByStringConversion(context, component, SelectItemsCollector.collectFromParent(context, component).iterator(), value, converter);
 	}
-	
+
 	private static Object findValueByStringConversion(FacesContext context, UIComponent component, Iterator<SelectItem> items, String value, Converter converter) {
 		while (items.hasNext()) {
 			SelectItem item = items.next();
@@ -65,27 +65,27 @@ public final class SelectItemsUtils {
 				return item.getValue();
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	/**
 	 * Collects all values associated with all {@link SelectItem} instances associated with the given component.
 	 * <p>
 	 * Note that values from recursively scanned {@link SelectItemGroup} instances are included.
-	 * 
-	 * @param context 
+	 *
+	 * @param context
 	 * @param component the component with which {@link SelectItem} instances should be associated
 	 * @return List of all values hold by {@link SelectItem} instances
 	 */
 	public static List<Object> collectAllValuesFromSelectItems(FacesContext context, UIComponent component) {
-		List<Object> values = new ArrayList<Object>(); 
+		List<Object> values = new ArrayList<Object>();
 		collect(SelectItemsCollector.collectFromParent(context, component).iterator(), values);
-		
+
 		return values;
 	}
 
-	private static void collect(Iterator<SelectItem> items, List<Object> values) {		
+	private static void collect(Iterator<SelectItem> items, List<Object> values) {
 		while (items.hasNext()) {
 			SelectItem item = items.next();
 			if (item instanceof SelectItemGroup) {
@@ -98,7 +98,7 @@ public final class SelectItemsUtils {
 			}
 		}
 	}
-	
+
 
 	/**
 	 * Exposes an Array via an <code>Iterator</code>

@@ -20,7 +20,9 @@ import javax.faces.context.FacesContext;
 /**
  * This class helps in letting code run within its own scope. Such scope is defined by specific variables being
  * available to EL within it. The request scope is used to store the variables.
- * 
+ * <p>
+ * TODO: Look for a better package. org.omnifaces.el? org.omnifaces.context?
+ *
  * @author Arjan Tijms
  *
  */
@@ -29,19 +31,19 @@ public class ScopedRunner {
 	FacesContext context;
 	Map<String, Object> scopedVariables;
 	Map<String, Object> previousVariables = new HashMap<String, Object>();
-	
+
 	public ScopedRunner(FacesContext context) {
 		this(context, new HashMap<String, Object>());
 	}
-	
+
 	public ScopedRunner(FacesContext context, Map<String, Object> scopedVariables) {
 		this.context = context;
-		this.scopedVariables = scopedVariables;		
+		this.scopedVariables = scopedVariables;
 	}
-	
+
 	/**
 	 * Adds the given variable to this instance. Can be used in a builder-pattern.
-	 * 
+	 *
 	 * @param key the key name of the variable
 	 * @param value the value of the variable
 	 * @return this ScopedRunner, so adding variables and finally calling invoke can be chained.
@@ -50,23 +52,23 @@ public class ScopedRunner {
 		scopedVariables.put(key, value);
 		return this;
 	}
-	
+
 	/**
 	 * Invokes the SAM type within the scope of the variables being given in the constructor.
 	 * @param runnable
 	 */
 	public void invoke(Runnable runnable) {
 		try {
-			setNewScope();			
-			runnable.run();			
+			setNewScope();
+			runnable.run();
 		} finally {
 			restorePreviousScope();
-		}		
+		}
 	}
-	
+
 	private void setNewScope() {
 		previousVariables.clear();
-		
+
 		Map<String, Object> requestMap = context.getExternalContext().getRequestMap();
 		for (Map.Entry<String, Object> entry : scopedVariables.entrySet()) {
 			Object previousVariable = requestMap.put(entry.getKey(), entry.getValue());
@@ -75,7 +77,7 @@ public class ScopedRunner {
 			}
 		}
 	}
-	
+
 	private void restorePreviousScope() {
 		try {
 			Map<String, Object> requestMap = context.getExternalContext().getRequestMap();
@@ -85,11 +87,11 @@ public class ScopedRunner {
 					requestMap.put(entry.getKey(), previousVariable);
 				} else {
 					requestMap.remove(entry.getKey());
-				}			
+				}
 			}
 		} finally {
 			previousVariables.clear();
 		}
 	}
-	
+
 }

@@ -20,11 +20,19 @@ import org.omnifaces.event.DefaultPhaseListener;
 
 /**
  * Collection of utility methods for the JSF API with respect to working with Faces events.
- * 
+ *
  * @author Arjan Tijms
  */
-public class Events {
-	
+public final class Events {
+
+	// Constructors ---------------------------------------------------------------------------------------------------
+
+	private Events() {
+		// Hide constructor.
+	}
+
+	// Utility --------------------------------------------------------------------------------------------------------
+
 	/**
 	 * Adds a phase listener to the view root of the current faces context.
 	 * @param newPhaseListener The phase listener to be added to the view root of the current faces context.
@@ -66,6 +74,6 @@ public class Events {
 			}
 		});
 	}
-	
+
 
 }

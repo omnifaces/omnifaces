@@ -85,8 +85,8 @@ public interface TreeModel<T> extends Iterable<TreeModel<T>> {
 	/**
 	 * Returns the zero-based unique index of the current tree node. This is an underscore separated representation of
 	 * the position of the node in the tree hierarchy. The root node has index of <code>null</code>. The first child has
-	 * index 0. The second child of first child has index 0_1. The first child of second child of third child has index
-	 * 2_1_0.
+	 * index <tt>0</tt>. The second child of first child has index <tt>0_1</tt>. The first child of second child of
+	 * third child has index <tt>2_1_0</tt>.
 	 * @return The unique index of the current tree node.
 	 */
 	String getIndex();

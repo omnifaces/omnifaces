@@ -64,10 +64,12 @@ public class CombinedResourceListener implements SystemEventListener {
 
 	/**
 	 * Only on non-postback requests, perform the following actions:
+	 * <ul>
 	 * <li>Collect all component resources from the head.
 	 * <li>Check and collect the script and stylesheet resources separately and remove them from the head.
 	 * <li>If there are any resources in the collection of script and/or stylesheet resources, then create a
 	 * component resource component pointing to the combined resource info and add it to the head.
+	 * </ul>
 	 */
 	@Override
 	public void processEvent(SystemEvent event) throws AbortProcessingException {
