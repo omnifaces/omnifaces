@@ -33,7 +33,7 @@ public final class Utils {
 
 	/**
 	 * Returns true if the given string is null or is empty.
-	 * @param value The string to be checked on emptiness.
+	 * @param string The string to be checked on emptiness.
 	 * @return True if the given string is null or is empty.
 	 */
 	public static boolean isEmpty(String string) {
@@ -42,7 +42,7 @@ public final class Utils {
 
 	/**
 	 * Returns true if the given array is null or is empty.
-	 * @param value The array to be checked on emptiness.
+	 * @param array The array to be checked on emptiness.
 	 * @return True if the given array is null or is empty.
 	 */
 	public static boolean isEmpty(Object[] array) {
