@@ -29,7 +29,7 @@ import org.omnifaces.util.Components;
 /**
  * Base class which is to be shared between all multi field validators. The implementors have to call the super
  * constructor with the default message. The implementors have to override the
- * {@link #validateComponents(FacesContext, List)} method to perform the actual validation.
+ * {@link #validateValues(FacesContext, List, List)} method to perform the actual validation.
  * <hr>
  * <h3>General usage of all multiple field validators</h3>
  * This validator must be placed inside the same <code>UIForm</code> as the <code>UIInput</code> components in question.
