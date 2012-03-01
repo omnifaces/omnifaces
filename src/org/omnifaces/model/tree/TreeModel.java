@@ -12,7 +12,6 @@
  */
 package org.omnifaces.model.tree;
 
-import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -22,7 +21,7 @@ import org.omnifaces.component.tree.Tree;
  * A generic and simple tree data model which is to be used by {@link Tree} component.
  *
  * @author Bauke Scholtz
- * @param <T> The type of the wrapped data of the tree node. It must implement {@link Serializable}.
+ * @param <T> The type of the wrapped data of the tree node.
  */
 public interface TreeModel<T> extends Iterable<TreeModel<T>> {
 

@@ -12,7 +12,6 @@
  */
 package org.omnifaces.model.tree;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -22,7 +21,7 @@ import java.util.List;
  * A concrete implementation of {@link TreeModel} which holds the tree children in a {@link List}.
  *
  * @author Bauke Scholtz
- * @param <T> The type of the wrapped data of the tree node. It must implement {@link Serializable}.
+ * @param <T> The type of the wrapped data of the tree node.
  */
 public class ListTreeModel<T> implements TreeModel<T> {
 
