@@ -243,7 +243,7 @@ public final class Functions {
 	}
 
 	/**
-	 * Converts a <code>Map&lt;K, V&gt;</code> to a <code>List&lt;Map.Entry&ltK, V&gt;&gt;</code>. Useful when you want
+	 * Converts a <code>Map&lt;K, V&gt;</code> to a <code>List&lt;Map.Entry&lt;K, V&gt;&gt;</code>. Useful when you want
 	 * to iterate over a <code>Map</code> in for example <code>&lt;ui:repeat&gt;</code>. Each of the entries has the
 	 * usual <code>getKey()</code> and <code>getValue()</code> methods.
 	 * @param map The map to be converted to list of its entries.

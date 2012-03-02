@@ -12,19 +12,18 @@
  */
 package org.omnifaces.component.validator;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
 
 import org.omnifaces.util.Components;
+import org.omnifaces.util.Messages;
 
 /**
  * Base class which is to be shared between all multi field validators. The implementors have to call the super
@@ -258,16 +257,14 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 			}
 		}
 
-		String message = MessageFormat.format(getMessage(), labels);
 		String showMessageFor = getShowMessageFor();
-		FacesMessage facesMessage = new FacesMessage(FacesMessage.SEVERITY_ERROR, message, null);
 
 		if (showMessageFor.equals("@this")) {
-			context.addMessage(getClientId(context), facesMessage);
+			Messages.addError(getClientId(context), getMessage(), labels);
 		}
 		else if (showMessageFor.equals("@all")) {
 			for (UIInput input : inputs) {
-				context.addMessage(input.getClientId(context), facesMessage);
+				Messages.addError(input.getClientId(context), getMessage(), labels);
 			}
 		}
 		else {
