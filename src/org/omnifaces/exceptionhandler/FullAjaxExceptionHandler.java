@@ -28,18 +28,21 @@ import org.omnifaces.util.Events;
 
 /**
  * This exception handler enables you to show the full HTTP 500 error page in its entirety to the enduser in
- * case of ajax requests. Refer the documentation of {@link FullAjaxExceptionHandlerFactory} how to setup it.
+ * case of exceptions during ajax requests. Refer the documentation of {@link FullAjaxExceptionHandlerFactory} how to
+ * setup it.
  * <p>
  * The exception detail is available in the request scope by the standard servlet error request attributes like as in a
  * normal synchronous HTTP 500 error page response. You could for example show them in the error page as follows:
  * <pre>
+ * &lt;ul&gt;
  * &lt;li&gt;Date/time: #{of:formatDate(now, 'yyyy-MM-dd HH:mm:ss')}&lt;/li&gt;
  * &lt;li&gt;HTTP user agent: #{header['user-agent']}&lt;/li&gt;
  * &lt;li&gt;Request URI: #{requestScope['javax.servlet.error.request_uri']}&lt;/li&gt;
  * &lt;li&gt;Status code: #{requestScope['javax.servlet.error.status_code']}&lt;/li&gt;
- * &lt;li&gt;Exception type: #{requestScope['javax.servlet.error.exception']}&lt;/li&gt;
+ * &lt;li&gt;Exception type: #{requestScope['javax.servlet.error.exception_type']}&lt;/li&gt;
  * &lt;li&gt;Exception message: #{requestScope['javax.servlet.error.message']}&lt;/li&gt;
  * &lt;li&gt;Exception stack trace: &lt;pre&gt;#{of:printStackTrace(requestScope['javax.servlet.error.exception'])}&lt;/pre&gt;&lt;/li&gt;
+ * &lt;/ul&gt;
  * </pre>
  *
  * @author Bauke Scholtz
