@@ -14,6 +14,8 @@ package org.omnifaces.el.functions;
 
 import static java.util.concurrent.TimeUnit.*;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -87,7 +89,7 @@ public final class Converters {
 	}
 
 	/**
-	 * Converts seconds to days.
+	 * Converts seconds to days. This rounds down.
 	 * @param seconds The seconds to be converted to days.
 	 * @return Days converted from seconds.
 	 */
@@ -113,7 +115,7 @@ public final class Converters {
 	}
 
 	/**
-	 * Converts bytes to kilobytes.
+	 * Converts bytes to kilobytes. This rounds down.
 	 * @param bytes The bytes to be converted to kilobytes.
 	 * @return Kilobytes converted from bytes.
 	 */
@@ -126,7 +128,7 @@ public final class Converters {
 	}
 
 	/**
-	 * Converts bytes to megabytes.
+	 * Converts bytes to megabytes. This rounds down.
 	 * @param bytes The bytes to be converted to megabytes.
 	 * @return Megabytes converted from bytes.
 	 */
@@ -136,6 +138,17 @@ public final class Converters {
 		}
 
 		return bytes >> 20;
+	}
+
+	/**
+	 * Print the stack trace of the given exception.
+	 * @param exception The exception to print the stack trace for.
+	 * @return The printed stack trace.
+	 */
+	public static String printStackTrace(Throwable exception) {
+		StringWriter stringWriter = new StringWriter();
+		exception.printStackTrace(new PrintWriter(stringWriter, true));
+		return stringWriter.toString();
 	}
 
 }

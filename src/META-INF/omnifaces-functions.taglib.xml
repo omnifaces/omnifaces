@@ -161,6 +161,7 @@
 	<function>
 		<description>
 			<![CDATA[
+				Converts seconds to days. This rounds down.
 			]]>
 		</description>
 		<function-name>secondsToDays</function-name>
@@ -171,6 +172,7 @@
 	<function>
 		<description>
 			<![CDATA[
+				Converts days to seconds.
 			]]>
 		</description>
 		<function-name>daysToSeconds</function-name>
@@ -181,6 +183,7 @@
 	<function>
 		<description>
 			<![CDATA[
+				Converts bytes to kilobytes. This rounds down.
 			]]>
 		</description>
 		<function-name>bytesToKilobytes</function-name>
@@ -191,11 +194,23 @@
 	<function>
 		<description>
 			<![CDATA[
+				Converts bytes to megabytes. This rounds down.
 			]]>
 		</description>
 		<function-name>bytesToMegabytes</function-name>
 		<function-class>org.omnifaces.el.functions.Converters</function-class>
 		<function-signature>java.lang.Long bytesToMegabytes(java.lang.Long)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Print the stack trace of the given exception.
+			]]>
+		</description>
+		<function-name>printStackTrace</function-name>
+		<function-class>org.omnifaces.el.functions.Converters</function-class>
+		<function-signature>java.lang.String printStackTrace(java.lang.Throwable)</function-signature>
 	</function>
 
 </facelet-taglib>
