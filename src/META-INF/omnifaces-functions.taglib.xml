@@ -43,7 +43,7 @@
 		</description>
 		<function-name>concat</function-name>
 		<function-class>org.omnifaces.el.functions.Strings</function-class>
-		<function-signature>java.lang.String concat(java.lang.String, java.lang.String)</function-signature>
+		<function-signature>java.lang.String concat(java.lang.Object, java.lang.Object)</function-signature>
 	</function>
 
 	<function>
