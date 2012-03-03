@@ -667,5 +667,197 @@
 			<type>java.lang.String</type>
 		</attribute>
 	</tag>
+	
+
+	<tag>
+		<description>
+				<![CDATA[
+					<strong>viewParam</strong> is a component that extends the standard viewParam and provides a stateless
+	 				mode of operation and a default for the label atrribute. When the label attribute is ommitted, the name
+	 				attribute will be used instead.				
+				]]>
+		</description>
+		<tag-name>viewParam</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.viewparam.ViewParam</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+	                The name of the request parameter from which the value for this component
+	                is retrieved on an initial request or to override the stored value on a
+	                postback.
+		        ]]>
+			</description>
+			<name>name</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+	
+		<attribute>
+			<description>
+				<![CDATA[
+	                Converter instance registered with this component.
+	            ]]></description>
+			<name>converter</name>
+			<required>false</required>
+			<type>javax.faces.convert.Converter</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                A ValueExpression enabled attribute that, if present, will be
+	                used as the text of the converter message, replacing any message
+	                that comes from the converter.
+	            ]]>
+			</description>
+			<name>converterMessage</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                The component identifier for this component. This value must be
+	                unique within the closest parent component that is a naming
+	                container.
+	            ]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                Flag indicating that the user is required to provide a submitted
+	                value for this input component. This component extends the behavior of
+	                this by only making this required for a non-faces request.
+	            ]]>
+			</description>
+			<name>required</name>
+			<required>false</required>
+			<type>boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                A ValueExpression enabled attribute that, if present, will be
+	                used as the text of the validation message for the "required"
+	                facility, if the "required" facility is used.
+	            ]]>
+			</description>
+			<name>requiredMessage</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                MethodExpression representing a validator method that will be
+	                called
+	                during Process Validations to perform correctness checks on the
+	                value of this component. The expression must evaluate to a
+	                public
+	                method that takes FacesContext, UIComponent, and Object
+	                parameters,
+	                with a return type of void.
+	            ]]>
+			</description>
+			<name>validator</name>
+			<required>false</required>
+			<method-signature>void validate(javax.faces.context.FacesContext,
+				javax.faces.component.UIComponent, java.lang.Object)
+			</method-signature>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                A ValueExpression enabled attribute that, if present, will be
+	                used as the text of the validator message, replacing any
+	                message that comes from the validator.
+	            ]]>
+			</description>
+			<name>validatorMessage</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                A ValueExpression to which the value of the request parameter, as
+	                determined by the name attribute, is bound. The resolved value of this
+	                expression is used when encoding the view parameter into a bookmarkable link or
+	                redirect URL with view parameter encoding enabled. If this attribute is omitted,
+	                the value of the request parameter will instead be the local value of the
+	                UIViewParameter.
+	            ]]>
+            </description>
+			<name>value</name>
+			<required>false</required>
+			<type>java.lang.Object</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                <p>
+	
+	                MethodExpression representing a value change listener method
+	                that will be notified when a new value has been set for this
+	                input component. The expression must evaluate to a public
+	                method that takes a <code>ValueChangeEvent</code>
+	                parameter,
+	                with a return type of void, or
+	                to a public method that takes no arguments with a return type
+	                of void. In the latter case, the method has no way of easily
+	                knowing what the new value is, but this can be useful in cases
+	                where a notification is needed that "this value
+	                changed".
+	
+	                </p>
+	            ]]>
+			</description>
+			<name>valueChangeListener</name>
+			<required>false</required>
+			<method-signature>void
+				valueChange(javax.faces.event.ValueChangeEvent)
+			</method-signature>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                The maximum number of characters that may
+	                be entered in this field.
+	            ]]>
+			</description>
+			<name>maxlength</name>
+			<required>false</required>
+			<type>int</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                The ValueExpression linking this component to a property in a
+	                backing bean
+	            ]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                If present, this attribute refers to the value of one of the exposed
+	                attached objects within the composite component inside
+	                of which this tag is nested.
+	            ]]>
+            </description>
+			<name>for</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+	
+	</tag>
 
 </facelet-taglib>

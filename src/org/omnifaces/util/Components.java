@@ -12,10 +12,12 @@
  */
 package org.omnifaces.util;
 
+import javax.el.ValueExpression;
 import javax.faces.component.EditableValueHolder;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
+
 
 /**
  * Collection of utility methods for the JSF API that are mainly shortcuts for obtaining stuff from the
@@ -93,8 +95,27 @@ public final class Components {
 	 * the client ID.
 	 */
 	public static String getLabel(UIInput input) {
-		Object label = input.getAttributes().get("label");
+		Object label = getOptionalLabel(input);
 		return (label != null) ? label.toString() : input.getClientId();
+	}
+	
+	/**
+	 * Returns the value of the <code>label</code> attribute associated with the given UI input component if any, else
+	 * null.
+	 * @param input The UI input component for which the label is to be retrieved.
+	 * @return The value of the <code>label</code> attribute associated with the given UI input component if any, else
+	 * null.
+	 */
+	public static Object getOptionalLabel(UIInput input) {
+		Object label = input.getAttributes().get("label");
+		if (label == null || (label instanceof String && ((String) label).length() == 0)) {
+			ValueExpression labelExpression = input.getValueExpression("label");
+			if (labelExpression != null) {
+				label = labelExpression.getValue(FacesContext.getCurrentInstance().getELContext());
+			}
+		}
+		
+		return label; 
 	}
 
 	/**
