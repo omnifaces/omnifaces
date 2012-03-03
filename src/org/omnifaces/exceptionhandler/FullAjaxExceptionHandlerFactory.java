@@ -68,7 +68,7 @@ public class FullAjaxExceptionHandlerFactory extends ExceptionHandlerFactory {
 	 * Construct a new full ajax exception handler factory around the given wrapped factory. This constructor will
 	 * parse the <tt>web.xml</tt> to find the HTTP 500 error page location.
 	 * @param wrapped The wrapped factory.
-     * @throws IllegalArgumentException When the HTTP 500 error page location in <tt>web.xml</tt> is missing or invalid.
+	 * @throws IllegalArgumentException When the HTTP 500 error page location in <tt>web.xml</tt> is missing or invalid.
 	 */
 	public FullAjaxExceptionHandlerFactory(ExceptionHandlerFactory wrapped) {
 		this.wrapped = wrapped;
@@ -93,31 +93,31 @@ public class FullAjaxExceptionHandlerFactory extends ExceptionHandlerFactory {
 		return wrapped;
 	}
 
-    // Helpers --------------------------------------------------------------------------------------------------------
+	// Helpers --------------------------------------------------------------------------------------------------------
 
-    /**
-     * Parse <tt>web.xml</tt> and find the location of the HTTP 500 error page.
-     * @return The location of the HTTP 500 error page.
-     * @throws IllegalArgumentException When the HTTP 500 error page is not definied in <tt>web.xml</tt> at all, or
-     * when the declared location is not resolveable.
-     */
-    private static String findErrorPageLocation() {
-    	InputStream input = null;
-    	String location = null;
+	/**
+	 * Parse <tt>web.xml</tt> and find the location of the HTTP 500 error page.
+	 * @return The location of the HTTP 500 error page.
+	 * @throws IllegalArgumentException When the HTTP 500 error page is not definied in <tt>web.xml</tt> at all, or
+	 * when the declared location is not resolveable.
+	 */
+	private static String findErrorPageLocation() {
+		InputStream input = null;
+		String location = null;
 
-        try {
-    		input = Faces.getResourceAsStream(WEB_XML);
+		try {
+			input = Faces.getResourceAsStream(WEB_XML);
 
-    		if (input != null) { // Since Servlet 3.0, web.xml is optional.
-        		Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input);
-        		location = XPathFactory.newInstance().newXPath().compile(XPATH_500_LOCATION).evaluate(document);
-    		}
+			if (input != null) { // Since Servlet 3.0, web.xml is optional.
+				Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input);
+				location = XPathFactory.newInstance().newXPath().compile(XPATH_500_LOCATION).evaluate(document);
+			}
 		}
 		catch (Exception e) {
 			// This exception should never occur. If web.xml was unparseable, the webapp wouldn't even have started.
 			throw new RuntimeException(e);
 		}
-        finally {
+		finally {
 			if (input != null) try { input.close(); } catch (IOException ignore) { /**/ }
 		}
 
@@ -130,6 +130,6 @@ public class FullAjaxExceptionHandlerFactory extends ExceptionHandlerFactory {
 		}
 
 		return location;
-    }
+	}
 
 }

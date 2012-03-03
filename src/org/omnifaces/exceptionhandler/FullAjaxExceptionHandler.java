@@ -48,90 +48,90 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-    private String errorPageLocation;
-    private ExceptionHandler wrapped;
+	private String errorPageLocation;
+	private ExceptionHandler wrapped;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
-    /**
-     * Construct a new ajax exception handler around the given wrapped exception handler and the given HTTP 500 error
-     * page location.
-     * @param wrapped The wrapped exception handler.
-     */
-    public FullAjaxExceptionHandler(ExceptionHandler wrapped, String errorPageLocation) {
-        this.wrapped = wrapped;
-        this.errorPageLocation = errorPageLocation;
-    }
+	/**
+	 * Construct a new ajax exception handler around the given wrapped exception handler and the given HTTP 500 error
+	 * page location.
+	 * @param wrapped The wrapped exception handler.
+	 */
+	public FullAjaxExceptionHandler(ExceptionHandler wrapped, String errorPageLocation) {
+		this.wrapped = wrapped;
+		this.errorPageLocation = errorPageLocation;
+	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
-    /**
-     * Handle the ajax exception as follows:
-     * <ul>
-     * <li>If the current request is an ajax request, continue.
-     * <li>If there is an unhandled exception, continue.
-     * <li>If the exception is an instance of {@link FacesException}, then unwrap its root cause as long as it is not
-     * an instance of {@link FacesException}.
-     * <li>Set the standard servlet error request attributes.
-     * <li>Force JSF to render the full HTTP 500 error page in its entirety.
-     * <li>If there are more unhandled exceptions, swallow them. Only the first one is relevant.
-     * </ul>
-     */
+	/**
+	 * Handle the ajax exception as follows:
+	 * <ul>
+	 * <li>If the current request is an ajax request, continue.
+	 * <li>If there is an unhandled exception, continue.
+	 * <li>If the exception is an instance of {@link FacesException}, then unwrap its root cause as long as it is not
+	 * an instance of {@link FacesException}.
+	 * <li>Set the standard servlet error request attributes.
+	 * <li>Force JSF to render the full HTTP 500 error page in its entirety.
+	 * <li>If there are more unhandled exceptions, swallow them. Only the first one is relevant.
+	 * </ul>
+	 */
 	@Override
-    public void handle() throws FacesException {
-        FacesContext context = FacesContext.getCurrentInstance();
+	public void handle() throws FacesException {
+		FacesContext context = FacesContext.getCurrentInstance();
 
-        if (context.getPartialViewContext().isAjaxRequest()) {
-        	Iterator<ExceptionQueuedEvent> unhandledExceptionQueuedEvents = getUnhandledExceptionQueuedEvents().iterator();
+		if (context.getPartialViewContext().isAjaxRequest()) {
+			Iterator<ExceptionQueuedEvent> unhandledExceptionQueuedEvents = getUnhandledExceptionQueuedEvents().iterator();
 
-        	if (unhandledExceptionQueuedEvents.hasNext()) {
-                Throwable exception = unhandledExceptionQueuedEvents.next().getContext().getException();
-                unhandledExceptionQueuedEvents.remove();
+			if (unhandledExceptionQueuedEvents.hasNext()) {
+				Throwable exception = unhandledExceptionQueuedEvents.next().getContext().getException();
+				unhandledExceptionQueuedEvents.remove();
 
-                // If the exception is wrapped in a FacesException, unwrap the root cause.
-                while (exception instanceof FacesException && exception.getCause() != null) {
-                	exception = exception.getCause();
-                }
+				// If the exception is wrapped in a FacesException, unwrap the root cause.
+				while (exception instanceof FacesException && exception.getCause() != null) {
+					exception = exception.getCause();
+				}
 
-                // Set the necessary servlet request attributes which a bit decent error page may expect.
-                final HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
- 				request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, exception);
- 				request.setAttribute(RequestDispatcher.ERROR_EXCEPTION_TYPE, exception.getClass());
- 				request.setAttribute(RequestDispatcher.ERROR_MESSAGE, exception.getMessage());
- 				request.setAttribute(RequestDispatcher.ERROR_REQUEST_URI, request.getRequestURI());
- 				request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				// Set the necessary servlet request attributes which a bit decent error page may expect.
+				final HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+				request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, exception);
+				request.setAttribute(RequestDispatcher.ERROR_EXCEPTION_TYPE, exception.getClass());
+				request.setAttribute(RequestDispatcher.ERROR_MESSAGE, exception.getMessage());
+				request.setAttribute(RequestDispatcher.ERROR_REQUEST_URI, request.getRequestURI());
+				request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
- 				// Force JSF to render the error page in its entirety to the ajax response.
- 				context.setViewRoot(context.getApplication().getViewHandler().createView(context, errorPageLocation));
-                context.getPartialViewContext().setRenderAll(true);
-                context.renderResponse();
+				// Force JSF to render the error page in its entirety to the ajax response.
+				context.setViewRoot(context.getApplication().getViewHandler().createView(context, errorPageLocation));
+				context.getPartialViewContext().setRenderAll(true);
+				context.renderResponse();
 
-                // Prevent some servlet containers from handling the error page itself afterwards. So far Tomcat/JBoss
-                // are known to do that. It would only result in IllegalStateException "response already committed".
-                Events.addAfterPhaseListener(PhaseId.RENDER_RESPONSE, new Runnable() {
+				// Prevent some servlet containers from handling the error page itself afterwards. So far Tomcat/JBoss
+				// are known to do that. It would only result in IllegalStateException "response already committed".
+				Events.addAfterPhaseListener(PhaseId.RENDER_RESPONSE, new Runnable() {
 					@Override
 					public void run() {
 						request.removeAttribute(RequestDispatcher.ERROR_EXCEPTION);
 					}
-                });
+				});
 
-                // Note that we cannot set response status code to 500, the JSF ajax response won't be processed then.
-            }
+				// Note that we cannot set response status code to 500, the JSF ajax response won't be processed then.
+			}
 
-        	while (unhandledExceptionQueuedEvents.hasNext()) {
-        		// Any remaining unhandled exceptions are not interesting. First fix the first.
-        		unhandledExceptionQueuedEvents.next();
-        		unhandledExceptionQueuedEvents.remove();
-        	}
+			while (unhandledExceptionQueuedEvents.hasNext()) {
+				// Any remaining unhandled exceptions are not interesting. First fix the first.
+				unhandledExceptionQueuedEvents.next();
+				unhandledExceptionQueuedEvents.remove();
+			}
 
-        }
+		}
 
-        wrapped.handle();
-    }
+		wrapped.handle();
+	}
 
-    @Override
-    public ExceptionHandler getWrapped() {
-        return wrapped;
-    }
+	@Override
+	public ExceptionHandler getWrapped() {
+		return wrapped;
+	}
 
 }
