@@ -31,31 +31,49 @@ public abstract class ValidatorFamily extends UIComponentBase {
 
 	// UIComponent overrides ------------------------------------------------------------------------------------------
 
+	/**
+	 * Returns {@link #COMPONENT_FAMILY}.
+	 */
 	@Override
 	public String getFamily() {
 		return COMPONENT_FAMILY;
 	}
 
+	/**
+	 * Returns <code>false</code>.
+	 */
 	@Override
 	public boolean getRendersChildren() {
 		return false;
 	}
 
+	/**
+	 * Calls {@link #validateHierarchy()}.
+	 */
 	@Override
 	public void processDecodes(FacesContext context) {
 		validateHierarchy();
 	}
 
+	/**
+	 * Calls {@link #validateComponents(FacesContext)}.
+	 */
 	@Override
 	public void processValidators(FacesContext context) {
 		validateComponents(context);
 	}
 
+	/**
+	 * Does nothing.
+	 */
 	@Override
 	public void processUpdates(FacesContext context) {
 		// NOOP.
 	}
 
+	/**
+	 * Calls {@link #validateHierarchy()}.
+	 */
 	@Override
 	public void encodeAll(FacesContext context) throws IOException {
 		validateHierarchy();

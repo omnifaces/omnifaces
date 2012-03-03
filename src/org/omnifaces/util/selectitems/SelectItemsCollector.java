@@ -26,8 +26,8 @@ import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import javax.faces.model.SelectItemGroup;
 
+import org.omnifaces.el.ScopedRunner;
 import org.omnifaces.model.ExtendedSelectItem;
-import org.omnifaces.util.ScopedRunner;
 
 /**
  * Collection of utility methods for collecting {@link SelectItem} instances from various sources.

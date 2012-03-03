@@ -43,32 +43,52 @@ public abstract class TreeFamily extends UIComponentBase {
 
 	// UIComponent overrides ------------------------------------------------------------------------------------------
 
+	/**
+	 * Returns {@link #COMPONENT_FAMILY}.
+	 */
 	@Override
 	public String getFamily() {
 		return COMPONENT_FAMILY;
 	}
 
+	/**
+	 * Returns <code>true</code>.
+	 */
 	@Override
 	public boolean getRendersChildren() {
 		return true;
 	}
 
+	/**
+	 * Calls {@link #validateHierarchy()} and then {@link #process(FacesContext, PhaseId)} with
+	 * {@link PhaseId#APPLY_REQUEST_VALUES}.
+	 */
 	@Override
 	public void processDecodes(FacesContext context) {
 		validateHierarchy();
 		process(context, PhaseId.APPLY_REQUEST_VALUES);
 	}
 
+	/**
+	 * Calls {@link #process(FacesContext, PhaseId)} with {@link PhaseId#PROCESS_VALIDATIONS}.
+	 */
 	@Override
 	public void processValidators(FacesContext context) {
 		process(context, PhaseId.PROCESS_VALIDATIONS);
 	}
 
+	/**
+	 * Calls {@link #process(FacesContext, PhaseId)} with {@link PhaseId#UPDATE_MODEL_VALUES}.
+	 */
 	@Override
 	public void processUpdates(FacesContext context) {
 		process(context, PhaseId.UPDATE_MODEL_VALUES);
 	}
 
+	/**
+	 * Calls {@link #validateHierarchy()} and then {@link #process(FacesContext, PhaseId)} with
+	 * {@link PhaseId#RENDER_RESPONSE}.
+	 */
 	@Override
 	public void encodeAll(FacesContext context) throws IOException {
 		validateHierarchy();

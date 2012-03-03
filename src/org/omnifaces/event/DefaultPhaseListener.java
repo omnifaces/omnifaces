@@ -21,7 +21,7 @@ import javax.faces.event.PhaseListener;
  *
  * @author Arjan Tijms
  */
-public class DefaultPhaseListener implements PhaseListener {
+public abstract class DefaultPhaseListener implements PhaseListener {
 
 	private static final long serialVersionUID = -7252366571645029385L;
 	private	PhaseId phaseId;

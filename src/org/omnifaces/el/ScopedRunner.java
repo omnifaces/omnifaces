@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.omnifaces.util;
+package org.omnifaces.el;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,8 +20,6 @@ import javax.faces.context.FacesContext;
 /**
  * This class helps in letting code run within its own scope. Such scope is defined by specific variables being
  * available to EL within it. The request scope is used to store the variables.
- * <p>
- * TODO: Look for a better package. org.omnifaces.el? org.omnifaces.context?
  *
  * @author Arjan Tijms
  *

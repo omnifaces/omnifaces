@@ -96,6 +96,10 @@ public class Tree extends TreeFamily implements NamingContainer {
 
 	// UIComponent overrides ------------------------------------------------------------------------------------------
 
+	/**
+	 * An override which appends the index of the current model node to the client ID chain, if any available.
+	 * @see TreeModel#getIndex()
+	 */
 	@Override
 	public String getContainerClientId(FacesContext context) {
 		String containerClientId = super.getContainerClientId(context);

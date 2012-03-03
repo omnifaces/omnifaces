@@ -1,22 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 
+<!--
    Copyright 2012 OmniFaces.
 
    Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
    the License. You may obtain a copy of the License at
 
-       http://www.apache.org/licenses/LICENSE-2.0
+	   http://www.apache.org/licenses/LICENSE-2.0
 
    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
    an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
    specific language governing permissions and limitations under the License.
  -->
-<facelet-taglib 
+<facelet-taglib
 	xmlns="http://java.sun.com/xml/ns/javaee"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facelettaglibrary_2_0.xsd"
 	version="2.0"
 >
+	<description>OmniFaces UI components.</description>
 	<namespace>http://omnifaces.org/ui</namespace>
 
 	<!-- Tree ===================================================================================================== -->
@@ -39,17 +40,17 @@
 				<pre>
 				&lt;o:tree value="#{bean.treeModel}" var="item" varNode="node"&gt;
 				  &lt;o:treeNode&gt;
-				    &lt;ul&gt;
-				      &lt;o:treeNodeItem&gt;
-				        &lt;li&gt;
-				          #{node.index} #{item.someProperty}
-				          &lt;o:treeInsertChildren /&gt;
-				        &lt;/li&gt;
-				      &lt;/o:treeNodeItem&gt;
-				    &lt;/ul&gt;
+					&lt;ul&gt;
+					  &lt;o:treeNodeItem&gt;
+						&lt;li&gt;
+						  #{node.index} #{item.someProperty}
+						  &lt;o:treeInsertChildren /&gt;
+						&lt;/li&gt;
+					  &lt;/o:treeNodeItem&gt;
+					&lt;/ul&gt;
 				  &lt;/o:treeNode&gt;
 				&lt;/o:tree&gt;
-				</pre>				
+				</pre>
 			]]>
 		</description>
 		<tag-name>tree</tag-name>
@@ -59,7 +60,7 @@
 		<attribute>
 			<description>
 				<![CDATA[
-					The component identifier for this component. This value must be unique within the closest parent 
+					The component identifier for this component. This value must be unique within the closest parent
 					component that is a naming container.
 				]]>
 			</description>
@@ -70,7 +71,7 @@
 		<attribute>
 			<description>
 				<![CDATA[
-					Flag indicating whether or not this component should be rendered (during Render Response Phase), or 
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
 					processed on any subsequent form submit. The default value for this property is true.
 				]]>
 			</description>
@@ -101,7 +102,7 @@
 		<attribute>
 			<description>
 				<![CDATA[
-					The name of the request attribute which exposes the wrapped data of the current node of the tree 
+					The name of the request attribute which exposes the wrapped data of the current node of the tree
 					model.
 				]]>
 			</description>
@@ -141,7 +142,7 @@
 		<attribute>
 			<description>
 				<![CDATA[
-					The component identifier for this component. This value must be unique within the closest parent 
+					The component identifier for this component. This value must be unique within the closest parent
 					component that is a naming container.
 				]]>
 			</description>
@@ -152,7 +153,7 @@
 		<attribute>
 			<description>
 				<![CDATA[
-					Flag indicating whether or not this component should be rendered (during Render Response Phase), or 
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
 					processed on any subsequent form submit. The default value for this property is true.
 				]]>
 			</description>
@@ -201,7 +202,7 @@
 		<attribute>
 			<description>
 				<![CDATA[
-					The component identifier for this component. This value must be unique within the closest parent 
+					The component identifier for this component. This value must be unique within the closest parent
 					component that is a naming container.
 				]]>
 			</description>
@@ -212,7 +213,7 @@
 		<attribute>
 			<description>
 				<![CDATA[
-					Flag indicating whether or not this component should be rendered (during Render Response Phase), or 
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
 					processed on any subsequent form submit. The default value for this property is true.
 				]]>
 			</description>
@@ -249,7 +250,7 @@
 		<attribute>
 			<description>
 				<![CDATA[
-					The component identifier for this component. This value must be unique within the closest parent 
+					The component identifier for this component. This value must be unique within the closest parent
 					component that is a naming container.
 				]]>
 			</description>
@@ -260,7 +261,7 @@
 		<attribute>
 			<description>
 				<![CDATA[
-					Flag indicating whether or not this component should be rendered (during Render Response Phase), or 
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
 					processed on any subsequent form submit. The default value for this property is true.
 				]]>
 			</description>
@@ -284,7 +285,7 @@
 		<description>
 			This component includes the output from a resource located at the given path. This path can
 			not extend outside of the current Servlet context. A resource is either a Servlet or a JSP
-			page.    	
+			page.
 		</description>
 		<tag-name>resourceInclude</tag-name>
 		<component>
@@ -349,7 +350,7 @@
 				&lt;h:message for="baz" /&gt;
 				</pre>
 				<p>
-				The <code>showMessageFor</code> attribute defaults to <code>@this</code>. Other values than 
+				The <code>showMessageFor</code> attribute defaults to <code>@this</code>. Other values than
 				<code>@this</code> or <code>@all</code> are not allowed.
 			]]>
 		</description>
@@ -360,7 +361,7 @@
 		<attribute>
 			<description>
 				<![CDATA[
-					The component identifier for this component. This value must be unique within the closest parent 
+					The component identifier for this component. This value must be unique within the closest parent
 					component that is a naming container.
 				]]>
 			</description>
@@ -371,7 +372,7 @@
 		<attribute>
 			<description>
 				<![CDATA[
-					Flag indicating whether or not this component should be rendered (during Render Response Phase), or 
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
 					processed on any subsequent form submit. The default value for this property is true.
 				]]>
 			</description>
@@ -441,7 +442,7 @@
 		<attribute>
 			<description>
 				<![CDATA[
-					The component identifier for this component. This value must be unique within the closest parent 
+					The component identifier for this component. This value must be unique within the closest parent
 					component that is a naming container.
 				]]>
 			</description>
@@ -452,7 +453,7 @@
 		<attribute>
 			<description>
 				<![CDATA[
-					Flag indicating whether or not this component should be rendered (during Render Response Phase), or 
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
 					processed on any subsequent form submit. The default value for this property is true.
 				]]>
 			</description>
@@ -522,7 +523,7 @@
 		<attribute>
 			<description>
 				<![CDATA[
-					The component identifier for this component. This value must be unique within the closest parent 
+					The component identifier for this component. This value must be unique within the closest parent
 					component that is a naming container.
 				]]>
 			</description>
@@ -533,7 +534,7 @@
 		<attribute>
 			<description>
 				<![CDATA[
-					Flag indicating whether or not this component should be rendered (during Render Response Phase), or 
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
 					processed on any subsequent form submit. The default value for this property is true.
 				]]>
 			</description>
@@ -603,7 +604,7 @@
 		<attribute>
 			<description>
 				<![CDATA[
-					The component identifier for this component. This value must be unique within the closest parent 
+					The component identifier for this component. This value must be unique within the closest parent
 					component that is a naming container.
 				]]>
 			</description>
@@ -614,7 +615,7 @@
 		<attribute>
 			<description>
 				<![CDATA[
-					Flag indicating whether or not this component should be rendered (during Render Response Phase), or 
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
 					processed on any subsequent form submit. The default value for this property is true.
 				]]>
 			</description>
@@ -666,139 +667,5 @@
 			<type>java.lang.String</type>
 		</attribute>
 	</tag>
-
-	<!-- Functions ================================================================================================ -->
-	
-	<function>
-		<description>
-			<![CDATA[
-				URL-encode the given string using UTF-8. This is useful for cases where you can't use 
-				<code>&lt;f:param&gt;</code>.
-			]]>
-		</description>
-		<function-name>encodeURL</function-name>
-		<function-class>org.omnifaces.el.Functions</function-class>
-		<function-signature>java.lang.String encodeURL(java.lang.String)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Escapes the given string according the JavaScript code rules. This escapes among others the special
-				characters, the whitespace, the quotes and the unicode characters. Useful whenever you want to use a
-				Java string variable as a JavaScript string variable.
-			]]>
-		</description>
-		<function-name>escapeJS</function-name>
-		<function-class>org.omnifaces.el.Functions</function-class>
-		<function-signature>java.lang.String escapeJS(java.lang.String)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				URL-prettify the given string. It performs the following tasks:
-				<ul>
-				<li>Lowercase the string.
-				<li>Remove combining diacritical marks.
-				<li>Replace non-alphanumeric characters by hyphens.
-				</ul>
-				This is useful when populating links with dynamic paths obtained from user controlled variables, such
-				as blog titles.
- 			]]>
-		</description>
-		<function-name>prettyURL</function-name>
-		<function-class>com.mbuyu.m4n.Utils</function-class>
-		<function-signature>java.lang.String prettyURL(java.lang.String)</function-signature>
-	</function>
-	
-	<function>
-		<description>
-			<![CDATA[
-				Abbreviate the given text on the given size limit with ellipsis.
-			]]>
-		</description>
-		<function-name>abbreviate</function-name>
-		<function-class>org.omnifaces.el.Functions</function-class>
-		<function-signature>java.lang.String abbreviate(java.lang.String, int)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Concatenate the string representation of the given objects. This is useful when you don't know
-				beforehand if one of the both hands is a string or is <code>null</code>, otherwise the new EL 2.2
-				<code>#{bean.string1.concat(bean.string2)}</code> can just be used.
-			]]>
-		</description>
-		<function-name>concat</function-name>
-		<function-class>org.omnifaces.el.Functions</function-class>
-		<function-signature>java.lang.String concat(java.lang.String, java.lang.String)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Format the given date in the given pattern. This is useful when you want to format dates in for example
-				the <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select
-				item, or wherever you can't use the <code>&lt;f:convertDateTime&gt;</code> tag.
-			]]>
-		</description>
-		<function-name>formatDate</function-name>
-		<function-class>org.omnifaces.el.Functions</function-class>
-		<function-signature>java.lang.String formatDate(java.util.Date, java.lang.String)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Creates and returns a dummy object array of the given size. This is useful if you want to iterate
-				<i>n</i> times over an <code>&lt;ui:repeat&gt;</code>, which doesn't support EL in <code>begin</code>
-				and <code>end</code> attributes.
-			]]>
-		</description>
-		<function-name>createArray</function-name>
-		<function-class>org.omnifaces.el.Functions</function-class>
-		<function-signature>java.lang.Object[] createArray(int)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Converts a <code>Set&lt;E&gt;</code> to a <code>List&lt;E&gt;</code>. Useful when you want to iterate
-				over a <code>Set</code> in for example <code>&lt;ui:repeat&gt;</code>.
-			]]>
-		</description>
-		<function-name>setToList</function-name>
-		<function-class>org.omnifaces.el.Functions</function-class>
-		<function-signature>java.util.List setToList(java.util.Set)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Converts a <code>Map&lt;K, V&gt;</code> to a <code>List&lt;Map.Entry&ltK, V&gt;&gt;</code>. Useful when
-				you want to iterate over a <code>Map</code> in for example <code>&lt;ui:repeat&gt;</code>. Each of the
-				entries has the usual <code>getKey()</code> and <code>getValue()</code> methods.
-			]]>
-		</description>
-		<function-name>mapToList</function-name>
-		<function-class>org.omnifaces.el.Functions</function-class>
-		<function-signature>java.util.List mapToList(java.util.Map)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Returns <code>true</code> if the string representation of an item of the given array equals to the
-				string representation of the given item. This returns <code>false</code> if either the array or the
-				item is null. This is useful if you want to for example check if <code>#{paramValues.foo}</code>
-				contains a certain value.
-			]]>
-		</description>
-		<function-name>contains</function-name>
-		<function-class>org.omnifaces.el.Functions</function-class>
-		<function-signature>boolean contains(java.lang.Object[], java.lang.Object)</function-signature>
-	</function>
 
 </facelet-taglib>

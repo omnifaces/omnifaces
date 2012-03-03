@@ -15,7 +15,6 @@ package org.omnifaces.util;
 import java.text.MessageFormat;
 
 import javax.faces.application.FacesMessage;
-import javax.faces.application.FacesMessage.Severity;
 import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
@@ -125,7 +124,7 @@ public final class Messages {
 	 * @see Resolver#getMessage(String, Object...)
 	 * @see FacesContext#addMessage(String, FacesMessage)
 	 */
-	public static void add(Severity severity, String clientId, String message, Object... params) {
+	public static void add(FacesMessage.Severity severity, String clientId, String message, Object... params) {
 		FacesMessage facesMessage = new FacesMessage(severity, resolver.getMessage(message, params), null);
 		FacesContext.getCurrentInstance().addMessage(clientId, facesMessage);
 	}
@@ -136,7 +135,7 @@ public final class Messages {
 	 * @param clientId The client ID to add the faces message for.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #add(Severity, String, String, Object...)
+	 * @see #add(FacesMessage.Severity, String, String, Object...)
 	 */
 	public static void addInfo(String clientId, String message, Object... params) {
 		add(FacesMessage.SEVERITY_INFO, clientId, message, params);
@@ -148,7 +147,7 @@ public final class Messages {
 	 * @param clientId The client ID to add the faces message for.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #add(Severity, String, String, Object...)
+	 * @see #add(FacesMessage.Severity, String, String, Object...)
 	 */
 	public static void addWarn(String clientId, String message, Object... params) {
 		add(FacesMessage.SEVERITY_WARN, clientId, message, params);
@@ -160,7 +159,7 @@ public final class Messages {
 	 * @param clientId The client ID to add the faces message for.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #add(Severity, String, String, Object...)
+	 * @see #add(FacesMessage.Severity, String, String, Object...)
 	 */
 	public static void addError(String clientId, String message, Object... params) {
 		add(FacesMessage.SEVERITY_ERROR, clientId, message, params);
@@ -172,7 +171,7 @@ public final class Messages {
 	 * @param clientId The client ID to add the faces message for.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #add(Severity, String, String, Object...)
+	 * @see #add(FacesMessage.Severity, String, String, Object...)
 	 */
 	public static void addFatal(String clientId, String message, Object... params) {
 		add(FacesMessage.SEVERITY_FATAL, clientId, message, params);
@@ -182,7 +181,7 @@ public final class Messages {
 	 * Add a global INFO faces message, with the given message body which is formatted with the given parameters.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #add(Severity, String, String, Object...)
+	 * @see #add(FacesMessage.Severity, String, String, Object...)
 	 */
 	public static void addGlobalInfo(String message, Object... params) {
 		add(FacesMessage.SEVERITY_INFO, null, message, params);
@@ -192,7 +191,7 @@ public final class Messages {
 	 * Add a global WARN faces message, with the given message body which is formatted with the given parameters.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #add(Severity, String, String, Object...)
+	 * @see #add(FacesMessage.Severity, String, String, Object...)
 	 */
 	public static void addGlobalWarn(String message, Object... params) {
 		add(FacesMessage.SEVERITY_WARN, null, message, params);
@@ -202,7 +201,7 @@ public final class Messages {
 	 * Add a global ERROR faces message, with the given message body which is formatted with the given parameters.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #add(Severity, String, String, Object...)
+	 * @see #add(FacesMessage.Severity, String, String, Object...)
 	 */
 	public static void addGlobalError(String message, Object... params) {
 		add(FacesMessage.SEVERITY_ERROR, null, message, params);
@@ -212,7 +211,7 @@ public final class Messages {
 	 * Add a global FATAL faces message, with the given message body which is formatted with the given parameters.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #add(Severity, String, String, Object...)
+	 * @see #add(FacesMessage.Severity, String, String, Object...)
 	 */
 	public static void addGlobalFatal(String message, Object... params) {
 		add(FacesMessage.SEVERITY_FATAL, null, message, params);
@@ -230,9 +229,9 @@ public final class Messages {
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
 	 * @see Flash#setKeepMessages(boolean)
-	 * @see #add(Severity, String, String, Object...)
+	 * @see #add(FacesMessage.Severity, String, String, Object...)
 	 */
-	public static void addFlash(Severity severity, String clientId, String message, Object... params) {
+	public static void addFlash(FacesMessage.Severity severity, String clientId, String message, Object... params) {
 		Faces.getFlash().setKeepMessages(true);
 		add(severity, clientId, message, params);
 	}
@@ -243,9 +242,9 @@ public final class Messages {
 	 * @param clientId The client ID to add the faces message for.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #addFlash(Severity, String, String, Object...)
+	 * @see #addFlash(FacesMessage.Severity, String, String, Object...)
 	 */
-	public static void addInfoFlash(String clientId, String message, Object... params) {
+	public static void addFlashInfo(String clientId, String message, Object... params) {
 		addFlash(FacesMessage.SEVERITY_INFO, clientId, message, params);
 	}
 
@@ -255,9 +254,9 @@ public final class Messages {
 	 * @param clientId The client ID to add the faces message for.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #addFlash(Severity, String, String, Object...)
+	 * @see #addFlash(FacesMessage.Severity, String, String, Object...)
 	 */
-	public static void addWarnFlash(String clientId, String message, Object... params) {
+	public static void addFlashWarn(String clientId, String message, Object... params) {
 		addFlash(FacesMessage.SEVERITY_WARN, clientId, message, params);
 	}
 
@@ -267,9 +266,9 @@ public final class Messages {
 	 * @param clientId The client ID to add the faces message for.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #addFlash(Severity, String, String, Object...)
+	 * @see #addFlash(FacesMessage.Severity, String, String, Object...)
 	 */
-	public static void addErrorFlash(String clientId, String message, Object... params) {
+	public static void addFlashError(String clientId, String message, Object... params) {
 		addFlash(FacesMessage.SEVERITY_ERROR, clientId, message, params);
 	}
 
@@ -279,9 +278,9 @@ public final class Messages {
 	 * @param clientId The client ID to add the faces message for.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #addFlash(Severity, String, String, Object...)
+	 * @see #addFlash(FacesMessage.Severity, String, String, Object...)
 	 */
-	public static void addFatalFlash(String clientId, String message, Object... params) {
+	public static void addFlashFatal(String clientId, String message, Object... params) {
 		addFlash(FacesMessage.SEVERITY_FATAL, clientId, message, params);
 	}
 
@@ -290,9 +289,9 @@ public final class Messages {
 	 * parameters.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #addFlash(Severity, String, String, Object...)
+	 * @see #addFlash(FacesMessage.Severity, String, String, Object...)
 	 */
-	public static void addGlobalInfoFlash(String message, Object... params) {
+	public static void addFlashGlobalInfo(String message, Object... params) {
 		addFlash(FacesMessage.SEVERITY_INFO, null, message, params);
 	}
 
@@ -301,9 +300,9 @@ public final class Messages {
 	 * parameters.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #addFlash(Severity, String, String, Object...)
+	 * @see #addFlash(FacesMessage.Severity, String, String, Object...)
 	 */
-	public static void addGlobalWarnFlash(String message, Object... params) {
+	public static void addFlashGlobalWarn(String message, Object... params) {
 		addFlash(FacesMessage.SEVERITY_WARN, null, message, params);
 	}
 
@@ -312,9 +311,9 @@ public final class Messages {
 	 * parameters.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #addFlash(Severity, String, String, Object...)
+	 * @see #addFlash(FacesMessage.Severity, String, String, Object...)
 	 */
-	public static void addGlobalErrorFlash(String message, Object... params) {
+	public static void addFlashGlobalError(String message, Object... params) {
 		addFlash(FacesMessage.SEVERITY_ERROR, null, message, params);
 	}
 
@@ -323,9 +322,9 @@ public final class Messages {
 	 * parameters.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #addFlash(Severity, String, String, Object...)
+	 * @see #addFlash(FacesMessage.Severity, String, String, Object...)
 	 */
-	public static void addGlobalFatalFlash(String message, Object... params) {
+	public static void addFlashGlobalFatal(String message, Object... params) {
 		addFlash(FacesMessage.SEVERITY_FATAL, null, message, params);
 	}
 
