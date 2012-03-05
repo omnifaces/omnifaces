@@ -19,7 +19,6 @@ import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
-import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContextListener;
 
 /**
@@ -43,8 +42,8 @@ import javax.servlet.ServletContextListener;
  * <p>
  * There is already a default resolver which just delegates the message and the parameters straight to
  * {@link MessageFormat#format(String, Object...)}. Note that the resolver can be set only once. It's recommend to do
- * it early during webapp's startup, for example with a {@link ServletContextListener}, or a
- * {@link ServletContainerInitializer}, or an eagerly initialized {@link ApplicationScoped} {@link ManagedBean}.
+ * it early during webapp's startup, for example with a {@link ServletContextListener}, or a Servlet 3.0 
+ * <code>ServletContainerInitializer</code>, or an eagerly initialized {@link ApplicationScoped} {@link ManagedBean}.
  *
  * @author Bauke Scholtz
  */

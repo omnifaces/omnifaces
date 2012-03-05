@@ -25,19 +25,19 @@ import org.omnifaces.util.MapWrapper;
 /**
  * <strong>ViewParameter</strong> is a component that extends the standard {@link UIViewParameter} and provides a stateless
  * mode of operation.
- * <p> 
- * The standard UIViewParameter implementation calls the model setter again after postback. This is not always desired when being 
+ * <p>
+ * The standard UIViewParameter implementation calls the model setter again after postback. This is not always desired when being
  * bound to a view scoped beans and can lead to performance problems when combined with an expensive converter.
- * <p> 
+ * <p>
  * To solve this, this component by default stores the submitted value as a component property instead of in the model (and thus
  * in the view state in case the binding is to a view scoped bean).
- * 
+ *
  * @author Arjan Tijms
  * @author Bauke Scholtz
  */
 @FacesComponent(ViewParam.COMPONENT_TYPE)
 public class ViewParam extends UIViewParameter {
-	
+
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.viewparam.ViewParam";
 
 	private String submittedValue;
@@ -52,53 +52,53 @@ public class ViewParam extends UIViewParameter {
 	public String getSubmittedValue() {
 		return submittedValue;
 	}
-	
+
 	@Override
 	public boolean isRequired() {
 		// The request parameter get lost on postbacks, however it's already present in the view scoped bean.
 		// So we can safely skip the required validation on postbacks.
 		return !FacesContext.getCurrentInstance().isPostback() && super.isRequired();
 	}
-	
+
 	@Override
 	public Map<String, Object> getAttributes() {
 		if (attributeInterceptMap == null) {
 			attributeInterceptMap = new MapWrapper<String, Object>(super.getAttributes()) {
-				
+
 				@Override
 				public Object get(Object key) {
 					if ("label".equals(key)) {
-						return getLabel();	
+						return getLabel();
 					} else {
 						return super.get(key);
 					}
 
-				};
-				
+				}
+
 				private Object getLabel() {
 					// First check if our wrapped Map has the label
 					Object label = getWrapped().get("label");
 					if (label == null || (label instanceof String && ((String) label).isEmpty())) {
-						
+
 						// Next check if our outer component has a value expression for the label
 						ValueExpression labelExpression = ViewParam.this.getValueExpression("label");
 						if (labelExpression != null) {
 							label = labelExpression.getValue(FacesContext.getCurrentInstance().getELContext());
 						}
 					}
-					
+
 					// No explicit label defined, default to "name" (which is in many cases the most
 					// sane label anyway).
 					if (label == null) {
 						label = ViewParam.this.getName();
 					}
-					
-					return label;	
+
+					return label;
 				}
-			
+
 			};
 		}
-	
+
 		return attributeInterceptMap;
 	}
 

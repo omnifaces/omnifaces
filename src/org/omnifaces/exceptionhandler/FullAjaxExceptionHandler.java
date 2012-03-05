@@ -20,7 +20,6 @@ import javax.faces.context.ExceptionHandlerWrapper;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ExceptionQueuedEvent;
 import javax.faces.event.PhaseId;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -35,19 +34,31 @@ import org.omnifaces.util.Events;
  * normal synchronous HTTP 500 error page response. You could for example show them in the error page as follows:
  * <pre>
  * &lt;ul&gt;
- * &lt;li&gt;Date/time: #{of:formatDate(now, 'yyyy-MM-dd HH:mm:ss')}&lt;/li&gt;
- * &lt;li&gt;HTTP user agent: #{header['user-agent']}&lt;/li&gt;
- * &lt;li&gt;Request URI: #{requestScope['javax.servlet.error.request_uri']}&lt;/li&gt;
- * &lt;li&gt;Status code: #{requestScope['javax.servlet.error.status_code']}&lt;/li&gt;
- * &lt;li&gt;Exception type: #{requestScope['javax.servlet.error.exception_type']}&lt;/li&gt;
- * &lt;li&gt;Exception message: #{requestScope['javax.servlet.error.message']}&lt;/li&gt;
- * &lt;li&gt;Exception stack trace: &lt;pre&gt;#{of:printStackTrace(requestScope['javax.servlet.error.exception'])}&lt;/pre&gt;&lt;/li&gt;
+ *   &lt;li&gt;Date/time: #{of:formatDate(now, 'yyyy-MM-dd HH:mm:ss')}&lt;/li&gt;
+ *   &lt;li&gt;HTTP user agent: #{header['user-agent']}&lt;/li&gt;
+ *   &lt;li&gt;Request URI: #{requestScope['javax.servlet.error.request_uri']}&lt;/li&gt;
+ *   &lt;li&gt;Status code: #{requestScope['javax.servlet.error.status_code']}&lt;/li&gt;
+ *   &lt;li&gt;Exception type: #{requestScope['javax.servlet.error.exception_type']}&lt;/li&gt;
+ *   &lt;li&gt;Exception message: #{requestScope['javax.servlet.error.message']}&lt;/li&gt;
+ *   &lt;li&gt;Exception stack trace:
+ *     &lt;pre&gt;#{of:printStackTrace(requestScope['javax.servlet.error.exception'])}&lt;/pre&gt;
+ *   &lt;/li&gt;
  * &lt;/ul&gt;
  * </pre>
  *
  * @author Bauke Scholtz
  */
 public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
+
+	// Private constants ----------------------------------------------------------------------------------------------
+
+	// Yes, those are copies of Servlet 3.0 RequestDispatcher constant field values.
+	// They are hardcoded to maintain Servlet 2.5 compatibility.
+	private static final String ATTRIBUTE_ERROR_EXCEPTION = "javax.servlet.error.exception";
+	private static final String ATTRIBUTE_ERROR_EXCEPTION_TYPE = "javax.servlet.error.exception_type";
+	private static final String ATTRIBUTE_ERROR_MESSAGE = "javax.servlet.error.message";
+	private static final String ATTRIBUTE_ERROR_REQUEST_URI = "javax.servlet.error.request_uri";
+	private static final String ATTRIBUTE_ERROR_STATUS_CODE = "javax.servlet.error.status_code";
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
@@ -98,11 +109,11 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
 				// Set the necessary servlet request attributes which a bit decent error page may expect.
 				final HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
-				request.setAttribute(RequestDispatcher.ERROR_EXCEPTION, exception);
-				request.setAttribute(RequestDispatcher.ERROR_EXCEPTION_TYPE, exception.getClass());
-				request.setAttribute(RequestDispatcher.ERROR_MESSAGE, exception.getMessage());
-				request.setAttribute(RequestDispatcher.ERROR_REQUEST_URI, request.getRequestURI());
-				request.setAttribute(RequestDispatcher.ERROR_STATUS_CODE, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+				request.setAttribute(ATTRIBUTE_ERROR_EXCEPTION, exception);
+				request.setAttribute(ATTRIBUTE_ERROR_EXCEPTION_TYPE, exception.getClass());
+				request.setAttribute(ATTRIBUTE_ERROR_MESSAGE, exception.getMessage());
+				request.setAttribute(ATTRIBUTE_ERROR_REQUEST_URI, request.getRequestURI());
+				request.setAttribute(ATTRIBUTE_ERROR_STATUS_CODE, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
 				// Force JSF to render the error page in its entirety to the ajax response.
 				context.setViewRoot(context.getApplication().getViewHandler().createView(context, errorPageLocation));
@@ -114,7 +125,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 				Events.addAfterPhaseListener(PhaseId.RENDER_RESPONSE, new Runnable() {
 					@Override
 					public void run() {
-						request.removeAttribute(RequestDispatcher.ERROR_EXCEPTION);
+						request.removeAttribute(ATTRIBUTE_ERROR_EXCEPTION);
 					}
 				});
 

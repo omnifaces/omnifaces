@@ -52,7 +52,7 @@ public class ValidateUnique extends ValidateMultipleFields {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Validate if values are unique.
+	 * Validate if all values are unique.
 	 */
 	@Override
 	protected boolean validateValues(FacesContext context, List<UIInput> inputs, List<Object> values) {

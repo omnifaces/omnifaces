@@ -12,7 +12,6 @@
  */
 package org.omnifaces.exceptionhandler;
 
-
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -29,7 +28,9 @@ import org.w3c.dom.Document;
  * {@link FullAjaxExceptionHandler} to run:
  * <pre>
  * &lt;factory&gt;
- *   &lt;exception-handler-factory&gt;org.omnifaces.exceptionhandler.FullAjaxExceptionHandlerFactory&lt;/exception-handler-factory&gt;
+ *   &lt;exception-handler-factory&gt;
+ *     org.omnifaces.exceptionhandler.FullAjaxExceptionHandlerFactory
+ *   &lt;/exception-handler-factory&gt;
  * &lt;/factory&gt;
  * </pre>
  * <p>
