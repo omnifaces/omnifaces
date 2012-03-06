@@ -64,7 +64,8 @@ public class TreeNode extends TreeFamily {
 	}
 
 	/**
-	 * This method is by design only called by {@link Tree#processTreeNode(FacesContext, PhaseId)}.
+	 * This method is by design only called by {@link Tree#processTreeNode(FacesContext, PhaseId)} as it maintains all
+	 * the nodes.
 	 * @see Tree#processTreeNode(FacesContext, PhaseId)
 	 */
 	@Override

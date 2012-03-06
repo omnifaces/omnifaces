@@ -186,8 +186,8 @@
 	<tag>
 		<description>
 			<![CDATA[
-				<strong><code>TreeNodeItem</strong> is an <code>UIComponent</code> that represents a single child tree
-				node within a parent <code>TreeNode</code> component. Within this component, the <code>var</code>
+				<strong><code>TreeNodeItem</code></strong> is an <code>UIComponent</code> that represents a single child
+				tree node within a parent <code>TreeNode</code> component. Within this component, the <code>var</code>
 				attribute of the parent <code>Tree</code> component will expose the child tree node.
 				<p>
 				This component allows a child component of type <code>TreeInsertChildren</code> which indicates the

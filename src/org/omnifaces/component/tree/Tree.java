@@ -265,7 +265,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @param context The faces context to work with.
 	 * @param vars An object array with the two values.
 	 */
-	private void setVars(FacesContext context, Object[] vars) {
+	private void setVars(FacesContext context, Object... vars) {
 		Map<String, Object> requestMap = context.getExternalContext().getRequestMap();
 		String[] names = { getVar(), getVarNode() };
 
@@ -292,16 +292,13 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 */
 	protected void setCurrentModelNode(FacesContext context, TreeModel currentModelNode) {
 
-		// Save state of any child input fields of previous node before setting new model.
+		// Save state of any child input fields of previous model node before setting new model node.
 		EditableValueHolderStateHelper.save(context, getStateHelper(), getFacetsAndChildren());
 
 		this.currentModelNode = currentModelNode;
-		setVars(context, new Object[] {
-			currentModelNode != null ? currentModelNode.getData() : null,
-			currentModelNode
-		});
+		setVars(context, (currentModelNode != null ? currentModelNode.getData() : null), currentModelNode);
 
-		// Restore any saved state of any child input fields of current node before continuing.
+		// Restore any saved state of any child input fields of current model node before continuing.
 		EditableValueHolderStateHelper.restore(context, getStateHelper(), getFacetsAndChildren());
 	}
 

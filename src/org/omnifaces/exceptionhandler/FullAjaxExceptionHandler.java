@@ -71,6 +71,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	 * Construct a new ajax exception handler around the given wrapped exception handler and the given HTTP 500 error
 	 * page location.
 	 * @param wrapped The wrapped exception handler.
+	 * @param errorPageLocation The HTTP 500 error page location.
 	 */
 	public FullAjaxExceptionHandler(ExceptionHandler wrapped, String errorPageLocation) {
 		this.wrapped = wrapped;
