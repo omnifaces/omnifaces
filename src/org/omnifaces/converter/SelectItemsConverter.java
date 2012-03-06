@@ -27,26 +27,38 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
  * This class can be used as-is provided the Object has a <code>toString</code> method that uniquely identifies it and which
  * makes sense as an identifier. Since this is not the typical case for <code>toString</code>, users are assumed to override
  * the <code>getAsString</code> method and provide an implementation that converts an object to its string representation.
- * This <code>getAsObject</code> method will then be used to automatically do the reverse mapping. 
+ * This <code>getAsObject</code> method will then be used to automatically do the reverse mapping.
+ * <p>
+ * This converter is available by converter ID <code>omnifaces.selectItemsConverter</code>. Basic usage example:
+ * <pre>
+ * &lt;h:selectOneMenu value="#{bean.selectedEntity}" converter="omnifaces.SelectItemsConverter"&gt;
+ *   &lt;f:selectItems value="#{bean.availableEntities}" var="entity"
+ *       itemValue="#{entity}" itemLabel="#{entity.someProperty}" /&gt;
+ * &lt;/h:selectOneMenu&gt;
+ * </pre>
+ * <p>
+ * When extending this converter to override <code>getAsString()</code> to return something simpler, such as the entity
+ * ID by <code>return String.valueOf(((Entity) value).getId());</code>, you only have to change the <code>converter</code>
+ * attribute in the above example to refer the extended converter instead.
  *
  * @author Arjan Tijms
  *
  */
-@FacesConverter("omnifaces.selectItemsConverter")
+@FacesConverter("omnifaces.SelectItemsConverter")
 public class SelectItemsConverter implements Converter {
 
 	@Override
-	public Object getAsObject(FacesContext context, UIComponent component, String value) {		
-		return SelectItemsUtils.findValueByStringConversion(context, component, value, this);	
+	public Object getAsObject(FacesContext context, UIComponent component, String value) {
+		return SelectItemsUtils.findValueByStringConversion(context, component, value, this);
 	}
-	
+
 	@Override
 	public String getAsString(FacesContext context, UIComponent component, Object value) {
 		if (value == null) {
 			return null;
 		}
-		
+
 		return value.toString();
 	}
-	
+
 }

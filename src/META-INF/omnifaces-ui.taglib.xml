@@ -25,7 +25,7 @@
 	<tag>
 		<description>
 			<![CDATA[
-				<strong><code>Tree</code></strong> is an <code>UIComponent</code> that supports data binding to a tree
+				<strong><code>o:tree</code></strong> is an <code>UIComponent</code> that supports data binding to a tree
 				of data objects represented by a <code>TreeModel</code> instance, which is the current value of this
 				component itself (typically established via a <code>ValueExpression</code>. During iterative processing
 				over the nodes of tree in the tree model, the object for the current node is exposed as a request
@@ -125,7 +125,7 @@
 	<tag>
 		<description>
 			<![CDATA[
-				<strong><code>TreeNode</code></strong> is an <code>UIComponent</code> that represents a single tree node
+				<strong><code>o:treeNode</code></strong> is an <code>UIComponent</code> that represents a single tree node
 				within a parent <code>Tree</code> component. Within this component, the <code>var</code> attribute of
 				the parent <code>Tree</code> component will expose the tree node. Each of its children is processed by
 				<code>TreeNodeItem</code>.
@@ -186,7 +186,7 @@
 	<tag>
 		<description>
 			<![CDATA[
-				<strong><code>TreeNodeItem</code></strong> is an <code>UIComponent</code> that represents a single child
+				<strong><code>o:treeNodeItem</code></strong> is an <code>UIComponent</code> that represents a single child
 				tree node within a parent <code>TreeNode</code> component. Within this component, the <code>var</code>
 				attribute of the parent <code>Tree</code> component will expose the child tree node.
 				<p>
@@ -236,7 +236,7 @@
 	<tag>
 		<description>
 			<![CDATA[
-				<strong><code>TreeInsertChildren</code></strong> is an <code>UIComponent</code> that represents the
+				<strong><code>o:treeInsertChildren</code></strong> is an <code>UIComponent</code> that represents the
 				insertion point for the children of a parent tree node which is represented by
 				<code>TreeNodeItem</code>.
 				<p>
@@ -304,7 +304,7 @@
 	<tag>
 		<description>
 			<![CDATA[
-				<strong>ValidateAllOrNone</strong> validates validates if at least ALL of the given <code>UIInput</code>
+				<strong><code>o:validateAllOrNone</code></strong> validates validates if at least ALL of the given <code>UIInput</code>
 				components have been filled in or that NONE of the given <code>UIInput</code> components have been
 				filled in. The default message is
 				<blockquote>{0}: Please fill in all or none of those fields</blockquote>
@@ -428,7 +428,7 @@
 	<tag>
 		<description>
 			<![CDATA[
-				<strong>ValidateOneOrMore</strong> validates if at least ONE of the given <code>UIInput</code>
+				<strong><code>o:validateOneOrMore</code></strong> validates if at least ONE of the given <code>UIInput</code>
 				components has been filled in. The default message is
 				<blockquote>{0}: Please fill in at least one of those fields</blockquote>
 				<p>
@@ -509,7 +509,7 @@
 	<tag>
 		<description>
 			<![CDATA[
-				<strong>ValidateEqual</strong> validates if ALL of the given <code>UIInput</code> components have the
+				<strong><code>o:validateEqual</code></strong> validates if ALL of the given <code>UIInput</code> components have the
 				same value. The default message is
 				<blockquote>{0}: Please fill in the same value for all of those fields</blockquote>
 				<p>
@@ -590,7 +590,7 @@
 	<tag>
 		<description>
 			<![CDATA[
-				<strong>ValidateUnique</strong> validates if ALL of the given <code>UIInput</code> components have an
+				<strong><code>o:validateUnique</code></strong> validates if ALL of the given <code>UIInput</code> components have an
 				unique value. The default message is
 				<blockquote>{0}: Please fill in an unique value for all of those fields</blockquote>
 				<p>
@@ -672,9 +672,18 @@
 	<tag>
 		<description>
 				<![CDATA[
-					<strong>viewParam</strong> is a component that extends the standard viewParam and provides a stateless
+					<strong><code>o:viewParam</code></strong> is a component that extends the standard viewParam and provides a stateless
 	 				mode of operation and a default for the label atrribute. When the label attribute is ommitted, the name
-	 				attribute will be used instead.				
+	 				attribute will be used instead.
+	 				<p>
+	 				The standard UIViewParameter implementation calls the model setter again after postback. This is not always desired when being
+					bound to a view scoped beans and can lead to performance problems when combined with an expensive converter.
+					<p>
+					To solve this, this component by default stores the submitted value as a component property instead of in the model (and thus
+					in the view state in case the binding is to a view scoped bean).
+					<p>
+					You can use it the same way as <code>&lt;f:viewParam&gt;</code>, you only need to change <code>f:</code> by
+					<code>o:</code>.
 				]]>
 		</description>
 		<tag-name>viewParam</tag-name>

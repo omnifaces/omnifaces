@@ -31,6 +31,9 @@ import org.omnifaces.util.MapWrapper;
  * <p>
  * To solve this, this component by default stores the submitted value as a component property instead of in the model (and thus
  * in the view state in case the binding is to a view scoped bean).
+ * <p>
+ * You can use it the same way as <code>&lt;f:viewParam&gt;</code>, you only need to change <code>f:</code> by
+ * <code>o:</code>.
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz
