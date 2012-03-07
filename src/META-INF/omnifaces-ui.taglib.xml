@@ -12,6 +12,7 @@
    specific language governing permissions and limitations under the License.
  -->
 <facelet-taglib
+	id="o"
 	xmlns="http://java.sun.com/xml/ns/javaee"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facelettaglibrary_2_0.xsd"
@@ -37,19 +38,18 @@
 				This component does not have a renderer since it does not render any markup by itself. This allows the
 				developers to have full control over the markup of the tree by declaring the appropriate JSF components
 				or HTML elements in the markup. Here is a basic usage example:
-				<pre>
-				&lt;o:tree value="#{bean.treeModel}" var="item" varNode="node"&gt;
-				  &lt;o:treeNode&gt;
-					&lt;ul&gt;
-					  &lt;o:treeNodeItem&gt;
-						&lt;li&gt;
-						  #{node.index} #{item.someProperty}
-						  &lt;o:treeInsertChildren /&gt;
-						&lt;/li&gt;
-					  &lt;/o:treeNodeItem&gt;
-					&lt;/ul&gt;
-				  &lt;/o:treeNode&gt;
-				&lt;/o:tree&gt;
+				<pre>&lt;o:tree value="#{bean.treeModel}" var="item" varNode="node"&gt;
+				<br/>&#160;&#160;&lt;o:treeNode&gt;
+				<br/>&#160;&#160;&#160;&#160;&lt;ul&gt;
+				<br/>&#160;&#160;&#160;&#160;&#160;&#160;&lt;o:treeNodeItem&gt;
+				<br/>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&lt;li&gt;
+				<br/>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;#{node.index} #{item.someProperty}
+				<br/>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&lt;o:treeInsertChildren /&gt;
+				<br/>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&lt;/li&gt;
+				<br/>&#160;&#160;&#160;&#160;&#160;&#160;&lt;/o:treeNodeItem&gt;
+				<br/>&#160;&#160;&#160;&#160;&lt;/ul&gt;
+				<br/>&#160;&#160;&lt;/o:treeNode&gt;
+				<br/>&lt;/o:tree&gt;
 				</pre>
 			]]>
 		</description>
@@ -322,32 +322,29 @@
 				is not recommended to put this validator somewhere in between the referenced components as the resulting
 				behaviour may be confusing. Put this validator either before or after all of the components, depending
 				on how you would like to prioritize the validation.
-				<pre>
-				&lt;o:validateMultipleFields id="myId" components="foo bar baz" /&gt;
-				&lt;h:message for="myId" /&gt;
-				&lt;h:inputText id="foo" /&gt;
-				&lt;h:inputText id="bar" /&gt;
-				&lt;h:inputText id="baz" /&gt;
+				<pre>&lt;o:validateMultipleFields id="myId" components="foo bar baz" /&gt;
+				<br/>&lt;h:message for="myId" /&gt;
+				<br/>&lt;h:inputText id="foo" /&gt;
+				<br/>&lt;h:inputText id="bar" /&gt;
+				<br/>&lt;h:inputText id="baz" /&gt;
 				</pre>
 				<p>
 				In an invalidating case, all of the referenced components will be marked invalid and a faces message
 				will be added on the client ID of this validator component. The default message can be changed by the
 				<code>message</code> attribute. Any "{0}" placeholder in the message will be substituted with a comma
 				separated string of labels of the referenced input components.
-				<pre>
-				&lt;o:validateMultipleFields components="foo bar baz" message="{0} are wrong!" /&gt;
+				<pre>&lt;o:validateMultipleFields components="foo bar baz" message="{0} are wrong!" /&gt;
 				</pre>
 				<p>
 				The faces message can also be shown for all of the referenced components using
 				<code>showMessageFor="@all"</code>.
-				<pre>
-				&lt;o:validateMultipleFields components="foo bar baz" message="This is wrong!" showMessageFor="@all" /&gt;
-				&lt;h:inputText id="foo" /&gt;
-				&lt;h:message for="foo" /&gt;
-				&lt;h:inputText id="bar" /&gt;
-				&lt;h:message for="bar" /&gt;
-				&lt;h:inputText id="baz" /&gt;
-				&lt;h:message for="baz" /&gt;
+				<pre>&lt;o:validateMultipleFields components="foo bar baz" message="This is wrong!" showMessageFor="@all" /&gt;
+				<br/>&lt;h:inputText id="foo" /&gt;
+				<br/>&lt;h:message for="foo" /&gt;
+				<br/>&lt;h:inputText id="bar" /&gt;
+				<br/>&lt;h:message for="bar" /&gt;
+				<br/>&lt;h:inputText id="baz" /&gt;
+				<br/>&lt;h:message for="baz" /&gt;
 				</pre>
 				<p>
 				The <code>showMessageFor</code> attribute defaults to <code>@this</code>. Other values than

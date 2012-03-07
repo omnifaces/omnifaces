@@ -29,11 +29,11 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
  * the <code>getAsString</code> method and provide an implementation that converts an object to its string representation.
  * This <code>getAsObject</code> method will then be used to automatically do the reverse mapping.
  * <p>
- * This converter is available by converter ID <code>omnifaces.selectItemsConverter</code>. Basic usage example:
+ * This converter is available by converter ID <code>omnifaces.SelectItemsConverter</code>. Basic usage example:
  * <pre>
  * &lt;h:selectOneMenu value="#{bean.selectedEntity}" converter="omnifaces.SelectItemsConverter"&gt;
  *   &lt;f:selectItems value="#{bean.availableEntities}" var="entity"
- *       itemValue="#{entity}" itemLabel="#{entity.someProperty}" /&gt;
+ *     itemValue="#{entity}" itemLabel="#{entity.someProperty}" /&gt;
  * &lt;/h:selectOneMenu&gt;
  * </pre>
  * <p>
