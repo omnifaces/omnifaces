@@ -52,6 +52,8 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
+	private static final String ERROR_EXCEPTION_OCCURRED = "ERROR: An exception occurred during JSF ajax request.";
+
 	// Yes, those are copies of Servlet 3.0 RequestDispatcher constant field values.
 	// They are hardcoded to maintain Servlet 2.5 compatibility.
 	private static final String ATTRIBUTE_ERROR_EXCEPTION = "javax.servlet.error.exception";
@@ -107,6 +109,9 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 				while (exception instanceof FacesException && exception.getCause() != null) {
 					exception = exception.getCause();
 				}
+
+				// Log the exception to server log.
+				context.getExternalContext().log(ERROR_EXCEPTION_OCCURRED, exception);
 
 				// Set the necessary servlet request attributes which a bit decent error page may expect.
 				final HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();

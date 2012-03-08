@@ -19,6 +19,8 @@ import javax.faces.bean.ApplicationScoped;
 import javax.faces.bean.ManagedBean;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
+import javax.faces.convert.ConverterException;
+import javax.faces.validator.ValidatorException;
 import javax.servlet.ServletContextListener;
 
 /**
@@ -114,18 +116,76 @@ public final class Messages {
 	// Utility --------------------------------------------------------------------------------------------------------
 
 	/**
+	 * Create a faces message of the given severity with the given message body which is formatted with the given
+	 * parameters. Useful when a faces message is needed to construct a {@link ConverterException} or a
+	 * {@link ValidatorException}.
+	 * @param severity The severity of the faces message.
+	 * @param message The message body.
+	 * @param params The message format parameters, if any.
+	 * @return A new faces message of the given severity with the given message body which is formatted with the given
+	 * parameters.
+	 * @see Resolver#getMessage(String, Object...)
+	 */
+	public static FacesMessage create(FacesMessage.Severity severity, String message, Object... params) {
+		return new FacesMessage(severity, resolver.getMessage(message, params), null);
+	}
+
+	/**
+	 * Create an INFO faces message with the given message body which is formatted with the given parameters.
+	 * @param message The message body.
+	 * @param params The message format parameters, if any.
+	 * @return A new INFO faces message with the given message body which is formatted with the given parameters.
+	 * @see #create(javax.faces.application.FacesMessage.Severity, String, Object...)
+	 */
+	public static FacesMessage createInfo(String message, Object... params) {
+		return create(FacesMessage.SEVERITY_INFO, message, params);
+	}
+
+	/**
+	 * Create a WARN faces message with the given message body which is formatted with the given parameters.
+	 * @param message The message body.
+	 * @param params The message format parameters, if any.
+	 * @return A new WARN faces message with the given message body which is formatted with the given parameters.
+	 * @see #create(javax.faces.application.FacesMessage.Severity, String, Object...)
+	 */
+	public static FacesMessage createWarn(String message, Object... params) {
+		return create(FacesMessage.SEVERITY_WARN, message, params);
+	}
+
+	/**
+	 * Create an ERROR faces message with the given message body which is formatted with the given parameters.
+	 * @param message The message body.
+	 * @param params The message format parameters, if any.
+	 * @return A new ERROR faces message with the given message body which is formatted with the given parameters.
+	 * @see #create(javax.faces.application.FacesMessage.Severity, String, Object...)
+	 */
+	public static FacesMessage createError(String message, Object... params) {
+		return create(FacesMessage.SEVERITY_ERROR, message, params);
+	}
+
+	/**
+	 * Create a FATAL faces message with the given message body which is formatted with the given parameters.
+	 * @param message The message body.
+	 * @param params The message format parameters, if any.
+	 * @return A new FATAL faces message with the given message body which is formatted with the given parameters.
+	 * @see #create(javax.faces.application.FacesMessage.Severity, String, Object...)
+	 */
+	public static FacesMessage createFatal(String message, Object... params) {
+		return create(FacesMessage.SEVERITY_FATAL, message, params);
+	}
+
+	/**
 	 * Add a faces message of the given severity to the given client ID, with the given message body which is formatted
 	 * with the given parameters.
 	 * @param clientId The client ID to add the faces message for.
 	 * @param severity The severity of the faces message.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see Resolver#getMessage(String, Object...)
+	 * @see #create(javax.faces.application.FacesMessage.Severity, String, Object...)
 	 * @see FacesContext#addMessage(String, FacesMessage)
 	 */
 	public static void add(FacesMessage.Severity severity, String clientId, String message, Object... params) {
-		FacesMessage facesMessage = new FacesMessage(severity, resolver.getMessage(message, params), null);
-		FacesContext.getCurrentInstance().addMessage(clientId, facesMessage);
+		FacesContext.getCurrentInstance().addMessage(clientId, create(severity, message, params));
 	}
 
 	/**

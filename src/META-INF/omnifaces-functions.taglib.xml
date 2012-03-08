@@ -12,13 +12,13 @@
    specific language governing permissions and limitations under the License.
  -->
 <facelet-taglib
-	id="of"
 	xmlns="http://java.sun.com/xml/ns/javaee"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-facelettaglibrary_2_0.xsd"
 	version="2.0"
 >
 	<description>OmniFaces EL functions.</description>
+	<display-name>of</display-name>
 	<namespace>http://omnifaces.org/functions</namespace>
 
 	<!-- Strings ================================================================================================== -->
