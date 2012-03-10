@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE project>
+<!--
+
+  OmniFaces ANT Build file
+  
+-->
+<project name="OmniFaces" default="all" basedir=".">
+
+    <path id="common.classpath">
+        <fileset dir="lib">
+            <include name="**/*.jar" />
+        </fileset>
+    </path>
+
+    <target name="clean">
+        <delete dir="build" />
+        <delete dir="dist" />
+    </target>
+
+    <target name="compile">
+        <mkdir dir="build/classes" />
+        <javac srcdir="src" destdir="build/classes" includeantruntime="false" source="1.6" target="1.6" debug="true">
+            <classpath refid="common.classpath" />        	
+        </javac>
+        <copy todir="build/classes">
+        	<fileset dir="src" excludes="**/*.java" />
+        </copy>
+    </target>
+
+    <target name="jar" depends="compile">
+        <mkdir dir="dist" />
+        <jar destfile="dist/omnifaces.jar" basedir="build/classes"/>
+    </target>
+
+    <target name="jar-src">
+        <mkdir dir="dist" />
+        <jar destfile="dist/omnifaces-src.jar" basedir="src"/>
+    </target>
+
+    <target name="dist" depends="jar,jar-src" />
+    <target name="all" depends="clean,dist" />
+</project>

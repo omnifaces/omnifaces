@@ -702,7 +702,6 @@
 			<required>true</required>
 			<type>java.lang.String</type>
 		</attribute>
-	
 		<attribute>
 			<description>
 				<![CDATA[
@@ -866,7 +865,42 @@
 			<required>false</required>
 			<type>java.lang.String</type>
 		</attribute>
+	</tag>
 	
+	
+	<tag>
+		<description>
+			<![CDATA[
+				<strong><code>o:methodParam</code></strong> is a tag handler that can be used to pass a method expression
+				into a Facelets tag.
+				<p>
+				By default this is not possible, and the expression that's intended to be a method expression will be created and
+				made available as a value expression.				
+			]]>
+		</description>
+		<tag-name>methodParam</tag-name>
+		<handler-class>org.omnifaces.facelets.MethodParamHandler</handler-class>
+		<attribute>
+			<description>
+				<![CDATA[
+	               Name under which the method expression will be made available to EL, scoped to the body of the Facelets tag.
+	            ]]>
+            </description>
+			<name>name</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	               The value expression that is to be interpreted and invoked as a method expression. This is typically the
+	               name of the parameter by which a value is passed into the Facelets tag.
+	            ]]>
+            </description>
+			<name>value</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
 	</tag>
 
 </facelet-taglib>
