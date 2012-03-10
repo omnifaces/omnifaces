@@ -30,7 +30,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * This exception handler factory needs to be registered as follows in <tt>faces-config.xml</tt> to get the
+ * <p>This exception handler factory needs to be registered as follows in <tt>faces-config.xml</tt> to get the
  * {@link FullAjaxExceptionHandler} to run:
  * <pre>
  * &lt;factory&gt;
@@ -39,8 +39,7 @@ import org.w3c.dom.NodeList;
  *   &lt;/exception-handler-factory&gt;
  * &lt;/factory&gt;
  * </pre>
- * <p>
- * This exception handler factory will parse the <tt>web.xml</tt> to find the error page locations of the HTTP error
+ * <p>This exception handler factory will parse the <tt>web.xml</tt> to find the error page locations of the HTTP error
  * code <tt>500</tt> all declared exception types. Those locations need to point to Facelets files. The location of the
  * HTTP error code <tt>500</tt> or the exception type <code>java.lang.Throwable</code> is required in order to get the
  * full ajax exception handler to work, because there's then at least a fall back error page whenever there's no match
@@ -51,16 +50,15 @@ import org.w3c.dom.NodeList;
  *   &lt;location&gt;/errors/500.xhtml&lt;/location&gt;
  * &lt;/error-page&gt;
  * </pre>
- * or
+ * <p>or
  * <pre>
  * &lt;error-page&gt;
- *   &lt;exception-type&gt;java.lang.Throwable&lt;/error-code&gt;
+ *   &lt;exception-type&gt;java.lang.Throwable&lt;/exception-type&gt;
  *   &lt;location&gt;/errors/500.xhtml&lt;/location&gt;
  * &lt;/error-page&gt;
  * </pre>
- * <p>
- * Both can also, only the <code>java.lang.Throwable</code> one will always get precedence over the <tt>500</tt> one,
- * as per the Servlet API specification, so the <tt>500</tt> one would be basically superfluous.
+ * <p>Both can also, only the <code>java.lang.Throwable</code> one will always get precedence over the <tt>500</tt>
+ * one, as per the Servlet API specification, so the <tt>500</tt> one would be basically superfluous.
  *
  * @author Bauke Scholtz
  */
