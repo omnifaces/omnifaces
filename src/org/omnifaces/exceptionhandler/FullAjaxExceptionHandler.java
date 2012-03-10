@@ -13,6 +13,8 @@
 package org.omnifaces.exceptionhandler;
 
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.faces.FacesException;
 import javax.faces.context.ExceptionHandler;
@@ -26,12 +28,11 @@ import javax.servlet.http.HttpServletResponse;
 import org.omnifaces.util.Events;
 
 /**
- * This exception handler enables you to show the full HTTP 500 error page in its entirety to the enduser in
- * case of exceptions during ajax requests. Refer the documentation of {@link FullAjaxExceptionHandlerFactory} how to
- * setup it.
+ * This exception handler enables you to show the full error page in its entirety to the enduser in case of exceptions
+ * during ajax requests. Refer the documentation of {@link FullAjaxExceptionHandlerFactory} how to setup it.
  * <p>
  * The exception detail is available in the request scope by the standard servlet error request attributes like as in a
- * normal synchronous HTTP 500 error page response. You could for example show them in the error page as follows:
+ * normal synchronous error page response. You could for example show them in the error page as follows:
  * <pre>
  * &lt;ul&gt;
  *   &lt;li&gt;Date/time: #{of:formatDate(now, 'yyyy-MM-dd HH:mm:ss')}&lt;/li&gt;
@@ -52,7 +53,8 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
-	private static final String ERROR_EXCEPTION_OCCURRED = "ERROR: An exception occurred during JSF ajax request.";
+	private static final String LOG_EXCEPTION_OCCURRED =
+		"An exception occurred during JSF ajax request. Showing error page location '%s'.";
 
 	// Yes, those are copies of Servlet 3.0 RequestDispatcher constant field values.
 	// They are hardcoded to maintain Servlet 2.5 compatibility.
@@ -64,8 +66,8 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private String errorPageLocation;
 	private ExceptionHandler wrapped;
+	private Map<Class<Throwable>, String> errorPageLocations;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -73,26 +75,33 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	 * Construct a new ajax exception handler around the given wrapped exception handler and the given HTTP 500 error
 	 * page location.
 	 * @param wrapped The wrapped exception handler.
-	 * @param errorPageLocation The HTTP 500 error page location.
+	 * @param errorPageLocations Ordered map of all available specific exception types and their locations. The key
+	 * <code>null</code> represents the default location.
 	 */
-	public FullAjaxExceptionHandler(ExceptionHandler wrapped, String errorPageLocation) {
+	public FullAjaxExceptionHandler(ExceptionHandler wrapped, Map<Class<Throwable>, String> errorPageLocations) {
 		this.wrapped = wrapped;
-		this.errorPageLocation = errorPageLocation;
+		this.errorPageLocations = errorPageLocations;
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Handle the ajax exception as follows:
+	 * Handle the ajax exception as follows, only and only if the current request is an ajax request and there is at
+	 * least one unhandled exception:
 	 * <ul>
-	 * <li>If the current request is an ajax request, continue.
-	 * <li>If there is an unhandled exception, continue.
-	 * <li>If the exception is an instance of {@link FacesException}, then unwrap its root cause as long as it is not
-	 * an instance of {@link FacesException}.
-	 * <li>Set the standard servlet error request attributes.
-	 * <li>Force JSF to render the full HTTP 500 error page in its entirety.
-	 * <li>If there are more unhandled exceptions, swallow them. Only the first one is relevant.
+	 *   <li>If the exception is an instance of {@link FacesException}, then unwrap its root cause as long as it is not
+	 *       an instance of {@link FacesException}.
+	 *   <li>Find the error page location as per Servlet specification 10.9.2:
+	 *     <ul>
+	 *       <li>Make a first pass through all specific exception types. If an exact match is found, use its location.
+	 *       <li>Else make a second pass through all specific exception types in the order as they are declared in
+	 *           web.xml. If the current exception is an instance of it, then use its location.
+	 *       <li>Else use the default error page location, which can be either the HTTP 500 or java.lang.Throwable one.
+	 *     </ul>
+	 *   <li>Set the standard servlet error request attributes.
+	 *   <li>Force JSF to render the full error page in its entirety.
 	 * </ul>
+	 * Any remaining unhandled exceptions will be swallowed. Only the first one is relevant.
 	 */
 	@Override
 	public void handle() throws FacesException {
@@ -110,8 +119,11 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 					exception = exception.getCause();
 				}
 
+				// Find the error page location for the given exception as per Servlet specification 10.9.2.
+				String errorPageLocation = findErrorPageLocation(exception);
+
 				// Log the exception to server log.
-				context.getExternalContext().log(ERROR_EXCEPTION_OCCURRED, exception);
+				context.getExternalContext().log(String.format(LOG_EXCEPTION_OCCURRED, errorPageLocation), exception);
 
 				// Set the necessary servlet request attributes which a bit decent error page may expect.
 				final HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
@@ -152,6 +164,35 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	@Override
 	public ExceptionHandler getWrapped() {
 		return wrapped;
+	}
+
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Find for the given exception the right error page location as per Servlet specification 10.9.2:
+	 * <ul>
+	 *   <li>Make a first pass through all specific exception types. If an exact match is found, use its location.
+	 *   <li>Else make a second pass through all specific exception types in the order as they are declared in
+	 *       web.xml. If the current exception is an instance of it, then use its location.
+	 *   <li>Else use the default error page location, which can be either the HTTP 500 or java.lang.Throwable one.
+	 * </ul>
+	 * @param throwable The exception to find the error page location for.
+	 * @return The right error page location for the given exception.
+	 */
+	private String findErrorPageLocation(Throwable exception) {
+		for (Entry<Class<Throwable>, String> entry : errorPageLocations.entrySet()) {
+			if (entry.getKey() == exception.getClass()) {
+				return entry.getValue();
+			}
+		}
+
+		for (Entry<Class<Throwable>, String> entry : errorPageLocations.entrySet()) {
+			if (entry.getKey() != null && entry.getKey().isInstance(exception)) {
+				return entry.getValue();
+			}
+		}
+
+		return errorPageLocations.get(null);
 	}
 
 }
