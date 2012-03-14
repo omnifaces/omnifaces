@@ -30,7 +30,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * <p>This exception handler factory needs to be registered as follows in <tt>faces-config.xml</tt> to get the
+ * This exception handler factory needs to be registered as follows in <tt>faces-config.xml</tt> to get the
  * {@link FullAjaxExceptionHandler} to run:
  * <pre>
  * &lt;factory&gt;
@@ -40,10 +40,10 @@ import org.w3c.dom.NodeList;
  * &lt;/factory&gt;
  * </pre>
  * <p>This exception handler factory will parse the <tt>web.xml</tt> to find the error page locations of the HTTP error
- * code <tt>500</tt> all declared exception types. Those locations need to point to Facelets files. The location of the
- * HTTP error code <tt>500</tt> or the exception type <code>java.lang.Throwable</code> is required in order to get the
- * full ajax exception handler to work, because there's then at least a fall back error page whenever there's no match
- * with any of the declared specific exceptions. So, you must at least have either
+ * code <tt>500</tt> and all declared specific exception types. Those locations need to point to Facelets files. The
+ * location of the HTTP error code <tt>500</tt> or the exception type <code>java.lang.Throwable</code> is required in
+ * order to get the full ajax exception handler to work, because there's then at least a fall back error page whenever
+ * there's no match with any of the declared specific exceptions. So, you must at least have either
  * <pre>
  * &lt;error-page&gt;
  *   &lt;error-code&gt;500&lt;/error-code&gt;

@@ -92,7 +92,8 @@ public class CombinedResourceListener implements SystemEventListener {
 			if (resource.getRendererType().equals(RENDERER_TYPE_STYLESHEET)) {
 				stylesheets.add(library, name);
 				iter.remove();
-			} else if (resource.getRendererType().equals(RENDERER_TYPE_SCRIPT)) {
+			}
+			else if (resource.getRendererType().equals(RENDERER_TYPE_SCRIPT)) {
 				scripts.add(library, name);
 				iter.remove();
 			}

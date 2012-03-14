@@ -93,7 +93,8 @@ final class CombinedResource extends Resource {
 		String path = ResourceHandler.RESOURCE_IDENTIFIER + "/" + getResourceName();
 		return Faces.getRequestContextPath()
 			+ (Faces.isPrefixMapping(mapping) ? (mapping + path) : (path + mapping))
-			+ "?ln=" + CombinedResourceHandler.LIBRARY_NAME;
+			+ "?ln=" + CombinedResourceHandler.LIBRARY_NAME
+			+ "&amp;v=" + (Faces.<Long>evaluateExpressionGet("#{startup.time}") / 60000); // In minutes.
 	}
 
 	@Override
@@ -129,7 +130,8 @@ final class CombinedResource extends Resource {
 			try {
 				info.reload();
 				return info.getLastModified() > sdf.parse(ifModifiedSince).getTime();
-			} catch (ParseException ignore) {
+			}
+			catch (ParseException ignore) {
 				return true;
 			}
 		}
@@ -151,7 +153,8 @@ final class CombinedResource extends Resource {
 		if (path == null) {
 			path = externalContext.getRequestServletPath();
 			return path.substring(path.lastIndexOf('/') + 1, path.lastIndexOf('.'));
-		} else {
+		}
+		else {
 			return path.substring(path.lastIndexOf('/') + 1);
 		}
 	}

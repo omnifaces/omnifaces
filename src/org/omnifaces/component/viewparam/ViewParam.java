@@ -72,10 +72,10 @@ public class ViewParam extends UIViewParameter {
 				public Object get(Object key) {
 					if ("label".equals(key)) {
 						return getLabel();
-					} else {
+					}
+					else {
 						return super.get(key);
 					}
-
 				}
 
 				private Object getLabel() {

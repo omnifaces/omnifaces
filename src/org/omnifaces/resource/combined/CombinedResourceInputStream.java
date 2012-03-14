@@ -50,7 +50,7 @@ final class CombinedResourceInputStream extends InputStream {
 		}
 
 		streamIterator = streams.iterator();
-		streamIterator.hasNext(); // We assume it to be always true; CombinedResourceInfo won't created anyway if it's empty.
+		streamIterator.hasNext(); // We assume it to be always true; CombinedResourceInfo won't be created anyway if it's empty.
 		currentStream = streamIterator.next();
 	}
 
@@ -67,7 +67,8 @@ final class CombinedResourceInputStream extends InputStream {
 		while ((read = currentStream.read()) == -1) {
 			if (streamIterator.hasNext()) {
 				currentStream = streamIterator.next();
-			} else {
+			}
+			else {
 				break;
 			}
 		}
@@ -87,7 +88,8 @@ final class CombinedResourceInputStream extends InputStream {
 		for (InputStream stream : streams) {
 			try {
 				stream.close();
-			} catch (IOException e) {
+			}
+			catch (IOException e) {
 				if (caught == null) {
 					caught = e; // Don't throw it yet. We have to continue closing all other streams.
 				}

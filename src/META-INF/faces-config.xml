@@ -18,7 +18,24 @@
     version="2.0"
 >
 	<managed-bean>
-		<description>This makes an instance of java.util.Date as current datetime available by #{now}.</description>
+		<description>
+			<![CDATA[
+				This makes an instance of <code>java.util.Date</code> as startup datetime available by 
+				<code>#{startup}</code>.
+			]]>
+		</description>
+		<managed-bean-name>startup</managed-bean-name>
+		<managed-bean-class>java.util.Date</managed-bean-class>
+		<managed-bean-scope>application</managed-bean-scope>
+	</managed-bean>
+
+	<managed-bean>
+		<description>
+			<![CDATA[
+				This makes an instance of <code>java.util.Date</code> as current datetime available by
+				<code>#{now}</code>.
+			]]>
+		</description>
 		<managed-bean-name>now</managed-bean-name>
 		<managed-bean-class>java.util.Date</managed-bean-class>
 		<managed-bean-scope>request</managed-bean-scope>

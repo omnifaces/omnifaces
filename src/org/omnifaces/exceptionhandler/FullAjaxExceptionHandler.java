@@ -36,7 +36,7 @@ import org.omnifaces.util.Events;
  * <pre>
  * &lt;ul&gt;
  *   &lt;li&gt;Date/time: #{of:formatDate(now, 'yyyy-MM-dd HH:mm:ss')}&lt;/li&gt;
- *   &lt;li&gt;HTTP user agent: #{header['user-agent']}&lt;/li&gt;
+ *   &lt;li&gt;User agent: #{header['user-agent']}&lt;/li&gt;
  *   &lt;li&gt;Request URI: #{requestScope['javax.servlet.error.request_uri']}&lt;/li&gt;
  *   &lt;li&gt;Status code: #{requestScope['javax.servlet.error.status_code']}&lt;/li&gt;
  *   &lt;li&gt;Exception type: #{requestScope['javax.servlet.error.exception_type']}&lt;/li&gt;
@@ -72,8 +72,8 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Construct a new ajax exception handler around the given wrapped exception handler and the given HTTP 500 error
-	 * page location.
+	 * Construct a new ajax exception handler around the given wrapped exception handler and the given error page
+	 * locations.
 	 * @param wrapped The wrapped exception handler.
 	 * @param errorPageLocations Ordered map of all available specific exception types and their locations. The key
 	 * <code>null</code> represents the default location.
@@ -122,7 +122,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 				// Find the error page location for the given exception as per Servlet specification 10.9.2.
 				String errorPageLocation = findErrorPageLocation(exception);
 
-				// Log the exception to server log.
+				// Log the exception to server log like as in a normal synchronous HTTP 500 error page response.
 				context.getExternalContext().log(String.format(LOG_EXCEPTION_OCCURRED, errorPageLocation), exception);
 
 				// Set the necessary servlet request attributes which a bit decent error page may expect.

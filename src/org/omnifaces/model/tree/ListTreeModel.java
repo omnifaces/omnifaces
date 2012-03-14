@@ -75,7 +75,8 @@ public class ListTreeModel<T> implements TreeModel<T> {
 	public List<TreeModel<T>> getChildren() {
 		if (unmodifiableChildren == null && children == null) {
 			unmodifiableChildren = Collections.emptyList();
-		} else if (unmodifiableChildren == null || unmodifiableChildren.size() != children.size()) {
+		}
+		else if (unmodifiableChildren == null || unmodifiableChildren.size() != children.size()) {
 			unmodifiableChildren = Collections.unmodifiableList(children);
 		}
 

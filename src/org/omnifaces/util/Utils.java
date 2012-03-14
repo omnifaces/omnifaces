@@ -76,4 +76,22 @@ public final class Utils {
 		}
 	}
 
+	/**
+	 * Returns the first non-<code>null</code> object of the argument list, or <code>null</code> if there is no such
+	 * element.
+	 * @param <T> The generic object type.
+	 * @param objects The argument list of objects to be tested for non-<code>null</code>.
+	 * @return The first non-<code>null</code> object of the argument list, or <code>null</code> if there is no such
+	 * element.
+	 */
+	public static <T> T coalesce(T... objects) {
+		for (T object : objects) {
+			if (object != null) {
+				return object;
+			}
+		}
+
+		return null;
+	}
+
 }

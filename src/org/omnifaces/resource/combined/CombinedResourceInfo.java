@@ -149,14 +149,15 @@ final class CombinedResourceInfo {
 		 * @return The unique ID of the given map.
 		 */
 		private static String createUniqueId(Map<String, Set<String>> map) {
-			// TODO: I personally don't trust MD5 to be fail-safe. This needs more testing or a different unique ID
-			// approach has to be invented.
+			// TODO: I personally don't trust MD5 to be fail-safe. There's still *a* chance on a clash even though it's
+			// less than 0.01%. This needs more testing or a different unique ID approach has to be invented.
 
 			byte[] hash;
 
 			try {
 				hash = MessageDigest.getInstance("MD5").digest(map.toString().getBytes("UTF-8"));
-			} catch (Exception e) {
+			}
+			catch (Exception e) {
 				// So, MD5 and/or UTF-8 isn't supported. Does such a platform ever exist nowadays?
 				throw new RuntimeException(ERROR_CREATING_UNIQUE_ID, e);
 			}
@@ -226,7 +227,8 @@ final class CombinedResourceInfo {
 					if (lastModified > this.lastModified) {
 						this.lastModified = lastModified;
 					}
-				} catch (IOException e) {
+				}
+				catch (IOException e) {
 					// Can't and shouldn't handle it here anyway.
 				}
 			}

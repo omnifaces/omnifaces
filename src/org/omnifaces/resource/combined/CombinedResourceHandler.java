@@ -71,7 +71,8 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper {
 	public Resource createResource(String resourceName, String libraryName) {
 		if (LIBRARY_NAME.equals(libraryName)) {
 			return new CombinedResource(resourceName);
-		} else {
+		}
+		else {
 			return super.createResource(resourceName, libraryName);
 		}
 	}
@@ -80,7 +81,8 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper {
 	public void handleResourceRequest(FacesContext context) throws IOException {
 		if (LIBRARY_NAME.equals(context.getExternalContext().getRequestParameterMap().get("ln"))) {
 			streamResource(context, new CombinedResource(context));
-		} else {
+		}
+		else {
 			super.handleResourceRequest(context);
 		}
 	}
@@ -142,14 +144,16 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper {
 
 				do {
 					written += outputChannel.write(buffer);
-				} while (written < size);
+				}
+				while (written < size);
 
 				buffer.clear();
 				size += read;
 			}
 
 			externalContext.setResponseContentLength(size);
-		} finally {
+		}
+		finally {
 			if (outputChannel != null) try { outputChannel.close(); } catch (IOException ignore) { /**/ }
 			if (inputChannel != null) try { inputChannel.close(); } catch (IOException ignore) { /**/ }
 		}

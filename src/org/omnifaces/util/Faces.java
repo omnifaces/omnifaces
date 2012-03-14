@@ -12,11 +12,18 @@
  */
 package org.omnifaces.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -39,15 +46,18 @@ import javax.servlet.http.HttpSession;
  * <p>
  * Do note that using the hierarchy is actually a better software design practice, but can lead to verbose code.
  * <p>
- * In addition, note that there's normally a small overhead in obtaining the thread local {@link FacesContext}. In case client code
- * needs to call methods in this class multiple times it's expected that performance will be slightly better if instead
- * the {@link FacesContext} is obtained once and the required methods called on that.
+ * In addition, note that there's normally a small overhead in obtaining the thread local {@link FacesContext}. In case
+ * client code needs to call methods in this class multiple times it's expected that performance will be slightly better
+ * if instead the {@link FacesContext} is obtained once and the required methods called on that.
  *
  * @author Arjan Tijms, Bauke Scholtz
  */
 public final class Faces {
 
 	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final String DEFAULT_SENDFILE_CONTENT_TYPE = "application/octet-stream";
+	private static final int DEFAULT_SENDFILE_BUFFER_SIZE = 10240;
 
 	private static final String ERROR_UNSUPPORTED_ENCODING = "UTF-8 is apparently not supported on this machine.";
 
@@ -116,7 +126,9 @@ public final class Faces {
 	 * Returns true if the given mapping is a prefix mapping, otherwise false. Use this method in preference to
 	 * {@link #isPrefixMapping()} when you already have obtained the mapping from {@link #getMapping()} so that the
 	 * mapping won't be calculated twice.
+	 * @param mapping The mapping to be tested.
 	 * @return True if the given mapping is a prefix mapping, otherwise false.
+	 * @throws NullPointerException When mapping is <code>null</code>.
 	 */
 	public static boolean isPrefixMapping(String mapping) {
 		return (mapping.charAt(0) == '/');
@@ -399,12 +411,13 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the ID of the current view root.
-	 * @return The ID of the current view root.
+	 * Returns the ID of the current view root, or <code>null</code> if there is no view.
+	 * @return The ID of the current view root, or <code>null</code> if there is no view.
 	 * @see UIViewRoot#getViewId()
 	 */
 	public static String getViewId() {
-		return FacesContext.getCurrentInstance().getViewRoot().getViewId();
+		UIViewRoot viewRoot = FacesContext.getCurrentInstance().getViewRoot();
+		return (viewRoot != null) ? viewRoot.getViewId() : null;
 	}
 
 	/**
@@ -476,6 +489,115 @@ public final class Faces {
 
 		FacesContext context = FacesContext.getCurrentInstance();
 		return (T) context.getApplication().evaluateExpressionGet(context, expression, Object.class);
+	}
+
+	/**
+	 * Send the given file to the response. The content type will be determined based on file name.
+	 * The {@link FacesContext#responseComplete()} will implicitly be called after successful streaming.
+	 * @param file The file to be sent to the response.
+	 * @param attachment Whether the file should be provided as attachment, or just inline.
+	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
+	 * redeclare it in the action method. The servletcontainer will handle it.
+	 */
+	public static void sendFile(File file, boolean attachment) throws IOException {
+		sendFile(new FileInputStream(file), file.getName(), file.length(), attachment);
+	}
+
+	/**
+	 * Send the given byte array as a file to the response. The content type will be determined based on file name.
+	 * The {@link FacesContext#responseComplete()} will implicitly be called after successful streaming.
+	 * @param content The file content as byte array.
+	 * @param filename The file name which should appear in content disposition header.
+	 * @param attachment Whether the file should be provided as attachment, or just inline.
+	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
+	 * redeclare it in the action method. The servletcontainer will handle it.
+	 */
+	public static void sendFile(byte[] content, String filename, boolean attachment) throws IOException {
+		sendFile(new ByteArrayInputStream(content), filename, content.length, attachment);
+	}
+
+	/**
+	 * Send the given input stream as a file to the response. The content type will be determined based on file name.
+	 * The {@link FacesContext#responseComplete()} will implicitly be called after successful streaming.
+	 * @param content The file content as input stream.
+	 * @param filename The file name which should appear in content disposition header.
+	 * @param attachment Whether the file should be provided as attachment, or just inline.
+	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
+	 * redeclare it in the action method. The servletcontainer will handle it.
+	 */
+	public static void sendFile(InputStream content, String filename, boolean attachment) throws IOException {
+		sendFile(content, filename, -1, attachment);
+	}
+
+	/**
+	 * Internal global method to send the given input stream to the response.
+	 * @param content The file content as input stream.
+	 * @param filename The file name which should appear in content disposition header.
+	 * @param contentLength The content length, or -1 if it is unknown.
+	 * @param attachment Whether the file should be provided as attachment, or just inline.
+	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
+	 * redeclare it in the action method. The servletcontainer will handle it.
+	 */
+	private static void sendFile(InputStream content, String filename, long contentLength, boolean attachment)
+		throws IOException
+	{
+		FacesContext context = FacesContext.getCurrentInstance();
+		ExternalContext externalContext = context.getExternalContext();
+		String contentType = externalContext.getMimeType(filename);
+		String contentDisposition = String.format("%s;filename=\"%s\"",
+			(attachment ? "attachment" : "inline"), URLEncoder.encode(filename, "UTF-8"));
+
+		// Prepare the response and set the necessary headers.
+		externalContext.responseReset();
+		externalContext.setResponseBufferSize(DEFAULT_SENDFILE_BUFFER_SIZE);
+		externalContext.setResponseContentType(contentType != null ? contentType : DEFAULT_SENDFILE_CONTENT_TYPE);
+		externalContext.setResponseHeader("Content-Disposition", contentDisposition);
+
+		// Not exactly mandatory, but this fixes at least a MSIE quirk: http://support.microsoft.com/kb/316431
+		if (((HttpServletRequest) externalContext.getRequest()).isSecure()) {
+			externalContext.setResponseHeader("Cache-Control", "public");
+			externalContext.setResponseHeader("Pragma", "public");
+		}
+
+		// If content length is known, set it. Note that setResponseContentLength() cannot be used as it takes only int.
+		if (contentLength != -1) {
+			externalContext.setResponseHeader("Content-Length", String.valueOf(contentLength));
+		}
+
+		// Now the streaming by NIO channels.
+		ReadableByteChannel inputChannel = null;
+		WritableByteChannel outputChannel = null;
+
+		try {
+			inputChannel = Channels.newChannel(content);
+			outputChannel = Channels.newChannel(externalContext.getResponseOutputStream());
+			ByteBuffer buffer = ByteBuffer.allocate(DEFAULT_SENDFILE_BUFFER_SIZE);
+			long size = 0;
+
+			for (int read = inputChannel.read(buffer), written = 0; read != -1; read = inputChannel.read(buffer)) {
+				buffer.rewind();
+				buffer.limit(read);
+
+				do {
+					written += outputChannel.write(buffer);
+				}
+				while (written < size);
+
+				buffer.clear();
+				size += read;
+			}
+
+			// This may be on time for files smaller than the default buffer size, but is otherwise ignored anyway.
+			if (contentLength == -1) {
+				externalContext.setResponseHeader("Content-Length", String.valueOf(size));
+			}
+
+			context.responseComplete();
+		}
+		finally {
+			if (outputChannel != null) try { outputChannel.close(); } catch (IOException ignore) { /**/ }
+			if (inputChannel != null) try { inputChannel.close(); } catch (IOException ignore) { /**/ }
+		}
 	}
 
 }

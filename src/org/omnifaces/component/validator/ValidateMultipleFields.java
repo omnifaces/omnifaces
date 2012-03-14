@@ -166,8 +166,8 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 
 	/**
 	 * Collect the input components. Only those which are an instance of {@link UIInput}, are rendered, not disabled nor
-	 * readonly and not processed yet will be returned. If at least one of them has already been validated ans is been
-	 * marked invalid, then an empty collection will be returned.
+	 * readonly will be returned. If at least one of them has already been validated and is been marked invalid, then an
+	 * empty collection will be returned.
 	 * @return The input components.
 	 * @throws IllegalArgumentException When the <code>components</code> attribute is missing, or when it references an
 	 * non-existing component, or when it references a non-input component.
