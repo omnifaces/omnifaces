@@ -97,9 +97,9 @@ public final class Faces {
 	}
 
 	/**
-	 * Determines and returns the faces servlet mapping used in the current request. If the path info is <tt>null</tt>,
-	 * then it is definitely a suffix (extension) mapping like <tt>*.xhtml</tt>, else it is definitely a prefix (path)
-	 * mapping like <tt>/faces/*</tt> as available by servlet path.
+	 * Determines and returns the faces servlet mapping used in the current request. If the path info is
+	 * <code>null</code>, then it is definitely a suffix (extension) mapping like <tt>*.xhtml</tt>, else it is
+	 * definitely a prefix (path) mapping like <tt>/faces/*</tt> as available by the servlet path.
 	 * @return The faces servlet mapping (without the wildcard).
 	 */
 	public static String getMapping() {

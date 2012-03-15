@@ -22,7 +22,7 @@ import javax.faces.context.FacesContext;
 /**
  * <strong>ValidateEqual</strong> validates if ALL of the given <code>UIInput</code> components have the same value.
  * The default message is
- * <blockquote>{0}: Please fill in the same value for all of those fields</blockquote>
+ * <blockquote>{0}: Please fill out the same value for all of those fields</blockquote>
  * <p>
  * For general usage instructions, refer {@link ValidateMultipleFields} documentation.
  *
@@ -38,7 +38,7 @@ public class ValidateEqual extends ValidateMultipleFields {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
-	private static final String DEFAULT_MESSAGE = "{0}: Please fill in the same value for all of those fields";
+	private static final String DEFAULT_MESSAGE = "{0}: Please fill out the same value for all of those fields";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 

@@ -23,7 +23,7 @@ import org.omnifaces.util.Utils;
 /**
  * <strong>ValidateAllOrNone</strong> validates if at least ALL of the given <code>UIInput</code> components have been
  * filled in or that NONE of the given <code>UIInput</code> components have been filled in. The default message is
- * <blockquote>{0}: Please fill in all or none of those fields</blockquote>
+ * <blockquote>{0}: Please fill out all or none of those fields</blockquote>
  * <p>
  * For general usage instructions, refer {@link ValidateMultipleFields} documentation.
  *
@@ -39,7 +39,7 @@ public class ValidateAllOrNone extends ValidateMultipleFields {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
-	private static final String DEFAULT_MESSAGE = "{0}: Please fill in all or none of those fields";
+	private static final String DEFAULT_MESSAGE = "{0}: Please fill out all or none of those fields";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
