@@ -953,14 +953,45 @@
 		</attribute>
 	</tag>
 
-	<tag>
+		<tag>
 		<description>
 			<![CDATA[
 				<strong><code>o:methodParam</code></strong> is a tag handler that can be used to pass a method expression
 				into a Facelets tag.
 				<p>
 				By default this is not possible, and the expression that's intended to be a method expression will be created and
-				made available as a value expression.				
+				made available as a value expression. This handler should be placed inside a Facelets tag as follows:				
+				<pre>
+&lt;ui:composition
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:o="http://omnifaces.org/ui"
+&gt;
+	&lt;o:methodParam name="method" value="#{action}"/&gt;
+	
+	&lt;h:commandButton value="test" action="#{method}" /&gt;
+		
+&lt;/ui:composition&gt;
+				</pre>
+				<p>
+				Assuming the above is a tag called <code>actionmethod</code> in the namespace <code>test</code>, a method can be passed into it
+				as follows:				
+				<pre>				
+&lt;test:actionmethod action="#{methodParamBean.doAction}" /&gt;
+				</pre>
+				<p>				
+				In case a method with no parameters is passed that is to be used as an action listener with no parameters, then the component
+				using this method unfortunely has to be wrapped by a component that puts the method in request scoped (with nested visibility),
+				e.g. by using <code>ui:repeat</code> as follows:				
+				<pre>
+&lt;ui:repeat var="method" value="#{method}"&gt;
+	&lt;h:commandButton value="test" actionListener="#{method}" /&gt;
+&lt;/ui:repeat&gt;
+				</pre>
+				<p>
+				Using modern EL implementations, this is not needed in case the EL expression references the method using explicit parenthesis,
+				e.g. <code>#{methodParamBean.doAction()}</code>							
 			]]>
 		</description>
 		<tag-name>methodParam</tag-name>
@@ -987,5 +1018,7 @@
 			<type>java.lang.String</type>
 		</attribute>
 	</tag>
+
+
 
 </facelet-taglib>

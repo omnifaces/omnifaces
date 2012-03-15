@@ -57,7 +57,7 @@ public class MethodParamHandler extends TagHandler {
 		
 		// Using the variable mapper so the expression is scoped to the body of the Facelets tag. Since the variable mapper only accepts
 		// value expressions, we once again wrap it by a value expression that directly returns the method expression.
-		ctx.getVariableMapper().setVariable(nameStr, ctx.getExpressionFactory().createValueExpression(methodExpression, MethodExpression.class));	
+		ctx.getVariableMapper().setVariable(nameStr, ctx.getExpressionFactory().createValueExpression(methodExpression, MethodExpression.class));
 	}
 
 }

@@ -11,13 +11,13 @@
 			<attribute name="org.eclipse.jst.component.nondependency" value=""/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/jsp-api-2.1.jar">
+	<classpathentry kind="lib" path="lib/servlet-api-2.5.jar">
 		<attributes>
 			<attribute name="org.eclipse.jst.component.nondependency" value=""/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="lib/servlet-api-2.5.jar">
-		<attributes>
+	<classpathentry kind="lib" path="lib/el-api-2.2.1-b04.jar">
+	<attributes>
 			<attribute name="org.eclipse.jst.component.nondependency" value=""/>
 		</attributes>
 	</classpathentry>
