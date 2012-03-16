@@ -12,6 +12,13 @@
  */
 package org.omnifaces.util;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.ReadableByteChannel;
+import java.nio.channels.WritableByteChannel;
 import java.util.Collection;
 import java.util.Map;
 
@@ -22,6 +29,10 @@ import java.util.Map;
  *
  */
 public final class Utils {
+
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final int DEFAULT_STREAM_BUFFER_SIZE = 10240;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -92,6 +103,37 @@ public final class Utils {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Stream the given input to the given output by NIO {@link ByteBuffer}.
+	 * @param input The input stream.
+	 * @param output The output stream.
+	 * @return The length of the written bytes.
+	 * @throws IOException When an I/O error occurs.
+	 */
+	public static long stream(InputStream input, OutputStream output) throws IOException {
+		ReadableByteChannel inputChannel = null;
+		WritableByteChannel outputChannel = null;
+
+		try {
+			inputChannel = Channels.newChannel(input);
+			outputChannel = Channels.newChannel(output);
+			ByteBuffer buffer = ByteBuffer.allocate(DEFAULT_STREAM_BUFFER_SIZE);
+			long size = 0;
+
+			while (inputChannel.read(buffer) != -1) {
+				buffer.flip();
+				size += outputChannel.write(buffer);
+				buffer.clear();
+			}
+
+			return size;
+		}
+		finally {
+			if (outputChannel != null) try { outputChannel.close(); } catch (IOException ignore) { /**/ }
+			if (inputChannel != null) try { inputChannel.close(); } catch (IOException ignore) { /**/ }
+		}
 	}
 
 }

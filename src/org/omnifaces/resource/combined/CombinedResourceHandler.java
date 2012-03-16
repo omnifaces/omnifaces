@@ -14,10 +14,6 @@ package org.omnifaces.resource.combined;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
 import java.util.Map.Entry;
 
 import javax.faces.application.Resource;
@@ -26,6 +22,8 @@ import javax.faces.application.ResourceHandlerWrapper;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletResponse;
+
+import org.omnifaces.util.Utils;
 
 /**
  * This {@link ResourceHandler} implementation recognizes combined resources based on the unique library name as
@@ -48,8 +46,6 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper {
 
 	/** The default library name of a combined resource. Make sure that this is never used for other libraries. */
 	public static final String LIBRARY_NAME = "omnifaces.combined";
-
-	private static final int DEFAULT_BUFFER_SIZE = 1024;
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -101,10 +97,6 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper {
 	 * @throws IOException If something fails at I/O level.
 	 */
 	private static void streamResource(FacesContext context, Resource resource) throws IOException {
-		// This bunch of code is copied from Mojarra's ResourceHandlerImpl#handleResourceRequest().
-		// It's only slightly rewritten/rearranged, it seems to be pretty efficient enough.
-		// It would however have been nice if the abstract class Resource provided a template method for this.
-
 		ExternalContext externalContext = context.getExternalContext();
 
 		if (!resource.userAgentNeedsUpdate(context)) {
@@ -112,51 +104,22 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper {
 			return;
 		}
 
-		ReadableByteChannel inputChannel = null;
-		WritableByteChannel outputChannel = null;
+		InputStream input = resource.getInputStream();
 
-		try {
-			InputStream input = resource.getInputStream();
-
-			if (input == null) {
-				externalContext.setResponseStatus(HttpServletResponse.SC_NOT_FOUND);
-				return;
-			}
-
-			inputChannel = Channels.newChannel(input);
-			outputChannel = Channels.newChannel(externalContext.getResponseOutputStream());
-
-			if (resource.getContentType() != null) {
-				externalContext.setResponseContentType(resource.getContentType());
-			}
-
-			for (Entry<String, String> header : resource.getResponseHeaders().entrySet()) {
-				externalContext.setResponseHeader(header.getKey(), header.getValue());
-			}
-
-			ByteBuffer buffer = ByteBuffer.allocate(DEFAULT_BUFFER_SIZE);
-			externalContext.setResponseBufferSize(buffer.capacity());
-			int size = 0;
-
-			for (int read = inputChannel.read(buffer), written = 0; read != -1; read = inputChannel.read(buffer)) {
-				buffer.rewind();
-				buffer.limit(read);
-
-				do {
-					written += outputChannel.write(buffer);
-				}
-				while (written < size);
-
-				buffer.clear();
-				size += read;
-			}
-
-			externalContext.setResponseContentLength(size);
+		if (input == null) {
+			externalContext.setResponseStatus(HttpServletResponse.SC_NOT_FOUND);
+			return;
 		}
-		finally {
-			if (outputChannel != null) try { outputChannel.close(); } catch (IOException ignore) { /**/ }
-			if (inputChannel != null) try { inputChannel.close(); } catch (IOException ignore) { /**/ }
+
+		if (resource.getContentType() != null) {
+			externalContext.setResponseContentType(resource.getContentType());
 		}
+
+		for (Entry<String, String> header : resource.getResponseHeaders().entrySet()) {
+			externalContext.setResponseHeader(header.getKey(), header.getValue());
+		}
+
+		Utils.stream(input, externalContext.getResponseOutputStream());
 	}
 
 }

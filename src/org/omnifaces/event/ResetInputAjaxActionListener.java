@@ -27,17 +27,18 @@ import javax.faces.event.ActionListener;
  * <li>When JSF validation fails for a particular input component during the validations phase, then the submitted
  * value is kept in the input component.
  * <li>When at least one input component is invalid after the validations phase, then JSF will not update the model
- * values for any of the input components JSF will directly proceed to render response phase.
+ * values for any of the input components. JSF will directly proceed to render response phase.
  * <li>When JSF renders input components, then it will first test if the submitted value is not <code>null</code> and
  * then display it, else if the local value is not <code>null</code> and then display it, else it will display the
  * model value.
+ * <li>As long as you're interacting with the same JSF view, you're dealing with the same component state.
  * </ul>
  * <p>
  * So, when the validation has failed for a particular form submit and you happen to need to update the values of input
  * fields by a different ajax action or even a different ajax form (e.g. populating a field depending on a dropdown
- * selection or on the result of some modal dialog form, etc), then you basically need to reset the target input
- * components in order to get JSF to display the edited model value. Otherwise JSF will still display its local value
- * as it was during the validation failure and keep them in an invalidated state.
+ * selection or the result of some modal dialog form, etc), then you basically need to reset the target input
+ * components in order to get JSF to display the model value which was edited during invoke action. Otherwise JSF will
+ * still display its local value as it was during the validation failure and keep them in an invalidated state.
  * <p>
  * The {@link ResetInputAjaxActionListener} is designed to solve exactly this problem. There are basically two ways to
  * use it:
@@ -72,9 +73,6 @@ public class ResetInputAjaxActionListener implements ActionListener {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String RF_PVC_CLASS_NAME = "org.richfaces.context.ExtendedPartialViewContextImpl";
-	private static final String RF_PVC_FIELD_NAME = "componentRenderIds";
-
 	private static final String ERROR_RF_PVC_HACK =
 		"Cannot obtain componentRenderIds property of RichFaces ExtendedPartialViewContextImpl instance '%s'.";
 	private static final String ERROR_INVALID_CLIENTID =
@@ -83,9 +81,15 @@ public class ResetInputAjaxActionListener implements ActionListener {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * @see ActionListener#processAction(ActionEvent)
-	 * @throws FacesException When the current request is not an ajax request, or when <code>componentRenderIds</code>
-	 * property cannot be obtained from ExtendedPartialViewContextImpl instance.
+	 * Handle the reset input action as follows, only and only if the current request is an ajax request and the
+	 * {@link PartialViewContext#getRenderIds()} doesn't return an empty collection:
+	 * <ul>
+	 * <li>Collect all {@link EditableValueHolder} components based on {@link PartialViewContext#getRenderIds()}.
+	 * <li>Remove all components covered by {@link PartialViewContext#getExecuteIds()} from this collection.
+	 * <li>Invoke {@link EditableValueHolder#resetValue()} on the remaining components of this collection.
+	 * </ul>
+	 * @throws IllegalArgumentException When one of the client IDs resolved to a <code>null</code> component. This
+	 * would however indicate a bug in the concrete {@link PartialViewContext} implementation which is been used.
 	 */
 	@Override
 	public void processAction(ActionEvent event) throws AbortProcessingException {
@@ -135,9 +139,11 @@ public class ResetInputAjaxActionListener implements ActionListener {
 		// HACK for RichFaces4 because its ExtendedPartialViewContextImpl class doesn't return its componentRenderIds
 		// property on getRenderIds() call when the action is executed using a RichFaces-specific command button/link.
 		// See also https://issues.jboss.org/browse/RF-11112
-		if (renderIds.isEmpty() && partialViewContext.getClass().getName().equals(RF_PVC_CLASS_NAME)) {
+		if (renderIds.isEmpty()
+			&& partialViewContext.getClass().getName().equals("org.richfaces.context.ExtendedPartialViewContextImpl"))
+		{
 			try {
-				Field componentRenderIds = partialViewContext.getClass().getDeclaredField(RF_PVC_FIELD_NAME);
+				Field componentRenderIds = partialViewContext.getClass().getDeclaredField("componentRenderIds");
 				componentRenderIds.setAccessible(true);
 				renderIds = (Collection<String>) componentRenderIds.get(partialViewContext);
 			}

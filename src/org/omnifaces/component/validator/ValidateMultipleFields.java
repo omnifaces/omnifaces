@@ -257,14 +257,15 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 			}
 		}
 
+		String message = getMessage();
 		String showMessageFor = getShowMessageFor();
 
 		if (showMessageFor.equals("@this")) {
-			Messages.addError(getClientId(context), getMessage(), labels);
+			Messages.addError(getClientId(context), message, labels);
 		}
 		else if (showMessageFor.equals("@all")) {
 			for (UIInput input : inputs) {
-				Messages.addError(input.getClientId(context), getMessage(), labels);
+				Messages.addError(input.getClientId(context), message, labels);
 			}
 		}
 		else {

@@ -94,7 +94,7 @@ final class CombinedResource extends Resource {
 		return Faces.getRequestContextPath()
 			+ (Faces.isPrefixMapping(mapping) ? (mapping + path) : (path + mapping))
 			+ "?ln=" + CombinedResourceHandler.LIBRARY_NAME
-			+ "&amp;v=" + (Faces.<Long>evaluateExpressionGet("#{startup.time}") / 60000); // In minutes.
+			+ "&amp;v=" + (info.getLastModified() / 60000); // To force browser refresh whenever a resource changes.
 	}
 
 	@Override
@@ -109,9 +109,10 @@ final class CombinedResource extends Resource {
 		Map<String, String> responseHeaders = new HashMap<String, String>(3);
 		SimpleDateFormat sdf = new SimpleDateFormat(PATTERN_RFC1123_DATE, Locale.US);
 		sdf.setTimeZone(TIMEZONE_GMT);
-		responseHeaders.put(HEADER_LAST_MODIFIED, sdf.format(new Date(info.getLastModified())));
+		long lastModified = info.getLastModified();
+		responseHeaders.put(HEADER_LAST_MODIFIED, sdf.format(new Date(lastModified)));
 		responseHeaders.put(HEADER_EXPIRES, sdf.format(new Date(System.currentTimeMillis() + info.getMaxAge())));
-		responseHeaders.put(HEADER_ETAG, String.format(FORMAT_ETAG, info.getContentLength(), info.getLastModified()));
+		responseHeaders.put(HEADER_ETAG, String.format(FORMAT_ETAG, info.getContentLength(), lastModified));
 		return responseHeaders;
 	}
 
@@ -128,7 +129,6 @@ final class CombinedResource extends Resource {
 			SimpleDateFormat sdf = new SimpleDateFormat(PATTERN_RFC1123_DATE, Locale.US);
 
 			try {
-				info.reload();
 				return info.getLastModified() > sdf.parse(ifModifiedSince).getTime();
 			}
 			catch (ParseException ignore) {

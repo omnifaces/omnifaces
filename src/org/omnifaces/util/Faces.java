@@ -20,15 +20,12 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.nio.channels.WritableByteChannel;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
 import javax.faces.application.Application;
+import javax.faces.application.ProjectStage;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
@@ -492,6 +489,15 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns true if we're in development stage.
+	 * @return True if we're in development stage.
+	 * @see Application#getProjectStage()
+	 */
+	public static boolean isDevelopment() {
+		return FacesContext.getCurrentInstance().getApplication().getProjectStage() == ProjectStage.Development;
+	}
+
+	/**
 	 * Send the given file to the response. The content type will be determined based on file name.
 	 * The {@link FacesContext#responseComplete()} will implicitly be called after successful streaming.
 	 * @param file The file to be sent to the response.
@@ -531,14 +537,14 @@ public final class Faces {
 
 	/**
 	 * Internal global method to send the given input stream to the response.
-	 * @param content The file content as input stream.
+	 * @param input The file content as input stream.
 	 * @param filename The file name which should appear in content disposition header.
 	 * @param contentLength The content length, or -1 if it is unknown.
 	 * @param attachment Whether the file should be provided as attachment, or just inline.
 	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
 	 * redeclare it in the action method. The servletcontainer will handle it.
 	 */
-	private static void sendFile(InputStream content, String filename, long contentLength, boolean attachment)
+	private static void sendFile(InputStream input, String filename, long contentLength, boolean attachment)
 		throws IOException
 	{
 		FacesContext context = FacesContext.getCurrentInstance();
@@ -564,40 +570,14 @@ public final class Faces {
 			externalContext.setResponseHeader("Content-Length", String.valueOf(contentLength));
 		}
 
-		// Now the streaming by NIO channels.
-		ReadableByteChannel inputChannel = null;
-		WritableByteChannel outputChannel = null;
+		long size = Utils.stream(input, externalContext.getResponseOutputStream());
 
-		try {
-			inputChannel = Channels.newChannel(content);
-			outputChannel = Channels.newChannel(externalContext.getResponseOutputStream());
-			ByteBuffer buffer = ByteBuffer.allocate(DEFAULT_SENDFILE_BUFFER_SIZE);
-			long size = 0;
-
-			for (int read = inputChannel.read(buffer), written = 0; read != -1; read = inputChannel.read(buffer)) {
-				buffer.rewind();
-				buffer.limit(read);
-
-				do {
-					written += outputChannel.write(buffer);
-				}
-				while (written < size);
-
-				buffer.clear();
-				size += read;
-			}
-
-			// This may be on time for files smaller than the default buffer size, but is otherwise ignored anyway.
-			if (contentLength == -1) {
-				externalContext.setResponseHeader("Content-Length", String.valueOf(size));
-			}
-
-			context.responseComplete();
+		// This may be on time for files smaller than the default buffer size, but is otherwise ignored anyway.
+		if (contentLength == -1) {
+			externalContext.setResponseHeader("Content-Length", String.valueOf(size));
 		}
-		finally {
-			if (outputChannel != null) try { outputChannel.close(); } catch (IOException ignore) { /**/ }
-			if (inputChannel != null) try { inputChannel.close(); } catch (IOException ignore) { /**/ }
-		}
+
+		context.responseComplete();
 	}
 
 }

@@ -27,6 +27,8 @@ import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
 import javax.faces.context.FacesContext;
 
+import org.omnifaces.util.Faces;
+
 /**
  * This class is a wrapper which collects all combined resources and stores it in the cache. A builder is been provided
  * to create an instance of combined resource info and put it in the cache if absent.
@@ -189,13 +191,6 @@ final class CombinedResourceInfo {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Forcibly reload the combined resources. This resets the resources, content length and last modified properties.
-	 */
-	public void reload() {
-		loadResources(true);
-	}
-
-	/**
 	 * Load the combined resources so that the set of resources, the total content length and the last modified are
 	 * been (re)initialized.
 	 * @param forceReload Set to true if you want to force reloading of the combined resources, even though the
@@ -288,11 +283,12 @@ final class CombinedResourceInfo {
 	}
 
 	/**
-	 * Returns the last modified timestamp in milliseconds of this combined resource info.
+	 * Returns the last modified timestamp in milliseconds of this combined resource info. If we're in development
+	 * stage, this will forcibly reload the resources.
 	 * @return The last modified timestamp in milliseconds of this combined resource info.
 	 */
 	public long getLastModified() {
-		loadResources(false);
+		loadResources(Faces.isDevelopment());
 		return lastModified;
 	}
 
