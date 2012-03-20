@@ -106,7 +106,7 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 	 * ElResolver.
 	 * 
 	 */
-	static class ValueToInvokeElContext extends ElContextWrapper {
+	static class ValueToInvokeElContext extends ELContextWrapper {
 		
 		// The parameters provided by the client that calls the EL method expression, as opposed to those
 		// parameters that are bound to the expression when it's created in EL (like #{bean.myMethod(param1, param2)}).
@@ -127,7 +127,7 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 	 * Custom EL Resolver that turns calls for value expression calls (getValue) into method expression calls (invoke).
 	 *
 	 */
-	static class ValueToInvokeElResolver extends ElResolverWrapper {
+	static class ValueToInvokeElResolver extends ELResolverWrapper {
 		
 		// Null should theoretically be accepted, but some EL implementations want an empty array.
 		private static final Object[] EMPTY_PARAMETERS = new Object[0];

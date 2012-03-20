@@ -32,7 +32,7 @@ import org.omnifaces.util.Faces;
  * <strong>OutputLabel</strong> is a component that extends the standard {@link HtmlOutputLabel} and provides support for
  * automatically setting its value as the label of the component identified by its <code>for</code> attribute (if any).
  * <p>
- * You can use it the same way as <code>&lt;f:outputLabel&gt;</code>, you only need to change <code>f:</code> into
+ * You can use it the same way as <code>&lt;h:outputLabel&gt;</code>, you only need to change <code>h:</code> into
  * <code>o:</code>.
  *
  * @author Arjan Tijms
