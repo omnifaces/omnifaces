@@ -136,6 +136,24 @@
 	<function>
 		<description>
 			<![CDATA[
+				Format the given bytes to nearest 10<sup>n</sup> with IEC binary unit (KiB, MiB, etc) with rounding
+				precision of 1 fraction. For example:
+				<ul>
+					<li>1023 bytes will appear as 1023 B
+					<li>1024 bytes will appear as 1.0 KiB
+					<li>500000 bytes will appear as 488.3 KiB
+					<li>1048576 bytes will appear as 1.0 GiB
+				</ul>
+			]]>
+		</description>
+		<function-name>formatBytes</function-name>
+		<function-class>org.omnifaces.el.functions.Converters</function-class>
+		<function-signature>java.lang.String formatBytes(java.lang.Long)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
 				Converts a <code>Set&lt;E&gt;</code> to a <code>List&lt;E&gt;</code>. Useful when you want to iterate
 				over a <code>Set</code> in for example <code>&lt;ui:repeat&gt;</code>.
 			]]>
@@ -156,50 +174,6 @@
 		<function-name>mapToList</function-name>
 		<function-class>org.omnifaces.el.functions.Converters</function-class>
 		<function-signature>java.util.List mapToList(java.util.Map)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Converts seconds to days. This rounds down.
-			]]>
-		</description>
-		<function-name>secondsToDays</function-name>
-		<function-class>org.omnifaces.el.functions.Converters</function-class>
-		<function-signature>java.lang.Long secondsToDays(java.lang.Long)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Converts days to seconds.
-			]]>
-		</description>
-		<function-name>daysToSeconds</function-name>
-		<function-class>org.omnifaces.el.functions.Converters</function-class>
-		<function-signature>java.lang.Long daysToSeconds(java.lang.Long)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Converts bytes to kilobytes. This rounds down.
-			]]>
-		</description>
-		<function-name>bytesToKilobytes</function-name>
-		<function-class>org.omnifaces.el.functions.Converters</function-class>
-		<function-signature>java.lang.Long bytesToKilobytes(java.lang.Long)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
-				Converts bytes to megabytes. This rounds down.
-			]]>
-		</description>
-		<function-name>bytesToMegabytes</function-name>
-		<function-class>org.omnifaces.el.functions.Converters</function-class>
-		<function-signature>java.lang.Long bytesToMegabytes(java.lang.Long)</function-signature>
 	</function>
 
 	<function>

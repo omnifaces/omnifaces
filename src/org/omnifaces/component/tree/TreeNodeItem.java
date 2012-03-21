@@ -43,8 +43,6 @@ public class TreeNodeItem extends TreeFamily {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
-	private static final String ERROR_INVALID_PARENT =
-		"TreeNodeItem must have a parent of type TreeNode, but it cannot be found.";
 	private static final String ERROR_NESTING_DISALLOWED =
 		"Nesting TreeNodeItem components is disallowed. Use TreeNode instead to markup specific levels.";
 
@@ -57,9 +55,7 @@ public class TreeNodeItem extends TreeFamily {
 	 */
 	@Override
 	protected void validateHierarchy() {
-		if (Components.getClosestParent(this, Tree.class) == null) {
-			throw new IllegalArgumentException(ERROR_INVALID_PARENT);
-		}
+		Components.validateHasParent(this, Tree.class);
 
 		if (Components.getClosestParent(this, TreeNodeItem.class) != null) {
 			throw new IllegalArgumentException(ERROR_NESTING_DISALLOWED);

@@ -80,7 +80,7 @@ import javax.faces.event.ActionListener;
  * @author Bauke Scholtz
  * @link http://java.net/jira/browse/JAVASERVERFACES_SPEC_PUBLIC-1060
  */
-@SuppressWarnings("unchecked") // For the cast on Collection<String>.
+@SuppressWarnings("unchecked") // For the cast on Collection<String> in getRenderIds().
 public class ResetInputAjaxActionListener implements ActionListener {
 
 	// Constants ------------------------------------------------------------------------------------------------------
@@ -121,12 +121,12 @@ public class ResetInputAjaxActionListener implements ActionListener {
 		UIViewRoot viewRoot = context.getViewRoot();
 		Set<EditableValueHolder> inputs = new HashSet<EditableValueHolder>();
 
-		// First find and add all to be rendered inputs to the set.
+		// First find all to be rendered inputs and add them to the set.
 		for (String renderId : renderIds) {
 			findAndAddEditableValueHolders(findComponent(viewRoot, renderId, "renderIds"), inputs);
 		}
 
-		// Then find and remove all executed inputs from the set.
+		// Then find all executed inputs and remove them from the set.
 		for (String executeId : partialViewContext.getExecuteIds()) {
 			findAndRemoveEditableValueHolders(findComponent(viewRoot, executeId, "executeIds"), inputs);
 		}

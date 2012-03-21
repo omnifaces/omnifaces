@@ -82,10 +82,6 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 
 	private static final String DEFAULT_SHOWMESSAGEFOR = "@this";
 
-	private static final String ERROR_INVALID_PARENT =
-		"%s must have a parent of type UIForm, but it cannot be found.";
-	private static final String ERROR_CHILDREN_DISALLOWED =
-		"%s must have no children. Encountered children of types '%s'.";
 	private static final String ERROR_MISSING_COMPONENTS =
 		"%s attribute 'components' must be specified.";
 	private static final String ERROR_UNKNOWN_COMPONENT =
@@ -122,21 +118,8 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	 */
 	@Override
 	protected void validateHierarchy() throws IllegalArgumentException {
-		if (Components.getClosestParent(this, UIForm.class) == null) {
-			throw new IllegalArgumentException(String.format(
-				ERROR_INVALID_PARENT, getClass().getSimpleName()));
-		}
-
-		if (getChildCount() > 0) {
-			StringBuilder childClassNames = new StringBuilder();
-
-			for (UIComponent child : getChildren()) {
-				childClassNames.append(", ").append(child.getClass().getName());
-			}
-
-			throw new IllegalArgumentException(String.format(
-				ERROR_CHILDREN_DISALLOWED, getClass().getSimpleName(), childClassNames.substring(2)));
-		}
+		Components.validateHasParent(this, UIForm.class);
+		Components.validateHasNoChildren(this);
 	}
 
 	/**

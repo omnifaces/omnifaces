@@ -12,8 +12,6 @@
  */
 package org.omnifaces.el.functions;
 
-import static java.util.concurrent.TimeUnit.*;
-
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
@@ -63,6 +61,28 @@ public final class Converters {
 	}
 
 	/**
+	 * Format the given bytes to nearest 10<sup>n</sup> with IEC binary unit (KiB, MiB, etc) with rounding precision of
+	 * 1 fraction. For example:
+	 * <ul>
+	 * <li>1023 bytes will appear as 1023 B
+	 * <li>1024 bytes will appear as 1.0 KiB
+	 * <li>500000 bytes will appear as 488.3 KiB
+	 * <li>1048576 bytes will appear as 1.0 GiB
+	 * </ul>
+	 * The format locale will be set to the one as obtained by {@link Faces#getLocale()}.
+	 * @param bytes The bytes to be formatted.
+	 * @return The formatted bytes.
+	 */
+	public static String formatBytes(Long bytes) {
+	    if (bytes < 1024) {
+	    	return bytes + " B";
+	    }
+
+	    int exp = (int) (Math.log(bytes) / Math.log(1024));
+	    return String.format(Faces.getLocale(), "%.1f %ciB", bytes / Math.pow(1024, exp), "KMGTPE".charAt(exp - 1));
+	}
+
+	/**
 	 * Converts a <code>Set&lt;E&gt;</code> to a <code>List&lt;E&gt;</code>. Useful when you want to iterate over a
 	 * <code>Set</code> in for example <code>&lt;ui:repeat&gt;</code>.
 	 * @param set The set to be converted to list of its entries.
@@ -89,58 +109,6 @@ public final class Converters {
 		}
 
 		return new ArrayList<Map.Entry<K, V>>(map.entrySet());
-	}
-
-	/**
-	 * Converts seconds to days. This rounds down.
-	 * @param seconds The seconds to be converted to days.
-	 * @return Days converted from seconds.
-	 */
-	public static Long secondsToDays(Long seconds) {
-		if (seconds == null) {
-			return null;
-		}
-
-		return DAYS.convert(seconds, SECONDS);
-	}
-
-	/**
-	 * Converts days to seconds.
-	 * @param days The days to be converted to seconds.
-	 * @return Seconds converted from days.
-	 */
-	public static Long daysToSeconds(Long days) {
-		if (days == null) {
-			return null;
-		}
-
-		return SECONDS.convert(days, DAYS);
-	}
-
-	/**
-	 * Converts bytes to kilobytes. This rounds down.
-	 * @param bytes The bytes to be converted to kilobytes.
-	 * @return Kilobytes converted from bytes.
-	 */
-	public static Long bytesToKilobytes(Long bytes) {
-		if (bytes == null) {
-			return null;
-		}
-
-		return bytes >> 10;
-	}
-
-	/**
-	 * Converts bytes to megabytes. This rounds down.
-	 * @param bytes The bytes to be converted to megabytes.
-	 * @return Megabytes converted from bytes.
-	 */
-	public static Long bytesToMegabytes(Long bytes) {
-		if (bytes == null) {
-			return null;
-		}
-
-		return bytes >> 20;
 	}
 
 	/**

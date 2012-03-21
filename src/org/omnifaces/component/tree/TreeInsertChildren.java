@@ -36,13 +36,6 @@ public class TreeInsertChildren extends TreeFamily {
 	/** The standard component type. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.tree.TreeInsertChildren";
 
-	// Private constants ----------------------------------------------------------------------------------------------
-
-	private static final String ERROR_INVALID_PARENT =
-		"TreeInsertChildren must have a parent of type TreeNodeItem, but it cannot be found.";
-	private static final String ERROR_CHILDREN_DISALLOWED =
-		"TreeInsertChildren should have no children. Encountered children of types '%s'.";
-
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
@@ -52,19 +45,8 @@ public class TreeInsertChildren extends TreeFamily {
 	 */
 	@Override
 	protected void validateHierarchy() {
-		if (Components.getClosestParent(this, TreeNodeItem.class) == null) {
-			throw new IllegalArgumentException(ERROR_INVALID_PARENT);
-		}
-
-		if (getChildCount() > 0) {
-			StringBuilder childClassNames = new StringBuilder();
-
-			for (UIComponent child : getChildren()) {
-				childClassNames.append(", ").append(child.getClass().getName());
-			}
-
-			throw new IllegalArgumentException(String.format(ERROR_CHILDREN_DISALLOWED, childClassNames.substring(2)));
-		}
+		Components.validateHasParent(this, TreeNodeItem.class);
+		Components.validateHasNoChildren(this);
 	}
 
 	/**

@@ -18,6 +18,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 
 import org.omnifaces.model.tree.TreeModel;
+import org.omnifaces.util.Components;
 
 /**
  * <strong>TreeNode</strong> is an {@link UIComponent} that represents a single tree node within a parent
@@ -42,9 +43,6 @@ public class TreeNode extends TreeFamily {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
-	private static final String ERROR_INVALID_PARENT =
-		"TreeNode must have a direct parent of type Tree. Encountered parent of type '%s'.";
-
 	private enum PropertyKeys {
 		// Cannot be uppercased. They have to exactly match the attribute names.
 		level;
@@ -58,9 +56,7 @@ public class TreeNode extends TreeFamily {
 	 */
 	@Override
 	protected void validateHierarchy() {
-		if (!(getParent() instanceof Tree)) {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_PARENT, getParent().getClass().getName()));
-		}
+		Components.validateHasDirectParent(this, Tree.class);
 	}
 
 	/**

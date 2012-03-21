@@ -31,6 +31,7 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
 import javax.faces.context.PartialViewContext;
+import javax.faces.event.PhaseId;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -65,33 +66,6 @@ public final class Faces {
 	}
 
 	// Utility --------------------------------------------------------------------------------------------------------
-
-	/**
-	 * Returns the HTTP servlet request.
-	 * @return The HTTP servlet request.
-	 * @see ExternalContext#getRequest()
-	 */
-	public static HttpServletRequest getRequest() {
-		return (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-	}
-
-	/**
-	 * Returns whether the current request is a postback.
-	 * @return true for a postback, false if the request is a non-faces (non-postback) request.
-	 * @see FacesContext#isPostback()
-	 */
-	public static boolean isPostback() {
-		return FacesContext.getCurrentInstance().isPostback();
-	}
-
-	/**
-	 * Returns whether the current request is an ajax request.
-	 * @return true for a postback, false if the request is a non-faces (non-postback) request.
-	 * @see PartialViewContext#isAjaxRequest()
-	 */
-	public static boolean isAjaxRequest() {
-		return FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest();
-	}
 
 	/**
 	 * Determines and returns the faces servlet mapping used in the current request. If the path info is
@@ -129,6 +103,42 @@ public final class Faces {
 	 */
 	public static boolean isPrefixMapping(String mapping) {
 		return (mapping.charAt(0) == '/');
+	}
+
+	/**
+	 * Returns the current phase ID.
+	 * @return The current phase ID.
+	 * @see FacesContext#getCurrentPhaseId()
+	 */
+	public static PhaseId getCurrentPhaseId() {
+		return FacesContext.getCurrentInstance().getCurrentPhaseId();
+	}
+
+	/**
+	 * Returns the HTTP servlet request.
+	 * @return The HTTP servlet request.
+	 * @see ExternalContext#getRequest()
+	 */
+	public static HttpServletRequest getRequest() {
+		return (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+	}
+
+	/**
+	 * Returns whether the current request is a postback.
+	 * @return true for a postback, false if the request is a non-faces (non-postback) request.
+	 * @see FacesContext#isPostback()
+	 */
+	public static boolean isPostback() {
+		return FacesContext.getCurrentInstance().isPostback();
+	}
+
+	/**
+	 * Returns whether the current request is an ajax request.
+	 * @return true for a postback, false if the request is a non-faces (non-postback) request.
+	 * @see PartialViewContext#isAjaxRequest()
+	 */
+	public static boolean isAjaxRequest() {
+		return FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest();
 	}
 
 	/**
@@ -524,7 +534,9 @@ public final class Faces {
 
 	/**
 	 * Send the given input stream as a file to the response. The content type will be determined based on file name.
-	 * The {@link FacesContext#responseComplete()} will implicitly be called after successful streaming.
+	 * The {@link InputStream#close()} will implicitly be called after streaming, regardless of whether an exception is
+	 * been thrown or not. The {@link FacesContext#responseComplete()} will implicitly be called after successful
+	 * streaming.
 	 * @param content The file content as input stream.
 	 * @param filename The file name which should appear in content disposition header.
 	 * @param attachment Whether the file should be provided as attachment, or just inline.

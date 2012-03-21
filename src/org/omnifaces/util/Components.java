@@ -12,7 +12,7 @@
  */
 package org.omnifaces.util;
 
-import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.*;
 
 import javax.el.ValueExpression;
 import javax.faces.component.EditableValueHolder;
@@ -30,6 +30,15 @@ import javax.faces.context.FacesContext;
  * @author Arjan Tijms
  */
 public final class Components {
+
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final String ERROR_INVALID_PARENT =
+		"Component '%s' must have a parent of type '%s', but it cannot be found.";
+	private static final String ERROR_INVALID_DIRECT_PARENT =
+		"Component '%s' must have a direct parent of type '%s', but it cannot be found.";
+	private static final String ERROR_CHILDREN_DISALLOWED =
+		"Component '%s' must have no children. Encountered children of types '%s'.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -59,14 +68,13 @@ public final class Components {
 	public static <T extends UIComponent> T findComponent(String clientId) {
 		return (T) FacesContext.getCurrentInstance().getViewRoot().findComponent(clientId);
 	}
-	
-	
+
 	/**
 	 * Returns the UI component matching the given client ID search expression relative to the point
 	 * in the component tree of the given component. For this search both parents and children are
 	 * consulted, increasingly moving further away from the given component. Parents are consulted
 	 * first, then children.
-	 * 
+	 *
 	 * @param component the component from which the relative search is started.
 	 * @param clientId The client ID search expression.
 	 * @return The UI component matching the given client ID search expression.
@@ -74,25 +82,25 @@ public final class Components {
 	 * @see UIComponent#findComponent(String)
 	 */
 	public static <T extends UIComponent> T findComponentRelatively(UIComponent component, String clientId) {
-		
+
 		if (isEmpty(clientId)) {
 			return null;
 		}
-		
+
 		// Search first in the naming container parents of the given component
 		T result = findComponentInParents(component, clientId);
 		if (result == null) {
 			// If not in the parents, search from the root
 			result = findComponentInChildren(Faces.getViewRoot(), clientId);
 		}
-		
-		return result;		
+
+		return result;
 	}
 
 	/**
 	 * Returns the UI component matching the given client ID search expression relative to the point
 	 * in the component tree of the given component, searching only in its parents.
-	 * 
+	 *
 	 * @param component the component from which the relative search is started.
 	 * @param clientId The client ID search expression.
 	 * @return The UI component matching the given client ID search expression.
@@ -101,14 +109,14 @@ public final class Components {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends UIComponent> T findComponentInParents(UIComponent component, String clientId) {
-		
+
 		if (isEmpty(clientId)) {
 			return null;
 		}
 
 		UIComponent parent = component;
 		while (parent != null) {
-			
+
 			UIComponent result = null;
 			if (parent instanceof NamingContainer) {
 				try {
@@ -117,22 +125,21 @@ public final class Components {
 					continue;
 				}
 			}
-			
-			
+
 			if (result != null) {
 				return (T) result;
 			}
-			
+
 			parent = parent.getParent();
 		}
 
 		return null;
 	}
-		
+
 	/**
 	 * Returns the UI component matching the given client ID search expression relative to the point
 	 * in the component tree of the given component, searching only in its children.
-	 * 
+	 *
 	 * @param component the component from which the relative search is started.
 	 * @param clientId The client ID search expression.
 	 * @return The UI component matching the given client ID search expression.
@@ -141,7 +148,7 @@ public final class Components {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends UIComponent> T findComponentInChildren(UIComponent component, String clientId) {
-		
+
 		if (isEmpty(clientId)) {
 			return null;
 		}
@@ -168,9 +175,7 @@ public final class Components {
 
 		return null;
 	}
-	
-	
-	
+
 	/**
 	 * Returns from the given component the closest parent of the given parent type, or <code>null</code> if none
 	 * is found.
@@ -179,6 +184,7 @@ public final class Components {
 	 * @param parentType The parent type.
 	 * @return From the given component the closest parent of the given parent type, or <code>null</code> if none
 	 * is found.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 */
 	public static <T extends UIComponent> T getClosestParent(UIComponent component, Class<T> parentType) {
 		UIComponent parent = component.getParent();
@@ -213,7 +219,7 @@ public final class Components {
 		Object label = getOptionalLabel(input);
 		return (label != null) ? label.toString() : input.getClientId();
 	}
-	
+
 	/**
 	 * Returns the value of the <code>label</code> attribute associated with the given UI component if any, else
 	 * null.
@@ -229,8 +235,8 @@ public final class Components {
 				label = labelExpression.getValue(FacesContext.getCurrentInstance().getELContext());
 			}
 		}
-		
-		return label; 
+
+		return label;
 	}
 
 	/**
@@ -253,6 +259,58 @@ public final class Components {
 	public static boolean hasSubmittedValue(EditableValueHolder component) {
 		Object submittedValue = component.getSubmittedValue();
 		return (submittedValue != null && !String.valueOf(submittedValue).isEmpty());
+	}
+
+	/**
+	 * Validate if the given component has a parent of the given parent type.
+	 * @param component The component to be validated.
+	 * @param parentType The parent type to be checked.
+	 * @throws IllegalArgumentException When the given component doesn't have any parent of the given type.
+	 */
+	public static <T extends UIComponent> void validateHasParent(UIComponent component, Class<T> parentType)
+		throws IllegalArgumentException
+	{
+		if (getClosestParent(component, parentType) == null) {
+			throw new IllegalArgumentException(String.format(
+				ERROR_INVALID_PARENT, component.getClass().getSimpleName(), parentType));
+		}
+	}
+
+	/**
+	 * Validate if the given component has a direct parent of the given parent type.
+	 * @param component The component to be validated.
+	 * @param parentType The parent type to be checked.
+	 * @throws IllegalArgumentException When the given component doesn't have a direct parent of the given type.
+	 */
+	public static <T extends UIComponent> void validateHasDirectParent(UIComponent component, Class<T> parentType)
+		throws IllegalArgumentException
+	{
+		if (!parentType.isInstance(component.getParent())) {
+			throw new IllegalArgumentException(String.format(
+				ERROR_INVALID_DIRECT_PARENT, component.getClass().getSimpleName(), parentType));
+		}
+	}
+
+	/**
+	 * Validate if the given component has no children.
+	 * @param component The component to be validated.
+	 * @throws IllegalArgumentException When the given component has any children.
+	 */
+	public static void validateHasNoChildren(UIComponent component) throws IllegalArgumentException {
+		if (component.getChildCount() > 0) {
+			StringBuilder childClassNames = new StringBuilder();
+
+			for (UIComponent child : component.getChildren()) {
+				if (childClassNames.length() > 0) {
+					childClassNames.append(", ");
+				}
+
+				childClassNames.append(child.getClass().getName());
+			}
+
+			throw new IllegalArgumentException(String.format(
+				ERROR_CHILDREN_DISALLOWED, component.getClass().getSimpleName(), childClassNames));
+		}
 	}
 
 }
