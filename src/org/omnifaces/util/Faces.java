@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.faces.FacesException;
 import javax.faces.application.Application;
 import javax.faces.application.ProjectStage;
 import javax.faces.component.UIViewRoot;
@@ -201,6 +202,16 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the value of the HTTP request header associated with the given name.
+	 * @param name The HTTP request header name.
+	 * @return The value of the HTTP request header associated with the given name.
+	 * @see ExternalContext#getRequestHeaderMap()
+	 */
+	public static String getRequestHeader(String name) {
+		return FacesContext.getCurrentInstance().getExternalContext().getRequestHeaderMap().get(name);
+	}
+
+	/**
 	 * Returns the value of the HTTP request cookie associated with the given name. The value is implicitly URL-decoded
 	 * with a charset of UTF-8.
 	 * @param name The HTTP request cookie name.
@@ -208,7 +219,7 @@ public final class Faces {
 	 * @throws UnsupportedOperationException If UTF-8 is not supported on this machine.
 	 * @see ExternalContext#getRequestCookieMap()
 	 */
-	public static String getRequestCookieValue(String name) {
+	public static String getRequestCookie(String name) {
 		Cookie cookie = (Cookie) FacesContext.getCurrentInstance().getExternalContext().getRequestCookieMap().get(name);
 
 		try {
@@ -249,8 +260,10 @@ public final class Faces {
 	/**
 	 * Redirects the current response to the given URL. If the given URL does not start with <tt>http</tt> or
 	 * <tt>/</tt>, then the request context path will be prepended, otherwise it will be the unmodified redirect URL.
+	 * Any {@link IOException} will be wrapped in {@link FacesException}.
 	 * @param url The URL to redirect the current response to.
-	 * @throws IOException If something fails in I/O.
+	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
+	 * redeclare it in the action method. The servletcontainer will handle it.
 	 * @see ExternalContext#redirect(String)
 	 */
 	public static void redirect(String url) throws IOException {
@@ -269,22 +282,47 @@ public final class Faces {
 	 * @param name The cookie name.
 	 * @param value The cookie value.
 	 * @param path The cookie path.
-	 * @param maxAge The maximum age of the cookie, in seconds.
+	 * @param maxAge The maximum age of the cookie, in seconds. If this is <tt>0</tt> then the cookie will be removed.
+	 * Note that the name and path must be exactly the same as it was when the cookie as added. If this is <tt>-1</tt>
+	 * then the cookie will become a session cookie and thus live as long as the established HTTP session.
 	 * @throws UnsupportedOperationException If UTF-8 is not supported on this machine.
 	 * @see ExternalContext#addResponseCookie(String, String, Map)
 	 */
 	public static void addResponseCookie(String name, String value, String path, int maxAge) {
-		try {
-			value = URLEncoder.encode(value, "UTF-8");
-		}
-		catch (UnsupportedEncodingException e) {
-			throw new UnsupportedOperationException(ERROR_UNSUPPORTED_ENCODING, e);
+		if (value != null) {
+			try {
+				value = URLEncoder.encode(value, "UTF-8");
+			}
+			catch (UnsupportedEncodingException e) {
+				throw new UnsupportedOperationException(ERROR_UNSUPPORTED_ENCODING, e);
+			}
 		}
 
 		Map<String, Object> properties = new HashMap<String, Object>();
 		properties.put("path", path);
 		properties.put("maxAge", maxAge);
 		FacesContext.getCurrentInstance().getExternalContext().addResponseCookie(name, value, properties);
+	}
+
+	/**
+	 * Remove the cookie with given name and path from the HTTP response. Note that the name and path must be exactly
+	 * the same as it was when the cookie was created.
+	 * @param name The cookie name.
+	 * @param path The cookie path.
+	 * @see ExternalContext#addResponseCookie(String, String, Map)
+	 */
+	public static void removeResponseCookie(String name, String path) {
+		addResponseCookie(name, null, path, 0);
+	}
+
+	/**
+	 * Add a header with given name and value to the HTTP response.
+	 * @param name The header name.
+	 * @param value The header value.
+	 * @see ExternalContext#addResponseHeader(String, String)
+	 */
+	public static void addResponseHeader(String name, String value) {
+		FacesContext.getCurrentInstance().getExternalContext().addResponseHeader(name, value);
 	}
 
 	/**
@@ -366,6 +404,14 @@ public final class Faces {
 	 */
 	public static void setSessionAttribute(String name, Object value) {
 		FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put(name, value);
+	}
+
+	/**
+	 * Invalidates the current HTTP session. So, any subsequent HTTP request will get a new one when necessary.
+	 * @see ExternalContext#invalidateSession()
+	 */
+	public static void invalidateSession() {
+		FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
 	}
 
 	/**
