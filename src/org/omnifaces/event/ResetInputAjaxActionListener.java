@@ -90,6 +90,20 @@ public class ResetInputAjaxActionListener implements ActionListener {
 	private static final String ERROR_INVALID_CLIENTID =
 		"The %s contains an invalid client ID '%s'. Resolved to null.";
 
+	// Variables ------------------------------------------------------------------------------------------------------
+
+	private ActionListener wrapped;
+
+	// Constructors ---------------------------------------------------------------------------------------------------
+
+	/**
+	 * Construct a new reset input ajax action listener around the given wrapped action listener.
+	 * @param wrapped The wrapped action listener.
+	 */
+	public ResetInputAjaxActionListener(ActionListener wrapped) {
+		this.wrapped = wrapped;
+	}
+
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
@@ -135,6 +149,8 @@ public class ResetInputAjaxActionListener implements ActionListener {
 		for (EditableValueHolder input : inputs) {
 			input.resetValue();
 		}
+
+		wrapped.processAction(event);
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
