@@ -14,6 +14,7 @@ package org.omnifaces.event;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -21,6 +22,10 @@ import javax.faces.FacesException;
 import javax.faces.component.EditableValueHolder;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIViewRoot;
+import javax.faces.component.visit.VisitCallback;
+import javax.faces.component.visit.VisitContext;
+import javax.faces.component.visit.VisitHint;
+import javax.faces.component.visit.VisitResult;
 import javax.faces.context.FacesContext;
 import javax.faces.context.PartialViewContext;
 import javax.faces.event.AbortProcessingException;
@@ -85,10 +90,9 @@ public class ResetInputAjaxActionListener implements ActionListener {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
+	private static final Set<VisitHint> VISIT_HINTS = Collections.singleton(VisitHint.SKIP_UNRENDERED);
 	private static final String ERROR_RF_PVC_HACK =
 		"Cannot obtain componentRenderIds property of RichFaces ExtendedPartialViewContextImpl instance '%s'.";
-	private static final String ERROR_INVALID_CLIENTID =
-		"The %s contains an invalid client ID '%s'. Resolved to null.";
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
@@ -142,17 +146,16 @@ public class ResetInputAjaxActionListener implements ActionListener {
 		}
 
 		UIViewRoot viewRoot = context.getViewRoot();
-		Set<EditableValueHolder> inputs = new HashSet<EditableValueHolder>();
+		Collection<String> executeIds = partialViewContext.getExecuteIds();
+		final Set<EditableValueHolder> inputs = new HashSet<EditableValueHolder>();
 
 		// First find all to be rendered inputs and add them to the set.
-		for (String renderId : renderIds) {
-			findAndAddEditableValueHolders(findComponent(viewRoot, renderId, "renderIds"), inputs);
-		}
+		findAndAddEditableValueHolders(
+			VisitContext.createVisitContext(context, renderIds, VISIT_HINTS), viewRoot, inputs);
 
 		// Then find all executed inputs and remove them from the set.
-		for (String executeId : partialViewContext.getExecuteIds()) {
-			findAndRemoveEditableValueHolders(findComponent(viewRoot, executeId, "executeIds"), inputs);
-		}
+		findAndRemoveEditableValueHolders(
+			VisitContext.createVisitContext(context, executeIds, VISIT_HINTS), viewRoot, inputs);
 
 		// The set now contains inputs which are to be rendered, but which are not been executed. Reset them.
 		for (EditableValueHolder input : inputs) {
@@ -196,52 +199,57 @@ public class ResetInputAjaxActionListener implements ActionListener {
 	}
 
 	/**
-	 * Helper method to find component and throw an exception if it is <code>null</code>.
-	 * @param viewRoot The view root to find the component in.
-	 * @param clientId The cliend ID of the component to be found.
-	 * @param collectionName "renderIds" or "executeIds".
-	 */
-	private static UIComponent findComponent(UIViewRoot viewRoot, String clientId, String collectionName) {
-		UIComponent component = viewRoot.findComponent(clientId);
-
-		if (component == null) {
-			// This should normally not occur at this point, but you never know with some JSF impls/libraries.
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_CLIENTID, collectionName, clientId));
-		}
-
-		return component;
-	}
-
-	/**
 	 * Find all editable value holder components in the component hierarchy, starting with the given component and
 	 * add them to the given set.
+	 * @param context The visit context to work with.
 	 * @param component The starting point of the component hierarchy to look for editable value holder components.
-	 * @param set The set to add the found editable value holder components to.
+	 * @param inputs The set to add the found editable value holder components to.
 	 */
-	private static void findAndAddEditableValueHolders(UIComponent component, Set<EditableValueHolder> set) {
-		if (component instanceof EditableValueHolder) {
-			set.add((EditableValueHolder) component);
-		}
+	private static void findAndAddEditableValueHolders
+		(VisitContext context, final UIComponent component, final Set<EditableValueHolder> inputs)
+	{
+		component.visitTree(context, new VisitCallback() {
+            @Override
+            public VisitResult visit(VisitContext context, UIComponent target) {
+				if (target instanceof EditableValueHolder) {
+					inputs.add((EditableValueHolder) target);
+				}
+				else if (context.getIdsToVisit() != VisitContext.ALL_IDS) {
+					// Render ID didn't point an EditableValueHolder. Visit all children as well.
+					findAndAddEditableValueHolders(VisitContext.createVisitContext(
+						context.getFacesContext(), null, context.getHints()), target, inputs);
+				}
 
-		for (UIComponent child : component.getChildren()) {
-			findAndAddEditableValueHolders(child, set);
-		}
+				return VisitResult.ACCEPT;
+            }
+        });
 	}
 
 	/**
 	 * Find all editable value holder components in the component hierarchy, starting with the given component and
 	 * remove them from the given set.
+	 * @param context The visit context to work with.
 	 * @param component The starting point of the component hierarchy to look for editable value holder components.
-	 * @param set The set to remove the found editable value holder components from.
+	 * @param inputs The set to remove the found editable value holder components from.
 	 */
-	private static void findAndRemoveEditableValueHolders(UIComponent component, Set<EditableValueHolder> set) {
-		if (component instanceof EditableValueHolder) {
-			set.remove(component);
-		}
+	private static void findAndRemoveEditableValueHolders
+		(VisitContext context, final UIComponent component, final Set<EditableValueHolder> inputs)
+	{
+		component.visitTree(context, new VisitCallback() {
+            @Override
+            public VisitResult visit(VisitContext context, UIComponent target) {
+				if (target instanceof EditableValueHolder) {
+					inputs.remove(target);
+				}
+				else if (context.getIdsToVisit() != VisitContext.ALL_IDS) {
+					// Execute ID didn't point an EditableValueHolder. Visit all children as well.
+					findAndRemoveEditableValueHolders(VisitContext.createVisitContext(
+						context.getFacesContext(), null, context.getHints()), target, inputs);
+				}
 
-		for (UIComponent child : component.getChildren()) {
-			findAndRemoveEditableValueHolders(child, set);
-		}
+				return VisitResult.ACCEPT;
+            }
+        });
 	}
 
 }
