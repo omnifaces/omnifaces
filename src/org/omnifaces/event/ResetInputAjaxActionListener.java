@@ -97,7 +97,16 @@ public class ResetInputAjaxActionListener implements ActionListener {
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Construct a new reset input ajax action listener around the given wrapped action listener.
+	 * Construct a new reset input ajax action listener. This constructor will be used when specifying the action
+	 * listener by <tt>&lt;f:actionListener&gt;</tt>.
+	 */
+	public ResetInputAjaxActionListener() {
+		//
+	}
+
+	/**
+	 * Construct a new reset input ajax action listener around the given wrapped action listener. This constructor
+	 * will be used when registering the action listener in <tt>faces-config.xml</tt>.
 	 * @param wrapped The wrapped action listener.
 	 */
 	public ResetInputAjaxActionListener(ActionListener wrapped) {
