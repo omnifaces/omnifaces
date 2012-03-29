@@ -14,6 +14,8 @@ package org.omnifaces.component.tree;
 
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponent;
+import javax.faces.component.visit.VisitCallback;
+import javax.faces.component.visit.VisitContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 
@@ -56,6 +58,15 @@ public class TreeInsertChildren extends TreeFamily {
 	@Override
 	protected void process(FacesContext context, PhaseId phaseId) {
 		Components.getClosestParent(this, Tree.class).processTreeNode(context, phaseId);
+	}
+
+	/**
+	 * Delegate visiting of the tree node to {@link Tree#visitTreeNode(VisitContext, VisitCallback)}.
+	 * @see Tree#visitTreeNode(VisitContext, VisitCallback)
+	 */
+	@Override
+	public boolean visitTree(VisitContext context, VisitCallback callback) {
+		return Components.getClosestParent(this, Tree.class).visitTreeNode(context, callback);
 	}
 
 }

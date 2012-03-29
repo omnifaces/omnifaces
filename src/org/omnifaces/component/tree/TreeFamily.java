@@ -90,7 +90,7 @@ public abstract class TreeFamily extends UIComponentBase {
 	 * {@link PhaseId#RENDER_RESPONSE}.
 	 */
 	@Override
-	public void encodeAll(FacesContext context) throws IOException {
+	public void encodeChildren(FacesContext context) throws IOException {
 		validateHierarchy();
 		process(context, PhaseId.RENDER_RESPONSE);
 	}

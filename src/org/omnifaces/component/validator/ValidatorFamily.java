@@ -40,11 +40,11 @@ public abstract class ValidatorFamily extends UIComponentBase {
 	}
 
 	/**
-	 * Returns <code>false</code>.
+	 * Returns <code>true</code>.
 	 */
 	@Override
 	public boolean getRendersChildren() {
-		return false;
+		return true;
 	}
 
 	/**
@@ -75,7 +75,7 @@ public abstract class ValidatorFamily extends UIComponentBase {
 	 * Calls {@link #validateHierarchy()}.
 	 */
 	@Override
-	public void encodeAll(FacesContext context) throws IOException {
+	public void encodeChildren(FacesContext context) throws IOException {
 		validateHierarchy();
 	}
 

@@ -13,6 +13,8 @@
 package org.omnifaces.component.highlight;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.Set;
 
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
@@ -22,6 +24,7 @@ import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
 import javax.faces.component.visit.VisitCallback;
 import javax.faces.component.visit.VisitContext;
+import javax.faces.component.visit.VisitHint;
 import javax.faces.component.visit.VisitResult;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
@@ -76,6 +79,7 @@ public class Highlight extends UIComponentBase {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
+	private static final Set<VisitHint> VISIT_HINTS = Collections.singleton(VisitHint.SKIP_UNRENDERED);
 	private static final String DEFAULT_STYLECLASS = "error";
 	private static final Boolean DEFAULT_FOCUS = Boolean.TRUE;
 	private static final String SCRIPT = "OmniFaces.Highlight.addErrorClass(%s, '%s', %s)";
@@ -95,11 +99,11 @@ public class Highlight extends UIComponentBase {
 	}
 
 	/**
-	 * Returns <code>false</code>.
+	 * Returns <code>true</code>.
 	 */
 	@Override
 	public boolean getRendersChildren() {
-		return false;
+		return true;
 	}
 
 	/**
@@ -113,13 +117,17 @@ public class Highlight extends UIComponentBase {
 	 * don't want it to be saved in the server side view state.
 	 */
 	@Override
-	public void encodeAll(FacesContext context) throws IOException {
+	public void encodeChildren(FacesContext context) throws IOException {
 		Components.validateHasParent(this, UIForm.class);
 		Components.validateHasNoChildren(this);
 
+		if (!context.isPostback()) {
+			return;
+		}
+
 		final StringBuilder clientIdsAsJSON = new StringBuilder();
 		UIForm form = Components.getClosestParent(this, UIForm.class);
-		form.visitTree(VisitContext.createVisitContext(context), new VisitCallback() {
+		form.visitTree(VisitContext.createVisitContext(context, null, VISIT_HINTS), new VisitCallback() {
 
 			@Override
 			public VisitResult visit(VisitContext context, UIComponent component) {

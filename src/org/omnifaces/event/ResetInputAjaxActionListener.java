@@ -209,8 +209,8 @@ public class ResetInputAjaxActionListener implements ActionListener {
 		(VisitContext context, final UIComponent component, final Set<EditableValueHolder> inputs)
 	{
 		component.visitTree(context, new VisitCallback() {
-            @Override
-            public VisitResult visit(VisitContext context, UIComponent target) {
+			@Override
+			public VisitResult visit(VisitContext context, UIComponent target) {
 				if (target instanceof EditableValueHolder) {
 					inputs.add((EditableValueHolder) target);
 				}
@@ -221,8 +221,8 @@ public class ResetInputAjaxActionListener implements ActionListener {
 				}
 
 				return VisitResult.ACCEPT;
-            }
-        });
+			}
+		});
 	}
 
 	/**
@@ -236,8 +236,8 @@ public class ResetInputAjaxActionListener implements ActionListener {
 		(VisitContext context, final UIComponent component, final Set<EditableValueHolder> inputs)
 	{
 		component.visitTree(context, new VisitCallback() {
-            @Override
-            public VisitResult visit(VisitContext context, UIComponent target) {
+			@Override
+			public VisitResult visit(VisitContext context, UIComponent target) {
 				if (target instanceof EditableValueHolder) {
 					inputs.remove(target);
 				}
@@ -248,8 +248,8 @@ public class ResetInputAjaxActionListener implements ActionListener {
 				}
 
 				return VisitResult.ACCEPT;
-            }
-        });
+			}
+		});
 	}
 
 }

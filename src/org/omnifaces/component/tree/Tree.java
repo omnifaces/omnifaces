@@ -20,6 +20,9 @@ import javax.faces.component.FacesComponent;
 import javax.faces.component.NamingContainer;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UINamingContainer;
+import javax.faces.component.visit.VisitCallback;
+import javax.faces.component.visit.VisitContext;
+import javax.faces.component.visit.VisitResult;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 
@@ -94,7 +97,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	private Map<Integer, TreeNode> nodes;
 	private TreeModel currentModelNode;
 
-	// UIComponent overrides ------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
 	/**
 	 * An override which appends the index of the current model node to the client ID chain, if any available.
@@ -129,8 +132,6 @@ public class Tree extends TreeFamily implements NamingContainer {
 		super.setValueExpression(name, binding);
 	}
 
-	// Actions --------------------------------------------------------------------------------------------------------
-
 	/**
 	 * Validate the component hierarchy.
 	 * @throws IllegalArgumentException When this component is nested in another {@link Tree}, or when there aren't any
@@ -153,25 +154,50 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @param phaseId The current phase ID.
 	 */
 	@Override
-	protected void process(FacesContext context, PhaseId phaseId) {
+	protected void process(final FacesContext context, final PhaseId phaseId) {
 		if (!isRendered()) {
 			return;
 		}
 
-		if (phaseId == PhaseId.APPLY_REQUEST_VALUES || phaseId == PhaseId.RENDER_RESPONSE) {
-			prepareNodes();
-			prepareModel();
+		processTree(context, phaseId, new Callback<Void>() {
+
+			@Override
+			public Void invoke() {
+				processTreeNode(context, phaseId);
+				return null;
+			}
+		});
+	}
+
+	/**
+	 * Set the root node and delegate the call to {@link #visitTreeNode(VisitContext, VisitCallback)}.
+	 * @param context The visit context to work with.
+	 * @param callback The visit callback to work with.
+	 * @return The visit result.
+	 */
+	@Override
+	public boolean visitTree(final VisitContext context, final VisitCallback callback) {
+		if (!isVisitable(context)) {
+			return false;
 		}
 
-		Object[] originalVars = captureOriginalVars(context);
+		return processTree(context.getFacesContext(), PhaseId.ANY_PHASE, new Callback<Boolean>() {
 
-		try {
-			setCurrentModelNode(context, model);
-			processTreeNode(context, phaseId);
-		}
-		finally {
-			setVars(context, originalVars);
-		}
+			@Override
+			public Boolean invoke() {
+				VisitResult result = context.invokeVisitCallback(Tree.this, callback);
+
+				if (result == VisitResult.COMPLETE) {
+					return true;
+				}
+
+				if (result == VisitResult.ACCEPT && !context.getSubtreeIdsToVisit(Tree.this).isEmpty()) {
+					return visitTreeNode(context, callback);
+				}
+
+				return false;
+			}
+		});
 	}
 
 	/**
@@ -184,60 +210,141 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @see TreeModel#getLevel()
 	 * @see TreeInsertChildren
 	 */
-	protected void processTreeNode(FacesContext context, PhaseId phaseId) {
-		if (!currentModelNode.isLeaf()) {
-			TreeNode treeNode = nodes.get(currentModelNode.getLevel());
+	protected void processTreeNode(final FacesContext context, final PhaseId phaseId) {
+		processTreeNode(new ArgumentCallback<Void, TreeNode>() {
 
-			if (treeNode == null) {
-				treeNode = nodes.get(null);
+			@Override
+			public Void invoke(TreeNode treeNode) {
+				if (treeNode != null) {
+					treeNode.process(context, phaseId);
+				}
+
+				return null;
 			}
+		});
+	}
 
-			if (treeNode == null) {
-				return;
+	/**
+	 * If the current model node isn't a leaf (i.e. it has any children), then obtain the {@link TreeNode} associated
+	 * with the level of the current model node. If it isn't null, then visit it according to the given visit context
+	 * and callback. This method is also called by {@link TreeInsertChildren#visitTree(VisitContext, VisitCallback)}.
+	 * @param context The visit context to work with.
+	 * @param callback The visit callback to work with.
+	 * @see TreeModel#isLeaf()
+	 * @see TreeModel#getLevel()
+	 * @see TreeInsertChildren
+	 */
+    protected boolean visitTreeNode(final VisitContext context, final VisitCallback callback) {
+		return processTreeNode(new ArgumentCallback<Boolean, TreeNode>() {
+
+			@Override
+			public Boolean invoke(TreeNode treeNode) {
+				if (treeNode != null) {
+					return treeNode.visitTree(context, callback);
+				}
+
+				return false;
 			}
+		});
+	}
 
-			treeNode.process(context, phaseId);
+	/**
+	 * Convenience method to handle both {@link #process(FacesContext, PhaseId)} and
+	 * {@link #visitTree(VisitContext, VisitCallback)} without code duplication.
+	 * @param context The faces context to work with.
+	 * @param phaseId The current phase ID.
+	 * @param callback The callback to be invoked.
+	 * @return
+	 */
+	private <R> R processTree(FacesContext context, PhaseId phaseId, Callback<R> callback) {
+		if (phaseId == PhaseId.RENDER_RESPONSE) {
+			nodes = null;
+			model = null;
+		}
+
+		Object[] originalVars = captureOriginalVars(context);
+		TreeModel originalModelNode = currentModelNode;
+		pushComponentToEL(context, null);
+
+		try {
+			setCurrentModelNode(context, getModel());
+			return callback.invoke();
+		}
+		finally {
+			popComponentFromEL(context);
+			setCurrentModelNode(context, originalModelNode);
+			setVars(context, originalVars);
 		}
 	}
 
 	/**
-	 * Prepare the tree nodes by finding direct {@link TreeNode} children and collecting them by their level attribute.
+	 * Convenience method to handle both {@link #processTreeNode(FacesContext, PhaseId)} and
+	 * {@link #visitTreeNode(VisitContext, VisitCallback)} without code duplication.
+	 * @param callback The callback to be invoked.
+	 * @return
+	 */
+	private <R> R processTreeNode(ArgumentCallback<R, TreeNode> callback) {
+		TreeNode treeNode = null;
+
+		if (!currentModelNode.isLeaf()) {
+			treeNode = getNodes().get(currentModelNode.getLevel());
+
+			if (treeNode == null) {
+				treeNode = getNodes().get(null);
+			}
+		}
+
+		return callback.invoke(treeNode);
+    }
+
+	/**
+	 * Returns the tree nodes by finding direct {@link TreeNode} children and collecting them by their level attribute.
+	 * @return The tree nodes.
 	 * @throws IllegalArgumentException When a direct child component isn't of type {@link TreeNode}, or when there are
 	 * multiple {@link TreeNode} components with the same level.
 	 */
-	private void prepareNodes() {
-		nodes = new HashMap<Integer, TreeNode>(getChildCount());
+	private Map<Integer, TreeNode> getNodes() {
+		if (nodes == null) {
+			nodes = new HashMap<Integer, TreeNode>(getChildCount());
 
-		for (UIComponent child : getChildren()) {
-			if (child instanceof TreeNode) {
-				TreeNode node = (TreeNode) child;
+			for (UIComponent child : getChildren()) {
+				if (child instanceof TreeNode) {
+					TreeNode node = (TreeNode) child;
 
-				if (nodes.put(node.getLevel(), node) != null) {
-					throw new IllegalArgumentException(String.format(ERROR_DUPLICATE_NODE, node.getLevel()));
+					if (nodes.put(node.getLevel(), node) != null) {
+						throw new IllegalArgumentException(String.format(ERROR_DUPLICATE_NODE, node.getLevel()));
+					}
+				}
+				else {
+					throw new IllegalArgumentException(String.format(ERROR_INVALID_CHILD, child.getClass().getName()));
 				}
 			}
-			else {
-				throw new IllegalArgumentException(String.format(ERROR_INVALID_CHILD, child.getClass().getName()));
-			}
 		}
+
+		return nodes;
 	}
 
 	/**
-	 * Prepare the tree model associated with the <code>value</code> attribute.
+	 * Returns the tree model associated with the <code>value</code> attribute.
+	 * @return The tree model.
 	 * @throws IllegalArgumentException When the <code>value</code> isn't of type {@link TreeModel}.
 	 */
-	private void prepareModel() {
-		Object value = getValue();
+	private TreeModel getModel() {
+		if (model == null) {
+			Object value = getValue();
 
-		if (value == null) {
-			model = new ListTreeModel();
+			if (value == null) {
+				model = new ListTreeModel();
+			}
+			else if (value instanceof TreeModel) {
+				model = (TreeModel) value;
+			}
+			else {
+				throw new IllegalArgumentException(String.format(ERROR_INVALID_MODEL, value.getClass().getName()));
+			}
 		}
-		else if (value instanceof TreeModel) {
-			model = (TreeModel) value;
-		}
-		else {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_MODEL, value.getClass().getName()));
-		}
+
+		return model;
 	}
 
 	/**
@@ -361,4 +468,12 @@ public class Tree extends TreeFamily implements NamingContainer {
 		getStateHelper().put(PropertyKeys.varNode, varNode);
 	}
 
+}
+
+interface Callback<R> {
+	R invoke();
+}
+
+interface ArgumentCallback<R, A> {
+	R invoke(A argument);
 }

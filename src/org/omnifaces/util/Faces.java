@@ -554,8 +554,9 @@ public final class Faces {
 	}
 
 	/**
-	 * Send the given file to the response. The content type will be determined based on file name.
-	 * The {@link FacesContext#responseComplete()} will implicitly be called after successful streaming.
+	 * Send the given file to the response. The content type will be determined based on file name. The content length
+	 * will be set to the length of the file. The {@link FacesContext#responseComplete()} will implicitly be called
+	 * after successful streaming.
 	 * @param file The file to be sent to the response.
 	 * @param attachment Whether the file should be provided as attachment, or just inline.
 	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
@@ -566,8 +567,9 @@ public final class Faces {
 	}
 
 	/**
-	 * Send the given byte array as a file to the response. The content type will be determined based on file name.
-	 * The {@link FacesContext#responseComplete()} will implicitly be called after successful streaming.
+	 * Send the given byte array as a file to the response. The content type will be determined based on file name. The
+	 * content length will be set to the length of the byte array. The {@link FacesContext#responseComplete()} will
+	 * implicitly be called after successful streaming.
 	 * @param content The file content as byte array.
 	 * @param filename The file name which should appear in content disposition header.
 	 * @param attachment Whether the file should be provided as attachment, or just inline.
@@ -580,7 +582,10 @@ public final class Faces {
 
 	/**
 	 * Send the given input stream as a file to the response. The content type will be determined based on file name.
-	 * The {@link InputStream#close()} will implicitly be called after streaming, regardless of whether an exception is
+	 * The content length may not be set because that's not predictable based on input stream. The client may receive a
+	 * download of an unknown length and thus the download progress may be unknown to the client. Only if the input
+	 * stream is smaller than the default buffer size, then the content length will be set. The
+	 * {@link InputStream#close()} will implicitly be called after streaming, regardless of whether an exception is
 	 * been thrown or not. The {@link FacesContext#responseComplete()} will implicitly be called after successful
 	 * streaming.
 	 * @param content The file content as input stream.

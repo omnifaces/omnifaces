@@ -14,6 +14,8 @@ package org.omnifaces.component.tree;
 
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponent;
+import javax.faces.component.visit.VisitCallback;
+import javax.faces.component.visit.VisitContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 
@@ -63,7 +65,7 @@ public class TreeNodeItem extends TreeFamily {
 	}
 
 	/**
-	 * Loop over children of the current model node, set the child as the current morel node and continue processing
+	 * Loop over children of the current model node, set the child as the current model node and continue processing
 	 * this component according to the rules of the given phase ID.
 	 * @param context The faces context to work with.
 	 * @param phaseId The current phase ID.
@@ -82,6 +84,33 @@ public class TreeNodeItem extends TreeFamily {
 			tree.setCurrentModelNode(context, childModelNode);
 			processSuper(context, phaseId);
 		}
+	}
+
+	/**
+	 * Loop over children of the current model node, set the child as the current model node and continue visiting
+	 * this component according to the given visit context and callback.
+	 * @param context The visit context to work with.
+	 * @param callback The visit callback to work with.
+	 * @see Tree#setCurrentModelNode(FacesContext, TreeModel)
+	 */
+	@Override
+	@SuppressWarnings({ "rawtypes", "unchecked" }) // For TreeModel. We don't care about its actual type anyway.
+	public boolean visitTree(VisitContext context, VisitCallback callback) {
+		if (!isVisitable(context) || getChildCount() == 0) {
+			return false;
+		}
+
+		Tree tree = Components.getClosestParent(this, Tree.class);
+
+		for (TreeModel childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
+			tree.setCurrentModelNode(context.getFacesContext(), childModelNode);
+
+			if (super.visitTree(context, callback)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 }
