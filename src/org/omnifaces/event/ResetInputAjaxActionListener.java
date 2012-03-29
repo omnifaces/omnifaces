@@ -159,7 +159,9 @@ public class ResetInputAjaxActionListener implements ActionListener {
 			input.resetValue();
 		}
 
-		wrapped.processAction(event);
+		if (wrapped != null) {
+			wrapped.processAction(event);
+		}
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
