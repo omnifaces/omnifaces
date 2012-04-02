@@ -25,7 +25,8 @@ import java.util.Map;
 /**
  * Collection of general utility methods that do not fit in one of the more JSF-specific classes.
  *
- * @author Arjan Tijms, Bauke Scholtz
+ * @author Arjan Tijms
+ * @author Bauke Scholtz
  *
  */
 public final class Utils {

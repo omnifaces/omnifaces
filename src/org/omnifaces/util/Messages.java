@@ -24,9 +24,9 @@ import javax.faces.validator.ValidatorException;
 import javax.servlet.ServletContextListener;
 
 /**
- * Collection of utility methods for the JSF API to ease adding faces messages. It also offers the possibility to set
- * a custom message resolver so that you can control the way how messages are been resolved. You can for example supply
- * an implementation wherein the message is been treated as for example a resource bundle key.
+ * Collection of utility methods for the JSF API with respect to working with {@link FacesMessage}. It also offers the
+ * possibility to set a custom message resolver so that you can control the way how messages are been resolved. You can
+ * for example supply an implementation wherein the message is been treated as for example a resource bundle key.
  * <p>
  * Here's an example:
  * <pre>

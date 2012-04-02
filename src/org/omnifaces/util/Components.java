@@ -23,8 +23,7 @@ import javax.faces.context.FacesContext;
 
 
 /**
- * Collection of utility methods for the JSF API that are mainly shortcuts for obtaining stuff from the
- * {@link UIComponent}.
+ * Collection of utility methods for the JSF API with respect to working with {@link UIComponent}.
  *
  * @author Bauke Scholtz
  * @author Arjan Tijms

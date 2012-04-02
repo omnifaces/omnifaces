@@ -14,7 +14,7 @@ package org.omnifaces.event;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -90,7 +90,7 @@ public class ResetInputAjaxActionListener implements ActionListener {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final Set<VisitHint> VISIT_HINTS = Collections.singleton(VisitHint.SKIP_UNRENDERED);
+	private static final Set<VisitHint> VISIT_HINTS = EnumSet.of(VisitHint.SKIP_UNRENDERED);
 	private static final String ERROR_RF_PVC_HACK =
 		"Cannot obtain componentRenderIds property of RichFaces ExtendedPartialViewContextImpl instance '%s'.";
 

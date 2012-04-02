@@ -49,7 +49,8 @@ import javax.servlet.http.HttpSession;
  * client code needs to call methods in this class multiple times it's expected that performance will be slightly better
  * if instead the {@link FacesContext} is obtained once and the required methods called on that.
  *
- * @author Arjan Tijms, Bauke Scholtz
+ * @author Arjan Tijms
+ * @author Bauke Scholtz
  */
 public final class Faces {
 
