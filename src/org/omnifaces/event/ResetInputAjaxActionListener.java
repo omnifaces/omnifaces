@@ -135,31 +135,27 @@ public class ResetInputAjaxActionListener implements ActionListener {
 		FacesContext context = FacesContext.getCurrentInstance();
 		PartialViewContext partialViewContext = context.getPartialViewContext();
 
-		if (!partialViewContext.isAjaxRequest()) {
-			return; // Ignore synchronous requests. All executed and rendered inputs are the same anyway.
-		}
+		if (partialViewContext.isAjaxRequest()) {
+			Collection<String> renderIds = getRenderIds(partialViewContext);
 
-		Collection<String> renderIds = getRenderIds(partialViewContext);
+			if (!renderIds.isEmpty()) {
+				UIViewRoot viewRoot = context.getViewRoot();
+				Collection<String> executeIds = partialViewContext.getExecuteIds();
+				final Set<EditableValueHolder> inputs = new HashSet<EditableValueHolder>();
 
-		if (renderIds.isEmpty()) {
-			return; // Nothing to render, thus also nothing to reset.
-		}
+				// First find all to be rendered inputs and add them to the set.
+				findAndAddEditableValueHolders(
+					VisitContext.createVisitContext(context, renderIds, VISIT_HINTS), viewRoot, inputs);
 
-		UIViewRoot viewRoot = context.getViewRoot();
-		Collection<String> executeIds = partialViewContext.getExecuteIds();
-		final Set<EditableValueHolder> inputs = new HashSet<EditableValueHolder>();
+				// Then find all executed inputs and remove them from the set.
+				findAndRemoveEditableValueHolders(
+					VisitContext.createVisitContext(context, executeIds, VISIT_HINTS), viewRoot, inputs);
 
-		// First find all to be rendered inputs and add them to the set.
-		findAndAddEditableValueHolders(
-			VisitContext.createVisitContext(context, renderIds, VISIT_HINTS), viewRoot, inputs);
-
-		// Then find all executed inputs and remove them from the set.
-		findAndRemoveEditableValueHolders(
-			VisitContext.createVisitContext(context, executeIds, VISIT_HINTS), viewRoot, inputs);
-
-		// The set now contains inputs which are to be rendered, but which are not been executed. Reset them.
-		for (EditableValueHolder input : inputs) {
-			input.resetValue();
+				// The set now contains inputs which are to be rendered, but which are not been executed. Reset them.
+				for (EditableValueHolder input : inputs) {
+					input.resetValue();
+				}
+			}
 		}
 
 		if (wrapped != null) {
