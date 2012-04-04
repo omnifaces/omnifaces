@@ -66,7 +66,7 @@ import org.omnifaces.util.Components;
  * @author Bauke Scholtz
  */
 @FacesComponent(Highlight.COMPONENT_TYPE)
-@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head")
+@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head") // highlight.js
 public class Highlight extends OnloadScript {
 
 	// Public constants -----------------------------------------------------------------------------------------------
@@ -100,14 +100,15 @@ public class Highlight extends OnloadScript {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Visit all componants of the parent {@link UIForm}, check if they are an instance of {@link UIInput} and are not
+	 * Visit all components of the current {@link UIForm}, check if they are an instance of {@link UIInput} and are not
 	 * {@link UIInput#isValid()} and finally append them to an array in JSON format and render the script.
 	 * <p>
 	 * Note that the {@link FacesContext#getClientIdsWithMessages()} could also be consulted, but it does not indicate
 	 * whether the components associated with those client IDs are actually {@link UIInput} components which are not
-	 * {@link UIInput#isValid()}. Also note that the highlighting is been done by delegated the job to JavaScript
+	 * {@link UIInput#isValid()}. Also note that the highlighting is been done by delegating the job to JavaScript
 	 * instead of directly changing the component's own <code>styleClass</code> attribute; this is chosen so because we
-	 * don't want it to be saved in the server side view state.
+	 * don't want the changed style class to be saved in the server side view state as it may result in potential
+	 * inconsitenties because it's supposed to be an one-time change.
 	 */
 	@Override
 	public void encodeChildren(FacesContext context) throws IOException {

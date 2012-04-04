@@ -47,7 +47,7 @@ import javax.faces.event.PostRestoreStateEvent;
 	@ListenerFor(systemEventClass=PostAddToViewEvent.class),
 	@ListenerFor(systemEventClass=PostRestoreStateEvent.class)
 })
-@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head")
+@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head") // ajax.js
 public class OnloadScript extends UIOutput {
 
 	// Public constants -----------------------------------------------------------------------------------------------
@@ -81,7 +81,7 @@ public class OnloadScript extends UIOutput {
 	/**
 	 * If the event is a {@link PostAddToViewEvent}, then relocate the component to end of body, so that we can make
 	 * sure that the script is executed after all HTML DOM elements are been created. If the event is a
-	 * {@link PostRestoreStateEvent}, and the current request is an ajax request, then add the client ID of this
+	 * {@link PostRestoreStateEvent} and the current request is an ajax request, then add the client ID of this
 	 * component to the collection of ajax render IDs, so that we can make sure that the script is executed on every
 	 * ajax response as well.
 	 */
@@ -90,11 +90,9 @@ public class OnloadScript extends UIOutput {
 		FacesContext context = FacesContext.getCurrentInstance();
 
 		if (event instanceof PostAddToViewEvent) {
-			// Relocate the component to end of body.
 			context.getViewRoot().addComponentResource(context, this, "body");
 		}
 		else if (event instanceof PostRestoreStateEvent) {
-			// If this is an ajax request, make sure that the current component is included in ajax re-render.
 			PartialViewContext ajaxContext = context.getPartialViewContext();
 
 			if (ajaxContext.isAjaxRequest()) {
@@ -106,12 +104,14 @@ public class OnloadScript extends UIOutput {
 				}
 			}
 		}
+
+		super.processEvent(event);
 	}
 
 	/**
-	 * If there are any children and the current request is an ajax request, then delegate the script body to
-	 * <code>OmniFaces.Ajax.addRunOnceOnSuccess()</code>. The actual script is wrapped in a <code>span</code> element
-	 * with an ID, so that it can be ajax-updated.
+	 * If there are any children and the current request is an ajax request, then add the script body as a callback
+	 * function to <code>OmniFaces.Ajax.addRunOnceOnSuccess()</code>. The entire <code>&lt;script&gt;</code> element
+	 * is wrapped in a <code>&lt;span&gt;</code> element with an ID, so that it can be ajax-updated.
 	 */
 	@Override
 	public void encodeChildren(FacesContext context) throws IOException {
