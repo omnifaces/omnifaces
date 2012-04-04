@@ -1,17 +1,17 @@
 OmniFaces.Ajax = function() {
 
-	var onloadCallbacks = [];
+	var runOnceOnSuccessCallbacks = [];
 
 	if (typeof jsf !== 'undefined') {
 		jsf.ajax.addOnEvent(function(data) {
 			if (data.status === 'success') {
-				for (var i in onloadCallbacks) {
-					if (onloadCallbacks.hasOwnProperty(i)) {
-						onloadCallbacks[i].call(null);
+				for (var i in runOnceOnSuccessCallbacks) {
+					if (runOnceOnSuccessCallbacks.hasOwnProperty(i)) {
+						runOnceOnSuccessCallbacks[i].call(null);
 					}
 				}
 
-				onloadCallbacks = [];
+				runOnceOnSuccessCallbacks = [];
 			}
 		});
 	}
@@ -19,14 +19,14 @@ OmniFaces.Ajax = function() {
 	return {
 
 		/**
-		 * Add a new onload callback function which will also be executed on success of every ajax response.
+		 * Add a new callback function which will be executed on success of the current ajax response only.
 		 */
-		addOnload: function addOnload(callback) {
+		addRunOnceOnSuccess: function addRunOnceOnSuccess(callback) {
 			if (typeof callback === 'function') {
-				onloadCallbacks[onloadCallbacks.length] = callback;
+				runOnceOnSuccessCallbacks[runOnceOnSuccessCallbacks.length] = callback;
 			}
 			else {
-				throw new Error("OmniFaces.Ajax.addOnload: The given callback is not a function.");
+				throw new Error("OmniFaces.Ajax.addRunOnceOnSuccess: The given callback is not a function.");
 			}
 		}
 	}

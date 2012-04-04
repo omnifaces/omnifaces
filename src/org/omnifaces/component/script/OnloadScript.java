@@ -57,7 +57,7 @@ public class OnloadScript extends UIOutput {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
-	private static final String AJAX_SCRIPT_START = "OmniFaces.Ajax.addOnload(function(){";
+	private static final String AJAX_SCRIPT_START = "OmniFaces.Ajax.addRunOnceOnSuccess(function(){";
 	private static final String AJAX_SCRIPT_END = "});";
 
 	// UIComponent overrides ------------------------------------------------------------------------------------------
@@ -110,7 +110,8 @@ public class OnloadScript extends UIOutput {
 
 	/**
 	 * If there are any children and the current request is an ajax request, then delegate the script body to
-	 * <code>OmniFaces.Ajax.addOnload()</code>. The actual script is wrapped in a <code>span</code> element with an ID.
+	 * <code>OmniFaces.Ajax.addRunOnceOnSuccess()</code>. The actual script is wrapped in a <code>span</code> element
+	 * with an ID, so that it can be ajax-updated.
 	 */
 	@Override
 	public void encodeChildren(FacesContext context) throws IOException {
@@ -128,7 +129,7 @@ public class OnloadScript extends UIOutput {
 		}
 
 		ResponseWriter writer = context.getResponseWriter();
-		writer.startElement("span", null); // We're wrapping it in a span, so that it can be ajax-updated.
+		writer.startElement("span", null);
 		writer.writeAttribute("id", getClientId(context), "id");
 		super.encodeChildren(context);
 		writer.endElement("span");
