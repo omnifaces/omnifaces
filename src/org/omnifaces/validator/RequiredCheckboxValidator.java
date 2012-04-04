@@ -1,0 +1,79 @@
+package org.omnifaces.validator;
+
+import java.util.ResourceBundle;
+
+import javax.faces.component.UIComponent;
+import javax.faces.component.UIInput;
+import javax.faces.component.UISelectBoolean;
+import javax.faces.context.FacesContext;
+import javax.faces.validator.FacesValidator;
+import javax.faces.validator.Validator;
+import javax.faces.validator.ValidatorException;
+
+import org.omnifaces.util.Components;
+import org.omnifaces.util.Faces;
+import org.omnifaces.util.Messages;
+
+/**
+ * The required attribute of a <code>&lt;h:selectBooleanCheckbox&gt;</code> is a bit non-intuitive. If you want to
+ * require the user to tick the desired checkbox, you would expect that setting <code>required="true"</code> is
+ * sufficient.
+ * <p>
+ * But it is not. As for every other {@link UIInput} component the default <code>required="true"</code> validator would
+ * only check if the value is actually filled and been sent to the server side, i.e. the value is not null nor empty.
+ * In case of a <code>&lt;h:selectBooleanCheckbox&gt;</code>, which accepts <code>Boolean</code> or <code>boolean</code>
+ * properties only, JSF EL will coerce the unchecked value to <code>Boolean.FALSE</code> during apply request values
+ * phase, right before validations phase. This value is not <code>null</code> nor empty! Thus, the required attribute of
+ * the <code>&lt;h:selectBooleanCheckbox&gt;</code> is fairly pointless. It would always pass the validation and thus
+ * never display the desired required message in case of an unticked checkbox.
+ * <p>
+ * To get it to work anyway, register this validator on validator ID of <tt>omnifaces.RequiredCheckboxValidator</tt> as
+ * follows:
+ * <pre>
+ * &lt;h:selectBooleanCheckbox id="agree" value="#{bean.agree}" requiredMessage="You must agree!"&gt;
+ *   &lt;f:validator validatorId="omnifaces.RequiredCheckboxValidator" /&gt;
+ * &lt;/h:selectBooleanCheckbox&gt;
+ * </pre>
+ * <p>
+ * The validator will use the message as specified in <code>requiredMessage</code>. If it's absent, then it will use
+ * the default required message as specified in custom <code>&lt;message-bundle&gt;</code> in <tt>faces-config.xml</tt>.
+ * If it's absent, then it will default to "{0}: a tick is required".
+ *
+ * @author Bauke Scholtz
+ */
+@FacesValidator("omnifaces.RequiredCheckboxValidator")
+public class RequiredCheckboxValidator implements Validator {
+
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final String DEFAULT_REQUIRED_MESSAGE = "{0}: a tick is required";
+
+	private static final String ERROR_WRONG_COMPONENT = "RequiredCheckboxValidator must be registered on a component"
+		+ " of type UISelectBoolean. Encountered component of type '%s'.";
+
+	// Actions --------------------------------------------------------------------------------------------------------
+
+	@Override
+	public void validate(FacesContext context, UIComponent component, Object value) throws ValidatorException {
+		if (!(component instanceof UISelectBoolean)) {
+			throw new IllegalArgumentException(String.format(ERROR_WRONG_COMPONENT, component.getClass().getName()));
+		}
+
+        if (!Boolean.TRUE.equals(value)) {
+            String requiredMessage = ((UIInput) component).getRequiredMessage();
+
+            if (requiredMessage == null && context.getApplication().getMessageBundle() != null) {
+                requiredMessage = ResourceBundle
+                	.getBundle(context.getApplication().getMessageBundle(), Faces.getLocale())
+                	.getString(UIInput.REQUIRED_MESSAGE_ID);
+            }
+
+            if (requiredMessage == null) {
+            	requiredMessage = DEFAULT_REQUIRED_MESSAGE;
+            }
+
+            throw new ValidatorException(Messages.createError(requiredMessage, Components.getLabel(component)));
+        }
+    }
+
+}
