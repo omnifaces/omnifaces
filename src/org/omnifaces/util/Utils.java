@@ -23,7 +23,7 @@ import java.util.Collection;
 import java.util.Map;
 
 /**
- * Collection of general utility methods that do not fit in one of the more JSF-specific classes.
+ * Collection of general utility methods that do not fit in one of the more specific classes.
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz

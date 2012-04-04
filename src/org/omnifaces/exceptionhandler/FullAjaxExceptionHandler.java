@@ -26,6 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.omnifaces.util.Events;
+import org.omnifaces.util.Exceptions;
 
 /**
  * This exception handler enables you to show the full error page in its entirety to the enduser in case of exceptions
@@ -115,9 +116,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 				unhandledExceptionQueuedEvents.remove();
 
 				// If the exception is wrapped in a FacesException, unwrap the root cause.
-				while (exception instanceof FacesException && exception.getCause() != null) {
-					exception = exception.getCause();
-				}
+				exception = Exceptions.unwrap(exception, FacesException.class);
 
 				// Find the error page location for the given exception as per Servlet specification 10.9.2.
 				String errorPageLocation = findErrorPageLocation(exception);

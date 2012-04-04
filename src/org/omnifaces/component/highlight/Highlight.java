@@ -13,36 +13,36 @@
 package org.omnifaces.component.highlight;
 
 import java.io.IOException;
-import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Set;
 
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponent;
-import javax.faces.component.UIComponentBase;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
+import javax.faces.component.UIOutput;
 import javax.faces.component.visit.VisitCallback;
 import javax.faces.component.visit.VisitContext;
 import javax.faces.component.visit.VisitHint;
 import javax.faces.component.visit.VisitResult;
 import javax.faces.context.FacesContext;
-import javax.faces.context.ResponseWriter;
 
+import org.omnifaces.component.script.OnloadScript;
 import org.omnifaces.util.Components;
 
 /**
  * <strong>Highlight</strong> is a helper component which highlights all invalid {@link UIInput} components by adding
  * an error style class to them. Additionally, it by default focuses the first invalid {@link UIInput} component. The
- * <code>&lt;o:highlight /&gt;</code> component needs to be placed in the view <i>after</i> any of the {@link UIInput}
- * components.
+ * <code>&lt;o:highlight /&gt;</code> component can be placed anywhere in the view, as long as there's only one of it.
+ * Preferably put it somewhere in the master template for forms.
  * <pre>
  * &lt;h:form&gt;
  *   &lt;h:inputText value="#{bean.input1}" required="true" /&gt;
  *   &lt;h:inputText value="#{bean.input1}" required="true" /&gt;
  *   &lt;h:commandButton value="Submit" action="#{bean.submit}" /&gt;
- *   &lt;o:highlight /&gt;
  * &lt;/h:form&gt;
+ * &lt;o:highlight /&gt;
  * </pre>
  * <p>
  * The default error style class name is <tt>error</tt>. You need to specify a CSS style associated with the class
@@ -67,48 +67,41 @@ import org.omnifaces.util.Components;
  */
 @FacesComponent(Highlight.COMPONENT_TYPE)
 @ResourceDependency(library="omnifaces", name="omnifaces.js", target="head")
-public class Highlight extends UIComponentBase {
+public class Highlight extends OnloadScript {
 
 	// Public constants -----------------------------------------------------------------------------------------------
-
-	/** The standard component family. */
-	public static final String COMPONENT_FAMILY = "org.omnifaces.component.highlight";
 
 	/** The standard component type. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.highlight.Highlight";
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
-	private static final Set<VisitHint> VISIT_HINTS = Collections.singleton(VisitHint.SKIP_UNRENDERED);
+	private static final Set<VisitHint> VISIT_HINTS = EnumSet.of(VisitHint.SKIP_UNRENDERED);
 	private static final String DEFAULT_STYLECLASS = "error";
 	private static final Boolean DEFAULT_FOCUS = Boolean.TRUE;
 	private static final String SCRIPT = "OmniFaces.Highlight.addErrorClass(%s, '%s', %s)";
 
 	private enum PropertyKeys {
+		// Cannot be uppercased. They have to exactly match the attribute names.
 		styleClass, focus
 	}
 
-	// UIComponent overrides ------------------------------------------------------------------------------------------
+	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns {@link #COMPONENT_FAMILY}.
+	 * Constructs the Highlight component.
 	 */
-	@Override
-	public String getFamily() {
-		return COMPONENT_FAMILY;
+	public Highlight() {
+		// Mojarra's ScriptRenderer expects either a library/name or at least a body, otherwise it will emit a warning
+		// message that there's a h:outputScript without library/name/body. So, prepare at least a body.
+		getChildren().add(new UIOutput());
 	}
 
-	/**
-	 * Returns <code>true</code>.
-	 */
-	@Override
-	public boolean getRendersChildren() {
-		return true;
-	}
+	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Visit all componants of the parent {@link UIForm}, check if they are an instance of {@link UIInput} and are not
-	 * {@link UIInput#isValid()} and finally append them to an array in JSON format and render the script call.
+	 * {@link UIInput#isValid()} and finally append them to an array in JSON format and render the script.
 	 * <p>
 	 * Note that the {@link FacesContext#getClientIdsWithMessages()} could also be consulted, but it does not indicate
 	 * whether the components associated with those client IDs are actually {@link UIInput} components which are not
@@ -118,40 +111,35 @@ public class Highlight extends UIComponentBase {
 	 */
 	@Override
 	public void encodeChildren(FacesContext context) throws IOException {
-		Components.validateHasParent(this, UIForm.class);
-		Components.validateHasNoChildren(this);
+		UIOutput body = (UIOutput) getChildren().get(0);
+		body.setValue(null); // Reset any previous value.
 
-		if (!context.isPostback()) {
-			return;
-		}
+		if (context.isPostback()) {
+			final StringBuilder clientIdsAsJSON = new StringBuilder();
+			UIForm form = Components.getCurrentForm();
+			form.visitTree(VisitContext.createVisitContext(context, null, VISIT_HINTS), new VisitCallback() {
 
-		final StringBuilder clientIdsAsJSON = new StringBuilder();
-		UIForm form = Components.getClosestParent(this, UIForm.class);
-		form.visitTree(VisitContext.createVisitContext(context, null, VISIT_HINTS), new VisitCallback() {
+				@Override
+				public VisitResult visit(VisitContext context, UIComponent component) {
+					if (component instanceof UIInput && !((UIInput) component).isValid()) {
+						if (clientIdsAsJSON.length() > 0) {
+							clientIdsAsJSON.append(',');
+						}
 
-			@Override
-			public VisitResult visit(VisitContext context, UIComponent component) {
-				if (component instanceof UIInput && !((UIInput) component).isValid()) {
-		        	if (clientIdsAsJSON.length() > 0) {
-		        		clientIdsAsJSON.append(',');
-		        	}
+						clientIdsAsJSON.append('"').append(component.getClientId(context.getFacesContext())).append('"');
+					}
 
-		        	clientIdsAsJSON.append('"').append(component.getClientId(context.getFacesContext())).append('"');
+					return VisitResult.ACCEPT;
 				}
+			});
 
-				return VisitResult.ACCEPT;
+			if (clientIdsAsJSON.length() > 0) {
+				clientIdsAsJSON.insert(0, '[').append(']');
+				body.setValue(String.format(SCRIPT, clientIdsAsJSON, getStyleClass(), isFocus()));
 			}
-		});
-
-		if (clientIdsAsJSON.length() > 0) {
-			clientIdsAsJSON.insert(0, '[').append(']');
-
-			ResponseWriter writer = context.getResponseWriter();
-	        writer.startElement("script", null);
-	        writer.writeAttribute("type", "text/javascript", null);
-	        writer.write(String.format(SCRIPT, clientIdsAsJSON, getStyleClass(), isFocus()));
-	        writer.endElement("script");
 		}
+
+		super.encodeChildren(context);
 	}
 
 	// Getters/setters ------------------------------------------------------------------------------------------------

@@ -22,6 +22,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.omnifaces.util.Exceptions;
+
 /**
  * This filter will solve 2 problems with faces exceptions.
  * <ol>
@@ -57,13 +59,7 @@ public class FacesExceptionFilter extends HttpFilter {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, request.getRequestURI());
 		}
 		catch (ServletException e) {
-			Throwable cause = e.getCause();
-
-			while (cause instanceof FacesException && cause.getCause() != null) {
-				cause = cause.getCause();
-			}
-
-			throw new ServletException(cause);
+			throw new ServletException(Exceptions.unwrap(e.getCause(), FacesException.class));
 		}
 	}
 

@@ -14,11 +14,15 @@ package org.omnifaces.util;
 
 import static org.omnifaces.util.Utils.*;
 
+import java.util.Map.Entry;
+
 import javax.el.ValueExpression;
 import javax.faces.component.EditableValueHolder;
 import javax.faces.component.NamingContainer;
 import javax.faces.component.UIComponent;
+import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
+import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
 
 
@@ -32,6 +36,10 @@ public final class Components {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
+	private static final String ERROR_NO_POSTBACK =
+		"The current request is not a POST request.";
+	private static final String ERROR_NO_CURRENT_FORM =
+		"The current POST request does not seem to be invoked by a JSF h:form.";
 	private static final String ERROR_INVALID_PARENT =
 		"Component '%s' must have a parent of type '%s', but it cannot be found.";
 	private static final String ERROR_INVALID_DIRECT_PARENT =
@@ -54,6 +62,32 @@ public final class Components {
 	 */
 	public static UIComponent getCurrentComponent() {
 		return UIComponent.getCurrentComponent(FacesContext.getCurrentInstance());
+	}
+
+	/**
+	 * Returns the current UI form involved in the POST request, or <code>null</code> if there is none.
+	 * @return The current UI form involved in the POST request.
+	 */
+	public static UIForm getCurrentForm() {
+		FacesContext facesContext = FacesContext.getCurrentInstance();
+
+		if (!facesContext.isPostback()) {
+			throw new IllegalStateException(ERROR_NO_POSTBACK);
+		}
+
+		UIViewRoot viewRoot = facesContext.getViewRoot();
+
+		for (Entry<String, String> entry : facesContext.getExternalContext().getRequestParameterMap().entrySet()) {
+			if (entry.getKey().equals(entry.getValue())) { // This is true for UIForm.
+				UIComponent component = viewRoot.findComponent(entry.getKey());
+
+				if (component instanceof UIForm) {
+					return (UIForm) component;
+				}
+			}
+		}
+
+		throw new IllegalStateException(ERROR_NO_CURRENT_FORM);
 	}
 
 	/**

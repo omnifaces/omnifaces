@@ -302,6 +302,59 @@
 	<tag>
 		<description>
 			<![CDATA[
+				<strong>OnloadScript</strong> is an extension to <code>&lt;h:outputScript&gt;</code> which will be executed in the
+				end of the HTML body (thus when all HTML elements are initialized in the HTML DOM tree) and will re-execute its
+				script body on every ajax request. This is particularly useful if you want to re-execute a specific helper script
+				to manipulate the HTML DOM tree, such as (re-)adding fancy tooltips, performing highlights, etcetera, also after
+				changes in the HTML DOM tree on ajax responses.
+				<p>
+				You can put it anywhere in the view, it will always be relocated to the end of body.
+				<pre>
+&lt;o:onloadScript&gt;alert('OnloadScript is invoked!');&lt;/o:onloadScript&gt;
+				</pre>
+			]]>
+		</description>
+		<tag-name>onloadScript</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.script.OnloadScript</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
 				<strong>Highlight</strong> is a helper component which highlights all invalid {@link UIInput} components by adding
 				an error style class to them. Additionally, it by default focuses the first invalid {@link UIInput} component. The
 				<code>&lt;o:highlight /&gt;</code> component needs to be placed in the view <i>after</i> any of the {@link UIInput}
