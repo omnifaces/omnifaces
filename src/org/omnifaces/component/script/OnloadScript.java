@@ -15,6 +15,7 @@ package org.omnifaces.component.script;
 import java.io.IOException;
 import java.util.Collection;
 
+import javax.faces.application.ResourceDependencies;
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIOutput;
@@ -47,7 +48,10 @@ import javax.faces.event.PostRestoreStateEvent;
 	@ListenerFor(systemEventClass=PostAddToViewEvent.class),
 	@ListenerFor(systemEventClass=PostRestoreStateEvent.class)
 })
-@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head") // ajax.js
+@ResourceDependencies({
+	@ResourceDependency(library="javax.faces", name="jsf.js", target="head"), // Required for jsf.ajax.addOnEvent.
+	@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head") // Specifically: ajax.js.
+})
 public class OnloadScript extends UIOutput {
 
 	// Public constants -----------------------------------------------------------------------------------------------
