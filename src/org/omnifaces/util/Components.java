@@ -39,7 +39,8 @@ public final class Components {
 	private static final String ERROR_NO_POSTBACK =
 		"The current request is not a POST request.";
 	private static final String ERROR_NO_CURRENT_FORM =
-		"The current POST request does not seem to be invoked by a JSF h:form.";
+		"The current POST request does not seem to be invoked by a JSF h:form."
+			+ " This is not as expected. Please report an issue to OmniFaces with a testcase.";
 	private static final String ERROR_INVALID_PARENT =
 		"Component '%s' must have a parent of type '%s', but it cannot be found.";
 	private static final String ERROR_INVALID_DIRECT_PARENT =
@@ -67,6 +68,9 @@ public final class Components {
 	/**
 	 * Returns the current UI form involved in the POST request, or <code>null</code> if there is none.
 	 * @return The current UI form involved in the POST request.
+	 * @throws IllegalStateException When the current request is not a POST request.
+	 * @throws IllegalArgumentException When there does not seem to be any h:form involved in the current POST request.
+	 * This should normally not occur, but if this occurs, please report an issue to OmniFaces with a testcase.
 	 */
 	public static UIForm getCurrentForm() {
 		FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -87,7 +91,7 @@ public final class Components {
 			}
 		}
 
-		throw new IllegalStateException(ERROR_NO_CURRENT_FORM);
+		throw new IllegalArgumentException(ERROR_NO_CURRENT_FORM);
 	}
 
 	/**
