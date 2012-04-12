@@ -14,6 +14,7 @@ package org.omnifaces.event;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
@@ -184,6 +185,10 @@ public class ResetInputAjaxActionListener implements ActionListener {
 				Field componentRenderIds = partialViewContext.getClass().getDeclaredField("componentRenderIds");
 				componentRenderIds.setAccessible(true);
 				renderIds = (Collection<String>) componentRenderIds.get(partialViewContext);
+
+				if (renderIds == null) {
+					renderIds = Collections.emptyList();
+				}
 			}
 			catch (Exception e) {
 				throw new FacesException(String.format(ERROR_RF_PVC_HACK, partialViewContext), e);
