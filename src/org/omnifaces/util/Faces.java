@@ -23,6 +23,7 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.faces.FacesException;
 import javax.faces.application.Application;
@@ -528,6 +529,17 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns a set of available application resource paths matching the specified path.
+	 * @param path The partial application resource path used to return matching resource paths.
+	 * @return A set of available application resource paths matching the specified path.
+	 * @see ServletContext#getResourcePaths(String)
+	 */
+	@SuppressWarnings("unchecked")
+	public static Set<String> getResourcePaths(String path) {
+		return getServletContext().getResourcePaths(path);
+	}
+
+	/**
 	 * Programmatically evaluate the given EL expression and return the evaluated value.
 	 * @param <T> The expected return type.
 	 * @param expression The EL expression to be evaluated.
@@ -543,6 +555,26 @@ public final class Faces {
 
 		FacesContext context = FacesContext.getCurrentInstance();
 		return (T) context.getApplication().evaluateExpressionGet(context, expression, Object.class);
+	}
+
+	/**
+	 * Returns the implementation information of currently loaded JSF implementation. E.g. "Mojarra 2.1.7-FCS".
+	 * @return The implementation information of currently loaded JSF implementation.
+	 * @see Package#getImplementationTitle()
+	 * @see Package#getImplementationVersion()
+	 */
+	public static String getImplInfo() {
+		Package jsfPackage = FacesContext.class.getPackage();
+		return jsfPackage.getImplementationTitle() + " " + jsfPackage.getImplementationVersion();
+	}
+
+	/**
+	 * Returns the server information of currently running application server implementation.
+	 * @return The server information of currently running application server implementation.
+	 * @see ServletContext#getServerInfo()
+	 */
+	public static String getServerInfo() {
+		return getServletContext().getServerInfo();
 	}
 
 	/**
