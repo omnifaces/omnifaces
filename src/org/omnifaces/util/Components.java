@@ -14,15 +14,15 @@ package org.omnifaces.util;
 
 import static org.omnifaces.util.Utils.*;
 
-import java.util.Map.Entry;
-
 import javax.el.ValueExpression;
 import javax.faces.component.EditableValueHolder;
 import javax.faces.component.NamingContainer;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
-import javax.faces.component.UIViewRoot;
+import javax.faces.component.visit.VisitCallback;
+import javax.faces.component.visit.VisitContext;
+import javax.faces.component.visit.VisitResult;
 import javax.faces.context.FacesContext;
 
 
@@ -36,11 +36,6 @@ public final class Components {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String ERROR_NO_POSTBACK =
-		"The current request is not a POST request.";
-	private static final String ERROR_NO_CURRENT_FORM =
-		"The current POST request does not seem to be invoked by a JSF h:form."
-			+ " This is not as expected. Please report an issue to OmniFaces with a testcase.";
 	private static final String ERROR_INVALID_PARENT =
 		"Component '%s' must have a parent of type '%s', but it cannot be found.";
 	private static final String ERROR_INVALID_DIRECT_PARENT =
@@ -66,32 +61,35 @@ public final class Components {
 	}
 
 	/**
-	 * Returns the current UI form involved in the POST request, or <code>null</code> if there is none.
-	 * @return The current UI form involved in the POST request.
-	 * @throws IllegalStateException When the current request is not a POST request.
-	 * @throws IllegalArgumentException When there does not seem to be any h:form involved in the current POST request.
-	 * This should normally not occur, but if this occurs, please report an issue to OmniFaces with a testcase.
+	 * Returns the currently submitted UI form component, or <code>null</code> if there is none, which may happen when
+	 * the current request is not a postback request at all, or when the view has been changed by for example a
+	 * successful navigation.
+	 * @return The currently submitted UI form component.
+	 * @see UIForm#isSubmitted()
 	 */
 	public static UIForm getCurrentForm() {
 		FacesContext facesContext = FacesContext.getCurrentInstance();
 
 		if (!facesContext.isPostback()) {
-			throw new IllegalStateException(ERROR_NO_POSTBACK);
+			return null;
 		}
 
-		UIViewRoot viewRoot = facesContext.getViewRoot();
+		final UIForm[] form = new UIForm[1];
+		facesContext.getViewRoot().visitTree(VisitContext.createVisitContext(facesContext), new VisitCallback() {
 
-		for (Entry<String, String> entry : facesContext.getExternalContext().getRequestParameterMap().entrySet()) {
-			if (entry.getKey().equals(entry.getValue())) { // This is true for UIForm.
-				UIComponent component = viewRoot.findComponent(entry.getKey());
-
-				if (component instanceof UIForm) {
-					return (UIForm) component;
+			@Override
+			public VisitResult visit(VisitContext visitContext, UIComponent target) {
+				if (target instanceof UIForm && ((UIForm) target).isSubmitted()) {
+					form[0] = (UIForm) target;
+					return VisitResult.COMPLETE;
+				}
+				else {
+					return VisitResult.ACCEPT;
 				}
 			}
-		}
+		});
 
-		throw new IllegalArgumentException(ERROR_NO_CURRENT_FORM);
+		return form[0];
 	}
 
 	/**

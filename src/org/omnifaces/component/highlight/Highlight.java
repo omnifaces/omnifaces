@@ -120,27 +120,31 @@ public class Highlight extends OnloadScript {
 		body.setValue(null); // Reset any previous value.
 
 		if (context.isPostback()) {
-			final StringBuilder clientIdsAsJSON = new StringBuilder();
 			UIForm form = Components.getCurrentForm();
-			form.visitTree(VisitContext.createVisitContext(context, null, VISIT_HINTS), new VisitCallback() {
 
-				@Override
-				public VisitResult visit(VisitContext context, UIComponent component) {
-					if (component instanceof UIInput && !((UIInput) component).isValid()) {
-						if (clientIdsAsJSON.length() > 0) {
-							clientIdsAsJSON.append(',');
+			if (form != null) {
+				final StringBuilder clientIdsAsJSON = new StringBuilder();
+				form.visitTree(VisitContext.createVisitContext(context, null, VISIT_HINTS), new VisitCallback() {
+
+					@Override
+					public VisitResult visit(VisitContext context, UIComponent component) {
+						if (component instanceof UIInput && !((UIInput) component).isValid()) {
+							if (clientIdsAsJSON.length() > 0) {
+								clientIdsAsJSON.append(',');
+							}
+
+							String clientId = component.getClientId(context.getFacesContext());
+							clientIdsAsJSON.append('"').append(clientId).append('"');
 						}
 
-						clientIdsAsJSON.append('"').append(component.getClientId(context.getFacesContext())).append('"');
+						return VisitResult.ACCEPT;
 					}
+				});
 
-					return VisitResult.ACCEPT;
+				if (clientIdsAsJSON.length() > 0) {
+					clientIdsAsJSON.insert(0, '[').append(']');
+					body.setValue(String.format(SCRIPT, clientIdsAsJSON, getStyleClass(), isFocus()));
 				}
-			});
-
-			if (clientIdsAsJSON.length() > 0) {
-				clientIdsAsJSON.insert(0, '[').append(']');
-				body.setValue(String.format(SCRIPT, clientIdsAsJSON, getStyleClass(), isFocus()));
 			}
 		}
 
