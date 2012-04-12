@@ -20,9 +20,7 @@ import javax.faces.component.NamingContainer;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
-import javax.faces.component.visit.VisitCallback;
-import javax.faces.component.visit.VisitContext;
-import javax.faces.component.visit.VisitResult;
+import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
 
 
@@ -74,22 +72,34 @@ public final class Components {
 			return null;
 		}
 
-		final UIForm[] form = new UIForm[1];
-		facesContext.getViewRoot().visitTree(VisitContext.createVisitContext(facesContext), new VisitCallback() {
+		UIViewRoot viewRoot = facesContext.getViewRoot();
 
-			@Override
-			public VisitResult visit(VisitContext visitContext, UIComponent target) {
-				if (target instanceof UIForm && ((UIForm) target).isSubmitted()) {
-					form[0] = (UIForm) target;
-					return VisitResult.COMPLETE;
+		for (String name : facesContext.getExternalContext().getRequestParameterMap().keySet()) {
+			if (name.startsWith("javax.faces.")) {
+				continue; // Quick skip.
+			}
+
+			try {
+				UIComponent component = viewRoot.findComponent(name);
+
+				if (component instanceof UIForm) {
+					return (UIForm) component;
 				}
 				else {
-					return VisitResult.ACCEPT;
+					UIForm form = getClosestParent(component, UIForm.class);
+
+					if (form != null) {
+						return form;
+					}
 				}
 			}
-		});
+			catch (IllegalArgumentException ignore) {
+				// May occur on findComponent() when view has changed by for example a successful navigation.
+				// TODO: check for a way to detect this beforehand so that the whole loop can be skipped.
+			}
+		}
 
-		return form[0];
+		return null;
 	}
 
 	/**
