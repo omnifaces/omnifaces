@@ -14,21 +14,29 @@ package org.omnifaces.resource.combined;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
 
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
 import javax.faces.application.ResourceHandlerWrapper;
+import javax.faces.component.UIComponent;
+import javax.faces.component.UIOutput;
+import javax.faces.component.UIViewRoot;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AbortProcessingException;
+import javax.faces.event.PreRenderViewEvent;
+import javax.faces.event.SystemEvent;
+import javax.faces.event.SystemEventListener;
 import javax.servlet.http.HttpServletResponse;
 
 import org.omnifaces.util.Utils;
 
 /**
- * This {@link ResourceHandler} implementation recognizes combined resources based on the unique library name as
- * represented by <tt>{@value #LIBRARY_NAME}</tt> and takes care of streaming of them. The
- * webapp developer should make sure that this library name is never used for other libraries.
+ * This {@link ResourceHandler} implementation will remove all separate script and stylesheet resources from the head
+ * and create a combined one for all scripts and another combined one for all stylesheets.
  * <p>
  * This handler must be registered as follows in <tt>faces-config.xml</tt>:
  * <pre>
@@ -36,16 +44,23 @@ import org.omnifaces.util.Utils;
  *   &lt;resource-handler&gt;org.omnifaces.resource.combined.CombinedResourceHandler&lt;/resource-handler&gt;
  * &lt;/application&gt;
  * </pre>
- * Don't forget to register the {@link CombinedResourceListener} in <code>&lt;application&gt;</code> as well.
  *
  * @author Bauke Scholtz
  */
-public class CombinedResourceHandler extends ResourceHandlerWrapper {
+public class CombinedResourceHandler extends ResourceHandlerWrapper implements SystemEventListener {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	/** The default library name of a combined resource. Make sure that this is never used for other libraries. */
 	public static final String LIBRARY_NAME = "omnifaces.combined";
+
+	private static final String TARGET_HEAD = "head";
+	private static final String ATTRIBUTE_RESOURCE_LIBRARY = "library";
+	private static final String ATTRIBUTE_RESOURCE_NAME = "name";
+	private static final String RENDERER_TYPE_STYLESHEET = "javax.faces.resource.Stylesheet";
+	private static final String RENDERER_TYPE_SCRIPT = "javax.faces.resource.Script";
+	private static final String EXTENSION_STYLESHEET = ".css";
+	private static final String EXTENSION_SCRIPT = ".js";
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -54,14 +69,73 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper {
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Creates a new instance of this combined resource handler which wraps the given resource handler.
+	 * Creates a new instance of this combined resource handler which wraps the given resource handler. This will also
+	 * immediately register this resource handler as a pre render view event listener, so that it can do the job of
+	 * removing the CSS/JS resources and adding combined ones.
 	 * @param wrapped The resource handler to be wrapped.
 	 */
 	public CombinedResourceHandler(ResourceHandler wrapped) {
 		this.wrapped = wrapped;
+		FacesContext.getCurrentInstance().getApplication().subscribeToEvent(PreRenderViewEvent.class, this);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns true if the source is an instance of {@link UIViewRoot}.
+	 */
+	@Override
+	public boolean isListenerForSource(Object source) {
+		return (source instanceof UIViewRoot);
+	}
+
+	/**
+	 * Only on non-postback requests, perform the following actions:
+	 * <ul>
+	 * <li>Collect all component resources from the head.
+	 * <li>Check and collect the script and stylesheet resources separately and remove them from the head.
+	 * <li>If there are any resources in the collection of script and/or stylesheet resources, then create a
+	 * component resource component pointing to the combined resource info and add it to the head.
+	 * </ul>
+	 */
+	@Override
+	public void processEvent(SystemEvent event) throws AbortProcessingException {
+		FacesContext context = FacesContext.getCurrentInstance();
+		UIViewRoot viewRoot = context.getViewRoot();
+
+		if (viewRoot.getAttributes().get(getClass().getName()) == Boolean.TRUE) {
+			return; // No need to repeat the job.
+		}
+
+		List<UIComponent> resources = viewRoot.getComponentResources(context, TARGET_HEAD);
+		CombinedResourceInfo.Builder stylesheets = new CombinedResourceInfo.Builder();
+		CombinedResourceInfo.Builder scripts = new CombinedResourceInfo.Builder();
+
+		for (Iterator<UIComponent> iter = resources.iterator(); iter.hasNext();) {
+			UIComponent resource = iter.next();
+			String library = (String) resource.getAttributes().get(ATTRIBUTE_RESOURCE_LIBRARY);
+			String name = (String) resource.getAttributes().get(ATTRIBUTE_RESOURCE_NAME);
+
+			if (resource.getRendererType().equals(RENDERER_TYPE_STYLESHEET)) {
+				stylesheets.add(library, name);
+				iter.remove();
+			}
+			else if (resource.getRendererType().equals(RENDERER_TYPE_SCRIPT)) {
+				scripts.add(library, name);
+				iter.remove();
+			}
+		}
+
+		if (!stylesheets.isEmpty()) {
+			addComponentResource(context, stylesheets.create(), EXTENSION_STYLESHEET, RENDERER_TYPE_STYLESHEET);
+		}
+
+		if (!scripts.isEmpty()) {
+			addComponentResource(context, scripts.create(), EXTENSION_SCRIPT, RENDERER_TYPE_SCRIPT);
+		}
+
+		viewRoot.getAttributes().put(getClass().getName(), Boolean.TRUE); // Indicate that job is done on this view.
+	}
 
 	@Override
 	public Resource createResource(String resourceName, String libraryName) {
@@ -89,6 +163,21 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper {
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Create a component resource of the given name, extension and renderer type.
+	 * @param context The current faces context.
+	 * @param name The name of the combined resource.
+	 * @param extension The extension of the combined resource.
+	 * @param rendererType The renderer type of the combined resource.
+	 */
+	private static void addComponentResource(FacesContext context, String name, String extension, String rendererType) {
+		UIOutput component = new UIOutput();
+		component.setRendererType(rendererType);
+		component.getAttributes().put(ATTRIBUTE_RESOURCE_LIBRARY, CombinedResourceHandler.LIBRARY_NAME);
+		component.getAttributes().put(ATTRIBUTE_RESOURCE_NAME, name + extension);
+		context.getViewRoot().addComponentResource(context, component, TARGET_HEAD);
+	}
 
 	/**
 	 * Stream the given resource to the response associated with the given faces context.

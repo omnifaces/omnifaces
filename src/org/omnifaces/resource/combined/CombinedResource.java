@@ -41,11 +41,6 @@ final class CombinedResource extends Resource {
 
 	private static final String PATTERN_RFC1123_DATE = "EEE, dd MMM yyyy HH:mm:ss zzz";
 	private static final TimeZone TIMEZONE_GMT = TimeZone.getTimeZone("GMT");
-	private static final String HEADER_LAST_MODIFIED = "Last-Modified";
-	private static final String HEADER_EXPIRES = "Expires";
-	private static final String HEADER_ETAG = "ETag";
-	private static final String FORMAT_ETAG = "W/\"%d-%d\"";
-	private static final String HEADER_IF_MODIFIED_SINCE = "If-Modified-Since";
 
 	private static final String ERROR_UNKNOWN_RESOURCE_NAME = "Unknown resource name: %s";
 	private static final String ERROR_CANNOT_CREATE_URL = "Cannot create an URL. %s is an in-memory resource pointer.";
@@ -94,7 +89,7 @@ final class CombinedResource extends Resource {
 		return Faces.getRequestContextPath()
 			+ (Faces.isPrefixMapping(mapping) ? (mapping + path) : (path + mapping))
 			+ "?ln=" + CombinedResourceHandler.LIBRARY_NAME
-			+ "&amp;v=" + (info.getLastModified() / 60000); // To force browser refresh whenever a resource changes.
+			+ "&v=" + (info.getLastModified() / 60000); // To force browser refresh whenever a resource changes.
 	}
 
 	@Override
@@ -110,9 +105,9 @@ final class CombinedResource extends Resource {
 		SimpleDateFormat sdf = new SimpleDateFormat(PATTERN_RFC1123_DATE, Locale.US);
 		sdf.setTimeZone(TIMEZONE_GMT);
 		long lastModified = info.getLastModified();
-		responseHeaders.put(HEADER_LAST_MODIFIED, sdf.format(new Date(lastModified)));
-		responseHeaders.put(HEADER_EXPIRES, sdf.format(new Date(System.currentTimeMillis() + info.getMaxAge())));
-		responseHeaders.put(HEADER_ETAG, String.format(FORMAT_ETAG, info.getContentLength(), lastModified));
+		responseHeaders.put("Last-Modified", sdf.format(new Date(lastModified)));
+		responseHeaders.put("Expires", sdf.format(new Date(System.currentTimeMillis() + info.getMaxAge())));
+		responseHeaders.put("Etag", String.format("W/\"%d-%d\"", info.getContentLength(), lastModified));
 		return responseHeaders;
 	}
 
@@ -123,7 +118,7 @@ final class CombinedResource extends Resource {
 
 	@Override
 	public boolean userAgentNeedsUpdate(FacesContext context) {
-		String ifModifiedSince = context.getExternalContext().getRequestHeaderMap().get(HEADER_IF_MODIFIED_SINCE);
+		String ifModifiedSince = context.getExternalContext().getRequestHeaderMap().get("If-Modified-Since");
 
 		if (ifModifiedSince != null) {
 			SimpleDateFormat sdf = new SimpleDateFormat(PATTERN_RFC1123_DATE, Locale.US);

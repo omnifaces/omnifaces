@@ -38,12 +38,14 @@ final class CombinedResourceInfo {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	// ConcurrentHashMap was considered, but as duplicate inserts technically don't harm, a HashMap is faster.
+	// ConcurrentHashMap was considered, but duplicate inserts technically don't harm and a HashMap is faster on read.
 	private static final Map<String, CombinedResourceInfo> CACHE = new HashMap<String, CombinedResourceInfo>();
 
-	private static final String MOJARRA_DEFAULT_RESOURCE_MAX_AGE = "com.sun.faces.defaultResourceMaxAge"; // TODO: Might want to add MyFaces one.
+	private static final String MOJARRA_DEFAULT_RESOURCE_MAX_AGE = "com.sun.faces.defaultResourceMaxAge";
+	private static final String MYFACES_DEFAULT_RESOURCE_MAX_AGE = "org.apache.myfaces.RESOURCE_MAX_TIME_EXPIRES";
 	private static final long DEFAULT_RESOURCE_MAX_AGE = 604800000L; // 1 week.
-	private static final long MAX_AGE = initMaxAge(DEFAULT_RESOURCE_MAX_AGE, MOJARRA_DEFAULT_RESOURCE_MAX_AGE);
+	private static final long MAX_AGE =
+		initMaxAge(DEFAULT_RESOURCE_MAX_AGE, MOJARRA_DEFAULT_RESOURCE_MAX_AGE, MYFACES_DEFAULT_RESOURCE_MAX_AGE);
 
 	private static final String ERROR_EMPTY_RESOURCE_NAMES =
 		"There are no resource names been added. Use add() method to add them or use isEmpty() to check beforehand.";
@@ -160,7 +162,7 @@ final class CombinedResourceInfo {
 				hash = MessageDigest.getInstance("MD5").digest(map.toString().getBytes("UTF-8"));
 			}
 			catch (Exception e) {
-				// So, MD5 and/or UTF-8 isn't supported. Does such a platform ever exist nowadays?
+				// So, MD5 and/or UTF-8 isn't supported. Does such a server platform ever exist nowadays?
 				throw new RuntimeException(ERROR_CREATING_UNIQUE_ID, e);
 			}
 
@@ -224,7 +226,8 @@ final class CombinedResourceInfo {
 					}
 				}
 				catch (IOException e) {
-					// Can't and shouldn't handle it here anyway.
+					// Can't and shouldn't handle it at this point.
+					// It would be thrown during resource streaming anyway which is a better moment.
 				}
 			}
 		}
