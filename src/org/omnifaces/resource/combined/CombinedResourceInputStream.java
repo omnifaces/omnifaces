@@ -21,6 +21,8 @@ import java.util.Set;
 
 import javax.faces.application.Resource;
 
+import org.omnifaces.util.Utils;
+
 /**
  * This {@link InputStream} implementation takes care that all in the constructor given resources are been read in
  * sequence.
@@ -86,13 +88,10 @@ final class CombinedResourceInputStream extends InputStream {
 		IOException caught = null;
 
 		for (InputStream stream : streams) {
-			try {
-				stream.close();
-			}
-			catch (IOException e) {
-				if (caught == null) {
-					caught = e; // Don't throw it yet. We have to continue closing all other streams.
-				}
+			IOException e = Utils.close(stream);
+
+			if (caught == null) {
+				caught = e; // Don't throw it yet. We have to continue closing all other streams.
 			}
 		}
 

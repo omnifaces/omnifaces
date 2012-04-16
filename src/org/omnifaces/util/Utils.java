@@ -12,6 +12,7 @@
  */
 package org.omnifaces.util;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -133,9 +134,29 @@ public final class Utils {
 			return size;
 		}
 		finally {
-			if (outputChannel != null) try { outputChannel.close(); } catch (IOException ignore) { /**/ }
-			if (inputChannel != null) try { inputChannel.close(); } catch (IOException ignore) { /**/ }
+			close(outputChannel);
+			close(inputChannel);
 		}
+	}
+
+	/**
+	 * Check if the given resource is not <code>null</code> and then close it, whereby any caught {@link IOException}
+	 * is been returned instead of thrown, so that the caller can if necessary handle (log) or just ignore it without
+	 * the need to put another try-catch.
+	 * @param resource The closeable resource to be closed.
+	 * @return The caught {@link IOException}, or <code>null</code> if none is been thrown.
+	 */
+	public static IOException close(Closeable resource) {
+		if (resource != null) {
+			try {
+				resource.close();
+			}
+			catch (IOException e) {
+				return e;
+			}
+		}
+
+		return null;
 	}
 
 }

@@ -34,17 +34,26 @@ public final class Events {
 	// Utility --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Adds a phase listener to the view root of the current faces context.
-	 * @param newPhaseListener The phase listener to be added to the view root of the current faces context.
+	 * Adds a phase listener to the current view root of the current faces context.
+	 * @param phaseListener The phase listener to be added to the current view root of the current faces context.
 	 */
-	public static void addPhaseListener(PhaseListener newPhaseListener) {
-		Faces.getViewRoot().addPhaseListener(newPhaseListener);
+	public static void addPhaseListener(PhaseListener phaseListener) {
+		Faces.getViewRoot().addPhaseListener(phaseListener);
 	}
 
 	/**
-	 * Adds a phase listener that executes the given SAM (Single Abstract Method) before the given phase ID.
-	 * @param phaseId The phase ID to execute the given SAM before.
-	 * @param runnable The SAM to be executed before the given phase ID.
+	 * Removes a phase listener from the current view root of the current faces context.
+	 * @param phaseListener The phase listener to be removed from the current view root of the current faces context.
+	 */
+	public static void removePhaseListener(PhaseListener phaseListener) {
+		Faces.getViewRoot().removePhaseListener(phaseListener);
+	}
+
+	/**
+	 * Adds a phase listener to the current view that executes the given SAM (Single Abstract Method) everytime before
+	 * given phase ID.
+	 * @param phaseId The phase ID to execute the given SAM everytime before.
+	 * @param runnable The SAM to be executed everytime before the given phase ID of the current view.
 	 */
 	public static void addBeforePhaseListener(PhaseId phaseId, final Runnable runnable) {
 		addPhaseListener(new DefaultPhaseListener(phaseId) {
@@ -59,9 +68,10 @@ public final class Events {
 	}
 
 	/**
-	 * Adds a phase listener that executes the given SAM (Single Abstract Method) after the given phase.
-	 * @param phaseId The phase ID to execute the given SAM after.
-	 * @param runnable The SAM to be executed after the given phase ID.
+	 * Adds a phase listener to the current view that executes the given SAM (Single Abstract Method) everytime after
+	 * given phase.
+	 * @param phaseId The phase ID to execute the given SAM everytime after.
+	 * @param runnable The SAM to be executed everytime after the given phase ID of the current view.
 	 */
 	public static void addAfterPhaseListener(PhaseId phaseId, final Runnable runnable) {
 		addPhaseListener(new DefaultPhaseListener(phaseId) {
@@ -74,6 +84,5 @@ public final class Events {
 			}
 		});
 	}
-
 
 }

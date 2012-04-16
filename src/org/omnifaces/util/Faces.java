@@ -57,7 +57,7 @@ public final class Faces {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String DEFAULT_SENDFILE_CONTENT_TYPE = "application/octet-stream";
+	private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
 	private static final int DEFAULT_SENDFILE_BUFFER_SIZE = 10240;
 
 	private static final String ERROR_UNSUPPORTED_ENCODING = "UTF-8 is apparently not supported on this machine.";
@@ -508,13 +508,21 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the mime type for the given file name.
+	 * Returns the mime type for the given file name. The mime type is determined based on file extension and
+	 * configureable by <code>&lt;mime-mapping&gt;</code> entries in <tt>web.xml</tt>. When the mime type is unknown,
+	 * then a default of <tt>application/octet-stream</tt> will be returned.
 	 * @param name The file name to return the mime type for.
 	 * @return The mime type for the given file name.
 	 * @see ExternalContext#getMimeType(String)
 	 */
 	public static String getMimeType(String name) {
-		return FacesContext.getCurrentInstance().getExternalContext().getMimeType(name);
+		String mimeType = FacesContext.getCurrentInstance().getExternalContext().getMimeType(name);
+
+		if (mimeType == null) {
+			mimeType = DEFAULT_MIME_TYPE;
+		}
+
+		return mimeType;
 	}
 
 	/**
@@ -645,15 +653,13 @@ public final class Faces {
 	{
 		FacesContext context = FacesContext.getCurrentInstance();
 		ExternalContext externalContext = context.getExternalContext();
-		String contentType = externalContext.getMimeType(filename);
-		String contentDisposition = String.format("%s;filename=\"%s\"",
-			(attachment ? "attachment" : "inline"), URLEncoder.encode(filename, "UTF-8"));
 
 		// Prepare the response and set the necessary headers.
 		externalContext.responseReset();
 		externalContext.setResponseBufferSize(DEFAULT_SENDFILE_BUFFER_SIZE);
-		externalContext.setResponseContentType(contentType != null ? contentType : DEFAULT_SENDFILE_CONTENT_TYPE);
-		externalContext.setResponseHeader("Content-Disposition", contentDisposition);
+		externalContext.setResponseContentType(getMimeType(filename));
+		externalContext.setResponseHeader("Content-Disposition", String.format("%s;filename=\"%s\"",
+			(attachment ? "attachment" : "inline"), URLEncoder.encode(filename, "UTF-8")));
 
 		// Not exactly mandatory, but this fixes at least a MSIE quirk: http://support.microsoft.com/kb/316431
 		if (((HttpServletRequest) externalContext.getRequest()).isSecure()) {

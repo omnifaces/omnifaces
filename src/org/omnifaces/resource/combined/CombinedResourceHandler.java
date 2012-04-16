@@ -90,7 +90,7 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	}
 
 	/**
-	 * Only on non-postback requests, perform the following actions:
+	 * Before rendering of a freshly created view, perform the following actions:
 	 * <ul>
 	 * <li>Collect all component resources from the head.
 	 * <li>Check and collect the script and stylesheet resources separately and remove them from the head.
@@ -200,9 +200,7 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 			return;
 		}
 
-		if (resource.getContentType() != null) {
-			externalContext.setResponseContentType(resource.getContentType());
-		}
+		externalContext.setResponseContentType(resource.getContentType());
 
 		for (Entry<String, String> header : resource.getResponseHeaders().entrySet()) {
 			externalContext.setResponseHeader(header.getKey(), header.getValue());

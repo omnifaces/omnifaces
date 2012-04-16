@@ -12,7 +12,6 @@
  */
 package org.omnifaces.exceptionhandler;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -35,6 +34,7 @@ import javax.xml.xpath.XPathFactory;
 import org.omnifaces.util.Events;
 import org.omnifaces.util.Exceptions;
 import org.omnifaces.util.Faces;
+import org.omnifaces.util.Utils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -278,7 +278,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 			throw new RuntimeException(e);
 		}
 		finally {
-			if (input != null) try { input.close(); } catch (IOException ignore) { /**/ }
+			Utils.close(input);
 		}
 
 		if (defaultLocation == null || defaultLocation.isEmpty()) {
