@@ -109,6 +109,30 @@ public final class Faces {
 	}
 
 	/**
+	 * Normalize the given path as a valid view ID based on the current mapping, if necessary.
+	 * <ul>
+	 * <li>If the current mapping is a prefix mapping and the given path starts with it, then remove it.
+	 * <li>If the current mapping is a suffix mapping and the given path does not end with it, then replace it.
+	 * </ul>
+	 * @param path The path to be normalized as a valid view ID based on the current mapping.
+	 * @return The path as a valid view ID.
+	 */
+	public static String normalizeViewId(String path) {
+		String mapping = getMapping();
+
+		if (isPrefixMapping(mapping)) {
+			if (path.startsWith(mapping)) {
+				return path.substring(mapping.length());
+			}
+		}
+		else if (!path.endsWith(mapping)) {
+			return path.substring(0, path.lastIndexOf('.')) + mapping;
+		}
+
+		return path;
+	}
+
+	/**
 	 * Returns the current phase ID.
 	 * @return The current phase ID.
 	 * @see FacesContext#getCurrentPhaseId()

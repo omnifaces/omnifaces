@@ -92,8 +92,6 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
 	private static final String WEB_XML =
 		"/WEB-INF/web.xml";
-	private static final String ERROR_LOCATION_INVALID =
-		"Error page location '%s' in web.xml is invalid. Resource resolved to null.";
 	private static final String ERROR_DEFAULT_LOCATION_MISSING =
 		"Either HTTP 500 or java.lang.Throwable error page is required in web.xml. Neither was found.";
 	private static final String LOG_EXCEPTION_OCCURRED =
@@ -171,7 +169,8 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 				request.setAttribute(ATTRIBUTE_ERROR_STATUS_CODE, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
 				// Force JSF to render the error page in its entirety to the ajax response.
-				context.setViewRoot(context.getApplication().getViewHandler().createView(context, errorPageLocation));
+				String viewId = Faces.normalizeViewId(errorPageLocation);
+				context.setViewRoot(context.getApplication().getViewHandler().createView(context, viewId));
 				context.getPartialViewContext().setRenderAll(true);
 				context.renderResponse();
 
@@ -286,12 +285,6 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 		}
 		else {
 			errorPageLocations.put(null, defaultLocation);
-		}
-
-		for (String exceptionLocation : errorPageLocations.values()) {
-			if (Faces.getResourceAsStream(exceptionLocation) == null) {
-				throw new IllegalArgumentException(String.format(ERROR_LOCATION_INVALID, exceptionLocation));
-			}
 		}
 
 		return errorPageLocations;
