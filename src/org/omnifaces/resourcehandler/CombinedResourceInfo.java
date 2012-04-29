@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.omnifaces.resource.combined;
+package org.omnifaces.resourcehandler;
 
 import java.io.IOException;
 import java.net.URLConnection;
@@ -56,6 +56,8 @@ final class CombinedResourceInfo {
 			+ "%n\tThe one which generated the same ID is: %s";
 	private static final String ERROR_CREATING_UNIQUE_ID =
 		"Cannot create unique resource ID. This platform doesn't support MD5 algorithm and/or UTF-8 charset.";
+	private static final String LOG_RESOURCE_NOT_FOUND =
+		"CombinedResourceHandler: Resource with library '%s' and name '%s' is not found. Skipping.";
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -155,6 +157,7 @@ final class CombinedResourceInfo {
 		private static String createUniqueId(Map<String, Set<String>> map) {
 			// TODO: I personally don't trust MD5 to be fail-safe. There's still *a* chance on a clash even though it's
 			// less than 0.01%. This needs more testing or a different unique ID approach has to be invented.
+			// Note that UUID is NOT suitable as the ID needs to be the same everytime based on map's content!
 
 			byte[] hash;
 
@@ -214,6 +217,12 @@ final class CombinedResourceInfo {
 
 			for (String resourceName : entry.getValue()) {
 				Resource resource = handler.createResource(resourceName, libraryName);
+
+				if (resource == null) {
+					context.getExternalContext().log(String.format(LOG_RESOURCE_NOT_FOUND, libraryName, resourceName));
+					continue;
+				}
+
 				resources.add(resource);
 
 				try {
@@ -306,10 +315,11 @@ final class CombinedResourceInfo {
 	// Helpers --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Initializes the maximum age in milleseconds.
-	 * @param defaultValue
-	 * @param initParameterNames
-	 * @return
+	 * Initializes the maximum age in milliseconds. The first non-null value associated with the given context parameter
+	 * names will be returned, else the given default value will be returned.
+	 * @param defaultValue The default value.
+	 * @param initParameterNames The context parameter names to look for any predefinied maximum age.
+	 * @return The maximum age in milliseconds.
 	 */
 	@SuppressWarnings("unchecked")
 	private static long initMaxAge(long defaultValue, String... initParameterNames) {

@@ -25,6 +25,10 @@ import java.util.List;
  */
 public class ListTreeModel<T> implements TreeModel<T> {
 
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final long serialVersionUID = 275741310298761716L;
+
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	private T data;

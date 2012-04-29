@@ -1,3 +1,15 @@
+/*
+ * Copyright 2012 OmniFaces.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package org.omnifaces.util;
 
 import javax.faces.FacesException;
@@ -9,7 +21,15 @@ import javax.servlet.ServletException;
  *
  * @author Bauke Scholtz
  */
-public class Exceptions {
+public final class Exceptions {
+
+	// Constructors ---------------------------------------------------------------------------------------------------
+
+	private Exceptions() {
+		// Hide constructor.
+	}
+
+	// Utility --------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Unwrap the nested causes of given exception as long as until it is not an instance of the given type and then

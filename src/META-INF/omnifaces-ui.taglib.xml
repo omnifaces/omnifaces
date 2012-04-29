@@ -389,7 +389,7 @@
 		</description>
 		<tag-name>highlight</tag-name>
 		<component>
-			<component-type>org.omnifaces.component.highlight.Highlight</component-type>
+			<component-type>org.omnifaces.component.script.Highlight</component-type>
 		</component>
 		<attribute>
 			<description>

@@ -47,7 +47,7 @@ public final class Components {
 		// Hide constructor.
 	}
 
-	// Utility --------------------------------------------------------------------------------------------------------
+	// General --------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Returns the current UI component from the EL context.
@@ -58,49 +58,7 @@ public final class Components {
 		return UIComponent.getCurrentComponent(FacesContext.getCurrentInstance());
 	}
 
-	/**
-	 * Returns the currently submitted UI form component, or <code>null</code> if there is none, which may happen when
-	 * the current request is not a postback request at all, or when the view has been changed by for example a
-	 * successful navigation.
-	 * @return The currently submitted UI form component.
-	 * @see UIForm#isSubmitted()
-	 */
-	public static UIForm getCurrentForm() {
-		FacesContext facesContext = FacesContext.getCurrentInstance();
-
-		if (!facesContext.isPostback()) {
-			return null;
-		}
-
-		UIViewRoot viewRoot = facesContext.getViewRoot();
-
-		for (String name : facesContext.getExternalContext().getRequestParameterMap().keySet()) {
-			if (name.startsWith("javax.faces.")) {
-				continue; // Quick skip.
-			}
-
-			try {
-				UIComponent component = viewRoot.findComponent(name);
-
-				if (component instanceof UIForm) {
-					return (UIForm) component;
-				}
-				else {
-					UIForm form = getClosestParent(component, UIForm.class);
-
-					if (form != null) {
-						return form;
-					}
-				}
-			}
-			catch (IllegalArgumentException ignore) {
-				// May occur on findComponent() when view has changed by for example a successful navigation.
-				// TODO: check for a way to detect this beforehand so that the whole loop can be skipped.
-			}
-		}
-
-		return null;
-	}
+	// Traversal ------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Returns the UI component matching the given client ID search expression.
@@ -241,6 +199,52 @@ public final class Components {
 		return parentType.cast(parent);
 	}
 
+	// Forms ----------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns the currently submitted UI form component, or <code>null</code> if there is none, which may happen when
+	 * the current request is not a postback request at all, or when the view has been changed by for example a
+	 * successful navigation.
+	 * @return The currently submitted UI form component.
+	 * @see UIForm#isSubmitted()
+	 */
+	public static UIForm getCurrentForm() {
+		FacesContext facesContext = FacesContext.getCurrentInstance();
+
+		if (!facesContext.isPostback()) {
+			return null;
+		}
+
+		UIViewRoot viewRoot = facesContext.getViewRoot();
+
+		for (String name : facesContext.getExternalContext().getRequestParameterMap().keySet()) {
+			if (name.startsWith("javax.faces.")) {
+				continue; // Quick skip.
+			}
+
+			try {
+				UIComponent component = viewRoot.findComponent(name);
+
+				if (component instanceof UIForm) {
+					return (UIForm) component;
+				}
+				else {
+					UIForm form = getClosestParent(component, UIForm.class);
+
+					if (form != null) {
+						return form;
+					}
+				}
+			}
+			catch (IllegalArgumentException ignore) {
+				// May occur on findComponent() when view has changed by for example a successful navigation.
+				// TODO: check for a way to detect this beforehand so that the whole loop can be skipped.
+			}
+		}
+
+		return null;
+	}
+
 	/**
 	 * Returns whether the given UI input component is editable. That is when it is rendered, not disabled and not
 	 * readonly.
@@ -305,6 +309,8 @@ public final class Components {
 		Object submittedValue = component.getSubmittedValue();
 		return (submittedValue != null && !String.valueOf(submittedValue).isEmpty());
 	}
+
+	// Validation -----------------------------------------------------------------------------------------------------
 
 	/**
 	 * Validate if the given component has a parent of the given parent type.

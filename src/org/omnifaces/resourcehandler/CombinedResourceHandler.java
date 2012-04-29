@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.omnifaces.resource.combined;
+package org.omnifaces.resourcehandler;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,7 +41,7 @@ import org.omnifaces.util.Utils;
  * This handler must be registered as follows in <tt>faces-config.xml</tt>:
  * <pre>
  * &lt;application&gt;
- *   &lt;resource-handler&gt;org.omnifaces.resource.combined.CombinedResourceHandler&lt;/resource-handler&gt;
+ *   &lt;resource-handler&gt;org.omnifaces.resourcehandler.CombinedResourceHandler&lt;/resource-handler&gt;
  * &lt;/application&gt;
  * </pre>
  *
@@ -143,7 +143,7 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 			return new CombinedResource(resourceName);
 		}
 		else {
-			return super.createResource(resourceName, libraryName);
+			return wrapped.createResource(resourceName, libraryName);
 		}
 	}
 
@@ -153,7 +153,7 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 			streamResource(context, new CombinedResource(context));
 		}
 		else {
-			super.handleResourceRequest(context);
+			wrapped.handleResourceRequest(context);
 		}
 	}
 

@@ -113,7 +113,7 @@ public final class Messages {
 		// Hide constructor.
 	}
 
-	// Utility --------------------------------------------------------------------------------------------------------
+	// Create message -------------------------------------------------------------------------------------------------
 
 	/**
 	 * Create a faces message of the given severity with the given message body which is formatted with the given
@@ -174,6 +174,8 @@ public final class Messages {
 		return create(FacesMessage.SEVERITY_FATAL, message, params);
 	}
 
+	// Add message ----------------------------------------------------------------------------------------------------
+
 	/**
 	 * Add a faces message of the given severity to the given client ID, with the given message body which is formatted
 	 * with the given parameters.
@@ -223,6 +225,8 @@ public final class Messages {
 	public static void addError(String clientId, String message, Object... params) {
 		add(FacesMessage.SEVERITY_ERROR, clientId, message, params);
 	}
+
+	// Add global message ---------------------------------------------------------------------------------------------
 
 	/**
 	 * Add a FATAL faces message to the given client ID, with the given message body which is formatted with the given
@@ -276,9 +280,11 @@ public final class Messages {
 		add(FacesMessage.SEVERITY_FATAL, null, message, params);
 	}
 
+	// Add flash message ----------------------------------------------------------------------------------------------
+
 	/**
 	 * Add a flash scoped faces message of the given severity to the given client ID, with the given message body which
-	 * is formatted with the given parameters.
+	 * is formatted with the given parameters. Use this when you need to display the message after a redirect.
 	 * <p>
 	 * NOTE: the flash scope has in early Mojarra versions however some pretty peculiar problems. In older versions,
 	 * the messages are remembered too long, or they are only displayed after refresh, or they are not displayed when
@@ -297,7 +303,7 @@ public final class Messages {
 
 	/**
 	 * Add a flash scoped INFO faces message to the given client ID, with the given message body which is formatted
-	 * with the given parameters.
+	 * with the given parameters. Use this when you need to display the message after a redirect.
 	 * @param clientId The client ID to add the faces message for.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
@@ -309,7 +315,7 @@ public final class Messages {
 
 	/**
 	 * Add a flash scoped WARN faces message to the given client ID, with the given message body which is formatted
-	 * with the given parameters.
+	 * with the given parameters. Use this when you need to display the message after a redirect.
 	 * @param clientId The client ID to add the faces message for.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
@@ -321,7 +327,7 @@ public final class Messages {
 
 	/**
 	 * Add a flash scoped ERROR faces message to the given client ID, with the given message body which is formatted
-	 * with the given parameters.
+	 * with the given parameters. Use this when you need to display the message after a redirect.
 	 * @param clientId The client ID to add the faces message for.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
@@ -333,7 +339,7 @@ public final class Messages {
 
 	/**
 	 * Add a flash scoped FATAL faces message to the given client ID, with the given message body which is formatted
-	 * with the given parameters.
+	 * with the given parameters. Use this when you need to display the message after a redirect.
 	 * @param clientId The client ID to add the faces message for.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
@@ -343,9 +349,11 @@ public final class Messages {
 		addFlash(FacesMessage.SEVERITY_FATAL, clientId, message, params);
 	}
 
+	// Add global flash message ---------------------------------------------------------------------------------------
+
 	/**
 	 * Add a flash scoped global INFO faces message, with the given message body which is formatted with the given
-	 * parameters.
+	 * parameters. Use this when you need to display the message after a redirect.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
 	 * @see #addFlash(FacesMessage.Severity, String, String, Object...)
@@ -356,7 +364,7 @@ public final class Messages {
 
 	/**
 	 * Add a flash scoped global WARN faces message, with the given message body which is formatted with the given
-	 * parameters.
+	 * parameters. Use this when you need to display the message after a redirect.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
 	 * @see #addFlash(FacesMessage.Severity, String, String, Object...)
@@ -367,7 +375,7 @@ public final class Messages {
 
 	/**
 	 * Add a flash scoped global ERROR faces message, with the given message body which is formatted with the given
-	 * parameters.
+	 * parameters. Use this when you need to display the message after a redirect.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
 	 * @see #addFlash(FacesMessage.Severity, String, String, Object...)
@@ -378,7 +386,7 @@ public final class Messages {
 
 	/**
 	 * Add a flash scoped global FATAL faces message, with the given message body which is formatted with the given
-	 * parameters.
+	 * parameters. Use this when you need to display the message after a redirect.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
 	 * @see #addFlash(FacesMessage.Severity, String, String, Object...)

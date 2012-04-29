@@ -31,7 +31,7 @@ public final class Events {
 		// Hide constructor.
 	}
 
-	// Utility --------------------------------------------------------------------------------------------------------
+	// PhaseListener --------------------------------------------------------------------------------------------------
 
 	/**
 	 * Adds a phase listener to the current view root of the current faces context.

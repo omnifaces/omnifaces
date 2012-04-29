@@ -68,7 +68,36 @@ public final class Faces {
 		// Hide constructor.
 	}
 
-	// Utility --------------------------------------------------------------------------------------------------------
+	// JSF general ----------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns the implementation information of currently loaded JSF implementation. E.g. "Mojarra 2.1.7-FCS".
+	 * @return The implementation information of currently loaded JSF implementation.
+	 * @see Package#getImplementationTitle()
+	 * @see Package#getImplementationVersion()
+	 */
+	public static String getImplInfo() {
+		Package jsfPackage = FacesContext.class.getPackage();
+		return jsfPackage.getImplementationTitle() + " " + jsfPackage.getImplementationVersion();
+	}
+
+	/**
+	 * Returns the server information of currently running application server implementation.
+	 * @return The server information of currently running application server implementation.
+	 * @see ServletContext#getServerInfo()
+	 */
+	public static String getServerInfo() {
+		return getServletContext().getServerInfo();
+	}
+
+	/**
+	 * Returns true if we're in development stage.
+	 * @return True if we're in development stage.
+	 * @see Application#getProjectStage()
+	 */
+	public static boolean isDevelopment() {
+		return FacesContext.getCurrentInstance().getApplication().getProjectStage() == ProjectStage.Development;
+	}
 
 	/**
 	 * Determines and returns the faces servlet mapping used in the current request. If the path info is
@@ -109,6 +138,54 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the current phase ID.
+	 * @return The current phase ID.
+	 * @see FacesContext#getCurrentPhaseId()
+	 */
+	public static PhaseId getCurrentPhaseId() {
+		return FacesContext.getCurrentInstance().getCurrentPhaseId();
+	}
+
+	/**
+	 * Programmatically evaluate the given EL expression and return the evaluated value.
+	 * @param <T> The expected return type.
+	 * @param expression The EL expression to be evaluated.
+	 * @return The evaluated value of the given EL expression.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see Application#evaluateExpressionGet(FacesContext, String, Class)
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T evaluateExpressionGet(String expression) {
+		if (expression == null) {
+			return null;
+		}
+
+		FacesContext context = FacesContext.getCurrentInstance();
+		return (T) context.getApplication().evaluateExpressionGet(context, expression, Object.class);
+	}
+
+	// JSF views ------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns the current view root.
+	 * @return The current view root.
+	 * @see FacesContext#getViewRoot()
+	 */
+	public static UIViewRoot getViewRoot() {
+		return FacesContext.getCurrentInstance().getViewRoot();
+	}
+
+	/**
+	 * Returns the ID of the current view root, or <code>null</code> if there is no view.
+	 * @return The ID of the current view root, or <code>null</code> if there is no view.
+	 * @see UIViewRoot#getViewId()
+	 */
+	public static String getViewId() {
+		UIViewRoot viewRoot = FacesContext.getCurrentInstance().getViewRoot();
+		return (viewRoot != null) ? viewRoot.getViewId() : null;
+	}
+
+	/**
 	 * Normalize the given path as a valid view ID based on the current mapping, if necessary.
 	 * <ul>
 	 * <li>If the current mapping is a prefix mapping and the given path starts with it, then remove it.
@@ -133,13 +210,38 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the current phase ID.
-	 * @return The current phase ID.
-	 * @see FacesContext#getCurrentPhaseId()
+	 * Returns the locale associated with the current view. If the locale set in the JSF view root is not null, then
+	 * return it. Else if the client preferred locale is not null, then return it. Else return the system default
+	 * locale.
+	 * @return The locale associated with the current view.
+	 * @see UIViewRoot#getLocale()
+	 * @see ExternalContext#getRequestLocale()
+	 * @see Locale#getDefault()
 	 */
-	public static PhaseId getCurrentPhaseId() {
-		return FacesContext.getCurrentInstance().getCurrentPhaseId();
+	public static Locale getLocale() {
+		FacesContext facesContext = FacesContext.getCurrentInstance();
+		Locale locale = null;
+		UIViewRoot viewRoot = facesContext.getViewRoot();
+
+		// Prefer the locale set in the view.
+		if (viewRoot != null) {
+			locale = viewRoot.getLocale();
+		}
+
+		// Then the client preferred locale.
+		if (locale == null) {
+			locale = facesContext.getExternalContext().getRequestLocale();
+		}
+
+		// Finally the system default locale.
+		if (locale == null) {
+			locale = Locale.getDefault();
+		}
+
+		return locale;
 	}
+
+	// HTTP request/response ------------------------------------------------------------------------------------------
 
 	/**
 	 * Returns the HTTP servlet request.
@@ -197,37 +299,6 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the HTTP request attribute map.
-	 * @return The HTTP request attribute map.
-	 * @see ExternalContext#getRequestMap()
-	 */
-	public static Map<String, Object> getRequestMap() {
-		return FacesContext.getCurrentInstance().getExternalContext().getRequestMap();
-	}
-
-	/**
-	 * Returns the HTTP request attribute value associated with the given name.
-	 * @param name The HTTP request attribute name.
-	 * @return The HTTP request attribute value associated with the given name.
-	 * @throws ClassCastException When <code>T</code> is of wrong type.
-	 * @see ExternalContext#getRequestMap()
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> T getRequestAttribute(String name) {
-		return (T) FacesContext.getCurrentInstance().getExternalContext().getRequestMap().get(name);
-	}
-
-	/**
-	 * Sets the HTTP request attribute value associated with the given name.
-	 * @param name The HTTP request attribute name.
-	 * @param value The HTTP request attribute value.
-	 * @see ExternalContext#getRequestMap()
-	 */
-	public static void setRequestAttribute(String name, Object value) {
-		FacesContext.getCurrentInstance().getExternalContext().getRequestMap().put(name, value);
-	}
-
-	/**
 	 * Returns the value of the HTTP request header associated with the given name.
 	 * @param name The HTTP request header name.
 	 * @return The value of the HTTP request header associated with the given name.
@@ -235,25 +306,6 @@ public final class Faces {
 	 */
 	public static String getRequestHeader(String name) {
 		return FacesContext.getCurrentInstance().getExternalContext().getRequestHeaderMap().get(name);
-	}
-
-	/**
-	 * Returns the value of the HTTP request cookie associated with the given name. The value is implicitly URL-decoded
-	 * with a charset of UTF-8.
-	 * @param name The HTTP request cookie name.
-	 * @return The value of the HTTP request cookie associated with the given name.
-	 * @throws UnsupportedOperationException If UTF-8 is not supported on this machine.
-	 * @see ExternalContext#getRequestCookieMap()
-	 */
-	public static String getRequestCookie(String name) {
-		Cookie cookie = (Cookie) FacesContext.getCurrentInstance().getExternalContext().getRequestCookieMap().get(name);
-
-		try {
-			return (cookie != null) ? URLDecoder.decode(cookie.getValue(), "UTF-8") : null;
-		}
-		catch (UnsupportedEncodingException e) {
-			throw new UnsupportedOperationException(ERROR_UNSUPPORTED_ENCODING, e);
-		}
 	}
 
 	/**
@@ -303,6 +355,37 @@ public final class Faces {
 	}
 
 	/**
+	 * Add a header with given name and value to the HTTP response.
+	 * @param name The header name.
+	 * @param value The header value.
+	 * @see ExternalContext#addResponseHeader(String, String)
+	 */
+	public static void addResponseHeader(String name, String value) {
+		FacesContext.getCurrentInstance().getExternalContext().addResponseHeader(name, value);
+	}
+
+	// HTTP cookies ---------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns the value of the HTTP request cookie associated with the given name. The value is implicitly URL-decoded
+	 * with a charset of UTF-8.
+	 * @param name The HTTP request cookie name.
+	 * @return The value of the HTTP request cookie associated with the given name.
+	 * @throws UnsupportedOperationException If UTF-8 is not supported on this machine.
+	 * @see ExternalContext#getRequestCookieMap()
+	 */
+	public static String getRequestCookie(String name) {
+		Cookie cookie = (Cookie) FacesContext.getCurrentInstance().getExternalContext().getRequestCookieMap().get(name);
+
+		try {
+			return (cookie != null) ? URLDecoder.decode(cookie.getValue(), "UTF-8") : null;
+		}
+		catch (UnsupportedEncodingException e) {
+			throw new UnsupportedOperationException(ERROR_UNSUPPORTED_ENCODING, e);
+		}
+	}
+
+	/**
 	 * Add a cookie with given name, value, path and maxage to the HTTP response. The cookie value will implicitly be
 	 * URL-encoded with UTF-8 so that any special characters can be stored in the cookie.
 	 * @param name The cookie name.
@@ -341,46 +424,7 @@ public final class Faces {
 		addResponseCookie(name, null, path, 0);
 	}
 
-	/**
-	 * Add a header with given name and value to the HTTP response.
-	 * @param name The header name.
-	 * @param value The header value.
-	 * @see ExternalContext#addResponseHeader(String, String)
-	 */
-	public static void addResponseHeader(String name, String value) {
-		FacesContext.getCurrentInstance().getExternalContext().addResponseHeader(name, value);
-	}
-
-	/**
-	 * Returns the flash scope.
-	 * @return The flash scope.
-	 * @see ExternalContext#getFlash()
-	 */
-	public static Flash getFlash() {
-		return FacesContext.getCurrentInstance().getExternalContext().getFlash();
-	}
-
-	/**
-	 * Returns the flash attribute value associated with the given name.
-	 * @param name The flash attribute name.
-	 * @return The flash attribute value associated with the given name.
-	 * @throws ClassCastException When <code>T</code> is of wrong type.
-	 * @see ExternalContext#getFlash()
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> T getFlashAttribute(String name) {
-		return (T) FacesContext.getCurrentInstance().getExternalContext().getFlash().get(name);
-	}
-
-	/**
-	 * Sets the flash attribute value associated with the given name.
-	 * @param name The flash attribute name.
-	 * @param value The flash attribute value.
-	 * @see ExternalContext#getFlash()
-	 */
-	public static void setFlashAttribute(String name, Object value) {
-		FacesContext.getCurrentInstance().getExternalContext().getFlash().put(name, value);
-	}
+	// HTTP session ---------------------------------------------------------------------------------------------------
 
 	/**
 	 * Returns the HTTP session and creates one if one doesn't exist.
@@ -402,43 +446,14 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the HTTP session attribute map.
-	 * @return The HTTP session attribute map.
-	 * @see ExternalContext#getSessionMap()
-	 */
-	public static Map<String, Object> getSessionMap() {
-		return FacesContext.getCurrentInstance().getExternalContext().getSessionMap();
-	}
-
-	/**
-	 * Returns the HTTP session attribute value associated with the given name.
-	 * @param name The HTTP session attribute name.
-	 * @return The HTTP session attribute value associated with the given name.
-	 * @throws ClassCastException When <code>T</code> is of wrong type.
-	 * @see ExternalContext#getSessionMap()
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> T getSessionAttribute(String name) {
-		return (T) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get(name);
-	}
-
-	/**
-	 * Sets the HTTP session attribute value associated with the given name.
-	 * @param name The HTTP session attribute name.
-	 * @param value The HTTP session attribute value.
-	 * @see ExternalContext#getSessionMap()
-	 */
-	public static void setSessionAttribute(String name, Object value) {
-		FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put(name, value);
-	}
-
-	/**
 	 * Invalidates the current HTTP session. So, any subsequent HTTP request will get a new one when necessary.
 	 * @see ExternalContext#invalidateSession()
 	 */
 	public static void invalidateSession() {
 		FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
 	}
+
+	// Servlet context ------------------------------------------------------------------------------------------------
 
 	/**
 	 * Returns the servlet context.
@@ -447,88 +462,6 @@ public final class Faces {
 	 */
 	public static ServletContext getServletContext() {
 		return (ServletContext) FacesContext.getCurrentInstance().getExternalContext().getContext();
-	}
-
-	/**
-	 * Returns the application (servlet context) attribute map.
-	 * @return The application (servlet context) attribute map.
-	 * @see ExternalContext#getApplicationMap()
-	 */
-	public static Map<String, Object> getApplicationMap() {
-		return FacesContext.getCurrentInstance().getExternalContext().getApplicationMap();
-	}
-
-	/**
-	 * Returns the application (servlet context) attribute value associated with the given name.
-	 * @param name The application (servlet context) attribute name.
-	 * @return The application (servlet context) attribute value associated with the given name.
-	 * @throws ClassCastException When <code>T</code> is of wrong type.
-	 * @see ExternalContext#getApplicationMap()
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> T getApplicationAttribute(String name) {
-		return (T) FacesContext.getCurrentInstance().getExternalContext().getApplicationMap().get(name);
-	}
-
-	/**
-	 * Sets the application (servlet context) attribute value associated with the given name.
-	 * @param name The application (servlet context) attribute name.
-	 * @param value The application (servlet context) attribute value.
-	 * @see ExternalContext#getApplicationMap()
-	 */
-	public static void setApplicationAttribute(String name, Object value) {
-		FacesContext.getCurrentInstance().getExternalContext().getApplicationMap().put(name, value);
-	}
-
-	/**
-	 * Returns the current view root.
-	 * @return The current view root.
-	 * @see FacesContext#getViewRoot()
-	 */
-	public static UIViewRoot getViewRoot() {
-		return FacesContext.getCurrentInstance().getViewRoot();
-	}
-
-	/**
-	 * Returns the ID of the current view root, or <code>null</code> if there is no view.
-	 * @return The ID of the current view root, or <code>null</code> if there is no view.
-	 * @see UIViewRoot#getViewId()
-	 */
-	public static String getViewId() {
-		UIViewRoot viewRoot = FacesContext.getCurrentInstance().getViewRoot();
-		return (viewRoot != null) ? viewRoot.getViewId() : null;
-	}
-
-	/**
-	 * Returns the locale associated with the current request. If the locale set in the JSF view root is not null, then
-	 * return it. Else if the client preferred locale is not null, then return it. Else return the system default
-	 * locale.
-	 * @return The locale associated with the current request.
-	 * @see UIViewRoot#getLocale()
-	 * @see ExternalContext#getRequestLocale()
-	 * @see Locale#getDefault()
-	 */
-	public static Locale getLocale() {
-		FacesContext facesContext = FacesContext.getCurrentInstance();
-		Locale locale = null;
-		UIViewRoot viewRoot = facesContext.getViewRoot();
-
-		// Prefer the locale set in the view.
-		if (viewRoot != null) {
-			locale = viewRoot.getLocale();
-		}
-
-		// Then the client preferred locale.
-		if (locale == null) {
-			locale = facesContext.getExternalContext().getRequestLocale();
-		}
-
-		// Finally the system default locale.
-		if (locale == null) {
-			locale = Locale.getDefault();
-		}
-
-		return locale;
 	}
 
 	/**
@@ -571,52 +504,172 @@ public final class Faces {
 		return getServletContext().getResourcePaths(path);
 	}
 
+	// Request scope --------------------------------------------------------------------------------------------------
+
 	/**
-	 * Programmatically evaluate the given EL expression and return the evaluated value.
-	 * @param <T> The expected return type.
-	 * @param expression The EL expression to be evaluated.
-	 * @return The evaluated value of the given EL expression.
+	 * Returns the request scope map.
+	 * @return The request scope map.
+	 * @see ExternalContext#getRequestMap()
+	 */
+	public static Map<String, Object> getRequestMap() {
+		return FacesContext.getCurrentInstance().getExternalContext().getRequestMap();
+	}
+
+	/**
+	 * Returns the request scope attribute value associated with the given name.
+	 * @param name The request scope attribute name.
+	 * @return The request scope attribute value associated with the given name.
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
-	 * @see Application#evaluateExpressionGet(FacesContext, String, Class)
+	 * @see ExternalContext#getRequestMap()
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T evaluateExpressionGet(String expression) {
-		if (expression == null) {
-			return null;
-		}
-
-		FacesContext context = FacesContext.getCurrentInstance();
-		return (T) context.getApplication().evaluateExpressionGet(context, expression, Object.class);
+	public static <T> T getRequestAttribute(String name) {
+		return (T) FacesContext.getCurrentInstance().getExternalContext().getRequestMap().get(name);
 	}
 
 	/**
-	 * Returns the implementation information of currently loaded JSF implementation. E.g. "Mojarra 2.1.7-FCS".
-	 * @return The implementation information of currently loaded JSF implementation.
-	 * @see Package#getImplementationTitle()
-	 * @see Package#getImplementationVersion()
+	 * Sets the request scope attribute value associated with the given name.
+	 * @param name The request scope attribute name.
+	 * @param value The request scope attribute value.
+	 * @see ExternalContext#getRequestMap()
 	 */
-	public static String getImplInfo() {
-		Package jsfPackage = FacesContext.class.getPackage();
-		return jsfPackage.getImplementationTitle() + " " + jsfPackage.getImplementationVersion();
+	public static void setRequestAttribute(String name, Object value) {
+		FacesContext.getCurrentInstance().getExternalContext().getRequestMap().put(name, value);
+	}
+
+	// Flash scope ----------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns the flash scope.
+	 * @return The flash scope.
+	 * @see ExternalContext#getFlash()
+	 */
+	public static Flash getFlash() {
+		return FacesContext.getCurrentInstance().getExternalContext().getFlash();
 	}
 
 	/**
-	 * Returns the server information of currently running application server implementation.
-	 * @return The server information of currently running application server implementation.
-	 * @see ServletContext#getServerInfo()
+	 * Returns the flash scope attribute value associated with the given name.
+	 * @param name The flash scope attribute name.
+	 * @return The flash scope attribute value associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see ExternalContext#getFlash()
 	 */
-	public static String getServerInfo() {
-		return getServletContext().getServerInfo();
+	@SuppressWarnings("unchecked")
+	public static <T> T getFlashAttribute(String name) {
+		return (T) FacesContext.getCurrentInstance().getExternalContext().getFlash().get(name);
 	}
 
 	/**
-	 * Returns true if we're in development stage.
-	 * @return True if we're in development stage.
-	 * @see Application#getProjectStage()
+	 * Sets the flash scope attribute value associated with the given name.
+	 * @param name The flash scope attribute name.
+	 * @param value The flash scope attribute value.
+	 * @see ExternalContext#getFlash()
 	 */
-	public static boolean isDevelopment() {
-		return FacesContext.getCurrentInstance().getApplication().getProjectStage() == ProjectStage.Development;
+	public static void setFlashAttribute(String name, Object value) {
+		FacesContext.getCurrentInstance().getExternalContext().getFlash().put(name, value);
 	}
+
+	// View scope -----------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns the view scope map.
+	 * @return The view scope map.
+	 * @see UIViewRoot#getViewMap()
+	 */
+	public static Map<String, Object> getViewMap() {
+		return FacesContext.getCurrentInstance().getViewRoot().getViewMap();
+	}
+
+	/**
+	 * Returns the view scope attribute value associated with the given name.
+	 * @param name The view scope attribute name.
+	 * @return The view scope attribute value associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see UIViewRoot#getViewMap()
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getViewAttribute(String name) {
+		return (T) FacesContext.getCurrentInstance().getViewRoot().getViewMap().get(name);
+	}
+
+	/**
+	 * Sets the view scope attribute value associated with the given name.
+	 * @param name The view scope attribute name.
+	 * @param value The view scope attribute value.
+	 * @see UIViewRoot#getViewMap()
+	 */
+	public static void setViewAttribute(String name, Object value) {
+		FacesContext.getCurrentInstance().getViewRoot().getViewMap().put(name, value);
+	}
+
+	// Session scope --------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns the session scope map.
+	 * @return The session scope map.
+	 * @see ExternalContext#getSessionMap()
+	 */
+	public static Map<String, Object> getSessionMap() {
+		return FacesContext.getCurrentInstance().getExternalContext().getSessionMap();
+	}
+
+	/**
+	 * Returns the session scope attribute value associated with the given name.
+	 * @param name The session scope attribute name.
+	 * @return The session scope attribute value associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see ExternalContext#getSessionMap()
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getSessionAttribute(String name) {
+		return (T) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get(name);
+	}
+
+	/**
+	 * Sets the session scope attribute value associated with the given name.
+	 * @param name The session scope attribute name.
+	 * @param value The session scope attribute value.
+	 * @see ExternalContext#getSessionMap()
+	 */
+	public static void setSessionAttribute(String name, Object value) {
+		FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put(name, value);
+	}
+
+	// Application scope ----------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns the application scope map.
+	 * @return The application scope map.
+	 * @see ExternalContext#getApplicationMap()
+	 */
+	public static Map<String, Object> getApplicationMap() {
+		return FacesContext.getCurrentInstance().getExternalContext().getApplicationMap();
+	}
+
+	/**
+	 * Returns the application scope attribute value associated with the given name.
+	 * @param name The application scope attribute name.
+	 * @return The application scope attribute value associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see ExternalContext#getApplicationMap()
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getApplicationAttribute(String name) {
+		return (T) FacesContext.getCurrentInstance().getExternalContext().getApplicationMap().get(name);
+	}
+
+	/**
+	 * Sets the application scope attribute value associated with the given name.
+	 * @param name The application scope attribute name.
+	 * @param value The application scope attribute value.
+	 * @see ExternalContext#getApplicationMap()
+	 */
+	public static void setApplicationAttribute(String name, Object value) {
+		FacesContext.getCurrentInstance().getExternalContext().getApplicationMap().put(name, value);
+	}
+
+	// File download --------------------------------------------------------------------------------------------------
 
 	/**
 	 * Send the given file to the response. The content type will be determined based on file name. The content length

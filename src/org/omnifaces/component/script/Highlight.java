@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.omnifaces.component.highlight;
+package org.omnifaces.component.script;
 
 import java.io.IOException;
 import java.util.EnumSet;
@@ -29,7 +29,6 @@ import javax.faces.component.visit.VisitHint;
 import javax.faces.component.visit.VisitResult;
 import javax.faces.context.FacesContext;
 
-import org.omnifaces.component.script.OnloadScript;
 import org.omnifaces.util.Components;
 
 /**
@@ -76,7 +75,7 @@ public class Highlight extends OnloadScript {
 	// Public constants -----------------------------------------------------------------------------------------------
 
 	/** The standard component type. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.highlight.Highlight";
+	public static final String COMPONENT_TYPE = "org.omnifaces.component.script.Highlight";
 
 	// Private constants ----------------------------------------------------------------------------------------------
 

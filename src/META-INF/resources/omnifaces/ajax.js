@@ -1,3 +1,9 @@
+/**
+ * Ajax related functions.
+ * 
+ * @author Bauke Scholtz
+ * @see org.omnifaces.component.script.OnloadScript
+ */
 OmniFaces.Ajax = function() {
 
 	var runOnceOnSuccessCallbacks = [];

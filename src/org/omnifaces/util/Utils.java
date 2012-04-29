@@ -42,7 +42,7 @@ public final class Utils {
 		// Hide constructor.
 	}
 
-	// Utility --------------------------------------------------------------------------------------------------------
+	// Lang -----------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Returns true if the given string is null or is empty.
@@ -106,6 +106,8 @@ public final class Utils {
 
 		return null;
 	}
+
+	// I/O ------------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Stream the given input to the given output by NIO {@link ByteBuffer}. Both the input and output streams will

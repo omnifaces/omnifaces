@@ -1,3 +1,9 @@
+/**
+ * Highlight/focus.
+ * 
+ * @author Bauke Scholtz
+ * @see org.omnifaces.component.script.Highlight
+ */
 OmniFaces.Highlight = {
 		
 	/**

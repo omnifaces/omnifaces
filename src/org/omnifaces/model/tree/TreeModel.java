@@ -12,6 +12,7 @@
  */
 package org.omnifaces.model.tree;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.List;
 
@@ -23,7 +24,7 @@ import org.omnifaces.component.tree.Tree;
  * @author Bauke Scholtz
  * @param <T> The type of the wrapped data of the tree node.
  */
-public interface TreeModel<T> extends Iterable<TreeModel<T>> {
+public interface TreeModel<T> extends Iterable<TreeModel<T>>, Serializable {
 
 	// Mutators -------------------------------------------------------------------------------------------------------
 
