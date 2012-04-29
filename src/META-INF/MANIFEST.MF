@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Specification-Title: OmniFaces
 Specification-Vendor: OmniFaces
-Specification-Version: 0.07
+Specification-Version: 0.08
 Implementation-Title: OmniFaces
 Implementation-Vendor: OmniFaces
-Implementation-Version: 0.07
+Implementation-Version: 0.08
