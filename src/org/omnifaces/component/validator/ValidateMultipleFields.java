@@ -81,6 +81,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	// Private constants ----------------------------------------------------------------------------------------------
 
 	private static final String DEFAULT_SHOWMESSAGEFOR = "@this";
+	private static final Boolean DEFAULT_DISABLED = Boolean.FALSE;
 
 	private static final String ERROR_MISSING_COMPONENTS =
 		"%s attribute 'components' must be specified.";
@@ -93,7 +94,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 
 	private enum PropertyKeys {
 		// Cannot be uppercased. They have to exactly match the attribute names.
-		components, message, showMessageFor;
+		components, message, showMessageFor, disabled;
 	}
 
 	// Properties -----------------------------------------------------------------------------------------------------
@@ -123,12 +124,17 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	}
 
 	/**
-	 * Collect the components, if it is not empty, then collect their values and delegate to
-	 * {@link #validateValues(FacesContext, List, List)}. If it returns <code>false</code>, then mark all inputs and
-	 * the faces context invalid and finally delegate to {@link #showMessage(FacesContext, List)} to show the message.
+	 * If the validation is not disabled, collect the components, if it is not empty, then collect their values and
+	 * delegate to {@link #validateValues(FacesContext, List, List)}. If it returns <code>false</code>, then mark all
+	 * inputs and the faces context invalid and finally delegate to {@link #showMessage(FacesContext, List)} to show
+	 * the message.
 	 */
 	@Override
 	protected void validateComponents(FacesContext context) {
+		if (isDisabled()) {
+			return;
+		}
+
 		List<UIInput> inputs = collectComponents();
 
 		if (inputs.isEmpty()) {
@@ -305,6 +311,22 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	 */
 	public void setShowMessageFor(String showMessageFor) {
 		getStateHelper().put(PropertyKeys.showMessageFor, showMessageFor);
+	}
+
+	/**
+	 * Returns whether the validation should be disabled or not.
+	 * @return Whether the validation should be disabled or not.
+	 */
+	public boolean isDisabled() {
+		return Boolean.valueOf(getStateHelper().eval(PropertyKeys.disabled, DEFAULT_DISABLED).toString());
+	}
+
+	/**
+	 * Sets whether the validation should be disabled or not.
+	 * @param disabled Whether the validation should be disabled or not.
+	 */
+	public void setDisabled(boolean disabled) {
+		getStateHelper().put(PropertyKeys.disabled, disabled);
 	}
 
 }

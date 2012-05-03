@@ -568,6 +568,16 @@
 			<required>false</required>
 			<type>java.lang.String</type>
 		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether the validation should be disabled or not. Defaults to <code>false</code>.
+				]]>
+			</description>
+			<name>disabled</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
 	</tag>
 
 	<tag>
@@ -648,6 +658,16 @@
 			<name>showMessageFor</name>
 			<required>false</required>
 			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether the validation should be disabled or not. Defaults to <code>false</code>.
+				]]>
+			</description>
+			<name>disabled</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
 		</attribute>
 	</tag>
 
@@ -730,6 +750,16 @@
 			<required>false</required>
 			<type>java.lang.String</type>
 		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether the validation should be disabled or not. Defaults to <code>false</code>.
+				]]>
+			</description>
+			<name>disabled</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
 	</tag>
 
 	<tag>
@@ -810,6 +840,16 @@
 			<name>showMessageFor</name>
 			<required>false</required>
 			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether the validation should be disabled or not. Defaults to <code>false</code>.
+				]]>
+			</description>
+			<name>disabled</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
 		</attribute>
 	</tag>
 	
@@ -896,6 +936,16 @@
 			<name>showMessageFor</name>
 			<required>false</required>
 			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether the validation should be disabled or not. Defaults to <code>false</code>.
+				]]>
+			</description>
+			<name>disabled</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
 		</attribute>
 	</tag>
 	
