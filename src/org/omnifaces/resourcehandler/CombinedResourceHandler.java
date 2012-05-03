@@ -14,7 +14,7 @@ package org.omnifaces.resourcehandler;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
@@ -107,23 +107,26 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 			return; // No need to repeat the job.
 		}
 
-		List<UIComponent> resources = viewRoot.getComponentResources(context, TARGET_HEAD);
 		CombinedResourceInfo.Builder stylesheets = new CombinedResourceInfo.Builder();
 		CombinedResourceInfo.Builder scripts = new CombinedResourceInfo.Builder();
+		List<UIComponent> componentResourcesToRemove = new ArrayList<UIComponent>();
 
-		for (Iterator<UIComponent> iter = resources.iterator(); iter.hasNext();) {
-			UIComponent resource = iter.next();
-			String library = (String) resource.getAttributes().get(ATTRIBUTE_RESOURCE_LIBRARY);
-			String name = (String) resource.getAttributes().get(ATTRIBUTE_RESOURCE_NAME);
+		for (UIComponent componentResource : viewRoot.getComponentResources(context, TARGET_HEAD)) {
+			String library = (String) componentResource.getAttributes().get(ATTRIBUTE_RESOURCE_LIBRARY);
+			String name = (String) componentResource.getAttributes().get(ATTRIBUTE_RESOURCE_NAME);
 
-			if (resource.getRendererType().equals(RENDERER_TYPE_STYLESHEET)) {
+			if (componentResource.getRendererType().equals(RENDERER_TYPE_STYLESHEET)) {
 				stylesheets.add(library, name);
-				iter.remove();
+				componentResourcesToRemove.add(componentResource);
 			}
-			else if (resource.getRendererType().equals(RENDERER_TYPE_SCRIPT)) {
+			else if (componentResource.getRendererType().equals(RENDERER_TYPE_SCRIPT)) {
 				scripts.add(library, name);
-				iter.remove();
+				componentResourcesToRemove.add(componentResource);
 			}
+		}
+
+		for (UIComponent componentResourceToRemove : componentResourcesToRemove) {
+			viewRoot.removeComponentResource(context, componentResourceToRemove, TARGET_HEAD);
 		}
 
 		if (!stylesheets.isEmpty()) {

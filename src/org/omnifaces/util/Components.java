@@ -228,7 +228,7 @@ public final class Components {
 				if (component instanceof UIForm) {
 					return (UIForm) component;
 				}
-				else {
+				else if (component != null) {
 					UIForm form = getClosestParent(component, UIForm.class);
 
 					if (form != null) {
