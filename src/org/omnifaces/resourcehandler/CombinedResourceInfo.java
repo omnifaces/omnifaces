@@ -79,7 +79,7 @@ final class CombinedResourceInfo {
 	}
 
 	/**
-	 * Use this builder to to create an instance of combined resource info and put it in the cache if absent.
+	 * Use this builder to create an instance of combined resource info and put it in the cache if absent.
 	 * @author Bauke Scholtz
 	 */
 	public static final class Builder {

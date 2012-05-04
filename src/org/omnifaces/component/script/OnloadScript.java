@@ -119,18 +119,18 @@ public class OnloadScript extends UIOutput {
 		ResponseWriter writer = context.getResponseWriter();
 		writer.startElement("span", this);
 		writer.writeAttribute("id", getClientId(context), "id");
-        writer.startElement("script", null);
-        writer.writeAttribute("type", "text/javascript", "type");
+		writer.startElement("script", null);
+		writer.writeAttribute("type", "text/javascript", "type");
 
-        if (ajaxRequest) {
-        	writer.write(AJAX_SCRIPT_START);
-        }
+		if (ajaxRequest) {
+			writer.write(AJAX_SCRIPT_START);
+		}
 
 		super.encodeChildren(context);
 
 		if (ajaxRequest) {
-        	writer.write(AJAX_SCRIPT_END);
-        }
+			writer.write(AJAX_SCRIPT_END);
+		}
 
 		writer.endElement("script");
 		writer.endElement("span");
