@@ -113,6 +113,11 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 
 		for (UIComponent componentResource : viewRoot.getComponentResources(context, TARGET_HEAD)) {
 			String library = (String) componentResource.getAttributes().get(ATTRIBUTE_RESOURCE_LIBRARY);
+
+			if (LIBRARY_NAME.equals(library)) {
+				return; // MyFaces somehow doesn't store custom view attributes. Prevent it from repeating the job.
+			}
+
 			String name = (String) componentResource.getAttributes().get(ATTRIBUTE_RESOURCE_NAME);
 
 			if (componentResource.getRendererType().equals(RENDERER_TYPE_STYLESHEET)) {

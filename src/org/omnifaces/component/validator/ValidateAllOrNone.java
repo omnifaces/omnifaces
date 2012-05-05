@@ -22,7 +22,7 @@ import org.omnifaces.util.Utils;
 
 /**
  * <strong>ValidateAllOrNone</strong> validates if at least ALL of the given <code>UIInput</code> components have been
- * filled in or that NONE of the given <code>UIInput</code> components have been filled in. The default message is
+ * filled out or that NONE of the given <code>UIInput</code> components have been filled out. The default message is
  * <blockquote>{0}: Please fill out all or none of those fields</blockquote>
  * <p>
  * For general usage instructions, refer {@link ValidateMultipleFields} documentation.
@@ -53,7 +53,7 @@ public class ValidateAllOrNone extends ValidateMultipleFields {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Validate if all or none is filled in.
+	 * Validate if all or none is filled out.
 	 */
 	@Override
 	protected boolean validateValues(FacesContext context, List<UIInput> inputs, List<Object> values) {

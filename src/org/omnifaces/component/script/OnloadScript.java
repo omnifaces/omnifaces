@@ -18,6 +18,7 @@ import java.util.Collection;
 import javax.faces.application.ResourceDependencies;
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
+import javax.faces.component.UIComponent;
 import javax.faces.component.UIOutput;
 import javax.faces.context.FacesContext;
 import javax.faces.context.PartialViewContext;
@@ -100,8 +101,6 @@ public class OnloadScript extends UIOutput {
 				}
 			}
 		}
-
-		super.processEvent(event);
 	}
 
 	/**
@@ -115,21 +114,26 @@ public class OnloadScript extends UIOutput {
 			return;
 		}
 
-		boolean ajaxRequest = context.getPartialViewContext().isAjaxRequest();
 		ResponseWriter writer = context.getResponseWriter();
 		writer.startElement("span", this);
 		writer.writeAttribute("id", getClientId(context), "id");
 		writer.startElement("script", null);
 		writer.writeAttribute("type", "text/javascript", "type");
 
-		if (ajaxRequest) {
-			writer.write(AJAX_SCRIPT_START);
-		}
+		if (getChildCount() > 0) {
+			boolean ajaxRequest = context.getPartialViewContext().isAjaxRequest();
 
-		super.encodeChildren(context);
+			if (ajaxRequest) {
+				writer.write(AJAX_SCRIPT_START);
+			}
 
-		if (ajaxRequest) {
-			writer.write(AJAX_SCRIPT_END);
+			for (UIComponent child : getChildren()) {
+				child.encodeAll(context);
+			}
+
+			if (ajaxRequest) {
+				writer.write(AJAX_SCRIPT_END);
+			}
 		}
 
 		writer.endElement("script");

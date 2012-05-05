@@ -22,7 +22,7 @@ import org.omnifaces.util.Utils;
 
 /**
  * <strong>ValidateOneOrMore</strong> validates if at least ONE of the given <code>UIInput</code> components has been
- * filled in. The default message is
+ * filled out. The default message is
  * <blockquote>{0}: Please fill out at least one of those fields</blockquote>
  * <p>
  * For general usage instructions, refer {@link ValidateMultipleFields} documentation.
@@ -53,7 +53,7 @@ public class ValidateOneOrMore extends ValidateMultipleFields {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Validate if at least one is filled in.
+	 * Validate if at least one is filled out.
 	 */
 	@Override
 	protected boolean validateValues(FacesContext context, List<UIInput> inputs, List<Object> values) {

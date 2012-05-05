@@ -72,6 +72,11 @@ import org.omnifaces.util.Messages;
  * The <code>showMessageFor</code> attribute defaults to <code>@this</code>. Other values than <code>@this</code> or
  * <code>@all</code> are not allowed.
  * <p>
+ * The validator can be disabled by the <code>disabled</code> attribute. It accepts a request based EL expression.
+ * <pre>
+ * &lt;o:validateMultipleFields components="foo bar baz" disabled="#{param.validationDisabled}" /&gt;
+ * </pre>
+ * <p>
  * TODO: support for immediate="true".
  *
  * @author Bauke Scholtz
