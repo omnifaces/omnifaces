@@ -28,6 +28,7 @@ import javax.faces.model.SelectItemGroup;
 
 import org.omnifaces.el.ScopedRunner;
 import org.omnifaces.model.ExtendedSelectItem;
+import org.omnifaces.util.Callback;
 
 /**
  * Collection of utility methods for collecting {@link SelectItem} instances from various sources.
@@ -155,7 +156,7 @@ public final class SelectItemsCollector {
 			}
 
 			// During each iteration, just resolve all attributes again.
-			scopedRunner.invoke(new Runnable() { @Override public void run() {
+			scopedRunner.invoke(new Callback.Void() { @Override public void invoke() {
 
 				Object itemValue = getItemValue(attributes, item);
 

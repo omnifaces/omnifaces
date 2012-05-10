@@ -19,7 +19,6 @@ import javax.faces.application.ResourceDependencies;
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponent;
-import javax.faces.component.UIOutput;
 import javax.faces.context.FacesContext;
 import javax.faces.context.PartialViewContext;
 import javax.faces.context.ResponseWriter;
@@ -53,7 +52,7 @@ import javax.faces.event.PostRestoreStateEvent;
 	@ResourceDependency(library="javax.faces", name="jsf.js", target="head"), // Required for jsf.ajax.addOnEvent.
 	@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head") // Specifically: ajax.js.
 })
-public class OnloadScript extends UIOutput {
+public class OnloadScript extends ScriptFamily {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
@@ -65,15 +64,7 @@ public class OnloadScript extends UIOutput {
 	private static final String AJAX_SCRIPT_START = "OmniFaces.Ajax.addRunOnceOnSuccess(function(){";
 	private static final String AJAX_SCRIPT_END = "});";
 
-	// UIComponent overrides ------------------------------------------------------------------------------------------
-
-	/**
-	 * Returns <code>true</code>.
-	 */
-	@Override
-	public boolean getRendersChildren() {
-		return true;
-	}
+	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
 	 * If the event is a {@link PostAddToViewEvent}, then relocate the component to end of body, so that we can make
@@ -128,6 +119,7 @@ public class OnloadScript extends UIOutput {
 			}
 
 			for (UIComponent child : getChildren()) {
+				System.out.println(child.getClass() + " " + child);
 				child.encodeAll(context);
 			}
 

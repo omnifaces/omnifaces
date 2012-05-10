@@ -29,6 +29,7 @@ import javax.faces.event.PhaseId;
 import org.omnifaces.component.EditableValueHolderStateHelper;
 import org.omnifaces.model.tree.ListTreeModel;
 import org.omnifaces.model.tree.TreeModel;
+import org.omnifaces.util.Callback;
 import org.omnifaces.util.Components;
 
 /**
@@ -97,7 +98,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	private Map<Integer, TreeNode> nodes;
 	private TreeModel currentModelNode;
 
-    // Actions --------------------------------------------------------------------------------------------------------
+	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
 	 * An override which appends the index of the current model node to the client ID chain, if any available.
@@ -159,7 +160,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 			return;
 		}
 
-		processTree(context, phaseId, new Callback<Void>() {
+		process(context, phaseId, new Callback.Returning<Void>() {
 
 			@Override
 			public Void invoke() {
@@ -181,7 +182,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 			return false;
 		}
 
-		return processTree(context.getFacesContext(), PhaseId.ANY_PHASE, new Callback<Boolean>() {
+		return process(context.getFacesContext(), PhaseId.ANY_PHASE, new Callback.Returning<Boolean>() {
 
 			@Override
 			public Boolean invoke() {
@@ -211,7 +212,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @see TreeInsertChildren
 	 */
 	protected void processTreeNode(final FacesContext context, final PhaseId phaseId) {
-		processTreeNode(new ArgumentCallback<Void, TreeNode>() {
+		processTreeNode(new Callback.ReturningWithArgument<Void, TreeNode>() {
 
 			@Override
 			public Void invoke(TreeNode treeNode) {
@@ -234,8 +235,8 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @see TreeModel#getLevel()
 	 * @see TreeInsertChildren
 	 */
-    protected boolean visitTreeNode(final VisitContext context, final VisitCallback callback) {
-		return processTreeNode(new ArgumentCallback<Boolean, TreeNode>() {
+	protected boolean visitTreeNode(final VisitContext context, final VisitCallback callback) {
+		return processTreeNode(new Callback.ReturningWithArgument<Boolean, TreeNode>() {
 
 			@Override
 			public Boolean invoke(TreeNode treeNode) {
@@ -254,9 +255,9 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @param context The faces context to work with.
 	 * @param phaseId The current phase ID.
 	 * @param callback The callback to be invoked.
-	 * @return
+	 * @return The callback result.
 	 */
-	private <R> R processTree(FacesContext context, PhaseId phaseId, Callback<R> callback) {
+	private <R> R process(FacesContext context, PhaseId phaseId, Callback.Returning<R> callback) {
 		if (phaseId == PhaseId.RENDER_RESPONSE) {
 			nodes = null;
 			model = null;
@@ -281,9 +282,9 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * Convenience method to handle both {@link #processTreeNode(FacesContext, PhaseId)} and
 	 * {@link #visitTreeNode(VisitContext, VisitCallback)} without code duplication.
 	 * @param callback The callback to be invoked.
-	 * @return
+	 * @return The callback result.
 	 */
-	private <R> R processTreeNode(ArgumentCallback<R, TreeNode> callback) {
+	private <R> R processTreeNode(Callback.ReturningWithArgument<R, TreeNode> callback) {
 		TreeNode treeNode = null;
 
 		if (!currentModelNode.isLeaf()) {
@@ -295,7 +296,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 		}
 
 		return callback.invoke(treeNode);
-    }
+	}
 
 	/**
 	 * Returns the tree nodes by finding direct {@link TreeNode} children and collecting them by their level attribute.
@@ -468,12 +469,4 @@ public class Tree extends TreeFamily implements NamingContainer {
 		getStateHelper().put(PropertyKeys.varNode, varNode);
 	}
 
-}
-
-interface Callback<R> {
-	R invoke();
-}
-
-interface ArgumentCallback<R, A> {
-	R invoke(A argument);
 }

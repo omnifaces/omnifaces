@@ -182,7 +182,7 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	private static void addComponentResource(FacesContext context, String name, String extension, String rendererType) {
 		UIOutput component = new UIOutput();
 		component.setRendererType(rendererType);
-		component.getAttributes().put(ATTRIBUTE_RESOURCE_LIBRARY, CombinedResourceHandler.LIBRARY_NAME);
+		component.getAttributes().put(ATTRIBUTE_RESOURCE_LIBRARY, LIBRARY_NAME);
 		component.getAttributes().put(ATTRIBUTE_RESOURCE_NAME, name + extension);
 		context.getViewRoot().addComponentResource(context, component, TARGET_HEAD);
 	}

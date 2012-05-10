@@ -71,21 +71,21 @@ public class RequiredCheckboxValidator implements Validator {
 			throw new IllegalArgumentException(String.format(ERROR_WRONG_COMPONENT, component.getClass().getName()));
 		}
 
-        if (!Boolean.TRUE.equals(value)) {
-            String requiredMessage = ((UIInput) component).getRequiredMessage();
+		if (!Boolean.TRUE.equals(value)) {
+			String requiredMessage = ((UIInput) component).getRequiredMessage();
 
-            if (requiredMessage == null && context.getApplication().getMessageBundle() != null) {
-                requiredMessage = ResourceBundle
-                	.getBundle(context.getApplication().getMessageBundle(), Faces.getLocale())
-                	.getString(UIInput.REQUIRED_MESSAGE_ID);
-            }
+			if (requiredMessage == null && context.getApplication().getMessageBundle() != null) {
+				requiredMessage = ResourceBundle
+					.getBundle(context.getApplication().getMessageBundle(), Faces.getLocale())
+					.getString(UIInput.REQUIRED_MESSAGE_ID);
+			}
 
-            if (requiredMessage == null) {
-            	requiredMessage = DEFAULT_REQUIRED_MESSAGE;
-            }
+			if (requiredMessage == null) {
+				requiredMessage = DEFAULT_REQUIRED_MESSAGE;
+			}
 
-            throw new ValidatorException(Messages.createError(requiredMessage, Components.getLabel(component)));
-        }
-    }
+			throw new ValidatorException(Messages.createError(requiredMessage, Components.getLabel(component)));
+		}
+	}
 
 }

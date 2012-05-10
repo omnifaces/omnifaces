@@ -50,37 +50,35 @@ public final class Events {
 	}
 
 	/**
-	 * Adds a phase listener to the current view that executes the given SAM (Single Abstract Method) everytime before
-	 * given phase ID.
-	 * @param phaseId The phase ID to execute the given SAM everytime before.
-	 * @param runnable The SAM to be executed everytime before the given phase ID of the current view.
+	 * Adds a phase listener to the current view that invokes the given callback everytime before given phase ID.
+	 * @param phaseId The phase ID to invoke the given callback everytime before.
+	 * @param callback The callback to be invoked everytime before the given phase ID of the current view.
 	 */
-	public static void addBeforePhaseListener(PhaseId phaseId, final Runnable runnable) {
+	public static void addBeforePhaseListener(PhaseId phaseId, final Callback.Void callback) {
 		addPhaseListener(new DefaultPhaseListener(phaseId) {
 
-			private static final long serialVersionUID = -7055586428104563512L;
+			private static final long serialVersionUID = -5078199683615308073L;
 
 			@Override
 			public void beforePhase(PhaseEvent event) {
-				runnable.run();
+				callback.invoke();
 			}
 		});
 	}
 
 	/**
-	 * Adds a phase listener to the current view that executes the given SAM (Single Abstract Method) everytime after
-	 * given phase.
-	 * @param phaseId The phase ID to execute the given SAM everytime after.
-	 * @param runnable The SAM to be executed everytime after the given phase ID of the current view.
+	 * Adds a phase listener to the current view that invokes the given callback everytime after given phase.
+	 * @param phaseId The phase ID to invoke the given callback everytime after.
+	 * @param callback The callback to be invoked everytime after the given phase ID of the current view.
 	 */
-	public static void addAfterPhaseListener(PhaseId phaseId, final Runnable runnable) {
+	public static void addAfterPhaseListener(PhaseId phaseId, final Callback.Void callback) {
 		addPhaseListener(new DefaultPhaseListener(phaseId) {
 
-			private static final long serialVersionUID = 8859817625884748405L;
+			private static final long serialVersionUID = -7760218897262285339L;
 
 			@Override
 			public void afterPhase(PhaseEvent event) {
-				runnable.run();
+				callback.invoke();
 			}
 		});
 	}

@@ -28,7 +28,7 @@ import javax.faces.model.SelectItemGroup;
 /**
  * Collection of utility methods for working with {@link SelectItem} or data represented by them.
  *
- * @author Arjan Tijm
+ * @author Arjan Tijms
  *
  */
 public final class SelectItemsUtils {

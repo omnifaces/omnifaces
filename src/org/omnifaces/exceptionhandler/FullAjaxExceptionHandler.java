@@ -31,6 +31,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
+import org.omnifaces.util.Callback;
 import org.omnifaces.util.Events;
 import org.omnifaces.util.Exceptions;
 import org.omnifaces.util.Faces;
@@ -176,9 +177,9 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
 				// Prevent some servlet containers from handling the error page itself afterwards. So far Tomcat/JBoss
 				// are known to do that. It would only result in IllegalStateException "response already committed".
-				Events.addAfterPhaseListener(PhaseId.RENDER_RESPONSE, new Runnable() {
+				Events.addAfterPhaseListener(PhaseId.RENDER_RESPONSE, new Callback.Void() {
 					@Override
-					public void run() {
+					public void invoke() {
 						request.removeAttribute(ATTRIBUTE_ERROR_EXCEPTION);
 					}
 				});

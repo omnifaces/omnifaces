@@ -14,6 +14,10 @@ package org.omnifaces.util;
 
 import static org.omnifaces.util.Utils.*;
 
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+
 import javax.el.ValueExpression;
 import javax.faces.component.EditableValueHolder;
 import javax.faces.component.NamingContainer;
@@ -21,6 +25,10 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
 import javax.faces.component.UIViewRoot;
+import javax.faces.component.visit.VisitCallback;
+import javax.faces.component.visit.VisitContext;
+import javax.faces.component.visit.VisitHint;
+import javax.faces.component.visit.VisitResult;
 import javax.faces.context.FacesContext;
 
 
@@ -33,6 +41,8 @@ import javax.faces.context.FacesContext;
 public final class Components {
 
 	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final EnumSet<VisitHint> SKIP_UNRENDERED = EnumSet.of(VisitHint.SKIP_UNRENDERED);
 
 	private static final String ERROR_INVALID_PARENT =
 		"Component '%s' must have a parent of type '%s', but it cannot be found.";
@@ -246,6 +256,34 @@ public final class Components {
 	}
 
 	/**
+	 * Returns a list of all invalid inputs of the currently submitted {@link UIForm}, or an empty list when there are
+	 * none. This will visit all components of the form as obtained by {@link #getCurrentForm()}, check if they are an
+	 * instance of {@link UIInput} and are not {@link UIInput#isValid()}.
+	 * @return A list of all invalid inputs of the given form, or an empty list when there are none.
+	 */
+	public static List<UIInput> getInvalidInputs() {
+		final List<UIInput> invalidInputs = new ArrayList<UIInput>();
+		UIForm form = Components.getCurrentForm();
+
+		if (form != null) {
+			FacesContext context = FacesContext.getCurrentInstance();
+			form.visitTree(VisitContext.createVisitContext(context, null, SKIP_UNRENDERED), new VisitCallback() {
+
+				@Override
+				public VisitResult visit(VisitContext context, UIComponent component) {
+					if (component instanceof UIInput && !((UIInput) component).isValid()) {
+						invalidInputs.add((UIInput) component);
+					}
+
+					return VisitResult.ACCEPT;
+				}
+			});
+		}
+
+		return invalidInputs;
+	}
+
+	/**
 	 * Returns whether the given UI input component is editable. That is when it is rendered, not disabled and not
 	 * readonly.
 	 * @param input The UI input component to be checked.
@@ -290,7 +328,9 @@ public final class Components {
 
 	/**
 	 * Returns the value of the given editable value holder component without the need to know if the given component
-	 * has already been converted/validated or not.
+	 * has already been converted/validated or not. Note that it thus returns the unconverted submitted string value
+	 * when the conversion/validation hasn't been taken place for the given component and it returns the converted
+	 * object value -if applicable- when conversion/validation has been taken place for the given component.
 	 * @param component The editable value holder component to obtain the value for.
 	 * @return The value of the given editable value holder component.
 	 */

@@ -13,20 +13,14 @@
 package org.omnifaces.component.script;
 
 import java.io.IOException;
-import java.util.EnumSet;
-import java.util.Set;
+import java.util.List;
 
 import javax.faces.application.ResourceDependencies;
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
-import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
 import javax.faces.component.UIOutput;
-import javax.faces.component.visit.VisitCallback;
-import javax.faces.component.visit.VisitContext;
-import javax.faces.component.visit.VisitHint;
-import javax.faces.component.visit.VisitResult;
 import javax.faces.context.FacesContext;
 
 import org.omnifaces.util.Components;
@@ -79,7 +73,6 @@ public class Highlight extends OnloadScript {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
-	private static final Set<VisitHint> VISIT_HINTS = EnumSet.of(VisitHint.SKIP_UNRENDERED);
 	private static final String DEFAULT_STYLECLASS = "error";
 	private static final Boolean DEFAULT_FOCUS = Boolean.TRUE;
 	private static final String SCRIPT = "OmniFaces.Highlight.addErrorClass(%s, '%s', %s);";
@@ -103,8 +96,8 @@ public class Highlight extends OnloadScript {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Visit all components of the current {@link UIForm}, check if they are an instance of {@link UIInput} and are not
-	 * {@link UIInput#isValid()} and finally append them to an array in JSON format and render the script.
+	 * Get all invalid input components of the currently submitted {@link UIForm} and append their client IDs to an
+	 * array in JSON format and finally render the script callback.
 	 * <p>
 	 * Note that the {@link FacesContext#getClientIdsWithMessages()} could also be consulted, but it does not indicate
 	 * whether the components associated with those client IDs are actually {@link UIInput} components which are not
@@ -119,31 +112,22 @@ public class Highlight extends OnloadScript {
 		body.setValue(null); // Reset any previous value.
 
 		if (context.isPostback()) {
-			UIForm form = Components.getCurrentForm();
+			List<UIInput> invalidInputs = Components.getInvalidInputs();
 
-			if (form != null) {
-				final StringBuilder clientIdsAsJSON = new StringBuilder();
-				form.visitTree(VisitContext.createVisitContext(context, null, VISIT_HINTS), new VisitCallback() {
+			if (!invalidInputs.isEmpty()) {
+				StringBuilder clientIdsAsJSON = new StringBuilder();
 
-					@Override
-					public VisitResult visit(VisitContext context, UIComponent component) {
-						if (component instanceof UIInput && !((UIInput) component).isValid()) {
-							if (clientIdsAsJSON.length() > 0) {
-								clientIdsAsJSON.append(',');
-							}
-
-							String clientId = component.getClientId(context.getFacesContext());
-							clientIdsAsJSON.append('"').append(clientId).append('"');
-						}
-
-						return VisitResult.ACCEPT;
+				for (UIInput invalidInput : invalidInputs) {
+					if (clientIdsAsJSON.length() > 0) {
+						clientIdsAsJSON.append(',');
 					}
-				});
 
-				if (clientIdsAsJSON.length() > 0) {
-					clientIdsAsJSON.insert(0, '[').append(']');
-					body.setValue(String.format(SCRIPT, clientIdsAsJSON, getStyleClass(), isFocus()));
+					String clientId = invalidInput.getClientId(context);
+					clientIdsAsJSON.append('"').append(clientId).append('"');
 				}
+
+				clientIdsAsJSON.insert(0, '[').append(']');
+				body.setValue(String.format(SCRIPT, clientIdsAsJSON, getStyleClass(), isFocus()));
 			}
 		}
 

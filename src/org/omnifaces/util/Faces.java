@@ -25,7 +25,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import javax.faces.FacesException;
 import javax.faces.application.Application;
 import javax.faces.application.ProjectStage;
 import javax.faces.component.UIViewRoot;
@@ -299,6 +298,16 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the HTTP request parameter values associated with the given name.
+	 * @param name The HTTP request parameter name.
+	 * @return The HTTP request parameter values associated with the given name.
+	 * @see ExternalContext#getRequestParameterValuesMap()
+	 */
+	public static String[] getRequestParameterValues(String name) {
+		return FacesContext.getCurrentInstance().getExternalContext().getRequestParameterValuesMap().get(name);
+	}
+
+	/**
 	 * Returns the value of the HTTP request header associated with the given name.
 	 * @param name The HTTP request header name.
 	 * @return The value of the HTTP request header associated with the given name.
@@ -338,7 +347,6 @@ public final class Faces {
 	/**
 	 * Redirects the current response to the given URL. If the given URL does not start with <tt>http</tt> or
 	 * <tt>/</tt>, then the request context path will be prepended, otherwise it will be the unmodified redirect URL.
-	 * Any {@link IOException} will be wrapped in {@link FacesException}.
 	 * @param url The URL to redirect the current response to.
 	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
 	 * redeclare it in the action method. The servletcontainer will handle it.
