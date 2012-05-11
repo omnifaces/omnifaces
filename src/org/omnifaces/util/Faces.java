@@ -180,7 +180,7 @@ public final class Faces {
 	 * @see UIViewRoot#getViewId()
 	 */
 	public static String getViewId() {
-		UIViewRoot viewRoot = FacesContext.getCurrentInstance().getViewRoot();
+		UIViewRoot viewRoot = getViewRoot();
 		return (viewRoot != null) ? viewRoot.getViewId() : null;
 	}
 
@@ -308,9 +308,27 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the value of the HTTP request header associated with the given name.
+	 * Returns the HTTP request header map.
+	 * @return The HTTP request header map.
+	 * @see ExternalContext#getRequestHeaderMap()
+	 */
+	public static Map<String, String> getRequestHeaderMap() {
+		return FacesContext.getCurrentInstance().getExternalContext().getRequestHeaderMap();
+	}
+
+	/**
+	 * Returns the HTTP request header values map.
+	 * @return The HTTP request header values map.
+	 * @see ExternalContext#getRequestHeaderValuesMap()
+	 */
+	public static Map<String, String[]> getRequestHeaderValuesMap() {
+		return FacesContext.getCurrentInstance().getExternalContext().getRequestHeaderValuesMap();
+	}
+
+	/**
+	 * Returns the HTTP request header value associated with the given name.
 	 * @param name The HTTP request header name.
-	 * @return The value of the HTTP request header associated with the given name.
+	 * @return The HTTP request header value associated with the given name.
 	 * @see ExternalContext#getRequestHeaderMap()
 	 */
 	public static String getRequestHeader(String name) {
@@ -318,7 +336,18 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the HTTP request context path.
+	 * Returns the HTTP request header values associated with the given name.
+	 * @param name The HTTP request header name.
+	 * @return The HTTP request header values associated with the given name.
+	 * @see ExternalContext#getRequestHeaderValuesMap()
+	 */
+	public static String[] getRequestHeaderValues(String name) {
+		return FacesContext.getCurrentInstance().getExternalContext().getRequestHeaderValuesMap().get(name);
+	}
+
+	/**
+	 * Returns the HTTP request context path. It's the webapp context name, with a leading slash. If the webapp runs
+	 * on context root, then it returns an empty string.
 	 * @return The HTTP request context path.
 	 * @see ExternalContext#getRequestContextPath()
 	 */
@@ -327,12 +356,39 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the HTTP request servlet path.
+	 * Returns the HTTP request servlet path. If JSF is prefix mapped (e.g. <tt>/faces/*</tt>), then this returns the
+	 * whole prefix mapping (e.g. <tt>/faces</tt>). If JSF is suffix mapped (e.g. <tt>*.xhtml</tt>), then this returns
+	 * the whole part after the context path.
 	 * @return The HTTP request servlet path.
 	 * @see ExternalContext#getRequestServletPath()
 	 */
 	public static String getRequestServletPath() {
 		return FacesContext.getCurrentInstance().getExternalContext().getRequestServletPath();
+	}
+
+	/**
+	 * Returns the HTTP request path info. If JSF is prefix mapped (e.g. <tt>/faces/*</tt>), then this returns the
+	 * whole part after the prefix mapping. If JSF is suffix mapped (e.g. <tt>*.xhtml</tt>), then this returns an empty
+	 * string.
+	 * @return The HTTP request path info.
+	 * @see ExternalContext#getRequestPathInfo()
+	 */
+	public static String getRequestPathInfo() {
+		return FacesContext.getCurrentInstance().getExternalContext().getRequestPathInfo();
+	}
+
+	/**
+	 * Returns the HTTP request base URL, this is the full URL from the scheme, domain until with context path,
+	 * including the trailing slash. This is the value you could use in HTML <code>&lt;base&gt;</code> tag.
+	 * @return The HTTP request base URL.
+	 * @see HttpServletRequest#getRequestURL()
+	 * @see HttpServletRequest#getRequestURI()
+	 * @see HttpServletRequest#getContextPath()
+	 */
+	public static String getRequestBaseURL() {
+		HttpServletRequest request = getRequest();
+		String url = request.getRequestURL().toString();
+		return url.substring(0, url.length() - request.getRequestURI().length()) + request.getContextPath() + "/";
 	}
 
 	/**
@@ -395,13 +451,14 @@ public final class Faces {
 
 	/**
 	 * Add a cookie with given name, value, path and maxage to the HTTP response. The cookie value will implicitly be
-	 * URL-encoded with UTF-8 so that any special characters can be stored in the cookie.
+	 * URL-encoded with UTF-8 so that any special characters can be stored in the cookie. The cookie will implicitly
+	 * be set to secure when the current request is secure (i.e. when the current request is a HTTPS request).
 	 * @param name The cookie name.
 	 * @param value The cookie value.
 	 * @param path The cookie path.
 	 * @param maxAge The maximum age of the cookie, in seconds. If this is <tt>0</tt> then the cookie will be removed.
-	 * Note that the name and path must be exactly the same as it was when the cookie as added. If this is <tt>-1</tt>
-	 * then the cookie will become a session cookie and thus live as long as the established HTTP session.
+	 * Note that the name and path must be exactly the same as it was when the cookie was created. If this is
+	 * <tt>-1</tt> then the cookie will become a session cookie and thus live as long as the established HTTP session.
 	 * @throws UnsupportedOperationException If UTF-8 is not supported on this machine.
 	 * @see ExternalContext#addResponseCookie(String, String, Map)
 	 */
@@ -415,10 +472,12 @@ public final class Faces {
 			}
 		}
 
+		ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 		Map<String, Object> properties = new HashMap<String, Object>();
 		properties.put("path", path);
 		properties.put("maxAge", maxAge);
-		FacesContext.getCurrentInstance().getExternalContext().addResponseCookie(name, value, properties);
+		properties.put("secure", ((HttpServletRequest) externalContext.getRequest()).isSecure());
+		externalContext.addResponseCookie(name, value, properties);
 	}
 
 	/**
