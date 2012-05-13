@@ -88,8 +88,7 @@ public class Highlight extends OnloadScript {
 	 * Constructs the Highlight component.
 	 */
 	public Highlight() {
-		// Mojarra's ScriptRenderer expects either a library/name or at least a body, otherwise it will emit a warning
-		// message that there's a h:outputScript without library/name/body. So, prepare at least a body.
+		// Prepare the script body.
 		getChildren().add(new UIOutput());
 	}
 

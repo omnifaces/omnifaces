@@ -119,7 +119,6 @@ public class OnloadScript extends ScriptFamily {
 			}
 
 			for (UIComponent child : getChildren()) {
-				System.out.println(child.getClass() + " " + child);
 				child.encodeAll(context);
 			}
 

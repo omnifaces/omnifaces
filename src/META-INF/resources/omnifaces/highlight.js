@@ -11,19 +11,17 @@ OmniFaces.Highlight = {
 	 * also set the focus on the first element. All non-existing elements are ignored.
 	 */
 	addErrorClass: function(clientIds, styleClass, doFocus) {
-		var focused = !doFocus;
+		for (var i = 0; i < clientIds.length; i++) {
+			var element = document.getElementById(clientIds[i]);
 
-	    for (var i = 0; i < clientIds.length; i++) {
-	        var element = document.getElementById(clientIds[i]);
+			if (element) {
+				element.className += ' ' + styleClass;
 
-	        if (element) {
-	            element.className += ' ' + styleClass;
-
-	            if (!focused) {
-	            	element.focus();
-	            	focused = true;
-	            }
-	        }
-	    }
+				if (doFocus) {
+					element.focus();
+					doFocus = false;
+				}
+			}
+		}
 	}
 };
