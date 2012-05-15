@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.omnifaces.component.resourceinclude;
+package org.omnifaces.component.output;
 
 import java.io.ByteArrayInputStream;
 import java.io.CharArrayWriter;
@@ -30,6 +30,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import org.omnifaces.util.Components;
+
 /**
  * This component is used to catch the output from a Servlet resource and render it as output
  * to the JSF writer. In effect, this allows you to include both Servlets and JSP pages in e.g. Facelets.
@@ -40,9 +42,9 @@ import javax.servlet.http.HttpServletResponseWrapper;
 @FacesComponent(ResourceInclude.COMPONENT_TYPE)
 public class ResourceInclude extends UIComponentBase {
 
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.resourceinclude.ResourceInclude";
+	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.ResourceInclude";
 
-	public static final String COMPONENT_FAMILY = "org.omnifaces.component";
+	public static final String COMPONENT_FAMILY = "org.omnifaces.component.output";
 
 	@Override
 	public String getFamily() {
@@ -51,6 +53,8 @@ public class ResourceInclude extends UIComponentBase {
 
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
+		Components.validateHasNoChildren(this);
+
 		try {
 			ExternalContext externalContext = context.getExternalContext();
 			HttpServletRequest request = (HttpServletRequest) externalContext.getRequest();

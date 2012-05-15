@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.omnifaces.facelets;
+package org.omnifaces.taghandler;
 
 import java.io.IOException;
 
@@ -34,12 +34,12 @@ import org.omnifaces.el.MethodExpressionValueExpressionAdapter;
  * @author Arjan Tijms
  *
  */
-public class MethodParamHandler extends TagHandler {
+public class MethodParam extends TagHandler {
 
 	private final TagAttribute name;
 	private final TagAttribute value;
 	
-	public MethodParamHandler(TagConfig config) {
+	public MethodParam(TagConfig config) {
 		super(config);
 		this.name = this.getRequiredAttribute("name");
 		this.value = this.getRequiredAttribute("value");

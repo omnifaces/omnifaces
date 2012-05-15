@@ -10,10 +10,10 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.omnifaces.component.outputlabel;
+package org.omnifaces.component.output;
 
-import static org.omnifaces.util.Faces.isPostback;
-import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Faces.*;
+import static org.omnifaces.util.Utils.*;
 
 import javax.el.ValueExpression;
 import javax.faces.component.FacesComponent;
@@ -40,35 +40,33 @@ import org.omnifaces.util.Faces;
 @FacesComponent(OutputLabel.COMPONENT_TYPE)
 public class OutputLabel extends HtmlOutputLabel implements SystemEventListener {
 
-    public static final String COMPONENT_TYPE = "org.omnifaces.component.outputlabel.OutputLabel";
+    public static final String COMPONENT_TYPE = "org.omnifaces.component.output.OutputLabel";
 
-    public static final String COMPONENT_FAMILY = "org.omnifaces.component";
-    
     private static final String ERROR_FOR_COMPONENT_NOT_FOUND =
 		"A component with Id '%s' as specified by the for attribute of the OutputLabel with Id '%s' could not be found.";
-    
+
     public OutputLabel() {
         if (!isPostback()) {
             Faces.getViewRoot().subscribeToViewEvent(PreRenderViewEvent.class, this);
         }
     }
-    
+
     @Override
     public boolean isListenerForSource(Object source) {
         return source instanceof UIViewRoot;
     }
-    
+
     @Override
     public void processEvent(SystemEvent event) throws AbortProcessingException {
         if (!isPostback()) {
             String forValue = (String) getAttributes().get("for");
             if (!isEmpty(forValue)) {
                 UIComponent forComponent = Components.findComponentRelatively(this, forValue);
-                
+
                 if (forComponent == null) {
                 	throw new IllegalArgumentException(String.format(ERROR_FOR_COMPONENT_NOT_FOUND, forValue, this.getId()));
                 }
-                
+
                 // To be sure, check if the target component doesn't have a label already. This
                 // is unlikely, since otherwise people have no need to use this outputLabel component
                 // but check to be sure.
@@ -76,12 +74,12 @@ public class OutputLabel extends HtmlOutputLabel implements SystemEventListener 
                     ValueExpression valueExpression = getValueExpression("value");
                     if (valueExpression != null) {
                         forComponent.setValueExpression("label", valueExpression);
-                    } else {                    
+                    } else {
                         forComponent.getAttributes().put("label", getValue());
                     }
                 }
             }
         }
-        
+
     }
 }

@@ -16,7 +16,7 @@ import javax.faces.event.PhaseEvent;
 import javax.faces.event.PhaseId;
 import javax.faces.event.PhaseListener;
 
-import org.omnifaces.event.DefaultPhaseListener;
+import org.omnifaces.eventlistener.DefaultPhaseListener;
 
 /**
  * Collection of utility methods for the JSF API with respect to working with Faces events.

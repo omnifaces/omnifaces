@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.omnifaces.component.viewparam;
+package org.omnifaces.component.input;
 
 import java.util.Map;
 
@@ -41,7 +41,7 @@ import org.omnifaces.util.MapWrapper;
 @FacesComponent(ViewParam.COMPONENT_TYPE)
 public class ViewParam extends UIViewParameter {
 
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.viewparam.ViewParam";
+	public static final String COMPONENT_TYPE = "org.omnifaces.component.input.ViewParam";
 
 	private String submittedValue;
 	private Map<String, Object> attributeInterceptMap;

@@ -288,7 +288,7 @@
 		</description>
 		<tag-name>resourceInclude</tag-name>
 		<component>
-			<component-type>org.omnifaces.component.resourceinclude.ResourceInclude</component-type>
+			<component-type>org.omnifaces.component.output.ResourceInclude</component-type>
 		</component>
 		 <attribute>
 			<description>A String specifying the pathname to the resource</description>
@@ -974,7 +974,7 @@
 		</description>
 		<tag-name>viewParam</tag-name>
 		<component>
-			<component-type>org.omnifaces.component.viewparam.ViewParam</component-type>
+			<component-type>org.omnifaces.component.input.ViewParam</component-type>
 		</component>
 		<attribute>
 			<description>
@@ -1195,7 +1195,7 @@
 			]]>
 		</description>
 		<tag-name>methodParam</tag-name>
-		<handler-class>org.omnifaces.facelets.MethodParamHandler</handler-class>
+		<handler-class>org.omnifaces.taghandler.MethodParam</handler-class>
 		<attribute>
 			<description>
 				<![CDATA[
@@ -1231,7 +1231,7 @@
         </description>
         <tag-name>outputLabel</tag-name>
         <component>
-            <component-type>org.omnifaces.component.outputlabel.OutputLabel</component-type>
+            <component-type>org.omnifaces.component.output.OutputLabel</component-type>
         </component>
         <attribute>
             <description>

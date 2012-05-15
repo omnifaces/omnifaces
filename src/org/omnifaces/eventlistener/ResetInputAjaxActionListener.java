@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.omnifaces.event;
+package org.omnifaces.eventlistener;
 
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -66,7 +66,7 @@ import javax.faces.event.ActionListener;
  * <code>UIInput</code> components such as <code>&lt;h:selectOneMenu&gt;</code>.
  * <pre>
  * &lt;application&gt;
- *   &lt;action-listener&gt;org.omnifaces.event.ResetInputAjaxActionListener&lt;/action-listener&gt;
+ *   &lt;action-listener&gt;org.omnifaces.eventlistener.ResetInputAjaxActionListener&lt;/action-listener&gt;
  * &lt;/application&gt;
  * </pre>
  * <li><p><i>Or</i> register it as <code>&lt;f:actionListener&gt;</code> on the invidivual <code>UICommand</code>
@@ -75,7 +75,7 @@ import javax.faces.event.ActionListener;
  * <pre>
  * &lt;h:commandButton&gt;
  *   &lt;f:ajax listener="#{bean.updateOtherInputs}" render="otherInputs" /&gt;
- *   &lt;f:actionListener type="org.omnifaces.event.ResetInputAjaxActionListener" /&gt;
+ *   &lt;f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" /&gt;
  * &lt;/h:commandButton&gt;
  * </pre>
  * </ul>
