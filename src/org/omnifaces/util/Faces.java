@@ -20,6 +20,8 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -27,12 +29,14 @@ import java.util.Set;
 
 import javax.faces.application.Application;
 import javax.faces.application.ProjectStage;
+import javax.faces.component.UIViewParameter;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
 import javax.faces.context.PartialViewContext;
 import javax.faces.event.PhaseId;
+import javax.faces.view.ViewMetadata;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -238,6 +242,16 @@ public final class Faces {
 		}
 
 		return locale;
+	}
+
+	/**
+	 * Returns the view parameters of the current view, or an empty collection if there is no view.
+	 * @return The view parameters of the current view, or an empty collection if there is no view.
+	 * @see ViewMetadata#getViewParameters(UIViewRoot)
+	 */
+	public static Collection<UIViewParameter> getViewParams() {
+		UIViewRoot viewRoot = getViewRoot();
+		return (viewRoot != null) ? ViewMetadata.getViewParameters(viewRoot) : Collections.<UIViewParameter>emptyList();
 	}
 
 	// HTTP request/response ------------------------------------------------------------------------------------------

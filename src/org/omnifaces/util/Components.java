@@ -14,10 +14,6 @@ package org.omnifaces.util;
 
 import static org.omnifaces.util.Utils.*;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-
 import javax.el.ValueExpression;
 import javax.faces.component.EditableValueHolder;
 import javax.faces.component.NamingContainer;
@@ -25,12 +21,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
 import javax.faces.component.UIViewRoot;
-import javax.faces.component.visit.VisitCallback;
-import javax.faces.component.visit.VisitContext;
-import javax.faces.component.visit.VisitHint;
-import javax.faces.component.visit.VisitResult;
 import javax.faces.context.FacesContext;
-
 
 /**
  * Collection of utility methods for the JSF API with respect to working with {@link UIComponent}.
@@ -41,8 +32,6 @@ import javax.faces.context.FacesContext;
 public final class Components {
 
 	// Constants ------------------------------------------------------------------------------------------------------
-
-	private static final EnumSet<VisitHint> SKIP_UNRENDERED = EnumSet.of(VisitHint.SKIP_UNRENDERED);
 
 	private static final String ERROR_INVALID_PARENT =
 		"Component '%s' must have a parent of type '%s', but it cannot be found.";
@@ -253,34 +242,6 @@ public final class Components {
 		}
 
 		return null;
-	}
-
-	/**
-	 * Returns a list of all invalid inputs of the currently submitted {@link UIForm}, or an empty list when there are
-	 * none. This will visit all components of the form as obtained by {@link #getCurrentForm()}, check if they are an
-	 * instance of {@link UIInput} and are not {@link UIInput#isValid()}.
-	 * @return A list of all invalid inputs of the given form, or an empty list when there are none.
-	 */
-	public static List<UIInput> getInvalidInputs() {
-		final List<UIInput> invalidInputs = new ArrayList<UIInput>();
-		UIForm form = Components.getCurrentForm();
-
-		if (form != null) {
-			FacesContext context = FacesContext.getCurrentInstance();
-			form.visitTree(VisitContext.createVisitContext(context, null, SKIP_UNRENDERED), new VisitCallback() {
-
-				@Override
-				public VisitResult visit(VisitContext context, UIComponent component) {
-					if (component instanceof UIInput && !((UIInput) component).isValid()) {
-						invalidInputs.add((UIInput) component);
-					}
-
-					return VisitResult.ACCEPT;
-				}
-			});
-		}
-
-		return invalidInputs;
 	}
 
 	/**
