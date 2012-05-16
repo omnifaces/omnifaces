@@ -591,7 +591,7 @@ public final class Faces {
 	/**
 	 * Returns the mime type for the given file name. The mime type is determined based on file extension and
 	 * configureable by <code>&lt;mime-mapping&gt;</code> entries in <tt>web.xml</tt>. When the mime type is unknown,
-	 * then a default of {@value #DEFAULT_MIME_TYPE} will be returned.
+	 * then a default of <tt>application/octet-stream</tt> will be returned.
 	 * @param name The file name to return the mime type for.
 	 * @return The mime type for the given file name.
 	 * @see ExternalContext#getMimeType(String)
