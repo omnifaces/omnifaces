@@ -43,7 +43,7 @@ public final class Converters {
 	 * <li>1023 bytes will appear as 1023 B
 	 * <li>1024 bytes will appear as 1.0 KiB
 	 * <li>500000 bytes will appear as 488.3 KiB
-	 * <li>1048576 bytes will appear as 1.0 GiB
+	 * <li>1048576 bytes will appear as 1.0 MiB
 	 * </ul>
 	 * The format locale will be set to the one as obtained by {@link Faces#getLocale()}.
 	 * @param bytes The bytes to be formatted.

@@ -22,7 +22,6 @@ public final class Arrays {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final String ERROR_INVALID_ARRAY_SIZE = "The array size must be at least 0.";
-	private static final String ERROR_INVALID_ARRAY_RANGE = "The end must be after begin.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -51,21 +50,18 @@ public final class Arrays {
 	/**
 	 * Creates and an integer array which starts at the given integer and ends at the given integer, inclusive. This is
 	 * useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows an integer range to
-	 * represent days and years.
+	 * represent days and years. If the begin is greater than end, then the array will be decremental. If the begin
+	 * equals end, then the array will contain only one item.
 	 * @param begin The begin integer.
 	 * @return end The end integer.
-	 * @throws IllegalArgumentException When end is not after begin.
 	 */
 	public static int[] createIntegerArray(int begin, int end) {
-		if (end <= begin) {
-			throw new IllegalArgumentException(ERROR_INVALID_ARRAY_RANGE);
-		}
-
-		int size = end - begin + 1;
+		int direction = (begin < end) ? 1 : (begin > end) ? -1 : 0;
+		int size = Math.abs(end - begin) + 1;
 		int[] array = new int[size];
 
 		for (int i = 0; i < size; i++) {
-			array[i] = begin + i;
+			array[i] = begin + (i * direction);
 		}
 
 		return array;
