@@ -301,7 +301,7 @@
 	<tag>
 		<description>
 			<![CDATA[
-				<strong>OnloadScript</strong> is an extension to <code>&lt;h:outputScript&gt;</code> which will be executed in the
+				<strong><code>o:onloadScript</code></strong> is an extension to <code>&lt;h:outputScript&gt;</code> which will be executed in the
 				end of the HTML body (thus when all HTML elements are initialized in the HTML DOM tree) and will re-execute its
 				script body on every ajax request. This is particularly useful if you want to re-execute a specific helper script
 				to manipulate the HTML DOM tree, such as (re-)adding fancy tooltips, performing highlights, etcetera, also after
@@ -354,7 +354,7 @@
 	<tag>
 		<description>
 			<![CDATA[
-				<strong>Highlight</strong> is a helper component which highlights all invalid {@link UIInput} components by adding
+				<strong><code>o:highlight</code></strong> is a helper component which highlights all invalid {@link UIInput} components by adding
 				an error style class to them. Additionally, it by default focuses the first invalid {@link UIInput} component. The
 				<code>&lt;o:highlight /&gt;</code> component can be placed anywhere in the view, as long as there's only one of it.
 				Preferably put it somewhere in the master template for forms.
@@ -441,6 +441,78 @@
 			<name>focus</name>
 			<required>false</required>
 			<type>java.lang.Boolean</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<p><strong>o:conditionalComment</strong> is an {@link UIComponent} which renders a conditional comment. Conditional 
+				comments are an IE specific feature which enables the developer to (out)comment blocks of HTML depending on whether
+				the client is using IE and if so even which version. They are often seen in combination with CSS stylesheets like so:
+				<pre>
+&lt;!--[if lte IE 7]&gt;
+  &lt;link rel="stylesheet" href="#{request.contextPath}/resources/css/ie6-ie7.css" /&gt;
+&lt;![endif]--&gt;
+				</pre>
+				<p>However, Facelets renders them HTML-escaped and if <tt>javax.faces.FACELETS_SKIP_COMMENTS</tt> context param is
+				set to <code>true</code> then it will even not be rendered at all.
+				<p>This component is designed to solve this problem.
+				<pre>
+&lt;o:conditionalComment if="lte IE 7"&gt;
+  &lt;link rel="stylesheet" href="#{request.contextPath}/resources/css/ie6-ie7.css" /&gt;
+&lt;/o:conditionalComment&gt;
+				</pre>
+				<p>Note that you cannot use this with <code>&lt;h:outputStylesheet&gt;</code> as it would implicitly be relocated as
+				direct child of <code>&lt;h:head&gt;</code>.
+			]]>
+		</description>
+		<tag-name>conditionalComment</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.output.ConditionalComment</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>if</code> condition of the conditional comment. This is exactly the value you would use 
+					in <code>&lt;!--[if ...]&gt;</code>, e.g. <code>if="lte IE 7"</code>.
+				]]>
+			</description>
+			<name>if</name>
+			<required>true</required>
+			<type>java.lang.String</type>
 		</attribute>
 	</tag>
 
@@ -1222,7 +1294,7 @@
 	<tag>
         <description>
         	<![CDATA[
-	        	<strong>o:outputLabel</strong> is a component that extends the standard outputLabel and provides extra support for
+	        	<strong><code>o:outputLabel</code></strong> is a component that extends the standard outputLabel and provides extra support for
 	 			automatically setting its value as the label of the component identified by its <code>for</code> attribute.
 	        	<p>
 	            It renders an HTML "label" element. If a "for" attribute is specified, the component specified by the value of the "for"
