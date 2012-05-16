@@ -20,14 +20,18 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
 import javax.faces.application.Application;
+import javax.faces.application.NavigationHandler;
 import javax.faces.application.ProjectStage;
 import javax.faces.component.UIViewParameter;
 import javax.faces.component.UIViewRoot;
@@ -245,6 +249,33 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns a list of all supported locales on this application, with the default locale as the first item, if any.
+	 * This will return an empty list if there are no locales definied in <tt>faces-config.xml</tt>.
+	 * @return A list of all supported locales on this application, with the default locale as the first item, if any.
+	 * @see Application#getDefaultLocale()
+	 * @see Application#getSupportedLocales()
+	 */
+	public static List<Locale> getSupportedLocales() {
+		Application application = FacesContext.getCurrentInstance().getApplication();
+		List<Locale> supportedLocales = new ArrayList<Locale>();
+		Locale defaultLocale = application.getDefaultLocale();
+
+		if (defaultLocale != null) {
+			supportedLocales.add(defaultLocale);
+		}
+
+		for (Iterator<Locale> iter = application.getSupportedLocales(); iter.hasNext();) {
+			Locale supportedLocale = iter.next();
+
+			if (!supportedLocale.equals(defaultLocale)) {
+				supportedLocales.add(supportedLocale);
+			}
+		}
+
+		return supportedLocales;
+	}
+
+	/**
 	 * Returns the view parameters of the current view, or an empty collection if there is no view.
 	 * @return The view parameters of the current view, or an empty collection if there is no view.
 	 * @see ViewMetadata#getViewParameters(UIViewRoot)
@@ -252,6 +283,17 @@ public final class Faces {
 	public static Collection<UIViewParameter> getViewParams() {
 		UIViewRoot viewRoot = getViewRoot();
 		return (viewRoot != null) ? ViewMetadata.getViewParameters(viewRoot) : Collections.<UIViewParameter>emptyList();
+	}
+
+	/**
+	 * Perform the JSF navigation to the given outcome.
+	 * @param outcome The navigation outcome.
+	 * @see Application#getNavigationHandler()
+	 * @see NavigationHandler#handleNavigation(FacesContext, String, String)
+	 */
+	public static void navigate(String outcome) {
+		FacesContext context = FacesContext.getCurrentInstance();
+		context.getApplication().getNavigationHandler().handleNavigation(context, null, outcome);
 	}
 
 	// HTTP request/response ------------------------------------------------------------------------------------------

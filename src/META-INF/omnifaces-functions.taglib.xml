@@ -106,6 +106,19 @@
 	<function>
 		<description>
 			<![CDATA[
+				Creates and an integer array which starts at the given integer and ends at the given integer, inclusive. This is
+				useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows an integer range to
+				represent days and years.
+			]]>
+		</description>
+		<function-name>createIntegerArray</function-name>
+		<function-class>org.omnifaces.el.functions.Arrays</function-class>
+		<function-signature>java.lang.int[] createIntegerArray(int, int)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
 				Returns <code>true</code> if the string representation of an item of the given array equals to the
 				string representation of the given item. This returns <code>false</code> if either the array or the
 				item is null. This is useful if you want to for example check if <code>#{paramValues.foo}</code>
@@ -200,6 +213,34 @@
 		<function-name>formatDateWithTimezone</function-name>
 		<function-class>org.omnifaces.el.functions.Dates</function-class>
 		<function-signature>java.lang.String formatDateWithTimezone(java.util.Date, java.lang.String, java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns a mapping of month names by month numbers for the current locale. For example: "January=1", "February=2",
+				etc. This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows all
+				months. The locale is obtained by Faces#getLocale(). The mapping is per locale stored in a local cache
+				to improve retrieving performance.
+			]]>
+		</description>
+		<function-name>getMonths</function-name>
+		<function-class>org.omnifaces.el.functions.Dates</function-class>
+		<function-signature>java.util.Map getMonths()</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns a mapping of short month names by month numbers for the current locale. For example: "Jan=1", "Feb=2",
+				etc. This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows all
+				short months. The locale is obtained by Faces#getLocale(). The mapping is per locale stored in a local
+				cache to improve retrieving performance.
+			]]>
+		</description>
+		<function-name>getShortMonths</function-name>
+		<function-class>org.omnifaces.el.functions.Dates</function-class>
+		<function-signature>java.util.Map getShortMonths()</function-signature>
 	</function>
 
 </facelet-taglib>

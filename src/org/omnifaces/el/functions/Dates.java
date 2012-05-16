@@ -13,8 +13,13 @@
 package org.omnifaces.el.functions;
 
 import java.text.DateFormat;
+import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 
 import org.omnifaces.util.Faces;
@@ -25,6 +30,11 @@ import org.omnifaces.util.Faces;
  * @author Bauke Scholtz
  */
 public final class Dates {
+
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final Map<Locale, Map<String, Integer>> MONTHS_CACHE = new HashMap<Locale, Map<String, Integer>>(3);
+	private static final Map<Locale, Map<String, Integer>> SHORT_MONTHS_CACHE = new HashMap<Locale, Map<String, Integer>>(3);
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -79,6 +89,60 @@ public final class Dates {
 		DateFormat formatter = new SimpleDateFormat(pattern, Faces.getLocale());
 		formatter.setTimeZone(timezone);
 		return formatter.format(date);
+	}
+
+	/**
+	 * Returns a mapping of month names by month numbers for the current locale. For example: "January=1", "February=2",
+	 * etc. This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows all
+	 * months. The locale is obtained by {@link Faces#getLocale()}. The mapping is per locale stored in a local cache
+	 * to improve retrieving performance.
+	 * @return Month names for the current locale.
+	 * @see DateFormatSymbols#getMonths()
+	 */
+	public static Map<String, Integer> getMonths() {
+		Locale locale = Faces.getLocale();
+		Map<String, Integer> months = MONTHS_CACHE.get(locale);
+
+		if (months == null) {
+			months = new LinkedHashMap<String, Integer>();
+
+			for (String month : DateFormatSymbols.getInstance(Faces.getLocale()).getMonths()) {
+				if (!month.isEmpty()) { // 13th month may or may not be empty, depending on default calendar.
+					months.put(month, months.size() + 1);
+				}
+			}
+
+			MONTHS_CACHE.put(locale, months);
+		}
+
+		return months;
+	}
+
+	/**
+	 * Returns a mapping of short month names by month numbers for the current locale. For example: "Jan=1", "Feb=2",
+	 * etc. This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows all
+	 * short months. The locale is obtained by {@link Faces#getLocale()}. The mapping is per locale stored in a local
+	 * cache to improve retrieving performance.
+	 * @return Short month names for the current locale.
+	 * @see DateFormatSymbols#getShortMonths()
+	 */
+	public static Map<String, Integer> getShortMonths() {
+		Locale locale = Faces.getLocale();
+		Map<String, Integer> shortMonths = SHORT_MONTHS_CACHE.get(locale);
+
+		if (shortMonths == null) {
+			shortMonths = new LinkedHashMap<String, Integer>();
+
+			for (String shortMonth : DateFormatSymbols.getInstance(Faces.getLocale()).getShortMonths()) {
+				if (!shortMonth.isEmpty()) { // 13th month may or may not be empty, depending on default calendar.
+					shortMonths.put(shortMonth, shortMonths.size() + 1);
+				}
+			}
+
+			SHORT_MONTHS_CACHE.put(locale, shortMonths);
+		}
+
+		return shortMonths;
 	}
 
 }
