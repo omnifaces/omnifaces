@@ -113,7 +113,12 @@ final class CombinedResource extends Resource {
 
 	@Override
 	public InputStream getInputStream() throws IOException {
-		return new CombinedResourceInputStream(info.getResources());
+		if (!info.getResources().isEmpty()) {
+			return new CombinedResourceInputStream(info.getResources());
+		}
+		else {
+			return null;
+		}
 	}
 
 	@Override

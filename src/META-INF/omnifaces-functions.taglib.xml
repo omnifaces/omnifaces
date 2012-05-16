@@ -122,19 +122,6 @@
 	<function>
 		<description>
 			<![CDATA[
-				Format the given date in the given pattern. This is useful when you want to format dates in for example
-				the <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select
-				item, or wherever you can't use the <code>&lt;f:convertDateTime&gt;</code> tag.
-			]]>
-		</description>
-		<function-name>formatDate</function-name>
-		<function-class>org.omnifaces.el.functions.Converters</function-class>
-		<function-signature>java.lang.String formatDate(java.util.Date, java.lang.String)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
 				Format the given bytes to nearest 10<sup>n</sup> with IEC binary unit (KiB, MiB, etc) with rounding
 				precision of 1 fraction. For example:
 				<ul>
@@ -184,6 +171,35 @@
 		<function-name>printStackTrace</function-name>
 		<function-class>org.omnifaces.el.functions.Converters</function-class>
 		<function-signature>java.lang.String printStackTrace(java.lang.Throwable)</function-signature>
+	</function>
+
+	<!-- Dates ==================================================================================================== -->
+
+	<function>
+		<description>
+			<![CDATA[
+				Format the given date in the given pattern and system default timezone. This is useful when you want to
+				format dates in for example the <code>title</code> attribute of an UI component, or the
+				<code>itemLabel</code> attribute of select item, or wherever you can't use the
+				<code>&lt;f:convertDateTime&gt;</code> tag.
+			]]>
+		</description>
+		<function-name>formatDate</function-name>
+		<function-class>org.omnifaces.el.functions.Dates</function-class>
+		<function-signature>java.lang.String formatDate(java.util.Date, java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Format the given date in the given pattern with given timezone. This is useful when you want to format
+				dates in for example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code>
+				attribute of select item, or wherever you can't use the <code>&lt;f:convertDateTime&gt;</code> tag.
+			]]>
+		</description>
+		<function-name>formatDateWithTimezone</function-name>
+		<function-class>org.omnifaces.el.functions.Dates</function-class>
+		<function-signature>java.lang.String formatDateWithTimezone(java.util.Date, java.lang.String, java.lang.String)</function-signature>
 	</function>
 
 </facelet-taglib>

@@ -52,7 +52,7 @@ final class CombinedResourceInputStream extends InputStream {
 		}
 
 		streamIterator = streams.iterator();
-		streamIterator.hasNext(); // We assume it to be always true; CombinedResourceInfo won't be created anyway if it's empty.
+		streamIterator.hasNext(); // We assume it to be always true, see also CombinedResource#getInputStream().
 		currentStream = streamIterator.next();
 	}
 

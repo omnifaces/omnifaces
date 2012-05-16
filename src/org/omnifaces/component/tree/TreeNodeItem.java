@@ -20,6 +20,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 
 import org.omnifaces.model.tree.TreeModel;
+import org.omnifaces.util.Callback;
 import org.omnifaces.util.Components;
 
 /**
@@ -73,17 +74,23 @@ public class TreeNodeItem extends TreeFamily {
 	 */
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" }) // For TreeModel. We don't care about its actual type anyway.
-	protected void process(FacesContext context, PhaseId phaseId) {
+	protected void process(final FacesContext context, final PhaseId phaseId) {
 		if (!isRendered() || getChildCount() == 0) {
 			return;
 		}
 
-		Tree tree = Components.getClosestParent(this, Tree.class);
+		process(context, new Callback.ReturningWithArgument<Void, Tree>() {
 
-		for (TreeModel childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
-			tree.setCurrentModelNode(context, childModelNode);
-			processSuper(context, phaseId);
-		}
+			@Override
+			public Void invoke(Tree tree) {
+				for (TreeModel childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
+					tree.setCurrentModelNode(context, childModelNode);
+					processSuper(context, phaseId);
+				}
+
+				return null;
+			}
+		});
 	}
 
 	/**
@@ -95,22 +102,48 @@ public class TreeNodeItem extends TreeFamily {
 	 */
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" }) // For TreeModel. We don't care about its actual type anyway.
-	public boolean visitTree(VisitContext context, VisitCallback callback) {
+	public boolean visitTree(final VisitContext context, final VisitCallback callback) {
 		if (!isVisitable(context) || getChildCount() == 0) {
 			return false;
 		}
 
-		Tree tree = Components.getClosestParent(this, Tree.class);
+		return process(context.getFacesContext(), new Callback.ReturningWithArgument<Boolean, Tree>() {
 
-		for (TreeModel childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
-			tree.setCurrentModelNode(context.getFacesContext(), childModelNode);
+			@Override
+			public Boolean invoke(Tree tree) {
+				for (TreeModel childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
+					tree.setCurrentModelNode(context.getFacesContext(), childModelNode);
 
-			if (super.visitTree(context, callback)) {
-				return true;
+					if (TreeNodeItem.super.visitTree(context, callback)) {
+						return true;
+					}
+				}
+
+				return false;
 			}
-		}
 
-		return false;
+		});
+	}
+
+	/**
+	 * Convenience method to handle both {@link #process(FacesContext, PhaseId)} and
+	 * {@link #visitTree(VisitContext, VisitCallback)} without code duplication.
+	 * @param context The faces context to work with.
+	 * @param phaseId The current phase ID (not used so far in this implementation).
+	 * @param callback The callback to be invoked.
+	 * @return The callback result.
+	 */
+	@SuppressWarnings("rawtypes") // For TreeModel. We don't care about its actual type anyway.
+	private <R> R process(FacesContext context, Callback.ReturningWithArgument<R, Tree> callback) {
+		Tree tree = Components.getClosestParent(this, Tree.class);
+		TreeModel originalModelNode = tree.getCurrentModelNode();
+
+		try {
+			return callback.invoke(tree);
+		}
+		finally {
+			tree.setCurrentModelNode(context, originalModelNode);
+		}
 	}
 
 }

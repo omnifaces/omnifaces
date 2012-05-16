@@ -14,9 +14,7 @@ package org.omnifaces.el.functions;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,28 +35,6 @@ public final class Converters {
 	}
 
 	// Utility --------------------------------------------------------------------------------------------------------
-
-	/**
-	 * Format the given date in the given pattern. This is useful when you want to format dates in for example the
-	 * <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select item, or
-	 * wherever you can't use the <code>&lt;f:convertDateTime&gt;</code> tag. The format locale will be set to the one
-	 * as obtained by {@link Faces#getLocale()}.
-	 * @param date The date to be formatted in the given pattern.
-	 * @param pattern The pattern to format the given date in.
-	 * @return The date which is formatted in the given pattern.
-	 * @throws NullPointerException When the pattern is <code>null</code>.
-	 */
-	public static String formatDate(Date date, String pattern) {
-		if (date == null) {
-			return null;
-		}
-
-		if (pattern == null) {
-			throw new NullPointerException("pattern");
-		}
-
-		return new SimpleDateFormat(pattern, Faces.getLocale()).format(date);
-	}
 
 	/**
 	 * Format the given bytes to nearest 10<sup>n</sup> with IEC binary unit (KiB, MiB, etc) with rounding precision of

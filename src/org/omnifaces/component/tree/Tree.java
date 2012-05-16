@@ -107,11 +107,12 @@ public class Tree extends TreeFamily implements NamingContainer {
 	@Override
 	public String getContainerClientId(FacesContext context) {
 		String containerClientId = super.getContainerClientId(context);
+		String currentModelNodeIndex = (currentModelNode != null) ? currentModelNode.getIndex() : null;
 
-		if (currentModelNode != null) {
+		if (currentModelNodeIndex != null) {
 			containerClientId = new StringBuilder(containerClientId)
 				.append(UINamingContainer.getSeparatorChar(context))
-				.append(currentModelNode.getIndex())
+				.append(currentModelNodeIndex)
 				.toString();
 		}
 

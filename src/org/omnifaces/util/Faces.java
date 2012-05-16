@@ -266,21 +266,21 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns whether the current request is a postback.
-	 * @return true for a postback, false if the request is a non-faces (non-postback) request.
-	 * @see FacesContext#isPostback()
-	 */
-	public static boolean isPostback() {
-		return FacesContext.getCurrentInstance().isPostback();
-	}
-
-	/**
 	 * Returns whether the current request is an ajax request.
 	 * @return true for a postback, false if the request is a non-faces (non-postback) request.
 	 * @see PartialViewContext#isAjaxRequest()
 	 */
 	public static boolean isAjaxRequest() {
 		return FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest();
+	}
+
+	/**
+	 * Returns whether the current request is a postback.
+	 * @return true for a postback, false if the request is a non-faces (non-postback) request.
+	 * @see FacesContext#isPostback()
+	 */
+	public static boolean isPostback() {
+		return FacesContext.getCurrentInstance().isPostback();
 	}
 
 	/**
@@ -293,15 +293,6 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the HTTP request parameter values map.
-	 * @return The HTTP request parameter values map.
-	 * @see ExternalContext#getRequestParameterValuesMap()
-	 */
-	public static Map<String, String[]> getRequestParameterValuesMap() {
-		return FacesContext.getCurrentInstance().getExternalContext().getRequestParameterValuesMap();
-	}
-
-	/**
 	 * Returns the HTTP request parameter value associated with the given name.
 	 * @param name The HTTP request parameter name.
 	 * @return The HTTP request parameter value associated with the given name.
@@ -309,6 +300,15 @@ public final class Faces {
 	 */
 	public static String getRequestParameter(String name) {
 		return FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get(name);
+	}
+
+	/**
+	 * Returns the HTTP request parameter values map.
+	 * @return The HTTP request parameter values map.
+	 * @see ExternalContext#getRequestParameterValuesMap()
+	 */
+	public static Map<String, String[]> getRequestParameterValuesMap() {
+		return FacesContext.getCurrentInstance().getExternalContext().getRequestParameterValuesMap();
 	}
 
 	/**
@@ -331,15 +331,6 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the HTTP request header values map.
-	 * @return The HTTP request header values map.
-	 * @see ExternalContext#getRequestHeaderValuesMap()
-	 */
-	public static Map<String, String[]> getRequestHeaderValuesMap() {
-		return FacesContext.getCurrentInstance().getExternalContext().getRequestHeaderValuesMap();
-	}
-
-	/**
 	 * Returns the HTTP request header value associated with the given name.
 	 * @param name The HTTP request header name.
 	 * @return The HTTP request header value associated with the given name.
@@ -347,6 +338,15 @@ public final class Faces {
 	 */
 	public static String getRequestHeader(String name) {
 		return FacesContext.getCurrentInstance().getExternalContext().getRequestHeaderMap().get(name);
+	}
+
+	/**
+	 * Returns the HTTP request header values map.
+	 * @return The HTTP request header values map.
+	 * @see ExternalContext#getRequestHeaderValuesMap()
+	 */
+	public static Map<String, String[]> getRequestHeaderValuesMap() {
+		return FacesContext.getCurrentInstance().getExternalContext().getRequestHeaderValuesMap();
 	}
 
 	/**
@@ -415,8 +415,9 @@ public final class Faces {
 	}
 
 	/**
-	 * Redirects the current response to the given URL. If the given URL does not start with <tt>http</tt> or
-	 * <tt>/</tt>, then the request context path will be prepended, otherwise it will be the unmodified redirect URL.
+	 * Redirects the current response to the given URL. If the given URL does not start with <tt>http://</tt>,
+	 * <tt>https://</tt> or <tt>/</tt>, then the request context path will be prepended, otherwise it will be the
+	 * unmodified redirect URL.
 	 * @param url The URL to redirect the current response to.
 	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
 	 * redeclare it in the action method. The servletcontainer will handle it.
@@ -425,7 +426,7 @@ public final class Faces {
 	public static void redirect(String url) throws IOException {
 		ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
 
-		if (!url.startsWith("http") && !url.startsWith("/")) {
+		if (!url.startsWith("http://") && !url.startsWith("https://") && !url.startsWith("/")) {
 			url = externalContext.getRequestContextPath() + "/" + url;
 		}
 
@@ -517,8 +518,8 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the HTTP session and creates one if one doesn't exist and boolean create is true, otherwise don't create
-	 * one and return null.
+	 * Returns the HTTP session and creates one if one doesn't exist and <code>create</code> argument is
+	 * <code>true</code>, otherwise don't create one and return <code>null</code>.
 	 * @return The HTTP session.
 	 * @see ExternalContext#getSession(boolean)
 	 */
@@ -548,7 +549,7 @@ public final class Faces {
 	/**
 	 * Returns the mime type for the given file name. The mime type is determined based on file extension and
 	 * configureable by <code>&lt;mime-mapping&gt;</code> entries in <tt>web.xml</tt>. When the mime type is unknown,
-	 * then a default of <tt>application/octet-stream</tt> will be returned.
+	 * then a default of {@value #DEFAULT_MIME_TYPE} will be returned.
 	 * @param name The file name to return the mime type for.
 	 * @return The mime type for the given file name.
 	 * @see ExternalContext#getMimeType(String)
