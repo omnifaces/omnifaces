@@ -623,7 +623,6 @@ public final class Faces {
 	 * @return A set of available application resource paths matching the specified path.
 	 * @see ServletContext#getResourcePaths(String)
 	 */
-	@SuppressWarnings("unchecked")
 	public static Set<String> getResourcePaths(String path) {
 		return getServletContext().getResourcePaths(path);
 	}
