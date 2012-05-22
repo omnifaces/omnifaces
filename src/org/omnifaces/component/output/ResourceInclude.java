@@ -95,65 +95,66 @@ public class ResourceInclude extends UIComponentBase {
 	 * This HTTP servlet response implementation buffers the entire response body. The buffered response body is as a
 	 * byte array available by {@link #getBuffer()} method. The response writer will use the same character encoding
 	 * as is been set on the response supplied to the constructor. Note that this way any setCharacterEncoding() calls
-	 * on the included JSP/Servlet resourse have thus no effect.
-	 *
+	 * on the included JSP/Servlet resource have thus no effect.
 	 * @author Bauke Scholtz
 	 */
 	static class BufferedHttpServletResponse extends HttpServletResponseWrapper {
 
-	    private final ByteArrayOutputStream buffer;
-	    private PrintWriter writer;
-	    private ServletOutputStream output;
+		private final ByteArrayOutputStream buffer;
+		private PrintWriter writer;
+		private ServletOutputStream output;
 
-	    public BufferedHttpServletResponse(HttpServletResponse response) {
-	        super(response);
-	        buffer = new ByteArrayOutputStream(response.getBufferSize());
-	    }
+		public BufferedHttpServletResponse(HttpServletResponse response) {
+			super(response);
+			buffer = new ByteArrayOutputStream(response.getBufferSize());
+		}
 
-	    @Override
-	    public ServletOutputStream getOutputStream() throws IOException {
-	        if (writer != null) {
-	            throw new IllegalStateException("getWriter() has already been called on this response.");
-	        }
+		@Override
+		public ServletOutputStream getOutputStream() throws IOException {
+			if (writer != null) {
+				throw new IllegalStateException("getWriter() has already been called on this response.");
+			}
 
-	        if (output == null) {
-	        	output = new ServletOutputStream() {
+			if (output == null) {
+				output = new ServletOutputStream() {
+
 					@Override
 					public void write(int b) throws IOException {
 						buffer.write(b);
 					}
 				};
-	        }
+			}
 
-	        return output;
-	    }
+			return output;
+		}
 
-	    @Override
-	    public PrintWriter getWriter() throws IOException {
-	        if (output != null) {
-	            throw new IllegalStateException("getOutputStream() has already been called on this response.");
-	        }
+		@Override
+		public PrintWriter getWriter() throws IOException {
+			if (output != null) {
+				throw new IllegalStateException("getOutputStream() has already been called on this response.");
+			}
 
-	        if (writer == null) {
-	            writer = new PrintWriter(new OutputStreamWriter(buffer, getResponse().getCharacterEncoding()), true);
-	        }
+			if (writer == null) {
+				writer = new PrintWriter(new OutputStreamWriter(buffer, getResponse().getCharacterEncoding()), true);
+			}
 
-	        return writer;
-	    }
+			return writer;
+		}
 
-	    @Override
-	    public void flushBuffer() throws IOException {
-	        if (writer != null) {
-	            writer.flush();
-	        } else if (output != null) {
-	            output.flush();
-	        }
-	    }
+		@Override
+		public void flushBuffer() throws IOException {
+			if (writer != null) {
+				writer.flush();
+			}
+			else if (output != null) {
+				output.flush();
+			}
+		}
 
-	    public byte[] getBuffer() throws IOException {
-	    	flushBuffer();
-            return buffer.toByteArray();
-	    }
+		public byte[] getBuffer() throws IOException {
+			flushBuffer();
+			return buffer.toByteArray();
+		}
 
 	}
 
