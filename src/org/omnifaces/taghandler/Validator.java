@@ -97,7 +97,7 @@ public class Validator extends TagHandler {
 	 * @see Application#createValidator(String)
 	 */
 	private javax.faces.validator.Validator createValidator(FaceletContext context) {
-		ValueExpression binding = getValueExpression(context, "binding", Validator.class);
+		ValueExpression binding = getValueExpression(context, "binding", javax.faces.validator.Validator.class);
 		ValueExpression validatorId = getValueExpression(context, "validatorId", String.class);
 		javax.faces.validator.Validator validator = null;
 
