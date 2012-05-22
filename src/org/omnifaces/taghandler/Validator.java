@@ -58,9 +58,10 @@ public class Validator extends TagHandler {
 	/**
 	 * If the parent component is new, then create the <code>Validator</code> based on the <code>binding</code> and/or
 	 * <code>validatorId</code> attributes as per the standard JSF <code>&lt;f:validator&gt;</code> implementation and
-	 * add it to the parent input component as an anonymous {@link Validator} implementation which wraps the created
-	 * <code>Validator</code> and invokes its {@link Validator#validate(FacesContext, UIComponent, Object)} only and
-	 * only if the <code>disabled</code> attribute evaluates <code>true</code> for the current request.
+	 * add it to the parent input component as an anonymous {@link javax.faces.validator.Validator} implementation
+	 * which wraps the created <code>Validator</code> and invokes its
+	 * {@link Validator#validate(FacesContext, UIComponent, Object)} only and only if the <code>disabled</code>
+	 * attribute evaluates <code>true</code> for the current request.
 	 * @param context The involved facelet context.
 	 * @param parent The parent component to attach the validator on.
 	 * @throws IOException If something fails at I/O level.
@@ -86,14 +87,15 @@ public class Validator extends TagHandler {
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
-    /**
-     * Create the {@link Validator} based on the <code>binding</code> and/or <code>validatorId</code> attribute.
+	/**
+	 * Create the {@link javax.faces.validator.Validator} based on the <code>binding</code> and/or
+	 * <code>validatorId</code> attribute.
 	 * @param context The involved facelet context.
-     * @return The created {@link Validator}.
-     * @throws IllegalArgumentException If the <code>validatorId</code> attribute is invalid or missing while the
-     * <code>binding</code> attribute is also missing.
-     * @see Application#createValidator(String)
-     */
+	 * @return The created {@link javax.faces.validator.Validator}.
+	 * @throws IllegalArgumentException If the <code>validatorId</code> attribute is invalid or missing while the
+	 * <code>binding</code> attribute is also missing.
+	 * @see Application#createValidator(String)
+	 */
 	private javax.faces.validator.Validator createValidator(FaceletContext context) {
 		ValueExpression binding = getValueExpression(context, "binding", Validator.class);
 		ValueExpression validatorId = getValueExpression(context, "validatorId", String.class);
@@ -123,14 +125,14 @@ public class Validator extends TagHandler {
 		return validator;
 	}
 
-    /**
-     * Convenience method to get the given attribute as a {@link ValueExpression}, or <code>null</code> if there is no
-     * such attribute.
+	/**
+	 * Convenience method to get the given attribute as a {@link ValueExpression}, or <code>null</code> if there is no
+	 * such attribute.
 	 * @param context The involved facelet context.
-     * @param name The attribute name to return the value expression for.
-     * @param type The type of the value expression.
-     * @return The given attribute as a {@link ValueExpression}.
-     */
+	 * @param name The attribute name to return the value expression for.
+	 * @param type The type of the value expression.
+	 * @return The given attribute as a {@link ValueExpression}.
+	 */
 	private <T> ValueExpression getValueExpression(FaceletContext context, String name, Class<T> type) {
 		TagAttribute attribute = getAttribute(name);
 		return (attribute != null) ? attribute.getValueExpression(context, type) : null;
