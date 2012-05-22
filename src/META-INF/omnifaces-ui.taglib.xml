@@ -1030,7 +1030,47 @@
 		</attribute>
 	</tag>
 	
-
+	<tag>
+		<description>
+			<![CDATA[
+				The <code>&lt;o:validator&gt;</code> basically extends the <code>&lt;f:validator&gt;</code> with the possibility to
+				evaluate the value expression in the <code>disabled</code> attribute on a per request basis instead of on a per view
+				build time basis. This allows the developer to change the <code>disabled</code> attribute on a per request basis.
+			]]>
+		</description>
+		<tag-name>validator</tag-name>
+		<handler-class>org.omnifaces.taghandler.Validator</handler-class>
+		<attribute>
+			<description>
+				<![CDATA[
+					A ValueExpression that evaluates to an object that implements the javax.faces.validator.Validator 
+					interface.
+				]]>
+			</description>
+			<name>binding</name>
+			<type>javax.faces.validator.Validator</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Validator identifier of the <code>Validator</code> to be created and registered.
+				]]>
+			</description>
+			<name>validatorId</name>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					A boolean value enabling request based determination of whether or not this validator is enabled on
+					the enclosing component.
+				]]>
+			</description>
+			<name>disabled</name>
+			<type>java.lang.Boolean</type>
+		</attribute>
+	</tag>
+	
 	<tag>
 		<description>
 				<![CDATA[
