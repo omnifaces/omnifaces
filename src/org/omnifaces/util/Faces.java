@@ -476,6 +476,25 @@ public final class Faces {
 	}
 
 	/**
+	 * Sends a HTTP response error with the given status and message. This will end up in either a custom
+	 * <code>&lt;error-page&gt;</code> whose <code>&lt;error-code&gt;</code> matches the given status, or in a servlet
+	 * container specific default error page if there is none. The message will be available in the error page as a
+	 * request attribute with name <tt>javax.servlet.error.message</tt>. The {@link FacesContext#responseComplete()}
+	 * will implicitly be called after sending the error.
+	 * @param status The HTTP response status which is supposed to be in the range 4nn-5nn. You can use the constant
+	 * field values of {@link HttpServletResponse} for this.
+	 * @param message The message which is supposed to be available in the error page.
+	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
+	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @see ExternalContext#responseSendError(int, String)
+	 */
+	public static void responseSendError(int status, String message) throws IOException {
+		FacesContext facesContext = FacesContext.getCurrentInstance();
+		facesContext.getExternalContext().responseSendError(status, message);
+		facesContext.responseComplete();
+	}
+
+	/**
 	 * Add a header with given name and value to the HTTP response.
 	 * @param name The header name.
 	 * @param value The header value.
