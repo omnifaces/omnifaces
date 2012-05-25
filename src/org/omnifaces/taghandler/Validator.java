@@ -23,23 +23,33 @@ import javax.faces.context.FacesContext;
 import javax.faces.validator.ValidatorException;
 import javax.faces.view.facelets.ComponentHandler;
 import javax.faces.view.facelets.FaceletContext;
-import javax.faces.view.facelets.TagAttribute;
 import javax.faces.view.facelets.TagConfig;
-import javax.faces.view.facelets.TagHandler;
 
 /**
- * The <code>&lt;o:validator&gt;</code> basically extends the <code>&lt;f:validator&gt;</code> with the possibility to
- * evaluate the value expression in the <code>disabled</code> attribute on a per request basis instead of on a per view
- * build time basis. This allows the developer to change the <code>disabled</code> attribute on a per request basis.
+ * The <code>&lt;o:validator&gt;</code> basically extends the <code>&lt;f:validator&gt;</code> tag family with the
+ * possibility to evaluate the value expression in all attributes on a per request basis instead of on a per view
+ * build time basis. This allows the developer to change the attributes on a per request basis, such as the
+ * <code>disabled</code> attribute.
+ * <pre>
+ * &lt;o:validator validatorId="someValidatorId" disabled="#{param.disableValidation}" /&gt;
+ * </pre>
+ * <p>
+ * When you specify for example the standard <code>&lt;f:validateLongRange&gt;</code> by
+ * <code>validatorId="javax.faces.LongRange"</code>, then you'll be able to use all its attributes such as
+ * <code>minimum</code> and <code>maximum</code> as per its documentation, but then with the possibility to supply
+ * request based value expressions.
+ * <pre>
+ * &lt;o:validator validatorId="javax.faces.LongRange" minimum="#{item.minimum}" maximum="#{item.maximum}" /&gt;
+ * </pre>
  *
  * @author Bauke Scholtz
  */
-public class Validator extends TagHandler {
+public class Validator extends RenderTimeTagHandler {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
 	private static final String ERROR_MISSING_VALIDATORID =
-		"o:validator attribute 'validatorId' must be specified.";
+		"o:validator attribute 'validatorId' or 'binding' must be specified.";
 	private static final String ERROR_INVALID_VALIDATORID =
 		"o:validator attribute 'validatorId' must refer an valid validator ID. The validator ID '%s' cannot be found.";
 
@@ -56,14 +66,14 @@ public class Validator extends TagHandler {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * If the parent component is new, then create the <code>Validator</code> based on the <code>binding</code> and/or
-	 * <code>validatorId</code> attributes as per the standard JSF <code>&lt;f:validator&gt;</code> implementation and
-	 * add it to the parent input component as an anonymous {@link javax.faces.validator.Validator} implementation
-	 * which wraps the created <code>Validator</code> and invokes its
-	 * {@link Validator#validate(FacesContext, UIComponent, Object)} only and only if the <code>disabled</code>
-	 * attribute evaluates <code>true</code> for the current request.
+	 * If the parent component is new, then create the {@link javax.faces.validator.Validator} based on the
+	 * <code>binding</code> and/or <code>validatorId</code> attributes as per the standard JSF
+	 * <code>&lt;f:validator&gt;</code> implementation and collect the render time attributes. Then create an anonymous
+	 * <code>Validator</code> implementation which wraps the created <code>Validator</code> and delegates the methods
+	 * to it after setting the render time attributes only and only if the <code>disabled</code> attribute evaluates
+	 * <code>true</code> for the current request. Finally set the anonymous implementation on the parent component.
 	 * @param context The involved facelet context.
-	 * @param parent The parent component to attach the validator on.
+	 * @param parent The parent component to add the <code>Validator</code> to.
 	 * @throws IOException If something fails at I/O level.
 	 */
 	@Override
@@ -73,12 +83,14 @@ public class Validator extends TagHandler {
 		}
 
 		final javax.faces.validator.Validator validator = createValidator(context);
+		final RenderTimeAttributes attributes = collectRenderTimeAttributes(context, validator);
 		final ValueExpression disabled = getValueExpression(context, "disabled", Boolean.class);
 		((EditableValueHolder) parent).addValidator(new javax.faces.validator.Validator() {
 
 			@Override
 			public void validate(FacesContext context, UIComponent component, Object value) throws ValidatorException {
 				if (disabled == null || Boolean.FALSE.equals(disabled.getValue(context.getELContext()))) {
+					attributes.invokeSetters(context.getELContext(), validator);
 					validator.validate(context, component, value);
 				}
 			}
@@ -88,10 +100,9 @@ public class Validator extends TagHandler {
 	// Helpers --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Create the {@link javax.faces.validator.Validator} based on the <code>binding</code> and/or
-	 * <code>validatorId</code> attribute.
+	 * Create the validator based on the <code>binding</code> and/or <code>validatorId</code> attribute.
 	 * @param context The involved facelet context.
-	 * @return The created {@link javax.faces.validator.Validator}.
+	 * @return The created validator.
 	 * @throws IllegalArgumentException If the <code>validatorId</code> attribute is invalid or missing while the
 	 * <code>binding</code> attribute is also missing.
 	 * @see Application#createValidator(String)
@@ -123,19 +134,6 @@ public class Validator extends TagHandler {
 		}
 
 		return validator;
-	}
-
-	/**
-	 * Convenience method to get the given attribute as a {@link ValueExpression}, or <code>null</code> if there is no
-	 * such attribute.
-	 * @param context The involved facelet context.
-	 * @param name The attribute name to return the value expression for.
-	 * @param type The type of the value expression.
-	 * @return The given attribute as a {@link ValueExpression}.
-	 */
-	private <T> ValueExpression getValueExpression(FaceletContext context, String name, Class<T> type) {
-		TagAttribute attribute = getAttribute(name);
-		return (attribute != null) ? attribute.getValueExpression(context, type) : null;
 	}
 
 }

@@ -1033,9 +1033,21 @@
 	<tag>
 		<description>
 			<![CDATA[
-				The <code>&lt;o:validator&gt;</code> basically extends the <code>&lt;f:validator&gt;</code> with the possibility to
-				evaluate the value expression in the <code>disabled</code> attribute on a per request basis instead of on a per view
-				build time basis. This allows the developer to change the <code>disabled</code> attribute on a per request basis.
+				The <code>&lt;o:validator&gt;</code> basically extends the <code>&lt;f:validator&gt;</code> tag family with the
+				possibility to evaluate the value expression in all attributes on a per request basis instead of on a per view
+				build time basis. This allows the developer to change the attributes on a per request basis, such as the
+				<code>disabled</code> attribute.
+				<pre>
+&lt;o:validator validatorId="someValidatorId" disabled="#{param.disableValidation}" /&gt;
+				</pre>
+				<p>Note that not all available attributes are listed. This depends on the validator you're specifying.
+				When you specify for example the standard <code>&lt;f:validateLongRange&gt;</code> by
+				<code>validatorId="javax.faces.LongRange"</code>, then you'll be able to use all its attributes such as
+				<code>minimum</code> and <code>maximum</code> as per its documentation, but then with the possibility to supply
+				request based value expressions.
+				<pre>
+&lt;o:validator validatorId="javax.faces.LongRange" minimum="#{item.minimum}" maximum="#{item.maximum}" /&gt;
+				</pre>
 			]]>
 		</description>
 		<tag-name>validator</tag-name>
@@ -1068,6 +1080,45 @@
 			</description>
 			<name>disabled</name>
 			<type>java.lang.Boolean</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				The <code>&lt;o:converter&gt;</code> basically extends the <code>&lt;f:converter&gt;</code> tag family with the
+				possibility to evaluate the value expression in all attributes on a per request basis instead of on a per view
+				build time basis. This allows the developer to change the attributes on a per request basis.
+				<p>
+				When you specify for example the standard <code>&lt;f:convertDateTime&gt;</code> by
+				<code>converterId="javax.faces.DateTime"</code>, then you'll be able to use all its attribuces such as
+				<code>pattern</code> and <code>locale</code> as per its documentation, but then with the possibility to supply
+				request based value expressions.
+				<pre>
+&lt;o:converter converterId="javax.faces.DateTime" pattern="#{item.pattern}" locale="#{item.locale}" /&gt;
+				</pre>
+			]]>
+		</description>
+		<tag-name>converter</tag-name>
+		<handler-class>org.omnifaces.taghandler.Converter</handler-class>
+		<attribute>
+			<description>
+				<![CDATA[
+					A ValueExpression that evaluates to an object that implements the javax.faces.convert.Converter 
+					interface.
+				]]>
+			</description>
+			<name>binding</name>
+			<type>javax.faces.convert.Converter</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Converter identifier of the <code>Converter</code> to be created and registered.
+				]]>
+			</description>
+			<name>converterId</name>
+			<type>java.lang.String</type>
 		</attribute>
 	</tag>
 	
