@@ -12,7 +12,6 @@
  */
 package org.omnifaces.taghandler;
 
-import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
@@ -72,19 +71,14 @@ abstract class RenderTimeTagHandler extends TagHandler {
 				}
 
 				if (valueExpression.isLiteralText()) {
-					try {
-						setter.invoke(object, valueExpression.getValue(context));
-					}
-					catch (Exception e) {
-						throw new FacesException(e);
-					}
+					setter.invoke(object, valueExpression.getValue(context));
 				}
 				else {
 					attributes.add(setter, valueExpression);
 				}
 			}
 		}
-		catch (IntrospectionException e) {
+		catch (Exception e) {
 			throw new FacesException(e);
 		}
 
