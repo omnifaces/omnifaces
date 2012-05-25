@@ -217,12 +217,13 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the locale associated with the current view. If the locale set in the JSF view root is not null, then
-	 * return it. Else if the client preferred locale is not null, then return it. Else return the system default
-	 * locale.
-	 * @return The locale associated with the current view.
+	 * Returns the current locale. If the locale set in the JSF view root is not null, then return it. Else if the
+	 * client preferred locale is not null and is among supported locales, then return it. Else if the JSF default
+	 * locale is not null, then return it. Else return the system default locale.
+	 * @return The current locale.
 	 * @see UIViewRoot#getLocale()
 	 * @see ExternalContext#getRequestLocale()
+	 * @see Application#getDefaultLocale()
 	 * @see Locale#getDefault()
 	 */
 	public static Locale getLocale() {
@@ -237,7 +238,16 @@ public final class Faces {
 
 		// Then the client preferred locale.
 		if (locale == null) {
-			locale = facesContext.getExternalContext().getRequestLocale();
+			Locale clientLocale = facesContext.getExternalContext().getRequestLocale();
+
+			if (getSupportedLocales().contains(clientLocale)) {
+				locale = clientLocale;
+			}
+		}
+
+		// Then the JSF default locale.
+		if (locale == null) {
+			locale = facesContext.getApplication().getDefaultLocale();
 		}
 
 		// Finally the system default locale.
@@ -457,7 +467,7 @@ public final class Faces {
 	}
 
 	/**
-	 * Redirects the current response to the given URL. If the given URL does not start with <tt>http://</tt>,
+	 * Sends a temporary (302) redirect to the given URL. If the given URL does not start with <tt>http://</tt>,
 	 * <tt>https://</tt> or <tt>/</tt>, then the request context path will be prepended, otherwise it will be the
 	 * unmodified redirect URL.
 	 * @param url The URL to redirect the current response to.
@@ -466,13 +476,38 @@ public final class Faces {
 	 * @see ExternalContext#redirect(String)
 	 */
 	public static void redirect(String url) throws IOException {
-		ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+		FacesContext.getCurrentInstance().getExternalContext().redirect(normalizeRedirectURL(url));
+	}
 
+	/**
+	 * Sends a permanent (301) redirect to the given URL. If the given URL does not start with <tt>http://</tt>,
+	 * <tt>https://</tt> or <tt>/</tt>, then the request context path will be prepended, otherwise it will be the
+	 * unmodified redirect URL.
+	 * @param url The URL to redirect the current response to.
+	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
+	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @see ExternalContext#setResponseStatus(int)
+	 * @see ExternalContext#setResponseHeader(String, String)
+	 */
+	public static void redirectPermanent(String url) throws IOException {
+		FacesContext facesContext = FacesContext.getCurrentInstance();
+		ExternalContext externalContext = facesContext.getExternalContext();
+		externalContext.setResponseStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+		externalContext.setResponseHeader("Location", normalizeRedirectURL(url));
+		facesContext.responseComplete();
+	}
+
+	/**
+	 * Helper method to normalize the given URL for a redirect. If the given URL does not start with <tt>http://</tt>,
+	 * <tt>https://</tt> or <tt>/</tt>, then the request context path will be prepended, otherwise it will be
+	 * unmodified.
+	 */
+	private static String normalizeRedirectURL(String url) {
 		if (!url.startsWith("http://") && !url.startsWith("https://") && !url.startsWith("/")) {
-			url = externalContext.getRequestContextPath() + "/" + url;
+			url = getRequestContextPath() + "/" + url;
 		}
 
-		externalContext.redirect(url);
+		return url;
 	}
 
 	/**
