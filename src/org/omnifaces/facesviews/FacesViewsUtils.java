@@ -43,7 +43,7 @@ public final class FacesViewsUtils {
     /**
      * Gets the JSF Application instance.
      *
-     * @return
+     * @return The JSF Application instance.
      */
     public static Application getApplication() {
         return ((ApplicationFactory) FactoryFinder.getFactory(APPLICATION_FACTORY)).getApplication();
@@ -178,7 +178,7 @@ public final class FacesViewsUtils {
      *
      * @param servletContext
      * @param resourcePaths
-     * @return
+     * @return views
      */
     public static Map<String, String> scanViews(ServletContext servletContext, Set<String> resourcePaths) {
         Map<String, String> collectedViews = new HashMap<String, String>();
