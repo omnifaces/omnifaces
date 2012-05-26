@@ -11,7 +11,7 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.omnifaces.resourcehandler.facesviews;
+package org.omnifaces.facesviews;
 
 import java.net.URL;
 import java.util.Map;
@@ -23,7 +23,7 @@ import org.omnifaces.util.Faces;
 /**
  * Facelets resource resolver that resolves mapped resources (views) to the special auto-scanned
  * faces-views folder.
- * 
+ *
  * @author Arjan Tijms
  *
  */
@@ -39,14 +39,14 @@ public class FacesViewsResolver extends ResourceResolver {
 
     @Override
     public URL resolveUrl(String path) {
-        
+
         String facesViewsPath = path;
-        
+
         Map<String, String> mappedResources = Faces.getApplicationAttribute(FacesViewsResolver.FACES_VIEWS_RESOURCES_PARAM_NAME);
         if (mappedResources != null && mappedResources.containsKey(path)) {
             facesViewsPath = mappedResources.get(path);
         }
-        
+
         return resourceResolver.resolveUrl(facesViewsPath);
     }
 

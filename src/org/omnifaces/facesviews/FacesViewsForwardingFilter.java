@@ -11,15 +11,11 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.omnifaces.resourcehandler.facesviews;
+package org.omnifaces.facesviews;
 
-import static java.util.Collections.unmodifiableMap;
-import static org.omnifaces.resourcehandler.facesviews.FacesViewsResolver.FACES_VIEWS_RESOURCES_PARAM_NAME;
-import static org.omnifaces.resourcehandler.facesviews.FacesViewsUtils.WEB_INF_VIEWS;
-import static org.omnifaces.resourcehandler.facesviews.FacesViewsUtils.getApplication;
-import static org.omnifaces.resourcehandler.facesviews.FacesViewsUtils.getApplicationAttribute;
-import static org.omnifaces.resourcehandler.facesviews.FacesViewsUtils.isExtensionless;
-import static org.omnifaces.resourcehandler.facesviews.FacesViewsUtils.scanViews;
+import static java.util.Collections.*;
+import static org.omnifaces.facesviews.FacesViewsResolver.*;
+import static org.omnifaces.facesviews.FacesViewsUtils.*;
 
 import java.io.IOException;
 import java.util.Map;
@@ -41,42 +37,42 @@ import org.omnifaces.filter.HttpFilter;
  * <p>
  * A filter like this is needed for extentionless requests, since the FacesServlet in at least JSF 2.1 and before
  * does not take into account any other mapping than prefix- and extension (suffix) mapping.
- * 
+ *
  * @author Arjan Tijms
  *
  */
 public class FacesViewsForwardingFilter extends HttpFilter {
-    
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-        
+
         // Mostly for pre-Servlet 3.0: scan the views if the auto-configure listener hasn't done this yet.
         tryScanAndStoreViews(filterConfig.getServletContext());
-        
+
         // Register a view handler that transforms a view id with extension back to an extensionless one.
-        
+
         // Note that Filter#init is used here, since it loads after the ServletContextListener that initializes JSF itself,
         // and thus guarantees the {@link Application} instance needed for installing the FacesViewHandler is available.
-        
-        Application application = getApplication();        
+
+        Application application = getApplication();
         application.setViewHandler(new FacesViewsViewHandler(application.getViewHandler()));
     }
 
     @Override
     public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException,
             IOException {
-        
+
         ServletContext context = request.getServletContext();
         Map<String, String> resources = getApplicationAttribute(context, FACES_VIEWS_RESOURCES_PARAM_NAME);
 
         String resource = request.getServletPath();
         if (isExtensionless(resource) && resources.containsKey(resource)) {
-            
+
             // Forward the resource (view) using its original extension, on which the Facelets Servlet
             // is mapped. Technically it matters most that the Facelets Servlet picks up the
             // request, and the exact extension of even prefix is perhaps less relevant.
             String forwardURI = resource + FacesViewsUtils.getExtension(resources.get(resource));
-            
+
             // Get the request dispatcher
             RequestDispatcher requestDispatcher = context.getRequestDispatcher(forwardURI);
             if (requestDispatcher != null) {
@@ -85,11 +81,11 @@ public class FacesViewsForwardingFilter extends HttpFilter {
                 return;
             }
         }
-        
+
         chain.doFilter(request, response);
 
     }
-    
+
     private void tryScanAndStoreViews(ServletContext context) {
         if (getApplicationAttribute(context, FACES_VIEWS_RESOURCES_PARAM_NAME) == null) {
             Map<String, String> views = scanViews(context, context.getResourcePaths(WEB_INF_VIEWS));
@@ -97,7 +93,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
                 context.setAttribute(FACES_VIEWS_RESOURCES_PARAM_NAME, unmodifiableMap(views));
             }
         }
-        
+
     }
 
 }

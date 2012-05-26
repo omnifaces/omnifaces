@@ -11,10 +11,10 @@
  * specific language governing permissions and limitations under the License.
  */
 
-package org.omnifaces.resourcehandler.facesviews;
+package org.omnifaces.facesviews;
 
-import static javax.faces.FactoryFinder.APPLICATION_FACTORY;
-import static org.omnifaces.util.Utils.isEmpty;
+import static javax.faces.FactoryFinder.*;
+import static org.omnifaces.util.Utils.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,38 +30,38 @@ import javax.servlet.ServletRegistration;
 
 /**
  * Collection of utilities for working with auto-scanned- and extensionless views.
- * 
+ *
  * @author Arjan Tijms
  *
  */
 public final class FacesViewsUtils {
-    
+
     private FacesViewsUtils() {}
-    
+
     public static final String WEB_INF_VIEWS = "/WEB-INF/faces-views/";
-    
+
     /**
      * Gets the JSF Application instance.
-     * 
+     *
      * @return
      */
     public static Application getApplication() {
         return ((ApplicationFactory) FactoryFinder.getFactory(APPLICATION_FACTORY)).getApplication();
     }
-    
+
     /**
      * Checks if the given resource path obtained from {@link ServletContext#getResourcePaths(String)} represents a directory.
-     * 
+     *
      * @param resourcePath the resource path to check
      * @return true if the resource path represents a directory, false otherwise
      */
     public static boolean isDirectory(final String resourcePath) {
         return resourcePath.endsWith("/");
     }
-    
+
     /**
      * Strips the special 'faces-views' prefix path from the resource if any.
-     * 
+     *
      * @param resource
      * @return the resource without the special prefix path, or as-is if it didn't start with this prefix.
      */
@@ -70,15 +70,15 @@ public final class FacesViewsUtils {
         if (normalizedResource.startsWith(WEB_INF_VIEWS)) {
             normalizedResource = normalizedResource.substring(WEB_INF_VIEWS.length() - 1);
         }
-        
+
         return normalizedResource;
     }
-    
+
     /**
      * Strips the extension from a resource if any. This extension is defined as
      * everything after the last occurrence of a period, including the period itself.
      * E.g. input "index.xhtml" will return "index".
-     * 
+     *
      * @param resource
      * @return the resource without its extension, of as-is if it doesn't have an extension.
      */
@@ -88,16 +88,16 @@ public final class FacesViewsUtils {
         if (lastPeriod != -1) {
             normalizedResource = resource.substring(0, lastPeriod);
         }
-        
+
         return normalizedResource;
     }
-    
+
     /**
      * Gets the extension of a resource if any. This extension is defined as
      * everything after the last occurrence of a period, including the period itself.
      * E.g. input "index.xhtml" will return ".xhtml'.
-     * 
-     * 
+     *
+     *
      * @param resource
      * @return the extension of the resource, or null if it doesn't have an extension.
      */
@@ -107,30 +107,30 @@ public final class FacesViewsUtils {
         if (lastPeriod != -1) {
             extension = resource.substring(lastPeriod);
         }
-        
+
         return extension;
     }
-    
+
     public static boolean isExtensionless(final String viewId) {
         return viewId != null && !viewId.contains(".");
     }
-    
-    
+
+
     @SuppressWarnings("unchecked")
     public static <T> T getApplicationAttribute(final FacesContext context, final String name) {
         return (T) context.getExternalContext().getApplicationMap().get(name);
     }
-    
+
     @SuppressWarnings("unchecked")
     public static <T> T getApplicationAttribute(final ServletContext context, final String name) {
         return (T) context.getAttribute(name);
     }
-    
+
     @SuppressWarnings("unchecked")
     public static <T> T getRequestAttribute(final FacesContext context, final String name) {
         return (T) context.getExternalContext().getRequestMap().get(name);
     }
-    
+
     /**
      * Gets the ServletRegistration associated with the FacesServlet.
      * @param servletContext the context to get the ServletRegistration from.
@@ -144,20 +144,20 @@ public final class FacesViewsUtils {
                 break;
             }
         }
-        
+
         return facesServletRegistration;
     }
-    
+
     /**
      * Scans resources (views) recursively starting with the given resource paths, and collects those and all unique extensions
      * encountered in a flat map respectively set.
-     * 
+     *
      * @param servletContext
      * @param resourcePaths
      * @param collectedViews
      * @param collectedExtentions
      */
-    public static void scanViews(ServletContext servletContext, Set<String> resourcePaths, Map<String, String> collectedViews, Set<String> collectedExtentions) {        
+    public static void scanViews(ServletContext servletContext, Set<String> resourcePaths, Map<String, String> collectedViews, Set<String> collectedExtentions) {
         if (!isEmpty(resourcePaths)) {
             for (String resourcePath : resourcePaths) {
                 if (isDirectory(resourcePath)) {
@@ -171,11 +171,11 @@ public final class FacesViewsUtils {
             }
         }
     }
-    
+
     /**
      * Scans resources (views) recursively starting with the given resource paths and returns a flat map containing all resources
      * encountered.
-     * 
+     *
      * @param servletContext
      * @param resourcePaths
      * @return
@@ -185,15 +185,15 @@ public final class FacesViewsUtils {
         scanViews(servletContext, resourcePaths, collectedViews);
         return collectedViews;
     }
-    
+
     /**
      * Scans resources (views) recursively starting with the given resource paths, and collects those in a flat map.
-     * 
+     *
      * @param servletContext
      * @param resourcePaths
      * @param collectedViews
      */
-    public static void scanViews(ServletContext servletContext, Set<String> resourcePaths, Map<String, String> collectedViews) {        
+    public static void scanViews(ServletContext servletContext, Set<String> resourcePaths, Map<String, String> collectedViews) {
         if (!isEmpty(resourcePaths)) {
             for (String resourcePath : resourcePaths) {
                 if (isDirectory(resourcePath)) {
