@@ -22,7 +22,6 @@ import java.util.Set;
 import javax.faces.FacesException;
 import javax.faces.component.EditableValueHolder;
 import javax.faces.component.UIComponent;
-import javax.faces.component.UIViewRoot;
 import javax.faces.component.visit.VisitCallback;
 import javax.faces.component.visit.VisitContext;
 import javax.faces.component.visit.VisitHint;
@@ -32,6 +31,12 @@ import javax.faces.context.PartialViewContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
+import javax.faces.event.AjaxBehaviorListener;
+import javax.faces.event.PhaseEvent;
+import javax.faces.event.PhaseId;
+import javax.faces.event.SystemEventListener;
+
+import org.omnifaces.util.Components;
 
 /**
  * Use this action listener when you want to partially (ajax) render input fields which are not executed during submit,
@@ -58,20 +63,28 @@ import javax.faces.event.ActionListener;
  * components in order to get JSF to display the model value which was edited during invoke action. Otherwise JSF will
  * still display its local value as it was during the validation failure and keep them in an invalidated state.
  * <p>
- * The {@link ResetInputAjaxActionListener} is designed to solve exactly this problem. There are basically two ways to
- * use it:
+ * The {@link ResetInputAjaxActionListener} is designed to solve exactly this problem. There are basically three ways
+ * to configure and use it:
  * <ul>
- * <li><p><i>Either</i> register it as <code>&lt;action-listener&gt;</code> in <tt>faces-config.xml</tt>. It'll be applied
- * to every single ajax action throughout the webapp, including the standalone <code>&lt;f:ajax&gt;</code> actions on
- * <code>UIInput</code> components such as <code>&lt;h:selectOneMenu&gt;</code>.
+ * <li><p>Register it as <code>&lt;phase-listener&gt;</code> in <tt>faces-config.xml</tt>. It'll be applied
+ * to <strong>every single</strong> ajax action throughout the webapp, on both <code>UIInput</code> and
+ * <code>UICommand</code> components.
+ * <pre>
+ * &lt;lifecycle&gt;
+ *   &lt;phase-listener&gt;org.omnifaces.eventlistener.ResetInputAjaxActionListener&lt;/phase-listener&gt;
+ * &lt;/lifecycle&gt;
+ * </pre>
+ * <li><p><i>Or</i> register it as <code>&lt;action-listener&gt;</code> in <tt>faces-config.xml</tt>. It'll
+ * <strong>only</strong> be applied to ajax actions which are invoked by an <code>UICommand</code> component such as
+ * <code>&lt;h:commandButton&gt;</code> and <code>&lt;h:commandLink&gt;</code>.
  * <pre>
  * &lt;application&gt;
  *   &lt;action-listener&gt;org.omnifaces.eventlistener.ResetInputAjaxActionListener&lt;/action-listener&gt;
  * &lt;/application&gt;
  * </pre>
  * <li><p><i>Or</i> register it as <code>&lt;f:actionListener&gt;</code> on the invidivual <code>UICommand</code>
- * components where this action listener is absolutely necessary to solve the concrete problem. It is <b>not</b>
- * possible to register it on the standalone <code>&lt;f:ajax&gt;</code> actions on <code>UIInput</code> components.
+ * components where this action listener is absolutely necessary to solve the concrete problem. Note that it isn't
+ * possible to register it on the individual <code>UIInput</code> components using the standard JSF tags.
  * <pre>
  * &lt;h:commandButton&gt;
  *   &lt;f:ajax listener="#{bean.updateOtherInputs}" render="otherInputs" /&gt;
@@ -79,17 +92,26 @@ import javax.faces.event.ActionListener;
  * &lt;/h:commandButton&gt;
  * </pre>
  * </ul>
- * <p>This works with standard JSF, PrimeFaces and RichFaces actions. Only for RichFaces there's a reflection hack,
+ * <p>
+ * This works with standard JSF, PrimeFaces and RichFaces actions. Only for RichFaces there's a reflection hack,
  * because its <code>ExtendedPartialViewContextImpl</code> <i>always</i> returns an empty collection for render IDs.
  * See also <a href="https://issues.jboss.org/browse/RF-11112">RF issue 11112</a>.
+ * <p>
+ * Design notice: being a phase listener was mandatory in order to be able to hook on every single ajax action as
+ * standard JSF API does not (seem to?) offer any ways to register some kind of {@link AjaxBehaviorListener} in an
+ * application wide basis, let alone on a per <code>&lt;f:ajax&gt;</code> tag basis, so that it also get applied to
+ * ajax actions in <code>UIInput</code> components. There are ways with help of {@link SystemEventListener}, but it
+ * ended up to be too clumsy.
  *
  * @author Bauke Scholtz
  * @link http://java.net/jira/browse/JAVASERVERFACES_SPEC_PUBLIC-1060
  */
 @SuppressWarnings("unchecked") // For the cast on Collection<String> in getRenderIds().
-public class ResetInputAjaxActionListener implements ActionListener {
+public class ResetInputAjaxActionListener extends DefaultPhaseListener implements ActionListener {
 
 	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final long serialVersionUID = -5317382021715077662L;
 
 	private static final Set<VisitHint> VISIT_HINTS = EnumSet.of(VisitHint.SKIP_UNRENDERED);
 	private static final String ERROR_RF_PVC_HACK =
@@ -103,26 +125,39 @@ public class ResetInputAjaxActionListener implements ActionListener {
 
 	/**
 	 * Construct a new reset input ajax action listener. This constructor will be used when specifying the action
-	 * listener by <tt>&lt;f:actionListener&gt;</tt>.
+	 * listener by <code>&lt;f:actionListener&gt;</code> or when registering as <code>&lt;phase-listener&gt;</code> in
+	 * <tt>faces-config.xml</tt>.
 	 */
 	public ResetInputAjaxActionListener() {
-		//
+		this(null);
 	}
 
 	/**
 	 * Construct a new reset input ajax action listener around the given wrapped action listener. This constructor
-	 * will be used when registering the action listener in <tt>faces-config.xml</tt>.
+	 * will be used when registering as <code>&lt;action-listener&gt;</code> in <tt>faces-config.xml</tt>.
 	 * @param wrapped The wrapped action listener.
 	 */
 	public ResetInputAjaxActionListener(ActionListener wrapped) {
+		super(PhaseId.INVOKE_APPLICATION);
 		this.wrapped = wrapped;
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Handle the reset input action as follows, only and only if the current request is an ajax request and the
-	 * {@link PartialViewContext#getRenderIds()} doesn't return an empty collection:
+	 * Delegate to the {@link #processAction(ActionEvent)} method when this action listener is been registered as a
+	 * phase listener so that it get applied on <strong>all</strong> ajax requests.
+	 * @see #processAction(ActionEvent)
+	 */
+	@Override
+	public void beforePhase(PhaseEvent event) {
+		processAction(null);
+	}
+
+	/**
+	 * <p>Handle the reset input action as follows, only and only if the current request is an ajax request and the
+	 * {@link PartialViewContext#getRenderIds()} does not return an empty collection nor is the same as
+	 * {@link PartialViewContext#getExecuteIds()}:
 	 * <ul>
 	 * <li>Collect all {@link EditableValueHolder} components based on {@link PartialViewContext#getRenderIds()}.
 	 * <li>Remove all components covered by {@link PartialViewContext#getExecuteIds()} from this collection.
@@ -138,19 +173,18 @@ public class ResetInputAjaxActionListener implements ActionListener {
 
 		if (partialViewContext.isAjaxRequest()) {
 			Collection<String> renderIds = getRenderIds(partialViewContext);
+			Collection<String> executeIds = partialViewContext.getExecuteIds();
 
-			if (!renderIds.isEmpty()) {
-				UIViewRoot viewRoot = context.getViewRoot();
-				Collection<String> executeIds = partialViewContext.getExecuteIds();
+			if (!renderIds.isEmpty() && !renderIds.containsAll(executeIds)) {
 				final Set<EditableValueHolder> inputs = new HashSet<EditableValueHolder>();
 
-				// First find all to be rendered inputs and add them to the set.
-				findAndAddEditableValueHolders(
-					VisitContext.createVisitContext(context, renderIds, VISIT_HINTS), viewRoot, inputs);
+				// First find all to be rendered inputs in the current view and add them to the set.
+				findAndAddEditableValueHolders(VisitContext.createVisitContext(
+					context, renderIds, VISIT_HINTS), context.getViewRoot(), inputs);
 
-				// Then find all executed inputs and remove them from the set.
-				findAndRemoveEditableValueHolders(
-					VisitContext.createVisitContext(context, executeIds, VISIT_HINTS), viewRoot, inputs);
+				// Then find all executed inputs in the current form and remove them from the set.
+				findAndRemoveEditableValueHolders(VisitContext.createVisitContext(
+					context, executeIds, VISIT_HINTS), Components.getCurrentForm(), inputs);
 
 				// The set now contains inputs which are to be rendered, but which are not been executed. Reset them.
 				for (EditableValueHolder input : inputs) {
@@ -159,7 +193,7 @@ public class ResetInputAjaxActionListener implements ActionListener {
 			}
 		}
 
-		if (wrapped != null) {
+		if (wrapped != null && event != null) {
 			wrapped.processAction(event);
 		}
 	}
