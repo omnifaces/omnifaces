@@ -336,7 +336,8 @@ final class CombinedResourceInfo {
 
 		if (param == null || !param.matches("\\d+")) {
 			return defaultValue;
-		} else {
+		}
+		else {
 			return Long.valueOf(param);
 		}
 	}

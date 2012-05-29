@@ -319,7 +319,7 @@ public final class Faces {
 
 	/**
 	 * Returns whether the current request is an ajax request.
-	 * @return true for a postback, false if the request is a non-faces (non-postback) request.
+	 * @return true for an ajax request, false if the request is a non-ajax (synchronous) request.
 	 * @see PartialViewContext#isAjaxRequest()
 	 */
 	public static boolean isAjaxRequest() {
@@ -333,6 +333,15 @@ public final class Faces {
 	 */
 	public static boolean isPostback() {
 		return FacesContext.getCurrentInstance().isPostback();
+	}
+
+	/**
+	 * Returns whether the validations phase of the current request has failed.
+	 * @return true if the validations phase of the current request has failed, otherwise false.
+	 * @see FacesContext#isValidationFailed()
+	 */
+	public static boolean isValidationFailed() {
+		return FacesContext.getCurrentInstance().isValidationFailed();
 	}
 
 	/**

@@ -218,7 +218,9 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	 */
 	private String findErrorPageLocation(Throwable exception) {
 		if (errorPageLocations == null) {
-			// #6: It isn't possible to perform this on webapp's startup which would be more ideal.
+			// #6: Due to a MyFaces issue, it isn't possible to perform this task in FullAjaxExceptionHandlerFactory on
+			// webapp's startup which would be more ideal.
+			// http://code.google.com/p/omnifaces/source/detail?r=c7899e317a95a92325bdac4ab707bfca22958d07
 			errorPageLocations = findErrorPageLocations();
 		}
 

@@ -32,14 +32,14 @@ import javax.faces.context.FacesContext;
 import org.omnifaces.util.Components;
 
 /**
- * <strong>Highlight</strong> is a helper component which highlights all invalid {@link UIInput} components by adding
+ * <p><strong>Highlight</strong> is a helper component which highlights all invalid {@link UIInput} components by adding
  * an error style class to them. Additionally, it by default focuses the first invalid {@link UIInput} component. The
  * <code>&lt;o:highlight /&gt;</code> component can be placed anywhere in the view, as long as there's only one of it.
  * Preferably put it somewhere in the master template for forms.
  * <pre>
  * &lt;h:form&gt;
  *   &lt;h:inputText value="#{bean.input1}" required="true" /&gt;
- *   &lt;h:inputText value="#{bean.input1}" required="true" /&gt;
+ *   &lt;h:inputText value="#{bean.input2}" required="true" /&gt;
  *   &lt;h:commandButton value="Submit" action="#{bean.submit}" /&gt;
  * &lt;/h:form&gt;
  * &lt;o:highlight /&gt;

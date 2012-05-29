@@ -216,6 +216,10 @@ public final class Components {
 
 		UIViewRoot viewRoot = facesContext.getViewRoot();
 
+		// The initial implementation has visited the tree for UIForm components which returns true on isSubmitted().
+		// But with testing it turns out to return false on ajax requests where the form is not included in execute!
+		// The current implementation just walks through the request parameter map instead.
+
 		for (String name : facesContext.getExternalContext().getRequestParameterMap().keySet()) {
 			if (name.startsWith("javax.faces.")) {
 				continue; // Quick skip.
