@@ -1,7 +1,7 @@
 /**
  * <h2>This package contains the classes for the OmniFaces' FacesViews feature.</h2>
  * <p>
- * FacesViews is a feature where a special dedicated directory (<code>WEB-INF/faces-views</code>) can be used
+ * FacesViews is a feature where a special dedicated directory (<code>/WEB-INF/faces-views</code>) can be used
  * to store Facelets source files. All files found in this directory are automatically mapped as Facelets files
  * and made available using both their original extension as well as without an extension (extensionless).
  *
@@ -21,8 +21,8 @@
  *
  * Consider the following file structure:
  * <pre>
- *    /WEB-INF/faces-view/index.xhtml
- *    /WEB-INF/faces-view/users/add.xhtml
+ *    /WEB-INF/faces-views/index.xhtml
+ *    /WEB-INF/faces-views/users/add.xhtml
  *    normal.xhtml
  * </pre>
  * This will make the Facelets available via the following URLs (given a root deployment on domain <code>example.com</code>):
@@ -34,15 +34,15 @@
  *    example.com/normal.xhtml
  * </pre>
  *
- * Note that although the directory outside <code>WEB-INF/faces-views</code> is not scanned, the {@link javax.faces.webapp.FacesServlet}
- * <em>is</em> mapped on all extensions found in <code>WEB-INF/faces-views</code>, so this will also affect files outside
+ * Note that although the directory outside <code>/WEB-INF/faces-views</code> is not scanned, the {@link javax.faces.webapp.FacesServlet}
+ * <em>is</em> mapped on all extensions found in <code>/WEB-INF/faces-views</code>, so this will also affect files outside
  * this directory. In the above example <code>normal.xhtml</code> is thus also available via the <code>.xhtml</code> extension, since
  * the whole FacesServlet is mapped on this.
  *
  * <p>
  * JSF links in which logical view ids are used will be rendered as either extensionless or with an extension based on whether
  * the request in which this rendering is done was extensionless or not. E.g. consider the following link on
- * <code>/WEB-INF/faces-view/index.xhtml</code>:
+ * <code>/WEB-INF/faces-views/index.xhtml</code>:
  * <pre>
  * &lt;h:link value="Add user" outcome="/users/add" /&gt;
  * </pre>
@@ -51,10 +51,11 @@
  *
  * <p>
  * <h3>Configuration</h3>
+ * The following context parameters are available.
  * <table>
  * <tr>
- * <td>{@value org.omnifaces.facesviews.FacesViewsInitializerListener#FACES_VIEWS_ENABLE_PARAM_NAME}</td>
- * <td>Used to completely switch scanning off. Allowed values: {TRUE,FALSE} Default: TRUE (note that if no WEB-INF/faces-view directory
+ * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViewsInitializerListener#FACES_VIEWS_ENABLE_PARAM_NAME}</code></td>
+ * <td>Used to completely switch scanning off. Allowed values: {TRUE,FALSE} Default: TRUE (note that if no <code>/WEB-INF/faces-views</code> directory
  * is present, no scanning will be done either)</td>
  * </tr>
  * </table>
