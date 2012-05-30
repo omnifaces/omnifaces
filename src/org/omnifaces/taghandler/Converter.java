@@ -30,7 +30,7 @@ import javax.faces.view.facelets.TagConfig;
  * build time basis. This allows the developer to change the attributes on a per request basis.
  * <p>
  * When you specify for example the standard <code>&lt;f:convertDateTime&gt;</code> by
- * <code>converterId="javax.faces.DateTime"</code>, then you'll be able to use all its attribuces such as
+ * <code>converterId="javax.faces.DateTime"</code>, then you'll be able to use all its attributes such as
  * <code>pattern</code> and <code>locale</code> as per its documentation, but then with the possibility to supply
  * request based value expressions.
  * <pre>

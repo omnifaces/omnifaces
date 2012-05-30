@@ -35,7 +35,7 @@ import org.omnifaces.filter.HttpFilter;
 /**
  * This filter forwards request to a FacesServlet using an extension on which this Servlet is mapped.
  * <p>
- * A filter like this is needed for extentionless requests, since the FacesServlet in at least JSF 2.1 and before
+ * A filter like this is needed for extensionless requests, since the FacesServlet in at least JSF 2.1 and before
  * does not take into account any other mapping than prefix- and extension (suffix) mapping.
  *
  * @author Arjan Tijms
