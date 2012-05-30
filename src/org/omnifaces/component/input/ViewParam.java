@@ -27,12 +27,12 @@ import org.omnifaces.util.MapWrapper;
  * mode of operation.
  * <p>
  * The standard UIViewParameter implementation calls the model setter again after postback. This is not always desired when being
- * bound to a view scoped beans and can lead to performance problems when combined with an expensive converter.
+ * bound to a view scoped bean and can lead to performance problems when combined with an expensive converter.
  * <p>
  * To solve this, this component by default stores the submitted value as a component property instead of in the model (and thus
  * in the view state in case the binding is to a view scoped bean).
  * <p>
- * You can use it the same way as <code>&lt;f:viewParam&gt;</code>, you only need to change <code>f:</code> by
+ * You can use it the same way as <code>&lt;f:viewParam&gt;</code>, you only need to change <code>f:</code> to
  * <code>o:</code>.
  *
  * @author Arjan Tijms
@@ -58,7 +58,7 @@ public class ViewParam extends UIViewParameter {
 
 	@Override
 	public boolean isRequired() {
-		// The request parameter get lost on postbacks, however it's already present in the view scoped bean.
+		// The request parameter gets lost on postbacks, however it's already present in the view scoped bean.
 		// So we can safely skip the required validation on postbacks.
 		return !FacesContext.getCurrentInstance().isPostback() && super.isRequired();
 	}

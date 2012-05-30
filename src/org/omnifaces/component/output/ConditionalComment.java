@@ -65,7 +65,7 @@ public class ConditionalComment extends UIComponentBase {
 		"ConditionalComment attribute 'if' must be specified.";
 
 	private enum PropertyKeys {
-		// Cannot be uppercased. They have to exactly match the attribute names.
+		// Cannot be uppercased. They have to match the attribute names exactly.
 		_if("if");
 
 		// The below mess is necessary because "if" is a keyword in Java and cannot be used as enum value.

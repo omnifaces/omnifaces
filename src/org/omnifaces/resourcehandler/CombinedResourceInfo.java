@@ -30,7 +30,7 @@ import javax.faces.context.FacesContext;
 import org.omnifaces.util.Faces;
 
 /**
- * This class is a wrapper which collects all combined resources and stores it in the cache. A builder is been provided
+ * This class is a wrapper which collects all combined resources and stores it in the cache. A builder has been provided
  * to create an instance of combined resource info and put it in the cache if absent.
  * @author Bauke Scholtz
  */
@@ -157,7 +157,7 @@ final class CombinedResourceInfo {
 		private static String createUniqueId(Map<String, Set<String>> map) {
 			// TODO: I personally don't trust MD5 to be fail-safe. There's still *a* chance on a clash even though it's
 			// less than 0.01%. This needs more testing or a different unique ID approach has to be invented.
-			// Note that UUID is NOT suitable as the ID needs to be the same everytime based on map's content!
+			// Note that UUID is NOT suitable as the ID needs to be the same every time based on map's content!
 
 			byte[] hash;
 
@@ -165,7 +165,7 @@ final class CombinedResourceInfo {
 				hash = MessageDigest.getInstance("MD5").digest(map.toString().getBytes("UTF-8"));
 			}
 			catch (Exception e) {
-				// So, MD5 and/or UTF-8 isn't supported. Does such a server platform ever exist nowadays?
+				// So, MD5 and/or UTF-8 isn't supported. Does such a server platform even exist nowadays?
 				throw new RuntimeException(ERROR_CREATING_UNIQUE_ID, e);
 			}
 

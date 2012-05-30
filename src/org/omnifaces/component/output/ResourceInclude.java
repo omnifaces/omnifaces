@@ -92,9 +92,9 @@ public class ResourceInclude extends UIComponentBase {
 	// Nested classes -------------------------------------------------------------------------------------------------
 
 	/**
-	 * This HTTP servlet response implementation buffers the entire response body. The buffered response body is as a
-	 * byte array available by {@link #getBuffer()} method. The response writer will use the same character encoding
-	 * as is been set on the response supplied to the constructor. Note that this way any setCharacterEncoding() calls
+	 * This HTTP servlet response implementation buffers the entire response body. The buffered response body is available 
+	 * as a byte array via the {@link #getBuffer()} method. The response writer will use the same character encoding
+	 * as has been set on the response supplied to the constructor. Note that this way any setCharacterEncoding() calls
 	 * on the included JSP/Servlet resource have thus no effect.
 	 * @author Bauke Scholtz
 	 */
