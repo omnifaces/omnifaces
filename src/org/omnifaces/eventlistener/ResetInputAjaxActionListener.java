@@ -86,8 +86,8 @@ import org.omnifaces.util.Components;
  * components where this action listener is absolutely necessary to solve the concrete problem. Note that it isn't
  * possible to register it on the individual <code>UIInput</code> components using the standard JSF tags.
  * <pre>
- * &lt;h:commandButton&gt;
- *   &lt;f:ajax listener="#{bean.updateOtherInputs}" render="otherInputs" /&gt;
+ * &lt;h:commandButton value="Update" action="#{bean.updateOtherInputs}"&gt;
+ *   &lt;f:ajax execute="currentInputs" render="otherInputs" /&gt;
  *   &lt;f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" /&gt;
  * &lt;/h:commandButton&gt;
  * </pre>
@@ -113,7 +113,7 @@ public class ResetInputAjaxActionListener extends DefaultPhaseListener implement
 
 	private static final long serialVersionUID = -5317382021715077662L;
 
-	private static final Set<VisitHint> VISIT_HINTS = EnumSet.of(VisitHint.SKIP_UNRENDERED);
+	private static final Set<VisitHint> VISIT_HINTS = EnumSet.of(VisitHint.SKIP_TRANSIENT);
 	private static final String ERROR_RF_PVC_HACK =
 		"Cannot obtain componentRenderIds property of RichFaces ExtendedPartialViewContextImpl instance '%s'.";
 
