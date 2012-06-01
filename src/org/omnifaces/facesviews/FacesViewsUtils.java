@@ -34,7 +34,7 @@ import javax.servlet.ServletRegistration;
  * @author Arjan Tijms
  *
  */
-public final class FacesViewsUtils {
+final class FacesViewsUtils {
 
     private FacesViewsUtils() {}
 

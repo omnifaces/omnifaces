@@ -29,7 +29,7 @@ import org.omnifaces.util.Faces;
  */
 public class FacesViewsResolver extends ResourceResolver {
 
-    public static final String FACES_VIEWS_RESOURCES_PARAM_NAME = "org.omnifaces.faces-views";
+    public static final String FACES_VIEWS_RESOURCES_PARAM_NAME = "org.omnifaces.facesviews";
 
     private final ResourceResolver resourceResolver;
 

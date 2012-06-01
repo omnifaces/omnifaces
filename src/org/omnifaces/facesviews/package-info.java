@@ -54,9 +54,9 @@
  * The following context parameters are available.
  * <table>
  * <tr>
- * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViewsInitializerListener#FACES_VIEWS_ENABLE_PARAM_NAME}</code></td>
- * <td>Used to completely switch scanning off. Allowed values: {TRUE,FALSE} Default: TRUE (note that if no <code>/WEB-INF/faces-views</code> directory
- * is present, no scanning will be done either)</td>
+ * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViewsInitializerListener#FACES_VIEWS_ENABLED_PARAM_NAME}</code></td>
+ * <td>Used to completely switch scanning off. Allowed values: {<code>true</code>,<code>false</code>} Default: <code>true</code>
+ * (note that if no <code>/WEB-INF/faces-views</code> directory is present, no scanning will be done either)</td>
  * </tr>
  * </table>
  *
@@ -82,7 +82,7 @@
  * <b>faces-config.xml</b>
  * <pre>
  * &lt;application>
- *       &lt;view-handler>org.omnifaces.facesviews.FacesViewsViewHandler&lt;/view-handler>
+ *     &lt;view-handler>org.omnifaces.facesviews.FacesViewsViewHandler&lt;/view-handler>
  * &lt;/application>
  * </pre>
  *
@@ -92,5 +92,3 @@
  *
  */
 package org.omnifaces.facesviews;
-
-

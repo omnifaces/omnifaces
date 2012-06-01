@@ -13,7 +13,6 @@
 
 package org.omnifaces.facesviews;
 
-import static java.lang.Boolean.*;
 import static java.util.Collections.*;
 import static javax.faces.view.facelets.ResourceResolver.*;
 import static org.omnifaces.facesviews.FacesViewsResolver.*;
@@ -43,14 +42,14 @@ import javax.servlet.annotation.WebListener;
 public class FacesViewsInitializerListener implements ServletContextListener {
 
     // Web context parameter to switch auto-scanning completely off for Servlet 3.0 containers.
-    public static final String FACES_VIEWS_ENABLE_PARAM_NAME = "org.omnifaces.FACES-VIEWS.ENABLE";
+    public static final String FACES_VIEWS_ENABLED_PARAM_NAME = "org.omnifaces.FACES_VIEWS_ENABLED";
 
     @Override
     public void contextInitialized(ServletContextEvent context) {
 
         ServletContext servletContext = context.getServletContext();
 
-        if (!FALSE.equals(servletContext.getInitParameter(FACES_VIEWS_ENABLE_PARAM_NAME))) {
+        if (!"false".equals(servletContext.getInitParameter(FACES_VIEWS_ENABLED_PARAM_NAME))) {
 
             // Scan our dedicated directory for Faces resources that need to be mapped
             Map<String, String> collectedViews = new HashMap<String, String>();
