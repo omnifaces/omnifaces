@@ -23,6 +23,8 @@ import org.omnifaces.util.Faces;
 /**
  * Facelets resource resolver that resolves mapped resources (views) to the special auto-scanned
  * faces-views folder.
+ * <p>
+ * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
  *
  * @author Arjan Tijms
  *

@@ -25,6 +25,8 @@ import javax.faces.context.FacesContext;
 /**
  * View handler that renders action URL extensionless if the current request is extensionless and the
  * requested resource is a mapped one, otherwise as-is.
+ * <p>
+ * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
  *
  * @author Arjan Tijms
  *

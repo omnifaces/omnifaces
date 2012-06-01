@@ -37,6 +37,8 @@ import org.omnifaces.filter.HttpFilter;
  * <p>
  * A filter like this is needed for extensionless requests, since the FacesServlet in at least JSF 2.1 and before
  * does not take into account any other mapping than prefix- and extension (suffix) mapping.
+ * <p>
+ * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
  *
  * @author Arjan Tijms
  *

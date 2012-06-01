@@ -34,6 +34,8 @@ import javax.servlet.annotation.WebListener;
 /**
  * Convenience class for Servlet 3.0 users, which will auto-register all artifacts
  * required for auto-mapping and extensionless view to work.
+ * <p>
+ * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
  *
  * @author Arjan Tijms
  *
