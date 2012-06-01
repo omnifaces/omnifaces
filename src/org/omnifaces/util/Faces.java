@@ -42,6 +42,7 @@ import javax.faces.context.PartialViewContext;
 import javax.faces.event.PhaseId;
 import javax.faces.view.ViewMetadata;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -78,6 +79,39 @@ public final class Faces {
 	// JSF general ----------------------------------------------------------------------------------------------------
 
 	/**
+	 * Returns the current faces context. Note that whenever you absolutely need this method to perform a general
+	 * task, you might want to consider to submit a feature request to OmniFaces in order to add a new utility method
+	 * which performs exactly this general task.
+	 * @return The current faces context.
+	 * @see FacesContext#getCurrentInstance()
+	 */
+	public static FacesContext getContext() {
+		return FacesContext.getCurrentInstance();
+	}
+
+	/**
+	 * Returns the current external context. Note that whenever you absolutely need this method to perform a general
+	 * task, you might want to consider to submit a feature request to OmniFaces in order to add a new utility method
+	 * which performs exactly this general task.
+	 * @return The current external context.
+	 * @see FacesContext#getExternalContext()
+	 */
+	public static ExternalContext getExternalContext() {
+		return FacesContext.getCurrentInstance().getExternalContext();
+	}
+
+	/**
+	 * Returns the application singleton. Note that whenever you absolutely need this method to perform a general
+	 * task, you might want to consider to submit a feature request to OmniFaces in order to add a new utility method
+	 * which performs exactly this general task.
+	 * @return The faces application singleton.
+	 * @see FacesContext#getApplication()
+	 */
+	public static Application getApplication() {
+		return FacesContext.getCurrentInstance().getApplication();
+	}
+
+	/**
 	 * Returns the implementation information of currently loaded JSF implementation. E.g. "Mojarra 2.1.7-FCS".
 	 * @return The implementation information of currently loaded JSF implementation.
 	 * @see Package#getImplementationTitle()
@@ -103,7 +137,7 @@ public final class Faces {
 	 * @see Application#getProjectStage()
 	 */
 	public static boolean isDevelopment() {
-		return FacesContext.getCurrentInstance().getApplication().getProjectStage() == ProjectStage.Development;
+		return getApplication().getProjectStage() == ProjectStage.Development;
 	}
 
 	/**
@@ -113,7 +147,7 @@ public final class Faces {
 	 * @return The faces servlet mapping (without the wildcard).
 	 */
 	public static String getMapping() {
-		ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+		ExternalContext externalContext = getExternalContext();
 
 		if (externalContext.getRequestPathInfo() == null) {
 			String path = externalContext.getRequestServletPath();
@@ -150,7 +184,7 @@ public final class Faces {
 	 * @see FacesContext#getCurrentPhaseId()
 	 */
 	public static PhaseId getCurrentPhaseId() {
-		return FacesContext.getCurrentInstance().getCurrentPhaseId();
+		return getContext().getCurrentPhaseId();
 	}
 
 	/**
@@ -167,7 +201,7 @@ public final class Faces {
 			return null;
 		}
 
-		FacesContext context = FacesContext.getCurrentInstance();
+		FacesContext context = getContext();
 		return (T) context.getApplication().evaluateExpressionGet(context, expression, Object.class);
 	}
 
@@ -179,7 +213,7 @@ public final class Faces {
 	 * @see FacesContext#getViewRoot()
 	 */
 	public static UIViewRoot getViewRoot() {
-		return FacesContext.getCurrentInstance().getViewRoot();
+		return getContext().getViewRoot();
 	}
 
 	/**
@@ -217,6 +251,16 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the view parameters of the current view, or an empty collection if there is no view.
+	 * @return The view parameters of the current view, or an empty collection if there is no view.
+	 * @see ViewMetadata#getViewParameters(UIViewRoot)
+	 */
+	public static Collection<UIViewParameter> getViewParameters() {
+		UIViewRoot viewRoot = getViewRoot();
+		return (viewRoot != null) ? ViewMetadata.getViewParameters(viewRoot) : Collections.<UIViewParameter>emptyList();
+	}
+
+	/**
 	 * Returns the current locale. If the locale set in the JSF view root is not null, then return it. Else if the
 	 * client preferred locale is not null and is among supported locales, then return it. Else if the JSF default
 	 * locale is not null, then return it. Else return the system default locale.
@@ -227,9 +271,9 @@ public final class Faces {
 	 * @see Locale#getDefault()
 	 */
 	public static Locale getLocale() {
-		FacesContext facesContext = FacesContext.getCurrentInstance();
+		FacesContext context = getContext();
 		Locale locale = null;
-		UIViewRoot viewRoot = facesContext.getViewRoot();
+		UIViewRoot viewRoot = context.getViewRoot();
 
 		// Prefer the locale set in the view.
 		if (viewRoot != null) {
@@ -238,7 +282,7 @@ public final class Faces {
 
 		// Then the client preferred locale.
 		if (locale == null) {
-			Locale clientLocale = facesContext.getExternalContext().getRequestLocale();
+			Locale clientLocale = context.getExternalContext().getRequestLocale();
 
 			if (getSupportedLocales().contains(clientLocale)) {
 				locale = clientLocale;
@@ -247,7 +291,7 @@ public final class Faces {
 
 		// Then the JSF default locale.
 		if (locale == null) {
-			locale = facesContext.getApplication().getDefaultLocale();
+			locale = context.getApplication().getDefaultLocale();
 		}
 
 		// Finally the system default locale.
@@ -259,6 +303,15 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the default locale, or <code>null</code> if there is none.
+	 * @return The default locale, or <code>null</code> if there is none.
+	 * @see Application#getDefaultLocale()
+	 */
+	public static Locale getDefaultLocale() {
+		return getApplication().getDefaultLocale();
+	}
+
+	/**
 	 * Returns a list of all supported locales on this application, with the default locale as the first item, if any.
 	 * This will return an empty list if there are no locales definied in <tt>faces-config.xml</tt>.
 	 * @return A list of all supported locales on this application, with the default locale as the first item, if any.
@@ -266,7 +319,7 @@ public final class Faces {
 	 * @see Application#getSupportedLocales()
 	 */
 	public static List<Locale> getSupportedLocales() {
-		Application application = FacesContext.getCurrentInstance().getApplication();
+		Application application = getApplication();
 		List<Locale> supportedLocales = new ArrayList<Locale>();
 		Locale defaultLocale = application.getDefaultLocale();
 
@@ -286,23 +339,13 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the view parameters of the current view, or an empty collection if there is no view.
-	 * @return The view parameters of the current view, or an empty collection if there is no view.
-	 * @see ViewMetadata#getViewParameters(UIViewRoot)
-	 */
-	public static Collection<UIViewParameter> getViewParams() {
-		UIViewRoot viewRoot = getViewRoot();
-		return (viewRoot != null) ? ViewMetadata.getViewParameters(viewRoot) : Collections.<UIViewParameter>emptyList();
-	}
-
-	/**
 	 * Perform the JSF navigation to the given outcome.
 	 * @param outcome The navigation outcome.
 	 * @see Application#getNavigationHandler()
 	 * @see NavigationHandler#handleNavigation(FacesContext, String, String)
 	 */
 	public static void navigate(String outcome) {
-		FacesContext context = FacesContext.getCurrentInstance();
+		FacesContext context = getContext();
 		context.getApplication().getNavigationHandler().handleNavigation(context, null, outcome);
 	}
 
@@ -314,7 +357,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequest()
 	 */
 	public static HttpServletRequest getRequest() {
-		return (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+		return (HttpServletRequest) getExternalContext().getRequest();
 	}
 
 	/**
@@ -323,7 +366,7 @@ public final class Faces {
 	 * @see PartialViewContext#isAjaxRequest()
 	 */
 	public static boolean isAjaxRequest() {
-		return FacesContext.getCurrentInstance().getPartialViewContext().isAjaxRequest();
+		return getContext().getPartialViewContext().isAjaxRequest();
 	}
 
 	/**
@@ -332,7 +375,7 @@ public final class Faces {
 	 * @see FacesContext#isPostback()
 	 */
 	public static boolean isPostback() {
-		return FacesContext.getCurrentInstance().isPostback();
+		return getContext().isPostback();
 	}
 
 	/**
@@ -341,7 +384,7 @@ public final class Faces {
 	 * @see FacesContext#isValidationFailed()
 	 */
 	public static boolean isValidationFailed() {
-		return FacesContext.getCurrentInstance().isValidationFailed();
+		return getContext().isValidationFailed();
 	}
 
 	/**
@@ -350,7 +393,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestParameterMap()
 	 */
 	public static Map<String, String> getRequestParameterMap() {
-		return FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap();
+		return getExternalContext().getRequestParameterMap();
 	}
 
 	/**
@@ -360,7 +403,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestParameterMap()
 	 */
 	public static String getRequestParameter(String name) {
-		return FacesContext.getCurrentInstance().getExternalContext().getRequestParameterMap().get(name);
+		return getRequestParameterMap().get(name);
 	}
 
 	/**
@@ -369,7 +412,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestParameterValuesMap()
 	 */
 	public static Map<String, String[]> getRequestParameterValuesMap() {
-		return FacesContext.getCurrentInstance().getExternalContext().getRequestParameterValuesMap();
+		return getExternalContext().getRequestParameterValuesMap();
 	}
 
 	/**
@@ -379,7 +422,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestParameterValuesMap()
 	 */
 	public static String[] getRequestParameterValues(String name) {
-		return FacesContext.getCurrentInstance().getExternalContext().getRequestParameterValuesMap().get(name);
+		return getRequestParameterValuesMap().get(name);
 	}
 
 	/**
@@ -388,7 +431,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestHeaderMap()
 	 */
 	public static Map<String, String> getRequestHeaderMap() {
-		return FacesContext.getCurrentInstance().getExternalContext().getRequestHeaderMap();
+		return getExternalContext().getRequestHeaderMap();
 	}
 
 	/**
@@ -398,7 +441,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestHeaderMap()
 	 */
 	public static String getRequestHeader(String name) {
-		return FacesContext.getCurrentInstance().getExternalContext().getRequestHeaderMap().get(name);
+		return getRequestHeaderMap().get(name);
 	}
 
 	/**
@@ -407,7 +450,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestHeaderValuesMap()
 	 */
 	public static Map<String, String[]> getRequestHeaderValuesMap() {
-		return FacesContext.getCurrentInstance().getExternalContext().getRequestHeaderValuesMap();
+		return getExternalContext().getRequestHeaderValuesMap();
 	}
 
 	/**
@@ -417,7 +460,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestHeaderValuesMap()
 	 */
 	public static String[] getRequestHeaderValues(String name) {
-		return FacesContext.getCurrentInstance().getExternalContext().getRequestHeaderValuesMap().get(name);
+		return getRequestHeaderValuesMap().get(name);
 	}
 
 	/**
@@ -427,29 +470,29 @@ public final class Faces {
 	 * @see ExternalContext#getRequestContextPath()
 	 */
 	public static String getRequestContextPath() {
-		return FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
+		return getExternalContext().getRequestContextPath();
 	}
 
 	/**
 	 * Returns the HTTP request servlet path. If JSF is prefix mapped (e.g. <tt>/faces/*</tt>), then this returns the
 	 * whole prefix mapping (e.g. <tt>/faces</tt>). If JSF is suffix mapped (e.g. <tt>*.xhtml</tt>), then this returns
-	 * the whole part after the context path.
+	 * the whole part after the context path, with a leading slash.
 	 * @return The HTTP request servlet path.
 	 * @see ExternalContext#getRequestServletPath()
 	 */
 	public static String getRequestServletPath() {
-		return FacesContext.getCurrentInstance().getExternalContext().getRequestServletPath();
+		return getExternalContext().getRequestServletPath();
 	}
 
 	/**
 	 * Returns the HTTP request path info. If JSF is prefix mapped (e.g. <tt>/faces/*</tt>), then this returns the
-	 * whole part after the prefix mapping. If JSF is suffix mapped (e.g. <tt>*.xhtml</tt>), then this returns an empty
-	 * string.
+	 * whole part after the prefix mapping, with a leading slash. If JSF is suffix mapped (e.g. <tt>*.xhtml</tt>), then
+	 * this returns an empty string.
 	 * @return The HTTP request path info.
 	 * @see ExternalContext#getRequestPathInfo()
 	 */
 	public static String getRequestPathInfo() {
-		return FacesContext.getCurrentInstance().getExternalContext().getRequestPathInfo();
+		return getExternalContext().getRequestPathInfo();
 	}
 
 	/**
@@ -472,7 +515,7 @@ public final class Faces {
 	 * @see ExternalContext#getResponse()
 	 */
 	public static HttpServletResponse getResponse() {
-		return (HttpServletResponse) FacesContext.getCurrentInstance().getExternalContext().getResponse();
+		return (HttpServletResponse) getExternalContext().getResponse();
 	}
 
 	/**
@@ -485,7 +528,7 @@ public final class Faces {
 	 * @see ExternalContext#redirect(String)
 	 */
 	public static void redirect(String url) throws IOException {
-		FacesContext.getCurrentInstance().getExternalContext().redirect(normalizeRedirectURL(url));
+		getExternalContext().redirect(normalizeRedirectURL(url));
 	}
 
 	/**
@@ -499,11 +542,11 @@ public final class Faces {
 	 * @see ExternalContext#setResponseHeader(String, String)
 	 */
 	public static void redirectPermanent(String url) throws IOException {
-		FacesContext facesContext = FacesContext.getCurrentInstance();
-		ExternalContext externalContext = facesContext.getExternalContext();
+		FacesContext context = getContext();
+		ExternalContext externalContext = context.getExternalContext();
 		externalContext.setResponseStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
 		externalContext.setResponseHeader("Location", normalizeRedirectURL(url));
-		facesContext.responseComplete();
+		context.responseComplete();
 	}
 
 	/**
@@ -533,9 +576,9 @@ public final class Faces {
 	 * @see ExternalContext#responseSendError(int, String)
 	 */
 	public static void responseSendError(int status, String message) throws IOException {
-		FacesContext facesContext = FacesContext.getCurrentInstance();
-		facesContext.getExternalContext().responseSendError(status, message);
-		facesContext.responseComplete();
+		FacesContext context = getContext();
+		context.getExternalContext().responseSendError(status, message);
+		context.responseComplete();
 	}
 
 	/**
@@ -545,7 +588,54 @@ public final class Faces {
 	 * @see ExternalContext#addResponseHeader(String, String)
 	 */
 	public static void addResponseHeader(String name, String value) {
-		FacesContext.getCurrentInstance().getExternalContext().addResponseHeader(name, value);
+		getExternalContext().addResponseHeader(name, value);
+	}
+
+	// FORM based authentication --------------------------------------------------------------------------------------
+
+	/**
+	 * Perform programmatic login for container managed FORM based authentication. Note that configuration is container
+	 * specific and unrelated to JSF. Refer the documentation of the servletcontainer using the keyword "realm".
+	 * @param username The login username.
+	 * @param password The login password.
+	 * @throws ServletException When the login is invalid, or when container managed FORM based authentication is not
+	 * enabled.
+	 * @see HttpServletRequest#login(String, String)
+	 */
+	public static void login(String username, String password) throws ServletException {
+		getRequest().login(username, password);
+	}
+
+	/**
+	 * Perform programmatic logout for container managed FORM based authentication. Note that this basically removes
+	 * the user principal from the session. It's however better practice to just invalidate the session altogether,
+	 * which will implicitly also remove the user principal. Just invoke {@link #invalidateSession()} instead. Note
+	 * that the user principal is still present in the response of the current request, it's recommendable to send a
+	 * redirect after {@link #logout()} or {@link #invalidateSession()}.
+	 * @throws ServletException When the logout has failed.
+	 * @see HttpServletRequest#logout()
+	 */
+	public static void logout() throws ServletException {
+		getRequest().logout();
+	}
+
+	/**
+	 * Returns the name of the logged-in user for container managed FORM based authentication, if any.
+	 * @return The name of the logged-in user for container managed FORM based authentication, if any.
+	 * @see ExternalContext#getRemoteUser()
+	 */
+	public static String getRemoteUser() {
+		return getExternalContext().getRemoteUser();
+	}
+
+	/**
+	 * Returns <code>true</code> if the currently logged-in user has the given role, otherwise <code>false</code>.
+	 * @param role The role to be checked on the currently logged-in user.
+	 * @return <code>true</code> if the currently logged-in user has the given role, otherwise <code>false</code>.
+	 * @see ExternalContext#isUserInRole(String)
+	 */
+	public static boolean isUserInRole(String role) {
+		return getExternalContext().isUserInRole(role);
 	}
 
 	// HTTP cookies ---------------------------------------------------------------------------------------------------
@@ -559,7 +649,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestCookieMap()
 	 */
 	public static String getRequestCookie(String name) {
-		Cookie cookie = (Cookie) FacesContext.getCurrentInstance().getExternalContext().getRequestCookieMap().get(name);
+		Cookie cookie = (Cookie) getExternalContext().getRequestCookieMap().get(name);
 
 		try {
 			return (cookie != null) ? URLDecoder.decode(cookie.getValue(), "UTF-8") : null;
@@ -592,7 +682,7 @@ public final class Faces {
 			}
 		}
 
-		ExternalContext externalContext = FacesContext.getCurrentInstance().getExternalContext();
+		ExternalContext externalContext = getExternalContext();
 		Map<String, Object> properties = new HashMap<String, Object>();
 		properties.put("path", path);
 		properties.put("maxAge", maxAge);
@@ -619,7 +709,7 @@ public final class Faces {
 	 * @see ExternalContext#getSession(boolean)
 	 */
 	public static HttpSession getSession() {
-		return (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(true);
+		return (HttpSession) getExternalContext().getSession(true);
 	}
 
 	/**
@@ -629,7 +719,7 @@ public final class Faces {
 	 * @see ExternalContext#getSession(boolean)
 	 */
 	public static HttpSession getSession(boolean create) {
-		return (HttpSession) FacesContext.getCurrentInstance().getExternalContext().getSession(create);
+		return (HttpSession) getExternalContext().getSession(create);
 	}
 
 	/**
@@ -637,7 +727,7 @@ public final class Faces {
 	 * @see ExternalContext#invalidateSession()
 	 */
 	public static void invalidateSession() {
-		FacesContext.getCurrentInstance().getExternalContext().invalidateSession();
+		getExternalContext().invalidateSession();
 	}
 
 	// Servlet context ------------------------------------------------------------------------------------------------
@@ -648,7 +738,7 @@ public final class Faces {
 	 * @see ExternalContext#getContext()
 	 */
 	public static ServletContext getServletContext() {
-		return (ServletContext) FacesContext.getCurrentInstance().getExternalContext().getContext();
+		return (ServletContext) getExternalContext().getContext();
 	}
 
 	/**
@@ -660,7 +750,7 @@ public final class Faces {
 	 * @see ExternalContext#getMimeType(String)
 	 */
 	public static String getMimeType(String name) {
-		String mimeType = FacesContext.getCurrentInstance().getExternalContext().getMimeType(name);
+		String mimeType = getExternalContext().getMimeType(name);
 
 		if (mimeType == null) {
 			mimeType = DEFAULT_MIME_TYPE;
@@ -677,7 +767,7 @@ public final class Faces {
 	 * @see ExternalContext#getResourceAsStream(String)
 	 */
 	public static InputStream getResourceAsStream(String path) {
-		return FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream(path);
+		return getExternalContext().getResourceAsStream(path);
 	}
 
 	/**
@@ -698,7 +788,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestMap()
 	 */
 	public static Map<String, Object> getRequestMap() {
-		return FacesContext.getCurrentInstance().getExternalContext().getRequestMap();
+		return getExternalContext().getRequestMap();
 	}
 
 	/**
@@ -710,7 +800,7 @@ public final class Faces {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T getRequestAttribute(String name) {
-		return (T) FacesContext.getCurrentInstance().getExternalContext().getRequestMap().get(name);
+		return (T) getRequestMap().get(name);
 	}
 
 	/**
@@ -720,18 +810,19 @@ public final class Faces {
 	 * @see ExternalContext#getRequestMap()
 	 */
 	public static void setRequestAttribute(String name, Object value) {
-		FacesContext.getCurrentInstance().getExternalContext().getRequestMap().put(name, value);
+		getRequestMap().put(name, value);
 	}
 
 	// Flash scope ----------------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns the flash scope.
+	 * Returns the flash scope. Note that <code>Flash</code> implements <code>Map&lt;String, Object&gt;</code>, so you
+	 * can just treat it like a <code>Map&lt;String, Object&gt;</code>.
 	 * @return The flash scope.
 	 * @see ExternalContext#getFlash()
 	 */
 	public static Flash getFlash() {
-		return FacesContext.getCurrentInstance().getExternalContext().getFlash();
+		return getExternalContext().getFlash();
 	}
 
 	/**
@@ -743,7 +834,7 @@ public final class Faces {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T getFlashAttribute(String name) {
-		return (T) FacesContext.getCurrentInstance().getExternalContext().getFlash().get(name);
+		return (T) getFlash().get(name);
 	}
 
 	/**
@@ -753,7 +844,7 @@ public final class Faces {
 	 * @see ExternalContext#getFlash()
 	 */
 	public static void setFlashAttribute(String name, Object value) {
-		FacesContext.getCurrentInstance().getExternalContext().getFlash().put(name, value);
+		getFlash().put(name, value);
 	}
 
 	// View scope -----------------------------------------------------------------------------------------------------
@@ -764,7 +855,7 @@ public final class Faces {
 	 * @see UIViewRoot#getViewMap()
 	 */
 	public static Map<String, Object> getViewMap() {
-		return FacesContext.getCurrentInstance().getViewRoot().getViewMap();
+		return getViewRoot().getViewMap();
 	}
 
 	/**
@@ -776,7 +867,7 @@ public final class Faces {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T getViewAttribute(String name) {
-		return (T) FacesContext.getCurrentInstance().getViewRoot().getViewMap().get(name);
+		return (T) getViewMap().get(name);
 	}
 
 	/**
@@ -786,7 +877,7 @@ public final class Faces {
 	 * @see UIViewRoot#getViewMap()
 	 */
 	public static void setViewAttribute(String name, Object value) {
-		FacesContext.getCurrentInstance().getViewRoot().getViewMap().put(name, value);
+		getViewMap().put(name, value);
 	}
 
 	// Session scope --------------------------------------------------------------------------------------------------
@@ -797,7 +888,7 @@ public final class Faces {
 	 * @see ExternalContext#getSessionMap()
 	 */
 	public static Map<String, Object> getSessionMap() {
-		return FacesContext.getCurrentInstance().getExternalContext().getSessionMap();
+		return getExternalContext().getSessionMap();
 	}
 
 	/**
@@ -809,7 +900,7 @@ public final class Faces {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T getSessionAttribute(String name) {
-		return (T) FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get(name);
+		return (T) getSessionMap().get(name);
 	}
 
 	/**
@@ -819,7 +910,7 @@ public final class Faces {
 	 * @see ExternalContext#getSessionMap()
 	 */
 	public static void setSessionAttribute(String name, Object value) {
-		FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put(name, value);
+		getSessionMap().put(name, value);
 	}
 
 	// Application scope ----------------------------------------------------------------------------------------------
@@ -830,7 +921,7 @@ public final class Faces {
 	 * @see ExternalContext#getApplicationMap()
 	 */
 	public static Map<String, Object> getApplicationMap() {
-		return FacesContext.getCurrentInstance().getExternalContext().getApplicationMap();
+		return getExternalContext().getApplicationMap();
 	}
 
 	/**
@@ -842,7 +933,7 @@ public final class Faces {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T getApplicationAttribute(String name) {
-		return (T) FacesContext.getCurrentInstance().getExternalContext().getApplicationMap().get(name);
+		return (T) getApplicationMap().get(name);
 	}
 
 	/**
@@ -852,7 +943,7 @@ public final class Faces {
 	 * @see ExternalContext#getApplicationMap()
 	 */
 	public static void setApplicationAttribute(String name, Object value) {
-		FacesContext.getCurrentInstance().getExternalContext().getApplicationMap().put(name, value);
+		getApplicationMap().put(name, value);
 	}
 
 	// File download --------------------------------------------------------------------------------------------------
@@ -914,7 +1005,7 @@ public final class Faces {
 	private static void sendFile(InputStream input, String filename, long contentLength, boolean attachment)
 		throws IOException
 	{
-		FacesContext context = FacesContext.getCurrentInstance();
+		FacesContext context = getContext();
 		ExternalContext externalContext = context.getExternalContext();
 
 		// Prepare the response and set the necessary headers.

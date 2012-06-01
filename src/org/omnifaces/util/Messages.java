@@ -46,6 +46,11 @@ import javax.servlet.ServletContextListener;
  * {@link MessageFormat#format(String, Object...)}. Note that the resolver can be set only once. It's recommend to do
  * it early during webapp's startup, for example with a {@link ServletContextListener}, or a Servlet 3.0
  * <code>ServletContainerInitializer</code>, or an eagerly initialized {@link ApplicationScoped} {@link ManagedBean}.
+ * <p>
+ * Note that all of those methods by design only sets the message summary and ignores the message detail (it is not
+ * possible to offer varargs to parameterize <em>both</em> the summary and the detail). The message summary is exactly
+ * the information which is by default displayed in the <code>&lt;h:message(s)&gt;</code>, while the detail is by
+ * default only displayed when you explicitly set the <code>showDetail="true"</code> attribute.
  *
  * @author Bauke Scholtz
  */
@@ -177,6 +182,17 @@ public final class Messages {
 	// Add message ----------------------------------------------------------------------------------------------------
 
 	/**
+	 * Add the given faces message to the given client ID. When the client ID is <code>null</code>, it becomes a
+	 * global faces message. This can be filtered in a <code>&lt;h:messages globalOnly="true"&gt;</code>.
+	 * @param clientId The client ID to add the faces message for.
+	 * @param message The faces message.
+	 * @see FacesContext#addMessage(String, FacesMessage)
+	 */
+	public static void add(String clientId, FacesMessage message) {
+		FacesContext.getCurrentInstance().addMessage(clientId, message);
+	}
+
+	/**
 	 * Add a faces message of the given severity to the given client ID, with the given message body which is formatted
 	 * with the given parameters.
 	 * @param clientId The client ID to add the faces message for.
@@ -184,10 +200,10 @@ public final class Messages {
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
 	 * @see #create(javax.faces.application.FacesMessage.Severity, String, Object...)
-	 * @see FacesContext#addMessage(String, FacesMessage)
+	 * @see #add(String, FacesMessage)
 	 */
 	public static void add(FacesMessage.Severity severity, String clientId, String message, Object... params) {
-		FacesContext.getCurrentInstance().addMessage(clientId, create(severity, message, params));
+		add(clientId, create(severity, message, params));
 	}
 
 	/**
@@ -196,10 +212,11 @@ public final class Messages {
 	 * @param clientId The client ID to add the faces message for.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #add(FacesMessage.Severity, String, String, Object...)
+	 * @see #createInfo(String, Object...)
+	 * @see #add(String, FacesMessage)
 	 */
 	public static void addInfo(String clientId, String message, Object... params) {
-		add(FacesMessage.SEVERITY_INFO, clientId, message, params);
+		add(clientId, createInfo(message, params));
 	}
 
 	/**
@@ -208,10 +225,11 @@ public final class Messages {
 	 * @param clientId The client ID to add the faces message for.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #add(FacesMessage.Severity, String, String, Object...)
+	 * @see #createWarn(String, Object...)
+	 * @see #add(String, FacesMessage)
 	 */
 	public static void addWarn(String clientId, String message, Object... params) {
-		add(FacesMessage.SEVERITY_WARN, clientId, message, params);
+		add(clientId, createWarn(message, params));
 	}
 
 	/**
@@ -220,13 +238,12 @@ public final class Messages {
 	 * @param clientId The client ID to add the faces message for.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #add(FacesMessage.Severity, String, String, Object...)
+	 * @see #createError(String, Object...)
+	 * @see #add(String, FacesMessage)
 	 */
 	public static void addError(String clientId, String message, Object... params) {
-		add(FacesMessage.SEVERITY_ERROR, clientId, message, params);
+		add(clientId, createError(message, params));
 	}
-
-	// Add global message ---------------------------------------------------------------------------------------------
 
 	/**
 	 * Add a FATAL faces message to the given client ID, with the given message body which is formatted with the given
@@ -234,71 +251,112 @@ public final class Messages {
 	 * @param clientId The client ID to add the faces message for.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #add(FacesMessage.Severity, String, String, Object...)
+	 * @see #createFatal(String, Object...)
+	 * @see #add(String, FacesMessage)
 	 */
 	public static void addFatal(String clientId, String message, Object... params) {
-		add(FacesMessage.SEVERITY_FATAL, clientId, message, params);
+		add(clientId, createFatal(message, params));
+	}
+
+	// Add global message ---------------------------------------------------------------------------------------------
+
+	/**
+	 * Add a global faces message. This adds a faces message to a client ID of <code>null</code>.
+	 * @param message The global faces message.
+	 * @see #add(String, FacesMessage)
+	 */
+	public static void addGlobal(FacesMessage message) {
+		add(null, message);
+	}
+
+	/**
+	 * Add a global faces message of the given severity, with the given message body which is formatted with the given
+	 * parameters.
+	 * @param severity The severity of the global faces message.
+	 * @param message The message body.
+	 * @param params The message format parameters, if any.
+	 * @see #create(javax.faces.application.FacesMessage.Severity, String, Object...)
+	 * @see #addGlobal(FacesMessage)
+	 */
+	public static void addGlobal(FacesMessage.Severity severity, String message, Object... params) {
+		addGlobal(create(severity, message, params));
 	}
 
 	/**
 	 * Add a global INFO faces message, with the given message body which is formatted with the given parameters.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #add(FacesMessage.Severity, String, String, Object...)
+	 * @see #createInfo(String, Object...)
+	 * @see #addGlobal(FacesMessage)
 	 */
 	public static void addGlobalInfo(String message, Object... params) {
-		add(FacesMessage.SEVERITY_INFO, null, message, params);
+		addGlobal(createInfo(message, params));
 	}
 
 	/**
 	 * Add a global WARN faces message, with the given message body which is formatted with the given parameters.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #add(FacesMessage.Severity, String, String, Object...)
+	 * @see #createWarn(String, Object...)
+	 * @see #addGlobal(FacesMessage)
 	 */
 	public static void addGlobalWarn(String message, Object... params) {
-		add(FacesMessage.SEVERITY_WARN, null, message, params);
+		addGlobal(createWarn(message, params));
 	}
 
 	/**
 	 * Add a global ERROR faces message, with the given message body which is formatted with the given parameters.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #add(FacesMessage.Severity, String, String, Object...)
+	 * @see #createError(String, Object...)
+	 * @see #addGlobal(FacesMessage)
 	 */
 	public static void addGlobalError(String message, Object... params) {
-		add(FacesMessage.SEVERITY_ERROR, null, message, params);
+		addGlobal(createError(message, params));
 	}
 
 	/**
 	 * Add a global FATAL faces message, with the given message body which is formatted with the given parameters.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #add(FacesMessage.Severity, String, String, Object...)
+	 * @see #createFatal(String, Object...)
+	 * @see #addGlobal(FacesMessage)
 	 */
 	public static void addGlobalFatal(String message, Object... params) {
-		add(FacesMessage.SEVERITY_FATAL, null, message, params);
+		addGlobal(createFatal(message, params));
 	}
 
 	// Add flash message ----------------------------------------------------------------------------------------------
 
 	/**
-	 * Add a flash scoped faces message of the given severity to the given client ID, with the given message body which
-	 * is formatted with the given parameters. Use this when you need to display the message after a redirect.
+	 * Add a flash scoped faces message to the given client ID. Use this when you need to display the message after a
+	 * redirect.
 	 * <p>
 	 * NOTE: the flash scope has in early Mojarra versions however some pretty peculiar problems. In older versions,
 	 * the messages are remembered too long, or they are only displayed after refresh, or they are not displayed when
 	 * the next request is on a different path. As of now, with Mojarra 2.1.7, only the last described problem remains.
+	 * @param clientId The client ID to add the flash scoped faces message for.
+	 * @param message The faces message.
+	 * @see Flash#setKeepMessages(boolean)
+	 * @see #add(String, FacesMessage)
+	 */
+	public static void addFlash(String clientId, FacesMessage message) {
+		Faces.getFlash().setKeepMessages(true);
+		add(clientId, message);
+	}
+
+	/**
+	 * Add a flash scoped faces message of the given severity to the given client ID, with the given message body which
+	 * is formatted with the given parameters. Use this when you need to display the message after a redirect.
 	 * @param clientId The client ID to add the faces message for.
 	 * @param severity The severity of the faces message.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see Flash#setKeepMessages(boolean)
-	 * @see #add(FacesMessage.Severity, String, String, Object...)
+	 * @see #create(javax.faces.application.FacesMessage.Severity, String, Object...)
+	 * @see #addFlash(String, FacesMessage)
 	 */
 	public static void addFlash(FacesMessage.Severity severity, String clientId, String message, Object... params) {
-		Faces.getFlash().setKeepMessages(true);
-		add(severity, clientId, message, params);
+		addFlash(clientId, create(severity, message, params));
 	}
 
 	/**
@@ -307,10 +365,11 @@ public final class Messages {
 	 * @param clientId The client ID to add the faces message for.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #addFlash(FacesMessage.Severity, String, String, Object...)
+	 * @see #createInfo(String, Object...)
+	 * @see #addFlash(String, FacesMessage)
 	 */
 	public static void addFlashInfo(String clientId, String message, Object... params) {
-		addFlash(FacesMessage.SEVERITY_INFO, clientId, message, params);
+		addFlash(clientId, createInfo(message, params));
 	}
 
 	/**
@@ -319,10 +378,11 @@ public final class Messages {
 	 * @param clientId The client ID to add the faces message for.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #addFlash(FacesMessage.Severity, String, String, Object...)
+	 * @see #createWarn(String, Object...)
+	 * @see #addFlash(String, FacesMessage)
 	 */
 	public static void addFlashWarn(String clientId, String message, Object... params) {
-		addFlash(FacesMessage.SEVERITY_WARN, clientId, message, params);
+		addFlash(clientId, createWarn(message, params));
 	}
 
 	/**
@@ -331,10 +391,11 @@ public final class Messages {
 	 * @param clientId The client ID to add the faces message for.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #addFlash(FacesMessage.Severity, String, String, Object...)
+	 * @see #createError(String, Object...)
+	 * @see #addFlash(String, FacesMessage)
 	 */
 	public static void addFlashError(String clientId, String message, Object... params) {
-		addFlash(FacesMessage.SEVERITY_ERROR, clientId, message, params);
+		addFlash(clientId, createError(message, params));
 	}
 
 	/**
@@ -343,23 +404,35 @@ public final class Messages {
 	 * @param clientId The client ID to add the faces message for.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #addFlash(FacesMessage.Severity, String, String, Object...)
+	 * @see #createFatal(String, Object...)
+	 * @see #addFlash(String, FacesMessage)
 	 */
 	public static void addFlashFatal(String clientId, String message, Object... params) {
-		addFlash(FacesMessage.SEVERITY_FATAL, clientId, message, params);
+		addFlash(clientId, createFatal(message, params));
 	}
 
 	// Add global flash message ---------------------------------------------------------------------------------------
+
+	/**
+	 * Add a flash scoped global faces message. This adds a faces message to a client ID of <code>null</code>. Use this
+	 * when you need to display the message after a redirect.
+	 * @param message The global faces message.
+	 * @see #addFlash(String, FacesMessage)
+	 */
+	public static void addFlashGlobal(FacesMessage message) {
+		addFlash(null, message);
+	}
 
 	/**
 	 * Add a flash scoped global INFO faces message, with the given message body which is formatted with the given
 	 * parameters. Use this when you need to display the message after a redirect.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #addFlash(FacesMessage.Severity, String, String, Object...)
+	 * @see #createInfo(String, Object...)
+	 * @see #addFlashGlobal(FacesMessage)
 	 */
 	public static void addFlashGlobalInfo(String message, Object... params) {
-		addFlash(FacesMessage.SEVERITY_INFO, null, message, params);
+		addFlashGlobal(createInfo(message, params));
 	}
 
 	/**
@@ -367,10 +440,11 @@ public final class Messages {
 	 * parameters. Use this when you need to display the message after a redirect.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #addFlash(FacesMessage.Severity, String, String, Object...)
+	 * @see #createWarn(String, Object...)
+	 * @see #addFlashGlobal(FacesMessage)
 	 */
 	public static void addFlashGlobalWarn(String message, Object... params) {
-		addFlash(FacesMessage.SEVERITY_WARN, null, message, params);
+		addFlashGlobal(createWarn(message, params));
 	}
 
 	/**
@@ -378,10 +452,11 @@ public final class Messages {
 	 * parameters. Use this when you need to display the message after a redirect.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #addFlash(FacesMessage.Severity, String, String, Object...)
+	 * @see #createError(String, Object...)
+	 * @see #addFlashGlobal(FacesMessage)
 	 */
 	public static void addFlashGlobalError(String message, Object... params) {
-		addFlash(FacesMessage.SEVERITY_ERROR, null, message, params);
+		addFlashGlobal(createError(message, params));
 	}
 
 	/**
@@ -389,10 +464,11 @@ public final class Messages {
 	 * parameters. Use this when you need to display the message after a redirect.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #addFlash(FacesMessage.Severity, String, String, Object...)
+	 * @see #createFatal(String, Object...)
+	 * @see #addFlashGlobal(FacesMessage)
 	 */
 	public static void addFlashGlobalFatal(String message, Object... params) {
-		addFlash(FacesMessage.SEVERITY_FATAL, null, message, params);
+		addFlashGlobal(createFatal(message, params));
 	}
 
 }
