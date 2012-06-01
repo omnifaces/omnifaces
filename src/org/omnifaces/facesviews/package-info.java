@@ -23,7 +23,7 @@
  * <pre>
  *    /WEB-INF/faces-views/index.xhtml
  *    /WEB-INF/faces-views/users/add.xhtml
- *    normal.xhtml
+ *    /normal.xhtml
  * </pre>
  * This will make the Facelets available via the following URLs (given a root deployment on domain <code>example.com</code>):
  * <pre>
@@ -74,7 +74,7 @@
  *     &lt;filter-class>org.omnifaces.facesviews.FacesViewsForwardingFilter&lt;/filter-class>
  * &lt;/filter>
  * &lt;filter-mapping>
- *     &lt;filter-name>FacesViewsForwardingFilter</filter-name>
+ *     &lt;filter-name>FacesViewsForwardingFilter&lt;/filter-name>
  *     &lt;url-pattern>/*&lt;/url-pattern>
  * &lt;/filter-mapping>
  * </pre>
