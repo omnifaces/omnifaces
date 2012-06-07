@@ -63,6 +63,15 @@ public final class Utils {
 	}
 
 	/**
+	 * Returns true if the given collection is null or is empty.
+	 * @param collection The collection to be checked on emptiness.
+	 * @return True if the given collection is null or is empty.
+	 */
+	public static boolean isEmpty(Collection<?> collection) {
+		return collection == null || collection.isEmpty();
+	}
+
+	/**
 	 * Returns true if the given value is null or is empty. Types of String, Object[], Collection and Map are
 	 * recognized. If none is recognized, then examine the emptiness of the toString() representation instead.
 	 * @param value The value to be checked on emptiness.
