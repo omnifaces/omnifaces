@@ -1126,7 +1126,7 @@
 		<description>
 				<![CDATA[
 					<strong><code>o:viewParam</code></strong> is a component that extends the standard viewParam and provides a stateless
-	 				mode of operation and a default for the label atrribute. When the label attribute is ommitted, the name
+	 				mode of operation and a default for the label atrribute. When the label attribute is omitted, the name
 	 				attribute will be used instead.
 	 				<p>
 	 				The standard UIViewParameter implementation calls the model setter again after postback. This is not always desired when being
