@@ -73,16 +73,19 @@ public class InvokeActionEventListener extends DefaultPhaseListener implements S
 	}
 
 	/**
-	 * Checks if the the {@link UIComponent} which passed the {@link #isListenerForSource(Object)} check has any
-	 * listeners for the {@link PreInvokeActionEvent} and/or {@link PostInvokeActionEvent} events and then add them to
-	 * a set in the current faces context.
+	 * If the validation has not failed for the current faces context, then check if the {@link UIComponent} which
+	 * passed the {@link #isListenerForSource(Object)} check has any listeners for the {@link PreInvokeActionEvent}
+	 * and/or {@link PostInvokeActionEvent} events and then add them to a set in the current faces context.
 	 */
 	@Override
 	public void processEvent(SystemEvent event) throws AbortProcessingException {
 		FacesContext context = FacesContext.getCurrentInstance();
-		UIComponent component = (UIComponent) event.getSource();
-		checkAndAddComponentWithListeners(context, component, PreInvokeActionEvent.class);
-		checkAndAddComponentWithListeners(context, component, PostInvokeActionEvent.class);
+
+		if (!context.isValidationFailed()) {
+			UIComponent component = (UIComponent) event.getSource();
+			checkAndAddComponentWithListeners(context, component, PreInvokeActionEvent.class);
+			checkAndAddComponentWithListeners(context, component, PostInvokeActionEvent.class);
+		}
 	}
 
 	/**
@@ -112,7 +115,7 @@ public class InvokeActionEventListener extends DefaultPhaseListener implements S
 	 * @param component The component to be checked.
 	 * @param type The event type.
 	 */
-	@SuppressWarnings("unchecked") // For the cast on List<UIComponent>.
+	@SuppressWarnings("unchecked") // For the cast on Set<UIComponent>.
 	private static <T extends SystemEvent> void checkAndAddComponentWithListeners(
 		FacesContext context, UIComponent component, Class<T> type)
 	{
@@ -134,7 +137,7 @@ public class InvokeActionEventListener extends DefaultPhaseListener implements S
 	 * @param context The involved faces context.
 	 * @param type The event type.
 	 */
-	@SuppressWarnings("unchecked") // For the cast on List<UIComponent>.
+	@SuppressWarnings("unchecked") // For the cast on Set<UIComponent>.
 	private static <T extends SystemEvent> void publishEvent(FacesContext context, Class<T> type) {
 		if (context.getPartialViewContext().isAjaxRequest()) {
 			// Event listeners on UIViewRoot should always be executed. However, PostValidateEvent of UIViewRoot isn't
