@@ -21,6 +21,8 @@ import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.NamedEvent;
 import javax.faces.event.PhaseId;
 
+import org.omnifaces.eventlistener.InvokeActionEventListener;
+
 /**
  * Use this event to have a hook on a listener method during the beforephase of the {@link PhaseId#INVOKE_APPLICATION}.
  * This event is supported on {@link UIViewRoot}, {@link UIForm}, {@link UIInput} and {@link UICommand} components.
@@ -30,6 +32,8 @@ import javax.faces.event.PhaseId;
  * components on an easy manner.
  *
  * @author Bauke Scholtz
+ * @see InvokeActionEventListener
+ * @since 1.1
  */
 @NamedEvent(shortName = "preInvokeAction")
 public class PreInvokeActionEvent extends ComponentSystemEvent {

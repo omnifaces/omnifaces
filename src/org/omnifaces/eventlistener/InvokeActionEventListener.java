@@ -41,6 +41,9 @@ import org.omnifaces.util.Utils;
  * when OmniFaces JAR is bundled in webapp, so endusers do not need to register this phase listener explicitly themself.
  *
  * @author Bauke Scholtz
+ * @see PreInvokeActionEvent
+ * @see PostInvokeActionEvent
+ * @since 1.1
  */
 public class InvokeActionEventListener extends DefaultPhaseListener implements SystemEventListener {
 
