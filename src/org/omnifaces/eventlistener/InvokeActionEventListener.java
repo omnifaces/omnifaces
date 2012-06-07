@@ -36,6 +36,9 @@ import org.omnifaces.util.Utils;
 /**
  * This phase listener takes care that the {@link PreInvokeActionEvent} and {@link PostInvokeActionEvent} events are
  * properly been published.
+ * <p>
+ * This phase listener is already registered by OmniFaces own <tt>faces-config.xml</tt> and thus get auto-initialized
+ * when OmniFaces JAR is bundled in webapp, so endusers do not need to register this phase listener explicitly themself.
  *
  * @author Bauke Scholtz
  */
