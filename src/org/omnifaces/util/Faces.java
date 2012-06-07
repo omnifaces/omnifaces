@@ -132,8 +132,9 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns true if we're in development stage.
-	 * @return True if we're in development stage.
+	 * Returns whether we're in development stage. This will be the case when the <tt>javax.faces.PROJECT_STATE</tt>
+	 * context parameter in <tt>web.xml</tt> is set to <tt>Development</tt>.
+	 * @return <code>true</code> if we're in development stage, otherwise <code>false</code>.
 	 * @see Application#getProjectStage()
 	 */
 	public static boolean isDevelopment() {
@@ -159,19 +160,21 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns true if the faces servlet mapping used in the current request is a prefix mapping, otherwise false.
-	 * @return True if the faces servlet mapping used in the current request is a prefix mapping, otherwise false.
+	 * Returns whether the faces servlet mapping used in the current request is a prefix mapping.
+	 * @return <code>true</code> if the faces servlet mapping used in the current request is a prefix mapping, otherwise
+	 * <code>false</code>.
 	 */
 	public static boolean isPrefixMapping() {
 		return isPrefixMapping(getMapping());
 	}
 
 	/**
-	 * Returns true if the given mapping is a prefix mapping, otherwise false. Use this method in preference to
-	 * {@link #isPrefixMapping()} when you already have obtained the mapping from {@link #getMapping()} so that the
-	 * mapping won't be calculated twice.
+	 * Returns whether the faces servlet mapping used in the current request is a prefix mapping. Use this method in
+	 * preference to {@link #isPrefixMapping()} when you already have obtained the mapping from {@link #getMapping()}
+	 * so that the mapping won't be calculated twice.
 	 * @param mapping The mapping to be tested.
-	 * @return True if the given mapping is a prefix mapping, otherwise false.
+	 * @return <code>true</code> if the faces servlet mapping used in the current request is a prefix mapping, otherwise
+	 * <code>false</code>.
 	 * @throws NullPointerException When mapping is <code>null</code>.
 	 */
 	public static boolean isPrefixMapping(String mapping) {
@@ -362,7 +365,7 @@ public final class Faces {
 
 	/**
 	 * Returns whether the current request is an ajax request.
-	 * @return true for an ajax request, false if the request is a non-ajax (synchronous) request.
+	 * @return <code>true</code> for an ajax request, <code>false</code> for a non-ajax (synchronous) request.
 	 * @see PartialViewContext#isAjaxRequest()
 	 */
 	public static boolean isAjaxRequest() {
@@ -371,7 +374,7 @@ public final class Faces {
 
 	/**
 	 * Returns whether the current request is a postback.
-	 * @return true for a postback, false if the request is a non-faces (non-postback) request.
+	 * @return <code>true</code> for a postback, <code>false</code> for a non-postback (GET) request.
 	 * @see FacesContext#isPostback()
 	 */
 	public static boolean isPostback() {
@@ -380,7 +383,8 @@ public final class Faces {
 
 	/**
 	 * Returns whether the validations phase of the current request has failed.
-	 * @return true if the validations phase of the current request has failed, otherwise false.
+	 * @return <code>true</code> if the validations phase of the current request has failed, otherwise
+	 * <code>false</code>.
 	 * @see FacesContext#isValidationFailed()
 	 */
 	public static boolean isValidationFailed() {
@@ -496,7 +500,7 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the HTTP request base URL, this is the full URL from the scheme, domain until with context path,
+	 * Returns the HTTP request base URL. This is the full URL from the scheme, domain until with context path,
 	 * including the trailing slash. This is the value you could use in HTML <code>&lt;base&gt;</code> tag.
 	 * @return The HTTP request base URL.
 	 * @see HttpServletRequest#getRequestURL()
@@ -507,6 +511,39 @@ public final class Faces {
 		HttpServletRequest request = getRequest();
 		String url = request.getRequestURL().toString();
 		return url.substring(0, url.length() - request.getRequestURI().length()) + request.getContextPath() + "/";
+	}
+
+	/**
+	 * Returns the HTTP request URL. This is the full request URL as the enduser sees in browser address bar. This does
+	 * not include the request query string.
+	 * @return The HTTP request URL.
+	 * @see HttpServletRequest#getRequestURL()
+	 * @since 1.1
+	 */
+	public static String getRequestURL() {
+		return getRequest().getRequestURL().toString();
+	}
+
+	/**
+	 * Returns the HTTP request URI. This is the part after the domain in the request URL, including the leading slash.
+	 * This does not include the request query string.
+	 * @return The HTTP request URI.
+	 * @see HttpServletRequest#getRequestURI()
+	 * @since 1.1
+	 */
+	public static String getRequestURI() {
+		return getRequest().getRequestURI();
+	}
+
+	/**
+	 * Returns the HTTP request query string. This is the part after the <tt>?</tt> in the request URL as the enduser
+	 * sees in browser address bar.
+	 * @return The HTTP request query string.
+	 * @see HttpServletRequest#getQueryString()
+	 * @since 1.1
+	 */
+	public static String getRequestQueryString() {
+		return getRequest().getQueryString();
 	}
 
 	/**
@@ -525,6 +562,7 @@ public final class Faces {
 	 * @param url The URL to redirect the current response to.
 	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
 	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @throws NullPointerException When url is <code>null</code>.
 	 * @see ExternalContext#redirect(String)
 	 */
 	public static void redirect(String url) throws IOException {
@@ -538,6 +576,7 @@ public final class Faces {
 	 * @param url The URL to redirect the current response to.
 	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
 	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @throws NullPointerException When url is <code>null</code>.
 	 * @see ExternalContext#setResponseStatus(int)
 	 * @see ExternalContext#setResponseHeader(String, String)
 	 */
@@ -629,7 +668,7 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns <code>true</code> if the currently logged-in user has the given role, otherwise <code>false</code>.
+	 * Returns whether the currently logged-in user has the given role.
 	 * @param role The role to be checked on the currently logged-in user.
 	 * @return <code>true</code> if the currently logged-in user has the given role, otherwise <code>false</code>.
 	 * @see ExternalContext#isUserInRole(String)
@@ -728,6 +767,21 @@ public final class Faces {
 	 */
 	public static void invalidateSession() {
 		getExternalContext().invalidateSession();
+	}
+
+	/**
+	 * Returns whether the session has been timed out for the current request. This is helpful if you need to
+	 * distinguish between a first-time request on a fresh session and a first-time request on a timed out session, for
+	 * example to display "Oops, you have been logged out because your session has been timed out!".
+	 * @return <code>true</code> if the session has been timed out for the current request, otherwise
+	 * <code>false</code>.
+	 * @see HttpServletRequest#getRequestedSessionId()
+	 * @see HttpServletRequest#isRequestedSessionIdValid()
+	 * @since 1.1
+	 */
+	public static boolean hasSessionTimedOut() {
+		HttpServletRequest request = getRequest();
+		return request.getRequestedSessionId() != null && !request.isRequestedSessionIdValid();
 	}
 
 	// Servlet context ------------------------------------------------------------------------------------------------
