@@ -48,6 +48,17 @@
 	<function>
 		<description>
 			<![CDATA[
+				Capitalize the given string, i.e. uppercase the first character.
+			]]>
+		</description>
+		<function-name>capitalize</function-name>
+		<function-class>org.omnifaces.el.functions.Strings</function-class>
+		<function-signature>java.lang.String capitalize(java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
 				URL-prettify the given string. It performs the following tasks:
 				<ul>
 				<li>Lowercase the string.

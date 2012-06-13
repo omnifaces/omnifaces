@@ -79,6 +79,23 @@ public final class Strings {
 	}
 
 	/**
+	 * Capitalize the given string, i.e. uppercase the first character.
+	 * @param string The string to be capitalized.
+	 * @return The capitalized string.
+	 * @since 1.1
+	 */
+	public static String capitalize(String string) {
+		if (string == null || string.isEmpty()) {
+			return string;
+		}
+
+		return new StringBuilder()
+			.append(Character.toTitleCase(string.charAt(0)))
+			.append(string.substring(1))
+			.toString();
+	}
+
+	/**
 	 * URL-prettify the given string. It performs the following tasks:
 	 * <ul>
 	 * <li>Lowercase the string.
