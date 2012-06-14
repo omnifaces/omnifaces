@@ -16,7 +16,6 @@ import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.Set;
 
 import javax.faces.FacesException;
@@ -35,8 +34,6 @@ import javax.faces.event.AjaxBehaviorListener;
 import javax.faces.event.PhaseEvent;
 import javax.faces.event.PhaseId;
 import javax.faces.event.SystemEventListener;
-
-import org.omnifaces.util.Components;
 
 /**
  * Use this action listener when you want to partially (ajax) render input fields which are not executed during submit,
@@ -155,14 +152,12 @@ public class ResetInputAjaxActionListener extends DefaultPhaseListener implement
 	}
 
 	/**
-	 * <p>Handle the reset input action as follows, only and only if the current request is an ajax request and the
+	 * Handle the reset input action as follows, only and only if the current request is an ajax request and the
 	 * {@link PartialViewContext#getRenderIds()} does not return an empty collection nor is the same as
-	 * {@link PartialViewContext#getExecuteIds()}:
-	 * <ul>
-	 * <li>Collect all {@link EditableValueHolder} components based on {@link PartialViewContext#getRenderIds()}.
-	 * <li>Remove all components covered by {@link PartialViewContext#getExecuteIds()} from this collection.
-	 * <li>Invoke {@link EditableValueHolder#resetValue()} on the remaining components of this collection.
-	 * </ul>
+	 * {@link PartialViewContext#getExecuteIds()}: find all {@link EditableValueHolder} components based on
+	 * {@link PartialViewContext#getRenderIds()} and if the component is not covered by
+	 * {@link PartialViewContext#getExecuteIds()}, then invoke {@link EditableValueHolder#resetValue()} on the
+	 * component.
 	 * @throws IllegalArgumentException When one of the client IDs resolved to a <code>null</code> component. This
 	 * would however indicate a bug in the concrete {@link PartialViewContext} implementation which is been used.
 	 */
@@ -176,20 +171,8 @@ public class ResetInputAjaxActionListener extends DefaultPhaseListener implement
 			Collection<String> executeIds = partialViewContext.getExecuteIds();
 
 			if (!renderIds.isEmpty() && !renderIds.containsAll(executeIds)) {
-				final Set<EditableValueHolder> inputs = new HashSet<EditableValueHolder>();
-
-				// First find all to be rendered inputs in the current view and add them to the set.
-				findAndAddEditableValueHolders(VisitContext.createVisitContext(
-					context, renderIds, VISIT_HINTS), context.getViewRoot(), inputs);
-
-				// Then find all executed inputs in the current form and remove them from the set.
-				findAndRemoveEditableValueHolders(VisitContext.createVisitContext(
-					context, executeIds, VISIT_HINTS), Components.getCurrentForm(), inputs);
-
-				// The set now contains inputs which are to be rendered, but which are not been executed. Reset them.
-				for (EditableValueHolder input : inputs) {
-					input.resetValue();
-				}
+				resetEditableValueHolders(VisitContext.createVisitContext(
+					context, renderIds, VISIT_HINTS), context.getViewRoot(), executeIds);
 			}
 		}
 
@@ -235,51 +218,28 @@ public class ResetInputAjaxActionListener extends DefaultPhaseListener implement
 
 	/**
 	 * Find all editable value holder components in the component hierarchy, starting with the given component and
-	 * add them to the given set.
+	 * reset them when they are not covered by the given execute IDs.
 	 * @param context The visit context to work with.
 	 * @param component The starting point of the component hierarchy to look for editable value holder components.
-	 * @param inputs The set to add the found editable value holder components to.
+	 * @param executeIds The execute IDs.
 	 */
-	private static void findAndAddEditableValueHolders
-		(VisitContext context, final UIComponent component, final Set<EditableValueHolder> inputs)
+	private void resetEditableValueHolders
+		(VisitContext context, final UIComponent component, final Collection<String> executeIds)
 	{
 		component.visitTree(context, new VisitCallback() {
 			@Override
 			public VisitResult visit(VisitContext context, UIComponent target) {
+				if (executeIds.contains(target.getClientId(context.getFacesContext()))) {
+					return VisitResult.REJECT;
+				}
+
 				if (target instanceof EditableValueHolder) {
-					inputs.add((EditableValueHolder) target);
+					((EditableValueHolder) target).resetValue();
 				}
 				else if (context.getIdsToVisit() != VisitContext.ALL_IDS) {
 					// Render ID didn't point an EditableValueHolder. Visit all children as well.
-					findAndAddEditableValueHolders(VisitContext.createVisitContext(
-						context.getFacesContext(), null, context.getHints()), target, inputs);
-				}
-
-				return VisitResult.ACCEPT;
-			}
-		});
-	}
-
-	/**
-	 * Find all editable value holder components in the component hierarchy, starting with the given component and
-	 * remove them from the given set.
-	 * @param context The visit context to work with.
-	 * @param component The starting point of the component hierarchy to look for editable value holder components.
-	 * @param inputs The set to remove the found editable value holder components from.
-	 */
-	private static void findAndRemoveEditableValueHolders
-		(VisitContext context, final UIComponent component, final Set<EditableValueHolder> inputs)
-	{
-		component.visitTree(context, new VisitCallback() {
-			@Override
-			public VisitResult visit(VisitContext context, UIComponent target) {
-				if (target instanceof EditableValueHolder) {
-					inputs.remove(target);
-				}
-				else if (context.getIdsToVisit() != VisitContext.ALL_IDS) {
-					// Execute ID didn't point an EditableValueHolder. Visit all children as well.
-					findAndRemoveEditableValueHolders(VisitContext.createVisitContext(
-						context.getFacesContext(), null, context.getHints()), target, inputs);
+					resetEditableValueHolders(VisitContext.createVisitContext(
+						context.getFacesContext(), null, context.getHints()), target, executeIds);
 				}
 
 				return VisitResult.ACCEPT;
