@@ -155,6 +155,12 @@ public class Html5RenderKit extends RenderKitWrapper {
 			return new Html5ResponseWriter(super.cloneWithWriter(writer));
 		}
 
+		/**
+		 * An override which checks if an attribute of <code>type="text"</code> is been written by an UIInput component
+		 * and if so then check if the <code>type</code> attribute isn't been explicitly set by the developer and if so
+		 * then write it.
+		 * @throws IllegalArgumentException When the <code>type</code> attribute is not supported.
+		 */
 		@Override
 		public void writeAttribute(String name, Object value, String property) throws IOException {
 			if ("type".equals(name) && "text".equals(value)) {
@@ -179,6 +185,10 @@ public class Html5RenderKit extends RenderKitWrapper {
 			super.writeAttribute(name, value, property);
 		}
 
+		/**
+		 * An override which checks if the current component is an instance of {@link UIForm} or {@link UIInput} and
+		 * then write HTML5 attributes which are explicitly been set by the developer.
+		 */
 		@Override
 		public void endElement(String elementName) throws IOException {
 			UIComponent component = Components.getCurrentComponent();
@@ -220,7 +230,7 @@ public class Html5RenderKit extends RenderKitWrapper {
 				Object value = attributes.get(name);
 
 				if (value != null) {
-					writeAttribute(name, value, null);
+					super.writeAttribute(name, value, null);
 				}
 			}
 		}
