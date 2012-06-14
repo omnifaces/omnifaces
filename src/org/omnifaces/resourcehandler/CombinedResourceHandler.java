@@ -32,6 +32,7 @@ import javax.faces.event.SystemEvent;
 import javax.faces.event.SystemEventListener;
 import javax.servlet.http.HttpServletResponse;
 
+import org.omnifaces.util.Events;
 import org.omnifaces.util.Utils;
 
 /**
@@ -76,7 +77,7 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	 */
 	public CombinedResourceHandler(ResourceHandler wrapped) {
 		this.wrapped = wrapped;
-		FacesContext.getCurrentInstance().getApplication().subscribeToEvent(PreRenderViewEvent.class, this);
+		Events.subscribeToEvent(PreRenderViewEvent.class, this);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------

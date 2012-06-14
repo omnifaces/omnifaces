@@ -15,6 +15,8 @@ package org.omnifaces.util;
 import javax.faces.event.PhaseEvent;
 import javax.faces.event.PhaseId;
 import javax.faces.event.PhaseListener;
+import javax.faces.event.SystemEvent;
+import javax.faces.event.SystemEventListener;
 
 import org.omnifaces.eventlistener.DefaultPhaseListener;
 
@@ -81,6 +83,17 @@ public final class Events {
 				callback.invoke();
 			}
 		});
+	}
+
+	/**
+	 * Adds the given system event listener to the application that get invoked everytime when the given system event
+	 * type is been published.
+	 * @param type The system event type to listen on.
+	 * @param listener The system event listener to be invoked.
+	 * @since 1.1
+	 */
+	public static void subscribeToEvent(Class<? extends SystemEvent> type, SystemEventListener listener) {
+		Faces.getApplication().subscribeToEvent(type, listener);
 	}
 
 }

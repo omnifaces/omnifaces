@@ -30,7 +30,7 @@ import javax.faces.event.SystemEventListener;
 
 import org.omnifaces.event.PostInvokeActionEvent;
 import org.omnifaces.event.PreInvokeActionEvent;
-import org.omnifaces.util.Faces;
+import org.omnifaces.util.Events;
 import org.omnifaces.util.Utils;
 
 /**
@@ -61,7 +61,7 @@ public class InvokeActionEventListener extends DefaultPhaseListener implements S
 	 */
 	public InvokeActionEventListener() {
 		super(PhaseId.INVOKE_APPLICATION);
-		Faces.getApplication().subscribeToEvent(PostValidateEvent.class, this);
+		Events.subscribeToEvent(PostValidateEvent.class, this);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
