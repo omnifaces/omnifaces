@@ -59,8 +59,9 @@ public abstract class HttpFilter implements Filter {
 
 	/**
 	 * Convenience init() method without FilterConfig parameter which will be called by init(FilterConfig).
+	 * @throws ServletException When filter's initialization failed.
 	 */
-	public void init() {
+	public void init() throws ServletException {
 		//
 	}
 
