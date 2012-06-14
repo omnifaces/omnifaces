@@ -24,9 +24,12 @@ import javax.faces.component.visit.VisitCallback;
 import javax.faces.component.visit.VisitContext;
 import javax.faces.component.visit.VisitResult;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AbortProcessingException;
+import javax.faces.event.FacesEvent;
 import javax.faces.event.PhaseId;
 
 import org.omnifaces.component.EditableValueHolderStateHelper;
+import org.omnifaces.event.FacesEventWrapper;
 import org.omnifaces.model.tree.ListTreeModel;
 import org.omnifaces.model.tree.TreeModel;
 import org.omnifaces.util.Callback;
@@ -135,6 +138,14 @@ public class Tree extends TreeFamily implements NamingContainer {
 	}
 
 	/**
+	 * An override which wraps the given faces event in a specific faces event which remembers the current model node.
+	 */
+	@Override
+	public void queueEvent(FacesEvent event) {
+		super.queueEvent(new TreeFacesEvent(event, this, getCurrentModelNode()));
+	}
+
+	/**
 	 * Validate the component hierarchy.
 	 * @throws IllegalArgumentException When this component is nested in another {@link Tree}, or when there aren't any
 	 * children of type {@link TreeNode}.
@@ -151,7 +162,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	}
 
 	/**
-	 * Set the root node and delegate the call to {@link #processTreeNode(FacesContext, PhaseId)}.
+	 * Set the root node as current node and delegate the call to {@link #processTreeNode(FacesContext, PhaseId)}.
 	 * @param context The faces context to work with.
 	 * @param phaseId The current phase ID.
 	 */
@@ -161,7 +172,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 			return;
 		}
 
-		process(context, phaseId, new Callback.Returning<Void>() {
+		process(context, phaseId, getModel(), new Callback.Returning<Void>() {
 
 			@Override
 			public Void invoke() {
@@ -172,7 +183,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	}
 
 	/**
-	 * Set the root node and delegate the call to {@link #visitTreeNode(VisitContext, VisitCallback)}.
+	 * Set the root node as current node and delegate the call to {@link #visitTreeNode(VisitContext, VisitCallback)}.
 	 * @param context The visit context to work with.
 	 * @param callback The visit callback to work with.
 	 * @return The visit result.
@@ -183,7 +194,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 			return false;
 		}
 
-		return process(context.getFacesContext(), PhaseId.ANY_PHASE, new Callback.Returning<Boolean>() {
+		return process(context.getFacesContext(), PhaseId.ANY_PHASE, getModel(), new Callback.Returning<Boolean>() {
 
 			@Override
 			public Boolean invoke() {
@@ -200,6 +211,32 @@ public class Tree extends TreeFamily implements NamingContainer {
 				return false;
 			}
 		});
+	}
+
+	/**
+	 * If the given event is an instance of the specific faces event which was created during our
+	 * {@link #queueEvent(FacesEvent)}, then extract the node from it and set it as current node and delegate the call
+	 * to the wrapped faces event.
+	 */
+	@Override
+	public void broadcast(FacesEvent event) throws AbortProcessingException {
+		if (event instanceof TreeFacesEvent) {
+			FacesContext context = FacesContext.getCurrentInstance();
+			TreeFacesEvent treeEvent = (TreeFacesEvent) event;
+			final FacesEvent wrapped = treeEvent.getWrapped();
+
+			process(context, PhaseId.INVOKE_APPLICATION, treeEvent.getNode(), new Callback.Returning<Void>() {
+
+				@Override
+				public Void invoke() {
+					wrapped.getComponent().broadcast(wrapped);
+					return null;
+				}
+			});
+		}
+		else {
+			super.broadcast(event);
+		}
 	}
 
 	/**
@@ -251,14 +288,15 @@ public class Tree extends TreeFamily implements NamingContainer {
 	}
 
 	/**
-	 * Convenience method to handle both {@link #process(FacesContext, PhaseId)} and
-	 * {@link #visitTree(VisitContext, VisitCallback)} without code duplication.
+	 * Convenience method to handle {@link #process(FacesContext, PhaseId)},
+	 * {@link #visitTree(VisitContext, VisitCallback)} and {@link #broadcast(FacesEvent)} without code duplication.
 	 * @param context The faces context to work with.
 	 * @param phaseId The current phase ID.
+	 * @param node The current tree model node.
 	 * @param callback The callback to be invoked.
 	 * @return The callback result.
 	 */
-	private <R> R process(FacesContext context, PhaseId phaseId, Callback.Returning<R> callback) {
+	private <R> R process(FacesContext context, PhaseId phaseId, TreeModel node, Callback.Returning<R> callback) {
 		if (phaseId == PhaseId.RENDER_RESPONSE) {
 			nodes = null;
 			model = null;
@@ -269,7 +307,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 		pushComponentToEL(context, null);
 
 		try {
-			setCurrentModelNode(context, getModel());
+			setCurrentModelNode(context, node);
 			return callback.invoke();
 		}
 		finally {
@@ -468,6 +506,30 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 */
 	public void setVarNode(String varNode) {
 		getStateHelper().put(PropertyKeys.varNode, varNode);
+	}
+
+	// Nested classes -------------------------------------------------------------------------------------------------
+
+	/**
+	 * This faces event implementation remembers the current model node at the moment the faces event was queued.
+	 *
+	 * @author Bauke Scholtz
+	 */
+	private static class TreeFacesEvent extends FacesEventWrapper {
+
+		private static final long serialVersionUID = -7751061713837227515L;
+
+		private TreeModel node;
+
+		public TreeFacesEvent(FacesEvent wrapped, Tree tree, TreeModel node) {
+			super(wrapped, tree);
+			this.node = node;
+		}
+
+		public TreeModel getNode() {
+			return node;
+		}
+
 	}
 
 }
