@@ -32,6 +32,7 @@ import org.omnifaces.component.input.componentidparam.ConditionalWriterListener;
  * The intended usage of this component is to allow client-side scripts to request markup for specific components
  * via a GET request (as opposed to AJAX based post-backs).
  * 
+ * @since 1.1
  * @author Arjan Tijms
  * 
  */

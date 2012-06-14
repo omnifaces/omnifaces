@@ -31,6 +31,7 @@ import org.omnifaces.component.input.ComponentIdParam;
  * This allows rendering to proceed to the output if the current component matches any of the given ids, otherwise simply does not send anything to
  * the output.
  * 
+ * @since 1.1
  * @author Arjan Tijms
  * 
  */
