@@ -107,6 +107,8 @@ public class GzipResponseFilter extends HttpFilter {
 	private Set<String> mimetypes = DEFAULT_MIMETYPES;
 	private int threshold = DEFAULT_THRESHOLD;
 
+	// Actions --------------------------------------------------------------------------------------------------------
+
 	/**
 	 * Initializes the filter parameters.
 	 */

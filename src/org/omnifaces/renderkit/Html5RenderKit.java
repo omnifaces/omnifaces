@@ -32,9 +32,10 @@ import org.omnifaces.util.Components;
 /**
  * <p>
  * This HTML5 render kit will return a special HTML5 response writer which checks for any HTML5 specific attributes
- * which are unsupported by the JSF {@link UIForm} and {@link UIInput} components. So far in JSF 2.0 and 2.1 only the
- * <code>autocomplete</code> attribute is supported in {@link UIInput} components. All other attributes are by design
- * ignored by the JSF standard HTML render kit. This HTML5 render kit supports the following HTML5 specific attributes:
+ * which are been set on the {@link UIForm} and {@link UIInput} components, but which are unsupported by JSF. So far in
+ * JSF 2.0 and 2.1 only the <code>autocomplete</code> attribute is supported in {@link UIInput} components. All other
+ * HTML5 attributes are by design ignored by the JSF standard HTML render kit. This HTML5 render kit adds the support
+ * for the following HTML5 specific attributes:
  * <ul>
  * <li><code>UIForm</code>: <code>autocomplete</code></li>
  * <li><code>UISelectBoolean</code>, <code>UISelectOne</code> and <code>UISelectMany</code>: <code>autofocus</code></li>
@@ -105,12 +106,12 @@ public class Html5RenderKit extends RenderKitWrapper {
 
 		private static final String[] UISelectAttributes = {
 			"autofocus"
-			// "form" attribute is not useable a JSF form.
+			// "form" attribute is not useable in a JSF form.
 		};
 
 		private static final String[] UIInputAttributes = {
 			"autofocus", "list", "pattern", "placeholder"
-			// "form*" attributes are not useable a JSF form.
+			// "form*" attributes are not useable in a JSF form.
 			// "height" and "width" attributes are only applicable on <input type="image">.
 			// "max", "min" and "step" are only applicable on <input type="number">.
 			// "multiple" is only applicable on <input type="email"> and <input type="file">.
