@@ -17,7 +17,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
@@ -31,6 +30,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 import javax.servlet.http.HttpSession;
+
+import org.omnifaces.util.Utils;
 
 /**
  * This filter will apply GZIP compression on responses whenever applicable. Whilst this is normally to be configured
@@ -94,10 +95,10 @@ public class GzipResponseFilter extends HttpFilter {
 	private static final String INIT_PARAM_MIMETYPES = "mimetypes";
 
 	private static final int DEFAULT_THRESHOLD = 500;
-	private static final Set<String> DEFAULT_MIMETYPES = Collections.unmodifiableSet(new HashSet<String>(Arrays.asList(
+	private static final Set<String> DEFAULT_MIMETYPES = Utils.unmodifiableSet(
 		"text/plain", "text/html", "text/css", "text/javascript", "text/csv", "text/rtf",
 		"application/xml", "application/xhtml+xml", "application/javascript", "application/json"
-	)));
+	);
 
 	private static final String ERROR_THRESHOLD = "The 'threshold' init param must be a number between 0 and 9999."
 		+ " Encountered an invalid value of '%s'.";

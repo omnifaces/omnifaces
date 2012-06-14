@@ -21,7 +21,10 @@ import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Collection of general utility methods that do not fit in one of the more specific classes.
@@ -185,6 +188,39 @@ public final class Utils {
 		}
 
 		return null;
+	}
+
+	// Collections ----------------------------------------------------------------------------------------------------
+
+	/**
+	 * Creates an unmodifiable set based on the given values. If one of the values is an instance of an array or a
+	 * collection, then each of its values will also be merged into the set. Nested arrays or collections will result
+	 * in a {@link ClassCastException}.
+	 * @param values The values to create an unmodifiable set for.
+	 * @return An unmodifiable set based on the given values.
+	 * @throws ClassCastException When one of the values or one of the arrays or collections is of wrong type.
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> Set<T> unmodifiableSet(Object... values) {
+		Set<T> set = new HashSet<T>();
+
+		for (Object value : values) {
+			if (value instanceof Object[]) {
+				for (Object item : (Object[]) value) {
+					set.add((T) item);
+				}
+			}
+			else if (value instanceof Collection<?>) {
+				for (Object item : (Collection<?>) value) {
+					set.add((T) item);
+				}
+			}
+			else {
+				set.add((T) value);
+			}
+		}
+
+		return Collections.unmodifiableSet(set);
 	}
 
 }
