@@ -33,6 +33,8 @@ import java.util.Set;
 import javax.faces.application.Application;
 import javax.faces.application.NavigationHandler;
 import javax.faces.application.ProjectStage;
+import javax.faces.application.ViewHandler;
+import javax.faces.component.UIComponent;
 import javax.faces.component.UIViewParameter;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.ExternalContext;
@@ -41,6 +43,7 @@ import javax.faces.context.Flash;
 import javax.faces.context.PartialViewContext;
 import javax.faces.event.PhaseId;
 import javax.faces.view.ViewMetadata;
+import javax.faces.view.facelets.FaceletContext;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -79,9 +82,11 @@ public final class Faces {
 	// JSF general ----------------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns the current faces context. Note that whenever you absolutely need this method to perform a general
-	 * task, you might want to consider to submit a feature request to OmniFaces in order to add a new utility method
-	 * which performs exactly this general task.
+	 * Returns the current faces context.
+	 * <p>
+	 * <i>Note that whenever you absolutely need this method to perform a general task, you might want to consider to
+	 * submit a feature request to OmniFaces in order to add a new utility method which performs exactly this general
+	 * task.</i>
 	 * @return The current faces context.
 	 * @see FacesContext#getCurrentInstance()
 	 */
@@ -90,9 +95,11 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the current external context. Note that whenever you absolutely need this method to perform a general
-	 * task, you might want to consider to submit a feature request to OmniFaces in order to add a new utility method
-	 * which performs exactly this general task.
+	 * Returns the current external context.
+	 * <p>
+	 * <i>Note that whenever you absolutely need this method to perform a general task, you might want to consider to
+	 * submit a feature request to OmniFaces in order to add a new utility method which performs exactly this general
+	 * task.</i>
 	 * @return The current external context.
 	 * @see FacesContext#getExternalContext()
 	 */
@@ -101,9 +108,11 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the application singleton. Note that whenever you absolutely need this method to perform a general
-	 * task, you might want to consider to submit a feature request to OmniFaces in order to add a new utility method
-	 * which performs exactly this general task.
+	 * Returns the application singleton.
+	 * <p>
+	 * <i>Note that whenever you absolutely need this method to perform a general task, you might want to consider to
+	 * submit a feature request to OmniFaces in order to add a new utility method which performs exactly this general
+	 * task.</i>
 	 * @return The faces application singleton.
 	 * @see FacesContext#getApplication()
 	 */
@@ -142,10 +151,12 @@ public final class Faces {
 	}
 
 	/**
-	 * Determines and returns the faces servlet mapping used in the current request. If the path info is
-	 * <code>null</code>, then it is definitely a suffix (extension) mapping like <tt>*.xhtml</tt>, else it is
-	 * definitely a prefix (path) mapping like <tt>/faces/*</tt> as available by the servlet path.
+	 * Determines and returns the faces servlet mapping used in the current request. If JSF is prefix mapped (e.g.
+	 * <tt>/faces/*</tt>), then this returns the whole path, with a leading slash (e.g. <tt>/faces</tt>). If JSF is
+	 * suffix mapped (e.g. <tt>*.xhtml</tt>), then this returns the whole extension (e.g. <tt>.xhtml</tt>).
 	 * @return The faces servlet mapping (without the wildcard).
+	 * @see #getRequestPathInfo()
+	 * @see #getRequestServletPath()
 	 */
 	public static String getMapping() {
 		ExternalContext externalContext = getExternalContext();
@@ -163,6 +174,8 @@ public final class Faces {
 	 * Returns whether the faces servlet mapping used in the current request is a prefix mapping.
 	 * @return <code>true</code> if the faces servlet mapping used in the current request is a prefix mapping, otherwise
 	 * <code>false</code>.
+	 * @see #getMapping()
+	 * @see #isPrefixMapping(String)
 	 */
 	public static boolean isPrefixMapping() {
 		return isPrefixMapping(getMapping());
@@ -220,6 +233,19 @@ public final class Faces {
 	}
 
 	/**
+	 * Sets the current view root to the given view ID. The view ID must start with a leading slash. If an invalid view
+	 * ID is given, then the response will simply result in a 404.
+	 * @param viewId The ID of the view which needs to be set as the current view root.
+	 * @see ViewHandler#createView(FacesContext, String)
+	 * @see FacesContext#setViewRoot(UIViewRoot)
+	 * @since 1.1
+	 */
+	public static void setViewRoot(String viewId) {
+		FacesContext context = getContext();
+		context.setViewRoot(context.getApplication().getViewHandler().createView(context, viewId));
+	}
+
+	/**
 	 * Returns the ID of the current view root, or <code>null</code> if there is no view.
 	 * @return The ID of the current view root, or <code>null</code> if there is no view.
 	 * @see UIViewRoot#getViewId()
@@ -237,6 +263,8 @@ public final class Faces {
 	 * </ul>
 	 * @param path The path to be normalized as a valid view ID based on the current mapping.
 	 * @return The path as a valid view ID.
+	 * @see #getMapping()
+	 * @see #isPrefixMapping(String)
 	 */
 	public static String normalizeViewId(String path) {
 		String mapping = getMapping();
@@ -352,10 +380,73 @@ public final class Faces {
 		context.getApplication().getNavigationHandler().handleNavigation(context, null, outcome);
 	}
 
+	// Facelets -------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns the Facelet context.
+	 * <p>
+	 * <i>Note that whenever you absolutely need this method to perform a general task, you might want to consider to
+	 * submit a feature request to OmniFaces in order to add a new utility method which performs exactly this general
+	 * task.</i>
+	 * @return The Facelet context.
+	 * @see FaceletContext
+	 * @since 1.1
+	 */
+	public static FaceletContext getFaceletContext() {
+	    return (FaceletContext) getContext().getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
+	}
+
+	/**
+	 * Include the Facelet file at the given (relative) path as child of the given UI component. This has the same
+	 * effect as using <code>&lt;ui:include&gt;</code>. The path is relative to the current view ID and absolute to the
+	 * webcontent root.
+	 * @param component The component to include the Facelet file in.
+	 * @param path The (relative) path to the Facelet file.
+	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
+	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @see FaceletContext#includeFacelet(UIComponent, String)
+	 * @since 1.1
+	 */
+	public static void includeFacelet(UIComponent component, String path) throws IOException {
+		getFaceletContext().includeFacelet(component, path);
+	}
+
+	/**
+	 * Returns the Facelet attribute value associated with the given name. This basically returns the value of the
+	 * <code>&lt;ui:param&gt;</code> which is been declared inside the Facelet file, or is been passed into the Facelet
+	 * file by e.g. an <code>&lt;ui:include&gt;</code>.
+	 * @param name The Facelet attribute name.
+	 * @return The Facelet attribute value associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see FaceletContext#getAttribute(String)
+	 * @since 1.1
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getFaceletAttribute(String name) {
+		return (T) getFaceletContext().getAttribute(name);
+	}
+
+	/**
+	 * Sets the Facelet attribute value associated with the given name. This basically does the same as an
+	 * <code>&lt;ui:param&gt;</code> which is been declared inside the Facelet file, or is been passed into the Facelet
+	 * file by e.g. an <code>&lt;ui:include&gt;</code>.
+	 * @param name The Facelet attribute name.
+	 * @param value The Facelet attribute value.
+	 * @see FaceletContext#setAttribute(String, Object)
+	 * @since 1.1
+	 */
+	public static void setFaceletAttribute(String name, Object value) {
+		getFaceletContext().setAttribute(name, value);
+	}
+
 	// HTTP request/response ------------------------------------------------------------------------------------------
 
 	/**
 	 * Returns the HTTP servlet request.
+	 * <p>
+	 * <i>Note that whenever you absolutely need this method to perform a general task, you might want to consider to
+	 * submit a feature request to OmniFaces in order to add a new utility method which performs exactly this general
+	 * task.</i>
 	 * @return The HTTP servlet request.
 	 * @see ExternalContext#getRequest()
 	 */
@@ -491,7 +582,7 @@ public final class Faces {
 	/**
 	 * Returns the HTTP request path info. If JSF is prefix mapped (e.g. <tt>/faces/*</tt>), then this returns the
 	 * whole part after the prefix mapping, with a leading slash. If JSF is suffix mapped (e.g. <tt>*.xhtml</tt>), then
-	 * this returns an empty string.
+	 * this returns <code>null</code>.
 	 * @return The HTTP request path info.
 	 * @see ExternalContext#getRequestPathInfo()
 	 */
@@ -511,6 +602,18 @@ public final class Faces {
 		HttpServletRequest request = getRequest();
 		String url = request.getRequestURL().toString();
 		return url.substring(0, url.length() - request.getRequestURI().length()) + request.getContextPath() + "/";
+	}
+
+	/**
+	 * Returns the scheme-relative HTTP request base URL. This is the URL from the <tt>//</tt>, domain until with
+	 * context path, including the trailing slash. This is the value you could use in HTML <code>&lt;base&gt;</code>
+	 * tag when having a webapp which uses both the HTTP and HTTPS schemes.
+	 * @return The HTTP request base URL.
+	 * @see #getRequestBaseURL()
+	 * @since 1.1
+	 */
+	public static String getRelativeRequestBaseURL() {
+		return getRequestBaseURL().split(":", 2)[1];
 	}
 
 	/**
@@ -548,6 +651,10 @@ public final class Faces {
 
 	/**
 	 * Returns the HTTP servlet response.
+	 * <p>
+	 * <i>Note that whenever you absolutely need this method to perform a general task, you might want to consider to
+	 * submit a feature request to OmniFaces in order to add a new utility method which performs exactly this general
+	 * task.</i>
 	 * @return The HTTP servlet response.
 	 * @see ExternalContext#getResponse()
 	 */
@@ -744,16 +851,24 @@ public final class Faces {
 
 	/**
 	 * Returns the HTTP session and creates one if one doesn't exist.
+	 * <p>
+	 * <i>Note that whenever you absolutely need this method to perform a general task, you might want to consider to
+	 * submit a feature request to OmniFaces in order to add a new utility method which performs exactly this general
+	 * task.</i>
 	 * @return The HTTP session.
 	 * @see ExternalContext#getSession(boolean)
 	 */
 	public static HttpSession getSession() {
-		return (HttpSession) getExternalContext().getSession(true);
+		return getSession(true);
 	}
 
 	/**
 	 * Returns the HTTP session and creates one if one doesn't exist and <code>create</code> argument is
 	 * <code>true</code>, otherwise don't create one and return <code>null</code>.
+	 * <p>
+	 * <i>Note that whenever you absolutely need this method to perform a general task, you might want to consider to
+	 * submit a feature request to OmniFaces in order to add a new utility method which performs exactly this general
+	 * task.</i>
 	 * @return The HTTP session.
 	 * @see ExternalContext#getSession(boolean)
 	 */
@@ -770,10 +885,79 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns whether the session has been timed out for the current request. This is helpful if you need to
+	 * Returns whether the HTTP session has already been created.
+	 * @return <code>true</code> if the HTTP session has already been created, otherwise <code>false</code>.
+	 * @see ExternalContext#getSession(boolean)
+	 * @since 1.1
+	 */
+	public static boolean hasSession() {
+		return getSession(false) != null;
+	}
+
+	/**
+	 * Returns whether the HTTP session has been created for the first time in the current request. This returns also
+	 * <code>false</code> when there is no means of a HTTP session.
+	 * @return <code>true</code> if the HTTP session has been created for the first time in the current request,
+	 * otherwise <code>false</code>.
+	 * @see ExternalContext#getSession(boolean)
+	 * @see HttpSession#isNew()
+	 * @since 1.1
+	 */
+	public static boolean isSessionNew() {
+		HttpSession session = getSession(false);
+		return (session != null && session.isNew());
+	}
+
+	/**
+	 * Returns the time when the HTTP session was created, measured in epoch time. This implicitly creates the session
+	 * if one doesn't exist.
+	 * @return The time when the HTTP session was created.
+	 * @see HttpSession#getCreationTime()
+	 * @since 1.1
+	 */
+	public static long getSessionCreationTime() {
+		return getSession().getCreationTime();
+	}
+
+	/**
+	 * Returns the time of the previous request associated with the current HTTP session, measured in epoch time. This
+	 * implicitly creates the session if one doesn't exist.
+	 * @return The time of the previous request associated with the current HTTP session.
+	 * @see HttpSession#getLastAccessedTime()
+	 * @since 1.1
+	 */
+	public static long getSessionLastAccessedTime() {
+		return getSession().getLastAccessedTime();
+	}
+
+	/**
+	 * Returns the HTTP session timeout in seconds. This implicitly creates the session if one doesn't exist.
+	 * @return The HTTP session timeout in seconds.
+	 * @see HttpSession#getMaxInactiveInterval()
+	 * @since 1.1
+	 */
+	public static int getSessionMaxInactiveInterval() {
+		// Note that JSF 2.1 has this method on ExternalContext. We don't use it in order to be JSF 2.0 compatible.
+		return getSession().getMaxInactiveInterval();
+	}
+
+	/**
+	 * Sets the HTTP session timeout in seconds. A value of 0 or less means that the session should never timeout.
+	 * This implicitly creates the session if one doesn't exist.
+	 * @param seconds The HTTP session timeout in seconds.
+	 * @see HttpSession#setMaxInactiveInterval(int)
+	 * @since 1.1
+	 */
+	public static void setSessionMaxInactiveInterval(int seconds) {
+		// Note that JSF 2.1 has this method on ExternalContext. We don't use it in order to be JSF 2.0 compatible.
+		getSession().setMaxInactiveInterval(seconds);
+	}
+
+	/**
+	 * Returns whether the HTTP session has been timed out for the current request. This is helpful if you need to
 	 * distinguish between a first-time request on a fresh session and a first-time request on a timed out session, for
 	 * example to display "Oops, you have been logged out because your session has been timed out!".
-	 * @return <code>true</code> if the session has been timed out for the current request, otherwise
+	 * @return <code>true</code> if the HTTP session has been timed out for the current request, otherwise
 	 * <code>false</code>.
 	 * @see HttpServletRequest#getRequestedSessionId()
 	 * @see HttpServletRequest#isRequestedSessionIdValid()
@@ -788,6 +972,10 @@ public final class Faces {
 
 	/**
 	 * Returns the servlet context.
+	 * <p>
+	 * <i>Note that whenever you absolutely need this method to perform a general task, you might want to consider to
+	 * submit a feature request to OmniFaces in order to add a new utility method which performs exactly this general
+	 * task.</i>
 	 * @return the servlet context.
 	 * @see ExternalContext#getContext()
 	 */
