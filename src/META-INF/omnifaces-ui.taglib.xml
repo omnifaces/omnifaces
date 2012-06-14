@@ -1320,7 +1320,7 @@
 		</attribute>
 	</tag>
 
-		<tag>
+	<tag>
 		<description>
 			<![CDATA[
 				<strong><code>o:methodParam</code></strong> is a tag handler that can be used to pass a method expression
@@ -1383,6 +1383,78 @@
 			<name>value</name>
 			<required>true</required>
 			<type>java.lang.String</type>
+		</attribute>
+	</tag>
+	
+	<tag>
+		<description>
+				<![CDATA[
+					<strong>ComponentIdParam</strong> is a component that allows component ids to be provided as request parameters
+ 					causing only components with matching ids to be rendered.
+ 					<p>
+ 					Both simple component ids as well as client ids are supported. Components can be rendered without their parents
+ 					having to be rendered. As such, e.g. single rows appearing in a table can be rendered without any of the
+ 					surrounding markup appearing in the response.
+ 					<p>
+ 					The intended usage of this component is to allow client-side scripts to request markup for specific components
+ 					via a GET request (as opposed to AJAX based post-backs).
+					<p>
+					This component is used in the same way view parameters are and needs to be put into the metadata section of a
+					Facelet.
+				]]>
+		</description>
+		<tag-name>componentIdParam</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.input.ComponentIdParam</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+	                The name of the request parameters from which the values are retrieved on an initial request that
+	                represent component ids of those components from which the markup should appear in the response (i.e. which 
+	                should be rendered)
+		        ]]>
+			</description>
+			<name>componentIdName</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		
+		
+		<attribute>
+			<description>
+				<![CDATA[
+	                The name of the request parameters from which the values are retrieved on an initial request that
+	                represent client ids of those components from which the markup should appear in the response (i.e. which 
+	                should be rendered)
+		        ]]>
+			</description>
+			<name>clientIdName</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                The component identifier for this component. This value must be
+	                unique within the closest parent component that is a naming
+	                container.
+	            ]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                The ValueExpression linking this component to a property in a
+	                backing bean
+	            ]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
 		</attribute>
 	</tag>
 

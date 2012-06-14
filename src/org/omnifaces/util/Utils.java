@@ -23,6 +23,7 @@ import java.nio.channels.WritableByteChannel;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -135,6 +136,26 @@ public final class Utils {
 
 		return false;
 	}
+	
+	/**
+     * Returns <code>true</code> if the given object equals one of the given objects.
+     * 
+     * @param <T> The generic object type.
+     * @param object The object to be checked if it equals one of the given objects.
+     * @param objects The argument list of objects to be tested for equality.
+     * @return <code>true</code> if the given object equals one of the given objects.
+     * 
+     * @since 1.1
+     */
+    public static <T> boolean isOneOf(T object, List<T> objects) {
+        for (Object other : objects) {
+            if (object == null ? other == null : object.equals(other)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 	// I/O ------------------------------------------------------------------------------------------------------------
 
