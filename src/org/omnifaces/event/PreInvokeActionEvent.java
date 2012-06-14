@@ -44,6 +44,10 @@ public class PreInvokeActionEvent extends ComponentSystemEvent {
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
+	/**
+	 * Construct a new pre invoke action event on the given component.
+	 * @param component The component to invoke the event on.
+	 */
 	public PreInvokeActionEvent(UIComponent component) {
 		super(component);
 	}

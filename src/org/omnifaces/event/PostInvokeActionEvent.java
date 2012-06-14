@@ -44,6 +44,10 @@ public class PostInvokeActionEvent extends ComponentSystemEvent {
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
+	/**
+	 * Construct a new post invoke action event on the given component.
+	 * @param component The component to invoke the event on.
+	 */
 	public PostInvokeActionEvent(UIComponent component) {
 		super(component);
 	}
