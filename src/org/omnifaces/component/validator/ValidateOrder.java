@@ -1,38 +1,39 @@
+/*
+ * Copyright 2012 OmniFaces.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package org.omnifaces.component.validator;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
 
-import javax.faces.component.FacesComponent;
 import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
 
 /**
- * <strong>ValidateOrder</strong> validates if the values of the given <code>UIInput</code> components are in the order
- * from least to greatest without duplicates, exactly as specified in the <code>components</code> attribute. The default
- * message is
+ * Base class which is to be shared between all field value ordering validators. The default message is
  * <blockquote>{0}: Please fill out the values of all those fields in order</blockquote>
  * <p>
  * For general usage instructions, refer {@link ValidateMultipleFields} documentation.
- * <p>
- * This validator has the additional requirement that the to-be-validated values must implement {@link Comparable}.
- * This validator throws an {@link IllegalArgumentException} when one or more of the values do not implement it.
  *
  * @author Bauke Scholtz
+ * @since 1.1
  */
-@FacesComponent(ValidateOrder.COMPONENT_TYPE)
-public class ValidateOrder extends ValidateMultipleFields {
+public abstract class ValidateOrder extends ValidateMultipleFields {
 
-	// Public constants -----------------------------------------------------------------------------------------------
-
-	/** The standard component type. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.validator.ValidateOrder";
-
-	// Private constants ----------------------------------------------------------------------------------------------
+	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final String DEFAULT_MESSAGE = "{0}: Please fill out the values of all those fields in order";
-	private static final String ERROR_VALUES_NOT_COMPARABLE = "All values must implement java.lang.Comparable.";
+
+	/** The error message when values do not implement comparable. */
+	protected static final String ERROR_VALUES_NOT_COMPARABLE = "All values must implement java.lang.Comparable.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -49,13 +50,21 @@ public class ValidateOrder extends ValidateMultipleFields {
 	 * Validate if all values are in specified order.
 	 */
 	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected boolean validateValues(FacesContext context, List<UIInput> components, List<Object> values) {
 		try {
-			return new ArrayList<Object>(new TreeSet<Object>(values)).equals(values);
+			return validateOrder(context, components, (List<? extends Comparable>) values);
 		}
 		catch (ClassCastException e) {
 			throw new IllegalArgumentException(ERROR_VALUES_NOT_COMPARABLE, e);
 		}
 	}
+
+	/**
+	 * Validate if all comparable values are in specified order.
+	 * @see #validateValues(FacesContext, List, List)
+	 */
+	protected abstract <T extends Comparable<T>> boolean validateOrder
+		(FacesContext context, List<UIInput> components, List<T> values);
 
 }
