@@ -31,9 +31,7 @@ public abstract class ValidateOrder extends ValidateMultipleFields {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final String DEFAULT_MESSAGE = "{0}: Please fill out the values of all those fields in order";
-
-	/** The error message when values do not implement comparable. */
-	protected static final String ERROR_VALUES_NOT_COMPARABLE = "All values must implement java.lang.Comparable.";
+	private static final String ERROR_VALUES_NOT_COMPARABLE = "All values must implement java.lang.Comparable.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 

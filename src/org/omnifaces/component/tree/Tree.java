@@ -225,7 +225,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 			TreeFacesEvent treeEvent = (TreeFacesEvent) event;
 			final FacesEvent wrapped = treeEvent.getWrapped();
 
-			process(context, PhaseId.INVOKE_APPLICATION, treeEvent.getNode(), new Callback.Returning<Void>() {
+			process(context, event.getPhaseId(), treeEvent.getNode(), new Callback.Returning<Void>() {
 
 				@Override
 				public Void invoke() {
