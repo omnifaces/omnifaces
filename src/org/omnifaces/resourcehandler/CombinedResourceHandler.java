@@ -121,6 +121,10 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 
 			String name = (String) componentResource.getAttributes().get(ATTRIBUTE_RESOURCE_NAME);
 
+			if (name == null) {
+				continue; // It's likely an inline script, they can't be combined.
+			}
+
 			if (componentResource.getRendererType().equals(RENDERER_TYPE_STYLESHEET)) {
 				stylesheets.add(library, name);
 				componentResourcesToRemove.add(componentResource);
