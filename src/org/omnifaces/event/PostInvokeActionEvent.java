@@ -30,8 +30,12 @@ import org.omnifaces.eventlistener.InvokeActionEventListener;
  * This event is particularly helpful as a replacement of <code>&lt;f:event type="preRenderView"&gt;</code> and also
  * provides the possibility to invoke multiple action listeners on a single {@link UIInput} and {@link UICommand}
  * components on an easy manner.
+ * <pre>
+ * &lt;f:event type="postInvokeAction" listener="#{bean.postInvokeAction}" /&gt;
+ * </pre>
  *
  * @author Bauke Scholtz
+ * @see PreInvokeActionEvent
  * @see InvokeActionEventListener
  * @since 1.1
  */

@@ -105,27 +105,27 @@ public class Html5RenderKit extends RenderKitWrapper {
 
 		// Constants --------------------------------------------------------------------------------------------------
 
-		private static final String[] UIFORM_HTML5_ATTRIBUTES = {
+		private static final Set<String> UIFORM_HTML5_ATTRIBUTES = Utils.unmodifiableSet(
 			"autocomplete"
 			// "novalidate" attribute is not useable in a JSF form.
-		};
+		);
 
-		private static final String[] UISELECT_HTML5_ATTRIBUTES = {
+		private static final Set<String> UISELECT_HTML5_ATTRIBUTES = Utils.unmodifiableSet(
 			"autofocus"
 			// "form" attribute is not useable in a JSF form.
-		};
+		);
 
-		private static final String[] UIINPUT_HTML5_ATTRIBUTES = {
-			"autofocus", "list", "pattern", "placeholder"
+		private static final Set<String> UIINPUT_HTML5_ATTRIBUTES = Utils.unmodifiableSet(
+			"list", "pattern", "placeholder", UISELECT_HTML5_ATTRIBUTES
 			// "form*" attributes are not useable in a JSF form.
 			// "multiple" attribute is only applicable on <input type="email"> and <input type="file"> and can't be
 			// decoded by standard HtmlInputText.
 			// "required" attribute can't be used as it would override JSF default "required" attribute behaviour.
-		};
+		);
 
-		private static final String[] UIINPUT_HTML5_RANGE_ATTRIBUTES = {
+		private static final Set<String> UIINPUT_HTML5_RANGE_ATTRIBUTES = Utils.unmodifiableSet(
 			"max", "min", "step"
-		};
+		);
 
 		private static final Set<String> UIINPUT_HTML5_RANGE_TYPES = Utils.unmodifiableSet(
 			"range", "number", "date"
@@ -156,9 +156,34 @@ public class Html5RenderKit extends RenderKitWrapper {
 		}
 
 		/**
-		 * An override which checks if an attribute of <code>type="text"</code> is been written by an UIInput component
-		 * and if so then check if the <code>type</code> attribute isn't been explicitly set by the developer and if so
-		 * then write it.
+		 * An override which checks if the given component is an instance of {@link UIForm} or {@link UIInput} and then
+		 * write HTML5 attributes which are explicitly been set by the developer.
+		 */
+		@Override
+		public void startElement(String name, UIComponent component) throws IOException {
+			super.startElement(name, component);
+
+			if (component instanceof UIForm && "form".equals(name)) {
+				writeHtml5AttributesIfNecessary(component.getAttributes(), UIFORM_HTML5_ATTRIBUTES);
+			}
+			else if (isInstanceofUISelect(component)) {
+				writeHtml5AttributesIfNecessary(component.getAttributes(), UISELECT_HTML5_ATTRIBUTES);
+			}
+			else if (component instanceof UIInput) {
+				Map<String, Object> attributes = component.getAttributes();
+				writeHtml5AttributesIfNecessary(attributes, UIINPUT_HTML5_ATTRIBUTES);
+				Object type = attributes.get("type");
+
+				if (UIINPUT_HTML5_RANGE_TYPES.contains(type)) {
+					writeHtml5AttributesIfNecessary(attributes, UIINPUT_HTML5_RANGE_ATTRIBUTES);
+				}
+			}
+		}
+
+		/**
+		 * An override which checks if an attribute of <code>type="text"</code> is been written by an {@link UIInput}
+		 * component and if so then check if the <code>type</code> attribute isn't been explicitly set by the developer
+		 * and if so then write it.
 		 * @throws IllegalArgumentException When the <code>type</code> attribute is not supported.
 		 */
 		@Override
@@ -185,33 +210,6 @@ public class Html5RenderKit extends RenderKitWrapper {
 			super.writeAttribute(name, value, property);
 		}
 
-		/**
-		 * An override which checks if the current component is an instance of {@link UIForm} or {@link UIInput} and
-		 * then write HTML5 attributes which are explicitly been set by the developer.
-		 */
-		@Override
-		public void endElement(String elementName) throws IOException {
-			UIComponent component = Components.getCurrentComponent();
-
-			if (component instanceof UIForm) {
-				writeHtml5AttributesIfNecessary(component.getAttributes(), UIFORM_HTML5_ATTRIBUTES);
-			}
-			else if (isInstanceofUISelect(component)) {
-				writeHtml5AttributesIfNecessary(component.getAttributes(), UISELECT_HTML5_ATTRIBUTES);
-			}
-			else if (component instanceof UIInput) {
-				Map<String, Object> attributes = component.getAttributes();
-				writeHtml5AttributesIfNecessary(attributes, UIINPUT_HTML5_ATTRIBUTES);
-				Object type = attributes.get("type");
-
-				if (UIINPUT_HTML5_RANGE_TYPES.contains(type)) {
-					writeHtml5AttributesIfNecessary(attributes, UIINPUT_HTML5_RANGE_ATTRIBUTES);
-				}
-			}
-
-			super.endElement(elementName);
-		}
-
 		@Override
 		public ResponseWriter getWrapped() {
 			return wrapped;
@@ -225,7 +223,9 @@ public class Html5RenderKit extends RenderKitWrapper {
 				|| component instanceof UISelectMany;
 		}
 
-		private void writeHtml5AttributesIfNecessary(Map<String, Object> attributes, String[] names) throws IOException {
+		private void writeHtml5AttributesIfNecessary(Map<String, Object> attributes, Set<String> names)
+			throws IOException
+		{
 			for (String name : names) {
 				Object value = attributes.get(name);
 

@@ -72,10 +72,10 @@ public class InvokeActionEventListener extends DefaultPhaseListener implements S
 	 */
 	@Override
 	public boolean isListenerForSource(Object source) {
-		return (source instanceof UIViewRoot
+		return source instanceof UIViewRoot
 			|| source instanceof UIForm
 			|| source instanceof UIInput
-			|| source instanceof UICommand);
+			|| source instanceof UICommand;
 	}
 
 	/**
