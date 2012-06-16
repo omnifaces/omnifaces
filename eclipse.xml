@@ -16,13 +16,13 @@
 		<sequential>
 			<eclipse.convertPath resourcePath="@{todir}" property="toFileSystemDir" />
 			<copy todir="${toFileSystemDir}" overwrite="true">
-				<fileset file="dist/omnifaces.jar" />
+				<fileset file="dist/omnifaces-${VERSION}.jar" />
 			</copy>
 			<eclipse.refreshLocal resource="@{todir}" depth="infinite" />
 
 			<eclipse.convertPath resourcePath="@{srcdir}" property="srcFileSystemDir" />
 			<copy todir="${srcFileSystemDir}" overwrite="true">
-				<fileset file="dist/omnifaces-src.jar" />
+				<fileset file="dist/omnifaces-${VERSION}-src.jar" />
 			</copy>
 			<eclipse.refreshLocal resource="@{srcdir}" depth="infinite" />
 		</sequential>
@@ -33,7 +33,7 @@
 	</target>
 	
 	<target name="copy_to_showcase" depends="refresh">
-		<copylib todir="omnifaces-showcase/WebContent/WEB-INF/lib" srcdir="omnifaces-showcase/WebContent/WEB-INF/lib-src" />
+		<copylib todir="omnifaces-showcase/WebContent/WEB-INF/lib" srcdir="omnifaces-showcase/lib-src" />
 	</target>
 		
 	<target name="all" depends="copy_to_showcase"/>
