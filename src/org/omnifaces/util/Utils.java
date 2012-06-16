@@ -136,26 +136,24 @@ public final class Utils {
 
 		return false;
 	}
-	
-	/**
-     * Returns <code>true</code> if the given object equals one of the given objects.
-     * 
-     * @param <T> The generic object type.
-     * @param object The object to be checked if it equals one of the given objects.
-     * @param objects The argument list of objects to be tested for equality.
-     * @return <code>true</code> if the given object equals one of the given objects.
-     * 
-     * @since 1.1
-     */
-    public static <T> boolean isOneOf(T object, List<T> objects) {
-        for (Object other : objects) {
-            if (object == null ? other == null : object.equals(other)) {
-                return true;
-            }
-        }
 
-        return false;
-    }
+	/**
+	 * Returns <code>true</code> if the given object equals one of the given objects.
+	 * @param <T> The generic object type.
+	 * @param object The object to be checked if it equals one of the given objects.
+	 * @param objects The argument list of objects to be tested for equality.
+	 * @return <code>true</code> if the given object equals one of the given objects.
+	 * @since 1.1
+	 */
+	public static <T> boolean isOneOf(T object, List<T> objects) {
+		for (Object other : objects) {
+			if (object == null ? other == null : object.equals(other)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	// I/O ------------------------------------------------------------------------------------------------------------
 
@@ -220,6 +218,7 @@ public final class Utils {
 	 * @param values The values to create an unmodifiable set for.
 	 * @return An unmodifiable set based on the given values.
 	 * @throws ClassCastException When one of the values or one of the arrays or collections is of wrong type.
+     * @since 1.1
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> Set<T> unmodifiableSet(Object... values) {

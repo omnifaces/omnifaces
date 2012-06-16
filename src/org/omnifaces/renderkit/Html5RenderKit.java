@@ -23,6 +23,8 @@ import javax.faces.component.UIInput;
 import javax.faces.component.UISelectBoolean;
 import javax.faces.component.UISelectMany;
 import javax.faces.component.UISelectOne;
+import javax.faces.component.html.HtmlInputText;
+import javax.faces.component.html.HtmlInputTextarea;
 import javax.faces.context.ResponseWriter;
 import javax.faces.context.ResponseWriterWrapper;
 import javax.faces.render.RenderKit;
@@ -41,7 +43,9 @@ import org.omnifaces.util.Utils;
  * <li><code>UIForm</code>: <ul><li><code>autocomplete</code></li></ul></li>
  * <li><code>UISelectBoolean</code>, <code>UISelectOne</code> and <code>UISelectMany</code>:
  * <ul><li><code>autofocus</code></li></ul></li>
- * <li><code>UIInput</code> (expect of <code>UISelect*</code>): <ul><li><code>type</code> (supported values are
+ * <li><code>HtmlInputTextarea</code>: <ul><li><code>autofocus</code></li><li><code>maxlength</code></li>
+ * <li><code>placeholder</code></li><li><code>wrap</code></li></ul></li>
+ * <li><code>HtmlInputText</code>: <ul><li><code>type</code> (supported values are
  * <code>text</code> (default), <code>search</code>, <code>email</code>, <code>url</code>, <code>tel</code>,
  * <code>range</code>, <code>number</code> and <code>date</code>)</li><li><code>autofocus</code></li>
  * <li><code>list</code></li><li><code>pattern</code></li><li><code>placeholder</code></li><li><code>min</code></li>
@@ -105,38 +109,44 @@ public class Html5RenderKit extends RenderKitWrapper {
 
 		// Constants --------------------------------------------------------------------------------------------------
 
-		private static final Set<String> UIFORM_HTML5_ATTRIBUTES = Utils.unmodifiableSet(
+		private static final Set<String> HTML5_UIFORM_ATTRIBUTES = Utils.unmodifiableSet(
 			"autocomplete"
 			// "novalidate" attribute is not useable in a JSF form.
 		);
 
-		private static final Set<String> UISELECT_HTML5_ATTRIBUTES = Utils.unmodifiableSet(
+		private static final Set<String> HTML5_UISELECT_ATTRIBUTES = Utils.unmodifiableSet(
 			"autofocus"
 			// "form" attribute is not useable in a JSF form.
 		);
 
-		private static final Set<String> UIINPUT_HTML5_ATTRIBUTES = Utils.unmodifiableSet(
-			"list", "pattern", "placeholder", UISELECT_HTML5_ATTRIBUTES
+		private static final Set<String> HTML5_TEXTAREA_ATTRIBUTES = Utils.unmodifiableSet(
+			"autofocus", "maxlength", "placeholder", "wrap"
+			// "form" attribute is not useable in a JSF form.
+			// "required" attribute can't be used as it would override JSF default "required" attribute behaviour.
+		);
+
+		private static final Set<String> HTML5_INPUT_ATTRIBUTES = Utils.unmodifiableSet(
+			"autofocus", "list", "pattern", "placeholder"
 			// "form*" attributes are not useable in a JSF form.
 			// "multiple" attribute is only applicable on <input type="email"> and <input type="file"> and can't be
 			// decoded by standard HtmlInputText.
 			// "required" attribute can't be used as it would override JSF default "required" attribute behaviour.
 		);
 
-		private static final Set<String> UIINPUT_HTML5_RANGE_ATTRIBUTES = Utils.unmodifiableSet(
+		private static final Set<String> HTML5_INPUT_RANGE_ATTRIBUTES = Utils.unmodifiableSet(
 			"max", "min", "step"
 		);
 
-		private static final Set<String> UIINPUT_HTML5_RANGE_TYPES = Utils.unmodifiableSet(
+		private static final Set<String> HTML5_INPUT_RANGE_TYPES = Utils.unmodifiableSet(
 			"range", "number", "date"
 		);
 
-		private static final Set<String> UIINPUT_HTML5_TYPES = Utils.unmodifiableSet(
-			"text", "search", "email", "url", "tel", UIINPUT_HTML5_RANGE_TYPES
+		private static final Set<String> HTML5_INPUT_TYPES = Utils.unmodifiableSet(
+			"text", "search", "email", "url", "tel", HTML5_INPUT_RANGE_TYPES
 		);
 
-		private static final String ERROR_UNSUPPORTED_UIINPUT_HTML5_TYPE =
-			"UIInput type '%s' is not supported. Supported types are %s.";
+		private static final String ERROR_UNSUPPORTED_HTML5_INPUT_TYPE =
+			"HtmlInputText type '%s' is not supported. Supported types are " + HTML5_INPUT_TYPES + ".";
 
 		// Properties -------------------------------------------------------------------------------------------------
 
@@ -164,18 +174,22 @@ public class Html5RenderKit extends RenderKitWrapper {
 			super.startElement(name, component);
 
 			if (component instanceof UIForm && "form".equals(name)) {
-				writeHtml5AttributesIfNecessary(component.getAttributes(), UIFORM_HTML5_ATTRIBUTES);
-			}
-			else if (isInstanceofUISelect(component)) {
-				writeHtml5AttributesIfNecessary(component.getAttributes(), UISELECT_HTML5_ATTRIBUTES);
+				writeHtml5AttributesIfNecessary(component.getAttributes(), HTML5_UIFORM_ATTRIBUTES);
 			}
 			else if (component instanceof UIInput) {
-				Map<String, Object> attributes = component.getAttributes();
-				writeHtml5AttributesIfNecessary(attributes, UIINPUT_HTML5_ATTRIBUTES);
-				Object type = attributes.get("type");
+				if (isInstanceofUISelect(component) && ("input".equals(name) || "select".equals(name))) {
+					writeHtml5AttributesIfNecessary(component.getAttributes(), HTML5_UISELECT_ATTRIBUTES);
+				}
+				else if (component instanceof HtmlInputTextarea && "textarea".equals(name)) {
+					writeHtml5AttributesIfNecessary(component.getAttributes(), HTML5_TEXTAREA_ATTRIBUTES);
+				}
+				else if (component instanceof HtmlInputText && "input".equals(name)) {
+					Map<String, Object> attributes = component.getAttributes();
+					writeHtml5AttributesIfNecessary(attributes, HTML5_INPUT_ATTRIBUTES);
 
-				if (UIINPUT_HTML5_RANGE_TYPES.contains(type)) {
-					writeHtml5AttributesIfNecessary(attributes, UIINPUT_HTML5_RANGE_ATTRIBUTES);
+					if (HTML5_INPUT_RANGE_TYPES.contains(attributes.get("type"))) {
+						writeHtml5AttributesIfNecessary(attributes, HTML5_INPUT_RANGE_ATTRIBUTES);
+					}
 				}
 			}
 		}
@@ -191,17 +205,17 @@ public class Html5RenderKit extends RenderKitWrapper {
 			if ("type".equals(name) && "text".equals(value)) {
 				UIComponent component = Components.getCurrentComponent();
 
-				if (component instanceof UIInput) {
+				if (component instanceof HtmlInputText) {
 					Object type = component.getAttributes().get("type");
 
 					if (type != null) {
-						if (UIINPUT_HTML5_TYPES.contains(type)) {
+						if (HTML5_INPUT_TYPES.contains(type)) {
 							super.writeAttribute(name, type, null);
 							return;
 						}
 						else {
 							throw new IllegalArgumentException(
-								String.format(ERROR_UNSUPPORTED_UIINPUT_HTML5_TYPE, type, UIINPUT_HTML5_TYPES));
+								String.format(ERROR_UNSUPPORTED_HTML5_INPUT_TYPE, type));
 						}
 					}
 				}
