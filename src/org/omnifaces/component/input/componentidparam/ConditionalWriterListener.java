@@ -29,38 +29,40 @@ import org.omnifaces.component.input.ComponentIdParam;
  * 
  * @since 1.1
  * @author Arjan Tijms
- *
+ * 
  */
 public class ConditionalWriterListener implements PhaseListener {
-    
-    private static final long serialVersionUID = -5527348022747113123L;
-    
-    private final FacesContext facesContext;
-    private final List<String> componentIds;
-    private final List<String> clientIds;
-    
-    private ResponseWriter responseWriter;
-    
-    public ConditionalWriterListener(FacesContext facesContext, List<String> componentIds, List<String> clientIds) {
-        this.facesContext = facesContext;
-        this.componentIds = componentIds;
-        this.clientIds = clientIds;
-    }
-    
-    @Override
-    public PhaseId getPhaseId() {
-        return PhaseId.RENDER_RESPONSE;
-    }
-    
-    @Override
-    public void beforePhase(PhaseEvent event) {
-        responseWriter = facesContext.getResponseWriter();
-        facesContext.setResponseWriter(new ConditionalResponseWriter(responseWriter, facesContext, componentIds, clientIds));
-    }
-    
-    @Override
-    public void afterPhase(PhaseEvent event) {
-        facesContext.setResponseWriter(responseWriter);
-    }
-    
+
+	private static final long serialVersionUID = -5527348022747113123L;
+
+	private final FacesContext facesContext;
+	private final List<String> componentIds;
+	private final List<String> clientIds;
+	private final boolean renderChildren;
+
+	private ResponseWriter responseWriter;
+
+	public ConditionalWriterListener(FacesContext facesContext, List<String> componentIds, List<String> clientIds, boolean renderChildren) {
+		this.facesContext = facesContext;
+		this.componentIds = componentIds;
+		this.clientIds = clientIds;
+		this.renderChildren = renderChildren;
+	}
+
+	@Override
+	public PhaseId getPhaseId() {
+		return PhaseId.RENDER_RESPONSE;
+	}
+
+	@Override
+	public void beforePhase(PhaseEvent event) {
+		responseWriter = facesContext.getResponseWriter();
+		facesContext.setResponseWriter(new ConditionalResponseWriter(responseWriter, facesContext, componentIds, clientIds, renderChildren));
+	}
+
+	@Override
+	public void afterPhase(PhaseEvent event) {
+		facesContext.setResponseWriter(responseWriter);
+	}
+
 }

@@ -1703,8 +1703,6 @@
 			<required>false</required>
 			<type>java.lang.String</type>
 		</attribute>
-		
-		
 		<attribute>
 			<description>
 				<![CDATA[
@@ -1716,6 +1714,18 @@
 			<name>clientIdName</name>
 			<required>false</required>
 			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	                Whether children of the components identified by <code>clientIdName</code> or
+	                <code>componentIdName</code> are rendered in addition to the component itself.
+	                Defaults to <code>true</code>
+		        ]]>
+			</description>
+			<name>renderChildren</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
 		</attribute>
 		<attribute>
 			<description>
