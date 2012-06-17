@@ -7,11 +7,14 @@
 -->
 <project name="OmniFaces" default="all" basedir=".">
 
-	<property name="VERSION" value="1.0" />
+	<tstamp>
+		<format property="DATE_SHORT" pattern="yyyyMMdd" />
+	</tstamp>
+	<property name="VERSION" value="1.1-SNAPSHOT-${DATE_SHORT}" />
 	<tstamp>
 		<format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
 	</tstamp>
-
+	
 	<path id="common.classpath">
 		<fileset dir="lib">
 			<include name="**/*.jar" />
