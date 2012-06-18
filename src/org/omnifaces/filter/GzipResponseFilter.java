@@ -13,31 +13,27 @@
 package org.omnifaces.filter;
 
 import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
 import javax.servlet.http.HttpSession;
 
+import org.omnifaces.servlet.GzipHttpServletResponse;
 import org.omnifaces.util.Utils;
 
 /**
- * This filter will apply GZIP compression on responses whenever applicable. Whilst this is normally to be configured
- * at the servletcontainer side (e.g. <code>&lt;Context compression="on"&gt;</code> in Tomcat, or
- * <code>&lt;property name="compression" value="on"&gt;</code> in Glassfish), this filter allows a servletcontainer
- * independent way of configuring GZIP compression.
+ * This filter will apply GZIP compression on responses whenever applicable. GZIP will greatly reduce the response size
+ * when applied on character based responses like HTML, CSS and JS, on average it can save up to ~70% of bandwidth.
+ * While GZIP is normally to be configured in the servletcontainer (e.g. <code>&lt;Context compression="on"&gt;</code>
+ * in Tomcat, or <code>&lt;property name="compression" value="on"&gt;</code> in Glassfish), this filter allows a
+ * servletcontainer independent way of configuring GZIP compression and also allows enabling GZIP compression anyway
+ * on 3rd party hosts where you have no control over servletcontainer configuration.
  * <p>
  * To get it to run, map this filter on the desired <code>&lt;url-pattern&gt;</code> or maybe even on the
  * <code>&lt;servlet-name&gt;</code> of the <code>FacesServlet</code>.
@@ -53,7 +49,7 @@ import org.omnifaces.util.Utils;
  * </pre>
  * <p>
  * This filter supports two initialization parameters which needs to be placed in <code>&lt;filter&gt;</code> element
- * as follows which shows the default values:
+ * as follows:
  * <pre>
  * &lt;init-param&gt;
  *   &lt;description&gt;
@@ -68,7 +64,7 @@ import org.omnifaces.util.Utils;
  *   &lt;/description&gt;
  *   &lt;param-name&gt;mimetypes&lt;/param-name&gt;
  *   &lt;param-value&gt;
- *     text/plain, text/html, text/css, text/javascript, text/csv, text/rtf,
+ *     text/plain, text/html, text/xml, text/css, text/javascript, text/csv, text/rtf,
  *     application/xml, application/xhtml+xml, application/javascript, application/json
  *   &lt;/param-value&gt;
  * &lt;/init-param&gt;
@@ -96,7 +92,7 @@ public class GzipResponseFilter extends HttpFilter {
 
 	private static final int DEFAULT_THRESHOLD = 500;
 	private static final Set<String> DEFAULT_MIMETYPES = Utils.unmodifiableSet(
-		"text/plain", "text/html", "text/css", "text/javascript", "text/csv", "text/rtf",
+		"text/plain", "text/html", "text/xml", "text/css", "text/javascript", "text/csv", "text/rtf",
 		"application/xml", "application/xhtml+xml", "application/javascript", "application/json"
 	);
 
@@ -141,14 +137,14 @@ public class GzipResponseFilter extends HttpFilter {
 		(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
 			throws ServletException, IOException
 	{
-		if (acceptsGzip(request)) {
+		if (request.getAttribute("javax.servlet.include.request_uri") == null && acceptsGzip(request)) {
 			GzipHttpServletResponse gzipResponse = new GzipHttpServletResponse(response, threshold, mimetypes);
 
 			try {
 				chain.doFilter(request, gzipResponse);
 			}
 			finally {
-				gzipResponse.complete();
+				gzipResponse.close(); // Mandatory for the case the threshold limit hasn't been reached.
 			}
 		}
 		else {
@@ -171,195 +167,6 @@ public class GzipResponseFilter extends HttpFilter {
 		}
 
 		return false;
-	}
-
-	// Nested classes -------------------------------------------------------------------------------------------------
-
-	/**
-	 * This HTTP servlet response wrapper will return the {@link GzipServletOutputStream} on {@link #getWriter()} and
-	 * {@link #getOutputStream()} and remember the content length (to avoid full content length being set instead of
-	 * the gzipped content length). The {@link GzipServletOutputStream} will in turn decide whether to use GZIP or not
-	 * based on the content type of the original response.
-	 *
-	 * @author Bauke Scholtz
-	 */
-	static class GzipHttpServletResponse extends HttpServletResponseWrapper {
-
-		private GzipServletOutputStream gzipOutput;
-		private ServletOutputStream output;
-		private PrintWriter writer;
-		private int contentLength;
-
-		public GzipHttpServletResponse(HttpServletResponse wrapped, int threshold, Set<String> mimetypes)
-			throws IOException
-		{
-			super(wrapped);
-			this.gzipOutput = new GzipServletOutputStream(this, threshold, mimetypes);
-		}
-
-		@Override
-		public void setContentLength(int contentLength) {
-			this.contentLength = contentLength;
-		}
-
-		/**
-		 * This should be called only when GZIP compression won't be used.
-		 */
-		void setSuperContentLength() {
-			if (contentLength != 0) {
-				super.setContentLength(contentLength);
-			}
-		}
-
-		@Override
-		public ServletOutputStream getOutputStream() throws IOException {
-			if (writer != null) {
-				throw new IllegalStateException("getWriter() has already been called on this response.");
-			}
-
-			if (output == null) {
-				output = gzipOutput;
-			}
-
-			return output;
-		}
-
-		@Override
-		public PrintWriter getWriter() throws IOException {
-			if (output != null) {
-				throw new IllegalStateException("getOutputStream() has already been called on this response.");
-			}
-
-			if (writer == null) {
-				writer = new PrintWriter(new OutputStreamWriter(gzipOutput, getCharacterEncoding()), true);
-			}
-
-			return writer;
-		}
-
-		@Override
-		public void flushBuffer() throws IOException {
-			if (writer != null) {
-				writer.flush();
-			}
-			else if (output != null) {
-				output.flush();
-			}
-		}
-
-		/**
-		 * Calling complete() after writing is mandatory as this forces a flush of threshold buffer when necessary.
-		 */
-		void complete() throws IOException {
-			if (writer != null) {
-				writer.close();
-			}
-			else if (output != null) {
-				output.close();
-			}
-		}
-	}
-
-	/**
-	 * This servlet output stream will switch to GZIP compression and set the appropriate response headers when the
-	 * given threshold is exceeded and one of the given mimetypes is matched.
-	 *
-	 * @author Bauke Scholtz
-	 */
-	static class GzipServletOutputStream extends ServletOutputStream {
-
-		private GzipHttpServletResponse response;
-		private ServletResponse originalResponse;
-		private byte[] thresholdBuffer;
-		private Set<String> mimetypes;
-		private int thresholdLength;
-		private OutputStream output;
-		private ServletOutputStream originalOutput;
-
-		public GzipServletOutputStream(GzipHttpServletResponse response, int threshold, Set<String> mimetypes)
-			throws IOException
-		{
-			this.response = response;
-			this.originalResponse = response.getResponse();
-			this.thresholdBuffer = (threshold > 0) ? new byte[threshold] : null;
-			this.mimetypes = mimetypes;
-			this.originalOutput = originalResponse.getOutputStream();
-		}
-
-		@Override
-		public void write(int b) throws IOException {
-			write(new byte[] { (byte) b }, 0, 1);
-		}
-
-		@Override
-		public void write(byte[] bytes) throws IOException {
-			write(bytes, 0, bytes.length);
-		}
-
-		@Override
-		public void write(byte[] bytes, int offset, int length) throws IOException {
-			if (length == 0) {
-				return;
-			}
-
-			if (thresholdBuffer != null) {
-				if ((length - offset) <= (thresholdBuffer.length - thresholdLength)) {
-					System.arraycopy(bytes, offset, thresholdBuffer, thresholdLength, length);
-					thresholdLength += length;
-					return;
-				}
-				else {
-					// Threshold buffer has exceeded. Now use GZIP if possible.
-					writeOutput(thresholdBuffer, 0, thresholdLength);
-					thresholdBuffer = null;
-				}
-			}
-
-			writeOutput(bytes, offset, length);
-		}
-
-		private void writeOutput(byte[] bytes, int offset, int length) throws IOException {
-			if (output == null) {
-				String contentType = response.getContentType();
-
-				if (contentType == null || !mimetypes.contains(contentType.split(";", 2)[0])) {
-					// Content type of null is unexpected, but you never know with starters.
-					// The split on semicolon gets rid of content type attributes like charset.
-
-					response.setSuperContentLength();
-					output = originalOutput;
-				}
-				else {
-					response.addHeader("Content-Encoding", "gzip");
-					String vary = response.getHeader("Vary");
-					response.setHeader("Vary", (vary != null && !vary.equals("*") ? vary + "," : "") + "Accept-Encoding");
-					output = new GZIPOutputStream(originalOutput);
-				}
-			}
-
-			output.write(bytes, offset, length);
-		}
-
-		@Override
-		public void flush() throws IOException {
-			if (output != null) {
-				output.flush();
-			}
-		}
-
-		@Override
-		public void close() throws IOException {
-			if (thresholdBuffer != null) {
-				// Threshold buffer hasn't exceeded. Stick to normal streaming.
-				originalResponse.setContentLength(thresholdLength);
-				originalOutput.write(thresholdBuffer, 0, thresholdLength);
-				originalOutput.close();
-			}
-			else if (output != null) {
-				output.close();
-			}
-		}
-
 	}
 
 }

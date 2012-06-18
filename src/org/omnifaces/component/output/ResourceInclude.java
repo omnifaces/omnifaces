@@ -12,10 +12,7 @@
  */
 package org.omnifaces.component.output;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 
 import javax.faces.FacesException;
 import javax.faces.component.FacesComponent;
@@ -23,11 +20,10 @@ import javax.faces.component.UIComponentBase;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
 
+import org.omnifaces.servlet.BufferedHttpServletResponse;
 import org.omnifaces.util.Components;
 
 /**
@@ -87,75 +83,6 @@ public class ResourceInclude extends UIComponentBase {
 		}
 
 		context.getResponseWriter().write(new String(bufferedResponse.getBuffer(), response.getCharacterEncoding()));
-	}
-
-	// Nested classes -------------------------------------------------------------------------------------------------
-
-	/**
-	 * This HTTP servlet response implementation buffers the entire response body. The buffered response body is available 
-	 * as a byte array via the {@link #getBuffer()} method. The response writer will use the same character encoding
-	 * as has been set on the response supplied to the constructor. Note that this way any setCharacterEncoding() calls
-	 * on the included JSP/Servlet resource have thus no effect.
-	 * @author Bauke Scholtz
-	 */
-	static class BufferedHttpServletResponse extends HttpServletResponseWrapper {
-
-		private final ByteArrayOutputStream buffer;
-		private PrintWriter writer;
-		private ServletOutputStream output;
-
-		public BufferedHttpServletResponse(HttpServletResponse response) {
-			super(response);
-			buffer = new ByteArrayOutputStream(response.getBufferSize());
-		}
-
-		@Override
-		public ServletOutputStream getOutputStream() throws IOException {
-			if (writer != null) {
-				throw new IllegalStateException("getWriter() has already been called on this response.");
-			}
-
-			if (output == null) {
-				output = new ServletOutputStream() {
-
-					@Override
-					public void write(int b) throws IOException {
-						buffer.write(b);
-					}
-				};
-			}
-
-			return output;
-		}
-
-		@Override
-		public PrintWriter getWriter() throws IOException {
-			if (output != null) {
-				throw new IllegalStateException("getOutputStream() has already been called on this response.");
-			}
-
-			if (writer == null) {
-				writer = new PrintWriter(new OutputStreamWriter(buffer, getResponse().getCharacterEncoding()), true);
-			}
-
-			return writer;
-		}
-
-		@Override
-		public void flushBuffer() throws IOException {
-			if (writer != null) {
-				writer.flush();
-			}
-			else if (output != null) {
-				output.flush();
-			}
-		}
-
-		public byte[] getBuffer() throws IOException {
-			flushBuffer();
-			return buffer.toByteArray();
-		}
-
 	}
 
 }

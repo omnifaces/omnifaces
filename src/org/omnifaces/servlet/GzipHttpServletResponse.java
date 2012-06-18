@@ -1,0 +1,171 @@
+/*
+ * Copyright 2012 OmniFaces.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
+package org.omnifaces.servlet;
+
+import java.io.IOException;
+import java.io.OutputStream;
+import java.util.Set;
+import java.util.zip.GZIPOutputStream;
+
+import javax.servlet.ServletOutputStream;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletResponse;
+
+/**
+ * This HTTP servlet response wrapper will GZIP the response when the given threshold has exceeded and the response
+ * content type matches one of the given mimetypes.
+ *
+ * @author Bauke Scholtz
+ * @since 1.1
+ */
+public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
+
+	// Properties -----------------------------------------------------------------------------------------------------
+
+	private int threshold;
+	private Set<String> mimetypes;
+	private int contentLength;
+
+	// Constructors ---------------------------------------------------------------------------------------------------
+
+	/**
+	 * Construct a new GZIP HTTP servlet response based on the given wrapped response, threshold and mimetypes.
+	 * @param wrapped The wrapped response.
+	 * @param threshold The GZIP buffer threshold.
+	 * @param mimetypes The mimetypes which needs to be compressed with GZIP.
+	 */
+	public GzipHttpServletResponse(HttpServletResponse wrapped, int threshold, Set<String> mimetypes) {
+		super(wrapped);
+		this.threshold = threshold;
+		this.mimetypes = mimetypes;
+	}
+
+	// Actions --------------------------------------------------------------------------------------------------------
+
+	@Override
+	public void setContentLength(int contentLength) {
+		// Get hold of content length locally to avoid it from being set on responses which will actually be gzipped.
+		this.contentLength = contentLength;
+	}
+
+	@Override
+	protected ServletOutputStream createOutputStream() {
+		return new GzipServletOutputStream(threshold);
+	}
+
+	// Inner classes --------------------------------------------------------------------------------------------------
+
+	/**
+	 * This servlet output stream will switch to GZIP compression when the given threshold is exceeded.
+	 * <p>
+	 * This is an inner class because it needs to be able to manipulate the response headers once the decision whether
+	 * to GZIP or not has been made.
+	 *
+	 * @author Bauke Scholtz
+	 */
+	private class GzipServletOutputStream extends ServletOutputStream {
+
+		// Properties -------------------------------------------------------------------------------------------------
+
+		private byte[] thresholdBuffer;
+		private int thresholdLength;
+		private OutputStream output;
+
+		// Constructors -----------------------------------------------------------------------------------------------
+
+		public GzipServletOutputStream(int threshold) {
+			this.thresholdBuffer = new byte[threshold];
+		}
+
+		// Actions ----------------------------------------------------------------------------------------------------
+
+		@Override
+		public void write(int b) throws IOException {
+			write(new byte[] { (byte) b }, 0, 1);
+		}
+
+		@Override
+		public void write(byte[] bytes) throws IOException {
+			write(bytes, 0, bytes.length);
+		}
+
+		@Override
+		public void write(byte[] bytes, int offset, int length) throws IOException {
+			if (length == 0) {
+				return;
+			}
+
+			if (output == null) {
+				if ((length - offset) <= (thresholdBuffer.length - thresholdLength)) {
+					System.arraycopy(bytes, offset, thresholdBuffer, thresholdLength, length);
+					thresholdLength += length;
+					return;
+				}
+				else {
+					// Threshold buffer has exceeded. Now use GZIP if possible.
+					output = createGzipOutputStreamIfNecessary(true);
+					output.write(thresholdBuffer, 0, thresholdLength);
+				}
+			}
+
+			output.write(bytes, offset, length);
+		}
+
+		@Override
+		public void flush() throws IOException {
+			if (output != null) {
+				output.flush();
+			}
+		}
+
+		@Override
+		public void close() throws IOException {
+			if (output == null) {
+				// Threshold buffer hasn't exceeded. Use normal output stream.
+				setContentLength(thresholdLength);
+				output = createGzipOutputStreamIfNecessary(false);
+				output.write(thresholdBuffer, 0, thresholdLength);
+			}
+
+			output.close();
+		}
+
+		// Helpers ----------------------------------------------------------------------------------------------------
+
+		/**
+		 * Create GZIP output stream if necessary. That is, when the given <code>gzip</code> argument is
+		 * <code>true</code>, the current response is not committed, the content type is not <code>null</code> and the
+		 * content type matches one of the mimetypes.
+		 */
+		private OutputStream createGzipOutputStreamIfNecessary(boolean gzip) throws IOException {
+			ServletResponse originalResponse = getResponse();
+			String contentType = getContentType();
+
+			if (gzip && !isCommitted() && contentType != null && mimetypes.contains(contentType.split(";", 2)[0])) {
+				addHeader("Content-Encoding", "gzip");
+				String vary = getHeader("Vary");
+				setHeader("Vary", (vary != null && !vary.equals("*") ? vary + "," : "") + "Accept-Encoding");
+				return new GZIPOutputStream(originalResponse.getOutputStream());
+			}
+			else {
+				if (contentLength > 0) {
+					originalResponse.setContentLength(contentLength);
+				}
+
+				return originalResponse.getOutputStream();
+			}
+		}
+
+	}
+
+}
