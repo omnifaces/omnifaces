@@ -12,7 +12,6 @@
  */
 package org.omnifaces.component.validator;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.faces.component.UIInput;
@@ -49,9 +48,11 @@ public abstract class ValidateOrder extends ValidateMultipleFields {
 	 * Validate if all values are in specified order.
 	 */
 	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	protected boolean validateValues(FacesContext context, List<UIInput> components, List<Object> values) {
 		try {
-			return validateOrder(context, components, castToComparables(values));
+			Object tmp = values; // https://bugs.eclipse.org/bugs/show_bug.cgi?id=158870
+			return validateOrder(context, components, (List<? extends Comparable>) tmp);
 		}
 		catch (ClassCastException e) {
 			throw new IllegalArgumentException(ERROR_VALUES_NOT_COMPARABLE, e);
@@ -59,24 +60,10 @@ public abstract class ValidateOrder extends ValidateMultipleFields {
 	}
 
 	/**
-	 * Helper method to properly cast them.
-	 */
-	@SuppressWarnings("unchecked")
-	private <T extends Comparable<? super T>> List<T> castToComparables(List<Object> values) {
-		List<T> comparables = new ArrayList<T>();
-
-		for (Object value : values) {
-			comparables.add((T) value);
-		}
-
-		return comparables;
-	}
-
-	/**
 	 * Validate if all comparable values are in specified order.
 	 * @see #validateValues(FacesContext, List, List)
 	 */
-	protected abstract <T extends Comparable<? super T>> boolean
+	protected abstract <T extends Comparable<T>> boolean
 		validateOrder(FacesContext context, List<UIInput> components, List<T> values);
 
 }
