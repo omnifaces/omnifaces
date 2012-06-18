@@ -46,7 +46,7 @@ public class ValidateOrderGt extends ValidateOrder {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
-	protected <T extends Comparable<T>> boolean validateOrder(FacesContext context, List<UIInput> components, List<T> values) {
+	protected <T extends Comparable<? super T>> boolean validateOrder(FacesContext context, List<UIInput> components, List<T> values) {
 		List<T> sortedValues = new ArrayList<T>(new TreeSet<T>(values));
 		Collections.reverse(sortedValues);
 		return sortedValues.equals(values);

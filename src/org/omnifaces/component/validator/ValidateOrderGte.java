@@ -45,7 +45,7 @@ public class ValidateOrderGte extends ValidateOrder {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
-	protected <T extends Comparable<T>> boolean validateOrder(FacesContext context, List<UIInput> components, List<T> values) {
+	protected <T extends Comparable<? super T>> boolean validateOrder(FacesContext context, List<UIInput> components, List<T> values) {
 		List<T> sortedValues = new ArrayList<T>(values);
 		Collections.sort(sortedValues, Collections.reverseOrder());
 		return sortedValues.equals(values);
