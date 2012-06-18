@@ -6,35 +6,41 @@
   
 -->
 <project name="eclipse" default="all">
-		
+
 	<import file="build.xml" />
-	
+
 	<macrodef name="copylib">
 		<attribute name="todir" />
 		<attribute name="srcdir" default="@{todir}" />
 
 		<sequential>
 			<eclipse.convertPath resourcePath="@{todir}" property="toFileSystemDir" />
+			<delete>
+				<fileset dir="${toFileSystemDir}" includes="omnifaces-*" />
+			</delete>
 			<copy todir="${toFileSystemDir}" overwrite="true">
 				<fileset file="dist/omnifaces-${VERSION}.jar" />
 			</copy>
 			<eclipse.refreshLocal resource="@{todir}" depth="infinite" />
 
 			<eclipse.convertPath resourcePath="@{srcdir}" property="srcFileSystemDir" />
+			<delete>
+				<fileset dir="${srcFileSystemDir}" includes="omnifaces-*" />
+			</delete>
 			<copy todir="${srcFileSystemDir}" overwrite="true">
-				<fileset file="dist/omnifaces-${VERSION}-src.jar" />
+				<fileset file="dist/omnifaces-${VERSION}-sources.jar" />
 			</copy>
 			<eclipse.refreshLocal resource="@{srcdir}" depth="infinite" />
 		</sequential>
 	</macrodef>
-	
+
 	<target name="refresh" depends="dist">
 		<eclipse.refreshLocal resource="omnifaces" depth="infinite" />
 	</target>
-	
+
 	<target name="copy_to_showcase" depends="refresh">
 		<copylib todir="omnifaces-showcase/WebContent/WEB-INF/lib" srcdir="omnifaces-showcase/lib-src" />
 	</target>
-		
+
 	<target name="all" depends="copy_to_showcase"/>
 </project>

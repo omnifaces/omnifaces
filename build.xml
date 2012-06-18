@@ -7,14 +7,20 @@
 -->
 <project name="OmniFaces" default="all" basedir=".">
 
+	<property name="version" value="1.1-SNAPSHOT" />
+
 	<tstamp>
 		<format property="DATE_SHORT" pattern="yyyyMMdd" />
 	</tstamp>
-	<property name="VERSION" value="1.1-SNAPSHOT-${DATE_SHORT}" />
 	<tstamp>
 		<format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
 	</tstamp>
-	
+
+	<condition property="VERSION" value="${version}">
+		<isset property="maven" />
+	</condition>
+	<property name="VERSION" value="${version}-${DATE_SHORT}" />
+
 	<path id="common.classpath">
 		<fileset dir="lib">
 			<include name="**/*.jar" />
@@ -54,9 +60,27 @@
 
 	<target name="jar-src">
 		<mkdir dir="dist" />
-		<jar destfile="dist/omnifaces-${VERSION}-src.jar" basedir="src" />
+		<jar destfile="dist/omnifaces-${VERSION}-sources.jar" basedir="src" />
 	</target>
 
-	<target name="dist" depends="jar,jar-src" />
+	<target name="javadoc-uptodate">
+		<uptodate property="javadoc.is.uptodate" targetfile="build/javadoc/index.html">
+			<srcfiles dir="src">
+				<include name="**/*.java" />
+			</srcfiles>
+		</uptodate>
+	</target>
+
+	<target name="jar-javadoc" depends="javadoc-uptodate" unless="javadoc.is.uptodate">
+		<mkdir dir="build/javadoc" />
+		<javadoc sourcepath="src" destdir="build/javadoc" >
+			<classpath refid="common.classpath" />
+		</javadoc>
+		<jar jarfile="dist/omnifaces-${VERSION}-javadoc.jar">
+			<fileset dir="build/javadoc" />
+		</jar>
+	</target>
+
+	<target name="dist" depends="jar,jar-src,jar-javadoc" />
 	<target name="all" depends="clean,dist" />
 </project>
