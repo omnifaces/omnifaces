@@ -16,19 +16,19 @@
 		<sequential>
 			<eclipse.convertPath resourcePath="@{todir}" property="toFileSystemDir" />
 			<delete>
-				<fileset dir="${toFileSystemDir}" includes="omnifaces-*" />
+				<fileset dir="${toFileSystemDir}" includes="${artifactId}-*" />
 			</delete>
 			<copy todir="${toFileSystemDir}" overwrite="true">
-				<fileset file="dist/omnifaces-${VERSION}.jar" />
+				<fileset file="${implementation-jar}" />
 			</copy>
 			<eclipse.refreshLocal resource="@{todir}" depth="infinite" />
 
 			<eclipse.convertPath resourcePath="@{srcdir}" property="srcFileSystemDir" />
 			<delete>
-				<fileset dir="${srcFileSystemDir}" includes="omnifaces-*" />
+				<fileset dir="${srcFileSystemDir}" includes="${artifactId}-*" />
 			</delete>
 			<copy todir="${srcFileSystemDir}" overwrite="true">
-				<fileset file="dist/omnifaces-${VERSION}-sources.jar" />
+				<fileset file="${sources-jar}" />
 			</copy>
 			<eclipse.refreshLocal resource="@{srcdir}" depth="infinite" />
 		</sequential>

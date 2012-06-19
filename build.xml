@@ -7,7 +7,11 @@
 -->
 <project name="OmniFaces" default="all" basedir=".">
 
+	
+	<!-- Properties -->
+	
 	<property name="version" value="1.1-SNAPSHOT" />
+	<property name="artifactId" value="omnifaces" />
 
 	<tstamp>
 		<format property="DATE_SHORT" pattern="yyyyMMdd" />
@@ -26,13 +30,18 @@
 			<include name="**/*.jar" />
 		</fileset>
 	</path>
+	
+	<!-- define artifacts' name, which follows the convention of Maven -->
+	
+	<property name="implementation-jar" value="dist/${artifactId}-${VERSION}.jar" />
+	<property name="sources-jar" value="dist/${artifactId}-${VERSION}-src.jar" />
+	<property name="javadoc-jar" value="dist/${artifactId}-${VERSION}-javadoc.jar" />
+	
+	
+	
+	<!-- Implementation targets -->
 
-	<target name="clean">
-		<delete dir="build" />
-		<delete dir="dist" />
-	</target>
-
-	<target name="compile">
+	<target name="compile-impl">
 		<mkdir dir="build/classes" />
 		<javac srcdir="src" destdir="build/classes" includeantruntime="false" source="1.6" target="1.6" debug="true">
 			<classpath refid="common.classpath" />
@@ -42,9 +51,9 @@
 		</copy>
 	</target>
 
-	<target name="jar" depends="compile">
+	<target name="jar-impl" depends="compile-impl">
 		<mkdir dir="dist" />
-		<jar destfile="dist/omnifaces-${VERSION}.jar" basedir="build/classes">
+		<jar destfile="${implementation-jar}" basedir="build/classes">
 			<manifest>
 				<attribute name="Specification-Title" value="OmniFaces" />
 				<attribute name="Specification-Vendor" value="OmniFaces" />
@@ -57,11 +66,19 @@
 			</manifest>
 		</jar>
 	</target>
+	
+	
+	
+	<!-- Source attachment targets -->
 
 	<target name="jar-src">
 		<mkdir dir="dist" />
-		<jar destfile="dist/omnifaces-${VERSION}-sources.jar" basedir="src" />
+		<jar destfile="${sources-jar}" basedir="src" />
 	</target>
+	
+	
+	
+	<!-- Javadoc targets -->
 
 	<target name="javadoc-uptodate">
 		<uptodate property="javadoc.is.uptodate" targetfile="build/javadoc/index.html">
@@ -70,17 +87,34 @@
 			</srcfiles>
 		</uptodate>
 	</target>
-
-	<target name="jar-javadoc" depends="javadoc-uptodate" unless="javadoc.is.uptodate">
+	
+	<target name="compile-javadoc" depends="javadoc-uptodate" unless="javadoc.is.uptodate">
 		<mkdir dir="build/javadoc" />
 		<javadoc sourcepath="src" destdir="build/javadoc" >
 			<classpath refid="common.classpath" />
 		</javadoc>
-		<jar jarfile="dist/omnifaces-${VERSION}-javadoc.jar">
+		<jar jarfile="${javadoc-jar}">
 			<fileset dir="build/javadoc" />
 		</jar>
 	</target>
+	
+	<target name="jar-javadoc" depends="compile-javadoc">
+		<mkdir dir="dist" />
+		<jar jarfile="${javadoc-jar}">
+			<fileset dir="build/javadoc" />
+		</jar>
+	</target>
+	
+	
+	
+	<!-- Other targets -->
+	
+	<target name="clean">
+		<delete dir="build" />
+		<delete dir="dist" />
+	</target>
+	
 
-	<target name="dist" depends="jar,jar-src,jar-javadoc" />
+	<target name="dist" depends="jar-impl,jar-src,jar-javadoc" />
 	<target name="all" depends="clean,dist" />
 </project>
