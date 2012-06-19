@@ -36,7 +36,9 @@ import org.omnifaces.util.Utils;
  * on 3rd party hosts where you have no control over servletcontainer configuration.
  * <p>
  * To get it to run, map this filter on the desired <code>&lt;url-pattern&gt;</code> or maybe even on the
- * <code>&lt;servlet-name&gt;</code> of the <code>FacesServlet</code>.
+ * <code>&lt;servlet-name&gt;</code> of the <code>FacesServlet</code>. A <code>Filter</code> is by default dispatched
+ * on <code>REQUEST</code> only, you might want to explicitly add the <code>ERROR</code> dispatcher to get it to run
+ * on error pages as well.
  * <pre>
  * &lt;filter&gt;
  *   &lt;filter-name&gt;gzipResponseFilter&lt;/filter-name&gt;
@@ -45,6 +47,8 @@ import org.omnifaces.util.Utils;
  * &lt;filter-mapping&gt;
  *   &lt;filter-name&gt;gzipResponseFilter&lt;/filter-name&gt;
  *   &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+ *   &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
+ *   &lt;dispatcher&gt;ERROR&lt;/dispatcher&gt;
  * &lt;/filter-mapping&gt;
  * </pre>
  * <p>
@@ -130,22 +134,18 @@ public class GzipResponseFilter extends HttpFilter {
 	}
 
 	/**
-	 * Perform the filtering job.
+	 * Perform the filtering job. Only if the client accepts GZIP based on the request headers, then wrap the response
+	 * in a {@link GzipHttpServletResponse} and pass it through the filter chain.
 	 */
 	@Override
 	public void doFilter
 		(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
 			throws ServletException, IOException
 	{
-		if (request.getAttribute("javax.servlet.include.request_uri") == null && acceptsGzip(request)) {
+		if (acceptsGzip(request)) {
 			GzipHttpServletResponse gzipResponse = new GzipHttpServletResponse(response, threshold, mimetypes);
-
-			try {
-				chain.doFilter(request, gzipResponse);
-			}
-			finally {
-				gzipResponse.close(); // Mandatory for the case the threshold limit hasn't been reached.
-			}
+			chain.doFilter(request, gzipResponse);
+			gzipResponse.close(); // Mandatory for the case the threshold limit hasn't been reached.
 		}
 		else {
 			chain.doFilter(request, response);
