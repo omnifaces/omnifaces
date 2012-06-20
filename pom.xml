@@ -11,7 +11,12 @@
 	<version>1.1-SNAPSHOT</version>
 	<description>JSF 2.x utility library</description>
 	<url>http://code.google.com/p/omnifaces</url>
-	
+	<organization>
+		<name>OmniFaces</name>
+		<url>http://code.google.com/p/omnifaces</url>
+	</organization>
+	<inceptionYear>2012</inceptionYear>
+
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
@@ -19,33 +24,118 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
-	
+
 	<scm>
 		<url>http://code.google.com/p/omnifaces/source/browse</url>
 		<connection>scm:hg:https://code.google.com/p/omnifaces</connection>
 		<developerConnection>scm:hg:https://code.google.com/p/omnifaces</developerConnection>
 	</scm>
-	
+
+	<prerequisites>
+		<maven>3.0.0</maven>
+	</prerequisites>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<jdk.version>1.6</jdk.version>
+		<jee.version>6.0</jee.version>
+	</properties>
+
 	<developers>
 		<developer>
 			<id>balusc</id>
 			<name>Bauke Scholtz</name>
 			<email>balusc@gmail.com</email>
 		</developer>
-		
+
 		<developer>
 			<id>arjan.tijms</id>
 			<name>Arjan Tijms</name>
 			<email>arjan.tijms@gmail.com</email>
 		</developer>
 	</developers>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>javax</groupId>
 			<artifactId>javaee-web-api</artifactId>
-			<version>6.0</version>
+			<version>${jee.version}</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
+
+	<build>
+		<sourceDirectory>${basedir}/src</sourceDirectory>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>${jdk.version}</source>
+					<target>${jdk.version}</target>
+					<compilerVersion>${jdk.version}</compilerVersion>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>2.5</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<!-- here the phase you need -->
+						<phase>validate</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/classes/META-INF</outputDirectory>
+							<resources>          
+								<resource>
+									<directory>${basedir}/src/META-INF</directory>
+								</resource>
+							</resources>              
+						</configuration>            
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.2.2</version>
+				<configuration>
+					<preparationGoals>clean verify javadoc:jar source:jar</preparationGoals>
+					<completionGoals>deploy</completionGoals>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+					<archive>
+						<manifest>
+							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
+						</manifest>
+						<manifestEntries>
+							<URL>${project.url}</URL>
+							<Extension-Name>${project.artifactId}</Extension-Name>
+						</manifestEntries>
+					</archive>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.9</version>
+				<configuration>
+					<addGroupIdToProjectName>true</addGroupIdToProjectName>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>true</downloadJavadocs>
+					<ajdtVersion>none</ajdtVersion>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>
