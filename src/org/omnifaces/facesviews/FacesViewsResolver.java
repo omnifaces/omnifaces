@@ -13,6 +13,10 @@
 
 package org.omnifaces.facesviews;
 
+import static javax.faces.application.ProjectStage.Development;
+import static org.omnifaces.facesviews.FacesViewsUtils.scanAndStoreViews;
+import static org.omnifaces.util.Faces.getServletContext;
+
 import java.net.URL;
 import java.util.Map;
 
@@ -41,15 +45,27 @@ public class FacesViewsResolver extends ResourceResolver {
 
     @Override
     public URL resolveUrl(String path) {
-
-        String facesViewsPath = path;
-
-        Map<String, String> mappedResources = Faces.getApplicationAttribute(FacesViewsResolver.FACES_VIEWS_RESOURCES_PARAM_NAME);
-        if (mappedResources != null && mappedResources.containsKey(path)) {
-            facesViewsPath = mappedResources.get(path);
+        
+        URL resource = resourceResolver.resolveUrl(getMappedPath(path));
+       
+        if (resource == null && Faces.getApplication().getProjectStage() == Development) {
+        	// If "resource" is null it means it wasn't found. Check if the resource was dynamically added by
+        	// scanning the faces-views location(s) again.
+        	scanAndStoreViews(getServletContext());
+        	resource = resourceResolver.resolveUrl(getMappedPath(path));
         }
 
-        return resourceResolver.resolveUrl(facesViewsPath);
+        return resource;
     }
+    
+	private String getMappedPath(String path) {
+		String facesViewsPath = path;
+		Map<String, String> mappedResources = Faces.getApplicationAttribute(FACES_VIEWS_RESOURCES_PARAM_NAME);
+		if (mappedResources != null && mappedResources.containsKey(path)) {
+			facesViewsPath = mappedResources.get(path);
+		}
+		
+		return facesViewsPath;
+	}
 
 }

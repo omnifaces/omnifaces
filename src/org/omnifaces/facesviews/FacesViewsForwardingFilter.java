@@ -13,9 +13,11 @@
 
 package org.omnifaces.facesviews;
 
-import static java.util.Collections.*;
-import static org.omnifaces.facesviews.FacesViewsResolver.*;
-import static org.omnifaces.facesviews.FacesViewsUtils.*;
+import static org.omnifaces.facesviews.FacesViewsResolver.FACES_VIEWS_RESOURCES_PARAM_NAME;
+import static org.omnifaces.facesviews.FacesViewsUtils.getApplication;
+import static org.omnifaces.facesviews.FacesViewsUtils.getApplicationAttribute;
+import static org.omnifaces.facesviews.FacesViewsUtils.isExtensionless;
+import static org.omnifaces.facesviews.FacesViewsUtils.tryScanAndStoreViews;
 
 import java.io.IOException;
 import java.util.Map;
@@ -72,7 +74,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 
             // Forward the resource (view) using its original extension, on which the Facelets Servlet
             // is mapped. Technically it matters most that the Facelets Servlet picks up the
-            // request, and the exact extension of even prefix is perhaps less relevant.
+            // request, and the exact extension or even prefix is perhaps less relevant.
             String forwardURI = resource + FacesViewsUtils.getExtension(resources.get(resource));
 
             // Get the request dispatcher
@@ -87,15 +89,6 @@ public class FacesViewsForwardingFilter extends HttpFilter {
         chain.doFilter(request, response);
 
     }
-
-    private void tryScanAndStoreViews(ServletContext context) {
-        if (getApplicationAttribute(context, FACES_VIEWS_RESOURCES_PARAM_NAME) == null) {
-            Map<String, String> views = scanViews(context, context.getResourcePaths(WEB_INF_VIEWS));
-            if (!views.isEmpty()) {
-                context.setAttribute(FACES_VIEWS_RESOURCES_PARAM_NAME, unmodifiableMap(views));
-            }
-        }
-
-    }
+    
 
 }

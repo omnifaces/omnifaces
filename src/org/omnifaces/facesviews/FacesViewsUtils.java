@@ -13,8 +13,10 @@
 
 package org.omnifaces.facesviews;
 
-import static javax.faces.FactoryFinder.*;
-import static org.omnifaces.util.Utils.*;
+import static java.util.Collections.unmodifiableMap;
+import static javax.faces.FactoryFinder.APPLICATION_FACTORY;
+import static org.omnifaces.facesviews.FacesViewsResolver.FACES_VIEWS_RESOURCES_PARAM_NAME;
+import static org.omnifaces.util.Utils.isEmpty;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -204,6 +206,31 @@ final class FacesViewsUtils {
                     collectedViews.put(stripExtension(resource), resourcePath);
                 }
             }
+        }
+    }
+    
+    /**
+     * Checks if resources haven't been scanned yet, and if not does scanning and stores the
+     * result at the designated location "org.omnifaces.facesviews" in the ServletContext.
+     * 
+     * @param context
+     */
+    public static void tryScanAndStoreViews(ServletContext context) {
+        if (getApplicationAttribute(context, FACES_VIEWS_RESOURCES_PARAM_NAME) == null) {
+        	scanAndStoreViews(context);
+        }
+    }
+    
+    /**
+     * Scans for faces-views resources and stores the result at the designated location "org.omnifaces.facesviews"
+     * in the ServletContext.
+     * 
+     * @param context
+     */
+    public static void scanAndStoreViews(ServletContext context) {
+        Map<String, String> views = scanViews(context, context.getResourcePaths(WEB_INF_VIEWS));
+        if (!views.isEmpty()) {
+            context.setAttribute(FACES_VIEWS_RESOURCES_PARAM_NAME, unmodifiableMap(views));
         }
     }
 
