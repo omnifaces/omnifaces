@@ -65,6 +65,7 @@
 		</dependency>
 	</dependencies>
 
+	<!-- Build part provided by mellowaredev (http://code.google.com/u/mellowaredev) -->
 	<build>
 		<sourceDirectory>${basedir}/src</sourceDirectory>
 		<plugins>
