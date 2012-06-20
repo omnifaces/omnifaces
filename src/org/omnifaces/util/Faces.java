@@ -439,7 +439,7 @@ public final class Faces {
 		getFaceletContext().setAttribute(name, value);
 	}
 
-	// HTTP request/response ------------------------------------------------------------------------------------------
+	// HTTP request ---------------------------------------------------------------------------------------------------
 
 	/**
 	 * Returns the HTTP servlet request.
@@ -649,6 +649,8 @@ public final class Faces {
 		return getRequest().getQueryString();
 	}
 
+	// HTTP request ---------------------------------------------------------------------------------------------------
+
 	/**
 	 * Returns the HTTP servlet response.
 	 * <p>
@@ -735,6 +737,29 @@ public final class Faces {
 	 */
 	public static void addResponseHeader(String name, String value) {
 		getExternalContext().addResponseHeader(name, value);
+	}
+
+	/**
+	 * Returns whether the response is already committed. That is, when the response headers and a part of the response
+	 * body has already been sent to the client. This is usually a point of no return and you can't change the response
+	 * anymore.
+	 * @return <code>true</code> if the response is already committed, otherwise <code>false</code>.
+	 * @see ExternalContext#isResponseCommitted()
+	 * @since 1.1
+	 */
+	public static boolean isResponseCommitted() {
+		return getExternalContext().isResponseCommitted();
+	}
+
+	/**
+	 * Resets the current response. This will clear any headers which are been set and any data which is written to
+	 * the response buffer which isn't committed yet.
+	 * @throws IllegalStateException When the response is already committed.
+	 * @see ExternalContext#responseReset()
+	 * @since 1.1
+	 */
+	public static void responseReset() {
+		getExternalContext().responseReset();
 	}
 
 	// FORM based authentication --------------------------------------------------------------------------------------
@@ -1016,10 +1041,10 @@ public final class Faces {
 	 * Returns a set of available application resource paths matching the specified path.
 	 * @param path The partial application resource path used to return matching resource paths.
 	 * @return A set of available application resource paths matching the specified path.
-	 * @see ServletContext#getResourcePaths(String)
+	 * @see ExternalContext#getResourcePaths(String)
 	 */
 	public static Set<String> getResourcePaths(String path) {
-		return getServletContext().getResourcePaths(path);
+		return getExternalContext().getResourcePaths(path);
 	}
 
 	// Request scope --------------------------------------------------------------------------------------------------
@@ -1251,7 +1276,6 @@ public final class Faces {
 		ExternalContext externalContext = context.getExternalContext();
 
 		// Prepare the response and set the necessary headers.
-		externalContext.responseReset();
 		externalContext.setResponseBufferSize(DEFAULT_SENDFILE_BUFFER_SIZE);
 		externalContext.setResponseContentType(getMimeType(filename));
 		externalContext.setResponseHeader("Content-Disposition", String.format("%s;filename=\"%s\"",

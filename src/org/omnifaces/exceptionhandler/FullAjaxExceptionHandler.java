@@ -317,7 +317,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 				fillErrorPageLocations("web-fragment", input, errorPageLocations);
 			}
 			catch (Exception e) {
-				// This exception should never occur. If it occurs, then web.xml is broken anyway.
+				// This exception should never occur. If it occurs, then web-fragment.xml is broken anyway.
 				throw new RuntimeException(e);
 			}
 			finally {
