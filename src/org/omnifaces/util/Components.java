@@ -83,6 +83,7 @@ public final class Components {
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see UIComponent#findComponent(String)
 	 */
+	@SuppressWarnings("unchecked")
 	public static <T extends UIComponent> T findComponentRelatively(UIComponent component, String clientId) {
 
 		if (isEmpty(clientId)) {
@@ -90,13 +91,14 @@ public final class Components {
 		}
 
 		// Search first in the naming container parents of the given component
-		T result = findComponentInParents(component, clientId);
+		UIComponent result = findComponentInParents(component, clientId);
+
 		if (result == null) {
 			// If not in the parents, search from the root
 			result = findComponentInChildren(Faces.getViewRoot(), clientId);
 		}
 
-		return result;
+		return (T) result;
 	}
 
 	/**
