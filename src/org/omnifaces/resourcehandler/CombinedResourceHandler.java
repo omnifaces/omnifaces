@@ -15,8 +15,11 @@ package org.omnifaces.resourcehandler;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
@@ -33,11 +36,12 @@ import javax.faces.event.SystemEventListener;
 import javax.servlet.http.HttpServletResponse;
 
 import org.omnifaces.util.Events;
+import org.omnifaces.util.Faces;
 import org.omnifaces.util.Utils;
 
 /**
- * This {@link ResourceHandler} implementation will remove all separate script and stylesheet resources from the head
- * and create a combined one for all scripts and another combined one for all stylesheets.
+ * This {@link ResourceHandler} implementation will remove all separate script and stylesheet resources from the
+ * <code>&lt;h:head&gt;</code> and create a combined one for all scripts and another combined one for all stylesheets.
  * <p>
  * This handler must be registered as follows in <tt>faces-config.xml</tt>:
  * <pre>
@@ -45,6 +49,28 @@ import org.omnifaces.util.Utils;
  *   &lt;resource-handler&gt;org.omnifaces.resourcehandler.CombinedResourceHandler&lt;/resource-handler&gt;
  * &lt;/application&gt;
  * </pre>
+ * <p>
+ * The following context parameters are available:
+ * <table>
+ * <tr><td nowrap>
+ * <code>{@value org.omnifaces.resourcehandlerCombinedResourceHandler#EXCLUDED_RESOURCES_PARAM_NAME}</code>
+ * </td><td>
+ * Comma separ1ated string of resource identifiers of <code>&lt;h:head&gt;</code> resources which needs to be excluded
+ * from combining. For example: <code>primefaces:primefaces.css, javax.faces:jsf.js</code>. Any combined resource will
+ * be included <i>after</i> any of those excluded resources.
+ * </td></tr>
+ * <tr><td nowrap>
+ * <code>{@value org.omnifaces.resourcehandlerCombinedResourceHandler#SUPPRESSED_RESOURCES_PARAM_NAME}</code>
+ * </td><td>
+ * Comma separated string of resource identifiers of <code>&lt;h:head&gt;</code> resources which needs to be suppressed
+ * and removed. For example: <code>skinning.ecss, primefaces:jquery/jquery.js</code>.
+ * </td></tr>
+ * </table>
+ * <p>
+ * Here, the "resource identifier" is the unique combination of library name and resource name, separated by a colon,
+ * exactly the syntax as you would use in <code>#{resource}</code> in EL. If there is no library name, then just omit
+ * the colon. Valid examples of resource identifiers are <tt>filename.ext</tt>, <tt>folder/filename.ext</tt>,
+ * <tt>library:filename.ext</tt> and <tt>library:folder/filename.ext</tt>.
  *
  * @author Bauke Scholtz
  */
@@ -54,6 +80,14 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 
 	/** The default library name of a combined resource. Make sure that this is never used for other libraries. */
 	public static final String LIBRARY_NAME = "omnifaces.combined";
+
+	/** The context parameter name to specify resource identifiers which needs to be excluded from combining. */
+    public static final String EXCLUDED_RESOURCES_PARAM_NAME =
+    	"org.omnifaces.COMBINED_RESOURCE_HANDLER_EXCLUDED_RESOURCES";
+
+	/** The context parameter name to specify resource identifiers which needs to be suppressed and removed. */
+    public static final String SUPPRESSED_RESOURCES_PARAM_NAME =
+    	"org.omnifaces.COMBINED_RESOURCE_HANDLER_SUPPRESSED_RESOURCES";
 
 	private static final String TARGET_HEAD = "head";
 	private static final String ATTRIBUTE_RESOURCE_LIBRARY = "library";
@@ -66,6 +100,8 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	private ResourceHandler wrapped;
+	private Set<String> excludedResources;
+	private Set<String> suppressedResources;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -77,6 +113,9 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	 */
 	public CombinedResourceHandler(ResourceHandler wrapped) {
 		this.wrapped = wrapped;
+		this.excludedResources = initResources(EXCLUDED_RESOURCES_PARAM_NAME);
+		this.suppressedResources = initResources(SUPPRESSED_RESOURCES_PARAM_NAME);
+		this.excludedResources.addAll(suppressedResources);
 		Events.subscribeToEvent(PreRenderViewEvent.class, this);
 	}
 
@@ -112,6 +151,8 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 		CombinedResourceInfo.Builder scripts = new CombinedResourceInfo.Builder();
 		List<UIComponent> componentResourcesToRemove = new ArrayList<UIComponent>();
 
+		System.out.println(viewRoot.getFacets());
+
 		for (UIComponent componentResource : viewRoot.getComponentResources(context, TARGET_HEAD)) {
 			String library = (String) componentResource.getAttributes().get(ATTRIBUTE_RESOURCE_LIBRARY);
 
@@ -125,12 +166,19 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 				continue; // It's likely an inline script, they can't be combined.
 			}
 
-			if (componentResource.getRendererType().equals(RENDERER_TYPE_STYLESHEET)) {
-				stylesheets.add(library, name);
-				componentResourcesToRemove.add(componentResource);
+			String resourceIdentifier = (library != null ? (library + ":") : "") + name;
+
+			if (excludedResources.isEmpty() || !excludedResources.contains(resourceIdentifier)) {
+				if (componentResource.getRendererType().equals(RENDERER_TYPE_STYLESHEET)) {
+					stylesheets.add(library, name);
+					componentResourcesToRemove.add(componentResource);
+				}
+				else if (componentResource.getRendererType().equals(RENDERER_TYPE_SCRIPT)) {
+					scripts.add(library, name);
+					componentResourcesToRemove.add(componentResource);
+				}
 			}
-			else if (componentResource.getRendererType().equals(RENDERER_TYPE_SCRIPT)) {
-				scripts.add(library, name);
+			else if (suppressedResources.contains(resourceIdentifier)) {
 				componentResourcesToRemove.add(componentResource);
 			}
 		}
@@ -176,6 +224,23 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Generic method to initialize set of resources based on given application initialization parameter name.
+	 * @param name The application initialization parameter name.
+	 * @return The set of resources which are set by the given application initialization parameter name, or an empty
+	 * set if the parameter is not been set.
+	 */
+	private static Set<String> initResources(String name) {
+		Set<String> resources = new HashSet<String>(1);
+		String configuredResources = Faces.getInitParameter(name);
+
+		if (configuredResources != null) {
+			resources.addAll(Arrays.asList(configuredResources.split("\\s*,\\s*")));
+		}
+
+		return resources;
+	}
 
 	/**
 	 * Create a component resource of the given name, extension and renderer type.
