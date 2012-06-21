@@ -172,7 +172,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 			return;
 		}
 
-		process(context, phaseId, getModel(), new Callback.Returning<Void>() {
+		process(context, phaseId, getModel(phaseId), new Callback.Returning<Void>() {
 
 			@Override
 			public Void invoke() {
@@ -194,7 +194,8 @@ public class Tree extends TreeFamily implements NamingContainer {
 			return false;
 		}
 
-		return process(context.getFacesContext(), PhaseId.ANY_PHASE, getModel(), new Callback.Returning<Boolean>() {
+		PhaseId phaseId = PhaseId.ANY_PHASE;
+		return process(context.getFacesContext(), phaseId, getModel(phaseId), new Callback.Returning<Boolean>() {
 
 			@Override
 			public Boolean invoke() {
@@ -250,7 +251,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @see TreeInsertChildren
 	 */
 	protected void processTreeNode(final FacesContext context, final PhaseId phaseId) {
-		processTreeNode(new Callback.ReturningWithArgument<Void, TreeNode>() {
+		processTreeNode(phaseId, new Callback.ReturningWithArgument<Void, TreeNode>() {
 
 			@Override
 			public Void invoke(TreeNode treeNode) {
@@ -274,7 +275,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @see TreeInsertChildren
 	 */
 	protected boolean visitTreeNode(final VisitContext context, final VisitCallback callback) {
-		return processTreeNode(new Callback.ReturningWithArgument<Boolean, TreeNode>() {
+		return processTreeNode(PhaseId.ANY_PHASE, new Callback.ReturningWithArgument<Boolean, TreeNode>() {
 
 			@Override
 			public Boolean invoke(TreeNode treeNode) {
@@ -297,11 +298,6 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @return The callback result.
 	 */
 	private <R> R process(FacesContext context, PhaseId phaseId, TreeModel node, Callback.Returning<R> callback) {
-		if (phaseId == PhaseId.RENDER_RESPONSE) {
-			nodes = null;
-			model = null;
-		}
-
 		Object[] originalVars = captureOriginalVars(context);
 		TreeModel originalModelNode = currentModelNode;
 		pushComponentToEL(context, null);
@@ -320,17 +316,19 @@ public class Tree extends TreeFamily implements NamingContainer {
 	/**
 	 * Convenience method to handle both {@link #processTreeNode(FacesContext, PhaseId)} and
 	 * {@link #visitTreeNode(VisitContext, VisitCallback)} without code duplication.
+	 * @param phaseId The current phase ID.
 	 * @param callback The callback to be invoked.
 	 * @return The callback result.
 	 */
-	private <R> R processTreeNode(Callback.ReturningWithArgument<R, TreeNode> callback) {
+	private <R> R processTreeNode(PhaseId phaseId, Callback.ReturningWithArgument<R, TreeNode> callback) {
 		TreeNode treeNode = null;
 
 		if (!currentModelNode.isLeaf()) {
-			treeNode = getNodes().get(currentModelNode.getLevel());
+			Map<Integer, TreeNode> nodes = getNodes(phaseId);
+			treeNode = nodes.get(currentModelNode.getLevel());
 
 			if (treeNode == null) {
-				treeNode = getNodes().get(null);
+				treeNode = nodes.get(null);
 			}
 		}
 
@@ -339,12 +337,13 @@ public class Tree extends TreeFamily implements NamingContainer {
 
 	/**
 	 * Returns the tree nodes by finding direct {@link TreeNode} children and collecting them by their level attribute.
+	 * @param phaseId The current phase ID.
 	 * @return The tree nodes.
 	 * @throws IllegalArgumentException When a direct child component isn't of type {@link TreeNode}, or when there are
 	 * multiple {@link TreeNode} components with the same level.
 	 */
-	private Map<Integer, TreeNode> getNodes() {
-		if (nodes == null) {
+	private Map<Integer, TreeNode> getNodes(PhaseId phaseId) {
+		if (phaseId == PhaseId.RENDER_RESPONSE || nodes == null) {
 			nodes = new HashMap<Integer, TreeNode>(getChildCount());
 
 			for (UIComponent child : getChildren()) {
@@ -366,11 +365,12 @@ public class Tree extends TreeFamily implements NamingContainer {
 
 	/**
 	 * Returns the tree model associated with the <code>value</code> attribute.
+	 * @param phaseId The current phase ID.
 	 * @return The tree model.
 	 * @throws IllegalArgumentException When the <code>value</code> isn't of type {@link TreeModel}.
 	 */
-	private TreeModel getModel() {
-		if (model == null) {
+	private TreeModel getModel(PhaseId phaseId) {
+		if (phaseId == PhaseId.RENDER_RESPONSE || model == null) {
 			Object value = getValue();
 
 			if (value == null) {
