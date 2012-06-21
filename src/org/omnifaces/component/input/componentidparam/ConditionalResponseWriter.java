@@ -12,8 +12,6 @@
  */
 package org.omnifaces.component.input.componentidparam;
 
-import static org.omnifaces.util.Utils.isOneOf;
-
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
@@ -32,10 +30,10 @@ import org.omnifaces.component.input.ComponentIdParam;
  * <p>
  * This allows rendering to proceed to the output if the current component matches any of the given ids, otherwise simply does not send anything to
  * the output.
- * 
+ *
  * @since 1.1
  * @author Arjan Tijms
- * 
+ *
  */
 public class ConditionalResponseWriter extends ResponseWriterWrapper {
 
@@ -225,7 +223,7 @@ public class ConditionalResponseWriter extends ResponseWriterWrapper {
 		}
 
 		// No decision made, check for an explicit id match
-		lastRendered = isOneOf(currentComponent.getId(), componentIds) || isOneOf(currentComponent.getClientId(), clientIds);
+		lastRendered = componentIds.contains(currentComponent.getId()) || clientIds.contains(currentComponent.getClientId());
 
 		if (renderChildren) {
 			// If current component not rendered because of explicit id match, check if parent is rendered.
