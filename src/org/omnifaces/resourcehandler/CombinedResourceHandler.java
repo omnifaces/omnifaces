@@ -40,30 +40,46 @@ import org.omnifaces.util.Faces;
 import org.omnifaces.util.Utils;
 
 /**
- * This {@link ResourceHandler} implementation will remove all separate script and stylesheet resources from the
- * <code>&lt;h:head&gt;</code> and create a combined one for all scripts and another combined one for all stylesheets.
+ * This {@link ResourceHandler} implementation will remove all separate script and stylesheet resources which have the
+ * <code>target</code> attribute set to <code>"head"</code> from the <code>UIViewRoot</code> and create a combined one
+ * for all scripts and another combined one for all stylesheets.
  * <p>
- * This handler must be registered as follows in <tt>faces-config.xml</tt>:
+ * To get it to run, this handler needs be registered as follows in <tt>faces-config.xml</tt>:
  * <pre>
  * &lt;application&gt;
  *   &lt;resource-handler&gt;org.omnifaces.resourcehandler.CombinedResourceHandler&lt;/resource-handler&gt;
  * &lt;/application&gt;
  * </pre>
  * <p>
+ * Note that the <code>target</code> attribute of <code>&lt;h:outputStylesheet&gt;</code> already defaults to
+ * <code>"head"</code> but the one of <code>&lt;h:outputScript&gt;</code> not. So if you have placed this inside the
+ * <code>&lt;h:head&gt;</code>, then you would still need to explicitly set its <code>target</code> attribute to
+ * <code>"head"</code>, otherwise it will be treated as an inline script and not be combined. This is a design
+ * limitation.
+ * <pre>
+ * &lt;h:head&gt;
+ *   &lt;h:outputStylesheet name="style.css" /&gt;
+ *   &lt;h:outputScript name="script.js" target="head" /&gt;
+ * &lt;/h:head&gt;
+ * </pre>
+ * <h3>Configuration</h3>
+ * <p>
  * The following context parameters are available:
  * <table>
  * <tr><td nowrap>
- * <code>{@value org.omnifaces.resourcehandlerCombinedResourceHandler#EXCLUDED_RESOURCES_PARAM_NAME}</code>
+ * <code>{@value org.omnifaces.resourcehandler.CombinedResourceHandler#EXCLUDED_RESOURCES_PARAM_NAME}</code>
  * </td><td>
- * Comma separ1ated string of resource identifiers of <code>&lt;h:head&gt;</code> resources which needs to be excluded
- * from combining. For example: <code>primefaces:primefaces.css, javax.faces:jsf.js</code>. Any combined resource will
- * be included <i>after</i> any of those excluded resources.
+ * Comma separated string of resource identifiers of <code>&lt;h:head&gt;</code> resources which needs to be excluded
+ * from combining. For example:
+ * <br/><code>&lt;param-value&gt;primefaces:primefaces.css, javax.faces:jsf.js&lt;/param-value&gt;</code><br/>
+ * Any combined resource will be included <i>after</i> any of those excluded resources.
  * </td></tr>
  * <tr><td nowrap>
- * <code>{@value org.omnifaces.resourcehandlerCombinedResourceHandler#SUPPRESSED_RESOURCES_PARAM_NAME}</code>
+ * <code>{@value org.omnifaces.resourcehandler.CombinedResourceHandler#SUPPRESSED_RESOURCES_PARAM_NAME}</code>
  * </td><td>
  * Comma separated string of resource identifiers of <code>&lt;h:head&gt;</code> resources which needs to be suppressed
- * and removed. For example: <code>skinning.ecss, primefaces:jquery/jquery.js</code>.
+ * and removed. For example:
+ * <br/><code>&lt;param-value&gt;skinning.ecss, primefaces:jquery/jquery.js&lt;/param-value&gt;</code>
  * </td></tr>
  * </table>
  * <p>
