@@ -226,12 +226,14 @@ final class FacesViewsUtils {
      * in the ServletContext.
      * 
      * @param context
+     * @return the view found during scanning, or the empty map if no views encountered
      */
-    public static void scanAndStoreViews(ServletContext context) {
+    public static Map<String, String> scanAndStoreViews(ServletContext context) {
         Map<String, String> views = scanViews(context, context.getResourcePaths(WEB_INF_VIEWS));
         if (!views.isEmpty()) {
             context.setAttribute(FACES_VIEWS_RESOURCES_PARAM_NAME, unmodifiableMap(views));
         }
+        return views;
     }
 
 }

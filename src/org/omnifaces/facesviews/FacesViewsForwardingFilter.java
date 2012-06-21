@@ -13,10 +13,12 @@
 
 package org.omnifaces.facesviews;
 
+import static javax.faces.application.ProjectStage.Development;
 import static org.omnifaces.facesviews.FacesViewsResolver.FACES_VIEWS_RESOURCES_PARAM_NAME;
 import static org.omnifaces.facesviews.FacesViewsUtils.getApplication;
 import static org.omnifaces.facesviews.FacesViewsUtils.getApplicationAttribute;
 import static org.omnifaces.facesviews.FacesViewsUtils.isExtensionless;
+import static org.omnifaces.facesviews.FacesViewsUtils.scanAndStoreViews;
 import static org.omnifaces.facesviews.FacesViewsUtils.tryScanAndStoreViews;
 
 import java.io.IOException;
@@ -60,6 +62,14 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 
         Application application = getApplication();
         application.setViewHandler(new FacesViewsViewHandler(application.getViewHandler()));
+        
+        // In development mode additionally map this Filter to "*", so we can catch requests to extensionless resources that 
+        // have been dynamically added. Note that resources with mapped extensions are already handled by the FacesViewsResolver.
+        // Adding resources with new extensions still requires a restart.
+        if (application.getProjectStage() == Development) {
+        	filterConfig.getServletContext().getFilterRegistration(FacesViewsForwardingFilter.class.getName())
+						.addMappingForUrlPatterns(null, false, "*");
+        }
     }
 
     @Override
@@ -70,25 +80,30 @@ public class FacesViewsForwardingFilter extends HttpFilter {
         Map<String, String> resources = getApplicationAttribute(context, FACES_VIEWS_RESOURCES_PARAM_NAME);
 
         String resource = request.getServletPath();
-        if (isExtensionless(resource) && resources.containsKey(resource)) {
-
-            // Forward the resource (view) using its original extension, on which the Facelets Servlet
-            // is mapped. Technically it matters most that the Facelets Servlet picks up the
-            // request, and the exact extension or even prefix is perhaps less relevant.
-            String forwardURI = resource + FacesViewsUtils.getExtension(resources.get(resource));
-
-            // Get the request dispatcher
-            RequestDispatcher requestDispatcher = context.getRequestDispatcher(forwardURI);
-            if (requestDispatcher != null) {
-                // Forward the request to FacesServlet
-                requestDispatcher.forward(request, response);
-                return;
-            }
+        if (isExtensionless(resource)) {
+        	
+        	if (getApplication().getProjectStage() == Development && !resources.containsKey(resource)) {
+        		// Check if the resource was dynamically added by scanning the faces-views location(s) again.
+        		resources = scanAndStoreViews(context);
+        	}
+        	
+        	if (resources.containsKey(resource)) {
+	            // Forward the resource (view) using its original extension, on which the Facelets Servlet
+	            // is mapped. Technically it matters most that the Facelets Servlet picks up the
+	            // request, and the exact extension or even prefix is perhaps less relevant.
+	            String forwardURI = resource + FacesViewsUtils.getExtension(resources.get(resource));
+	
+	            // Get the request dispatcher
+	            RequestDispatcher requestDispatcher = context.getRequestDispatcher(forwardURI);
+	            if (requestDispatcher != null) {
+	                // Forward the request to FacesServlet
+	                requestDispatcher.forward(request, response);
+	                return;
+	            }
+        	}
         }
 
         chain.doFilter(request, response);
-
     }
-    
 
 }
