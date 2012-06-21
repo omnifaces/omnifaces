@@ -167,8 +167,6 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 		CombinedResourceInfo.Builder scripts = new CombinedResourceInfo.Builder();
 		List<UIComponent> componentResourcesToRemove = new ArrayList<UIComponent>();
 
-		System.out.println(viewRoot.getFacets());
-
 		for (UIComponent componentResource : viewRoot.getComponentResources(context, TARGET_HEAD)) {
 			String library = (String) componentResource.getAttributes().get(ATTRIBUTE_RESOURCE_LIBRARY);
 
