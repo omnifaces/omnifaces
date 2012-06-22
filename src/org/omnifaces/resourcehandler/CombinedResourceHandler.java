@@ -159,10 +159,6 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 		FacesContext context = FacesContext.getCurrentInstance();
 		UIViewRoot viewRoot = context.getViewRoot();
 
-		if (viewRoot.getAttributes().get(getClass().getName()) == Boolean.TRUE) {
-			return; // No need to repeat the job.
-		}
-
 		CombinedResourceInfo.Builder stylesheets = new CombinedResourceInfo.Builder();
 		CombinedResourceInfo.Builder scripts = new CombinedResourceInfo.Builder();
 		List<UIComponent> componentResourcesToRemove = new ArrayList<UIComponent>();
@@ -171,13 +167,13 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 			String library = (String) componentResource.getAttributes().get(ATTRIBUTE_RESOURCE_LIBRARY);
 
 			if (LIBRARY_NAME.equals(library)) {
-				return; // MyFaces somehow doesn't store custom view attributes. Prevent it from repeating the job.
+				continue; // Don't recombine already combined resources.
 			}
 
 			String name = (String) componentResource.getAttributes().get(ATTRIBUTE_RESOURCE_NAME);
 
 			if (name == null) {
-				continue; // It's likely an inline script, they can't be combined.
+				continue; // It's likely an inline script, they can't be combined as it might contain EL expressions.
 			}
 
 			String resourceIdentifier = (library != null ? (library + ":") : "") + name;
@@ -208,8 +204,6 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 		if (!scripts.isEmpty()) {
 			addComponentResource(context, scripts.create(), EXTENSION_SCRIPT, RENDERER_TYPE_SCRIPT);
 		}
-
-		viewRoot.getAttributes().put(getClass().getName(), Boolean.TRUE); // Indicate that job is done on this view.
 	}
 
 	@Override
