@@ -117,7 +117,7 @@ public class Highlight extends OnloadScript {
 		UIOutput body = (UIOutput) getChildren().get(0);
 		body.setValue(null); // Reset any previous value.
 
-		if (context.isPostback()) {
+		if (context.isPostback() && context.isValidationFailed()) {
 			UIForm form = Components.getCurrentForm();
 
 			if (form != null) {

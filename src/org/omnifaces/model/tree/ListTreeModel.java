@@ -58,6 +58,22 @@ public class ListTreeModel<T> implements TreeModel<T> {
 		return child;
 	}
 
+	@Override
+	public TreeModel<T> remove() {
+		if (parent != null) {
+			synchronized (parent.children) {
+				parent.children.remove(this);
+
+				// Fix the indexes of the children (that's why it needs to be synchronized).
+				for (int index = 0; index < parent.children.size(); index++) {
+					((ListTreeModel<T>) parent.children.get(index)).index = index;
+				}
+			}
+		}
+
+		return parent;
+	}
+
 	// Accessors ------------------------------------------------------------------------------------------------------
 
 	@Override
@@ -80,7 +96,7 @@ public class ListTreeModel<T> implements TreeModel<T> {
 		if (unmodifiableChildren == null && children == null) {
 			unmodifiableChildren = Collections.emptyList();
 		}
-		else if (unmodifiableChildren == null || unmodifiableChildren.size() != children.size()) {
+		else if (unmodifiableChildren == null || (children != null && unmodifiableChildren.size() != children.size())) {
 			unmodifiableChildren = Collections.unmodifiableList(children);
 		}
 

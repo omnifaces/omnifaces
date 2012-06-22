@@ -35,10 +35,16 @@ public interface TreeModel<T> extends Iterable<TreeModel<T>>, Serializable {
 	void setData(T data);
 
 	/**
-	 * Creates and adds a child tree node with the given data to the current tree node and return it.
+	 * Creates and adds a child tree node with the given data to the current tree node. It returns the newly created
+	 * and added child tree node to ease further building.
 	 * @return The newly created and added child tree node of the current tree node.
 	 */
 	TreeModel<T> addChild(T data);
+
+	/**
+	 * Removes the current tree node from its parent, if any. It returns the parent to ease further building.
+	 */
+	TreeModel<T> remove();
 
 	// Accessors ------------------------------------------------------------------------------------------------------
 
@@ -61,8 +67,9 @@ public interface TreeModel<T> extends Iterable<TreeModel<T>>, Serializable {
 	int getChildCount();
 
 	/**
-	 * Returns an unmodifiable list of all child tree nodes of the current tree node. Adding new children should be
-	 * done by the {@link #addChild(Object)} method. Adding/inserting/removing elements is not supported on the list.
+	 * Returns an unmodifiable list of all child tree nodes of the current tree node. Adding and removing elements is
+	 * not supported on the list. Adding new children should be done by the {@link #addChild(Object)} method on the
+	 * tree node parent. Removing children should be done by the {@link #remove()} method on the tree node itself.
 	 * @return An unmodifiable list of all child tree nodes of the current tree node.
 	 */
 	List<TreeModel<T>> getChildren();
