@@ -84,7 +84,7 @@ public class ComponentIdParam extends ViewParam {
 	 * Gets the boolean value for the given property key. Defaults to true if no value is defined.
 	 * 
 	 * @param propertyKey
-	 * @return false if the boolean attribute is explicitly false, true otherwise.
+	 * @return false if the boolean attribute is present and not equal to "true", true otherwise.
 	 */
 	private boolean getBooleanAttribute(PropertyKeys propertyKey) {
 		String attribute = (String) getAttributes().get(propertyKey.name());

@@ -2006,5 +2006,258 @@
             <type>javax.faces.component.UIComponent</type>
         </attribute>
     </tag>
+    
+    <tag>
+        <description>
+        	<![CDATA[
+        		<strong>Form</strong> is a component that extends the standard h:form and provides a way to keep view parameters
+ 				in the request URL after a post-back.
+             ]]>           
+        </description>
+        <tag-name>form</tag-name>
+        <component>
+            <component-type>org.omnifaces.component.input.Form</component-type>
+        </component>
+        <attribute>
+            <description>
+                The component identifier for this component. This value must be
+                unique within the closest parent component that is a naming
+                container.
+            </description>
+            <name>id</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+         <attribute>
+            <description>
+                Whether to include view parameters in the action URI.
+            </description>
+            <name>includeViewParams</name>
+            <required>false</required>
+            <type>boolean</type>
+        </attribute>
+        <attribute>
+            <description>
+                Flag indicating whether or not this form should prepend its id
+                to its descendent's id during the clientId generation process.
+                If this flag is not set, the default value is true.
+            </description>
+            <name>prependId</name>
+            <required>false</required>
+            <type>boolean</type>
+        </attribute>
+        <attribute>
+            <description>
+                Flag indicating whether or not this component should be rendered
+                (during Render Response Phase), or processed on any subsequent
+                form submit. The default value for this property is true.
+            </description>
+            <name>rendered</name>
+            <required>false</required>
+            <type>boolean</type>
+        </attribute>
+        <attribute>
+            <description>
+                List of content types that a server processing this form
+                will handle correctly
+            </description>
+            <name>accept</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                List of character encodings for input data
+                that are accepted by the server processing
+                this form.
+            </description>
+            <name>acceptcharset</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Direction indication for text that does not inherit
+                directionality.
+                Valid values are "LTR" (left-to-right) and "RTL"
+                (right-to-left).
+            </description>
+            <name>dir</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Content type used to submit the form to the server. If not
+                specified, the default value is
+                "application/x-www-form-urlencoded".
+            </description>
+            <name>enctype</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Code describing the language used in the generated markup
+                for this component.
+            </description>
+            <name>lang</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is
+                clicked over this element.
+            </description>
+            <name>onclick</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is
+                double clicked over this element.
+            </description>
+            <name>ondblclick</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a key is
+                pressed down over this element.
+            </description>
+            <name>onkeydown</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a key is
+                pressed and released over this element.
+            </description>
+            <name>onkeypress</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a key is
+                released over this element.
+            </description>
+            <name>onkeyup</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is
+                pressed down over this element.
+            </description>
+            <name>onmousedown</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is
+                moved within this element.
+            </description>
+            <name>onmousemove</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is
+                moved away from this element.
+            </description>
+            <name>onmouseout</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is
+                moved onto this element.
+            </description>
+            <name>onmouseover</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is
+                released over this element.
+            </description>
+            <name>onmouseup</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when this form is reset.
+            </description>
+            <name>onreset</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when this form is submitted.
+            </description>
+            <name>onsubmit</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                CSS style(s) to be applied when this component is rendered.
+            </description>
+            <name>style</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Space-separated list of CSS style class(es) to be applied when
+                this element is rendered. This value must be passed through
+                as the "class" attribute on generated markup.
+            </description>
+            <name>styleClass</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Name of a frame where the response
+                retrieved after this form submit is to
+                be displayed.
+            </description>
+            <name>target</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Advisory title information about markup elements generated
+                for this component.
+            </description>
+            <name>title</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                The ValueExpression linking this component to a property in a
+                backing bean
+            </description>
+            <name>binding</name>
+            <required>false</required>
+            <type>javax.faces.component.UIComponent</type>
+        </attribute>
+    </tag>
+    
 
 </facelet-taglib>
