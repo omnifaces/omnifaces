@@ -10,10 +10,8 @@ OmniFaces.Ajax = function() {
 
 	var executeRunOnceOnSuccessCallbacks = function executeRunOnceOnSuccessCallbacks(data) {
 		if (data.status === 'success') {
-			for (var i in runOnceOnSuccessCallbacks) {
-				if (runOnceOnSuccessCallbacks.hasOwnProperty(i)) {
-					runOnceOnSuccessCallbacks[i].call(null);
-				}
+			for (var i = 0; i < runOnceOnSuccessCallbacks.length; i++) {
+				runOnceOnSuccessCallbacks[i].call(null);
 			}
 
 			runOnceOnSuccessCallbacks = [];

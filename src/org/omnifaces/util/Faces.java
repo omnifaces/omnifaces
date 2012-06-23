@@ -694,6 +694,7 @@ public final class Faces {
 		ExternalContext externalContext = context.getExternalContext();
 		externalContext.setResponseStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
 		externalContext.setResponseHeader("Location", normalizeRedirectURL(url));
+		externalContext.setResponseHeader("Connection", "close");
 		context.responseComplete();
 	}
 
@@ -1093,6 +1094,20 @@ public final class Faces {
 		getRequestMap().put(name, value);
 	}
 
+	/**
+	 * Removes the request scope attribute value associated with the given name.
+	 * @param name The request scope attribute name.
+	 * @return The request scope attribute value previously associated with the given name, or <code>null</code> if
+	 * there is no such attribute.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see ExternalContext#getRequestMap()
+	 * @since 1.1
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T removeRequestAttribute(String name) {
+		return (T) getRequestMap().remove(name);
+	}
+
 	// Flash scope ----------------------------------------------------------------------------------------------------
 
 	/**
@@ -1125,6 +1140,20 @@ public final class Faces {
 	 */
 	public static void setFlashAttribute(String name, Object value) {
 		getFlash().put(name, value);
+	}
+
+	/**
+	 * Removes the flash scope attribute value associated with the given name.
+	 * @param name The flash scope attribute name.
+	 * @return The flash scope attribute value previously associated with the given name, or <code>null</code> if
+	 * there is no such attribute.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see ExternalContext#getFlash()
+	 * @since 1.1
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T removeFlashAttribute(String name) {
+		return (T) getFlash().remove(name);
 	}
 
 	// View scope -----------------------------------------------------------------------------------------------------
@@ -1160,6 +1189,20 @@ public final class Faces {
 		getViewMap().put(name, value);
 	}
 
+	/**
+	 * Removes the view scope attribute value associated with the given name.
+	 * @param name The view scope attribute name.
+	 * @return The view scope attribute value previously associated with the given name, or <code>null</code> if
+	 * there is no such attribute.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see UIViewRoot#getViewMap()
+	 * @since 1.1
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T removeViewAttribute(String name) {
+		return (T) getViewMap().remove(name);
+	}
+
 	// Session scope --------------------------------------------------------------------------------------------------
 
 	/**
@@ -1193,6 +1236,20 @@ public final class Faces {
 		getSessionMap().put(name, value);
 	}
 
+	/**
+	 * Removes the session scope attribute value associated with the given name.
+	 * @param name The session scope attribute name.
+	 * @return The session scope attribute value previously associated with the given name, or <code>null</code> if
+	 * there is no such attribute.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see ExternalContext#getSessionMap()
+	 * @since 1.1
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T removeSessionAttribute(String name) {
+		return (T) getSessionMap().remove(name);
+	}
+
 	// Application scope ----------------------------------------------------------------------------------------------
 
 	/**
@@ -1224,6 +1281,20 @@ public final class Faces {
 	 */
 	public static void setApplicationAttribute(String name, Object value) {
 		getApplicationMap().put(name, value);
+	}
+
+	/**
+	 * Removes the application scope attribute value associated with the given name.
+	 * @param name The application scope attribute name.
+	 * @return The application scope attribute value previously associated with the given name, or <code>null</code> if
+	 * there is no such attribute.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see ExternalContext#getApplicationMap()
+	 * @since 1.1
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T removeApplicationAttribute(String name) {
+		return (T) getApplicationMap().remove(name);
 	}
 
 	// File download --------------------------------------------------------------------------------------------------

@@ -35,8 +35,9 @@ public interface TreeModel<T> extends Iterable<TreeModel<T>>, Serializable {
 	void setData(T data);
 
 	/**
-	 * Creates and adds a child tree node with the given data to the current tree node. It returns the newly created
-	 * and added child tree node to ease further building.
+	 * Creates and adds a child tree node with the given wrapped data to the current tree node. It returns the newly
+	 * created and added child tree node to ease further building.
+	 * @param data The wrapped data of the child tree node to be created and added.
 	 * @return The newly created and added child tree node of the current tree node.
 	 */
 	TreeModel<T> addChild(T data);
