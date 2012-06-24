@@ -47,10 +47,13 @@ import javax.servlet.ServletContextListener;
  * it early during webapp's startup, for example with a {@link ServletContextListener}, or a Servlet 3.0
  * <code>ServletContainerInitializer</code>, or an eagerly initialized {@link ApplicationScoped} {@link ManagedBean}.
  * <p>
- * Note that all of those methods by design only sets the message summary and ignores the message detail (it is not
- * possible to offer varargs to parameterize <em>both</em> the summary and the detail). The message summary is exactly
- * the information which is by default displayed in the <code>&lt;h:message(s)&gt;</code>, while the detail is by
- * default only displayed when you explicitly set the <code>showDetail="true"</code> attribute.
+ * Note that all of those shortcut methods by design only sets the message summary and ignores the message detail (it
+ * is not possible to offer varargs to parameterize <em>both</em> the summary and the detail). The message summary is
+ * exactly the information which is by default displayed in the <code>&lt;h:message(s)&gt;</code>, while the detail is
+ * by default only displayed when you explicitly set the <code>showDetail="true"</code> attribute.
+ * <p>
+ * To create a {@link FacesMessage} with a message detail as well, use the {@link Message} builder as you can obtain by
+ * {@link Messages#create(String, Object...)}.
  *
  * @author Bauke Scholtz
  */
@@ -118,7 +121,112 @@ public final class Messages {
 		// Hide constructor.
 	}
 
-	// Create message -------------------------------------------------------------------------------------------------
+	// Builder --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Create a faces message with the default INFO severity and the given message body which is formatted with the
+	 * given parameters as summary message. To set the detail message, use {@link Message#detail(String, Object...)}.
+	 * To change the default INFO severity, use {@link Message#warn()}, {@link Message#error()}, or
+	 * {@link Message#fatal()}. To make it a flash message, use {@link Message#flash()}. To finally add it to the faces
+	 * context, use either {@link Message#add(String)} to add it for a specific client ID, or {@link Message#add()} to
+	 * add it as a global message.
+	 * @param message The message body.
+	 * @param params The message format parameters, if any.
+	 * @return The {@link Message} builder.
+	 * @see Messages#createInfo(String, Object...)
+	 * @see Resolver#getMessage(String, Object...)
+	 * @since 1.1
+	 */
+	public static Message create(String message, Object... params) {
+		return new Message(createInfo(message, params));
+	}
+
+	/**
+	 * Faces message builder.
+	 *
+	 * @author Bauke Scholtz
+	 * @since 1.1
+	 */
+	public static class Message {
+
+		private FacesMessage message;
+
+		private Message(FacesMessage message) {
+			this.message = message;
+		}
+
+		/**
+		 * Set the detail message of the current message.
+		 * @param detail The detail message to be set on the current message.
+		 * @param params The detail message format parameters, if any.
+		 * @return The current {@link Message} instance for further building.
+		 * @see FacesMessage#setDetail(String)
+		 */
+		public Message detail(String detail, Object... params) {
+			message.setDetail(resolver.getMessage(detail, params));
+			return this;
+		}
+
+		/**
+		 * Set the severity of the current message to WARN. Note: it defaults to INFO already.
+		 * @return The current {@link Message} instance for further building.
+		 * @see FacesMessage#setSeverity(javax.faces.application.FacesMessage.Severity)
+		 */
+		public Message warn() {
+			message.setSeverity(FacesMessage.SEVERITY_WARN);
+			return this;
+		}
+
+		/**
+		 * Set the severity of the current message to ERROR. Note: it defaults to INFO already.
+		 * @return The current {@link Message} instance for further building.
+		 * @see FacesMessage#setSeverity(javax.faces.application.FacesMessage.Severity)
+		 */
+		public Message error() {
+			message.setSeverity(FacesMessage.SEVERITY_ERROR);
+			return this;
+		}
+
+		/**
+		 * Set the severity of the current message to FATAL. Note: it defaults to INFO already.
+		 * @return The current {@link Message} instance for further building.
+		 * @see FacesMessage#setSeverity(javax.faces.application.FacesMessage.Severity)
+		 */
+		public Message fatal() {
+			message.setSeverity(FacesMessage.SEVERITY_FATAL);
+			return this;
+		}
+
+		/**
+		 * Make the current message a flash message. Use this when you need to display the message after a redirect.
+		 * @return The current {@link Message} instance for further building.
+		 * @see Flash#setKeepMessages(boolean)
+		 */
+		public Message flash() {
+			Faces.getFlash().setKeepMessages(true);
+			return this;
+		}
+
+		/**
+		 * Add the current message for the given client ID.
+		 * @param clientId The client ID to add the current message for.
+		 * @see FacesContext#addMessage(String, FacesMessage)
+		 */
+		public void add(String clientId) {
+			Messages.add(clientId, message);
+		}
+
+		/**
+		 * Add the current message as a global message.
+		 * @see FacesContext#addMessage(String, FacesMessage)
+		 */
+		public void add() {
+			Messages.addGlobal(message);
+		}
+
+	}
+
+	// Shortcuts - create message -------------------------------------------------------------------------------------
 
 	/**
 	 * Create a faces message of the given severity with the given message body which is formatted with the given
@@ -179,7 +287,7 @@ public final class Messages {
 		return create(FacesMessage.SEVERITY_FATAL, message, params);
 	}
 
-	// Add message ----------------------------------------------------------------------------------------------------
+	// Shortcuts - add message ----------------------------------------------------------------------------------------
 
 	/**
 	 * Add the given faces message to the given client ID. When the client ID is <code>null</code>, it becomes a
@@ -258,7 +366,7 @@ public final class Messages {
 		add(clientId, createFatal(message, params));
 	}
 
-	// Add global message ---------------------------------------------------------------------------------------------
+	// Shortcuts - add global message ---------------------------------------------------------------------------------
 
 	/**
 	 * Add a global faces message. This adds a faces message to a client ID of <code>null</code>.
@@ -326,7 +434,7 @@ public final class Messages {
 		addGlobal(createFatal(message, params));
 	}
 
-	// Add flash message ----------------------------------------------------------------------------------------------
+	// Shortcuts - add flash message ----------------------------------------------------------------------------------
 
 	/**
 	 * Add a flash scoped faces message to the given client ID. Use this when you need to display the message after a
@@ -411,7 +519,7 @@ public final class Messages {
 		addFlash(clientId, createFatal(message, params));
 	}
 
-	// Add global flash message ---------------------------------------------------------------------------------------
+	// Shortcuts - add global flash message ---------------------------------------------------------------------------
 
 	/**
 	 * Add a flash scoped global faces message. This adds a faces message to a client ID of <code>null</code>. Use this

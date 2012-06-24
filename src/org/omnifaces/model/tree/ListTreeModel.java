@@ -93,10 +93,10 @@ public class ListTreeModel<T> implements TreeModel<T> {
 
 	@Override
 	public List<TreeModel<T>> getChildren() {
-		if (unmodifiableChildren == null && children == null) {
+		if (unmodifiableChildren == null && getChildCount() == 0) {
 			unmodifiableChildren = Collections.emptyList();
 		}
-		else if (unmodifiableChildren == null || (children != null && unmodifiableChildren.size() != children.size())) {
+		else if (unmodifiableChildren == null || unmodifiableChildren.size() != getChildCount()) {
 			unmodifiableChildren = Collections.unmodifiableList(children);
 		}
 
@@ -127,7 +127,7 @@ public class ListTreeModel<T> implements TreeModel<T> {
 
 	@Override
 	public boolean isLeaf() {
-		return children == null;
+		return getChildCount() == 0;
 	}
 
 	@Override

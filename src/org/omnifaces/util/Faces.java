@@ -57,9 +57,10 @@ import javax.servlet.http.HttpSession;
  * <p>
  * Do note that using the hierarchy is actually a better software design practice, but can lead to verbose code.
  * <p>
- * In addition, note that there's normally a small overhead in obtaining the thread local {@link FacesContext}. In case
+ * In addition, note that there's normally a minor overhead in obtaining the thread local {@link FacesContext}. In case
  * client code needs to call methods in this class multiple times it's expected that performance will be slightly better
- * if instead the {@link FacesContext} is obtained once and the required methods called on that.
+ * if instead the {@link FacesContext} is obtained once and the required methods are called on that, although the
+ * difference is practically negligible when used in modern server hardware.
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz
@@ -810,8 +811,9 @@ public final class Faces {
 	 * Perform programmatic logout for container managed FORM based authentication. Note that this basically removes
 	 * the user principal from the session. It's however better practice to just invalidate the session altogether,
 	 * which will implicitly also remove the user principal. Just invoke {@link #invalidateSession()} instead. Note
-	 * that the user principal is still present in the response of the current request, it's recommendable to send a
-	 * redirect after {@link #logout()} or {@link #invalidateSession()}.
+	 * that the user principal is still present in the response of the current request, it's therefore recommend to
+	 * send a redirect after {@link #logout()} or {@link #invalidateSession()}. You can use {@link #redirect(String)}
+	 * for this.
 	 * @throws ServletException When the logout has failed.
 	 * @see HttpServletRequest#logout()
 	 */
@@ -865,8 +867,9 @@ public final class Faces {
 	 * be set to secure when the current request is secure (i.e. when the current request is a HTTPS request).
 	 * @param name The cookie name.
 	 * @param value The cookie value.
-	 * @param path The cookie path.
-	 * @param maxAge The maximum age of the cookie, in seconds. If this is <tt>0</tt> then the cookie will be removed.
+	 * @param path The cookie path. If this is <tt>/</tt>, then the cookie is available in all pages of the webapp.
+	 * If this is <tt>/somespecificpath</tt>, then the cookie is only available in pages under the specified path.
+	 * @param maxAge The maximum age of the cookie, in seconds. If this is <tt>0</tt>, then the cookie will be removed.
 	 * Note that the name and path must be exactly the same as it was when the cookie was created. If this is
 	 * <tt>-1</tt> then the cookie will become a session cookie and thus live as long as the established HTTP session.
 	 * @throws UnsupportedOperationException If UTF-8 is not supported on this machine.
