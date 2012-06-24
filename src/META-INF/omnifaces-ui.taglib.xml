@@ -1991,5 +1991,24 @@
         </attribute>
     </tag>
     
+	<tag>
+        <description>
+        	<![CDATA[
+        		<strong>Cache</strong> is a component that initially renders the output of its children into a buffer 
+        		instead of to the response. This output is then inserted into a cache and on subsequent requests the
+        		content retrieved from the cache is used.
+        		<p>
+        		By default the viewid concatenated to the component id via an underscore is used as the cache key.
+        		
+        		WIP implementation: support for scopes, cache providers, user provided cache keys and some common settings per
+        		instance (LRU, TTL) still need to be implemented.
+             ]]>           
+        </description>
+        <tag-name>cache</tag-name>
+        <component>
+            <component-type>org.omnifaces.component.output.Cache</component-type>
+        </component>
+	</tag>
+    
 
 </facelet-taglib>
