@@ -53,7 +53,7 @@
 
 	<target name="jar-impl" depends="compile-impl">
 		<mkdir dir="dist" />
-		<jar destfile="${implementation-jar}" basedir="build/classes">
+		<jar destfile="${implementation-jar}" basedir="build/classes" excludes="**/*.jsfdia">
 			<manifest>
 				<attribute name="Specification-Title" value="OmniFaces" />
 				<attribute name="Specification-Vendor" value="OmniFaces" />
@@ -73,7 +73,7 @@
 
 	<target name="jar-src">
 		<mkdir dir="dist" />
-		<jar destfile="${sources-jar}" basedir="src" />
+		<jar destfile="${sources-jar}" basedir="src" excludes="**/*.jsfdia"/>
 	</target>
 	
 	
