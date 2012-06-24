@@ -104,7 +104,20 @@ public final class Faces {
 	 * @see FacesContext#getExternalContext()
 	 */
 	public static ExternalContext getExternalContext() {
-		return FacesContext.getCurrentInstance().getExternalContext();
+		return getContext().getExternalContext();
+	}
+
+	/**
+	 * Returns the current partial view context (the ajax context).
+	 * <p>
+	 * <i>Note that whenever you absolutely need this method to perform a general task, you might want to consider to
+	 * submit a feature request to OmniFaces in order to add a new utility method which performs exactly this general
+	 * task.</i>
+	 * @return The current partial view context.
+	 * @see FacesContext#getPartialViewContext()
+	 */
+	public static PartialViewContext getPartialViewContext() {
+		return getContext().getPartialViewContext();
 	}
 
 	/**
@@ -117,7 +130,7 @@ public final class Faces {
 	 * @see FacesContext#getApplication()
 	 */
 	public static Application getApplication() {
-		return FacesContext.getCurrentInstance().getApplication();
+		return getContext().getApplication();
 	}
 
 	/**
@@ -378,6 +391,21 @@ public final class Faces {
 	public static void navigate(String outcome) {
 		FacesContext context = getContext();
 		context.getApplication().getNavigationHandler().handleNavigation(context, null, outcome);
+	}
+
+	/**
+	 * Add the given client IDs to the collection of render IDs of the current partial view context. This will force
+	 * JSF to ajax-render/update the components with the given client IDs on render response. Note that those client IDs
+	 * should not start with the naming container separator character like <code>:</code>.
+	 * @param clientIds The client IDs to be added to the collection of render IDs of the current partial view context.
+	 * @since 1.1
+	 */
+	public static void addRenderIds(String... clientIds) {
+		Collection<String> renderIds = getContext().getPartialViewContext().getRenderIds();
+
+		for (String clientId : clientIds) {
+			renderIds.add(clientId);
+		}
 	}
 
 	// Facelets -------------------------------------------------------------------------------------------------------

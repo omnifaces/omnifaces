@@ -122,11 +122,10 @@ public class InvokeActionEventListener extends DefaultPhaseListener implements S
 	 * @param type The event type.
 	 */
 	@SuppressWarnings("unchecked") // For the cast on Set<UIComponent>.
-	private static <T extends SystemEvent> void checkAndAddComponentWithListeners(
-		FacesContext context, UIComponent component, Class<T> type)
+	private static <T extends SystemEvent> void checkAndAddComponentWithListeners
+		(FacesContext context, UIComponent component, Class<T> type)
 	{
 		if (!Utils.isEmpty(component.getListenersForEventClass(type))) {
-
 			Set<UIComponent> components = (Set<UIComponent>) context.getAttributes().get(type);
 
 			if (components == null) {
