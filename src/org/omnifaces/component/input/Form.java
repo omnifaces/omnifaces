@@ -12,7 +12,7 @@
  */
 package org.omnifaces.component.input;
 
-import static org.omnifaces.component.input.Form.PropertyKeys.includeViewParams;
+import static org.omnifaces.component.input.Form.PropertyKeys.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -48,8 +48,8 @@ import javax.faces.view.ViewMetadata;
  * To solve this, this component offers an attribute <code>includeViewParams</code> that will optionally include all view parameters, in exactly the
  * same way that this can be done for <code>&lt;h:link&gt;<code> and <code>&lt;h:button&gt;<code>.
  * <p>
- * You can use it the same way as <code>&lt;f:form&gt;</code>, you only need to change <code>h:</code> to <code>o:</code>.
- * 
+ * You can use it the same way as <code>&lt;h:form&gt;</code>, you only need to change <code>h:</code> to <code>o:</code>.
+ *
  * @since 1.1
  * @author Arjan Tijms
  */
@@ -80,7 +80,7 @@ public class Form extends UIForm {
 
 	/**
 	 * Set whether or not the view parameters should be encoded into the form's action URL.
-	 * 
+	 *
 	 * @param includeViewParams
 	 *            The state of the switch for encoding view parameters
 	 */
@@ -90,9 +90,9 @@ public class Form extends UIForm {
 
 	/**
 	 * Helper class used for creating a FacesContext with a decorated FacesContext -&gt; Application -&gt; ViewHandler -&gt; getActionURL.
-	 * 
+	 *
 	 * @author Arjan Tijms
-	 * 
+	 *
 	 */
 	static class ActionURLDecorator extends FacesContextWrapper {
 
@@ -151,7 +151,7 @@ public class Form extends UIForm {
 	 * Gets parameters associated with the {@link UIViewParameter}s as a request-parameter like map of Strings.
 	 * <p>
 	 * In the returned map, keys represent the parameter name, while the value is a list of one of more values associated with that parameter name.
-	 * 
+	 *
 	 * @param context
 	 * @return Map with parameters. An empty map will be returned if there are no parameters.
 	 */
