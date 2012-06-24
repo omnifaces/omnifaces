@@ -12,6 +12,8 @@
  */
 package org.omnifaces.component.input;
 
+import static org.omnifaces.util.Faces.isPostback;
+
 import java.util.Map;
 
 import javax.el.ValueExpression;
@@ -45,6 +47,7 @@ public class ViewParam extends UIViewParameter {
 
 	private String submittedValue;
 	private Map<String, Object> attributeInterceptMap;
+	
 
 	@Override
 	public void setSubmittedValue(Object submittedValue) {
@@ -58,9 +61,24 @@ public class ViewParam extends UIViewParameter {
 
 	@Override
 	public boolean isRequired() {
-		// The request parameter gets lost on postbacks, however it's already present in the view scoped bean.
+		// The request parameter is ignored on postbacks, however it's already present in the view scoped bean.
 		// So we can safely skip the required validation on postbacks.
-		return !FacesContext.getCurrentInstance().isPostback() && super.isRequired();
+		return !isPostback() && super.isRequired();
+	}
+	
+	@Override
+	public void processDecodes(FacesContext context) {
+		// Ignore any request parameters that are present when the postback is done.
+		if (!context.isPostback()) {
+			super.processDecodes(context);
+		}
+	}
+
+	@Override
+	public void processValidators(FacesContext context) {
+		if (!context.isPostback()) {
+			super.processValidators(context);
+		}
 	}
 
 	@Override
