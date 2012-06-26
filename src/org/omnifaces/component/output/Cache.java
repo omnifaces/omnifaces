@@ -12,6 +12,8 @@
  */
 package org.omnifaces.component.output;
 
+import static org.omnifaces.component.output.Cache.PropertyKeys.key;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -23,11 +25,26 @@ import javax.faces.component.UIComponentBase;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 
+import org.omnifaces.util.State;
+
+/**
+ * <strong>Cache</strong> is a component that captures the mark-up rendered by its children and caches
+ * this for future requests.
+ *
+ * @since 1.1
+ * @author Arjan Tijms
+ */
 @FacesComponent(Cache.COMPONENT_TYPE)
 public class Cache extends UIComponentBase {
 
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.Cache";
 	public static final String COMPONENT_FAMILY = "org.omnifaces.component.output";
+
+	private final State state = new State(getStateHelper());
+
+	enum PropertyKeys {
+		key
+	}
 
 	// TMP
 	private static final Map<String, String> cacheStore = new ConcurrentHashMap<String, String>();
@@ -51,11 +68,15 @@ public class Cache extends UIComponentBase {
 	@Override
 	public void encodeChildren(FacesContext context) throws IOException {
 
-		String defaultKey = context.getViewRoot().getViewId() + "_" + this.getClientId(context);
+		String key = getKey();
+		if (key == null) {
+			key = context.getViewRoot().getViewId() + "_" + this.getClientId(context);
+		}
+
 		ResponseWriter responseWriter = context.getResponseWriter();
 		String childRendering = null;
 
-		if (!cacheStore.containsKey(defaultKey)) {
+		if (!cacheStore.containsKey(key)) {
 			Writer bufferWriter = new StringWriter();
 
 			context.setResponseWriter(responseWriter.cloneWithWriter(bufferWriter));
@@ -66,12 +87,20 @@ public class Cache extends UIComponentBase {
 			}
 
 			childRendering = bufferWriter.toString();
-			cacheStore.put(defaultKey, childRendering);
+			cacheStore.put(key, childRendering);
 		} else {
-			childRendering = cacheStore.get(defaultKey);
+			childRendering = cacheStore.get(key);
 		}
 
 		responseWriter.write(childRendering);
+	}
+
+	public String getKey() {
+		return state.get(key);
+	}
+
+	public void setKey(String keyValue) {
+		state.put(key, keyValue);
 	}
 
 }

@@ -1992,22 +1992,39 @@
     </tag>
     
 	<tag>
-        <description>
-        	<![CDATA[
-        		<strong>Cache</strong> is a component that initially renders the output of its children into a buffer 
-        		instead of to the response. This output is then inserted into a cache and on subsequent requests the
-        		content retrieved from the cache is used.
-        		<p>
-        		By default the viewid concatenated to the component id via an underscore is used as the cache key.
-        		
-        		WIP implementation: support for scopes, cache providers, user provided cache keys and some common settings per
-        		instance (LRU, TTL) still need to be implemented.
-             ]]>           
-        </description>
-        <tag-name>cache</tag-name>
-        <component>
-            <component-type>org.omnifaces.component.output.Cache</component-type>
-        </component>
+		<description>
+	       	<![CDATA[
+	       		<strong>Cache</strong> is a component that initially renders the output of its children into a buffer 
+	       		instead of to the response. This output is then inserted into a cache and on subsequent requests the
+	       		content retrieved from the cache is used.
+	       		<p>
+	       		By default the viewid concatenated to the component id via an underscore is used as the cache key.
+	       		
+	       		WIP implementation: support for scopes, cache providers, and some common settings per
+	       		instance (LRU, TTL) still need to be implemented.
+			]]>           
+		</description>
+		<tag-name>cache</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.output.Cache</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					Optional key used to store content in the cache. If no key is specified, a key is calculated
+					based on the client Id of this component.
+					<p>
+					While auto-generated keys can be convenient, note that in the face of dynamic behavior on a view the
+					id of a component and thus the cache key can change in ways that are difficult to predict.
+					<p>
+					Keys are relative to the scope for which they are defined, meaning a key "foo" for the a session scoped
+					cache will not conflict with a key of the same name for an application scoped cache.
+				 ]]>
+            </description>
+			<name>key</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
 	</tag>
     
 
