@@ -2068,7 +2068,7 @@ public enum Baz {
 		<attribute>
 			<description>
 				<![CDATA[
-	               The full qualified name of the class/interface/enum to import the constant field values for.
+	               The fully qualified name of the class/interface/enum to import the constant field values for.
 	            ]]>
             </description>
 			<name>type</name>

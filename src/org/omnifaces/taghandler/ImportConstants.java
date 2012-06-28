@@ -29,8 +29,8 @@ import org.omnifaces.util.MapWrapper;
 
 /**
  * <p>The <code>&lt;o:importConstants&gt;</code> allows the developer to have a mapping of all constant field values of
- * the given type in the EL scope. The constant field values are those public static final fields. This works for
- * classes, interfaces and enums. For example:
+ * the given fully qualified name of a type in the EL scope. The constant field values are those public static final
+ * fields. This works for classes, interfaces and enums. For example:
  * <pre>
  * public class Foo {
  *     public static final String FOO1 = "foo1";
@@ -64,7 +64,7 @@ import org.omnifaces.util.MapWrapper;
  */
 public class ImportConstants extends TagHandler {
 
-    // Constants ------------------------------------------------------------------------------------------------------
+	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static Map<String, Map<String, Object>> CONSTANTS_CACHE = new HashMap<String, Map<String, Object>>();
 
@@ -73,12 +73,12 @@ public class ImportConstants extends TagHandler {
 	private static final String ERROR_FIELD_ACCESS = "Cannot access constant field '%s' of type '%s'.";
 	private static final String ERROR_INVALID_CONSTANT = "Type '%s' does not have the constant '%s'.";
 
-    // Variables ------------------------------------------------------------------------------------------------------
+	// Variables ------------------------------------------------------------------------------------------------------
 
-    private String var;
-    private TagAttribute type;
+	private String var;
+	private TagAttribute type;
 
-    // Constructors ---------------------------------------------------------------------------------------------------
+	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
 	 * The tag constructor.
@@ -86,24 +86,24 @@ public class ImportConstants extends TagHandler {
 	 */
 	public ImportConstants(TagConfig config) {
 		super(config);
-        TagAttribute var = getAttribute("var");
+		TagAttribute var = getAttribute("var");
 
-        if (var != null) {
-        	if (var.isLiteral()) {
-        		this.var = var.getValue();
-        	}
-        	else {
-        		throw new IllegalArgumentException(ERROR_INVALID_VAR);
-        	}
-        }
+		if (var != null) {
+			if (var.isLiteral()) {
+				this.var = var.getValue();
+			}
+			else {
+				throw new IllegalArgumentException(ERROR_INVALID_VAR);
+			}
+		}
 
-        this.type = getRequiredAttribute("type");
+		this.type = getRequiredAttribute("type");
 	}
 
-    // Actions --------------------------------------------------------------------------------------------------------
+	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * First obtain the constants of the class by its full qualified name as specified in the <code>type<code>
+	 * First obtain the constants of the class by its fully qualified name as specified in the <code>type<code>
 	 * attribute from the cache. If it hasn't been collected yet and is thus not present in the cashe, then collect
 	 * them and store in cache. Finally set the constants in the EL scope by the simple name of the type, or by the
 	 * name as specified in the <code>var</code> attribute, if any.
@@ -121,11 +121,11 @@ public class ImportConstants extends TagHandler {
 		context.setAttribute(var != null ? var : type.substring(type.lastIndexOf('.') + 1), constants);
 	}
 
-    // Helpers --------------------------------------------------------------------------------------------------------
+	// Helpers --------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Collect constants of the given type. That are, all public static final fields of the given type.
-	 * @param type The full qualified name of the type to collect constants for.
+	 * @param type The fully qualified name of the type to collect constants for.
 	 * @return Constants of the given type.
 	 */
 	private static Map<String, Object> collectConstants(final String type) {
@@ -155,8 +155,8 @@ public class ImportConstants extends TagHandler {
 	}
 
 	/**
-	 * Convert the given type, which should represent a full qualified name, to a concrete {@link Class} instance.
-	 * @param type The full qualified name of the class.
+	 * Convert the given type, which should represent a fully qualified name, to a concrete {@link Class} instance.
+	 * @param type The fully qualified name of the class.
 	 * @return The concrete {@link Class} instance.
 	 * @throws IllegalArgumentException When it is missing in the classpath.
 	 */
