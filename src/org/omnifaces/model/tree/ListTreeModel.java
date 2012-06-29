@@ -46,14 +46,23 @@ public class ListTreeModel<T> implements TreeModel<T> {
 
 	@Override
 	public TreeModel<T> addChild(T data) {
+		ListTreeModel<T> child = new ListTreeModel<T>();
+		child.data = data;
+		return addChildNode(child);
+	}
+
+	@Override
+	public TreeModel<T> addChildNode(TreeModel<T> child) {
+		if (!(child instanceof ListTreeModel)) {
+			throw new IllegalArgumentException();
+		}
+
 		if (children == null) {
 			children = new ArrayList<TreeModel<T>>();
 		}
 
-		ListTreeModel<T> child = new ListTreeModel<T>();
-		child.data = data;
-		child.parent = this;
-		child.index = children.size();
+		((ListTreeModel<T>) child).parent = this;
+		((ListTreeModel<T>) child).index = children.size();
 		children.add(child);
 		return child;
 	}

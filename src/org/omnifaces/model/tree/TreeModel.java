@@ -43,6 +43,15 @@ public interface TreeModel<T> extends Iterable<TreeModel<T>>, Serializable {
 	TreeModel<T> addChild(T data);
 
 	/**
+	 * Adds the given child tree node to the current tree node. It returns the added child tree node to ease further
+	 * building.
+	 * @param child The child tree node to be added.
+	 * @return The same child treenode.
+	 * @throws IllegalArgumentException When the given child is not an instance of the same class as the parent.
+	 */
+	TreeModel<T> addChildNode(TreeModel<T> child);
+
+	/**
 	 * Removes the current tree node from its parent, if any. It returns the parent to ease further building.
 	 */
 	TreeModel<T> remove();
