@@ -142,16 +142,7 @@ public class ImportConstants extends TagHandler {
 			}
 		}
 
-		return Collections.unmodifiableMap(new MapWrapper<String, Object>(constants) {
-			@Override
-			public Object get(Object key) {
-				if (!containsKey(key)) {
-					throw new IllegalArgumentException(String.format(ERROR_INVALID_CONSTANT, type, key));
-				}
-
-				return super.get(key);
-			}
-		});
+		return new ConstantsMap(constants, type);
 	}
 
 	/**
@@ -177,6 +168,33 @@ public class ImportConstants extends TagHandler {
 	private static boolean isPublicStaticFinal(Field field) {
 		int modifiers = field.getModifiers();
 		return Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers);
+	}
+
+	// Nested classes -------------------------------------------------------------------------------------------------
+
+	/**
+	 * Specific map implementation which wraps the given map in {@link Collections#unmodifiableMap(Map)} and throws an
+	 * {@link IllegalArgumentException} in {@link ConstantsMap#get(Object)} method when the key doesn't exist at all.
+	 *
+	 * @author Bauke Scholtz
+	 */
+	private static class ConstantsMap extends MapWrapper<String, Object> {
+
+		private String type;
+
+		public ConstantsMap(Map<String, Object> map, String type) {
+			super(Collections.unmodifiableMap(map));
+			this.type = type;
+		}
+
+		@Override
+		public Object get(Object key) {
+			if (!containsKey(key)) {
+				throw new IllegalArgumentException(String.format(ERROR_INVALID_CONSTANT, type, key));
+			}
+
+			return super.get(key);
+		}
 	}
 
 }
