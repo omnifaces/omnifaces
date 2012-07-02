@@ -634,18 +634,6 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the scheme-relative HTTP request base URL. This is the URL from the <tt>//</tt>, domain until with
-	 * context path, including the trailing slash. This is the value you could use in HTML <code>&lt;base&gt;</code>
-	 * tag when having a webapp which uses both the HTTP and HTTPS schemes.
-	 * @return The HTTP request base URL.
-	 * @see #getRequestBaseURL()
-	 * @since 1.1
-	 */
-	public static String getRelativeRequestBaseURL() {
-		return getRequestBaseURL().split(":", 2)[1];
-	}
-
-	/**
 	 * Returns the HTTP request URL. This is the full request URL as the enduser sees in browser address bar. This does
 	 * not include the request query string.
 	 * @return The HTTP request URL.
