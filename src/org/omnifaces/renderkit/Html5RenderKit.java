@@ -57,13 +57,7 @@ import org.omnifaces.util.Utils;
  * "plain vanilla" HTML (and is currently, June 2012, only supported in Firefox 4 and Opera 11). See also
  * <a href="http://www.html5tutorial.info/html5-datalist.php">HTML5 tutorial</a>.
  * <p>
- * To use the HTML5 render kit, register it as follows in <tt>faces-config.xml</tt>:
- * <pre>
- * &lt;render-kit&gt;
- *   &lt;render-kit-id&gt;HTML_BASIC&lt;/render-kit-id&gt;
- *   &lt;render-kit-class&gt;org.omnifaces.renderkit.Html5RenderKit&lt;/render-kit-class&gt;
- * &lt;/render-kit&gt;
- * </pre>
+ * Refer the documentation of {@link Html5RenderKitFactory} how to setup it.
  *
  * @author Bauke Scholtz
  * @since 1.1
