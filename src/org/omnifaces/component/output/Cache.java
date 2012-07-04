@@ -12,25 +12,24 @@
  */
 package org.omnifaces.component.output;
 
-import static org.omnifaces.component.output.Cache.PropertyKeys.key;
+import static org.omnifaces.component.output.Cache.PropertyKeys.*;
 
 import java.io.IOException;
 import java.io.StringWriter;
 import java.io.Writer;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponentBase;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 
+import org.omnifaces.component.output.cache.CacheFactory;
 import org.omnifaces.util.State;
 
 /**
- * <strong>Cache</strong> is a component that captures the mark-up rendered by its children and caches
- * this for future requests.
- *
+ * <strong>Cache</strong> is a component that captures the mark-up rendered by its children and caches this for future
+ * requests.
+ * 
  * @since 1.1
  * @author Arjan Tijms
  */
@@ -39,15 +38,13 @@ public class Cache extends UIComponentBase {
 
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.Cache";
 	public static final String COMPONENT_FAMILY = "org.omnifaces.component.output";
+	public static final String DEFAULT_SCOPE = "session";
 
 	private final State state = new State(getStateHelper());
 
 	enum PropertyKeys {
-		key
+		key, scope
 	}
-
-	// TMP
-	private static final Map<String, String> cacheStore = new ConcurrentHashMap<String, String>();
 
 	/**
 	 * Returns {@link #COMPONENT_FAMILY}.
@@ -74,9 +71,11 @@ public class Cache extends UIComponentBase {
 		}
 
 		ResponseWriter responseWriter = context.getResponseWriter();
-		String childRendering = null;
+		org.omnifaces.component.output.cache.Cache scopedCache = CacheFactory.getCache(context, getScope());
 
-		if (!cacheStore.containsKey(key)) {
+		String childRendering = scopedCache.get(key);
+
+		if (childRendering == null) {
 			Writer bufferWriter = new StringWriter();
 
 			context.setResponseWriter(responseWriter.cloneWithWriter(bufferWriter));
@@ -87,9 +86,7 @@ public class Cache extends UIComponentBase {
 			}
 
 			childRendering = bufferWriter.toString();
-			cacheStore.put(key, childRendering);
-		} else {
-			childRendering = cacheStore.get(key);
+			scopedCache.put(key, childRendering);
 		}
 
 		responseWriter.write(childRendering);
@@ -101,6 +98,14 @@ public class Cache extends UIComponentBase {
 
 	public void setKey(String keyValue) {
 		state.put(key, keyValue);
+	}
+
+	public String getScope() {
+		return state.get(scope, DEFAULT_SCOPE);
+	}
+
+	public void setScope(String scopeValue) {
+		state.put(scope, scopeValue);
 	}
 
 }

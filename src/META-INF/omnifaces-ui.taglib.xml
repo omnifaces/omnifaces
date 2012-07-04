@@ -2025,6 +2025,23 @@
 			<required>false</required>
 			<type>java.lang.String</type>
 		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Optional scope identifier used to set the scope in which caching takes place. If no scope is specified,
+					the default scope "session" will be used.
+					<p>
+					The supported scopes depent on the caching provider that is installed via the 
+					<code>org.omnifaces.CACHE_PROVIDER</code>. If no such provider is installed, a default one is used
+					that supports scopes "session" and "application".
+					<p>
+					A runtime exception will be thrown if an unsupported value for scope is used.
+				 ]]>
+            </description>
+			<name>scope</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
 	</tag>
     
 	<tag>
