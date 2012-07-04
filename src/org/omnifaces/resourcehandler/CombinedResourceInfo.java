@@ -91,8 +91,8 @@ final class CombinedResourceInfo {
 		// Actions ----------------------------------------------------------------------------------------------------
 
 		/**
-		 * Add the the resource represented by the given library name and resource name to the resource names mapping
-		 * of this combined resource info. The insertion order is maintained and grouped by library name and duplicates
+		 * Add the resource represented by the given library name and resource name to the resource names mapping of
+		 * this combined resource info. The insertion order is maintained and grouped by library name and duplicates
 		 * are filtered.
 		 * @param libraryName The library name of the resource to be added.
 		 * @param resourceName The resource name of the resource to be added.

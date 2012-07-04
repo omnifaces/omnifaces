@@ -25,7 +25,6 @@ import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
 import javax.faces.application.ResourceHandlerWrapper;
 import javax.faces.component.UIComponent;
-import javax.faces.component.UIOutput;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
@@ -151,7 +150,8 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	 * <li>Collect all component resources from the head.
 	 * <li>Check and collect the script and stylesheet resources separately and remove them from the head.
 	 * <li>If there are any resources in the collection of script and/or stylesheet resources, then create a
-	 * component resource component pointing to the combined resource info and add it to the head.
+	 * component resource component pointing to the combined resource info and add it to the head at the location of
+	 * the first resource.
 	 * </ul>
 	 */
 	@Override
@@ -161,6 +161,8 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 
 		CombinedResourceInfo.Builder stylesheets = new CombinedResourceInfo.Builder();
 		CombinedResourceInfo.Builder scripts = new CombinedResourceInfo.Builder();
+		UIComponent stylesheetComponentResource = null;
+		UIComponent scriptComponentResource = null;
 		List<UIComponent> componentResourcesToRemove = new ArrayList<UIComponent>();
 
 		for (UIComponent componentResource : viewRoot.getComponentResources(context, TARGET_HEAD)) {
@@ -181,11 +183,23 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 			if (excludedResources.isEmpty() || !excludedResources.contains(resourceIdentifier)) {
 				if (componentResource.getRendererType().equals(RENDERER_TYPE_STYLESHEET)) {
 					stylesheets.add(library, name);
-					componentResourcesToRemove.add(componentResource);
+
+					if (stylesheetComponentResource == null) {
+						stylesheetComponentResource = componentResource;
+					}
+					else {
+						componentResourcesToRemove.add(componentResource);
+					}
 				}
 				else if (componentResource.getRendererType().equals(RENDERER_TYPE_SCRIPT)) {
 					scripts.add(library, name);
-					componentResourcesToRemove.add(componentResource);
+
+					if (scriptComponentResource == null) {
+						scriptComponentResource = componentResource;
+					}
+					else {
+						componentResourcesToRemove.add(componentResource);
+					}
 				}
 			}
 			else if (suppressedResources.contains(resourceIdentifier)) {
@@ -193,16 +207,16 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 			}
 		}
 
+		if (stylesheetComponentResource != null) {
+			setComponentResource(stylesheetComponentResource, stylesheets.create(), EXTENSION_STYLESHEET);
+		}
+
+		if (scriptComponentResource != null) {
+			setComponentResource(scriptComponentResource, scripts.create(), EXTENSION_SCRIPT);
+		}
+
 		for (UIComponent componentResourceToRemove : componentResourcesToRemove) {
 			viewRoot.removeComponentResource(context, componentResourceToRemove, TARGET_HEAD);
-		}
-
-		if (!stylesheets.isEmpty()) {
-			addComponentResource(context, stylesheets.create(), EXTENSION_STYLESHEET, RENDERER_TYPE_STYLESHEET);
-		}
-
-		if (!scripts.isEmpty()) {
-			addComponentResource(context, scripts.create(), EXTENSION_SCRIPT, RENDERER_TYPE_SCRIPT);
 		}
 	}
 
@@ -251,18 +265,14 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	}
 
 	/**
-	 * Create a component resource of the given name, extension and renderer type.
-	 * @param context The current faces context.
+	 * Set the given component as a combined resource with the given name and extension.
+	 * @param component The component to be set as combined resource.
 	 * @param name The name of the combined resource.
 	 * @param extension The extension of the combined resource.
-	 * @param rendererType The renderer type of the combined resource.
 	 */
-	private static void addComponentResource(FacesContext context, String name, String extension, String rendererType) {
-		UIOutput component = new UIOutput();
-		component.setRendererType(rendererType);
+	private static void setComponentResource(UIComponent component, String name, String extension) {
 		component.getAttributes().put(ATTRIBUTE_RESOURCE_LIBRARY, LIBRARY_NAME);
 		component.getAttributes().put(ATTRIBUTE_RESOURCE_NAME, name + extension);
-		context.getViewRoot().addComponentResource(context, component, TARGET_HEAD);
 	}
 
 	/**
