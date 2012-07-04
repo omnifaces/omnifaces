@@ -48,7 +48,7 @@ public class FullAjaxExceptionHandlerFactory extends ExceptionHandlerFactory {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns a new instance {@link FullAjaxExceptionHandler}.
+	 * Returns a new instance of {@link FullAjaxExceptionHandler} which wraps the original exception handler.
 	 */
 	@Override
 	public ExceptionHandler getExceptionHandler() {

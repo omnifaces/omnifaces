@@ -57,7 +57,7 @@ public class Html5RenderKitFactory extends RenderKitFactory {
 
 	/**
 	 * If the given render kit ID equals to {@link RenderKitFactory#HTML_BASIC_RENDER_KIT}, then return a new
-	 * {@link Html5RenderKit} which wraps the original render kit, else return the original render kit unmodified.
+	 * {@link Html5RenderKit} instance which wraps the original render kit, else return the original render kit.
 	 */
 	@Override
 	public RenderKit getRenderKit(FacesContext context, String renderKitId) {

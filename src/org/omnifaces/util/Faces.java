@@ -30,6 +30,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
+import javax.el.ELContext;
+import javax.el.ExpressionFactory;
+import javax.el.ValueExpression;
 import javax.faces.application.Application;
 import javax.faces.application.NavigationHandler;
 import javax.faces.application.ProjectStage;
@@ -233,6 +236,24 @@ public final class Faces {
 
 		FacesContext context = getContext();
 		return (T) context.getApplication().evaluateExpressionGet(context, expression, Object.class);
+	}
+
+	/**
+	 * Programmatically evaluate the given EL expression and set the given value.
+	 * @param expression The EL expression to be evaluated.
+	 * @param value The value to be set in the property behind the EL expression.
+	 * @return The evaluated value of the given EL expression.
+	 * @see Application#getExpressionFactory()
+	 * @see ExpressionFactory#createValueExpression(ELContext, String, Class)
+	 * @see ValueExpression#setValue(ELContext, Object)
+	 * @since 1.1
+	 */
+	public static void evaluateExpressionSet(String expression, Object value) {
+		FacesContext context = getContext();
+		ELContext elContext = context.getELContext();
+		ValueExpression valueExpression = context.getApplication().getExpressionFactory()
+		    .createValueExpression(elContext, expression, Object.class);
+		valueExpression.setValue(elContext, value);
 	}
 
 	// JSF views ------------------------------------------------------------------------------------------------------
