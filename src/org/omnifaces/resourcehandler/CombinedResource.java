@@ -14,6 +14,7 @@ package org.omnifaces.resourcehandler;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -43,7 +44,6 @@ final class CombinedResource extends Resource {
 	private static final TimeZone TIMEZONE_GMT = TimeZone.getTimeZone("GMT");
 
 	private static final String ERROR_UNKNOWN_RESOURCE_NAME = "Unknown resource name: %s";
-	private static final String ERROR_CANNOT_CREATE_URL = "Cannot create an URL. %s is an in-memory resource pointer.";
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -94,9 +94,14 @@ final class CombinedResource extends Resource {
 
 	@Override
 	public URL getURL() {
-		// This method won't be used anyway. It's only used on Facelet templates and composite components.
-		// If really necessary, we can always invent some custom protocol, but this is nonsense.
-		throw new UnsupportedOperationException(String.format(ERROR_CANNOT_CREATE_URL, getResourceName()));
+		try {
+			// Yes, this returns a HTTP URL, not a classpath URL. There's no other way anyway.
+			return new URL(Faces.getRequestDomainURL() + getRequestPath());
+		}
+		catch (MalformedURLException e) {
+			// This exception should never occur.
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override

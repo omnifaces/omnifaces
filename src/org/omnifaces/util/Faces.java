@@ -242,7 +242,6 @@ public final class Faces {
 	 * Programmatically evaluate the given EL expression and set the given value.
 	 * @param expression The EL expression to be evaluated.
 	 * @param value The value to be set in the property behind the EL expression.
-	 *
 	 * @see Application#getExpressionFactory()
 	 * @see ExpressionFactory#createValueExpression(ELContext, String, Class)
 	 * @see ValueExpression#setValue(ELContext, Object)
@@ -641,8 +640,8 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the HTTP request base URL. This is the full URL from the scheme, domain until with context path,
-	 * including the trailing slash. This is the value you could use in HTML <code>&lt;base&gt;</code> tag.
+	 * Returns the HTTP request base URL. This is the URL from the scheme, domain until with context path, including
+	 * the trailing slash. This is the value you could use in HTML <code>&lt;base&gt;</code> tag.
 	 * @return The HTTP request base URL.
 	 * @see HttpServletRequest#getRequestURL()
 	 * @see HttpServletRequest#getRequestURI()
@@ -652,6 +651,19 @@ public final class Faces {
 		HttpServletRequest request = getRequest();
 		String url = request.getRequestURL().toString();
 		return url.substring(0, url.length() - request.getRequestURI().length()) + request.getContextPath() + "/";
+	}
+
+	/**
+	 * Returns the HTTP request domain URL. This is the URL with the scheme and domain, without any trailing slash.
+	 * @return The HTTP request domain URL.
+	 * @see HttpServletRequest#getRequestURL()
+	 * @see HttpServletRequest#getRequestURI()
+	 * @since 1.1
+	 */
+	public static String getRequestDomainURL() {
+		HttpServletRequest request = getRequest();
+		String url = request.getRequestURL().toString();
+		return url.substring(0, url.length() - request.getRequestURI().length());
 	}
 
 	/**
@@ -1047,6 +1059,18 @@ public final class Faces {
 	 */
 	public static ServletContext getServletContext() {
 		return (ServletContext) getExternalContext().getContext();
+	}
+
+	/**
+	 * Returns the application initialization parameter map. This returns the parameter name-value pairs of all
+	 * <code>&lt;context-param&gt;</code> entries in in <code>web.xml</code>.
+	 * @return The application initialization parameter map.
+	 * @see ExternalContext#getInitParameterMap()
+	 * @since 1.1
+	 */
+	@SuppressWarnings("unchecked")
+	public static Map<String, String> getInitParameterMap() {
+		return getExternalContext().getInitParameterMap();
 	}
 
 	/**

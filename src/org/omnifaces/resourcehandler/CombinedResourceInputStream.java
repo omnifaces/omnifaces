@@ -14,6 +14,7 @@ package org.omnifaces.resourcehandler;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.Set;
 
 import javax.faces.application.Resource;
 
+import org.omnifaces.util.Faces;
 import org.omnifaces.util.Utils;
 
 /**
@@ -48,7 +50,9 @@ final class CombinedResourceInputStream extends InputStream {
 		streams = new ArrayList<InputStream>();
 
 		for (Resource resource : resources) {
-			streams.add(resource.getInputStream());
+			streams.add(!CombinedResourceInfo.ENABLE_RF_RES_HACK
+				? resource.getInputStream()
+				: new URL(Faces.getRequestDomainURL() + resource.getRequestPath()).openStream());
 		}
 
 		streamIterator = streams.iterator();
