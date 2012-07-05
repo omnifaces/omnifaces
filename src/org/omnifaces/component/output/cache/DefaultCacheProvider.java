@@ -20,6 +20,7 @@ import javax.faces.context.FacesContext;
  * A default cache provider that will be used by the OmniFaces Cache component if no explicit provider has been
  * configured.
  * 
+ * @since 1.1
  * @author Arjan Tijms
  * 
  */

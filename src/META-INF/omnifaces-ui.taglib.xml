@@ -1999,9 +1999,11 @@
 	       		content retrieved from the cache is used.
 	       		<p>
 	       		By default the viewid concatenated to the component id via an underscore is used as the cache key.
-	       		
-	       		WIP implementation: support for scopes, cache providers, and some common settings per
-	       		instance (LRU, TTL) still need to be implemented.
+	       		<p>
+	       		Note that this component <strong>does not</strong> support a cache loader and locking mechanism. This mean several
+	       		simultaenous page requests may render the same content and it's undetermined which of those will end up being cached.
+	       		<p>
+	       		WIP implementation: Common settings per instance (LRU, TTL) still need to be implemented.
 			]]>           
 		</description>
 		<tag-name>cache</tag-name>
@@ -2039,6 +2041,30 @@
 				 ]]>
             </description>
 			<name>scope</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Optional amount of time in seconds for which the cached content is valid (TTL). This is counted
+					from the moment content is actually added to the cache. If no time is provided the content will be subject
+					to the global cache settings, and in absence of these are subject to the behavior of the cache implementation
+					that is used. The default cache implementation will simply cache indefinitely. 
+					<p>
+					Whether the content is actually removed from the cache (to preserve memory) after the given time has elapsed is
+					dependend on the actual cache implementation that is used. The default cache implementation will 
+					<strong>NOT</strong> do this automatically, but will instead remove it only when the cache item is being accessed
+					again.
+					<p>
+					Following the above, new content will only be inserted into the cache following a page request. A time of e.g. <code>30<code>
+					<strong>will not</strong> cause new content to be inserted into the cache at <code>30<code> seconds intervals.
+					<p>
+					Note that this component <strong>does not</strong> support a cache loader and locking mechanism. This means after content times out,
+					several simultaneous page requests may render the same content and it's undetermined which of those will end up being cached.
+				 ]]>
+            </description>
+			<name>time</name>
 			<required>false</required>
 			<type>java.lang.String</type>
 		</attribute>

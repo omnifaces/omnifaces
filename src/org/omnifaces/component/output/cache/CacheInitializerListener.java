@@ -22,6 +22,7 @@ import javax.servlet.annotation.WebListener;
  * It takes a configuration from web.xml context parameters and used that to set a cache provider and/or configure the
  * caching provider. If no initialization is done defaults are used.
  * 
+ * @since 1.1
  * @author Arjan Tijms
  * 
  */

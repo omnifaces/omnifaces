@@ -18,6 +18,7 @@ import javax.faces.context.FacesContext;
  * A provider for a specific {@link Cache} implementation. Via this plug-in construct, the OmniFaces Cache component can
  * make use of different kinds of cache implementations.
  * 
+ * @since 1.1
  * @author Arjan Tijms
  * 
  */

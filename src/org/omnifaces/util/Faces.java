@@ -242,7 +242,7 @@ public final class Faces {
 	 * Programmatically evaluate the given EL expression and set the given value.
 	 * @param expression The EL expression to be evaluated.
 	 * @param value The value to be set in the property behind the EL expression.
-	 * @return The evaluated value of the given EL expression.
+	 *
 	 * @see Application#getExpressionFactory()
 	 * @see ExpressionFactory#createValueExpression(ELContext, String, Class)
 	 * @see ValueExpression#setValue(ELContext, Object)

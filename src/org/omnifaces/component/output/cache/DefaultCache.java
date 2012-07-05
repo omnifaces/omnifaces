@@ -12,12 +12,17 @@
  */
 package org.omnifaces.component.output.cache;
 
+import static java.lang.System.currentTimeMillis;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
+import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * A simple in-memory cache implementation that's used if the user did not configure an explicit caching provider.
  * 
+ * @since 1.1
  * @author Arjan Tijms
  * 
  */
@@ -29,15 +34,29 @@ public class DefaultCache implements Cache {
 	@Override
 	public String get(String key) {
 		Object value = cacheStore.get(key);
+		
 		if (value instanceof String) {
 			return (String) value;
+		} else if (value instanceof CacheEntry) {
+			CacheEntry entry = (CacheEntry) value;
+			if (entry.isValid()) {
+				return entry.getValue();
+			} else {
+				cacheStore.remove(key);
+			}
 		}
+		
 		return null;
 	}
 
 	@Override
 	public void put(String key, String value) {
 		cacheStore.put(key, value);
+	}
+	
+	@Override
+	public void put(String key, String value, int timeToLive) {
+		cacheStore.put(key, new CacheEntry(value, new Date(currentTimeMillis() + SECONDS.toMillis(timeToLive))));
 	}
 
 }

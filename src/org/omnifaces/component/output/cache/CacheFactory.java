@@ -18,6 +18,7 @@ import javax.servlet.ServletContext;
 /**
  * Factory used to obtain {@link Cache} instance and to register the {@link CacheProvider} that is used to obtain that.
  * 
+ * @since 1.1
  * @author Arjan Tijms
  * 
  */

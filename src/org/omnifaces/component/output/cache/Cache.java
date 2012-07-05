@@ -18,6 +18,7 @@ package org.omnifaces.component.output.cache;
  * Note that this takes Strings for both key and value since it's not intended as a general cache solution, but is
  * something specific for the {@link Cache} component which caches rendered output.
  * 
+ * @since 1.1
  * @author Arjan Tijms
  * 
  */
@@ -41,4 +42,19 @@ public interface Cache {
 	 *            the value that is to be stored
 	 */
 	void put(String key, String value);
+	
+	/**
+	 * Stores a value in the cache
+	 * 
+	 * @param key
+	 *            the key under which a value is to be stored
+	 * @param value
+	 *            the value that is to be stored
+	 * @param timeToLive
+	 * 				the amount of time in seconds for which the cached value is valid from the time it's being added to the cache.
+	 * 				It's provider specific whether the cache implementation will actually remove (evict) the entry after this time has
+	 * 				elapsed or will only perform a check upon accessing the cache entry. Whatever method the implementation chooses; after
+	 * 				this time is elapsed a call to {@link Cache#get(String)} should return null.
+	 */
+	void put(String key, String value, int timeToLive);
 }

@@ -12,7 +12,8 @@
  */
 package org.omnifaces.component.output;
 
-import static org.omnifaces.component.output.Cache.PropertyKeys.*;
+import static org.omnifaces.component.output.Cache.PropertyKeys.key;
+import static org.omnifaces.component.output.Cache.PropertyKeys.scope;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -43,8 +44,10 @@ public class Cache extends UIComponentBase {
 	private final State state = new State(getStateHelper());
 
 	enum PropertyKeys {
-		key, scope
+		key, scope, time
 	}
+
+	int time;
 
 	/**
 	 * Returns {@link #COMPONENT_FAMILY}.
@@ -86,7 +89,12 @@ public class Cache extends UIComponentBase {
 			}
 
 			childRendering = bufferWriter.toString();
-			scopedCache.put(key, childRendering);
+			int time = getTime();
+			if (time > 0) {
+				scopedCache.put(key, childRendering, time);
+			} else {
+				scopedCache.put(key, childRendering);
+			}
 		}
 
 		responseWriter.write(childRendering);
@@ -106,6 +114,14 @@ public class Cache extends UIComponentBase {
 
 	public void setScope(String scopeValue) {
 		state.put(scope, scopeValue);
+	}
+
+	public int getTime() {
+		return state.get(time, -1);
+	}
+
+	public void setTime(int timeValue) {
+		state.put(time, timeValue);
 	}
 
 }
