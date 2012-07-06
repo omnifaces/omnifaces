@@ -61,6 +61,15 @@ import org.omnifaces.util.Utils;
  *   &lt;h:outputScript name="script.js" target="head" /&gt;
  * &lt;/h:head&gt;
  * </pre>
+ * <p>
+ * If you want them to appear <em>after</em> any auto-included resources, then move the declarations to the
+ * <code>&lt;h:body&gt;</code>.
+ * <pre>
+ * &lt;h:body&gt;
+ *   &lt;h:outputStylesheet name="style.css" /&gt;
+ *   &lt;h:outputScript name="script.js" target="head" /&gt;
+ * &lt;/h:body&gt;
+ * </pre>
  * <h3>Configuration</h3>
  * <p>
  * The following context parameters are available:
