@@ -27,6 +27,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * 
  */
 public class DefaultCache implements Cache {
+	
+	private final Integer defaultTimeToLive;
+	
+	public DefaultCache(Integer defaultTimeToLive) {
+		this.defaultTimeToLive = defaultTimeToLive;
+	}
 
 	// Still a quick temp thing - will be replaced soon.
 	private final Map<String, Object> cacheStore = new ConcurrentHashMap<String, Object>();
@@ -51,7 +57,11 @@ public class DefaultCache implements Cache {
 
 	@Override
 	public void put(String key, String value) {
-		cacheStore.put(key, value);
+		if (defaultTimeToLive != null) {
+			put(key, value, defaultTimeToLive);
+		} else {
+			cacheStore.put(key, value);
+		}
 	}
 	
 	@Override

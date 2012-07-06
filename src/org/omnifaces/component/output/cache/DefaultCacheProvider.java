@@ -27,6 +27,11 @@ import javax.faces.context.FacesContext;
 public class DefaultCacheProvider implements CacheProvider {
 
 	public static final String DEFAULT_CACHE_PARAM_NAME = "org.omnifaces.defaultcache";
+	public static final String APP_TTL_PARAM_NAME = "APPLICATION_SCOPE_TTL";
+	public static final String SESSION_TTL_PARAM_NAME = "SESSION_SCOPE_TTL";
+
+	private Integer appDefaultTimeToLive;
+	private Integer sessionDefaultTimeToLive;
 
 	@Override
 	public Cache getCache(FacesContext context, String scope) {
@@ -40,13 +45,23 @@ public class DefaultCacheProvider implements CacheProvider {
 		throw new IllegalArgumentException("Scope " + scope + " not supported by provider" + DefaultCacheProvider.class.getName());
 	}
 
+	@Override
+	public void setParameters(Map<String, String> parameters) {
+		if (parameters.containsKey(APP_TTL_PARAM_NAME)) {
+			appDefaultTimeToLive = Integer.valueOf(parameters.get(APP_TTL_PARAM_NAME));
+		}
+		if (parameters.containsKey(SESSION_TTL_PARAM_NAME)) {
+			sessionDefaultTimeToLive = Integer.valueOf(parameters.get(SESSION_TTL_PARAM_NAME));
+		}
+	}
+
 	private Cache getAppScopeCache(FacesContext context) {
 
 		Map<String, Object> applicationMap = context.getExternalContext().getApplicationMap();
 		if (!applicationMap.containsKey("DEFAULT_CACHE_PARAM_NAME")) {
 			synchronized (DefaultCacheProvider.class) {
 				if (!applicationMap.containsKey("DEFAULT_CACHE_PARAM_NAME")) {
-					applicationMap.put("DEFAULT_CACHE_PARAM_NAME", new DefaultCache());
+					applicationMap.put("DEFAULT_CACHE_PARAM_NAME", new DefaultCache(appDefaultTimeToLive));
 				}
 
 			}
@@ -62,7 +77,7 @@ public class DefaultCacheProvider implements CacheProvider {
 			Object session = context.getExternalContext().getSession(true);
 			synchronized (session) {
 				if (!sessionMap.containsKey("DEFAULT_CACHE_PARAM_NAME")) {
-					sessionMap.put("DEFAULT_CACHE_PARAM_NAME", new DefaultCache());
+					sessionMap.put("DEFAULT_CACHE_PARAM_NAME", new DefaultCache(sessionDefaultTimeToLive));
 				}
 			}
 		}

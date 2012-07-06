@@ -12,6 +12,12 @@
  */
 package org.omnifaces.component.output.cache;
 
+import static java.util.Collections.list;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.annotation.WebListener;
@@ -31,18 +37,38 @@ public class CacheInitializerListener implements ServletContextListener {
 
 	// Web context parameter to set the cache provider implementation
 	public static final String CACHE_PROVIDER_INIT_PARAM_NAME = "org.omnifaces.CACHE_PROVIDER";
+	
+	public static final String CACHE_PROVIDER_SETTING_INIT_PARAM_PREFIX = "org.omnifaces.CACHE_SETTING_";
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		String cacheProviderName = sce.getServletContext().getInitParameter(CACHE_PROVIDER_INIT_PARAM_NAME);
-		if (cacheProviderName != null) {
-			CacheFactory.setCacheProvider(createInstance(cacheProviderName), sce.getServletContext());
-		}
+		
+		ServletContext context = sce.getServletContext();
+		
+		// Check for a user configured custom cache provider, or get default one
+		CacheProvider cacheProvider = getCacheProvider(context);
+		
+		// Build a map of settings for either the custom- or the default cache provider and set them.
+		cacheProvider.setParameters(getCacheSetting(context));
 	}
 
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 		// NOOP for now, give cache destroy command later
+	}
+	
+	private CacheProvider getCacheProvider(ServletContext context) {
+		CacheProvider cacheProvider = null;
+		
+		String cacheProviderName = context.getInitParameter(CACHE_PROVIDER_INIT_PARAM_NAME);
+		if (cacheProviderName != null) {
+			cacheProvider = createInstance(cacheProviderName);
+			CacheFactory.setCacheProvider(cacheProvider, context);
+		} else {
+			cacheProvider = CacheFactory.getDefaultCacheProvider();
+		}
+		
+		return cacheProvider;
 	}
 
 	private CacheProvider createInstance(String cacheProviderName) {
@@ -55,5 +81,20 @@ public class CacheInitializerListener implements ServletContextListener {
 		} catch (ClassNotFoundException e) {
 			throw new IllegalArgumentException(e);
 		}
+	}
+	
+	private Map<String, String> getCacheSetting(ServletContext context) {
+		Map<String, String> settings = new HashMap<String, String>();
+
+		for (String initParameterName : list(context.getInitParameterNames())) {
+			if (initParameterName.startsWith(CACHE_PROVIDER_SETTING_INIT_PARAM_PREFIX)) {
+				settings.put(
+					initParameterName.substring(CACHE_PROVIDER_SETTING_INIT_PARAM_PREFIX.length()),
+					context.getInitParameter(initParameterName)
+				);
+			}
+		}
+		
+		return settings;
 	}
 }

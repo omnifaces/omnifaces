@@ -12,6 +12,8 @@
  */
 package org.omnifaces.component.output.cache;
 
+import java.util.Map;
+
 import javax.faces.context.FacesContext;
 
 /**
@@ -36,5 +38,13 @@ public interface CacheProvider {
 	 * @return Cache instance encapsulating the cache represented by this CacheProvider
 	 */
 	Cache getCache(FacesContext context, String scope);
+	
+	/**
+	 * Passes parameters to the cache provider implementation. This is mainly intended for configuration of things
+	 * like LRU and global TTL. Settings are mainly implementation specific.
+	 * 
+	 * @param parameters map of parameters used to configure the cache.
+	 */
+	void setParameters(Map<String, String> parameters);
 
 }
