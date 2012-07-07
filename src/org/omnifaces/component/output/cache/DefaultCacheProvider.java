@@ -12,77 +12,26 @@
  */
 package org.omnifaces.component.output.cache;
 
-import java.util.Map;
+import org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 
-import javax.faces.context.FacesContext;
 
 /**
  * A default cache provider that will be used by the OmniFaces Cache component if no explicit provider has been
  * configured.
+ * <p>
+ * This will create a Cache instance that uses a repackaged {@link ConcurrentLinkedHashMap} for the actual implementation.
+ * <p>
+ * <b>See:</b> <a href="http://code.google.com/p/concurrentlinkedhashmap">http://code.google.com/p/concurrentlinkedhashmap</a>
  * 
  * @since 1.1
  * @author Arjan Tijms
  * 
  */
-public class DefaultCacheProvider implements CacheProvider {
-
-	public static final String DEFAULT_CACHE_PARAM_NAME = "org.omnifaces.defaultcache";
-	public static final String APP_TTL_PARAM_NAME = "APPLICATION_SCOPE_TTL";
-	public static final String SESSION_TTL_PARAM_NAME = "SESSION_SCOPE_TTL";
-
-	private Integer appDefaultTimeToLive;
-	private Integer sessionDefaultTimeToLive;
+public class DefaultCacheProvider extends CacheInstancePerScopeProvider {
 
 	@Override
-	public Cache getCache(FacesContext context, String scope) {
-
-		if ("application".equals(scope)) {
-			return getAppScopeCache(context);
-		} else if ("session".equals(scope)) {
-			return getSessionScopeCache(context);
-		}
-
-		throw new IllegalArgumentException("Scope " + scope + " not supported by provider" + DefaultCacheProvider.class.getName());
-	}
-
-	@Override
-	public void setParameters(Map<String, String> parameters) {
-		if (parameters.containsKey(APP_TTL_PARAM_NAME)) {
-			appDefaultTimeToLive = Integer.valueOf(parameters.get(APP_TTL_PARAM_NAME));
-		}
-		if (parameters.containsKey(SESSION_TTL_PARAM_NAME)) {
-			sessionDefaultTimeToLive = Integer.valueOf(parameters.get(SESSION_TTL_PARAM_NAME));
-		}
-	}
-
-	private Cache getAppScopeCache(FacesContext context) {
-
-		Map<String, Object> applicationMap = context.getExternalContext().getApplicationMap();
-		if (!applicationMap.containsKey("DEFAULT_CACHE_PARAM_NAME")) {
-			synchronized (DefaultCacheProvider.class) {
-				if (!applicationMap.containsKey("DEFAULT_CACHE_PARAM_NAME")) {
-					applicationMap.put("DEFAULT_CACHE_PARAM_NAME", new DefaultCache(appDefaultTimeToLive));
-				}
-
-			}
-		}
-
-		return (Cache) applicationMap.get("DEFAULT_CACHE_PARAM_NAME");
-	}
-
-	private Cache getSessionScopeCache(FacesContext context) {
-
-		Map<String, Object> sessionMap = context.getExternalContext().getSessionMap();
-		if (!sessionMap.containsKey("DEFAULT_CACHE_PARAM_NAME")) {
-			Object session = context.getExternalContext().getSession(true);
-			synchronized (session) {
-				if (!sessionMap.containsKey("DEFAULT_CACHE_PARAM_NAME")) {
-					sessionMap.put("DEFAULT_CACHE_PARAM_NAME", new DefaultCache(sessionDefaultTimeToLive));
-				}
-			}
-		}
-
-		return (Cache) sessionMap.get("DEFAULT_CACHE_PARAM_NAME");
+	protected Cache createCache(Integer timeToLive, Integer maxCapacity) {
+		return new DefaultCache(timeToLive, maxCapacity);
 	}
 
 }

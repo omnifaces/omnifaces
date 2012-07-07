@@ -2003,7 +2003,63 @@
 	       		Note that this component <strong>does not</strong> support a cache loader and locking mechanism. This mean several
 	       		simultaenous page requests may render the same content and it's undetermined which of those will end up being cached.
 	       		<p>
-	       		WIP implementation: Common settings per instance (LRU, TTL) still need to be implemented.
+	       		An optional caching provider (see below) can be set to control the caching implementation that is used for the actual caching.
+	       		If no such provider is installed, a default caching implementation is used that's based on
+	       		<a href="http://code.google.com/p/concurrentlinkedhashmap">http://code.google.com/p/concurrentlinkedhashmap</a> in case
+	       		a maximum cache capacity is set, or on a plain ConcurrentMap if no capacity is set.
+	       		<p>
+	       		<hr>
+				<h3>Setting a custom caching provider</h3>
+				A custom caching provider can be set by using the <code>org.omnifaces.CACHE_PROVIDER</code> context
+				parameter in web.xml to point to an implementation of <code>org.omnifaces.component.output.cache.CacheProvider</code>.
+				For example:
+				<pre>
+&lt;context-param&gt;
+	&lt;param-name&gt;org.omnifaces.CACHE_PROVIDER&lt;/param-name&gt;
+	&lt;param-value&gt;com.example.MyProvider&lt;/param-value&gt;
+&lt;/context-param&gt;
+				</pre>
+				<p>
+				The default provider, <code>org.omnifaces.component.output.cache.DefaultCacheProvider</code> can be used as an
+				example.
+				<hr>
+				<h3>Global settings</h3>
+				For the default provider, the maximum capacity and the default time to live can be specified for the
+				supported scopes "session" and "application". If the maximum capacity is reached, an entry will be
+				evicted following a least recently used policy. The default time to live specifies for how long
+				entries are considered to be valid. A value for the <code>time</code> attribute on this component
+				will override this global default time to live. The following context parameters can be used in web.xml:
+				<p>
+				<table>
+				<tr>
+ 				<td nowrap><code>org.omnifaces.CACHE_SETTING_APPLICATION_MAX_CAPACITY</code></td>
+				<td>Sets the maximum number of elements that will be stored per web module (application scope). Default: no limit</td>
+ 				</tr>
+ 				<tr>
+ 				<td nowrap><code><org.omnifaces.CACHE_SETTING_SESSION_MAX_CAPACITY</code></td>
+				<td>Sets the maximum number of elements that will be stored per session. Default: no limit</td>
+ 				</tr>
+ 				<tr>
+ 				<td nowrap><code>org.omnifaces.CACHE_SETTING_APPLICATION_TTL</code></td>
+				<td>Sets the maximum amount of time in seconds that cached content is valid for the application scope. 
+				Can be overriden by individal cache components. Default: no limit</td>
+ 				</tr>
+ 				<tr>
+ 				<td nowrap><code>org.omnifaces.CACHE_SETTING_SESSION_TTL</code></td>
+				<td>Sets the maximum amount of time in seconds that cached content is valid for the session scope. 
+				Can be overriden by individal cache components. Default: no limit</td>
+ 				</tr>
+ 				</table>
+ 				<hr>
+				<h3>Servlet 2.5 configuration</h3>
+				If no custom caching provider or global settings are used, no specific configuration is needed. Otherwise
+				<code>org.omnifaces.component.output.cache.CacheInitializerListener</code> needs to be installed as a
+				listener in web.xml:
+				<pre>
+&lt;listener&gt;
+	&lt;listener-class&gt;org.omnifaces.component.output.cache.CacheInitializerListener&lt;/listener-class&gt;
+&lt;/listener&gt;
+				</pre>
 			]]>           
 		</description>
 		<tag-name>cache</tag-name>

@@ -12,61 +12,37 @@
  */
 package org.omnifaces.component.output.cache;
 
-import static java.lang.System.currentTimeMillis;
-import static java.util.concurrent.TimeUnit.SECONDS;
-
-import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+
 /**
- * A simple in-memory cache implementation that's used if the user did not configure an explicit caching provider.
+ * An in-memory cache implementation that's used if the user did not configure an explicit caching provider.
+ * <p>
+ * For the actual implementation, a repackaged {@link ConcurrentLinkedHashMap} is used if a maximum capacity is requested,
+ * otherwise a plain {@link ConcurrentHashMap} is used.
+ * <p>
+ * <b>See:</b> <a href="http://code.google.com/p/concurrentlinkedhashmap">http://code.google.com/p/concurrentlinkedhashmap</a>
  * 
  * @since 1.1
  * @author Arjan Tijms
  * 
  */
-public class DefaultCache implements Cache {
-	
-	private final Integer defaultTimeToLive;
-	
-	public DefaultCache(Integer defaultTimeToLive) {
-		this.defaultTimeToLive = defaultTimeToLive;
-	}
+public class DefaultCache extends TimeToLiveCache {
 
-	// Still a quick temp thing - will be replaced soon.
-	private final Map<String, Object> cacheStore = new ConcurrentHashMap<String, Object>();
-
-	@Override
-	public String get(String key) {
-		Object value = cacheStore.get(key);
-		
-		if (value instanceof String) {
-			return (String) value;
-		} else if (value instanceof CacheEntry) {
-			CacheEntry entry = (CacheEntry) value;
-			if (entry.isValid()) {
-				return entry.getValue();
-			} else {
-				cacheStore.remove(key);
-			}
-		}
-		
-		return null;
+	public DefaultCache(Integer defaultTimeToLive, Integer maxCapacity) {
+		super(defaultTimeToLive, maxCapacity);
 	}
 
 	@Override
-	public void put(String key, String value) {
-		if (defaultTimeToLive != null) {
-			put(key, value, defaultTimeToLive);
+	protected Map<String, Object> createCacheStore(Integer maxCapacity) {
+		if (maxCapacity != null) {
+			return new ConcurrentLinkedHashMap.Builder<String, Object>()
+						    .maximumWeightedCapacity(maxCapacity)
+						    .build();
 		} else {
-			cacheStore.put(key, value);
+			return new ConcurrentHashMap<String, Object>();
 		}
 	}
-	
-	@Override
-	public void put(String key, String value, int timeToLive) {
-		cacheStore.put(key, new CacheEntry(value, new Date(currentTimeMillis() + SECONDS.toMillis(timeToLive))));
-	}
-
 }
