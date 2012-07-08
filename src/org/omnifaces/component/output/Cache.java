@@ -116,11 +116,11 @@ public class Cache extends UIComponentBase {
 		state.put(scope, scopeValue);
 	}
 
-	public int getTime() {
+	public Integer getTime() {
 		return state.get(time, -1);
 	}
 
-	public void setTime(int timeValue) {
+	public void setTime(Integer timeValue) {
 		state.put(time, timeValue);
 	}
 
