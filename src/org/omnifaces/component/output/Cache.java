@@ -12,8 +12,10 @@
  */
 package org.omnifaces.component.output;
 
+import static java.lang.Boolean.TRUE;
 import static org.omnifaces.component.output.Cache.PropertyKeys.key;
 import static org.omnifaces.component.output.Cache.PropertyKeys.scope;
+import static org.omnifaces.component.output.Cache.PropertyKeys.time;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -21,6 +23,7 @@ import java.io.Writer;
 
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponentBase;
+import javax.faces.component.visit.VisitContext;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 
@@ -39,6 +42,7 @@ public class Cache extends UIComponentBase {
 
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.Cache";
 	public static final String COMPONENT_FAMILY = "org.omnifaces.component.output";
+	public static final String VALUE_SET = "org.omnifaces.cache.VALUE_SET";
 	public static final String DEFAULT_SCOPE = "session";
 
 	private final State state = new State(getStateHelper());
@@ -46,8 +50,6 @@ public class Cache extends UIComponentBase {
 	enum PropertyKeys {
 		key, scope, time
 	}
-
-	int time;
 
 	/**
 	 * Returns {@link #COMPONENT_FAMILY}.
@@ -68,10 +70,7 @@ public class Cache extends UIComponentBase {
 	@Override
 	public void encodeChildren(FacesContext context) throws IOException {
 
-		String key = getKey();
-		if (key == null) {
-			key = context.getViewRoot().getViewId() + "_" + this.getClientId(context);
-		}
+		String key = getKeyWithDefault(context);
 
 		ResponseWriter responseWriter = context.getResponseWriter();
 		org.omnifaces.component.output.cache.Cache scopedCache = CacheFactory.getCache(context, getScope());
@@ -95,9 +94,34 @@ public class Cache extends UIComponentBase {
 			} else {
 				scopedCache.put(key, childRendering);
 			}
+			
+			// Marker to register we added a value to the cache during this request
+			context.getExternalContext().getRequestMap().put(VALUE_SET, TRUE);
 		}
 
 		responseWriter.write(childRendering);
+	}
+	
+	@Override
+	protected boolean isVisitable(VisitContext visitContext) {
+		
+		FacesContext context = visitContext.getFacesContext();
+		
+		// Visit us and our children if a value for the cache was set in this request, or
+		// if no value was cached yet.
+		return
+			TRUE.equals(context.getExternalContext().getRequestMap().get(VALUE_SET)) ||
+				
+			CacheFactory.getCache(context, getScope()).get(getKeyWithDefault(context)) == null;
+	}
+	
+	private String getKeyWithDefault(FacesContext context) {
+		String key = getKey();
+		if (key == null) {
+			key = context.getViewRoot().getViewId() + "_" + this.getClientId(context);
+		}
+		
+		return key;
 	}
 
 	public String getKey() {
