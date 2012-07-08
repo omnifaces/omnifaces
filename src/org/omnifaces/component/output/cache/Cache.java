@@ -57,4 +57,12 @@ public interface Cache {
 	 * 				this time is elapsed a call to {@link Cache#get(String)} should return null.
 	 */
 	void put(String key, String value, int timeToLive);
+	
+	/**
+	 * Removes a value from the cache
+	 * 
+	 * @param key
+	 *            the key under which a value is to be stored
+	 */
+	void remove(String key);
 }

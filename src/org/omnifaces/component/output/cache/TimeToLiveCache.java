@@ -67,6 +67,11 @@ public abstract class TimeToLiveCache implements Cache {
 		cacheStore.put(key, new CacheEntry(value, new Date(currentTimeMillis() + SECONDS.toMillis(timeToLive))));
 	}
 	
+	@Override
+	public void remove(String key) {
+		cacheStore.remove(key);
+	}
+	
 	protected abstract Map<String, Object> createCacheStore(Integer maxCapacity);
 	
 	
