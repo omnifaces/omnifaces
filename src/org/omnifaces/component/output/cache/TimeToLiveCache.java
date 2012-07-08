@@ -28,11 +28,10 @@ import java.util.Map;
 public abstract class TimeToLiveCache implements Cache {
 
 	private final Integer defaultTimeToLive;
-	private final Map<String, Object> cacheStore;
+	private Map<String, Object> cacheStore;
 	
-	public TimeToLiveCache(Integer defaultTimeToLive, Integer maxCapacity) {
+	public TimeToLiveCache(Integer defaultTimeToLive) {
 		this.defaultTimeToLive = defaultTimeToLive;
-		cacheStore = createCacheStore(maxCapacity);
 	}
 
 	@Override
@@ -71,8 +70,10 @@ public abstract class TimeToLiveCache implements Cache {
 	public void remove(String key) {
 		cacheStore.remove(key);
 	}
-	
-	protected abstract Map<String, Object> createCacheStore(Integer maxCapacity);
+
+	protected void setCacheStore(Map<String, Object> cacheStore) {
+		this.cacheStore = cacheStore;
+	}
 	
 	
 	

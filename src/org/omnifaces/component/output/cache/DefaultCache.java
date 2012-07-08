@@ -32,11 +32,11 @@ import org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLi
 public class DefaultCache extends TimeToLiveCache {
 
 	public DefaultCache(Integer defaultTimeToLive, Integer maxCapacity) {
-		super(defaultTimeToLive, maxCapacity);
+		super(defaultTimeToLive);
+		setCacheStore(createCacheStore(maxCapacity));
 	}
-
-	@Override
-	protected Map<String, Object> createCacheStore(Integer maxCapacity) {
+	
+	private Map<String, Object> createCacheStore(Integer maxCapacity) {
 		if (maxCapacity != null) {
 			return new ConcurrentLinkedHashMap.Builder<String, Object>()
 						    .maximumWeightedCapacity(maxCapacity)
