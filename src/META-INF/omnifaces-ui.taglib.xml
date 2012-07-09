@@ -525,10 +525,9 @@
 	<tag>
 		<description>
 			<![CDATA[
-				<strong><code>o:validateAllOrNone</code></strong> validates validates if at least ALL of the given <code>UIInput</code>
-				components have been filled in or that NONE of the given <code>UIInput</code> components have been
-				filled in. The default message is
-				<blockquote>{0}: Please fill out all or none of those fields</blockquote>
+				<strong><code>o:validateAll</code></strong> validates validates if ALL of the given <code>UIInput</code>
+				components have been filled out. The default message is
+				<blockquote>{0}: Please fill out all of those fields</blockquote>
 				<hr>
 				<h3>General usage of all multiple field validators</h3>
 				<p>
@@ -578,6 +577,98 @@
 				<pre>
 &lt;o:validateMultipleFields components="foo bar baz" disabled="#{param.validationDisabled}" /&gt;
 				</pre>
+			]]>
+		</description>
+		<tag-name>validateAll</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.validator.ValidateAll</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The space separated collection of client IDs of UI input components to be validated.
+				]]>
+			</description>
+			<name>components</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The validator message to be shown on failure. Any "{0}" placeholder in the message will be
+					substituted with a comma separated string of labels of the referenced input components.
+				]]>
+			</description>
+			<name>message</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The identifier for which this validator should show the message. Defaults to "@this" which is the
+					validator component itself. Other available value is "@all" which will show the message for all of
+					the referenced components.
+				]]>
+			</description>
+			<name>showMessageFor</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether the validation should be disabled or not. Defaults to <code>false</code>.
+				]]>
+			</description>
+			<name>disabled</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<strong><code>o:validateAllOrNone</code></strong> validates validates if at least ALL of the given <code>UIInput</code>
+				components have been filled out or that NONE of the given <code>UIInput</code> components have been
+				filled out. The default message is
+				<blockquote>{0}: Please fill out all or none of those fields</blockquote>
+				<p>
+				For general usage instructions, refer <code>validateAll</code> tag documentation.
 			]]>
 		</description>
 		<tag-name>validateAllOrNone</tag-name>
@@ -665,10 +756,10 @@
 		<description>
 			<![CDATA[
 				<strong><code>o:validateOneOrMore</code></strong> validates if at least ONE of the given <code>UIInput</code>
-				components has been filled in. The default message is
+				components has been filled out. The default message is
 				<blockquote>{0}: Please fill out at least one of those fields</blockquote>
 				<p>
-				For general usage instructions, refer <code>validateAllOrNone</code> tag documentation.
+				For general usage instructions, refer <code>validateAll</code> tag documentation.
 			]]>
 		</description>
 		<tag-name>validateOneOrMore</tag-name>
@@ -759,7 +850,7 @@
 				same value. The default message is
 				<blockquote>{0}: Please fill out the same value for all of those fields</blockquote>
 				<p>
-				For general usage instructions, refer <code>validateAllOrNone</code> tag documentation.
+				For general usage instructions, refer <code>validateAll</code> tag documentation.
 			]]>
 		</description>
 		<tag-name>validateEqual</tag-name>
@@ -850,7 +941,7 @@
 				unique value. The default message is
 				<blockquote>{0}: Please fill out an unique value for all of those fields</blockquote>
 				<p>
-				For general usage instructions, refer <code>validateAllOrNone</code> tag documentation.
+				For general usage instructions, refer <code>validateAll</code> tag documentation.
 			]]>
 		</description>
 		<tag-name>validateUnique</tag-name>
@@ -949,7 +1040,7 @@
 				The default message is
 				<blockquote>{0}: Please fill out the values of all those fields in order</blockquote>
 				<p>
-				For general usage instructions, refer <code>validateAllOrNone</code> tag documentation.
+				For general usage instructions, refer <code>validateAll</code> tag documentation.
 				<p>
 				This validator has the additional requirement that the to-be-validated values must implement <code>Comparable</code>.
 				This validator throws an <code>IllegalArgumentException</code> when one or more of the values do not implement it.
