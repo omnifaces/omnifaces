@@ -1,3 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE project>
+<!--
+
+  OmniFaces ANT Build file that uses the Maven ANT tasks for deploying the OmniFaces artifacts to the
+  sonatype repository.
+  
+-->
 <project name="publish-maven" default="deploy" basedir="." xmlns:artifact="antlib:org.apache.maven.artifact.ant">
 
 
