@@ -15,6 +15,7 @@ package org.omnifaces.servlet;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.ServletOutputStream;
@@ -30,11 +31,18 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final Pattern NO_TRANSFORM =
+		Pattern.compile("((.*)[\\s,])?no-transform([\\s,](.*))?", Pattern.CASE_INSENSITIVE);
+
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	private int threshold;
 	private Set<String> mimetypes;
 	private int contentLength;
+	private String vary;
+	private boolean noGzip;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -56,6 +64,44 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 	public void setContentLength(int contentLength) {
 		// Get hold of content length locally to avoid it from being set on responses which will actually be gzipped.
 		this.contentLength = contentLength;
+	}
+
+	@Override
+	public void setHeader(String name, String value) {
+		super.setHeader(name, value);
+
+		if (name != null) {
+			name = name.toLowerCase();
+
+			if ("vary".equals(name)) {
+				vary = value;
+			}
+			else if ("content-range".equals(name)) {
+				noGzip = (value != null);
+			}
+			else if ("cache-control".equals(name)) {
+				noGzip = (value != null && NO_TRANSFORM.matcher(value).matches());
+			}
+		}
+	}
+
+	@Override
+	public void addHeader(String name, String value) {
+		super.addHeader(name, value);
+
+		if (name != null && value != null) {
+			name = name.toLowerCase();
+
+			if ("vary".equals(name)) {
+				vary = ((vary != null) ? (vary + ",") : "") + value;
+			}
+			else if ("content-range".equals(name)) {
+				noGzip = true;
+			}
+			else if ("cache-control".equals(name)) {
+				noGzip = (noGzip || NO_TRANSFORM.matcher(value).matches());
+			}
+		}
 	}
 
 	@Override
@@ -144,26 +190,28 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 
 		/**
 		 * Create GZIP output stream if necessary. That is, when the given <code>gzip</code> argument is
-		 * <code>true</code>, the current response is not committed, the content type is not <code>null</code> and the
-		 * content type matches one of the mimetypes.
+		 * <code>true</code>, the current response does not have the <code>Cache-Control: no-transform</code> or
+		 * <code>Content-Range</code> headers, the current response is not committed, the content type is not
+		 * <code>null</code> and the content type matches one of the mimetypes.
 		 */
 		private OutputStream createGzipOutputStreamIfNecessary(boolean gzip) throws IOException {
 			ServletResponse originalResponse = getResponse();
-			String contentType = getContentType();
 
-			if (gzip && !isCommitted() && contentType != null && mimetypes.contains(contentType.split(";", 2)[0])) {
-				addHeader("Content-Encoding", "gzip");
-				String vary = getHeader("Vary");
-				setHeader("Vary", (vary != null && !vary.equals("*") ? vary + "," : "") + "Accept-Encoding");
-				return new GZIPOutputStream(originalResponse.getOutputStream());
-			}
-			else {
-				if (contentLength > 0) {
-					originalResponse.setContentLength(contentLength);
+			if (gzip && !noGzip && !isCommitted()) {
+				String contentType = getContentType();
+
+				if (contentType != null && mimetypes.contains(contentType.split(";", 2)[0])) {
+					addHeader("Content-Encoding", "gzip");
+					setHeader("Vary", ((vary != null && !vary.equals("*")) ? (vary + ",") : "") + "Accept-Encoding");
+					return new GZIPOutputStream(originalResponse.getOutputStream());
 				}
-
-				return originalResponse.getOutputStream();
 			}
+
+			if (contentLength > 0) {
+				originalResponse.setContentLength(contentLength);
+			}
+
+			return originalResponse.getOutputStream();
 		}
 
 	}
