@@ -12,24 +12,26 @@
  */
 package org.omnifaces.component.output.cache;
 
-import static java.lang.System.currentTimeMillis;
-import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.lang.System.*;
+import static java.util.concurrent.TimeUnit.*;
 
 import java.util.Date;
 import java.util.Map;
 
 /**
  * Base class that can be used by Map based caches that don't support time to live semantics natively.
- * 
+ *
  * @since 1.1
  * @author Arjan Tijms
  *
  */
 public abstract class TimeToLiveCache implements Cache {
 
+	private static final long serialVersionUID = 6637500586287606410L;
+
 	private final Integer defaultTimeToLive;
 	private Map<String, Object> cacheStore;
-	
+
 	public TimeToLiveCache(Integer defaultTimeToLive) {
 		this.defaultTimeToLive = defaultTimeToLive;
 	}
@@ -37,7 +39,7 @@ public abstract class TimeToLiveCache implements Cache {
 	@Override
 	public String get(String key) {
 		Object value = cacheStore.get(key);
-		
+
 		if (value instanceof String) {
 			return (String) value;
 		} else if (value instanceof CacheEntry) {
@@ -48,7 +50,7 @@ public abstract class TimeToLiveCache implements Cache {
 				cacheStore.remove(key);
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -60,12 +62,12 @@ public abstract class TimeToLiveCache implements Cache {
 			cacheStore.put(key, value);
 		}
 	}
-	
+
 	@Override
 	public void put(String key, String value, int timeToLive) {
 		cacheStore.put(key, new CacheEntry(value, new Date(currentTimeMillis() + SECONDS.toMillis(timeToLive))));
 	}
-	
+
 	@Override
 	public void remove(String key) {
 		cacheStore.remove(key);
@@ -74,7 +76,5 @@ public abstract class TimeToLiveCache implements Cache {
 	protected void setCacheStore(Map<String, Object> cacheStore) {
 		this.cacheStore = cacheStore;
 	}
-	
-	
-	
+
 }

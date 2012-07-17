@@ -12,17 +12,20 @@
  */
 package org.omnifaces.component.output.cache;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * Meta data for a value that's stored in a cache. Can be used for cache implementations that
  * don't support this concept natively.
- * 
+ *
  * @since 1.1
  * @author Arjan Tijms
  *
  */
-public class CacheEntry {
+public class CacheEntry implements Serializable {
+
+	private static final long serialVersionUID = -4602586599152573869L;
 
 	private final String value;
 	private final Date validTill;
@@ -44,18 +47,18 @@ public class CacheEntry {
 	/**
 	 * Returns the date that's the last moment in time the value obtained via getValue() is valid.
 	 * After that moment, the value should not be used.
-	 * 
+	 *
 	 * @return date indicating last moment value hold by this object is valid.
 	 */
 	public Date getValidTill() {
 		return validTill;
 	}
-	
+
 	/**
 	 * Returns whether this entry holds a valid value. If false is returned, the value
 	 * should not be used and the cache implementation should try to remove this entry
 	 * and its associated value from the cache.
-	 * 
+	 *
 	 * @return true if this entry is still valid, false otherwise.
 	 */
 	public boolean isValid() {

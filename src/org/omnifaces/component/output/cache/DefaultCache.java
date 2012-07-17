@@ -24,18 +24,20 @@ import org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLi
  * otherwise a plain {@link ConcurrentHashMap} is used.
  * <p>
  * <b>See:</b> <a href="http://code.google.com/p/concurrentlinkedhashmap">http://code.google.com/p/concurrentlinkedhashmap</a>
- * 
+ *
  * @since 1.1
  * @author Arjan Tijms
- * 
+ *
  */
 public class DefaultCache extends TimeToLiveCache {
+
+	private static final long serialVersionUID = 9043165102510796018L;
 
 	public DefaultCache(Integer defaultTimeToLive, Integer maxCapacity) {
 		super(defaultTimeToLive);
 		setCacheStore(createCacheStore(maxCapacity));
 	}
-	
+
 	private Map<String, Object> createCacheStore(Integer maxCapacity) {
 		if (maxCapacity != null) {
 			return new ConcurrentLinkedHashMap.Builder<String, Object>()
@@ -45,4 +47,5 @@ public class DefaultCache extends TimeToLiveCache {
 			return new ConcurrentHashMap<String, Object>();
 		}
 	}
+
 }

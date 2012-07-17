@@ -21,9 +21,9 @@ import javax.faces.context.FacesContext;
  * is present yet.
  * <p>
  * This kind of cache provider is suitable for simple in-memory cache implementations, where the cache is very cheap
- * to create. This is in contrast to caches where there is typically one expensive to create instance active per JVM, 
+ * to create. This is in contrast to caches where there is typically one expensive to create instance active per JVM,
  * and where scoped caches are better expressed as nodes in a tree structure.
- * 
+ *
  * @since 1.1
  * @author Arjan Tijms
  *
@@ -31,20 +31,20 @@ import javax.faces.context.FacesContext;
 public abstract class CacheInstancePerScopeProvider implements CacheProvider {
 
 	public static final String DEFAULT_CACHE_PARAM_NAME = "org.omnifaces.defaultcache";
-	
+
 	public static final String APP_TTL_PARAM_NAME = "APPLICATION_TTL";
 	public static final String SESSION_TTL_PARAM_NAME = "SESSION_TTL";
 
 	public static final String APP_MAX_CAP_PARAM_NAME = "APPLICATION_MAX_CAPACITY";
 	public static final String SESSION_MAX_CAP_PARAM_NAME = "SESSION_MAX_CAPACITY";
-	
+
 	private Integer appDefaultTimeToLive;
 	private Integer sessionDefaultTimeToLive;
-	
+
 	private Integer appMaxCapacity;
 	private Integer sessionMaxCapacity;
-	
-	
+
+
 	private Map<String, String> parameters;
 
 	@Override
@@ -62,7 +62,7 @@ public abstract class CacheInstancePerScopeProvider implements CacheProvider {
 	@Override
 	public void setParameters(Map<String, String> parameters) {
 		this.parameters = parameters;
-		
+
 		if (parameters.containsKey(APP_TTL_PARAM_NAME)) {
 			appDefaultTimeToLive = Integer.valueOf(parameters.get(APP_TTL_PARAM_NAME));
 		}
@@ -76,7 +76,7 @@ public abstract class CacheInstancePerScopeProvider implements CacheProvider {
 			sessionMaxCapacity = Integer.valueOf(parameters.get(SESSION_MAX_CAP_PARAM_NAME));
 		}
 	}
-	
+
 	public Map<String, String> getParameters() {
 		return parameters;
 	}
@@ -84,34 +84,33 @@ public abstract class CacheInstancePerScopeProvider implements CacheProvider {
 	private Cache getAppScopeCache(FacesContext context) {
 
 		Map<String, Object> applicationMap = context.getExternalContext().getApplicationMap();
-		if (!applicationMap.containsKey("DEFAULT_CACHE_PARAM_NAME")) {
+		if (!applicationMap.containsKey(DEFAULT_CACHE_PARAM_NAME)) {
 			synchronized (DefaultCacheProvider.class) {
-				if (!applicationMap.containsKey("DEFAULT_CACHE_PARAM_NAME")) {
-					applicationMap.put("DEFAULT_CACHE_PARAM_NAME", createCache(appDefaultTimeToLive, appMaxCapacity));
+				if (!applicationMap.containsKey(DEFAULT_CACHE_PARAM_NAME)) {
+					applicationMap.put(DEFAULT_CACHE_PARAM_NAME, createCache(appDefaultTimeToLive, appMaxCapacity));
 				}
 
 			}
 		}
 
-		return (Cache) applicationMap.get("DEFAULT_CACHE_PARAM_NAME");
+		return (Cache) applicationMap.get(DEFAULT_CACHE_PARAM_NAME);
 	}
 
 	private Cache getSessionScopeCache(FacesContext context) {
 
 		Map<String, Object> sessionMap = context.getExternalContext().getSessionMap();
-		if (!sessionMap.containsKey("DEFAULT_CACHE_PARAM_NAME")) {
+		if (!sessionMap.containsKey(DEFAULT_CACHE_PARAM_NAME)) {
 			Object session = context.getExternalContext().getSession(true);
 			synchronized (session) {
-				if (!sessionMap.containsKey("DEFAULT_CACHE_PARAM_NAME")) {
-					sessionMap.put("DEFAULT_CACHE_PARAM_NAME", createCache(sessionDefaultTimeToLive, sessionMaxCapacity));
+				if (!sessionMap.containsKey(DEFAULT_CACHE_PARAM_NAME)) {
+					sessionMap.put(DEFAULT_CACHE_PARAM_NAME, createCache(sessionDefaultTimeToLive, sessionMaxCapacity));
 				}
 			}
 		}
 
-		return (Cache) sessionMap.get("DEFAULT_CACHE_PARAM_NAME");
+		return (Cache) sessionMap.get(DEFAULT_CACHE_PARAM_NAME);
 	}
-	
-	protected abstract Cache createCache(Integer timeToLive, Integer maxCapacity);
 
+	protected abstract Cache createCache(Integer timeToLive, Integer maxCapacity);
 
 }

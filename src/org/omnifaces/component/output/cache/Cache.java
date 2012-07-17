@@ -12,21 +12,23 @@
  */
 package org.omnifaces.component.output.cache;
 
+import java.io.Serializable;
+
 /**
  * Interface that abstracts a simple get and put operation for a concrete cache implementation.
  * <p>
  * Note that this takes Strings for both key and value since it's not intended as a general cache solution, but is
  * something specific for the {@link Cache} component which caches rendered output.
- * 
+ *
  * @since 1.1
  * @author Arjan Tijms
- * 
+ *
  */
-public interface Cache {
+public interface Cache extends Serializable {
 
 	/**
 	 * Gets a value from the cache
-	 * 
+	 *
 	 * @param key
 	 *            the key under which a value was previously stored
 	 * @return The previously stored value, or null if no such value exists
@@ -35,17 +37,17 @@ public interface Cache {
 
 	/**
 	 * Stores a value in the cache
-	 * 
+	 *
 	 * @param key
 	 *            the key under which a value is to be stored
 	 * @param value
 	 *            the value that is to be stored
 	 */
 	void put(String key, String value);
-	
+
 	/**
 	 * Stores a value in the cache
-	 * 
+	 *
 	 * @param key
 	 *            the key under which a value is to be stored
 	 * @param value
@@ -57,10 +59,10 @@ public interface Cache {
 	 * 				this time is elapsed a call to {@link Cache#get(String)} should return null.
 	 */
 	void put(String key, String value, int timeToLive);
-	
+
 	/**
 	 * Removes a value from the cache
-	 * 
+	 *
 	 * @param key
 	 *            the key under which a value is to be stored
 	 */
