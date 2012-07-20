@@ -61,8 +61,12 @@ public final class SelectItemsUtils {
 						return object;
 					}
 				}
-			} else if (!item.isNoSelectionOption() && value.equals(converter.getAsString(context, component, item.getValue()))) {
-				return item.getValue();
+			} else if (!item.isNoSelectionOption()) {
+				Object itemValue = item.getValue();
+				String convertedItemValue = converter.getAsString(context, component, itemValue);
+				if (value == null ? convertedItemValue == null : value.equals(convertedItemValue)) {
+					return itemValue;
+				}
 			}
 		}
 
