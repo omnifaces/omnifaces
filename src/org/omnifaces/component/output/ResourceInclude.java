@@ -16,7 +16,6 @@ import java.io.IOException;
 
 import javax.faces.FacesException;
 import javax.faces.component.FacesComponent;
-import javax.faces.component.UIComponentBase;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletException;
@@ -34,33 +33,14 @@ import org.omnifaces.util.Components;
  * @author Bauke Scholtz
  */
 @FacesComponent(ResourceInclude.COMPONENT_TYPE)
-public class ResourceInclude extends UIComponentBase {
+public class ResourceInclude extends OutputFamily {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
 	/** The component type. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.ResourceInclude";
 
-	/** The standard component family. */
-	public static final String COMPONENT_FAMILY = "org.omnifaces.component.output";
-
 	// UIComponent overrides ------------------------------------------------------------------------------------------
-
-	/**
-	 * Returns {@link #COMPONENT_FAMILY}.
-	 */
-	@Override
-	public String getFamily() {
-		return COMPONENT_FAMILY;
-	}
-
-	/**
-	 * Returns <code>true</code>.
-	 */
-	@Override
-	public boolean getRendersChildren() {
-		return true;
-	}
 
 	/**
 	 * Create a dispatcher for the resource given by the component's path attribute, catch its output and write it to

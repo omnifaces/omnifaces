@@ -153,7 +153,7 @@ public final class Utils {
 		try {
 			inputChannel = Channels.newChannel(input);
 			outputChannel = Channels.newChannel(output);
-			ByteBuffer buffer = ByteBuffer.allocate(DEFAULT_STREAM_BUFFER_SIZE);
+			ByteBuffer buffer = ByteBuffer.allocateDirect(DEFAULT_STREAM_BUFFER_SIZE);
 			long size = 0;
 
 			while (inputChannel.read(buffer) != -1) {

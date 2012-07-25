@@ -16,7 +16,6 @@ import java.io.IOException;
 
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponent;
-import javax.faces.component.UIComponentBase;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 
@@ -49,15 +48,12 @@ import org.omnifaces.util.Utils;
  * @author Bauke Scholtz
  */
 @FacesComponent(ConditionalComment.COMPONENT_TYPE)
-public class ConditionalComment extends UIComponentBase {
+public class ConditionalComment extends OutputFamily {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
 	/** The component type. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.ConditionalComment";
-
-	/** The standard component family. */
-	public static final String COMPONENT_FAMILY = "org.omnifaces.component.output";
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
@@ -76,22 +72,6 @@ public class ConditionalComment extends UIComponentBase {
 	}
 
 	// UIComponent overrides ------------------------------------------------------------------------------------------
-
-	/**
-	 * Returns {@link #COMPONENT_FAMILY}.
-	 */
-	@Override
-	public String getFamily() {
-		return COMPONENT_FAMILY;
-	}
-
-	/**
-	 * Returns <code>true</code>.
-	 */
-	@Override
-	public boolean getRendersChildren() {
-		return true;
-	}
 
 	/**
 	 * Encode the conditional comment.
