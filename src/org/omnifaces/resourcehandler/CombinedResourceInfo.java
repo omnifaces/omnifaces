@@ -15,7 +15,6 @@ package org.omnifaces.resourcehandler;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.security.MessageDigest;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -29,6 +28,7 @@ import javax.faces.application.ResourceHandler;
 import javax.faces.context.FacesContext;
 
 import org.omnifaces.util.Faces;
+import org.omnifaces.util.Utils;
 
 /**
  * This class is a wrapper which collects all combined resources and stores it in the cache. A builder has been provided
@@ -59,18 +59,6 @@ final class CombinedResourceInfo {
 	static final boolean ENABLE_RF_RES_HACK =
 		Boolean.valueOf(Faces.getInitParameter(RICHFACES_RESOURCE_OPTIMIZATION_ENABLED));
 
-	private static final String ERROR_EMPTY_RESOURCE_NAMES =
-		"There are no resource names been added. Use add() method to add them or use isEmpty() to check beforehand.";
-	private static final String ERROR_CLASH_IN_CACHE =
-		"There's a clash in the combined resource info cache!"
-			+ "%n\tThe resource ID is: %s"
-			+ "%n\tThe one which was already in cache is : %s"
-			+ "%n\tThe one which generated the same ID is: %s";
-	private static final String ERROR_CREATING_UNIQUE_ID =
-		"Cannot create unique resource ID. This platform doesn't support MD5 algorithm and/or UTF-8 charset.";
-	private static final String LOG_RESOURCE_NOT_FOUND =
-		"CombinedResourceHandler: Resource with library '%s' and name '%s' is not found. Skipping.";
-
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	private String id;
@@ -95,6 +83,11 @@ final class CombinedResourceInfo {
 	 * @author Bauke Scholtz
 	 */
 	public static final class Builder {
+
+		// Constants --------------------------------------------------------------------------------------------------
+
+		private static final String ERROR_EMPTY_RESOURCE_NAMES =
+			"There are no resource names been added. Use add() method to add them or use isEmpty() to check beforehand.";
 
 		// Properties -------------------------------------------------------------------------------------------------
 
@@ -132,7 +125,7 @@ final class CombinedResourceInfo {
 		}
 
 		/**
-		 * Creates the CombinedResourceInfo instance, puts it in the cache if absent and returns its ID.
+		 * Creates the CombinedResourceInfo instance in cache if absent and return its ID.
 		 * @return The ID of the CombinedResourceInfo instance.
 		 * @throws IllegalStateException If there are no resource names been added. So, to prevent it beforehand, use
 		 * the {@link #isEmpty()} method to check if there are any resource names been added.
@@ -142,74 +135,37 @@ final class CombinedResourceInfo {
 				throw new IllegalStateException(ERROR_EMPTY_RESOURCE_NAMES);
 			}
 
-			String id = createUniqueId(resourceNames);
-
-			if (!CACHE.containsKey(id)) {
-				CombinedResourceInfo info = new CombinedResourceInfo(id, Collections.unmodifiableMap(resourceNames));
-				CombinedResourceInfo clash = CACHE.put(id, info);
-
-				if (clash != null && !clash.equals(info)) {
-					// We hope that MD5 is good enough that this never occurs. Needs more testing.
-					throw new RuntimeException(String.format(ERROR_CLASH_IN_CACHE, id, clash, info));
-				}
-			}
-
-			return id;
-		}
-
-		// Helpers ----------------------------------------------------------------------------------------------------
-
-		/**
-		 * Create an unique ID based on the given mapping with a string key and a set of string value. The current
-		 * implementation uses a MD5 hash of the {@link Map#toString()} and returns the MD5 bytes as a fixed length
-		 * 32-character hexadecimal string.
-		 * @param map The map to create an unique ID for.
-		 * @return The unique ID of the given map.
-		 */
-		private static String createUniqueId(Map<String, Set<String>> map) {
-			// TODO: I personally don't trust MD5 to be fail-safe. There's still *a* chance on a clash even though it's
-			// less than 0.01%. This needs more testing or a different unique ID approach has to be invented.
-			// Note that UUID is NOT suitable as the ID needs to be the same every time based on map's content!
-
-			byte[] hash;
-
-			try {
-				hash = MessageDigest.getInstance("MD5").digest(map.toString().getBytes("UTF-8"));
-			}
-			catch (Exception e) {
-				// So, MD5 and/or UTF-8 isn't supported. Does such a server platform even exist nowadays?
-				throw new RuntimeException(ERROR_CREATING_UNIQUE_ID, e);
-			}
-
-			StringBuilder hex = new StringBuilder(hash.length * 2);
-
-			for (byte b : hash) {
-				if ((b & 0xff) < 0x10) {
-					hex.append("0");
-				}
-
-				hex.append(Integer.toHexString(b & 0xff));
-			}
-
-			return hex.toString();
+			return get(toUniqueId(resourceNames)).id;
 		}
 
 	}
 
 	/**
-	 * Returns the combined resource info identified by the given ID from the cache.
+	 * Returns the combined resource info identified by the given ID from the cache. A new one will be created based on
+	 * the given ID if absent in cache.
 	 * @param id The ID of the combined resource info to be returned from the cache.
 	 * @return The combined resource info identified by the given ID from the cache.
 	 */
 	public static CombinedResourceInfo get(String id) {
-		return CACHE.get(id);
+		CombinedResourceInfo info = CACHE.get(id);
+
+		if (info == null) {
+			Map<String, Set<String>> resources = fromUniqueId(id);
+
+			if (resources != null) {
+				info = new CombinedResourceInfo(id, Collections.unmodifiableMap(resources));
+				CACHE.put(id, info);
+			}
+		}
+
+		return info;
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Load the combined resources so that the set of resources, the total content length and the last modified are
-	 * been (re)initialized.
+	 * been (re)initialized. If one of the resources cannot be resolved, then this leaves the resources empty.
 	 * @param forceReload Set to true if you want to force reloading of the combined resources, even though the
 	 * resources are already been initialized.
 	 */
@@ -231,8 +187,8 @@ final class CombinedResourceInfo {
 				Resource resource = handler.createResource(resourceName, libraryName);
 
 				if (resource == null) {
-					context.getExternalContext().log(String.format(LOG_RESOURCE_NOT_FOUND, libraryName, resourceName));
-					continue;
+					resources.clear();
+					return;
 				}
 
 				resources.add(resource);
@@ -258,24 +214,22 @@ final class CombinedResourceInfo {
 	}
 
 	/**
-	 * Returns true if the given object is also an instance of {@link CombinedResourceInfo} and its resource names
-	 * mapping equals to the one of the current combined resource info instance.
+	 * Returns true if the given object is also an instance of {@link CombinedResourceInfo} and its ID equals to the
+	 * ID of the current combined resource info instance.
 	 */
 	@Override
 	public boolean equals(Object other) {
-		// Do NOT compare by ID yet!
 		return (other instanceof CombinedResourceInfo)
-			? ((CombinedResourceInfo) other).resourceNames.equals(resourceNames)
+			? ((CombinedResourceInfo) other).id.equals(id)
 			: false;
 	}
 
 	/**
-	 * Returns the sum of the hash code of this class and the resource names mapping.
+	 * Returns the sum of the hash code of this class and the ID.
 	 */
 	@Override
 	public int hashCode() {
-		// Do NOT calculate hashcode by ID yet!
-		return getClass().hashCode() + resourceNames.hashCode();
+		return getClass().hashCode() + id.hashCode();
 	}
 
 	/**
@@ -355,6 +309,68 @@ final class CombinedResourceInfo {
 		else {
 			return Long.valueOf(param);
 		}
+	}
+
+	// Helpers ----------------------------------------------------------------------------------------------------
+
+	/**
+	 * Create an unique ID based on the given mapping of resources. The current implementation converts the mapping to
+	 * an delimited string which is serialized using {@link Utils#serialize(String)}.
+	 * @param resources The mapping of resources to create an unique ID for.
+	 * @return The unique ID of the given mapping of resources.
+	 */
+	private static String toUniqueId(Map<String, Set<String>> resources) {
+		StringBuilder resourcesId = new StringBuilder();
+
+		for (Entry<String, Set<String>> entry : resources.entrySet()) {
+			if (resourcesId.length() > 0) {
+				resourcesId.append('|');
+			}
+
+			String library = entry.getKey();
+
+			if (library != null) {
+				resourcesId.append(library);
+			}
+
+			for (String name : entry.getValue()) {
+				resourcesId.append(':').append(name);
+			}
+
+			// Note: the characters | and : are chosen so because they're not allowed in Windows/Unix filenames anyway.
+			// This saves us from the need to quote them individually which would only make the ID larger.
+		}
+
+		return Utils.serialize(resourcesId.toString());
+	}
+
+	/**
+	 * Create a mapping of resources based on the given unique ID. This does the reverse of {@link #toUniqueId(Map)}.
+	 * @param id Te unique ID of the mapping of resources.
+	 * @return The mapping of resources based on the given unique ID, or <code>null</code> if the ID is not valid.
+	 */
+	private static Map<String, Set<String>> fromUniqueId(String id) {
+		String resourcesId = Utils.unserialize(id);
+
+		if (resourcesId == null) {
+			return null;
+		}
+
+		Map<String, Set<String>> resources = new LinkedHashMap<String, Set<String>>();
+
+		for (String libraries : resourcesId.split("\\|")) {
+			String[] libraryAndNames = libraries.split(":");
+			String library = libraryAndNames[0];
+			Set<String> names = new LinkedHashSet<String>();
+
+			for (int i = 1; i < libraryAndNames.length; i++) {
+				names.add(libraryAndNames[i]);
+			}
+
+			resources.put(library.isEmpty() ? null : library, names);
+		}
+
+		return resources;
 	}
 
 }

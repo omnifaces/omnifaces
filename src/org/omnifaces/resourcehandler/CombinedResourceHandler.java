@@ -13,7 +13,6 @@
 package org.omnifaces.resourcehandler;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -281,7 +280,12 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	@Override
 	public void handleResourceRequest(FacesContext context) throws IOException {
 		if (LIBRARY_NAME.equals(context.getExternalContext().getRequestParameterMap().get("ln"))) {
-			streamResource(context, new CombinedResource(context));
+			try {
+				streamResource(context, new CombinedResource(context));
+			}
+			catch (IllegalArgumentException e) {
+				context.getExternalContext().responseSendError(HttpServletResponse.SC_NOT_FOUND, Faces.getRequestURI());
+			}
 		}
 		else {
 			wrapped.handleResourceRequest(context);
@@ -326,20 +330,13 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 			return;
 		}
 
-		InputStream input = resource.getInputStream();
-
-		if (input == null) {
-			externalContext.setResponseStatus(HttpServletResponse.SC_NOT_FOUND);
-			return;
-		}
-
 		externalContext.setResponseContentType(resource.getContentType());
 
 		for (Entry<String, String> header : resource.getResponseHeaders().entrySet()) {
 			externalContext.setResponseHeader(header.getKey(), header.getValue());
 		}
 
-		Utils.stream(input, externalContext.getResponseOutputStream());
+		Utils.stream(resource.getInputStream(), externalContext.getResponseOutputStream());
 	}
 
 }

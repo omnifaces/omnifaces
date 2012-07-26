@@ -43,8 +43,6 @@ final class CombinedResource extends Resource {
 	private static final String PATTERN_RFC1123_DATE = "EEE, dd MMM yyyy HH:mm:ss zzz";
 	private static final TimeZone TIMEZONE_GMT = TimeZone.getTimeZone("GMT");
 
-	private static final String ERROR_UNKNOWN_RESOURCE_NAME = "Unknown resource name: %s";
-
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	private CombinedResourceInfo info;
@@ -60,8 +58,8 @@ final class CombinedResource extends Resource {
 	public CombinedResource(String name) {
 		info = CombinedResourceInfo.get(name.split("\\.", 2)[0]);
 
-		if (info == null) {
-			throw new IllegalArgumentException(String.format(ERROR_UNKNOWN_RESOURCE_NAME, name));
+		if (info == null || info.getResources().isEmpty()) {
+			throw new IllegalArgumentException();
 		}
 
 		setResourceName(name);

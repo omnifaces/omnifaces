@@ -12,10 +12,13 @@
  */
 package org.omnifaces.util;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -25,6 +28,11 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.zip.Deflater;
+import java.util.zip.DeflaterOutputStream;
+import java.util.zip.InflaterInputStream;
+
+import javax.xml.bind.DatatypeConverter;
 
 /**
  * Collection of general utility methods that do not fit in one of the more specific classes.
@@ -222,6 +230,66 @@ public final class Utils {
 		}
 
 		return Collections.unmodifiableSet(set);
+	}
+
+	// Encoding/decoding ----------------------------------------------------------------------------------------------
+
+	/**
+	 * Serialize the given string to the short possible unique URL-safe representation. The current implementation will
+	 * decode the given string with UTF-8 and then compress it with ZLIB using "best compression" algorithm and then
+	 * Base64-encode the resulting bytes whereafter the Base64 characters <code>/</code>, <code>+</code> and
+	 * <code>=</code> are been replaced by respectively <code>~</code>, <code>-</code> and <code>_</code> to make it
+	 * URL-safe (so that no platform-sensitive URL-encoding needs to be done when used in URLs).
+	 * @param string The string to be serialized.
+	 * @return The serialized string, or <code>null</code> when the given string is itself <code>null</code>.
+	 * @since 1.2
+	 */
+	public static String serialize(String string) {
+		if (string == null) {
+			return null;
+		}
+
+		try {
+			InputStream raw = new ByteArrayInputStream(string.getBytes("UTF-8"));
+			ByteArrayOutputStream deflated = new ByteArrayOutputStream();
+			stream(raw, new DeflaterOutputStream(deflated, new Deflater(Deflater.BEST_COMPRESSION)));
+			String base64 = DatatypeConverter.printBase64Binary(deflated.toByteArray());
+			return base64.replace('/', '~').replace('+', '-').replace('=', '_');
+		}
+		catch (IOException e) {
+			// This will occur when ZLIB and/or UTF-8 are not supported, but this is not to be expected these days.
+			throw new RuntimeException(e);
+		}
+	}
+
+	/**
+	 * Unserialize the given string. This does the reverse of {@link #serialize(String)}.
+	 * @param string The string to be unserialized.
+	 * @return The unserialized string, or <code>null</code> when the given string is by itself <code>null</code>, or
+	 * when its format is malformed.
+	 * @since 1.2
+	 */
+	public static String unserialize(String string) {
+		if (string == null) {
+			return null;
+		}
+
+		try {
+			String base64 = string.replace('~', '/').replace('-', '+').replace('_', '=');
+			InputStream deflated = new ByteArrayInputStream(DatatypeConverter.parseBase64Binary(base64));
+			ByteArrayOutputStream raw = new ByteArrayOutputStream();
+			stream(new InflaterInputStream(deflated), raw);
+			return new String(raw.toByteArray(), "UTF-8");
+		}
+		catch (UnsupportedEncodingException e) {
+			// This will occur when UTF-8 is not supported, but this is not to be expected these days.
+			throw new RuntimeException(e);
+		}
+		catch (Exception e) {
+			// This will occur when the string has been manipulated for some reason so that it's not in valid Base64
+			// or ZLIB format anymore. Just return null then.
+			return null;
+		}
 	}
 
 }
