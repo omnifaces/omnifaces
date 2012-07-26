@@ -40,7 +40,10 @@ import org.omnifaces.util.Callback;
  * For general usage instructions, refer {@link ValidateMultipleFields} documentation.
  * <p>
  * This validator has the additional requirement that the to-be-validated values must implement {@link Comparable}.
- * This validator throws an {@link IllegalArgumentException} when one or more of the values do not implement it.
+ * This validator throws an {@link IllegalArgumentException} when one or more of the values do not implement it. Note
+ * that when this validator is placed before all of the components, then it will only compare the raw unconverted
+ * submitted string values, not the converted object values. If you need to compare by the converted object values,
+ * then you need to place this validator after all of the components.
  *
  * @author Bauke Scholtz
  */
