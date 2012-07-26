@@ -54,19 +54,19 @@ public abstract class InlineResourceRenderer extends Renderer {
 		ResponseWriter writer = context.getResponseWriter();
 		String name = (String) component.getAttributes().get("name");
 		String library = (String) component.getAttributes().get("library");
-        Resource resource = context.getApplication().getResourceHandler().createResource(name, library);
-        Reader reader = new InputStreamReader(resource.getInputStream(), writer.getCharacterEncoding());
+		Resource resource = context.getApplication().getResourceHandler().createResource(name, library);
+		Reader reader = new InputStreamReader(resource.getInputStream(), writer.getCharacterEncoding());
 
 		startElement(writer, component);
 
 		try {
-        	writeResource(reader, writer);
-        }
-        finally {
-        	Utils.close(reader);
-        }
+			writeResource(reader, writer);
+		}
+		finally {
+			Utils.close(reader);
+		}
 
-    	endElement(writer);
+		endElement(writer);
 	}
 
 	/**

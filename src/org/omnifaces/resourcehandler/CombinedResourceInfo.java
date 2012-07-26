@@ -350,9 +350,14 @@ final class CombinedResourceInfo {
 	 * @return The mapping of resources based on the given unique ID, or <code>null</code> if the ID is not valid.
 	 */
 	private static Map<String, Set<String>> fromUniqueId(String id) {
-		String resourcesId = Utils.unserializeURLSafe(id);
+		String resourcesId;
 
-		if (resourcesId == null) {
+		try {
+			resourcesId = Utils.unserializeURLSafe(id);
+		}
+		catch (IllegalArgumentException e) {
+			// This will occur when the ID has purposefully been manipulated for some reason.
+			// Just return null then so that it will end up in a 404.
 			return null;
 		}
 

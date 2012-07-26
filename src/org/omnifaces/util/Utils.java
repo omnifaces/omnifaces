@@ -207,7 +207,7 @@ public final class Utils {
 	 * @param values The values to create an unmodifiable set for.
 	 * @return An unmodifiable set based on the given values.
 	 * @throws ClassCastException When one of the values or one of the arrays or collections is of wrong type.
-     * @since 1.1
+	 * @since 1.1
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> Set<T> unmodifiableSet(Object... values) {
@@ -265,8 +265,9 @@ public final class Utils {
 	/**
 	 * Unserialize the given serialized URL-safe string. This does the reverse of {@link #serialize(String)}.
 	 * @param string The serialized URL-safe string to be unserialized.
-	 * @return The unserialized string, or <code>null</code> when the given string is by itself <code>null</code>, or
-	 * when its format is malformed.
+	 * @return The unserialized string, or <code>null</code> when the given string is by itself <code>null</code>.
+	 * @throws IllegalArgumentException When the given serialized URL-safe string is not in valid format as returned by
+	 * {@link #serializeURLSafe(String)}.
 	 * @since 1.2
 	 */
 	public static String unserializeURLSafe(String string) {
@@ -286,9 +287,8 @@ public final class Utils {
 			throw new RuntimeException(e);
 		}
 		catch (Exception e) {
-			// This will occur when the string has been manipulated for some reason so that it's not in valid Base64
-			// or ZLIB format anymore. Just return null then.
-			return null;
+			// This will occur when the string is not in valid Base64 or ZLIB format.
+			throw new IllegalArgumentException(e);
 		}
 	}
 
