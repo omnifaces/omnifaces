@@ -27,39 +27,80 @@ import javax.faces.application.ApplicationWrapper;
 import javax.faces.application.ViewHandler;
 import javax.faces.application.ViewHandlerWrapper;
 import javax.faces.component.FacesComponent;
+import javax.faces.component.UICommand;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIViewParameter;
 import javax.faces.context.FacesContext;
 import javax.faces.context.FacesContextWrapper;
 import javax.faces.view.ViewMetadata;
 
+import org.omnifaces.taghandler.IgnoreValidationFailed;
+
 /**
- * <strong>Form</strong> is a component that extends the standard {@link UIForm} and provides a way to keep view parameters in the request URL after a
- * post-back.
+ * <strong>Form</strong> is a component that extends the standard {@link UIForm} and provides a way to keep view
+ * parameters in the request URL after a post-back and offers in combination with the
+ * <code>&lt;o:ignoreValidationFailed&gt;</code> tag on an {@link UICommand} component the possibility to ignore
+ * validation failures so that the invoke action phase will be executed anyway.
  * <p>
- * The standard UIForm doesn't put the original view parameters in the action URL that's used for the post-back. Instead, it relies on those view
- * parameters to be stored in the state associated with the standard {@link UIViewParameter}. Via this state those parameters are invisibly re-applied
- * after every post-back.
+ * You can use it the same way as <code>&lt;h:form&gt;</code>, you only need to change <code>h:</code> to
+ * <code>o:</code>.
+ *
+ * <h4>Include View Params</h4>
  * <p>
- * The disadvantage of this invisible retention of view parameters is that the user doesn't see them anymore in the address bar of the browser that is
- * used to interact with the faces application. Copy-pasting the URL from the address bar or refreshing the page by hitting enter inside the address
- * bar will therefore not always yield the expected results.
+ * The standard {@link UIForm} doesn't put the original view parameters in the action URL that's used for the post-back.
+ * Instead, it relies on those view parameters to be stored in the state associated with the standard
+ * {@link UIViewParameter}. Via this state those parameters are invisibly re-applied after every post-back.
  * <p>
- * To solve this, this component offers an attribute <code>includeViewParams</code> that will optionally include all view parameters, in exactly the
- * same way that this can be done for <code>&lt;h:link&gt;<code> and <code>&lt;h:button&gt;<code>.
+ * The disadvantage of this invisible retention of view parameters is that the user doesn't see them anymore in the
+ * address bar of the browser that is used to interact with the faces application. Copy-pasting the URL from the address
+ * bar or refreshing the page by hitting enter inside the address bar will therefore not always yield the expected
+ * results.
  * <p>
- * You can use it the same way as <code>&lt;h:form&gt;</code>, you only need to change <code>h:</code> to <code>o:</code>.
+ * To solve this, this component offers an attribute <code>includeViewParams</code> that will optionally include all
+ * view parameters, in exactly the same way that this can be done for <code>&lt;h:link&gt;</code> and
+ * <code>&lt;h:button&gt;</code>.
+ *
+ * <h4>Ignore Validation Failed</h4>
+ * <p>
+ * In order to properly use the <code>&lt;o:ignoreValidationFailed&gt;</code> tag on an {@link UICommand} component, its
+ * parent <code>&lt;h:form&gt;</code> component has to be replaced by this <code>&lt;o:form&gt;</code> component.
+ * See also {@link IgnoreValidationFailed}.
  *
  * @since 1.1
  * @author Arjan Tijms
+ * @author Bauke Scholtz
  */
 @FacesComponent(Form.COMPONENT_TYPE)
 public class Form extends UIForm {
+
+	// Constants ------------------------------------------------------------------------------------------------------
 
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.input.Form";
 
 	enum PropertyKeys {
 		includeViewParams
+	}
+
+	// Actions --------------------------------------------------------------------------------------------------------
+
+	@Override
+	public void processValidators(FacesContext context) {
+		if (isIgnoreValidationFailed(context)) {
+			super.processValidators(new IgnoreValidationFailedFacesContext(context));
+		}
+		else {
+			super.processValidators(context);
+		}
+	}
+
+	@Override
+	public void processUpdates(FacesContext context) {
+		if (isIgnoreValidationFailed(context)) {
+			super.processUpdates(new IgnoreValidationFailedFacesContext(context));
+		}
+		else {
+			super.processUpdates(context);
+		}
 	}
 
 	@Override
@@ -70,6 +111,12 @@ public class Form extends UIForm {
 			super.encodeBegin(context);
 		}
 	}
+
+	private boolean isIgnoreValidationFailed(FacesContext context) {
+		return context.getAttributes().get(IgnoreValidationFailed.class.getName()) == Boolean.TRUE;
+	}
+
+	// Getters/setters ------------------------------------------------------------------------------------------------
 
 	/**
 	 * Return whether or not the view parameters should be encoded into the form's action URL.
@@ -88,11 +135,44 @@ public class Form extends UIForm {
 		getStateHelper().put(PropertyKeys.includeViewParams, includeViewParams);
 	}
 
+	// Nested classes -------------------------------------------------------------------------------------------------
+
 	/**
-	 * Helper class used for creating a FacesContext with a decorated FacesContext -&gt; Application -&gt; ViewHandler -&gt; getActionURL.
+	 * FacesContext wrapper which performs NOOP during {@link FacesContext#validationFailed()} and
+	 * {@link FacesContext#renderResponse()}.
+	 *
+	 * @author Bauke Scholtz
+	 */
+	static class IgnoreValidationFailedFacesContext extends FacesContextWrapper {
+
+		private FacesContext wrapped;
+
+		public IgnoreValidationFailedFacesContext(FacesContext wrapped) {
+			this.wrapped = wrapped;
+		}
+
+		@Override
+		public void validationFailed() {
+			// NOOP.
+		}
+
+		@Override
+		public void renderResponse() {
+			// NOOP.
+		}
+
+		@Override
+		public FacesContext getWrapped() {
+			return wrapped;
+		}
+
+	}
+
+	/**
+	 * Helper class used for creating a FacesContext with a decorated FacesContext -&gt; Application -&gt; ViewHandler
+	 * -&gt; getActionURL.
 	 *
 	 * @author Arjan Tijms
-	 *
 	 */
 	static class ActionURLDecorator extends FacesContextWrapper {
 
@@ -117,14 +197,15 @@ public class Form extends UIForm {
 						private final ViewHandler viewHandler = outer.getWrapped().getViewHandler();
 
 						/**
-						 * The actual method we're decorating in order to include the view parameters into the action URL.
+						 * The actual method we're decorating in order to include the view parameters into the action
+						 * URL.
 						 */
 						@Override
 						public String getActionURL(FacesContext context, String viewId) {
 							return context.getExternalContext().encodeBookmarkableURL(
 								super.getActionURL(context, viewId),
-						        getViewParameterMap(context)
-					        );
+								getViewParameterMap(context)
+							);
 						}
 
 						@Override
@@ -147,10 +228,13 @@ public class Form extends UIForm {
 		}
 	}
 
+	// Helpers --------------------------------------------------------------------------------------------------------
+
 	/**
 	 * Gets parameters associated with the {@link UIViewParameter}s as a request-parameter like map of Strings.
 	 * <p>
-	 * In the returned map, keys represent the parameter name, while the value is a list of one of more values associated with that parameter name.
+	 * In the returned map, keys represent the parameter name, while the value is a list of one of more values
+	 * associated with that parameter name.
 	 *
 	 * @param context
 	 * @return Map with parameters. An empty map will be returned if there are no parameters.

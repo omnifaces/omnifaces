@@ -1833,8 +1833,10 @@
     <tag>
         <description>
         	<![CDATA[
-        		<strong>Form</strong> is a component that extends the standard h:form and provides a way to keep view parameters
- 				in the request URL after a post-back.
+        		<strong>Form</strong> is a component that extends the standard <code>UIForm</code> and provides a way to keep view
+				parameters in the request URL after a post-back and offers in combination with the
+				<code>&lt;o:ignoreValidationFailed&gt;</code> tag on an <code>UICommand</code> component the possibility to ignore
+				validation failures so that the invoke action phase will be executed anyway.
              ]]>           
         </description>
         <tag-name>form</tag-name>
@@ -2277,4 +2279,18 @@ public enum Baz {
 		</attribute>
 	</tag>
 	
+	<tag>
+		<description>
+			<![CDATA[
+				The <code>&lt;o:ignoreValidationFailed&gt;</code> allows the developer to ignore validation failures when 
+				executing an <code>UICommand</code> action. This taghandler must be placed inside an <code>UICommand</code> component and the
+				parent <code>UIForm</code> must be an <code>&lt;o:form&gt;</code>.
+				<p>
+				Any validation errors will be ignored and thus not be displayed. Note that the model values will (obviously) only be
+				updated for components which have passed the validation.
+			]]>
+		</description>
+		<tag-name>ignoreValidationFailed</tag-name>
+		<handler-class>org.omnifaces.taghandler.IgnoreValidationFailed</handler-class>
+	</tag>
 </facelet-taglib>
