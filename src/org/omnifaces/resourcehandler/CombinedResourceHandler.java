@@ -34,6 +34,8 @@ import javax.faces.event.SystemEvent;
 import javax.faces.event.SystemEventListener;
 import javax.servlet.http.HttpServletResponse;
 
+import org.omnifaces.renderer.InlineScriptRenderer;
+import org.omnifaces.renderer.InlineStylesheetRenderer;
 import org.omnifaces.util.Events;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.Utils;
@@ -75,7 +77,7 @@ import org.omnifaces.util.Utils;
  * The following context parameters are available:
  * <table>
  * <tr><td nowrap>
- * <code>{@value org.omnifaces.resourcehandler.CombinedResourceHandler#EXCLUDED_RESOURCES_PARAM_NAME}</code>
+ * <code>{@value org.omnifaces.resourcehandler.CombinedResourceHandler#PARAM_NAME_EXCLUDED_RESOURCES}</code>
  * </td><td>
  * Comma separated string of resource identifiers of <code>&lt;h:head&gt;</code> resources which needs to be excluded
  * from combining. For example:
@@ -83,11 +85,23 @@ import org.omnifaces.util.Utils;
  * Any combined resource will be included <i>after</i> any of those excluded resources.
  * </td></tr>
  * <tr><td nowrap>
- * <code>{@value org.omnifaces.resourcehandler.CombinedResourceHandler#SUPPRESSED_RESOURCES_PARAM_NAME}</code>
+ * <code>{@value org.omnifaces.resourcehandler.CombinedResourceHandler#PARAM_NAME_SUPPRESSED_RESOURCES}</code>
  * </td><td>
  * Comma separated string of resource identifiers of <code>&lt;h:head&gt;</code> resources which needs to be suppressed
  * and removed. For example:
  * <br/><code>&lt;param-value&gt;skinning.ecss, primefaces:jquery/jquery.js&lt;/param-value&gt;</code>
+ * </td></tr>
+ * <tr><td nowrap>
+ * <code>{@value org.omnifaces.resourcehandler.CombinedResourceHandler#PARAM_NAME_INLINE_CSS}</code>
+ * </td><td>
+ * Set to <code>true</code> if you want to render the combined CSS resources inline (embedded in HTML) instead of as a
+ * resource.
+ * </td></tr>
+ * <tr><td nowrap>
+ * <code>{@value org.omnifaces.resourcehandler.CombinedResourceHandler#PARAM_NAME_INLINE_JS}</code>
+ * </td><td>
+ * Set to <code>true</code> if you want to render the combined JS resources inline (embedded in HTML) instead of as a
+ * resource.
  * </td></tr>
  * </table>
  * <p>
@@ -115,26 +129,36 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	public static final String LIBRARY_NAME = "omnifaces.combined";
 
 	/** The context parameter name to specify resource identifiers which needs to be excluded from combining. */
-    public static final String EXCLUDED_RESOURCES_PARAM_NAME =
+    public static final String PARAM_NAME_EXCLUDED_RESOURCES =
     	"org.omnifaces.COMBINED_RESOURCE_HANDLER_EXCLUDED_RESOURCES";
 
 	/** The context parameter name to specify resource identifiers which needs to be suppressed and removed. */
-    public static final String SUPPRESSED_RESOURCES_PARAM_NAME =
+    public static final String PARAM_NAME_SUPPRESSED_RESOURCES =
     	"org.omnifaces.COMBINED_RESOURCE_HANDLER_SUPPRESSED_RESOURCES";
+
+	/** The context parameter name to enable rendering CSS inline instead of as resource link. */
+    public static final String PARAM_NAME_INLINE_CSS =
+    	"org.omnifaces.COMBINED_RESOURCE_HANDLER_INLINE_CSS";
+
+	/** The context parameter name to enable rendering JS inline instead of as resource link. */
+    public static final String PARAM_NAME_INLINE_JS =
+    	"org.omnifaces.COMBINED_RESOURCE_HANDLER_INLINE_JS";
 
 	private static final String TARGET_HEAD = "head";
 	private static final String ATTRIBUTE_RESOURCE_LIBRARY = "library";
 	private static final String ATTRIBUTE_RESOURCE_NAME = "name";
-	private static final String RENDERER_TYPE_STYLESHEET = "javax.faces.resource.Stylesheet";
-	private static final String RENDERER_TYPE_SCRIPT = "javax.faces.resource.Script";
-	private static final String EXTENSION_STYLESHEET = ".css";
-	private static final String EXTENSION_SCRIPT = ".js";
+	private static final String RENDERER_TYPE_CSS = "javax.faces.resource.Stylesheet";
+	private static final String RENDERER_TYPE_JS = "javax.faces.resource.Script";
+	private static final String EXTENSION_CSS = ".css";
+	private static final String EXTENSION_JS = ".js";
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	private ResourceHandler wrapped;
 	private Set<String> excludedResources;
 	private Set<String> suppressedResources;
+	private boolean inlineCSS;
+	private boolean inlineJS;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -146,9 +170,11 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	 */
 	public CombinedResourceHandler(ResourceHandler wrapped) {
 		this.wrapped = wrapped;
-		this.excludedResources = initResources(EXCLUDED_RESOURCES_PARAM_NAME);
-		this.suppressedResources = initResources(SUPPRESSED_RESOURCES_PARAM_NAME);
+		this.excludedResources = initResources(PARAM_NAME_EXCLUDED_RESOURCES);
+		this.suppressedResources = initResources(PARAM_NAME_SUPPRESSED_RESOURCES);
 		this.excludedResources.addAll(suppressedResources);
+		this.inlineCSS = Boolean.valueOf(Faces.getInitParameter(PARAM_NAME_INLINE_CSS));
+		this.inlineJS = Boolean.valueOf(Faces.getInitParameter(PARAM_NAME_INLINE_JS));
 		Events.subscribeToEvent(PreRenderViewEvent.class, this);
 	}
 
@@ -199,7 +225,7 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 			String resourceIdentifier = (library != null ? (library + ":") : "") + name;
 
 			if (excludedResources.isEmpty() || !excludedResources.contains(resourceIdentifier)) {
-				if (componentResource.getRendererType().equals(RENDERER_TYPE_STYLESHEET)) {
+				if (componentResource.getRendererType().equals(RENDERER_TYPE_CSS)) {
 					stylesheets.add(library, name);
 
 					if (stylesheetComponentResource == null) {
@@ -209,7 +235,7 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 						componentResourcesToRemove.add(componentResource);
 					}
 				}
-				else if (componentResource.getRendererType().equals(RENDERER_TYPE_SCRIPT)) {
+				else if (componentResource.getRendererType().equals(RENDERER_TYPE_JS)) {
 					scripts.add(library, name);
 
 					if (scriptComponentResource == null) {
@@ -226,11 +252,15 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 		}
 
 		if (stylesheetComponentResource != null) {
-			setComponentResource(stylesheetComponentResource, stylesheets.create(), EXTENSION_STYLESHEET);
+			stylesheetComponentResource.getAttributes().put(ATTRIBUTE_RESOURCE_LIBRARY, LIBRARY_NAME);
+			stylesheetComponentResource.getAttributes().put(ATTRIBUTE_RESOURCE_NAME, stylesheets.create() + EXTENSION_CSS);
+			stylesheetComponentResource.setRendererType(inlineCSS ? InlineStylesheetRenderer.RENDERER_TYPE : RENDERER_TYPE_CSS);
 		}
 
 		if (scriptComponentResource != null) {
-			setComponentResource(scriptComponentResource, scripts.create(), EXTENSION_SCRIPT);
+			scriptComponentResource.getAttributes().put(ATTRIBUTE_RESOURCE_LIBRARY, LIBRARY_NAME);
+			scriptComponentResource.getAttributes().put(ATTRIBUTE_RESOURCE_NAME, scripts.create() + EXTENSION_JS);
+			scriptComponentResource.setRendererType(inlineJS ? InlineScriptRenderer.RENDERER_TYPE : RENDERER_TYPE_JS);
 		}
 
 		for (UIComponent componentResourceToRemove : componentResourcesToRemove) {
@@ -280,17 +310,6 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 		}
 
 		return resources;
-	}
-
-	/**
-	 * Set the given component as a combined resource with the given name and extension.
-	 * @param component The component to be set as combined resource.
-	 * @param name The name of the combined resource.
-	 * @param extension The extension of the combined resource.
-	 */
-	private static void setComponentResource(UIComponent component, String name, String extension) {
-		component.getAttributes().put(ATTRIBUTE_RESOURCE_LIBRARY, LIBRARY_NAME);
-		component.getAttributes().put(ATTRIBUTE_RESOURCE_NAME, name + extension);
 	}
 
 	/**
