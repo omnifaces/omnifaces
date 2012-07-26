@@ -241,10 +241,10 @@ public final class Utils {
 	 * <code>=</code> are been replaced by respectively <code>~</code>, <code>-</code> and <code>_</code> to make it
 	 * URL-safe (so that no platform-sensitive URL-encoding needs to be done when used in URLs).
 	 * @param string The string to be serialized.
-	 * @return The serialized string, or <code>null</code> when the given string is itself <code>null</code>.
+	 * @return The serialized URL-safe string, or <code>null</code> when the given string is itself <code>null</code>.
 	 * @since 1.2
 	 */
-	public static String serialize(String string) {
+	public static String serializeURLSafe(String string) {
 		if (string == null) {
 			return null;
 		}
@@ -263,13 +263,13 @@ public final class Utils {
 	}
 
 	/**
-	 * Unserialize the given string. This does the reverse of {@link #serialize(String)}.
-	 * @param string The string to be unserialized.
+	 * Unserialize the given serialized URL-safe string. This does the reverse of {@link #serialize(String)}.
+	 * @param string The serialized URL-safe string to be unserialized.
 	 * @return The unserialized string, or <code>null</code> when the given string is by itself <code>null</code>, or
 	 * when its format is malformed.
 	 * @since 1.2
 	 */
-	public static String unserialize(String string) {
+	public static String unserializeURLSafe(String string) {
 		if (string == null) {
 			return null;
 		}

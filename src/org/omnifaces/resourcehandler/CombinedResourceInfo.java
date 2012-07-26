@@ -341,7 +341,7 @@ final class CombinedResourceInfo {
 			// This saves us from the need to quote them individually which would only make the ID larger.
 		}
 
-		return Utils.serialize(resourcesId.toString());
+		return Utils.serializeURLSafe(resourcesId.toString());
 	}
 
 	/**
@@ -350,7 +350,7 @@ final class CombinedResourceInfo {
 	 * @return The mapping of resources based on the given unique ID, or <code>null</code> if the ID is not valid.
 	 */
 	private static Map<String, Set<String>> fromUniqueId(String id) {
-		String resourcesId = Utils.unserialize(id);
+		String resourcesId = Utils.unserializeURLSafe(id);
 
 		if (resourcesId == null) {
 			return null;
