@@ -263,7 +263,7 @@ public final class Utils {
 	}
 
 	/**
-	 * Unserialize the given serialized URL-safe string. This does the reverse of {@link #serialize(String)}.
+	 * Unserialize the given serialized URL-safe string. This does the reverse of {@link #serializeURLSafe(String)}.
 	 * @param string The serialized URL-safe string to be unserialized.
 	 * @return The unserialized string, or <code>null</code> when the given string is by itself <code>null</code>.
 	 * @throws IllegalArgumentException When the given serialized URL-safe string is not in valid format as returned by
