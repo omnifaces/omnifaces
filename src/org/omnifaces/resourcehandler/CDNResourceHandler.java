@@ -92,12 +92,12 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	/** The context parameter name to specify CDN URLs for the given resource identifiers. */
-    public static final String PARAM_NAME_CDN_RESOURCES = "org.omnifaces.CDN_RESOURCE_HANDLER_URLS";
+	public static final String PARAM_NAME_CDN_RESOURCES = "org.omnifaces.CDN_RESOURCE_HANDLER_URLS";
 
-    private static final String ERROR_MISSING_INIT_PARAM =
-    	"Context parameter '" + PARAM_NAME_CDN_RESOURCES + "' is missing in web.xml or web-fragment.xml.";
-    private static final String ERROR_INVALID_INIT_PARAM =
-    	"Context parameter '" + PARAM_NAME_CDN_RESOURCES + "' is in invalid syntax.";
+	private static final String ERROR_MISSING_INIT_PARAM =
+		"Context parameter '" + PARAM_NAME_CDN_RESOURCES + "' is missing in web.xml or web-fragment.xml.";
+	private static final String ERROR_INVALID_INIT_PARAM =
+		"Context parameter '" + PARAM_NAME_CDN_RESOURCES + "' is in invalid syntax.";
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
