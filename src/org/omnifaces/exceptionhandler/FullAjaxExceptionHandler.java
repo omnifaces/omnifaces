@@ -47,7 +47,7 @@ import org.w3c.dom.NodeList;
  * This exception handler enables you to show the full error page in its entirety to the enduser in case of exceptions
  * during ajax requests. Refer the documentation of {@link FullAjaxExceptionHandlerFactory} how to setup it.
  * <p>
- * This exception handler will parse the <tt>web.xml</tt> and <tt>web-fragment.xml<tt> files to find the error page
+ * This exception handler will parse the <tt>web.xml</tt> and <tt>web-fragment.xml</tt> files to find the error page
  * locations of the HTTP error code <tt>500</tt> and all declared specific exception types. Those locations need to
  * point to Facelets files. The location of the HTTP error code <tt>500</tt> or the exception type
  * <code>java.lang.Throwable</code> is required in order to get the full ajax exception handler to work, because
