@@ -50,8 +50,9 @@ import org.omnifaces.util.Events;
  * </pre>
  * <p>
  * Note that the model values will (obviously) only be updated for components which have actually passed the validation.
- * Also the validation messages will still be displayed. If you prefer to not display them, then you'd need to
- * conditionally render them yourself using <code>&lt;f:ajax render&gt;</code>.
+ * Also the validation messages will still be displayed. If you prefer to not display them, then you'd need to exclude
+ * them from rendering by <code>&lt;f:ajax render&gt;</code>, or to put a proper condition in the <code>rendered</code>
+ * attribute.
  *
  * @author Bauke Scholtz
  * @see Form
