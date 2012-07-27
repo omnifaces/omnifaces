@@ -15,8 +15,10 @@ package org.omnifaces.resourcehandler;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -117,6 +119,11 @@ import org.omnifaces.util.Utils;
  * resource cannot be resolved by a classpath URL due to RichFaces design limitations, so this combined resource handler
  * will use an internal workaround to get it to work anyway, but this involves firing a HTTP request for every resource.
  * The impact should however be relatively negligible as this is performed on localhost.
+ * <h3>CDNResourceHandler</h3>
+ * <p>
+ * If you're also using the {@link CDNResourceHandler} or, at least, have configured its context parameter
+ * {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_RESOURCES}, then those CDN resources will
+ * automatically be added to the set of excluded resources.
  *
  * @author Bauke Scholtz
  */
@@ -170,6 +177,7 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	public CombinedResourceHandler(ResourceHandler wrapped) {
 		this.wrapped = wrapped;
 		this.excludedResources = initResources(PARAM_NAME_EXCLUDED_RESOURCES);
+		this.excludedResources.addAll(initCDNResources());
 		this.suppressedResources = initResources(PARAM_NAME_SUPPRESSED_RESOURCES);
 		this.excludedResources.addAll(suppressedResources);
 		this.inlineCSS = Boolean.valueOf(Faces.getInitParameter(PARAM_NAME_INLINE_CSS));
@@ -314,6 +322,22 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 		}
 
 		return resources;
+	}
+
+	/**
+	 * Initialize the set of CDN resources based on {@link CDNResourceHandler} configuration.
+	 * @return The set of CDN resources.
+	 */
+	private static Set<String> initCDNResources() {
+		if (!Faces.isDevelopment()) {
+			Map<String, String> cdnResources = CDNResourceHandler.initCDNResources();
+
+			if (cdnResources != null) {
+				return cdnResources.keySet();
+			}
+		}
+
+		return Collections.emptySet();
 	}
 
 	/**
