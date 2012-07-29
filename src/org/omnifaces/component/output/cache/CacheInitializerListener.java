@@ -13,14 +13,19 @@
 package org.omnifaces.component.output.cache;
 
 import static java.util.Collections.list;
+import static org.omnifaces.facesviews.FacesViewsUtils.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
+import javax.servlet.ServletRegistration;
 import javax.servlet.annotation.WebListener;
+
+import org.omnifaces.servlet.OnDemandResponseBufferFilter;
 
 /**
  * Optional initializer for the {@link Cache} used by the Omnifaces Cache component.
@@ -37,6 +42,7 @@ public class CacheInitializerListener implements ServletContextListener {
 
 	// Web context parameter to set the cache provider implementation
 	public static final String CACHE_PROVIDER_INIT_PARAM_NAME = "org.omnifaces.CACHE_PROVIDER";
+	public static final String CACHE_INSTALL_BUFFER_FILTER = "org.omnifaces.CACHE_INSTALL_BUFFER_FILTER";
 	
 	public static final String CACHE_PROVIDER_SETTING_INIT_PARAM_PREFIX = "org.omnifaces.CACHE_SETTING_";
 
@@ -50,6 +56,14 @@ public class CacheInitializerListener implements ServletContextListener {
 		
 		// Build a map of settings for either the custom- or the default cache provider and set them.
 		cacheProvider.setParameters(getCacheSetting(context));
+		
+		// Installs a filter that on demands buffers the response from the Faces Servlet, in order to grab child content
+		// from the buffer.
+		if (Boolean.TRUE.equals(Boolean.valueOf(context.getInitParameter(CACHE_INSTALL_BUFFER_FILTER)))) {
+			ServletRegistration facesServletRegistration = getFacesServletRegistration(context);
+			FilterRegistration bufferFilterRegistration = context.addFilter(OnDemandResponseBufferFilter.class.getName(), OnDemandResponseBufferFilter.class);
+			bufferFilterRegistration.addMappingForServletNames(null, true, facesServletRegistration.getName());
+		}
 	}
 
 	@Override

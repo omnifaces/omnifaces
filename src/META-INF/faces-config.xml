@@ -19,6 +19,7 @@
 >
 	<lifecycle>
 		<phase-listener>org.omnifaces.eventlistener.InvokeActionEventListener</phase-listener>
+		<phase-listener>org.omnifaces.eventlistener.CallBackPhaseListener</phase-listener>
 	</lifecycle>
 
 	<managed-bean>

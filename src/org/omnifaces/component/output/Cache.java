@@ -12,8 +12,16 @@
  */
 package org.omnifaces.component.output;
 
-import static java.lang.Boolean.*;
-import static org.omnifaces.component.output.Cache.PropertyKeys.*;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static javax.faces.event.PhaseId.RENDER_RESPONSE;
+import static org.omnifaces.component.output.Cache.PropertyKeys.key;
+import static org.omnifaces.component.output.Cache.PropertyKeys.scope;
+import static org.omnifaces.component.output.Cache.PropertyKeys.time;
+import static org.omnifaces.component.output.Cache.PropertyKeys.useBuffer;
+import static org.omnifaces.servlet.OnDemandResponseBufferFilter.BUFFERED_RESPONSE;
+import static org.omnifaces.util.Events.setCallBackAfterPhaseListener;
+import static org.omnifaces.util.Events.subscribeToViewEvent;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -23,14 +31,21 @@ import javax.faces.component.FacesComponent;
 import javax.faces.component.visit.VisitContext;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
+import javax.faces.event.PreRenderViewEvent;
+import javax.faces.event.SystemEvent;
 
 import org.omnifaces.component.output.cache.CacheFactory;
+import org.omnifaces.component.output.cache.CacheInitializerListener;
+import org.omnifaces.servlet.BufferedHttpServletResponse;
+import org.omnifaces.servlet.OnDemandResponseBufferFilter;
+import org.omnifaces.util.Callback;
+import org.omnifaces.util.Faces;
 import org.omnifaces.util.State;
 
 /**
  * <strong>Cache</strong> is a component that captures the mark-up rendered by its children and caches this for future
  * requests.
- *
+ * 
  * @since 1.1
  * @author Arjan Tijms
  */
@@ -40,12 +55,60 @@ public class Cache extends OutputFamily {
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.Cache";
 	public static final String VALUE_SET = "org.omnifaces.cache.VALUE_SET";
 	public static final String DEFAULT_SCOPE = "session";
-
+	public static final String START_CONTENT_MARKER = "<!-- START CACHE FOR %s -->";
+	public static final String END_CONTENT_MARKER = "<!-- END CACHE FOR %s -->";
+	
+	private static final String ERROR_NO_BUFFERED_RESPONSE = String.format(
+		"No buffered response found in request, but 'useBuffer' set to true. Check setting the '%s' context parameter or installing the '%s' filter manually.",
+		CacheInitializerListener.CACHE_INSTALL_BUFFER_FILTER, OnDemandResponseBufferFilter.class
+	);
+	private static Class<? extends SystemEvent> PRE_RENDER = PreRenderViewEvent.class;
+	
 	private final State state = new State(getStateHelper());
 
 	enum PropertyKeys {
-		key, scope, time
+		key, scope, time, useBuffer
 	}
+	
+	public Cache() {
+		
+		final FacesContext context = FacesContext.getCurrentInstance();
+		
+		// Execute the following code in PreRenderView, since at construction time the "useBuffer" and "key" attributes
+		// have not been set, and there is no @PostContruct for UIComponents.
+		subscribeToViewEvent(PRE_RENDER, new Callback.Void() {
+			
+			@Override
+			public void invoke() {
+				
+				if (isUseBuffer() && !hasCachedValue(context)) {
+					
+					final BufferedHttpServletResponse bufferedHttpServletResponse = Faces.getRequestAttribute(BUFFERED_RESPONSE);
+					
+					if (bufferedHttpServletResponse == null) {
+						throw new IllegalStateException(ERROR_NO_BUFFERED_RESPONSE);
+					}
+					
+					// Start buffering the response from now on
+					bufferedHttpServletResponse.setPassThrough(false);
+					
+					// After the RENDER_RESPONSE phase, copy the area we need to cache from the response buffer
+					// and insert it into our cache
+					setCallBackAfterPhaseListener(RENDER_RESPONSE, new Callback.Void() {
+						
+						@Override
+						public void invoke() {
+							String content = getContentFromBuffer(bufferedHttpServletResponse.getBufferAsString());
+							if (content != null) {
+								cacheContent(context, content);
+							}
+						}
+						
+					});
+				}
+			}
+		});
+    }
 
 	@Override
 	public void encodeChildren(FacesContext context) throws IOException {
@@ -59,49 +122,110 @@ public class Cache extends OutputFamily {
 
 		if (childRendering == null) {
 			Writer bufferWriter = new StringWriter();
+			
+			ResponseWriter bufferedResponseWriter = responseWriter.cloneWithWriter(bufferWriter);
 
-			context.setResponseWriter(responseWriter.cloneWithWriter(bufferWriter));
+			context.setResponseWriter(bufferedResponseWriter);
+			
 			try {
+				if (isUseBuffer()) {
+					bufferedResponseWriter.write(getStartContentMarker());
+				}
+				
 				super.encodeChildren(context);
+				
+				if (isUseBuffer()) {
+					bufferedResponseWriter.write(getEndContentMarker());
+				}
 			} finally {
 				context.setResponseWriter(responseWriter);
 			}
 
 			childRendering = bufferWriter.toString();
-			int time = getTime();
-			if (time > 0) {
-				scopedCache.put(key, childRendering, time);
-			} else {
-				scopedCache.put(key, childRendering);
-			}
-
-			// Marker to register we added a value to the cache during this request
-			context.getExternalContext().getRequestMap().put(VALUE_SET, TRUE);
+			
+			cacheContent(context, scopedCache, key, childRendering);
 		}
 
 		responseWriter.write(childRendering);
 	}
-
+	
 	@Override
 	protected boolean isVisitable(VisitContext visitContext) {
-
+		
 		FacesContext context = visitContext.getFacesContext();
-
+		
 		// Visit us and our children if a value for the cache was set in this request, or
 		// if no value was cached yet.
-		return
-			TRUE.equals(context.getExternalContext().getRequestMap().get(VALUE_SET)) ||
-
-			CacheFactory.getCache(context, getScope()).get(getKeyWithDefault(context)) == null;
+		return isCachedValueJustSet(context) || !hasCachedValue(context);
 	}
-
+	
+	private void cacheContent(FacesContext context, String content) {
+		cacheContent(context, CacheFactory.getCache(context, getScope()), getKeyWithDefault(context), content);
+	}
+	
+	private void cacheContent(FacesContext context, org.omnifaces.component.output.cache.Cache scopedCache, String key, String content) {
+		int time = getTime();
+		if (time > 0) {
+			scopedCache.put(key, content, time);
+		} else {
+			scopedCache.put(key, content);
+		}
+		
+		// Marker to register we added a value to the cache during this request
+		context.getExternalContext().getRequestMap().put(VALUE_SET, TRUE);
+	}
+	
 	private String getKeyWithDefault(FacesContext context) {
 		String key = getKey();
 		if (key == null) {
 			key = context.getViewRoot().getViewId() + "_" + this.getClientId(context);
 		}
-
+		
 		return key;
+	}
+	
+	/**
+	 * 
+	 * @param context the FacesContext
+	 * @return true if a value was inserted in the cache during this request, false otherwise
+	 */
+	private boolean isCachedValueJustSet(FacesContext context) {
+		return TRUE.equals(context.getExternalContext().getRequestMap().get(VALUE_SET));
+	}
+	
+	/**
+	 * 
+	 * @param context the FacesContext
+	 * @return true if there is a value in the cache corresponding to this component, false otherwise
+	 */
+	private boolean hasCachedValue(FacesContext context) {
+		return CacheFactory.getCache(context, getScope()).get(getKeyWithDefault(context)) != null;
+	}
+	
+	private String getStartContentMarker() {
+		return String.format(START_CONTENT_MARKER, getClientId());
+	}
+	
+	private String getEndContentMarker() {
+		return String.format(END_CONTENT_MARKER, getClientId());
+	}
+	
+	private String getContentFromBuffer(String buffer) {
+		String startMarker = getStartContentMarker();
+		int startIndex = buffer.indexOf(startMarker);
+		
+		if (startIndex != -1) {
+			
+			String endMarker = getEndContentMarker();
+			int endIndex = buffer.indexOf(endMarker);
+			
+			if (endIndex != -1) {
+				
+				return buffer.substring(startIndex + startMarker.length(), endIndex);
+			}
+		}
+		
+		return null;
 	}
 
 	public String getKey() {
@@ -127,5 +251,13 @@ public class Cache extends OutputFamily {
 	public void setTime(Integer timeValue) {
 		state.put(time, timeValue);
 	}
+	
+	public Boolean isUseBuffer() {
+    	return state.get(useBuffer, FALSE);
+    }
+
+	public void setUseBuffer(Boolean useBufferValue) {
+    	state.put(useBuffer, useBufferValue);
+    }
 
 }

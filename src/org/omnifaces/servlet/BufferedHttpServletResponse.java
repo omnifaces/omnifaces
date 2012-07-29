@@ -58,13 +58,21 @@ public class BufferedHttpServletResponse extends HttpServletResponseOutputWrappe
 	}
 
 	/**
-	 * Flushses and returns the buffered response.
+	 * Flushes and returns the buffered response.
 	 * @return The buffered response.
 	 * @throws IOException When an I/O error occurs.
 	 */
 	public byte[] getBuffer() throws IOException {
 		flushBuffer();
 		return buffer.toByteArray();
+	}
+	
+	public String getBufferAsString() {
+		try {
+			return new String(getBuffer(), getCharacterEncoding());
+		} catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
 }

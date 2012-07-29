@@ -43,6 +43,7 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 
 	private ServletOutputStream output;
 	private PrintWriter writer;
+	private boolean passThrough;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -64,6 +65,11 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 
 	@Override
 	public ServletOutputStream getOutputStream() throws IOException {
+		if (passThrough) {
+			return super.getOutputStream();
+		}
+		
+		
 		if (writer != null) {
 			throw new IllegalStateException(ERROR_GETWRITER_ALREADY_CALLED);
 		}
@@ -77,6 +83,11 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 
 	@Override
 	public PrintWriter getWriter() throws IOException {
+		if (passThrough) {
+			return super.getWriter();
+		}
+		
+		
 		if (output != null) {
 			throw new IllegalStateException(ERROR_GETOUTPUT_ALREADY_CALLED);
 		}
@@ -91,6 +102,10 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 	@Override
 	public void flushBuffer() throws IOException {
 		super.flushBuffer();
+		
+		if (passThrough) {
+			return;
+		}
 
 		if (writer != null) {
 			writer.flush();
@@ -112,5 +127,13 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 			output.close();
 		}
 	}
+	
+	public boolean isPassThrough() {
+    	return passThrough;
+    }
+
+	public void setPassThrough(boolean passThrough) {
+    	this.passThrough = passThrough;
+    }
 
 }
