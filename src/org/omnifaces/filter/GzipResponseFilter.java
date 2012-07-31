@@ -30,6 +30,7 @@ import org.omnifaces.util.Utils;
 /**
  * This filter will apply GZIP compression on responses whenever applicable. GZIP will greatly reduce the response size
  * when applied on character based responses like HTML, CSS and JS, on average it can save up to ~70% of bandwidth.
+ * <p>
  * While GZIP is normally to be configured in the servletcontainer (e.g. <code>&lt;Context compression="on"&gt;</code>
  * in Tomcat, or <code>&lt;property name="compression" value="on"&gt;</code> in Glassfish), this filter allows a
  * servletcontainer independent way of configuring GZIP compression and also allows enabling GZIP compression anyway

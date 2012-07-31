@@ -38,8 +38,8 @@ import org.omnifaces.util.MapWrapper;
  * }
  *
  * public interface Bar {
- *     public static final String BAR1 = "bar1";
- *     public static final String BAR2 = "bar2";
+ *     public String BAR1 = "bar1";
+ *     public String BAR2 = "bar2";
  * }
  *
  * public enum Baz {
@@ -104,7 +104,7 @@ public class ImportConstants extends TagHandler {
 
 	/**
 	 * First obtain the constants of the class by its fully qualified name as specified in the <code>type<code>
-	 * attribute from the cache. If it hasn't been collected yet and is thus not present in the cashe, then collect
+	 * attribute from the cache. If it hasn't been collected yet and is thus not present in the cache, then collect
 	 * them and store in cache. Finally set the constants in the EL scope by the simple name of the type, or by the
 	 * name as specified in the <code>var</code> attribute, if any.
 	 */

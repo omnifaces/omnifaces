@@ -29,8 +29,8 @@ import javax.servlet.http.HttpSession;
  * fail to set it to UTF-8 when something else has set it to a different value before JSF2/Facelets gets the chance to
  * set it during the restore view phase. PrimeFaces 3.x for example is known to do that. During ajax requests, it will
  * call {@link ExternalContext#getRequestParameterMap()} inside {@link PartialViewContext#isAjaxRequest()} right before
- * building/restoring the view and thus implicitly sets the request body character to the server-default value, which
- * is not UTF-8 per se.
+ * building/restoring the view, which will implicitly set the request body character encoding to the server-default
+ * value, which is not UTF-8 per se.
  * <p>
  * To get this filter to run, map it as follows in <code>web.xml</code>:
  * <pre>
@@ -56,9 +56,10 @@ import javax.servlet.http.HttpSession;
  * &lt;/init-param&gt;
  * </pre>
  * <p>Please note that this only affects HTTP POST requests, not HTTP GET requests. For HTTP GET requests, you should
- * be specifying the charset at servletcontainer level. Also note that this doesn't affect HTTP responses in any way.
- * For HTTP responses, you should be specifying the charset in <code>&lt;f:view encoding&gt;</code>, which also already
- * defaults to UTF-8 by the way.
+ * be specifying the charset at servletcontainer level (e.g. <code>&lt;Context URIEncoding="UTF-8"&gt;</code> in Tomcat,
+ * or <code>&lt;parameter-encoding default-charset="UTF-8"&gt;</code> in Glassfish). Also note that this doesn't affect
+ * HTTP responses in any way. For HTTP responses, you should be specifying the charset in
+ * <code>&lt;f:view encoding&gt;</code>, which also already defaults to UTF-8 by the way.
  *
  * @author Bauke Scholtz
  * @link http://code.google.com/p/primefaces/issues/detail?id=2223
