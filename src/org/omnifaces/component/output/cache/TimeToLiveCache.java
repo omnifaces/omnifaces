@@ -12,14 +12,14 @@
  */
 package org.omnifaces.component.output.cache;
 
-import static java.lang.System.*;
-import static java.util.concurrent.TimeUnit.*;
+import static java.lang.System.currentTimeMillis;
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 import java.util.Date;
 import java.util.Map;
 
 /**
- * Base class that can be used by Map based caches that don't support time to live semantics natively.
+ * Base class that can be used by Map based caches that don't support time to live semantics and arbitrary attributes natively.
  *
  * @since 1.1
  * @author Arjan Tijms
@@ -30,7 +30,7 @@ public abstract class TimeToLiveCache implements Cache {
 	private static final long serialVersionUID = 6637500586287606410L;
 
 	private final Integer defaultTimeToLive;
-	private Map<String, Object> cacheStore;
+	private Map<String, CacheEntry> cacheStore;
 
 	public TimeToLiveCache(Integer defaultTimeToLive) {
 		this.defaultTimeToLive = defaultTimeToLive;
@@ -38,12 +38,9 @@ public abstract class TimeToLiveCache implements Cache {
 
 	@Override
 	public String get(String key) {
-		Object value = cacheStore.get(key);
+		CacheEntry entry = cacheStore.get(key);
 
-		if (value instanceof String) {
-			return (String) value;
-		} else if (value instanceof CacheEntry) {
-			CacheEntry entry = (CacheEntry) value;
+		if (entry != null) {
 			if (entry.isValid()) {
 				return entry.getValue();
 			} else {
@@ -59,13 +56,49 @@ public abstract class TimeToLiveCache implements Cache {
 		if (defaultTimeToLive != null) {
 			put(key, value, defaultTimeToLive);
 		} else {
-			cacheStore.put(key, value);
+			put(key, value, -1);
 		}
 	}
 
 	@Override
 	public void put(String key, String value, int timeToLive) {
-		cacheStore.put(key, new CacheEntry(value, new Date(currentTimeMillis() + SECONDS.toMillis(timeToLive))));
+		
+		CacheEntry entry = cacheStore.get(key);
+		
+		if (entry == null || !entry.isValid()) {
+			cacheStore.put(key, new CacheEntry(value, timeToLiveToDate(timeToLive)));
+		} else {
+			entry.setValue(value);
+			entry.setValidTill(timeToLiveToDate(timeToLive));
+		}
+	}
+	
+	@Override
+	public void putAttribute(String key, String name, Object value, int timeToLive) {
+		CacheEntry entry = cacheStore.get(key);
+		
+		if (entry == null || !entry.isValid()) {
+			// NOTE: timeToLive is only used when a new entry is created
+			entry = new CacheEntry(null, timeToLiveToDate(timeToLive));
+			cacheStore.put(key, entry);
+		}
+		
+		entry.getAttributes().put(name, value);
+	}
+	
+	@Override
+	public Object getAttribute(String key, String name) {
+		CacheEntry entry = cacheStore.get(key);
+
+		if (entry != null) {
+			if (entry.isValid()) {
+				return entry.getAttributes().get(name);
+			} else {
+				cacheStore.remove(key);
+			}
+		}
+
+		return null;
 	}
 
 	@Override
@@ -73,8 +106,16 @@ public abstract class TimeToLiveCache implements Cache {
 		cacheStore.remove(key);
 	}
 
-	protected void setCacheStore(Map<String, Object> cacheStore) {
+	protected void setCacheStore(Map<String, CacheEntry> cacheStore) {
 		this.cacheStore = cacheStore;
+	}
+	
+	private Date timeToLiveToDate(int timeToLive) {
+		if (timeToLive != -1) {
+			return new Date(currentTimeMillis() + SECONDS.toMillis(timeToLive));
+		} else {
+			return null;
+		}
 	}
 
 }

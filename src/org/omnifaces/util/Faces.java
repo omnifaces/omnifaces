@@ -97,6 +97,19 @@ public final class Faces {
 	public static FacesContext getContext() {
 		return FacesContext.getCurrentInstance();
 	}
+	
+	/**
+	 * Returns the faces context that's stored in an ELContext.
+	 * <p>
+	 * Note that this only works for an ELContext that is created in the context of JSF.
+	 * 
+	 * @param elContext the EL context to obtain the faces context from.
+	 * @return the faces context that's stored in the given ELContext.
+	 * @since 1.2
+	 */
+	public static FacesContext getContext(ELContext elContext) {
+		return (FacesContext) elContext.getContext(FacesContext.class);
+	}
 
 	/**
 	 * Returns the current external context.

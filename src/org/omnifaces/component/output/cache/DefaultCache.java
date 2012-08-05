@@ -38,13 +38,13 @@ public class DefaultCache extends TimeToLiveCache {
 		setCacheStore(createCacheStore(maxCapacity));
 	}
 
-	private Map<String, Object> createCacheStore(Integer maxCapacity) {
+	private Map<String, CacheEntry> createCacheStore(Integer maxCapacity) {
 		if (maxCapacity != null) {
-			return new ConcurrentLinkedHashMap.Builder<String, Object>()
+			return new ConcurrentLinkedHashMap.Builder<String, CacheEntry>()
 						    .maximumWeightedCapacity(maxCapacity)
 						    .build();
 		} else {
-			return new ConcurrentHashMap<String, Object>();
+			return new ConcurrentHashMap<String, CacheEntry>();
 		}
 	}
 

@@ -116,7 +116,7 @@ public class Cache extends OutputFamily {
 		String key = getKeyWithDefault(context);
 
 		ResponseWriter responseWriter = context.getResponseWriter();
-		org.omnifaces.component.output.cache.Cache scopedCache = CacheFactory.getCache(context, getScope());
+		org.omnifaces.component.output.cache.Cache scopedCache = getCacheImpl(context);
 
 		String childRendering = scopedCache.get(key);
 
@@ -147,6 +147,32 @@ public class Cache extends OutputFamily {
 		}
 
 		responseWriter.write(childRendering);
+	}
+	
+	/**
+	 * Gets a named attribute associated with the main cache entry this component is using to store
+	 * the rendering of its child components.
+	 * 
+	 * @param context the current FacesContext
+	 * @param name name of the attribute to retrieve a value for
+	 * @return value associated with the named attribute
+	 * @since 1.2
+	 */
+	public Object getCacheAttribute(FacesContext context, String name) {
+		return getCacheImpl(context).getAttribute(getKeyWithDefault(context), name);
+	}
+	
+	/**
+	 * Sets a named attribute associated with the main cache entry this component is using to store
+	 * the rendering of its child components.
+	 * 
+	 * @param context the current FacesContext
+	 * @param name name of the attribute under which the value is stored
+	 * @param value the value that is to be stored
+	 * @since 1.2
+	 */
+	public void setCacheAttribute(FacesContext context, String name, Object value) {
+		getCacheImpl(context).putAttribute(getKeyWithDefault(context), name, value, getTime());
 	}
 	
 	@Override
@@ -182,6 +208,10 @@ public class Cache extends OutputFamily {
 		}
 		
 		return key;
+	}
+	
+	private org.omnifaces.component.output.cache.Cache getCacheImpl(FacesContext context) {
+		return CacheFactory.getCache(context, getScope());
 	}
 	
 	/**

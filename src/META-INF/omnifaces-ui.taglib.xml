@@ -2255,6 +2255,47 @@
 			<type>java.lang.Boolean</type>
 		</attribute>
 	</tag>
+	
+	<tag>
+		<description>
+			<![CDATA[
+				Tag handler (runs at tree build-time) that makes a value expression available under the given name that caches its value.
+				Although the value expressions scope is that of the entire Facelet in which this tag appears, the value it self is cached
+				using the parent Cache component.
+				<p>
+				This means that if the parent <code>o:Cache</code> component clears its cache (e.g. because of time to live expiration), the value cached
+				by this value expression will be automatically cleared as well.
+				<p>
+				The direct parent of this component <b>MUST</b> be <code>o:Cache</code> or a potential subclass of the associated UIComponent.
+				It's an error to have any other kind of parent.
+				<p>
+				The intended use of this is to explicitly cache a value expression that is used by one of the component children of <code>o:Cache</code>,
+				so that even after a post-back (where the cached markup is of nu use) the original value expression will not be re-evaluated.
+			]]>
+		</description>
+		<tag-name>cacheValue</tag-name>
+		<handler-class>org.omnifaces.component.output.cache.el.CacheValue</handler-class>
+		<attribute>
+			<description>
+				<![CDATA[
+	               Name under which the value expression will be made available to EL, scoped to the Facelet in which this tag occurs.
+	            ]]>
+            </description>
+			<name>name</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	               The value expression for which its value will be cached on demand and made available as a new value expression.
+	            ]]>
+            </description>
+			<name>value</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+	</tag>
     
 	<tag>
 		<description>
