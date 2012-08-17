@@ -109,7 +109,7 @@
 		</description>
 		<function-name>format1</function-name>
 		<function-class>org.omnifaces.el.functions.Strings</function-class>
-		<function-signature>java.lang.String format1(java.lang.String, java.lang.String)</function-signature>
+		<function-signature>java.lang.String format1(java.lang.String, java.lang.Object)</function-signature>
 	</function>
 
 	<function>
@@ -122,7 +122,7 @@
 		</description>
 		<function-name>format2</function-name>
 		<function-class>org.omnifaces.el.functions.Strings</function-class>
-		<function-signature>java.lang.String format2(java.lang.String, java.lang.String, java.lang.String)</function-signature>
+		<function-signature>java.lang.String format2(java.lang.String, java.lang.Object, java.lang.Object)</function-signature>
 	</function>
 
 	<function>
@@ -135,7 +135,7 @@
 		</description>
 		<function-name>format3</function-name>
 		<function-class>org.omnifaces.el.functions.Strings</function-class>
-		<function-signature>java.lang.String format3(java.lang.String, java.lang.String, java.lang.String, java.lang.String)</function-signature>
+		<function-signature>java.lang.String format3(java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object)</function-signature>
 	</function>
 
 	<function>
@@ -148,7 +148,7 @@
 		</description>
 		<function-name>format4</function-name>
 		<function-class>org.omnifaces.el.functions.Strings</function-class>
-		<function-signature>java.lang.String format4(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)</function-signature>
+		<function-signature>java.lang.String format4(java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)</function-signature>
 	</function>
 
 	<function>
@@ -161,7 +161,7 @@
 		</description>
 		<function-name>format5</function-name>
 		<function-class>org.omnifaces.el.functions.Strings</function-class>
-		<function-signature>java.lang.String format5(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)</function-signature>
+		<function-signature>java.lang.String format5(java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)</function-signature>
 	</function>
 
 	<!-- Arrays =================================================================================================== -->
