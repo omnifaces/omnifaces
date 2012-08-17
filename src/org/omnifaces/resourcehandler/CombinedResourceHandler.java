@@ -135,20 +135,20 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	public static final String LIBRARY_NAME = "omnifaces.combined";
 
 	/** The context parameter name to specify resource identifiers which needs to be excluded from combining. */
-    public static final String PARAM_NAME_EXCLUDED_RESOURCES =
-    	"org.omnifaces.COMBINED_RESOURCE_HANDLER_EXCLUDED_RESOURCES";
+	public static final String PARAM_NAME_EXCLUDED_RESOURCES =
+		"org.omnifaces.COMBINED_RESOURCE_HANDLER_EXCLUDED_RESOURCES";
 
 	/** The context parameter name to specify resource identifiers which needs to be suppressed and removed. */
-    public static final String PARAM_NAME_SUPPRESSED_RESOURCES =
-    	"org.omnifaces.COMBINED_RESOURCE_HANDLER_SUPPRESSED_RESOURCES";
+	public static final String PARAM_NAME_SUPPRESSED_RESOURCES =
+		"org.omnifaces.COMBINED_RESOURCE_HANDLER_SUPPRESSED_RESOURCES";
 
 	/** The context parameter name to enable rendering CSS inline instead of as resource link. */
-    public static final String PARAM_NAME_INLINE_CSS =
-    	"org.omnifaces.COMBINED_RESOURCE_HANDLER_INLINE_CSS";
+	public static final String PARAM_NAME_INLINE_CSS =
+		"org.omnifaces.COMBINED_RESOURCE_HANDLER_INLINE_CSS";
 
 	/** The context parameter name to enable rendering JS inline instead of as resource link. */
-    public static final String PARAM_NAME_INLINE_JS =
-    	"org.omnifaces.COMBINED_RESOURCE_HANDLER_INLINE_JS";
+	public static final String PARAM_NAME_INLINE_JS =
+		"org.omnifaces.COMBINED_RESOURCE_HANDLER_INLINE_JS";
 
 	private static final String TARGET_HEAD = "head";
 	private static final String ATTRIBUTE_RESOURCE_LIBRARY = "library";

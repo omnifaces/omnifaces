@@ -26,7 +26,7 @@ import org.omnifaces.util.Utils;
 
 /**
  * This {@link ResourceHandler} implementation allows the developer to provide CDN URLs instead of the default local
- * URLs for JSF resources as provided by <code>&lt;h:outputScript&gt;</code>, <code>&lt;h:outputStylesheett&gt;</code>
+ * URLs for JSF resources as provided by <code>&lt;h:outputScript&gt;</code>, <code>&lt;h:outputStylesheet&gt;</code>
  * and <code>&lt;h:graphicImage&gt;</code> when the current JSF project stage is <strong>not</strong> set to
  * <code>Development</code>.
  * <p>
