@@ -99,6 +99,71 @@
 		<function-signature>java.lang.String escapeJS(java.lang.String)</function-signature>
 	</function>
 
+	<function>
+		<description>
+			<![CDATA[
+				Format the given string with 1 parameter.
+				Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
+				functions does not support varargs methods nor overloaded function names.
+			]]>
+		</description>
+		<function-name>format1</function-name>
+		<function-class>org.omnifaces.el.functions.Strings</function-class>
+		<function-signature>java.lang.String format1(java.lang.String, java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Format the given string with 2 parameters.
+				Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
+				functions does not support varargs methods nor overloaded function names.
+			]]>
+		</description>
+		<function-name>format2</function-name>
+		<function-class>org.omnifaces.el.functions.Strings</function-class>
+		<function-signature>java.lang.String format2(java.lang.String, java.lang.String, java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Format the given string with 3 parameters.
+				Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
+				functions does not support varargs methods nor overloaded function names.
+			]]>
+		</description>
+		<function-name>format3</function-name>
+		<function-class>org.omnifaces.el.functions.Strings</function-class>
+		<function-signature>java.lang.String format3(java.lang.String, java.lang.String, java.lang.String, java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Format the given string with 4 parameters.
+				Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
+				functions does not support varargs methods nor overloaded function names.
+			]]>
+		</description>
+		<function-name>format4</function-name>
+		<function-class>org.omnifaces.el.functions.Strings</function-class>
+		<function-signature>java.lang.String format4(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Format the given string with 5 parameters.
+				Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
+				functions does not support varargs methods nor overloaded function names.
+			]]>
+		</description>
+		<function-name>format5</function-name>
+		<function-class>org.omnifaces.el.functions.Strings</function-class>
+		<function-signature>java.lang.String format5(java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String, java.lang.String)</function-signature>
+	</function>
+
 	<!-- Arrays =================================================================================================== -->
 
 	<function>

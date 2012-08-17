@@ -14,8 +14,11 @@ package org.omnifaces.el.functions;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.text.MessageFormat;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
+
+import org.omnifaces.util.Faces;
 
 /**
  * Collection of EL functions for string manipulation.
@@ -211,6 +214,58 @@ public final class Strings {
 		}
 
 		return builder.toString();
+	}
+
+	/**
+	 * Format the given string with 1 parameter. The locale is obtained by {@link Faces#getLocale()}. Design notice:
+	 * There are five formatX() methods, each taking 1 to 5 format parameters because EL functions does not support
+	 * varargs methods nor overloaded function names.
+	 * @param pattern The format pattern.
+	 * @param param1 The first parameter.
+	 * @return The formatted string.
+	 * @see MessageFormat
+	 */
+	public static String format1(String pattern, String param1) {
+		return format(pattern, param1);
+	}
+
+	/**
+	 * @see #format1(String, String)
+	 */
+	public static String format2(String pattern, String param1, String param2) {
+		return format(pattern, param1, param2);
+	}
+
+	/**
+	 * @see #format1(String, String)
+	 */
+	public static String format3(String pattern, String param1, String param2, String param3) {
+		return format(pattern, param1, param2, param3);
+	}
+
+	/**
+	 * @see #format1(String, String)
+	 */
+	public static String format4(String pattern, String param1, String param2, String param3, String param4) {
+		return format(pattern, param1, param2, param3, param4);
+	}
+
+	/**
+	 * @see #format1(String, String)
+	 */
+	public static String format5
+		(String pattern, String param1, String param2, String param3, String param4, String param5)
+	{
+		return format(pattern, param1, param2, param3, param4, param5);
+	}
+
+	/**
+	 * The main string format method taking varargs.
+	 */
+	private static String format(String pattern, String... params) {
+		StringBuffer result = new StringBuffer();
+		new MessageFormat(pattern, Faces.getLocale()).format(params, result, null);
+		return result.toString();
 	}
 
 }
