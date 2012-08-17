@@ -97,12 +97,12 @@ public final class Faces {
 	public static FacesContext getContext() {
 		return FacesContext.getCurrentInstance();
 	}
-	
+
 	/**
 	 * Returns the faces context that's stored in an ELContext.
 	 * <p>
 	 * Note that this only works for an ELContext that is created in the context of JSF.
-	 * 
+	 *
 	 * @param elContext the EL context to obtain the faces context from.
 	 * @return the faces context that's stored in the given ELContext.
 	 * @since 1.2
@@ -171,7 +171,7 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns whether we're in development stage. This will be the case when the <tt>javax.faces.PROJECT_STATE</tt>
+	 * Returns whether we're in development stage. This will be the case when the <tt>javax.faces.PROJECT_STAGE</tt>
 	 * context parameter in <tt>web.xml</tt> is set to <tt>Development</tt>.
 	 * @return <code>true</code> if we're in development stage, otherwise <code>false</code>.
 	 * @see Application#getProjectStage()
