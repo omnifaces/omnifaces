@@ -447,7 +447,7 @@
 	<tag>
 		<description>
 			<![CDATA[
-				<p><strong>o:conditionalComment</strong> is an <code>UIComponent</code> which renders a conditional comment. Conditional 
+				<p><strong>o:conditionalComment</strong> is an <code>UIComponent</code> which renders a conditional comment. Conditional
 				comments are an IE specific feature which enables the developer to (out)comment blocks of HTML depending on whether
 				the client is using IE and if so even which version. They are often seen in combination with CSS stylesheets like so:
 				<pre>
@@ -510,7 +510,7 @@
 		<attribute>
 			<description>
 				<![CDATA[
-					The <code>if</code> condition of the conditional comment. This is exactly the value you would use 
+					The <code>if</code> condition of the conditional comment. This is exactly the value you would use
 					in <code>&lt;!--[if ...]&gt;</code>, e.g. <code>if="lte IE 7"</code>.
 				]]>
 			</description>
@@ -1024,7 +1024,7 @@
 			<type>java.lang.Boolean</type>
 		</attribute>
 	</tag>
-	
+
 	<tag>
 		<description>
 			<![CDATA[
@@ -1162,7 +1162,7 @@
 		<attribute>
 			<description>
 				<![CDATA[
-					A ValueExpression that evaluates to an object that implements the javax.faces.validator.Validator 
+					A ValueExpression that evaluates to an object that implements the javax.faces.validator.Validator
 					interface.
 				]]>
 			</description>
@@ -1211,7 +1211,7 @@
 		<attribute>
 			<description>
 				<![CDATA[
-					A ValueExpression that evaluates to an object that implements the javax.faces.convert.Converter 
+					A ValueExpression that evaluates to an object that implements the javax.faces.convert.Converter
 					interface.
 				]]>
 			</description>
@@ -1228,7 +1228,7 @@
 			<type>java.lang.String</type>
 		</attribute>
 	</tag>
-	
+
 	<tag>
 		<description>
 				<![CDATA[
@@ -1369,7 +1369,7 @@
 			<description>
 				<![CDATA[
 	                <p>
-	
+
 	                MethodExpression representing a value change listener method
 	                that will be notified when a new value has been set for this
 	                input component. The expression must evaluate to a public
@@ -1381,7 +1381,7 @@
 	                knowing what the new value is, but this can be useful in cases
 	                where a notification is needed that "this value
 	                changed".
-	
+
 	                </p>
 	            ]]>
 			</description>
@@ -1434,7 +1434,7 @@
 				into a Facelets tag.
 				<p>
 				By default this is not possible, and the expression that's intended to be a method expression will be created and
-				made available as a value expression. This handler should be placed inside a Facelets tag as follows:				
+				made available as a value expression. This handler should be placed inside a Facelets tag as follows:
 				<pre>
 &lt;ui:composition
 	xmlns="http://www.w3.org/1999/xhtml"
@@ -1443,21 +1443,21 @@
 	xmlns:o="http://omnifaces.org/ui"
 &gt;
 	&lt;o:methodParam name="method" value="#{action}"/&gt;
-	
+
 	&lt;h:commandButton value="test" action="#{method}" /&gt;
-		
+
 &lt;/ui:composition&gt;
 				</pre>
 				<p>
 				Assuming the above is a tag called <code>actionmethod</code> in the namespace <code>test</code>, a method can be passed into it
-				as follows:				
-				<pre>				
+				as follows:
+				<pre>
 &lt;test:actionmethod action="#{methodParamBean.doAction}" /&gt;
 				</pre>
-				<p>				
+				<p>
 				In case a method with no parameters is passed that is to be used as an action listener with no parameters, then the component
 				using this method unfortunely has to be wrapped by a component that puts the method in request scoped (with nested visibility),
-				e.g. by using <code>ui:repeat</code> as follows:				
+				e.g. by using <code>ui:repeat</code> as follows:
 				<pre>
 &lt;ui:repeat var="method" value="#{method}"&gt;
 	&lt;h:commandButton value="test" actionListener="#{method}" /&gt;
@@ -1465,7 +1465,7 @@
 				</pre>
 				<p>
 				Using modern EL implementations, this is not needed in case the EL expression references the method using explicit parenthesis,
-				e.g. <code>#{methodParamBean.doAction()}</code>							
+				e.g. <code>#{methodParamBean.doAction()}</code>
 			]]>
 		</description>
 		<tag-name>methodParam</tag-name>
@@ -1492,7 +1492,7 @@
 			<type>java.lang.String</type>
 		</attribute>
 	</tag>
-	
+
 	<tag>
 		<description>
 				<![CDATA[
@@ -1518,7 +1518,7 @@
 			<description>
 				<![CDATA[
 	                The name of the request parameters from which the values are retrieved on an initial request that
-	                represent component ids of those components from which the markup should appear in the response (i.e. which 
+	                represent component ids of those components from which the markup should appear in the response (i.e. which
 	                should be rendered)
 		        ]]>
 			</description>
@@ -1530,7 +1530,7 @@
 			<description>
 				<![CDATA[
 	                The name of the request parameters from which the values are retrieved on an initial request that
-	                represent client ids of those components from which the markup should appear in the response (i.e. which 
+	                represent client ids of those components from which the markup should appear in the response (i.e. which
 	                should be rendered)
 		        ]]>
 			</description>
@@ -1578,12 +1578,128 @@
 	<tag>
         <description>
         	<![CDATA[
+				<strong>OutputFormat</strong> is a component that extends the standard <code>HtmlOutputFormat</code> and provides support
+				for capturing the output and exposing it into the request scope by the variable name as specified by the
+				<code>var</code> attribute.
+             ]]>
+        </description>
+        <tag-name>outputFormat</tag-name>
+        <component>
+            <component-type>org.omnifaces.component.output.OutputFormat</component-type>
+        </component>
+		<attribute>
+			<description>
+				Converter instance registered with this	component.
+			</description>
+			<name>converter</name>
+			<required>false</required>
+			<type>javax.faces.convert.Converter</type>
+		</attribute>
+		<attribute>
+			<description>
+				The	component identifier for this component. This value	must be
+				unique within the closest parent component that	is a naming
+				container.
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Flag indicating	whether	or not this	component should be	rendered
+				(during	Render Response	Phase),	or processed on	any	subsequent
+				form submit. The default value for this	property is	true.
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				The	current	value of this component.
+			</description>
+			<name>value</name>
+			<required>false</required>
+			<type>java.lang.Object</type>
+		</attribute>
+		<attribute>
+			<description>
+				Direction indication for text that does	not	inherit
+				directionality.
+				Valid values are "LTR" (left-to-right) and "RTL"
+				(right-to-left).
+			</description>
+			<name>dir</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Flag indicating	that characters	that are sensitive
+				in HTML	and	XML	markup must	be escaped.	This flag
+				is set to "true" by	default.
+			</description>
+			<name>escape</name>
+			<required>false</required>
+			<type>boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				Code describing	the	language used in the generated markup
+				for	this component.
+			</description>
+			<name>lang</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				CSS	style(s) to	be applied when	this component is rendered.
+			</description>
+			<name>style</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Space-separated	list of	CSS	style class(es)	to be applied when
+				this element is	rendered. This value must be passed	through
+				as the "class" attribute on	generated markup.
+			</description>
+			<name>styleClass</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Advisory title information about markup	elements generated
+				for	this component.
+			</description>
+			<name>title</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				The	ValueExpression	linking	this component to a	property in	a
+				backing	bean
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+	</tag>
+
+	<tag>
+        <description>
+        	<![CDATA[
 	        	<strong><code>o:outputLabel</code></strong> is a component that extends the standard outputLabel and provides extra support for
 	 			automatically setting its value as the label of the component identified by its <code>for</code> attribute.
 	        	<p>
 	            It renders an HTML "label" element. If a "for" attribute is specified, the component specified by the value of the "for"
-	            attribute is queried for its client id, which is then rendered as the value of the "for" attribute of the HTML label element. 
-             ]]>           
+	            attribute is queried for its client id, which is then rendered as the value of the "for" attribute of the HTML label element.
+             ]]>
         </description>
         <tag-name>outputLabel</tag-name>
         <component>
@@ -1829,7 +1945,7 @@
             <type>javax.faces.component.UIComponent</type>
         </attribute>
     </tag>
-    
+
     <tag>
         <description>
         	<![CDATA[
@@ -1837,7 +1953,7 @@
 				parameters in the request URL after a post-back and offers in combination with the
 				<code>&lt;o:ignoreValidationFailed&gt;</code> tag on an <code>UICommand</code> component the possibility to ignore
 				validation failures so that the invoke action phase will be executed anyway.
-             ]]>           
+             ]]>
         </description>
         <tag-name>form</tag-name>
         <component>
@@ -2083,11 +2199,11 @@
             <type>javax.faces.component.UIComponent</type>
         </attribute>
     </tag>
-    
+
 	<tag>
 		<description>
 	       	<![CDATA[
-	       		<strong>Cache</strong> is a component that initially renders the output of its children into a buffer 
+	       		<strong>Cache</strong> is a component that initially renders the output of its children into a buffer
 	       		instead of to the response. This output is then inserted into a cache and on subsequent requests the
 	       		content retrieved from the cache is used.
 	       		<p>
@@ -2134,12 +2250,12 @@
  				</tr>
  				<tr>
  				<td nowrap><code>org.omnifaces.CACHE_SETTING_APPLICATION_TTL</code></td>
-				<td>Sets the maximum amount of time in seconds that cached content is valid for the application scope. 
+				<td>Sets the maximum amount of time in seconds that cached content is valid for the application scope.
 				Can be overriden by individal cache components. Default: no limit</td>
  				</tr>
  				<tr>
  				<td nowrap><code>org.omnifaces.CACHE_SETTING_SESSION_TTL</code></td>
-				<td>Sets the maximum amount of time in seconds that cached content is valid for the session scope. 
+				<td>Sets the maximum amount of time in seconds that cached content is valid for the session scope.
 				Can be overriden by individal cache components. Default: no limit</td>
  				</tr>
  				<tr>
@@ -2165,7 +2281,7 @@
 				In case the alternative caching method via buffering is used, <code>org.omnifaces.servlet.BufferedHttpServletResponse</code> needs
 				to be installed as a Servlet Filter in web.xml, filtering either the FacesServlet itself or any page on which the alternative caching
 				method is required.
-			]]>           
+			]]>
 		</description>
 		<tag-name>cache</tag-name>
 		<component>
@@ -2194,7 +2310,7 @@
 					Optional scope identifier used to set the scope in which caching takes place. If no scope is specified,
 					the default scope "session" will be used.
 					<p>
-					The supported scopes depent on the caching provider that is installed via the 
+					The supported scopes depent on the caching provider that is installed via the
 					<code>org.omnifaces.CACHE_PROVIDER</code>. If no such provider is installed, a default one is used
 					that supports scopes "session" and "application".
 					<p>
@@ -2211,10 +2327,10 @@
 					Optional amount of time in seconds for which the cached content is valid (TTL). This is counted
 					from the moment content is actually added to the cache. If no time is provided the content will be subject
 					to the global cache settings, and in absence of these are subject to the behavior of the cache implementation
-					that is used. The default cache implementation will simply cache indefinitely. 
+					that is used. The default cache implementation will simply cache indefinitely.
 					<p>
 					Whether the content is actually removed from the cache (to preserve memory) after the given time has elapsed is
-					dependend on the actual cache implementation that is used. The default cache implementation will 
+					dependend on the actual cache implementation that is used. The default cache implementation will
 					<strong>NOT</strong> do this automatically, but will instead remove it only when the cache item is being accessed
 					again.
 					<p>
@@ -2240,14 +2356,14 @@
 					<p>
 					Via this switch, the full response is buffered if the cache doesn't contain content for this component and special
 					markers are inserted surrounding the children's rendering. Afterwards, the content between the markers (if any) is
-					extracted and inserted into the cache. Note that the full response is only buffered incase there's no value the cache. 
+					extracted and inserted into the cache. Note that the full response is only buffered incase there's no value the cache.
 					For all other requests this buffering will not happen.
 					<p>
 					Since this is clearly a more resource intensive and invasive method to grab content, it's not enabled by default.
 					In addition to setting this attribute to <code>true</code>, the <code>org.omnifaces.servlet.BufferedHttpServletResponse</code>
 					Servlet Filter needs to be configured to filter the Faces Servlet (or alternatively just the pages for which the buffering
-					method should be used). 
-				
+					method should be used).
+
 				 ]]>
             </description>
 			<name>useBuffer</name>
@@ -2255,7 +2371,7 @@
 			<type>java.lang.Boolean</type>
 		</attribute>
 	</tag>
-	
+
 	<tag>
 		<description>
 			<![CDATA[
@@ -2296,7 +2412,7 @@
 			<type>java.lang.String</type>
 		</attribute>
 	</tag>
-    
+
 	<tag>
 		<description>
 			<![CDATA[
@@ -2356,11 +2472,11 @@ public enum Baz {
 			<type>java.lang.String</type>
 		</attribute>
 	</tag>
-	
+
 	<tag>
 		<description>
 			<![CDATA[
-				The <code>&lt;o:ignoreValidationFailed&gt;</code> allows the developer to ignore validation failures when 
+				The <code>&lt;o:ignoreValidationFailed&gt;</code> allows the developer to ignore validation failures when
 				executing an <code>UICommand</code> action. This taghandler must be placed inside an <code>UICommand</code> component and the
 				parent <code>UIForm</code> must be an <code>&lt;o:form&gt;</code>.
 				<p>
