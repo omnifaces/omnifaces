@@ -53,6 +53,7 @@ public interface TreeModel<T> extends Iterable<TreeModel<T>>, Serializable {
 
 	/**
 	 * Removes the current tree node from its parent, if any. It returns the parent to ease further building.
+	 * @return The parent tree node of the current tree node.
 	 */
 	TreeModel<T> remove();
 
@@ -60,13 +61,13 @@ public interface TreeModel<T> extends Iterable<TreeModel<T>>, Serializable {
 
 	/**
 	 * Returns the wrapped data of the current tree node.
-	 * @return the wrapped data of the current tree node.
+	 * @return The wrapped data of the current tree node.
 	 */
 	T getData();
 
 	/**
 	 * Returns the parent tree node of the current tree node.
-	 * @return the parent tree node of the current tree node.
+	 * @return The parent tree node of the current tree node.
 	 */
 	TreeModel<T> getParent();
 

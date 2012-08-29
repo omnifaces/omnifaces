@@ -17,7 +17,7 @@ OmniFaces.Ajax = function() {
 			runOnceOnSuccessCallbacks = [];
 		}
 	};
-	
+
 	return {
 
 		/**
