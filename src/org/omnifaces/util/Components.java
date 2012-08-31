@@ -270,8 +270,8 @@ public final class Components {
 	 * the client ID.
 	 */
 	public static String getLabel(UIComponent input) {
-		Object label = getOptionalLabel(input);
-		return (label != null) ? label.toString() : input.getClientId();
+		String label = getOptionalLabel(input);
+		return (label != null) ? label : input.getClientId();
 	}
 
 	/**
@@ -281,16 +281,18 @@ public final class Components {
 	 * @return The value of the <code>label</code> attribute associated with the given UI component if any, else
 	 * null.
 	 */
-	public static Object getOptionalLabel(UIComponent input) {
+	public static String getOptionalLabel(UIComponent input) {
 		Object label = input.getAttributes().get("label");
-		if (label == null || (label instanceof String && ((String) label).length() == 0)) {
+
+		if (Utils.isEmpty(label)) {
 			ValueExpression labelExpression = input.getValueExpression("label");
+
 			if (labelExpression != null) {
 				label = labelExpression.getValue(FacesContext.getCurrentInstance().getELContext());
 			}
 		}
 
-		return label;
+		return (label != null) ? label.toString() : null;
 	}
 
 	/**
@@ -300,10 +302,29 @@ public final class Components {
 	 * object value -if applicable- when conversion/validation has been taken place for the given component.
 	 * @param component The editable value holder component to obtain the value for.
 	 * @return The value of the given editable value holder component.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 */
-	public static Object getValue(EditableValueHolder component) {
+	@SuppressWarnings("unchecked")
+	public static <T> T getValue(EditableValueHolder component) {
 		Object submittedValue = component.getSubmittedValue();
-		return (submittedValue != null) ? submittedValue : component.getLocalValue();
+		return (T) ((submittedValue != null) ? submittedValue : component.getLocalValue());
+	}
+
+	/**
+	 * Returns the value of the given input component whereby any unconverted submitted string value will immediately
+	 * be converted/validated as this method is called. This method thus always returns the converted/validated value.
+	 * @param component The editable value holder component to obtain the converted/validated value for.
+	 * @return The converted/validated value of the given editable value holder component.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @since 1.2
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getImmediateValue(UIInput input) {
+		if (input.isValid() && input.getSubmittedValue() != null) {
+			input.validate(FacesContext.getCurrentInstance());
+		}
+
+		return input.isLocalValueSet() ? (T) input.getValue() : null;
 	}
 
 	/**
@@ -313,8 +334,7 @@ public final class Components {
 	 * <code>false</code>.
 	 */
 	public static boolean hasSubmittedValue(EditableValueHolder component) {
-		Object submittedValue = component.getSubmittedValue();
-		return (submittedValue != null && !String.valueOf(submittedValue).isEmpty());
+		return !Utils.isEmpty(component.getSubmittedValue());
 	}
 
 	// Validation -----------------------------------------------------------------------------------------------------

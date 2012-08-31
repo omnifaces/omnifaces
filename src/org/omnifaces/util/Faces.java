@@ -417,6 +417,16 @@ public final class Faces {
 	}
 
 	/**
+	 * Set the locale of the current view, which is to be used in localizing the response being created.
+	 * @param The locale of the current view.
+	 * @see UIViewRoot#setLocale(Locale)
+	 * @since 1.2
+	 */
+	public static void setLocale(Locale locale) {
+		getViewRoot().setLocale(locale);
+	}
+
+	/**
 	 * Perform the JSF navigation to the given outcome.
 	 * @param outcome The navigation outcome.
 	 * @see Application#getNavigationHandler()
@@ -1136,6 +1146,27 @@ public final class Faces {
 	 */
 	public static Set<String> getResourcePaths(String path) {
 		return getExternalContext().getResourcePaths(path);
+	}
+
+	/**
+	 * Returns the absolute disk file system path representation of the given web content path. This thus converts the
+	 * given path of a web content resource (e.g. <code>/index.xhtml</code>) to an absolute disk file system path (e.g.
+	 * <code>/path/to/server/work/folder/some.war/index.xhtml</code>) which can then be used in {@link File},
+	 * {@link FileInputStream}, etc.
+	 * <p>
+	 * Note that this will return <code>null</code> when the WAR is not expanded into the disk file system, but instead
+	 * into memory. If all you want is just an {@link InputStream} of the web content resource, then better use
+	 * {@link #getResourceAsStream(String)} instead.
+	 * <p>
+	 * Also note that it wouldn't make sense to modify or create files in this location, as those changes would get lost
+	 * anyway when the WAR is redeployed or even when the server is restarted. This is thus absolutely not a good
+	 * location to store for example uploaded files.
+	 * @param webContentPath The web content path to be converted to an absolute disk file system path.
+	 * @return The absolute disk file system path representation of the given web content path.
+	 * @since 1.2
+	 */
+	public static String getRealPath(String webContentPath) {
+		return getExternalContext().getRealPath(webContentPath);
 	}
 
 	// Request scope --------------------------------------------------------------------------------------------------
