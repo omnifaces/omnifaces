@@ -230,28 +230,28 @@ public final class Strings {
 	}
 
 	/**
-	 * @see #format1(String, String)
+	 * @see #format1(String, Object)
 	 */
 	public static String format2(String pattern, Object param1, Object param2) {
 		return format(pattern, param1, param2);
 	}
 
 	/**
-	 * @see #format1(String, String)
+	 * @see #format1(String, Object)
 	 */
 	public static String format3(String pattern, Object param1, Object param2, Object param3) {
 		return format(pattern, param1, param2, param3);
 	}
 
 	/**
-	 * @see #format1(String, String)
+	 * @see #format1(String, Object)
 	 */
 	public static String format4(String pattern, Object param1, Object param2, Object param3, Object param4) {
 		return format(pattern, param1, param2, param3, param4);
 	}
 
 	/**
-	 * @see #format1(String, String)
+	 * @see #format1(String, Object)
 	 */
 	public static String format5
 		(String pattern, Object param1, Object param2, Object param3, Object param4, Object param5)

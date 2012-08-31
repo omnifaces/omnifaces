@@ -313,8 +313,8 @@ public final class Components {
 	/**
 	 * Returns the value of the given input component whereby any unconverted submitted string value will immediately
 	 * be converted/validated as this method is called. This method thus always returns the converted/validated value.
-	 * @param component The editable value holder component to obtain the converted/validated value for.
-	 * @return The converted/validated value of the given editable value holder component.
+	 * @param input The input component to obtain the converted/validated value for.
+	 * @return The converted/validated value of the given input component.
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @since 1.2
 	 */

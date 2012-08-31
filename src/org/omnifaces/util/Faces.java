@@ -76,6 +76,7 @@ public final class Faces {
 	private static final int DEFAULT_SENDFILE_BUFFER_SIZE = 10240;
 
 	private static final String ERROR_UNSUPPORTED_ENCODING = "UTF-8 is apparently not supported on this machine.";
+	private static final String ERROR_NO_VIEW = "There is no UIViewRoot.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -417,13 +418,21 @@ public final class Faces {
 	}
 
 	/**
-	 * Set the locale of the current view, which is to be used in localizing the response being created.
-	 * @param The locale of the current view.
+	 * Set the locale of the current view, which is to be used in localizing of the response.
+	 * @param locale The locale of the current view.
+	 * @throws IllegalStateException When there is no view (i.e. when it is <code>null</code>). This can happen if the
+	 * method is called at the wrong moment in the JSF lifecycle, e.g. before the view has been restored/created.
 	 * @see UIViewRoot#setLocale(Locale)
 	 * @since 1.2
 	 */
 	public static void setLocale(Locale locale) {
-		getViewRoot().setLocale(locale);
+		UIViewRoot viewRoot = getViewRoot();
+
+		if (viewRoot == null) {
+			throw new IllegalStateException(ERROR_NO_VIEW);
+		}
+
+		viewRoot.setLocale(locale);
 	}
 
 	/**
