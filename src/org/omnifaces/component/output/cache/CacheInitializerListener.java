@@ -25,7 +25,7 @@ import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRegistration;
 import javax.servlet.annotation.WebListener;
 
-import org.omnifaces.servlet.OnDemandResponseBufferFilter;
+import org.omnifaces.filter.OnDemandResponseBufferFilter;
 
 /**
  * Optional initializer for the {@link Cache} used by the Omnifaces Cache component.

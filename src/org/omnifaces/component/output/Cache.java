@@ -19,7 +19,7 @@ import static org.omnifaces.component.output.Cache.PropertyKeys.key;
 import static org.omnifaces.component.output.Cache.PropertyKeys.scope;
 import static org.omnifaces.component.output.Cache.PropertyKeys.time;
 import static org.omnifaces.component.output.Cache.PropertyKeys.useBuffer;
-import static org.omnifaces.servlet.OnDemandResponseBufferFilter.BUFFERED_RESPONSE;
+import static org.omnifaces.filter.OnDemandResponseBufferFilter.*;
 import static org.omnifaces.util.Events.setCallBackAfterPhaseListener;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
 
@@ -36,8 +36,8 @@ import javax.faces.event.SystemEvent;
 
 import org.omnifaces.component.output.cache.CacheFactory;
 import org.omnifaces.component.output.cache.CacheInitializerListener;
+import org.omnifaces.filter.OnDemandResponseBufferFilter;
 import org.omnifaces.servlet.BufferedHttpServletResponse;
-import org.omnifaces.servlet.OnDemandResponseBufferFilter;
 import org.omnifaces.util.Callback;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.State;
