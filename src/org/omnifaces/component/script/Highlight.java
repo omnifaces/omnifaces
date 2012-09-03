@@ -82,7 +82,7 @@ public class Highlight extends OnloadScript {
 	private static final Set<VisitHint> VISIT_HINTS = EnumSet.of(VisitHint.SKIP_UNRENDERED);
 	private static final String DEFAULT_STYLECLASS = "error";
 	private static final Boolean DEFAULT_FOCUS = Boolean.TRUE;
-	private static final String SCRIPT = "OmniFaces.Highlight.addErrorClass(%s, '[%s]', %s);";
+	private static final String SCRIPT = "OmniFaces.Highlight.addErrorClass([%s], '%s', %s);";
 
 	private enum PropertyKeys {
 		// Cannot be uppercased. They have to exactly match the attribute names.
