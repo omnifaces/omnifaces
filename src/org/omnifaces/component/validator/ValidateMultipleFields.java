@@ -174,11 +174,11 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 				ERROR_MISSING_COMPONENTS, getClass().getSimpleName()));
 		}
 
-		UIForm form = Components.getClosestParent(this, UIForm.class);
+		UIComponent namingContainerParent = getNamingContainer();
 		List<UIInput> inputs = new ArrayList<UIInput>();
 
 		for (String clientId : components.split("\\s+")) {
-			UIComponent found = form.findComponent(clientId);
+			UIComponent found = namingContainerParent.findComponent(clientId);
 
 			if (found == null) {
 				throw new IllegalArgumentException(String.format(
