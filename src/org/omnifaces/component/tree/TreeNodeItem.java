@@ -75,7 +75,7 @@ public class TreeNodeItem extends TreeFamily {
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" }) // For TreeModel. We don't care about its actual type anyway.
 	protected void process(final FacesContext context, final PhaseId phaseId) {
-		if (!isRendered() || getChildCount() == 0) {
+		if (getChildCount() == 0) {
 			return;
 		}
 
@@ -85,7 +85,10 @@ public class TreeNodeItem extends TreeFamily {
 			public Void invoke(Tree tree) {
 				for (TreeModel childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
 					tree.setCurrentModelNode(context, childModelNode);
-					processSuper(context, phaseId);
+
+					if (isRendered()) {
+						processSuper(context, phaseId);
+					}
 				}
 
 				return null;
