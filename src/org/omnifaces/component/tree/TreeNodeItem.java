@@ -12,6 +12,8 @@
  */
 package org.omnifaces.component.tree;
 
+import java.io.IOException;
+
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponent;
 import javax.faces.component.visit.VisitCallback;
@@ -66,6 +68,15 @@ public class TreeNodeItem extends TreeFamily {
 	}
 
 	/**
+	 * Suppress default behavior of {@link #encodeAll(FacesContext)} (which also checks {@link #isRendered()}) by
+	 * delegating directly to {@link #encodeChildren(FacesContext)}.
+	 */
+	@Override
+	public void encodeAll(FacesContext context) throws IOException {
+		encodeChildren(context);
+	}
+
+	/**
 	 * Loop over children of the current model node, set the child as the current model node and continue processing
 	 * this component according to the rules of the given phase ID.
 	 * @param context The faces context to work with.
@@ -83,11 +94,13 @@ public class TreeNodeItem extends TreeFamily {
 
 			@Override
 			public Void invoke(Tree tree) {
-				for (TreeModel childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
-					tree.setCurrentModelNode(context, childModelNode);
+				if (tree.getCurrentModelNode() != null) {
+					for (TreeModel childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
+						tree.setCurrentModelNode(context, childModelNode);
 
-					if (isRendered()) {
-						processSuper(context, phaseId);
+						if (isRendered()) {
+							processSuper(context, phaseId);
+						}
 					}
 				}
 
@@ -114,11 +127,13 @@ public class TreeNodeItem extends TreeFamily {
 
 			@Override
 			public Boolean invoke(Tree tree) {
-				for (TreeModel childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
-					tree.setCurrentModelNode(context.getFacesContext(), childModelNode);
+				if (tree.getCurrentModelNode() != null) {
+					for (TreeModel childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
+						tree.setCurrentModelNode(context.getFacesContext(), childModelNode);
 
-					if (TreeNodeItem.super.visitTree(context, callback)) {
-						return true;
+						if (TreeNodeItem.super.visitTree(context, callback)) {
+							return true;
+						}
 					}
 				}
 
