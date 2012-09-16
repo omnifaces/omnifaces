@@ -20,7 +20,7 @@ import static org.omnifaces.component.output.Cache.PropertyKeys.scope;
 import static org.omnifaces.component.output.Cache.PropertyKeys.time;
 import static org.omnifaces.component.output.Cache.PropertyKeys.useBuffer;
 import static org.omnifaces.filter.OnDemandResponseBufferFilter.*;
-import static org.omnifaces.util.Events.setCallBackAfterPhaseListener;
+import static org.omnifaces.util.Events.setCallbackAfterPhaseListener;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
 
 import java.io.IOException;
@@ -94,7 +94,7 @@ public class Cache extends OutputFamily {
 					
 					// After the RENDER_RESPONSE phase, copy the area we need to cache from the response buffer
 					// and insert it into our cache
-					setCallBackAfterPhaseListener(RENDER_RESPONSE, new Callback.Void() {
+					setCallbackAfterPhaseListener(RENDER_RESPONSE, new Callback.Void() {
 						
 						@Override
 						public void invoke() {
