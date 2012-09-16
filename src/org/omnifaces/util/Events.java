@@ -19,7 +19,7 @@ import javax.faces.event.PhaseListener;
 import javax.faces.event.SystemEvent;
 import javax.faces.event.SystemEventListener;
 
-import org.omnifaces.eventlistener.CallBackPhaseListener;
+import org.omnifaces.eventlistener.CalllbackPhaseListener;
 import org.omnifaces.eventlistener.DefaultPhaseListener;
 import org.omnifaces.eventlistener.DefaultViewEventListener;
 
@@ -53,7 +53,7 @@ public final class Events {
 	public static void removePhaseListener(PhaseListener phaseListener) {
 		Faces.getViewRoot().removePhaseListener(phaseListener);
 	}
-	
+
 	/**
 	 * Sets phase listener for callback by a global phase listener during the current request.
 	 * <p>
@@ -66,22 +66,22 @@ public final class Events {
 	 * this can be difficult due to the fact iterators over listeners are kept 'open' during each phase).
 	 * <p>
 	 * Note: at the moment only 1 callback phase listener per request can be set.
-	 * 
+	 *
 	 * @param phaseListener The phase listener to be set for callback during the current request.
 	 * @since 1.2
 	 */
-	public static void setCallBackPhaseListener(PhaseListener phaseListener) {
-		Faces.setRequestAttribute(CallBackPhaseListener.CALL_BACK_PHASE_LISTENER, phaseListener);
+	public static void setCallbackPhaseListener(PhaseListener phaseListener) {
+		Faces.setRequestAttribute(CalllbackPhaseListener.CALLBACK_PHASE_LISTENER, phaseListener);
 	}
-	
+
 	/**
 	 * Removes the one and only phase listener from callbacks by the global phase listener for the current request.
 	 * @since 1.2
 	 */
-	public static void removeCallBackPhaseListener() {
-		Faces.removeRequestAttribute(CallBackPhaseListener.CALL_BACK_PHASE_LISTENER);
+	public static void removeCallbackPhaseListener() {
+		Faces.removeRequestAttribute(CalllbackPhaseListener.CALLBACK_PHASE_LISTENER);
 	}
-	
+
 
 	/**
 	 * Adds a phase listener to the current view that invokes the given callback every time before given phase ID.
@@ -100,29 +100,29 @@ public final class Events {
 	public static void addAfterPhaseListener(PhaseId phaseId, final Callback.Void callback) {
 		addPhaseListener(createAfterPhaseListener(phaseId, callback));
 	}
-	
+
 	/**
-	 * Sets a phase listener for callback by a global phase listener during the current request that invokes the 
+	 * Sets a phase listener for callback by a global phase listener during the current request that invokes the
 	 * given callback every time before given phase ID.
 	 * @param phaseId The phase ID to invoke the given callback every time before.
 	 * @param callback The callback to be invoked every time before the given phase ID of the current request.
 	 * @since 1.2
 	 */
 	public static void setCallBackBeforePhaseListener(PhaseId phaseId, final Callback.Void callback) {
-		setCallBackPhaseListener(createBeforePhaseListener(phaseId, callback));
+		setCallbackPhaseListener(createBeforePhaseListener(phaseId, callback));
 	}
-	
+
 	/**
-	 * Sets a phase listener for callback by a global phase listener during the current request that invokes the 
+	 * Sets a phase listener for callback by a global phase listener during the current request that invokes the
 	 * given callback every time after given phase ID.
 	 * @param phaseId The phase ID to invoke the given callback every time after.
 	 * @param callback The callback to be invoked every time after the given phase ID of the current request.
 	 * @since 1.2
 	 */
-	public static void setCallBackAfterPhaseListener(PhaseId phaseId, final Callback.Void callback) {
-		setCallBackPhaseListener(createAfterPhaseListener(phaseId, callback));
+	public static void setCallbackAfterPhaseListener(PhaseId phaseId, final Callback.Void callback) {
+		setCallbackPhaseListener(createAfterPhaseListener(phaseId, callback));
 	}
-	
+
 	/**
 	 * Creates a phase listener that invokes the given callback every time before the given phase.
 	 * @param phaseId The phase ID to invoke the given callback every time before.
@@ -141,7 +141,7 @@ public final class Events {
 			}
 		};
 	}
-	
+
 	/**
 	 * Creates a phase listener that invokes the given callback every time after the given phase.
 	 * @param phaseId The phase ID to invoke the given callback every time after.
@@ -171,7 +171,7 @@ public final class Events {
 	public static void subscribeToEvent(Class<? extends SystemEvent> type, SystemEventListener listener) {
 		Faces.getApplication().subscribeToEvent(type, listener);
 	}
-	
+
 	/**
 	 * Install the listener instance referenced by argument listener into the UIViewRoot as a listener for events of type systemEventClass.
 	 * @param type The system event type to listen on.
@@ -181,7 +181,7 @@ public final class Events {
 	public static void subscribeToViewEvent(Class<? extends SystemEvent> type, SystemEventListener listener) {
 		Faces.getViewRoot().subscribeToViewEvent(type, listener);
 	}
-	
+
 	/**
 	 * Install the callback instance referenced by argument listener into the UIViewRoot as a listener for events of type systemEventClass.
 	 * @param type The system event type to listen on.

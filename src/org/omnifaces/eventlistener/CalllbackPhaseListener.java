@@ -12,7 +12,7 @@
  */
 package org.omnifaces.eventlistener;
 
-import static javax.faces.event.PhaseId.ANY_PHASE;
+import static javax.faces.event.PhaseId.*;
 
 import javax.faces.event.PhaseEvent;
 import javax.faces.event.PhaseId;
@@ -32,24 +32,24 @@ import org.omnifaces.util.Faces;
  * attached to the view root will come back after each postback and have to be remove manually (in Mojarra this can be difficult due to the fact
  * iterators over listeners are kept 'open' during each phase).
  * <p>
- * See {@link Events#setCallBackPhaseListener(PhaseListener)}
- * 
+ * See {@link Events#setCallbackPhaseListener(PhaseListener)}
+ *
  * @author Arjan Tijms
  * @since 1.2
- * 
+ *
  */
-public class CallBackPhaseListener implements PhaseListener {
+public class CalllbackPhaseListener implements PhaseListener {
 
 	private static final long serialVersionUID = -4574664722715466481L;
 
-	public static final String CALL_BACK_PHASE_LISTENER = "org.omnifaces.eventlistener.CALL_BACK_PHASE_LISTENER";
+	public static final String CALLBACK_PHASE_LISTENER = "org.omnifaces.eventlistener.CALLBACK_PHASE_LISTENER";
 
-	public static void setCallBackPhaseListener(PhaseListener callBackPhaseListener) {
-		Faces.setRequestAttribute(CALL_BACK_PHASE_LISTENER, callBackPhaseListener);
+	public static void setCallbackPhaseListener(PhaseListener callbackPhaseListener) {
+		Faces.setRequestAttribute(CALLBACK_PHASE_LISTENER, callbackPhaseListener);
 	}
 
-	public static PhaseListener getCallBackPhaseListener() {
-		return Faces.<PhaseListener> getRequestAttribute(CALL_BACK_PHASE_LISTENER); // (Explicit generic because of JDK 6 bug)
+	public static PhaseListener getCallbackPhaseListener() {
+		return Faces.<PhaseListener>getRequestAttribute(CALLBACK_PHASE_LISTENER); // (Explicit generic because of JDK 6 bug)
 	}
 
 	@Override
@@ -59,17 +59,17 @@ public class CallBackPhaseListener implements PhaseListener {
 
 	@Override
 	public void beforePhase(final PhaseEvent event) {
-		PhaseListener callBackPhaseListener = getCallBackPhaseListener();
-		if (callBackPhaseListener != null && isPhaseMatch(event, callBackPhaseListener.getPhaseId())) {
-			callBackPhaseListener.beforePhase(event);
+		PhaseListener callbackPhaseListener = getCallbackPhaseListener();
+		if (callbackPhaseListener != null && isPhaseMatch(event, callbackPhaseListener.getPhaseId())) {
+			callbackPhaseListener.beforePhase(event);
 		}
 	}
 
 	@Override
 	public void afterPhase(PhaseEvent event) {
-		PhaseListener callBackPhaseListener = getCallBackPhaseListener();
-		if (callBackPhaseListener != null && isPhaseMatch(event, callBackPhaseListener.getPhaseId())) {
-			callBackPhaseListener.afterPhase(event);
+		PhaseListener callbackPhaseListener = getCallbackPhaseListener();
+		if (callbackPhaseListener != null && isPhaseMatch(event, callbackPhaseListener.getPhaseId())) {
+			callbackPhaseListener.afterPhase(event);
 		}
 	}
 
