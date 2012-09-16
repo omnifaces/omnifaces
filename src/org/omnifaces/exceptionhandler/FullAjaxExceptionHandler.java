@@ -12,6 +12,7 @@
  */
 package org.omnifaces.exceptionhandler;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
@@ -22,11 +23,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.faces.FacesException;
+import javax.faces.application.ViewHandler;
+import javax.faces.component.UIViewRoot;
 import javax.faces.context.ExceptionHandler;
 import javax.faces.context.ExceptionHandlerWrapper;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ExceptionQueuedEvent;
-import javax.faces.event.PhaseId;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -34,8 +36,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
-import org.omnifaces.util.Callback;
-import org.omnifaces.util.Events;
+import org.omnifaces.context.OmniPartialViewContext;
 import org.omnifaces.util.Exceptions;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.Utils;
@@ -175,22 +176,34 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 				request.setAttribute(ATTRIBUTE_ERROR_REQUEST_URI, request.getRequestURI());
 				request.setAttribute(ATTRIBUTE_ERROR_STATUS_CODE, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
+				// If the exception was thrown in midst of rendering the JSF response, then reset response.
+				if (context.getRenderResponse()) {
+					context.getExternalContext().responseReset();
+					OmniPartialViewContext.getCurrentInstance().resetPartialResponse();
+				}
+
 				// Force JSF to render the error page in its entirety to the ajax response.
-				String viewId = Faces.normalizeViewId(errorPageLocation);
-				context.setViewRoot(context.getApplication().getViewHandler().createView(context, viewId));
-				context.getPartialViewContext().setRenderAll(true);
-				context.renderResponse();
-
-				// Prevent some servlet containers from handling the error page itself afterwards. So far Tomcat/JBoss
-				// are known to do that. It would only result in IllegalStateException "response already committed".
-				Events.addAfterPhaseListener(PhaseId.RENDER_RESPONSE, new Callback.Void() {
-					@Override
-					public void invoke() {
-						request.removeAttribute(ATTRIBUTE_ERROR_EXCEPTION);
-					}
-				});
-
 				// Note that we cannot set response status code to 500, the JSF ajax response won't be processed then.
+				String viewId = Faces.normalizeViewId(errorPageLocation);
+				ViewHandler viewHandler = context.getApplication().getViewHandler();
+				UIViewRoot viewRoot = viewHandler.createView(context, viewId);
+				context.setViewRoot(viewRoot);
+				context.getPartialViewContext().setRenderAll(true);
+
+	            try {
+	            	viewHandler.getViewDeclarationLanguage(context, viewId).renderView(context, viewRoot);
+	            }
+	            catch (IOException e) {
+	            	throw new FacesException(e);
+	            }
+	            finally {
+					// Prevent some servlet containers from handling error page itself afterwards. So far Tomcat/JBoss
+					// are known to do that. It would only result in IllegalStateException "response already committed".
+					request.removeAttribute(ATTRIBUTE_ERROR_EXCEPTION);
+	            }
+
+	            // Inform JSF that we've completed the response ourselves.
+				context.responseComplete();
 			}
 
 			while (unhandledExceptionQueuedEvents.hasNext()) {
@@ -223,8 +236,9 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	private String findErrorPageLocation(Throwable exception) {
 		if (errorPageLocations == null) {
 			// #6: Due to a MyFaces issue, it isn't possible to perform this task in FullAjaxExceptionHandlerFactory on
-			// webapp's startup which would be more ideal.
+			// webapp's startup which would be more ideal. The FacesContext#getCurrentInstance() returns null.
 			// http://code.google.com/p/omnifaces/source/detail?r=c7899e317a95a92325bdac4ab707bfca22958d07
+			// TODO: Revert this once MyFaces has reached a version wherein this issue is fixed for long.
 			errorPageLocations = findErrorPageLocations();
 		}
 

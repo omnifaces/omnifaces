@@ -22,6 +22,10 @@
 		<phase-listener>org.omnifaces.eventlistener.CallbackPhaseListener</phase-listener>
 	</lifecycle>
 
+	<factory>
+		<partial-view-context-factory>org.omnifaces.context.OmniPartialViewContextFactory</partial-view-context-factory>
+	</factory>
+
 	<managed-bean>
 		<description>
 			<![CDATA[
