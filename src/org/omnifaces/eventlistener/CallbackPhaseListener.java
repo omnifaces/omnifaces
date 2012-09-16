@@ -38,7 +38,7 @@ import org.omnifaces.util.Faces;
  * @since 1.2
  *
  */
-public class CalllbackPhaseListener implements PhaseListener {
+public class CallbackPhaseListener implements PhaseListener {
 
 	private static final long serialVersionUID = -4574664722715466481L;
 

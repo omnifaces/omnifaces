@@ -19,7 +19,7 @@ import javax.faces.event.PhaseListener;
 import javax.faces.event.SystemEvent;
 import javax.faces.event.SystemEventListener;
 
-import org.omnifaces.eventlistener.CalllbackPhaseListener;
+import org.omnifaces.eventlistener.CallbackPhaseListener;
 import org.omnifaces.eventlistener.DefaultPhaseListener;
 import org.omnifaces.eventlistener.DefaultViewEventListener;
 
@@ -71,7 +71,7 @@ public final class Events {
 	 * @since 1.2
 	 */
 	public static void setCallbackPhaseListener(PhaseListener phaseListener) {
-		Faces.setRequestAttribute(CalllbackPhaseListener.CALLBACK_PHASE_LISTENER, phaseListener);
+		Faces.setRequestAttribute(CallbackPhaseListener.CALLBACK_PHASE_LISTENER, phaseListener);
 	}
 
 	/**
@@ -79,7 +79,7 @@ public final class Events {
 	 * @since 1.2
 	 */
 	public static void removeCallbackPhaseListener() {
-		Faces.removeRequestAttribute(CalllbackPhaseListener.CALLBACK_PHASE_LISTENER);
+		Faces.removeRequestAttribute(CallbackPhaseListener.CALLBACK_PHASE_LISTENER);
 	}
 
 
