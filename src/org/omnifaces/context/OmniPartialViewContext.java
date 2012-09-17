@@ -185,7 +185,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 			// Variables ----------------------------------------------------------------------------------------------
 
 			private ResponseWriter wrapped;
-			private ResponseWriter cloned;
+			private ResponseWriter writer;
 			private StringWriter buffer;
 
 			// Constructors -------------------------------------------------------------------------------------------
@@ -198,7 +198,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 			// Actions ------------------------------------------------------------------------------------------------
 
 			public void reset() {
-				cloned = null;
+				writer = null;
 			}
 
 			@Override
@@ -210,12 +210,12 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
 			@Override
 			public ResponseWriter getWrapped() {
-				if (cloned == null) {
+				if (writer == null) {
 					buffer = new StringWriter();
-					cloned = wrapped.cloneWithWriter(buffer);
+					writer = wrapped.cloneWithWriter(buffer);
 				}
 
-				return cloned;
+				return writer;
 			}
 
 		}

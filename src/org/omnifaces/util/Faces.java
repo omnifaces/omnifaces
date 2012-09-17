@@ -307,7 +307,8 @@ public final class Faces {
 	 * Normalize the given path as a valid view ID based on the current mapping, if necessary.
 	 * <ul>
 	 * <li>If the current mapping is a prefix mapping and the given path starts with it, then remove it.
-	 * <li>If the current mapping is a suffix mapping and the given path does not end with it, then replace it.
+	 * <li>If the current mapping is a suffix mapping and the given path ends with it, then replace it with the default
+	 * Facelets suffix.
 	 * </ul>
 	 * @param path The path to be normalized as a valid view ID based on the current mapping.
 	 * @return The path as a valid view ID.
@@ -322,8 +323,9 @@ public final class Faces {
 				return path.substring(mapping.length());
 			}
 		}
-		else if (!path.endsWith(mapping)) {
-			return path.substring(0, path.lastIndexOf('.')) + mapping;
+		else if (path.endsWith(mapping)) {
+			return path.substring(0, path.lastIndexOf('.')) + Utils.coalesce(
+				getInitParameter(ViewHandler.FACELETS_SUFFIX_PARAM_NAME), ViewHandler.DEFAULT_FACELETS_SUFFIX);
 		}
 
 		return path;
@@ -1128,7 +1130,8 @@ public final class Faces {
 	 * <code>&lt;context-param&gt;</code> in <code>web.xml</code> associated with the given
 	 * <code>&lt;param-name&gt;</code>.
 	 * @param name The application initialization parameter name.
-	 * @return The application initialization parameter value associated with the given name.
+	 * @return The application initialization parameter value associated with the given name, or <code>null</code> if
+	 * there is none.
 	 * @see ExternalContext#getInitParameter(String)
 	 * @since 1.1
 	 */

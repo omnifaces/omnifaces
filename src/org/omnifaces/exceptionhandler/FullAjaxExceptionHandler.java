@@ -176,9 +176,8 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 				request.setAttribute(ATTRIBUTE_ERROR_REQUEST_URI, request.getRequestURI());
 				request.setAttribute(ATTRIBUTE_ERROR_STATUS_CODE, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
-				// If the exception was thrown in midst of rendering the JSF response, then reset response.
+				// If the exception was thrown in midst of rendering the JSF response, then reset partial response.
 				if (context.getRenderResponse()) {
-					context.getExternalContext().responseReset();
 					OmniPartialViewContext.getCurrentInstance().resetPartialResponse();
 				}
 
