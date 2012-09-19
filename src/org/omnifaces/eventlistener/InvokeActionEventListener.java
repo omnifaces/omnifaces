@@ -38,7 +38,8 @@ import org.omnifaces.util.Utils;
  * properly published.
  * <p>
  * This phase listener is already registered by OmniFaces' own <tt>faces-config.xml</tt> and thus gets auto-initialized
- * when the OmniFaces JAR is bundled in a webapp, so end-users do not need to register this phase listener explicitly themselves.
+ * when the OmniFaces JAR is bundled in a webapp, so end-users do not need to register this phase listener explicitly
+ * themselves.
  *
  * @author Bauke Scholtz
  * @see PreInvokeActionEvent
