@@ -20,6 +20,7 @@ import java.util.List;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
+import javax.faces.component.UISelectBoolean;
 import javax.faces.context.FacesContext;
 
 import org.omnifaces.util.Components;
@@ -214,7 +215,13 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 		List<Object> values = new ArrayList<Object>(inputs.size());
 
 		for (UIInput input : inputs) {
-			values.add(Components.getValue(input));
+			Object value = Components.getValue(input);
+
+			if (input instanceof UISelectBoolean && Boolean.FALSE.equals(value)) {
+				value = null;
+			}
+
+			values.add(value);
 		}
 
 		return values;
