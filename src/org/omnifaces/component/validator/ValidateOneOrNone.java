@@ -21,40 +21,40 @@ import javax.faces.context.FacesContext;
 import org.omnifaces.util.Utils;
 
 /**
- * <strong>ValidateOneNotMore</strong> validates if only ONE of the given <code>UIInput</code> components has been
- * filled out. The default message is
- * <blockquote>{0}: Please fill out only one of those fields</blockquote>
+ * <strong>ValidateOneOrNone</strong> validates if ONLY ONE of the given <code>UIInput</code> components have been
+ * filled out or that NONE of the given <code>UIInput</code> components have been filled out. The default message is
+ * <blockquote>{0}: Please fill out only one or none of those fields</blockquote>
  * <p>
  * For general usage instructions, refer {@link ValidateMultipleFields} documentation.
  *
  * @author Bauke Scholtz
  * @since 1.2
  */
-@FacesComponent(ValidateOneNotMore.COMPONENT_TYPE)
-public class ValidateOneNotMore extends ValidateMultipleFields {
+@FacesComponent(ValidateOneOrNone.COMPONENT_TYPE)
+public class ValidateOneOrNone extends ValidateMultipleFields {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
 	/** The standard component type. */
-	public static final String COMPONENT_TYPE = "org.omnifaces.component.validator.ValidateOneNotMore";
+	public static final String COMPONENT_TYPE = "org.omnifaces.component.validator.ValidateOneOrNone";
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
-	private static final String DEFAULT_MESSAGE = "{0}: Please fill out only one of those fields";
+	private static final String DEFAULT_MESSAGE = "{0}: Please fill out only one or none of those fields";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
 	 * The default constructor sets the default message.
 	 */
-	public ValidateOneNotMore() {
+	public ValidateOneOrNone() {
 		super(DEFAULT_MESSAGE);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Validate if at least one is filled out.
+	 * Validate if only one or none is filled out.
 	 */
 	@Override
 	protected boolean validateValues(FacesContext context, List<UIInput> inputs, List<Object> values) {
@@ -70,7 +70,7 @@ public class ValidateOneNotMore extends ValidateMultipleFields {
 			}
 		}
 
-		return hasValue;
+		return true;
 	}
 
 }
