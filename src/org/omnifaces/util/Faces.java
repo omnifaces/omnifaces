@@ -18,6 +18,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -751,7 +753,7 @@ public final class Faces {
 		return getRequest().getRemoteAddr();
 	}
 
-	// HTTP request ---------------------------------------------------------------------------------------------------
+	// HTTP response --------------------------------------------------------------------------------------------------
 
 	/**
 	 * Returns the HTTP servlet response.
@@ -764,6 +766,18 @@ public final class Faces {
 	 */
 	public static HttpServletResponse getResponse() {
 		return (HttpServletResponse) getExternalContext().getResponse();
+	}
+
+	/**
+	 * Returns the HTTP response buffer size. If Facelets is used and the <code>javax.faces.FACELETS_BUFFER_SIZE</code>
+	 * context parameter is been set, then it's the context parameter value which will be returned. Otherwise it
+	 * returns the implementation independent default value, which is 1024 in Mojarra.
+	 * @return The HTTP response buffer size.
+	 * @see ExternalContext#getResponseBufferSize()
+	 * @since 1.2
+	 */
+	public static int getResponseBufferSize() {
+		return getExternalContext().getResponseBufferSize();
 	}
 
 	/**
@@ -1155,6 +1169,19 @@ public final class Faces {
 		}
 
 		return mimeType;
+	}
+
+	/**
+	 * Returns a URL for an application resource mapped to the specified path, if it exists; otherwise, return
+	 * <code>null</code>.
+	 * @param path The application resource path to return an input stream for.
+	 * @return An input stream for an application resource mapped to the specified path.
+	 * @throws MalformedURLException
+	 * @see ExternalContext#getResource(String)
+	 * @since 1.2
+	 */
+	public static URL getResource(String path) throws MalformedURLException {
+		return getExternalContext().getResource(path);
 	}
 
 	/**

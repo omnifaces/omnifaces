@@ -21,6 +21,7 @@ import javax.faces.context.PartialViewContextFactory;
  *
  * @author Bauke Scholtz
  * @see OmniPartialViewContext
+ * @since 1.2
  */
 public class OmniPartialViewContextFactory extends PartialViewContextFactory {
 

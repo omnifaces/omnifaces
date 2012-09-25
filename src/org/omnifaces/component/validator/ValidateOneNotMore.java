@@ -28,6 +28,7 @@ import org.omnifaces.util.Utils;
  * For general usage instructions, refer {@link ValidateMultipleFields} documentation.
  *
  * @author Bauke Scholtz
+ * @since 1.2
  */
 @FacesComponent(ValidateOneNotMore.COMPONENT_TYPE)
 public class ValidateOneNotMore extends ValidateMultipleFields {

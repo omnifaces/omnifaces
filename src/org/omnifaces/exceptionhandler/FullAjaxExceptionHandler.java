@@ -13,14 +13,7 @@
 package org.omnifaces.exceptionhandler;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.net.URLConnection;
-import java.util.Enumeration;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.faces.FacesException;
 import javax.faces.application.ViewHandler;
@@ -31,18 +24,11 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ExceptionQueuedEvent;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathFactory;
 
 import org.omnifaces.context.OmniPartialViewContext;
 import org.omnifaces.util.Exceptions;
 import org.omnifaces.util.Faces;
-import org.omnifaces.util.Utils;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.omnifaces.util.WebXml;
 
 /**
  * This exception handler enables you to show the full error page in its entirety to the enduser in case of exceptions
@@ -96,9 +82,6 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
-	private static final String WEB_XML = "/WEB-INF/web.xml";
-	private static final String WEB_FRAGMENT_XML = "META-INF/web-fragment.xml";
-
 	private static final String ERROR_DEFAULT_LOCATION_MISSING =
 		"Either HTTP 500 or java.lang.Throwable error page is required in web.xml or web-fragment.xml."
 			+ " Neither was found.";
@@ -116,7 +99,6 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private ExceptionHandler wrapped;
-	private Map<Class<Throwable>, String> errorPageLocations;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -136,13 +118,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	 * <ul>
 	 *   <li>If the exception is an instance of {@link FacesException}, then unwrap its root cause as long as it is not
 	 *       an instance of {@link FacesException}.
-	 *   <li>Find the error page location as per Servlet specification 10.9.2:
-	 *     <ul>
-	 *       <li>Make a first pass through all specific exception types. If an exact match is found, use its location.
-	 *       <li>Else make a second pass through all specific exception types in the order as they are declared in
-	 *           web.xml. If the current exception is an instance of it, then use its location.
-	 *       <li>Else use the default error page location, which can be either the HTTP 500 or java.lang.Throwable one.
-	 *     </ul>
+	 *   <li>Find the error page location by {@link WebXml#findErrorPageLocation(Throwable)}.
 	 *   <li>Set the standard servlet error request attributes.
 	 *   <li>Force JSF to render the full error page in its entirety.
 	 * </ul>
@@ -162,8 +138,13 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 				// If the exception is wrapped in a FacesException, unwrap the root cause.
 				exception = Exceptions.unwrap(exception, FacesException.class);
 
-				// Find the error page location for the given exception as per Servlet specification 10.9.2.
-				String errorPageLocation = findErrorPageLocation(exception);
+				// Find the error page location for the given exception.
+				String errorPageLocation = WebXml.getInstance().findErrorPageLocation(exception);
+
+				// If there's no default error page location, well, it's then end of story.
+				if (errorPageLocation == null) {
+					throw new IllegalArgumentException(ERROR_DEFAULT_LOCATION_MISSING);
+				}
 
 				// Log the exception to server log like as in a normal synchronous HTTP 500 error page response.
 				context.getExternalContext().log(String.format(LOG_EXCEPTION_OCCURRED, errorPageLocation), exception);
@@ -219,161 +200,6 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	@Override
 	public ExceptionHandler getWrapped() {
 		return wrapped;
-	}
-
-	/**
-	 * Find for the given exception the right error page location as per Servlet specification 10.9.2:
-	 * <ul>
-	 *   <li>Make a first pass through all specific exception types. If an exact match is found, use its location.
-	 *   <li>Else make a second pass through all specific exception types in the order as they are declared in
-	 *       web.xml. If the current exception is an instance of it, then use its location.
-	 *   <li>Else use the default error page location, which can be either the HTTP 500 or java.lang.Throwable one.
-	 * </ul>
-	 * @param throwable The exception to find the error page location for.
-	 * @return The right error page location for the given exception.
-	 */
-	private String findErrorPageLocation(Throwable exception) {
-		if (errorPageLocations == null) {
-			// #6: Due to a MyFaces issue, it isn't possible to perform this task in FullAjaxExceptionHandlerFactory on
-			// webapp's startup which would be more ideal. The FacesContext#getCurrentInstance() returns null.
-			// http://code.google.com/p/omnifaces/source/detail?r=c7899e317a95a92325bdac4ab707bfca22958d07
-			// TODO: Revert this once MyFaces has reached a version wherein this issue is fixed for long.
-			errorPageLocations = findErrorPageLocations();
-		}
-
-		for (Entry<Class<Throwable>, String> entry : errorPageLocations.entrySet()) {
-			if (entry.getKey() == exception.getClass()) {
-				return entry.getValue();
-			}
-		}
-
-		for (Entry<Class<Throwable>, String> entry : errorPageLocations.entrySet()) {
-			if (entry.getKey() != null && entry.getKey().isInstance(exception)) {
-				return entry.getValue();
-			}
-		}
-
-		return errorPageLocations.get(null);
-	}
-
-	// Helpers --------------------------------------------------------------------------------------------------------
-
-	/**
-	 * Parse <tt>web.xml</tt> and <tt>web-fragment.xml</tt> files and find all error page locations.
-	 * @return An ordered map of all error page locations. The key <code>null</code> represents the default location.
-	 * @throws IllegalArgumentException When the default location is missing.
-	 */
-	private static Map<Class<Throwable>, String> findErrorPageLocations() {
-		Map<Class<Throwable>, String> errorPageLocations = new LinkedHashMap<Class<Throwable>, String>();
-
-		parseWebXmlAndFillErrorPageLocations(errorPageLocations);
-
-		if (Faces.getServletContext().getMajorVersion() >= 3) { // web-fragment.xml exist only since Servlet 3.0.
-			parseWebFragmentXmlAndFillErrorPageLocations(errorPageLocations);
-		}
-
-		if (!errorPageLocations.containsKey(null)) {
-			throw new IllegalArgumentException(ERROR_DEFAULT_LOCATION_MISSING);
-		}
-
-		return errorPageLocations;
-	}
-
-	/**
-	 * Parse the <tt>web.xml</tt> file found in the webapp and fill all error page locations in the given map.
-	 * @param errorPageLocations The error page locations map to be filled.
-	 */
-	private static void parseWebXmlAndFillErrorPageLocations(Map<Class<Throwable>, String> errorPageLocations) {
-		InputStream input = null;
-
-		try {
-			input = Faces.getResourceAsStream(WEB_XML);
-
-			if (input == null) {
-				return; // Since Servlet 3.0, web.xml is optional.
-			}
-
-			fillErrorPageLocations("web-app", input, errorPageLocations);
-		}
-		catch (Exception e) {
-			// This exception should never occur. If it occurs, then web.xml is broken anyway.
-			throw new RuntimeException(e);
-		}
-		finally {
-			Utils.close(input);
-		}
-	}
-
-	/**
-	 * Parse all <tt>web-fragment.xml</tt> files found in the runtime classpath and fill all error page locations in
-	 * the given map.
-	 * @param errorPageLocations The error page locations map to be filled.
-	 */
-	private static void parseWebFragmentXmlAndFillErrorPageLocations(Map<Class<Throwable>, String> errorPageLocations) {
-		Enumeration<URL> urls = null;
-
-		try {
-			urls = Thread.currentThread().getContextClassLoader().getResources(WEB_FRAGMENT_XML);
-		}
-		catch (Exception e) {
-			// This exception should never occur. If it occurs, then classpath is broken anyway.
-			throw new RuntimeException(e);
-		}
-
-		while (urls.hasMoreElements()) {
-			InputStream input = null;
-
-			try {
-				URLConnection connection = urls.nextElement().openConnection();
-				connection.setUseCaches(false);
-				input = connection.getInputStream();
-				fillErrorPageLocations("web-fragment", input, errorPageLocations);
-			}
-			catch (Exception e) {
-				// This exception should never occur. If it occurs, then web-fragment.xml is broken anyway.
-				throw new RuntimeException(e);
-			}
-			finally {
-				Utils.close(input);
-			}
-		}
-	}
-
-	/**
-	 * Perform the actual XML parsing starting with the given root element name on the given input stream. If an error
-	 * page location is found and it does not exist in the given map yet, then it will be added.
-	 * @param root The XML root element name.
-	 * @param input The XML input stream.
-	 * @param errorPageLocations The error page locations map to be filled.
-	 */
-	@SuppressWarnings("unchecked") // For the cast on Class<Throwable>.
-	private static void fillErrorPageLocations
-		(String root, InputStream input, Map<Class<Throwable>, String> errorPageLocations)
-			throws Exception
-	{
-		Document document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(input);
-		XPath xpath = XPathFactory.newInstance().newXPath();
-		String defaultLocation =
-			xpath.compile(root + "/error-page[error-code=500]/location").evaluate(document).trim();
-		NodeList exceptionTypes =
-			(NodeList) xpath.compile(root + "/error-page/exception-type").evaluate(document, XPathConstants.NODESET);
-
-		for (int i = 0; i < exceptionTypes.getLength(); i++) {
-			Node node = exceptionTypes.item(i);
-			Class<Throwable> exceptionClass = (Class<Throwable>) Class.forName(node.getTextContent().trim());
-			String exceptionLocation = xpath.compile("location").evaluate(node.getParentNode()).trim();
-
-			if (exceptionClass == Throwable.class) {
-				defaultLocation = exceptionLocation;
-			}
-			else if (!errorPageLocations.containsKey(exceptionClass)) {
-				errorPageLocations.put(exceptionClass, exceptionLocation);
-			}
-		}
-
-		if (defaultLocation != null && !defaultLocation.isEmpty() && !errorPageLocations.containsKey(null)) {
-			errorPageLocations.put(null, defaultLocation);
-		}
 	}
 
 }

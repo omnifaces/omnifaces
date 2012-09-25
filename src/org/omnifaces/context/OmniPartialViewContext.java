@@ -12,8 +12,8 @@
  */
 package org.omnifaces.context;
 
+import java.io.CharArrayWriter;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +28,8 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.context.ResponseWriterWrapper;
 
 import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
+import org.omnifaces.util.Faces;
+import org.omnifaces.util.WebXml;
 
 /**
  * This OmniFaces partial view context ... [TBD].
@@ -37,14 +39,21 @@ import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
  * view context explicitly themselves.
  *
  * @author Bauke Scholtz
+ * @since 1.2
  */
 public class OmniPartialViewContext extends PartialViewContextWrapper {
+
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final String ERROR_NO_OMNI_PVC = "There is no current OmniPartialViewContext instance.";
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private PartialViewContext wrapped;
 	private Map<String, Object> arguments;
 	private List<String> callbackScripts;
+	private int bufferSize;
+	private String loginURL;
 	private OmniPartialResponseWriter writer;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
@@ -57,6 +66,8 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		this.wrapped = wrapped;
 		this.arguments = new HashMap<String, Object>(3);
 		this.callbackScripts = new ArrayList<String>(3);
+		this.bufferSize = Faces.getResponseBufferSize();
+		this.loginURL = WebXml.getInstance().getFormLoginPage();
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -113,7 +124,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 			return (OmniPartialViewContext) context;
 		}
 		else {
-			throw new IllegalStateException("There is no current OmniPartialViewContext instance.");
+			throw new IllegalStateException(ERROR_NO_OMNI_PVC);
 		}
 	}
 
@@ -133,7 +144,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		// Constructors -----------------------------------------------------------------------------------------------
 
 		public OmniPartialResponseWriter(OmniPartialViewContext context, PartialResponseWriter writer) {
-			super(new BufferingResponseWriter(writer));
+			super(new ResettableBufferedResponseWriter(writer, context.bufferSize));
 			this.context = context;
 		}
 
@@ -156,7 +167,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		}
 
 		/**
-		 * Calls {@link PartialResponseWriter#endDocument()} and then {@link BufferingResponseWriter#reset()}.
+		 * Calls {@link PartialResponseWriter#endDocument()} and then {@link ResettableBufferedResponseWriter#reset()}.
 		 */
 		public void reset() {
 			try {
@@ -170,48 +181,59 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		}
 
 		@Override
-		public BufferingResponseWriter getWrapped() {
-			return (BufferingResponseWriter) super.getWrapped();
+		public ResettableBufferedResponseWriter getWrapped() {
+			return (ResettableBufferedResponseWriter) super.getWrapped();
 		}
 
 		// Nested classes ---------------------------------------------------------------------------------------------
 
 		/**
-		 * This response writer buffers the entire response body until {@link #close()} is called.
+		 * This response writer buffers the entire response body until buffer size is reached, regardless of flush,
+		 * which allows us to perform a reset before the buffer size is reached.
 		 * @author Bauke Scholtz
 		 */
-		private static class BufferingResponseWriter extends ResponseWriterWrapper {
+		private static class ResettableBufferedResponseWriter extends ResponseWriterWrapper {
 
 			// Variables ----------------------------------------------------------------------------------------------
 
 			private ResponseWriter wrapped;
+			private int bufferSize;
+			private CharArrayWriter buffer;
 			private ResponseWriter writer;
-			private StringWriter buffer;
 
 			// Constructors -------------------------------------------------------------------------------------------
 
-			public BufferingResponseWriter(ResponseWriter wrapped) {
+			public ResettableBufferedResponseWriter(ResponseWriter wrapped, int bufferSize) {
 				this.wrapped = wrapped;
-				this.buffer = new StringWriter();
+				this.bufferSize = bufferSize;
+				this.buffer = new CharArrayWriter(bufferSize);
 			}
 
 			// Actions ------------------------------------------------------------------------------------------------
 
 			public void reset() {
 				writer = null;
+				buffer.reset();
+			}
+
+			@Override
+			public void flush() throws IOException {
+				if (buffer.size() > bufferSize) { // TODO: buffer size is actually measured in bytes, not chars, right?
+					wrapped.write(buffer.toCharArray());
+					buffer.reset();
+					super.flush();
+				}
 			}
 
 			@Override
 			public void close() throws IOException {
-				super.flush();
-				wrapped.write(buffer.toString());
+				wrapped.write(buffer.toCharArray());
 				super.close();
 			}
 
 			@Override
 			public ResponseWriter getWrapped() {
 				if (writer == null) {
-					buffer = new StringWriter();
 					writer = wrapped.cloneWithWriter(buffer);
 				}
 
