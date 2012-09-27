@@ -44,7 +44,8 @@ import org.omnifaces.util.Utils;
 /**
  * This {@link ResourceHandler} implementation will remove all separate script and stylesheet resources which have the
  * <code>target</code> attribute set to <code>"head"</code> from the <code>UIViewRoot</code> and create a combined one
- * for all scripts and another combined one for all stylesheets.
+ * for all scripts and another combined one for all stylesheets, when the JSF project stage is <strong>not</strong> set
+ * to <code>Development</code>.
  * <p>
  * To get it to run, this handler needs be registered as follows in <tt>faces-config.xml</tt>:
  * <pre>
@@ -169,20 +170,24 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Creates a new instance of this combined resource handler which wraps the given resource handler. This will also
-	 * immediately register this resource handler as a pre render view event listener, so that it can do the job of
+	 * Creates a new instance of this combined resource handler which wraps the given resource handler. If the current
+	 * JSF project stage is not set to <code>Development</code>, then the initialization will be performed and this
+	 * will also register this resource handler as a pre render view event listener, so that it can do the job of
 	 * removing the CSS/JS resources and adding combined ones.
 	 * @param wrapped The resource handler to be wrapped.
 	 */
 	public CombinedResourceHandler(ResourceHandler wrapped) {
 		this.wrapped = wrapped;
-		this.excludedResources = initResources(PARAM_NAME_EXCLUDED_RESOURCES);
-		this.excludedResources.addAll(initCDNResources());
-		this.suppressedResources = initResources(PARAM_NAME_SUPPRESSED_RESOURCES);
-		this.excludedResources.addAll(suppressedResources);
-		this.inlineCSS = Boolean.valueOf(Faces.getInitParameter(PARAM_NAME_INLINE_CSS));
-		this.inlineJS = Boolean.valueOf(Faces.getInitParameter(PARAM_NAME_INLINE_JS));
-		Events.subscribeToEvent(PreRenderViewEvent.class, this);
+
+		if (!Faces.isDevelopment()) {
+			this.excludedResources = initResources(PARAM_NAME_EXCLUDED_RESOURCES);
+			this.excludedResources.addAll(initCDNResources());
+			this.suppressedResources = initResources(PARAM_NAME_SUPPRESSED_RESOURCES);
+			this.excludedResources.addAll(suppressedResources);
+			this.inlineCSS = Boolean.valueOf(Faces.getInitParameter(PARAM_NAME_INLINE_CSS));
+			this.inlineJS = Boolean.valueOf(Faces.getInitParameter(PARAM_NAME_INLINE_JS));
+			Events.subscribeToEvent(PreRenderViewEvent.class, this);
+		}
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -329,15 +334,8 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	 * @return The set of CDN resources.
 	 */
 	private static Set<String> initCDNResources() {
-		if (!Faces.isDevelopment()) {
-			Map<String, String> cdnResources = CDNResourceHandler.initCDNResources();
-
-			if (cdnResources != null) {
-				return cdnResources.keySet();
-			}
-		}
-
-		return Collections.emptySet();
+		Map<String, String> cdnResources = CDNResourceHandler.initCDNResources();
+		return (cdnResources != null) ? cdnResources.keySet() : Collections.<String>emptySet();
 	}
 
 	/**

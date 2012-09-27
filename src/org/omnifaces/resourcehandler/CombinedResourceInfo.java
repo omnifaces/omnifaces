@@ -164,13 +164,11 @@ final class CombinedResourceInfo {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Load the combined resources so that the set of resources, the total content length and the last modified are
-	 * been (re)initialized. If one of the resources cannot be resolved, then this leaves the resources empty.
-	 * @param forceReload Set to true if you want to force reloading of the combined resources, even though the
-	 * resources are already been initialized.
+	 * Lazily load the combined resources so that the set of resources, the total content length and the last modified
+	 * are been initialized. If one of the resources cannot be resolved, then this leaves the resources empty.
 	 */
-	private synchronized void loadResources(boolean forceReload) {
-		if (!forceReload && resources != null) {
+	private synchronized void loadResources() {
+		if (resources != null) {
 			return;
 		}
 
@@ -250,7 +248,7 @@ final class CombinedResourceInfo {
 	 * @return The ordered set of resources of this combined resource info.
 	 */
 	public Set<Resource> getResources() {
-		loadResources(false);
+		loadResources();
 		return resources;
 	}
 
@@ -259,17 +257,16 @@ final class CombinedResourceInfo {
 	 * @return The content length in bytes of this combined resource info.
 	 */
 	public int getContentLength() {
-		loadResources(false);
+		loadResources();
 		return contentLength;
 	}
 
 	/**
-	 * Returns the last modified timestamp in milliseconds of this combined resource info. If we're in development
-	 * stage, this will forcibly reload the resources.
+	 * Returns the last modified timestamp in milliseconds of this combined resource info.
 	 * @return The last modified timestamp in milliseconds of this combined resource info.
 	 */
 	public long getLastModified() {
-		loadResources(Faces.isDevelopment());
+		loadResources();
 		return lastModified;
 	}
 
