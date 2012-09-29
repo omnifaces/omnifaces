@@ -15,6 +15,7 @@ package org.omnifaces.context;
 import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,12 +28,23 @@ import javax.faces.context.PartialViewContextWrapper;
 import javax.faces.context.ResponseWriter;
 import javax.faces.context.ResponseWriterWrapper;
 
+import org.omnifaces.config.WebXml;
 import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
+import org.omnifaces.util.Ajax;
 import org.omnifaces.util.Faces;
-import org.omnifaces.util.WebXml;
+import org.omnifaces.util.Json;
+import org.omnifaces.util.Utils;
 
 /**
- * This OmniFaces partial view context ... [TBD].
+ * This OmniFaces partial view context extends and improves the standard partial view context as follows:
+ * <ul>
+ * <li>Support for executing callback scripts.</li>
+ * <li>Support for adding arguments to ajax response.</li>
+ * <li>Buffers the response until <code>javax.faces.FACELETS_BUFFER_SIZE</code> (regardless of flush calls).</li>
+ * <li>Resettable buffer so that exceptions during ajax rendering can be properly handled.</li>
+ * <li>Fixes the no-feedback problem when ViewExpiredException occurs during ajax request on a restricted page.</li>
+ * </ul>
+ * You can use the {@link Ajax} utility class to easily add callback scripts and arguments.
  * <p>
  * This partial view context is already registered by OmniFaces' own <tt>faces-config.xml</tt> and thus gets
  * auto-initialized when the OmniFaces JAR is bundled in a webapp, so end-users do not need to register this partial
@@ -45,6 +57,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
+	private static final String EXTENSION_ID = "omnifaces";
 	private static final String ERROR_NO_OMNI_PVC = "There is no current OmniPartialViewContext instance.";
 
 	// Variables ------------------------------------------------------------------------------------------------------
@@ -52,8 +65,6 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 	private PartialViewContext wrapped;
 	private Map<String, Object> arguments;
 	private List<String> callbackScripts;
-	private int bufferSize;
-	private String loginURL;
 	private OmniPartialResponseWriter writer;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
@@ -64,10 +75,6 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 	 */
 	public OmniPartialViewContext(PartialViewContext wrapped) {
 		this.wrapped = wrapped;
-		this.arguments = new HashMap<String, Object>(3);
-		this.callbackScripts = new ArrayList<String>(3);
-		this.bufferSize = Faces.getResponseBufferSize();
-		this.loginURL = WebXml.getInstance().getFormLoginPage();
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -81,6 +88,52 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		return writer;
 	}
 
+	@Override
+	public void setPartialRequest(boolean isPartialRequest) {
+		wrapped.setPartialRequest(isPartialRequest);
+	}
+
+	@Override
+	public PartialViewContext getWrapped() {
+		return wrapped;
+	}
+
+	/**
+	 * Add an argument to the partial response. This is available in JSF ajax <code>onevent</code> handler as follows:
+	 * <pre>
+	 * jsf.ajax.addOnEvent(function(data) {
+	 *   if (data.status == "success") {
+	 *     var args = JSON.parse(data.responseXML.getElementById("omnifaces-args").firstChild.nodeValue);
+	 *     // ...
+	 *   }
+	 * }
+	 * </pre>
+	 * For supported argument value types, read {@link Utils#toJson(Object)}. If a given argument type is not supported,
+	 * then an {@link IllegalArgumentException} will be thrown during render response.
+	 * @param name The argument name.
+	 * @param value The argument value.
+	 */
+	public void addArgument(String name, Object value) {
+		if (arguments == null) {
+			arguments = new HashMap<String, Object>(3);
+		}
+
+		arguments.put(name, value);
+	}
+
+	/**
+	 * Add a callback script to the partial response. This script will be executed once the partial response is
+	 * successfully retrieved at the client side.
+	 * @param callbackScript The callback script to be added to the partial response.
+	 */
+	public void addCallbackScript(String callbackScript) {
+		if (callbackScripts == null) {
+			callbackScripts = new ArrayList<String>(3);
+		}
+
+		callbackScripts.add(callbackScript);
+	}
+
 	/**
 	 * Reset the partial response. This clears any JavaScript arguments and callbacks set any data written to the
 	 * {@link PartialResponseWriter}.
@@ -92,16 +145,6 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
 		arguments.clear();
 		callbackScripts.clear();
-	}
-
-	@Override
-	public void setPartialRequest(boolean isPartialRequest) {
-		wrapped.setPartialRequest(isPartialRequest);
-	}
-
-	@Override
-	public PartialViewContext getWrapped() {
-		return wrapped;
 	}
 
 	// Static ---------------------------------------------------------------------------------------------------------
@@ -144,23 +187,55 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		// Constructors -----------------------------------------------------------------------------------------------
 
 		public OmniPartialResponseWriter(OmniPartialViewContext context, PartialResponseWriter writer) {
-			super(new ResettableBufferedResponseWriter(writer, context.bufferSize));
+			super(new ResettableBufferedResponseWriter(writer, Faces.getResponseBufferSize()));
 			this.context = context;
 		}
 
 		// Actions ----------------------------------------------------------------------------------------------------
 
+		/**
+		 * An override which checks if the web.xml security constraint has been triggered during this ajax request
+		 * (which can happen when the session has been timed out) and if so, then perform a redirect to the originally
+		 * requested page. Otherwise the enduser ends up with an ajax response containing only the new view state
+		 * without any form of visual feedback.
+		 */
+		@Override
+		public void startDocument() throws IOException {
+			super.startDocument();
+			String loginURL = WebXml.INSTANCE.getFormLoginPage();
+
+			if (loginURL != null) {
+				String loginViewId = Faces.normalizeViewId(loginURL);
+
+				if (loginViewId.equals(Faces.getViewId())) {
+					String originalURL = Faces.getRequestAttribute("javax.servlet.forward.request_uri");
+
+					if (originalURL != null) {
+						redirect(originalURL);
+					}
+				}
+			}
+		}
+
+		/**
+		 * An override which writes all {@link OmniPartialViewContext#arguments} as JSON to the extension and all
+		 * {@link OmniPartialViewContext#callbackScripts} to the eval.
+		 */
 		@Override
 		public void endDocument() throws IOException {
-//			if (!context.arguments.isEmpty()) {
-//				// Convert to JSON?
-//			}
-//
-//			for (String callbackScript : context.callbackScripts) {
-//				startEval();
-//				write(callbackScript);
-//				endEval();
-//			}
+	        if (context.arguments != null) {
+		        startExtension(Collections.singletonMap("id", EXTENSION_ID));
+	        	write(Json.encode(context.arguments));
+		        endExtension();
+			}
+
+			if (context.callbackScripts != null) {
+				for (String callbackScript : context.callbackScripts) {
+					startEval();
+					write(callbackScript);
+					endEval();
+				}
+			}
 
 			super.endDocument();
 			getWrapped().close();

@@ -17,12 +17,9 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
@@ -30,6 +27,7 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
 import org.omnifaces.util.Faces;
+import org.omnifaces.util.Utils;
 
 /**
  * This {@link Resource} implementation holds all the necessary information about combined resources in order to
@@ -37,11 +35,6 @@ import org.omnifaces.util.Faces;
  * @author Bauke Scholtz
  */
 final class CombinedResource extends Resource {
-
-	// Constants ------------------------------------------------------------------------------------------------------
-
-	private static final String PATTERN_RFC1123_DATE = "EEE, dd MMM yyyy HH:mm:ss zzz";
-	private static final TimeZone TIMEZONE_GMT = TimeZone.getTimeZone("GMT");
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -105,11 +98,9 @@ final class CombinedResource extends Resource {
 	@Override
 	public Map<String, String> getResponseHeaders() {
 		Map<String, String> responseHeaders = new HashMap<String, String>(3);
-		SimpleDateFormat sdf = new SimpleDateFormat(PATTERN_RFC1123_DATE, Locale.US);
-		sdf.setTimeZone(TIMEZONE_GMT);
 		long lastModified = info.getLastModified();
-		responseHeaders.put("Last-Modified", sdf.format(new Date(lastModified)));
-		responseHeaders.put("Expires", sdf.format(new Date(System.currentTimeMillis() + info.getMaxAge())));
+		responseHeaders.put("Last-Modified", Utils.formatRFC1123(new Date(lastModified)));
+		responseHeaders.put("Expires", Utils.formatRFC1123(new Date(System.currentTimeMillis() + info.getMaxAge())));
 		responseHeaders.put("Etag", String.format("W/\"%d-%d\"", info.getContentLength(), lastModified));
 		return responseHeaders;
 	}
@@ -129,10 +120,8 @@ final class CombinedResource extends Resource {
 		String ifModifiedSince = context.getExternalContext().getRequestHeaderMap().get("If-Modified-Since");
 
 		if (ifModifiedSince != null) {
-			SimpleDateFormat sdf = new SimpleDateFormat(PATTERN_RFC1123_DATE, Locale.US);
-
 			try {
-				return info.getLastModified() > sdf.parse(ifModifiedSince).getTime();
+				return info.getLastModified() > Utils.parseRFC1123(ifModifiedSince).getTime();
 			}
 			catch (ParseException ignore) {
 				return true;

@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.omnifaces.util;
+package org.omnifaces.config;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -26,23 +26,32 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
+import org.omnifaces.util.Faces;
+import org.omnifaces.util.Utils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * This configuration utility class reads configuration from the <tt>/WEB-INF/web.xml</tt> and all
- * <tt>/META-INF/web-fragment</tt> files found in the classpath and offers methods to obtain information from them
- * which is not available by the standard servlet API means. This utility class is designed using
- * initialization-on-demand holder (lazy singleton).
+ * This configuration enum parses the <tt>/WEB-INF/web.xml</tt> and all <tt>/META-INF/web-fragment</tt> files found in
+ * the classpath and offers methods to obtain information from them which is not available by the standard servlet API
+ * means.
  * <p>
- * So far there are only methods for obtaining a mapping of all error page locations by exception type and
+ * So far there are only methods for obtaining a mapping of all error page locations by exception type and the location
+ * of the FORM authentication login page.
  *
  * @author Bauke Scholtz
  * @since 1.2
  */
-public final class WebXml {
+public enum WebXml {
+
+	// Enum singleton -------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns the lazily loaded enum singleton instance.
+	 */
+	INSTANCE;
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
@@ -65,25 +74,10 @@ public final class WebXml {
 	private Map<Class<Throwable>, String> errorPageLocations;
 	private String formLoginPage;
 
-	// Lazy singleton -------------------------------------------------------------------------------------------------
+	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns the lazily loaded instance of this configuration class.
-	 * @return The lazily loaded instance of this configuration class.
-	 */
-	public static WebXml getInstance() {
-		return This.INSTANCE;
-	}
-
-	/**
-	 * Lazy initialization on demand holder.
-	 */
-	private static class This {
-		private static final WebXml INSTANCE = new WebXml();
-	}
-
-	/**
-	 * Constructor performs all initialization.
+	 * Perform initialization.
 	 */
 	private WebXml() {
 		try {

@@ -13,14 +13,12 @@
 package org.omnifaces.component.script;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.io.StringWriter;
 
-import javax.faces.application.ResourceDependencies;
-import javax.faces.application.ResourceDependency;
+import javax.faces.FacesException;
 import javax.faces.component.FacesComponent;
-import javax.faces.component.UIComponent;
+import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
-import javax.faces.context.PartialViewContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
@@ -28,6 +26,12 @@ import javax.faces.event.ListenerFor;
 import javax.faces.event.ListenersFor;
 import javax.faces.event.PostAddToViewEvent;
 import javax.faces.event.PostRestoreStateEvent;
+import javax.faces.event.PreRenderViewEvent;
+import javax.faces.event.SystemEvent;
+import javax.faces.event.SystemEventListener;
+
+import org.omnifaces.util.Ajax;
+import org.omnifaces.util.Events;
 
 /**
  * <strong>OnloadScript</strong> is an extension to <code>&lt;h:outputScript&gt;</code> which will be executed in the
@@ -48,30 +52,28 @@ import javax.faces.event.PostRestoreStateEvent;
 	@ListenerFor(systemEventClass=PostAddToViewEvent.class),
 	@ListenerFor(systemEventClass=PostRestoreStateEvent.class)
 })
-@ResourceDependencies({
-	@ResourceDependency(library="javax.faces", name="jsf.js", target="head"), // Required for jsf.ajax.addOnEvent.
-	@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head") // Specifically: ajax.js.
-})
-public class OnloadScript extends ScriptFamily {
+public class OnloadScript extends ScriptFamily implements SystemEventListener {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
 	/** The standard component type. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.script.OnloadScript";
 
-	// Private constants ----------------------------------------------------------------------------------------------
-
-	private static final String AJAX_SCRIPT_START = "OmniFaces.Ajax.addRunOnceOnSuccess(function(){";
-	private static final String AJAX_SCRIPT_END = "});";
-
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
+	 * Returns <code>true</code> if the given source is an instance of {@link UIViewRoot}.
+	 */
+	@Override
+	public boolean isListenerForSource(Object source) {
+        return source instanceof UIViewRoot;
+	}
+
+	/**
 	 * If the event is a {@link PostAddToViewEvent}, then relocate the component to end of body, so that we can make
-	 * sure that the script is executed after all HTML DOM elements are been created. If the event is a
-	 * {@link PostRestoreStateEvent} and the current request is an ajax request, then add the client ID of this
-	 * component to the collection of ajax render IDs, so that we can make sure that the script is executed on every
-	 * ajax response as well.
+	 * sure that the script is executed after all HTML DOM elements are been created. Else if the event is a
+	 * {@link PostRestoreStateEvent} and the current request is an ajax request, then subscribe to the
+	 * {@link PreRenderViewEvent} event.
 	 */
 	@Override
 	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
@@ -80,55 +82,72 @@ public class OnloadScript extends ScriptFamily {
 		if (event instanceof PostAddToViewEvent) {
 			context.getViewRoot().addComponentResource(context, this, "body");
 		}
-		else if (event instanceof PostRestoreStateEvent) {
-			PartialViewContext ajaxContext = context.getPartialViewContext();
-
-			if (ajaxContext.isAjaxRequest()) {
-				Collection<String> renderIds = ajaxContext.getRenderIds();
-				String clientId = getClientId(context);
-
-				if (!renderIds.contains(clientId)) {
-					renderIds.add(clientId);
-				}
-			}
+		else if (event instanceof PostRestoreStateEvent && context.getPartialViewContext().isAjaxRequest()) {
+			Events.subscribeToViewEvent(PreRenderViewEvent.class, this);
 		}
 	}
 
 	/**
-	 * If there are any children and the current request is an ajax request, then add the script body as a callback
-	 * function to <code>OmniFaces.Ajax.addRunOnceOnSuccess()</code>. The entire <code>&lt;script&gt;</code> element
-	 * is wrapped in a <code>&lt;span&gt;</code> element with an ID, so that it can be ajax-updated.
+	 * If the event is a {@link PreRenderViewEvent} and the current request is an ajax request and this component is
+	 * rendered and there are any children, then encode the children as {@link Ajax#oncomplete(String...)}.
 	 */
 	@Override
-	public void encodeChildren(FacesContext context) throws IOException {
-		if (!isRendered()) {
+	public void processEvent(SystemEvent event) throws AbortProcessingException {
+		if (!(event instanceof PreRenderViewEvent)) {
 			return;
 		}
 
-		ResponseWriter writer = context.getResponseWriter();
-		writer.startElement("span", this);
-		writer.writeAttribute("id", getClientId(context), "id");
-		writer.startElement("script", null);
-		writer.writeAttribute("type", "text/javascript", "type");
+		FacesContext context = FacesContext.getCurrentInstance();
 
-		if (getChildCount() > 0) {
-			boolean ajaxRequest = context.getPartialViewContext().isAjaxRequest();
-
-			if (ajaxRequest) {
-				writer.write(AJAX_SCRIPT_START);
-			}
-
-			for (UIComponent child : getChildren()) {
-				child.encodeAll(context);
-			}
-
-			if (ajaxRequest) {
-				writer.write(AJAX_SCRIPT_END);
-			}
+		if (!context.getPartialViewContext().isAjaxRequest() || !isRendered() || getChildCount() == 0) {
+			return;
 		}
 
-		writer.endElement("script");
-		writer.endElement("span");
+		ResponseWriter originalResponseWriter = context.getResponseWriter();
+		StringWriter buffer = new StringWriter();
+		context.setResponseWriter(originalResponseWriter.cloneWithWriter(buffer));
+
+		try {
+			encodeChildren(context);
+		}
+		catch (IOException e) {
+			throw new FacesException(e);
+		}
+
+		context.setResponseWriter(originalResponseWriter);
+		String script = buffer.toString().trim();
+
+		if (!script.isEmpty()) {
+			Ajax.oncomplete(script);
+		}
+	}
+
+	/**
+	 * If this component is rendered and there are any children, then start the <code>&lt;script&gt;</code> element.
+	 */
+	@Override
+	public void encodeBegin(FacesContext context) throws IOException {
+		if (!isRendered() || getChildCount() == 0) {
+			return;
+		}
+
+		pushComponentToEL(context, this);
+		ResponseWriter writer = context.getResponseWriter();
+		writer.startElement("script", this);
+		writer.writeAttribute("type", "text/javascript", "type");
+	}
+
+	/**
+	 * If this component is rendered and there are any children, then end the <code>&lt;script&gt;</code> element.
+	 */
+	@Override
+	public void encodeEnd(FacesContext context) throws IOException {
+		if (!isRendered() || getChildCount() == 0) {
+			return;
+		}
+
+		context.getResponseWriter().endElement("script");
+		popComponentFromEL(context);
 	}
 
 }

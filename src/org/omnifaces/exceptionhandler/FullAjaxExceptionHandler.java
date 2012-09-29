@@ -25,10 +25,10 @@ import javax.faces.event.ExceptionQueuedEvent;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.omnifaces.config.WebXml;
 import org.omnifaces.context.OmniPartialViewContext;
 import org.omnifaces.util.Exceptions;
 import org.omnifaces.util.Faces;
-import org.omnifaces.util.WebXml;
 
 /**
  * This exception handler enables you to show the full error page in its entirety to the enduser in case of exceptions
@@ -139,7 +139,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 				exception = Exceptions.unwrap(exception, FacesException.class);
 
 				// Find the error page location for the given exception.
-				String errorPageLocation = WebXml.getInstance().findErrorPageLocation(exception);
+				String errorPageLocation = WebXml.INSTANCE.findErrorPageLocation(exception);
 
 				// If there's no default error page location, well, it's then end of story.
 				if (errorPageLocation == null) {

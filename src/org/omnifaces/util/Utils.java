@@ -23,11 +23,16 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
@@ -46,6 +51,8 @@ public final class Utils {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final int DEFAULT_STREAM_BUFFER_SIZE = 10240;
+	private static final String PATTERN_RFC1123_DATE = "EEE, dd MMM yyyy HH:mm:ss zzz";
+	private static final TimeZone TIMEZONE_GMT = TimeZone.getTimeZone("GMT");
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -230,6 +237,31 @@ public final class Utils {
 		}
 
 		return Collections.unmodifiableSet(set);
+	}
+
+	// Dates ----------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Formats the given {@link Date} to a string in RFC1123 format. This format is used in HTTP headers and in
+	 * JavaScript <code>Date</code> constructor.
+	 * @param date The <code>Date</code> to be formatted to a string in RFC1123 format.
+	 * @return The formatted string.
+	 */
+	public static String formatRFC1123(Date date) {
+		SimpleDateFormat sdf = new SimpleDateFormat(PATTERN_RFC1123_DATE, Locale.US);
+		sdf.setTimeZone(TIMEZONE_GMT);
+		return sdf.format(date);
+	}
+
+	/**
+	 * Parses the given string in RFC1123 format to a {@link Date} object.
+	 * @param string The string in RFC1123 format to be parsed to a <code>Date</code> object.
+	 * @return The parsed <code>Date</code>.
+	 * @throws ParseException When the given string is not in RFC1123 format.
+	 */
+	public static Date parseRFC1123(String string) throws ParseException {
+		SimpleDateFormat sdf = new SimpleDateFormat(PATTERN_RFC1123_DATE, Locale.US);
+		return sdf.parse(string);
 	}
 
 	// Encoding/decoding ----------------------------------------------------------------------------------------------
