@@ -25,7 +25,8 @@ import javax.servlet.http.HttpServletResponseWrapper;
  * be replaced by a custom implementation. This saves the developer from writing repeated {@link #getOutputStream()},
  * {@link #getWriter()} and {@link #flushBuffer()} boilerplate. All the developer has to do is to implement the
  * {@link #createOutputStream()} accordingly. This will in turn be used by both {@link #getOutputStream()} and
- * {@link #getWriter()}.
+ * {@link #getWriter()}. The boolean property <code>passThrough</code>, which defaults to <code>false</code> also
+ * enables the developer to control whether to pass through to the wrapped {@link ServletOutputStream} or not.
  *
  * @author Bauke Scholtz
  * @since 1.1
@@ -68,8 +69,7 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 		if (passThrough) {
 			return super.getOutputStream();
 		}
-		
-		
+
 		if (writer != null) {
 			throw new IllegalStateException(ERROR_GETWRITER_ALREADY_CALLED);
 		}
@@ -86,8 +86,7 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 		if (passThrough) {
 			return super.getWriter();
 		}
-		
-		
+
 		if (output != null) {
 			throw new IllegalStateException(ERROR_GETOUTPUT_ALREADY_CALLED);
 		}
@@ -102,7 +101,7 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 	@Override
 	public void flushBuffer() throws IOException {
 		super.flushBuffer();
-		
+
 		if (passThrough) {
 			return;
 		}
@@ -127,11 +126,23 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 			output.close();
 		}
 	}
-	
+
+	// Getters/setters ------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns whether the writing has to be passed through to the wrapped {@link ServletOutputStream}.
+	 * @return <code>true</code>, if the writing has to be passed through to the wrapped {@link ServletOutputStream},
+	 * otherwise <code>false</code>.
+	 */
 	public boolean isPassThrough() {
     	return passThrough;
     }
 
+	/**
+	 * Sets whether the writing has to be passed through to the wrapped {@link ServletOutputStream}.
+	 * @param passThrough set to <code>true</code> if the writing has to be passed through to the wrapped
+	 * {@link ServletOutputStream}.
+	 */
 	public void setPassThrough(boolean passThrough) {
     	this.passThrough = passThrough;
     }

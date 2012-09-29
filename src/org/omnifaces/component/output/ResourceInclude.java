@@ -62,7 +62,7 @@ public class ResourceInclude extends OutputFamily {
 			throw new FacesException(e);
 		}
 
-		context.getResponseWriter().write(new String(bufferedResponse.getBuffer(), response.getCharacterEncoding()));
+		context.getResponseWriter().write(bufferedResponse.getBufferAsString());
 	}
 
 }

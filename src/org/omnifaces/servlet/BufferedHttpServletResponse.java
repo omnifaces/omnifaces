@@ -66,13 +66,15 @@ public class BufferedHttpServletResponse extends HttpServletResponseOutputWrappe
 		flushBuffer();
 		return buffer.toByteArray();
 	}
-	
-	public String getBufferAsString() {
-		try {
-			return new String(getBuffer(), getCharacterEncoding());
-		} catch (IOException e) {
-			throw new IllegalStateException(e);
-		}
+
+	/**
+	 * Flushes and returns the buffered response as a string which is encoded using the character encoding provided by
+	 * {@link #getCharacterEncoding()}.
+	 * @return The buffered response as string.
+	 * @throws IOException When an I/O error occurs.
+	 */
+	public String getBufferAsString() throws IOException {
+		return new String(getBuffer(), getCharacterEncoding());
 	}
 
 }
