@@ -458,7 +458,7 @@ public final class Faces {
 	 * @since 1.1
 	 */
 	public static void addRenderIds(String... clientIds) {
-		Collection<String> renderIds = getContext().getPartialViewContext().getRenderIds();
+		Collection<String> renderIds = getPartialViewContext().getRenderIds();
 
 		for (String clientId : clientIds) {
 			renderIds.add(clientId);
@@ -545,7 +545,7 @@ public final class Faces {
 	 * @see PartialViewContext#isAjaxRequest()
 	 */
 	public static boolean isAjaxRequest() {
-		return getContext().getPartialViewContext().isAjaxRequest();
+		return getPartialViewContext().isAjaxRequest();
 	}
 
 	/**

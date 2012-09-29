@@ -26,7 +26,7 @@ import javax.faces.event.SystemEvent;
 import javax.faces.event.SystemEventListener;
 
 import org.omnifaces.util.Components;
-import org.omnifaces.util.Faces;
+import org.omnifaces.util.Events;
 
 /**
  * <strong>OutputLabel</strong> is a component that extends the standard {@link HtmlOutputLabel} and provides support for
@@ -47,7 +47,7 @@ public class OutputLabel extends HtmlOutputLabel implements SystemEventListener 
 
     public OutputLabel() {
         if (!isPostback()) {
-            Faces.getViewRoot().subscribeToViewEvent(PreRenderViewEvent.class, this);
+            Events.subscribeToViewEvent(PreRenderViewEvent.class, this);
         }
     }
 
