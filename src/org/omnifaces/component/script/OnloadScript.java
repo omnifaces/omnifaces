@@ -104,17 +104,19 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 			return;
 		}
 
+		pushComponentToEL(context, this);
 		StringWriter buffer = new StringWriter();
 		ResponseWriter originalResponseWriter = context.getResponseWriter();
-		final ResponseWriter clonedResponseWriter = originalResponseWriter.cloneWithWriter(buffer);
+		String encoding = context.getExternalContext().getResponseCharacterEncoding();
+		final ResponseWriter writer = context.getRenderKit().createResponseWriter(buffer, null, encoding);
 		context.setResponseWriter(new ResponseWriterWrapper() {
 			@Override
 			public void writeText(Object text, String property) throws IOException {
-				clonedResponseWriter.write(text.toString()); // So, don't escape HTML.
+				writer.write(text.toString()); // So, don't escape HTML.
 			}
 			@Override
 			public ResponseWriter getWrapped() {
-				return clonedResponseWriter;
+				return writer;
 			}
 		});
 
@@ -124,8 +126,13 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 		catch (IOException e) {
 			throw new FacesException(e);
 		}
+		finally {
+			if (originalResponseWriter != null) {
+				context.setResponseWriter(originalResponseWriter);
+			}
+		}
 
-		context.setResponseWriter(originalResponseWriter);
+		popComponentFromEL(context);
 		String script = buffer.toString().trim();
 
 		if (!script.isEmpty()) {

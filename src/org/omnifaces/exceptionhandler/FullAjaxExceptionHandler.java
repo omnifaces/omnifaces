@@ -22,6 +22,7 @@ import javax.faces.context.ExceptionHandler;
 import javax.faces.context.ExceptionHandlerWrapper;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ExceptionQueuedEvent;
+import javax.faces.view.ViewDeclarationLanguage;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -169,9 +170,11 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 				UIViewRoot viewRoot = viewHandler.createView(context, viewId);
 				context.setViewRoot(viewRoot);
 				context.getPartialViewContext().setRenderAll(true);
+            	ViewDeclarationLanguage vdl = viewHandler.getViewDeclarationLanguage(context, viewId);
 
 	            try {
-	            	viewHandler.getViewDeclarationLanguage(context, viewId).renderView(context, viewRoot);
+	            	vdl.buildView(context, viewRoot);
+	            	vdl.renderView(context, viewRoot);
 	            }
 	            catch (IOException e) {
 	            	throw new FacesException(e);
