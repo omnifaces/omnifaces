@@ -21,7 +21,7 @@ import javax.faces.context.FacesContext;
 import org.omnifaces.util.Utils;
 
 /**
- * <strong>ValidateOneOrNone</strong> validates if ONLY ONE of the given <code>UIInput</code> components have been
+ * <strong>ValidateOneOrNone</strong> validates if ONLY ONE of the given <code>UIInput</code> components has been
  * filled out or that NONE of the given <code>UIInput</code> components have been filled out. The default message is
  * <blockquote>{0}: Please fill out only one or none of those fields</blockquote>
  * <p>

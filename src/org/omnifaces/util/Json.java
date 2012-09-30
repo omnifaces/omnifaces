@@ -12,6 +12,7 @@
  */
 package org.omnifaces.util;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
@@ -37,7 +38,7 @@ public final class Json {
 
 	/**
 	 * Encodes the given object as JSON. This supports the standard types {@link Boolean}, {@link Number},
-	 * {@link String} and {@link Date}. It also supports arrays, {@link Collection}s and {@link Map}s of them, even
+	 * {@link String} and {@link Date}. It also supports {@link Collection}s, {@link Map}s and arrays of them, even
 	 * nested ones. The {@link Date} is formatted in RFC 1123 format, so you can if necessary just pass it straight to
 	 * <code>new Date()</code> in JavaScript.
 	 * <p>
@@ -59,19 +60,6 @@ public final class Json {
 		else if (object instanceof Date) {
 			return '"' + Utils.formatRFC1123((Date) object) + '"';
 		}
-		else if (object instanceof Object[]) {
-			StringBuilder builder = new StringBuilder();
-
-			for (Object item : ((Object[]) object)) {
-				if (builder.length() > 0) {
-					builder.append(',');
-				}
-
-				builder.append(encode(item));
-			}
-
-			return builder.insert(0, '[').append(']').toString();
-		}
 		else if (object instanceof Collection<?>) {
 			return encode(((Collection<?>) object).toArray());
 		}
@@ -87,6 +75,19 @@ public final class Json {
 			}
 
 			return builder.insert(0, '{').append('}').toString();
+		}
+		else if (object.getClass().isArray()) {
+			StringBuilder builder = new StringBuilder();
+
+			for (int i = 0; i < Array.getLength(object); i++) {
+				if (builder.length() > 0) {
+					builder.append(',');
+				}
+
+				builder.append(encode(Array.get(object, i)));
+			}
+
+			return builder.insert(0, '[').append(']').toString();
 		}
 		else {
 			throw new IllegalArgumentException("Unsupported type: " + object.getClass());

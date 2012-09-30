@@ -12,13 +12,18 @@
  */
 package org.omnifaces.util;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import javax.faces.context.FacesContext;
+import javax.faces.context.PartialViewContext;
 
 import org.omnifaces.context.OmniPartialViewContext;
 
 /**
- * Ajax utility class. It are mainly shortcuts to the current {@link OmniPartialViewContext} instance.
+ * Collection of utility methods for working with {@link PartialViewContext}. There are also shortcuts to the current
+ * {@link OmniPartialViewContext} instance.
  *
  * @author Bauke Scholtz
  * @since 1.2
@@ -39,16 +44,36 @@ public final class Ajax {
 	// Shortcuts ------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Update the given client IDs in the current ajax response.
-	 * @param clientIds The client IDs to be updated.
+	 * Returns the current partial view context (the ajax context).
+	 * <p>
+	 * <i>Note that whenever you absolutely need this method to perform a general task, you might want to consider to
+	 * submit a feature request to OmniFaces in order to add a new utility method which performs exactly this general
+	 * task.</i>
+	 * @return The current partial view context.
+	 * @see FacesContext#getPartialViewContext()
+	 */
+	public static PartialViewContext getContext() {
+		return FacesContext.getCurrentInstance().getPartialViewContext();
+	}
+
+	/**
+	 * Update the given client IDs in the current ajax response. Note that those client IDs should not start with the
+	 * naming container separator character like <code>:</code>.
+	 * @param clientIds The client IDs to be updated in the current ajax response.
+	 * @see PartialViewContext#getRenderIds()
 	 */
 	public static void update(String... clientIds) {
-		Faces.addRenderIds(clientIds);
+		Collection<String> renderIds = getContext().getRenderIds();
+
+		for (String clientId : clientIds) {
+			renderIds.add(clientId);
+		}
 	}
 
 	/**
 	 * Execute the given scripts on complete of the current ajax response.
 	 * @param scripts The scripts to be executed.
+	 * @see OmniPartialViewContext#addCallbackScript(String)
 	 */
 	public static void oncomplete(String... scripts) {
 		OmniPartialViewContext context = OmniPartialViewContext.getCurrentInstance();
@@ -59,9 +84,11 @@ public final class Ajax {
 	}
 
 	/**
-	 * Add the given data argument to the current ajax response.
+	 * Add the given data argument to the current ajax response. They are as JSON object available by
+	 * <code>OmniFaces.Ajax.data</code>.
 	 * @param name The argument name.
 	 * @param value The argument value.
+	 * @see OmniPartialViewContext#addArgument(String, Object)
 	 */
 	public static void data(String name, Object value) {
 		OmniPartialViewContext.getCurrentInstance().addArgument(name, value);
@@ -69,9 +96,11 @@ public final class Ajax {
 
 	/**
 	 * Add the given data arguments to the current ajax response. The arguments length must be even. Every first and
-	 * second argument is considered the name and value pair. The name must always be a {@link String}.
+	 * second argument is considered the name and value pair. The name must always be a {@link String}. They are as JSON
+	 * object available by <code>OmniFaces.Ajax.data</code>.
 	 * @param namesValues The argument names and values.
 	 * @throws IllegalArgumentException When the arguments length is not even, or when a name is not a string.
+	 * @see OmniPartialViewContext#addArgument(String, Object)
 	 */
 	public static void data(Object... namesValues) {
 		if (namesValues.length % 2 != 0) {
@@ -91,8 +120,10 @@ public final class Ajax {
 	}
 
 	/**
-	 * Add the given mapping of data arguments to the current ajax response.
+	 * Add the given mapping of data arguments to the current ajax response. They are as JSON object available by
+	 * <code>OmniFaces.Ajax.data</code>.
 	 * @param data The mapping of data arguments.
+	 * @see OmniPartialViewContext#addArgument(String, Object)
 	 */
 	public static void data(Map<String, Object> data) {
 		OmniPartialViewContext context = OmniPartialViewContext.getCurrentInstance();

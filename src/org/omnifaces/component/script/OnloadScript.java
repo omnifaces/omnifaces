@@ -20,6 +20,7 @@ import javax.faces.component.FacesComponent;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
+import javax.faces.context.ResponseWriterWrapper;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.ListenerFor;
@@ -62,11 +63,11 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns <code>true</code> if the given source is an instance of {@link UIViewRoot}.
+	 * Returns <code>true</code> if the given source is an instance of {@link OnloadScript} or {@link UIViewRoot}.
 	 */
 	@Override
 	public boolean isListenerForSource(Object source) {
-        return source instanceof UIViewRoot;
+        return source instanceof OnloadScript || source instanceof UIViewRoot;
 	}
 
 	/**
@@ -103,9 +104,19 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 			return;
 		}
 
-		ResponseWriter originalResponseWriter = context.getResponseWriter();
 		StringWriter buffer = new StringWriter();
-		context.setResponseWriter(originalResponseWriter.cloneWithWriter(buffer));
+		ResponseWriter originalResponseWriter = context.getResponseWriter();
+		final ResponseWriter clonedResponseWriter = originalResponseWriter.cloneWithWriter(buffer);
+		context.setResponseWriter(new ResponseWriterWrapper() {
+			@Override
+			public void writeText(Object text, String property) throws IOException {
+				clonedResponseWriter.write(text.toString()); // So, don't escape HTML.
+			}
+			@Override
+			public ResponseWriter getWrapped() {
+				return clonedResponseWriter;
+			}
+		});
 
 		try {
 			encodeChildren(context);

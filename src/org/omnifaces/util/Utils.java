@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Array;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -90,7 +91,7 @@ public final class Utils {
 	}
 
 	/**
-	 * Returns true if the given value is null or is empty. Types of String, Object[], Collection and Map are
+	 * Returns true if the given value is null or is empty. Types of String, Collection, Map and Array are
 	 * recognized. If none is recognized, then examine the emptiness of the toString() representation instead.
 	 * @param value The value to be checked on emptiness.
 	 * @return True if the given value is null or is empty.
@@ -102,14 +103,14 @@ public final class Utils {
 		else if (value instanceof String) {
 			return ((String) value).isEmpty();
 		}
-		else if (value instanceof Object[]) {
-			return ((Object[]) value).length == 0;
-		}
 		else if (value instanceof Collection<?>) {
 			return ((Collection<?>) value).isEmpty();
 		}
 		else if (value instanceof Map<?, ?>) {
 			return ((Map<?, ?>) value).isEmpty();
+		}
+		else if (value.getClass().isArray()) {
+			return Array.getLength(value) == 0;
 		}
 		else {
 		    return value.toString() == null || value.toString().isEmpty();

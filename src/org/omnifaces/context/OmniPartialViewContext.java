@@ -15,7 +15,6 @@ package org.omnifaces.context;
 import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +56,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String EXTENSION_ID = "omnifaces";
+	private static final String AJAX_DATA = "OmniFaces=OmniFaces||{};OmniFaces.Ajax={data:%s};";
 	private static final String ERROR_NO_OMNI_PVC = "There is no current OmniPartialViewContext instance.";
 
 	// Variables ------------------------------------------------------------------------------------------------------
@@ -99,17 +98,9 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 	}
 
 	/**
-	 * Add an argument to the partial response. This is available in JSF ajax <code>onevent</code> handler as follows:
-	 * <pre>
-	 * jsf.ajax.addOnEvent(function(data) {
-	 *   if (data.status == "success") {
-	 *     var args = JSON.parse(data.responseXML.getElementById("omnifaces-args").firstChild.nodeValue);
-	 *     // ...
-	 *   }
-	 * }
-	 * </pre>
+	 * Add an argument to the partial response. This is as JSON object available by <code>OmniFaces.Ajax.data</code>.
 	 * For supported argument value types, read {@link Utils#toJson(Object)}. If a given argument type is not supported,
-	 * then an {@link IllegalArgumentException} will be thrown during render response.
+	 * then an {@link IllegalArgumentException} will be thrown during end of render response.
 	 * @param name The argument name.
 	 * @param value The argument value.
 	 */
@@ -143,8 +134,8 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 			writer.reset();
 		}
 
-		arguments.clear();
-		callbackScripts.clear();
+		arguments = null;
+		callbackScripts = null;
 	}
 
 	// Static ---------------------------------------------------------------------------------------------------------
@@ -224,9 +215,9 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		@Override
 		public void endDocument() throws IOException {
 	        if (context.arguments != null) {
-		        startExtension(Collections.singletonMap("id", EXTENSION_ID));
-	        	write(Json.encode(context.arguments));
-		        endExtension();
+		        startEval();
+		        write(String.format(AJAX_DATA, Json.encode(context.arguments)));
+		        endEval();
 			}
 
 			if (context.callbackScripts != null) {
