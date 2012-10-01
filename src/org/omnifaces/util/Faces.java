@@ -135,7 +135,7 @@ public final class Faces {
 	 * task.</i>
 	 * @return The current partial view context.
 	 * @see FacesContext#getPartialViewContext()
-	 * @Deprecated Please use {@link Ajax#getContext()} instead.
+	 * @deprecated Please use {@link Ajax#getContext()} instead.
 	 */
 	public static PartialViewContext getPartialViewContext() {
 		return getContext().getPartialViewContext();
@@ -457,7 +457,7 @@ public final class Faces {
 	 * should not start with the naming container separator character like <code>:</code>.
 	 * @param clientIds The client IDs to be added to the collection of render IDs of the current partial view context.
 	 * @since 1.1
-	 * @Deprecated Please use {@link Ajax#update(String...)} instead.
+	 * @deprecated Please use {@link Ajax#update(String...)} instead.
 	 */
 	public static void addRenderIds(String... clientIds) {
 		Collection<String> renderIds = getPartialViewContext().getRenderIds();

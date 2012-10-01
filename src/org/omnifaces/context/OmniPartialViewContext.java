@@ -32,7 +32,6 @@ import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
 import org.omnifaces.util.Ajax;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.Json;
-import org.omnifaces.util.Utils;
 
 /**
  * This OmniFaces partial view context extends and improves the standard partial view context as follows:
@@ -99,7 +98,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
 	/**
 	 * Add an argument to the partial response. This is as JSON object available by <code>OmniFaces.Ajax.data</code>.
-	 * For supported argument value types, read {@link Utils#toJson(Object)}. If a given argument type is not supported,
+	 * For supported argument value types, read {@link Json#encode(Object)}. If a given argument type is not supported,
 	 * then an {@link IllegalArgumentException} will be thrown during end of render response.
 	 * @param name The argument name.
 	 * @param value The argument value.

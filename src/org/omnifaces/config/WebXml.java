@@ -102,7 +102,7 @@ public enum WebXml {
 	 *   <li>Else use the default error page location, which can be either the java.lang.Throwable or HTTP 500 or
 	 *       default one.
 	 * </ul>
-	 * @param throwable The exception to find the error page location for.
+	 * @param exception The exception to find the error page location for.
 	 * @return The right error page location for the given exception.
 	 */
 	public String findErrorPageLocation(Throwable exception) {
