@@ -247,6 +247,7 @@ public final class Utils {
 	 * JavaScript <code>Date</code> constructor.
 	 * @param date The <code>Date</code> to be formatted to a string in RFC1123 format.
 	 * @return The formatted string.
+	 * @since 1.2
 	 */
 	public static String formatRFC1123(Date date) {
 		SimpleDateFormat sdf = new SimpleDateFormat(PATTERN_RFC1123_DATE, Locale.US);
@@ -259,6 +260,7 @@ public final class Utils {
 	 * @param string The string in RFC1123 format to be parsed to a <code>Date</code> object.
 	 * @return The parsed <code>Date</code>.
 	 * @throws ParseException When the given string is not in RFC1123 format.
+	 * @since 1.2
 	 */
 	public static Date parseRFC1123(String string) throws ParseException {
 		SimpleDateFormat sdf = new SimpleDateFormat(PATTERN_RFC1123_DATE, Locale.US);

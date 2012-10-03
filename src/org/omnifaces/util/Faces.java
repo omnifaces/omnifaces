@@ -783,6 +783,16 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the HTTP response character encoding.
+	 * @return The HTTP response character encoding.
+	 * @see ExternalContext#getResponseCharacterEncoding()
+	 * @since 1.2
+	 */
+	public static String getResponseCharacterEncoding() {
+		return getExternalContext().getResponseCharacterEncoding();
+	}
+
+	/**
 	 * Sends a temporary (302) redirect to the given URL. If the given URL does not start with <tt>http://</tt>,
 	 * <tt>https://</tt> or <tt>/</tt>, then the request context path will be prepended, otherwise it will be the
 	 * unmodified redirect URL.

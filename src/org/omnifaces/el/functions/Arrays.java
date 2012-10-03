@@ -55,10 +55,10 @@ public final class Arrays {
 	 * @param begin The begin integer.
 	 * @return end The end integer.
 	 */
-	public static int[] createIntegerArray(int begin, int end) {
+	public static Integer[] createIntegerArray(int begin, int end) {
 		int direction = (begin < end) ? 1 : (begin > end) ? -1 : 0;
 		int size = Math.abs(end - begin) + 1;
-		int[] array = new int[size];
+		Integer[] array = new Integer[size];
 
 		for (int i = 0; i < size; i++) {
 			array[i] = begin + (i * direction);

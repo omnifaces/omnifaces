@@ -145,7 +145,7 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 	 */
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
-		if (!isRendered() || getChildCount() == 0) {
+		if (context.getPartialViewContext().isAjaxRequest() || !isRendered() || getChildCount() == 0) {
 			return;
 		}
 
@@ -160,7 +160,7 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 	 */
 	@Override
 	public void encodeEnd(FacesContext context) throws IOException {
-		if (!isRendered() || getChildCount() == 0) {
+		if (context.getPartialViewContext().isAjaxRequest() || !isRendered() || getChildCount() == 0) {
 			return;
 		}
 

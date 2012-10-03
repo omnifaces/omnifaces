@@ -14,12 +14,16 @@ package org.omnifaces.context;
 
 import java.io.CharArrayWriter;
 import java.io.IOException;
+import java.nio.CharBuffer;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.faces.FacesException;
+import javax.faces.application.ViewExpiredException;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.context.PartialResponseWriter;
 import javax.faces.context.PartialViewContext;
@@ -36,11 +40,13 @@ import org.omnifaces.util.Json;
 /**
  * This OmniFaces partial view context extends and improves the standard partial view context as follows:
  * <ul>
- * <li>Support for executing callback scripts.</li>
+ * <li>Support for executing callback scripts by {@link PartialResponseWriter#startEval()}.</li>
  * <li>Support for adding arguments to ajax response.</li>
- * <li>Buffers the response until <code>javax.faces.FACELETS_BUFFER_SIZE</code> (regardless of flush calls).</li>
+ * <li>Buffers the response until {@link ExternalContext#getResponseBufferSize()} regardless of
+ * {@link ResponseWriter#flush()} calls (which defaults to <code>javax.faces.FACELETS_BUFFER_SIZE</code>).</li>
  * <li>Resettable buffer so that exceptions during ajax rendering can be properly handled.</li>
- * <li>Fixes the no-feedback problem when ViewExpiredException occurs during ajax request on a restricted page.</li>
+ * <li>Fixes the no-feedback problem when {@link ViewExpiredException} occurs during an ajax request on a restricted
+ * page. The enduser will now properly be redirected to the login page.</li>
  * </ul>
  * You can use the {@link Ajax} utility class to easily add callback scripts and arguments.
  * <p>
@@ -176,8 +182,9 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
 		// Constructors -----------------------------------------------------------------------------------------------
 
-		public OmniPartialResponseWriter(OmniPartialViewContext context, PartialResponseWriter writer) {
-			super(new ResettableBufferedResponseWriter(writer, Faces.getResponseBufferSize()));
+		public OmniPartialResponseWriter(OmniPartialViewContext context, ResponseWriter writer) {
+			super(new ResettableBufferedResponseWriter(
+				writer, Faces.getResponseBufferSize(), Faces.getResponseCharacterEncoding()));
 			this.context = context;
 		}
 
@@ -213,10 +220,10 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		 */
 		@Override
 		public void endDocument() throws IOException {
-	        if (context.arguments != null) {
-		        startEval();
-		        write(String.format(AJAX_DATA, Json.encode(context.arguments)));
-		        endEval();
+			if (context.arguments != null) {
+				startEval();
+				write(String.format(AJAX_DATA, Json.encode(context.arguments)));
+				endEval();
 			}
 
 			if (context.callbackScripts != null) {
@@ -263,14 +270,16 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
 			private ResponseWriter wrapped;
 			private int bufferSize;
+			private Charset charset;
 			private CharArrayWriter buffer;
 			private ResponseWriter writer;
 
 			// Constructors -------------------------------------------------------------------------------------------
 
-			public ResettableBufferedResponseWriter(ResponseWriter wrapped, int bufferSize) {
+			public ResettableBufferedResponseWriter(ResponseWriter wrapped, int bufferSize, String characterEncoding) {
 				this.wrapped = wrapped;
 				this.bufferSize = bufferSize;
+				this.charset = Charset.forName(characterEncoding);
 				this.buffer = new CharArrayWriter(bufferSize);
 			}
 
@@ -283,7 +292,9 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
 			@Override
 			public void flush() throws IOException {
-				if (buffer.size() > bufferSize) { // TODO: buffer size is actually measured in bytes, not chars, right?
+				int writtenBytes = charset.encode(CharBuffer.wrap(buffer.toCharArray())).limit();
+
+				if (writtenBytes > bufferSize) {
 					wrapped.write(buffer.toCharArray());
 					buffer.reset();
 					super.flush();
