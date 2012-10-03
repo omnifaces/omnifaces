@@ -20,6 +20,7 @@ import javax.faces.application.ViewHandler;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.ExceptionHandler;
 import javax.faces.context.ExceptionHandlerWrapper;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ExceptionQueuedEvent;
 import javax.faces.view.ViewDeclarationLanguage;
@@ -128,18 +129,17 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	@Override
 	public void handle() throws FacesException {
 		FacesContext context = FacesContext.getCurrentInstance();
+		ExternalContext externalContext = context.getExternalContext();
 
-		if (context.getPartialViewContext().isAjaxRequest()) {
+		if (context.getPartialViewContext().isAjaxRequest() && !externalContext.isResponseCommitted()) {
 			Iterator<ExceptionQueuedEvent> unhandledExceptionQueuedEvents = getUnhandledExceptionQueuedEvents().iterator();
 
 			if (unhandledExceptionQueuedEvents.hasNext()) {
 				Throwable exception = unhandledExceptionQueuedEvents.next().getContext().getException();
 				unhandledExceptionQueuedEvents.remove();
 
-				// If the exception is wrapped in a FacesException, unwrap the root cause.
+				// Unwrap root cause of FacesException and find error page location for the unwrapped root cause.
 				exception = Exceptions.unwrap(exception, FacesException.class);
-
-				// Find the error page location for the given exception.
 				String errorPageLocation = WebXml.INSTANCE.findErrorPageLocation(exception);
 
 				// If there's no default error page location, well, it's then end of story.
@@ -148,18 +148,19 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 				}
 
 				// Log the exception to server log like as in a normal synchronous HTTP 500 error page response.
-				context.getExternalContext().log(String.format(LOG_EXCEPTION_OCCURRED, errorPageLocation), exception);
+				externalContext.log(String.format(LOG_EXCEPTION_OCCURRED, errorPageLocation), exception);
 
 				// Set the necessary servlet request attributes which a bit decent error page may expect.
-				final HttpServletRequest request = (HttpServletRequest) context.getExternalContext().getRequest();
+				HttpServletRequest request = (HttpServletRequest) externalContext.getRequest();
 				request.setAttribute(ATTRIBUTE_ERROR_EXCEPTION, exception);
 				request.setAttribute(ATTRIBUTE_ERROR_EXCEPTION_TYPE, exception.getClass());
 				request.setAttribute(ATTRIBUTE_ERROR_MESSAGE, exception.getMessage());
 				request.setAttribute(ATTRIBUTE_ERROR_REQUEST_URI, request.getRequestURI());
 				request.setAttribute(ATTRIBUTE_ERROR_STATUS_CODE, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
-				// If the exception was thrown in midst of rendering the JSF response, then reset partial response.
+				// If the exception was thrown in midst of rendering the JSF response, then reset (partial) response.
 				if (context.getRenderResponse()) {
+					externalContext.responseReset();
 					OmniPartialViewContext.getCurrentInstance().resetPartialResponse();
 				}
 
