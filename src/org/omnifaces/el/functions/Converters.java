@@ -50,6 +50,10 @@ public final class Converters {
 	 * @return The formatted bytes.
 	 */
 	public static String formatBytes(Long bytes) {
+		if (bytes == null) {
+			return "0 B";
+		}
+
 	    if (bytes < 1024) {
 	    	return bytes + " B";
 	    }
@@ -93,6 +97,10 @@ public final class Converters {
 	 * @return The printed stack trace.
 	 */
 	public static String printStackTrace(Throwable exception) {
+		if (exception == null) {
+			return null;
+		}
+
 		StringWriter stringWriter = new StringWriter();
 		exception.printStackTrace(new PrintWriter(stringWriter, true));
 		return stringWriter.toString();
