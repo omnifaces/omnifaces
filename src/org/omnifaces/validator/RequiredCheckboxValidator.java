@@ -27,11 +27,11 @@ import org.omnifaces.util.Faces;
 import org.omnifaces.util.Messages;
 
 /**
- * The required attribute of a <code>&lt;h:selectBooleanCheckbox&gt;</code> is a bit non-intuitive. If you want to
- * require the user to tick the desired checkbox, you would expect that setting <code>required="true"</code> is
- * sufficient.
+ * This validator solves the broken <code>required="true"</code> attribute of the
+ * <code>&lt;h:selectBooleanCheckbox&gt;</code>. If you want to require the user to tick the desired checkbox, you would
+ * expect that setting <code>required="true"</code> is sufficient. But it is not, the validation wil always pass.
  * <p>
- * But it is not. As for every other {@link UIInput} component the default <code>required="true"</code> validator would
+ * As for every other {@link UIInput} component the default <code>required="true"</code> validator would
  * only check if the value is actually filled and been sent to the server side, i.e. the value is not null nor empty.
  * In case of a <code>&lt;h:selectBooleanCheckbox&gt;</code>, which accepts <code>Boolean</code> or <code>boolean</code>
  * properties only, JSF EL will coerce the unchecked value to <code>Boolean.FALSE</code> during apply request values
