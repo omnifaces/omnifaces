@@ -23,6 +23,7 @@ import javax.faces.context.ExceptionHandlerWrapper;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ExceptionQueuedEvent;
+import javax.faces.event.PreRenderViewEvent;
 import javax.faces.view.ViewDeclarationLanguage;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -174,7 +175,9 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
             	ViewDeclarationLanguage vdl = viewHandler.getViewDeclarationLanguage(context, viewId);
 
 	            try {
+	            	context.getAttributes().clear();
 	            	vdl.buildView(context, viewRoot);
+	                context.getApplication().publishEvent(context, PreRenderViewEvent.class, viewRoot);
 	            	vdl.renderView(context, viewRoot);
 	            }
 	            catch (IOException e) {
