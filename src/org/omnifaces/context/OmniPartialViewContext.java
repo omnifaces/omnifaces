@@ -260,8 +260,9 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		// Nested classes ---------------------------------------------------------------------------------------------
 
 		/**
-		 * This response writer buffers the entire response body until buffer size is reached, regardless of flush,
-		 * which allows us to perform a reset before the buffer size is reached.
+		 * This response writer buffers the response body until the <code>javax.faces.FACELETS_BUFFER_SIZE</code> is
+		 * reached, regardless of flush calls, which allows us to perform a reset before the buffer size is reached.
+		 *
 		 * @author Bauke Scholtz
 		 */
 		private static class ResettableBufferedResponseWriter extends ResponseWriterWrapper {
@@ -304,6 +305,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 			@Override
 			public void close() throws IOException {
 				wrapped.write(buffer.toCharArray());
+				buffer.reset();
 				super.close();
 			}
 
