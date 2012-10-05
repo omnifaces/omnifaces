@@ -235,7 +235,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 			}
 
 			super.endDocument();
-			getWrapped().close();
+			getWrapped().forceFlush();
 		}
 
 		/**
@@ -296,17 +296,14 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 				int writtenBytes = charset.encode(CharBuffer.wrap(buffer.toCharArray())).limit();
 
 				if (writtenBytes > bufferSize) {
-					wrapped.write(buffer.toCharArray());
-					buffer.reset();
-					super.flush();
+					forceFlush();
 				}
 			}
 
-			@Override
-			public void close() throws IOException {
+			public void forceFlush() throws IOException {
 				wrapped.write(buffer.toCharArray());
 				buffer.reset();
-				super.close();
+				super.flush();
 			}
 
 			@Override
