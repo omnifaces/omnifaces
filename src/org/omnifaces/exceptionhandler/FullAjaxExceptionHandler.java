@@ -23,6 +23,7 @@ import javax.faces.context.ExceptionHandlerWrapper;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ExceptionQueuedEvent;
+import javax.faces.event.PhaseId;
 import javax.faces.event.PreRenderViewEvent;
 import javax.faces.view.ViewDeclarationLanguage;
 import javax.servlet.http.HttpServletRequest;
@@ -160,7 +161,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 				request.setAttribute(ATTRIBUTE_ERROR_STATUS_CODE, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
 				// If the exception was thrown in midst of rendering the JSF response, then reset (partial) response.
-				if (context.getRenderResponse()) {
+				if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
 					externalContext.responseReset();
 					OmniPartialViewContext.getCurrentInstance().resetPartialResponse();
 				}
