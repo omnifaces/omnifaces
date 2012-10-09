@@ -184,7 +184,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
 		public OmniPartialResponseWriter(OmniPartialViewContext context, ResponseWriter writer) {
 			super(new ResettableBufferedResponseWriter(
-				writer, Faces.getResponseBufferSize(), Faces.getResponseCharacterEncoding()));
+				writer, Faces.getResponseCharacterEncoding(), Faces.getResponseBufferSize()));
 			this.context = context;
 		}
 
@@ -242,14 +242,18 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		 * Calls {@link PartialResponseWriter#endDocument()} and then {@link ResettableBufferedResponseWriter#reset()}.
 		 */
 		public void reset() {
+			ResettableBufferedResponseWriter writer = getWrapped();
+			writer.startReset();
+
 			try {
 				super.endDocument(); // Clears any internal state of this PartialResponseWriter.
 			}
 			catch (IOException e) {
 				throw new FacesException(e);
 			}
-
-			getWrapped().reset();
+			finally {
+				writer.endReset();
+			}
 		}
 
 		@Override
@@ -270,39 +274,66 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 			// Variables ----------------------------------------------------------------------------------------------
 
 			private ResponseWriter wrapped;
-			private int bufferSize;
 			private Charset charset;
 			private CharArrayWriter buffer;
+			private int bufferSize;
+			private int writtenBytes;
 			private ResponseWriter writer;
+			private boolean resetting;
 
 			// Constructors -------------------------------------------------------------------------------------------
 
-			public ResettableBufferedResponseWriter(ResponseWriter wrapped, int bufferSize, String characterEncoding) {
+			public ResettableBufferedResponseWriter(ResponseWriter wrapped, String characterEncoding, int bufferSize) {
 				this.wrapped = wrapped;
-				this.bufferSize = bufferSize;
 				this.charset = Charset.forName(characterEncoding);
 				this.buffer = new CharArrayWriter(bufferSize);
+				this.bufferSize = bufferSize;
 			}
 
 			// Actions ------------------------------------------------------------------------------------------------
 
-			public void reset() {
+			@Override
+			public void write(char[] chars, int offset, int length) throws IOException {
+				if (buffer != null) {
+					if (!resetting && (writtenBytes += charset.encode(CharBuffer.wrap(chars)).limit()) > bufferSize) {
+						wrapped.write(buffer.toCharArray());
+						buffer = null;
+					}
+					else {
+						buffer.write(chars, offset, length);
+						return;
+					}
+				}
+
+				if (buffer == null) {
+					wrapped.write(chars, offset, length);
+				}
+			}
+
+			public void startReset() {
+				resetting = true;
+			}
+
+			public void endReset() {
 				writer = null;
-				buffer.reset();
+				buffer = new CharArrayWriter(bufferSize);
+				writtenBytes = 0;
+				resetting = false;
 			}
 
 			@Override
 			public void flush() throws IOException {
-				int writtenBytes = charset.encode(CharBuffer.wrap(buffer.toCharArray())).limit();
-
-				if (writtenBytes > bufferSize) {
-					forceFlush();
+				if (!resetting || buffer == null) {
+					super.flush();
 				}
 			}
 
 			public void forceFlush() throws IOException {
-				wrapped.write(buffer.toCharArray());
-				buffer.reset();
+				if (buffer != null) {
+					wrapped.write(buffer.toCharArray());
+					buffer.reset();
+				}
+
 				super.flush();
 			}
 

@@ -14,8 +14,8 @@ package org.omnifaces.servlet;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
@@ -48,13 +48,8 @@ public class BufferedHttpServletResponse extends HttpServletResponseOutputWrappe
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
-	protected ServletOutputStream createOutputStream() {
-		return new ServletOutputStream() {
-			@Override
-			public void write(int b) throws IOException {
-				buffer.write(b);
-			}
-		};
+	protected OutputStream createOutputStream() {
+		return buffer;
 	}
 
 	/**

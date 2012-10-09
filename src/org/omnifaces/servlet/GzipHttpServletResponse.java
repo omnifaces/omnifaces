@@ -18,7 +18,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
 
-import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
@@ -43,6 +42,7 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 	private int contentLength;
 	private String vary;
 	private boolean noGzip;
+	private GzipThresholdOutputStream output;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -105,31 +105,51 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 	}
 
 	@Override
-	protected ServletOutputStream createOutputStream() {
-		return new GzipServletOutputStream(threshold);
+	public void reset() {
+		super.reset();
+
+		if (!isCommitted()) {
+			contentLength = 0;
+			vary = null;
+			noGzip = false;
+
+			if (output != null) {
+				output.reset();
+			}
+		}
+	}
+
+	@Override
+	protected OutputStream createOutputStream() {
+		return output = new GzipThresholdOutputStream(threshold);
 	}
 
 	// Inner classes --------------------------------------------------------------------------------------------------
 
 	/**
-	 * This servlet output stream will switch to GZIP compression when the given threshold is exceeded.
+	 * This output stream will switch to GZIP compression when the given threshold is exceeded.
 	 * <p>
 	 * This is an inner class because it needs to be able to manipulate the response headers once the decision whether
 	 * to GZIP or not has been made.
 	 *
 	 * @author Bauke Scholtz
 	 */
-	private class GzipServletOutputStream extends ServletOutputStream {
+	private class GzipThresholdOutputStream extends OutputStream {
+
+		// Constants --------------------------------------------------------------------------------------------------
+
+		private static final String ERROR_CLOSED = "Stream is already closed.";
 
 		// Properties -------------------------------------------------------------------------------------------------
 
 		private byte[] thresholdBuffer;
 		private int thresholdLength;
 		private OutputStream output;
+		private boolean closed;
 
 		// Constructors -----------------------------------------------------------------------------------------------
 
-		public GzipServletOutputStream(int threshold) {
+		public GzipThresholdOutputStream(int threshold) {
 			this.thresholdBuffer = new byte[threshold];
 		}
 
@@ -147,6 +167,8 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 
 		@Override
 		public void write(byte[] bytes, int offset, int length) throws IOException {
+			checkClosed();
+
 			if (length == 0) {
 				return;
 			}
@@ -169,6 +191,8 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 
 		@Override
 		public void flush() throws IOException {
+			checkClosed();
+
 			if (output != null) {
 				output.flush();
 			}
@@ -176,6 +200,10 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 
 		@Override
 		public void close() throws IOException {
+			if (closed) {
+				return;
+			}
+
 			if (output == null) {
 				// Threshold buffer hasn't exceeded. Use normal output stream.
 				setContentLength(thresholdLength);
@@ -184,6 +212,12 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 			}
 
 			output.close();
+			closed = true;
+		}
+
+		public void reset() {
+			thresholdLength = 0;
+			output = null;
 		}
 
 		// Helpers ----------------------------------------------------------------------------------------------------
@@ -212,6 +246,16 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 			}
 
 			return originalResponse.getOutputStream();
+		}
+
+		/**
+		 * Check if the current stream is closed and if so, then throw IO exception.
+		 * @throws IOException When the current stream is closed.
+		 */
+		private void checkClosed() throws IOException {
+			if (closed) {
+				throw new IOException(ERROR_CLOSED);
+			}
 		}
 
 	}

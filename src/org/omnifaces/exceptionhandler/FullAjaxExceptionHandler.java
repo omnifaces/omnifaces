@@ -117,8 +117,8 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Handle the ajax exception as follows, only and only if the current request is an ajax request and there is at
-	 * least one unhandled exception:
+	 * Handle the ajax exception as follows, only and only if the current request is an ajax request with an uncommitted
+	 * response and there is at least one unhandled exception:
 	 * <ul>
 	 *   <li>If the exception is an instance of {@link FacesException}, then unwrap its root cause as long as it is not
 	 *       an instance of {@link FacesException}.
@@ -152,6 +152,12 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 				// Log the exception to server log like as in a normal synchronous HTTP 500 error page response.
 				externalContext.log(String.format(LOG_EXCEPTION_OCCURRED, errorPageLocation), exception);
 
+				// If the exception was thrown in midst of rendering the JSF response, then reset (partial) response.
+				if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
+					externalContext.responseReset();
+					OmniPartialViewContext.getCurrentInstance().resetPartialResponse();
+				}
+
 				// Set the necessary servlet request attributes which a bit decent error page may expect.
 				HttpServletRequest request = (HttpServletRequest) externalContext.getRequest();
 				request.setAttribute(ATTRIBUTE_ERROR_EXCEPTION, exception);
@@ -159,12 +165,6 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 				request.setAttribute(ATTRIBUTE_ERROR_MESSAGE, exception.getMessage());
 				request.setAttribute(ATTRIBUTE_ERROR_REQUEST_URI, request.getRequestURI());
 				request.setAttribute(ATTRIBUTE_ERROR_STATUS_CODE, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-
-				// If the exception was thrown in midst of rendering the JSF response, then reset (partial) response.
-				if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
-					externalContext.responseReset();
-					OmniPartialViewContext.getCurrentInstance().resetPartialResponse();
-				}
 
 				// Force JSF to render the error page in its entirety to the ajax response.
 				// Note that we cannot set response status code to 500, the JSF ajax response won't be processed then.
