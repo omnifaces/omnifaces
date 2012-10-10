@@ -12,27 +12,30 @@
  */
 package org.omnifaces.servlet;
 
-import java.io.ByteArrayOutputStream;
-import java.io.CharArrayWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import org.omnifaces.io.ResettableBuffer;
+import org.omnifaces.io.ResettableBufferedOutputStream;
+import org.omnifaces.io.ResettableBufferedWriter;
+
 /**
- * Convenience class for extending {@link HttpServletResponseWrapper} wherein the {@link ServletOutputStream} has to
- * be replaced by a custom implementation. This saves the developer from writing repeated {@link #getOutputStream()},
- * {@link #getWriter()} and {@link #flushBuffer()} boilerplate. All the developer has to do is to implement the
- * {@link #createOutputStream()} accordingly. This will in turn be used by both {@link #getOutputStream()} and
- * {@link #getWriter()}. The boolean property <code>passThrough</code>, which defaults to <code>false</code> also
- * enables the developer to control whether to pass through to the wrapped {@link ServletOutputStream} or not.
+ * Convenience class for extending {@link HttpServletResponseWrapper} wherein the servlet response {@link OutputStream}
+ * has to be replaced by a custom implementation. This saves the developer from writing repeated
+ * {@link #getOutputStream()}, {@link #getWriter()} and {@link #flushBuffer()} boilerplate. All the developer has to do
+ * is to implement the {@link #createOutputStream()} accordingly. This will in turn be used by both
+ * {@link #getOutputStream()} and {@link #getWriter()}.
+ * <p>
+ * The boolean property <code>passThrough</code>, which defaults to <code>false</code> also enables the developer to
+ * control whether to pass through to the wrapped {@link ServletOutputStream} or not.
+ * <p>
  *
  * @author Bauke Scholtz
  * @since 1.1
@@ -50,7 +53,7 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 
 	private ServletOutputStream output;
 	private PrintWriter writer;
-	private Resettable buffer;
+	private ResettableBuffer buffer;
 	private boolean passThrough;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
@@ -114,7 +117,7 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 
 		if (writer == null) {
 			buffer = new ResettableBufferedWriter(new OutputStreamWriter(createOutputStream(),
-				getCharacterEncoding()), getCharacterEncoding(), getBufferSize());
+				getCharacterEncoding()), getBufferSize(), getCharacterEncoding());
 			writer = new PrintWriter((Writer) buffer);
 		}
 
@@ -142,7 +145,6 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 	 * @throws IOException When an I/O error occurs.
 	 */
 	public void close() throws IOException {
-
 		if (writer != null) {
 			writer.close();
 		}
@@ -163,6 +165,16 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 	// Getters/setters ------------------------------------------------------------------------------------------------
 
 	/**
+	 * Returns whether the response is committed or not. The response is also considered committed when the resettable
+	 * buffer has been flushed.
+	 * @return <code>true</code> if the response is committed, otherwise <code>false</code>.
+	 */
+	@Override
+	public boolean isCommitted() {
+		return super.isCommitted() || (buffer != null && !buffer.isResettable());
+	}
+
+	/**
 	 * Returns whether the writing has to be passed through to the wrapped {@link ServletOutputStream}.
 	 * @return <code>true</code>, if the writing has to be passed through to the wrapped {@link ServletOutputStream},
 	 * otherwise <code>false</code>.
@@ -179,175 +191,5 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 	public void setPassThrough(boolean passThrough) {
     	this.passThrough = passThrough;
     }
-
-	// Nested classes -------------------------------------------------------------------------------------------------
-
-	/**
-	 * @author Bauke Scholtz
-	 */
-	private static interface Resettable {
-
-		/**
-		 * Perform a reset.
-		 */
-		void reset();
-
-	}
-
-	/**
-	 * @author Bauke Scholtz
-	 */
-	private static class ResettableBufferedOutputStream extends OutputStream implements Resettable {
-
-		// Variables ------------------------------------------------------------------------------------------------------
-
-		private OutputStream output;
-		private ByteArrayOutputStream buffer;
-		private int bufferSize;
-		private int writtenBytes;
-
-		// Constructors ---------------------------------------------------------------------------------------------------
-
-		/**
-		 * Construct a new resettable buffered output stream which wraps the given output stream and forcibly buffers
-		 * everything until the given buffer size, regardless of flush calls.
-		 * @param output The wrapped output stream .
-		 * @param bufferSize The buffer size.
-		 */
-		public ResettableBufferedOutputStream(OutputStream output, int bufferSize) {
-			this.output = output;
-			this.buffer = new ByteArrayOutputStream(bufferSize);
-			this.bufferSize = bufferSize;
-		}
-
-		// Actions --------------------------------------------------------------------------------------------------------
-
-		@Override
-		public void write(int b) throws IOException {
-			write(new byte[] { (byte) b }, 0, 1);
-		}
-
-		@Override
-		public void write(byte[] bytes) throws IOException {
-			write(bytes, 0, bytes.length);
-		}
-
-		@Override
-		public void write(byte[] bytes, int offset, int length) throws IOException {
-			if (buffer != null) {
-				if ((writtenBytes += length) > bufferSize) {
-					output.write(buffer.toByteArray());
-					buffer = null;
-				}
-				else {
-					buffer.write(bytes, offset, length);
-					return;
-				}
-			}
-
-			if (buffer == null) {
-				output.write(bytes, offset, length);
-			}
-		}
-
-		@Override
-		public void reset() {
-			buffer = new ByteArrayOutputStream(bufferSize);
-			writtenBytes = 0;
-		}
-
-		@Override
-		public void flush() throws IOException {
-			if (buffer == null) {
-				output.flush();
-			}
-		}
-
-		@Override
-		public void close() throws IOException {
-			if (buffer != null) {
-				output.write(buffer.toByteArray());
-				buffer = null;
-			}
-
-			output.close();
-		}
-
-	}
-
-	/**
-	 * @author Bauke Scholtz
-	 */
-	private static class ResettableBufferedWriter extends Writer implements Resettable {
-
-		// Variables --------------------------------------------------------------------------------------------------
-
-		private Writer writer;
-		private Charset charset;
-		private CharArrayWriter buffer;
-		private int bufferSize;
-		private int writtenBytes;
-
-		// Constructors -----------------------------------------------------------------------------------------------
-
-		/**
-		 * Construct a new resettable buffered writer which wraps the given writer, uses the given character encoding
-		 * to measure the amount of written bytes and forcibly buffers everything until the given buffer size,
-		 * regardless of flush calls.
-		 * @param writer The wrapped writer.
-		 * @param characterEncoding The character encoding.
-		 * @param bufferSize The buffer size.
-		 */
-		public ResettableBufferedWriter(Writer writer, String characterEncoding, int bufferSize) {
-			this.writer = writer;
-			this.charset = Charset.forName(characterEncoding);
-			this.buffer = new CharArrayWriter(bufferSize);
-			this.bufferSize = bufferSize;
-		}
-
-		// Actions ----------------------------------------------------------------------------------------------------
-
-		@Override
-		public void write(char[] chars, int offset, int length) throws IOException {
-			if (buffer != null) {
-				if ((writtenBytes += charset.encode(CharBuffer.wrap(chars)).limit()) > bufferSize) {
-					writer.write(buffer.toCharArray());
-					buffer = null;
-				}
-				else {
-					buffer.write(chars, offset, length);
-					return;
-				}
-			}
-
-			if (buffer == null) {
-				writer.write(chars, offset, length);
-			}
-		}
-
-		@Override
-		public void reset() {
-			buffer = new CharArrayWriter(bufferSize);
-			writtenBytes = 0;
-		}
-
-		@Override
-		public void flush() throws IOException {
-			if (buffer == null) {
-				writer.flush();
-			}
-		}
-
-		@Override
-		public void close() throws IOException {
-			if (buffer != null) {
-				writer.write(buffer.toCharArray());
-				buffer = null;
-			}
-
-			writer.close();
-		}
-
-	}
 
 }

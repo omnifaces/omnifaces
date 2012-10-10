@@ -78,6 +78,10 @@ import org.omnifaces.util.Faces;
  *   &lt;/li&gt;
  * &lt;/ul&gt;
  * </pre>
+ * <p>
+ * Exceptions during render response can only be handled when the <code>javax.faces.FACELETS_BUFFER_SIZE</code> is
+ * large enough so that the so far rendered response until the occurrence of the exception fits in there and can
+ * therefore safely be resetted.
  *
  * @author Bauke Scholtz
  * @see FullAjaxExceptionHandlerFactory
@@ -89,8 +93,16 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	private static final String ERROR_DEFAULT_LOCATION_MISSING =
 		"Either HTTP 500 or java.lang.Throwable error page is required in web.xml or web-fragment.xml."
 			+ " Neither was found.";
-	private static final String LOG_EXCEPTION_OCCURRED =
-		"An exception occurred during JSF ajax request. Showing error page location '%s'.";
+	private static final String LOG_EXCEPTION_HANDLED =
+		"FullAjaxExceptionHandler: An exception occurred during processing JSF ajax request."
+			+ " Error page '%s' will be shown.";
+	private static final String LOG_RENDER_EXCEPTION_HANDLED =
+		"FullAjaxExceptionHandler: An exception occurred during rendering JSF ajax response."
+			+ " Error page '%s' will be shown.";
+	private static final String LOG_RENDER_EXCEPTION_UNHANDLED =
+		"FullAjaxExceptionHandler: An exception occurred during rendering JSF ajax response."
+			+ " Error page '%s' CANNOT be shown as response is already committed."
+			+ " Consider increasing 'javax.faces.FACELETS_BUFFER_SIZE' if it really needs to be handled.";
 
 	// Yes, those are copies of Servlet 3.0 RequestDispatcher constant field values.
 	// They are hardcoded to maintain Servlet 2.5 compatibility.
@@ -130,79 +142,93 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	 */
 	@Override
 	public void handle() throws FacesException {
-		FacesContext context = FacesContext.getCurrentInstance();
-		ExternalContext externalContext = context.getExternalContext();
+		handleAjaxException(FacesContext.getCurrentInstance());
+		wrapped.handle();
+	}
 
-		if (context.getPartialViewContext().isAjaxRequest() && !externalContext.isResponseCommitted()) {
-			Iterator<ExceptionQueuedEvent> unhandledExceptionQueuedEvents = getUnhandledExceptionQueuedEvents().iterator();
-
-			if (unhandledExceptionQueuedEvents.hasNext()) {
-				Throwable exception = unhandledExceptionQueuedEvents.next().getContext().getException();
-				unhandledExceptionQueuedEvents.remove();
-
-				// Unwrap root cause of FacesException and find error page location for the unwrapped root cause.
-				exception = Exceptions.unwrap(exception, FacesException.class);
-				String errorPageLocation = WebXml.INSTANCE.findErrorPageLocation(exception);
-
-				// If there's no default error page location, well, it's then end of story.
-				if (errorPageLocation == null) {
-					throw new IllegalArgumentException(ERROR_DEFAULT_LOCATION_MISSING);
-				}
-
-				// Log the exception to server log like as in a normal synchronous HTTP 500 error page response.
-				externalContext.log(String.format(LOG_EXCEPTION_OCCURRED, errorPageLocation), exception);
-
-				// If the exception was thrown in midst of rendering the JSF response, then reset (partial) response.
-				if (context.getCurrentPhaseId() == PhaseId.RENDER_RESPONSE) {
-					externalContext.responseReset();
-					OmniPartialViewContext.getCurrentInstance().resetPartialResponse();
-				}
-
-				// Set the necessary servlet request attributes which a bit decent error page may expect.
-				HttpServletRequest request = (HttpServletRequest) externalContext.getRequest();
-				request.setAttribute(ATTRIBUTE_ERROR_EXCEPTION, exception);
-				request.setAttribute(ATTRIBUTE_ERROR_EXCEPTION_TYPE, exception.getClass());
-				request.setAttribute(ATTRIBUTE_ERROR_MESSAGE, exception.getMessage());
-				request.setAttribute(ATTRIBUTE_ERROR_REQUEST_URI, request.getRequestURI());
-				request.setAttribute(ATTRIBUTE_ERROR_STATUS_CODE, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-
-				// Force JSF to render the error page in its entirety to the ajax response.
-				// Note that we cannot set response status code to 500, the JSF ajax response won't be processed then.
-				String viewId = Faces.normalizeViewId(errorPageLocation);
-				ViewHandler viewHandler = context.getApplication().getViewHandler();
-				UIViewRoot viewRoot = viewHandler.createView(context, viewId);
-				context.setViewRoot(viewRoot);
-				context.getPartialViewContext().setRenderAll(true);
-            	ViewDeclarationLanguage vdl = viewHandler.getViewDeclarationLanguage(context, viewId);
-
-	            try {
-	            	context.getAttributes().clear();
-	            	vdl.buildView(context, viewRoot);
-	                context.getApplication().publishEvent(context, PreRenderViewEvent.class, viewRoot);
-	            	vdl.renderView(context, viewRoot);
-	            }
-	            catch (IOException e) {
-	            	throw new FacesException(e);
-	            }
-	            finally {
-					// Prevent some servlet containers from handling error page itself afterwards. So far Tomcat/JBoss
-					// are known to do that. It would only result in IllegalStateException "response already committed".
-					request.removeAttribute(ATTRIBUTE_ERROR_EXCEPTION);
-	            }
-
-	            // Inform JSF that we've completed the response ourselves.
-				context.responseComplete();
-			}
-
-			while (unhandledExceptionQueuedEvents.hasNext()) {
-				// Any remaining unhandled exceptions are not interesting. First fix the first.
-				unhandledExceptionQueuedEvents.next();
-				unhandledExceptionQueuedEvents.remove();
-			}
-
+	private void handleAjaxException(FacesContext context) {
+		if (!context.getPartialViewContext().isAjaxRequest()) {
+			return; // Not an ajax request.
 		}
 
-		wrapped.handle();
+		Iterator<ExceptionQueuedEvent> unhandledExceptionQueuedEvents = getUnhandledExceptionQueuedEvents().iterator();
+
+		if (unhandledExceptionQueuedEvents.hasNext()) {
+			Throwable exception = unhandledExceptionQueuedEvents.next().getContext().getException();
+			unhandledExceptionQueuedEvents.remove();
+
+			// Unwrap the root cause from FacesException and find the associated error page location.
+			exception = Exceptions.unwrap(exception, FacesException.class);
+			String errorPageLocation = WebXml.INSTANCE.findErrorPageLocation(exception);
+
+			if (errorPageLocation == null) {
+				// If there's no default error page location, then it's end of story.
+				throw new IllegalArgumentException(ERROR_DEFAULT_LOCATION_MISSING);
+			}
+
+			ExternalContext externalContext = context.getExternalContext();
+
+			// Check if we're inside render response and if the response is committed.
+			if (context.getCurrentPhaseId() != PhaseId.RENDER_RESPONSE) {
+				externalContext.log(String.format(LOG_EXCEPTION_HANDLED, errorPageLocation), exception);
+			}
+			else if (!externalContext.isResponseCommitted()) {
+				externalContext.log(String.format(LOG_RENDER_EXCEPTION_HANDLED, errorPageLocation), exception);
+
+				// If the exception was thrown in midst of rendering the JSF response, then reset (partial) response.
+				externalContext.responseReset();
+				OmniPartialViewContext.getCurrentInstance().resetPartialResponse();
+			}
+			else {
+				externalContext.log(String.format(LOG_RENDER_EXCEPTION_UNHANDLED, errorPageLocation), exception);
+
+				// Mojarra doesn't close the partial response during render exception. Let do it ourselves.
+				OmniPartialViewContext.getCurrentInstance().closePartialResponse();
+				return;
+			}
+
+			// Set the necessary servlet request attributes which a bit decent error page may expect.
+			HttpServletRequest request = (HttpServletRequest) externalContext.getRequest();
+			request.setAttribute(ATTRIBUTE_ERROR_EXCEPTION, exception);
+			request.setAttribute(ATTRIBUTE_ERROR_EXCEPTION_TYPE, exception.getClass());
+			request.setAttribute(ATTRIBUTE_ERROR_MESSAGE, exception.getMessage());
+			request.setAttribute(ATTRIBUTE_ERROR_REQUEST_URI, request.getRequestURI());
+			request.setAttribute(ATTRIBUTE_ERROR_STATUS_CODE, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+			// Force JSF to render the error page in its entirety to the ajax response.
+			try {
+	        	renderErrorPageView(context, errorPageLocation);
+	        }
+	        catch (IOException e) {
+	        	throw new FacesException(e);
+	        }
+	        finally {
+				// Prevent some servlet containers from handling error page itself afterwards. So far Tomcat/JBoss
+				// are known to do that. It would only result in IllegalStateException "response already committed".
+				request.removeAttribute(ATTRIBUTE_ERROR_EXCEPTION);
+	        }
+
+			context.responseComplete();
+		}
+
+		while (unhandledExceptionQueuedEvents.hasNext()) {
+			// Any remaining unhandled exceptions are not interesting. First fix the first.
+			unhandledExceptionQueuedEvents.next();
+			unhandledExceptionQueuedEvents.remove();
+		}
+	}
+
+	private void renderErrorPageView(FacesContext context, String errorPageLocation) throws IOException {
+		String viewId = Faces.normalizeViewId(errorPageLocation);
+		ViewHandler viewHandler = context.getApplication().getViewHandler();
+		UIViewRoot viewRoot = viewHandler.createView(context, viewId);
+		context.setViewRoot(viewRoot);
+		context.getPartialViewContext().setRenderAll(true);
+    	ViewDeclarationLanguage vdl = viewHandler.getViewDeclarationLanguage(context, viewId);
+    	context.getAttributes().clear();
+    	vdl.buildView(context, viewRoot);
+        context.getApplication().publishEvent(context, PreRenderViewEvent.class, viewRoot);
+    	vdl.renderView(context, viewRoot);
 	}
 
 	@Override

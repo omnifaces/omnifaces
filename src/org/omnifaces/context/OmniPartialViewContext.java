@@ -12,10 +12,7 @@
  */
 package org.omnifaces.context;
 
-import java.io.CharArrayWriter;
 import java.io.IOException;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +30,7 @@ import javax.faces.context.ResponseWriterWrapper;
 
 import org.omnifaces.config.WebXml;
 import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
+import org.omnifaces.io.ResettableBufferedWriter;
 import org.omnifaces.util.Ajax;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.Json;
@@ -133,6 +131,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 	/**
 	 * Reset the partial response. This clears any JavaScript arguments and callbacks set any data written to the
 	 * {@link PartialResponseWriter}.
+	 * @see FullAjaxExceptionHandler
 	 */
 	public void resetPartialResponse() {
 		if (writer != null) {
@@ -141,6 +140,23 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
 		arguments = null;
 		callbackScripts = null;
+	}
+
+	/**
+	 * Close the partial response. If the writer is still in update phase, then end the update and the document. This
+	 * fixes the Mojarra problem of incomplete ajax responses caused by exceptions during ajax render response.
+	 * @see FullAjaxExceptionHandler
+	 */
+	public void closePartialResponse() {
+		if (writer.updating) {
+			try {
+				writer.endUpdate();
+				writer.endDocument();
+			}
+			catch (IOException e) {
+				throw new FacesException(e);
+			}
+		}
 	}
 
 	// Static ---------------------------------------------------------------------------------------------------------
@@ -179,12 +195,13 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		// Variables --------------------------------------------------------------------------------------------------
 
 		private OmniPartialViewContext context;
+		private boolean updating;
 
 		// Constructors -----------------------------------------------------------------------------------------------
 
 		public OmniPartialResponseWriter(OmniPartialViewContext context, ResponseWriter writer) {
 			super(new ResettableBufferedResponseWriter(
-				writer, Faces.getResponseCharacterEncoding(), Faces.getResponseBufferSize()));
+				writer, Faces.getResponseBufferSize(), Faces.getResponseCharacterEncoding()));
 			this.context = context;
 		}
 
@@ -215,44 +232,83 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		}
 
 		/**
+		 * An override which remembers if we're updating or not.
+		 * @see #endDocument()
+		 * @see #reset()
+		 */
+		@Override
+		public void startUpdate(String targetId) throws IOException {
+			updating = true;
+			super.startUpdate(targetId);
+		}
+
+		/**
+		 * An override which remembers if we're updating or not.
+		 * @see #endDocument()
+		 * @see #reset()
+		 */
+		@Override
+		public void endUpdate() throws IOException {
+			updating = false;
+			super.endUpdate();
+		}
+
+		/**
 		 * An override which writes all {@link OmniPartialViewContext#arguments} as JSON to the extension and all
 		 * {@link OmniPartialViewContext#callbackScripts} to the eval.
 		 */
 		@Override
 		public void endDocument() throws IOException {
-			if (context.arguments != null) {
-				startEval();
-				write(String.format(AJAX_DATA, Json.encode(context.arguments)));
-				endEval();
+			if (updating) {
+				// Resets partial response writer state in MyFaces in case of exception during ajax render response.
+				// Mojarra never enters endDocument() method with updating=true, this is handled in reset() method.
+				super.endCDATA();
+				super.endUpdate();
 			}
-
-			if (context.callbackScripts != null) {
-				for (String callbackScript : context.callbackScripts) {
+			else {
+				if (context.arguments != null) {
 					startEval();
-					write(callbackScript);
+					write(String.format(AJAX_DATA, Json.encode(context.arguments)));
 					endEval();
+				}
+
+				if (context.callbackScripts != null) {
+					for (String callbackScript : context.callbackScripts) {
+						startEval();
+						write(callbackScript);
+						endEval();
+					}
 				}
 			}
 
 			super.endDocument();
-			getWrapped().forceFlush();
+
+			if (updating) {
+				updating = false;
+			}
+			else {
+				// Commit the ajax response.
+				getWrapped().close();
+			}
 		}
 
 		/**
-		 * Calls {@link PartialResponseWriter#endDocument()} and then {@link ResettableBufferedResponseWriter#reset()}.
+		 * Reset the partial response writer.
 		 */
 		public void reset() {
-			ResettableBufferedResponseWriter writer = getWrapped();
-			writer.startReset();
-
 			try {
-				super.endDocument(); // Clears any internal state of this PartialResponseWriter.
+				if (updating) {
+					// Resets partial response writer state in Mojarra in case of exception during ajax render response.
+					// MyFaces never enters reset() method with updating=true, this is handled in endDocument() method.
+					endUpdate(); // Note: this already implicitly closes CDATA in Mojarra.
+					super.endDocument();
+				}
 			}
 			catch (IOException e) {
 				throw new FacesException(e);
 			}
 			finally {
-				writer.endReset();
+				getWrapped().reset();
 			}
 		}
 
@@ -274,67 +330,32 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 			// Variables ----------------------------------------------------------------------------------------------
 
 			private ResponseWriter wrapped;
-			private Charset charset;
-			private CharArrayWriter buffer;
-			private int bufferSize;
-			private int writtenBytes;
+			private ResettableBufferedWriter buffer;
 			private ResponseWriter writer;
-			private boolean resetting;
 
 			// Constructors -------------------------------------------------------------------------------------------
 
-			public ResettableBufferedResponseWriter(ResponseWriter wrapped, String characterEncoding, int bufferSize) {
+			public ResettableBufferedResponseWriter(ResponseWriter wrapped, int bufferSize, String characterEncoding) {
 				this.wrapped = wrapped;
-				this.charset = Charset.forName(characterEncoding);
-				this.buffer = new CharArrayWriter(bufferSize);
-				this.bufferSize = bufferSize;
+				this.buffer = new ResettableBufferedWriter(wrapped, bufferSize, characterEncoding);
 			}
 
 			// Actions ------------------------------------------------------------------------------------------------
 
-			@Override
-			public void write(char[] chars, int offset, int length) throws IOException {
-				if (buffer != null) {
-					if (!resetting && (writtenBytes += charset.encode(CharBuffer.wrap(chars)).limit()) > bufferSize) {
-						wrapped.write(buffer.toCharArray());
-						buffer = null;
-					}
-					else {
-						buffer.write(chars, offset, length);
-						return;
-					}
-				}
-
-				if (buffer == null) {
-					wrapped.write(chars, offset, length);
-				}
-			}
-
-			public void startReset() {
-				resetting = true;
-			}
-
-			public void endReset() {
-				writer = null;
-				buffer = new CharArrayWriter(bufferSize);
-				writtenBytes = 0;
-				resetting = false;
+			public void reset() {
+				buffer.reset();
 			}
 
 			@Override
 			public void flush() throws IOException {
-				if (!resetting || buffer == null) {
-					super.flush();
-				}
+				buffer.flush();
+				wrapped.flush();
 			}
 
-			public void forceFlush() throws IOException {
-				if (buffer != null) {
-					wrapped.write(buffer.toCharArray());
-					buffer.reset();
-				}
-
-				super.flush();
+			@Override
+			public void close() throws IOException {
+				buffer.close();
+				wrapped.close();
 			}
 
 			@Override
