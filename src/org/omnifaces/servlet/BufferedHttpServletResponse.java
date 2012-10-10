@@ -58,7 +58,7 @@ public class BufferedHttpServletResponse extends HttpServletResponseOutputWrappe
 	 * @throws IOException When an I/O error occurs.
 	 */
 	public byte[] getBuffer() throws IOException {
-		flushBuffer();
+		close();
 		return buffer.toByteArray();
 	}
 
