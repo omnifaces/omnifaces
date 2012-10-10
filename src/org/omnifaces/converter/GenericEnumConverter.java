@@ -34,7 +34,7 @@ import org.omnifaces.util.Messages;
  * <code>Role</code> enum) is not an option due to design restrictions (e.g. JPA <code>@ElementCollection</code>, etc),
  * then you'd need to create an explicit converter for the enum type like follows:
  * <pre>
- * @FacesConverter(value="roleConverter")
+ * {@literal @}FacesConverter(value="roleConverter")
  * public class RoleConverter extends EnumConverter {
  *     public RoleConverter() {
  *         super(Role.class);
