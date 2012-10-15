@@ -19,8 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.omnifaces.util.Faces;
-
 /**
  * Collection of EL functions for data conversion.
  *
@@ -35,32 +33,6 @@ public final class Converters {
 	}
 
 	// Utility --------------------------------------------------------------------------------------------------------
-
-	/**
-	 * Format the given bytes to nearest 10<sup>n</sup> with IEC binary unit (KiB, MiB, etc) with rounding precision of
-	 * 1 fraction. For example:
-	 * <ul>
-	 * <li>1023 bytes will appear as 1023 B
-	 * <li>1024 bytes will appear as 1.0 KiB
-	 * <li>500000 bytes will appear as 488.3 KiB
-	 * <li>1048576 bytes will appear as 1.0 MiB
-	 * </ul>
-	 * The format locale will be set to the one as obtained by {@link Faces#getLocale()}.
-	 * @param bytes The bytes to be formatted.
-	 * @return The formatted bytes.
-	 */
-	public static String formatBytes(Long bytes) {
-		if (bytes == null) {
-			return "0 B";
-		}
-
-	    if (bytes < 1024) {
-	    	return bytes + " B";
-	    }
-
-	    int exp = (int) (Math.log(bytes) / Math.log(1024));
-	    return String.format(Faces.getLocale(), "%.1f %ciB", bytes / Math.pow(1024, exp), "KMGTPE".charAt(exp - 1));
-	}
 
 	/**
 	 * Converts a <code>Set&lt;E&gt;</code> to a <code>List&lt;E&gt;</code>. Useful when you want to iterate over a

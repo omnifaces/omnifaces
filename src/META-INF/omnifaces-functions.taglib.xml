@@ -211,24 +211,6 @@
 	<function>
 		<description>
 			<![CDATA[
-				Format the given bytes to nearest 10<sup>n</sup> with IEC binary unit (KiB, MiB, etc) with rounding
-				precision of 1 fraction. For example:
-				<ul>
-					<li>1023 bytes will appear as 1023 B
-					<li>1024 bytes will appear as 1.0 KiB
-					<li>500000 bytes will appear as 488.3 KiB
-					<li>1048576 bytes will appear as 1.0 GiB
-				</ul>
-			]]>
-		</description>
-		<function-name>formatBytes</function-name>
-		<function-class>org.omnifaces.el.functions.Converters</function-class>
-		<function-signature>java.lang.String formatBytes(java.lang.Long)</function-signature>
-	</function>
-
-	<function>
-		<description>
-			<![CDATA[
 				Converts a <code>Set&lt;E&gt;</code> to a <code>List&lt;E&gt;</code>. Useful when you want to iterate
 				over a <code>Set</code> in for example <code>&lt;ui:repeat&gt;</code>.
 			]]>
@@ -317,6 +299,48 @@
 		<function-name>getShortMonths</function-name>
 		<function-class>org.omnifaces.el.functions.Dates</function-class>
 		<function-signature>java.util.Map getShortMonths()</function-signature>
+	</function>
+
+	<!-- Numbers ================================================================================================== -->
+
+	<function>
+		<description>
+			<![CDATA[
+				Format the given bytes to nearest 10<sup>n</sup> with IEC binary unit (KiB, MiB, etc) with rounding
+				precision of 1 fraction. For example:
+				<ul>
+					<li>1023 bytes will appear as 1023 B
+					<li>1024 bytes will appear as 1.0 KiB
+					<li>500000 bytes will appear as 488.3 KiB
+					<li>1048576 bytes will appear as 1.0 GiB
+				</ul>
+			]]>
+		</description>
+		<function-name>formatBytes</function-name>
+		<function-class>org.omnifaces.el.functions.Numbers</function-class>
+		<function-signature>java.lang.String formatBytes(java.lang.Long)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				TBD
+			]]>
+		</description>
+		<function-name>formatCurrency</function-name>
+		<function-class>org.omnifaces.el.functions.Numbers</function-class>
+		<function-signature>java.lang.String formatCurrency(java.lang.Number, java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				TBD
+			]]>
+		</description>
+		<function-name>formatNumber</function-name>
+		<function-class>org.omnifaces.el.functions.Numbers</function-class>
+		<function-signature>java.lang.String formatNumber(java.lang.Number, java.lang.String)</function-signature>
 	</function>
 
 </facelet-taglib>
