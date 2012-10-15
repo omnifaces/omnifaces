@@ -137,6 +137,7 @@ public final class Faces {
 	 * @see FacesContext#getPartialViewContext()
 	 * @deprecated Please use {@link Ajax#getContext()} instead.
 	 */
+	@Deprecated
 	public static PartialViewContext getPartialViewContext() {
 		return getContext().getPartialViewContext();
 	}
@@ -459,6 +460,7 @@ public final class Faces {
 	 * @since 1.1
 	 * @deprecated Please use {@link Ajax#update(String...)} instead.
 	 */
+	@Deprecated
 	public static void addRenderIds(String... clientIds) {
 		Collection<String> renderIds = getPartialViewContext().getRenderIds();
 

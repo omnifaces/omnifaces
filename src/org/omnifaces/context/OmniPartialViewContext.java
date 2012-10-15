@@ -260,7 +260,9 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		@Override
 		public void endDocument() throws IOException {
 			if (updating) {
-				// Resets partial response writer state in MyFaces in case of exception during ajax render response.
+				// If endDocument() method is entered with updating=true, then it means that MyFaces is used and that
+				// an exception was been thrown during ajax render response. The following calls will gently close the
+				// partial response which MyFaces has left open.
 				// Mojarra never enters endDocument() method with updating=true, this is handled in reset() method.
 				super.endCDATA();
 				super.endUpdate();
@@ -298,7 +300,9 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		public void reset() {
 			try {
 				if (updating) {
-					// Resets partial response writer state in Mojarra in case of exception during ajax render response.
+					// If reset() method is entered with updating=true, then it means that Mojarra is used and that
+					// an exception was been thrown during ajax render response. The following calls will gently close
+					// the partial response which Mojarra has left open.
 					// MyFaces never enters reset() method with updating=true, this is handled in endDocument() method.
 					endUpdate(); // Note: this already implicitly closes CDATA in Mojarra.
 					super.endDocument();
@@ -317,56 +321,54 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 			return (ResettableBufferedResponseWriter) super.getWrapped();
 		}
 
-		// Nested classes ---------------------------------------------------------------------------------------------
+	}
 
-		/**
-		 * This response writer buffers the response body until the <code>javax.faces.FACELETS_BUFFER_SIZE</code> is
-		 * reached, regardless of flush calls, which allows us to perform a reset before the buffer size is reached.
-		 *
-		 * @author Bauke Scholtz
-		 */
-		private static class ResettableBufferedResponseWriter extends ResponseWriterWrapper {
+	/**
+	 * This response writer buffers the response body until the <code>javax.faces.FACELETS_BUFFER_SIZE</code> is
+	 * reached, regardless of flush calls, which allows us to perform a reset before the buffer size is reached.
+	 *
+	 * @author Bauke Scholtz
+	 */
+	private static class ResettableBufferedResponseWriter extends ResponseWriterWrapper {
 
-			// Variables ----------------------------------------------------------------------------------------------
+		// Variables --------------------------------------------------------------------------------------------------
 
-			private ResponseWriter wrapped;
-			private ResettableBufferedWriter buffer;
-			private ResponseWriter writer;
+		private ResponseWriter wrapped;
+		private ResettableBufferedWriter buffer;
+		private ResponseWriter writer;
 
-			// Constructors -------------------------------------------------------------------------------------------
+		// Constructors -----------------------------------------------------------------------------------------------
 
-			public ResettableBufferedResponseWriter(ResponseWriter wrapped, int bufferSize, String characterEncoding) {
-				this.wrapped = wrapped;
-				this.buffer = new ResettableBufferedWriter(wrapped, bufferSize, characterEncoding);
+		public ResettableBufferedResponseWriter(ResponseWriter wrapped, int bufferSize, String characterEncoding) {
+			this.wrapped = wrapped;
+			this.buffer = new ResettableBufferedWriter(wrapped, bufferSize, characterEncoding);
+		}
+
+		// Actions ----------------------------------------------------------------------------------------------------
+
+		public void reset() {
+			buffer.reset();
+		}
+
+		@Override
+		public void flush() throws IOException {
+			buffer.flush();
+			wrapped.flush();
+		}
+
+		@Override
+		public void close() throws IOException {
+			buffer.close();
+			wrapped.close();
+		}
+
+		@Override
+		public ResponseWriter getWrapped() {
+			if (writer == null) {
+				writer = wrapped.cloneWithWriter(buffer);
 			}
 
-			// Actions ------------------------------------------------------------------------------------------------
-
-			public void reset() {
-				buffer.reset();
-			}
-
-			@Override
-			public void flush() throws IOException {
-				buffer.flush();
-				wrapped.flush();
-			}
-
-			@Override
-			public void close() throws IOException {
-				buffer.close();
-				wrapped.close();
-			}
-
-			@Override
-			public ResponseWriter getWrapped() {
-				if (writer == null) {
-					writer = wrapped.cloneWithWriter(buffer);
-				}
-
-				return writer;
-			}
-
+			return writer;
 		}
 
 	}

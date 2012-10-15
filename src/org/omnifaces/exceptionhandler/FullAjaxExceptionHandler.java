@@ -202,11 +202,11 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	        catch (IOException e) {
 	        	throw new FacesException(e);
 	        }
-	        finally {
+			finally {
 				// Prevent some servlet containers from handling error page itself afterwards. So far Tomcat/JBoss
 				// are known to do that. It would only result in IllegalStateException "response already committed".
 				request.removeAttribute(ATTRIBUTE_ERROR_EXCEPTION);
-	        }
+			}
 
 			context.responseComplete();
 		}
@@ -224,11 +224,11 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 		UIViewRoot viewRoot = viewHandler.createView(context, viewId);
 		context.setViewRoot(viewRoot);
 		context.getPartialViewContext().setRenderAll(true);
-    	ViewDeclarationLanguage vdl = viewHandler.getViewDeclarationLanguage(context, viewId);
-    	context.getAttributes().clear();
-    	vdl.buildView(context, viewRoot);
-        context.getApplication().publishEvent(context, PreRenderViewEvent.class, viewRoot);
-    	vdl.renderView(context, viewRoot);
+		ViewDeclarationLanguage vdl = viewHandler.getViewDeclarationLanguage(context, viewId);
+		context.getAttributes().clear();
+		vdl.buildView(context, viewRoot);
+		context.getApplication().publishEvent(context, PreRenderViewEvent.class, viewRoot);
+		vdl.renderView(context, viewRoot);
 	}
 
 	@Override

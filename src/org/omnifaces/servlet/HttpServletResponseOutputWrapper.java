@@ -180,8 +180,8 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 	 * otherwise <code>false</code>.
 	 */
 	public boolean isPassThrough() {
-    	return passThrough;
-    }
+		return passThrough;
+	}
 
 	/**
 	 * Sets whether the writing has to be passed through to the wrapped {@link ServletOutputStream}.
@@ -189,7 +189,7 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 	 * {@link ServletOutputStream}.
 	 */
 	public void setPassThrough(boolean passThrough) {
-    	this.passThrough = passThrough;
-    }
+		this.passThrough = passThrough;
+	}
 
 }
