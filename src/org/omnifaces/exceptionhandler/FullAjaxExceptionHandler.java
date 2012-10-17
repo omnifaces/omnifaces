@@ -147,7 +147,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	}
 
 	private void handleAjaxException(FacesContext context) {
-		if (!context.getPartialViewContext().isAjaxRequest()) {
+		if (context.getPartialViewContext() == null || !context.getPartialViewContext().isAjaxRequest()) {
 			return; // Not an ajax request.
 		}
 
