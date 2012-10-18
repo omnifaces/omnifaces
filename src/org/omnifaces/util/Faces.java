@@ -1035,6 +1035,18 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns a string containing the unique identifier assigned to this session. The identifier is assigned by the
+	 * servlet container and is implementation dependent.
+	 * @return The HTTP session ID.
+	 * @see HttpSession#getId()
+	 * @since 1.2
+	 */
+	public static String getSessionId() {
+		HttpSession session = getSession(false);
+		return (session != null) ? session.getId() : null;
+	}
+
+	/**
 	 * Invalidates the current HTTP session. So, any subsequent HTTP request will get a new one when necessary.
 	 * @see ExternalContext#invalidateSession()
 	 */

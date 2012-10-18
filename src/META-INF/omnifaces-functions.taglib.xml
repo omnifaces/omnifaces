@@ -324,7 +324,10 @@
 	<function>
 		<description>
 			<![CDATA[
-				TBD
+				Format the given number as currency with the given symbol. This is useful when you want to format numbers as
+				currency in for example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code>
+				attribute of select item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The format
+				locale will be set to the one as obtained by <code>Faces#getLocale()</code>.
 			]]>
 		</description>
 		<function-name>formatCurrency</function-name>
@@ -335,7 +338,10 @@
 	<function>
 		<description>
 			<![CDATA[
-				TBD
+				Format the given number in the given pattern. This is useful when you want to format numbers in for example the
+				<code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select item, or
+				wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The format locale will be set to the one as
+				obtained by <code>Faces#getLocale()</code>.
 			]]>
 		</description>
 		<function-name>formatNumber</function-name>
