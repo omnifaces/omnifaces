@@ -7,15 +7,29 @@
 OmniFaces.Highlight = {
 
 	/**
-	 * Add the given error style class to all elements of the given client IDs. If doFocus is <code>true</code>, then
-	 * also set the focus on the first element. All non-existing elements are ignored.
+	 * Add the given error style class to all input elements of the given client IDs and their associated labels.
+	 * If doFocus is <code>true</code>, then also set the focus on the first input element. All non-existing input 
+	 * elements are ignored.
 	 */
 	addErrorClass: function(clientIds, styleClass, doFocus) {
+		var labels = document.getElementsByTagName('LABEL');
+		var labelsByFor = {};
+
+		for ( var i = 0; i < labels.length; i++) {
+			var label = labels[i];
+			var htmlFor = label.htmlFor;
+
+			if (htmlFor) {
+				labelsByFor[htmlFor] = label;
+			}
+		}
+		
 		for (var i = 0; i < clientIds.length; i++) {
-			var element = document.getElementById(clientIds[i]);
+			var clientId = clientIds[i];
+			var element = document.getElementById(clientId);
 
 			if (!element) {
-				var elements = document.getElementsByName(clientIds[i]); // #21
+				var elements = document.getElementsByName(clientId); // #21
 
 				if (elements && elements.length) {
 					element = elements[0];
@@ -24,6 +38,11 @@ OmniFaces.Highlight = {
 
 			if (element) {
 				element.className += ' ' + styleClass;
+				var label = labelsByFor[element.id];
+
+				if (label) {
+					label.className += ' ' + styleClass;
+				}
 
 				if (doFocus) {
 					element.focus();
