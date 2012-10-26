@@ -19,6 +19,14 @@ package org.omnifaces.util;
  */
 public final class Callback {
 
+	// Constructors ---------------------------------------------------------------------------------------------------
+
+	private Callback() {
+		// Hide constructor.
+	}
+
+	// Interfaces -----------------------------------------------------------------------------------------------------
+
 	/**
 	 * Use this if you need a void callback.
 	 *
