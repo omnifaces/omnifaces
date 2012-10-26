@@ -36,8 +36,10 @@ public final class Ajax {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String ERROR_ARGUMENTS_LENGTH = "The arguments length must be even. Encountered %d items.";
-	private static final String ERROR_ARGUMENT_TYPE = "The argument name must be a String. Encountered type '%s'.";
+	private static final String ERROR_ARGUMENTS_LENGTH =
+		"The arguments length must be even. Encountered %d items.";
+	private static final String ERROR_ARGUMENT_TYPE =
+		"The argument name must be a String. Encountered type '%s' with value '%s'.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -77,12 +79,14 @@ public final class Ajax {
 	/**
 	 * Update the row of the given {@link UIData} component at the given zero-based row index. This will basically
 	 * update all direct children of all {@link UIColumn} components at the given row index.
+	 * <p>
+	 * Note that the direct child of {@link UIColumn} must be a fullworthy JSF UI component, not template text.
 	 * @param table The {@link UIData} component.
 	 * @param index The zero-based index of the row to be updated.
 	 * @since 1.3
 	 */
 	public static void updateRow(UIData table, int index) {
-		if (index < 0 || table.getRowCount() < 1) {
+		if (index < 0 || table.getRowCount() < 1 || table.getChildCount() == 0) {
 			return;
 		}
 
@@ -95,6 +99,7 @@ public final class Ajax {
 		FacesContext context = FacesContext.getCurrentInstance();
 		String tableId = table.getClientId(context);
 		char separator = UINamingContainer.getSeparatorChar(context);
+		Collection<String> renderIds = getContext().getRenderIds();
 
 		for (UIComponent column : table.getChildren()) {
 			if (!(column instanceof UIColumn)) {
@@ -102,7 +107,7 @@ public final class Ajax {
 			}
 
 			for (UIComponent cell : column.getChildren()) {
-				Ajax.update(String.format("%s%c%d%c%s", tableId, separator, index, separator, cell.getId()));
+				renderIds.add(String.format("%s%c%d%c%s", tableId, separator, index, separator, cell.getId()));
 			}
 		}
 	}
@@ -112,12 +117,14 @@ public final class Ajax {
 	 * update all direct children of the {@link UIColumn} component at the given column index in all rows. The column
 	 * index is the physical column index and does not depend on whether one or more columns is rendered or not (i.e. it
 	 * is not necessarily the same column index as the enduser sees in the UI).
+	 * <p>
+	 * Note that the direct child of {@link UIColumn} must be a fullworthy JSF UI component, not template text.
 	 * @param table The {@link UIData} component.
 	 * @param index The zero-based index of the column to be updated.
 	 * @since 1.3
 	 */
 	public static void updateColumn(UIData table, int index) {
-		if (index < 0 || table.getRowCount() < 1) {
+		if (index < 0 || table.getRowCount() < 1 || index > table.getChildCount()) {
 			return;
 		}
 
@@ -130,6 +137,7 @@ public final class Ajax {
 		FacesContext context = FacesContext.getCurrentInstance();
 		String tableId = table.getClientId(context);
 		char separator = UINamingContainer.getSeparatorChar(context);
+		Collection<String> renderIds = getContext().getRenderIds();
 		int columnIndex = 0;
 
 		for (UIComponent column : table.getChildren()) {
@@ -141,7 +149,7 @@ public final class Ajax {
 				String cellId = cell.getId();
 
 				for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-					Ajax.update(String.format("%s%c%d%c%s", tableId, separator, rowIndex, separator, cellId));
+					renderIds.add(String.format("%s%c%d%c%s", tableId, separator, rowIndex, separator, cellId));
 				}
 			}
 
@@ -190,8 +198,8 @@ public final class Ajax {
 
 		for (int i = 0; i < namesValues.length; i+= 2) {
 			if (!(namesValues[i] instanceof String)) {
-				String type = namesValues[i] != null ? namesValues[i].getClass().getName() : "null";
-				throw new IllegalArgumentException(String.format(ERROR_ARGUMENT_TYPE, type));
+				String type = (namesValues[i]) != null ? namesValues[i].getClass().getName() : "null";
+				throw new IllegalArgumentException(String.format(ERROR_ARGUMENT_TYPE, type, namesValues[i]));
 			}
 
 			context.addArgument((String) namesValues[i], namesValues[i + 1]);
