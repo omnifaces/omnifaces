@@ -20,10 +20,10 @@
 		<format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
 	</tstamp>
 
-	<condition property="VERSION" value="${version}-${DATE_SHORT}">
+	<condition property="VERSION" value="${version}">
 		<isset property="maven" />
 	</condition>
-	<property name="VERSION" value="${version}" />
+	<property name="VERSION" value="${version}-${DATE_SHORT}" />
 
 	<path id="common.classpath">
 		<fileset dir="lib">
