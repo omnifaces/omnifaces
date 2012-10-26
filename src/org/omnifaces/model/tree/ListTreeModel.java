@@ -34,7 +34,7 @@ public class ListTreeModel<T> implements TreeModel<T> {
 	private T data;
 	private ListTreeModel<T> parent;
 	private List<TreeModel<T>> children;
-	private List<TreeModel<T>> unmodifiableChildren;
+	private List<TreeModel<T>> unmodifiableChildren = Collections.emptyList();
 	private int index;
 
 	// Mutators -------------------------------------------------------------------------------------------------------
@@ -102,10 +102,7 @@ public class ListTreeModel<T> implements TreeModel<T> {
 
 	@Override
 	public List<TreeModel<T>> getChildren() {
-		if (unmodifiableChildren == null && getChildCount() == 0) {
-			unmodifiableChildren = Collections.emptyList();
-		}
-		else if (unmodifiableChildren == null || unmodifiableChildren.size() != getChildCount()) {
+		if (unmodifiableChildren.size() != getChildCount()) {
 			unmodifiableChildren = Collections.unmodifiableList(children);
 		}
 
@@ -156,13 +153,13 @@ public class ListTreeModel<T> implements TreeModel<T> {
 	public boolean equals(Object object) {
 		// Basic checks.
 		if (object == this) return true;
-		if (!(object instanceof TreeModel)) return false;
+		if (!(object instanceof ListTreeModel)) return false;
 
 		// Property checks.
-		TreeModel other = (TreeModel) object;
-		if (data == null ? other.getData() != null : !data.equals(other.getData())) return false;
-		if (parent == null ? other.getParent() != null : !parent.equals(other.getParent())) return false;
-		if (children == null ? other.getChildren() != null : !children.equals(other.getChildren())) return false;
+		ListTreeModel other = (ListTreeModel) object;
+		if (data == null ? other.data != null : !data.equals(other.data)) return false;
+		if (parent == null ? other.parent != null : !parent.equals(other.parent)) return false;
+		if (children == null ? other.children != null : !children.equals(other.children)) return false;
 
 		// All passed.
 		return true;

@@ -16,6 +16,10 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.faces.component.UIColumn;
+import javax.faces.component.UIComponent;
+import javax.faces.component.UIData;
+import javax.faces.component.UINamingContainer;
 import javax.faces.context.FacesContext;
 import javax.faces.context.PartialViewContext;
 
@@ -67,6 +71,81 @@ public final class Ajax {
 
 		for (String clientId : clientIds) {
 			renderIds.add(clientId);
+		}
+	}
+
+	/**
+	 * Update the row of the given {@link UIData} component at the given row index. This will basically update all
+	 * direct children of all {@link UIColumn} components at the given row index.
+	 * @param table The {@link UIData} component.
+	 * @param index The index of the row to be updated.
+	 */
+	public static void updateRow(UIData table, int index) {
+		if (index < 0 || table.getRowCount() < 1) {
+			return;
+		}
+
+		int rowCount = (table.getRows() == 0) ? table.getRowCount() : table.getRows();
+
+		if (index >= rowCount) {
+			return;
+		}
+
+		FacesContext context = FacesContext.getCurrentInstance();
+		String tableId = table.getClientId(context);
+		char separator = UINamingContainer.getSeparatorChar(context);
+
+		for (UIComponent column : table.getChildren()) {
+			if (!(column instanceof UIColumn)) {
+				continue;
+			}
+
+			for (UIComponent cell : column.getChildren()) {
+				Ajax.update(String.format("%s%c%d%c%s", tableId, separator, index, separator, cell.getId()));
+			}
+		}
+	}
+
+	/**
+	 * Update the column of the given {@link UIData} component at the given column index. This will basically update
+	 * all direct children of the {@link UIColumn} component at the given column index at all row indexes. The column
+	 * index is the physical column index and does not depend on whether one or more columns is rendered or not (i.e.
+	 * it is not necessarily the same column index as the enduser sees in the UI).
+	 * @param table The {@link UIData} component.
+	 * @param index The index of the column to be updated.
+	 */
+	public static void updateColumn(UIData table, int index) {
+		if (index < 0 || table.getRowCount() < 1) {
+			return;
+		}
+
+		int rowCount = (table.getRows() == 0) ? table.getRowCount() : table.getRows();
+
+		if (rowCount == 0) {
+			return;
+		}
+
+		int columnIndex = 0;
+		FacesContext context = FacesContext.getCurrentInstance();
+		String tableId = table.getClientId(context);
+		char separator = UINamingContainer.getSeparatorChar(context);
+
+		for (UIComponent column : table.getChildren()) {
+			if (!(column instanceof UIColumn)) {
+				continue;
+			}
+
+			if (columnIndex++ != index) {
+				continue;
+			}
+
+			for (UIComponent cell : column.getChildren()) {
+				String cellId = cell.getId();
+
+				for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+					Ajax.update(String.format("%s%c%d%c%s", tableId, separator, rowIndex, separator, cellId));
+				}
+			}
 		}
 	}
 

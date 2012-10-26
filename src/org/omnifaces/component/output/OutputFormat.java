@@ -70,10 +70,9 @@ public class OutputFormat extends HtmlOutputFormat {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * An override which checks if this isn't been invoked on <code>var</code> or <code>varNode</code> attribute.
+	 * An override which checks if this isn't been invoked on <code>var</code> attribute.
 	 * Finally it delegates to the super method.
-	 * @throws IllegalArgumentException When this value expression is been set on <code>var</code> or
-	 * <code>varNode</code> attribute.
+	 * @throws IllegalArgumentException When this value expression is been set on <code>var</code> attribute.
 	 */
 	@Override
 	public void setValueExpression(String name, ValueExpression binding) {

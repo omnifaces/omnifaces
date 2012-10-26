@@ -82,8 +82,8 @@ public enum WebXml {
 	private WebXml() {
 		try {
 			Document allWebXml = loadAllWebXml();
-			errorPageLocations = loadErrorPageLocations(allWebXml);
-			formLoginPage = loadFormLoginPage(allWebXml);
+			errorPageLocations = parseErrorPageLocations(allWebXml);
+			formLoginPage = parseFormLoginPage(allWebXml);
 		}
 		catch (Exception e) {
 			// If this occurs, web.xml is broken anyway and the app shouldn't have started/initialized this far at all.
@@ -205,7 +205,7 @@ public enum WebXml {
 	 * Create and return a mapping of all error page locations by exception type found in the given document.
 	 */
 	@SuppressWarnings("unchecked") // For the cast on Class<Throwable>.
-	private static Map<Class<Throwable>, String> loadErrorPageLocations(Document document) throws Exception {
+	private static Map<Class<Throwable>, String> parseErrorPageLocations(Document document) throws Exception {
 		Map<Class<Throwable>, String> errorPageLocations = new LinkedHashMap<Class<Throwable>, String>();
 		Element documentElement = document.getDocumentElement();
 		XPath xpath = XPathFactory.newInstance().newXPath();
@@ -241,7 +241,7 @@ public enum WebXml {
 	/**
 	 * Return the location of the FORM authentication login page found in the given document.
 	 */
-	private static String loadFormLoginPage(Document document) throws Exception {
+	private static String parseFormLoginPage(Document document) throws Exception {
 		XPath xpath = XPathFactory.newInstance().newXPath();
 		String formLoginPage = xpath.compile(XPATH_FORM_LOGIN_PAGE).evaluate(document.getDocumentElement()).trim();
 		return Utils.isEmpty(formLoginPage) ? null : formLoginPage;
