@@ -75,10 +75,11 @@ public final class Ajax {
 	}
 
 	/**
-	 * Update the row of the given {@link UIData} component at the given row index. This will basically update all
-	 * direct children of all {@link UIColumn} components at the given row index.
+	 * Update the row of the given {@link UIData} component at the given zero-based row index. This will basically
+	 * update all direct children of all {@link UIColumn} components at the given row index.
 	 * @param table The {@link UIData} component.
-	 * @param index The index of the row to be updated.
+	 * @param index The zero-based index of the row to be updated.
+	 * @since 1.3
 	 */
 	public static void updateRow(UIData table, int index) {
 		if (index < 0 || table.getRowCount() < 1) {
@@ -107,12 +108,13 @@ public final class Ajax {
 	}
 
 	/**
-	 * Update the column of the given {@link UIData} component at the given column index. This will basically update
-	 * all direct children of the {@link UIColumn} component at the given column index at all row indexes. The column
-	 * index is the physical column index and does not depend on whether one or more columns is rendered or not (i.e.
-	 * it is not necessarily the same column index as the enduser sees in the UI).
+	 * Update the column of the given {@link UIData} component at the given zero-based column index. This will basically
+	 * update all direct children of the {@link UIColumn} component at the given column index in all rows. The column
+	 * index is the physical column index and does not depend on whether one or more columns is rendered or not (i.e. it
+	 * is not necessarily the same column index as the enduser sees in the UI).
 	 * @param table The {@link UIData} component.
-	 * @param index The index of the column to be updated.
+	 * @param index The zero-based index of the column to be updated.
+	 * @since 1.3
 	 */
 	public static void updateColumn(UIData table, int index) {
 		if (index < 0 || table.getRowCount() < 1) {
