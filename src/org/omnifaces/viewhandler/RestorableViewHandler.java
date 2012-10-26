@@ -10,6 +10,7 @@ import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
 
 import org.omnifaces.taghandler.EnableRestorableView;
+import org.omnifaces.util.Faces;
 
 /**
  * This view handler implementation will recreate the entire view state whenever the view has apparently been expired,
@@ -52,6 +53,7 @@ public class RestorableViewHandler extends ViewHandlerWrapper {
 			return restoredView;
 		}
 
+		viewId = Faces.normalizeViewId(viewId);
 		UIViewRoot createdView = createView(context, viewId);
 		context.setViewRoot(createdView);
 
