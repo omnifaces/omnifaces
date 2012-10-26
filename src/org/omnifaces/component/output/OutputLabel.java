@@ -12,21 +12,17 @@
  */
 package org.omnifaces.component.output;
 
-import static org.omnifaces.util.Faces.*;
 import static org.omnifaces.util.Utils.*;
 
 import javax.el.ValueExpression;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponent;
-import javax.faces.component.UIViewRoot;
 import javax.faces.component.html.HtmlOutputLabel;
 import javax.faces.event.AbortProcessingException;
-import javax.faces.event.PreRenderViewEvent;
-import javax.faces.event.SystemEvent;
-import javax.faces.event.SystemEventListener;
+import javax.faces.event.ComponentSystemEvent;
+import javax.faces.event.PostRestoreStateEvent;
 
 import org.omnifaces.util.Components;
-import org.omnifaces.util.Events;
 
 /**
  * <strong>OutputLabel</strong> is a component that extends the standard {@link HtmlOutputLabel} and provides support for
@@ -38,27 +34,16 @@ import org.omnifaces.util.Events;
  * @author Arjan Tijms
  */
 @FacesComponent(OutputLabel.COMPONENT_TYPE)
-public class OutputLabel extends HtmlOutputLabel implements SystemEventListener {
+public class OutputLabel extends HtmlOutputLabel {
 
     public static final String COMPONENT_TYPE = "org.omnifaces.component.output.OutputLabel";
 
     private static final String ERROR_FOR_COMPONENT_NOT_FOUND =
 		"A component with Id '%s' as specified by the for attribute of the OutputLabel with Id '%s' could not be found.";
 
-    public OutputLabel() {
-        if (!isPostback()) {
-            Events.subscribeToViewEvent(PreRenderViewEvent.class, this);
-        }
-    }
-
     @Override
-    public boolean isListenerForSource(Object source) {
-        return source instanceof UIViewRoot;
-    }
-
-    @Override
-    public void processEvent(SystemEvent event) throws AbortProcessingException {
-        if (!isPostback()) {
+    public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
+        if (event instanceof PostRestoreStateEvent) {
             String forValue = (String) getAttributes().get("for");
             if (!isEmpty(forValue)) {
                 UIComponent forComponent = Components.findComponentRelatively(this, forValue);
