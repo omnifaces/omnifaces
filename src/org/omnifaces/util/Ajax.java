@@ -127,17 +127,13 @@ public final class Ajax {
 			return;
 		}
 
-		int columnIndex = 0;
 		FacesContext context = FacesContext.getCurrentInstance();
 		String tableId = table.getClientId(context);
 		char separator = UINamingContainer.getSeparatorChar(context);
+		int columnIndex = 0;
 
 		for (UIComponent column : table.getChildren()) {
-			if (!(column instanceof UIColumn)) {
-				continue;
-			}
-
-			if (columnIndex++ != index) {
+			if (!(column instanceof UIColumn) || columnIndex++ != index) {
 				continue;
 			}
 
@@ -148,6 +144,8 @@ public final class Ajax {
 					Ajax.update(String.format("%s%c%d%c%s", tableId, separator, rowIndex, separator, cellId));
 				}
 			}
+
+			break;
 		}
 	}
 

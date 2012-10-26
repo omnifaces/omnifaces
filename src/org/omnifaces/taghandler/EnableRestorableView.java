@@ -15,6 +15,7 @@ package org.omnifaces.taghandler;
 import java.io.IOException;
 
 import javax.faces.application.ViewExpiredException;
+import javax.faces.application.ViewHandler;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
@@ -28,9 +29,9 @@ import org.omnifaces.viewhandler.RestorableViewHandler;
 /**
  * <p>
  * The <code>&lt;o:enableRestorableView&gt;</code> instructs the view handler to recreate the entire view whenever the
- * view has been expired, i.e. whenever {@link #restoreView(FacesContext, String)} returns <code>null</code> and the
- * current request is a postback. This effectively prevents {@link ViewExpiredException} on the view. This tag needs to
- * be placed in <code>&lt;f:metadata&gt;</code> of the view.
+ * view has been expired, i.e. whenever {@link ViewHandler#restoreView(FacesContext, String)} returns <code>null</code>
+ * and the current request is a postback. This effectively prevents {@link ViewExpiredException} on the view. This tag
+ * needs to be placed in <code>&lt;f:metadata&gt;</code> of the view.
  * <p>
  * There are however technical design limitations: the recreated view is exactly the same as during the initial request,
  * so any modifications which are made thereafter, either by taghandlers or conditionally rendered components based on
