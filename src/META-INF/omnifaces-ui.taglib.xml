@@ -2672,4 +2672,20 @@ public enum Baz {
 		<tag-name>ignoreValidationFailed</tag-name>
 		<handler-class>org.omnifaces.taghandler.IgnoreValidationFailed</handler-class>
 	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				The <code>&lt;o:enableRestorableView&gt;</code> instructs the view handler to recreate the entire view whenever the
+				view has been expired, i.e. whenever <code>#restoreView(FacesContext, String)</code> returns <code>null</code> and the
+				current request is a postback. This effectively prevents <code>ViewExpiredException</code> on the view. This tag needs to
+				be placed in <code>&lt;f:metadata&gt;</code> of the view.
+				<p>
+				There are however technical design limitations: please consult the javadoc for details. To the point, the bean associated
+				with the view has to be exclusively request scoped in order to properly recreate the same view.
+			]]>
+		</description>
+		<tag-name>enableRestorableView</tag-name>
+		<handler-class>org.omnifaces.taghandler.EnableRestorableView</handler-class>
+	</tag>
 </facelet-taglib>
