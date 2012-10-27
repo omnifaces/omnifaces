@@ -44,6 +44,7 @@ import javax.faces.component.UIViewParameter;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.context.FacesContextWrapper;
 import javax.faces.context.Flash;
 import javax.faces.context.PartialViewContext;
 import javax.faces.event.PhaseId;
@@ -113,6 +114,26 @@ public final class Faces {
 	public static FacesContext getContext(ELContext elContext) {
 		return (FacesContext) elContext.getContext(FacesContext.class);
 	}
+
+	/**
+	 * Sets the given faces context as current instance. Use this if you have a custom {@link FacesContextWrapper}
+	 * which you'd like to (temporarily) use as the current instance of the faces context.
+	 * @param context The faces context to be set as the current instance.
+	 * @since 1.3
+	 */
+	public static void setContext(FacesContext context) {
+		FacesContextSetter.setCurrentInstance(context);
+	}
+
+	/**
+	 * Inner class so that the protected {@link FacesContext#setCurrentInstance(FacesContext)} method can be invoked.
+	 * @author Bauke Scholtz
+	 */
+    private static abstract class FacesContextSetter extends FacesContext {
+        protected static void setCurrentInstance(FacesContext context) {
+            FacesContext.setCurrentInstance(context);
+        }
+    }
 
 	/**
 	 * Returns the current external context.

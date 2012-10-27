@@ -15,11 +15,15 @@ package org.omnifaces.viewhandler;
 import java.io.IOException;
 
 import javax.faces.FacesException;
+import javax.faces.FactoryFinder;
 import javax.faces.application.ViewExpiredException;
 import javax.faces.application.ViewHandler;
 import javax.faces.application.ViewHandlerWrapper;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
+import javax.faces.context.FacesContextWrapper;
+import javax.faces.render.RenderKit;
+import javax.faces.render.RenderKitFactory;
 
 import org.omnifaces.taghandler.EnableRestorableView;
 import org.omnifaces.util.Faces;
@@ -67,20 +71,23 @@ public class RestorableViewHandler extends ViewHandlerWrapper {
 
 		viewId = Faces.normalizeViewId(viewId);
 		UIViewRoot createdView = createView(context, viewId);
-		context.setViewRoot(createdView);
+		FacesContext temporaryContext = new TemporaryViewFacesContext(context, createdView);
 
 		try {
-			getViewDeclarationLanguage(context, viewId).buildView(context, createdView);
+			Faces.setContext(temporaryContext);
+			getViewDeclarationLanguage(temporaryContext, viewId).buildView(temporaryContext, createdView);
 		}
 		catch (IOException e) {
 			throw new FacesException(e);
+		}
+		finally {
+			Faces.setContext(context);
 		}
 
 		if (createdView.getAttributes().get(EnableRestorableView.class.getName()) == Boolean.TRUE) {
 			return createdView;
 		}
 		else {
-			context.setViewRoot(null);
 			return null;
 		}
 	}
@@ -88,6 +95,46 @@ public class RestorableViewHandler extends ViewHandlerWrapper {
 	@Override
 	public ViewHandler getWrapped() {
 		return wrapped;
+	}
+
+	// Inner classes --------------------------------------------------------------------------------------------------
+
+	/**
+	 * This faces context wrapper allows returning the given (temporary) view on {@link #getViewRoot()} and its
+	 * associated renderer in {@link #getRenderKit()}. This can then be used in cases when
+	 * {@link FacesContext#setViewRoot(UIViewRoot)} isn't desired as it can't be cleared afterwards (the
+	 * {@link #setViewRoot(UIViewRoot)} doesn't accept a <code>null</code> being set).
+	 *
+	 * @author Bauke Scholtz
+	 */
+	private static class TemporaryViewFacesContext extends FacesContextWrapper {
+
+		private FacesContext wrapped;
+		private UIViewRoot temporaryView;
+		private RenderKit temporaryViewRenderKit;
+
+		public TemporaryViewFacesContext(FacesContext wrapped, UIViewRoot temporaryView) {
+			this.wrapped = wrapped;
+			this.temporaryView = temporaryView;
+			this.temporaryViewRenderKit = ((RenderKitFactory) FactoryFinder.getFactory(FactoryFinder.RENDER_KIT_FACTORY))
+				.getRenderKit(this, temporaryView.getRenderKitId());
+		}
+
+		@Override
+		public UIViewRoot getViewRoot() {
+			return temporaryView;
+		}
+
+		@Override
+		public RenderKit getRenderKit() {
+			return temporaryViewRenderKit;
+		}
+
+		@Override
+		public FacesContext getWrapped() {
+			return wrapped;
+		}
+
 	}
 
 }
