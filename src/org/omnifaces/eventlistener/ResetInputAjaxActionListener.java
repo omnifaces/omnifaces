@@ -12,13 +12,10 @@
  */
 package org.omnifaces.eventlistener;
 
-import java.lang.reflect.Field;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
-import javax.faces.FacesException;
 import javax.faces.component.EditableValueHolder;
 import javax.faces.component.UIComponent;
 import javax.faces.component.visit.VisitCallback;
@@ -27,7 +24,6 @@ import javax.faces.component.visit.VisitHint;
 import javax.faces.component.visit.VisitResult;
 import javax.faces.context.FacesContext;
 import javax.faces.context.PartialViewContext;
-import javax.faces.context.PartialViewContextWrapper;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
@@ -35,6 +31,8 @@ import javax.faces.event.AjaxBehaviorListener;
 import javax.faces.event.PhaseEvent;
 import javax.faces.event.PhaseId;
 import javax.faces.event.SystemEventListener;
+
+import org.omnifaces.util.Hacks;
 
 /**
  * Use this action listener when you want to partially (ajax) render input fields which are not executed during submit,
@@ -104,7 +102,6 @@ import javax.faces.event.SystemEventListener;
  * @author Bauke Scholtz
  * @link http://java.net/jira/browse/JAVASERVERFACES_SPEC_PUBLIC-1060
  */
-@SuppressWarnings("unchecked") // For the cast on Collection<String> in getRenderIds().
 public class ResetInputAjaxActionListener extends DefaultPhaseListener implements ActionListener {
 
 	// Constants ------------------------------------------------------------------------------------------------------
@@ -112,9 +109,6 @@ public class ResetInputAjaxActionListener extends DefaultPhaseListener implement
 	private static final long serialVersionUID = -5317382021715077662L;
 
 	private static final Set<VisitHint> VISIT_HINTS = EnumSet.of(VisitHint.SKIP_TRANSIENT);
-	private static final String RF_PVC_NAME = "org.richfaces.context.ExtendedPartialViewContextImpl";
-	private static final String ERROR_RF_PVC_HACK =
-		"Cannot obtain componentRenderIds property of RichFaces ExtendedPartialViewContextImpl instance '%s'.";
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
@@ -197,27 +191,8 @@ public class ResetInputAjaxActionListener extends DefaultPhaseListener implement
 		// HACK for RichFaces4 because its ExtendedPartialViewContextImpl class doesn't return its componentRenderIds
 		// property on getRenderIds() call when the action is executed using a RichFaces-specific command button/link.
 		// See also https://issues.jboss.org/browse/RF-11112
-		if (renderIds.isEmpty()) {
-			while (!partialViewContext.getClass().getName().equals(RF_PVC_NAME)
-				&& partialViewContext instanceof PartialViewContextWrapper)
-			{
-				partialViewContext = ((PartialViewContextWrapper) partialViewContext).getWrapped(); // #61
-			}
-
-			if (partialViewContext.getClass().getName().equals(RF_PVC_NAME)) {
-				try {
-					Field componentRenderIds = partialViewContext.getClass().getDeclaredField("componentRenderIds");
-					componentRenderIds.setAccessible(true);
-					renderIds = (Collection<String>) componentRenderIds.get(partialViewContext);
-
-					if (renderIds == null) {
-						renderIds = Collections.emptyList();
-					}
-				}
-				catch (Exception e) {
-					throw new FacesException(String.format(ERROR_RF_PVC_HACK, partialViewContext), e);
-				}
-			}
+		if (renderIds.isEmpty() && Hacks.isRichFacesInstalled()) {
+			renderIds = Hacks.getRichFacesRenderIds();
 		}
 		// END OF HACK ------------------------------------------------------------------------------------------------
 

@@ -28,6 +28,7 @@ import javax.faces.application.ResourceHandler;
 import javax.faces.context.FacesContext;
 
 import org.omnifaces.util.Faces;
+import org.omnifaces.util.Hacks;
 import org.omnifaces.util.Utils;
 
 /**
@@ -47,17 +48,6 @@ final class CombinedResourceInfo {
 	private static final long DEFAULT_RESOURCE_MAX_AGE = 604800000L; // 1 week.
 	private static final long MAX_AGE =
 		initMaxAge(DEFAULT_RESOURCE_MAX_AGE, MOJARRA_DEFAULT_RESOURCE_MAX_AGE, MYFACES_DEFAULT_RESOURCE_MAX_AGE);
-
-	private static final String RICHFACES_RESOURCE_OPTIMIZATION_ENABLED = "org.richfaces.resourceOptimization.enabled";
-
-	/**
-	 * RichFaces "resource optimization" do not support getURL() and getInputStream(). The combined resource handler
-	 * has to manually create the URL based on getRequestPath() and the current request domain URL whenever RichFaces
-	 * "resource optimization" is enabled. This field is package private because CombinedResourceInputStream also need
-	 * to know about this.
-	 */
-	static final boolean ENABLE_RF_RES_HACK =
-		Boolean.valueOf(Faces.getInitParameter(RICHFACES_RESOURCE_OPTIMIZATION_ENABLED));
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -192,7 +182,7 @@ final class CombinedResourceInfo {
 				resources.add(resource);
 
 				try {
-					URLConnection connection = !ENABLE_RF_RES_HACK
+					URLConnection connection = !Hacks.isRichFacesResourceOptimizationEnabled()
 						? resource.getURL().openConnection()
 						: new URL(Faces.getRequestDomainURL() + resource.getRequestPath()).openConnection();
 

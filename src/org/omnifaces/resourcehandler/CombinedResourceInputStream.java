@@ -23,6 +23,7 @@ import java.util.Set;
 import javax.faces.application.Resource;
 
 import org.omnifaces.util.Faces;
+import org.omnifaces.util.Hacks;
 import org.omnifaces.util.Utils;
 
 /**
@@ -50,7 +51,7 @@ final class CombinedResourceInputStream extends InputStream {
 		streams = new ArrayList<InputStream>();
 
 		for (Resource resource : resources) {
-			streams.add(!CombinedResourceInfo.ENABLE_RF_RES_HACK
+			streams.add(!Hacks.isRichFacesResourceOptimizationEnabled()
 				? resource.getInputStream()
 				: new URL(Faces.getRequestDomainURL() + resource.getRequestPath()).openStream());
 		}
