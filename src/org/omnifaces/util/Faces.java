@@ -294,6 +294,30 @@ public final class Faces {
 		valueExpression.setValue(elContext, value);
 	}
 
+	/**
+	 * Returns the Faces context attribute value associated with the given name.
+	 * @param name The Faces context attribute name.
+	 * @return The Faces context attribute value associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see FacesContext#getAttributes()
+	 * @since 1.3
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getContextAttribute(String name) {
+		return (T) getContext().getAttributes().get(name);
+	}
+
+	/**
+	 * Sets the Faces context attribute value associated with the given name.
+	 * @param name The Faces context attribute name.
+	 * @param value The Faces context attribute value.
+	 * @see FacesContext#getAttributes()
+	 * @since 1.3
+	 */
+	public static void setContextAttribute(String name, Object value) {
+		getContext().getAttributes().put(name, value);
+	}
+
 	// JSF views ------------------------------------------------------------------------------------------------------
 
 	/**

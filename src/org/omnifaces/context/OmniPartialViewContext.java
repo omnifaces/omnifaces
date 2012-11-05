@@ -33,6 +33,7 @@ import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
 import org.omnifaces.io.ResettableBufferedWriter;
 import org.omnifaces.util.Ajax;
 import org.omnifaces.util.Faces;
+import org.omnifaces.util.Hacks;
 import org.omnifaces.util.Json;
 
 /**
@@ -77,6 +78,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 	 */
 	public OmniPartialViewContext(PartialViewContext wrapped) {
 		this.wrapped = wrapped;
+		Faces.setContextAttribute(OmniPartialViewContext.class.getName(), this);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -169,8 +171,37 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 	 * {@link PartialViewContext} implementation which doesn't properly delegate through the wrapped instance.
 	 */
 	public static OmniPartialViewContext getCurrentInstance() {
-		PartialViewContext context = FacesContext.getCurrentInstance().getPartialViewContext();
+		OmniPartialViewContext instance = Faces.getContextAttribute(OmniPartialViewContext.class.getName());
 
+		if (instance != null) {
+			return instance;
+		}
+
+		// Not found. Well, maybe the context attribute map was cleared for some reason.
+		instance = unwrap(FacesContext.getCurrentInstance().getPartialViewContext());
+
+		if (instance != null) {
+			return instance;
+		}
+
+		// Still not found. Well, maybe RichFaces is installed which doesn't use PartialViewContextWrapper.
+		if (Hacks.isRichFacesInstalled()) {
+			PartialViewContext context = Hacks.getRichFacesWrappedPartialViewContext();
+
+			if (context != null) {
+				instance = unwrap(context);
+
+				if (instance != null) {
+					return instance;
+				}
+			}
+		}
+
+		// Still not found. Well, it's end of story.
+		throw new IllegalStateException(ERROR_NO_OMNI_PVC);
+	}
+
+	private static OmniPartialViewContext unwrap(PartialViewContext context) {
 		while (!(context instanceof OmniPartialViewContext) && context instanceof PartialViewContextWrapper) {
 			context = ((PartialViewContextWrapper) context).getWrapped();
 		}
@@ -179,7 +210,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 			return (OmniPartialViewContext) context;
 		}
 		else {
-			throw new IllegalStateException(ERROR_NO_OMNI_PVC);
+			return null;
 		}
 	}
 
