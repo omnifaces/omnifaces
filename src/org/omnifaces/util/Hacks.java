@@ -26,6 +26,7 @@ import javax.faces.context.PartialViewContextWrapper;
  * specific hacks to get OmniFaces to work nicely together with RichFaces.
  *
  * @author Bauke Scholtz
+ * @since 1.3
  */
 public final class Hacks {
 

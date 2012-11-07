@@ -78,7 +78,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 	 */
 	public OmniPartialViewContext(PartialViewContext wrapped) {
 		this.wrapped = wrapped;
-		Faces.setContextAttribute(OmniPartialViewContext.class.getName(), this);
+		setCurrentInstance(this);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -177,10 +177,11 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 			return instance;
 		}
 
-		// Not found. Well, maybe the context attribute map was cleared for some reason.
+		// Not found. Well, maybe the context attribute map was cleared for some reason. Get it once again.
 		instance = unwrap(FacesContext.getCurrentInstance().getPartialViewContext());
 
 		if (instance != null) {
+			setCurrentInstance(instance);
 			return instance;
 		}
 
@@ -192,6 +193,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 				instance = unwrap(context);
 
 				if (instance != null) {
+					setCurrentInstance(instance);
 					return instance;
 				}
 			}
@@ -199,6 +201,10 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
 		// Still not found. Well, it's end of story.
 		throw new IllegalStateException(ERROR_NO_OMNI_PVC);
+	}
+
+	private static void setCurrentInstance(OmniPartialViewContext instance) {
+		Faces.setContextAttribute(OmniPartialViewContext.class.getName(), instance);
 	}
 
 	private static OmniPartialViewContext unwrap(PartialViewContext context) {
