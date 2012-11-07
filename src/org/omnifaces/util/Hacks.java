@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import javax.faces.FacesException;
+import javax.faces.application.Resource;
 import javax.faces.context.FacesContext;
 import javax.faces.context.PartialViewContext;
 import javax.faces.context.PartialViewContextWrapper;
@@ -93,9 +94,9 @@ public final class Hacks {
 	}
 
 	/**
-	 * RichFaces PartialViewContext implementation does have the getRenderIds() method properly implemented. So a hack
-	 * wherin the exact internal field name needs to be known has to be used to properly extract it from the RichFaces
-	 * PartialViewContext implementation.
+	 * RichFaces PartialViewContext implementation does not have the getRenderIds() method properly implemented. So a
+	 * hack wherin the exact name of the private field needs to be known has to be used to properly extract it from the
+	 * RichFaces PartialViewContext implementation.
 	 */
 	@SuppressWarnings("unchecked")
 	public static Collection<String> getRichFacesRenderIds() {
@@ -123,7 +124,7 @@ public final class Hacks {
 
 	/**
 	 * RichFaces PartialViewContext implementation does not have any getWrapped() method to return the wrapped
-	 * PartialViewContext. So a reflection hack is necessary to return it.
+	 * PartialViewContext. So a reflection hack is necessary to return it from the private field.
 	 */
 	public static PartialViewContext getRichFacesWrappedPartialViewContext() {
 		PartialViewContext richFacesContext = getRichFacesPartialViewContext();
@@ -143,10 +144,9 @@ public final class Hacks {
 	}
 
 	/**
-	 * RichFaces "resource optimization" do not support getURL() and getInputStream(). The combined resource handler
-	 * has to manually create the URL based on getRequestPath() and the current request domain URL whenever RichFaces
-	 * "resource optimization" is enabled. This field is package private because CombinedResourceInputStream also need
-	 * to know about this.
+	 * RichFaces "resource optimization" do not support {@link Resource#getURL()} and {@link Resource#getInputStream()}.
+	 * The combined resource handler has to manually create the URL based on {@link Resource#getRequestPath()} and the
+	 * current request domain URL whenever RichFaces "resource optimization" is enabled.
 	 */
 	public static boolean isRichFacesResourceOptimizationEnabled() {
 		return RICHFACES_RESOURCE_OPTIMIZATION_ENABLED;
