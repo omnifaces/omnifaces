@@ -111,13 +111,10 @@ public class RestorableViewHandler extends ViewHandlerWrapper {
 
 		private FacesContext wrapped;
 		private UIViewRoot temporaryView;
-		private RenderKit temporaryViewRenderKit;
 
 		public TemporaryViewFacesContext(FacesContext wrapped, UIViewRoot temporaryView) {
 			this.wrapped = wrapped;
 			this.temporaryView = temporaryView;
-			this.temporaryViewRenderKit = ((RenderKitFactory) FactoryFinder.getFactory(FactoryFinder.RENDER_KIT_FACTORY))
-				.getRenderKit(this, temporaryView.getRenderKitId());
 		}
 
 		@Override
@@ -127,7 +124,8 @@ public class RestorableViewHandler extends ViewHandlerWrapper {
 
 		@Override
 		public RenderKit getRenderKit() {
-			return temporaryViewRenderKit;
+			return ((RenderKitFactory) FactoryFinder.getFactory(FactoryFinder.RENDER_KIT_FACTORY))
+				.getRenderKit(this, temporaryView.getRenderKitId());
 		}
 
 		@Override
