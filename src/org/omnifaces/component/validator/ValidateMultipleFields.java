@@ -78,6 +78,15 @@ import org.omnifaces.util.Messages;
  * &lt;o:validateMultipleFields components="foo bar baz" disabled="#{param.validationDisabled}" /&gt;
  * </pre>
  * <p>
+ * There is a read-only <code>validationFailed</code> attribute which can be used to determine if the validation by
+ * this component has failed.
+ * <pre>
+ * &lt;o:validateMultipleFields id="myId" binding="#{myId}" components="foo bar baz" /&gt;
+ * &lt;h:panelGroup rendered="#{myId.validationFailed}"&gt;
+ *     Validation has failed! &lt;h:message for="myId" /&gt;
+ * &lt;/h:panelGroup&gt;
+ * </pre>
+ * <p>
  * TODO: support for immediate="true".
  *
  * @author Bauke Scholtz
@@ -106,6 +115,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	private String defaultMessage;
+	private boolean validationFailed;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -154,6 +164,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 				input.setValid(false);
 			}
 
+			validationFailed = true;
 			context.validationFailed();
 			showMessage(context, inputs);
 		}
@@ -339,6 +350,15 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	 */
 	public void setDisabled(boolean disabled) {
 		getStateHelper().put(PropertyKeys.disabled, disabled);
+	}
+
+	/**
+	 * Returns whether the validation has failed or not.
+	 * @return Whether the validation has failed or not.
+	 * @since 1.3
+	 */
+	public boolean isValidationFailed() {
+		return validationFailed;
 	}
 
 }

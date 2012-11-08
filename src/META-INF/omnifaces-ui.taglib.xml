@@ -580,6 +580,15 @@ input.error, select.error, textarea.error {
 				<pre>
 &lt;o:validateMultipleFields components="foo bar baz" disabled="#{param.validationDisabled}" /&gt;
 				</pre>
+				<p>
+				There is a read-only <code>validationFailed</code> attribute which can be used to determine if the validation by
+				this component has failed.
+				<pre>
+&lt;o:validateMultipleFields id="myId" binding="#{myId}" components="foo bar baz" /&gt;
+&lt;h:panelGroup rendered="#{myId.validationFailed}"&gt;
+    Validation has failed! &lt;h:message for="myId" /&gt;
+&lt;/h:panelGroup&gt;
+				</pre>
 			]]>
 		</description>
 		<tag-name>validateAll</tag-name>
