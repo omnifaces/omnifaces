@@ -14,9 +14,12 @@ package org.omnifaces.util;
 
 import static org.omnifaces.util.Utils.*;
 
+import java.util.Map;
+
 import javax.el.ValueExpression;
 import javax.faces.component.EditableValueHolder;
 import javax.faces.component.NamingContainer;
+import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
@@ -335,6 +338,32 @@ public final class Components {
 	 */
 	public static boolean hasSubmittedValue(EditableValueHolder component) {
 		return !Utils.isEmpty(component.getSubmittedValue());
+	}
+
+	/**
+	 * Returns whether the given component has invoked the form submit. In non-ajax requests, that can only be an
+	 * {@link UICommand} component. In ajax requests, that can also be among others an {@link UIInput} component.
+	 * @param component The component to be checked.
+	 * @return <code>true</code> if the given component has invoked the form submit.
+	 * @since 1.3
+	 */
+	public static boolean hasInvokedSubmit(UIComponent component) {
+		FacesContext context = FacesContext.getCurrentInstance();
+
+		if (context.isPostback()) {
+			String clientId = component.getClientId(context);
+			Map<String, String> params = context.getExternalContext().getRequestParameterMap();
+
+			if (context.getPartialViewContext().isAjaxRequest()) {
+				return clientId.equals(params.get("javax.faces.source"));
+			}
+			else {
+				return component instanceof UICommand && params.get(clientId) != null;
+			}
+		}
+		else {
+			return false;
+		}
 	}
 
 	// Validation -----------------------------------------------------------------------------------------------------

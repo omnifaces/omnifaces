@@ -13,12 +13,10 @@
 package org.omnifaces.taghandler;
 
 import java.io.IOException;
-import java.util.Map;
 
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
-import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 import javax.faces.event.PhaseListener;
 import javax.faces.view.facelets.ComponentHandler;
@@ -30,6 +28,7 @@ import org.omnifaces.component.input.Form;
 import org.omnifaces.util.Callback;
 import org.omnifaces.util.Components;
 import org.omnifaces.util.Events;
+import org.omnifaces.util.Faces;
 
 /**
  * <p>
@@ -94,16 +93,8 @@ public class IgnoreValidationFailed extends TagHandler {
 
 				@Override
 				public void invoke() {
-					FacesContext context = FacesContext.getCurrentInstance();
-
-					if (context.isPostback()) {
-						boolean ajax = context.getPartialViewContext().isAjaxRequest();
-						String clientId = parent.getClientId(context);
-						Map<String, String> params = context.getExternalContext().getRequestParameterMap();
-
-						if (ajax ? clientId.equals(params.get("javax.faces.source")) : params.get(clientId) != null) {
-							context.getAttributes().put(IgnoreValidationFailed.class.getName(), true);
-						}
+					if (Components.hasInvokedSubmit(parent)) {
+						Faces.setContextAttribute(IgnoreValidationFailed.class.getName(), true);
 					}
 				}
 			});
