@@ -49,7 +49,7 @@ public class BeanValidationEventListener implements SystemEventListener {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-    private String validationGroups;
+	private String validationGroups;
 	private boolean disabled;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
@@ -58,24 +58,24 @@ public class BeanValidationEventListener implements SystemEventListener {
 	 * Construct an instance of bean validation event listener based on the given validation groups and disabled state.
 	 */
 	public BeanValidationEventListener(String validationGroups, boolean disabled) {
-    	this.validationGroups = validationGroups;
-    	this.disabled = disabled;
+		this.validationGroups = validationGroups;
+		this.disabled = disabled;
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-     * Only listens to {@link UIInput} components which have a {@link javax.faces.validator.BeanValidator}
-     * assigned.
-     */
-    @Override
+	 * Only listens to {@link UIInput} components which have a {@link javax.faces.validator.BeanValidator}
+	 * assigned.
+	 */
+	@Override
 	public boolean isListenerForSource(Object source) {
-        return source instanceof UIInput && getBeanValidator((EditableValueHolder) source) != null;
-    }
+		return source instanceof UIInput && getBeanValidator((EditableValueHolder) source) != null;
+	}
 
-    /**
-     * Handle the {@link PreValidateEvent} and {@link PostValidateEvent}.
-     */
+	/**
+	 * Handle the {@link PreValidateEvent} and {@link PostValidateEvent}.
+	 */
 	@Override
 	public void processEvent(SystemEvent event) throws AbortProcessingException {
 		if (event instanceof PreValidateEvent) {
@@ -86,16 +86,16 @@ public class BeanValidationEventListener implements SystemEventListener {
 		}
 	}
 
-    /**
-     * Replaces the original value of {@link BeanValidator#getValidationGroups()} with the value
-     * from the {@link #REQ_PARAM_PARTIAL_VALIDATION_GROUPS} request attribute.
-     */
+	/**
+	 * Replaces the original value of {@link BeanValidator#getValidationGroups()} with the value
+	 * from the {@link #REQ_PARAM_PARTIAL_VALIDATION_GROUPS} request attribute.
+	 */
 	private void handlePreValidate(UIInput component) {
 		final BeanValidator beanValidator = getBeanValidator(component);
-        final String validationGroups = this.disabled ? NoValidationGroup.class.getName() : this.validationGroups;
-        final String originalValidationGroups = beanValidator.getValidationGroups();
+		final String validationGroups = this.disabled ? NoValidationGroup.class.getName() : this.validationGroups;
+		final String originalValidationGroups = beanValidator.getValidationGroups();
 
-        if (originalValidationGroups != null) {
+		if (originalValidationGroups != null) {
 			component.getAttributes().put(ATTRIBUTE_ORIGINAL_VALIDATION_GROUPS, originalValidationGroups);
 		}
 
