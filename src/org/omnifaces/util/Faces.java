@@ -238,9 +238,9 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns whether the faces servlet mapping used in the current request is a prefix mapping. Use this method in
-	 * preference to {@link #isPrefixMapping()} when you already have obtained the mapping from {@link #getMapping()}
-	 * so that the mapping won't be calculated twice.
+	 * Returns whether the given faces servlet mapping is a prefix mapping. Use this method in preference to
+	 * {@link #isPrefixMapping()} when you already have obtained the mapping from {@link #getMapping()} so that the
+	 * mapping won't be calculated twice.
 	 * @param mapping The mapping to be tested.
 	 * @return <code>true</code> if the faces servlet mapping used in the current request is a prefix mapping, otherwise
 	 * <code>false</code>.
