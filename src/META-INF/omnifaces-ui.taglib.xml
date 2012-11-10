@@ -2697,4 +2697,40 @@ public enum Baz {
 		<tag-name>enableRestorableView</tag-name>
 		<handler-class>org.omnifaces.taghandler.EnableRestorableView</handler-class>
 	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				The <code>&lt;o:validateBean&gt;</code> allows the developer to control bean validation groups on a
+				per-<code>UICommand</code> or <code>UIInput</code> component basis. Usage example:
+				<pre>
+&lt;h:commandButton&gt;
+    &lt;o:validateBean groups="javax.validation.groups.Default,com.example.MyGroup"/&gt;
+&lt;/h:commandButton&gt;
+		        </pre>
+			]]>
+		</description>
+		<tag-name>validateBean</tag-name>
+		<handler-class>org.omnifaces.taghandler.ValidateBean</handler-class>
+		<attribute>
+			<description>
+				<![CDATA[
+					A comma-separated list of validation groups. A validation group is a fully-qualified class name.
+				]]>
+			</description>
+			<name>validationGroups</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					A boolean value enabling page level determination of whether or not this validator is enabled.
+				]]>
+			</description>
+			<name>disabled</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+	</tag>
 </facelet-taglib>
