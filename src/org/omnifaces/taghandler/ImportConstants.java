@@ -137,7 +137,7 @@ public class ImportConstants extends TagHandler {
 					constants.put(field.getName(), field.get(null));
 				}
 				catch (Exception e) {
-					throw new IllegalArgumentException(String.format(ERROR_FIELD_ACCESS, type, field.getName()));
+					throw new IllegalArgumentException(String.format(ERROR_FIELD_ACCESS, type, field.getName()), e);
 				}
 			}
 		}
@@ -156,7 +156,7 @@ public class ImportConstants extends TagHandler {
 			return Class.forName(type);
 		}
 		catch (ClassNotFoundException e) {
-			throw new IllegalArgumentException(String.format(ERROR_MISSING_CLASS, type));
+			throw new IllegalArgumentException(String.format(ERROR_MISSING_CLASS, type), e);
 		}
 	}
 
