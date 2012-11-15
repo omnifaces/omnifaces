@@ -110,4 +110,21 @@ public final class Numbers {
 		return formatter.format(number);
 	}
 
+	/**
+	 * Format the given number in the locale-default pattern. This is useful when you want to format numbers in for
+	 * example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select
+	 * item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The format locale will be set to
+	 * the one as obtained by {@link Faces#getLocale()}.
+	 * @param number The number to be formatted in the locale-default pattern.
+	 * @return The number which is formatted in the locale-default pattern.
+	 * @since 1.3
+	 */
+	public static String formatNumberDefault(Number number) {
+		if (number == null) {
+			return null;
+		}
+
+		return NumberFormat.getNumberInstance(Faces.getLocale()).format(number);
+	}
+
 }

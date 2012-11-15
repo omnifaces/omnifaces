@@ -349,4 +349,18 @@
 		<function-signature>java.lang.String formatNumber(java.lang.Number, java.lang.String)</function-signature>
 	</function>
 
+	<function>
+		<description>
+			<![CDATA[
+				Format the given number in the locale-default pattern. This is useful when you want to format numbers in for 
+				example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select
+				item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The format locale will be set to
+				the one as obtained by <code>Faces#getLocale()</code>.
+			]]>
+		</description>
+		<function-name>formatNumberDefault</function-name>
+		<function-class>org.omnifaces.el.functions.Numbers</function-class>
+		<function-signature>java.lang.String formatNumberDefault(java.lang.Number)</function-signature>
+	</function>
+
 </facelet-taglib>
