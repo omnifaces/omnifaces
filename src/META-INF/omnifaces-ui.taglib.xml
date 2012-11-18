@@ -2733,4 +2733,64 @@ public enum Baz {
 			<type>java.lang.Boolean</type>
 		</attribute>
 	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<strong>ValidateUniqueColumn</strong> validates if the given <code>UIInput</code> component in an <code>UIData</code> component
+				has an unique value throughout all rows, also those not visible by pagination. This validator works directly on the
+				data model and may therefore not work as expected if the data model does not represent <strong>all</strong> available
+				rows of the <code>UIData</code> component (e.g. when there's means of lazy loading).
+				<p>
+				The default message is
+				<blockquote>{0}: Please fill out an unique value for the entire column. Duplicate found in row {1}</blockquote>
+				<p>
+				Usage example:
+				<pre>
+&lt;h:dataTable value="#{bean.items}" var="item"&gt;
+  &lt;h:column&gt;
+    &lt;h:inputText value="#{item.value}"&gt;
+      &lt;o:validateUniqueColumn /&gt;
+    &lt;/h:inputText&gt;
+  &lt;/h:column&gt;
+&lt;/h:dataTable&gt;
+				</pre>
+				<p>
+				In an invalidating case, only the first row on which the value is actually changed (i.e. the value change event has
+				been fired on the input component in the particular row) will be marked invalid and a faces message will be added
+				on the client ID of the input component in the particular row. The default message can be changed by the
+				<code>message</code> attribute. Any "{0}" placeholder in the message will be substituted with the label of the
+				input component. Any "{1}" placeholder in the message will be substituted with the 1-based row index of the data
+				model. Note that this does not take pagination into account and that this needs if necessary to be taken care of in
+				the custom message yourself.
+				<pre>
+&lt;o:validateUniqueColumn message="Duplicate value!" /&gt;
+				</pre>
+			]]>
+		</description>
+		<tag-name>validateUniqueColumn</tag-name>
+		<handler-class>org.omnifaces.taghandler.ValidateUniqueColumn</handler-class>
+		<attribute>
+			<description>
+				<![CDATA[
+					The validator message to be shown on failure. Any "{0}" placeholder in the message will be substituted with the label of the
+					input component. Any "{1}" placeholder in the message will be substituted with the 1-based row index of the data
+					model.
+				]]>
+			</description>
+			<name>message</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether the validation should be disabled or not. Defaults to <code>false</code>.
+				]]>
+			</description>
+			<name>disabled</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+	</tag>
 </facelet-taglib>
