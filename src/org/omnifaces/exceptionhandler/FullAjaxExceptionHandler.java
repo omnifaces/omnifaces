@@ -197,11 +197,11 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
 			// Force JSF to render the error page in its entirety to the ajax response.
 			try {
-	        	renderErrorPageView(context, errorPageLocation);
-	        }
-	        catch (IOException e) {
-	        	throw new FacesException(e);
-	        }
+				renderErrorPageView(context, errorPageLocation);
+			}
+			catch (IOException e) {
+				throw new FacesException(e);
+			}
 			finally {
 				// Prevent some servlet containers from handling error page itself afterwards. So far Tomcat/JBoss
 				// are known to do that. It would only result in IllegalStateException "response already committed".
