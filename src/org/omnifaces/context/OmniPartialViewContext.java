@@ -20,17 +20,13 @@ import java.util.Map;
 
 import javax.faces.FacesException;
 import javax.faces.application.ViewExpiredException;
-import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.context.PartialResponseWriter;
 import javax.faces.context.PartialViewContext;
 import javax.faces.context.PartialViewContextWrapper;
-import javax.faces.context.ResponseWriter;
-import javax.faces.context.ResponseWriterWrapper;
 
 import org.omnifaces.config.WebXml;
 import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
-import org.omnifaces.io.ResettableBufferedWriter;
 import org.omnifaces.util.Ajax;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.Hacks;
@@ -41,9 +37,6 @@ import org.omnifaces.util.Json;
  * <ul>
  * <li>Support for executing callback scripts by {@link PartialResponseWriter#startEval()}.</li>
  * <li>Support for adding arguments to ajax response.</li>
- * <li>Buffers the response until {@link ExternalContext#getResponseBufferSize()} regardless of
- * {@link ResponseWriter#flush()} calls (which defaults to <code>javax.faces.FACELETS_BUFFER_SIZE</code>).</li>
- * <li>Resettable buffer so that exceptions during ajax rendering can be properly handled.</li>
  * <li>Fixes the no-feedback problem when {@link ViewExpiredException} occurs during an ajax request on a restricted
  * page. The enduser will now properly be redirected to the login page.</li>
  * </ul>
@@ -236,9 +229,8 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
 		// Constructors -----------------------------------------------------------------------------------------------
 
-		public OmniPartialResponseWriter(OmniPartialViewContext context, ResponseWriter writer) {
-			super(new ResettableBufferedResponseWriter(
-				writer, Faces.getResponseBufferSize(), Faces.getResponseCharacterEncoding()));
+		public OmniPartialResponseWriter(OmniPartialViewContext context, PartialResponseWriter wrapped) {
+			super(wrapped);
 			this.context = context;
 		}
 
@@ -252,7 +244,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		 */
 		@Override
 		public void startDocument() throws IOException {
-			super.startDocument();
+			getWrapped().startDocument();
 			String loginURL = WebXml.INSTANCE.getFormLoginPage();
 
 			if (loginURL != null) {
@@ -276,7 +268,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		@Override
 		public void startUpdate(String targetId) throws IOException {
 			updating = true;
-			super.startUpdate(targetId);
+			getWrapped().startUpdate(targetId);
 		}
 
 		/**
@@ -287,7 +279,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		@Override
 		public void endUpdate() throws IOException {
 			updating = false;
-			super.endUpdate();
+			getWrapped().endUpdate();
 		}
 
 		/**
@@ -301,8 +293,8 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 				// an exception was been thrown during ajax render response. The following calls will gently close the
 				// partial response which MyFaces has left open.
 				// Mojarra never enters endDocument() method with updating=true, this is handled in reset() method.
-				super.endCDATA();
-				super.endUpdate();
+				endCDATA();
+				endUpdate();
 			}
 			else {
 				if (context.arguments != null) {
@@ -320,15 +312,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 				}
 			}
 
-			super.endDocument();
-
-			if (updating) {
-				updating = false;
-			}
-			else {
-				// Commit the ajax response.
-				getWrapped().close();
-			}
+			getWrapped().endDocument();
 		}
 
 		/**
@@ -342,70 +326,20 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 					// the partial response which Mojarra has left open.
 					// MyFaces never enters reset() method with updating=true, this is handled in endDocument() method.
 					endUpdate(); // Note: this already implicitly closes CDATA in Mojarra.
-					super.endDocument();
+					getWrapped().endDocument();
 				}
 			}
 			catch (IOException e) {
 				throw new FacesException(e);
 			}
 			finally {
-				getWrapped().reset();
+				Faces.responseReset();
 			}
 		}
 
 		@Override
-		public ResettableBufferedResponseWriter getWrapped() {
-			return (ResettableBufferedResponseWriter) super.getWrapped();
-		}
-
-	}
-
-	/**
-	 * This response writer buffers the response body until the <code>javax.faces.FACELETS_BUFFER_SIZE</code> is
-	 * reached, regardless of flush calls, which allows us to perform a reset before the buffer size is reached.
-	 *
-	 * @author Bauke Scholtz
-	 */
-	private static class ResettableBufferedResponseWriter extends ResponseWriterWrapper {
-
-		// Variables --------------------------------------------------------------------------------------------------
-
-		private ResponseWriter wrapped;
-		private ResettableBufferedWriter buffer;
-		private ResponseWriter writer;
-
-		// Constructors -----------------------------------------------------------------------------------------------
-
-		public ResettableBufferedResponseWriter(ResponseWriter wrapped, int bufferSize, String characterEncoding) {
-			this.wrapped = wrapped;
-			this.buffer = new ResettableBufferedWriter(wrapped, bufferSize, characterEncoding);
-		}
-
-		// Actions ----------------------------------------------------------------------------------------------------
-
-		public void reset() {
-			buffer.reset();
-		}
-
-		@Override
-		public void flush() throws IOException {
-			buffer.flush();
-			wrapped.flush();
-		}
-
-		@Override
-		public void close() throws IOException {
-			buffer.close();
-			wrapped.close();
-		}
-
-		@Override
-		public ResponseWriter getWrapped() {
-			if (writer == null) {
-				writer = wrapped.cloneWithWriter(buffer);
-			}
-
-			return writer;
+		public PartialResponseWriter getWrapped() {
+			return (PartialResponseWriter) super.getWrapped();
 		}
 
 	}
