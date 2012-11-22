@@ -37,6 +37,8 @@ import org.omnifaces.util.Json;
  * <ul>
  * <li>Support for executing callback scripts by {@link PartialResponseWriter#startEval()}.</li>
  * <li>Support for adding arguments to ajax response.</li>
+ * <li>Any XML tags which Mojarra and MyFaces has left open after an exception in rendering of an already committed
+ * ajax response, will now be properly closed. This prevents errors about malformed XML.</li>
  * <li>Fixes the no-feedback problem when {@link ViewExpiredException} occurs during an ajax request on a restricted
  * page. The enduser will now properly be redirected to the login page.</li>
  * </ul>
