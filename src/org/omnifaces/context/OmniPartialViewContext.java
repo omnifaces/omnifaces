@@ -217,7 +217,8 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
 	/**
 	 * This OmniFaces partial response writer adds support for passing arguments to JavaScript context, executing
-	 * oncomplete callback scripts, resetting the ajax response (specifically for {@link FullAjaxExceptionHandler}).
+	 * oncomplete callback scripts, resetting the ajax response (specifically for {@link FullAjaxExceptionHandler}) and
+	 * fixing incomlete XML response in case of exceptions.
 	 * @author Bauke Scholtz
 	 */
 	private static class OmniPartialResponseWriter extends PartialResponseWriter {
@@ -225,16 +226,18 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		// Variables --------------------------------------------------------------------------------------------------
 
 		private OmniPartialViewContext context;
+		PartialResponseWriter wrapped;
 		private boolean updating;
 
 		// Constructors -----------------------------------------------------------------------------------------------
 
 		public OmniPartialResponseWriter(OmniPartialViewContext context, PartialResponseWriter wrapped) {
 			super(wrapped);
+			this.wrapped = wrapped;
 			this.context = context;
 		}
 
-		// Actions ----------------------------------------------------------------------------------------------------
+		// Overridden actions -----------------------------------------------------------------------------------------
 
 		/**
 		 * An override which checks if the web.xml security constraint has been triggered during this ajax request
@@ -244,7 +247,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		 */
 		@Override
 		public void startDocument() throws IOException {
-			getWrapped().startDocument();
+			wrapped.startDocument();
 			String loginURL = WebXml.INSTANCE.getFormLoginPage();
 
 			if (loginURL != null) {
@@ -268,7 +271,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		@Override
 		public void startUpdate(String targetId) throws IOException {
 			updating = true;
-			getWrapped().startUpdate(targetId);
+			wrapped.startUpdate(targetId);
 		}
 
 		/**
@@ -279,7 +282,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		@Override
 		public void endUpdate() throws IOException {
 			updating = false;
-			getWrapped().endUpdate();
+			wrapped.endUpdate();
 		}
 
 		/**
@@ -312,8 +315,10 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 				}
 			}
 
-			getWrapped().endDocument();
+			wrapped.endDocument();
 		}
+
+		// Custom actions ---------------------------------------------------------------------------------------------
 
 		/**
 		 * Reset the partial response writer.
@@ -326,7 +331,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 					// the partial response which Mojarra has left open.
 					// MyFaces never enters reset() method with updating=true, this is handled in endDocument() method.
 					endUpdate(); // Note: this already implicitly closes CDATA in Mojarra.
-					getWrapped().endDocument();
+					wrapped.endDocument();
 				}
 			}
 			catch (IOException e) {
@@ -337,10 +342,67 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 			}
 		}
 
+		// Delegate actions -------------------------------------------------------------------------------------------
+
 		@Override
-		public PartialResponseWriter getWrapped() {
-			return (PartialResponseWriter) super.getWrapped();
-		}
+	    public void startError(String errorName) throws IOException {
+	        wrapped.startError(errorName);
+	    }
+
+	    @Override
+	    public void startEval() throws IOException {
+	        wrapped.startEval();
+	    }
+
+	    @Override
+	    public void startExtension(Map<String, String> attributes) throws IOException {
+	        wrapped.startExtension(attributes);
+	    }
+
+	    @Override
+	    public void startInsertAfter(String targetId) throws IOException {
+	        wrapped.startInsertAfter(targetId);
+	    }
+
+	    @Override
+	    public void startInsertBefore(String targetId) throws IOException {
+	        wrapped.startInsertBefore(targetId);
+	    }
+
+	    @Override
+	    public void endError() throws IOException {
+	        wrapped.endError();
+	    }
+
+	    @Override
+	    public void endEval() throws IOException {
+	        wrapped.endEval();
+	    }
+
+	    @Override
+	    public void endExtension() throws IOException {
+	        wrapped.endExtension();
+	    }
+
+	    @Override
+	    public void endInsert() throws IOException {
+	        wrapped.endInsert();
+	    }
+
+	    @Override
+	    public void delete(String targetId) throws IOException {
+	        wrapped.delete(targetId);
+	    }
+
+	    @Override
+	    public void redirect(String url) throws IOException {
+	        wrapped.redirect(url);
+	    }
+
+	    @Override
+	    public void updateAttributes(String targetId, Map<String, String> attributes) throws IOException {
+	        wrapped.updateAttributes(targetId, attributes);
+	    }
 
 	}
 
