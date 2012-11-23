@@ -32,7 +32,7 @@ import javax.faces.validator.Validator;
  * temporarily use different validationGroups or disabling validation if a specific {@link UICommand} or {@link UIInput}
  * has invoked the form submit.
  *
- * @author Adrian Gygax, mimacom ag
+ * @author Adrian Gygax
  * @author Bauke Scholtz
  * @since 1.3
  */

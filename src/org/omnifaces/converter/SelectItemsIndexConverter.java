@@ -40,7 +40,7 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
  * <p>
  * This converter has the following disadvantage over {@link SelectItemsConverter}:
  * <ul>
- * <li>The "Validation Error: value is not valid" will never occur anymore for the case that the avilable select items
+ * <li>The "Validation Error: value is not valid" will never occur anymore for the case that the available select items
  * has incompatibly changed during the postback due to a developer's mistake. The developer should make absolutely sure
  * that exactly the same list is preserved on postback (e.g. by making it a property of a view scoped or broader scoped
  * bean).</li>
