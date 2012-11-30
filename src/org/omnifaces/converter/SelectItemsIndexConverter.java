@@ -22,6 +22,7 @@ import javax.faces.convert.FacesConverter;
 
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.Messages;
+import org.omnifaces.util.Utils;
 import org.omnifaces.util.selectitems.SelectItemsUtils;
 
 /**
@@ -69,8 +70,6 @@ public class SelectItemsIndexConverter implements Converter {
 		"Could not determine select items list for component {0}";
 	private static final String ERROR_SELECT_ITEMS_LIST_INDEX =
 		"Could not determine index for value {0} in component {1}";
-	private static final String ERROR_NO_SELECT_ITEM_VALUE_FOUND =
-		"No matching select item entry was found for object {0} in component {1}";
 	private static final String ERROR_GET_AS_OBJECT =
 		"Could not convert value {0} for component {1}";
 
@@ -98,13 +97,12 @@ public class SelectItemsIndexConverter implements Converter {
 		for (int i = 0; i < selectItemValues.size(); i++) {
 			Object selectItemValue = selectItemValues.get(i);
 
-			if (modelValue == null ? selectItemValue == null : modelValue.equals(selectItemValue)) {
+			if (Utils.isEmpty(modelValue) ? Utils.isEmpty(selectItemValue) : modelValue.equals(selectItemValue)) {
 				return Integer.toString(i);
 			}
 		}
 
-		throw new ConverterException(
-			Messages.createError(ERROR_NO_SELECT_ITEM_VALUE_FOUND, modelValue, component.getClientId(context)));
+		return null;
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
