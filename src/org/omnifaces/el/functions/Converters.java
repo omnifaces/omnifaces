@@ -14,9 +14,12 @@ package org.omnifaces.el.functions;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 /**
@@ -25,6 +28,10 @@ import java.util.Set;
  * @author Bauke Scholtz
  */
 public final class Converters {
+
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final String ERROR_NOT_AN_ARRAY = "The given type '%' is not an array at all.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -61,6 +68,106 @@ public final class Converters {
 		}
 
 		return new ArrayList<Map.Entry<K, V>>(map.entrySet());
+	}
+
+	/**
+	 * Joins all elements of the given array to a single string, separated by the given separator.
+	 * @param array The array to be joined.
+	 * @param separator The separator to be used. If null, then it defaults to empty string.
+	 * @return All elements of the given array as a single string, separated by the given separator.
+	 * @throws IllegalArgumentException When the given array is not an array at all.
+	 * @since 1.3
+	 */
+	public static String joinArray(Object array, String separator) {
+		if (array == null) {
+			return null;
+		}
+
+		if (!array.getClass().isArray()) {
+			throw new IllegalArgumentException(String.format(ERROR_NOT_AN_ARRAY, array.getClass()));
+		}
+
+		if (separator == null) {
+			separator = "";
+		}
+
+		StringBuilder builder = new StringBuilder();
+
+		for (int i = 0; i < Array.getLength(array); i++) {
+			if (i > 0) {
+				builder.append(separator);
+			}
+
+			builder.append(Array.get(array, i));
+		}
+
+		return builder.toString();
+	}
+
+	/**
+	 * Joins all elements of the given collection to a single string, separated by the given separator.
+	 * @param collection The collection to be joined.
+	 * @param separator The separator to be used. If null, then it defaults to empty string.
+	 * @return All elements of the given collection as a single string, separated by the given separator.
+	 * @since 1.3
+	 */
+	public static <E> String joinCollection(Collection<E> collection, String separator) {
+		if (collection == null) {
+			return null;
+		}
+
+		if (separator == null) {
+			separator = "";
+		}
+
+		StringBuilder builder = new StringBuilder();
+		int i = 0;
+
+		for (E element : collection) {
+			if (i++ > 0) {
+				builder.append(separator);
+			}
+
+			builder.append(element);
+		}
+
+		return builder.toString();
+	}
+
+	/**
+	 * Joins all elements of the given map to a single string, separated by the given key-value pair separator and
+	 * entry separator.
+	 * @param map The map to be joined.
+	 * @param pairSeparator The key-value pair separator to be used. If null, then it defaults to empty string.
+	 * @param entrySeparator The entry separator to be used. If null, then it defaults to empty string.
+	 * @return All elements of the given map as a single string, separated by the given separators.
+	 * @since 1.3
+	 */
+	public static <K, V> String joinMap(Map<K, V> map, String pairSeparator, String entrySeparator) {
+		if (map == null) {
+			return null;
+		}
+
+		if (pairSeparator == null) {
+			pairSeparator = "";
+		}
+
+		if (entrySeparator == null) {
+			entrySeparator = "";
+		}
+
+		StringBuilder builder = new StringBuilder();
+		int i = 0;
+
+		for (Entry<K, V> entry : map.entrySet()) {
+			if (i++ > 0) {
+				builder.append(entrySeparator);
+			}
+
+			builder.append(entry.getKey()).append(pairSeparator).append(entry.getValue());
+		}
+
+		return builder.toString();
 	}
 
 	/**

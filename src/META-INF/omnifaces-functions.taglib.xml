@@ -236,6 +236,40 @@
 	<function>
 		<description>
 			<![CDATA[
+				Joins all elements of the given array to a single string, separated by the given separator.
+			]]>
+		</description>
+		<function-name>joinArray</function-name>
+		<function-class>org.omnifaces.el.functions.Converters</function-class>
+		<function-signature>java.lang.String joinArray(java.lang.Object, java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Joins all elements of the given collection to a single string, separated by the given separator.
+			]]>
+		</description>
+		<function-name>joinCollection</function-name>
+		<function-class>org.omnifaces.el.functions.Converters</function-class>
+		<function-signature>java.lang.String joinCollection(java.util.Collection, java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Joins all elements of the given map to a single string, separated by the given key-value pair separator and
+				entry separator.
+			]]>
+		</description>
+		<function-name>joinMap</function-name>
+		<function-class>org.omnifaces.el.functions.Converters</function-class>
+		<function-signature>java.lang.String joinMap(java.util.Map, java.lang.String, java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
 				Print the stack trace of the given exception.
 			]]>
 		</description>
