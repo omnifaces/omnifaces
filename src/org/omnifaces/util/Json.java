@@ -61,7 +61,18 @@ public final class Json {
 			return '"' + Utils.formatRFC1123((Date) object) + '"';
 		}
 		else if (object instanceof Collection<?>) {
-			return encode(((Collection<?>) object).toArray());
+			StringBuilder builder = new StringBuilder().append('[');
+			int i = 0;
+
+			for (Object element : ((Collection<?>) object)) {
+				if (i++ > 0) {
+					builder.append(',');
+				}
+
+				builder.append(encode(element));
+			}
+
+			return builder.append(']').toString();
 		}
 		else if (object instanceof Map<?, ?>) {
 			StringBuilder builder = new StringBuilder().append('{');
