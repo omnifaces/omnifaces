@@ -33,7 +33,7 @@ public final class EditableValueHolderStateHelper {
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private Object submittedValue;
-	private boolean valid;
+	private boolean valid = true;
 	private Object localValue;
 	private boolean localValueSet;
 
