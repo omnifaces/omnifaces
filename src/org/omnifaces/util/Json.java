@@ -64,30 +64,31 @@ public final class Json {
 			return encode(((Collection<?>) object).toArray());
 		}
 		else if (object instanceof Map<?, ?>) {
-			StringBuilder builder = new StringBuilder();
+			StringBuilder builder = new StringBuilder().append('{');
+			int i = 0;
 
 			for (Entry<?, ?> entry : ((Map<?, ?>) object).entrySet()) {
-				if (builder.length() > 0) {
+				if (i++ > 0) {
 					builder.append(',');
 				}
 
 				builder.append(encode(String.valueOf(entry.getKey()))).append(':').append(encode(entry.getValue()));
 			}
 
-			return builder.insert(0, '{').append('}').toString();
+			return builder.append('}').toString();
 		}
 		else if (object.getClass().isArray()) {
-			StringBuilder builder = new StringBuilder();
+			StringBuilder builder = new StringBuilder().append('[');
 
 			for (int i = 0; i < Array.getLength(object); i++) {
-				if (builder.length() > 0) {
+				if (i > 0) {
 					builder.append(',');
 				}
 
 				builder.append(encode(Array.get(object, i)));
 			}
 
-			return builder.insert(0, '[').append(']').toString();
+			return builder.append(']').toString();
 		}
 		else {
 			throw new IllegalArgumentException("Unsupported type: " + object.getClass());

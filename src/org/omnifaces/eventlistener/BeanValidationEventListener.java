@@ -65,8 +65,7 @@ public class BeanValidationEventListener implements SystemEventListener {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Only listens to {@link UIInput} components which have a {@link javax.faces.validator.BeanValidator}
-	 * assigned.
+	 * Only listens to {@link UIInput} components which have a {@link javax.faces.validator.BeanValidator} assigned.
 	 */
 	@Override
 	public boolean isListenerForSource(Object source) {
@@ -87,8 +86,7 @@ public class BeanValidationEventListener implements SystemEventListener {
 	}
 
 	/**
-	 * Replaces the original value of {@link BeanValidator#getValidationGroups()} with the value
-	 * from the {@link #REQ_PARAM_PARTIAL_VALIDATION_GROUPS} request attribute.
+	 * Replaces the original value of {@link BeanValidator#getValidationGroups()} with the value from the tag attribute.
 	 */
 	private void handlePreValidate(UIInput component) {
 		final BeanValidator beanValidator = getBeanValidator(component);
@@ -108,7 +106,7 @@ public class BeanValidationEventListener implements SystemEventListener {
 	}
 
 	/**
-	 * Restores the default validationGroups value.
+	 * Restores the original value of {@link BeanValidator#getValidationGroups()}.
 	 */
 	private void handlePostValidate(UIInput component) {
 		final BeanValidator beanValidator = getBeanValidator(component);
