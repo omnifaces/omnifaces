@@ -66,6 +66,10 @@ public class TreeInsertChildren extends TreeFamily {
 	 */
 	@Override
 	public boolean visitTree(VisitContext context, VisitCallback callback) {
+		if (shouldSkipIteration(context)) {
+			return super.visitTree(context, callback);
+		}
+
 		return Components.getClosestParent(this, Tree.class).visitTreeNode(context, callback);
 	}
 
