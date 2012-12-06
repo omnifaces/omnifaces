@@ -66,7 +66,7 @@ public class TreeInsertChildren extends TreeFamily {
 	 */
 	@Override
 	public boolean visitTree(VisitContext context, VisitCallback callback) {
-		if (shouldSkipIteration(context)) {
+		if (Components.shouldVisitSkipIteration(context)) {
 			return super.visitTree(context, callback);
 		}
 

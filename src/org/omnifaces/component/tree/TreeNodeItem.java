@@ -119,7 +119,7 @@ public class TreeNodeItem extends TreeFamily {
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" }) // For TreeModel. We don't care about its actual type anyway.
 	public boolean visitTree(final VisitContext context, final VisitCallback callback) {
-		if (shouldSkipIteration(context)) {
+		if (Components.shouldVisitSkipIteration(context)) {
 			return super.visitTree(context, callback);
 		}
 

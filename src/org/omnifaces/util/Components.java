@@ -24,6 +24,8 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
 import javax.faces.component.UIViewRoot;
+import javax.faces.component.visit.VisitContext;
+import javax.faces.component.visit.VisitHint;
 import javax.faces.context.FacesContext;
 
 /**
@@ -201,6 +203,22 @@ public final class Components {
 		}
 
 		return parentType.cast(parent);
+	}
+
+	/**
+	 * Returns true if the given visit context contains the visit hint that iteration should be skipped.
+	 * @param context The involved visit context.
+	 * @since 1.3
+	 */
+	public static boolean shouldVisitSkipIteration(VisitContext context) {
+		try {
+			// JSF 2.1.
+			return context.getHints().contains(VisitHint.valueOf("SKIP_ITERATION"));
+		}
+		catch (IllegalArgumentException e) {
+			// JSF 2.0.
+			return context.getFacesContext().getAttributes().get("javax.faces.visit.SKIP_ITERATION") == Boolean.TRUE;
+		}
 	}
 
 	// Forms ----------------------------------------------------------------------------------------------------------

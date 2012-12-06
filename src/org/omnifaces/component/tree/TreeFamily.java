@@ -16,8 +16,6 @@ import java.io.IOException;
 
 import javax.faces.FacesException;
 import javax.faces.component.UIComponentBase;
-import javax.faces.component.visit.VisitContext;
-import javax.faces.component.visit.VisitHint;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 
@@ -135,21 +133,6 @@ public abstract class TreeFamily extends UIComponentBase {
 			catch (IOException e) {
 				throw new FacesException(e);
 			}
-		}
-	}
-
-	/**
-	 * Returns true if the given visit context contains the visit hint that iteration should be skipped.
-	 * @param context The involved visit context.
-	 */
-	protected static boolean shouldSkipIteration(VisitContext context) {
-		try {
-			// JSF 2.1.
-			return context.getHints().contains(VisitHint.valueOf("SKIP_ITERATION"));
-		}
-		catch (IllegalArgumentException e) {
-			// JSF 2.0.
-			return context.getFacesContext().getAttributes().get("javax.faces.visit.SKIP_ITERATION") == Boolean.TRUE;
 		}
 	}
 
