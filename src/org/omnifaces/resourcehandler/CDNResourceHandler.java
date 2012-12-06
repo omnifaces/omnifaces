@@ -102,7 +102,7 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	private ResourceHandler wrapped;
-	private Map<String, String> cdnResources;
+	private Map<ResourceIdentifier, String> cdnResources;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -144,8 +144,7 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 			return resource;
 		}
 
-		String resourceId = ((libraryName != null) ? libraryName + ":" : "") + resourceName;
-		final String requestPath = cdnResources.get(resourceId);
+		final String requestPath = cdnResources.get(new ResourceIdentifier(libraryName, resourceName));
 
 		if (requestPath == null) {
 			return resource;
@@ -177,14 +176,14 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 	 * @return The CDN resources, or <code>null</code> if the context parameter has not been set.
 	 * @throws IllegalArgumentException When the context parameter value is in invalid format.
 	 */
-	static Map<String, String> initCDNResources() {
+	static Map<ResourceIdentifier, String> initCDNResources() {
 		String cdnResourcesParam = Faces.getInitParameter(PARAM_NAME_CDN_RESOURCES);
 
 		if (Utils.isEmpty(cdnResourcesParam)) {
 			return null;
 		}
 
-		Map<String, String> cdnResources = new HashMap<String, String>();
+		Map<ResourceIdentifier, String> cdnResources = new HashMap<ResourceIdentifier, String>();
 
 		for (String cdnResource : cdnResourcesParam.split("\\s*,\\s*")) {
 			String[] cdnResourceIdAndURL = cdnResource.split("\\s*=\\s*", 2);
@@ -193,7 +192,7 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 				throw new IllegalArgumentException(ERROR_INVALID_INIT_PARAM);
 			}
 
-			cdnResources.put(cdnResourceIdAndURL[0], cdnResourceIdAndURL[1]);
+			cdnResources.put(new ResourceIdentifier(cdnResourceIdAndURL[0]), cdnResourceIdAndURL[1]);
 		}
 
 		return cdnResources;

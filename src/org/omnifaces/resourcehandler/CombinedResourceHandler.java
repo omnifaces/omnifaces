@@ -14,7 +14,6 @@ package org.omnifaces.resourcehandler;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -26,6 +25,7 @@ import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
 import javax.faces.application.ResourceHandlerWrapper;
 import javax.faces.component.UIComponent;
+import javax.faces.component.UIOutput;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
@@ -39,6 +39,7 @@ import org.omnifaces.renderer.InlineScriptRenderer;
 import org.omnifaces.renderer.InlineStylesheetRenderer;
 import org.omnifaces.util.Events;
 import org.omnifaces.util.Faces;
+import org.omnifaces.util.Hacks;
 import org.omnifaces.util.Utils;
 
 /**
@@ -154,16 +155,12 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	private static final String TARGET_HEAD = "head";
 	private static final String ATTRIBUTE_RESOURCE_LIBRARY = "library";
 	private static final String ATTRIBUTE_RESOURCE_NAME = "name";
-	private static final String RENDERER_TYPE_CSS = "javax.faces.resource.Stylesheet";
-	private static final String RENDERER_TYPE_JS = "javax.faces.resource.Script";
-	private static final String EXTENSION_CSS = ".css";
-	private static final String EXTENSION_JS = ".js";
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	private ResourceHandler wrapped;
-	private Set<String> excludedResources;
-	private Set<String> suppressedResources;
+	private Set<ResourceIdentifier> excludedResources;
+	private Set<ResourceIdentifier> suppressedResources;
 	private boolean inlineCSS;
 	private boolean inlineJS;
 
@@ -213,71 +210,21 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	@Override
 	public void processEvent(SystemEvent event) throws AbortProcessingException {
 		FacesContext context = FacesContext.getCurrentInstance();
-		UIViewRoot viewRoot = context.getViewRoot();
+		CombinedResourceBuilder builder = new CombinedResourceBuilder();
 
-		CombinedResourceInfo.Builder stylesheets = new CombinedResourceInfo.Builder();
-		CombinedResourceInfo.Builder scripts = new CombinedResourceInfo.Builder();
-		UIComponent stylesheetComponentResource = null;
-		UIComponent scriptComponentResource = null;
-		List<UIComponent> componentResourcesToRemove = new ArrayList<UIComponent>();
-
-		for (UIComponent componentResource : viewRoot.getComponentResources(context, TARGET_HEAD)) {
+		for (UIComponent componentResource : context.getViewRoot().getComponentResources(context, TARGET_HEAD)) {
 			String library = (String) componentResource.getAttributes().get(ATTRIBUTE_RESOURCE_LIBRARY);
-
-			if (LIBRARY_NAME.equals(library)) {
-				continue; // Don't recombine already combined resources.
-			}
-
 			String name = (String) componentResource.getAttributes().get(ATTRIBUTE_RESOURCE_NAME);
 
 			if (name == null) {
 				continue; // It's likely an inline script, they can't be combined as it might contain EL expressions.
 			}
 
-			String resourceIdentifier = (library != null ? (library + ":") : "") + name;
-
-			if (excludedResources.isEmpty() || !excludedResources.contains(resourceIdentifier)) {
-				if (componentResource.getRendererType().equals(RENDERER_TYPE_CSS)) {
-					stylesheets.add(library, name);
-
-					if (stylesheetComponentResource == null) {
-						stylesheetComponentResource = componentResource;
-					}
-					else {
-						componentResourcesToRemove.add(componentResource);
-					}
-				}
-				else if (componentResource.getRendererType().equals(RENDERER_TYPE_JS)) {
-					scripts.add(library, name);
-
-					if (scriptComponentResource == null) {
-						scriptComponentResource = componentResource;
-					}
-					else {
-						componentResourcesToRemove.add(componentResource);
-					}
-				}
-			}
-			else if (suppressedResources.contains(resourceIdentifier)) {
-				componentResourcesToRemove.add(componentResource);
-			}
+			ResourceIdentifier resourceIdentifier = new ResourceIdentifier(library, name);
+			builder.add(context, componentResource, componentResource.getRendererType(), resourceIdentifier);
 		}
 
-		if (stylesheetComponentResource != null) {
-			stylesheetComponentResource.getAttributes().put(ATTRIBUTE_RESOURCE_LIBRARY, LIBRARY_NAME);
-			stylesheetComponentResource.getAttributes().put(ATTRIBUTE_RESOURCE_NAME, stylesheets.create() + EXTENSION_CSS);
-			stylesheetComponentResource.setRendererType(inlineCSS ? InlineStylesheetRenderer.RENDERER_TYPE : RENDERER_TYPE_CSS);
-		}
-
-		if (scriptComponentResource != null) {
-			scriptComponentResource.getAttributes().put(ATTRIBUTE_RESOURCE_LIBRARY, LIBRARY_NAME);
-			scriptComponentResource.getAttributes().put(ATTRIBUTE_RESOURCE_NAME, scripts.create() + EXTENSION_JS);
-			scriptComponentResource.setRendererType(inlineJS ? InlineScriptRenderer.RENDERER_TYPE : RENDERER_TYPE_JS);
-		}
-
-		for (UIComponent componentResourceToRemove : componentResourcesToRemove) {
-			viewRoot.removeComponentResource(context, componentResourceToRemove, TARGET_HEAD);
-		}
+		builder.create(context);
 	}
 
 	@Override
@@ -318,12 +265,14 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	 * @return The set of resources which are set by the given application initialization parameter name, or an empty
 	 * set if the parameter is not been set.
 	 */
-	private static Set<String> initResources(String name) {
-		Set<String> resources = new HashSet<String>(1);
+	private static Set<ResourceIdentifier> initResources(String name) {
+		Set<ResourceIdentifier> resources = new HashSet<ResourceIdentifier>(1);
 		String configuredResources = Faces.getInitParameter(name);
 
 		if (configuredResources != null) {
-			resources.addAll(Arrays.asList(configuredResources.split("\\s*,\\s*")));
+			for (String resourceIdentifier : configuredResources.split("\\s*,\\s*")) {
+				resources.add(new ResourceIdentifier(resourceIdentifier));
+			}
 		}
 
 		return resources;
@@ -333,9 +282,9 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	 * Initialize the set of CDN resources based on {@link CDNResourceHandler} configuration.
 	 * @return The set of CDN resources.
 	 */
-	private static Set<String> initCDNResources() {
-		Map<String, String> cdnResources = CDNResourceHandler.initCDNResources();
-		return (cdnResources != null) ? cdnResources.keySet() : Collections.<String>emptySet();
+	private static Set<ResourceIdentifier> initCDNResources() {
+		Map<ResourceIdentifier, String> cdnResources = CDNResourceHandler.initCDNResources();
+		return (cdnResources != null) ? cdnResources.keySet() : Collections.<ResourceIdentifier>emptySet();
 	}
 
 	/**
@@ -359,6 +308,135 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 		}
 
 		Utils.stream(resource.getInputStream(), externalContext.getResponseOutputStream());
+	}
+
+	// Inner classes --------------------------------------------------------------------------------------------------
+
+	/**
+	 * General builder to collect, exclude and suppress stylesheet and script component resources.
+	 *
+	 * @author Bauke Scholtz
+	 */
+	private final class CombinedResourceBuilder {
+
+		// Constants --------------------------------------------------------------------------------------------------
+
+		private static final String RENDERER_TYPE_CSS = "javax.faces.resource.Stylesheet";
+		private static final String RENDERER_TYPE_JS = "javax.faces.resource.Script";
+		private static final String EXTENSION_CSS = ".css";
+		private static final String EXTENSION_JS = ".js";
+
+		// General stylesheet/script builder --------------------------------------------------------------------------
+
+		private CombinedResourceBuilder stylesheets;
+		private CombinedResourceBuilder scripts;
+		private List<UIComponent> componentResourcesToRemove;
+
+		public CombinedResourceBuilder() {
+			this.stylesheets = new CombinedResourceBuilder(EXTENSION_CSS);
+			this.scripts = new CombinedResourceBuilder(EXTENSION_JS);
+			this.componentResourcesToRemove = new ArrayList<UIComponent>(3);
+		}
+
+		public void add(FacesContext context, UIComponent component, String rendererType, ResourceIdentifier id) {
+			if (LIBRARY_NAME.equals(id.getLibrary())) {
+				// Found an already combined resource. Extract and recombine it.
+				CombinedResourceInfo info = CombinedResourceInfo.get(id.getName());
+
+				if (info != null) {
+					for (ResourceIdentifier combinedId : info.getResourceIdentifiers()) {
+						add(context, null, rendererType, combinedId);
+					}
+				}
+
+				componentResourcesToRemove.add(component);
+			}
+			else if (rendererType.equals(RENDERER_TYPE_CSS)) {
+				stylesheets.add(component, id.getLibrary(), id.getName());
+			}
+			else if (rendererType.equals(RENDERER_TYPE_JS)) {
+				scripts.add(component, id.getLibrary(), id.getName());
+			}
+
+			// WARNING: START OF HACK! --------------------------------------------------------------------------------
+			// HACK for RichFaces4 because of its non-standard resource library handling. Resources with the extension
+			// ".reslib" have special treatment by RichFaces specific resource library renderer. They represent multiple
+			// resources which are supposed to be dynamically constructed/added with the purpose to keep resource
+			// dependencies in RichFaces components "DRY". So far, it are usually only JS resources.
+			else if (Hacks.isRichFacesResourceLibraryRenderer(rendererType)) {
+				Set<ResourceIdentifier> resourceIdentifiers = Hacks.getRichFacesResourceLibraryResources(id);
+				ResourceHandler handler = context.getApplication().getResourceHandler();
+
+				for (ResourceIdentifier identifier : resourceIdentifiers) {
+					rendererType = handler.getRendererTypeForResourceName(identifier.getName());
+					add(context, null, rendererType, identifier);
+				}
+
+				componentResourcesToRemove.add(component);
+			}
+			// --------------------------------------------------------------------------------------------------------
+		}
+
+		public void create(FacesContext context) {
+			stylesheets.create(context, inlineCSS ? InlineStylesheetRenderer.RENDERER_TYPE : RENDERER_TYPE_CSS);
+			scripts.create(context, inlineJS ? InlineScriptRenderer.RENDERER_TYPE : RENDERER_TYPE_JS);
+			removeComponentResources(context);
+		}
+
+
+		private void removeComponentResources(FacesContext context) {
+			for (UIComponent resourceToRemove : componentResourcesToRemove) {
+				if (resourceToRemove != null) {
+					context.getViewRoot().removeComponentResource(context, resourceToRemove, TARGET_HEAD);
+				}
+			}
+		}
+
+		// Specific stylesheet/script builder -------------------------------------------------------------------------
+
+		private String extension;
+		private CombinedResourceInfo.Builder info;
+		private UIComponent componentResource;
+
+		private CombinedResourceBuilder(String extension) {
+			this.extension = extension;
+			this.info = new CombinedResourceInfo.Builder();
+			this.componentResourcesToRemove = new ArrayList<UIComponent>(3);
+		}
+
+		private void add(UIComponent componentResource, String library, String name) {
+			ResourceIdentifier resourceIdentifier = new ResourceIdentifier(library, name);
+
+			if (excludedResources.isEmpty() || !excludedResources.contains(resourceIdentifier)) {
+				info.add(resourceIdentifier);
+
+				if (this.componentResource == null) {
+					this.componentResource = componentResource;
+				}
+				else {
+					componentResourcesToRemove.add(componentResource);
+				}
+			}
+			else if (suppressedResources.contains(resourceIdentifier)) {
+				componentResourcesToRemove.add(componentResource);
+			}
+		}
+
+		private void create(FacesContext context, String rendererType) {
+			if (!info.isEmpty()) {
+				if (componentResource == null) {
+					componentResource = new UIOutput();
+					context.getViewRoot().addComponentResource(context, componentResource, TARGET_HEAD);
+				}
+
+				componentResource.getAttributes().put(ATTRIBUTE_RESOURCE_LIBRARY, LIBRARY_NAME);
+				componentResource.getAttributes().put(ATTRIBUTE_RESOURCE_NAME, info.create() + extension);
+				componentResource.setRendererType(rendererType);
+			}
+
+			removeComponentResources(context);
+		}
+
 	}
 
 }
