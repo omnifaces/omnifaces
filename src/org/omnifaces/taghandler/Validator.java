@@ -14,6 +14,7 @@ package org.omnifaces.taghandler;
 
 import java.io.IOException;
 
+import javax.el.ELContext;
 import javax.el.ValueExpression;
 import javax.faces.FacesException;
 import javax.faces.application.Application;
@@ -24,6 +25,9 @@ import javax.faces.validator.ValidatorException;
 import javax.faces.view.facelets.ComponentHandler;
 import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagConfig;
+
+import org.omnifaces.util.Components;
+import org.omnifaces.util.Messages;
 
 /**
  * The <code>&lt;o:validator&gt;</code> basically extends the <code>&lt;f:validator&gt;</code> tag family with the
@@ -40,6 +44,14 @@ import javax.faces.view.facelets.TagConfig;
  * request based value expressions.
  * <pre>
  * &lt;o:validator validatorId="javax.faces.LongRange" minimum="#{item.minimum}" maximum="#{item.maximum}" /&gt;
+ * </pre>
+ * <p>
+ * It is also possible to specify the validator message on a per-validator basis using the <code>message</code>
+ * attribute. Any "{0}" placeholder in the message will be substituted with the label of the referenced input component.
+ * Note that this attribute is ignored when the parent component has already <code>validatorMessage</code> specified.
+ * <pre>
+ * &lt;o:validator validatorId="javax.faces.LongRange" minimum="#{item.minimum}" maximum="#{item.maximum}"
+ *   message="Please enter between #{item.minimum} and #{item.maximum} characters" /&gt;
  * </pre>
  *
  * @author Bauke Scholtz
@@ -85,13 +97,32 @@ public class Validator extends RenderTimeTagHandler {
 		final javax.faces.validator.Validator validator = createValidator(context);
 		final RenderTimeAttributes attributes = collectRenderTimeAttributes(context, validator);
 		final ValueExpression disabled = getValueExpression(context, "disabled", Boolean.class);
+		final ValueExpression message = getValueExpression(context, "message", String.class);
 		((EditableValueHolder) parent).addValidator(new javax.faces.validator.Validator() {
 
 			@Override
 			public void validate(FacesContext context, UIComponent component, Object value) throws ValidatorException {
-				if (disabled == null || Boolean.FALSE.equals(disabled.getValue(context.getELContext()))) {
-					attributes.invokeSetters(context.getELContext(), validator);
-					validator.validate(context, component, value);
+				ELContext el = context.getELContext();
+
+				if (disabled == null || Boolean.FALSE.equals(disabled.getValue(el))) {
+					attributes.invokeSetters(el, validator);
+
+					try {
+						validator.validate(context, component, value);
+					}
+					catch (ValidatorException e) {
+						if (message != null) {
+							String validatorMessage = (String) message.getValue(el);
+
+							if (validatorMessage != null) {
+								String label = Components.getLabel(component);
+								throw new ValidatorException(Messages.create(validatorMessage, label)
+									.detail(validatorMessage, label).error().get(), e.getCause());
+							}
+						}
+
+						throw e;
+					}
 				}
 			}
 		});

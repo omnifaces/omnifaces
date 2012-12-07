@@ -224,6 +224,14 @@ public final class Messages {
 			Messages.addGlobal(message);
 		}
 
+		/**
+		 * Returns the so far built message.
+		 * @return The so far built message.
+		 */
+		public FacesMessage get() {
+			return message;
+		}
+
 	}
 
 	// Shortcuts - create message -------------------------------------------------------------------------------------
