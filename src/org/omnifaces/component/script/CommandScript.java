@@ -362,7 +362,7 @@ public class CommandScript extends UICommand {
 
 	/**
 	 * Sets a script to execute after ajax response is processed.
-	 * @name oncomplete A script to execute after ajax response is processed.
+	 * @param oncomplete A script to execute after ajax response is processed.
 	 */
 	public void setOncomplete(String oncomplete) {
 		state.put(PropertyKeys.oncomplete, oncomplete);
