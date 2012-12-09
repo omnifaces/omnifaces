@@ -2804,4 +2804,173 @@ public enum Baz {
 			<type>java.lang.Boolean</type>
 		</attribute>
 	</tag>
+	
+	<tag>
+		<description>
+			<![CDATA[
+				<p><strong>CommandScript</strong> is an extension to <code>&lt;h:commandXxx&gt;</code> which generates a JavaScript
+				function in the global JavaScript scope which allows the enduser to execute a JSF ajax request by a just function
+				call <code>functionName()</code> in the JavaScript context.
+				<p>
+				The <code>&lt;o:commandScript&gt;</code> component is required to be enclosed in an <code>UIForm</code> component. The
+				<code>name</code> attribute is required and it represents the JavaScript function name. The <code>execute</code>
+				and <code>render</code> attributes work exactly the same as in <code>&lt;f:ajax&gt;</code>. The <code>onbegin</code>
+				and <code>oncomplete</code> attributes must represent (valid!) JavaScript code which will be executed before sending
+				the ajax request and after processing the ajax response respectively. The <code>action</code>,
+				<code>actionListener</code> and <code>immediate</code> attributes work exactly the same as in
+				<code>&lt;h:commandXxx&gt;</code>.
+				<p>
+				Basic usage example of <code>&lt;o:commandScript&gt;</code> which submits the entire form on click of a plain HTML
+				button:
+				<pre>
+&lt;h:form&gt;
+  &lt;h:inputText value="#{bean.input1}" ... /&gt;
+  &lt;h:inputText value="#{bean.input2}" ... /&gt;
+  &lt;h:inputText value="#{bean.input3}" ... /&gt;
+  &lt;o:commandScript name="submitForm" action="#{bean.submit}" render="@form" /&gt;
+&lt;/h:form&gt;
+&lt;input type="button" value="submit" onclick="submitForm()" /&gt;
+				</pre>
+				<p>
+				Usage example which uses the <code>&lt;o:commandScript&gt;</code> as a poll function which updates every 3 seconds:
+				<pre>
+&lt;h:form&gt;
+  &lt;h:dataTable id="data" value="#{bean.data}" ...&gt;...&lt;/h:dataTable&gt;
+  &lt;o:commandScript name="updateData" action="#{bean.reloadData}" render="data" /&gt;
+&lt;/h:form&gt;
+&lt;h:outputScript target="body"&gt;setInterval(updateData, 3000);&lt;/h:outputScript&gt;
+				</pre>
+				Note that it also supports nesting of <code>&lt;f:param&gt;</code>, <code>&lt;f:actionListener&gt;</code> and
+				<code>&lt;f:setPropertyActionListener&gt;</code>, exactly like as in <code>&lt;h:commandXxx&gt;</code>.
+			]]>
+		</description>
+		<tag-name>commandScript</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.script.CommandScript</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The script function name.
+				]]>
+			</description>
+			<name>name</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					A space separated string of client IDs to process on ajax request.
+				]]>
+			</description>
+			<name>execute</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					A space separated string of client IDs to update on ajax response.
+				]]>
+			</description>
+			<name>render</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					A script to execute before ajax request is fired.
+				]]>
+			</description>
+			<name>onbegin</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					A script to execute after ajax response is processed.
+				]]>
+			</description>
+			<name>oncomplete</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					<code>MethodExpression</code> representing the application action to invoke when this component is
+					activated by the user. The expression must evaluate to a public method that takes no parameters, and
+					returns an <code>Object</code> (the <code>toString()</code> of which is called to derive the logical
+					outcome) which is passed to the <code>NavigationHandler</code> for this application.
+				]]>
+			</description>
+			<name>action</name>
+			<required>false</required>
+			<method-signature>java.lang.Object action()</method-signature>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					<code>MethodExpression</code> representing an action listener method that will be notified when this
+					component is activated by the user. The expression must evaluate to a public method that takes an 
+					<code>ActionEvent</code> parameter, with a return type of void, or to a public method that takes no
+					arguments with a return type of void. In the latter case, the method has no way of easily knowing
+					where the event came from, but this can be useful in cases where a notification is needed that
+					"some action happened".
+				]]>
+			</description>
+			<name>actionListener</name>
+			<required>false</required>
+			<method-signature>void actionListener(javax.faces.event.ActionEvent)
+			</method-signature>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating that, if this component is activated by the user, notifications should be delivered
+					to interested listeners and actions immediately (that is, during Apply Request Values phase) rather
+					than waiting until Invoke Application phase.
+				]]>
+			</description>
+			<name>immediate</name>
+			<required>false</required>
+			<type>boolean</type>
+		</attribute>
+	</tag>
+
 </facelet-taglib>

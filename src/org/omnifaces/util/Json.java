@@ -38,9 +38,9 @@ public final class Json {
 
 	/**
 	 * Encodes the given object as JSON. This supports the standard types {@link Boolean}, {@link Number},
-	 * {@link String} and {@link Date}. It also supports {@link Collection}s, {@link Map}s and arrays of them, even
-	 * nested ones. The {@link Date} is formatted in RFC 1123 format, so you can if necessary just pass it straight to
-	 * <code>new Date()</code> in JavaScript.
+	 * {@link CharSequence} and {@link Date}. It also supports {@link Collection}s, {@link Map}s and arrays of them,
+	 * even nested ones. The {@link Date} is formatted in RFC 1123 format, so you can if necessary just pass it
+	 * straight to <code>new Date()</code> in JavaScript.
 	 * <p>
 	 * Complex objects like javabeans are not supported. Consider a "real" JSON library instead if you need this.
 	 * @param object The object to be encoded as JSON.
@@ -54,8 +54,8 @@ public final class Json {
 		else if (object instanceof Boolean || object instanceof Number) {
 			return object.toString();
 		}
-		else if (object instanceof String) {
-			return '"' + Strings.escapeJS((String) object) + '"';
+		else if (object instanceof CharSequence) {
+			return '"' + Strings.escapeJS(object.toString()) + '"';
 		}
 		else if (object instanceof Date) {
 			return '"' + Utils.formatRFC1123((Date) object) + '"';
