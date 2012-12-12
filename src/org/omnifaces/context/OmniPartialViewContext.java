@@ -289,7 +289,9 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
 		/**
 		 * An override which writes all {@link OmniPartialViewContext#arguments} as JSON to the extension and all
-		 * {@link OmniPartialViewContext#callbackScripts} to the eval.
+		 * {@link OmniPartialViewContext#callbackScripts} to the eval. It also checks if we're still updating, which
+		 * may occur when MyFaces is used and an exception was thrown during rendering the partial response, and then
+		 * gently closes the partial response which MyFaces has left open.
 		 */
 		@Override
 		public void endDocument() throws IOException {
@@ -323,7 +325,10 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		// Custom actions ---------------------------------------------------------------------------------------------
 
 		/**
-		 * Reset the partial response writer.
+		 * Reset the partial response writer. It checks if we're still updating, which may occur when Mojarra is used
+		 * and an exception was thrown during rendering the partial response, and then gently closes the partial
+		 * response which Mojarra has left open. This would clear the internal state of the wrapped partial response
+		 * writer and thus make it ready for reuse without risking malformed XML.
 		 */
 		public void reset() {
 			try {
@@ -332,7 +337,8 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 					// an exception was been thrown during ajax render response. The following calls will gently close
 					// the partial response which Mojarra has left open.
 					// MyFaces never enters reset() method with updating=true, this is handled in endDocument() method.
-					endUpdate(); // Note: this already implicitly closes CDATA in Mojarra.
+					endCDATA();
+					endUpdate();
 					wrapped.endDocument();
 				}
 			}
@@ -344,67 +350,67 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 			}
 		}
 
-		// Delegate actions -------------------------------------------------------------------------------------------
+		// Delegate actions (due to MyFaces issue we can't rely on getWrapped()) --------------------------------------
 
 		@Override
-	    public void startError(String errorName) throws IOException {
-	        wrapped.startError(errorName);
-	    }
+		public void startError(String errorName) throws IOException {
+			wrapped.startError(errorName);
+		}
 
-	    @Override
-	    public void startEval() throws IOException {
-	        wrapped.startEval();
-	    }
+		@Override
+		public void startEval() throws IOException {
+			wrapped.startEval();
+		}
 
-	    @Override
-	    public void startExtension(Map<String, String> attributes) throws IOException {
-	        wrapped.startExtension(attributes);
-	    }
+		@Override
+		public void startExtension(Map<String, String> attributes) throws IOException {
+			wrapped.startExtension(attributes);
+		}
 
-	    @Override
-	    public void startInsertAfter(String targetId) throws IOException {
-	        wrapped.startInsertAfter(targetId);
-	    }
+		@Override
+		public void startInsertAfter(String targetId) throws IOException {
+			wrapped.startInsertAfter(targetId);
+		}
 
-	    @Override
-	    public void startInsertBefore(String targetId) throws IOException {
-	        wrapped.startInsertBefore(targetId);
-	    }
+		@Override
+		public void startInsertBefore(String targetId) throws IOException {
+			wrapped.startInsertBefore(targetId);
+		}
 
-	    @Override
-	    public void endError() throws IOException {
-	        wrapped.endError();
-	    }
+		@Override
+		public void endError() throws IOException {
+			wrapped.endError();
+		}
 
-	    @Override
-	    public void endEval() throws IOException {
-	        wrapped.endEval();
-	    }
+		@Override
+		public void endEval() throws IOException {
+			wrapped.endEval();
+		}
 
-	    @Override
-	    public void endExtension() throws IOException {
-	        wrapped.endExtension();
-	    }
+		@Override
+		public void endExtension() throws IOException {
+			wrapped.endExtension();
+		}
 
-	    @Override
-	    public void endInsert() throws IOException {
-	        wrapped.endInsert();
-	    }
+		@Override
+		public void endInsert() throws IOException {
+			wrapped.endInsert();
+		}
 
-	    @Override
-	    public void delete(String targetId) throws IOException {
-	        wrapped.delete(targetId);
-	    }
+		@Override
+		public void delete(String targetId) throws IOException {
+			wrapped.delete(targetId);
+		}
 
-	    @Override
-	    public void redirect(String url) throws IOException {
-	        wrapped.redirect(url);
-	    }
+		@Override
+		public void redirect(String url) throws IOException {
+			wrapped.redirect(url);
+		}
 
-	    @Override
-	    public void updateAttributes(String targetId, Map<String, String> attributes) throws IOException {
-	        wrapped.updateAttributes(targetId, attributes);
-	    }
+		@Override
+		public void updateAttributes(String targetId, Map<String, String> attributes) throws IOException {
+			wrapped.updateAttributes(targetId, attributes);
+		}
 
 	}
 

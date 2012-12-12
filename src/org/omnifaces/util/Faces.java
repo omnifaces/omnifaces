@@ -875,11 +875,14 @@ public final class Faces {
 	 * You can use {@link String#format(String, Object...)} placeholder <code>%s</code> in the redirect URL to represent
 	 * placeholders for any request parameter values which needs to be URL-encoded. Here's a concrete example:
 	 * <pre>
-	 * Faces.redirect("other.xhtml?foo=%s&bar=%s", foo, bar);
+	 * Faces.redirectPermanent("other.xhtml?foo=%s&bar=%s", foo, bar);
 	 * </pre>
 	 * <p>
 	 * This method implicitly also calls {@link Flash#setRedirect(boolean)} with <code>true</code> so that any flash
 	 * scoped attributes will survive the redirect.
+	 * <p>
+	 * This method does by design not work on ajax requests. It is not possible to return a "permanent redirect" via
+	 * JSF ajax XML response.
 	 * @param url The URL to redirect the current response to.
 	 * @param paramValues The request parameter values which you'd like to put URL-encoded in the given URL.
 	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
