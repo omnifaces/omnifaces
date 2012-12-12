@@ -845,20 +845,25 @@ public final class Faces {
 	 * unmodified redirect URL. So, when redirecting to another page in the same web application, always specify the
 	 * full path from the context root on (which in turn does not need to start with <tt>/</tt>).
 	 * <p>
+	 * You can use {@link String#format(String, Object...)} placeholder <code>%s</code> in the redirect URL to represent
+	 * placeholders for any request parameter values which needs to be URL-encoded. Here's a concrete example:
+	 * <pre>
+	 * Faces.redirect("other.xhtml?foo=%s&bar=%s", foo, bar);
+	 * </pre>
+	 * <p>
 	 * This method implicitly also calls {@link Flash#setRedirect(boolean)} with <code>true</code> so that any flash
 	 * scoped attributes will survive the redirect.
-	 * @param url The URL to redirect the current response to. You can use {@link String#format(String, Object...)}
-	 * placeholder <code>%s</code> to represent placeholders for any request parameters which needs to be URL-encoded.
-	 * @param params The request parameters which you'd like to URL-encode in the given URL.
+	 * @param url The URL to redirect the current response to.
+	 * @param paramValues The request parameter values which you'd like to put URL-encoded in the given URL.
 	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
 	 * redeclare it in the action method. The servletcontainer will handle it.
 	 * @throws NullPointerException When url is <code>null</code>.
 	 * @see ExternalContext#redirect(String)
 	 */
-	public static void redirect(String url, String... params) throws IOException {
+	public static void redirect(String url, String... paramValues) throws IOException {
 		ExternalContext externalContext = getExternalContext();
 		externalContext.getFlash().setRedirect(true);
-		externalContext.redirect(String.format(normalizeRedirectURL(url), encodeURLParams(params)));
+		externalContext.redirect(String.format(normalizeRedirectURL(url), encodeURLParams(paramValues)));
 	}
 
 	/**
@@ -867,23 +872,28 @@ public final class Faces {
 	 * unmodified redirect URL. So, when redirecting to another page in the same web application, always specify the
 	 * full path from the context root on (which in turn does not need to start with <tt>/</tt>).
 	 * <p>
+	 * You can use {@link String#format(String, Object...)} placeholder <code>%s</code> in the redirect URL to represent
+	 * placeholders for any request parameter values which needs to be URL-encoded. Here's a concrete example:
+	 * <pre>
+	 * Faces.redirect("other.xhtml?foo=%s&bar=%s", foo, bar);
+	 * </pre>
+	 * <p>
 	 * This method implicitly also calls {@link Flash#setRedirect(boolean)} with <code>true</code> so that any flash
 	 * scoped attributes will survive the redirect.
-	 * @param url The URL to redirect the current response to. You can use {@link String#format(String, Object...)}
-	 * placeholder <code>%s</code> to represent placeholders for any request parameters which needs to be URL-encoded.
-	 * @param params The request parameters which you'd like to URL-encode in the given URL.
+	 * @param url The URL to redirect the current response to.
+	 * @param paramValues The request parameter values which you'd like to put URL-encoded in the given URL.
 	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
 	 * redeclare it in the action method. The servletcontainer will handle it.
 	 * @throws NullPointerException When url is <code>null</code>.
 	 * @see ExternalContext#setResponseStatus(int)
 	 * @see ExternalContext#setResponseHeader(String, String)
 	 */
-	public static void redirectPermanent(String url, String... params) throws IOException {
+	public static void redirectPermanent(String url, String... paramValues) throws IOException {
 		FacesContext context = getContext();
 		ExternalContext externalContext = context.getExternalContext();
 		externalContext.getFlash().setRedirect(true);
 		externalContext.setResponseStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
-		externalContext.setResponseHeader("Location", String.format(normalizeRedirectURL(url), encodeURLParams(params)));
+		externalContext.setResponseHeader("Location", String.format(normalizeRedirectURL(url), encodeURLParams(paramValues)));
 		externalContext.setResponseHeader("Connection", "close");
 		context.responseComplete();
 	}
