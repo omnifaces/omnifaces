@@ -842,33 +842,48 @@ public final class Faces {
 	/**
 	 * Sends a temporary (302) redirect to the given URL. If the given URL does not start with <tt>http://</tt>,
 	 * <tt>https://</tt> or <tt>/</tt>, then the request context path will be prepended, otherwise it will be the
-	 * unmodified redirect URL.
-	 * @param url The URL to redirect the current response to.
+	 * unmodified redirect URL. So, when redirecting to another page in the same web application, always specify the
+	 * full path from the context root on (which in turn does not need to start with <tt>/</tt>).
+	 * <p>
+	 * This method implicitly also calls {@link Flash#setRedirect(boolean)} with <code>true</code> so that any flash
+	 * scoped attributes will survive the redirect.
+	 * @param url The URL to redirect the current response to. You can use {@link String#format(String, Object...)}
+	 * placeholder <code>%s</code> to represent placeholders for any request parameters which needs to be URL-encoded.
+	 * @param params The request parameters which you'd like to URL-encode in the given URL.
 	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
 	 * redeclare it in the action method. The servletcontainer will handle it.
 	 * @throws NullPointerException When url is <code>null</code>.
 	 * @see ExternalContext#redirect(String)
 	 */
-	public static void redirect(String url) throws IOException {
-		getExternalContext().redirect(normalizeRedirectURL(url));
+	public static void redirect(String url, String... params) throws IOException {
+		ExternalContext externalContext = getExternalContext();
+		externalContext.getFlash().setRedirect(true);
+		externalContext.redirect(String.format(normalizeRedirectURL(url), encodeURLParams(params)));
 	}
 
 	/**
 	 * Sends a permanent (301) redirect to the given URL. If the given URL does not start with <tt>http://</tt>,
 	 * <tt>https://</tt> or <tt>/</tt>, then the request context path will be prepended, otherwise it will be the
-	 * unmodified redirect URL.
-	 * @param url The URL to redirect the current response to.
+	 * unmodified redirect URL. So, when redirecting to another page in the same web application, always specify the
+	 * full path from the context root on (which in turn does not need to start with <tt>/</tt>).
+	 * <p>
+	 * This method implicitly also calls {@link Flash#setRedirect(boolean)} with <code>true</code> so that any flash
+	 * scoped attributes will survive the redirect.
+	 * @param url The URL to redirect the current response to. You can use {@link String#format(String, Object...)}
+	 * placeholder <code>%s</code> to represent placeholders for any request parameters which needs to be URL-encoded.
+	 * @param params The request parameters which you'd like to URL-encode in the given URL.
 	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
 	 * redeclare it in the action method. The servletcontainer will handle it.
 	 * @throws NullPointerException When url is <code>null</code>.
 	 * @see ExternalContext#setResponseStatus(int)
 	 * @see ExternalContext#setResponseHeader(String, String)
 	 */
-	public static void redirectPermanent(String url) throws IOException {
+	public static void redirectPermanent(String url, String... params) throws IOException {
 		FacesContext context = getContext();
 		ExternalContext externalContext = context.getExternalContext();
+		externalContext.getFlash().setRedirect(true);
 		externalContext.setResponseStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
-		externalContext.setResponseHeader("Location", normalizeRedirectURL(url));
+		externalContext.setResponseHeader("Location", String.format(normalizeRedirectURL(url), encodeURLParams(params)));
 		externalContext.setResponseHeader("Connection", "close");
 		context.responseComplete();
 	}
@@ -884,6 +899,29 @@ public final class Faces {
 		}
 
 		return url;
+	}
+
+	/**
+	 * Helper method to encode the given URL parameters using UTF-8.
+	 */
+	private static Object[] encodeURLParams(String... params) {
+		if (params == null) {
+			return new Object[0];
+		}
+		else {
+			Object[] encodedParams = new Object[params.length];
+
+			for (int i = 0; i < params.length; i++) {
+				try {
+					encodedParams[i] = URLEncoder.encode(params[i], "UTF-8");
+				}
+				catch (UnsupportedEncodingException e) {
+					throw new UnsupportedOperationException(ERROR_UNSUPPORTED_ENCODING, e);
+				}
+			}
+
+			return encodedParams;
+		}
 	}
 
 	/**
