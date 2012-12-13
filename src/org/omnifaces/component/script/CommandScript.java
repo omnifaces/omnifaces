@@ -166,7 +166,7 @@ public class CommandScript extends UICommand {
 		writer.writeAttribute("id", getClientId(context), "id");
 		writer.startElement("script", this);
 		writer.writeAttribute("type", "text/javascript", "type");
-		writer.write(encodeFunction(context, name));
+		encodeFunction(context, name);
 		writer.endElement("script");
 		writer.endElement("span");
 	}
@@ -186,25 +186,24 @@ public class CommandScript extends UICommand {
 	 * <code>onevent</code> function which contains the <code>onbegin</code> and <code>oncomplete</code> scripts.
 	 * @param context The faces context to work with.
 	 * @param name The script function name.
-	 * @return The script function.
+	 * @throws IOException When something fails at I/O level.
 	 */
-	private String encodeFunction(FacesContext context, String name) {
-		StringBuilder function = new StringBuilder();
-		function.append("var ").append(name).append('=').append("function(o){var o=(typeof o==='object')&&o?o:{};");
-		function.append(createOptions(context));
-		function.append("jsf.ajax.request('").append(getClientId(context)).append("',null,o)}");
-		return function.toString();
+	protected void encodeFunction(FacesContext context, String name) throws IOException {
+		ResponseWriter writer = context.getResponseWriter();
+		writer.append("var ").append(name).append('=').append("function(o){var o=(typeof o==='object')&&o?o:{};");
+		encodeOptions(context);
+		writer.append("jsf.ajax.request('").append(getClientId(context)).append("',null,o)}");
 	}
 
 	/**
-	 * Create the JS object which holds the jsf.ajax.request options, such as additional request parameters from
+	 * Encode the JS object which holds the jsf.ajax.request options, such as additional request parameters from
 	 * <code>&lt;f:param&gt;</code>, the values of <code>execute</code> and <code>render</code> attributes and the
 	 * <code>onevent</code> function which contains the <code>onbegin</code> and <code>oncomplete</code> scripts.
 	 * @param context The faces context to work with.
-	 * @return The jsf.ajax.request options.
+	 * @throws IOException When something fails at I/O level.
 	 */
-	private String createOptions(FacesContext context) {
-		StringBuilder options = new StringBuilder();
+	protected void encodeOptions(FacesContext context) throws IOException {
+		ResponseWriter writer = context.getResponseWriter();
 
 		if (getChildCount() > 0) {
 			for (UIComponent child : getChildren()) {
@@ -213,18 +212,44 @@ public class CommandScript extends UICommand {
 					String name = param.getName();
 
 					if (!Utils.isEmpty(name)) {
-						options.append("o[").append(Json.encode(name)).append("]=")
+						writer.append("o[").append(Json.encode(name)).append("]=")
 							.append(Json.encode(param.getValue())).append(";");
 					}
 				}
 			}
 		}
 
-		options.append("o['javax.faces.behavior.event']='action';");
-		options.append("o.execute='").append(resolveClientIds(context, getExecute())).append("';");
-		options.append("o.render='").append(resolveClientIds(context, getRender())).append("';");
-		appendOneventOption(options, getOnbegin(), getOncomplete());
-		return options.toString();
+		writer.append("o['javax.faces.behavior.event']='action';");
+		writer.append("o.execute='").append(resolveClientIds(context, getExecute())).append("';");
+		writer.append("o.render='").append(resolveClientIds(context, getRender())).append("';");
+		encodeOneventOption(context, getOnbegin(), getOncomplete());
+	}
+
+	/**
+	 * Create an option for the <code>onevent</code> function which contains the <code>onbegin</code> and
+	 * <code>oncomplete</code> scripts. This will return <code>null</code> when no scripts are been definied.
+	 * @param context The faces context to work with.
+	 * @param onbegin The onbegin script.
+	 * @param oncomplete The oncomplete script.
+	 * @throws IOException When something fails at I/O level.
+	 */
+	protected void encodeOneventOption(FacesContext context, String onbegin, String oncomplete) throws IOException {
+		if (onbegin == null && oncomplete == null) {
+			return;
+		}
+
+		ResponseWriter writer = context.getResponseWriter();
+		writer.write("o.onevent=function(data){");
+
+		if (onbegin != null) {
+			writer.append("if(data.status=='begin'){").append(onbegin).append('}');
+		}
+
+		if (oncomplete != null) {
+			writer.append("if(data.status=='success'){").append(oncomplete).append('}');
+		}
+
+		writer.write("};");
 	}
 
 	/**
@@ -234,7 +259,7 @@ public class CommandScript extends UICommand {
 	 * @return A space separated collection of absolute client IDs, or <code>null</code> if the given relative client
 	 * IDs is empty.
 	 */
-	private String resolveClientIds(FacesContext context, String relativeClientIds) {
+	protected String resolveClientIds(FacesContext context, String relativeClientIds) {
 		if (Utils.isEmpty(relativeClientIds)) {
 			return null;
 		}
@@ -262,28 +287,6 @@ public class CommandScript extends UICommand {
 		}
 
 		return absoluteClientIds.toString();
-	}
-
-	/**
-	 * Create an option for the <code>onevent</code> function which contains the <code>onbegin</code> and
-	 * <code>oncomplete</code> scripts. This will return <code>null</code> when no scripts are been definied.
-	 */
-	private void appendOneventOption(StringBuilder options, String onbegin, String oncomplete) {
-		if (onbegin == null && oncomplete == null) {
-			return;
-		}
-
-		options.append("o.onevent=function(data){");
-
-		if (onbegin != null) {
-			options.append("if(data.status=='begin'){").append(onbegin).append('}');
-		}
-
-		if (oncomplete != null) {
-			options.append("if(data.status=='success'){").append(oncomplete).append('}');
-		}
-
-		options.append("};");
 	}
 
 	// Attribute getters/setters --------------------------------------------------------------------------------------
