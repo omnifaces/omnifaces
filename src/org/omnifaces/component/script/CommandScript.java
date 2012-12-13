@@ -13,8 +13,6 @@
 package org.omnifaces.component.script;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.faces.application.ResourceDependency;
@@ -66,8 +64,19 @@ import org.omnifaces.util.Utils;
  * &lt;/h:form&gt;
  * &lt;h:outputScript target="body"&gt;setInterval(updateData, 3000);&lt;/h:outputScript&gt;
  * </pre>
- * Note that it also supports nesting of <code>&lt;f:param&gt;</code>, <code>&lt;f:actionListener&gt;</code> and
- * <code>&lt;f:setPropertyActionListener&gt;</code>, exactly like as in <code>&lt;h:commandXxx&gt;</code>.
+ * <p>
+ * The component also supports nesting of <code>&lt;f:param&gt;</code>, <code>&lt;f:actionListener&gt;</code> and
+ * <code>&lt;f:setPropertyActionListener&gt;</code>, exactly like as in <code>&lt;h:commandXxx&gt;</code>. The function
+ * also supports a JS object as argument which will then end up in the HTTP request parameter map:
+ * <pre>
+ * functionName({ name1: "value1", name2: "value2" });
+ * </pre>
+ * <p>
+ * With the above example, the parameters are available as follows:
+ * <pre>
+ * String name1 = Faces.getRequestParameter("name1"); // value1
+ * String name2 = Faces.getRequestParameter("name2"); // value2
+ * </pre>
  *
  * @author Bauke Scholtz
  * @since 1.3
@@ -181,13 +190,10 @@ public class CommandScript extends UICommand {
 	 */
 	private String encodeFunction(FacesContext context, String name) {
 		StringBuilder function = new StringBuilder();
-		function.append("var ").append(name).append('=').append("function(){jsf.ajax.request(");
-		function.append('"').append(getClientId(context)).append('"');
-		function.append(',');
-		function.append("null");
-		function.append(',');
+		function.append("var ").append(name).append('=').append("function(o){var o=(typeof o==='object')&&o?o:{};");
 		function.append(createOptions(context));
-		return function.append(")}").toString();
+		function.append("jsf.ajax.request('").append(getClientId(context)).append("',null,o)}");
+		return function.toString();
 	}
 
 	/**
@@ -198,7 +204,7 @@ public class CommandScript extends UICommand {
 	 * @return The jsf.ajax.request options.
 	 */
 	private String createOptions(FacesContext context) {
-		Map<String, Object> params = new HashMap<String, Object>(3 + getChildCount());
+		StringBuilder options = new StringBuilder();
 
 		if (getChildCount() > 0) {
 			for (UIComponent child : getChildren()) {
@@ -207,23 +213,18 @@ public class CommandScript extends UICommand {
 					String name = param.getName();
 
 					if (!Utils.isEmpty(name)) {
-						params.put(name, param.getValue());
+						options.append("o[").append(Json.encode(name)).append("]=")
+							.append(Json.encode(param.getValue())).append(";");
 					}
 				}
 			}
 		}
 
-		params.put("javax.faces.behavior.event", "action");
-		params.put("execute", resolveClientIds(context, getExecute()));
-		params.put("render", resolveClientIds(context, getRender()));
-		String options = Json.encode(params);
-		String onevent = createOneventOption(getOnbegin(), getOncomplete());
-
-		if (onevent != null) {
-			options = new StringBuilder(options).insert(options.length() - 1, onevent).toString();
-		}
-
-		return options;
+		options.append("o['javax.faces.behavior.event']='action';");
+		options.append("o.execute='").append(resolveClientIds(context, getExecute())).append("';");
+		options.append("o.render='").append(resolveClientIds(context, getRender())).append("';");
+		appendOneventOption(options, getOnbegin(), getOncomplete());
+		return options.toString();
 	}
 
 	/**
@@ -267,23 +268,22 @@ public class CommandScript extends UICommand {
 	 * Create an option for the <code>onevent</code> function which contains the <code>onbegin</code> and
 	 * <code>oncomplete</code> scripts. This will return <code>null</code> when no scripts are been definied.
 	 */
-	private String createOneventOption(String onbegin, String oncomplete) {
+	private void appendOneventOption(StringBuilder options, String onbegin, String oncomplete) {
 		if (onbegin == null && oncomplete == null) {
-			return null;
+			return;
 		}
 
-		StringBuilder onevent = new StringBuilder();
-		onevent.append(",'onevent':function(data){");
+		options.append("o.onevent=function(data){");
 
 		if (onbegin != null) {
-			onevent.append("if(data.status=='begin'){").append(onbegin).append('}');
+			options.append("if(data.status=='begin'){").append(onbegin).append('}');
 		}
 
 		if (oncomplete != null) {
-			onevent.append("if(data.status=='success'){").append(oncomplete).append('}');
+			options.append("if(data.status=='success'){").append(oncomplete).append('}');
 		}
 
-		return onevent.append('}').toString();
+		options.append("};");
 	}
 
 	// Attribute getters/setters --------------------------------------------------------------------------------------
