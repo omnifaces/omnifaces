@@ -37,6 +37,8 @@ public final class Dates {
 
 	private static final Map<Locale, Map<String, Integer>> MONTHS_CACHE = new HashMap<Locale, Map<String, Integer>>(3);
 	private static final Map<Locale, Map<String, Integer>> SHORT_MONTHS_CACHE = new HashMap<Locale, Map<String, Integer>>(3);
+	private static final Map<Locale, Map<String, Integer>> DAYS_OF_WEEK_CACHE = new HashMap<Locale, Map<String, Integer>>(3);
+	private static final Map<Locale, Map<String, Integer>> SHORT_DAYS_OF_WEEK_CACHE = new HashMap<Locale, Map<String, Integer>>(3);
 	private static final TimeZone TIMEZONE_UTC = TimeZone.getTimeZone("UTC");
 
 	// Constructors ---------------------------------------------------------------------------------------------------
@@ -278,6 +280,7 @@ public final class Dates {
 	 */
 	private static Calendar toUTCCalendarWithoutTime(Date date) {
 		Calendar calendar = Calendar.getInstance();
+		calendar.clear();
 		calendar.setTime(date);
 		calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
 		calendar.set(Calendar.HOUR_OF_DAY, 0);
@@ -353,14 +356,7 @@ public final class Dates {
 		Map<String, Integer> months = MONTHS_CACHE.get(locale);
 
 		if (months == null) {
-			months = new LinkedHashMap<String, Integer>();
-
-			for (String month : DateFormatSymbols.getInstance(Faces.getLocale()).getMonths()) {
-				if (!month.isEmpty()) { // 13th month may or may not be empty, depending on default calendar.
-					months.put(month, months.size() + 1);
-				}
-			}
-
+			months = mapMonths(DateFormatSymbols.getInstance(Faces.getLocale()).getMonths());
 			MONTHS_CACHE.put(locale, months);
 		}
 
@@ -380,18 +376,81 @@ public final class Dates {
 		Map<String, Integer> shortMonths = SHORT_MONTHS_CACHE.get(locale);
 
 		if (shortMonths == null) {
-			shortMonths = new LinkedHashMap<String, Integer>();
-
-			for (String shortMonth : DateFormatSymbols.getInstance(Faces.getLocale()).getShortMonths()) {
-				if (!shortMonth.isEmpty()) { // 13th month may or may not be empty, depending on default calendar.
-					shortMonths.put(shortMonth, shortMonths.size() + 1);
-				}
-			}
-
+			shortMonths = mapMonths(DateFormatSymbols.getInstance(Faces.getLocale()).getShortMonths());
 			SHORT_MONTHS_CACHE.put(locale, shortMonths);
 		}
 
 		return shortMonths;
+	}
+
+	/**
+	 * Helper method to map months.
+	 */
+	private static Map<String, Integer> mapMonths(String[] months) {
+		Map<String, Integer> mapping = new LinkedHashMap<String, Integer>();
+
+		for (String month : months) {
+			if (!month.isEmpty()) { // 13th month may or may not be empty, depending on default calendar.
+				mapping.put(month, mapping.size() + 1);
+			}
+		}
+
+		return mapping;
+	}
+
+	/**
+	 * Returns a mapping of day of week names in ISO 8601 order (Monday first) for the current locale. For example:
+	 * "Monday=1", "Tuesday=2", etc. This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code>
+	 * which shows all days of week. The locale is obtained by {@link Faces#getLocale()}. The mapping is per locale
+	 * stored in a local cache to improve retrieving performance.
+	 * @return Day of week names for the current locale.
+	 * @see DateFormatSymbols#getWeekdays()
+	 */
+	public static Map<String, Integer> getDaysOfWeek() {
+		Locale locale = Faces.getLocale();
+		Map<String, Integer> daysOfWeek = DAYS_OF_WEEK_CACHE.get(locale);
+
+		if (daysOfWeek == null) {
+			daysOfWeek = mapDaysOfWeek(DateFormatSymbols.getInstance(Faces.getLocale()).getWeekdays());
+			DAYS_OF_WEEK_CACHE.put(locale, daysOfWeek);
+		}
+
+		return daysOfWeek;
+	}
+
+	/**
+	 * Returns a mapping of short day of week names in ISO 8601 order (Monday first) for the current locale. For example:
+	 * "Mon=1", "Tue=2", etc. This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code>
+	 * which shows all short days of week. The locale is obtained by {@link Faces#getLocale()}. The mapping is per locale
+	 * stored in a local cache to improve retrieving performance.
+	 * @return Short day of week names for the current locale.
+	 * @see DateFormatSymbols#getShortWeekdays()
+	 */
+	public static Map<String, Integer> getShortDaysOfWeek() {
+		Locale locale = Faces.getLocale();
+		Map<String, Integer> shortDaysOfWeek = SHORT_DAYS_OF_WEEK_CACHE.get(locale);
+
+		if (shortDaysOfWeek == null) {
+			shortDaysOfWeek = mapDaysOfWeek(DateFormatSymbols.getInstance(Faces.getLocale()).getShortWeekdays());
+			SHORT_DAYS_OF_WEEK_CACHE.put(locale, shortDaysOfWeek);
+		}
+
+		return shortDaysOfWeek;
+	}
+
+	/**
+	 * Helper method to map days of week.
+	 */
+	private static Map<String, Integer> mapDaysOfWeek(String[] weekdays) {
+		Map<String, Integer> mapping = new LinkedHashMap<String, Integer>();
+		mapping.put(weekdays[Calendar.MONDAY], 1);
+		mapping.put(weekdays[Calendar.TUESDAY], 2);
+		mapping.put(weekdays[Calendar.WEDNESDAY], 3);
+		mapping.put(weekdays[Calendar.THURSDAY], 4);
+		mapping.put(weekdays[Calendar.FRIDAY], 5);
+		mapping.put(weekdays[Calendar.SATURDAY], 6);
+		mapping.put(weekdays[Calendar.SUNDAY], 7);
+		return mapping;
 	}
 
 }

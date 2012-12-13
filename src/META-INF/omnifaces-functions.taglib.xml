@@ -489,6 +489,34 @@
 		<function-signature>java.util.Map getShortMonths()</function-signature>
 	</function>
 
+	<function>
+		<description>
+			<![CDATA[
+				Returns a mapping of day of week names in ISO 8601 order for the current locale. For example: "Monday=1", "Tuesday=2",
+				etc. This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows all
+				days of week. The locale is obtained by Faces#getLocale(). The mapping is per locale stored in a local cache
+				to improve retrieving performance.
+			]]>
+		</description>
+		<function-name>getDaysOfWeek</function-name>
+		<function-class>org.omnifaces.el.functions.Dates</function-class>
+		<function-signature>java.util.Map getDaysOfWeek()</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns a mapping of short day of week names in ISO 8601 order for the current locale. For example: "Mon=1", "Tue=2",
+				etc. This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows all
+				short days of week. The locale is obtained by Faces#getLocale(). The mapping is per locale stored in a local
+				cache to improve retrieving performance.
+			]]>
+		</description>
+		<function-name>getShortDaysOfWeek</function-name>
+		<function-class>org.omnifaces.el.functions.Dates</function-class>
+		<function-signature>java.util.Map getShortDaysOfWeek()</function-signature>
+	</function>
+
 	<!-- Numbers ================================================================================================== -->
 
 	<function>
