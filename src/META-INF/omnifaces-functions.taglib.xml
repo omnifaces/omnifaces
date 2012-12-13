@@ -387,6 +387,83 @@
 	<function>
 		<description>
 			<![CDATA[
+				Returns the amount of years between two given dates. This will be negative when the end date is before the start date.
+			]]>
+		</description>
+		<function-name>yearsBetween</function-name>
+		<function-class>org.omnifaces.el.functions.Dates</function-class>
+		<function-signature>int yearsBetween(java.util.Date, java.util.Date)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns the amount of months between two given dates. This will be negative when the end date is before the start date.
+			]]>
+		</description>
+		<function-name>monthsBetween</function-name>
+		<function-class>org.omnifaces.el.functions.Dates</function-class>
+		<function-signature>int monthsBetween(java.util.Date, java.util.Date)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns the amount of weeks between two given dates. This will be negative when the end date is before the start date.
+			]]>
+		</description>
+		<function-name>weeksBetween</function-name>
+		<function-class>org.omnifaces.el.functions.Dates</function-class>
+		<function-signature>int weeksBetween(java.util.Date, java.util.Date)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns the amount of days between two given dates. This will be negative when the end date is before the start date.
+			]]>
+		</description>
+		<function-name>daysBetween</function-name>
+		<function-class>org.omnifaces.el.functions.Dates</function-class>
+		<function-signature>int daysBetween(java.util.Date, java.util.Date)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns the amount of hours between two given dates. This will be negative when the end date is before the start date.
+			]]>
+		</description>
+		<function-name>hoursBetween</function-name>
+		<function-class>org.omnifaces.el.functions.Dates</function-class>
+		<function-signature>int hoursBetween(java.util.Date, java.util.Date)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns the amount of minutes between two given dates. This will be negative when the end date is before the start date.
+			]]>
+		</description>
+		<function-name>minutesBetween</function-name>
+		<function-class>org.omnifaces.el.functions.Dates</function-class>
+		<function-signature>int minutesBetween(java.util.Date, java.util.Date)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns the amount of seconds between two given dates. This will be negative when the end date is before the start date.
+			]]>
+		</description>
+		<function-name>secondsBetween</function-name>
+		<function-class>org.omnifaces.el.functions.Dates</function-class>
+		<function-signature>int secondsBetween(java.util.Date, java.util.Date)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
 				Returns a mapping of month names by month numbers for the current locale. For example: "January=1", "February=2",
 				etc. This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows all
 				months. The locale is obtained by Faces#getLocale(). The mapping is per locale stored in a local cache

@@ -22,6 +22,7 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 import org.omnifaces.util.Faces;
 
@@ -187,6 +188,154 @@ public final class Dates {
 		calendar.setTimeZone(TIMEZONE_UTC);
 		calendar.add(field, units);
 		return calendar.getTime();
+	}
+
+	// Calculating ----------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns the amount of years between two given dates.
+	 * This will be negative when the end date is before the start date.
+	 * @param start The start date.
+	 * @param end The end date.
+	 * @return The amount of years between two given dates.
+	 * @throws NullPointerException When a date is <code>null</code>.
+	 */
+	public static int yearsBetween(Date start, Date end) {
+		return dateDiff(start, end, Calendar.YEAR);
+	}
+
+	/**
+	 * Returns the amount of months between two given dates.
+	 * This will be negative when the end date is before the start date.
+	 * @param start The start date.
+	 * @param end The end date.
+	 * @return The amount of months between two given dates.
+	 * @throws NullPointerException When a date is <code>null</code>.
+	 */
+	public static int monthsBetween(Date start, Date end) {
+		return dateDiff(start, end, Calendar.MONTH);
+	}
+
+	/**
+	 * Returns the amount of weeks between two given dates.
+	 * This will be negative when the end date is before the start date.
+	 * @param start The start date.
+	 * @param end The end date.
+	 * @return The amount of weeks between two given dates.
+	 * @throws NullPointerException When a date is <code>null</code>.
+	 */
+	public static int weeksBetween(Date start, Date end) {
+		return dateDiff(start, end, Calendar.WEEK_OF_YEAR);
+	}
+
+	/**
+	 * Returns the amount of days between two given dates.
+	 * This will be negative when the end date is before the start date.
+	 * @param start The start date.
+	 * @param end The end date.
+	 * @return The amount of days between two given dates.
+	 * @throws NullPointerException When a date is <code>null</code>.
+	 */
+	public static int daysBetween(Date start, Date end) {
+		return dateDiff(start, end, Calendar.DAY_OF_MONTH);
+	}
+
+	/**
+	 * Helper method which converts the given dates to UTC calendar without time and returns the unit difference of the
+	 * given calendar field.
+	 */
+	private static int dateDiff(Date startDate, Date endDate, int field) {
+		if (startDate == null) {
+			throw new NullPointerException("start");
+		}
+
+		if (endDate == null) {
+			throw new NullPointerException("end");
+		}
+
+		Calendar start = toUTCCalendarWithoutTime(startDate);
+		Calendar end = toUTCCalendarWithoutTime(endDate);
+		int elapsed = 0;
+
+		if (start.before(end)) {
+			while (start.before(end)) {
+				start.add(field, 1);
+				elapsed++;
+			}
+		}
+		else if (start.after(end)) {
+			while (start.after(end)) {
+				start.add(field, -1);
+				elapsed--;
+			}
+		}
+
+		return elapsed;
+	}
+
+	/**
+	 * Helper method to convert given date to an UTC calendar without time part (to prevent potential DST issues).
+	 */
+	private static Calendar toUTCCalendarWithoutTime(Date date) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(date);
+		calendar.setTimeZone(TimeZone.getTimeZone("UTC"));
+		calendar.set(Calendar.HOUR_OF_DAY, 0);
+		calendar.set(Calendar.MINUTE, 0);
+		calendar.set(Calendar.SECOND, 0);
+		calendar.set(Calendar.MILLISECOND, 0);
+		return calendar;
+	}
+
+	/**
+	 * Returns the amount of hours between two given dates.
+	 * This will be negative when the end date is before the start date.
+	 * @param start The start date.
+	 * @param end The end date.
+	 * @return The amount of hours between two given dates.
+	 * @throws NullPointerException When a date is <code>null</code>.
+	 */
+	public static long hoursBetween(Date start, Date end) {
+		return timeDiff(start, end, TimeUnit.HOURS);
+	}
+
+	/**
+	 * Returns the amount of minutes between two given dates.
+	 * This will be negative when the end date is before the start date.
+	 * @param start The start date.
+	 * @param end The end date.
+	 * @return The amount of minutes between two given dates.
+	 * @throws NullPointerException When a date is <code>null</code>.
+	 */
+	public static long minutesBetween(Date start, Date end) {
+		return timeDiff(start, end, TimeUnit.MINUTES);
+	}
+
+	/**
+	 * Returns the amount of seconds between two given dates.
+	 * This will be negative when the end date is before the start date.
+	 * @param start The start date.
+	 * @param end The end date.
+	 * @return The amount of seconds between two given dates.
+	 * @throws NullPointerException When a date is <code>null</code>.
+	 */
+	public static long secondsBetween(Date start, Date end) {
+		return timeDiff(start, end, TimeUnit.SECONDS);
+	}
+
+	/**
+	 * Helper method which calculates the time difference of the given two dates in given time unit.
+	 */
+	private static long timeDiff(Date startDate, Date endDate, TimeUnit timeUnit) {
+		if (startDate == null) {
+			throw new NullPointerException("start");
+		}
+
+		if (endDate == null) {
+			throw new NullPointerException("end");
+		}
+
+		return timeUnit.convert(endDate.getTime() - startDate.getTime(), TimeUnit.MILLISECONDS);
 	}
 
 	// Mappings -------------------------------------------------------------------------------------------------------
