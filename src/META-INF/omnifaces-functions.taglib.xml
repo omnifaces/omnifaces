@@ -310,6 +310,83 @@
 	<function>
 		<description>
 			<![CDATA[
+				Returns a new date instance which is a sum of the given date and the given amount of years. The years can be negative.
+			]]>
+		</description>
+		<function-name>addYears</function-name>
+		<function-class>org.omnifaces.el.functions.Dates</function-class>
+		<function-signature>java.util.Date addYears(java.util.Date, int)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns a new date instance which is a sum of the given date and the given amount of months. The months can be negative.
+			]]>
+		</description>
+		<function-name>addMonths</function-name>
+		<function-class>org.omnifaces.el.functions.Dates</function-class>
+		<function-signature>java.util.Date addMonths(java.util.Date, int)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns a new date instance which is a sum of the given date and the given amount of weeks. The weeks can be negative.
+			]]>
+		</description>
+		<function-name>addWeeks</function-name>
+		<function-class>org.omnifaces.el.functions.Dates</function-class>
+		<function-signature>java.util.Date addWeeks(java.util.Date, int)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns a new date instance which is a sum of the given date and the given amount of days. The days can be negative.
+			]]>
+		</description>
+		<function-name>addDays</function-name>
+		<function-class>org.omnifaces.el.functions.Dates</function-class>
+		<function-signature>java.util.Date addDays(java.util.Date, int)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns a new date instance which is a sum of the given date and the given amount of hours. The hours can be negative.
+			]]>
+		</description>
+		<function-name>addHours</function-name>
+		<function-class>org.omnifaces.el.functions.Dates</function-class>
+		<function-signature>java.util.Date addHours(java.util.Date, int)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns a new date instance which is a sum of the given date and the given amount of minutes. The minutes can be negative.
+			]]>
+		</description>
+		<function-name>addMinutes</function-name>
+		<function-class>org.omnifaces.el.functions.Dates</function-class>
+		<function-signature>java.util.Date addMinutes(java.util.Date, int)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns a new date instance which is a sum of the given date and the given amount of seconds. The seconds can be negative.
+			]]>
+		</description>
+		<function-name>addSeconds</function-name>
+		<function-class>org.omnifaces.el.functions.Dates</function-class>
+		<function-signature>java.util.Date addSeconds(java.util.Date, int)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
 				Returns a mapping of month names by month numbers for the current locale. For example: "January=1", "February=2",
 				etc. This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows all
 				months. The locale is obtained by Faces#getLocale(). The mapping is per locale stored in a local cache

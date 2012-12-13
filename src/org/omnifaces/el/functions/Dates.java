@@ -15,6 +15,7 @@ package org.omnifaces.el.functions;
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -35,6 +36,7 @@ public final class Dates {
 
 	private static final Map<Locale, Map<String, Integer>> MONTHS_CACHE = new HashMap<Locale, Map<String, Integer>>(3);
 	private static final Map<Locale, Map<String, Integer>> SHORT_MONTHS_CACHE = new HashMap<Locale, Map<String, Integer>>(3);
+	private static final TimeZone TIMEZONE_UTC = TimeZone.getTimeZone("UTC");
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -42,7 +44,7 @@ public final class Dates {
 		// Hide constructor.
 	}
 
-	// Utility --------------------------------------------------------------------------------------------------------
+	// Formatting -----------------------------------------------------------------------------------------------------
 
 	/**
 	 * Format the given date in the given pattern with system default timezone. This is useful when you want to format
@@ -75,7 +77,7 @@ public final class Dates {
 	}
 
 	/**
-	 * Helper method taking TimeZone instead of String.
+	 * Helper method taking {@link TimeZone} instead of {@link String}.
 	 */
 	private static String formatDate(Date date, String pattern, TimeZone timezone) {
 		if (date == null) {
@@ -90,6 +92,104 @@ public final class Dates {
 		formatter.setTimeZone(timezone);
 		return formatter.format(date);
 	}
+
+	// Manipulating ---------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns a new date instance which is a sum of the given date and the given amount of years.
+	 * @param date The date to add the given amount of years to.
+	 * @param years The amount of years to be added to the given date. It can be negative.
+	 * @return A new date instance which is a sum of the given date and the given amount of years.
+	 * @throws NullPointerException When the date is <code>null</code>.
+	 */
+	public static Date addYears(Date date, int years) {
+		return add(date, years, Calendar.YEAR);
+	}
+
+	/**
+	 * Returns a new date instance which is a sum of the given date and the given amount of months.
+	 * @param date The date to add the given amount of months to.
+	 * @param months The amount of months to be added to the given date. It can be negative.
+	 * @return A new date instance which is a sum of the given date and the given amount of months.
+	 * @throws NullPointerException When the date is <code>null</code>.
+	 */
+	public static Date addMonths(Date date, int months) {
+		return add(date, months, Calendar.MONTH);
+	}
+
+	/**
+	 * Returns a new date instance which is a sum of the given date and the given amount of weeks.
+	 * @param date The date to add the given amount of weeks to.
+	 * @param weeks The amount of weeks to be added to the given date. It can be negative.
+	 * @return A new date instance which is a sum of the given date and the given amount of weeks.
+	 * @throws NullPointerException When the date is <code>null</code>.
+	 */
+	public static Date addWeeks(Date date, int weeks) {
+		return add(date, weeks, Calendar.WEEK_OF_YEAR);
+	}
+
+	/**
+	 * Returns a new date instance which is a sum of the given date and the given amount of days.
+	 * @param date The date to add the given amount of days to.
+	 * @param days The amount of days to be added to the given date. It can be negative.
+	 * @return A new date instance which is a sum of the given date and the given amount of days.
+	 * @throws NullPointerException When the date is <code>null</code>.
+	 */
+	public static Date addDays(Date date, int days) {
+		return add(date, days, Calendar.DAY_OF_MONTH);
+	}
+
+	/**
+	 * Returns a new date instance which is a sum of the given date and the given amount of hours.
+	 * @param date The date to add the given amount of hours to.
+	 * @param hours The amount of hours to be added to the given date. It can be negative.
+	 * @return A new date instance which is a sum of the given date and the given amount of hours.
+	 * @throws NullPointerException When the date is <code>null</code>.
+	 */
+	public static Date addHours(Date date, int hours) {
+		return add(date, hours, Calendar.HOUR_OF_DAY);
+	}
+
+	/**
+	 * Returns a new date instance which is a sum of the given date and the given amount of minutes.
+	 * @param date The date to add the given amount of minutes to.
+	 * @param minutes The amount of minutes to be added to the given date. It can be negative.
+	 * @return A new date instance which is a sum of the given date and the given amount of minutes.
+	 * @throws NullPointerException When the date is <code>null</code>.
+	 */
+	public static Date addMinutes(Date date, int minutes) {
+		return add(date, minutes, Calendar.MINUTE);
+	}
+
+	/**
+	 * Returns a new date instance which is a sum of the given date and the given amount of seconds.
+	 * @param date The date to add the given amount of seconds to.
+	 * @param seconds The amount of seconds to be added to the given date. It can be negative.
+	 * @return A new date instance which is a sum of the given date and the given amount of seconds.
+	 * @throws NullPointerException When the date is <code>null</code>.
+	 */
+	public static Date addSeconds(Date date, int seconds) {
+		return add(date, seconds, Calendar.SECOND);
+	}
+
+	/**
+	 * Helper method which converts the given date to an UTC calendar and adds the given amount of units to the given
+	 * calendar field.
+	 */
+	private static Date add(Date date, int units, int field) {
+		if (date == null) {
+			throw new NullPointerException("date");
+		}
+
+		Calendar calendar = Calendar.getInstance();
+		calendar.clear();
+		calendar.setTime(date);
+		calendar.setTimeZone(TIMEZONE_UTC);
+		calendar.add(field, units);
+		return calendar.getTime();
+	}
+
+	// Mappings -------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Returns a mapping of month names by month numbers for the current locale. For example: "January=1", "February=2",
