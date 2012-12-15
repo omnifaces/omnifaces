@@ -25,8 +25,8 @@ public interface ResettableBuffer {
 	void reset();
 
 	/**
-	 * Returns true if buffer can be resetted.
-	 * @return <code>true</code> if buffer can be resetted, otherwise <code>false</code>.
+	 * Returns true if buffer can be reset.
+	 * @return <code>true</code> if buffer can be reset, otherwise <code>false</code>.
 	 */
 	boolean isResettable();
 

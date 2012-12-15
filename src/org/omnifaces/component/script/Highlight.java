@@ -113,7 +113,7 @@ public class Highlight extends OnloadScript {
 	 * {@link UIInput#isValid()}. Also note that the highlighting is been done by delegating the job to JavaScript
 	 * instead of directly changing the component's own <code>styleClass</code> attribute; this is chosen so because we
 	 * don't want the changed style class to be saved in the server side view state as it may result in potential
-	 * inconsitenties because it's supposed to be an one-time change.
+	 * inconsistencies because it's supposed to be an one-time change.
 	 */
 	@Override
 	public void encodeChildren(FacesContext context) throws IOException {

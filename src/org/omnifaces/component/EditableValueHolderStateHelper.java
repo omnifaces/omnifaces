@@ -28,7 +28,7 @@ import javax.faces.context.FacesContext;
  */
 public final class EditableValueHolderStateHelper {
 
-	// UIData and UIRepeat have a similar nested class. Too bad that they aren't publicly reuseable.
+	// UIData and UIRepeat have a similar nested class. Too bad that they aren't publicly reusable.
 
 	// Variables ------------------------------------------------------------------------------------------------------
 

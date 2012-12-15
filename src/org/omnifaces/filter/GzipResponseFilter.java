@@ -31,10 +31,10 @@ import org.omnifaces.util.Utils;
  * This filter will apply GZIP compression on responses whenever applicable. GZIP will greatly reduce the response size
  * when applied on character based responses like HTML, CSS and JS, on average it can save up to ~70% of bandwidth.
  * <p>
- * While GZIP is normally to be configured in the servletcontainer (e.g. <code>&lt;Context compression="on"&gt;</code>
+ * While GZIP is normally to be configured in the servlet container (e.g. <code>&lt;Context compression="on"&gt;</code>
  * in Tomcat, or <code>&lt;property name="compression" value="on"&gt;</code> in Glassfish), this filter allows a
- * servletcontainer independent way of configuring GZIP compression and also allows enabling GZIP compression anyway
- * on 3rd party hosts where you have no control over servletcontainer configuration.
+ * servlet container independent way of configuring GZIP compression and also allows enabling GZIP compression anyway
+ * on 3rd party hosts where you have no control over servlet container configuration.
  * <p>
  * To get it to run, map this filter on the desired <code>&lt;url-pattern&gt;</code> or maybe even on the
  * <code>&lt;servlet-name&gt;</code> of the <code>FacesServlet</code>. A <code>Filter</code> is by default dispatched
@@ -80,7 +80,7 @@ import org.omnifaces.util.Utils;
  * threshold of between 150 and 1000 bytes is recommended due to overhead and latency of compression/decompression.
  * The value must be a number between 0 and 9999. A value larger than 2000 is not recommended.
  * <p>
- * The <code>mimetypes</code> represents a commaseparated string of mime types which needs to be compressed. It's
+ * The <code>mimetypes</code> represents a comma separated string of mime types which needs to be compressed. It's
  * exactly that value which appears in the <code>Content-Type</code> header of the response. The in the above example
  * mentioned mime types are already the default values. Note that GZIP does not have any benefit when applied on
  * binary mimetypes like images, office documents, PDF files, etcetera. So setting it for them is not recommended.

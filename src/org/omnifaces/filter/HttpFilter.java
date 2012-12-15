@@ -29,7 +29,7 @@ import javax.servlet.http.HttpSession;
  * An abstract filter for HTTP requests. It provides a convenient abstract <code>doFilter()</code> method providing the
  * HTTP servlet request, response and session so that there's no need to cast them everytime. Also, default
  * implementations of {@link #init(FilterConfig)} and {@link #destroy()} are provided, so that there's no need to
- * implement them everytime even when not really needed.
+ * implement them every time even when not really needed.
  *
  * @author Arjan Tijms, Bauke Scholtz
  */

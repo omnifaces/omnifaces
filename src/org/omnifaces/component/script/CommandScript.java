@@ -33,10 +33,10 @@ import org.omnifaces.util.Utils;
 
 /**
  * <p><strong>CommandScript</strong> is an extension to <code>&lt;h:commandXxx&gt;</code> which generates a JavaScript
- * function in the global JavaScript scope which allows the enduser to execute a JSF ajax request by a just function
+ * function in the global JavaScript scope which allows the end-user to execute a JSF ajax request by a just function
  * call <code>functionName()</code> in the JavaScript context.
  * <p>
- * The <code>&lt;o:commandScript&gt;</code> component is required to be enclosed in an {@link UIForm} component. The
+ * The <code>&lt;o:commandScript&gt;</code> component is required to be enclosed in a {@link UIForm} component. The
  * <code>name</code> attribute is required and it represents the JavaScript function name. The <code>execute</code>
  * and <code>render</code> attributes work exactly the same as in <code>&lt;f:ajax&gt;</code>. The <code>onbegin</code>
  * and <code>oncomplete</code> attributes must represent (valid!) JavaScript code which will be executed before sending
@@ -143,7 +143,7 @@ public class CommandScript extends UICommand {
 	}
 
 	/**
-	 * Write a <code>&lt;span&gt;&lt;script&gt;</code> with therein the script function which allows the enduser to
+	 * Write a <code>&lt;span&gt;&lt;script&gt;</code> with therein the script function which allows the end-user to
 	 * execute a JSF ajax request by a just script function call <code>functionName()</code> in the JavaScript context.
 	 * @throws IllegalArgumentException When there is no parent form, or when the <code>name</code> attribute is
 	 * missing, or when the <code>name</code> attribute does not represent a valid script function name.

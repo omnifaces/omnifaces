@@ -35,8 +35,7 @@ import org.w3c.dom.NodeList;
 
 /**
  * This configuration enum parses the <tt>/WEB-INF/web.xml</tt> and all <tt>/META-INF/web-fragment</tt> files found in
- * the classpath and offers methods to obtain information from them which is not available by the standard servlet API
- * means.
+ * the classpath and offers methods to obtain information from them which is not available by the standard Servlet API.
  * <p>
  * So far there are only methods for obtaining a mapping of all error page locations by exception type and the location
  * of the FORM authentication login page.

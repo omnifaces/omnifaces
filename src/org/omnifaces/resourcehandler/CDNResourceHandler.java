@@ -39,7 +39,7 @@ import org.omnifaces.util.Utils;
  * <h3>Configuration</h3>
  * <p>
  * To configure the CDN URLs, a {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_RESOURCES}
- * context parameter has to be provided wherein the CDN resources are been specified as a commaseparated string of
+ * context parameter has to be provided wherein the CDN resources are been specified as a comma separated string of
  * <code>libraryName:resourceName=http://cdn.example.com/url</code> key=value pairs. The key represents the default
  * JSF resource identifier and the value represents the full CDN URL, including the scheme. The CDN URL is not validated
  * by this resource handler, so you need to make absolutely sure yourself that it is valid. Here's an example:
