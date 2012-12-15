@@ -2840,8 +2840,18 @@ public enum Baz {
 &lt;/h:form&gt;
 &lt;h:outputScript target="body"&gt;setInterval(updateData, 3000);&lt;/h:outputScript&gt;
 				</pre>
-				Note that it also supports nesting of <code>&lt;f:param&gt;</code>, <code>&lt;f:actionListener&gt;</code> and
-				<code>&lt;f:setPropertyActionListener&gt;</code>, exactly like as in <code>&lt;h:commandXxx&gt;</code>.
+				The component also supports nesting of <code>&lt;f:param&gt;</code>, <code>&lt;f:actionListener&gt;</code> and
+				<code>&lt;f:setPropertyActionListener&gt;</code>, exactly like as in <code>&lt;h:commandXxx&gt;</code>. The function
+				also supports a JS object as argument which will then end up in the HTTP request parameter map:
+				<pre>
+functionName({ name1: "value1", name2: "value2" });
+				</pre>
+				<p>
+				With the above example, the parameters are in the action method available as follows:
+				<pre>
+String name1 = Faces.getRequestParameter("name1"); // value1
+String name2 = Faces.getRequestParameter("name2"); // value2
+				</pre>
 			]]>
 		</description>
 		<tag-name>commandScript</tag-name>

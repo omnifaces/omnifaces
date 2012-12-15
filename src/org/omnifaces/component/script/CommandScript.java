@@ -72,7 +72,7 @@ import org.omnifaces.util.Utils;
  * functionName({ name1: "value1", name2: "value2" });
  * </pre>
  * <p>
- * With the above example, the parameters are available as follows:
+ * With the above example, the parameters are in the action method available as follows:
  * <pre>
  * String name1 = Faces.getRequestParameter("name1"); // value1
  * String name2 = Faces.getRequestParameter("name2"); // value2
