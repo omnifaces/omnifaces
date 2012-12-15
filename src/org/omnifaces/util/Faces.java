@@ -1009,7 +1009,7 @@ public final class Faces {
 	 * the user principal from the session. It's however better practice to just invalidate the session altogether,
 	 * which will implicitly also remove the user principal. Just invoke {@link #invalidateSession()} instead. Note
 	 * that the user principal is still present in the response of the current request, it's therefore recommend to
-	 * send a redirect after {@link #logout()} or {@link #invalidateSession()}. You can use {@link #redirect(String)}
+	 * send a redirect after {@link #logout()} or {@link #invalidateSession()}. You can use {@link #redirect(String, String...)}
 	 * for this.
 	 * @throws ServletException When the logout has failed.
 	 * @see HttpServletRequest#logout()
