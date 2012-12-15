@@ -35,8 +35,8 @@ import org.omnifaces.util.Exceptions;
 import org.omnifaces.util.Faces;
 
 /**
- * This exception handler enables you to show the full error page in its entirety to the enduser in case of exceptions
- * during ajax requests. Refer the documentation of {@link FullAjaxExceptionHandlerFactory} how to setup it.
+ * This exception handler enables you to show the full error page in its entirety to the end-user in case of exceptions
+ * during ajax requests. Refer to the documentation of {@link FullAjaxExceptionHandlerFactory} to see how to set this up.
  * <p>
  * This exception handler will parse the <tt>web.xml</tt> and <tt>web-fragment.xml</tt> files to find the error page
  * locations of the HTTP error code <tt>500</tt> and all declared specific exception types. Those locations need to
@@ -58,10 +58,10 @@ import org.omnifaces.util.Faces;
  * &lt;/error-page&gt;
  * </pre>
  * <p>
- * Both can also, only the <code>java.lang.Throwable</code> one will always get precedence over the <tt>500</tt>
+ * You can have both, but the <code>java.lang.Throwable</code> one will always get precedence over the <tt>500</tt>
  * one, as per the Servlet API specification, so the <tt>500</tt> one would be basically superfluous.
  * <p>
- * The exception detail is available in the request scope by the standard servlet error request attributes like as in a
+ * The exception detail is available in the request scope by the standard Servlet error request attributes like as in a
  * normal synchronous error page response. You could for example show them in the error page as follows:
  * <pre>
  * &lt;ul&gt;
@@ -81,7 +81,7 @@ import org.omnifaces.util.Faces;
  * <p>
  * Exceptions during render response can only be handled when the <code>javax.faces.FACELETS_BUFFER_SIZE</code> is
  * large enough so that the so far rendered response until the occurrence of the exception fits in there and can
- * therefore safely be resetted.
+ * therefore safely be reset.
  *
  * @author Bauke Scholtz
  * @see FullAjaxExceptionHandlerFactory

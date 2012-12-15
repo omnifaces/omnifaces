@@ -36,17 +36,17 @@ import org.omnifaces.util.Json;
  * This OmniFaces partial view context extends and improves the standard partial view context as follows:
  * <ul>
  * <li>Support for executing callback scripts by {@link PartialResponseWriter#startEval()}.</li>
- * <li>Support for adding arguments to ajax response.</li>
+ * <li>Support for adding arguments to an ajax response.</li>
  * <li>Any XML tags which Mojarra and MyFaces has left open after an exception in rendering of an already committed
  * ajax response, will now be properly closed. This prevents errors about malformed XML.</li>
  * <li>Fixes the no-feedback problem when {@link ViewExpiredException} occurs during an ajax request on a restricted
- * page. The enduser will now properly be redirected to the login page.</li>
+ * page. The end-user will now properly be redirected to the login page.</li>
  * </ul>
  * You can use the {@link Ajax} utility class to easily add callback scripts and arguments.
  * <p>
  * This partial view context is already registered by OmniFaces' own <tt>faces-config.xml</tt> and thus gets
- * auto-initialized when the OmniFaces JAR is bundled in a webapp, so end-users do not need to register this partial
- * view context explicitly themselves.
+ * auto-initialized when the OmniFaces JAR is bundled in a web application, so end-users do not need to register this 
+ * partial view context explicitly themselves.
  *
  * @author Bauke Scholtz
  * @since 1.2
