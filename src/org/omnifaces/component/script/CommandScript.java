@@ -33,7 +33,7 @@ import org.omnifaces.util.Utils;
 
 /**
  * <p><strong>CommandScript</strong> is an extension to <code>&lt;h:commandXxx&gt;</code> which generates a JavaScript
- * function in the global JavaScript scope which allows the end-user to execute a JSF ajax request by a just function
+ * function in the global JavaScript scope which allows the end-user to execute a JSF ajax request by just a function
  * call <code>functionName()</code> in the JavaScript context.
  * <p>
  * The <code>&lt;o:commandScript&gt;</code> component is required to be enclosed in a {@link UIForm} component. The
