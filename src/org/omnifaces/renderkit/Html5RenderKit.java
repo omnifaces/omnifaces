@@ -17,6 +17,7 @@ import java.io.Writer;
 import java.util.Map;
 import java.util.Set;
 
+import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
@@ -35,10 +36,10 @@ import org.omnifaces.util.Utils;
 
 /**
  * <p>
- * This HTML5 render kit adds support for HTML5 specific attributes which are unsupported by the JSF {@link UIForm} and
- * {@link UIInput} components. So far in JSF 2.0 and 2.1 only the <code>autocomplete</code> attribute is supported in
- * {@link UIInput} components. All other attributes are by design ignored by the JSF standard HTML render kit. This
- * HTML5 render kit supports the following HTML5 specific attributes:
+ * This HTML5 render kit adds support for HTML5 specific attributes which are unsupported by the JSF {@link UIForm},
+ * {@link UIInput} and {@link UICommand} components. So far in JSF 2.0 and 2.1 only the <code>autocomplete</code>
+ * attribute is supported in {@link UIInput} components. All other attributes are by design ignored by the JSF standard
+ * HTML render kit. This HTML5 render kit supports the following HTML5 specific attributes:
  * <ul>
  * <li><code>UIForm</code>: <ul><li><code>autocomplete</code></li></ul></li>
  * <li><code>UISelectBoolean</code>, <code>UISelectOne</code> and <code>UISelectMany</code>:
@@ -51,6 +52,7 @@ import org.omnifaces.util.Utils;
  * <li><code>list</code></li><li><code>pattern</code></li><li><code>placeholder</code></li><li><code>min</code></li>
  * <li><code>max</code></li><li><code>step</code></li></ul>(the latter three are only supported on <code>type</code> of
  * <code>range</code>, <code>number</code> and <code>date</code>)</li>
+ * <li><code>HtmlCommandButton</code>: <ul><li><code>autofocus</code></li></ul></li>
  * </ul>
  * <p>
  * Note: the <code>list</code> attribute expects a <code>&lt;datalist&gt;</code> element which needs to be coded in
@@ -139,6 +141,11 @@ public class Html5RenderKit extends RenderKitWrapper {
 			"text", "search", "email", "url", "tel", HTML5_INPUT_RANGE_TYPES
 		);
 
+		private static final Set<String> HTML5_BUTTON_ATTRIBUTES = Utils.unmodifiableSet(
+			"autofocus"
+			// "form" attribute is not useable in a JSF form.
+		);
+
 		private static final String ERROR_UNSUPPORTED_HTML5_INPUT_TYPE =
 			"HtmlInputText type '%s' is not supported. Supported types are " + HTML5_INPUT_TYPES + ".";
 
@@ -171,13 +178,7 @@ public class Html5RenderKit extends RenderKitWrapper {
 				writeHtml5AttributesIfNecessary(component.getAttributes(), HTML5_UIFORM_ATTRIBUTES);
 			}
 			else if (component instanceof UIInput) {
-				if (isInstanceofUISelect(component) && ("input".equals(name) || "select".equals(name))) {
-					writeHtml5AttributesIfNecessary(component.getAttributes(), HTML5_UISELECT_ATTRIBUTES);
-				}
-				else if (component instanceof HtmlInputTextarea && "textarea".equals(name)) {
-					writeHtml5AttributesIfNecessary(component.getAttributes(), HTML5_TEXTAREA_ATTRIBUTES);
-				}
-				else if (component instanceof HtmlInputText && "input".equals(name)) {
+				if (component instanceof HtmlInputText && "input".equals(name)) {
 					Map<String, Object> attributes = component.getAttributes();
 					writeHtml5AttributesIfNecessary(attributes, HTML5_INPUT_ATTRIBUTES);
 
@@ -185,6 +186,15 @@ public class Html5RenderKit extends RenderKitWrapper {
 						writeHtml5AttributesIfNecessary(attributes, HTML5_INPUT_RANGE_ATTRIBUTES);
 					}
 				}
+				else if (component instanceof HtmlInputTextarea && "textarea".equals(name)) {
+					writeHtml5AttributesIfNecessary(component.getAttributes(), HTML5_TEXTAREA_ATTRIBUTES);
+				}
+				else if (isInstanceofUISelect(component) && ("input".equals(name) || "select".equals(name))) {
+					writeHtml5AttributesIfNecessary(component.getAttributes(), HTML5_UISELECT_ATTRIBUTES);
+				}
+			}
+			else if (component instanceof UICommand && "input".equals(name)) {
+				writeHtml5AttributesIfNecessary(component.getAttributes(), HTML5_BUTTON_ATTRIBUTES);
 			}
 		}
 
