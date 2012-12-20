@@ -90,8 +90,9 @@ public final class Json {
 		}
 		else if (object.getClass().isArray()) {
 			StringBuilder builder = new StringBuilder().append('[');
+			int length = Array.getLength(object);
 
-			for (int i = 0; i < Array.getLength(object); i++) {
+			for (int i = 0; i < length; i++) {
 				if (i > 0) {
 					builder.append(',');
 				}
