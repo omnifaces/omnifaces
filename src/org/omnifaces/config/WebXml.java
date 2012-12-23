@@ -12,6 +12,9 @@
  */
 package org.omnifaces.config;
 
+import static javax.xml.xpath.XPathConstants.NODESET;
+import static org.omnifaces.util.Utils.isEmpty;
+
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
@@ -23,7 +26,6 @@ import java.util.Map.Entry;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
 import org.omnifaces.util.Faces;
@@ -209,7 +211,7 @@ public enum WebXml {
 		Element documentElement = document.getDocumentElement();
 		XPath xpath = XPathFactory.newInstance().newXPath();
 		NodeList exceptionTypes = (NodeList)
-			xpath.compile(XPATH_EXCEPTION_TYPE).evaluate(documentElement, XPathConstants.NODESET);
+			xpath.compile(XPATH_EXCEPTION_TYPE).evaluate(documentElement, NODESET);
 
 		for (int i = 0; i < exceptionTypes.getLength(); i++) {
 			Node node = exceptionTypes.item(i);
@@ -225,11 +227,11 @@ public enum WebXml {
 		if (!errorPageLocations.containsKey(null)) {
 			String defaultLocation = xpath.compile(XPATH_500_LOCATION).evaluate(documentElement).trim();
 
-			if (Utils.isEmpty(defaultLocation)) {
+			if (isEmpty(defaultLocation)) {
 				defaultLocation = xpath.compile(XPATH_DEFAULT_LOCATION).evaluate(documentElement).trim();
 			}
 
-			if (!Utils.isEmpty(defaultLocation)) {
+			if (!isEmpty(defaultLocation)) {
 				errorPageLocations.put(null, defaultLocation);
 			}
 		}
@@ -243,7 +245,7 @@ public enum WebXml {
 	private static String parseFormLoginPage(Document document) throws Exception {
 		XPath xpath = XPathFactory.newInstance().newXPath();
 		String formLoginPage = xpath.compile(XPATH_FORM_LOGIN_PAGE).evaluate(document.getDocumentElement()).trim();
-		return Utils.isEmpty(formLoginPage) ? null : formLoginPage;
+		return isEmpty(formLoginPage) ? null : formLoginPage;
 	}
 
 }
