@@ -246,19 +246,43 @@ public final class Utils {
 	}
 	
 	/**
+	 * Converts comma separated values in a string into a list with those values.
+	 * <p>
+	 * E.g. a string with "foo, bar, kaz" will be converted into a <code>List</code>
+	 * with values:
+	 * <ul>
+	 * <li>"foo"</li>
+	 * <li>"bar"</li>
+	 * <li>"kaz"</li>
+	 * </ul>
 	 * 
-	 * @param values
-	 * @return
+	 * Note that whitespace will be stripped. Empty entries are not supported. This method defaults to
+	 * using a comma (<code>","</code>) as delimiter. See {@link Utils#csvToList(String, String)} for when
+	 * a different delimiter is needed.
+	 * 
+	 * @param values string with comma separated values
+	 * @return a list with all values encountered in the <code>values</argument>, can be the empty list.
 	 */
 	public static List<String> csvToList(String values) {
 		return csvToList(values, ",");
 	}
 	
 	/**
+	 * Converts comma separated values in a string into a list with those values.
+	 * <p>
+	 * E.g. a string with "foo, bar, kaz" will be converted into a <code>List</code>
+	 * with values:
+	 * <ul>
+	 * <li>"foo"</li>
+	 * <li>"bar"</li>
+	 * <li>"kaz"</li>
+	 * </ul>
 	 * 
-	 * @param values
-	 * @param delimiter
-	 * @return
+	 * Note that whitespace will be stripped. Empty entries are not supported.
+	 * 
+	 * @param values string with comma separated values
+	 * @param delimiter the delimiter used to separate the actual values in the <code>values</code> parameter.
+	 * @return a list with all values encountered in the <code>values</argument>, can be the empty list.
 	 */
 	public static List<String> csvToList(String values, String delimiter) {
 		
