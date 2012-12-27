@@ -12,6 +12,9 @@
  */
 package org.omnifaces.util;
 
+import static java.util.Collections.emptyList;
+import static java.util.regex.Pattern.quote;
+
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
@@ -26,10 +29,12 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -238,6 +243,39 @@ public final class Utils {
 		}
 
 		return Collections.unmodifiableSet(set);
+	}
+	
+	/**
+	 * 
+	 * @param values
+	 * @return
+	 */
+	public static List<String> csvToList(String values) {
+		return csvToList(values, ",");
+	}
+	
+	/**
+	 * 
+	 * @param values
+	 * @param delimiter
+	 * @return
+	 */
+	public static List<String> csvToList(String values, String delimiter) {
+		
+		if (isEmpty(values)) {
+			return emptyList();
+		}
+		
+		List<String> list = new ArrayList<String>();
+		
+		for (String value : values.split(quote(delimiter))) {
+			String trimmedValue = value.trim();
+			if (!isEmpty(trimmedValue)) {
+				list.add(trimmedValue);
+			}
+		}
+		
+		return list;
 	}
 
 	// Dates ----------------------------------------------------------------------------------------------------------
