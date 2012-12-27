@@ -14,11 +14,14 @@
 package org.omnifaces.facesviews;
 
 import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableSet;
 import static javax.faces.FactoryFinder.APPLICATION_FACTORY;
 import static org.omnifaces.facesviews.FacesViewsResolver.FACES_VIEWS_RESOURCES_PARAM_NAME;
+import static org.omnifaces.util.Utils.csvToList;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -41,6 +44,21 @@ final public class FacesViewsUtils {
     private FacesViewsUtils() {}
 
     public static final String WEB_INF_VIEWS = "/WEB-INF/faces-views/";
+    
+    
+    /**
+     * The name of the init parameter (in web.xml) where the value holds a comma separated list of paths
+     * that are to be scanned by faces views.
+     */
+    public static final String FACES_VIEWS_SCAN_PATHS_PARAM_NAME = "org.omnifaces.FACES_VIEWS_SCAN_PATHS";
+    
+    /**
+     * The name of the application scope context parameter under which a Set version of the
+     * paths that are to be scanned by faces views are kept.
+     */
+    public static final String SCAN_PATHS = "org.omnifaces.facesviews.scanpaths";
+    
+    
 
     /**
      * Gets the JSF Application instance.
@@ -68,9 +86,19 @@ final public class FacesViewsUtils {
      * @return the resource without the special prefix path, or as-is if it didn't start with this prefix.
      */
     public static String stripPrefixPath(final String resource) {
+       return stripPrefixPath(WEB_INF_VIEWS, resource);
+    }
+    
+    /**
+     * Strips the special 'faces-views' prefix path from the resource if any.
+     *
+     * @param resource
+     * @return the resource without the special prefix path, or as-is if it didn't start with this prefix.
+     */
+    public static String stripPrefixPath(final String prefix, final String resource) {
         String normalizedResource = resource;
-        if (normalizedResource.startsWith(WEB_INF_VIEWS)) {
-            normalizedResource = normalizedResource.substring(WEB_INF_VIEWS.length() - 1);
+        if (normalizedResource.startsWith(prefix)) {
+            normalizedResource = normalizedResource.substring(prefix.length() - 1);
         }
 
         return normalizedResource;
@@ -149,26 +177,60 @@ final public class FacesViewsUtils {
 
         return facesServletRegistration;
     }
+    
+    public static void scanViewsFromRootPaths(ServletContext servletContext, Map<String, String> collectedViews, Set<String> collectedExtentions) {
+    	for (String rootPath : getRootPaths(servletContext)) {
+    		scanViews(servletContext, rootPath, servletContext.getResourcePaths(rootPath), collectedViews, collectedExtentions);
+    	}
+    }
+    
+    public static Set<String> getRootPaths(ServletContext servletContext) {
+    	@SuppressWarnings("unchecked")
+		Set<String> rootPaths = (Set<String>) servletContext.getAttribute(SCAN_PATHS);
+    	if (rootPaths == null) {
+    		rootPaths = new HashSet<String>(csvToList(servletContext.getInitParameter(FACES_VIEWS_SCAN_PATHS_PARAM_NAME)));
+    		rootPaths.add(WEB_INF_VIEWS);
+    		servletContext.setAttribute(SCAN_PATHS, unmodifiableSet(rootPaths));
+    	}
+    	
+    	return rootPaths;
+    }
 
-    /**
-     * Scans resources (views) recursively starting with the given resource paths, and collects those and all unique extensions
-     * encountered in a flat map respectively set.
-     *
-     * @param servletContext
-     * @param resourcePaths
-     * @param collectedViews
-     * @param collectedExtentions
-     */
-    public static void scanViews(ServletContext servletContext, Set<String> resourcePaths, Map<String, String> collectedViews, Set<String> collectedExtentions) {
+	/**
+	 * Scans resources (views) recursively starting with the given resource paths for a specific root path, and collects
+	 * those and all unique extensions encountered in a flat map respectively set.
+	 * 
+	 * @param servletContext
+	 * @param rootPath
+	 *            one of the paths from which views are scanned. By default this is typically /WEB-INF/faces-view/
+	 * @param resourcePaths
+	 *            collection of paths to be considered for scanning, can be either files or directories.
+	 * @param collectedViews
+	 *            a mapping of all views encountered during scanning. Mapping will be from the simplified form to the
+	 *            actual location relatively to the web root. E.g key "foo", value "/WEB-INF/faces-view/foo.xhtml"
+	 * @param collectedExtentions
+	 *            set in which all unique extensions will be collected. May be null, in which case no extensions will be
+	 *            collected
+	 */
+    public static void scanViews(ServletContext servletContext, String rootPath, Set<String> resourcePaths, Map<String, String> collectedViews, Set<String> collectedExtentions) {
         if (!isEmpty(resourcePaths)) {
             for (String resourcePath : resourcePaths) {
                 if (isDirectory(resourcePath)) {
-                    scanViews(servletContext, servletContext.getResourcePaths(resourcePath), collectedViews, collectedExtentions);
+                    scanViews(servletContext, rootPath, servletContext.getResourcePaths(resourcePath), collectedViews, collectedExtentions);
                 } else {
-                    String resource = stripPrefixPath(resourcePath);
+                	
+                	// Strip the root path from the current path. E.g.
+                	// /WEB-INF/faces-views/foo.xhtml will become foo.xhtml if the root path = /WEB-INF/faces-view/
+                    String resource = stripPrefixPath(rootPath, resourcePath);
+                    
+                    // Store the resource with and without an extension, e.g. store both foo.xhtml and foo
                     collectedViews.put(resource, resourcePath);
                     collectedViews.put(stripExtension(resource), resourcePath);
-                    collectedExtentions.add("*" + getExtension(resourcePath));
+                    
+                    // Optionally, collect all unique extensions that we have encountered
+                    if (collectedExtentions != null) {
+                    	collectedExtentions.add("*" + getExtension(resourcePath));
+                    }
                 }
             }
         }
@@ -179,34 +241,12 @@ final public class FacesViewsUtils {
      * encountered.
      *
      * @param servletContext
-     * @param resourcePaths
      * @return views
      */
-    public static Map<String, String> scanViews(ServletContext servletContext, Set<String> resourcePaths) {
+    public static Map<String, String> scanViews(ServletContext servletContext) {
         Map<String, String> collectedViews = new HashMap<String, String>();
-        scanViews(servletContext, resourcePaths, collectedViews);
+        scanViewsFromRootPaths(servletContext, collectedViews, null);
         return collectedViews;
-    }
-
-    /**
-     * Scans resources (views) recursively starting with the given resource paths, and collects those in a flat map.
-     *
-     * @param servletContext
-     * @param resourcePaths
-     * @param collectedViews
-     */
-    public static void scanViews(ServletContext servletContext, Set<String> resourcePaths, Map<String, String> collectedViews) {
-        if (!isEmpty(resourcePaths)) {
-            for (String resourcePath : resourcePaths) {
-                if (isDirectory(resourcePath)) {
-                    scanViews(servletContext, servletContext.getResourcePaths(resourcePath), collectedViews);
-                } else {
-                    String resource = stripPrefixPath(resourcePath);
-                    collectedViews.put(resource, resourcePath);
-                    collectedViews.put(stripExtension(resource), resourcePath);
-                }
-            }
-        }
     }
     
     /**
@@ -229,7 +269,7 @@ final public class FacesViewsUtils {
      * @return the view found during scanning, or the empty map if no views encountered
      */
     public static Map<String, String> scanAndStoreViews(ServletContext context) {
-        Map<String, String> views = scanViews(context, context.getResourcePaths(WEB_INF_VIEWS));
+        Map<String, String> views = scanViews(context);
         if (!views.isEmpty()) {
             context.setAttribute(FACES_VIEWS_RESOURCES_PARAM_NAME, unmodifiableMap(views));
         }

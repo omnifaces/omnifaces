@@ -13,10 +13,11 @@
 
 package org.omnifaces.facesviews;
 
-import static java.util.Collections.*;
-import static javax.faces.view.facelets.ResourceResolver.*;
-import static org.omnifaces.facesviews.FacesViewsResolver.*;
-import static org.omnifaces.facesviews.FacesViewsUtils.*;
+import static java.util.Collections.unmodifiableMap;
+import static javax.faces.view.facelets.ResourceResolver.FACELETS_RESOURCE_RESOLVER_PARAM_NAME;
+import static org.omnifaces.facesviews.FacesViewsResolver.FACES_VIEWS_RESOURCES_PARAM_NAME;
+import static org.omnifaces.facesviews.FacesViewsUtils.getFacesServletRegistration;
+import static org.omnifaces.facesviews.FacesViewsUtils.scanViewsFromRootPaths;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -56,7 +57,7 @@ public class FacesViewsInitializerListener implements ServletContextListener {
             // Scan our dedicated directory for Faces resources that need to be mapped
             Map<String, String> collectedViews = new HashMap<String, String>();
             Set<String> collectedExtentions = new HashSet<String>();
-            scanViews(servletContext, servletContext.getResourcePaths(WEB_INF_VIEWS), collectedViews, collectedExtentions);
+            scanViewsFromRootPaths(servletContext, collectedViews, collectedExtentions);
 
             if (!collectedViews.isEmpty()) {
 
