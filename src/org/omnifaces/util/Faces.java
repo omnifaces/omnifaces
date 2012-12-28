@@ -129,11 +129,11 @@ public final class Faces {
 	 * Inner class so that the protected {@link FacesContext#setCurrentInstance(FacesContext)} method can be invoked.
 	 * @author Bauke Scholtz
 	 */
-    private static abstract class FacesContextSetter extends FacesContext {
-        protected static void setCurrentInstance(FacesContext context) {
-            FacesContext.setCurrentInstance(context);
-        }
-    }
+	private static abstract class FacesContextSetter extends FacesContext {
+		protected static void setCurrentInstance(FacesContext context) {
+			FacesContext.setCurrentInstance(context);
+		}
+	}
 
 	/**
 	 * Returns the current external context.
@@ -146,21 +146,6 @@ public final class Faces {
 	 */
 	public static ExternalContext getExternalContext() {
 		return getContext().getExternalContext();
-	}
-
-	/**
-	 * Returns the current partial view context (the ajax context).
-	 * <p>
-	 * <i>Note that whenever you absolutely need this method to perform a general task, you might want to consider to
-	 * submit a feature request to OmniFaces in order to add a new utility method which performs exactly this general
-	 * task.</i>
-	 * @return The current partial view context.
-	 * @see FacesContext#getPartialViewContext()
-	 * @deprecated Please use {@link Ajax#getContext()} instead.
-	 */
-	@Deprecated
-	public static PartialViewContext getPartialViewContext() {
-		return getContext().getPartialViewContext();
 	}
 
 	/**
@@ -495,23 +480,6 @@ public final class Faces {
 	public static void navigate(String outcome) {
 		FacesContext context = getContext();
 		context.getApplication().getNavigationHandler().handleNavigation(context, null, outcome);
-	}
-
-	/**
-	 * Add the given client IDs to the collection of render IDs of the current partial view context. This will force
-	 * JSF to ajax-render/update the components with the given client IDs on render response. Note that those client IDs
-	 * should not start with the naming container separator character like <code>:</code>.
-	 * @param clientIds The client IDs to be added to the collection of render IDs of the current partial view context.
-	 * @since 1.1
-	 * @deprecated Please use {@link Ajax#update(String...)} instead.
-	 */
-	@Deprecated
-	public static void addRenderIds(String... clientIds) {
-		Collection<String> renderIds = getPartialViewContext().getRenderIds();
-
-		for (String clientId : clientIds) {
-			renderIds.add(clientId);
-		}
 	}
 
 	// Facelets -------------------------------------------------------------------------------------------------------
