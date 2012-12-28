@@ -12,6 +12,10 @@
  */
 package org.omnifaces.util;
 
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Date;
@@ -28,6 +32,11 @@ import org.omnifaces.el.functions.Strings;
  */
 public final class Json {
 
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final String ERROR_INVALID_BEAN = "Cannot introspect object of type '%s' as bean.";
+	private static final String ERROR_INVALID_GETTER = "Cannot invoke getter of property '%s' of bean '%s'.";
+
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	private Json() {
@@ -38,73 +47,153 @@ public final class Json {
 
 	/**
 	 * Encodes the given object as JSON. This supports the standard types {@link Boolean}, {@link Number},
-	 * {@link CharSequence} and {@link Date}. It also supports {@link Collection}s, {@link Map}s and arrays of them,
-	 * even nested ones. The {@link Date} is formatted in RFC 1123 format, so you can if necessary just pass it
-	 * straight to <code>new Date()</code> in JavaScript.
-	 * <p>
-	 * Complex objects like javabeans are not supported. Consider a "real" JSON library instead if you need this.
+	 * {@link CharSequence} and {@link Date}. If the given object type does not match any of them, then it will attempt
+	 * to inspect the object as a javabean whereby the public properties (with public getters) will be encoded as a JS
+	 * object. It also supports {@link Collection}s, {@link Map}s and arrays of them, even nested ones. The {@link Date}
+	 * is formatted in RFC 1123 format, so you can if necessary just pass it straight to <code>new Date()</code> in
+	 * JavaScript.
 	 * @param object The object to be encoded as JSON.
 	 * @return The JSON-encoded representation of the given object.
-	 * @throws IllegalArgumentException When an unsupported type is encountered in the given object argument.
+	 * @throws IllegalArgumentException When the given object or one of its properties cannot be inspected as a bean.
 	 */
 	public static String encode(Object object) {
+		StringBuilder builder = new StringBuilder();
+		encode(object, builder);
+		return builder.toString();
+	}
+
+	/**
+	 * Method allowing tail recursion (prevents potential stack overflow on deeply nested structures).
+	 */
+	private static void encode(Object object, StringBuilder builder) {
 		if (object == null) {
-			return "null";
+			builder.append("null");
 		}
 		else if (object instanceof Boolean || object instanceof Number) {
-			return object.toString();
+			builder.append(object.toString());
 		}
 		else if (object instanceof CharSequence) {
-			return '"' + Strings.escapeJS(object.toString()) + '"';
+			builder.append('"').append(Strings.escapeJS(object.toString())).append('"');
 		}
 		else if (object instanceof Date) {
-			return '"' + Utils.formatRFC1123((Date) object) + '"';
+			builder.append('"').append(Utils.formatRFC1123((Date) object)).append('"');
 		}
 		else if (object instanceof Collection<?>) {
-			StringBuilder builder = new StringBuilder().append('[');
-			int i = 0;
-
-			for (Object element : ((Collection<?>) object)) {
-				if (i++ > 0) {
-					builder.append(',');
-				}
-
-				builder.append(encode(element));
-			}
-
-			return builder.append(']').toString();
-		}
-		else if (object instanceof Map<?, ?>) {
-			StringBuilder builder = new StringBuilder().append('{');
-			int i = 0;
-
-			for (Entry<?, ?> entry : ((Map<?, ?>) object).entrySet()) {
-				if (i++ > 0) {
-					builder.append(',');
-				}
-
-				builder.append(encode(String.valueOf(entry.getKey()))).append(':').append(encode(entry.getValue()));
-			}
-
-			return builder.append('}').toString();
+			encodeCollection((Collection<?>) object, builder);
 		}
 		else if (object.getClass().isArray()) {
-			StringBuilder builder = new StringBuilder().append('[');
-			int length = Array.getLength(object);
-
-			for (int i = 0; i < length; i++) {
-				if (i > 0) {
-					builder.append(',');
-				}
-
-				builder.append(encode(Array.get(object, i)));
-			}
-
-			return builder.append(']').toString();
+			encodeArray(object, builder);
+		}
+		else if (object instanceof Map<?, ?>) {
+			encodeMap((Map<?, ?>) object, builder);
 		}
 		else {
-			throw new IllegalArgumentException("Unsupported type: " + object.getClass());
+			encodeBean(object, builder);
 		}
+	}
+
+	/**
+	 * Encode a Java collection as JS array.
+	 */
+	private static void encodeCollection(Collection<?> collection, StringBuilder builder) {
+		builder.append('[');
+		int i = 0;
+
+		for (Object element : collection) {
+			if (i++ > 0) {
+				builder.append(',');
+			}
+
+			encode(element, builder);
+		}
+
+		builder.append(']');
+	}
+
+	/**
+	 * Encode a Java array as JS array.
+	 */
+	private static void encodeArray(Object array, StringBuilder builder) {
+		builder.append('[');
+		int length = Array.getLength(array);
+
+		for (int i = 0; i < length; i++) {
+			if (i > 0) {
+				builder.append(',');
+			}
+
+			encode(Array.get(array, i), builder);
+		}
+
+		builder.append(']');
+	}
+
+	/**
+	 * Encode a Java map as JS object.
+	 */
+	private static void encodeMap(Map<?, ?> map, StringBuilder builder) {
+		builder.append('{');
+		int i = 0;
+
+		for (Entry<?, ?> entry : map.entrySet()) {
+			if (i++ > 0) {
+				builder.append(',');
+			}
+
+			encode(String.valueOf(entry.getKey()), builder);
+			builder.append(':');
+			encode(entry.getValue(), builder);
+		}
+
+		builder.append('}');
+	}
+
+	/**
+	 * Encode a Java bean as JS object.
+	 */
+	private static void encodeBean(Object bean, StringBuilder builder) {
+		BeanInfo beanInfo;
+
+		try {
+			beanInfo = Introspector.getBeanInfo(bean.getClass());
+		}
+		catch (IntrospectionException e) {
+			throw new IllegalArgumentException(
+				String.format(ERROR_INVALID_BEAN, bean.getClass()), e);
+		}
+
+		builder.append('{');
+		int i = 0;
+
+		for (PropertyDescriptor property : beanInfo.getPropertyDescriptors()) {
+			if (property.getReadMethod() == null || "class".equals(property.getName())) {
+				continue;
+			}
+
+			Object value;
+
+			try {
+				value = property.getReadMethod().invoke(bean);
+			}
+			catch (Exception e) {
+				throw new IllegalArgumentException(
+					String.format(ERROR_INVALID_GETTER, property.getName(), bean.getClass()), e);
+			}
+
+			if (value == null) {
+				continue;
+			}
+
+			if (i++ > 0) {
+				builder.append(',');
+			}
+
+			encode(property.getName(), builder);
+			builder.append(':');
+			encode(value, builder);
+		}
+
+		builder.append('}');
 	}
 
 }
