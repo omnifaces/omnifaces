@@ -13,8 +13,12 @@
 
 package org.omnifaces.facesviews;
 
-import static org.omnifaces.facesviews.FacesViewsResolver.*;
-import static org.omnifaces.facesviews.FacesViewsUtils.*;
+import static org.omnifaces.facesviews.FacesViewsResolver.FACES_VIEWS_RESOURCES_PARAM_NAME;
+import static org.omnifaces.facesviews.FacesViewsUtils.getApplicationAttribute;
+import static org.omnifaces.facesviews.FacesViewsUtils.getRequestAttribute;
+import static org.omnifaces.facesviews.FacesViewsUtils.isExtensionless;
+import static org.omnifaces.facesviews.FacesViewsUtils.isScannedViewsAlwaysExtensionless;
+import static org.omnifaces.facesviews.FacesViewsUtils.stripExtension;
 
 import java.util.Map;
 
@@ -23,43 +27,43 @@ import javax.faces.application.ViewHandlerWrapper;
 import javax.faces.context.FacesContext;
 
 /**
- * View handler that renders action URL extensionless if the current request is extensionless and the
- * requested resource is a mapped one, otherwise as-is.
+ * View handler that renders action URL extensionless if the current request is extensionless and the requested resource
+ * is a mapped one, otherwise as-is.
  * <p>
  * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
- *
+ * 
  * @author Arjan Tijms
- *
+ * 
  */
 public class FacesViewsViewHandler extends ViewHandlerWrapper {
 
-    private final ViewHandler wrapped;
+	private final ViewHandler wrapped;
 
-    public FacesViewsViewHandler(ViewHandler viewHandler) {
-        wrapped = viewHandler;
-    }
+	public FacesViewsViewHandler(ViewHandler viewHandler) {
+		wrapped = viewHandler;
+	}
 
-    @Override
-    public String getActionURL(FacesContext context, String viewId) {
+	@Override
+	public String getActionURL(FacesContext context, String viewId) {
 
-        Map<String, String> mappedResources = getApplicationAttribute(context, FACES_VIEWS_RESOURCES_PARAM_NAME);
-        if (mappedResources.containsKey(viewId)) {
+		Map<String, String> mappedResources = getApplicationAttribute(context, FACES_VIEWS_RESOURCES_PARAM_NAME);
+		if (mappedResources.containsKey(viewId)) {
 
-            String originalViewId = getRequestAttribute(context, "javax.servlet.forward.servlet_path");
-            if (isExtensionless(originalViewId)) {
-                // Requested viewId was mapped and the current request is extensionless, render the
-                // action URL extensionless as well.
-                return context.getExternalContext().getRequestContextPath() + stripExtension(viewId);
-            }
-        }
+			String originalViewId = getRequestAttribute(context, "javax.servlet.forward.servlet_path");
+			if (isScannedViewsAlwaysExtensionless(context) || isExtensionless(originalViewId)) {
+				// User has requested to always render extensionless, or the requested viewId was mapped and the current
+				// request is extensionless, render the action URL extensionless as well.
+				return context.getExternalContext().getRequestContextPath() + stripExtension(viewId);
+			}
+		}
 
-        // Not a resource we mapped or not a forwarded one, let the original view handler take care of it.
-        return super.getActionURL(context, viewId);
-    }
+		// Not a resource we mapped or not a forwarded one, let the original view handler take care of it.
+		return super.getActionURL(context, viewId);
+	}
 
-    @Override
-    public ViewHandler getWrapped() {
-       return wrapped;
-    }
+	@Override
+	public ViewHandler getWrapped() {
+		return wrapped;
+	}
 
 }
