@@ -76,11 +76,11 @@ public class FacesViewsForwardingFilter extends HttpFilter {
     public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException,
             IOException {
 
-        ServletContext context = request.getServletContext();
-        Map<String, String> resources = getApplicationAttribute(context, FACES_VIEWS_RESOURCES_PARAM_NAME);
-
         String resource = request.getServletPath();
         if (isExtensionless(resource)) {
+        	
+        	ServletContext context = request.getServletContext();
+            Map<String, String> resources = getApplicationAttribute(context, FACES_VIEWS_RESOURCES_PARAM_NAME);
         	
         	if (getApplication().getProjectStage() == Development && !resources.containsKey(resource)) {
         		// Check if the resource was dynamically added by scanning the faces-views location(s) again.
