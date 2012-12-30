@@ -15,10 +15,12 @@ package org.omnifaces.facesviews;
 
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
+import static java.util.regex.Pattern.quote;
 import static javax.faces.FactoryFinder.APPLICATION_FACTORY;
 import static org.omnifaces.facesviews.FacesViewsResolver.FACES_VIEWS_RESOURCES_PARAM_NAME;
 import static org.omnifaces.util.Utils.csvToList;
 import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.startsWithOneOf;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -191,9 +193,18 @@ final public class FacesViewsUtils {
 		return facesServletRegistration;
 	}
 
-	public static void scanViewsFromRootPaths(ServletContext servletContext, Map<String, String> collectedViews, Set<String> collectedExtentions) {
+	public static void scanViewsFromRootPaths(ServletContext servletContext, Map<String, String> collectedViews, Set<String> collectedExtensions) {
 		for (String rootPath : getRootPaths(servletContext)) {
-			scanViews(servletContext, rootPath, servletContext.getResourcePaths(rootPath), collectedViews, collectedExtentions);
+			
+			String extensionToScan = null;
+			if (rootPath.contains("*")) {
+				String[] pathAndExtension = rootPath.split(quote("*"));
+				rootPath = pathAndExtension[0];
+				extensionToScan = pathAndExtension[1];
+				
+			}
+			
+			scanViews(servletContext, rootPath, servletContext.getResourcePaths(rootPath), collectedViews, extensionToScan, collectedExtensions);
 		}
 	}
 
@@ -235,33 +246,64 @@ final public class FacesViewsUtils {
 	 * @param collectedViews
 	 *            a mapping of all views encountered during scanning. Mapping will be from the simplified form to the
 	 *            actual location relatively to the web root. E.g key "foo", value "/WEB-INF/faces-view/foo.xhtml"
-	 * @param collectedExtentions
+	 * @param extensionToScan
+	 *            a specific extension to scan for. Should start with a ., e.g. ".xhtml". If this is given, only
+	 *            resources with that extension will be scanned. If null, all resources will be scanned.
+	 * @param collectedExtensions
 	 *            set in which all unique extensions will be collected. May be null, in which case no extensions will be
 	 *            collected
 	 */
 	public static void scanViews(ServletContext servletContext, String rootPath, Set<String> resourcePaths, Map<String, String> collectedViews,
-			Set<String> collectedExtentions) {
+			String extensionToScan, Set<String> collectedExtensions) {
+		
 		if (!isEmpty(resourcePaths)) {
 			for (String resourcePath : resourcePaths) {
 				if (isDirectory(resourcePath)) {
-					scanViews(servletContext, rootPath, servletContext.getResourcePaths(resourcePath), collectedViews, collectedExtentions);
-				} else {
+					if (canScanDirectory(rootPath, resourcePath)) {
+						scanViews(servletContext, rootPath, servletContext.getResourcePaths(resourcePath), collectedViews, extensionToScan, collectedExtensions);
+					}
+				} else if (canScanResource(resourcePath, extensionToScan)) {
 
 					// Strip the root path from the current path. E.g.
 					// /WEB-INF/faces-views/foo.xhtml will become foo.xhtml if the root path = /WEB-INF/faces-view/
 					String resource = stripPrefixPath(rootPath, resourcePath);
 
 					// Store the resource with and without an extension, e.g. store both foo.xhtml and foo
-					collectedViews.put(resource, resourcePath);
+					if (!"/".equals(rootPath)) {
+						// For the root path "/", there is no need to store the resource with extension, as
+						// that particular 'mapping' is already what servers load by default.
+						collectedViews.put(resource, resourcePath);
+					}
 					collectedViews.put(stripExtension(resource), resourcePath);
 
 					// Optionally, collect all unique extensions that we have encountered
-					if (collectedExtentions != null) {
-						collectedExtentions.add("*" + getExtension(resourcePath));
+					if (collectedExtensions != null) {
+						collectedExtensions.add("*" + getExtension(resourcePath));
 					}
 				}
 			}
 		}
+	}
+	
+	public static boolean canScanDirectory(String rootPath, String directory) {
+		
+		if (!"/".equals(rootPath)) {
+			// If a user has explicitly asked for scanning anything other than /, every sub directory of it can be scanned.
+			return true;
+		}
+		
+		// For the special directory /, don't scan WEB-INF and META-INF
+		return !startsWithOneOf(directory, "/WEB-INF/", "/META-INF/");
+	}
+	
+	public static boolean canScanResource(String resource, String extensionToScan) {
+		
+		if (extensionToScan == null) {
+			// If no extension has been explicitly defined, we scan all extensions encountered
+			return true;
+		}
+		
+		return resource.endsWith(extensionToScan);
 	}
 
 	/**
