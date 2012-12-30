@@ -156,6 +156,22 @@ public final class Utils {
 
 		return false;
 	}
+	
+	/**
+	 * Returns <code>true</code> if the given string starts with one of the given prefixes.
+	 * @param string The object to be checked if it starts with one of the given prefixes.
+	 * @param prefixes The argument list of prefixes to be checked
+	 * @return <code>true</code> if the given string starts with one of the given prefixes.
+	 */
+	public static boolean startsWithOneOf(String string, String... prefixes) {
+		for (String prefix : prefixes) {
+			if (string.startsWith(prefix)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
 
 	// I/O ------------------------------------------------------------------------------------------------------------
 
