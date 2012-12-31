@@ -162,6 +162,7 @@ public final class Utils {
 	 * @param string The object to be checked if it starts with one of the given prefixes.
 	 * @param prefixes The argument list of prefixes to be checked
 	 * @return <code>true</code> if the given string starts with one of the given prefixes.
+	 * @since 1.4
 	 */
 	public static boolean startsWithOneOf(String string, String... prefixes) {
 		for (String prefix : prefixes) {
@@ -278,6 +279,7 @@ public final class Utils {
 	 * 
 	 * @param values string with comma separated values
 	 * @return a list with all values encountered in the <code>values</argument>, can be the empty list.
+	 * @since 1.4
 	 */
 	public static List<String> csvToList(String values) {
 		return csvToList(values, ",");
@@ -299,6 +301,7 @@ public final class Utils {
 	 * @param values string with comma separated values
 	 * @param delimiter the delimiter used to separate the actual values in the <code>values</code> parameter.
 	 * @return a list with all values encountered in the <code>values</argument>, can be the empty list.
+	 * @since 1.4
 	 */
 	public static List<String> csvToList(String values, String delimiter) {
 		
