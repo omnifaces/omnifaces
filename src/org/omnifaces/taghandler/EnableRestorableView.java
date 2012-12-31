@@ -87,7 +87,7 @@ public class EnableRestorableView extends TagHandler {
 			return;
 		}
 
-		((UIViewRoot) parent).getAttributes().put(EnableRestorableView.class.getName(), true);
+		parent.getAttributes().put(EnableRestorableView.class.getName(), true);
 	}
 
 }

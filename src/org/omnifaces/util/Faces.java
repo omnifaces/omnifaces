@@ -48,6 +48,7 @@ import javax.faces.context.FacesContextWrapper;
 import javax.faces.context.Flash;
 import javax.faces.context.PartialViewContext;
 import javax.faces.event.PhaseId;
+import javax.faces.view.ViewDeclarationLanguage;
 import javax.faces.view.ViewMetadata;
 import javax.faces.view.facelets.FaceletContext;
 import javax.servlet.ServletContext;
@@ -373,6 +374,54 @@ public final class Faces {
 	public static Collection<UIViewParameter> getViewParameters() {
 		UIViewRoot viewRoot = getViewRoot();
 		return (viewRoot != null) ? ViewMetadata.getViewParameters(viewRoot) : Collections.<UIViewParameter>emptyList();
+	}
+
+	/**
+	 * Returns the metadata attribute map of the given view ID, or an empty map if there is no view metadata.
+	 * @param viewId The view ID to return the metadata attribute map for.
+	 * @return The metadata attribute map of the given view ID, or an empty map if there is no view metadata.
+	 * @see ViewDeclarationLanguage#getViewMetadata(FacesContext, String)
+	 * @since 1.4
+	 */
+	public static Map<String, Object> getMetadataAttributes(String viewId) {
+		FacesContext context = Faces.getContext();
+		viewId = Faces.normalizeViewId(viewId);
+		ViewHandler viewHandler = context.getApplication().getViewHandler();
+		ViewDeclarationLanguage vdl = viewHandler.getViewDeclarationLanguage(context, viewId);
+		ViewMetadata metadata = vdl.getViewMetadata(context, viewId);
+
+		return (metadata != null)
+			? metadata.createMetadataView(context).getAttributes()
+			: Collections.<String, Object>emptyMap();
+	}
+
+	/**
+	 * Returns the metadata attribute of the given view ID associated with the given name.
+	 * Note: this is not the same as the view scope, for that use {@link #getViewAttribute(String)}.
+	 * @param viewId The view ID to return the metadata attribute for.
+	 * @param name The metadata attribute name.
+	 * @return The metadata attribute of the given view ID associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see ViewDeclarationLanguage#getViewMetadata(FacesContext, String)
+	 * @since 1.4
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getMetadataAttribute(String viewId, String name) {
+		return (T) getMetadataAttributes(viewId).get(name);
+	}
+
+	/**
+	 * Returns the metadata attribute of the current view associated with the given name.
+	 * Note: this is not the same as the view scope, for that use {@link #getViewAttribute(String)}.
+	 * @param name The metadata attribute name.
+	 * @return The metadata attribute of the current view associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see UIViewRoot#getAttributes()
+	 * @since 1.4
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getMetadataAttribute(String name) {
+		return (T) Faces.getViewRoot().getAttributes().get(name);
 	}
 
 	/**
