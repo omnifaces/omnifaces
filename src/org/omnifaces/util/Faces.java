@@ -17,11 +17,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -78,8 +75,6 @@ public final class Faces {
 
 	private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
 	private static final int DEFAULT_SENDFILE_BUFFER_SIZE = 10240;
-
-	private static final String ERROR_UNSUPPORTED_ENCODING = "UTF-8 is apparently not supported on this machine.";
 	private static final String ERROR_NO_VIEW = "There is no UIViewRoot.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
@@ -942,12 +937,7 @@ public final class Faces {
 			Object[] encodedParams = new Object[params.length];
 
 			for (int i = 0; i < params.length; i++) {
-				try {
-					encodedParams[i] = URLEncoder.encode(params[i], "UTF-8");
-				}
-				catch (UnsupportedEncodingException e) {
-					throw new UnsupportedOperationException(ERROR_UNSUPPORTED_ENCODING, e);
-				}
+				encodedParams[i] = Utils.encodeURL(params[i]);
 			}
 
 			return encodedParams;
@@ -1066,13 +1056,7 @@ public final class Faces {
 	 */
 	public static String getRequestCookie(String name) {
 		Cookie cookie = (Cookie) getExternalContext().getRequestCookieMap().get(name);
-
-		try {
-			return (cookie != null) ? URLDecoder.decode(cookie.getValue(), "UTF-8") : null;
-		}
-		catch (UnsupportedEncodingException e) {
-			throw new UnsupportedOperationException(ERROR_UNSUPPORTED_ENCODING, e);
-		}
+		return (cookie != null) ? Utils.decodeURL(cookie.getValue()) : null;
 	}
 
 	/**
@@ -1091,12 +1075,7 @@ public final class Faces {
 	 */
 	public static void addResponseCookie(String name, String value, String path, int maxAge) {
 		if (value != null) {
-			try {
-				value = URLEncoder.encode(value, "UTF-8");
-			}
-			catch (UnsupportedEncodingException e) {
-				throw new UnsupportedOperationException(ERROR_UNSUPPORTED_ENCODING, e);
-			}
+			value = Utils.encodeURL(value);
 		}
 
 		ExternalContext externalContext = getExternalContext();
@@ -1667,7 +1646,7 @@ public final class Faces {
 		externalContext.setResponseBufferSize(DEFAULT_SENDFILE_BUFFER_SIZE);
 		externalContext.setResponseContentType(getMimeType(filename));
 		externalContext.setResponseHeader("Content-Disposition", String.format("%s;filename=\"%s\"",
-			(attachment ? "attachment" : "inline"), URLEncoder.encode(filename, "UTF-8")));
+			(attachment ? "attachment" : "inline"), Utils.encodeURL(filename)));
 
 		// Not exactly mandatory, but this fixes at least a MSIE quirk: http://support.microsoft.com/kb/316431
 		if (((HttpServletRequest) externalContext.getRequest()).isSecure()) {

@@ -12,8 +12,8 @@
  */
 package org.omnifaces.util;
 
-import static java.util.Collections.emptyList;
-import static java.util.regex.Pattern.quote;
+import static java.util.Collections.*;
+import static java.util.regex.Pattern.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -23,6 +23,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
@@ -59,6 +61,7 @@ public final class Utils {
 	private static final int DEFAULT_STREAM_BUFFER_SIZE = 10240;
 	private static final String PATTERN_RFC1123_DATE = "EEE, dd MMM yyyy HH:mm:ss zzz";
 	private static final TimeZone TIMEZONE_GMT = TimeZone.getTimeZone("GMT");
+	private static final String ERROR_UNSUPPORTED_ENCODING = "UTF-8 is apparently not supported on this machine.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -156,7 +159,7 @@ public final class Utils {
 
 		return false;
 	}
-	
+
 	/**
 	 * Returns <code>true</code> if the given string starts with one of the given prefixes.
 	 * @param string The object to be checked if it starts with one of the given prefixes.
@@ -170,7 +173,7 @@ public final class Utils {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 
@@ -261,7 +264,7 @@ public final class Utils {
 
 		return Collections.unmodifiableSet(set);
 	}
-	
+
 	/**
 	 * Converts comma separated values in a string into a list with those values.
 	 * <p>
@@ -272,11 +275,11 @@ public final class Utils {
 	 * <li>"bar"</li>
 	 * <li>"kaz"</li>
 	 * </ul>
-	 * 
+	 *
 	 * Note that whitespace will be stripped. Empty entries are not supported. This method defaults to
 	 * using a comma (<code>","</code>) as delimiter. See {@link Utils#csvToList(String, String)} for when
 	 * a different delimiter is needed.
-	 * 
+	 *
 	 * @param values string with comma separated values
 	 * @return a list with all values encountered in the <code>values</argument>, can be the empty list.
 	 * @since 1.4
@@ -284,7 +287,7 @@ public final class Utils {
 	public static List<String> csvToList(String values) {
 		return csvToList(values, ",");
 	}
-	
+
 	/**
 	 * Converts comma separated values in a string into a list with those values.
 	 * <p>
@@ -295,29 +298,29 @@ public final class Utils {
 	 * <li>"bar"</li>
 	 * <li>"kaz"</li>
 	 * </ul>
-	 * 
+	 *
 	 * Note that whitespace will be stripped. Empty entries are not supported.
-	 * 
+	 *
 	 * @param values string with comma separated values
 	 * @param delimiter the delimiter used to separate the actual values in the <code>values</code> parameter.
 	 * @return a list with all values encountered in the <code>values</argument>, can be the empty list.
 	 * @since 1.4
 	 */
 	public static List<String> csvToList(String values, String delimiter) {
-		
+
 		if (isEmpty(values)) {
 			return emptyList();
 		}
-		
+
 		List<String> list = new ArrayList<String>();
-		
+
 		for (String value : values.split(quote(delimiter))) {
 			String trimmedValue = value.trim();
 			if (!isEmpty(trimmedValue)) {
 				list.add(trimmedValue);
 			}
 		}
-		
+
 		return list;
 	}
 
@@ -405,6 +408,46 @@ public final class Utils {
 		catch (Exception e) {
 			// This will occur when the string is not in valid Base64 or ZLIB format.
 			throw new IllegalArgumentException(e);
+		}
+	}
+
+	/**
+	 * URL-encode the given string using UTF-8.
+	 * @param string The string to be URL-encoded using UTF-8.
+	 * @return The given string, URL-encoded using UTF-8, or <code>null</code> if <code>null</code> was given.
+	 * @throws UnsupportedOperationException When UTF-8 is not supported.
+	 * @since 1.4
+	 */
+	public static String encodeURL(String string) {
+		if (string == null) {
+			return null;
+		}
+
+		try {
+			return URLEncoder.encode(string, "UTF-8");
+		}
+		catch (UnsupportedEncodingException e) {
+			throw new UnsupportedOperationException(ERROR_UNSUPPORTED_ENCODING, e);
+		}
+	}
+
+	/**
+	 * URL-decode the given string using UTF-8.
+	 * @param string The string to be URL-decode using UTF-8.
+	 * @return The given string, URL-decode using UTF-8, or <code>null</code> if <code>null</code> was given.
+	 * @throws UnsupportedOperationException When UTF-8 is not supported.
+	 * @since 1.4
+	 */
+	public static String decodeURL(String string) {
+		if (string == null) {
+			return null;
+		}
+
+		try {
+			return URLDecoder.decode(string, "UTF-8");
+		}
+		catch (UnsupportedEncodingException e) {
+			throw new UnsupportedOperationException(ERROR_UNSUPPORTED_ENCODING, e);
 		}
 	}
 
