@@ -12,6 +12,8 @@
  */
 package org.omnifaces.el;
 
+import java.lang.reflect.Method;
+
 import javax.el.ELContext;
 import javax.el.ELException;
 import javax.el.ELResolver;
@@ -65,8 +67,11 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 	}
 	
 	@Override
-	public MethodInfo getMethodInfo(ELContext context) {				
-		return new MethodInfo(null, valueExpression.getExpectedType(), null);
+	public MethodInfo getMethodInfo(ELContext context) {
+		
+		Method method = ExpressionInspector.getMethodReference(context, valueExpression).getMethod();
+		
+		return new MethodInfo(method.getName(), method.getReturnType(), method.getParameterTypes());
 	}
 
 	@Override
