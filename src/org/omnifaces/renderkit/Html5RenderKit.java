@@ -45,13 +45,13 @@ import org.omnifaces.util.Utils;
  * <li><code>UISelectBoolean</code>, <code>UISelectOne</code> and <code>UISelectMany</code>:
  * <ul><li><code>autofocus</code></li></ul></li>
  * <li><code>HtmlInputTextarea</code>: <ul><li><code>autofocus</code></li><li><code>maxlength</code></li>
- * <li><code>placeholder</code></li><li><code>wrap</code></li></ul></li>
+ * <li><code>placeholder</code></li><li><code>spellcheck</code></li><li><code>wrap</code></li></ul></li>
  * <li><code>HtmlInputText</code>: <ul><li><code>type</code> (supported values are
  * <code>text</code> (default), <code>search</code>, <code>email</code>, <code>url</code>, <code>tel</code>,
  * <code>range</code>, <code>number</code> and <code>date</code>)</li><li><code>autofocus</code></li>
- * <li><code>list</code></li><li><code>pattern</code></li><li><code>placeholder</code></li><li><code>min</code></li>
- * <li><code>max</code></li><li><code>step</code></li></ul>(the latter three are only supported on <code>type</code> of
- * <code>range</code>, <code>number</code> and <code>date</code>)</li>
+ * <li><code>list</code></li><li><code>pattern</code></li><li><code>placeholder</code></li><li><code>spellcheck</code>
+ * </li><li><code>min</code></li><li><code>max</code></li><li><code>step</code></li></ul>(the latter three are only
+ * supported on <code>type</code> of <code>range</code>, <code>number</code> and <code>date</code>)</li>
  * <li><code>HtmlCommandButton</code>: <ul><li><code>autofocus</code></li></ul></li>
  * </ul>
  * <p>
@@ -116,13 +116,13 @@ public class Html5RenderKit extends RenderKitWrapper {
 		);
 
 		private static final Set<String> HTML5_TEXTAREA_ATTRIBUTES = Utils.unmodifiableSet(
-			"autofocus", "maxlength", "placeholder", "wrap"
+			"autofocus", "maxlength", "placeholder", "spellcheck", "wrap"
 			// "form" attribute is not useable in a JSF form.
 			// "required" attribute can't be used as it would override JSF default "required" attribute behaviour.
 		);
 
 		private static final Set<String> HTML5_INPUT_ATTRIBUTES = Utils.unmodifiableSet(
-			"autofocus", "list", "pattern", "placeholder"
+			"autofocus", "list", "pattern", "placeholder", "spellcheck"
 			// "form*" attributes are not useable in a JSF form.
 			// "multiple" attribute is only applicable on <input type="email"> and <input type="file"> and can't be
 			// decoded by standard HtmlInputText.
