@@ -35,6 +35,7 @@ import org.omnifaces.util.Callback;
 import org.omnifaces.util.Events;
 import org.omnifaces.util.Exceptions;
 import org.omnifaces.util.Faces;
+import org.omnifaces.util.Hacks;
 
 /**
  * This exception handler enables you to show the full error page in its entirety to the end-user in case of exceptions
@@ -238,6 +239,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 		else {
 			try {
 				// We're already in render response phase. JSF won't re-execute it. Re-execute it manually.
+				Hacks.removeResourceDependencyState(context);
 				ViewDeclarationLanguage vdl = viewHandler.getViewDeclarationLanguage(context, viewId);
 				vdl.buildView(context, viewRoot);
 				context.getApplication().publishEvent(context, PreRenderViewEvent.class, viewRoot);

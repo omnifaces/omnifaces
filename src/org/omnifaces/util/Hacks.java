@@ -51,17 +51,24 @@ public final class Hacks {
 	private static final boolean RICHFACES_INSTALLED = initRichFacesInstalled();
 	private static final boolean RICHFACES_RESOURCE_OPTIMIZATION_ENABLED =
 		RICHFACES_INSTALLED && Boolean.valueOf(Faces.getInitParameter("org.richfaces.resourceOptimization.enabled"));
-	private static final boolean JUEL_SUPPORTS_METHOD_EXPRESSION = initJUELSupportsMethodExpression();
 	private static final String RICHFACES_PVC_CLASS_NAME =
 		"org.richfaces.context.ExtendedPartialViewContextImpl";
 	private static final String RICHFACES_RLR_RENDERER_TYPE =
 		"org.richfaces.renderkit.ResourceLibraryRenderer";
 	private static final String RICHFACES_RLF_CLASS_NAME =
 		"org.richfaces.resource.ResourceLibraryFactoryImpl";
-	private static final String JUEL_EF_CLASS_NAME = 
+
+	private static final boolean JUEL_SUPPORTS_METHOD_EXPRESSION = initJUELSupportsMethodExpression();
+	private static final String JUEL_EF_CLASS_NAME =
 		"de.odysseus.el.ExpressionFactoryImpl";
-	private static final String JUEL_MINIMUM_METHOD_EXPRESSION_VERSION = 
+	private static final String JUEL_MINIMUM_METHOD_EXPRESSION_VERSION =
 		"2.2.6";
+
+	private static final Set<String> MOJARRA_MYFACES_RESOURCE_DEPENDENCY_KEYS =
+		Utils.unmodifiableSet(
+			"com.sun.faces.PROCESSED_RESOURCE_DEPENDENCIES",
+			"org.apache.myfaces.RENDERED_SCRIPT_RESOURCES_SET",
+			"org.apache.myfaces.RENDERED_STYLESHEET_RESOURCES_SET");
 
 	private static final String ERROR_CREATE_INSTANCE =
 		"Cannot create instance of class '%s'.";
@@ -69,7 +76,7 @@ public final class Hacks {
 		"Cannot access field '%s' of class '%s'.";
 	private static final String ERROR_INVOKE_METHOD =
 		"Cannot invoke method '%s' of class '%s' with arguments %s.";
-	
+
 	private static final Object[] EMPTY_PARAMETERS = new Object[0];
 
 	// Constructors/init ----------------------------------------------------------------------------------------------
@@ -87,22 +94,22 @@ public final class Hacks {
 			return false;
 		}
 	}
-	
+
 	private static boolean initJUELSupportsMethodExpression() {
 		Package juelPackage = Package.getPackage("de.odysseus.el");
 		if (juelPackage == null) {
 			return false;
 		}
-		
+
 		String juelVersion = juelPackage.getImplementationVersion();
 		if (juelVersion == null) {
 			return false;
 		}
-		
+
 		return isSameOrHigherVersion(juelVersion, JUEL_MINIMUM_METHOD_EXPRESSION_VERSION);
 	}
-	
-	
+
+
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
@@ -214,37 +221,37 @@ public final class Hacks {
 
 		return resourceIdentifiers;
 	}
-	
+
 	public static boolean isJUELUsed() {
 		return isJUELUsed(Faces.getApplication().getExpressionFactory());
 	}
-	
+
 	public static boolean isJUELUsed(ExpressionFactory factory) {
 		return factory.getClass().getName().equals(JUEL_EF_CLASS_NAME);
 	}
-	
+
 	public static boolean isJUELSupportingMethodExpression() {
 		return JUEL_SUPPORTS_METHOD_EXPRESSION;
 	}
-	
+
 	/**
 	 * Checks if the given version1 is the same or a higher version than version2.
-	 * 
+	 *
 	 * @param version1 the first version in the comparison
 	 * @param version2 the second version in the comparison
 	 * @return true if version1 is the same or a higher version than version2, false otherwise
 	 */
 	public static boolean isSameOrHigherVersion(String version1, String version2) {
-		
+
 		List<Integer> version1Elements = toVersionElements(version1);
 		List<Integer> version2Elements = toVersionElements(version2);
-		
+
 		int maxLength = Math.max(version1Elements.size(), version2Elements.size());
-		
+
 		for (int i = 0; i< maxLength; i++) {
 			int version1Element = getVersionElement(version1Elements, i);
 			int version2Element = getVersionElement(version2Elements, i);
-			
+
 			if (version1Element > version2Element) {
 				return true;
 			}
@@ -252,39 +259,39 @@ public final class Hacks {
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	private static List<Integer> toVersionElements(String version) {
 
 		List<Integer> versionElements = new ArrayList<Integer>();
 		for (String string : version.split("\\.")) {
 			versionElements.add(Integer.valueOf(string));
 		}
-		
+
 		return versionElements;
 	}
-	
+
 	private static int getVersionElement(List<Integer> versionElements, int index) {
 		if (index < versionElements.size()) {
 			return versionElements.get(index);
 		}
-		
+
 		return 0;
 	}
-	
+
 	/**
 	 * This method wraps a <code>MethodExpression</code> in a <code>Method</code> which can be statically invoked.
 	 * <p>
 	 * Since Method is a final class with only a non-public constructor, various reflective tricks have been used to
 	 * create an instance of this class and make sure it calls the given method expression. It has been tested on the
 	 * Sun/Oracle JDK versions 6 and 7, and it should work on OpenJDK 6 and 7 as well. Other JDKs might not work.
-	 * 
+	 *
 	 * @param context
 	 *            the context used for evaluation of the method expression when it's invoked later. NOTE, this reference
 	 *            is retained by the returned method.
-	 * 
+	 *
 	 * @param methodExpression
 	 *            the method expression to be wrapped
 	 * @return a Method instance that when invoked causes the wrapped method expression to be invoked.
@@ -296,13 +303,13 @@ public final class Hacks {
 		try {
 			// Create a Method instance with the signature (return type, name, parameter types) corresponding
 			// to the method the MethodExpression references.
-			Constructor<Method> methodConstructor = Method.class.getDeclaredConstructor(Class.class, 
+			Constructor<Method> methodConstructor = Method.class.getDeclaredConstructor(Class.class,
 				String.class, Class[].class, Class.class,
 				Class[].class, int.class, int.class, String.class, byte[].class, byte[].class, byte[].class
 			);
 			methodConstructor.setAccessible(true);
-			Method staticMethod = methodConstructor.newInstance(null, 
-				methodInfo.getName(), methodInfo.getParamTypes(), methodInfo.getReturnType(), 
+			Method staticMethod = methodConstructor.newInstance(null,
+				methodInfo.getName(), methodInfo.getParamTypes(), methodInfo.getReturnType(),
 				null, 0, 0, null, null, null, null
 			);
 
@@ -317,7 +324,7 @@ public final class Hacks {
 
 						@Override
 						public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-							
+
 							Object[] params = null;
 							if (args != null && args.length > 1) {
 								// args[0] should be the Object on which the method is to be invoked (null in case of static call)
@@ -326,7 +333,7 @@ public final class Hacks {
 							} else {
 								params = EMPTY_PARAMETERS;
 							}
-							
+
 							return methodExpression.invoke(context, params);
 						}
 					});
@@ -340,14 +347,26 @@ public final class Hacks {
 			Field override = AccessibleObject.class.getDeclaredField("override");
 			override.setAccessible(true);
 			override.set(staticMethod, true);
-			
+
 			return staticMethod;
-		} 
+		}
 		catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
 	}
-	
+
+	/**
+	 * Remove the resource dependency processing related attributes from the given faces context.
+	 * @param context The involved faces context.
+	 */
+	public static void removeResourceDependencyState(FacesContext context) {
+		// Mojarra and MyFaces remembers processed resource dependencies in a map.
+		context.getAttributes().keySet().removeAll(MOJARRA_MYFACES_RESOURCE_DEPENDENCY_KEYS);
+
+		// PrimeFaces puts "namelibrary=true" for every processed resource dependency.
+		// TODO: This may possibly conflict with other keys with value=true. So far tested, this is harmless.
+		context.getAttributes().values().removeAll(Collections.singleton(true));
+	}
 
 	// Some reflection helpers ----------------------------------------------------------------------------------------
 
