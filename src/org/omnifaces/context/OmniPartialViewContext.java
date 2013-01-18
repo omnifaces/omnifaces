@@ -45,7 +45,7 @@ import org.omnifaces.util.Json;
  * You can use the {@link Ajax} utility class to easily add callback scripts and arguments.
  * <p>
  * This partial view context is already registered by OmniFaces' own <tt>faces-config.xml</tt> and thus gets
- * auto-initialized when the OmniFaces JAR is bundled in a web application, so end-users do not need to register this 
+ * auto-initialized when the OmniFaces JAR is bundled in a web application, so end-users do not need to register this
  * partial view context explicitly themselves.
  *
  * @author Bauke Scholtz
@@ -81,7 +81,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 	@Override
 	public PartialResponseWriter getPartialResponseWriter() {
 		if (writer == null) {
-			writer = new OmniPartialResponseWriter(this, wrapped.getPartialResponseWriter());
+			writer = new OmniPartialResponseWriter(this, getWrapped().getPartialResponseWriter());
 		}
 
 		return writer;
@@ -89,7 +89,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
 	@Override
 	public void setPartialRequest(boolean isPartialRequest) {
-		wrapped.setPartialRequest(isPartialRequest);
+		getWrapped().setPartialRequest(isPartialRequest);
 	}
 
 	@Override
@@ -145,7 +145,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 	 * @see FullAjaxExceptionHandler
 	 */
 	public void closePartialResponse() {
-		if (writer.updating) {
+		if (writer != null && writer.updating) {
 			try {
 				writer.endUpdate();
 				writer.endDocument();

@@ -31,6 +31,8 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.omnifaces.config.WebXml;
 import org.omnifaces.context.OmniPartialViewContext;
+import org.omnifaces.util.Callback;
+import org.omnifaces.util.Events;
 import org.omnifaces.util.Exceptions;
 import org.omnifaces.util.Faces;
 
@@ -195,20 +197,12 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 			request.setAttribute(ATTRIBUTE_ERROR_REQUEST_URI, request.getRequestURI());
 			request.setAttribute(ATTRIBUTE_ERROR_STATUS_CODE, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 
-			// Force JSF to render the error page in its entirety to the ajax response.
 			try {
-				renderErrorPageView(context, errorPageLocation);
+				renderErrorPageView(context, request, errorPageLocation);
 			}
 			catch (IOException e) {
 				throw new FacesException(e);
 			}
-			finally {
-				// Prevent some servlet containers from handling error page itself afterwards. So far Tomcat/JBoss
-				// are known to do that. It would only result in IllegalStateException "response already committed".
-				request.removeAttribute(ATTRIBUTE_ERROR_EXCEPTION);
-			}
-
-			context.responseComplete();
 		}
 
 		while (unhandledExceptionQueuedEvents.hasNext()) {
@@ -218,17 +212,42 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 		}
 	}
 
-	private void renderErrorPageView(FacesContext context, String errorPageLocation) throws IOException {
+	private void renderErrorPageView(FacesContext context, final HttpServletRequest request, String errorPageLocation)
+		throws IOException
+	{
 		String viewId = Faces.normalizeViewId(errorPageLocation);
 		ViewHandler viewHandler = context.getApplication().getViewHandler();
 		UIViewRoot viewRoot = viewHandler.createView(context, viewId);
 		context.setViewRoot(viewRoot);
 		context.getPartialViewContext().setRenderAll(true);
-		ViewDeclarationLanguage vdl = viewHandler.getViewDeclarationLanguage(context, viewId);
-		context.getAttributes().clear();
-		vdl.buildView(context, viewRoot);
-		context.getApplication().publishEvent(context, PreRenderViewEvent.class, viewRoot);
-		vdl.renderView(context, viewRoot);
+
+		if (context.getCurrentPhaseId() != PhaseId.RENDER_RESPONSE) {
+			Events.setCallbackAfterPhaseListener(PhaseId.RENDER_RESPONSE, new Callback.Void() {
+				@Override
+				public void invoke() {
+					// Prevent some servlet containers from handling error page itself afterwards. So far Tomcat/JBoss
+					// are known to do that. It would only result in IllegalStateException "response already committed"
+					// or "getOutputStream() has already been called for this response".
+					request.removeAttribute(ATTRIBUTE_ERROR_EXCEPTION);
+				}
+			});
+
+			// Let JSF do the job during render response.
+			context.renderResponse();
+		}
+		else {
+			try {
+				// We're already in render response phase. JSF won't re-execute it. Re-execute it manually.
+				ViewDeclarationLanguage vdl = viewHandler.getViewDeclarationLanguage(context, viewId);
+				vdl.buildView(context, viewRoot);
+				context.getApplication().publishEvent(context, PreRenderViewEvent.class, viewRoot);
+				vdl.renderView(context, viewRoot);
+				context.responseComplete();
+			}
+			finally {
+				request.removeAttribute(ATTRIBUTE_ERROR_EXCEPTION);
+			}
+		}
 	}
 
 	@Override
