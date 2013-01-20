@@ -121,7 +121,7 @@ public class ListTreeModel<T> implements TreeModel<T> {
 
 	@Override
 	public String getIndex() {
-		return parent == null ? null : (parent.getIndex() == null ? "" : parent.getIndex() + "_") + index;
+		return parent == null ? null : (parent.parent == null ? "" : parent.getIndex() + "_") + index;
 	}
 
 	// Checkers -------------------------------------------------------------------------------------------------------

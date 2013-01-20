@@ -38,10 +38,10 @@ import javax.faces.context.PartialViewContextWrapper;
 import org.omnifaces.resourcehandler.ResourceIdentifier;
 
 /**
- * Collection of JSF implementation and/or JSF component library specific hacks. So far now there are only RichFaces
- * specific hacks to get OmniFaces to work nicely together with RichFaces.
+ * Collection of JSF implementation and/or JSF component library specific hacks.
  *
  * @author Bauke Scholtz
+ * @author Arjan Tijms
  * @since 1.3
  */
 public final class Hacks {
@@ -108,8 +108,6 @@ public final class Hacks {
 
 		return isSameOrHigherVersion(juelVersion, JUEL_MINIMUM_METHOD_EXPRESSION_VERSION);
 	}
-
-
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
