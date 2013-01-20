@@ -24,6 +24,7 @@ import javax.faces.component.UIInput;
 import javax.faces.component.UISelectBoolean;
 import javax.faces.component.UISelectMany;
 import javax.faces.component.UISelectOne;
+import javax.faces.component.html.HtmlInputSecret;
 import javax.faces.component.html.HtmlInputText;
 import javax.faces.component.html.HtmlInputTextarea;
 import javax.faces.context.ResponseWriter;
@@ -129,6 +130,12 @@ public class Html5RenderKit extends RenderKitWrapper {
 			// "required" attribute can't be used as it would override JSF default "required" attribute behaviour.
 		);
 
+		private static final Set<String> HTML5_INPUT_PASSWORD_ATTRIBUTES = Utils.unmodifiableSet(
+			"autofocus", "pattern", "placeholder"
+			// "form*" attributes are not useable in a JSF form.
+			// "required" attribute can't be used as it would override JSF default "required" attribute behaviour.
+		);
+
 		private static final Set<String> HTML5_INPUT_RANGE_ATTRIBUTES = Utils.unmodifiableSet(
 			"max", "min", "step"
 		);
@@ -185,6 +192,9 @@ public class Html5RenderKit extends RenderKitWrapper {
 					if (HTML5_INPUT_RANGE_TYPES.contains(attributes.get("type"))) {
 						writeHtml5AttributesIfNecessary(attributes, HTML5_INPUT_RANGE_ATTRIBUTES);
 					}
+				}
+				else if (component instanceof HtmlInputSecret && "input".equals(name)) {
+					writeHtml5AttributesIfNecessary(component.getAttributes(), HTML5_INPUT_PASSWORD_ATTRIBUTES);
 				}
 				else if (component instanceof HtmlInputTextarea && "textarea".equals(name)) {
 					writeHtml5AttributesIfNecessary(component.getAttributes(), HTML5_TEXTAREA_ATTRIBUTES);
