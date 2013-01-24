@@ -79,7 +79,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
         String resource = request.getServletPath();
         if (isExtensionless(resource)) {
         	
-        	ServletContext context = request.getServletContext();
+        	ServletContext context = getServletContext();
             Map<String, String> resources = getApplicationAttribute(context, FACES_VIEWS_RESOURCES_PARAM_NAME);
         	
         	if (getApplication().getProjectStage() == Development && !resources.containsKey(resource)) {
