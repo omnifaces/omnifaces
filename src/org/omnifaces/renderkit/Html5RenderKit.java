@@ -53,6 +53,8 @@ import org.omnifaces.util.Utils;
  * <li><code>list</code></li><li><code>pattern</code></li><li><code>placeholder</code></li><li><code>spellcheck</code>
  * </li><li><code>min</code></li><li><code>max</code></li><li><code>step</code></li></ul>(the latter three are only
  * supported on <code>type</code> of <code>range</code>, <code>number</code> and <code>date</code>)</li>
+ * <li><code>HtmlInputSecret</code>: <ul><li><code>autofocus</code></li><li><code>pattern</code></li><li><code>
+ * placeholder</code></li></ul></li>
  * <li><code>HtmlCommandButton</code>: <ul><li><code>autofocus</code></li></ul></li>
  * </ul>
  * <p>
