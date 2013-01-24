@@ -42,6 +42,7 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 	private int contentLength;
 	private String vary;
 	private boolean noGzip;
+	private boolean closing;
 	private GzipThresholdOutputStream output;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
@@ -117,6 +118,13 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 				output.reset();
 			}
 		}
+	}
+
+	@Override
+	public void close() throws IOException {
+		closing = true;
+		super.close();
+		closing = false;
 	}
 
 	@Override
@@ -231,7 +239,7 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 		private OutputStream createGzipOutputStreamIfNecessary(boolean gzip) throws IOException {
 			ServletResponse originalResponse = getResponse();
 
-			if (gzip && !noGzip && !isCommitted()) {
+			if (gzip && !noGzip && (closing || !isCommitted())) {
 				String contentType = getContentType();
 
 				if (contentType != null && mimetypes.contains(contentType.split(";", 2)[0])) {
