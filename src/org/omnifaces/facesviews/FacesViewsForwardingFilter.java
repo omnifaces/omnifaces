@@ -14,7 +14,7 @@
 package org.omnifaces.facesviews;
 
 import static javax.faces.application.ProjectStage.Development;
-import static org.omnifaces.facesviews.FacesViewsResolver.FACES_VIEWS_RESOURCES_PARAM_NAME;
+import static org.omnifaces.facesviews.FacesViewsUtils.FACES_VIEWS_RESOURCES;
 import static org.omnifaces.facesviews.FacesViewsUtils.getApplication;
 import static org.omnifaces.facesviews.FacesViewsUtils.getApplicationAttribute;
 import static org.omnifaces.facesviews.FacesViewsUtils.isExtensionless;
@@ -51,6 +51,8 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
+    	
+    	super.init(filterConfig);
 
         // Mostly for pre-Servlet 3.0: scan the views if the auto-configure listener hasn't done this yet.
         tryScanAndStoreViews(filterConfig.getServletContext());
@@ -80,7 +82,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
         if (isExtensionless(resource)) {
         	
         	ServletContext context = getServletContext();
-            Map<String, String> resources = getApplicationAttribute(context, FACES_VIEWS_RESOURCES_PARAM_NAME);
+            Map<String, String> resources = getApplicationAttribute(context, FACES_VIEWS_RESOURCES);
         	
         	if (getApplication().getProjectStage() == Development && !resources.containsKey(resource)) {
         		// Check if the resource was dynamically added by scanning the faces-views location(s) again.

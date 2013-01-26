@@ -17,7 +17,6 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.regex.Pattern.quote;
 import static javax.faces.FactoryFinder.APPLICATION_FACTORY;
-import static org.omnifaces.facesviews.FacesViewsResolver.FACES_VIEWS_RESOURCES_PARAM_NAME;
 import static org.omnifaces.util.Utils.csvToList;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.startsWithOneOf;
@@ -48,6 +47,11 @@ final public class FacesViewsUtils {
 	}
 
 	public static final String WEB_INF_VIEWS = "/WEB-INF/faces-views/";
+	
+	/**
+	 * Web context parameter to switch auto-scanning completely off for Servlet 3.0 containers.
+	 */
+    public static final String FACES_VIEWS_ENABLED_PARAM_NAME = "org.omnifaces.FACES_VIEWS_ENABLED";
 
 	/**
 	 * The name of the init parameter (in web.xml) where the value holds a comma separated list of paths that are to be
@@ -70,9 +74,13 @@ final public class FacesViewsUtils {
 
 	/**
 	 * The name of the application scope context parameter under which a Boolean version of the scanned views always
-	 * exentionless init parameter is kept.
+	 * exensionless init parameter is kept.
 	 */
-	public static final String SCANNED_VIEWS_EXTENSIONLESS = "org.omnifaces.facesviews.scannedviewsextenstionless";
+	public static final String SCANNED_VIEWS_EXTENSIONLESS = "org.omnifaces.facesviews.scannedviewsextensionless";
+	
+	public static final String FACES_VIEWS_RESOURCES = "org.omnifaces.facesviews";
+    public static final String FACES_VIEWS_RESOURCES_EXTENSIONS = "org.omnifaces.facesviews.extensions";
+    
 
 	/**
 	 * Gets the JSF Application instance.
@@ -326,7 +334,7 @@ final public class FacesViewsUtils {
 	 * @param context
 	 */
 	public static void tryScanAndStoreViews(ServletContext context) {
-		if (getApplicationAttribute(context, FACES_VIEWS_RESOURCES_PARAM_NAME) == null) {
+		if (getApplicationAttribute(context, FACES_VIEWS_RESOURCES) == null) {
 			scanAndStoreViews(context);
 		}
 	}
@@ -341,7 +349,7 @@ final public class FacesViewsUtils {
 	public static Map<String, String> scanAndStoreViews(ServletContext context) {
 		Map<String, String> views = scanViews(context);
 		if (!views.isEmpty()) {
-			context.setAttribute(FACES_VIEWS_RESOURCES_PARAM_NAME, unmodifiableMap(views));
+			context.setAttribute(FACES_VIEWS_RESOURCES, unmodifiableMap(views));
 		}
 		return views;
 	}

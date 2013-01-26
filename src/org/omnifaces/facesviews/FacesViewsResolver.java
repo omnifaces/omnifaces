@@ -34,8 +34,6 @@ import org.omnifaces.util.Faces;
  */
 public class FacesViewsResolver extends ResourceResolver {
 
-    public static final String FACES_VIEWS_RESOURCES_PARAM_NAME = "org.omnifaces.facesviews";
-
     private final ResourceResolver resourceResolver;
 
     public FacesViewsResolver(ResourceResolver resourceResolver) {
@@ -59,7 +57,7 @@ public class FacesViewsResolver extends ResourceResolver {
 
 	private String getMappedPath(String path) {
 		String facesViewsPath = path;
-		Map<String, String> mappedResources = Faces.getApplicationAttribute(FACES_VIEWS_RESOURCES_PARAM_NAME);
+		Map<String, String> mappedResources = Faces.getApplicationAttribute(FACES_VIEWS_RESOURCES);
 		if (mappedResources != null && mappedResources.containsKey(path)) {
 			facesViewsPath = mappedResources.get(path);
 		}

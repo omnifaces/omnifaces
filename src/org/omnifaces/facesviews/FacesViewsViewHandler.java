@@ -13,7 +13,7 @@
 
 package org.omnifaces.facesviews;
 
-import static org.omnifaces.facesviews.FacesViewsResolver.FACES_VIEWS_RESOURCES_PARAM_NAME;
+import static org.omnifaces.facesviews.FacesViewsUtils.FACES_VIEWS_RESOURCES;
 import static org.omnifaces.facesviews.FacesViewsUtils.getApplicationAttribute;
 import static org.omnifaces.facesviews.FacesViewsUtils.getRequestAttribute;
 import static org.omnifaces.facesviews.FacesViewsUtils.isExtensionless;
@@ -46,7 +46,7 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 	@Override
 	public String getActionURL(FacesContext context, String viewId) {
 
-		Map<String, String> mappedResources = getApplicationAttribute(context, FACES_VIEWS_RESOURCES_PARAM_NAME);
+		Map<String, String> mappedResources = getApplicationAttribute(context, FACES_VIEWS_RESOURCES);
 		if (mappedResources.containsKey(viewId)) {
 
 			String originalViewId = getRequestAttribute(context, "javax.servlet.forward.servlet_path");

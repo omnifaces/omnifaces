@@ -90,7 +90,7 @@
  * The following context parameters are available.
  * <table>
  * <tr>
- * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViewsInitializerListener#FACES_VIEWS_ENABLED_PARAM_NAME}</code></td>
+ * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViewsUtils#FACES_VIEWS_ENABLED_PARAM_NAME}</code></td>
  * <td>Used to completely switch scanning off. Allowed values: {<code>true</code>,<code>false</code>} Default: <code>true</code>
  * (note that if no <code>/WEB-INF/faces-views</code> directory is present, no scanning will be done either)</td>
  * </tr>
