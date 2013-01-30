@@ -12,11 +12,13 @@
  */
 package org.omnifaces.taghandler;
 
+import static org.omnifaces.taghandler.RenderTimeTagHandlerHelper.*;
+
 import java.io.IOException;
+import java.io.Serializable;
 
 import javax.el.ELContext;
 import javax.el.ValueExpression;
-import javax.faces.FacesException;
 import javax.faces.application.Application;
 import javax.faces.component.EditableValueHolder;
 import javax.faces.component.UIComponent;
@@ -24,8 +26,14 @@ import javax.faces.context.FacesContext;
 import javax.faces.validator.ValidatorException;
 import javax.faces.view.facelets.ComponentHandler;
 import javax.faces.view.facelets.FaceletContext;
-import javax.faces.view.facelets.TagConfig;
+import javax.faces.view.facelets.TagAttribute;
+import javax.faces.view.facelets.TagHandlerDelegate;
+import javax.faces.view.facelets.ValidatorConfig;
+import javax.faces.view.facelets.ValidatorHandler;
 
+import org.omnifaces.taghandler.RenderTimeTagHandlerHelper.RenderTimeAttributes;
+import org.omnifaces.taghandler.RenderTimeTagHandlerHelper.RenderTimeTagHandler;
+import org.omnifaces.taghandler.RenderTimeTagHandlerHelper.RenderTimeTagHandlerDelegate;
 import org.omnifaces.util.Components;
 import org.omnifaces.util.Messages;
 
@@ -56,49 +64,50 @@ import org.omnifaces.util.Messages;
  *
  * @author Bauke Scholtz
  */
-public class Validator extends RenderTimeTagHandler {
-
-	// Private constants ----------------------------------------------------------------------------------------------
-
-	private static final String ERROR_MISSING_VALIDATORID =
-		"o:validator attribute 'validatorId' or 'binding' must be specified.";
-	private static final String ERROR_INVALID_VALIDATORID =
-		"o:validator attribute 'validatorId' must refer an valid validator ID. The validator ID '%s' cannot be found.";
+public class Validator extends ValidatorHandler implements RenderTimeTagHandler {
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * The tag constructor.
-	 * @param config The tag config.
+	 * The constructor.
+	 * @param config The validator config.
 	 */
-	public Validator(TagConfig config) {
+	public Validator(ValidatorConfig config) {
 		super(config);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * If the parent component is new, then create the {@link javax.faces.validator.Validator} based on the
-	 * <code>binding</code> and/or <code>validatorId</code> attributes as per the standard JSF
-	 * <code>&lt;f:validator&gt;</code> implementation and collect the render time attributes. Then create an anonymous
-	 * <code>Validator</code> implementation which wraps the created <code>Validator</code> and delegates the methods
-	 * to it after setting the render time attributes only and only if the <code>disabled</code> attribute evaluates
-	 * <code>true</code> for the current request. Finally set the anonymous implementation on the parent component.
+	 * Create a {@link javax.faces.validator.Validator} based on the <code>binding</code> and/or
+	 * <code>validatorId</code> attributes as per the standard JSF <code>&lt;f:validator&gt;</code> implementation and
+	 * collect the render time attributes. Then create an anonymous <code>Validator</code> implementation which wraps
+	 * the created <code>Validator</code> and delegates the methods to it after setting the render time attributes only
+	 * and only if the <code>disabled</code> attribute evaluates <code>true</code> for the current request. Finally set
+	 * the anonymous implementation on the parent component.
 	 * @param context The involved facelet context.
 	 * @param parent The parent component to add the <code>Validator</code> to.
 	 * @throws IOException If something fails at I/O level.
 	 */
 	@Override
 	public void apply(FaceletContext context, UIComponent parent) throws IOException {
-		if (!ComponentHandler.isNew(parent)) {
+		if (!ComponentHandler.isNew(parent) && UIComponent.getCompositeComponentParent(parent) == null) {
+			// If it's not new nor inside a composite component, we're finished.
 			return;
 		}
 
-		final javax.faces.validator.Validator validator = createValidator(context);
-		final RenderTimeAttributes attributes = collectRenderTimeAttributes(context, validator);
-		final ValueExpression disabled = getValueExpression(context, "disabled", Boolean.class);
-		final ValueExpression message = getValueExpression(context, "message", String.class);
-		((EditableValueHolder) parent).addValidator(new javax.faces.validator.Validator() {
+		if (!(parent instanceof EditableValueHolder)) {
+			// It's likely a composite component. TagHandlerDelegate will pickup it and pass the target component back.
+			super.apply(context, parent);
+			return;
+		}
+
+		final javax.faces.validator.Validator validator = createInstance(context, this, "validatorId");
+		final RenderTimeAttributes attributes = collectRenderTimeAttributes(context, this, validator);
+		final ValueExpression disabled = getValueExpression(context, this, "disabled", Boolean.class);
+		final ValueExpression message = getValueExpression(context, this, "message", String.class);
+		((EditableValueHolder) parent).addValidator(new RenderTimeValidator() {
+			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void validate(FacesContext context, UIComponent component, Object value) throws ValidatorException {
@@ -128,43 +137,36 @@ public class Validator extends RenderTimeTagHandler {
 		});
 	}
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T> T create(Application application, String id) {
+		return (T) application.createValidator(id);
+	}
+
+	@Override
+	public TagAttribute getTagAttribute(String name) {
+		return getAttribute(name);
+	}
+
+	@Override
+	protected TagHandlerDelegate getTagHandlerDelegate() {
+		return new RenderTimeTagHandlerDelegate(this, super.getTagHandlerDelegate());
+	}
+
+	@Override
+	public boolean isDisabled(FaceletContext context) {
+		return false; // Let the render time validator handle it.
+	}
+
+	// Nested classes -------------------------------------------------------------------------------------------------
 
 	/**
-	 * Create the validator based on the <code>binding</code> and/or <code>validatorId</code> attribute.
-	 * @param context The involved facelet context.
-	 * @return The created validator.
-	 * @throws IllegalArgumentException If the <code>validatorId</code> attribute is invalid or missing while the
-	 * <code>binding</code> attribute is also missing.
-	 * @see Application#createValidator(String)
+	 * So that we can have a serializable validator.
+	 *
+	 * @author Bauke Scholtz
 	 */
-	private javax.faces.validator.Validator createValidator(FaceletContext context) {
-		ValueExpression binding = getValueExpression(context, "binding", javax.faces.validator.Validator.class);
-		ValueExpression validatorId = getValueExpression(context, "validatorId", String.class);
-		javax.faces.validator.Validator validator = null;
-
-		if (binding != null) {
-			validator = (javax.faces.validator.Validator) binding.getValue(context);
-		}
-
-		if (validatorId != null) {
-			try {
-				validator = context.getFacesContext().getApplication()
-					.createValidator((String) validatorId.getValue(context));
-			}
-			catch (FacesException e) {
-				throw new IllegalArgumentException(String.format(ERROR_INVALID_VALIDATORID, validatorId));
-			}
-
-			if (binding != null) {
-				binding.setValue(context, validator);
-			}
-		}
-		else if (validator == null) {
-			throw new IllegalArgumentException(ERROR_MISSING_VALIDATORID);
-		}
-
-		return validator;
+	protected static abstract class RenderTimeValidator implements javax.faces.validator.Validator, Serializable {
+		private static final long serialVersionUID = 1L;
 	}
 
 }

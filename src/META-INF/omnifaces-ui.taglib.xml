@@ -1352,7 +1352,10 @@ input.error, select.error, textarea.error {
 			]]>
 		</description>
 		<tag-name>validator</tag-name>
-		<handler-class>org.omnifaces.taghandler.Validator</handler-class>
+		<validator>
+			<validator-id>omnifaces.Validator</validator-id>
+			<handler-class>org.omnifaces.taghandler.Validator</handler-class>
+		</validator>
 		<attribute>
 			<description>
 				<![CDATA[
@@ -1370,6 +1373,16 @@ input.error, select.error, textarea.error {
 				]]>
 			</description>
 			<name>validatorId</name>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					If present, this attribute refers to the value of one of the exposed attached objects within the
+					composite component inside of which this tag is nested.
+				]]>
+			</description>
+			<name>for</name>
 			<type>java.lang.String</type>
 		</attribute>
 		<attribute>
@@ -1412,7 +1425,10 @@ input.error, select.error, textarea.error {
 			]]>
 		</description>
 		<tag-name>converter</tag-name>
-		<handler-class>org.omnifaces.taghandler.Converter</handler-class>
+		<converter>
+			<converter-id>omnifaces.Converter</converter-id>
+			<handler-class>org.omnifaces.taghandler.Converter</handler-class>
+		</converter>
 		<attribute>
 			<description>
 				<![CDATA[
@@ -1430,6 +1446,16 @@ input.error, select.error, textarea.error {
 				]]>
 			</description>
 			<name>converterId</name>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					If present, this attribute refers to the value of one of the exposed attached objects within the
+					composite component inside of which this tag is nested.
+				]]>
+			</description>
+			<name>for</name>
 			<type>java.lang.String</type>
 		</attribute>
 	</tag>

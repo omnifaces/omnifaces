@@ -12,17 +12,25 @@
  */
 package org.omnifaces.taghandler;
 
-import java.io.IOException;
+import static org.omnifaces.taghandler.RenderTimeTagHandlerHelper.*;
 
-import javax.el.ValueExpression;
-import javax.faces.FacesException;
+import java.io.IOException;
+import java.io.Serializable;
+
 import javax.faces.application.Application;
 import javax.faces.component.UIComponent;
 import javax.faces.component.ValueHolder;
 import javax.faces.context.FacesContext;
 import javax.faces.view.facelets.ComponentHandler;
+import javax.faces.view.facelets.ConverterConfig;
+import javax.faces.view.facelets.ConverterHandler;
 import javax.faces.view.facelets.FaceletContext;
-import javax.faces.view.facelets.TagConfig;
+import javax.faces.view.facelets.TagAttribute;
+import javax.faces.view.facelets.TagHandlerDelegate;
+
+import org.omnifaces.taghandler.RenderTimeTagHandlerHelper.RenderTimeAttributes;
+import org.omnifaces.taghandler.RenderTimeTagHandlerHelper.RenderTimeTagHandler;
+import org.omnifaces.taghandler.RenderTimeTagHandlerHelper.RenderTimeTagHandlerDelegate;
 
 /**
  * The <code>&lt;o:converter&gt;</code> basically extends the <code>&lt;f:converter&gt;</code> tag family with the
@@ -39,46 +47,47 @@ import javax.faces.view.facelets.TagConfig;
  *
  * @author Bauke Scholtz
  */
-public class Converter extends RenderTimeTagHandler {
-
-	// Private constants ----------------------------------------------------------------------------------------------
-
-	private static final String ERROR_MISSING_CONVERTERID =
-		"o:converter attribute 'converterId' or 'binding' must be specified.";
-	private static final String ERROR_INVALID_CONVERTERID =
-		"o:converter attribute 'converterId' must refer an valid converter ID. The converter ID '%s' cannot be found.";
+public class Converter extends ConverterHandler implements RenderTimeTagHandler {
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * The tag constructor.
-	 * @param config The tag config.
+	 * The constructor.
+	 * @param config The converter config.
 	 */
-	public Converter(TagConfig config) {
+	public Converter(ConverterConfig config) {
 		super(config);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * If the parent component is new, then create a {@link javax.faces.convert.Converter} based on the
-	 * <code>binding</code> and/or <code>converterId</code> attributes as per the standard JSF
-	 * <code>&lt;f:converter&gt;</code> implementation and collect the render time attributes. Then create an anonymous
-	 * <code>Converter</code> implementation which wraps the created <code>Converter</code> and delegates the methods
-	 * to it after setting the render time attributes. Finally set the anonymous implementation on the parent component.
+	 * Create a {@link javax.faces.convert.Converter} based on the <code>binding</code> and/or <code>converterId</code>
+	 * attributes as per the standard JSF <code>&lt;f:converter&gt;</code> implementation and collect the render time
+	 * attributes. Then create an anonymous <code>Converter</code> implementation which wraps the created
+	 * <code>Converter</code> and delegates the methods to it after setting the render time attributes. Finally set the
+	 * anonymous implementation on the parent component.
 	 * @param context The involved facelet context.
 	 * @param parent The parent component to set the <code>Converter</code> on.
 	 * @throws IOException If something fails at I/O level.
 	 */
 	@Override
 	public void apply(FaceletContext context, UIComponent parent) throws IOException {
-		if (!ComponentHandler.isNew(parent)) {
+		if (!ComponentHandler.isNew(parent) && UIComponent.getCompositeComponentParent(parent) == null) {
+			// If it's not new nor inside a composite component, we're finished.
 			return;
 		}
 
-		final javax.faces.convert.Converter converter = createConverter(context);
-		final RenderTimeAttributes attributes = collectRenderTimeAttributes(context, converter);
-		((ValueHolder) parent).setConverter(new javax.faces.convert.Converter() {
+		if (!(parent instanceof ValueHolder)) {
+			// It's likely a composite component. TagHandlerDelegate will pickup it and pass the target component back.
+			super.apply(context, parent);
+			return;
+		}
+
+		final javax.faces.convert.Converter converter = createInstance(context, this, "converterId");
+		final RenderTimeAttributes attributes = collectRenderTimeAttributes(context, this, converter);
+		((ValueHolder) parent).setConverter(new RenderTimeConverter() {
+			private static final long serialVersionUID = 1L;
 
 			@Override
 			public Object getAsObject(FacesContext context, UIComponent component, String value) {
@@ -94,43 +103,36 @@ public class Converter extends RenderTimeTagHandler {
 		});
 	}
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T> T create(Application application, String id) {
+		return (T) application.createConverter(id);
+	}
+
+	@Override
+	public TagAttribute getTagAttribute(String name) {
+		return getAttribute(name);
+	}
+
+	@Override
+	protected TagHandlerDelegate getTagHandlerDelegate() {
+		return new RenderTimeTagHandlerDelegate(this, super.getTagHandlerDelegate());
+	}
+
+	@Override
+	public boolean isDisabled(FaceletContext context) {
+		return false; // This attribute isn't supported on converters anyway.
+	}
+
+	// Nested classes -------------------------------------------------------------------------------------------------
 
 	/**
-	 * Create the converter based on the <code>binding</code> and/or <code>converterId</code> attribute.
-	 * @param context The involved facelet context.
-	 * @return The created converter.
-	 * @throws IllegalArgumentException If the <code>converterId</code> attribute is invalid or missing while the
-	 * <code>binding</code> attribute is also missing.
-	 * @see Application#createConverter(String)
+	 * So that we can have a serializable converter.
+	 *
+	 * @author Bauke Scholtz
 	 */
-	private javax.faces.convert.Converter createConverter(FaceletContext context) {
-		ValueExpression binding = getValueExpression(context, "binding", javax.faces.convert.Converter.class);
-		ValueExpression converterId = getValueExpression(context, "converterId", String.class);
-		javax.faces.convert.Converter converter = null;
-
-		if (binding != null) {
-			converter = (javax.faces.convert.Converter) binding.getValue(context);
-		}
-
-		if (converterId != null) {
-			try {
-				converter = context.getFacesContext().getApplication()
-					.createConverter((String) converterId.getValue(context));
-			}
-			catch (FacesException e) {
-				throw new IllegalArgumentException(String.format(ERROR_INVALID_CONVERTERID, converterId));
-			}
-
-			if (binding != null) {
-				binding.setValue(context, converter);
-			}
-		}
-		else if (converter == null) {
-			throw new IllegalArgumentException(ERROR_MISSING_CONVERTERID);
-		}
-
-		return converter;
+	protected static abstract class RenderTimeConverter implements javax.faces.convert.Converter, Serializable {
+		private static final long serialVersionUID = 1L;
 	}
 
 }
