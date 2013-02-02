@@ -96,6 +96,47 @@ public class ListTreeModel<T> implements TreeModel<T> {
 	}
 
 	@Override
+	public TreeModel<T> getNextSibling() {
+		return getNextSibling(parent, index + 1);
+	}
+
+	/**
+	 * Recursive helper method for {@link #getNextSibling()}.
+	 */
+	private TreeModel<T> getNextSibling(TreeModel<T> parent, int index) {
+		if (parent == null) {
+			return null;
+		}
+		else if (index < parent.getChildCount()) {
+			return parent.getChildren().get(index);
+		}
+		else {
+			return getNextSibling(parent.getNextSibling(), 0);
+		}
+	}
+
+	@Override
+	public TreeModel<T> getPreviousSibling() {
+		return getPreviousSibling(parent, index - 1);
+	}
+
+	/**
+	 * Recursive helper method for {@link #getPreviousSibling()}.
+	 */
+	private TreeModel<T> getPreviousSibling(TreeModel<T> parent, int index) {
+		if (parent == null) {
+			return null;
+		}
+		else if (index >= 0) {
+			return parent.getChildren().get(index);
+		}
+		else {
+			parent = parent.getPreviousSibling();
+			return getPreviousSibling(parent, (parent != null ? parent.getChildCount() : 0) - 1);
+		}
+	}
+
+	@Override
 	public int getChildCount() {
 		return children == null ? 0 : children.size();
 	}

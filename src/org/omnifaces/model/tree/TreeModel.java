@@ -48,12 +48,14 @@ public interface TreeModel<T> extends Iterable<TreeModel<T>>, Serializable {
 	 * @param child The child tree node to be added.
 	 * @return The same child treenode.
 	 * @throws IllegalArgumentException When the given child is not an instance of the same class as the parent.
+	 * @since 1.1
 	 */
 	TreeModel<T> addChildNode(TreeModel<T> child);
 
 	/**
 	 * Removes the current tree node from its parent, if any. It returns the parent to ease further building.
 	 * @return The parent tree node of the current tree node.
+	 * @since 1.1
 	 */
 	TreeModel<T> remove();
 
@@ -66,10 +68,24 @@ public interface TreeModel<T> extends Iterable<TreeModel<T>>, Serializable {
 	T getData();
 
 	/**
-	 * Returns the parent tree node of the current tree node.
+	 * Returns the parent tree node of the current tree node. Returns <code>null</code> if there is none.
 	 * @return The parent tree node of the current tree node.
 	 */
 	TreeModel<T> getParent();
+
+	/**
+	 * Returns the next tree node sibling of the current tree node. Returns <code>null</code> if there is none.
+	 * @return The next tree node sibling of the current tree node.
+	 * @since 1.4
+	 */
+	TreeModel<T> getNextSibling();
+
+	/**
+	 * Returns the previous tree node sibling of the current tree node. Returns <code>null</code> if there is none.
+	 * @return The previous tree node sibling of the current tree node.
+	 * @since 1.4
+	 */
+	TreeModel<T> getPreviousSibling();
 
 	/**
 	 * Returns the count of the children of the current tree node.
