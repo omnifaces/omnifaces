@@ -281,7 +281,7 @@ public final class Utils {
 	 * a different delimiter is needed.
 	 *
 	 * @param values string with comma separated values
-	 * @return a list with all values encountered in the <code>values</argument>, can be the empty list.
+	 * @return a list with all values encountered in the <code>values</code> argument, can be the empty list.
 	 * @since 1.4
 	 */
 	public static List<String> csvToList(String values) {
@@ -303,7 +303,7 @@ public final class Utils {
 	 *
 	 * @param values string with comma separated values
 	 * @param delimiter the delimiter used to separate the actual values in the <code>values</code> parameter.
-	 * @return a list with all values encountered in the <code>values</argument>, can be the empty list.
+	 * @return a list with all values encountered in the <code>values</code> argument, can be the empty list.
 	 * @since 1.4
 	 */
 	public static List<String> csvToList(String values, String delimiter) {
