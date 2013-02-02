@@ -579,4 +579,17 @@
 		<function-signature>java.lang.String formatNumberDefault(java.lang.Number)</function-signature>
 	</function>
 
+	<!-- Objects ================================================================================================== -->
+
+	<function>
+		<description>
+			<![CDATA[
+				Return the first non-<code>null</code> object from the two objects.
+			]]>
+		</description>
+		<function-name>coalesce</function-name>
+		<function-class>org.omnifaces.el.functions.Objects</function-class>
+		<function-signature>java.lang.Object coalesce(java.lang.Object, java.lang.Object)</function-signature>
+	</function>
+
 </facelet-taglib>
