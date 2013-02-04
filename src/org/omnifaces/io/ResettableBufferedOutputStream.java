@@ -66,8 +66,8 @@ public class ResettableBufferedOutputStream extends OutputStream implements Rese
 		if (buffer != null) {
 			if ((writtenBytes += (length - offset)) > bufferSize) {
 				output.write(buffer.toByteArray());
-				buffer = null;
 				output.write(bytes, offset, length);
+				buffer = null;
 			}
 			else {
 				buffer.write(bytes, offset, length);

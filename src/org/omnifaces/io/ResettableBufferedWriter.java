@@ -63,8 +63,8 @@ public class ResettableBufferedWriter extends Writer implements ResettableBuffer
 		if (buffer != null) {
 			if ((writtenBytes += charset.encode(CharBuffer.wrap(chars, offset, length)).limit()) > bufferSize) {
 				writer.write(buffer.toCharArray());
-				buffer = null;
 				writer.write(chars, offset, length);
+				buffer = null;
 			}
 			else {
 				buffer.write(chars, offset, length);
