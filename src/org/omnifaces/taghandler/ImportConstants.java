@@ -156,6 +156,20 @@ public class ImportConstants extends TagHandler {
 			return Class.forName(type);
 		}
 		catch (ClassNotFoundException e) {
+			// Perhaps it's an inner enum which is specified as com.example.SomeClass.SomeEnum.
+			// Let's be lenient on that although the proper type notation should be com.example.SomeClass$SomeEnum.
+			int i = type.lastIndexOf('.');
+
+			if (i > 0) {
+				try {
+					return Class.forName(
+						new StringBuilder(type.substring(0, i)).append('$').append(type.substring(i + 1)).toString());
+				}
+				catch (ClassNotFoundException ignore) {
+					// Just continue to the IllegalArgumentException on the original ClassNotFoundException.
+				}
+			}
+
 			throw new IllegalArgumentException(String.format(ERROR_MISSING_CLASS, type), e);
 		}
 	}
