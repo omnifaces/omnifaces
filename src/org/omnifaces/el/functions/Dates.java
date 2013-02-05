@@ -71,12 +71,14 @@ public final class Dates {
 	 * set to the one as obtained by {@link Faces#getLocale()}.
 	 * @param date The date to be formatted in the given pattern.
 	 * @param pattern The pattern to format the given date in.
-	 * @param timezone The timezone to format the given date with.
+	 * @param timezone The timezone to format the given date with, can be either timezone ID as string or
+	 * {@link TimeZone} object.
 	 * @return The date which is formatted in the given pattern.
 	 * @throws NullPointerException When the pattern is <code>null</code>.
 	 */
-	public static String formatDateWithTimezone(Date date, String pattern, String timezone) {
-		return formatDate(date, pattern, TimeZone.getTimeZone(timezone));
+	public static String formatDateWithTimezone(Date date, String pattern, Object timezone) {
+		return formatDate(date, pattern,
+			(timezone instanceof TimeZone) ? ((TimeZone) timezone) : TimeZone.getTimeZone(String.valueOf(timezone)));
 	}
 
 	/**

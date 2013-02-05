@@ -304,7 +304,7 @@
 		</description>
 		<function-name>formatDateWithTimezone</function-name>
 		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.lang.String formatDateWithTimezone(java.util.Date, java.lang.String, java.lang.String)</function-signature>
+		<function-signature>java.lang.String formatDateWithTimezone(java.util.Date, java.lang.String, java.lang.Object)</function-signature>
 	</function>
 
 	<function>
