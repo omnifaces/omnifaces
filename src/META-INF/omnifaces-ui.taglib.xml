@@ -2707,6 +2707,58 @@ public enum Baz {
 	<tag>
 		<description>
 			<![CDATA[
+				<p>The <code>&lt;o:importFunctions&gt;</code> allows the developer to have access to all functions of the given
+				fully qualified name of a type in the EL scope using the usual EL functions syntax without the need to register them
+				in <code>.taglib.xml</code> file. The functions are those <code>public static</code> methods with a
+				<strong>non</strong>-<code>void</code> return type. For example:
+				<pre>
+&lt;o:importFunctions type="java.lang.Math" /&gt;
+&lt;o:importFunctions type="org.omnifaces.util.Faces" /&gt;
+...
+#{Math:abs(-10)}
+#{Math:max(bean.number1, bean.number2)}
+...
+&lt;base href="#{Faces:getRequestBaseURL()}" /&gt;
+				</pre>
+				<p>The functions prefix becomes by default the simple name of the type. You can override this by explicitly
+				specifying the <code>var</code> attribute. If there are multiple function methods with exactly the same name, then
+				the one with the least amount of parameters will be used. If there are multiple function methods with exactly the
+				same name and amount of parameters, then the choice is unspecified (technically, JVM-dependent) and should not be
+				relied upon. So if you absolutely need to differentiate functions in such case, give them each a different name.</p>
+				<p>Note the colon <code>:</code> notation to invoke the method is as required by EL functions spec. It's by design
+				not easily possible to change it to <code>.</code>. Also note that in case of <code>org.omnifaces.util.Faces</code>
+				it's considered poor practice if the same functionality is already available through the implicit EL variables
+				<code>#{facesContext}</code>, <code>#{view}</code>, <code>#{request}</code>, etc such as
+				<code>#{request.contextPath}</code> which should be preferred over <code>#{Faces:getRequestContextPath()}</code>.</p>
+			]]>
+		</description>
+		<tag-name>importFunctions</tag-name>
+		<handler-class>org.omnifaces.taghandler.ImportFunctions</handler-class>
+		<attribute>
+			<description>
+				<![CDATA[
+	               The fully qualified name of the class to import the public static non-void methods for.
+	            ]]>
+            </description>
+			<name>type</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	               The EL functions prefix which exposes the functions in the EL scope.
+	            ]]>
+            </description>
+			<name>var</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
 				The <code>&lt;o:ignoreValidationFailed&gt;</code> allows the developer to ignore validation failures when
 				executing an <code>UICommand</code> action. This taghandler must be placed inside an <code>UICommand</code> component and the
 				parent <code>UIForm</code> must be an <code>&lt;o:form&gt;</code>.
