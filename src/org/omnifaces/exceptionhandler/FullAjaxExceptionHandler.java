@@ -22,6 +22,7 @@ import javax.faces.context.ExceptionHandler;
 import javax.faces.context.ExceptionHandlerWrapper;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ExceptionQueuedEvent;
 import javax.faces.event.PhaseId;
 import javax.faces.event.PreRenderViewEvent;
@@ -158,6 +159,11 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
 		if (unhandledExceptionQueuedEvents.hasNext()) {
 			Throwable exception = unhandledExceptionQueuedEvents.next().getContext().getException();
+
+			if (exception instanceof AbortProcessingException) {
+				return; // Let JSF handle it itself.
+			}
+
 			unhandledExceptionQueuedEvents.remove();
 
 			// Unwrap the root cause from FacesException and find the associated error page location.
@@ -179,8 +185,10 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 				externalContext.log(String.format(LOG_RENDER_EXCEPTION_HANDLED, errorPageLocation), exception);
 
 				// If the exception was thrown in midst of rendering the JSF response, then reset (partial) response.
+				String characterEncoding = externalContext.getResponseCharacterEncoding(); // Remember encoding.
 				externalContext.responseReset();
 				OmniPartialViewContext.getCurrentInstance().resetPartialResponse();
+				externalContext.setResponseCharacterEncoding(characterEncoding);
 			}
 			else {
 				externalContext.log(String.format(LOG_RENDER_EXCEPTION_UNHANDLED, errorPageLocation), exception);
