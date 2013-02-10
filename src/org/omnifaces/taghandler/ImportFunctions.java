@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -50,6 +52,8 @@ import javax.faces.view.facelets.TagHandler;
  * it's considered poor practice if the same functionality is already available through the implicit EL variables
  * <code>#{facesContext}</code>, <code>#{view}</code>, <code>#{request}</code>, etc such as
  * <code>#{request.contextPath}</code> which should be preferred over <code>#{Faces:getRequestContextPath()}</code>.</p>
+ * <p>
+ * The resolved functions are by reference stored in the cache to improve retrieving performance.
  *
  * @author Bauke Scholtz
  * @since 1.4
@@ -57,6 +61,8 @@ import javax.faces.view.facelets.TagHandler;
 public class ImportFunctions extends TagHandler {
 
 	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static Map<String, Method> FUNCTIONS_CACHE = new HashMap<String, Method>();
 
 	private static final String ERROR_INVALID_VAR = "The 'var' attribute may not be an EL expression.";
 	private static final String ERROR_MISSING_CLASS = "Cannot find type '%s' in classpath.";
@@ -105,7 +111,15 @@ public class ImportFunctions extends TagHandler {
 			@Override
 			public Method resolveFunction(String prefix, String name) {
 				if (var.equals(prefix)) {
-					return findMethod(cls, name);
+					String key = cls + "." + name;
+					Method function = FUNCTIONS_CACHE.get(key);
+
+					if (function == null) {
+						function = findMethod(cls, name);
+						FUNCTIONS_CACHE.put(key, function);
+					}
+
+					return function;
 				}
 				else {
 					return originalFunctionMapper.resolveFunction(prefix, name);
@@ -130,8 +144,8 @@ public class ImportFunctions extends TagHandler {
 	}
 
 	/**
-	 * Collect all public static methods of the given name in the given class, sort them by the amount of parameters and return the
-	 * first one.
+	 * Collect all public static methods of the given name in the given class, sort them by the amount of parameters
+	 * and return the first one.
 	 * @param cls The class to find the method in.
 	 * @param name The method name.
 	 * @return The found method, or <code>null</code> if none is found.

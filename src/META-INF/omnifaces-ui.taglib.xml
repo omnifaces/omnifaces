@@ -2730,6 +2730,8 @@ public enum Baz {
 				it's considered poor practice if the same functionality is already available through the implicit EL variables
 				<code>#{facesContext}</code>, <code>#{view}</code>, <code>#{request}</code>, etc such as
 				<code>#{request.contextPath}</code> which should be preferred over <code>#{Faces:getRequestContextPath()}</code>.</p>
+				<p>
+				The resolved functions are by reference stored in the cache to improve retrieving performance.
 			]]>
 		</description>
 		<tag-name>importFunctions</tag-name>
