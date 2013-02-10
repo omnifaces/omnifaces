@@ -380,7 +380,6 @@ public final class Faces {
 	 */
 	public static Map<String, Object> getMetadataAttributes(String viewId) {
 		FacesContext context = Faces.getContext();
-		viewId = Faces.normalizeViewId(viewId);
 		ViewHandler viewHandler = context.getApplication().getViewHandler();
 		ViewDeclarationLanguage vdl = viewHandler.getViewDeclarationLanguage(context, viewId);
 		ViewMetadata metadata = vdl.getViewMetadata(context, viewId);
@@ -996,6 +995,48 @@ public final class Faces {
 		getExternalContext().responseReset();
 	}
 
+	/**
+	 * Signals JSF that, as soon as the current phase of the lifecycle has been completed, control should be passed to
+	 * the Render Response phase, bypassing any phases that have not been executed yet.
+	 * @see FacesContext#renderResponse()
+	 * @since 1.4
+	 */
+	public static void renderResponse() {
+		getContext().renderResponse();
+	}
+
+	/**
+	 * Returns <code>true</code> if we're currently in the render response phase. This explicitly checks the current
+	 * phase ID instead of {@link FacesContext#getRenderResponse()} as the latter may unexpectedly return false during
+	 * a GET request when <code>&lt;f:viewParam&gt;</code> is been used.
+	 * @return <code>true</code> if we're currently in the render response phase.
+	 * @see FacesContext#getCurrentPhaseId()
+	 * @since 1.4
+	 */
+	public static boolean isRenderResponse() {
+		return getCurrentPhaseId() == PhaseId.RENDER_RESPONSE;
+	}
+
+	/**
+	 * Signals JSF that the response for this request has already been generated (such as providing a file download),
+	 * and that the lifecycle should be terminated as soon as the current phase is completed.
+	 * @see FacesContext#responseComplete()
+	 * @since 1.4
+	 */
+	public static void responseComplete() {
+		getContext().responseComplete();
+	}
+
+	/**
+	 * Returns <code>true</code> if the {@link FacesContext#responseComplete()} has been called.
+	 * @return <code>true</code> if the {@link FacesContext#responseComplete()} has been called.
+	 * @see FacesContext#responseComplete()
+	 * @since 1.4
+	 */
+	public static boolean isResponseComplete() {
+		return getContext().getResponseComplete();
+	}
+
 	// FORM based authentication --------------------------------------------------------------------------------------
 
 	/**
@@ -1009,6 +1050,21 @@ public final class Faces {
 	 */
 	public static void login(String username, String password) throws ServletException {
 		getRequest().login(username, password);
+	}
+
+	/**
+	 * Trigger the default container managed authentication mechanism on the current request. It expects the username
+	 * and password being available as predefinied request parameters on the current request and/or a custom JASPIC
+	 * implementation.
+	 * @return <code>true</code> if the authentication was successful, otherwise <code>false</code>.
+	 * @throws ServletException When the authentication has failed. The caller is responsible for handling it.
+	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
+	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @see HttpServletRequest#authenticate(HttpServletResponse)
+	 * @since 1.4
+	 */
+	public static boolean authenticate() throws ServletException, IOException {
+		return getRequest().authenticate(getResponse());
 	}
 
 	/**
