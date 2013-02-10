@@ -58,7 +58,7 @@ public final class Dates {
 	 * @param pattern The pattern to format the given date in.
 	 * @return The date which is formatted in the given pattern.
 	 * @throws NullPointerException When the pattern is <code>null</code>.
-	 * @see #formatDateWithTimezone(Date, String, String)
+	 * @see #formatDateWithTimezone(Date, String, Object)
 	 */
 	public static String formatDate(Date date, String pattern) {
 		return formatDate(date, pattern, TimeZone.getDefault());
