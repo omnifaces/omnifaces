@@ -47,11 +47,12 @@ import javax.faces.view.facelets.TagHandler;
  * the one with the least amount of parameters will be used. If there are multiple function methods with exactly the
  * same name and amount of parameters, then the choice is unspecified (technically, JVM-dependent) and should not be
  * relied upon. So if you absolutely need to differentiate functions in such case, give them each a different name.</p>
- * <p>Note the colon <code>:</code> notation to invoke the method is as required by EL functions spec. It's by design
- * not easily possible to change it to <code>.</code>. Also note that in case of <code>org.omnifaces.util.Faces</code>
- * it's considered poor practice if the same functionality is already available through the implicit EL variables
- * <code>#{facesContext}</code>, <code>#{view}</code>, <code>#{request}</code>, etc such as
- * <code>#{request.contextPath}</code> which should be preferred over <code>#{Faces:getRequestContextPath()}</code>.</p>
+ * <p>Note that the colon <code>:</code> operator to invoke the method is as required by EL functions spec. It's by
+ * design not easily possible to change it to the period <code>.</code> operator. Also note that in case of
+ * <code>org.omnifaces.util.Faces</code> it's considered poor practice if the same functionality is already available
+ * through the implicit EL variables <code>#{facesContext}</code>, <code>#{view}</code>, <code>#{request}</code>, etc
+ * such as <code>#{request.contextPath}</code> which should be preferred over
+ * <code>#{Faces:getRequestContextPath()}</code>.</p>
  * <p>
  * The resolved functions are by reference stored in the cache to improve retrieving performance.
  *
