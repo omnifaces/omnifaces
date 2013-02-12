@@ -15,7 +15,6 @@ package org.omnifaces.component.input;
 import static org.omnifaces.component.input.Form.PropertyKeys.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -247,17 +246,12 @@ public class Form extends UIForm {
 
 		Map<String, List<String>> parameters = new HashMap<String, List<String>>();
 		for (UIViewParameter viewParameter : viewParameters) {
-
-			String key = viewParameter.getName();
 			String value = viewParameter.getStringValue(context);
 
 			if (value != null) {
-				List<String> values = parameters.get(key);
-				if (values == null) {
-					values = new ArrayList<String>();
-					parameters.put(key, values);
-				}
-				values.add(value);
+				// #138: <f:viewParam> doesn't support multiple values anyway, so having multiple <f:viewParam> on the
+				// same request parameter shouldn't end up in repeated parameters in action URL.
+				parameters.put(viewParameter.getName(), Collections.singletonList(value));
 			}
 		}
 
