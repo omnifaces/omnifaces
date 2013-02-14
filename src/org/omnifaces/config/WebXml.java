@@ -12,13 +12,13 @@
  */
 package org.omnifaces.config;
 
-import static javax.xml.xpath.XPathConstants.*;
 import static org.omnifaces.util.Utils.*;
 
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
 import org.omnifaces.util.Faces;
@@ -73,12 +74,21 @@ public enum WebXml {
 		"error-page[not(error-code) and not(exception-type)]/location";
 	private static final String XPATH_FORM_LOGIN_PAGE =
 		"login-config[auth-method='FORM']/form-login-config/form-login-page";
+	private static final String XPATH_SECURITY_CONSTRAINT =
+		"security-constraint";
+	private static final String XPATH_SECURITY_CONSTRAINT_URL_PATTERN =
+		"web-resource-collection/url-pattern";
+	private static final String XPATH_SECURITY_CONSTRAINT_AUTH =
+		"auth-constraint";
+	private static final String XPATH_SECURITY_CONSTRAINT_AUTH_ROLE =
+		"auth-constraint/role-name";
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	private List<String> welcomeFiles;
 	private Map<Class<Throwable>, String> errorPageLocations;
 	private String formLoginPage;
+	private Map<String, List<String>> securityConstraints;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -87,10 +97,12 @@ public enum WebXml {
 	 */
 	private WebXml() {
 		try {
-			Document allWebXml = loadAllWebXml();
-			welcomeFiles = parseWelcomeFiles(allWebXml);
-			errorPageLocations = parseErrorPageLocations(allWebXml);
-			formLoginPage = parseFormLoginPage(allWebXml);
+			Element webXml = loadWebXml().getDocumentElement();
+			XPath xpath = XPathFactory.newInstance().newXPath();
+			welcomeFiles = parseWelcomeFiles(webXml, xpath);
+			errorPageLocations = parseErrorPageLocations(webXml, xpath);
+			formLoginPage = parseFormLoginPage(webXml, xpath);
+			securityConstraints = parseSecurityConstraints(webXml, xpath);
 		}
 		catch (Exception e) {
 			// If this occurs, web.xml is broken anyway and the app shouldn't have started/initialized this far at all.
@@ -156,13 +168,24 @@ public enum WebXml {
 		return formLoginPage;
 	}
 
+	/**
+	 * Returns a mapping of all security constraint URL patterns and the associated roles in the declared order. If the
+	 * roles is <code>null</code>, then it means that no auth constraint is been set (i.e. the resource is publicly
+	 * accessible and overrides all previously declared auth constraints on the matching URL pattern). If the roles is
+	 * empty, then it means that an empty auth constraint is been set (i.e. the resource is in no way accessible).
+	 * @return A mapping of all security constraint URL patterns and the associated roles in the declared order.
+	 */
+	public Map<String, List<String>> getSecurityConstraints() {
+		return securityConstraints;
+	}
+
 	// Helpers --------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Load, merge and return all <code>web.xml</code> and <code>web-fragment.xml</code> files found in the classpath
 	 * into a single {@link Document}.
 	 */
-	private static Document loadAllWebXml() throws Exception {
+	private static Document loadWebXml() throws Exception {
 		DocumentBuilder builder = createDocumentBuilder();
 		Document document = builder.newDocument();
 		document.appendChild(document.createElement("web"));
@@ -218,30 +241,26 @@ public enum WebXml {
 	}
 
 	/**
-	 * Create and return a list of all welcome files found in the given document.
+	 * Create and return a list of all welcome files.
 	 */
-	private static List<String> parseWelcomeFiles(Document document) throws Exception {
-		Element documentElement = document.getDocumentElement();
-		XPath xpath = XPathFactory.newInstance().newXPath();
-		NodeList list = (NodeList) xpath.compile(XPATH_WELCOME_FILE).evaluate(documentElement, NODESET);
-		List<String> welcomeFiles = new ArrayList<String>(list.getLength());
+	private static List<String> parseWelcomeFiles(Element webXml, XPath xpath) throws Exception {
+		NodeList welcomeFileList = getNodeList(webXml, xpath, XPATH_WELCOME_FILE);
+		List<String> welcomeFiles = new ArrayList<String>(welcomeFileList.getLength());
 
-		for (int i = 0; i < list.getLength(); i++) {
-			welcomeFiles.add(list.item(i).getTextContent().trim());
+		for (int i = 0; i < welcomeFileList.getLength(); i++) {
+			welcomeFiles.add(welcomeFileList.item(i).getTextContent().trim());
 		}
 
-		return welcomeFiles;
+		return Collections.unmodifiableList(welcomeFiles);
 	}
 
 	/**
 	 * Create and return a mapping of all error page locations by exception type found in the given document.
 	 */
 	@SuppressWarnings("unchecked") // For the cast on Class<Throwable>.
-	private static Map<Class<Throwable>, String> parseErrorPageLocations(Document document) throws Exception {
+	private static Map<Class<Throwable>, String> parseErrorPageLocations(Element webXml, XPath xpath) throws Exception {
 		Map<Class<Throwable>, String> errorPageLocations = new LinkedHashMap<Class<Throwable>, String>();
-		Element documentElement = document.getDocumentElement();
-		XPath xpath = XPathFactory.newInstance().newXPath();
-		NodeList exceptionTypes = (NodeList) xpath.compile(XPATH_EXCEPTION_TYPE).evaluate(documentElement, NODESET);
+		NodeList exceptionTypes = getNodeList(webXml, xpath, XPATH_EXCEPTION_TYPE);
 
 		for (int i = 0; i < exceptionTypes.getLength(); i++) {
 			Node node = exceptionTypes.item(i);
@@ -255,10 +274,10 @@ public enum WebXml {
 		}
 
 		if (!errorPageLocations.containsKey(null)) {
-			String defaultLocation = xpath.compile(XPATH_500_LOCATION).evaluate(documentElement).trim();
+			String defaultLocation = xpath.compile(XPATH_500_LOCATION).evaluate(webXml).trim();
 
 			if (isEmpty(defaultLocation)) {
-				defaultLocation = xpath.compile(XPATH_DEFAULT_LOCATION).evaluate(documentElement).trim();
+				defaultLocation = xpath.compile(XPATH_DEFAULT_LOCATION).evaluate(webXml).trim();
 			}
 
 			if (!isEmpty(defaultLocation)) {
@@ -266,16 +285,55 @@ public enum WebXml {
 			}
 		}
 
-		return errorPageLocations;
+		return Collections.unmodifiableMap(errorPageLocations);
 	}
 
 	/**
-	 * Return the location of the FORM authentication login page found in the given document.
+	 * Return the location of the FORM authentication login page.
 	 */
-	private static String parseFormLoginPage(Document document) throws Exception {
-		XPath xpath = XPathFactory.newInstance().newXPath();
-		String formLoginPage = xpath.compile(XPATH_FORM_LOGIN_PAGE).evaluate(document.getDocumentElement()).trim();
+	private static String parseFormLoginPage(Element webXml, XPath xpath) throws Exception {
+		String formLoginPage = xpath.compile(XPATH_FORM_LOGIN_PAGE).evaluate(webXml).trim();
 		return isEmpty(formLoginPage) ? null : formLoginPage;
+	}
+
+	/**
+	 * Create and return a mapping of all security constraint URL patterns and the associated roles.
+	 */
+	private static Map<String, List<String>> parseSecurityConstraints(Element webXml, XPath xpath) throws Exception {
+		Map<String, List<String>> securityConstraints = new LinkedHashMap<String, List<String>>();
+		NodeList constraints = getNodeList(webXml, xpath, XPATH_SECURITY_CONSTRAINT);
+
+		for (int i = 0; i < constraints.getLength(); i++) {
+			Node constraint = constraints.item(i);
+			List<String> roles = null;
+			NodeList auth = getNodeList(constraint, xpath, XPATH_SECURITY_CONSTRAINT_AUTH);
+
+			if (auth.getLength() > 0) {
+				NodeList authRoles = getNodeList(constraint, xpath, XPATH_SECURITY_CONSTRAINT_AUTH_ROLE);
+				roles = new ArrayList<String>(authRoles.getLength());
+
+				for (int j = 0; j < authRoles.getLength(); j++) {
+					roles.add(authRoles.item(j).getTextContent().trim());
+				}
+
+				roles = Collections.unmodifiableList(roles);
+			}
+
+			NodeList urlPatterns = getNodeList(constraint, xpath, XPATH_SECURITY_CONSTRAINT_URL_PATTERN);
+
+			for (int j = 0; j < urlPatterns.getLength(); j++) {
+				String urlPattern = urlPatterns.item(j).getTextContent().trim();
+				securityConstraints.put(urlPattern, roles);
+			}
+		}
+
+		return Collections.unmodifiableMap(securityConstraints);
+	}
+
+	// Helpers of helpers (JAXP hell) ---------------------------------------------------------------------------------
+
+	private static NodeList getNodeList(Node node, XPath xpath, String expression) throws Exception {
+		return (NodeList) xpath.compile(expression).evaluate(node, XPathConstants.NODESET);
 	}
 
 }
