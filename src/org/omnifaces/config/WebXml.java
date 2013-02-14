@@ -12,14 +12,16 @@
  */
 package org.omnifaces.config;
 
-import static javax.xml.xpath.XPathConstants.NODESET;
-import static org.omnifaces.util.Utils.isEmpty;
+import static javax.xml.xpath.XPathConstants.*;
+import static org.omnifaces.util.Utils.*;
 
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -59,6 +61,8 @@ public enum WebXml {
 	private static final String WEB_XML = "/WEB-INF/web.xml";
 	private static final String WEB_FRAGMENT_XML = "META-INF/web-fragment.xml";
 
+	private static final String XPATH_WELCOME_FILE =
+		"welcome-file-list/welcome-file";
 	private static final String XPATH_EXCEPTION_TYPE =
 		"error-page/exception-type";
 	private static final String XPATH_LOCATION =
@@ -72,6 +76,7 @@ public enum WebXml {
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
+	private List<String> welcomeFiles;
 	private Map<Class<Throwable>, String> errorPageLocations;
 	private String formLoginPage;
 
@@ -83,6 +88,7 @@ public enum WebXml {
 	private WebXml() {
 		try {
 			Document allWebXml = loadAllWebXml();
+			welcomeFiles = parseWelcomeFiles(allWebXml);
 			errorPageLocations = parseErrorPageLocations(allWebXml);
 			formLoginPage = parseFormLoginPage(allWebXml);
 		}
@@ -123,6 +129,15 @@ public enum WebXml {
 	}
 
 	// Getters --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns a list of all welcome files.
+	 * @return A list of all welcome files.
+	 * @since 1.4
+	 */
+	public List<String> getWelcomeFiles() {
+		return welcomeFiles;
+	}
 
 	/**
 	 * Returns a mapping of all error page locations by exception type. The default location is identified by
@@ -203,6 +218,22 @@ public enum WebXml {
 	}
 
 	/**
+	 * Create and return a list of all welcome files found in the given document.
+	 */
+	private static List<String> parseWelcomeFiles(Document document) throws Exception {
+		Element documentElement = document.getDocumentElement();
+		XPath xpath = XPathFactory.newInstance().newXPath();
+		NodeList list = (NodeList) xpath.compile(XPATH_WELCOME_FILE).evaluate(documentElement, NODESET);
+		List<String> welcomeFiles = new ArrayList<String>(list.getLength());
+
+		for (int i = 0; i < list.getLength(); i++) {
+			welcomeFiles.add(list.item(i).getTextContent().trim());
+		}
+
+		return welcomeFiles;
+	}
+
+	/**
 	 * Create and return a mapping of all error page locations by exception type found in the given document.
 	 */
 	@SuppressWarnings("unchecked") // For the cast on Class<Throwable>.
@@ -210,8 +241,7 @@ public enum WebXml {
 		Map<Class<Throwable>, String> errorPageLocations = new LinkedHashMap<Class<Throwable>, String>();
 		Element documentElement = document.getDocumentElement();
 		XPath xpath = XPathFactory.newInstance().newXPath();
-		NodeList exceptionTypes = (NodeList)
-			xpath.compile(XPATH_EXCEPTION_TYPE).evaluate(documentElement, NODESET);
+		NodeList exceptionTypes = (NodeList) xpath.compile(XPATH_EXCEPTION_TYPE).evaluate(documentElement, NODESET);
 
 		for (int i = 0; i < exceptionTypes.getLength(); i++) {
 			Node node = exceptionTypes.item(i);
