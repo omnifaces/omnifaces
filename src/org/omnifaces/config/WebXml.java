@@ -165,7 +165,7 @@ public enum WebXml {
 		}
 
 		if (url.length() > 1 && url.charAt(url.length() - 1) == '/') {
-			url = url.substring(0, url.length() - 1); // Trim leading slash.
+			url = url.substring(0, url.length() - 1); // Trim trailing slash.
 		}
 
 		for (Entry<String, Set<String>> entry : securityConstraints.entrySet()) {
