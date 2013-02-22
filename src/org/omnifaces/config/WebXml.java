@@ -151,7 +151,7 @@ public enum WebXml {
 	 *       trying to find the longest path match. If it is found, then check the role on it.
 	 *   <li>Else if the last segment in the URL path contains an extension, then make a last pass through all suffix
 	 *       URL patterns. If a match is found, then check the role on it.
-	 *   <li>Else return <code>false</code>.
+	 *   <li>Else assume it as unprotected resource and return <code>true</code>.
 	 * </ul>
 	 * @param url URL to be checked for access by the given role. It must start with '/' and be context-relative.
 	 * @param role Role to be checked for access to the given URL.
@@ -189,13 +189,15 @@ public enum WebXml {
 			}
 		}
 
-		for (Entry<String, Set<String>> entry : securityConstraints.entrySet()) {
-			if (isSuffixMatch(url, entry.getKey())) {
-				return isRoleMatch(entry.getValue(), role);
+		if (url.contains(".")) {
+			for (Entry<String, Set<String>> entry : securityConstraints.entrySet()) {
+				if (isSuffixMatch(url, entry.getKey())) {
+					return isRoleMatch(entry.getValue(), role);
+				}
 			}
 		}
 
-		return false;
+		return true;
 	}
 
 	private static boolean isExactMatch(String urlPattern, String url) {
