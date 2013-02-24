@@ -14,12 +14,13 @@
 package org.omnifaces.facesviews;
 
 import static javax.faces.application.ProjectStage.Development;
-import static org.omnifaces.facesviews.FacesViewsUtils.FACES_VIEWS_RESOURCES;
-import static org.omnifaces.facesviews.FacesViewsUtils.getApplication;
-import static org.omnifaces.facesviews.FacesViewsUtils.getApplicationAttribute;
-import static org.omnifaces.facesviews.FacesViewsUtils.isExtensionless;
-import static org.omnifaces.facesviews.FacesViewsUtils.scanAndStoreViews;
-import static org.omnifaces.facesviews.FacesViewsUtils.tryScanAndStoreViews;
+import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES;
+import static org.omnifaces.facesviews.FacesViews.scanAndStoreViews;
+import static org.omnifaces.facesviews.FacesViews.tryScanAndStoreViews;
+import static org.omnifaces.util.Faces.getApplicationAttribute;
+import static org.omnifaces.util.Faces.getApplicationFromFactory;
+import static org.omnifaces.util.ResourcePaths.getExtension;
+import static org.omnifaces.util.ResourcePaths.isExtensionless;
 
 import java.io.IOException;
 import java.util.Map;
@@ -62,7 +63,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
         // Note that Filter#init is used here, since it loads after the ServletContextListener that initializes JSF itself,
         // and thus guarantees the {@link Application} instance needed for installing the FacesViewHandler is available.
 
-        Application application = getApplication();
+        Application application = getApplicationFromFactory();
         application.setViewHandler(new FacesViewsViewHandler(application.getViewHandler()));
         
         // In development mode additionally map this Filter to "*", so we can catch requests to extensionless resources that 
@@ -70,7 +71,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
         // Adding resources with new extensions still requires a restart.
         if (application.getProjectStage() == Development && filterConfig.getServletContext().getMajorVersion() > 2) {
         	filterConfig.getServletContext().getFilterRegistration(FacesViewsForwardingFilter.class.getName())
-						.addMappingForUrlPatterns(null, false, "*");
+											.addMappingForUrlPatterns(null, false, "*");
         }
     }
 
@@ -84,7 +85,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
         	ServletContext context = getServletContext();
             Map<String, String> resources = getApplicationAttribute(context, FACES_VIEWS_RESOURCES);
         	
-        	if (getApplication().getProjectStage() == Development && !resources.containsKey(resource)) {
+        	if (getApplicationFromFactory().getProjectStage() == Development && !resources.containsKey(resource)) {
         		// Check if the resource was dynamically added by scanning the faces-views location(s) again.
         		resources = scanAndStoreViews(context);
         	}
@@ -93,7 +94,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 	            // Forward the resource (view) using its original extension, on which the Facelets Servlet
 	            // is mapped. Technically it matters most that the Facelets Servlet picks up the
 	            // request, and the exact extension or even prefix is perhaps less relevant.
-	            String forwardURI = resource + FacesViewsUtils.getExtension(resources.get(resource));
+	            String forwardURI = resource + getExtension(resources.get(resource));
 	
 	            // Get the request dispatcher
 	            RequestDispatcher requestDispatcher = context.getRequestDispatcher(forwardURI);

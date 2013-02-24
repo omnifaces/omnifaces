@@ -12,6 +12,8 @@
  */
 package org.omnifaces.util;
 
+import static javax.faces.FactoryFinder.APPLICATION_FACTORY;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -32,7 +34,9 @@ import java.util.Set;
 import javax.el.ELContext;
 import javax.el.ExpressionFactory;
 import javax.el.ValueExpression;
+import javax.faces.FactoryFinder;
 import javax.faces.application.Application;
+import javax.faces.application.ApplicationFactory;
 import javax.faces.application.NavigationHandler;
 import javax.faces.application.ProjectStage;
 import javax.faces.application.ViewHandler;
@@ -48,8 +52,10 @@ import javax.faces.event.PhaseId;
 import javax.faces.view.ViewDeclarationLanguage;
 import javax.faces.view.ViewMetadata;
 import javax.faces.view.facelets.FaceletContext;
+import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -57,7 +63,7 @@ import javax.servlet.http.HttpSession;
 
 /**
  * Collection of utility methods for the JSF API that are mainly shortcuts for obtaining stuff from the thread local
- * {@link FacesContext}. In effects, it 'flattens' the hierarchy of nested objects.
+ * {@link FacesContext}. In effect, it 'flattens' the hierarchy of nested objects.
  * <p>
  * Do note that using the hierarchy is actually a better software design practice, but can lead to verbose code.
  * <p>
@@ -155,6 +161,18 @@ public final class Faces {
 	 */
 	public static Application getApplication() {
 		return getContext().getApplication();
+	}
+	
+	/**
+	 * Gets the JSF Application singleton from the FactoryFinder.
+	 * <p>
+	 * This method is an alternative for {@link Faces#getApplication()} for those situations where the
+	 * {@link FacesContext} isn't available.
+	 * 
+	 * @return The faces application singleton.
+	 */
+	public static Application getApplicationFromFactory() {
+		return ((ApplicationFactory) FactoryFinder.getFactory(APPLICATION_FACTORY)).getApplication();
 	}
 
 	/**
@@ -1446,6 +1464,22 @@ public final class Faces {
 	public static <T> T removeRequestAttribute(String name) {
 		return (T) getRequestMap().remove(name);
 	}
+	
+	/**
+	 * Returns the request scope attribute value associated with the given name.
+	 * 
+	 * @param context The faces context used for looking up the attribute.
+	 * @param name The request scope attribute name.
+	 * 
+	 * @return The request scope attribute value associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see ExternalContext#getRequestMap()
+	 * @since 1.4
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getRequestAttribute(final FacesContext context, final String name) {
+		return (T) context.getExternalContext().getRequestMap().get(name);
+	}
 
 	// Flash scope ----------------------------------------------------------------------------------------------------
 
@@ -1635,6 +1669,40 @@ public final class Faces {
 	public static <T> T removeApplicationAttribute(String name) {
 		return (T) getApplicationMap().remove(name);
 	}
+	
+	/**
+	 * Returns the application scope attribute value associated with the given name.
+	 * 
+	 * @param name The application scope attribute name.
+	 * @param context The faces context used for looking up the attribute.
+	 * 
+	 * @return The application scope attribute value associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see ExternalContext#getApplicationMap()
+	 * @since 1.4
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getApplicationAttribute(final FacesContext context, final String name) {
+		return (T) context.getExternalContext().getApplicationMap().get(name);
+	}
+	
+	/**
+	 * Returns the application scope attribute value associated with the given name.
+	 * 
+	 * @param name The application scope attribute name.
+	 * @param context The servlet context used for looking up the attribute.
+	 * 
+	 * @return The application scope attribute value associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see ServletContext#getAttribute(String)
+	 * @since 1.4
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getApplicationAttribute(final ServletContext context, final String name) {
+		return (T) context.getAttribute(name);
+	}
+	
+	
 
 	// File download --------------------------------------------------------------------------------------------------
 
@@ -1724,5 +1792,26 @@ public final class Faces {
 
 		context.responseComplete();
 	}
+
+	/**
+	 * Gets the ServletRegistration associated with the FacesServlet.
+	 * 
+	 * @param servletContext
+	 *            the context to get the ServletRegistration from.
+	 * @return ServletRegistration for FacesServlet, or null if the FacesServlet is not installed.
+	 * @since 1.4
+	 */
+	public static ServletRegistration getFacesServletRegistration(final ServletContext servletContext) {
+		ServletRegistration facesServletRegistration = null;
+		for (ServletRegistration registration : servletContext.getServletRegistrations().values()) {
+			if (registration.getClassName().equals(FacesServlet.class.getName())) {
+				facesServletRegistration = registration;
+				break;
+			}
+		}
+	
+		return facesServletRegistration;
+	}
+
 
 }

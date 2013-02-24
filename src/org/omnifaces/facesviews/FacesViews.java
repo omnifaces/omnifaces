@@ -16,7 +16,6 @@ package org.omnifaces.facesviews;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.regex.Pattern.quote;
-import static javax.faces.FactoryFinder.APPLICATION_FACTORY;
 import static org.omnifaces.util.Utils.csvToList;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.startsWithOneOf;
@@ -26,26 +25,28 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.faces.FactoryFinder;
-import javax.faces.application.Application;
-import javax.faces.application.ApplicationFactory;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration;
+
+import org.omnifaces.util.Faces;
+import org.omnifaces.util.ResourcePaths;
 
 /**
- * Collection of utilities for working with auto-scanned- and extensionless views.
+ * This class contains the core methods that implement the Faces Views feature.
  * 
  * @author Arjan Tijms
  * 
  */
-final public class FacesViewsUtils {
+public final class FacesViews {
 
-	private FacesViewsUtils() {
+	private FacesViews() {
 	}
 
+	/**
+	 * A special dedicated "well-known" directory where facelets implementing views can be placed.
+	 * This directory is scanned by convention so that no explicit configuration is needed.
+	 */
 	public static final String WEB_INF_VIEWS = "/WEB-INF/faces-views/";
 	
 	/**
@@ -80,128 +81,9 @@ final public class FacesViewsUtils {
 	
 	public static final String FACES_VIEWS_RESOURCES = "org.omnifaces.facesviews";
     public static final String FACES_VIEWS_RESOURCES_EXTENSIONS = "org.omnifaces.facesviews.extensions";
+
     
-
-	/**
-	 * Gets the JSF Application instance.
-	 * 
-	 * @return The JSF Application instance.
-	 */
-	public static Application getApplication() {
-		return ((ApplicationFactory) FactoryFinder.getFactory(APPLICATION_FACTORY)).getApplication();
-	}
-
-	/**
-	 * Checks if the given resource path obtained from {@link ServletContext#getResourcePaths(String)} represents a
-	 * directory.
-	 * 
-	 * @param resourcePath
-	 *            the resource path to check
-	 * @return true if the resource path represents a directory, false otherwise
-	 */
-	public static boolean isDirectory(final String resourcePath) {
-		return resourcePath.endsWith("/");
-	}
-
-	/**
-	 * Strips the special 'faces-views' prefix path from the resource if any.
-	 * 
-	 * @param resource
-	 * @return the resource without the special prefix path, or as-is if it didn't start with this prefix.
-	 */
-	public static String stripPrefixPath(final String resource) {
-		return stripPrefixPath(WEB_INF_VIEWS, resource);
-	}
-
-	/**
-	 * Strips the special 'faces-views' prefix path from the resource if any.
-	 * 
-	 * @param resource
-	 * @return the resource without the special prefix path, or as-is if it didn't start with this prefix.
-	 */
-	public static String stripPrefixPath(final String prefix, final String resource) {
-		String normalizedResource = resource;
-		if (normalizedResource.startsWith(prefix)) {
-			normalizedResource = normalizedResource.substring(prefix.length() - 1);
-		}
-
-		return normalizedResource;
-	}
-
-	/**
-	 * Strips the extension from a resource if any. This extension is defined as everything after the last occurrence of
-	 * a period, including the period itself. E.g. input "index.xhtml" will return "index".
-	 * 
-	 * @param resource
-	 * @return the resource without its extension, of as-is if it doesn't have an extension.
-	 */
-	public static String stripExtension(final String resource) {
-		String normalizedResource = resource;
-		int lastPeriod = resource.lastIndexOf('.');
-		if (lastPeriod != -1) {
-			normalizedResource = resource.substring(0, lastPeriod);
-		}
-
-		return normalizedResource;
-	}
-
-	/**
-	 * Gets the extension of a resource if any. This extension is defined as everything after the last occurrence of a
-	 * period, including the period itself. E.g. input "index.xhtml" will return ".xhtml'.
-	 * 
-	 * 
-	 * @param resource
-	 * @return the extension of the resource, or null if it doesn't have an extension.
-	 */
-	public static String getExtension(final String resource) {
-		String extension = null;
-		int lastPeriod = resource.lastIndexOf('.');
-		if (lastPeriod != -1) {
-			extension = resource.substring(lastPeriod);
-		}
-
-		return extension;
-	}
-
-	public static boolean isExtensionless(final String viewId) {
-		return viewId != null && !viewId.contains(".");
-	}
-
-	@SuppressWarnings("unchecked")
-	public static <T> T getApplicationAttribute(final FacesContext context, final String name) {
-		return (T) context.getExternalContext().getApplicationMap().get(name);
-	}
-
-	@SuppressWarnings("unchecked")
-	public static <T> T getApplicationAttribute(final ServletContext context, final String name) {
-		return (T) context.getAttribute(name);
-	}
-
-	@SuppressWarnings("unchecked")
-	public static <T> T getRequestAttribute(final FacesContext context, final String name) {
-		return (T) context.getExternalContext().getRequestMap().get(name);
-	}
-
-	/**
-	 * Gets the ServletRegistration associated with the FacesServlet.
-	 * 
-	 * @param servletContext
-	 *            the context to get the ServletRegistration from.
-	 * @return ServletRegistration for FacesServlet, or null if the FacesServlet is not installed.
-	 */
-	public static ServletRegistration getFacesServletRegistration(final ServletContext servletContext) {
-		ServletRegistration facesServletRegistration = null;
-		for (ServletRegistration registration : servletContext.getServletRegistrations().values()) {
-			if (registration.getClassName().equals(FacesServlet.class.getName())) {
-				facesServletRegistration = registration;
-				break;
-			}
-		}
-
-		return facesServletRegistration;
-	}
-
-	public static void scanViewsFromRootPaths(ServletContext servletContext, Map<String, String> collectedViews, Set<String> collectedExtensions) {
+    public static void scanViewsFromRootPaths(ServletContext servletContext, Map<String, String> collectedViews, Set<String> collectedExtensions) {
 		for (String rootPath : getRootPaths(servletContext)) {
 			
 			String extensionToScan = null;
@@ -266,7 +148,7 @@ final public class FacesViewsUtils {
 		
 		if (!isEmpty(resourcePaths)) {
 			for (String resourcePath : resourcePaths) {
-				if (isDirectory(resourcePath)) {
+				if (ResourcePaths.isDirectory(resourcePath)) {
 					if (canScanDirectory(rootPath, resourcePath)) {
 						scanViews(servletContext, rootPath, servletContext.getResourcePaths(resourcePath), collectedViews, extensionToScan, collectedExtensions);
 					}
@@ -274,7 +156,7 @@ final public class FacesViewsUtils {
 
 					// Strip the root path from the current path. E.g.
 					// /WEB-INF/faces-views/foo.xhtml will become foo.xhtml if the root path = /WEB-INF/faces-view/
-					String resource = stripPrefixPath(rootPath, resourcePath);
+					String resource = ResourcePaths.stripPrefixPath(rootPath, resourcePath);
 
 					// Store the resource with and without an extension, e.g. store both foo.xhtml and foo
 					if (!"/".equals(rootPath)) {
@@ -282,11 +164,11 @@ final public class FacesViewsUtils {
 						// that particular 'mapping' is already what servers load by default.
 						collectedViews.put(resource, resourcePath);
 					}
-					collectedViews.put(stripExtension(resource), resourcePath);
+					collectedViews.put(ResourcePaths.stripExtension(resource), resourcePath);
 
 					// Optionally, collect all unique extensions that we have encountered
 					if (collectedExtensions != null) {
-						collectedExtensions.add("*" + getExtension(resourcePath));
+						collectedExtensions.add("*" + ResourcePaths.getExtension(resourcePath));
 					}
 				}
 			}
@@ -334,7 +216,7 @@ final public class FacesViewsUtils {
 	 * @param context
 	 */
 	public static void tryScanAndStoreViews(ServletContext context) {
-		if (getApplicationAttribute(context, FACES_VIEWS_RESOURCES) == null) {
+		if (Faces.getApplicationAttribute(context, FACES_VIEWS_RESOURCES) == null) {
 			scanAndStoreViews(context);
 		}
 	}
@@ -352,6 +234,16 @@ final public class FacesViewsUtils {
 			context.setAttribute(FACES_VIEWS_RESOURCES, unmodifiableMap(views));
 		}
 		return views;
+	}
+
+	/**
+	 * Strips the special 'faces-views' prefix path from the resource if any.
+	 * 
+	 * @param resource
+	 * @return the resource without the special prefix path, or as-is if it didn't start with this prefix.
+	 */
+	public static String stripFacesViewsPrefix(final String resource) {
+		return ResourcePaths.stripPrefixPath(WEB_INF_VIEWS, resource);
 	}
 
 }

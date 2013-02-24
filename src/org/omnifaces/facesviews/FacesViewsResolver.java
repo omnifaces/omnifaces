@@ -13,7 +13,7 @@
 
 package org.omnifaces.facesviews;
 
-import static org.omnifaces.facesviews.FacesViewsUtils.*;
+import static org.omnifaces.facesviews.FacesViews.*;
 import static org.omnifaces.util.Faces.*;
 
 import java.net.URL;

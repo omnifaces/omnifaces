@@ -13,7 +13,7 @@
 package org.omnifaces.component.output.cache;
 
 import static java.util.Collections.list;
-import static org.omnifaces.facesviews.FacesViewsUtils.*;
+import static org.omnifaces.util.Faces.getFacesServletRegistration;
 
 import java.util.HashMap;
 import java.util.Map;

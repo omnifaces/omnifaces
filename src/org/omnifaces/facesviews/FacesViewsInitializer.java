@@ -3,10 +3,10 @@ package org.omnifaces.facesviews;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static javax.faces.view.facelets.ResourceResolver.FACELETS_RESOURCE_RESOLVER_PARAM_NAME;
-import static org.omnifaces.facesviews.FacesViewsUtils.FACES_VIEWS_ENABLED_PARAM_NAME;
-import static org.omnifaces.facesviews.FacesViewsUtils.FACES_VIEWS_RESOURCES;
-import static org.omnifaces.facesviews.FacesViewsUtils.FACES_VIEWS_RESOURCES_EXTENSIONS;
-import static org.omnifaces.facesviews.FacesViewsUtils.scanViewsFromRootPaths;
+import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ENABLED_PARAM_NAME;
+import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES;
+import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES_EXTENSIONS;
+import static org.omnifaces.facesviews.FacesViews.scanViewsFromRootPaths;
 
 import java.util.HashMap;
 import java.util.HashSet;

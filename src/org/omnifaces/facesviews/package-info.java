@@ -90,12 +90,12 @@
  * The following context parameters are available.
  * <table>
  * <tr>
- * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViewsUtils#FACES_VIEWS_ENABLED_PARAM_NAME}</code></td>
+ * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_ENABLED_PARAM_NAME}</code></td>
  * <td>Used to completely switch scanning off. Allowed values: {<code>true</code>,<code>false</code>} Default: <code>true</code>
  * (note that if no <code>/WEB-INF/faces-views</code> directory is present, no scanning will be done either)</td>
  * </tr>
  * <tr>
- * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViewsUtils#FACES_VIEWS_SCAN_PATHS_PARAM_NAME}</code></td>
+ * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_SCAN_PATHS_PARAM_NAME}</code></td>
  * <td>A comma separated list of paths that are to be scanned in addition to <code>/WEB-INF/faces-views</code>. Allowed values: any path relative
  * to the web root, including the root path (<code>/</code>) and <code>/WEB-INF</code>. A wildcard can be added to the path, which will cause
  * only files with the given extension te be scanned. Example: Scan all files in both folder1 and folder2 <code>/folder1, /folder2</code>, Scan only
@@ -105,7 +105,7 @@
  * </td>
  * </tr>
  * <tr>
- * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViewsUtils#FACES_VIEWS_SCANNED_VIEWS_EXTENSIONLESS_PARAM_NAME}</code></td>
+ * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_SCANNED_VIEWS_EXTENSIONLESS_PARAM_NAME}</code></td>
  * <td>Used to set that scanned views should always be rendered extensionless when used in JSF controlled links. Without this setting
  *  (or it being set to false), it depends on whether the request URI uses an extension or not. If it doesn't, links are also rendered without one,
  *  otherwise they are rendered with an extension. Default: <code>false</code>

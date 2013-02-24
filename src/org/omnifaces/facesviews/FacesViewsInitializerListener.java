@@ -13,10 +13,9 @@
 
 package org.omnifaces.facesviews;
 
-import static org.omnifaces.facesviews.FacesViewsUtils.FACES_VIEWS_ENABLED_PARAM_NAME;
-import static org.omnifaces.facesviews.FacesViewsUtils.FACES_VIEWS_RESOURCES_EXTENSIONS;
-import static org.omnifaces.facesviews.FacesViewsUtils.getApplicationAttribute;
-import static org.omnifaces.facesviews.FacesViewsUtils.getFacesServletRegistration;
+import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ENABLED_PARAM_NAME;
+import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES_EXTENSIONS;
+import static org.omnifaces.util.Faces.getApplicationAttribute;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.util.Collection;
@@ -27,6 +26,8 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRegistration;
 import javax.servlet.annotation.WebListener;
+
+import org.omnifaces.util.Faces;
 
 
 @WebListener
@@ -59,7 +60,7 @@ public class FacesViewsInitializerListener implements ServletContextListener {
      */
     private void mapFacesServlet(ServletContext servletContext, Set<String> extensions) {
     	
-        ServletRegistration facesServletRegistration = getFacesServletRegistration(servletContext);
+        ServletRegistration facesServletRegistration = Faces.getFacesServletRegistration(servletContext);
         if (facesServletRegistration != null) {
             Collection<String> mappings = facesServletRegistration.getMappings();
             for (String extension : extensions) {
