@@ -18,6 +18,9 @@ import static java.util.Collections.unmodifiableSet;
 import static java.util.regex.Pattern.quote;
 import static org.omnifaces.util.Faces.getApplicationAttribute;
 import static org.omnifaces.util.Faces.getFacesServletRegistration;
+import static org.omnifaces.util.ResourcePaths.getExtension;
+import static org.omnifaces.util.ResourcePaths.isDirectory;
+import static org.omnifaces.util.ResourcePaths.stripExtension;
 import static org.omnifaces.util.ResourcePaths.stripPrefixPath;
 import static org.omnifaces.util.Utils.csvToList;
 import static org.omnifaces.util.Utils.isEmpty;
@@ -33,8 +36,6 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
-
-import org.omnifaces.util.ResourcePaths;
 
 /**
  * This class contains the core methods that implement the Faces Views feature.
@@ -152,7 +153,7 @@ public final class FacesViews {
 		
 		if (!isEmpty(resourcePaths)) {
 			for (String resourcePath : resourcePaths) {
-				if (ResourcePaths.isDirectory(resourcePath)) {
+				if (isDirectory(resourcePath)) {
 					if (canScanDirectory(rootPath, resourcePath)) {
 						scanViews(servletContext, rootPath, servletContext.getResourcePaths(resourcePath), collectedViews, extensionToScan, collectedExtensions);
 					}
@@ -160,19 +161,15 @@ public final class FacesViews {
 
 					// Strip the root path from the current path. E.g.
 					// /WEB-INF/faces-views/foo.xhtml will become foo.xhtml if the root path = /WEB-INF/faces-view/
-					String resource = ResourcePaths.stripPrefixPath(rootPath, resourcePath);
+					String resource = stripPrefixPath(rootPath, resourcePath);
 
 					// Store the resource with and without an extension, e.g. store both foo.xhtml and foo
-					if (!"/".equals(rootPath)) {
-						// For the root path "/", there is no need to store the resource with extension, as
-						// that particular 'mapping' is already what servers load by default.
-						collectedViews.put(resource, resourcePath);
-					}
-					collectedViews.put(ResourcePaths.stripExtension(resource), resourcePath);
+					collectedViews.put(resource, resourcePath);
+					collectedViews.put(stripExtension(resource), resourcePath);
 
 					// Optionally, collect all unique extensions that we have encountered
 					if (collectedExtensions != null) {
-						collectedExtensions.add("*" + ResourcePaths.getExtension(resourcePath));
+						collectedExtensions.add("*" + getExtension(resourcePath));
 					}
 				}
 			}
