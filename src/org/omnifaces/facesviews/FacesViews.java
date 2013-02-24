@@ -16,7 +16,9 @@ package org.omnifaces.facesviews;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.regex.Pattern.quote;
+import static org.omnifaces.util.Faces.getApplicationAttribute;
 import static org.omnifaces.util.Faces.getFacesServletRegistration;
+import static org.omnifaces.util.ResourcePaths.stripPrefixPath;
 import static org.omnifaces.util.Utils.csvToList;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.startsWithOneOf;
@@ -32,7 +34,6 @@ import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 
-import org.omnifaces.util.Faces;
 import org.omnifaces.util.ResourcePaths;
 
 /**
@@ -219,7 +220,7 @@ public final class FacesViews {
 	 * @param context
 	 */
 	public static void tryScanAndStoreViews(ServletContext context) {
-		if (Faces.getApplicationAttribute(context, FACES_VIEWS_RESOURCES) == null) {
+		if (getApplicationAttribute(context, FACES_VIEWS_RESOURCES) == null) {
 			scanAndStoreViews(context);
 		}
 	}
@@ -246,12 +247,12 @@ public final class FacesViews {
 	 * @return the resource without the special prefix path, or as-is if it didn't start with this prefix.
 	 */
 	public static String stripFacesViewsPrefix(final String resource) {
-		return ResourcePaths.stripPrefixPath(WEB_INF_VIEWS, resource);
+		return stripPrefixPath(WEB_INF_VIEWS, resource);
 	}
 
 	public static String getMappedPath(String path) {
 		String facesViewsPath = path;
-		Map<String, String> mappedResources = Faces.getApplicationAttribute(FACES_VIEWS_RESOURCES);
+		Map<String, String> mappedResources = getApplicationAttribute(FACES_VIEWS_RESOURCES);
 		if (mappedResources != null && mappedResources.containsKey(path)) {
 			facesViewsPath = mappedResources.get(path);
 		}
