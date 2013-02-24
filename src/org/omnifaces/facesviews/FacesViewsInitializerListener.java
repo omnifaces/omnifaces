@@ -18,16 +18,13 @@ import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES_EXTENSIO
 import static org.omnifaces.util.Faces.getApplicationAttribute;
 import static org.omnifaces.util.Utils.isEmpty;
 
-import java.util.Collection;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import javax.servlet.ServletRegistration;
 import javax.servlet.annotation.WebListener;
 
-import org.omnifaces.util.Faces;
 
 
 @WebListener
@@ -43,7 +40,7 @@ public class FacesViewsInitializerListener implements ServletContextListener {
         	Set<String> extensions = getApplicationAttribute(servletContext, FACES_VIEWS_RESOURCES_EXTENSIONS);
         	
         	if (!isEmpty(extensions)) {
-        		mapFacesServlet(servletContext, extensions);
+        		FacesViews.mapFacesServlet(servletContext, extensions);
         	}
         }
     }
@@ -51,24 +48,6 @@ public class FacesViewsInitializerListener implements ServletContextListener {
     @Override
     public void contextDestroyed(ServletContextEvent event) {
     	// NOOP.
-    }
-    
-    /**
-     * Map the Facelets Servlet to the extension we found
-     * 
-     * @param extensions collections of extensions encountered during scanning.
-     */
-    private void mapFacesServlet(ServletContext servletContext, Set<String> extensions) {
-    	
-        ServletRegistration facesServletRegistration = Faces.getFacesServletRegistration(servletContext);
-        if (facesServletRegistration != null) {
-            Collection<String> mappings = facesServletRegistration.getMappings();
-            for (String extension : extensions) {
-                if (!mappings.contains(extension)) {
-                    facesServletRegistration.addMapping(extension);
-                }
-            }
-        }
     }
 
 }

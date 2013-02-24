@@ -16,10 +16,12 @@ package org.omnifaces.facesviews;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.regex.Pattern.quote;
+import static org.omnifaces.util.Faces.getFacesServletRegistration;
 import static org.omnifaces.util.Utils.csvToList;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.startsWithOneOf;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -28,6 +30,7 @@ import java.util.Set;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletRegistration;
 
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.ResourcePaths;
@@ -244,6 +247,34 @@ public final class FacesViews {
 	 */
 	public static String stripFacesViewsPrefix(final String resource) {
 		return ResourcePaths.stripPrefixPath(WEB_INF_VIEWS, resource);
+	}
+
+	public static String getMappedPath(String path) {
+		String facesViewsPath = path;
+		Map<String, String> mappedResources = Faces.getApplicationAttribute(FACES_VIEWS_RESOURCES);
+		if (mappedResources != null && mappedResources.containsKey(path)) {
+			facesViewsPath = mappedResources.get(path);
+		}
+	
+		return facesViewsPath;
+	}
+
+	/**
+	 * Map the Facelets Servlet to the given extensions
+	 * 
+	 * @param extensions collections of extensions (typically those as encountered during scanning)
+	 */
+	public static void mapFacesServlet(ServletContext servletContext, Set<String> extensions) {
+		
+	    ServletRegistration facesServletRegistration = getFacesServletRegistration(servletContext);
+	    if (facesServletRegistration != null) {
+	        Collection<String> mappings = facesServletRegistration.getMappings();
+	        for (String extension : extensions) {
+	            if (!mappings.contains(extension)) {
+	                facesServletRegistration.addMapping(extension);
+	            }
+	        }
+	    }
 	}
 
 }

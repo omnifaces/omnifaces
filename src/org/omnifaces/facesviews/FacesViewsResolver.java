@@ -13,15 +13,15 @@
 
 package org.omnifaces.facesviews;
 
-import static org.omnifaces.facesviews.FacesViews.*;
-import static org.omnifaces.util.Faces.*;
+import static org.omnifaces.facesviews.FacesViews.getMappedPath;
+import static org.omnifaces.facesviews.FacesViews.scanAndStoreViews;
+import static org.omnifaces.util.Faces.getServletContext;
+import static org.omnifaces.util.Faces.isDevelopment;
 
 import java.net.URL;
-import java.util.Map;
 
 import javax.faces.view.facelets.ResourceResolver;
 
-import org.omnifaces.util.Faces;
 
 /**
  * Facelets resource resolver that resolves mapped resources (views) to the special auto-scanned
@@ -54,15 +54,5 @@ public class FacesViewsResolver extends ResourceResolver {
 
         return resource;
     }
-
-	private String getMappedPath(String path) {
-		String facesViewsPath = path;
-		Map<String, String> mappedResources = Faces.getApplicationAttribute(FACES_VIEWS_RESOURCES);
-		if (mappedResources != null && mappedResources.containsKey(path)) {
-			facesViewsPath = mappedResources.get(path);
-		}
-
-		return facesViewsPath;
-	}
 
 }
