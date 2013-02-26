@@ -19,8 +19,6 @@
 >
 	<namespace>http://omnifaces.org/ui</namespace>
 
-	<!-- Tree ===================================================================================================== -->
-
 	<tag>
 		<description>
 			<![CDATA[
@@ -522,8 +520,6 @@ input.error, select.error, textarea.error {
 			<type>java.lang.String</type>
 		</attribute>
 	</tag>
-
-	<!-- Validator ================================================================================================ -->
 
 	<tag>
 		<description>
@@ -3064,4 +3060,82 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 		</attribute>
 	</tag>
 
+	<tag>
+		<description>
+			<![CDATA[
+				<strong>Param</strong> is a component that extends the standard <code>UIParameter</code> to implement <code>ValueHolder</code>
+				and thus support a <code>Converter</code> to convert the supplied value to string, if necessary.
+				<p>
+				You can use it the same way as <code>&lt;f:param&gt;</code>, you only need to change <code>f:</code> into
+				<code>o:</code> to get the extra support for a <code>Converter</code> by usual means via the <code>converter</code>
+				attribute of the tag, or the nested <code>&lt;f:converter&gt;</code tag, or just automatically if a converter is
+				already registered for the target class.
+			]]>
+		</description>
+		<tag-name>param</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.output.Param</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Name of the parameter to be created.
+				]]>
+			</description>
+			<name>name</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Value of the parameter to be set.
+				]]>
+			</description>
+			<name>value</name>
+			<required>false</required>
+			<type>java.lang.Object</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Converter instance registered with this component.
+				]]>
+			</description>
+			<name>converter</name>
+			<required>false</required>
+			<type>javax.faces.convert.Converter</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag enabling or disabling the inclusion of the parameter.
+				]]>
+			</description>
+			<name>disable</name>
+			<required>false</required>
+			<type>boolean</type>
+		</attribute>
+	</tag>
 </facelet-taglib>
