@@ -15,6 +15,7 @@ package org.omnifaces.facesviews;
 
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
+import static java.util.Locale.US;
 import static java.util.regex.Pattern.quote;
 import static org.omnifaces.util.Faces.getApplicationAttribute;
 import static org.omnifaces.util.Faces.getFacesServletRegistration;
@@ -36,6 +37,9 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
+import javax.servlet.http.HttpServletRequest;
+
+import org.omnifaces.util.Faces;
 
 /**
  * This class contains the core methods that implement the Faces Views feature.
@@ -65,6 +69,8 @@ public final class FacesViews {
 	 */
 	public static final String FACES_VIEWS_SCAN_PATHS_PARAM_NAME = "org.omnifaces.FACES_VIEWS_SCAN_PATHS";
 
+	public static final String FACES_VIEWS_EXTENSION_ACTION_PARAM_NAME = "org.omnifaces.FACES_VIEWS_EXTENSION_ACTION";
+	
 	/**
 	 * The name of the application scope context parameter under which a Set version of the paths that are to be scanned
 	 * by faces views are kept.
@@ -113,6 +119,24 @@ public final class FacesViews {
 		}
 
 		return rootPaths;
+	}
+	
+	public static ExtensionAction getExtensionAction(ServletContext servletContext) {
+		String extensionActionString = servletContext.getInitParameter(FACES_VIEWS_EXTENSION_ACTION_PARAM_NAME);
+		if (isEmpty(extensionActionString)) {
+			return null;
+		}
+		
+		try {
+			return ExtensionAction.valueOf(extensionActionString.toUpperCase(US));
+		} catch (Exception e) {
+			throw new IllegalStateException(
+				String.format(
+					"Value '%s' is not valud for context parameter for '%s'",
+					extensionActionString, FACES_VIEWS_EXTENSION_ACTION_PARAM_NAME
+				)
+			);
+		}
 	}
 
 	public static Boolean isScannedViewsAlwaysExtensionless(final FacesContext context) {
@@ -273,6 +297,26 @@ public final class FacesViews {
 	            }
 	        }
 	    }
+	}
+	
+	/**
+	 * Obtains the full request URL from the given request complete with the query string, but with the
+	 * extension (if any) cut out.
+	 * <p>
+	 * E.g. <code>http://localhost/foo/bar.xhtml?kaz=1</code> becomes <code>http://localhost/foo/bar?kaz=1</code>
+	 * 
+	 * @param request the request from the URL is obtained.
+	 * @return request URL with query parameters but without file extension
+	 */
+	public static String getExtensionlessURLWithQuery(HttpServletRequest request) {
+		String queryString = !isEmpty(request.getQueryString()) ? "?" + request.getQueryString() : "";
+		
+		String baseURL = Faces.getRequestBaseURL(request);
+		if (baseURL.endsWith("/")) {
+			baseURL = baseURL.substring(0, baseURL.length()-1);
+		}
+		
+		return baseURL + stripExtension(request.getServletPath()) + queryString;
 	}
 
 }

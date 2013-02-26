@@ -14,11 +14,14 @@
 package org.omnifaces.facesviews;
 
 import static javax.faces.application.ProjectStage.Development;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES;
+import static org.omnifaces.facesviews.FacesViews.getExtensionlessURLWithQuery;
 import static org.omnifaces.facesviews.FacesViews.scanAndStoreViews;
 import static org.omnifaces.facesviews.FacesViews.tryScanAndStoreViews;
 import static org.omnifaces.util.Faces.getApplicationAttribute;
 import static org.omnifaces.util.Faces.getApplicationFromFactory;
+import static org.omnifaces.util.Faces.redirectPermanent;
 import static org.omnifaces.util.ResourcePaths.getExtension;
 import static org.omnifaces.util.ResourcePaths.isExtensionless;
 
@@ -49,14 +52,18 @@ import org.omnifaces.filter.HttpFilter;
  *
  */
 public class FacesViewsForwardingFilter extends HttpFilter {
+	
+	private static ExtensionAction extensionAction = ExtensionAction.REDIRECT_TO_EXTENSIONLESS;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
     	
     	super.init(filterConfig);
+    	
+    	ServletContext servletContext = filterConfig.getServletContext();
 
         // Mostly for pre-Servlet 3.0: scan the views if the auto-configure listener hasn't done this yet.
-        tryScanAndStoreViews(filterConfig.getServletContext());
+        tryScanAndStoreViews(servletContext);
 
         // Register a view handler that transforms a view id with extension back to an extensionless one.
 
@@ -69,9 +76,14 @@ public class FacesViewsForwardingFilter extends HttpFilter {
         // In development mode additionally map this Filter to "*", so we can catch requests to extensionless resources that 
         // have been dynamically added. Note that resources with mapped extensions are already handled by the FacesViewsResolver.
         // Adding resources with new extensions still requires a restart.
-        if (application.getProjectStage() == Development && filterConfig.getServletContext().getMajorVersion() > 2) {
+        if (application.getProjectStage() == Development && servletContext.getMajorVersion() > 2) {
         	filterConfig.getServletContext().getFilterRegistration(FacesViewsForwardingFilter.class.getName())
 											.addMappingForUrlPatterns(null, false, "*");
+        }
+        
+        ExtensionAction userAction = FacesViews.getExtensionAction(servletContext);
+        if (userAction != null) {
+        	extensionAction = userAction;
         }
     }
 
@@ -79,11 +91,11 @@ public class FacesViewsForwardingFilter extends HttpFilter {
     public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException,
             IOException {
 
+    	ServletContext context = getServletContext();
+        Map<String, String> resources = getApplicationAttribute(context, FACES_VIEWS_RESOURCES);
         String resource = request.getServletPath();
+        
         if (isExtensionless(resource)) {
-        	
-        	ServletContext context = getServletContext();
-            Map<String, String> resources = getApplicationAttribute(context, FACES_VIEWS_RESOURCES);
         	
         	if (getApplicationFromFactory().getProjectStage() == Development && !resources.containsKey(resource)) {
         		// Check if the resource was dynamically added by scanning the faces-views location(s) again.
@@ -104,6 +116,20 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 	                return;
 	            }
         	}
+        } else if (resources.containsKey(resource)) {
+        	
+        	switch (extensionAction) {
+		    	case REDIRECT_TO_EXTENSIONLESS:
+		    		redirectPermanent(response, getExtensionlessURLWithQuery(request));
+		    		return;
+		    	case SEND_404:
+		    		response.sendError(SC_NOT_FOUND);
+		    		return;
+				case PROCEED:
+					break;
+				default:
+					break;
+	        	}
         }
 
         chain.doFilter(request, response);

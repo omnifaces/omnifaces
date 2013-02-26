@@ -13,6 +13,7 @@
 package org.omnifaces.util;
 
 import static javax.faces.FactoryFinder.APPLICATION_FACTORY;
+import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -762,7 +763,21 @@ public final class Faces {
 	 * @see HttpServletRequest#getContextPath()
 	 */
 	public static String getRequestBaseURL() {
-		HttpServletRequest request = getRequest();
+		return getRequestBaseURL(getRequest());
+	}
+	
+	/**
+	 * Returns the HTTP request base URL. This is the URL from the scheme, domain until with context path, including
+	 * the trailing slash. This is the value you could use in HTML <code>&lt;base&gt;</code> tag.
+	 * 
+	 * @param request The request for which the base URL is computed.
+	 * 
+	 * @return The HTTP request base URL.
+	 * @see HttpServletRequest#getRequestURL()
+	 * @see HttpServletRequest#getRequestURI()
+	 * @see HttpServletRequest#getContextPath()
+	 */
+	public static String getRequestBaseURL(HttpServletRequest request) {
 		String url = request.getRequestURL().toString();
 		return url.substring(0, url.length() - request.getRequestURI().length()) + request.getContextPath() + "/";
 	}
@@ -924,10 +939,24 @@ public final class Faces {
 		FacesContext context = getContext();
 		ExternalContext externalContext = context.getExternalContext();
 		externalContext.getFlash().setRedirect(true);
-		externalContext.setResponseStatus(HttpServletResponse.SC_MOVED_PERMANENTLY);
+		externalContext.setResponseStatus(SC_MOVED_PERMANENTLY);
 		externalContext.setResponseHeader("Location", String.format(normalizeRedirectURL(url), encodeURLParams(paramValues)));
 		externalContext.setResponseHeader("Connection", "close");
 		context.responseComplete();
+	}
+	
+	/**
+	 * Sends a permanent (301) redirect to the given URL. Servlet variant on {@link Faces#redirectPermanent(String, String...)}
+	 * 
+	 * @param response The response on which the redirect should be send
+	 * @param url The URL to redirect the current response to.
+	 * @param paramValues paramValues The request parameter values which you'd like to put URL-encoded in the given URL.
+	 * @since 1.4
+	 */
+	public static void redirectPermanent(HttpServletResponse response, String url, String... paramValues) {
+		response.setStatus(SC_MOVED_PERMANENTLY);
+		response.setHeader( "Location", String.format(normalizeRedirectURL(url), encodeURLParams(paramValues)));
+		response.setHeader( "Connection", "close" );
 	}
 
 	/**
