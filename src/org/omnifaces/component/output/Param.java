@@ -24,7 +24,7 @@ import javax.faces.convert.Converter;
  * <p>
  * You can use it the same way as <code>&lt;f:param&gt;</code>, you only need to change <code>f:</code> into
  * <code>o:</code> to get the extra support for a {@link Converter} by usual means via the <code>converter</code>
- * attribute of the tag, or the nested <code>&lt;f:converter&gt;</code tag, or just automatically if a converter is
+ * attribute of the tag, or the nested <code>&lt;f:converter&gt;</code> tag, or just automatically if a converter is
  * already registered for the target class.
  *
  * @author Bauke Scholtz
