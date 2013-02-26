@@ -517,6 +517,56 @@
 		<function-signature>java.util.Map getShortDaysOfWeek()</function-signature>
 	</function>
 
+	<function>
+		<description>
+			<![CDATA[
+				Returns the month name from the mapping associated with the given month number for the current locale. For
+				example: "1=January", "2=February", etc. The locale is obtained by Faces#getLocale().
+			]]>
+		</description>
+		<function-name>getMonth</function-name>
+		<function-class>org.omnifaces.el.functions.Dates</function-class>
+		<function-signature>java.lang.String getMonth(java.lang.Integer)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns the short month name from the mapping associated with the given month number for the current locale. For
+				example: "1=Jan", "2=Feb", etc. The locale is obtained by Faces#getLocale().
+			]]>
+		</description>
+		<function-name>getShortMonth</function-name>
+		<function-class>org.omnifaces.el.functions.Dates</function-class>
+		<function-signature>java.lang.String getShortMonth(java.lang.Integer)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns the day of week name from the mapping associated with the given day of week number in ISO 8601 order
+				(Monday first) for the current locale. For example: "1=Monday", "2=Tuesday", etc. The locale is obtained by
+				Faces#getLocale().
+			]]>
+		</description>
+		<function-name>getDayOfWeek</function-name>
+		<function-class>org.omnifaces.el.functions.Dates</function-class>
+		<function-signature>java.lang.String getDayOfWeek(java.lang.Integer)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns the short day of week name from the mapping associated with the given day of week number in ISO 8601
+				order (Monday first) for the current locale. For example: "1=Mon", "2=Tue", etc. The locale is obtained by
+				Faces#getLocale().
+			]]>
+		</description>
+		<function-name>getShortDayOfWeek</function-name>
+		<function-class>org.omnifaces.el.functions.Dates</function-class>
+		<function-signature>java.lang.String getShortDayOfWeek(java.lang.Integer)</function-signature>
+	</function>
+
 	<!-- Numbers ================================================================================================== -->
 
 	<function>

@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
@@ -453,6 +454,69 @@ public final class Dates {
 		mapping.put(weekdays[Calendar.SATURDAY], 6);
 		mapping.put(weekdays[Calendar.SUNDAY], 7);
 		return mapping;
+	}
+
+	/**
+	 * Returns the month name from the mapping associated with the given month number for the current locale. For
+	 * example: "1=January", "2=February", etc. The locale is obtained by {@link Faces#getLocale()}.
+	 * @param monthNumber The month number to return the month name from the mapping for.
+	 * @return The month name form the mapping associated with the given month number.
+	 * @since 1.4
+	 */
+	public static String getMonth(Integer monthNumber) {
+		return getKey(getMonths(), monthNumber);
+	}
+
+	/**
+	 * Returns the short month name from the mapping associated with the given month number for the current locale. For
+	 * example: "1=Jan", "2=Feb", etc. The locale is obtained by {@link Faces#getLocale()}.
+	 * @param monthNumber The month number to return the short month name from the mapping for.
+	 * @return The short month name form the mapping associated with the given month number.
+	 * @since 1.4
+	 */
+	public static String getShortMonth(Integer monthNumber) {
+		return getKey(getShortMonths(), monthNumber);
+	}
+
+	/**
+	 * Returns the day of week name from the mapping associated with the given day of week number in ISO 8601 order
+	 * (Monday first) for the current locale. For example: "1=Monday", "2=Tuesday", etc. The locale is obtained by
+	 * {@link Faces#getLocale()}.
+	 * @param dayOfWeekNumber The day of week number to return the day of week name from the mapping for.
+	 * @return The day of week name from the mapping associated with the given day of week number.
+	 * @since 1.4
+	 */
+	public static String getDayOfWeek(Integer dayOfWeekNumber) {
+		return getKey(getDaysOfWeek(), dayOfWeekNumber);
+	}
+
+	/**
+	 * Returns the short day of week name from the mapping associated with the given day of week number in ISO 8601
+	 * order (Monday first) for the current locale. For example: "1=Mon", "2=Tue", etc. The locale is obtained by
+	 * {@link Faces#getLocale()}.
+	 * @param dayOfWeekNumber The day of week number to return the short day of week name from the mapping for.
+	 * @return The short day of week name from the mapping associated with the given day of week number.
+	 * @since 1.4
+	 */
+	public static String getShortDayOfWeek(Integer dayOfWeekNumber) {
+		return getKey(getShortDaysOfWeek(), dayOfWeekNumber);
+	}
+
+	/**
+	 * Helper method to return the map key from the given map associated with given map value.
+	 */
+	private static <K, V> K getKey(Map<K, V> map, V value) {
+		if (value == null) {
+			return null; // None of the maps have a null value anyway.
+		}
+
+		for (Entry<K, V> entry : map.entrySet()) {
+			if (value.equals(entry.getValue())) {
+				return entry.getKey();
+			}
+		}
+
+		return null;
 	}
 
 }
