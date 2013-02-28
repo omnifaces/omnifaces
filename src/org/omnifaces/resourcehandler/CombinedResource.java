@@ -49,7 +49,9 @@ final class CombinedResource extends Resource {
 	 * @throws IllegalArgumentException If the resource name does not represent a valid combined resource.
 	 */
 	public CombinedResource(String name) {
-		info = CombinedResourceInfo.get(name.split("\\.", 2)[0]);
+		String[] resourcePathParts = name.split("\\.", 2)[0].split("/");
+		String resourceId = resourcePathParts[resourcePathParts.length - 1];
+		info = CombinedResourceInfo.get(resourceId);
 
 		if (info == null || info.getResources().isEmpty()) {
 			throw new IllegalArgumentException();
