@@ -108,7 +108,7 @@ public class ResetInputAjaxActionListener extends DefaultPhaseListener implement
 
 	private static final long serialVersionUID = -5317382021715077662L;
 
-	private static final Set<VisitHint> VISIT_HINTS = EnumSet.of(VisitHint.SKIP_TRANSIENT);
+	private static final Set<VisitHint> VISIT_HINTS = EnumSet.of(VisitHint.SKIP_TRANSIENT, VisitHint.SKIP_UNRENDERED);
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
