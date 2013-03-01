@@ -25,6 +25,7 @@ import javax.faces.context.FacesContext;
 
 import org.omnifaces.util.Components;
 import org.omnifaces.util.Messages;
+import org.omnifaces.util.State;
 
 /**
  * Base class which is to be shared between all multi field validators. The implementors have to call the super
@@ -111,6 +112,10 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 		// Cannot be uppercased. They have to exactly match the attribute names.
 		components, message, showMessageFor, disabled;
 	}
+
+	// Variables ------------------------------------------------------------------------------------------------------
+
+	private final State state = new State(getStateHelper());
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -293,7 +298,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	 * @return The client identifiers of components which are to be validated.
 	 */
 	public String getComponents() {
-		return (String) getStateHelper().eval(PropertyKeys.components, "");
+		return state.get(PropertyKeys.components, "");
 	}
 
 	/**
@@ -301,7 +306,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	 * @param components The client identifiers of components which are to be validated.
 	 */
 	public void setComponents(String components) {
-		getStateHelper().put(PropertyKeys.components, components);
+		state.put(PropertyKeys.components, components);
 	}
 
 	/**
@@ -309,7 +314,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	 * @return The validation message to be shown.
 	 */
 	public String getMessage() {
-		return (String) getStateHelper().eval(PropertyKeys.message, defaultMessage);
+		return state.get(PropertyKeys.message, defaultMessage);
 	}
 
 	/**
@@ -317,7 +322,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	 * @param message The validation message to be shown.
 	 */
 	public void setMessage(String message) {
-		getStateHelper().put(PropertyKeys.message, message);
+		state.put(PropertyKeys.message, message);
 	}
 
 	/**
@@ -325,7 +330,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	 * @return The client identifier to show the validation message for.
 	 */
 	public String getShowMessageFor() {
-		return (String) getStateHelper().eval(PropertyKeys.showMessageFor, DEFAULT_SHOWMESSAGEFOR);
+		return state.get(PropertyKeys.showMessageFor, DEFAULT_SHOWMESSAGEFOR);
 	}
 
 	/**
@@ -333,7 +338,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	 * @param showMessageFor The client identifier to show the validation message for.
 	 */
 	public void setShowMessageFor(String showMessageFor) {
-		getStateHelper().put(PropertyKeys.showMessageFor, showMessageFor);
+		state.put(PropertyKeys.showMessageFor, showMessageFor);
 	}
 
 	/**
@@ -341,7 +346,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	 * @return Whether the validation should be disabled or not.
 	 */
 	public boolean isDisabled() {
-		return Boolean.valueOf(getStateHelper().eval(PropertyKeys.disabled, DEFAULT_DISABLED).toString());
+		return state.get(PropertyKeys.disabled, DEFAULT_DISABLED);
 	}
 
 	/**
@@ -349,7 +354,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	 * @param disabled Whether the validation should be disabled or not.
 	 */
 	public void setDisabled(boolean disabled) {
-		getStateHelper().put(PropertyKeys.disabled, disabled);
+		state.put(PropertyKeys.disabled, disabled);
 	}
 
 	/**

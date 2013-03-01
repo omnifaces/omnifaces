@@ -30,6 +30,7 @@ import javax.faces.component.visit.VisitResult;
 import javax.faces.context.FacesContext;
 
 import org.omnifaces.util.Components;
+import org.omnifaces.util.State;
 
 /**
  * <p><strong>Highlight</strong> is a helper component which highlights all invalid {@link UIInput} components and the
@@ -91,6 +92,10 @@ public class Highlight extends OnloadScript {
 		// Cannot be uppercased. They have to exactly match the attribute names.
 		styleClass, focus
 	}
+
+	// Variables ------------------------------------------------------------------------------------------------------
+
+	private final State state = new State(getStateHelper());
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -158,7 +163,7 @@ public class Highlight extends OnloadScript {
 	 * @return The error style class which is to be applied on invalid inputs.
 	 */
 	public String getStyleClass() {
-		return (String) getStateHelper().eval(PropertyKeys.styleClass, DEFAULT_STYLECLASS);
+		return state.get(PropertyKeys.styleClass, DEFAULT_STYLECLASS);
 	}
 
 	/**
@@ -166,7 +171,7 @@ public class Highlight extends OnloadScript {
 	 * @param styleClass The error style class which is to be applied on invalid inputs.
 	 */
 	public void setStyleClass(String styleClass) {
-		getStateHelper().put(PropertyKeys.styleClass, styleClass);
+		state.put(PropertyKeys.styleClass, styleClass);
 	}
 
 	/**
@@ -174,7 +179,7 @@ public class Highlight extends OnloadScript {
 	 * @return Whether the first error element should gain focus.
 	 */
 	public boolean isFocus() {
-		return Boolean.valueOf(getStateHelper().eval(PropertyKeys.focus, DEFAULT_FOCUS).toString());
+		return state.get(PropertyKeys.focus, DEFAULT_FOCUS);
 	}
 
 	/**
@@ -182,7 +187,7 @@ public class Highlight extends OnloadScript {
 	 * @param focus Whether the first error element should gain focus.
 	 */
 	public void setFocus(boolean focus) {
-		getStateHelper().put(PropertyKeys.focus, focus);
+		state.put(PropertyKeys.focus, focus);
 	}
 
 }

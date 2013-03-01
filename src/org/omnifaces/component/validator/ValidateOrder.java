@@ -22,6 +22,7 @@ import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
 
 import org.omnifaces.util.Callback;
+import org.omnifaces.util.State;
 
 /**
  * <strong>ValidateOrder</strong> validates if the values of the given {@link UIInput} components as specified in
@@ -114,6 +115,10 @@ public class ValidateOrder extends ValidateMultipleFields {
 		type;
 	}
 
+	// Variables ------------------------------------------------------------------------------------------------------
+
+	private final State state = new State(getStateHelper());
+
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
@@ -146,7 +151,7 @@ public class ValidateOrder extends ValidateMultipleFields {
 	 * @return The ordering type to be used.
 	 */
 	public String getType() {
-		return (String) getStateHelper().eval(PropertyKeys.type, DEFAULT_TYPE);
+		return state.get(PropertyKeys.type, DEFAULT_TYPE);
 	}
 
 	/**
@@ -161,7 +166,7 @@ public class ValidateOrder extends ValidateMultipleFields {
 			throw new IllegalArgumentException(String.format(ERROR_INVALID_TYPE, type), e);
 		}
 
-		getStateHelper().put(PropertyKeys.type, type);
+		state.put(PropertyKeys.type, type);
 	}
 
 }

@@ -19,6 +19,7 @@ import javax.faces.event.PhaseId;
 
 import org.omnifaces.model.tree.TreeModel;
 import org.omnifaces.util.Components;
+import org.omnifaces.util.State;
 
 /**
  * <strong>TreeNode</strong> is an {@link UIComponent} that represents a single tree node within a parent
@@ -47,6 +48,10 @@ public class TreeNode extends TreeFamily {
 		// Cannot be uppercased. They have to exactly match the attribute names.
 		level;
 	}
+
+	// Variables ------------------------------------------------------------------------------------------------------
+
+	private final State state = new State(getStateHelper());
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -80,7 +85,7 @@ public class TreeNode extends TreeFamily {
 	 * @return The level for which this node should render the items.
 	 */
 	public Integer getLevel() {
-		return (Integer) getStateHelper().eval(PropertyKeys.level);
+		return state.get(PropertyKeys.level);
 	}
 
 	/**
@@ -88,7 +93,7 @@ public class TreeNode extends TreeFamily {
 	 * @param level The level for which this node should render the items.
 	 */
 	public void setLevel(Integer level) {
-		getStateHelper().put(PropertyKeys.level, level);
+		state.put(PropertyKeys.level, level);
 	}
 
 }

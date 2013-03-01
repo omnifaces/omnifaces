@@ -21,6 +21,8 @@ import javax.faces.component.html.HtmlOutputFormat;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 
+import org.omnifaces.util.State;
+
 /**
  * <strong>OutputFormat</strong> is a component that extends the standard {@link HtmlOutputFormat} and provides support
  * for capturing the output and exposing it into the request scope by the variable name as specified by the
@@ -66,6 +68,10 @@ public class OutputFormat extends HtmlOutputFormat {
 		// Cannot be uppercased. They have to exactly match the attribute names.
 		var;
 	}
+
+	// Variables ------------------------------------------------------------------------------------------------------
+
+	private final State state = new State(getStateHelper());
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -122,7 +128,7 @@ public class OutputFormat extends HtmlOutputFormat {
 	 * @return The variable name which exposes the captured output into the request scope.
 	 */
 	public String getVar() {
-		return (String) getStateHelper().eval(PropertyKeys.var);
+		return state.get(PropertyKeys.var);
 	}
 
 	/**
@@ -130,7 +136,7 @@ public class OutputFormat extends HtmlOutputFormat {
 	 * @param var The variable name which exposes the captured output into the request scope.
 	 */
 	public void setVar(String var) {
-		getStateHelper().put(PropertyKeys.var, var);
+		state.put(PropertyKeys.var, var);
 	}
 
 }

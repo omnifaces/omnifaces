@@ -19,6 +19,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 
+import org.omnifaces.util.State;
 import org.omnifaces.util.Utils;
 
 /**
@@ -71,6 +72,10 @@ public class ConditionalComment extends OutputFamily {
 		@Override public String toString() { return (toString != null) ? toString : super.toString(); }
 	}
 
+	// Variables ------------------------------------------------------------------------------------------------------
+
+	private final State state = new State(getStateHelper());
+
 	// UIComponent overrides ------------------------------------------------------------------------------------------
 
 	/**
@@ -100,7 +105,7 @@ public class ConditionalComment extends OutputFamily {
 	 * @return The if condition.
 	 */
 	public String getIf() {
-		return (String) getStateHelper().eval(PropertyKeys._if);
+		return state.get(PropertyKeys._if);
 	}
 
 	/**
@@ -108,7 +113,7 @@ public class ConditionalComment extends OutputFamily {
 	 * @param _if The if condition.
 	 */
 	public void setIf(String _if) {
-		getStateHelper().put(PropertyKeys._if, _if);
+		state.put(PropertyKeys._if, _if);
 	}
 
 }

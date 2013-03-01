@@ -34,6 +34,7 @@ import javax.faces.context.FacesContextWrapper;
 import javax.faces.view.ViewMetadata;
 
 import org.omnifaces.taghandler.IgnoreValidationFailed;
+import org.omnifaces.util.State;
 
 /**
  * <strong>Form</strong> is a component that extends the standard {@link UIForm} and provides a way to keep view
@@ -80,6 +81,10 @@ public class Form extends UIForm {
 		includeViewParams
 	}
 
+	// Variables ------------------------------------------------------------------------------------------------------
+
+	private final State state = new State(getStateHelper());
+
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
@@ -121,7 +126,7 @@ public class Form extends UIForm {
 	 * Return whether or not the view parameters should be encoded into the form's action URL.
 	 */
 	public boolean isIncludeViewParams() {
-		return (Boolean) getStateHelper().eval(includeViewParams, false);
+		return state.get(includeViewParams, false);
 	}
 
 	/**
@@ -131,7 +136,7 @@ public class Form extends UIForm {
 	 *            The state of the switch for encoding view parameters
 	 */
 	public void setIncludeViewParams(boolean includeViewParams) {
-		getStateHelper().put(PropertyKeys.includeViewParams, includeViewParams);
+		state.put(PropertyKeys.includeViewParams, includeViewParams);
 	}
 
 	// Nested classes -------------------------------------------------------------------------------------------------

@@ -34,6 +34,7 @@ import org.omnifaces.model.tree.ListTreeModel;
 import org.omnifaces.model.tree.TreeModel;
 import org.omnifaces.util.Callback;
 import org.omnifaces.util.Components;
+import org.omnifaces.util.State;
 
 /**
  * <strong>Tree</strong> is an {@link UIComponent} that supports data binding to a tree of data objects represented by
@@ -97,6 +98,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
+	private final State state = new State(getStateHelper());
 	private TreeModel model;
 	private Map<Integer, TreeNode> nodes;
 	private TreeModel currentModelNode;
@@ -464,7 +466,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @return The tree model
 	 */
 	public Object getValue() {
-		return getStateHelper().eval(PropertyKeys.value);
+		return state.get(PropertyKeys.value);
 	}
 
 	/**
@@ -472,7 +474,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @param value The tree model.
 	 */
 	public void setValue(Object value) {
-		getStateHelper().put(PropertyKeys.value, value);
+		state.put(PropertyKeys.value, value);
 	}
 
 	/**
@@ -480,7 +482,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @return The name of the request attribute which exposes the wrapped data of the current node of the tree model.
 	 */
 	public String getVar() {
-		return (String) getStateHelper().eval(PropertyKeys.var);
+		return state.get(PropertyKeys.var);
 	}
 
 	/**
@@ -489,7 +491,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * model.
 	 */
 	public void setVar(String var) {
-		getStateHelper().put(PropertyKeys.var, var);
+		state.put(PropertyKeys.var, var);
 	}
 
 	/**
@@ -497,7 +499,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @return The name of the request attribute which exposes the current node of the tree model.
 	 */
 	public String getVarNode() {
-		return (String) getStateHelper().eval(PropertyKeys.varNode);
+		return state.get(PropertyKeys.varNode);
 	}
 
 	/**
@@ -505,7 +507,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @param varNode The name of the request attribute which exposes the current node of the tree model.
 	 */
 	public void setVarNode(String varNode) {
-		getStateHelper().put(PropertyKeys.varNode, varNode);
+		state.put(PropertyKeys.varNode, varNode);
 	}
 
 	// Nested classes -------------------------------------------------------------------------------------------------
