@@ -15,7 +15,7 @@
  */
 package org.omnifaces.component.output.cache.concurrentlinkedhashmap;
 
-import static org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLinkedHashMap.checkNotNull;
+import static org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLinkedHashMap.*;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -58,7 +58,7 @@ public final class Weighers {
    *
    * @return A weigher where a value takes one unit of capacity.
    */
-  @SuppressWarnings({"cast", "unchecked"})
+  @SuppressWarnings({"unchecked"})
   public static <K, V> EntryWeigher<K, V> entrySingleton() {
     return (EntryWeigher<K, V>) SingletonEntryWeigher.INSTANCE;
   }
@@ -70,7 +70,7 @@ public final class Weighers {
    *
    * @return A weigher where a value takes one unit of capacity.
    */
-  @SuppressWarnings({"cast", "unchecked"})
+  @SuppressWarnings({"unchecked"})
   public static <V> Weigher<V> singleton() {
     return (Weigher<V>) SingletonWeigher.INSTANCE;
   }
@@ -108,7 +108,7 @@ public final class Weighers {
    *
    * @return A weigher where each element takes one unit of capacity.
    */
-  @SuppressWarnings({"cast", "unchecked"})
+  @SuppressWarnings({"unchecked"})
   public static <E> Weigher<? super Iterable<E>> iterable() {
     return (Weigher<Iterable<E>>) (Weigher<?>) IterableWeigher.INSTANCE;
   }
@@ -126,7 +126,7 @@ public final class Weighers {
    *
    * @return A weigher where each element takes one unit of capacity.
    */
-  @SuppressWarnings({"cast", "unchecked"})
+  @SuppressWarnings({"unchecked"})
   public static <E> Weigher<? super Collection<E>> collection() {
     return (Weigher<Collection<E>>) (Weigher<?>) CollectionWeigher.INSTANCE;
   }
@@ -144,7 +144,7 @@ public final class Weighers {
    *
    * @return A weigher where each element takes one unit of capacity.
    */
-  @SuppressWarnings({"cast", "unchecked"})
+  @SuppressWarnings({"unchecked"})
   public static <E> Weigher<? super List<E>> list() {
     return (Weigher<List<E>>) (Weigher<?>) ListWeigher.INSTANCE;
   }
@@ -162,7 +162,7 @@ public final class Weighers {
    *
    * @return A weigher where each element takes one unit of capacity.
    */
-  @SuppressWarnings({"cast", "unchecked"})
+  @SuppressWarnings({"unchecked"})
   public static <E> Weigher<? super Set<E>> set() {
     return (Weigher<Set<E>>) (Weigher<?>) SetWeigher.INSTANCE;
   }
@@ -180,7 +180,7 @@ public final class Weighers {
    *
    * @return A weigher where each entry takes one unit of capacity.
    */
-  @SuppressWarnings({"cast", "unchecked"})
+  @SuppressWarnings({"unchecked"})
   public static <A, B> Weigher<? super Map<A, B>> map() {
     return (Weigher<Map<A, B>>) (Weigher<?>) MapWeigher.INSTANCE;
   }

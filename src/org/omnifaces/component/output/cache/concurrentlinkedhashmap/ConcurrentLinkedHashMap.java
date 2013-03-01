@@ -12,18 +12,14 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * 
+ *
  * REPACKAGED BY OMNIFACES, BUT NO CODE CHANGES HAVE BEEN MADE.
- * 
+ *
  */
 package org.omnifaces.component.output.cache.concurrentlinkedhashmap;
 
-import static org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLinkedHashMap.DrainStatus.IDLE;
-import static org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLinkedHashMap.DrainStatus.PROCESSING;
-import static org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLinkedHashMap.DrainStatus.REQUIRED;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.unmodifiableMap;
-import static java.util.Collections.unmodifiableSet;
+import static java.util.Collections.*;
+import static org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLinkedHashMap.DrainStatus.*;
 
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
@@ -1471,7 +1467,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
   enum DiscardingListener implements EvictionListener<Object, Object> {
     INSTANCE;
 
-    @Override public void onEviction(Object key, Object value) {}
+    @Override public void onEviction(Object key, Object value) {/**/}
   }
 
   /** An operation that can be lazily applied to the page replacement policy. */
@@ -1523,7 +1519,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
     return new SerializationProxy<K, V>(this);
   }
 
-  private void readObject(ObjectInputStream stream) throws InvalidObjectException {
+  private void readObject(@SuppressWarnings("unused") ObjectInputStream stream) throws InvalidObjectException {
     throw new InvalidObjectException("Proxy required");
   }
 
