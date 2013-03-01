@@ -209,7 +209,7 @@ final class CombinedResourceInfo {
 	/**
 	 * Returns the string representation of this combined resource info in the format of
 	 * <pre>CombinedResourceInfo[id,resourceIdentifiers]</pre>
-	 * Where <tt>id</tt> is the unique ID and <tt>resourceIdentifiers</tt> is the ordered set of all resource
+	 * Where <code>id</code> is the unique ID and <code>resourceIdentifiers</code> is the ordered set of all resource
 	 * identifiers as is been created with the builder.
 	 */
 	@Override

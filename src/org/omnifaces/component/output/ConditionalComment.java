@@ -30,7 +30,7 @@ import org.omnifaces.util.Utils;
  *   &lt;link rel="stylesheet" href="ie6-ie7.css" /&gt;
  * &lt;![endif]--&gt;
  * </pre>
- * <p>However, Facelets renders them HTML-escaped and if <tt>javax.faces.FACELETS_SKIP_COMMENTS</tt> context param is
+ * <p>However, Facelets renders them HTML-escaped and if <code>javax.faces.FACELETS_SKIP_COMMENTS</code> context param is
  * set to <code>true</code> then it will even not be rendered at all. You would need to workaround this with an ugly
  * <code>&lt;h:outputText escape="false"&gt;</code>.
  * <pre>

@@ -12,8 +12,8 @@
  */
 package org.omnifaces.util;
 
-import static javax.faces.FactoryFinder.APPLICATION_FACTORY;
-import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
+import static javax.faces.FactoryFinder.*;
+import static javax.servlet.http.HttpServletResponse.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -163,13 +163,13 @@ public final class Faces {
 	public static Application getApplication() {
 		return getContext().getApplication();
 	}
-	
+
 	/**
 	 * Gets the JSF Application singleton from the FactoryFinder.
 	 * <p>
 	 * This method is an alternative for {@link Faces#getApplication()} for those situations where the
 	 * {@link FacesContext} isn't available.
-	 * 
+	 *
 	 * @return The faces application singleton.
 	 */
 	public static Application getApplicationFromFactory() {
@@ -197,8 +197,8 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns whether we're in development stage. This will be the case when the <tt>javax.faces.PROJECT_STAGE</tt>
-	 * context parameter in <tt>web.xml</tt> is set to <tt>Development</tt>.
+	 * Returns whether we're in development stage. This will be the case when the <code>javax.faces.PROJECT_STAGE</code>
+	 * context parameter in <code>web.xml</code> is set to <code>Development</code>.
 	 * @return <code>true</code> if we're in development stage, otherwise <code>false</code>.
 	 * @see Application#getProjectStage()
 	 */
@@ -208,8 +208,8 @@ public final class Faces {
 
 	/**
 	 * Determines and returns the faces servlet mapping used in the current request. If JSF is prefix mapped (e.g.
-	 * <tt>/faces/*</tt>), then this returns the whole path, with a leading slash (e.g. <tt>/faces</tt>). If JSF is
-	 * suffix mapped (e.g. <tt>*.xhtml</tt>), then this returns the whole extension (e.g. <tt>.xhtml</tt>).
+	 * <code>/faces/*</code>), then this returns the whole path, with a leading slash (e.g. <code>/faces</code>). If JSF
+	 * is suffix mapped (e.g. <code>*.xhtml</code>), then this returns the whole extension (e.g. <code>.xhtml</code>).
 	 * @return The faces servlet mapping (without the wildcard).
 	 * @see #getRequestPathInfo()
 	 * @see #getRequestServletPath()
@@ -490,7 +490,7 @@ public final class Faces {
 
 	/**
 	 * Returns a list of all supported locales on this application, with the default locale as the first item, if any.
-	 * This will return an empty list if there are no locales definied in <tt>faces-config.xml</tt>.
+	 * This will return an empty list if there are no locales definied in <code>faces-config.xml</code>.
 	 * @return A list of all supported locales on this application, with the default locale as the first item, if any.
 	 * @see Application#getDefaultLocale()
 	 * @see Application#getSupportedLocales()
@@ -733,9 +733,9 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the HTTP request servlet path. If JSF is prefix mapped (e.g. <tt>/faces/*</tt>), then this returns the
-	 * whole prefix mapping (e.g. <tt>/faces</tt>). If JSF is suffix mapped (e.g. <tt>*.xhtml</tt>), then this returns
-	 * the whole part after the context path, with a leading slash.
+	 * Returns the HTTP request servlet path. If JSF is prefix mapped (e.g. <code>/faces/*</code>), then this returns
+	 * the whole prefix mapping (e.g. <code>/faces</code>). If JSF is suffix mapped (e.g. <code>*.xhtml</code>), then
+	 * this returns the whole part after the context path, with a leading slash.
 	 * @return The HTTP request servlet path.
 	 * @see ExternalContext#getRequestServletPath()
 	 */
@@ -744,9 +744,9 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the HTTP request path info. If JSF is prefix mapped (e.g. <tt>/faces/*</tt>), then this returns the
-	 * whole part after the prefix mapping, with a leading slash. If JSF is suffix mapped (e.g. <tt>*.xhtml</tt>), then
-	 * this returns <code>null</code>.
+	 * Returns the HTTP request path info. If JSF is prefix mapped (e.g. <code>/faces/*</code>), then this returns the
+	 * whole part after the prefix mapping, with a leading slash. If JSF is suffix mapped (e.g. <code>*.xhtml</code>),
+	 * then this returns <code>null</code>.
 	 * @return The HTTP request path info.
 	 * @see ExternalContext#getRequestPathInfo()
 	 */
@@ -765,13 +765,13 @@ public final class Faces {
 	public static String getRequestBaseURL() {
 		return getRequestBaseURL(getRequest());
 	}
-	
+
 	/**
 	 * Returns the HTTP request base URL. This is the URL from the scheme, domain until with context path, including
 	 * the trailing slash. This is the value you could use in HTML <code>&lt;base&gt;</code> tag.
-	 * 
+	 *
 	 * @param request The request for which the base URL is computed.
-	 * 
+	 *
 	 * @return The HTTP request base URL.
 	 * @see HttpServletRequest#getRequestURL()
 	 * @see HttpServletRequest#getRequestURI()
@@ -818,8 +818,8 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the HTTP request query string. This is the part after the <tt>?</tt> in the request URL as the enduser
-	 * sees in browser address bar.
+	 * Returns the HTTP request query string. This is the part after the <code>?</code> in the request URL as the
+	 * enduser sees in browser address bar.
 	 * @return The HTTP request query string.
 	 * @see HttpServletRequest#getQueryString()
 	 * @since 1.1
@@ -884,10 +884,10 @@ public final class Faces {
 	}
 
 	/**
-	 * Sends a temporary (302) redirect to the given URL. If the given URL does not start with <tt>http://</tt>,
-	 * <tt>https://</tt> or <tt>/</tt>, then the request context path will be prepended, otherwise it will be the
-	 * unmodified redirect URL. So, when redirecting to another page in the same web application, always specify the
-	 * full path from the context root on (which in turn does not need to start with <tt>/</tt>).
+	 * Sends a temporary (302) redirect to the given URL. If the given URL does not start with <code>http://</code>,
+	 * <code>https://</code> or <code>/</code>, then the request context path will be prepended, otherwise it will be
+	 * the unmodified redirect URL. So, when redirecting to another page in the same web application, always specify the
+	 * full path from the context root on (which in turn does not need to start with <code>/</code>).
 	 * <p>
 	 * You can use {@link String#format(String, Object...)} placeholder <code>%s</code> in the redirect URL to represent
 	 * placeholders for any request parameter values which needs to be URL-encoded. Here's a concrete example:
@@ -911,10 +911,10 @@ public final class Faces {
 	}
 
 	/**
-	 * Sends a permanent (301) redirect to the given URL. If the given URL does not start with <tt>http://</tt>,
-	 * <tt>https://</tt> or <tt>/</tt>, then the request context path will be prepended, otherwise it will be the
-	 * unmodified redirect URL. So, when redirecting to another page in the same web application, always specify the
-	 * full path from the context root on (which in turn does not need to start with <tt>/</tt>).
+	 * Sends a permanent (301) redirect to the given URL. If the given URL does not start with <code>http://</code>,
+	 * <code>https://</code> or <code>/</code>, then the request context path will be prepended, otherwise it will be
+	 * the unmodified redirect URL. So, when redirecting to another page in the same web application, always specify the
+	 * full path from the context root on (which in turn does not need to start with <code>/</code>).
 	 * <p>
 	 * You can use {@link String#format(String, Object...)} placeholder <code>%s</code> in the redirect URL to represent
 	 * placeholders for any request parameter values which needs to be URL-encoded. Here's a concrete example:
@@ -944,10 +944,10 @@ public final class Faces {
 		externalContext.setResponseHeader("Connection", "close");
 		context.responseComplete();
 	}
-	
+
 	/**
 	 * Sends a permanent (301) redirect to the given URL. Servlet variant on {@link Faces#redirectPermanent(String, String...)}
-	 * 
+	 *
 	 * @param response The response on which the redirect should be send
 	 * @param url The URL to redirect the current response to.
 	 * @param paramValues paramValues The request parameter values which you'd like to put URL-encoded in the given URL.
@@ -960,9 +960,9 @@ public final class Faces {
 	}
 
 	/**
-	 * Helper method to normalize the given URL for a redirect. If the given URL does not start with <tt>http://</tt>,
-	 * <tt>https://</tt> or <tt>/</tt>, then the request context path will be prepended, otherwise it will be
-	 * unmodified.
+	 * Helper method to normalize the given URL for a redirect. If the given URL does not start with
+	 * <code>http://</code>, <code>https://</code> or <code>/</code>, then the request context path will be prepended,
+	 * otherwise it will be unmodified.
 	 */
 	private static String normalizeRedirectURL(String url) {
 		if (!url.startsWith("http://") && !url.startsWith("https://") && !url.startsWith("/")) {
@@ -994,7 +994,7 @@ public final class Faces {
 	 * Sends a HTTP response error with the given status and message. This will end up in either a custom
 	 * <code>&lt;error-page&gt;</code> whose <code>&lt;error-code&gt;</code> matches the given status, or in a servlet
 	 * container specific default error page if there is none. The message will be available in the error page as a
-	 * request attribute with name <tt>javax.servlet.error.message</tt>. The {@link FacesContext#responseComplete()}
+	 * request attribute with name <code>javax.servlet.error.message</code>. The {@link FacesContext#responseComplete()}
 	 * will implicitly be called after sending the error.
 	 * @param status The HTTP response status which is supposed to be in the range 4nn-5nn. You can use the constant
 	 * field values of {@link HttpServletResponse} for this.
@@ -1168,11 +1168,12 @@ public final class Faces {
 	 * be set to secure when the current request is secure (i.e. when the current request is a HTTPS request).
 	 * @param name The cookie name.
 	 * @param value The cookie value.
-	 * @param path The cookie path. If this is <tt>/</tt>, then the cookie is available in all pages of the webapp.
-	 * If this is <tt>/somespecificpath</tt>, then the cookie is only available in pages under the specified path.
-	 * @param maxAge The maximum age of the cookie, in seconds. If this is <tt>0</tt>, then the cookie will be removed.
-	 * Note that the name and path must be exactly the same as it was when the cookie was created. If this is
-	 * <tt>-1</tt> then the cookie will become a session cookie and thus live as long as the established HTTP session.
+	 * @param path The cookie path. If this is <code>/</code>, then the cookie is available in all pages of the webapp.
+	 * If this is <code>/somespecificpath</code>, then the cookie is only available in pages under the specified path.
+	 * @param maxAge The maximum age of the cookie, in seconds. If this is <code>0</code>, then the cookie will be
+	 * removed. Note that the name and path must be exactly the same as it was when the cookie was created. If this is
+	 * <code>-1</code> then the cookie will become a session cookie and thus live as long as the established HTTP
+	 * session.
 	 * @throws UnsupportedOperationException If UTF-8 is not supported on this machine.
 	 * @see ExternalContext#addResponseCookie(String, String, Map)
 	 */
@@ -1376,8 +1377,8 @@ public final class Faces {
 
 	/**
 	 * Returns the mime type for the given file name. The mime type is determined based on file extension and
-	 * configureable by <code>&lt;mime-mapping&gt;</code> entries in <tt>web.xml</tt>. When the mime type is unknown,
-	 * then a default of <tt>application/octet-stream</tt> will be returned.
+	 * configureable by <code>&lt;mime-mapping&gt;</code> entries in <code>web.xml</code>. When the mime type is
+	 * unknown, then a default of <code>application/octet-stream</code> will be returned.
 	 * @param name The file name to return the mime type for.
 	 * @return The mime type for the given file name.
 	 * @see ExternalContext#getMimeType(String)
@@ -1493,13 +1494,13 @@ public final class Faces {
 	public static <T> T removeRequestAttribute(String name) {
 		return (T) getRequestMap().remove(name);
 	}
-	
+
 	/**
 	 * Returns the request scope attribute value associated with the given name.
-	 * 
+	 *
 	 * @param context The faces context used for looking up the attribute.
 	 * @param name The request scope attribute name.
-	 * 
+	 *
 	 * @return The request scope attribute value associated with the given name.
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see ExternalContext#getRequestMap()
@@ -1698,13 +1699,13 @@ public final class Faces {
 	public static <T> T removeApplicationAttribute(String name) {
 		return (T) getApplicationMap().remove(name);
 	}
-	
+
 	/**
 	 * Returns the application scope attribute value associated with the given name.
-	 * 
+	 *
 	 * @param name The application scope attribute name.
 	 * @param context The faces context used for looking up the attribute.
-	 * 
+	 *
 	 * @return The application scope attribute value associated with the given name.
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see ExternalContext#getApplicationMap()
@@ -1714,13 +1715,13 @@ public final class Faces {
 	public static <T> T getApplicationAttribute(final FacesContext context, final String name) {
 		return (T) context.getExternalContext().getApplicationMap().get(name);
 	}
-	
+
 	/**
 	 * Returns the application scope attribute value associated with the given name.
-	 * 
+	 *
 	 * @param name The application scope attribute name.
 	 * @param context The servlet context used for looking up the attribute.
-	 * 
+	 *
 	 * @return The application scope attribute value associated with the given name.
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see ServletContext#getAttribute(String)
@@ -1730,8 +1731,8 @@ public final class Faces {
 	public static <T> T getApplicationAttribute(final ServletContext context, final String name) {
 		return (T) context.getAttribute(name);
 	}
-	
-	
+
+
 
 	// File download --------------------------------------------------------------------------------------------------
 
@@ -1824,7 +1825,7 @@ public final class Faces {
 
 	/**
 	 * Gets the ServletRegistration associated with the FacesServlet.
-	 * 
+	 *
 	 * @param servletContext
 	 *            the context to get the ServletRegistration from.
 	 * @return ServletRegistration for FacesServlet, or null if the FacesServlet is not installed.
@@ -1838,7 +1839,7 @@ public final class Faces {
 				break;
 			}
 		}
-	
+
 		return facesServletRegistration;
 	}
 

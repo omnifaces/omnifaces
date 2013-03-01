@@ -19,7 +19,7 @@ import javax.faces.render.RenderKit;
 import javax.faces.render.RenderKitFactory;
 
 /**
- * This render kit factory needs to be registered as follows in <tt>faces-config.xml</tt> to get the
+ * This render kit factory needs to be registered as follows in <code>faces-config.xml</code> to get the
  * {@link Html5RenderKit} to run:
  * <pre>
  * &lt;factory&gt;

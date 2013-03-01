@@ -30,7 +30,7 @@ import org.omnifaces.util.Utils;
  * and <code>&lt;h:graphicImage&gt;</code> when the current JSF project stage is <strong>not</strong> set to
  * <code>Development</code>.
  * <p>
- * To get it to run, this handler needs be registered as follows in <tt>faces-config.xml</tt>:
+ * To get it to run, this handler needs be registered as follows in <code>faces-config.xml</code>:
  * <pre>
  * &lt;application&gt;
  *   &lt;resource-handler&gt;org.omnifaces.resourcehandler.CDNResourceHandler&lt;/resource-handler&gt;

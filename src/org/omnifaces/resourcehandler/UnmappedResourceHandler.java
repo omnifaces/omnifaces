@@ -162,8 +162,8 @@ public class UnmappedResourceHandler extends ResourceHandlerWrapper {
 	}
 
 	/**
-	 * Returns <code>true</code> if {@link ExternalContext#getRequestServletPath()} starts with
-	 * {@value ResourceHandler#RESOURCE_IDENTIFIER}.
+	 * Returns <code>true</code> if {@link ExternalContext#getRequestServletPath()} starts with value of
+	 * {@link ResourceHandler#RESOURCE_IDENTIFIER}.
 	 */
 	@Override
 	public boolean isResourceRequest(FacesContext context) {

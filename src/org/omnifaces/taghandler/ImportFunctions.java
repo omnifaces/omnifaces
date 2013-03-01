@@ -34,11 +34,11 @@ import javax.faces.view.facelets.TagHandler;
  * in <code>.taglib.xml</code> file. The functions are those <code>public static</code> methods with a
  * <strong>non</strong>-<code>void</code> return type. For example:
  * <pre>
- * &lt;o:importFunctions type="java.lang.Math" /&gt;
+ * &lt;o:importFunctions type="java.lang.Math" var="m" /&gt;
  * &lt;o:importFunctions type="org.omnifaces.util.Faces" /&gt;
  * ...
- * #{Math:abs(-10)}
- * #{Math:max(bean.number1, bean.number2)}
+ * #{m:abs(-10)}
+ * #{m:max(bean.number1, bean.number2)}
  * ...
  * &lt;base href="#{Faces:getRequestBaseURL()}" /&gt;
  * </pre>

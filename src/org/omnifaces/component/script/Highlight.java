@@ -45,7 +45,7 @@ import org.omnifaces.util.Components;
  * &lt;o:highlight /&gt;
  * </pre>
  * <p>
- * The default error style class name is <tt>error</tt>. You need to specify a CSS style associated with the class
+ * The default error style class name is <code>error</code>. You need to specify a CSS style associated with the class
  * yourself. For example,
  * <pre>
  * label.error {
@@ -154,7 +154,7 @@ public class Highlight extends OnloadScript {
 	// Getters/setters ------------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns the error style class which is to be applied on invalid inputs. Defaults to <tt>error</tt>.
+	 * Returns the error style class which is to be applied on invalid inputs. Defaults to <code>error</code>.
 	 * @return The error style class which is to be applied on invalid inputs.
 	 */
 	public String getStyleClass() {

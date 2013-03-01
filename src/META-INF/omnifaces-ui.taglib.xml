@@ -365,7 +365,7 @@
 &lt;o:highlight /&gt;
 				</pre>
 				<p>
-				The default error style class name is <tt>error</tt>. You need to specify a CSS style associated with the class
+				The default error style class name is <code>error</code>. You need to specify a CSS style associated with the class
 				yourself. For example,
 				<pre>
 label.error {
@@ -426,7 +426,7 @@ input.error, select.error, textarea.error {
 		<attribute>
 			<description>
 				<![CDATA[
-					The error style class which is to be applied on invalid inputs. Defaults to <tt>error</tt>.
+					The error style class which is to be applied on invalid inputs. Defaults to <code>error</code>.
 				]]>
 			</description>
 			<name>styleClass</name>
@@ -456,7 +456,7 @@ input.error, select.error, textarea.error {
   &lt;link rel="stylesheet" href="ie6-ie7.css" /&gt;
 &lt;![endif]--&gt;
 				</pre>
-				<p>However, Facelets renders them HTML-escaped and if <tt>javax.faces.FACELETS_SKIP_COMMENTS</tt> context param is
+				<p>However, Facelets renders them HTML-escaped and if <code>javax.faces.FACELETS_SKIP_COMMENTS</code> context param is
 				set to <code>true</code> then it will even not be rendered at all. You would need to workaround this with an ugly
 				<code>&lt;h:outputText escape="false"&gt;</code>.
 				<pre>
@@ -2708,11 +2708,11 @@ public enum Baz {
 				in <code>.taglib.xml</code> file. The functions are those <code>public static</code> methods with a
 				<strong>non</strong>-<code>void</code> return type. For example:
 				<pre>
-&lt;o:importFunctions type="java.lang.Math" /&gt;
+&lt;o:importFunctions type="java.lang.Math" var="m" /&gt;
 &lt;o:importFunctions type="org.omnifaces.util.Faces" /&gt;
 ...
-#{Math:abs(-10)}
-#{Math:max(bean.number1, bean.number2)}
+#{m:abs(-10)}
+#{m:max(bean.number1, bean.number2)}
 ...
 &lt;base href="#{Faces:getRequestBaseURL()}" /&gt;
 				</pre>

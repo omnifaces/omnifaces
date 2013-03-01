@@ -41,8 +41,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
- * This configuration enum parses the <tt>/WEB-INF/web.xml</tt> and all <tt>/META-INF/web-fragment</tt> files found in
- * the classpath and offers methods to obtain information from them which is not available by the standard Servlet API.
+ * This configuration enum parses the <code>/WEB-INF/web.xml</code> and all <code>/META-INF/web-fragment</code> files
+ * found in the classpath and offers methods to obtain information from them which is not available by the standard
+ * Servlet API.
  *
  * @author Bauke Scholtz
  * @since 1.2

@@ -44,7 +44,7 @@ import org.omnifaces.util.Json;
  * </ul>
  * You can use the {@link Ajax} utility class to easily add callback scripts and arguments.
  * <p>
- * This partial view context is already registered by OmniFaces' own <tt>faces-config.xml</tt> and thus gets
+ * This partial view context is already registered by OmniFaces' own <code>faces-config.xml</code> and thus gets
  * auto-initialized when the OmniFaces JAR is bundled in a web application, so end-users do not need to register this
  * partial view context explicitly themselves.
  *

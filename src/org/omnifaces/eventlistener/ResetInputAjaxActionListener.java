@@ -62,7 +62,7 @@ import org.omnifaces.util.Hacks;
  * The {@link ResetInputAjaxActionListener} is designed to solve exactly this problem. There are basically three ways
  * to configure and use it:
  * <ul>
- * <li><p>Register it as <code>&lt;phase-listener&gt;</code> in <tt>faces-config.xml</tt>. It'll be applied
+ * <li><p>Register it as <code>&lt;phase-listener&gt;</code> in <code>faces-config.xml</code>. It'll be applied
  * to <strong>every single</strong> ajax action throughout the webapp, on both <code>UIInput</code> and
  * <code>UICommand</code> components.
  * <pre>
@@ -70,7 +70,7 @@ import org.omnifaces.util.Hacks;
  *   &lt;phase-listener&gt;org.omnifaces.eventlistener.ResetInputAjaxActionListener&lt;/phase-listener&gt;
  * &lt;/lifecycle&gt;
  * </pre>
- * <li><p><i>Or</i> register it as <code>&lt;action-listener&gt;</code> in <tt>faces-config.xml</tt>. It'll
+ * <li><p><i>Or</i> register it as <code>&lt;action-listener&gt;</code> in <code>faces-config.xml</code>. It'll
  * <strong>only</strong> be applied to ajax actions which are invoked by an <code>UICommand</code> component such as
  * <code>&lt;h:commandButton&gt;</code> and <code>&lt;h:commandLink&gt;</code>.
  * <pre>
@@ -119,7 +119,7 @@ public class ResetInputAjaxActionListener extends DefaultPhaseListener implement
 	/**
 	 * Construct a new reset input ajax action listener. This constructor will be used when specifying the action
 	 * listener by <code>&lt;f:actionListener&gt;</code> or when registering as <code>&lt;phase-listener&gt;</code> in
-	 * <tt>faces-config.xml</tt>.
+	 * <code>faces-config.xml</code>.
 	 */
 	public ResetInputAjaxActionListener() {
 		this(null);
@@ -127,7 +127,7 @@ public class ResetInputAjaxActionListener extends DefaultPhaseListener implement
 
 	/**
 	 * Construct a new reset input ajax action listener around the given wrapped action listener. This constructor
-	 * will be used when registering as <code>&lt;action-listener&gt;</code> in <tt>faces-config.xml</tt>.
+	 * will be used when registering as <code>&lt;action-listener&gt;</code> in <code>faces-config.xml</code>.
 	 * @param wrapped The wrapped action listener.
 	 */
 	public ResetInputAjaxActionListener(ActionListener wrapped) {

@@ -64,8 +64,8 @@ final class CombinedResourceInputStream extends InputStream {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * For each resource, read until its {@link InputStream#read()} returns <tt>-1</tt> and then iterate to the
-	 * {@link InputStream} of the next resource, if any available, else return <tt>-1</tt>.
+	 * For each resource, read until its {@link InputStream#read()} returns <code>-1</code> and then iterate to the
+	 * {@link InputStream} of the next resource, if any available, else return <code>-1</code>.
 	 */
 	@Override
 	public int read() throws IOException {

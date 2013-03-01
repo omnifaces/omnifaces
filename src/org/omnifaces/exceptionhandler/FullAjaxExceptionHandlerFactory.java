@@ -16,7 +16,7 @@ import javax.faces.context.ExceptionHandler;
 import javax.faces.context.ExceptionHandlerFactory;
 
 /**
- * This exception handler factory needs to be registered as follows in <tt>faces-config.xml</tt> to get the
+ * This exception handler factory needs to be registered as follows in <code>faces-config.xml</code> to get the
  * {@link FullAjaxExceptionHandler} to run:
  * <pre>
  * &lt;factory&gt;

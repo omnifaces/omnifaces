@@ -251,8 +251,8 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	/**
 	 * Show the message at the desired place(s) depending on the value of the <code>showMessageFor</code> attribute.
 	 * <ul>
-	 * <li><tt>@this</tt>: message will be added to the <code>&lt;h:message&gt;</code> for this component.
-	 * <li><tt>@all</tt>: message will be added to all components as specified in <code>components</code> attribute.
+	 * <li><code>@this</code>: message will be added to the <code>&lt;h:message&gt;</code> for this component.
+	 * <li><code>@all</code>: message will be added to all components as specified in <code>components</code> attribute.
 	 * </ul>
 	 * @param context The faces context to work with.
 	 * @param inputs The validated input components.

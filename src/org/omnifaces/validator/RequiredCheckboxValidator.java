@@ -39,8 +39,8 @@ import org.omnifaces.util.Messages;
  * the <code>&lt;h:selectBooleanCheckbox&gt;</code> is fairly pointless. It would always pass the validation and thus
  * never display the desired required message in case of an unticked checkbox.
  * <p>
- * To get it to work anyway, register this validator on validator ID of <tt>omnifaces.RequiredCheckboxValidator</tt> as
- * follows:
+ * To get it to work anyway, register this validator on validator ID of <code>omnifaces.RequiredCheckboxValidator</code>
+ * as follows:
  * <pre>
  * &lt;h:selectBooleanCheckbox id="agree" value="#{bean.agree}" requiredMessage="You must agree!"&gt;
  *   &lt;f:validator validatorId="omnifaces.RequiredCheckboxValidator" /&gt;
@@ -48,7 +48,8 @@ import org.omnifaces.util.Messages;
  * </pre>
  * <p>
  * The validator will use the message as specified in <code>requiredMessage</code>. If it's absent, then it will use
- * the default required message as specified in custom <code>&lt;message-bundle&gt;</code> in <tt>faces-config.xml</tt>.
+ * the default required message as specified in custom <code>&lt;message-bundle&gt;</code> in
+ * <code>faces-config.xml</code>.
  * If it's absent, then it will default to "{0}: a tick is required".
  *
  * @author Bauke Scholtz

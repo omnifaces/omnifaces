@@ -48,7 +48,7 @@ import org.omnifaces.util.Utils;
  * for all scripts and another combined one for all stylesheets, when the JSF project stage is <strong>not</strong> set
  * to <code>Development</code>.
  * <p>
- * To get it to run, this handler needs be registered as follows in <tt>faces-config.xml</tt>:
+ * To get it to run, this handler needs be registered as follows in <code>faces-config.xml</code>:
  * <pre>
  * &lt;application&gt;
  *   &lt;resource-handler&gt;org.omnifaces.resourcehandler.CombinedResourceHandler&lt;/resource-handler&gt;
@@ -110,8 +110,8 @@ import org.omnifaces.util.Utils;
  * <p>
  * Here, the "resource identifier" is the unique combination of library name and resource name, separated by a colon,
  * exactly the syntax as you would use in <code>#{resource}</code> in EL. If there is no library name, then just omit
- * the colon. Valid examples of resource identifiers are <tt>filename.ext</tt>, <tt>folder/filename.ext</tt>,
- * <tt>library:filename.ext</tt> and <tt>library:folder/filename.ext</tt>.
+ * the colon. Valid examples of resource identifiers are <code>filename.ext</code>, <code>folder/filename.ext</code>,
+ * <code>library:filename.ext</code> and <code>library:folder/filename.ext</code>.
  * <p>
  * Note that this combined resource handler is <strong>not</strong> able to combine resources which are <em>not</em>
  * been added as a component resource, but are been hardcoded in some renderer (such as <code>theme.css</code> in case
