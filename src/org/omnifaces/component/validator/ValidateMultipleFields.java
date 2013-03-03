@@ -12,6 +12,8 @@
  */
 package org.omnifaces.component.validator;
 
+import static java.lang.Boolean.FALSE;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -97,7 +99,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	// Private constants ----------------------------------------------------------------------------------------------
 
 	private static final String DEFAULT_SHOWMESSAGEFOR = "@this";
-	private static final Boolean DEFAULT_DISABLED = Boolean.FALSE;
+	private static final Boolean DEFAULT_DISABLED = FALSE;
 
 	private static final String ERROR_MISSING_COMPONENTS =
 		"%s attribute 'components' must be specified.";
@@ -345,7 +347,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	 * Returns whether the validation should be disabled or not.
 	 * @return Whether the validation should be disabled or not.
 	 */
-	public boolean isDisabled() {
+	public Boolean isDisabled() {
 		return state.get(PropertyKeys.disabled, DEFAULT_DISABLED);
 	}
 
@@ -353,7 +355,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	 * Sets whether the validation should be disabled or not.
 	 * @param disabled Whether the validation should be disabled or not.
 	 */
-	public void setDisabled(boolean disabled) {
+	public void setDisabled(Boolean disabled) {
 		state.put(PropertyKeys.disabled, disabled);
 	}
 

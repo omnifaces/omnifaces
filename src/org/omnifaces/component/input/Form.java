@@ -12,7 +12,8 @@
  */
 package org.omnifaces.component.input;
 
-import static org.omnifaces.component.input.Form.PropertyKeys.*;
+import static java.lang.Boolean.FALSE;
+import static org.omnifaces.component.input.Form.PropertyKeys.includeViewParams;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -125,8 +126,8 @@ public class Form extends UIForm {
 	/**
 	 * Return whether or not the view parameters should be encoded into the form's action URL.
 	 */
-	public boolean isIncludeViewParams() {
-		return state.get(includeViewParams, false);
+	public Boolean isIncludeViewParams() {
+		return state.get(includeViewParams, FALSE);
 	}
 
 	/**

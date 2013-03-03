@@ -12,6 +12,8 @@
  */
 package org.omnifaces.component.script;
 
+import static java.lang.Boolean.TRUE;
+
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Set;
@@ -85,7 +87,7 @@ public class Highlight extends OnloadScript {
 
 	private static final Set<VisitHint> VISIT_HINTS = EnumSet.of(VisitHint.SKIP_UNRENDERED);
 	private static final String DEFAULT_STYLECLASS = "error";
-	private static final Boolean DEFAULT_FOCUS = Boolean.TRUE;
+	private static final Boolean DEFAULT_FOCUS = TRUE;
 	private static final String SCRIPT = "OmniFaces.Highlight.addErrorClass([%s], '%s', %s);";
 
 	private enum PropertyKeys {
@@ -178,7 +180,7 @@ public class Highlight extends OnloadScript {
 	 * Returns whether the first error element should gain focus. Defaults to <code>true</code>.
 	 * @return Whether the first error element should gain focus.
 	 */
-	public boolean isFocus() {
+	public Boolean isFocus() {
 		return state.get(PropertyKeys.focus, DEFAULT_FOCUS);
 	}
 
@@ -186,7 +188,7 @@ public class Highlight extends OnloadScript {
 	 * Sets whether the first error element should gain focus.
 	 * @param focus Whether the first error element should gain focus.
 	 */
-	public void setFocus(boolean focus) {
+	public void setFocus(Boolean focus) {
 		state.put(PropertyKeys.focus, focus);
 	}
 
