@@ -15,7 +15,11 @@ package org.omnifaces.facesviews;
 import static javax.faces.application.ProjectStage.Development;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES;
+import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_REVERSE_RESOURCES;
+import static org.omnifaces.facesviews.FacesViews.getExtensionAction;
 import static org.omnifaces.facesviews.FacesViews.getExtensionlessURLWithQuery;
+import static org.omnifaces.facesviews.FacesViews.getPathAction;
+import static org.omnifaces.facesviews.FacesViews.isResourceInPublicPath;
 import static org.omnifaces.facesviews.FacesViews.scanAndStoreViews;
 import static org.omnifaces.facesviews.FacesViews.tryScanAndStoreViews;
 import static org.omnifaces.util.Faces.getApplicationAttribute;
@@ -53,6 +57,7 @@ import org.omnifaces.filter.HttpFilter;
 public class FacesViewsForwardingFilter extends HttpFilter {
 	
 	private static ExtensionAction extensionAction = ExtensionAction.REDIRECT_TO_EXTENSIONLESS;
+	private static PathAction pathAction = PathAction.SEND_404;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -80,10 +85,17 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 											.addMappingForUrlPatterns(null, false, "*");
         }
         
-        ExtensionAction userAction = FacesViews.getExtensionAction(servletContext);
-        if (userAction != null) {
-        	extensionAction = userAction;
+        ExtensionAction userExtensionAction = getExtensionAction(servletContext);
+        if (userExtensionAction != null) {
+        	extensionAction = userExtensionAction;
         }
+        
+        PathAction userPathAction = getPathAction(servletContext);
+        if (userPathAction != null) {
+        	pathAction = userPathAction;
+        }
+        
+        
     }
 
     @Override
@@ -117,6 +129,9 @@ public class FacesViewsForwardingFilter extends HttpFilter {
         	}
         } else if (resources.containsKey(resource)) {
         	
+        	// A mapped resource request with extension is encountered, user setting
+        	// determines how we handle this.
+        	
         	switch (extensionAction) {
 		    	case REDIRECT_TO_EXTENSIONLESS:
 		    		redirectPermanent(response, getExtensionlessURLWithQuery(request));
@@ -129,6 +144,28 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 				default:
 					break;
 	        	}
+        } else if (isResourceInPublicPath(context, resource)) {
+        	
+        	Map<String, String> reverseResources = getApplicationAttribute(context, FACES_VIEWS_REVERSE_RESOURCES);
+        		
+    		if (reverseResources.containsKey(resource)) {
+    			
+    			// A direct request to one of the public paths (excluding /) from where we scanned resources
+    			// was done. Again, the user setting determined how we handle this.
+    			
+    			switch (pathAction) {
+    				case REDIRECT_TO_SCANNED_EXTENTIONLESS:
+    					redirectPermanent(response, getExtensionlessURLWithQuery(request, reverseResources.get(resource)));
+    					return;
+	    			case SEND_404:
+	    				response.sendError(SC_NOT_FOUND);
+	    				return;
+	    			case PROCEED:
+						break;
+					default:
+						break;
+    			}
+    		}
         }
 
         chain.doFilter(request, response);

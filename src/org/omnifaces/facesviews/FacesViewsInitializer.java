@@ -18,7 +18,10 @@ import static javax.faces.view.facelets.ResourceResolver.FACELETS_RESOURCE_RESOL
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ENABLED_PARAM_NAME;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES_EXTENSIONS;
+import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_REVERSE_RESOURCES;
+import static org.omnifaces.facesviews.FacesViews.getPublicRootPaths;
 import static org.omnifaces.facesviews.FacesViews.scanViewsFromRootPaths;
+import static org.omnifaces.util.Utils.reverse;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,6 +58,7 @@ public class FacesViewsInitializer implements ServletContainerInitializer {
 
 				// Store the resources and extensions that were found in application scope, where others can find it.
 				servletContext.setAttribute(FACES_VIEWS_RESOURCES, unmodifiableMap(collectedViews));
+				servletContext.setAttribute(FACES_VIEWS_REVERSE_RESOURCES, unmodifiableMap(reverse(collectedViews)));
 				servletContext.setAttribute(FACES_VIEWS_RESOURCES_EXTENSIONS, unmodifiableSet(collectedExtentions));
 
 				// Register 3 artifacts with the Servlet container and JSF that help implement this feature:
@@ -76,6 +80,12 @@ public class FacesViewsInitializer implements ServletContainerInitializer {
 				// Map the forwarding filter to all the resources we found.
 				for (String resource : collectedViews.keySet()) {
 					facesViewsRegistration.addMappingForUrlPatterns(null, false, resource);
+				}
+				
+				// Additionally map the filter to all paths that were scanned and which are also directly
+				// accessible. This is to give the filter an opportunity to block these.
+				for (String path : getPublicRootPaths(servletContext)) {
+					facesViewsRegistration.addMappingForUrlPatterns(null, false, path + "*");
 				}
 				
 				// We now need to map the Faces Servlet to the extensions we found, but at this point in time

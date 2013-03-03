@@ -24,6 +24,7 @@ import static org.omnifaces.util.ResourcePaths.stripExtension;
 import static org.omnifaces.util.ResourcePaths.stripPrefixPath;
 import static org.omnifaces.util.Utils.csvToList;
 import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.reverse;
 import static org.omnifaces.util.Utils.startsWithOneOf;
 
 import java.util.Collection;
@@ -70,11 +71,20 @@ public final class FacesViews {
 
 	public static final String FACES_VIEWS_EXTENSION_ACTION_PARAM_NAME = "org.omnifaces.FACES_VIEWS_EXTENSION_ACTION";
 	
+	public static final String FACES_VIEWS_PATH_ACTION_PARAM_NAME = "org.omnifaces.FACES_VIEWS_PATH_ACTION";
+	
 	/**
 	 * The name of the application scope context parameter under which a Set version of the paths that are to be scanned
 	 * by faces views are kept.
 	 */
 	public static final String SCAN_PATHS = "org.omnifaces.facesviews.scanpaths";
+	
+	/**
+	 * The name of the application scope context parameter under which a Set version of the public paths that are to be scanned
+	 * by faces views are kept. A public path is a path that is also directly accessible, e.g. is world readable. This excludes
+	 * the special path /, which is by definition world readable but not included in this set.
+	 */
+	public static final String PUBLIC_SCAN_PATHS = "org.omnifaces.facesviews.public.scanpaths";
 
 	/**
 	 * The name of the init parameter (in web.xml) via which the user can set scanned views to be always rendered
@@ -90,6 +100,7 @@ public final class FacesViews {
 	public static final String SCANNED_VIEWS_EXTENSIONLESS = "org.omnifaces.facesviews.scannedviewsextensionless";
 	
 	public static final String FACES_VIEWS_RESOURCES = "org.omnifaces.facesviews";
+	public static final String FACES_VIEWS_REVERSE_RESOURCES = "org.omnifaces.facesviews.reverse.resources";
     public static final String FACES_VIEWS_RESOURCES_EXTENSIONS = "org.omnifaces.facesviews.extensions";
 
     
@@ -120,6 +131,33 @@ public final class FacesViews {
 		return rootPaths;
 	}
 	
+	public static Set<String> getPublicRootPaths(ServletContext servletContext) {
+		@SuppressWarnings("unchecked")
+		Set<String> publicRootPaths = (Set<String>) servletContext.getAttribute(PUBLIC_SCAN_PATHS);
+		if (publicRootPaths == null) {
+			Set<String> rootPaths = getRootPaths(servletContext);
+			publicRootPaths = new HashSet<String>();
+			for (String rootPath : rootPaths) {
+				if (!"/".equals(rootPath) && !startsWithOneOf(rootPath, "/WEB-INF/", "/META-INF/")) {
+					publicRootPaths.add(rootPath);
+				}
+			}
+			servletContext.setAttribute(PUBLIC_SCAN_PATHS, unmodifiableSet(publicRootPaths));
+		}
+		
+		return publicRootPaths;
+	}
+	
+	public static boolean isResourceInPublicPath(ServletContext servletContext, String resource) {
+		Set<String> publicPaths = getPublicRootPaths(servletContext);
+    	for (String path : publicPaths) {
+    		if (resource.startsWith(path)) {
+    			return true;
+    		}
+    	}
+    	return false;
+	}
+	
 	public static ExtensionAction getExtensionAction(ServletContext servletContext) {
 		String extensionActionString = servletContext.getInitParameter(FACES_VIEWS_EXTENSION_ACTION_PARAM_NAME);
 		if (isEmpty(extensionActionString)) {
@@ -133,6 +171,24 @@ public final class FacesViews {
 				String.format(
 					"Value '%s' is not valud for context parameter for '%s'",
 					extensionActionString, FACES_VIEWS_EXTENSION_ACTION_PARAM_NAME
+				)
+			);
+		}
+	}
+	
+	public static PathAction getPathAction(ServletContext servletContext) {
+		String pathActionString = servletContext.getInitParameter(FACES_VIEWS_PATH_ACTION_PARAM_NAME);
+		if (isEmpty(pathActionString)) {
+			return null;
+		}
+		
+		try {
+			return PathAction.valueOf(pathActionString.toUpperCase(US));
+		} catch (Exception e) {
+			throw new IllegalStateException(
+				String.format(
+					"Value '%s' is not valud for context parameter for '%s'",
+					pathActionString, FACES_VIEWS_PATH_ACTION_PARAM_NAME
 				)
 			);
 		}
@@ -256,6 +312,7 @@ public final class FacesViews {
 		Map<String, String> views = scanViews(context);
 		if (!views.isEmpty()) {
 			context.setAttribute(FACES_VIEWS_RESOURCES, unmodifiableMap(views));
+			context.setAttribute(FACES_VIEWS_REVERSE_RESOURCES, unmodifiableMap(reverse(views)));
 		}
 		return views;
 	}
@@ -308,6 +365,20 @@ public final class FacesViews {
 	 * @return request URL with query parameters but without file extension
 	 */
 	public static String getExtensionlessURLWithQuery(HttpServletRequest request) {
+		return getExtensionlessURLWithQuery(request, request.getServletPath());
+	}
+	
+	/**
+	 * Obtains the full request URL from the given request and the given resource complete with the query string, but with the
+	 * extension (if any) cut out.
+	 * <p>
+	 * E.g. <code>http://localhost/foo/bar.xhtml?kaz=1</code> becomes <code>http://localhost/foo/bar?kaz=1</code>
+	 * 
+	 * @param request the request from which the base URL is obtained.
+	 * @param resource the resource relative to the base URL
+	 * @return request URL with query parameters but without file extension
+	 */
+	public static String getExtensionlessURLWithQuery(HttpServletRequest request, String resource) {
 		String queryString = !isEmpty(request.getQueryString()) ? "?" + request.getQueryString() : "";
 		
 		String baseURL = Faces.getRequestBaseURL(request);
@@ -315,7 +386,7 @@ public final class FacesViews {
 			baseURL = baseURL.substring(0, baseURL.length()-1);
 		}
 		
-		return baseURL + stripExtension(request.getServletPath()) + queryString;
+		return baseURL + stripExtension(resource) + queryString;
 	}
 
 }
