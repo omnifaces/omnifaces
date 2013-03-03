@@ -121,7 +121,6 @@ public final class FacesViews {
 				String[] pathAndExtension = rootPath.split(quote("*"));
 				rootPath = pathAndExtension[0];
 				extensionToScan = pathAndExtension[1];
-				
 			}
 			
 			scanViews(servletContext, rootPath, servletContext.getResourcePaths(rootPath), collectedViews, extensionToScan, collectedExtensions);
@@ -131,8 +130,14 @@ public final class FacesViews {
 	public static Set<String> getRootPaths(ServletContext servletContext) {
 		@SuppressWarnings("unchecked")
 		Set<String> rootPaths = (Set<String>) servletContext.getAttribute(SCAN_PATHS);
+		
 		if (rootPaths == null) {
-			rootPaths = new HashSet<String>(csvToList(servletContext.getInitParameter(FACES_VIEWS_SCAN_PATHS_PARAM_NAME)));
+			rootPaths = new HashSet<String>();
+			
+			for (String rootPath : csvToList(servletContext.getInitParameter(FACES_VIEWS_SCAN_PATHS_PARAM_NAME))) {
+				rootPaths.add(normalizeRootPath(rootPath));
+			}
+			
 			rootPaths.add(WEB_INF_VIEWS);
 			servletContext.setAttribute(SCAN_PATHS, unmodifiableSet(rootPaths));
 		}
@@ -143,10 +148,19 @@ public final class FacesViews {
 	public static Set<String> getPublicRootPaths(ServletContext servletContext) {
 		@SuppressWarnings("unchecked")
 		Set<String> publicRootPaths = (Set<String>) servletContext.getAttribute(PUBLIC_SCAN_PATHS);
+		
 		if (publicRootPaths == null) {
 			Set<String> rootPaths = getRootPaths(servletContext);
 			publicRootPaths = new HashSet<String>();
 			for (String rootPath : rootPaths) {
+				
+				if (rootPath.contains("*")) {
+					String[] pathAndExtension = rootPath.split(quote("*"));
+					rootPath = pathAndExtension[0];
+				}
+				
+				rootPath = normalizeRootPath(rootPath);
+				
 				if (!"/".equals(rootPath) && !startsWithOneOf(rootPath, "/WEB-INF/", "/META-INF/")) {
 					publicRootPaths.add(rootPath);
 				}
@@ -155,6 +169,17 @@ public final class FacesViews {
 		}
 		
 		return publicRootPaths;
+	}
+	
+	public static String normalizeRootPath(String rootPath) {
+		String normalizedPath = rootPath;
+		if (!normalizedPath.startsWith("/")) {
+			normalizedPath = "/" + normalizedPath;
+		}
+		if (!normalizedPath.endsWith("/")) {
+			normalizedPath = normalizedPath + "/";
+		}
+		return normalizedPath;
 	}
 	
 	public static boolean isResourceInPublicPath(ServletContext servletContext, String resource) {
@@ -275,8 +300,8 @@ public final class FacesViews {
 			return true;
 		}
 		
-		// For the special directory /, don't scan WEB-INF and META-INF
-		return !startsWithOneOf(directory, "/WEB-INF/", "/META-INF/");
+		// For the special directory /, don't scan WEB-INF, META-INF and resources
+		return !startsWithOneOf(directory, "/WEB-INF/", "/META-INF/", "/resources/");
 	}
 	
 	public static boolean canScanResource(String resource, String extensionToScan) {

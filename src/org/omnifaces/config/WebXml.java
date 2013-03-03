@@ -159,6 +159,7 @@ public enum WebXml {
 	 * @return <code>true</code> if access to the given URL is allowed for the given role, otherwise <code>false</code>.
 	 * @throws NullPointerException If given URL is null.
 	 * @throws IllegalArgumentException If given URL does not start with '/'.
+	 * @since 1.4
 	 */
 	public boolean isAccessAllowed(String url, String role) {
 		if (url.charAt(0) != ('/')) {

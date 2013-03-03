@@ -102,7 +102,8 @@
  * <td>A comma separated list of paths that are to be scanned in addition to <code>/WEB-INF/faces-views</code>. Allowed values: any path relative
  * to the web root, including the root path (<code>/</code>) and <code>/WEB-INF</code>. A wildcard can be added to the path, which will cause
  * only files with the given extension te be scanned. Example: Scan all files in both folder1 and folder2 <code>/folder1, /folder2</code>, Scan only
- * .xhtml files in the root <code>/*.xhtml</code>. Note that when the root path is given, all its sub paths are also scanned EXCEPT WEB-INF and META-INF.
+ * .xhtml files in the root <code>/*.xhtml</code>. Note that when the root path is given, all its sub paths are also scanned EXCEPT <code>WEB-INF</code>, 
+ * <code>META-INF</code> and <code>resources</code>.
  * If those have to be scanned as well, they can be added to the list of paths explicitly. Default: <code>/WEB-INF/faces-views</code> (note when this value
  * is set, those paths will be in addition to the default <code>/WEB-INF/faces-views</code>)
  * </td>
@@ -132,9 +133,9 @@
  * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_PATH_ACTION_PARAM_NAME}</code></td>
  * <td>Determines the action that is performed whenever a resource is requested in a public path that has been used for scanning views by faces views
  * (e.g. the paths set by <code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_SCAN_PATHS_PARAM_NAME}</code>, but excluding the root path /).
- * Allowed values: {<code>SEND_404</code>,<code>REDIRECT_TO_SCANNED_EXTENTIONLESS</code>,<code>PROCEED</code>}, which have the following meaning: 
+ * Allowed values: {<code>SEND_404</code>,<code>REDIRECT_TO_SCANNED_EXTENSIONLESS</code>,<code>PROCEED</code>}, which have the following meaning: 
  * <code>SEND_404</code> - Send a 404 (not found), makes it look like e.g. "/path/foo.xhtml" never existed and there's only "/foo" and optionally "/foo.xhtml"
- * <code>REDIRECT_TO_SCANNED_EXTENTIONLESS</code> - Redirects to the resource corresponding with the one that was scanned. e.g. "/path/foo.xml" redirects to "/foo"
+ * <code>REDIRECT_TO_SCANNED_EXTENSIONLESS</code> - Redirects to the resource corresponding with the one that was scanned. e.g. "/path/foo.xml" redirects to "/foo"
  * <code>PROCEED</code> - No special action is taken. "/path/foo.xml" and "/foo" (and optionally "/foo.xhtml") will be accessible.
  * Default: <code>REDIRECT_TO_EXTENSIONLESS</code>
  * </td>

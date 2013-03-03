@@ -51,15 +51,15 @@ public class FacesViewsInitializer implements ServletContainerInitializer {
 
 			// Scan our dedicated directory for Faces resources that need to be mapped
 			Map<String, String> collectedViews = new HashMap<String, String>();
-			Set<String> collectedExtentions = new HashSet<String>();
-			scanViewsFromRootPaths(servletContext, collectedViews, collectedExtentions);
+			Set<String> collectedExtensions = new HashSet<String>();
+			scanViewsFromRootPaths(servletContext, collectedViews, collectedExtensions);
 
 			if (!collectedViews.isEmpty()) {
 
 				// Store the resources and extensions that were found in application scope, where others can find it.
 				servletContext.setAttribute(FACES_VIEWS_RESOURCES, unmodifiableMap(collectedViews));
 				servletContext.setAttribute(FACES_VIEWS_REVERSE_RESOURCES, unmodifiableMap(reverse(collectedViews)));
-				servletContext.setAttribute(FACES_VIEWS_RESOURCES_EXTENSIONS, unmodifiableSet(collectedExtentions));
+				servletContext.setAttribute(FACES_VIEWS_RESOURCES_EXTENSIONS, unmodifiableSet(collectedExtensions));
 
 				// Register 3 artifacts with the Servlet container and JSF that help implement this feature:
 

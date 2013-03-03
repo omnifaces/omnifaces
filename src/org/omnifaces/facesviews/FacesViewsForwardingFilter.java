@@ -154,7 +154,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
     			// was done. Again, the user setting determined how we handle this.
     			
     			switch (pathAction) {
-    				case REDIRECT_TO_SCANNED_EXTENTIONLESS:
+    				case REDIRECT_TO_SCANNED_EXTENSIONLESS:
     					redirectPermanent(response, getExtensionlessURLWithQuery(request, reverseResources.get(resource)));
     					return;
 	    			case SEND_404:
