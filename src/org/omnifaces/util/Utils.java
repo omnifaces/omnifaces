@@ -12,8 +12,8 @@
  */
 package org.omnifaces.util;
 
-import static java.util.Collections.*;
-import static java.util.regex.Pattern.*;
+import static java.util.Collections.emptyList;
+import static java.util.regex.Pattern.quote;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -35,10 +35,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.zip.Deflater;
@@ -337,6 +339,24 @@ public final class Utils {
 		return list;
 	}
 
+	/**
+	 * Returns a new map that contains the reverse of the given map.
+	 * <p>
+	 * The reverse of a map means that every value X becomes a key X' with as corresponding
+	 * value Y' the key Y that was originally associated with the value X.
+	 * 
+	 * @param source the map that is to be reversed
+	 * @return the reverse of the given map
+	 */
+	public static <T> Map<T, T> reverse(Map<T, T> source) {
+		Map<T, T> target = new HashMap<T, T>();
+		for (Entry<T, T> entry : source.entrySet()) {
+			target.put(entry.getValue(), entry.getKey());
+		}
+		
+		return target;
+	}
+	
 	// Dates ----------------------------------------------------------------------------------------------------------
 
 	/**
