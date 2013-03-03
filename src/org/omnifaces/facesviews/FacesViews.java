@@ -68,9 +68,24 @@ public final class FacesViews {
 	 * scanned by faces views.
 	 */
 	public static final String FACES_VIEWS_SCAN_PATHS_PARAM_NAME = "org.omnifaces.FACES_VIEWS_SCAN_PATHS";
+	
+	/**
+	 * The name of the init parameter (in web.xml) via which the user can set scanned views to be always rendered
+	 * extensionless. Without this setting (or it being set to false), it depends on whether the request URI uses an
+	 * extension or not. If it doesn't, links are also rendered without one, otherwise are rendered with an extension.
+	 */
+	public static final String FACES_VIEWS_SCANNED_VIEWS_EXTENSIONLESS_PARAM_NAME = "org.omnifaces.FACES_VIEWS_SCANNED_VIEWS_ALWAYS_EXTENSIONLESS";
 
+	/**
+	 * The name of the init parameter (in web.xml) that determines the action that is performed whenever a resource
+	 * is requested WITH extension that's also available without an extension. See {@link ExtensionAction}
+	 */
 	public static final String FACES_VIEWS_EXTENSION_ACTION_PARAM_NAME = "org.omnifaces.FACES_VIEWS_EXTENSION_ACTION";
 	
+	/**
+	 * The name of the init parameter (in web.xml) that determines the action that is performed whenever a resource
+	 * is requested in a public path that has been used for scanning views by faces views. See {@link PathAction}
+	 */
 	public static final String FACES_VIEWS_PATH_ACTION_PARAM_NAME = "org.omnifaces.FACES_VIEWS_PATH_ACTION";
 	
 	/**
@@ -85,13 +100,7 @@ public final class FacesViews {
 	 * the special path /, which is by definition world readable but not included in this set.
 	 */
 	public static final String PUBLIC_SCAN_PATHS = "org.omnifaces.facesviews.public.scanpaths";
-
-	/**
-	 * The name of the init parameter (in web.xml) via which the user can set scanned views to be always rendered
-	 * extensionless. Without this setting (or it being set to false), it depends on whether the request URI uses an
-	 * extension or not. If it doesn't, links are also rendered without one, otherwise are rendered with an extension.
-	 */
-	public static final String FACES_VIEWS_SCANNED_VIEWS_EXTENSIONLESS_PARAM_NAME = "org.omnifaces.FACES_VIEWS_SCANNED_VIEWS_ALWAYS_EXTENSIONLESS";
+	
 
 	/**
 	 * The name of the application scope context parameter under which a Boolean version of the scanned views always
@@ -201,7 +210,11 @@ public final class FacesViews {
 
 		Boolean scannedViewsExtensionless = (Boolean) applicationMap.get(SCANNED_VIEWS_EXTENSIONLESS);
 		if (scannedViewsExtensionless == null) {
-			scannedViewsExtensionless = Boolean.valueOf(externalContext.getInitParameter(FACES_VIEWS_SCANNED_VIEWS_EXTENSIONLESS_PARAM_NAME));
+			if (externalContext.getInitParameter(FACES_VIEWS_SCANNED_VIEWS_EXTENSIONLESS_PARAM_NAME) == null) {
+				scannedViewsExtensionless = true;
+			} else {
+				scannedViewsExtensionless = Boolean.valueOf(externalContext.getInitParameter(FACES_VIEWS_SCANNED_VIEWS_EXTENSIONLESS_PARAM_NAME));
+			}
 			applicationMap.put(SCANNED_VIEWS_EXTENSIONLESS, scannedViewsExtensionless);
 		}
 

@@ -32,15 +32,17 @@
  * <pre>
  *    example.com/index
  *    example.com/users/add
- *    example.com/index.xhtml
- *    example.com/users/add.xhtml
+ *    example.com/index.xhtml (will direct to /index by default)
+ *    example.com/users/add.xhtml (will direct to /users/add by default)
  *    example.com/normal.xhtml
  * </pre>
  *
  * Note that although the directory outside <code>/WEB-INF/faces-views</code> is not scanned, the {@link javax.faces.webapp.FacesServlet}
  * <em>is</em> mapped on all extensions found in <code>/WEB-INF/faces-views</code>, so this will also affect files outside
  * this directory. In the above example <code>normal.xhtml</code> is thus also available via the <code>.xhtml</code> extension, since
- * the whole FacesServlet is mapped on this.
+ * the whole FacesServlet is mapped on this.<br>
+ * Also note that the extension variants of the scanned views will redirect to the extensionless variants. This behavior can be changed (see below),
+ * so that these views are either directly available (no redirect) or are not available at all.
  * 
  * <p>
  * <b>Example 2:</b><br>
@@ -66,8 +68,8 @@
  * <pre>
  *     example.com/page1
  *     example.com/foo/page2
- *     example.com/page1.xhtml
- *     example.com/foo/page2.xhtml
+ *     example.com/page1.xhtml (will direct to /page1 by default)
+ *     example.com/foo/page2.xhtml (will direct to /foo/page2 by default)
  * </pre>
  * 
  * Note that in the above example, <code>WEB-INF</code> was NOT scanned and thus <code>template.xhtml</code> is not made publicly available. Likewise
@@ -92,8 +94,9 @@
  * <tr>
  * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_ENABLED_PARAM_NAME}</code></td>
  * <td>Used to completely switch scanning off. Allowed values: {<code>true</code>,<code>false</code>} Default: <code>true</code>
- * (note that if no <code>/WEB-INF/faces-views</code> directory is present, no scanning will be done either)</td>
+ * (note that if no <code>/WEB-INF/faces-views</code> directory is present and no explicit paths have been configured, no scanning will be done either)</td>
  * </tr>
+ * 
  * <tr>
  * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_SCAN_PATHS_PARAM_NAME}</code></td>
  * <td>A comma separated list of paths that are to be scanned in addition to <code>/WEB-INF/faces-views</code>. Allowed values: any path relative
@@ -104,13 +107,39 @@
  * is set, those paths will be in addition to the default <code>/WEB-INF/faces-views</code>)
  * </td>
  * </tr>
+ * 
  * <tr>
  * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_SCANNED_VIEWS_EXTENSIONLESS_PARAM_NAME}</code></td>
- * <td>Used to set that scanned views should always be rendered extensionless when used in JSF controlled links. Without this setting
- *  (or it being set to false), it depends on whether the request URI uses an extension or not. If it doesn't, links are also rendered without one,
- *  otherwise they are rendered with an extension. Default: <code>false</code>
+ * <td>Used to set how scanned views should be rendered in JSF controlled links. With this setting set to <code>false</code>, 
+ *  it depends on whether the request  URI uses an extension or not. If it doesn't, links are also rendered without one, 
+ *  otherwise they are rendered with an extension. When set to <code>true</code> links are always rendered without an extension.
+ *  Default: <code>true</code>
  * </td>
  * </tr>
+ * 
+ * <tr>
+ * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_EXTENSION_ACTION_PARAM_NAME}</code></td>
+ * <td>Determines the action that is performed whenever a resource is requested WITH extension that's also available without an extension.
+ * Allowed values: {<code>SEND_404</code>,<code>REDIRECT_TO_EXTENSIONLESS</code>,<code>PROCEED</code>}, which have the following meaning: 
+ * <code>SEND_404</code> - Send a 404 (not found), makes it look like e.g. "/foo.xhtml" never existed and there's only "/foo".
+ * <code>REDIRECT_TO_EXTENSIONLESS</code> - Redirects to the same URL, but with the extension removed. E.g. "/foo.xhtml" is redirected to "/foo"
+ * <code>PROCEED</code> - No special action is taken. Both "/foo.xhtml" and "/foo" are processed as-if they were separate views (with same content)
+ * Default: <code>REDIRECT_TO_EXTENSIONLESS</code>
+ * </td>
+ * </tr>
+ * 
+ * <tr>
+ * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_PATH_ACTION_PARAM_NAME}</code></td>
+ * <td>Determines the action that is performed whenever a resource is requested in a public path that has been used for scanning views by faces views
+ * (e.g. the paths set by <code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_SCAN_PATHS_PARAM_NAME}</code>, but excluding the root path /).
+ * Allowed values: {<code>SEND_404</code>,<code>REDIRECT_TO_SCANNED_EXTENTIONLESS</code>,<code>PROCEED</code>}, which have the following meaning: 
+ * <code>SEND_404</code> - Send a 404 (not found), makes it look like e.g. "/path/foo.xhtml" never existed and there's only "/foo" and optionally "/foo.xhtml"
+ * <code>REDIRECT_TO_SCANNED_EXTENTIONLESS</code> - Redirects to the resource corresponding with the one that was scanned. e.g. "/path/foo.xml" redirects to "/foo"
+ * <code>PROCEED</code> - No special action is taken. "/path/foo.xml" and "/foo" (and optionally "/foo.xhtml") will be accessible.
+ * Default: <code>REDIRECT_TO_EXTENSIONLESS</code>
+ * </td>
+ * </tr>
+ 
  * </table>
  * 
  * <p>
