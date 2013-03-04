@@ -123,6 +123,8 @@ public final class FacesViews {
 				extensionToScan = pathAndExtension[1];
 			}
 			
+			rootPath = normalizeRootPath(rootPath);
+			
 			scanViews(servletContext, rootPath, servletContext.getResourcePaths(rootPath), collectedViews, extensionToScan, collectedExtensions);
 		}
 	}
@@ -132,12 +134,7 @@ public final class FacesViews {
 		Set<String> rootPaths = (Set<String>) servletContext.getAttribute(SCAN_PATHS);
 		
 		if (rootPaths == null) {
-			rootPaths = new HashSet<String>();
-			
-			for (String rootPath : csvToList(servletContext.getInitParameter(FACES_VIEWS_SCAN_PATHS_PARAM_NAME))) {
-				rootPaths.add(normalizeRootPath(rootPath));
-			}
-			
+			rootPaths = new HashSet<String>(csvToList(servletContext.getInitParameter(FACES_VIEWS_SCAN_PATHS_PARAM_NAME)));
 			rootPaths.add(WEB_INF_VIEWS);
 			servletContext.setAttribute(SCAN_PATHS, unmodifiableSet(rootPaths));
 		}
