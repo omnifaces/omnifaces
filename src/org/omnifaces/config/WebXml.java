@@ -12,7 +12,7 @@
  */
 package org.omnifaces.config;
 
-import static org.omnifaces.util.Utils.*;
+import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -26,7 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.servlet.ServletContext;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
@@ -55,7 +57,12 @@ public enum WebXml {
 	/**
 	 * Returns the lazily loaded enum singleton instance.
 	 */
-	INSTANCE;
+	INSTANCE(true), 
+	
+	/**
+	 * Returns the explicitly loaded enum singleton instance for use in Servlet-only environment
+	 */
+	INSTANCE_SERVLET(false);
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
@@ -92,25 +99,44 @@ public enum WebXml {
 	private Map<Class<Throwable>, String> errorPageLocations;
 	private String formLoginPage;
 	private Map<String, Set<String>> securityConstraints;
+	
+	private AtomicBoolean initDone = new AtomicBoolean();
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
 	 * Perform initialization.
 	 */
-	private WebXml() {
+	private WebXml(boolean doInit) {
 		try {
-			Element webXml = loadWebXml().getDocumentElement();
-			XPath xpath = XPathFactory.newInstance().newXPath();
-			welcomeFiles = parseWelcomeFiles(webXml, xpath);
-			errorPageLocations = parseErrorPageLocations(webXml, xpath);
-			formLoginPage = parseFormLoginPage(webXml, xpath);
-			securityConstraints = parseSecurityConstraints(webXml, xpath);
+			parseFiles(loadWebXml().getDocumentElement());
 		}
 		catch (Exception e) {
 			// If this occurs, web.xml is broken anyway and the app shouldn't have started/initialized this far at all.
 			throw new RuntimeException(e);
 		}
+	}
+	
+	public WebXml doInit(ServletContext servletContext) {
+		if (!initDone.getAndSet(true)) {
+			try {
+				parseFiles(loadWebXml(servletContext).getDocumentElement());
+			}
+			catch (Exception e) {
+				// If this occurs, web.xml is broken anyway and the app shouldn't have started/initialized this far at all.
+				throw new RuntimeException(e);
+			}
+		}
+		
+		return this;
+	}
+	
+	private void parseFiles(Element webXml) throws Exception {
+		XPath xpath = XPathFactory.newInstance().newXPath();
+		welcomeFiles = parseWelcomeFiles(webXml, xpath);
+		errorPageLocations = parseErrorPageLocations(webXml, xpath);
+		formLoginPage = parseFormLoginPage(webXml, xpath);
+		securityConstraints = parseSecurityConstraints(webXml, xpath);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -265,16 +291,27 @@ public enum WebXml {
 	 * into a single {@link Document}.
 	 */
 	private static Document loadWebXml() throws Exception {
+		return doLoadWebXml(Faces.getResource(WEB_XML), Faces.getServletContext().getMajorVersion());
+	}
+	
+	/**
+	 * Load, merge and return all <code>web.xml</code> and <code>web-fragment.xml</code> files found in the classpath
+	 * into a single {@link Document}.
+	 */
+	private static Document loadWebXml(ServletContext servletContext) throws Exception {
+		return doLoadWebXml(servletContext.getResource(WEB_XML), servletContext.getMajorVersion());
+	}
+	
+	private static Document doLoadWebXml(URL url, int majorServletVersion) throws Exception {
 		DocumentBuilder builder = createDocumentBuilder();
 		Document document = builder.newDocument();
 		document.appendChild(document.createElement("web"));
-		URL url = Faces.getResource(WEB_XML);
-
+		
 		if (url != null) { // Since Servlet 3.0, web.xml is optional.
 			parseAndAppendChildren(url, builder, document);
 		}
 
-		if (Faces.getServletContext().getMajorVersion() >= 3) { // web-fragment.xml exist only since Servlet 3.0.
+		if (majorServletVersion >= 3) { // web-fragment.xml exist only since Servlet 3.0.
 			Enumeration<URL> urls = Thread.currentThread().getContextClassLoader().getResources(WEB_FRAGMENT_XML);
 
 			while (urls.hasMoreElements()) {
