@@ -15,7 +15,6 @@ package org.omnifaces.filter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import javax.faces.FacesException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -25,10 +24,11 @@ import javax.servlet.http.HttpSession;
 import org.omnifaces.util.Exceptions;
 
 /**
- * This filter will solve 2 problems with faces exceptions.
+ * This filter will solve 2 problems with exceptions thrown in JSF methods.
  * <ol>
  * <li>Mojarra's FacesFileNotFoundException needs to be interpreted as 404.
- * <li>Root cause of FacesException needs to be unwrapped to utilize standard Servlet API error page handling.
+ * <li>Root cause needs to be unwrapped from FacesException (Mojarra) and ELException (MyFaces) to utilize standard
+ * Servlet API error page handling.
  * </ol>
  * <p>
  * To get it to run, map this filter on the <code>&lt;servlet-name&gt;</code> of the <code>FacesServlet</code>.
@@ -59,7 +59,7 @@ public class FacesExceptionFilter extends HttpFilter {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, request.getRequestURI());
 		}
 		catch (ServletException e) {
-			throw new ServletException(Exceptions.unwrap(e.getCause(), FacesException.class));
+			throw new ServletException(Exceptions.unwrap(e.getRootCause()));
 		}
 	}
 

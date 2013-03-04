@@ -167,7 +167,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 			unhandledExceptionQueuedEvents.remove();
 
 			// Unwrap the root cause from FacesException and find the associated error page location.
-			exception = Exceptions.unwrap(exception, FacesException.class);
+			exception = Exceptions.unwrap(exception);
 			String errorPageLocation = WebXml.INSTANCE.findErrorPageLocation(exception);
 
 			if (errorPageLocation == null) {

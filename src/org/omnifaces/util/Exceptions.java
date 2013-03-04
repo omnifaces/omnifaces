@@ -12,6 +12,7 @@
  */
 package org.omnifaces.util;
 
+import javax.el.ELException;
 import javax.faces.FacesException;
 import javax.servlet.ServletException;
 
@@ -47,6 +48,19 @@ public final class Exceptions {
 		}
 
 		return exception;
+	}
+
+	/**
+	 * Unwrap the nested causes of given exception as long as until it is not an instance of {@link FacesException}
+	 * (Mojarra) or {@link ELException} (MyFaces) and then return it. If the given exception is already not an instance
+	 * of the mentioned types, then it will directly be returned. Or if the exception, unwrapped or not, does not have
+	 * a nested cause anymore, then it will be returned.
+	 * @param exception The exception to be unwrapped from {@link FacesException} and {@link ELException}.
+	 * @return The unwrapped root cause.
+	 * @since 1.4
+	 */
+	public static <T extends Throwable> Throwable unwrap(Throwable exception) {
+		return unwrap(unwrap(exception, FacesException.class), ELException.class);
 	}
 
 	/**
