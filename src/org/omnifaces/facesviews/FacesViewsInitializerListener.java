@@ -16,14 +16,17 @@ import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ENABLED_PARAM_NAME
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES_EXTENSIONS;
 import static org.omnifaces.facesviews.FacesViews.mapFacesServlet;
 import static org.omnifaces.util.Faces.getApplicationAttribute;
+import static org.omnifaces.util.ResourcePaths.isExtensionless;
 import static org.omnifaces.util.Utils.isEmpty;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.annotation.WebListener;
 
+import org.omnifaces.config.WebXml;
 import org.omnifaces.eventlistener.DefaultServletContextListener;
 
 
@@ -51,7 +54,21 @@ public class FacesViewsInitializerListener extends DefaultServletContextListener
         	Set<String> extensions = getApplicationAttribute(servletContext, FACES_VIEWS_RESOURCES_EXTENSIONS);
         	
         	if (!isEmpty(extensions)) {
-        		mapFacesServlet(servletContext, extensions);
+        		
+        		WebXml webXml = WebXml.INSTANCE_SERVLET.doInit(servletContext);
+        		
+        		Set<String> mappings = new HashSet<String>(extensions);
+        		for (String welcomeFile : webXml.getWelcomeFiles()) {
+        			if (isExtensionless(welcomeFile)) {
+        				if (!welcomeFile.startsWith("/")) {
+        					welcomeFile = "/" + welcomeFile;
+        				}
+        				mappings.add(welcomeFile);
+        			}
+        		}
+        		
+        		
+        		mapFacesServlet(servletContext, mappings);
         	}
         }
     }
