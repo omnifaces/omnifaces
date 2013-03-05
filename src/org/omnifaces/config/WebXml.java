@@ -60,7 +60,10 @@ public enum WebXml {
 	INSTANCE(true), 
 	
 	/**
-	 * Returns the explicitly loaded enum singleton instance for use in Servlet-only environment
+	 * Returns the explicitly loaded enum singleton instance for use in Servlet-only environment.
+	 * Note that {@link WebXml#doInit(ServletContext)} MUST be called at least once in order to parse
+	 * web.xml. Repeated calls to this method will be harmless, but it's advised to call it only once
+	 * in e.g. a ServletContextListener when the app is starting up.
 	 */
 	INSTANCE_SERVLET(false);
 
@@ -108,12 +111,14 @@ public enum WebXml {
 	 * Perform initialization.
 	 */
 	private WebXml(boolean doInit) {
-		try {
-			parseFiles(loadWebXml().getDocumentElement());
-		}
-		catch (Exception e) {
-			// If this occurs, web.xml is broken anyway and the app shouldn't have started/initialized this far at all.
-			throw new RuntimeException(e);
+		if (doInit) {
+			try {
+				parseFiles(loadWebXml().getDocumentElement());
+			}
+			catch (Exception e) {
+				// If this occurs, web.xml is broken anyway and the app shouldn't have started/initialized this far at all.
+				throw new RuntimeException(e);
+			}
 		}
 	}
 	
