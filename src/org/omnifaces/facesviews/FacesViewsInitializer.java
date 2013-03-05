@@ -79,7 +79,7 @@ public class FacesViewsInitializer implements ServletContainerInitializer {
 
 				// Map the forwarding filter to all the resources we found.
 				for (String resource : collectedViews.keySet()) {
-					facesViewsRegistration.addMappingForUrlPatterns(null, false, resource);
+					facesViewsRegistration.addMappingForUrlPatterns(null, true, resource);
 				}
 				
 				// Additionally map the filter to all paths that were scanned and which are also directly
