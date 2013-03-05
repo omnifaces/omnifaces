@@ -26,9 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.servlet.ServletContext;
+import javax.servlet.ServletContextListener;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
@@ -55,17 +54,16 @@ public enum WebXml {
 	// Enum singleton -------------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns the lazily loaded enum singleton instance.
+	 * Returns the lazily loaded enum singleton instance. 
+	 * <p>
+	 * If this is needed in e.g. a Filter (which is called before
+	 * the FacesServlet is invoked), it won't work if the INSTANCE hasn't been referenced before. Since JSF
+	 * installs a special "init" FacesContext during startup, one option for doing this initial referencing 
+	 * is in a {@link ServletContextListener}.
+	 * The data this enum encapsulates will then be available even where there is no FacesContext available.
 	 */
-	INSTANCE(true), 
+	INSTANCE;
 	
-	/**
-	 * Returns the explicitly loaded enum singleton instance for use in Servlet-only environment.
-	 * Note that {@link WebXml#doInit(ServletContext)} MUST be called at least once in order to parse
-	 * web.xml. Repeated calls to this method will be harmless, but it's advised to call it only once
-	 * in e.g. a ServletContextListener when the app is starting up.
-	 */
-	INSTANCE_SERVLET(false);
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
@@ -103,37 +101,20 @@ public enum WebXml {
 	private String formLoginPage;
 	private Map<String, Set<String>> securityConstraints;
 	
-	private AtomicBoolean initDone = new AtomicBoolean();
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
 	 * Perform initialization.
 	 */
-	private WebXml(boolean doInit) {
-		if (doInit) {
-			try {
-				parseFiles(loadWebXml().getDocumentElement());
-			}
-			catch (Exception e) {
-				// If this occurs, web.xml is broken anyway and the app shouldn't have started/initialized this far at all.
-				throw new RuntimeException(e);
-			}
+	private WebXml() {
+		try {
+			parseFiles(loadWebXml().getDocumentElement());
 		}
-	}
-	
-	public WebXml doInit(ServletContext servletContext) {
-		if (!initDone.getAndSet(true)) {
-			try {
-				parseFiles(loadWebXml(servletContext).getDocumentElement());
-			}
-			catch (Exception e) {
-				// If this occurs, web.xml is broken anyway and the app shouldn't have started/initialized this far at all.
-				throw new RuntimeException(e);
-			}
+		catch (Exception e) {
+			// If this occurs, web.xml is broken anyway and the app shouldn't have started/initialized this far at all.
+			throw new RuntimeException(e);
 		}
-		
-		return this;
 	}
 	
 	private void parseFiles(Element webXml) throws Exception {
@@ -297,14 +278,6 @@ public enum WebXml {
 	 */
 	private static Document loadWebXml() throws Exception {
 		return doLoadWebXml(Faces.getResource(WEB_XML), Faces.getServletContext().getMajorVersion());
-	}
-	
-	/**
-	 * Load, merge and return all <code>web.xml</code> and <code>web-fragment.xml</code> files found in the classpath
-	 * into a single {@link Document}.
-	 */
-	private static Document loadWebXml(ServletContext servletContext) throws Exception {
-		return doLoadWebXml(servletContext.getResource(WEB_XML), servletContext.getMajorVersion());
 	}
 	
 	private static Document doLoadWebXml(URL url, int majorServletVersion) throws Exception {
