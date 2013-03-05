@@ -86,6 +86,19 @@
  * This will render as <code>/users/add</code> if the request was to <code>/index</code> and as <code>/users/add.xhtml</code> if the
  * request was to <code>/index.xhtml</code>. This behavior can be changed so that such links are always rendered as the extensionless
  * version using a configuration parameter (see below).
+ * 
+ * <p>
+ * <b>Welcome files</b><br>
+ * 
+ * If a <code>welcome-file</code> is defined in <code>web.xml</code> that's scanned by FacesViews AND <code>REDIRECT_TO_EXTENSIONLESS</code> is used 
+ * (which is the default, see below), it's necessary to define an extensionless welcome file to prevent a request to "/" being redirected to 
+ * "/[welcome file]". E.g. without this "http://example.com" will redirect to say "http://example.com/index". <br>
+ * For example:
+ * <pre>
+ * &lt;welcome-file-list&gt;
+ *     &lt;welcome-file&gt;index&lt;/welcome-file&gt;
+ * &lt;/welcome-file-list&gt;
+ * </pre>
  *
  * <p>
  * <h3>Configuration</h3>
@@ -161,7 +174,29 @@
  *     &lt;url-pattern>/*&lt;/url-pattern>
  * &lt;/filter-mapping>
  * </pre>
+ * <br>
+ * 
+ * When an extensionless welcome-file is defined in <code>web.xml</code> (see above), the FacesServlet has to be explicitly mapped
+ * to this welcome-file for Servlet 2.5. E.g.
+ * 
+ * <pre>
+ * &lt;welcome-file-list&gt;
+ *     &lt;welcome-file&gt;index&lt;/welcome-file&gt;
+ * &lt;/welcome-file-list&gt;
  *
+ * &lt;servlet&gt;
+ *     &lt;servlet-name&gt;facesServlet&lt;/servlet-name&gt;
+ *     &lt;servlet-class&gt;javax.faces.webapp.FacesServlet&lt;/servlet-class&gt;
+ *     &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;
+ * &lt;/servlet&gt;
+ * &lt;servlet-mapping&gt;
+ *     &lt;servlet-name&gt;facesServlet&lt;/servlet-name&gt;
+ *     &lt;url-pattern&gt;*.xhtml&lt;/url-pattern&gt;
+ *     &lt;url-pattern&gt;/welcome&lt;/url-pattern&gt;		
+ * &lt;/servlet-mapping&gt;
+ * </pre>
+ * <br>
+ * 
  * <b>faces-config.xml</b>
  * <pre>
  * &lt;application>
@@ -169,7 +204,7 @@
  * &lt;/application>
  * </pre>
  *
- * <em>(at the moment Servlet 2.5 compatibility has not been tested)</em>
+ * <em>(at the moment Servlet 2.5 compatibility has not been tested thorougly)</em>
  *
  * @author Arjan Tijms
  *
