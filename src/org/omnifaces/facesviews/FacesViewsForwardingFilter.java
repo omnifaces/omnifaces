@@ -13,6 +13,7 @@
 package org.omnifaces.facesviews;
 
 import static javax.faces.application.ProjectStage.Development;
+import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_REVERSE_RESOURCES;
@@ -24,7 +25,6 @@ import static org.omnifaces.facesviews.FacesViews.scanAndStoreViews;
 import static org.omnifaces.facesviews.FacesViews.tryScanAndStoreViews;
 import static org.omnifaces.util.Faces.getApplicationAttribute;
 import static org.omnifaces.util.Faces.getApplicationFromFactory;
-import static org.omnifaces.util.Faces.redirectPermanent;
 import static org.omnifaces.util.ResourcePaths.getExtension;
 import static org.omnifaces.util.ResourcePaths.isExtensionless;
 
@@ -168,6 +168,12 @@ public class FacesViewsForwardingFilter extends HttpFilter {
         }
 
         chain.doFilter(request, response);
+    }
+
+    private static void redirectPermanent(HttpServletResponse response, String url) {
+    	response.setStatus(SC_MOVED_PERMANENTLY);
+    	response.setHeader("Location", url);
+    	response.setHeader("Connection", "close");
     }
 
 }

@@ -946,20 +946,6 @@ public final class Faces {
 	}
 
 	/**
-	 * Sends a permanent (301) redirect to the given URL. Servlet variant on {@link Faces#redirectPermanent(String, String...)}
-	 *
-	 * @param response The response on which the redirect should be send
-	 * @param url The URL to redirect the current response to.
-	 * @param paramValues paramValues The request parameter values which you'd like to put URL-encoded in the given URL.
-	 * @since 1.4
-	 */
-	public static void redirectPermanent(HttpServletResponse response, String url, String... paramValues) {
-		response.setStatus(SC_MOVED_PERMANENTLY);
-		response.setHeader( "Location", String.format(normalizeRedirectURL(url), encodeURLParams(paramValues)));
-		response.setHeader( "Connection", "close" );
-	}
-
-	/**
 	 * Helper method to normalize the given URL for a redirect. If the given URL does not start with
 	 * <code>http://</code>, <code>https://</code> or <code>/</code>, then the request context path will be prepended,
 	 * otherwise it will be unmodified.
