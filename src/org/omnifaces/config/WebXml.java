@@ -27,6 +27,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.faces.context.FacesContext;
+import javax.faces.webapp.FacesServlet;
+import javax.servlet.Filter;
 import javax.servlet.ServletContextListener;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -54,16 +57,15 @@ public enum WebXml {
 	// Enum singleton -------------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns the lazily loaded enum singleton instance. 
+	 * Returns the lazily loaded enum singleton instance.
 	 * <p>
-	 * If this is needed in e.g. a Filter (which is called before
-	 * the FacesServlet is invoked), it won't work if the INSTANCE hasn't been referenced before. Since JSF
-	 * installs a special "init" FacesContext during startup, one option for doing this initial referencing 
-	 * is in a {@link ServletContextListener}.
-	 * The data this enum encapsulates will then be available even where there is no FacesContext available.
+	 * Note: if this is needed in e.g. a {@link Filter} which is called before the {@link FacesServlet} is invoked,
+	 * then it won't work if the <code>INSTANCE</code> hasn't been referenced before. Since JSF installs a special
+	 * "init" {@link FacesContext} during startup, one option for doing this initial referencing is in a
+	 * {@link ServletContextListener}. The data this enum encapsulates will then be available even where there is no
+	 * {@link FacesContext} available.
 	 */
 	INSTANCE;
-	
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
@@ -100,7 +102,6 @@ public enum WebXml {
 	private Map<Class<Throwable>, String> errorPageLocations;
 	private String formLoginPage;
 	private Map<String, Set<String>> securityConstraints;
-	
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -109,20 +110,17 @@ public enum WebXml {
 	 */
 	private WebXml() {
 		try {
-			parseFiles(loadWebXml().getDocumentElement());
+			Element webXml = loadWebXml().getDocumentElement();
+			XPath xpath = XPathFactory.newInstance().newXPath();
+			welcomeFiles = parseWelcomeFiles(webXml, xpath);
+			errorPageLocations = parseErrorPageLocations(webXml, xpath);
+			formLoginPage = parseFormLoginPage(webXml, xpath);
+			securityConstraints = parseSecurityConstraints(webXml, xpath);
 		}
 		catch (Exception e) {
 			// If this occurs, web.xml is broken anyway and the app shouldn't have started/initialized this far at all.
 			throw new RuntimeException(e);
 		}
-	}
-	
-	private void parseFiles(Element webXml) throws Exception {
-		XPath xpath = XPathFactory.newInstance().newXPath();
-		welcomeFiles = parseWelcomeFiles(webXml, xpath);
-		errorPageLocations = parseErrorPageLocations(webXml, xpath);
-		formLoginPage = parseFormLoginPage(webXml, xpath);
-		securityConstraints = parseSecurityConstraints(webXml, xpath);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -277,19 +275,16 @@ public enum WebXml {
 	 * into a single {@link Document}.
 	 */
 	private static Document loadWebXml() throws Exception {
-		return doLoadWebXml(Faces.getResource(WEB_XML), Faces.getServletContext().getMajorVersion());
-	}
-	
-	private static Document doLoadWebXml(URL url, int majorServletVersion) throws Exception {
 		DocumentBuilder builder = createDocumentBuilder();
 		Document document = builder.newDocument();
 		document.appendChild(document.createElement("web"));
-		
+		URL url = Faces.getResource(WEB_XML);
+
 		if (url != null) { // Since Servlet 3.0, web.xml is optional.
 			parseAndAppendChildren(url, builder, document);
 		}
 
-		if (majorServletVersion >= 3) { // web-fragment.xml exist only since Servlet 3.0.
+		if (Faces.getServletContext().getMajorVersion() >= 3) { // web-fragment.xml exist only since Servlet 3.0.
 			Enumeration<URL> urls = Thread.currentThread().getContextClassLoader().getResources(WEB_FRAGMENT_XML);
 
 			while (urls.hasMoreElements()) {
