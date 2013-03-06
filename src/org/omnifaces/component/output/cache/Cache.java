@@ -19,16 +19,16 @@ import java.io.Serializable;
  * <p>
  * Note that this takes Strings for both key and value since it's not intended as a general cache solution, but is
  * something specific for the {@link Cache} component which caches rendered output.
- * 
+ *
  * @since 1.1
  * @author Arjan Tijms
- * 
+ *
  */
 public interface Cache extends Serializable {
 
 	/**
 	 * Gets a value from the cache
-	 * 
+	 *
 	 * @param key
 	 *            the key under which a value was previously stored
 	 * @return The previously stored value, or null if no such value exists
@@ -37,7 +37,7 @@ public interface Cache extends Serializable {
 
 	/**
 	 * Stores a value in the cache
-	 * 
+	 *
 	 * @param key
 	 *            the key under which a value is to be stored
 	 * @param value
@@ -47,7 +47,7 @@ public interface Cache extends Serializable {
 
 	/**
 	 * Stores a value in the cache
-	 * 
+	 *
 	 * @param key
 	 *            the key under which a value is to be stored
 	 * @param value
@@ -66,7 +66,7 @@ public interface Cache extends Serializable {
 	 * <p>
 	 * This in effect implements a 2-level multi-map, which the single main value stored in the first level, and the
 	 * optional attributes stored in the second level.
-	 * 
+	 *
 	 * @param key
 	 *            key that identifies the first level cache entry
 	 * @param name
@@ -78,7 +78,7 @@ public interface Cache extends Serializable {
 
 	/**
 	 * Stores a named attribute in the cache entry identified by the key parameter.
-	 * 
+	 *
 	 * @param key
 	 *            key that identifies the first level cache entry
 	 * @param name
@@ -94,7 +94,7 @@ public interface Cache extends Serializable {
 
 	/**
 	 * Removes a value from the cache
-	 * 
+	 *
 	 * @param key
 	 *            the key under which a value is to be stored
 	 */

@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 
 /**
  * This encapsulates a base model object and one of its methods.
- * 
+ *
  * @since 1.4
  */
 public class MethodReference {

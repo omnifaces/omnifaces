@@ -29,7 +29,6 @@ import javax.servlet.annotation.WebListener;
 import org.omnifaces.config.WebXml;
 import org.omnifaces.eventlistener.DefaultServletContextListener;
 
-
 /**
  * Convenience class for Servlet 3.0 users, which will map the FacesServlet to extensions found
  * during scanning in {@link FacesViewsInitializer}. This part of the initialization is executed
@@ -48,13 +47,13 @@ public class FacesViewsInitializerListener extends DefaultServletContextListener
     public void contextInitialized(ServletContextEvent context) {
 
         ServletContext servletContext = context.getServletContext();
-        
+
         if (!"false".equals(servletContext.getInitParameter(FACES_VIEWS_ENABLED_PARAM_NAME))) {
-        	
+
         	Set<String> extensions = getApplicationAttribute(servletContext, FACES_VIEWS_RESOURCES_EXTENSIONS);
-        	
+
         	if (!isEmpty(extensions)) {
-        		
+
         		Set<String> mappings = new HashSet<String>(extensions);
         		for (String welcomeFile : WebXml.INSTANCE.getWelcomeFiles()) {
         			if (isExtensionless(welcomeFile)) {
@@ -64,12 +63,10 @@ public class FacesViewsInitializerListener extends DefaultServletContextListener
         				mappings.add(welcomeFile);
         			}
         		}
-        		
-        		
+
         		mapFacesServlet(servletContext, mappings);
         	}
         }
     }
 
 }
-

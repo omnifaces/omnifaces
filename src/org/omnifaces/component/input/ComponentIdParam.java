@@ -30,10 +30,10 @@ import org.omnifaces.component.input.componentidparam.ConditionalWriterListener;
  * <p>
  * The intended usage of this component is to allow client-side scripts to request markup for specific components via a GET request (as opposed to
  * AJAX based post-backs).
- * 
+ *
  * @since 1.1
  * @author Arjan Tijms
- * 
+ *
  */
 @FacesComponent(ComponentIdParam.COMPONENT_TYPE)
 public class ComponentIdParam extends ViewParam {
@@ -61,7 +61,7 @@ public class ComponentIdParam extends ViewParam {
 
 	/**
 	 * Gets the list of request values for the request parameter names identified by the value of the given property key.
-	 * 
+	 *
 	 * @param context
 	 *            FacesContext for the request we are processing
 	 * @param propertyKey
@@ -82,7 +82,7 @@ public class ComponentIdParam extends ViewParam {
 
 	/**
 	 * Gets the boolean value for the given property key. Defaults to true if no value is defined.
-	 * 
+	 *
 	 * @param propertyKey
 	 * @return false if the boolean attribute is present and not equal to "true", true otherwise.
 	 */

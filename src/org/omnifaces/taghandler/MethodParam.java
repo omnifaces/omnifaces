@@ -29,10 +29,10 @@ import org.omnifaces.util.Hacks;
 /**
  * This handler wraps a value expression that's actually a method expression by another value expression that returns a method expression
  * that gets the value of first value expression, which as "side-effect" executes the original method expression.
- * 
+ *
  * <p>
  * This somewhat over-the-top chain of wrapping is done so a method expression can be passed into a Facelet tag as parameter.
- * 
+ *
  * @author Arjan Tijms
  *
  */
@@ -40,28 +40,28 @@ public class MethodParam extends TagHandler {
 
 	private final TagAttribute name;
 	private final TagAttribute value;
-	
+
 	public MethodParam(TagConfig config) {
 		super(config);
 		this.name = this.getRequiredAttribute("name");
 		this.value = this.getRequiredAttribute("value");
 	}
-	
+
 	@Override
 	public void apply(FaceletContext ctx, UIComponent parent) throws IOException {
 		String nameStr = name.getValue(ctx);
-		
+
 		// The original value expression we get inside the Facelets tag, that's actually the method expression passed-in by the user.
 		ValueExpression valueExpression = value.getValueExpression(ctx, Object.class);
-		
+
 		// A method expression that wraps the value expression and uses its own invoke method to get the value from the wrapped expression.
 		MethodExpression methodExpression = new MethodExpressionValueExpressionAdapter(valueExpression);
-		
+
 		// Using the variable mapper so the expression is scoped to the body of the Facelets tag. Since the variable mapper only accepts
 		// value expressions, we once again wrap it by a value expression that directly returns the method expression.
-		
+
 		ValueExpression valueExpressionWrapper;
-		
+
 		// JUEL older than 2.2.6 had the expectation that the value expression only wraps a Method instance that can be statically called.
 		if (Hacks.isJUELUsed(ctx.getExpressionFactory()) && !Hacks.isJUELSupportingMethodExpression()) {
 			valueExpressionWrapper = new ValueExpressionMethodWrapper(methodExpression);
@@ -69,7 +69,7 @@ public class MethodParam extends TagHandler {
 			// Sun/Apache EL and JUEL 2.2.6 and higher can call a method expression wrapped in a value expression.
 			valueExpressionWrapper = ctx.getExpressionFactory().createValueExpression(methodExpression, MethodExpression.class);
 		}
-		
+
 		ctx.getVariableMapper().setVariable(nameStr, valueExpressionWrapper);
 	}
 

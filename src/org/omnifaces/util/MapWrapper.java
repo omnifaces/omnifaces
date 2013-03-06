@@ -23,10 +23,10 @@ import java.util.Set;
  * @param <K> the type of keys maintained by this map
  * @param <V> the type of mapped values
  *
- * @author Arjan Tijms 
+ * @author Arjan Tijms
  */
 public class MapWrapper<K, V> implements Map<K, V> {
-	
+
 	private Map<K, V> map;
 
     /**
@@ -148,9 +148,9 @@ public class MapWrapper<K, V> implements Map<K, V> {
     public Collection<V> values() {
         return getWrapped().values();
     }
-    
+
     public Map<K, V> getWrapped() {
     	return map;
     }
-    
+
 }

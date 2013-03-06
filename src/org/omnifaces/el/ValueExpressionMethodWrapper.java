@@ -10,7 +10,7 @@ import org.omnifaces.util.Hacks;
 /**
  * Special purpose value expression that wraps a method expression for which a Method instance is created
  * whenever the getValue method is called.
- * 
+ *
  * @author Arjan Tijms
  * @since 1.4
  */
@@ -19,7 +19,6 @@ public final class ValueExpressionMethodWrapper extends ValueExpression {
 	private static final long serialVersionUID = 891954866066788234L;
 
 	private MethodExpression methodExpression;
-	
 
 	public ValueExpressionMethodWrapper(MethodExpression methodExpression) {
 		this.methodExpression = methodExpression;

@@ -12,7 +12,7 @@
  */
 package org.omnifaces.util.selectitems;
 
-import static org.omnifaces.util.Utils.*;
+import static org.omnifaces.util.Utils.isEmpty;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -102,7 +102,6 @@ public final class SelectItemsUtils {
 			}
 		}
 	}
-
 
 	/**
 	 * Exposes an Array via an <code>Iterator</code>

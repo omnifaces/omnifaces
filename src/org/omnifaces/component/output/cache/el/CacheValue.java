@@ -26,10 +26,10 @@ import org.omnifaces.component.output.Cache;
 /**
  * This handler wraps a value expression that's actually a method expression by another value expression that returns a method expression
  * that gets the value of first value expression, which as "side-effect" executes the original method expression.
- * 
+ *
  * <p>
  * This somewhat over-the-top chain of wrapping is done so a method expression can be passed into a Facelet tag as parameter.
- * 
+ *
  * @author Arjan Tijms
  *
  */
@@ -37,28 +37,28 @@ public class CacheValue extends TagHandler {
 
 	private final TagAttribute name;
 	private final TagAttribute value;
-	
+
 	public CacheValue(TagConfig config) {
 		super(config);
 		this.name = this.getRequiredAttribute("name");
 		this.value = this.getRequiredAttribute("value");
 	}
-	
+
 	@Override
 	public void apply(FaceletContext ctx, UIComponent parent) throws IOException {
-		
+
 		Cache cacheComponent;
 		if (parent instanceof Cache) {
 			cacheComponent = (Cache) parent;
 		} else {
 			throw new IllegalStateException("CacheValue components needs to have a Cache component as direct parent.");
 		}
-		
+
 		String nameStr = name.getValue(ctx);
-		
+
 		// The original value expression we get inside the Facelets tag
 		ValueExpression valueExpression = value.getValueExpression(ctx, Object.class);
-		
+
 		ctx.getVariableMapper().setVariable(nameStr, new CachingValueExpression(nameStr, valueExpression, cacheComponent));
 	}
 }

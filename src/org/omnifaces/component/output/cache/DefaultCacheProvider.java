@@ -14,7 +14,6 @@ package org.omnifaces.component.output.cache;
 
 import org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 
-
 /**
  * A default cache provider that will be used by the OmniFaces Cache component if no explicit provider has been
  * configured.
@@ -22,10 +21,10 @@ import org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLi
  * This will create a Cache instance that uses a repackaged {@link ConcurrentLinkedHashMap} for the actual implementation.
  * <p>
  * <b>See:</b> <a href="http://code.google.com/p/concurrentlinkedhashmap">http://code.google.com/p/concurrentlinkedhashmap</a>
- * 
+ *
  * @since 1.1
  * @author Arjan Tijms
- * 
+ *
  */
 public class DefaultCacheProvider extends CacheInstancePerScopeProvider {
 

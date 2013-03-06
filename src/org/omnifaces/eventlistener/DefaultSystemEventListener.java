@@ -18,17 +18,17 @@ import javax.faces.event.SystemEventListener;
 
 /**
  * Default implementation for the SystemEventListener interface.
- * 
+ *
  * @author Arjan Tijms
  * @since 1.2
  */
 public class DefaultSystemEventListener implements SystemEventListener {
-	
+
 	@Override
 	public void processEvent(SystemEvent event) throws AbortProcessingException {
 	    // NOOP
 	}
-	
+
 	@Override
 	public boolean isListenerForSource(Object source) {
 	    return true;

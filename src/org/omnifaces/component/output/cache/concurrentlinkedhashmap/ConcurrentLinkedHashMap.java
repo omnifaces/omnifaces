@@ -18,8 +18,12 @@
  */
 package org.omnifaces.component.output.cache.concurrentlinkedhashmap;
 
-import static java.util.Collections.*;
-import static org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLinkedHashMap.DrainStatus.*;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.Collections.unmodifiableSet;
+import static org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLinkedHashMap.DrainStatus.IDLE;
+import static org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLinkedHashMap.DrainStatus.PROCESSING;
+import static org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLinkedHashMap.DrainStatus.REQUIRED;
 
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;

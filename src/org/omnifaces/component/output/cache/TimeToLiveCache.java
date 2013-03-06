@@ -62,9 +62,9 @@ public abstract class TimeToLiveCache implements Cache {
 
 	@Override
 	public void put(String key, String value, int timeToLive) {
-		
+
 		CacheEntry entry = cacheStore.get(key);
-		
+
 		if (entry == null || !entry.isValid()) {
 			cacheStore.put(key, new CacheEntry(value, timeToLiveToDate(timeToLive)));
 		} else {
@@ -72,20 +72,20 @@ public abstract class TimeToLiveCache implements Cache {
 			entry.setValidTill(timeToLiveToDate(timeToLive));
 		}
 	}
-	
+
 	@Override
 	public void putAttribute(String key, String name, Object value, int timeToLive) {
 		CacheEntry entry = cacheStore.get(key);
-		
+
 		if (entry == null || !entry.isValid()) {
 			// NOTE: timeToLive is only used when a new entry is created
 			entry = new CacheEntry(null, timeToLiveToDate(timeToLive));
 			cacheStore.put(key, entry);
 		}
-		
+
 		entry.getAttributes().put(name, value);
 	}
-	
+
 	@Override
 	public Object getAttribute(String key, String name) {
 		CacheEntry entry = cacheStore.get(key);
@@ -109,7 +109,7 @@ public abstract class TimeToLiveCache implements Cache {
 	protected void setCacheStore(Map<String, CacheEntry> cacheStore) {
 		this.cacheStore = cacheStore;
 	}
-	
+
 	private Date timeToLiveToDate(int timeToLive) {
 		if (timeToLive != -1) {
 			return new Date(currentTimeMillis() + SECONDS.toMillis(timeToLive));

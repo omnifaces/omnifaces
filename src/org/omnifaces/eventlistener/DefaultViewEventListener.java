@@ -22,7 +22,7 @@ import org.omnifaces.util.Events;
 /**
  * Default implementation for the SystemEventListener interface that's used for the subset of system events
  * that are registered as "view event" on the component tree's view root.
- * 
+ *
  * @see Events#subscribeToViewEvent(Class, SystemEventListener)
  * @see UIViewRoot#subscribeToViewEvent(Class, SystemEventListener)
  *
@@ -30,12 +30,12 @@ import org.omnifaces.util.Events;
  * @since 1.2
  */
 public class DefaultViewEventListener implements SystemEventListener {
-	
+
 	@Override
 	public void processEvent(SystemEvent event) throws AbortProcessingException {
 	    // NOOP
 	}
-	
+
 	@Override
 	public boolean isListenerForSource(Object source) {
 		return source instanceof UIViewRoot;

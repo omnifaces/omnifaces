@@ -21,7 +21,7 @@ import org.omnifaces.util.Faces;
 
 /**
  * This event listener logs the version of OmniFaces that's being used when JSF has started up.
- * 
+ *
  * @since 1.4
  * @author Arjan Tijms
  */

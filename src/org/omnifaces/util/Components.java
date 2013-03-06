@@ -12,7 +12,7 @@
  */
 package org.omnifaces.util;
 
-import static org.omnifaces.util.Utils.*;
+import static org.omnifaces.util.Utils.isEmpty;
 
 import java.util.Map;
 

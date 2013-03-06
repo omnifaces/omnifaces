@@ -44,7 +44,6 @@ public abstract class CacheInstancePerScopeProvider implements CacheProvider {
 	private Integer appMaxCapacity;
 	private Integer sessionMaxCapacity;
 
-
 	private Map<String, String> parameters;
 
 	@Override

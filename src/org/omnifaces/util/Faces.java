@@ -12,8 +12,8 @@
  */
 package org.omnifaces.util;
 
-import static javax.faces.FactoryFinder.*;
-import static javax.servlet.http.HttpServletResponse.*;
+import static javax.faces.FactoryFinder.APPLICATION_FACTORY;
+import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -1732,8 +1732,6 @@ public final class Faces {
 		return (T) context.getAttribute(name);
 	}
 
-
-
 	// File download --------------------------------------------------------------------------------------------------
 
 	/**
@@ -1842,6 +1840,5 @@ public final class Faces {
 
 		return facesServletRegistration;
 	}
-
 
 }

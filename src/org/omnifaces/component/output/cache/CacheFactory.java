@@ -17,10 +17,10 @@ import javax.servlet.ServletContext;
 
 /**
  * Factory used to obtain {@link Cache} instance and to register the {@link CacheProvider} that is used to obtain that.
- * 
+ *
  * @since 1.1
  * @author Arjan Tijms
- * 
+ *
  */
 public final class CacheFactory {
 
@@ -32,13 +32,13 @@ public final class CacheFactory {
 
 	/**
 	 * Gets an instance of a Cache using the configured cache provider.
-	 * 
+	 *
 	 * @param context
 	 *            faces context used for retrieving the cache provider and for resolving the given scope.
 	 * @param scope
 	 *            scope for which the cache should be obtained. Supported scopes are dependent on the specific caching
 	 *            provider, but generally at least "session" and "application" should be supported.
-	 * 
+	 *
 	 * @return a cache provider specific Cache instance
 	 */
 	public static Cache getCache(FacesContext context, String scope) {
@@ -48,7 +48,7 @@ public final class CacheFactory {
 	/**
 	 * Gets the cache provider as it has been set in the ServletContext. Does NOT return the default cache provider if
 	 * none is present.
-	 * 
+	 *
 	 * @param servletContext
 	 *            the servlet context where the cache provider is retrieved from
 	 * @return the previously set provider if one is set, null otherwise
@@ -63,7 +63,7 @@ public final class CacheFactory {
 
 	/**
 	 * Gets the cache provider that has been set, or the default provider if none is present.
-	 * 
+	 *
 	 * @param context
 	 *            the faces context where the cache provider is retrieved from
 	 * @return the previously set provider if one is set, otherwise the default provider
@@ -77,7 +77,7 @@ public final class CacheFactory {
 	 * Returns an instance of the default cache provider. This is the provider that is used in
 	 * {@link CacheFactory#getCache(FacesContext, String)} and {@link CacheFactory#getCacheProvider(FacesContext)} if no
 	 * explicit provider has been set.
-	 * 
+	 *
 	 * @return the default cache provider
 	 */
 	public static CacheProvider getDefaultCacheProvider() {

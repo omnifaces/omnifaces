@@ -383,7 +383,6 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 			removeComponentResources(context);
 		}
 
-
 		private void removeComponentResources(FacesContext context) {
 			for (UIComponent resourceToRemove : componentResourcesToRemove) {
 				if (resourceToRemove != null) {

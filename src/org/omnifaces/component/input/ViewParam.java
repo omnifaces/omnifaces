@@ -23,7 +23,6 @@ import javax.faces.context.FacesContext;
 
 import org.omnifaces.util.MapWrapper;
 
-
 /**
  * <strong>ViewParameter</strong> is a component that extends the standard {@link UIViewParameter} and provides a stateless
  * mode of operation.
@@ -47,7 +46,6 @@ public class ViewParam extends UIViewParameter {
 
 	private String submittedValue;
 	private Map<String, Object> attributeInterceptMap;
-	
 
 	@Override
 	public void setSubmittedValue(Object submittedValue) {
@@ -65,7 +63,7 @@ public class ViewParam extends UIViewParameter {
 		// So we can safely skip the required validation on postbacks.
 		return !isPostback() && super.isRequired();
 	}
-	
+
 	@Override
 	public void processDecodes(FacesContext context) {
 		// Ignore any request parameters that are present when the postback is done.

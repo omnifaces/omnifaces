@@ -75,7 +75,7 @@ public final class Utils {
 
 	/**
 	 * Returns true if the given string is null or is empty.
-	 * 
+	 *
 	 * @param string The string to be checked on emptiness.
 	 * @return True if the given string is null or is empty.
 	 */
@@ -85,7 +85,7 @@ public final class Utils {
 
 	/**
 	 * Returns true if the given array is null or is empty.
-	 * 
+	 *
 	 * @param array The array to be checked on emptiness.
 	 * @return True if the given array is null or is empty.
 	 */
@@ -95,17 +95,17 @@ public final class Utils {
 
 	/**
 	 * Returns true if the given collection is null or is empty.
-	 * 
+	 *
 	 * @param collection The collection to be checked on emptiness.
 	 * @return True if the given collection is null or is empty.
 	 */
 	public static boolean isEmpty(Collection<?> collection) {
 		return collection == null || collection.isEmpty();
 	}
-	
+
 	/**
 	 * Returns true if the given map is null or is empty.
-	 * 
+	 *
 	 * @param map The map to be checked on emptiness.
 	 * @return True if the given map is null or is empty.
 	 */
@@ -344,7 +344,7 @@ public final class Utils {
 	 * <p>
 	 * The reverse of a map means that every value X becomes a key X' with as corresponding
 	 * value Y' the key Y that was originally associated with the value X.
-	 * 
+	 *
 	 * @param source the map that is to be reversed
 	 * @return the reverse of the given map
 	 */
@@ -353,10 +353,10 @@ public final class Utils {
 		for (Entry<T, T> entry : source.entrySet()) {
 			target.put(entry.getValue(), entry.getKey());
 		}
-		
+
 		return target;
 	}
-	
+
 	// Dates ----------------------------------------------------------------------------------------------------------
 
 	/**

@@ -30,9 +30,9 @@ import javax.faces.context.FacesContext;
  * is a mapped one, otherwise as-is.
  * <p>
  * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
- * 
+ *
  * @author Arjan Tijms
- * 
+ *
  */
 public class FacesViewsViewHandler extends ViewHandlerWrapper {
 

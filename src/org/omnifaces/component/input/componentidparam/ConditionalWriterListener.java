@@ -26,10 +26,10 @@ import org.omnifaces.component.input.ComponentIdParam;
  * PhaseListener intended to work in conjunction with the {@link ComponentIdParam} component.
  * <p>
  * This installs a {@link ResponseWriter} that only renders specific components.
- * 
+ *
  * @since 1.1
  * @author Arjan Tijms
- * 
+ *
  */
 public class ConditionalWriterListener implements PhaseListener {
 

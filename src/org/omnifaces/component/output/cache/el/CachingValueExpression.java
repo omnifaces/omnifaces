@@ -23,33 +23,33 @@ import org.omnifaces.util.Faces;
 /**
  * A value expression implementation that caches its main value at the moment it's evaluated and uses
  * this cache value in future evaluations.
- * 
+ *
  * @author Arjan Tijms
  *
  */
 public class CachingValueExpression extends ValueExpressionWrapper {
-	
+
 	private static final long serialVersionUID = -3172741983469325940L;
-	
+
 	private final String name;
 	private final Cache cache;
-	
+
 	public CachingValueExpression(String name, ValueExpression valueExpression, Cache cache) {
 		super(valueExpression);
 		this.name = name;
 		this.cache = cache;
 	}
-	
+
 	@Override
 	public Object getValue(ELContext elContext) {
 		FacesContext facesContext = Faces.getContext(elContext);
-		
+
 		Object value = cache.getCacheAttribute(facesContext, name);
 		if (value == null) {
 			value = super.getValue(elContext);
 			cache.setCacheAttribute(facesContext, name, value);
-		} 
-		
+		}
+
 		return value;
 	}
 

@@ -12,7 +12,8 @@
  */
 package org.omnifaces.taghandler;
 
-import static org.omnifaces.taghandler.RenderTimeTagHandlerHelper.*;
+import static org.omnifaces.taghandler.RenderTimeTagHandlerHelper.collectRenderTimeAttributes;
+import static org.omnifaces.taghandler.RenderTimeTagHandlerHelper.createInstance;
 
 import java.io.IOException;
 import java.io.Serializable;

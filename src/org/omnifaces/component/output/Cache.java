@@ -12,11 +12,16 @@
  */
 package org.omnifaces.component.output;
 
-import static java.lang.Boolean.*;
-import static javax.faces.event.PhaseId.*;
-import static org.omnifaces.component.output.Cache.PropertyKeys.*;
-import static org.omnifaces.filter.OnDemandResponseBufferFilter.*;
-import static org.omnifaces.util.Events.*;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static javax.faces.event.PhaseId.RENDER_RESPONSE;
+import static org.omnifaces.component.output.Cache.PropertyKeys.key;
+import static org.omnifaces.component.output.Cache.PropertyKeys.scope;
+import static org.omnifaces.component.output.Cache.PropertyKeys.time;
+import static org.omnifaces.component.output.Cache.PropertyKeys.useBuffer;
+import static org.omnifaces.filter.OnDemandResponseBufferFilter.BUFFERED_RESPONSE;
+import static org.omnifaces.util.Events.setCallbackAfterPhaseListener;
+import static org.omnifaces.util.Events.subscribeToViewEvent;
 
 import java.io.IOException;
 import java.io.StringWriter;

@@ -81,13 +81,13 @@ public class FacesViewsInitializer implements ServletContainerInitializer {
 				for (String resource : collectedViews.keySet()) {
 					facesViewsRegistration.addMappingForUrlPatterns(null, true, resource);
 				}
-				
+
 				// Additionally map the filter to all paths that were scanned and which are also directly
 				// accessible. This is to give the filter an opportunity to block these.
 				for (String path : getPublicRootPaths(servletContext)) {
 					facesViewsRegistration.addMappingForUrlPatterns(null, false, path + "*");
 				}
-				
+
 				// We now need to map the Faces Servlet to the extensions we found, but at this point in time
 				// this Faces Servlet might not be created yet, so we do this part in FacesViewInitializedListener.
 			}

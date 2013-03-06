@@ -82,7 +82,6 @@ public final class Events {
 		Faces.removeRequestAttribute(CallbackPhaseListener.CALLBACK_PHASE_LISTENER);
 	}
 
-
 	/**
 	 * Adds a phase listener to the current view that invokes the given callback every time before given phase ID.
 	 * @param phaseId The phase ID to invoke the given callback every time before.

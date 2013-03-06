@@ -16,7 +16,6 @@ import javax.el.ELException;
 import javax.faces.FacesException;
 import javax.servlet.ServletException;
 
-
 /**
  * Collection of general utility methods with respect to working with exceptions.
  *

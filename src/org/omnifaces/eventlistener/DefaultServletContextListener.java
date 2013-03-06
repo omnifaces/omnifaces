@@ -17,17 +17,17 @@ import javax.servlet.ServletContextListener;
 
 /**
  * Default implementation for the SystemEventListener interface.
- * 
+ *
  * @author Arjan Tijms
  * @since 1.4
  */
 public class DefaultServletContextListener implements ServletContextListener {
-	
+
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
 		// NOOP
 	}
-	
+
 	@Override
 	public void contextDestroyed(ServletContextEvent sce) {
 		// NOOP

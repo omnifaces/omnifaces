@@ -55,15 +55,15 @@ import org.omnifaces.filter.HttpFilter;
  *
  */
 public class FacesViewsForwardingFilter extends HttpFilter {
-	
+
 	private static ExtensionAction extensionAction = ExtensionAction.REDIRECT_TO_EXTENSIONLESS;
 	private static PathAction pathAction = PathAction.SEND_404;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
-    	
+
     	super.init(filterConfig);
-    	
+
     	ServletContext servletContext = filterConfig.getServletContext();
 
         // Mostly for pre-Servlet 3.0: scan the views if the auto-configure listener hasn't done this yet.
@@ -76,26 +76,25 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 
         Application application = getApplicationFromFactory();
         application.setViewHandler(new FacesViewsViewHandler(application.getViewHandler()));
-        
-        // In development mode additionally map this Filter to "*", so we can catch requests to extensionless resources that 
+
+        // In development mode additionally map this Filter to "*", so we can catch requests to extensionless resources that
         // have been dynamically added. Note that resources with mapped extensions are already handled by the FacesViewsResolver.
         // Adding resources with new extensions still requires a restart.
         if (application.getProjectStage() == Development && servletContext.getMajorVersion() > 2) {
         	filterConfig.getServletContext().getFilterRegistration(FacesViewsForwardingFilter.class.getName())
 											.addMappingForUrlPatterns(null, false, "*");
         }
-        
+
         ExtensionAction userExtensionAction = getExtensionAction(servletContext);
         if (userExtensionAction != null) {
         	extensionAction = userExtensionAction;
         }
-        
+
         PathAction userPathAction = getPathAction(servletContext);
         if (userPathAction != null) {
         	pathAction = userPathAction;
         }
-        
-        
+
     }
 
     @Override
@@ -105,20 +104,20 @@ public class FacesViewsForwardingFilter extends HttpFilter {
     	ServletContext context = getServletContext();
         Map<String, String> resources = getApplicationAttribute(context, FACES_VIEWS_RESOURCES);
         String resource = request.getServletPath();
-        
+
         if (isExtensionless(resource)) {
-        	
+
         	if (getApplicationFromFactory().getProjectStage() == Development && !resources.containsKey(resource)) {
         		// Check if the resource was dynamically added by scanning the faces-views location(s) again.
         		resources = scanAndStoreViews(context);
         	}
-        	
+
         	if (resources.containsKey(resource)) {
 	            // Forward the resource (view) using its original extension, on which the Facelets Servlet
 	            // is mapped. Technically it matters most that the Facelets Servlet picks up the
 	            // request, and the exact extension or even prefix is perhaps less relevant.
 	            String forwardURI = resource + getExtension(resources.get(resource));
-	
+
 	            // Get the request dispatcher
 	            RequestDispatcher requestDispatcher = context.getRequestDispatcher(forwardURI);
 	            if (requestDispatcher != null) {
@@ -128,10 +127,10 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 	            }
         	}
         } else if (resources.containsKey(resource)) {
-        	
+
         	// A mapped resource request with extension is encountered, user setting
         	// determines how we handle this.
-        	
+
         	switch (extensionAction) {
 		    	case REDIRECT_TO_EXTENSIONLESS:
 		    		redirectPermanent(response, getExtensionlessURLWithQuery(request));
@@ -145,14 +144,14 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 					break;
 	        	}
         } else if (isResourceInPublicPath(context, resource)) {
-        	
+
         	Map<String, String> reverseResources = getApplicationAttribute(context, FACES_VIEWS_REVERSE_RESOURCES);
-        		
+
     		if (reverseResources.containsKey(resource)) {
-    			
+
     			// A direct request to one of the public paths (excluding /) from where we scanned resources
     			// was done. Again, the user setting determined how we handle this.
-    			
+
     			switch (pathAction) {
     				case REDIRECT_TO_SCANNED_EXTENSIONLESS:
     					redirectPermanent(response, getExtensionlessURLWithQuery(request, reverseResources.get(resource)));

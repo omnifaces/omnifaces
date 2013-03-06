@@ -12,7 +12,7 @@
  */
 package org.omnifaces.util.selectitems;
 
-import static org.omnifaces.util.Utils.*;
+import static org.omnifaces.util.Utils.isEmpty;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -115,7 +115,6 @@ public final class SelectItemsCollector {
 
 		return selectItems;
 	}
-
 
 	/**
 	 * This method runs the algorithm expressed by a <code>UISelectItems<code> component that uses the <code>var</code> iterator construct to generate

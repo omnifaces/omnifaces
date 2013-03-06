@@ -16,8 +16,8 @@ import javax.faces.component.UISelectItem;
 import javax.faces.model.SelectItem;
 
 /**
- * This class extends the default {@link SelectItem} with several convenience methods. 
- * 
+ * This class extends the default {@link SelectItem} with several convenience methods.
+ *
  * @author Arjan Tijms
  *
  */
@@ -30,7 +30,7 @@ public class ExtendedSelectItem extends SelectItem {
      * values.</p>
      */
 	public ExtendedSelectItem() {}
-	
+
 	/**
      * <p>Construct a <code>SelectItem</code> with property values initialized from the corresponding
      * properties on the <code>UISelectItem</code>.
@@ -43,8 +43,8 @@ public class ExtendedSelectItem extends SelectItem {
 			uiSelectItem.getItemDescription(),
 			uiSelectItem.isItemDisabled(),
 			uiSelectItem.isItemEscaped(),
-			uiSelectItem.isNoSelectionOption()	
+			uiSelectItem.isNoSelectionOption()
 		);
-	}	
-	
+	}
+
 }

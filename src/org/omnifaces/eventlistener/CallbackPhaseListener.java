@@ -12,7 +12,7 @@
  */
 package org.omnifaces.eventlistener;
 
-import static javax.faces.event.PhaseId.*;
+import static javax.faces.event.PhaseId.ANY_PHASE;
 
 import javax.faces.event.PhaseEvent;
 import javax.faces.event.PhaseId;

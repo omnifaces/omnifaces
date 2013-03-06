@@ -15,7 +15,7 @@
  */
 package org.omnifaces.component.output.cache.concurrentlinkedhashmap;
 
-import static org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLinkedHashMap.*;
+import static org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLinkedHashMap.checkNotNull;
 
 import java.io.Serializable;
 import java.util.Collection;

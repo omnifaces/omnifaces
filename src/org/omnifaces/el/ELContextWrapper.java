@@ -34,20 +34,20 @@ import javax.faces.application.ViewHandler;
  * @author Arjan Tijms
  */
 public class ELContextWrapper extends ELContext implements FacesWrapper<ELContext> {
-	
+
 	private ELContext elContext;
 
 	public ELContextWrapper() {}
-	
+
 	public ELContextWrapper(ELContext elContext) {
 		this.elContext = elContext;
 	}
-	
+
 	@Override
     public ELContext getWrapped() {
     	return elContext;
     }
-	
+
 	 /**
      * {@inheritDoc}
      */
@@ -79,7 +79,7 @@ public class ELContextWrapper extends ELContext implements FacesWrapper<ELContex
     public Object getContext(@SuppressWarnings("rawtypes") Class key) {
        return getWrapped().getContext(key);
     }
-                      
+
     /**
      * {@inheritDoc}
      */
@@ -87,7 +87,7 @@ public class ELContextWrapper extends ELContext implements FacesWrapper<ELContex
     public ELResolver getELResolver() {
     	return getWrapped().getELResolver();
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -95,8 +95,8 @@ public class ELContextWrapper extends ELContext implements FacesWrapper<ELContex
     public FunctionMapper getFunctionMapper() {
     	return getWrapped().getFunctionMapper();
     }
-    
-    
+
+
     /**
      * {@inheritDoc}
      */
@@ -111,9 +111,9 @@ public class ELContextWrapper extends ELContext implements FacesWrapper<ELContex
     @Override
     public void setLocale(Locale locale) {
     	getWrapped().setLocale(locale);
-    }    
-        
-    
+    }
+
+
     /**
      * {@inheritDoc}
      */

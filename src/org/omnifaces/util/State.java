@@ -18,7 +18,7 @@ import javax.faces.component.StateHelper;
 
 /**
  * Helper class for StateHelper that uses generic type-inference to make code that uses the StateHelper slightly less verbose.
- * 
+ *
  * @since 1.1
  * @author Arjan Tijms
  */
@@ -34,7 +34,7 @@ public class State {
 	 * Attempts to find a value associated with the specified key in the component's state.
 	 * <p>
 	 * See {@link StateHelper#eval(Serializable)}
-	 * 
+	 *
 	 * @param key
 	 *            the name of the value in component's state
 	 */
@@ -47,7 +47,7 @@ public class State {
 	 * Attempts to find a value associated with the specified key in the component's state.
 	 * <p>
 	 * See {@link StateHelper#eval(Serializable, Object)}
-	 * 
+	 *
 	 * @param key
 	 *            the name of the value in component's state
 	 * @param defaultValue
@@ -59,12 +59,12 @@ public class State {
 	}
 
 	/**
-	 * Puts a value in the component's state and returns the previous value. 
+	 * Puts a value in the component's state and returns the previous value.
 	 * Note that the previous value has to be of the same type as the value
 	 * being set. If this is unwanted, use the original StateHelper.
 	 * <p>
 	 * See {@link StateHelper#put(Serializable, Object)}
-	 * 
+	 *
 	 * @param key
 	 * @param value
 	 */

@@ -34,18 +34,18 @@ import javax.faces.FacesWrapper;
 public class ELResolverWrapper extends ELResolver implements FacesWrapper<ELResolver> {
 
 	private ELResolver elResolver;
-	
+
 	public ELResolverWrapper() {}
-	
+
 	public ELResolverWrapper(ELResolver elResolver) {
 		this.elResolver = elResolver;
 	}
-	
+
 	@Override
 	public ELResolver getWrapped() {
 		return elResolver;
 	}
-	
+
 	 /**
      * {@inheritDoc}
      */
@@ -74,14 +74,14 @@ public class ELResolverWrapper extends ELResolver implements FacesWrapper<ELReso
      * {@inheritDoc}
      */
     @Override
-	public void setValue(ELContext context, Object base, Object property, Object value) {    	
+	public void setValue(ELContext context, Object base, Object property, Object value) {
     	getWrapped().setValue(context, base, property, value);
     }
 
     /**
      * {@inheritDoc}
      */
-    @Override	
+    @Override
 	public boolean isReadOnly(ELContext context, Object base, Object property) {
 		return getWrapped().isReadOnly(context, base, property);
 	}

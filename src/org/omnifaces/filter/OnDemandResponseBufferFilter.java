@@ -33,29 +33,29 @@ import org.omnifaces.servlet.BufferedHttpServletResponse;
  * before <code>passThrough</code> was set to false and is used afterwards, will <b>not</b> automatically start buffering. Only newly obtained
  * writers will buffer from that point on.
  * <p>
- * If at the end of the request, when this filter resumes control again, the response is still buffering (<code>passThrough</code> is false) 
+ * If at the end of the request, when this filter resumes control again, the response is still buffering (<code>passThrough</code> is false)
  * its buffer will be automatically flushed to the underlying response. If however the buffer is not empty, but <code>passThrough</code> is true,
  * no such flushing will be done and it's assumed the application has taken care of this.
- * 
+ *
  * @author Arjan Tijms
  * @since 1.2
  *
  */
 public class OnDemandResponseBufferFilter extends HttpFilter {
-	
+
 	public static final String BUFFERED_RESPONSE = "org.omnifaces.servlet.BUFFERED_RESPONSE";
-	
+
 	@Override
 	public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException,
 	        IOException {
 
 		BufferedHttpServletResponse bufferedResponse = new BufferedHttpServletResponse(response);
-		
+
 		// By default don't buffer, code has to activate this explicitly.
 		bufferedResponse.setPassThrough(true);
-		
+
 		request.setAttribute(BUFFERED_RESPONSE, bufferedResponse);
-		
+
 		try {
 			chain.doFilter(request, bufferedResponse);
 		} finally {
@@ -64,7 +64,7 @@ public class OnDemandResponseBufferFilter extends HttpFilter {
 				response.getWriter().write(bufferedResponse.getBufferAsString());
 			}
 		}
-		
+
 	}
 
 }
