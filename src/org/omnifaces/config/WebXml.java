@@ -113,11 +113,12 @@ public enum WebXml {
 	 * Perform initialization.
 	 */
 	private WebXml() {
-		try {
-			init(Faces.getServletContext());
-		}
-		catch (Exception ignore) {
-			//
+		if (Faces.getContext() != null) {
+			ServletContext servletContext = Faces.getServletContext();
+
+			if (servletContext != null) {
+				init(servletContext);
+			}
 		}
 	}
 
