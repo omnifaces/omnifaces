@@ -26,10 +26,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.faces.context.FacesContext;
 import javax.faces.webapp.FacesServlet;
 import javax.servlet.Filter;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextListener;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -63,7 +65,8 @@ public enum WebXml {
 	 * then it won't work if the <code>INSTANCE</code> hasn't been referenced before. Since JSF installs a special
 	 * "init" {@link FacesContext} during startup, one option for doing this initial referencing is in a
 	 * {@link ServletContextListener}. The data this enum encapsulates will then be available even where there is no
-	 * {@link FacesContext} available.
+	 * {@link FacesContext} available. If there's no other option, then you need to manually invoke
+	 * {@link #init(ServletContext)} whereby you pass the desired {@link ServletContext}.
 	 */
 	INSTANCE;
 
@@ -98,6 +101,7 @@ public enum WebXml {
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
+	private AtomicBoolean initialized = new AtomicBoolean();
 	private List<String> welcomeFiles;
 	private Map<Class<Throwable>, String> errorPageLocations;
 	private String formLoginPage;
@@ -110,17 +114,35 @@ public enum WebXml {
 	 */
 	private WebXml() {
 		try {
-			Element webXml = loadWebXml().getDocumentElement();
-			XPath xpath = XPathFactory.newInstance().newXPath();
-			welcomeFiles = parseWelcomeFiles(webXml, xpath);
-			errorPageLocations = parseErrorPageLocations(webXml, xpath);
-			formLoginPage = parseFormLoginPage(webXml, xpath);
-			securityConstraints = parseSecurityConstraints(webXml, xpath);
+			init(Faces.getServletContext());
 		}
-		catch (Exception e) {
-			// If this occurs, web.xml is broken anyway and the app shouldn't have started/initialized this far at all.
-			throw new RuntimeException(e);
+		catch (Exception ignore) {
+			//
 		}
+	}
+
+	/**
+	 * Perform manual initialization with the given servlet context, if not already initialized yet.
+	 * @param servletContext The servlet context to obtain the web.xml from.
+	 * @return The current {@link WebXml} instance, initialized and all.
+	 */
+	public WebXml init(ServletContext context) {
+		if (!initialized.getAndSet(true)) {
+			try {
+				Element webXml = loadWebXml(context).getDocumentElement();
+				XPath xpath = XPathFactory.newInstance().newXPath();
+				welcomeFiles = parseWelcomeFiles(webXml, xpath);
+				errorPageLocations = parseErrorPageLocations(webXml, xpath);
+				formLoginPage = parseFormLoginPage(webXml, xpath);
+				securityConstraints = parseSecurityConstraints(webXml, xpath);
+			}
+			catch (Exception e) {
+				// If this occurs, web.xml is broken anyway and app shouldn't have started/initialized this far at all.
+				throw new RuntimeException(e);
+			}
+		}
+
+		return this;
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -274,17 +296,17 @@ public enum WebXml {
 	 * Load, merge and return all <code>web.xml</code> and <code>web-fragment.xml</code> files found in the classpath
 	 * into a single {@link Document}.
 	 */
-	private static Document loadWebXml() throws Exception {
+	private static Document loadWebXml(ServletContext context) throws Exception {
 		DocumentBuilder builder = createDocumentBuilder();
 		Document document = builder.newDocument();
 		document.appendChild(document.createElement("web"));
-		URL url = Faces.getResource(WEB_XML);
+		URL url = context.getResource(WEB_XML);
 
 		if (url != null) { // Since Servlet 3.0, web.xml is optional.
 			parseAndAppendChildren(url, builder, document);
 		}
 
-		if (Faces.getServletContext().getMajorVersion() >= 3) { // web-fragment.xml exist only since Servlet 3.0.
+		if (context.getMajorVersion() >= 3) { // web-fragment.xml exist only since Servlet 3.0.
 			Enumeration<URL> urls = Thread.currentThread().getContextClassLoader().getResources(WEB_FRAGMENT_XML);
 
 			while (urls.hasMoreElements()) {
