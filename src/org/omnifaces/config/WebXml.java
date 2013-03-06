@@ -96,8 +96,10 @@ public enum WebXml {
 	private static final String XPATH_AUTH_CONSTRAINT_ROLE_NAME =
 		"auth-constraint/role-name";
 
-	private static final String URL_MUST_START_WITH_SLASH =
-		"URL must start with '/': '%s'";
+	private static final String ERROR_NOT_INITIALIZED =
+			"WebXml is not initialized yet. Please use #init(ServletContext) method to manually initialize it.";
+	private static final String ERROR_URL_MUST_START_WITH_SLASH =
+			"URL must start with '/': '%s'";
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -161,6 +163,8 @@ public enum WebXml {
 	 * @return The right error page location for the given exception.
 	 */
 	public String findErrorPageLocation(Throwable exception) {
+		Map<Class<Throwable>, String> errorPageLocations = getErrorPageLocations();
+
 		for (Entry<Class<Throwable>, String> entry : errorPageLocations.entrySet()) {
 			if (entry.getKey() == exception.getClass()) {
 				return entry.getValue();
@@ -195,8 +199,10 @@ public enum WebXml {
 	 * @since 1.4
 	 */
 	public boolean isAccessAllowed(String url, String role) {
+		Map<String, Set<String>> securityConstraints = getSecurityConstraints();
+
 		if (url.charAt(0) != ('/')) {
-			throw new IllegalArgumentException(String.format(URL_MUST_START_WITH_SLASH, url));
+			throw new IllegalArgumentException(String.format(ERROR_URL_MUST_START_WITH_SLASH, url));
 		}
 
 		if (url.length() > 1 && url.charAt(url.length() - 1) == '/') {
@@ -259,6 +265,7 @@ public enum WebXml {
 	 * @since 1.4
 	 */
 	public List<String> getWelcomeFiles() {
+		checkInitialized();
 		return welcomeFiles;
 	}
 
@@ -268,6 +275,7 @@ public enum WebXml {
 	 * @return A mapping of all error page locations by exception type.
 	 */
 	public Map<Class<Throwable>, String> getErrorPageLocations() {
+		checkInitialized();
 		return errorPageLocations;
 	}
 
@@ -276,6 +284,7 @@ public enum WebXml {
 	 * @return The location of the FORM authentication login page, or <code>null</code> if it is not defined.
 	 */
 	public String getFormLoginPage() {
+		checkInitialized();
 		return formLoginPage;
 	}
 
@@ -288,7 +297,14 @@ public enum WebXml {
 	 * @since 1.4
 	 */
 	public Map<String, Set<String>> getSecurityConstraints() {
+		checkInitialized();
 		return securityConstraints;
+	}
+
+	private void checkInitialized() {
+		if (!initialized.get()) {
+			throw new IllegalStateException(ERROR_NOT_INITIALIZED);
+		}
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
