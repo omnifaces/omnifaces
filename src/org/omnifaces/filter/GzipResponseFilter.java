@@ -146,7 +146,10 @@ public class GzipResponseFilter extends HttpFilter {
 		if (acceptsGzip(request)) {
 			GzipHttpServletResponse gzipResponse = new GzipHttpServletResponse(response, threshold, mimetypes);
 			chain.doFilter(request, gzipResponse);
-			gzipResponse.close(); // Mandatory for the case the threshold limit hasn't been reached.
+
+			if (!gzipResponse.isCommitted()) { // Some other filter may have performed a forward/redirect.
+				gzipResponse.close(); // Mandatory for the case the threshold limit hasn't been reached.
+			}
 		}
 		else {
 			chain.doFilter(request, response);
