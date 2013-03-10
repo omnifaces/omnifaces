@@ -129,10 +129,10 @@ public enum WebXml {
 	 * @param servletContext The servlet context to obtain the web.xml from.
 	 * @return The current {@link WebXml} instance, initialized and all.
 	 */
-	public WebXml init(ServletContext context) {
+	public WebXml init(ServletContext servletContext) {
 		if (!initialized.getAndSet(true)) {
 			try {
-				Element webXml = loadWebXml(context).getDocumentElement();
+				Element webXml = loadWebXml(servletContext).getDocumentElement();
 				XPath xpath = XPathFactory.newInstance().newXPath();
 				welcomeFiles = parseWelcomeFiles(webXml, xpath);
 				errorPageLocations = parseErrorPageLocations(webXml, xpath);
