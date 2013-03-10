@@ -20,6 +20,7 @@ import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES_EXTENSIONS;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_REVERSE_RESOURCES;
 import static org.omnifaces.facesviews.FacesViews.getPublicRootPaths;
+import static org.omnifaces.facesviews.FacesViews.isFilterAfterDeclaredFilters;
 import static org.omnifaces.facesviews.FacesViews.scanViewsFromRootPaths;
 import static org.omnifaces.util.Utils.reverse;
 
@@ -79,7 +80,7 @@ public class FacesViewsInitializer implements ServletContainerInitializer {
 
 				// Map the forwarding filter to all the resources we found.
 				for (String resource : collectedViews.keySet()) {
-					facesViewsRegistration.addMappingForUrlPatterns(null, true, resource);
+					facesViewsRegistration.addMappingForUrlPatterns(null, isFilterAfterDeclaredFilters(servletContext), resource);
 				}
 
 				// Additionally map the filter to all paths that were scanned and which are also directly

@@ -19,6 +19,7 @@ import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_REVERSE_RESOURCES;
 import static org.omnifaces.facesviews.FacesViews.getExtensionAction;
 import static org.omnifaces.facesviews.FacesViews.getExtensionlessURLWithQuery;
+import static org.omnifaces.facesviews.FacesViews.getFacesServletDispatchMethod;
 import static org.omnifaces.facesviews.FacesViews.getPathAction;
 import static org.omnifaces.facesviews.FacesViews.isResourceInPublicPath;
 import static org.omnifaces.facesviews.FacesViews.scanAndStoreViews;
@@ -56,8 +57,9 @@ import org.omnifaces.filter.HttpFilter;
  */
 public class FacesViewsForwardingFilter extends HttpFilter {
 
-	private static ExtensionAction extensionAction = ExtensionAction.REDIRECT_TO_EXTENSIONLESS;
-	private static PathAction pathAction = PathAction.SEND_404;
+	private static ExtensionAction extensionAction;
+	private static PathAction pathAction;
+	private static FacesServletDispatchMethod dispatchMethod;
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
@@ -85,16 +87,9 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 											.addMappingForUrlPatterns(null, false, "*");
         }
 
-        ExtensionAction userExtensionAction = getExtensionAction(servletContext);
-        if (userExtensionAction != null) {
-        	extensionAction = userExtensionAction;
-        }
-
-        PathAction userPathAction = getPathAction(servletContext);
-        if (userPathAction != null) {
-        	pathAction = userPathAction;
-        }
-
+        extensionAction = getExtensionAction(servletContext);
+        pathAction = getPathAction(servletContext);
+        dispatchMethod = getFacesServletDispatchMethod(servletContext);
     }
 
     @Override
@@ -113,18 +108,29 @@ public class FacesViewsForwardingFilter extends HttpFilter {
         	}
 
         	if (resources.containsKey(resource)) {
-	            // Forward the resource (view) using its original extension, on which the Facelets Servlet
-	            // is mapped. Technically it matters most that the Facelets Servlet picks up the
-	            // request, and the exact extension or even prefix is perhaps less relevant.
-	            String forwardURI = resource + getExtension(resources.get(resource));
-
-	            // Get the request dispatcher
-	            RequestDispatcher requestDispatcher = context.getRequestDispatcher(forwardURI);
-	            if (requestDispatcher != null) {
-	                // Forward the request to FacesServlet
-	                requestDispatcher.forward(request, response);
-	                return;
-	            }
+        		
+        		String extension = getExtension(resources.get(resource));
+        		
+        		switch (dispatchMethod) {
+        			case DO_FILTER:
+        				
+        				// Continue the chain, but make the request appear to be to the resource with an extension.
+        				// This assumes that the FacesServlet has been mapped to something that includes the extensionless
+        				// request.
+        				chain.doFilter(new UriExtensionRequestWrapper(request, extension), response);
+        				return;
+        			case FORWARD:
+        				
+        				// Forward the resource (view) using its original extension, on which the Facelets Servlet
+        	            // is mapped. Technically it matters most that the Facelets Servlet picks up the
+        	            // request, and the exact extension or even prefix is perhaps less relevant.
+        				RequestDispatcher requestDispatcher = context.getRequestDispatcher(resource + extension);
+    		            if (requestDispatcher != null) {
+    		                // Forward the request to FacesServlet
+    		                requestDispatcher.forward(request, response);
+    		                return;
+    		            }
+        		}
         	}
         } else if (resources.containsKey(resource)) {
 

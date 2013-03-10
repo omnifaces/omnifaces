@@ -43,6 +43,8 @@ import org.omnifaces.util.Faces;
 
 /**
  * This class contains the core methods that implement the Faces Views feature.
+ * 
+ * TODO: break up in logic and config?
  *
  * @author Arjan Tijms
  *
@@ -87,6 +89,18 @@ public final class FacesViews {
 	 * is requested in a public path that has been used for scanning views by faces views. See {@link PathAction}
 	 */
 	public static final String FACES_VIEWS_PATH_ACTION_PARAM_NAME = "org.omnifaces.FACES_VIEWS_PATH_ACTION";
+	
+	/**
+	 * The name of the init parameter (in web.xml) that determines the method used by FacesViews to invoke the FacesServlet.
+	 * See {@link FacesServletDispatchMethod}.
+	 */
+	public static final String FACES_VIEWS_DISPATCH_METHOD_PARAM_NAME = "org.omnifaces.FACES_VIEWS_DISPATCH_METHOD";
+	
+	/**
+	 * The name of the boolean init parameter (in web.xml) via which the user can set whether the {@link FacesViewsForwardingFilter}
+	 * should match before declared filters (false) or after declared filters (true);
+	 */
+	public static final String FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS_PARAM_NAME = "org.omnifaces.FILTER_AFTER_DECLARED_FILTERS";
 
 	/**
 	 * The name of the application scope context parameter under which a Set version of the paths that are to be scanned
@@ -190,7 +204,7 @@ public final class FacesViews {
 	public static ExtensionAction getExtensionAction(ServletContext servletContext) {
 		String extensionActionString = servletContext.getInitParameter(FACES_VIEWS_EXTENSION_ACTION_PARAM_NAME);
 		if (isEmpty(extensionActionString)) {
-			return null;
+			return ExtensionAction.REDIRECT_TO_EXTENSIONLESS;
 		}
 
 		try {
@@ -198,7 +212,7 @@ public final class FacesViews {
 		} catch (Exception e) {
 			throw new IllegalStateException(
 				String.format(
-					"Value '%s' is not valud for context parameter for '%s'",
+					"Value '%s' is not valid for context parameter for '%s'",
 					extensionActionString, FACES_VIEWS_EXTENSION_ACTION_PARAM_NAME
 				)
 			);
@@ -208,7 +222,7 @@ public final class FacesViews {
 	public static PathAction getPathAction(ServletContext servletContext) {
 		String pathActionString = servletContext.getInitParameter(FACES_VIEWS_PATH_ACTION_PARAM_NAME);
 		if (isEmpty(pathActionString)) {
-			return null;
+			return PathAction.SEND_404;
 		}
 
 		try {
@@ -216,11 +230,39 @@ public final class FacesViews {
 		} catch (Exception e) {
 			throw new IllegalStateException(
 				String.format(
-					"Value '%s' is not valud for context parameter for '%s'",
+					"Value '%s' is not valid for context parameter for '%s'",
 					pathActionString, FACES_VIEWS_PATH_ACTION_PARAM_NAME
 				)
 			);
 		}
+	}
+	
+	public static FacesServletDispatchMethod getFacesServletDispatchMethod(ServletContext servletContext) {
+		String dispatchMethodString = servletContext.getInitParameter(FACES_VIEWS_DISPATCH_METHOD_PARAM_NAME);
+		if (isEmpty(dispatchMethodString)) {
+			return FacesServletDispatchMethod.DO_FILTER;
+		}
+
+		try {
+			return FacesServletDispatchMethod.valueOf(dispatchMethodString.toUpperCase(US));
+		} catch (Exception e) {
+			throw new IllegalStateException(
+				String.format(
+					"Value '%s' is not valid for context parameter for '%s'",
+					dispatchMethodString, FACES_VIEWS_DISPATCH_METHOD_PARAM_NAME
+				)
+			);
+		}
+	}
+	
+	public static boolean isFilterAfterDeclaredFilters(ServletContext servletContext) {
+		String filterAfterDeclaredFilters = servletContext.getInitParameter(FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS_PARAM_NAME);
+		
+		if (filterAfterDeclaredFilters == null) {
+			return true;
+		}
+		
+		return Boolean.valueOf(filterAfterDeclaredFilters);
 	}
 
 	public static Boolean isScannedViewsAlwaysExtensionless(final FacesContext context) {
