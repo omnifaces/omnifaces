@@ -78,17 +78,6 @@
  * does not need to be a mapping for the <code>FacesServlet</code> in it when using a Servlet 3.0 container.
  *
  * <p>
- * JSF links in which logical view ids are used will be rendered as either extensionless or with an extension based on whether
- * the request in which this rendering is done was extensionless or not. E.g. consider the following link on
- * <code>/WEB-INF/faces-views/index.xhtml</code>:
- * <pre>
- * &lt;h:link value="Add user" outcome="/users/add" /&gt;
- * </pre>
- * This will render as <code>/users/add</code> if the request was to <code>/index</code> and as <code>/users/add.xhtml</code> if the
- * request was to <code>/index.xhtml</code>. This behavior can be changed so that such links are always rendered as the extensionless
- * version using a configuration parameter (see below).
- *
- * <p>
  * <b>Welcome files</b><br>
  *
  * If a <code>welcome-file</code> is defined in <code>web.xml</code> that's scanned by FacesViews AND <code>REDIRECT_TO_EXTENSIONLESS</code> is used
@@ -100,6 +89,33 @@
  *     &lt;welcome-file&gt;index&lt;/welcome-file&gt;
  * &lt;/welcome-file-list&gt;
  * </pre>
+ * 
+ * <p>
+ * <b>Dispatch methods</b><br>
+ * 
+ * JSF normally inspects the request URI to derive a logical view id from it. It assumes the FacesServlet is either mapped on a prefix path
+ * or an extension, and will get confused when an extensionless "exactly mapped" request is encountered. To counter this, FacesViews
+ * makes use of a filter that intercepts each request and makes it appear to JSF that the request was a normal extension mapped one.
+ * <p>
+ * In order to do this dispatching, two methods are provided; forwarding, and wrapping the request and continuing the filter chain.
+ * For the last method to work, the FacesServlet is programmatically mapped to every individual resource (page/view) that is encountered. By
+ * default the filter is automatically registered and is inserted <b>after</b> all filters that are declared in <code>web.xml</code>.
+ * <p>
+ * These internal details are important for users to be aware of, since they greatly influence how extensionless requests interact with other
+ * filter based functionality such as security filters, compression filters, file upload filters, etc.
+ * <p>
+ * With the forwarding method, filters typically have to be set to dispatch type <code>FORWARD</code> as well. If the FacesView filter is the first
+ * in the chain other filters that are set to dispatch type <code>REQUEST</code> will NOT be invoked at all (the chain is ended). If the
+ * FacesView filter is set to be the last, other filters will be invoked, but they should not modify the response (a forward clears
+ * the response buffer till so far if not committed).
+ * <p>
+ * No such problems appear to exist when the FacesView filter simply continues the filtering chain. However, since it wraps the requess there
+ * might be unforeseen problems with containers or other filters that get confused when the request URI changes in the middle of the chain.
+ * Continuing the chain has been tested with JBoss EAP 6.0.1, GlassFish 3.1.2.2, WebLogic 12.1.1 and TomEE 1.5.2-snapshot and thus with both
+ * Mojarra and MyFaces. However, since it's a new method for OmniFaces 1.4 we kept the existing forward as an alternative.
+ * <p>
+ * The configuration options below provide more details about the dispatch methods and the filter position which can be used for tweaking
+ * FacesViews for interoperability with other filters. 
  *
  * <p>
  * <h3>Configuration</h3>
@@ -226,6 +242,42 @@
  * </pre>
  *
  * <em>(at the moment Servlet 2.5 compatibility has not been tested thorougly)</em>
+ * 
+ * <p>
+ * <h3>OmniFaces 1.3 compatibility</h3>
+ * 
+ * In OmniFaces 1.4, a major overhaul was done for FacesViews and several things are done differently from how they
+ * were done in 1.3<br/>
+ * <p>
+ * Most notably is that the FacesServlet dispatch changed from forwarding to continuing the chain, the FacesView filter
+ * moved from being the first in the chain to being the last, links are always rendered as their extensionless variant independent
+ * of the request using an extension or not, and when a request with an extension is used anyway (e.g. by typing it directly into
+ * the address bar) it's now redirected to the extensionless variant.
+ * <p>
+ * By putting the following settings in <code>web.xml</code> a behavior that most closely resembles 1.3 can be obtained:
+ * 
+ * <pre>
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.FACES_VIEWS_DISPATCH_METHOD&lt;/param-name&gt;
+ *     &lt;param-value&gt;FORWARD&lt;/param-value&gt;	
+ * &lt;/context-param&gt;
+ * 
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.FILTER_AFTER_DECLARED_FILTERS&lt;/param-name&gt;
+ *     &lt;param-value&gt;false&lt;/param-value&gt;	
+ * &lt;/context-param&gt;
+ * 
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.FACES_VIEWS_SCANNED_VIEWS_ALWAYS_EXTENSIONLESS&lt;/param-name&gt;
+ *     &lt;param-value&gt;false&lt;/param-value&gt;	
+ * &lt;/context-param&gt;
+ * 
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.FACES_VIEWS_EXTENSION_ACTION&lt;/param-name&gt;
+ *     &lt;param-value&gt;PROCEED&lt;/param-value&gt;	
+ * &lt;/context-param&gt;
+ * </pre>
+ * 
  *
  * @author Arjan Tijms
  *
