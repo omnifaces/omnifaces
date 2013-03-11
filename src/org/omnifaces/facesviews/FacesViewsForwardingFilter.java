@@ -15,6 +15,7 @@ package org.omnifaces.facesviews;
 import static javax.faces.application.ProjectStage.Development;
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_SERVLET_PATH;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_REVERSE_RESOURCES;
 import static org.omnifaces.facesviews.FacesViews.getExtensionAction;
@@ -117,7 +118,12 @@ public class FacesViewsForwardingFilter extends HttpFilter {
         				// Continue the chain, but make the request appear to be to the resource with an extension.
         				// This assumes that the FacesServlet has been mapped to something that includes the extensionless
         				// request.
-        				chain.doFilter(new UriExtensionRequestWrapper(request, extension), response);
+        				try {
+        					request.setAttribute(FACES_VIEWS_ORIGINAL_SERVLET_PATH, request.getServletPath());
+        					chain.doFilter(new UriExtensionRequestWrapper(request, extension), response);
+        				} finally {
+        					request.removeAttribute(FACES_VIEWS_ORIGINAL_SERVLET_PATH);
+        				}
         				return;
         			case FORWARD:
         				

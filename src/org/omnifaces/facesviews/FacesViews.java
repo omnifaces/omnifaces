@@ -124,6 +124,8 @@ public final class FacesViews {
 	public static final String FACES_VIEWS_RESOURCES = "org.omnifaces.facesviews";
 	public static final String FACES_VIEWS_REVERSE_RESOURCES = "org.omnifaces.facesviews.reverse.resources";
     public static final String FACES_VIEWS_RESOURCES_EXTENSIONS = "org.omnifaces.facesviews.extensions";
+    
+    public static final String FACES_VIEWS_ORIGINAL_SERVLET_PATH = "org.omnifaces.facesviews.original.servlet_path";
 
     public static void scanViewsFromRootPaths(ServletContext servletContext, Map<String, String> collectedViews, Set<String> collectedExtensions) {
 		for (String rootPath : getRootPaths(servletContext)) {

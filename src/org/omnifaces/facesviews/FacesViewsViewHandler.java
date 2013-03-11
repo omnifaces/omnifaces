@@ -12,6 +12,7 @@
  */
 package org.omnifaces.facesviews;
 
+import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_SERVLET_PATH;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES;
 import static org.omnifaces.facesviews.FacesViews.isScannedViewsAlwaysExtensionless;
 import static org.omnifaces.util.Faces.getApplicationAttribute;
@@ -47,9 +48,8 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 
 		Map<String, String> mappedResources = getApplicationAttribute(context, FACES_VIEWS_RESOURCES);
 		if (mappedResources.containsKey(viewId)) {
-
-			String originalViewId = getRequestAttribute(context, "javax.servlet.forward.servlet_path");
-			if (isScannedViewsAlwaysExtensionless(context) || isExtensionless(originalViewId)) {
+			
+			if (isScannedViewsAlwaysExtensionless(context) || isOriginalViewExtensionless(context)) {
 				// User has requested to always render extensionless, or the requested viewId was mapped and the current
 				// request is extensionless, render the action URL extensionless as well.
 				return context.getExternalContext().getRequestContextPath() + stripExtension(viewId);
@@ -58,6 +58,15 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 
 		// Not a resource we mapped or not a forwarded one, let the original view handler take care of it.
 		return super.getActionURL(context, viewId);
+	}
+	
+	private boolean isOriginalViewExtensionless(FacesContext context) {
+		String originalViewId = getRequestAttribute(context, "javax.servlet.forward.servlet_path");
+		if (originalViewId == null) {
+			originalViewId = getRequestAttribute(context, FACES_VIEWS_ORIGINAL_SERVLET_PATH);
+		}
+		
+		return isExtensionless(originalViewId);
 	}
 
 	@Override
