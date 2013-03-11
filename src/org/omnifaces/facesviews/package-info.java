@@ -154,6 +154,26 @@
  * Default: <code>REDIRECT_TO_EXTENSIONLESS</code>
  * </td>
  * </tr>
+ * 
+ * <tr>
+ * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_DISPATCH_METHOD_PARAM_NAME}</code></td>
+ * <td>Determines the method used by FacesViews to invoke the FacesServlet.
+ * Allowed values: {<code>FORWARD</code>,<code>DO_FILTER</code>}, which have the following meaning:
+ * <code>FORWARD</code> - Use a forward to invoke the {@link javax.faces.webapp.FacesServlet}. Using this method the {@link javax.faces.webapp.FacesServlet} does not have to be mapped to the (extensionless) requested resource or to everything (/*) when manually mapping.
+ * <code>DO_FILTER</code> - Use a plain {@link javax.servlet.FilterChain#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse)} to invoke the {@link javax.faces.webapp.FacesServlet}. Using this method necessitates 
+ * the FacesServlet to be mapped to the (extensionless) requested resource or to everything (/*) when manually mapping.
+ * Default: <code>DO_FILTER</code>
+ * </td>
+ * </tr>
+ * 
+ * <tr>
+ * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS_PARAM_NAME}</code></td>
+ * <td>Used to set whether the {@link org.omnifaces.facesviews.FacesViewsForwardingFilter} should match before declared filters (<code>false</code>) 
+ * or after declared filters (<code>true</code>), when automatic scanning and mapping is used (as opposed to manually mapping the Servlet as explained
+ * in the Servlet 2.5 section below).
+ * Default: <code>true</code> (the FacesViews forwarding filter is the last in the filter chain)
+ * </td>
+ * </tr>
 
  * </table>
  *
@@ -211,3 +231,4 @@
  *
  */
 package org.omnifaces.facesviews;
+
