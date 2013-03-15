@@ -118,9 +118,9 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 		this.wrapped = wrapped;
 
 		if (!Faces.isDevelopment()) {
-			this.cdnResources = initCDNResources();
+			cdnResources = initCDNResources();
 
-			if (this.cdnResources == null) {
+			if (cdnResources == null) {
 				throw new IllegalArgumentException(ERROR_MISSING_INIT_PARAM);
 			}
 		}
@@ -129,18 +129,35 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Creates a new instance of a resource based on the given resource name and library name. If the current JSF
-	 * project stage is <strong>not</strong> set to <code>Development</code>, then the properties file will be consulted
-	 * if any CDN URL is available for the given resource name and library name. If there is none, then just return the
-	 * JSF default resource, otherwise return a wrapped resource whose {@link Resource#getRequestPath()} returns the CDN
-	 * URL as is been set in the {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_RESOURCES}
-	 * context parameter.
+	 * Delegate to {@link #createResource(String, String, String)} with <code>null</code> as library name and content
+	 * type.
+	 */
+	@Override
+	public Resource createResource(String resourceName) {
+		return createResource(resourceName, null, null);
+	}
+
+	/**
+	 * Delegate to {@link #createResource(String, String, String)} with <code>null</code> as content type.
 	 */
 	@Override
 	public Resource createResource(String resourceName, String libraryName) {
-		final Resource resource = wrapped.createResource(resourceName, libraryName);
+		return createResource(resourceName, libraryName, null);
+	}
 
-		if (cdnResources == null) {
+	/**
+	 * Delegate to {@link #createResource(String, String, String)} of the wrapped resource handler. If it returns
+	 * non-<code>null</code> and the current JSF project stage is <strong>not</strong> set to <code>Development</code>,
+	 * then the properties file will be consulted if any CDN URL is available for the given resource. If there is none,
+	 * then just return the JSF default resource, otherwise return a wrapped resource whose
+	 * {@link Resource#getRequestPath()} returns the CDN URL as is been set in the
+	 * {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_RESOURCES} context parameter.
+	 */
+	@Override
+	public Resource createResource(String resourceName, String libraryName, String contentType) {
+		final Resource resource = wrapped.createResource(resourceName, libraryName, contentType);
+
+		if (resource == null  || cdnResources == null) {
 			return resource;
 		}
 

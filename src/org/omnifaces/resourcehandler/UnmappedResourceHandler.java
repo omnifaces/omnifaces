@@ -109,13 +109,30 @@ public class UnmappedResourceHandler extends ResourceHandlerWrapper {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Creates a new instance of a resource based on the given resource name and library name. If it is not
-	 * <code>null</code>, then return a wrapped resource whose {@link Resource#getRequestPath()} returns the unmapped
-	 * URL.
+	 * Delegate to {@link #createResource(String, String, String)} with <code>null</code> as library name and content
+	 * type.
 	 */
 	@Override
-	public Resource createResource(final String resourceName, final String libraryName) {
-		final Resource resource = super.createResource(resourceName, libraryName);
+	public Resource createResource(String resourceName) {
+		return createResource(resourceName, null, null);
+	}
+
+	/**
+	 * Delegate to {@link #createResource(String, String, String)} with <code>null</code> as content type.
+	 */
+	@Override
+	public Resource createResource(String resourceName, String libraryName) {
+		return createResource(resourceName, libraryName, null);
+	}
+
+	/**
+	 * Delegate to {@link #createResource(String, String, String)} of the wrapped resource handler. If it returns
+	 * non-<code>null</code>, then return a wrapped resource whose {@link Resource#getRequestPath()} returns the
+	 * unmapped URL.
+	 */
+	@Override
+	public Resource createResource(String resourceName, String libraryName, String contentType) {
+		final Resource resource = super.createResource(resourceName, libraryName, contentType);
 
 		if (resource == null) {
 			return null;
@@ -141,17 +158,17 @@ public class UnmappedResourceHandler extends ResourceHandlerWrapper {
 
 			@Override // Necessary because this is missing in ResourceWrapper (will be fixed in JSF 2.2).
 			public String getResourceName() {
-				return resource.getResourceName();
+				return getWrapped().getResourceName();
 			}
 
 			@Override // Necessary because this is missing in ResourceWrapper (will be fixed in JSF 2.2).
 			public String getLibraryName() {
-				return resource.getLibraryName();
+				return getWrapped().getLibraryName();
 			}
 
 			@Override // Necessary because this is missing in ResourceWrapper (will be fixed in JSF 2.2).
 			public String getContentType() {
-				return resource.getContentType();
+				return getWrapped().getContentType();
 			}
 
 			@Override

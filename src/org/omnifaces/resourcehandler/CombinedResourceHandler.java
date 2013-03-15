@@ -177,12 +177,12 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 		this.wrapped = wrapped;
 
 		if (!Faces.isDevelopment()) {
-			this.excludedResources = initResources(PARAM_NAME_EXCLUDED_RESOURCES);
-			this.excludedResources.addAll(initCDNResources());
-			this.suppressedResources = initResources(PARAM_NAME_SUPPRESSED_RESOURCES);
-			this.excludedResources.addAll(suppressedResources);
-			this.inlineCSS = Boolean.valueOf(Faces.getInitParameter(PARAM_NAME_INLINE_CSS));
-			this.inlineJS = Boolean.valueOf(Faces.getInitParameter(PARAM_NAME_INLINE_JS));
+			excludedResources = initResources(PARAM_NAME_EXCLUDED_RESOURCES);
+			excludedResources.addAll(initCDNResources());
+			suppressedResources = initResources(PARAM_NAME_SUPPRESSED_RESOURCES);
+			excludedResources.addAll(suppressedResources);
+			inlineCSS = Boolean.valueOf(Faces.getInitParameter(PARAM_NAME_INLINE_CSS));
+			inlineJS = Boolean.valueOf(Faces.getInitParameter(PARAM_NAME_INLINE_JS));
 			Events.subscribeToEvent(PreRenderViewEvent.class, this);
 		}
 	}
@@ -228,12 +228,22 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	}
 
 	@Override
+	public Resource createResource(String resourceName) {
+		return createResource(resourceName, null, null);
+	}
+
+	@Override
 	public Resource createResource(String resourceName, String libraryName) {
+		return createResource(resourceName, libraryName, null);
+	}
+
+	@Override
+	public Resource createResource(String resourceName, String libraryName, String contentType) {
 		if (LIBRARY_NAME.equals(libraryName)) {
 			return new CombinedResource(resourceName);
 		}
 		else {
-			return wrapped.createResource(resourceName, libraryName);
+			return wrapped.createResource(resourceName, libraryName, contentType);
 		}
 	}
 
@@ -333,9 +343,9 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 		private List<UIComponent> componentResourcesToRemove;
 
 		public CombinedResourceBuilder() {
-			this.stylesheets = new CombinedResourceBuilder(EXTENSION_CSS);
-			this.scripts = new CombinedResourceBuilder(EXTENSION_JS);
-			this.componentResourcesToRemove = new ArrayList<UIComponent>(3);
+			stylesheets = new CombinedResourceBuilder(EXTENSION_CSS);
+			scripts = new CombinedResourceBuilder(EXTENSION_JS);
+			componentResourcesToRemove = new ArrayList<UIComponent>(3);
 		}
 
 		public void add(FacesContext context, UIComponent component, String rendererType, ResourceIdentifier id) {
@@ -399,8 +409,8 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 
 		private CombinedResourceBuilder(String extension) {
 			this.extension = extension;
-			this.info = new CombinedResourceInfo.Builder();
-			this.componentResourcesToRemove = new ArrayList<UIComponent>(3);
+			info = new CombinedResourceInfo.Builder();
+			componentResourcesToRemove = new ArrayList<UIComponent>(3);
 		}
 
 		private void add(UIComponent componentResource, String library, String name) {
