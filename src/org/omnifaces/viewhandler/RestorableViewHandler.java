@@ -62,7 +62,7 @@ public class RestorableViewHandler extends ViewHandlerWrapper {
 			return restoredView;
 		}
 
-		if (Faces.getMetadataAttribute(viewId, EnableRestorableView.class.getName()) == Boolean.TRUE) {
+		if (Faces.getMetadataAttribute(Faces.normalizeViewId(viewId), EnableRestorableView.class.getName()) == Boolean.TRUE) {
 			return createView(context, viewId);
 		}
 		else {
