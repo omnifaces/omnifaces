@@ -183,6 +183,10 @@ public class Html5RenderKit extends RenderKitWrapper {
 		public void startElement(String name, UIComponent component) throws IOException {
 			super.startElement(name, component);
 
+			if (component == null) {
+				component = Components.getCurrentComponent();
+			}
+
 			if (component instanceof UIForm && "form".equals(name)) {
 				writeHtml5AttributesIfNecessary(component.getAttributes(), HTML5_UIFORM_ATTRIBUTES);
 			}
