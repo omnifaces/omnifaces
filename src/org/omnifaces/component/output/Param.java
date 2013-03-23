@@ -12,10 +12,15 @@
  */
 package org.omnifaces.component.output;
 
+import java.io.IOException;
+import java.io.StringWriter;
+
+import javax.faces.FacesException;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIParameter;
 import javax.faces.component.ValueHolder;
 import javax.faces.context.FacesContext;
+import javax.faces.context.ResponseWriter;
 import javax.faces.convert.Converter;
 
 /**
@@ -26,6 +31,21 @@ import javax.faces.convert.Converter;
  * <code>o:</code> to get the extra support for a {@link Converter} by usual means via the <code>converter</code>
  * attribute of the tag, or the nested <code>&lt;f:converter&gt;</code> tag, or just automatically if a converter is
  * already registered for the target class.
+ * <p>
+ * Also, if no value is specified, but children are present, then the encoded output of children will be returned as
+ * value. This is useful when you want to supply JSF components or HTML as parameter of an escaped
+ * <code>&lt;h:outputFormat&gt;</code>. For example,
+ * <pre>
+ * &lt;h:outputFormat value="#{bundle.paragraph}" escape="false"&gt;
+ *   &lt;o:param&gt;&lt;h:link outcome="contact" value="#{bundle.contact}" /&gt;&lt;/o:param&gt;
+ * &lt;/h:outputFormat&gt;
+ * </pre>
+ * <p>with this bundle
+ * <pre>
+ * bundle.paragraph = Please {0} for more information.
+ * bundle.contact = contact us
+ * </pre>
+ * <p>will result in the link being actually encoded as output format parameter value.
  *
  * @author Bauke Scholtz
  * @since 1.4
@@ -52,7 +72,7 @@ public class Param extends UIParameter implements ValueHolder {
 
 	@Override
 	public Converter getConverter() {
-		return this.converter != null ? this.converter : (Converter) getStateHelper().eval(PropertyKeys.converter);
+		return converter != null ? converter : (Converter) getStateHelper().eval(PropertyKeys.converter);
 	}
 
 	@Override
@@ -71,6 +91,24 @@ public class Param extends UIParameter implements ValueHolder {
 		Converter converter = getConverter();
 		Object value = getLocalValue();
 
+		if (value == null && getChildCount() > 0) {
+			ResponseWriter originalResponseWriter = context.getResponseWriter();
+			StringWriter output = new StringWriter();
+			context.setResponseWriter(originalResponseWriter.cloneWithWriter(output));
+
+			try {
+				super.encodeChildren(context);
+			}
+			catch (IOException e) {
+				throw new FacesException(e);
+			}
+			finally {
+				context.setResponseWriter(originalResponseWriter);
+			}
+
+			value = output.toString();
+		}
+
 		if (converter == null && value != null) {
 			converter = context.getApplication().createConverter(value.getClass());
 		}
@@ -81,6 +119,11 @@ public class Param extends UIParameter implements ValueHolder {
 		else {
 			return value;
 		}
+	}
+
+	@Override
+	public void encodeAll(FacesContext context) throws IOException {
+		// This override which does nothing effectively blocks the children from being encoded during JSF render.
 	}
 
 }
