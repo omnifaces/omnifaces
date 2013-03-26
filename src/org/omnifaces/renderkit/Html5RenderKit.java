@@ -14,7 +14,9 @@ package org.omnifaces.renderkit;
 
 import java.io.IOException;
 import java.io.Writer;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.faces.component.UICommand;
@@ -33,6 +35,7 @@ import javax.faces.render.RenderKit;
 import javax.faces.render.RenderKitWrapper;
 
 import org.omnifaces.util.Components;
+import org.omnifaces.util.Faces;
 import org.omnifaces.util.Utils;
 
 /**
@@ -61,17 +64,118 @@ import org.omnifaces.util.Utils;
  * Note: the <code>list</code> attribute expects a <code>&lt;datalist&gt;</code> element which needs to be coded in
  * "plain vanilla" HTML (and is currently, June 2012, only supported in Firefox 4 and Opera 11). See also
  * <a href="http://www.html5tutorial.info/html5-datalist.php">HTML5 tutorial</a>.
+ *
+ * <h3>Installation</h3>
  * <p>
  * Refer the documentation of {@link Html5RenderKitFactory} how to setup it.
+ *
+ * <h3>Configuration</h3>
+ * <p>
+ * You can also configure additional passthrough attributes via the
+ * {@value org.omnifaces.renderkit.Html5RenderKit#PARAM_NAME_PASSTHROUGH_ATTRIBUTES} context parameter, wherein the
+ * passthrough attributes are been specified in semicolon-separated
+ * <code>com.example.SomeComponent=attr1,attr2,attr3</code> key=value pairs. The key represents the fully qualified
+ * name of a class whose {@link Class#isInstance(Object)} must return <code>true</code> for the particular component
+ * and the value represents the commaseparated string of names of passthrough attributes. Here's an example:
+ * <pre>
+ * &lt;context-param&gt;
+ *   &lt;param-name&gt;org.omnifaces.HTML5_RENDER_KIT_PASSTHROUGH_ATTRIBUTES&lt;/param-name&gt;
+ *   &lt;param-value&gt;
+ *     javax.faces.component.UIInput=x-webkit-speech,x-webkit-grammar;
+ *     javax.faces.component.UIComponent=contenteditable,draggable
+ *   &lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * </pre>
+ *
+ * <h3>JSF 2.2 notice</h3>
+ * <p>
+ * Noted should be that JSF 2.2 will support defining custom attributes directly in the view via the new
+ * <code>http://java.sun.com/jsf/passthrough</code> namespace or the <code>&lt;f:passThroughAttribute&gt;</code> tag.
+ * <pre>
+ * &lt;html ... xmlns:p="http://java.sun.com/jsf/passthrough"&gt;
+ * ...
+ * &lt;h:inputText ... p:autofocus="true" /&gt;
+ * </pre>
+ * <em>(you may want to use <code>a</code> instead of <code>p</code> as namespace prefix to avoid clash with PrimeFaces
+ * default namespace)</em>
+ * <p>
+ * Or:
+ * <pre>
+ * &lt;h:inputText ...&gt;
+ *   &lt;f:passThroughAttribute name="autofocus" value="true" /&gt;
+ * &lt;/h:inputText&gt;
+ * </pre>
  *
  * @author Bauke Scholtz
  * @since 1.1
  */
 public class Html5RenderKit extends RenderKitWrapper {
 
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	/** The context parameter name to specify additional passthrough attributes. */
+	public static final String PARAM_NAME_PASSTHROUGH_ATTRIBUTES =
+		"org.omnifaces.HTML5_RENDER_KIT_PASSTHROUGH_ATTRIBUTES";
+
+	private static final Set<String> HTML5_UIFORM_ATTRIBUTES = Utils.unmodifiableSet(
+		"autocomplete"
+		// "novalidate" attribute is not useable in a JSF form.
+	);
+
+	private static final Set<String> HTML5_UISELECT_ATTRIBUTES = Utils.unmodifiableSet(
+		"autofocus"
+		// "form" attribute is not useable in a JSF form.
+	);
+
+	private static final Set<String> HTML5_TEXTAREA_ATTRIBUTES = Utils.unmodifiableSet(
+		"autofocus", "maxlength", "placeholder", "spellcheck", "wrap"
+		// "form" attribute is not useable in a JSF form.
+		// "required" attribute can't be used as it would override JSF default "required" attribute behaviour.
+	);
+
+	private static final Set<String> HTML5_INPUT_ATTRIBUTES = Utils.unmodifiableSet(
+		"autofocus", "list", "pattern", "placeholder", "spellcheck"
+		// "form*" attributes are not useable in a JSF form.
+		// "multiple" attribute is only applicable on <input type="email"> and <input type="file"> and can't be
+		// decoded by standard HtmlInputText.
+		// "required" attribute can't be used as it would override JSF default "required" attribute behaviour.
+	);
+
+	private static final Set<String> HTML5_INPUT_PASSWORD_ATTRIBUTES = Utils.unmodifiableSet(
+		"autofocus", "pattern", "placeholder"
+		// "form*" attributes are not useable in a JSF form.
+		// "required" attribute can't be used as it would override JSF default "required" attribute behaviour.
+	);
+
+	private static final Set<String> HTML5_INPUT_RANGE_ATTRIBUTES = Utils.unmodifiableSet(
+		"max", "min", "step"
+	);
+
+	private static final Set<String> HTML5_INPUT_RANGE_TYPES = Utils.unmodifiableSet(
+		"range", "number", "date"
+	);
+
+	private static final Set<String> HTML5_INPUT_TYPES = Utils.unmodifiableSet(
+		"text", "search", "email", "url", "tel", HTML5_INPUT_RANGE_TYPES
+	);
+
+	private static final Set<String> HTML5_BUTTON_ATTRIBUTES = Utils.unmodifiableSet(
+		"autofocus"
+		// "form" attribute is not useable in a JSF form.
+	);
+
+	private static final String ERROR_INVALID_INIT_PARAM =
+		"Context parameter '" + PARAM_NAME_PASSTHROUGH_ATTRIBUTES + "' is in invalid syntax.";
+	private static final String ERROR_INVALID_INIT_PARAM_CLASS =
+		"Context parameter '" + PARAM_NAME_PASSTHROUGH_ATTRIBUTES + "'"
+			+ " references a class which is not found in runtime classpath: '%s'";
+	private static final String ERROR_UNSUPPORTED_HTML5_INPUT_TYPE =
+		"HtmlInputText type '%s' is not supported. Supported types are " + HTML5_INPUT_TYPES + ".";
+
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	private RenderKit wrapped;
+	private Map<Class<UIComponent>, Set<String>> passthroughAttributes;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -81,6 +185,7 @@ public class Html5RenderKit extends RenderKitWrapper {
 	 */
 	public Html5RenderKit(RenderKit wrapped) {
 		this.wrapped = wrapped;
+		passthroughAttributes = initPassthroughAttributes();
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -98,65 +203,47 @@ public class Html5RenderKit extends RenderKitWrapper {
 		return wrapped;
 	}
 
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	@SuppressWarnings("unchecked")
+	private static Map<Class<UIComponent>, Set<String>> initPassthroughAttributes() {
+		String passthroughAttributesParam = Faces.getInitParameter(PARAM_NAME_PASSTHROUGH_ATTRIBUTES);
+
+		if (Utils.isEmpty(passthroughAttributesParam)) {
+			return null;
+		}
+
+		Map<Class<UIComponent>, Set<String>> passthroughAttributes = new HashMap<Class<UIComponent>, Set<String>>();
+
+		for (String passthroughAttribute : passthroughAttributesParam.split("\\s*;\\s*")) {
+			String[] classAndAttributeNames = passthroughAttribute.split("\\s*=\\s*", 2);
+
+			if (classAndAttributeNames.length != 2) {
+				throw new IllegalArgumentException(ERROR_INVALID_INIT_PARAM);
+			}
+
+			String className = classAndAttributeNames[0];
+			Object[] attributeNames = classAndAttributeNames[1].split("\\s*,\\s*");
+			Set<String> attributeNameSet = Utils.unmodifiableSet(attributeNames);
+
+			try {
+				passthroughAttributes.put((Class<UIComponent>) Class.forName(className), attributeNameSet);
+			}
+			catch (ClassNotFoundException e) {
+				throw new IllegalArgumentException(String.format(ERROR_INVALID_INIT_PARAM_CLASS, className), e);
+			}
+		}
+
+		return passthroughAttributes;
+	}
+
 	// Nested classes -------------------------------------------------------------------------------------------------
 
 	/**
 	 * This HTML5 response writer does all the job.
 	 * @author Bauke Scholtz
 	 */
-	static class Html5ResponseWriter extends ResponseWriterWrapper {
-
-		// Constants --------------------------------------------------------------------------------------------------
-
-		private static final Set<String> HTML5_UIFORM_ATTRIBUTES = Utils.unmodifiableSet(
-			"autocomplete"
-			// "novalidate" attribute is not useable in a JSF form.
-		);
-
-		private static final Set<String> HTML5_UISELECT_ATTRIBUTES = Utils.unmodifiableSet(
-			"autofocus"
-			// "form" attribute is not useable in a JSF form.
-		);
-
-		private static final Set<String> HTML5_TEXTAREA_ATTRIBUTES = Utils.unmodifiableSet(
-			"autofocus", "maxlength", "placeholder", "spellcheck", "wrap"
-			// "form" attribute is not useable in a JSF form.
-			// "required" attribute can't be used as it would override JSF default "required" attribute behaviour.
-		);
-
-		private static final Set<String> HTML5_INPUT_ATTRIBUTES = Utils.unmodifiableSet(
-			"autofocus", "list", "pattern", "placeholder", "spellcheck"
-			// "form*" attributes are not useable in a JSF form.
-			// "multiple" attribute is only applicable on <input type="email"> and <input type="file"> and can't be
-			// decoded by standard HtmlInputText.
-			// "required" attribute can't be used as it would override JSF default "required" attribute behaviour.
-		);
-
-		private static final Set<String> HTML5_INPUT_PASSWORD_ATTRIBUTES = Utils.unmodifiableSet(
-			"autofocus", "pattern", "placeholder"
-			// "form*" attributes are not useable in a JSF form.
-			// "required" attribute can't be used as it would override JSF default "required" attribute behaviour.
-		);
-
-		private static final Set<String> HTML5_INPUT_RANGE_ATTRIBUTES = Utils.unmodifiableSet(
-			"max", "min", "step"
-		);
-
-		private static final Set<String> HTML5_INPUT_RANGE_TYPES = Utils.unmodifiableSet(
-			"range", "number", "date"
-		);
-
-		private static final Set<String> HTML5_INPUT_TYPES = Utils.unmodifiableSet(
-			"text", "search", "email", "url", "tel", HTML5_INPUT_RANGE_TYPES
-		);
-
-		private static final Set<String> HTML5_BUTTON_ATTRIBUTES = Utils.unmodifiableSet(
-			"autofocus"
-			// "form" attribute is not useable in a JSF form.
-		);
-
-		private static final String ERROR_UNSUPPORTED_HTML5_INPUT_TYPE =
-			"HtmlInputText type '%s' is not supported. Supported types are " + HTML5_INPUT_TYPES + ".";
+	class Html5ResponseWriter extends ResponseWriterWrapper {
 
 		// Properties -------------------------------------------------------------------------------------------------
 
@@ -211,6 +298,14 @@ public class Html5RenderKit extends RenderKitWrapper {
 			}
 			else if (component instanceof UICommand && "input".equals(name)) {
 				writeHtml5AttributesIfNecessary(component.getAttributes(), HTML5_BUTTON_ATTRIBUTES);
+			}
+
+			if (passthroughAttributes != null) {
+				for (Entry<Class<UIComponent>, Set<String>> entry : passthroughAttributes.entrySet()) {
+					if (entry.getKey().isInstance(component)) {
+						writeHtml5AttributesIfNecessary(component.getAttributes(), entry.getValue());
+					}
+				}
 			}
 		}
 
