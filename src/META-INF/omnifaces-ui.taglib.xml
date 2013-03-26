@@ -1852,6 +1852,14 @@ input.error, select.error, textarea.error {
 		</attribute>
 		<attribute>
 			<description>
+				If specified, then the output will be captured and exposed in the request scope by the given variable name.
+			</description>
+			<name>var</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
 				Direction indication for text that does	not	inherit
 				directionality.
 				Valid values are "LTR" (left-to-right) and "RTL"
