@@ -24,7 +24,7 @@
 			<![CDATA[
 				<strong><code>o:tree</code></strong> is an <code>UIComponent</code> that supports data binding to a tree
 				of data objects represented by a <code>TreeModel</code> instance, which is the current value of this
-				component itself (typically established via a <code>ValueExpression</code>. During iterative processing
+				component itself (typically established via a <code>ValueExpression</code>). During iterative processing
 				over the nodes of tree in the tree model, the object for the current node is exposed as a request
 				attribute under the key specified by the <code>var</code> attribute. The node itself is exposed as a
 				request attribute under the key specified by the <code>varNode</code> attribute.
