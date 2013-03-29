@@ -231,7 +231,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 		context.getPartialViewContext().setRenderAll(true);
 
 		if (context.getCurrentPhaseId() != PhaseId.RENDER_RESPONSE) {
-			Events.setCallbackAfterPhaseListener(PhaseId.RENDER_RESPONSE, new Callback.Void() {
+			Events.addCallbackAfterPhaseListener(PhaseId.RENDER_RESPONSE, new Callback.Void() {
 				@Override
 				public void invoke() {
 					// Prevent some servlet containers from handling error page itself afterwards. So far Tomcat/JBoss

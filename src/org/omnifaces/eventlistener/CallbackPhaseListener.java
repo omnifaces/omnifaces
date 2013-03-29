@@ -14,6 +14,9 @@ package org.omnifaces.eventlistener;
 
 import static javax.faces.event.PhaseId.ANY_PHASE;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.faces.event.PhaseEvent;
 import javax.faces.event.PhaseId;
 import javax.faces.event.PhaseListener;
@@ -22,35 +25,35 @@ import org.omnifaces.util.Events;
 import org.omnifaces.util.Faces;
 
 /**
- * This phase listener picks up phase listener instances from the request scope and calls them back for each matching phase.
+ * This phase listener picks up phase listener instances from the request scope by <code>addCallbackXxx()</code> methods
+ * of the {@link Events} utility class and calls them back for each matching phase.
  * <p>
- * This differs in a few subtle ways from {@link Events#addPhaseListener(PhaseListener)}. Namely, the phase listener registered here will be called
- * via the global phase listener, which executes slightly earlier for its before phase and slightly later for its after phase as compared to phase
- * listeners attached to the view root.
+ * This differs in a few subtle ways from {@link Events#addPhaseListener(PhaseListener)}. Namely, the phase listener
+ * registered here will be called via the global phase listener, which executes slightly earlier for its before phase
+ * and slightly later for its after phase as compared to phase listeners attached to the view root.
  * <p>
- * Additionally, a phase listener registered via this method will not become part of the view state, but will execute only once. Phase listeners
- * attached to the view root will come back after each postback and have to be remove manually (in Mojarra this can be difficult due to the fact
- * iterators over listeners are kept 'open' during each phase).
- * <p>
- * See {@link Events#setCallbackPhaseListener(PhaseListener)}
+ * Additionally, a phase listener registered via this method will not become part of the view state, but will execute
+ * only once. Phase listeners attached to the view root will come back after each postback and have to be remove
+ * manually (in Mojarra this can be difficult due to the fact iterators over listeners are kept 'open' during each
+ * phase).
  *
  * @author Arjan Tijms
+ * @author Bauke Scholtz
  * @since 1.2
- *
+ * @see Events#addCallbackPhaseListener(PhaseListener)
+ * @see Events#addCallbackBeforePhaseListener(PhaseId, org.omnifaces.util.Callback.Void)
+ * @see Events#addCallbackAfterPhaseListener(PhaseId, org.omnifaces.util.Callback.Void)
  */
 public class CallbackPhaseListener implements PhaseListener {
 
-	private static final long serialVersionUID = -4574664722715466481L;
+	// Constants ------------------------------------------------------------------------------------------------------
 
+	/** @deprecated This is not used anymore. */ @Deprecated
 	public static final String CALLBACK_PHASE_LISTENER = "org.omnifaces.eventlistener.CALLBACK_PHASE_LISTENER";
 
-	public static void setCallbackPhaseListener(PhaseListener callbackPhaseListener) {
-		Faces.setRequestAttribute(CALLBACK_PHASE_LISTENER, callbackPhaseListener);
-	}
+	private static final long serialVersionUID = -4574664722715466481L;
 
-	public static PhaseListener getCallbackPhaseListener() {
-		return Faces.<PhaseListener>getRequestAttribute(CALLBACK_PHASE_LISTENER); // (Explicit generic because of JDK 6 bug)
-	}
+	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
 	public PhaseId getPhaseId() {
@@ -59,21 +62,65 @@ public class CallbackPhaseListener implements PhaseListener {
 
 	@Override
 	public void beforePhase(final PhaseEvent event) {
-		PhaseListener callbackPhaseListener = getCallbackPhaseListener();
-		if (callbackPhaseListener != null && isPhaseMatch(event, callbackPhaseListener.getPhaseId())) {
-			callbackPhaseListener.beforePhase(event);
+		Set<PhaseListener> phaseListeners = getCallbackPhaseListeners(false);
+
+		if (phaseListeners == null) {
+			return;
+		}
+
+		for (PhaseListener phaseListener : phaseListeners) {
+			if (isPhaseMatch(event, phaseListener.getPhaseId())) {
+				phaseListener.beforePhase(event);
+			}
 		}
 	}
 
 	@Override
 	public void afterPhase(PhaseEvent event) {
-		PhaseListener callbackPhaseListener = getCallbackPhaseListener();
-		if (callbackPhaseListener != null && isPhaseMatch(event, callbackPhaseListener.getPhaseId())) {
-			callbackPhaseListener.afterPhase(event);
+		Set<PhaseListener> phaseListeners = getCallbackPhaseListeners(false);
+
+		if (phaseListeners == null) {
+			return;
+		}
+
+		for (PhaseListener phaseListener : phaseListeners) {
+			if (isPhaseMatch(event, phaseListener.getPhaseId())) {
+				phaseListener.afterPhase(event);
+			}
 		}
 	}
 
-	private boolean isPhaseMatch(PhaseEvent event, PhaseId phaseId) {
+	// Utility --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * @see Events#addCallbackPhaseListener(PhaseListener)
+	 */
+	public static void add(PhaseListener phaseListener) {
+		getCallbackPhaseListeners(true).add(phaseListener);
+	}
+
+	/**
+	 * @see Events#removeCallbackPhaseListener(PhaseListener)
+	 */
+	public static boolean remove(PhaseListener phaseListener) {
+		Set<PhaseListener> phaseListeners = getCallbackPhaseListeners(false);
+		return phaseListeners == null ? false : phaseListeners.remove(phaseListener);
+	}
+
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	private static Set<PhaseListener> getCallbackPhaseListeners(boolean create) {
+		Set<PhaseListener> set = Faces.getRequestAttribute(CallbackPhaseListener.class.getName());
+
+		if (set == null && create) {
+			set = new HashSet<PhaseListener>(1);
+			Faces.setRequestAttribute(CallbackPhaseListener.class.getName(), set);
+		}
+
+		return set;
+	}
+
+	private static boolean isPhaseMatch(PhaseEvent event, PhaseId phaseId) {
 		return ANY_PHASE.equals(phaseId) || event.getPhaseId().equals(phaseId);
 	}
 

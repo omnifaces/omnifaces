@@ -27,6 +27,7 @@ import org.omnifaces.eventlistener.DefaultViewEventListener;
  * Collection of utility methods for the JSF API with respect to working with Faces events.
  *
  * @author Arjan Tijms
+ * @author Bauke Scholtz
  */
 public final class Events {
 
@@ -55,31 +56,53 @@ public final class Events {
 	}
 
 	/**
-	 * Sets phase listener for callback by a global phase listener during the current request.
-	 * <p>
-	 * This differs in a few subtle ways from {@link Events#addPhaseListener(PhaseListener)}. Namely, the phase listener
-	 * registered here will be called via the global phase listener, which executes slightly earlier for its before phase
-	 * and slightly later for its after phase as compared to phase listeners attached to the view root.
-	 * <p>
-	 * Additionally, a phase listener registered via this method will not become part of the view state, but will execute only
-	 * once. Phase listeners attached to the view root will come back after each postback and have to be remove manually (in Mojarra
-	 * this can be difficult due to the fact iterators over listeners are kept 'open' during each phase).
-	 * <p>
-	 * Note: at the moment only 1 callback phase listener per request can be set.
-	 *
-	 * @param phaseListener The phase listener to be set for callback during the current request.
-	 * @since 1.2
+	 * @deprecated Because it allows only one callback phase listener to be set. Please use
+	 * {@link #addCallbackPhaseListener(PhaseListener)} instead.
 	 */
+	@Deprecated
 	public static void setCallbackPhaseListener(PhaseListener phaseListener) {
 		Faces.setRequestAttribute(CallbackPhaseListener.CALLBACK_PHASE_LISTENER, phaseListener);
 	}
 
 	/**
-	 * Removes the one and only phase listener from callbacks by the global phase listener for the current request.
-	 * @since 1.2
+	 * @deprecated Because it only removes the one being set by {@link #setCallbackPhaseListener(PhaseListener)} which
+	 * is currently deprecated.
 	 */
+	@Deprecated
 	public static void removeCallbackPhaseListener() {
 		Faces.removeRequestAttribute(CallbackPhaseListener.CALLBACK_PHASE_LISTENER);
+	}
+
+	/**
+	 * Adds phase listener for callback by a global phase listener during the current request.
+	 * <p>
+	 * This differs in a few subtle ways from {@link Events#addPhaseListener(PhaseListener)}. Namely, the phase listener
+	 * registered here will be called via the global phase listener, which executes slightly earlier for its before
+	 * phase and slightly later for its after phase as compared to phase listeners attached to the view root.
+	 * <p>
+	 * Additionally, a phase listener registered via this method will not become part of the view state, but will
+	 * execute only once. Phase listeners attached to the view root will come back after each postback and have to be
+	 * remove manually (in Mojarra this can be difficult due to the fact iterators over listeners are kept 'open'
+	 * during each phase).
+	 *
+	 * @param phaseListener The phase listener to be added for callback during the current request.
+	 * @since 1.5
+	 * @see CallbackPhaseListener
+	 */
+	public static void addCallbackPhaseListener(PhaseListener phaseListener) {
+		CallbackPhaseListener.add(phaseListener);
+	}
+
+	/**
+	 * Removes the given phase listener from callbacks for the current request.
+	 *
+	 * @return <code>true</code> if the given phase listener was indeed been added, otherwise <code>false</code> (and
+	 * thus effectively no change has taken place).
+	 * @since 1.5
+	 * @see CallbackPhaseListener
+	 */
+	public static boolean removeCallbackPhaseListener(PhaseListener phaseListener) {
+		return CallbackPhaseListener.remove(phaseListener);
 	}
 
 	/**
@@ -101,25 +124,47 @@ public final class Events {
 	}
 
 	/**
-	 * Sets a phase listener for callback by a global phase listener during the current request that invokes the
-	 * given callback every time before given phase ID.
-	 * @param phaseId The phase ID to invoke the given callback every time before.
-	 * @param callback The callback to be invoked every time before the given phase ID of the current request.
-	 * @since 1.2
+	 * @deprecated Because it allows only one callback phase listener to be set. Please use
+	 * {@link #addCallbackBeforePhaseListener(PhaseId, org.omnifaces.util.Callback.Void)} instead.
 	 */
+	@Deprecated
 	public static void setCallBackBeforePhaseListener(PhaseId phaseId, final Callback.Void callback) {
 		setCallbackPhaseListener(createBeforePhaseListener(phaseId, callback));
 	}
 
 	/**
-	 * Sets a phase listener for callback by a global phase listener during the current request that invokes the
+	 * @deprecated Because it allows only one callback phase listener to be set. Please use
+	 * {@link #addCallbackAfterPhaseListener(PhaseId, org.omnifaces.util.Callback.Void)} instead.
+	 */
+	@Deprecated
+	public static void setCallbackAfterPhaseListener(PhaseId phaseId, final Callback.Void callback) {
+		setCallbackPhaseListener(createAfterPhaseListener(phaseId, callback));
+	}
+
+	/**
+	 * Adds a phase listener for callback by a global phase listener during the current request that invokes the
+	 * given callback every time before given phase ID.
+	 * @param phaseId The phase ID to invoke the given callback every time before.
+	 * @param callback The callback to be invoked every time before the given phase ID of the current request.
+	 * @since 1.5
+	 * @see #createBeforePhaseListener(PhaseId, org.omnifaces.util.Callback.Void)
+	 * @see #addCallbackPhaseListener(PhaseListener)
+	 */
+	public static void addCallbackBeforePhaseListener(PhaseId phaseId, final Callback.Void callback) {
+		addCallbackPhaseListener(createBeforePhaseListener(phaseId, callback));
+	}
+
+	/**
+	 * Adds a phase listener for callback by a global phase listener during the current request that invokes the
 	 * given callback every time after given phase ID.
 	 * @param phaseId The phase ID to invoke the given callback every time after.
 	 * @param callback The callback to be invoked every time after the given phase ID of the current request.
-	 * @since 1.2
+	 * @since 1.5
+	 * @see #createAfterPhaseListener(PhaseId, org.omnifaces.util.Callback.Void)
+	 * @see #addCallbackPhaseListener(PhaseListener)
 	 */
-	public static void setCallbackAfterPhaseListener(PhaseId phaseId, final Callback.Void callback) {
-		setCallbackPhaseListener(createAfterPhaseListener(phaseId, callback));
+	public static void addCallbackAfterPhaseListener(PhaseId phaseId, final Callback.Void callback) {
+		addCallbackPhaseListener(createAfterPhaseListener(phaseId, callback));
 	}
 
 	/**
