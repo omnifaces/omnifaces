@@ -51,7 +51,7 @@ public class CallbackPhaseListener implements PhaseListener {
 	/** @deprecated This is not used anymore. */ @Deprecated
 	public static final String CALLBACK_PHASE_LISTENER = "org.omnifaces.eventlistener.CALLBACK_PHASE_LISTENER";
 
-	private static final long serialVersionUID = -4574664722715466481L;
+	private static final long serialVersionUID = 3611407485061585042L;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
