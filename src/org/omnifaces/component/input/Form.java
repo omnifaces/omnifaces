@@ -13,12 +13,19 @@
 package org.omnifaces.component.input;
 
 import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static java.util.regex.Pattern.quote;
+import static org.omnifaces.component.input.Form.PropertyKeys.includeRequestParams;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeViewParams;
+import static org.omnifaces.util.Utils.decodeURL;
+import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,9 +37,11 @@ import javax.faces.component.FacesComponent;
 import javax.faces.component.UICommand;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIViewParameter;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.context.FacesContextWrapper;
 import javax.faces.view.ViewMetadata;
+import javax.servlet.http.HttpServletRequest;
 
 import org.omnifaces.taghandler.IgnoreValidationFailed;
 import org.omnifaces.util.State;
@@ -79,7 +88,8 @@ public class Form extends UIForm {
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.input.Form";
 
 	enum PropertyKeys {
-		includeViewParams
+		includeViewParams,
+		includeRequestParams
 	}
 
 	// Variables ------------------------------------------------------------------------------------------------------
@@ -110,17 +120,21 @@ public class Form extends UIForm {
 
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
-		if (isIncludeViewParams()) {
-			super.encodeBegin(new ActionURLDecorator(context));
+		if (isIncludeRequestParams()) {
+			super.encodeBegin(new ActionURLDecorator(context, includeRequestParams));
+		}
+		else if (isIncludeViewParams()) {
+			super.encodeBegin(new ActionURLDecorator(context, includeViewParams));
 		} else {
 			super.encodeBegin(context);
 		}
 	}
 
 	private boolean isIgnoreValidationFailed(FacesContext context) {
-		return context.getAttributes().get(IgnoreValidationFailed.class.getName()) == Boolean.TRUE;
+		return context.getAttributes().get(IgnoreValidationFailed.class.getName()) == TRUE;
 	}
 
+	
 	// Getters/setters ------------------------------------------------------------------------------------------------
 
 	/**
@@ -139,6 +153,26 @@ public class Form extends UIForm {
 	public void setIncludeViewParams(boolean includeViewParams) {
 		state.put(PropertyKeys.includeViewParams, includeViewParams);
 	}
+	
+	/**
+	 * Return whether or not the request parameters should be encoded into the form's action URL.
+	 * @since 1.5
+	 */
+	public Boolean isIncludeRequestParams() {
+		return state.get(includeRequestParams, FALSE);
+	}
+
+	/**
+	 * Set whether or not the request parameters should be encoded into the form's action URL.
+	 *
+	 * @param includeRequestParams
+	 *            The state of the switch for encoding request parameters
+	 * @since 1.5
+	 */
+	public void setIncludeRequestParams(boolean includeRequestParams) {
+		state.put(PropertyKeys.includeRequestParams, includeRequestParams);
+	}
+	
 
 	// Nested classes -------------------------------------------------------------------------------------------------
 
@@ -182,9 +216,12 @@ public class Form extends UIForm {
 	static class ActionURLDecorator extends FacesContextWrapper {
 
 		private final FacesContext facesContext;
+		private final PropertyKeys type;
 
-		public ActionURLDecorator(FacesContext facesContext) {
+
+		public ActionURLDecorator(FacesContext facesContext, PropertyKeys type) {
 			this.facesContext = facesContext;
+			this.type = type;
 		}
 
 		@Override
@@ -209,7 +246,7 @@ public class Form extends UIForm {
 						public String getActionURL(FacesContext context, String viewId) {
 							return context.getExternalContext().encodeBookmarkableURL(
 								super.getActionURL(context, viewId),
-								getViewParameterMap(context)
+								type == includeRequestParams? getRequestParameterMap(context) : getViewParameterMap(context)
 							);
 						}
 
@@ -261,6 +298,52 @@ public class Form extends UIForm {
 			}
 		}
 
+		return parameters;
+	}
+	
+	/**
+	 * Gets parameters from the URL query (aka GET parameters) as a request-parameter like map of Strings.
+	 * <p>
+	 * In the returned map, keys represent the parameter name, while the value is a list of one of more values
+	 * associated with that parameter name.
+	 * <p>
+	 * Note this method returns ONLY the URL query parameters, as opposed to {@link ExternalContext#getRequestParameterValuesMap()} which
+	 * contains both URL (GET) parameters and body (POST) parameters. 
+	 *
+	 * @param context
+	 * @return Map with parameters. An empty map will be returned if there are no parameters.
+	 * @since 1.5
+	 */
+	private static Map<String, List<String>> getRequestParameterMap(FacesContext context) {
+		
+		String queryString = ((HttpServletRequest) context.getExternalContext().getRequest()).getQueryString();
+		if (isEmpty(queryString)) {
+			return Collections.<String, List<String>> emptyMap();
+		}
+		
+		String[] keyValueParameters = queryString.split(quote("&"));
+		
+		Map<String, List<String>> parameters = new LinkedHashMap<String, List<String>>();
+		for (String keyValueParameter : keyValueParameters) {
+			
+			if (keyValueParameter.contains("=")) {
+				String[] keyAndValue = keyValueParameter.split(quote("="));
+				String key = decodeURL(keyAndValue[0]);
+				String value = "";
+				if (keyAndValue.length > 1 && !isEmpty(keyAndValue[1])) {
+					value = decodeURL(keyAndValue[1]);
+				}
+			
+				List<String> values = parameters.get(key);
+				if (values == null) {
+					values = new ArrayList<String>();
+					parameters.put(key, values);
+				}
+			
+				values.add(value);
+			}
+		}
+		
 		return parameters;
 	}
 
