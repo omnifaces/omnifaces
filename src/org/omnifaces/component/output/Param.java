@@ -33,7 +33,7 @@ import javax.faces.convert.Converter;
  * already registered for the target class.
  * <p>
  * Also, if no value is specified, but children are present, then the encoded output of children will be returned as
- * value. This is useful when you want to supply JSF components or HTML as parameter of an escaped
+ * value. This is useful when you want to supply JSF components or HTML as parameter of an unescaped
  * <code>&lt;h:outputFormat&gt;</code>. For example,
  * <pre>
  * &lt;h:outputFormat value="#{bundle.paragraph}" escape="false"&gt;
@@ -42,8 +42,8 @@ import javax.faces.convert.Converter;
  * </pre>
  * <p>with this bundle
  * <pre>
- * bundle.paragraph = Please {0} for more information.
- * bundle.contact = contact us
+ * paragraph = Please {0} for more information.
+ * contact = contact us
  * </pre>
  * <p>will result in the link being actually encoded as output format parameter value.
  *
