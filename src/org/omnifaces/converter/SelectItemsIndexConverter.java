@@ -12,6 +12,8 @@
  */
 package org.omnifaces.converter;
 
+import static org.omnifaces.util.Utils.isEmpty;
+
 import java.util.List;
 
 import javax.faces.component.UIComponent;
@@ -22,7 +24,6 @@ import javax.faces.convert.FacesConverter;
 
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.Messages;
-import org.omnifaces.util.Utils;
 import org.omnifaces.util.selectitems.SelectItemsUtils;
 
 /**
@@ -97,7 +98,7 @@ public class SelectItemsIndexConverter implements Converter {
 		for (int i = 0; i < selectItemValues.size(); i++) {
 			Object selectItemValue = selectItemValues.get(i);
 
-			if (Utils.isEmpty(modelValue) ? Utils.isEmpty(selectItemValue) : modelValue.equals(selectItemValue)) {
+			if (isEmpty(modelValue) ? isEmpty(selectItemValue) : modelValue.equals(selectItemValue)) {
 				return Integer.toString(i);
 			}
 		}
