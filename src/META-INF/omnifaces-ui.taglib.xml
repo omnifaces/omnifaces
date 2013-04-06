@@ -2212,13 +2212,21 @@ input.error, select.error, textarea.error {
             <required>false</required>
             <type>java.lang.String</type>
         </attribute>
-         <attribute>
+        <attribute>
             <description>
                 Whether to include view parameters in the action URI.
             </description>
             <name>includeViewParams</name>
             <required>false</required>
             <type>java.lang.Boolean</type>
+        </attribute>
+        <attribute>
+            <description>
+                Whether to include all URL (GET) request parameters in the action URI.
+            </description>
+            <name>includeRequestParams</name>
+            <required>false</required>
+            <type>boolean</type>
         </attribute>
         <attribute>
             <description>
