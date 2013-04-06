@@ -40,7 +40,7 @@ import javax.faces.render.Renderer;
 import org.omnifaces.component.messages.OmniMessages;
 
 /**
- * This renderer does all the rendering work for {@link OmniMessages}. It's basically copypasted from Mojarra 2.2,
+ * This renderer is the default renderer of {@link OmniMessages}. It's basically copypasted from Mojarra 2.2,
  * including the fix of tooltip rendering as described in <a href="http://java.net/jira/browse/JAVASERVERFACES-2160">
  * issue 2160</a>, and afterwards slightly rewritten, refactored and enhanced to take the new features into account.
  *
@@ -202,7 +202,7 @@ public class MessagesRenderer extends Renderer {
 		boolean showSummary = component.isShowSummary();
 		boolean showDetail = component.isShowDetail();
 		boolean escape = component.isEscape();
-		boolean tooltip = component.isTooltip() && !isEmpty(component.getTitle());
+		boolean tooltip = component.isTooltip() && isEmpty(component.getTitle());
 
 		for (FacesMessage message : messages) {
 			if (message.isRendered() && !component.isRedisplay()) {
@@ -210,7 +210,6 @@ public class MessagesRenderer extends Renderer {
 			}
 
 			writer.startElement(table ? "tr" : "li", component);
-
 			String severityName = SEVERITY_NAMES.get(message.getSeverity());
 			writeAttribute(writer, component, severityName + "Style", "style");
 			writeAttribute(writer, component, severityName + "Class", "class", "styleClass");

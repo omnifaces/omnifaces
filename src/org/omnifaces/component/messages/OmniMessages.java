@@ -26,8 +26,8 @@ import org.omnifaces.util.State;
  * the following new features:
  * <dl>
  * <dt>Multiple <code>for</code> components</dt>
- * <dd>Possibility to specify multiple client IDs space separated in the <code>for</code> attribute. It can even refer
- * non-input components which in turn contains input components. For example,
+ * <dd>Possibility to specify multiple client IDs space separated in the <code>for</code> attribute. The below example
+ * would only display messages for <code>input1</code> and <code>input3</code>:
  * <pre><code>
  * &lt;h:form&gt;
  *   &lt;o:messages for="input1 input3" /&gt;
@@ -37,7 +37,8 @@ import org.omnifaces.util.State;
  *   &lt;h:inputText id="input4" /&gt;
  * &lt;/h:form&gt;
  * </code></pre>
- * would only display messages for <code>input1</code> and <code>input3</code>. And,
+ * It can even refer non-input components which in turn contains input components. The below example would only display
+ * messages for <code>input1</code> and <code>input2</code>:
  * <pre><code>
  * &lt;h:form&gt;
  *   &lt;o:messages for="inputs" /&gt;
@@ -49,7 +50,8 @@ import org.omnifaces.util.State;
  *   &lt;h:inputText id="input4" /&gt;
  * &lt;/h:form&gt;
  * </code></pre>
- * would only display messages for <code>input1</code> and <code>input2</code>. You can even combine them,
+ * You can even combine them. The below example would only display messages for <code>input1</code>,
+ * <code>input2</code> and <code>input4</code>.
  * <pre><code>
  * &lt;h:form&gt;
  *   &lt;o:messages for="inputs input4" /&gt;
@@ -61,7 +63,6 @@ import org.omnifaces.util.State;
  *   &lt;h:inputText id="input4" /&gt;
  * &lt;/h:form&gt;
  * </code></pre>
- * which would only display messages for <code>input1</code>, <code>input2</code> and <code>input4</code>.
  * </dd>
  * <dt>HTML escaping</dt>
  * <dd>Control HTML escaping by the new <code>escape</code> attribute.
@@ -89,8 +90,8 @@ import org.omnifaces.util.State;
  * </dd>
  * </dl>
  * <p>
- * Design notice: the class is named <code>OmniMessages</code> instead of <code>Messages</code> to avoid confusion with
- * the {@link Messages} utility class.
+ * Design notice: the component class is named <code>OmniMessages</code> instead of <code>Messages</code> to avoid
+ * confusion with the {@link Messages} utility class.
  *
  * @author Bauke Scholtz
  * @since 1.5
