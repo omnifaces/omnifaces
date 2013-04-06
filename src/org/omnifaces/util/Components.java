@@ -14,6 +14,8 @@ package org.omnifaces.util;
 
 import static org.omnifaces.util.Utils.isEmpty;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.el.ValueExpression;
@@ -60,6 +62,20 @@ public final class Components {
 	 */
 	public static UIComponent getCurrentComponent() {
 		return UIComponent.getCurrentComponent(FacesContext.getCurrentInstance());
+	}
+
+	/**
+	 * Returns the attribute of the given component on the given name.
+	 * @param <T> The expected return type.
+	 * @param component The component to return the attribute of the given name for.
+	 * @param name The name of the attribute of the given component to be returned.
+	 * @return The attribute of the given component on the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @since 1.5
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getAttribute(UIComponent component, String name) {
+		return (T) component.getAttributes().get(name);
 	}
 
 	// Traversal ------------------------------------------------------------------------------------------------------
@@ -183,6 +199,33 @@ public final class Components {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Returns a list of UI components matching the given type in children of the given component.
+	 * @param component The component to search in its children for UI components matching the given type.
+	 * @param type The type of the UI components to be searched in children of the given component.
+	 * @return A list of UI components matching the given type in children of the given component.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 */
+	public static <T extends UIComponent> List<T> findComponentsInChildren(UIComponent component, Class<T> type) {
+		List<T> components = new ArrayList<T>();
+		findComponentsInChildren(component, type, components);
+		return components;
+	}
+
+	/**
+	 * Helper method for {@link #findComponentsInChildren(UIComponent, Class)} utilizing tail recursion.
+	 */
+	@SuppressWarnings("unchecked")
+	private static <T extends UIComponent> void findComponentsInChildren(UIComponent component, Class<T> type, List<T> matches) {
+		for (UIComponent child : component.getChildren()) {
+			if (type.isInstance(child)) {
+				matches.add((T) child);
+			}
+
+			findComponentsInChildren(child, type, matches);
+		}
 	}
 
 	/**

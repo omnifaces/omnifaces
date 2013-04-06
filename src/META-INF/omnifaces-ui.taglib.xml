@@ -1360,6 +1360,7 @@ input.error, select.error, textarea.error {
 				]]>
 			</description>
 			<name>binding</name>
+			<required>false</required>
 			<type>javax.faces.validator.Validator</type>
 		</attribute>
 		<attribute>
@@ -1369,6 +1370,7 @@ input.error, select.error, textarea.error {
 				]]>
 			</description>
 			<name>validatorId</name>
+			<required>false</required>
 			<type>java.lang.String</type>
 		</attribute>
 		<attribute>
@@ -1379,6 +1381,7 @@ input.error, select.error, textarea.error {
 				]]>
 			</description>
 			<name>for</name>
+			<required>false</required>
 			<type>java.lang.String</type>
 		</attribute>
 		<attribute>
@@ -1390,6 +1393,7 @@ input.error, select.error, textarea.error {
 				]]>
 			</description>
 			<name>message</name>
+			<required>false</required>
 			<type>java.lang.String</type>
 		</attribute>
 		<attribute>
@@ -1400,6 +1404,7 @@ input.error, select.error, textarea.error {
 				]]>
 			</description>
 			<name>disabled</name>
+			<required>false</required>
 			<type>java.lang.Boolean</type>
 		</attribute>
 	</tag>
@@ -1433,6 +1438,7 @@ input.error, select.error, textarea.error {
 				]]>
 			</description>
 			<name>binding</name>
+			<required>false</required>
 			<type>javax.faces.convert.Converter</type>
 		</attribute>
 		<attribute>
@@ -1442,6 +1448,7 @@ input.error, select.error, textarea.error {
 				]]>
 			</description>
 			<name>converterId</name>
+			<required>false</required>
 			<type>java.lang.String</type>
 		</attribute>
 		<attribute>
@@ -1452,6 +1459,7 @@ input.error, select.error, textarea.error {
 				]]>
 			</description>
 			<name>for</name>
+			<required>false</required>
 			<type>java.lang.String</type>
 		</attribute>
 	</tag>
@@ -1532,7 +1540,7 @@ input.error, select.error, textarea.error {
 			</description>
 			<name>required</name>
 			<required>false</required>
-			<type>boolean</type>
+			<type>java.lang.Boolean</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -1840,7 +1848,7 @@ input.error, select.error, textarea.error {
 			</description>
 			<name>rendered</name>
 			<required>false</required>
-			<type>boolean</type>
+			<type>java.lang.Boolean</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -1877,7 +1885,7 @@ input.error, select.error, textarea.error {
 			</description>
 			<name>escape</name>
 			<required>false</required>
-			<type>boolean</type>
+			<type>java.lang.Boolean</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -1966,7 +1974,7 @@ input.error, select.error, textarea.error {
             </description>
             <name>rendered</name>
             <required>false</required>
-            <type>boolean</type>
+            <type>java.lang.Boolean</type>
         </attribute>
         <attribute>
             <description>
@@ -2006,7 +2014,7 @@ input.error, select.error, textarea.error {
             </description>
             <name>escape</name>
             <required>false</required>
-            <type>boolean</type>
+            <type>java.lang.Boolean</type>
         </attribute>
         <attribute>
             <description>
@@ -2210,7 +2218,7 @@ input.error, select.error, textarea.error {
             </description>
             <name>includeViewParams</name>
             <required>false</required>
-            <type>boolean</type>
+            <type>java.lang.Boolean</type>
         </attribute>
         <attribute>
             <description>
@@ -2220,7 +2228,7 @@ input.error, select.error, textarea.error {
             </description>
             <name>prependId</name>
             <required>false</required>
-            <type>boolean</type>
+            <type>java.lang.Boolean</type>
         </attribute>
         <attribute>
             <description>
@@ -2230,7 +2238,7 @@ input.error, select.error, textarea.error {
             </description>
             <name>rendered</name>
             <required>false</required>
-            <type>boolean</type>
+            <type>java.lang.Boolean</type>
         </attribute>
         <attribute>
             <description>
@@ -3064,7 +3072,7 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 			</description>
 			<name>immediate</name>
 			<required>false</required>
-			<type>boolean</type>
+			<type>java.lang.Boolean</type>
 		</attribute>
 	</tag>
 
@@ -3157,7 +3165,360 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 			</description>
 			<name>disable</name>
 			<required>false</required>
-			<type>boolean</type>
+			<type>java.lang.Boolean</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				The <code>&lt;o:messages&gt;</code> is a component that extends the standard <code>&lt;h:messages&gt;</code> with
+				the following new features:
+				<dl>
+				<dt>Multiple <code>for</code> components</dt>
+				<dd>Possibility to specify multiple client IDs space separated in the <code>for</code> attribute. It can even refer
+				non-input components which in turn contains input components. For example,
+				<pre><code>
+&lt;h:form&gt;
+  &lt;o:messages for="input1 input3" /&gt;
+  &lt;h:inputText id="input1" /&gt;
+  &lt;h:inputText id="input2" /&gt;
+  &lt;h:inputText id="input3" /&gt;
+  &lt;h:inputText id="input4" /&gt;
+&lt;/h:form&gt;
+				</code></pre>
+				would only display messages for <code>input1</code> and <code>input3</code>. And,
+				<pre><code>
+&lt;h:form&gt;
+  &lt;o:messages for="inputs" /&gt;
+  &lt;h:panelGroup id="inputs"&gt;
+    &lt;h:inputText id="input1" /&gt;
+    &lt;h:inputText id="input2" /&gt;
+  &lt;/h:panelGroup&gt;
+  &lt;h:inputText id="input3" /&gt;
+  &lt;h:inputText id="input4" /&gt;
+&lt;/h:form&gt;
+				</code></pre>
+				would only display messages for <code>input1</code> and <code>input2</code>. You can even combine them,
+				<pre><code>
+&lt;h:form&gt;
+  &lt;o:messages for="inputs input4" /&gt;
+  &lt;h:panelGroup id="inputs"&gt;
+    &lt;h:inputText id="input1" /&gt;
+    &lt;h:inputText id="input2" /&gt;
+  &lt;/h:panelGroup&gt;
+  &lt;h:inputText id="input3" /&gt;
+  &lt;h:inputText id="input4" /&gt;
+&lt;/h:form&gt;
+				</code></pre>
+				which would only display messages for <code>input1</code>, <code>input2</code> and <code>input4</code>.
+				</dd>
+				<dt>HTML escaping</dt>
+				<dd>Control HTML escaping by the new <code>escape</code> attribute.
+				<pre><code>
+&lt;o:messages escape="false" /&gt;
+				</code></pre>
+				Beware of potential XSS attack holes when user-controlled input is redisplayed through messages!
+				</dd>
+				<dt>Iteration markup control</dt>
+				<dd>Control iteration markup fully by the new <code>var</code> attribute which sets the current <code>FacesMessage</code>
+				in the request scope and disables the default table/list rendering. For example,
+				<pre><code>
+&lt;dl&gt;
+  &lt;o:messages var="message"&gt;
+    &lt;dt&gt;#{message.severity}&lt;/dt&gt;
+    &lt;dd title="#{message.detail}"&gt;#{message.summary}&lt;/dd&gt;
+  &lt;/o:messages&gt;
+&lt;/dl&gt;
+				</code></pre>
+				Note: the iteration is by design completely stateless. It's therefore not recommended to nest form components inside
+				the <code>&lt;o:messages&gt;</code> component. It should be used for pure output only, like as the standard
+				<code>&lt;h:messages&gt;</code>. Plain output links are however no problem. Also note that the <code>escape</code>
+				attribute has in this case no effect. If you'd like to escape message properties, just use
+				<code>&lt;h:outputText escape="false"&gt;</code> the usual way.
+				</dd>
+				</dl>
+				<p>
+				Design notice: the class is named <code>OmniMessages</code> instead of <code>Messages</code> to avoid confusion with
+				the <code>Messages</code> utility class.
+			]]>
+		</description>
+		<tag-name>messages</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.messages.OmniMessages</component-type>
+			<renderer-type>org.omnifaces.Messages</renderer-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or processed on any subsequent form submit.
+					Default value is "true".
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating that only global messages (that is, messages not associated with any client identifier) are to be displayed.
+					Default value is "false".
+				]]>
+			</description>
+			<name>globalOnly</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The space separated collection of client IDs of UI input components whose messages needs to be displayed.
+					It is also possible to specify the client ID of a parent component containing UI input components of interest.
+					This attribute is ignored when the globalOnly attribute is set to "true".
+				]]>
+			</description>
+			<name>for</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The name of the request attribute which exposes the current faces message in the request scope.
+					This will trigger rendering without any HTML markup and delegate the markup control to the developer like as ui:repeat.
+				]]>
+			</description>
+			<name>var</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The type of layout markup to use when rendering error messages.
+					Valid values are "table" (an HTML table) and "list" (an HTML unordered list).
+					Default value is "list".
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>layout</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The tooltip to be applied on the of HTML table or ul when this component is rendered.
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>title</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether the summary portion of displayed messages should be included.
+					Default value is "true".
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>showSummary</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether the detail portion of displayed messages should be included.
+					Default value is "false".
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>showDetail</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether the detail portion of the message should be displayed as a tooltip.
+					Default value is "false".
+					This attribute is ignored when the var or title attributes are specified.
+				]]>
+			</description>
+			<name>tooltip</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating that characters in summary and detail that are sensitive in HTML and XML markup must be escaped.
+					Default value is "true".
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>escape</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					CSS style(s) to be applied on the HTML table or HTML ul when this component is rendered.
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>style</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Space-separated list of CSS style class(es) to be applied on the HTML table or ul when this component is rendered.
+					This value must be passed through as the "class" attribute on generated markup.
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>styleClass</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					CSS style(s) to apply to HTML tr or li with any message with a severity class of "INFO".
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>infoStyle</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					CSS style class to apply to HTML tr or li with any message with a severity class of "INFO".
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>infoClass</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					CSS style(s) to apply to HTML tr or li with any message with a severity class of "WARN".
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>warnStyle</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					CSS style class to apply to HTML tr or li with any message with a severity class of "WARN".
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>warnClass</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					CSS style(s) to apply to HTML tr or li with any message with a severity class of "ERROR".
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>errorStyle</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					CSS style class to apply to HTML tr or li with any message with a severity class of "ERROR".
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>errorClass</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					CSS style(s) to apply to HTML tr or li with any message with a severity class of "FATAL".
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>fatalStyle</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					CSS style class to apply to HTML tr or li with any message with a severity class of "FATAL".
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>fatalClass</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Code describing the language used in the generated markup for this component.
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>lang</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Direction indication for text that does not inherit directionality.
+					Valid values are "LTR" (left-to-right) and "RTL" (right-to-left).
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>dir</name>
+			<required>false</required>
+			<type>java.lang.String</type>
 		</attribute>
 	</tag>
 </facelet-taglib>
