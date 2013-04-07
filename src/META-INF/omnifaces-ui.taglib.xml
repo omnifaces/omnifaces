@@ -3315,6 +3315,17 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 		<attribute>
 			<description>
 				<![CDATA[
+					Flag indicating whether the message should be redisplayed if already displayed by another message(s) component beforehand.
+					Default value is "true".
+				]]>
+			</description>
+			<name>redisplay</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
 					The name of the request attribute which exposes the current faces message in the request scope.
 					This will trigger rendering without any HTML markup and delegate the markup control to the developer like as ui:repeat.
 				]]>
@@ -3376,7 +3387,7 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 				<![CDATA[
 					Flag indicating whether the detail portion of the message should be displayed as a tooltip.
 					Default value is "false".
-					This attribute is ignored when the var or title attributes are specified.
+					This attribute is ignored when the var or title attribute is specified.
 				]]>
 			</description>
 			<name>tooltip</name>
