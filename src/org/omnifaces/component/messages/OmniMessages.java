@@ -12,6 +12,8 @@
  */
 package org.omnifaces.component.messages;
 
+import static java.lang.Boolean.TRUE;
+
 import javax.el.ValueExpression;
 import javax.faces.application.FacesMessage;
 import javax.faces.component.FacesComponent;
@@ -166,15 +168,15 @@ public class OmniMessages extends HtmlMessages {
 	 * Returns whether the message detail and summary should be HTML-escaped. Defaults to <code>true</code>.
 	 * @return Whether the message detail and summary should be HTML-escaped.
 	 */
-	public boolean isEscape() {
-		return state.get(PropertyKeys.escape, true);
+	public Boolean isEscape() {
+		return state.get(PropertyKeys.escape, TRUE);
 	}
 
 	/**
 	 * Sets whether the message detail and summary should be HTML-escaped.
 	 * @param escape Whether the message detail and summary should be HTML-escaped.
 	 */
-	public void setEscape(boolean escape) {
+	public void setEscape(Boolean escape) {
 		state.put(PropertyKeys.escape, escape);
 	}
 
