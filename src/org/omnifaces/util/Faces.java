@@ -35,13 +35,16 @@ import java.util.Set;
 import javax.el.ELContext;
 import javax.el.ExpressionFactory;
 import javax.el.ValueExpression;
+import javax.faces.FacesException;
 import javax.faces.FactoryFinder;
 import javax.faces.application.Application;
 import javax.faces.application.ApplicationFactory;
 import javax.faces.application.NavigationHandler;
 import javax.faces.application.ProjectStage;
+import javax.faces.application.Resource;
 import javax.faces.application.ViewHandler;
 import javax.faces.component.UIComponent;
+import javax.faces.component.UIPanel;
 import javax.faces.component.UIViewParameter;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.ExternalContext;
@@ -561,18 +564,58 @@ public final class Faces {
 	}
 
 	/**
-	 * Include the Facelet file at the given (relative) path as child of the given UI component. This has the same
-	 * effect as using <code>&lt;ui:include&gt;</code>. The path is relative to the current view ID and absolute to the
-	 * webcontent root.
-	 * @param component The component to include the Facelet file in.
+	 * Include the Facelet file at the given (relative) path as child of the given UI component parent. This has the
+	 * same effect as using <code>&lt;ui:include&gt;</code>. The path is relative to the current view ID and absolute
+	 * to the webcontent root.
+	 * @param parent The parent component to include the Facelet file in.
 	 * @param path The (relative) path to the Facelet file.
 	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
 	 * redeclare it in the action method. The servletcontainer will handle it.
 	 * @see FaceletContext#includeFacelet(UIComponent, String)
 	 * @since 1.1
 	 */
-	public static void includeFacelet(UIComponent component, String path) throws IOException {
-		getFaceletContext().includeFacelet(component, path);
+	public static void includeFacelet(UIComponent parent, String path) throws IOException {
+		getFaceletContext().includeFacelet(parent, path);
+	}
+
+	/**
+	 * Include the composite component of the given library ane resource name as child of the given UI component parent.
+	 * This has the same effect as using <code>&lt;my:resourceName&gt;</code>. The given component ID must be unique
+	 * relative to the current naming container parent and is mandatory for functioning of input components inside the
+	 * composite, if any.
+	 * @param parent The parent component to include the composite component in.
+	 * @param libraryName The library name of the composite component.
+	 * @param resourceName The resource name of the composite component.
+	 * @param id The component ID of the composite component.
+	 * @since 1.5
+	 */
+	public static void includeCompositeComponent(UIComponent parent, String libraryName, String resourceName, String id) {
+		FacesContext context = getContext();
+		Application application = getApplication();
+		FaceletContext faceletContext = getFaceletContext();
+
+		// This basically creates <ui:component> based on <composite:interface>.
+		Resource resource = application.getResourceHandler().createResource(resourceName, libraryName);
+		UIComponent composite = application.createComponent(context, resource);
+		composite.setId(id); // Mandatory for the case composite is part of UIForm! Otherwise JSF can't find inputs.
+
+		// This basically creates <composite:implementation>.
+		UIComponent implementation = application.createComponent(UIPanel.COMPONENT_TYPE);
+		implementation.setRendererType("javax.faces.Group");
+		composite.getFacets().put(UIComponent.COMPOSITE_FACET_NAME, implementation);
+
+		// Now include the composite component file in the given parent.
+		parent.getChildren().add(composite);
+		parent.pushComponentToEL(context, composite); // This makes #{cc} available.
+		try {
+			faceletContext.includeFacelet(implementation, resource.getURL());
+		}
+		catch (IOException e) {
+			throw new FacesException(e);
+		}
+		finally {
+			parent.popComponentFromEL(context);
+		}
 	}
 
 	/**
