@@ -71,7 +71,7 @@ public class MessagesRenderer extends Renderer {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
-	public void encodeEnd(FacesContext context, UIComponent component) throws IOException {
+	public void encodeChildren(FacesContext context, UIComponent component) throws IOException {
 		if (!component.isRendered()) {
 			return;
 		}
@@ -84,7 +84,7 @@ public class MessagesRenderer extends Renderer {
 			return;
 		}
 
-		if (!isEmpty(omniMessages.getVar())) {
+		if (!isEmpty(omniMessages.getVar()) && omniMessages.getChildCount() > 0) {
 			encodeMessagesRepeater(context, omniMessages, messages);
 		}
 		else {
@@ -167,7 +167,11 @@ public class MessagesRenderer extends Renderer {
 				}
 
 				requestMap.put(var, message);
-				encodeChildren(context, component);
+
+				for (UIComponent child : component.getChildren()) {
+					child.encodeAll(context);
+				}
+
 				message.rendered();
 			}
 		}

@@ -12,12 +12,13 @@
  */
 package org.omnifaces.component.messages;
 
-import static java.lang.Boolean.TRUE;
+import java.io.IOException;
 
 import javax.el.ValueExpression;
 import javax.faces.application.FacesMessage;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.html.HtmlMessages;
+import javax.faces.context.FacesContext;
 
 import org.omnifaces.renderer.MessagesRenderer;
 import org.omnifaces.util.Messages;
@@ -146,6 +147,14 @@ public class OmniMessages extends HtmlMessages {
 		super.setValueExpression(name, binding);
 	}
 
+	/**
+	 * An override which delegates directly to {@link #encodeChildren(FacesContext)}.
+	 */
+	@Override
+	public void encodeAll(FacesContext context) throws IOException {
+		encodeChildren(context);
+	}
+
 	// Attribute getters/setters --------------------------------------------------------------------------------------
 
 	/**
@@ -169,7 +178,7 @@ public class OmniMessages extends HtmlMessages {
 	 * @return Whether the message detail and summary should be HTML-escaped.
 	 */
 	public Boolean isEscape() {
-		return state.get(PropertyKeys.escape, TRUE);
+		return state.get(PropertyKeys.escape, true);
 	}
 
 	/**
