@@ -110,6 +110,15 @@ public class CommandScript extends UICommand {
 
 	private final State state = new State(getStateHelper());
 
+	// Constructors ---------------------------------------------------------------------------------------------------
+
+	/**
+	 * Constructs the CommandScript component.
+	 */
+	public CommandScript() {
+		setRendererType(null);
+	}
+
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
