@@ -579,7 +579,8 @@ public final class Faces {
 	}
 
 	/**
-	 * Include the composite component of the given library ane resource name as child of the given UI component parent.
+	 * Create and include the composite component of the given library ane resource name as child of the given UI
+	 * component parent and return the created composite component.
 	 * This has the same effect as using <code>&lt;my:resourceName&gt;</code>. The given component ID must be unique
 	 * relative to the current naming container parent and is mandatory for functioning of input components inside the
 	 * composite, if any.
@@ -587,9 +588,11 @@ public final class Faces {
 	 * @param libraryName The library name of the composite component.
 	 * @param resourceName The resource name of the composite component.
 	 * @param id The component ID of the composite component.
+	 * @return The created composite component, which can if necessary be further used to set custom attributes or
+	 * value expressions on it.
 	 * @since 1.5
 	 */
-	public static void includeCompositeComponent(UIComponent parent, String libraryName, String resourceName, String id) {
+	public static UIComponent includeCompositeComponent(UIComponent parent, String libraryName, String resourceName, String id) {
 		FacesContext context = getContext();
 		Application application = getApplication();
 		FaceletContext faceletContext = getFaceletContext();
@@ -616,6 +619,8 @@ public final class Faces {
 		finally {
 			parent.popComponentFromEL(context);
 		}
+
+		return composite;
 	}
 
 	/**

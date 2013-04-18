@@ -64,16 +64,49 @@ public final class Ajax {
 
 	/**
 	 * Update the given client IDs in the current ajax response. Note that those client IDs should not start with the
-	 * naming container separator character like <code>:</code>.
+	 * naming container separator character like <code>:</code>. This method also supports the client ID keywords
+	 * <code>@all</code>, <code>@form</code> and <code>@this</code> which respectively refers the entire view, the
+	 * currently submitted form as obtained by {@link Components#getCurrentForm()} and the currently processed
+	 * component as obtained by {@link UIComponent#getCurrentComponent(FacesContext)}. Any other client ID starting
+	 * with <code>@</code> is by design ignored, including <code>@none</code>.
 	 * @param clientIds The client IDs to be updated in the current ajax response.
 	 * @see PartialViewContext#getRenderIds()
 	 */
 	public static void update(String... clientIds) {
-		Collection<String> renderIds = getContext().getRenderIds();
+		PartialViewContext context = getContext();
+		Collection<String> renderIds = context.getRenderIds();
 
 		for (String clientId : clientIds) {
-			renderIds.add(clientId);
+			if (clientId.charAt(0) != '@') {
+				renderIds.add(clientId);
+			}
+			else if (clientId.equals("@all")) {
+				context.setRenderAll(true);
+			}
+			else if (clientId.equals("@form")) {
+			    UIComponent currentForm = Components.getCurrentForm();
+
+			    if (currentForm != null) {
+			    	renderIds.add(currentForm.getClientId());
+			    }
+			}
+			else if (clientId.equals("@this")) {
+			    UIComponent currentComponent = Components.getCurrentComponent();
+
+			    if (currentComponent != null) {
+			    	renderIds.add(currentComponent.getClientId());
+			    }
+			}
 		}
+	}
+
+	/**
+	 * Update the entire view.
+	 * @see PartialViewContext#setRenderAll(boolean)
+	 * @since 1.5
+	 */
+	public static void updateAll() {
+		getContext().setRenderAll(true);
 	}
 
 	/**
