@@ -97,9 +97,11 @@ public enum WebXml {
 		"auth-constraint/role-name";
 
 	private static final String ERROR_NOT_INITIALIZED =
-			"WebXml is not initialized yet. Please use #init(ServletContext) method to manually initialize it.";
+		"WebXml is not initialized yet. Please use #init(ServletContext) method to manually initialize it.";
 	private static final String ERROR_URL_MUST_START_WITH_SLASH =
-			"URL must start with '/': '%s'";
+		"URL must start with '/': '%s'";
+	private static final String LOG_INITIALIZATION_ERROR =
+		"WebXml failed to initialize. Perhaps your web.xml contains a typo?";
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -140,7 +142,7 @@ public enum WebXml {
 				securityConstraints = parseSecurityConstraints(webXml, xpath);
 			}
 			catch (Exception e) {
-				// If this occurs, web.xml is broken anyway and app shouldn't have started/initialized this far at all.
+				servletContext.log(LOG_INITIALIZATION_ERROR, e);
 				throw new RuntimeException(e);
 			}
 		}
