@@ -263,6 +263,26 @@ public final class Faces {
 	}
 
 	/**
+	 * Signals JSF that the validations phase of the current request has failed. This can be invoked in any other
+	 * phase than the validations phase. The value can be read by {@link #isValidationFailed()} in Java and by
+	 * <code>#{facesContext.validationFailed}</code> in EL.
+	 * @see FacesContext#validationFailed()
+	 */
+	public static void validationFailed() {
+		getContext().validationFailed();
+	}
+
+	/**
+	 * Returns whether the validations phase of the current request has failed.
+	 * @return <code>true</code> if the validations phase of the current request has failed, otherwise
+	 * <code>false</code>.
+	 * @see FacesContext#isValidationFailed()
+	 */
+	public static boolean isValidationFailed() {
+		return getContext().isValidationFailed();
+	}
+
+	/**
 	 * Programmatically evaluate the given EL expression and return the evaluated value.
 	 * @param <T> The expected return type.
 	 * @param expression The EL expression to be evaluated.
@@ -682,16 +702,6 @@ public final class Faces {
 	 */
 	public static boolean isPostback() {
 		return getContext().isPostback();
-	}
-
-	/**
-	 * Returns whether the validations phase of the current request has failed.
-	 * @return <code>true</code> if the validations phase of the current request has failed, otherwise
-	 * <code>false</code>.
-	 * @see FacesContext#isValidationFailed()
-	 */
-	public static boolean isValidationFailed() {
-		return getContext().isValidationFailed();
 	}
 
 	/**
@@ -1482,6 +1492,25 @@ public final class Faces {
 		return getExternalContext().getRealPath(webContentPath);
 	}
 
+	/**
+	 * Returns the {@link ServletRegistration} associated with the {@link FacesServlet}.
+	 * @param servletContext The context to get the ServletRegistration from.
+	 * @return ServletRegistration for FacesServlet, or <code>null</code> if the FacesServlet is not installed.
+	 * @since 1.4
+	 */
+	public static ServletRegistration getFacesServletRegistration(final ServletContext servletContext) {
+		ServletRegistration facesServletRegistration = null;
+
+		for (ServletRegistration registration : servletContext.getServletRegistrations().values()) {
+			if (registration.getClassName().equals(FacesServlet.class.getName())) {
+				facesServletRegistration = registration;
+				break;
+			}
+		}
+
+		return facesServletRegistration;
+	}
+
 	// Request scope --------------------------------------------------------------------------------------------------
 
 	/**
@@ -1853,26 +1882,6 @@ public final class Faces {
 		}
 
 		context.responseComplete();
-	}
-
-	/**
-	 * Gets the ServletRegistration associated with the FacesServlet.
-	 *
-	 * @param servletContext
-	 *            the context to get the ServletRegistration from.
-	 * @return ServletRegistration for FacesServlet, or null if the FacesServlet is not installed.
-	 * @since 1.4
-	 */
-	public static ServletRegistration getFacesServletRegistration(final ServletContext servletContext) {
-		ServletRegistration facesServletRegistration = null;
-		for (ServletRegistration registration : servletContext.getServletRegistrations().values()) {
-			if (registration.getClassName().equals(FacesServlet.class.getName())) {
-				facesServletRegistration = registration;
-				break;
-			}
-		}
-
-		return facesServletRegistration;
 	}
 
 }

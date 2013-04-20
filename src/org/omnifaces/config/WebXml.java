@@ -153,7 +153,8 @@ public enum WebXml {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Find for the given exception the right error page location as per Servlet 3.0 specification 10.9.2:
+	 * Find for the given exception the right error page location. Exception types are matched as per Servlet 3.0
+	 * specification 10.9.2:
 	 * <ul>
 	 *   <li>Make a first pass through all specific exception types. If an exact match is found, use its location.
 	 *   <li>Else make a second pass through all specific exception types in the order as they are declared in
