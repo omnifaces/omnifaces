@@ -158,6 +158,8 @@ public final class SelectItemsCollector {
 			scopedRunner.invoke(new Callback.Void() { @Override public void invoke() {
 
 				Object itemValue = getItemValue(attributes, item);
+				Object noSelectionValue = attributes.get("noSelectionValue");
+				boolean itemValueIsNoSelectionValue = noSelectionValue != null && noSelectionValue.equals(itemValue);
 
 				selectItems.add(new SelectItem(
 					itemValue,
@@ -165,7 +167,7 @@ public final class SelectItemsCollector {
 					getItemDescription(attributes),
 					getBooleanAttribute(attributes, "itemDisabled", false),
 					getBooleanAttribute(attributes, "itemLabelEscaped", true),
-					getBooleanAttribute(attributes, "noSelectionOption", false)
+					getBooleanAttribute(attributes, "noSelectionOption", false) || itemValueIsNoSelectionValue
 				));
 			}});
 		}
