@@ -40,6 +40,7 @@ public final class Dates {
 	private static final Map<Locale, Map<String, Integer>> SHORT_MONTHS_CACHE = new HashMap<Locale, Map<String, Integer>>(3);
 	private static final Map<Locale, Map<String, Integer>> DAYS_OF_WEEK_CACHE = new HashMap<Locale, Map<String, Integer>>(3);
 	private static final Map<Locale, Map<String, Integer>> SHORT_DAYS_OF_WEEK_CACHE = new HashMap<Locale, Map<String, Integer>>(3);
+	private static final TimeZone TIMEZONE_DEFAULT = TimeZone.getDefault();
 	private static final TimeZone TIMEZONE_UTC = TimeZone.getTimeZone("UTC");
 
 	// Constructors ---------------------------------------------------------------------------------------------------
@@ -62,7 +63,7 @@ public final class Dates {
 	 * @see #formatDateWithTimezone(Date, String, Object)
 	 */
 	public static String formatDate(Date date, String pattern) {
-		return formatDate(date, pattern, TimeZone.getDefault());
+		return formatDate(date, pattern, TIMEZONE_DEFAULT);
 	}
 
 	/**
