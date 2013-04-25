@@ -79,13 +79,11 @@ public class MessagesRenderer extends Renderer {
 		OmniMessages omniMessages = (OmniMessages) component;
 		List<FacesMessage> messages = getMessages(context, omniMessages);
 
-		if (messages.isEmpty()) {
-			encodeEmptyMessages(context, omniMessages);
-			return;
-		}
-
 		if (!isEmpty(omniMessages.getVar()) && omniMessages.getChildCount() > 0) {
 			encodeMessagesRepeater(context, omniMessages, messages);
+		}
+		else if (messages.isEmpty()) {
+			encodeEmptyMessages(context, omniMessages);
 		}
 		else {
 			encodeMessages(context, omniMessages, messages, "table".equals(omniMessages.getLayout()));
@@ -128,23 +126,6 @@ public class MessagesRenderer extends Renderer {
 	}
 
 	/**
-	 * Encode the case when there are no messages. So far, it only renders the hidden development stage messages list.
-	 * @param context The involved faces context.
-	 * @param component The messages component.
-	 * @throws IOException When an I/O error occurs.
-	 */
-	protected void encodeEmptyMessages(FacesContext context, OmniMessages component) throws IOException {
-		String id = component.getId();
-
-		if (id != null && !id.equals("javax_faces_developmentstage_messages")) {
-			ResponseWriter writer = context.getResponseWriter();
-			writer.startElement("div", component);
-			writeAttribute(writer, "id", component.getClientId(context));
-			writer.endElement("div");
-		}
-	}
-
-	/**
 	 * Encode the case when the <code>var</code> attribute is specified. This will render without any HTML markup and
 	 * put the current message in the request scope as identified by the <code>var</code> attribute.
 	 * Note: the iteration is by design completely stateless.
@@ -182,6 +163,23 @@ public class MessagesRenderer extends Renderer {
 			else {
 				requestMap.remove(var);
 			}
+		}
+	}
+
+	/**
+	 * Encode the case when there are no messages. This will render a div when the ID is specified.
+	 * @param context The involved faces context.
+	 * @param component The messages component.
+	 * @throws IOException When an I/O error occurs.
+	 */
+	protected void encodeEmptyMessages(FacesContext context, OmniMessages component) throws IOException {
+		String id = component.getId();
+
+		if (id != null && !id.equals("javax_faces_developmentstage_messages")) {
+			ResponseWriter writer = context.getResponseWriter();
+			writer.startElement("div", component);
+			writeAttribute(writer, "id", component.getClientId(context));
+			writer.endElement("div");
 		}
 	}
 
