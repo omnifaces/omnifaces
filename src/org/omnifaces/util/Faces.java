@@ -887,6 +887,21 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the HTTP request URL with query string. This is the full request URL with query string as the enduser
+	 * sees in browser address bar.
+	 * @return The HTTP request URL with query string.
+	 * @see HttpServletRequest#getRequestURL()
+	 * @see HttpServletRequest#getQueryString()
+	 * @since 1.5
+	 */
+	public static String getRequestURLWithQueryString() {
+		HttpServletRequest request = getRequest();
+		StringBuffer requestURL = request.getRequestURL();
+		String queryString = request.getQueryString();
+		return (queryString == null) ? requestURL.toString() : requestURL.append('?').append(queryString).toString();
+	}
+
+	/**
 	 * Returns the Internet Protocol (IP) address of the client that sent the request. This will first check the
 	 * <code>X-Forwarded-For</code> request header and if it's present, then return its first IP address, else just
 	 * return {@link HttpServletRequest#getRemoteAddr()} unmodified.
