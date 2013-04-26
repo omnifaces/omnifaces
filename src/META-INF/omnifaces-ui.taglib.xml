@@ -2467,10 +2467,9 @@ input.error, select.error, textarea.error {
 	       		If no such provider is installed, a default caching implementation is used that's based on
 	       		<a href="http://code.google.com/p/concurrentlinkedhashmap">http://code.google.com/p/concurrentlinkedhashmap</a> in case
 	       		a maximum cache capacity is set, or on a plain ConcurrentMap if no capacity is set.
-	       		<p>
 	       		<hr>
 				<h3>Setting a custom caching provider</h3>
-				A custom caching provider can be set by using the <code>org.omnifaces.CACHE_PROVIDER</code> context
+				<p>A custom caching provider can be set by using the <code>org.omnifaces.CACHE_PROVIDER</code> context
 				parameter in web.xml to point to an implementation of <code>org.omnifaces.component.output.cache.CacheProvider</code>.
 				For example:
 				<pre>
@@ -2484,7 +2483,7 @@ input.error, select.error, textarea.error {
 				example.
 				<hr>
 				<h3>Global settings</h3>
-				For the default provider, the maximum capacity and the default time to live can be specified for the
+				<p>For the default provider, the maximum capacity and the default time to live can be specified for the
 				supported scopes "session" and "application". If the maximum capacity is reached, an entry will be
 				evicted following a least recently used policy. The default time to live specifies for how long
 				entries are considered to be valid. A value for the <code>time</code> attribute on this component
@@ -2511,7 +2510,7 @@ input.error, select.error, textarea.error {
  				</tr>
  				<tr>
  				<td nowrap><code>org.omnifaces.CACHE_INSTALL_BUFFER_FILTER</code></td>
-				<td>Boolean that when true installs a Servlet Filter (Servlet 3.0+ only) that works in conjunction with the <code>useBuffer<code> attribute of the Cache component
+				<td>Boolean that when true installs a Servlet Filter (Servlet 3.0+ only) that works in conjunction with the <code>useBuffer</code> attribute of the Cache component
 				    to enable an alternative way to grab the content that needs to be cached. This is a convenience setting that is a short-cut
 				    for installing the <code>org.omnifaces.servlet.BufferedHttpServletResponse</code> filter manually. If more finegrained control
 				    is needed regarding which place in the filter chain the filter appears and which resources it exactly filters, this setting
@@ -2521,7 +2520,7 @@ input.error, select.error, textarea.error {
  				</table>
  				<hr>
 				<h3>Servlet 2.5 configuration</h3>
-				If no custom caching provider or global settings are used, no specific configuration is needed. Otherwise
+				<p>If no custom caching provider or global settings are used, no specific configuration is needed. Otherwise
 				<code>org.omnifaces.component.output.cache.CacheInitializerListener</code> needs to be installed as a
 				listener in web.xml:
 				<pre>
@@ -2529,7 +2528,7 @@ input.error, select.error, textarea.error {
 	&lt;listener-class&gt;org.omnifaces.component.output.cache.CacheInitializerListener&lt;/listener-class&gt;
 &lt;/listener&gt;
 				</pre>
-				In case the alternative caching method via buffering is used, <code>org.omnifaces.servlet.BufferedHttpServletResponse</code> needs
+				<p>In case the alternative caching method via buffering is used, <code>org.omnifaces.servlet.BufferedHttpServletResponse</code> needs
 				to be installed as a Servlet Filter in web.xml, filtering either the FacesServlet itself or any page on which the alternative caching
 				method is required.
 			]]>
