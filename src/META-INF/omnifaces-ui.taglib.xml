@@ -2585,8 +2585,8 @@ input.error, select.error, textarea.error {
 					<strong>NOT</strong> do this automatically, but will instead remove it only when the cache item is being accessed
 					again.
 					<p>
-					Following the above, new content will only be inserted into the cache following a page request. A time of e.g. <code>30<code>
-					<strong>will not</strong> cause new content to be inserted into the cache at <code>30<code> seconds intervals.
+					Following the above, new content will only be inserted into the cache following a page request. A time of e.g. <code>30</code>
+					<strong>will not</strong> cause new content to be inserted into the cache at <code>30</code> seconds intervals.
 					<p>
 					Note that this component <strong>does not</strong> support a cache loader and locking mechanism. This means after content times out,
 					several simultaneous page requests may render the same content and it's undetermined which of those will end up being cached.
