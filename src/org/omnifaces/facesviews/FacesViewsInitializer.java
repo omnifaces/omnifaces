@@ -14,11 +14,15 @@ package org.omnifaces.facesviews;
 
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
+import static javax.faces.application.ProjectStage.Development;
+import static javax.faces.application.ProjectStage.PROJECT_STAGE_PARAM_NAME;
 import static javax.faces.view.facelets.ResourceResolver.FACELETS_RESOURCE_RESOLVER_PARAM_NAME;
+import static org.omnifaces.facesviews.FacesServletDispatchMethod.DO_FILTER;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ENABLED_PARAM_NAME;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES_EXTENSIONS;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_REVERSE_RESOURCES;
+import static org.omnifaces.facesviews.FacesViews.getFacesServletDispatchMethod;
 import static org.omnifaces.facesviews.FacesViews.getPublicRootPaths;
 import static org.omnifaces.facesviews.FacesViews.isFilterAfterDeclaredFilters;
 import static org.omnifaces.facesviews.FacesViews.scanViewsFromRootPaths;
@@ -77,16 +81,33 @@ public class FacesViewsInitializer implements ServletContainerInitializer {
 				// 3. A ViewHandler that transforms the forwarded extension based URL back to an extensionless one, e.g.
 				// /index.xhtml to /index
 				// See FacesViewsForwardingFilter#init
+				
+				
+				if (Development.name().equals(servletContext.getInitParameter(PROJECT_STAGE_PARAM_NAME)) &&
+					getFacesServletDispatchMethod(servletContext) != DO_FILTER) {
+					
+					// In development mode map this Filter to "*", so we can catch requests to extensionless resources that
+			        // have been dynamically added. Note that resources with mapped extensions are already handled by the FacesViewsResolver.
+			        // Adding resources with new extensions still requires a restart.
+					
+					// Development mode only works when the dispatch mode is not DO_FILTER, since DO_FILTER mode depends
+					// on the Faces Servlet being "exact"-mapped on the view resources. 
+					
+					facesViewsRegistration.addMappingForUrlPatterns(null, isFilterAfterDeclaredFilters(servletContext), "/*");
+				} else {
+					
+					// In non-development mode, only map this Filter to specific resources
+					
+					// Map the forwarding filter to all the resources we found.
+					for (String resource : collectedViews.keySet()) {
+						facesViewsRegistration.addMappingForUrlPatterns(null, isFilterAfterDeclaredFilters(servletContext), resource);
+					}
 
-				// Map the forwarding filter to all the resources we found.
-				for (String resource : collectedViews.keySet()) {
-					facesViewsRegistration.addMappingForUrlPatterns(null, isFilterAfterDeclaredFilters(servletContext), resource);
-				}
-
-				// Additionally map the filter to all paths that were scanned and which are also directly
-				// accessible. This is to give the filter an opportunity to block these.
-				for (String path : getPublicRootPaths(servletContext)) {
-					facesViewsRegistration.addMappingForUrlPatterns(null, false, path + "*");
+					// Additionally map the filter to all paths that were scanned and which are also directly
+					// accessible. This is to give the filter an opportunity to block these.
+					for (String path : getPublicRootPaths(servletContext)) {
+						facesViewsRegistration.addMappingForUrlPatterns(null, false, path + "*");
+					}
 				}
 
 				// We now need to map the Faces Servlet to the extensions we found, but at this point in time

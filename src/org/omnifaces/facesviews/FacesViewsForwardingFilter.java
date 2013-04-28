@@ -80,14 +80,6 @@ public class FacesViewsForwardingFilter extends HttpFilter {
         Application application = getApplicationFromFactory();
         application.setViewHandler(new FacesViewsViewHandler(application.getViewHandler()));
 
-        // In development mode additionally map this Filter to "*", so we can catch requests to extensionless resources that
-        // have been dynamically added. Note that resources with mapped extensions are already handled by the FacesViewsResolver.
-        // Adding resources with new extensions still requires a restart.
-        if (application.getProjectStage() == Development && servletContext.getMajorVersion() > 2) {
-        	filterConfig.getServletContext().getFilterRegistration(FacesViewsForwardingFilter.class.getName())
-											.addMappingForUrlPatterns(null, false, "*");
-        }
-
         extensionAction = getExtensionAction(servletContext);
         pathAction = getPathAction(servletContext);
         dispatchMethod = getFacesServletDispatchMethod(servletContext);
