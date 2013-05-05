@@ -24,11 +24,11 @@ import javax.faces.view.facelets.TagHandler;
 import org.omnifaces.component.output.Cache;
 
 /**
- * This handler wraps a value expression that's actually a method expression by another value expression that returns a method expression
- * that gets the value of first value expression, which as "side-effect" executes the original method expression.
- *
+ * CacheValue is a replacement for <code>ui:param</code> and <code>c:set</code> that only evaluates a value expression once
+ * and thereafter resolves it from the cache.
  * <p>
- * This somewhat over-the-top chain of wrapping is done so a method expression can be passed into a Facelet tag as parameter.
+ * A <code>CacheValue</code> piggybacks onto a parent <code>Cache</code> component for the control of caching scope and
+ * other parameters.
  *
  * @author Arjan Tijms
  *
