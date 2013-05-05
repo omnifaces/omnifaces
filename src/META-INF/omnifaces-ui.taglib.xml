@@ -2620,6 +2620,23 @@ input.error, select.error, textarea.error {
 			<required>false</required>
 			<type>java.lang.Boolean</type>
 		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Resets the cache when set to to <code>true</code>. Default is <code>false</code>.
+					<p>
+					This attribute can be used to reset the cache, meaning that the first time the cache component is rendered
+					again, it will re-render its children and will cause any cached value expressions (via <code>o:cacheValue</code>) to be
+					re-evaluated when its next referenced.
+					<p>
+					Note that this value has to remain true until the cache component is rendered, after that it should be set to false
+					again otherwise the cached content will be reset again at the next rendering.
+				 ]]>
+            </description>
+			<name>reset</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
 	</tag>
 
 	<tag>

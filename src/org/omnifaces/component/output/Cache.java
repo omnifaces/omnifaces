@@ -16,6 +16,7 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static javax.faces.event.PhaseId.RENDER_RESPONSE;
 import static org.omnifaces.component.output.Cache.PropertyKeys.key;
+import static org.omnifaces.component.output.Cache.PropertyKeys.reset;
 import static org.omnifaces.component.output.Cache.PropertyKeys.scope;
 import static org.omnifaces.component.output.Cache.PropertyKeys.time;
 import static org.omnifaces.component.output.Cache.PropertyKeys.useBuffer;
@@ -67,7 +68,7 @@ public class Cache extends OutputFamily {
 	private final State state = new State(getStateHelper());
 
 	enum PropertyKeys {
-		key, scope, time, useBuffer
+		key, scope, time, useBuffer, reset
 	}
 
 	public Cache() {
@@ -125,6 +126,10 @@ public class Cache extends OutputFamily {
 
 		ResponseWriter responseWriter = context.getResponseWriter();
 		org.omnifaces.component.output.cache.Cache scopedCache = getCacheImpl(context);
+		
+		if (isReset()) {
+			scopedCache.remove(key);
+		}
 
 		String childRendering = scopedCache.get(key);
 
@@ -296,6 +301,14 @@ public class Cache extends OutputFamily {
 
 	public void setUseBuffer(Boolean useBufferValue) {
     	state.put(useBuffer, useBufferValue);
+    }
+	
+	public Boolean isReset() {
+    	return state.get(reset, FALSE);
+    }
+
+	public void setReset(Boolean resetValue) {
+    	state.put(reset, resetValue);
     }
 
 }
