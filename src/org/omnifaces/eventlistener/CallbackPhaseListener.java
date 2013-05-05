@@ -33,7 +33,7 @@ import org.omnifaces.util.Faces;
  * and slightly later for its after phase as compared to phase listeners attached to the view root.
  * <p>
  * Additionally, a phase listener registered via this method will not become part of the view state, but will execute
- * only once. Phase listeners attached to the view root will come back after each postback and have to be remove
+ * only once. Phase listeners attached to the view root will come back after each postback and have to be removed
  * manually (in Mojarra this can be difficult due to the fact iterators over listeners are kept 'open' during each
  * phase).
  *
