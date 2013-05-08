@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2013 OmniFaces.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -22,10 +22,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.faces.model.DataModel;
+
+import org.omnifaces.model.IterableDataModel;
+import org.omnifaces.util.Utils;
+
 /**
  * Collection of EL functions for data conversion.
  *
  * @author Bauke Scholtz
+ * @author Arjan Tijms
  */
 public final class Converters {
 
@@ -68,6 +74,51 @@ public final class Converters {
 		}
 
 		return new ArrayList<Map.Entry<K, V>>(map.entrySet());
+	}
+	
+	/**
+	 * Converts a <code>Iterable&lt;E&gt;</code> to a <code>List&lt;E&gt;</code>. Useful when you want to iterate over an
+	 * <code>Iterable</code>, which includes any type of <code>Collection</code> (which includes e.g. a <code>Set</code>) 
+	 * in for example <code>&lt;ui:repeat&gt;</code> and <code>&lt;h:dataTable&gt;</code>.
+	 * <p>
+	 * When iterating specifically over a Set using the above mentioned components {@link Converters#setToList(Set)} is 
+	 * an alternative to this.
+	 * 
+	 * @param iterable The Iterable to be converted to a List.
+	 * @return The converted List.
+	 * 
+	 * @since 1.5
+	 */
+	public static <E> List<E> iterableToList(Iterable<E> iterable) {
+		if (iterable == null) {
+			return null;
+		}
+		
+		return Utils.iterableToList(iterable);
+	}
+	
+	/**
+	 * Converts an <code>Iterable&lt;E&gt;</code> to a <code>DataModel&lt;E&gt;</code>. Useful when you want to iterate over an
+	 * <code>Iterable</code>, which includes any type of <code>Collection</code> (which includes e.g. a <code>Set</code>) 
+	 * in for example <code>&lt;ui:repeat&gt;</code> and <code>&lt;h:dataTable&gt;</code>.
+	 * <p>
+	 * When iterating specifically over a Set using the above mentioned components {@link Converters#setToList(Set)} is 
+	 * an alternative to this. Use this for more general cases or when the exact collection type is unknown.
+	 * <p>
+	 * For those same components {@link Converters#iterableToList(Iterable))} is another alternative. Use this when
+	 * a DataModel is specifically needed.
+	 * 
+	 * @param iterable The Iterable to be converted to a DataModel.
+	 * @return The converted DataModel.
+	 * 
+	 * @since 1.5
+	 */
+	public static <E> DataModel<E> iterableToModel(Iterable<E> iterable) {
+		if (iterable == null) {
+			return null;
+		}
+		
+		return new IterableDataModel<E>(iterable);
 	}
 
 	/**

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2013 OmniFaces.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -278,6 +279,36 @@ public final class Utils {
 		}
 
 		return Collections.unmodifiableSet(set);
+	}
+	
+	/**
+	 * Converts an iterable into a list.
+	 * <p>
+	 * This method makes NO guarantee to whether changes to the source iterable are
+	 * reflected in the returned list or not. For instance if the given iterable
+	 * already is a list, it's returned directly.
+	 * 
+	 * @param iterable The iterable to be converted.
+	 * @return The list representation of the given iterable, possibly the same instance as that iterable.
+	 * @since 1.5
+	 */
+	public static <T> List<T> iterableToList(Iterable<T> iterable) {
+		
+		List<T> list = null;
+		
+		if (iterable instanceof List) {
+			list = (List<T>) iterable;
+		} else if (iterable instanceof Collection) {
+			list = new ArrayList<T>((Collection<T>) iterable);
+		} else {
+			list = new ArrayList<T>();
+			Iterator<T> iterator = iterable.iterator();
+			while (iterator.hasNext()) {
+				list.add(iterator.next());
+			}
+		}
+		
+		return list;
 	}
 
 	/**

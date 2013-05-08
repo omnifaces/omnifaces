@@ -219,6 +219,30 @@
 		<function-class>org.omnifaces.el.functions.Converters</function-class>
 		<function-signature>java.util.List setToList(java.util.Set)</function-signature>
 	</function>
+	
+	<function>
+		<description>
+			<![CDATA[
+				Converts any iterable, like a Collection or more specifically a Set into a List so it can 
+				be used with components like <code>&lt;ui:repeat&gt;</code> and <code>&lt;h:datatable&gt;</code>.
+			]]>
+		</description>
+		<function-name>iterableToList</function-name>
+		<function-class>org.omnifaces.el.functions.Converters</function-class>
+		<function-signature>java.util.List iterableToList(java.lang.Iterable)</function-signature>
+	</function>
+	
+	<function>
+		<description>
+			<![CDATA[
+				Wraps any iterable, like a Collection or more specifically a Set into a DataModel so it can 
+				be used with components like <code>&lt;ui:repeat&gt;</code> and <code>&lt;h:datatable&gt;</code>.
+			]]>
+		</description>
+		<function-name>iterableToModel</function-name>
+		<function-class>org.omnifaces.el.functions.Converters</function-class>
+		<function-signature>javax.faces.model.DataModel iterableToModel(java.lang.Iterable)</function-signature>
+	</function>
 
 	<function>
 		<description>
