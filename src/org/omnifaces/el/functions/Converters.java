@@ -105,7 +105,7 @@ public final class Converters {
 	 * When iterating specifically over a Set using the above mentioned components {@link Converters#setToList(Set)} is 
 	 * an alternative to this. Use this for more general cases or when the exact collection type is unknown.
 	 * <p>
-	 * For those same components {@link Converters#iterableToList(Iterable))} is another alternative. Use this when
+	 * For those same components {@link Converters#iterableToList(Iterable)} is another alternative. Use this when
 	 * a DataModel is specifically needed.
 	 * 
 	 * @param iterable The Iterable to be converted to a DataModel.
