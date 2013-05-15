@@ -86,6 +86,11 @@ import org.omnifaces.util.Hacks;
  * Exceptions during render response can only be handled when the <code>javax.faces.FACELETS_BUFFER_SIZE</code> is
  * large enough so that the so far rendered response until the occurrence of the exception fits in there and can
  * therefore safely be reset.
+ * <p>
+ * If more fine grained control of determining the root cause of the caught exception and/or the error page is desired,
+ * then the developer can opt to extend this {@link FullAjaxExceptionHandler} and override the
+ * {@link #findExceptionRootCause(FacesContext, Throwable)} and/or
+ * {@link #findErrorPageLocation(FacesContext, Throwable)} methods.
  *
  * @author Bauke Scholtz
  * @see FullAjaxExceptionHandlerFactory
@@ -136,9 +141,8 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	 * Handle the ajax exception as follows, only and only if the current request is an ajax request with an uncommitted
 	 * response and there is at least one unhandled exception:
 	 * <ul>
-	 *   <li>If the exception is an instance of {@link FacesException}, then unwrap its root cause as long as it is not
-	 *       an instance of {@link FacesException}.
-	 *   <li>Find the error page location by {@link WebXml#findErrorPageLocation(Throwable)}.
+	 *   <li>Find the root cause of the exception by {@link #findExceptionRootCause(FacesContext, Throwable)}.
+	 *   <li>Find the error page location based on root cause by {@link #findErrorPageLocation(FacesContext, Throwable)}.
 	 *   <li>Set the standard servlet error request attributes.
 	 *   <li>Force JSF to render the full error page in its entirety.
 	 * </ul>
@@ -167,8 +171,8 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 			unhandledExceptionQueuedEvents.remove();
 
 			// Unwrap the root cause from FacesException and find the associated error page location.
-			exception = Exceptions.unwrap(exception);
-			String errorPageLocation = WebXml.INSTANCE.findErrorPageLocation(exception);
+			exception = findExceptionRootCause(context, exception);
+			String errorPageLocation = findErrorPageLocation(context, exception);
 
 			if (errorPageLocation == null) {
 				// If there's no default error page location, then it's end of story.
@@ -219,6 +223,30 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 			unhandledExceptionQueuedEvents.next();
 			unhandledExceptionQueuedEvents.remove();
 		}
+	}
+
+	/**
+	 * Determine the root cause based on the caught exception, which will then be used to find the error page location.
+	 * The default implementation delegates to {@link Exceptions#unwrap(Throwable)}.
+	 * @param context The involved faces context.
+	 * @param exception The caught exception to determine the root cause for.
+	 * @return The root cause of the caught exception.
+	 * @since 1.5
+	 */
+	protected Throwable findExceptionRootCause(FacesContext context, Throwable exception) {
+		return Exceptions.unwrap(exception);
+	}
+
+	/**
+	 * Determine the error page location based on the given exception.
+	 * The default implementation delegates to {@link WebXml#findErrorPageLocation(Throwable)}.
+	 * @param context The involved faces context.
+	 * @param exception The exception to determine the error page for.
+	 * @return The location of the error page. It must start with <code>/</code> and be relative to the context path.
+	 * @since 1.5
+	 */
+	protected String findErrorPageLocation(FacesContext context, Throwable exception) {
+		return WebXml.INSTANCE.findErrorPageLocation(exception);
 	}
 
 	private void renderErrorPageView(FacesContext context, final HttpServletRequest request, String errorPageLocation)
