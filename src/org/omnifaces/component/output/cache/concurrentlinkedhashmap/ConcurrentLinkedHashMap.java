@@ -1523,6 +1523,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
     return new SerializationProxy<K, V>(this);
   }
 
+  @SuppressWarnings("unused")
   private void readObject(ObjectInputStream stream) throws InvalidObjectException {
     throw new InvalidObjectException("Proxy required");
   }

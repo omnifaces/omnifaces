@@ -142,6 +142,19 @@ public final class Utils {
 	}
 
 	/**
+	 * Returns true if the given string is null or is empty or contains whitespace only. In addition to
+	 * {@link #isEmpty(String)}, this thus also returns <code>true</code> when <code>string.trim().isEmpty()</code>
+	 * returns <code>true</code>.
+	 *
+	 * @param string The string to be checked on blankness.
+	 * @return True if the given string is null or is empty or contains whitespace only.
+	 * @since 1.5
+	 */
+	public static boolean isBlank(String string) {
+		return isEmpty(string) || string.trim().isEmpty();
+	}
+
+	/**
 	 * Returns the first non-<code>null</code> object of the argument list, or <code>null</code> if there is no such
 	 * element.
 	 * @param <T> The generic object type.
