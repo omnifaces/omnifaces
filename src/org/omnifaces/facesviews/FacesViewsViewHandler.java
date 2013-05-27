@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2013 OmniFaces.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -15,11 +15,14 @@ package org.omnifaces.facesviews;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_SERVLET_PATH;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES;
 import static org.omnifaces.facesviews.FacesViews.getFacesServletExtensions;
+import static org.omnifaces.facesviews.FacesViews.getViewHandlerMode;
 import static org.omnifaces.facesviews.FacesViews.isScannedViewsAlwaysExtensionless;
+import static org.omnifaces.facesviews.ViewHandlerMode.STRIP_EXTENSION_FROM_PARENT;
 import static org.omnifaces.util.Faces.getApplicationAttribute;
 import static org.omnifaces.util.Faces.getRequestAttribute;
 import static org.omnifaces.util.ResourcePaths.getExtension;
 import static org.omnifaces.util.ResourcePaths.isExtensionless;
+import static org.omnifaces.util.ResourcePaths.stripExtension;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -28,6 +31,7 @@ import java.util.Set;
 import javax.faces.application.ViewHandler;
 import javax.faces.application.ViewHandlerWrapper;
 import javax.faces.context.FacesContext;
+import javax.servlet.ServletContext;
 
 /**
  * View handler that renders action URL extensionless if the current request is extensionless and the requested resource
@@ -57,11 +61,20 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 			if (isScannedViewsAlwaysExtensionless(context) || isOriginalViewExtensionless(context)) {
 				// User has requested to always render extensionless, or the requested viewId was mapped and the current
 				// request is extensionless, render the action URL extensionless as well.
-				return removeExtension(context, actionURL, viewId);
+				
+				ServletContext servletContext = (ServletContext) context.getExternalContext().getContext();
+				
+				if (servletContext.getMajorVersion() > 2 &&	getViewHandlerMode(servletContext) == STRIP_EXTENSION_FROM_PARENT) {
+					return removeExtension(context, actionURL, viewId);
+				} else {
+					// BUILD_WITH_PARENT_QUERY_PARAMETERS - Idea and code contributed by Radu Creanga
+					// See https://code.google.com/p/omnifaces/issues/detail?id=177
+					return context.getExternalContext().getRequestContextPath() + stripExtension(viewId) + getQueryParameters(actionURL);
+				}
 			}
 		}
 
-		// Not a resource we mapped or not a forwarded one, let the original view handler take care of it.
+		// Not a resource we mapped or not a forwarded one, take the version from the parent view handler
 		return actionURL;
 	}
 	
@@ -98,6 +111,22 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 	    }
 	    
 		return resource;
+	}
+	
+	/**
+	 * Extracts the query string from a resource.
+	 * 
+	 * @param resource
+	 *            A URL string
+	 * @return the query string part of the URL
+	 */
+	public static String getQueryParameters(final String resource) {
+		String queryParameters = "";
+		int questionMarkPos = resource.indexOf('?');
+		if (questionMarkPos != -1) {
+			queryParameters = resource.substring(questionMarkPos);
+		}
+		return queryParameters;
 	}
 
 	@Override

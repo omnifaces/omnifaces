@@ -101,6 +101,13 @@ public final class FacesViews {
 	 * should match before declared filters (false) or after declared filters (true);
 	 */
 	public static final String FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS_PARAM_NAME = "org.omnifaces.FILTER_AFTER_DECLARED_FILTERS";
+	
+	/**
+	 * The name of the boolean init parameter (in web.xml) via which the user can set whether the {@link FacesViewsViewHandler}
+	 * should strip the extension from the parent view handler's outcome or construct the URL itself and only take the query
+	 * parameters (if any) from the parent.
+	 */
+	public static final String FACES_VIEWS_VIEW_HANDLER_MODE_PARAM_NAME = "org.omnifaces.VIEW_HANDLER_MODE";
 
 	/**
 	 * The name of the application scope context parameter under which a Set version of the paths that are to be scanned
@@ -258,6 +265,28 @@ public final class FacesViews {
 				String.format(
 					"Value '%s' is not valid for context parameter for '%s'",
 					dispatchMethodString, FACES_VIEWS_DISPATCH_METHOD_PARAM_NAME
+				)
+			);
+		}
+	}
+	
+	public static ViewHandlerMode getViewHandlerMode(FacesContext context) {
+		return getViewHandlerMode((ServletContext) context.getExternalContext().getContext());
+	}
+	
+	public static ViewHandlerMode getViewHandlerMode(ServletContext servletContext) {
+		String viewHandlerModeString = servletContext.getInitParameter(FACES_VIEWS_VIEW_HANDLER_MODE_PARAM_NAME);
+		if (isEmpty(viewHandlerModeString)) {
+			return ViewHandlerMode.STRIP_EXTENSION_FROM_PARENT;
+		}
+
+		try {
+			return ViewHandlerMode.valueOf(viewHandlerModeString.toUpperCase(US));
+		} catch (Exception e) {
+			throw new IllegalStateException(
+				String.format(
+					"Value '%s' is not valid for context parameter for '%s'",
+					viewHandlerModeString, FACES_VIEWS_VIEW_HANDLER_MODE_PARAM_NAME
 				)
 			);
 		}
