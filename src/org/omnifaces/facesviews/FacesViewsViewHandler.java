@@ -14,13 +14,16 @@ package org.omnifaces.facesviews;
 
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_SERVLET_PATH;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES;
+import static org.omnifaces.facesviews.FacesViews.getFacesServletExtensions;
 import static org.omnifaces.facesviews.FacesViews.isScannedViewsAlwaysExtensionless;
 import static org.omnifaces.util.Faces.getApplicationAttribute;
 import static org.omnifaces.util.Faces.getRequestAttribute;
+import static org.omnifaces.util.ResourcePaths.getExtension;
 import static org.omnifaces.util.ResourcePaths.isExtensionless;
-import static org.omnifaces.util.ResourcePaths.stripExtension;
 
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.faces.application.ViewHandler;
 import javax.faces.application.ViewHandlerWrapper;
@@ -45,6 +48,8 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 
 	@Override
 	public String getActionURL(FacesContext context, String viewId) {
+		
+		String actionURL = super.getActionURL(context, viewId);
 
 		Map<String, String> mappedResources = getApplicationAttribute(context, FACES_VIEWS_RESOURCES);
 		if (mappedResources.containsKey(viewId)) {
@@ -52,12 +57,12 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 			if (isScannedViewsAlwaysExtensionless(context) || isOriginalViewExtensionless(context)) {
 				// User has requested to always render extensionless, or the requested viewId was mapped and the current
 				// request is extensionless, render the action URL extensionless as well.
-				return context.getExternalContext().getRequestContextPath() + stripExtension(viewId);
+				return removeExtension(context, actionURL, viewId);
 			}
 		}
 
 		// Not a resource we mapped or not a forwarded one, let the original view handler take care of it.
-		return super.getActionURL(context, viewId);
+		return actionURL;
 	}
 	
 	private boolean isOriginalViewExtensionless(FacesContext context) {
@@ -67,6 +72,32 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 		}
 		
 		return isExtensionless(originalViewId);
+	}
+	
+	public String removeExtension(FacesContext context, String resource, String viewId) {
+		
+		Set<String> extensions = getFacesServletExtensions(context);
+	    
+	    if (!isExtensionless(viewId)) {
+	    	String viewIdExtension = getExtension(viewId);
+	    	if (!extensions.contains(viewIdExtension)) {
+	    		extensions = new HashSet<String>(extensions);
+	    		extensions.add(viewIdExtension);
+	    	}
+	    }
+	    
+	    int lastSlashPos = resource.lastIndexOf('/');
+	    int lastQuestionMarkPos = resource.lastIndexOf('?'); // so we don't remove "extension" from parameter value
+	    for (String extension : extensions) {
+	    	
+	    	int extensionPos = resource.lastIndexOf(extension);
+	    	if (extensionPos > lastSlashPos && (lastQuestionMarkPos == -1 || extensionPos < lastQuestionMarkPos)) {
+	    		return resource.substring(0, extensionPos) + resource.substring(extensionPos + extension.length());
+	    	}
+	    	
+	    }
+	    
+		return resource;
 	}
 
 	@Override

@@ -120,6 +120,12 @@ public final class FacesViews {
 	 * exensionless init parameter is kept.
 	 */
 	public static final String SCANNED_VIEWS_EXTENSIONLESS = "org.omnifaces.facesviews.scannedviewsextensionless";
+	
+	/**
+	 * The name of the application scope context parameter under which a Set that stores the extensions to which
+	 * the FacesServlet is mapped.
+	 */
+	public static final String FACES_SERVLET_EXTENSIONS = "org.omnifaces.facesviews.facesservletextensions";
 
 	public static final String FACES_VIEWS_RESOURCES = "org.omnifaces.facesviews";
 	public static final String FACES_VIEWS_REVERSE_RESOURCES = "org.omnifaces.facesviews.reverse.resources";
@@ -430,6 +436,32 @@ public final class FacesViews {
 	            }
 	        }
 	    }
+	}
+	
+	public static Set<String> getFacesServletExtensions(FacesContext context) {
+		return getFacesServletExtensions((ServletContext) context.getExternalContext().getContext());
+	}
+	
+	public static Set<String> getFacesServletExtensions(ServletContext servletContext) {
+		
+		@SuppressWarnings("unchecked")
+		Set<String> extensions = (Set<String>) servletContext.getAttribute(FACES_SERVLET_EXTENSIONS);
+		
+		if (extensions == null) {
+			extensions = new HashSet<String>();
+			ServletRegistration facesServletRegistration = getFacesServletRegistration(servletContext);
+		    if (facesServletRegistration != null) {
+		        Collection<String> mappings = facesServletRegistration.getMappings();
+		        for (String mapping : mappings) {
+		        	if (mapping.startsWith("*")) {
+		        		extensions.add(mapping.substring(1));
+		        	}
+		        }
+		    }
+		    servletContext.setAttribute(FACES_SERVLET_EXTENSIONS, unmodifiableSet(extensions));
+		}
+		
+		return extensions;
 	}
 
 	/**
