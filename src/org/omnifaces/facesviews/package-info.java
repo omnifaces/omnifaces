@@ -183,6 +183,16 @@
  * </tr>
  * 
  * <tr>
+ * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_VIEW_HANDLER_MODE_PARAM_NAME}</code></td>
+ * <td>Determines how the {@link org.omnifaces.facesviews.FacesViewsViewHandler} should build the action URL that's used in e.g. forms and links.
+ * Allowed values: {<code>STRIP_EXTENSION_FROM_PARENT</code>, <code>BUILD_WITH_PARENT_QUERY_PARAMETERS</code>}, which have the following meaning:
+ * <code>STRIP_EXTENSION_FROM_PARENT</code> - Strip the extension from the parent view handler's outcome using the at runtime determined extension mapping of the FacesServlet. Requires Servlet 3.0+.
+ * <code>BUILD_WITH_PARENT_QUERY_PARAMETERS</code> - The <code>FacesViewsViewHandler</code> constructs the action URL itself and only takes the query parameters (if any) from the parent view handler outcome. This is mode is automatically selected on Servlet 2.5.
+ * Default: <code>STRIP_EXTENSION_FROM_PARENT</code> on Servlet 3.0+, <code>BUILD_WITH_PARENT_QUERY_PARAMETERS</code> on Servlet 2.5.
+ * </td>
+ * </tr>
+ * 
+ * <tr>
  * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS_PARAM_NAME}</code></td>
  * <td>Used to set whether the {@link org.omnifaces.facesviews.FacesViewsForwardingFilter} should match before declared filters (<code>false</code>) 
  * or after declared filters (<code>true</code>), when automatic scanning and mapping is used (as opposed to manually mapping the Servlet as explained
@@ -210,11 +220,23 @@
  *     &lt;filter-name>FacesViewsForwardingFilter&lt;/filter-name>
  *     &lt;url-pattern>/*&lt;/url-pattern>
  * &lt;/filter-mapping>
+ * 
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.FACES_VIEWS_DISPATCH_METHOD&lt;/param-name&gt;
+ *     &lt;param-value&gt;FORWARD&lt;/param-value&gt;
+ * &lt;/context-param&gt;
  * </pre>
- * <br>
  *
+ * <p>
+ * Note that the <code>FORWARD</code> method has been set. Without that, the FacesServlet has to be mapped manually (also in web.xml) to
+ * each and every view that is used. This is similar to how the welcome file (see below) has to be mapped to the FacesServlet for Servlet
+ * 2.5 users.
+ * </p>
+ *
+ *<p>
  * When an extensionless welcome-file is defined in <code>web.xml</code> (see above), the FacesServlet has to be explicitly mapped
  * to this welcome-file for Servlet 2.5. E.g.
+ * </p>
  *
  * <pre>
  * &lt;welcome-file-list&gt;
