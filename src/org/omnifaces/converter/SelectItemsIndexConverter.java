@@ -103,7 +103,7 @@ public class SelectItemsIndexConverter implements Converter {
 			}
 		}
 
-		return null;
+		return "";
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
