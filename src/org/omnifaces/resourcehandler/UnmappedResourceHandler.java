@@ -29,7 +29,7 @@ import org.omnifaces.util.Utils;
 
 /**
  * The <strong>UnmappedResourceHandler</strong> allows the developer to map JSF resources on an URL pattern of
- * <code>/javax.faces.resource/*</code> without the need for an additional {@link FacesServlet} prefix or suffic URL
+ * <code>/javax.faces.resource/*</code> without the need for an additional {@link FacesServlet} prefix or suffix URL
  * pattern in the default produced resource URLs, such as <code>/javax.faces.resource/faces/css/style.css</code> or
  * <code>/javax.faces.resource/css/style.css.xhtml</code>. This resource handler will produce unmapped URLs like
  * <code>/javax.faces.resource/css/style.css</code>. This has the major advantage that the developer don't need the
@@ -42,6 +42,10 @@ import org.omnifaces.util.Utils;
  *            |-- images
  *            |    `-- background.png
  *            `-- style.css
+ * </pre>
+ * <p>And the following CSS file reference:
+ * <pre>
+ * &lt;h:outputStylesheet name="css/style.css" /&gt;
  * </pre>
  * <p>you can in <code>css/style.css</code> just use:
  * <pre>
