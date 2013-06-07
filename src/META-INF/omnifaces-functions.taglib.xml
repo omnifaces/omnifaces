@@ -59,6 +59,28 @@
 	<function>
 		<description>
 			<![CDATA[
+				Replace all matches of the given pattern on the given string with the given replacement.
+			]]>
+		</description>
+		<function-name>replaceAll</function-name>
+		<function-class>org.omnifaces.el.functions.Strings</function-class>
+		<function-signature>java.lang.String replaceAll(java.lang.String, java.lang.String, java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns true if the given string matches the given pattern.
+			]]>
+		</description>
+		<function-name>matches</function-name>
+		<function-class>org.omnifaces.el.functions.Strings</function-class>
+		<function-signature>java.lang.String matches(java.lang.String, java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
 				URL-prettify the given string. It performs the following tasks:
 				<ul>
 				<li>Lowercase the string.

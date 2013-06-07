@@ -99,6 +99,35 @@ public final class Strings {
 	}
 
 	/**
+	 * Replace all matches of the given pattern on the given string with the given replacement.
+	 * @param value The string to be replaced.
+	 * @param pattern The regular expression pattern to be tested.
+	 * @param replacement The string to be substituted for each match.
+	 * @return True if the given string matches the given pattern.
+	 * @see String#replaceAll(String, String)
+	 * @since 1.5
+	 */
+	public static String replaceAll(String value, String pattern, String replacement) {
+		if (value == null) {
+			return null;
+		}
+
+		return value.replaceAll(pattern, replacement);
+	}
+
+	/**
+	 * Returns true if the given string matches the given pattern.
+	 * @param value The string to be matched.
+	 * @param pattern The regular expression pattern to be tested.
+	 * @return True if the given string matches the given pattern.
+	 * @see String#matches(String)
+	 * @since 1.5
+	 */
+	public static boolean matches(String value, String pattern) {
+		return value != null && value.matches(pattern);
+	}
+
+	/**
 	 * URL-prettify the given string. It performs the following tasks:
 	 * <ul>
 	 * <li>Lowercase the string.
