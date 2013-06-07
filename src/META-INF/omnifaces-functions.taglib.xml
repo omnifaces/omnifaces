@@ -294,6 +294,17 @@
 	<function>
 		<description>
 			<![CDATA[
+				Encode given object as JSON.
+			]]>
+		</description>
+		<function-name>toJson</function-name>
+		<function-class>org.omnifaces.el.functions.Converters</function-class>
+		<function-signature>java.lang.String toJson(java.lang.Object)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
 				Print the stack trace of the given exception.
 			]]>
 		</description>
