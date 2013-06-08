@@ -155,6 +155,42 @@ public final class Utils {
 	}
 
 	/**
+	 * Returns true if the given string is parseable as a number. I.e. it is not null, nor blank and contains solely
+	 * digits. I.e., it won't throw a <code>NumberFormatException</code> when parsing as <code>Long</code>.
+	 * @param string The string to be checked as number.
+	 * @return True if the given string is parseable as a number.
+	 * @since 1.5.
+	 */
+	public static boolean isNumber(String string) {
+		try {
+			// Performance tests taught that this approach is in general faster than regex or char-by-char checking.
+			Long.parseLong(string);
+			return true;
+		}
+		catch (Exception e) {
+			return false;
+		}
+	}
+
+	/**
+	 * Returns true if the given string is parseable as a decimal. I.e. it is not null, nor blank and contains solely
+	 * digits. I.e., it won't throw a <code>NumberFormatException</code> when parsing as <code>Double</code>.
+	 * @param string The string to be checked as decimal.
+	 * @return True if the given string is parseable as a decimal.
+	 * @since 1.5.
+	 */
+	public static boolean isDecimal(String string) {
+		try {
+			// Performance tests taught that this approach is in general faster than regex or char-by-char checking.
+			Double.parseDouble(string);
+			return true;
+		}
+		catch (Exception e) {
+			return false;
+		}
+	}
+
+	/**
 	 * Returns the first non-<code>null</code> object of the argument list, or <code>null</code> if there is no such
 	 * element.
 	 * @param <T> The generic object type.
@@ -293,22 +329,22 @@ public final class Utils {
 
 		return Collections.unmodifiableSet(set);
 	}
-	
+
 	/**
 	 * Converts an iterable into a list.
 	 * <p>
 	 * This method makes NO guarantee to whether changes to the source iterable are
 	 * reflected in the returned list or not. For instance if the given iterable
 	 * already is a list, it's returned directly.
-	 * 
+	 *
 	 * @param iterable The iterable to be converted.
 	 * @return The list representation of the given iterable, possibly the same instance as that iterable.
 	 * @since 1.5
 	 */
 	public static <T> List<T> iterableToList(Iterable<T> iterable) {
-		
+
 		List<T> list = null;
-		
+
 		if (iterable instanceof List) {
 			list = (List<T>) iterable;
 		} else if (iterable instanceof Collection) {
@@ -320,7 +356,7 @@ public final class Utils {
 				list.add(iterator.next());
 			}
 		}
-		
+
 		return list;
 	}
 
