@@ -564,4 +564,87 @@ public final class Utils {
 		}
 	}
 
+	// Escaping/unescaping --------------------------------------------------------------------------------------------
+
+	/**
+	 * Escapes the given string according the JavaScript code rules. This escapes among others the special characters,
+	 * the whitespace, the quotes and the unicode characters. Useful whenever you want to use a Java string variable as
+	 * a JavaScript string variable.
+	 * @param string The string to be escaped according the JavaScript code rules.
+	 * @param escapeSingleQuote Whether to escape single quotes as well or not. Set to <code>false</code> if you want
+	 * to escape it for usage in JSON.
+	 * @return The escaped string according the JavaScript code rules.
+	 */
+	public static String escapeJS(String string, boolean escapeSingleQuote) {
+		if (string == null) {
+			return null;
+		}
+
+		StringBuilder builder = new StringBuilder(string.length());
+
+		for (char c : string.toCharArray()) {
+			if (c > 0xfff) {
+				builder.append("\\u" + Integer.toHexString(c));
+			}
+			else if (c > 0xff) {
+				builder.append("\\u0" + Integer.toHexString(c));
+			}
+			else if (c > 0x7f) {
+				builder.append("\\u00" + Integer.toHexString(c));
+			}
+			else if (c < 32) {
+				switch (c) {
+					case '\b':
+						builder.append('\\').append('b');
+						break;
+					case '\n':
+						builder.append('\\').append('n');
+						break;
+					case '\t':
+						builder.append('\\').append('t');
+						break;
+					case '\f':
+						builder.append('\\').append('f');
+						break;
+					case '\r':
+						builder.append('\\').append('r');
+						break;
+					default:
+						if (c > 0xf) {
+							builder.append("\\u00" + Integer.toHexString(c));
+						}
+						else {
+							builder.append("\\u000" + Integer.toHexString(c));
+						}
+
+						break;
+				}
+			}
+			else {
+				switch (c) {
+					case '\'':
+						if (escapeSingleQuote) {
+							builder.append('\\');
+						}
+						builder.append('\'');
+						break;
+					case '"':
+						builder.append('\\').append('"');
+						break;
+					case '\\':
+						builder.append('\\').append('\\');
+						break;
+					case '/':
+						builder.append('\\').append('/');
+						break;
+					default:
+						builder.append(c);
+						break;
+				}
+			}
+		}
+
+		return builder.toString();
+	}
+
 }

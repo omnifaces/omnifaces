@@ -19,6 +19,7 @@ import java.text.Normalizer;
 import java.text.Normalizer.Form;
 
 import org.omnifaces.util.Faces;
+import org.omnifaces.util.Utils;
 
 /**
  * Collection of EL functions for string manipulation.
@@ -177,72 +178,7 @@ public final class Strings {
 	 * @return The escaped string according the JavaScript code rules.
 	 */
 	public static String escapeJS(String string) {
-		if (string == null) {
-			return null;
-		}
-
-		StringBuilder builder = new StringBuilder(string.length());
-
-		for (char c : string.toCharArray()) {
-			if (c > 0xfff) {
-				builder.append("\\u" + Integer.toHexString(c));
-			}
-			else if (c > 0xff) {
-				builder.append("\\u0" + Integer.toHexString(c));
-			}
-			else if (c > 0x7f) {
-				builder.append("\\u00" + Integer.toHexString(c));
-			}
-			else if (c < 32) {
-				switch (c) {
-					case '\b':
-						builder.append('\\').append('b');
-						break;
-					case '\n':
-						builder.append('\\').append('n');
-						break;
-					case '\t':
-						builder.append('\\').append('t');
-						break;
-					case '\f':
-						builder.append('\\').append('f');
-						break;
-					case '\r':
-						builder.append('\\').append('r');
-						break;
-					default:
-						if (c > 0xf) {
-							builder.append("\\u00" + Integer.toHexString(c));
-						}
-						else {
-							builder.append("\\u000" + Integer.toHexString(c));
-						}
-
-						break;
-				}
-			}
-			else {
-				switch (c) {
-					case '\'':
-						builder.append('\\').append('\'');
-						break;
-					case '"':
-						builder.append('\\').append('"');
-						break;
-					case '\\':
-						builder.append('\\').append('\\');
-						break;
-					case '/':
-						builder.append('\\').append('/');
-						break;
-					default:
-						builder.append(c);
-						break;
-				}
-			}
-		}
-
-		return builder.toString();
+		return Utils.escapeJS(string, true);
 	}
 
 	/**

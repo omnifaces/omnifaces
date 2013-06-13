@@ -22,8 +22,6 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.omnifaces.el.functions.Strings;
-
 /**
  * A simple JSON encoder.
  *
@@ -73,7 +71,7 @@ public final class Json {
 			builder.append(object.toString());
 		}
 		else if (object instanceof CharSequence) {
-			builder.append('"').append(Strings.escapeJS(object.toString())).append('"');
+			builder.append('"').append(Utils.escapeJS(object.toString(), false)).append('"');
 		}
 		else if (object instanceof Date) {
 			builder.append('"').append(Utils.formatRFC1123((Date) object)).append('"');
