@@ -350,7 +350,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 			}
 		}
 
-		// Delegate actions (due to MyFaces issue we can't rely on getWrapped()) --------------------------------------
+		// Delegate actions (due to MyFaces broken ResponseWriterWrapper we can't rely on getWrapped()) ---------------
 
 		@Override
 		public void startError(String errorName) throws IOException {
