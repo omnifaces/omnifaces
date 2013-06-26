@@ -107,7 +107,7 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 
 	@Override
 	public void flushBuffer() throws IOException {
-		if (!isCommitted()) {
+		if (isCommitted()) {
 			super.flushBuffer();
 		}
 	}
