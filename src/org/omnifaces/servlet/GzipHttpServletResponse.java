@@ -106,6 +106,13 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 	}
 
 	@Override
+	public void flushBuffer() throws IOException {
+		if (!isCommitted()) {
+			super.flushBuffer();
+		}
+	}
+
+	@Override
 	public void reset() {
 		super.reset();
 
@@ -158,7 +165,7 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 		// Constructors -----------------------------------------------------------------------------------------------
 
 		public GzipThresholdOutputStream(int threshold) {
-			this.thresholdBuffer = new byte[threshold];
+			thresholdBuffer = new byte[threshold];
 		}
 
 		// Actions ----------------------------------------------------------------------------------------------------
