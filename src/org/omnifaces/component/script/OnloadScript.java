@@ -19,6 +19,7 @@ import javax.faces.FacesException;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
+import javax.faces.context.PartialViewContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.context.ResponseWriterWrapper;
 import javax.faces.event.AbortProcessingException;
@@ -100,7 +101,7 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 
 		FacesContext context = FacesContext.getCurrentInstance();
 
-		if (!context.getPartialViewContext().isAjaxRequest() || !isRendered() || getChildCount() == 0) {
+		if (!shouldEncodeOncomplete(context.getPartialViewContext())) {
 			return;
 		}
 
@@ -142,11 +143,12 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 	}
 
 	/**
-	 * If this component is rendered and there are any children, then start the <code>&lt;script&gt;</code> element.
+	 * If the current request is not an ajax request, and this component is rendered, and there are any children, then
+	 * start the <code>&lt;script&gt;</code> element.
 	 */
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
-		if (context.getPartialViewContext().isAjaxRequest() || !isRendered() || getChildCount() == 0) {
+		if (!shouldEncodeHtml(context.getPartialViewContext())) {
 			return;
 		}
 
@@ -157,16 +159,29 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 	}
 
 	/**
-	 * If this component is rendered and there are any children, then end the <code>&lt;script&gt;</code> element.
+	 * If the current request is not an ajax request, and this component is rendered, and there are any children, then
+	 * end the <code>&lt;script&gt;</code> element.
 	 */
 	@Override
 	public void encodeEnd(FacesContext context) throws IOException {
-		if (context.getPartialViewContext().isAjaxRequest() || !isRendered() || getChildCount() == 0) {
+		if (!shouldEncodeHtml(context.getPartialViewContext())) {
 			return;
 		}
 
 		context.getResponseWriter().endElement("script");
 		popComponentFromEL(context);
+	}
+
+	private boolean shouldEncodeHtml(PartialViewContext pvc) {
+		return shouldEncode() && (!pvc.isAjaxRequest() || pvc.isRenderAll());
+	}
+
+	private boolean shouldEncodeOncomplete(PartialViewContext pvc) {
+		return shouldEncode() && pvc.isAjaxRequest() && !pvc.isRenderAll();
+	}
+
+	private boolean shouldEncode() {
+		return isRendered() && getChildCount() > 0;
 	}
 
 }
