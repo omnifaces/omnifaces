@@ -73,8 +73,19 @@ import org.omnifaces.util.State;
  * &lt;h:message for="baz" /&gt;
  * </pre>
  * <p>
- * The <code>showMessageFor</code> attribute defaults to <code>@this</code>. Other values than <code>@this</code> or
- * <code>@all</code> are not allowed.
+ * The faces message can also be shown for specific components referenced by a space separated collection of their
+ * client IDs in <code>showMessageFor</code> attribute.
+ * <pre>
+ * &lt;o:validateMultipleFields components="foo bar baz" message="This is wrong!" showMessageFor="foo baz" /&gt;
+ * &lt;h:inputText id="foo" /&gt;
+ * &lt;h:message for="foo" /&gt;
+ * &lt;h:inputText id="bar" /&gt;
+ * &lt;h:message for="bar" /&gt;
+ * &lt;h:inputText id="baz" /&gt;
+ * &lt;h:message for="baz" /&gt;
+ * </pre>
+ * <p>
+ * The <code>showMessageFor</code> attribute defaults to <code>@this</code>.
  * <p>
  * The validator can be disabled by the <code>disabled</code> attribute. It accepts a request based EL expression.
  * <pre>
@@ -104,11 +115,9 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	private static final String ERROR_MISSING_COMPONENTS =
 		"%s attribute 'components' must be specified.";
 	private static final String ERROR_UNKNOWN_COMPONENT =
-		"%s attribute 'components' must refer existing client IDs. Client ID '%s' cannot be found.";
+		"%s attribute '%s' must refer existing client IDs. Client ID '%s' cannot be found.";
 	private static final String ERROR_INVALID_COMPONENT =
-		"%s attribute 'components' must refer UIInput client IDs. Client ID '%s' is of type '%s'.";
-	private static final String ERROR_INVALID_SHOWMESSAGEFOR =
-		"%s attribute 'showMessageFor' must be '@this' or '@all'. Encountered invalid value '%s'.";
+		"%s attribute '%s' must refer UIInput client IDs. Client ID '%s' is of type '%s'.";
 
 	private enum PropertyKeys {
 		// Cannot be uppercased. They have to exactly match the attribute names.
@@ -197,18 +206,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 		List<UIInput> inputs = new ArrayList<UIInput>();
 
 		for (String clientId : components.split("\\s+")) {
-			UIComponent found = namingContainerParent.findComponent(clientId);
-
-			if (found == null) {
-				throw new IllegalArgumentException(String.format(
-					ERROR_UNKNOWN_COMPONENT, getClass().getSimpleName(), clientId));
-			}
-			else if (!(found instanceof UIInput)) {
-				throw new IllegalArgumentException(String.format(
-					ERROR_INVALID_COMPONENT, getClass().getSimpleName(), clientId, found.getClass().getName()));
-			}
-
-			UIInput input = (UIInput) found;
+			UIInput input = findInputComponent(namingContainerParent, clientId, PropertyKeys.components);
 
 			if (!Components.isEditable(input)) {
 				continue;
@@ -260,6 +258,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	 * <ul>
 	 * <li><code>@this</code>: message will be added to the <code>&lt;h:message&gt;</code> for this component.
 	 * <li><code>@all</code>: message will be added to all components as specified in <code>components</code> attribute.
+	 * <li>Any other value in a space separated collection will be treated as client ID of {@link UIInput} component.
 	 * </ul>
 	 * @param context The faces context to work with.
 	 * @param inputs The validated input components.
@@ -288,9 +287,28 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 			}
 		}
 		else {
-			throw new IllegalArgumentException(String.format(
-				ERROR_INVALID_SHOWMESSAGEFOR, getClass().getSimpleName(), showMessageFor));
+			UIComponent namingContainerParent = getNamingContainer();
+
+			for (String clientId : showMessageFor.split("\\s+")) {
+				UIInput input = findInputComponent(namingContainerParent, clientId, PropertyKeys.showMessageFor);
+				Messages.addError(input.getClientId(context), message, labels);
+			}
 		}
+	}
+
+	private UIInput findInputComponent(UIComponent parent, String clientId, PropertyKeys property) {
+		UIComponent found = parent.findComponent(clientId);
+
+		if (found == null) {
+			throw new IllegalArgumentException(String.format(
+				ERROR_UNKNOWN_COMPONENT, getClass().getSimpleName(), property, clientId));
+		}
+		else if (!(found instanceof UIInput)) {
+			throw new IllegalArgumentException(String.format(
+				ERROR_INVALID_COMPONENT, getClass().getSimpleName(), property, clientId, found.getClass().getName()));
+		}
+
+		return (UIInput) found;
 	}
 
 	// Attribute getters/setters --------------------------------------------------------------------------------------
@@ -328,16 +346,16 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	}
 
 	/**
-	 * Returns the client identifier to show the validation message for.
-	 * @return The client identifier to show the validation message for.
+	 * Returns the client identifiers to show the validation message for.
+	 * @return The client identifiers to show the validation message for.
 	 */
 	public String getShowMessageFor() {
 		return state.get(PropertyKeys.showMessageFor, DEFAULT_SHOWMESSAGEFOR);
 	}
 
 	/**
-	 * Sets the client identifier to show the validation message for.
-	 * @param showMessageFor The client identifier to show the validation message for.
+	 * Sets the client identifiers to show the validation message for.
+	 * @param showMessageFor The client identifiers to show the validation message for.
 	 */
 	public void setShowMessageFor(String showMessageFor) {
 		state.put(PropertyKeys.showMessageFor, showMessageFor);

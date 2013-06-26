@@ -569,8 +569,19 @@ input.error, select.error, textarea.error {
 &lt;h:message for="baz" /&gt;
 				</pre>
 				<p>
-				The <code>showMessageFor</code> attribute defaults to <code>@this</code>. Other values than
-				<code>@this</code> or <code>@all</code> are not allowed.
+				The faces message can also be shown for specific components referenced by a space separated collection of their
+				client IDs in <code>showMessageFor</code> attribute.
+				<pre>
+&lt;o:validateMultipleFields components="foo bar baz" message="This is wrong!" showMessageFor="foo baz" /&gt;
+&lt;h:inputText id="foo" /&gt;
+&lt;h:message for="foo" /&gt;
+&lt;h:inputText id="bar" /&gt;
+&lt;h:message for="bar" /&gt;
+&lt;h:inputText id="baz" /&gt;
+&lt;h:message for="baz" /&gt;
+				</pre>
+				<p>
+				The <code>showMessageFor</code> attribute defaults to <code>@this</code>.
 				<p>
 				The validator can be disabled by the <code>disabled</code> attribute. It accepts a request based EL expression.
 				<pre>
@@ -649,7 +660,8 @@ input.error, select.error, textarea.error {
 				<![CDATA[
 					The identifier for which this validator should show the message. Defaults to "@this" which is the
 					validator component itself. Other available value is "@all" which will show the message for all of
-					the referenced components.
+					the referenced components. Any other space separated value will be treated as client ID of UI input
+					component.
 				]]>
 			</description>
 			<name>showMessageFor</name>
@@ -741,7 +753,8 @@ input.error, select.error, textarea.error {
 				<![CDATA[
 					The identifier for which this validator should show the message. Defaults to "@this" which is the
 					validator component itself. Other available value is "@all" which will show the message for all of
-					the referenced components.
+					the referenced components. Any other space separated value will be treated as client ID of UI input
+					component.
 				]]>
 			</description>
 			<name>showMessageFor</name>
@@ -832,7 +845,8 @@ input.error, select.error, textarea.error {
 				<![CDATA[
 					The identifier for which this validator should show the message. Defaults to "@this" which is the
 					validator component itself. Other available value is "@all" which will show the message for all of
-					the referenced components.
+					the referenced components. Any other space separated value will be treated as client ID of UI input
+					component.
 				]]>
 			</description>
 			<name>showMessageFor</name>
@@ -923,7 +937,8 @@ input.error, select.error, textarea.error {
 				<![CDATA[
 					The identifier for which this validator should show the message. Defaults to "@this" which is the
 					validator component itself. Other available value is "@all" which will show the message for all of
-					the referenced components.
+					the referenced components. Any other space separated value will be treated as client ID of UI input
+					component.
 				]]>
 			</description>
 			<name>showMessageFor</name>
@@ -1014,7 +1029,8 @@ input.error, select.error, textarea.error {
 				<![CDATA[
 					The identifier for which this validator should show the message. Defaults to "@this" which is the
 					validator component itself. Other available value is "@all" which will show the message for all of
-					the referenced components.
+					the referenced components. Any other space separated value will be treated as client ID of UI input
+					component.
 				]]>
 			</description>
 			<name>showMessageFor</name>
@@ -1105,7 +1121,8 @@ input.error, select.error, textarea.error {
 				<![CDATA[
 					The identifier for which this validator should show the message. Defaults to "@this" which is the
 					validator component itself. Other available value is "@all" which will show the message for all of
-					the referenced components.
+					the referenced components. Any other space separated value will be treated as client ID of UI input
+					component.
 				]]>
 			</description>
 			<name>showMessageFor</name>
@@ -1196,7 +1213,8 @@ input.error, select.error, textarea.error {
 				<![CDATA[
 					The identifier for which this validator should show the message. Defaults to "@this" which is the
 					validator component itself. Other available value is "@all" which will show the message for all of
-					the referenced components.
+					the referenced components. Any other space separated value will be treated as client ID of UI input
+					component.
 				]]>
 			</description>
 			<name>showMessageFor</name>
@@ -1308,7 +1326,8 @@ input.error, select.error, textarea.error {
 				<![CDATA[
 					The identifier for which this validator should show the message. Defaults to "@this" which is the
 					validator component itself. Other available value is "@all" which will show the message for all of
-					the referenced components.
+					the referenced components. Any other space separated value will be treated as client ID of UI input
+					component.
 				]]>
 			</description>
 			<name>showMessageFor</name>
