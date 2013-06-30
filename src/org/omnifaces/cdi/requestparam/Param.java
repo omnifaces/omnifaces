@@ -41,14 +41,14 @@ import javax.inject.Qualifier;
  * <p>
  * Injection should be into a field of type {@link ParamValue&lt;V&gt;}, with <code>V</code> the actual type of the
  * (converted) request parameter.
- * <p> 
- * The following is an example of the injection of a request parameter <code>user</user> following
+ * <p>
+ * The following is an example of the injection of a request parameter <code>user</code> following
  * a request such as <code>http://example.com/mypage?user=100</code>:
- * 
+ *
  * <pre>
- * &#064;Inject &#064;Param(
+ * {@literal @}Inject {@literal @}Param(
  * 	converter="#{userconverter}"
- * 	validator="#{priviledgedUser}"*           
+ * 	validator="#{priviledgedUser}"*
  * )
  * private ParamValue&lt;User&gt; user;
  * </pre>
@@ -56,7 +56,7 @@ import javax.inject.Qualifier;
  * If conversion or validation fails, a {@link ParamValue&lt;V&gt;} is injected, but it will contain a null value. The
  * conversion and validation messages (if any) will be set in the JSF context then, and {@link FacesContext#isValidationFailed()}
  * will return true;
- * 
+ *
  * @since 1.6
  * @author Arjan Tijms
  *
@@ -65,12 +65,12 @@ import javax.inject.Qualifier;
 @Retention(RUNTIME)
 @Target({ TYPE, METHOD, FIELD, PARAMETER })
 public @interface Param {
-	
+
 	/**
-	 * (Optional) The name of the request parameter. If not specified the name of the injection target field will be used. 
+	 * (Optional) The name of the request parameter. If not specified the name of the injection target field will be used.
 	 */
 	@Nonbinding	String name() default "";
-	
+
 	/**
 	 * (Optional/Required) The converter to be used for converting the request parameter to the type that is to be injected.
 	 * Optional if the target type is String, otherwise optional.
@@ -86,10 +86,10 @@ public @interface Param {
      * If this attribute is specified in addition to {@link Param#converterClass()}, this attribute takes precedence.
 	 */
 	@Nonbinding String converter() default "";
-	
+
 	/**
 	 * (Optional) The validators to be used for validating the (converted) request parameter.
-	 * 
+	 *
 	 * <p>
 	 * A validator can be specified in 3 ways:
 	 * <ol>
@@ -104,19 +104,19 @@ public @interface Param {
      * be called first.
 	 */
 	@Nonbinding String[] validators() default {};
-	
+
 	/**
 	 * (Optional) Class of the converter to be used for converting the request parameter to the type that is to be injected.
-	 * 
+	 *
 	 */
 	@Nonbinding Class<? extends Converter> converterClass() default Converter.class;
-	
+
 	/**
 	 * (Optional) Class of one ore more validators to be used for validating the (converted) request parameter.
 	 */
 	@Nonbinding Class<? extends Validator>[] validatorClasses() default {};
-	
-	
+
+
 	/**
 	 * (Optional) Attributes that will be set on the converter instance obtained from {@link Param#converter()} or {@link Param#converterClass()}.
 	 * <p>
@@ -127,7 +127,7 @@ public @interface Param {
 	 * Attributes for which the converter doesn't have a property (setter) are silently ignored.
 	 */
 	@Nonbinding Attribute[] converterAttributes() default {};
-	
+
 	/**
 	 * (Optional) Attributes that will be set on each of the validator instances obtained from {@link Param#validators()()} and {@link Param#validatorClasses()()}.
 	 * <p>
