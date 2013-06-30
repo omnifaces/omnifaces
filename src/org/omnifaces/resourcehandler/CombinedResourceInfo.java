@@ -284,7 +284,7 @@ final class CombinedResourceInfo {
 			}
 		}
 
-		if (param == null || !param.matches("\\d+")) {
+		if (param == null || !param.matches("[0-9]+")) {
 			return defaultValue;
 		}
 		else {

@@ -119,7 +119,7 @@ public class GzipResponseFilter extends HttpFilter {
 		String threshold = getInitParameter(INIT_PARAM_THRESHOLD);
 
 		if (threshold != null) {
-			if (!threshold.matches("\\d{1,4}")) {
+			if (!threshold.matches("[0-9]{1,4}")) {
 				throw new ServletException(String.format(ERROR_THRESHOLD, threshold));
 			}
 			else {
