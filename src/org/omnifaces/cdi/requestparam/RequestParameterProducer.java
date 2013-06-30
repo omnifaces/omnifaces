@@ -43,9 +43,11 @@ import javax.faces.convert.ConverterException;
 import javax.faces.validator.Validator;
 import javax.faces.validator.ValidatorException;
 
+import org.omnifaces.util.Faces;
+
 /**
  * Producer for a request parameter as defined by the {@link Param} annotation.
- * 
+ *
  * @since 1.6
  * @author Arjan Tijms
  */
@@ -73,10 +75,14 @@ public class RequestParameterProducer {
 		boolean valid = true;
 
 		try {
+			if (converter == null) {
+				converter = Faces.getApplication().createConverter(targetType);
+			}
+
 			if (converter != null) {
 				setAttributes(converter, getConverterAttributes(requestParameter));
 				convertedValue = converter.getAsObject(context, component, value);
-			} else if (targetType.equals(String.class)) {
+			} else {
 				convertedValue = value;
 			}
 
