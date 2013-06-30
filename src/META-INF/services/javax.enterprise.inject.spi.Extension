@@ -1,0 +1,2 @@
+org.omnifaces.cdi.converter.ConverterExtension
+org.omnifaces.cdi.validator.ValidatorExtension

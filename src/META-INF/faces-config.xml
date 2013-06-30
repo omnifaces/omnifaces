@@ -21,10 +21,10 @@
 
 	<application>
 		<view-handler>org.omnifaces.viewhandler.RestorableViewHandler</view-handler>
-		 <system-event-listener>
-            <system-event-listener-class>org.omnifaces.eventlistener.VersionLoggerEventListener</system-event-listener-class>
-            <system-event-class>javax.faces.event.PostConstructApplicationEvent</system-event-class>
-        </system-event-listener>
+		<system-event-listener>
+			<system-event-listener-class>org.omnifaces.eventlistener.VersionLoggerEventListener</system-event-listener-class>
+			<system-event-class>javax.faces.event.PostConstructApplicationEvent</system-event-class>
+		</system-event-listener>
 	</application>
 
 	<lifecycle>
@@ -33,6 +33,7 @@
 	</lifecycle>
 
 	<factory>
+		<application-factory>org.omnifaces.application.OmniApplicationFactory</application-factory>
 		<partial-view-context-factory>org.omnifaces.context.OmniPartialViewContextFactory</partial-view-context-factory>
 	</factory>
 
