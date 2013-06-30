@@ -39,7 +39,7 @@ import javax.inject.Qualifier;
  * <p>
  * String values can be injected without a converter, other types need a converter.
  * <p>
- * Injection should be into a field of type {@link ParamValue&lt;V&gt;}, with <code>V</code> the actual type of the
+ * Injection should be into a field of type {@link ParamValue}, with <code>V</code> the actual type of the
  * (converted) request parameter.
  * <p>
  * The following is an example of the injection of a request parameter <code>user</code> following
@@ -53,7 +53,7 @@ import javax.inject.Qualifier;
  * private ParamValue&lt;User&gt; user;
  * </pre>
  * <p>
- * If conversion or validation fails, a {@link ParamValue&lt;V&gt;} is injected, but it will contain a null value. The
+ * If conversion or validation fails, a {@link ParamValue} is injected, but it will contain a null value. The
  * conversion and validation messages (if any) will be set in the JSF context then, and {@link FacesContext#isValidationFailed()}
  * will return true;
  *
