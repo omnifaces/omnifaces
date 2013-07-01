@@ -33,7 +33,7 @@ import javax.faces.validator.Validator;
  * @see ValidatorProvider
  * @since 1.6
  */
-class ValidatorExtension implements Extension {
+public class ValidatorExtension implements Extension {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 

@@ -33,7 +33,7 @@ import javax.faces.convert.FacesConverter;
  * @see ConverterProvider
  * @since 1.6
  */
-class ConverterExtension implements Extension {
+public class ConverterExtension implements Extension {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
