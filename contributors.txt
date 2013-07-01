@@ -1,0 +1,13 @@
+Thanks go to the following people for their contributions in code or otherwise:
+
+Patrick Dobler
+	For his idea and code to convert select items based on the index position of the still available list
+	
+Adrian Gygax
+	For the work on the bean validation event listener
+	
+Radu Creanga
+	For the CDI injection in converters and validators
+	
+Oleg Varaksin
+	For his help with addressing the JUEL method param issue to the JUEL maintainers
