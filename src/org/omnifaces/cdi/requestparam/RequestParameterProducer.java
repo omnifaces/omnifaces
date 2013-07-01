@@ -60,36 +60,29 @@ public class RequestParameterProducer {
 
 		Param requestParameter = getQualifier(injectionPoint, Param.class);
 
-		Class<V> targetType = getTargetType(injectionPoint);
-		String name = getName(requestParameter, injectionPoint);
-		Converter converter = getConverter(requestParameter);
-		List<Validator> validators = getValidators(requestParameter);
-
 		FacesContext context = getContext();
 		UIComponent component = getViewRoot();
 
-		String value = getRequestParameter(name);
-
+		// Get raw submitted value from the request
+		String submittedValue = getRequestParameter(getName(requestParameter, injectionPoint));
 		Object convertedValue = null;
-
 		boolean valid = true;
 
 		try {
-			if (converter == null) {
-				converter = Faces.getApplication().createConverter(targetType);
-			}
-
+			
+			// Convert the submitted value
+			
+			Converter converter = getConverter(requestParameter, getTargetType(injectionPoint));
 			if (converter != null) {
-				setAttributes(converter, getConverterAttributes(requestParameter));
-				convertedValue = converter.getAsObject(context, component, value);
+				convertedValue = converter.getAsObject(context, component, submittedValue);
 			} else {
-				convertedValue = value;
+				convertedValue = submittedValue;
 			}
 
-			Map<String, Object> validatorAttributes = getValidatorAttributes(requestParameter);
-			for (Validator validator : validators) {
+			// Validate the converted value
+			
+			for (Validator validator : getValidators(requestParameter)) {
 				try {
-					setAttributes(validator, validatorAttributes);
 					validator.validate(context, component, convertedValue);
 				} catch (ValidatorException ve) {
 					valid = false;
@@ -104,7 +97,7 @@ public class RequestParameterProducer {
 			FacesMessage message = ce.getFacesMessage();
 			if (message == null) {
 				// If the converter didn't add a FacesMessage, set a generic one.
-				message = createError("Conversion failed for {0} because: {1}", value, ce.getMessage());
+				message = createError("Conversion failed for {0} because: {1}", submittedValue, ce.getMessage());
 			}
 
 			context.addMessage(component.getClientId(context), message);
@@ -139,25 +132,37 @@ public class RequestParameterProducer {
 		return name;
 	}
 
-	private Converter getConverter(Param requestParameter) {
+	private Converter getConverter(Param requestParameter, Class<?> targetType) {
 
 		Class<? extends Converter> converterClass = requestParameter.converterClass();
 		String converterName = requestParameter.converter();
+		
+		Converter converter = null;
 
 		if (!isEmpty(converterName)) {
-			Object converter = evaluateExpressionGet(converterName);
-			if (converter instanceof Converter) {
-				return (Converter) converter;
-			} else if (converter instanceof String) {
-				return getApplication().createConverter((String) converter);
+			Object expressionResult = evaluateExpressionGet(converterName);
+			if (expressionResult instanceof Converter) {
+				converter = (Converter) expressionResult;
+			} else if (expressionResult instanceof String) {
+				converter = getApplication().createConverter((String) expressionResult);
+			}
+		} else if (!converterClass.equals(Converter.class)) { // Converter.cass is default, representing null
+			converter = instance(converterClass);
+		}
+		
+		if (converter == null) {
+			try {
+				converter = Faces.getApplication().createConverter(targetType);
+			} catch (Exception e) {
+				return null;
 			}
 		}
-
-		if (!converterClass.equals(Converter.class)) {
-			return instance(converterClass);
+		
+		if (converter != null) {
+			setAttributes(converter, getConverterAttributes(requestParameter));
 		}
-
-		return null;
+		
+		return converter;
 	}
 
 	private List<Validator> getValidators(Param requestParameter) {
@@ -178,6 +183,13 @@ public class RequestParameterProducer {
 
 		for (Class<? extends Validator> validatorClass : validatorClasses) {
 			validators.add(instance(validatorClass));
+		}
+		
+		// Set the attributes on all instantiated validators. We don't distinguish here
+		// which attribute should go to which validator.
+		Map<String, Object> validatorAttributes = getValidatorAttributes(requestParameter);
+		for (Validator validator : validators) {
+			setAttributes(validator, validatorAttributes);
 		}
 
 		return validators;
