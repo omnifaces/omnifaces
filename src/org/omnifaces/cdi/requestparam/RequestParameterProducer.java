@@ -94,13 +94,7 @@ public class RequestParameterProducer {
 			}
 		} catch (ConverterException ce) {
 			valid = false;
-			FacesMessage message = ce.getFacesMessage();
-			if (message == null) {
-				// If the converter didn't add a FacesMessage, set a generic one.
-				message = createError("Conversion failed for {0} because: {1}", submittedValue, ce.getMessage());
-			}
-
-			context.addMessage(component.getClientId(context), message);
+			addConverterMessage(context, component, submittedValue, ce, requestParameter.converterMessage());
 		}
 
 		if (!valid) {
@@ -131,7 +125,7 @@ public class RequestParameterProducer {
 
 		return name;
 	}
-
+	
 	private Converter getConverter(Param requestParameter, Class<?> targetType) {
 
 		Class<? extends Converter> converterClass = requestParameter.converterClass();
@@ -247,6 +241,22 @@ public class RequestParameterProducer {
 		} catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
+	}
+	
+	private void addConverterMessage( FacesContext context, UIComponent component, String submittedValue, ConverterException ce, String converterMessage) {
+		FacesMessage message = null;
+		
+		if (!isEmpty(converterMessage)) {
+			message = createError(converterMessage, submittedValue);
+		} else {
+			message = ce.getFacesMessage();
+			if (message == null) {
+				// If the converter didn't add a FacesMessage, set a generic one.
+				message = createError("Conversion failed for {0} because: {1}", submittedValue, ce.getMessage());
+			}
+		}
+
+		context.addMessage(component.getClientId(context), message);
 	}
 
 	private static <T> T instance(Class<T> clazz) {

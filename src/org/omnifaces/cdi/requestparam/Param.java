@@ -73,7 +73,7 @@ public @interface Param {
 
 	/**
 	 * (Optional/Required) The converter to be used for converting the request parameter to the type that is to be injected.
-	 * Optional if the target type is String, otherwise optional.
+	 * Optional if the target type is String, otherwise required.
 	 * <p>
 	 * A converter can be specified in 3 ways:
 	 * <ol>
@@ -122,7 +122,7 @@ public @interface Param {
 	 * <p>
 	 * For each attribute the converter instance should have a writable JavaBeans property with the same name. The value can be a string literal
 	 * or an EL expression. String literals are coerced if necessary if there's a {@link PropertyEditor} available (the JDK provides these for
-	 * the primitive types are their corresponding boxed types).
+	 * the primitive types and their corresponding boxed types).
 	 * <p>
 	 * Attributes for which the converter doesn't have a property (setter) are silently ignored.
 	 */
@@ -133,9 +133,16 @@ public @interface Param {
 	 * <p>
 	 * For each attribute the validator instances should have a writable JavaBeans property with the same name. The value can be a string literal
 	 * or an EL expression. String literals are coerced if necessary if there's a {@link PropertyEditor} available (the JDK provides these for
-	 * the primitive types are their corresponding boxed types).
+	 * the primitive types and their corresponding boxed types).
 	 * <p>
 	 * Attributes for which any given validator doesn't have a property (setter) are silently ignored.
 	 */
 	@Nonbinding Attribute[] validatorAttributes() default {};
+	
+	@Nonbinding String converterMessage() default "";
+	
+	@Nonbinding String validatorMessage() default "";
+	
+	@Nonbinding String requiredMessage() default "";
+	
 }
