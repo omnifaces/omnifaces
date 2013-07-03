@@ -145,8 +145,22 @@ public @interface Param {
 	 */
 	@Nonbinding Attribute[] validatorAttributes() default {};
 	
+	/**
+	 * (Optional) A message that will be used if conversion fails instead of the message set by the converter.
+	 * <p>
+	 * The value for which conversion failed is available as <code>{0}</code>. The label associated with this
+	 * parameter value (see the {@link Param#label()} attribute) is available as <code>{1}</code>.
+	 * 
+	 */
 	@Nonbinding String converterMessage() default "";
 	
+	/**
+	 * (Optional) A message that will be used if validation fails instead of the message set by the validator(s).
+	 * <p>
+	 * The value for which validation failed is available as <code>{0}</code>. The label associated with this
+	 * parameter value (see the {@link Param#label()} attribute) is available as <code>{1}</code>.
+	 * 
+	 */
 	@Nonbinding String validatorMessage() default "";
 	
 	@Nonbinding String requiredMessage() default "";

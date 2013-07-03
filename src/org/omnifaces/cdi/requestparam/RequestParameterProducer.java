@@ -64,8 +64,10 @@ public class RequestParameterProducer {
 		FacesContext context = getContext();
 		UIComponent component = getViewRoot();
 		
+		String label = getLabel(requestParameter, injectionPoint);
+		
 		// TODO: Save/restore existing potentially existing label?
-		component.getAttributes().put("label", getLabel(requestParameter, injectionPoint));
+		component.getAttributes().put("label", label);
 
 		// Get raw submitted value from the request
 		String submittedValue = getRequestParameter(getName(requestParameter, injectionPoint));
@@ -90,12 +92,12 @@ public class RequestParameterProducer {
 					validator.validate(context, component, convertedValue);
 				} catch (ValidatorException ve) {
 					valid = false;
-					addValidatorMessages(context, component, submittedValue, ve, requestParameter.validatorMessage());
+					addValidatorMessages(context, component, label, submittedValue, ve, requestParameter.validatorMessage());
 				}
 			}
 		} catch (ConverterException ce) {
 			valid = false;
-			addConverterMessage(context, component, submittedValue, ce, requestParameter.converterMessage());
+			addConverterMessage(context, component, label, submittedValue, ce, requestParameter.converterMessage());
 		}
 
 		if (!valid) {
@@ -256,11 +258,11 @@ public class RequestParameterProducer {
 		}
 	}
 	
-	private void addConverterMessage(FacesContext context, UIComponent component, String submittedValue, ConverterException ce,	String converterMessage) {
+	private void addConverterMessage(FacesContext context, UIComponent component, String label, String submittedValue, ConverterException ce,	String converterMessage) {
 		FacesMessage message = null;
 
 		if (!isEmpty(converterMessage)) {
-			message = createError(converterMessage, submittedValue);
+			message = createError(converterMessage, submittedValue, label);
 		} else {
 			message = ce.getFacesMessage();
 			if (message == null) {
@@ -272,12 +274,12 @@ public class RequestParameterProducer {
 		context.addMessage(component.getClientId(context), message);
 	}
 	
-	private void addValidatorMessages(FacesContext context, UIComponent component, String submittedValue, ValidatorException ve, String validatorMessage) {
+	private void addValidatorMessages(FacesContext context, UIComponent component, String label, String submittedValue, ValidatorException ve, String validatorMessage) {
 		
 		String clientId = component.getClientId(context);
 		
 		if (!isEmpty(validatorMessage)) {
-			context.addMessage(clientId, createError(validatorMessage, submittedValue));
+			context.addMessage(clientId, createError(validatorMessage, submittedValue, label));
 		} else {
 			for (FacesMessage facesMessage : getFacesMessages(ve)) {
 				context.addMessage(clientId, facesMessage);
