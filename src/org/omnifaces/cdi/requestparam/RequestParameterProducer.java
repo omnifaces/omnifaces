@@ -58,10 +58,14 @@ public class RequestParameterProducer {
 	@Param
 	public <V> ParamValue<V> produce(InjectionPoint injectionPoint) {
 
+		// @Param is the annotation on the injection point that holds all data for this request parameter
 		Param requestParameter = getQualifier(injectionPoint, Param.class);
 
 		FacesContext context = getContext();
 		UIComponent component = getViewRoot();
+		
+		// TODO: Save/restore existing potentially existing label?
+		component.getAttributes().put("label", getLabel(requestParameter, injectionPoint));
 
 		// Get raw submitted value from the request
 		String submittedValue = getRequestParameter(getName(requestParameter, injectionPoint));
@@ -86,10 +90,7 @@ public class RequestParameterProducer {
 					validator.validate(context, component, convertedValue);
 				} catch (ValidatorException ve) {
 					valid = false;
-					String clientId = component.getClientId(context);
-					for (FacesMessage facesMessage : getFacesMessages(ve)) {
-						context.addMessage(clientId, facesMessage);
-					}
+					addValidatorMessages(context, component, submittedValue, ve, requestParameter.validatorMessage());
 				}
 			}
 		} catch (ConverterException ce) {
@@ -125,6 +126,18 @@ public class RequestParameterProducer {
 
 		return name;
 	}
+	
+	private String getLabel(Param requestParameter, InjectionPoint injectionPoint) {
+		
+		String label = requestParameter.label();
+		
+		if (isEmpty(label)) {
+			label = getName(requestParameter, injectionPoint);
+		}
+		
+		return label;
+	}
+	
 	
 	private Converter getConverter(Param requestParameter, Class<?> targetType) {
 
@@ -243,9 +256,9 @@ public class RequestParameterProducer {
 		}
 	}
 	
-	private void addConverterMessage( FacesContext context, UIComponent component, String submittedValue, ConverterException ce, String converterMessage) {
+	private void addConverterMessage(FacesContext context, UIComponent component, String submittedValue, ConverterException ce,	String converterMessage) {
 		FacesMessage message = null;
-		
+
 		if (!isEmpty(converterMessage)) {
 			message = createError(converterMessage, submittedValue);
 		} else {
@@ -257,6 +270,19 @@ public class RequestParameterProducer {
 		}
 
 		context.addMessage(component.getClientId(context), message);
+	}
+	
+	private void addValidatorMessages(FacesContext context, UIComponent component, String submittedValue, ValidatorException ve, String validatorMessage) {
+		
+		String clientId = component.getClientId(context);
+		
+		if (!isEmpty(validatorMessage)) {
+			context.addMessage(clientId, createError(validatorMessage, submittedValue));
+		} else {
+			for (FacesMessage facesMessage : getFacesMessages(ve)) {
+				context.addMessage(clientId, facesMessage);
+			}
+		}
 	}
 
 	private static <T> T instance(Class<T> clazz) {

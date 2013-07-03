@@ -70,6 +70,12 @@ public @interface Param {
 	 * (Optional) The name of the request parameter. If not specified the name of the injection target field will be used.
 	 */
 	@Nonbinding	String name() default "";
+	
+	/**
+	 * (Optional) the label used to refer to the request parameter. If not specified the name of the request parameter.
+	 * 
+	 */
+	@Nonbinding	String label() default "";
 
 	/**
 	 * (Optional/Required) The converter to be used for converting the request parameter to the type that is to be injected.
