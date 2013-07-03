@@ -92,12 +92,12 @@ public class RequestParameterProducer {
 					validator.validate(context, component, convertedValue);
 				} catch (ValidatorException ve) {
 					valid = false;
-					addValidatorMessages(context, component, label, submittedValue, ve, requestParameter.validatorMessage());
+					addValidatorMessages(context, component, label, submittedValue, ve, getValidatorMessage(requestParameter));
 				}
 			}
 		} catch (ConverterException ce) {
 			valid = false;
-			addConverterMessage(context, component, label, submittedValue, ce, requestParameter.converterMessage());
+			addConverterMessage(context, component, label, submittedValue, ce, getConverterMessage(requestParameter));
 		}
 
 		if (!valid) {
@@ -124,6 +124,8 @@ public class RequestParameterProducer {
 
 		if (isEmpty(name)) {
 			name = injectionPoint.getMember().getName();
+		} else {
+			name = evaluateExpressionAsString(name);
 		}
 
 		return name;
@@ -135,9 +137,34 @@ public class RequestParameterProducer {
 		
 		if (isEmpty(label)) {
 			label = getName(requestParameter, injectionPoint);
+		} else {
+			label = evaluateExpressionAsString(label);
 		}
 		
 		return label;
+	}
+	
+	private String getValidatorMessage(Param requestParameter) {
+		return evaluateExpressionAsString(requestParameter.validatorMessage());
+	}
+	
+	private String getConverterMessage(Param requestParameter) {
+		return evaluateExpressionAsString(requestParameter.converterMessage());
+	}
+	
+	private String evaluateExpressionAsString(String expression) {
+		
+		if (isEmpty(expression)) {
+			return expression;
+		}
+		
+		Object expressionResult = evaluateExpressionGet(expression);
+		
+		if (expressionResult == null) {
+			return null;
+		}
+		
+		return expressionResult.toString();
 	}
 	
 	
