@@ -196,7 +196,8 @@ public class UnmappedResourceHandler extends ResourceHandlerWrapper {
 		ExternalContext externalContext = context.getExternalContext();
 		String resourceName = externalContext.getRequestPathInfo();
 		String libraryName = externalContext.getRequestParameterMap().get("ln");
-		Resource resource = context.getApplication().getResourceHandler().createResource(resourceName, libraryName);
+		Resource resource = context.getApplication().getResourceHandler().createResource(
+			resourceName != null ? resourceName.substring(1) : null, libraryName);
 
 		if (resource == null) {
 			super.handleResourceRequest(context);
