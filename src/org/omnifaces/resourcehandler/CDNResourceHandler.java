@@ -27,8 +27,7 @@ import org.omnifaces.util.Utils;
 /**
  * This {@link ResourceHandler} implementation allows the developer to provide CDN URLs instead of the default local
  * URLs for JSF resources as provided by <code>&lt;h:outputScript&gt;</code>, <code>&lt;h:outputStylesheet&gt;</code>
- * and <code>&lt;h:graphicImage&gt;</code> when the current JSF project stage is <strong>not</strong> set to
- * <code>Development</code>.
+ * and <code>&lt;h:graphicImage&gt;</code>.
  * <p>
  * To get it to run, this handler needs be registered as follows in <code>faces-config.xml</code>:
  * <pre>
@@ -36,6 +35,8 @@ import org.omnifaces.util.Utils;
  *   &lt;resource-handler&gt;org.omnifaces.resourcehandler.CDNResourceHandler&lt;/resource-handler&gt;
  * &lt;/application&gt;
  * </pre>
+ * <p>
+ * By default, it runs only when the current JSF project stage is <strong>not</strong> set to <code>Development</code>.
  * <h3>Configuration</h3>
  * <p>
  * To configure the CDN URLs, a {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_RESOURCES}
@@ -63,7 +64,7 @@ import org.omnifaces.util.Utils;
  * &lt;h:graphicImage name="images/logo.png" /&gt;
  * </pre>
  * <p>
- * Will during <strong>non</strong>-<code>Development</code> stage be rendered as:
+ * Will be rendered as:
  * <pre>
  * &lt;script type="text/javascript" src="http://cdn.example.com/js/script1.js"&gt;&lt;/script&gt;
  * &lt;script type="text/javascript" src="http://cdn.example.com/somelib/js/script2.js"&gt;&lt;/script&gt;
@@ -77,12 +78,21 @@ import org.omnifaces.util.Utils;
  * <pre>
  * javax.faces:jsf.js=http://cdn.example.com/jsf.js
  * </pre>
+ * <p>
+ * When you need to run it during <code>Development</code> stage as well, then set the context parameter
+ * {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_DEV_STAGE} to <code>true</code>.
+ * <pre>
+ * &lt;context-param&gt;
+ *   &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_ALWAYS_ENABLED&lt;/param-name&gt;
+ *   &lt;param-value&gt;true&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * </pre>
+ *
  * <h3>CombinedResourceHandler</h3>
  * <p>
  * If you're also using the {@link CombinedResourceHandler}, then you need to understand that CDN resources can
  * simply not be combined, as that would defeat the CDN purpose. The {@link CombinedResourceHandler} will therefore
- * automatically exclude all CDN resources from combining when the current JSF project stage is <strong>not</strong>
- * set to <code>Development</code>.
+ * automatically exclude all CDN resources from combining.
  *
  * @author Bauke Scholtz
  * @since 1.2
@@ -93,6 +103,12 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 
 	/** The context parameter name to specify CDN URLs for the given resource identifiers. */
 	public static final String PARAM_NAME_CDN_RESOURCES = "org.omnifaces.CDN_RESOURCE_HANDLER_URLS";
+
+	/**
+	 * The context parameter name to tell CDN resource handler to run during development stage as well.
+	 * @since 1.6
+	 */
+	public static final String PARAM_NAME_CDN_DEV_STAGE = "org.omnifaces.CDN_RESOURCE_HANDLER_ALWAYS_ENABLED";
 
 	private static final String ERROR_MISSING_INIT_PARAM =
 		"Context parameter '" + PARAM_NAME_CDN_RESOURCES + "' is missing in web.xml or web-fragment.xml.";
@@ -117,7 +133,7 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 	public CDNResourceHandler(ResourceHandler wrapped) {
 		this.wrapped = wrapped;
 
-		if (!Faces.isDevelopment()) {
+		if (!Faces.isDevelopment() || "true".equals(Faces.getInitParameter(PARAM_NAME_CDN_DEV_STAGE))) {
 			cdnResources = initCDNResources();
 
 			if (cdnResources == null) {
@@ -155,16 +171,11 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 	 */
 	@Override
 	public Resource createResource(String resourceName, String libraryName, String contentType) {
-		final Resource resource = wrapped.createResource(resourceName, libraryName, contentType);
-
-		if (resource == null  || cdnResources == null) {
-			return resource;
-		}
-
-		final String requestPath = cdnResources.get(new ResourceIdentifier(libraryName, resourceName));
+		final String requestPath = (cdnResources == null) ? null :
+			cdnResources.get(new ResourceIdentifier(libraryName, resourceName));
 
 		if (requestPath == null) {
-			return resource;
+			return getWrapped().createResource(resourceName, libraryName, contentType);
 		}
 
 		return new ResourceWrapper() {
@@ -176,7 +187,7 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 
 			@Override
 			public Resource getWrapped() {
-				return resource;
+				return null;
 			}
 		};
 	}
