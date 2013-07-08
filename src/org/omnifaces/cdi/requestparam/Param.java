@@ -25,8 +25,11 @@ import java.lang.annotation.Target;
 import javax.enterprise.util.Nonbinding;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
+import javax.faces.validator.RequiredValidator;
 import javax.faces.validator.Validator;
 import javax.inject.Qualifier;
+
+import org.omnifaces.util.Utils;
 
 
 /**
@@ -92,6 +95,14 @@ public @interface Param {
      * If this attribute is specified in addition to {@link Param#converterClass()}, this attribute takes precedence.
 	 */
 	@Nonbinding String converter() default "";
+	
+	/**
+	 * (Optional) Flag indicating if this request parameter is required (must be present) or not. The required check is done
+	 * after conversion and before validation. A value is said to be not present if it turns out to be empty according to 
+	 * the semantics of {@link Utils#isEmpty(Object)}.
+	 * 
+	 */
+	@Nonbinding boolean required() default false;
 
 	/**
 	 * (Optional) The validators to be used for validating the (converted) request parameter.
@@ -121,7 +132,6 @@ public @interface Param {
 	 * (Optional) Class of one ore more validators to be used for validating the (converted) request parameter.
 	 */
 	@Nonbinding Class<? extends Validator>[] validatorClasses() default {};
-
 
 	/**
 	 * (Optional) Attributes that will be set on the converter instance obtained from {@link Param#converter()} or {@link Param#converterClass()}.
@@ -163,6 +173,14 @@ public @interface Param {
 	 */
 	@Nonbinding String validatorMessage() default "";
 	
+	/**
+	 * (Optional) A message that will be used if a non-empty value is submitted instead of the default message associated
+	 * with the {@link RequiredValidator}.
+	 * <p>
+	 * The (empty) value for which the required check failed is available as <code>{0}</code>. (this will be either null or the empty string) 
+	 * The label associated with this parameter value (see the {@link Param#label()} attribute) is available as <code>{1}</code>.
+	 * 
+	 */
 	@Nonbinding String requiredMessage() default "";
 	
 }

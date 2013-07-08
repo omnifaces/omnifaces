@@ -40,6 +40,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
+import javax.faces.validator.RequiredValidator;
 import javax.faces.validator.Validator;
 import javax.faces.validator.ValidatorException;
 
@@ -83,6 +84,12 @@ public class RequestParameterProducer {
 				convertedValue = converter.getAsObject(context, component, submittedValue);
 			} else {
 				convertedValue = submittedValue;
+			}
+			
+			// Check for required
+			
+			if (requestParameter.required() && isEmpty(convertedValue)) {
+				addRequiredMessage(context, component, label, submittedValue, getRequiredMessage(requestParameter));
 			}
 
 			// Validate the converted value
@@ -150,6 +157,10 @@ public class RequestParameterProducer {
 	
 	private String getConverterMessage(Param requestParameter) {
 		return evaluateExpressionAsString(requestParameter.converterMessage());
+	}
+	
+	private String getRequiredMessage(Param requestParameter) {
+		return evaluateExpressionAsString(requestParameter.requiredMessage());
 	}
 	
 	private String evaluateExpressionAsString(String expression) {
@@ -285,7 +296,7 @@ public class RequestParameterProducer {
 		}
 	}
 	
-	private void addConverterMessage(FacesContext context, UIComponent component, String label, String submittedValue, ConverterException ce,	String converterMessage) {
+	private void addConverterMessage(FacesContext context, UIComponent component, String label, String submittedValue, ConverterException ce, String converterMessage) {
 		FacesMessage message = null;
 
 		if (!isEmpty(converterMessage)) {
@@ -298,6 +309,32 @@ public class RequestParameterProducer {
 			}
 		}
 
+		context.addMessage(component.getClientId(context), message);
+	}
+	
+	private void addRequiredMessage(FacesContext context, UIComponent component, String label, String submittedValue, String requiredMessage) {
+		
+		FacesMessage message = null;
+
+		if (!isEmpty(requiredMessage)) {
+			message = createError(requiredMessage, submittedValue, label);
+		} else {
+			// Use RequiredValidator to get the same message that all required attributes are using.
+			// TODO: this is a little convoluted :X
+			try {
+				new RequiredValidator().validate(context, component, submittedValue);
+			} catch (ValidatorException ve) {
+				message = ve.getFacesMessage();
+			}
+			
+			if (message == null) {
+				// RequiredValidator didn't throw or its exception did not have a message set.
+				// Use a generic fallback message
+				// TODO: Use OmniFaces resource bundle to override this globally
+				message = createError("{0}: A value is required!", label);
+			}
+		}
+		
 		context.addMessage(component.getClientId(context), message);
 	}
 	
