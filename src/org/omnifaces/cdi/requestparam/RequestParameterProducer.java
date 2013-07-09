@@ -20,6 +20,7 @@ import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getRequestParameter;
 import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.Messages.createError;
+import static org.omnifaces.util.Platform.getBeanValidator;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.beans.PropertyDescriptor;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
@@ -43,6 +45,7 @@ import javax.faces.convert.ConverterException;
 import javax.faces.validator.RequiredValidator;
 import javax.faces.validator.Validator;
 import javax.faces.validator.ValidatorException;
+import javax.validation.ConstraintViolation;
 
 import org.omnifaces.util.Faces;
 
@@ -94,6 +97,17 @@ public class RequestParameterProducer {
 
 			// Validate the converted value
 			
+			// 1. Use Bean Validation validators
+			@SuppressWarnings("rawtypes")
+			Set violationsr = getBeanValidator().validateValue(injectionPoint.getBean().getBeanClass(), injectionPoint.getMember().getName(), convertedValue);
+			
+			Set<ConstraintViolation<?>> violations = (Set<ConstraintViolation<?>>) violationsr;
+			
+			for (ConstraintViolation<?> violation : violations) {
+				context.addMessage(component.getClientId(context), createError(violation.getMessage(), label));
+			}
+			
+			// 2. Use JSF native validators
 			for (Validator validator : getValidators(requestParameter)) {
 				try {
 					validator.validate(context, component, convertedValue);
