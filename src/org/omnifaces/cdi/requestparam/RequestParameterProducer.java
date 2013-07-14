@@ -20,6 +20,7 @@ import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getRequestParameter;
 import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.Messages.createError;
+import static org.omnifaces.util.Platform.getBeanValidator;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.beans.PropertyDescriptor;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
@@ -40,8 +42,10 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
+import javax.faces.validator.RequiredValidator;
 import javax.faces.validator.Validator;
 import javax.faces.validator.ValidatorException;
+import javax.validation.ConstraintViolation;
 
 import org.omnifaces.util.Faces;
 
@@ -84,9 +88,26 @@ public class RequestParameterProducer {
 			} else {
 				convertedValue = submittedValue;
 			}
+			
+			// Check for required
+			
+			if (requestParameter.required() && isEmpty(convertedValue)) {
+				addRequiredMessage(context, component, label, submittedValue, getRequiredMessage(requestParameter));
+			}
 
 			// Validate the converted value
 			
+			// 1. Use Bean Validation validators
+			@SuppressWarnings("rawtypes")
+			Set violationsr = getBeanValidator().validateValue(injectionPoint.getBean().getBeanClass(), injectionPoint.getMember().getName(), convertedValue);
+			
+			Set<ConstraintViolation<?>> violations = (Set<ConstraintViolation<?>>) violationsr;
+			
+			for (ConstraintViolation<?> violation : violations) {
+				context.addMessage(component.getClientId(context), createError(violation.getMessage(), label));
+			}
+			
+			// 2. Use JSF native validators
 			for (Validator validator : getValidators(requestParameter)) {
 				try {
 					validator.validate(context, component, convertedValue);
@@ -150,6 +171,10 @@ public class RequestParameterProducer {
 	
 	private String getConverterMessage(Param requestParameter) {
 		return evaluateExpressionAsString(requestParameter.converterMessage());
+	}
+	
+	private String getRequiredMessage(Param requestParameter) {
+		return evaluateExpressionAsString(requestParameter.requiredMessage());
 	}
 	
 	private String evaluateExpressionAsString(String expression) {
@@ -285,7 +310,7 @@ public class RequestParameterProducer {
 		}
 	}
 	
-	private void addConverterMessage(FacesContext context, UIComponent component, String label, String submittedValue, ConverterException ce,	String converterMessage) {
+	private void addConverterMessage(FacesContext context, UIComponent component, String label, String submittedValue, ConverterException ce, String converterMessage) {
 		FacesMessage message = null;
 
 		if (!isEmpty(converterMessage)) {
@@ -298,6 +323,32 @@ public class RequestParameterProducer {
 			}
 		}
 
+		context.addMessage(component.getClientId(context), message);
+	}
+	
+	private void addRequiredMessage(FacesContext context, UIComponent component, String label, String submittedValue, String requiredMessage) {
+		
+		FacesMessage message = null;
+
+		if (!isEmpty(requiredMessage)) {
+			message = createError(requiredMessage, submittedValue, label);
+		} else {
+			// Use RequiredValidator to get the same message that all required attributes are using.
+			// TODO: this is a little convoluted :X
+			try {
+				new RequiredValidator().validate(context, component, submittedValue);
+			} catch (ValidatorException ve) {
+				message = ve.getFacesMessage();
+			}
+			
+			if (message == null) {
+				// RequiredValidator didn't throw or its exception did not have a message set.
+				// Use a generic fallback message
+				// TODO: Use OmniFaces resource bundle to override this globally
+				message = createError("{0}: A value is required!", label);
+			}
+		}
+		
 		context.addMessage(component.getClientId(context), message);
 	}
 	
