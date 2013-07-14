@@ -25,7 +25,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.omnifaces.application.OmniApplication;
-import org.omnifaces.util.Faces;
+import org.omnifaces.application.ValidatorProvider;
 
 /**
  * Provides access to all {@link FacesValidator} annotated {@link Validator} instances which are made eligible for CDI.
@@ -37,12 +37,7 @@ import org.omnifaces.util.Faces;
  */
 @Named(ValidatorProvider.NAME)
 @ApplicationScoped
-public class ValidatorProvider {
-
-	// Constants ------------------------------------------------------------------------------------------------------
-
-	static final String NAME = "omnifaces_ValidatorProvider";
-	private static final String EL_NAME = String.format("#{%s}", NAME);
+public class CDIValidatorProvider extends ValidatorProvider {
 
 	// Dependencies ---------------------------------------------------------------------------------------------------
 
@@ -54,14 +49,8 @@ public class ValidatorProvider {
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns the CDI-managed validator instance associated with the given validator ID, or <code>null</code> if there
-	 * is none.
-	 * @param validatorId
-	 * @return the CDI-managed validator instance associated with the given validator ID, or <code>null</code> if there
-	 * is none.
-	 */
-	public Validator getValidator(String validatorId) {
+	@Override
+	public Validator createValidator(String validatorId) {
 		Bean<Validator> bean = extension.getValidatorsById().get(validatorId);
 
 		if (bean == null) {
@@ -70,18 +59,6 @@ public class ValidatorProvider {
 
 		CreationalContext<Validator> context = manager.createCreationalContext(bean);
 		return (Validator) manager.getReference(bean, Validator.class, context);
-	}
-
-	// Helpers --------------------------------------------------------------------------------------------------------
-
-	/**
-	 * Returns the application scoped instance of this validator provider from the EL context, or <code>null</code> if
-	 * CDI is not supported on the application.
-	 * @return The application scoped instance of this validator provider from the EL context, or <code>null</code> if
-	 * CDI is not supported on the application.
-	 */
-	public static ValidatorProvider getInstance() {
-		return Faces.evaluateExpressionGet(EL_NAME);
 	}
 
 }

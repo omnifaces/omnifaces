@@ -25,6 +25,8 @@ import javax.enterprise.inject.spi.ProcessManagedBean;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 
+import org.omnifaces.application.ConverterProvider;
+
 /**
  * Collect all classes having {@link FacesConverter} annotation by their ID and/or for-class.
  *

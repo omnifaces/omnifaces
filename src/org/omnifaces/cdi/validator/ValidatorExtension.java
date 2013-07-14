@@ -25,6 +25,8 @@ import javax.enterprise.inject.spi.ProcessManagedBean;
 import javax.faces.validator.FacesValidator;
 import javax.faces.validator.Validator;
 
+import org.omnifaces.application.ValidatorProvider;
+
 /**
  * Collect all classes having {@link FacesValidator} annotation by their ID.
  *
