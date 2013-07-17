@@ -67,9 +67,9 @@ public class RequestParameterProducer {
 
 		FacesContext context = getContext();
 		UIComponent component = getViewRoot();
-		
+
 		String label = getLabel(requestParameter, injectionPoint);
-		
+
 		// TODO: Save/restore existing potentially existing label?
 		component.getAttributes().put("label", label);
 
@@ -79,34 +79,34 @@ public class RequestParameterProducer {
 		boolean valid = true;
 
 		try {
-			
+
 			// Convert the submitted value
-			
+
 			Converter converter = getConverter(requestParameter, getTargetType(injectionPoint));
 			if (converter != null) {
 				convertedValue = converter.getAsObject(context, component, submittedValue);
 			} else {
 				convertedValue = submittedValue;
 			}
-			
+
 			// Check for required
-			
+
 			if (requestParameter.required() && isEmpty(convertedValue)) {
 				addRequiredMessage(context, component, label, submittedValue, getRequiredMessage(requestParameter));
 			}
 
 			// Validate the converted value
-			
+
 			// 1. Use Bean Validation validators
 			@SuppressWarnings("rawtypes")
 			Set violationsr = getBeanValidator().validateValue(injectionPoint.getBean().getBeanClass(), injectionPoint.getMember().getName(), convertedValue);
-			
-			Set<ConstraintViolation<?>> violations = (Set<ConstraintViolation<?>>) violationsr;
-			
+
+			Set<ConstraintViolation<?>> violations = violationsr;
+
 			for (ConstraintViolation<?> violation : violations) {
 				context.addMessage(component.getClientId(context), createError(violation.getMessage(), label));
 			}
-			
+
 			// 2. Use JSF native validators
 			for (Validator validator : getValidators(requestParameter)) {
 				try {
@@ -151,53 +151,53 @@ public class RequestParameterProducer {
 
 		return name;
 	}
-	
+
 	private String getLabel(Param requestParameter, InjectionPoint injectionPoint) {
-		
+
 		String label = requestParameter.label();
-		
+
 		if (isEmpty(label)) {
 			label = getName(requestParameter, injectionPoint);
 		} else {
 			label = evaluateExpressionAsString(label);
 		}
-		
+
 		return label;
 	}
-	
+
 	private String getValidatorMessage(Param requestParameter) {
 		return evaluateExpressionAsString(requestParameter.validatorMessage());
 	}
-	
+
 	private String getConverterMessage(Param requestParameter) {
 		return evaluateExpressionAsString(requestParameter.converterMessage());
 	}
-	
+
 	private String getRequiredMessage(Param requestParameter) {
 		return evaluateExpressionAsString(requestParameter.requiredMessage());
 	}
-	
+
 	private String evaluateExpressionAsString(String expression) {
-		
+
 		if (isEmpty(expression)) {
 			return expression;
 		}
-		
+
 		Object expressionResult = evaluateExpressionGet(expression);
-		
+
 		if (expressionResult == null) {
 			return null;
 		}
-		
+
 		return expressionResult.toString();
 	}
-	
-	
+
+
 	private Converter getConverter(Param requestParameter, Class<?> targetType) {
 
 		Class<? extends Converter> converterClass = requestParameter.converterClass();
 		String converterName = requestParameter.converter();
-		
+
 		Converter converter = null;
 
 		if (!isEmpty(converterName)) {
@@ -210,7 +210,7 @@ public class RequestParameterProducer {
 		} else if (!converterClass.equals(Converter.class)) { // Converter.cass is default, representing null
 			converter = instance(converterClass);
 		}
-		
+
 		if (converter == null) {
 			try {
 				converter = Faces.getApplication().createConverter(targetType);
@@ -218,11 +218,11 @@ public class RequestParameterProducer {
 				return null;
 			}
 		}
-		
+
 		if (converter != null) {
 			setAttributes(converter, getConverterAttributes(requestParameter));
 		}
-		
+
 		return converter;
 	}
 
@@ -245,7 +245,7 @@ public class RequestParameterProducer {
 		for (Class<? extends Validator> validatorClass : validatorClasses) {
 			validators.add(instance(validatorClass));
 		}
-		
+
 		// Set the attributes on all instantiated validators. We don't distinguish here
 		// which attribute should go to which validator.
 		Map<String, Object> validatorAttributes = getValidatorAttributes(requestParameter);
@@ -309,7 +309,7 @@ public class RequestParameterProducer {
 			throw new IllegalStateException(e);
 		}
 	}
-	
+
 	private void addConverterMessage(FacesContext context, UIComponent component, String label, String submittedValue, ConverterException ce, String converterMessage) {
 		FacesMessage message = null;
 
@@ -325,9 +325,9 @@ public class RequestParameterProducer {
 
 		context.addMessage(component.getClientId(context), message);
 	}
-	
+
 	private void addRequiredMessage(FacesContext context, UIComponent component, String label, String submittedValue, String requiredMessage) {
-		
+
 		FacesMessage message = null;
 
 		if (!isEmpty(requiredMessage)) {
@@ -340,7 +340,7 @@ public class RequestParameterProducer {
 			} catch (ValidatorException ve) {
 				message = ve.getFacesMessage();
 			}
-			
+
 			if (message == null) {
 				// RequiredValidator didn't throw or its exception did not have a message set.
 				// Use a generic fallback message
@@ -348,14 +348,14 @@ public class RequestParameterProducer {
 				message = createError("{0}: A value is required!", label);
 			}
 		}
-		
+
 		context.addMessage(component.getClientId(context), message);
 	}
-	
+
 	private void addValidatorMessages(FacesContext context, UIComponent component, String label, String submittedValue, ValidatorException ve, String validatorMessage) {
-		
+
 		String clientId = component.getClientId(context);
-		
+
 		if (!isEmpty(validatorMessage)) {
 			context.addMessage(clientId, createError(validatorMessage, submittedValue, label));
 		} else {
