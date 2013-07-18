@@ -25,6 +25,7 @@ import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.Messages.createError;
 import static org.omnifaces.util.Platform.getBeanValidator;
 import static org.omnifaces.util.Platform.isBeanValidationAvailable;
+import static org.omnifaces.util.Utils.containsByClassName;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.beans.PropertyDescriptor;
@@ -37,15 +38,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
+import javax.faces.application.Application;
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
+import javax.faces.validator.BeanValidator;
 import javax.faces.validator.RequiredValidator;
 import javax.faces.validator.Validator;
 import javax.faces.validator.ValidatorException;
@@ -277,6 +281,21 @@ public class RequestParameterProducer {
 		for (Class<? extends Validator> validatorClass : validatorClasses) {
 			validators.add(instance(validatorClass));
 		}
+		
+		// Process the default validators
+		
+		Application application = getApplication();
+		for (Entry<String, String> validatorEntry :	application.getDefaultValidatorInfo().entrySet()) {
+			
+			String validatorID = validatorEntry.getKey();
+			String validatorClassName = validatorEntry.getValue();
+			
+			// Check that the validator ID is not the BeanValidator one which we handle in a special way.
+			// And make sure the default validator is not already set manually as well.
+			if (!validatorID.equals(BeanValidator.VALIDATOR_ID) && !containsByClassName(validators, validatorClassName)) {
+				validators.add(application.createValidator(validatorID));
+			}
+		}
 
 		// Set the attributes on all instantiated validators. We don't distinguish here
 		// which attribute should go to which validator.
@@ -287,7 +306,7 @@ public class RequestParameterProducer {
 
 		return validators;
 	}
-
+	
 	private Map<String, Object> getConverterAttributes(Param requestParameter) {
 
 		Map<String, Object> attributeMap = new HashMap<String, Object>();

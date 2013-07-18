@@ -436,6 +436,24 @@ public final class Utils {
 
 		return target;
 	}
+	
+	/**
+	 * Checks if the given collection contains an object with the given class name.
+	 * 
+	 * @param objects collection of objects to check
+	 * @param className name of the class to be checked for
+	 * @return true if the collection contains at least one object with the given class name, false otherwise
+	 * @since 1.6
+	 */
+	public static boolean containsByClassName(Collection<?> objects, String className) {
+		for (Object object : objects) {
+			if (object.getClass().getName().equals(className)) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
 
 	// Dates ----------------------------------------------------------------------------------------------------------
 
