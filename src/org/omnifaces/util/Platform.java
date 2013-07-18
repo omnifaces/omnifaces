@@ -12,21 +12,43 @@
  */
 package org.omnifaces.util;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static javax.faces.validator.BeanValidator.VALIDATOR_FACTORY_KEY;
 import static javax.validation.Validation.buildDefaultValidatorFactory;
 import static org.omnifaces.util.Faces.getApplicationAttribute;
 import static org.omnifaces.util.Faces.setApplicationAttribute;
+
+import java.util.logging.Logger;
 
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 /**
  * This class provides access to (Java EE) platform services from the view point of JSF.
+ * <p>
+ * Note that this utility class can only be used in a JSF environment and is thus not
+ * a Java EE general way to obtain platform services.
  * 
+ * @since 1.6
  * @author Arjan Tijms
- *
  */
-public class Platform {
+public final class Platform {
+	
+	// Constants ------------------------------------------------------------------------------------------------------
+	
+	public static final String BEAN_VALIDATION_AVAILABLE = "org.omnifaces.BEAN_VALIDATION_AVAILABLE";
+	private static final Logger logger = Logger.getLogger(Platform.class.getName());
+	
+	
+	// Constructors ---------------------------------------------------------------------------------------------------
+	
+	private Platform() {
+		// Hide constructor.
+	}
+	
+	
+	// Bean Validation ------------------------------------------------------------------------------------------------
 	
 	public static ValidatorFactory getBeanValidatorFactory() {
 		
@@ -43,5 +65,26 @@ public class Platform {
 	public static Validator getBeanValidator() {
 		return getBeanValidatorFactory().getValidator();
 	}
+	
+	public static boolean isBeanValidationAvailable() {
+		
+		Boolean beanValidationAvailable = getApplicationAttribute(BEAN_VALIDATION_AVAILABLE);
+		
+		if (beanValidationAvailable == null) {
+			try {
+				Class.forName("javax.validation.Validation");
+				getBeanValidator();
+				beanValidationAvailable = TRUE;
+			} catch (Throwable e) {
+				beanValidationAvailable = FALSE;
+				logger.warning("Bean validation not available.");
+			}
+			
+			setApplicationAttribute(BEAN_VALIDATION_AVAILABLE, beanValidationAvailable);
+		}
+		
+		return beanValidationAvailable;
+	}
+	
 
 }

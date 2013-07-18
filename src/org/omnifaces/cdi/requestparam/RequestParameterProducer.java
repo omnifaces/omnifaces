@@ -14,13 +14,17 @@ package org.omnifaces.cdi.requestparam;
 
 import static java.beans.Introspector.getBeanInfo;
 import static java.beans.PropertyEditorManager.findEditor;
+import static java.lang.Boolean.valueOf;
+import static javax.faces.validator.BeanValidator.DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME;
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getApplication;
 import static org.omnifaces.util.Faces.getContext;
+import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Faces.getRequestParameter;
 import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.Messages.createError;
 import static org.omnifaces.util.Platform.getBeanValidator;
+import static org.omnifaces.util.Platform.isBeanValidationAvailable;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.beans.PropertyDescriptor;
@@ -98,13 +102,15 @@ public class RequestParameterProducer {
 			// Validate the converted value
 
 			// 1. Use Bean Validation validators
-			@SuppressWarnings("rawtypes")
-			Set violationsr = getBeanValidator().validateValue(injectionPoint.getBean().getBeanClass(), injectionPoint.getMember().getName(), convertedValue);
-
-			Set<ConstraintViolation<?>> violations = violationsr;
-
-			for (ConstraintViolation<?> violation : violations) {
-				context.addMessage(component.getClientId(context), createError(violation.getMessage(), label));
+			if (shouldDoBeanValidation(requestParameter)) {
+				
+				Set<ConstraintViolation<?>> violations = doBeanValidation(injectionPoint.getBean().getBeanClass(), injectionPoint.getMember().getName(), convertedValue);
+				
+				valid = violations.isEmpty();
+				
+				for (ConstraintViolation<?> violation : violations) {
+					context.addMessage(component.getClientId(context), createError(violation.getMessage(), label));
+				}
 			}
 
 			// 2. Use JSF native validators
@@ -224,6 +230,32 @@ public class RequestParameterProducer {
 		}
 
 		return converter;
+	}
+	
+	private boolean shouldDoBeanValidation(Param requestParameter) {
+		
+		// If bean validation is explicitly disabled for this instance, immediately return false
+		if (requestParameter.disableBeanValidation()) {
+			return false;
+		}
+		
+		// Next check if bean validation has been disabled globally, but only if this hasn't been overridden locally
+		if (!requestParameter.overrideGlobalBeanValidationDisabled() && valueOf(getInitParameter(DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME))) {
+			return false;
+		}
+		
+		// For all other cases, the availability of bean validation determines if we attempt bean validation or not.
+		return isBeanValidationAvailable();
+	}
+	
+	private Set<ConstraintViolation<?>> doBeanValidation(Class<?> base, String property, Object value) {
+		@SuppressWarnings("rawtypes")
+		Set violationsRaw = getBeanValidator().validateValue(base, property, value);
+
+		@SuppressWarnings("unchecked")
+		Set<ConstraintViolation<?>> violations = violationsRaw;
+		
+		return violations;
 	}
 
 	private List<Validator> getValidators(Param requestParameter) {

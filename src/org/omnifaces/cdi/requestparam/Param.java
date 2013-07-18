@@ -25,6 +25,7 @@ import java.lang.annotation.Target;
 import javax.enterprise.util.Nonbinding;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
+import javax.faces.validator.BeanValidator;
 import javax.faces.validator.RequiredValidator;
 import javax.faces.validator.Validator;
 import javax.inject.Qualifier;
@@ -182,5 +183,24 @@ public @interface Param {
 	 * 
 	 */
 	@Nonbinding String requiredMessage() default "";
+	
+	/**
+	 * (Optional) Flag that disables bean validation for this instance.
+	 * <p>
+	 * If <code>true</code> no bean validation will be attempted. If <code>false</code> (the default) no specific action is taken, and it
+	 * will depend on the availability of bean validation and the global {@link BeanValidator#DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME} setting
+	 * whether bean validation is attempted or not.
+	 * 
+	 */
+	@Nonbinding boolean disableBeanValidation() default false;
+	
+	/**
+	 * (Optional) Flag that overrides the global {@link BeanValidator#DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME} setting.
+	 * <p>
+	 * If <code>true</code> bean validation will be performed for this instance (given that bean validation is available) despite
+	 * it globally being disabled. If <code>false</code> (the default) no specific action is taken.
+	 * 
+	 */
+	@Nonbinding boolean overrideGlobalBeanValidationDisabled() default false;
 	
 }
