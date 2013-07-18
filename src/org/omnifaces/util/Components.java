@@ -337,7 +337,7 @@ public final class Components {
 	/**
 	 * Returns the currently submitted UI form component, or <code>null</code> if there is none, which may happen when
 	 * the current request is not a postback request at all, or when the view has been changed by for example a
-	 * successful navigation.
+	 * successful navigation. If the latter is the case, you'd better invoke this method before navigation.
 	 * @return The currently submitted UI form component.
 	 * @see UIForm#isSubmitted()
 	 */
@@ -359,23 +359,61 @@ public final class Components {
 				continue; // Quick skip.
 			}
 
-			try {
-				UIComponent component = viewRoot.findComponent(name);
+			UIComponent component = findComponentIgnoringIAE(viewRoot, name);
 
-				if (component instanceof UIForm) {
-					return (UIForm) component;
-				}
-				else if (component != null) {
-					UIForm form = getClosestParent(component, UIForm.class);
+			if (component instanceof UIForm) {
+				return (UIForm) component;
+			}
+			else if (component != null) {
+				UIForm form = getClosestParent(component, UIForm.class);
 
-					if (form != null) {
-						return form;
-					}
+				if (form != null) {
+					return form;
 				}
 			}
-			catch (IllegalArgumentException ignore) {
-				// May occur on findComponent() when view has changed by for example a successful navigation.
-				// TODO: check for a way to detect this beforehand so that the whole loop can be skipped.
+		}
+
+		return null;
+	}
+
+	/**
+	 * Returns the currently invoked UI command component, or <code>null</code> if there is none, which may happen when
+	 * the current request is not a postback request at all, or when the view has been changed by for example a
+	 * successful navigation. If the latter is the case, you'd better invoke this method before navigation.
+	 * @return The currently invoked UI command component.
+	 * @since 1.6
+	 */
+	public static UICommand getCurrentCommand() {
+		FacesContext facesContext = FacesContext.getCurrentInstance();
+
+		if (!facesContext.isPostback()) {
+			return null;
+		}
+
+		UIViewRoot viewRoot = facesContext.getViewRoot();
+	    Map<String, String> params = facesContext.getExternalContext().getRequestParameterMap();
+
+	    if (facesContext.getPartialViewContext().isAjaxRequest()) {
+	    	String source = params.get("javax.faces.source");
+
+	    	if (source != null) {
+    	        UIComponent component = findComponentIgnoringIAE(viewRoot, source);
+
+				if (component instanceof UICommand) {
+					return (UICommand) component;
+				}
+	    	}
+	    }
+
+	    for (String name : params.keySet()) {
+			if (name.startsWith("javax.faces.")) {
+				continue; // Quick skip.
+			}
+
+	        UIComponent component = findComponentIgnoringIAE(viewRoot, name);
+
+			if (component instanceof UICommand) {
+				return (UICommand) component;
 			}
 		}
 
@@ -546,6 +584,22 @@ public final class Components {
 
 			throw new IllegalArgumentException(String.format(
 				ERROR_CHILDREN_DISALLOWED, component.getClass().getSimpleName(), childClassNames));
+		}
+	}
+
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Use {@link UIViewRoot#findComponent(String)} and ignore the potential {@link IllegalArgumentException} by
+	 * returning null instead.
+	 */
+	private static UIComponent findComponentIgnoringIAE(UIViewRoot viewRoot, String clientId) {
+		try {
+			return viewRoot.findComponent(clientId);
+		}
+		catch (IllegalArgumentException ignore) {
+			// May occur when view has changed by for example a successful navigation.
+			return null;
 		}
 	}
 
