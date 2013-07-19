@@ -54,9 +54,6 @@ import javax.faces.view.ViewDeclarationLanguage;
 import javax.faces.view.ViewMetadata;
 import javax.faces.view.facelets.FaceletContext;
 import javax.faces.webapp.FacesServlet;
-import javax.naming.InitialContext;
-import javax.naming.NameNotFoundException;
-import javax.naming.NamingException;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
@@ -1381,53 +1378,6 @@ public final class Faces {
 	public static String getInitParameter(String name) {
 		return getExternalContext().getInitParameter(name);
 	}
-	
-	/**
-	 * Returns the named environment entry for the deployment component from where this is called. From within the web
-	 * module this returns the <code>&lt;env-entry-value&gt;</code> of a <code>&lt;env-entry&gt;</code> in 
-	 * <code>web.xml</code> associated with the given <code>&lt;env-entry-name&gt;</code>.
-	 * @param name the environment entry name
-	 * @return The environment entry value associated with the given name, or <code>null</code> if
-	 * there is none.
-	 * @see InitialContext#lookup(String)
-	 * @since 1.6
-	 */
-	public static <T> T getEnvEntry(String name) {
-		return JNDIlookup("java:comp/env/" + name);
-	}
-
-	/**
-	 * Returns the named object from the default JNDI instance.
-	 * @param name the name of the object to be retrieved
-	 * @return the named object, or <code>null</code> if there is none.
-	 * @see InitialContext#lookup(String)
-	 * @since 1.6
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> T JNDIlookup(String name) {
-		InitialContext context = null;
-		try {
-			context = new InitialContext();
-			return (T) context.lookup(name);
-		} catch (NameNotFoundException e) {
-			return null;
-		} catch (NamingException e) {
-			throw new IllegalStateException(e);
-		} finally {
-			closeJNDIContext(context);
-		}
-	}
-
-	private static void closeJNDIContext(InitialContext context) {
-		try {
-			if (context != null) {
-				context.close();
-			}
-		} catch (NamingException e) {
-			throw new IllegalStateException(e);
-		}
-	}
-	
 
 	/**
 	 * Returns the mime type for the given file name. The mime type is determined based on file extension and
