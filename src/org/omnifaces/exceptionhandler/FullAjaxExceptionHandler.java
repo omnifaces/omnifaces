@@ -161,61 +161,63 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
 		Iterator<ExceptionQueuedEvent> unhandledExceptionQueuedEvents = getUnhandledExceptionQueuedEvents().iterator();
 
-		if (unhandledExceptionQueuedEvents.hasNext()) {
-			Throwable exception = unhandledExceptionQueuedEvents.next().getContext().getException();
+		if (!unhandledExceptionQueuedEvents.hasNext()) {
+			return;
+		}
 
-			if (exception instanceof AbortProcessingException) {
-				return; // Let JSF handle it itself.
-			}
+		Throwable exception = unhandledExceptionQueuedEvents.next().getContext().getException();
 
-			unhandledExceptionQueuedEvents.remove();
+		if (exception instanceof AbortProcessingException) {
+			return; // Let JSF handle it itself.
+		}
 
-			// Unwrap the root cause from FacesException and find the associated error page location.
-			exception = findExceptionRootCause(context, exception);
-			String errorPageLocation = findErrorPageLocation(context, exception);
+		unhandledExceptionQueuedEvents.remove();
 
-			if (errorPageLocation == null) {
-				// If there's no default error page location, then it's end of story.
-				throw new IllegalArgumentException(ERROR_DEFAULT_LOCATION_MISSING);
-			}
+		// Unwrap the root cause from FacesException and find the associated error page location.
+		exception = findExceptionRootCause(context, exception);
+		String errorPageLocation = findErrorPageLocation(context, exception);
 
-			ExternalContext externalContext = context.getExternalContext();
+		if (errorPageLocation == null) {
+			// If there's no default error page location, then it's end of story.
+			throw new IllegalArgumentException(ERROR_DEFAULT_LOCATION_MISSING);
+		}
 
-			// Check if we're inside render response and if the response is committed.
-			if (context.getCurrentPhaseId() != PhaseId.RENDER_RESPONSE) {
-				externalContext.log(String.format(LOG_EXCEPTION_HANDLED, errorPageLocation), exception);
-			}
-			else if (!externalContext.isResponseCommitted()) {
-				externalContext.log(String.format(LOG_RENDER_EXCEPTION_HANDLED, errorPageLocation), exception);
+		ExternalContext externalContext = context.getExternalContext();
 
-				// If the exception was thrown in midst of rendering the JSF response, then reset (partial) response.
-				String characterEncoding = externalContext.getResponseCharacterEncoding(); // Remember encoding.
-				externalContext.responseReset();
-				OmniPartialViewContext.getCurrentInstance().resetPartialResponse();
-				externalContext.setResponseCharacterEncoding(characterEncoding);
-			}
-			else {
-				externalContext.log(String.format(LOG_RENDER_EXCEPTION_UNHANDLED, errorPageLocation), exception);
+		// Check if we're inside render response and if the response is committed.
+		if (context.getCurrentPhaseId() != PhaseId.RENDER_RESPONSE) {
+			externalContext.log(String.format(LOG_EXCEPTION_HANDLED, errorPageLocation), exception);
+		}
+		else if (!externalContext.isResponseCommitted()) {
+			externalContext.log(String.format(LOG_RENDER_EXCEPTION_HANDLED, errorPageLocation), exception);
 
-				// Mojarra doesn't close the partial response during render exception. Let do it ourselves.
-				OmniPartialViewContext.getCurrentInstance().closePartialResponse();
-				return;
-			}
+			// If the exception was thrown in midst of rendering the JSF response, then reset (partial) response.
+			String characterEncoding = externalContext.getResponseCharacterEncoding(); // Remember encoding.
+			externalContext.responseReset();
+			OmniPartialViewContext.getCurrentInstance().resetPartialResponse();
+			externalContext.setResponseCharacterEncoding(characterEncoding);
+		}
+		else {
+			externalContext.log(String.format(LOG_RENDER_EXCEPTION_UNHANDLED, errorPageLocation), exception);
 
-			// Set the necessary servlet request attributes which a bit decent error page may expect.
-			HttpServletRequest request = (HttpServletRequest) externalContext.getRequest();
-			request.setAttribute(ATTRIBUTE_ERROR_EXCEPTION, exception);
-			request.setAttribute(ATTRIBUTE_ERROR_EXCEPTION_TYPE, exception.getClass());
-			request.setAttribute(ATTRIBUTE_ERROR_MESSAGE, exception.getMessage());
-			request.setAttribute(ATTRIBUTE_ERROR_REQUEST_URI, request.getRequestURI());
-			request.setAttribute(ATTRIBUTE_ERROR_STATUS_CODE, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+			// Mojarra doesn't close the partial response during render exception. Let do it ourselves.
+			OmniPartialViewContext.getCurrentInstance().closePartialResponse();
+			return;
+		}
 
-			try {
-				renderErrorPageView(context, request, errorPageLocation);
-			}
-			catch (IOException e) {
-				throw new FacesException(e);
-			}
+		// Set the necessary servlet request attributes which a bit decent error page may expect.
+		HttpServletRequest request = (HttpServletRequest) externalContext.getRequest();
+		request.setAttribute(ATTRIBUTE_ERROR_EXCEPTION, exception);
+		request.setAttribute(ATTRIBUTE_ERROR_EXCEPTION_TYPE, exception.getClass());
+		request.setAttribute(ATTRIBUTE_ERROR_MESSAGE, exception.getMessage());
+		request.setAttribute(ATTRIBUTE_ERROR_REQUEST_URI, request.getRequestURI());
+		request.setAttribute(ATTRIBUTE_ERROR_STATUS_CODE, HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+		try {
+			renderErrorPageView(context, request, errorPageLocation);
+		}
+		catch (IOException e) {
+			throw new FacesException(e);
 		}
 
 		while (unhandledExceptionQueuedEvents.hasNext()) {
