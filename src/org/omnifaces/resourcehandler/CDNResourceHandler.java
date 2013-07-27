@@ -12,6 +12,8 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static org.omnifaces.util.Faces.evaluateExpressionGet;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +39,8 @@ import org.omnifaces.util.Utils;
  * </pre>
  * <p>
  * By default, it runs only when the current JSF project stage is <strong>not</strong> set to <code>Development</code>.
- * <h3>Configuration</h3>
+ *
+ * <h3>Standard configuration</h3>
  * <p>
  * To configure the CDN URLs, a {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_RESOURCES}
  * context parameter has to be provided wherein the CDN resources are been specified as a comma separated string of
@@ -78,9 +81,45 @@ import org.omnifaces.util.Utils;
  * <pre>
  * javax.faces:jsf.js=http://cdn.example.com/jsf.js
  * </pre>
+ *
+ * <h3>Wildcard configuration</h3>
  * <p>
- * When you need to run it during <code>Development</code> stage as well, then set the context parameter
- * {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_DEV_STAGE} to <code>true</code>.
+ * You can also use the wildcard syntax to map every single resource of a specific library to a common CDN URL. To
+ * achieve that, just use <code>*</code> as the sole resource name and make sure that the CDN URL ends with
+ * <code>/*</code>. Here's an example:
+ * <pre>
+ * &lt;context-param&gt;
+ *   &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_URLS&lt;/param-name&gt;
+ *   &lt;param-value&gt;jquery-cdn:*=http://code.jquery.com/*&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * </pre>
+ * With the above configuration, the following resources:
+ * <pre>
+ * &lt;h:outputScript library="jquery-cdn" name="jquery-1.9.1.js" /&gt;
+ * &lt;h:outputScript library="jquery-cdn" name="ui/1.10.3/jquery-ui.js" /&gt;
+ * </pre>
+ * <p>
+ * Will be rendered as:
+ * <pre>
+ * &lt;script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"&gt;&lt;/script&gt;
+ * &lt;script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"&gt;&lt;/script&gt;
+ * </pre>
+ *
+ * <h3>EL expressions</h3>
+ * <p>The CDN resource handler supports evaluating EL expessions in the CDN URL. Here's an example:</p>
+ * <pre>
+ * &lt;context-param&gt;
+ *   &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_URLS&lt;/param-name&gt;
+ *   &lt;param-value&gt;jquery-cdn:*=http://#{settings.jqueryCDN}/*&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * </pre>
+ * <p>The EL expression is resolved on a per-request basis.</p>
+ *
+ * <h3>Always enable CDN resource handler</h3>
+ * <p>
+ * By default, the CDN resource handler runs only when the current JSF project stage is <strong>not</strong> set to
+ * <code>Development</code>. When you need to run it during <code>Development</code> stage as well, then set the context
+ * parameter {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_DEV_STAGE} to <code>true</code>.
  * <pre>
  * &lt;context-param&gt;
  *   &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_ALWAYS_ENABLED&lt;/param-name&gt;
@@ -113,7 +152,12 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 	private static final String ERROR_MISSING_INIT_PARAM =
 		"Context parameter '" + PARAM_NAME_CDN_RESOURCES + "' is missing in web.xml or web-fragment.xml.";
 	private static final String ERROR_INVALID_INIT_PARAM =
-		"Context parameter '" + PARAM_NAME_CDN_RESOURCES + "' is in invalid syntax.";
+		"Context parameter '" + PARAM_NAME_CDN_RESOURCES + "' is in invalid syntax."
+			+ " It must follow 'resourceId=URL,resourceId=URL,resourceId=URL' syntax.";
+	private static final String ERROR_INVALID_WILDCARD =
+		"Context parameter '" + PARAM_NAME_CDN_RESOURCES + "' is in invalid syntax."
+			+ " Wildcard can only represent entire resource name '*' and URL suffix '/*' as in"
+			+ " 'libraryName:*=http://cdn.example.com/*'.";
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -171,18 +215,31 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 	 */
 	@Override
 	public Resource createResource(String resourceName, String libraryName, String contentType) {
-		final String requestPath = (cdnResources == null) ? null :
-			cdnResources.get(new ResourceIdentifier(libraryName, resourceName));
+		String requestPath = null;
+
+		if (cdnResources != null) {
+			requestPath = cdnResources.get(new ResourceIdentifier(libraryName, resourceName));
+
+			if (requestPath == null) {
+				requestPath = cdnResources.get(new ResourceIdentifier(libraryName, "*"));
+
+				if (requestPath != null) {
+					requestPath = requestPath.substring(0, requestPath.length() - 1) + resourceName;
+				}
+			}
+		}
 
 		if (requestPath == null) {
 			return getWrapped().createResource(resourceName, libraryName, contentType);
 		}
 
+		final String finalRequestPath = evaluateExpressionGet(requestPath);
+
 		return new ResourceWrapper() {
 
 			@Override
 			public String getRequestPath() {
-				return requestPath;
+				return finalRequestPath;
 			}
 
 			@Override
@@ -220,7 +277,13 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 				throw new IllegalArgumentException(ERROR_INVALID_INIT_PARAM);
 			}
 
-			cdnResources.put(new ResourceIdentifier(cdnResourceIdAndURL[0]), cdnResourceIdAndURL[1]);
+			ResourceIdentifier id = new ResourceIdentifier(cdnResourceIdAndURL[0]);
+
+			if (id.getName().contains("*") && (!id.getName().equals("*") || !cdnResourceIdAndURL[1].endsWith("/*"))) {
+				throw new IllegalArgumentException(ERROR_INVALID_WILDCARD);
+			}
+
+			cdnResources.put(id, cdnResourceIdAndURL[1]);
 		}
 
 		return cdnResources;
