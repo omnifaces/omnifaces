@@ -82,7 +82,7 @@ public final class Faces {
 
 	private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
 	private static final int DEFAULT_SENDFILE_BUFFER_SIZE = 10240;
-	private static final String ERROR_NO_VIEW = "There is no UIViewRoot.";
+	private static final String ERROR_NO_VIEW = "There is no view.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -562,6 +562,46 @@ public final class Faces {
 	public static void navigate(String outcome) {
 		FacesContext context = getContext();
 		context.getApplication().getNavigationHandler().handleNavigation(context, null, outcome);
+	}
+
+	/**
+	 * Returns the concrete domain-relative URL to the current view with the given params URL-encoded in the query
+	 * string and optionally include view parameters as well. This URL can ultimately be used as redirect URL, or in
+	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>.
+	 * @param params The parameters to be URL-encoded in the query string. Can be <code>null</code>.
+	 * @param includeViewParams Whether the view parameters of the current view should be included as well.
+	 * @return The concrete domain-relative URL to the current view.
+	 * @see ViewHandler#getBookmarkableURL(FacesContext, String, Map, boolean)
+	 * @throws IllegalStateException When there is no view (i.e. when it is <code>null</code>). This can happen if the
+	 * method is called at the wrong moment in the JSF lifecycle, e.g. before the view has been restored/created.
+	 * @since 1.6
+	 */
+	public static String getBookmarkableURL(Map<String, List<String>> params, boolean includeViewParams) {
+		String viewId = getViewId();
+
+		if (viewId == null) {
+			throw new IllegalStateException(ERROR_NO_VIEW);
+		}
+
+		return getBookmarkableURL(viewId, params, includeViewParams);
+	}
+
+	/**
+	 * Returns the concrete domain-relative URL to the given view with the given params URL-encoded in the query
+	 * string and optionally include view parameters as well. This URL can ultimately be used as redirect URL, or in
+	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>.
+	 * @param viewId The view ID to create the bookmarkable URL for.
+	 * @param params The parameters to be URL-encoded in the query string. Can be <code>null</code>.
+	 * @param includeViewParams Whether the view parameters of the current view which are also declared in the target
+	 * view should be included as well. Note thus that this does not include the view parameters which are not declared
+	 * in the target view!
+	 * @return The concrete domain-relative URL to the target view.
+	 * @see ViewHandler#getBookmarkableURL(FacesContext, String, Map, boolean)
+	 * @since 1.6
+	 */
+	public static String getBookmarkableURL(String viewId, Map<String, List<String>> params, boolean includeViewParams) {
+		FacesContext context = getContext();
+		return context.getApplication().getViewHandler().getBookmarkableURL(context, viewId, params, includeViewParams);
 	}
 
 	// Facelets -------------------------------------------------------------------------------------------------------
