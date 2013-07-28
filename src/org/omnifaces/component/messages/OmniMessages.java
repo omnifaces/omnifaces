@@ -189,6 +189,7 @@ public class OmniMessages extends HtmlMessages {
 	/**
 	 * Returns the single INFO message to be shown instead when this component has any faces message.
 	 * @return The single INFO message to be shown instead when this component has any faces message.
+	 * @since 1.6
 	 */
 	public String getMessage() {
 		return state.get(PropertyKeys.message);
@@ -197,6 +198,7 @@ public class OmniMessages extends HtmlMessages {
 	/**
 	 * Sets the single INFO message to be shown instead when this component has any faces message.
 	 * @param message The single INFO message to be shown instead when this component has any faces message.
+	 * @since 1.6
 	 */
 	public void setMessage(String message) {
 		state.put(PropertyKeys.message, message);
