@@ -3257,6 +3257,19 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 &lt;/h:form&gt;
 				</code></pre>
 				</dd>
+				<dt>Displaying single message</dt>
+				<dd>Show a single custom message whenever the component has received any faces message. This is particularly useful
+				when you want to display a global message in case any of the in <code>for</code> specified components has a faces
+				message. For example:
+				<pre><code>
+&lt;o:messages for="form" message="There are validation errors. Please fix them." /&gt;
+&lt;h:form id="form"&gt;
+  &lt;h:inputText id="input1" /&gt;&lt;h:message for="input1" /&gt;
+  &lt;h:inputText id="input2" /&gt;&lt;h:message for="input2" /&gt;
+  &lt;h:inputText id="input3" /&gt;&lt;h:message for="input3" /&gt;
+&lt;/h:form&gt;
+				</code></pre>
+				</dd>
 				<dt>HTML escaping</dt>
 				<dd>Control HTML escaping by the new <code>escape</code> attribute.
 				<pre><code>
@@ -3277,9 +3290,9 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 				</code></pre>
 				Note: the iteration is by design completely stateless. It's therefore not recommended to nest form components inside
 				the <code>&lt;o:messages&gt;</code> component. It should be used for pure output only, like as the standard
-				<code>&lt;h:messages&gt;</code>. Plain output links are however no problem. Also note that the <code>escape</code>
-				attribute has in this case no effect. If you'd like to escape message properties, just use
-				<code>&lt;h:outputText escape="false"&gt;</code> the usual way.
+				<code>&lt;h:messages&gt;</code>. Plain output links are however no problem. Also note that the <code>message</code>
+				and <code>escape</code> attributes have in this case no effect. With a single message, there's no point of
+				iteration. As to escaping, just use <code>&lt;h:outputText escape="false"&gt;</code> the usual way.
 				</dd>
 				</dl>
 				<p>
