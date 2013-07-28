@@ -3372,6 +3372,17 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 		<attribute>
 			<description>
 				<![CDATA[
+					The single INFO message to be shown instead when this component has any faces message.
+					This attribute is ignored when the var attribute is specified.
+				]]>
+			</description>
+			<name>message</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
 					The type of layout markup to use when rendering error messages.
 					Valid values are "table" (an HTML table) and "list" (an HTML unordered list).
 					Default value is "list".

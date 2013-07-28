@@ -14,6 +14,7 @@ package org.omnifaces.renderer;
 
 import static org.omnifaces.util.Components.findComponentRelatively;
 import static org.omnifaces.util.Components.findComponentsInChildren;
+import static org.omnifaces.util.Messages.createInfo;
 import static org.omnifaces.util.Renderers.writeAttribute;
 import static org.omnifaces.util.Renderers.writeAttributes;
 import static org.omnifaces.util.Renderers.writeText;
@@ -22,6 +23,7 @@ import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -86,6 +88,12 @@ public class MessagesRenderer extends Renderer {
 			encodeEmptyMessages(context, omniMessages);
 		}
 		else {
+			String message = omniMessages.getMessage();
+
+			if (!isEmpty(message)) {
+				messages = Arrays.asList(createInfo(message));
+			}
+
 			encodeMessages(context, omniMessages, messages, "table".equals(omniMessages.getLayout()));
 		}
 	}

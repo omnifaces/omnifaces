@@ -114,7 +114,7 @@ public class OmniMessages extends HtmlMessages {
 
 	private enum PropertyKeys {
 		// Cannot be uppercased. They have to exactly match the attribute names.
-		var, escape;
+		var, message, escape;
 	}
 
 	// Variables ------------------------------------------------------------------------------------------------------
@@ -171,6 +171,22 @@ public class OmniMessages extends HtmlMessages {
 	 */
 	public void setVar(String var) {
 		state.put(PropertyKeys.var, var);
+	}
+
+	/**
+	 * Returns the single INFO message to be shown instead when this component has any faces message.
+	 * @return The single INFO message to be shown instead when this component has any faces message.
+	 */
+	public String getMessage() {
+		return state.get(PropertyKeys.message);
+	}
+
+	/**
+	 * Sets the single INFO message to be shown instead when this component has any faces message.
+	 * @param message The single INFO message to be shown instead when this component has any faces message.
+	 */
+	public void setMessage(String message) {
+		state.put(PropertyKeys.message, message);
 	}
 
 	/**
