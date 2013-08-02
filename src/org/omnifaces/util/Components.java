@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.el.MethodExpression;
 import javax.el.ValueExpression;
 import javax.faces.FacesException;
 import javax.faces.application.Application;
@@ -27,13 +28,21 @@ import javax.faces.component.EditableValueHolder;
 import javax.faces.component.NamingContainer;
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
+import javax.faces.component.UIComponentBase;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
 import javax.faces.component.UIPanel;
 import javax.faces.component.UIViewRoot;
+import javax.faces.component.behavior.AjaxBehavior;
+import javax.faces.component.behavior.ClientBehavior;
 import javax.faces.component.visit.VisitContext;
 import javax.faces.component.visit.VisitHint;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AbortProcessingException;
+import javax.faces.event.ActionEvent;
+import javax.faces.event.AjaxBehaviorEvent;
+import javax.faces.event.AjaxBehaviorListener;
+import javax.faces.event.MethodExpressionActionListener;
 import javax.faces.view.facelets.FaceletContext;
 
 /**
@@ -531,6 +540,108 @@ public final class Components {
 		else {
 			return false;
 		}
+	}
+
+	// Expressions ----------------------------------------------------------------------------------------------------
+
+	/**
+	 * Create an editable value expression based on the given EL expression and the given type.
+	 * @param expression The EL expression to represent an editable value expression.
+	 * @param type The type of the property referenced by the value expression.
+	 * @return The created editable value expression, ready to be used as
+	 * {@link UIComponent#setValueExpression(String, ValueExpression)}.
+	 */
+	public static ValueExpression createValueExpression(String expression, Class<?> type) {
+		FacesContext context = FacesContext.getCurrentInstance();
+		return context.getApplication().getExpressionFactory().createValueExpression(
+			context.getELContext(), expression, type);
+	}
+
+	/**
+	 * <p>Create a method expression based on the given EL expression, the given return type and the given parameter types,
+	 * if any. As an example, the following action method examples,
+	 * <ul>
+	 * <li><code>public void submit1()</code></li>
+	 * <li><code>public String submit2()</code></li>
+	 * <li><code>public void submit3(String argument)</code></li>
+	 * <li><code>public String submit4(String argument)</code></li>
+	 * <li><code>public void submit5(String argument1, Long argument2)</code></li>
+	 * <li><code>public String submit6(Long argument1, String argument2)</code></li>
+	 * </ul>
+	 * <p>can be created as follows:
+	 * <ul>
+	 * <li><code>createMethodExpression("#{bean.submit1}", Void.class);</code></li>
+	 * <li><code>createMethodExpression("#{bean.submit2}", String.class);</code></li>
+	 * <li><code>createMethodExpression("#{bean.submit3('foo')}", Void.class, String.class);</code></li>
+	 * <li><code>createMethodExpression("#{bean.submit4('foo')}", String.class, String.class);</code></li>
+	 * <li><code>createMethodExpression("#{bean.submit5('foo', 0)}", Void.class, String.class, Long.class);</code></li>
+	 * <li><code>createMethodExpression("#{bean.submit6(0, 'foo')}", String.class, Long.class, String.class);</code></li>
+	 * </ul>
+	 * @param expression The EL expression to create a method expression for.
+	 * @param returnType The return type of the method expression. Can be <code>null</code> if you don't care about the
+	 * return type (e.g. <code>void</code> or <code>String</code>).
+	 * @param parameterTypes The parameter types of the method expression.
+	 * @return The created method expression, ready to be used as
+	 * {@link UICommand#setActionExpression(MethodExpression)}.
+	 */
+	public static MethodExpression createMethodExpression
+		(String expression, Class<?> returnType, Class<?>... parameterTypes)
+	{
+		FacesContext context = FacesContext.getCurrentInstance();
+		return context.getApplication().getExpressionFactory().createMethodExpression(
+			context.getELContext(), expression, returnType, parameterTypes);
+	}
+
+	/**
+	 * <p>Create a void method expression based on the given EL expression and the given parameter types, if any.
+	 * As an example, the following action method examples,
+	 * <ul>
+	 * <li><code>public void submit1()</code></li>
+	 * <li><code>public void submit3(String argument)</code></li>
+	 * <li><code>public void submit5(String argument1, Long argument2)</code></li>
+	 * </ul>
+	 * <p>can be created as follows:
+	 * <ul>
+	 * <li><code>createVoidMethodExpression("#{bean.submit1}");</code></li>
+	 * <li><code>createVoidMethodExpression("#{bean.submit3('foo')}", String.class);</code></li>
+	 * <li><code>createVoidMethodExpression("#{bean.submit5('foo', 0)}", String.class, Long.class);</code></li>
+	 * </ul>
+	 * @param expression The EL expression to create a void method expression for.
+	 * @param parameterTypes The parameter types of the void method expression.
+	 * @return The created void method expression, ready to be used as
+	 * {@link UICommand#setActionExpression(MethodExpression)}.
+	 */
+	public static MethodExpression createVoidMethodExpression(String expression, Class<?>... parameterTypes) {
+		return createMethodExpression(expression, Void.class, parameterTypes);
+	}
+
+	/**
+	 * Create an action listener method expression based on the given EL expression.
+	 * @param expression The EL expression to create an action listener method expression for.
+	 * @return The created action listener method expression, ready to be used as
+	 * {@link UICommand#addActionListener(javax.faces.event.ActionListener)}.
+	 */
+	public static MethodExpressionActionListener createActionListenerMethodExpression(String expression) {
+		return new MethodExpressionActionListener(createVoidMethodExpression(expression, ActionEvent.class));
+	}
+
+	/**
+	 * Create an ajax behavior which should invoke the given expression.
+	 * @param expression The EL expression to be invoked when the created ajax behavior is processed.
+	 * @return The created ajax behavior, ready to be used as
+	 * {@link UIComponentBase#addClientBehavior(String, ClientBehavior)} whereby the string argument represents the
+	 * client event name, such as "action", "valueChange", "click", etc.
+	 */
+	public static AjaxBehavior createAjaxBehavior(String expression) {
+		AjaxBehavior behavior = new AjaxBehavior();
+		final MethodExpression method = createVoidMethodExpression(expression, AjaxBehaviorEvent.class);
+		behavior.addAjaxBehaviorListener(new AjaxBehaviorListener() {
+			@Override
+			public void processAjaxBehavior(AjaxBehaviorEvent event) throws AbortProcessingException {
+				method.invoke(FacesContext.getCurrentInstance().getELContext(), new Object[] { event });
+			}
+		});
+		return behavior;
 	}
 
 	// Validation -----------------------------------------------------------------------------------------------------
