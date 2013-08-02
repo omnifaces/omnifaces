@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.faces.context.FacesContext;
 import javax.faces.webapp.FacesServlet;
@@ -71,6 +73,8 @@ public enum WebXml {
 	INSTANCE;
 
 	// Private constants ----------------------------------------------------------------------------------------------
+
+	private static final Logger logger = Logger.getLogger(WebXml.class.getName());
 
 	private static final String WEB_XML = "/WEB-INF/web.xml";
 	private static final String WEB_FRAGMENT_XML = "META-INF/web-fragment.xml";
@@ -142,7 +146,7 @@ public enum WebXml {
 				securityConstraints = parseSecurityConstraints(webXml, xpath);
 			}
 			catch (Exception e) {
-				servletContext.log(LOG_INITIALIZATION_ERROR, e);
+				logger.log(Level.SEVERE, LOG_INITIALIZATION_ERROR, e);
 				throw new RuntimeException(e);
 			}
 		}

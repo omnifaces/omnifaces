@@ -14,6 +14,8 @@ package org.omnifaces.exceptionhandler;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.faces.FacesException;
 import javax.faces.application.ViewHandler;
@@ -87,10 +89,14 @@ import org.omnifaces.util.Hacks;
  * large enough so that the so far rendered response until the occurrence of the exception fits in there and can
  * therefore safely be reset.
  * <p>
- * If more fine grained control of determining the root cause of the caught exception and/or the error page is desired,
- * then the developer can opt to extend this {@link FullAjaxExceptionHandler} and override the
- * {@link #findExceptionRootCause(FacesContext, Throwable)} and/or
- * {@link #findErrorPageLocation(FacesContext, Throwable)} methods.
+ * If more fine grained control of determining the root cause of the caught exception, or determining the error page is,
+ * or logging the exception is desired, then the developer can opt to extend this {@link FullAjaxExceptionHandler} and
+ * override one or more of the following methods:
+ * <ul>
+ * <li>{@link #findExceptionRootCause(FacesContext, Throwable)}
+ * <li>{@link #findErrorPageLocation(FacesContext, Throwable)}
+ * <li>{@link #logException(FacesContext, Throwable, String, String, Object...)}
+ * </ul>
  *
  * @author Bauke Scholtz
  * @see FullAjaxExceptionHandlerFactory
@@ -98,6 +104,8 @@ import org.omnifaces.util.Hacks;
 public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
 	// Private constants ----------------------------------------------------------------------------------------------
+
+	private static final Logger logger = Logger.getLogger(FullAjaxExceptionHandler.class.getName());
 
 	private static final String ERROR_DEFAULT_LOCATION_MISSING =
 		"Either HTTP 500 or java.lang.Throwable error page is required in web.xml or web-fragment.xml."
@@ -186,10 +194,10 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
 		// Check if we're inside render response and if the response is committed.
 		if (context.getCurrentPhaseId() != PhaseId.RENDER_RESPONSE) {
-			externalContext.log(String.format(LOG_EXCEPTION_HANDLED, errorPageLocation), exception);
+			logException(context, exception, errorPageLocation, LOG_EXCEPTION_HANDLED);
 		}
 		else if (!externalContext.isResponseCommitted()) {
-			externalContext.log(String.format(LOG_RENDER_EXCEPTION_HANDLED, errorPageLocation), exception);
+			logException(context, exception, errorPageLocation, LOG_RENDER_EXCEPTION_HANDLED);
 
 			// If the exception was thrown in midst of rendering the JSF response, then reset (partial) response.
 			String characterEncoding = externalContext.getResponseCharacterEncoding(); // Remember encoding.
@@ -198,7 +206,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 			externalContext.setResponseCharacterEncoding(characterEncoding);
 		}
 		else {
-			externalContext.log(String.format(LOG_RENDER_EXCEPTION_UNHANDLED, errorPageLocation), exception);
+			logException(context, exception, errorPageLocation, LOG_RENDER_EXCEPTION_UNHANDLED);
 
 			// Mojarra doesn't close the partial response during render exception. Let do it ourselves.
 			OmniPartialViewContext.getCurrentInstance().closePartialResponse();
@@ -249,6 +257,21 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	 */
 	protected String findErrorPageLocation(FacesContext context, Throwable exception) {
 		return WebXml.INSTANCE.findErrorPageLocation(exception);
+	}
+
+	/**
+	 * Log the thrown exception and determined error page location with the given message, optionally parameterized
+	 * with the given parameters.
+	 * The default implementation logs through <code>java.util.logging</code> as SEVERE.
+	 * @param context The involved faces context.
+	 * @param exception The exception to log.
+	 * @param location The error page location.
+	 * @param message The log message.
+	 * @param parameters The log message parameters, if any.
+	 * @since 1.6
+	 */
+	protected void logException(FacesContext context, Throwable exception, String location, String message, Object... parameters) {
+		logger.log(Level.SEVERE, String.format(message, location), exception);
 	}
 
 	private void renderErrorPageView(FacesContext context, final HttpServletRequest request, String errorPageLocation)
