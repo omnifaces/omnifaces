@@ -18,8 +18,8 @@ import static org.omnifaces.facesviews.FacesViews.getFacesServletExtensions;
 import static org.omnifaces.facesviews.FacesViews.getViewHandlerMode;
 import static org.omnifaces.facesviews.FacesViews.isScannedViewsAlwaysExtensionless;
 import static org.omnifaces.facesviews.ViewHandlerMode.STRIP_EXTENSION_FROM_PARENT;
-import static org.omnifaces.util.Faces.getApplicationAttribute;
-import static org.omnifaces.util.Faces.getRequestAttribute;
+import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
+import static org.omnifaces.util.FacesLocal.getRequestAttribute;
 import static org.omnifaces.util.ResourcePaths.getExtension;
 import static org.omnifaces.util.ResourcePaths.isExtensionless;
 import static org.omnifaces.util.ResourcePaths.stripExtension;
@@ -52,18 +52,18 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 
 	@Override
 	public String getActionURL(FacesContext context, String viewId) {
-		
+
 		String actionURL = super.getActionURL(context, viewId);
 
 		Map<String, String> mappedResources = getApplicationAttribute(context, FACES_VIEWS_RESOURCES);
 		if (mappedResources.containsKey(viewId)) {
-			
+
 			if (isScannedViewsAlwaysExtensionless(context) || isOriginalViewExtensionless(context)) {
 				// User has requested to always render extensionless, or the requested viewId was mapped and the current
 				// request is extensionless, render the action URL extensionless as well.
-				
+
 				ServletContext servletContext = (ServletContext) context.getExternalContext().getContext();
-				
+
 				if (servletContext.getMajorVersion() > 2 &&	getViewHandlerMode(servletContext) == STRIP_EXTENSION_FROM_PARENT) {
 					return removeExtension(context, actionURL, viewId);
 				} else {
@@ -77,20 +77,20 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 		// Not a resource we mapped or not a forwarded one, take the version from the parent view handler
 		return actionURL;
 	}
-	
+
 	private boolean isOriginalViewExtensionless(FacesContext context) {
 		String originalViewId = getRequestAttribute(context, "javax.servlet.forward.servlet_path");
 		if (originalViewId == null) {
 			originalViewId = getRequestAttribute(context, FACES_VIEWS_ORIGINAL_SERVLET_PATH);
 		}
-		
+
 		return isExtensionless(originalViewId);
 	}
-	
+
 	public String removeExtension(FacesContext context, String resource, String viewId) {
-		
+
 		Set<String> extensions = getFacesServletExtensions(context);
-	    
+
 	    if (!isExtensionless(viewId)) {
 	    	String viewIdExtension = getExtension(viewId);
 	    	if (!extensions.contains(viewIdExtension)) {
@@ -98,24 +98,24 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 	    		extensions.add(viewIdExtension);
 	    	}
 	    }
-	    
+
 	    int lastSlashPos = resource.lastIndexOf('/');
 	    int lastQuestionMarkPos = resource.lastIndexOf('?'); // so we don't remove "extension" from parameter value
 	    for (String extension : extensions) {
-	    	
+
 	    	int extensionPos = resource.lastIndexOf(extension);
 	    	if (extensionPos > lastSlashPos && (lastQuestionMarkPos == -1 || extensionPos < lastQuestionMarkPos)) {
 	    		return resource.substring(0, extensionPos) + resource.substring(extensionPos + extension.length());
 	    	}
-	    	
+
 	    }
-	    
+
 		return resource;
 	}
-	
+
 	/**
 	 * Extracts the query string from a resource.
-	 * 
+	 *
 	 * @param resource
 	 *            A URL string
 	 * @return the query string part of the URL

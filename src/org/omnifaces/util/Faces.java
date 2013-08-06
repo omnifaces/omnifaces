@@ -13,20 +13,14 @@
 package org.omnifaces.util;
 
 import static javax.faces.FactoryFinder.APPLICATION_FACTORY;
-import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -39,7 +33,6 @@ import javax.faces.FactoryFinder;
 import javax.faces.application.Application;
 import javax.faces.application.ApplicationFactory;
 import javax.faces.application.NavigationHandler;
-import javax.faces.application.ProjectStage;
 import javax.faces.application.ViewHandler;
 import javax.faces.component.UIViewParameter;
 import javax.faces.component.UIViewRoot;
@@ -56,7 +49,6 @@ import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRegistration;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -71,17 +63,15 @@ import javax.servlet.http.HttpSession;
  * client code needs to call methods in this class multiple times it's expected that performance will be slightly better
  * if instead the {@link FacesContext} is obtained once and the required methods are called on that, although the
  * difference is practically negligible when used in modern server hardware.
+ * <p>
+ * In such case, consider using {@link FacesLocal} instead. The difference with {@link Faces} is that no one method of
+ * {@link FacesLocal} obtains the {@link FacesContext} from the current thread by
+ * {@link FacesContext#getCurrentInstance()}. This job is up to the caller.
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz
  */
 public final class Faces {
-
-	// Constants ------------------------------------------------------------------------------------------------------
-
-	private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
-	private static final int DEFAULT_SENDFILE_BUFFER_SIZE = 10240;
-	private static final String ERROR_NO_VIEW = "There is no view.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -192,7 +182,7 @@ public final class Faces {
 	 * @see ServletContext#getServerInfo()
 	 */
 	public static String getServerInfo() {
-		return getServletContext().getServerInfo();
+		return FacesLocal.getServerInfo(getContext());
 	}
 
 	/**
@@ -202,7 +192,7 @@ public final class Faces {
 	 * @see Application#getProjectStage()
 	 */
 	public static boolean isDevelopment() {
-		return getApplication().getProjectStage() == ProjectStage.Development;
+		return FacesLocal.isDevelopment(getContext());
 	}
 
 	/**
@@ -214,15 +204,7 @@ public final class Faces {
 	 * @see #getRequestServletPath()
 	 */
 	public static String getMapping() {
-		ExternalContext externalContext = getExternalContext();
-
-		if (externalContext.getRequestPathInfo() == null) {
-			String path = externalContext.getRequestServletPath();
-			return path.substring(path.lastIndexOf('.'));
-		}
-		else {
-			return externalContext.getRequestServletPath();
-		}
+		return FacesLocal.getMapping(getContext());
 	}
 
 	/**
@@ -286,14 +268,8 @@ public final class Faces {
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see Application#evaluateExpressionGet(FacesContext, String, Class)
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T evaluateExpressionGet(String expression) {
-		if (expression == null) {
-			return null;
-		}
-
-		FacesContext context = getContext();
-		return (T) context.getApplication().evaluateExpressionGet(context, expression, Object.class);
+		return FacesLocal.evaluateExpressionGet(getContext(), expression);
 	}
 
 	/**
@@ -306,11 +282,7 @@ public final class Faces {
 	 * @since 1.1
 	 */
 	public static void evaluateExpressionSet(String expression, Object value) {
-		FacesContext context = getContext();
-		ELContext elContext = context.getELContext();
-		ValueExpression valueExpression = context.getApplication().getExpressionFactory()
-		    .createValueExpression(elContext, expression, Object.class);
-		valueExpression.setValue(elContext, value);
+		FacesLocal.evaluateExpressionSet(getContext(), expression, value);
 	}
 
 	/**
@@ -321,9 +293,8 @@ public final class Faces {
 	 * @see FacesContext#getAttributes()
 	 * @since 1.3
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T getContextAttribute(String name) {
-		return (T) getContext().getAttributes().get(name);
+		return FacesLocal.getContextAttribute(getContext(), name);
 	}
 
 	/**
@@ -334,7 +305,7 @@ public final class Faces {
 	 * @since 1.3
 	 */
 	public static void setContextAttribute(String name, Object value) {
-		getContext().getAttributes().put(name, value);
+		FacesLocal.setContextAttribute(getContext(), name, value);
 	}
 
 	// JSF views ------------------------------------------------------------------------------------------------------
@@ -357,8 +328,7 @@ public final class Faces {
 	 * @since 1.1
 	 */
 	public static void setViewRoot(String viewId) {
-		FacesContext context = getContext();
-		context.setViewRoot(context.getApplication().getViewHandler().createView(context, viewId));
+		FacesLocal.setViewRoot(getContext(), viewId);
 	}
 
 	/**
@@ -367,8 +337,7 @@ public final class Faces {
 	 * @see UIViewRoot#getViewId()
 	 */
 	public static String getViewId() {
-		UIViewRoot viewRoot = getViewRoot();
-		return (viewRoot != null) ? viewRoot.getViewId() : null;
+		return FacesLocal.getViewId(getContext());
 	}
 
 	/**
@@ -384,19 +353,7 @@ public final class Faces {
 	 * @see #isPrefixMapping(String)
 	 */
 	public static String normalizeViewId(String path) {
-		String mapping = getMapping();
-
-		if (isPrefixMapping(mapping)) {
-			if (path.startsWith(mapping)) {
-				return path.substring(mapping.length());
-			}
-		}
-		else if (path.endsWith(mapping)) {
-			return path.substring(0, path.lastIndexOf('.')) + Utils.coalesce(
-				getInitParameter(ViewHandler.FACELETS_SUFFIX_PARAM_NAME), ViewHandler.DEFAULT_FACELETS_SUFFIX);
-		}
-
-		return path;
+		return FacesLocal.normalizeViewId(getContext(), path);
 	}
 
 	/**
@@ -405,8 +362,7 @@ public final class Faces {
 	 * @see ViewMetadata#getViewParameters(UIViewRoot)
 	 */
 	public static Collection<UIViewParameter> getViewParameters() {
-		UIViewRoot viewRoot = getViewRoot();
-		return (viewRoot != null) ? ViewMetadata.getViewParameters(viewRoot) : Collections.<UIViewParameter>emptyList();
+		return FacesLocal.getViewParameters(getContext());
 	}
 
 	/**
@@ -417,14 +373,7 @@ public final class Faces {
 	 * @since 1.4
 	 */
 	public static Map<String, Object> getMetadataAttributes(String viewId) {
-		FacesContext context = Faces.getContext();
-		ViewHandler viewHandler = context.getApplication().getViewHandler();
-		ViewDeclarationLanguage vdl = viewHandler.getViewDeclarationLanguage(context, viewId);
-		ViewMetadata metadata = vdl.getViewMetadata(context, viewId);
-
-		return (metadata != null)
-			? metadata.createMetadataView(context).getAttributes()
-			: Collections.<String, Object>emptyMap();
+		return FacesLocal.getMetadataAttributes(getContext(), viewId);
 	}
 
 	/**
@@ -437,9 +386,8 @@ public final class Faces {
 	 * @see ViewDeclarationLanguage#getViewMetadata(FacesContext, String)
 	 * @since 1.4
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T getMetadataAttribute(String viewId, String name) {
-		return (T) getMetadataAttributes(viewId).get(name);
+		return FacesLocal.getMetadataAttribute(getContext(), viewId, name);
 	}
 
 	/**
@@ -451,9 +399,8 @@ public final class Faces {
 	 * @see UIViewRoot#getAttributes()
 	 * @since 1.4
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T getMetadataAttribute(String name) {
-		return (T) Faces.getViewRoot().getAttributes().get(name);
+		return FacesLocal.getMetadataAttribute(getContext(), name);
 	}
 
 	/**
@@ -467,35 +414,7 @@ public final class Faces {
 	 * @see Locale#getDefault()
 	 */
 	public static Locale getLocale() {
-		FacesContext context = getContext();
-		Locale locale = null;
-		UIViewRoot viewRoot = context.getViewRoot();
-
-		// Prefer the locale set in the view.
-		if (viewRoot != null) {
-			locale = viewRoot.getLocale();
-		}
-
-		// Then the client preferred locale.
-		if (locale == null) {
-			Locale clientLocale = context.getExternalContext().getRequestLocale();
-
-			if (getSupportedLocales().contains(clientLocale)) {
-				locale = clientLocale;
-			}
-		}
-
-		// Then the JSF default locale.
-		if (locale == null) {
-			locale = context.getApplication().getDefaultLocale();
-		}
-
-		// Finally the system default locale.
-		if (locale == null) {
-			locale = Locale.getDefault();
-		}
-
-		return locale;
+		return FacesLocal.getLocale(getContext());
 	}
 
 	/**
@@ -504,7 +423,7 @@ public final class Faces {
 	 * @see Application#getDefaultLocale()
 	 */
 	public static Locale getDefaultLocale() {
-		return getApplication().getDefaultLocale();
+		return FacesLocal.getDefaultLocale(getContext());
 	}
 
 	/**
@@ -515,23 +434,7 @@ public final class Faces {
 	 * @see Application#getSupportedLocales()
 	 */
 	public static List<Locale> getSupportedLocales() {
-		Application application = getApplication();
-		List<Locale> supportedLocales = new ArrayList<Locale>();
-		Locale defaultLocale = application.getDefaultLocale();
-
-		if (defaultLocale != null) {
-			supportedLocales.add(defaultLocale);
-		}
-
-		for (Iterator<Locale> iter = application.getSupportedLocales(); iter.hasNext();) {
-			Locale supportedLocale = iter.next();
-
-			if (!supportedLocale.equals(defaultLocale)) {
-				supportedLocales.add(supportedLocale);
-			}
-		}
-
-		return supportedLocales;
+		return FacesLocal.getSupportedLocales(getContext());
 	}
 
 	/**
@@ -543,13 +446,7 @@ public final class Faces {
 	 * @since 1.2
 	 */
 	public static void setLocale(Locale locale) {
-		UIViewRoot viewRoot = getViewRoot();
-
-		if (viewRoot == null) {
-			throw new IllegalStateException(ERROR_NO_VIEW);
-		}
-
-		viewRoot.setLocale(locale);
+		FacesLocal.setLocale(getContext(), locale);
 	}
 
 	/**
@@ -559,8 +456,7 @@ public final class Faces {
 	 * @see NavigationHandler#handleNavigation(FacesContext, String, String)
 	 */
 	public static void navigate(String outcome) {
-		FacesContext context = getContext();
-		context.getApplication().getNavigationHandler().handleNavigation(context, null, outcome);
+		FacesLocal.navigate(getContext(), outcome);
 	}
 
 	/**
@@ -576,13 +472,7 @@ public final class Faces {
 	 * @since 1.6
 	 */
 	public static String getBookmarkableURL(Map<String, List<String>> params, boolean includeViewParams) {
-		String viewId = getViewId();
-
-		if (viewId == null) {
-			throw new IllegalStateException(ERROR_NO_VIEW);
-		}
-
-		return getBookmarkableURL(viewId, params, includeViewParams);
+		return FacesLocal.getBookmarkableURL(getContext(), params, includeViewParams);
 	}
 
 	/**
@@ -599,8 +489,7 @@ public final class Faces {
 	 * @since 1.6
 	 */
 	public static String getBookmarkableURL(String viewId, Map<String, List<String>> params, boolean includeViewParams) {
-		FacesContext context = getContext();
-		return context.getApplication().getViewHandler().getBookmarkableURL(context, viewId, params, includeViewParams);
+		return FacesLocal.getBookmarkableURL(getContext(), viewId, params, includeViewParams);
 	}
 
 	// Facelets -------------------------------------------------------------------------------------------------------
@@ -616,7 +505,7 @@ public final class Faces {
 	 * @since 1.1
 	 */
 	public static FaceletContext getFaceletContext() {
-	    return (FaceletContext) getContext().getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
+	    return FacesLocal.getFaceletContext(getContext());
 	}
 
 	/**
@@ -629,9 +518,8 @@ public final class Faces {
 	 * @see FaceletContext#getAttribute(String)
 	 * @since 1.1
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T getFaceletAttribute(String name) {
-		return (T) getFaceletContext().getAttribute(name);
+		return FacesLocal.getFaceletAttribute(getContext(), name);
 	}
 
 	/**
@@ -644,7 +532,7 @@ public final class Faces {
 	 * @since 1.1
 	 */
 	public static void setFaceletAttribute(String name, Object value) {
-		getFaceletContext().setAttribute(name, value);
+		FacesLocal.setFaceletAttribute(getContext(), name, value);
 	}
 
 	// HTTP request ---------------------------------------------------------------------------------------------------
@@ -659,7 +547,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequest()
 	 */
 	public static HttpServletRequest getRequest() {
-		return (HttpServletRequest) getExternalContext().getRequest();
+		return FacesLocal.getRequest(getContext());
 	}
 
 	/**
@@ -668,7 +556,7 @@ public final class Faces {
 	 * @see PartialViewContext#isAjaxRequest()
 	 */
 	public static boolean isAjaxRequest() {
-		return Ajax.getContext().isAjaxRequest();
+		return FacesLocal.isAjaxRequest(getContext());
 	}
 
 	/**
@@ -686,7 +574,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestParameterMap()
 	 */
 	public static Map<String, String> getRequestParameterMap() {
-		return getExternalContext().getRequestParameterMap();
+		return FacesLocal.getRequestParameterMap(getContext());
 	}
 
 	/**
@@ -696,7 +584,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestParameterMap()
 	 */
 	public static String getRequestParameter(String name) {
-		return getRequestParameterMap().get(name);
+		return FacesLocal.getRequestParameterMap(getContext()).get(name);
 	}
 
 	/**
@@ -705,7 +593,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestParameterValuesMap()
 	 */
 	public static Map<String, String[]> getRequestParameterValuesMap() {
-		return getExternalContext().getRequestParameterValuesMap();
+		return FacesLocal.getRequestParameterValuesMap(getContext());
 	}
 
 	/**
@@ -715,7 +603,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestParameterValuesMap()
 	 */
 	public static String[] getRequestParameterValues(String name) {
-		return getRequestParameterValuesMap().get(name);
+		return FacesLocal.getRequestParameterValues(getContext(), name);
 	}
 
 	/**
@@ -724,7 +612,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestHeaderMap()
 	 */
 	public static Map<String, String> getRequestHeaderMap() {
-		return getExternalContext().getRequestHeaderMap();
+		return FacesLocal.getRequestHeaderMap(getContext());
 	}
 
 	/**
@@ -734,7 +622,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestHeaderMap()
 	 */
 	public static String getRequestHeader(String name) {
-		return getRequestHeaderMap().get(name);
+		return FacesLocal.getRequestHeader(getContext(), name);
 	}
 
 	/**
@@ -743,7 +631,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestHeaderValuesMap()
 	 */
 	public static Map<String, String[]> getRequestHeaderValuesMap() {
-		return getExternalContext().getRequestHeaderValuesMap();
+		return FacesLocal.getRequestHeaderValuesMap(getContext());
 	}
 
 	/**
@@ -753,7 +641,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestHeaderValuesMap()
 	 */
 	public static String[] getRequestHeaderValues(String name) {
-		return getRequestHeaderValuesMap().get(name);
+		return FacesLocal.getRequestHeaderValues(getContext(), name);
 	}
 
 	/**
@@ -763,7 +651,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestContextPath()
 	 */
 	public static String getRequestContextPath() {
-		return getExternalContext().getRequestContextPath();
+		return FacesLocal.getRequestContextPath(getContext());
 	}
 
 	/**
@@ -774,7 +662,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestServletPath()
 	 */
 	public static String getRequestServletPath() {
-		return getExternalContext().getRequestServletPath();
+		return FacesLocal.getRequestServletPath(getContext());
 	}
 
 	/**
@@ -785,7 +673,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestPathInfo()
 	 */
 	public static String getRequestPathInfo() {
-		return getExternalContext().getRequestPathInfo();
+		return FacesLocal.getRequestPathInfo(getContext());
 	}
 
 	/**
@@ -797,7 +685,7 @@ public final class Faces {
 	 * @see HttpServletRequest#getContextPath()
 	 */
 	public static String getRequestBaseURL() {
-		return getRequestBaseURL(getRequest());
+		return FacesLocal.getRequestBaseURL(getContext());
 	}
 
 	/**
@@ -810,6 +698,8 @@ public final class Faces {
 	 * @see HttpServletRequest#getRequestURL()
 	 * @see HttpServletRequest#getRequestURI()
 	 * @see HttpServletRequest#getContextPath()
+	 *
+	 * TODO: this method does actually not belong here! It belongs in a fictive "Servlets" utility class.
 	 */
 	public static String getRequestBaseURL(HttpServletRequest request) {
 		String url = request.getRequestURL().toString();
@@ -824,9 +714,7 @@ public final class Faces {
 	 * @since 1.1
 	 */
 	public static String getRequestDomainURL() {
-		HttpServletRequest request = getRequest();
-		String url = request.getRequestURL().toString();
-		return url.substring(0, url.length() - request.getRequestURI().length());
+		return FacesLocal.getRequestDomainURL(getContext());
 	}
 
 	/**
@@ -837,7 +725,7 @@ public final class Faces {
 	 * @since 1.1
 	 */
 	public static String getRequestURL() {
-		return getRequest().getRequestURL().toString();
+		return FacesLocal.getRequestURL(getContext());
 	}
 
 	/**
@@ -848,7 +736,7 @@ public final class Faces {
 	 * @since 1.1
 	 */
 	public static String getRequestURI() {
-		return getRequest().getRequestURI();
+		return FacesLocal.getRequestURI(getContext());
 	}
 
 	/**
@@ -859,7 +747,7 @@ public final class Faces {
 	 * @since 1.1
 	 */
 	public static String getRequestQueryString() {
-		return getRequest().getQueryString();
+		return FacesLocal.getRequestQueryString(getContext());
 	}
 
 	/**
@@ -871,10 +759,7 @@ public final class Faces {
 	 * @since 1.5
 	 */
 	public static String getRequestURLWithQueryString() {
-		HttpServletRequest request = getRequest();
-		StringBuffer requestURL = request.getRequestURL();
-		String queryString = request.getQueryString();
-		return (queryString == null) ? requestURL.toString() : requestURL.append('?').append(queryString).toString();
+		return FacesLocal.getRequestURLWithQueryString(getContext());
 	}
 
 	/**
@@ -886,13 +771,7 @@ public final class Faces {
 	 * @since 1.2
 	 */
 	public static String getRemoteAddr() {
-		String forwardedFor = getRequestHeader("X-Forwarded-For");
-
-		if (!Utils.isEmpty(forwardedFor)) {
-			return forwardedFor.split("\\s*,\\s*", 2)[0]; // It's a comma separated string: client,proxy1,proxy2,...
-		}
-
-		return getRequest().getRemoteAddr();
+		return FacesLocal.getRemoteAddr(getContext());
 	}
 
 	// HTTP response --------------------------------------------------------------------------------------------------
@@ -907,7 +786,7 @@ public final class Faces {
 	 * @see ExternalContext#getResponse()
 	 */
 	public static HttpServletResponse getResponse() {
-		return (HttpServletResponse) getExternalContext().getResponse();
+		return FacesLocal.getResponse(getContext());
 	}
 
 	/**
@@ -919,7 +798,7 @@ public final class Faces {
 	 * @since 1.2
 	 */
 	public static int getResponseBufferSize() {
-		return getExternalContext().getResponseBufferSize();
+		return FacesLocal.getResponseBufferSize(getContext());
 	}
 
 	/**
@@ -929,7 +808,7 @@ public final class Faces {
 	 * @since 1.2
 	 */
 	public static String getResponseCharacterEncoding() {
-		return getExternalContext().getResponseCharacterEncoding();
+		return FacesLocal.getResponseCharacterEncoding(getContext());
 	}
 
 	/**
@@ -954,9 +833,7 @@ public final class Faces {
 	 * @see ExternalContext#redirect(String)
 	 */
 	public static void redirect(String url, String... paramValues) throws IOException {
-		ExternalContext externalContext = getExternalContext();
-		externalContext.getFlash().setRedirect(true);
-		externalContext.redirect(String.format(normalizeRedirectURL(url), encodeURLParams(paramValues)));
+		FacesLocal.redirect(getContext(), url, paramValues);
 	}
 
 	/**
@@ -978,51 +855,12 @@ public final class Faces {
 	 * JSF ajax XML response.
 	 * @param url The URL to redirect the current response to.
 	 * @param paramValues The request parameter values which you'd like to put URL-encoded in the given URL.
-	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
-	 * redeclare it in the action method. The servletcontainer will handle it.
 	 * @throws NullPointerException When url is <code>null</code>.
 	 * @see ExternalContext#setResponseStatus(int)
 	 * @see ExternalContext#setResponseHeader(String, String)
 	 */
-	public static void redirectPermanent(String url, String... paramValues) throws IOException {
-		FacesContext context = getContext();
-		ExternalContext externalContext = context.getExternalContext();
-		externalContext.getFlash().setRedirect(true);
-		externalContext.setResponseStatus(SC_MOVED_PERMANENTLY);
-		externalContext.setResponseHeader("Location", String.format(normalizeRedirectURL(url), encodeURLParams(paramValues)));
-		externalContext.setResponseHeader("Connection", "close");
-		context.responseComplete();
-	}
-
-	/**
-	 * Helper method to normalize the given URL for a redirect. If the given URL does not start with
-	 * <code>http://</code>, <code>https://</code> or <code>/</code>, then the request context path will be prepended,
-	 * otherwise it will be unmodified.
-	 */
-	private static String normalizeRedirectURL(String url) {
-		if (!url.startsWith("http://") && !url.startsWith("https://") && !url.startsWith("/")) {
-			url = getRequestContextPath() + "/" + url;
-		}
-
-		return url;
-	}
-
-	/**
-	 * Helper method to encode the given URL parameters using UTF-8.
-	 */
-	private static Object[] encodeURLParams(String... params) {
-		if (params == null) {
-			return new Object[0];
-		}
-		else {
-			Object[] encodedParams = new Object[params.length];
-
-			for (int i = 0; i < params.length; i++) {
-				encodedParams[i] = Utils.encodeURL(params[i]);
-			}
-
-			return encodedParams;
-		}
+	public static void redirectPermanent(String url, String... paramValues) {
+		FacesLocal.redirectPermanent(getContext(), url, paramValues);
 	}
 
 	/**
@@ -1039,9 +877,7 @@ public final class Faces {
 	 * @see ExternalContext#responseSendError(int, String)
 	 */
 	public static void responseSendError(int status, String message) throws IOException {
-		FacesContext context = getContext();
-		context.getExternalContext().responseSendError(status, message);
-		context.responseComplete();
+		FacesLocal.responseSendError(getContext(), status, message);
 	}
 
 	/**
@@ -1051,7 +887,7 @@ public final class Faces {
 	 * @see ExternalContext#addResponseHeader(String, String)
 	 */
 	public static void addResponseHeader(String name, String value) {
-		getExternalContext().addResponseHeader(name, value);
+		FacesLocal.addResponseHeader(getContext(), name, value);
 	}
 
 	/**
@@ -1063,7 +899,7 @@ public final class Faces {
 	 * @since 1.1
 	 */
 	public static boolean isResponseCommitted() {
-		return getExternalContext().isResponseCommitted();
+		return FacesLocal.isResponseCommitted(getContext());
 	}
 
 	/**
@@ -1074,7 +910,7 @@ public final class Faces {
 	 * @since 1.1
 	 */
 	public static void responseReset() {
-		getExternalContext().responseReset();
+		FacesLocal.responseReset(getContext());
 	}
 
 	/**
@@ -1096,7 +932,7 @@ public final class Faces {
 	 * @since 1.4
 	 */
 	public static boolean isRenderResponse() {
-		return getCurrentPhaseId() == PhaseId.RENDER_RESPONSE;
+		return FacesLocal.isRenderResponse(getContext());
 	}
 
 	/**
@@ -1131,7 +967,7 @@ public final class Faces {
 	 * @see HttpServletRequest#login(String, String)
 	 */
 	public static void login(String username, String password) throws ServletException {
-		getRequest().login(username, password);
+		FacesLocal.login(getContext(), username, password);
 	}
 
 	/**
@@ -1146,7 +982,7 @@ public final class Faces {
 	 * @since 1.4
 	 */
 	public static boolean authenticate() throws ServletException, IOException {
-		return getRequest().authenticate(getResponse());
+		return FacesLocal.authenticate(getContext());
 	}
 
 	/**
@@ -1160,7 +996,7 @@ public final class Faces {
 	 * @see HttpServletRequest#logout()
 	 */
 	public static void logout() throws ServletException {
-		getRequest().logout();
+		FacesLocal.logout(getContext());
 	}
 
 	/**
@@ -1169,7 +1005,7 @@ public final class Faces {
 	 * @see ExternalContext#getRemoteUser()
 	 */
 	public static String getRemoteUser() {
-		return getExternalContext().getRemoteUser();
+		return FacesLocal.getRemoteUser(getContext());
 	}
 
 	/**
@@ -1179,7 +1015,7 @@ public final class Faces {
 	 * @see ExternalContext#isUserInRole(String)
 	 */
 	public static boolean isUserInRole(String role) {
-		return getExternalContext().isUserInRole(role);
+		return FacesLocal.isUserInRole(getContext(), role);
 	}
 
 	// HTTP cookies ---------------------------------------------------------------------------------------------------
@@ -1193,8 +1029,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestCookieMap()
 	 */
 	public static String getRequestCookie(String name) {
-		Cookie cookie = (Cookie) getExternalContext().getRequestCookieMap().get(name);
-		return (cookie != null) ? Utils.decodeURL(cookie.getValue()) : null;
+		return FacesLocal.getRequestCookie(getContext(), name);
 	}
 
 	/**
@@ -1213,16 +1048,7 @@ public final class Faces {
 	 * @see ExternalContext#addResponseCookie(String, String, Map)
 	 */
 	public static void addResponseCookie(String name, String value, String path, int maxAge) {
-		if (value != null) {
-			value = Utils.encodeURL(value);
-		}
-
-		ExternalContext externalContext = getExternalContext();
-		Map<String, Object> properties = new HashMap<String, Object>();
-		properties.put("path", path);
-		properties.put("maxAge", maxAge);
-		properties.put("secure", ((HttpServletRequest) externalContext.getRequest()).isSecure());
-		externalContext.addResponseCookie(name, value, properties);
+		FacesLocal.addResponseCookie(getContext(), name, value, path, maxAge);
 	}
 
 	/**
@@ -1233,7 +1059,7 @@ public final class Faces {
 	 * @see ExternalContext#addResponseCookie(String, String, Map)
 	 */
 	public static void removeResponseCookie(String name, String path) {
-		addResponseCookie(name, null, path, 0);
+		FacesLocal.removeResponseCookie(getContext(), name, path);
 	}
 
 	// HTTP session ---------------------------------------------------------------------------------------------------
@@ -1248,7 +1074,7 @@ public final class Faces {
 	 * @see ExternalContext#getSession(boolean)
 	 */
 	public static HttpSession getSession() {
-		return getSession(true);
+		return FacesLocal.getSession(getContext());
 	}
 
 	/**
@@ -1262,7 +1088,7 @@ public final class Faces {
 	 * @see ExternalContext#getSession(boolean)
 	 */
 	public static HttpSession getSession(boolean create) {
-		return (HttpSession) getExternalContext().getSession(create);
+		return FacesLocal.getSession(getContext(), create);
 	}
 
 	/**
@@ -1273,8 +1099,7 @@ public final class Faces {
 	 * @since 1.2
 	 */
 	public static String getSessionId() {
-		HttpSession session = getSession(false);
-		return (session != null) ? session.getId() : null;
+		return FacesLocal. getSessionId(getContext());
 	}
 
 	/**
@@ -1282,7 +1107,7 @@ public final class Faces {
 	 * @see ExternalContext#invalidateSession()
 	 */
 	public static void invalidateSession() {
-		getExternalContext().invalidateSession();
+		FacesLocal.invalidateSession(getContext());
 	}
 
 	/**
@@ -1292,7 +1117,7 @@ public final class Faces {
 	 * @since 1.1
 	 */
 	public static boolean hasSession() {
-		return getSession(false) != null;
+		return FacesLocal.hasSession(getContext());
 	}
 
 	/**
@@ -1305,8 +1130,7 @@ public final class Faces {
 	 * @since 1.1
 	 */
 	public static boolean isSessionNew() {
-		HttpSession session = getSession(false);
-		return (session != null && session.isNew());
+		return FacesLocal.isSessionNew(getContext());
 	}
 
 	/**
@@ -1317,7 +1141,7 @@ public final class Faces {
 	 * @since 1.1
 	 */
 	public static long getSessionCreationTime() {
-		return getSession().getCreationTime();
+		return FacesLocal.getSessionCreationTime(getContext());
 	}
 
 	/**
@@ -1328,7 +1152,7 @@ public final class Faces {
 	 * @since 1.1
 	 */
 	public static long getSessionLastAccessedTime() {
-		return getSession().getLastAccessedTime();
+		return FacesLocal.getSessionLastAccessedTime(getContext());
 	}
 
 	/**
@@ -1339,7 +1163,7 @@ public final class Faces {
 	 */
 	public static int getSessionMaxInactiveInterval() {
 		// Note that JSF 2.1 has this method on ExternalContext. We don't use it in order to be JSF 2.0 compatible.
-		return getSession().getMaxInactiveInterval();
+		return FacesLocal.getSessionMaxInactiveInterval(getContext());
 	}
 
 	/**
@@ -1351,7 +1175,7 @@ public final class Faces {
 	 */
 	public static void setSessionMaxInactiveInterval(int seconds) {
 		// Note that JSF 2.1 has this method on ExternalContext. We don't use it in order to be JSF 2.0 compatible.
-		getSession().setMaxInactiveInterval(seconds);
+		FacesLocal.setSessionMaxInactiveInterval(getContext(), seconds);
 	}
 
 	/**
@@ -1365,8 +1189,7 @@ public final class Faces {
 	 * @since 1.1
 	 */
 	public static boolean hasSessionTimedOut() {
-		HttpServletRequest request = getRequest();
-		return request.getRequestedSessionId() != null && !request.isRequestedSessionIdValid();
+		return FacesLocal.hasSessionTimedOut(getContext());
 	}
 
 	// Servlet context ------------------------------------------------------------------------------------------------
@@ -1381,7 +1204,7 @@ public final class Faces {
 	 * @see ExternalContext#getContext()
 	 */
 	public static ServletContext getServletContext() {
-		return (ServletContext) getExternalContext().getContext();
+		return FacesLocal.getServletContext(getContext());
 	}
 
 	/**
@@ -1391,9 +1214,8 @@ public final class Faces {
 	 * @see ExternalContext#getInitParameterMap()
 	 * @since 1.1
 	 */
-	@SuppressWarnings("unchecked")
 	public static Map<String, String> getInitParameterMap() {
-		return getExternalContext().getInitParameterMap();
+		return FacesLocal.getInitParameterMap(getContext());
 	}
 
 	/**
@@ -1407,7 +1229,7 @@ public final class Faces {
 	 * @since 1.1
 	 */
 	public static String getInitParameter(String name) {
-		return getExternalContext().getInitParameter(name);
+		return FacesLocal.getInitParameter(getContext(), name);
 	}
 
 	/**
@@ -1419,13 +1241,7 @@ public final class Faces {
 	 * @see ExternalContext#getMimeType(String)
 	 */
 	public static String getMimeType(String name) {
-		String mimeType = getExternalContext().getMimeType(name);
-
-		if (mimeType == null) {
-			mimeType = DEFAULT_MIME_TYPE;
-		}
-
-		return mimeType;
+		return FacesLocal.getMimeType(getContext(), name);
 	}
 
 	/**
@@ -1438,7 +1254,7 @@ public final class Faces {
 	 * @since 1.2
 	 */
 	public static URL getResource(String path) throws MalformedURLException {
-		return getExternalContext().getResource(path);
+		return FacesLocal.getResource(getContext(), path);
 	}
 
 	/**
@@ -1449,7 +1265,7 @@ public final class Faces {
 	 * @see ExternalContext#getResourceAsStream(String)
 	 */
 	public static InputStream getResourceAsStream(String path) {
-		return getExternalContext().getResourceAsStream(path);
+		return FacesLocal.getResourceAsStream(getContext(), path);
 	}
 
 	/**
@@ -1459,7 +1275,7 @@ public final class Faces {
 	 * @see ExternalContext#getResourcePaths(String)
 	 */
 	public static Set<String> getResourcePaths(String path) {
-		return getExternalContext().getResourcePaths(path);
+		return FacesLocal.getResourcePaths(getContext(), path);
 	}
 
 	/**
@@ -1480,7 +1296,7 @@ public final class Faces {
 	 * @since 1.2
 	 */
 	public static String getRealPath(String webContentPath) {
-		return getExternalContext().getRealPath(webContentPath);
+		return FacesLocal.getRealPath(getContext(), webContentPath);
 	}
 
 	/**
@@ -1510,7 +1326,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestMap()
 	 */
 	public static Map<String, Object> getRequestMap() {
-		return getExternalContext().getRequestMap();
+		return FacesLocal.getRequestMap(getContext());
 	}
 
 	/**
@@ -1520,9 +1336,8 @@ public final class Faces {
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see ExternalContext#getRequestMap()
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T getRequestAttribute(String name) {
-		return (T) getRequestMap().get(name);
+		return FacesLocal.getRequestAttribute(getContext(), name);
 	}
 
 	/**
@@ -1532,7 +1347,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestMap()
 	 */
 	public static void setRequestAttribute(String name, Object value) {
-		getRequestMap().put(name, value);
+		FacesLocal.setRequestAttribute(getContext(), name, value);
 	}
 
 	/**
@@ -1544,25 +1359,16 @@ public final class Faces {
 	 * @see ExternalContext#getRequestMap()
 	 * @since 1.1
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T removeRequestAttribute(String name) {
-		return (T) getRequestMap().remove(name);
+		return FacesLocal.removeRequestAttribute(getContext(), name);
 	}
 
 	/**
-	 * Returns the request scope attribute value associated with the given name.
-	 *
-	 * @param context The faces context used for looking up the attribute.
-	 * @param name The request scope attribute name.
-	 *
-	 * @return The request scope attribute value associated with the given name.
-	 * @throws ClassCastException When <code>T</code> is of wrong type.
-	 * @see ExternalContext#getRequestMap()
-	 * @since 1.4
+	 * @deprecated Use {@link FacesLocal#getRequestAttribute(FacesContext, String)} instead.
 	 */
-	@SuppressWarnings("unchecked")
+	@Deprecated
 	public static <T> T getRequestAttribute(final FacesContext context, final String name) {
-		return (T) context.getExternalContext().getRequestMap().get(name);
+		return FacesLocal.getRequestAttribute(context, name);
 	}
 
 	// Flash scope ----------------------------------------------------------------------------------------------------
@@ -1574,7 +1380,7 @@ public final class Faces {
 	 * @see ExternalContext#getFlash()
 	 */
 	public static Flash getFlash() {
-		return getExternalContext().getFlash();
+		return FacesLocal.getFlash(getContext());
 	}
 
 	/**
@@ -1584,9 +1390,8 @@ public final class Faces {
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see ExternalContext#getFlash()
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T getFlashAttribute(String name) {
-		return (T) getFlash().get(name);
+		return FacesLocal.getFlashAttribute(getContext(), name);
 	}
 
 	/**
@@ -1596,7 +1401,7 @@ public final class Faces {
 	 * @see ExternalContext#getFlash()
 	 */
 	public static void setFlashAttribute(String name, Object value) {
-		getFlash().put(name, value);
+		FacesLocal.setFlashAttribute(getContext(), name, value);
 	}
 
 	/**
@@ -1608,9 +1413,8 @@ public final class Faces {
 	 * @see ExternalContext#getFlash()
 	 * @since 1.1
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T removeFlashAttribute(String name) {
-		return (T) getFlash().remove(name);
+		return FacesLocal.removeFlashAttribute(getContext(), name);
 	}
 
 	// View scope -----------------------------------------------------------------------------------------------------
@@ -1621,7 +1425,7 @@ public final class Faces {
 	 * @see UIViewRoot#getViewMap()
 	 */
 	public static Map<String, Object> getViewMap() {
-		return getViewRoot().getViewMap();
+		return FacesLocal.getViewMap(getContext());
 	}
 
 	/**
@@ -1631,9 +1435,8 @@ public final class Faces {
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see UIViewRoot#getViewMap()
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T getViewAttribute(String name) {
-		return (T) getViewMap().get(name);
+		return FacesLocal.getViewAttribute(getContext(), name);
 	}
 
 	/**
@@ -1643,7 +1446,7 @@ public final class Faces {
 	 * @see UIViewRoot#getViewMap()
 	 */
 	public static void setViewAttribute(String name, Object value) {
-		getViewMap().put(name, value);
+		FacesLocal.setViewAttribute(getContext(), name, value);
 	}
 
 	/**
@@ -1655,9 +1458,8 @@ public final class Faces {
 	 * @see UIViewRoot#getViewMap()
 	 * @since 1.1
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T removeViewAttribute(String name) {
-		return (T) getViewMap().remove(name);
+		return FacesLocal.removeViewAttribute(getContext(), name);
 	}
 
 	// Session scope --------------------------------------------------------------------------------------------------
@@ -1668,7 +1470,7 @@ public final class Faces {
 	 * @see ExternalContext#getSessionMap()
 	 */
 	public static Map<String, Object> getSessionMap() {
-		return getExternalContext().getSessionMap();
+		return FacesLocal.getSessionMap(getContext());
 	}
 
 	/**
@@ -1678,9 +1480,8 @@ public final class Faces {
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see ExternalContext#getSessionMap()
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T getSessionAttribute(String name) {
-		return (T) getSessionMap().get(name);
+		return FacesLocal.getSessionAttribute(getContext(), name);
 	}
 
 	/**
@@ -1690,7 +1491,7 @@ public final class Faces {
 	 * @see ExternalContext#getSessionMap()
 	 */
 	public static void setSessionAttribute(String name, Object value) {
-		getSessionMap().put(name, value);
+		FacesLocal.setSessionAttribute(getContext(), name, value);
 	}
 
 	/**
@@ -1702,9 +1503,8 @@ public final class Faces {
 	 * @see ExternalContext#getSessionMap()
 	 * @since 1.1
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T removeSessionAttribute(String name) {
-		return (T) getSessionMap().remove(name);
+		return FacesLocal.removeSessionAttribute(getContext(), name);
 	}
 
 	// Application scope ----------------------------------------------------------------------------------------------
@@ -1715,7 +1515,7 @@ public final class Faces {
 	 * @see ExternalContext#getApplicationMap()
 	 */
 	public static Map<String, Object> getApplicationMap() {
-		return getExternalContext().getApplicationMap();
+		return FacesLocal.getApplicationMap(getContext());
 	}
 
 	/**
@@ -1725,9 +1525,8 @@ public final class Faces {
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see ExternalContext#getApplicationMap()
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T getApplicationAttribute(String name) {
-		return (T) getApplicationMap().get(name);
+		return FacesLocal.getApplicationAttribute(getContext(), name);
 	}
 
 	/**
@@ -1737,7 +1536,7 @@ public final class Faces {
 	 * @see ExternalContext#getApplicationMap()
 	 */
 	public static void setApplicationAttribute(String name, Object value) {
-		getApplicationMap().put(name, value);
+		FacesLocal.setApplicationAttribute(getContext(), name, value);
 	}
 
 	/**
@@ -1749,25 +1548,16 @@ public final class Faces {
 	 * @see ExternalContext#getApplicationMap()
 	 * @since 1.1
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T removeApplicationAttribute(String name) {
-		return (T) getApplicationMap().remove(name);
+		return FacesLocal.removeApplicationAttribute(getContext(), name);
 	}
 
 	/**
-	 * Returns the application scope attribute value associated with the given name.
-	 *
-	 * @param name The application scope attribute name.
-	 * @param context The faces context used for looking up the attribute.
-	 *
-	 * @return The application scope attribute value associated with the given name.
-	 * @throws ClassCastException When <code>T</code> is of wrong type.
-	 * @see ExternalContext#getApplicationMap()
-	 * @since 1.4
+	 * @deprecated Use {@link FacesLocal#getApplicationAttribute(FacesContext, String)} instead.
 	 */
-	@SuppressWarnings("unchecked")
+	@Deprecated
 	public static <T> T getApplicationAttribute(final FacesContext context, final String name) {
-		return (T) context.getExternalContext().getApplicationMap().get(name);
+		return FacesLocal.getApplicationAttribute(context, name);
 	}
 
 	/**
@@ -1780,6 +1570,8 @@ public final class Faces {
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see ServletContext#getAttribute(String)
 	 * @since 1.4
+	 *
+	 * TODO: this method does actually not belong here! It belongs in a fictive "Servlets" utility class.
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T getApplicationAttribute(final ServletContext context, final String name) {
@@ -1798,7 +1590,7 @@ public final class Faces {
 	 * redeclare it in the action method. The servletcontainer will handle it.
 	 */
 	public static void sendFile(File file, boolean attachment) throws IOException {
-		sendFile(new FileInputStream(file), file.getName(), file.length(), attachment);
+		FacesLocal.sendFile(getContext(), file, attachment);
 	}
 
 	/**
@@ -1812,7 +1604,7 @@ public final class Faces {
 	 * redeclare it in the action method. The servletcontainer will handle it.
 	 */
 	public static void sendFile(byte[] content, String filename, boolean attachment) throws IOException {
-		sendFile(new ByteArrayInputStream(content), filename, content.length, attachment);
+		FacesLocal.sendFile(getContext(), content, filename, attachment);
 	}
 
 	/**
@@ -1830,49 +1622,7 @@ public final class Faces {
 	 * redeclare it in the action method. The servletcontainer will handle it.
 	 */
 	public static void sendFile(InputStream content, String filename, boolean attachment) throws IOException {
-		sendFile(content, filename, -1, attachment);
-	}
-
-	/**
-	 * Internal global method to send the given input stream to the response.
-	 * @param input The file content as input stream.
-	 * @param filename The file name which should appear in content disposition header.
-	 * @param contentLength The content length, or -1 if it is unknown.
-	 * @param attachment Whether the file should be provided as attachment, or just inline.
-	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
-	 * redeclare it in the action method. The servletcontainer will handle it.
-	 */
-	private static void sendFile(InputStream input, String filename, long contentLength, boolean attachment)
-		throws IOException
-	{
-		FacesContext context = getContext();
-		ExternalContext externalContext = context.getExternalContext();
-
-		// Prepare the response and set the necessary headers.
-		externalContext.setResponseBufferSize(DEFAULT_SENDFILE_BUFFER_SIZE);
-		externalContext.setResponseContentType(getMimeType(filename));
-		externalContext.setResponseHeader("Content-Disposition", String.format("%s;filename=\"%s\"",
-			(attachment ? "attachment" : "inline"), Utils.encodeURL(filename)));
-
-		// Not exactly mandatory, but this fixes at least a MSIE quirk: http://support.microsoft.com/kb/316431
-		if (((HttpServletRequest) externalContext.getRequest()).isSecure()) {
-			externalContext.setResponseHeader("Cache-Control", "public");
-			externalContext.setResponseHeader("Pragma", "public");
-		}
-
-		// If content length is known, set it. Note that setResponseContentLength() cannot be used as it takes only int.
-		if (contentLength != -1) {
-			externalContext.setResponseHeader("Content-Length", String.valueOf(contentLength));
-		}
-
-		long size = Utils.stream(input, externalContext.getResponseOutputStream());
-
-		// This may be on time for files smaller than the default buffer size, but is otherwise ignored anyway.
-		if (contentLength == -1) {
-			externalContext.setResponseHeader("Content-Length", String.valueOf(size));
-		}
-
-		context.responseComplete();
+		FacesLocal.sendFile(getContext(), content, filename, attachment);
 	}
 
 }
