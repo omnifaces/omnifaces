@@ -63,9 +63,9 @@ import javax.servlet.http.HttpSession;
  * <code>getExternalContext()</code>, <code>getViewRoot()</code>, <code>isValidationFailed()</code>, etc are not
  * delegated by the current utility class, because it would design technically not make any sense to delegate a
  * single-depth method call like
- * <pre>ExternalContext externalContext = FacesLocal.getExternalContext(facesContext);</code>
+ * <pre>ExternalContext externalContext = FacesLocal.getExternalContext(facesContext);</pre>
  * <p>instead of just calling it directly
- * <pre>ExternalContext externalContext = facesContext.getExternalContext();</code>
+ * <pre>ExternalContext externalContext = facesContext.getExternalContext();</pre>
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz
@@ -146,12 +146,7 @@ public final class FacesLocal {
 	}
 
 	/**
-	 * Returns the Faces context attribute value associated with the given name.
-	 * @param name The Faces context attribute name.
-	 * @return The Faces context attribute value associated with the given name.
-	 * @throws ClassCastException When <code>T</code> is of wrong type.
-	 * @see FacesContext#getAttributes()
-	 * @since 1.3
+	 * @see Faces#getContextAttribute(String)
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T getContextAttribute(FacesContext context, String name) {
@@ -159,11 +154,7 @@ public final class FacesLocal {
 	}
 
 	/**
-	 * Sets the Faces context attribute value associated with the given name.
-	 * @param name The Faces context attribute name.
-	 * @param value The Faces context attribute value.
-	 * @see FacesContext#getAttributes()
-	 * @since 1.3
+	 * @see Faces#setContextAttribute(String, Object)
 	 */
 	public static void setContextAttribute(FacesContext context, String name, Object value) {
 		context.getAttributes().put(name, value);
@@ -554,19 +545,25 @@ public final class FacesLocal {
 	 * @see Faces#redirect(String, String...)
 	 */
 	public static void redirect(FacesContext context, String url, String... paramValues) throws IOException {
+		String normalizedURL = normalizeRedirectURL(context, url);
+		Object[] params = encodeURLParams(paramValues);
+
 		ExternalContext externalContext = context.getExternalContext();
 		externalContext.getFlash().setRedirect(true);
-		externalContext.redirect(String.format(normalizeRedirectURL(context, url), encodeURLParams(paramValues)));
+		externalContext.redirect(String.format(normalizedURL, params));
 	}
 
 	/**
 	 * @see Faces#redirectPermanent(String, String...)
 	 */
 	public static void redirectPermanent(FacesContext context, String url, String... paramValues) {
+		String normalizedURL = normalizeRedirectURL(context, url);
+		Object[] params = encodeURLParams(paramValues);
+
 		ExternalContext externalContext = context.getExternalContext();
 		externalContext.getFlash().setRedirect(true);
 		externalContext.setResponseStatus(SC_MOVED_PERMANENTLY);
-		externalContext.setResponseHeader("Location", String.format(normalizeRedirectURL(context, url), encodeURLParams(paramValues)));
+		externalContext.setResponseHeader("Location", String.format(normalizedURL, params));
 		externalContext.setResponseHeader("Connection", "close");
 		context.responseComplete();
 	}
