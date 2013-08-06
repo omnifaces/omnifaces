@@ -41,7 +41,6 @@ import javax.faces.application.ApplicationFactory;
 import javax.faces.application.NavigationHandler;
 import javax.faces.application.ProjectStage;
 import javax.faces.application.ViewHandler;
-import javax.faces.component.UIComponent;
 import javax.faces.component.UIViewParameter;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.ExternalContext;
@@ -618,14 +617,6 @@ public final class Faces {
 	 */
 	public static FaceletContext getFaceletContext() {
 	    return (FaceletContext) getContext().getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
-	}
-
-	/**
-	 * @deprecated Moved to {@link Components#includeFacelet(UIComponent, String)}. Please use it instead.
-	 */
-	@Deprecated
-	public static void includeFacelet(UIComponent parent, String path) throws IOException {
-		Components.includeFacelet(parent, path);
 	}
 
 	/**

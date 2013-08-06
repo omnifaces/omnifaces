@@ -616,7 +616,16 @@ public final class Components {
 	}
 
 	/**
-	 * Create an action listener method expression based on the given EL expression.
+	 * Create an action listener method expression based on the given EL expression. The target method must take an
+	 * {@link ActionEvent} as argument.
+	 * As an example, the following action method example,
+	 * <ul>
+	 * <li><code>public void actionListener(ActionEvent event)</code></li>
+	 * </ul>
+	 * <p>can be created as follows:
+	 * <ul>
+	 * <li><code>createActionListenerMethodExpression("#{bean.actionListener}");</code></li>
+	 * </ul>
 	 * @param expression The EL expression to create an action listener method expression for.
 	 * @return The created action listener method expression, ready to be used as
 	 * {@link UICommand#addActionListener(javax.faces.event.ActionListener)}.
@@ -626,11 +635,20 @@ public final class Components {
 	}
 
 	/**
-	 * Create an ajax behavior which should invoke the given expression.
+	 * Create an ajax behavior which should invoke an ajax listener method expression based on the given EL expression.
+	 * The target method must take an {@link AjaxBehaviorEvent} as argument.
+	 * As an example, the following ajax listener example,
+	 * <ul>
+	 * <li><code>public void ajaxListener(AjaxBehaviorEvent event)</code></li>
+	 * </ul>
+	 * <p>can be created as follows:
+	 * <ul>
+	 * <li><code>createAjaxBehavior("#{bean.ajaxListener}");</code></li>
+	 * </ul>
 	 * @param expression The EL expression to be invoked when the created ajax behavior is processed.
 	 * @return The created ajax behavior, ready to be used as
 	 * {@link UIComponentBase#addClientBehavior(String, ClientBehavior)} whereby the string argument represents the
-	 * client event name, such as "action", "valueChange", "click", etc.
+	 * client event name, such as "action", "valueChange", "click", "blur", etc.
 	 */
 	public static AjaxBehavior createAjaxBehavior(String expression) {
 		AjaxBehavior behavior = new AjaxBehavior();
