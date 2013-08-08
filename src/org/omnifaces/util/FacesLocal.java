@@ -459,19 +459,24 @@ public final class FacesLocal {
 	}
 
 	/**
+	 * @see Faces#getRequestHostname()
+	 */
+	public static String getRequestHostname(FacesContext context) {
+		return Servlets.getRequestHostname(getRequest(context));
+	}
+
+	/**
 	 * @see Faces#getRequestBaseURL()
 	 */
 	public static String getRequestBaseURL(FacesContext context) {
-		return Faces.getRequestBaseURL(getRequest(context));
+		return Servlets.getRequestBaseURL(getRequest(context));
 	}
 
 	/**
 	 * @see Faces#getRequestDomainURL()
 	 */
 	public static String getRequestDomainURL(FacesContext context) {
-		HttpServletRequest request = getRequest(context);
-		String url = request.getRequestURL().toString();
-		return url.substring(0, url.length() - request.getRequestURI().length());
+		return Servlets.getRequestDomainURL(getRequest(context));
 	}
 
 	/**
@@ -499,10 +504,7 @@ public final class FacesLocal {
 	 * @see Faces#getRequestURLWithQueryString()
 	 */
 	public static String getRequestURLWithQueryString(FacesContext context) {
-		HttpServletRequest request = getRequest(context);
-		StringBuffer requestURL = request.getRequestURL();
-		String queryString = request.getQueryString();
-		return (queryString == null) ? requestURL.toString() : requestURL.append('?').append(queryString).toString();
+		return Servlets.getRequestURLWithQueryString(getRequest(context));
 	}
 
 	/**
@@ -539,6 +541,13 @@ public final class FacesLocal {
 	 */
 	public static String getResponseCharacterEncoding(FacesContext context) {
 		return context.getExternalContext().getResponseCharacterEncoding();
+	}
+
+	/**
+	 * @see Faces#setResponseStatus(FacesContext, int)
+	 */
+	public static void setResponseStatus(FacesContext context, int status) {
+		context.getExternalContext().setResponseStatus(status);
 	}
 
 	/**

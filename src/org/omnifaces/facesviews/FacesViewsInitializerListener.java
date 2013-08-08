@@ -18,9 +18,9 @@ import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES_EXTENSIONS;
 import static org.omnifaces.facesviews.FacesViews.getFacesServletDispatchMethod;
 import static org.omnifaces.facesviews.FacesViews.mapFacesServlet;
-import static org.omnifaces.util.Faces.getApplicationAttribute;
 import static org.omnifaces.util.ResourcePaths.filterExtension;
 import static org.omnifaces.util.ResourcePaths.isExtensionless;
+import static org.omnifaces.util.Servlets.getApplicationAttribute;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.util.HashSet;
@@ -68,7 +68,7 @@ public class FacesViewsInitializerListener extends DefaultServletContextListener
         				mappings.add(welcomeFile);
         			}
         		}
-        		
+
         		if (getFacesServletDispatchMethod(servletContext) == DO_FILTER) {
         			// In order for the DO_FILTER method to work the FacesServlet, in addition the forward filter, has
         			// to be mapped on all extensionless resources.

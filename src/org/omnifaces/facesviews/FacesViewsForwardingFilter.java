@@ -25,10 +25,10 @@ import static org.omnifaces.facesviews.FacesViews.getPathAction;
 import static org.omnifaces.facesviews.FacesViews.isResourceInPublicPath;
 import static org.omnifaces.facesviews.FacesViews.scanAndStoreViews;
 import static org.omnifaces.facesviews.FacesViews.tryScanAndStoreViews;
-import static org.omnifaces.util.Faces.getApplicationAttribute;
 import static org.omnifaces.util.Faces.getApplicationFromFactory;
 import static org.omnifaces.util.ResourcePaths.getExtension;
 import static org.omnifaces.util.ResourcePaths.isExtensionless;
+import static org.omnifaces.util.Servlets.getApplicationAttribute;
 
 import java.io.IOException;
 import java.util.Map;
@@ -62,29 +62,29 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 	private static ExtensionAction extensionAction;
 	private static PathAction pathAction;
 	private static FacesServletDispatchMethod dispatchMethod;
-	
+
 	private static AtomicBoolean initDone = new AtomicBoolean();
 
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
 
     	super.init(filterConfig);
-    	
+
     	if (!initDone.getAndSet(true)) {
-    		
+
 	    	ServletContext servletContext = filterConfig.getServletContext();
-	
+
 	        // Mostly for pre-Servlet 3.0: scan the views if the auto-configure listener hasn't done this yet.
 	        tryScanAndStoreViews(servletContext);
-	
+
 	        // Register a view handler that transforms a view id with extension back to an extensionless one.
-	
+
 	        // Note that Filter#init is used here, since it loads after the ServletContextListener that initializes JSF itself,
 	        // and thus guarantees the {@link Application} instance needed for installing the FacesViewHandler is available.
-	
+
 	        Application application = getApplicationFromFactory();
 	        application.setViewHandler(new FacesViewsViewHandler(application.getViewHandler()));
-	
+
 	        extensionAction = getExtensionAction(servletContext);
 	        pathAction = getPathAction(servletContext);
 	        dispatchMethod = getFacesServletDispatchMethod(servletContext);
@@ -107,12 +107,12 @@ public class FacesViewsForwardingFilter extends HttpFilter {
         	}
 
         	if (resources.containsKey(resource)) {
-        		
+
         		String extension = getExtension(resources.get(resource));
-        		
+
         		switch (dispatchMethod) {
         			case DO_FILTER:
-        				
+
         				// Continue the chain, but make the request appear to be to the resource with an extension.
         				// This assumes that the FacesServlet has been mapped to something that includes the extensionless
         				// request.
@@ -124,7 +124,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
         				}
         				return;
         			case FORWARD:
-        				
+
         				// Forward the resource (view) using its original extension, on which the Facelets Servlet
         	            // is mapped. Technically it matters most that the Facelets Servlet picks up the
         	            // request, and the exact extension or even prefix is perhaps less relevant.

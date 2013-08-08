@@ -677,6 +677,20 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the HTTP request hostname. This is the entire domain, without any scheme and slashes. Noted should be
+	 * that this value is extracted from the request URL, not from {@link HttpServletRequest#getServerName()} as its
+	 * outcome can be influenced by proxies.
+	 * @return The HTTP request hostname.
+	 * @throws IllegalArgumentException When the URL is malformed. This is however unexpected as the request would
+	 * otherwise not have hit the server at all.
+	 * @see HttpServletRequest#getRequestURL()
+	 * @since 1.6
+	 */
+	public static String getRequestHostname() {
+		return FacesLocal.getRequestHostname(getContext());
+	}
+
+	/**
 	 * Returns the HTTP request base URL. This is the URL from the scheme, domain until with context path, including
 	 * the trailing slash. This is the value you could use in HTML <code>&lt;base&gt;</code> tag.
 	 * @return The HTTP request base URL.
@@ -686,24 +700,6 @@ public final class Faces {
 	 */
 	public static String getRequestBaseURL() {
 		return FacesLocal.getRequestBaseURL(getContext());
-	}
-
-	/**
-	 * Returns the HTTP request base URL. This is the URL from the scheme, domain until with context path, including
-	 * the trailing slash. This is the value you could use in HTML <code>&lt;base&gt;</code> tag.
-	 *
-	 * @param request The request for which the base URL is computed.
-	 *
-	 * @return The HTTP request base URL.
-	 * @see HttpServletRequest#getRequestURL()
-	 * @see HttpServletRequest#getRequestURI()
-	 * @see HttpServletRequest#getContextPath()
-	 *
-	 * TODO: this method does actually not belong here! It belongs in a fictive "Servlets" utility class.
-	 */
-	public static String getRequestBaseURL(HttpServletRequest request) {
-		String url = request.getRequestURL().toString();
-		return url.substring(0, url.length() - request.getRequestURI().length()) + request.getContextPath() + "/";
 	}
 
 	/**
@@ -809,6 +805,16 @@ public final class Faces {
 	 */
 	public static String getResponseCharacterEncoding() {
 		return FacesLocal.getResponseCharacterEncoding(getContext());
+	}
+
+	/**
+	 * Sets the HTTP response status code. You can use the constant field values of {@link HttpServletResponse} for
+	 * this. For example, <code>Faces.setResponseStatus(HttpServletResponse.SC_BAD_REQUEST)</code>.
+	 * @param status The HTTP status code to be set on the current response.
+	 * @since 1.6
+	 */
+	public static void setResponseStatus(int status) {
+		FacesLocal.setResponseStatus(getContext(), status);
 	}
 
 	/**
@@ -1305,7 +1311,7 @@ public final class Faces {
 	 * @return ServletRegistration for FacesServlet, or <code>null</code> if the FacesServlet is not installed.
 	 * @since 1.4
 	 */
-	public static ServletRegistration getFacesServletRegistration(final ServletContext servletContext) {
+	public static ServletRegistration getFacesServletRegistration(ServletContext servletContext) {
 		ServletRegistration facesServletRegistration = null;
 
 		for (ServletRegistration registration : servletContext.getServletRegistrations().values()) {
@@ -1556,26 +1562,8 @@ public final class Faces {
 	 * @deprecated Use {@link FacesLocal#getApplicationAttribute(FacesContext, String)} instead.
 	 */
 	@Deprecated
-	public static <T> T getApplicationAttribute(final FacesContext context, final String name) {
+	public static <T> T getApplicationAttribute(FacesContext context, String name) {
 		return FacesLocal.getApplicationAttribute(context, name);
-	}
-
-	/**
-	 * Returns the application scope attribute value associated with the given name.
-	 *
-	 * @param name The application scope attribute name.
-	 * @param context The servlet context used for looking up the attribute.
-	 *
-	 * @return The application scope attribute value associated with the given name.
-	 * @throws ClassCastException When <code>T</code> is of wrong type.
-	 * @see ServletContext#getAttribute(String)
-	 * @since 1.4
-	 *
-	 * TODO: this method does actually not belong here! It belongs in a fictive "Servlets" utility class.
-	 */
-	@SuppressWarnings("unchecked")
-	public static <T> T getApplicationAttribute(final ServletContext context, final String name) {
-		return (T) context.getAttribute(name);
 	}
 
 	// File download --------------------------------------------------------------------------------------------------

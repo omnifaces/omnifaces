@@ -22,6 +22,8 @@ import static org.omnifaces.util.ResourcePaths.getExtension;
 import static org.omnifaces.util.ResourcePaths.isDirectory;
 import static org.omnifaces.util.ResourcePaths.stripExtension;
 import static org.omnifaces.util.ResourcePaths.stripPrefixPath;
+import static org.omnifaces.util.Servlets.getApplicationAttribute;
+import static org.omnifaces.util.Servlets.getRequestBaseURL;
 import static org.omnifaces.util.Utils.csvToList;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.reverse;
@@ -39,11 +41,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 import javax.servlet.http.HttpServletRequest;
 
-import org.omnifaces.util.Faces;
-
 /**
  * This class contains the core methods that implement the Faces Views feature.
- * 
+ *
  * TODO: break up in logic and config?
  *
  * @author Arjan Tijms
@@ -89,19 +89,19 @@ public final class FacesViews {
 	 * is requested in a public path that has been used for scanning views by faces views. See {@link PathAction}
 	 */
 	public static final String FACES_VIEWS_PATH_ACTION_PARAM_NAME = "org.omnifaces.FACES_VIEWS_PATH_ACTION";
-	
+
 	/**
 	 * The name of the init parameter (in web.xml) that determines the method used by FacesViews to invoke the FacesServlet.
 	 * See {@link FacesServletDispatchMethod}.
 	 */
 	public static final String FACES_VIEWS_DISPATCH_METHOD_PARAM_NAME = "org.omnifaces.FACES_VIEWS_DISPATCH_METHOD";
-	
+
 	/**
 	 * The name of the boolean init parameter (in web.xml) via which the user can set whether the {@link FacesViewsForwardingFilter}
 	 * should match before declared filters (false) or after declared filters (true);
 	 */
 	public static final String FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS_PARAM_NAME = "org.omnifaces.FILTER_AFTER_DECLARED_FILTERS";
-	
+
 	/**
 	 * The name of the boolean init parameter (in web.xml) via which the user can set whether the {@link FacesViewsViewHandler}
 	 * should strip the extension from the parent view handler's outcome or construct the URL itself and only take the query
@@ -127,7 +127,7 @@ public final class FacesViews {
 	 * exensionless init parameter is kept.
 	 */
 	public static final String SCANNED_VIEWS_EXTENSIONLESS = "org.omnifaces.facesviews.scannedviewsextensionless";
-	
+
 	/**
 	 * The name of the application scope context parameter under which a Set that stores the extensions to which
 	 * the FacesServlet is mapped.
@@ -137,7 +137,7 @@ public final class FacesViews {
 	public static final String FACES_VIEWS_RESOURCES = "org.omnifaces.facesviews";
 	public static final String FACES_VIEWS_REVERSE_RESOURCES = "org.omnifaces.facesviews.reverse.resources";
     public static final String FACES_VIEWS_RESOURCES_EXTENSIONS = "org.omnifaces.facesviews.extensions";
-    
+
     public static final String FACES_VIEWS_ORIGINAL_SERVLET_PATH = "org.omnifaces.facesviews.original.servlet_path";
 
     public static void scanViewsFromRootPaths(ServletContext servletContext, Map<String, String> collectedViews, Set<String> collectedExtensions) {
@@ -251,7 +251,7 @@ public final class FacesViews {
 			);
 		}
 	}
-	
+
 	public static FacesServletDispatchMethod getFacesServletDispatchMethod(ServletContext servletContext) {
 		String dispatchMethodString = servletContext.getInitParameter(FACES_VIEWS_DISPATCH_METHOD_PARAM_NAME);
 		if (isEmpty(dispatchMethodString)) {
@@ -269,11 +269,11 @@ public final class FacesViews {
 			);
 		}
 	}
-	
+
 	public static ViewHandlerMode getViewHandlerMode(FacesContext context) {
 		return getViewHandlerMode((ServletContext) context.getExternalContext().getContext());
 	}
-	
+
 	public static ViewHandlerMode getViewHandlerMode(ServletContext servletContext) {
 		String viewHandlerModeString = servletContext.getInitParameter(FACES_VIEWS_VIEW_HANDLER_MODE_PARAM_NAME);
 		if (isEmpty(viewHandlerModeString)) {
@@ -291,14 +291,14 @@ public final class FacesViews {
 			);
 		}
 	}
-	
+
 	public static boolean isFilterAfterDeclaredFilters(ServletContext servletContext) {
 		String filterAfterDeclaredFilters = servletContext.getInitParameter(FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS_PARAM_NAME);
-		
+
 		if (filterAfterDeclaredFilters == null) {
 			return true;
 		}
-		
+
 		return Boolean.valueOf(filterAfterDeclaredFilters);
 	}
 
@@ -466,16 +466,16 @@ public final class FacesViews {
 	        }
 	    }
 	}
-	
+
 	public static Set<String> getFacesServletExtensions(FacesContext context) {
 		return getFacesServletExtensions((ServletContext) context.getExternalContext().getContext());
 	}
-	
+
 	public static Set<String> getFacesServletExtensions(ServletContext servletContext) {
-		
+
 		@SuppressWarnings("unchecked")
 		Set<String> extensions = (Set<String>) servletContext.getAttribute(FACES_SERVLET_EXTENSIONS);
-		
+
 		if (extensions == null) {
 			extensions = new HashSet<String>();
 			ServletRegistration facesServletRegistration = getFacesServletRegistration(servletContext);
@@ -489,7 +489,7 @@ public final class FacesViews {
 		    }
 		    servletContext.setAttribute(FACES_SERVLET_EXTENSIONS, unmodifiableSet(extensions));
 		}
-		
+
 		return extensions;
 	}
 
@@ -519,7 +519,7 @@ public final class FacesViews {
 	public static String getExtensionlessURLWithQuery(HttpServletRequest request, String resource) {
 		String queryString = !isEmpty(request.getQueryString()) ? "?" + request.getQueryString() : "";
 
-		String baseURL = Faces.getRequestBaseURL(request);
+		String baseURL = getRequestBaseURL(request);
 		if (baseURL.endsWith("/")) {
 			baseURL = baseURL.substring(0, baseURL.length()-1);
 		}
