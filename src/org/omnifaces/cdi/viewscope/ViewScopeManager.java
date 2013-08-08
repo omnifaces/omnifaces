@@ -15,7 +15,7 @@
  */
 package org.omnifaces.cdi.viewscope;
 
-import static org.omnifaces.util.Events.subscribeToViewEvent;
+import static org.omnifaces.util.Events.subscribeToEvent;
 import static org.omnifaces.util.Faces.getViewAttribute;
 import static org.omnifaces.util.Faces.setViewAttribute;
 
@@ -37,6 +37,7 @@ import javax.inject.Named;
 
 import org.omnifaces.cdi.BeanManager;
 import org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+import org.omnifaces.component.output.cache.concurrentlinkedhashmap.EvictionListener;
 
 /**
  * Manage the view scoped beans by listening on view scope and session scope creation and destroy.
@@ -64,6 +65,7 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	private final ConcurrentMap<UUID, BeanManager> activeViewScopes =
 		new ConcurrentLinkedHashMap.Builder<UUID, BeanManager>()
 			.maximumWeightedCapacity(MAX_ACTIVE_VIEW_SCOPES)
+			.listener(new BeanManagerEvictionListener())
 			.build();
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -74,7 +76,7 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	 */
 	@PostConstruct
 	public void postConstruct() {
-		subscribeToViewEvent(PreDestroyViewMapEvent.class, this);
+		subscribeToEvent(PreDestroyViewMapEvent.class, this);
 	}
 
 	/**
@@ -146,6 +148,21 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 		}
 
 		return id;
+	}
+
+	// Nested classes -------------------------------------------------------------------------------------------------
+
+	/**
+	 * Listener for {@link ConcurrentLinkedHashMap} which will be invoked when an entry is evicted. It will in turn
+	 * invoke {@link BeanManager#destroyBeans()}.
+	 */
+	private static final class BeanManagerEvictionListener implements EvictionListener<UUID, BeanManager> {
+
+		@Override
+		public void onEviction(UUID id, BeanManager manager) {
+			manager.destroyBeans();
+		}
+
 	}
 
 }
