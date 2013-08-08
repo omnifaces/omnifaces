@@ -56,24 +56,6 @@ public final class Events {
 	}
 
 	/**
-	 * @deprecated Because it allows only one callback phase listener to be set. Please use
-	 * {@link #addCallbackPhaseListener(PhaseListener)} instead.
-	 */
-	@Deprecated
-	public static void setCallbackPhaseListener(PhaseListener phaseListener) {
-		Faces.setRequestAttribute(CallbackPhaseListener.CALLBACK_PHASE_LISTENER, phaseListener);
-	}
-
-	/**
-	 * @deprecated Because it only removes the one being set by {@link #setCallbackPhaseListener(PhaseListener)} which
-	 * is currently deprecated.
-	 */
-	@Deprecated
-	public static void removeCallbackPhaseListener() {
-		Faces.removeRequestAttribute(CallbackPhaseListener.CALLBACK_PHASE_LISTENER);
-	}
-
-	/**
 	 * Adds phase listener for callback by a global phase listener during the current request.
 	 * <p>
 	 * This differs in a few subtle ways from {@link Events#addPhaseListener(PhaseListener)}. Namely, the phase listener
@@ -121,24 +103,6 @@ public final class Events {
 	 */
 	public static void addAfterPhaseListener(PhaseId phaseId, final Callback.Void callback) {
 		addPhaseListener(createAfterPhaseListener(phaseId, callback));
-	}
-
-	/**
-	 * @deprecated Because it allows only one callback phase listener to be set. Please use
-	 * {@link #addCallbackBeforePhaseListener(PhaseId, org.omnifaces.util.Callback.Void)} instead.
-	 */
-	@Deprecated
-	public static void setCallBackBeforePhaseListener(PhaseId phaseId, final Callback.Void callback) {
-		setCallbackPhaseListener(createBeforePhaseListener(phaseId, callback));
-	}
-
-	/**
-	 * @deprecated Because it allows only one callback phase listener to be set. Please use
-	 * {@link #addCallbackAfterPhaseListener(PhaseId, org.omnifaces.util.Callback.Void)} instead.
-	 */
-	@Deprecated
-	public static void setCallbackAfterPhaseListener(PhaseId phaseId, final Callback.Void callback) {
-		setCallbackPhaseListener(createAfterPhaseListener(phaseId, callback));
 	}
 
 	/**
