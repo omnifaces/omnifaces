@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.omnifaces.cdi.requestparam;
+package org.omnifaces.cdi.param;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -19,6 +19,8 @@ import java.lang.annotation.Target;
 
 import javax.faces.convert.Converter;
 import javax.faces.validator.Validator;
+
+import org.omnifaces.cdi.Param;
 
 /**
  * Attribute for a {@link Converter} or {@link Validator} that is applied to a value retrieved from an HTTP request and

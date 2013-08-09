@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.omnifaces.cdi.requestparam;
+package org.omnifaces.cdi;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
@@ -30,8 +30,9 @@ import javax.faces.validator.RequiredValidator;
 import javax.faces.validator.Validator;
 import javax.inject.Qualifier;
 
+import org.omnifaces.cdi.param.Attribute;
+import org.omnifaces.cdi.param.ParamValue;
 import org.omnifaces.util.Utils;
-
 
 /**
  * Specifies a request parameter that is to be injected into a managed bean within a JSF context, with
@@ -74,10 +75,10 @@ public @interface Param {
 	 * (Optional) The name of the request parameter. If not specified the name of the injection target field will be used.
 	 */
 	@Nonbinding	String name() default "";
-	
+
 	/**
 	 * (Optional) the label used to refer to the request parameter. If not specified the name of the request parameter.
-	 * 
+	 *
 	 */
 	@Nonbinding	String label() default "";
 
@@ -96,12 +97,12 @@ public @interface Param {
      * If this attribute is specified in addition to {@link Param#converterClass()}, this attribute takes precedence.
 	 */
 	@Nonbinding String converter() default "";
-	
+
 	/**
 	 * (Optional) Flag indicating if this request parameter is required (must be present) or not. The required check is done
-	 * after conversion and before validation. A value is said to be not present if it turns out to be empty according to 
+	 * after conversion and before validation. A value is said to be not present if it turns out to be empty according to
 	 * the semantics of {@link Utils#isEmpty(Object)}.
-	 * 
+	 *
 	 */
 	@Nonbinding boolean required() default false;
 
@@ -155,52 +156,52 @@ public @interface Param {
 	 * Attributes for which any given validator doesn't have a property (setter) are silently ignored.
 	 */
 	@Nonbinding Attribute[] validatorAttributes() default {};
-	
+
 	/**
 	 * (Optional) A message that will be used if conversion fails instead of the message set by the converter.
 	 * <p>
 	 * The value for which conversion failed is available as <code>{0}</code>. The label associated with this
 	 * parameter value (see the {@link Param#label()} attribute) is available as <code>{1}</code>.
-	 * 
+	 *
 	 */
 	@Nonbinding String converterMessage() default "";
-	
+
 	/**
 	 * (Optional) A message that will be used if validation fails instead of the message set by the validator(s).
 	 * <p>
 	 * The value for which validation failed is available as <code>{0}</code>. The label associated with this
 	 * parameter value (see the {@link Param#label()} attribute) is available as <code>{1}</code>.
-	 * 
+	 *
 	 */
 	@Nonbinding String validatorMessage() default "";
-	
+
 	/**
 	 * (Optional) A message that will be used if a non-empty value is submitted instead of the default message associated
 	 * with the {@link RequiredValidator}.
 	 * <p>
-	 * The (empty) value for which the required check failed is available as <code>{0}</code>. (this will be either null or the empty string) 
+	 * The (empty) value for which the required check failed is available as <code>{0}</code>. (this will be either null or the empty string)
 	 * The label associated with this parameter value (see the {@link Param#label()} attribute) is available as <code>{1}</code>.
-	 * 
+	 *
 	 */
 	@Nonbinding String requiredMessage() default "";
-	
+
 	/**
 	 * (Optional) Flag that disables bean validation for this instance.
 	 * <p>
 	 * If <code>true</code> no bean validation will be attempted. If <code>false</code> (the default) no specific action is taken, and it
 	 * will depend on the availability of bean validation and the global {@link BeanValidator#DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME} setting
 	 * whether bean validation is attempted or not.
-	 * 
+	 *
 	 */
 	@Nonbinding boolean disableBeanValidation() default false;
-	
+
 	/**
 	 * (Optional) Flag that overrides the global {@link BeanValidator#DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME} setting.
 	 * <p>
 	 * If <code>true</code> bean validation will be performed for this instance (given that bean validation is available) despite
 	 * it globally being disabled. If <code>false</code> (the default) no specific action is taken.
-	 * 
+	 *
 	 */
 	@Nonbinding boolean overrideGlobalBeanValidationDisabled() default false;
-	
+
 }

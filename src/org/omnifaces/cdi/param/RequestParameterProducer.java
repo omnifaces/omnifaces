@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.omnifaces.cdi.requestparam;
+package org.omnifaces.cdi.param;
 
 import static java.beans.Introspector.getBeanInfo;
 import static java.beans.PropertyEditorManager.findEditor;
@@ -55,6 +55,7 @@ import javax.faces.validator.Validator;
 import javax.faces.validator.ValidatorException;
 import javax.validation.ConstraintViolation;
 
+import org.omnifaces.cdi.Param;
 import org.omnifaces.util.Faces;
 
 /**

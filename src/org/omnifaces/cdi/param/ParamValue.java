@@ -10,7 +10,9 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.omnifaces.cdi.requestparam;
+package org.omnifaces.cdi.param;
+
+import org.omnifaces.cdi.Param;
 
 /**
  * The type that's injected via the {@link Param} qualifier.
