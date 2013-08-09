@@ -6,6 +6,8 @@
  *
  * Any republication or derived work distributed in source code form
  * must include this copyright and license notice.
+ *
+ * REPACKAGED BY OMNIFACES, BUT NO CODE CHANGES HAVE BEEN MADE.
  */
 package org.omnifaces.util.concurrentlinkedhashmap;
 

@@ -3,6 +3,8 @@
  * Released under the Creative Commons Attribution License
  *   (http://creativecommons.org/licenses/by/2.5)
  * Official home: http://www.jcip.net
+ *
+ * REPACKAGED BY OMNIFACES, BUT NO CODE CHANGES HAVE BEEN MADE.
  */
 package org.omnifaces.util.concurrentlinkedhashmap;
 
