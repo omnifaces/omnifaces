@@ -29,7 +29,7 @@ import org.omnifaces.util.Events;
  * @author Arjan Tijms
  * @since 1.2
  */
-public class DefaultViewEventListener implements SystemEventListener {
+public abstract class DefaultViewEventListener implements SystemEventListener {
 
 	@Override
 	public void processEvent(SystemEvent event) throws AbortProcessingException {

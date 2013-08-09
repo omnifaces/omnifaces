@@ -15,7 +15,7 @@
  *
  * REPACKAGED BY OMNIFACES, BUT NO CODE CHANGES HAVE BEEN MADE.
  */
-package org.omnifaces.component.output.cache.concurrentlinkedhashmap;
+package org.omnifaces.util.concurrentlinkedhashmap;
 
 /**
  * A listener registered for notification when an entry is evicted. An instance

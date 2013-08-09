@@ -7,7 +7,7 @@
  * Any republication or derived work distributed in source code form
  * must include this copyright and license notice.
  */
-package org.omnifaces.component.output.cache.concurrentlinkedhashmap;
+package org.omnifaces.util.concurrentlinkedhashmap;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

@@ -16,6 +16,7 @@
 package org.omnifaces.cdi.viewscope;
 
 import static org.omnifaces.util.Events.subscribeToEvent;
+import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Faces.getViewAttribute;
 import static org.omnifaces.util.Faces.setViewAttribute;
 
@@ -36,46 +37,71 @@ import javax.faces.event.ViewMapListener;
 import javax.inject.Named;
 
 import org.omnifaces.cdi.BeanManager;
-import org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
-import org.omnifaces.component.output.cache.concurrentlinkedhashmap.EvictionListener;
+import org.omnifaces.cdi.ViewScoped;
+import org.omnifaces.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+import org.omnifaces.util.concurrentlinkedhashmap.EvictionListener;
 
 /**
  * Manage the view scoped beans by listening on view scope and session scope creation and destroy.
  *
  * @author Radu Creanga <rdcrng@gmail.com>
  * @author Bauke Scholtz
+ * @see ViewScoped
+ * @see ViewScopeContext
  * @since 1.6
  */
 @Named(ViewScopeManager.NAME)
 @SessionScoped
 public class ViewScopeManager implements ViewMapListener, Serializable {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+	// Public constants -----------------------------------------------------------------------------------------------
 
-	/**
-	 * The name on which the CDI view scope manager should be stored in the session scope.
-	 */
+	/** The name on which the CDI view scope manager should be stored in the session scope. */
 	public static final String NAME = "omnifaces_ViewScopeManager";
 
+	/** OmniFaces specific context parameter name of maximum active view scopes in session. */
+	public static final String PARAM_NAME_MAX_ACTIVE_VIEW_SCOPES =
+		"org.omnifaces.VIEW_SCOPE_MANAGER_MAX_ACTIVE_VIEW_SCOPES";
+
+	/** Mojarra specific context parameter name of maximum number of logical views in session. */
+	public static final String PARAM_NAME_MOJARRA_NUMBER_OF_VIEWS =
+		"com.sun.faces.numberOfLogicalViews";
+
+	/** MyFaces specific context parameter name of maximum number of views in session. */
+	public static final String PARAM_NAME_MYFACES_NUMBER_OF_VIEWS =
+		"org.apache.myfaces.NUMBER_OF_VIEWS_IN_SESSION";
+
+	/** Default value of maximum active view scopes in session. */
+	public static final int DEFAULT_MAX_ACTIVE_VIEW_SCOPES = 20;
+
+	// Private constants ----------------------------------------------------------------------------------------------
+
 	private static final long serialVersionUID = 42L;
-	private static final int MAX_ACTIVE_VIEW_SCOPES = 25; // TODO: this should depend on JSF impl specific "max views per session" configuration setting or at least be configurable.
+	private static final String[] PARAM_NAMES_MAX_ACTIVE_VIEW_SCOPES = {
+		PARAM_NAME_MAX_ACTIVE_VIEW_SCOPES, PARAM_NAME_MOJARRA_NUMBER_OF_VIEWS, PARAM_NAME_MYFACES_NUMBER_OF_VIEWS
+	};
+	private static final int DEFAULT_BEANS_PER_VIEW_SCOPE = 3;
+	private static final String ERROR_MAX_ACTIVE_VIEW_SCOPES = "The '%s' init param must be a number."
+		+ " Encountered an invalid value of '%s'.";
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private final ConcurrentMap<UUID, BeanManager> activeViewScopes =
-		new ConcurrentLinkedHashMap.Builder<UUID, BeanManager>()
-			.maximumWeightedCapacity(MAX_ACTIVE_VIEW_SCOPES)
-			.listener(new BeanManagerEvictionListener())
-			.build();
+	private ConcurrentMap<UUID, BeanManager> activeViewScopes;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
+	 * Create a new LRU map of active view scopes with maximum weighted capacity depending on several context params.
+	 * See javadoc of {@link ViewScoped} for details.
 	 * Subscribe to {@link PreDestroyViewMapEvent}, so that {@link #processEvent(SystemEvent)} will be invoked when
 	 * the JSF view scope is about to be destroyed.
 	 */
 	@PostConstruct
 	public void postConstruct() {
+		activeViewScopes = new ConcurrentLinkedHashMap.Builder<UUID, BeanManager>()
+			.maximumWeightedCapacity(getMaxActiveViewScopes())
+			.listener(new BeanManagerEvictionListener())
+			.build();
 		subscribeToEvent(PreDestroyViewMapEvent.class, this);
 	}
 
@@ -87,7 +113,7 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	 */
 	public <T> T createBean(Contextual<T> contextual, CreationalContext<T> creationalContext) {
 		UUID beanManagerId = getBeanManagerId();
-		activeViewScopes.putIfAbsent(beanManagerId, new BeanManager());
+		activeViewScopes.putIfAbsent(beanManagerId, new BeanManager(DEFAULT_BEANS_PER_VIEW_SCOPE));
 		return activeViewScopes.get(beanManagerId).createBean(contextual, creationalContext);
 	}
 
@@ -135,6 +161,26 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns the max active view scopes depending on available context params.
+	 */
+	private int getMaxActiveViewScopes() {
+		for (String name : PARAM_NAMES_MAX_ACTIVE_VIEW_SCOPES) {
+			String value = getInitParameter(name);
+
+			if (value != null) {
+				if (value.matches("[0-9]+")) {
+					return Integer.valueOf(value);
+				}
+				else {
+					throw new IllegalArgumentException(String.format(ERROR_MAX_ACTIVE_VIEW_SCOPES, name, value));
+				}
+			}
+		}
+
+		return DEFAULT_MAX_ACTIVE_VIEW_SCOPES;
+	}
 
 	/**
 	 * Returns the unique ID from the current JSF view scope which is to be associated with the CDI bean manager.

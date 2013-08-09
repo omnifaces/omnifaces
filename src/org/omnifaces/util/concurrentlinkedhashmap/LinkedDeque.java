@@ -15,7 +15,7 @@
  *
  * REPACKAGED BY OMNIFACES, BUT NO CODE CHANGES HAVE BEEN MADE.
  */
-package org.omnifaces.component.output.cache.concurrentlinkedhashmap;
+package org.omnifaces.util.concurrentlinkedhashmap;
 
 import java.util.AbstractCollection;
 import java.util.Collection;

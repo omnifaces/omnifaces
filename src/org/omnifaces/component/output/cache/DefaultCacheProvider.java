@@ -12,7 +12,7 @@
  */
 package org.omnifaces.component.output.cache;
 
-import org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+import org.omnifaces.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 
 /**
  * A default cache provider that will be used by the OmniFaces Cache component if no explicit provider has been

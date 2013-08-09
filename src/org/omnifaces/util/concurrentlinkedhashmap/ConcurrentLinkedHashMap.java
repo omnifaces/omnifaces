@@ -16,14 +16,14 @@
  * REPACKAGED BY OMNIFACES, BUT NO CODE CHANGES HAVE BEEN MADE.
  *
  */
-package org.omnifaces.component.output.cache.concurrentlinkedhashmap;
+package org.omnifaces.util.concurrentlinkedhashmap;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
-import static org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLinkedHashMap.DrainStatus.IDLE;
-import static org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLinkedHashMap.DrainStatus.PROCESSING;
-import static org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLinkedHashMap.DrainStatus.REQUIRED;
+import static org.omnifaces.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap.DrainStatus.IDLE;
+import static org.omnifaces.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap.DrainStatus.PROCESSING;
+import static org.omnifaces.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap.DrainStatus.REQUIRED;
 
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;

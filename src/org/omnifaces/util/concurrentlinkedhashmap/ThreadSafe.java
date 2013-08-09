@@ -4,7 +4,7 @@
  *   (http://creativecommons.org/licenses/by/2.5)
  * Official home: http://www.jcip.net
  */
-package org.omnifaces.component.output.cache.concurrentlinkedhashmap;
+package org.omnifaces.util.concurrentlinkedhashmap;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

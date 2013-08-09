@@ -21,7 +21,7 @@ import javax.servlet.ServletContextListener;
  * @author Arjan Tijms
  * @since 1.4
  */
-public class DefaultServletContextListener implements ServletContextListener {
+public abstract class DefaultServletContextListener implements ServletContextListener {
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {

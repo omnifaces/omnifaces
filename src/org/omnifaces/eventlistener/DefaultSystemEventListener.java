@@ -22,7 +22,7 @@ import javax.faces.event.SystemEventListener;
  * @author Arjan Tijms
  * @since 1.2
  */
-public class DefaultSystemEventListener implements SystemEventListener {
+public abstract class DefaultSystemEventListener implements SystemEventListener {
 
 	@Override
 	public void processEvent(SystemEvent event) throws AbortProcessingException {

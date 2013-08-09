@@ -38,7 +38,17 @@ public class BeanManager implements Serializable {
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
-	private final ConcurrentMap<Contextual<?>, Bean<?>> beans = new ConcurrentHashMap<Contextual<?>, Bean<?>>();
+	private final ConcurrentMap<Contextual<?>, Bean<?>> beans;
+
+	// Constructors ---------------------------------------------------------------------------------------------------
+
+	/**
+	 * Construct a new CDI bean manager with the given initial capacity of the map holding all beans.
+	 * @param initialCapacity The initial capacity of the map holding all beans.
+	 */
+	public BeanManager(int initialCapacity) {
+		beans = new ConcurrentHashMap<Contextual<?>, Bean<?>>(initialCapacity);
+	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -62,7 +72,7 @@ public class BeanManager implements Serializable {
 	@SuppressWarnings("unchecked")
 	public <T> T getBean(Contextual<T> contextual) {
 		Bean<?> bean = beans.get(contextual);
-		return (bean == null) ? null : (T) bean.getInstance();
+		return (bean != null) ? (T) bean.getInstance() : null;
 	}
 
 	/**

@@ -15,7 +15,7 @@ package org.omnifaces.component.output.cache;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
+import org.omnifaces.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 
 /**
  * An in-memory cache implementation that's used if the user did not configure an explicit caching provider.

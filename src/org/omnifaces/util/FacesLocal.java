@@ -544,7 +544,7 @@ public final class FacesLocal {
 	}
 
 	/**
-	 * @see Faces#setResponseStatus(FacesContext, int)
+	 * @see Faces#setResponseStatus(int)
 	 */
 	public static void setResponseStatus(FacesContext context, int status) {
 		context.getExternalContext().setResponseStatus(status);

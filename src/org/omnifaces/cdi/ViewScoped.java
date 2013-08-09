@@ -28,9 +28,12 @@ import javax.enterprise.context.NormalScope;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
 
+import org.omnifaces.cdi.viewscope.ViewScopeContext;
+import org.omnifaces.cdi.viewscope.ViewScopeExtension;
 import org.omnifaces.cdi.viewscope.ViewScopeManager;
 
 /**
+ * <p>
  * The CDI view scope annotation, intented for use in JSF 2.0/2.1. Just use it the usual way as all other CDI scopes.
  * Watch out with IDE autocomplete on import that you don't accidentally import JSF's own one.
  * <pre>
@@ -41,9 +44,10 @@ import org.omnifaces.cdi.viewscope.ViewScopeManager;
  * {@literal @}ViewScoped
  * public class OmniCDIViewScopedBean implements Serializable {}
  * </pre>
+ * <p>
  * In JSF 2.2, you're supposed to use JSF's own new CDI compatible <code>javax.faces.view.ViewScoped</code> instead;
  * not because this CDI view scope annotation is so bad, in contrary, but just because using the standard solutions
- * should be preferred over alternative solutions.
+ * should be preferred over alternative solutions if they solve the same problem.
  * <p>
  * Under the covers, CDI managed beans with this scope are via {@link ViewScopeManager} stored in the session scope by
  * an {@link UUID} based key which is referenced in JSF's own view map as available by {@link UIViewRoot#getViewMap()}.
@@ -60,12 +64,28 @@ import org.omnifaces.cdi.viewscope.ViewScopeManager;
  * </ul>
  * <p>
  * Summarized, it's only invoked when the view is either explicitly changed by a non-null/void navigation on a postback,
- * or when the view is explicitly rebuilt by {@link FacesContext#setViewRoot(UIViewRoot)}. This CDI view scope
- * annotation however guarantees that the {@link PreDestroy} annotated method is also invoked on session expire, while
- * JSF 2.0/2.1 doesn't do that (JSF 2.2 does).
+ * or when the view is explicitly rebuilt by {@link FacesContext#setViewRoot(UIViewRoot)}. It's not invoked on a GET
+ * navigation, nor a close of browser tab/window. This CDI view scope annotation however guarantees that the
+ * {@link PreDestroy} annotated method is also invoked on session expire, while JSF 2.0/2.1 doesn't do that (JSF 2.2
+ * does).
+ * <h3>Configuration</h3>
+ * <p>
+ * By default, the maximum number of active view scopes is hold in a LRU map with a default size equal to the first
+ * non-null value of the following context parameters:
+ * <ul>
+ * <li>{@value org.omnifaces.cdi.viewscope.ViewScopeManager#PARAM_NAME_MAX_ACTIVE_VIEW_SCOPES} (OmniFaces)</li>
+ * <li>{@value org.omnifaces.cdi.viewscope.ViewScopeManager#PARAM_NAME_MOJARRA_NUMBER_OF_VIEWS} (Mojarra-specific)</li>
+ * <li>{@value org.omnifaces.cdi.viewscope.ViewScopeManager#PARAM_NAME_MYFACES_NUMBER_OF_VIEWS} (MyFaces-specific)</li>
+ * </ul>
+ * <p>If none of those context parameters are present, then a default size of
+ * {@value org.omnifaces.cdi.viewscope.ViewScopeManager#DEFAULT_MAX_ACTIVE_VIEW_SCOPES} will be used. When a view scoped
+ * bean is evicted from the LRU map, then its {@link PreDestroy} will also guaranteed to be invoked.
  *
  * @author Radu Creanga <rdcrng@gmail.com>
  * @author Bauke Scholtz
+ * @see ViewScopeExtension
+ * @see ViewScopeContext
+ * @see ViewScopeManager
  * @since 1.6
  */
 @Inherited

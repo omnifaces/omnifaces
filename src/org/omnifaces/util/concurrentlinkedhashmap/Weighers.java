@@ -13,9 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.omnifaces.component.output.cache.concurrentlinkedhashmap;
+package org.omnifaces.util.concurrentlinkedhashmap;
 
-import static org.omnifaces.component.output.cache.concurrentlinkedhashmap.ConcurrentLinkedHashMap.checkNotNull;
+import static org.omnifaces.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap.checkNotNull;
 
 import java.io.Serializable;
 import java.util.Collection;
