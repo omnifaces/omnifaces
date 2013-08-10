@@ -72,7 +72,7 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 		"org.apache.myfaces.NUMBER_OF_VIEWS_IN_SESSION";
 
 	/** Default value of maximum active view scopes in session. */
-	public static final int DEFAULT_MAX_ACTIVE_VIEW_SCOPES = 20;
+	public static final int DEFAULT_MAX_ACTIVE_VIEW_SCOPES = 20; // Mojarra's default is 15 and MyFaces' default is 20.
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
@@ -83,6 +83,10 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	private static final int DEFAULT_BEANS_PER_VIEW_SCOPE = 3;
 	private static final String ERROR_MAX_ACTIVE_VIEW_SCOPES = "The '%s' init param must be a number."
 		+ " Encountered an invalid value of '%s'.";
+
+	// Static variables -----------------------------------------------------------------------------------------------
+
+	private static Integer maxActiveViewScopes;
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
@@ -156,15 +160,21 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	// Helpers --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns the max active view scopes depending on available context params.
+	 * Returns the max active view scopes depending on available context params. This will be calculated lazily once
+	 * and re-returned everytime; the faces context is namely not available during class' initialization/construction,
+	 * but only during a post construct.
 	 */
 	private int getMaxActiveViewScopes() {
+		if (maxActiveViewScopes != null) {
+			return maxActiveViewScopes;
+		}
+
 		for (String name : PARAM_NAMES_MAX_ACTIVE_VIEW_SCOPES) {
 			String value = getInitParameter(name);
 
 			if (value != null) {
 				if (value.matches("[0-9]+")) {
-					return Integer.valueOf(value);
+					return (maxActiveViewScopes = Integer.valueOf(value));
 				}
 				else {
 					throw new IllegalArgumentException(String.format(ERROR_MAX_ACTIVE_VIEW_SCOPES, name, value));
@@ -172,11 +182,12 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 			}
 		}
 
-		return DEFAULT_MAX_ACTIVE_VIEW_SCOPES;
+		return (maxActiveViewScopes = DEFAULT_MAX_ACTIVE_VIEW_SCOPES);
 	}
 
 	/**
 	 * Returns the unique ID from the current JSF view scope which is to be associated with the CDI bean storage.
+	 * If none is found, then a new ID and CDI bean storage will be auto-created.
 	 */
 	private UUID getBeanStorageId() {
 		UUID id = (UUID) getViewAttribute(ViewScopeManager.class.getName());

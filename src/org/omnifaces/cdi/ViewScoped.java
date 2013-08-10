@@ -15,6 +15,7 @@
  */
 package org.omnifaces.cdi;
 
+import java.io.Serializable;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
@@ -45,6 +46,9 @@ import org.omnifaces.cdi.viewscope.ViewScopeManager;
  * public class OmniCDIViewScopedBean implements Serializable {}
  * </pre>
  * <p>
+ * Please note that the bean <strong>must</strong> implement {@link Serializable}, otherwise the CDI implementation
+ * will throw an exception about the bean not being passivation capable.
+ * <p>
  * In JSF 2.2, you're supposed to use JSF's own new CDI compatible <code>javax.faces.view.ViewScoped</code> instead;
  * not because this CDI view scope annotation is so bad, in contrary, but just because using the standard solutions
  * should be preferred over alternative solutions if they solve the same problem.
@@ -63,11 +67,11 @@ import org.omnifaces.cdi.viewscope.ViewScopeManager;
  * <li><a href="https://java.net/jira/browse/JAVASERVERFACES_SPEC_PUBLIC-905">JSF spec issue 905</a>
  * </ul>
  * <p>
- * Summarized, it's only invoked when the view is either explicitly changed by a non-null/void navigation on a postback,
- * or when the view is explicitly rebuilt by {@link FacesContext#setViewRoot(UIViewRoot)}. It's not invoked on a GET
- * navigation, nor a close of browser tab/window. This CDI view scope annotation however guarantees that the
- * {@link PreDestroy} annotated method is also invoked on session expire, while JSF 2.0/2.1 doesn't do that (JSF 2.2
- * does).
+ * Summarized, it's only <em>immediately</em> invoked when the view is either explicitly changed by a non-null/void
+ * navigation on a postback, or when the view is explicitly rebuilt by {@link FacesContext#setViewRoot(UIViewRoot)}.
+ * It's not <em>immediately</em> invoked on a GET navigation, nor a close of browser tab/window. This CDI view scope
+ * annotation however guarantees that the {@link PreDestroy} annotated method is also invoked on session expire, while
+ * JSF 2.0/2.1 doesn't do that (JSF 2.2 does).
  * <h3>Configuration</h3>
  * <p>
  * By default, the maximum number of active view scopes is hold in a LRU map with a default size equal to the first
