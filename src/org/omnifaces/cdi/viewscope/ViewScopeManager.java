@@ -139,11 +139,7 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	@Override
 	public void processEvent(SystemEvent event) throws AbortProcessingException {
 		if (event instanceof PreDestroyViewMapEvent) {
-			BeanStorage storage = activeViewScopes.remove(getBeanStorageId());
-
-			if (storage != null) {
-				storage.destroyBeans();
-			}
+			activeViewScopes.remove(getBeanStorageId()).destroyBeans();
 		}
 	}
 
