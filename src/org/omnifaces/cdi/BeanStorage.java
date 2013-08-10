@@ -23,14 +23,14 @@ import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;
 
 /**
- * CDI bean manager. This class is theoretically reusable for multiple CDI scopes. It's currently however only used by
+ * CDI bean storage. This class is theoretically reusable for multiple CDI scopes. It's currently however only used by
  * the OmniFaces CDI view scope.
  *
  * @author Radu Creanga <rdcrng@gmail.com>
  * @author Bauke Scholtz
  * @since 1.6
  */
-public class BeanManager implements Serializable {
+public class BeanStorage implements Serializable {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
@@ -43,10 +43,10 @@ public class BeanManager implements Serializable {
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Construct a new CDI bean manager with the given initial capacity of the map holding all beans.
+	 * Construct a new CDI bean storage with the given initial capacity of the map holding all beans.
 	 * @param initialCapacity The initial capacity of the map holding all beans.
 	 */
-	public BeanManager(int initialCapacity) {
+	public BeanStorage(int initialCapacity) {
 		beans = new ConcurrentHashMap<Contextual<?>, Bean<?>>(initialCapacity);
 	}
 

@@ -36,7 +36,7 @@ import javax.faces.event.SystemEvent;
 import javax.faces.event.ViewMapListener;
 import javax.inject.Named;
 
-import org.omnifaces.cdi.BeanManager;
+import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import org.omnifaces.util.concurrentlinkedhashmap.EvictionListener;
@@ -86,7 +86,7 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private ConcurrentMap<UUID, BeanManager> activeViewScopes;
+	private ConcurrentMap<UUID, BeanStorage> activeViewScopes;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -98,9 +98,9 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	 */
 	@PostConstruct
 	public void postConstruct() {
-		activeViewScopes = new ConcurrentLinkedHashMap.Builder<UUID, BeanManager>()
+		activeViewScopes = new ConcurrentLinkedHashMap.Builder<UUID, BeanStorage>()
 			.maximumWeightedCapacity(getMaxActiveViewScopes())
-			.listener(new BeanManagerEvictionListener())
+			.listener(new BeanStorageEvictionListener())
 			.build();
 		subscribeToEvent(PreDestroyViewMapEvent.class, this);
 	}
@@ -112,8 +112,8 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	 * @return The created CDI view scoped managed bean from the current JSF view scope.
 	 */
 	public <T> T createBean(Contextual<T> contextual, CreationalContext<T> creationalContext) {
-		UUID beanManagerId = getBeanManagerId();
-		activeViewScopes.putIfAbsent(beanManagerId, new BeanManager(DEFAULT_BEANS_PER_VIEW_SCOPE));
+		UUID beanManagerId = getBeanStorageId();
+		activeViewScopes.putIfAbsent(beanManagerId, new BeanStorage(DEFAULT_BEANS_PER_VIEW_SCOPE));
 		return activeViewScopes.get(beanManagerId).createBean(contextual, creationalContext);
 	}
 
@@ -123,8 +123,8 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	 * @return The CDI view scoped managed bean from the current JSF view scope.
 	 */
 	public <T> T getBean(Contextual<T> contextual) {
-		BeanManager manager = activeViewScopes.get(getBeanManagerId());
-		return (manager == null) ? null : manager.getBean(contextual);
+		BeanStorage storage = activeViewScopes.get(getBeanStorageId());
+		return (storage == null) ? null : storage.getBean(contextual);
 	}
 
 	/**
@@ -142,10 +142,10 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	@Override
 	public void processEvent(SystemEvent event) throws AbortProcessingException {
 		if (event instanceof PreDestroyViewMapEvent) {
-			BeanManager manager = activeViewScopes.remove(getBeanManagerId());
+			BeanStorage storage = activeViewScopes.remove(getBeanStorageId());
 
-			if (manager != null) {
-				manager.destroyBeans();
+			if (storage != null) {
+				storage.destroyBeans();
 			}
 		}
 	}
@@ -155,8 +155,8 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	 */
 	@PreDestroy
 	public void preDestroy() {
-		for (BeanManager manager : activeViewScopes.values()) {
-			manager.destroyBeans();
+		for (BeanStorage storage : activeViewScopes.values()) {
+			storage.destroyBeans();
 		}
 	}
 
@@ -183,9 +183,9 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	}
 
 	/**
-	 * Returns the unique ID from the current JSF view scope which is to be associated with the CDI bean manager.
+	 * Returns the unique ID from the current JSF view scope which is to be associated with the CDI bean storage.
 	 */
-	private UUID getBeanManagerId() {
+	private UUID getBeanStorageId() {
 		UUID id = (UUID) getViewAttribute(ViewScopeManager.class.getName());
 
 		if (id == null) {
@@ -200,13 +200,13 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 
 	/**
 	 * Listener for {@link ConcurrentLinkedHashMap} which will be invoked when an entry is evicted. It will in turn
-	 * invoke {@link BeanManager#destroyBeans()}.
+	 * invoke {@link BeanStorage#destroyBeans()}.
 	 */
-	private static final class BeanManagerEvictionListener implements EvictionListener<UUID, BeanManager> {
+	private static final class BeanStorageEvictionListener implements EvictionListener<UUID, BeanStorage> {
 
 		@Override
-		public void onEviction(UUID id, BeanManager manager) {
-			manager.destroyBeans();
+		public void onEviction(UUID id, BeanStorage storage) {
+			storage.destroyBeans();
 		}
 
 	}
