@@ -78,10 +78,12 @@ public class BeanStorage implements Serializable {
 	/**
 	 * Destroy all beans managed so far.
 	 */
-	public void destroyBeans() {
+	public synchronized void destroyBeans() {
 		for (Bean<?> bean : beans.values()) {
 			bean.destroy();
 		}
+
+		beans.clear();
 	}
 
 	// Nested classes -------------------------------------------------------------------------------------------------
