@@ -112,9 +112,7 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	 * @return The created CDI view scoped managed bean from the current JSF view scope.
 	 */
 	public <T> T createBean(Contextual<T> contextual, CreationalContext<T> creationalContext) {
-		UUID beanManagerId = getBeanStorageId();
-		activeViewScopes.putIfAbsent(beanManagerId, new BeanStorage(DEFAULT_BEANS_PER_VIEW_SCOPE));
-		return activeViewScopes.get(beanManagerId).createBean(contextual, creationalContext);
+		return activeViewScopes.get(getBeanStorageId()).createBean(contextual, creationalContext);
 	}
 
 	/**
@@ -123,8 +121,7 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	 * @return The CDI view scoped managed bean from the current JSF view scope.
 	 */
 	public <T> T getBean(Contextual<T> contextual) {
-		BeanStorage storage = activeViewScopes.get(getBeanStorageId());
-		return (storage == null) ? null : storage.getBean(contextual);
+		return activeViewScopes.get(getBeanStorageId()).getBean(contextual);
 	}
 
 	/**
@@ -190,6 +187,7 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 
 		if (id == null) {
 			id = UUID.randomUUID();
+			activeViewScopes.put(id, new BeanStorage(DEFAULT_BEANS_PER_VIEW_SCOPE));
 			setViewAttribute(ViewScopeManager.class.getName(), id);
 		}
 
