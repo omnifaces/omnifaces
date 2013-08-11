@@ -192,7 +192,7 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	private UUID getBeanStorageId() {
 		UUID id = (UUID) getViewAttribute(ViewScopeManager.class.getName());
 
-		if (id == null) {
+		if (id == null || activeViewScopes.get(id) == null) {
 			id = UUID.randomUUID();
 			activeViewScopes.put(id, new BeanStorage(DEFAULT_BEANS_PER_VIEW_SCOPE));
 			setViewAttribute(ViewScopeManager.class.getName(), id);
