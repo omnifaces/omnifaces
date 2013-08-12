@@ -116,7 +116,7 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	 * @return The created CDI view scoped managed bean from the current JSF view scope.
 	 */
 	public <T> T createBean(Contextual<T> contextual, CreationalContext<T> creationalContext) {
-		return activeViewScopes.get(getBeanStorageId()).createBean(contextual, creationalContext);
+		return activeViewScopes.get(getBeanStorageId(true)).createBean(contextual, creationalContext);
 	}
 
 	/**
@@ -125,7 +125,7 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	 * @return The CDI view scoped managed bean from the current JSF view scope.
 	 */
 	public <T> T getBean(Contextual<T> contextual) {
-		return activeViewScopes.get(getBeanStorageId()).getBean(contextual);
+		return activeViewScopes.get(getBeanStorageId(true)).getBean(contextual);
 	}
 
 	/**
@@ -143,7 +143,11 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	@Override
 	public void processEvent(SystemEvent event) throws AbortProcessingException {
 		if (event instanceof PreDestroyViewMapEvent) {
-			activeViewScopes.remove(getBeanStorageId()).destroyBeans();
+			BeanStorage storage = activeViewScopes.remove(getBeanStorageId(false));
+
+			if (storage != null) {
+				storage.destroyBeans();
+			}
 		}
 	}
 
@@ -187,14 +191,19 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 
 	/**
 	 * Returns the unique ID from the current JSF view scope which is to be associated with the CDI bean storage.
-	 * If none is found, then a new ID and CDI bean storage will be auto-created.
+	 * If none is found, then a new ID will be auto-created. If <code>create</code> is <code>true</code>, then a new
+	 * CDI bean storage will also be auto-created.
 	 */
-	private UUID getBeanStorageId() {
+	private UUID getBeanStorageId(boolean create) {
 		UUID id = (UUID) getViewAttribute(ViewScopeManager.class.getName());
 
 		if (id == null || activeViewScopes.get(id) == null) {
 			id = UUID.randomUUID();
-			activeViewScopes.put(id, new BeanStorage(DEFAULT_BEANS_PER_VIEW_SCOPE));
+
+			if (create) {
+				activeViewScopes.put(id, new BeanStorage(DEFAULT_BEANS_PER_VIEW_SCOPE));
+			}
+
 			setViewAttribute(ViewScopeManager.class.getName(), id);
 		}
 
