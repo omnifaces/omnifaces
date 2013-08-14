@@ -137,7 +137,40 @@ public class RequestParameterProducer {
 			convertedValue = null;
 		}
 
-		return (ParamValue<V>) new ParamValue<Object>(convertedValue);
+		return (ParamValue<V>) new ParamValue<Object>(submittedValue, requestParameter, getTargetType(injectionPoint), convertedValue);
+	}
+	
+	public static Converter getConverter(Param requestParameter, Class<?> targetType) {
+
+		Class<? extends Converter> converterClass = requestParameter.converterClass();
+		String converterName = requestParameter.converter();
+
+		Converter converter = null;
+
+		if (!isEmpty(converterName)) {
+			Object expressionResult = evaluateExpressionGet(converterName);
+			if (expressionResult instanceof Converter) {
+				converter = (Converter) expressionResult;
+			} else if (expressionResult instanceof String) {
+				converter = getApplication().createConverter((String) expressionResult);
+			}
+		} else if (!converterClass.equals(Converter.class)) { // Converter.class is default, representing null
+			converter = instance(converterClass);
+		}
+
+		if (converter == null) {
+			try {
+				converter = Faces.getApplication().createConverter(targetType);
+			} catch (Exception e) {
+				return null;
+			}
+		}
+
+		if (converter != null) {
+			setAttributes(converter, getConverterAttributes(requestParameter));
+		}
+
+		return converter;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -201,40 +234,6 @@ public class RequestParameterProducer {
 		}
 
 		return expressionResult.toString();
-	}
-
-
-	private Converter getConverter(Param requestParameter, Class<?> targetType) {
-
-		Class<? extends Converter> converterClass = requestParameter.converterClass();
-		String converterName = requestParameter.converter();
-
-		Converter converter = null;
-
-		if (!isEmpty(converterName)) {
-			Object expressionResult = evaluateExpressionGet(converterName);
-			if (expressionResult instanceof Converter) {
-				converter = (Converter) expressionResult;
-			} else if (expressionResult instanceof String) {
-				converter = getApplication().createConverter((String) expressionResult);
-			}
-		} else if (!converterClass.equals(Converter.class)) { // Converter.cass is default, representing null
-			converter = instance(converterClass);
-		}
-
-		if (converter == null) {
-			try {
-				converter = Faces.getApplication().createConverter(targetType);
-			} catch (Exception e) {
-				return null;
-			}
-		}
-
-		if (converter != null) {
-			setAttributes(converter, getConverterAttributes(requestParameter));
-		}
-
-		return converter;
 	}
 	
 	private boolean shouldDoBeanValidation(Param requestParameter) {
@@ -308,7 +307,7 @@ public class RequestParameterProducer {
 		return validators;
 	}
 	
-	private Map<String, Object> getConverterAttributes(Param requestParameter) {
+	private static Map<String, Object> getConverterAttributes(Param requestParameter) {
 
 		Map<String, Object> attributeMap = new HashMap<String, Object>();
 
@@ -332,7 +331,7 @@ public class RequestParameterProducer {
 		return attributeMap;
 	}
 
-	private void setAttributes(Object object, Map<String, Object> attributes) {
+	private static void setAttributes(Object object, Map<String, Object> attributes) {
 		try {
 			for (PropertyDescriptor property : getBeanInfo(object.getClass()).getPropertyDescriptors()) {
 				Method setter = property.getWriteMethod();
