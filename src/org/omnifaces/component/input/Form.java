@@ -14,20 +14,14 @@ package org.omnifaces.component.input;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static java.util.regex.Pattern.quote;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeRequestParams;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeViewParams;
-import static org.omnifaces.util.Utils.decodeURL;
-import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.component.input.Form.PropertyKeys.useRequestURI;
+import static org.omnifaces.util.FacesLocal.getRequestQueryStringMap;
+import static org.omnifaces.util.FacesLocal.getRequestURLWithQueryString;
+import static org.omnifaces.util.FacesLocal.getViewParameterMap;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 import javax.faces.application.Application;
 import javax.faces.application.ApplicationWrapper;
@@ -37,25 +31,22 @@ import javax.faces.component.FacesComponent;
 import javax.faces.component.UICommand;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIViewParameter;
-import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.context.FacesContextWrapper;
-import javax.faces.view.ViewMetadata;
-import javax.servlet.http.HttpServletRequest;
 
 import org.omnifaces.taghandler.IgnoreValidationFailed;
 import org.omnifaces.util.State;
 
 /**
  * <strong>Form</strong> is a component that extends the standard {@link UIForm} and provides a way to keep view
- * parameters in the request URL after a post-back and offers in combination with the
+ * or request parameters in the request URL after a post-back and offers in combination with the
  * <code>&lt;o:ignoreValidationFailed&gt;</code> tag on an {@link UICommand} component the possibility to ignore
  * validation failures so that the invoke action phase will be executed anyway.
  * <p>
  * You can use it the same way as <code>&lt;h:form&gt;</code>, you only need to change <code>h:</code> to
  * <code>o:</code>.
  *
- * <h4>Include View Params</h4>
+ * <h3>Include View Params</h3>
  * <p>
  * The standard {@link UIForm} doesn't put the original view parameters in the action URL that's used for the post-back.
  * Instead, it relies on those view parameters to be stored in the state associated with the standard
@@ -66,11 +57,30 @@ import org.omnifaces.util.State;
  * bar or refreshing the page by hitting enter inside the address bar will therefore not always yield the expected
  * results.
  * <p>
- * To solve this, this component offers an attribute <code>includeViewParams</code> that will optionally include all
- * view parameters, in exactly the same way that this can be done for <code>&lt;h:link&gt;</code> and
+ * To solve this, this component offers an attribute <code>includeViewParams="true"</code> that will optionally include
+ * all view parameters, in exactly the same way that this can be done for <code>&lt;h:link&gt;</code> and
  * <code>&lt;h:button&gt;</code>.
+ * <p>
+ * This setting is ignored when <code>includeRequestParams="true"</code> or <code>useRequestURI="true"</code> is used.
  *
- * <h4>Ignore Validation Failed</h4>
+ * <h3>Include Request Params</h3>
+ * <p>
+ * As an alternative to <code>includeViewParams</code>, you can use <code>includeRequestParams="true"</code> to
+ * optionally include the current GET request query string.
+ * <p>
+ * This setting overrides the <code>includeViewParams</code>.
+ * This setting is ignored when <code>useRequestURI="true"</code> is used.
+ *
+ * <h3>Use request URI</h3>
+ * <p>
+ * As an alternative to <code>includeViewParams</code> and <code>includeRequestParams</code>, you can use
+ * <code>useRequestURI="true"</code> to use the current request URI, including with the GET request query string, if
+ * any. This is particularly useful if you're using FacesViews or forwarding everything to 1 page. Otherwise, by default
+ * the current view ID will be used.
+ * <p>
+ * This setting overrides the <code>includeViewParams</code> and <code>includeRequestParams</code>.
+ *
+ * <h3>Ignore Validation Failed</h3>
  * <p>
  * In order to properly use the <code>&lt;o:ignoreValidationFailed&gt;</code> tag on an {@link UICommand} component, its
  * parent <code>&lt;h:form&gt;</code> component has to be replaced by this <code>&lt;o:form&gt;</code> component.
@@ -89,7 +99,8 @@ public class Form extends UIForm {
 
 	enum PropertyKeys {
 		includeViewParams,
-		includeRequestParams
+		includeRequestParams,
+		useRequestURI
 	}
 
 	// Variables ------------------------------------------------------------------------------------------------------
@@ -120,12 +131,16 @@ public class Form extends UIForm {
 
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
-		if (isIncludeRequestParams()) {
+		if (isUseRequestURI()) {
+			super.encodeBegin(new ActionURLDecorator(context, useRequestURI));
+		}
+		else if (isIncludeRequestParams()) {
 			super.encodeBegin(new ActionURLDecorator(context, includeRequestParams));
 		}
 		else if (isIncludeViewParams()) {
 			super.encodeBegin(new ActionURLDecorator(context, includeViewParams));
-		} else {
+		}
+		else {
 			super.encodeBegin(context);
 		}
 	}
@@ -134,7 +149,7 @@ public class Form extends UIForm {
 		return context.getAttributes().get(IgnoreValidationFailed.class.getName()) == TRUE;
 	}
 
-	
+
 	// Getters/setters ------------------------------------------------------------------------------------------------
 
 	/**
@@ -153,7 +168,7 @@ public class Form extends UIForm {
 	public void setIncludeViewParams(boolean includeViewParams) {
 		state.put(PropertyKeys.includeViewParams, includeViewParams);
 	}
-	
+
 	/**
 	 * Return whether or not the request parameters should be encoded into the form's action URL.
 	 * @since 1.5
@@ -166,13 +181,31 @@ public class Form extends UIForm {
 	 * Set whether or not the request parameters should be encoded into the form's action URL.
 	 *
 	 * @param includeRequestParams
-	 *            The state of the switch for encoding request parameters
+	 *            The state of the switch for encoding request parameters.
 	 * @since 1.5
 	 */
 	public void setIncludeRequestParams(boolean includeRequestParams) {
 		state.put(PropertyKeys.includeRequestParams, includeRequestParams);
 	}
-	
+
+	/**
+	 * Return whether or not the request URI should be used as form's action URL.
+	 * @since 1.6
+	 */
+	public Boolean isUseRequestURI() {
+		return state.get(useRequestURI, FALSE);
+	}
+
+	/**
+	 * Set whether or not the request URI should be used as form's action URL.
+	 *
+	 * @param useRequestURI
+	 *            The state of the switch for using request URI.
+	 * @since 1.6
+	 */
+	public void setUseRequestURI(boolean useRequestURI) {
+		state.put(PropertyKeys.useRequestURI, useRequestURI);
+	}
 
 	// Nested classes -------------------------------------------------------------------------------------------------
 
@@ -239,15 +272,26 @@ public class Form extends UIForm {
 						private final ViewHandler viewHandler = outer.getWrapped().getViewHandler();
 
 						/**
-						 * The actual method we're decorating in order to include the view parameters into the action
-						 * URL.
+						 * The actual method we're decorating in order to either include the view parameters into the
+						 * action URL, or include the request parameters into the action URL, or use request URI as
+						 * action URL.
 						 */
 						@Override
 						public String getActionURL(FacesContext context, String viewId) {
-							return context.getExternalContext().encodeBookmarkableURL(
-								super.getActionURL(context, viewId),
-								type == includeRequestParams? getRequestParameterMap(context) : getViewParameterMap(context)
-							);
+							if (type == useRequestURI) {
+								return getRequestURLWithQueryString(context);
+							}
+							else if (type == includeRequestParams) {
+								return context.getExternalContext().encodeBookmarkableURL(
+									super.getActionURL(context, viewId), getRequestQueryStringMap(context));
+							}
+							else if (type == includeViewParams) {
+								return context.getExternalContext().encodeBookmarkableURL(
+									super.getActionURL(context, viewId), getViewParameterMap(context));
+							}
+							else {
+								return super.getActionURL(context, viewId);
+							}
 						}
 
 						@Override
@@ -268,83 +312,6 @@ public class Form extends UIForm {
 		public FacesContext getWrapped() {
 			return facesContext;
 		}
-	}
-
-	// Helpers --------------------------------------------------------------------------------------------------------
-
-	/**
-	 * Gets parameters associated with the {@link UIViewParameter}s as a request-parameter like map of Strings.
-	 * <p>
-	 * In the returned map, keys represent the parameter name, while the value is a list of one of more values
-	 * associated with that parameter name.
-	 *
-	 * @param context
-	 * @return Map with parameters. An empty map will be returned if there are no parameters.
-	 */
-	private static Map<String, List<String>> getViewParameterMap(FacesContext context) {
-		Collection<UIViewParameter> viewParameters = ViewMetadata.getViewParameters(context.getViewRoot());
-		if (viewParameters.isEmpty()) {
-			return Collections.<String, List<String>> emptyMap();
-		}
-
-		Map<String, List<String>> parameters = new HashMap<String, List<String>>();
-		for (UIViewParameter viewParameter : viewParameters) {
-			String value = viewParameter.getStringValue(context);
-
-			if (value != null) {
-				// #138: <f:viewParam> doesn't support multiple values anyway, so having multiple <f:viewParam> on the
-				// same request parameter shouldn't end up in repeated parameters in action URL.
-				parameters.put(viewParameter.getName(), Collections.singletonList(value));
-			}
-		}
-
-		return parameters;
-	}
-	
-	/**
-	 * Gets parameters from the URL query (aka GET parameters) as a request-parameter like map of Strings.
-	 * <p>
-	 * In the returned map, keys represent the parameter name, while the value is a list of one of more values
-	 * associated with that parameter name.
-	 * <p>
-	 * Note this method returns ONLY the URL query parameters, as opposed to {@link ExternalContext#getRequestParameterValuesMap()} which
-	 * contains both URL (GET) parameters and body (POST) parameters. 
-	 *
-	 * @param context
-	 * @return Map with parameters. An empty map will be returned if there are no parameters.
-	 * @since 1.5
-	 */
-	private static Map<String, List<String>> getRequestParameterMap(FacesContext context) {
-		
-		String queryString = ((HttpServletRequest) context.getExternalContext().getRequest()).getQueryString();
-		if (isEmpty(queryString)) {
-			return Collections.<String, List<String>> emptyMap();
-		}
-		
-		String[] keyValueParameters = queryString.split(quote("&"));
-		
-		Map<String, List<String>> parameters = new LinkedHashMap<String, List<String>>();
-		for (String keyValueParameter : keyValueParameters) {
-			
-			if (keyValueParameter.contains("=")) {
-				String[] keyAndValue = keyValueParameter.split(quote("="));
-				String key = decodeURL(keyAndValue[0]);
-				String value = "";
-				if (keyAndValue.length > 1 && !isEmpty(keyAndValue[1])) {
-					value = decodeURL(keyAndValue[1]);
-				}
-			
-				List<String> values = parameters.get(key);
-				if (values == null) {
-					values = new ArrayList<String>();
-					parameters.put(key, values);
-				}
-			
-				values.add(value);
-			}
-		}
-		
-		return parameters;
 	}
 
 }

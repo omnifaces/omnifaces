@@ -366,6 +366,16 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the view parameters of the current view as a parameter map, or an empty map if there is no view. This is
+	 * ready for usage in among others {@link ViewHandler#getBookmarkableURL(FacesContext, String, Map, boolean)}.
+	 * @return The view parameters of the current view as a parameter map, or an empty map if there is no view.
+	 * @see ViewMetadata#getViewParameters(UIViewRoot)
+	 */
+	public static Map<String, List<String>> getViewParameterMap() {
+		return FacesLocal.getViewParameterMap(getContext());
+	}
+
+	/**
 	 * Returns the metadata attribute map of the given view ID, or an empty map if there is no view metadata.
 	 * @param viewId The view ID to return the metadata attribute map for.
 	 * @return The metadata attribute map of the given view ID, or an empty map if there is no view metadata.
@@ -744,6 +754,19 @@ public final class Faces {
 	 */
 	public static String getRequestQueryString() {
 		return FacesLocal.getRequestQueryString(getContext());
+	}
+
+	/**
+	 * Returns the HTTP request query string as parameter values map. Note this method returns <strong>only</strong>
+	 * the request URL (GET) parameters, as opposed to {@link #getRequestParameterValuesMap()}, which contains both
+	 * the request URL (GET) parameters and and the request body (POST) parameters. This is ready for usage in among
+	 * others {@link ViewHandler#getBookmarkableURL(FacesContext, String, Map, boolean)}.
+	 * @return The HTTP request query string as parameter values map.
+	 * @see HttpServletRequest#getQueryString()
+	 * @since 1.6
+	 */
+	public static Map<String, List<String>> getRequestQueryStringMap() {
+		return FacesLocal.getRequestQueryStringMap(getContext());
 	}
 
 	/**

@@ -12,8 +12,17 @@
  */
 package org.omnifaces.util;
 
+import static java.util.regex.Pattern.quote;
+import static org.omnifaces.util.Utils.decodeURL;
+import static org.omnifaces.util.Utils.isEmpty;
+
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -39,6 +48,7 @@ public final class Servlets {
 	 * Returns the HTTP request hostname. This is the entire domain, without any scheme and slashes. Noted should be
 	 * that this value is extracted from the request URL, not from {@link HttpServletRequest#getServerName()} as its
 	 * outcome can be influenced by proxies.
+	 * @param request The involved HTTP servlet request.
 	 * @return The HTTP request hostname.
 	 * @throws IllegalArgumentException When the URL is malformed. This is however unexpected as the request would
 	 * otherwise not have hit the server at all.
@@ -55,6 +65,7 @@ public final class Servlets {
 
 	/**
 	 * Returns the HTTP request domain URL. This is the URL with the scheme and domain, without any trailing slash.
+	 * @param request The involved HTTP servlet request.
 	 * @return The HTTP request domain URL.
 	 * @see HttpServletRequest#getRequestURL()
 	 * @see HttpServletRequest#getRequestURI()
@@ -67,7 +78,7 @@ public final class Servlets {
 	/**
 	 * Returns the HTTP request base URL. This is the URL from the scheme, domain until with context path, including
 	 * the trailing slash. This is the value you could use in HTML <code>&lt;base&gt;</code> tag.
-	 * @param request The request for which the base URL is computed.
+	 * @param request The involved HTTP servlet request.
 	 * @return The HTTP request base URL.
 	 * @see HttpServletRequest#getRequestURL()
 	 * @see HttpServletRequest#getRequestURI()
@@ -80,6 +91,7 @@ public final class Servlets {
 	/**
 	 * Returns the HTTP request URL with query string. This is the full request URL with query string as the enduser
 	 * sees in browser address bar.
+	 * @param request The request for which the base URL is computed.
 	 * @return The HTTP request URL with query string.
 	 * @see HttpServletRequest#getRequestURL()
 	 * @see HttpServletRequest#getQueryString()
@@ -88,6 +100,43 @@ public final class Servlets {
 		StringBuffer requestURL = request.getRequestURL();
 		String queryString = request.getQueryString();
 		return (queryString == null) ? requestURL.toString() : requestURL.append('?').append(queryString).toString();
+	}
+
+	/**
+	 * Returns the HTTP request query string as parameter values map. Note this method returns <strong>only</strong>
+	 * the request URL (GET) parameters, as opposed to {@link HttpServletRequest#getParameterMap()}, which contains both
+	 * the request URL (GET) parameters and and the request body (POST) parameters.
+	 * The map entries are in the same order as they appear in the query string.
+	 * @param request The request for which the base URL is computed.
+	 * @return The HTTP request query string as parameter values map.
+	 */
+	public static Map<String, List<String>> getRequestQueryStringMap(HttpServletRequest request) {
+		String queryString = request.getQueryString();
+
+		if (isEmpty(queryString)) {
+			return Collections.<String, List<String>>emptyMap();
+		}
+
+		String[] parameters = queryString.split(quote("&"));
+		Map<String, List<String>> parameterMap = new LinkedHashMap<String, List<String>>();
+
+		for (String parameter : parameters) {
+			if (parameter.contains("=")) {
+				String[] pair = parameter.split(quote("="));
+				String key = decodeURL(pair[0]);
+				String value = (pair.length > 1 && !isEmpty(pair[1])) ? decodeURL(pair[1]) : "";
+				List<String> values = parameterMap.get(key);
+
+				if (values == null) {
+					values = new ArrayList<String>();
+					parameterMap.put(key, values);
+				}
+
+				values.add(value);
+			}
+		}
+
+		return parameterMap;
 	}
 
 	// ServletContext -------------------------------------------------------------------------------------------------

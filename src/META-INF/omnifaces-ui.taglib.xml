@@ -2241,9 +2241,17 @@ input.error, select.error, textarea.error {
         </attribute>
         <attribute>
             <description>
-                Whether to include all URL (GET) request parameters in the action URI.
+                Whether to include all URL (GET) request parameters in the action URI. This overrides includeViewParams.
             </description>
             <name>includeRequestParams</name>
+            <required>false</required>
+            <type>boolean</type>
+        </attribute>
+        <attribute>
+            <description>
+                Whether to use current request URI with query string as action URI. This overrides includeViewParams and includeRequestParams.
+            </description>
+            <name>useRequestURI</name>
             <required>false</required>
             <type>boolean</type>
         </attribute>

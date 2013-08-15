@@ -205,6 +205,31 @@ public final class FacesLocal {
 	}
 
 	/**
+	 * @see Faces#getViewParameterMap()
+	 */
+	public static Map<String, List<String>> getViewParameterMap(FacesContext context) {
+		Collection<UIViewParameter> viewParameters = getViewParameters(context);
+
+		if (viewParameters.isEmpty()) {
+			return Collections.<String, List<String>>emptyMap();
+		}
+
+		Map<String, List<String>> parameterMap = new HashMap<String, List<String>>();
+
+		for (UIViewParameter viewParameter : viewParameters) {
+			String value = viewParameter.getStringValue(context);
+
+			if (value != null) {
+				// <f:viewParam> doesn't support multiple values anyway, so having multiple <f:viewParam> on the
+				// same request parameter shouldn't end up in repeated parameters in action URL.
+				parameterMap.put(viewParameter.getName(), Collections.singletonList(value));
+			}
+		}
+
+		return parameterMap;
+	}
+
+	/**
 	 * @see Faces#getMetadataAttributes(String)
 	 */
 	public static Map<String, Object> getMetadataAttributes(FacesContext context, String viewId) {
@@ -498,6 +523,13 @@ public final class FacesLocal {
 	 */
 	public static String getRequestQueryString(FacesContext context) {
 		return getRequest(context).getQueryString();
+	}
+
+	/**
+	 * @see Faces#getRequestQueryStringMap()
+	 */
+	public static Map<String, List<String>> getRequestQueryStringMap(FacesContext context) {
+		return Servlets.getRequestQueryStringMap(getRequest(context));
 	}
 
 	/**
