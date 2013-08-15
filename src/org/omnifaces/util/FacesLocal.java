@@ -540,6 +540,13 @@ public final class FacesLocal {
 	}
 
 	/**
+	 * @see Faces#getRequestURIWithQueryString()
+	 */
+	public static String getRequestURIWithQueryString(FacesContext context) {
+		return Servlets.getRequestURIWithQueryString(getRequest(context));
+	}
+
+	/**
 	 * @see Faces#getRemoteAddr()
 	 */
 	public static String getRemoteAddr(FacesContext context) {

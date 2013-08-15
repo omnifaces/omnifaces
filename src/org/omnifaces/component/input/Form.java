@@ -18,7 +18,7 @@ import static org.omnifaces.component.input.Form.PropertyKeys.includeRequestPara
 import static org.omnifaces.component.input.Form.PropertyKeys.includeViewParams;
 import static org.omnifaces.component.input.Form.PropertyKeys.useRequestURI;
 import static org.omnifaces.util.FacesLocal.getRequestQueryStringMap;
-import static org.omnifaces.util.FacesLocal.getRequestURLWithQueryString;
+import static org.omnifaces.util.FacesLocal.getRequestURIWithQueryString;
 import static org.omnifaces.util.FacesLocal.getViewParameterMap;
 
 import java.io.IOException;
@@ -279,7 +279,7 @@ public class Form extends UIForm {
 						@Override
 						public String getActionURL(FacesContext context, String viewId) {
 							if (type == useRequestURI) {
-								return getRequestURLWithQueryString(context);
+								return getRequestURIWithQueryString(context);
 							}
 							else if (type == includeRequestParams) {
 								return context.getExternalContext().encodeBookmarkableURL(

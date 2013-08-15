@@ -782,6 +782,18 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the HTTP request URI with query string. This is the part after the domain in the request URL, including
+	 * the leading slash and the request query string.
+	 * @return The HTTP request URI with query string.
+	 * @see HttpServletRequest#getRequestURI()
+	 * @see HttpServletRequest#getQueryString()
+	 * @since 1.6
+	 */
+	public static String getRequestURIWithQueryString() {
+		return FacesLocal.getRequestURIWithQueryString(getContext());
+	}
+
+	/**
 	 * Returns the Internet Protocol (IP) address of the client that sent the request. This will first check the
 	 * <code>X-Forwarded-For</code> request header and if it's present, then return its first IP address, else just
 	 * return {@link HttpServletRequest#getRemoteAddr()} unmodified.

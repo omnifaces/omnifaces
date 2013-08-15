@@ -91,7 +91,7 @@ public final class Servlets {
 	/**
 	 * Returns the HTTP request URL with query string. This is the full request URL with query string as the enduser
 	 * sees in browser address bar.
-	 * @param request The request for which the base URL is computed.
+	 * @param request The involved HTTP servlet request.
 	 * @return The HTTP request URL with query string.
 	 * @see HttpServletRequest#getRequestURL()
 	 * @see HttpServletRequest#getQueryString()
@@ -100,6 +100,20 @@ public final class Servlets {
 		StringBuffer requestURL = request.getRequestURL();
 		String queryString = request.getQueryString();
 		return (queryString == null) ? requestURL.toString() : requestURL.append('?').append(queryString).toString();
+	}
+
+	/**
+	 * Returns the HTTP request URI with query string. This is the part after the domain in the request URL, including
+	 * the leading slash and the request query string.
+	 * @param request The involved HTTP servlet request.
+	 * @return The HTTP request URI with query string.
+	 * @see HttpServletRequest#getRequestURI()
+	 * @see HttpServletRequest#getQueryString()
+	 */
+	public static String getRequestURIWithQueryString(HttpServletRequest request) {
+		String requestURI = request.getRequestURI();
+		String queryString = request.getQueryString();
+		return (queryString == null) ? requestURI : (requestURI + "?" + queryString);
 	}
 
 	/**
