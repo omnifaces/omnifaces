@@ -12,11 +12,14 @@
  */
 package org.omnifaces.el.functions;
 
+import static org.omnifaces.util.Utils.isEmpty;
+
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,12 +36,14 @@ import org.omnifaces.util.Utils;
  *
  * @author Bauke Scholtz
  * @author Arjan Tijms
+ * @author Radu Creanga <rdcrng@gmail.com>
  */
 public final class Converters {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final String ERROR_NOT_AN_ARRAY = "The given type '%' is not an array at all.";
+    private static final String ERROR_INVALID_FRAGMENT_SIZE = "Fragment size must be at least 1.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -223,6 +228,69 @@ public final class Converters {
 	}
 
 	/**
+	 * Splits the given array into an array of subarrays of the given fragment size. This is useful for creating nested
+	 * <code>&lt;ui:repeat&gt;</code> structures, for example, when positioning a list of items into a grid based
+	 * layout system such as Twitter Bootstrap.
+	 * @param array The array to be split.
+	 * @param fragmentSize The size of each subarray.
+	 * @return A new array consisting of subarrays of the given array.
+	 * @throws IllegalArgumentException When the fragment size is less than 1.
+	 * @since 1.6
+	 */
+	public static Object[][] splitArray(Object array, int fragmentSize) {
+		if (isEmpty(array)) {
+			return new Object[0][];
+		}
+
+		if (!array.getClass().isArray()) {
+			throw new IllegalArgumentException(String.format(ERROR_NOT_AN_ARRAY, array.getClass()));
+		}
+
+		if (fragmentSize < 1) {
+			throw new IllegalArgumentException(ERROR_INVALID_FRAGMENT_SIZE);
+		}
+
+		int sourceSize = Array.getLength(array);
+		Object[][] arrays = new Object[(sourceSize + fragmentSize - 1) / fragmentSize][];
+
+		for (int i = 0, j = 0; i < sourceSize; i += fragmentSize, j++) {
+			arrays[j] = new Object[Math.min(fragmentSize, sourceSize - i)];
+			System.arraycopy(array, i, arrays[j], 0, arrays[j].length);
+		}
+
+		return arrays;
+	}
+
+	/**
+	 * Splits the given list into a list of sublists of the given fragment size. This is useful for creating nested
+	 * <code>&lt;ui:repeat&gt;</code> structures, for example, when positioning a list of items into a grid based
+	 * layout system such as Twitter Bootstrap.
+	 * @param list The list to be split.
+	 * @param fragmentSize The size of each sublist.
+	 * @return A new list consisting of sublists of the given list.
+	 * @throws IllegalArgumentException When the fragment size is less than 1.
+	 * @since 1.6
+	 */
+	public static <T> List<List<T>> splitList(List<T> list, int fragmentSize) {
+		if (isEmpty(list)) {
+			return Collections.emptyList();
+		}
+
+		if (fragmentSize < 1) {
+			throw new IllegalArgumentException(ERROR_INVALID_FRAGMENT_SIZE);
+		}
+
+		int sourceSize = list.size();
+		List<List<T>> lists = new ArrayList<List<T>>((sourceSize + fragmentSize - 1) / fragmentSize);
+
+		for (int i = 0; i < sourceSize; i += fragmentSize) {
+			lists.add(list.subList(i, Math.min(i + fragmentSize, sourceSize)));
+		}
+
+		return lists;
+	}
+
+    /**
 	 * Encode given object as JSON.
 	 * Currently, this delegates directly to {@link Json#encode(Object)}.
 	 * @param object Object to be encoded as JSON.

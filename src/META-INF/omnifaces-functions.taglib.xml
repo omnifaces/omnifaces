@@ -316,6 +316,28 @@
 	<function>
 		<description>
 			<![CDATA[
+				Splits the given array into an array of subarrays of the given fragment size.
+			]]>
+		</description>
+		<function-name>splitArray</function-name>
+		<function-class>org.omnifaces.el.functions.Converters</function-class>
+		<function-signature>java.lang.Object[] splitArray(java.lang.Object, int)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Splits the given list into a list of sublists of the given fragment size. 
+			]]>
+		</description>
+		<function-name>splitList</function-name>
+		<function-class>org.omnifaces.el.functions.Converters</function-class>
+		<function-signature>java.util.List splitList(java.util.List, int)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
 				Encode given object as JSON.
 			]]>
 		</description>
