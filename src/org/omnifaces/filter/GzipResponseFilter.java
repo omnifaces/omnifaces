@@ -37,7 +37,8 @@ import org.omnifaces.util.Utils;
  * on 3rd party hosts where you have no control over servlet container configuration.
  * <p>
  * To get it to run, map this filter on the desired <code>&lt;url-pattern&gt;</code> or maybe even on the
- * <code>&lt;servlet-name&gt;</code> of the <code>FacesServlet</code>. A <code>Filter</code> is by default dispatched
+ * <code>&lt;servlet-name&gt;</code> of the <code>FacesServlet</code>. Mapping on <code>/*</code> may be too global as
+ * some types of requests (comet, long polling, etc) cannot be gzipped. A <code>Filter</code> is by default dispatched
  * on <code>REQUEST</code> only, you might want to explicitly add the <code>ERROR</code> dispatcher to get it to run
  * on error pages as well.
  * <pre>
