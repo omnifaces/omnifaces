@@ -43,7 +43,7 @@ public final class Converters {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final String ERROR_NOT_AN_ARRAY = "The given type '%' is not an array at all.";
-    private static final String ERROR_INVALID_FRAGMENT_SIZE = "Fragment size must be at least 1.";
+    private static final String ERROR_INVALID_FRAGMENT_SIZE = "The given fragment size '%s' must be at least 1.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -247,7 +247,7 @@ public final class Converters {
 		}
 
 		if (fragmentSize < 1) {
-			throw new IllegalArgumentException(ERROR_INVALID_FRAGMENT_SIZE);
+			throw new IllegalArgumentException(String.format(ERROR_INVALID_FRAGMENT_SIZE, fragmentSize));
 		}
 
 		int sourceSize = Array.getLength(array);
@@ -277,7 +277,7 @@ public final class Converters {
 		}
 
 		if (fragmentSize < 1) {
-			throw new IllegalArgumentException(ERROR_INVALID_FRAGMENT_SIZE);
+			throw new IllegalArgumentException(String.format(ERROR_INVALID_FRAGMENT_SIZE, fragmentSize));
 		}
 
 		int sourceSize = list.size();
