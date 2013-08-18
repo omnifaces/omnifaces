@@ -66,10 +66,10 @@ import org.omnifaces.util.Faces;
  */
 public class RequestParameterProducer {
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	@Produces
 	@Param
-	public <V> ParamValue<V> produce(InjectionPoint injectionPoint) {
+	public ParamValue produce(InjectionPoint injectionPoint) {
 
 		// @Param is the annotation on the injection point that holds all data for this request parameter
 		Param requestParameter = getQualifier(injectionPoint, Param.class);
@@ -137,7 +137,7 @@ public class RequestParameterProducer {
 			convertedValue = null;
 		}
 
-		return (ParamValue<V>) new ParamValue<Object>(submittedValue, requestParameter, getTargetType(injectionPoint), convertedValue);
+		return new ParamValue<Object>(submittedValue, requestParameter, getTargetType(injectionPoint), convertedValue);
 	}
 	
 	public static Converter getConverter(Param requestParameter, Class<?> targetType) {
