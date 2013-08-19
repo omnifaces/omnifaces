@@ -182,7 +182,7 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 	}
 
 	private boolean shouldEncode() {
-		return isRendered() && getChildCount() > 0;
+		return isRendered();
 	}
 
 }

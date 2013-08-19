@@ -24,7 +24,6 @@ import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
-import javax.faces.component.UIOutput;
 import javax.faces.component.visit.VisitCallback;
 import javax.faces.component.visit.VisitContext;
 import javax.faces.component.visit.VisitHint;
@@ -99,16 +98,6 @@ public class Highlight extends OnloadScript {
 
 	private final State state = new State(getStateHelper());
 
-	// Constructors ---------------------------------------------------------------------------------------------------
-
-	/**
-	 * Constructs the Highlight component.
-	 */
-	public Highlight() {
-		// Prepare script body.
-		getChildren().add(new UIOutput());
-	}
-
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
@@ -124,9 +113,6 @@ public class Highlight extends OnloadScript {
 	 */
 	@Override
 	public void encodeChildren(FacesContext context) throws IOException {
-		UIOutput body = (UIOutput) getChildren().get(0);
-		body.setValue(null); // Reset any previous value.
-
 		if (context.isPostback() && context.isValidationFailed()) {
 			UIForm form = Components.getCurrentForm();
 
@@ -150,12 +136,10 @@ public class Highlight extends OnloadScript {
 				});
 
 				if (clientIdsAsJSON.length() > 0) {
-					body.setValue(String.format(SCRIPT, clientIdsAsJSON, getStyleClass(), isFocus()));
+					context.getResponseWriter().write(String.format(SCRIPT, clientIdsAsJSON, getStyleClass(), isFocus()));
 				}
 			}
 		}
-
-		super.encodeChildren(context);
 	}
 
 	// Getters/setters ------------------------------------------------------------------------------------------------
