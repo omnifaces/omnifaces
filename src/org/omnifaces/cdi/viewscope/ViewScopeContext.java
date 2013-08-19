@@ -21,6 +21,8 @@ import javax.enterprise.context.ContextNotActiveException;
 import javax.enterprise.context.spi.Context;
 import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
 
@@ -39,16 +41,20 @@ public class ViewScopeContext implements Context {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private final ViewScopeManager manager;
+	private BeanManager bm;
+	private Bean<ViewScopeManager> bean;
+	private ViewScopeManager manager;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Construct a new view scope context based on the given view scope manager.
-	 * @param manager The view scope manager.
+	 * Construct a new view scope context.
+	 * @param bm The bean manager.
+	 * @param bean The view scope manager bean.
 	 */
-	public ViewScopeContext(ViewScopeManager manager) {
-		this.manager = manager;
+	public ViewScopeContext(BeanManager bm, Bean<ViewScopeManager> bean) {
+		this.bm = bm;
+		this.bean = bean;
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -62,12 +68,13 @@ public class ViewScopeContext implements Context {
 	}
 
 	/**
-	 * Returns <code>true</code> if there is a {@link FacesContext} and it has a {@link UIViewRoot}.
+	 * Returns <code>true</code> if there is a {@link FacesContext}, and it has a {@link UIViewRoot}, and
+	 * {@link #isInitialized()} has returned <code>true</code>.
 	 */
 	@Override
 	public boolean isActive() {
 		FacesContext context = FacesContext.getCurrentInstance();
-		return context != null && context.getViewRoot() != null;
+		return context != null && context.getViewRoot() != null && isInitialized();
 	}
 
 	@Override
@@ -84,6 +91,19 @@ public class ViewScopeContext implements Context {
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Check and initialize the view scope manager.
+	 * @return <code>true</code> if it has been initialized.
+	 */
+	private boolean isInitialized() {
+		if (manager == null) {
+			CreationalContext<ViewScopeManager> context = bm.createCreationalContext(bean);
+			manager = (ViewScopeManager) bm.getReference(bean, ViewScopeManager.class, context);
+		}
+
+		return manager != null;
+	}
 
 	/**
 	 * Throws {@link ContextNotActiveException} when {@link #isActive()} returns <code>false</code>.
