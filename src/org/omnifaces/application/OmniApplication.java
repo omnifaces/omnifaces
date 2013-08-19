@@ -16,6 +16,7 @@
 package org.omnifaces.application;
 
 import javax.el.ELContext;
+import javax.el.ELResolver;
 import javax.el.ExpressionFactory;
 import javax.faces.FacesException;
 import javax.faces.application.Application;
@@ -125,8 +126,8 @@ public class OmniApplication extends ApplicationWrapper {
 	/**
 	 * The same as {@link Application#evaluateExpressionGet(javax.faces.context.FacesContext, String, Class)}, but
 	 * then <code>null</code>-safe. I.e. it doesn't throw NPE when {@link FacesContext}, or {@link ELContext}, or
-	 * {@link ExpressionFactory} are not available. This is sometimes mandatory during early initialization stages
-	 * when JSF or EL contexts are not available for some reason.
+	 * {@link ExpressionFactory}, or {@link ELResolver} are not available. This is sometimes mandatory during early
+	 * initialization stages when JSF or EL contexts are not available for some reason.
 	 */
 	@SuppressWarnings("unchecked")
 	static <T> T safeEvaluateExpressionGet(String expression) {
@@ -139,7 +140,7 @@ public class OmniApplication extends ApplicationWrapper {
 		ELContext elContext = facesContext.getELContext();
 		ExpressionFactory elFactory = facesContext.getApplication().getExpressionFactory();
 
-		if (elContext == null || elFactory == null) {
+		if (elContext == null || elFactory == null || elContext.getELResolver() == null) {
 			return null;
 		}
 
