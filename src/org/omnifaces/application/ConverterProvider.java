@@ -15,13 +15,13 @@
  */
 package org.omnifaces.application;
 
-import static org.omnifaces.application.OmniApplication.safeEvaluateExpressionGet;
-
 import javax.faces.convert.Converter;
+
+import org.omnifaces.util.Faces;
 
 /**
  * An abstraction of converter provider. Concrete converter provider implementations (such as the one from CDI) must
- * store themselves in the EL scope under the {@link #NAME}.
+ * store themselves in the JSF application scope under the name {@link #NAME}.
  *
  * @author Bauke Scholtz
  * @see OmniApplication
@@ -32,10 +32,9 @@ public abstract class ConverterProvider {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	/**
-	 * The name on which the converter provider implementation should be stored in the EL scope.
+	 * The name on which the converter provider implementation should be stored in the JSF application scope.
 	 */
 	public static final String NAME = "omnifaces_ConverterProvider";
-	private static final String EL_NAME = String.format("#{%s}", NAME);
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -60,13 +59,13 @@ public abstract class ConverterProvider {
 	// Helpers --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns the converter provider implementation from the EL context,
+	 * Returns the converter provider implementation from the JSF application scope,
 	 * or <code>null</code> if there is none.
-	 * @return The converter provider implementation from the EL context,
+	 * @return The converter provider implementation from the JSF application scope,
 	 * or <code>null</code> if there is none.
 	 */
 	public static ConverterProvider getInstance() {
-		return safeEvaluateExpressionGet(EL_NAME);
+		return Faces.getApplicationAttribute(NAME);
 	}
 
 }
