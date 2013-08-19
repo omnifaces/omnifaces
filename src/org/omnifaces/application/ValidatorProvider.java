@@ -15,7 +15,7 @@
  */
 package org.omnifaces.application;
 
-import static org.omnifaces.util.Faces.evaluateExpressionGet;
+import static org.omnifaces.application.OmniApplication.safeEvaluateExpressionGet;
 
 import javax.faces.validator.Validator;
 
@@ -57,7 +57,7 @@ public abstract class ValidatorProvider {
 	 * or <code>null</code> if there is none.
 	 */
 	public static ValidatorProvider getInstance() {
-		return evaluateExpressionGet(EL_NAME);
+		return safeEvaluateExpressionGet(EL_NAME);
 	}
 
 }
