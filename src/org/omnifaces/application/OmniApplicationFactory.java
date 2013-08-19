@@ -31,6 +31,7 @@ public class OmniApplicationFactory extends ApplicationFactory {
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private final ApplicationFactory wrapped;
+	private volatile Application application;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -49,7 +50,11 @@ public class OmniApplicationFactory extends ApplicationFactory {
 	 */
 	@Override
 	public Application getApplication() {
-		return new OmniApplication(wrapped.getApplication());
+		if (application == null) {
+			application = new OmniApplication(wrapped.getApplication());
+		}
+
+		return application;
 	}
 
 	/**
@@ -57,8 +62,9 @@ public class OmniApplicationFactory extends ApplicationFactory {
 	 * then it will be wrapped by {@link OmniApplication}.
 	 */
 	@Override
-	public void setApplication(Application application) {
-		wrapped.setApplication(application instanceof OmniApplication ? application : new OmniApplication(application));
+	public synchronized void setApplication(Application application) {
+		this.application = (application instanceof OmniApplication) ? application : new OmniApplication(application);
+		wrapped.setApplication(this.application);
 	}
 
 	/**
