@@ -2522,7 +2522,7 @@ input.error, select.error, textarea.error {
 				<td>Sets the maximum number of elements that will be stored per web module (application scope). Default: no limit</td>
  				</tr>
  				<tr>
- 				<td nowrap><code><org.omnifaces.CACHE_SETTING_SESSION_MAX_CAPACITY</code></td>
+ 				<td nowrap><code>org.omnifaces.CACHE_SETTING_SESSION_MAX_CAPACITY</code></td>
 				<td>Sets the maximum number of elements that will be stored per session. Default: no limit</td>
  				</tr>
  				<tr>
@@ -3135,7 +3135,7 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 				<p>
 				You can use it the same way as <code>&lt;f:param&gt;</code>, you only need to change <code>f:</code> into
 				<code>o:</code> to get the extra support for a <code>Converter</code> by usual means via the <code>converter</code>
-				attribute of the tag, or the nested <code>&lt;f:converter&gt;</code tag, or just automatically if a converter is
+				attribute of the tag, or the nested <code>&lt;f:converter&gt;</code> tag, or just automatically if a converter is
 				already registered for the target class.
 				Also, if no value is specified, but children are present, then the encoded output of children will be returned as
 				value. This is useful when you want to supply JSF components or HTML as parameter of an unescaped
