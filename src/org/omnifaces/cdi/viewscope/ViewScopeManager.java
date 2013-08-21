@@ -15,7 +15,7 @@
  */
 package org.omnifaces.cdi.viewscope;
 
-import static org.omnifaces.util.Events.subscribeToEvent;
+import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Faces.getViewAttribute;
 import static org.omnifaces.util.Faces.setViewAttribute;
@@ -106,7 +106,6 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 			.maximumWeightedCapacity(getMaxActiveViewScopes())
 			.listener(new BeanStorageEvictionListener())
 			.build();
-		subscribeToEvent(PreDestroyViewMapEvent.class, this);
 	}
 
 	/**
@@ -138,16 +137,30 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 
 	/**
 	 * If the event is an instance of {@link PreDestroyViewMapEvent}, which means that the JSF view scope is about to
-	 * be destroyed, then destroy all CDI managed beans associated with the JSF view scope.
+	 * be destroyed, then invoke {@link #processPreDestroyViewMapEvent()} on the current CDI managed instance of this
+	 * view scope manager.
 	 */
 	@Override
 	public void processEvent(SystemEvent event) throws AbortProcessingException {
 		if (event instanceof PreDestroyViewMapEvent) {
-			BeanStorage storage = activeViewScopes.remove(getBeanStorageId(false));
+			// This method is invoked by a separate JSF-managed instance which is registered in faces-config.xml.
+			// That's why it needs to resolve the actual CDI-managed instance where the view scopes are stored.
+			ViewScopeManager instance = evaluateExpressionGet("#{" + NAME + "}");
 
-			if (storage != null) {
-				storage.destroyBeans();
+			if (instance != null) {
+				instance.processPreDestroyViewMapEvent();
 			}
+		}
+	}
+
+	/**
+	 * This method is invoked during view destroy, in that case destroy all beans in current active view scope.
+	 */
+	public void processPreDestroyViewMapEvent() {
+		BeanStorage storage = activeViewScopes.remove(getBeanStorageId(false));
+
+		if (storage != null) {
+			storage.destroyBeans();
 		}
 	}
 
