@@ -41,19 +41,19 @@ public class ViewScopeContext implements Context {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private BeanManager bm;
+	private BeanManager manager;
 	private Bean<ViewScopeManager> bean;
-	private ViewScopeManager manager;
+	private ViewScopeManager viewScopeManager;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
 	 * Construct a new view scope context.
-	 * @param bm The bean manager.
+	 * @param manager The bean manager.
 	 * @param bean The view scope manager bean.
 	 */
-	public ViewScopeContext(BeanManager bm, Bean<ViewScopeManager> bean) {
-		this.bm = bm;
+	public ViewScopeContext(BeanManager manager, Bean<ViewScopeManager> bean) {
+		this.manager = manager;
 		this.bean = bean;
 	}
 
@@ -78,16 +78,16 @@ public class ViewScopeContext implements Context {
 	}
 
 	@Override
-	public <T> T get(Contextual<T> contextual) {
+	public <T> T get(Contextual<T> type) {
 		checkActive();
-		return manager.getBean(contextual);
+		return viewScopeManager.getBean(type);
 	}
 
 	@Override
-	public <T> T get(Contextual<T> contextual, CreationalContext<T> creationalContext) {
+	public <T> T get(Contextual<T> type, CreationalContext<T> context) {
 		checkActive();
-		T bean = manager.getBean(contextual);
-		return (bean != null) ? bean : manager.createBean(contextual, creationalContext);
+		T bean = viewScopeManager.getBean(type);
+		return (bean != null) ? bean : viewScopeManager.createBean(type, context);
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
@@ -97,12 +97,12 @@ public class ViewScopeContext implements Context {
 	 * @return <code>true</code> if it has been initialized.
 	 */
 	private boolean isInitialized() {
-		if (manager == null) {
-			CreationalContext<ViewScopeManager> context = bm.createCreationalContext(bean);
-			manager = (ViewScopeManager) bm.getReference(bean, ViewScopeManager.class, context);
+		if (viewScopeManager == null) {
+			CreationalContext<ViewScopeManager> context = manager.createCreationalContext(bean);
+			viewScopeManager = (ViewScopeManager) manager.getReference(bean, ViewScopeManager.class, context);
 		}
 
-		return manager != null;
+		return viewScopeManager != null;
 	}
 
 	/**

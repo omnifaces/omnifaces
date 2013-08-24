@@ -60,7 +60,6 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 
 	/** The name on which the CDI view scope manager should be stored in the session scope. */
 	public static final String NAME = "omnifaces_ViewScopeManager";
-	private static final String EL_NAME = String.format("#{%s}", NAME);
 
 	/** OmniFaces specific context parameter name of maximum active view scopes in session. */
 	public static final String PARAM_NAME_MAX_ACTIVE_VIEW_SCOPES =
@@ -80,6 +79,7 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	// Private constants ----------------------------------------------------------------------------------------------
 
 	private static final long serialVersionUID = 42L;
+	private static final String EL_NAME = String.format("#{%s}", NAME);
 	private static final String[] PARAM_NAMES_MAX_ACTIVE_VIEW_SCOPES = {
 		PARAM_NAME_MAX_ACTIVE_VIEW_SCOPES, PARAM_NAME_MOJARRA_NUMBER_OF_VIEWS, PARAM_NAME_MYFACES_NUMBER_OF_VIEWS
 	};
@@ -96,7 +96,7 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	private ConcurrentMap<UUID, BeanStorage> activeViewScopes;
 
 	@Inject
-	private BeanManager beanManager;
+	private BeanManager manager;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -107,7 +107,7 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	 * the JSF view scope is about to be destroyed.
 	 */
 	@PostConstruct
-	public void postConstruct() {
+	public void postConstructSession() {
 		activeViewScopes = new ConcurrentLinkedHashMap.Builder<UUID, BeanStorage>()
 			.maximumWeightedCapacity(getMaxActiveViewScopes())
 			.listener(new BeanStorageEvictionListener())
@@ -116,21 +116,21 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 
 	/**
 	 * Create and returns the CDI view scoped managed bean from the current JSF view scope.
-	 * @param contextual The CDI context to find the CDI managed bean in.
-	 * @param creationalContext The CDI creational context to create the CDI managed bean in.
+	 * @param type The contextual type of the CDI managed bean.
+	 * @param context The CDI context to create the CDI managed bean in.
 	 * @return The created CDI view scoped managed bean from the current JSF view scope.
 	 */
-	public <T> T createBean(Contextual<T> contextual, CreationalContext<T> creationalContext) {
-		return activeViewScopes.get(getBeanStorageId(true)).createBean(contextual, creationalContext);
+	public <T> T createBean(Contextual<T> type, CreationalContext<T> context) {
+		return activeViewScopes.get(getBeanStorageId(true)).createBean(type, context);
 	}
 
 	/**
 	 * Returns the CDI view scoped managed bean from the current JSF view scope.
-	 * @param contextual The CDI context to find the CDI managed bean in.
+	 * @param type The contextual type of the CDI managed bean.
 	 * @return The CDI view scoped managed bean from the current JSF view scope.
 	 */
-	public <T> T getBean(Contextual<T> contextual) {
-		return activeViewScopes.get(getBeanStorageId(true)).getBean(contextual, beanManager);
+	public <T> T getBean(Contextual<T> type) {
+		return activeViewScopes.get(getBeanStorageId(true)).getBean(type, manager);
 	}
 
 	/**
@@ -143,7 +143,7 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 
 	/**
 	 * If the event is an instance of {@link PreDestroyViewMapEvent}, which means that the JSF view scope is about to
-	 * be destroyed, then invoke {@link #processPreDestroyViewMapEvent()} on the current CDI managed instance of this
+	 * be destroyed, then invoke {@link #preDestroyView()} on the current CDI managed instance of this
 	 * view scope manager.
 	 */
 	@Override
@@ -154,7 +154,7 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 			ViewScopeManager instance = evaluateExpressionGet(EL_NAME);
 
 			if (instance != null) {
-				instance.processPreDestroyViewMapEvent();
+				instance.preDestroyView();
 			}
 		}
 	}
@@ -162,7 +162,7 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	/**
 	 * This method is invoked during view destroy, in that case destroy all beans in current active view scope.
 	 */
-	public void processPreDestroyViewMapEvent() {
+	public void preDestroyView() {
 		BeanStorage storage = activeViewScopes.remove(getBeanStorageId(false));
 
 		if (storage != null) {
@@ -174,7 +174,7 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	 * This method is invoked during session destroy, in that case destroy all beans in all active view scopes.
 	 */
 	@PreDestroy
-	public void preDestroy() {
+	public void preDestroySession() {
 		for (BeanStorage storage : activeViewScopes.values()) {
 			storage.destroyBeans();
 		}

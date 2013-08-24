@@ -56,32 +56,32 @@ public class BeanStorage implements Serializable {
 
 	/**
 	 * Create and return the bean associated with given context and creational context.
-	 * @param contextual The context to return the bean for.
-	 * @param creationalContext The context to create the bean in.
+	 * @param type The contextual type of the CDI managed bean.
+	 * @param context The context to create the bean in.
 	 * @return The bean associated with given context and creational context.
 	 */
-	public <T> T createBean(Contextual<T> contextual, CreationalContext<T> creationalContext) {
-		Bean<T> bean = new Bean<T>(contextual, creationalContext);
-		beans.put(((PassivationCapable) contextual).getId(), bean);
+	public <T> T createBean(Contextual<T> type, CreationalContext<T> context) {
+		Bean<T> bean = new Bean<T>(type, context);
+		beans.put(((PassivationCapable) type).getId(), bean);
 		return bean.getInstance();
 	}
 
 	/**
 	 * Returns the bean associated with the given context, or <code>null</code> if there is none.
-	 * @param contextual The context to return the bean for.
+	 * @param type The contextual type of the CDI managed bean.
 	 * @param manager The bean manager used to create the creational context, if necessary.
 	 * @return The bean associated with the given context, or <code>null</code> if there is none.
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> T getBean(Contextual<T> contextual, BeanManager manager) {
-		Bean<T> bean = (Bean<T>) beans.get(((PassivationCapable) contextual).getId());
+	public <T> T getBean(Contextual<T> type, BeanManager manager) {
+		Bean<T> bean = (Bean<T>) beans.get(((PassivationCapable) type).getId());
 
 		if (bean == null) {
 			return null;
 		}
 
 		if (!bean.hasContext()) { // May happen after passivation.
-			bean.setContext(contextual, manager.createCreationalContext(contextual));
+			bean.setContext(type, manager.createCreationalContext(type));
 		}
 
 		return bean.getInstance();
@@ -90,7 +90,7 @@ public class BeanStorage implements Serializable {
 	/**
 	 * Destroy all beans managed so far.
 	 */
-	public synchronized void destroyBeans() {
+	public synchronized void destroyBeans() { // Not sure if synchronization is absolutely necessary. Just to be on safe side.
 		for (Bean<?> bean : beans.values()) {
 			bean.destroy();
 		}
@@ -107,22 +107,22 @@ public class BeanStorage implements Serializable {
 
 		private static final long serialVersionUID = 42L;
 
-		private transient Contextual<T> contextual;
-		private transient CreationalContext<T> creationalContext;
+		private transient Contextual<T> type;
+		private transient CreationalContext<T> context;
 		private final T instance;
 
-		public Bean(Contextual<T> contextual, CreationalContext<T> creationalContext) {
-			setContext(contextual, creationalContext);
-			instance = contextual.create(creationalContext);
+		public Bean(Contextual<T> type, CreationalContext<T> context) {
+			setContext(type, context);
+			instance = type.create(context);
 		}
 
-		public void setContext(Contextual<T> contextual, CreationalContext<T> creationalContext) {
-			this.contextual = contextual;
-			this.creationalContext = creationalContext;
+		public void setContext(Contextual<T> type, CreationalContext<T> context) {
+			this.type = type;
+			this.context = context;
 		}
 
 		public boolean hasContext() {
-			return contextual == null || creationalContext == null;
+			return type == null || context == null;
 		}
 
 		public T getInstance() {
@@ -130,7 +130,7 @@ public class BeanStorage implements Serializable {
 		}
 
 		public void destroy() {
-			contextual.destroy(instance, creationalContext);
+			type.destroy(instance, context);
 		}
 
 	}

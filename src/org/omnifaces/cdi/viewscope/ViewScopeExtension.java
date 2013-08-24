@@ -55,10 +55,10 @@ public class ViewScopeExtension implements Extension {
 	 * Register a new view scope context, wrapping the given bean manager and view scope manager bean, in the current
 	 * CDI context.
 	 * @param event The after bean discovery event.
-	 * @param bm The bean manager.
+	 * @param manager The bean manager.
 	 */
-	protected void afterBeanDiscovery(@Observes AfterBeanDiscovery event, BeanManager bm) {
-		event.addContext(new ViewScopeContext(bm, bean));
+	protected void afterBeanDiscovery(@Observes AfterBeanDiscovery event, BeanManager manager) {
+		event.addContext(new ViewScopeContext(manager, bean));
 	}
 
 }
