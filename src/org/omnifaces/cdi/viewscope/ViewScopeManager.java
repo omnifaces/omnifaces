@@ -29,11 +29,13 @@ import javax.annotation.PreDestroy;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.spi.BeanManager;
 import javax.faces.component.UIViewRoot;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.PreDestroyViewMapEvent;
 import javax.faces.event.SystemEvent;
 import javax.faces.event.ViewMapListener;
+import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.omnifaces.cdi.BeanStorage;
@@ -58,6 +60,7 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 
 	/** The name on which the CDI view scope manager should be stored in the session scope. */
 	public static final String NAME = "omnifaces_ViewScopeManager";
+	private static final String EL_NAME = String.format("#{%s}", NAME);
 
 	/** OmniFaces specific context parameter name of maximum active view scopes in session. */
 	public static final String PARAM_NAME_MAX_ACTIVE_VIEW_SCOPES =
@@ -92,6 +95,9 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 
 	private ConcurrentMap<UUID, BeanStorage> activeViewScopes;
 
+	@Inject
+	private BeanManager beanManager;
+
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
@@ -124,7 +130,7 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	 * @return The CDI view scoped managed bean from the current JSF view scope.
 	 */
 	public <T> T getBean(Contextual<T> contextual) {
-		return activeViewScopes.get(getBeanStorageId(true)).getBean(contextual);
+		return activeViewScopes.get(getBeanStorageId(true)).getBean(contextual, beanManager);
 	}
 
 	/**
@@ -145,7 +151,7 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 		if (event instanceof PreDestroyViewMapEvent) {
 			// This method is invoked by a separate JSF-managed instance which is registered in faces-config.xml.
 			// That's why it needs to resolve the actual CDI-managed instance where the view scopes are stored.
-			ViewScopeManager instance = evaluateExpressionGet("#{" + NAME + "}");
+			ViewScopeManager instance = evaluateExpressionGet(EL_NAME);
 
 			if (instance != null) {
 				instance.processPreDestroyViewMapEvent();
@@ -229,7 +235,9 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	 * Listener for {@link ConcurrentLinkedHashMap} which will be invoked when an entry is evicted. It will in turn
 	 * invoke {@link BeanStorage#destroyBeans()}.
 	 */
-	private static final class BeanStorageEvictionListener implements EvictionListener<UUID, BeanStorage> {
+	private static final class BeanStorageEvictionListener implements EvictionListener<UUID, BeanStorage>, Serializable {
+
+		private static final long serialVersionUID = 42L;
 
 		@Override
 		public void onEviction(UUID id, BeanStorage storage) {

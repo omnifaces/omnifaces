@@ -21,6 +21,8 @@ import java.util.concurrent.ConcurrentMap;
 
 import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.PassivationCapable;
 
 /**
  * CDI bean storage. This class is theoretically reusable for multiple CDI scopes. It's currently however only used by
@@ -38,7 +40,7 @@ public class BeanStorage implements Serializable {
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
-	private final ConcurrentMap<Contextual<?>, Bean<?>> beans;
+	private final ConcurrentMap<String, Bean<?>> beans;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -47,7 +49,7 @@ public class BeanStorage implements Serializable {
 	 * @param initialCapacity The initial capacity of the map holding all beans.
 	 */
 	public BeanStorage(int initialCapacity) {
-		beans = new ConcurrentHashMap<Contextual<?>, Bean<?>>(initialCapacity);
+		beans = new ConcurrentHashMap<String, Bean<?>>(initialCapacity);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -60,19 +62,29 @@ public class BeanStorage implements Serializable {
 	 */
 	public <T> T createBean(Contextual<T> contextual, CreationalContext<T> creationalContext) {
 		Bean<T> bean = new Bean<T>(contextual, creationalContext);
-		beans.put(contextual, bean);
+		beans.put(((PassivationCapable) contextual).getId(), bean);
 		return bean.getInstance();
 	}
 
 	/**
 	 * Returns the bean associated with the given context, or <code>null</code> if there is none.
 	 * @param contextual The context to return the bean for.
+	 * @param manager The bean manager used to create the creational context, if necessary.
 	 * @return The bean associated with the given context, or <code>null</code> if there is none.
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> T getBean(Contextual<T> contextual) {
-		Bean<?> bean = beans.get(contextual);
-		return (bean != null) ? (T) bean.getInstance() : null;
+	public <T> T getBean(Contextual<T> contextual, BeanManager manager) {
+		Bean<T> bean = (Bean<T>) beans.get(((PassivationCapable) contextual).getId());
+
+		if (bean == null) {
+			return null;
+		}
+
+		if (!bean.hasContext()) { // May happen after passivation.
+			bean.setContext(contextual, manager.createCreationalContext(contextual));
+		}
+
+		return bean.getInstance();
 	}
 
 	/**
@@ -95,14 +107,22 @@ public class BeanStorage implements Serializable {
 
 		private static final long serialVersionUID = 42L;
 
-		private final Contextual<T> contextual;
-		private final CreationalContext<T> creationalContext;
+		private transient Contextual<T> contextual;
+		private transient CreationalContext<T> creationalContext;
 		private final T instance;
 
 		public Bean(Contextual<T> contextual, CreationalContext<T> creationalContext) {
+			setContext(contextual, creationalContext);
+			instance = contextual.create(creationalContext);
+		}
+
+		public void setContext(Contextual<T> contextual, CreationalContext<T> creationalContext) {
 			this.contextual = contextual;
 			this.creationalContext = creationalContext;
-			instance = this.contextual.create(this.creationalContext);
+		}
+
+		public boolean hasContext() {
+			return contextual == null || creationalContext == null;
 		}
 
 		public T getInstance() {
