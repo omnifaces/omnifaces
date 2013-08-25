@@ -122,7 +122,7 @@ public class BeanStorage implements Serializable {
 		}
 
 		public boolean hasContext() {
-			return type == null || context == null;
+			return type != null && context != null;
 		}
 
 		public T getInstance() {
@@ -130,7 +130,9 @@ public class BeanStorage implements Serializable {
 		}
 
 		public void destroy() {
-			type.destroy(instance, context);
+			if (hasContext()) {
+				type.destroy(instance, context);
+			}
 		}
 
 	}
