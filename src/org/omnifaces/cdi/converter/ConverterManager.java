@@ -13,36 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.omnifaces.cdi.validator;
+package org.omnifaces.cdi.converter;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
-import javax.faces.validator.FacesValidator;
-import javax.faces.validator.Validator;
+import javax.faces.convert.Converter;
+import javax.faces.convert.FacesConverter;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.omnifaces.application.ConverterProvider;
 import org.omnifaces.application.OmniApplication;
-import org.omnifaces.application.ValidatorProvider;
 
 /**
- * Provides access to all {@link FacesValidator} annotated {@link Validator} instances which are made eligible for CDI.
+ * Provides access to all {@link FacesConverter} annotated {@link Converter} instances which are made eligible for CDI.
  *
  * @author Radu Creanga <rdcrng@gmail.com>
  * @author Bauke Scholtz
  * @see OmniApplication
  * @since 1.6
  */
-@Named(ValidatorProvider.NAME)
+@Named(ConverterProvider.NAME)
 @ApplicationScoped
-public class CDIValidatorProvider extends ValidatorProvider {
+public class ConverterManager extends ConverterProvider {
 
 	// Dependencies ---------------------------------------------------------------------------------------------------
 
 	@Inject
-	private ValidatorExtension extension;
+	private ConverterExtension extension;
 
 	@Inject
 	private BeanManager manager;
@@ -50,15 +50,24 @@ public class CDIValidatorProvider extends ValidatorProvider {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
-	public Validator createValidator(String validatorId) {
-		Bean<Validator> bean = extension.getValidatorsById().get(validatorId);
+	public Converter createConverter(String converterId) {
+		return getConverterReference(extension.getConvertersByID().get(converterId));
+	}
 
+	@Override
+	public Converter createConverter(Class<?> converterForClass) {
+		return getConverterReference(extension.getConvertersByForClass().get(converterForClass));
+	}
+
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	private Converter getConverterReference(Bean<Converter> bean) {
 		if (bean == null) {
 			return null;
 		}
 
-		CreationalContext<Validator> context = manager.createCreationalContext(bean);
-		return (Validator) manager.getReference(bean, Validator.class, context);
+		CreationalContext<Converter> context = manager.createCreationalContext(bean);
+		return (Converter) manager.getReference(bean, Converter.class, context);
 	}
 
 }
