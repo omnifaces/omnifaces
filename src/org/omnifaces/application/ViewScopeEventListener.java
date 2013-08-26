@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.omnifaces.cdi.viewscope;
+package org.omnifaces.application;
 
 import javax.faces.component.UIViewRoot;
 import javax.faces.event.AbortProcessingException;
@@ -25,7 +25,7 @@ import javax.faces.event.ViewMapListener;
  * Listener for JSF view scope destroy events so that view scope provider implementation can be notified.
  *
  * @author Bauke Scholtz
- * @see ViewScopeManager
+ * @see ViewScopeProvider
  * @since 1.6
  */
 public class ViewScopeEventListener implements ViewMapListener {

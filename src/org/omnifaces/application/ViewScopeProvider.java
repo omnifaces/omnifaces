@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.omnifaces.cdi.viewscope;
+package org.omnifaces.application;
 
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
 
 /**
- * An abstraction of view scope provider. Concrete validator provider implementations (such as the one from CDI) must
+ * An abstraction of view scope provider. Concrete view scope provider implementations (such as the one from CDI) must
  * store themselves in the EL scope under the {@link #NAME}.
  *
  * @author Bauke Scholtz

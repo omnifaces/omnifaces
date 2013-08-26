@@ -32,6 +32,8 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.omnifaces.application.ViewScopeEventListener;
+import org.omnifaces.application.ViewScopeProvider;
 import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
