@@ -15,7 +15,6 @@
  */
 package org.omnifaces.cdi.viewscope;
 
-import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Faces.getViewAttribute;
 import static org.omnifaces.util.Faces.setViewAttribute;
@@ -30,11 +29,6 @@ import javax.enterprise.context.SessionScoped;
 import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.BeanManager;
-import javax.faces.component.UIViewRoot;
-import javax.faces.event.AbortProcessingException;
-import javax.faces.event.PreDestroyViewMapEvent;
-import javax.faces.event.SystemEvent;
-import javax.faces.event.ViewMapListener;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -45,6 +39,8 @@ import org.omnifaces.util.concurrentlinkedhashmap.EvictionListener;
 
 /**
  * Manage the view scoped beans by listening on view scope and session scope creation and destroy.
+ * The view scope destroy is done externally with aid of {@link ViewScopeEventListener} which is registered in
+ * <code>faces-config.xml</code>.
  *
  * @author Radu Creanga <rdcrng@gmail.com>
  * @author Bauke Scholtz
@@ -52,14 +48,11 @@ import org.omnifaces.util.concurrentlinkedhashmap.EvictionListener;
  * @see ViewScopeContext
  * @since 1.6
  */
-@Named(ViewScopeManager.NAME)
+@Named(ViewScopeProvider.NAME)
 @SessionScoped
-public class ViewScopeManager implements ViewMapListener, Serializable {
+public class ViewScopeManager extends ViewScopeProvider implements Serializable {
 
 	// Public constants -----------------------------------------------------------------------------------------------
-
-	/** The name on which the CDI view scope manager should be stored in the session scope. */
-	public static final String NAME = "omnifaces_ViewScopeManager";
 
 	/** OmniFaces specific context parameter name of maximum active view scopes in session. */
 	public static final String PARAM_NAME_MAX_ACTIVE_VIEW_SCOPES =
@@ -79,7 +72,6 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	// Private constants ----------------------------------------------------------------------------------------------
 
 	private static final long serialVersionUID = 42L;
-	private static final String EL_NAME = String.format("#{%s}", NAME);
 	private static final String[] PARAM_NAMES_MAX_ACTIVE_VIEW_SCOPES = {
 		PARAM_NAME_MAX_ACTIVE_VIEW_SCOPES, PARAM_NAME_MOJARRA_NUMBER_OF_VIEWS, PARAM_NAME_MYFACES_NUMBER_OF_VIEWS
 	};
@@ -103,8 +95,6 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	/**
 	 * Create a new LRU map of active view scopes with maximum weighted capacity depending on several context params.
 	 * See javadoc of {@link ViewScoped} for details.
-	 * Subscribe to {@link PreDestroyViewMapEvent}, so that {@link #processEvent(SystemEvent)} will be invoked when
-	 * the JSF view scope is about to be destroyed.
 	 */
 	@PostConstruct
 	public void postConstructSession() {
@@ -134,34 +124,10 @@ public class ViewScopeManager implements ViewMapListener, Serializable {
 	}
 
 	/**
-	 * Returns <code>true</code> if given source is an instance of {@link UIViewRoot}.
+	 * This method is invoked during view destroy by {@link ViewScopeEventListener}, in that case destroy all beans in
+	 * current active view scope.
 	 */
 	@Override
-	public boolean isListenerForSource(Object source) {
-		return (source instanceof UIViewRoot);
-	}
-
-	/**
-	 * If the event is an instance of {@link PreDestroyViewMapEvent}, which means that the JSF view scope is about to
-	 * be destroyed, then invoke {@link #preDestroyView()} on the current CDI managed instance of this
-	 * view scope manager.
-	 */
-	@Override
-	public void processEvent(SystemEvent event) throws AbortProcessingException {
-		if (event instanceof PreDestroyViewMapEvent) {
-			// This method is invoked by a separate JSF-managed instance which is registered in faces-config.xml.
-			// That's why it needs to resolve the actual CDI-managed instance where the view scopes are stored.
-			ViewScopeManager instance = evaluateExpressionGet(EL_NAME);
-
-			if (instance != null) {
-				instance.preDestroyView();
-			}
-		}
-	}
-
-	/**
-	 * This method is invoked during view destroy, in that case destroy all beans in current active view scope.
-	 */
 	public void preDestroyView() {
 		BeanStorage storage = activeViewScopes.remove(getBeanStorageId(false));
 
