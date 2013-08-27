@@ -253,8 +253,14 @@ public class RequestParameterProducer {
 	}
 	
 	private Set<ConstraintViolation<?>> doBeanValidation(Class<?> base, String property, Object value) {
+		
+		ParamValue<?> paramValue = null;
+		if (value != null) {
+			paramValue = new ParamValue<Object>(null, null, null, value);
+		}
+		
 		@SuppressWarnings("rawtypes")
-		Set violationsRaw = getBeanValidator().validateValue(base, property, value);
+		Set violationsRaw = getBeanValidator().validateValue(base, property, paramValue);
 
 		@SuppressWarnings("unchecked")
 		Set<ConstraintViolation<?>> violations = violationsRaw;

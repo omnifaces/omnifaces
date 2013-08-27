@@ -188,6 +188,9 @@ public @interface Param {
 	/**
 	 * (Optional) Flag that disables bean validation for this instance.
 	 * <p>
+	 * <b>NOTE:</b> bean validation at the moment (OmniFaces 1.6) is done against the {@link ParamValue} that is injected. In many cases this will
+	 * be of limited use. We hope to directly inject the converted type in OmniFaces 1.7 and then bean validation will make more sense.
+	 * <p>
 	 * If <code>true</code> no bean validation will be attempted. If <code>false</code> (the default) no specific action is taken, and it
 	 * will depend on the availability of bean validation and the global {@link BeanValidator#DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME} setting
 	 * whether bean validation is attempted or not.
