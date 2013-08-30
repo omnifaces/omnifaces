@@ -645,13 +645,16 @@ public final class Components {
 	 * <ul>
 	 * <li><code>createAjaxBehavior("#{bean.ajaxListener}");</code></li>
 	 * </ul>
+	 * <p>Note that this is essentially the programmatic equivalent of <code>&lt;f:ajax&gt;</code>. So if you intented
+	 * to create for example a <code>&lt;p:ajax&gt;</code> programmatically, then don't use this method.
 	 * @param expression The EL expression to be invoked when the created ajax behavior is processed.
 	 * @return The created ajax behavior, ready to be used as
 	 * {@link UIComponentBase#addClientBehavior(String, ClientBehavior)} whereby the string argument represents the
 	 * client event name, such as "action", "valueChange", "click", "blur", etc.
 	 */
 	public static AjaxBehavior createAjaxBehavior(String expression) {
-		AjaxBehavior behavior = new AjaxBehavior();
+		FacesContext context = FacesContext.getCurrentInstance();
+		AjaxBehavior behavior = (AjaxBehavior) context.getApplication().createBehavior(AjaxBehavior.BEHAVIOR_ID);
 		final MethodExpression method = createVoidMethodExpression(expression, AjaxBehaviorEvent.class);
 		behavior.addAjaxBehaviorListener(new AjaxBehaviorListener() {
 			@Override
