@@ -12,6 +12,8 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static org.omnifaces.util.Faces.getInitParameter;
+
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -45,8 +47,13 @@ final class CombinedResourceInfo {
 	private static final String MOJARRA_DEFAULT_RESOURCE_MAX_AGE = "com.sun.faces.defaultResourceMaxAge";
 	private static final String MYFACES_DEFAULT_RESOURCE_MAX_AGE = "org.apache.myfaces.RESOURCE_MAX_TIME_EXPIRES";
 	private static final long DEFAULT_RESOURCE_MAX_AGE = 604800000L; // 1 week.
-	private static final long MAX_AGE =
-		initMaxAge(DEFAULT_RESOURCE_MAX_AGE, MOJARRA_DEFAULT_RESOURCE_MAX_AGE, MYFACES_DEFAULT_RESOURCE_MAX_AGE);
+	private static final String[] PARAM_NAMES_RESOURCE_MAX_AGE = {
+		MOJARRA_DEFAULT_RESOURCE_MAX_AGE, MYFACES_DEFAULT_RESOURCE_MAX_AGE
+	};
+
+	// Static variables -----------------------------------------------------------------------------------------------
+
+	private static Long maxAge;
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -255,41 +262,26 @@ final class CombinedResourceInfo {
 	}
 
 	/**
-	 * Returns the maximum age in milliseconds of this combined resource info.
+	 * Returns the maximum age in milliseconds of this combined resource info. This will be calculated lazily once
+	 * and re-returned everytime; the faces context is namely not available during class' initialization/construction.
 	 * @return The maximum age in milliseconds of this combined resource info.
 	 */
 	public long getMaxAge() {
-		return MAX_AGE;
-	}
+		if (maxAge != null) {
+			return maxAge;
+		}
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+		for (String name : PARAM_NAMES_RESOURCE_MAX_AGE) {
+			String value = getInitParameter(name);
 
-	/**
-	 * Initializes the maximum age in milliseconds. The first non-null value associated with the given context parameter
-	 * names will be returned, else the given default value will be returned.
-	 * @param defaultValue The default value.
-	 * @param initParameterNames The context parameter names to look for any predefinied maximum age.
-	 * @return The maximum age in milliseconds.
-	 */
-	@SuppressWarnings("unchecked")
-	private static long initMaxAge(long defaultValue, String... initParameterNames) {
-		Map<String, String> params = FacesContext.getCurrentInstance().getExternalContext().getInitParameterMap();
-		String param = null;
-
-		for (String name : initParameterNames) {
-			param = params.get(name);
-
-			if (param != null) {
-				break;
+			if (value != null) {
+				if (value.matches("[0-9]+")) {
+					return (maxAge = Long.valueOf(value));
+				}
 			}
 		}
 
-		if (param == null || !param.matches("[0-9]+")) {
-			return defaultValue;
-		}
-		else {
-			return Long.valueOf(param);
-		}
+		return (maxAge = DEFAULT_RESOURCE_MAX_AGE);
 	}
 
 	// Helpers ----------------------------------------------------------------------------------------------------
