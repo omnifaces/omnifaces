@@ -100,14 +100,14 @@ public final class FacesViews {
 	 * The name of the boolean init parameter (in web.xml) via which the user can set whether the {@link FacesViewsForwardingFilter}
 	 * should match before declared filters (false) or after declared filters (true);
 	 */
-	public static final String FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS_PARAM_NAME = "org.omnifaces.FILTER_AFTER_DECLARED_FILTERS";
+	public static final String FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS_PARAM_NAME = "org.omnifaces.FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS";
 
 	/**
 	 * The name of the boolean init parameter (in web.xml) via which the user can set whether the {@link FacesViewsViewHandler}
 	 * should strip the extension from the parent view handler's outcome or construct the URL itself and only take the query
 	 * parameters (if any) from the parent.
 	 */
-	public static final String FACES_VIEWS_VIEW_HANDLER_MODE_PARAM_NAME = "org.omnifaces.VIEW_HANDLER_MODE";
+	public static final String FACES_VIEWS_VIEW_HANDLER_MODE_PARAM_NAME = "org.omnifaces.FACES_VIEWS_VIEW_HANDLER_MODE";
 
 	/**
 	 * The name of the application scope context parameter under which a Set version of the paths that are to be scanned
