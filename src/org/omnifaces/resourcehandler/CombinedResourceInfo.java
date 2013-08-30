@@ -274,10 +274,8 @@ final class CombinedResourceInfo {
 		for (String name : PARAM_NAMES_RESOURCE_MAX_AGE) {
 			String value = getInitParameter(name);
 
-			if (value != null) {
-				if (value.matches("[0-9]+")) {
-					return (maxAge = Long.valueOf(value));
-				}
+			if (value != null && value.matches("[0-9]+")) {
+				return (maxAge = Long.valueOf(value));
 			}
 		}
 
