@@ -41,11 +41,21 @@ public class ConverterManager extends ConverterProvider {
 
 	// Dependencies ---------------------------------------------------------------------------------------------------
 
-	@Inject
 	private ConverterExtension extension;
 
 	@Inject
 	private BeanManager manager;
+
+	// Constructors ---------------------------------------------------------------------------------------------------
+
+	public ConverterManager() {
+		// Keep default c'tor alive for CDI proxy.
+	}
+
+	@Inject
+	public ConverterManager(ConverterExtension extension) {
+		this.extension = extension;
+	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 

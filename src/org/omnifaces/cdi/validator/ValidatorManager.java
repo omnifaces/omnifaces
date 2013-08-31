@@ -41,11 +41,21 @@ public class ValidatorManager extends ValidatorProvider {
 
 	// Dependencies ---------------------------------------------------------------------------------------------------
 
-	@Inject
 	private ValidatorExtension extension;
 
 	@Inject
 	private BeanManager manager;
+
+	// Constructors ---------------------------------------------------------------------------------------------------
+
+	public ValidatorManager() {
+		// Keep default c'tor alive for CDI proxy.
+	}
+
+	@Inject
+	public ValidatorManager(ValidatorExtension extension) {
+		this.extension = extension;
+	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
