@@ -127,4 +127,21 @@ public final class Numbers {
 		return NumberFormat.getNumberInstance(Faces.getLocale()).format(number);
 	}
 
+	/**
+	 * Format the given number as percentage. This is useful when you want to format numbers as
+	 * percentage in for example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code>
+	 * attribute of select item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The format
+	 * locale will be set to the one as obtained by {@link Faces#getLocale()}.
+	 * @param number The number to be formatted as percentage.
+	 * @return The number which is formatted as percentage.
+	 * @since 1.6
+	 */
+	public static String formatPercent(Number number) {
+		if (number == null) {
+			return null;
+		}
+
+		return NumberFormat.getPercentInstance(Faces.getLocale()).format(number);
+	}
+
 }
