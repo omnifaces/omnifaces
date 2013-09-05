@@ -316,7 +316,7 @@
  *        &lt;param-value&gt;FORWARD&lt;/param-value&gt;
  *    &lt;/context-param&gt;
  *    &lt;context-param&gt;
- *        &lt;param-name&gt;org.omnifaces.FILTER_AFTER_DECLARED_FILTERS&lt;/param-name&gt;
+ *        &lt;param-name&gt;org.omnifaces.FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS&lt;/param-name&gt;
  *        &lt;param-value&gt;false&lt;/param-value&gt;
  *    &lt;/context-param&gt;
  *    &lt;context-param&gt;
