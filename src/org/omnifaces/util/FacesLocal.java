@@ -595,10 +595,11 @@ public final class FacesLocal {
 	public static void redirect(FacesContext context, String url, String... paramValues) throws IOException {
 		String normalizedURL = normalizeRedirectURL(context, url);
 		Object[] params = encodeURLParams(paramValues);
+		String redirectURL = (params.length == 0) ? normalizedURL : String.format(normalizedURL, params);
 
 		ExternalContext externalContext = context.getExternalContext();
 		externalContext.getFlash().setRedirect(true);
-		externalContext.redirect(String.format(normalizedURL, params));
+		externalContext.redirect(redirectURL);
 	}
 
 	/**
@@ -607,11 +608,12 @@ public final class FacesLocal {
 	public static void redirectPermanent(FacesContext context, String url, String... paramValues) {
 		String normalizedURL = normalizeRedirectURL(context, url);
 		Object[] params = encodeURLParams(paramValues);
+		String redirectURL = (params.length == 0) ? normalizedURL : String.format(normalizedURL, params);
 
 		ExternalContext externalContext = context.getExternalContext();
 		externalContext.getFlash().setRedirect(true);
 		externalContext.setResponseStatus(SC_MOVED_PERMANENTLY);
-		externalContext.setResponseHeader("Location", String.format(normalizedURL, params));
+		externalContext.setResponseHeader("Location", redirectURL);
 		externalContext.setResponseHeader("Connection", "close");
 		context.responseComplete();
 	}
