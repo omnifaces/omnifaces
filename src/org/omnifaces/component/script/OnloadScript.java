@@ -80,12 +80,18 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 	@Override
 	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
 		FacesContext context = FacesContext.getCurrentInstance();
+		UIViewRoot view = context.getViewRoot();
+		boolean ajaxRequest = context.getPartialViewContext().isAjaxRequest();
 
 		if (event instanceof PostAddToViewEvent) {
-			context.getViewRoot().addComponentResource(context, this, "body");
+			if (!ajaxRequest || !view.getComponentResources(context, "body").contains(this)) {
+				view.addComponentResource(context, this, "body");
+			}
 		}
-		else if (event instanceof PostRestoreStateEvent && context.getPartialViewContext().isAjaxRequest()) {
-			Events.subscribeToViewEvent(PreRenderViewEvent.class, this);
+		else if (event instanceof PostRestoreStateEvent) {
+			if (ajaxRequest) {
+				Events.subscribeToViewEvent(PreRenderViewEvent.class, this);
+			}
 		}
 	}
 
@@ -173,15 +179,11 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 	}
 
 	private boolean shouldEncodeHtml(PartialViewContext pvc) {
-		return shouldEncode() && (!pvc.isAjaxRequest() || pvc.isRenderAll());
+		return isRendered() && !(pvc.isAjaxRequest() && !pvc.isRenderAll());
 	}
 
 	private boolean shouldEncodeOncomplete(PartialViewContext pvc) {
-		return shouldEncode() && pvc.isAjaxRequest() && !pvc.isRenderAll();
-	}
-
-	private boolean shouldEncode() {
-		return isRendered();
+		return isRendered() && pvc.isAjaxRequest() && !pvc.isRenderAll();
 	}
 
 }
