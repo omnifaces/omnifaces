@@ -80,10 +80,9 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 	@Override
 	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
 		FacesContext context = FacesContext.getCurrentInstance();
-		UIViewRoot view = context.getViewRoot();
 
-		if (event instanceof PostAddToViewEvent && !view.getComponentResources(context, "body").contains(this)) {
-			view.addComponentResource(context, this, "body");
+		if (event instanceof PostAddToViewEvent) {
+			context.getViewRoot().addComponentResource(context, this, "body");
 		}
 		else if (event instanceof PostRestoreStateEvent && context.getPartialViewContext().isAjaxRequest()) {
 			Events.subscribeToViewEvent(PreRenderViewEvent.class, this);
