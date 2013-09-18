@@ -15,10 +15,15 @@
  */
 package org.omnifaces.cdi.validator;
 
+import static org.omnifaces.cdi.validator.ValidatorExtension.Helper.getFacesValidatorAnnotation;
+import static org.omnifaces.cdi.validator.ValidatorExtension.Helper.getFacesValidatorAnnotationValue;
+
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessManagedBean;
@@ -54,14 +59,14 @@ public class ValidatorExtension implements Extension {
 	 * @param validator The processed {@link Validator} instance.
 	 */
 	protected void processValidators(@Observes ProcessManagedBean<Validator> validator) {
-		FacesValidator annotation = validator.getAnnotatedBeanClass().getAnnotation(FacesValidator.class);
+		Annotation annotation = getFacesValidatorAnnotation(validator.getAnnotatedBeanClass());
 
 		if (annotation == null) {
 			return;
 		}
 
 		Bean<Validator> currentBean = validator.getBean();
-		String validatorId = annotation.value();
+		String validatorId = getFacesValidatorAnnotationValue(annotation);
 		Bean<Validator> previousBean = validatorsById.put(validatorId, currentBean);
 
 		if (previousBean != null) {
@@ -78,6 +83,29 @@ public class ValidatorExtension implements Extension {
 	 */
 	Map<String, Bean<Validator>> getValidatorsById() {
 		return validatorsById;
+	}
+
+	// Nested classes -------------------------------------------------------------------------------------------------
+
+	/**
+	 * This ugly nested class should prevent Mojarra's AnnotationScanner from treating this class as an actual
+	 * FacesValidator because of the presence of the javax.faces.validator.FacesValidator signature in class file bytes.
+	 * This would otherwise only produce a confusing warning like this in Tomcat:
+	 * <pre>
+	 * SEVERE: Unable to load annotated class: org.omnifaces.cdi.validator.ValidatorExtension,
+	 * reason: java.lang.NoClassDefFoundError: javax/enterprise/inject/spi/Extension
+	 * </pre>
+	 */
+	static final class Helper {
+
+		public static Annotation getFacesValidatorAnnotation(AnnotatedType<?> type) {
+			return type.getAnnotation(FacesValidator.class);
+		}
+
+		public static String getFacesValidatorAnnotationValue(Annotation facesValidatorAnnotation) {
+			return ((FacesValidator) facesValidatorAnnotation).value();
+		}
+
 	}
 
 }

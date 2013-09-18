@@ -15,10 +15,15 @@
  */
 package org.omnifaces.cdi.converter;
 
+import static org.omnifaces.cdi.converter.ConverterExtension.Helper.getFacesConverterAnnotation;
+import static org.omnifaces.cdi.converter.ConverterExtension.Helper.getFacesConverterAnnotationValue;
+
+import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessManagedBean;
@@ -57,14 +62,14 @@ public class ConverterExtension implements Extension {
 	 * @param converter The processed {@link Converter} instance.
 	 */
 	protected void processConverters(@Observes ProcessManagedBean<Converter> converter) {
-		FacesConverter annotation = converter.getAnnotatedBeanClass().getAnnotation(FacesConverter.class);
+		Annotation annotation = getFacesConverterAnnotation(converter.getAnnotatedBeanClass());
 
 		if (annotation == null) {
 			return;
 		}
 
 		Bean<Converter> bean = converter.getBean();
-		String converterId = annotation.value();
+		String converterId = getFacesConverterAnnotationValue(annotation);
 
 		if (!"".equals(converterId)) {
 			Bean<Converter> previousBean = convertersByID.put(converterId, bean);
@@ -75,7 +80,7 @@ public class ConverterExtension implements Extension {
 			}
 		}
 
-		Class<?> converterForClass = annotation.forClass();
+		Class<?> converterForClass = Helper.getFacesConverterAnnotationForClass(annotation);
 
 		if (converterForClass != Object.class) {
 			Bean<Converter> previousBean = convertersByForClass.put(converterForClass, bean);
@@ -103,6 +108,33 @@ public class ConverterExtension implements Extension {
 	 */
 	public Map<Class<?>, Bean<Converter>> getConvertersByForClass() {
 		return convertersByForClass;
+	}
+
+	// Nested classes -------------------------------------------------------------------------------------------------
+
+	/**
+	 * This ugly nested class should prevent Mojarra's AnnotationScanner from treating this class as an actual
+	 * FacesConverter because of the presence of the javax.faces.convert.FacesConverter signature in class file bytes.
+	 * This would otherwise only produce a confusing warning like this in Tomcat:
+	 * <pre>
+	 * SEVERE: Unable to load annotated class: org.omnifaces.cdi.converter.ConverterExtension,
+	 * reason: java.lang.NoClassDefFoundError: javax/enterprise/inject/spi/Extension
+	 * </pre>
+	 */
+	static final class Helper {
+
+		public static Annotation getFacesConverterAnnotation(AnnotatedType<?> type) {
+			return type.getAnnotation(FacesConverter.class);
+		}
+
+		public static String getFacesConverterAnnotationValue(Annotation facesConverterAnnotation) {
+			return ((FacesConverter) facesConverterAnnotation).value();
+		}
+
+		public static Class<?> getFacesConverterAnnotationForClass(Annotation facesConverterAnnotation) {
+			return ((FacesConverter) facesConverterAnnotation).forClass();
+		}
+
 	}
 
 }
