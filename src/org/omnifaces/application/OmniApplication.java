@@ -138,9 +138,14 @@ public class OmniApplication extends ApplicationWrapper {
 		}
 
 		ELContext elContext = facesContext.getELContext();
+
+		if (elContext == null || elContext.getELResolver() == null) {
+			return null;
+		}
+
 		ExpressionFactory elFactory = facesContext.getApplication().getExpressionFactory();
 
-		if (elContext == null || elFactory == null || elContext.getELResolver() == null) {
+		if (elFactory == null) {
 			return null;
 		}
 
