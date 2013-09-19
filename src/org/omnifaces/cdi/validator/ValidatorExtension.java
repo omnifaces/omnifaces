@@ -88,13 +88,15 @@ public class ValidatorExtension implements Extension {
 	// Nested classes -------------------------------------------------------------------------------------------------
 
 	/**
-	 * This ugly nested class should prevent Mojarra's AnnotationScanner from treating this class as an actual
+	 * This ugly nested class should prevent Mojarra's annotation scanner from treating this class as an actual
 	 * FacesValidator because of the presence of the javax.faces.validator.FacesValidator signature in class file bytes.
 	 * This would otherwise only produce a confusing warning like this in Tomcat:
 	 * <pre>
+	 * [date and time] com.sun.faces.config.AnnotationScanner processClassList
 	 * SEVERE: Unable to load annotated class: org.omnifaces.cdi.validator.ValidatorExtension,
 	 * reason: java.lang.NoClassDefFoundError: javax/enterprise/inject/spi/Extension
 	 * </pre>
+	 * See also com.sun.faces.config.JavaClassScanningAnnotationScanner$ClassFile#containsAnnotation()
 	 */
 	static final class Helper {
 
