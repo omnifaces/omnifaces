@@ -19,7 +19,7 @@ import javax.enterprise.inject.spi.BeanManager;
  * Collection of utility methods for the CDI API with respect to working with {@link BeanManager}.
  * <p>
  * If you need a dependency-free way of obtaining the CDI managed bean instance (e.g. when you want to write code which
- * should also run on Tomcat), use {@link org.omnifaces.config.Beans} instead.
+ * should also run on Tomcat), use {@link org.omnifaces.config.BeanManager} instead.
  *
  * @author Bauke Scholtz
  * @since 1.6.1

@@ -32,7 +32,7 @@ import org.omnifaces.util.JNDI;
  * @author Bauke Scholtz
  * @since 1.6.1
  */
-public enum Beans {
+public enum BeanManager {
 
 	// Enum singleton -------------------------------------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ public enum Beans {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
-	private static final Logger logger = Logger.getLogger(Beans.class.getName());
+	private static final Logger logger = Logger.getLogger(BeanManager.class.getName());
 	private static final String LOG_INITIALIZATION_ERROR = "Beans failed to initialize.";
 	private static final Annotation[] NO_ANNOTATIONS = new Annotation[0];
 
@@ -61,7 +61,7 @@ public enum Beans {
 	/**
 	 * Perform initialization.
 	 */
-	private Beans() {
+	private BeanManager() {
 		init(JNDI.lookup("java:comp/BeanManager"));
 	}
 
@@ -69,9 +69,9 @@ public enum Beans {
 	 * Perform manual initialization with the given bean manager, if not already initialized yet. If the given bean
 	 * manager is <code>null</code> and this instance is not initialized yet, then it remains uninitialized.
 	 * @param beanManager The bean manager to obtain the CDI bean reference from.
-	 * @return The current {@link Beans} instance, initialized and all if given bean manager was not <code>null</code>.
+	 * @return The current {@link BeanManager} instance, initialized and all if given bean manager was not <code>null</code>.
 	 */
-	public Beans init(Object beanManager) {
+	public BeanManager init(Object beanManager) {
 		if (beanManager != null && !initialized.getAndSet(true)) {
 			try {
 				this.beanManager = beanManager;

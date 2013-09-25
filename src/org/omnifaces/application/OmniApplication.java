@@ -21,7 +21,7 @@ import javax.faces.application.ApplicationWrapper;
 import javax.faces.convert.Converter;
 import javax.faces.validator.Validator;
 
-import org.omnifaces.config.Beans;
+import org.omnifaces.config.BeanManager;
 
 /**
  * This OmniFaces application extends the standard JSF application as follows:
@@ -64,7 +64,7 @@ public class OmniApplication extends ApplicationWrapper {
 	 */
 	@Override
 	public Converter createConverter(String converterId) {
-		ConverterProvider converterProvider = Beans.INSTANCE.getReference(ConverterProvider.class);
+		ConverterProvider converterProvider = BeanManager.INSTANCE.getReference(ConverterProvider.class);
 
 		if (converterProvider != null) {
 			Converter converter = converterProvider.createConverter(converterId);
@@ -83,7 +83,7 @@ public class OmniApplication extends ApplicationWrapper {
 	 */
 	@Override
 	public Converter createConverter(Class<?> targetClass) {
-		ConverterProvider converterProvider = Beans.INSTANCE.getReference(ConverterProvider.class);
+		ConverterProvider converterProvider = BeanManager.INSTANCE.getReference(ConverterProvider.class);
 
 		if (converterProvider != null) {
 			Converter converter = converterProvider.createConverter(targetClass);
@@ -102,7 +102,7 @@ public class OmniApplication extends ApplicationWrapper {
 	 */
 	@Override
 	public Validator createValidator(String validatorId) throws FacesException {
-		ValidatorProvider validatorProvider = Beans.INSTANCE.getReference(ValidatorProvider.class);
+		ValidatorProvider validatorProvider = BeanManager.INSTANCE.getReference(ValidatorProvider.class);
 
 		if (validatorProvider != null) {
 			Validator validator = validatorProvider.createValidator(validatorId);
