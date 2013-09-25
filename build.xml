@@ -10,7 +10,7 @@
 	
 	<!-- Properties -->
 	
-	<property name="version" value="1.6" />
+	<property name="version" value="1.6.1-SNAPSHOT" />
 	<property name="artifactId" value="omnifaces" />
 
 	<tstamp>
@@ -23,7 +23,7 @@
 	<condition property="VERSION" value="${version}">
 		<isset property="maven" />
 	</condition>
-	<property name="VERSION" value="${version}" />
+	<property name="VERSION" value="${version}-${DATE_SHORT}" />
 
 	<path id="common.classpath">
 		<fileset dir="lib">
