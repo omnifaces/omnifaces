@@ -58,20 +58,21 @@ public class ValidatorExtension implements Extension {
 	 * collect it by its ID.
 	 * @param validator The processed {@link Validator} instance.
 	 */
-	protected void processValidators(@Observes ProcessManagedBean<Validator> validator) {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	protected void processValidators(@Observes ProcessManagedBean validator) {
 		Annotation annotation = getFacesValidatorAnnotation(validator.getAnnotatedBeanClass());
 
 		if (annotation == null) {
 			return;
 		}
 
-		Bean<Validator> currentBean = validator.getBean();
+		Bean<Validator> bean = validator.getBean();
 		String validatorId = getFacesValidatorAnnotationValue(annotation);
-		Bean<Validator> previousBean = validatorsById.put(validatorId, currentBean);
+		Bean<Validator> previousBean = validatorsById.put(validatorId, bean);
 
-		if (previousBean != null) {
+		if (previousBean != null && !previousBean.getBeanClass().getName().equals(bean.getBeanClass().getName())) {
 			validator.addDefinitionError(new IllegalArgumentException(String.format(
-				ERROR_DUPLICATE_ID, currentBean.getBeanClass(), validatorId, previousBean.getBeanClass())));
+				ERROR_DUPLICATE_ID, bean.getBeanClass(), validatorId, previousBean.getBeanClass())));
 		}
 	}
 

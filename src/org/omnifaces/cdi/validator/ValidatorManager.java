@@ -15,14 +15,15 @@
  */
 package org.omnifaces.cdi.validator;
 
+import static org.omnifaces.util.Beans.getReference;
+
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.faces.validator.FacesValidator;
 import javax.faces.validator.Validator;
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.omnifaces.application.OmniApplication;
 import org.omnifaces.application.ValidatorProvider;
@@ -35,26 +36,20 @@ import org.omnifaces.application.ValidatorProvider;
  * @see OmniApplication
  * @since 1.6
  */
-@Named(ValidatorProvider.NAME)
 @ApplicationScoped
-public class ValidatorManager extends ValidatorProvider {
+public class ValidatorManager implements ValidatorProvider {
 
 	// Dependencies ---------------------------------------------------------------------------------------------------
 
-	private ValidatorExtension extension;
-
 	@Inject
 	private BeanManager manager;
+	private ValidatorExtension extension;
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+	// Init -----------------------------------------------------------------------------------------------------------
 
-	public ValidatorManager() {
-		// Keep default c'tor alive for CDI proxy.
-	}
-
-	@Inject
-	public ValidatorManager(ValidatorExtension extension) {
-		this.extension = extension;
+	@PostConstruct
+	public void init() {
+		extension = getReference(manager, ValidatorExtension.class);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -67,8 +62,7 @@ public class ValidatorManager extends ValidatorProvider {
 			return null;
 		}
 
-		CreationalContext<Validator> context = manager.createCreationalContext(bean);
-		return (Validator) manager.getReference(bean, Validator.class, context);
+		return getReference(manager, bean);
 	}
 
 }

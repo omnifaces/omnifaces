@@ -36,20 +36,19 @@ import org.omnifaces.cdi.ViewScoped;
  */
 public class ViewScopeExtension implements Extension {
 
-
-    // Variables ------------------------------------------------------------------------------------------------------
+	// Variables ------------------------------------------------------------------------------------------------------
 
 	private Bean<ViewScopeManager> bean;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
-    /**
-     * Obtain an instance of the view scope manager bean.
-     * @param event The process managed bean event.
-     */
-    protected void processManagedBeans(@Observes ProcessManagedBean<ViewScopeManager> event) {
-        bean = event.getBean();
-    }
+	/**
+	 * Obtain an instance of the view scope manager bean.
+	 * @param event The process managed bean event.
+	 */
+	protected void processManagedBeans(@Observes ProcessManagedBean<ViewScopeManager> event) {
+		bean = event.getBean();
+	}
 
 	/**
 	 * Register a new view scope context, wrapping the given bean manager and view scope manager bean, in the current

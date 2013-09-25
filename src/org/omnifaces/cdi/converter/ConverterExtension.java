@@ -16,6 +16,7 @@
 package org.omnifaces.cdi.converter;
 
 import static org.omnifaces.cdi.converter.ConverterExtension.Helper.getFacesConverterAnnotation;
+import static org.omnifaces.cdi.converter.ConverterExtension.Helper.getFacesConverterAnnotationForClass;
 import static org.omnifaces.cdi.converter.ConverterExtension.Helper.getFacesConverterAnnotationValue;
 
 import java.lang.annotation.Annotation;
@@ -61,7 +62,8 @@ public class ConverterExtension implements Extension {
 	 * collect it by its ID and/or for-class.
 	 * @param converter The processed {@link Converter} instance.
 	 */
-	protected void processConverters(@Observes ProcessManagedBean<Converter> converter) {
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	protected void processConverters(@Observes ProcessManagedBean converter) {
 		Annotation annotation = getFacesConverterAnnotation(converter.getAnnotatedBeanClass());
 
 		if (annotation == null) {
@@ -74,18 +76,18 @@ public class ConverterExtension implements Extension {
 		if (!"".equals(converterId)) {
 			Bean<Converter> previousBean = convertersByID.put(converterId, bean);
 
-			if (previousBean != null) {
+			if (previousBean != null && !previousBean.getBeanClass().getName().equals(bean.getBeanClass().getName())) {
 				converter.addDefinitionError(new IllegalArgumentException(String.format(
 					ERROR_DUPLICATE_ID, bean.getBeanClass(), converterId, previousBean.getBeanClass())));
 			}
 		}
 
-		Class<?> converterForClass = Helper.getFacesConverterAnnotationForClass(annotation);
+		Class<?> converterForClass = getFacesConverterAnnotationForClass(annotation);
 
 		if (converterForClass != Object.class) {
 			Bean<Converter> previousBean = convertersByForClass.put(converterForClass, bean);
 
-			if (previousBean != null) {
+			if (previousBean != null && !previousBean.getBeanClass().getName().equals(bean.getBeanClass().getName())) {
 				converter.addDefinitionError(new IllegalArgumentException(String.format(
 					ERROR_DUPLICATE_FORCLASS, bean.getBeanClass(), converterForClass, previousBean.getBeanClass())));
 			}

@@ -15,27 +15,16 @@
  */
 package org.omnifaces.application;
 
-import static org.omnifaces.application.OmniApplication.safeEvaluateExpressionGet;
-
 import javax.faces.validator.Validator;
 
 /**
- * An abstraction of validator provider. Concrete validator provider implementations (such as the one from CDI) must
- * store themselves in the EL scope under the {@link #NAME}.
+ * An abstraction of validator provider, so that JSF can obtain the concrete instance without a CDI dependency.
  *
  * @author Bauke Scholtz
  * @see OmniApplication
  * @since 1.6
  */
-public abstract class ValidatorProvider {
-
-	// Constants ------------------------------------------------------------------------------------------------------
-
-	/**
-	 * The name on which the validator provider implementation should be stored in the EL scope.
-	 */
-	public static final String NAME = "omnifaces_ValidatorProvider";
-	private static final String EL_NAME = String.format("#{%s}", NAME);
+public interface ValidatorProvider {
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -46,18 +35,6 @@ public abstract class ValidatorProvider {
 	 * @return the validator instance associated with the given validator ID,
 	 * or <code>null</code> if there is none.
 	 */
-	public abstract Validator createValidator(String validatorId);
-
-	// Helpers --------------------------------------------------------------------------------------------------------
-
-	/**
-	 * Returns the validator provider implementation from the EL context,
-	 * or <code>null</code> if there is none.
-	 * @return The validator provider implementation from the EL context,
-	 * or <code>null</code> if there is none.
-	 */
-	public static ValidatorProvider getInstance() {
-		return safeEvaluateExpressionGet(EL_NAME);
-	}
+	public Validator createValidator(String validatorId);
 
 }

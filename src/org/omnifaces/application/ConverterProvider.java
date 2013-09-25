@@ -15,27 +15,16 @@
  */
 package org.omnifaces.application;
 
-import static org.omnifaces.application.OmniApplication.safeEvaluateExpressionGet;
-
 import javax.faces.convert.Converter;
 
 /**
- * An abstraction of converter provider. Concrete converter provider implementations (such as the one from CDI) must
- * store themselves in the EL scope under the {@link #NAME}.
+ * An abstraction of converter provider, so that JSF can obtain the concrete instance without a CDI dependency.
  *
  * @author Bauke Scholtz
  * @see OmniApplication
  * @since 1.6
  */
-public abstract class ConverterProvider {
-
-	// Constants ------------------------------------------------------------------------------------------------------
-
-	/**
-	 * The name on which the converter provider implementation should be stored in the EL scope.
-	 */
-	public static final String NAME = "omnifaces_ConverterProvider";
-	private static final String EL_NAME = String.format("#{%s}", NAME);
+public interface ConverterProvider {
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -46,7 +35,7 @@ public abstract class ConverterProvider {
 	 * @return the converter instance associated with the given converter ID,
 	 * or <code>null</code> if there is none.
 	 */
-	public abstract Converter createConverter(String converterId);
+	public Converter createConverter(String converterId);
 
 	/**
 	 * Returns the converter instance associated with the given converter for-class,
@@ -55,18 +44,6 @@ public abstract class ConverterProvider {
 	 * @return the converter instance associated with the given converter for-class,
 	 * or <code>null</code> if there is none.
 	 */
-	public abstract Converter createConverter(Class<?> converterForClass);
-
-	// Helpers --------------------------------------------------------------------------------------------------------
-
-	/**
-	 * Returns the converter provider implementation from the EL context,
-	 * or <code>null</code> if there is none.
-	 * @return The converter provider implementation from the EL context,
-	 * or <code>null</code> if there is none.
-	 */
-	public static ConverterProvider getInstance() {
-		return safeEvaluateExpressionGet(EL_NAME);
-	}
+	public Converter createConverter(Class<?> converterForClass);
 
 }

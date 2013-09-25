@@ -15,14 +15,15 @@
  */
 package org.omnifaces.cdi.converter;
 
+import static org.omnifaces.util.Beans.getReference;
+
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.omnifaces.application.ConverterProvider;
 import org.omnifaces.application.OmniApplication;
@@ -35,26 +36,20 @@ import org.omnifaces.application.OmniApplication;
  * @see OmniApplication
  * @since 1.6
  */
-@Named(ConverterProvider.NAME)
 @ApplicationScoped
-public class ConverterManager extends ConverterProvider {
+public class ConverterManager implements ConverterProvider {
 
 	// Dependencies ---------------------------------------------------------------------------------------------------
 
-	private ConverterExtension extension;
-
 	@Inject
 	private BeanManager manager;
+	private ConverterExtension extension;
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+	// Init -----------------------------------------------------------------------------------------------------------
 
-	public ConverterManager() {
-		// Keep default c'tor alive for CDI proxy.
-	}
-
-	@Inject
-	public ConverterManager(ConverterExtension extension) {
-		this.extension = extension;
+	@PostConstruct
+	public void init() {
+		extension = getReference(manager, ConverterExtension.class);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -76,8 +71,7 @@ public class ConverterManager extends ConverterProvider {
 			return null;
 		}
 
-		CreationalContext<Converter> context = manager.createCreationalContext(bean);
-		return (Converter) manager.getReference(bean, Converter.class, context);
+		return getReference(manager, bean);
 	}
 
 }

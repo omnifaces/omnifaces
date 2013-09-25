@@ -15,16 +15,13 @@
  */
 package org.omnifaces.application;
 
-import javax.el.ELContext;
-import javax.el.ELResolver;
-import javax.el.ExpressionFactory;
 import javax.faces.FacesException;
 import javax.faces.application.Application;
 import javax.faces.application.ApplicationWrapper;
-import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.validator.Validator;
 
+import org.omnifaces.config.Beans;
 
 /**
  * This OmniFaces application extends the standard JSF application as follows:
@@ -67,7 +64,7 @@ public class OmniApplication extends ApplicationWrapper {
 	 */
 	@Override
 	public Converter createConverter(String converterId) {
-		ConverterProvider converterProvider = ConverterProvider.getInstance();
+		ConverterProvider converterProvider = Beans.INSTANCE.getReference(ConverterProvider.class);
 
 		if (converterProvider != null) {
 			Converter converter = converterProvider.createConverter(converterId);
@@ -86,7 +83,7 @@ public class OmniApplication extends ApplicationWrapper {
 	 */
 	@Override
 	public Converter createConverter(Class<?> targetClass) {
-		ConverterProvider converterProvider = ConverterProvider.getInstance();
+		ConverterProvider converterProvider = Beans.INSTANCE.getReference(ConverterProvider.class);
 
 		if (converterProvider != null) {
 			Converter converter = converterProvider.createConverter(targetClass);
@@ -105,7 +102,7 @@ public class OmniApplication extends ApplicationWrapper {
 	 */
 	@Override
 	public Validator createValidator(String validatorId) throws FacesException {
-		ValidatorProvider validatorProvider = ValidatorProvider.getInstance();
+		ValidatorProvider validatorProvider = Beans.INSTANCE.getReference(ValidatorProvider.class);
 
 		if (validatorProvider != null) {
 			Validator validator = validatorProvider.createValidator(validatorId);
@@ -121,35 +118,6 @@ public class OmniApplication extends ApplicationWrapper {
 	@Override
 	public Application getWrapped() {
 		return wrapped;
-	}
-
-	/**
-	 * The same as {@link Application#evaluateExpressionGet(javax.faces.context.FacesContext, String, Class)}, but
-	 * then <code>null</code>-safe. I.e. it doesn't throw NPE when {@link FacesContext}, or {@link ELContext}, or
-	 * {@link ExpressionFactory}, or {@link ELResolver} are not available. This is sometimes mandatory during early
-	 * initialization stages when JSF or EL contexts are not available for some reason.
-	 */
-	@SuppressWarnings("unchecked")
-	static <T> T safeEvaluateExpressionGet(String expression) {
-		FacesContext facesContext = FacesContext.getCurrentInstance();
-
-		if (facesContext == null) {
-			return null;
-		}
-
-		ELContext elContext = facesContext.getELContext();
-
-		if (elContext == null || elContext.getELResolver() == null) {
-			return null;
-		}
-
-		ExpressionFactory elFactory = facesContext.getApplication().getExpressionFactory();
-
-		if (elFactory == null) {
-			return null;
-		}
-
-		return (T) elFactory.createValueExpression(elContext, expression, Object.class).getValue(elContext);
 	}
 
 }

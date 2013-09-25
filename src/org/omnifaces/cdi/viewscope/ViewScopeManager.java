@@ -30,7 +30,6 @@ import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.omnifaces.application.ViewScopeEventListener;
 import org.omnifaces.application.ViewScopeProvider;
@@ -50,9 +49,8 @@ import org.omnifaces.util.concurrentlinkedhashmap.EvictionListener;
  * @see ViewScopeContext
  * @since 1.6
  */
-@Named(ViewScopeProvider.NAME)
 @SessionScoped
-public class ViewScopeManager extends ViewScopeProvider implements Serializable {
+public class ViewScopeManager implements ViewScopeProvider, Serializable {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 

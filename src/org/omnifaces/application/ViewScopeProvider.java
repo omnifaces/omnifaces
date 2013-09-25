@@ -15,43 +15,20 @@
  */
 package org.omnifaces.application;
 
-import static org.omnifaces.util.Faces.evaluateExpressionGet;
-
 /**
- * An abstraction of view scope provider. Concrete view scope provider implementations (such as the one from CDI) must
- * store themselves in the EL scope under the {@link #NAME}.
+ * An abstraction of view scope provider, so that JSF can obtain the concrete instance without a CDI dependency.
  *
  * @author Bauke Scholtz
  * @see ViewScopeEventListener
  * @since 1.6
  */
-public abstract class ViewScopeProvider {
-
-	// Constants ------------------------------------------------------------------------------------------------------
-
-	/**
-	 * The name on which the view scope provider implementation should be stored in the EL scope.
-	 */
-	public static final String NAME = "omnifaces_ViewScopeProvider";
-	private static final String EL_NAME = String.format("#{%s}", NAME);
+public interface ViewScopeProvider {
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
 	 * This method is invoked during view destroy by {@link ViewScopeEventListener}.
 	 */
-	public abstract void preDestroyView();
-
-	// Helpers --------------------------------------------------------------------------------------------------------
-
-	/**
-	 * Returns the view scope provider implementation from the EL context,
-	 * or <code>null</code> if there is none.
-	 * @return The view scope provider implementation from the EL context,
-	 * or <code>null</code> if there is none.
-	 */
-	public static ViewScopeProvider getInstance() {
-		return evaluateExpressionGet(EL_NAME);
-	}
+	public void preDestroyView();
 
 }
