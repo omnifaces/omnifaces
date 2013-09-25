@@ -40,7 +40,7 @@ public final class Beans {
 	/**
 	 * Returns the CDI managed bean instance of the given resolved bean from the given bean manager.
 	 * @param beanManager The involved CDI bean manager.
-	 * @param beanClass The resolved bean of the CDI managed bean instance.
+	 * @param bean The resolved bean of the CDI managed bean instance.
 	 * @return The CDI managed bean instance of the given resolved bean from the given bean manager.
 	 */
 	@SuppressWarnings("unchecked")
