@@ -15,6 +15,7 @@
  */
 package org.omnifaces.application;
 
+import javax.faces.application.Application;
 import javax.faces.convert.Converter;
 
 /**
@@ -31,19 +32,21 @@ public interface ConverterProvider {
 	/**
 	 * Returns the converter instance associated with the given converter ID,
 	 * or <code>null</code> if there is none.
+	 * @param application The involved JSF application.
 	 * @param converterId The converter ID of the desired converter instance.
 	 * @return the converter instance associated with the given converter ID,
 	 * or <code>null</code> if there is none.
 	 */
-	public Converter createConverter(String converterId);
+	public Converter createConverter(Application application, String converterId);
 
 	/**
 	 * Returns the converter instance associated with the given converter for-class,
 	 * or <code>null</code> if there is none.
+	 * @param application The involved JSF application.
 	 * @param converterForClass The converter for-class of the desired converter instance.
 	 * @return the converter instance associated with the given converter for-class,
 	 * or <code>null</code> if there is none.
 	 */
-	public Converter createConverter(Class<?> converterForClass);
+	public Converter createConverter(Application application, Class<?> converterForClass);
 
 }

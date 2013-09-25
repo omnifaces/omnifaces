@@ -67,7 +67,7 @@ public class OmniApplication extends ApplicationWrapper {
 		ConverterProvider converterProvider = BeanManager.INSTANCE.getReference(ConverterProvider.class);
 
 		if (converterProvider != null) {
-			Converter converter = converterProvider.createConverter(converterId);
+			Converter converter = converterProvider.createConverter(getWrapped(), converterId);
 
 			if (converter != null) {
 				return converter;
@@ -86,7 +86,7 @@ public class OmniApplication extends ApplicationWrapper {
 		ConverterProvider converterProvider = BeanManager.INSTANCE.getReference(ConverterProvider.class);
 
 		if (converterProvider != null) {
-			Converter converter = converterProvider.createConverter(targetClass);
+			Converter converter = converterProvider.createConverter(getWrapped(), targetClass);
 
 			if (converter != null) {
 				return converter;
@@ -105,7 +105,7 @@ public class OmniApplication extends ApplicationWrapper {
 		ValidatorProvider validatorProvider = BeanManager.INSTANCE.getReference(ValidatorProvider.class);
 
 		if (validatorProvider != null) {
-			Validator validator = validatorProvider.createValidator(validatorId);
+			Validator validator = validatorProvider.createValidator(getWrapped(), validatorId);
 
 			if (validator != null) {
 				return validator;

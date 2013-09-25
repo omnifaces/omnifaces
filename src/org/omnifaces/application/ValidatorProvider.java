@@ -15,6 +15,7 @@
  */
 package org.omnifaces.application;
 
+import javax.faces.application.Application;
 import javax.faces.validator.Validator;
 
 /**
@@ -31,10 +32,11 @@ public interface ValidatorProvider {
 	/**
 	 * Returns the validator instance associated with the given validator ID,
 	 * or <code>null</code> if there is none.
+	 * @param application The involved JSF application.
 	 * @param validatorId The validator ID of the desired validator instance.
 	 * @return the validator instance associated with the given validator ID,
 	 * or <code>null</code> if there is none.
 	 */
-	public Validator createValidator(String validatorId);
+	public Validator createValidator(Application application, String validatorId);
 
 }

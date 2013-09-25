@@ -17,16 +17,20 @@ package org.omnifaces.cdi.validator;
 
 import static org.omnifaces.util.Beans.getReference;
 
-import javax.annotation.PostConstruct;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.faces.application.Application;
 import javax.faces.validator.FacesValidator;
 import javax.faces.validator.Validator;
 import javax.inject.Inject;
 
 import org.omnifaces.application.OmniApplication;
 import org.omnifaces.application.ValidatorProvider;
+import org.omnifaces.util.Beans;
 
 /**
  * Provides access to all {@link FacesValidator} annotated {@link Validator} instances which are made eligible for CDI.
@@ -43,28 +47,26 @@ public class ValidatorManager implements ValidatorProvider {
 
 	@Inject
 	private BeanManager manager;
-	private ValidatorExtension extension;
-
-	// Init -----------------------------------------------------------------------------------------------------------
-
-	@PostConstruct
-	public void init() {
-		// Normally, the extension is @Inject-able, however this fails with WELD-001408 "Unsatisfied dependencies" when
-		// OmniFaces is deployed in multiple WARs in same EAR. So, we're resolving it manually here.
-		extension = getReference(manager, ValidatorExtension.class);
-	}
+	private Map<String, Bean<Validator>> validatorsById = new HashMap<String, Bean<Validator>>();
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
-	public Validator createValidator(String validatorId) {
-		Bean<Validator> bean = extension.getValidatorsById().get(validatorId);
+	@SuppressWarnings("unchecked")
+	public Validator createValidator(Application application, String validatorId) {
+		Bean<Validator> bean = validatorsById.get(validatorId);
 
-		if (bean == null) {
-			return null;
+		if (bean == null && !validatorsById.containsKey(validatorId)) {
+			Validator validator = application.createValidator(validatorId);
+
+			if (validator != null) {
+				bean = (Bean<Validator>) Beans.resolve(manager, validator.getClass());
+			}
+
+			validatorsById.put(validatorId, bean);
 		}
 
-		return getReference(manager, bean);
+		return (bean != null) ? getReference(manager, bean) : null;
 	}
 
 }

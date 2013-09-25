@@ -27,21 +27,31 @@ import javax.enterprise.inject.spi.BeanManager;
 public final class Beans {
 
 	/**
-	 * Returns the CDI managed bean instance of the given class from the given bean manager.
+	 * Resolve and returns the CDI managed bean of the given class from the given bean manager.
 	 * @param beanManager The involved CDI bean manager.
 	 * @param beanClass The type of the CDI managed bean instance.
-	 * @return The CDI managed bean instance of the given class from the given bean manager.
+	 * @return The resolved CDI managed bean of the given class from the given bean manager.
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> T getReference(BeanManager beanManager, Class<T> beanClass) {
-		return getReference(beanManager, (Bean<T>) beanManager.resolve(beanManager.getBeans(beanClass)));
+	public static <T> Bean<T> resolve(BeanManager beanManager, Class<T> beanClass) {
+		return (Bean<T>) beanManager.resolve(beanManager.getBeans(beanClass));
 	}
 
 	/**
-	 * Returns the CDI managed bean instance of the given resolved bean from the given bean manager.
+	 * Returns the CDI managed bean reference of the given class from the given bean manager.
+	 * @param beanManager The involved CDI bean manager.
+	 * @param beanClass The type of the CDI managed bean instance.
+	 * @return The CDI managed bean reference of the given class from the given bean manager.
+	 */
+	public static <T> T getReference(BeanManager beanManager, Class<T> beanClass) {
+		return getReference(beanManager, resolve(beanManager, beanClass));
+	}
+
+	/**
+	 * Returns the CDI managed bean reference of the given resolved bean from the given bean manager.
 	 * @param beanManager The involved CDI bean manager.
 	 * @param bean The resolved bean of the CDI managed bean instance.
-	 * @return The CDI managed bean instance of the given resolved bean from the given bean manager.
+	 * @return The CDI managed bean reference of the given resolved bean from the given bean manager.
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T getReference(BeanManager beanManager, Bean<T> bean) {
