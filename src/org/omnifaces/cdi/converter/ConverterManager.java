@@ -49,6 +49,8 @@ public class ConverterManager implements ConverterProvider {
 
 	@PostConstruct
 	public void init() {
+		// Normally, the extension is @Inject-able, however this fails with WELD-001408 "Unsatisfied dependencies" when
+		// OmniFaces is deployed in multiple WARs in same EAR. So, we're resolving it manually here.
 		extension = getReference(manager, ConverterExtension.class);
 	}
 
