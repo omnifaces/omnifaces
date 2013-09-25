@@ -62,7 +62,7 @@ public class ConverterExtension implements Extension {
 	 * collect it by its ID and/or for-class.
 	 * @param converter The processed {@link Converter} instance.
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes", "unchecked" }) // A ProcessManagedBean parameterized with a JSF-specific class (read: WAR-specific class) is never triggered in GF4, WF8 and possibly others using Weld2 when deployed as EAR.
 	protected void processConverters(@Observes ProcessManagedBean converter) {
 		Annotation annotation = getFacesConverterAnnotation(converter.getAnnotatedBeanClass());
 

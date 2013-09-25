@@ -58,7 +58,7 @@ public class ValidatorExtension implements Extension {
 	 * collect it by its ID.
 	 * @param validator The processed {@link Validator} instance.
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes", "unchecked" }) // A ProcessManagedBean parameterized with a JSF-specific class (read: WAR-specific class) is never triggered in GF4, WF8 and possibly others using Weld2 when deployed as EAR.
 	protected void processValidators(@Observes ProcessManagedBean validator) {
 		Annotation annotation = getFacesValidatorAnnotation(validator.getAnnotatedBeanClass());
 
