@@ -62,7 +62,15 @@ public enum BeanManager {
 	 * Perform initialization.
 	 */
 	private BeanManager() {
-		init(JNDI.lookup("java:comp/BeanManager"));
+		Object beanManager = JNDI.lookup("java:comp/BeanManager"); // CDI spec.
+
+		if (beanManager == null) {
+			beanManager = JNDI.lookup("java:comp/env/BeanManager"); // Tomcat.
+		}
+
+		if (beanManager != null) {
+			init(beanManager);
+		}
 	}
 
 	/**
