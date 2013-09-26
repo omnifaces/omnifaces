@@ -64,10 +64,10 @@ public class OmniApplication extends ApplicationWrapper {
 	 */
 	@Override
 	public Converter createConverter(String converterId) {
-		ConverterProvider converterProvider = BeanManager.INSTANCE.getReference(ConverterProvider.class);
+		Object provider = BeanManager.INSTANCE.getReference(ConverterProvider.class);
 
-		if (converterProvider != null) {
-			Converter converter = converterProvider.createConverter(getWrapped(), converterId);
+		if (provider instanceof ConverterProvider) { // It doesn't return true in EAR deployment on GF3, see also #251.
+			Converter converter = ((ConverterProvider) provider).createConverter(getWrapped(), converterId);
 
 			if (converter != null) {
 				return converter;
@@ -83,10 +83,10 @@ public class OmniApplication extends ApplicationWrapper {
 	 */
 	@Override
 	public Converter createConverter(Class<?> targetClass) {
-		ConverterProvider converterProvider = BeanManager.INSTANCE.getReference(ConverterProvider.class);
+		Object provider = BeanManager.INSTANCE.getReference(ConverterProvider.class);
 
-		if (converterProvider != null) {
-			Converter converter = converterProvider.createConverter(getWrapped(), targetClass);
+		if (provider instanceof ConverterProvider) { // It doesn't return true in EAR deployment on GF3, see also #251.
+			Converter converter = ((ConverterProvider) provider).createConverter(getWrapped(), targetClass);
 
 			if (converter != null) {
 				return converter;
@@ -102,10 +102,10 @@ public class OmniApplication extends ApplicationWrapper {
 	 */
 	@Override
 	public Validator createValidator(String validatorId) throws FacesException {
-		ValidatorProvider validatorProvider = BeanManager.INSTANCE.getReference(ValidatorProvider.class);
+		Object provider = BeanManager.INSTANCE.getReference(ValidatorProvider.class);
 
-		if (validatorProvider != null) {
-			Validator validator = validatorProvider.createValidator(getWrapped(), validatorId);
+		if (provider instanceof ValidatorProvider) { // It doesn't return true in EAR deployment on GF3, see also #251.
+			Validator validator = ((ValidatorProvider) provider).createValidator(getWrapped(), validatorId);
 
 			if (validator != null) {
 				return validator;

@@ -108,7 +108,6 @@ public enum BeanManager {
 	 * @param beanClass The type of the CDI managed bean instance.
 	 * @return The CDI managed bean instance of the given class, or <code>null</code> if there is none.
 	 */
-	@SuppressWarnings("unchecked")
 	public <T> T getReference(Class<T> beanClass) {
 		if (beanClass == null || beanManager == null) {
 			return null;
@@ -117,11 +116,12 @@ public enum BeanManager {
 		try {
 			Object bean = resolve.invoke(beanManager, getBeans.invoke(beanManager, beanClass, NO_ANNOTATIONS));
 			Object creationalContext = createCreationalContext.invoke(beanManager, bean);
-			return (T) getReference.invoke(beanManager, bean, beanClass, creationalContext);
-		} catch (Exception e) {
+			Object reference = getReference.invoke(beanManager, bean, beanClass, creationalContext);
+			return beanClass.cast(reference);
+		}
+		catch (Exception e) {
 			return null;
 		}
-
 	}
 
 }
