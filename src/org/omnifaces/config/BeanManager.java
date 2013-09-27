@@ -44,7 +44,7 @@ public enum BeanManager {
 	// Private constants ----------------------------------------------------------------------------------------------
 
 	private static final Logger logger = Logger.getLogger(BeanManager.class.getName());
-	private static final String LOG_INITIALIZATION_ERROR = "Beans failed to initialize.";
+	private static final String LOG_INITIALIZATION_ERROR = "BeanManager enum singleton failed to initialize.";
 	private static final Annotation[] NO_ANNOTATIONS = new Annotation[0];
 
 	// Properties -----------------------------------------------------------------------------------------------------

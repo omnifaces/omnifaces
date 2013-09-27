@@ -15,6 +15,8 @@
  */
 package org.omnifaces.cdi.viewscope;
 
+import static org.omnifaces.util.Beans.getReference;
+
 import java.lang.annotation.Annotation;
 
 import javax.enterprise.context.ContextNotActiveException;
@@ -98,8 +100,7 @@ public class ViewScopeContext implements Context {
 	 */
 	private boolean isInitialized() {
 		if (viewScopeManager == null) {
-			CreationalContext<ViewScopeManager> context = manager.createCreationalContext(bean);
-			viewScopeManager = (ViewScopeManager) manager.getReference(bean, ViewScopeManager.class, context);
+			viewScopeManager = getReference(manager, bean);
 		}
 
 		return viewScopeManager != null;
