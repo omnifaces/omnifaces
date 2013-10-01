@@ -46,6 +46,8 @@ public enum BeanManager {
 	private static final Logger logger = Logger.getLogger(BeanManager.class.getName());
 	private static final String LOG_INITIALIZATION_ERROR = "BeanManager enum singleton failed to initialize.";
 	private static final Annotation[] NO_ANNOTATIONS = new Annotation[0];
+	private static final String ERROR_NOT_INITIALIZED =
+		"BeanManager is not initialized yet. Please use #init(BeanManager) method to manually initialize it.";
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -58,10 +60,14 @@ public enum BeanManager {
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
+	private BeanManager() {
+		init();
+	}
+
 	/**
 	 * Perform initialization.
 	 */
-	private BeanManager() {
+	private void init() {
 		Object beanManager = JNDI.lookup("java:comp/BeanManager"); // CDI spec.
 
 		if (beanManager == null) {
@@ -109,6 +115,8 @@ public enum BeanManager {
 	 * @return The CDI managed bean instance of the given class, or <code>null</code> if there is none.
 	 */
 	public <T> T getReference(Class<T> beanClass) {
+		checkInitialized();
+
 		if (beanClass == null || beanManager == null) {
 			return null;
 		}
@@ -121,6 +129,16 @@ public enum BeanManager {
 		}
 		catch (Exception e) {
 			return null;
+		}
+	}
+
+	private void checkInitialized() {
+		if (!initialized.get()) {
+			init();
+
+			if (!initialized.get()) {
+				throw new IllegalStateException(ERROR_NOT_INITIALIZED);
+			}
 		}
 	}
 
