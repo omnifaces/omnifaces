@@ -65,17 +65,20 @@ public enum BeanManager {
 	}
 
 	/**
-	 * Perform initialization.
+	 * Perform automatic initialization whereby the bean manager is looked up from the JNDI. If the bean manager is
+	 * found, then invoke {@link #init(Object)} with the found bean manager.
 	 */
 	private void init() {
-		Object beanManager = JNDI.lookup("java:comp/BeanManager"); // CDI spec.
+		if (!initialized.get()) {
+			Object beanManager = JNDI.lookup("java:comp/BeanManager"); // CDI spec.
 
-		if (beanManager == null) {
-			beanManager = JNDI.lookup("java:comp/env/BeanManager"); // Tomcat.
-		}
+			if (beanManager == null) {
+				beanManager = JNDI.lookup("java:comp/env/BeanManager"); // Tomcat.
+			}
 
-		if (beanManager != null) {
-			init(beanManager);
+			if (beanManager != null) {
+				init(beanManager);
+			}
 		}
 	}
 
@@ -117,10 +120,6 @@ public enum BeanManager {
 	public <T> T getReference(Class<T> beanClass) {
 		checkInitialized();
 
-		if (beanClass == null || beanManager == null) {
-			return null;
-		}
-
 		try {
 			Object bean = resolve.invoke(beanManager, getBeans.invoke(beanManager, beanClass, NO_ANNOTATIONS));
 			Object creationalContext = createCreationalContext.invoke(beanManager, bean);
@@ -133,12 +132,14 @@ public enum BeanManager {
 	}
 
 	private void checkInitialized() {
-		if (!initialized.get()) {
-			init();
+		// This explicit init() call is necessary for WebLogic because it loads this enum as a CDI managed bean (in
+		// spite of having a VetoAnnotatedTypeExtension) which in turn implicitly invokes the enum constructor and thus
+		// causes an init while CDI context isn't fully initialized and thus the bean manager isn't available in JNDI
+		// yet. Perhaps it's fixed in newer WebLogic versions.
+		init();
 
-			if (!initialized.get()) {
-				throw new IllegalStateException(ERROR_NOT_INITIALIZED);
-			}
+		if (!initialized.get()) {
+			throw new IllegalStateException(ERROR_NOT_INITIALIZED);
 		}
 	}
 
