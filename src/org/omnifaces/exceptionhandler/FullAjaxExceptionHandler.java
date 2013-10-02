@@ -89,7 +89,7 @@ import org.omnifaces.util.Hacks;
  * large enough so that the so far rendered response until the occurrence of the exception fits in there and can
  * therefore safely be reset.
  * <p>
- * If more fine grained control of determining the root cause of the caught exception, or determining the error page is,
+ * If more fine grained control of determining the root cause of the caught exception, or determining the error page,
  * or logging the exception is desired, then the developer can opt to extend this {@link FullAjaxExceptionHandler} and
  * override one or more of the following methods:
  * <ul>
