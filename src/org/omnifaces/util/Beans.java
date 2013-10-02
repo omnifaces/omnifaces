@@ -12,6 +12,10 @@
  */
 package org.omnifaces.util;
 
+import static org.omnifaces.util.Utils.isEmpty;
+
+import java.util.Set;
+
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 
@@ -34,7 +38,14 @@ public final class Beans {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> Bean<T> resolve(BeanManager beanManager, Class<T> beanClass) {
-		return (Bean<T>) beanManager.resolve(beanManager.getBeans(beanClass));
+		Set<Bean<?>> beans = beanManager.getBeans(beanClass);
+		if (isEmpty(beans)) {
+			// OpenWebBeans 1.1.1 (used in e.g. Geronimo 3.0.1) throws a NoSuchElementException
+			// when being given an empty list in beanManager#resolve
+			return null;
+		}
+		
+		return (Bean<T>) beanManager.resolve(beans);
 	}
 
 	/**
