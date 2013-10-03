@@ -24,6 +24,7 @@ import javax.enterprise.inject.spi.ProcessAnnotatedType;
  * from org.omnifaces.cdi and org.omnifaces.showcase subpackages as CDI managed beans.
  *
  * @author Bauke Scholtz
+ * @since 1.6.1
  */
 public class VetoAnnotatedTypeExtension implements Extension {
 
