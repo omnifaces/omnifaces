@@ -46,8 +46,6 @@ public enum BeanManager {
 	private static final Logger logger = Logger.getLogger(BeanManager.class.getName());
 	private static final String LOG_INITIALIZATION_ERROR = "BeanManager enum singleton failed to initialize.";
 	private static final Annotation[] NO_ANNOTATIONS = new Annotation[0];
-	private static final String ERROR_NOT_INITIALIZED =
-		"BeanManager is not initialized yet. Please use #init(BeanManager) method to manually initialize it.";
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -60,37 +58,23 @@ public enum BeanManager {
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
-	private BeanManager() {
-		init();
-	}
-
 	/**
 	 * Perform automatic initialization whereby the bean manager is looked up from the JNDI. If the bean manager is
 	 * found, then invoke {@link #init(Object)} with the found bean manager.
 	 */
 	private void init() {
-		if (!initialized.get()) {
-			Object beanManager = JNDI.lookup("java:comp/BeanManager"); // CDI spec.
-
-			if (beanManager == null) {
-				beanManager = JNDI.lookup("java:comp/env/BeanManager"); // Tomcat.
-			}
-
-			if (beanManager != null) {
-				init(beanManager);
-			}
-		}
-	}
-
-	/**
-	 * Perform manual initialization with the given bean manager, if not already initialized yet. If the given bean
-	 * manager is <code>null</code> and this instance is not initialized yet, then it remains uninitialized.
-	 * @param beanManager The bean manager to obtain the CDI bean reference from.
-	 * @return The current {@link BeanManager} instance, initialized and all if given bean manager was not <code>null</code>.
-	 */
-	public BeanManager init(Object beanManager) {
-		if (beanManager != null && !initialized.getAndSet(true)) {
+		if (!initialized.getAndSet(true)) {
 			try {
+				Object beanManager = JNDI.lookup("java:comp/BeanManager"); // CDI spec.
+
+				if (beanManager == null) {
+					beanManager = JNDI.lookup("java:comp/env/BeanManager"); // Tomcat.
+				}
+
+				if (beanManager == null) {
+					return; // CDI not supported on this environment.
+				}
+
 				this.beanManager = beanManager;
 				Class<?> beanManagerClass = beanManager.getClass();
 				Class<?> contextualClass = Class.forName("javax.enterprise.context.spi.Contextual");
@@ -106,8 +90,6 @@ public enum BeanManager {
 				throw new RuntimeException(e);
 			}
 		}
-
-		return this;
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -118,7 +100,15 @@ public enum BeanManager {
 	 * @return The CDI managed bean instance of the given class, or <code>null</code> if there is none.
 	 */
 	public <T> T getReference(Class<T> beanClass) {
-		checkInitialized();
+		// This init() call is performed here instead of in constructor, because WebLogic loads this enum as a CDI
+		// managed bean (in spite of having a VetoAnnotatedTypeExtension) which in turn implicitly invokes the enum
+		// constructor and thus causes an init while CDI context isn't fully initialized and thus the bean manager
+		// isn't available in JNDI yet. Perhaps it's fixed in newer WebLogic versions.
+		init();
+
+		if (beanManager == null) {
+			return null; // CDI not supported on this environment.
+		}
 
 		try {
 			Object bean = resolve.invoke(beanManager, getBeans.invoke(beanManager, beanClass, NO_ANNOTATIONS));
@@ -128,18 +118,6 @@ public enum BeanManager {
 		}
 		catch (Exception e) {
 			return null;
-		}
-	}
-
-	private void checkInitialized() {
-		// This explicit init() call is necessary for WebLogic because it loads this enum as a CDI managed bean (in
-		// spite of having a VetoAnnotatedTypeExtension) which in turn implicitly invokes the enum constructor and thus
-		// causes an init while CDI context isn't fully initialized and thus the bean manager isn't available in JNDI
-		// yet. Perhaps it's fixed in newer WebLogic versions.
-		init();
-
-		if (!initialized.get()) {
-			throw new IllegalStateException(ERROR_NOT_INITIALIZED);
 		}
 	}
 
