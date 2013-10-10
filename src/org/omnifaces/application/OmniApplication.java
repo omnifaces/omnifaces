@@ -66,7 +66,7 @@ public class OmniApplication extends ApplicationWrapper {
 	public Converter createConverter(String converterId) {
 		Object provider = BeanManager.INSTANCE.getReference(ConverterProvider.class);
 
-		if (provider instanceof ConverterProvider) { // It doesn't return true in EAR deployment on GF3, see also #251.
+		if (provider instanceof ConverterProvider) { // If not null, it doesn't return true in EAR deployment on GF3, see also #251.
 			Converter converter = ((ConverterProvider) provider).createConverter(getWrapped(), converterId);
 
 			if (converter != null) {
@@ -85,7 +85,7 @@ public class OmniApplication extends ApplicationWrapper {
 	public Converter createConverter(Class<?> targetClass) {
 		Object provider = BeanManager.INSTANCE.getReference(ConverterProvider.class);
 
-		if (provider instanceof ConverterProvider) { // It doesn't return true in EAR deployment on GF3, see also #251.
+		if (provider instanceof ConverterProvider) { // If not null, it doesn't return true in EAR deployment on GF3, see also #251.
 			Converter converter = ((ConverterProvider) provider).createConverter(getWrapped(), targetClass);
 
 			if (converter != null) {
@@ -104,7 +104,7 @@ public class OmniApplication extends ApplicationWrapper {
 	public Validator createValidator(String validatorId) throws FacesException {
 		Object provider = BeanManager.INSTANCE.getReference(ValidatorProvider.class);
 
-		if (provider instanceof ValidatorProvider) { // It doesn't return true in EAR deployment on GF3, see also #251.
+		if (provider instanceof ValidatorProvider) { // If not null, it doesn't return true in EAR deployment on GF3, see also #251.
 			Validator validator = ((ValidatorProvider) provider).createValidator(getWrapped(), validatorId);
 
 			if (validator != null) {
