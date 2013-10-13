@@ -22,8 +22,8 @@ import java.net.URL;
 import javax.faces.view.facelets.ResourceResolver;
 
 /**
- * Facelets resource resolver that resolves mapped resources (views) to the special auto-scanned
- * faces-views folder.
+ * Facelets resource resolver that resolves mapped resources (views) to the folders from which
+ * those views were scanned (like the the special auto-scanned faces-views folder).
  * <p>
  * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
  *

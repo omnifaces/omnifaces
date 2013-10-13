@@ -53,7 +53,7 @@ import org.omnifaces.util.Utils;
  * <pre>
  * {@literal @}Inject {@literal @}Param(
  * 	converter="#{userconverter}"
- * 	validator="#{priviledgedUser}"*
+ * 	validator="#{priviledgedUser}"
  * )
  * private ParamValue&lt;User&gt; user;
  * </pre>

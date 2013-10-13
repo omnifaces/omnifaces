@@ -29,7 +29,7 @@ import javax.faces.context.ExternalContextWrapper;
  * External context factory that installs an external context which locates resources just
  * like the {@link FacesViewsResolver} does.
  * <p>
- * This is only needed for JSF 2.0 implementations and is not needed for JSF 2.1+.
+ * <b>This is only needed for JSF 2.0 implementations and is not needed for JSF 2.1+.</b>
  * 
  * @since 1.6
  * @author Arjan Tijms

@@ -34,8 +34,9 @@ import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
 
 /**
- * View handler that renders action URL extensionless if the current request is extensionless and the requested resource
- * is a mapped one, otherwise as-is.
+ * View handler that renders an action URL extensionless if a resource is a mapped one, and faces views has been set to always
+ * render extensionless or if the current request is extensionless, otherwise as-is.
+ * 
  * <p>
  * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
  *

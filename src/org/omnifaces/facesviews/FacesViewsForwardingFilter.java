@@ -47,7 +47,16 @@ import javax.servlet.http.HttpSession;
 import org.omnifaces.filter.HttpFilter;
 
 /**
- * This filter forwards request to a FacesServlet using an extension on which this Servlet is mapped.
+ * This filter makes sure extensionless requests arrive at the FacesServlet using an extension on which that Servlet is mapped,
+ * and that non-extensionless requests are handled according to a set preference.
+ * <p>
+ * For dispatching to the FacesServlet, 2 methods are available:
+ * 
+ * <ul>
+ * <li> DO_FILTER (continues the filter chain but modifies request) </li>
+ * <li> FORWARD (starts a new filter chain by using a Servlet requestDispatcher.forward) </li>
+ * </ul>
+ * 
  * <p>
  * A filter like this is needed for extensionless requests, since the FacesServlet in at least JSF 2.1 and before
  * does not take into account any other mapping than prefix- and extension (suffix) mapping.
