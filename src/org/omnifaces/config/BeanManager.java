@@ -65,6 +65,14 @@ public enum BeanManager {
 	private void init() {
 		if (!initialized.getAndSet(true)) {
 			try {
+				Class.forName("javax.enterprise.inject.spi.BeanManager"); // Is CDI present?
+				Class.forName("javax.naming.InitialContext"); // Is JNDI present? (not on Google App Engine)
+			}
+			catch (Exception e) {
+				return; // CDI or JNDI not supported on this environment.
+			}
+
+			try {
 				Object beanManager = JNDI.lookup("java:comp/BeanManager"); // CDI spec.
 
 				if (beanManager == null) {
