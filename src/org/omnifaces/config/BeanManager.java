@@ -80,7 +80,7 @@ public enum BeanManager {
 				}
 
 				if (beanManager == null) {
-					return; // CDI not supported on this environment.
+					return; // CDI not registered on this environment.
 				}
 
 				this.beanManager = beanManager;

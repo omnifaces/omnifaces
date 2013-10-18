@@ -29,7 +29,13 @@ import javax.enterprise.inject.spi.ProcessAnnotatedType;
 public class VetoAnnotatedTypeExtension implements Extension {
 
 	public <T> void processAnnotatedType(@Observes ProcessAnnotatedType<T> type) {
-		String packageName = type.getAnnotatedType().getJavaClass().getPackage().getName();
+		Package _package = type.getAnnotatedType().getJavaClass().getPackage();
+
+		if (_package == null) {
+			return;
+		}
+
+		String packageName = _package.getName();
 
 		if (packageName.startsWith("org.omnifaces.")
 			&& !packageName.startsWith("org.omnifaces.cdi.")
