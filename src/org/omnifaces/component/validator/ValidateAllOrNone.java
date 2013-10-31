@@ -69,4 +69,12 @@ public class ValidateAllOrNone extends ValidateMultipleFields {
 		return (hasValue != hasNoValue);
 	}
 
+	/**
+	 * In an invalidating case, invalidate only those inputs which have an empty value.
+	 */
+	@Override
+	protected boolean shouldInvalidateInput(FacesContext context, UIInput input, Object value) {
+		return Utils.isEmpty(value);
+	}
+
 }

@@ -13,6 +13,7 @@
 package org.omnifaces.component.validator;
 
 import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -54,12 +55,19 @@ import org.omnifaces.util.State;
  * &lt;h:inputText id="baz" /&gt;
  * </pre>
  * <p>
- * In an invalidating case, all of the referenced components will be marked invalid and a faces message will be added
- * on the client ID of this validator component. The default message can be changed by the <code>message</code>
+ * By default, in an invalidating case, all of the referenced components will be marked invalid and a faces message will
+ * be added on the client ID of this validator component. The default message can be changed by the <code>message</code>
  * attribute. Any "{0}" placeholder in the message will be substituted with a comma separated string of labels of the
  * referenced input components.
  * <pre>
  * &lt;o:validateMultipleFields components="foo bar baz" message="{0} are wrong!" /&gt;
+ * </pre>
+ * <p>
+ * You can use <code>invalidateAll="false"</code> to mark only those components which are actually invalid as invalid.
+ * In case of for example "input all" or "input all or none" validation, that would be only the fields which are left
+ * empty.
+ * <pre>
+ * &lt;o:validateMultipleFields components="foo bar baz" message="{0} are wrong!" invalidateAll="false" /&gt;
  * </pre>
  * <p>
  * The faces message can also be shown for all of the referenced components using <code>showMessageFor="@all"</code>.
@@ -73,16 +81,15 @@ import org.omnifaces.util.State;
  * &lt;h:message for="baz" /&gt;
  * </pre>
  * <p>
+ * The faces message can also be shown for only the invalidated components using <code>showMessageFor="@invalid"</code>.
+ * <pre>
+ * &lt;o:validateMultipleFields components="foo bar baz" message="This is wrong!" showMessageFor="@invalid" /&gt;
+ * </pre>
+ * <p>
  * The faces message can also be shown for specific components referenced by a space separated collection of their
  * client IDs in <code>showMessageFor</code> attribute.
  * <pre>
  * &lt;o:validateMultipleFields components="foo bar baz" message="This is wrong!" showMessageFor="foo baz" /&gt;
- * &lt;h:inputText id="foo" /&gt;
- * &lt;h:message for="foo" /&gt;
- * &lt;h:inputText id="bar" /&gt;
- * &lt;h:message for="bar" /&gt;
- * &lt;h:inputText id="baz" /&gt;
- * &lt;h:message for="baz" /&gt;
  * </pre>
  * <p>
  * The <code>showMessageFor</code> attribute defaults to <code>@this</code>.
@@ -110,6 +117,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	// Private constants ----------------------------------------------------------------------------------------------
 
 	private static final String DEFAULT_SHOWMESSAGEFOR = "@this";
+	private static final Boolean DEFAULT_INVALIDATEALL = TRUE;
 	private static final Boolean DEFAULT_DISABLED = FALSE;
 
 	private static final String ERROR_MISSING_COMPONENTS =
@@ -121,7 +129,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 
 	private enum PropertyKeys {
 		// Cannot be uppercased. They have to exactly match the attribute names.
-		components, message, showMessageFor, disabled;
+		components, invalidateAll, message, showMessageFor, disabled;
 	}
 
 	// Variables ------------------------------------------------------------------------------------------------------
@@ -176,8 +184,11 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 		List<Object> values = collectValues(inputs);
 
 		if (!validateValues(context, inputs, values)) {
+			int i = 0;
+
 			for (UIInput input : inputs) {
-				input.setValid(false);
+				input.setValid(!(isInvalidateAll() || shouldInvalidateInput(context, input, values.get(i))));
+				i++;
 			}
 
 			validationFailed = true;
@@ -219,7 +230,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 			inputs.add(input);
 		}
 
-		return inputs;
+		return Collections.unmodifiableList(inputs);
 	}
 
 	/**
@@ -240,18 +251,33 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 			values.add(value);
 		}
 
-		return values;
+		return Collections.unmodifiableList(values);
 	}
 
 	/**
 	 * Perform the validation on the collected values of the input components and returns whether the validation is
 	 * successful.
 	 * @param context The faces context to work with.
-	 * @param components The input components whose values are to be validated.
+	 * @param inputs The input components whose values are to be validated.
 	 * @param values The values of the input components to be validated.
 	 * @return <code>true</code> if validation is successful, otherwise <code>false</code> (and thus show the message).
 	 */
-	protected abstract boolean validateValues(FacesContext context, List<UIInput> components, List<Object> values);
+	protected abstract boolean validateValues(FacesContext context, List<UIInput> inputs, List<Object> values);
+
+	/**
+	 * Returns whether in in an invalidating case the given input component should be marked invalid. The default
+	 * implementation returns <code>true</code>, meaning that <strong>all</strong> input components should be
+	 * invalidated in an invalidating case. Perform the invalidation of the given input component. The default implementation calls
+	 * {@link UIInput#setValid(boolean)} passing <code>false</code> when {@link #isInvalidateAll()} returns
+	 * <code>true</code>. The overriding implementation may choose to invalidate it only when the value is empty.
+	 * @param context The faces context to work with.
+	 * @param input The input component which may need to be invalidated.
+	 * @param value The value of the input component.
+	 * @since 1.7
+	 */
+	protected boolean shouldInvalidateInput(FacesContext context, UIInput input, Object value) {
+		return true;
+	}
 
 	/**
 	 * Show the message at the desired place(s) depending on the value of the <code>showMessageFor</code> attribute.
@@ -284,6 +310,13 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 		else if (showMessageFor.equals("@all")) {
 			for (UIInput input : inputs) {
 				Messages.addError(input.getClientId(context), message, labels);
+			}
+		}
+		else if (showMessageFor.equals("@invalid")) {
+			for (UIInput input : inputs) {
+				if (!input.isValid()) {
+					Messages.addError(input.getClientId(context), message, labels);
+				}
 			}
 		}
 		else {
@@ -327,6 +360,26 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	 */
 	public void setComponents(String components) {
 		state.put(PropertyKeys.components, components);
+	}
+
+	/**
+	 * Returns whether to invalidate all fields or only those which are actually invalid as per
+	 * {@link #shouldInvalidateInput(FacesContext, UIInput, Object)}
+	 * @return Whether to invalidate all fields or only those which are actually invalid.
+	 * @since 1.7
+	 */
+	public Boolean isInvalidateAll() {
+		return state.get(PropertyKeys.invalidateAll, DEFAULT_INVALIDATEALL);
+	}
+
+	/**
+	 * Sets whether to invalidate all fields or only those which are actually invalid as per
+	 * {@link #shouldInvalidateInput(FacesContext, UIInput, Object)}
+	 * @param invalidateAllFields Whether to invalidate all fields or only those which are actually invalid.
+	 * @since 1.7
+	 */
+	public void setInvalidateAll(Boolean invalidateAll) {
+		state.put(PropertyKeys.invalidateAll, invalidateAll);
 	}
 
 	/**

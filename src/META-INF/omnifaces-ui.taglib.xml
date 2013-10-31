@@ -549,16 +549,22 @@ input.error, select.error, textarea.error {
 &lt;h:inputText id="baz" /&gt;
 				</pre>
 				<p>
-				In an invalidating case, all of the referenced components will be marked invalid and a faces message
-				will be added on the client ID of this validator component. The default message can be changed by the
-				<code>message</code> attribute. Any "{0}" placeholder in the message will be substituted with a comma
-				separated string of labels of the referenced input components.
+				By default, in an invalidating case, all of the referenced components will be marked invalid and a faces message will
+				be added on the client ID of this validator component. The default message can be changed by the <code>message</code>
+				attribute. Any "{0}" placeholder in the message will be substituted with a comma separated string of labels of the
+				referenced input components.
 				<pre>
 &lt;o:validateMultipleFields components="foo bar baz" message="{0} are wrong!" /&gt;
 				</pre>
 				<p>
-				The faces message can also be shown for all of the referenced components using
-				<code>showMessageFor="@all"</code>.
+				You can use <code>invalidateAll="false"</code> to mark only those components which are actually invalid as invalid.
+				In case of for example "input all" or "input all or none" validation, that would be only the fields which are left
+				empty.
+				<pre>
+&lt;o:validateMultipleFields components="foo bar baz" message="{0} are wrong!" invalidateAll="false" /&gt;
+				</pre>
+				<p>
+				The faces message can also be shown for all of the referenced components using <code>showMessageFor="@all"</code>.
 				<pre>
 &lt;o:validateMultipleFields components="foo bar baz" message="This is wrong!" showMessageFor="@all" /&gt;
 &lt;h:inputText id="foo" /&gt;
@@ -569,16 +575,15 @@ input.error, select.error, textarea.error {
 &lt;h:message for="baz" /&gt;
 				</pre>
 				<p>
+				The faces message can also be shown for only the invalidated components using <code>showMessageFor="@invalid"</code>.
+				<pre>
+&lt;o:validateMultipleFields components="foo bar baz" message="This is wrong!" showMessageFor="@invalid" /&gt;
+				</pre>
+				<p>
 				The faces message can also be shown for specific components referenced by a space separated collection of their
 				client IDs in <code>showMessageFor</code> attribute.
 				<pre>
 &lt;o:validateMultipleFields components="foo bar baz" message="This is wrong!" showMessageFor="foo baz" /&gt;
-&lt;h:inputText id="foo" /&gt;
-&lt;h:message for="foo" /&gt;
-&lt;h:inputText id="bar" /&gt;
-&lt;h:message for="bar" /&gt;
-&lt;h:inputText id="baz" /&gt;
-&lt;h:message for="baz" /&gt;
 				</pre>
 				<p>
 				The <code>showMessageFor</code> attribute defaults to <code>@this</code>.
@@ -647,6 +652,16 @@ input.error, select.error, textarea.error {
 		<attribute>
 			<description>
 				<![CDATA[
+					Whether to invalidate <strong>all</strong> fields or only those which are empty.
+				]]>
+			</description>
+			<name>invalidateAll</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
 					The validator message to be shown on failure. Any "{0}" placeholder in the message will be
 					substituted with a comma separated string of labels of the referenced input components.
 				]]>
@@ -659,9 +674,9 @@ input.error, select.error, textarea.error {
 			<description>
 				<![CDATA[
 					The identifier for which this validator should show the message. Defaults to "@this" which is the
-					validator component itself. Other available value is "@all" which will show the message for all of
-					the referenced components. Any other space separated value will be treated as client ID of UI input
-					component.
+					validator component itself. Other available values are "@all" which will show the message for all of
+					the referenced components and "@invalid" which will show the message for only the invalidated
+					components. Any other space separated value will be treated as client ID of UI input component.
 				]]>
 			</description>
 			<name>showMessageFor</name>
@@ -740,6 +755,16 @@ input.error, select.error, textarea.error {
 		<attribute>
 			<description>
 				<![CDATA[
+					Whether to invalidate <strong>all</strong> fields or only those which are empty.
+				]]>
+			</description>
+			<name>invalidateAll</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
 					The validator message to be shown on failure. Any "{0}" placeholder in the message will be
 					substituted with a comma separated string of labels of the referenced input components.
 				]]>
@@ -752,9 +777,9 @@ input.error, select.error, textarea.error {
 			<description>
 				<![CDATA[
 					The identifier for which this validator should show the message. Defaults to "@this" which is the
-					validator component itself. Other available value is "@all" which will show the message for all of
-					the referenced components. Any other space separated value will be treated as client ID of UI input
-					component.
+					validator component itself. Other available values are "@all" which will show the message for all of
+					the referenced components and "@invalid" which will show the message for only the invalidated
+					components. Any other space separated value will be treated as client ID of UI input component.
 				]]>
 			</description>
 			<name>showMessageFor</name>
@@ -781,6 +806,7 @@ input.error, select.error, textarea.error {
 				<blockquote>{0}: Please fill out at least one of those fields</blockquote>
 				<p>
 				For general usage instructions, refer <code>validateAll</code> tag documentation.
+				The <code>invalidateAll</code> attribute has no effect on this component and is therefore not listed.
 			]]>
 		</description>
 		<tag-name>validateOneOrMore</tag-name>
@@ -844,9 +870,9 @@ input.error, select.error, textarea.error {
 			<description>
 				<![CDATA[
 					The identifier for which this validator should show the message. Defaults to "@this" which is the
-					validator component itself. Other available value is "@all" which will show the message for all of
-					the referenced components. Any other space separated value will be treated as client ID of UI input
-					component.
+					validator component itself. Other available values are "@all" which will show the message for all of
+					the referenced components and "@invalid" which will show the message for only the invalidated
+					components. Any other space separated value will be treated as client ID of UI input component.
 				]]>
 			</description>
 			<name>showMessageFor</name>
@@ -873,6 +899,7 @@ input.error, select.error, textarea.error {
 				<blockquote>{0}: Please fill out only one of those fields</blockquote>
 				<p>
 				For general usage instructions, refer <code>validateAll</code> tag documentation.
+				The <code>invalidateAll</code> attribute has no effect on this component and is therefore not listed.
 			]]>
 		</description>
 		<tag-name>validateOne</tag-name>
@@ -936,9 +963,9 @@ input.error, select.error, textarea.error {
 			<description>
 				<![CDATA[
 					The identifier for which this validator should show the message. Defaults to "@this" which is the
-					validator component itself. Other available value is "@all" which will show the message for all of
-					the referenced components. Any other space separated value will be treated as client ID of UI input
-					component.
+					validator component itself. Other available values are "@all" which will show the message for all of
+					the referenced components and "@invalid" which will show the message for only the invalidated
+					components. Any other space separated value will be treated as client ID of UI input component.
 				]]>
 			</description>
 			<name>showMessageFor</name>
@@ -965,6 +992,7 @@ input.error, select.error, textarea.error {
 				<blockquote>{0}: Please fill out only one or none of those fields</blockquote>
 				<p>
 				For general usage instructions, refer <code>validateAll</code> tag documentation.
+				The <code>invalidateAll</code> attribute has no effect on this component and is therefore not listed.
 			]]>
 		</description>
 		<tag-name>validateOneOrNone</tag-name>
@@ -1028,9 +1056,9 @@ input.error, select.error, textarea.error {
 			<description>
 				<![CDATA[
 					The identifier for which this validator should show the message. Defaults to "@this" which is the
-					validator component itself. Other available value is "@all" which will show the message for all of
-					the referenced components. Any other space separated value will be treated as client ID of UI input
-					component.
+					validator component itself. Other available values are "@all" which will show the message for all of
+					the referenced components and "@invalid" which will show the message for only the invalidated
+					components. Any other space separated value will be treated as client ID of UI input component.
 				]]>
 			</description>
 			<name>showMessageFor</name>
@@ -1057,6 +1085,7 @@ input.error, select.error, textarea.error {
 				<blockquote>{0}: Please fill out the same value for all of those fields</blockquote>
 				<p>
 				For general usage instructions, refer <code>validateAll</code> tag documentation.
+				The <code>invalidateAll</code> attribute has no effect on this component and is therefore not listed.
 			]]>
 		</description>
 		<tag-name>validateEqual</tag-name>
@@ -1120,9 +1149,9 @@ input.error, select.error, textarea.error {
 			<description>
 				<![CDATA[
 					The identifier for which this validator should show the message. Defaults to "@this" which is the
-					validator component itself. Other available value is "@all" which will show the message for all of
-					the referenced components. Any other space separated value will be treated as client ID of UI input
-					component.
+					validator component itself. Other available values are "@all" which will show the message for all of
+					the referenced components and "@invalid" which will show the message for only the invalidated
+					components. Any other space separated value will be treated as client ID of UI input component.
 				]]>
 			</description>
 			<name>showMessageFor</name>
@@ -1149,6 +1178,7 @@ input.error, select.error, textarea.error {
 				<blockquote>{0}: Please fill out an unique value for all of those fields</blockquote>
 				<p>
 				For general usage instructions, refer <code>validateAll</code> tag documentation.
+				The <code>invalidateAll</code> attribute has no effect on this component and is therefore not listed.
 			]]>
 		</description>
 		<tag-name>validateUnique</tag-name>
@@ -1212,9 +1242,9 @@ input.error, select.error, textarea.error {
 			<description>
 				<![CDATA[
 					The identifier for which this validator should show the message. Defaults to "@this" which is the
-					validator component itself. Other available value is "@all" which will show the message for all of
-					the referenced components. Any other space separated value will be treated as client ID of UI input
-					component.
+					validator component itself. Other available values are "@all" which will show the message for all of
+					the referenced components and "@invalid" which will show the message for only the invalidated
+					components. Any other space separated value will be treated as client ID of UI input component.
 				]]>
 			</description>
 			<name>showMessageFor</name>
@@ -1249,6 +1279,7 @@ input.error, select.error, textarea.error {
 				<blockquote>{0}: Please fill out the values of all those fields in order</blockquote>
 				<p>
 				For general usage instructions, refer <code>validateAll</code> tag documentation.
+				The <code>invalidateAll</code> attribute has no effect on this component and is therefore not listed.
 				<p>
 				This validator has the additional requirement that the to-be-validated values must implement <code>Comparable</code>.
 				This validator throws an <code>IllegalArgumentException</code> when one or more of the values do not implement it.
@@ -1325,9 +1356,9 @@ input.error, select.error, textarea.error {
 			<description>
 				<![CDATA[
 					The identifier for which this validator should show the message. Defaults to "@this" which is the
-					validator component itself. Other available value is "@all" which will show the message for all of
-					the referenced components. Any other space separated value will be treated as client ID of UI input
-					component.
+					validator component itself. Other available values are "@all" which will show the message for all of
+					the referenced components and "@invalid" which will show the message for only the invalidated
+					components. Any other space separated value will be treated as client ID of UI input component.
 				]]>
 			</description>
 			<name>showMessageFor</name>
