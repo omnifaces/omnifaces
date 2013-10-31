@@ -115,28 +115,24 @@ public enum WebXml {
 	private String formLoginPage;
 	private Map<String, Set<String>> securityConstraints;
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+	// Init -----------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Perform initialization.
+	 * Perform automatic initialization whereby the servlet context is obtained from the faces context.
 	 */
-	private WebXml() {
-		if (Faces.getContext() != null) {
-			ServletContext servletContext = Faces.getServletContext();
-
-			if (servletContext != null) {
-				init(servletContext);
-			}
+	private void init() {
+		if (!initialized.get() && Faces.getContext() != null) {
+			init(Faces.getServletContext());
 		}
 	}
 
 	/**
-	 * Perform manual initialization with the given servlet context, if not already initialized yet.
+	 * Perform manual initialization with the given servlet context, if not null and not already initialized yet.
 	 * @param servletContext The servlet context to obtain the web.xml from.
 	 * @return The current {@link WebXml} instance, initialized and all.
 	 */
 	public WebXml init(ServletContext servletContext) {
-		if (!initialized.getAndSet(true)) {
+		if (servletContext != null && !initialized.getAndSet(true)) {
 			try {
 				Element webXml = loadWebXml(servletContext).getDocumentElement();
 				XPath xpath = XPathFactory.newInstance().newXPath();
@@ -309,6 +305,12 @@ public enum WebXml {
 	}
 
 	private void checkInitialized() {
+		// This init() call is performed here instead of in constructor, because WebLogic loads this enum as a CDI
+		// managed bean (in spite of having a VetoAnnotatedTypeExtension) which in turn implicitly invokes the enum
+		// constructor and thus causes an init while JSF context isn't fully initialized and thus the faces context
+		// isn't available yet. Perhaps it's fixed in newer WebLogic versions.
+		init();
+
 		if (!initialized.get()) {
 			throw new IllegalStateException(ERROR_NOT_INITIALIZED);
 		}

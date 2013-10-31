@@ -56,7 +56,7 @@ public enum BeanManager {
 	private Method createCreationalContext;
 	private Method getReference;
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+	// Init -----------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Perform automatic initialization whereby the bean manager is looked up from the JNDI. If the bean manager is
