@@ -87,7 +87,9 @@ import org.omnifaces.util.Hacks;
  * <p>
  * Exceptions during render response can only be handled when the <code>javax.faces.FACELETS_BUFFER_SIZE</code> is
  * large enough so that the so far rendered response until the occurrence of the exception fits in there and can
- * therefore safely be reset.
+ * therefore safely be resetted. When rendering of the error page itself fails due to a bug in the error page itself
+ * and the response can still be resetted, then a hardcoded message will be returned informing the developer about the
+ * double mistake.
  * <p>
  * If more fine grained control of determining the root cause of the caught exception, or determining the error page,
  * or logging the exception is desired, then the developer can opt to extend this {@link FullAjaxExceptionHandler} and
@@ -120,6 +122,13 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 		"FullAjaxExceptionHandler: An exception occurred during rendering JSF ajax response."
 			+ " Error page '%s' CANNOT be shown as response is already committed."
 			+ " Consider increasing 'javax.faces.FACELETS_BUFFER_SIZE' if it really needs to be handled.";
+	private static final String ERROR_PAGE_ERROR =
+		"<?xml version='1.0' encoding='UTF-8'?><partial-response id='error'><changes><update id='javax.faces.ViewRoot'>"
+			+ "<![CDATA[<html lang='en'><head><title>Error Error</title></head><body><section><h2>Oops!</h2>"
+			+ "<p>A problem occurred during processing the ajax request. Subsequently, another problem occurred during"
+			+ " processing the error page which should inform you about that problem.</p><p>If you are the responsible"
+			+ " web developer, it's time to read the server logs about the bug in the error page itself.</p></section>"
+			+ "</body></html>]]></update></changes></partial-response>";
 
 	// Yes, those are copies of Servlet 3.0 RequestDispatcher constant field values.
 	// They are hardcoded to maintain Servlet 2.5 compatibility.
@@ -200,10 +209,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 			logException(context, exception, errorPageLocation, LOG_RENDER_EXCEPTION_HANDLED);
 
 			// If the exception was thrown in midst of rendering the JSF response, then reset (partial) response.
-			String characterEncoding = externalContext.getResponseCharacterEncoding(); // Remember encoding.
-			externalContext.responseReset();
-			OmniPartialViewContext.getCurrentInstance().resetPartialResponse();
-			externalContext.setResponseCharacterEncoding(characterEncoding);
+			resetResponse(externalContext);
 		}
 		else {
 			logException(context, exception, errorPageLocation, LOG_RENDER_EXCEPTION_UNHANDLED);
@@ -274,6 +280,13 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 		logger.log(Level.SEVERE, String.format(message, location), exception);
 	}
 
+	private void resetResponse(ExternalContext externalContext) {
+		String characterEncoding = externalContext.getResponseCharacterEncoding(); // Remember encoding.
+		externalContext.responseReset();
+		OmniPartialViewContext.getCurrentInstance().resetPartialResponse();
+		externalContext.setResponseCharacterEncoding(characterEncoding);
+	}
+
 	private void renderErrorPageView(FacesContext context, final HttpServletRequest request, String errorPageLocation)
 		throws IOException
 	{
@@ -307,7 +320,23 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 				vdl.renderView(context, viewRoot);
 				context.responseComplete();
 			}
+			catch (Exception e) {
+				// Apparently, the error page itself contained an error.
+				ExternalContext externalContext = context.getExternalContext();
+
+				if (!externalContext.isResponseCommitted()) {
+					// Okay, reset the response and tell that the error page itself contained an error.
+					resetResponse(externalContext);
+					externalContext.getResponseOutputWriter().write(ERROR_PAGE_ERROR);
+					context.responseComplete();
+				}
+				else {
+					// Well, it's too late to handle. Just let it go.
+					throw new FacesException(e);
+				}
+			}
 			finally {
+				// Prevent some servlet containers from handling error page itself afterwards.
 				request.removeAttribute(ATTRIBUTE_ERROR_EXCEPTION);
 			}
 		}
