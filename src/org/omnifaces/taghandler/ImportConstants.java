@@ -17,6 +17,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.faces.component.UIComponent;
@@ -97,7 +98,7 @@ public class ImportConstants extends TagHandler {
 			}
 		}
 
-		this.type = getRequiredAttribute("type");
+		type = getRequiredAttribute("type");
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -129,7 +130,7 @@ public class ImportConstants extends TagHandler {
 	 * @return Constants of the given type.
 	 */
 	private static Map<String, Object> collectConstants(final String type) {
-		Map<String, Object> constants = new HashMap<String, Object>();
+		Map<String, Object> constants = new LinkedHashMap<String, Object>();
 
 		for (Field field : toClass(type).getFields()) {
 			if (isPublicStaticFinal(field)) {
