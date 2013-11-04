@@ -18,13 +18,13 @@ var OmniFaces = OmniFaces || {};
  * script containing standars JSF ajax API, then it will be automatically applied on all JSF ajax requests.
  * <pre>
  * &lt;h:outputScript library="javax.faces" name="jsf.js" target="head" /&gt;
- * &lt;h:outputScript library="omnifaces" name="fixViewState.js" target="head" /&gt;
+ * &lt;h:outputScript library="omnifaces" name="fixviewstate.js" target="head" /&gt;
  * </pre>
  * <p>This script also recognizes jQuery ajax API as used by some component libraries such as PrimeFaces, it will then
  * be automatically applied on all jQuery ajax requests.
  * <pre>
  * &lt;h:outputScript library="primefaces" name="jquery/jquery.js" target="head" /&gt;
- * &lt;h:outputScript library="omnifaces" name="fixViewState.js" target="head" /&gt;
+ * &lt;h:outputScript library="omnifaces" name="fixviewstate.js" target="head" /&gt;
  * </pre>
  * <p>Explicit declaration of jsf.js or jquery.js is not necessary. In that case you need to put the 
  * <code>&lt;h:outputScript&gt;</code> tag inside the <code>&lt;h:body&gt;</code> to ensure that it's loaded 
