@@ -375,7 +375,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	/**
 	 * Sets whether to invalidate all fields or only those which are actually invalid as per
 	 * {@link #shouldInvalidateInput(FacesContext, UIInput, Object)}
-	 * @param invalidateAllFields Whether to invalidate all fields or only those which are actually invalid.
+	 * @param invalidateAll Whether to invalidate all fields or only those which are actually invalid.
 	 * @since 1.7
 	 */
 	public void setInvalidateAll(Boolean invalidateAll) {

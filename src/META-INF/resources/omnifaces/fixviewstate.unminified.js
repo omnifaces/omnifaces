@@ -15,7 +15,7 @@ var OmniFaces = OmniFaces || {};
 /**
  * <p>Fix JSF view state if necessary. In Mojarra, it get lost on certain forms during certain ajax updates (e.g. 
  * updating content which in turn contains another form). When this script is loaded <em>after</em> the standard jsf.js
- * script containing standars JSF ajax API, then it will be automatically applied on all JSF ajax requests.
+ * script containing standard JSF ajax API, then it will be automatically applied on all JSF ajax requests.
  * <pre>
  * &lt;h:outputScript library="javax.faces" name="jsf.js" target="head" /&gt;
  * &lt;h:outputScript library="omnifaces" name="fixviewstate.js" target="head" /&gt;
