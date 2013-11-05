@@ -13,6 +13,7 @@
 package org.omnifaces.resourcehandler;
 
 import static org.omnifaces.util.Faces.getInitParameter;
+import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
 import java.net.URL;
@@ -22,6 +23,8 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
@@ -41,6 +44,8 @@ final class CombinedResourceInfo {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
+	private static final Logger logger = Logger.getLogger(CombinedResourceHandler.class.getName());
+
 	// ConcurrentHashMap was considered, but duplicate inserts technically don't harm and a HashMap is faster on read.
 	private static final Map<String, CombinedResourceInfo> CACHE = new HashMap<String, CombinedResourceInfo>();
 
@@ -50,6 +55,9 @@ final class CombinedResourceInfo {
 	private static final String[] PARAM_NAMES_RESOURCE_MAX_AGE = {
 		MOJARRA_DEFAULT_RESOURCE_MAX_AGE, MYFACES_DEFAULT_RESOURCE_MAX_AGE
 	};
+	private static final String LOG_RESOURCE_NOT_FOUND =
+		"CombinedResourceHandler: The resource %s cannot be found"
+			+ " and therefore a 404 will be returned for the combined resource ID %s";
 
 	// Static variables -----------------------------------------------------------------------------------------------
 
@@ -152,10 +160,11 @@ final class CombinedResourceInfo {
 
 	/**
 	 * Lazily load the combined resources so that the set of resources, the total content length and the last modified
-	 * are been initialized. If one of the resources cannot be resolved, then this leaves the resources empty.
+	 * are been initialized. If one of the resources cannot be resolved, then this will log a WARNING and leave the
+	 * resources empty.
 	 */
 	private synchronized void loadResources() {
-		if (resources != null) {
+		if (!isEmpty(resources)) {
 			return;
 		}
 
@@ -169,6 +178,7 @@ final class CombinedResourceInfo {
 			Resource resource = handler.createResource(resourceIdentifier.getName(), resourceIdentifier.getLibrary());
 
 			if (resource == null) {
+				logger.log(Level.WARNING, String.format(LOG_RESOURCE_NOT_FOUND, resourceIdentifier, id));
 				resources.clear();
 				return;
 			}

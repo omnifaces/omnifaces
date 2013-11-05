@@ -46,17 +46,11 @@ final class CombinedResource extends Resource {
 	 * Constructs a new combined resource based on the given resource name. This constructor is only used by
 	 * {@link CombinedResourceHandler#createResource(String, String)}.
 	 * @param name The resource name of the combined resource.
-	 * @throws IllegalArgumentException If the resource name does not represent a valid combined resource.
 	 */
 	public CombinedResource(String name) {
 		String[] resourcePathParts = name.split("\\.", 2)[0].split("/");
 		String resourceId = resourcePathParts[resourcePathParts.length - 1];
 		info = CombinedResourceInfo.get(resourceId);
-
-		if (info == null || info.getResources().isEmpty()) {
-			throw new IllegalArgumentException();
-		}
-
 		setResourceName(name);
 		setLibraryName(CombinedResourceHandler.LIBRARY_NAME);
 		setContentType(Faces.getMimeType(name));
@@ -67,10 +61,16 @@ final class CombinedResource extends Resource {
 	 * request information and be passed to the other constructor {@link #CombinedResource(String)}. This constructor
 	 * is only used by {@link CombinedResourceHandler#handleResourceRequest(FacesContext)}.
 	 * @param context The faces context involved in the current request.
-	 * @throws IllegalArgumentException If the resource name does not represent a valid combined resource.
+	 * @throws IllegalArgumentException If the resource name does not represent a valid combined resource. Specifically
+	 * this exception is handled by {@link CombinedResourceHandler#handleResourceRequest(FacesContext)} which should
+	 * return a 404.
 	 */
 	public CombinedResource(FacesContext context) {
 		this(getResourceName(context));
+
+		if (info == null || info.getResources().isEmpty()) {
+			throw new IllegalArgumentException();
+		}
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
