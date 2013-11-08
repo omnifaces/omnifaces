@@ -267,9 +267,8 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 	/**
 	 * Returns whether in in an invalidating case the given input component should be marked invalid. The default
 	 * implementation returns <code>true</code>, meaning that <strong>all</strong> input components should be
-	 * invalidated in an invalidating case. Perform the invalidation of the given input component. The default implementation calls
-	 * {@link UIInput#setValid(boolean)} passing <code>false</code> when {@link #isInvalidateAll()} returns
-	 * <code>true</code>. The overriding implementation may choose to invalidate it only when the value is empty.
+	 * invalidated in an invalidating case. The overriding implementation may choose to return <code>false</code> for
+	 * example when the value is empty, such as {@link ValidateAllOrNone}.
 	 * @param context The faces context to work with.
 	 * @param input The input component which may need to be invalidated.
 	 * @param value The value of the input component.
