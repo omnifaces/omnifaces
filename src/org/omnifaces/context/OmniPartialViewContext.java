@@ -55,7 +55,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String AJAX_DATA = "OmniFaces=OmniFaces||{};OmniFaces.Ajax={data:%s};";
+	private static final String AJAX_DATA = "var OmniFaces=OmniFaces||{};OmniFaces.Ajax={data:%s};";
 	private static final String ERROR_NO_OMNI_PVC = "There is no current OmniPartialViewContext instance.";
 
 	// Variables ------------------------------------------------------------------------------------------------------
