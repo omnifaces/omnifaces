@@ -12,6 +12,9 @@
  */
 package org.omnifaces.converter;
 
+import static org.omnifaces.util.Faces.getViewAttribute;
+import static org.omnifaces.util.Faces.setViewAttribute;
+
 import javax.faces.component.UIComponent;
 import javax.faces.component.UISelectMany;
 import javax.faces.context.FacesContext;
@@ -20,7 +23,6 @@ import javax.faces.convert.ConverterException;
 import javax.faces.convert.EnumConverter;
 import javax.faces.convert.FacesConverter;
 
-import org.omnifaces.util.Faces;
 import org.omnifaces.util.Messages;
 
 /**
@@ -74,7 +76,7 @@ public class GenericEnumConverter implements Converter {
 			return null;
 		}
 		else if (modelValue instanceof Enum) {
-			Faces.setViewAttribute(String.format(ATTRIBUTE_ENUM_TYPE, component.getId()), modelValue.getClass());
+			setViewAttribute(String.format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)), modelValue.getClass());
 			return ((Enum<?>) modelValue).name();
 		}
 		else {
@@ -89,7 +91,7 @@ public class GenericEnumConverter implements Converter {
 			return null;
 		}
 
-		Class<Enum> enumType = Faces.getViewAttribute(String.format(ATTRIBUTE_ENUM_TYPE, component.getId()));
+		Class<Enum> enumType = getViewAttribute(String.format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)));
 
 		try {
 			return Enum.valueOf(enumType, submittedValue);
