@@ -53,9 +53,9 @@ import javax.faces.validator.Validator;
 public abstract class ValueChangeValidator implements Validator {
 
 	/**
-	 * If the component is an instance of {@link EditableValueHolder} and the string representation of its old object
-	 * value is equal to the submitted value, then immediately return its old object value unchanged. Otherwise, invoke
-	 * {@link #getAsChangedObject(FacesContext, UIComponent, String)} which may in turn do the necessary possibly
+	 * If the component is an instance of {@link EditableValueHolder} and its old object value is equal to the
+	 * submitted value, then return immediately from the method and don't perform any validation. Otherwise, invoke
+	 * {@link #validateChangedObject(FacesContext, UIComponent, Object) which may in turn do the necessary possibly
 	 * expensive DAO operations.
 	 */
 	@Override
