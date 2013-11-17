@@ -19,9 +19,9 @@ import javax.faces.convert.Converter;
 
 /**
  * By default, JSF converters run on every request, regardless of whether the submitted value has changed or not. In
- * case of complex objects which are already stored in the model in a broader scope, such as the view scope, this may
- * result in unnecessarily expensive service/DAO calls. In such case, you'd like to perform the expensive service/DAO
- * call only when the submitted value is really changed as compared to the model value.
+ * case of conversion against the DB on complex objects which are already stored in the model in a broader scope, such
+ * as the view scope, this may result in unnecessarily expensive service/DAO calls. In such case, you'd like to perform
+ * the expensive service/DAO call only when the submitted value is really changed as compared to the model value.
  * <p>
  * This converter offers you a template to do it transparently. To use it, just change your converters from:
  * <pre>
