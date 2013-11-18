@@ -14,8 +14,13 @@ package org.omnifaces.util;
 
 import static org.omnifaces.util.Utils.isEmpty;
 
+import java.lang.annotation.Annotation;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
+import javax.enterprise.context.spi.Context;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 
@@ -39,17 +44,19 @@ public final class Beans {
 	@SuppressWarnings("unchecked")
 	public static <T> Bean<T> resolve(BeanManager beanManager, Class<T> beanClass) {
 		Set<Bean<?>> beans = beanManager.getBeans(beanClass);
+
 		if (isEmpty(beans)) {
 			// OpenWebBeans 1.1.1 (used in e.g. Geronimo 3.0.1) throws a NoSuchElementException
 			// when being given an empty list in beanManager#resolve
 			return null;
 		}
-		
+
 		return (Bean<T>) beanManager.resolve(beans);
 	}
 
 	/**
-	 * Returns the CDI managed bean reference of the given class from the given bean manager.
+	 * Returns the CDI managed bean reference of the given class from the given bean manager and creates one if
+	 * one doesn't exist.
 	 * @param beanManager The involved CDI bean manager.
 	 * @param beanClass The type of the CDI managed bean instance.
 	 * @return The CDI managed bean reference of the given class from the given bean manager.
@@ -59,14 +66,74 @@ public final class Beans {
 	}
 
 	/**
-	 * Returns the CDI managed bean reference of the given resolved bean from the given bean manager.
+	 * Returns the CDI managed bean reference of the given resolved bean from the given bean manager and creates one if
+	 * one doesn't exist.
 	 * @param beanManager The involved CDI bean manager.
 	 * @param bean The resolved bean of the CDI managed bean instance.
 	 * @return The CDI managed bean reference of the given resolved bean from the given bean manager.
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T getReference(BeanManager beanManager, Bean<T> bean) {
-		return (T) beanManager.getReference(bean, bean.getBeanClass(), beanManager.createCreationalContext(bean));
+		return getReference(beanManager, bean, true);
+	}
+
+	/**
+	 * Returns the CDI managed bean reference of the given class from the given bean manager and creates one if
+	 * one doesn't exist and <code>create</code> argument is <code>true</code>, otherwise don't create one and return
+	 * <code>null</code> if there's no current instance.
+	 * @param beanManager The involved CDI bean manager.
+	 * @param beanClass The type of the CDI managed bean instance.
+	 * @param create If <code>true</code>, then create one if one doesn't exist, otherwise don't create one and return
+	 * <code>null</code> if there's no current instance.
+	 * @return The CDI managed bean reference of the given class from the given bean manager.
+	 * @since 1.7
+	 */
+	public static <T> T getReference(BeanManager beanManager, Class<T> beanClass, boolean create) {
+		return getReference(beanManager, resolve(beanManager, beanClass), create);
+	}
+
+	/**
+	 * Returns the CDI managed bean reference of the given resolved bean from the given bean manager and creates one if
+	 * one doesn't exist and <code>create</code> argument is <code>true</code>, otherwise don't create one and return
+	 * <code>null</code> if there's no current instance.
+	 * @param beanManager The involved CDI bean manager.
+	 * @param bean The resolved bean of the CDI managed bean instance.
+	 * @param create If <code>true</code>, then create one if one doesn't exist, otherwise don't create one and return
+	 * <code>null</code> if there's no current instance.
+	 * @return The CDI managed bean reference of the given class from the given bean manager.
+	 * @since 1.7
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getReference(BeanManager beanManager, Bean<T> bean, boolean create) {
+		if (create) {
+			return (T) beanManager.getReference(bean, bean.getBeanClass(), beanManager.createCreationalContext(bean));
+		}
+		else {
+			return beanManager.getContext(bean.getScope()).get(bean);
+		}
+	}
+
+	/**
+	 * Returns all active references of a CDI managed bean in the given CDI managed bean scope. The map key represents
+	 * the active reference and the map value represents the managed bean name, if any.
+	 * @param beanManager The involved CDI bean manager.
+	 * @param scope The CDI managed bean scope, e.g. <code>RequestScoped.class</code>.
+	 * @return All active references of a CDI managed bean in the given CDI managed bean scope.
+	 * @since 1.7
+	 */
+	public static Map<Object, String> getActiveReferences(BeanManager beanManager, Class<? extends Annotation> scope) {
+		Map<Object, String> activeReferences = new HashMap<Object, String>();
+		Set<Bean<?>> beans = beanManager.getBeans(Object.class);
+		Context context = beanManager.getContext(scope);
+
+		for (Bean<?> bean : beans) {
+			Object reference = context.get(bean);
+
+			if (reference != null) {
+				activeReferences.put(reference, bean.getName());
+			}
+		}
+
+		return Collections.unmodifiableMap(activeReferences);
 	}
 
 }
