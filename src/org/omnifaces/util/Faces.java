@@ -516,7 +516,7 @@ public final class Faces {
 	 * method is called at the wrong moment in the JSF lifecycle, e.g. before the view has been restored/created.
 	 * @since 1.7
 	 */
-	public static String getBookmarkableURL(List<ParamHolder> params, boolean includeViewParams) {
+	public static String getBookmarkableURL(Collection<ParamHolder> params, boolean includeViewParams) {
 		return FacesLocal.getBookmarkableURL(getContext(), params, includeViewParams);
 	}
 
@@ -533,7 +533,7 @@ public final class Faces {
 	 * @see ViewHandler#getBookmarkableURL(FacesContext, String, Map, boolean)
 	 * @since 1.7
 	 */
-	public static String getBookmarkableURL(String viewId, List<ParamHolder> params, boolean includeViewParams) {
+	public static String getBookmarkableURL(String viewId, Collection<ParamHolder> params, boolean includeViewParams) {
 		return FacesLocal.getBookmarkableURL(getContext(), viewId, params, includeViewParams);
 	}
 

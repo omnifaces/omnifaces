@@ -20,7 +20,7 @@ import org.omnifaces.util.Faces;
 /**
  * This interface represents a (request) parameter holder which extends {@link ValueHolder} with methods to obtain the
  * parameter name associated with the parameter value and to explicitly obtain the converted value. This is used in
- * among others the {@link Faces#getBookmarkableURL(String, java.util.List, boolean)}.
+ * among others the {@link Faces#getBookmarkableURL(String, java.util.Collection, boolean)}.
  *
  * @author Bauke Scholtz
  * @since 1.7
