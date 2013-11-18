@@ -47,7 +47,7 @@ public final class Beans {
 
 		if (isEmpty(beans)) {
 			// OpenWebBeans 1.1.1 (used in e.g. Geronimo 3.0.1) throws a NoSuchElementException
-			// when being given an empty list in beanManager#resolve
+			// when being given an empty list in BeanManager#resolve().
 			return null;
 		}
 
@@ -102,13 +102,16 @@ public final class Beans {
 	 * @return The CDI managed bean reference of the given class from the given bean manager.
 	 * @since 1.7
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T getReference(BeanManager beanManager, Bean<T> bean, boolean create) {
+		// Context#get() is used instead of BeanManager#getReference() for reasons mentioned in
+		// http://stackoverflow.com/q/20048410/157882
+		Context context = beanManager.getContext(bean.getScope());
+
 		if (create) {
-			return (T) beanManager.getReference(bean, bean.getBeanClass(), beanManager.createCreationalContext(bean));
+			return context.get(bean, beanManager.createCreationalContext(bean));
 		}
 		else {
-			return beanManager.getContext(bean.getScope()).get(bean);
+			return context.get(bean);
 		}
 	}
 
