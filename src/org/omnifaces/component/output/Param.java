@@ -23,6 +23,8 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.convert.Converter;
 
+import org.omnifaces.component.ParamHolder;
+
 /**
  * <strong>Param</strong> is a component that extends the standard {@link UIParameter} to implement {@link ValueHolder}
  * and thus support a {@link Converter} to convert the supplied value to string, if necessary.
@@ -51,7 +53,7 @@ import javax.faces.convert.Converter;
  * @since 1.4
  */
 @FacesComponent(Param.COMPONENT_TYPE)
-public class Param extends UIParameter implements ValueHolder {
+public class Param extends UIParameter implements ParamHolder {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
@@ -87,7 +89,11 @@ public class Param extends UIParameter implements ValueHolder {
 
 	@Override
 	public Object getValue() {
-		FacesContext context = getFacesContext();
+		return getConvertedValue(getFacesContext());
+	}
+
+	@Override
+	public String getConvertedValue(FacesContext context) {
 		Converter converter = getConverter();
 		Object value = getLocalValue();
 
@@ -117,7 +123,7 @@ public class Param extends UIParameter implements ValueHolder {
 			return converter.getAsString(context, this, value);
 		}
 		else {
-			return value;
+			return (String) value;
 		}
 	}
 

@@ -52,6 +52,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.omnifaces.component.ParamHolder;
+
 /**
  * Collection of utility methods for the JSF API that are mainly shortcuts for obtaining stuff from the provided
  * {@link FacesContext} argument. In effect, it 'flattens' the hierarchy of nested objects.
@@ -364,6 +366,36 @@ public final class FacesLocal {
 		(FacesContext context, String viewId, Map<String, List<String>> params, boolean includeViewParams)
 	{
 		return context.getApplication().getViewHandler().getBookmarkableURL(context, viewId, params, includeViewParams);
+	}
+
+	/**
+	 * @see Faces#getBookmarkableURL(List, boolean)
+	 */
+	public static String getBookmarkableURL
+		(FacesContext context, List<ParamHolder> params, boolean includeViewParams)
+	{
+		String viewId = getViewId(context);
+
+		if (viewId == null) {
+			throw new IllegalStateException(ERROR_NO_VIEW);
+		}
+
+		return getBookmarkableURL(context, viewId, params, includeViewParams);
+	}
+
+	/**
+	 * @see Faces#getBookmarkableURL(String, List, boolean)
+	 */
+	public static String getBookmarkableURL
+		(FacesContext context, String viewId, List<ParamHolder> params, boolean includeViewParams)
+	{
+		Map<String, List<String>> convertedParams = new HashMap<String, List<String>>();
+
+		for (ParamHolder param : params) {
+			convertedParams.put(param.getName(), Collections.singletonList(param.getConvertedValue(context)));
+		}
+
+		return getBookmarkableURL(context, viewId, convertedParams, includeViewParams);
 	}
 
 	// Facelets -------------------------------------------------------------------------------------------------------

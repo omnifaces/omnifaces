@@ -53,6 +53,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.omnifaces.component.ParamHolder;
+
 /**
  * Collection of utility methods for the JSF API that are mainly shortcuts for obtaining stuff from the thread local
  * {@link FacesContext}. In effect, it 'flattens' the hierarchy of nested objects.
@@ -499,6 +501,39 @@ public final class Faces {
 	 * @since 1.6
 	 */
 	public static String getBookmarkableURL(String viewId, Map<String, List<String>> params, boolean includeViewParams) {
+		return FacesLocal.getBookmarkableURL(getContext(), viewId, params, includeViewParams);
+	}
+
+	/**
+	 * Returns the concrete domain-relative URL to the current view with the given params URL-encoded in the query
+	 * string and optionally include view parameters as well. This URL can ultimately be used as redirect URL, or in
+	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>.
+	 * @param params The parameters to be URL-encoded in the query string. Can be <code>null</code>.
+	 * @param includeViewParams Whether the view parameters of the current view should be included as well.
+	 * @return The concrete domain-relative URL to the current view.
+	 * @see ViewHandler#getBookmarkableURL(FacesContext, String, Map, boolean)
+	 * @throws IllegalStateException When there is no view (i.e. when it is <code>null</code>). This can happen if the
+	 * method is called at the wrong moment in the JSF lifecycle, e.g. before the view has been restored/created.
+	 * @since 1.7
+	 */
+	public static String getBookmarkableURL(List<ParamHolder> params, boolean includeViewParams) {
+		return FacesLocal.getBookmarkableURL(getContext(), params, includeViewParams);
+	}
+
+	/**
+	 * Returns the concrete domain-relative URL to the given view with the given params URL-encoded in the query
+	 * string and optionally include view parameters as well. This URL can ultimately be used as redirect URL, or in
+	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>.
+	 * @param viewId The view ID to create the bookmarkable URL for.
+	 * @param params The parameters to be URL-encoded in the query string. Can be <code>null</code>.
+	 * @param includeViewParams Whether the view parameters of the current view which are also declared in the target
+	 * view should be included as well. Note thus that this does not include the view parameters which are not declared
+	 * in the target view!
+	 * @return The concrete domain-relative URL to the target view.
+	 * @see ViewHandler#getBookmarkableURL(FacesContext, String, Map, boolean)
+	 * @since 1.7
+	 */
+	public static String getBookmarkableURL(String viewId, List<ParamHolder> params, boolean includeViewParams) {
 		return FacesLocal.getBookmarkableURL(getContext(), viewId, params, includeViewParams);
 	}
 
