@@ -55,7 +55,7 @@ public abstract class ValueChangeValidator implements Validator {
 	/**
 	 * If the component is an instance of {@link EditableValueHolder} and its old object value is equal to the
 	 * submitted value, then return immediately from the method and don't perform any validation. Otherwise, invoke
-	 * {@link #validateChangedObject(FacesContext, UIComponent, Object) which may in turn do the necessary possibly
+	 * {@link #validateChangedObject(FacesContext, UIComponent, Object)} which may in turn do the necessary possibly
 	 * expensive DAO operations.
 	 */
 	@Override
