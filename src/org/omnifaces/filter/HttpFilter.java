@@ -38,7 +38,8 @@ public abstract class HttpFilter implements Filter {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final String ERROR_NO_FILTERCONFIG = "FilterConfig is not available."
-		+ " When overriding HttpFilter#init(FilterConfig), please don't forget to call super.init(config).";
+		+ " It seems that you've overriden HttpFilter#init(FilterConfig)."
+		+ " You should be overriding HttpFilter#init() instead, otherwise you have to call super.init(config).";
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -48,8 +49,9 @@ public abstract class HttpFilter implements Filter {
 
 	/**
 	 * Called by the servlet container when the filter is about to be placed into service. This implementation stores
-	 * the {@link FilterConfig} object for later use by the getter methods. When overriding this method, call
-	 * <code>super.init(config)</code>, otherwise the getter methods will throw an illegal state exception.
+	 * the {@link FilterConfig} object for later use by the getter methods. It's recommended to <strong>not</strong>
+	 * override this method. Instead, just use {@link #init()} method. When overriding this method anyway, don't forget
+	 * to call <code>super.init(config)</code>, otherwise the getter methods will throw an illegal state exception.
 	 */
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {

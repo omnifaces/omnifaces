@@ -104,6 +104,7 @@ final class CombinedResource extends Resource {
 		responseHeaders.put("Last-Modified", Utils.formatRFC1123(new Date(lastModified)));
 		responseHeaders.put("Expires", Utils.formatRFC1123(new Date(System.currentTimeMillis() + info.getMaxAge())));
 		responseHeaders.put("Etag", String.format("W/\"%d-%d\"", info.getContentLength(), lastModified));
+		responseHeaders.put("Pragma", ""); // Explicitly set empty pragma to prevent some containers from setting it.
 		return responseHeaders;
 	}
 
