@@ -23,20 +23,22 @@ import javax.faces.context.FacesContext;
 import org.omnifaces.validator.MultiFieldValidator;
 
 /**
- * <strong>ValidateMultiple</strong> allows the developer to validate multiple fields by a custom validator method:
+ * <p><strong>ValidateMultiple</strong> allows the developer to validate multiple fields by either a custom validator
+ * method:
  * <pre>
- * &lt;o:validateMultiple id="myId" components="foo bar baz" validator="#{bean.validateValues}" /&gt;
+ * &lt;o:validateMultiple id="myId" components="foo bar baz" validator="#{bean.someMethod}" /&gt;
  * &lt;h:message for="myId" /&gt;
  * &lt;h:inputText id="foo" /&gt;
  * &lt;h:inputText id="bar" /&gt;
  * &lt;h:inputText id="baz" /&gt;
  * </pre>
+ * <p>whereby the method has the following signature (method name is free to your choice):
  * <pre>
- * public boolean validateValues(FacesContext context, List&lt;UIInput&gt; components, List&lt;Object&gt; values) {
+ * public boolean someMethod(FacesContext context, List&lt;UIInput&gt; components, List&lt;Object&gt; values) {
  *     // ...
  * }
  * </pre>
- * <p>Or by a managed bean instance which implements the {@link MultiFieldValidator} interface:
+ * <p>Or, by a managed bean instance which implements the {@link MultiFieldValidator} interface:
  * <pre>
  * &lt;o:validateMultiple id="myId" components="foo bar baz" validator="#{validateValuesBean}" /&gt;
  * &lt;h:message for="myId" /&gt;
@@ -49,15 +51,16 @@ import org.omnifaces.validator.MultiFieldValidator;
  * {@literal @}RequestScoped
  * public class ValidateValuesBean implements MultiFieldValidator {
  *     {@literal @}Override
- *     boolean validateValues(FacesContext context, List&lt;UIInput&gt; components, List&lt;Object&gt; values) {
+ *     public boolean validateValues(FacesContext context, List&lt;UIInput&gt; components, List&lt;Object&gt; values) {
  *         // ...
  *     }
  * }
  * </pre>
  *
  * @author Juliano Marques
- * @author Baukt Scholtz
+ * @author Bauke Scholtz
  * @since 1.7
+ * @see ValidateMultipleHandler
  */
 @FacesComponent(ValidateMultiple.COMPONENT_TYPE)
 public class ValidateMultiple extends ValidateMultipleFields {
