@@ -1380,6 +1380,150 @@ input.error, select.error, textarea.error {
 	<tag>
 		<description>
 			<![CDATA[
+				<strong>ValidateMultiple</strong> allows the developer to validate multiple fields by a custom validator method:
+				<pre>
+&lt;o:validateMultiple id="myId" components="foo bar baz" validator="#{bean.validateValues}" /&gt;
+&lt;h:message for="myId" /&gt;
+&lt;h:inputText id="foo" /&gt;
+&lt;h:inputText id="bar" /&gt;
+&lt;h:inputText id="baz" /&gt;
+				</pre>
+				<pre>
+public boolean validateValues(FacesContext context, List&lt;UIInput&gt; components, List&lt;Object&gt; values) {
+    // ...
+}
+				</pre>
+				<p>Or by a managed bean instance which implements the {@link MultiFieldValidator} interface:
+				<pre>
+&lt;o:validateMultiple id="myId" components="foo bar baz" validator="#{validateValuesBean}" /&gt;
+&lt;h:message for="myId" /&gt;
+&lt;h:inputText id="foo" /&gt;
+&lt;h:inputText id="bar" /&gt;
+&lt;h:inputText id="baz" /&gt;
+				</pre>
+				<pre>
+{@literal @}ManagedBean
+{@literal @}RequestScoped
+public class ValidateValuesBean implements MultiFieldValidator {
+    {@literal @}Override
+    boolean validateValues(FacesContext context, List&lt;UIInput&gt; components, List&lt;Object&gt; values) {
+        // ...
+    }
+}
+				</pre>
+			]]>
+		</description>
+		<tag-name>validateMultiple</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.validator.ValidateMultiple</component-type>
+			<handler-class>org.omnifaces.component.validator.ValidateMultipleHandler</handler-class>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The ordering type, available values are "lt", "lte", "gt" and "gte", defaults to "lt".
+				]]>
+			</description>
+			<name>type</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The space separated collection of client IDs of UI input components to be validated.
+				]]>
+			</description>
+			<name>components</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					This attribute can take either a <code>ValueExpression</code> representing an implementation of the
+					<code>MultiFieldValidator</code> instance, or a <code>MethodExpression</code> representing a validator
+					method with the following signature: 
+					<code>boolean validate(FacesContext context, List&lt;UIInput&gt; components, List&lt;Object&gt; values)</code>
+					that will be called during Process Validations phase to perform correctness checks on the value of
+					this component.
+				]]>
+			</description>
+			<name>validator</name>
+			<required>true</required>
+			<type>java.lang.Object</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The validator message to be shown on failure. Any "{0}" placeholder in the message will be
+					substituted with a comma separated string of labels of the referenced input components.
+				]]>
+			</description>
+			<name>message</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The identifier for which this validator should show the message. Defaults to "@this" which is the
+					validator component itself. Other available values are "@all" which will show the message for all of
+					the referenced components and "@invalid" which will show the message for only the invalidated
+					components. Any other space separated value will be treated as client ID of UI input component.
+				]]>
+			</description>
+			<name>showMessageFor</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether the validation should be disabled or not. Defaults to <code>false</code>.
+				]]>
+			</description>
+			<name>disabled</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
 				The <code>&lt;o:validator&gt;</code> basically extends the <code>&lt;f:validator&gt;</code> tag family with the
 				possibility to evaluate the value expression in all attributes on a per request basis instead of on a per view
 				build time basis. This allows the developer to change the attributes on a per request basis, such as the
