@@ -132,7 +132,7 @@ public class ValidateMultiple extends ValidateMultipleFields {
 
 	/**
 	 * Sets the validator method expression.
-	 * @param validator The validator method expression.
+	 * @param validateMethod The validator method expression.
 	 */
 	public void setValidateMethod(MethodExpression validateMethod) {
 		getStateHelper().put(PropertyKeys.validateMethod, validateMethod);

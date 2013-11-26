@@ -34,7 +34,7 @@ public interface MultiFieldValidator {
 	 * successful. Note: this validator does NOT throw {@link ValidatorException}! This job is up to the
 	 * {@link ValidateMultipleFields} implementation who will call this method.
 	 * @param context The faces context to work with.
-	 * @param inputs The input components whose values are to be validated.
+	 * @param components The input components whose values are to be validated.
 	 * @param values The values of the input components to be validated.
 	 * @return <code>true</code> if validation is successful, otherwise <code>false</code> (and thus show the message).
 	 */
