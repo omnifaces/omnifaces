@@ -56,7 +56,7 @@ public class ValidateOneOrMore extends ValidateMultipleFields {
 	 * Validate if at least one is filled out.
 	 */
 	@Override
-	protected boolean validateValues(FacesContext context, List<UIInput> inputs, List<Object> values) {
+	public boolean validateValues(FacesContext context, List<UIInput> inputs, List<Object> values) {
 		for (Object value : values) {
 			if (!Utils.isEmpty(value)) {
 				return true;

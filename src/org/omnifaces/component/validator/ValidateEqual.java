@@ -55,7 +55,7 @@ public class ValidateEqual extends ValidateMultipleFields {
 	 * Validate if all values are equal.
 	 */
 	@Override
-	protected boolean validateValues(FacesContext context, List<UIInput> inputs, List<Object> values) {
+	public boolean validateValues(FacesContext context, List<UIInput> inputs, List<Object> values) {
 		return (new HashSet<Object>(values).size() == 1);
 	}
 

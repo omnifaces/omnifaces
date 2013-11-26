@@ -29,6 +29,7 @@ import javax.faces.context.FacesContext;
 import org.omnifaces.util.Components;
 import org.omnifaces.util.Messages;
 import org.omnifaces.util.State;
+import org.omnifaces.validator.MultiFieldValidator;
 
 /**
  * Base class which is to be shared between all multi field validators. The implementors have to call the super
@@ -112,7 +113,7 @@ import org.omnifaces.util.State;
  *
  * @author Bauke Scholtz
  */
-public abstract class ValidateMultipleFields extends ValidatorFamily {
+public abstract class ValidateMultipleFields extends ValidatorFamily implements MultiFieldValidator {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
@@ -253,16 +254,6 @@ public abstract class ValidateMultipleFields extends ValidatorFamily {
 
 		return Collections.unmodifiableList(values);
 	}
-
-	/**
-	 * Perform the validation on the collected values of the input components and returns whether the validation is
-	 * successful.
-	 * @param context The faces context to work with.
-	 * @param inputs The input components whose values are to be validated.
-	 * @param values The values of the input components to be validated.
-	 * @return <code>true</code> if validation is successful, otherwise <code>false</code> (and thus show the message).
-	 */
-	protected abstract boolean validateValues(FacesContext context, List<UIInput> inputs, List<Object> values);
 
 	/**
 	 * Returns whether in in an invalidating case the given input component should be marked invalid. The default

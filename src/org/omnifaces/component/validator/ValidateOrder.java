@@ -134,7 +134,7 @@ public class ValidateOrder extends ValidateMultipleFields {
 	 * Validate if all values are in specified order.
 	 */
 	@Override
-	protected boolean validateValues(FacesContext context, List<UIInput> components, List<Object> values) {
+	public boolean validateValues(FacesContext context, List<UIInput> components, List<Object> values) {
 		try {
 			Object tmp = values; // https://bugs.eclipse.org/bugs/show_bug.cgi?id=158870
 			return Type.valueOf(getType().toUpperCase()).validateOrder((List<Comparable>) tmp);
