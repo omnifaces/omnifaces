@@ -37,8 +37,8 @@ import javax.servlet.http.HttpSession;
  * webbrowser's back button, and then re-submits it, then the enduser would face a
  * <a href="http://stackoverflow.com/a/3642969/157882"><code>ViewExpiredException</code></a>.
  * <p>
- * However, on stateless resources, caching the response would be beneficial. Set the expire time to to the same time
- * as you'd like to use as refresh interval of the resource, which can be 10 seconds (to avoid F5-madness on resources
+ * However, on stateless resources, caching the response would be beneficial. Set the expire time to the same time as
+ * you'd like to use as refresh interval of the resource, which can be 10 seconds (to avoid F5-madness on resources
  * which are subject to quick changes), but also minutes or even hours, days or weeks. For example, a list of links, a
  * news page, a JS/CSS/image file, etc.
  * <p>
@@ -50,10 +50,11 @@ import javax.servlet.http.HttpSession;
  * <li>Or when the cache is expired, or when the enduser does a soft-refresh by pressing refresh button or F5 key, then:
  * <ul>
  * <li>When the <code>ETag</code> or <code>Last-Modified</code> header is present on cached resource, then the client
- * will perform a so-called conditional GET request with <code>If-None-Match</code> or <code>If-Modified-Since</code>.
- * If the server responds with HTTP status 304 ("not modified") along with the updated cache-related headers, then the
- * client will keep the resource in cache and expand its expire time based on the headers. Note: <code>ETag</code> takes
- * precedence.
+ * will perform a so-called conditional GET request with <code>If-None-Match</code> or <code>If-Modified-Since</code>
+ * headers. If the server responds with HTTP status 304 ("not modified") along with the updated cache-related headers,
+ * then the client will keep the resource in cache and expand its expire time based on the headers. Note:
+ * <code>ETag</code> takes precedence over <code>Last-Modified</code> when both are present and consequently
+ * <code>If-None-Match</code> takes precedence over <code>If-Modified-Since</code> when both are present.
  * <li>When those headers are <strong>not</strong> present, then the behavior is the same as during a hard-refresh.
  * </ul>
  * <li>Or when the resource is not cached, or when the enduser does a hard-refresh by pressing <code>Ctrl</code> key
