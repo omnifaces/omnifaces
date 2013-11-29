@@ -88,12 +88,8 @@ public class Param extends UIParameter implements ParamHolder {
 	}
 
 	@Override
-	public Object getValue() {
-		return getConvertedValue(getFacesContext());
-	}
-
-	@Override
-	public String getConvertedValue(FacesContext context) {
+	public String getValue() {
+		FacesContext context = getFacesContext();
 		Converter converter = getConverter();
 		Object value = getLocalValue();
 
@@ -123,7 +119,7 @@ public class Param extends UIParameter implements ParamHolder {
 			return converter.getAsString(context, this, value);
 		}
 		else {
-			return (String) value;
+			return (value != null) ? value.toString() : "";
 		}
 	}
 

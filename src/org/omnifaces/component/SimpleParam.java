@@ -17,12 +17,14 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 
 /**
- * A default implementation of the {@link ParamHolder} interface.
+ * This class provides a basic and default implementation of the {@link ParamHolder} interface. Ultimately, this class
+ * can be used as a simple key-value pair holder (parameter name-value) which uses an explicit/implicit JSF converter
+ * to convert the object value to string.
  *
  * @author Bauke Scholtz
  * @since 1.7
  */
-public class DefaultParamHolder implements ParamHolder {
+public class SimpleParam implements ParamHolder {
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -35,27 +37,27 @@ public class DefaultParamHolder implements ParamHolder {
 	/**
 	 * Default constructor.
 	 */
-	public DefaultParamHolder() {
+	public SimpleParam() {
 		// NOOP.
 	}
 
 	/**
-	 * Construct a param holder with name and value.
+	 * Construct a simple param with name and value.
 	 * @param name The parameter name.
 	 * @param value The parameter value.
 	 */
-	public DefaultParamHolder(String name, Object value) {
+	public SimpleParam(String name, Object value) {
 		this.name = name;
 		this.value = value;
 	}
 
 	/**
-	 * Construct a param holder with name, value and converter.
+	 * Construct a simple param with name, value and converter.
 	 * @param name The parameter name.
 	 * @param value The parameter value.
 	 * @param converter The converter.
 	 */
-	public DefaultParamHolder(String name, Object value, Converter converter) {
+	public SimpleParam(String name, Object value, Converter converter) {
 		this.name = name;
 		this.value = value;
 		this.converter = converter;
@@ -82,8 +84,22 @@ public class DefaultParamHolder implements ParamHolder {
 	}
 
 	@Override
-	public Object getValue() {
-		return value;
+	public String getValue() {
+		FacesContext context = FacesContext.getCurrentInstance();
+
+		if (converter == null && value != null) {
+			converter = context.getApplication().createConverter(value.getClass());
+		}
+
+		if (converter != null) {
+			UIParameter component = new UIParameter();
+			component.setName(name);
+			component.setValue(value);
+			return converter.getAsString(context, component, value);
+		}
+		else {
+			return (value != null) ? value.toString() : "";
+		}
 	}
 
 	@Override
@@ -99,23 +115,6 @@ public class DefaultParamHolder implements ParamHolder {
 	@Override
 	public void setConverter(Converter converter) {
 		this.converter = converter;
-	}
-
-	@Override
-	public String getConvertedValue(FacesContext context) {
-		if (converter == null && value != null) {
-			converter = context.getApplication().createConverter(value.getClass());
-		}
-
-		if (converter != null) {
-			UIParameter component = new UIParameter();
-			component.setName(name);
-			component.setValue(value);
-			return converter.getAsString(context, component, value);
-		}
-		else {
-			return (String) value;
-		}
 	}
 
 }

@@ -12,15 +12,17 @@
  */
 package org.omnifaces.component;
 
+import javax.faces.application.Application;
 import javax.faces.component.ValueHolder;
-import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
 
 import org.omnifaces.util.Faces;
 
 /**
- * This interface represents a (request) parameter holder which extends {@link ValueHolder} with methods to obtain the
- * parameter name associated with the parameter value and to explicitly obtain the converted value. This is used in
- * among others the {@link Faces#getBookmarkableURL(String, java.util.Collection, boolean)}.
+ * This interface represents a (request) parameter holder which extends {@link ValueHolder} with {@link #getName()}
+ * method to obtain the parameter name associated with the parameter value and changes the {@link #getLocalValue()}
+ * method to return the original, unconverted value and changes the {@link #getValue()} method to return the converted
+ * value. This is used in among others the {@link Faces#getBookmarkableURL(String, java.util.Collection, boolean)}.
  *
  * @author Bauke Scholtz
  * @since 1.7
@@ -34,10 +36,22 @@ public interface ParamHolder extends ValueHolder {
 	public String getName();
 
 	/**
-	 * Returns the converted value of the parameter.
-	 * @param context The involved faces context.
-	 * @return The converted value of the parameter.
+	 * Returns the original, unconverted value of the parameter.
+	 * @return The original, unconverted value of the parameter.
 	 */
-	public String getConvertedValue(FacesContext context);
+	@Override
+	public Object getLocalValue();
+
+	/**
+	 * Returns the converted value of the parameter. If the converter is set, or if any converter is available by
+	 * {@link Application#createConverter(Class)}, passing the value's class, then return the result of
+	 * {@link Converter#getAsString(javax.faces.context.FacesContext, javax.faces.component.UIComponent, Object)},
+	 * otherwise if the value is not <code>null</code>, then return the value's {@link Object#toString()}, else return
+	 * an empty string.
+	 * @return The converted value of the parameter, which should never be <code>null</code>.
+	 * @see Converter#getAsString(javax.faces.context.FacesContext, javax.faces.component.UIComponent, Object)
+	 */
+	@Override
+	public String getValue();
 
 }
