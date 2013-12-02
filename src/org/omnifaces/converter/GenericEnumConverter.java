@@ -71,13 +71,16 @@ public class GenericEnumConverter implements Converter {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public String getAsString(FacesContext context, UIComponent component, Object modelValue) {
 		if (modelValue == null) {
 			return null;
 		}
-		else if (modelValue instanceof Enum) {
-			setViewAttribute(String.format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)), modelValue.getClass());
-			return ((Enum<?>) modelValue).name();
+
+		if (modelValue instanceof Enum) {
+			Class<Enum> enumType = ((Enum) modelValue).getDeclaringClass();
+			setViewAttribute(String.format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)), enumType);
+			return ((Enum) modelValue).name();
 		}
 		else {
 			throw new ConverterException(Messages.createError(ERROR_NO_ENUM_TYPE, modelValue.getClass()));
