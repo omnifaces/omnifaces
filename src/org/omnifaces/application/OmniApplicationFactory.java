@@ -17,6 +17,7 @@ package org.omnifaces.application;
 
 import javax.faces.application.Application;
 import javax.faces.application.ApplicationFactory;
+import javax.faces.application.ApplicationWrapper;
 
 /**
  * This application factory takes care that the {@link OmniApplication} is properly initialized.
@@ -41,29 +42,26 @@ public class OmniApplicationFactory extends ApplicationFactory {
 	 */
 	public OmniApplicationFactory(ApplicationFactory wrapped) {
 		this.wrapped = wrapped;
+		setApplication(wrapped.getApplication());
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns a new instance of {@link OmniApplication} which wraps the original application.
+	 * Returns an instance of {@link OmniApplication} which wraps the original application.
 	 */
 	@Override
 	public Application getApplication() {
-		if (application == null) {
-			application = new OmniApplication(wrapped.getApplication());
-		}
-
 		return application;
 	}
 
 	/**
 	 * Sets the given application instance as the current instance. If it's not an instance of {@link OmniApplication},
-	 * then it will be wrapped by {@link OmniApplication}.
+	 * nor wraps the {@link OmniApplication}, then it will be wrapped by a new instance of {@link OmniApplication}.
 	 */
 	@Override
 	public synchronized void setApplication(Application application) {
-		this.application = (application instanceof OmniApplication) ? application : new OmniApplication(application);
+		this.application = isOmniApplicationPresent(application) ? application : new OmniApplication(application);
 		wrapped.setApplication(this.application);
 	}
 
@@ -73,6 +71,16 @@ public class OmniApplicationFactory extends ApplicationFactory {
 	@Override
 	public ApplicationFactory getWrapped() {
 		return wrapped;
+	}
+
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	private static boolean isOmniApplicationPresent(Application application) {
+		while (!(application instanceof OmniApplication) && application instanceof ApplicationWrapper) {
+			application = ((ApplicationWrapper) application).getWrapped();
+		}
+
+		return (application instanceof OmniApplication);
 	}
 
 }
