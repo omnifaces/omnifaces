@@ -12,6 +12,13 @@
  */
 package org.omnifaces.context;
 
+import static org.omnifaces.util.Faces.responseReset;
+import static org.omnifaces.util.Faces.setContextAttribute;
+import static org.omnifaces.util.FacesLocal.getContextAttribute;
+import static org.omnifaces.util.FacesLocal.getRequestAttribute;
+import static org.omnifaces.util.FacesLocal.getViewId;
+import static org.omnifaces.util.FacesLocal.normalizeViewId;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -166,14 +173,26 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 	 * {@link PartialViewContext} implementation which doesn't properly delegate through the wrapped instance.
 	 */
 	public static OmniPartialViewContext getCurrentInstance() {
-		OmniPartialViewContext instance = Faces.getContextAttribute(OmniPartialViewContext.class.getName());
+		return getCurrentInstance(FacesContext.getCurrentInstance());
+	}
+
+	/**
+	 * Returns the current instance of the OmniFaces partial view context from the given faces context.
+	 * @param context The faces context to obtain the current instance of the OmniFaces partial view context from.
+	 * @return The current instance of the OmniFaces partial view context from the given faces context.
+	 * @throws IllegalStateException When there is no current instance of the OmniFaces partial view context. That can
+	 * happen when the {@link OmniPartialViewContextFactory} is not properly registered, or when there's another
+	 * {@link PartialViewContext} implementation which doesn't properly delegate through the wrapped instance.
+	 */
+	public static OmniPartialViewContext getCurrentInstance(FacesContext context) {
+		OmniPartialViewContext instance = getContextAttribute(context, OmniPartialViewContext.class.getName());
 
 		if (instance != null) {
 			return instance;
 		}
 
 		// Not found. Well, maybe the context attribute map was cleared for some reason. Get it once again.
-		instance = unwrap(FacesContext.getCurrentInstance().getPartialViewContext());
+		instance = unwrap(context.getPartialViewContext());
 
 		if (instance != null) {
 			setCurrentInstance(instance);
@@ -182,10 +201,10 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
 		// Still not found. Well, maybe RichFaces is installed which doesn't use PartialViewContextWrapper.
 		if (Hacks.isRichFacesInstalled()) {
-			PartialViewContext context = Hacks.getRichFacesWrappedPartialViewContext();
+			PartialViewContext pvc = Hacks.getRichFacesWrappedPartialViewContext();
 
-			if (context != null) {
-				instance = unwrap(context);
+			if (pvc != null) {
+				instance = unwrap(pvc);
 
 				if (instance != null) {
 					setCurrentInstance(instance);
@@ -199,7 +218,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 	}
 
 	private static void setCurrentInstance(OmniPartialViewContext instance) {
-		Faces.setContextAttribute(OmniPartialViewContext.class.getName(), instance);
+		setContextAttribute(OmniPartialViewContext.class.getName(), instance);
 	}
 
 	private static OmniPartialViewContext unwrap(PartialViewContext context) {
@@ -253,10 +272,11 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 			String loginURL = WebXml.INSTANCE.getFormLoginPage();
 
 			if (loginURL != null) {
-				String loginViewId = Faces.normalizeViewId(loginURL);
+				FacesContext context = FacesContext.getCurrentInstance();
+				String loginViewId = normalizeViewId(context, loginURL);
 
-				if (loginViewId.equals(Faces.getViewId())) {
-					String originalURL = Faces.getRequestAttribute("javax.servlet.forward.request_uri");
+				if (loginViewId.equals(getViewId(context))) {
+					String originalURL = getRequestAttribute(context, "javax.servlet.forward.request_uri");
 
 					if (originalURL != null) {
 						redirect(originalURL);
@@ -346,7 +366,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 				throw new FacesException(e);
 			}
 			finally {
-				Faces.responseReset();
+				responseReset();
 			}
 		}
 
