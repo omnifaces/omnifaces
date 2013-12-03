@@ -12,6 +12,8 @@
  */
 package org.omnifaces.exceptionhandler;
 
+import static org.omnifaces.util.FacesLocal.normalizeViewId;
+
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.logging.Level;
@@ -35,7 +37,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.omnifaces.config.WebXml;
 import org.omnifaces.context.OmniPartialViewContext;
 import org.omnifaces.util.Exceptions;
-import org.omnifaces.util.Faces;
 import org.omnifaces.util.Hacks;
 
 /**
@@ -121,11 +122,11 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 			+ " Error page '%s' CANNOT be shown as response is already committed."
 			+ " Consider increasing 'javax.faces.FACELETS_BUFFER_SIZE' if it really needs to be handled.";
 	private static final String LOG_ERROR_PAGE_ERROR =
-		"FullAjaxExceptionHandler: An exception occurred during rendering error page '%s'."
-			+ " A hardcoded error page will be shown.";
+		"FullAjaxExceptionHandler: Well, another exception occurred during rendering error page '%s'."
+			+ " Trying to render a hardcoded error page now.";
 	private static final String ERROR_PAGE_ERROR =
 		"<?xml version='1.0' encoding='UTF-8'?><partial-response id='error'><changes><update id='javax.faces.ViewRoot'>"
-			+ "<![CDATA[<html lang='en'><head><title>Error Error</title></head><body><section><h2>Oops!</h2>"
+			+ "<![CDATA[<html lang='en'><head><title>Error in error</title></head><body><section><h2>Oops!</h2>"
 			+ "<p>A problem occurred during processing the ajax request. Subsequently, another problem occurred during"
 			+ " processing the error page which should inform you about that problem.</p><p>If you are the responsible"
 			+ " web developer, it's time to read the server logs about the bug in the error page itself.</p></section>"
@@ -180,7 +181,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 		Iterator<ExceptionQueuedEvent> unhandledExceptionQueuedEvents = getUnhandledExceptionQueuedEvents().iterator();
 
 		if (!unhandledExceptionQueuedEvents.hasNext()) {
-			return;
+			return; // There's no unhandled exception.
 		}
 
 		Throwable exception = unhandledExceptionQueuedEvents.next().getContext().getException();
@@ -210,13 +211,13 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 			logException(context, exception, errorPageLocation, LOG_RENDER_EXCEPTION_HANDLED);
 
 			// If the exception was thrown in midst of rendering the JSF response, then reset (partial) response.
-			resetResponse(externalContext);
+			resetResponse(context);
 		}
 		else {
 			logException(context, exception, errorPageLocation, LOG_RENDER_EXCEPTION_UNHANDLED);
 
 			// Mojarra doesn't close the partial response during render exception. Let do it ourselves.
-			OmniPartialViewContext.getCurrentInstance().closePartialResponse();
+			OmniPartialViewContext.getCurrentInstance(context).closePartialResponse();
 			return;
 		}
 
@@ -281,17 +282,18 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 		logger.log(Level.SEVERE, String.format(message, location), exception);
 	}
 
-	private void resetResponse(ExternalContext externalContext) {
+	private void resetResponse(FacesContext context) {
+		ExternalContext externalContext = context.getExternalContext();
 		String characterEncoding = externalContext.getResponseCharacterEncoding(); // Remember encoding.
 		externalContext.responseReset();
-		OmniPartialViewContext.getCurrentInstance().resetPartialResponse();
+		OmniPartialViewContext.getCurrentInstance(context).resetPartialResponse();
 		externalContext.setResponseCharacterEncoding(characterEncoding);
 	}
 
 	private void renderErrorPageView(FacesContext context, final HttpServletRequest request, String errorPageLocation)
 		throws IOException
 	{
-		String viewId = Faces.normalizeViewId(errorPageLocation);
+		String viewId = getViewIdAndPrepareParamsIfNecessary(context, errorPageLocation);
 		ViewHandler viewHandler = context.getApplication().getViewHandler();
 		UIViewRoot viewRoot = viewHandler.createView(context, viewId);
 		context.setViewRoot(viewRoot);
@@ -312,7 +314,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
 			if (!externalContext.isResponseCommitted()) {
 				// Okay, reset the response and tell that the error page itself contained an error.
-				resetResponse(externalContext);
+				resetResponse(context);
 				externalContext.getResponseOutputWriter().write(ERROR_PAGE_ERROR);
 				context.responseComplete();
 			}
@@ -327,6 +329,28 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 			// or "getOutputStream() has already been called for this response".
 			request.removeAttribute(ATTRIBUTE_ERROR_EXCEPTION);
 		}
+	}
+
+	private String getViewIdAndPrepareParamsIfNecessary(FacesContext context, String errorPageLocation) {
+		String[] parts = errorPageLocation.split("\\?", 2);
+
+		if (parts.length == 2) {
+//			FaceletContext faceletContext = getFaceletContext(context);
+//			final VariableMapper originalVariableMapper = faceletContext.getVariableMapper();
+//			faceletContext.setVariableMapper(new VariableMapper() {
+//				@Override
+//				public ValueExpression resolveVariable(String variable) {
+//					return originalVariableMapper.resolveVariable(variable);
+//				}
+//
+//				@Override
+//				public ValueExpression setVariable(String variable, ValueExpression expression) {
+//					return originalVariableMapper.setVariable(variable, expression);
+//				}
+//			});
+		}
+
+		return normalizeViewId(context, parts[0]);
 	}
 
 	@Override
