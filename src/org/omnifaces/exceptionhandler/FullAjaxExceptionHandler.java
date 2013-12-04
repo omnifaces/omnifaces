@@ -13,9 +13,12 @@
 package org.omnifaces.exceptionhandler;
 
 import static org.omnifaces.util.FacesLocal.normalizeViewId;
+import static org.omnifaces.util.Servlets.toParameterMap;
 
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -335,19 +338,8 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 		String[] parts = errorPageLocation.split("\\?", 2);
 
 		if (parts.length == 2) {
-//			FaceletContext faceletContext = getFaceletContext(context);
-//			final VariableMapper originalVariableMapper = faceletContext.getVariableMapper();
-//			faceletContext.setVariableMapper(new VariableMapper() {
-//				@Override
-//				public ValueExpression resolveVariable(String variable) {
-//					return originalVariableMapper.resolveVariable(variable);
-//				}
-//
-//				@Override
-//				public ValueExpression setVariable(String variable, ValueExpression expression) {
-//					return originalVariableMapper.setVariable(variable, expression);
-//				}
-//			});
+			Map<String, List<String>> params = toParameterMap(parts[1]);
+			// TODO: #287: make available via #{param(Values)}. Request wrapper needed :|
 		}
 
 		return normalizeViewId(context, parts[0]);

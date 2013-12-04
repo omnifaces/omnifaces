@@ -131,8 +131,18 @@ public final class Servlets {
 			return Collections.<String, List<String>>emptyMap();
 		}
 
+		return toParameterMap(queryString);
+	}
+
+	/**
+	 * Converts the given query string to request parameter values map.
+	 * @param queryString The query string.
+	 * @return The query string as parameter values map.
+	 * @since 1.7
+	 */
+	public static Map<String, List<String>> toParameterMap(String queryString) {
 		String[] parameters = queryString.split(quote("&"));
-		Map<String, List<String>> parameterMap = new LinkedHashMap<String, List<String>>();
+		Map<String, List<String>> parameterMap = new LinkedHashMap<String, List<String>>(parameters.length);
 
 		for (String parameter : parameters) {
 			if (parameter.contains("=")) {
@@ -142,7 +152,7 @@ public final class Servlets {
 				List<String> values = parameterMap.get(key);
 
 				if (values == null) {
-					values = new ArrayList<String>();
+					values = new ArrayList<String>(1);
 					parameterMap.put(key, values);
 				}
 
