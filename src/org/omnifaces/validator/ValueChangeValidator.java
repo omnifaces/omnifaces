@@ -37,7 +37,7 @@ import javax.faces.validator.Validator;
  * <pre>
  * public class YourValidator extends ValueChangeValidator {
  *
- *     public Object validateChangedObject(FacesContext context, UIComponent component, Object submittedValue) {
+ *     public void validateChangedObject(FacesContext context, UIComponent component, Object submittedValue) {
  *         // ...
  *     }
  *

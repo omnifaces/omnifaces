@@ -139,7 +139,6 @@ import javax.servlet.http.HttpSession;
  * </pre>
  *
  * <h3>Actual headers</h3>
- * <p>
  * <p>If the <code>expires</code> init param is set with a value which represents a time larger than 0 seconds, then the
  * following headers will be set:
  * <ul>
