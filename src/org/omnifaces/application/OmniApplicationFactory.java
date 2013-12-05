@@ -73,6 +73,10 @@ public class OmniApplicationFactory extends ApplicationFactory {
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
+	/**
+	 * If the given application not an instance of {@link OmniApplication}, nor wraps the {@link OmniApplication}, then
+	 * it will be wrapped by a new instance of {@link OmniApplication} and set as the current instance and returned.
+	 */
 	private Application createOmniApplication(Application application) {
 		while (!(application instanceof OmniApplication) && application instanceof ApplicationWrapper) {
 			application = ((ApplicationWrapper) application).getWrapped();
