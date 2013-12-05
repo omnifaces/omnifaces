@@ -35,7 +35,6 @@ import javax.faces.context.PartialViewContextWrapper;
 import org.omnifaces.config.WebXml;
 import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
 import org.omnifaces.util.Ajax;
-import org.omnifaces.util.Faces;
 import org.omnifaces.util.Hacks;
 import org.omnifaces.util.Json;
 
@@ -370,7 +369,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 			}
 		}
 
-		// Delegate actions (due to MyFaces broken ResponseWriterWrapper we can't rely on getWrapped()) ---------------
+		// Delegate actions (due to MyFaces broken PartialResponseWriter, we can't rely on getWrapped()) --------------
 
 		@Override
 		public void startError(String errorName) throws IOException {

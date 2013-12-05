@@ -42,7 +42,6 @@ public class OmniApplicationFactory extends ApplicationFactory {
 	 */
 	public OmniApplicationFactory(ApplicationFactory wrapped) {
 		this.wrapped = wrapped;
-		setApplication(wrapped.getApplication());
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -52,7 +51,7 @@ public class OmniApplicationFactory extends ApplicationFactory {
 	 */
 	@Override
 	public Application getApplication() {
-		return application;
+		return (application == null) ? createOmniApplication(wrapped.getApplication()) : application;
 	}
 
 	/**
@@ -61,8 +60,7 @@ public class OmniApplicationFactory extends ApplicationFactory {
 	 */
 	@Override
 	public synchronized void setApplication(Application application) {
-		this.application = isOmniApplicationPresent(application) ? application : new OmniApplication(application);
-		wrapped.setApplication(this.application);
+		wrapped.setApplication(createOmniApplication(application));
 	}
 
 	/**
@@ -75,12 +73,16 @@ public class OmniApplicationFactory extends ApplicationFactory {
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
-	private static boolean isOmniApplicationPresent(Application application) {
+	private Application createOmniApplication(Application application) {
 		while (!(application instanceof OmniApplication) && application instanceof ApplicationWrapper) {
 			application = ((ApplicationWrapper) application).getWrapped();
 		}
 
-		return (application instanceof OmniApplication);
+		if (!(application instanceof OmniApplication)) {
+			application =  new OmniApplication(application);
+		}
+
+		return (this.application = application);
 	}
 
 }
