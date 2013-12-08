@@ -13,6 +13,7 @@
 package org.omnifaces.config;
 
 import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.isNumber;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -99,6 +100,8 @@ public enum WebXml {
 		"auth-constraint";
 	private static final String XPATH_AUTH_CONSTRAINT_ROLE_NAME =
 		"auth-constraint/role-name";
+	private static final String XPATH_SESSION_TIMEOUT =
+		"session-config/session-timeout";
 
 	private static final String ERROR_NOT_INITIALIZED =
 		"WebXml is not initialized yet. Please use #init(ServletContext) method to manually initialize it.";
@@ -114,6 +117,7 @@ public enum WebXml {
 	private Map<Class<Throwable>, String> errorPageLocations;
 	private String formLoginPage;
 	private Map<String, Set<String>> securityConstraints;
+	private int sessionTimeout;
 
 	// Init -----------------------------------------------------------------------------------------------------------
 
@@ -140,6 +144,7 @@ public enum WebXml {
 				errorPageLocations = parseErrorPageLocations(webXml, xpath);
 				formLoginPage = parseFormLoginPage(webXml, xpath);
 				securityConstraints = parseSecurityConstraints(webXml, xpath);
+				sessionTimeout = parseSessionTimeout(webXml, xpath);
 			}
 			catch (Exception e) {
 				logger.log(Level.SEVERE, LOG_INITIALIZATION_ERROR, e);
@@ -304,6 +309,16 @@ public enum WebXml {
 		return securityConstraints;
 	}
 
+	/**
+	 * Returns the configured session timeout in minutes, or <code>-1</code> if it is not defined.
+	 * @return The configured session timeout in minutes, or <code>-1</code> if it is not defined.
+	 * @since 1.7
+	 */
+	public int getSessionTimeout() {
+		checkInitialized();
+		return sessionTimeout;
+	}
+
 	private void checkInitialized() {
 		// This init() call is performed here instead of in constructor, because WebLogic loads this enum as a CDI
 		// managed bean (in spite of having a VetoAnnotatedTypeExtension) which in turn implicitly invokes the enum
@@ -465,6 +480,14 @@ public enum WebXml {
 		}
 
 		return Collections.unmodifiableMap(securityConstraints);
+	}
+
+	/**
+	 * Return the configured session timeout in minutes, or <code>-1</code> if it is not defined.
+	 */
+	private static int parseSessionTimeout(Element webXml, XPath xpath) throws Exception {
+		String sessionTimeout = xpath.compile(XPATH_SESSION_TIMEOUT).evaluate(webXml).trim();
+		return isNumber(sessionTimeout) ? Integer.parseInt(sessionTimeout) : -1;
 	}
 
 	// Helpers of helpers (JAXP hell) ---------------------------------------------------------------------------------
