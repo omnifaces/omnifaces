@@ -156,6 +156,8 @@ if (typeof jsf !== "undefined") {
 // Global initialization for jQuery ajax API.
 if (typeof jQuery !== "undefined") {
 	jQuery(document).ajaxComplete(function(event, xhr, options) {
-		OmniFaces.FixViewState.apply(xhr.responseXML);
+		if (typeof xhr !== "undefined") {
+			OmniFaces.FixViewState.apply(xhr.responseXML);
+		}
 	});
 }
