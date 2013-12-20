@@ -92,7 +92,7 @@ public class ImportFunctions extends TagHandler {
 			}
 		}
 
-		this.type = getRequiredAttribute("type");
+		type = getRequiredAttribute("type");
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -137,7 +137,7 @@ public class ImportFunctions extends TagHandler {
 	 */
 	private static Class<?> toClass(String type) {
 		try {
-			return Class.forName(type);
+			return Class.forName(type, true, Thread.currentThread().getContextClassLoader());
 		}
 		catch (ClassNotFoundException e) {
 			throw new IllegalArgumentException(String.format(ERROR_MISSING_CLASS, type), e);

@@ -154,7 +154,7 @@ public class ImportConstants extends TagHandler {
 	 */
 	private static Class<?> toClass(String type) {
 		try {
-			return Class.forName(type);
+			return Class.forName(type, true, Thread.currentThread().getContextClassLoader());
 		}
 		catch (ClassNotFoundException e) {
 			// Perhaps it's an inner enum which is specified as com.example.SomeClass.SomeEnum.
