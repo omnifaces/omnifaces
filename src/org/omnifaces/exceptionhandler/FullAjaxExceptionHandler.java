@@ -318,6 +318,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 			if (!externalContext.isResponseCommitted()) {
 				// Okay, reset the response and tell that the error page itself contained an error.
 				resetResponse(context);
+				externalContext.setResponseContentType("text/xml");
 				externalContext.getResponseOutputWriter().write(ERROR_PAGE_ERROR);
 				context.responseComplete();
 			}
