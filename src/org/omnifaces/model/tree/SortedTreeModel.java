@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2013 OmniFaces.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,26 +12,49 @@
  */
 package org.omnifaces.model.tree;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.TreeSet;
 
 /**
- * A concrete implementation of {@link TreeModel} which holds the tree children in an {@link ArrayList}.
+ * A concrete implementation of {@link TreeModel} which holds the tree children in a {@link TreeSet}.
  *
  * @author Bauke Scholtz
  * @param <T> The type of the wrapped data of the tree node.
+ * @since 1.7
  */
-public class ListTreeModel<T> extends AbstractTreeModel<T> {
+public class SortedTreeModel<T> extends AbstractTreeModel<T> implements Comparable<T> {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = -6277872613890069786L;
+	private static final long serialVersionUID = 8694627466999765186L;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
 	protected Collection<TreeModel<T>> createChildren() {
-		return new ArrayList<TreeModel<T>>();
+		return new TreeSet<TreeModel<T>>();
+	}
+
+	/**
+	 * An override which throws {@link IllegalArgumentException} when given data is not <code>null</code> and not an
+	 * instance of {@link Comparable}.
+	 */
+	@Override
+	public TreeModel<T> addChild(T data) {
+		if (data != null && !(data instanceof Comparable)) {
+			throw new IllegalArgumentException();
+		}
+
+		return super.addChild(data);
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public int compareTo(T object) {
+		SortedTreeModel<T> other = (SortedTreeModel<T>) object;
+		return (getData() == null) ? -1
+			: (other == null || other.getData() == null) ? 1
+			: ((Comparable<T>) getData()).compareTo(other.getData());
 	}
 
 }

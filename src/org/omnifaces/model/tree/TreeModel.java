@@ -39,6 +39,8 @@ public interface TreeModel<T> extends Iterable<TreeModel<T>>, Serializable {
 	 * created and added child tree node to ease further building.
 	 * @param data The wrapped data of the child tree node to be created and added.
 	 * @return The newly created and added child tree node of the current tree node.
+	 * @throws IllegalArgumentException When the given wrapped data is not acceptable by the tree model implementation.
+	 * @throws UnsupportedOperationException When the child tree node cannot be instantiated using default constructor.
 	 */
 	TreeModel<T> addChild(T data);
 
