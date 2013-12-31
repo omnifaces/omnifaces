@@ -65,7 +65,7 @@ public class FacesViewsInitializerListener extends DefaultServletContextListener
         				if (!welcomeFile.startsWith("/")) {
         					welcomeFile = "/" + welcomeFile;
         				}
-        				mappings.add(welcomeFile + "/*");
+        				mappings.add(welcomeFile);
         			}
         		}
 
@@ -73,9 +73,7 @@ public class FacesViewsInitializerListener extends DefaultServletContextListener
         			// In order for the DO_FILTER method to work the FacesServlet, in addition the forward filter, has
         			// to be mapped on all extensionless resources.
 	        		Map<String, String> collectedViews = getApplicationAttribute(servletContext, FACES_VIEWS_RESOURCES);
-	        		for (String collectedView : filterExtension(collectedViews.keySet())) {
-	        			mappings.add(collectedView + "/*");
-	        		}
+	        		mappings.addAll(filterExtension(collectedViews.keySet()));
         		}
 
         		mapFacesServlet(servletContext, mappings);
