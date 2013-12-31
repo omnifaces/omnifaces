@@ -51,12 +51,12 @@ import org.omnifaces.filter.HttpFilter;
  * and that non-extensionless requests are handled according to a set preference.
  * <p>
  * For dispatching to the FacesServlet, 2 methods are available:
- * 
+ *
  * <ul>
  * <li> DO_FILTER (continues the filter chain but modifies request) </li>
  * <li> FORWARD (starts a new filter chain by using a Servlet requestDispatcher.forward) </li>
  * </ul>
- * 
+ *
  * <p>
  * A filter like this is needed for extensionless requests, since the FacesServlet in at least JSF 2.1 and before
  * does not take into account any other mapping than prefix- and extension (suffix) mapping.
@@ -126,7 +126,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
         				// This assumes that the FacesServlet has been mapped to something that includes the extensionless
         				// request.
         				try {
-        					request.setAttribute(FACES_VIEWS_ORIGINAL_SERVLET_PATH, request.getServletPath());
+        					request.setAttribute(FACES_VIEWS_ORIGINAL_SERVLET_PATH, resource);
         					chain.doFilter(new UriExtensionRequestWrapper(request, extension), response);
         				} finally {
         					request.removeAttribute(FACES_VIEWS_ORIGINAL_SERVLET_PATH);
@@ -145,7 +145,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
     		            }
         		}
         	}
-        } else if (resources.containsKey(resource)) {
+        } else if (resources.containsKey(resource) && request.getAttribute(FACES_VIEWS_ORIGINAL_SERVLET_PATH) == null) {
 
         	// A mapped resource request with extension is encountered, user setting
         	// determines how we handle this.
