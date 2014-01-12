@@ -8,7 +8,7 @@
 	<artifactId>omnifaces</artifactId>
 	<packaging>jar</packaging>
 	<name>Omnifaces</name>
-	<version>1.7-SNAPSHOT</version>
+	<version>1.7</version>
 	<description>JSF 2.x utility library</description>
 	<url>http://code.google.com/p/omnifaces</url>
 	<organization>

@@ -10,7 +10,7 @@
 	
 	<!-- Properties -->
 	
-	<property name="version" value="1.7-SNAPSHOT" />
+	<property name="version" value="1.7" />
 	<property name="artifactId" value="omnifaces" />
 
 	<tstamp>
@@ -20,7 +20,7 @@
 		<format property="TODAY" pattern="yyyy-MM-dd HH:mm:ss" />
 	</tstamp>
 
-	<condition property="VERSION" value="${version}-${DATE_SHORT}">
+	<condition property="VERSION" value="${version}">
 		<isset property="maven" />
 	</condition>
 	<property name="VERSION" value="${version}" />
