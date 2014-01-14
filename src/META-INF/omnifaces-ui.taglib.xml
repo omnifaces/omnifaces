@@ -1453,16 +1453,6 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-					The ordering type, available values are "lt", "lte", "gt" and "gte", defaults to "lt".
-				]]>
-			</description>
-			<name>type</name>
-			<required>false</required>
-			<type>java.lang.String</type>
-		</attribute>
-		<attribute>
-			<description>
-				<![CDATA[
 					The space separated collection of client IDs of UI input components to be validated.
 				]]>
 			</description>
