@@ -1439,14 +1439,6 @@ public final class Faces {
 		return FacesLocal.removeRequestAttribute(getContext(), name);
 	}
 
-	/**
-	 * @deprecated Use {@link FacesLocal#getRequestAttribute(FacesContext, String)} instead.
-	 */
-	@Deprecated
-	public static <T> T getRequestAttribute(final FacesContext context, final String name) {
-		return FacesLocal.getRequestAttribute(context, name);
-	}
-
 	// Flash scope ----------------------------------------------------------------------------------------------------
 
 	/**
@@ -1626,14 +1618,6 @@ public final class Faces {
 	 */
 	public static <T> T removeApplicationAttribute(String name) {
 		return FacesLocal.removeApplicationAttribute(getContext(), name);
-	}
-
-	/**
-	 * @deprecated Use {@link FacesLocal#getApplicationAttribute(FacesContext, String)} instead.
-	 */
-	@Deprecated
-	public static <T> T getApplicationAttribute(FacesContext context, String name) {
-		return FacesLocal.getApplicationAttribute(context, name);
 	}
 
 	// File download --------------------------------------------------------------------------------------------------
