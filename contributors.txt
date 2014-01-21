@@ -15,6 +15,9 @@ Oleg Varaksin
 Howard Smith
 	For consistently testing snapshots and reporting issues.
 
+Juliano Marques
+	For the work on the <o:validateMultiple> tag.
+
 And of course a general thank you to everyone who contributed by creating an issue, pointing out a defect, etc.
 
 If you think anyone else who is not in the list should be there, please create an issue for this at 
