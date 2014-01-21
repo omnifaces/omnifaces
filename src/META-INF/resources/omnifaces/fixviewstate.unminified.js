@@ -47,8 +47,8 @@ var OmniFaces = OmniFaces || {};
 OmniFaces.FixViewState = (function() {
 
 	var fixViewState = {};
-	var viewStateParam = "javax.faces.ViewState";
-	var viewStateRegex = new RegExp("^([\\w]+:)?" + viewStateParam.replace(/\./g, "\\.") + "(:[0-9]+)?$");
+	var VIEW_STATE_PARAM = "javax.faces.ViewState";
+	var VIEW_STATE_REGEX = new RegExp("^([\\w]+:)?" + VIEW_STATE_PARAM.replace(/\./g, "\\.") + "(:[0-9]+)?$");
 
 	/**
 	 * Apply the "fix view state" on the current document based on the given XML response.
@@ -58,22 +58,23 @@ OmniFaces.FixViewState = (function() {
 			return;
 		}
 
-		var viewState = getViewState(responseXML);
+		var viewStateValue = getViewStateValue(responseXML);
 
-		if (!viewState) {
+		if (!viewStateValue) {
 			return;
 		}
 
 		for (var i = 0; i < document.forms.length; i++) {
 			var form = document.forms[i];
+			var viewStateElement = getViewStateElement(form);
 
-			if (form.method == "post") {
-				if (!hasViewState(form)) {
-					createViewState(form, viewState);
-				}
+			if (form.method == "post" && !viewStateElement) {
+				// This POST form doesn't have a view state. This isn't right. Create it.
+				createViewStateElement(form, viewStateValue);
 			}
-			else { // PrimeFaces also adds them to GET forms!
-				removeViewState(form);
+			else if (form.method == "get" && viewStateElement) {
+				// PrimeFaces < 3.5.23 and < 4.0.7 also adds them to GET forms! This isn't right. Remove it.
+				viewStateElement.parentNode.removeChild(viewStateElement);
 			}
 		}
 	};
@@ -81,14 +82,12 @@ OmniFaces.FixViewState = (function() {
 	/**
 	 * Get the view state value from the given XML response.
 	 */
-	function getViewState(responseXML) {
+	function getViewStateValue(responseXML) {
 		var updates = responseXML.getElementsByTagName("update");
 
 		for (var i = 0; i < updates.length; i++) {
-			var update = updates[i];
-
-			if (viewStateRegex.exec(update.getAttribute("id"))) {
-				return update.firstChild.nodeValue;
+			if (VIEW_STATE_REGEX.exec(updates[i].getAttribute("id"))) {
+				return updates[i].firstChild.nodeValue;
 			}
 		}
 
@@ -96,48 +95,38 @@ OmniFaces.FixViewState = (function() {
 	}
 
 	/**
-	 * Returns whether the given form has already a view state hidden field.
+	 * Get the view state hidden input element from the given form.
 	 */
-	function hasViewState(form) {
-		for (var i = 0; i < form.elements.length; i++) {
-			if (form.elements[i].name == viewStateParam) {
-				return true;
+	function getViewStateElement(form) {
+		var elements = form.elements;
+
+		for (var i = 0; i < elements.length; i++) {
+			if (elements[i].name == VIEW_STATE_PARAM) {
+				return elements[i];
 			}
 		}
 
-		return false;
+		return null;
 	}
 
 	/**
-	 * Create view state hidden field and add it to given form.
+	 * Create view state hidden input element with given view state value and add it to given form.
 	 */
-	function createViewState(form, viewState) {
+	function createViewStateElement(form, viewStateValue) {
 		var hidden;
 
 		try {
-			hidden = document.createElement("<input name='" + viewStateParam + "'>"); // IE6-8.
-		} catch(e) {
+			hidden = document.createElement("<input name='" + VIEW_STATE_PARAM + "'>"); // IE6-8.
+		}
+		catch(e) {
 			hidden = document.createElement("input");
-			hidden.setAttribute("name", viewStateParam);
+			hidden.setAttribute("name", VIEW_STATE_PARAM);
 		}
 
 		hidden.setAttribute("type", "hidden");
-		hidden.setAttribute("value", viewState);
+		hidden.setAttribute("value", viewStateValue);
 		hidden.setAttribute("autocomplete", "off");
 		form.appendChild(hidden);
-	}
-
-	/**
-	 * Remove view state hidden field from given form.
-	 */
-	function removeViewState(form) {
-		for (var i = 0; i < form.elements.length; i++) {
-			var element = form.elements[i];
-
-			if (element.name == viewStateParam) {
-				element.parentNode.removeChild(element);
-			}
-		}
 	}
 	
 	return fixViewState;
