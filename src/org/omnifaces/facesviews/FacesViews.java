@@ -17,7 +17,7 @@ import static java.util.Collections.unmodifiableSet;
 import static java.util.Locale.US;
 import static java.util.regex.Pattern.quote;
 import static org.omnifaces.util.Faces.getApplicationAttribute;
-import static org.omnifaces.util.Faces.getFacesServletRegistration;
+import static org.omnifaces.util.Platform.getFacesServletRegistration;
 import static org.omnifaces.util.ResourcePaths.getExtension;
 import static org.omnifaces.util.ResourcePaths.isDirectory;
 import static org.omnifaces.util.ResourcePaths.stripExtension;

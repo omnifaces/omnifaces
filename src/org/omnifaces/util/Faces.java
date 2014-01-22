@@ -45,10 +45,8 @@ import javax.faces.event.PhaseId;
 import javax.faces.view.ViewDeclarationLanguage;
 import javax.faces.view.ViewMetadata;
 import javax.faces.view.facelets.FaceletContext;
-import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRegistration;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -1373,25 +1371,6 @@ public final class Faces {
 	 */
 	public static String getRealPath(String webContentPath) {
 		return FacesLocal.getRealPath(getContext(), webContentPath);
-	}
-
-	/**
-	 * Returns the {@link ServletRegistration} associated with the {@link FacesServlet}.
-	 * @param servletContext The context to get the ServletRegistration from.
-	 * @return ServletRegistration for FacesServlet, or <code>null</code> if the FacesServlet is not installed.
-	 * @since 1.4
-	 */
-	public static ServletRegistration getFacesServletRegistration(ServletContext servletContext) {
-		ServletRegistration facesServletRegistration = null;
-
-		for (ServletRegistration registration : servletContext.getServletRegistrations().values()) {
-			if (registration.getClassName().equals(FacesServlet.class.getName())) {
-				facesServletRegistration = registration;
-				break;
-			}
-		}
-
-		return facesServletRegistration;
 	}
 
 	// Request scope --------------------------------------------------------------------------------------------------

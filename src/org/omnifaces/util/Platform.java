@@ -21,55 +21,58 @@ import static org.omnifaces.util.Faces.setApplicationAttribute;
 
 import java.util.logging.Logger;
 
+import javax.faces.webapp.FacesServlet;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletRegistration;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
 /**
- * This class provides access to (Java EE) platform services from the view point of JSF.
+ * This class provides access to (Java EE 6) platform services from the view point of JSF.
  * <p>
  * Note that this utility class can only be used in a JSF environment and is thus not
  * a Java EE general way to obtain platform services.
- * 
+ *
  * @since 1.6
  * @author Arjan Tijms
  */
 public final class Platform {
-	
+
 	// Constants ------------------------------------------------------------------------------------------------------
-	
+
 	public static final String BEAN_VALIDATION_AVAILABLE = "org.omnifaces.BEAN_VALIDATION_AVAILABLE";
 	private static final Logger logger = Logger.getLogger(Platform.class.getName());
-	
-	
+
+
 	// Constructors ---------------------------------------------------------------------------------------------------
-	
+
 	private Platform() {
 		// Hide constructor.
 	}
-	
-	
+
+
 	// Bean Validation ------------------------------------------------------------------------------------------------
-	
+
 	public static ValidatorFactory getBeanValidatorFactory() {
-		
+
 		ValidatorFactory validatorFactory = getApplicationAttribute(VALIDATOR_FACTORY_KEY);
-		
+
 		if (validatorFactory == null) {
 			validatorFactory = buildDefaultValidatorFactory();
 			setApplicationAttribute(VALIDATOR_FACTORY_KEY, validatorFactory);
 		}
-		
+
 		return validatorFactory;
 	}
-	
+
 	public static Validator getBeanValidator() {
 		return getBeanValidatorFactory().getValidator();
 	}
-	
+
 	public static boolean isBeanValidationAvailable() {
-		
+
 		Boolean beanValidationAvailable = getApplicationAttribute(BEAN_VALIDATION_AVAILABLE);
-		
+
 		if (beanValidationAvailable == null) {
 			try {
 				Class.forName("javax.validation.Validation");
@@ -79,12 +82,30 @@ public final class Platform {
 				beanValidationAvailable = FALSE;
 				logger.warning("Bean validation not available.");
 			}
-			
+
 			setApplicationAttribute(BEAN_VALIDATION_AVAILABLE, beanValidationAvailable);
 		}
-		
+
 		return beanValidationAvailable;
 	}
-	
+
+	/**
+	 * Returns the {@link ServletRegistration} associated with the {@link FacesServlet}.
+	 * @param servletContext The context to get the ServletRegistration from.
+	 * @return ServletRegistration for FacesServlet, or <code>null</code> if the FacesServlet is not installed.
+	 * @since 1.8
+	 */
+	public static ServletRegistration getFacesServletRegistration(ServletContext servletContext) {
+		ServletRegistration facesServletRegistration = null;
+
+		for (ServletRegistration registration : servletContext.getServletRegistrations().values()) {
+			if (registration.getClassName().equals(FacesServlet.class.getName())) {
+				facesServletRegistration = registration;
+				break;
+			}
+		}
+
+		return facesServletRegistration;
+	}
 
 }
