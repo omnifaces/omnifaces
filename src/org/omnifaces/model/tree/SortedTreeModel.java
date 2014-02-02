@@ -30,14 +30,18 @@ public class SortedTreeModel<T> extends AbstractTreeModel<T> implements Comparab
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
+	/**
+	 * Returns a new {@link TreeSet}.
+	 */
 	@Override
 	protected Collection<TreeModel<T>> createChildren() {
 		return new TreeSet<TreeModel<T>>();
 	}
 
 	/**
-	 * An override which throws {@link IllegalArgumentException} when given data is not <code>null</code> and not an
-	 * instance of {@link Comparable}.
+	 * An override which throws {@link IllegalArgumentException} when given data is not <code>null</code>
+	 * <strong>and</strong> not an instance of {@link Comparable}. In other words, it only accepts <code>null</code>
+	 * or an instance of {@link Comparable}.
 	 */
 	@Override
 	public TreeModel<T> addChild(T data) {

@@ -29,6 +29,9 @@ public class ListTreeModel<T> extends AbstractTreeModel<T> {
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
+	/**
+	 * Returns a new {@link ArrayList}.
+	 */
 	@Override
 	protected Collection<TreeModel<T>> createChildren() {
 		return new ArrayList<TreeModel<T>>();
