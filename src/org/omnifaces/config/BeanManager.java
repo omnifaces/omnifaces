@@ -93,6 +93,9 @@ public enum BeanManager {
 				createCreationalContext = beanManagerClass.getMethod("createCreationalContext", contextualClass);
 				getReference = beanManagerClass.getMethod("getReference", beanClass, Type.class, creationalContextClass);
 			}
+			catch (RuntimeException e) {
+				return; // CDI most likely just not supported on this environment.
+			}
 			catch (Exception e) {
 				logger.log(Level.SEVERE, LOG_INITIALIZATION_ERROR, e);
 				throw new RuntimeException(e);
