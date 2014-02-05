@@ -65,8 +65,8 @@ public class GenericEnumConverter implements Converter {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final String ATTRIBUTE_ENUM_TYPE = "GenericEnumConverter.%s";
-	private static final String ERROR_NO_ENUM_TYPE = "Given type '%s' is not an enum.";
-	private static final String ERROR_NO_ENUM_VALUE = "Given value '%s' is not an enum of type '%s'.";
+	private static final String ERROR_NO_ENUM_TYPE = "Given type ''{0}'' is not an enum.";
+	private static final String ERROR_NO_ENUM_VALUE = "Given value ''{0}'' is not an enum of type ''{1}''.";
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -74,7 +74,7 @@ public class GenericEnumConverter implements Converter {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public String getAsString(FacesContext context, UIComponent component, Object modelValue) {
 		if (modelValue == null) {
-			return null;
+			return "-";
 		}
 
 		if (modelValue instanceof Enum) {
@@ -90,7 +90,7 @@ public class GenericEnumConverter implements Converter {
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Object getAsObject(FacesContext context, UIComponent component, String submittedValue) {
-		if (submittedValue == null) {
+		if (submittedValue == null || submittedValue.isEmpty() || submittedValue.equals("-")) {
 			return null;
 		}
 
@@ -100,7 +100,7 @@ public class GenericEnumConverter implements Converter {
 			return Enum.valueOf(enumType, submittedValue);
 		}
 		catch (IllegalArgumentException e) {
-			throw new ConverterException(Messages.createError(ERROR_NO_ENUM_VALUE, enumType));
+			throw new ConverterException(Messages.createError(ERROR_NO_ENUM_VALUE, submittedValue, enumType));
 		}
 	}
 
