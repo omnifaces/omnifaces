@@ -147,6 +147,14 @@ public class OmniMessages extends HtmlMessages {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
+	 * Returns <code>true</code>.
+	 */
+	@Override
+	public boolean getRendersChildren() {
+		return true;
+	}
+
+	/**
 	 * An override which checks if this isn't been invoked on <code>var</code> attribute.
 	 * Finally it delegates to the super method.
 	 * @throws IllegalArgumentException When this value expression is been set on <code>var</code> attribute.
