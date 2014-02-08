@@ -84,7 +84,7 @@ public class SimpleParam implements ParamHolder {
 	}
 
 	@Override
-	public String getValue() {
+	public Object getValue() {
 		FacesContext context = FacesContext.getCurrentInstance();
 
 		if (converter == null && value != null) {
@@ -98,7 +98,7 @@ public class SimpleParam implements ParamHolder {
 			return converter.getAsString(context, component, value);
 		}
 		else {
-			return (value != null) ? value.toString() : "";
+			return value;
 		}
 	}
 

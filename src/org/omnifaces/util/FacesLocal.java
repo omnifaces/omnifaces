@@ -392,7 +392,8 @@ public final class FacesLocal {
 		Map<String, List<String>> convertedParams = new HashMap<String, List<String>>();
 
 		for (ParamHolder param : params) {
-			convertedParams.put(param.getName(), Collections.singletonList(param.getValue()));
+			Object value = param.getValue();
+			convertedParams.put(param.getName(), Collections.singletonList(value != null ? value.toString() : ""));
 		}
 
 		return getBookmarkableURL(context, viewId, convertedParams, includeViewParams);

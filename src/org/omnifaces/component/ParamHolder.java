@@ -46,12 +46,11 @@ public interface ParamHolder extends ValueHolder {
 	 * Returns the converted value of the parameter. If the converter is set, or if any converter is available by
 	 * {@link Application#createConverter(Class)}, passing the value's class, then return the result of
 	 * {@link Converter#getAsString(javax.faces.context.FacesContext, javax.faces.component.UIComponent, Object)},
-	 * otherwise if the value is not <code>null</code>, then return the value's {@link Object#toString()}, else return
-	 * an empty string.
-	 * @return The converted value of the parameter, which should never be <code>null</code>.
+	 * otherwise return the original value of the parameter.
+	 * @return The converted value of the parameter, or the original value if the converter is not available.
 	 * @see Converter#getAsString(javax.faces.context.FacesContext, javax.faces.component.UIComponent, Object)
 	 */
 	@Override
-	public String getValue();
+	public Object getValue();
 
 }
