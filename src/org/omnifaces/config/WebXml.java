@@ -91,7 +91,9 @@ public enum WebXml {
 	private static final String XPATH_ERROR_PAGE_DEFAULT_LOCATION =
 		"error-page[not(error-code) and not(exception-type)]/location";
 	private static final String XPATH_FORM_LOGIN_PAGE =
-		"login-config[auth-method='FORM']/form-login-config/form-login-page";
+			"login-config[auth-method='FORM']/form-login-config/form-login-page";
+	private static final String XPATH_FORM_ERROR_PAGE =
+			"login-config[auth-method='FORM']/form-login-config/form-error-page";
 	private static final String XPATH_SECURITY_CONSTRAINT =
 		"security-constraint";
 	private static final String XPATH_WEB_RESOURCE_URL_PATTERN =
@@ -116,6 +118,7 @@ public enum WebXml {
 	private List<String> welcomeFiles;
 	private Map<Class<Throwable>, String> errorPageLocations;
 	private String formLoginPage;
+	private String formErrorPage;
 	private Map<String, Set<String>> securityConstraints;
 	private int sessionTimeout;
 
@@ -143,6 +146,7 @@ public enum WebXml {
 				welcomeFiles = parseWelcomeFiles(webXml, xpath);
 				errorPageLocations = parseErrorPageLocations(webXml, xpath);
 				formLoginPage = parseFormLoginPage(webXml, xpath);
+				formErrorPage = parseFormErrorPage(webXml, xpath);
 				securityConstraints = parseSecurityConstraints(webXml, xpath);
 				sessionTimeout = parseSessionTimeout(webXml, xpath);
 			}
@@ -297,6 +301,16 @@ public enum WebXml {
 	}
 
 	/**
+	 * Returns the location of the FORM authentication error page, or <code>null</code> if it is not defined.
+	 * @return The location of the FORM authentication error page, or <code>null</code> if it is not defined.
+	 * @since 1.8
+	 */
+	public String getFormErrorPage() {
+		checkInitialized();
+		return formErrorPage;
+	}
+
+	/**
 	 * Returns a mapping of all security constraint URL patterns and the associated roles in the declared order. If the
 	 * roles is <code>null</code>, then it means that no auth constraint is been set (i.e. the resource is publicly
 	 * accessible). If the roles is empty, then it means that an empty auth constraint is been set (i.e. the resource
@@ -446,6 +460,14 @@ public enum WebXml {
 	private static String parseFormLoginPage(Element webXml, XPath xpath) throws Exception {
 		String formLoginPage = xpath.compile(XPATH_FORM_LOGIN_PAGE).evaluate(webXml).trim();
 		return isEmpty(formLoginPage) ? null : formLoginPage;
+	}
+
+	/**
+	 * Return the location of the FORM authentication error page.
+	 */
+	private static String parseFormErrorPage(Element webXml, XPath xpath) throws Exception {
+		String formErrorPage = xpath.compile(XPATH_FORM_ERROR_PAGE).evaluate(webXml).trim();
+		return isEmpty(formErrorPage) ? null : formErrorPage;
 	}
 
 	/**
