@@ -70,17 +70,17 @@ OmniFaces.DeferredScript = (function() {
 		script.onerror = function() { if (deferredScript.error) deferredScript.error(); };
 		script.onload = script.onreadystatechange = function(_, abort) {
 			if (abort || !script.readyState || /loaded|complete/.test(script.readyState)) {
-	            script.onload = script.onreadystatechange = null; // IE memory leak fix.
+				script.onload = script.onreadystatechange = null; // IE memory leak fix.
 
-	            if (abort) {
+				if (abort) {
 					script.onerror();
 				}
 				else if (deferredScript.success) {
 					deferredScript.success();
 				}
 
-	            script = null;
-	            loadDeferredScript(index + 1); // Load next deferred script (regardless of current state).
+				script = null;
+				loadDeferredScript(index + 1); // Load next deferred script (regardless of current state).
 			}
 		};
 		head.insertBefore(script, null); // IE6 has trouble with appendChild.

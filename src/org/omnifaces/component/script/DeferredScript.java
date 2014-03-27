@@ -101,7 +101,7 @@ public class DeferredScript extends ScriptFamily {
 			writer.write(");");
 		}
 		else {
-	        writer.writeURIAttribute("src", "RES_NOT_FOUND", "src");
+			writer.writeURIAttribute("src", "RES_NOT_FOUND", "src");
 		}
 
 		writer.endElement("script");
