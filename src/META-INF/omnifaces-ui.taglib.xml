@@ -299,6 +299,97 @@
 	<tag>
 		<description>
 			<![CDATA[
+				<strong>DeferredScript</strong> is a component which defers the loading of the given script resource to the window
+				load event. In other words, the given script resource is only loaded when the window is really finished with loading.
+				So, the enduser can start working with the webpage without waiting for the additional scripts to be loaded. Usually,
+				it are those kind of scripts which are just for progressive enhancement and thus not essential for the functioning
+				of the webpage.
+				<p>
+				This will give bonus points with among others the Google PageSpeed tool, on the contrary to placing the script at
+				bottom of body, or using <code>defer="true"</code> or even <code>async="true"</code>.
+			]]>
+		</description>
+		<tag-name>deferredScript</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.script.DeferredScript</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The "library name" part of the resource identifier.
+				]]>
+			</description>
+			<name>library</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The "resource name" part of the resource identifier.
+				]]>
+			</description>
+			<name>name</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					JavaScript code to execute when the script loading is successfully completed.
+				]]>
+			</description>
+			<name>onsuccess</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					JavaScript code to execute when the script loading has failed.
+				]]>
+			</description>
+			<name>onerror</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
 				<strong><code>o:onloadScript</code></strong> is an extension to <code>&lt;h:outputScript&gt;</code> which will be executed in the
 				end of the HTML body (thus when all HTML elements are initialized in the HTML DOM tree) and will re-execute its
 				script body on every ajax request. This is particularly useful if you want to re-execute a specific helper script

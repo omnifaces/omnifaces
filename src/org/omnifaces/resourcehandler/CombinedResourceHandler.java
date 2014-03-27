@@ -153,6 +153,7 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 		"org.omnifaces.COMBINED_RESOURCE_HANDLER_INLINE_JS";
 
 	private static final String TARGET_HEAD = "head";
+	private static final String TARGET_BODY = "body";
 	private static final String ATTRIBUTE_RESOURCE_LIBRARY = "library";
 	private static final String ATTRIBUTE_RESOURCE_NAME = "name";
 
@@ -211,6 +212,18 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	public void processEvent(SystemEvent event) throws AbortProcessingException {
 		FacesContext context = FacesContext.getCurrentInstance();
 		CombinedResourceBuilder builder = new CombinedResourceBuilder();
+
+		for (UIComponent componentResource : context.getViewRoot().getComponentResources(context, TARGET_BODY)) {
+			String library = (String) componentResource.getAttributes().get(ATTRIBUTE_RESOURCE_LIBRARY);
+			String name = (String) componentResource.getAttributes().get(ATTRIBUTE_RESOURCE_NAME);
+
+//			if (name == null) {
+//				continue; // It's likely an inline script, they can't be combined as it might contain EL expressions.
+//			}
+//
+//			ResourceIdentifier resourceIdentifier = new ResourceIdentifier(library, name);
+//			builder.add(context, componentResource, componentResource.getRendererType(), resourceIdentifier);
+		}
 
 		for (UIComponent componentResource : context.getViewRoot().getComponentResources(context, TARGET_HEAD)) {
 			String library = (String) componentResource.getAttributes().get(ATTRIBUTE_RESOURCE_LIBRARY);
