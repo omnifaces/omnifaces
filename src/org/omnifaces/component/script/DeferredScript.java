@@ -12,21 +12,16 @@
  */
 package org.omnifaces.component.script;
 
-import static org.omnifaces.util.Utils.isEmpty;
-
-import java.io.IOException;
-
-import javax.faces.application.Resource;
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
-import javax.faces.context.ResponseWriter;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.ListenerFor;
 import javax.faces.event.PostAddToViewEvent;
 
+import org.omnifaces.renderer.DeferredScriptRenderer;
 import org.omnifaces.util.Hacks;
 
 /**
@@ -52,6 +47,16 @@ public class DeferredScript extends ScriptFamily {
 	/** The standard component type. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.script.DeferredScript";
 
+	// Constructors ---------------------------------------------------------------------------------------------------
+
+	/**
+	 * Construct a new {@link DeferredScript} component whereby the renderer type is set to
+	 * {@link DeferredScriptRenderer#RENDERER_TYPE}.
+	 */
+	public DeferredScript() {
+		setRendererType(DeferredScriptRenderer.RENDERER_TYPE);
+	}
+
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
@@ -67,65 +72,6 @@ public class DeferredScript extends ScriptFamily {
 				String name = (String) getAttributes().get("name");
 				Hacks.setScriptResourceRendered(context, library, name);
 			}
-		}
-	}
-
-	/**
-	 * Writes a <code>&lt;script&gt;</code> element which calls <code>OmniFaces.DeferredScript.add</code> with as
-	 * arguments the script URL and, if any, the onsuccess and/or onerror callbacks. If the script resource is not
-	 * resolvable, then a <code>RES_NOT_FOUND</code> will be written to <code>src</code> attribute instead.
-	 */
-	@Override
-	public void encodeChildren(FacesContext context) throws IOException {
-		String library = (String) getAttributes().get("library");
-		String name = (String) getAttributes().get("name");
-		Resource resource = context.getApplication().getResourceHandler().createResource(name, library);
-
-		ResponseWriter writer = context.getResponseWriter();
-		writer.startElement("script", this);
-		writer.writeAttribute("type", "text/javascript", "type");
-
-		if (resource != null) {
-			writer.write("OmniFaces.DeferredScript.add('");
-			writer.write(resource.getRequestPath());
-			writer.write('\'');
-
-			String onbegin = (String) getAttributes().get("onbegin");
-			String onsuccess = (String) getAttributes().get("onsuccess");
-			String onerror = (String) getAttributes().get("onerror");
-			boolean hasOnbegin = !isEmpty(onbegin);
-			boolean hasOnsuccess = !isEmpty(onsuccess);
-			boolean hasOnerror = !isEmpty(onerror);
-
-			if (hasOnbegin || hasOnsuccess || hasOnerror) {
-				encodeFunctionArgument(writer, onbegin, hasOnbegin);
-			}
-
-			if (hasOnsuccess || hasOnerror) {
-				encodeFunctionArgument(writer, onsuccess, hasOnsuccess);
-			}
-
-			if (hasOnerror) {
-				encodeFunctionArgument(writer, onerror, true);
-			}
-
-			writer.write(");");
-		}
-		else {
-			writer.writeURIAttribute("src", "RES_NOT_FOUND", "src");
-		}
-
-		writer.endElement("script");
-	}
-
-	private void encodeFunctionArgument(ResponseWriter writer, String function, boolean hasFunction) throws IOException {
-		if (hasFunction) {
-			writer.write(",function() {");
-			writer.write(function);
-			writer.write('}');
-		}
-		else {
-			writer.write(",null");
 		}
 	}
 
