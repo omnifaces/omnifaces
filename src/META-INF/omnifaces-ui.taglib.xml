@@ -368,6 +368,16 @@
 		<attribute>
 			<description>
 				<![CDATA[
+					JavaScript code to execute right before the script loading begins.
+				]]>
+			</description>
+			<name>onbegin</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
 					JavaScript code to execute when the script loading is successfully completed.
 				]]>
 			</description>

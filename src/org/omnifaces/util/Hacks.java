@@ -12,6 +12,9 @@
  */
 package org.omnifaces.util;
 
+import static org.omnifaces.util.FacesLocal.getContextAttribute;
+import static org.omnifaces.util.FacesLocal.setContextAttribute;
+
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -22,8 +25,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.el.ELContext;
@@ -64,10 +69,14 @@ public final class Hacks {
 	private static final String JUEL_MINIMUM_METHOD_EXPRESSION_VERSION =
 		"2.2.6";
 
+	private static final boolean MYFACES_USED = initMyFacesUsed();
+	private static final String MYFACES_PACKAGE_PREFIX = "org.apache.myfaces.";
+	private static final String MYFACES_RENDERED_SCRIPT_RESOURCES_KEY =
+		"org.apache.myfaces.RENDERED_SCRIPT_RESOURCES_SET";
 	private static final Set<String> MOJARRA_MYFACES_RESOURCE_DEPENDENCY_KEYS =
 		Utils.unmodifiableSet(
 			"com.sun.faces.PROCESSED_RESOURCE_DEPENDENCIES",
-			"org.apache.myfaces.RENDERED_SCRIPT_RESOURCES_SET",
+			MYFACES_RENDERED_SCRIPT_RESOURCES_KEY,
 			"org.apache.myfaces.RENDERED_STYLESHEET_RESOURCES_SET");
 
 	private static final String ERROR_CREATE_INSTANCE =
@@ -93,6 +102,10 @@ public final class Hacks {
 		catch (ClassNotFoundException ignore) {
 			return false;
 		}
+	}
+
+	private static boolean initMyFacesUsed() {
+		return FacesContext.getCurrentInstance().getClass().getPackage().getName().startsWith(MYFACES_PACKAGE_PREFIX);
 	}
 
 	private static boolean initJUELSupportsMethodExpression() {
@@ -354,6 +367,60 @@ public final class Hacks {
 	}
 
 	/**
+	 * Returns true if MyFaces is used. That is, when the FacesContext instance is from the MyFaces specific package.
+	 * @return Whether MyFaces is used.
+	 * @since 1.8
+	 */
+	public static boolean isMyFacesUsed() {
+		return MYFACES_USED;
+	}
+
+	/**
+	 * Set the given script resource as rendered.
+	 * @param context The involved faces context.
+	 * @param library The resource library.
+	 * @param name The resource name.
+	 */
+	public static void setScriptResourceRendered(FacesContext context, String library, String name) {
+		context.getAttributes().put(name + library, true);
+
+		if (MYFACES_USED) {
+			String key = (library != null) ? (library + '/' + name) : name;
+			getMyFacesRenderedScriptResources(context).put(key, true);
+		}
+	}
+
+	/**
+	 * Returns whether the given script resource is rendered.
+	 * @param context The involved faces context.
+	 * @param library The resource library.
+	 * @param name The resource name.
+	 * @return Whether the given script resource is rendered.
+	 */
+	public static boolean isScriptResourceRendered(FacesContext context, String library, String name) {
+		boolean rendered = context.getAttributes().containsKey(name + library);
+
+		if (!rendered && MYFACES_USED) {
+			String key = (library != null) ? (library + '/' + name) : name;
+			return getMyFacesRenderedScriptResources(context).containsKey(key);
+		}
+		else {
+			return rendered;
+		}
+	}
+
+	private static Map<String, Boolean> getMyFacesRenderedScriptResources(FacesContext context) {
+		Map<String, Boolean> map = getContextAttribute(context, MYFACES_RENDERED_SCRIPT_RESOURCES_KEY);
+
+		if (map == null) {
+			map = new HashMap<String, Boolean>();
+			setContextAttribute(context, MYFACES_RENDERED_SCRIPT_RESOURCES_KEY, map);
+		}
+
+		return map;
+	}
+
+	/**
 	 * Remove the resource dependency processing related attributes from the given faces context.
 	 * @param context The involved faces context.
 	 */
@@ -361,7 +428,7 @@ public final class Hacks {
 		// Mojarra and MyFaces remembers processed resource dependencies in a map.
 		context.getAttributes().keySet().removeAll(MOJARRA_MYFACES_RESOURCE_DEPENDENCY_KEYS);
 
-		// PrimeFaces puts "namelibrary=true" for every processed resource dependency.
+		// Mojarra and PrimeFaces puts "namelibrary=true" for every processed resource dependency.
 		// TODO: This may possibly conflict with other keys with value=true. So far tested, this is harmless.
 		context.getAttributes().values().removeAll(Collections.singleton(true));
 	}

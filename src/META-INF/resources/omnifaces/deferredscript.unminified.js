@@ -25,7 +25,7 @@ OmniFaces.DeferredScript = (function() {
 	var deferredScripts = [];
 	var loading = false;
 
-	deferredScript.add = function(url, success, error) {
+	deferredScript.add = function(url, begin, success, error) {
 		if (loading) {
 			return; // Sorry, too late to accept more.
 		}
@@ -37,7 +37,7 @@ OmniFaces.DeferredScript = (function() {
 			});
 		}
 
-		deferredScripts.push({ url: url, success: success, error: error });
+		deferredScripts.push({ url: url, begin: begin, success: success, error: error });
 	}
 
 	function addOnloadListener(listener) {
@@ -83,6 +83,11 @@ OmniFaces.DeferredScript = (function() {
 				loadDeferredScript(index + 1); // Load next deferred script (regardless of current state).
 			}
 		};
+
+		if (deferredScript.begin) {
+			deferredScript.begin();
+		}
+
 		head.insertBefore(script, null); // IE6 has trouble with appendChild.
 	}
 

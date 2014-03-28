@@ -27,6 +27,8 @@ import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.ListenerFor;
 import javax.faces.event.PostAddToViewEvent;
 
+import org.omnifaces.util.Hacks;
+
 /**
  * <strong>DeferredScript</strong> is a component which defers the loading of the given script resource to the window
  * load event. In other words, the given script resource is only loaded when the window is really finished with loading.
@@ -61,6 +63,9 @@ public class DeferredScript extends ScriptFamily {
 
 			if (!ajaxRequest || !view.getComponentResources(context, "body").contains(this)) {
 				view.addComponentResource(context, this, "body");
+				String library = (String) getAttributes().get("library");
+				String name = (String) getAttributes().get("name");
+				Hacks.setScriptResourceRendered(context, library, name);
 			}
 		}
 	}
@@ -72,8 +77,8 @@ public class DeferredScript extends ScriptFamily {
 	 */
 	@Override
 	public void encodeChildren(FacesContext context) throws IOException {
-		String name = (String) getAttributes().get("name");
 		String library = (String) getAttributes().get("library");
+		String name = (String) getAttributes().get("name");
 		Resource resource = context.getApplication().getResourceHandler().createResource(name, library);
 
 		ResponseWriter writer = context.getResponseWriter();
@@ -85,10 +90,16 @@ public class DeferredScript extends ScriptFamily {
 			writer.write(resource.getRequestPath());
 			writer.write('\'');
 
+			String onbegin = (String) getAttributes().get("onbegin");
 			String onsuccess = (String) getAttributes().get("onsuccess");
 			String onerror = (String) getAttributes().get("onerror");
+			boolean hasOnbegin = !isEmpty(onbegin);
 			boolean hasOnsuccess = !isEmpty(onsuccess);
 			boolean hasOnerror = !isEmpty(onerror);
+
+			if (hasOnbegin || hasOnsuccess || hasOnerror) {
+				encodeFunctionArgument(writer, onbegin, hasOnbegin);
+			}
 
 			if (hasOnsuccess || hasOnerror) {
 				encodeFunctionArgument(writer, onsuccess, hasOnsuccess);
