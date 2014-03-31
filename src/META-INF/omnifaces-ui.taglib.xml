@@ -368,6 +368,18 @@
 		<attribute>
 			<description>
 				<![CDATA[
+					The group name on which the deferred script resources should be combined by CombinedResourceHandler. 
+					All deferred scripts resources having the same combined group name will be combined into a single 
+					deferred script in the place where the first member of the group occurs in the component tree.
+				]]>
+			</description>
+			<name>group</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
 					JavaScript code to execute right before the script loading begins.
 				]]>
 			</description>

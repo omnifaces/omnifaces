@@ -12,6 +12,10 @@
  */
 package org.omnifaces.resourcehandler;
 
+import java.util.Map;
+
+import javax.faces.component.UIComponent;
+
 /**
  * Convenience class to represent a resource identifier.
  *
@@ -33,8 +37,18 @@ public class ResourceIdentifier {
 	 */
 	public ResourceIdentifier(String resourceIdentifier) {
 		String[] parts = resourceIdentifier.split(":");
-		this.library = (parts.length > 1) ? parts[0] : null;
-		this.name = parts[parts.length -1 ];
+		library = (parts.length > 1) ? parts[0] : null;
+		name = parts[parts.length -1 ];
+	}
+
+	/**
+	 * Create a new instance based on library and name attributes of the given component resource.
+	 * @param componentResource The component resource.
+	 */
+	public ResourceIdentifier(UIComponent componentResource) {
+		Map<String, Object> attributes = componentResource.getAttributes();
+		library = (String) attributes.get("library");
+		name = (String) attributes.get("name");
 	}
 
 	/**
