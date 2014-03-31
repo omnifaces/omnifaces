@@ -47,8 +47,8 @@ public class DeferredScriptRenderer extends Renderer {
 
 	/**
 	 * Writes a <code>&lt;script&gt;</code> element which calls <code>OmniFaces.DeferredScript.add</code> with as
-	 * arguments the script URL and, if any, the onsuccess and/or onerror callbacks. If the script resource is not
-	 * resolvable, then a <code>RES_NOT_FOUND</code> will be written to <code>src</code> attribute instead.
+	 * arguments the script URL and, if any, the onbegin, onsuccess and/or onerror callbacks. If the script resource is
+	 * not resolvable, then a <code>RES_NOT_FOUND</code> will be written to <code>src</code> attribute instead.
 	 */
 	@Override
 	public void encodeChildren(FacesContext context, UIComponent component) throws IOException {
