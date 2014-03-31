@@ -440,7 +440,7 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 			String library = resourceIdentifier.getLibrary();
 			String name = resourceIdentifier.getName();
 
-			if (!componentResource.isRendered() // Component resource has rendered="false".
+			if ((componentResource != null && !componentResource.isRendered()) // Component resource has rendered="false".
 				|| (!(componentResource instanceof DeferredScript) // It already calls setScriptResourceRendered.
 					&& Hacks.isScriptResourceRendered(context, library, name))) { // Apparently auto-added by a lib.
 				Hacks.setScriptResourceRendered(context, library, name); // Prevents future forced additions by libs.
