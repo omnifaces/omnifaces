@@ -12,8 +12,6 @@
  */
 package org.omnifaces.resourcehandler;
 
-import static org.omnifaces.util.Hacks.isScriptResourceRendered;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -439,8 +437,13 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 		}
 
 		private void add(FacesContext context, UIComponent componentResource, ResourceIdentifier resourceIdentifier) {
-			if (!(componentResource instanceof DeferredScript)
-				&& isScriptResourceRendered(context, resourceIdentifier.getLibrary(), resourceIdentifier.getName())) {
+			String library = resourceIdentifier.getLibrary();
+			String name = resourceIdentifier.getName();
+
+			if (!componentResource.isRendered() // Component resource has rendered="false".
+				|| (!(componentResource instanceof DeferredScript) // It already calls setScriptResourceRendered.
+					&& Hacks.isScriptResourceRendered(context, library, name))) { // Apparently auto-added by a lib.
+				Hacks.setScriptResourceRendered(context, library, name); // Prevents future forced additions by libs.
 				componentResourcesToRemove.add(componentResource); // Prevents duplicate rendering.
 			}
 			else if (excludedResources.isEmpty() || !excludedResources.contains(resourceIdentifier)) {
