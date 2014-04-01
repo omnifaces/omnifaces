@@ -12,6 +12,7 @@
  */
 package org.omnifaces.resourcehandler;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -32,6 +33,10 @@ import org.omnifaces.util.Utils;
  * @author Bauke Scholtz
  */
 final class CombinedResourceInputStream extends InputStream {
+
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final byte[] CRLF = { '\r', '\n' };
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -54,6 +59,7 @@ final class CombinedResourceInputStream extends InputStream {
 			streams.add(!Hacks.isRichFacesResourceOptimizationEnabled()
 				? resource.getInputStream()
 				: new URL(Faces.getRequestDomainURL() + resource.getRequestPath()).openStream());
+			streams.add(new ByteArrayInputStream(CRLF));
 		}
 
 		streamIterator = streams.iterator();
