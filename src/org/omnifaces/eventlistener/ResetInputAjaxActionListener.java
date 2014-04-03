@@ -166,7 +166,7 @@ public class ResetInputAjaxActionListener extends DefaultPhaseListener implement
 			Collection<String> renderIds = getRenderIds(partialViewContext);
 			Collection<String> executeIds = partialViewContext.getExecuteIds();
 
-			if (!renderIds.isEmpty() && !renderIds.containsAll(executeIds)) {
+			if (!renderIds.isEmpty() && !executeIds.containsAll(renderIds)) {
 				resetEditableValueHolders(VisitContext.createVisitContext(
 					context, renderIds, VISIT_HINTS), context.getViewRoot(), executeIds);
 			}
