@@ -43,7 +43,8 @@ import org.omnifaces.util.Utils;
  *            |    `-- background.png
  *            `-- style.css
  * </pre>
- * <p>And the following CSS file reference:
+ * <p>And the following CSS file reference (note: resource libraries are <strong>not</strong> supported by the
+ * <code>UnmappedResourceHandler</code>! this is a technical limitation):
  * <pre>
  * &lt;h:outputStylesheet name="css/style.css" /&gt;
  * </pre>
