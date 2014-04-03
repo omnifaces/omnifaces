@@ -339,6 +339,19 @@ public final class Faces {
 	public static String getViewId() {
 		return FacesLocal.getViewId(getContext());
 	}
+	
+	/**
+	 * Returns the {@link ViewDeclarationLanguage} associated with the "current" view ID.
+	 * <p>
+	 * The current view ID is the view ID that's set for the view root that's associated with
+	 * the current faces context.
+	 * 
+	 * @return The {@link ViewDeclarationLanguage} associated with the "current" view ID.
+	 * @since 1.8
+	 */
+	public static ViewDeclarationLanguage getViewDeclarationLanguage() {
+		return FacesLocal.getViewDeclarationLanguage(getContext());
+	}
 
 	/**
 	 * Normalize the given path as a valid view ID based on the current mapping, if necessary.
