@@ -297,7 +297,7 @@ public final class Components {
 	}
 
 	/**
-	 * Create and include the composite component of the given library ane resource name as child of the given UI
+	 * Create and include the composite component of the given library and resource name as child of the given UI
 	 * component parent and return the created composite component.
 	 * This has the same effect as using <code>&lt;my:resourceName&gt;</code>. The given component ID must be unique
 	 * relative to the current naming container parent and is mandatory for functioning of input components inside the
