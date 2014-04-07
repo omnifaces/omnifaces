@@ -151,6 +151,7 @@ public enum WebXml {
 				sessionTimeout = parseSessionTimeout(webXml, xpath);
 			}
 			catch (Exception e) {
+				initialized.set(false);
 				logger.log(Level.SEVERE, LOG_INITIALIZATION_ERROR, e);
 				throw new RuntimeException(e);
 			}

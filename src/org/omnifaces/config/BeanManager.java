@@ -97,6 +97,7 @@ public enum BeanManager {
 				return; // CDI most likely just not supported on this environment.
 			}
 			catch (Exception e) {
+				initialized.set(false);
 				logger.log(Level.SEVERE, LOG_INITIALIZATION_ERROR, e);
 				throw new RuntimeException(e);
 			}
