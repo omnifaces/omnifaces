@@ -187,7 +187,7 @@ public final class FacesLocal {
                 	  .getViewHandler()
                 	  .getViewDeclarationLanguage(context, context.getViewRoot().getViewId());
 	}
-	
+
 	/**
 	 * @see Faces#normalizeViewId(String)
 	 */
@@ -775,16 +775,38 @@ public final class FacesLocal {
 	}
 
 	/**
+	 * @see Faces#addResponseCookie(String, String, int)
+	 */
+	public static void addResponseCookie(FacesContext context, String name, String value, int maxAge) {
+		addResponseCookie(context, name, value, null, null, maxAge);
+	}
+
+	/**
 	 * @see Faces#addResponseCookie(String, String, String, int)
 	 */
 	public static void addResponseCookie(FacesContext context, String name, String value, String path, int maxAge) {
+		addResponseCookie(context, name, value, null, path, maxAge);
+	}
+
+	/**
+	 * @see Faces#addResponseCookie(String, String, String, String, int)
+	 */
+	public static void addResponseCookie(FacesContext context, String name, String value, String domain, String path, int maxAge) {
 		if (value != null) {
 			value = Utils.encodeURL(value);
 		}
 
 		ExternalContext externalContext = context.getExternalContext();
 		Map<String, Object> properties = new HashMap<String, Object>();
-		properties.put("path", path);
+
+		if (domain != null) {
+			properties.put("domain", domain);
+		}
+
+		if (path != null) {
+			properties.put("path", path);
+		}
+
 		properties.put("maxAge", maxAge);
 		properties.put("secure", ((HttpServletRequest) externalContext.getRequest()).isSecure());
 		externalContext.addResponseCookie(name, value, properties);

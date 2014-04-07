@@ -339,13 +339,13 @@ public final class Faces {
 	public static String getViewId() {
 		return FacesLocal.getViewId(getContext());
 	}
-	
+
 	/**
 	 * Returns the {@link ViewDeclarationLanguage} associated with the "current" view ID.
 	 * <p>
 	 * The current view ID is the view ID that's set for the view root that's associated with
 	 * the current faces context.
-	 * 
+	 *
 	 * @return The {@link ViewDeclarationLanguage} associated with the "current" view ID.
 	 * @since 1.8
 	 */
@@ -1120,9 +1120,29 @@ public final class Faces {
 	}
 
 	/**
+	 * Add a cookie with given name, value and maxage to the HTTP response. The cookie value will implicitly be
+	 * URL-encoded with UTF-8 so that any special characters can be stored in the cookie. The cookie will implicitly
+	 * be set to secure when the current request is secure (i.e. when the current request is a HTTPS request). The
+	 * cookie will implicitly be set in the domain and path of the current request URL.
+	 * @param name The cookie name.
+	 * @param value The cookie value.
+	 * @param maxAge The maximum age of the cookie, in seconds. If this is <code>0</code>, then the cookie will be
+	 * removed. Note that the name and path must be exactly the same as it was when the cookie was created. If this is
+	 * <code>-1</code> then the cookie will become a session cookie and thus live as long as the established HTTP
+	 * session.
+	 * @throws UnsupportedOperationException If UTF-8 is not supported on this machine.
+	 * @see ExternalContext#addResponseCookie(String, String, Map)
+	 * @since 1.8
+	 */
+	public static void addResponseCookie(String name, String value, int maxAge) {
+		FacesLocal.addResponseCookie(getContext(), name, value, maxAge);
+	}
+
+	/**
 	 * Add a cookie with given name, value, path and maxage to the HTTP response. The cookie value will implicitly be
 	 * URL-encoded with UTF-8 so that any special characters can be stored in the cookie. The cookie will implicitly
-	 * be set to secure when the current request is secure (i.e. when the current request is a HTTPS request).
+	 * be set to secure when the current request is secure (i.e. when the current request is a HTTPS request). The
+	 * cookie will implicitly be set in the domain of the current request URL.
 	 * @param name The cookie name.
 	 * @param value The cookie value.
 	 * @param path The cookie path. If this is <code>/</code>, then the cookie is available in all pages of the webapp.
@@ -1136,6 +1156,28 @@ public final class Faces {
 	 */
 	public static void addResponseCookie(String name, String value, String path, int maxAge) {
 		FacesLocal.addResponseCookie(getContext(), name, value, path, maxAge);
+	}
+
+	/**
+	 * Add a cookie with given name, value, domain, path and maxage to the HTTP response. The cookie value will
+	 * implicitly be URL-encoded with UTF-8 so that any special characters can be stored in the cookie. The cookie will
+	 * implicitly be set to secure when the current request is secure (i.e. when the current request is a HTTPS request).
+	 * @param name The cookie name.
+	 * @param value The cookie value.
+	 * @param domain The cookie domain. You can use <code>.example.com</code> (with a leading period) if you'd like the
+	 * cookie to be available to all subdomains of the domain. Note that you cannot set it to a different domain.
+	 * @param path The cookie path. If this is <code>/</code>, then the cookie is available in all pages of the webapp.
+	 * If this is <code>/somespecificpath</code>, then the cookie is only available in pages under the specified path.
+	 * @param maxAge The maximum age of the cookie, in seconds. If this is <code>0</code>, then the cookie will be
+	 * removed. Note that the name and path must be exactly the same as it was when the cookie was created. If this is
+	 * <code>-1</code> then the cookie will become a session cookie and thus live as long as the established HTTP
+	 * session.
+	 * @throws UnsupportedOperationException If UTF-8 is not supported on this machine.
+	 * @see ExternalContext#addResponseCookie(String, String, Map)
+	 * @since 1.8
+	 */
+	public static void addResponseCookie(String name, String value, String domain, String path, int maxAge) {
+		FacesLocal.addResponseCookie(getContext(), name, value, domain, path, maxAge);
 	}
 
 	/**
