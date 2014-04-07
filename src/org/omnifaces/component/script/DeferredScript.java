@@ -16,6 +16,7 @@ import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
+import javax.faces.context.PartialViewContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.ListenerFor;
@@ -63,10 +64,13 @@ public class DeferredScript extends ScriptFamily {
 	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
 		if (event instanceof PostAddToViewEvent) {
 			FacesContext context = FacesContext.getCurrentInstance();
+			PartialViewContext ajaxContext = context.getPartialViewContext();
 			UIViewRoot view = context.getViewRoot();
-			boolean ajaxRequest = context.getPartialViewContext().isAjaxRequest();
 
-			if (!ajaxRequest || !view.getComponentResources(context, "body").contains(this)) {
+			boolean ajaxRequest = ajaxContext.isAjaxRequest();
+			boolean ajaxRenderAll = ajaxContext.isRenderAll();
+
+			if (!(ajaxRequest && !ajaxRenderAll) || !view.getComponentResources(context, "body").contains(this)) {
 				view.addComponentResource(context, this, "body");
 				String library = (String) getAttributes().get("library");
 				String name = (String) getAttributes().get("name");

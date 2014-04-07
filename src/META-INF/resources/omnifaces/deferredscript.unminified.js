@@ -23,16 +23,10 @@ OmniFaces.DeferredScript = (function() {
 
 	var deferredScript = {};
 	var deferredScripts = [];
-	var loading = false;
 
 	deferredScript.add = function(url, begin, success, error) {
-		if (loading) {
-			return; // Sorry, too late to accept more.
-		}
-
 		if (!deferredScripts.length) {
 			addOnloadListener(function() {
-				loading = true;
 				loadDeferredScript(0);
 			});
 		}
@@ -41,7 +35,10 @@ OmniFaces.DeferredScript = (function() {
 	}
 
 	function addOnloadListener(listener) {
-		if (window.addEventListener) {
+		if (document.readyState === "complete") {
+			setTimeout(listener);
+		}
+		else if (window.addEventListener) {
 			window.addEventListener("load", listener, false);
 		}
 		else if (window.attachEvent) {
@@ -67,7 +64,11 @@ OmniFaces.DeferredScript = (function() {
 
 		script.async = true;
 		script.src = deferredScript.url;
-		script.onerror = function() { if (deferredScript.error) deferredScript.error(); };
+		script.onerror = function() {
+			if (deferredScript.error) {
+				deferredScript.error();
+			}
+		};
 		script.onload = script.onreadystatechange = function(_, abort) {
 			if (abort || !script.readyState || /loaded|complete/.test(script.readyState)) {
 				script.onload = script.onreadystatechange = null; // IE memory leak fix.
