@@ -25,6 +25,7 @@ import javax.faces.webapp.FacesServlet;
 import javax.servlet.http.HttpServletResponse;
 
 import org.omnifaces.util.Faces;
+import org.omnifaces.util.Hacks;
 import org.omnifaces.util.Utils;
 
 /**
@@ -194,6 +195,11 @@ public class UnmappedResourceHandler extends ResourceHandlerWrapper {
 
 	@Override
 	public void handleResourceRequest(FacesContext context) throws IOException {
+		if (Hacks.isPrimeFacesDynamicResourceRequest(context)) {
+			super.handleResourceRequest(context);
+			return;
+		}
+
 		ExternalContext externalContext = context.getExternalContext();
 		String resourceName = externalContext.getRequestPathInfo();
 		String libraryName = externalContext.getRequestParameterMap().get("ln");

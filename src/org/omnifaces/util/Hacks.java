@@ -380,6 +380,7 @@ public final class Hacks {
 	 * @param context The involved faces context.
 	 * @param library The resource library.
 	 * @param name The resource name.
+	 * @since 1.8
 	 */
 	public static void setScriptResourceRendered(FacesContext context, String library, String name) {
 		context.getAttributes().put(name + library, true);
@@ -396,6 +397,7 @@ public final class Hacks {
 	 * @param library The resource library.
 	 * @param name The resource name.
 	 * @return Whether the given script resource is rendered.
+	 * @since 1.8
 	 */
 	public static boolean isScriptResourceRendered(FacesContext context, String library, String name) {
 		boolean rendered = context.getAttributes().containsKey(name + library);
@@ -431,6 +433,17 @@ public final class Hacks {
 		// Mojarra and PrimeFaces puts "namelibrary=true" for every processed resource dependency.
 		// TODO: This may possibly conflict with other keys with value=true. So far tested, this is harmless.
 		context.getAttributes().values().removeAll(Collections.singleton(true));
+	}
+
+	/**
+	 * Returns true if the current request is a PrimeFaces dynamic resource request.
+	 * @param context The involved faces context.
+	 * @return Whether the current request is a PrimeFaces dynamic resource request.
+	 * @since 1.8
+	 */
+	public static boolean isPrimeFacesDynamicResourceRequest(FacesContext context) {
+		Map<String, String> params = context.getExternalContext().getRequestParameterMap();
+		return "primefaces".equals(params.get("ln")) && params.get("pfdrid") != null;
 	}
 
 	// Some reflection helpers ----------------------------------------------------------------------------------------
