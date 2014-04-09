@@ -92,7 +92,7 @@ public class ConditionalComment extends OutputFamily {
 
 		ResponseWriter writer = context.getResponseWriter();
 		writer.write("<!--[if ");
-		writer.writeText(_if, this, "if");
+		writer.write(_if);
 		writer.write("]>");
 		super.encodeChildren(context);
 		writer.write("<![endif]-->");
