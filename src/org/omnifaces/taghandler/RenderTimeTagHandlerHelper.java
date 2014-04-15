@@ -12,6 +12,8 @@
  */
 package org.omnifaces.taghandler;
 
+import org.omnifaces.util.FacesLocal;
+
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
@@ -239,7 +241,7 @@ final class RenderTimeTagHandlerHelper {
 		@Override
 		public void applyAttachedObject(FacesContext context, UIComponent parent) {
 			try {
-				tag.apply((FaceletContext) context.getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY), parent);
+                tag.apply(FacesLocal.getFaceletContext(context), parent);
 			}
 			catch (IOException e) {
 				throw new FacesException(e);

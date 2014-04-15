@@ -81,6 +81,10 @@ public final class FacesLocal {
 	private static final int DEFAULT_SENDFILE_BUFFER_SIZE = 10240;
 	private static final String ERROR_NO_VIEW = "There is no view.";
 
+    //to ensure compatibility between jsf 2.1 and >
+    private static final String JSF_2_1_FACELET_CONTEXT_KEY = "com.sun.faces.facelets.FACELET_CONTEXT";
+    private static final String JSF_2_2_FACELET_CONTEXT_KEY = "javax.faces.FACELET_CONTEXT";
+
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	private FacesLocal() {
@@ -414,7 +418,15 @@ public final class FacesLocal {
 	 * @see Faces#getFaceletContext()
 	 */
 	public static FaceletContext getFaceletContext(FacesContext context) {
-	    return (FaceletContext) context.getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
+        Object facelets = context.getAttributes().get(FaceletContext.FACELET_CONTEXT_KEY);
+        if (facelets == null) {
+            facelets = context.getAttributes().get(JSF_2_1_FACELET_CONTEXT_KEY);
+        }
+        if (facelets == null) {
+            facelets = context.getAttributes().get(JSF_2_2_FACELET_CONTEXT_KEY);
+        }
+
+        return (FaceletContext) facelets;
 	}
 
 	/**
