@@ -84,6 +84,8 @@ public class ViewParam extends UIViewParameter {
 		if (attributeInterceptMap == null) {
 			attributeInterceptMap = new MapWrapper<String, Object>(super.getAttributes()) {
 
+				private static final long serialVersionUID = -7674000948288609007L;
+
 				@Override
 				public Object get(Object key) {
 					if ("label".equals(key)) {

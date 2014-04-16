@@ -195,6 +195,8 @@ public class ImportConstants extends TagHandler {
 	 */
 	private static class ConstantsMap extends MapWrapper<String, Object> {
 
+		private static final long serialVersionUID = -7699617036767530156L;
+
 		private String type;
 
 		public ConstantsMap(Map<String, Object> map, String type) {

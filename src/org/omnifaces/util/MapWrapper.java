@@ -12,6 +12,7 @@
  */
 package org.omnifaces.util;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -25,7 +26,9 @@ import java.util.Set;
  *
  * @author Arjan Tijms
  */
-public class MapWrapper<K, V> implements Map<K, V> {
+public class MapWrapper<K, V> implements Map<K, V>, Serializable {
+
+	private static final long serialVersionUID = -4057606871241504872L;
 
 	private Map<K, V> map;
 
