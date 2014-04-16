@@ -93,6 +93,23 @@ public final class Components {
 		return (T) component.getAttributes().get(name);
 	}
 
+	/**
+	 * Returns whether the given UI component and all of its parents is rendered. This thus not only checks the
+	 * component's own <code>rendered</code> attribute, but also of all of its parents.
+	 * @param component The component to be checked.
+	 * @return <code>true</code> if the given UI component and all of its parents is rendered.
+	 * @since 1.8
+	 */
+	public static boolean isRendered(UIComponent component) {
+		for (UIComponent current = component; current.getParent() != null; current = current.getParent()) {
+			if (!current.isRendered()) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	// Traversal ------------------------------------------------------------------------------------------------------
 
 	/**
