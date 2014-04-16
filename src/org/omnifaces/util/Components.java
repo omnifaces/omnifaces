@@ -313,7 +313,7 @@ public final class Components {
 	public static UIComponent includeCompositeComponent(UIComponent parent, String libraryName, String resourceName, String id) {
 		FacesContext context = Faces.getContext();
 		Application application = context.getApplication();
-		FaceletContext faceletContext = Faces.getFaceletContext();
+		FaceletContext faceletContext = FacesLocal.getFaceletContext(context);
 
 		// This basically creates <ui:component> based on <composite:interface>.
 		Resource resource = application.getResourceHandler().createResource(resourceName, libraryName);
