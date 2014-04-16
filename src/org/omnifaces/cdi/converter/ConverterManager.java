@@ -87,6 +87,10 @@ public class ConverterManager implements ConverterProvider {
 
 			if (converter != null) {
 				bean = (Bean<Converter>) resolve(manager, converter.getClass());
+
+				if (bean != null && bean.getBeanClass() != converter.getClass()) {
+					bean = null;
+				}
 			}
 
 			convertersByForClass.put(converterForClass, bean);
