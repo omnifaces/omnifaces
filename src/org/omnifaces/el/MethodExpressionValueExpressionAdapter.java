@@ -13,6 +13,7 @@
 package org.omnifaces.el;
 
 import java.lang.reflect.Method;
+import java.util.Set;
 
 import javax.el.ELContext;
 import javax.el.ELException;
@@ -22,6 +23,10 @@ import javax.el.MethodInfo;
 import javax.el.MethodNotFoundException;
 import javax.el.PropertyNotFoundException;
 import javax.el.ValueExpression;
+import javax.faces.convert.ConverterException;
+import javax.faces.validator.ValidatorException;
+
+import org.omnifaces.util.Utils;
 
 /**
  * This MethodExpression wraps a ValueExpression.
@@ -36,6 +41,11 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 
 	private static final long serialVersionUID = 1L;
 
+	private static final Set<RuntimeException> EXCEPTIONS_TO_UNWRAP = Utils.unmodifiableSet(
+		MethodNotFoundException.class, // Needed for proper action listener error handling.
+		ConverterException.class, // Needed for proper conversion error handling.
+		ValidatorException.class); // Needed for proper validation error handling.
+
 	private final ValueExpression valueExpression;
 
 	public MethodExpressionValueExpressionAdapter(ValueExpression valueExpression) {
@@ -46,22 +56,14 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 	public Object invoke(ELContext context, Object[] params) {
 		try {
 			return valueExpression.getValue(new ValueToInvokeElContext(context, params));
-		} catch (ELException e) {
-
-			// If the method is not found, an ELException will be thrown here which wraps a MethodNotFoundException. However, normally
-			// a MethodExpression#invoke will directly throw the MethodNotFoundExpression and classes like MethodExpressionActionListener
-			// depend on this to try an invocation with and without the Event parameter.
-
-			// Try to find wrapped MethodNotFoundExpression and throw that if found.
-			Throwable throwable = e.getCause();
-			while (throwable != null) {
-				if (throwable instanceof MethodNotFoundException) {
-					throw (MethodNotFoundException) throwable;
+		}
+		catch (ELException e) {
+			for (Throwable cause = e.getCause(); cause != null; cause = cause.getCause()) {
+				if (EXCEPTIONS_TO_UNWRAP.contains(cause.getClass())) {
+					throw (RuntimeException) cause;
 				}
-				throwable = throwable.getCause();
 			}
 
-			// Not found, just re-throw original
 			throw e;
 		}
 	}
