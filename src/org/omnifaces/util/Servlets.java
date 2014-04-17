@@ -135,6 +135,36 @@ public final class Servlets {
 	}
 
 	/**
+	 * Returns the original HTTP request URI behind this forwarded request, if any.
+	 * This does not include the request query string.
+	 * @return The original HTTP request URI behind this forwarded request, if any.
+	 * @since 1.8
+	 */
+	public static String getForwardRequestURI(HttpServletRequest request) {
+		return (String) request.getAttribute("javax.servlet.forward.request_uri");
+	}
+
+	/**
+	 * Returns the original HTTP request query string behind this forwarded request, if any.
+	 * @return The original HTTP request query string behind this forwarded request, if any.
+	 * @since 1.8
+	 */
+	public static String getForwardRequestQueryString(HttpServletRequest request) {
+		return (String) request.getAttribute("javax.servlet.forward.query_string");
+	}
+
+	/**
+	 * Returns the original HTTP request URI with query string behind this forwarded request, if any.
+	 * @return The original HTTP request URI with query string behind this forwarded request, if any.
+	 * @since 1.8
+	 */
+	public static String getForwardRequestURIWithQueryString(HttpServletRequest request) {
+		String requestURI = getForwardRequestURI(request);
+		String queryString = getForwardRequestQueryString(request);
+		return (queryString == null) ? requestURI : (requestURI + "?" + queryString);
+	}
+
+	/**
 	 * Converts the given query string to request parameter values map.
 	 * @param queryString The query string.
 	 * @return The query string as parameter values map.

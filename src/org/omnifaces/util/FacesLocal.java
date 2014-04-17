@@ -604,6 +604,27 @@ public final class FacesLocal {
 	}
 
 	/**
+	 * @see Faces#getForwardRequestURI()
+	 */
+	public static String getForwardRequestURI(FacesContext context) {
+		return Servlets.getForwardRequestURI(getRequest(context));
+	}
+
+	/**
+	 * @see Faces#getForwardRequestQueryString()
+	 */
+	public static String getForwardRequestQueryString(FacesContext context) {
+		return Servlets.getForwardRequestQueryString(getRequest(context));
+	}
+
+	/**
+	 * @see Faces#getForwardRequestURIWithQueryString()
+	 */
+	public static String getForwardRequestURIWithQueryString(FacesContext context) {
+		return Servlets.getForwardRequestURIWithQueryString(getRequest(context));
+	}
+
+	/**
 	 * @see Faces#getRemoteAddr()
 	 */
 	public static String getRemoteAddr(FacesContext context) {
