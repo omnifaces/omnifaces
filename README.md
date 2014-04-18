@@ -18,7 +18,7 @@ Besides utility classes for working with the JSF API from Java code, such as [Fa
 
 It is a matter of dropping the [OmniFaces 1.7 JAR file](http://repo1.maven.org/maven2/org/omnifaces/omnifaces/1.7/) in `/WEB-INF/lib`. If you like to play around with the newest of the newest, hereby accepting the risk that new components/tags/classes/methods may be moved/renamed without notice, then grab the [OmniFaces 1.8 SNAPSHOT JAR file](https://oss.sonatype.org/content/repositories/snapshots/org/omnifaces/omnifaces/1.8-SNAPSHOT/) instead.
 
-Maven users can add !OmniFaces by adding the following Maven coordinates to pom.xml:
+Maven users can add OmniFaces by adding the following Maven coordinates to pom.xml:
 
 ```XML
 <dependency>
