@@ -20,16 +20,20 @@ It is a matter of dropping the [OmniFaces 1.7 JAR file](http://repo1.maven.org/m
 
 Maven users can add !OmniFaces by adding the following Maven coordinates to pom.xml:
 
-    <dependency>
-        <groupId>org.omnifaces</groupId>
-        <artifactId>omnifaces</artifactId>
-        <version>1.7</version> <!-- Or 1.8-SNAPSHOT -->
-    </dependency>
+```XML
+<dependency>
+    <groupId>org.omnifaces</groupId>
+    <artifactId>omnifaces</artifactId>
+    <version>1.7</version> <!-- Or 1.8-SNAPSHOT -->
+</dependency>
+```
 
 The OmniFaces UI components/taghandlers and EL functions are available under the following XML namespaces:
 
-    xmlns:o="http://omnifaces.org/ui"
-    xmlns:of="http://omnifaces.org/functions"
+```XML
+xmlns:o="http://omnifaces.org/ui"
+xmlns:of="http://omnifaces.org/functions"
+```
 
 ###Documentation
 
@@ -45,7 +49,7 @@ The OmniFaces UI components/taghandlers and EL functions are available under the
 
 ###Support
 
-If you have specific programming problems or questions related to the OmniFaces library, feel free to post a question on [Stack Overflow](http://stackoverflow.com) using at least the [[jsf]](http://stackoverflow.com/questions/tagged/jsf) and [[omnifaces]](http://stackoverflow.com/questions/tagged/omnifaces) tags.
+If you have specific programming problems or questions related to the OmniFaces library, feel free to post a question on [Stack Overflow](http://stackoverflow.com) using at least the [`jsf`](http://stackoverflow.com/questions/tagged/jsf) and [`omnifaces`](http://stackoverflow.com/questions/tagged/omnifaces) tags.
 
 If you have found bugs or have new ideas, feel free to open a [new issue](https://github.com/omnifaces/omnifaces/issues).
 
