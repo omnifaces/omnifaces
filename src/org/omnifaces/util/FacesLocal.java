@@ -814,14 +814,14 @@ public final class FacesLocal {
 	 * @see Faces#addResponseCookie(String, String, int)
 	 */
 	public static void addResponseCookie(FacesContext context, String name, String value, int maxAge) {
-		addResponseCookie(context, name, value, null, null, maxAge);
+		addResponseCookie(context, name, value, getRequestHostname(context), null, maxAge);
 	}
 
 	/**
 	 * @see Faces#addResponseCookie(String, String, String, int)
 	 */
 	public static void addResponseCookie(FacesContext context, String name, String value, String path, int maxAge) {
-		addResponseCookie(context, name, value, null, path, maxAge);
+		addResponseCookie(context, name, value, getRequestHostname(context), path, maxAge);
 	}
 
 	/**
