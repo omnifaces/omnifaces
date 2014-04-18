@@ -385,7 +385,7 @@ public final class Components {
 				continue; // Quick skip.
 			}
 
-			UIComponent component = findComponentIgnoringIAE(viewRoot, name);
+			UIComponent component = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(name));
 
 			if (component instanceof UIForm) {
 				return (UIForm) component;
@@ -423,7 +423,7 @@ public final class Components {
 	    	String source = params.get("javax.faces.source");
 
 	    	if (source != null) {
-    	        UIComponent component = findComponentIgnoringIAE(viewRoot, source);
+    	        UIComponent component = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(source));
 
 				if (component instanceof UICommand) {
 					return (UICommand) component;
@@ -436,7 +436,7 @@ public final class Components {
 				continue; // Quick skip.
 			}
 
-	        UIComponent component = findComponentIgnoringIAE(viewRoot, name);
+	        UIComponent component = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(name));
 
 			if (component instanceof UICommand) {
 				return (UICommand) component;
@@ -737,6 +737,13 @@ public final class Components {
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Strip UIData/UIRepeat iteration index in pattern <code>:[0-9+]:</code> from given component client ID.
+	 */
+	private static String stripIterationIndexFromClientId(String clientId) {
+		return clientId.replaceAll(":[0-9]+:", ":");
+	}
 
 	/**
 	 * Use {@link UIViewRoot#findComponent(String)} and ignore the potential {@link IllegalArgumentException} by
