@@ -3230,6 +3230,39 @@ public enum Baz {
 	<tag>
 		<description>
 			<![CDATA[
+				This handler sets an attribute of the given name and value on all nested components, if they don't already have an
+				attribute set. On boolean attributes like <code>disabled</code>, <code>readonly</code> and <code>rendered</code>,
+				any literal (static) attribute value will be ignored and overridden. Only if they have already a value expression as
+				attribute value, then it won't be overridden. This is a technical limitation as they don't default to <code>null</code>.
+			]]>
+		</description>
+		<tag-name>massAttribute</tag-name>
+		<handler-class>org.omnifaces.taghandler.MassAttribute</handler-class>
+		<attribute>
+			<description>
+				<![CDATA[
+					The name of the attribute to be set on all nested components.
+				]]>
+			</description>
+			<name>name</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The value of the attribute to be set on all nested components.
+				]]>
+			</description>
+			<name>value</name>
+			<required>true</required>
+			<type>java.lang.Object</type>
+		</attribute>
+	</tag>
+	
+	<tag>
+		<description>
+			<![CDATA[
 				<p><strong>CommandScript</strong> is an extension to <code>&lt;h:commandXxx&gt;</code> which generates a JavaScript
 				function in the global JavaScript scope which allows the enduser to execute a JSF ajax request by a just function
 				call <code>functionName()</code> in the JavaScript context.
