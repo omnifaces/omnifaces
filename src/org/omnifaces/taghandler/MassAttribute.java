@@ -12,8 +12,11 @@
  */
 package org.omnifaces.taghandler;
 
+import static org.omnifaces.util.Utils.unmodifiableSet;
+
 import java.io.IOException;
 import java.util.List;
+import java.util.Set;
 
 import javax.faces.component.UIComponent;
 import javax.faces.view.facelets.FaceletContext;
@@ -32,6 +35,11 @@ import javax.faces.view.facelets.TagHandler;
  */
 public class MassAttribute extends TagHandler {
 
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final Set<String> ILLEGAL_NAMES = unmodifiableSet("id", "binding");
+	private static final String ERROR_ILLEGAL_NAME = "The 'name' attribute may not be set to 'id' or 'binding'.";
+
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	private String name;
@@ -46,6 +54,11 @@ public class MassAttribute extends TagHandler {
 	public MassAttribute(TagConfig config) {
 		super(config);
 		name = getRequiredAttribute("name").getValue();
+
+		if (ILLEGAL_NAMES.contains(name)) {
+			throw new IllegalArgumentException(ERROR_ILLEGAL_NAME);
+		}
+
 		value = getRequiredAttribute("value");
 	}
 
