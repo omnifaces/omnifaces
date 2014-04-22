@@ -40,6 +40,7 @@ import javax.faces.event.ExceptionQueuedEvent;
  *
  * @author Bauke Scholtz
  * @see FacesMessageExceptionHandlerFactory
+ * @since 1.8
  */
 public class FacesMessageExceptionHandler extends ExceptionHandlerWrapper {
 

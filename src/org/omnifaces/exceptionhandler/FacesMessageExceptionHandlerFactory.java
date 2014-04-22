@@ -28,6 +28,7 @@ import javax.faces.context.ExceptionHandlerFactory;
  *
  * @author Bauke Scholtz
  * @see FacesMessageExceptionHandler
+ * @since 1.8
  */
 public class FacesMessageExceptionHandlerFactory extends ExceptionHandlerFactory {
 
