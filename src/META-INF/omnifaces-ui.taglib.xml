@@ -2911,14 +2911,13 @@ public class ValidateValuesBean implements MultiFieldValidator {
 					<p>
 					Via this switch, the full response is buffered if the cache doesn't contain content for this component and special
 					markers are inserted surrounding the children's rendering. Afterwards, the content between the markers (if any) is
-					extracted and inserted into the cache. Note that the full response is only buffered incase there's no value the cache.
+					extracted and inserted into the cache. Note that the full response is only buffered incase there's no value in the cache.
 					For all other requests this buffering will not happen.
 					<p>
 					Since this is clearly a more resource intensive and invasive method to grab content, it's not enabled by default.
 					In addition to setting this attribute to <code>true</code>, the <code>org.omnifaces.servlet.BufferedHttpServletResponse</code>
 					Servlet Filter needs to be configured to filter the Faces Servlet (or alternatively just the pages for which the buffering
 					method should be used).
-
 				 ]]>
             </description>
 			<name>useBuffer</name>
@@ -2928,7 +2927,7 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-					Resets the cache when set to to <code>true</code>. Default is <code>false</code>.
+					Resets the cache when set to <code>true</code>. Default is <code>false</code>.
 					<p>
 					This attribute can be used to reset the cache, meaning that the first time the cache component is rendered
 					again, it will re-render its children and will cause any cached value expressions (via <code>o:cacheValue</code>) to be
@@ -2942,6 +2941,23 @@ public class ValidateValuesBean implements MultiFieldValidator {
 			<required>false</required>
 			<type>java.lang.Boolean</type>
 		</attribute>
+        <attribute>
+            <description>
+                <![CDATA[
+                    Disables the cache when set to <code>true</code>. Default is <code>false</code>.
+                    <p>
+                    This attribute can be used to disable the cache (temporarily). In disabled state the children will be rendered directly
+                    and cached content (if any) will not be used, nor will the rendering outcome of the children be cached.
+                    <p>
+                    When the attribute is set to <code>false</code> again any content that was cached before the cache was disabled will be
+                    shown again if said content is still available in the cache. The content that was rendered when the cache was disabled
+                    has no effect on any such previously cached content.
+                 ]]>
+            </description>
+            <name>disabled</name>
+            <required>false</required>
+            <type>java.lang.Boolean</type>
+        </attribute>
 	</tag>
 
 	<tag>

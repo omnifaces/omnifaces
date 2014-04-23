@@ -15,6 +15,7 @@ package org.omnifaces.component.output;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static javax.faces.event.PhaseId.RENDER_RESPONSE;
+import static org.omnifaces.component.output.Cache.PropertyKeys.disabled;
 import static org.omnifaces.component.output.Cache.PropertyKeys.key;
 import static org.omnifaces.component.output.Cache.PropertyKeys.reset;
 import static org.omnifaces.component.output.Cache.PropertyKeys.scope;
@@ -68,7 +69,7 @@ public class Cache extends OutputFamily {
 	private final State state = new State(getStateHelper());
 
 	enum PropertyKeys {
-		key, scope, time, useBuffer, reset
+		key, scope, time, useBuffer, reset, disabled
 	}
 
 	public Cache() {
@@ -82,7 +83,7 @@ public class Cache extends OutputFamily {
 			@Override
 			public void invoke() {
 
-				if (isUseBuffer() && !hasCachedValue(context)) {
+				if (!isDisabled() && isUseBuffer() && !hasCachedValue(context)) {
 
 					final BufferedHttpServletResponse bufferedHttpServletResponse = Faces.getRequestAttribute(BUFFERED_RESPONSE);
 
@@ -121,6 +122,11 @@ public class Cache extends OutputFamily {
 
 	@Override
 	public void encodeChildren(FacesContext context) throws IOException {
+
+		if (isDisabled()) {
+			super.encodeChildren(context);
+			return;
+		}
 
 		String key = getKeyWithDefault(context);
 
@@ -195,7 +201,7 @@ public class Cache extends OutputFamily {
 
 		// Visit us and our children if a value for the cache was set in this request, or
 		// if no value was cached yet.
-		return isCachedValueJustSet(context) || !hasCachedValue(context);
+		return isDisabled() || isCachedValueJustSet(context) || !hasCachedValue(context);
 	}
 
 	private void cacheContent(FacesContext context, String content) {
@@ -270,6 +276,9 @@ public class Cache extends OutputFamily {
 
 		return null;
 	}
+	
+    
+	// Attribute getters/setters --------------------------------------------------------------------------------------
 
 	public String getKey() {
 		return state.get(key);
@@ -310,5 +319,19 @@ public class Cache extends OutputFamily {
 	public void setReset(Boolean resetValue) {
     	state.put(reset, resetValue);
     }
+	
+	/**
+	 * @since 1.8
+	 */
+	public Boolean isDisabled() {
+		return state.get(disabled, FALSE);
+	}
+
+	/**
+	 * @since 1.8
+	 */
+	public void setDisabled(Boolean disabledValue) {
+		state.put(disabled, disabledValue);
+	}
 
 }
