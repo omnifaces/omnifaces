@@ -219,7 +219,7 @@ public class CacheControlFilter extends HttpFilter {
 		(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
 			throws ServletException, IOException
 	{
-		if (!request.getRequestURI().startsWith(ResourceHandler.RESOURCE_IDENTIFIER)) {
+		if (!request.getRequestURI().startsWith(request.getContextPath() + ResourceHandler.RESOURCE_IDENTIFIER)) {
 			setCacheHeaders(response, expires);
 		}
 
