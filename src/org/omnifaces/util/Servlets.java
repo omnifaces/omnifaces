@@ -87,6 +87,18 @@ public final class Servlets {
 	public static String getRequestBaseURL(HttpServletRequest request) {
 		return getRequestDomainURL(request) + request.getContextPath() + "/";
 	}
+	
+	/**
+	 * Returns the HTTP request URI relative to the context root of a web application. This is the request URI
+	 * minus the context path.
+	 * 
+	 * @param request The involved HTTP servlet request.
+	 * @return the request URI relative to the context root
+	 * @since 1.8
+	 */
+	public static String getRequestRelativeURI(HttpServletRequest request) {
+		return request.getRequestURI().substring(request.getContextPath().length());
+	}
 
 	/**
 	 * Returns the HTTP request URL with query string. This is the full request URL with query string as the enduser

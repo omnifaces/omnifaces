@@ -35,7 +35,7 @@
 	<lifecycle>
 		<phase-listener>org.omnifaces.eventlistener.InvokeActionEventListener</phase-listener>
 		<phase-listener>org.omnifaces.eventlistener.CallbackPhaseListener</phase-listener>
-		<phase-listener>org.omnifaces.cdi.eager.InstantiateEagerBeansListener</phase-listener>
+		<phase-listener>org.omnifaces.cdi.eager.EagerBeansPhaseListener</phase-listener>
 	</lifecycle>
 
 	<factory>

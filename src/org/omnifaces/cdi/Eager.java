@@ -15,5 +15,6 @@ import javax.inject.Qualifier;
 public @interface Eager {
 	
 	@Nonbinding	String viewId() default "";
+	@Nonbinding	String requestURI() default "";
 	
 }
