@@ -1,1 +1,1 @@
-[OmniFaces homepage is available at omnifaces.github.io](http://omnifaces.github.io).
+[OmniFaces homepage is available at **omnifaces.org**](http://omnifaces.org).
