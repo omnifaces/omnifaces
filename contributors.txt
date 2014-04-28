@@ -21,4 +21,4 @@ Juliano Marques
 And of course a general thank you to everyone who contributed by creating an issue, pointing out a defect, etc.
 
 If you think anyone else who is not in the list should be there, please create an issue for this at 
-https://code.google.com/p/omnifaces/issues/list
+https://github.com/omnifaces/omnifaces

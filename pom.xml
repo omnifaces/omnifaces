@@ -10,10 +10,10 @@
 	<name>Omnifaces</name>
 	<version>1.8-SNAPSHOT</version>
 	<description>JSF 2.x utility library</description>
-	<url>http://code.google.com/p/omnifaces</url>
+	<url>http://omnifaces.org</url>
 	<organization>
 		<name>OmniFaces</name>
-		<url>http://code.google.com/p/omnifaces</url>
+		<url>http://omnifaces.org</url>
 	</organization>
 	<inceptionYear>2012</inceptionYear>
 
@@ -26,9 +26,9 @@
 	</licenses>
 
 	<scm>
-		<url>http://code.google.com/p/omnifaces/source/browse</url>
-		<connection>scm:hg:https://code.google.com/p/omnifaces</connection>
-		<developerConnection>scm:hg:https://code.google.com/p/omnifaces</developerConnection>
+		<url>https://github.com/omnifaces/omnifaces</url>
+		<connection>scm:git:git://github.com/omnifaces/omnifaces.git</connection>
+		<developerConnection>scm:git:git@github.com:omnifaces/omnifaces.git</developerConnection>
 	</scm>
 
 	<properties>
