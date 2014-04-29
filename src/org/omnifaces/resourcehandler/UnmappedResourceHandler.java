@@ -195,21 +195,14 @@ public class UnmappedResourceHandler extends ResourceHandlerWrapper {
 
 	@Override
 	public void handleResourceRequest(FacesContext context) throws IOException {
-		if (Hacks.isPrimeFacesDynamicResourceRequest(context)) {
-			super.handleResourceRequest(context);
+		Resource resource = createResource(context);
+
+		if (resource == null) {
+			getWrapped().handleResourceRequest(context);
 			return;
 		}
 
 		ExternalContext externalContext = context.getExternalContext();
-		String resourceName = externalContext.getRequestPathInfo();
-		String libraryName = externalContext.getRequestParameterMap().get("ln");
-		Resource resource = context.getApplication().getResourceHandler().createResource(
-			resourceName != null ? resourceName.substring(1) : null, libraryName);
-
-		if (resource == null) {
-			super.handleResourceRequest(context);
-			return;
-		}
 
 		if (!resource.userAgentNeedsUpdate(context)) {
 			externalContext.setResponseStatus(HttpServletResponse.SC_NOT_MODIFIED);
@@ -223,6 +216,22 @@ public class UnmappedResourceHandler extends ResourceHandlerWrapper {
 		}
 
 		Utils.stream(resource.getInputStream(), externalContext.getResponseOutputStream());
+	}
+
+	private Resource createResource(FacesContext context) {
+		if (Hacks.isPrimeFacesDynamicResourceRequest(context)) {
+			return null;
+		}
+
+		String pathInfo = context.getExternalContext().getRequestPathInfo();
+		String resourceName = (pathInfo != null) ? pathInfo.substring(1) : "";
+
+		if (resourceName.isEmpty()) {
+			return null;
+		}
+
+		String libraryName = context.getExternalContext().getRequestParameterMap().get("ln");
+		return context.getApplication().getResourceHandler().createResource(resourceName, libraryName);
 	}
 
 	@Override
