@@ -72,6 +72,18 @@ public final class Beans {
 	public static <T> T getReference(BeanManager beanManager, Bean<T> bean) {
 		return (T) beanManager.getReference(bean, bean.getBeanClass(), beanManager.createCreationalContext(bean));
 	}
+	
+	/**
+	 * Returns the CDI managed bean instance of the given class from the given bean manager and creates one if
+	 * one doesn't exist.
+	 * @param beanManager The involved CDI bean manager.
+	 * @param beanClass The type of the CDI managed bean instance.
+	 * @return The CDI managed bean instance of the given class from the given bean manager.
+	 * @since 1.8
+	 */
+	public static <T> T getInstance(BeanManager beanManager, Class<T> beanClass) {
+		return getInstance(beanManager, resolve(beanManager, beanClass), true);
+	}
 
 	/**
 	 * Returns the CDI managed bean instance of the given class from the given bean manager and creates one if
