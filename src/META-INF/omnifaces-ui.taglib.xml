@@ -3246,10 +3246,37 @@ public enum Baz {
 	<tag>
 		<description>
 			<![CDATA[
-				This handler sets an attribute of the given name and value on all nested components, if they don't already have an
-				attribute set. On boolean attributes like <code>disabled</code>, <code>readonly</code> and <code>rendered</code>,
-				any literal (static) attribute value will be ignored and overridden. Only if they have already a value expression as
-				attribute value, then it won't be overridden. This is a technical limitation as they don't default to <code>null</code>.
+				The <strong>&lt;o:massAttribute&gt;</strong> sets an attribute of the given name and value on all nested components,
+				if they don't already have an attribute set. On boolean attributes like <code>disabled</code>, <code>readonly</code>
+				and <code>rendered</code>, any literal (static) attribute value will be ignored and overridden. Only if they have
+				already a value expression <code>#{...}</code> as attribute value, then it won't be overridden. This is a technical
+				limitation specifically for boolean attributes as they don't default to <code>null</code>.
+				<p>
+				For example, the following setup
+				<pre>
+&lt;o:massAttribute name="disabled" value="true"&gt;
+    &lt;h:inputText id="input1" /&gt;
+    &lt;h:inputText id="input2" disabled="true" /&gt;
+    &lt;h:inputText id="input3" disabled="false" /&gt;
+    &lt;h:inputText id="input4" disabled="#{true}" /&gt;
+    &lt;h:inputText id="input5" disabled="#{false}" /&gt;
+&lt;/o:massAttribute&gt;
+				</pre>
+				will only set the <code>disabled="true"</code> attribute in <code>input1</code>, <code>input2</code> and
+				<code>input3</code>.
+				<p>
+				As another general example without booleans, the following setup
+				<pre>
+&lt;o:massAttribute name="styleClass" value="#{component.valid ? '' : 'error'}"&gt;
+    &lt;h:inputText id="input1" /&gt;
+    &lt;h:inputText id="input2" styleClass="some" /&gt;
+    &lt;h:inputText id="input3" styleClass="#{'some'}" /&gt;
+    &lt;h:inputText id="input4" styleClass="#{null}" /&gt;
+&lt;/o:massAttribute&gt;
+				</pre>
+				will only set the <code>styleClass="#{component.valid ? '' : 'error'}"</code> attribute in <code>input1</code> as
+				that's the only component on which the attribute is absent.
+				Do note that the specified EL expression will actually be evaluated on a per-component basis.
 			]]>
 		</description>
 		<tag-name>massAttribute</tag-name>
@@ -3257,7 +3284,9 @@ public enum Baz {
 		<attribute>
 			<description>
 				<![CDATA[
-					The name of the attribute to be set on all nested components.
+					The name of the attribute to be set on all nested components. This cannot be set to <code>id</code>
+					or <code>binding</code> as those are already evaluated during view build time and they shouldn't be
+					shared among components anyway.
 				]]>
 			</description>
 			<name>name</name>
@@ -3267,7 +3296,9 @@ public enum Baz {
 		<attribute>
 			<description>
 				<![CDATA[
-					The value of the attribute to be set on all nested components.
+					The value of the attribute to be set on all nested components. This will be evaluated on a
+					per-component basis. In other words, <code>#{component}</code> can be used here to refer the 
+					"current" component.
 				]]>
 			</description>
 			<name>value</name>

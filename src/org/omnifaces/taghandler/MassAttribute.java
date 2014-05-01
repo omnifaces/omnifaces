@@ -19,16 +19,46 @@ import java.util.List;
 import java.util.Set;
 
 import javax.faces.component.UIComponent;
+import javax.faces.view.facelets.ComponentHandler;
 import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagAttribute;
 import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
 
 /**
- * This handler sets an attribute of the given name and value on all nested components, if they don't already have an
- * attribute set. On boolean attributes like <code>disabled</code>, <code>readonly</code> and <code>rendered</code>,
- * any literal (static) attribute value will be ignored and overridden. Only if they have already a value expression as
- * attribute value, then it won't be overridden. This is a technical limitation as they don't default to <code>null</code>.
+ * The <strong>&lt;o:massAttribute&gt;</strong> sets an attribute of the given name and value on all nested components,
+ * if they don't already have an attribute set. On boolean attributes like <code>disabled</code>, <code>readonly</code>
+ * and <code>rendered</code>, any literal (static) attribute value will be ignored and overridden. Only if they have
+ * already a value expression <code>#{...}</code> as attribute value, then it won't be overridden. This is a technical
+ * limitation specifically for boolean attributes as they don't default to <code>null</code>.
+ * <p>
+ * For example, the following setup
+ * <pre>
+ * &lt;o:massAttribute name="disabled" value="true"&gt;
+ *     &lt;h:inputText id="input1" /&gt;
+ *     &lt;h:inputText id="input2" disabled="true" /&gt;
+ *     &lt;h:inputText id="input3" disabled="false" /&gt;
+ *     &lt;h:inputText id="input4" disabled="#{true}" /&gt;
+ *     &lt;h:inputText id="input5" disabled="#{false}" /&gt;
+ * &lt;/o:massAttribute&gt;
+ * </pre>
+ * will only set the <code>disabled="true"</code> attribute in <code>input1</code>, <code>input2</code> and
+ * <code>input3</code>.
+ * <p>
+ * As another general example without booleans, the following setup
+ * <pre>
+ * &lt;o:massAttribute name="styleClass" value="#{component.valid ? '' : 'error'}"&gt;
+ *     &lt;h:inputText id="input1" /&gt;
+ *     &lt;h:inputText id="input2" styleClass="some" /&gt;
+ *     &lt;h:inputText id="input3" styleClass="#{'some'}" /&gt;
+ *     &lt;h:inputText id="input4" styleClass="#{null}" /&gt;
+ * &lt;/o:massAttribute&gt;
+ * </pre>
+ * will only set the <code>styleClass="#{component.valid ? '' : 'error'}"</code> attribute in <code>input1</code> as
+ * that's the only component on which the attribute is absent.
+ * Do note that the specified EL expression will actually be evaluated on a per-component basis.
+ * <p>
+ *
  *
  * @author Bauke Scholtz
  * @since 1.8
@@ -67,7 +97,10 @@ public class MassAttribute extends TagHandler {
 	@Override
 	public void apply(FaceletContext context, UIComponent parent) throws IOException {
 		nextHandler.apply(context, parent);
-		applyMassAttribute(context, parent.getChildren());
+
+		if (ComponentHandler.isNew(parent)) {
+			applyMassAttribute(context, parent.getChildren());
+		}
 	}
 
 	private void applyMassAttribute(FaceletContext context, List<UIComponent> children) {
