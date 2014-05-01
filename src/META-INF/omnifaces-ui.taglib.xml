@@ -3278,8 +3278,8 @@ public enum Baz {
 				that's the only component on which the attribute is absent.
 				Do note that the specified EL expression will actually be evaluated on a per-component basis.
 				<p>
-				To target a specific component (super)class, use the <code>target</code> attribute. The below example skips labels
-				(as that would in the below example otherwise fail because they don't have a <code>valid</code> property):
+				To target a specific component (super)class, use the <code>target</code> attribute. The example below skips labels
+				(as that would otherwise fail in the example below because they don't have a <code>valid</code> property):
 				<pre>
 &lt;o:massAttribute name="styleClass" value="#{component.valid ? '' : 'error'}" target="javax.faces.component.UIInput"&gt;
     &lt;h:outputLabel for="input1" /&gt;
@@ -3598,7 +3598,7 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 				the following new features:
 				<dl>
 				<dt>Multiple <code>for</code> components</dt>
-				<dd>Possibility to specify multiple client IDs space separated in the <code>for</code> attribute. The below example
+				<dd>Possibility to specify multiple client IDs space separated in the <code>for</code> attribute. The example below
 				would only display messages for <code>input1</code> and <code>input3</code>:
 				<pre><code>
 &lt;h:form&gt;
@@ -3609,7 +3609,7 @@ String name2 = Faces.getRequestParameter("name2"); // value2
   &lt;h:inputText id="input4" /&gt;
 &lt;/h:form&gt;
 				</code></pre>
-				It can even refer non-input components which in turn contains input components. The below example would only display
+				It can even refer non-input components which in turn contains input components. The example below would only display
 				messages for <code>input1</code> and <code>input2</code>:
 				<pre><code>
 &lt;h:form&gt;
@@ -3622,7 +3622,7 @@ String name2 = Faces.getRequestParameter("name2"); // value2
   &lt;h:inputText id="input4" /&gt;
 &lt;/h:form&gt;
 				</code></pre>
-				You can even combine them. The below example would only display messages for <code>input1</code>,
+				You can even combine them. The example below would only display messages for <code>input1</code>,
 				<code>input2</code> and <code>input4</code>.
 				<pre><code>
 &lt;h:form&gt;

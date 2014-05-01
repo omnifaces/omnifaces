@@ -29,7 +29,7 @@ import org.omnifaces.util.State;
  * the following new features:
  * <dl>
  * <dt>Multiple <code>for</code> components</dt>
- * <dd>Possibility to specify multiple client IDs space separated in the <code>for</code> attribute. The below example
+ * <dd>Possibility to specify multiple client IDs space separated in the <code>for</code> attribute. The example below
  * would only display messages for <code>input1</code> and <code>input3</code>:
  * <pre><code>
  * &lt;h:form&gt;
@@ -40,7 +40,7 @@ import org.omnifaces.util.State;
  *   &lt;h:inputText id="input4" /&gt;
  * &lt;/h:form&gt;
  * </code></pre>
- * It can even refer non-input components which in turn contains input components. The below example would only display
+ * It can even refer non-input components which in turn contains input components. The example below would only display
  * messages for <code>input1</code> and <code>input2</code>:
  * <pre><code>
  * &lt;h:form&gt;
@@ -53,7 +53,7 @@ import org.omnifaces.util.State;
  *   &lt;h:inputText id="input4" /&gt;
  * &lt;/h:form&gt;
  * </code></pre>
- * You can even combine them. The below example would only display messages for <code>input1</code>,
+ * You can even combine them. The example below would only display messages for <code>input1</code>,
  * <code>input2</code> and <code>input4</code>.
  * <pre><code>
  * &lt;h:form&gt;

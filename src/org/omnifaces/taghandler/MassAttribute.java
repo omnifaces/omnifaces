@@ -58,8 +58,8 @@ import javax.faces.view.facelets.TagHandler;
  * that's the only component on which the attribute is absent.
  * Do note that the specified EL expression will actually be evaluated on a per-component basis.
  * <p>
- * To target a specific component (super)class, use the <code>target</code> attribute. The below example skips labels
- * (as that would in the below example otherwise fail because they don't have a <code>valid</code> property):
+ * To target a specific component (super)class, use the <code>target</code> attribute. The example below skips labels
+ * (as that would otherwise fail in the example below because they don't have a <code>valid</code> property):
  * <pre>
  * &lt;o:massAttribute name="styleClass" value="#{component.valid ? '' : 'error'}" target="javax.faces.component.UIInput"&gt;
  *     &lt;h:outputLabel for="input1" /&gt;
