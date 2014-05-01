@@ -57,8 +57,6 @@ import javax.faces.view.facelets.TagHandler;
  * will only set the <code>styleClass="#{component.valid ? '' : 'error'}"</code> attribute in <code>input1</code> as
  * that's the only component on which the attribute is absent.
  * Do note that the specified EL expression will actually be evaluated on a per-component basis.
- * <p>
- *
  *
  * @author Bauke Scholtz
  * @since 1.8
