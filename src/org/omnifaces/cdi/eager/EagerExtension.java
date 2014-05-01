@@ -15,6 +15,7 @@
  */
 package org.omnifaces.cdi.eager;
 
+import static org.omnifaces.util.Beans.getInstance;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.util.ArrayList;
@@ -65,12 +66,15 @@ public class EagerExtension implements Extension {
 	}
 
 	public void load(@Observes AfterDeploymentValidation event, BeanManager beanManager) {
+		
+		EagerBeansRepository eagerBeansRepository = getInstance(beanManager, EagerBeansRepository.class);
+		
 		if (!requestScopedBeansRequestURI.isEmpty()) {
-			EagerBeansRequestListener.init(beanManager, requestScopedBeansRequestURI);
+			eagerBeansRepository.setRequestScopedBeansRequestURI(requestScopedBeansRequestURI);
 		}
 		
 		if (!requestScopedBeansViewId.isEmpty()) {
-			EagerBeansPhaseListener.init(beanManager, requestScopedBeansViewId);
+			eagerBeansRepository.setRequestScopedBeansViewId(requestScopedBeansViewId);
 		}
 	}
 

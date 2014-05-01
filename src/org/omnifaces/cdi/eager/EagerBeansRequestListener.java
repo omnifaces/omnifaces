@@ -15,14 +15,9 @@
  */
 package org.omnifaces.cdi.eager;
 
-import static java.util.Collections.unmodifiableMap;
 import static org.omnifaces.util.Servlets.getRequestRelativeURI;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
+import javax.inject.Inject;
 import javax.servlet.ServletRequestEvent;
 import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpServletRequest;
@@ -38,23 +33,13 @@ import org.omnifaces.eventlistener.DefaultServletRequestListener;
 @WebListener
 public class EagerBeansRequestListener extends DefaultServletRequestListener {
 	
-	private static BeanManager beanManager;
-	private static Map<String, List<Bean<?>>> beans;
-	
-	static void init(BeanManager beanManager, Map<String, List<Bean<?>>> beans) {
-		EagerBeansRequestListener.beanManager = beanManager;
-		EagerBeansRequestListener.beans = unmodifiableMap(beans);
-	}
-	
+	@Inject
+	private HideForTomcatEagerBeansRepository eagerBeansRepository;
 	
 	@Override
 	public void requestInitialized(ServletRequestEvent sre) {
-		if (beans == null || beanManager == null || beans.get(getRequestRelativeURI((HttpServletRequest)sre.getServletRequest())) == null) {
-			return;
-		}
-		
-		for (Bean<?> bean : beans.get(getRequestRelativeURI((HttpServletRequest)sre.getServletRequest()))) {
-			beanManager.getReference(bean, bean.getBeanClass(), beanManager.createCreationalContext(bean)).toString();
+		if (eagerBeansRepository != null) {
+			eagerBeansRepository.instantiateByRequestURI(getRequestRelativeURI((HttpServletRequest)sre.getServletRequest()));
 		}
 	}
 
