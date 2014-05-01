@@ -24,24 +24,27 @@ import javax.faces.event.PhaseEvent;
 import org.omnifaces.eventlistener.DefaultPhaseListener;
 
 /**
- * 
+ *
  * @author Arjan Tijms
  * @since 1.8
  *
  */
 public class EagerBeansPhaseListener extends DefaultPhaseListener {
-	
+
 	private static final long serialVersionUID = -7252366571645029385L;
 
 	public EagerBeansPhaseListener() {
 		super(RESTORE_VIEW);
 	}
-	
+
 	@Override
 	public void afterPhase(PhaseEvent event) {
 		HideForTomcatEagerBeansRepository eagerBeansRepository = evaluateExpressionGet("#{eagerBeansRepository}");
-		eagerBeansRepository.instantiateByViewID(getViewId());
+
+		if (eagerBeansRepository != null) {
+			eagerBeansRepository.instantiateByViewID(getViewId());
+		}
 	}
-	
-	
+
+
 }
