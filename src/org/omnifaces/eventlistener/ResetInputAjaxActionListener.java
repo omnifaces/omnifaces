@@ -12,6 +12,8 @@
  */
 package org.omnifaces.eventlistener;
 
+import static javax.faces.component.visit.VisitContext.createVisitContext;
+
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
@@ -109,6 +111,27 @@ public class ResetInputAjaxActionListener extends DefaultPhaseListener implement
 	private static final long serialVersionUID = -5317382021715077662L;
 
 	private static final Set<VisitHint> VISIT_HINTS = EnumSet.of(VisitHint.SKIP_TRANSIENT, VisitHint.SKIP_UNRENDERED);
+	private static final VisitCallback VISIT_CALLBACK = new VisitCallback() {
+		@Override
+		public VisitResult visit(VisitContext context, UIComponent target) {
+			FacesContext facesContext = context.getFacesContext();
+			Collection<String> executeIds = facesContext.getPartialViewContext().getExecuteIds();
+
+			if (executeIds.contains(target.getClientId(facesContext))) {
+				return VisitResult.REJECT;
+			}
+
+			if (target instanceof EditableValueHolder) {
+				((EditableValueHolder) target).resetValue();
+			}
+			else if (context.getIdsToVisit() != VisitContext.ALL_IDS) {
+				// Render ID didn't specifically point an EditableValueHolder. Visit all children as well.
+				target.visitTree(createVisitContext(facesContext, null, context.getHints()), VISIT_CALLBACK);
+			}
+
+			return VisitResult.ACCEPT;
+		}
+	};
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
@@ -164,11 +187,9 @@ public class ResetInputAjaxActionListener extends DefaultPhaseListener implement
 
 		if (partialViewContext.isAjaxRequest()) {
 			Collection<String> renderIds = getRenderIds(partialViewContext);
-			Collection<String> executeIds = partialViewContext.getExecuteIds();
 
-			if (!renderIds.isEmpty() && !executeIds.containsAll(renderIds)) {
-				resetEditableValueHolders(VisitContext.createVisitContext(
-					context, renderIds, VISIT_HINTS), context.getViewRoot(), executeIds);
+			if (!renderIds.isEmpty() && !partialViewContext.getExecuteIds().containsAll(renderIds)) {
+				context.getViewRoot().visitTree(createVisitContext(context, renderIds, VISIT_HINTS), VISIT_CALLBACK);
 			}
 		}
 
@@ -197,37 +218,6 @@ public class ResetInputAjaxActionListener extends DefaultPhaseListener implement
 		// END OF HACK ------------------------------------------------------------------------------------------------
 
 		return renderIds;
-	}
-
-	/**
-	 * Find all editable value holder components in the component hierarchy, starting with the given component and
-	 * reset them when they are not covered by the given execute IDs.
-	 * @param context The visit context to work with.
-	 * @param component The starting point of the component hierarchy to look for editable value holder components.
-	 * @param executeIds The execute IDs.
-	 */
-	private void resetEditableValueHolders
-		(VisitContext context, final UIComponent component, final Collection<String> executeIds)
-	{
-		component.visitTree(context, new VisitCallback() {
-			@Override
-			public VisitResult visit(VisitContext context, UIComponent target) {
-				if (executeIds.contains(target.getClientId(context.getFacesContext()))) {
-					return VisitResult.REJECT;
-				}
-
-				if (target instanceof EditableValueHolder) {
-					((EditableValueHolder) target).resetValue();
-				}
-				else if (context.getIdsToVisit() != VisitContext.ALL_IDS) {
-					// Render ID didn't point an EditableValueHolder. Visit all children as well.
-					resetEditableValueHolders(VisitContext.createVisitContext(
-						context.getFacesContext(), null, context.getHints()), target, executeIds);
-				}
-
-				return VisitResult.ACCEPT;
-			}
-		});
 	}
 
 }
