@@ -15,6 +15,8 @@
  */
 package org.omnifaces.cdi.eager;
 
+import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableMap;
 import static org.omnifaces.util.Beans.getInstance;
 import static org.omnifaces.util.Utils.isEmpty;
 
@@ -23,7 +25,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterDeploymentValidation;
 import javax.enterprise.inject.spi.Annotated;
@@ -35,6 +39,8 @@ import javax.enterprise.inject.spi.ProcessBean;
 import org.omnifaces.cdi.Eager;
 
 /**
+ * CDI extension that collects beans annotated with {@link Eager}. After deployment
+ * collected beans are transferred to the {@link EagerBeansRepository}.
  * 
  * @author Arjan Tijms
  * @since 1.8
@@ -42,6 +48,9 @@ import org.omnifaces.cdi.Eager;
  */
 public class EagerExtension implements Extension {
 
+	private List<Bean<?>> applicationScopedBeans = new ArrayList<Bean<?>>();
+	private List<Bean<?>> sessionScopedBeans = new ArrayList<Bean<?>>();
+	
 	private Map<String, List<Bean<?>>> requestScopedBeansViewId = new HashMap<String, List<Bean<?>>>();
 	private Map<String, List<Bean<?>>> requestScopedBeansRequestURI = new HashMap<String, List<Bean<?>>>();
 
@@ -54,8 +63,12 @@ public class EagerExtension implements Extension {
 			Eager eager = annotated.getAnnotation(Eager.class);
 			Bean<?> bean = event.getBean();
 			
-			if (annotated.isAnnotationPresent(RequestScoped.class)) {
-				
+			if (annotated.isAnnotationPresent(ApplicationScoped.class)) {
+				applicationScopedBeans.add(bean);
+			} else if (annotated.isAnnotationPresent(SessionScoped.class)) {
+				sessionScopedBeans.add(bean);
+			} else if (annotated.isAnnotationPresent(RequestScoped.class)) {
+
 				if (!isEmpty(eager.requestURI())) {
 					getRequestScopedBeansByRequestURI(eager.requestURI()).add(bean);
 				} else if (!isEmpty(eager.viewId())) {
@@ -69,12 +82,21 @@ public class EagerExtension implements Extension {
 		
 		EagerBeansRepository eagerBeansRepository = getInstance(beanManager, EagerBeansRepository.class);
 		
+		if (!applicationScopedBeans.isEmpty()) {
+			eagerBeansRepository.setApplicationScopedBeans(unmodifiableList(applicationScopedBeans));
+			eagerBeansRepository.instantiateApplicationScoped();
+		}
+		
+		if (!sessionScopedBeans.isEmpty()) {
+			eagerBeansRepository.setSessionScopedBeans(unmodifiableList(sessionScopedBeans));
+		}
+		
 		if (!requestScopedBeansRequestURI.isEmpty()) {
-			eagerBeansRepository.setRequestScopedBeansRequestURI(requestScopedBeansRequestURI);
+			eagerBeansRepository.setRequestScopedBeansRequestURI(unmodifiableMap(requestScopedBeansRequestURI));
 		}
 		
 		if (!requestScopedBeansViewId.isEmpty()) {
-			eagerBeansRepository.setRequestScopedBeansViewId(requestScopedBeansViewId);
+			eagerBeansRepository.setRequestScopedBeansViewId(unmodifiableMap(requestScopedBeansViewId));
 		}
 	}
 

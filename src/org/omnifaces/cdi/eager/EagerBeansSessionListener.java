@@ -15,36 +15,30 @@
  */
 package org.omnifaces.cdi.eager;
 
-import static org.omnifaces.util.Servlets.getRequestRelativeURI;
-
 import javax.inject.Inject;
-import javax.servlet.ServletRequestEvent;
 import javax.servlet.annotation.WebListener;
-import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSessionEvent;
 
-import org.omnifaces.eventlistener.DefaultServletRequestListener;
+import org.omnifaces.eventlistener.DefaultHttpSessionListener;
 
 /**
- * A WebListener that instantiates eager request scoped beans.
- * <p>
- * This instantiates beans at one of the earliest possible moment during request
- * processing.
+ * A WebListener that instantiates eager session scoped beans.
  * 
  * @author Arjan Tijms
  * @since 1.8
  *
  */
 @WebListener
-public class EagerBeansRequestListener extends DefaultServletRequestListener {
+public class EagerBeansSessionListener extends DefaultHttpSessionListener {
 	
 	@Inject
 	private HideForTomcatEagerBeansRepository eagerBeansRepository;
-	
+
 	@Override
-	public void requestInitialized(ServletRequestEvent sre) {
+	public void sessionCreated(HttpSessionEvent se) {
 		if (eagerBeansRepository != null) {
-			eagerBeansRepository.instantiateByRequestURI(getRequestRelativeURI((HttpServletRequest)sre.getServletRequest()));
+			eagerBeansRepository.instantiateSessionScoped();
 		}
 	}
-
+	
 }

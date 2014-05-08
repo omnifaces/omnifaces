@@ -24,6 +24,11 @@ import javax.faces.event.PhaseEvent;
 import org.omnifaces.eventlistener.DefaultPhaseListener;
 
 /**
+ * A PhaseListener that instantiates eager request scoped beans.
+ * <p>
+ * This instantiates beans relatively late during request processing but at a point
+ * that JSF and the view root corresponding to the current view id are available to the
+ * bean.
  *
  * @author Arjan Tijms
  * @since 1.8
