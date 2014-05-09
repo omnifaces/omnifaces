@@ -10,7 +10,7 @@ Radu Creanga
 	For the CDI injection in converters and validators, the CDI view scope and his idea for the FacesViews handling of other ViewHandlers.
 	
 Oleg Varaksin
-	For his help with addressing the JUEL method param issue to the JUEL maintainers.
+	For his help with addressing the JUEL method param issue to the JUEL maintainers and for the inspiration for the @Eager feature.
 
 Howard Smith
 	For consistently testing snapshots and reporting issues.
