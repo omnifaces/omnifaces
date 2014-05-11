@@ -27,7 +27,6 @@ import javax.enterprise.context.SessionScoped;
 import javax.enterprise.util.Nonbinding;
 import javax.faces.event.PhaseId;
 import javax.faces.webapp.FacesServlet;
-import javax.inject.Qualifier;
 
 /**
  * Specifies that a scoped bean is to be eagerly instantiated.
@@ -74,7 +73,6 @@ import javax.inject.Qualifier;
  * @author Arjan Tijms
  *
  */
-@Qualifier
 @Retention(RUNTIME)
 @Target(TYPE)
 public @interface Eager {
