@@ -17,6 +17,7 @@ package org.omnifaces.cdi.eager;
 
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
+import static org.omnifaces.util.Beans.getAnnotation;
 import static org.omnifaces.util.Beans.getInstance;
 import static org.omnifaces.util.Utils.isEmpty;
 
@@ -54,20 +55,20 @@ public class EagerExtension implements Extension {
 	private Map<String, List<Bean<?>>> requestScopedBeansViewId = new HashMap<String, List<Bean<?>>>();
 	private Map<String, List<Bean<?>>> requestScopedBeansRequestURI = new HashMap<String, List<Bean<?>>>();
 
-	public <T> void collect(@Observes ProcessBean<T> event) {
+	public <T> void collect(@Observes ProcessBean<T> event, BeanManager beanManager) {
 		
 		Annotated annotated = event.getAnnotated();
+		Eager eager = getAnnotation(beanManager, annotated, Eager.class);
 		
-		if (annotated.isAnnotationPresent(Eager.class)) {
+		if (eager != null) {
 			
-			Eager eager = annotated.getAnnotation(Eager.class);
 			Bean<?> bean = event.getBean();
 			
-			if (annotated.isAnnotationPresent(ApplicationScoped.class)) {
+			if (getAnnotation(beanManager, annotated, ApplicationScoped.class) != null) {
 				applicationScopedBeans.add(bean);
-			} else if (annotated.isAnnotationPresent(SessionScoped.class)) {
+			} else if (getAnnotation(beanManager, annotated, SessionScoped.class) != null) {
 				sessionScopedBeans.add(bean);
-			} else if (annotated.isAnnotationPresent(RequestScoped.class)) {
+			} else if (getAnnotation(beanManager, annotated, RequestScoped.class) != null) {
 
 				if (!isEmpty(eager.requestURI())) {
 					getRequestScopedBeansByRequestURI(eager.requestURI()).add(bean);
