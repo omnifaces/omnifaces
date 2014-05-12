@@ -34,6 +34,7 @@ import javax.faces.webapp.FacesServlet;
  * Currently supported scopes:
  * <ol>
  * <li> {@link RequestScoped}
+ * <li> {@link ViewScoped}
  * <li> {@link SessionScoped}
  * <li> {@link ApplicationScoped}
  * </ol>
@@ -84,21 +85,24 @@ public @interface Eager {
 	 * <p>
 	 * JSF services will not be available (yet) when the bean is instantiated this way.
 	 * <p>
-	 * If both this attribute and {@link Eager#viewId()} is specified, this attribute takes precedence.
+	 * If both this attribute and {@link Eager#viewId()} is specified, this attribute takes precedence for {@link RequestScoped}.
+	 * This attribute <b>can not</b> be used for {@link ViewScoped} beans.
 	 */
 	@Nonbinding
 	String requestURI() default "";
 
 	/**
-	 * (Required when combined with {@link RequestScoped}) The id of the view for which a request scoped bean should be
-	 * instantiated. When this attribute is specified the bean will be instantiated during invocation of the
+	 * (Required when combined with {@link RequestScoped} or {@link ViewScoped}) The id of the view for which a request or view scoped bean 
+	 * should be instantiated. When this attribute is specified the bean will be instantiated during invocation of the
 	 * {@link FacesServlet}, namely right after the RESTORE_VIEW phase (see {@link PhaseId#RESTORE_VIEW}).
 	 * 
 	 * <p>
 	 * JSF services are available when the bean is instantiated this way.
 	 * 
 	 * <p>
-	 * If both this attribute and {@link Eager#requestURI()} is specified, <code>requestURI</code> attribute takes precedence.
+	 * If both this attribute and {@link Eager#requestURI()} is specified and the scope is {@link RequestScoped}, the 
+	 * <code>requestURI</code> attribute takes precedence. If the scope is {@link ViewScoped} <code>requestURI</code> is ignored and only
+	 * this attribute is considered.
 	 * 
 	 * 
 	 */
