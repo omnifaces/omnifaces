@@ -15,6 +15,7 @@
  */
 package org.omnifaces.cdi.eager;
 
+import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 import static org.omnifaces.util.Beans.getAnnotation;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
@@ -49,6 +51,19 @@ import org.omnifaces.cdi.ViewScoped;
  *
  */
 public class EagerExtension implements Extension {
+	
+	private static final Logger logger = Logger.getLogger(EagerExtension.class.getName());
+	
+	// Private constants ----------------------------------------------------------------------------------------------
+
+	private static final String MISSING_REQUEST_URI_OR_VIEW_ID =
+			"Bean %s with scope %s was annotated with @Eager, but required attribute 'requestURI' or 'viewId' is missing. Bean will not be eagerly instantiated.";
+	
+	private static final String MISSING_VIEW_ID =
+			"Bean %s with scope %s was annotated with @Eager, but required attribute 'viewId' is missing. Bean will not be eagerly instantiated.";
+	
+	
+	// Variables ------------------------------------------------------------------------------------------------------
 
 	private List<Bean<?>> applicationScopedBeans = new ArrayList<Bean<?>>();
 	private List<Bean<?>> sessionScopedBeans = new ArrayList<Bean<?>>();
@@ -56,6 +71,9 @@ public class EagerExtension implements Extension {
 	private Map<String, List<Bean<?>>> requestScopedBeansViewId = new HashMap<String, List<Bean<?>>>();
 	private Map<String, List<Bean<?>>> requestScopedBeansRequestURI = new HashMap<String, List<Bean<?>>>();
 
+	
+	// Methods --------------------------------------------------------------------------------------------------------
+	
 	public <T> void collect(@Observes ProcessBean<T> event, BeanManager beanManager) {
 		
 		Annotated annotated = event.getAnnotated();
@@ -75,10 +93,14 @@ public class EagerExtension implements Extension {
 					getRequestScopedBeansByRequestURI(eager.requestURI()).add(bean);
 				} else if (!isEmpty(eager.viewId())) {
 					getRequestScopedBeansByViewId(eager.viewId()).add(bean);
+				} else {
+					logger.severe(format(MISSING_REQUEST_URI_OR_VIEW_ID, bean.getBeanClass().getName(), RequestScoped.class.getName()));
 				}
 			} else if (getAnnotation(beanManager, annotated, ViewScoped.class) != null) {
 				if (!isEmpty(eager.viewId())) {
 					getRequestScopedBeansByViewId(eager.viewId()).add(bean);
+				} else {
+					logger.severe(format(MISSING_VIEW_ID, bean.getBeanClass().getName(), ViewScoped.class.getName()));
 				}
 			}
 		}
