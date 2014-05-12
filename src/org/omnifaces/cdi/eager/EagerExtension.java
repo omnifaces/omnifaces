@@ -38,6 +38,7 @@ import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessBean;
 
 import org.omnifaces.cdi.Eager;
+import org.omnifaces.cdi.ViewScoped;
 
 /**
  * CDI extension that collects beans annotated with {@link Eager}. After deployment
@@ -73,6 +74,10 @@ public class EagerExtension implements Extension {
 				if (!isEmpty(eager.requestURI())) {
 					getRequestScopedBeansByRequestURI(eager.requestURI()).add(bean);
 				} else if (!isEmpty(eager.viewId())) {
+					getRequestScopedBeansByViewId(eager.viewId()).add(bean);
+				}
+			} else if (getAnnotation(beanManager, annotated, ViewScoped.class) != null) {
+				if (!isEmpty(eager.viewId())) {
 					getRequestScopedBeansByViewId(eager.viewId()).add(bean);
 				}
 			}
