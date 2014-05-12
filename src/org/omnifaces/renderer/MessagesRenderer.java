@@ -12,7 +12,6 @@
  */
 package org.omnifaces.renderer;
 
-import static org.omnifaces.util.Components.findComponent;
 import static org.omnifaces.util.Components.findComponentsInChildren;
 import static org.omnifaces.util.Messages.createInfo;
 import static org.omnifaces.util.Renderers.writeAttribute;
@@ -115,7 +114,7 @@ public class MessagesRenderer extends Renderer {
 		List<FacesMessage> messages = new ArrayList<FacesMessage>();
 
 		for (String forClientId : forClientIds.split("\\s+")) {
-			UIComponent forComponent = findComponent(forClientId);
+			UIComponent forComponent = component.findComponent(forClientId);
 
 			if (forComponent == null) {
 				continue;
