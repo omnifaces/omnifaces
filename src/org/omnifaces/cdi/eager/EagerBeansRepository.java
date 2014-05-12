@@ -29,13 +29,13 @@ import javax.inject.Named;
 /**
  * Bean repository via which various types of eager beans can be instantiated on demand.
  * 
- * @author Arjan Tijms
  * @since 1.8
+ * @author Arjan Tijms
  *
  */
 @Named
 @ApplicationScoped
-public class EagerBeansRepository implements HideForTomcatEagerBeansRepository {
+public class EagerBeansRepository implements BeansInstantiator {
 
 	@Inject
 	private BeanManager beanManager;

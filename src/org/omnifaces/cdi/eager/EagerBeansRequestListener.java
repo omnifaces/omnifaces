@@ -30,15 +30,15 @@ import org.omnifaces.eventlistener.DefaultServletRequestListener;
  * This instantiates beans at one of the earliest possible moment during request
  * processing.
  * 
- * @author Arjan Tijms
  * @since 1.8
+ * @author Arjan Tijms
  *
  */
 @WebListener
 public class EagerBeansRequestListener extends DefaultServletRequestListener {
 	
 	@Inject
-	private HideForTomcatEagerBeansRepository eagerBeansRepository;
+	private BeansInstantiator eagerBeansRepository;
 	
 	@Override
 	public void requestInitialized(ServletRequestEvent sre) {

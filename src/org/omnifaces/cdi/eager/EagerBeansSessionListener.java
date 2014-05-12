@@ -24,15 +24,15 @@ import org.omnifaces.eventlistener.DefaultHttpSessionListener;
 /**
  * A WebListener that instantiates eager session scoped beans.
  * 
- * @author Arjan Tijms
  * @since 1.8
+ * @author Arjan Tijms
  *
  */
 @WebListener
 public class EagerBeansSessionListener extends DefaultHttpSessionListener {
 	
 	@Inject
-	private HideForTomcatEagerBeansRepository eagerBeansRepository;
+	private BeansInstantiator eagerBeansRepository;
 
 	@Override
 	public void sessionCreated(HttpSessionEvent se) {

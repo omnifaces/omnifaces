@@ -30,8 +30,8 @@ import org.omnifaces.eventlistener.DefaultPhaseListener;
  * that JSF and the view root corresponding to the current view id are available to the
  * bean.
  *
- * @author Arjan Tijms
  * @since 1.8
+ * @author Arjan Tijms
  *
  */
 public class EagerBeansPhaseListener extends DefaultPhaseListener {
@@ -44,7 +44,7 @@ public class EagerBeansPhaseListener extends DefaultPhaseListener {
 
 	@Override
 	public void afterPhase(PhaseEvent event) {
-		HideForTomcatEagerBeansRepository eagerBeansRepository = evaluateExpressionGet("#{eagerBeansRepository}");
+		BeansInstantiator eagerBeansRepository = evaluateExpressionGet("#{eagerBeansRepository}");
 
 		if (eagerBeansRepository != null) {
 			eagerBeansRepository.instantiateByViewID(getViewId());
