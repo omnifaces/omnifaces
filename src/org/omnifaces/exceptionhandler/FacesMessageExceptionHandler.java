@@ -30,7 +30,8 @@ import javax.faces.event.ExceptionQueuedEvent;
  * <strong>Note:</strong> it's your own responsibility to make sure that the faces messages are being shown. Make sure
  * that there's a <code>&lt;h:messages&gt;</code> or any equivalent component (OmniFaces, PrimeFaces, etc) is present
  * in the view and that it can handle global messages and that it's explicitly or automatically updated in case of ajax
- * requests.
+ * requests. Also make sure that you don't have bugs in rendering of your views. This exception handler is not capable
+ * of handling exceptions during render response. It will fail silently.
  * <p>
  * If more fine grained control of creating the FATAL faces message is desired, then the developer can opt to extend
  * this {@link FacesMessageExceptionHandler} and override the following method:
