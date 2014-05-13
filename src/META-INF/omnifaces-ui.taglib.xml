@@ -3318,6 +3318,18 @@ public enum Baz {
 			<required>true</required>
 			<type>java.lang.Object</type>
 		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The FQN (fully qualified name) of the specific <code>UIComponent</code> (super)class for which the
+					attribute should be set. For example, <code>javax.faces.component.UIInput</code> which has the
+					<code>valid</code> property.
+				]]>
+			</description>
+			<name>target</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
 	</tag>
 	
 	<tag>
