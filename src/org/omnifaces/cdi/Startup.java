@@ -35,7 +35,7 @@ import javax.enterprise.inject.Stereotype;
  * public class MyStartupBean {}
  * </pre>
  * <p>
- * In effects, this annotation does exactly the same as:
+ * In effect, this annotation does exactly the same as:
  * <pre>
  * import javax.enterprise.context.ApplicationScoped;
  * import org.omnifaces.cdi.Eager;
@@ -47,11 +47,11 @@ import javax.enterprise.inject.Stereotype;
  * <p>
  * This bean type effectively functions as a CDI based startup listener for the web application.
  * <p>
- * Note that Java EE also provides the <code>javax.ejb.Startup</code> and <code>javax.ejb.Singleton</code> annotations
+ * Note that Java EE thus also provides the <code>javax.ejb.Startup</code> and <code>javax.ejb.Singleton</code> annotations
  * which together provide similar functionality, but it requires an EJB dependency (which may not be applicable on e.g.
  * Tomcat+Weld) and it will result in the bean annotated with these annotations to become an EJB session bean (with
- * transaction management and all on em which you probably want to turn off with an additional
- * <code>TransactionAttribute</code> annotation).
+ * automatic transaction management and automatic locking which you might need to turn off with an additional
+ * <code>TransactionAttribute</code> and <code>Lock</code> annotation if these are not appropriate for some situation).
  *
  * @since 1.8
  * @author Arjan Tijms
