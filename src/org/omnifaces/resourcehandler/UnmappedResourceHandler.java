@@ -18,13 +18,11 @@ import java.util.Map.Entry;
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
 import javax.faces.application.ResourceHandlerWrapper;
-import javax.faces.application.ResourceWrapper;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.webapp.FacesServlet;
 import javax.servlet.http.HttpServletResponse;
 
-import org.omnifaces.util.Faces;
 import org.omnifaces.util.Hacks;
 import org.omnifaces.util.Utils;
 
@@ -133,55 +131,17 @@ public class UnmappedResourceHandler extends ResourceHandlerWrapper {
 
 	/**
 	 * Delegate to {@link #createResource(String, String, String)} of the wrapped resource handler. If it returns
-	 * non-<code>null</code>, then return a wrapped resource whose {@link Resource#getRequestPath()} returns the
-	 * unmapped URL.
+	 * non-<code>null</code>, then return a new instanceof {@link UnmappedResource}.
 	 */
 	@Override
 	public Resource createResource(String resourceName, String libraryName, String contentType) {
-		final Resource resource = super.createResource(resourceName, libraryName, contentType);
+		Resource resource = super.createResource(resourceName, libraryName, contentType);
 
 		if (resource == null) {
 			return null;
 		}
 
-		return new ResourceWrapper() {
-
-			@Override
-			public String getRequestPath() {
-				String path = super.getRequestPath();
-				String mapping = Faces.getMapping();
-
-				if (Faces.isPrefixMapping(mapping)) {
-					return path.replaceFirst(mapping, "");
-				}
-				else if (path.contains("?")) {
-					return path.replace(mapping + "?", "?");
-				}
-				else {
-					return path.substring(0, path.length() - mapping.length());
-				}
-			}
-
-			@Override // Necessary because this is missing in ResourceWrapper (will be fixed in JSF 2.2).
-			public String getResourceName() {
-				return getWrapped().getResourceName();
-			}
-
-			@Override // Necessary because this is missing in ResourceWrapper (will be fixed in JSF 2.2).
-			public String getLibraryName() {
-				return getWrapped().getLibraryName();
-			}
-
-			@Override // Necessary because this is missing in ResourceWrapper (will be fixed in JSF 2.2).
-			public String getContentType() {
-				return getWrapped().getContentType();
-			}
-
-			@Override
-			public Resource getWrapped() {
-				return resource;
-			}
-		};
+		return new UnmappedResource(resource);
 	}
 
 	/**
