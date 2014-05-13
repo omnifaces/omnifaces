@@ -40,36 +40,51 @@ import javax.faces.webapp.FacesServlet;
  * </ol>
  * <p>
  * E.g.
+ * The following bean will be instantiated during application's startup:
+ * <pre>
+ * {@literal @}Eager
+ * {@literal @}ApplicationScoped
+ * public class MyEagerApplicationScopedBean {
+ *
+ *     {@literal @}PostConstruct
+ *     public void init() {
+ *         System.out.println("Application scoped init!");
+ *     }
+ * }
+ * </pre>
+ * <p>
+ * <em>Note: you can also use the stereotype {@link Startup} for this instead.</em>
+ * <p>
  * The following bean will be instantiated whenever a session is created:
  * <pre>
  * {@literal @}Eager
  * {@literal @}SessionScoped
- * public class MySessionScopedBean implements Serializable {
- *	
- * 	private static final long serialVersionUID = 1L;
+ * public class MyEagerSessionScopedBean implements Serializable {
  *
- *	{@literal @}PostConstruct
- *	public void init() {
- *		System.out.println("Session scoped init!");
- *	}
+ *     private static final long serialVersionUID = 1L;
+ *
+ *     {@literal @}PostConstruct
+ *     public void init() {
+ *         System.out.println("Session scoped init!");
+ *     }
  * }
  * </pre>
- * 
+ * <p>
  * The following bean will be instantiated whenever the URI <code>/components/cache</code> (relatively to the
  * application root) is requested, i.e. when an app is deployed to <code>/myapp</code> at localhost this will correspond to
  * a URL like <code>http://localhost:8080/myapp/components/cache</code>:
  * <pre>
  * {@literal @}Eager(requestURI = "/components/cache")
  * {@literal @}RequestScoped
- * public class MyRequestScopedBean {
+ * public class MyEagerRequestScopedBean {
  *
- *	{@literal @}PostConstruct
- *	public void init() {
- *		System.out.println("/components/cache requested");
- *	}	
+ *     {@literal @}PostConstruct
+ *     public void init() {
+ *         System.out.println("/components/cache requested");
+ *     }
  * }
  * </pre>
- * 
+ *
  * @since 1.8
  * @author Arjan Tijms
  *
@@ -92,19 +107,17 @@ public @interface Eager {
 	String requestURI() default "";
 
 	/**
-	 * (Required when combined with {@link RequestScoped} or {@link ViewScoped}) The id of the view for which a request or view scoped bean 
+	 * (Required when combined with {@link RequestScoped} or {@link ViewScoped}) The id of the view for which a request or view scoped bean
 	 * should be instantiated. When this attribute is specified the bean will be instantiated during invocation of the
 	 * {@link FacesServlet}, namely right after the RESTORE_VIEW phase (see {@link PhaseId#RESTORE_VIEW}).
-	 * 
+	 *
 	 * <p>
 	 * JSF services are available when the bean is instantiated this way.
-	 * 
+	 *
 	 * <p>
-	 * If both this attribute and {@link Eager#requestURI()} is specified and the scope is {@link RequestScoped}, the 
+	 * If both this attribute and {@link Eager#requestURI()} is specified and the scope is {@link RequestScoped}, the
 	 * <code>requestURI</code> attribute takes precedence. If the scope is {@link ViewScoped} <code>requestURI</code> is ignored and only
 	 * this attribute is considered.
-	 * 
-	 * 
 	 */
 	@Nonbinding
 	String viewId() default "";

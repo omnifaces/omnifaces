@@ -25,21 +25,21 @@ import javax.servlet.http.HttpServletRequest;
 import org.omnifaces.eventlistener.DefaultServletRequestListener;
 
 /**
- * A WebListener that instantiates eager request scoped beans.
+ * A WebListener that instantiates eager request scoped beans by request URI.
  * <p>
  * This instantiates beans at one of the earliest possible moment during request
  * processing.
- * 
+ *
  * @since 1.8
  * @author Arjan Tijms
  *
  */
 @WebListener
 public class EagerBeansRequestListener extends DefaultServletRequestListener {
-	
+
 	@Inject
 	private BeansInstantiator eagerBeansRepository;
-	
+
 	@Override
 	public void requestInitialized(ServletRequestEvent sre) {
 		if (eagerBeansRepository != null) {

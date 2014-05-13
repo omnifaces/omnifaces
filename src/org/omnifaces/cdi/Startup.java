@@ -21,19 +21,38 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import javax.ejb.Singleton;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Stereotype;
 
 /**
+ * <p>
  * Stereo type that designates a bean as an eagerly instantiated bean with application scope.
+ * Watch out with IDE autocomplete on import that you don't accidentally import EJB's one.
+ * <pre>
+ * import org.omnifaces.cdi.Startup;
+ *
+ * {@literal @}Startup
+ * public class MyStartupBean {}
+ * </pre>
+ * <p>
+ * In effects, this annotation does exactly the same as:
+ * <pre>
+ * import javax.enterprise.context.ApplicationScoped;
+ * import org.omnifaces.cdi.Eager;
+ *
+ * {@literal @}Eager
+ * {@literal @}ApplicationScoped
+ * public class MyStartupBean {}
+ * </pre>
  * <p>
  * This bean type effectively functions as a CDI based startup listener for the web application.
  * <p>
- * Note that Java EE also provides the {@link javax.ejb.Startup} and {@link Singleton} annotations
- * which together provide similar functionality, but requires EJB and will result in the bean annotated 
- * with these annotations to become an EJB session bean. 
- * 
+ * Note that Java EE also provides the <code>javax.ejb.Startup</code> and <code>javax.ejb.Singleton</code> annotations
+ * which together provide similar functionality, but it requires an EJB dependency (which may not be applicable on e.g.
+ * Tomcat+Weld) and it will result in the bean annotated with these annotations to become an EJB session bean (with
+ * transaction management and all on em which you probably want to turn off with an additional
+ * <code>TransactionAttribute</code> annotation).
+ *
  * @since 1.8
  * @author Arjan Tijms
  *
@@ -43,4 +62,6 @@ import javax.enterprise.inject.Stereotype;
 @Stereotype
 @Retention(RUNTIME)
 @Target(TYPE)
-public @interface Startup {}
+public @interface Startup {
+	//
+}

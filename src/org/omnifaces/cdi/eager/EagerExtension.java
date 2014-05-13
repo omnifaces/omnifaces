@@ -19,7 +19,7 @@ import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
 import static org.omnifaces.util.Beans.getAnnotation;
-import static org.omnifaces.util.Beans.getInstance;
+import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.util.ArrayList;
@@ -45,44 +45,44 @@ import org.omnifaces.cdi.ViewScoped;
 /**
  * CDI extension that collects beans annotated with {@link Eager}. After deployment
  * collected beans are transferred to the {@link EagerBeansRepository}.
- * 
+ *
  * @author Arjan Tijms
  * @since 1.8
  *
  */
 public class EagerExtension implements Extension {
-	
+
 	private static final Logger logger = Logger.getLogger(EagerExtension.class.getName());
-	
+
 	// Private constants ----------------------------------------------------------------------------------------------
 
 	private static final String MISSING_REQUEST_URI_OR_VIEW_ID =
-			"Bean %s with scope %s was annotated with @Eager, but required attribute 'requestURI' or 'viewId' is missing. Bean will not be eagerly instantiated.";
-	
+		"Bean %s with scope %s was annotated with @Eager, but required attribute 'requestURI' or 'viewId' is missing."
+			+ " Bean will not be eagerly instantiated.";
+
 	private static final String MISSING_VIEW_ID =
-			"Bean %s with scope %s was annotated with @Eager, but required attribute 'viewId' is missing. Bean will not be eagerly instantiated.";
-	
-	
+		"Bean %s with scope %s was annotated with @Eager, but required attribute 'viewId' is missing."
+			+ " Bean will not be eagerly instantiated.";
+
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private List<Bean<?>> applicationScopedBeans = new ArrayList<Bean<?>>();
 	private List<Bean<?>> sessionScopedBeans = new ArrayList<Bean<?>>();
-	
+
 	private Map<String, List<Bean<?>>> requestScopedBeansViewId = new HashMap<String, List<Bean<?>>>();
 	private Map<String, List<Bean<?>>> requestScopedBeansRequestURI = new HashMap<String, List<Bean<?>>>();
 
-	
 	// Methods --------------------------------------------------------------------------------------------------------
-	
+
 	public <T> void collect(@Observes ProcessBean<T> event, BeanManager beanManager) {
-		
+
 		Annotated annotated = event.getAnnotated();
 		Eager eager = getAnnotation(beanManager, annotated, Eager.class);
-		
+
 		if (eager != null) {
-			
+
 			Bean<?> bean = event.getBean();
-			
+
 			if (getAnnotation(beanManager, annotated, ApplicationScoped.class) != null) {
 				applicationScopedBeans.add(bean);
 			} else if (getAnnotation(beanManager, annotated, SessionScoped.class) != null) {
@@ -106,23 +106,23 @@ public class EagerExtension implements Extension {
 		}
 	}
 
-	public void load(@Observes AfterDeploymentValidation event, BeanManager beanManager) {
-		
-		EagerBeansRepository eagerBeansRepository = getInstance(beanManager, EagerBeansRepository.class);
-		
+	public void load(@SuppressWarnings("unused") @Observes AfterDeploymentValidation event, BeanManager beanManager) {
+
+		EagerBeansRepository eagerBeansRepository = getReference(beanManager, EagerBeansRepository.class);
+
 		if (!applicationScopedBeans.isEmpty()) {
 			eagerBeansRepository.setApplicationScopedBeans(unmodifiableList(applicationScopedBeans));
 			eagerBeansRepository.instantiateApplicationScoped();
 		}
-		
+
 		if (!sessionScopedBeans.isEmpty()) {
 			eagerBeansRepository.setSessionScopedBeans(unmodifiableList(sessionScopedBeans));
 		}
-		
+
 		if (!requestScopedBeansRequestURI.isEmpty()) {
 			eagerBeansRepository.setRequestScopedBeansRequestURI(unmodifiableMap(requestScopedBeansRequestURI));
 		}
-		
+
 		if (!requestScopedBeansViewId.isEmpty()) {
 			eagerBeansRepository.setRequestScopedBeansViewId(unmodifiableMap(requestScopedBeansViewId));
 		}
@@ -134,18 +134,18 @@ public class EagerExtension implements Extension {
 			beans = new ArrayList<Bean<?>>();
 			requestScopedBeansViewId.put(viewId, beans);
 		}
-		
+
 		return beans;
 	}
-	
+
 	private List<Bean<?>> getRequestScopedBeansByRequestURI(String requestURI) {
 		List<Bean<?>> beans = requestScopedBeansRequestURI.get(requestURI);
 		if (beans == null) {
 			beans = new ArrayList<Bean<?>>();
 			requestScopedBeansRequestURI.put(requestURI, beans);
 		}
-		
+
 		return beans;
 	}
-	
+
 }

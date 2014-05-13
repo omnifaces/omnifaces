@@ -16,15 +16,15 @@
 package org.omnifaces.cdi.eager;
 
 import static javax.faces.event.PhaseId.RESTORE_VIEW;
-import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getViewId;
 
 import javax.faces.event.PhaseEvent;
 
+import org.omnifaces.config.BeanManager;
 import org.omnifaces.eventlistener.DefaultPhaseListener;
 
 /**
- * A PhaseListener that instantiates eager request scoped beans.
+ * A PhaseListener that instantiates eager request scoped beans by JSF view ID.
  * <p>
  * This instantiates beans relatively late during request processing but at a point
  * that JSF and the view root corresponding to the current view id are available to the
@@ -44,12 +44,11 @@ public class EagerBeansPhaseListener extends DefaultPhaseListener {
 
 	@Override
 	public void afterPhase(PhaseEvent event) {
-		BeansInstantiator eagerBeansRepository = evaluateExpressionGet("#{eagerBeansRepository}");
+		BeansInstantiator eagerBeansRepository = BeanManager.INSTANCE.getReference(BeansInstantiator.class);
 
 		if (eagerBeansRepository != null) {
 			eagerBeansRepository.instantiateByViewID(getViewId());
 		}
 	}
-
 
 }

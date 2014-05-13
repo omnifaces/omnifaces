@@ -24,22 +24,20 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
-import javax.inject.Named;
 
 /**
  * Bean repository via which various types of eager beans can be instantiated on demand.
- * 
+ *
  * @since 1.8
  * @author Arjan Tijms
  *
  */
-@Named
 @ApplicationScoped
 public class EagerBeansRepository implements BeansInstantiator {
 
 	@Inject
 	private BeanManager beanManager;
-	
+
 	private List<Bean<?>> applicationScopedBeans;
 	private List<Bean<?>> sessionScopedBeans;
 	private Map<String, List<Bean<?>>> requestScopedBeansViewId;
@@ -50,43 +48,43 @@ public class EagerBeansRepository implements BeansInstantiator {
 		if (isAnyEmpty(applicationScopedBeans, beanManager)) {
 			return;
 		}
-		
+
 		instantiateBeans(applicationScopedBeans);
 	}
-	
+
 	@Override
 	public void instantiateSessionScoped() {
 		if (isAnyEmpty(sessionScopedBeans, beanManager)) {
 			return;
 		}
-		
+
 		instantiateBeans(sessionScopedBeans);
 	}
-	
+
 	@Override
 	public void instantiateByRequestURI(String relativeRequestURI) {
 		instantiateRequestScopedBeans(requestScopedBeansRequestURI, relativeRequestURI);
 	}
-	
+
 	@Override
 	public void instantiateByViewID(String viewId) {
 		instantiateRequestScopedBeans(requestScopedBeansViewId, viewId);
 	}
-	
+
 	private void instantiateRequestScopedBeans(Map<String, List<Bean<?>>> beans, String key) {
 		if (isAnyEmpty(beans, beanManager) || !beans.containsKey(key)) {
 			return;
 		}
-		
+
 		instantiateBeans(beans.get(key));
 	}
-	
+
 	private void instantiateBeans(List<Bean<?>> beans) {
 		for (Bean<?> bean : beans) {
 			beanManager.getReference(bean, bean.getBeanClass(), beanManager.createCreationalContext(bean)).toString();
 		}
 	}
-	
+
 	public void setApplicationScopedBeans(List<Bean<?>> applicationScopedBeans) {
 		this.applicationScopedBeans = applicationScopedBeans;
 	}
@@ -94,7 +92,7 @@ public class EagerBeansRepository implements BeansInstantiator {
 	public void setSessionScopedBeans(List<Bean<?>> sessionScopedBeans) {
 		this.sessionScopedBeans = sessionScopedBeans;
 	}
-	
+
 	public void setRequestScopedBeansViewId(Map<String, List<Bean<?>>> requestScopedBeansViewId) {
 		this.requestScopedBeansViewId = requestScopedBeansViewId;
 	}
