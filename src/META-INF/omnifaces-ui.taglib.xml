@@ -3335,6 +3335,51 @@ public enum Baz {
 	<tag>
 		<description>
 			<![CDATA[
+				For detailed documentation, please refer javadoc of
+				<a href="http://omnifaces.org/docs/javadoc/current/org/omnifaces/taghandler/ViewParamValidationFailed.html"><code>org.omnifaces.taghandler.ViewParamValidationFailed</code></a>
+			]]>
+		</description>
+		<tag-name>viewParamValidationFailed</tag-name>
+		<handler-class>org.omnifaces.taghandler.ViewParamValidationFailed</handler-class>
+		<attribute>
+			<description>
+				<![CDATA[
+					The URL to send redirect to on validation failure. 
+					The same rules apply as with Faces#redirect().
+					This attribute is required when the <code>sendError</code> attribute is absent.
+				]]>
+			</description>
+			<name>sendRedirect</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The HTTP status to send error with on validation failure.
+					This attribute cannot be specified when the <code>sendRedirect</code> is already specified.
+				]]>
+			</description>
+			<name>sendError</name>
+			<required>false</required>
+			<type>java.lang.Integer</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The message to send along with the redirect or error.
+					If this attribute is not specified, then by default the validation error message will be used.
+				]]>
+			</description>
+			<name>message</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+	</tag>
+	
+	<tag>
+		<description>
+			<![CDATA[
 				<p><strong>CommandScript</strong> is an extension to <code>&lt;h:commandXxx&gt;</code> which generates a JavaScript
 				function in the global JavaScript scope which allows the enduser to execute a JSF ajax request by a just function
 				call <code>functionName()</code> in the JavaScript context.
