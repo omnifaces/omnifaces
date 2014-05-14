@@ -127,7 +127,6 @@ import org.omnifaces.util.Faces;
  * If you intend to "redirect" with a different HTTP status code, then you should be using <code>sendError</code>
  * instead and specify the desired page as <code>&lt;error-page&gt;</code> in <code>web.xml</code>.
  *
- *
  * @author Bauke Scholtz
  * @since 1.8
  */

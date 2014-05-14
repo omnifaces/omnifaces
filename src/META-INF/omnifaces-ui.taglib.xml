@@ -465,9 +465,9 @@
 	<tag>
 		<description>
 			<![CDATA[
-				<strong><code>o:highlight</code></strong> is a helper component which highlights all invalid {@link UIInput} components and the
+				<strong><code>o:highlight</code></strong> is a helper component which highlights all invalid <code>UIInput</code> components and the
 				associated labels by adding an error style class to them. Additionally, it by default focuses the first invalid 
-				{@link UIInput} component. The <code>&lt;o:highlight /&gt;</code> component can be placed anywhere in the view, as 
+				<code>UIInput</code> component. The <code>&lt;o:highlight /&gt;</code> component can be placed anywhere in the view, as 
 				long as there's only one of it.	Preferably put it somewhere in the master template for forms.
 				<pre>
 &lt;h:form&gt;
@@ -1506,7 +1506,7 @@ public boolean validateValues(FacesContext context, List&lt;UIInput&gt; componen
     // ...
 }
 				</pre>
-				<p>Or by a managed bean instance which implements the {@link MultiFieldValidator} interface:
+				<p>Or by a managed bean instance which implements the <code>MultiFieldValidator</code> interface:
 				<pre>
 &lt;o:validateMultiple id="myId" components="foo bar baz" validator="#{validateValuesBean}" /&gt;
 &lt;h:message for="myId" /&gt;
@@ -3335,8 +3335,86 @@ public enum Baz {
 	<tag>
 		<description>
 			<![CDATA[
-				For detailed documentation, please refer javadoc of
-				<a href="http://omnifaces.org/docs/javadoc/current/org/omnifaces/taghandler/ViewParamValidationFailed.html"><code>org.omnifaces.taghandler.ViewParamValidationFailed</code></a>
+				<p>
+				<code>&lt;o:viewParamValidationFailed&gt;</code> allows the developer to handle a view parameter validation failure
+				with either a redirect or a HTTP error status, optionally with respectively a flash message or HTTP error message.
+				This tag can be placed inside <code>&lt;f:metadata&gt;</code> or <code>&lt;f|o:viewParam&gt;</code>. When placed in
+				<code>&lt;f|o:viewParam&gt;</code>, then it will be applied when the particular view parameter has a validation
+				error as per <code>UIViewParameter#isValid()</code>. When placed in <code>&lt;f:metadata&gt;</code>, and no one view
+				parameter has already handled the validation error via its own  <code>&lt;o:viewParamValidationFailed&gt;</code>,
+				then it will be applied when there's a general validation error as per <code>FacesContext#isValidationFailed()</code>.
+				<p>
+				The <code>sendRedirect</code> attribute uses under the covers <code>Faces#redirect(String, String...)</code> to send the
+				redirect, so the same rules as to scheme and leading slash apply here.
+				The <code>sendError</code> attribute uses under the covers <code>Faces#responseSendError(int, String)</code> to send the
+				error, so you can customize HTTP error pages via <code>&lt;error-page&gt;</code> entries in <code>web.xml</code>,
+				otherwise the server-default one will be displayed instead.
+
+				<h3>Examples</h3>
+				<p>
+				With the example below, when at least one view param is absent, then the client will be returned a HTTP 400 error.
+				<pre>
+&lt;f:metadata&gt;
+    &lt;f:viewParam name="foo" required="true" /&gt;
+    &lt;f:viewParam name="bar" required="true" /&gt;
+    &lt;o:viewParamValidationFailed sendError="400" /&gt;
+&lt;/f:metadata&gt;
+				</pre>
+				<p>
+				With the example below, only when the "foo" parameter is absent, then the client will be redirected to "login.xhtml".
+				When the "bar" parameter is absent, nothing new will happen. The process will proceed "as usual". I.e. the validation
+				error will end up as a faces message in the current view the usual way.
+				<pre>
+&lt;f:metadata&gt;
+    &lt;f:viewParam name="foo" required="true"&gt;
+        &lt;o:viewParamValidationFailed sendRedirect="login.xhtml" /&gt;
+    &lt;/f:viewParam&gt;
+    &lt;f:viewParam name="bar" required="true" /&gt;
+&lt;/f:metadata&gt;
+				</pre>
+				<p>
+				With the example below, only when the "foo" parameter is absent, regardless of the "bar" or "baz" parameters, then
+				the client will be returned a HTTP 401 error. When the "foo" parameter is present, but either "bar" or "baz"
+				parameter is absent, then the client will be redirected to "search.xhtml".
+				<pre>
+&lt;f:metadata&gt;
+    &lt;f:viewParam name="foo" required="true"&gt;
+        &lt;o:viewParamValidationFailed sendError="401" /&gt;
+    &lt;/f:viewParam&gt;
+    &lt;f:viewParam name="bar" required="true" /&gt;
+    &lt;f:viewParam name="baz" required="true" /&gt;
+    &lt;o:viewParamValidationFailed sendRedirect="search.xhtml" /&gt;
+&lt;/f:metadata&gt;
+				</pre>
+				<p>
+				In a nutshell: the one nested in <code>&lt;f:viewParam&gt;</code> takes precedence over the one nested in
+				<code>&lt;f:metadata&gt;</code>. Also, when there are multiple <code>&lt;f:viewParam&gt;</code> tags with a
+				<code>&lt;o:viewParamValidationFailed&gt;</code>, then they will be applied in the same order as they are declared
+				in the view.
+
+				<h3>Messaging</h3>
+				<p>
+				By default, the first occurring validation message on the parent component will be copied, or when there is none,
+				then the first occurring global message will be copied. When <code>sendRedirect</code> is used, then it will be set
+				as a global flash error message. When <code>sendError</code> is used, then it will be set as HTTP status message.
+				<p>
+				You can override this message by explicitly specifying the <code>message</code> attribute. This is applicable on
+				both <code>sendRedirect</code> and <code>sendError</code>.
+				<pre>
+&lt;o:viewParamValidationFailed sendRedirect="search.xhtml" message="You need to perform a search." /&gt;
+...
+&lt;o:viewParamValidationFailed sendError="401" message="Authentication failed. You need to login." /&gt;
+				</pre>
+
+				<h3>Design notes</h3>
+				<p>
+				You can technically nest multiple <code>&lt;o:viewParamValidationFailed&gt;</code> inside the same parent, but this
+				is not the documented approach and the behavior is unspecified.
+				<p>
+				You can <strong>not</strong> change the HTTP status code of a redirect. This is not a JSF limitation, but a HTTP
+				limitation. The status code of a redirect will <strong>always</strong> be the one of the response of the redirect.
+				If you intend to "redirect" with a different HTTP status code, then you should be using <code>sendError</code>
+				instead and specify the desired page as <code>&lt;error-page&gt;</code> in <code>web.xml</code>.
 			]]>
 		</description>
 		<tag-name>viewParamValidationFailed</tag-name>
