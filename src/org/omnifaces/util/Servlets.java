@@ -90,7 +90,7 @@ public final class Servlets {
 	
 	/**
 	 * Returns the HTTP request URI relative to the context root of a web application. This is the request URI
-	 * minus the context path.
+	 * minus the context path. Note that this includes path parameters.
 	 * 
 	 * @param request The involved HTTP servlet request.
 	 * @return the request URI relative to the context root
@@ -98,6 +98,18 @@ public final class Servlets {
 	 */
 	public static String getRequestRelativeURI(HttpServletRequest request) {
 		return request.getRequestURI().substring(request.getContextPath().length());
+	}
+	
+	/**
+	 * Returns the HTTP request URI relative to the context root of a web application. This is the servlet path
+	 * plus the path info (if any).
+	 * 
+	 * @param request The involved HTTP servlet request.
+	 * @return the request URI relative to the context root
+	 * @since 1.8
+	 */
+	public static String getRequestRelativeURIWithoutPathParameters(HttpServletRequest request) {
+		return request.getPathInfo() == null? request.getServletPath() : request.getServletPath() + request.getPathInfo(); 
 	}
 
 	/**

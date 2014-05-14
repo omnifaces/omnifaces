@@ -15,7 +15,7 @@
  */
 package org.omnifaces.cdi.eager;
 
-import static org.omnifaces.util.Servlets.getRequestRelativeURI;
+import static org.omnifaces.util.Servlets.getRequestRelativeURIWithoutPathParameters;
 
 import javax.inject.Inject;
 import javax.servlet.ServletRequestEvent;
@@ -43,7 +43,7 @@ public class EagerBeansRequestListener extends DefaultServletRequestListener {
 	@Override
 	public void requestInitialized(ServletRequestEvent sre) {
 		if (eagerBeansRepository != null) {
-			eagerBeansRepository.instantiateByRequestURI(getRequestRelativeURI((HttpServletRequest)sre.getServletRequest()));
+			eagerBeansRepository.instantiateByRequestURI(getRequestRelativeURIWithoutPathParameters((HttpServletRequest)sre.getServletRequest()));
 		}
 	}
 
