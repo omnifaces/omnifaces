@@ -25,13 +25,13 @@ OmniFaces.DeferredScript = (function() {
 	var deferredScripts = [];
 
 	deferredScript.add = function(url, begin, success, error) {
-		if (!deferredScripts.length) {
+		deferredScripts.push({ url: url, begin: begin, success: success, error: error });
+
+		if (deferredScripts.length == 1) {
 			addOnloadListener(function() {
 				loadDeferredScript(0);
 			});
 		}
-
-		deferredScripts.push({ url: url, begin: begin, success: success, error: error });
 	}
 
 	function addOnloadListener(listener) {
