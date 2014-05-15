@@ -36,6 +36,7 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.ComponentSystemEventListener;
 import javax.faces.event.PostValidateEvent;
+import javax.faces.event.PreRenderViewEvent;
 import javax.faces.view.facelets.ComponentHandler;
 import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagAttribute;
@@ -134,6 +135,7 @@ public class ViewParamValidationFailed extends TagHandler implements ComponentSy
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
+	private static final String KEY = ViewParamValidationFailed.class.getName();
 	private static final Pattern HTTP_STATUS_CODE = Pattern.compile("[1-9][0-9][0-9]");
 
 	private static final String ERROR_INVALID_PARENT =
@@ -151,6 +153,9 @@ public class ViewParamValidationFailed extends TagHandler implements ComponentSy
 	private ValueExpression sendRedirect;
 	private ValueExpression sendError;
 	private ValueExpression message;
+	private String evaluatedSendRedirect;
+	private Integer evaluatedSendError;
+	private String evaluatedMessage;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -165,9 +170,9 @@ public class ViewParamValidationFailed extends TagHandler implements ComponentSy
 	// Actions --------------------------------------------------------------------------------------------------------
 
     /**
-     * If the parent component is new, and the current request is <strong>not</strong> a postback, and the parent
-     * component is an instance of {@link UIViewRoot} or {@link UIViewParameter}, and all required attributes are set,
-     * then subscribe to the {@link PostValidateEvent} of the parent component.
+     * If the parent component is an instance of {@link UIViewRoot} or {@link UIViewParameter} and is new, and the
+     * current request is <strong>not</strong> a postback, and all required attributes are set, then subscribe to the
+     * {@link PostValidateEvent}.
      * @throws IllegalArgumentException When the parent component is not an instance of {@link UIViewRoot} or
      * {@link UIViewParameter}, or when both <code>sendRedirect</code> and <code>sendError</code> attributes are
      * simultaneously specified, you can speficy only one of them.
@@ -176,13 +181,13 @@ public class ViewParamValidationFailed extends TagHandler implements ComponentSy
      */
     @Override
     public void apply(FaceletContext context, UIComponent parent) throws IOException {
-    	if (!ComponentHandler.isNew(parent) || context.getFacesContext().isPostback()) {
-    		return;
-    	}
-
     	if (!(parent instanceof UIViewRoot || parent instanceof UIViewParameter)) {
     		throw new IllegalArgumentException(
 				String.format(ERROR_INVALID_PARENT, this, parent != null ? parent.getClass().getName() : null));
+    	}
+
+    	if (!ComponentHandler.isNew(parent) || context.getFacesContext().isPostback()) {
+    		return;
     	}
 
         sendError = getValueExpression(context, "sendError", false);
@@ -206,13 +211,21 @@ public class ViewParamValidationFailed extends TagHandler implements ComponentSy
      */
     @Override
     public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
-        FacesContext context = FacesContext.getCurrentInstance();
+    	FacesContext context = FacesContext.getCurrentInstance();
 
+    	if (event instanceof PostValidateEvent) {
+    		checkValidationFailed(context, event.getComponent());
+    	}
+    	else if (event instanceof PreRenderViewEvent) {
+    		handleSendRedirectOrError(context);
+    	}
+    }
+
+	private void checkValidationFailed(FacesContext context, UIComponent component) {
         if (context.isPostback() || context.getResponseComplete()) {
         	return;
         }
 
-        UIComponent component = event.getComponent();
     	boolean validationFailed = context.isValidationFailed();
 
     	if (component instanceof UIViewParameter) {
@@ -223,55 +236,79 @@ public class ViewParamValidationFailed extends TagHandler implements ComponentSy
     		return;
     	}
 
-    	String message = evaluateMessage(context, component);
+    	String firstFacesMessage = cleanupFacesMessagesAndGetFirst(context, component);
 
+    	if (context.getAttributes().containsKey(KEY)) {
+    		return; // Validation fail has already been handled for another view parameter. Don't repeat it.
+    	}
+
+    	evaluateAllAttributes(context.getELContext(), firstFacesMessage);
+    	context.getAttributes().put(KEY, true);
+    	context.getViewRoot().subscribeToEvent(PreRenderViewEvent.class, this);
+	}
+
+	private String cleanupFacesMessagesAndGetFirst(FacesContext context, UIComponent component) {
+		String firstFacesMessage = null;
+    	Iterator<FacesMessage> facesMessages = context.getMessages(component.getClientId(context));
+
+    	if (!facesMessages.hasNext()) {
+    		facesMessages = context.getMessages(null);
+    	}
+
+    	while (facesMessages.hasNext()) {
+    		FacesMessage facesMessage = facesMessages.next();
+
+        	if (firstFacesMessage == null) {
+        		firstFacesMessage = facesMessage.getSummary();
+        	}
+
+        	facesMessages.remove(); // Avoid warning "Faces message has been enqueued but is not displayed".
+    	}
+
+    	return firstFacesMessage;
+    }
+
+	private void evaluateAllAttributes(ELContext elContext, String defaultMessage) {
+    	if (message != null) {
+    		evaluatedMessage = evaluate(elContext, message, false);
+    	}
+
+    	if (isEmpty(evaluatedMessage)) {
+    		evaluatedMessage = defaultMessage;
+    	}
+
+    	if (sendRedirect != null) {
+    		evaluatedSendRedirect = evaluate(elContext, sendRedirect, true);
+
+    		if (!isEmpty(evaluatedMessage)) {
+    			addFlashGlobalError(evaluatedMessage); // Can namely not set it during PreRenderView for redirect.
+    		}
+    	}
+    	else {
+			String evaluatedSendErrorString = evaluate(elContext, sendError, false);
+
+			if (evaluatedSendErrorString == null || !HTTP_STATUS_CODE.matcher(evaluatedSendErrorString).matches()) {
+				throw new IllegalArgumentException(
+					String.format(ERROR_INVALID_SENDERROR, sendError, evaluatedSendErrorString));
+			}
+
+			evaluatedSendError = Integer.valueOf(evaluatedSendErrorString);
+    	}
+	}
+
+    private void handleSendRedirectOrError(FacesContext context) {
         try {
-    		if (sendRedirect != null) {
-    			sendRedirect(context, message);
+    		if (evaluatedSendRedirect != null) {
+    	        redirect(context, evaluatedSendRedirect); // Evaluated message is already set during PostValidate.
     		}
     		else {
-    			sendError(context, message);
+    			responseSendError(context, evaluatedSendError, evaluatedMessage);
     		}
         }
         catch (IOException e) {
             throw new FacesException(e);
     	}
-    }
-
-    private String evaluateMessage(FacesContext context, UIComponent component) {
-    	Iterator<FacesMessage> messages = context.getMessages(component.getClientId(context));
-
-    	if (!messages.hasNext()) {
-    		messages = context.getMessages(null);
-    	}
-
-    	if (messages.hasNext()) {
-    		return messages.next().getSummary();
-    	}
-
-    	return evaluate(context.getELContext(), message, false);
-    }
-
-    private void sendRedirect(FacesContext context, String message) throws IOException {
-		String evaluatedSendRedirect = evaluate(context.getELContext(), sendRedirect, true);
-
-		if (message != null) {
-			addFlashGlobalError(message);
-		}
-
-        redirect(context, evaluatedSendRedirect);
-    }
-
-    private void sendError(FacesContext context, String message) throws IOException {
-		String evaluatedSendError = evaluate(context.getELContext(), sendError, false);
-
-		if (evaluatedSendError == null || !HTTP_STATUS_CODE.matcher(evaluatedSendError).matches()) {
-			throw new IllegalArgumentException(
-				String.format(ERROR_INVALID_SENDERROR, sendError, evaluatedSendError));
-		}
-
-    	responseSendError(context, Integer.valueOf(evaluatedSendError), message);
-    }
+	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
