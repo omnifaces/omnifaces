@@ -1764,17 +1764,20 @@ public class ValidateValuesBean implements MultiFieldValidator {
 	<tag>
 		<description>
 				<![CDATA[
-					<strong><code>o:viewParam</code></strong> is a component that extends the standard viewParam and provides a stateless
-	 				mode of operation and a default for the label atrribute. When the label attribute is omitted, the name
-	 				attribute will be used instead.
-	 				<p>
-	 				The standard UIViewParameter implementation calls the model setter again after postback. This is not always desired when being
-					bound to a view scoped beans and can lead to performance problems when combined with an expensive converter.
+					<strong>ViewParameter</strong> is a component that extends the standard {@link UIViewParameter} and provides a
+					stateless mode of operation and fixes the issue wherein null model values are converted to empty string parameters
+					in query string (e.g. when <code>includeViewParams=true</code>).
 					<p>
-					To solve this, this component by default stores the submitted value as a component property instead of in the model (and thus
-					in the view state in case the binding is to a view scoped bean).
+					The standard UIViewParameter implementation calls the model setter again after postback. This is not always desired
+					when being bound to a view scoped bean and can lead to performance problems when combined with an expensive converter.
+					To solve this, this component by default stores the submitted value as a component property instead of in the model
+					(and thus in the view state in case the binding is to a view scoped bean).
 					<p>
-					You can use it the same way as <code>&lt;f:viewParam&gt;</code>, you only need to change <code>f:</code> by
+					The standard UIViewParameter implementation calls the converter regardless of whether the evaluated model value is
+					<code>null</code> or not. As converters by specification return an empty string in case of <code>null</code> value,
+					this is being added to the query string as an empty parameter. This is not desired.
+					<p>
+					You can use it the same way as <code>&lt;f:viewParam&gt;</code>, you only need to change <code>f:</code> to
 					<code>o:</code>.
 				]]>
 		</description>

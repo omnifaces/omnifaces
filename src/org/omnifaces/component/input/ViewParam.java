@@ -20,18 +20,23 @@ import javax.el.ValueExpression;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIViewParameter;
 import javax.faces.context.FacesContext;
+import javax.faces.convert.ConverterException;
 
 import org.omnifaces.util.MapWrapper;
 
 /**
- * <strong>ViewParameter</strong> is a component that extends the standard {@link UIViewParameter} and provides a stateless
- * mode of operation.
+ * <strong>ViewParameter</strong> is a component that extends the standard {@link UIViewParameter} and provides a
+ * stateless mode of operation and fixes the issue wherein null model values are converted to empty string parameters
+ * in query string (e.g. when <code>includeViewParams=true</code>).
  * <p>
- * The standard UIViewParameter implementation calls the model setter again after postback. This is not always desired when being
- * bound to a view scoped bean and can lead to performance problems when combined with an expensive converter.
+ * The standard UIViewParameter implementation calls the model setter again after postback. This is not always desired
+ * when being bound to a view scoped bean and can lead to performance problems when combined with an expensive converter.
+ * To solve this, this component by default stores the submitted value as a component property instead of in the model
+ * (and thus in the view state in case the binding is to a view scoped bean).
  * <p>
- * To solve this, this component by default stores the submitted value as a component property instead of in the model (and thus
- * in the view state in case the binding is to a view scoped bean).
+ * The standard UIViewParameter implementation calls the converter regardless of whether the evaluated model value is
+ * <code>null</code> or not. As converters by specification return an empty string in case of <code>null</code> value,
+ * this is being added to the query string as an empty parameter. This is not desired.
  * <p>
  * You can use it the same way as <code>&lt;f:viewParam&gt;</code>, you only need to change <code>f:</code> to
  * <code>o:</code>.
@@ -108,8 +113,7 @@ public class ViewParam extends UIViewParameter {
 						}
 					}
 
-					// No explicit label defined, default to "name" (which is in many cases the most
-					// sane label anyway).
+					// No explicit label defined, default to "name" (which is in many cases the most sane label anyway).
 					if (label == null) {
 						label = ViewParam.this.getName();
 					}
@@ -121,6 +125,19 @@ public class ViewParam extends UIViewParameter {
 		}
 
 		return attributeInterceptMap;
+	}
+
+	/**
+	 * When there's a value expression and the evaluated model value is <code>null</code>, then just return
+	 * <code>null</code> instead of delegating to default implementation which would return an empty string when a
+	 * converter is attached.
+	 * @since 1.8
+	 */
+	@Override
+	public String getStringValueFromModel(FacesContext context) throws ConverterException {
+		ValueExpression ve = getValueExpression("value");
+		Object value = (ve != null) ? ve.getValue(context.getELContext()) : null;
+		return (value != null) ? super.getStringValueFromModel(context) : null;
 	}
 
 }
