@@ -378,6 +378,16 @@ public final class Hacks {
 	/**
 	 * Set the given script resource as rendered.
 	 * @param context The involved faces context.
+	 * @param id The resource identifier.
+	 * @since 1.8
+	 */
+	public static void setScriptResourceRendered(FacesContext context, ResourceIdentifier id) {
+		setScriptResourceRendered(context, id.getLibrary(), id.getName());
+	}
+
+	/**
+	 * Set the given script resource as rendered.
+	 * @param context The involved faces context.
 	 * @param library The resource library.
 	 * @param name The resource name.
 	 * @since 1.8
