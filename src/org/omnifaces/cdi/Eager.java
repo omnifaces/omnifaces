@@ -27,6 +27,10 @@ import javax.enterprise.context.SessionScoped;
 import javax.enterprise.util.Nonbinding;
 import javax.faces.event.PhaseId;
 import javax.faces.webapp.FacesServlet;
+import javax.servlet.ServletRequestListener;
+
+import org.omnifaces.cdi.eager.EagerBeansFilter;
+import org.omnifaces.cdi.eager.EagerBeansRequestListener;
 
 /**
  * Specifies that a scoped bean is to be eagerly instantiated.
@@ -84,6 +88,29 @@ import javax.faces.webapp.FacesServlet;
  *     }
  * }
  * </pre>
+ * 
+ * <h3> Compatibility </h3>
+ * 
+ * <p>
+ * In some (older) containers, most notably GlassFish 3, the CDI request scope is not available in a {@link ServletRequestListener} 
+ * (this is actually not spec complicant, as CDI demands this scope to be active then, but it is what it is).
+ * If this is thus indeed the case, a filter needs to be installed instead in <code>web.xml</code> as follows:
+ * 
+ * <pre>
+ * &lt;filter&gt;
+ *     &lt;filter-name&gt;eagerBeansFilter&lt;/filter-name&gt;
+ *     &lt;filter-class&gt;org.omnifaces.cdi.eager.EagerBeansFilter&lt;/filter-class&gt;
+ * &lt;/filter&gt;
+ * &lt;filter-mapping&gt;
+ * &lt;filter-name&gt;eagerBeansFilter&lt;/filter-name&gt;
+ *     &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+ * &lt;/filter-mapping&gt;
+ *</pre>
+ *
+ * Note that the {@link EagerBeansFilter} will automatically disable the request listener by calling 
+ * {@link EagerBeansRequestListener#setEnabled(boolean)}. If so needed the request listener can also be disabled
+ * in the same way via user code.
+ * 
  *
  * @since 1.8
  * @author Arjan Tijms
