@@ -28,9 +28,11 @@ import javax.enterprise.util.Nonbinding;
 import javax.faces.event.PhaseId;
 import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletRequestListener;
+import javax.servlet.http.HttpSessionListener;
 
 import org.omnifaces.cdi.eager.EagerBeansFilter;
 import org.omnifaces.cdi.eager.EagerBeansRequestListener;
+import org.omnifaces.cdi.eager.EagerBeansSessionListener;
 
 /**
  * Specifies that a scoped bean is to be eagerly instantiated.
@@ -94,7 +96,24 @@ import org.omnifaces.cdi.eager.EagerBeansRequestListener;
  * <p>
  * In some (older) containers, most notably GlassFish 3, the CDI request scope is not available in a {@link ServletRequestListener} 
  * (this is actually not spec complicant, as CDI demands this scope to be active then, but it is what it is).
- * If this is thus indeed the case, a filter needs to be installed instead in <code>web.xml</code> as follows:
+ * <p>
+ * Additionally in some containers, most notably GlassFish 3 again, instantiating session scoped beans from a {@link HttpSessionListener}
+ * will corrupt "something" in the container. The instantiating of the beans will succeed, but if the session is later accessed an
+ * exception like the following will be thrown:
+ * 
+ * <pre>
+ * java.lang.IllegalArgumentException: Should never reach here
+ *  at org.apache.catalina.connector.SessionTracker.track(SessionTracker.java:168)
+ *  at org.apache.catalina.connector.Request.doGetSession(Request.java:2939)
+ *  at org.apache.catalina.connector.Request.getSession(Request.java:2583)
+ *  at org.apache.catalina.connector.RequestFacade.getSession(RequestFacade.java:920)
+ *  at javax.servlet.http.HttpServletRequestWrapper.getSession(HttpServletRequestWrapper.java:259)
+ *  at com.sun.faces.context.ExternalContextImpl.getSession(ExternalContextImpl.java:155)
+ *  at javax.faces.context.ExternalContextWrapper.getSession(ExternalContextWrapper.java:396)
+ *  at javax.faces.context.ExternalContextWrapper.getSession(ExternalContextWrapper.java:396)
+ *  </pre>
+ * 
+ * If any or both of those problems occur, a filter needs to be installed instead in <code>web.xml</code> as follows:
  * 
  * <pre>
  * &lt;filter&gt;
@@ -108,8 +127,10 @@ import org.omnifaces.cdi.eager.EagerBeansRequestListener;
  *</pre>
  *
  * Note that the {@link EagerBeansFilter} will automatically disable the request listener by calling 
- * {@link EagerBeansRequestListener#setEnabled(boolean)}. If so needed the request listener can also be disabled
- * in the same way via user code.
+ * {@link EagerBeansRequestListener#setEnabled(boolean)} and disable instantiating beans from the session listener by
+ * calling {@link EagerBeansSessionListener#setEnabled(boolean)}.
+ * <p>
+ * If so needed the listeners can also be disabled in the same way via user code.
  * 
  *
  * @since 1.8
