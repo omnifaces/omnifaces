@@ -54,8 +54,8 @@ public final class Hacks {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final boolean RICHFACES_INSTALLED = initRichFacesInstalled();
-	private static final boolean RICHFACES_RESOURCE_OPTIMIZATION_ENABLED =
-		RICHFACES_INSTALLED && Boolean.valueOf(Faces.getInitParameter("org.richfaces.resourceOptimization.enabled"));
+	private static final String RICHFACES_RO_INIT_PARAM =
+		"org.richfaces.resourceOptimization.enabled";
 	private static final String RICHFACES_PVC_CLASS_NAME =
 		"org.richfaces.context.ExtendedPartialViewContextImpl";
 	private static final String RICHFACES_RLR_RENDERER_TYPE =
@@ -69,7 +69,6 @@ public final class Hacks {
 	private static final String JUEL_MINIMUM_METHOD_EXPRESSION_VERSION =
 		"2.2.6";
 
-	private static final boolean MYFACES_USED = initMyFacesUsed();
 	private static final String MYFACES_PACKAGE_PREFIX = "org.apache.myfaces.";
 	private static final String MYFACES_RENDERED_SCRIPT_RESOURCES_KEY =
 		"org.apache.myfaces.RENDERED_SCRIPT_RESOURCES_SET";
@@ -90,6 +89,11 @@ public final class Hacks {
 
 	private static final Object[] EMPTY_PARAMETERS = new Object[0];
 
+	// Lazy loaded properties (will only be initialized when FacesContext is available) -------------------------------
+
+	private static Boolean richFacesResourceOptimizationEnabled;
+	private static Boolean myFacesUsed;
+
 	// Constructors/init ----------------------------------------------------------------------------------------------
 
 	private Hacks() {
@@ -106,10 +110,6 @@ public final class Hacks {
 		}
 	}
 
-	private static boolean initMyFacesUsed() {
-		return FacesContext.getCurrentInstance().getClass().getPackage().getName().startsWith(MYFACES_PACKAGE_PREFIX);
-	}
-
 	private static boolean initJUELSupportsMethodExpression() {
 		Package juelPackage = Package.getPackage("de.odysseus.el");
 		if (juelPackage == null) {
@@ -124,7 +124,7 @@ public final class Hacks {
 		return isSameOrHigherVersion(juelVersion, JUEL_MINIMUM_METHOD_EXPRESSION_VERSION);
 	}
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+	// RichFaces related ----------------------------------------------------------------------------------------------
 
 	/**
 	 * Returns true if RichFaces is installed. That is, when the RichFaces specific ExtendedPartialViewContextImpl is
@@ -201,7 +201,19 @@ public final class Hacks {
 	 * @return Whether RichFaces resource optimization is enabled.
 	 */
 	public static boolean isRichFacesResourceOptimizationEnabled() {
-		return RICHFACES_RESOURCE_OPTIMIZATION_ENABLED;
+		if (richFacesResourceOptimizationEnabled == null) {
+			if (!RICHFACES_INSTALLED) {
+				richFacesResourceOptimizationEnabled = false;
+			}
+			else if (Faces.getContext() != null) {
+				richFacesResourceOptimizationEnabled = Boolean.valueOf(Faces.getInitParameter(RICHFACES_RO_INIT_PARAM));
+			}
+			else {
+				return false;
+			}
+		}
+
+		return richFacesResourceOptimizationEnabled;
 	}
 
 	/**
@@ -235,6 +247,8 @@ public final class Hacks {
 		return resourceIdentifiers;
 	}
 
+	// JUEL related ---------------------------------------------------------------------------------------------------
+
 	public static boolean isJUELUsed() {
 		return isJUELUsed(Faces.getApplication().getExpressionFactory());
 	}
@@ -254,7 +268,7 @@ public final class Hacks {
 	 * @param version2 the second version in the comparison
 	 * @return true if version1 is the same or a higher version than version2, false otherwise
 	 */
-	public static boolean isSameOrHigherVersion(String version1, String version2) {
+	private static boolean isSameOrHigherVersion(String version1, String version2) {
 
 		List<Integer> version1Elements = toVersionElements(version1);
 		List<Integer> version2Elements = toVersionElements(version2);
@@ -293,6 +307,8 @@ public final class Hacks {
 
 		return 0;
 	}
+
+	// EL related -----------------------------------------------------------------------------------------------------
 
 	/**
 	 * This method wraps a <code>MethodExpression</code> in a <code>Method</code> which can be statically invoked.
@@ -368,14 +384,29 @@ public final class Hacks {
 		}
 	}
 
+	// MyFaces related ------------------------------------------------------------------------------------------------
+
 	/**
 	 * Returns true if MyFaces is used. That is, when the FacesContext instance is from the MyFaces specific package.
 	 * @return Whether MyFaces is used.
 	 * @since 1.8
 	 */
 	public static boolean isMyFacesUsed() {
-		return MYFACES_USED;
+		if (myFacesUsed == null) {
+			FacesContext context = Faces.getContext();
+
+			if (context != null) {
+				myFacesUsed = context.getClass().getPackage().getName().startsWith(MYFACES_PACKAGE_PREFIX);
+			}
+			else {
+				return false;
+			}
+		}
+
+		return myFacesUsed;
 	}
+
+	// JSF resource handling related ----------------------------------------------------------------------------------
 
 	/**
 	 * Set the given script resource as rendered.
@@ -386,7 +417,7 @@ public final class Hacks {
 	public static void setScriptResourceRendered(FacesContext context, ResourceIdentifier id) {
 		setMojarraResourceRendered(context, id);
 
-		if (MYFACES_USED) {
+		if (isMyFacesUsed()) {
 			setMyFacesResourceRendered(context, MYFACES_RENDERED_SCRIPT_RESOURCES_KEY, id);
 		}
 	}
@@ -400,7 +431,7 @@ public final class Hacks {
 	public static void setStylesheetResourceRendered(FacesContext context, ResourceIdentifier id) {
 		setMojarraResourceRendered(context, id);
 
-		if (MYFACES_USED) {
+		if (isMyFacesUsed()) {
 			setMyFacesResourceRendered(context, MYFACES_RENDERED_STYLESHEET_RESOURCES_KEY, id);
 		}
 	}
@@ -436,6 +467,8 @@ public final class Hacks {
 		// TODO: This may possibly conflict with other keys with value=true. So far tested, this is harmless.
 		context.getAttributes().values().removeAll(Collections.singleton(true));
 	}
+
+	// PrimeFaces related ---------------------------------------------------------------------------------------------
 
 	/**
 	 * Returns true if the current request is a PrimeFaces dynamic resource request.
