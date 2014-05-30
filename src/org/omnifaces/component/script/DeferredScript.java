@@ -23,6 +23,7 @@ import javax.faces.event.ListenerFor;
 import javax.faces.event.PostAddToViewEvent;
 
 import org.omnifaces.renderer.DeferredScriptRenderer;
+import org.omnifaces.resourcehandler.ResourceIdentifier;
 import org.omnifaces.util.Hacks;
 
 /**
@@ -69,12 +70,11 @@ public class DeferredScript extends ScriptFamily {
 
 			boolean ajaxRequest = ajaxContext.isAjaxRequest();
 			boolean ajaxRenderAll = ajaxContext.isRenderAll();
+			boolean alreadyAdded = view.getComponentResources(context, "body").contains(this);
 
-			if (!(ajaxRequest && !ajaxRenderAll) || !view.getComponentResources(context, "body").contains(this)) {
+			if (!(ajaxRequest && !ajaxRenderAll) || !alreadyAdded) {
 				view.addComponentResource(context, this, "body");
-				String library = (String) getAttributes().get("library");
-				String name = (String) getAttributes().get("name");
-				Hacks.setScriptResourceRendered(context, library, name);
+				Hacks.setScriptResourceRendered(context, new ResourceIdentifier(this));
 			}
 		}
 	}

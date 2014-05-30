@@ -375,10 +375,14 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 				componentResourcesToRemove.add(component);
 			}
 			else if (rendererType.equals(RENDERER_TYPE_CSS)) {
-				stylesheets.add(context, component, id);
+				if (stylesheets.add(component, id)) {
+					Hacks.setStylesheetResourceRendered(context, id); // Prevents future forced additions by libs.
+				}
 			}
 			else if (rendererType.equals(RENDERER_TYPE_JS)) {
-				scripts.add(context, component, id);
+				if (scripts.add(component, id)) {
+					Hacks.setScriptResourceRendered(context, id); // Prevents future forced additions by libs.
+				}
 			}
 			else if (component instanceof DeferredScript) {
 				String group = (String) component.getAttributes().get("group");
@@ -389,7 +393,7 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 					deferredScripts.put(group, builder);
 				}
 
-				builder.add(context, component, id);
+				builder.add(component, id);
 			}
 
 			// WARNING: START OF HACK! --------------------------------------------------------------------------------
@@ -436,15 +440,10 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 			componentResourcesToRemove = new ArrayList<UIComponent>(3);
 		}
 
-		private void add(FacesContext context, UIComponent componentResource, ResourceIdentifier resourceIdentifier) {
-			String library = resourceIdentifier.getLibrary();
-			String name = resourceIdentifier.getName();
-
-			if ((componentResource != null && !componentResource.isRendered()) // Component resource has rendered="false".
-				|| (!(componentResource instanceof DeferredScript) // It already calls setScriptResourceRendered.
-					&& Hacks.isScriptResourceRendered(context, library, name))) { // Apparently auto-added by a lib.
-				Hacks.setScriptResourceRendered(context, library, name); // Prevents future forced additions by libs.
-				componentResourcesToRemove.add(componentResource); // Prevents duplicate rendering.
+		private boolean add(UIComponent componentResource, ResourceIdentifier resourceIdentifier) {
+			if (componentResource != null && !componentResource.isRendered()) {
+				componentResourcesToRemove.add(componentResource);
+				return true;
 			}
 			else if (excludedResources.isEmpty() || !excludedResources.contains(resourceIdentifier)) {
 				info.add(resourceIdentifier);
@@ -460,10 +459,15 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 					}
 					componentResourcesToRemove.add(componentResource);
 				}
+
+				return true;
 			}
 			else if (suppressedResources.contains(resourceIdentifier)) {
 				componentResourcesToRemove.add(componentResource);
+				return true;
 			}
+
+			return false;
 		}
 
 		private void mergeAttribute(UIComponent originalComponent, UIComponent newComponent, String name) {

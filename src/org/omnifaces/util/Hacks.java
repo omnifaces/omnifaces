@@ -73,11 +73,13 @@ public final class Hacks {
 	private static final String MYFACES_PACKAGE_PREFIX = "org.apache.myfaces.";
 	private static final String MYFACES_RENDERED_SCRIPT_RESOURCES_KEY =
 		"org.apache.myfaces.RENDERED_SCRIPT_RESOURCES_SET";
+	private static final String MYFACES_RENDERED_STYLESHEET_RESOURCES_KEY =
+		"org.apache.myfaces.RENDERED_STYLESHEET_RESOURCES_SET";
 	private static final Set<String> MOJARRA_MYFACES_RESOURCE_DEPENDENCY_KEYS =
 		Utils.unmodifiableSet(
 			"com.sun.faces.PROCESSED_RESOURCE_DEPENDENCIES",
 			MYFACES_RENDERED_SCRIPT_RESOURCES_KEY,
-			"org.apache.myfaces.RENDERED_STYLESHEET_RESOURCES_SET");
+			MYFACES_RENDERED_STYLESHEET_RESOURCES_KEY);
 
 	private static final String ERROR_CREATE_INSTANCE =
 		"Cannot create instance of class '%s'.";
@@ -378,48 +380,48 @@ public final class Hacks {
 	/**
 	 * Set the given script resource as rendered.
 	 * @param context The involved faces context.
-	 * @param library The resource library.
-	 * @param name The resource name.
+	 * @param id The resource identifier.
 	 * @since 1.8
 	 */
-	public static void setScriptResourceRendered(FacesContext context, String library, String name) {
-		context.getAttributes().put(name + library, true);
+	public static void setScriptResourceRendered(FacesContext context, ResourceIdentifier id) {
+		setMojarraResourceRendered(context, id);
 
 		if (MYFACES_USED) {
-			String key = (library != null) ? (library + '/' + name) : name;
-			getMyFacesRenderedScriptResources(context).put(key, true);
+			setMyFacesResourceRendered(context, MYFACES_RENDERED_SCRIPT_RESOURCES_KEY, id);
 		}
 	}
 
 	/**
-	 * Returns whether the given script resource is rendered.
+	 * Set the given stylesheet resource as rendered.
 	 * @param context The involved faces context.
-	 * @param library The resource library.
-	 * @param name The resource name.
-	 * @return Whether the given script resource is rendered.
+	 * @param id The resource identifier.
 	 * @since 1.8
 	 */
-	public static boolean isScriptResourceRendered(FacesContext context, String library, String name) {
-		boolean rendered = context.getAttributes().containsKey(name + library);
+	public static void setStylesheetResourceRendered(FacesContext context, ResourceIdentifier id) {
+		setMojarraResourceRendered(context, id);
 
-		if (!rendered && MYFACES_USED) {
-			String key = (library != null) ? (library + '/' + name) : name;
-			return getMyFacesRenderedScriptResources(context).containsKey(key);
-		}
-		else {
-			return rendered;
+		if (MYFACES_USED) {
+			setMyFacesResourceRendered(context, MYFACES_RENDERED_STYLESHEET_RESOURCES_KEY, id);
 		}
 	}
 
-	private static Map<String, Boolean> getMyFacesRenderedScriptResources(FacesContext context) {
-		Map<String, Boolean> map = getContextAttribute(context, MYFACES_RENDERED_SCRIPT_RESOURCES_KEY);
+	private static void setMojarraResourceRendered(FacesContext context, ResourceIdentifier id) {
+		String library = id.getLibrary();
+		String name = id.getName();
+		context.getAttributes().put(name + library, true);
+	}
+
+	private static void setMyFacesResourceRendered(FacesContext context, String key, ResourceIdentifier id) {
+		Map<String, Boolean> map = getContextAttribute(context, key);
 
 		if (map == null) {
 			map = new HashMap<String, Boolean>();
-			setContextAttribute(context, MYFACES_RENDERED_SCRIPT_RESOURCES_KEY, map);
+			setContextAttribute(context, key, map);
 		}
 
-		return map;
+		String library = id.getLibrary();
+		String name = id.getName();
+		map.put((library != null) ? (library + '/' + name) : name, true);
 	}
 
 	/**
