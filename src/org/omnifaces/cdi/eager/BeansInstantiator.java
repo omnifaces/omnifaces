@@ -25,6 +25,7 @@ package org.omnifaces.cdi.eager;
  * <p>
  * This interface will most likely be removed in OmniFaces 2.0 if OmniFaces 2.0 requires CDI to be present.
  * 
+ * @since 1.8
  * @author Arjan Tijms
  * 
  */
