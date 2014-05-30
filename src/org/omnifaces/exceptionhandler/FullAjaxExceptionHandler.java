@@ -93,11 +93,12 @@ import org.omnifaces.util.Hacks;
  * and the response can still be resetted, then a hardcoded message will be returned informing the developer about the
  * double mistake.
  * <p>
- * If more fine grained control of determining the root cause of the caught exception, or determining the error page,
- * or logging the exception is desired, then the developer can opt to extend this {@link FullAjaxExceptionHandler} and
- * override one or more of the following methods:
+ * If more fine grained control is desired for determining the root cause of the caught exception, or whether it should
+ * be handled, or determining the error page, or logging the exception, then the developer can opt to extend this
+ * {@link FullAjaxExceptionHandler} and override one or more of the following methods:
  * <ul>
  * <li>{@link #findExceptionRootCause(FacesContext, Throwable)}
+ * <li>{@link #shouldHandleExceptionRootCause(FacesContext, Throwable)}
  * <li>{@link #findErrorPageLocation(FacesContext, Throwable)}
  * <li>{@link #logException(FacesContext, Throwable, String, String, Object...)}
  * </ul>
@@ -193,10 +194,12 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 			return; // Let JSF handle it itself.
 		}
 
-		unhandledExceptionQueuedEvents.remove();
-
-		// Unwrap the root cause from FacesException and find the associated error page location.
 		exception = findExceptionRootCause(context, exception);
+
+		if (!shouldHandleExceptionRootCause(context, exception)) {
+			return; // A subclass apparently want to do it differently.
+		}
+
 		String errorPageLocation = findErrorPageLocation(context, exception);
 
 		if (errorPageLocation == null) {
@@ -204,6 +207,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 			throw new IllegalArgumentException(ERROR_DEFAULT_LOCATION_MISSING);
 		}
 
+		unhandledExceptionQueuedEvents.remove();
 		ExternalContext externalContext = context.getExternalContext();
 
 		// Check if we're inside render response and if the response is committed.
@@ -256,6 +260,19 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	 */
 	protected Throwable findExceptionRootCause(FacesContext context, Throwable exception) {
 		return Exceptions.unwrap(exception);
+	}
+
+	/**
+	 * Returns <code>true</code> if the {@link FullAjaxExceptionHandler} should handle this exception root cause. If
+	 * this returns <code>false</code>, then the {@link FullAjaxExceptionHandler} will skip handling this exception and
+	 * delegate it further to the wrapped exception handler. The default implementation just returns <code>true</code>.
+	 * @param context The involved faces context.
+	 * @param exception The caught exception to determine the root cause for.
+	 * @return <code>true</code> if the given exception should be handled by the {@link FullAjaxExceptionHandler}.
+	 * @since 1.8
+	 */
+	protected boolean shouldHandleExceptionRootCause(FacesContext context, Throwable exception) {
+		return true;
 	}
 
 	/**
