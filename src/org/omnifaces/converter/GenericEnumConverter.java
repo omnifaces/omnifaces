@@ -32,7 +32,7 @@ import org.omnifaces.util.Messages;
  * <code>E</code> is lost during runtime. The list would be filled with unconverted <code>String</code> values instead
  * which may in turn cause <code>ClassCastException</code>.
  * <p>
- * If replacing the <code>List&lt;E&gt;</code> property by a <code>T[]</code> (e.g. <code>Role[]</code> in case of a
+ * If replacing the <code>List&lt;E&gt;</code> property by a <code>E[]</code> (e.g. <code>Role[]</code> in case of a
  * <code>Role</code> enum) is not an option due to design restrictions (e.g. JPA <code>@ElementCollection</code>, etc),
  * then you'd need to create an explicit converter for the enum type like follows:
  * <pre>
