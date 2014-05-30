@@ -27,12 +27,12 @@ import org.omnifaces.util.Messages;
 
 /**
  * This generic enum converter is intended for use in {@link UISelectMany} components whose value is been bound to a
- * <code>List&lt;T&gt;</code> property. Even though JSF has already a built-in {@link EnumConverter}, this doesn't work
- * for a <code>List&lt;T&gt;</code> property as the generic type information <code>T</code> is lost during runtime. The
- * list would be filled with unconverted <code>String</code> values instead which may in turn cause
- * <code>ClassCastException</code>.
+ * <code>List&lt;E&gt;</code> property where <code>E</code> is an enum. Even though JSF has already a built-in
+ * {@link EnumConverter}, this doesn't work for a <code>List&lt;E&gt;</code> property as the generic type information
+ * <code>E</code> is lost during runtime. The list would be filled with unconverted <code>String</code> values instead
+ * which may in turn cause <code>ClassCastException</code>.
  * <p>
- * If replacing the <code>List&lt;T&gt;</code> property by a <code>T[]</code> (e.g. <code>Role[]</code> in case of a
+ * If replacing the <code>List&lt;E&gt;</code> property by a <code>T[]</code> (e.g. <code>Role[]</code> in case of a
  * <code>Role</code> enum) is not an option due to design restrictions (e.g. JPA <code>@ElementCollection</code>, etc),
  * then you'd need to create an explicit converter for the enum type like follows:
  * <pre>
@@ -45,7 +45,7 @@ import org.omnifaces.util.Messages;
  * </pre>
  * <p>
  * However, creating a new converter for every single enum type, only and only for use in {@link UISelectMany} with a
- * <code>List&lt;T&gt;</code> property, may be a bit clumsy. This generic enum converter is intended to remove the need
+ * <code>List&lt;E&gt;</code> property, may be a bit clumsy. This generic enum converter is intended to remove the need
  * to create a new enum converter every time.
  * <p>
  * This converter is available by converter ID <code>omnifaces.GenericEnumConverter</code>. Basic usage example:
