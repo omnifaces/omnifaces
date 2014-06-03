@@ -423,6 +423,25 @@ public final class Hacks {
 	}
 
 	/**
+	 * Returns whether the given script resource is rendered.
+	 * @param context The involved faces context.
+	 * @param library The resource library.
+	 * @param name The resource name.
+	 * @return Whether the given script resource is rendered.
+	 * @since 1.8
+	 */
+	public static boolean isScriptResourceRendered(FacesContext context, ResourceIdentifier id) {
+		boolean rendered = isMojarraResourceRendered(context, id);
+
+		if (!rendered && isMyFacesUsed()) {
+			return isMyFacesResourceRendered(context, MYFACES_RENDERED_SCRIPT_RESOURCES_KEY, id);
+		}
+		else {
+			return rendered;
+		}
+	}
+
+	/**
 	 * Set the given stylesheet resource as rendered.
 	 * @param context The involved faces context.
 	 * @param id The resource identifier.
@@ -437,12 +456,22 @@ public final class Hacks {
 	}
 
 	private static void setMojarraResourceRendered(FacesContext context, ResourceIdentifier id) {
-		String library = id.getLibrary();
-		String name = id.getName();
-		context.getAttributes().put(name + library, true);
+		context.getAttributes().put(id.getName() + id.getLibrary(), true);
+	}
+
+	private static boolean isMojarraResourceRendered(FacesContext context, ResourceIdentifier id) {
+		return context.getAttributes().containsKey(id.getName() + id.getLibrary());
 	}
 
 	private static void setMyFacesResourceRendered(FacesContext context, String key, ResourceIdentifier id) {
+		getMyFacesResourceMap(context, key).put(getMyFacesResourceKey(id), true);
+	}
+
+	private static boolean isMyFacesResourceRendered(FacesContext context, String key, ResourceIdentifier id) {
+		return getMyFacesResourceMap(context, key).containsKey(getMyFacesResourceKey(id));
+	}
+
+	private static Map<String, Boolean> getMyFacesResourceMap(FacesContext context, String key) {
 		Map<String, Boolean> map = getContextAttribute(context, key);
 
 		if (map == null) {
@@ -450,9 +479,13 @@ public final class Hacks {
 			setContextAttribute(context, key, map);
 		}
 
+		return map;
+	}
+
+	private static String getMyFacesResourceKey(ResourceIdentifier id) {
 		String library = id.getLibrary();
 		String name = id.getName();
-		map.put((library != null) ? (library + '/' + name) : name, true);
+		return (library != null) ? (library + '/' + name) : name;
 	}
 
 	/**

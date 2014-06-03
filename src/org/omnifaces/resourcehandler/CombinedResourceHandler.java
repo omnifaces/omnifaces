@@ -380,7 +380,10 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 				}
 			}
 			else if (rendererType.equals(RENDERER_TYPE_JS)) {
-				if (scripts.add(component, id)) {
+				if (Hacks.isScriptResourceRendered(context, id)) { // This is true when o:deferredScript is used.
+					componentResourcesToRemove.add(component);
+				}
+				else if (scripts.add(component, id)) {
 					Hacks.setScriptResourceRendered(context, id); // Prevents future forced additions by libs.
 				}
 			}
