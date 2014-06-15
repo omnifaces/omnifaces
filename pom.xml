@@ -3,13 +3,18 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
 >
 	<modelVersion>4.0.0</modelVersion>
+	<prerequisites>
+		<maven>3.0.0</maven>
+	</prerequisites>
 
 	<groupId>org.omnifaces</groupId>
 	<artifactId>omnifaces</artifactId>
-	<packaging>jar</packaging>
-	<name>Omnifaces</name>
 	<version>1.8.1</version>
+	<packaging>jar</packaging>
+	
+	<name>Omnifaces</name>
 	<description>JSF 2.x utility library</description>
+	
 	<url>http://omnifaces.org</url>
 	<organization>
 		<name>OmniFaces</name>
@@ -34,8 +39,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<jdk.version>1.6</jdk.version>
-		<jee.version>6.0</jee.version>
+		<javase.version>1.6</javase.version>
+		<javaee.version>6.0</javaee.version>
 	</properties>
 
 	<developers>
@@ -56,80 +61,20 @@
 		<dependency>
 			<groupId>javax</groupId>
 			<artifactId>javaee-web-api</artifactId>
-			<version>${jee.version}</version>
+			<version>${javaee.version}</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
-	<!-- Build part provided by mellowaredev (http://code.google.com/u/mellowaredev) -->
 	<build>
-		<sourceDirectory>${basedir}/src</sourceDirectory>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
+				<version>3.1</version>
 				<configuration>
-					<source>${jdk.version}</source>
-					<target>${jdk.version}</target>
-					<compilerVersion>${jdk.version}</compilerVersion>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-resources-plugin</artifactId>
-				<version>2.5</version>
-				<executions>
-					<execution>
-						<id>copy-resources</id>
-						<!-- here the phase you need -->
-						<phase>validate</phase>
-						<goals>
-							<goal>copy-resources</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${basedir}/target/classes/META-INF</outputDirectory>
-							<resources>          
-								<resource>
-									<directory>${basedir}/src/META-INF</directory>
-								</resource>
-							</resources>              
-						</configuration>            
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.2.2</version>
-				<configuration>
-					<preparationGoals>clean verify javadoc:jar source:jar</preparationGoals>
-					<completionGoals>deploy</completionGoals>
-				</configuration>
-			</plugin>
-			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.4</version>
-				<configuration>
-					<archive>
-						<manifest>
-							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-							<addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-						</manifest>
-						<manifestEntries>
-							<URL>${project.url}</URL>
-							<Extension-Name>${project.artifactId}</Extension-Name>
-						</manifestEntries>
-					</archive>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>2.9</version>
-				<configuration>
-					<addGroupIdToProjectName>true</addGroupIdToProjectName>
-					<downloadSources>true</downloadSources>
-					<downloadJavadocs>true</downloadJavadocs>
-					<ajdtVersion>none</ajdtVersion>
+					<source>${javase.version}</source>
+					<target>${javase.version}</target>
 				</configuration>
 			</plugin>
 		</plugins>
