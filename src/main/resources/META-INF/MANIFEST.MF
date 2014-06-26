@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Implementation-Title: Omnifaces
+Implementation-Version: 2.0-SNAPSHOT
+Archiver-Version: Plexus Archiver
+Specification-Vendor: OmniFaces
+Specification-Title: Omnifaces
+Implementation-Vendor-Id: org.omnifaces
+URL: http://omnifaces.org
+Implementation-Vendor: OmniFaces
+Extension-Name: omnifaces
+Created-By: Apache Maven 3.2.1
+Build-Jdk: 1.8.0_05
+Specification-Version: 2.0-SNAPSHOT
+
