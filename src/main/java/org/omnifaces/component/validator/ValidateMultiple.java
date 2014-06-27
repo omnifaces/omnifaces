@@ -72,8 +72,6 @@ public class ValidateMultiple extends ValidateMultipleFields {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
-	private static final String DEFAULT_MESSAGE = "{0}: Invalid value";
-
 	private enum PropertyKeys {
 		validateMethod
 	}
@@ -81,15 +79,6 @@ public class ValidateMultiple extends ValidateMultipleFields {
 	// Vars -----------------------------------------------------------------------------------------------------------
 
 	private MultiFieldValidator validator;
-
-	// Constructors ---------------------------------------------------------------------------------------------------
-
-	/**
-	 * The default constructor sets the default message.
-	 */
-	public ValidateMultiple() {
-		super(DEFAULT_MESSAGE);
-	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 

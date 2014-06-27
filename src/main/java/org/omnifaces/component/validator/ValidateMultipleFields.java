@@ -14,12 +14,15 @@ package org.omnifaces.component.validator;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static java.util.ResourceBundle.getBundle;
+import static org.omnifaces.util.Faces.getLocale;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
+import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
@@ -27,6 +30,7 @@ import javax.faces.component.UISelectBoolean;
 import javax.faces.context.FacesContext;
 
 import org.omnifaces.util.Components;
+import org.omnifaces.util.Faces;
 import org.omnifaces.util.Messages;
 import org.omnifaces.util.State;
 import org.omnifaces.validator.MultiFieldValidator;
@@ -62,6 +66,15 @@ import org.omnifaces.validator.MultiFieldValidator;
  * referenced input components.
  * <pre>
  * &lt;o:validateMultipleFields components="foo bar baz" message="{0} are wrong!" /&gt;
+ * </pre>
+ * <p>
+ * You can also change the default message in the message bundle file as identified by
+ * <code>&lt;application&gt;&lt;message-bundle&gt;</code> in <code>faces-config.xml</code>. The message key is just
+ * the component type as identified by <code>COMPONENT_TYPE</code> constant of the validator component. For example,
+ * {@link ValidateAll} has a {@link ValidateAll#COMPONENT_TYPE} value of
+ * <code>org.omnifaces.component.validator.ValidateAll</code>. Use exactly this value as message bundle key:
+ * <pre>
+ * org.omnifaces.component.validator.ValidateAll = {0} are wrong!
  * </pre>
  * <p>
  * You can use <code>invalidateAll="false"</code> to mark only those components which are actually invalid as invalid.
@@ -117,6 +130,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
+	private static final String DEFAULT_MESSAGE_BUNDLE = "org.omnifaces.component.validator.messages";
 	private static final String DEFAULT_SHOWMESSAGEFOR = "@this";
 	private static final Boolean DEFAULT_INVALIDATEALL = TRUE;
 	private static final Boolean DEFAULT_DISABLED = FALSE;
@@ -147,8 +161,18 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 	/**
 	 * The default constructor sets the default message and sets the renderer type to <code>null</code>.
 	 */
-	public ValidateMultipleFields(String defaultMessage) {
-		this.defaultMessage = defaultMessage;
+	public ValidateMultipleFields() {
+		String componentType = getClass().getAnnotation(FacesComponent.class).value();
+		String messageBundle = Faces.getApplication().getMessageBundle();
+
+		if (messageBundle != null) {
+			defaultMessage = getBundle(messageBundle, getLocale()).getString(componentType);
+		}
+
+		if (defaultMessage == null) {
+			defaultMessage = getBundle(DEFAULT_MESSAGE_BUNDLE, getLocale()).getString(componentType);
+		}
+
 		setRendererType(null);
 	}
 

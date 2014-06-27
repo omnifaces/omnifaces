@@ -37,19 +37,6 @@ public class ValidateOneOrMore extends ValidateMultipleFields {
 	/** The standard component type. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.validator.ValidateOneOrMore";
 
-	// Private constants ----------------------------------------------------------------------------------------------
-
-	private static final String DEFAULT_MESSAGE = "{0}: Please fill out at least one of those fields";
-
-	// Constructors ---------------------------------------------------------------------------------------------------
-
-	/**
-	 * The default constructor sets the default message.
-	 */
-	public ValidateOneOrMore() {
-		super(DEFAULT_MESSAGE);
-	}
-
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**

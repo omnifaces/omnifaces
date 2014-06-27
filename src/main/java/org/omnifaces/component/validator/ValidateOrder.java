@@ -107,7 +107,6 @@ public class ValidateOrder extends ValidateMultipleFields {
 	}
 
 	private static final String DEFAULT_TYPE = Type.LT.name();
-	private static final String DEFAULT_MESSAGE = "{0}: Please fill out the values of all those fields in order";
 	private static final String ERROR_INVALID_TYPE = "Invalid type '%s'. Only 'lt', 'lte', 'gt' and 'gte' are allowed.";
 	private static final String ERROR_VALUES_NOT_COMPARABLE = "All values must implement java.lang.Comparable.";
 
@@ -119,15 +118,6 @@ public class ValidateOrder extends ValidateMultipleFields {
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private final State state = new State(getStateHelper());
-
-	// Constructors ---------------------------------------------------------------------------------------------------
-
-	/**
-	 * The default constructor sets the default message.
-	 */
-	public ValidateOrder() {
-		super(DEFAULT_MESSAGE);
-	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
