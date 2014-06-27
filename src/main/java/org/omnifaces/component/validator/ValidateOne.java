@@ -38,19 +38,6 @@ public class ValidateOne extends ValidateMultipleFields {
 	/** The standard component type. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.validator.ValidateOne";
 
-	// Private constants ----------------------------------------------------------------------------------------------
-
-	private static final String DEFAULT_MESSAGE = "{0}: Please fill out only one of those fields";
-
-	// Constructors ---------------------------------------------------------------------------------------------------
-
-	/**
-	 * The default constructor sets the default message.
-	 */
-	public ValidateOne() {
-		super(DEFAULT_MESSAGE);
-	}
-
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**

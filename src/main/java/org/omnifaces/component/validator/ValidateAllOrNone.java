@@ -37,19 +37,6 @@ public class ValidateAllOrNone extends ValidateMultipleFields {
 	/** The standard component type. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.validator.ValidateAllOrNone";
 
-	// Private constants ----------------------------------------------------------------------------------------------
-
-	private static final String DEFAULT_MESSAGE = "{0}: Please fill out all or none of those fields";
-
-	// Constructors ---------------------------------------------------------------------------------------------------
-
-	/**
-	 * The default constructor sets the default message.
-	 */
-	public ValidateAllOrNone() {
-		super(DEFAULT_MESSAGE);
-	}
-
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**

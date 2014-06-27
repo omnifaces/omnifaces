@@ -36,19 +36,6 @@ public class ValidateUnique extends ValidateMultipleFields {
 	/** The standard component type. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.validator.ValidateUnique";
 
-	// Private constants ----------------------------------------------------------------------------------------------
-
-	private static final String DEFAULT_MESSAGE = "{0}: Please fill out an unique value for all of those fields";
-
-	// Constructors ---------------------------------------------------------------------------------------------------
-
-	/**
-	 * The default constructor sets the default message.
-	 */
-	public ValidateUnique() {
-		super(DEFAULT_MESSAGE);
-	}
-
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
