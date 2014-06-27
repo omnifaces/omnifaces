@@ -63,7 +63,7 @@ public class ImportFunctions extends TagHandler {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static Map<String, Method> FUNCTIONS_CACHE = new HashMap<String, Method>();
+	private static Map<String, Method> FUNCTIONS_CACHE = new HashMap<>();
 
 	private static final String ERROR_INVALID_VAR = "The 'var' attribute may not be an EL expression.";
 	private static final String ERROR_MISSING_CLASS = "Cannot find type '%s' in classpath.";
@@ -152,7 +152,7 @@ public class ImportFunctions extends TagHandler {
 	 * @return The found method, or <code>null</code> if none is found.
 	 */
 	private static Method findMethod(Class<?> cls, String name) {
-		Set<Method> methods = new TreeSet<Method>(new Comparator<Method>() {
+		Set<Method> methods = new TreeSet<>(new Comparator<Method>() {
 			@Override
 			public int compare(Method m1, Method m2) {
 				return Integer.valueOf(m1.getParameterTypes().length).compareTo(m2.getParameterTypes().length);

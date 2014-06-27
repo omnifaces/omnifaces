@@ -49,7 +49,7 @@ public class BeanStorage implements Serializable {
 	 * @param initialCapacity The initial capacity of the map holding all beans.
 	 */
 	public BeanStorage(int initialCapacity) {
-		beans = new ConcurrentHashMap<String, Bean<?>>(initialCapacity);
+		beans = new ConcurrentHashMap<>(initialCapacity);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -61,7 +61,7 @@ public class BeanStorage implements Serializable {
 	 * @return The bean associated with given context and creational context.
 	 */
 	public <T> T createBean(Contextual<T> type, CreationalContext<T> context) {
-		Bean<T> bean = new Bean<T>(type, context);
+		Bean<T> bean = new Bean<>(type, context);
 		beans.put(((PassivationCapable) type).getId(), bean);
 		return bean.getInstance();
 	}

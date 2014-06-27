@@ -130,7 +130,7 @@ public class InvokeActionEventListener extends DefaultPhaseListener implements S
 			Set<UIComponent> components = (Set<UIComponent>) context.getAttributes().get(type);
 
 			if (components == null) {
-				components = new LinkedHashSet<UIComponent>();
+				components = new LinkedHashSet<>();
 				context.getAttributes().put(type, components);
 			}
 

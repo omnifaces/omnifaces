@@ -131,7 +131,7 @@ public class GzipResponseFilter extends HttpFilter {
 		String mimetypes = getInitParameter(INIT_PARAM_MIMETYPES);
 
 		if (mimetypes != null) {
-			this.mimetypes = new HashSet<String>(Arrays.asList(mimetypes.split("\\s*,\\s*")));
+			this.mimetypes = new HashSet<>(Arrays.asList(mimetypes.split("\\s*,\\s*")));
 		}
 	}
 

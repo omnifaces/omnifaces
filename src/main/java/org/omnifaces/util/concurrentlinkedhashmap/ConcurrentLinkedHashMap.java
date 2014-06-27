@@ -226,20 +226,20 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
     // The data store and its maximum capacity
     concurrencyLevel = builder.concurrencyLevel;
     capacity = Math.min(builder.capacity, MAXIMUM_CAPACITY);
-    data = new ConcurrentHashMap<K, Node>(builder.initialCapacity, 0.75f, concurrencyLevel);
+    data = new ConcurrentHashMap<>(builder.initialCapacity, 0.75f, concurrencyLevel);
 
     // The eviction support
     weigher = builder.weigher;
     nextOrder = Integer.MIN_VALUE;
     drainedOrder = Integer.MIN_VALUE;
     evictionLock = new ReentrantLock();
-    evictionDeque = new LinkedDeque<Node>();
-    drainStatus = new AtomicReference<DrainStatus>(IDLE);
+    evictionDeque = new LinkedDeque<>();
+    drainStatus = new AtomicReference<>(IDLE);
 
     buffers = new Queue[NUMBER_OF_BUFFERS];
     bufferLengths = new AtomicIntegerArray(NUMBER_OF_BUFFERS);
     for (int i = 0; i < NUMBER_OF_BUFFERS; i++) {
-      buffers[i] = new ConcurrentLinkedQueue<Task>();
+      buffers[i] = new ConcurrentLinkedQueue<>();
     }
 
     // The notification queue and listener
@@ -765,7 +765,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
     checkNotNull(value);
 
     final int weight = weigher.weightOf(key, value);
-    final WeightedValue<V> weightedValue = new WeightedValue<V>(value, weight);
+    final WeightedValue<V> weightedValue = new WeightedValue<>(value, weight);
     final Node node = new Node(key, weightedValue);
 
     for (;;) {
@@ -840,7 +840,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
     checkNotNull(value);
 
     final int weight = weigher.weightOf(key, value);
-    final WeightedValue<V> weightedValue = new WeightedValue<V>(value, weight);
+    final WeightedValue<V> weightedValue = new WeightedValue<>(value, weight);
 
     final Node node = data.get(key);
     if (node == null) {
@@ -868,7 +868,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
     checkNotNull(newValue);
 
     final int weight = weigher.weightOf(key, newValue);
-    final WeightedValue<V> newWeightedValue = new WeightedValue<V>(newValue, weight);
+    final WeightedValue<V> newWeightedValue = new WeightedValue<>(newValue, weight);
 
     final Node node = data.get(key);
     if (node == null) {
@@ -977,7 +977,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
       int initialCapacity = (weigher == Weighers.singleton())
           ? Math.min(limit, (int) weightedSize())
           : 16;
-      Set<K> keys = new LinkedHashSet<K>(initialCapacity);
+      Set<K> keys = new LinkedHashSet<>(initialCapacity);
       Iterator<Node> iterator = ascending
           ? evictionDeque.iterator()
           : evictionDeque.descendingIterator();
@@ -1087,7 +1087,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
       int initialCapacity = (weigher == Weighers.singleton())
           ? Math.min(limit, (int) weightedSize())
           : 16;
-      Map<K, V> map = new LinkedHashMap<K, V>(initialCapacity);
+      Map<K, V> map = new LinkedHashMap<>(initialCapacity);
       Iterator<Node> iterator = ascending
           ? evictionDeque.iterator()
           : evictionDeque.descendingIterator();
@@ -1196,7 +1196,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
      */
     boolean tryToRetire(WeightedValue<V> expect) {
       if (expect.isAlive()) {
-        WeightedValue<V> retired = new WeightedValue<V>(expect.value, -expect.weight);
+        WeightedValue<V> retired = new WeightedValue<>(expect.value, -expect.weight);
         return compareAndSet(expect, retired);
       }
       return false;
@@ -1212,7 +1212,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
         if (!current.isAlive()) {
           return;
         }
-        WeightedValue<V> retired = new WeightedValue<V>(current.value, -current.weight);
+        WeightedValue<V> retired = new WeightedValue<>(current.value, -current.weight);
         if (compareAndSet(current, retired)) {
           return;
         }
@@ -1227,7 +1227,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
     void makeDead() {
       for (;;) {
         WeightedValue<V> current = get();
-        WeightedValue<V> dead = new WeightedValue<V>(current.value, 0);
+        WeightedValue<V> dead = new WeightedValue<>(current.value, 0);
         if (compareAndSet(current, dead)) {
           weightedSize -= Math.abs(current.weight);
           return;
@@ -1431,7 +1431,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
     }
 
     Object writeReplace() {
-      return new SimpleEntry<K, V>(this);
+      return new SimpleEntry<>(this);
     }
   }
 
@@ -1520,7 +1520,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
   static final long serialVersionUID = 1;
 
   Object writeReplace() {
-    return new SerializationProxy<K, V>(this);
+    return new SerializationProxy<>(this);
   }
 
   @SuppressWarnings("unused")
@@ -1544,7 +1544,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 
     SerializationProxy(ConcurrentLinkedHashMap<K, V> map) {
       concurrencyLevel = map.concurrencyLevel;
-      data = new HashMap<K, V>(map);
+      data = new HashMap<>(map);
       capacity = map.capacity;
       listener = map.listener;
       weigher = map.weigher;
@@ -1681,7 +1681,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
     public Builder<K, V> weigher(EntryWeigher<? super K, ? super V> weigher) {
       this.weigher = (weigher == Weighers.entrySingleton())
           ? Weighers.<K, V>entrySingleton()
-          : new BoundedEntryWeigher<K, V>(weigher);
+          : new BoundedEntryWeigher<>(weigher);
       return this;
     }
 
@@ -1693,7 +1693,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
      */
     public ConcurrentLinkedHashMap<K, V> build() {
       checkState(capacity >= 0);
-      return new ConcurrentLinkedHashMap<K, V>(this);
+      return new ConcurrentLinkedHashMap<>(this);
     }
   }
 }

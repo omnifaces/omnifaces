@@ -53,7 +53,7 @@ final class CombinedResourceInputStream extends InputStream {
 	 * @throws IOException If something fails at I/O level.
 	 */
 	public CombinedResourceInputStream(Set<Resource> resources) throws IOException {
-		streams = new ArrayList<InputStream>();
+		streams = new ArrayList<>();
 
 		for (Resource resource : resources) {
 			streams.add(!Hacks.isRichFacesResourceOptimizationEnabled()

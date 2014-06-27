@@ -412,7 +412,7 @@ public enum WebXml {
 	 */
 	private static List<String> parseWelcomeFiles(Element webXml, XPath xpath) throws Exception {
 		NodeList welcomeFileList = getNodeList(webXml, xpath, XPATH_WELCOME_FILE);
-		List<String> welcomeFiles = new ArrayList<String>(welcomeFileList.getLength());
+		List<String> welcomeFiles = new ArrayList<>(welcomeFileList.getLength());
 
 		for (int i = 0; i < welcomeFileList.getLength(); i++) {
 			welcomeFiles.add(welcomeFileList.item(i).getTextContent().trim());
@@ -426,7 +426,7 @@ public enum WebXml {
 	 */
 	@SuppressWarnings("unchecked") // For the cast on Class<Throwable>.
 	private static Map<Class<Throwable>, String> parseErrorPageLocations(Element webXml, XPath xpath) throws Exception {
-		Map<Class<Throwable>, String> errorPageLocations = new LinkedHashMap<Class<Throwable>, String>();
+		Map<Class<Throwable>, String> errorPageLocations = new LinkedHashMap<>();
 		NodeList exceptionTypes = getNodeList(webXml, xpath, XPATH_EXCEPTION_TYPE);
 
 		for (int i = 0; i < exceptionTypes.getLength(); i++) {
@@ -475,7 +475,7 @@ public enum WebXml {
 	 * Create and return a mapping of all security constraint URL patterns and the associated roles.
 	 */
 	private static Map<String, Set<String>> parseSecurityConstraints(Element webXml, XPath xpath) throws Exception {
-		Map<String, Set<String>> securityConstraints = new LinkedHashMap<String, Set<String>>();
+		Map<String, Set<String>> securityConstraints = new LinkedHashMap<>();
 		NodeList constraints = getNodeList(webXml, xpath, XPATH_SECURITY_CONSTRAINT);
 
 		for (int i = 0; i < constraints.getLength(); i++) {
@@ -485,7 +485,7 @@ public enum WebXml {
 
 			if (auth.getLength() > 0) {
 				NodeList authRoles = getNodeList(constraint, xpath, XPATH_AUTH_CONSTRAINT_ROLE_NAME);
-				roles = new HashSet<String>(authRoles.getLength());
+				roles = new HashSet<>(authRoles.getLength());
 
 				for (int j = 0; j < authRoles.getLength(); j++) {
 					roles.add(authRoles.item(j).getTextContent().trim());

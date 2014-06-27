@@ -35,7 +35,7 @@ public class SortedTreeModel<T> extends AbstractTreeModel<T> implements Comparab
 	 */
 	@Override
 	protected Collection<TreeModel<T>> createChildren() {
-		return new TreeSet<TreeModel<T>>();
+		return new TreeSet<>();
 	}
 
 	/**

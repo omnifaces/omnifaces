@@ -169,7 +169,7 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 	public List<TreeModel<T>> getChildren() {
 		if (unmodifiableChildren.size() != getChildCount()) {
 			unmodifiableChildren = Collections.unmodifiableList((children instanceof List)
-				? (List<TreeModel<T>>) children : new ArrayList<TreeModel<T>>(children));
+				? (List<TreeModel<T>>) children : new ArrayList<>(children));
 		}
 
 		return unmodifiableChildren;

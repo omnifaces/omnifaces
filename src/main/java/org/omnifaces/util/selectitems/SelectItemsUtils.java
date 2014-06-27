@@ -83,7 +83,7 @@ public final class SelectItemsUtils {
 	 * @return List of all values hold by {@link SelectItem} instances
 	 */
 	public static List<Object> collectAllValuesFromSelectItems(FacesContext context, UIComponent component) {
-		List<Object> values = new ArrayList<Object>();
+		List<Object> values = new ArrayList<>();
 		collect(SelectItemsCollector.collectFromParent(context, component).iterator(), values);
 
 		return values;

@@ -47,7 +47,7 @@ final class CombinedResourceInfo {
 	private static final Logger logger = Logger.getLogger(CombinedResourceHandler.class.getName());
 
 	// ConcurrentHashMap was considered, but duplicate inserts technically don't harm and a HashMap is faster on read.
-	private static final Map<String, CombinedResourceInfo> CACHE = new HashMap<String, CombinedResourceInfo>();
+	private static final Map<String, CombinedResourceInfo> CACHE = new HashMap<>();
 
 	private static final String MOJARRA_DEFAULT_RESOURCE_MAX_AGE = "com.sun.faces.defaultResourceMaxAge";
 	private static final String MYFACES_DEFAULT_RESOURCE_MAX_AGE = "org.apache.myfaces.RESOURCE_MAX_TIME_EXPIRES";
@@ -95,7 +95,7 @@ final class CombinedResourceInfo {
 
 		// Properties -------------------------------------------------------------------------------------------------
 
-		private Set<ResourceIdentifier> resourceIdentifiers = new LinkedHashSet<ResourceIdentifier>();
+		private Set<ResourceIdentifier> resourceIdentifiers = new LinkedHashSet<>();
 
 		// Actions ----------------------------------------------------------------------------------------------------
 
@@ -170,7 +170,7 @@ final class CombinedResourceInfo {
 
 		FacesContext context = FacesContext.getCurrentInstance();
 		ResourceHandler handler = context.getApplication().getResourceHandler();
-		resources = new LinkedHashSet<Resource>();
+		resources = new LinkedHashSet<>();
 		contentLength = 0;
 		lastModified = 0;
 
@@ -323,7 +323,7 @@ final class CombinedResourceInfo {
 			return null;
 		}
 
-		Set<ResourceIdentifier> resourceIdentifiers = new LinkedHashSet<ResourceIdentifier>();
+		Set<ResourceIdentifier> resourceIdentifiers = new LinkedHashSet<>();
 
 		for (String resourceIdentifier : resourcesId.split("\\|")) {
 			resourceIdentifiers.add(new ResourceIdentifier(resourceIdentifier));

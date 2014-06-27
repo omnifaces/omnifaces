@@ -59,7 +59,7 @@ public class FacesViewsInitializerListener extends DefaultServletContextListener
 
         	if (!isEmpty(extensions)) {
 
-        		Set<String> mappings = new HashSet<String>(extensions);
+        		Set<String> mappings = new HashSet<>(extensions);
         		for (String welcomeFile : WebXml.INSTANCE.init(servletContext).getWelcomeFiles()) {
         			if (isExtensionless(welcomeFile)) {
         				if (!welcomeFile.startsWith("/")) {

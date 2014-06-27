@@ -56,7 +56,7 @@ public final class SelectItemsCollector {
 	 */
 	public static List<SelectItem> collectFromParent(FacesContext context, UIComponent parent) {
 
-		List<SelectItem> selectItems = new ArrayList<SelectItem>();
+		List<SelectItem> selectItems = new ArrayList<>();
 
 		// Iterate over all children of the parent component. Non-UISelectItem/s children are automatically skipped.
 		for (UIComponent child : parent.getChildren()) {
@@ -127,7 +127,7 @@ public final class SelectItemsCollector {
 	 */
 	public static List<SelectItem> collectFromUISelectItemsIterator(FacesContext facesContext, UISelectItems uiSelectItems, Iterable<?> items) {
 
-		final List<SelectItem> selectItems = new ArrayList<SelectItem>();
+		final List<SelectItem> selectItems = new ArrayList<>();
 
 		final Map<String, Object> attributes = uiSelectItems.getAttributes();
 		String var = (String) attributes.get("var");

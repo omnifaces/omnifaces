@@ -193,7 +193,7 @@ final class RenderTimeTagHandlerHelper {
 		private Map<Method, ValueExpression> attributes;
 
 		private RenderTimeAttributes() {
-			attributes = new HashMap<Method, ValueExpression>();
+			attributes = new HashMap<>();
 		}
 
 		private void add(Method setter, ValueExpression valueExpression) {

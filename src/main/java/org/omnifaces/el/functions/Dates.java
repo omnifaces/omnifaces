@@ -36,10 +36,10 @@ public final class Dates {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final Map<Locale, Map<String, Integer>> MONTHS_CACHE = new HashMap<Locale, Map<String, Integer>>(3);
-	private static final Map<Locale, Map<String, Integer>> SHORT_MONTHS_CACHE = new HashMap<Locale, Map<String, Integer>>(3);
-	private static final Map<Locale, Map<String, Integer>> DAYS_OF_WEEK_CACHE = new HashMap<Locale, Map<String, Integer>>(3);
-	private static final Map<Locale, Map<String, Integer>> SHORT_DAYS_OF_WEEK_CACHE = new HashMap<Locale, Map<String, Integer>>(3);
+	private static final Map<Locale, Map<String, Integer>> MONTHS_CACHE = new HashMap<>(3);
+	private static final Map<Locale, Map<String, Integer>> SHORT_MONTHS_CACHE = new HashMap<>(3);
+	private static final Map<Locale, Map<String, Integer>> DAYS_OF_WEEK_CACHE = new HashMap<>(3);
+	private static final Map<Locale, Map<String, Integer>> SHORT_DAYS_OF_WEEK_CACHE = new HashMap<>(3);
 	private static final TimeZone TIMEZONE_DEFAULT = TimeZone.getDefault();
 	private static final TimeZone TIMEZONE_UTC = TimeZone.getTimeZone("UTC");
 
@@ -391,7 +391,7 @@ public final class Dates {
 	 * Helper method to map months.
 	 */
 	private static Map<String, Integer> mapMonths(String[] months) {
-		Map<String, Integer> mapping = new LinkedHashMap<String, Integer>();
+		Map<String, Integer> mapping = new LinkedHashMap<>();
 
 		for (String month : months) {
 			if (!month.isEmpty()) { // 13th month may or may not be empty, depending on default calendar.
@@ -446,7 +446,7 @@ public final class Dates {
 	 * Helper method to map days of week.
 	 */
 	private static Map<String, Integer> mapDaysOfWeek(String[] weekdays) {
-		Map<String, Integer> mapping = new LinkedHashMap<String, Integer>();
+		Map<String, Integer> mapping = new LinkedHashMap<>();
 		mapping.put(weekdays[Calendar.MONDAY], 1);
 		mapping.put(weekdays[Calendar.TUESDAY], 2);
 		mapping.put(weekdays[Calendar.WEDNESDAY], 3);

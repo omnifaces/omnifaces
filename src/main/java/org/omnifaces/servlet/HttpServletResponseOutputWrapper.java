@@ -100,14 +100,14 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 				public void close() throws IOException {
 					((OutputStream) buffer).close();
 				}
-				
+
 				@Override
 				public boolean isReady() {
 					return true;
 				}
 				@Override
 				public void setWriteListener(WriteListener writeListener) {
-					
+					// NOOP.
 				}
 			};
 		}

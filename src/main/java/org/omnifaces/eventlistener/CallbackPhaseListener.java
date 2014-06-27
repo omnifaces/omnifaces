@@ -110,7 +110,7 @@ public class CallbackPhaseListener implements PhaseListener {
 		Set<PhaseListener> set = Faces.getRequestAttribute(CallbackPhaseListener.class.getName());
 
 		if (set == null && create) {
-			set = new HashSet<PhaseListener>(1);
+			set = new HashSet<>(1);
 			Faces.setRequestAttribute(CallbackPhaseListener.class.getName(), set);
 		}
 

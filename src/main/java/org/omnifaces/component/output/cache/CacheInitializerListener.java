@@ -98,7 +98,7 @@ public class CacheInitializerListener implements ServletContextListener {
 	}
 
 	private Map<String, String> getCacheSetting(ServletContext context) {
-		Map<String, String> settings = new HashMap<String, String>();
+		Map<String, String> settings = new HashMap<>();
 
 		for (String initParameterName : list(context.getInitParameterNames())) {
 			if (initParameterName.startsWith(CACHE_PROVIDER_SETTING_INIT_PARAM_PREFIX)) {

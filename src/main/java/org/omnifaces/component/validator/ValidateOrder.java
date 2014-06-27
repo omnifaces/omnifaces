@@ -15,7 +15,6 @@ package org.omnifaces.component.validator;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.TreeSet;
 
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIInput;
@@ -71,7 +70,7 @@ public class ValidateOrder extends ValidateMultipleFields {
 		LTE(new Callback.ReturningWithArgument<Boolean, List<Comparable>>() {
 			@Override
 			public Boolean invoke(List<Comparable> values) {
-				List<Comparable> sortedValues = new ArrayList<Comparable>(values);
+				List<Comparable> sortedValues = new ArrayList<>(values);
 				Collections.sort(sortedValues);
 				return sortedValues.equals(values);
 			}
@@ -80,7 +79,7 @@ public class ValidateOrder extends ValidateMultipleFields {
 		GT(new Callback.ReturningWithArgument<Boolean, List<Comparable>>() {
 			@Override
 			public Boolean invoke(List<Comparable> values) {
-				List<Comparable> sortedValues = new ArrayList<Comparable>(Utils.nullSafeTreeSet(values));
+				List<Comparable> sortedValues = new ArrayList<>(Utils.nullSafeTreeSet(values));
 				Collections.reverse(sortedValues);
 				return sortedValues.equals(values);
 			}
@@ -89,7 +88,7 @@ public class ValidateOrder extends ValidateMultipleFields {
 		GTE(new Callback.ReturningWithArgument<Boolean, List<Comparable>>() {
 			@Override
 			public Boolean invoke(List<Comparable> values) {
-				List<Comparable> sortedValues = new ArrayList<Comparable>(values);
+				List<Comparable> sortedValues = new ArrayList<>(values);
 				Collections.sort(sortedValues, Collections.reverseOrder());
 				return sortedValues.equals(values);
 			}

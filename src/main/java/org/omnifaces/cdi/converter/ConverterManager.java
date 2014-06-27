@@ -54,8 +54,8 @@ public class ConverterManager implements ConverterProvider {
 
 	@Inject
 	private BeanManager manager;
-	private Map<String, Bean<Converter>> convertersById = new HashMap<String, Bean<Converter>>();
-    private Map<Class<?>, Bean<Converter>> convertersByForClass = new HashMap<Class<?>, Bean<Converter>>();
+	private Map<String, Bean<Converter>> convertersById = new HashMap<>();
+    private Map<Class<?>, Bean<Converter>> convertersByForClass = new HashMap<>();
 
 	// Actions --------------------------------------------------------------------------------------------------------
 

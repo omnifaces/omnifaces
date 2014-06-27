@@ -268,7 +268,7 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 			return null;
 		}
 
-		Map<ResourceIdentifier, String> cdnResources = new HashMap<ResourceIdentifier, String>();
+		Map<ResourceIdentifier, String> cdnResources = new HashMap<>();
 
 		for (String cdnResource : cdnResourcesParam.split("\\s*,\\s*")) {
 			String[] cdnResourceIdAndURL = cdnResource.split("\\s*=\\s*", 2);

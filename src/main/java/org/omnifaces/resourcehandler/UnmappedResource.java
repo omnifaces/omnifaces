@@ -61,21 +61,6 @@ public class UnmappedResource extends ResourceWrapper implements Externalizable 
 		}
 	}
 
-	@Override // Necessary because this is missing in ResourceWrapper (will be fixed in JSF 2.2).
-	public String getResourceName() {
-		return getWrapped().getResourceName();
-	}
-
-	@Override // Necessary because this is missing in ResourceWrapper (will be fixed in JSF 2.2).
-	public String getLibraryName() {
-		return getWrapped().getLibraryName();
-	}
-
-	@Override // Necessary because this is missing in ResourceWrapper (will be fixed in JSF 2.2).
-	public String getContentType() {
-		return getWrapped().getContentType();
-	}
-
 	@Override
 	public Resource getWrapped() {
 		return wrapped;

@@ -143,7 +143,7 @@ public final class Utils {
 		    return value.toString() == null || value.toString().isEmpty();
 		}
 	}
-	
+
 	/**
 	 * Returns <code>true</code> if at least one value is empty.
 	 *
@@ -218,6 +218,7 @@ public final class Utils {
 	 * @return The first non-<code>null</code> object of the argument list, or <code>null</code> if there is no such
 	 * element.
 	 */
+	@SafeVarargs
 	public static <T> T coalesce(T... objects) {
 		for (T object : objects) {
 			if (object != null) {
@@ -235,6 +236,7 @@ public final class Utils {
 	 * @param objects The argument list of objects to be tested for equality.
 	 * @return <code>true</code> if the given object equals one of the given objects.
 	 */
+	@SafeVarargs
 	public static <T> boolean isOneOf(T object, T... objects) {
 		for (Object other : objects) {
 			if (object == null ? other == null : object.equals(other)) {
@@ -329,7 +331,7 @@ public final class Utils {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> Set<T> unmodifiableSet(Object... values) {
-		Set<T> set = new HashSet<T>();
+		Set<T> set = new HashSet<>();
 
 		for (Object value : values) {
 			if (value instanceof Object[]) {
@@ -368,9 +370,9 @@ public final class Utils {
 		if (iterable instanceof List) {
 			list = (List<T>) iterable;
 		} else if (iterable instanceof Collection) {
-			list = new ArrayList<T>((Collection<T>) iterable);
+			list = new ArrayList<>((Collection<T>) iterable);
 		} else {
-			list = new ArrayList<T>();
+			list = new ArrayList<>();
 			Iterator<T> iterator = iterable.iterator();
 			while (iterator.hasNext()) {
 				list.add(iterator.next());
@@ -427,7 +429,7 @@ public final class Utils {
 			return emptyList();
 		}
 
-		List<String> list = new ArrayList<String>();
+		List<String> list = new ArrayList<>();
 
 		for (String value : values.split(quote(delimiter))) {
 			String trimmedValue = value.trim();
@@ -449,7 +451,7 @@ public final class Utils {
 	 * @return the reverse of the given map
 	 */
 	public static <T> Map<T, T> reverse(Map<T, T> source) {
-		Map<T, T> target = new HashMap<T, T>();
+		Map<T, T> target = new HashMap<>();
 		for (Entry<T, T> entry : source.entrySet()) {
 			target.put(entry.getValue(), entry.getKey());
 		}
@@ -488,7 +490,7 @@ public final class Utils {
 	 * @since 1.7
 	 */
 	public static <T extends Comparable<T>> TreeSet<T> nullSafeTreeSet(Collection<T> collection) {
-		TreeSet<T> nullSafeTreeSet = new TreeSet<T>(NULL_COMPARATOR);
+		TreeSet<T> nullSafeTreeSet = new TreeSet<>(NULL_COMPARATOR);
 		nullSafeTreeSet.addAll(collection);
 		return nullSafeTreeSet;
 	}

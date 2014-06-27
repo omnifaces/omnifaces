@@ -66,11 +66,11 @@ public class EagerExtension implements Extension {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private List<Bean<?>> applicationScopedBeans = new ArrayList<Bean<?>>();
-	private List<Bean<?>> sessionScopedBeans = new ArrayList<Bean<?>>();
+	private List<Bean<?>> applicationScopedBeans = new ArrayList<>();
+	private List<Bean<?>> sessionScopedBeans = new ArrayList<>();
 
-	private Map<String, List<Bean<?>>> requestScopedBeansViewId = new HashMap<String, List<Bean<?>>>();
-	private Map<String, List<Bean<?>>> requestScopedBeansRequestURI = new HashMap<String, List<Bean<?>>>();
+	private Map<String, List<Bean<?>>> requestScopedBeansViewId = new HashMap<>();
+	private Map<String, List<Bean<?>>> requestScopedBeansRequestURI = new HashMap<>();
 
 	// Methods --------------------------------------------------------------------------------------------------------
 
@@ -131,7 +131,7 @@ public class EagerExtension implements Extension {
 	private List<Bean<?>> getRequestScopedBeansByViewId(String viewId) {
 		List<Bean<?>> beans = requestScopedBeansViewId.get(viewId);
 		if (beans == null) {
-			beans = new ArrayList<Bean<?>>();
+			beans = new ArrayList<>();
 			requestScopedBeansViewId.put(viewId, beans);
 		}
 
@@ -141,7 +141,7 @@ public class EagerExtension implements Extension {
 	private List<Bean<?>> getRequestScopedBeansByRequestURI(String requestURI) {
 		List<Bean<?>> beans = requestScopedBeansRequestURI.get(requestURI);
 		if (beans == null) {
-			beans = new ArrayList<Bean<?>>();
+			beans = new ArrayList<>();
 			requestScopedBeansRequestURI.put(requestURI, beans);
 		}
 

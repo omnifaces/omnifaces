@@ -54,7 +54,7 @@ public class ValidatorManager implements ValidatorProvider {
 
 	@Inject
 	private BeanManager manager;
-	private Map<String, Bean<Validator>> validatorsById = new HashMap<String, Bean<Validator>>();
+	private Map<String, Bean<Validator>> validatorsById = new HashMap<>();
 
 	// Actions --------------------------------------------------------------------------------------------------------
 

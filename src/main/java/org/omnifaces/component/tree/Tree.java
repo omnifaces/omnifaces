@@ -346,7 +346,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 */
 	private Map<Integer, TreeNode> getNodes(PhaseId phaseId) {
 		if (phaseId == PhaseId.RENDER_RESPONSE || nodes == null) {
-			nodes = new HashMap<Integer, TreeNode>(getChildCount());
+			nodes = new HashMap<>(getChildCount());
 
 			for (UIComponent child : getChildren()) {
 				if (child instanceof TreeNode) {

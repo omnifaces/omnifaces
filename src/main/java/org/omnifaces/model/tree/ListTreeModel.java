@@ -34,7 +34,7 @@ public class ListTreeModel<T> extends AbstractTreeModel<T> {
 	 */
 	@Override
 	protected Collection<TreeModel<T>> createChildren() {
-		return new ArrayList<TreeModel<T>>();
+		return new ArrayList<>();
 	}
 
 }

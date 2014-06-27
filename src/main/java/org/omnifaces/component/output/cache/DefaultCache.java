@@ -44,7 +44,7 @@ public class DefaultCache extends TimeToLiveCache {
 						    .maximumWeightedCapacity(maxCapacity)
 						    .build();
 		} else {
-			return new ConcurrentHashMap<String, CacheEntry>();
+			return new ConcurrentHashMap<>();
 		}
 	}
 

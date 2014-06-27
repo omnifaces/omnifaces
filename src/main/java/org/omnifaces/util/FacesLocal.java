@@ -230,7 +230,7 @@ public final class FacesLocal {
 			return Collections.<String, List<String>>emptyMap();
 		}
 
-		Map<String, List<String>> parameterMap = new HashMap<String, List<String>>();
+		Map<String, List<String>> parameterMap = new HashMap<>();
 
 		for (UIViewParameter viewParameter : viewParameters) {
 			String value = viewParameter.getStringValue(context);
@@ -320,7 +320,7 @@ public final class FacesLocal {
 	 */
 	public static List<Locale> getSupportedLocales(FacesContext context) {
 		Application application = context.getApplication();
-		List<Locale> supportedLocales = new ArrayList<Locale>();
+		List<Locale> supportedLocales = new ArrayList<>();
 		Locale defaultLocale = application.getDefaultLocale();
 
 		if (defaultLocale != null) {
@@ -403,7 +403,7 @@ public final class FacesLocal {
 	public static String getBookmarkableURL
 		(FacesContext context, String viewId, Collection<ParamHolder> params, boolean includeViewParams)
 	{
-		Map<String, List<String>> convertedParams = new HashMap<String, List<String>>();
+		Map<String, List<String>> convertedParams = new HashMap<>();
 
 		for (ParamHolder param : params) {
 			Object value = param.getValue();
@@ -833,7 +833,7 @@ public final class FacesLocal {
 		}
 
 		ExternalContext externalContext = context.getExternalContext();
-		Map<String, Object> properties = new HashMap<String, Object>();
+		Map<String, Object> properties = new HashMap<>();
 
 		if (domain != null) {
 			properties.put("domain", domain);

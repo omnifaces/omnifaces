@@ -283,7 +283,7 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	 * set if the parameter is not been set.
 	 */
 	private static Set<ResourceIdentifier> initResources(String name) {
-		Set<ResourceIdentifier> resources = new HashSet<ResourceIdentifier>(1);
+		Set<ResourceIdentifier> resources = new HashSet<>(1);
 		String configuredResources = Faces.getInitParameter(name);
 
 		if (configuredResources != null) {
@@ -353,8 +353,8 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 		public CombinedResourceBuilder() {
 			stylesheets = new CombinedResourceBuilder(EXTENSION_CSS, TARGET_HEAD);
 			scripts = new CombinedResourceBuilder(EXTENSION_JS, TARGET_HEAD);
-			deferredScripts = new LinkedHashMap<String, CombinedResourceBuilder>(2);
-			componentResourcesToRemove = new ArrayList<UIComponent>(3);
+			deferredScripts = new LinkedHashMap<>(2);
+			componentResourcesToRemove = new ArrayList<>(3);
 		}
 
 		public void add(FacesContext context, UIComponent component, String target) {
@@ -440,7 +440,7 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 			this.extension = extension;
 			this.target = target;
 			info = new CombinedResourceInfo.Builder();
-			componentResourcesToRemove = new ArrayList<UIComponent>(3);
+			componentResourcesToRemove = new ArrayList<>(3);
 		}
 
 		private boolean add(UIComponent componentResource, ResourceIdentifier resourceIdentifier) {

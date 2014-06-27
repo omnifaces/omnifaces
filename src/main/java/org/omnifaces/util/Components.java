@@ -241,7 +241,7 @@ public final class Components {
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 */
 	public static <T extends UIComponent> List<T> findComponentsInChildren(UIComponent component, Class<T> type) {
-		List<T> components = new ArrayList<T>();
+		List<T> components = new ArrayList<>();
 		findComponentsInChildren(component, type, components);
 		return components;
 	}

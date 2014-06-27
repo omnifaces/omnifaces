@@ -108,11 +108,11 @@ public class RequestParameterProducer {
 
 			// 1. Use Bean Validation validators
 			if (shouldDoBeanValidation(requestParameter)) {
-				
+
 				Set<ConstraintViolation<?>> violations = doBeanValidation(injectionPoint.getBean().getBeanClass(), injectionPoint.getMember().getName(), convertedValue);
-				
+
 				valid = violations.isEmpty();
-				
+
 				for (ConstraintViolation<?> violation : violations) {
 					context.addMessage(component.getClientId(context), createError(violation.getMessage(), label));
 				}
@@ -137,9 +137,9 @@ public class RequestParameterProducer {
 			convertedValue = null;
 		}
 
-		return (ParamValue<V>) new ParamValue<Object>(submittedValue, requestParameter, getTargetType(injectionPoint), convertedValue);
+		return (ParamValue<V>) new ParamValue<>(submittedValue, requestParameter, getTargetType(injectionPoint), convertedValue);
 	}
-	
+
 	public static Converter getConverter(Param requestParameter, Class<?> targetType) {
 
 		Class<? extends Converter> converterClass = requestParameter.converterClass();
@@ -235,42 +235,42 @@ public class RequestParameterProducer {
 
 		return expressionResult.toString();
 	}
-	
+
 	private boolean shouldDoBeanValidation(Param requestParameter) {
-		
+
 		// If bean validation is explicitly disabled for this instance, immediately return false
 		if (requestParameter.disableBeanValidation()) {
 			return false;
 		}
-		
+
 		// Next check if bean validation has been disabled globally, but only if this hasn't been overridden locally
 		if (!requestParameter.overrideGlobalBeanValidationDisabled() && valueOf(getInitParameter(DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME))) {
 			return false;
 		}
-		
+
 		// For all other cases, the availability of bean validation determines if we attempt bean validation or not.
 		return isBeanValidationAvailable();
 	}
-	
+
 	private Set<ConstraintViolation<?>> doBeanValidation(Class<?> base, String property, Object value) {
-		
+
 		ParamValue<?> paramValue = null;
 		if (value != null) {
-			paramValue = new ParamValue<Object>(null, null, null, value);
+			paramValue = new ParamValue<>(null, null, null, value);
 		}
-		
+
 		@SuppressWarnings("rawtypes")
 		Set violationsRaw = getBeanValidator().validateValue(base, property, paramValue);
 
 		@SuppressWarnings("unchecked")
 		Set<ConstraintViolation<?>> violations = violationsRaw;
-		
+
 		return violations;
 	}
 
 	private List<Validator> getValidators(Param requestParameter) {
 
-		List<Validator> validators = new ArrayList<Validator>();
+		List<Validator> validators = new ArrayList<>();
 
 		Class<? extends Validator>[] validatorClasses = requestParameter.validatorClasses();
 		String[] validatorNames = requestParameter.validators();
@@ -287,15 +287,15 @@ public class RequestParameterProducer {
 		for (Class<? extends Validator> validatorClass : validatorClasses) {
 			validators.add(instance(validatorClass));
 		}
-		
+
 		// Process the default validators
-		
+
 		Application application = getApplication();
 		for (Entry<String, String> validatorEntry :	application.getDefaultValidatorInfo().entrySet()) {
-			
+
 			String validatorID = validatorEntry.getKey();
 			String validatorClassName = validatorEntry.getValue();
-			
+
 			// Check that the validator ID is not the BeanValidator one which we handle in a special way.
 			// And make sure the default validator is not already set manually as well.
 			if (!validatorID.equals(BeanValidator.VALIDATOR_ID) && !containsByClassName(validators, validatorClassName)) {
@@ -312,10 +312,10 @@ public class RequestParameterProducer {
 
 		return validators;
 	}
-	
+
 	private static Map<String, Object> getConverterAttributes(Param requestParameter) {
 
-		Map<String, Object> attributeMap = new HashMap<String, Object>();
+		Map<String, Object> attributeMap = new HashMap<>();
 
 		Attribute[] attributes = requestParameter.converterAttributes();
 		for (Attribute attribute : attributes) {
@@ -327,7 +327,7 @@ public class RequestParameterProducer {
 
 	private Map<String, Object> getValidatorAttributes(Param requestParameter) {
 
-		Map<String, Object> attributeMap = new HashMap<String, Object>();
+		Map<String, Object> attributeMap = new HashMap<>();
 
 		Attribute[] attributes = requestParameter.validatorAttributes();
 		for (Attribute attribute : attributes) {
@@ -431,7 +431,7 @@ public class RequestParameterProducer {
 	}
 
 	private static List<FacesMessage> getFacesMessages(ValidatorException ve) {
-		List<FacesMessage> facesMessages = new ArrayList<FacesMessage>();
+		List<FacesMessage> facesMessages = new ArrayList<>();
 		if (ve.getFacesMessages() != null) {
 			facesMessages.addAll(ve.getFacesMessages());
 		} else if (ve.getFacesMessage() != null) {

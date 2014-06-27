@@ -161,7 +161,7 @@ public final class FacesViews {
 		Set<String> rootPaths = (Set<String>) servletContext.getAttribute(SCAN_PATHS);
 
 		if (rootPaths == null) {
-			rootPaths = new HashSet<String>(csvToList(servletContext.getInitParameter(FACES_VIEWS_SCAN_PATHS_PARAM_NAME)));
+			rootPaths = new HashSet<>(csvToList(servletContext.getInitParameter(FACES_VIEWS_SCAN_PATHS_PARAM_NAME)));
 			rootPaths.add(WEB_INF_VIEWS);
 			servletContext.setAttribute(SCAN_PATHS, unmodifiableSet(rootPaths));
 		}
@@ -175,7 +175,7 @@ public final class FacesViews {
 
 		if (publicRootPaths == null) {
 			Set<String> rootPaths = getRootPaths(servletContext);
-			publicRootPaths = new HashSet<String>();
+			publicRootPaths = new HashSet<>();
 			for (String rootPath : rootPaths) {
 
 				if (rootPath.contains("*")) {
@@ -396,7 +396,7 @@ public final class FacesViews {
 	 * @return views
 	 */
 	public static Map<String, String> scanViews(ServletContext servletContext) {
-		Map<String, String> collectedViews = new HashMap<String, String>();
+		Map<String, String> collectedViews = new HashMap<>();
 		scanViewsFromRootPaths(servletContext, collectedViews, null);
 		return collectedViews;
 	}
@@ -477,7 +477,7 @@ public final class FacesViews {
 		Set<String> extensions = (Set<String>) servletContext.getAttribute(FACES_SERVLET_EXTENSIONS);
 
 		if (extensions == null) {
-			extensions = new HashSet<String>();
+			extensions = new HashSet<>();
 			ServletRegistration facesServletRegistration = getFacesServletRegistration(servletContext);
 		    if (facesServletRegistration != null) {
 		        Collection<String> mappings = facesServletRegistration.getMappings();

@@ -213,7 +213,7 @@ public class Html5RenderKit extends RenderKitWrapper {
 			return null;
 		}
 
-		Map<Class<UIComponent>, Set<String>> passthroughAttributes = new HashMap<Class<UIComponent>, Set<String>>();
+		Map<Class<UIComponent>, Set<String>> passthroughAttributes = new HashMap<>();
 
 		for (String passthroughAttribute : passthroughAttributesParam.split("\\s*;\\s*")) {
 			String[] classAndAttributeNames = passthroughAttribute.split("\\s*=\\s*", 2);

@@ -67,7 +67,7 @@ public class ImportConstants extends TagHandler {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static Map<String, Map<String, Object>> CONSTANTS_CACHE = new HashMap<String, Map<String, Object>>();
+	private static Map<String, Map<String, Object>> CONSTANTS_CACHE = new HashMap<>();
 
 	private static final String ERROR_INVALID_VAR = "The 'var' attribute may not be an EL expression.";
 	private static final String ERROR_MISSING_CLASS = "Cannot find type '%s' in classpath.";
@@ -130,7 +130,7 @@ public class ImportConstants extends TagHandler {
 	 * @return Constants of the given type.
 	 */
 	private static Map<String, Object> collectConstants(final String type) {
-		Map<String, Object> constants = new LinkedHashMap<String, Object>();
+		Map<String, Object> constants = new LinkedHashMap<>();
 
 		for (Field field : toClass(type).getFields()) {
 			if (isPublicStaticFinal(field)) {

@@ -99,7 +99,7 @@ final class CombinedResource extends Resource {
 
 	@Override
 	public Map<String, String> getResponseHeaders() {
-		Map<String, String> responseHeaders = new HashMap<String, String>(3);
+		Map<String, String> responseHeaders = new HashMap<>(3);
 		long lastModified = info.getLastModified();
 		responseHeaders.put("Last-Modified", Utils.formatRFC1123(new Date(lastModified)));
 		responseHeaders.put("Expires", Utils.formatRFC1123(new Date(System.currentTimeMillis() + info.getMaxAge())));

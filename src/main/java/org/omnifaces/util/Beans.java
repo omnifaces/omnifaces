@@ -77,7 +77,7 @@ public final class Beans {
 	public static <T> T getReference(BeanManager beanManager, Bean<T> bean) {
 		return (T) beanManager.getReference(bean, bean.getBeanClass(), beanManager.createCreationalContext(bean));
 	}
-	
+
 	/**
 	 * Returns the CDI managed bean instance of the given class from the given bean manager and creates one if
 	 * one doesn't exist.
@@ -136,7 +136,7 @@ public final class Beans {
 	 * @since 1.7
 	 */
 	public static Map<Object, String> getActiveInstances(BeanManager beanManager, Class<? extends Annotation> scope) {
-		Map<Object, String> activeInstances = new HashMap<Object, String>();
+		Map<Object, String> activeInstances = new HashMap<>();
 		Set<Bean<?>> beans = beanManager.getBeans(Object.class);
 		Context context = beanManager.getContext(scope);
 
@@ -150,74 +150,74 @@ public final class Beans {
 
 		return Collections.unmodifiableMap(activeInstances);
 	}
-	
+
 	/**
 	 * Get program element annotation of a certain annotation type.
 	 * <p>
 	 * The difference with {@link Annotated#getAnnotation(Class)} is that this method will recursively search inside
 	 * all {@link Stereotype} annotations.
-	 * 
+	 *
 	 * @param beanManager The involved CDI bean manager.
 	 * @param annotated a Java program element that can be annotated
 	 * @param annotationType the class of the annotation type
-	 * 
+	 *
 	 * @return the program element annotation of the given annotation type if it could be found, otherwise <code>null</code>
-	 * 
+	 *
 	 * @since 1.8
 	 */
 	public static <T extends Annotation> T getAnnotation(BeanManager beanManager, Annotated annotated, Class<T> annotationType) {
-		
+
 		annotated.getAnnotation(annotationType);
-		
+
 		if (annotated.getAnnotations().isEmpty()) {
 			return null;
 		}
-		
+
 		if (annotated.isAnnotationPresent(annotationType)) {
 			return annotated.getAnnotation(annotationType);
 		}
-		
+
 		return getAnnotation(beanManager, annotated.getAnnotations(), annotationType);
 	}
-	
+
 	/**
 	 * Get program element annotation of a certain annotation type from a collection of annotations.
 	 * <p>
 	 * This method will investigate the list of the initial annotations and for every such annotation that's a stereo type
 	 * will recursively investigate the annotations represented by the stereo type as long as the given annotation type hasn't been
 	 * encountered.
-	 * 
+	 *
 	 * @param beanManager The involved CDI bean manager.
 	 * @param initialAnnotations collection of annotations to investigate
 	 * @param annotationType the class of the annotation type
-	 * 
+	 *
 	 * @return the annotation of the given annotation type if it could be found, otherwise <code>null</code>
-	 * 
+	 *
 	 * @since 1.8
 	 */
 	public static <T extends Annotation> T getAnnotation(BeanManager beanManager, Collection<Annotation> initialAnnotations, Class<T> annotationType) {
-		
+
 		if (initialAnnotations.isEmpty()) {
 			return null;
 		}
-		
-		Queue<Annotation> annotations = new LinkedList<Annotation>(initialAnnotations);
-		
+
+		Queue<Annotation> annotations = new LinkedList<>(initialAnnotations);
+
 		while (!annotations.isEmpty()) {
-			
+
 			Annotation annotation = annotations.remove();
 
 			if (annotation.annotationType().equals(annotationType)) {
 				return annotationType.cast(annotation);
 			}
-			
+
 			if (beanManager.isStereotype(annotation.annotationType())) {
 				annotations.addAll(beanManager.getStereotypeDefinition(annotation.annotationType()));
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 
 }

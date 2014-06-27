@@ -56,7 +56,7 @@ public class ValidateUnique extends ValidateMultipleFields {
 	 */
 	@Override
 	public boolean validateValues(FacesContext context, List<UIInput> inputs, List<Object> values) {
-		return (new HashSet<Object>(values).size() == inputs.size());
+		return (new HashSet<>(values).size() == inputs.size());
 	}
 
 }

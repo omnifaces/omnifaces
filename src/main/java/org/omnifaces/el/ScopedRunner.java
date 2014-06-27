@@ -30,7 +30,7 @@ public class ScopedRunner {
 
 	FacesContext context;
 	Map<String, Object> scopedVariables;
-	Map<String, Object> previousVariables = new HashMap<String, Object>();
+	Map<String, Object> previousVariables = new HashMap<>();
 
 	public ScopedRunner(FacesContext context) {
 		this(context, new HashMap<String, Object>());

@@ -236,7 +236,7 @@ public final class Hacks {
 		String name = id.getName().split("\\.")[0];
 		Object resourceLibrary = invokeMethod(resourceFactory, "getResourceLibrary", name, id.getLibrary());
 		Iterable resources = invokeMethod(resourceLibrary, "getResources");
-		Set<ResourceIdentifier> resourceIdentifiers = new LinkedHashSet<ResourceIdentifier>();
+		Set<ResourceIdentifier> resourceIdentifiers = new LinkedHashSet<>();
 
 		for (Object resource : resources) {
 			String libraryName = invokeMethod(resource, "getLibraryName");
@@ -292,7 +292,7 @@ public final class Hacks {
 
 	private static List<Integer> toVersionElements(String version) {
 
-		List<Integer> versionElements = new ArrayList<Integer>();
+		List<Integer> versionElements = new ArrayList<>();
 		for (String string : version.split("\\.")) {
 			versionElements.add(Integer.valueOf(string));
 		}
@@ -475,7 +475,7 @@ public final class Hacks {
 		Map<String, Boolean> map = getContextAttribute(context, key);
 
 		if (map == null) {
-			map = new HashMap<String, Boolean>();
+			map = new HashMap<>();
 			setContextAttribute(context, key, map);
 		}
 

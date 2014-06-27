@@ -25,7 +25,7 @@ import javax.faces.model.SelectItem;
  */
 public class SelectItemsBuilder {
 
-	List<SelectItem> selectItems = new ArrayList<SelectItem>();
+	List<SelectItem> selectItems = new ArrayList<>();
 
 	public SelectItemsBuilder add(Object value, String label) {
 		selectItems.add(new SelectItem(value, label));
@@ -47,7 +47,7 @@ public class SelectItemsBuilder {
 	 * @return <code>List</code> of <code>SelectItem</code>s having the map's value as value and the map's key as label.
 	 */
 	public static List<SelectItem> fromMap(Map<?, ?> map) {
-		List<SelectItem> items = new ArrayList<SelectItem>(map.size());
+		List<SelectItem> items = new ArrayList<>(map.size());
 		for (Map.Entry<?, ?> entry : map.entrySet()) {
 			items.add(new SelectItem(entry.getValue(), entry.getKey().toString()));
 		}

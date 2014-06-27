@@ -106,7 +106,7 @@ public class CacheEntry implements Serializable {
 			// popular pages). We assume here that it being cached data that can be created
 			// by one request or the other, eventually one request will create the lasting one
 			// and the Maps that are lost don't matter.
-			attributes = new HashMap<String, Object>();
+			attributes = new HashMap<>();
 		}
 
 		return attributes;

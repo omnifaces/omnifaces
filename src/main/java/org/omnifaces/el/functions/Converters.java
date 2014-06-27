@@ -64,7 +64,7 @@ public final class Converters {
 			return null;
 		}
 
-		return new ArrayList<E>(set);
+		return new ArrayList<>(set);
 	}
 
 	/**
@@ -79,7 +79,7 @@ public final class Converters {
 			return null;
 		}
 
-		return new ArrayList<Map.Entry<K, V>>(map.entrySet());
+		return new ArrayList<>(map.entrySet());
 	}
 
 	/**
@@ -124,7 +124,7 @@ public final class Converters {
 			return null;
 		}
 
-		return new IterableDataModel<E>(iterable);
+		return new IterableDataModel<>(iterable);
 	}
 
 	/**
@@ -281,7 +281,7 @@ public final class Converters {
 		}
 
 		int sourceSize = list.size();
-		List<List<T>> lists = new ArrayList<List<T>>((sourceSize + fragmentSize - 1) / fragmentSize);
+		List<List<T>> lists = new ArrayList<>((sourceSize + fragmentSize - 1) / fragmentSize);
 
 		for (int i = 0; i < sourceSize; i += fragmentSize) {
 			lists.add(list.subList(i, Math.min(i + fragmentSize, sourceSize)));

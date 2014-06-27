@@ -61,7 +61,7 @@ public class MessagesRenderer extends Renderer {
 	private static final Map<Severity, String> SEVERITY_NAMES = createSeverityNames();
 
 	private static final Map<Severity, String> createSeverityNames() {
-		Map<Severity, String> severityNames = new HashMap<Severity, String>();
+		Map<Severity, String> severityNames = new HashMap<>();
 		severityNames.put(FacesMessage.SEVERITY_INFO, "info");
 		severityNames.put(FacesMessage.SEVERITY_WARN, "warn");
 		severityNames.put(FacesMessage.SEVERITY_ERROR, "error");
@@ -111,7 +111,7 @@ public class MessagesRenderer extends Renderer {
 			return component.isGlobalOnly() ? context.getMessageList(null) : context.getMessageList();
 		}
 
-		List<FacesMessage> messages = new ArrayList<FacesMessage>();
+		List<FacesMessage> messages = new ArrayList<>();
 
 		for (String forClientId : forClientIds.split("\\s+")) {
 			UIComponent forComponent = component.findComponent(forClientId);
