@@ -16,11 +16,13 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.ResourceBundle.getBundle;
 import static org.omnifaces.util.Faces.getLocale;
+import static org.omnifaces.util.Faces.getMessageBundle;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ResourceBundle;
 
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponent;
@@ -30,7 +32,6 @@ import javax.faces.component.UISelectBoolean;
 import javax.faces.context.FacesContext;
 
 import org.omnifaces.util.Components;
-import org.omnifaces.util.Faces;
 import org.omnifaces.util.Messages;
 import org.omnifaces.util.State;
 import org.omnifaces.validator.MultiFieldValidator;
@@ -163,16 +164,13 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 	 */
 	public ValidateMultipleFields() {
 		String componentType = getClass().getAnnotation(FacesComponent.class).value();
-		String messageBundle = Faces.getApplication().getMessageBundle();
+		ResourceBundle messageBundle = getMessageBundle();
 
-		if (messageBundle != null) {
-			defaultMessage = getBundle(messageBundle, getLocale()).getString(componentType);
+		if (messageBundle == null) {
+			messageBundle = getBundle(DEFAULT_MESSAGE_BUNDLE, getLocale());
 		}
 
-		if (defaultMessage == null) {
-			defaultMessage = getBundle(DEFAULT_MESSAGE_BUNDLE, getLocale()).getString(componentType);
-		}
-
+		defaultMessage = messageBundle.getString(componentType);
 		setRendererType(null);
 	}
 
