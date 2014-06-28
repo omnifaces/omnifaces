@@ -29,6 +29,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.el.ELContext;
@@ -80,6 +81,7 @@ public final class FacesLocal {
 	private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
 	private static final int DEFAULT_SENDFILE_BUFFER_SIZE = 10240;
 	private static final String ERROR_NO_VIEW = "There is no view.";
+	private static final String ERROR_NO_MESSAGE_BUNDLE = "There is no message bundle.";
 	private static final String[] FACELET_CONTEXT_KEYS = {
 		FaceletContext.FACELET_CONTEXT_KEY, // Compiletime constant, may fail when compiled against EE6 and run on EE7.
 		"com.sun.faces.facelets.FACELET_CONTEXT", // JSF 2.0/2.1.
@@ -349,6 +351,19 @@ public final class FacesLocal {
 		}
 
 		viewRoot.setLocale(locale);
+	}
+
+	/**
+	 * @see Faces#getMessageBundle()
+	 */
+	public static ResourceBundle getMessageBundle(FacesContext context) {
+		String messageBundle = context.getApplication().getMessageBundle();
+
+		if (messageBundle == null) {
+			return null;
+		}
+
+		return ResourceBundle.getBundle(messageBundle, getLocale(context));
 	}
 
 	/**

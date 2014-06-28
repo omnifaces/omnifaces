@@ -24,6 +24,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.el.ELContext;
@@ -470,6 +472,19 @@ public final class Faces {
 	 */
 	public static void setLocale(Locale locale) {
 		FacesLocal.setLocale(getContext(), locale);
+	}
+
+	/**
+	 * Returns the message bundle as identified by <code>&lt;message-bundle&gt;</code> in <code>faces-config.xml</code>.
+	 * The instance is already localized via {@link Faces#getLocale()}. If there is no
+	 * <code>&lt;message-bundle&gt;</code>, then this method just returns <code>null</code>.
+	 * @return The message bundle as identified by <code>&lt;message-bundle&gt;</code> in <code>faces-config.xml</code>.
+	 * @since 2.0
+	 * @throws MissingResourceException When the <code>&lt;message-bundle&gt;</code> in <code>faces-config.xml</code>
+	 * does not refer an existing resource in the classpath.
+	 */
+	public static ResourceBundle getMessageBundle() {
+		return FacesLocal.getMessageBundle(getContext());
 	}
 
 	/**
