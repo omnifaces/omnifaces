@@ -13,6 +13,9 @@
 package org.omnifaces.resourcehandler;
 
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
+import static org.omnifaces.util.Faces.getInitParameter;
+import static org.omnifaces.util.Faces.isDevelopment;
+import static org.omnifaces.util.Utils.isEmpty;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,9 +25,6 @@ import javax.faces.application.ResourceDependency;
 import javax.faces.application.ResourceHandler;
 import javax.faces.application.ResourceHandlerWrapper;
 import javax.faces.application.ResourceWrapper;
-
-import org.omnifaces.util.Faces;
-import org.omnifaces.util.Utils;
 
 /**
  * This {@link ResourceHandler} implementation allows the developer to provide CDN URLs instead of the default local
@@ -177,7 +177,7 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 	public CDNResourceHandler(ResourceHandler wrapped) {
 		this.wrapped = wrapped;
 
-		if (!Faces.isDevelopment() || "true".equals(Faces.getInitParameter(PARAM_NAME_CDN_DEV_STAGE))) {
+		if (!isDevelopment() || "true".equals(getInitParameter(PARAM_NAME_CDN_DEV_STAGE))) {
 			cdnResources = initCDNResources();
 
 			if (cdnResources == null) {
@@ -262,9 +262,9 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 	 * @throws IllegalArgumentException When the context parameter value is in invalid format.
 	 */
 	static Map<ResourceIdentifier, String> initCDNResources() {
-		String cdnResourcesParam = Faces.getInitParameter(PARAM_NAME_CDN_RESOURCES);
+		String cdnResourcesParam = getInitParameter(PARAM_NAME_CDN_RESOURCES);
 
-		if (Utils.isEmpty(cdnResourcesParam)) {
+		if (isEmpty(cdnResourcesParam)) {
 			return null;
 		}
 

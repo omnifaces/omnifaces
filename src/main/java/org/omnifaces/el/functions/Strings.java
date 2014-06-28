@@ -12,6 +12,8 @@
  */
 package org.omnifaces.el.functions;
 
+import static org.omnifaces.util.Faces.getLocale;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.MessageFormat;
@@ -229,7 +231,7 @@ public final class Strings {
 	 */
 	private static String format(String pattern, Object... params) {
 		StringBuffer result = new StringBuffer();
-		new MessageFormat(pattern, Faces.getLocale()).format(params, result, null);
+		new MessageFormat(pattern, getLocale()).format(params, result, null);
 		return result.toString();
 	}
 

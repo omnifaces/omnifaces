@@ -12,13 +12,14 @@
  */
 package org.omnifaces.component.output.cache.el;
 
+import static org.omnifaces.util.Faces.getContext;
+
 import javax.el.ELContext;
 import javax.el.ValueExpression;
 import javax.faces.context.FacesContext;
 
 import org.omnifaces.component.output.Cache;
 import org.omnifaces.el.ValueExpressionWrapper;
-import org.omnifaces.util.Faces;
 
 /**
  * A value expression implementation that caches its main value at the moment it's evaluated and uses
@@ -42,7 +43,7 @@ public class CachingValueExpression extends ValueExpressionWrapper {
 
 	@Override
 	public Object getValue(ELContext elContext) {
-		FacesContext facesContext = Faces.getContext(elContext);
+		FacesContext facesContext = getContext(elContext);
 
 		Object value = cache.getCacheAttribute(facesContext, name);
 		if (value == null) {

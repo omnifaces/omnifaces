@@ -18,10 +18,8 @@ import static java.lang.Boolean.valueOf;
 import static javax.faces.validator.BeanValidator.DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME;
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getApplication;
-import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getInitParameter;
-import static org.omnifaces.util.Faces.getRequestParameter;
-import static org.omnifaces.util.Faces.getViewRoot;
+import static org.omnifaces.util.FacesLocal.getRequestParameter;
 import static org.omnifaces.util.Messages.createError;
 import static org.omnifaces.util.Platform.getBeanValidator;
 import static org.omnifaces.util.Platform.isBeanValidationAvailable;
@@ -56,7 +54,6 @@ import javax.faces.validator.ValidatorException;
 import javax.validation.ConstraintViolation;
 
 import org.omnifaces.cdi.Param;
-import org.omnifaces.util.Faces;
 
 /**
  * Producer for a request parameter as defined by the {@link Param} annotation.
@@ -74,8 +71,8 @@ public class RequestParameterProducer {
 		// @Param is the annotation on the injection point that holds all data for this request parameter
 		Param requestParameter = getQualifier(injectionPoint, Param.class);
 
-		FacesContext context = getContext();
-		UIComponent component = getViewRoot();
+		FacesContext context = FacesContext.getCurrentInstance();
+		UIComponent component = context.getViewRoot();
 
 		String label = getLabel(requestParameter, injectionPoint);
 
@@ -83,7 +80,7 @@ public class RequestParameterProducer {
 		component.getAttributes().put("label", label);
 
 		// Get raw submitted value from the request
-		String submittedValue = getRequestParameter(getName(requestParameter, injectionPoint));
+		String submittedValue = getRequestParameter(context, getName(requestParameter, injectionPoint));
 		Object convertedValue = null;
 		boolean valid = true;
 
@@ -160,7 +157,7 @@ public class RequestParameterProducer {
 
 		if (converter == null) {
 			try {
-				converter = Faces.getApplication().createConverter(targetType);
+				converter = getApplication().createConverter(targetType);
 			} catch (Exception e) {
 				return null;
 			}

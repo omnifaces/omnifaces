@@ -12,13 +12,13 @@
  */
 package org.omnifaces.component.validator;
 
+import static org.omnifaces.util.Utils.isEmpty;
+
 import java.util.List;
 
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
-
-import org.omnifaces.util.Utils;
 
 /**
  * <strong>ValidateOneNotMore</strong> validates if ONLY ONE of the given <code>UIInput</code> components has been
@@ -48,7 +48,7 @@ public class ValidateOne extends ValidateMultipleFields {
 		boolean hasValue = false;
 
 		for (Object value : values) {
-			if (!Utils.isEmpty(value)) {
+			if (!isEmpty(value)) {
 				if (hasValue) {
 					return false;
 				}

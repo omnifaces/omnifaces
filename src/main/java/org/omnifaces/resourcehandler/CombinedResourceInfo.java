@@ -13,7 +13,10 @@
 package org.omnifaces.resourcehandler;
 
 import static org.omnifaces.util.Faces.getInitParameter;
+import static org.omnifaces.util.FacesLocal.getRequestDomainURL;
 import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.serializeURLSafe;
+import static org.omnifaces.util.Utils.unserializeURLSafe;
 
 import java.io.IOException;
 import java.net.URL;
@@ -31,7 +34,6 @@ import javax.faces.application.ResourceHandler;
 import javax.faces.context.FacesContext;
 
 import org.omnifaces.el.functions.Converters;
-import org.omnifaces.util.Faces;
 import org.omnifaces.util.Hacks;
 import org.omnifaces.util.Utils;
 
@@ -188,7 +190,7 @@ final class CombinedResourceInfo {
 			try {
 				URLConnection connection = !Hacks.isRichFacesResourceOptimizationEnabled()
 					? resource.getURL().openConnection()
-					: new URL(Faces.getRequestDomainURL() + resource.getRequestPath()).openConnection();
+					: new URL(getRequestDomainURL(context) + resource.getRequestPath()).openConnection();
 
 				contentLength += connection.getContentLength();
 				long lastModified = connection.getLastModified();
@@ -301,7 +303,7 @@ final class CombinedResourceInfo {
 	 * @return The unique ID of the given set of resource identifiers.
 	 */
 	private static String toUniqueId(Set<ResourceIdentifier> resourceIdentifiers) {
-		return Utils.serializeURLSafe(Converters.joinCollection(resourceIdentifiers, "|"));
+		return serializeURLSafe(Converters.joinCollection(resourceIdentifiers, "|"));
 	}
 
 	/**
@@ -315,7 +317,7 @@ final class CombinedResourceInfo {
 		String resourcesId;
 
 		try {
-			resourcesId = Utils.unserializeURLSafe(id);
+			resourcesId = unserializeURLSafe(id);
 		}
 		catch (IllegalArgumentException e) {
 			// This will occur when the ID has purposefully been manipulated for some reason.

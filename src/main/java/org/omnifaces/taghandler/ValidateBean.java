@@ -12,6 +12,10 @@
  */
 package org.omnifaces.taghandler;
 
+import static org.omnifaces.util.Components.hasInvokedSubmit;
+import static org.omnifaces.util.Events.addBeforePhaseListener;
+import static org.omnifaces.util.Events.subscribeToViewEvent;
+
 import java.io.IOException;
 
 import javax.faces.component.UICommand;
@@ -29,8 +33,6 @@ import javax.faces.view.facelets.TagHandler;
 
 import org.omnifaces.eventlistener.BeanValidationEventListener;
 import org.omnifaces.util.Callback;
-import org.omnifaces.util.Components;
-import org.omnifaces.util.Events;
 
 /**
  * The <code>&lt;o:validateBean&gt;</code> allows the developer to control bean validation on a per-{@link UICommand}
@@ -74,8 +76,8 @@ public class ValidateBean extends TagHandler {
 	 */
 	public ValidateBean(TagConfig config) {
 		super(config);
-		this.validationGroups = getAttribute("validationGroups");
-		this.disabled = getAttribute("disabled");
+		validationGroups = getAttribute("validationGroups");
+		disabled = getAttribute("disabled");
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -95,14 +97,14 @@ public class ValidateBean extends TagHandler {
 
 		final String validationGroups = this.validationGroups != null ? this.validationGroups.getValue(context) : null;
 		final boolean disabled = this.disabled != null ? this.disabled.getBoolean(context) : false;
-		Events.addBeforePhaseListener(PhaseId.PROCESS_VALIDATIONS, new Callback.Void() {
+		addBeforePhaseListener(PhaseId.PROCESS_VALIDATIONS, new Callback.Void() {
 
 			@Override
 			public void invoke() {
-				if (Components.hasInvokedSubmit(parent)) {
+				if (hasInvokedSubmit(parent)) {
 					SystemEventListener listener = new BeanValidationEventListener(validationGroups, disabled);
-					Events.subscribeToViewEvent(PreValidateEvent.class, listener);
-					Events.subscribeToViewEvent(PostValidateEvent.class, listener);
+					subscribeToViewEvent(PreValidateEvent.class, listener);
+					subscribeToViewEvent(PostValidateEvent.class, listener);
 				}
 			}
 		});

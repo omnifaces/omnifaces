@@ -12,6 +12,7 @@
  */
 package org.omnifaces.context;
 
+import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.responseReset;
 import static org.omnifaces.util.Faces.setContextAttribute;
 import static org.omnifaces.util.FacesLocal.getContextAttribute;
@@ -172,7 +173,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 	 * {@link PartialViewContext} implementation which doesn't properly delegate through the wrapped instance.
 	 */
 	public static OmniPartialViewContext getCurrentInstance() {
-		return getCurrentInstance(FacesContext.getCurrentInstance());
+		return getCurrentInstance(getContext());
 	}
 
 	/**

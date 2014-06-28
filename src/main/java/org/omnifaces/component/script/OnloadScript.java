@@ -12,6 +12,9 @@
  */
 package org.omnifaces.component.script;
 
+import static org.omnifaces.util.Ajax.oncomplete;
+import static org.omnifaces.util.Events.subscribeToViewEvent;
+
 import java.io.IOException;
 import java.io.StringWriter;
 
@@ -33,7 +36,6 @@ import javax.faces.event.SystemEvent;
 import javax.faces.event.SystemEventListener;
 
 import org.omnifaces.util.Ajax;
-import org.omnifaces.util.Events;
 
 /**
  * <strong>OnloadScript</strong> is an extension to <code>&lt;h:outputScript&gt;</code> which will be executed in the
@@ -90,7 +92,7 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 		}
 		else if (event instanceof PostRestoreStateEvent) {
 			if (ajaxRequest) {
-				Events.subscribeToViewEvent(PreRenderViewEvent.class, this);
+				subscribeToViewEvent(PreRenderViewEvent.class, this);
 			}
 		}
 	}
@@ -144,7 +146,7 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 		String script = buffer.toString().trim();
 
 		if (!script.isEmpty()) {
-			Ajax.oncomplete(script);
+			oncomplete(script);
 		}
 	}
 

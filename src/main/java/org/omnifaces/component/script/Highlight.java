@@ -13,6 +13,7 @@
 package org.omnifaces.component.script;
 
 import static java.lang.Boolean.TRUE;
+import static org.omnifaces.util.Components.getCurrentForm;
 
 import java.io.IOException;
 import java.util.EnumSet;
@@ -30,7 +31,6 @@ import javax.faces.component.visit.VisitHint;
 import javax.faces.component.visit.VisitResult;
 import javax.faces.context.FacesContext;
 
-import org.omnifaces.util.Components;
 import org.omnifaces.util.State;
 
 /**
@@ -114,7 +114,7 @@ public class Highlight extends OnloadScript {
 	@Override
 	public void encodeChildren(FacesContext context) throws IOException {
 		if (context.isPostback() && context.isValidationFailed()) {
-			UIForm form = Components.getCurrentForm();
+			UIForm form = getCurrentForm();
 
 			if (form != null) {
 				final StringBuilder clientIdsAsJSON = new StringBuilder();

@@ -12,6 +12,10 @@
  */
 package org.omnifaces.util;
 
+import static org.omnifaces.util.Faces.getApplication;
+import static org.omnifaces.util.Faces.getELContext;
+import static org.omnifaces.util.Faces.getInitParameter;
+import static org.omnifaces.util.Faces.hasContext;
 import static org.omnifaces.util.FacesLocal.getContextAttribute;
 import static org.omnifaces.util.FacesLocal.setContextAttribute;
 
@@ -205,8 +209,8 @@ public final class Hacks {
 			if (!RICHFACES_INSTALLED) {
 				richFacesResourceOptimizationEnabled = false;
 			}
-			else if (Faces.getContext() != null) {
-				richFacesResourceOptimizationEnabled = Boolean.valueOf(Faces.getInitParameter(RICHFACES_RO_INIT_PARAM));
+			else if (hasContext()) {
+				richFacesResourceOptimizationEnabled = Boolean.valueOf(getInitParameter(RICHFACES_RO_INIT_PARAM));
 			}
 			else {
 				return false;
@@ -250,7 +254,7 @@ public final class Hacks {
 	// JUEL related ---------------------------------------------------------------------------------------------------
 
 	public static boolean isJUELUsed() {
-		return isJUELUsed(Faces.getApplication().getExpressionFactory());
+		return isJUELUsed(getApplication().getExpressionFactory());
 	}
 
 	public static boolean isJUELUsed(ExpressionFactory factory) {
@@ -327,7 +331,7 @@ public final class Hacks {
 	 */
 	public static Method methodExpressionToStaticMethod(final ELContext context, final MethodExpression methodExpression) {
 
-		MethodInfo methodInfo = methodExpression.getMethodInfo(FacesContext.getCurrentInstance().getELContext());
+		MethodInfo methodInfo = methodExpression.getMethodInfo(getELContext());
 
 		try {
 			// Create a Method instance with the signature (return type, name, parameter types) corresponding
@@ -393,7 +397,7 @@ public final class Hacks {
 	 */
 	public static boolean isMyFacesUsed() {
 		if (myFacesUsed == null) {
-			FacesContext context = Faces.getContext();
+			FacesContext context = FacesContext.getCurrentInstance();
 
 			if (context != null) {
 				myFacesUsed = context.getClass().getPackage().getName().startsWith(MYFACES_PACKAGE_PREFIX);

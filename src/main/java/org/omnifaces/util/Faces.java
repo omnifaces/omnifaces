@@ -130,6 +130,15 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns <code>true</code> when the current faces context is available (i.e. it is not <code>null</code>).
+	 * @return <code>true</code> when the current faces context is available.
+	 * @since 2.0
+	 */
+	public static boolean hasContext() {
+		return getContext() != null;
+	}
+
+	/**
 	 * Returns the current external context.
 	 * <p>
 	 * <i>Note that whenever you absolutely need this method to perform a general task, you might want to consider to
@@ -260,6 +269,16 @@ public final class Faces {
 	 */
 	public static boolean isValidationFailed() {
 		return getContext().isValidationFailed();
+	}
+
+	/**
+	 * Returns the current EL context.
+	 * @return The current EL context.
+	 * @see FacesContext#getELContext()
+	 * @since 2.0
+	 */
+	public static ELContext getELContext() {
+		return getContext().getELContext();
 	}
 
 	/**

@@ -12,6 +12,8 @@
  */
 package org.omnifaces.component.validator;
 
+import static org.omnifaces.util.Utils.nullSafeTreeSet;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -22,7 +24,6 @@ import javax.faces.context.FacesContext;
 
 import org.omnifaces.util.Callback;
 import org.omnifaces.util.State;
-import org.omnifaces.util.Utils;
 
 /**
  * <strong>ValidateOrder</strong> validates if the values of the given {@link UIInput} components as specified in
@@ -63,7 +64,7 @@ public class ValidateOrder extends ValidateMultipleFields {
 		LT(new Callback.ReturningWithArgument<Boolean, List<Comparable>>() {
 			@Override
 			public Boolean invoke(List<Comparable> values) {
-				return new ArrayList<Comparable>(Utils.nullSafeTreeSet(values)).equals(values);
+				return new ArrayList<Comparable>(nullSafeTreeSet(values)).equals(values);
 			}
 		}),
 
@@ -79,7 +80,7 @@ public class ValidateOrder extends ValidateMultipleFields {
 		GT(new Callback.ReturningWithArgument<Boolean, List<Comparable>>() {
 			@Override
 			public Boolean invoke(List<Comparable> values) {
-				List<Comparable> sortedValues = new ArrayList<>(Utils.nullSafeTreeSet(values));
+				List<Comparable> sortedValues = new ArrayList<>(nullSafeTreeSet(values));
 				Collections.reverse(sortedValues);
 				return sortedValues.equals(values);
 			}

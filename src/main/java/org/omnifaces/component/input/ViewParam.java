@@ -12,6 +12,7 @@
  */
 package org.omnifaces.component.input;
 
+import static org.omnifaces.util.Faces.getELContext;
 import static org.omnifaces.util.Faces.isPostback;
 
 import java.util.Map;
@@ -109,7 +110,7 @@ public class ViewParam extends UIViewParameter {
 						// Next check if our outer component has a value expression for the label
 						ValueExpression labelExpression = ViewParam.this.getValueExpression("label");
 						if (labelExpression != null) {
-							label = labelExpression.getValue(FacesContext.getCurrentInstance().getELContext());
+							label = labelExpression.getValue(getELContext());
 						}
 					}
 

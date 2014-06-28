@@ -12,6 +12,8 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static org.omnifaces.util.Utils.stream;
+
 import java.io.IOException;
 import java.util.Map.Entry;
 
@@ -24,7 +26,6 @@ import javax.faces.webapp.FacesServlet;
 import javax.servlet.http.HttpServletResponse;
 
 import org.omnifaces.util.Hacks;
-import org.omnifaces.util.Utils;
 
 /**
  * The <strong>UnmappedResourceHandler</strong> allows the developer to map JSF resources on an URL pattern of
@@ -175,7 +176,7 @@ public class UnmappedResourceHandler extends ResourceHandlerWrapper {
 			externalContext.setResponseHeader(header.getKey(), header.getValue());
 		}
 
-		Utils.stream(resource.getInputStream(), externalContext.getResponseOutputStream());
+		stream(resource.getInputStream(), externalContext.getResponseOutputStream());
 	}
 
 	private Resource createResource(FacesContext context) {

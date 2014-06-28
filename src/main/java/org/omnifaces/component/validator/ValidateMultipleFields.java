@@ -15,8 +15,14 @@ package org.omnifaces.component.validator;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.ResourceBundle.getBundle;
+import static org.omnifaces.util.Components.getLabel;
+import static org.omnifaces.util.Components.getValue;
+import static org.omnifaces.util.Components.isEditable;
+import static org.omnifaces.util.Components.validateHasNoChildren;
+import static org.omnifaces.util.Components.validateHasParent;
 import static org.omnifaces.util.Faces.getLocale;
 import static org.omnifaces.util.Faces.getMessageBundle;
+import static org.omnifaces.util.Messages.addError;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,8 +37,6 @@ import javax.faces.component.UIInput;
 import javax.faces.component.UISelectBoolean;
 import javax.faces.context.FacesContext;
 
-import org.omnifaces.util.Components;
-import org.omnifaces.util.Messages;
 import org.omnifaces.util.State;
 import org.omnifaces.validator.MultiFieldValidator;
 
@@ -182,8 +186,8 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 	 */
 	@Override
 	protected void validateHierarchy() throws IllegalArgumentException {
-		Components.validateHasParent(this, UIForm.class);
-		Components.validateHasNoChildren(this);
+		validateHasParent(this, UIForm.class);
+		validateHasNoChildren(this);
 	}
 
 	/**
@@ -242,7 +246,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 		for (String clientId : components.split("\\s+")) {
 			UIInput input = findInputComponent(namingContainerParent, clientId, PropertyKeys.components);
 
-			if (!Components.isEditable(input)) {
+			if (!isEditable(input)) {
 				continue;
 			}
 
@@ -265,7 +269,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 		List<Object> values = new ArrayList<>(inputs.size());
 
 		for (UIInput input : inputs) {
-			Object value = Components.getValue(input);
+			Object value = getValue(input);
 
 			if (input instanceof UISelectBoolean && Boolean.FALSE.equals(value)) {
 				value = null;
@@ -306,7 +310,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 
 		for (Iterator<UIInput> iterator = inputs.iterator(); iterator.hasNext();) {
 			UIInput input = iterator.next();
-			labels.append(Components.getLabel(input));
+			labels.append(getLabel(input));
 
 			if (iterator.hasNext()) {
 				labels.append(", ");
@@ -317,17 +321,17 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 		String showMessageFor = getShowMessageFor();
 
 		if (showMessageFor.equals("@this")) {
-			Messages.addError(getClientId(context), message, labels);
+			addError(getClientId(context), message, labels);
 		}
 		else if (showMessageFor.equals("@all")) {
 			for (UIInput input : inputs) {
-				Messages.addError(input.getClientId(context), message, labels);
+				addError(input.getClientId(context), message, labels);
 			}
 		}
 		else if (showMessageFor.equals("@invalid")) {
 			for (UIInput input : inputs) {
 				if (!input.isValid()) {
-					Messages.addError(input.getClientId(context), message, labels);
+					addError(input.getClientId(context), message, labels);
 				}
 			}
 		}
@@ -336,7 +340,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 
 			for (String clientId : showMessageFor.split("\\s+")) {
 				UIInput input = findInputComponent(namingContainerParent, clientId, PropertyKeys.showMessageFor);
-				Messages.addError(input.getClientId(context), message, labels);
+				addError(input.getClientId(context), message, labels);
 			}
 		}
 	}

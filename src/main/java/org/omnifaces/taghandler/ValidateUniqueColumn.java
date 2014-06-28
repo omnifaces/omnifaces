@@ -12,6 +12,11 @@
  */
 package org.omnifaces.taghandler;
 
+import static org.omnifaces.util.Components.getClosestParent;
+import static org.omnifaces.util.Components.getLabel;
+import static org.omnifaces.util.Faces.getELContext;
+import static org.omnifaces.util.Messages.addError;
+
 import java.io.IOException;
 
 import javax.el.ValueExpression;
@@ -30,9 +35,6 @@ import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagAttribute;
 import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
-
-import org.omnifaces.util.Components;
-import org.omnifaces.util.Messages;
 
 /**
  * <strong>ValidateUniqueColumn</strong> validates if the given {@link UIInput} component in an {@link UIData} component
@@ -104,7 +106,7 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
 	@Override
 	public void apply(FaceletContext context, final UIComponent parent) throws IOException {
 		if (!ComponentHandler.isNew(parent)) {
-			if (Components.getClosestParent(parent, UIData.class) == null) {
+			if (getClosestParent(parent, UIData.class) == null) {
 				throw new IllegalArgumentException(ERROR_INVALID_PARENT_PARENT);
 			}
 
@@ -157,7 +159,7 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
 			return;
 		}
 
-		UIData table = Components.getClosestParent(input, UIData.class);
+		UIData table = getClosestParent(input, UIData.class);
 		int originalRows = table.getRows();
 		table.setRows(0); // We want to visit all rows.
 
@@ -169,8 +171,7 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
 		if (checker.isDuplicate()) {
 			input.setValid(false);
 			context.validationFailed();
-			Messages.addError(
-				input.getClientId(context), getMessage(), Components.getLabel(input), checker.getDuplicateIndex() + 1);
+			addError(input.getClientId(context), getMessage(), getLabel(input), checker.getDuplicateIndex() + 1);
 		}
 	}
 
@@ -214,7 +215,7 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
 	@SuppressWarnings("unchecked")
 	private static <T> T getValue(ValueExpression expression, T defaultValue) {
 		if (expression != null) {
-			T value = (T) expression.getValue(FacesContext.getCurrentInstance().getELContext());
+			T value = (T) expression.getValue(getELContext());
 
 			if (value != null) {
 				return value;
@@ -241,9 +242,9 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
 
 		public UniqueColumnValueChecker(UIData table, UIInput input) {
 			this.table = table;
-			this.rowIndex = table.getRowIndex();
+			rowIndex = table.getRowIndex();
 			this.input = input;
-			this.value = input.getLocalValue();
+			value = input.getLocalValue();
 		}
 
 		@Override

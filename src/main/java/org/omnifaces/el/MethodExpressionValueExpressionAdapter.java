@@ -12,6 +12,8 @@
  */
 package org.omnifaces.el;
 
+import static org.omnifaces.util.Utils.unmodifiableSet;
+
 import java.lang.reflect.Method;
 import java.util.Set;
 
@@ -26,8 +28,6 @@ import javax.el.ValueExpression;
 import javax.faces.convert.ConverterException;
 import javax.faces.validator.ValidatorException;
 
-import org.omnifaces.util.Utils;
-
 /**
  * This MethodExpression wraps a ValueExpression.
  * <p>
@@ -41,7 +41,7 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Set<RuntimeException> EXCEPTIONS_TO_UNWRAP = Utils.unmodifiableSet(
+	private static final Set<RuntimeException> EXCEPTIONS_TO_UNWRAP = unmodifiableSet(
 		MethodNotFoundException.class, // Needed for proper action listener error handling.
 		ConverterException.class, // Needed for proper conversion error handling.
 		ValidatorException.class); // Needed for proper validation error handling.

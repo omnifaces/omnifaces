@@ -12,14 +12,17 @@
  */
 package org.omnifaces.component.tree;
 
+import static org.omnifaces.util.Components.getClosestParent;
+import static org.omnifaces.util.Components.shouldVisitSkipIteration;
+import static org.omnifaces.util.Components.validateHasNoChildren;
+import static org.omnifaces.util.Components.validateHasParent;
+
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponent;
 import javax.faces.component.visit.VisitCallback;
 import javax.faces.component.visit.VisitContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
-
-import org.omnifaces.util.Components;
 
 /**
  * <strong>TreeInsertChildren</strong> is an {@link UIComponent} that represents the insertion point for the
@@ -47,8 +50,8 @@ public class TreeInsertChildren extends TreeFamily {
 	 */
 	@Override
 	protected void validateHierarchy() {
-		Components.validateHasParent(this, TreeNodeItem.class);
-		Components.validateHasNoChildren(this);
+		validateHasParent(this, TreeNodeItem.class);
+		validateHasNoChildren(this);
 	}
 
 	/**
@@ -57,7 +60,7 @@ public class TreeInsertChildren extends TreeFamily {
 	 */
 	@Override
 	protected void process(FacesContext context, PhaseId phaseId) {
-		Components.getClosestParent(this, Tree.class).processTreeNode(context, phaseId);
+		getClosestParent(this, Tree.class).processTreeNode(context, phaseId);
 	}
 
 	/**
@@ -66,11 +69,11 @@ public class TreeInsertChildren extends TreeFamily {
 	 */
 	@Override
 	public boolean visitTree(VisitContext context, VisitCallback callback) {
-		if (Components.shouldVisitSkipIteration(context)) {
+		if (shouldVisitSkipIteration(context)) {
 			return super.visitTree(context, callback);
 		}
 
-		return Components.getClosestParent(this, Tree.class).visitTreeNode(context, callback);
+		return getClosestParent(this, Tree.class).visitTreeNode(context, callback);
 	}
 
 }

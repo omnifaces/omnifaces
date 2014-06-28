@@ -29,7 +29,6 @@ import javax.faces.model.DataModel;
 
 import org.omnifaces.model.IterableDataModel;
 import org.omnifaces.util.Json;
-import org.omnifaces.util.Utils;
 
 /**
  * Collection of EL functions for data conversion.
@@ -100,7 +99,7 @@ public final class Converters {
 			return null;
 		}
 
-		return Utils.iterableToList(iterable);
+		return iterableToList(iterable);
 	}
 
 	/**

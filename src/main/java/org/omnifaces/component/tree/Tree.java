@@ -12,6 +12,8 @@
  */
 package org.omnifaces.component.tree;
 
+import static org.omnifaces.util.Components.getClosestParent;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,7 +35,6 @@ import org.omnifaces.event.FacesEventWrapper;
 import org.omnifaces.model.tree.ListTreeModel;
 import org.omnifaces.model.tree.TreeModel;
 import org.omnifaces.util.Callback;
-import org.omnifaces.util.Components;
 import org.omnifaces.util.State;
 
 /**
@@ -154,7 +155,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 */
 	@Override
 	protected void validateHierarchy() {
-		if (Components.getClosestParent(this, Tree.class) != null) {
+		if (getClosestParent(this, Tree.class) != null) {
 			throw new IllegalArgumentException(ERROR_NESTING_DISALLOWED);
 		}
 

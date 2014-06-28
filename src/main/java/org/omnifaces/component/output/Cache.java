@@ -24,6 +24,7 @@ import static org.omnifaces.component.output.Cache.PropertyKeys.useBuffer;
 import static org.omnifaces.filter.OnDemandResponseBufferFilter.BUFFERED_RESPONSE;
 import static org.omnifaces.util.Events.addCallbackAfterPhaseListener;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
+import static org.omnifaces.util.Faces.getRequestAttribute;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -41,7 +42,6 @@ import org.omnifaces.component.output.cache.CacheInitializerListener;
 import org.omnifaces.filter.OnDemandResponseBufferFilter;
 import org.omnifaces.servlet.BufferedHttpServletResponse;
 import org.omnifaces.util.Callback;
-import org.omnifaces.util.Faces;
 import org.omnifaces.util.State;
 
 /**
@@ -85,7 +85,7 @@ public class Cache extends OutputFamily {
 
 				if (!isDisabled() && isUseBuffer() && !hasCachedValue(context)) {
 
-					final BufferedHttpServletResponse bufferedHttpServletResponse = Faces.getRequestAttribute(BUFFERED_RESPONSE);
+					final BufferedHttpServletResponse bufferedHttpServletResponse = getRequestAttribute(BUFFERED_RESPONSE);
 
 					if (bufferedHttpServletResponse == null) {
 						throw new IllegalStateException(ERROR_NO_BUFFERED_RESPONSE);
@@ -132,7 +132,7 @@ public class Cache extends OutputFamily {
 
 		ResponseWriter responseWriter = context.getResponseWriter();
 		org.omnifaces.component.output.cache.Cache scopedCache = getCacheImpl(context);
-		
+
 		if (isReset()) {
 			scopedCache.remove(key);
 		}
@@ -276,8 +276,8 @@ public class Cache extends OutputFamily {
 
 		return null;
 	}
-	
-    
+
+
 	// Attribute getters/setters --------------------------------------------------------------------------------------
 
 	public String getKey() {
@@ -311,7 +311,7 @@ public class Cache extends OutputFamily {
 	public void setUseBuffer(Boolean useBufferValue) {
     	state.put(useBuffer, useBufferValue);
     }
-	
+
 	public Boolean isReset() {
     	return state.get(reset, FALSE);
     }
@@ -319,7 +319,7 @@ public class Cache extends OutputFamily {
 	public void setReset(Boolean resetValue) {
     	state.put(reset, resetValue);
     }
-	
+
 	/**
 	 * @since 1.8
 	 */

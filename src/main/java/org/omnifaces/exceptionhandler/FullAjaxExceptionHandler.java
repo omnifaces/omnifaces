@@ -17,6 +17,8 @@ import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION_TYPE;
 import static javax.servlet.RequestDispatcher.ERROR_MESSAGE;
 import static javax.servlet.RequestDispatcher.ERROR_REQUEST_URI;
 import static javax.servlet.RequestDispatcher.ERROR_STATUS_CODE;
+import static org.omnifaces.util.Exceptions.unwrap;
+import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.FacesLocal.normalizeViewId;
 
 import java.io.IOException;
@@ -167,7 +169,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	 */
 	@Override
 	public void handle() throws FacesException {
-		handleAjaxException(FacesContext.getCurrentInstance());
+		handleAjaxException(getContext());
 		wrapped.handle();
 	}
 
@@ -253,7 +255,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	 * @since 1.5
 	 */
 	protected Throwable findExceptionRootCause(FacesContext context, Throwable exception) {
-		return Exceptions.unwrap(exception);
+		return unwrap(exception);
 	}
 
 	/**

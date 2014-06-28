@@ -12,6 +12,9 @@
  */
 package org.omnifaces.viewhandler;
 
+import static org.omnifaces.util.Faces.normalizeViewId;
+import static org.omnifaces.util.Faces.setContext;
+
 import java.io.IOException;
 
 import javax.faces.FacesException;
@@ -26,7 +29,6 @@ import javax.faces.render.RenderKit;
 import javax.faces.render.RenderKitFactory;
 
 import org.omnifaces.taghandler.EnableRestorableView;
-import org.omnifaces.util.Faces;
 
 /**
  * This view handler implementation will recreate the entire view state whenever the view has apparently been expired,
@@ -69,19 +71,19 @@ public class RestorableViewHandler extends ViewHandlerWrapper {
 			return restoredView;
 		}
 
-		viewId = Faces.normalizeViewId(viewId);
+		viewId = normalizeViewId(viewId);
 		UIViewRoot createdView = createView(context, viewId);
 		FacesContext temporaryContext = new TemporaryViewFacesContext(context, createdView);
 
 		try {
-			Faces.setContext(temporaryContext);
+			setContext(temporaryContext);
 			getViewDeclarationLanguage(temporaryContext, viewId).buildView(temporaryContext, createdView);
 		}
 		catch (IOException e) {
 			throw new FacesException(e);
 		}
 		finally {
-			Faces.setContext(context);
+			setContext(context);
 		}
 
 		if (createdView.getAttributes().get(EnableRestorableView.class.getName()) == Boolean.TRUE) {

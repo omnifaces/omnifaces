@@ -14,6 +14,7 @@ package org.omnifaces.converter;
 
 import static org.omnifaces.util.Faces.getViewAttribute;
 import static org.omnifaces.util.Faces.setViewAttribute;
+import static org.omnifaces.util.Messages.createError;
 
 import javax.faces.component.UIComponent;
 import javax.faces.component.UISelectMany;
@@ -22,8 +23,6 @@ import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
 import javax.faces.convert.EnumConverter;
 import javax.faces.convert.FacesConverter;
-
-import org.omnifaces.util.Messages;
 
 /**
  * This generic enum converter is intended for use in {@link UISelectMany} components whose value is been bound to a
@@ -83,7 +82,7 @@ public class GenericEnumConverter implements Converter {
 			return ((Enum) modelValue).name();
 		}
 		else {
-			throw new ConverterException(Messages.createError(ERROR_NO_ENUM_TYPE, modelValue.getClass()));
+			throw new ConverterException(createError(ERROR_NO_ENUM_TYPE, modelValue.getClass()));
 		}
 	}
 
@@ -100,7 +99,7 @@ public class GenericEnumConverter implements Converter {
 			return Enum.valueOf(enumType, submittedValue);
 		}
 		catch (IllegalArgumentException e) {
-			throw new ConverterException(Messages.createError(ERROR_NO_ENUM_VALUE, submittedValue, enumType));
+			throw new ConverterException(createError(ERROR_NO_ENUM_VALUE, submittedValue, enumType));
 		}
 	}
 

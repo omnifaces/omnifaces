@@ -12,6 +12,8 @@
  */
 package org.omnifaces.config;
 
+import static org.omnifaces.util.Faces.getServletContext;
+import static org.omnifaces.util.Faces.hasContext;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isNumber;
 
@@ -42,7 +44,6 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
-import org.omnifaces.util.Faces;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -127,8 +128,8 @@ public enum WebXml {
 	 * Perform automatic initialization whereby the servlet context is obtained from the faces context.
 	 */
 	private void init() {
-		if (!initialized.get() && Faces.getContext() != null) {
-			init(Faces.getServletContext());
+		if (!initialized.get() && hasContext()) {
+			init(getServletContext());
 		}
 	}
 

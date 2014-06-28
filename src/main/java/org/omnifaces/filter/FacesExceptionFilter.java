@@ -12,6 +12,8 @@
  */
 package org.omnifaces.filter;
 
+import static org.omnifaces.util.Exceptions.unwrap;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
@@ -20,8 +22,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
-import org.omnifaces.util.Exceptions;
 
 /**
  * This filter will solve 2 problems with exceptions thrown in JSF methods.
@@ -59,7 +59,7 @@ public class FacesExceptionFilter extends HttpFilter {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, request.getRequestURI());
 		}
 		catch (ServletException e) {
-			throw new ServletException(Exceptions.unwrap(e.getRootCause()));
+			throw new ServletException(unwrap(e.getRootCause()));
 		}
 	}
 
