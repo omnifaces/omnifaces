@@ -12,6 +12,8 @@
  */
 package org.omnifaces.taghandler;
 
+import static org.omnifaces.util.FacesLocal.getFaceletContext;
+
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
@@ -34,8 +36,6 @@ import javax.faces.view.facelets.MetaRuleset;
 import javax.faces.view.facelets.TagAttribute;
 import javax.faces.view.facelets.TagHandlerDelegate;
 import javax.faces.view.facelets.ValidatorHandler;
-
-import org.omnifaces.util.FacesLocal;
 
 /**
  * Helper class for OmniFaces {@link Converter} and {@link Validator}. It can't be an abstract class as they have to
@@ -241,7 +241,7 @@ final class RenderTimeTagHandlerHelper {
 		@Override
 		public void applyAttachedObject(FacesContext context, UIComponent parent) {
 			try {
-				tag.apply(FacesLocal.getFaceletContext(context), parent);
+				tag.apply(getFaceletContext(context), parent);
 			}
 			catch (IOException e) {
 				throw new FacesException(e);

@@ -12,6 +12,8 @@
  */
 package org.omnifaces.el.functions;
 
+import static org.omnifaces.util.Faces.getLocale;
+
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
@@ -95,7 +97,7 @@ public final class Dates {
 			throw new NullPointerException("pattern");
 		}
 
-		DateFormat formatter = new SimpleDateFormat(pattern, Faces.getLocale());
+		DateFormat formatter = new SimpleDateFormat(pattern, getLocale());
 		formatter.setTimeZone(timezone);
 		return formatter.format(date);
 	}
@@ -356,11 +358,11 @@ public final class Dates {
 	 * @see DateFormatSymbols#getMonths()
 	 */
 	public static Map<String, Integer> getMonths() {
-		Locale locale = Faces.getLocale();
+		Locale locale = getLocale();
 		Map<String, Integer> months = MONTHS_CACHE.get(locale);
 
 		if (months == null) {
-			months = mapMonths(DateFormatSymbols.getInstance(Faces.getLocale()).getMonths());
+			months = mapMonths(DateFormatSymbols.getInstance(locale).getMonths());
 			MONTHS_CACHE.put(locale, months);
 		}
 
@@ -376,11 +378,11 @@ public final class Dates {
 	 * @see DateFormatSymbols#getShortMonths()
 	 */
 	public static Map<String, Integer> getShortMonths() {
-		Locale locale = Faces.getLocale();
+		Locale locale = getLocale();
 		Map<String, Integer> shortMonths = SHORT_MONTHS_CACHE.get(locale);
 
 		if (shortMonths == null) {
-			shortMonths = mapMonths(DateFormatSymbols.getInstance(Faces.getLocale()).getShortMonths());
+			shortMonths = mapMonths(DateFormatSymbols.getInstance(locale).getShortMonths());
 			SHORT_MONTHS_CACHE.put(locale, shortMonths);
 		}
 
@@ -411,11 +413,11 @@ public final class Dates {
 	 * @see DateFormatSymbols#getWeekdays()
 	 */
 	public static Map<String, Integer> getDaysOfWeek() {
-		Locale locale = Faces.getLocale();
+		Locale locale = getLocale();
 		Map<String, Integer> daysOfWeek = DAYS_OF_WEEK_CACHE.get(locale);
 
 		if (daysOfWeek == null) {
-			daysOfWeek = mapDaysOfWeek(DateFormatSymbols.getInstance(Faces.getLocale()).getWeekdays());
+			daysOfWeek = mapDaysOfWeek(DateFormatSymbols.getInstance(locale).getWeekdays());
 			DAYS_OF_WEEK_CACHE.put(locale, daysOfWeek);
 		}
 
@@ -431,11 +433,11 @@ public final class Dates {
 	 * @see DateFormatSymbols#getShortWeekdays()
 	 */
 	public static Map<String, Integer> getShortDaysOfWeek() {
-		Locale locale = Faces.getLocale();
+		Locale locale = getLocale();
 		Map<String, Integer> shortDaysOfWeek = SHORT_DAYS_OF_WEEK_CACHE.get(locale);
 
 		if (shortDaysOfWeek == null) {
-			shortDaysOfWeek = mapDaysOfWeek(DateFormatSymbols.getInstance(Faces.getLocale()).getShortWeekdays());
+			shortDaysOfWeek = mapDaysOfWeek(DateFormatSymbols.getInstance(locale).getShortWeekdays());
 			SHORT_DAYS_OF_WEEK_CACHE.put(locale, shortDaysOfWeek);
 		}
 

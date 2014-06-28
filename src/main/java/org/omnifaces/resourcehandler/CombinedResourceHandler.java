@@ -12,6 +12,12 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static org.omnifaces.util.Events.subscribeToEvent;
+import static org.omnifaces.util.Faces.getInitParameter;
+import static org.omnifaces.util.Faces.getRequestURI;
+import static org.omnifaces.util.Faces.isDevelopment;
+import static org.omnifaces.util.Utils.stream;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -40,10 +46,7 @@ import org.omnifaces.component.script.DeferredScript;
 import org.omnifaces.renderer.DeferredScriptRenderer;
 import org.omnifaces.renderer.InlineScriptRenderer;
 import org.omnifaces.renderer.InlineStylesheetRenderer;
-import org.omnifaces.util.Events;
-import org.omnifaces.util.Faces;
 import org.omnifaces.util.Hacks;
-import org.omnifaces.util.Utils;
 
 /**
  * This {@link ResourceHandler} implementation will remove all separate script and stylesheet resources which have the
@@ -178,14 +181,14 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	public CombinedResourceHandler(ResourceHandler wrapped) {
 		this.wrapped = wrapped;
 
-		if (!Faces.isDevelopment()) {
+		if (!isDevelopment()) {
 			excludedResources = initResources(PARAM_NAME_EXCLUDED_RESOURCES);
 			excludedResources.addAll(initCDNResources());
 			suppressedResources = initResources(PARAM_NAME_SUPPRESSED_RESOURCES);
 			excludedResources.addAll(suppressedResources);
-			inlineCSS = Boolean.valueOf(Faces.getInitParameter(PARAM_NAME_INLINE_CSS));
-			inlineJS = Boolean.valueOf(Faces.getInitParameter(PARAM_NAME_INLINE_JS));
-			Events.subscribeToEvent(PreRenderViewEvent.class, this);
+			inlineCSS = Boolean.valueOf(getInitParameter(PARAM_NAME_INLINE_CSS));
+			inlineJS = Boolean.valueOf(getInitParameter(PARAM_NAME_INLINE_JS));
+			subscribeToEvent(PreRenderViewEvent.class, this);
 		}
 	}
 
@@ -261,7 +264,7 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 				streamResource(context, new CombinedResource(context));
 			}
 			catch (IllegalArgumentException e) {
-				context.getExternalContext().responseSendError(HttpServletResponse.SC_NOT_FOUND, Faces.getRequestURI());
+				context.getExternalContext().responseSendError(HttpServletResponse.SC_NOT_FOUND, getRequestURI());
 			}
 		}
 		else {
@@ -284,7 +287,7 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	 */
 	private static Set<ResourceIdentifier> initResources(String name) {
 		Set<ResourceIdentifier> resources = new HashSet<ResourceIdentifier>(1);
-		String configuredResources = Faces.getInitParameter(name);
+		String configuredResources = getInitParameter(name);
 
 		if (configuredResources != null) {
 			for (String resourceIdentifier : configuredResources.split("\\s*,\\s*")) {
@@ -324,7 +327,7 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 			externalContext.setResponseHeader(header.getKey(), header.getValue());
 		}
 
-		Utils.stream(resource.getInputStream(), externalContext.getResponseOutputStream());
+		stream(resource.getInputStream(), externalContext.getResponseOutputStream());
 	}
 
 	// Inner classes --------------------------------------------------------------------------------------------------

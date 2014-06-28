@@ -12,13 +12,13 @@
  */
 package org.omnifaces.component.validator;
 
+import static org.omnifaces.util.Utils.isEmpty;
+
 import java.util.List;
 
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
-
-import org.omnifaces.util.Utils;
 
 /**
  * <strong>ValidateAll</strong> validates if ALL of the given <code>UIInput</code> components have been filled out. The
@@ -46,7 +46,7 @@ public class ValidateAll extends ValidateMultipleFields {
 	@Override
 	public boolean validateValues(FacesContext context, List<UIInput> inputs, List<Object> values) {
 		for (Object value : values) {
-			if (Utils.isEmpty(value)) {
+			if (isEmpty(value)) {
 				return false;
 			}
 		}
@@ -59,7 +59,7 @@ public class ValidateAll extends ValidateMultipleFields {
 	 */
 	@Override
 	protected boolean shouldInvalidateInput(FacesContext context, UIInput input, Object value) {
-		return Utils.isEmpty(value);
+		return isEmpty(value);
 	}
 
 }

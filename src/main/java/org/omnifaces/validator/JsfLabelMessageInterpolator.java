@@ -14,13 +14,12 @@ package org.omnifaces.validator;
 
 import static javax.validation.Validation.byDefaultProvider;
 import static org.omnifaces.util.Components.getCurrentComponent;
+import static org.omnifaces.util.Components.getLabel;
+import static org.omnifaces.util.Faces.hasContext;
 
 import java.util.Locale;
 
 import javax.validation.MessageInterpolator;
-
-import org.omnifaces.util.Components;
-import org.omnifaces.util.Faces;
 
 
 /**
@@ -38,15 +37,15 @@ import org.omnifaces.util.Faces;
  * message. That functionality is already provided by JSF itself via the <code>javax.faces.validator.BeanValidator.MESSAGE</code>
  * key in any resource bundle known to JSF.
  * </p>
- * 
- * 
+ *
+ *
  * <h3>Example</h3>
  * In <code>ValidationMessages.properties</code>
  * <pre>javax.validation.constraints.Size.message = The size of {jsf.label} must be between {min} and {max} characters</pre>
- * 
+ *
  * <h3>Installation</h3>
  * Create a <code>META-INF/validation.xml</code> file with the following contents:
- * 
+ *
  * <pre>
  * &lt;?xml version="1.0" encoding="UTF-8"?&gt;
  * &lt;validation-config
@@ -58,39 +57,39 @@ import org.omnifaces.util.Faces;
  *
  * &lt;/validation-config&gt;
  * </pre>
- * 
+ *
  * @since 1.5
  * @author Arjan Tijms
  *
  */
 public class JsfLabelMessageInterpolator implements MessageInterpolator {
-	
+
 	private final MessageInterpolator wrapped;
 
 	public JsfLabelMessageInterpolator() {
 		wrapped = byDefaultProvider().configure().getDefaultMessageInterpolator();
 	}
-	
+
 	@Override
 	public String interpolate(String messageTemplate, Context context) {
 		return wrapped.interpolate(messageTemplate, context);
 	}
-	
+
 	@Override
 	public String interpolate(String messageTemplate, Context context, Locale locale) {
 		String message = wrapped.interpolate(messageTemplate, context, locale);
-		
+
 		if (message.contains("{jsf.label}")) {
-			
+
 			String label = "";
-			if (Faces.getContext() != null) {
-				label = Components.getLabel(getCurrentComponent());
+			if (hasContext()) {
+				label = getLabel(getCurrentComponent());
 			}
-			
+
 			message = message.replace("{jsf.label}", label);
 		}
-		
+
 		return message;
 	}
-	
+
 }

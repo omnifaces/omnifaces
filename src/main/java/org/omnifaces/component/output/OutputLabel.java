@@ -12,6 +12,8 @@
  */
 package org.omnifaces.component.output;
 
+import static org.omnifaces.util.Components.findComponentRelatively;
+import static org.omnifaces.util.Components.getOptionalLabel;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import javax.el.ValueExpression;
@@ -21,8 +23,6 @@ import javax.faces.component.html.HtmlOutputLabel;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.PostRestoreStateEvent;
-
-import org.omnifaces.util.Components;
 
 /**
  * <strong>OutputLabel</strong> is a component that extends the standard {@link HtmlOutputLabel} and provides support for
@@ -46,7 +46,7 @@ public class OutputLabel extends HtmlOutputLabel {
         if (event instanceof PostRestoreStateEvent) {
             String forValue = (String) getAttributes().get("for");
             if (!isEmpty(forValue)) {
-                UIComponent forComponent = Components.findComponentRelatively(this, forValue);
+                UIComponent forComponent = findComponentRelatively(this, forValue);
 
                 if (forComponent == null) {
                 	throw new IllegalArgumentException(String.format(ERROR_FOR_COMPONENT_NOT_FOUND, forValue, getId()));
@@ -55,7 +55,7 @@ public class OutputLabel extends HtmlOutputLabel {
                 // To be sure, check if the target component doesn't have a label already. This
                 // is unlikely, since otherwise people have no need to use this outputLabel component
                 // but check to be sure.
-                if (Components.getOptionalLabel(forComponent) == null) {
+                if (getOptionalLabel(forComponent) == null) {
                     ValueExpression valueExpression = getValueExpression("value");
                     if (valueExpression != null) {
                         forComponent.setValueExpression("label", valueExpression);

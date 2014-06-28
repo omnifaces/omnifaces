@@ -12,6 +12,8 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static org.omnifaces.util.Faces.getRequestDomainURL;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,7 +25,6 @@ import java.util.Set;
 
 import javax.faces.application.Resource;
 
-import org.omnifaces.util.Faces;
 import org.omnifaces.util.Hacks;
 import org.omnifaces.util.Utils;
 
@@ -54,11 +55,12 @@ final class CombinedResourceInputStream extends InputStream {
 	 */
 	public CombinedResourceInputStream(Set<Resource> resources) throws IOException {
 		streams = new ArrayList<InputStream>();
+		String domainURL = getRequestDomainURL();
 
 		for (Resource resource : resources) {
 			streams.add(!Hacks.isRichFacesResourceOptimizationEnabled()
 				? resource.getInputStream()
-				: new URL(Faces.getRequestDomainURL() + resource.getRequestPath()).openStream());
+				: new URL(domainURL + resource.getRequestPath()).openStream());
 			streams.add(new ByteArrayInputStream(CRLF));
 		}
 

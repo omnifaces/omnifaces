@@ -12,6 +12,9 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static org.omnifaces.util.Faces.getMapping;
+import static org.omnifaces.util.Faces.isPrefixMapping;
+
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -19,8 +22,6 @@ import java.io.ObjectOutput;
 
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceWrapper;
-
-import org.omnifaces.util.Faces;
 
 /**
  * This {@link Resource} implementation is extracted from {@link UnmappedResourceHandler} in order to overcome
@@ -48,9 +49,9 @@ public class UnmappedResource extends ResourceWrapper implements Externalizable 
 	@Override
 	public String getRequestPath() {
 		String path = getWrapped().getRequestPath();
-		String mapping = Faces.getMapping();
+		String mapping = getMapping();
 
-		if (Faces.isPrefixMapping(mapping)) {
+		if (isPrefixMapping(mapping)) {
 			return path.replaceFirst(mapping, "");
 		}
 		else if (path.contains("?")) {

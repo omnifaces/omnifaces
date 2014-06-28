@@ -12,6 +12,8 @@
  */
 package org.omnifaces.component.output;
 
+import static org.omnifaces.util.Components.validateHasNoChildren;
+
 import java.io.IOException;
 
 import javax.faces.FacesException;
@@ -23,7 +25,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.omnifaces.servlet.BufferedHttpServletResponse;
-import org.omnifaces.util.Components;
 
 /**
  * This component is used to catch the output from a JSP/Servlet resource and render it as output
@@ -48,7 +49,7 @@ public class ResourceInclude extends OutputFamily {
 	 */
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
-		Components.validateHasNoChildren(this);
+		validateHasNoChildren(this);
 
 		ExternalContext externalContext = context.getExternalContext();
 		HttpServletRequest request = (HttpServletRequest) externalContext.getRequest();

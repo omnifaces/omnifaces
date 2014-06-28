@@ -12,6 +12,9 @@
  */
 package org.omnifaces.util;
 
+import static org.omnifaces.util.Components.getCurrentComponent;
+import static org.omnifaces.util.Components.getCurrentForm;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -59,7 +62,7 @@ public final class Ajax {
 	 * @see FacesContext#getPartialViewContext()
 	 */
 	public static PartialViewContext getContext() {
-		return FacesContext.getCurrentInstance().getPartialViewContext();
+		return Faces.getContext().getPartialViewContext();
 	}
 
 	/**
@@ -84,14 +87,14 @@ public final class Ajax {
 				context.setRenderAll(true);
 			}
 			else if (clientId.equals("@form")) {
-			    UIComponent currentForm = Components.getCurrentForm();
+			    UIComponent currentForm = getCurrentForm();
 
 			    if (currentForm != null) {
 			    	renderIds.add(currentForm.getClientId());
 			    }
 			}
 			else if (clientId.equals("@this")) {
-			    UIComponent currentComponent = Components.getCurrentComponent();
+			    UIComponent currentComponent = getCurrentComponent();
 
 			    if (currentComponent != null) {
 			    	renderIds.add(currentComponent.getClientId());

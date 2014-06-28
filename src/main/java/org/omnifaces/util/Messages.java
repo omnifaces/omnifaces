@@ -12,6 +12,9 @@
  */
 package org.omnifaces.util;
 
+import static org.omnifaces.util.Faces.getContext;
+import static org.omnifaces.util.Faces.getFlash;
+
 import java.text.MessageFormat;
 
 import javax.faces.application.FacesMessage;
@@ -203,7 +206,7 @@ public final class Messages {
 		 * @see Flash#setKeepMessages(boolean)
 		 */
 		public Message flash() {
-			Faces.getFlash().setKeepMessages(true);
+			getFlash().setKeepMessages(true);
 			return this;
 		}
 
@@ -305,7 +308,7 @@ public final class Messages {
 	 * @see FacesContext#addMessage(String, FacesMessage)
 	 */
 	public static void add(String clientId, FacesMessage message) {
-		FacesContext.getCurrentInstance().addMessage(clientId, message);
+		getContext().addMessage(clientId, message);
 	}
 
 	/**
@@ -457,7 +460,7 @@ public final class Messages {
 	 * @see #add(String, FacesMessage)
 	 */
 	public static void addFlash(String clientId, FacesMessage message) {
-		Faces.getFlash().setKeepMessages(true);
+		getFlash().setKeepMessages(true);
 		add(clientId, message);
 	}
 

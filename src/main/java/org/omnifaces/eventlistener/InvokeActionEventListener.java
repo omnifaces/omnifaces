@@ -12,6 +12,9 @@
  */
 package org.omnifaces.eventlistener;
 
+import static org.omnifaces.util.Events.subscribeToEvent;
+import static org.omnifaces.util.Utils.isEmpty;
+
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -30,8 +33,6 @@ import javax.faces.event.SystemEventListener;
 
 import org.omnifaces.event.PostInvokeActionEvent;
 import org.omnifaces.event.PreInvokeActionEvent;
-import org.omnifaces.util.Events;
-import org.omnifaces.util.Utils;
 
 /**
  * This phase listener takes care that the {@link PreInvokeActionEvent} and {@link PostInvokeActionEvent} events are
@@ -62,7 +63,7 @@ public class InvokeActionEventListener extends DefaultPhaseListener implements S
 	 */
 	public InvokeActionEventListener() {
 		super(PhaseId.INVOKE_APPLICATION);
-		Events.subscribeToEvent(PostValidateEvent.class, this);
+		subscribeToEvent(PostValidateEvent.class, this);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -126,7 +127,7 @@ public class InvokeActionEventListener extends DefaultPhaseListener implements S
 	private static <T extends SystemEvent> void checkAndAddComponentWithListeners
 		(FacesContext context, UIComponent component, Class<T> type)
 	{
-		if (!Utils.isEmpty(component.getListenersForEventClass(type))) {
+		if (!isEmpty(component.getListenersForEventClass(type))) {
 			Set<UIComponent> components = (Set<UIComponent>) context.getAttributes().get(type);
 
 			if (components == null) {

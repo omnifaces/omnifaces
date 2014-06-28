@@ -12,6 +12,9 @@
  */
 package org.omnifaces.util;
 
+import static org.omnifaces.util.Faces.getApplication;
+import static org.omnifaces.util.Faces.getViewRoot;
+
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.PhaseEvent;
 import javax.faces.event.PhaseId;
@@ -44,7 +47,7 @@ public final class Events {
 	 * @param phaseListener The phase listener to be added to the current view root of the current faces context.
 	 */
 	public static void addPhaseListener(PhaseListener phaseListener) {
-		Faces.getViewRoot().addPhaseListener(phaseListener);
+		getViewRoot().addPhaseListener(phaseListener);
 	}
 
 	/**
@@ -52,7 +55,7 @@ public final class Events {
 	 * @param phaseListener The phase listener to be removed from the current view root of the current faces context.
 	 */
 	public static void removePhaseListener(PhaseListener phaseListener) {
-		Faces.getViewRoot().removePhaseListener(phaseListener);
+		getViewRoot().removePhaseListener(phaseListener);
 	}
 
 	/**
@@ -177,7 +180,7 @@ public final class Events {
 	 * @since 1.1
 	 */
 	public static void subscribeToEvent(Class<? extends SystemEvent> type, SystemEventListener listener) {
-		Faces.getApplication().subscribeToEvent(type, listener);
+		getApplication().subscribeToEvent(type, listener);
 	}
 
 	/**
@@ -187,7 +190,7 @@ public final class Events {
 	 * @since 1.2
 	 */
 	public static void subscribeToViewEvent(Class<? extends SystemEvent> type, SystemEventListener listener) {
-		Faces.getViewRoot().subscribeToViewEvent(type, listener);
+		getViewRoot().subscribeToViewEvent(type, listener);
 	}
 
 	/**
@@ -197,7 +200,7 @@ public final class Events {
 	 * @since 1.2
 	 */
 	public static void subscribeToViewEvent(Class<? extends SystemEvent> type, final Callback.Void callback) {
-		Faces.getViewRoot().subscribeToViewEvent(type, new DefaultViewEventListener() {
+		getViewRoot().subscribeToViewEvent(type, new DefaultViewEventListener() {
 			@Override
 			public void processEvent(SystemEvent event) throws AbortProcessingException {
 			    callback.invoke();

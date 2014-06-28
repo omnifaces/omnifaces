@@ -12,6 +12,10 @@
  */
 package org.omnifaces.util;
 
+import static org.omnifaces.util.Faces.getContext;
+import static org.omnifaces.util.Faces.getELContext;
+import static org.omnifaces.util.Faces.getFaceletContext;
+import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
@@ -76,7 +80,7 @@ public final class Components {
 	 * @see UIComponent#getCurrentComponent(FacesContext)
 	 */
 	public static UIComponent getCurrentComponent() {
-		return UIComponent.getCurrentComponent(FacesContext.getCurrentInstance());
+		return UIComponent.getCurrentComponent(getContext());
 	}
 
 	/**
@@ -121,7 +125,7 @@ public final class Components {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T extends UIComponent> T findComponent(String clientId) {
-		return (T) FacesContext.getCurrentInstance().getViewRoot().findComponent(clientId);
+		return (T) getViewRoot().findComponent(clientId);
 	}
 
 	/**
@@ -148,7 +152,7 @@ public final class Components {
 
 		if (result == null) {
 			// If not in the parents, search from the root
-			result = findComponentInChildren(Faces.getViewRoot(), clientId);
+			result = findComponentInChildren(getViewRoot(), clientId);
 		}
 
 		return (T) result;
@@ -310,7 +314,7 @@ public final class Components {
 	 * @since 1.5
 	 */
 	public static void includeFacelet(UIComponent parent, String path) throws IOException {
-		Faces.getFaceletContext().includeFacelet(parent, path);
+		getFaceletContext().includeFacelet(parent, path);
 	}
 
 	/**
@@ -328,7 +332,7 @@ public final class Components {
 	 * @since 1.5
 	 */
 	public static UIComponent includeCompositeComponent(UIComponent parent, String libraryName, String resourceName, String id) {
-		FacesContext context = Faces.getContext();
+		FacesContext context = FacesContext.getCurrentInstance();
 		Application application = context.getApplication();
 		FaceletContext faceletContext = FacesLocal.getFaceletContext(context);
 
@@ -368,19 +372,19 @@ public final class Components {
 	 * @see UIForm#isSubmitted()
 	 */
 	public static UIForm getCurrentForm() {
-		FacesContext facesContext = FacesContext.getCurrentInstance();
+		FacesContext context = FacesContext.getCurrentInstance();
 
-		if (!facesContext.isPostback()) {
+		if (!context.isPostback()) {
 			return null;
 		}
 
-		UIViewRoot viewRoot = facesContext.getViewRoot();
+		UIViewRoot viewRoot = context.getViewRoot();
 
 		// The initial implementation has visited the tree for UIForm components which returns true on isSubmitted().
 		// But with testing it turns out to return false on ajax requests where the form is not included in execute!
 		// The current implementation just walks through the request parameter map instead.
 
-		for (String name : facesContext.getExternalContext().getRequestParameterMap().keySet()) {
+		for (String name : context.getExternalContext().getRequestParameterMap().keySet()) {
 			if (name.startsWith("javax.faces.")) {
 				continue; // Quick skip.
 			}
@@ -410,16 +414,16 @@ public final class Components {
 	 * @since 1.6
 	 */
 	public static UICommand getCurrentCommand() {
-		FacesContext facesContext = FacesContext.getCurrentInstance();
+		FacesContext context = FacesContext.getCurrentInstance();
 
-		if (!facesContext.isPostback()) {
+		if (!context.isPostback()) {
 			return null;
 		}
 
-		UIViewRoot viewRoot = facesContext.getViewRoot();
-	    Map<String, String> params = facesContext.getExternalContext().getRequestParameterMap();
+		UIViewRoot viewRoot = context.getViewRoot();
+	    Map<String, String> params = context.getExternalContext().getRequestParameterMap();
 
-	    if (facesContext.getPartialViewContext().isAjaxRequest()) {
+	    if (context.getPartialViewContext().isAjaxRequest()) {
 	    	String source = params.get("javax.faces.source");
 
 	    	if (source != null) {
@@ -484,7 +488,7 @@ public final class Components {
 			ValueExpression labelExpression = input.getValueExpression("label");
 
 			if (labelExpression != null) {
-				label = labelExpression.getValue(FacesContext.getCurrentInstance().getELContext());
+				label = labelExpression.getValue(getELContext());
 			}
 		}
 
@@ -517,7 +521,7 @@ public final class Components {
 	@SuppressWarnings("unchecked")
 	public static <T> T getImmediateValue(UIInput input) {
 		if (input.isValid() && input.getSubmittedValue() != null) {
-			input.validate(FacesContext.getCurrentInstance());
+			input.validate(getContext());
 		}
 
 		return input.isLocalValueSet() ? (T) input.getValue() : null;
@@ -676,7 +680,7 @@ public final class Components {
 		behavior.addAjaxBehaviorListener(new AjaxBehaviorListener() {
 			@Override
 			public void processAjaxBehavior(AjaxBehaviorEvent event) throws AbortProcessingException {
-				method.invoke(FacesContext.getCurrentInstance().getELContext(), new Object[] { event });
+				method.invoke(getELContext(), new Object[] { event });
 			}
 		});
 		return behavior;

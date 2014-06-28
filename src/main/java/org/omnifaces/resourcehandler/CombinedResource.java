@@ -12,6 +12,14 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static org.omnifaces.util.Faces.getMapping;
+import static org.omnifaces.util.Faces.getMimeType;
+import static org.omnifaces.util.Faces.getRequestContextPath;
+import static org.omnifaces.util.Faces.getRequestDomainURL;
+import static org.omnifaces.util.Faces.isPrefixMapping;
+import static org.omnifaces.util.Utils.formatRFC1123;
+import static org.omnifaces.util.Utils.parseRFC1123;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
@@ -25,9 +33,6 @@ import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-
-import org.omnifaces.util.Faces;
-import org.omnifaces.util.Utils;
 
 /**
  * This {@link Resource} implementation holds all the necessary information about combined resources in order to
@@ -53,7 +58,7 @@ final class CombinedResource extends Resource {
 		info = CombinedResourceInfo.get(resourceId);
 		setResourceName(name);
 		setLibraryName(CombinedResourceHandler.LIBRARY_NAME);
-		setContentType(Faces.getMimeType(name));
+		setContentType(getMimeType(name));
 	}
 
 	/**
@@ -77,10 +82,10 @@ final class CombinedResource extends Resource {
 
 	@Override
 	public String getRequestPath() {
-		String mapping = Faces.getMapping();
+		String mapping = getMapping();
 		String path = ResourceHandler.RESOURCE_IDENTIFIER + "/" + getResourceName();
-		return Faces.getRequestContextPath()
-			+ (Faces.isPrefixMapping(mapping) ? (mapping + path) : (path + mapping))
+		return getRequestContextPath()
+			+ (isPrefixMapping(mapping) ? (mapping + path) : (path + mapping))
 			+ "?ln=" + CombinedResourceHandler.LIBRARY_NAME
 			+ "&v=" + (info.getLastModified() / 60000); // To force browser refresh whenever a resource changes.
 	}
@@ -89,7 +94,7 @@ final class CombinedResource extends Resource {
 	public URL getURL() {
 		try {
 			// Yes, this returns a HTTP URL, not a classpath URL. There's no other way anyway.
-			return new URL(Faces.getRequestDomainURL() + getRequestPath());
+			return new URL(getRequestDomainURL() + getRequestPath());
 		}
 		catch (MalformedURLException e) {
 			// This exception should never occur.
@@ -101,8 +106,8 @@ final class CombinedResource extends Resource {
 	public Map<String, String> getResponseHeaders() {
 		Map<String, String> responseHeaders = new HashMap<String, String>(3);
 		long lastModified = info.getLastModified();
-		responseHeaders.put("Last-Modified", Utils.formatRFC1123(new Date(lastModified)));
-		responseHeaders.put("Expires", Utils.formatRFC1123(new Date(System.currentTimeMillis() + info.getMaxAge())));
+		responseHeaders.put("Last-Modified", formatRFC1123(new Date(lastModified)));
+		responseHeaders.put("Expires", formatRFC1123(new Date(System.currentTimeMillis() + info.getMaxAge())));
 		responseHeaders.put("Etag", String.format("W/\"%d-%d\"", info.getContentLength(), lastModified));
 		responseHeaders.put("Pragma", ""); // Explicitly set empty pragma to prevent some containers from setting it.
 		return responseHeaders;
@@ -124,7 +129,7 @@ final class CombinedResource extends Resource {
 
 		if (ifModifiedSince != null) {
 			try {
-				return info.getLastModified() > Utils.parseRFC1123(ifModifiedSince).getTime();
+				return info.getLastModified() > parseRFC1123(ifModifiedSince).getTime();
 			}
 			catch (ParseException ignore) {
 				return true;

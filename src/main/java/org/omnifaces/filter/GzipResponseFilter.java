@@ -12,6 +12,8 @@
  */
 package org.omnifaces.filter;
 
+import static org.omnifaces.util.Utils.unmodifiableSet;
+
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -25,7 +27,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.omnifaces.servlet.GzipHttpServletResponse;
-import org.omnifaces.util.Utils;
 
 /**
  * This filter will apply GZIP compression on responses whenever applicable. GZIP will greatly reduce the response size
@@ -97,7 +98,7 @@ public class GzipResponseFilter extends HttpFilter {
 	private static final String INIT_PARAM_MIMETYPES = "mimetypes";
 
 	private static final int DEFAULT_THRESHOLD = 500;
-	private static final Set<String> DEFAULT_MIMETYPES = Utils.unmodifiableSet(
+	private static final Set<String> DEFAULT_MIMETYPES = unmodifiableSet(
 		"text/plain", "text/html", "text/xml", "text/css", "text/javascript", "text/csv", "text/rtf",
 		"application/xml", "application/xhtml+xml", "application/javascript", "application/json"
 	);

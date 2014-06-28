@@ -12,6 +12,8 @@
  */
 package org.omnifaces.el.functions;
 
+import static org.omnifaces.util.Faces.getLocale;
+
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
@@ -57,7 +59,7 @@ public final class Numbers {
 	    }
 
 	    int exp = (int) (Math.log(bytes) / Math.log(1024));
-	    return String.format(Faces.getLocale(), "%.1f %ciB", bytes / Math.pow(1024, exp), "KMGTPE".charAt(exp - 1));
+	    return String.format(getLocale(), "%.1f %ciB", bytes / Math.pow(1024, exp), "KMGTPE".charAt(exp - 1));
 	}
 
 	/**
@@ -79,7 +81,7 @@ public final class Numbers {
 			throw new NullPointerException("currencySymbol");
 		}
 
-		DecimalFormat formatter = (DecimalFormat) NumberFormat.getCurrencyInstance(Faces.getLocale());
+		DecimalFormat formatter = (DecimalFormat) NumberFormat.getCurrencyInstance(getLocale());
 		DecimalFormatSymbols symbols = formatter.getDecimalFormatSymbols();
 		symbols.setCurrencySymbol(currencySymbol);
 		formatter.setDecimalFormatSymbols(symbols);
@@ -105,7 +107,7 @@ public final class Numbers {
 			throw new NullPointerException("pattern");
 		}
 
-		DecimalFormat formatter = (DecimalFormat) NumberFormat.getNumberInstance(Faces.getLocale());
+		DecimalFormat formatter = (DecimalFormat) NumberFormat.getNumberInstance(getLocale());
 		formatter.applyPattern(pattern);
 		return formatter.format(number);
 	}
@@ -124,7 +126,7 @@ public final class Numbers {
 			return null;
 		}
 
-		return NumberFormat.getNumberInstance(Faces.getLocale()).format(number);
+		return NumberFormat.getNumberInstance(getLocale()).format(number);
 	}
 
 	/**
@@ -141,7 +143,7 @@ public final class Numbers {
 			return null;
 		}
 
-		return NumberFormat.getPercentInstance(Faces.getLocale()).format(number);
+		return NumberFormat.getPercentInstance(getLocale()).format(number);
 	}
 
 }

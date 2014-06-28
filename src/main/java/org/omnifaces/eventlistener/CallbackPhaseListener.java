@@ -13,6 +13,9 @@
 package org.omnifaces.eventlistener;
 
 import static javax.faces.event.PhaseId.ANY_PHASE;
+import static org.omnifaces.util.Faces.getContext;
+import static org.omnifaces.util.FacesLocal.getRequestAttribute;
+import static org.omnifaces.util.FacesLocal.setRequestAttribute;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,8 +26,6 @@ import javax.faces.event.PhaseId;
 import javax.faces.event.PhaseListener;
 
 import org.omnifaces.util.Events;
-import org.omnifaces.util.Faces;
-import org.omnifaces.util.FacesLocal;
 
 /**
  * This phase listener picks up phase listener instances from the request scope by <code>addCallbackXxx()</code> methods
@@ -95,25 +96,25 @@ public class CallbackPhaseListener implements PhaseListener {
 	 * @see Events#addCallbackPhaseListener(PhaseListener)
 	 */
 	public static void add(PhaseListener phaseListener) {
-		getCallbackPhaseListeners(Faces.getContext(), true).add(phaseListener);
+		getCallbackPhaseListeners(getContext(), true).add(phaseListener);
 	}
 
 	/**
 	 * @see Events#removeCallbackPhaseListener(PhaseListener)
 	 */
 	public static boolean remove(PhaseListener phaseListener) {
-		Set<PhaseListener> phaseListeners = getCallbackPhaseListeners(Faces.getContext(), false);
+		Set<PhaseListener> phaseListeners = getCallbackPhaseListeners(getContext(), false);
 		return phaseListeners == null ? false : phaseListeners.remove(phaseListener);
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
 	private static Set<PhaseListener> getCallbackPhaseListeners(FacesContext context, boolean create) {
-		Set<PhaseListener> set = FacesLocal.getRequestAttribute(context, CallbackPhaseListener.class.getName());
+		Set<PhaseListener> set = getRequestAttribute(context, CallbackPhaseListener.class.getName());
 
 		if (set == null && create) {
 			set = new HashSet<PhaseListener>(1);
-			FacesLocal.setRequestAttribute(context, CallbackPhaseListener.class.getName(), set);
+			setRequestAttribute(context, CallbackPhaseListener.class.getName(), set);
 		}
 
 		return set;

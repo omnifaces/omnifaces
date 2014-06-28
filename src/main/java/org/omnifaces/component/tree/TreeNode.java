@@ -12,13 +12,14 @@
  */
 package org.omnifaces.component.tree;
 
+import static org.omnifaces.util.Components.validateHasDirectParent;
+
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 
 import org.omnifaces.model.tree.TreeModel;
-import org.omnifaces.util.Components;
 import org.omnifaces.util.State;
 
 /**
@@ -61,7 +62,7 @@ public class TreeNode extends TreeFamily {
 	 */
 	@Override
 	protected void validateHierarchy() {
-		Components.validateHasDirectParent(this, Tree.class);
+		validateHasDirectParent(this, Tree.class);
 	}
 
 	/**

@@ -12,6 +12,9 @@
  */
 package org.omnifaces.converter;
 
+import static org.omnifaces.util.Faces.getContextAttribute;
+import static org.omnifaces.util.Faces.setContextAttribute;
+import static org.omnifaces.util.Messages.createError;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.util.List;
@@ -22,8 +25,6 @@ import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
 import javax.faces.convert.FacesConverter;
 
-import org.omnifaces.util.Faces;
-import org.omnifaces.util.Messages;
 import org.omnifaces.util.selectitems.SelectItemsUtils;
 
 /**
@@ -84,10 +85,10 @@ public class SelectItemsIndexConverter implements Converter {
 			return selectItemValues.get(Integer.parseInt(submittedValue));
 		} catch (NumberFormatException e) {
 			throw new ConverterException(
-				Messages.createError(ERROR_SELECT_ITEMS_LIST_INDEX, submittedValue, component.getClientId(context)), e);
+				createError(ERROR_SELECT_ITEMS_LIST_INDEX, submittedValue, component.getClientId(context)), e);
 		} catch (Exception e) {
 			throw new ConverterException(
-				Messages.createError(ERROR_GET_AS_OBJECT, submittedValue, component.getClientId(context)), e);
+				createError(ERROR_GET_AS_OBJECT, submittedValue, component.getClientId(context)), e);
 		}
 	}
 
@@ -110,16 +111,15 @@ public class SelectItemsIndexConverter implements Converter {
 
 	private static List<Object> getSelectItemValues(FacesContext context, UIComponent component) {
 		String key = String.format(ATTRIBUTE_SELECT_ITEMS, component.getClientId(context));
-		List<Object> selectItemValues = Faces.getContextAttribute(key);
+		List<Object> selectItemValues = getContextAttribute(key);
 
 		if (selectItemValues == null) {
 			selectItemValues = SelectItemsUtils.collectAllValuesFromSelectItems(context, component);
-			Faces.setContextAttribute(key, selectItemValues);
+			setContextAttribute(key, selectItemValues);
 		}
 
 		if (selectItemValues == null) {
-			throw new ConverterException(
-				Messages.createError(ERROR_SELECT_ITEMS_LIST_NULL, component.getClientId(context)));
+			throw new ConverterException(createError(ERROR_SELECT_ITEMS_LIST_NULL, component.getClientId(context)));
 		}
 
 		return selectItemValues;

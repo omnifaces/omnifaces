@@ -12,6 +12,11 @@
  */
 package org.omnifaces.taghandler;
 
+import static org.omnifaces.util.Components.getClosestParent;
+import static org.omnifaces.util.Components.hasInvokedSubmit;
+import static org.omnifaces.util.Events.addBeforePhaseListener;
+import static org.omnifaces.util.Faces.setContextAttribute;
+
 import java.io.IOException;
 
 import javax.faces.component.UICommand;
@@ -26,9 +31,6 @@ import javax.faces.view.facelets.TagHandler;
 
 import org.omnifaces.component.input.Form;
 import org.omnifaces.util.Callback;
-import org.omnifaces.util.Components;
-import org.omnifaces.util.Events;
-import org.omnifaces.util.Faces;
 
 /**
  * <p>
@@ -89,18 +91,18 @@ public class IgnoreValidationFailed extends TagHandler {
 		}
 
 		if (ComponentHandler.isNew(parent)) {
-			Events.addBeforePhaseListener(PhaseId.PROCESS_VALIDATIONS, new Callback.Void() {
+			addBeforePhaseListener(PhaseId.PROCESS_VALIDATIONS, new Callback.Void() {
 
 				@Override
 				public void invoke() {
-					if (Components.hasInvokedSubmit(parent)) {
-						Faces.setContextAttribute(IgnoreValidationFailed.class.getName(), true);
+					if (hasInvokedSubmit(parent)) {
+						setContextAttribute(IgnoreValidationFailed.class.getName(), true);
 					}
 				}
 			});
 		}
 		else {
-			if (Components.getClosestParent(parent, Form.class) == null) {
+			if (getClosestParent(parent, Form.class) == null) {
 				throw new IllegalArgumentException(ERROR_INVALID_FORM);
 			}
 		}

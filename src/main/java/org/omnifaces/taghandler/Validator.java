@@ -15,6 +15,7 @@ package org.omnifaces.taghandler;
 import static org.omnifaces.taghandler.RenderTimeTagHandlerHelper.collectRenderTimeAttributes;
 import static org.omnifaces.taghandler.RenderTimeTagHandlerHelper.createInstance;
 import static org.omnifaces.taghandler.RenderTimeTagHandlerHelper.getValueExpression;
+import static org.omnifaces.util.Components.getLabel;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -36,7 +37,6 @@ import javax.faces.view.facelets.ValidatorHandler;
 import org.omnifaces.taghandler.RenderTimeTagHandlerHelper.RenderTimeAttributes;
 import org.omnifaces.taghandler.RenderTimeTagHandlerHelper.RenderTimeTagHandler;
 import org.omnifaces.taghandler.RenderTimeTagHandlerHelper.RenderTimeTagHandlerDelegate;
-import org.omnifaces.util.Components;
 import org.omnifaces.util.Messages;
 
 /**
@@ -126,7 +126,7 @@ public class Validator extends ValidatorHandler implements RenderTimeTagHandler 
 							String validatorMessage = (String) message.getValue(el);
 
 							if (validatorMessage != null) {
-								String label = Components.getLabel(component);
+								String label = getLabel(component);
 								throw new ValidatorException(Messages.create(validatorMessage, label)
 									.detail(validatorMessage, label).error().get(), e.getCause());
 							}

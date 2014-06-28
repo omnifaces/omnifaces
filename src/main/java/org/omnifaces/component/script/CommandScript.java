@@ -12,6 +12,9 @@
  */
 package org.omnifaces.component.script;
 
+import static org.omnifaces.util.Components.validateHasParent;
+import static org.omnifaces.util.Utils.isEmpty;
+
 import java.io.IOException;
 import java.util.regex.Pattern;
 
@@ -26,10 +29,8 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.PhaseId;
 
-import org.omnifaces.util.Components;
 import org.omnifaces.util.Json;
 import org.omnifaces.util.State;
-import org.omnifaces.util.Utils;
 
 /**
  * <p><strong>CommandScript</strong> is an extension to <code>&lt;h:commandXxx&gt;</code> which generates a JavaScript
@@ -159,7 +160,7 @@ public class CommandScript extends UICommand {
 	 */
 	@Override
 	public void encodeChildren(FacesContext context) throws IOException {
-		Components.validateHasParent(this, UIForm.class);
+		validateHasParent(this, UIForm.class);
 		String name = getName();
 
 		if (name == null) {
@@ -220,7 +221,7 @@ public class CommandScript extends UICommand {
 					UIParameter param = (UIParameter) child;
 					String name = param.getName();
 
-					if (!Utils.isEmpty(name)) {
+					if (!isEmpty(name)) {
 						writer.append("o[").append(Json.encode(name)).append("]=")
 							.append(Json.encode(param.getValue())).append(";");
 					}
@@ -269,7 +270,7 @@ public class CommandScript extends UICommand {
 	 * IDs is empty.
 	 */
 	protected String resolveClientIds(FacesContext context, String relativeClientIds) {
-		if (Utils.isEmpty(relativeClientIds)) {
+		if (isEmpty(relativeClientIds)) {
 			return null;
 		}
 

@@ -12,6 +12,8 @@
  */
 package org.omnifaces.component.output;
 
+import static org.omnifaces.util.Utils.isEmpty;
+
 import java.io.IOException;
 
 import javax.faces.component.FacesComponent;
@@ -20,7 +22,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 
 import org.omnifaces.util.State;
-import org.omnifaces.util.Utils;
 
 /**
  * <p><strong>ConditionalComment</strong> is an {@link UIComponent} which renders a conditional comment. Conditional
@@ -86,7 +87,7 @@ public class ConditionalComment extends OutputFamily {
 	public void encodeChildren(FacesContext context) throws IOException {
 		String _if = getIf();
 
-		if (Utils.isEmpty(_if)) {
+		if (isEmpty(_if)) {
 			throw new IllegalArgumentException(ERROR_MISSING_IF);
 		}
 

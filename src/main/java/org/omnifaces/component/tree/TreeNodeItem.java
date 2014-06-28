@@ -12,6 +12,10 @@
  */
 package org.omnifaces.component.tree;
 
+import static org.omnifaces.util.Components.getClosestParent;
+import static org.omnifaces.util.Components.shouldVisitSkipIteration;
+import static org.omnifaces.util.Components.validateHasParent;
+
 import java.io.IOException;
 
 import javax.faces.component.FacesComponent;
@@ -23,7 +27,6 @@ import javax.faces.event.PhaseId;
 
 import org.omnifaces.model.tree.TreeModel;
 import org.omnifaces.util.Callback;
-import org.omnifaces.util.Components;
 
 /**
  * <strong>TreeNodeItem</strong> is an {@link UIComponent} that represents a single child tree node within a parent
@@ -60,9 +63,9 @@ public class TreeNodeItem extends TreeFamily {
 	 */
 	@Override
 	protected void validateHierarchy() {
-		Components.validateHasParent(this, Tree.class);
+		validateHasParent(this, Tree.class);
 
-		if (Components.getClosestParent(this, TreeNodeItem.class) != null) {
+		if (getClosestParent(this, TreeNodeItem.class) != null) {
 			throw new IllegalArgumentException(ERROR_NESTING_DISALLOWED);
 		}
 	}
@@ -119,7 +122,7 @@ public class TreeNodeItem extends TreeFamily {
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" }) // For TreeModel. We don't care about its actual type anyway.
 	public boolean visitTree(final VisitContext context, final VisitCallback callback) {
-		if (Components.shouldVisitSkipIteration(context)) {
+		if (shouldVisitSkipIteration(context)) {
 			return super.visitTree(context, callback);
 		}
 
@@ -157,7 +160,7 @@ public class TreeNodeItem extends TreeFamily {
 	 */
 	@SuppressWarnings("rawtypes") // For TreeModel. We don't care about its actual type anyway.
 	private <R> R process(FacesContext context, Callback.ReturningWithArgument<R, Tree> callback) {
-		Tree tree = Components.getClosestParent(this, Tree.class);
+		Tree tree = getClosestParent(this, Tree.class);
 		TreeModel originalModelNode = tree.getCurrentModelNode();
 
 		try {

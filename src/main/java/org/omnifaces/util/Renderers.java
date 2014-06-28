@@ -69,7 +69,7 @@ public final class Renderers {
 	 * @see ResponseWriter#writeAttribute(String, Object, String)
 	 */
 	public static void writeAttribute(ResponseWriter writer, UIComponent component, String name) throws IOException {
-		writeAttribute(writer, name, Components.getAttribute(component, name), name);
+		writeAttribute(writer, name, getAttribute(component, name), name);
 	}
 
 	/**

@@ -12,6 +12,10 @@
  */
 package org.omnifaces.validator;
 
+import static org.omnifaces.util.Components.getLabel;
+import static org.omnifaces.util.FacesLocal.getMessageBundle;
+import static org.omnifaces.util.Messages.createError;
+
 import java.util.ResourceBundle;
 
 import javax.faces.component.UIComponent;
@@ -21,10 +25,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.validator.FacesValidator;
 import javax.faces.validator.Validator;
 import javax.faces.validator.ValidatorException;
-
-import org.omnifaces.util.Components;
-import org.omnifaces.util.Faces;
-import org.omnifaces.util.Messages;
 
 /**
  * This validator solves the broken <code>required="true"</code> attribute of the
@@ -75,17 +75,19 @@ public class RequiredCheckboxValidator implements Validator {
 		if (!Boolean.TRUE.equals(value)) {
 			String requiredMessage = ((UIInput) component).getRequiredMessage();
 
-			if (requiredMessage == null && context.getApplication().getMessageBundle() != null) {
-				requiredMessage = ResourceBundle
-					.getBundle(context.getApplication().getMessageBundle(), Faces.getLocale())
-					.getString(UIInput.REQUIRED_MESSAGE_ID);
+			if (requiredMessage == null) {
+				ResourceBundle messageBundle = getMessageBundle(context);
+
+				if (messageBundle != null) {
+					requiredMessage = messageBundle.getString(UIInput.REQUIRED_MESSAGE_ID);
+				}
 			}
 
 			if (requiredMessage == null) {
 				requiredMessage = DEFAULT_REQUIRED_MESSAGE;
 			}
 
-			throw new ValidatorException(Messages.createError(requiredMessage, Components.getLabel(component)));
+			throw new ValidatorException(createError(requiredMessage, getLabel(component)));
 		}
 	}
 
