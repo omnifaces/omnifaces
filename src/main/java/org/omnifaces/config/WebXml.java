@@ -43,7 +43,6 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
 import org.omnifaces.util.Faces;
-import org.omnifaces.util.Utils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -392,18 +391,13 @@ public enum WebXml {
 	private static void parseAndAppendChildren(URL url, DocumentBuilder builder, Document document) throws Exception {
 		URLConnection connection = url.openConnection();
 		connection.setUseCaches(false);
-		InputStream input = null;
 
-		try {
-			input = connection.getInputStream();
+		try (InputStream input = connection.getInputStream()) {
 			NodeList children = builder.parse(input).getDocumentElement().getChildNodes();
 
 			for (int i = 0; i < children.getLength(); i++) {
 				document.getDocumentElement().appendChild(document.importNode(children.item(i), true));
 			}
-		}
-		finally {
-			Utils.close(input);
 		}
 	}
 

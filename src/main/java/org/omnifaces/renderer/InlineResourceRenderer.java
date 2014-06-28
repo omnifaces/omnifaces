@@ -23,7 +23,6 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.render.Renderer;
 
 import org.omnifaces.resourcehandler.CombinedResourceHandler;
-import org.omnifaces.util.Utils;
 
 /**
  * Base renderer which is to be shared between inline CSS and JS renderers.
@@ -55,15 +54,11 @@ public abstract class InlineResourceRenderer extends Renderer {
 		String name = (String) component.getAttributes().get("name");
 		String library = (String) component.getAttributes().get("library");
 		Resource resource = context.getApplication().getResourceHandler().createResource(name, library);
-		Reader reader = new InputStreamReader(resource.getInputStream(), writer.getCharacterEncoding());
 
 		startElement(writer, component);
 
-		try {
+		try (Reader reader = new InputStreamReader(resource.getInputStream(), writer.getCharacterEncoding())) {
 			writeResource(reader, writer);
-		}
-		finally {
-			Utils.close(reader);
 		}
 
 		endElement(writer);

@@ -275,12 +275,9 @@ public final class Utils {
 	 * @throws IOException When an I/O error occurs.
 	 */
 	public static long stream(InputStream input, OutputStream output) throws IOException {
-		ReadableByteChannel inputChannel = null;
-		WritableByteChannel outputChannel = null;
-
-		try {
-			inputChannel = Channels.newChannel(input);
-			outputChannel = Channels.newChannel(output);
+		try (ReadableByteChannel inputChannel = Channels.newChannel(input);
+			WritableByteChannel outputChannel = Channels.newChannel(output))
+		{
 			ByteBuffer buffer = ByteBuffer.allocateDirect(DEFAULT_STREAM_BUFFER_SIZE);
 			long size = 0;
 
@@ -291,10 +288,6 @@ public final class Utils {
 			}
 
 			return size;
-		}
-		finally {
-			close(outputChannel);
-			close(inputChannel);
 		}
 	}
 
