@@ -88,11 +88,8 @@ public class CacheInitializerListener implements ServletContextListener {
 	private CacheProvider createInstance(String cacheProviderName) {
 		try {
 			return (CacheProvider) Class.forName(cacheProviderName).newInstance();
-		} catch (InstantiationException e) {
-			throw new IllegalArgumentException(e);
-		} catch (IllegalAccessException e) {
-			throw new IllegalArgumentException(e);
-		} catch (ClassNotFoundException e) {
+		}
+		catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
 			throw new IllegalArgumentException(e);
 		}
 	}
