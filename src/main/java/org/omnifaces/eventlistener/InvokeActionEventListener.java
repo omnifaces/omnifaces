@@ -146,13 +146,6 @@ public class InvokeActionEventListener extends DefaultPhaseListener implements S
 	 */
 	@SuppressWarnings("unchecked") // For the cast on Set<UIComponent>.
 	private static <T extends SystemEvent> void publishEvent(FacesContext context, Class<T> type) {
-		if (context.getPartialViewContext().isAjaxRequest()) {
-			// Event listeners on UIViewRoot should always be executed. However, PostValidateEvent of UIViewRoot isn't
-			// published during a non-@all ajax request, so it might not have been processed by processEvent() at all.
-			// So, just to be sure, we need to force a check for listeners on UIViewRoot.
-			checkAndAddComponentWithListeners(context, context.getViewRoot(), type);
-		}
-
 		Set<UIComponent> components = (Set<UIComponent>) context.getAttributes().get(type);
 
 		if (components != null) {
