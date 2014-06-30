@@ -748,6 +748,16 @@ public final class FacesLocal {
 	public static void responseSendError(FacesContext context, int status, String message) throws IOException {
 		context.getExternalContext().responseSendError(status, message);
 		context.responseComplete();
+
+		// Below is a workaround for disappearing FacesContext in WildFly/Undertow. It disappears because Undertow
+		// immediately performs a forward to error page instead of waiting until servlet's service is finished. When
+		// the error page is a JSF page as well, then it implicitly invokes FacesServlet once again, which in turn
+		// creates another FacesContext which overrides the current FacesContext in the same thread! So, when the
+		// FacesContext which is created during the forward is released, it leaves the current FacesContext as null,
+		// causing NPE over all place which is relying on FacesContext#getCurrentInstance().
+		if (!Faces.hasContext()) {
+			Faces.setContext(context);
+		}
 	}
 
 	/**
