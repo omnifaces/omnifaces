@@ -170,7 +170,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 		String componentType = getClass().getAnnotation(FacesComponent.class).value();
 		ResourceBundle messageBundle = getMessageBundle();
 
-		if (messageBundle == null) {
+		if (messageBundle == null || !messageBundle.containsKey(componentType)) {
 			messageBundle = getBundle(DEFAULT_MESSAGE_BUNDLE, getLocale());
 		}
 
