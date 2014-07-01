@@ -112,7 +112,6 @@ public class EagerExtension implements Extension {
 
 		if (!applicationScopedBeans.isEmpty()) {
 			eagerBeansRepository.setApplicationScopedBeans(unmodifiableList(applicationScopedBeans));
-			eagerBeansRepository.instantiateApplicationScoped();
 		}
 
 		if (!sessionScopedBeans.isEmpty()) {
