@@ -81,7 +81,6 @@ public final class FacesLocal {
 	private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
 	private static final int DEFAULT_SENDFILE_BUFFER_SIZE = 10240;
 	private static final String ERROR_NO_VIEW = "There is no view.";
-	private static final String ERROR_NO_MESSAGE_BUNDLE = "There is no message bundle.";
 	private static final String[] FACELET_CONTEXT_KEYS = {
 		FaceletContext.FACELET_CONTEXT_KEY, // Compiletime constant, may fail when compiled against EE6 and run on EE7.
 		"com.sun.faces.facelets.FACELET_CONTEXT", // JSF 2.0/2.1.

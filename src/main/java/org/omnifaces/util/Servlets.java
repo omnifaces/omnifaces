@@ -14,6 +14,7 @@ package org.omnifaces.util;
 
 import static java.util.regex.Pattern.quote;
 import static org.omnifaces.util.Utils.decodeURL;
+import static org.omnifaces.util.Utils.encodeURL;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.net.MalformedURLException;
@@ -25,7 +26,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Collection of utility methods for the Servlet API in general.
@@ -215,6 +218,138 @@ public final class Servlets {
 		}
 
 		return parameterMap;
+	}
+
+	// Cookies --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns the value of the HTTP request cookie associated with the given name. The value is implicitly URL-decoded
+	 * with a charset of UTF-8.
+	 * @param request The involved HTTP servlet request.
+	 * @param name The HTTP request cookie name.
+	 * @return The value of the HTTP request cookie associated with the given name.
+	 * @throws UnsupportedOperationException If UTF-8 is not supported on this machine.
+	 * @see HttpServletRequest#getCookies()
+	 * @since 2.0
+	 */
+	public static String getRequestCookie(HttpServletRequest request, String name) {
+		Cookie[] cookies = request.getCookies();
+
+		if (cookies != null) {
+			for (Cookie cookie : cookies) {
+				if (cookie.getName().equals(name)) {
+					return decodeURL(cookie.getValue());
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Add a cookie with given name, value and maxage to the HTTP response. The cookie value will implicitly be
+	 * URL-encoded with UTF-8 so that any special characters can be stored in the cookie. The cookie will implicitly
+	 * be set to secure when the current request is secure (i.e. when the current request is a HTTPS request). The
+	 * cookie will implicitly be set in the domain and path of the current request URL.
+	 * @param request The involved HTTP servlet request.
+	 * @param response The involved HTTP servlet response.
+	 * @param name The cookie name.
+	 * @param value The cookie value.
+	 * @param maxAge The maximum age of the cookie, in seconds. If this is <code>0</code>, then the cookie will be
+	 * removed. Note that the name and path must be exactly the same as it was when the cookie was created. If this is
+	 * <code>-1</code> then the cookie will become a session cookie and thus live as long as the established HTTP
+	 * session.
+	 * @throws UnsupportedOperationException If UTF-8 is not supported on this machine.
+	 * @see HttpServletResponse#addCookie(Cookie)
+	 * @since 2.0
+	 */
+	public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response,
+		String name, String value, int maxAge)
+	{
+		addResponseCookie(request, response, name, value, getRequestHostname(request), null, maxAge);
+	}
+
+	/**
+	 * Add a cookie with given name, value, path and maxage to the HTTP response. The cookie value will implicitly be
+	 * URL-encoded with UTF-8 so that any special characters can be stored in the cookie. The cookie will implicitly
+	 * be set to secure when the current request is secure (i.e. when the current request is a HTTPS request). The
+	 * cookie will implicitly be set in the domain of the current request URL.
+	 * @param request The involved HTTP servlet request.
+	 * @param response The involved HTTP servlet response.
+	 * @param name The cookie name.
+	 * @param value The cookie value.
+	 * @param path The cookie path. If this is <code>/</code>, then the cookie is available in all pages of the webapp.
+	 * If this is <code>/somespecificpath</code>, then the cookie is only available in pages under the specified path.
+	 * @param maxAge The maximum age of the cookie, in seconds. If this is <code>0</code>, then the cookie will be
+	 * removed. Note that the name and path must be exactly the same as it was when the cookie was created. If this is
+	 * <code>-1</code> then the cookie will become a session cookie and thus live as long as the established HTTP
+	 * session.
+	 * @throws UnsupportedOperationException If UTF-8 is not supported on this machine.
+	 * @see HttpServletResponse#addCookie(Cookie)
+	 * @since 2.0
+	 */
+	public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response,
+		String name, String value, String path, int maxAge)
+	{
+		addResponseCookie(request, response, name, value, getRequestHostname(request), path, maxAge);
+	}
+
+	/**
+	 * Add a cookie with given name, value, domain, path and maxage to the HTTP response. The cookie value will
+	 * implicitly be URL-encoded with UTF-8 so that any special characters can be stored in the cookie. The cookie will
+	 * implicitly be set to secure when the current request is secure (i.e. when the current request is a HTTPS request).
+	 * @param request The involved HTTP servlet request.
+	 * @param response The involved HTTP servlet response.
+	 * @param name The cookie name.
+	 * @param value The cookie value.
+	 * @param domain The cookie domain. You can use <code>.example.com</code> (with a leading period) if you'd like the
+	 * cookie to be available to all subdomains of the domain. Note that you cannot set it to a different domain.
+	 * @param path The cookie path. If this is <code>/</code>, then the cookie is available in all pages of the webapp.
+	 * If this is <code>/somespecificpath</code>, then the cookie is only available in pages under the specified path.
+	 * @param maxAge The maximum age of the cookie, in seconds. If this is <code>0</code>, then the cookie will be
+	 * removed. Note that the name and path must be exactly the same as it was when the cookie was created. If this is
+	 * <code>-1</code> then the cookie will become a session cookie and thus live as long as the established HTTP
+	 * session.
+	 * @throws UnsupportedOperationException If UTF-8 is not supported on this machine.
+	 * @see HttpServletResponse#addCookie(Cookie)
+	 * @since 2.0
+	 */
+	public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response,
+		String name, String value, String domain, String path, int maxAge)
+	{
+		if (value != null) {
+			value = encodeURL(value);
+		}
+
+		Cookie cookie = new Cookie(name, value);
+
+		if (domain != null) {
+			cookie.setDomain(domain);
+		}
+
+		if (path != null) {
+			cookie.setPath(path);
+		}
+
+		cookie.setMaxAge(maxAge);
+		cookie.setSecure(request.isSecure());
+		response.addCookie(cookie);
+	}
+
+	/**
+	 * Remove the cookie with given name and path from the HTTP response. Note that the name and path must be exactly
+	 * the same as it was when the cookie was created.
+	 * @param request The involved HTTP servlet request.
+	 * @param response The involved HTTP servlet response.
+	 * @param name The cookie name.
+	 * @param path The cookie path.
+	 * @see HttpServletResponse#addCookie(Cookie)
+	 * @since 2.0
+	 */
+	public static void removeResponseCookie(HttpServletRequest request, HttpServletResponse response,
+		String name, String path)
+	{
+		addResponseCookie(request, response, name, null, path, 0);
 	}
 
 	// ServletContext -------------------------------------------------------------------------------------------------
