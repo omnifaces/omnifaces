@@ -1961,6 +1961,55 @@ public class ValidateValuesBean implements MultiFieldValidator {
 			<type>java.lang.String</type>
 		</attribute>
 	</tag>
+	
+	<tag>
+		<description>
+			<![CDATA[
+				<strong>ResolveComponent</strong> is a utility component via which a component can be looked up by its ID and
+ 				a reference to it put in either the "facelet scope" (default) or the request scope.
+			]]>
+		</description>
+		<tag-name>resolveComponent</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.util.ResolveComponent</component-type>
+			<handler-class>org.omnifaces.taghandler.ComponentExtraHandler</handler-class>
+		</component>
+		
+		<attribute>
+			<description>
+				<![CDATA[
+	               Name under which the component will be made available to EL, scoped to the body of the Facelets tag (default)
+	               or to the request.
+	            ]]>
+            </description>
+			<name>name</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+	               ID of the component that will be resolved (looked-up) and if found a reference of it made available to EL.
+	            ]]>
+            </description>
+			<name>for</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Optional scope identifier used to set the scope in which the component reference is inserted. If no scope is specified,
+					the default scope "facelet" will be used.
+					<p>
+					Values values are "facelet" (default) and "request".					
+				 ]]>
+            </description>
+			<name>scope</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+	</tag>
 
 	<tag>
 		<description>
