@@ -23,20 +23,22 @@ import org.omnifaces.eventlistener.DefaultServletContextListener;
 
 /**
  * A ServletContextListener that instantiates eager application scoped beans.
- * 
+ *
  * @since 2.0
  * @author Arjan Tijms
  *
  */
 @WebListener
 public class EagerBeansServletContextListener extends DefaultServletContextListener {
-	
+
 	@Inject
 	private BeansInstantiator eagerBeansRepository;
 
 	@Override
 	public void contextInitialized(ServletContextEvent sce) {
-		eagerBeansRepository.instantiateApplicationScoped();
+		if (eagerBeansRepository != null) {
+			eagerBeansRepository.instantiateApplicationScoped();
+		}
 	}
-	
+
 }
