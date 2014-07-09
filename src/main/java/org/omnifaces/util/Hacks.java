@@ -429,8 +429,7 @@ public final class Hacks {
 	/**
 	 * Returns whether the given script resource is rendered.
 	 * @param context The involved faces context.
-	 * @param library The resource library.
-	 * @param name The resource name.
+	 * @param id The resource identifier.
 	 * @return Whether the given script resource is rendered.
 	 * @since 1.8
 	 */
