@@ -2010,6 +2010,88 @@ public class ValidateValuesBean implements MultiFieldValidator {
 			<type>java.lang.String</type>
 		</attribute>
 	</tag>
+	
+	<tag>
+		<description>
+			<![CDATA[
+				<strong>MoveComponent</strong> is a utility component via which a components and behaviors can be moved to 
+ 				a target component at various ways.
+			]]>
+		</description>
+		
+		<tag-name>moveComponent</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.util.MoveComponent</component-type>
+		</component>
+		
+		<attribute>
+			<description>
+				<![CDATA[
+	               ID of the target component for which the component moving will be done
+	            ]]>
+            </description>
+			<name>for</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		
+		<attribute>
+			<description>
+				<![CDATA[
+					The destination relative to the target component where the source component(s) are move to. Valid values are
+					<ul>
+						<li> <code>BEFORE</code>    - Component is moved right before target component, i.e. as a sibling with an index that's 1 position lower 
+						<li> <code>ADD_FIRST</code> - Component is added as the first child of the target component, any other children will have their index increased by 1
+						<li> <code>ADD_LAST</code>  - Component is added as the last child of the target component, any other children will stay at their original location
+						<li> <code>FACET</code>     - Component will be moved to the facet section of the target component under the name denoted by "facet" 
+						<li> <code>BEHAVIOR</code>  - A Behavior will be moved to the behavior section of the target component
+						<li> <code>AFTER</code>     - Component is moved right after target component, i.e. as a sibling with an index that's 1 position higher
+					</ul>				
+				 ]]>
+            </description>
+			<name>destination</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		
+		<attribute>
+			<description>
+				<![CDATA[
+				    In case the <code>destination</code> is set to FACET, the name of the facet in the target component to which the components should be moved		
+				 ]]>
+            </description>
+			<name>facet</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		
+		<attribute>
+			<description>
+				<![CDATA[
+				    In case the <code>destination</code> is set to BEHAVIOR, the name of the default event that the <b>target</b> component is 'supposed' to have.
+				    This normally does not need to be set, but might be needed for some over-eager tag handlers associated with a behavior that in advance try
+				    to check whether the behavior event matches with what the component supports.	
+				 ]]>
+            </description>
+			<name>behaviorDefaultEvent</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		
+		<attribute>
+			<description>
+				<![CDATA[
+				    In case the <code>destination</code> is set to BEHAVIOR, the comma separated list events that the <b>target</b> component is 'supposed' to support.
+				    This normally does not need to be set, but might be needed for some over-eager tag handlers associated with a behavior that in advance try
+				    to check whether the behavior event matches with what the component supports.	
+				 ]]>
+            </description>
+			<name>behaviorEvents</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+	</tag>
+	
 
 	<tag>
 		<description>
