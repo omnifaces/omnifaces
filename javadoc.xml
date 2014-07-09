@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="javadoc">
+    <target name="javadoc">
+        <javadoc access="protected" additionalparam=" -notimestamp" author="true" classpath="/home/baukescholtz/.m2/repository/javax/javaee-web-api/7.0/javaee-web-api-7.0.jar:target/test-classes" destdir="/home/baukescholtz/git/omnifaces.github.io/docs/javadoc/current" doctitle="OmniFaces API documentation" nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" packagenames="org.omnifaces.component.validator,org.omnifaces.component.output,org.omnifaces.cdi.converter,org.omnifaces.model.tree,org.omnifaces.util.selectitems,org.omnifaces.eventlistener,org.omnifaces.validator,org.omnifaces.config,org.omnifaces.viewhandler,org.omnifaces.facesviews,org.omnifaces.renderkit,org.omnifaces.application,org.omnifaces.component.input.componentidparam,org.omnifaces.component.util,org.omnifaces.component.output.cache,org.omnifaces.component.script,org.omnifaces.cdi,org.omnifaces.util.concurrentlinkedhashmap,org.omnifaces.taghandler,org.omnifaces.converter,org.omnifaces.component.input,org.omnifaces.component.tree,org.omnifaces.event,org.omnifaces.resourcehandler,org.omnifaces.component.output.cache.el,org.omnifaces.cdi.validator,org.omnifaces.exceptionhandler,org.omnifaces.model,org.omnifaces.component.messages,org.omnifaces.util,org.omnifaces.cdi.viewscope,org.omnifaces.renderer,org.omnifaces.io,org.omnifaces.el.functions,org.omnifaces.context,org.omnifaces.filter,org.omnifaces.component,org.omnifaces.cdi.eager,org.omnifaces,org.omnifaces.cdi.param,org.omnifaces.servlet,org.omnifaces.el" source="1.7" sourcepath="src/main/resources:src/main/java" splitindex="true" use="true" version="true">
+            <link href="http://docs.oracle.com/javaee/7/api/"/>
+            <link href="http://docs.oracle.com/javase/7/docs/api/"/>
+        </javadoc>
+    </target>
+</project>
