@@ -14,8 +14,6 @@ package org.omnifaces.el.functions;
 
 import static org.omnifaces.util.Faces.getLocale;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
@@ -29,10 +27,6 @@ import org.omnifaces.util.Utils;
  * @author Bauke Scholtz
  */
 public final class Strings {
-
-	// Constants ------------------------------------------------------------------------------------------------------
-
-	private static final String ERROR_UNSUPPORTED_ENCODING = "UTF-8 is apparently not supported on this machine.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -160,16 +154,7 @@ public final class Strings {
 	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
 	 */
 	public static String encodeURL(String string) {
-		if (string == null) {
-			return null;
-		}
-
-		try {
-			return URLEncoder.encode(string, "UTF-8");
-		}
-		catch (UnsupportedEncodingException e) {
-			throw new UnsupportedOperationException(ERROR_UNSUPPORTED_ENCODING);
-		}
+		return Utils.encodeURL(string);
 	}
 
 	/**

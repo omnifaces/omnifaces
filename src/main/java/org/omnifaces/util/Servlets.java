@@ -228,7 +228,7 @@ public final class Servlets {
 	 * @param request The involved HTTP servlet request.
 	 * @param name The HTTP request cookie name.
 	 * @return The value of the HTTP request cookie associated with the given name.
-	 * @throws UnsupportedOperationException If UTF-8 is not supported on this machine.
+	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
 	 * @see HttpServletRequest#getCookies()
 	 * @since 2.0
 	 */
@@ -259,7 +259,7 @@ public final class Servlets {
 	 * removed. Note that the name and path must be exactly the same as it was when the cookie was created. If this is
 	 * <code>-1</code> then the cookie will become a session cookie and thus live as long as the established HTTP
 	 * session.
-	 * @throws UnsupportedOperationException If UTF-8 is not supported on this machine.
+	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
 	 * @see HttpServletResponse#addCookie(Cookie)
 	 * @since 2.0
 	 */
@@ -284,7 +284,7 @@ public final class Servlets {
 	 * removed. Note that the name and path must be exactly the same as it was when the cookie was created. If this is
 	 * <code>-1</code> then the cookie will become a session cookie and thus live as long as the established HTTP
 	 * session.
-	 * @throws UnsupportedOperationException If UTF-8 is not supported on this machine.
+	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
 	 * @see HttpServletResponse#addCookie(Cookie)
 	 * @since 2.0
 	 */
@@ -310,7 +310,7 @@ public final class Servlets {
 	 * removed. Note that the name and path must be exactly the same as it was when the cookie was created. If this is
 	 * <code>-1</code> then the cookie will become a session cookie and thus live as long as the established HTTP
 	 * session.
-	 * @throws UnsupportedOperationException If UTF-8 is not supported on this machine.
+	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
 	 * @see HttpServletResponse#addCookie(Cookie)
 	 * @since 2.0
 	 */

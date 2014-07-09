@@ -12,6 +12,7 @@
  */
 package org.omnifaces.util;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
 import static java.util.regex.Pattern.quote;
 
@@ -67,7 +68,7 @@ public final class Utils {
 	private static final int DEFAULT_STREAM_BUFFER_SIZE = 10240;
 	private static final String PATTERN_RFC1123_DATE = "EEE, dd MMM yyyy HH:mm:ss zzz";
 	private static final TimeZone TIMEZONE_GMT = TimeZone.getTimeZone("GMT");
-	private static final String ERROR_UNSUPPORTED_ENCODING = "UTF-8 is apparently not supported on this machine.";
+	private static final String ERROR_UNSUPPORTED_ENCODING = "UTF-8 is apparently not supported on this platform.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -533,7 +534,7 @@ public final class Utils {
 		}
 
 		try {
-			InputStream raw = new ByteArrayInputStream(string.getBytes("UTF-8"));
+			InputStream raw = new ByteArrayInputStream(string.getBytes(UTF_8));
 			ByteArrayOutputStream deflated = new ByteArrayOutputStream();
 			stream(raw, new DeflaterOutputStream(deflated, new Deflater(Deflater.BEST_COMPRESSION)));
 			String base64 = DatatypeConverter.printBase64Binary(deflated.toByteArray());
@@ -563,7 +564,7 @@ public final class Utils {
 			InputStream deflated = new ByteArrayInputStream(DatatypeConverter.parseBase64Binary(base64));
 			ByteArrayOutputStream raw = new ByteArrayOutputStream();
 			stream(new InflaterInputStream(deflated), raw);
-			return new String(raw.toByteArray(), "UTF-8");
+			return new String(raw.toByteArray(), UTF_8);
 		}
 		catch (UnsupportedEncodingException e) {
 			// This will occur when UTF-8 is not supported, but this is not to be expected these days.
@@ -579,7 +580,7 @@ public final class Utils {
 	 * URL-encode the given string using UTF-8.
 	 * @param string The string to be URL-encoded using UTF-8.
 	 * @return The given string, URL-encoded using UTF-8, or <code>null</code> if <code>null</code> was given.
-	 * @throws UnsupportedOperationException When UTF-8 is not supported.
+	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
 	 * @since 1.4
 	 */
 	public static String encodeURL(String string) {
@@ -588,7 +589,7 @@ public final class Utils {
 		}
 
 		try {
-			return URLEncoder.encode(string, "UTF-8");
+			return URLEncoder.encode(string, UTF_8.name());
 		}
 		catch (UnsupportedEncodingException e) {
 			throw new UnsupportedOperationException(ERROR_UNSUPPORTED_ENCODING, e);
@@ -599,7 +600,7 @@ public final class Utils {
 	 * URL-decode the given string using UTF-8.
 	 * @param string The string to be URL-decode using UTF-8.
 	 * @return The given string, URL-decode using UTF-8, or <code>null</code> if <code>null</code> was given.
-	 * @throws UnsupportedOperationException When UTF-8 is not supported.
+	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
 	 * @since 1.4
 	 */
 	public static String decodeURL(String string) {
@@ -608,7 +609,7 @@ public final class Utils {
 		}
 
 		try {
-			return URLDecoder.decode(string, "UTF-8");
+			return URLDecoder.decode(string, UTF_8.name());
 		}
 		catch (UnsupportedEncodingException e) {
 			throw new UnsupportedOperationException(ERROR_UNSUPPORTED_ENCODING, e);

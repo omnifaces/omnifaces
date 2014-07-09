@@ -13,6 +13,7 @@
 package org.omnifaces.util;
 
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
+import static org.omnifaces.util.Utils.encodeURL;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -735,7 +736,7 @@ public final class FacesLocal {
 			Object[] encodedParams = new Object[params.length];
 
 			for (int i = 0; i < params.length; i++) {
-				encodedParams[i] = Utils.encodeURL(params[i]);
+				encodedParams[i] = encodeURL(params[i]);
 			}
 
 			return encodedParams;
@@ -854,7 +855,7 @@ public final class FacesLocal {
 	 */
 	public static void addResponseCookie(FacesContext context, String name, String value, String domain, String path, int maxAge) {
 		if (value != null) {
-			value = Utils.encodeURL(value);
+			value = encodeURL(value);
 		}
 
 		ExternalContext externalContext = context.getExternalContext();
@@ -1235,7 +1236,7 @@ public final class FacesLocal {
 		externalContext.setResponseBufferSize(DEFAULT_SENDFILE_BUFFER_SIZE);
 		externalContext.setResponseContentType(getMimeType(context, filename));
 		externalContext.setResponseHeader("Content-Disposition", String.format(SENDFILE_HEADER,
-			(attachment ? "attachment" : "inline"), Utils.encodeURL(filename)));
+			(attachment ? "attachment" : "inline"), encodeURL(filename)));
 
 		// Not exactly mandatory, but this fixes at least a MSIE quirk: http://support.microsoft.com/kb/316431
 		if (((HttpServletRequest) externalContext.getRequest()).isSecure()) {

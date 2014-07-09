@@ -1174,7 +1174,7 @@ public final class Faces {
 	 * with a charset of UTF-8.
 	 * @param name The HTTP request cookie name.
 	 * @return The value of the HTTP request cookie associated with the given name.
-	 * @throws UnsupportedOperationException If UTF-8 is not supported on this machine.
+	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
 	 * @see ExternalContext#getRequestCookieMap()
 	 */
 	public static String getRequestCookie(String name) {
@@ -1192,7 +1192,7 @@ public final class Faces {
 	 * removed. Note that the name and path must be exactly the same as it was when the cookie was created. If this is
 	 * <code>-1</code> then the cookie will become a session cookie and thus live as long as the established HTTP
 	 * session.
-	 * @throws UnsupportedOperationException If UTF-8 is not supported on this machine.
+	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
 	 * @see ExternalContext#addResponseCookie(String, String, Map)
 	 * @since 1.8
 	 */
@@ -1213,7 +1213,7 @@ public final class Faces {
 	 * removed. Note that the name and path must be exactly the same as it was when the cookie was created. If this is
 	 * <code>-1</code> then the cookie will become a session cookie and thus live as long as the established HTTP
 	 * session.
-	 * @throws UnsupportedOperationException If UTF-8 is not supported on this machine.
+	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
 	 * @see ExternalContext#addResponseCookie(String, String, Map)
 	 */
 	public static void addResponseCookie(String name, String value, String path, int maxAge) {
@@ -1234,7 +1234,7 @@ public final class Faces {
 	 * removed. Note that the name and path must be exactly the same as it was when the cookie was created. If this is
 	 * <code>-1</code> then the cookie will become a session cookie and thus live as long as the established HTTP
 	 * session.
-	 * @throws UnsupportedOperationException If UTF-8 is not supported on this machine.
+	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
 	 * @see ExternalContext#addResponseCookie(String, String, Map)
 	 * @since 1.8
 	 */
