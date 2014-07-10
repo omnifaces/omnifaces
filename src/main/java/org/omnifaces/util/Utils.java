@@ -264,6 +264,26 @@ public final class Utils {
 
 		return false;
 	}
+	
+	/**
+	 * Returns <code>true</code> if an instance of the given clazz would be an instance of an instance of 
+	 * one of the given clazzes.
+	 * @param <T> The generic object type.
+	 * @param clazz The class to be checked if it would be an instance of one of the given clazzes.
+	 * @param clazzes The argument list of clazzes to be tested for instance of.
+	 * @return <code>true</code> if the given clazz would be an instance of one of the given clazzes.
+	 * @since 2.0
+	 */
+	@SafeVarargs
+	public static <T> boolean isOneInstanceOf(Class<?> clazz, Class<?>... clazzes) {
+		for (Class<?> other : clazzes) {
+			if (clazz == null ? other == null :	other.isAssignableFrom(clazz)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
 
 	// I/O ------------------------------------------------------------------------------------------------------------
 
