@@ -734,5 +734,21 @@
 		<function-class>org.omnifaces.el.functions.Objects</function-class>
 		<function-signature>java.lang.Object coalesce(java.lang.Object, java.lang.Object)</function-signature>
 	</function>
+	
+	
+	<!-- Components =============================================================================================== -->
+	
+	<function>
+		<description>
+			<![CDATA[
+				Gets the value of a component's attribute by trying to evaluate a value expression associated with the
+				attribute first, and if none exists goes via the regular attribute mechanism (which will likely call
+				a getter on the component if indeed no value expression is associated).
+			]]>
+		</description>
+		<function-name>evalAttribute</function-name>
+		<function-class>org.omnifaces.el.functions.Components</function-class>
+		<function-signature>java.lang.Object evalAttribute(javax.faces.component.UIComponent, java.lang.String)</function-signature>
+	</function>
 
 </facelet-taglib>
