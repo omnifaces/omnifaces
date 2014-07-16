@@ -12,16 +12,23 @@
  */
 package org.omnifaces.util;
 
+import static java.util.Arrays.asList;
+import static javax.faces.component.visit.VisitContext.createVisitContext;
+import static javax.faces.component.visit.VisitResult.ACCEPT;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getELContext;
 import static org.omnifaces.util.Faces.getFaceletContext;
 import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.isOneInstanceOf;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.el.MethodExpression;
 import javax.el.ValueExpression;
@@ -39,8 +46,10 @@ import javax.faces.component.UIPanel;
 import javax.faces.component.UIViewRoot;
 import javax.faces.component.behavior.AjaxBehavior;
 import javax.faces.component.behavior.ClientBehavior;
+import javax.faces.component.visit.VisitCallback;
 import javax.faces.component.visit.VisitContext;
 import javax.faces.component.visit.VisitHint;
+import javax.faces.component.visit.VisitResult;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
@@ -299,6 +308,224 @@ public final class Components {
 			return context.getFacesContext().getAttributes().get("javax.faces.visit.SKIP_ITERATION") == Boolean.TRUE;
 		}
 	}
+	
+	
+	// Iteration / Visiting -------------------------------------------------------------------------------------------
+	
+	/**
+	 * Invokes an operation on every component in the component tree.
+	 * <p>
+	 * This is a simplified version of regular component visiting that uses the builder pattern to provide the various
+	 * optional parameters. Includes supports for only visiting components of a certain class type and two
+	 * simplified functional interfaces / lambdas.
+	 * <p>
+	 * See {@link UIComponent#visitTree(VisitContext, VisitCallback)}
+	 *
+	 * @since 2.0
+	 */
+	public static ForEach forEachComponent() {
+		return new ForEach();
+	}
+	
+	/**
+	 * Invokes an operation on every component in the component tree.
+	 * <p>
+	 * This is a simplified version of regular component visiting that uses the builder pattern to provide the various
+	 * optional parameters. Includes supports for only visiting components of a certain class type and two
+	 * simplified functional interfaces / lambdas.
+	 * <p>
+	 * See {@link UIComponent#visitTree(VisitContext, VisitCallback)}
+	 * 
+	 * @param facesContext the faces context used for tree visiting
+	 *
+	 * @since 2.0
+	 */
+	public static ForEach forEachComponent(FacesContext facesContext) {
+		return new ForEach(facesContext);
+	}
+	
+	/**
+	 * Builder class used to collect a number of query parameters for a visit (for each) of components in the JSF
+	 * component tree. The chain of collecting parameters is terminated by calling one of the invoke methods.
+	 * 
+	 * @since 2.0
+	 * @author Arjan Tijms
+	 *
+	 */
+	public static class ForEach {
+
+		private FacesContext facesContext;
+		private UIComponent root;
+		private Collection<String> ids;
+		private Set<VisitHint> hints;
+		private Class<? extends UIComponent>[] types;
+
+		public ForEach() {
+			facesContext = Faces.getContext();
+		}
+
+		public ForEach(FacesContext facesContext) {
+			this.facesContext = facesContext;
+		}
+
+		/**
+		 * The root component where tree visiting starts
+		 * 
+		 * @param root the root component where tree visiting starts
+		 * @return the intermediate builder object to continue the builder chain
+		 */
+		public ForEach fromRoot(UIComponent root) {
+			this.root = root;
+			return this;
+		}
+
+		/**
+		 * The IDs of the components that are visited
+		 * 
+		 * @param ids the IDs of the components that are visited
+		 * @return the intermediate builder object to continue the builder chain
+		 */
+		public ForEach havingIds(Collection<String> ids) {
+			this.ids = ids;
+			return this;
+		}
+
+		/**
+		 * The IDs of the components that are to be visited
+		 * 
+		 * @param ids the IDs of the components that are to be visited
+		 * @return the intermediate builder object to continue the builder chain
+		 */
+		public ForEach havingIds(String... ids) {
+			this.ids = asList(ids);
+			return this;
+		}
+
+		/**
+		 * The VisitHints that are used for the visit.
+		 * 
+		 * @param hints the VisitHints that are used for the visit.
+		 * @return the intermediate builder object to continue the builder chain
+		 */
+		public ForEach withHints(Set<VisitHint> hints) {
+			this.hints = hints;
+			return this;
+		}
+
+		/**
+		 * The VisitHints that are used for the visit.
+		 * 
+		 * @param hints the VisitHints that are used for the visit.
+		 * @return the intermediate builder object to continue the builder chain
+		 */
+		public ForEach withHints(VisitHint... hints) {
+
+			if (hints.length > 0) {
+				EnumSet<VisitHint> hintsSet = EnumSet.noneOf(hints[0].getDeclaringClass());
+				for (VisitHint hint : hints) {
+					hintsSet.add(hint);
+				}
+
+				this.hints = hintsSet;
+
+			}
+			return this;
+		}
+		
+		/**
+		 * The types of the components that are to be visited
+		 * 
+		 * @param types the types of the components that are to be visited
+		 * @return the intermediate builder object to continue the builder chain
+		 */
+		@SafeVarargs
+		final public ForEach ofTypes(Class<? extends UIComponent>... types) {
+			this.types = types;
+			return this;
+		}
+
+		/**
+		 * Invokes the given operation on the components as specified by the
+		 * query parameters set via this builder.
+		 * 
+		 * @param operation the operation to invoke on each component
+		 */
+		public void invoke(final Callback.WithArgument<UIComponent> operation) {
+			invoke(new VisitCallback() {
+				@Override
+				public VisitResult visit(VisitContext context, UIComponent target) {
+					operation.invoke(target);
+					return ACCEPT;
+				}
+			});
+		}
+		
+		/**
+		 * Invokes the given operation on the components as specified by the
+		 * query parameters set via this builder.
+		 * 
+		 * @param operation the operation to invoke on each component
+		 */
+		public void invoke(final Callback.ReturningWithArgument<VisitResult, UIComponent> operation) {
+			invoke(new VisitCallback() {
+				@Override
+				public VisitResult visit(VisitContext context, UIComponent target) {
+					return operation.invoke(target);
+				}
+			});
+		}
+		
+		/**
+		 * Invokes the given operation on the components as specified by the
+		 * query parameters set via this builder.
+		 * 
+		 * @param operation the operation to invoke on each component
+		 */
+		public void invoke(final VisitCallback visitCallback) {
+			VisitCallback callback = visitCallback;
+			if (types != null) {
+				callback = new TypesVisitCallback(types, callback);
+			}
+			
+			getRoot().visitTree(createVisitContext(getContext(), getIds(), getHints()), callback);
+		}
+
+		protected FacesContext getFacesContext() {
+			return facesContext;
+		}
+
+		protected UIComponent getRoot() {
+			return root != null ? root : getFacesContext().getViewRoot();
+		}
+
+		protected Collection<String> getIds() {
+			return ids;
+		}
+
+		protected Set<VisitHint> getHints() {
+			return hints;
+		}
+		
+		private static class TypesVisitCallback implements VisitCallback {
+			
+			private Class<? extends UIComponent>[] types; 
+			private VisitCallback next;
+			
+			public TypesVisitCallback(Class<? extends UIComponent>[] types, VisitCallback next) {
+				this.types = types;
+				this.next = next;
+			}
+			
+			@Override
+			public VisitResult visit(VisitContext context, UIComponent target) {
+				if (isOneInstanceOf(target.getClass(), types)) {
+					return next.visit(context, target);
+				}
+				return ACCEPT;
+			}
+		}
+	}
+	
 
 	// Manipulation ---------------------------------------------------------------------------------------------------
 
