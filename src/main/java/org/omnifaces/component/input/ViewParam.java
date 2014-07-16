@@ -22,13 +22,16 @@ import javax.faces.component.FacesComponent;
 import javax.faces.component.UIViewParameter;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.ConverterException;
+import javax.faces.event.PostValidateEvent;
+import javax.faces.event.PreValidateEvent;
 
 import org.omnifaces.util.MapWrapper;
 
 /**
  * <strong>ViewParameter</strong> is a component that extends the standard {@link UIViewParameter} and provides a
  * stateless mode of operation and fixes the issue wherein null model values are converted to empty string parameters
- * in query string (e.g. when <code>includeViewParams=true</code>).
+ * in query string (e.g. when <code>includeViewParams=true</code>) and the (bean) validation never being triggered
+ * when the parameter is completely absent in query string, causing e.g. <code>@NotNull</code> to fail.
  * <p>
  * The standard UIViewParameter implementation calls the model setter again after postback. This is not always desired
  * when being bound to a view scoped bean and can lead to performance problems when combined with an expensive converter.
@@ -38,6 +41,11 @@ import org.omnifaces.util.MapWrapper;
  * The standard UIViewParameter implementation calls the converter regardless of whether the evaluated model value is
  * <code>null</code> or not. As converters by specification return an empty string in case of <code>null</code> value,
  * this is being added to the query string as an empty parameter. This is not desired.
+ * <p>
+ * The standard UIViewParameter implementation uses an internal "is required" check when the submitted value is
+ * <code>null</code>, hereby completely bypassing the standard <code>UIInput</code> validation, including any bean
+ * validation annotations and even the {@link PreValidateEvent} and {@link PostValidateEvent} events. This is not
+ * desired.
  * <p>
  * You can use it the same way as <code>&lt;f:viewParam&gt;</code>, you only need to change <code>f:</code> to
  * <code>o:</code>.
@@ -81,6 +89,10 @@ public class ViewParam extends UIViewParameter {
 	@Override
 	public void processValidators(FacesContext context) {
 		if (!context.isPostback()) {
+			if (getSubmittedValue() == null) {
+				setSubmittedValue(""); // Workaround for it never triggering the (bean) validation when unspecified.
+			}
+
 			super.processValidators(context);
 		}
 	}
