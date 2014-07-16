@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 OmniFaces.
+ * Copyright 2014 OmniFaces.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -40,7 +40,7 @@ public class ApplicationInitializer implements ServletContainerInitializer {
 	@Override
 	public void onStartup(Set<Class<?>> c, ServletContext servletContext) throws ServletException {
 		logOmniFacesVersion();
-		checkCDIAvailability();
+		checkCDIEnabled(servletContext);
 		FacesViews.initilaize(servletContext);
 	}
 
@@ -48,9 +48,17 @@ public class ApplicationInitializer implements ServletContainerInitializer {
 		logger.info("Using OmniFaces version " + Faces.class.getPackage().getSpecificationVersion());
 	}
 
-	private static void checkCDIAvailability() throws ServletException {
+	private static void checkCDIEnabled(ServletContext servletContext) throws ServletException {
 		try {
-			Class.forName("javax.enterprise.inject.spi.BeanManager");
+			try {
+				Class.forName("javax.enterprise.inject.spi.BeanManager");
+			}
+			catch (ClassNotFoundException e) {
+				throw new IllegalStateException("CDI BeanManager API is missing in classpath.");
+			}
+			if (servletContext.getResource("/WEB-INF/beans.xml") == null) {
+				throw new IllegalStateException("CDI beans.xml file is missing in /WEB-INF.");
+			}
 		}
 		catch (Throwable e) {
 			logger.severe(""
@@ -87,7 +95,7 @@ public class ApplicationInitializer implements ServletContainerInitializer {
 				+ "\n████████████████████████████████████████████████████████████████████████████████"
 			);
 
-			throw new ServletException();
+			throw new ServletException(e);
 		}
 	}
 
