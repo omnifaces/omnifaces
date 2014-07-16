@@ -235,12 +235,13 @@ public class ViewParamValidationFailed extends TagHandler implements ComponentSy
 		}
 
     	if (context.getAttributes().put(getClass().getName(), true) != null) {
-			return; // Validation fail has already been handled. We can't send redirect or error multiple times.
+			return; // Validation fail has already been handled before. We can't send redirect or error multiple times.
 		}
 
 		String firstFacesMessage = coalesce(
 			cleanupFacesMessagesAndGetFirst(context.getMessages(component.getClientId(context))), // Prefer own message.
-			cleanupFacesMessagesAndGetFirst(context.getMessages(null)) // Then global messages.
+			cleanupFacesMessagesAndGetFirst(context.getMessages(null)), // Then global messages.
+			cleanupFacesMessagesAndGetFirst(context.getMessages()) // Cleanup remainder.
 		);
 
 		evaluateAttributesAndHandleSendRedirectOrError(context, firstFacesMessage);
