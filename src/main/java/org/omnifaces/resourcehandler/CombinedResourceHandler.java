@@ -15,7 +15,6 @@ package org.omnifaces.resourcehandler;
 import static org.omnifaces.util.Events.subscribeToEvent;
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Faces.getRequestURI;
-import static org.omnifaces.util.Faces.isDevelopment;
 import static org.omnifaces.util.Utils.stream;
 
 import java.io.IOException;
@@ -51,8 +50,7 @@ import org.omnifaces.util.Hacks;
 /**
  * This {@link ResourceHandler} implementation will remove all separate script and stylesheet resources which have the
  * <code>target</code> attribute set to <code>"head"</code> from the <code>UIViewRoot</code> and create a combined one
- * for all scripts and another combined one for all stylesheets, when the JSF project stage is <strong>not</strong> set
- * to <code>Development</code>.
+ * for all scripts and another combined one for all stylesheets.
  * <p>
  * To get it to run, this handler needs be registered as follows in <code>faces-config.xml</code>:
  * <pre>
@@ -172,24 +170,20 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Creates a new instance of this combined resource handler which wraps the given resource handler. If the current
-	 * JSF project stage is not set to <code>Development</code>, then the initialization will be performed and this
-	 * will also register this resource handler as a pre render view event listener, so that it can do the job of
-	 * removing the CSS/JS resources and adding combined ones.
+	 * Creates a new instance of this combined resource handler which wraps the given resource handler. This will also
+	 * register this resource handler as a pre render view event listener, so that it can do the job of removing the
+	 * CSS/JS resources and adding combined ones.
 	 * @param wrapped The resource handler to be wrapped.
 	 */
 	public CombinedResourceHandler(ResourceHandler wrapped) {
 		this.wrapped = wrapped;
-
-		if (!isDevelopment()) {
-			excludedResources = initResources(PARAM_NAME_EXCLUDED_RESOURCES);
-			excludedResources.addAll(initCDNResources());
-			suppressedResources = initResources(PARAM_NAME_SUPPRESSED_RESOURCES);
-			excludedResources.addAll(suppressedResources);
-			inlineCSS = Boolean.valueOf(getInitParameter(PARAM_NAME_INLINE_CSS));
-			inlineJS = Boolean.valueOf(getInitParameter(PARAM_NAME_INLINE_JS));
-			subscribeToEvent(PreRenderViewEvent.class, this);
-		}
+		excludedResources = initResources(PARAM_NAME_EXCLUDED_RESOURCES);
+		excludedResources.addAll(initCDNResources());
+		suppressedResources = initResources(PARAM_NAME_SUPPRESSED_RESOURCES);
+		excludedResources.addAll(suppressedResources);
+		inlineCSS = Boolean.valueOf(getInitParameter(PARAM_NAME_INLINE_CSS));
+		inlineJS = Boolean.valueOf(getInitParameter(PARAM_NAME_INLINE_JS));
+		subscribeToEvent(PreRenderViewEvent.class, this);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------

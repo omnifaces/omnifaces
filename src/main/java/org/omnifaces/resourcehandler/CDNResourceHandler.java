@@ -14,7 +14,6 @@ package org.omnifaces.resourcehandler;
 
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getInitParameter;
-import static org.omnifaces.util.Faces.isDevelopment;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.util.HashMap;
@@ -37,8 +36,6 @@ import javax.faces.application.ResourceWrapper;
  *   &lt;resource-handler&gt;org.omnifaces.resourcehandler.CDNResourceHandler&lt;/resource-handler&gt;
  * &lt;/application&gt;
  * </pre>
- * <p>
- * By default, it runs only when the current JSF project stage is <strong>not</strong> set to <code>Development</code>.
  *
  * <h3>Standard configuration</h3>
  * <p>
@@ -115,18 +112,6 @@ import javax.faces.application.ResourceWrapper;
  * </pre>
  * <p>The EL expression is resolved on a per-request basis.</p>
  *
- * <h3>Always enable CDN resource handler</h3>
- * <p>
- * By default, the CDN resource handler runs only when the current JSF project stage is <strong>not</strong> set to
- * <code>Development</code>. When you need to run it during <code>Development</code> stage as well, then set the context
- * parameter {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_DEV_STAGE} to <code>true</code>.
- * <pre>
- * &lt;context-param&gt;
- *   &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_ALWAYS_ENABLED&lt;/param-name&gt;
- *   &lt;param-value&gt;true&lt;/param-value&gt;
- * &lt;/context-param&gt;
- * </pre>
- *
  * <h3>CombinedResourceHandler</h3>
  * <p>
  * If you're also using the {@link CombinedResourceHandler}, then you need to understand that CDN resources can
@@ -142,12 +127,6 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 
 	/** The context parameter name to specify CDN URLs for the given resource identifiers. */
 	public static final String PARAM_NAME_CDN_RESOURCES = "org.omnifaces.CDN_RESOURCE_HANDLER_URLS";
-
-	/**
-	 * The context parameter name to tell CDN resource handler to run during development stage as well.
-	 * @since 1.6
-	 */
-	public static final String PARAM_NAME_CDN_DEV_STAGE = "org.omnifaces.CDN_RESOURCE_HANDLER_ALWAYS_ENABLED";
 
 	private static final String ERROR_MISSING_INIT_PARAM =
 		"Context parameter '" + PARAM_NAME_CDN_RESOURCES + "' is missing in web.xml or web-fragment.xml.";
@@ -176,13 +155,10 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 	 */
 	public CDNResourceHandler(ResourceHandler wrapped) {
 		this.wrapped = wrapped;
+		cdnResources = initCDNResources();
 
-		if (!isDevelopment() || "true".equals(getInitParameter(PARAM_NAME_CDN_DEV_STAGE))) {
-			cdnResources = initCDNResources();
-
-			if (cdnResources == null) {
-				throw new IllegalArgumentException(ERROR_MISSING_INIT_PARAM);
-			}
+		if (cdnResources == null) {
+			throw new IllegalArgumentException(ERROR_MISSING_INIT_PARAM);
 		}
 	}
 
