@@ -64,7 +64,7 @@ public class ValidateOrder extends ValidateMultipleFields {
 		LT(new Callback.ReturningWithArgument<Boolean, List<Comparable>>() {
 			@Override
 			public Boolean invoke(List<Comparable> values) {
-				return new ArrayList<Comparable>(nullSafeTreeSet(values)).equals(values);
+				return new ArrayList<>(nullSafeTreeSet(values)).equals(values);
 			}
 		}),
 

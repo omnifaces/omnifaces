@@ -58,7 +58,7 @@ public final class Exceptions {
 	 * @return The unwrapped root cause.
 	 * @since 1.4
 	 */
-	public static <T extends Throwable> Throwable unwrap(Throwable exception) {
+	public static Throwable unwrap(Throwable exception) {
 		return unwrap(unwrap(exception, FacesException.class), ELException.class);
 	}
 
