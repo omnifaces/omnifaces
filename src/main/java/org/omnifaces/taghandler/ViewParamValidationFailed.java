@@ -15,6 +15,7 @@
  */
 package org.omnifaces.taghandler;
 
+import static java.lang.Boolean.TRUE;
 import static org.omnifaces.util.Events.addCallbackAfterPhaseListener;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.FacesLocal.redirect;
@@ -58,20 +59,21 @@ import org.omnifaces.util.Faces;
  * parameter has already handled the validation error via its own <code>&lt;o:viewParamValidationFailed&gt;</code>,
  * it will be applied when there's a general validation error as per {@link FacesContext#isValidationFailed()}.
  * <p>
- * When the <code>sendRedirect</code> attribute is set, a call to {@link Faces#redirect(String, String…)} is made internally
- * to send the redirect. So, the same rules as to scheme and leading slash apply here.
- * When the <code>sendError</code> attribute is set, a call to {@link Faces#responseSendError(int, String)} is made internally
- * to send the error. You can therefore customize HTTP error pages via <code>&lt;error-page&gt;</code> entries in <code>web.xml</code>.
- * Otherwise the server-default one will be displayed instead.
+ * When the <code>sendRedirect</code> attribute is set, a call to {@link Faces#redirect(String, String…)} is made
+ * internally to send the redirect. So, the same rules as to scheme and leading slash apply here.
+ * When the <code>sendError</code> attribute is set, a call to {@link Faces#responseSendError(int, String)} is made
+ * internally to send the error. You can therefore customize HTTP error pages via <code>&lt;error-page&gt;</code>
+ * entries in <code>web.xml</code>. Otherwise the server-default one will be displayed instead.
  *
- * <h3>f:viewParam required="true" fail</h3>
+ * <h3>&lt;f:viewParam required="true"&gt; fail</h3>
  * <p>
- * As a precaution; be aware that <code>&lt;f:viewParam required="true"&gt;</code> has a design error in current 
- * Mojarra and MyFaces releases (as of now, Mojarra 2.2.7 and MyFaces 2.2.4). When the parameter is not specified in 
+ * As a precaution; be aware that <code>&lt;f:viewParam required="true"&gt;</code> has a design error in current
+ * Mojarra and MyFaces releases (as of now, Mojarra 2.2.7 and MyFaces 2.2.4). When the parameter is not specified in
  * the query string it is retrieved as <code>null</code>, which causes an internal <code>isRequired()</code> check to be
- * performed instead of delegating the check to the standard <code>UIInput</code> implementation. This has the consequence 
- * that <code>PreValidateEvent</code> and <code>PostValidateEvent</code> listeners are never invoked, which the
- * <code>&lt;o:viewParamValidationFailed&gt;</code> is actually relying on. This is fixed in <code>&lt;o:viewParam</code>.
+ * performed instead of delegating the check to the standard <code>UIInput</code> implementation. This has the
+ * consequence that <code>PreValidateEvent</code> and <code>PostValidateEvent</code> listeners are never invoked, which
+ * the <code>&lt;o:viewParamValidationFailed&gt;</code> is actually relying on. This is fixed in
+ * <code>&lt;o:viewParam</code>.
  *
  * <h3>Examples</h3>
  * <p>
@@ -97,7 +99,7 @@ import org.omnifaces.util.Faces;
  * </pre>
  * <p>
  * In the example below, only when the "foo" parameter is absent, regardless of the "bar" or "baz" parameters
- * an HTTP 401 error will be returned to the client. When the "foo" parameter is present, but either the "bar" or 
+ * an HTTP 401 error will be returned to the client. When the "foo" parameter is present, but either the "bar" or
  * "baz" parameter is absent, the client will be redirected to "search.xhtml".
  * <pre>
  * &lt;f:metadata&gt;
@@ -116,7 +118,7 @@ import org.omnifaces.util.Faces;
  *
  * <h3>Messaging</h3>
  * <p>
- * By default, the first occurring faces message on the parent component will be copied, or when there is none the first 
+ * By default, the first occurring faces message on the parent component will be copied, or when there is none the first
  * occurring global faces message will be copied. When <code>sendRedirect</code> is used it will be set
  * as a global flash error message. When <code>sendError</code> is used it will be set as HTTP status message.
  * <p>
@@ -127,6 +129,12 @@ import org.omnifaces.util.Faces;
  * ...
  * &lt;o:viewParamValidationFailed sendError="401" message="Authentication failed. You need to login." /&gt;
  * </pre>
+ *
+ * <p>
+ * Note, although all of above examples use <code>required="true"</code>, this does not mean that you can only use
+ * <code>&lt;o:viewParamValidationFailed&gt;</code> in combination with <code>required="true"</code> validation. You
+ * can use it in combination with any kind of conversion/validation on <code>&lt;f|o:viewParam</code>, even bean
+ * validation.
  *
  * <h3>Design notes</h3>
  * <p>
@@ -226,14 +234,24 @@ public class ViewParamValidationFailed extends TagHandler implements ComponentSy
     		return; // Should never occur, but you never know.
     	}
 
-    	final FacesContext context = getContext();
+    	FacesContext context = getContext();
     	final UIComponent component = event.getComponent();
+    	addCallbackAfterPhaseListener(context.getCurrentPhaseId(), new Callback.Void() {
+			@Override
+			public void invoke() {
+				// We can't unsubscribe immediately inside processEvent() itself, as it would otherwise end up in a
+				// ConcurrentModificationException while JSF is iterating over all system event listeners.
+				// The unsubscribe is necessary in order to avoid InstantiationException on this tag during restore
+				// view of a postback, because ComponentSystemEventListener instances are also saved in JSF view state.
+				component.unsubscribeFromEvent(PostValidateEvent.class, ViewParamValidationFailed.this);
+			}
+		});
 
 		if (component instanceof UIViewParameter ? ((UIViewParameter) component).isValid() : !context.isValidationFailed()) {
 			return; // Validation has not failed.
 		}
 
-    	if (context.getAttributes().put(getClass().getName(), true) != null) {
+    	if (context.getAttributes().put(getClass().getName(), TRUE) == TRUE) {
 			return; // Validation fail has already been handled before. We can't send redirect or error multiple times.
 		}
 
@@ -244,16 +262,6 @@ public class ViewParamValidationFailed extends TagHandler implements ComponentSy
 		);
 
 		evaluateAttributesAndHandleSendRedirectOrError(context, firstFacesMessage);
-    	addCallbackAfterPhaseListener(context.getCurrentPhaseId(), new Callback.Void() {
-			@Override
-			public void invoke() {
-				// We can't unsubscribe immediately inside processEvent() itself, as it would otherwise end up in a
-				// concurrent modification exception while JSF is iterating over all system event listeners.
-				// The unsubscribe is necessary in order to avoid InstantiationException on this tag during restore
-				// view of a postback, because ComponentSystemEventListener instances are also saved in JSF view state.
-				component.unsubscribeFromEvent(PostValidateEvent.class, ViewParamValidationFailed.this);
-			}
-		});
 	}
 
 	private String cleanupFacesMessagesAndGetFirst(Iterator<FacesMessage> facesMessages) {
