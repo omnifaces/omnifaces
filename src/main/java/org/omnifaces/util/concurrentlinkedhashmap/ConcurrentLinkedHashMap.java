@@ -246,7 +246,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
     listener = builder.listener;
     pendingNotifications = (listener == DiscardingListener.INSTANCE)
         ? (Queue<Node>) DISCARDING_QUEUE
-        : new ConcurrentLinkedQueue<>();
+        : new ConcurrentLinkedQueue<Node>();
   }
 
   /** Ensures that the object is not null. */
@@ -1666,7 +1666,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
     public Builder<K, V> weigher(Weigher<? super V> weigher) {
       this.weigher = (weigher == Weighers.singleton())
           ? Weighers.<K, V>entrySingleton()
-          : new BoundedEntryWeigher<>(Weighers.asEntryWeigher(weigher));
+          : new BoundedEntryWeigher<K, V>(Weighers.asEntryWeigher(weigher));
       return this;
     }
 
