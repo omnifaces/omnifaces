@@ -108,8 +108,9 @@ public final class Messages {
 
 	/**
 	 * Set the custom message resolver. It can be set only once. It's recommend to do it early during webapp's startup,
-	 * for example with a {@link ServletContextListener}, or a Servlet 3.0 <code>ServletContainerInitializer</code>, or
-	 * an eagerly initialized {@link ApplicationScoped} {@link ManagedBean}.
+	 * for example with a {@link ServletContextListener} as {@link WebListener}, or a
+	 * {@link ServletContainerInitializer} in custom JAR, or a {@link ApplicationScoped} bean, or an eagerly initialized
+	 * {@link Startup} bean.
 	 * @param resolver The custom message resolver.
 	 * @throws IllegalStateException When the resolver has already been set.
 	 */

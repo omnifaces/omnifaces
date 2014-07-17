@@ -31,12 +31,13 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.annotation.WebListener;
 
+import org.omnifaces.ApplicationInitializer;
 import org.omnifaces.config.WebXml;
 import org.omnifaces.eventlistener.DefaultServletContextListener;
 
 /**
  * Convenience class for Servlet 3.0 users, which will map the FacesServlet to extensions found
- * during scanning in {@link FacesViewsInitializer}. This part of the initialization is executed
+ * during scanning in {@link ApplicationInitializer}. This part of the initialization is executed
  * in a separate ServletContextListener, because the FacesServlet has to be available. This is
  * not guaranteed to be the case in an ServletContainerInitializer.
  * <p>

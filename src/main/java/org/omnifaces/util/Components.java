@@ -308,10 +308,10 @@ public final class Components {
 			return context.getFacesContext().getAttributes().get("javax.faces.visit.SKIP_ITERATION") == Boolean.TRUE;
 		}
 	}
-	
-	
+
+
 	// Iteration / Visiting -------------------------------------------------------------------------------------------
-	
+
 	/**
 	 * Invokes an operation on every component in the component tree.
 	 * <p>
@@ -326,7 +326,7 @@ public final class Components {
 	public static ForEach forEachComponent() {
 		return new ForEach();
 	}
-	
+
 	/**
 	 * Invokes an operation on every component in the component tree.
 	 * <p>
@@ -335,7 +335,7 @@ public final class Components {
 	 * simplified functional interfaces / lambdas.
 	 * <p>
 	 * See {@link UIComponent#visitTree(VisitContext, VisitCallback)}
-	 * 
+	 *
 	 * @param facesContext the faces context used for tree visiting
 	 *
 	 * @since 2.0
@@ -343,11 +343,11 @@ public final class Components {
 	public static ForEach forEachComponent(FacesContext facesContext) {
 		return new ForEach(facesContext);
 	}
-	
+
 	/**
 	 * Builder class used to collect a number of query parameters for a visit (for each) of components in the JSF
 	 * component tree. The chain of collecting parameters is terminated by calling one of the invoke methods.
-	 * 
+	 *
 	 * @since 2.0
 	 * @author Arjan Tijms
 	 *
@@ -370,7 +370,7 @@ public final class Components {
 
 		/**
 		 * The root component where tree visiting starts
-		 * 
+		 *
 		 * @param root the root component where tree visiting starts
 		 * @return the intermediate builder object to continue the builder chain
 		 */
@@ -381,7 +381,7 @@ public final class Components {
 
 		/**
 		 * The IDs of the components that are visited
-		 * 
+		 *
 		 * @param ids the IDs of the components that are visited
 		 * @return the intermediate builder object to continue the builder chain
 		 */
@@ -392,7 +392,7 @@ public final class Components {
 
 		/**
 		 * The IDs of the components that are to be visited
-		 * 
+		 *
 		 * @param ids the IDs of the components that are to be visited
 		 * @return the intermediate builder object to continue the builder chain
 		 */
@@ -403,7 +403,7 @@ public final class Components {
 
 		/**
 		 * The VisitHints that are used for the visit.
-		 * 
+		 *
 		 * @param hints the VisitHints that are used for the visit.
 		 * @return the intermediate builder object to continue the builder chain
 		 */
@@ -414,7 +414,7 @@ public final class Components {
 
 		/**
 		 * The VisitHints that are used for the visit.
-		 * 
+		 *
 		 * @param hints the VisitHints that are used for the visit.
 		 * @return the intermediate builder object to continue the builder chain
 		 */
@@ -431,15 +431,15 @@ public final class Components {
 			}
 			return this;
 		}
-		
+
 		/**
 		 * The types of the components that are to be visited
-		 * 
+		 *
 		 * @param types the types of the components that are to be visited
 		 * @return the intermediate builder object to continue the builder chain
 		 */
 		@SafeVarargs
-		final public ForEach ofTypes(Class<? extends UIComponent>... types) {
+		public final ForEach ofTypes(Class<? extends UIComponent>... types) {
 			this.types = types;
 			return this;
 		}
@@ -447,7 +447,7 @@ public final class Components {
 		/**
 		 * Invokes the given operation on the components as specified by the
 		 * query parameters set via this builder.
-		 * 
+		 *
 		 * @param operation the operation to invoke on each component
 		 */
 		public void invoke(final Callback.WithArgument<UIComponent> operation) {
@@ -459,11 +459,11 @@ public final class Components {
 				}
 			});
 		}
-		
+
 		/**
 		 * Invokes the given operation on the components as specified by the
 		 * query parameters set via this builder.
-		 * 
+		 *
 		 * @param operation the operation to invoke on each component
 		 */
 		public void invoke(final Callback.ReturningWithArgument<VisitResult, UIComponent> operation) {
@@ -474,19 +474,19 @@ public final class Components {
 				}
 			});
 		}
-		
+
 		/**
 		 * Invokes the given operation on the components as specified by the
 		 * query parameters set via this builder.
-		 * 
+		 *
 		 * @param operation the operation to invoke on each component
 		 */
-		public void invoke(final VisitCallback visitCallback) {
-			VisitCallback callback = visitCallback;
+		public void invoke(final VisitCallback operation) {
+			VisitCallback callback = operation;
 			if (types != null) {
 				callback = new TypesVisitCallback(types, callback);
 			}
-			
+
 			getRoot().visitTree(createVisitContext(getContext(), getIds(), getHints()), callback);
 		}
 
@@ -505,17 +505,17 @@ public final class Components {
 		protected Set<VisitHint> getHints() {
 			return hints;
 		}
-		
+
 		private static class TypesVisitCallback implements VisitCallback {
-			
-			private Class<? extends UIComponent>[] types; 
+
+			private Class<? extends UIComponent>[] types;
 			private VisitCallback next;
-			
+
 			public TypesVisitCallback(Class<? extends UIComponent>[] types, VisitCallback next) {
 				this.types = types;
 				this.next = next;
 			}
-			
+
 			@Override
 			public VisitResult visit(VisitContext context, UIComponent target) {
 				if (isOneInstanceOf(target.getClass(), types)) {
@@ -525,7 +525,7 @@ public final class Components {
 			}
 		}
 	}
-	
+
 
 	// Manipulation ---------------------------------------------------------------------------------------------------
 
