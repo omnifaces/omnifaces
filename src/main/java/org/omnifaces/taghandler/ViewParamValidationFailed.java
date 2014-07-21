@@ -73,7 +73,7 @@ import org.omnifaces.util.Faces;
  * performed instead of delegating the check to the standard <code>UIInput</code> implementation. This has the
  * consequence that <code>PreValidateEvent</code> and <code>PostValidateEvent</code> listeners are never invoked, which
  * the <code>&lt;o:viewParamValidationFailed&gt;</code> is actually relying on. This is fixed in
- * <code>&lt;o:viewParam</code>.
+ * <code>&lt;o:viewParam&gt;</code>.
  *
  * <h3>Examples</h3>
  * <p>
@@ -139,7 +139,7 @@ import org.omnifaces.util.Faces;
  * <h3>Design notes</h3>
  * <p>
  * You can technically nest multiple <code>&lt;o:viewParamValidationFailed&gt;</code> inside the same parent, but this
- * is not the documented approach and the behavior is unspecified.
+ * is not the documented approach and only the first one would be used.
  * <p>
  * You can <strong>not</strong> change the HTTP status code of a redirect. This is not a JSF limitation, but an HTTP
  * limitation. The status code of a redirect will <strong>always</strong> end up as the one of the redirected response.
@@ -191,8 +191,9 @@ public class ViewParamValidationFailed extends TagHandler implements ComponentSy
      * attributes are set, then subscribe the parent component to the {@link PostValidateEvent}. This will invoke the
      * {@link #processEvent(ComponentSystemEvent)} method after validation.
      * @throws IllegalArgumentException When the parent component is not an instance of {@link UIViewRoot} or
-     * {@link UIViewParameter}, or when both <code>sendRedirect</code> and <code>sendError</code> attributes are
-     * missing or simultaneously specified, you can specify only one of them.
+     * {@link UIViewParameter}, or when there's already another <code>&lt;o:viewParamValidationFailed&gt;</code> tag
+     * registered on the same parent, or when both <code>sendRedirect</code> and <code>sendError</code> attributes are
+     * missing or simultaneously specified.
      */
     @Override
     public void apply(FaceletContext context, final UIComponent parent) throws IOException {
