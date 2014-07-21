@@ -24,11 +24,11 @@ import org.omnifaces.util.Faces;
 
 /**
  * <p>OmniFaces application initializer. So far, this performs the following tasks:
- * <ul>
+ * <ol>
  * <li>Log the OmniFaces version.
- * <li>Check if CDI is present, otherwise log and fail.
+ * <li>Check if CDI is enabled, otherwise log and fail.
  * <li>Initialize FacesViews.
- * </li>
+ * </ol>
  *
  * @author Bauke Scholtz
  * @since 2.0
