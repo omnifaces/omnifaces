@@ -15,10 +15,16 @@
  */
 package org.omnifaces.application;
 
+import static javax.faces.convert.Converter.DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE_PARAM_NAME;
+import static org.omnifaces.util.Faces.getInitParameter;
+
+import java.util.TimeZone;
+
 import javax.faces.FacesException;
 import javax.faces.application.Application;
 import javax.faces.application.ApplicationWrapper;
 import javax.faces.convert.Converter;
+import javax.faces.convert.DateTimeConverter;
 import javax.faces.validator.Validator;
 
 import org.omnifaces.config.BeanManager;
@@ -45,6 +51,7 @@ public class OmniApplication extends ApplicationWrapper {
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private final Application wrapped;
+	private final TimeZone dateTimeConverterDefaultTimeZone;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -54,6 +61,10 @@ public class OmniApplication extends ApplicationWrapper {
 	 */
 	public OmniApplication(Application wrapped) {
 		this.wrapped = wrapped;
+		dateTimeConverterDefaultTimeZone =
+			Boolean.valueOf(getInitParameter(DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE_PARAM_NAME))
+				? TimeZone.getDefault()
+				: null;
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -70,6 +81,7 @@ public class OmniApplication extends ApplicationWrapper {
 			Converter converter = ((ConverterProvider) provider).createConverter(getWrapped(), converterId);
 
 			if (converter != null) {
+				setDefaultPropertiesIfNecessary(converter);
 				return converter;
 			}
 		}
@@ -89,6 +101,7 @@ public class OmniApplication extends ApplicationWrapper {
 			Converter converter = ((ConverterProvider) provider).createConverter(getWrapped(), targetClass);
 
 			if (converter != null) {
+				setDefaultPropertiesIfNecessary(converter);
 				return converter;
 			}
 		}
@@ -118,6 +131,14 @@ public class OmniApplication extends ApplicationWrapper {
 	@Override
 	public Application getWrapped() {
 		return wrapped;
+	}
+
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	private void setDefaultPropertiesIfNecessary(Converter converter) {
+		if (converter instanceof DateTimeConverter && dateTimeConverterDefaultTimeZone != null) {
+			((DateTimeConverter) converter).setTimeZone(dateTimeConverterDefaultTimeZone);
+		}
 	}
 
 }
