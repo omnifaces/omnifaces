@@ -28,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -232,7 +233,8 @@ public final class Servlets {
 	 * {@link Faces#redirect(String, String...)}. The major advantage over calling
 	 * {@link HttpServletResponse#sendRedirect(String)} is that this method also recognizes JSF ajax requests which
 	 * requires a special XML response in order to successfully perform the redirect. This enables you to perform a
-	 * fullworthy "JSF redirect" from inside a servlet filter or even a plain vanilla servlet.
+	 * fullworthy "JSF redirect" from inside a servlet filter or even a plain vanilla servlet, where the
+	 * {@link FacesContext} is normally not available.
 	 * <p>
 	 * If the given URL does <b>not</b> start with <code>http://</code>, <code>https://</code> or <code>/</code>, then
 	 * the request context path will be prepended, otherwise it will be the unmodified redirect URL. So, when
