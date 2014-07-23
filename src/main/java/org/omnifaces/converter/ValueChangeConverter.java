@@ -46,6 +46,7 @@ import javax.faces.convert.Converter;
  *     // ...
  * }
  * </pre>
+ * <p>
  * So, essentially, just replace <code>implements Converter</code> by <code>extends ValueChangeConverter</code> and
  * rename the method from <code>getAsObject</code> to <code>getAsChangedObject</code>.
  * Note: the <code>getAsString</code> method of your converter doesn't need to be changed.

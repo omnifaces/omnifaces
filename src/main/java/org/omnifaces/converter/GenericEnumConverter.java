@@ -55,6 +55,7 @@ import javax.faces.convert.FacesConverter;
  * to create a new enum converter every time.
  *
  * <h3>Usage</h3>
+ * <p>
  * This converter is available by converter ID <code>omnifaces.GenericEnumConverter</code>. Just specify it in the
  * <code>converter</code> attribute of the multi-selection component holding <code>&lt;f:selectItems&gt;</code>.
  * example:

@@ -44,7 +44,9 @@ import org.omnifaces.util.State;
  * set to <code>true</code> then it will even not be rendered at all. You would need to workaround this with an ugly
  * <code>&lt;h:outputText escape="false"&gt;</code>.
  * <pre>
- * &lt;h:outputText value="&amp;lt;!--[if lte IE 7]&amp;gt;&amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;ie6-ie7.css&amp;quot; /&amp;gt;&amp;lt;![endif]--&amp;gt;" escape="false" /&gt;
+ * &lt;h:outputText
+ *     value="&amp;lt;!--[if lte IE 7]&amp;gt;&amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;ie6-ie7.css&amp;quot; /&amp;gt;&amp;lt;![endif]--&amp;gt;"
+ *     escape="false" /&gt;
  * </pre>
  * <p>This component is designed to solve this problem.
  * <pre>

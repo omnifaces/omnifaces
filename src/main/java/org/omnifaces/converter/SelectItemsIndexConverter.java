@@ -38,7 +38,7 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
  * This converter is available by converter ID <code>omnifaces.SelectItemsIndexConverter</code>. Just specify it in the
  * <code>converter</code> attribute of the selection component holding <code>&lt;f:selectItems&gt;</code>.
  * <pre>
- * &lt;h:selectOneMenu value="#{bean.selectedItem}" converter="omnifaces.SelectItemsConverter"&gt;
+ * &lt;h:selectOneMenu value="#{bean.selectedItem}" converter="omnifaces.SelectItemsIndexConverter"&gt;
  *     &lt;f:selectItems value="#{bean.availableItems}" /&gt;
  * &lt;/h:selectOneMenu&gt;
  * </pre>

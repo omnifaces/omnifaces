@@ -55,10 +55,7 @@ import org.omnifaces.util.Utils;
  * a request such as <code>http://example.com/mypage?user=100</code>:
  *
  * <pre>
- * {@literal @}Inject {@literal @}Param(
- *     converter="#{userconverter}"
- * 	   validator="#{priviledgedUser}"
- * )
+ * {@literal @}Inject {@literal @}Param(converter="#{userconverter}", validator="#{priviledgedUser}")
  * private ParamValue&lt;User&gt; user;
  * </pre>
  * <p>

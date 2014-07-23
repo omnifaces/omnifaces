@@ -28,7 +28,7 @@ import org.omnifaces.util.Hacks;
 
 /**
  * <p>
- * The <strong>&lt;o:deferredScript&gt;</strong> is a component based on the standard <code>&lt;h:outputScript&gt;</code>
+ * The <code>&lt;o:deferredScript&gt;</code> is a component based on the standard <code>&lt;h:outputScript&gt;</code>
  * which defers the loading of the given script resource to the window load event. In other words, the given script
  * resource is only loaded when the window is really finished with loading. So, the enduser can start working with the
  * webpage without waiting for the additional scripts to be loaded. Usually, it are those kind of scripts which are just

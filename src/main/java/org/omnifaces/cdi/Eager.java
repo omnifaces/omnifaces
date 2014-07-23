@@ -118,15 +118,16 @@ import org.omnifaces.cdi.eager.EagerBeansSessionListener;
  *
  * <pre>
  * java.lang.IllegalArgumentException: Should never reach here
- *  at org.apache.catalina.connector.SessionTracker.track(SessionTracker.java:168)
- *  at org.apache.catalina.connector.Request.doGetSession(Request.java:2939)
- *  at org.apache.catalina.connector.Request.getSession(Request.java:2583)
- *  at org.apache.catalina.connector.RequestFacade.getSession(RequestFacade.java:920)
- *  at javax.servlet.http.HttpServletRequestWrapper.getSession(HttpServletRequestWrapper.java:259)
- *  at com.sun.faces.context.ExternalContextImpl.getSession(ExternalContextImpl.java:155)
- *  at javax.faces.context.ExternalContextWrapper.getSession(ExternalContextWrapper.java:396)
- *  at javax.faces.context.ExternalContextWrapper.getSession(ExternalContextWrapper.java:396)
- *  </pre>
+ *     at org.apache.catalina.connector.SessionTracker.track(SessionTracker.java:168)
+ *     at org.apache.catalina.connector.Request.doGetSession(Request.java:2939)
+ *     at org.apache.catalina.connector.Request.getSession(Request.java:2583)
+ *     at org.apache.catalina.connector.RequestFacade.getSession(RequestFacade.java:920)
+ *     at javax.servlet.http.HttpServletRequestWrapper.getSession(HttpServletRequestWrapper.java:259)
+ *     at com.sun.faces.context.ExternalContextImpl.getSession(ExternalContextImpl.java:155)
+ *     at javax.faces.context.ExternalContextWrapper.getSession(ExternalContextWrapper.java:396)
+ *     at javax.faces.context.ExternalContextWrapper.getSession(ExternalContextWrapper.java:396)
+ *     ...
+ * </pre>
  *
  * If any or both of those problems occur, a filter needs to be installed instead in <code>web.xml</code> as follows:
  *

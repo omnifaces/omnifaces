@@ -48,7 +48,9 @@ import javax.servlet.http.HttpSession;
  * public class LoginFilter extends HttpFilter {
  *
  *     {@literal @}Override
- *     public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException, IOException {
+ *     public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
+ *         throws ServletException, IOException
+ *     {
  *         if (session != null &amp;&amp; session.getAttribute("user") != null) {
  *             chain.doFilter(request, response);
  *         }
