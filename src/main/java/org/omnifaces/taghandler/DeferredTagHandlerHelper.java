@@ -43,7 +43,7 @@ import javax.faces.view.facelets.ValidatorHandler;
  *
  * @author Bauke Scholtz
  */
-final class RenderTimeTagHandlerHelper {
+final class DeferredTagHandlerHelper {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
@@ -57,7 +57,7 @@ final class RenderTimeTagHandlerHelper {
 	/**
 	 * Hide constructor.
 	 */
-	private RenderTimeTagHandlerHelper() {
+	private DeferredTagHandlerHelper() {
 		//
 	}
 
@@ -74,7 +74,7 @@ final class RenderTimeTagHandlerHelper {
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 */
 	@SuppressWarnings("unchecked")
-	static <T> T createInstance(FaceletContext context, RenderTimeTagHandler tag, String instanceId) {
+	static <T> T createInstance(FaceletContext context, DeferredTagHandler tag, String instanceId) {
 		ValueExpression binding = getValueExpression(context, tag, "binding", Object.class);
 		ValueExpression id = getValueExpression(context, tag, instanceId, String.class);
 		T instance = null;
@@ -105,16 +105,17 @@ final class RenderTimeTagHandlerHelper {
 	}
 
 	/**
-	 * Collect the EL properties of the given object. If the property is a literal text (i.e. no EL expression),
-	 * then it will just be set directly on the given object, else it will be collected and returned.
+	 * Collect the deferred attributes of the given object. If the property is a literal text (i.e. no EL expression),
+	 * then it will just be set directly on the given object, else it will be collected as {@link ValueExpression} and
+	 * setter method pairs and returned.
 	 * @param context The involved facelet context.
 	 * @param instance The instance to collect EL properties for.
-	 * @return The EL properties of the given object.
+	 * @return The deferred attributes of the given object.
 	 */
-	static <T> RenderTimeAttributes collectRenderTimeAttributes
-		(FaceletContext context, RenderTimeTagHandler tag, T instance)
+	static <T> DeferredAttributes collectDeferredAttributes
+		(FaceletContext context, DeferredTagHandler tag, T instance)
 	{
-		RenderTimeAttributes attributes = new RenderTimeAttributes();
+		DeferredAttributes attributes = new DeferredAttributes();
 
 		try {
 			for (PropertyDescriptor property : Introspector.getBeanInfo(instance.getClass()).getPropertyDescriptors()) {
@@ -154,7 +155,7 @@ final class RenderTimeTagHandlerHelper {
 	 * @return The given attribute as a {@link ValueExpression}.
 	 */
 	static <T> ValueExpression getValueExpression
-		(FaceletContext context, RenderTimeTagHandler tag, String name, Class<T> type)
+		(FaceletContext context, DeferredTagHandler tag, String name, Class<T> type)
 	{
 		TagAttribute attribute = tag.getTagAttribute(name);
 		return (attribute != null) ? attribute.getValueExpression(context, type) : null;
@@ -168,11 +169,11 @@ final class RenderTimeTagHandlerHelper {
 	 *
 	 * @author Bauke Scholtz
 	 */
-	static interface RenderTimeTagHandler {
+	static interface DeferredTagHandler {
 
 		/**
 		 * Just return TagHandler#getAttribute() via a public method (it's by default protected and otherwise thus
-		 * unavailable inside collectRenderTimeAttributes().
+		 * unavailable inside collectDeferredAttributes().
 		 */
 		public TagAttribute getTagAttribute(String name);
 
@@ -184,15 +185,15 @@ final class RenderTimeTagHandlerHelper {
 	}
 
 	/**
-	 * Convenience class which holds all render time attribute setters and value expressions.
+	 * Convenience class which holds all deferred attribute setters and value expressions.
 	 *
 	 * @author Bauke Scholtz
 	 */
-	static class RenderTimeAttributes {
+	static class DeferredAttributes {
 
 		private Map<Method, ValueExpression> attributes;
 
-		private RenderTimeAttributes() {
+		private DeferredAttributes() {
 			attributes = new HashMap<>();
 		}
 
@@ -218,12 +219,12 @@ final class RenderTimeTagHandlerHelper {
 	 *
 	 * @author Bauke Scholtz
 	 */
-	static class RenderTimeTagHandlerDelegate extends TagHandlerDelegate implements AttachedObjectHandler {
+	static class DeferredTagHandlerDelegate extends TagHandlerDelegate implements AttachedObjectHandler {
 
 		private DelegatingMetaTagHandler tag;
 		private TagHandlerDelegate delegate;
 
-		public RenderTimeTagHandlerDelegate(DelegatingMetaTagHandler tag, TagHandlerDelegate delegate) {
+		public DeferredTagHandlerDelegate(DelegatingMetaTagHandler tag, TagHandlerDelegate delegate) {
 			this.tag = tag;
 			this.delegate = delegate;
 		}

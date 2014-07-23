@@ -12,8 +12,8 @@
  */
 package org.omnifaces.taghandler;
 
-import static org.omnifaces.taghandler.RenderTimeTagHandlerHelper.collectRenderTimeAttributes;
-import static org.omnifaces.taghandler.RenderTimeTagHandlerHelper.createInstance;
+import static org.omnifaces.taghandler.DeferredTagHandlerHelper.collectDeferredAttributes;
+import static org.omnifaces.taghandler.DeferredTagHandlerHelper.createInstance;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -29,26 +29,27 @@ import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagAttribute;
 import javax.faces.view.facelets.TagHandlerDelegate;
 
-import org.omnifaces.taghandler.RenderTimeTagHandlerHelper.RenderTimeAttributes;
-import org.omnifaces.taghandler.RenderTimeTagHandlerHelper.RenderTimeTagHandler;
-import org.omnifaces.taghandler.RenderTimeTagHandlerHelper.RenderTimeTagHandlerDelegate;
+import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredAttributes;
+import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandler;
+import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDelegate;
 
 /**
- * The <code>&lt;o:converter&gt;</code> basically extends the <code>&lt;f:converter&gt;</code> tag family with the
- * possibility to evaluate the value expression in all attributes on a per request basis instead of on a per view
- * build time basis. This allows the developer to change the attributes on a per request basis.
+ * <p>
+ * The <code>&lt;o:converter&gt;</code> is a taghandler that extends the standard <code>&lt;f:converter&gt;</code> tag
+ * family with support for deferred value expressions in all attributes. In other words, the converter attributes are
+ * not evaluated anymore on a per view build time basis, but just on every access like as with UI components.
  * <p>
  * When you specify for example the standard <code>&lt;f:convertDateTime&gt;</code> by
  * <code>converterId="javax.faces.DateTime"</code>, then you'll be able to use all its attributes such as
  * <code>pattern</code> and <code>locale</code> as per its documentation, but then with the possibility to supply
- * request based value expressions.
+ * deferred value expressions.
  * <pre>
  * &lt;o:converter converterId="javax.faces.DateTime" pattern="#{item.pattern}" locale="#{item.locale}" /&gt;
  * </pre>
  *
  * @author Bauke Scholtz
  */
-public class Converter extends ConverterHandler implements RenderTimeTagHandler {
+public class Converter extends ConverterHandler implements DeferredTagHandler {
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -86,8 +87,8 @@ public class Converter extends ConverterHandler implements RenderTimeTagHandler 
 		}
 
 		final javax.faces.convert.Converter converter = createInstance(context, this, "converterId");
-		final RenderTimeAttributes attributes = collectRenderTimeAttributes(context, this, converter);
-		((ValueHolder) parent).setConverter(new RenderTimeConverter() {
+		final DeferredAttributes attributes = collectDeferredAttributes(context, this, converter);
+		((ValueHolder) parent).setConverter(new DeferredConverter() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -117,7 +118,7 @@ public class Converter extends ConverterHandler implements RenderTimeTagHandler 
 
 	@Override
 	protected TagHandlerDelegate getTagHandlerDelegate() {
-		return new RenderTimeTagHandlerDelegate(this, super.getTagHandlerDelegate());
+		return new DeferredTagHandlerDelegate(this, super.getTagHandlerDelegate());
 	}
 
 	@Override
@@ -132,7 +133,7 @@ public class Converter extends ConverterHandler implements RenderTimeTagHandler 
 	 *
 	 * @author Bauke Scholtz
 	 */
-	protected static abstract class RenderTimeConverter implements javax.faces.convert.Converter, Serializable {
+	protected static abstract class DeferredConverter implements javax.faces.convert.Converter, Serializable {
 		private static final long serialVersionUID = 1L;
 	}
 
