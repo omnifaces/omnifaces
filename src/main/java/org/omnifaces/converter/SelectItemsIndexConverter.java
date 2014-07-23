@@ -29,16 +29,28 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
 
 /**
  * <p>
- * The <strong><code>SelectItemsIndexConverter</code></strong> automatically converts between the index of the select
- * item value and the select item value itself based on its position in the associated select items for the component
- * for which conversion is taking place.
+ * The <code>omnifaces.SelectItemsIndexConverter</code> is a variant of the {@link SelectItemsConverter} which
+ * automatically converts based on the position (index) of the selected item in the list instead of the
+ * {@link #toString()} of the selected item.
+ *
+ * <h3>Usage</h3>
+ * <p>
+ * This converter is available by converter ID <code>omnifaces.SelectItemsIndexConverter</code>. Just specify it in the
+ * <code>converter</code> attribute of the selection component holding <code>&lt;f:selectItems&gt;</code>.
+ * <pre>
+ * &lt;h:selectOneMenu value="#{bean.selectedItem}" converter="omnifaces.SelectItemsConverter"&gt;
+ *     &lt;f:selectItems value="#{bean.availableItems}" /&gt;
+ * &lt;/h:selectOneMenu&gt;
+ * </pre>
+ *
+ * <h3>Pros and cons as compared to {@link SelectItemsConverter}</h3>
  * <p>
  * This converter has the following advantages over {@link SelectItemsConverter}:
  * <ul>
- * <li>No need to rely on <code>toString()</code> method of the object.</li>
- * <li>No need to extend the {@link SelectItemsConverter} when <code>toString()</code> method of the object cannot be
+ * <li>No need to rely on {@link #toString()} method of the object.</li>
+ * <li>No need to extend the {@link SelectItemsConverter} when {@link #toString()} method of the object cannot be
  * used.</li>
- * <li>No need to expose the object's unique key if that's a problem.</li>
+ * <li>No need to expose the object's unique key in its {@link #toString()},if that's a problem.</li>
  * </ul>
  * <p>
  * This converter has the following disadvantage over {@link SelectItemsConverter}:
@@ -48,14 +60,6 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
  * that exactly the same list is preserved on postback (e.g. by making it a property of a view scoped or broader scoped
  * bean).</li>
  * </ul>
- * <p>
- * This converter is available by converter ID <code>omnifaces.SelectItemsIndexConverter</code>. Basic usage example:
- * <pre>
- * &lt;h:selectOneMenu value="#{bean.selectedEntity}" converter="omnifaces.SelectItemsIndexConverter"&gt;
- *   &lt;f:selectItems value="#{bean.availableEntities}" var="entity"
- *     itemValue="#{entity}" itemLabel="#{entity.someProperty}" /&gt;
- * &lt;/h:selectOneMenu&gt;
- * </pre>
  *
  * @author Patrick Dobler
  * @author Bauke Scholtz

@@ -24,8 +24,9 @@ import javax.faces.context.ResponseWriter;
 import org.omnifaces.util.State;
 
 /**
- * <strong>OutputFormat</strong> is a component that extends the standard {@link HtmlOutputFormat} and provides support
- * for capturing the output and exposing it into the request scope by the variable name as specified by the
+ * <p>
+ * The <code>&lt;o:outputFormat&gt;</code> is a component that extends the standard <code>&lt;h:outputFormat&gt;</code>
+ * with support for capturing the output and exposing it into the request scope by the variable name as specified by the
  * <code>var</code> attribute.
  * <p>
  * You can use it the same way as <code>&lt;h:outputFormat&gt;</code>, you only need to change <code>h:</code> into

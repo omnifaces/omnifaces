@@ -33,9 +33,10 @@ import org.omnifaces.util.Json;
 import org.omnifaces.util.State;
 
 /**
- * <p><strong>CommandScript</strong> is an extension to <code>&lt;h:commandXxx&gt;</code> which generates a JavaScript
- * function in the global JavaScript scope which allows the end-user to execute a JSF ajax request by just a function
- * call <code>functionName()</code> in the JavaScript context.
+ * <p>
+ * The <code>&lt;o:commandScript&gt;</code> is a component based on the standard <code>&lt;h:commandXxx&gt;</code> which
+ * generates a JavaScript function in the global JavaScript scope which allows the end-user to execute a JSF ajax
+ * request by just a function call <code>functionName()</code> in the JavaScript context.
  * <p>
  * The <code>&lt;o:commandScript&gt;</code> component is required to be enclosed in a {@link UIForm} component. The
  * <code>name</code> attribute is required and it represents the JavaScript function name. The <code>execute</code>
@@ -78,6 +79,11 @@ import org.omnifaces.util.State;
  * String name1 = Faces.getRequestParameter("name1"); // value1
  * String name2 = Faces.getRequestParameter("name2"); // value2
  * </pre>
+ * <p>
+ * This is much similar to PrimeFaces <code>&lt;p:remoteCommand&gt;</code>,
+ * expect that the <code>&lt;o:commandScript&gt;</code> uses the standard JSF ajax API instead of the PrimeFaces/jQuery ajax API.
+ * So it wouldn't trigger jQuery-specific event listeners, but only JSF-specific event listeners
+ * (e.g. <code>jsf.ajax.addOnEvent()</code> and so on).
  *
  * @author Bauke Scholtz
  * @since 1.3

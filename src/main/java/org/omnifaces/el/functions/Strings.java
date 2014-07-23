@@ -24,7 +24,11 @@ import org.omnifaces.util.Faces;
 import org.omnifaces.util.Utils;
 
 /**
- * Collection of EL functions for string manipulation.
+ * <p>
+ * Collection of EL functions for string manipulation: <code>of:abbreviate()</code>, <code>of:capitalize()</code>, <code>of:concat()</code>,
+ * <code>of:prettyURL()</code>, <code>of:encodeURL()</code>, <code>of:escapeJS()</code> and <code>of:formatX()</code>.
+ * <p>
+ * Instead of <code>of:formatX()</code>, you can also use <code>&lt;o:outputFormat&gt;</code>.
  *
  * @author Bauke Scholtz
  */

@@ -7,6 +7,7 @@ import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 
 /**
+ * <p>
  * Utility class for simplifying some web related tasks that use JNDI under the hood, such as getting the
  * <code>&lt;env-entry&gt;</code> from <code>web.xml</code>.
  * <p>
@@ -30,8 +31,8 @@ public final class JNDI {
 	 * <p>
 	 * Note that the name used here is relative to "java:comp/env", which is exactly as it appears in <code>web.xml</code>.
 	 * <p>
-	 * Example: <br/><br/>
-	 *
+	 * Example:
+	 * <p>
 	 * <b>web.xml</b>
 	 * <pre>
 	 * &lt;env-entry&gt;
@@ -40,12 +41,12 @@ public final class JNDI {
 	 *	&lt;env-entry-value&gt;10&lt;/env-entry-value&gt;
 	 * &lt;/env-entry&gt;
 	 * </pre>
-	 *
+	 * <p>
 	 * <b>Lookup in Java using relative name</b>
 	 * <pre>
 	 * Integer test = JNDI.getEnvEntry("org.omnifaces.TEST_INTEGER");
 	 * </pre>
-	 *
+	 * <p>
 	 * <b>Lookup in Java using full JNDI name</b>
 	 * <pre>
 	 * Integer test = JNDI.lookup("java:comp/env/org.omnifaces.TEST_INTEGER");

@@ -56,6 +56,8 @@ public class BeanValidationEventListener implements SystemEventListener {
 
 	/**
 	 * Construct an instance of bean validation event listener based on the given validation groups and disabled state.
+	 * @param validationGroups The validation groups.
+	 * @param disabled The disabled state.
 	 */
 	public BeanValidationEventListener(String validationGroups, boolean disabled) {
 		this.validationGroups = validationGroups;
@@ -90,7 +92,7 @@ public class BeanValidationEventListener implements SystemEventListener {
 	 */
 	private void handlePreValidate(UIInput component) {
 		final BeanValidator beanValidator = getBeanValidator(component);
-		final String validationGroups = this.disabled ? NoValidationGroup.class.getName() : this.validationGroups;
+		final String validationGroups = disabled ? NoValidationGroup.class.getName() : this.validationGroups;
 		final String originalValidationGroups = beanValidator.getValidationGroups();
 
 		if (originalValidationGroups != null) {

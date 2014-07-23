@@ -13,7 +13,9 @@
 package org.omnifaces.el.functions;
 
 /**
- * Collection of EL functions for array manipulation.
+ * <p>
+ * Collection of EL functions for array manipulation: <code>of:createArray()</code>, <code>of:createIntegerArray()</code>,
+ * and <code>of:contains()</code>.
  *
  * @author Bauke Scholtz
  */
@@ -53,7 +55,8 @@ public final class Arrays {
 	 * represent days and years. If the begin is greater than end, then the array will be decremental. If the begin
 	 * equals end, then the array will contain only one item.
 	 * @param begin The begin integer.
-	 * @return end The end integer.
+	 * @param end The end integer.
+	 * @return An integer array which starts at the given integer and ends at the given integer, inclusive
 	 */
 	public static Integer[] createIntegerArray(int begin, int end) {
 		int direction = (begin < end) ? 1 : (begin > end) ? -1 : 0;

@@ -38,16 +38,23 @@ import javax.faces.event.SystemEventListener;
 import org.omnifaces.util.Ajax;
 
 /**
- * <strong>OnloadScript</strong> is an extension to <code>&lt;h:outputScript&gt;</code> which will be executed in the
- * end of the HTML body (thus when all HTML elements are initialized in the HTML DOM tree) and will re-execute its
- * script body on every ajax request. This is particularly useful if you want to re-execute a specific helper script
- * to manipulate the HTML DOM tree, such as (re-)adding fancy tooltips, performing highlights, etcetera, also after
- * changes in the HTML DOM tree on ajax responses.
+ * <p>
+ * The <code>&lt;o:onloadScript</code> is a component that extends the standard <code>&lt;h:outputScript&gt;</code>
+ * which will be executed in the end of the HTML body (thus when all HTML elements are initialized in the HTML DOM tree)
+ * and will re-execute its script body on every ajax request. This is particularly useful if you want to re-execute a
+ * specific helper script to manipulate the HTML DOM tree, such as (re-)adding fancy tooltips, performing highlights,
+ * etcetera, also after changes in the HTML DOM tree on ajax responses.
  * <p>
  * You can put it anywhere in the view, it will always be relocated to the end of body.
  * <pre>
  * &lt;o:onloadScript&gt;alert('OnloadScript is invoked!');&lt;/o:onloadScript&gt;
  * </pre>
+ * <p>
+ * The <code>&lt;o:onloadScript&gt;</code> is implicitly relocated to the end of the <code>&lt;body&gt;</code>,
+ * exactly like as <code>&lt;h:outputScript target="body"&gt;</code> does. So it's always executed when the entire
+ * <code>&lt;body&gt;</code> is finished populating and thus you don't need a <code>window.onload</code> or a
+ * <code>$(document).ready()</code> in there. Again, the difference with <code>&lt;h:outputScript target="body"&gt;</code>
+ * is that the <code>&lt;o:onloadScript&gt;</code> is also executed on every ajax request.
  *
  * @author Bauke Scholtz
  */

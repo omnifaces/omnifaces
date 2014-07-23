@@ -21,10 +21,12 @@ import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.el.ELException;
 import javax.faces.FacesException;
 import javax.faces.application.ViewHandler;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.ExceptionHandler;
+import javax.faces.context.ExceptionHandlerFactory;
 import javax.faces.context.ExceptionHandlerWrapper;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
@@ -33,35 +35,59 @@ import javax.faces.event.ExceptionQueuedEvent;
 import javax.faces.event.PhaseId;
 import javax.faces.event.PreRenderViewEvent;
 import javax.faces.view.ViewDeclarationLanguage;
+import javax.faces.webapp.FacesServlet;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.omnifaces.config.WebXml;
 import org.omnifaces.context.OmniPartialViewContext;
+import org.omnifaces.filter.FacesExceptionFilter;
 import org.omnifaces.util.Exceptions;
 import org.omnifaces.util.Hacks;
 
 /**
- * This exception handler enables you to show the full error page in its entirety to the end-user in case of exceptions
- * during ajax requests. Refer to the documentation of {@link FullAjaxExceptionHandlerFactory} to see how to set this up.
+ * <p>
+ * The {@link FullAjaxExceptionHandler} will transparently handle exceptions during ajax requests exactly the same way
+ * as exceptions during synchronous (non-ajax) requests.
+ * <p>
+ * By default, when an exception occurs during a JSF ajax request, the enduser would not get any form of feedback if the
+ * action was successfully performed or not. In Mojarra, only when the project stage is set to <code>Development</code>,
+ * the enduser would see a bare JavaScript alert with only the exception type and message. It would make sense if
+ * exceptions during ajax requests are handled the same way as exceptions during synchronous requests, which is
+ * utilizing the standard Servlet API <code>&lt;error-page&gt;</code> mechanisms in <code>web.xml</code>.
+ *
+ * <h3>Installation</h3>
+ * <p>
+ * This handler must be registered by a factory as follows in <code>faces-config.xml</code> in order to get it to run:
+ * <pre>
+ * &lt;factory&gt;
+ *     &lt;exception-handler-factory&gt;org.omnifaces.exceptionhandler.FullAjaxExceptionHandlerFactory&lt;/exception-handler-factory&gt;
+ * &lt;/factory&gt;
+ * </pre>
+ *
+ * <h3>Error pages</h3>
  * <p>
  * This exception handler will parse the <code>web.xml</code> and <code>web-fragment.xml</code> files to find the error
  * page locations of the HTTP error code <code>500</code> and all declared specific exception types. Those locations
- * need to point to Facelets files (JSP is not supported). The location of the HTTP error code <code>500</code> or the
- * exception type <code>java.lang.Throwable</code> is required in order to get the full ajax exception handler to work,
- * because there's then at least a fall back error page whenever there's no match with any of the declared specific
- * exceptions. So, you must at least have either
+ * need to point to Facelets files (JSP is not supported) and the URL must match the {@link FacesServlet} mapping (just
+ * mapping it on <code>*.xhtml</code> should eliminate confusion about virtual URLs).
+ * <p>
+ * The location of the HTTP error code <code>500</code> or the exception type <code>java.lang.Throwable</code> is
+ * <b>required</b> in order to get the {@link FullAjaxExceptionHandler} to work, because there's then at least a fall
+ * back error page whenever there's no match with any of the declared specific exceptions. So, you must at least have
+ * either
  * <pre>
  * &lt;error-page&gt;
- *   &lt;error-code&gt;500&lt;/error-code&gt;
- *   &lt;location&gt;/errors/500.xhtml&lt;/location&gt;
+ *     &lt;error-code&gt;500&lt;/error-code&gt;
+ *     &lt;location&gt;/WEB-INF/errorpages/500.xhtml&lt;/location&gt;
  * &lt;/error-page&gt;
  * </pre>
  * <p>or
  * <pre>
  * &lt;error-page&gt;
- *   &lt;exception-type&gt;java.lang.Throwable&lt;/exception-type&gt;
- *   &lt;location&gt;/errors/500.xhtml&lt;/location&gt;
+ *     &lt;exception-type&gt;java.lang.Throwable&lt;/exception-type&gt;
+ *     &lt;location&gt;/WEB-INF/errorpages/500.xhtml&lt;/location&gt;
  * &lt;/error-page&gt;
  * </pre>
  * <p>
@@ -72,17 +98,17 @@ import org.omnifaces.util.Hacks;
  * normal synchronous error page response. You could for example show them in the error page as follows:
  * <pre>
  * &lt;ul&gt;
- *   &lt;li&gt;Date/time: #{of:formatDate(now, 'yyyy-MM-dd HH:mm:ss')}&lt;/li&gt;
- *   &lt;li&gt;User agent: #{header['user-agent']}&lt;/li&gt;
- *   &lt;li&gt;User IP: #{request.remoteAddr}&lt;/li&gt;
- *   &lt;li&gt;Request URI: #{requestScope['javax.servlet.error.request_uri']}&lt;/li&gt;
- *   &lt;li&gt;Ajax request: #{facesContext.partialViewContext.ajaxRequest ? 'Yes' : 'No'}&lt;/li&gt;
- *   &lt;li&gt;Status code: #{requestScope['javax.servlet.error.status_code']}&lt;/li&gt;
- *   &lt;li&gt;Exception type: #{requestScope['javax.servlet.error.exception_type']}&lt;/li&gt;
- *   &lt;li&gt;Exception message: #{requestScope['javax.servlet.error.message']}&lt;/li&gt;
- *   &lt;li&gt;Stack trace:
- *     &lt;pre&gt;#{of:printStackTrace(requestScope['javax.servlet.error.exception'])}&lt;/pre&gt;
- *   &lt;/li&gt;
+ *     &lt;li&gt;Date/time: #{of:formatDate(now, 'yyyy-MM-dd HH:mm:ss')}&lt;/li&gt;
+ *     &lt;li&gt;User agent: #{header['user-agent']}&lt;/li&gt;
+ *     &lt;li&gt;User IP: #{request.remoteAddr}&lt;/li&gt;
+ *     &lt;li&gt;Request URI: #{requestScope['javax.servlet.error.request_uri']}&lt;/li&gt;
+ *     &lt;li&gt;Ajax request: #{facesContext.partialViewContext.ajaxRequest ? 'Yes' : 'No'}&lt;/li&gt;
+ *     &lt;li&gt;Status code: #{requestScope['javax.servlet.error.status_code']}&lt;/li&gt;
+ *     &lt;li&gt;Exception type: #{requestScope['javax.servlet.error.exception_type']}&lt;/li&gt;
+ *     &lt;li&gt;Exception message: #{requestScope['javax.servlet.error.message']}&lt;/li&gt;
+ *     &lt;li&gt;Stack trace:
+ *         &lt;pre&gt;#{of:printStackTrace(requestScope['javax.servlet.error.exception'])}&lt;/pre&gt;
+ *     &lt;/li&gt;
  * &lt;/ul&gt;
  * </pre>
  * <p>
@@ -91,16 +117,35 @@ import org.omnifaces.util.Hacks;
  * therefore safely be resetted. When rendering of the error page itself fails due to a bug in the error page itself
  * and the response can still be resetted, then a hardcoded message will be returned informing the developer about the
  * double mistake.
+ *
+ * <h3>Error in error page itself</h3>
+ * <p>
+ * When the rendering of the error page itself failed due to a bug in the error page itself, then the
+ * {@link FullAjaxExceptionHandler} will reset the response and display a hardcoded error message in "plain text".
+ *
+ * <h3>Normal requests</h3>
+ * <p>
+ * Note that the {@link FullAjaxExceptionHandler} does not deal with normal (non-ajax) requests at all. To properly
+ * handle JSF and EL exceptions on normal requests as well, you need an additional {@link FacesExceptionFilter}. This
+ * will extract the root cause from a wrapped {@link FacesException} and {@link ELException} before delegating the
+ * {@link ServletException} further to the container (the container will namely use the first root cause of
+ * {@link ServletException} to match an error page by exception in web.xml).
+ *
+ * <h3>Customizing <code>FullAjaxExceptionHandler</code></h3>
  * <p>
  * If more fine grained control is desired for determining the root cause of the caught exception, or whether it should
  * be handled, or determining the error page, or logging the exception, then the developer can opt to extend this
- * {@link FullAjaxExceptionHandler} and override one or more of the following methods:
+ * {@link FullAjaxExceptionHandler} and override one or more of the following protected methods:
  * <ul>
  * <li>{@link #findExceptionRootCause(FacesContext, Throwable)}
  * <li>{@link #shouldHandleExceptionRootCause(FacesContext, Throwable)}
  * <li>{@link #findErrorPageLocation(FacesContext, Throwable)}
  * <li>{@link #logException(FacesContext, Throwable, String, String, Object...)}
  * </ul>
+ * <p>
+ * Don't forget to create a custom {@link ExceptionHandlerFactory} for it as well, so that it could be registered
+ * in <code>faces-config.xml</code>. This does not necessarily need to extend from
+ * {@link FullAjaxExceptionHandlerFactory}.
  *
  * @author Bauke Scholtz
  * @see FullAjaxExceptionHandlerFactory

@@ -21,7 +21,9 @@ import java.text.NumberFormat;
 import org.omnifaces.util.Faces;
 
 /**
- * Collection of EL functions for numbers.
+ * <p>
+ * Collection of EL functions for number formatting: <code>of:formatBytes()</code>, <code>of:formatCurrency()</code>,
+ * <code>of:formatNumber()</code>, <code>of:formatNumberDefault()</code> and <code>of:formatPercent()</code>.
  *
  * @author Bauke Scholtz
  * @since 1.2

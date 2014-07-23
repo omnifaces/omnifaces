@@ -56,15 +56,71 @@ import javax.servlet.http.HttpSession;
 import org.omnifaces.component.ParamHolder;
 
 /**
+ * <p>
  * Collection of utility methods for the JSF API that are mainly shortcuts for obtaining stuff from the thread local
- * {@link FacesContext}. In effect, it 'flattens' the hierarchy of nested objects.
+ * {@link FacesContext}. In effects, it 'flattens' the hierarchy of nested objects. Do note that using the hierarchy is
+ * actually a better software design practice, but can lead to verbose code.
  * <p>
- * Do note that using the hierarchy is actually a better software design practice, but can lead to verbose code.
+ * Next to those oneliner delegate calls, there are also some helpful methods which eliminates multiline boilerplate
+ * code, such as {@link #getLocale()} which returns sane fallback values, a more convenient
+ * {@link #redirect(String, String...)} which automatically prepends the context path when the path does not start with
+ * <code>/</code> and offers support for URL encoding of request parameters supplied by varargs argument, and several
+ * useful {@link #sendFile(File, boolean)} methods which allows you to provide a {@link File}, <code>byte[]</code> or
+ * {@link InputStream} as a download to the client.
+ *
+ * <h3>Usage</h3>
  * <p>
- * In addition, note that there's normally a minor overhead in obtaining the thread local {@link FacesContext}. In case
- * client code needs to call methods in this class multiple times it's expected that performance will be slightly better
- * if instead the {@link FacesContext} is obtained once and the required methods are called on that, although the
- * difference is practically negligible when used in modern server hardware.
+ * Some examples:
+ * <pre>
+ * // Get a session attribute (no explicit cast necessary!).
+ * User user = Faces.getSessionAttribute("user");
+ * </pre>
+ * <pre>
+ * // Evaluate EL programmatically (no explicit cast necessary!).
+ * Item item = Faces.evaluateExpressionGet("#{item}");
+ * </pre>
+ * <pre>
+ * // Get a cookie value.
+ * String cookieValue = Faces.getRequestCookie("cookieName");
+ * </pre>
+ * <pre>
+ * // Get all supported locales with default locale as first item.
+ * List&lt;Locale&gt; supportedLocales = Faces.getSupportedLocales();
+ * </pre>
+ * <pre>
+ * // Check in e.g. preRenderView if session has been timed out.
+ * if (Faces.hasSessionTimedOut()) {
+ *     Messages.addGlobalWarn("Oops, you have been logged out because your session was been timed out!");
+ * }
+ * </pre>
+ * <pre>
+ * // Get value of &lt;f:metadata&gt;&lt;f:attribute name="foo"&gt; of different view without building it.
+ * String foo = Faces.getMetadataAttribute("/other.xhtml", "foo");
+ * </pre>
+ * <pre>
+ * // Send a redirect with parameters UTF-8 encoded in query string.
+ * Faces.redirect("product.xhtml?id=%d&amp;name=%s", product.getId(), product.getName());
+ * </pre>
+ * <pre>
+ * // Invalidate the session and send a redirect.
+ * public void logout() throws IOException {
+ *     Faces.invalidateSession();
+ *     Faces.redirect("login.xhtml"); // Can by the way also be done by return "login?faces-redirect=true" if in action method.
+ * }
+ * </pre>
+ * <pre>
+ * // Provide a file as attachment.
+ * public void download() throws IOException {
+ *     Faces.sendFile(new File("/path/to/file.ext"), true);
+ * }
+ * </pre>
+ *
+ * <h3>FacesLocal</h3>
+ * <p>
+ * Note that there's normally a minor overhead in obtaining the thread local {@link FacesContext}. In case client code
+ * needs to call methods in this class multiple times it's expected that performance will be slightly better if instead
+ * the {@link FacesContext} is obtained once and the required methods are called on that, although the difference is
+ * practically negligible when used in modern server hardware.
  * <p>
  * In such case, consider using {@link FacesLocal} instead. The difference with {@link Faces} is that no one method of
  * {@link FacesLocal} obtains the {@link FacesContext} from the current thread by
@@ -973,7 +1029,7 @@ public final class Faces {
 	 * You can use {@link String#format(String, Object...)} placeholder <code>%s</code> in the redirect URL to represent
 	 * placeholders for any request parameter values which needs to be URL-encoded. Here's a concrete example:
 	 * <pre>
-	 * Faces.redirect("other.xhtml?foo=%s&bar=%s", foo, bar);
+	 * Faces.redirect("other.xhtml?foo=%s&amp;bar=%s", foo, bar);
 	 * </pre>
 	 * <p>
 	 * This method implicitly also calls {@link Flash#setRedirect(boolean)} with <code>true</code> so that any flash
@@ -998,7 +1054,7 @@ public final class Faces {
 	 * You can use {@link String#format(String, Object...)} placeholder <code>%s</code> in the redirect URL to represent
 	 * placeholders for any request parameter values which needs to be URL-encoded. Here's a concrete example:
 	 * <pre>
-	 * Faces.redirectPermanent("other.xhtml?foo=%s&bar=%s", foo, bar);
+	 * Faces.redirectPermanent("other.xhtml?foo=%s&amp;bar=%s", foo, bar);
 	 * </pre>
 	 * <p>
 	 * This method implicitly also calls {@link Flash#setRedirect(boolean)} with <code>true</code> so that any flash
@@ -1279,6 +1335,7 @@ public final class Faces {
 	 * <i>Note that whenever you absolutely need this method to perform a general task, you might want to consider to
 	 * submit a feature request to OmniFaces in order to add a new utility method which performs exactly this general
 	 * task.</i>
+	 * @param create Whether or not to create a new session if one doesn't exist.
 	 * @return The HTTP session.
 	 * @see ExternalContext#getSession(boolean)
 	 */
@@ -1444,7 +1501,7 @@ public final class Faces {
 	 * <code>null</code>.
 	 * @param path The application resource path to return an input stream for.
 	 * @return An input stream for an application resource mapped to the specified path.
-	 * @throws MalformedURLException
+	 * @throws MalformedURLException When the specified path is not in correct URL form.
 	 * @see ExternalContext#getResource(String)
 	 * @since 1.2
 	 */

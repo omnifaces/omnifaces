@@ -27,11 +27,54 @@ import javax.faces.validator.ValidatorException;
 import javax.servlet.ServletContextListener;
 
 /**
- * Collection of utility methods for the JSF API with respect to working with {@link FacesMessage}. It also offers the
- * possibility to set a custom message resolver so that you can control the way how messages are been resolved. You can
- * for example supply an implementation wherein the message is been treated as for example a resource bundle key.
  * <p>
- * Here's an example:
+ * Collection of utility methods for the JSF API with respect to working with {@link FacesMessage}.
+ *
+ * <h3>Usage</h3>
+ * <p>
+ * Some examples:
+ * <pre>
+ * // In a validator.
+ * throw new ValidatorException(Messages.createError("Invalid input."));
+ * </pre>
+ * <pre>
+ * // In a validator, as extra message on another component.
+ * Messages.addError("someFormId:someInputId", "This is also invalid.");
+ * </pre>
+ * <pre>
+ * // In a managed bean action method.
+ * Messages.addGlobalError("Unknown login, please try again.");
+ * </pre>
+ * <pre>
+ * // In a managed bean action method which uses Post-Redirect-Get.
+ * Messages.addFlashGlobalInfo("New item with id {0} is successfully added.", item.getId());
+ * return "items?faces-redirect=true";
+ * </pre>
+ * <p>
+ * There is also a builder which also allows you to set the message detail. Some examples:
+ * <pre>
+ * // In a validator.
+ * throw new ValidatorException(Messages.create("Invalid input.").detail("Value {0} is not expected.", value).get());
+ * </pre>
+ * <pre>
+ * // In a validator, as extra message on another component.
+ * Messages.create("This is also invalid.").error().add("someFormId:someInputId");
+ * </pre>
+ * <pre>
+ * // In a managed bean action method.
+ * Messages.create("Unknown login, please try again.").error().add();
+ * </pre>
+ * <pre>
+ * // In a managed bean action method which uses Post-Redirect-Get.
+ * Messages.create("New item with id {0} is successfully added.", item.getId()).flash().add();
+ * return "items?faces-redirect=true";
+ * </pre>
+ *
+ * <h3>Message resolver</h3>
+ * <p>
+ * It also offers the possibility to set a custom message resolver so that you can control the way how messages are been
+ * resolved. You can for example supply an implementation wherein the message is been treated as for example a resource
+ * bundle key. Here's an example:
  * <pre>
  * Messages.setResolver(new Messages.Resolver() {
  *     private static final String BASE_NAME = "com.example.i18n.messages";
@@ -49,6 +92,8 @@ import javax.servlet.ServletContextListener;
  * {@link MessageFormat#format(String, Object...)}. Note that the resolver can be set only once. It's recommend to do
  * it early during webapp's startup, for example with a {@link ServletContextListener}, or a Servlet 3.0
  * <code>ServletContainerInitializer</code>, or an eagerly initialized {@link ApplicationScoped} {@link ManagedBean}.
+ *
+ * <h3>Design notice</h3>
  * <p>
  * Note that all of those shortcut methods by design only sets the message summary and ignores the message detail (it
  * is not possible to offer varargs to parameterize <em>both</em> the summary and the detail). The message summary is

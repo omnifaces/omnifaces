@@ -17,22 +17,30 @@ import static org.omnifaces.util.Utils.isEmpty;
 import java.io.IOException;
 
 import javax.faces.component.FacesComponent;
-import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 
 import org.omnifaces.util.State;
 
 /**
- * <p><strong>ConditionalComment</strong> is an {@link UIComponent} which renders a conditional comment. Conditional
+ * <p>
+ * The <code>&lt;o:conditionalComment&gt;</code> component renders a conditional comment. Conditional
  * comments are an IE specific feature which enables the developer to (out)comment blocks of HTML depending on whether
  * the client is using IE and if so even which version. They are often seen in combination with CSS stylesheets like so:
  * <pre>
  * &lt;!--[if lte IE 7]&gt;
- *   &lt;link rel="stylesheet" href="ie6-ie7.css" /&gt;
+ *     &lt;link rel="stylesheet" href="ie6-ie7.css" /&gt;
  * &lt;![endif]--&gt;
  * </pre>
- * <p>However, Facelets renders them HTML-escaped and if <code>javax.faces.FACELETS_SKIP_COMMENTS</code> context param is
+ * <p>
+ * However, Facelets renders the comment's contents HTML-escaped which makes it unusable.
+ * <pre>
+ * &lt;!--[if lte IE 7]&amp;gt;
+ *     &amp;lt;link rel=&amp;quot;stylesheet&amp;quot; href=&amp;quot;ie6-ie7.css&amp;quot; /&amp;gt;
+ * &amp;lt;![endif]--&gt;
+ * </pre>
+ * <p>
+ * Also, if <code>javax.faces.FACELETS_SKIP_COMMENTS</code> context param is
  * set to <code>true</code> then it will even not be rendered at all. You would need to workaround this with an ugly
  * <code>&lt;h:outputText escape="false"&gt;</code>.
  * <pre>
@@ -41,7 +49,7 @@ import org.omnifaces.util.State;
  * <p>This component is designed to solve this problem.
  * <pre>
  * &lt;o:conditionalComment if="lte IE 7"&gt;
- *   &lt;link rel="stylesheet" href="ie6-ie7.css" /&gt;
+ *     &lt;link rel="stylesheet" href="ie6-ie7.css" /&gt;
  * &lt;/o:conditionalComment&gt;
  * </pre>
  * <p>Note that you cannot use this with <code>&lt;h:outputStylesheet&gt;</code> as it would implicitly be relocated as

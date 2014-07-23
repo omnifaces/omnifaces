@@ -45,8 +45,22 @@ import org.omnifaces.util.Callback;
 import org.omnifaces.util.State;
 
 /**
- * <strong>Cache</strong> is a component that captures the mark-up rendered by its children and caches this for future
- * requests.
+ * <p>
+ * The <code>&lt;o:cache&gt;</code> component allows to cache a fragment of rendered markup. The first
+ * request for a page that has this component on it will cause this markup to be put into the cache. Then
+ * for subsequent requests the cached content is used directly and none of the components, backing beans
+ * and services that were used to generate this content in the first place will be consulted.
+ * <p>
+ * Caching can take place in application scope, or in session scope. For individual fragments a
+ * time can be specified for which the cached content is valid. After this time is elapsed, the very
+ * first request to the page containing the cache component in question will cause new content to be
+ * rendered and put into the cache. A default time can be set per scope in web.xml.
+ * <p>
+ * For each scope a maximum capacity can be set. If the capacity for that scope is exceeded, an element will be
+ * removed following a least recently used policy (LRU).
+ * <p>
+ * Via a cache provider mechanism an alternative cache implementation can be configured in web.xml. The default
+ * cache is based on <a href="http://code.google.com/p/concurrentlinkedhashmap">http://code.google.com/p/concurrentlinkedhashmap</a>.
  *
  * @since 1.1
  * @author Arjan Tijms

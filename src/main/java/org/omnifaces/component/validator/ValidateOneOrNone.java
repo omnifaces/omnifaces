@@ -21,8 +21,11 @@ import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
 
 /**
- * <strong>ValidateOneOrNone</strong> validates if ONLY ONE of the given <code>UIInput</code> components has been
- * filled out or that NONE of the given <code>UIInput</code> components have been filled out. The default message is
+ * <p>
+ * The <code>&lt;o:validateOneOrNone&gt;</code> validates if ONLY ONE of the given {@link UIInput} components has been
+ * filled out or that NONE of the given {@link UIInput} components have been filled out.
+ * <p>
+ * The default message is
  * <blockquote>{0}: Please fill out only one or none of those fields</blockquote>
  * <p>
  * For general usage instructions, refer {@link ValidateMultipleFields} documentation.

@@ -37,9 +37,11 @@ import javax.faces.event.SystemEventListener;
 import org.omnifaces.util.Hacks;
 
 /**
- * Use this action listener when you want to partially (ajax) render input fields which are not executed during submit,
- * but which are possibly in an invalidated state because of a validation failure during a previous request. Those
- * input fields will be resetted so that they are not in an invalidated state anymore.
+ * <p>
+ * The {@link ResetInputAjaxActionListener} will reset input fields which are not executed during ajax submit, but which
+ * are rendered/updated during ajax response. This will prevent those input fields to remain in an invalidated state
+ * because of a validation failure during a previous request. This is very useful for cases where you need to update one
+ * form from another form by for example a modal dialog, or when you need a cancel/clear button.
  * <p>
  * How does it work? First, here are some JSF facts:
  * <ul>
@@ -69,7 +71,7 @@ import org.omnifaces.util.Hacks;
  * <code>UICommand</code> components.
  * <pre>
  * &lt;lifecycle&gt;
- *   &lt;phase-listener&gt;org.omnifaces.eventlistener.ResetInputAjaxActionListener&lt;/phase-listener&gt;
+ *     &lt;phase-listener&gt;org.omnifaces.eventlistener.ResetInputAjaxActionListener&lt;/phase-listener&gt;
  * &lt;/lifecycle&gt;
  * </pre>
  * <li><p><i>Or</i> register it as <code>&lt;action-listener&gt;</code> in <code>faces-config.xml</code>. It'll
@@ -77,7 +79,7 @@ import org.omnifaces.util.Hacks;
  * <code>&lt;h:commandButton&gt;</code> and <code>&lt;h:commandLink&gt;</code>.
  * <pre>
  * &lt;application&gt;
- *   &lt;action-listener&gt;org.omnifaces.eventlistener.ResetInputAjaxActionListener&lt;/action-listener&gt;
+ *     &lt;action-listener&gt;org.omnifaces.eventlistener.ResetInputAjaxActionListener&lt;/action-listener&gt;
  * &lt;/application&gt;
  * </pre>
  * <li><p><i>Or</i> register it as <code>&lt;f:actionListener&gt;</code> on the invidivual <code>UICommand</code>
@@ -85,8 +87,8 @@ import org.omnifaces.util.Hacks;
  * possible to register it on the individual <code>UIInput</code> components using the standard JSF tags.
  * <pre>
  * &lt;h:commandButton value="Update" action="#{bean.updateOtherInputs}"&gt;
- *   &lt;f:ajax execute="currentInputs" render="otherInputs" /&gt;
- *   &lt;f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" /&gt;
+ *     &lt;f:ajax execute="currentInputs" render="otherInputs" /&gt;
+ *     &lt;f:actionListener type="org.omnifaces.eventlistener.ResetInputAjaxActionListener" /&gt;
  * &lt;/h:commandButton&gt;
  * </pre>
  * </ul>

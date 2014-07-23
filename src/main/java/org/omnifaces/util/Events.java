@@ -27,7 +27,41 @@ import org.omnifaces.eventlistener.DefaultPhaseListener;
 import org.omnifaces.eventlistener.DefaultViewEventListener;
 
 /**
+ * <p>
  * Collection of utility methods for the JSF API with respect to working with Faces events.
+ *
+ * <h3>Usage</h3>
+ * <p>
+ * Some examples:
+ * <pre>
+ * // Add a callback to the current view which should run during every after phase of the render response.
+ * Events.addAfterPhaseListener(PhaseId.RENDER_RESPONSE, new Callback.Void() {
+ *    {@literal @}Override
+ *    public void invoke() {
+ *        // ...
+ *    }
+ * });
+ * </pre>
+ * <pre>
+ * // Add a callback to the current request which should run during after phase of the render response.
+ * Events.addCallbackAfterPhaseListener(PhaseId.RENDER_RESPONSE, new Callback.Void() {
+ *     {@literal @}Override
+ *     public void invoke() {
+ *         // ...
+ *     }
+ * });
+ * </pre>
+ * <pre>
+ * // Add a callback to the current view which should run during the pre render view event.
+ * Events.subscribeToViewEvent(PreRenderViewEvent.class, new Callback.Void() {
+ *     {@literal @}Override
+ *     public void invoke() {
+ *         // ...
+ *     }
+ * });
+ * </pre>
+ * <p>
+ * Note that you can specify any phase ID or system event to your choice.
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz
@@ -81,8 +115,9 @@ public final class Events {
 	/**
 	 * Removes the given phase listener from callbacks for the current request.
 	 *
-	 * @return <code>true</code> if the given phase listener was indeed been added, otherwise <code>false</code> (and
-	 * thus effectively no change has taken place).
+	 * @param phaseListener The phase listener to be removed from callbacks during the current request.
+	 * @return <code>true</code> if the given phase listener was indeed been added before, otherwise <code>false</code>
+	 * (and thus effectively no change has taken place).
 	 * @since 1.5
 	 * @see CallbackPhaseListener
 	 */

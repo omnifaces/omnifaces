@@ -34,19 +34,21 @@ import org.omnifaces.util.Callback;
 
 /**
  * <p>
- * The <code>&lt;o:ignoreValidationFailed&gt;</code> allows the developer to ignore validation failures when
+ * The <code>&lt;o:ignoreValidationFailed&gt;</code> taghandler allows the developer to ignore validation failures when
  * executing an {@link UICommand} action. This taghandler must be placed inside an {@link UICommand} component and the
  * parent {@link UIForm} must be an <code>&lt;o:form&gt;</code>. When executing an ajax action, make sure that the
  * parent {@link UIForm} is also included in the <code>&lt;f:ajax execute&gt;</code>.
+ *
+ * <h3>Usage</h3>
  * <p>
  * For example:
  * <pre>
  * &lt;o:form&gt;
- *   ...
- *   &lt;h:commandButton value="save valid data" action="#{bean.saveValidData}"&gt;
- *     &lt;o:ignoreValidationFailed /&gt;
- *     &lt;f:ajax execute="@form" /&gt;
- *   &lt;/h:commandButton&gt;
+ *     ...
+ *     &lt;h:commandButton value="save valid data" action="#{bean.saveValidData}"&gt;
+ *         &lt;o:ignoreValidationFailed /&gt;
+ *         &lt;f:ajax execute="@form" /&gt;
+ *     &lt;/h:commandButton&gt;
  * &lt;/o:form&gt;
  * </pre>
  * <p>

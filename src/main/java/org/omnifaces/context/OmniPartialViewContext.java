@@ -40,14 +40,17 @@ import org.omnifaces.util.Hacks;
 import org.omnifaces.util.Json;
 
 /**
+ * <p>
  * This OmniFaces partial view context extends and improves the standard partial view context as follows:
  * <ul>
  * <li>Support for executing callback scripts by {@link PartialResponseWriter#startEval()}.</li>
  * <li>Support for adding arguments to an ajax response.</li>
  * <li>Any XML tags which Mojarra and MyFaces has left open after an exception in rendering of an already committed
  * ajax response, will now be properly closed. This prevents errors about malformed XML.</li>
- * <li>Fixes the no-feedback problem when {@link ViewExpiredException} occurs during an ajax request on a restricted
- * page. The end-user will now properly be redirected to the login page.</li>
+ * <li>Fixes the no-feedback problem when a {@link ViewExpiredException} occurs during an ajax request on a page which
+ * is restricted by <code>web.xml</code> <code>&lt;security-constraint&gt;</code>. The enduser will now properly be
+ * redirected to the login page instead of retrieving an ajax response with only a changed view state (and effectively
+ * thus no visual feedback at all).</li>
  * </ul>
  * You can use the {@link Ajax} utility class to easily add callback scripts and arguments.
  * <p>
@@ -254,7 +257,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
 		public OmniPartialResponseWriter(OmniPartialViewContext context, PartialResponseWriter wrapped) {
 			super(wrapped);
-			this.wrapped = wrapped;
+			this.wrapped = wrapped; // We can't rely on getWrapped() due to MyFaces broken PartialResponseWriter.
 			this.context = context;
 		}
 
@@ -370,7 +373,9 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 			}
 		}
 
-		// Delegate actions (due to MyFaces broken PartialResponseWriter, we can't rely on getWrapped()) --------------
+		// Delegate actions -------------------------------------------------------------------------------------------
+		// Due to MyFaces broken PartialResponseWriter, which doesn't delegate to getWrapped() method, but instead to
+		// the local variable wrapped, we can't use getWrapped() in our own PartialResponseWriter implementations.
 
 		@Override
 		public void startError(String errorName) throws IOException {

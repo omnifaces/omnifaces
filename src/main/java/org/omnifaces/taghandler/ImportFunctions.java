@@ -31,10 +31,15 @@ import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
 
 /**
- * <p>The <code>&lt;o:importFunctions&gt;</code> allows the developer to have access to all functions of the given
- * fully qualified name of a type in the EL scope using the usual EL functions syntax without the need to register them
- * in <code>.taglib.xml</code> file. The functions are those <code>public static</code> methods with a
- * <strong>non</strong>-<code>void</code> return type. For example:
+ * <p>
+ * The <code>&lt;o:importFunctions&gt;</code> taghandler allows the developer to have access to all functions of the
+ * given fully qualified name of a type in the EL scope using the usual EL functions syntax without the need to register
+ * them in <code>.taglib.xml</code> file. The functions are those <code>public static</code> methods with a
+ * <strong>non</strong>-<code>void</code> return type.
+ *
+ * <h3>Usage</h3>
+ * <p>
+ * For example:
  * <pre>
  * &lt;o:importFunctions type="java.lang.Math" var="m" /&gt;
  * &lt;o:importFunctions type="org.omnifaces.util.Faces" /&gt;
@@ -44,19 +49,32 @@ import javax.faces.view.facelets.TagHandler;
  * ...
  * &lt;base href="#{Faces:getRequestBaseURL()}" /&gt;
  * </pre>
- * <p>The functions prefix becomes by default the simple name of the type. You can override this by explicitly
- * specifying the <code>var</code> attribute. If there are multiple function methods with exactly the same name, then
- * the one with the least amount of parameters will be used. If there are multiple function methods with exactly the
- * same name and amount of parameters, then the choice is unspecified (technically, JVM-dependent) and should not be
- * relied upon. So if you absolutely need to differentiate functions in such case, give them each a different name.</p>
- * <p>Note that the colon <code>:</code> operator to invoke the method is as required by EL functions spec. It's by
+ * <p>
+ * The functions prefix becomes by default the simple name of the type. You can override this by explicitly
+ * specifying the <code>var</code> attribute.
+ * <p>
+ * The resolved functions are by reference stored in the cache to improve retrieving performance.
+ *
+ * <h3>Precaution as to multiple functions with exactly the same method name</h3>
+ * <p>
+ * EL functions does <strong>not</strong> support method overloading. It's therefore <strong>not</strong> possible to
+ * provide overloaded methods like {@link Math#abs(int)}, {@link Math#abs(long)}, {@link Math#abs(float)} and
+ * {@link Math#abs(double)} in four separate EL functions.
+ * <p>
+ * If there are multiple function methods discovered with exactly the same name, then the one with the least amount of
+ * parameters will be used. If there are multiple function methods with exactly the same name and amount of parameters,
+ * then the choice is unspecified (technically, JVM-dependent, the first one in the methods array as found by reflection
+ * would be picked up) and should not be relied upon. So if you absolutely need to differentiate functions in such case,
+ * give them each a different name.
+ *
+ * <h3>Design notes</h3>
+ * <p>
+ * Note that the colon <code>:</code> operator to invoke the method is as required by EL functions spec. It's by
  * design not easily possible to change it to the period <code>.</code> operator. Also note that in case of
  * <code>org.omnifaces.util.Faces</code> it's considered poor practice if the same functionality is already available
  * through the implicit EL variables <code>#{facesContext}</code>, <code>#{view}</code>, <code>#{request}</code>, etc
  * such as <code>#{request.contextPath}</code> which should be preferred over
  * <code>#{Faces:getRequestContextPath()}</code>.</p>
- * <p>
- * The resolved functions are by reference stored in the cache to improve retrieving performance.
  *
  * @author Bauke Scholtz
  * @since 1.4

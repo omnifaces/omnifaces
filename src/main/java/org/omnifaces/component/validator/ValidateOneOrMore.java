@@ -21,8 +21,11 @@ import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
 
 /**
- * <strong>ValidateOneOrMore</strong> validates if at least ONE of the given <code>UIInput</code> components has been
- * filled out. The default message is
+ * <p>
+ * The <code>&lt;o:validateOneOrMore&gt;</code> validates if at least ONE of the given {@link UIInput} components has
+ * been filled out.
+ * <p>
+ * The default message is
  * <blockquote>{0}: Please fill out at least one of those fields</blockquote>
  * <p>
  * For general usage instructions, refer {@link ValidateMultipleFields} documentation.

@@ -35,12 +35,15 @@ import org.omnifaces.eventlistener.BeanValidationEventListener;
 import org.omnifaces.util.Callback;
 
 /**
+ * <p>
  * The <code>&lt;o:validateBean&gt;</code> allows the developer to control bean validation on a per-{@link UICommand}
  * or {@link UIInput} component basis. The standard <code>&lt;f:validateBean&gt;</code> only allows that on a per-form
  * or a per-request basis (by using multiple tags and conditional EL expressions in its attributes) which may end up in
  * boilerplate code.
+ *
+ * <h3>Usage</h3>
  * <p>
- * Usage examples:
+ * Some examples:
  * <pre>
  * &lt;h:commandButton value="submit" action="#{bean.submit}"&gt;
  *     &lt;o:validateBean validationGroups="javax.validation.groups.Default,com.example.MyGroup"/&gt;

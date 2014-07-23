@@ -27,14 +27,17 @@ import org.omnifaces.el.ValueExpressionMethodWrapper;
 import org.omnifaces.util.Hacks;
 
 /**
- * This handler wraps a value expression that's actually a method expression by another value expression that returns a method expression
- * that gets the value of first value expression, which as "side-effect" executes the original method expression.
- *
  * <p>
- * This somewhat over-the-top chain of wrapping is done so a method expression can be passed into a Facelet tag as parameter.
+ * The <code>&lt;o:methodParam&gt;</code> is a tag handler that can be used to pass a method expression as attribute
+ * into a Facelets tag. By default this is not possible, and the expression that's intended to be a method expression
+ * will be created and made available as a value expression.
+ * <p>
+ * This handler wraps a value expression that's actually a method expression by another value expression that returns a
+ * method expression that gets the value of first value expression, which as "side-effect" executes the original method
+ * expression. This somewhat over-the-top chain of wrapping is done so a method expression can be passed as attribute
+ * into a Facelet tag.
  *
  * @author Arjan Tijms
- *
  */
 public class MethodParam extends TagHandler {
 
@@ -43,8 +46,8 @@ public class MethodParam extends TagHandler {
 
 	public MethodParam(TagConfig config) {
 		super(config);
-		this.name = this.getRequiredAttribute("name");
-		this.value = this.getRequiredAttribute("value");
+		name = getRequiredAttribute("name");
+		value = getRequiredAttribute("value");
 	}
 
 	@Override

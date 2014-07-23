@@ -15,7 +15,9 @@ package org.omnifaces.util;
 import static org.omnifaces.util.Components.getCurrentComponent;
 import static org.omnifaces.util.Components.getCurrentForm;
 
+import java.beans.Introspector;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -29,8 +31,22 @@ import javax.faces.context.PartialViewContext;
 import org.omnifaces.context.OmniPartialViewContext;
 
 /**
+ * <p>
  * Collection of utility methods for working with {@link PartialViewContext}. There are also shortcuts to the current
  * {@link OmniPartialViewContext} instance.
+ * <p>
+ * This utility class allows an easy way of programmaticaly (from inside a managed bean method) specifying new client
+ * IDs which should be ajax-updated, also {@link UIData} rows or columns on specific index, specifying callback scripts
+ * which should be executed on complete of the ajax response and adding arguments to the JavaScript scope. The added
+ * arguments are during the "on complete" phase as a JSON object available by <code>OmniFaces.Ajax.data</code> in
+ * JavaScript context.
+ * <p>
+ * The JSON object is been encoded by {@link Json#encode(Object)} which supports standard Java types {@link Boolean},
+ * {@link Number}, {@link CharSequence} and {@link Date} arrays, {@link Collection}s and {@link Map}s of them and as
+ * last resort it will use the {@link Introspector} to examine it as a Javabean and encode it like a {@link Map}.
+ * <p>
+ * Note that {@link #updateRow(UIData, int)} and {@link #updateColumn(UIData, int)} can only update cell content when
+ * it has been wrapped in some container component with a fixed ID.
  *
  * @author Bauke Scholtz
  * @since 1.2

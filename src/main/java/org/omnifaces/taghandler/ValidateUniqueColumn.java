@@ -37,22 +37,25 @@ import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
 
 /**
- * <strong>ValidateUniqueColumn</strong> validates if the given {@link UIInput} component in an {@link UIData} component
- * has an unique value throughout all rows, also those not visible by pagination. This validator works directly on the
- * data model and may therefore not work as expected if the data model does not represent <strong>all</strong> available
- * rows of the {@link UIData} component (e.g. when there's means of lazy loading).
+ * <p>
+ * The <code>&lt;o:validateUniqueColumn&gt;</code> validates if the given {@link UIInput} component in an {@link UIData}
+ * component has an unique value throughout all rows, also those not visible by pagination. This validator works
+ * directly on the data model and may therefore not work as expected if the data model does not represent
+ * <strong>all</strong> available rows of the {@link UIData} component (e.g. when there's means of lazy loading).
  * <p>
  * The default message is
  * <blockquote>{0}: Please fill out an unique value for the entire column. Duplicate found in row {1}</blockquote>
+ *
+ * <h3>Usage</h3>
  * <p>
  * Usage example:
  * <pre>
  * &lt;h:dataTable value="#{bean.items}" var="item"&gt;
- *   &lt;h:column&gt;
- *     &lt;h:inputText value="#{item.value}"&gt;
- *       &lt;o:validateUniqueColumn /&gt;
- *     &lt;/h:inputText&gt;
- *   &lt;/h:column&gt;
+ *     &lt;h:column&gt;
+ *         &lt;h:inputText value="#{item.value}"&gt;
+ *             &lt;o:validateUniqueColumn /&gt;
+ *         &lt;/h:inputText&gt;
+ *     &lt;/h:column&gt;
  * &lt;/h:dataTable&gt;
  * </pre>
  * <p>

@@ -22,79 +22,80 @@ import org.omnifaces.util.Messages;
 import org.omnifaces.util.State;
 
 /**
+ * <p>
  * The <code>&lt;o:messages&gt;</code> is a component that extends the standard <code>&lt;h:messages&gt;</code> with
  * the following new features:
  * <dl>
  * <dt>Multiple <code>for</code> components</dt>
  * <dd>Possibility to specify multiple client IDs space separated in the <code>for</code> attribute. The example below
  * would only display messages for <code>input1</code> and <code>input3</code>:
- * <pre><code>
+ * <pre>
  * &lt;h:form&gt;
- *   &lt;o:messages for="input1 input3" /&gt;
- *   &lt;h:inputText id="input1" /&gt;
- *   &lt;h:inputText id="input2" /&gt;
- *   &lt;h:inputText id="input3" /&gt;
- *   &lt;h:inputText id="input4" /&gt;
+ *     &lt;o:messages for="input1 input3" /&gt;
+ *     &lt;h:inputText id="input1" /&gt;
+ *     &lt;h:inputText id="input2" /&gt;
+ *     &lt;h:inputText id="input3" /&gt;
+ *     &lt;h:inputText id="input4" /&gt;
  * &lt;/h:form&gt;
- * </code></pre>
+ * </pre>
  * It can even refer non-input components which in turn contains input components. The example below would only display
  * messages for <code>input1</code> and <code>input2</code>:
- * <pre><code>
+ * <pre>
  * &lt;h:form&gt;
- *   &lt;o:messages for="inputs" /&gt;
- *   &lt;h:panelGroup id="inputs"&gt;
- *     &lt;h:inputText id="input1" /&gt;
- *     &lt;h:inputText id="input2" /&gt;
- *   &lt;/h:panelGroup&gt;
- *   &lt;h:inputText id="input3" /&gt;
- *   &lt;h:inputText id="input4" /&gt;
+ *     &lt;o:messages for="inputs" /&gt;
+ *     &lt;h:panelGroup id="inputs"&gt;
+ *         &lt;h:inputText id="input1" /&gt;
+ *         &lt;h:inputText id="input2" /&gt;
+ *     &lt;/h:panelGroup&gt;
+ *     &lt;h:inputText id="input3" /&gt;
+ *     &lt;h:inputText id="input4" /&gt;
  * &lt;/h:form&gt;
- * </code></pre>
+ * </pre>
  * You can even combine them. The example below would only display messages for <code>input1</code>,
  * <code>input2</code> and <code>input4</code>.
- * <pre><code>
+ * <pre>
  * &lt;h:form&gt;
- *   &lt;o:messages for="inputs input4" /&gt;
- *   &lt;h:panelGroup id="inputs"&gt;
- *     &lt;h:inputText id="input1" /&gt;
- *     &lt;h:inputText id="input2" /&gt;
- *   &lt;/h:panelGroup&gt;
- *   &lt;h:inputText id="input3" /&gt;
- *   &lt;h:inputText id="input4" /&gt;
+ *     &lt;o:messages for="inputs input4" /&gt;
+ *     &lt;h:panelGroup id="inputs"&gt;
+ *         &lt;h:inputText id="input1" /&gt;
+ *         &lt;h:inputText id="input2" /&gt;
+ *     &lt;/h:panelGroup&gt;
+ *     &lt;h:inputText id="input3" /&gt;
+ *     &lt;h:inputText id="input4" /&gt;
  * &lt;/h:form&gt;
- * </code></pre>
+ * </pre>
  * </dd>
  * <dt>Displaying single message</dt>
  * <dd>Show a single custom message whenever the component has received any faces message. This is particularly useful
  * when you want to display a global message in case any of the in <code>for</code> specified components has a faces
  * message. For example:
- * <pre><code>
+ * <pre>
  * &lt;o:messages for="form" message="There are validation errors. Please fix them." /&gt;
  * &lt;h:form id="form"&gt;
- *   &lt;h:inputText id="input1" /&gt;&lt;h:message for="input1" /&gt;
- *   &lt;h:inputText id="input2" /&gt;&lt;h:message for="input2" /&gt;
- *   &lt;h:inputText id="input3" /&gt;&lt;h:message for="input3" /&gt;
+ *     &lt;h:inputText id="input1" /&gt;&lt;h:message for="input1" /&gt;
+ *     &lt;h:inputText id="input2" /&gt;&lt;h:message for="input2" /&gt;
+ *     &lt;h:inputText id="input3" /&gt;&lt;h:message for="input3" /&gt;
  * &lt;/h:form&gt;
- * </code></pre>
+ * </pre>
  * </dd>
  * <dt>HTML escaping</dt>
  * <dd>Control HTML escaping by the new <code>escape</code> attribute.
- * <pre><code>
+ * <pre>
  * &lt;o:messages escape="false" /&gt;
- * </code></pre>
+ * </pre>
  * Beware of potential XSS attack holes when user-controlled input is redisplayed through messages!
  * </dd>
  * <dt>Iteration markup control</dt>
  * <dd>Control iteration markup fully by the new <code>var</code> attribute which sets the current {@link FacesMessage}
  * in the request scope and disables the default table/list rendering. For example,
- * <pre><code>
+ * <pre>
  * &lt;dl&gt;
- *   &lt;o:messages var="message"&gt;
- *     &lt;dt&gt;#{message.severity}&lt;/dt&gt;
- *     &lt;dd title="#{message.detail}"&gt;#{message.summary}&lt;/dd&gt;
- *   &lt;/o:messages&gt;
+ *     &lt;o:messages var="message"&gt;
+ *         &lt;dt&gt;#{message.severity}&lt;/dt&gt;
+ *         &lt;dd title="#{message.detail}"&gt;#{message.summary}&lt;/dd&gt;
+ *     &lt;/o:messages&gt;
  * &lt;/dl&gt;
- * </code></pre>
+ * </pre>
  * Note: the iteration is by design completely stateless. It's therefore not recommended to nest form components inside
  * the <code>&lt;o:messages&gt;</code> component. It should be used for pure output only, like as the standard
  * <code>&lt;h:messages&gt;</code>. Plain output links are however no problem. Also note that the <code>message</code>

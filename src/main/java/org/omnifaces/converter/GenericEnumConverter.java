@@ -25,15 +25,17 @@ import javax.faces.convert.EnumConverter;
 import javax.faces.convert.FacesConverter;
 
 /**
- * This generic enum converter is intended for use in {@link UISelectMany} components whose value is been bound to a
- * <code>List&lt;E&gt;</code> property where <code>E</code> is an enum. Even though JSF has already a built-in
- * {@link EnumConverter}, this doesn't work for a <code>List&lt;E&gt;</code> property as the generic type information
- * <code>E</code> is lost during runtime. The list would be filled with unconverted <code>String</code> values instead
- * which may in turn cause <code>ClassCastException</code>.
  * <p>
- * If replacing the <code>List&lt;E&gt;</code> property by a <code>E[]</code> (e.g. <code>Role[]</code> in case of a
- * <code>Role</code> enum) is not an option due to design restrictions (e.g. JPA <code>@ElementCollection</code>, etc),
- * then you'd need to create an explicit converter for the enum type like follows:
+ * The <code>omnifaces.GenericEnumConverter</code> is intended for use in {@link UISelectMany} components whose value is
+ * been bound to a <code>List&lt;E&gt;</code> property where <code>E</code> is an enum. Even though JSF has already a
+ * built-in {@link EnumConverter}, this doesn't work for a <code>List&lt;E&gt;</code> property as the generic type
+ * information <code>E</code> is lost during runtime. The list would be filled with unconverted <code>String</code>
+ * values instead which may in turn cause <code>ClassCastException</code> during postprocessing in the business logic.
+ * <p>
+ * This can be solved by using a <code>E[]</code> property instead of <code>List&lt;E&gt;</code> (e.g.
+ * <code>Role[]</code> in case of a <code>Role</code> enum). If this is however is not an option due to some design
+ * restrictions (e.g. JPA <code>@ElementCollection</code>, etc), then you'd need to create an explicit converter for the
+ * enum type like follows:
  * <pre>
  * {@literal @}FacesConverter("roleConverter")
  * public class RoleConverter extends EnumConverter {
@@ -42,15 +44,23 @@ import javax.faces.convert.FacesConverter;
  *     }
  * }
  * </pre>
+ * <pre>
+ * &lt;h:selectManyCheckbox value="#{bean.selectedRoles}" converter="roleConverter"&gt;
+ *     &lt;f:selectItems value="#{bean.availableRoles}" /&gt;
+ * &lt;/h:selectManyCheckbox&gt;
+ * </pre>
  * <p>
  * However, creating a new converter for every single enum type, only and only for use in {@link UISelectMany} with a
  * <code>List&lt;E&gt;</code> property, may be a bit clumsy. This generic enum converter is intended to remove the need
  * to create a new enum converter every time.
- * <p>
- * This converter is available by converter ID <code>omnifaces.GenericEnumConverter</code>. Basic usage example:
+ *
+ * <h3>Usage</h3>
+ * This converter is available by converter ID <code>omnifaces.GenericEnumConverter</code>. Just specify it in the
+ * <code>converter</code> attribute of the multi-selection component holding <code>&lt;f:selectItems&gt;</code>.
+ * example:
  * <pre>
  * &lt;h:selectManyCheckbox value="#{bean.selectedEnums}" converter="omnifaces.GenericEnumConverter"&gt;
- *   &lt;f:selectItems value="#{bean.availableEnums}" /&gt;
+ *     &lt;f:selectItems value="#{bean.availableEnums}" /&gt;
  * &lt;/h:selectManyCheckbox&gt;
  * </pre>
  *

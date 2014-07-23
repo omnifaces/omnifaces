@@ -22,18 +22,23 @@ import javax.faces.context.FacesContext;
 import org.omnifaces.component.input.componentidparam.ConditionalWriterListener;
 
 /**
- * <strong>ComponentIdParam</strong> is a component that allows component ids to be provided as request parameters causing only components with
- * matching ids to be rendered.
  * <p>
- * Both simple component ids as well as client ids are supported. Components can be rendered without their parents having to be rendered. As such,
- * e.g. single rows appearing in a table can be rendered without any of the surrounding markup appearing in the response.
+ * The <code>&lt;o:componentIdParam&gt;</code> component allows to render just one or more components on a view via a GET
+ * parameter.
  * <p>
- * The intended usage of this component is to allow client-side scripts to request markup for specific components via a GET request (as opposed to
- * AJAX based post-backs).
+ * Components can be identified via both their client id or simple component id. Via the former it's possible to
+ * e.g. render only a specific row in a table. For specific cases, it's possible to render only the parent
+ * component and omit any children.
+ * <p>
+ * Among the use cases for this is creating simple mashups from various JSF based views, and scripts needing to obtain
+ * markup for specific components on an initial (non-faces) request.
+ * <p>
+ * Note that this is a rather specialized component and for many common use cases the user is advised to investigate if the existing
+ * AJAX and partial page requests in JSF don't already cover the requirements. For the moment this component only supports the
+ * direct output of the original markup and does not wrap it into any "partial response" envelope.
  *
  * @since 1.1
  * @author Arjan Tijms
- *
  */
 @FacesComponent(ComponentIdParam.COMPONENT_TYPE)
 public class ComponentIdParam extends ViewParam {

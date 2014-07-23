@@ -17,21 +17,50 @@ import java.io.IOException;
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
+import javax.servlet.Servlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
- * An abstract filter for HTTP requests. It provides a convenient abstract <code>doFilter()</code> method providing the
- * HTTP servlet request, response and session so that there's no need to cast them everytime. Also, default
- * implementations of {@link #init(FilterConfig)} and {@link #destroy()} are provided, so that there's no need to
- * implement them every time even when not really needed.
+ * <p>
+ * The {@link HttpFilter} is abstract filter specifically for HTTP requests. It provides a convenient abstract
+ * {@link #doFilter(HttpServletRequest, HttpServletResponse, HttpSession, FilterChain)} method directly providing the
+ * HTTP servlet request, response and session, so that there's no need to cast them everytime in the
+ * {@link #doFilter(ServletRequest, ServletResponse, FilterChain)} implementation. Also, default implementations of
+ * {@link #init(FilterConfig)} and {@link #destroy()} are provided, so that there's no need to implement them every time
+ * even when not really needed.
+ * <p>
+ * It's a bit the idea of using the convenient {@link HttpServlet} abstract servlet class instead of the barebones
+ * {@link Servlet} interface.
  *
- * @author Arjan Tijms, Bauke Scholtz
+ * <h3>Usage</h3>
+ * <p>
+ * To use it, just let your custom filter extend from {@link HttpFilter} instead of implement {@link Filter}.
+ * For example:
+ * <pre>
+ * {@literal @}WebFilter("/app/*")
+ * public class LoginFilter extends HttpFilter {
+ *
+ *     {@literal @}Override
+ *     public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException, IOException {
+ *         if (session != null &amp;&amp; session.getAttribute("user") != null) {
+ *             chain.doFilter(request, response);
+ *         }
+ *         else {
+ *             Servlets.facesRedirect(request, response, "login.xhtml");
+ *         }
+ *     }
+ * }
+ * </pre>
+ *
+ * @author Arjan Tijms
+ * @author Bauke Scholtz
  */
 public abstract class HttpFilter implements Filter {
 
@@ -79,6 +108,12 @@ public abstract class HttpFilter implements Filter {
 
 	/**
 	 * Filter the HTTP request. The session argument is <code>null</code> if there is no session.
+	 * @param request The HTTP request.
+	 * @param response The HTTP response.
+	 * @param session The HTTP session, if any, else <code>null</code>.
+	 * @param chain The filter chain to continue.
+	 * @throws ServletException As wrapper exception when something fails in the request processing.
+	 * @throws IOException Whenever something fails at I/O level.
 	 * @see Filter#doFilter(ServletRequest, ServletResponse, FilterChain)
 	 */
 	public abstract void doFilter

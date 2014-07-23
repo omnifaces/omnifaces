@@ -52,7 +52,47 @@ import javax.faces.event.MethodExpressionActionListener;
 import javax.faces.view.facelets.FaceletContext;
 
 /**
- * Collection of utility methods for the JSF API with respect to working with {@link UIComponent}.
+ * <p>
+ * Collection of utility methods for the JSF API with respect to working with {@link UIComponent}. There are several
+ * traversal/lookup methods, there are several {@link UIForm} and {@link UIInput} related methods which makes it easier
+ * to deal with forms and inputs.
+ *
+ * <h3>Usage</h3>
+ * <p>
+ * Some examples:
+ * <pre>
+ * // Get closest parent of given type.
+ * UIForm form = Components.getClosestParent(someUIInputComponent, UIForm.class);
+ * </pre>
+ * <pre>
+ * // Get currently submitted form.
+ * UIForm form = Components.getCurrentForm();
+ * </pre>
+ * <pre>
+ * // Get currently invoked command, useful for logging actions in a phase listener.
+ * UICommand command = Components.getCurrentCommand();
+ * </pre>
+ * <pre>
+ * // Get the label of the given UIInput component as JSF uses for validation messages.
+ * String label = Components.getLabel(someUIInputComponent);
+ * </pre>
+ * <pre>
+ * // Inside decode() and/or encode() of some custom component, validate if it has no children.
+ * Components.validateHasNoChildren(this);
+ * </pre>
+ * <pre>
+ * // Programmatically include composite component.
+ * Components.includeCompositeComponent(someParentComponent, libraryName, resourceName, id);
+ * </pre>
+ * <pre>
+ * // Programmatically create value and action expressions.
+ * UICommand command = new HtmlCommandButton();
+ * command.setId("foo");
+ * command.setValue(Components.createValueExpression("#{bundle['button.foo']}", String.class));
+ * command.addClientBehavior("action", Components.createAjaxBehavior("#{bean.ajaxListener}"));
+ * command.addActionListener(Components.createActionListenerMethodExpression("#{bean.actionListener}"));
+ * command.setActionExpression(Components.createVoidMethodExpression("#{bean.action}"));
+ * </pre>
  *
  * @author Bauke Scholtz
  * @author Arjan Tijms

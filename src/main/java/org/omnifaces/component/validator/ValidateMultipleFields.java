@@ -289,6 +289,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 	 * @param context The faces context to work with.
 	 * @param input The input component which may need to be invalidated.
 	 * @param value The value of the input component.
+	 * @return Whether in in an invalidating case the given input component should be marked invalid
 	 * @since 1.7
 	 */
 	protected boolean shouldInvalidateInput(FacesContext context, UIInput input, Object value) {
