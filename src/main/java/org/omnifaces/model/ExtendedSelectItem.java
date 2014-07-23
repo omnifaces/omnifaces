@@ -35,6 +35,7 @@ public class ExtendedSelectItem extends SelectItem {
      * <p>Construct a <code>SelectItem</code> with property values initialized from the corresponding
      * properties on the <code>UISelectItem</code>.
      * </p>
+     * @param uiSelectItem The UI select item.
      */
 	public ExtendedSelectItem(UISelectItem uiSelectItem) {
 		super(

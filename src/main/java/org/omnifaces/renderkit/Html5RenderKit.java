@@ -31,6 +31,7 @@ import javax.faces.component.UIInput;
 import javax.faces.component.UISelectBoolean;
 import javax.faces.component.UISelectMany;
 import javax.faces.component.UISelectOne;
+import javax.faces.component.html.HtmlCommandButton;
 import javax.faces.component.html.HtmlInputSecret;
 import javax.faces.component.html.HtmlInputText;
 import javax.faces.component.html.HtmlInputTextarea;
@@ -46,29 +47,26 @@ import javax.faces.render.RenderKitWrapper;
  * attribute is supported in {@link UIInput} components. All other attributes are by design ignored by the JSF standard
  * HTML render kit. This HTML5 render kit supports the following HTML5 specific attributes:
  * <ul>
- * <li><code>UIForm</code>: <ul><li><code>autocomplete</code></li></ul></li>
- * <li><code>UISelectBoolean</code>, <code>UISelectOne</code> and <code>UISelectMany</code>:
- * <ul><li><code>autofocus</code></li></ul></li>
- * <li><code>HtmlInputTextarea</code>: <ul><li><code>autofocus</code></li><li><code>maxlength</code></li>
- * <li><code>placeholder</code></li><li><code>spellcheck</code></li><li><code>wrap</code></li></ul></li>
- * <li><code>HtmlInputText</code>: <ul><li><code>type</code> (supported values are
- * <code>text</code> (default), <code>search</code>, <code>email</code>, <code>url</code>, <code>tel</code>,
- * <code>range</code>, <code>number</code> and <code>date</code>)</li><li><code>autofocus</code></li>
- * <li><code>list</code></li><li><code>pattern</code></li><li><code>placeholder</code></li><li><code>spellcheck</code>
- * </li><li><code>min</code></li><li><code>max</code></li><li><code>step</code></li></ul>(the latter three are only
- * supported on <code>type</code> of <code>range</code>, <code>number</code> and <code>date</code>)</li>
- * <li><code>HtmlInputSecret</code>: <ul><li><code>autofocus</code></li><li><code>pattern</code></li><li><code>
- * placeholder</code></li></ul></li>
- * <li><code>HtmlCommandButton</code>: <ul><li><code>autofocus</code></li></ul></li>
+ * <li>{@link UIForm}: <ul><li><code>autocomplete</code></li></ul></li>
+ * <li>{@link UISelectBoolean}, {@link UISelectOne} and {@link UISelectMany}: <ul><li><code>autofocus</code></li></ul></li>
+ * <li>{@link HtmlInputText}: <ul><li><code>type</code> (supported values are <code>text</code> (default), <code>search</code>, <code>email</code>, <code>url</code>, <code>tel</code>, <code>range</code>, <code>number</code> and <code>date</code>)</li><li><code>autofocus</code></li><li><code>list</code></li><li><code>pattern</code></li><li><code>placeholder</code></li><li><code>spellcheck</code></li><li><code>min</code></li><li><code>max</code></li><li><code>step</code></li></ul>(the latter three are only supported on <code>type</code> of <code>range</code>, <code>number</code> and <code>date</code>)</li>
+ * <li>{@link HtmlInputTextarea}: <ul><li><code>autofocus</code></li><li><code>maxlength</code></li><li><code>placeholder</code></li><li><code>spellcheck</code></li><li><code>wrap</code></li></ul></li>
+ * <li>{@link HtmlInputSecret}: <ul><li><code>autofocus</code></li><li><code>pattern</code></li><li><code>placeholder</code></li></ul></li>
+ * <li>{@link HtmlCommandButton}: <ul><li><code>autofocus</code></li></ul></li>
  * </ul>
  * <p>
  * Note: the <code>list</code> attribute expects a <code>&lt;datalist&gt;</code> element which needs to be coded in
- * "plain vanilla" HTML (and is currently, June 2012, only supported in Firefox 4 and Opera 11). See also
- * <a href="http://www.html5tutorial.info/html5-datalist.php">HTML5 tutorial</a>.
+ * "plain vanilla" HTML (and is currently, July 2014, only supported in IE 10, Firefox 4, Chrome 20 and Opera 11). See
+ * also <a href="http://www.html5tutorial.info/html5-datalist.php">HTML5 tutorial</a>.
  *
  * <h3>Installation</h3>
  * <p>
- * Refer the documentation of {@link Html5RenderKitFactory} how to setup it.
+ * To use the HTML5 render kit, register it as follows in <code>faces-config.xml</code>:
+ * <pre>
+ * &lt;factory&gt;
+ *     &lt;render-kit-factory&gt;org.omnifaces.renderkit.Html5RenderKitFactory&lt;/render-kit-factory&gt;
+ * &lt;/factory&gt;
+ * </pre>
  *
  * <h3>Configuration</h3>
  * <p>
@@ -80,20 +78,28 @@ import javax.faces.render.RenderKitWrapper;
  * and the value represents the commaseparated string of names of passthrough attributes. Here's an example:
  * <pre>
  * &lt;context-param&gt;
- *   &lt;param-name&gt;org.omnifaces.HTML5_RENDER_KIT_PASSTHROUGH_ATTRIBUTES&lt;/param-name&gt;
- *   &lt;param-value&gt;
- *     javax.faces.component.UIInput=x-webkit-speech,x-webkit-grammar;
- *     javax.faces.component.UIComponent=contenteditable,draggable
- *   &lt;/param-value&gt;
+ *     &lt;param-name&gt;org.omnifaces.HTML5_RENDER_KIT_PASSTHROUGH_ATTRIBUTES&lt;/param-name&gt;
+ *     &lt;param-value&gt;
+ *         javax.faces.component.UIInput=x-webkit-speech,x-webkit-grammar;
+ *         javax.faces.component.UIComponent=contenteditable,draggable
+ *       &lt;/param-value&gt;
  * &lt;/context-param&gt;
  * </pre>
+ *
+ * <h3>Mojarra f:ajax bug</h3>
+ * <p>
+ * Note that <code>&lt;f:ajax&gt;</code> of Mojarra 2.0.0-2.1.13 explicitly checks for
+ * <code>&lt;input type="text"&gt;</code> and ignores other types while preparing request parameters for ajax submit,
+ * resulting in <code>null</code> values in managed bean after an ajax submit. This has been reported as
+ * <a href="http://java.net/jira/browse/JAVASERVERFACES-2532">Mojarra issue 2532</a> and is fixed in Mojarra 2.1.14.
+ * This problem is thus completely unrelated to <code>Html5RenderKit</code>.
  *
  * <h3>JSF 2.2 notice</h3>
  * <p>
  * Noted should be that JSF 2.2 will support defining custom attributes directly in the view via the new
- * <code>http://java.sun.com/jsf/passthrough</code> namespace or the <code>&lt;f:passThroughAttribute&gt;</code> tag.
+ * <code>http://xmlns.jcp.org/jsf/passthrough</code> namespace or the <code>&lt;f:passThroughAttribute&gt;</code> tag.
  * <pre>
- * &lt;html ... xmlns:p="http://java.sun.com/jsf/passthrough"&gt;
+ * &lt;html ... xmlns:p="http://xmlns.jcp.org/jsf/passthrough"&gt;
  * ...
  * &lt;h:inputText ... p:autofocus="true" /&gt;
  * </pre>
@@ -103,7 +109,7 @@ import javax.faces.render.RenderKitWrapper;
  * Or:
  * <pre>
  * &lt;h:inputText ...&gt;
- *   &lt;f:passThroughAttribute name="autofocus" value="true" /&gt;
+ *     &lt;f:passThroughAttribute name="autofocus" value="true" /&gt;
  * &lt;/h:inputText&gt;
  * </pre>
  *

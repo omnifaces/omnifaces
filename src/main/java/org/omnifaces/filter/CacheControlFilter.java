@@ -91,38 +91,38 @@ import javax.servlet.http.HttpSession;
  * Then you can configure the filter as follows (filter name is fully free to your choice, but keep it sensible):
  * <pre>
  * &lt;filter&gt;
- *   &lt;filter-name&gt;noCache&lt;/filter-name&gt;
- *   &lt;filter-class&gt;org.omnifaces.filter.CacheControlFilter&lt;/filter-class&gt;
+ *     &lt;filter-name&gt;noCache&lt;/filter-name&gt;
+ *     &lt;filter-class&gt;org.omnifaces.filter.CacheControlFilter&lt;/filter-class&gt;
  * &lt;/filter&gt;
  * &lt;filter&gt;
- *   &lt;filter-name&gt;cache10seconds&lt;/filter-name&gt;
- *   &lt;filter-class&gt;org.omnifaces.filter.CacheControlFilter&lt;/filter-class&gt;
- *   &lt;init-param&gt;
- *     &lt;param-name&gt;expires&lt;/param-name&gt;
- *     &lt;param-value&gt;10s&lt;/param-value&gt;
- *   &lt;/init-param&gt;
+ *     &lt;filter-name&gt;cache10seconds&lt;/filter-name&gt;
+ *     &lt;filter-class&gt;org.omnifaces.filter.CacheControlFilter&lt;/filter-class&gt;
+ *     &lt;init-param&gt;
+ *         &lt;param-name&gt;expires&lt;/param-name&gt;
+ *         &lt;param-value&gt;10s&lt;/param-value&gt;
+ *     &lt;/init-param&gt;
  * &lt;/filter&gt;
  * &lt;filter&gt;
- *   &lt;filter-name&gt;cache2days&lt;/filter-name&gt;
- *   &lt;filter-class&gt;org.omnifaces.filter.CacheControlFilter&lt;/filter-class&gt;
- *   &lt;init-param&gt;
- *     &lt;param-name&gt;expires&lt;/param-name&gt;
- *     &lt;param-value&gt;2d&lt;/param-value&gt;
- *   &lt;/init-param&gt;
+ *     &lt;filter-name&gt;cache2days&lt;/filter-name&gt;
+ *     &lt;filter-class&gt;org.omnifaces.filter.CacheControlFilter&lt;/filter-class&gt;
+ *     &lt;init-param&gt;
+ *         &lt;param-name&gt;expires&lt;/param-name&gt;
+ *         &lt;param-value&gt;2d&lt;/param-value&gt;
+ *     &lt;/init-param&gt;
  * &lt;/filter&gt;
  *
  * &lt;filter-mapping&gt;
- *   &lt;filter-name&gt;noCache&lt;/filter-name&gt;
- *   &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+ *     &lt;filter-name&gt;noCache&lt;/filter-name&gt;
+ *     &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
  * &lt;/filter-mapping&gt;
  * &lt;filter-mapping&gt;
- *   &lt;filter-name&gt;cache10seconds&lt;/filter-name&gt;
- *   &lt;url-pattern&gt;/forum/*&lt;/url-pattern&gt;
+ *     &lt;filter-name&gt;cache10seconds&lt;/filter-name&gt;
+ *     &lt;url-pattern&gt;/forum/*&lt;/url-pattern&gt;
  * &lt;/filter-mapping&gt;
  * &lt;filter-mapping&gt;
- *   &lt;filter-name&gt;cache2days&lt;/filter-name&gt;
- *   &lt;url-pattern&gt;*.pdf&lt;/url-pattern&gt;
- *   &lt;url-pattern&gt;*.zip&lt;/url-pattern&gt;
+ *     &lt;filter-name&gt;cache2days&lt;/filter-name&gt;
+ *     &lt;url-pattern&gt;*.pdf&lt;/url-pattern&gt;
+ *     &lt;url-pattern&gt;*.zip&lt;/url-pattern&gt;
  * &lt;/filter-mapping&gt;
  * </pre>
  * <p>
@@ -133,8 +133,8 @@ import javax.servlet.http.HttpSession;
  * a servlet name of <code>facesServlet</code>:
  * <pre>
  * &lt;filter-mapping&gt;
- *   &lt;filter-name&gt;noCache&lt;/filter-name&gt;
- *   &lt;servlet-name&gt;facesServlet&lt;/servlet-name&gt;
+ *     &lt;filter-name&gt;noCache&lt;/filter-name&gt;
+ *     &lt;servlet-name&gt;facesServlet&lt;/servlet-name&gt;
  * &lt;/filter-mapping&gt;
  * </pre>
  *

@@ -20,7 +20,10 @@ import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
 
 /**
- * <strong>ValidateEqual</strong> validates if ALL of the given <code>UIInput</code> components have the same value.
+ * <p>
+ * The <code>&lt;o:validateEqual&gt;</code> validates if ALL of the given {@link UIInput} components have the same
+ * value.
+ * <p>
  * The default message is
  * <blockquote>{0}: Please fill out the same value for all of those fields</blockquote>
  * <p>

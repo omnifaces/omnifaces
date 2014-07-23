@@ -38,8 +38,9 @@ import org.omnifaces.taghandler.IgnoreValidationFailed;
 import org.omnifaces.util.State;
 
 /**
- * <strong>Form</strong> is a component that extends the standard {@link UIForm} and provides a way to keep view
- * or request parameters in the request URL after a post-back and offers in combination with the
+ * <p>
+ * The <code>&lt;o:form&gt;</code> is a component that extends the standard <code>&lt;h:form&gt;</code> and provides a
+ * way to keep view or request parameters in the request URL after a post-back and offers in combination with the
  * <code>&lt;o:ignoreValidationFailed&gt;</code> tag on an {@link UICommand} component the possibility to ignore
  * validation failures so that the invoke action phase will be executed anyway.
  * <p>
@@ -153,7 +154,8 @@ public class Form extends UIForm {
 	// Getters/setters ------------------------------------------------------------------------------------------------
 
 	/**
-	 * Return whether or not the view parameters should be encoded into the form's action URL.
+	 * Returns whether or not the view parameters should be encoded into the form's action URL.
+	 * @return Whether or not the view parameters should be encoded into the form's action URL.
 	 */
 	public Boolean isIncludeViewParams() {
 		return state.get(includeViewParams, FALSE);
@@ -170,7 +172,8 @@ public class Form extends UIForm {
 	}
 
 	/**
-	 * Return whether or not the request parameters should be encoded into the form's action URL.
+	 * Returns whether or not the request parameters should be encoded into the form's action URL.
+	 * @return Whether or not the request parameters should be encoded into the form's action URL.
 	 * @since 1.5
 	 */
 	public Boolean isIncludeRequestParams() {
@@ -189,7 +192,8 @@ public class Form extends UIForm {
 	}
 
 	/**
-	 * Return whether or not the request URI should be used as form's action URL.
+	 * Returns whether or not the request URI should be used as form's action URL.
+	 * @return Whether or not the request URI should be used as form's action URL.
 	 * @since 1.6
 	 */
 	public Boolean isUseRequestURI() {

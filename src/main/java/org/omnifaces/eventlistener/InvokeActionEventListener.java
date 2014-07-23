@@ -35,12 +35,26 @@ import org.omnifaces.event.PostInvokeActionEvent;
 import org.omnifaces.event.PreInvokeActionEvent;
 
 /**
- * This phase listener takes care that the {@link PreInvokeActionEvent} and {@link PostInvokeActionEvent} events are
- * properly published.
  * <p>
- * This phase listener is already registered by OmniFaces' own <code>faces-config.xml</code> and thus gets
- * auto-initialized when the OmniFaces JAR is bundled in a webapp, so end-users do not need to register this phase
- * listener explicitly themselves.
+ * The {@link InvokeActionEventListener} will add support for new <code>&lt;f:event&gt;</code> types
+ * <code>preInvokeAction</code> and <code>postInvokeAction</code>. Those events are published during the beforephase and
+ * afterphase of <code>INVOKE_APPLICATION</code> respectively. This actually offers a better hook on invoking actions
+ * after the <code>&lt;f:viewParam&gt;</code> values been set than the <code>preRenderView</code> event. In some
+ * circumstances the <code>preRenderView</code> event might be too late. For example, when you need to set a faces
+ * message in the flash scope and send a redirect. Also, it won't be invoked when the validations phase has failed for
+ * one of the <code>&lt;f:viewParam&gt;</code> values, in contrary to the <code>preRenderView</code> event.
+ * <p>
+ * Note that the upcoming JSF 2.2 will come with a <code>&lt;f:viewAction&gt;</code> tag which should actually solve
+ * the concrete functional requirement for which a <code>&lt;f:event type="preRenderView"&gt;</code> workaround is often
+ * been used in JSF 2.0 and 2.1.
+ * <p>
+ * This event is not only supported on {@link UIViewRoot}, but it is also supported on {@link UIForm}, {@link UIInput}
+ * {@link UICommand} components. This thus also provides the possibility to invoke multiple action listeners on a single
+ * {@link UIInput} and {@link UICommand} component on an easy manner.
+ * <p>
+ * As this phase listener has totally no impact on a webapp's default behavior, this phase listener is already
+ * registered by OmniFaces own <code>faces-config.xml</code> and thus gets auto-initialized when the OmniFaces JAR
+ * is bundled in a webapp, so endusers do not need to register this phase listener explicitly themselves.
  *
  * @author Bauke Scholtz
  * @see PreInvokeActionEvent

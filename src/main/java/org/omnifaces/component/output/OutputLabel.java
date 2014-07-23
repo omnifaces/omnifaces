@@ -25,8 +25,12 @@ import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.PostRestoreStateEvent;
 
 /**
- * <strong>OutputLabel</strong> is a component that extends the standard {@link HtmlOutputLabel} and provides support for
- * automatically setting its value as the label of the component identified by its <code>for</code> attribute (if any).
+ * <p>
+ * The <code>&lt;o:outputLabel&gt;</code> is a component that extends the standard <code>&lt;h:outputLabel&gt;</code>
+ * with support for automatically setting its value as the label of the component identified by its <code>for</code>
+ * attribute (if any). This way there's no need to duplicate the very same label into the <code>label</code> attribute
+ * of the input component. After submitting the form without having entered a value, a validation message is posted that
+ * should contain the label printed before the input instead of some generated ID.
  * <p>
  * You can use it the same way as <code>&lt;h:outputLabel&gt;</code>, you only need to change <code>h:</code> into
  * <code>o:</code>.

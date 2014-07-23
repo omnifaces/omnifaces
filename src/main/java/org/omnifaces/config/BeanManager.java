@@ -23,10 +23,19 @@ import java.util.logging.Logger;
 import org.omnifaces.util.JNDI;
 
 /**
- * Get reference to CDI managed beans without having any CDI dependency. It's using JNDI to grab the CDI bean manager
- * and if it's not <code>null</code>, then it's using reflection to get the necessary methods and invoke them.
  * <p>
- * If you already have a CDI bean manager instance at hands (and thus having a CDI dependency is no problem), then use
+ * This configuration enum allows you to get a reference to CDI managed beans without having any direct CDI dependency.
+ * It will during initialization grab the CDI bean manager instance from JNDI and if it's not <code>null</code>, then
+ * it's using reflection to get and store the necessary methods in the enum instance which are then invoked on instance
+ * methods such as <code>getReference()</code>.
+ *
+ * <h3>Usage</h3>
+ * <pre>
+ * // Get the CDI managed bean instance of the given bean class.
+ * SomeBean someBean = BeanManager.INSTANCE.getReference(SomeBean.class);
+ * </pre>
+ * <p>
+ * If you however already have a CDI bean manager instance at hands (and thus having a CDI dependency is no problem),
  * {@link org.omnifaces.util.Beans} instead.
  *
  * @author Bauke Scholtz

@@ -23,44 +23,44 @@ import javax.validation.MessageInterpolator;
 
 
 /**
- * Bean Validation message interpolator that is able to insert the label of the component via which
- * validation failed <em>into</em> the validation message. For this the special placeholder <code>{jsf.label}</code>
- * can be used. This {@link MessageInterpolator} will replace every occurrence of that with the label of the
- * <em>current</em> component.
+ * <p>
+ * Unlike native JSF validation error messages, in a bean validation message by default the label of the component where
+ * a validation constraint violation originated from can not be displayed in the middle of a message. Using the
+ * <code>javax.faces.validator.BeanValidator.MESSAGE</code> bundle key such label can be put in front or behind the
+ * message, but that's it. With this {@link JsfLabelMessageInterpolator} a label can appear in the middle of a message,
+ * by using the special placeholder <code>{jsf.label}</code> in bean validation messages.
  * <p>
  * Note that Bean Validation is not only called from within JSF, and as such JSF might not be available. If JSF
- * is not available occurrences of <code>{jsf.label}</code> will be replaced by "nothing" (the empty string).
- * The user should take care that messages are compatible with both situations if needed.
- * </p>
+ * is not available occurrences of <code>{jsf.label}</code> will be replaced by an empty string. The user should take
+ * care that messages are compatible with both situations if needed.
  * <p>
- * This message interpolator is <em>NOT</em> needed for putting a component label before or after a bean validation
- * message. That functionality is already provided by JSF itself via the <code>javax.faces.validator.BeanValidator.MESSAGE</code>
- * key in any resource bundle known to JSF.
- * </p>
- *
- *
- * <h3>Example</h3>
- * In <code>ValidationMessages.properties</code>
- * <pre>javax.validation.constraints.Size.message = The size of {jsf.label} must be between {min} and {max} characters</pre>
+ * This message interpolator is <strong>not</strong> needed for putting a component label before or after a bean
+ * validation message. That functionality is already provided by JSF itself via the
+ * <code>javax.faces.validator.BeanValidator.MESSAGE</code> key in any resource bundle known to JSF.
  *
  * <h3>Installation</h3>
- * Create a <code>META-INF/validation.xml</code> file with the following contents:
+ * <p>
+ * Create a <code>/META-INF/validation.xml</code> file in WAR with the following contents:
  *
  * <pre>
  * &lt;?xml version="1.0" encoding="UTF-8"?&gt;
  * &lt;validation-config
- *	xmlns="http://jboss.org/xml/ns/javax/validation/configuration"
- *	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
- *	xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/configuration validation-configuration-1.0.xsd"&gt;
- *
- *	&lt;message-interpolator&gt;org.omnifaces.validator.JsfLabelMessageInterpolator&lt;/message-interpolator&gt;
- *
+ *     xmlns="http://jboss.org/xml/ns/javax/validation/configuration"
+ *     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+ *     xsi:schemaLocation="http://jboss.org/xml/ns/javax/validation/configuration validation-configuration-1.0.xsd"
+ * &gt;
+ *     &lt;message-interpolator&gt;org.omnifaces.validator.JsfLabelMessageInterpolator&lt;/message-interpolator&gt;
  * &lt;/validation-config&gt;
  * </pre>
  *
- * @since 1.5
- * @author Arjan Tijms
+ * <h3>Usage</h3>
+ * <p>As an example, the customization of <code>@Size</code> in <code>ValidationMessages.properties</code>:
+ * <pre>
+ * javax.validation.constraints.Size.message = The size of {jsf.label} must be between {min} and {max} characters
+ * </pre>
  *
+ * @author Arjan Tijms
+ * @since 1.5
  */
 public class JsfLabelMessageInterpolator implements MessageInterpolator {
 

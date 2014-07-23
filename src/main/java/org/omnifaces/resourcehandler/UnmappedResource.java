@@ -36,6 +36,7 @@ public class UnmappedResource extends ResourceWrapper implements Externalizable 
 
 	/**
 	 * Constructs a new unmapped resource wrapping the given resource.
+	 * @param wrapped The resource to be wrapped.
 	 */
 	public UnmappedResource(Resource wrapped) {
 		this.wrapped = wrapped;

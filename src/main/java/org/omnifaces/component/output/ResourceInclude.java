@@ -27,8 +27,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.omnifaces.servlet.BufferedHttpServletResponse;
 
 /**
- * This component is used to catch the output from a JSP/Servlet resource and render it as output
- * to the JSF writer. In effect, this allows you to include both Servlets and JSP pages in e.g. Facelets.
+ * <p>
+ * The <code>&lt;o:resourceInclude&gt;</code> component can be used to catch the output from a JSP or Servlet
+ * resource and render it as output to the JSF writer. In effect, this allows you to include both Servlets and
+ * JSP pages in e.g. Facelets.
+ * <p>
+ * Note that this isn't recommended as a lasting solution, but it might ease a migration from legacy JSP with
+ * smelly scriptlets and all on them to a more sane and modern Facelets application.
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz

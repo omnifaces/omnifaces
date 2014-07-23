@@ -22,7 +22,7 @@ import javax.faces.application.ApplicationWrapper;
 /**
  * This application factory takes care that the {@link OmniApplication} is properly initialized.
  *
- * @author Radu Creanga <rdcrng@gmail.com>
+ * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz
  * @see OmniApplication
  * @since 1.6

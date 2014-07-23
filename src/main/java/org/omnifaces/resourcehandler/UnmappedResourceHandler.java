@@ -28,13 +28,16 @@ import javax.servlet.http.HttpServletResponse;
 import org.omnifaces.util.Hacks;
 
 /**
- * The <strong>UnmappedResourceHandler</strong> allows the developer to map JSF resources on an URL pattern of
- * <code>/javax.faces.resource/*</code> without the need for an additional {@link FacesServlet} prefix or suffix URL
- * pattern in the default produced resource URLs, such as <code>/javax.faces.resource/faces/css/style.css</code> or
+ * <p>
+ * This {@link ResourceHandler} implementation allows the developer to map JSF resources on an URL pattern of
+ * <code>/javax.faces.resource/*</code> (basically, the value of {@link ResourceHandler#RESOURCE_IDENTIFIER}) without
+ * the need for an additional {@link FacesServlet} prefix or suffix URL pattern in the default produced resource URLs,
+ * such as <code>/javax.faces.resource/faces/css/style.css</code> or
  * <code>/javax.faces.resource/css/style.css.xhtml</code>. This resource handler will produce unmapped URLs like
  * <code>/javax.faces.resource/css/style.css</code>. This has the major advantage that the developer don't need the
  * <code>#{resource}</code> EL expression anymore in order to properly reference relative URLs to images in CSS files.
- * Given the following folder structure,
+ * <p>
+ * So, given the following folder structure,
  * <pre>
  * WebContent
  *  `-- resources
@@ -43,8 +46,8 @@ import org.omnifaces.util.Hacks;
  *            |    `-- background.png
  *            `-- style.css
  * </pre>
- * <p>And the following CSS file reference (note: resource libraries are <strong>not</strong> supported by the
- * <code>UnmappedResourceHandler</code>! this is a technical limitation):
+ * <p>And the following CSS file reference (note: the <code>library</code> is <strong>not</strong> supported by the
+ * <code>UnmappedResourceHandler</code>! this is a technical limitation, just exclusively use <code>name</code>):
  * <pre>
  * &lt;h:outputStylesheet name="css/style.css" /&gt;
  * </pre>
@@ -60,12 +63,16 @@ import org.omnifaces.util.Hacks;
  *     background: url("#{resource['css/images/background.png']}");
  * }
  * </pre>
- * <h3>Configuration</h3>
+ * <p>
+ * This has in turn the advantage that you don't need to modify the background image or font face URLs in CSS files from
+ * 3rd party libraries such as Twitter Bootstrap, FontAwesome, etcetera.
+ *
+ * <h3>Installation</h3>
  * <p>
  * To get it to run, this handler needs be registered as follows in <code>faces-config.xml</code>:
  * <pre>
  * &lt;application&gt;
- *   &lt;resource-handler&gt;org.omnifaces.resourcehandler.UnmappedResourceHandler&lt;/resource-handler&gt;
+ *     &lt;resource-handler&gt;org.omnifaces.resourcehandler.UnmappedResourceHandler&lt;/resource-handler&gt;
  * &lt;/application&gt;
  * </pre>
  * <p>
@@ -73,11 +80,12 @@ import org.omnifaces.util.Hacks;
  * <code>web.xml</code>. For example, assuming that you've already a mapping on <code>*.xhtml</code>:
  * <pre>
  * &lt;servlet-mapping&gt;
- *   &lt;servlet-name&gt;facesServlet&lt;/servlet-name&gt;
- *   &lt;url-pattern&gt;*.xhtml&lt;/url-pattern&gt;
- *   &lt;url-pattern&gt;/javax.faces.resource/*&lt;/url-pattern&gt;
+ *     &lt;servlet-name&gt;facesServlet&lt;/servlet-name&gt;
+ *     &lt;url-pattern&gt;*.xhtml&lt;/url-pattern&gt;
+ *     &lt;url-pattern&gt;/javax.faces.resource/*&lt;/url-pattern&gt;
  * &lt;/servlet-mapping&gt;
  * </pre>
+ *
  * <h3>CombinedResourceHandler</h3>
  * <p>
  * If you're also using the {@link CombinedResourceHandler} or any other custom resource handler, then you need to
@@ -85,11 +93,12 @@ import org.omnifaces.util.Hacks;
  * <code>UnmappedResourceHandler</code>. Thus, like so:
  * <pre>
  * &lt;application&gt;
- *   &lt;resource-handler&gt;org.omnifaces.resourcehandler.CombinedResourceHandler&lt;/resource-handler&gt;
- *   &lt;resource-handler&gt;org.omnifaces.resourcehandler.UnmappedResourceHandler&lt;/resource-handler&gt;
+ *     &lt;resource-handler&gt;org.omnifaces.resourcehandler.CombinedResourceHandler&lt;/resource-handler&gt;
+ *     &lt;resource-handler&gt;org.omnifaces.resourcehandler.UnmappedResourceHandler&lt;/resource-handler&gt;
  * &lt;/application&gt;
  * </pre>
- * <p>Otherwise the combined resource handler will still produce mapped URLs. In essence, the one which is later
+ * <p>
+ * Otherwise the combined resource handler will still produce mapped URLs. In essence, the one which is later
  * registered wraps the previously registered one.
  *
  * @author Bauke Scholtz

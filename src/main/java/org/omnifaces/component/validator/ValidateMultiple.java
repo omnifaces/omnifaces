@@ -19,12 +19,14 @@ import javax.el.MethodExpression;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
+import javax.faces.validator.ValidatorException;
 
 import org.omnifaces.validator.MultiFieldValidator;
 
 /**
- * <p><strong>ValidateMultiple</strong> allows the developer to validate multiple fields by either a custom validator
- * method:
+ * <p>
+ * The <code>&lt;o:validateMultiple&gt;</code> allows the developer to validate multiple fields by either a custom
+ * validator method:
  * <pre>
  * &lt;o:validateMultiple id="myId" components="foo bar baz" validator="#{bean.someMethod}" /&gt;
  * &lt;h:message for="myId" /&gt;
@@ -56,6 +58,13 @@ import org.omnifaces.validator.MultiFieldValidator;
  *     }
  * }
  * </pre>
+ *
+ * <h3>Design notice</h3>
+ * <p>
+ * Note that this validator does <strong>not</strong> throw {@link ValidatorException}, but returns a boolean! Message
+ * handling and invalidation job is up to the {@link ValidateMultipleFields} implementation who will call this method.
+ * You can customize the message by the <code>message</code> attribute of the tag. Refer {@link ValidateMultipleFields}
+ * documentation for general usage instructions.
  *
  * @author Juliano Marques
  * @author Bauke Scholtz

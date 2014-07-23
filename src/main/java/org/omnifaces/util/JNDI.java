@@ -7,31 +7,32 @@ import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
 
 /**
+ * <p>
  * Utility class for simplifying some web related tasks that use JNDI under the hood, such as getting the
  * <code>&lt;env-entry&gt;</code> from <code>web.xml</code>.
  * <p>
  * Note that the JSF spec defines one parameter that can optionally be defined via an env entry instead of the typical
  * context/init parameter; {@link ProjectStage#PROJECT_STAGE_JNDI_NAME}. Mojarra defines an additional proprietary one:
  * "java:comp/env/ClientStateSavingPassword".
- * 
+ *
  * @author Arjan Tijms
  * @since 1.6
  */
 public final class JNDI {
-	
+
 	private JNDI() {
 		// Hide constructor.
 	}
 
 	/**
 	 * Returns the named environment entry for the deployment component from where this is called. From within the web
-	 * module this returns the <code>&lt;env-entry-value&gt;</code> of a <code>&lt;env-entry&gt;</code> in 
+	 * module this returns the <code>&lt;env-entry-value&gt;</code> of a <code>&lt;env-entry&gt;</code> in
 	 * <code>web.xml</code> associated with the given <code>&lt;env-entry-name&gt;</code>.
 	 * <p>
 	 * Note that the name used here is relative to "java:comp/env", which is exactly as it appears in <code>web.xml</code>.
 	 * <p>
-	 * Example: <br/><br/>
-	 * 
+	 * Example:
+	 * <p>
 	 * <b>web.xml</b>
 	 * <pre>
 	 * &lt;env-entry&gt;
@@ -40,12 +41,12 @@ public final class JNDI {
 	 *	&lt;env-entry-value&gt;10&lt;/env-entry-value&gt;
 	 * &lt;/env-entry&gt;
 	 * </pre>
-	 * 
+	 * <p>
 	 * <b>Lookup in Java using relative name</b>
 	 * <pre>
 	 * Integer test = JNDI.getEnvEntry("org.omnifaces.TEST_INTEGER");
 	 * </pre>
-	 * 
+	 * <p>
 	 * <b>Lookup in Java using full JNDI name</b>
 	 * <pre>
 	 * Integer test = JNDI.lookup("java:comp/env/org.omnifaces.TEST_INTEGER");
@@ -54,7 +55,7 @@ public final class JNDI {
 	 * <p>
 	 * Note that even the "full JNDI name" is relative to the "deployment component" from which the lookup is done.
 	 * To use a true global JNDI name an additional <code>&lt;lookup-name&gt;</code> should be specified in <code>web.xml</code>.
-	 * 
+	 *
 	 * <p>
 	 * Environment entries can also be injected using {@link Resource}.
 	 *
@@ -99,5 +100,5 @@ public final class JNDI {
 			throw new IllegalStateException(e);
 		}
 	}
-	
+
 }

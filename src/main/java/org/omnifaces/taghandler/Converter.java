@@ -38,6 +38,8 @@ import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDeleg
  * The <code>&lt;o:converter&gt;</code> is a taghandler that extends the standard <code>&lt;f:converter&gt;</code> tag
  * family with support for deferred value expressions in all attributes. In other words, the converter attributes are
  * not evaluated anymore on a per view build time basis, but just on every access like as with UI components.
+ *
+ * <h3>Usage</h3>
  * <p>
  * When you specify for example the standard <code>&lt;f:convertDateTime&gt;</code> by
  * <code>converterId="javax.faces.DateTime"</code>, then you'll be able to use all its attributes such as
@@ -46,6 +48,11 @@ import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDeleg
  * <pre>
  * &lt;o:converter converterId="javax.faces.DateTime" pattern="#{item.pattern}" locale="#{item.locale}" /&gt;
  * </pre>
+ * <p>
+ * The converter ID of all standard JSF converters can be found in
+ * <a href="http://docs.oracle.com/javaee/7/api/javax/faces/convert/package-summary.html">their javadocs</a>.
+ * First go to the javadoc of the class of interest, then go to <code>CONVERTER_ID</code> in its field summary
+ * and finally click the Constant Field Values link to see the value.
  *
  * @author Bauke Scholtz
  */

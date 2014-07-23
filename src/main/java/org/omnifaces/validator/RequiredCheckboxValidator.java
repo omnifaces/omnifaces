@@ -27,30 +27,35 @@ import javax.faces.validator.Validator;
 import javax.faces.validator.ValidatorException;
 
 /**
- * This validator solves the broken <code>required="true"</code> attribute of the
+ * <p>
+ * The <code>omnifaces.RequiredCheckboxValidator</code> is intented to solve a peculiar problem with
+ * <code>required="true"</code> attribute of {@link UISelectBoolean} components like
  * <code>&lt;h:selectBooleanCheckbox&gt;</code>. If you want to require the user to tick the desired checkbox, you would
  * expect that setting <code>required="true"</code> is sufficient. But it is not, the validation wil always pass.
  * <p>
  * As for every other {@link UIInput} component the default <code>required="true"</code> validator would
  * only check if the value is actually filled and been sent to the server side, i.e. the value is not null nor empty.
  * In case of a <code>&lt;h:selectBooleanCheckbox&gt;</code>, which accepts <code>Boolean</code> or <code>boolean</code>
- * properties only, JSF EL will coerce the unchecked value to <code>Boolean.FALSE</code> during apply request values
- * phase, right before validations phase. This value is not <code>null</code> nor empty! Thus, the required attribute of
- * the <code>&lt;h:selectBooleanCheckbox&gt;</code> is fairly pointless. It would always pass the validation and thus
- * never display the desired required message in case of an unticked checkbox.
+ * properties only, EL will coerce the unchecked value to <code>Boolean.FALSE</code> during apply request values phase
+ * right before validations phase. This value is not <code>null</code> nor empty! Thus, the required attribute of the
+ * <code>&lt;h:selectBooleanCheckbox&gt;</code> is fairly pointless. It would always pass the validation and thus never
+ * display the desired required message in case of an unticked checkbox.
+ *
+ * <h3>Usage</h3>
  * <p>
- * To get it to work anyway, register this validator on validator ID of <code>omnifaces.RequiredCheckboxValidator</code>
- * as follows:
+ * <p>
+ * This validator is available by validator ID <code>omnifaces.RequiredCheckboxValidator</code>. Just specify it as
+ * <code>&lt;f:validator&gt;</code> of the boolean selection component:
  * <pre>
  * &lt;h:selectBooleanCheckbox id="agree" value="#{bean.agree}" requiredMessage="You must agree!"&gt;
- *   &lt;f:validator validatorId="omnifaces.RequiredCheckboxValidator" /&gt;
+ *     &lt;f:validator validatorId="omnifaces.RequiredCheckboxValidator" /&gt;
  * &lt;/h:selectBooleanCheckbox&gt;
  * </pre>
  * <p>
  * The validator will use the message as specified in <code>requiredMessage</code>. If it's absent, then it will use
  * the default required message as specified in custom <code>&lt;message-bundle&gt;</code> in
- * <code>faces-config.xml</code>.
- * If it's absent, then it will default to "{0}: a tick is required".
+ * <code>faces-config.xml</code>. If it's absent, then it will default to
+ * <blockquote>{0}: a tick is required"</blockquote>
  *
  * @author Bauke Scholtz
  */

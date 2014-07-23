@@ -53,6 +53,11 @@ import org.omnifaces.util.Messages;
  * &lt;o:validator validatorId="javax.faces.LongRange" minimum="#{item.minimum}" maximum="#{item.maximum}" /&gt;
  * </pre>
  * <p>
+ * The validator ID of all standard JSF validators can be found in
+ * <a href="http://docs.oracle.com/javaee/7/api/javax/faces/validator/package-summary.html">their javadocs</a>.
+ * First go to the javadoc of the class of interest, then go to <code>VALIDATOR_ID</code> in its field summary
+ * and finally click the Constant Field Values link to see the value.
+ * <p>
  * It is also possible to specify the validator message on a per-validator basis using the <code>message</code>
  * attribute. Any "{0}" placeholder in the message will be substituted with the label of the referenced input component.
  * Note that this attribute is ignored when the parent component has already <code>validatorMessage</code> specified.

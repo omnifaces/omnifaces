@@ -29,9 +29,14 @@ import javax.faces.view.facelets.TagHandler;
 import org.omnifaces.util.MapWrapper;
 
 /**
- * <p>The <code>&lt;o:importConstants&gt;</code> allows the developer to have a mapping of all constant field values of
- * the given fully qualified name of a type in the EL scope. The constant field values are those public static final
- * fields. This works for classes, interfaces and enums. For example:
+ * <p>
+ * The <code>&lt;o:importConstants&gt;</code> taghandler allows the developer to have a mapping of all constant field
+ * values of the given fully qualified name of a type in the EL scope. The constant field values are those public static
+ * final fields. This works for classes, interfaces and enums.
+ *
+ * <h3>Usage</h3>
+ * <p>
+ * For example:
  * <pre>
  * public class Foo {
  *     public static final String FOO1 = "foo1";
@@ -59,7 +64,9 @@ import org.omnifaces.util.MapWrapper;
  * this by explicitly specifying the <code>var</code> attribute, as demonstrated for <code>com.example.Baz</code> in
  * the above example.
  * <p>
- * The resolved constants are by reference stored in the cache to improve retrieving performance.
+ * The resolved constants are by reference stored in the cache to improve retrieving performance. There is also a
+ * runtime (no, not compiletime as that's just not possible in EL) check during retrieving the constant value.
+ * If a constant value doesn't exist, then an <code>IllegalArgumentException</code> will be thrown.
  *
  * @author Bauke Scholtz
  */
@@ -104,7 +111,7 @@ public class ImportConstants extends TagHandler {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * First obtain the constants of the class by its fully qualified name as specified in the <code>type<code>
+	 * First obtain the constants of the class by its fully qualified name as specified in the <code>type</code>
 	 * attribute from the cache. If it hasn't been collected yet and is thus not present in the cache, then collect
 	 * them and store in cache. Finally set the constants in the EL scope by the simple name of the type, or by the
 	 * name as specified in the <code>var</code> attribute, if any.

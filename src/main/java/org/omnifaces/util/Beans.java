@@ -26,12 +26,30 @@ import javax.enterprise.inject.Stereotype;
 import javax.enterprise.inject.spi.Annotated;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.inject.Inject;
 
 /**
- * Collection of utility methods for the CDI API with respect to working with {@link BeanManager}.
+ * <p>
+ * Collection of utility methods for the CDI API with respect to working with <code>BeanManager</code>.
+ *
+ * <h3>Usage</h3>
+ * <pre>
+ * // Get the CDI managed bean instance of the given bean class.
+ * SomeBean someBean = Beans.getReference(beanManager, SomeBean.class);
+ * </pre>
+ * <p>
+ * The "native" CDI way would otherwise look like this (...), provided that you can't use {@link Inject} for some
+ * technical reasons.
+ * <pre>
+ * // Get the CDI managed bean instance of the given bean class.
+ * Set&lt;Bean&lt;?&gt;&gt; beans = beanManager.getBeans(SomeBean.class);
+ * Bean&lt;SomeBean&gt; bean = (Bean&lt;SomeBean&gt;) beanManager.resolve(beans);
+ * CreationalContext&lt;SomeBean&gt; context = beanManager.createCreationalContext(bean);
+ * SomeBean someBean = (SomeBean) beanManager.getReference(bean, SomeBean.class, context);
+ * </pre>
  * <p>
  * If you need a dependency-free way of obtaining the CDI managed bean instance (e.g. when you want to write code which
- * should also run on Tomcat), use {@link org.omnifaces.config.BeanManager} instead.
+ * should also run on Tomcat), use {@link org.omnifaces.config.BeanManager} enum instead.
  *
  * @author Bauke Scholtz
  * @since 1.6.1

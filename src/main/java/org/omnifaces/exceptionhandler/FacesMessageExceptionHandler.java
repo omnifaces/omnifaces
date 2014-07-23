@@ -24,14 +24,27 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.ExceptionQueuedEvent;
 
 /**
- * This exception handler will add every exception as a global FATAL faces message. Refer to the documentation of
- * {@link FacesMessageExceptionHandlerFactory} to see how to set this up.
  * <p>
- * <strong>Note:</strong> it's your own responsibility to make sure that the faces messages are being shown. Make sure
- * that there's a <code>&lt;h:messages&gt;</code> or any equivalent component (OmniFaces, PrimeFaces, etc) is present
- * in the view and that it can handle global messages and that it's explicitly or automatically updated in case of ajax
- * requests. Also make sure that you don't have bugs in rendering of your views. This exception handler is not capable
- * of handling exceptions during render response. It will fail silently.
+ * The {@link FacesMessageExceptionHandler} will add every exception as a global FATAL faces message.
+ *
+ * <h3>Installation</h3>
+ * <p>
+ * This handler must be registered by a factory as follows in <code>faces-config.xml</code> in order to get it to run:
+ * <pre>
+ * &lt;factory&gt;
+ *     &lt;exception-handler-factory&gt;org.omnifaces.exceptionhandler.FacesMessageExceptionHandlerFactory&lt;/exception-handler-factory&gt;
+ * &lt;/factory&gt;
+ * </pre>
+ *
+ * <h3>Note</h3>
+ * <p>
+ * It's your own responsibility to make sure that the faces messages are being shown. Make sure that there's a
+ * <code>&lt;h:messages&gt;</code> or any equivalent component (OmniFaces, PrimeFaces, etc) is present in the view and
+ * that it can handle global messages and that it's explicitly or automatically updated in case of ajax requests. Also
+ * make sure that you don't have bugs in rendering of your views. This exception handler is not capable of handling
+ * exceptions during render response. It will fail silently.
+ *
+ * <h3>Customizing <code>FacesMessageExceptionHandler</code></h3>
  * <p>
  * If more fine grained control of creating the FATAL faces message is desired, then the developer can opt to extend
  * this {@link FacesMessageExceptionHandler} and override the following method:

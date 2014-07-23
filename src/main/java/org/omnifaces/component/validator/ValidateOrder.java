@@ -26,9 +26,10 @@ import org.omnifaces.util.Callback;
 import org.omnifaces.util.State;
 
 /**
- * <strong>ValidateOrder</strong> validates if the values of the given {@link UIInput} components as specified in
- * the <code>components</code> attribute are in the order as specified by the <code>type</code> attribute which accepts
- * the following values:
+ * <p>
+ * The <code>&lt;o:validateOrder&gt;</code> validates if the values of the given {@link UIInput} components as specified
+ * in the <code>components</code> attribute are in the order as specified by the <code>type</code> attribute which
+ * accepts the following values:
  * <ul>
  * <li><code>lt</code> (default): from least to greatest, without duplicates.</li>
  * <li><code>lte</code>: from least to greatest, allowing duplicates (equal values next to each other).</li>
@@ -36,16 +37,16 @@ import org.omnifaces.util.State;
  * <li><code>gte</code>: from greatest to least, allowing duplicates (equal values next to each other).</li>
  * </ul>
  * <p>
+ * This validator has the additional requirement that the to-be-validated values must implement {@link Comparable}.
+ * This validator throws an {@link IllegalArgumentException} when one or more of the values do not implement it. Note
+ * that when this validator is placed <em>before</em> all of the components, then it will only compare the raw
+ * unconverted submitted string values, not the converted object values. If you need to compare by the converted object
+ * values, then you need to place this validator <em>after</em> all of the components.
+ * <p>
  * The default message is
  * <blockquote>{0}: Please fill out the values of all those fields in order</blockquote>
  * <p>
  * For general usage instructions, refer {@link ValidateMultipleFields} documentation.
- * <p>
- * This validator has the additional requirement that the to-be-validated values must implement {@link Comparable}.
- * This validator throws an {@link IllegalArgumentException} when one or more of the values do not implement it. Note
- * that when this validator is placed before all of the components, then it will only compare the raw unconverted
- * submitted string values, not the converted object values. If you need to compare by the converted object values,
- * then you need to place this validator after all of the components.
  *
  * @author Bauke Scholtz
  */

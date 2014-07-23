@@ -21,8 +21,11 @@ import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
 
 /**
- * <strong>ValidateAllOrNone</strong> validates if at least ALL of the given <code>UIInput</code> components have been
- * filled out or that NONE of the given <code>UIInput</code> components have been filled out. The default message is
+ * <p>
+ * The <code>&lt;o:validateAllOrNone&gt;</code> validates if at least ALL of the given {@link UIInput} components have
+ * been filled out or that NONE of the given <code>UIInput</code> components have been filled out.
+ * <p>
+ * The default message is
  * <blockquote>{0}: Please fill out all or none of those fields</blockquote>
  * <p>
  * For general usage instructions, refer {@link ValidateMultipleFields} documentation.

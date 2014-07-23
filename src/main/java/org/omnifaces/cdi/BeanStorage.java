@@ -28,7 +28,7 @@ import javax.enterprise.inject.spi.PassivationCapable;
  * CDI bean storage. This class is theoretically reusable for multiple CDI scopes. It's currently however only used by
  * the OmniFaces CDI view scope.
  *
- * @author Radu Creanga <rdcrng@gmail.com>
+ * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz
  * @since 1.6
  */

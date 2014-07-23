@@ -17,7 +17,28 @@ import javax.faces.FacesException;
 import javax.servlet.ServletException;
 
 /**
- * Collection of general utility methods with respect to working with exceptions.
+ * <p>
+ * Collection of general utility methods with respect to working with exceptions. So far there's only an unwrapper and
+ * a type checker.
+ *
+ * <h3>Usage</h3>
+ * <p>
+ * Some examples:
+ * <pre>
+ * // Check if the caught exception has a ConstraintViolationException in its hierarchy.
+ * catch (PersistenceException e) {
+ *     if (Exceptions.is(e, ConstraintViolationException.class)) {
+ *         // ...
+ *     }
+ * }
+ * </pre>
+ * <pre>
+ * // Unwrap the caught FacesException until a non-FacesException is found.
+ * catch (FacesException e) {
+ *     Exception realRootCause = Exceptions.unwrap(e, FacesException.class);
+ *     // ...
+ * }
+ * </pre>
  *
  * @author Bauke Scholtz
  */

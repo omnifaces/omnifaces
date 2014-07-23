@@ -30,7 +30,11 @@ import java.util.concurrent.TimeUnit;
 import org.omnifaces.util.Faces;
 
 /**
- * Collection of EL functions for date and time.
+ * <p>
+ * Collection of EL functions for date and time: <code>of:formatDate()</code>, <code>of:formatDateWithTimezone()</code>,
+ * <code>of:addXxx()</code> like <code>of:addDays()</code>, <code>of:xxxBetween()</code> like <code>of:daysBetween()</code>,
+ * <code>of:getMonths()</code>, <code>of:getShortMonths()</code>, <code>of:getDaysOfWeek()</code>, <code>of:getShortDaysOfWeek()</code>,
+ * <code>of:getMonth()</code>, <code>of:getShortMonth()</code>, <code>of:getDayOfWeek()</code> and <code>of:getShortDayOfWeek()</code>.
  *
  * @author Bauke Scholtz
  */

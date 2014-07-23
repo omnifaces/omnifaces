@@ -20,7 +20,10 @@ import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
 
 /**
- * <strong>ValidateUnique</strong> validates if ALL of the given <code>UIInput</code> components have an unique value.
+ * <p>
+ * The <code>&lt;o:validateUnique&gt;</code> validates if ALL of the given {@link UIInput} components have an unique
+ * value.
+ * <p>
  * The default message is
  * <blockquote>{0}: Please fill out an unique value for all of those fields</blockquote>
  * <p>

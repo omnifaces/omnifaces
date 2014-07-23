@@ -55,7 +55,7 @@ public class ScopedRunner {
 
 	/**
 	 * Invokes the callback within the scope of the variables being given in the constructor.
-	 * @param callback
+	 * @param callback The callback.
 	 */
 	public void invoke(Callback.Void callback) {
 		try {

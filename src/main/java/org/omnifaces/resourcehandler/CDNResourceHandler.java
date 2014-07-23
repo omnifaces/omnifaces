@@ -26,14 +26,17 @@ import javax.faces.application.ResourceHandlerWrapper;
 import javax.faces.application.ResourceWrapper;
 
 /**
+ * <p>
  * This {@link ResourceHandler} implementation allows the developer to provide CDN URLs instead of the default local
  * URLs for JSF resources as provided by <code>&lt;h:outputScript&gt;</code>, <code>&lt;h:outputStylesheet&gt;</code>
  * and <code>&lt;h:graphicImage&gt;</code>.
+ *
+ * <h3>Installation</h3>
  * <p>
  * To get it to run, this handler needs be registered as follows in <code>faces-config.xml</code>:
  * <pre>
  * &lt;application&gt;
- *   &lt;resource-handler&gt;org.omnifaces.resourcehandler.CDNResourceHandler&lt;/resource-handler&gt;
+ *     &lt;resource-handler&gt;org.omnifaces.resourcehandler.CDNResourceHandler&lt;/resource-handler&gt;
  * &lt;/application&gt;
  * </pre>
  *
@@ -46,13 +49,13 @@ import javax.faces.application.ResourceWrapper;
  * by this resource handler, so you need to make absolutely sure yourself that it is valid. Here's an example:
  * <pre>
  * &lt;context-param&gt;
- *   &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_URLS&lt;/param-name&gt;
- *   &lt;param-value&gt;
- *     js/script1.js=http://cdn.example.com/js/script1.js,
- *     somelib:js/script2.js=http://cdn.example.com/somelib/js/script2.js,
- *     otherlib:style.css=http://cdn.example.com/otherlib/style.css,
- *     images/logo.png=http://cdn.example.com/logo.png
- *   &lt;/param-value&gt;
+ *     &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_URLS&lt;/param-name&gt;
+ *     &lt;param-value&gt;
+ *         js/script1.js=http://cdn.example.com/js/script1.js,
+ *         somelib:js/script2.js=http://cdn.example.com/somelib/js/script2.js,
+ *         otherlib:style.css=http://cdn.example.com/otherlib/style.css,
+ *         images/logo.png=http://cdn.example.com/logo.png
+ *     &lt;/param-value&gt;
  * &lt;/context-param&gt;
  * </pre>
  * <p>

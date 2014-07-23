@@ -35,15 +35,30 @@ import org.omnifaces.cdi.eager.EagerBeansRequestListener;
 import org.omnifaces.cdi.eager.EagerBeansSessionListener;
 
 /**
- * Specifies that a scoped bean is to be eagerly instantiated.
+ * <p>
+ * The CDI annotation {@link Eager} specifies that a scoped bean is to be eagerly instantiated.
+ * <p>
+ * JSF's own native managed beans are being deprecated in favor of CDI managed beans. One feature that those native JSF
+ * managed beans had that's not directly available for CDI managed beans is the ability to eagerly instantiate
+ * application scoped beans.
+ * <p>
+ * OmniFaces fills this void and even goes one step further by introducing the <code>@Eager</code> annotation
+ * that can be applied to <code>@RequestScoped</code>, <code>@ViewScoped</code>,
+ * <code>@SessionScoped</code> and <code>@ApplicationScoped</code> beans. This causes these beans to be instantiated
+ * automatically at the start of each such scope instead of on demand when a bean is first referenced.
+ * <p>
+ * In case of <code>@RequestScoped</code> and <code>@ViewScoped</code> beans instantiation happens per request URI / view
+ * and an extra attribute is required for specifying this.
+ *
  * <p>
  * Currently supported scopes:
  * <ol>
- * <li> {@link RequestScoped}
- * <li> {@link ViewScoped}
- * <li> {@link SessionScoped}
- * <li> {@link ApplicationScoped}
+ * <li> CDI {@link RequestScoped}
+ * <li> OmniFaces {@link ViewScoped}
+ * <li> CDI {@link SessionScoped}
+ * <li> CDI {@link ApplicationScoped}
  * </ol>
+ *
  * <p>
  * E.g.
  * The following bean will be instantiated during application's startup:
@@ -90,17 +105,17 @@ import org.omnifaces.cdi.eager.EagerBeansSessionListener;
  *     }
  * }
  * </pre>
- * 
+ *
  * <h3> Compatibility </h3>
- * 
+ *
  * <p>
- * In some (older) containers, most notably GlassFish 3, the CDI request scope is not available in a {@link ServletRequestListener} 
+ * In some (older) containers, most notably GlassFish 3, the CDI request scope is not available in a {@link ServletRequestListener}
  * (this is actually not spec complicant, as CDI demands this scope to be active then, but it is what it is).
  * <p>
  * Additionally in some containers, most notably GlassFish 3 again, instantiating session scoped beans from a {@link HttpSessionListener}
  * will corrupt "something" in the container. The instantiating of the beans will succeed, but if the session is later accessed an
  * exception like the following will be thrown:
- * 
+ *
  * <pre>
  * java.lang.IllegalArgumentException: Should never reach here
  *  at org.apache.catalina.connector.SessionTracker.track(SessionTracker.java:168)
@@ -112,9 +127,9 @@ import org.omnifaces.cdi.eager.EagerBeansSessionListener;
  *  at javax.faces.context.ExternalContextWrapper.getSession(ExternalContextWrapper.java:396)
  *  at javax.faces.context.ExternalContextWrapper.getSession(ExternalContextWrapper.java:396)
  *  </pre>
- * 
+ *
  * If any or both of those problems occur, a filter needs to be installed instead in <code>web.xml</code> as follows:
- * 
+ *
  * <pre>
  * &lt;filter&gt;
  *     &lt;filter-name&gt;eagerBeansFilter&lt;/filter-name&gt;
@@ -126,12 +141,12 @@ import org.omnifaces.cdi.eager.EagerBeansSessionListener;
  * &lt;/filter-mapping&gt;
  *</pre>
  *
- * Note that the {@link EagerBeansFilter} will automatically disable the request listener by calling 
+ * Note that the {@link EagerBeansFilter} will automatically disable the request listener by calling
  * {@link EagerBeansRequestListener#setEnabled(boolean)} and disable instantiating beans from the session listener by
  * calling {@link EagerBeansSessionListener#setEnabled(boolean)}.
  * <p>
  * If so needed the listeners can also be disabled in the same way via user code.
- * 
+ *
  *
  * @since 1.8
  * @author Arjan Tijms

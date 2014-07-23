@@ -27,7 +27,7 @@ import org.omnifaces.cdi.ViewScoped;
 /**
  * Register the CDI view scope context.
  *
- * @author Radu Creanga <rdcrng@gmail.com>
+ * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz
  * @see ViewScoped
  * @see ViewScopeContext

@@ -38,29 +38,32 @@ import org.omnifaces.util.Callback;
 import org.omnifaces.util.State;
 
 /**
- * <strong>Tree</strong> is an {@link UIComponent} that supports data binding to a tree of data objects represented by
- * a {@link TreeModel} instance, which is the current value of this component itself (typically established via a
- * {@link ValueExpression}). During iterative processing over the nodes of tree in the tree model, the object for the
- * current node is exposed as a request attribute under the key specified by the <code>var</code> attribute. The node
- * itself is exposed as a request attribute under the key specified by the <code>varNode</code> attribute.
+ * <p>
+ * The <code>&lt;o:tree&gt;</code> allows the developers to have full control over the markup of a tree
+ * hierarchy by declaring the appropriate JSF components or HTML elements in the markup. The <code>&lt;o:tree&gt;</code>
+ * does namely not render any HTML markup by itself.
+ * <p>
+ * The component value must point to a tree of data objects represented by a {@link TreeModel} instance, typically
+ * established via a {@link ValueExpression}. During iterative processing over the nodes of tree in the tree model,
+ * the object for the current node is exposed as a request attribute under the key specified by the <code>var</code>
+ * attribute. The node itself is exposed as a request attribute under the key specified by the <code>varNode</code>
+ * attribute.
  * <p>
  * Only children of type {@link TreeNode} are allowed and processed by this component.
  * <p>
- * This component does not have a renderer since it does not render any markup by itself. This allows the developers to
- * have full control over the markup of the tree by declaring the appropriate JSF components or HTML elements in the
- * markup. Here is a basic usage example:
+ * Here is a basic usage example:
  * <pre>
  * &lt;o:tree value="#{bean.treeModel}" var="item" varNode="node"&gt;
- *   &lt;o:treeNode&gt;
- *     &lt;ul&gt;
- *       &lt;o:treeNodeItem&gt;
- *         &lt;li&gt;
- *           #{node.index} #{item.someProperty}
- *           &lt;o:treeInsertChildren /&gt;
- *         &lt;/li&gt;
- *       &lt;/o:treeNodeItem&gt;
- *     &lt;/ul&gt;
- *   &lt;/o:treeNode&gt;
+ *     &lt;o:treeNode&gt;
+ *         &lt;ul&gt;
+ *             &lt;o:treeNodeItem&gt;
+ *                 &lt;li&gt;
+ *                     #{node.index} #{item.someProperty}
+ *                     &lt;o:treeInsertChildren /&gt;
+ *                 &lt;/li&gt;
+ *             &lt;/o:treeNodeItem&gt;
+ *         &lt;/ul&gt;
+ *     &lt;/o:treeNode&gt;
  * &lt;/o:tree&gt;
  * </pre>
  *
@@ -273,6 +276,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * and callback. This method is also called by {@link TreeInsertChildren#visitTree(VisitContext, VisitCallback)}.
 	 * @param context The visit context to work with.
 	 * @param callback The visit callback to work with.
+	 * @return <code>true</code> if the visit is complete.
 	 * @see TreeModel#isLeaf()
 	 * @see TreeModel#getLevel()
 	 * @see TreeInsertChildren

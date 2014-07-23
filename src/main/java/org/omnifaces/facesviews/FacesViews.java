@@ -47,12 +47,40 @@ import javax.servlet.ServletRegistration;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * This class contains the core methods that implement the Faces Views feature.
+ * <p>
+ * FacesViews is a mechanism to use SEO-friendly extensionless URLs in a JSF application without the need to enlist
+ * individual Facelet source files in some configuration file.
+ * <p>
+ * Instead, Facelets source files can be put into either the special <code>/WEB-INF/faces-views</code>
+ * directory, from where they will be automatically scanned (no configuration whatsoever required) or an
+ * explicit directory can be configured to be scanned. The web app root is supported as well.
  *
- * TODO: break up in logic and config?
+ * <h3>Installation</h3>
+ * <p>
+ * Example of configuring FacesViews to make all Facelets found in the root and its sub-directories (excluding /WEB-INF,
+ * /META-INF and /resources) available as extensionless URLs:
+ * <pre>
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.FACES_VIEWS_SCAN_PATHS&lt;/param-name&gt;
+ *     &lt;param-value&gt;/*.xhtml&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * </pre>
+ * <p>
+ * See <a href="package-summary.html">package documentation</a> for additional details.
+ *
+ * <h3>PrettyFaces</h3>
+ * <p>
+ * Note that there is some overlap between this feature and <a href="http://ocpsoft.org/prettyfaces">PrettyFaces</a>.
+ * The difference is that FacesViews has a focus on zero- or very minimal config, where PrettyFaces has a focus on very
+ * powerful mapping mechanisms, which of course need some level of configuration. As such FacesViews will only focus on
+ * auto discovering views and mapping them to both <code>.xhtml</code> and to no-extension without needing to explicitly
+ * declare the <code>FacesServlet</code> in <code>web.xml</code>.
+ * <p>
+ * Specifically, FacesViews will thus <em>not</em> become a general URL rewriting tool (e.g. one that maps path segments
+ * to parameters, or that totally changes the name of the URL). For this the user is advised to look at the
+ * aforementioned <a href="http://ocpsoft.org/prettyfaces">PrettyFaces</a>.
  *
  * @author Arjan Tijms
- *
  */
 public final class FacesViews {
 
@@ -395,7 +423,7 @@ public final class FacesViews {
 	 * Scans resources (views) recursively starting with the given resource paths for a specific root path, and collects
 	 * those and all unique extensions encountered in a flat map respectively set.
 	 *
-	 * @param servletContext
+	 * @param servletContext The involved servlet context.
 	 * @param rootPath
 	 *            one of the paths from which views are scanned. By default this is typically /WEB-INF/faces-view/
 	 * @param resourcePaths
@@ -463,7 +491,7 @@ public final class FacesViews {
 	 * Scans resources (views) recursively starting with the given resource paths and returns a flat map containing all
 	 * resources encountered.
 	 *
-	 * @param servletContext
+	 * @param servletContext The involved servlet context.
 	 * @return views
 	 */
 	public static Map<String, String> scanViews(ServletContext servletContext) {
@@ -476,7 +504,7 @@ public final class FacesViews {
 	 * Checks if resources haven't been scanned yet, and if not does scanning and stores the result at the designated
 	 * location "org.omnifaces.facesviews" in the ServletContext.
 	 *
-	 * @param context
+	 * @param context The involved servlet context.
 	 */
 	public static void tryScanAndStoreViews(ServletContext context) {
 		if (getApplicationAttribute(context, FACES_VIEWS_RESOURCES) == null) {
@@ -488,7 +516,7 @@ public final class FacesViews {
 	 * Scans for faces-views resources and stores the result at the designated location "org.omnifaces.facesviews" in
 	 * the ServletContext.
 	 *
-	 * @param context
+	 * @param context The involved servlet context.
 	 * @return the view found during scanning, or the empty map if no views encountered
 	 */
 	public static Map<String, String> scanAndStoreViews(ServletContext context) {
@@ -503,7 +531,7 @@ public final class FacesViews {
 	/**
 	 * Strips the special 'faces-views' prefix path from the resource if any.
 	 *
-	 * @param resource
+	 * @param resource The resource.
 	 * @return the resource without the special prefix path, or as-is if it didn't start with this prefix.
 	 */
 	public static String stripFacesViewsPrefix(final String resource) {
@@ -523,6 +551,7 @@ public final class FacesViews {
 	/**
 	 * Map the Facelets Servlet to the given extensions
 	 *
+	 * @param servletContext The involved servlet context.
 	 * @param extensions collections of extensions (typically those as encountered during scanning)
 	 */
 	public static void mapFacesServlet(ServletContext servletContext, Set<String> extensions) {

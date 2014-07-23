@@ -40,7 +40,7 @@ import org.omnifaces.config.BeanManager;
  * auto-initialized when the OmniFaces JAR is bundled in a web application, so end-users do not need to register this
  * application explicitly themselves.
  *
- * @author Radu Creanga <rdcrng@gmail.com>
+ * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz
  * @see ConverterProvider
  * @see ValidatorProvider

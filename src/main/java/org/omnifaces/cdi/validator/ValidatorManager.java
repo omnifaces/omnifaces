@@ -24,8 +24,13 @@ import java.util.Map;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.Extension;
 import javax.faces.application.Application;
+import javax.faces.application.NavigationHandler;
+import javax.faces.application.ResourceHandler;
+import javax.faces.convert.Converter;
+import javax.faces.event.ActionListener;
+import javax.faces.event.PhaseListener;
+import javax.faces.event.SystemEventListener;
 import javax.faces.validator.FacesValidator;
 import javax.faces.validator.Validator;
 import javax.inject.Inject;
@@ -34,15 +39,29 @@ import org.omnifaces.application.OmniApplication;
 import org.omnifaces.application.ValidatorProvider;
 
 /**
- * Provides access to all {@link FacesValidator} annotated {@link Validator} instances which are made eligible for CDI.
  * <p>
- * Previously, in OmniFaces 1.6, all validators were proactively collected in an {@link Extension} instance. However,
- * this construct failed when OmniFaces was installed in multiple WARs of an EAR. The extension was EAR-wide, but each
- * WAR got its own instance injected and only one of them will have access to the collected validators. Since OmniFaces
- * 1.6.1, the whole extension is removed and the validators are now lazily collected in this manager class. See also
- * <a href="https://code.google.com/p/omnifaces/issues/detail?id=251">issue 251</a>.
+ * The <code>@FacesValidator</code> is by default not eligible for dependency injection by <code>@Inject</code> nor <code>@EJB</code>.
+ * There is a <a href="http://balusc.blogspot.com/2011/09/communication-in-jsf-20.html#GettingAnEJBInFacesConverterAndFacesValidator">workaround</a>
+ * for EJB, but this is nasty and doesn't work out for CDI. <a href="http://stackoverflow.com/q/7572335/157882">Another way</a>
+ * would be to make it a JSF or CDI managed bean, however this doesn't register the validator instance into the JSF application context,
+ * and hence you won't be able to make use of {@link Application#createValidator(String)} on it.
+ * <p>
+ * Initially, this should be solved in JSF 2.2 which comes with new support for dependency injection in among others all
+ * <code>javax.faces.*.*Factory</code>, {@link NavigationHandler}, {@link ResourceHandler},
+ * {@link ActionListener}, {@link PhaseListener} and {@link SystemEventListener} instances.
+ * The {@link Converter} and {@link Validator} were initially also among them, but they broke a TCK test and were at the
+ * last moment removed from dependency injection support.
+ * <p>
+ * The support is expected to come back in JSF 2.3, but we just can't wait any longer.
+ * <a href="http://myfaces.apache.org/extensions/cdi/">MyFaces CODI</a> has support for it,
+ * but it requires an additional <code>@Advanced</code> annotation.
+ * OmniFaces solves this by implicitly making all {@link FacesValidator} instances eligible for dependency injection
+ * <strong>without any further modification</strong>, like as JSF 2.2 would initially do, hereby providing a transparent
+ * bridge of the code to the upcoming JSF 2.3.
+ * <p>
+ * The {@link ValidatorManager} provides access to all {@link FacesValidator} annotated {@link Validator} instances which are made eligible for CDI.
  *
- * @author Radu Creanga <rdcrng@gmail.com>
+ * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz
  * @see OmniApplication
  * @since 1.6

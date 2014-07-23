@@ -33,33 +33,38 @@ import javax.servlet.http.HttpSession;
  * call {@link ExternalContext#getRequestParameterMap()} inside {@link PartialViewContext#isAjaxRequest()} right before
  * building/restoring the view, which will implicitly set the request body character encoding to the server-default
  * value, which is not UTF-8 per se.
+ *
+ * <h3>Installation</h3>
  * <p>
  * To get this filter to run, map it as follows in <code>web.xml</code>:
  * <pre>
  * &lt;filter&gt;
- *   &lt;filter-name&gt;characterEncodingFilter&lt;/filter-name&gt;
- *   &lt;filter-class&gt;org.omnifaces.filter.CharacterEncodingFilter&lt;/filter-class&gt;
+ *     &lt;filter-name&gt;characterEncodingFilter&lt;/filter-name&gt;
+ *     &lt;filter-class&gt;org.omnifaces.filter.CharacterEncodingFilter&lt;/filter-class&gt;
  * &lt;/filter&gt;
  * &lt;filter-mapping&gt;
- *   &lt;filter-name&gt;characterEncodingFilter&lt;/filter-name&gt;
- *   &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+ *     &lt;filter-name&gt;characterEncodingFilter&lt;/filter-name&gt;
+ *     &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
  * &lt;/filter-mapping&gt;
  * </pre>
+ *
+ * <h3>Configuration (optional)</h3>
  * <p>As JSF2/Facelets uses by default UTF-8 everywhere, the default charset is also set to UTF-8. When really
  * necessary for some reason, then it can be overridden by specifying the <code>encoding</code> initialization
  * parameter in the <code>&lt;filter&gt;</code> element as follows:
  * <pre>
  * &lt;init-param&gt;
- *   &lt;description&gt;
- *     The character encoding which is to be used to parse the HTTP request body. Defaults to UTF-8.
- *   &lt;/description&gt;
- *   &lt;param-name&gt;encoding&lt;/param-name&gt;
- *   &lt;param-value&gt;ISO-8859-1&lt;/param-value&gt;
+ *     &lt;description&gt;The character encoding which is to be used to parse the HTTP request body. Defaults to UTF-8.&lt;/description&gt;
+ *     &lt;param-name&gt;encoding&lt;/param-name&gt;
+ *     &lt;param-value&gt;ISO-8859-1&lt;/param-value&gt;
  * &lt;/init-param&gt;
  * </pre>
- * <p>Please note that this only affects HTTP POST requests, not HTTP GET requests. For HTTP GET requests, you should
+ * <p>
+ * Please note that this only affects HTTP POST requests, not HTTP GET requests. For HTTP GET requests, you should
  * be specifying the charset at servletcontainer level (e.g. <code>&lt;Context URIEncoding="UTF-8"&gt;</code> in Tomcat,
- * or <code>&lt;parameter-encoding default-charset="UTF-8"&gt;</code> in Glassfish). Also note that this doesn't affect
+ * or <code>&lt;parameter-encoding default-charset="UTF-8"&gt;</code> in Glassfish, or
+ * <code>&lt;property name="org.apache.catalina.connector.USE_BODY_ENCODING_FOR_QUERY_STRING" value="true" /&gt;</code>
+ * in JBoss in combination with this filter). Also note that this doesn't affect
  * HTTP responses in any way. For HTTP responses, you should be specifying the charset in
  * <code>&lt;f:view encoding&gt;</code>, which also already defaults to UTF-8 by the way.
  *

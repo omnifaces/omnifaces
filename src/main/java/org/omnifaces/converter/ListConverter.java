@@ -18,14 +18,36 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
+import javax.faces.model.SelectItem;
 
 /**
- * Base class for a converter that automatically converts a string representation of an Object back
- * to its original object based on objects in a given list for which conversion is taking place.
  * <p>
- * This is a variant of the {@link SelectItemsConverter}. See its Javadoc for further documentation.
- * </p>
- * 
+ * The <code>omnifaces.ListConverter</code> is intented for use in specialized selection components which doesn't
+ * use {@link SelectItem}s as the source for their selectable items, but work directly via a {@link List} of entities,
+ * and therefore the {@link SelectItemsConverter} isn't usable on them.
+ * <p>
+ * This converter allows you to populate a selection component with complex Java objects and have JSF convert those
+ * automatically back without the need to provide a custom converter which may need to do the job based on possibly
+ * expensive service/DAO operations. This converter automatically converts based on the {@link #toString()} of the
+ * selected item.
+ *
+ * <h3>Usage</h3>
+ * <p>
+ * This converter is available by converter ID <code>omnifaces.ListConverter</code> and should be used in combination
+ * with <code>&lt;o:converter&gt;</code> in order to be able to pass the {@link List} source to it, which it can use
+ * for conversion. Here's a basic usage example with PrimeFaces <code>&lt;p:pickList&gt;</code>, which is one of the
+ * few select components which doesn't use {@link SelectItem}s as the source, but work directly via a {@link List}.
+ * <pre>
+ * &lt;p:pickList value="#{bean.dualListModel}" var="entity" itemValue="#{entity}" itemLabel="#{entity.someProperty}"&gt;
+ *     &lt;o:converter converterId="omnifaces.ListConverter" list="#{bean.dualListModel.source}" /&gt;
+ * &lt;/p:pickList&gt;
+ * </pre>
+ *
+ * <h3>Make sure that your entity has a good <code>toString()</code> implementation</h3>
+ * <p>
+ * For detail, refer the javadoc of {@link SelectItemsConverter} and substitute "<code>SelectItemsConverter</code>" by
+ * "<code>ListConverter</code>" and "<code>SelectItemsIndexConverter</code>" by "<code>ListIndexConverter</code>".
+ *
  * @since 1.5
  * @author Arjan Tijms
  */

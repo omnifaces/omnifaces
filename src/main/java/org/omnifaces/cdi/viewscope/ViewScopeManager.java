@@ -43,7 +43,7 @@ import org.omnifaces.util.concurrentlinkedhashmap.EvictionListener;
  * The view scope destroy is done externally with aid of {@link ViewScopeEventListener} which is registered in
  * <code>faces-config.xml</code>.
  *
- * @author Radu Creanga <rdcrng@gmail.com>
+ * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz
  * @see ViewScoped
  * @see ViewScopeContext

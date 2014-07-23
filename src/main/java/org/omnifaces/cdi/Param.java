@@ -22,6 +22,7 @@ import java.beans.PropertyEditor;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.util.Nonbinding;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
@@ -35,9 +36,12 @@ import org.omnifaces.cdi.param.ParamValue;
 import org.omnifaces.util.Utils;
 
 /**
- * Specifies a request parameter that is to be injected into a managed bean within a JSF context, with
- * full support for a converter and one or more validators. Converters and validators can optionally
- * have attributes.
+ * <p>
+ * The CDI annotation {@link Param} allows you to inject, convert and validate a HTTP request parameter
+ * in a CDI managed bean. It's basically like <code>&lt;f:viewParam&gt;</code>, but with the major difference
+ * that the injected HTTP request parameter is available during {@link PostConstruct}, allowing a much easier
+ * way of processing without the need for a <code>&lt;f:event type="preRenderView"&gt;</code> or
+ * <code>&lt;f:viewAction&gt;</code>.
  * <p>
  * By default the name of the request parameter is taken from the name of the variable into which
  * injection takes place. It can be optionally specified.
@@ -52,8 +56,8 @@ import org.omnifaces.util.Utils;
  *
  * <pre>
  * {@literal @}Inject {@literal @}Param(
- * 	converter="#{userconverter}"
- * 	validator="#{priviledgedUser}"
+ *     converter="#{userconverter}"
+ * 	   validator="#{priviledgedUser}"
  * )
  * private ParamValue&lt;User&gt; user;
  * </pre>
@@ -147,7 +151,7 @@ public @interface Param {
 	@Nonbinding Attribute[] converterAttributes() default {};
 
 	/**
-	 * (Optional) Attributes that will be set on each of the validator instances obtained from {@link Param#validators()()} and {@link Param#validatorClasses()()}.
+	 * (Optional) Attributes that will be set on each of the validator instances obtained from {@link Param#validators()} and {@link Param#validatorClasses()}.
 	 * <p>
 	 * For each attribute the validator instances should have a writable JavaBeans property with the same name. The value can be a string literal
 	 * or an EL expression. String literals are coerced if necessary if there's a {@link PropertyEditor} available (the JDK provides these for

@@ -85,7 +85,7 @@ import org.omnifaces.cdi.viewscope.ViewScopeManager;
  * {@value org.omnifaces.cdi.viewscope.ViewScopeManager#DEFAULT_MAX_ACTIVE_VIEW_SCOPES} will be used. When a view scoped
  * bean is evicted from the LRU map, then its {@link PreDestroy} will also guaranteed to be invoked.
  *
- * @author Radu Creanga <rdcrng@gmail.com>
+ * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz
  * @see ViewScopeExtension
  * @see ViewScopeContext

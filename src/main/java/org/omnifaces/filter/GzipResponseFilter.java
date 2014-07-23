@@ -20,6 +20,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.faces.webapp.FacesServlet;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -29,51 +30,68 @@ import javax.servlet.http.HttpSession;
 import org.omnifaces.servlet.GzipHttpServletResponse;
 
 /**
- * This filter will apply GZIP compression on responses whenever applicable. GZIP will greatly reduce the response size
- * when applied on character based responses like HTML, CSS and JS, on average it can save up to ~70% of bandwidth.
+ * <p>
+ * The {@link GzipResponseFilter} will apply GZIP compression on responses whenever applicable. GZIP will greatly reduce
+ * the response size when applied on character based responses like HTML, CSS and JS, on average it can save up to ~70%
+ * of bandwidth.
  * <p>
  * While GZIP is normally to be configured in the servlet container (e.g. <code>&lt;Context compression="on"&gt;</code>
  * in Tomcat, or <code>&lt;property name="compression" value="on"&gt;</code> in Glassfish), this filter allows a
  * servlet container independent way of configuring GZIP compression and also allows enabling GZIP compression anyway
  * on 3rd party hosts where you have no control over servlet container configuration.
+ *
+ * <h3>Installation</h3>
  * <p>
  * To get it to run, map this filter on the desired <code>&lt;url-pattern&gt;</code> or maybe even on the
- * <code>&lt;servlet-name&gt;</code> of the <code>FacesServlet</code>. Mapping on <code>/*</code> may be too global as
- * some types of requests (comet, long polling, etc) cannot be gzipped. A <code>Filter</code> is by default dispatched
+ * <code>&lt;servlet-name&gt;</code> of the <code>FacesServlet</code>. A <code>Filter</code> is by default dispatched
  * on <code>REQUEST</code> only, you might want to explicitly add the <code>ERROR</code> dispatcher to get it to run
  * on error pages as well.
  * <pre>
  * &lt;filter&gt;
- *   &lt;filter-name&gt;gzipResponseFilter&lt;/filter-name&gt;
- *   &lt;filter-class&gt;org.omnifaces.filter.GzipResponseFilter&lt;/filter-class&gt;
+ *     &lt;filter-name&gt;gzipResponseFilter&lt;/filter-name&gt;
+ *     &lt;filter-class&gt;org.omnifaces.filter.GzipResponseFilter&lt;/filter-class&gt;
  * &lt;/filter&gt;
  * &lt;filter-mapping&gt;
- *   &lt;filter-name&gt;gzipResponseFilter&lt;/filter-name&gt;
- *   &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
- *   &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
- *   &lt;dispatcher&gt;ERROR&lt;/dispatcher&gt;
+ *     &lt;filter-name&gt;gzipResponseFilter&lt;/filter-name&gt;
+ *     &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
+ *     &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
+ *     &lt;dispatcher&gt;ERROR&lt;/dispatcher&gt;
  * &lt;/filter-mapping&gt;
  * </pre>
+ * <p>
+ * Mapping on <code>/*</code> may be too global as some types of requests (comet, long polling, etc) cannot be gzipped.
+ * In that case, consider mapping it to the exact <code>&lt;servlet-name&gt;</code> of the {@link FacesServlet} in the
+ * same <code>web.xml</code>.
+ * <pre>
+ * &lt;filter&gt;
+ *     &lt;filter-name&gt;gzipResponseFilter&lt;/filter-name&gt;
+ *     &lt;filter-class&gt;org.omnifaces.filter.GzipResponseFilter&lt;/filter-class&gt;
+ * &lt;/filter&gt;
+ * &lt;filter-mapping&gt;
+ *     &lt;filter-name&gt;gzipResponseFilter&lt;/filter-name&gt;
+ *     &lt;servlet-name&gt;facesServlet&lt;/servlet-name&gt;
+ *     &lt;dispatcher&gt;REQUEST&lt;/dispatcher&gt;
+ *     &lt;dispatcher&gt;ERROR&lt;/dispatcher&gt;
+ * &lt;/filter-mapping&gt;
+ * </pre>
+ *
+ * <h3>Configuration (optional)</h3>
  * <p>
  * This filter supports two initialization parameters which needs to be placed in <code>&lt;filter&gt;</code> element
  * as follows:
  * <pre>
  * &lt;init-param&gt;
- *   &lt;description&gt;
- *     The threshold size in bytes. Must be a number between 0 and 9999. Defaults to 500.
- *   &lt;/description&gt;
- *   &lt;param-name&gt;threshold&lt;/param-name&gt;
- *   &lt;param-value&gt;500&lt;/param-value&gt;
+ *     &lt;description&gt;The threshold size in bytes. Must be a number between 0 and 9999. Defaults to 500.&lt;/description&gt;
+ *     &lt;param-name&gt;threshold&lt;/param-name&gt;
+ *     &lt;param-value&gt;500&lt;/param-value&gt;
  * &lt;/init-param&gt;
  * &lt;init-param&gt;
- *   &lt;description&gt;
- *     The mimetypes which needs to be compressed. Must be a commaseparated string. Defaults to the below values.
- *   &lt;/description&gt;
- *   &lt;param-name&gt;mimetypes&lt;/param-name&gt;
- *   &lt;param-value&gt;
- *     text/plain, text/html, text/xml, text/css, text/javascript, text/csv, text/rtf,
- *     application/xml, application/xhtml+xml, application/javascript, application/json
- *   &lt;/param-value&gt;
+ *     &lt;description&gt;The mimetypes which needs to be compressed. Must be a commaseparated string. Defaults to the below values.&lt;/description&gt;
+ *     &lt;param-name&gt;mimetypes&lt;/param-name&gt;
+ *     &lt;param-value&gt;
+ *         text/plain, text/html, text/xml, text/css, text/javascript, text/csv, text/rtf,
+ *         application/xml, application/xhtml+xml, application/javascript, application/json
+ *     &lt;/param-value&gt;
  * &lt;/init-param&gt;
  * </pre>
  * <p>

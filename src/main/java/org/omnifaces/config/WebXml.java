@@ -50,9 +50,38 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 /**
+ * <p>
  * This configuration enum parses the <code>/WEB-INF/web.xml</code> and all <code>/META-INF/web-fragment</code> files
  * found in the classpath and offers methods to obtain information from them which is not available by the standard
  * Servlet API.
+ *
+ * <h3>Usage</h3>
+ * <p>
+ * Some examples:
+ * <pre>
+ * // Get the &lt;welcome-file-list&gt; (which are essentially path-relative filenames which needs to be served when a folder is requested).
+ * List&lt;String&gt; welcomeFiles = WebXml.INSTANCE.getWelcomeFiles();
+ * </pre>
+ * <pre>
+ * // Get a mapping of all error page locations by exception type (a key of null represents the default error page location, if any).
+ * Map&lt;Class&lt;Throwable&gt;, String&gt; errorPageLocations = WebXml.INSTANCE.getErrorPageLocations();
+ * </pre>
+ * <pre>
+ * // Get the &lt;form-login-page&gt; (which is a context-relative URL to the login page of FORM based authentication).
+ * String formLoginPage = WebXml.INSTANCE.getFormLoginPage();
+ * </pre>
+ * <pre>
+ * // Get a mapping of all &lt;security-constraint&gt; URL patterns and associated roles.
+ * Map&lt;String, Set&lt;String&gt;&gt; securityConstraints = WebXml.INSTANCE.getSecurityConstraints();
+ * </pre>
+ * <pre>
+ * // Check if access to certain (context-relative) URL is allowed for the given role based on &lt;security-constraint&gt;.
+ * boolean accessAllowed = WebXml.INSTANCE.isAccessAllowed("/admin.xhtml", "admin");
+ * </pre>
+ * <pre>
+ * // Get web.xml configured session timeout (in seconds).
+ * int sessionTimeout = WebXml.INSTANCE.getSessionTimeout();
+ * </pre>
  *
  * @author Bauke Scholtz
  * @since 1.2

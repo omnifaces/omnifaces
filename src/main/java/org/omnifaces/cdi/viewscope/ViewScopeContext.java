@@ -33,7 +33,7 @@ import org.omnifaces.cdi.ViewScoped;
 /**
  * Provide a context for the {@link ViewScoped} annotation wherein beans are managed by {@link ViewScopeManager}.
  *
- * @author Radu Creanga <rdcrng@gmail.com>
+ * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz
  * @see ViewScoped
  * @see ViewScopeManager

@@ -26,11 +26,14 @@ import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
 
 /**
+ * <p>
  * The <strong>&lt;o:massAttribute&gt;</strong> sets an attribute of the given name and value on all nested components,
  * if they don't already have an attribute set. On boolean attributes like <code>disabled</code>, <code>readonly</code>
  * and <code>rendered</code>, any literal (static) attribute value will be ignored and overridden. Only if they have
  * already a value expression <code>#{...}</code> as attribute value, then it won't be overridden. This is a technical
  * limitation specifically for boolean attributes as they don't default to <code>null</code>.
+ *
+ * <h3>Usage</h3>
  * <p>
  * For example, the following setup
  * <pre>

@@ -117,7 +117,7 @@ public final class SelectItemsCollector {
 	}
 
 	/**
-	 * This method runs the algorithm expressed by a <code>UISelectItems<code> component that uses the <code>var</code> iterator construct to generate
+	 * This method runs the algorithm expressed by a <code>UISelectItems</code> component that uses the <code>var</code> iterator construct to generate
 	 * a list of <code>SelectItem</code>s.
 	 *
 	 * @param uiSelectItems

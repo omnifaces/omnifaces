@@ -58,19 +58,42 @@ import javax.servlet.http.HttpSession;
 import org.omnifaces.component.ParamHolder;
 
 /**
+ * <p>
  * Collection of utility methods for the JSF API that are mainly shortcuts for obtaining stuff from the provided
  * {@link FacesContext} argument. In effect, it 'flattens' the hierarchy of nested objects.
  * <p>
  * The difference with {@link Faces} is that no one method of {@link FacesLocal} obtains the {@link FacesContext} from
- * the current thread by {@link FacesContext#getCurrentInstance()}. This job is up to the caller.
+ * the current thread by {@link FacesContext#getCurrentInstance()}. This job is up to the caller. This is more efficient
+ * in situations where multiple utility methods needs to be called at the same time. Invoking
+ * {@link FacesContext#getCurrentInstance()} is at its own an extremely cheap operation, however as it's to be obtained
+ * as a {@link ThreadLocal} variable, it's during the call still blocking all other running threads for some nanoseconds
+ * or so.
  * <p>
  * Note that methods which are <strong>directly</strong> available on {@link FacesContext} instance itself, such as
- * <code>getExternalContext()</code>, <code>getViewRoot()</code>, <code>isValidationFailed()</code>, etc are not
- * delegated by the current utility class, because it would design technically not make any sense to delegate a
- * single-depth method call like
- * <pre>ExternalContext externalContext = FacesLocal.getExternalContext(facesContext);</pre>
- * <p>instead of just calling it directly
- * <pre>ExternalContext externalContext = facesContext.getExternalContext();</pre>
+ * {@link FacesContext#getExternalContext()}, {@link FacesContext#getViewRoot()},
+ * {@link FacesContext#isValidationFailed()}, etc are not delegated by the this utility class, because it would design
+ * technically not make any sense to delegate a single-depth method call like follows:
+ * <pre>
+ * ExternalContext externalContext = FacesLocal.getExternalContext(facesContext);
+ * </pre>
+ * <p>
+ * instead of just calling it directly like follows:
+ * <pre>
+ * ExternalContext externalContext = facesContext.getExternalContext();
+ * </pre>
+ *
+ * <h3>Usage</h3>
+ * <p>
+ * Some examples (for the full list, check the API documentation):
+ * <pre>
+ * FacesContext context = Faces.getContext();
+ * User user = FacesLocal.getSessionAttribute(context, "user");
+ * Item item = FacesLocal.evaluateExpressionGet(context, "#{item}");
+ * String cookieValue = FacesLocal.getRequestCookie(context, "cookieName");
+ * List&lt;Locale&gt; supportedLocales = FacesLocal.getSupportedLocales(context);
+ * FacesLocal.invalidateSession(context);
+ * FacesLocal.redirect(context, "login.xhtml");
+ * </pre>
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz

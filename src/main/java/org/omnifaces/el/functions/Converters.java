@@ -32,11 +32,34 @@ import org.omnifaces.util.Json;
 import org.omnifaces.util.Utils;
 
 /**
- * Collection of EL functions for data conversion.
+ * <p>
+ * Collection of EL functions for data conversion: <code>of:iterableToList()</code> (with alternative <code>of:iterableToModel</code>),
+ * <code>of:setToList()</code>, <code>of:mapToList()</code>, <code>of:joinArray()</code>, <code>of:joinCollection()</code>,
+ * <code>of:joinMap()</code>, <code>of:splitArray()</code>, <code>of:splitList()</code>, and <code>of:toJson()</code>.
+ * <p>
+ * Regarding the <code>of:xxxToList()</code> functions; <code>&lt;ui:repeat&gt;</code> (and <code>&lt;h:dataTable&gt;</code>)
+ * doesn't support <code>Iterable</code> (such as <code>Set</code>) and <code>Map</code> directly, so those functions may be
+ * handy for them. If however EL 2.2 is used, then e.g. <code>#{bean.set.toArray()}</code> (for {@link Collection} types) and
+ * <code>#{bean.map.entrySet().toArray()}</code> could be used instead.
+ * But if EL 2.2 is not supported or for a general <code>Iterable</code> the provided EL functions can be used.
+ * <p>
+ * The <code>of:joinXxx()</code> functions basically joins the elements of the array, collection or map to a string using the given separator.
+ * This may be helpful if you want to display the contents of a collection as a commaseparated string without the need for an <code>&lt;ui:repeat&gt;</code>.
+ * <p>
+ * The <code>of:splitXxx()</code> functions basically splits an array or list into an array of subarrays or list of sublists of the given fragment size.
+ * This may be helpful if you want to create a two-dimensional matrix of a fixed width based on a single-dimensional array or list.
+ * <p>
+ * The <code>of:toJson()</code> function encodes any object to a string in JSON format according the rules of
+ * {@link Json#encode(Object)}.
+ * <p>
+ * Note that since JSF 2.2 it should be possible to use <code>#{bean.set}</code> directly in <code>&lt;h:dataTable&gt;</code>, but not
+ * in <code>&lt;ui:repeat&gt;</code>.
+ * The <code>of:setToList()</code> thus remains useful for JSF 2.0 and 2.1 in all cases, but is not needed for
+ * <code>&lt;h:dataTable&gt;</code> in JSF 2.2.
  *
  * @author Bauke Scholtz
  * @author Arjan Tijms
- * @author Radu Creanga <rdcrng@gmail.com>
+ * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  */
 public final class Converters {
 
