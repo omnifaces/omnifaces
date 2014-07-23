@@ -13,6 +13,7 @@
 package org.omnifaces.util;
 
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
+import static org.omnifaces.util.Servlets.prepareRedirectURL;
 import static org.omnifaces.util.Utils.encodeURL;
 
 import java.io.ByteArrayInputStream;
@@ -262,6 +263,13 @@ public final class FacesLocal {
 	}
 
 	/**
+	 * @see Faces#getMetadataAttributes()
+	 */
+	public static Map<String, Object> getMetadataAttributes(FacesContext context) {
+		return context.getViewRoot().getAttributes();
+	}
+
+	/**
 	 * @see Faces#getMetadataAttribute(String, String)
 	 */
 	@SuppressWarnings("unchecked")
@@ -274,7 +282,7 @@ public final class FacesLocal {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T getMetadataAttribute(FacesContext context, String name) {
-		return (T) context.getViewRoot().getAttributes().get(name);
+		return (T) getMetadataAttributes(context).get(name);
 	}
 
 	/**
@@ -687,60 +695,21 @@ public final class FacesLocal {
 	 * @see Faces#redirect(String, String...)
 	 */
 	public static void redirect(FacesContext context, String url, String... paramValues) throws IOException {
-		String normalizedURL = normalizeRedirectURL(context, url);
-		Object[] params = encodeURLParams(paramValues);
-		String redirectURL = (params.length == 0) ? normalizedURL : String.format(normalizedURL, params);
-
 		ExternalContext externalContext = context.getExternalContext();
 		externalContext.getFlash().setRedirect(true);
-		externalContext.redirect(redirectURL);
+		externalContext.redirect(prepareRedirectURL(getRequest(context), url, paramValues));
 	}
 
 	/**
 	 * @see Faces#redirectPermanent(String, String...)
 	 */
 	public static void redirectPermanent(FacesContext context, String url, String... paramValues) {
-		String normalizedURL = normalizeRedirectURL(context, url);
-		Object[] params = encodeURLParams(paramValues);
-		String redirectURL = (params.length == 0) ? normalizedURL : String.format(normalizedURL, params);
-
 		ExternalContext externalContext = context.getExternalContext();
 		externalContext.getFlash().setRedirect(true);
 		externalContext.setResponseStatus(SC_MOVED_PERMANENTLY);
-		externalContext.setResponseHeader("Location", redirectURL);
+		externalContext.setResponseHeader("Location", prepareRedirectURL(getRequest(context), url, paramValues));
 		externalContext.setResponseHeader("Connection", "close");
 		context.responseComplete();
-	}
-
-	/**
-	 * Helper method to normalize the given URL for a redirect. If the given URL does not start with
-	 * <code>http://</code>, <code>https://</code> or <code>/</code>, then the request context path will be prepended,
-	 * otherwise it will be unmodified.
-	 */
-	private static String normalizeRedirectURL(FacesContext context, String url) {
-		if (!url.startsWith("http://") && !url.startsWith("https://") && !url.startsWith("/")) {
-			url = getRequestContextPath(context) + "/" + url;
-		}
-
-		return url;
-	}
-
-	/**
-	 * Helper method to encode the given URL parameters using UTF-8.
-	 */
-	private static Object[] encodeURLParams(String... params) {
-		if (params == null) {
-			return new Object[0];
-		}
-		else {
-			Object[] encodedParams = new Object[params.length];
-
-			for (int i = 0; i < params.length; i++) {
-				encodedParams[i] = encodeURL(params[i]);
-			}
-
-			return encodedParams;
-		}
 	}
 
 	/**

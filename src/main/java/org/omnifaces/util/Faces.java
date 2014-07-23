@@ -421,6 +421,16 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the metadata attribute map of the current view, or an empty map if there is no view metadata.
+	 * @return The metadata attribute map of the current view, or an empty map if there is no view metadata.
+	 * @see UIViewRoot#getAttributes()
+	 * @since 2.0
+	 */
+	public static Map<String, Object> getMetadataAttributes() {
+		return FacesLocal.getMetadataAttributes(getContext());
+	}
+
+	/**
 	 * Returns the metadata attribute of the given view ID associated with the given name.
 	 * Note: this is not the same as the view scope, for that use {@link #getViewAttribute(String)}.
 	 * @param viewId The view ID to return the metadata attribute for.
@@ -961,10 +971,13 @@ public final class Faces {
 	}
 
 	/**
-	 * Sends a temporary (302) redirect to the given URL. If the given URL does not start with <code>http://</code>,
+	 * Sends a temporary (302) redirect to the given URL. If the given URL does <b>not</b> start with <code>http://</code>,
 	 * <code>https://</code> or <code>/</code>, then the request context path will be prepended, otherwise it will be
 	 * the unmodified redirect URL. So, when redirecting to another page in the same web application, always specify the
 	 * full path from the context root on (which in turn does not need to start with <code>/</code>).
+	 * <pre>
+	 * Faces.redirect("other.xhtml");
+	 * </pre>
 	 * <p>
 	 * You can use {@link String#format(String, Object...)} placeholder <code>%s</code> in the redirect URL to represent
 	 * placeholders for any request parameter values which needs to be URL-encoded. Here's a concrete example:
@@ -986,10 +999,13 @@ public final class Faces {
 	}
 
 	/**
-	 * Sends a permanent (301) redirect to the given URL. If the given URL does not start with <code>http://</code>,
+	 * Sends a permanent (301) redirect to the given URL. If the given URL does <b>not</b> start with <code>http://</code>,
 	 * <code>https://</code> or <code>/</code>, then the request context path will be prepended, otherwise it will be
 	 * the unmodified redirect URL. So, when redirecting to another page in the same web application, always specify the
 	 * full path from the context root on (which in turn does not need to start with <code>/</code>).
+	 * <pre>
+	 * Faces.redirectPermanent("other.xhtml");
+	 * </pre>
 	 * <p>
 	 * You can use {@link String#format(String, Object...)} placeholder <code>%s</code> in the redirect URL to represent
 	 * placeholders for any request parameter values which needs to be URL-encoded. Here's a concrete example:

@@ -16,9 +16,12 @@ import static java.util.regex.Pattern.quote;
 import static org.omnifaces.util.Utils.decodeURL;
 import static org.omnifaces.util.Utils.encodeURL;
 import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.startsWithOneOf;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -29,6 +32,8 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.omnifaces.filter.CacheControlFilter;
 
 /**
  * Collection of utility methods for the Servlet API in general.
@@ -220,6 +225,55 @@ public final class Servlets {
 		return parameterMap;
 	}
 
+	// HttpServletResponse --------------------------------------------------------------------------------------------
+
+	/**
+	 * Sends a temporary (302) faces redirect to the given URL. This does exactly the same as
+	 * {@link Faces#redirect(String, String...)}. The major advantage over calling
+	 * {@link HttpServletResponse#sendRedirect(String)} is that this method also recognizes JSF ajax requests which
+	 * requires a special XML response in order to successfully perform the redirect. This enables you to perform a
+	 * fullworthy "JSF redirect" from inside a servlet filter or even a plain vanilla servlet.
+	 * <p>
+	 * If the given URL does <b>not</b> start with <code>http://</code>, <code>https://</code> or <code>/</code>, then
+	 * the request context path will be prepended, otherwise it will be the unmodified redirect URL. So, when
+	 * redirecting to another page in the same web application, always specify the full path from the context root on
+	 * (which in turn does not need to start with <code>/</code>).
+	 * <pre>
+	 * Servlets.facesRedirect(request, response, "some.xhtml");
+	 * </pre>
+	 * <p>
+	 * You can use {@link String#format(String, Object...)} placeholder <code>%s</code> in the redirect URL to represent
+	 * placeholders for any request parameter values which needs to be URL-encoded. Here's a concrete example:
+	 * <pre>
+	 * Servlets.facesRedirect(request, response, "some.xhtml?foo=%s&bar=%s", foo, bar);
+	 * </pre>
+	 * @param request The involved HTTP servlet request.
+	 * @param response The involved HTTP servlet response.
+	 * @param url The URL to redirect the current response to.
+	 * @param paramValues The request parameter values which you'd like to put URL-encoded in the given URL.
+	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
+	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @since 2.0
+	 */
+	public static void facesRedirect
+		(HttpServletRequest request, HttpServletResponse response, String url, String ... paramValues)
+			throws IOException
+	{
+		String redirectURL = prepareRedirectURL(request, url, paramValues);
+		String facesRequestHeader = request.getHeader("Faces-Request");
+
+		if ("partial/ajax".equals(facesRequestHeader) || "partial/process".equals(facesRequestHeader)) {
+			response.setContentType("text/xml");
+			response.setCharacterEncoding(StandardCharsets.UTF_8.name());
+			CacheControlFilter.setNoCacheHeaders(response);
+			response.getWriter().append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
+				.printf("<partial-response><redirect url=\"%s\"></redirect></partial-response>", redirectURL);
+		}
+		else {
+			response.sendRedirect(redirectURL);
+		}
+	}
+
 	// Cookies --------------------------------------------------------------------------------------------------------
 
 	/**
@@ -365,6 +419,29 @@ public final class Servlets {
 	@SuppressWarnings("unchecked")
 	public static <T> T getApplicationAttribute(ServletContext context, String name) {
 		return (T) context.getAttribute(name);
+	}
+
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Helper method to prepare redirect URL. Package-private so that {@link FacesLocal} can also use it.
+	 */
+	static String prepareRedirectURL(HttpServletRequest request, String url, String... paramValues) {
+		if (!startsWithOneOf(url, "http://", "https://", "/")) {
+			url = request.getContextPath() + "/" + url;
+		}
+
+		if (isEmpty(paramValues)) {
+			return url;
+		}
+
+		Object[] encodedParams = new Object[paramValues.length];
+
+		for (int i = 0; i < paramValues.length; i++) {
+			encodedParams[i] = encodeURL(paramValues[i]);
+		}
+
+		return String.format(url, encodedParams);
 	}
 
 }
