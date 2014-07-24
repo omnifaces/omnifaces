@@ -59,6 +59,16 @@ public class ComponentIdParam extends ViewParam {
 		}
 	}
 
+	@Override
+	public void processValidators(FacesContext context) {
+		// NOOP. This component doesn't have a model value anyway.
+	}
+
+	@Override
+	public void processUpdates(FacesContext context) {
+		// NOOP. This component doesn't have a model value anyway.
+	}
+
 	/**
 	 * Gets the list of request values for the request parameter names identified by the value of the given property key.
 	 *
