@@ -30,11 +30,7 @@ import javax.faces.context.ExceptionHandlerFactory;
  * @see FacesMessageExceptionHandler
  * @since 1.8
  */
-public class FacesMessageExceptionHandlerFactory extends ExceptionHandlerFactory {
-
-	// Variables ------------------------------------------------------------------------------------------------------
-
-	private ExceptionHandlerFactory wrapped;
+public class FacesMessageExceptionHandlerFactory extends DefaultExceptionHandlerFactory {
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -43,7 +39,7 @@ public class FacesMessageExceptionHandlerFactory extends ExceptionHandlerFactory
 	 * @param wrapped The wrapped factory.
 	 */
 	public FacesMessageExceptionHandlerFactory(ExceptionHandlerFactory wrapped) {
-		this.wrapped = wrapped;
+		super(wrapped);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -53,15 +49,7 @@ public class FacesMessageExceptionHandlerFactory extends ExceptionHandlerFactory
 	 */
 	@Override
 	public ExceptionHandler getExceptionHandler() {
-		return new FacesMessageExceptionHandler(wrapped.getExceptionHandler());
-	}
-
-	/**
-	 * Returns the wrapped factory.
-	 */
-	@Override
-	public ExceptionHandlerFactory getWrapped() {
-		return wrapped;
+		return new FacesMessageExceptionHandler(getWrapped().getExceptionHandler());
 	}
 
 }

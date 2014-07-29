@@ -29,11 +29,7 @@ import javax.faces.context.ExceptionHandlerFactory;
  * @author Bauke Scholtz
  * @see FullAjaxExceptionHandler
  */
-public class FullAjaxExceptionHandlerFactory extends ExceptionHandlerFactory {
-
-	// Variables ------------------------------------------------------------------------------------------------------
-
-	private ExceptionHandlerFactory wrapped;
+public class FullAjaxExceptionHandlerFactory extends DefaultExceptionHandlerFactory {
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -42,7 +38,7 @@ public class FullAjaxExceptionHandlerFactory extends ExceptionHandlerFactory {
 	 * @param wrapped The wrapped factory.
 	 */
 	public FullAjaxExceptionHandlerFactory(ExceptionHandlerFactory wrapped) {
-		this.wrapped = wrapped;
+		super(wrapped);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -52,15 +48,7 @@ public class FullAjaxExceptionHandlerFactory extends ExceptionHandlerFactory {
 	 */
 	@Override
 	public ExceptionHandler getExceptionHandler() {
-		return new FullAjaxExceptionHandler(wrapped.getExceptionHandler());
-	}
-
-	/**
-	 * Returns the wrapped factory.
-	 */
-	@Override
-	public ExceptionHandlerFactory getWrapped() {
-		return wrapped;
+		return new FullAjaxExceptionHandler(getWrapped().getExceptionHandler());
 	}
 
 }
