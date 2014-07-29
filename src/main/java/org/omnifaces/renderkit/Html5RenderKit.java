@@ -71,8 +71,8 @@ import javax.faces.render.RenderKitWrapper;
  * <h3>Configuration</h3>
  * <p>
  * You can also configure additional passthrough attributes via the
- * {@value org.omnifaces.renderkit.Html5RenderKit#PARAM_NAME_PASSTHROUGH_ATTRIBUTES} context parameter, wherein the
- * passthrough attributes are been specified in semicolon-separated
+ * {@value org.omnifaces.renderkit.Html5RenderKit#PARAM_NAME_PASSTHROUGH_ATTRIBUTES} context parameter in
+ * <code>web.xml</code>, wherein the passthrough attributes are been specified in semicolon-separated
  * <code>com.example.SomeComponent=attr1,attr2,attr3</code> key=value pairs. The key represents the fully qualified
  * name of a class whose {@link Class#isInstance(Object)} must return <code>true</code> for the particular component
  * and the value represents the commaseparated string of names of passthrough attributes. Here's an example:

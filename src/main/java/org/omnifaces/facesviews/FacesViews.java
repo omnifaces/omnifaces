@@ -58,7 +58,7 @@ import javax.servlet.http.HttpServletRequest;
  * <h3>Installation</h3>
  * <p>
  * Example of configuring FacesViews to make all Facelets found in the root and its sub-directories (excluding /WEB-INF,
- * /META-INF and /resources) available as extensionless URLs:
+ * /META-INF and /resources) available as extensionless URLs in <code>web.xml</code>:
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.FACES_VIEWS_SCAN_PATHS&lt;/param-name&gt;
