@@ -272,7 +272,7 @@ public class Html5RenderKit extends RenderKitWrapper {
 			super.startElement(name, component);
 
 			if (component == null) {
-				component = getCurrentComponent();
+				return; // Either the renderer is broken, or it's plain text/html.
 			}
 
 			if (component instanceof UIForm && "form".equals(name)) {
