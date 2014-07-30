@@ -32,7 +32,6 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 
 import org.omnifaces.application.ViewScopeEventListener;
-import org.omnifaces.application.ViewScopeProvider;
 import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
@@ -50,7 +49,7 @@ import org.omnifaces.util.concurrentlinkedhashmap.EvictionListener;
  * @since 1.6
  */
 @SessionScoped
-public class ViewScopeManager implements ViewScopeProvider, Serializable {
+public class ViewScopeManager implements Serializable {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
@@ -127,7 +126,6 @@ public class ViewScopeManager implements ViewScopeProvider, Serializable {
 	 * This method is invoked during view destroy by {@link ViewScopeEventListener}, in that case destroy all beans in
 	 * current active view scope.
 	 */
-	@Override
 	public void preDestroyView() {
 		BeanStorage storage = activeViewScopes.remove(getBeanStorageId(false));
 
