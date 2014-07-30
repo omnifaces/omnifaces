@@ -22,8 +22,10 @@ import static javax.faces.view.facelets.ResourceResolver.FACELETS_RESOURCE_RESOL
 import static org.omnifaces.facesviews.FacesServletDispatchMethod.DO_FILTER;
 import static org.omnifaces.util.Faces.getApplicationAttribute;
 import static org.omnifaces.util.Platform.getFacesServletRegistration;
+import static org.omnifaces.util.ResourcePaths.filterExtension;
 import static org.omnifaces.util.ResourcePaths.getExtension;
 import static org.omnifaces.util.ResourcePaths.isDirectory;
+import static org.omnifaces.util.ResourcePaths.isExtensionless;
 import static org.omnifaces.util.ResourcePaths.stripExtension;
 import static org.omnifaces.util.ResourcePaths.stripPrefixPath;
 import static org.omnifaces.util.Servlets.getApplicationAttribute;
@@ -41,10 +43,15 @@ import java.util.Set;
 
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.webapp.FacesServlet;
 import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 import javax.servlet.http.HttpServletRequest;
+
+import org.omnifaces.ApplicationInitializer;
+import org.omnifaces.ApplicationListener;
+import org.omnifaces.config.WebXml;
 
 /**
  * <p>
@@ -173,7 +180,10 @@ public final class FacesViews {
 
     public static final String FACES_VIEWS_ORIGINAL_SERVLET_PATH = "org.omnifaces.facesviews.original.servlet_path";
 
-    public static void initilaize(ServletContext servletContext) {
+    /**
+     * This will register the {@link FacesViewsForwardingFilter}.
+     */
+    public static void registerFilter(ServletContext servletContext) {
 
 		if (!"false".equals(servletContext.getInitParameter(FACES_VIEWS_ENABLED_PARAM_NAME))) {
 
@@ -237,6 +247,41 @@ public final class FacesViews {
 				// this Faces Servlet might not be created yet, so we do this part in FacesViewInitializedListener.
 			}
 		}
+    }
+
+    /**
+     * This will map the {@link FacesServlet} to extensions found during scanning in {@link ApplicationInitializer}.
+     * This part of the initialization is executed via {@link ApplicationListener}, because the {@link FacesServlet}
+     * has to be available.
+     */
+    public static void addMappings(ServletContext servletContext) {
+
+        if (!"false".equals(servletContext.getInitParameter(FACES_VIEWS_ENABLED_PARAM_NAME))) {
+
+        	Set<String> extensions = getApplicationAttribute(servletContext, FACES_VIEWS_RESOURCES_EXTENSIONS);
+
+        	if (!isEmpty(extensions)) {
+
+        		Set<String> mappings = new HashSet<>(extensions);
+        		for (String welcomeFile : WebXml.INSTANCE.init(servletContext).getWelcomeFiles()) {
+        			if (isExtensionless(welcomeFile)) {
+        				if (!welcomeFile.startsWith("/")) {
+        					welcomeFile = "/" + welcomeFile;
+        				}
+        				mappings.add(welcomeFile);
+        			}
+        		}
+
+        		if (getFacesServletDispatchMethod(servletContext) == DO_FILTER) {
+        			// In order for the DO_FILTER method to work the FacesServlet, in addition the forward filter, has
+        			// to be mapped on all extensionless resources.
+	        		Map<String, String> collectedViews = getApplicationAttribute(servletContext, FACES_VIEWS_RESOURCES);
+	        		mappings.addAll(filterExtension(collectedViews.keySet()));
+        		}
+
+        		mapFacesServlet(servletContext, mappings);
+        	}
+        }
     }
 
     public static void scanViewsFromRootPaths(ServletContext servletContext, Map<String, String> collectedViews, Set<String> collectedExtensions) {

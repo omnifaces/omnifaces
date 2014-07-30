@@ -38,7 +38,7 @@ import javax.faces.event.PreRenderViewEvent;
 import javax.faces.event.SystemEvent;
 
 import org.omnifaces.component.output.cache.CacheFactory;
-import org.omnifaces.component.output.cache.CacheInitializerListener;
+import org.omnifaces.component.output.cache.CacheInitializer;
 import org.omnifaces.filter.OnDemandResponseBufferFilter;
 import org.omnifaces.servlet.BufferedHttpServletResponse;
 import org.omnifaces.util.Callback;
@@ -76,7 +76,7 @@ public class Cache extends OutputFamily {
 
 	private static final String ERROR_NO_BUFFERED_RESPONSE = String.format(
 		"No buffered response found in request, but 'useBuffer' set to true. Check setting the '%s' context parameter or installing the '%s' filter manually.",
-		CacheInitializerListener.CACHE_INSTALL_BUFFER_FILTER, OnDemandResponseBufferFilter.class
+		CacheInitializer.CACHE_INSTALL_BUFFER_FILTER, OnDemandResponseBufferFilter.class
 	);
 	private static Class<? extends SystemEvent> PRE_RENDER = PreRenderViewEvent.class;
 

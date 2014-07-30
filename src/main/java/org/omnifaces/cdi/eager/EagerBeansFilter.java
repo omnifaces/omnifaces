@@ -15,7 +15,7 @@
  */
 package org.omnifaces.cdi.eager;
 
-import static org.omnifaces.cdi.eager.EagerBeansSessionListener.SESSION_CREATED;
+import static org.omnifaces.cdi.eager.EagerBeansWebListener.SESSION_CREATED;
 import static org.omnifaces.util.Servlets.getRequestRelativeURIWithoutPathParameters;
 
 import java.io.IOException;
@@ -33,6 +33,7 @@ import javax.servlet.http.HttpSessionListener;
 import org.omnifaces.filter.HttpFilter;
 
 /**
+ * <p>
  * A servlet Filter that can be used as alternative for {@link EagerBeansRequestListener} and {@link EagerBeansSessionListener}
  * <p>
  * This instantiates eager request scoped beans during request processing at the point where this filter
@@ -42,49 +43,47 @@ import org.omnifaces.filter.HttpFilter;
  * such as is the case for GlassFish 3 (note that this is not spec compliant, CDI request scope should be available) and where
  * session scoped beans cannot be instantiated from an {@link HttpSessionListener} such as is the case for GlassFish 3 again.
  * <p>
- * If this Filter is installed {@link EagerBeansRequestListener} and {@link EagerBeansSessionListener} main function 
+ * If this Filter is installed {@link EagerBeansRequestListener} and {@link EagerBeansSessionListener} main function
  * (instantiating beans) will be automatically disabled.
  * <p>
- * Naturally this filter should not be enabled for environments where CDI is not available at all. 
+ * Naturally this filter should not be enabled for environments where CDI is not available at all.
  *
  * @since 1.8
  * @author Arjan Tijms
  *
  */
 public class EagerBeansFilter extends HttpFilter {
-	
+
 	@Inject
-	private BeansInstantiator eagerBeansRepository;
+	private EagerBeansRepository eagerBeansRepository;
 
 	@Override
 	public void init() throws ServletException {
-		EagerBeansRequestListener.setEnabled(false);
-		EagerBeansSessionListener.setEnabled(false);
-		EagerBeansSessionListener.setRecordSessionCreated(true);
+		EagerBeansWebListener.disable();
 	}
 
 	@Override
 	public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session,	FilterChain chain) throws ServletException, IOException {
 		eagerBeansRepository.instantiateByRequestURI(getRequestRelativeURIWithoutPathParameters(request));
-		
+
 		chain.doFilter(request, response);
-		
+
 		HttpSession newSession = request.getSession(false);
+
 		if (newSession != null) {
-			
-			// Get the session created marker inserted by EagerBeansSessionListener. Note that HttpSession#isNew
+
+			// Get the session created marker inserted by EagerBeansSessionListener. Note that HttpSession#isNew()
 			// would be tons easier but doesn't seem to work reliably on all servers.
 			AtomicBoolean sessionCreated = (AtomicBoolean) newSession.getAttribute(SESSION_CREATED);
 			if (sessionCreated != null) {
 				// First remove so session created marker to minimize other threads/request picking it up at all.
 				newSession.removeAttribute(SESSION_CREATED);
-				
+
 				// Even if we remove it immediately there's still a chance for a race, so test the boolean atomically
 				// and make sure only one thread sees the initial value of "true" returned.
 				if (sessionCreated.getAndSet(false)) {
 					eagerBeansRepository.instantiateSessionScoped();
 				}
-			
 			}
 		}
 	}

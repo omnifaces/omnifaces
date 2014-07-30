@@ -19,15 +19,17 @@ import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
+import org.omnifaces.config.BeanManager;
 import org.omnifaces.facesviews.FacesViews;
-import org.omnifaces.util.Faces;
 
 /**
- * <p>OmniFaces application initializer. So far, this performs the following tasks:
+ * <p>
+ * OmniFaces application initializer. This runs when the servlet container starts up.
+ * This performs the following tasks:
  * <ol>
  * <li>Log the OmniFaces version.
- * <li>Check if CDI is enabled, otherwise log and fail.
- * <li>Initialize FacesViews.
+ * <li>Check if CDI is available, otherwise log and fail.
+ * <li>Register {@link FacesViews} filter.
  * </ol>
  *
  * @author Bauke Scholtz
@@ -35,30 +37,26 @@ import org.omnifaces.util.Faces;
  */
 public class ApplicationInitializer implements ServletContainerInitializer {
 
+	// Constants ------------------------------------------------------------------------------------------------------
+
 	private static final Logger logger = Logger.getLogger(ApplicationInitializer.class.getName());
+
+	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
 	public void onStartup(Set<Class<?>> c, ServletContext servletContext) throws ServletException {
 		logOmniFacesVersion();
-		checkCDIEnabled(servletContext);
-		FacesViews.initilaize(servletContext);
+		checkCDIAvailable();
+		FacesViews.registerFilter(servletContext);
 	}
 
-	private static void logOmniFacesVersion() {
-		logger.info("Using OmniFaces version " + Faces.class.getPackage().getSpecificationVersion());
+	private void logOmniFacesVersion() {
+		logger.info("Using OmniFaces version " + getClass().getPackage().getSpecificationVersion());
 	}
 
-	private static void checkCDIEnabled(ServletContext servletContext) throws ServletException {
+	private void checkCDIAvailable() throws ServletException {
 		try {
-			try {
-				Class.forName("javax.enterprise.inject.spi.BeanManager");
-			}
-			catch (ClassNotFoundException e) {
-				throw new IllegalStateException("CDI BeanManager API is missing in classpath.");
-			}
-			if (servletContext.getResource("/WEB-INF/beans.xml") == null) {
-				throw new IllegalStateException("CDI beans.xml file is missing in /WEB-INF.");
-			}
+			BeanManager.INSTANCE.toString();
 		}
 		catch (Throwable e) {
 			logger.severe(""

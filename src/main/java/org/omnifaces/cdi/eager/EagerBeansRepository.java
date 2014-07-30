@@ -33,7 +33,7 @@ import javax.inject.Inject;
  *
  */
 @ApplicationScoped
-public class EagerBeansRepository implements BeansInstantiator {
+public class EagerBeansRepository {
 
 	@Inject
 	private BeanManager beanManager;
@@ -43,7 +43,6 @@ public class EagerBeansRepository implements BeansInstantiator {
 	private Map<String, List<Bean<?>>> requestScopedBeansViewId;
 	private Map<String, List<Bean<?>>> requestScopedBeansRequestURI;
 
-	@Override
 	public void instantiateApplicationScoped() {
 		if (isAnyEmpty(applicationScopedBeans, beanManager)) {
 			return;
@@ -52,7 +51,6 @@ public class EagerBeansRepository implements BeansInstantiator {
 		instantiateBeans(applicationScopedBeans);
 	}
 
-	@Override
 	public void instantiateSessionScoped() {
 		if (isAnyEmpty(sessionScopedBeans, beanManager)) {
 			return;
@@ -61,12 +59,10 @@ public class EagerBeansRepository implements BeansInstantiator {
 		instantiateBeans(sessionScopedBeans);
 	}
 
-	@Override
 	public void instantiateByRequestURI(String relativeRequestURI) {
 		instantiateRequestScopedBeans(requestScopedBeansRequestURI, relativeRequestURI);
 	}
 
-	@Override
 	public void instantiateByViewID(String viewId) {
 		instantiateRequestScopedBeans(requestScopedBeansViewId, viewId);
 	}

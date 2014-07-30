@@ -37,19 +37,17 @@ import org.omnifaces.eventlistener.DefaultPhaseListener;
 public class EagerBeansPhaseListener extends DefaultPhaseListener {
 
 	private static final long serialVersionUID = -7252366571645029385L;
-	
-	private BeansInstantiator eagerBeansRepository;
+
+	private EagerBeansRepository eagerBeansRepository;
 
 	public EagerBeansPhaseListener() {
 		super(RESTORE_VIEW);
-		eagerBeansRepository = BeanManager.INSTANCE.getReference(BeansInstantiator.class);
+		eagerBeansRepository = BeanManager.INSTANCE.getReference(EagerBeansRepository.class);
 	}
 
 	@Override
 	public void afterPhase(PhaseEvent event) {
-		if (eagerBeansRepository != null) {
-			eagerBeansRepository.instantiateByViewID(getViewId());
-		}
+		eagerBeansRepository.instantiateByViewID(getViewId());
 	}
 
 }

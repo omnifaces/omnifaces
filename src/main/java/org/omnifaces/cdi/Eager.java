@@ -31,8 +31,7 @@ import javax.servlet.ServletRequestListener;
 import javax.servlet.http.HttpSessionListener;
 
 import org.omnifaces.cdi.eager.EagerBeansFilter;
-import org.omnifaces.cdi.eager.EagerBeansRequestListener;
-import org.omnifaces.cdi.eager.EagerBeansSessionListener;
+import org.omnifaces.cdi.eager.EagerBeansWebListener;
 
 /**
  * <p>
@@ -142,11 +141,9 @@ import org.omnifaces.cdi.eager.EagerBeansSessionListener;
  * &lt;/filter-mapping&gt;
  *</pre>
  *
- * Note that the {@link EagerBeansFilter} will automatically disable the request listener by calling
- * {@link EagerBeansRequestListener#setEnabled(boolean)} and disable instantiating beans from the session listener by
- * calling {@link EagerBeansSessionListener#setEnabled(boolean)}.
  * <p>
- * If so needed the listeners can also be disabled in the same way via user code.
+ * Note that the {@link EagerBeansFilter} will automatically disable the request/session listener by calling
+ * {@link EagerBeansWebListener#disable()}.
  *
  *
  * @since 1.8

@@ -20,10 +20,7 @@ import java.util.Map;
 
 import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
 import javax.servlet.ServletRegistration;
-import javax.servlet.annotation.WebListener;
 
 import org.omnifaces.filter.OnDemandResponseBufferFilter;
 
@@ -35,10 +32,9 @@ import org.omnifaces.filter.OnDemandResponseBufferFilter;
  *
  * @since 1.1
  * @author Arjan Tijms
- *
+ * @See ApplicationListener
  */
-@WebListener
-public class CacheInitializerListener implements ServletContextListener {
+public class CacheInitializer {
 
 	// Web context parameter to set the cache provider implementation
 	public static final String CACHE_PROVIDER_INIT_PARAM_NAME = "org.omnifaces.CACHE_PROVIDER";
@@ -46,10 +42,7 @@ public class CacheInitializerListener implements ServletContextListener {
 
 	public static final String CACHE_PROVIDER_SETTING_INIT_PARAM_PREFIX = "org.omnifaces.CACHE_SETTING_";
 
-	@Override
-	public void contextInitialized(ServletContextEvent sce) {
-
-		ServletContext context = sce.getServletContext();
+	public static void loadProviderAndRegisterFilter(ServletContext context) {
 
 		// Check for a user configured custom cache provider, or get default one
 		CacheProvider cacheProvider = getCacheProvider(context);
@@ -66,12 +59,7 @@ public class CacheInitializerListener implements ServletContextListener {
 		}
 	}
 
-	@Override
-	public void contextDestroyed(ServletContextEvent sce) {
-		// NOOP for now, give cache destroy command later
-	}
-
-	private CacheProvider getCacheProvider(ServletContext context) {
+	private static CacheProvider getCacheProvider(ServletContext context) {
 		CacheProvider cacheProvider = null;
 
 		String cacheProviderName = context.getInitParameter(CACHE_PROVIDER_INIT_PARAM_NAME);
@@ -85,7 +73,7 @@ public class CacheInitializerListener implements ServletContextListener {
 		return cacheProvider;
 	}
 
-	private CacheProvider createInstance(String cacheProviderName) {
+	private static CacheProvider createInstance(String cacheProviderName) {
 		try {
 			return (CacheProvider) Class.forName(cacheProviderName).newInstance();
 		}
@@ -94,7 +82,7 @@ public class CacheInitializerListener implements ServletContextListener {
 		}
 	}
 
-	private Map<String, String> getCacheSetting(ServletContext context) {
+	private static Map<String, String> getCacheSetting(ServletContext context) {
 		Map<String, String> settings = new HashMap<>();
 
 		for (String initParameterName : list(context.getInitParameterNames())) {
@@ -108,4 +96,5 @@ public class CacheInitializerListener implements ServletContextListener {
 
 		return settings;
 	}
+
 }
