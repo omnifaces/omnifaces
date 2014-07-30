@@ -21,6 +21,7 @@ import static javax.faces.application.ProjectStage.PROJECT_STAGE_PARAM_NAME;
 import static javax.faces.view.facelets.ResourceResolver.FACELETS_RESOURCE_RESOLVER_PARAM_NAME;
 import static org.omnifaces.facesviews.FacesServletDispatchMethod.DO_FILTER;
 import static org.omnifaces.util.Faces.getApplicationAttribute;
+import static org.omnifaces.util.Faces.getApplicationFromFactory;
 import static org.omnifaces.util.Platform.getFacesServletRegistration;
 import static org.omnifaces.util.ResourcePaths.filterExtension;
 import static org.omnifaces.util.ResourcePaths.getExtension;
@@ -41,6 +42,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.faces.application.Application;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.webapp.FacesServlet;
@@ -283,6 +285,24 @@ public final class FacesViews {
         	}
         }
     }
+    
+    /**
+     * Register a view handler that transforms a view id with extension back to an extensionless one.
+     */
+    public static void setViewHander(ServletContext servletContext) {
+    	if (isFacesViewsActive(servletContext)) {
+	        Application application = getApplicationFromFactory();
+	        application.setViewHandler(new FacesViewsViewHandler(application.getViewHandler()));
+    	}
+    }
+    
+	public static boolean isFacesViewsActive(ServletContext servletContext) {
+		if (!"false".equals(servletContext.getInitParameter(FACES_VIEWS_ENABLED_PARAM_NAME))) {
+			return !isEmpty(getApplicationAttribute(servletContext, FACES_VIEWS_RESOURCES_EXTENSIONS));
+		}
+		
+		return false;
+	}
 
     public static void scanViewsFromRootPaths(ServletContext servletContext, Map<String, String> collectedViews, Set<String> collectedExtensions) {
 		for (String rootPath : getRootPaths(servletContext)) {
