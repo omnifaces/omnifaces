@@ -20,10 +20,10 @@ import javax.faces.event.SystemEvent;
 import javax.faces.event.SystemEventListener;
 
 /**
- * Installs the FacesViewsHandler.
- * 
+ * Installs the {@link FacesViewsViewHandler}.
+ *
  * @since 2.0
- * @author arjan
+ * @author Arjan Tijms
  *
  */
 public class FacesViewsViewHandlerInstaller implements SystemEventListener {
