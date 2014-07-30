@@ -34,7 +34,7 @@ import org.omnifaces.filter.HttpFilter;
 
 /**
  * <p>
- * A servlet Filter that can be used as alternative for {@link EagerBeansRequestListener} and {@link EagerBeansSessionListener}
+ * A servlet Filter that can be used as alternative for {@link EagerBeansWebListener}.
  * <p>
  * This instantiates eager request scoped beans during request processing at the point where this filter
  * is inserted in the chain.
@@ -43,8 +43,8 @@ import org.omnifaces.filter.HttpFilter;
  * such as is the case for GlassFish 3 (note that this is not spec compliant, CDI request scope should be available) and where
  * session scoped beans cannot be instantiated from an {@link HttpSessionListener} such as is the case for GlassFish 3 again.
  * <p>
- * If this Filter is installed {@link EagerBeansRequestListener} and {@link EagerBeansSessionListener} main function
- * (instantiating beans) will be automatically disabled.
+ * If this Filter is installed {@link EagerBeansWebListener} main function (instantiating request and session scoped
+ * beans) will be automatically disabled.
  * <p>
  * Naturally this filter should not be enabled for environments where CDI is not available at all.
  *

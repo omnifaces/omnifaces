@@ -96,7 +96,7 @@ import org.omnifaces.util.Hacks;
  * <h3>Configuration</h3>
  * <p>
  * The following context parameters are available:
- * <table>
+ * <table summary="All available context parameters">
  * <tr><td nowrap>
  * <code>{@value org.omnifaces.resourcehandler.CombinedResourceHandler#PARAM_NAME_EXCLUDED_RESOURCES}</code>
  * </td><td>

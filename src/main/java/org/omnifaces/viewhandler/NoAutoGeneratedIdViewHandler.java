@@ -45,7 +45,7 @@ import javax.faces.context.ResponseWriterWrapper;
  * writes to the "id" attribute. Components that write their markup in any other way won't be checked and will thus
  * slip through.
  *
- * <h3>Installation<h3>
+ * <h3>Installation</h3>
  * <p>
  * Register it as <code>&lt;view-handler&gt;</code> in <code>faces-config.xml</code>.
  * <pre>

@@ -148,7 +148,7 @@
  * <p>
  * The following context parameters are available.
  *
- * <table border="1" cellspacing="0">
+ * <table summary="All available context parameters" border="1" cellspacing="0">
  *
  * <tr>
  * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_ENABLED_PARAM_NAME}</code></td>

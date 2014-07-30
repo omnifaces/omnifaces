@@ -22,6 +22,7 @@ import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 
+import org.omnifaces.ApplicationListener;
 import org.omnifaces.filter.OnDemandResponseBufferFilter;
 
 /**
@@ -32,7 +33,7 @@ import org.omnifaces.filter.OnDemandResponseBufferFilter;
  *
  * @since 1.1
  * @author Arjan Tijms
- * @See ApplicationListener
+ * @see ApplicationListener
  */
 public class CacheInitializer {
 

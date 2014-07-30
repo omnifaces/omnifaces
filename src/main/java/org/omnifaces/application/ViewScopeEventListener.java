@@ -50,8 +50,8 @@ public class ViewScopeEventListener implements ViewMapListener {
 
 	/**
 	 * If the event is an instance of {@link PreDestroyViewMapEvent}, which means that the JSF view scope is about to
-	 * be destroyed, then find the current instance of {@link ViewScopeProvider} and invoke its
-	 * {@link ViewScopeProvider#preDestroyView()} method.
+	 * be destroyed, then find the current instance of {@link ViewScopeManager} and invoke its
+	 * {@link ViewScopeManager#preDestroyView()} method.
 	 */
 	@Override
 	public void processEvent(SystemEvent event) throws AbortProcessingException {
