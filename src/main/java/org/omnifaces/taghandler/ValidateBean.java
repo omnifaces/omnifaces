@@ -13,7 +13,7 @@
 package org.omnifaces.taghandler;
 
 import static org.omnifaces.util.Components.hasInvokedSubmit;
-import static org.omnifaces.util.Events.addBeforePhaseListener;
+import static org.omnifaces.util.Events.subscribeToViewBeforePhase;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
 
 import java.io.IOException;
@@ -100,7 +100,7 @@ public class ValidateBean extends TagHandler {
 
 		final String validationGroups = this.validationGroups != null ? this.validationGroups.getValue(context) : null;
 		final boolean disabled = this.disabled != null ? this.disabled.getBoolean(context) : false;
-		addBeforePhaseListener(PhaseId.PROCESS_VALIDATIONS, new Callback.Void() {
+		subscribeToViewBeforePhase(PhaseId.PROCESS_VALIDATIONS, new Callback.Void() {
 
 			@Override
 			public void invoke() {

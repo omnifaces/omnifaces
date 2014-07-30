@@ -12,7 +12,7 @@
  */
 package org.omnifaces.resourcehandler;
 
-import static org.omnifaces.util.Events.subscribeToEvent;
+import static org.omnifaces.util.Events.subscribeToApplicationEvent;
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Faces.getRequestURI;
 import static org.omnifaces.util.Utils.stream;
@@ -198,7 +198,7 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 		excludedResources.addAll(suppressedResources);
 		inlineCSS = Boolean.valueOf(getInitParameter(PARAM_NAME_INLINE_CSS));
 		inlineJS = Boolean.valueOf(getInitParameter(PARAM_NAME_INLINE_JS));
-		subscribeToEvent(PreRenderViewEvent.class, this);
+		subscribeToApplicationEvent(PreRenderViewEvent.class, this);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------

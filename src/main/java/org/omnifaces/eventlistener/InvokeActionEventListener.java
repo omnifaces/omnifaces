@@ -12,7 +12,7 @@
  */
 package org.omnifaces.eventlistener;
 
-import static org.omnifaces.util.Events.subscribeToEvent;
+import static org.omnifaces.util.Events.subscribeToApplicationEvent;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.util.LinkedHashSet;
@@ -77,7 +77,7 @@ public class InvokeActionEventListener extends DefaultPhaseListener implements S
 	 */
 	public InvokeActionEventListener() {
 		super(PhaseId.INVOKE_APPLICATION);
-		subscribeToEvent(PostValidateEvent.class, this);
+		subscribeToApplicationEvent(PostValidateEvent.class, this);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------

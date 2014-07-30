@@ -28,24 +28,21 @@ import javax.faces.event.PhaseListener;
 import org.omnifaces.util.Events;
 
 /**
- * This phase listener picks up phase listener instances from the request scope by <code>addCallbackXxx()</code> methods
- * of the {@link Events} utility class and calls them back for each matching phase.
  * <p>
- * This differs in a few subtle ways from {@link Events#addPhaseListener(PhaseListener)}. Namely, the phase listener
- * registered here will be called via the global phase listener, which executes slightly earlier for its before phase
- * and slightly later for its after phase as compared to phase listeners attached to the view root.
+ * This phase listener picks up phase listener instances and phase event callbacks from the request scope subscribed via
+ * <code>subscribeToRequestXxxPhase()</code> methods of the {@link Events} utility class and calls them back for each
+ * matching phase.
  * <p>
- * Additionally, a phase listener registered via this method will not become part of the view state, but will execute
- * only once. Phase listeners attached to the view root will come back after each postback and have to be removed
- * manually (in Mojarra this can be difficult due to the fact iterators over listeners are kept 'open' during each
- * phase).
+ * This differs in a few subtle ways from <code>subscribeToViewXxxPhase()</code> methods of the {@link Events} class
+ * which subscribes to the view scope. Namely, this phase listener will execute slightly earlier for its before phase
+ * and slightly later for its after phase as compared to the view scoped ones. Additionally, the phase listener
+ * instances and phase event callbacks registered via this phase listener will not become part of the view state, but
+ * will execute only once during the current request instead of during every (postback) request on the same view.
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz
  * @since 1.2
- * @see Events#addCallbackPhaseListener(PhaseListener)
- * @see Events#addCallbackBeforePhaseListener(PhaseId, org.omnifaces.util.Callback.Void)
- * @see Events#addCallbackAfterPhaseListener(PhaseId, org.omnifaces.util.Callback.Void)
+ * @see Events
  */
 public class CallbackPhaseListener implements PhaseListener {
 
@@ -93,14 +90,14 @@ public class CallbackPhaseListener implements PhaseListener {
 	// Utility --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * @see Events#addCallbackPhaseListener(PhaseListener)
+	 * @see Events#addRequestPhaseListener(PhaseListener)
 	 */
 	public static void add(PhaseListener phaseListener) {
 		getCallbackPhaseListeners(getContext(), true).add(phaseListener);
 	}
 
 	/**
-	 * @see Events#removeCallbackPhaseListener(PhaseListener)
+	 * @see Events#removeRequestPhaseListener(PhaseListener)
 	 */
 	public static boolean remove(PhaseListener phaseListener) {
 		Set<PhaseListener> phaseListeners = getCallbackPhaseListeners(getContext(), false);

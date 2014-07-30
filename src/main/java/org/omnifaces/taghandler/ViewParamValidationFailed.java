@@ -16,7 +16,7 @@
 package org.omnifaces.taghandler;
 
 import static java.lang.Boolean.TRUE;
-import static org.omnifaces.util.Events.addCallbackAfterPhaseListener;
+import static org.omnifaces.util.Events.subscribeToRequestAfterPhase;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.FacesLocal.redirect;
 import static org.omnifaces.util.FacesLocal.responseSendError;
@@ -237,7 +237,7 @@ public class ViewParamValidationFailed extends TagHandler implements ComponentSy
 
 		FacesContext context = getContext();
 		final UIComponent component = event.getComponent();
-		addCallbackAfterPhaseListener(context.getCurrentPhaseId(), new Callback.Void() {
+		subscribeToRequestAfterPhase(context.getCurrentPhaseId(), new Callback.Void() {
 			@Override
 			public void invoke() {
 				// We can't unsubscribe immediately inside processEvent() itself, as it would otherwise end up in a

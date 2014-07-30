@@ -14,7 +14,7 @@ package org.omnifaces.taghandler;
 
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Components.hasInvokedSubmit;
-import static org.omnifaces.util.Events.addBeforePhaseListener;
+import static org.omnifaces.util.Events.subscribeToViewBeforePhase;
 import static org.omnifaces.util.Faces.setContextAttribute;
 
 import java.io.IOException;
@@ -93,7 +93,7 @@ public class IgnoreValidationFailed extends TagHandler {
 		}
 
 		if (ComponentHandler.isNew(parent)) {
-			addBeforePhaseListener(PhaseId.PROCESS_VALIDATIONS, new Callback.Void() {
+			subscribeToViewBeforePhase(PhaseId.PROCESS_VALIDATIONS, new Callback.Void() {
 
 				@Override
 				public void invoke() {
