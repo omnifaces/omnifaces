@@ -12,21 +12,23 @@
  */
 package org.omnifaces.util;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.regex.Pattern.quote;
 import static org.omnifaces.util.Utils.decodeURL;
 import static org.omnifaces.util.Utils.encodeURL;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.startsWithOneOf;
+import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
@@ -44,6 +46,12 @@ import org.omnifaces.filter.CacheControlFilter;
  * @since 1.6
  */
 public final class Servlets {
+
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final Set<String> FACES_AJAX_HEADERS = unmodifiableSet("partial/ajax", "partial/process");
+	private static final String FACES_AJAX_REDIRECT_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
+		+ "<partial-response><redirect url=\"%s\"></redirect></partial-response>";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -226,56 +234,6 @@ public final class Servlets {
 		return parameterMap;
 	}
 
-	// HttpServletResponse --------------------------------------------------------------------------------------------
-
-	/**
-	 * Sends a temporary (302) faces redirect to the given URL. This does exactly the same as
-	 * {@link Faces#redirect(String, String...)}. The major advantage over calling
-	 * {@link HttpServletResponse#sendRedirect(String)} is that this method also recognizes JSF ajax requests which
-	 * requires a special XML response in order to successfully perform the redirect. This enables you to perform a
-	 * fullworthy "JSF redirect" from inside a servlet filter or even a plain vanilla servlet, where the
-	 * {@link FacesContext} is normally not available.
-	 * <p>
-	 * If the given URL does <b>not</b> start with <code>http://</code>, <code>https://</code> or <code>/</code>, then
-	 * the request context path will be prepended, otherwise it will be the unmodified redirect URL. So, when
-	 * redirecting to another page in the same web application, always specify the full path from the context root on
-	 * (which in turn does not need to start with <code>/</code>).
-	 * <pre>
-	 * Servlets.facesRedirect(request, response, "some.xhtml");
-	 * </pre>
-	 * <p>
-	 * You can use {@link String#format(String, Object...)} placeholder <code>%s</code> in the redirect URL to represent
-	 * placeholders for any request parameter values which needs to be URL-encoded. Here's a concrete example:
-	 * <pre>
-	 * Servlets.facesRedirect(request, response, "some.xhtml?foo=%s&amp;bar=%s", foo, bar);
-	 * </pre>
-	 * @param request The involved HTTP servlet request.
-	 * @param response The involved HTTP servlet response.
-	 * @param url The URL to redirect the current response to.
-	 * @param paramValues The request parameter values which you'd like to put URL-encoded in the given URL.
-	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
-	 * redeclare it in the action method. The servletcontainer will handle it.
-	 * @since 2.0
-	 */
-	public static void facesRedirect
-		(HttpServletRequest request, HttpServletResponse response, String url, String ... paramValues)
-			throws IOException
-	{
-		String redirectURL = prepareRedirectURL(request, url, paramValues);
-		String facesRequestHeader = request.getHeader("Faces-Request");
-
-		if ("partial/ajax".equals(facesRequestHeader) || "partial/process".equals(facesRequestHeader)) {
-			response.setContentType("text/xml");
-			response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-			CacheControlFilter.setNoCacheHeaders(response);
-			response.getWriter().append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
-				.printf("<partial-response><redirect url=\"%s\"></redirect></partial-response>", redirectURL);
-		}
-		else {
-			response.sendRedirect(redirectURL);
-		}
-	}
-
 	// Cookies --------------------------------------------------------------------------------------------------------
 
 	/**
@@ -421,6 +379,65 @@ public final class Servlets {
 	@SuppressWarnings("unchecked")
 	public static <T> T getApplicationAttribute(ServletContext context, String name) {
 		return (T) context.getAttribute(name);
+	}
+
+	// JSF ------------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns <code>true</code> if the given HTTP servlet request is a JSF ajax request. This does exactly the same as
+	 * {@link Faces#isAjaxRequest()}, but then without the need for a {@link FacesContext}. The major advantage is that
+	 * you can perform the job inside a servlet filter, where the {@link FacesContext} is normally not available.
+	 * @param request The involved HTTP servlet request.
+	 * @return <code>true</code> if the given HTTP servlet request is a JSF ajax request.
+	 * @since 2.0
+	 */
+	public static boolean isFacesAjaxRequest(HttpServletRequest request) {
+		return FACES_AJAX_HEADERS.contains(request.getHeader("Faces-Request"));
+	}
+
+	/**
+	 * Sends a temporary (302) JSF redirect to the given URL, supporting JSF ajax requests. This does exactly the same
+	 * as {@link Faces#redirect(String, String...)}, but without the need for a {@link FacesContext}. The major
+	 * advantage is that you can perform the job inside a servlet filter or even a plain vanilla servlet, where the
+	 * {@link FacesContext} is normally not available. This method also recognizes JSF ajax requests which requires a
+	 * special XML response in order to successfully perform the redirect.
+	 * <p>
+	 * If the given URL does <b>not</b> start with <code>http://</code>, <code>https://</code> or <code>/</code>, then
+	 * the request context path will be prepended, otherwise it will be the unmodified redirect URL. So, when
+	 * redirecting to another page in the same web application, always specify the full path from the context root on
+	 * (which in turn does not need to start with <code>/</code>).
+	 * <pre>
+	 * Servlets.facesRedirect(request, response, "some.xhtml");
+	 * </pre>
+	 * <p>
+	 * You can use {@link String#format(String, Object...)} placeholder <code>%s</code> in the redirect URL to represent
+	 * placeholders for any request parameter values which needs to be URL-encoded. Here's a concrete example:
+	 * <pre>
+	 * Servlets.facesRedirect(request, response, "some.xhtml?foo=%s&amp;bar=%s", foo, bar);
+	 * </pre>
+	 * @param request The involved HTTP servlet request.
+	 * @param response The involved HTTP servlet response.
+	 * @param url The URL to redirect the current response to.
+	 * @param paramValues The request parameter values which you'd like to put URL-encoded in the given URL.
+	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
+	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @since 2.0
+	 */
+	public static void facesRedirect
+		(HttpServletRequest request, HttpServletResponse response, String url, String ... paramValues)
+			throws IOException
+	{
+		String redirectURL = prepareRedirectURL(request, url, paramValues);
+
+		if (isFacesAjaxRequest(request)) {
+			CacheControlFilter.setNoCacheHeaders(response);
+			response.setContentType("text/xml");
+			response.setCharacterEncoding(UTF_8.name());
+			response.getWriter().printf(FACES_AJAX_REDIRECT_XML, redirectURL);
+		}
+		else {
+			response.sendRedirect(redirectURL);
+		}
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
