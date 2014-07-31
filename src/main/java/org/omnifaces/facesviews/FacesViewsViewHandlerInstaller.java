@@ -16,11 +16,25 @@ import static org.omnifaces.util.Faces.getServletContext;
 
 import javax.faces.application.Application;
 import javax.faces.event.AbortProcessingException;
+import javax.faces.event.PostConstructApplicationEvent;
 import javax.faces.event.SystemEvent;
 import javax.faces.event.SystemEventListener;
+import javax.servlet.Filter;
+import javax.servlet.ServletContextListener;
 
 /**
  * Installs the {@link FacesViewsViewHandler}.
+ * 
+ * <p>
+ * <i>Implementation note</i>: this needs to be done during the {@link PostConstructApplicationEvent}, in 
+ * which it's guaranteed that Faces initialization (typically done via a {@link ServletContextListener}) has
+ * been done. Setting a view handler programmatically requires the Faces {@link Application} to be present
+ * which isn't the case before Faces initialization has been done.
+ * <p>
+ * Additionally, the view handler needs to be set BEFORE the first faces request is processed. Putting
+ * the view handler setting code in a {@link Filter#init(javax.servlet.FilterConfig)} method only works
+ * when all init methods are called during startup, OR when the filter filters every request.
+ * 
  *
  * @since 2.0
  * @author Arjan Tijms
