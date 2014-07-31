@@ -31,7 +31,6 @@ import static org.omnifaces.util.Servlets.getApplicationAttribute;
 
 import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -70,22 +69,17 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 	private static PathAction pathAction;
 	private static FacesServletDispatchMethod dispatchMethod;
 
-	private static AtomicBoolean initDone = new AtomicBoolean();
+	@Override
+	public void init(FilterConfig filterConfig) throws ServletException {
 
-    @Override
-    public void init(FilterConfig filterConfig) throws ServletException {
+		super.init(filterConfig);
 
-    	super.init(filterConfig);
+		ServletContext servletContext = filterConfig.getServletContext();
 
-    	if (!initDone.getAndSet(true)) {
-
-	    	ServletContext servletContext = filterConfig.getServletContext();
-
-	        extensionAction = getExtensionAction(servletContext);
-	        pathAction = getPathAction(servletContext);
-	        dispatchMethod = getFacesServletDispatchMethod(servletContext);
-    	}
-    }
+		extensionAction = getExtensionAction(servletContext);
+		pathAction = getPathAction(servletContext);
+		dispatchMethod = getFacesServletDispatchMethod(servletContext);
+	}
 
     @Override
     public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException,
