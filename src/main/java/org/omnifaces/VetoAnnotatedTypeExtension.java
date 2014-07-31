@@ -20,8 +20,47 @@ import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
 
 /**
+ * <p>
  * This CDI extension should tell the CDI implementation to register from the org.omnifaces package only the classes
  * from org.omnifaces.cdi and org.omnifaces.showcase subpackages as CDI managed beans.
+ *
+ * <h3>Weld 2.x warning</h3>
+ * <p>
+ * Weld 2.x will during startup log a warning like below on this class:
+ * <blockquote>
+ * WARN: WELD-000411: Observer method [BackedAnnotatedMethod] public
+ * org.omnifaces.VetoAnnotatedTypeExtension.processAnnotatedType({@literal @}Observes ProcessAnnotatedType&lt;Object&gt;)
+ * receives events for all annotated types. Consider restricting events using {@literal @}WithAnnotations or a generic
+ * type with bounds.
+ * </blockquote>
+ * <p>
+ * First of all, this warning is harmless. We are aware of this and we won't take further action in order to ensure
+ * compatibility of OmniFaces on as many containers as possible.
+ * <p>
+ * By default, CDI capable containers attempt to register every single class in every single JAR in
+ * <code>/WEB-INF/lib</code> as a CDI managed bean. In older CDI versions as used by older Java EE 6 containers, there
+ * were bugs whereby the CDI implementation even attempts to register enums, abstract classes and/or classes without a
+ * default constructor, resulting in deployment exceptions (WebLogic), runtime exceptions (WebSphere) and/or loads of
+ * confusing warnings (GlassFish/TomEE).
+ * <p>
+ * In order to solve that, OmniFaces added this {@link VetoAnnotatedTypeExtension} which should "veto" any class from
+ * <code>org.omnifaces</code> package which is <strong>not</strong> in either <code>org.omnifaces.cdi</code> or
+ * <code>org.omnifaces.showcase</code> subpackage from being registered as a CDI managed bean. This happens via
+ * {@link ProcessAnnotatedType#veto()}
+ * <p>
+ * In Weld 2.x as used in among others WildFly, there's apparently a new type of warning which occurs when you use
+ * {@link ProcessAnnotatedType} on <strong>all</strong> classes. However, in this specific case, it's just the whole
+ * purpose to scan every single class, because classes which needs to be excluded from being registered as CDI managed
+ * beans are obviously not explicitly registered as a CDI managed bean (for which you could otherwise use a more
+ * specific <code>T</code> or <code>{@literal @}WithAnnotations</code> as suggested in the warning message).
+ * <p>
+ * Theoretically, the solution in this specific case would be to use <code>&lt;weld:include&gt;</code> or
+ * <code>&lt;weld:exclude&gt;</code> in <code>beans.xml</code> instead of an <code>Extension</code>. However, this is
+ * not a standard CDI solution as this is Weld-specific and thus wouldn't work with other CDI implementations such as
+ * OpenWebBeans or CanDI. We couldn't figure a similar mechanism for other CDI implementations, so we went for the
+ * <code>Extension</code>.
+ * <p>
+ * After all, again, this is "just" a warning, not an error. Everything should continue to work as intented.
  *
  * @author Bauke Scholtz
  * @since 1.6.1
