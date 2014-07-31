@@ -15,6 +15,8 @@ package org.omnifaces.util;
 import static org.omnifaces.util.Faces.getApplication;
 import static org.omnifaces.util.Faces.getViewRoot;
 
+import javax.faces.application.Application;
+import javax.faces.component.UIViewRoot;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.PhaseEvent;
 import javax.faces.event.PhaseId;
@@ -43,8 +45,8 @@ import org.omnifaces.eventlistener.DefaultViewEventListener;
  * });
  * </pre>
  * <pre>
- * // Add a callback to the current request which should run during after phase of the render response on current request.
- * Events.subscribeToRequestAfterPhase(PhaseId.RENDER_RESPONSE, new Callback.Void() {
+ * // Add a callback to the current request which should run during before phase of the render response on current request.
+ * Events.subscribeToRequestBeforePhase(PhaseId.RENDER_RESPONSE, new Callback.Void() {
  *     {@literal @}Override
  *     public void invoke() {
  *         // ...
@@ -82,6 +84,7 @@ public final class Events {
 	 * @param type The system event type to be observed.
 	 * @param listener The system event listener to be subscribed.
 	 * @since 2.0
+	 * @see Application#subscribeToEvent(Class, SystemEventListener)
 	 */
 	public static void subscribeToApplicationEvent(Class<? extends SystemEvent> type, SystemEventListener listener) {
 		getApplication().subscribeToEvent(type, listener);
@@ -93,9 +96,10 @@ public final class Events {
 	 * @param type The system event type to be observed.
 	 * @param callback The callback to be invoked.
 	 * @since 2.0
+	 * @see #subscribeToApplicationEvent(Class, SystemEventListener)
 	 */
 	public static void subscribeToApplicationEvent(Class<? extends SystemEvent> type, Callback.Void callback) {
-		subscribeToApplicationEvent(type, createViewEventListener(Events.<SystemEvent>wrap(callback)));
+		subscribeToApplicationEvent(type, createSystemEventListener(Events.<SystemEvent>wrap(callback)));
 	}
 
 	/**
@@ -104,9 +108,10 @@ public final class Events {
 	 * @param type The system event type to be observed.
 	 * @param callback The callback to be invoked.
 	 * @since 2.0
+	 * @see #subscribeToApplicationEvent(Class, SystemEventListener)
 	 */
 	public static void subscribeToApplicationEvent(Class<? extends SystemEvent> type, Callback.WithArgument<SystemEvent> callback) {
-		subscribeToApplicationEvent(type, createViewEventListener(callback));
+		subscribeToApplicationEvent(type, createSystemEventListener(callback));
 	}
 
 	// View scoped event listeners ------------------------------------------------------------------------------------
@@ -117,6 +122,7 @@ public final class Events {
 	 * @param type The system event type to be observed.
 	 * @param listener The system event listener to be subscribed.
 	 * @since 1.2
+	 * @see UIViewRoot#subscribeToViewEvent(Class, SystemEventListener)
 	 */
 	public static void subscribeToViewEvent(Class<? extends SystemEvent> type, SystemEventListener listener) {
 		getViewRoot().subscribeToViewEvent(type, listener);
@@ -128,9 +134,10 @@ public final class Events {
 	 * @param type The system event type to be observed.
 	 * @param callback The callback to be invoked.
 	 * @since 1.2
+	 * @see #subscribeToViewEvent(Class, SystemEventListener)
 	 */
 	public static void subscribeToViewEvent(Class<? extends SystemEvent> type, Callback.Void callback) {
-		subscribeToViewEvent(type, createViewEventListener(Events.<SystemEvent>wrap(callback)));
+		subscribeToViewEvent(type, createSystemEventListener(Events.<SystemEvent>wrap(callback)));
 	}
 
 	/**
@@ -139,9 +146,10 @@ public final class Events {
 	 * @param type The system event type to be observed.
 	 * @param callback The callback to be invoked.
 	 * @since 2.0
+	 * @see #subscribeToViewEvent(Class, SystemEventListener)
 	 */
 	public static void subscribeToViewEvent(Class<? extends SystemEvent> type, Callback.WithArgument<SystemEvent> callback) {
-		subscribeToViewEvent(type, createViewEventListener(callback));
+		subscribeToViewEvent(type, createSystemEventListener(callback));
 	}
 
 	// View scoped phase listeners ------------------------------------------------------------------------------------
@@ -152,7 +160,7 @@ public final class Events {
 	 * during every (postback) request on the same view instead of only during the current request.
 	 * @param listener The phase listener to be added to the current view.
 	 * @since 2.0
-	 * @see CallbackPhaseListener
+	 * @see UIViewRoot#addPhaseListener(PhaseListener)
 	 */
 	public static void addViewPhaseListener(PhaseListener listener) {
 		getViewRoot().addPhaseListener(listener);
@@ -163,6 +171,7 @@ public final class Events {
 	 * @param phaseId The phase ID to be observed.
 	 * @param callback The callback to be invoked.
 	 * @since 2.0
+	 * @see #addViewPhaseListener(PhaseListener)
 	 */
 	public static void subscribeToViewBeforePhase(PhaseId phaseId, Callback.Void callback) {
 		addViewPhaseListener(createBeforePhaseListener(phaseId, Events.<PhaseEvent>wrap(callback)));
@@ -173,6 +182,7 @@ public final class Events {
 	 * @param phaseId The phase ID to be observed.
 	 * @param callback The callback to be invoked.
 	 * @since 2.0
+	 * @see #addViewPhaseListener(PhaseListener)
 	 */
 	public static void subscribeToViewBeforePhase(PhaseId phaseId, Callback.WithArgument<PhaseEvent> callback) {
 		addViewPhaseListener(createBeforePhaseListener(phaseId, callback));
@@ -183,6 +193,7 @@ public final class Events {
 	 * @param phaseId The phase ID to be observed.
 	 * @param callback The callback to be invoked.
 	 * @since 2.0
+	 * @see #addViewPhaseListener(PhaseListener)
 	 */
 	public static void subscribeToViewAfterPhase(PhaseId phaseId, Callback.Void callback) {
 		addViewPhaseListener(createAfterPhaseListener(phaseId, Events.<PhaseEvent>wrap(callback)));
@@ -193,6 +204,7 @@ public final class Events {
 	 * @param phaseId The phase ID to be observed.
 	 * @param callback The callback to be invoked.
 	 * @since 2.0
+	 * @see #addViewPhaseListener(PhaseListener)
 	 */
 	public static void subscribeToViewAfterPhase(PhaseId phaseId, Callback.WithArgument<PhaseEvent> callback) {
 		addViewPhaseListener(createAfterPhaseListener(phaseId, callback));
@@ -217,6 +229,7 @@ public final class Events {
 	 * @param phaseId The phase ID to be observed.
 	 * @param callback The callback to be invoked.
 	 * @since 2.0
+	 * @see #addRequestPhaseListener(PhaseListener)
 	 */
 	public static void subscribeToRequestBeforePhase(PhaseId phaseId, Callback.Void callback) {
 		addRequestPhaseListener(createBeforePhaseListener(phaseId, Events.<PhaseEvent>wrap(callback)));
@@ -227,6 +240,7 @@ public final class Events {
 	 * @param phaseId The phase ID to be observed.
 	 * @param callback The callback to be invoked.
 	 * @since 2.0
+	 * @see #addRequestPhaseListener(PhaseListener)
 	 */
 	public static void subscribeToRequestBeforePhase(PhaseId phaseId, Callback.WithArgument<PhaseEvent> callback) {
 		addRequestPhaseListener(createBeforePhaseListener(phaseId, callback));
@@ -237,6 +251,7 @@ public final class Events {
 	 * @param phaseId The phase ID to be observed.
 	 * @param callback The callback to be invoked.
 	 * @since 2.0
+	 * @see #addRequestPhaseListener(PhaseListener)
 	 */
 	public static void subscribeToRequestAfterPhase(PhaseId phaseId, Callback.Void callback) {
 		addRequestPhaseListener(createAfterPhaseListener(phaseId, Events.<PhaseEvent>wrap(callback)));
@@ -247,6 +262,7 @@ public final class Events {
 	 * @param phaseId The phase ID to be observed.
 	 * @param callback The callback to be invoked.
 	 * @since 2.0
+	 * @see #addRequestPhaseListener(PhaseListener)
 	 */
 	public static void subscribeToRequestAfterPhase(PhaseId phaseId, Callback.WithArgument<PhaseEvent> callback) {
 		addRequestPhaseListener(createAfterPhaseListener(phaseId, callback));
@@ -264,7 +280,7 @@ public final class Events {
 		};
 	}
 
-	private static SystemEventListener createViewEventListener(final Callback.WithArgument<SystemEvent> callback) {
+	private static SystemEventListener createSystemEventListener(final Callback.WithArgument<SystemEvent> callback) {
 		return new DefaultViewEventListener() {
 
 			@Override
