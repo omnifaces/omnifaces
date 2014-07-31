@@ -46,6 +46,7 @@ public enum BeanManager {
 
 	/**
 	 * Returns the lazily loaded enum singleton instance.
+	 * @throws IllegalStateException When initialization fails.
 	 */
 	INSTANCE;
 
@@ -74,11 +75,16 @@ public enum BeanManager {
 
 	/**
 	 * Perform automatic initialization whereby the bean manager is looked up from the JNDI.
-	 * @throws IllegalStateException When automatic initialization failed.
+	 * @throws IllegalStateException When initialization fails.
 	 */
 	private BeanManager() {
+		Class<?> beanManagerClass, contextualClass, beanClass, creationalContextClass;
+
 		try {
-			Class.forName("javax.enterprise.inject.spi.BeanManager");
+			beanManagerClass = Class.forName("javax.enterprise.inject.spi.BeanManager");
+			contextualClass = Class.forName("javax.enterprise.context.spi.Contextual");
+			beanClass = Class.forName("javax.enterprise.inject.spi.Bean");
+			creationalContextClass = Class.forName("javax.enterprise.context.spi.CreationalContext");
 		}
 		catch (Throwable e) {
 			throw new IllegalStateException(ERROR_CDI_API_UNAVAILABLE, e);
@@ -91,6 +97,9 @@ public enum BeanManager {
 				beanManager = JNDI.lookup("java:comp/env/BeanManager"); // Tomcat.
 			}
 		}
+		catch (IllegalStateException e) {
+			throw new IllegalStateException(ERROR_CDI_IMPL_UNAVAILABLE, e.getCause());
+		}
 		catch (Throwable e) {
 			throw new IllegalStateException(ERROR_JNDI_UNAVAILABLE, e);
 		}
@@ -100,10 +109,6 @@ public enum BeanManager {
 		}
 
 		try {
-			Class<?> beanManagerClass = beanManager.getClass();
-			Class<?> contextualClass = Class.forName("javax.enterprise.context.spi.Contextual");
-			Class<?> beanClass = Class.forName("javax.enterprise.inject.spi.Bean");
-			Class<?> creationalContextClass = Class.forName("javax.enterprise.context.spi.CreationalContext");
 			getBeans = beanManagerClass.getMethod("getBeans", Type.class, Annotation[].class);
 			resolve = beanManagerClass.getMethod("resolve", Set.class);
 			createCreationalContext = beanManagerClass.getMethod("createCreationalContext", contextualClass);

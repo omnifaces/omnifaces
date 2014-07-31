@@ -24,7 +24,6 @@ import static org.omnifaces.facesviews.FacesViews.getFacesServletDispatchMethod;
 import static org.omnifaces.facesviews.FacesViews.getPathAction;
 import static org.omnifaces.facesviews.FacesViews.isResourceInPublicPath;
 import static org.omnifaces.facesviews.FacesViews.scanAndStoreViews;
-import static org.omnifaces.facesviews.FacesViews.tryScanAndStoreViews;
 import static org.omnifaces.util.Faces.getApplicationFromFactory;
 import static org.omnifaces.util.ResourcePaths.getExtension;
 import static org.omnifaces.util.ResourcePaths.isExtensionless;
@@ -34,7 +33,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.faces.application.Application;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
 import javax.servlet.RequestDispatcher;
@@ -82,17 +80,6 @@ public class FacesViewsForwardingFilter extends HttpFilter {
     	if (!initDone.getAndSet(true)) {
 
 	    	ServletContext servletContext = filterConfig.getServletContext();
-
-	        // Mostly for pre-Servlet 3.0: scan the views if the auto-configure listener hasn't done this yet.
-	        tryScanAndStoreViews(servletContext);
-
-	        // Register a view handler that transforms a view id with extension back to an extensionless one.
-
-	        // Note that Filter#init is used here, since it loads after the ServletContextListener that initializes JSF itself,
-	        // and thus guarantees the {@link Application} instance needed for installing the FacesViewHandler is available.
-
-	        Application application = getApplicationFromFactory();
-	        application.setViewHandler(new FacesViewsViewHandler(application.getViewHandler()));
 
 	        extensionAction = getExtensionAction(servletContext);
 	        pathAction = getPathAction(servletContext);
