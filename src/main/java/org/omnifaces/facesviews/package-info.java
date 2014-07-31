@@ -9,7 +9,7 @@
  * one or more user specified directories, can be used to store Facelets source files.
  *
  * <p>
- * All files found in these directory are automatically mapped as Facelets files
+ * All files found in these directories are automatically mapped as Facelets files
  * and made available using both their original extension as well as without an extension (extensionless). Optionally scanning
  * can be restricted to include only certain extensions.
  *
@@ -19,7 +19,7 @@
  * prevents exposing the source code of those Facelets that happens with the default JSF mapping.
  *
  * <p>
- * In Servlet 3.0 containers, scanning is done automatically and no further configuration is needed. The feature
+ * Scanning is done automatically and thus no further configuration is needed. The feature
  * is compatible with applications that don't have <code>web.xml</code> or <code>faces-config.xml</code> configuration
  * files. As such, it can be used as an alternative to declaring the {@link javax.faces.webapp.FacesServlet} in <code>web.xml</code>
  * for the <code>.xhtml</code> to <code>.xhtml</code> mapping.
@@ -93,7 +93,7 @@
  * <p>
  * Note that in the above example, <code>/WEB-INF</code> was NOT scanned and thus <code>template.xhtml</code> is not made publicly available. Likewise
  * <code>/script.js</code> was also not scanned since it doesn't have the configured extension (<code>.xhtml</code>). Finally, although a <code>web.xml</code> was used, there
- * does not need to be a mapping for the <code>FacesServlet</code> in it when using a Servlet 3.0 container.
+ * does not need to be a mapping for the <code>FacesServlet</code> in it.
  *
  * <h3>Welcome files</h3>
  *
@@ -219,81 +219,28 @@
  * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_VIEW_HANDLER_MODE_PARAM_NAME}</code></td>
  * <td>Determines how the {@link org.omnifaces.facesviews.FacesViewsViewHandler} should build the action URL that's used in e.g. forms and links.
  * <br>Allowed values: {<code>STRIP_EXTENSION_FROM_PARENT</code>, <code>BUILD_WITH_PARENT_QUERY_PARAMETERS</code>}, which have the following meaning:
- * <br>- <code>STRIP_EXTENSION_FROM_PARENT</code>: Strip the extension from the parent view handler's outcome using the at runtime determined extension mapping of the FacesServlet. Requires Servlet 3.0+.
- * <br>- <code>BUILD_WITH_PARENT_QUERY_PARAMETERS</code>: The <code>FacesViewsViewHandler</code> constructs the action URL itself and only takes the query parameters (if any) from the parent view handler outcome. This is mode is automatically selected on Servlet 2.5.
- * <br>Default value: <code>STRIP_EXTENSION_FROM_PARENT</code> on Servlet 3.0+, <code>BUILD_WITH_PARENT_QUERY_PARAMETERS</code> on Servlet 2.5.
+ * <br>- <code>STRIP_EXTENSION_FROM_PARENT</code>: Strip the extension from the parent view handler's outcome using the at runtime determined extension mapping of the FacesServlet.
+ * <br>- <code>BUILD_WITH_PARENT_QUERY_PARAMETERS</code>: The <code>FacesViewsViewHandler</code> constructs the action URL itself and only takes the query parameters (if any) from the parent view handler outcome.
+ * <br>Default value: <code>STRIP_EXTENSION_FROM_PARENT</code>. 
  * </td>
  * </tr>
  *
  * <tr>
  * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS_PARAM_NAME}</code></td>
- * <td>Used to set whether the {@link org.omnifaces.facesviews.FacesViewsForwardingFilter} should match before declared filters (<code>false</code>) or after declared filters (<code>true</code>),
- * when automatic scanning and mapping is used (as opposed to manually mapping the Servlet as explained in the Servlet 2.5 section below).
+ * <td>Used to set whether the {@link org.omnifaces.facesviews.FacesViewsForwardingFilter} should match before declared filters (<code>false</code>) or 
+ * after declared filters (<code>true</code>).
  * <br>Default value: <code>true</code> (the FacesViews forwarding filter is the last in the filter chain)
  * </td>
  * </tr>
  *
  * </table>
  *
- * <h3>Servlet 2.5 configuration</h3>
- *
+ * <h3>Servlet 2.5 compatibility</h3>
+ * 
  * <p>
- * Servlet 2.5 users will have to install the {@link org.omnifaces.facesviews.FacesViewsForwardingFilter} and
- * {@link org.omnifaces.facesviews.FacesViewsViewHandler} manually in <code>web.xml</code>:
+ * Since OmniFaces 2.0, Servlet 2.5 compatibility has been dropped. Servlet 2.5 users are advised to either
+ * upgrade to Servlet 3.0+, or keep using OmniFaces 1.x.
  *
- * <pre>
- *    &lt;filter&gt;
- *        &lt;filter-name&gt;FacesViewsForwardingFilter&lt;/filter-name&gt;
- *        &lt;filter-class&gt;org.omnifaces.facesviews.FacesViewsForwardingFilter&lt;/filter-class&gt;
- *    &lt;/filter&gt;
- *    &lt;filter-mapping&gt;
- *        &lt;filter-name&gt;FacesViewsForwardingFilter&lt;/filter-name&gt;
- *        &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
- *    &lt;/filter-mapping&gt;
- *
- *    &lt;context-param&gt;
- *        &lt;param-name&gt;org.omnifaces.FACES_VIEWS_DISPATCH_METHOD&lt;/param-name&gt;
- *        &lt;param-value&gt;FORWARD&lt;/param-value&gt;
- *    &lt;/context-param&gt;
- * </pre>
- *
- * <p>
- * Note that the <code>FORWARD</code> method has been set. Without that, the FacesServlet has to be mapped manually (also in web.xml) to
- * each and every view that is used. This is similar to how the welcome file (see below) has to be mapped to the FacesServlet for Servlet
- * 2.5 users.
- *
- * <p>
- * When an extensionless welcome file is defined in <code>web.xml</code> (see above), the FacesServlet has to be explicitly mapped
- * to this welcome file for Servlet 2.5. E.g.
- *
- * <pre>
- *    &lt;welcome-file-list&gt;
- *        &lt;welcome-file&gt;index&lt;/welcome-file&gt;
- *    &lt;/welcome-file-list&gt;
- *
- *    &lt;servlet&gt;
- *        &lt;servlet-name&gt;facesServlet&lt;/servlet-name&gt;
- *        &lt;servlet-class&gt;javax.faces.webapp.FacesServlet&lt;/servlet-class&gt;
- *        &lt;load-on-startup&gt;1&lt;/load-on-startup&gt;
- *    &lt;/servlet&gt;
- *    &lt;servlet-mapping&gt;
- *        &lt;servlet-name&gt;facesServlet&lt;/servlet-name&gt;
- *        &lt;url-pattern&gt;*.xhtml&lt;/url-pattern&gt;
- *        &lt;url-pattern&gt;/welcome&lt;/url-pattern&gt;
- *    &lt;/servlet-mapping&gt;
- * </pre>
- *
- * <p>
- * And this in <code>faces-config.xml</code>
- *
- * <pre>
- *    &lt;application&gt;
- *        &lt;view-handler&gt;org.omnifaces.facesviews.FacesViewsViewHandler&lt;/view-handler&gt;
- *    &lt;/application&gt;
- * </pre>
- *
- * <p>
- * <em>(at the moment Servlet 2.5 compatibility has not been tested thorougly)</em>
  *
  * <h3>OmniFaces 1.3 compatibility</h3>
  *
