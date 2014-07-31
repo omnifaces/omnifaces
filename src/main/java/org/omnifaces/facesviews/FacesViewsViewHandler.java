@@ -17,9 +17,10 @@ import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES;
 import static org.omnifaces.facesviews.FacesViews.getFacesServletExtensions;
 import static org.omnifaces.facesviews.FacesViews.getViewHandlerMode;
 import static org.omnifaces.facesviews.FacesViews.isScannedViewsAlwaysExtensionless;
-import static org.omnifaces.facesviews.ViewHandlerMode.STRIP_EXTENSION_FROM_PARENT;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getRequestAttribute;
+import static org.omnifaces.util.FacesLocal.getRequestContextPath;
+import static org.omnifaces.util.FacesLocal.getServletContext;
 import static org.omnifaces.util.ResourcePaths.getExtension;
 import static org.omnifaces.util.ResourcePaths.isExtensionless;
 import static org.omnifaces.util.ResourcePaths.stripExtension;
@@ -31,7 +32,6 @@ import java.util.Set;
 import javax.faces.application.ViewHandler;
 import javax.faces.application.ViewHandlerWrapper;
 import javax.faces.context.FacesContext;
-import javax.servlet.ServletContext;
 
 /**
  * View handler that renders an action URL extensionless if a resource is a mapped one, and faces views has been set to always
@@ -60,17 +60,15 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 		if (mappedResources.containsKey(viewId)) {
 
 			if (isScannedViewsAlwaysExtensionless(context) || isOriginalViewExtensionless(context)) {
+				
 				// User has requested to always render extensionless, or the requested viewId was mapped and the current
-				// request is extensionless, render the action URL extensionless as well.
-
-				ServletContext servletContext = (ServletContext) context.getExternalContext().getContext();
-
-				if (servletContext.getMajorVersion() > 2 &&	getViewHandlerMode(servletContext) == STRIP_EXTENSION_FROM_PARENT) {
-					return removeExtension(context, actionURL, viewId);
-				} else {
-					// BUILD_WITH_PARENT_QUERY_PARAMETERS - Idea and code contributed by Radu Creanga
-					// See https://code.google.com/p/omnifaces/issues/detail?id=177
-					return context.getExternalContext().getRequestContextPath() + stripExtension(viewId) + getQueryParameters(actionURL);
+				// request is extensionless; render the action URL extensionless as well.
+				
+				switch (getViewHandlerMode(getServletContext(context))) {
+					case STRIP_EXTENSION_FROM_PARENT:
+						return removeExtension(context, actionURL, viewId);
+					case BUILD_WITH_PARENT_QUERY_PARAMETERS:
+						return getRequestContextPath(context) + stripExtension(viewId) + getQueryParameters(actionURL);
 				}
 			}
 		}
