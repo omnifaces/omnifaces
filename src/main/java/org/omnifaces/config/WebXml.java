@@ -391,12 +391,10 @@ public enum WebXml {
 			parseAndAppendChildren(url, builder, document);
 		}
 
-		if (context.getMajorVersion() >= 3) { // web-fragment.xml exist only since Servlet 3.0.
-			Enumeration<URL> urls = Thread.currentThread().getContextClassLoader().getResources(WEB_FRAGMENT_XML);
+		Enumeration<URL> urls = Thread.currentThread().getContextClassLoader().getResources(WEB_FRAGMENT_XML);
 
-			while (urls.hasMoreElements()) {
-				parseAndAppendChildren(urls.nextElement(), builder, document);
-			}
+		while (urls.hasMoreElements()) {
+			parseAndAppendChildren(urls.nextElement(), builder, document);
 		}
 
 		return document;
