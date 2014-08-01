@@ -8,7 +8,7 @@
 		http://jboss.org/schema/weld/beans http://jboss.org/schema/weld/beans_1_1.xsd"
 >
 	<weld:scan>
-		<!-- weld:include on org.omnifaces.cdi.** fails in Tomcat+Weld; it causes to bypass /WEB-INF/classes as well. -->
+		<!-- weld:include on org.omnifaces.cdi.** fails in Tomcat+Weld; it causes to bypass /WEB-INF/classes as well. Latest tested versions: Tomcat 7.0.55 + Weld 2.2.0. -->
 		<weld:exclude name="org.omnifaces.application.**" />
 		<weld:exclude name="org.omnifaces.component.**" />
 		<weld:exclude name="org.omnifaces.config.**" />
