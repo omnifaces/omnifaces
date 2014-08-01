@@ -30,6 +30,7 @@ import org.omnifaces.facesviews.FacesViews;
  * This performs the following tasks:
  * <ol>
  * <li>Log the OmniFaces version.
+ * <li>Check if JSF 2.2 is available, otherwise log and fail.
  * <li>Check if CDI is available, otherwise log and fail.
  * <li>Register {@link FacesViews} filter.
  * </ol>
