@@ -15,9 +15,11 @@ package org.omnifaces;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 
 import org.omnifaces.config.BeanManager;
 import org.omnifaces.facesviews.FacesViews;
@@ -46,12 +48,32 @@ public class ApplicationInitializer implements ServletContainerInitializer {
 	@Override
 	public void onStartup(Set<Class<?>> c, ServletContext servletContext) throws ServletException {
 		logOmniFacesVersion();
+		checkJSF22Available(); // Already implies Servlet 3.0 (and EL 2.2).
 		checkCDIAvailable();
 		FacesViews.registerFilter(servletContext);
 	}
 
 	private void logOmniFacesVersion() {
 		logger.info("Using OmniFaces version " + getClass().getPackage().getSpecificationVersion());
+	}
+
+	private void checkJSF22Available() throws ServletException {
+		try {
+			FacesServlet.class.getAnnotation(MultipartConfig.class).toString();
+		}
+		catch (Throwable e) {
+			logger.severe(""
+				+ "\n████████████████████████████████████████████████████████████████████████████████"
+				+ "\n█░▀░░░░▀█▀░░░░░░▀█░░░░░░▀█▀░░░░░▀█                                             ▐"
+				+ "\n█░░▐█▌░░█░░░██░░░█░░██░░░█░░░██░░█ OmniFaces failed to initialize!             ▐"
+				+ "\n█░░▐█▌░░█░░░██░░░█░░██░░░█░░░██░░█                                             ▐"
+				+ "\n█░░▐█▌░░█░░░██░░░█░░░░░░▄█░░▄▄▄▄▄█ This OmniFaces version requires JSF 2.2, but▐"
+				+ "\n█░░▐█▌░░█░░░██░░░█░░░░████░░░░░░░█ none was found on this environment.         ▐"
+				+ "\n█░░░█░░░█▄░░░░░░▄█░░░░████▄░░░░░▄█                                             ▐"
+				+ "\n████████████████████████████████████████████████████████████████████████████████"
+			);
+			throw new ServletException(e);
+		}
 	}
 
 	private void checkCDIAvailable() throws ServletException {
