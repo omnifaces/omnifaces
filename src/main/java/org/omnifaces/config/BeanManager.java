@@ -17,8 +17,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Set;
 
-import javax.enterprise.inject.CreationException;
-
 import org.omnifaces.util.JNDI;
 
 /**
@@ -125,7 +123,7 @@ public enum BeanManager {
 	 * Returns the CDI managed bean instance of the given class, or <code>null</code> if there is none.
 	 * @param beanClass The type of the CDI managed bean instance.
 	 * @return The CDI managed bean instance of the given class, or <code>null</code> if there is none.
-	 * @throws CreationException When obtaining the CD managed bean instance failed with an exception.
+	 * @throws UnsupportedOperationException When obtaining the CDI managed bean instance failed with an exception.
 	 */
 	public <T> T getReference(Class<T> beanClass) {
 		try {
@@ -135,7 +133,7 @@ public enum BeanManager {
 			return beanClass.cast(reference);
 		}
 		catch (Exception e) {
-			throw new CreationException(e);
+			throw new UnsupportedOperationException(e);
 		}
 	}
 
