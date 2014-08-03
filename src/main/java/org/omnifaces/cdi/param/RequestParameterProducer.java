@@ -40,6 +40,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.enterprise.inject.Produces;
+import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.faces.application.Application;
 import javax.faces.application.FacesMessage;
@@ -66,8 +67,8 @@ public class RequestParameterProducer {
 	@SuppressWarnings("unchecked")
 	@Produces
 	@Param
-	public <V> ParamValue<V> produce(InjectionPoint injectionPoint) {
-
+	public <V> ParamValue<V> produce(InjectionPoint injectionPoint, BeanManager beanManager) {
+		
 		// @Param is the annotation on the injection point that holds all data for this request parameter
 		Param requestParameter = getQualifier(injectionPoint, Param.class);
 
@@ -174,7 +175,11 @@ public class RequestParameterProducer {
 	private <V> Class<V> getTargetType(InjectionPoint injectionPoint) {
 		Type type = injectionPoint.getType();
 		if (type instanceof ParameterizedType) {
+			// Assumes ParamValue now. Needs to be adjusted later.
 			return (Class<V>) ((ParameterizedType) type).getActualTypeArguments()[0];
+		} else if (type instanceof Class) {
+			// Direct injection into class type using dynamic producer
+			return  (Class<V>)  type;
 		}
 
 		return null;
