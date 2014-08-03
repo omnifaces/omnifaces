@@ -22,10 +22,12 @@ import java.util.Queue;
 import java.util.Set;
 
 import javax.enterprise.context.spi.Context;
+import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.Stereotype;
 import javax.enterprise.inject.spi.Annotated;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
 
 /**
@@ -235,6 +237,28 @@ public final class Beans {
 		}
 
 		return null;
+	}
+	
+	/**
+	 * Returns the current {@link InjectionPoint} if any is available.
+	 * <p>
+	 * An <code>InjectionPoint</code> is available in code that's called in the context of CDI performing an injection,
+	 * e.g. by calling a producer ({@link Produces}) method or the {@link Bean#create(javax.enterprise.context.spi.CreationalContext)}
+	 * method.
+	 * 
+	 * @param beanManager The involved CDI bean manager.
+	 * @return the current {@link InjectionPoint} if any is available, otherwise <code>null</code>.
+	 * 
+	 * Since 2.0
+	 */
+	public static InjectionPoint getCurrentInjectionPoint(BeanManager beanManager) {
+		@SuppressWarnings("unchecked")
+		Bean<InjectionPoint> resolvedBean = (Bean<InjectionPoint>) beanManager.resolve(beanManager.getBeans(InjectionPoint.class));
+		if (resolvedBean == null) {
+			return null;
+		}
+		
+		return beanManager.getContext(resolvedBean.getScope()).get(resolvedBean, beanManager.createCreationalContext(resolvedBean));
 	}
 
 
