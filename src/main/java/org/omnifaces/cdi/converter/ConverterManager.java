@@ -36,7 +36,6 @@ import javax.faces.event.SystemEventListener;
 import javax.faces.validator.Validator;
 import javax.inject.Inject;
 
-import org.omnifaces.application.ConverterProvider;
 import org.omnifaces.application.OmniApplication;
 
 /**
@@ -70,7 +69,7 @@ import org.omnifaces.application.OmniApplication;
  * @since 1.6
  */
 @ApplicationScoped
-public class ConverterManager implements ConverterProvider {
+public class ConverterManager {
 
 	// Dependencies ---------------------------------------------------------------------------------------------------
 
@@ -81,7 +80,14 @@ public class ConverterManager implements ConverterProvider {
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
-	@Override
+	/**
+	 * Returns the converter instance associated with the given converter ID,
+	 * or <code>null</code> if there is none.
+	 * @param application The involved JSF application.
+	 * @param converterId The converter ID of the desired converter instance.
+	 * @return the converter instance associated with the given converter ID,
+	 * or <code>null</code> if there is none.
+	 */
 	@SuppressWarnings("unchecked")
 	public Converter createConverter(Application application, String converterId) {
 		Bean<Converter> bean = convertersById.get(converterId);
@@ -99,7 +105,14 @@ public class ConverterManager implements ConverterProvider {
 		return (bean != null) ? getReference(manager, bean) : null;
 	}
 
-	@Override
+	/**
+	 * Returns the converter instance associated with the given converter for-class,
+	 * or <code>null</code> if there is none.
+	 * @param application The involved JSF application.
+	 * @param converterForClass The converter for-class of the desired converter instance.
+	 * @return the converter instance associated with the given converter for-class,
+	 * or <code>null</code> if there is none.
+	 */
 	@SuppressWarnings("unchecked")
 	public Converter createConverter(Application application, Class<?> converterForClass) {
 		Bean<Converter> bean = convertersByForClass.get(converterForClass);

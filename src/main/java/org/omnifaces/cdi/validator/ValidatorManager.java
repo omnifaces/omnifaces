@@ -36,7 +36,6 @@ import javax.faces.validator.Validator;
 import javax.inject.Inject;
 
 import org.omnifaces.application.OmniApplication;
-import org.omnifaces.application.ValidatorProvider;
 
 /**
  * <p>
@@ -67,7 +66,7 @@ import org.omnifaces.application.ValidatorProvider;
  * @since 1.6
  */
 @ApplicationScoped
-public class ValidatorManager implements ValidatorProvider {
+public class ValidatorManager {
 
 	// Dependencies ---------------------------------------------------------------------------------------------------
 
@@ -77,7 +76,14 @@ public class ValidatorManager implements ValidatorProvider {
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
-	@Override
+	/**
+	 * Returns the validator instance associated with the given validator ID,
+	 * or <code>null</code> if there is none.
+	 * @param application The involved JSF application.
+	 * @param validatorId The validator ID of the desired validator instance.
+	 * @return the validator instance associated with the given validator ID,
+	 * or <code>null</code> if there is none.
+	 */
 	@SuppressWarnings("unchecked")
 	public Validator createValidator(Application application, String validatorId) {
 		Bean<Validator> bean = validatorsById.get(validatorId);

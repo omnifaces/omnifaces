@@ -27,9 +27,12 @@ import javax.faces.convert.Converter;
 import javax.faces.convert.DateTimeConverter;
 import javax.faces.validator.Validator;
 
+import org.omnifaces.cdi.converter.ConverterManager;
+import org.omnifaces.cdi.validator.ValidatorManager;
 import org.omnifaces.config.BeanManager;
 
 /**
+ * <p>
  * This OmniFaces application extends the standard JSF application as follows:
  * <ul>
  * <li>Support for CDI in {@link Converter}s and {@link Validator}s, so that e.g. <code>@Inject</code> and
@@ -42,8 +45,8 @@ import org.omnifaces.config.BeanManager;
  *
  * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz
- * @see ConverterProvider
- * @see ValidatorProvider
+ * @see ConverterManager
+ * @see ValidatorManager
  * @since 1.6
  */
 public class OmniApplication extends ApplicationWrapper {
@@ -51,6 +54,8 @@ public class OmniApplication extends ApplicationWrapper {
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private final Application wrapped;
+	private final ConverterManager converterManager;
+	private final ValidatorManager validatorManager;
 	private final TimeZone dateTimeConverterDefaultTimeZone;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
@@ -61,6 +66,8 @@ public class OmniApplication extends ApplicationWrapper {
 	 */
 	public OmniApplication(Application wrapped) {
 		this.wrapped = wrapped;
+		converterManager = BeanManager.INSTANCE.getReference(ConverterManager.class);
+		validatorManager = BeanManager.INSTANCE.getReference(ValidatorManager.class);
 		dateTimeConverterDefaultTimeZone =
 			Boolean.valueOf(getInitParameter(DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE_PARAM_NAME))
 				? TimeZone.getDefault()
@@ -70,59 +77,47 @@ public class OmniApplication extends ApplicationWrapper {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * If the {@link ConverterProvider} is present and there's a CDI managed {@link Converter} instance available, then
-	 * return it, else delegate to {@link #getWrapped()} which may return the JSF managed {@link Converter} instance.
+	 * If the there's a CDI managed {@link Converter} instance available, then return it, else delegate to
+	 * {@link #getWrapped()} which may return the JSF managed {@link Converter} instance.
 	 */
 	@Override
 	public Converter createConverter(String converterId) {
-		Object provider = BeanManager.INSTANCE.getReference(ConverterProvider.class);
+		Converter converter = converterManager.createConverter(getWrapped(), converterId);
 
-		if (provider instanceof ConverterProvider) { // If not null, it doesn't return true in EAR deployment on GF3, see also #251.
-			Converter converter = ((ConverterProvider) provider).createConverter(getWrapped(), converterId);
-
-			if (converter != null) {
-				setDefaultPropertiesIfNecessary(converter);
-				return converter;
-			}
+		if (converter != null) {
+			setDefaultPropertiesIfNecessary(converter);
+			return converter;
 		}
 
 		return getWrapped().createConverter(converterId);
 	}
 
 	/**
-	 * If the {@link ConverterProvider} is present and there's a CDI managed {@link Converter} instance available, then
-	 * return it, else delegate to {@link #getWrapped()} which may return the JSF managed {@link Converter} instance.
+	 * If the there's a CDI managed {@link Converter} instance available, then return it, else delegate to
+	 * {@link #getWrapped()} which may return the JSF managed {@link Converter} instance.
 	 */
 	@Override
-	public Converter createConverter(Class<?> targetClass) {
-		Object provider = BeanManager.INSTANCE.getReference(ConverterProvider.class);
+	public Converter createConverter(Class<?> forClass) {
+		Converter converter = converterManager.createConverter(getWrapped(), forClass);
 
-		if (provider instanceof ConverterProvider) { // If not null, it doesn't return true in EAR deployment on GF3, see also #251.
-			Converter converter = ((ConverterProvider) provider).createConverter(getWrapped(), targetClass);
-
-			if (converter != null) {
-				setDefaultPropertiesIfNecessary(converter);
-				return converter;
-			}
+		if (converter != null) {
+			setDefaultPropertiesIfNecessary(converter);
+			return converter;
 		}
 
-		return getWrapped().createConverter(targetClass);
+		return getWrapped().createConverter(forClass);
 	}
 
 	/**
-	 * If the {@link ValidatorProvider} is present and there's a CDI managed {@link Validator} instance available, then
-	 * return it, else delegate to {@link #getWrapped()} which may return the JSF managed {@link Validator} instance.
+	 * If the there's a CDI managed {@link Validator} instance available, then return it, else delegate to
+	 * {@link #getWrapped()} which may return the JSF managed {@link Validator} instance.
 	 */
 	@Override
 	public Validator createValidator(String validatorId) throws FacesException {
-		Object provider = BeanManager.INSTANCE.getReference(ValidatorProvider.class);
+		Validator validator = validatorManager.createValidator(getWrapped(), validatorId);
 
-		if (provider instanceof ValidatorProvider) { // If not null, it doesn't return true in EAR deployment on GF3, see also #251.
-			Validator validator = ((ValidatorProvider) provider).createValidator(getWrapped(), validatorId);
-
-			if (validator != null) {
-				return validator;
-			}
+		if (validator != null) {
+			return validator;
 		}
 
 		return getWrapped().createValidator(validatorId);
