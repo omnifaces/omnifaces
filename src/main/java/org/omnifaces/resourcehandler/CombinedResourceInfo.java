@@ -57,8 +57,9 @@ final class CombinedResourceInfo {
 	private static final String[] PARAM_NAMES_RESOURCE_MAX_AGE = {
 		MOJARRA_DEFAULT_RESOURCE_MAX_AGE, MYFACES_DEFAULT_RESOURCE_MAX_AGE
 	};
-	private static final String LOG_RESOURCE_NOT_FOUND =
-		"CombinedResourceHandler: The resource %s cannot be found"
+	private static final String ERROR_MAX_AGE = "The '%s' init param must be a number."
+		+ " Encountered an invalid value of '%s'.";
+	private static final String LOG_RESOURCE_NOT_FOUND = "CombinedResourceHandler: The resource %s cannot be found"
 			+ " and therefore a 404 will be returned for the combined resource ID %s";
 
 	// Static variables -----------------------------------------------------------------------------------------------
@@ -286,8 +287,13 @@ final class CombinedResourceInfo {
 		for (String name : PARAM_NAMES_RESOURCE_MAX_AGE) {
 			String value = getInitParameter(name);
 
-			if (value != null && value.matches("[0-9]+")) {
-				return (maxAge = Long.valueOf(value));
+			if (value != null) {
+				try {
+					return (maxAge = Long.valueOf(value));
+				}
+				catch (NumberFormatException e) {
+					throw new IllegalArgumentException(String.format(ERROR_MAX_AGE, name, value), e);
+				}
 			}
 		}
 

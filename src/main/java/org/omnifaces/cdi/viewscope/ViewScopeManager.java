@@ -160,11 +160,11 @@ public class ViewScopeManager implements Serializable {
 			String value = getInitParameter(name);
 
 			if (value != null) {
-				if (value.matches("[0-9]+")) {
+				try {
 					return (maxActiveViewScopes = Integer.valueOf(value));
 				}
-				else {
-					throw new IllegalArgumentException(String.format(ERROR_MAX_ACTIVE_VIEW_SCOPES, name, value));
+				catch (NumberFormatException e) {
+					throw new IllegalArgumentException(String.format(ERROR_MAX_ACTIVE_VIEW_SCOPES, name, value), e);
 				}
 			}
 		}
