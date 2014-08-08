@@ -194,6 +194,12 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 	 */
 	@Override
 	public Resource createResource(String resourceName, String libraryName, String contentType) {
+		final Resource resource = getWrapped().createResource(resourceName, libraryName, contentType);
+
+		if (resource == null) {
+			return null;
+		}
+
 		String requestPath = null;
 
 		if (cdnResources != null) {
@@ -209,7 +215,7 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 		}
 
 		if (requestPath == null) {
-			return getWrapped().createResource(resourceName, libraryName, contentType);
+			return resource;
 		}
 
 		final String finalRequestPath = evaluateExpressionGet(requestPath);
@@ -223,7 +229,7 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 
 			@Override
 			public Resource getWrapped() {
-				return null;
+				return resource;
 			}
 		};
 	}
