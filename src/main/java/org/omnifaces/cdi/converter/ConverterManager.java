@@ -21,7 +21,6 @@ import static org.omnifaces.util.Beans.resolve;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ejb.EJB;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
@@ -40,7 +39,7 @@ import org.omnifaces.application.OmniApplication;
 
 /**
  * <p>
- * The <code>@FacesConverter</code> is by default not eligible for dependency injection by {@link Inject} nor {@link EJB}.
+ * The <code>@FacesConverter</code> is by default not eligible for dependency injection by <code>@Inject</code> nor <code>@EJB</code>.
  * There is a <a href="http://balusc.blogspot.com/2011/09/communication-in-jsf-20.html#GettingAnEJBInFacesConverterAndFacesValidator">workaround</a>
  * for EJB, but this is nasty and doesn't work out for CDI. <a href="http://stackoverflow.com/q/7531449/157882">Another way</a>
  * would be to make it a JSF or CDI managed bean, however this doesn't register the converter instance into the JSF application context,
