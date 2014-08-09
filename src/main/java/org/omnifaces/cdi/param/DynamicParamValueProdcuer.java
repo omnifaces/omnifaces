@@ -38,80 +38,80 @@ import org.omnifaces.cdi.Param;
  * <p>
  * This dynamic producer calls through to the "real" producer for {@link Param}
  * annotated injection points.
- * 
+ *
  * @see ParamExtension
  * @see RequestParameterProducer
- * 
+ *
  * @since 2.0
  * @author Arjan Tijms
  *
  */
 public class DynamicParamValueProdcuer implements Bean<Object> {
-    
+
     private BeanManager beanManager;
     private Set<Type> types;
-    
+
     public DynamicParamValueProdcuer(BeanManager beanManager, Type type) {
     	this.beanManager = beanManager;
-    	types = new HashSet<Type>(asList(type, Object.class));
+    	types = new HashSet<>(asList(type, Object.class));
     }
- 
+
     @Override
     public Class<?> getBeanClass() {
         return RequestParameterProducer.class;
     }
- 
+
     @Override
     public Set<Type> getTypes() {
         return types;
     }
- 
+
     @Override
     public Object create(CreationalContext<Object> creationalContext) {
     	ParamValue<?> paramValue = new RequestParameterProducer().produce(getCurrentInjectionPoint(beanManager), beanManager);
     	return paramValue.getValue();
     }
- 
+
     @Override
     public Set<Annotation> getQualifiers() {
         return Collections.singleton((Annotation) new DefaultParamAnnotationLiteral());
     }
- 
+
     @Override
     public Class<? extends Annotation> getScope() {
         return Dependent.class;
     }
- 
+
     @Override
     public Set<Class<? extends Annotation>> getStereotypes() {
         return emptySet();
     }
- 
+
     @Override
     public Set<InjectionPoint> getInjectionPoints() {
         return emptySet();
     }
- 
+
     @Override
     public boolean isAlternative() {
         return false;
     }
- 
+
     @Override
     public boolean isNullable() {
         return false;
     }
- 
+
     @Override
     public String getName() {
         return null;
     }
- 
+
     @Override
     public void destroy(Object instance, CreationalContext<Object> creationalContext) {
     	// NOOP
     }
-    
+
     @SuppressWarnings("all")
     public static class DefaultParamAnnotationLiteral extends AnnotationLiteral<Param> implements Param {
         private static final long serialVersionUID = 1L;
