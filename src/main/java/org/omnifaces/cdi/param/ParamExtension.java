@@ -18,22 +18,22 @@ import java.util.Set;
 
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
+import javax.enterprise.inject.spi.AnnotatedField;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.Extension;
-import javax.enterprise.inject.spi.InjectionPoint;
-import javax.enterprise.inject.spi.ProcessInjectionPoint;
+import javax.enterprise.inject.spi.ProcessManagedBean;
 
 import org.omnifaces.cdi.Param;
 
 /**
  * CDI extension that works around the fact that CDI insists on doing absolutely
- * guaranteed type safe injections. While generally applaudable this unfortunately 
- * impedes writing true generic producers that dynamically do conversion based on 
+ * guaranteed type safe injections. While generally applaudable this unfortunately
+ * impedes writing true generic producers that dynamically do conversion based on
  * the target type.
  * <p>
  * This extension collects the target types of each injection point qualified with
  * the {@link Param} annotation and dynamically registers Beans that effectively
- * represents producers for each type. 
+ * represents producers for each type.
  *
  * @since 2.0
  * @author Arjan Tijms
@@ -41,15 +41,11 @@ import org.omnifaces.cdi.Param;
 public class ParamExtension implements Extension {
 
 	private Set<Type> types = new HashSet<>();
-	
-	public void OnProcessInjectionPoint(@Observes ProcessInjectionPoint<?, ?> event) {
-		
-		InjectionPoint injectionPoint = event.getInjectionPoint();
 
-		if (injectionPoint.getAnnotated().isAnnotationPresent(Param.class)) {
-			// For now only support injection into simple class types like java.lang.String etc
-			if (injectionPoint.getType() instanceof Class) {
-				types.add(injectionPoint.getType());
+	public <T> void collect(@Observes ProcessManagedBean<T> event) {
+		for (AnnotatedField<? super T> field : event.getAnnotatedBeanClass().getFields()) {
+			if (field.isAnnotationPresent(Param.class) && field.getBaseType() instanceof Class) {
+				types.add(field.getBaseType());
 			}
 		}
 	}
