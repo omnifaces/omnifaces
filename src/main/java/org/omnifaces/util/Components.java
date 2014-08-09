@@ -13,6 +13,7 @@
 package org.omnifaces.util;
 
 import static java.util.Arrays.asList;
+import static java.util.regex.Pattern.quote;
 import static javax.faces.component.visit.VisitContext.createVisitContext;
 import static javax.faces.component.visit.VisitResult.ACCEPT;
 import static org.omnifaces.util.Faces.getContext;
@@ -42,6 +43,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.UIComponentBase;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
+import javax.faces.component.UINamingContainer;
 import javax.faces.component.UIPanel;
 import javax.faces.component.UIViewRoot;
 import javax.faces.component.behavior.AjaxBehavior;
@@ -814,20 +816,34 @@ public final class Components {
 	public static boolean hasInvokedSubmit(UIComponent component) {
 		FacesContext context = FacesContext.getCurrentInstance();
 
-		if (context.isPostback()) {
-			String clientId = component.getClientId(context);
-			Map<String, String> params = context.getExternalContext().getRequestParameterMap();
-
-			if (context.getPartialViewContext().isAjaxRequest()) {
-				return clientId.equals(params.get("javax.faces.source"));
-			}
-			else {
-				return component instanceof UICommand && params.get(clientId) != null;
-			}
-		}
-		else {
+		if (!context.isPostback()) {
 			return false;
 		}
+
+		String clientId = stripIterationIndexFromClientId(component.getClientId(context));
+		Map<String, String> params = context.getExternalContext().getRequestParameterMap();
+
+		if (context.getPartialViewContext().isAjaxRequest()) {
+			String source = params.get("javax.faces.source");
+
+			if (source != null) {
+				return clientId.equals(stripIterationIndexFromClientId(source));
+			}
+		}
+
+		if (component instanceof UICommand) {
+		    for (String name : params.keySet()) {
+				if (name.startsWith("javax.faces.")) {
+					continue; // Quick skip.
+				}
+
+		        if (clientId.equals(stripIterationIndexFromClientId(name))) {
+		        	return true;
+		        }
+			}
+		}
+
+		return false;
 	}
 
 	// Expressions ----------------------------------------------------------------------------------------------------
@@ -1013,7 +1029,8 @@ public final class Components {
 	 * Strip UIData/UIRepeat iteration index in pattern <code>:[0-9+]:</code> from given component client ID.
 	 */
 	private static String stripIterationIndexFromClientId(String clientId) {
-		return clientId.replaceAll(":[0-9]+:", ":");
+		String separatorChar = Character.toString(UINamingContainer.getSeparatorChar(getContext()));
+		return clientId.replaceAll(quote(separatorChar) + "[0-9]+" + quote(separatorChar), separatorChar);
 	}
 
 	/**
