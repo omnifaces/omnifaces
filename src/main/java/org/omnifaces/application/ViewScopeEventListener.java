@@ -20,9 +20,9 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.PreDestroyViewMapEvent;
 import javax.faces.event.SystemEvent;
 import javax.faces.event.ViewMapListener;
-import javax.inject.Inject;
 
 import org.omnifaces.cdi.viewscope.ViewScopeManager;
+import org.omnifaces.config.BeanManager;
 
 /**
  * Listener for JSF view scope destroy events so that view scope provider implementation can be notified.
@@ -32,11 +32,6 @@ import org.omnifaces.cdi.viewscope.ViewScopeManager;
  * @since 1.6
  */
 public class ViewScopeEventListener implements ViewMapListener {
-
-	// Properties -----------------------------------------------------------------------------------------------------
-
-	@Inject
-	private ViewScopeManager viewScopeManager;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -56,7 +51,7 @@ public class ViewScopeEventListener implements ViewMapListener {
 	@Override
 	public void processEvent(SystemEvent event) throws AbortProcessingException {
 		if (event instanceof PreDestroyViewMapEvent) {
-			viewScopeManager.preDestroyView();
+			BeanManager.INSTANCE.getReference(ViewScopeManager.class).preDestroyView();
 		}
 	}
 
