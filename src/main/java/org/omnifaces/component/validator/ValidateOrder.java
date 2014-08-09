@@ -12,11 +12,12 @@
  */
 package org.omnifaces.component.validator;
 
-import static org.omnifaces.util.Utils.nullSafeTreeSet;
+import static java.util.Arrays.asList;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.TreeSet;
 
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIInput;
@@ -65,7 +66,7 @@ public class ValidateOrder extends ValidateMultipleFields {
 		LT(new Callback.ReturningWithArgument<Boolean, List<Comparable>>() {
 			@Override
 			public Boolean invoke(List<Comparable> values) {
-				return new ArrayList<>(nullSafeTreeSet(values)).equals(values);
+				return new ArrayList<>(new TreeSet<>(values)).equals(values);
 			}
 		}),
 
@@ -81,7 +82,7 @@ public class ValidateOrder extends ValidateMultipleFields {
 		GT(new Callback.ReturningWithArgument<Boolean, List<Comparable>>() {
 			@Override
 			public Boolean invoke(List<Comparable> values) {
-				List<Comparable> sortedValues = new ArrayList<>(nullSafeTreeSet(values));
+				List<Comparable> sortedValues = new ArrayList<>(new TreeSet<>(values));
 				Collections.reverse(sortedValues);
 				return sortedValues.equals(values);
 			}
@@ -129,7 +130,9 @@ public class ValidateOrder extends ValidateMultipleFields {
 	public boolean validateValues(FacesContext context, List<UIInput> components, List<Object> values) {
 		try {
 			Object tmp = values; // https://bugs.eclipse.org/bugs/show_bug.cgi?id=158870
-			return Type.valueOf(getType().toUpperCase()).validateOrder((List<Comparable>) tmp);
+			List<Comparable> comparableValues = new ArrayList<>((List<Comparable>) tmp);
+			comparableValues.removeAll(asList(null, "")); // Empty checking job is up to required="true".
+			return Type.valueOf(getType().toUpperCase()).validateOrder(comparableValues);
 		}
 		catch (ClassCastException e) {
 			throw new IllegalArgumentException(ERROR_VALUES_NOT_COMPARABLE, e);

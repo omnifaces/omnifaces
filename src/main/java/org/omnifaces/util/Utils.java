@@ -47,7 +47,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.TreeSet;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
@@ -489,24 +488,6 @@ public final class Utils {
 		}
 
 		return false;
-	}
-
-	/**
-	 * This comparator also takes account with null values and sorts them first.
-	 * @since 1.7
-	 */
-	@SuppressWarnings("rawtypes")
-	public static final Comparator<Comparable> NULL_COMPARATOR = new NullComparator();
-
-	/**
-	 * Create a new {@link TreeSet} which uses {@link Utils#NULL_COMPARATOR}, add the given collection to it and return
-	 * the {@link TreeSet}.
-	 * @since 1.7
-	 */
-	public static <T extends Comparable<T>> TreeSet<T> nullSafeTreeSet(Collection<T> collection) {
-		TreeSet<T> nullSafeTreeSet = new TreeSet<>(NULL_COMPARATOR);
-		nullSafeTreeSet.addAll(collection);
-		return nullSafeTreeSet;
 	}
 
 	// Dates ----------------------------------------------------------------------------------------------------------
