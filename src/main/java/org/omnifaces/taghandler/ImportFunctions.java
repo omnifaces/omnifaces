@@ -12,6 +12,8 @@
  */
 package org.omnifaces.taghandler;
 
+import static org.omnifaces.taghandler.ImportConstants.toClass;
+
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -66,7 +68,6 @@ public class ImportFunctions extends TagHandler {
 	private static Map<String, Method> FUNCTIONS_CACHE = new HashMap<String, Method>();
 
 	private static final String ERROR_INVALID_VAR = "The 'var' attribute may not be an EL expression.";
-	private static final String ERROR_MISSING_CLASS = "Cannot find type '%s' in classpath.";
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
@@ -127,21 +128,6 @@ public class ImportFunctions extends TagHandler {
 				}
 			}
 		});
-	}
-
-	/**
-	 * Convert the given type, which should represent a fully qualified name, to a concrete {@link Class} instance.
-	 * @param type The fully qualified name of the class.
-	 * @return The concrete {@link Class} instance.
-	 * @throws IllegalArgumentException When it is missing in the classpath.
-	 */
-	private static Class<?> toClass(String type) {
-		try {
-			return Class.forName(type, true, Thread.currentThread().getContextClassLoader());
-		}
-		catch (ClassNotFoundException e) {
-			throw new IllegalArgumentException(String.format(ERROR_MISSING_CLASS, type), e);
-		}
 	}
 
 	/**

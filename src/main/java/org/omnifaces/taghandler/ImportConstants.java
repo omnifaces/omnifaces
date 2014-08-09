@@ -152,7 +152,7 @@ public class ImportConstants extends TagHandler {
 	 * @return The concrete {@link Class} instance.
 	 * @throws IllegalArgumentException When it is missing in the classpath.
 	 */
-	private static Class<?> toClass(String type) {
+	static Class<?> toClass(String type) { // Package-private so that ImportFunctions can also use it.
 		try {
 			return Class.forName(type, true, Thread.currentThread().getContextClassLoader());
 		}
