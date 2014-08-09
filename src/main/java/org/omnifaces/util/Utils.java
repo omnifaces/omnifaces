@@ -21,7 +21,6 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.net.URLDecoder;
@@ -35,7 +34,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -46,7 +44,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.TreeSet;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
@@ -495,24 +492,6 @@ public final class Utils {
 		return false;
 	}
 
-	/**
-	 * This comparator also takes account with null values and sorts them first.
-	 * @since 1.7
-	 */
-	@SuppressWarnings("rawtypes")
-	public static final Comparator<Comparable> NULL_COMPARATOR = new NullComparator();
-
-	/**
-	 * Create a new {@link TreeSet} which uses {@link Utils#NULL_COMPARATOR}, add the given collection to it and return
-	 * the {@link TreeSet}.
-	 * @since 1.7
-	 */
-	public static <T extends Comparable<T>> TreeSet<T> nullSafeTreeSet(Collection<T> collection) {
-		TreeSet<T> nullSafeTreeSet = new TreeSet<T>(NULL_COMPARATOR);
-		nullSafeTreeSet.addAll(collection);
-		return nullSafeTreeSet;
-	}
-
 	// Dates ----------------------------------------------------------------------------------------------------------
 
 	/**
@@ -721,22 +700,6 @@ public final class Utils {
 		}
 
 		return builder.toString();
-	}
-
-	// Nested classes -------------------------------------------------------------------------------------------------
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static class NullComparator implements Comparator<Comparable>, Serializable {
-
-		private static final long serialVersionUID = 304919481351409790L;
-
-		@Override
-		public int compare(Comparable o1, Comparable o2) {
-			return (o1 == null) ? 1
-				: (o2 == null) ? -1
-				: o1.compareTo(o2);
-		}
-
 	}
 
 }
