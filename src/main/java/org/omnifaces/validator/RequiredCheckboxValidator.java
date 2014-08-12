@@ -43,7 +43,6 @@ import javax.faces.validator.ValidatorException;
  *
  * <h3>Usage</h3>
  * <p>
- * <p>
  * This validator is available by validator ID <code>omnifaces.RequiredCheckboxValidator</code>. Just specify it as
  * <code>&lt;f:validator&gt;</code> of the boolean selection component:
  * <pre>

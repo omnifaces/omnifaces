@@ -60,6 +60,7 @@ public final class Beans {
 
 	/**
 	 * Resolve and returns the CDI managed bean of the given class from the given bean manager.
+	 * @param <T> The generic bean type.
 	 * @param beanManager The involved CDI bean manager.
 	 * @param beanClass The type of the CDI managed bean instance.
 	 * @return The resolved CDI managed bean of the given class from the given bean manager.
@@ -78,6 +79,7 @@ public final class Beans {
 	/**
 	 * Returns the CDI managed bean reference of the given class from the given bean manager.
 	 * Note that this actually returns a client proxy and the underlying instance is thus always auto-created.
+	 * @param <T> The generic bean type.
 	 * @param beanManager The involved CDI bean manager.
 	 * @param beanClass The type of the CDI managed bean instance.
 	 * @return The CDI managed bean reference of the given class from the given bean manager.
@@ -89,6 +91,7 @@ public final class Beans {
 	/**
 	 * Returns the CDI managed bean reference of the given resolved bean from the given bean manager.
 	 * Note that this actually returns a client proxy and the underlying instance is thus always auto-created.
+	 * @param <T> The generic return type.
 	 * @param beanManager The involved CDI bean manager.
 	 * @param bean The resolved bean of the CDI managed bean instance.
 	 * @return The CDI managed bean reference of the given resolved bean from the given bean manager.
@@ -101,6 +104,7 @@ public final class Beans {
 	/**
 	 * Returns the CDI managed bean instance of the given class from the given bean manager and creates one if
 	 * one doesn't exist.
+	 * @param <T> The generic bean type.
 	 * @param beanManager The involved CDI bean manager.
 	 * @param beanClass The type of the CDI managed bean instance.
 	 * @return The CDI managed bean instance of the given class from the given bean manager.
@@ -114,6 +118,7 @@ public final class Beans {
 	 * Returns the CDI managed bean instance of the given class from the given bean manager and creates one if
 	 * one doesn't exist and <code>create</code> argument is <code>true</code>, otherwise don't create one and return
 	 * <code>null</code> if there's no current instance.
+	 * @param <T> The expected return type.
 	 * @param beanManager The involved CDI bean manager.
 	 * @param beanClass The type of the CDI managed bean instance.
 	 * @param create If <code>true</code>, then create one if one doesn't exist, otherwise don't create one and return
@@ -129,6 +134,7 @@ public final class Beans {
 	 * Returns the CDI managed bean instance of the given resolved bean from the given bean manager and creates one if
 	 * one doesn't exist and <code>create</code> argument is <code>true</code>, otherwise don't create one and return
 	 * <code>null</code> if there's no current instance.
+	 * @param <T> The generic bean type.
 	 * @param beanManager The involved CDI bean manager.
 	 * @param bean The resolved bean of the CDI managed bean instance.
 	 * @param create If <code>true</code>, then create one if one doesn't exist, otherwise don't create one and return
@@ -177,6 +183,7 @@ public final class Beans {
 	 * The difference with {@link Annotated#getAnnotation(Class)} is that this method will recursively search inside
 	 * all {@link Stereotype} annotations.
 	 *
+	 * @param <T> The generic annotation type.
 	 * @param beanManager The involved CDI bean manager.
 	 * @param annotated a Java program element that can be annotated
 	 * @param annotationType the class of the annotation type
@@ -207,6 +214,7 @@ public final class Beans {
 	 * will recursively investigate the annotations represented by the stereo type as long as the given annotation type hasn't been
 	 * encountered.
 	 *
+	 * @param <T> The generic annotation type.
 	 * @param beanManager The involved CDI bean manager.
 	 * @param initialAnnotations collection of annotations to investigate
 	 * @param annotationType the class of the annotation type
@@ -238,17 +246,17 @@ public final class Beans {
 
 		return null;
 	}
-	
+
 	/**
 	 * Returns the current {@link InjectionPoint} if any is available.
 	 * <p>
 	 * An <code>InjectionPoint</code> is available in code that's called in the context of CDI performing an injection,
 	 * e.g. by calling a producer ({@link Produces}) method or the {@link Bean#create(javax.enterprise.context.spi.CreationalContext)}
 	 * method.
-	 * 
+	 *
 	 * @param beanManager The involved CDI bean manager.
 	 * @return the current {@link InjectionPoint} if any is available, otherwise <code>null</code>.
-	 * 
+	 *
 	 * Since 2.0
 	 */
 	public static InjectionPoint getCurrentInjectionPoint(BeanManager beanManager) {
@@ -257,7 +265,7 @@ public final class Beans {
 		if (resolvedBean == null) {
 			return null;
 		}
-		
+
 		return beanManager.getContext(resolvedBean.getScope()).get(resolvedBean, beanManager.createCreationalContext(resolvedBean));
 	}
 

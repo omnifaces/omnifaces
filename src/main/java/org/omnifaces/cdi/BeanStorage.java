@@ -56,6 +56,7 @@ public class BeanStorage implements Serializable {
 
 	/**
 	 * Create and return the bean associated with given context and creational context.
+	 * @param <T> The generic bean type.
 	 * @param type The contextual type of the CDI managed bean.
 	 * @param context The context to create the bean in.
 	 * @return The bean associated with given context and creational context.
@@ -68,6 +69,7 @@ public class BeanStorage implements Serializable {
 
 	/**
 	 * Returns the bean associated with the given context, or <code>null</code> if there is none.
+	 * @param <T> The generic bean type.
 	 * @param type The contextual type of the CDI managed bean.
 	 * @param manager The bean manager used to create the creational context, if necessary.
 	 * @return The bean associated with the given context, or <code>null</code> if there is none.

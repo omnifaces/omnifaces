@@ -335,6 +335,8 @@ public class Cache extends OutputFamily {
     }
 
 	/**
+	 * Returns whether this cache is disabled.
+	 * @return Whether this cache is disabled.
 	 * @since 1.8
 	 */
 	public Boolean isDisabled() {
@@ -342,10 +344,12 @@ public class Cache extends OutputFamily {
 	}
 
 	/**
+	 * Sets whether this cache is disabled.
+	 * @param disabled Whether this cache is disabled.
 	 * @since 1.8
 	 */
-	public void setDisabled(Boolean disabledValue) {
-		state.put(disabled, disabledValue);
+	public void setDisabled(Boolean disabled) {
+		state.put(disabled, disabled);
 	}
 
 }

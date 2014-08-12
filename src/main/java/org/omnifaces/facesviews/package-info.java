@@ -151,7 +151,7 @@
  * <table summary="All available context parameters" border="1" cellspacing="0">
  *
  * <tr>
- * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_ENABLED_PARAM_NAME}</code></td>
+ * <td class="colFirst"><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_ENABLED_PARAM_NAME}</code></td>
  * <td>Used to completely switch scanning off.
  * <br>Allowed values: {<code>true</code>,<code>false</code>}
  * <br>Default value: <code>true</code>
@@ -159,7 +159,7 @@
  * </tr>
  *
  * <tr>
- * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_SCAN_PATHS_PARAM_NAME}</code></td>
+ * <td class="colFirst"><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_SCAN_PATHS_PARAM_NAME}</code></td>
  * <td>A comma separated list of paths that are to be scanned in addition to <code>/WEB-INF/faces-views</code>.
  * <br>Allowed values: any path relative to the web root, including the root path (<code>/</code>) and <code>/WEB-INF</code>.
  * A wildcard can be added to the path, which will cause only files with the given extension te be scanned.
@@ -173,7 +173,7 @@
  * </tr>
  *
  * <tr>
- * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_SCANNED_VIEWS_EXTENSIONLESS_PARAM_NAME}</code></td>
+ * <td class="colFirst"><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_SCANNED_VIEWS_EXTENSIONLESS_PARAM_NAME}</code></td>
  * <td>Used to set how scanned views should be rendered in JSF controlled links.
  * With this setting set to <code>false</code>, it depends on whether the request URI uses an extension or not.
  * If it doesn't, links are also rendered without one, otherwise they are rendered with an extension.
@@ -183,7 +183,7 @@
  * </tr>
  *
  * <tr>
- * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_EXTENSION_ACTION_PARAM_NAME}</code></td>
+ * <td class="colFirst"><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_EXTENSION_ACTION_PARAM_NAME}</code></td>
  * <td>Determines the action that is performed whenever a resource is requested WITH extension that's also available without an extension.
  * <br>Allowed values: {<code>SEND_404</code>,<code>REDIRECT_TO_EXTENSIONLESS</code>,<code>PROCEED</code>}, which have the following meaning:
  * <br>- <code>SEND_404</code>: Send a 404 (not found), makes it look like e.g. <code>/foo.xhtml</code> never existed and there's only <code>/foo</code>.
@@ -194,7 +194,7 @@
  * </tr>
  *
  * <tr>
- * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_PATH_ACTION_PARAM_NAME}</code></td>
+ * <td class="colFirst"><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_PATH_ACTION_PARAM_NAME}</code></td>
  * <td>Determines the action that is performed whenever a resource is requested in a public path that has been used for scanning views by faces views
  * (e.g. the paths set by <code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_SCAN_PATHS_PARAM_NAME}</code>, but excluding the root path /).
  * <br>Allowed values: {<code>SEND_404</code>,<code>REDIRECT_TO_SCANNED_EXTENSIONLESS</code>,<code>PROCEED</code>}, which have the following meaning:
@@ -206,7 +206,7 @@
  * </tr>
  *
  * <tr>
- * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_DISPATCH_METHOD_PARAM_NAME}</code></td>
+ * <td class="colFirst"><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_DISPATCH_METHOD_PARAM_NAME}</code></td>
  * <td>Determines the method used by FacesViews to invoke the FacesServlet.
  * <br>Allowed values: {<code>FORWARD</code>,<code>DO_FILTER</code>}, which have the following meaning:
  * <br>- <code>FORWARD</code>: Use a forward to invoke the {@link javax.faces.webapp.FacesServlet}. Using this method the {@link javax.faces.webapp.FacesServlet} does not have to be mapped to the (extensionless) requested resource or to everything (/*) when manually mapping.
@@ -216,18 +216,18 @@
  * </tr>
  *
  * <tr>
- * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_VIEW_HANDLER_MODE_PARAM_NAME}</code></td>
+ * <td class="colFirst"><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_VIEW_HANDLER_MODE_PARAM_NAME}</code></td>
  * <td>Determines how the {@link org.omnifaces.facesviews.FacesViewsViewHandler} should build the action URL that's used in e.g. forms and links.
  * <br>Allowed values: {<code>STRIP_EXTENSION_FROM_PARENT</code>, <code>BUILD_WITH_PARENT_QUERY_PARAMETERS</code>}, which have the following meaning:
  * <br>- <code>STRIP_EXTENSION_FROM_PARENT</code>: Strip the extension from the parent view handler's outcome using the at runtime determined extension mapping of the FacesServlet.
  * <br>- <code>BUILD_WITH_PARENT_QUERY_PARAMETERS</code>: The <code>FacesViewsViewHandler</code> constructs the action URL itself and only takes the query parameters (if any) from the parent view handler outcome.
- * <br>Default value: <code>STRIP_EXTENSION_FROM_PARENT</code>. 
+ * <br>Default value: <code>STRIP_EXTENSION_FROM_PARENT</code>.
  * </td>
  * </tr>
  *
  * <tr>
- * <td nowrap><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS_PARAM_NAME}</code></td>
- * <td>Used to set whether the {@link org.omnifaces.facesviews.FacesViewsForwardingFilter} should match before declared filters (<code>false</code>) or 
+ * <td class="colFirst"><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS_PARAM_NAME}</code></td>
+ * <td>Used to set whether the {@link org.omnifaces.facesviews.FacesViewsForwardingFilter} should match before declared filters (<code>false</code>) or
  * after declared filters (<code>true</code>).
  * <br>Default value: <code>true</code> (the FacesViews forwarding filter is the last in the filter chain)
  * </td>
@@ -236,7 +236,7 @@
  * </table>
  *
  * <h3>Servlet 2.5 compatibility</h3>
- * 
+ *
  * <p>
  * Since OmniFaces 2.0, Servlet 2.5 compatibility has been dropped. Servlet 2.5 users are advised to either
  * upgrade to Servlet 3.0+, or keep using OmniFaces 1.x.

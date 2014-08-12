@@ -184,6 +184,7 @@ public final class FacesViews {
 
     /**
      * This will register the {@link FacesViewsForwardingFilter}.
+     * @param servletContext The involved servlet context.
      */
     public static void registerFilter(ServletContext servletContext) {
 
@@ -255,6 +256,7 @@ public final class FacesViews {
      * This will map the {@link FacesServlet} to extensions found during scanning in {@link ApplicationInitializer}.
      * This part of the initialization is executed via {@link ApplicationListener}, because the {@link FacesServlet}
      * has to be available.
+     * @param servletContext The involved servlet context.
      */
     public static void addMappings(ServletContext servletContext) {
 
@@ -285,9 +287,10 @@ public final class FacesViews {
         	}
         }
     }
-    
+
     /**
      * Register a view handler that transforms a view id with extension back to an extensionless one.
+     * @param servletContext The involved servlet context.
      */
     public static void setViewHander(ServletContext servletContext) {
     	if (isFacesViewsActive(servletContext)) {
@@ -295,12 +298,12 @@ public final class FacesViews {
 	        application.setViewHandler(new FacesViewsViewHandler(application.getViewHandler()));
     	}
     }
-    
+
 	public static boolean isFacesViewsActive(ServletContext servletContext) {
 		if (!"false".equals(servletContext.getInitParameter(FACES_VIEWS_ENABLED_PARAM_NAME))) {
 			return !isEmpty(getApplicationAttribute(servletContext, FACES_VIEWS_RESOURCES_EXTENSIONS));
 		}
-		
+
 		return false;
 	}
 

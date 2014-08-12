@@ -79,6 +79,7 @@ public final class Converters {
 	/**
 	 * Converts a <code>Set&lt;E&gt;</code> to a <code>List&lt;E&gt;</code>. Useful when you want to iterate over a
 	 * <code>Set</code> in for example <code>&lt;ui:repeat&gt;</code>.
+	 * @param <E> The generic set element type.
 	 * @param set The set to be converted to list of its entries.
 	 * @return The converted list.
 	 */
@@ -94,6 +95,8 @@ public final class Converters {
 	 * Converts a <code>Map&lt;K, V&gt;</code> to a <code>List&lt;Map.Entry&lt;K, V&gt;&gt;</code>. Useful when you want
 	 * to iterate over a <code>Map</code> in for example <code>&lt;ui:repeat&gt;</code>. Each of the entries has the
 	 * usual <code>getKey()</code> and <code>getValue()</code> methods.
+	 * @param <K> The generic map key type.
+	 * @param <V> The generic map value type.
 	 * @param map The map to be converted to list of its entries.
 	 * @return The converted list.
 	 */
@@ -113,6 +116,7 @@ public final class Converters {
 	 * When iterating specifically over a Set using the above mentioned components {@link Converters#setToList(Set)} is
 	 * an alternative to this.
 	 *
+	 * @param <E> The generic iterable element type.
 	 * @param iterable The Iterable to be converted to a List.
 	 * @return The converted List.
 	 *
@@ -137,6 +141,7 @@ public final class Converters {
 	 * For those same components {@link Converters#iterableToList(Iterable)} is another alternative. Use this when
 	 * a DataModel is specifically needed.
 	 *
+	 * @param <E> The generic iterable element type.
 	 * @param iterable The Iterable to be converted to a DataModel.
 	 * @return The converted DataModel.
 	 *
@@ -186,6 +191,7 @@ public final class Converters {
 
 	/**
 	 * Joins all elements of the given collection to a single string, separated by the given separator.
+	 * @param <E> The generic collection element type.
 	 * @param collection The collection to be joined.
 	 * @param separator The separator to be used. If null, then it defaults to empty string.
 	 * @return All elements of the given collection as a single string, separated by the given separator.
@@ -217,6 +223,8 @@ public final class Converters {
 	/**
 	 * Joins all elements of the given map to a single string, separated by the given key-value pair separator and
 	 * entry separator.
+	 * @param <K> The generic map key type.
+	 * @param <V> The generic map value type.
 	 * @param map The map to be joined.
 	 * @param pairSeparator The key-value pair separator to be used. If null, then it defaults to empty string.
 	 * @param entrySeparator The entry separator to be used. If null, then it defaults to empty string.
@@ -288,13 +296,14 @@ public final class Converters {
 	 * Splits the given list into a list of sublists of the given fragment size. This is useful for creating nested
 	 * <code>&lt;ui:repeat&gt;</code> structures, for example, when positioning a list of items into a grid based
 	 * layout system such as Twitter Bootstrap.
+	 * @param <E> The generic list element type.
 	 * @param list The list to be split.
 	 * @param fragmentSize The size of each sublist.
 	 * @return A new list consisting of sublists of the given list.
 	 * @throws IllegalArgumentException When the fragment size is less than 1.
 	 * @since 1.6
 	 */
-	public static <T> List<List<T>> splitList(List<T> list, int fragmentSize) {
+	public static <E> List<List<E>> splitList(List<E> list, int fragmentSize) {
 		if (isEmpty(list)) {
 			return Collections.emptyList();
 		}
@@ -304,7 +313,7 @@ public final class Converters {
 		}
 
 		int sourceSize = list.size();
-		List<List<T>> lists = new ArrayList<>((sourceSize + fragmentSize - 1) / fragmentSize);
+		List<List<E>> lists = new ArrayList<>((sourceSize + fragmentSize - 1) / fragmentSize);
 
 		for (int i = 0; i < sourceSize; i += fragmentSize) {
 			lists.add(list.subList(i, Math.min(i + fragmentSize, sourceSize)));

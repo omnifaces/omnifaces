@@ -364,6 +364,7 @@ public final class Faces {
 
 	/**
 	 * Returns the Faces context attribute value associated with the given name.
+	 * @param <T> The expected return type.
 	 * @param name The Faces context attribute name.
 	 * @return The Faces context attribute value associated with the given name.
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
@@ -489,6 +490,7 @@ public final class Faces {
 	/**
 	 * Returns the metadata attribute of the given view ID associated with the given name.
 	 * Note: this is not the same as the view scope, for that use {@link #getViewAttribute(String)}.
+	 * @param <T> The expected return type.
 	 * @param viewId The view ID to return the metadata attribute for.
 	 * @param name The metadata attribute name.
 	 * @return The metadata attribute of the given view ID associated with the given name.
@@ -503,6 +505,7 @@ public final class Faces {
 	/**
 	 * Returns the metadata attribute of the current view associated with the given name.
 	 * Note: this is not the same as the view scope, for that use {@link #getViewAttribute(String)}.
+	 * @param <T> The expected return type.
 	 * @param name The metadata attribute name.
 	 * @return The metadata attribute of the current view associated with the given name.
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
@@ -668,6 +671,7 @@ public final class Faces {
 	 * Returns the Facelet attribute value associated with the given name. This basically returns the value of the
 	 * <code>&lt;ui:param&gt;</code> which is been declared inside the Facelet file, or is been passed into the Facelet
 	 * file by e.g. an <code>&lt;ui:include&gt;</code>.
+	 * @param <T> The expected return type.
 	 * @param name The Facelet attribute name.
 	 * @return The Facelet attribute value associated with the given name.
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
@@ -1576,6 +1580,7 @@ public final class Faces {
 
 	/**
 	 * Returns the request scope attribute value associated with the given name.
+	 * @param <T> The expected return type.
 	 * @param name The request scope attribute name.
 	 * @return The request scope attribute value associated with the given name.
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
@@ -1597,6 +1602,7 @@ public final class Faces {
 
 	/**
 	 * Removes the request scope attribute value associated with the given name.
+	 * @param <T> The expected return type.
 	 * @param name The request scope attribute name.
 	 * @return The request scope attribute value previously associated with the given name, or <code>null</code> if
 	 * there is no such attribute.
@@ -1622,6 +1628,7 @@ public final class Faces {
 
 	/**
 	 * Returns the flash scope attribute value associated with the given name.
+	 * @param <T> The expected return type.
 	 * @param name The flash scope attribute name.
 	 * @return The flash scope attribute value associated with the given name.
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
@@ -1643,6 +1650,7 @@ public final class Faces {
 
 	/**
 	 * Removes the flash scope attribute value associated with the given name.
+	 * @param <T> The expected return type.
 	 * @param name The flash scope attribute name.
 	 * @return The flash scope attribute value previously associated with the given name, or <code>null</code> if
 	 * there is no such attribute.
@@ -1667,6 +1675,7 @@ public final class Faces {
 
 	/**
 	 * Returns the view scope attribute value associated with the given name.
+	 * @param <T> The expected return type.
 	 * @param name The view scope attribute name.
 	 * @return The view scope attribute value associated with the given name.
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
@@ -1688,6 +1697,7 @@ public final class Faces {
 
 	/**
 	 * Removes the view scope attribute value associated with the given name.
+	 * @param <T> The expected return type.
 	 * @param name The view scope attribute name.
 	 * @return The view scope attribute value previously associated with the given name, or <code>null</code> if
 	 * there is no such attribute.
@@ -1712,6 +1722,7 @@ public final class Faces {
 
 	/**
 	 * Returns the session scope attribute value associated with the given name.
+	 * @param <T> The expected return type.
 	 * @param name The session scope attribute name.
 	 * @return The session scope attribute value associated with the given name.
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
@@ -1733,6 +1744,7 @@ public final class Faces {
 
 	/**
 	 * Removes the session scope attribute value associated with the given name.
+	 * @param <T> The expected return type.
 	 * @param name The session scope attribute name.
 	 * @return The session scope attribute value previously associated with the given name, or <code>null</code> if
 	 * there is no such attribute.
@@ -1757,6 +1769,7 @@ public final class Faces {
 
 	/**
 	 * Returns the application scope attribute value associated with the given name.
+	 * @param <T> The expected return type.
 	 * @param name The application scope attribute name.
 	 * @return The application scope attribute value associated with the given name.
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
@@ -1778,6 +1791,7 @@ public final class Faces {
 
 	/**
 	 * Removes the application scope attribute value associated with the given name.
+	 * @param <T> The expected return type.
 	 * @param name The application scope attribute name.
 	 * @return The application scope attribute value previously associated with the given name, or <code>null</code> if
 	 * there is no such attribute.

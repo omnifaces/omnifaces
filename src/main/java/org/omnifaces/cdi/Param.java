@@ -74,12 +74,15 @@ public @interface Param {
 
 	/**
 	 * (Optional) The name of the request parameter. If not specified the name of the injection target field will be used.
+	 *
+	 * @return The name of the request parameter.
 	 */
 	@Nonbinding	String name() default "";
 
 	/**
 	 * (Optional) the label used to refer to the request parameter. If not specified the name of the request parameter.
 	 *
+	 * @return The label used to refer the request parameter, defaults to the name of the request parameter.
 	 */
 	@Nonbinding	String label() default "";
 
@@ -96,6 +99,8 @@ public @interface Param {
      * </ol>
      * <p>
      * If this attribute is specified in addition to {@link Param#converterClass()}, this attribute takes precedence.
+     *
+     * @return The converter used to convert the request parameter to model value.
 	 */
 	@Nonbinding String converter() default "";
 
@@ -104,6 +109,7 @@ public @interface Param {
 	 * after conversion and before validation. A value is said to be not present if it turns out to be empty according to
 	 * the semantics of {@link Utils#isEmpty(Object)}.
 	 *
+	 * @return Whether the absence of the request parameter should cause a validation error.
 	 */
 	@Nonbinding boolean required() default false;
 
@@ -122,17 +128,24 @@ public @interface Param {
      * If this attribute is specified in addition to {@link Param#validatorClasses()} then the validators from both
      * attributes will be added to the final collection of validators. The validators from this attribute will however
      * be called first.
+     *
+     * @return The validators used to validate the (converted) request parameter.
 	 */
 	@Nonbinding String[] validators() default {};
 
 	/**
 	 * (Optional) Class of the converter to be used for converting the request parameter to the type that is to be injected.
-	 *
+	 * This is ignored when {@link #converter()} is specified.
+     *
+     * @return The converter class used to convert the request parameter to model value.
 	 */
 	@Nonbinding Class<? extends Converter> converterClass() default Converter.class;
 
 	/**
 	 * (Optional) Class of one ore more validators to be used for validating the (converted) request parameter.
+	 * These will run <i>after</i> the ones specified in {@link #validators()}.
+	 *
+	 * @return The validator classes used to validate the (converted) request parameter.
 	 */
 	@Nonbinding Class<? extends Validator>[] validatorClasses() default {};
 
@@ -144,6 +157,8 @@ public @interface Param {
 	 * the primitive types and their corresponding boxed types).
 	 * <p>
 	 * Attributes for which the converter doesn't have a property (setter) are silently ignored.
+	 *
+	 * @return The attributes which need to be set on the converter.
 	 */
 	@Nonbinding Attribute[] converterAttributes() default {};
 
@@ -155,6 +170,8 @@ public @interface Param {
 	 * the primitive types and their corresponding boxed types).
 	 * <p>
 	 * Attributes for which any given validator doesn't have a property (setter) are silently ignored.
+	 *
+	 * @return The attributes which need to be set on the validators.
 	 */
 	@Nonbinding Attribute[] validatorAttributes() default {};
 
@@ -164,6 +181,7 @@ public @interface Param {
 	 * The value for which conversion failed is available as <code>{0}</code>. The label associated with this
 	 * parameter value (see the {@link Param#label()} attribute) is available as <code>{1}</code>.
 	 *
+	 * @return The error message to be used when the {@link #converter()} or {@link #converterClass()} fail.
 	 */
 	@Nonbinding String converterMessage() default "";
 
@@ -173,6 +191,7 @@ public @interface Param {
 	 * The value for which validation failed is available as <code>{0}</code>. The label associated with this
 	 * parameter value (see the {@link Param#label()} attribute) is available as <code>{1}</code>.
 	 *
+	 * @return The error message to be used when any of the {@link #validators()} or {@link #validatorClasses()} fail.
 	 */
 	@Nonbinding String validatorMessage() default "";
 
@@ -183,6 +202,7 @@ public @interface Param {
 	 * The (empty) value for which the required check failed is available as <code>{0}</code>. (this will be either null or the empty string)
 	 * The label associated with this parameter value (see the {@link Param#label()} attribute) is available as <code>{1}</code>.
 	 *
+	 * @return The error message to be used on empty submit while {@link #required()} is <code>true</code>.
 	 */
 	@Nonbinding String requiredMessage() default "";
 
@@ -196,6 +216,7 @@ public @interface Param {
 	 * will depend on the availability of bean validation and the global {@link BeanValidator#DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME} setting
 	 * whether bean validation is attempted or not.
 	 *
+	 * @return Whether to disable bean validation or not.
 	 */
 	@Nonbinding boolean disableBeanValidation() default false;
 
@@ -205,6 +226,7 @@ public @interface Param {
 	 * If <code>true</code> bean validation will be performed for this instance (given that bean validation is available) despite
 	 * it globally being disabled. If <code>false</code> (the default) no specific action is taken.
 	 *
+	 * @return Whether to override that JSF bean validation is globally disabled.
 	 */
 	@Nonbinding boolean overrideGlobalBeanValidationDisabled() default false;
 

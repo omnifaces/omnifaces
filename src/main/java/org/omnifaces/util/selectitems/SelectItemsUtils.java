@@ -39,7 +39,7 @@ public final class SelectItemsUtils {
 	 * Finds an object value in the {@link SelectItem} instances associated with the given component by means of matching its converted value with
 	 * the given string value.
 	 *
-	 * @param context
+	 * @param context The involved faces context.
 	 * @param component the component with which {@link SelectItem}s should be associated that are used to search in.
 	 * @param value a string that should match the string representation of one of the values held by the {@link SelectItem}s.
 	 * @param converter the faces {@link Converter} used to generate String representations for the values held by the {@link SelectItem}s.
@@ -78,7 +78,7 @@ public final class SelectItemsUtils {
 	 * <p>
 	 * Note that values from recursively scanned {@link SelectItemGroup} instances are included.
 	 *
-	 * @param context
+	 * @param context The involved faces context.
 	 * @param component the component with which {@link SelectItem} instances should be associated
 	 * @return List of all values hold by {@link SelectItem} instances
 	 */

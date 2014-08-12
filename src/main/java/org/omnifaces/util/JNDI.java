@@ -59,9 +59,11 @@ public final class JNDI {
 	 * <p>
 	 * Environment entries can also be injected using {@link Resource}.
 	 *
+	 * @param <T> The expected return type.
 	 * @param name the environment entry name relative to "java:comp/env".
 	 * @return The environment entry value associated with the given name, or <code>null</code> if
 	 * there is none.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see InitialContext#lookup(String)
 	 * @since 1.6
 	 */
@@ -71,8 +73,10 @@ public final class JNDI {
 
 	/**
 	 * Returns the named object from the default JNDI instance.
+	 * @param <T> The expected return type.
 	 * @param name the name of the object to be retrieved
 	 * @return the named object, or <code>null</code> if there is none.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see InitialContext#lookup(String)
 	 * @since 1.6
 	 */

@@ -178,6 +178,7 @@ public final class Servlets {
 	/**
 	 * Returns the original HTTP request URI behind this forwarded request, if any.
 	 * This does not include the request query string.
+	 * @param request The involved HTTP servlet request.
 	 * @return The original HTTP request URI behind this forwarded request, if any.
 	 * @since 1.8
 	 */
@@ -187,6 +188,7 @@ public final class Servlets {
 
 	/**
 	 * Returns the original HTTP request query string behind this forwarded request, if any.
+	 * @param request The involved HTTP servlet request.
 	 * @return The original HTTP request query string behind this forwarded request, if any.
 	 * @since 1.8
 	 */
@@ -196,6 +198,7 @@ public final class Servlets {
 
 	/**
 	 * Returns the original HTTP request URI with query string behind this forwarded request, if any.
+	 * @param request The involved HTTP servlet request.
 	 * @return The original HTTP request URI with query string behind this forwarded request, if any.
 	 * @since 1.8
 	 */
@@ -370,6 +373,7 @@ public final class Servlets {
 
 	/**
 	 * Returns the application scope attribute value associated with the given name.
+	 * @param <T> The expected return type.
 	 * @param context The servlet context used for looking up the attribute.
 	 * @param name The application scope attribute name.
 	 * @return The application scope attribute value associated with the given name.

@@ -44,7 +44,7 @@ public enum BeanManager {
 
 	/**
 	 * Returns the lazily loaded enum singleton instance.
-	 * @throws IllegalStateException When initialization fails.
+	 * Throws {@link IllegalStateException} when initialization fails.
 	 */
 	INSTANCE;
 
@@ -121,6 +121,7 @@ public enum BeanManager {
 
 	/**
 	 * Returns the CDI managed bean instance of the given class, or <code>null</code> if there is none.
+	 * @param <T> The generic bean type.
 	 * @param beanClass The type of the CDI managed bean instance.
 	 * @return The CDI managed bean instance of the given class, or <code>null</code> if there is none.
 	 * @throws UnsupportedOperationException When obtaining the CDI managed bean instance failed with an exception.

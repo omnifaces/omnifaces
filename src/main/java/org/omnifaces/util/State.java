@@ -35,8 +35,10 @@ public class State {
 	 * <p>
 	 * See {@link StateHelper#eval(Serializable)}
 	 *
-	 * @param key
-	 *            the name of the value in component's state
+	 * @param <T> The expected return type.
+	 * @param key the name of the value in component's state
+	 * @return The value associated with the specified key.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> T get(Serializable key) {
@@ -48,10 +50,11 @@ public class State {
 	 * <p>
 	 * See {@link StateHelper#eval(Serializable, Object)}
 	 *
-	 * @param key
-	 *            the name of the value in component's state
-	 * @param defaultValue
-	 *            the value to return if no value is found in the call to get()
+	 * @param <T> The expected return type.
+	 * @param key the name of the value in component's state
+	 * @param defaultValue the value to return if no value is found in the call to get()
+	 * @return The value associated with the specified key, or the given default value if no value is found.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> T get(Serializable key, Object defaultValue) {
@@ -65,8 +68,11 @@ public class State {
 	 * <p>
 	 * See {@link StateHelper#put(Serializable, Object)}
 	 *
-	 * @param key
-	 * @param value
+	 * @param <T> The expected value and return type.
+	 * @param key The name of the value in component's state.
+	 * @param value The value to put in component's state.
+	 * @return The previous value, if any.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> T put(Serializable key, T value) {

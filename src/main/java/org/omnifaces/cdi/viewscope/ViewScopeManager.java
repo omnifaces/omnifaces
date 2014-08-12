@@ -105,6 +105,7 @@ public class ViewScopeManager implements Serializable {
 
 	/**
 	 * Create and returns the CDI view scoped managed bean from the current JSF view scope.
+	 * @param <T> The expected return type.
 	 * @param type The contextual type of the CDI managed bean.
 	 * @param context The CDI context to create the CDI managed bean in.
 	 * @return The created CDI view scoped managed bean from the current JSF view scope.
@@ -115,6 +116,7 @@ public class ViewScopeManager implements Serializable {
 
 	/**
 	 * Returns the CDI view scoped managed bean from the current JSF view scope.
+	 * @param <T> The expected return type.
 	 * @param type The contextual type of the CDI managed bean.
 	 * @return The CDI view scoped managed bean from the current JSF view scope.
 	 */

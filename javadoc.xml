@@ -8,7 +8,7 @@
         	doctitle="OmniFaces API documentation" 
         	nodeprecated="false" nodeprecatedlist="false" noindex="false" nonavbar="false" notree="false" 
         	packagenames="org.omnifaces,org.omnifaces.application,org.omnifaces.cdi,org.omnifaces.cdi.converter,org.omnifaces.cdi.eager,org.omnifaces.cdi.param,org.omnifaces.cdi.validator,org.omnifaces.cdi.viewscope,org.omnifaces.component,org.omnifaces.component.input,org.omnifaces.component.input.componentidparam,org.omnifaces.component.messages,org.omnifaces.component.output,org.omnifaces.component.output.cache,org.omnifaces.component.output.cache.el,org.omnifaces.component.script,org.omnifaces.component.tree,org.omnifaces.component.util,org.omnifaces.component.validator,org.omnifaces.config,org.omnifaces.context,org.omnifaces.converter,org.omnifaces.el,org.omnifaces.el.functions,org.omnifaces.event,org.omnifaces.eventlistener,org.omnifaces.exceptionhandler,org.omnifaces.facesviews,org.omnifaces.filter,org.omnifaces.io,org.omnifaces.model,org.omnifaces.model.tree,org.omnifaces.renderer,org.omnifaces.renderkit,org.omnifaces.resourcehandler,org.omnifaces.servlet,org.omnifaces.taghandler,org.omnifaces.util,org.omnifaces.util.concurrentlinkedhashmap,org.omnifaces.util.selectitems,org.omnifaces.validator,org.omnifaces.viewhandler" 
-        	source="1.7" sourcepath="src/main/java:src/main/resources" splitindex="true" use="true" version="true"
+        	source="1.8" sourcepath="src/main/java:src/main/resources" splitindex="true" use="true" version="true"
         >
             <link href="http://docs.oracle.com/javase/7/docs/api/"/>
             <link href="http://docs.oracle.com/javaee/7/api/"/>

@@ -97,7 +97,7 @@ import org.omnifaces.util.Hacks;
  * <p>
  * The following context parameters are available:
  * <table summary="All available context parameters">
- * <tr><td nowrap>
+ * <tr><td class="colFirst">
  * <code>{@value org.omnifaces.resourcehandler.CombinedResourceHandler#PARAM_NAME_EXCLUDED_RESOURCES}</code>
  * </td><td>
  * Comma separated string of resource identifiers of <code>&lt;h:head&gt;</code> resources which needs to be excluded
@@ -105,20 +105,20 @@ import org.omnifaces.util.Hacks;
  * <br><code>&lt;param-value&gt;primefaces:primefaces.css, javax.faces:jsf.js&lt;/param-value&gt;</code>
  * <br>Any combined resource will be included <i>after</i> any of those excluded resources.
  * </td></tr>
- * <tr><td nowrap>
+ * <tr><td class="colFirst">
  * <code>{@value org.omnifaces.resourcehandler.CombinedResourceHandler#PARAM_NAME_SUPPRESSED_RESOURCES}</code>
  * </td><td>
  * Comma separated string of resource identifiers of <code>&lt;h:head&gt;</code> resources which needs to be suppressed
  * and removed. For example:
  * <br><code>&lt;param-value&gt;skinning.ecss, primefaces:jquery/jquery.js&lt;/param-value&gt;</code>
  * </td></tr>
- * <tr><td nowrap>
+ * <tr><td class="colFirst">
  * <code>{@value org.omnifaces.resourcehandler.CombinedResourceHandler#PARAM_NAME_INLINE_CSS}</code>
  * </td><td>
  * Set to <code>true</code> if you want to render the combined CSS resources inline (embedded in HTML) instead of as a
  * resource.
  * </td></tr>
- * <tr><td nowrap>
+ * <tr><td class="colFirst">
  * <code>{@value org.omnifaces.resourcehandler.CombinedResourceHandler#PARAM_NAME_INLINE_JS}</code>
  * </td><td>
  * Set to <code>true</code> if you want to render the combined JS resources inline (embedded in HTML) instead of as a

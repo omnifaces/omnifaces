@@ -163,6 +163,8 @@ public @interface Eager {
 	 * <p>
 	 * If both this attribute and {@link Eager#viewId()} is specified, this attribute takes precedence for {@link RequestScoped}.
 	 * This attribute <b>can not</b> be used for {@link ViewScoped} beans.
+	 *
+	 * @return The request URI relative to the context root.
 	 */
 	@Nonbinding
 	String requestURI() default "";
@@ -179,6 +181,8 @@ public @interface Eager {
 	 * If both this attribute and {@link Eager#requestURI()} is specified and the scope is {@link RequestScoped}, the
 	 * <code>requestURI</code> attribute takes precedence. If the scope is {@link ViewScoped} <code>requestURI</code> is ignored and only
 	 * this attribute is considered.
+	 *
+	 * @return The view ID.
 	 */
 	@Nonbinding
 	String viewId() default "";
