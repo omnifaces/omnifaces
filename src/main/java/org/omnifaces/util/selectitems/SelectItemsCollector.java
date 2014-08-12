@@ -51,7 +51,7 @@ public final class SelectItemsCollector {
 	 * and the using code still has to iterate over its children recursively to obtain all separate {@link SelectItem} instances.
 	 *
 	 * @param parent the parent whose children are scanned
-	 * @param context
+	 * @param context The involved faces context.
 	 * @return list of select items obtained from parent's children.
 	 */
 	public static List<SelectItem> collectFromParent(FacesContext context, UIComponent parent) {
@@ -120,9 +120,9 @@ public final class SelectItemsCollector {
 	 * This method runs the algorithm expressed by a <code>UISelectItems<code> component that uses the <code>var</code> iterator construct to generate
 	 * a list of <code>SelectItem</code>s.
 	 *
-	 * @param uiSelectItems
-	 * @param items
-	 * @param facesContext
+	 * @param uiSelectItems The involved select items component.
+	 * @param items The available select items.
+	 * @param facesContext The involved faces context.
 	 * @return list of <code>SelectItem</code> obtained from the given parameters
 	 */
 	public static List<SelectItem> collectFromUISelectItemsIterator(FacesContext facesContext, UISelectItems uiSelectItems, Iterable<?> items) {

@@ -101,8 +101,10 @@ import org.omnifaces.util.Hacks;
  * ajax actions in <code>UIInput</code> components. There are ways with help of {@link SystemEventListener}, but it
  * ended up to be too clumsy.
  *
+ * <p><strong>See also</strong>:
+ * <br><a href="http://java.net/jira/browse/JAVASERVERFACES_SPEC_PUBLIC-1060">JSF spec issue 1060</a>
+ *
  * @author Bauke Scholtz
- * @link http://java.net/jira/browse/JAVASERVERFACES_SPEC_PUBLIC-1060
  */
 public class ResetInputAjaxActionListener extends DefaultPhaseListener implements ActionListener {
 

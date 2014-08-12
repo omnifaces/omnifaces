@@ -54,8 +54,10 @@ import javax.faces.convert.FacesConverter;
  * &lt;/h:selectManyCheckbox&gt;
  * </pre>
  *
+ * <p><strong>See also</strong>:
+ * <br><a href="http://stackoverflow.com/q/3822058/157882">Use enum in &lt;h:selectManyCheckbox&gt;</a>
+ *
  * @author Bauke Scholtz
- * @link http://stackoverflow.com/q/3822058/157882
  * @since 1.2
  */
 @FacesConverter(value = "omnifaces.GenericEnumConverter")

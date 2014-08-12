@@ -31,10 +31,11 @@ public final class ResourcePaths {
 	}
 
 	/**
-	 * Strips the special 'faces-views' prefix path from the resource if any.
+	 * Strips the given prefix path from the given resource path if any.
 	 *
-	 * @param resource
-	 * @return the resource without the special prefix path, or as-is if it didn't start with this prefix.
+	 * @param prefix The prefix to be stripped.
+	 * @param resource The resource to strip the prefix from.
+	 * @return the resource without the prefix path, or as-is if it didn't start with this prefix.
 	 */
 	public static String stripPrefixPath(final String prefix, final String resource) {
 		String normalizedResource = resource;
@@ -49,7 +50,7 @@ public final class ResourcePaths {
 	 * Strips the extension from a resource if any. This extension is defined as everything after the last occurrence of
 	 * a period, including the period itself. E.g. input "index.xhtml" will return "index".
 	 *
-	 * @param resource
+	 * @param resource The resource to strip the extension from.
 	 * @return the resource without its extension, of as-is if it doesn't have an extension.
 	 */
 	public static String stripExtension(final String resource) {
@@ -66,8 +67,7 @@ public final class ResourcePaths {
 	 * Gets the extension of a resource if any. This extension is defined as everything after the last occurrence of a
 	 * period, including the period itself. E.g. input "index.xhtml" will return ".xhtml'.
 	 *
-	 *
-	 * @param resource
+	 * @param resource The resource to get the extension from.
 	 * @return the extension of the resource, or null if it doesn't have an extension.
 	 */
 	public static String getExtension(final String resource) {

@@ -39,8 +39,8 @@ import javax.faces.validator.ValidatorException;
  * the <code>&lt;h:selectBooleanCheckbox&gt;</code> is fairly pointless. It would always pass the validation and thus
  * never display the desired required message in case of an unticked checkbox.
  * <p>
- * To get it to work anyway, register this validator on validator ID of <code>omnifaces.RequiredCheckboxValidator</code>
- * as follows:
+ * This validator is available by validator ID <code>omnifaces.RequiredCheckboxValidator</code>. Just specify it as
+ * <code>&lt;f:validator&gt;</code> of the boolean selection component:
  * <pre>
  * &lt;h:selectBooleanCheckbox id="agree" value="#{bean.agree}" requiredMessage="You must agree!"&gt;
  *   &lt;f:validator validatorId="omnifaces.RequiredCheckboxValidator" /&gt;

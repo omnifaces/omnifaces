@@ -197,6 +197,13 @@ public final class Strings {
 	}
 
 	/**
+	 * Format the given string with 2 parameters. The locale is obtained by {@link Faces#getLocale()}. Design notice:
+	 * There are five formatX() methods, each taking 1 to 5 format parameters because EL functions does not support
+	 * varargs methods nor overloaded function names.
+	 * @param pattern The format pattern.
+	 * @param param1 The first parameter.
+	 * @param param2 The second parameter.
+	 * @return The formatted string.
 	 * @see #format1(String, Object)
 	 */
 	public static String format2(String pattern, Object param1, Object param2) {
@@ -204,6 +211,14 @@ public final class Strings {
 	}
 
 	/**
+	 * Format the given string with 3 parameters. The locale is obtained by {@link Faces#getLocale()}. Design notice:
+	 * There are five formatX() methods, each taking 1 to 5 format parameters because EL functions does not support
+	 * varargs methods nor overloaded function names.
+	 * @param pattern The format pattern.
+	 * @param param1 The first parameter.
+	 * @param param2 The second parameter.
+	 * @param param3 The third parameter.
+	 * @return The formatted string.
 	 * @see #format1(String, Object)
 	 */
 	public static String format3(String pattern, Object param1, Object param2, Object param3) {
@@ -211,6 +226,15 @@ public final class Strings {
 	}
 
 	/**
+	 * Format the given string with 4 parameters. The locale is obtained by {@link Faces#getLocale()}. Design notice:
+	 * There are five formatX() methods, each taking 1 to 5 format parameters because EL functions does not support
+	 * varargs methods nor overloaded function names.
+	 * @param pattern The format pattern.
+	 * @param param1 The first parameter.
+	 * @param param2 The second parameter.
+	 * @param param3 The third parameter.
+	 * @param param4 The fourth parameter.
+	 * @return The formatted string.
 	 * @see #format1(String, Object)
 	 */
 	public static String format4(String pattern, Object param1, Object param2, Object param3, Object param4) {
@@ -218,6 +242,16 @@ public final class Strings {
 	}
 
 	/**
+	 * Format the given string with 5 parameters. The locale is obtained by {@link Faces#getLocale()}. Design notice:
+	 * There are five formatX() methods, each taking 1 to 5 format parameters because EL functions does not support
+	 * varargs methods nor overloaded function names.
+	 * @param pattern The format pattern.
+	 * @param param1 The first parameter.
+	 * @param param2 The second parameter.
+	 * @param param3 The third parameter.
+	 * @param param4 The fourth parameter.
+	 * @param param5 The fifth parameter.
+	 * @return The formatted string.
 	 * @see #format1(String, Object)
 	 */
 	public static String format5

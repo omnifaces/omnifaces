@@ -61,9 +61,11 @@ import javax.servlet.http.HttpSession;
  * HTTP responses in any way. For HTTP responses, you should be specifying the charset in
  * <code>&lt;f:view encoding&gt;</code>, which also already defaults to UTF-8 by the way.
  *
+ * <p><strong>See also</strong>:
+ * <br><a href="http://code.google.com/p/primefaces/issues/detail?id=2223">PrimeFaces issue 2223</a>
+ * <br><a href="http://stackoverflow.com/q/9634230/157882">Typing Chinese with PrimeFaces' &lt;p:editor&gt; component</a>
+ *
  * @author Bauke Scholtz
- * @link http://code.google.com/p/primefaces/issues/detail?id=2223
- * @link http://stackoverflow.com/a/9839362/157882
  * @since 1.2
  */
 public class CharacterEncodingFilter extends HttpFilter {

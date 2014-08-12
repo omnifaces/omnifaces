@@ -319,28 +319,29 @@ public final class Utils {
 	 * Creates an unmodifiable set based on the given values. If one of the values is an instance of an array or a
 	 * collection, then each of its values will also be merged into the set. Nested arrays or collections will result
 	 * in a {@link ClassCastException}.
+	 * @param <E> The expected set element type.
 	 * @param values The values to create an unmodifiable set for.
 	 * @return An unmodifiable set based on the given values.
 	 * @throws ClassCastException When one of the values or one of the arrays or collections is of wrong type.
 	 * @since 1.1
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> Set<T> unmodifiableSet(Object... values) {
-		Set<T> set = new HashSet<T>();
+	public static <E> Set<E> unmodifiableSet(Object... values) {
+		Set<E> set = new HashSet<E>();
 
 		for (Object value : values) {
 			if (value instanceof Object[]) {
 				for (Object item : (Object[]) value) {
-					set.add((T) item);
+					set.add((E) item);
 				}
 			}
 			else if (value instanceof Collection<?>) {
 				for (Object item : (Collection<?>) value) {
-					set.add((T) item);
+					set.add((E) item);
 				}
 			}
 			else {
-				set.add((T) value);
+				set.add((E) value);
 			}
 		}
 
@@ -354,21 +355,22 @@ public final class Utils {
 	 * reflected in the returned list or not. For instance if the given iterable
 	 * already is a list, it's returned directly.
 	 *
+	 * @param <E> The generic iterable element type.
 	 * @param iterable The iterable to be converted.
 	 * @return The list representation of the given iterable, possibly the same instance as that iterable.
 	 * @since 1.5
 	 */
-	public static <T> List<T> iterableToList(Iterable<T> iterable) {
+	public static <E> List<E> iterableToList(Iterable<E> iterable) {
 
-		List<T> list = null;
+		List<E> list = null;
 
 		if (iterable instanceof List) {
-			list = (List<T>) iterable;
+			list = (List<E>) iterable;
 		} else if (iterable instanceof Collection) {
-			list = new ArrayList<T>((Collection<T>) iterable);
+			list = new ArrayList<E>((Collection<E>) iterable);
 		} else {
-			list = new ArrayList<T>();
-			Iterator<T> iterator = iterable.iterator();
+			list = new ArrayList<E>();
+			Iterator<E> iterator = iterable.iterator();
 			while (iterator.hasNext()) {
 				list.add(iterator.next());
 			}
@@ -442,6 +444,7 @@ public final class Utils {
 	 * The reverse of a map means that every value X becomes a key X' with as corresponding
 	 * value Y' the key Y that was originally associated with the value X.
 	 *
+	 * @param <T> The generic map key/value type.
 	 * @param source the map that is to be reversed
 	 * @return the reverse of the given map
 	 */

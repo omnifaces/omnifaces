@@ -37,6 +37,7 @@ public final class Exceptions {
 	 * returned. Or if the exception, unwrapped or not, does not have a nested cause anymore, then it will be returned.
 	 * This is particularly useful if you want to unwrap the real root cause out of a nested hierarchy of
 	 * {@link ServletException} or {@link FacesException}.
+	 * @param <T> The generic throwable type.
 	 * @param exception The exception to be unwrapped.
 	 * @param type The type which needs to be unwrapped.
 	 * @return The unwrapped root cause.
@@ -64,6 +65,7 @@ public final class Exceptions {
 
 	/**
 	 * Returns <code>true</code> if the given exception or one of its nested causes is an instance of the given type.
+	 * @param <T> The generic throwable type.
 	 * @param exception The exception to be checked.
 	 * @param type The type to be compared to.
 	 * @return <code>true</code> if the given exception or one of its nested causes is an instance of the given type.

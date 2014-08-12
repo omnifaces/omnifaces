@@ -120,14 +120,15 @@ public final class Components {
 
 	/**
 	 * Returns the UI component matching the given client ID search expression.
+	 * @param <C> The expected component type.
 	 * @param clientId The client ID search expression.
 	 * @return The UI component matching the given client ID search expression.
-	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @throws ClassCastException When <code>C</code> is of wrong type.
 	 * @see UIComponent#findComponent(String)
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends UIComponent> T findComponent(String clientId) {
-		return (T) getViewRoot().findComponent(clientId);
+	public static <C extends UIComponent> C findComponent(String clientId) {
+		return (C) getViewRoot().findComponent(clientId);
 	}
 
 	/**
@@ -136,14 +137,15 @@ public final class Components {
 	 * consulted, increasingly moving further away from the given component. Parents are consulted
 	 * first, then children.
 	 *
+	 * @param <C> The expected component type.
 	 * @param component the component from which the relative search is started.
 	 * @param clientId The client ID search expression.
 	 * @return The UI component matching the given client ID search expression.
-	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @throws ClassCastException When <code>C</code> is of wrong type.
 	 * @see UIComponent#findComponent(String)
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends UIComponent> T findComponentRelatively(UIComponent component, String clientId) {
+	public static <C extends UIComponent> C findComponentRelatively(UIComponent component, String clientId) {
 
 		if (isEmpty(clientId)) {
 			return null;
@@ -157,21 +159,22 @@ public final class Components {
 			result = findComponentInChildren(getViewRoot(), clientId);
 		}
 
-		return (T) result;
+		return (C) result;
 	}
 
 	/**
 	 * Returns the UI component matching the given client ID search expression relative to the point
 	 * in the component tree of the given component, searching only in its parents.
 	 *
+	 * @param <C> The expected component type.
 	 * @param component the component from which the relative search is started.
 	 * @param clientId The client ID search expression.
 	 * @return The UI component matching the given client ID search expression.
-	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @throws ClassCastException When <code>C</code> is of wrong type.
 	 * @see UIComponent#findComponent(String)
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends UIComponent> T findComponentInParents(UIComponent component, String clientId) {
+	public static <C extends UIComponent> C findComponentInParents(UIComponent component, String clientId) {
 
 		if (isEmpty(clientId)) {
 			return null;
@@ -190,7 +193,7 @@ public final class Components {
 			}
 
 			if (result != null) {
-				return (T) result;
+				return (C) result;
 			}
 
 			parent = parent.getParent();
@@ -203,14 +206,15 @@ public final class Components {
 	 * Returns the UI component matching the given client ID search expression relative to the point
 	 * in the component tree of the given component, searching only in its children.
 	 *
+	 * @param <C> The expected component type.
 	 * @param component the component from which the relative search is started.
 	 * @param clientId The client ID search expression.
 	 * @return The UI component matching the given client ID search expression.
-	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @throws ClassCastException When <code>C</code> is of wrong type.
 	 * @see UIComponent#findComponent(String)
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T extends UIComponent> T findComponentInChildren(UIComponent component, String clientId) {
+	public static <C extends UIComponent> C findComponentInChildren(UIComponent component, String clientId) {
 
 		if (isEmpty(clientId)) {
 			return null;
@@ -232,7 +236,7 @@ public final class Components {
 			}
 
 			if (result != null) {
-				return (T) result;
+				return (C) result;
 			}
 		}
 
@@ -241,13 +245,13 @@ public final class Components {
 
 	/**
 	 * Returns a list of UI components matching the given type in children of the given component.
+	 * @param <C> The generic component type.
 	 * @param component The component to search in its children for UI components matching the given type.
 	 * @param type The type of the UI components to be searched in children of the given component.
 	 * @return A list of UI components matching the given type in children of the given component.
-	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 */
-	public static <T extends UIComponent> List<T> findComponentsInChildren(UIComponent component, Class<T> type) {
-		List<T> components = new ArrayList<T>();
+	public static <C extends UIComponent> List<C> findComponentsInChildren(UIComponent component, Class<C> type) {
+		List<C> components = new ArrayList<C>();
 		findComponentsInChildren(component, type, components);
 		return components;
 	}
@@ -256,10 +260,10 @@ public final class Components {
 	 * Helper method for {@link #findComponentsInChildren(UIComponent, Class)} utilizing tail recursion.
 	 */
 	@SuppressWarnings("unchecked")
-	private static <T extends UIComponent> void findComponentsInChildren(UIComponent component, Class<T> type, List<T> matches) {
+	private static <C extends UIComponent> void findComponentsInChildren(UIComponent component, Class<C> type, List<C> matches) {
 		for (UIComponent child : component.getChildren()) {
 			if (type.isInstance(child)) {
-				matches.add((T) child);
+				matches.add((C) child);
 			}
 
 			findComponentsInChildren(child, type, matches);
@@ -269,14 +273,13 @@ public final class Components {
 	/**
 	 * Returns from the given component the closest parent of the given parent type, or <code>null</code> if none
 	 * is found.
-	 * @param <T> The generic parent type.
+	 * @param <C> The generic component type.
 	 * @param component The component to return the closest parent of the given parent type for.
 	 * @param parentType The parent type.
 	 * @return From the given component the closest parent of the given parent type, or <code>null</code> if none
 	 * is found.
-	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 */
-	public static <T extends UIComponent> T getClosestParent(UIComponent component, Class<T> parentType) {
+	public static <C extends UIComponent> C getClosestParent(UIComponent component, Class<C> parentType) {
 		UIComponent parent = component.getParent();
 
 		while (parent != null && !parentType.isInstance(parent)) {
@@ -287,8 +290,9 @@ public final class Components {
 	}
 
 	/**
-	 * Returns true if the given visit context contains the visit hint that iteration should be skipped.
+	 * Returns <code>true</code> if the given visit context contains the visit hint that iteration should be skipped.
 	 * @param context The involved visit context.
+	 * @return <code>true</code> if the given visit context contains the visit hint that iteration should be skipped.
 	 * @since 1.3
 	 */
 	public static boolean shouldVisitSkipIteration(VisitContext context) {
@@ -502,6 +506,7 @@ public final class Components {
 	 * has already been converted/validated or not. Note that it thus returns the unconverted submitted string value
 	 * when the conversion/validation hasn't been taken place for the given component and it returns the converted
 	 * object value -if applicable- when conversion/validation has been taken place for the given component.
+	 * @param <T> The expected return type.
 	 * @param component The editable value holder component to obtain the value for.
 	 * @return The value of the given editable value holder component.
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
@@ -515,6 +520,7 @@ public final class Components {
 	/**
 	 * Returns the value of the given input component whereby any unconverted submitted string value will immediately
 	 * be converted/validated as this method is called. This method thus always returns the converted/validated value.
+	 * @param <T> The expected return type.
 	 * @param input The input component to obtain the converted/validated value for.
 	 * @return The converted/validated value of the given input component.
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
@@ -706,11 +712,12 @@ public final class Components {
 
 	/**
 	 * Validate if the given component has a parent of the given parent type.
+	 * @param <C> The generic component type.
 	 * @param component The component to be validated.
 	 * @param parentType The parent type to be checked.
 	 * @throws IllegalArgumentException When the given component doesn't have any parent of the given type.
 	 */
-	public static <T extends UIComponent> void validateHasParent(UIComponent component, Class<T> parentType)
+	public static <C extends UIComponent> void validateHasParent(UIComponent component, Class<C> parentType)
 		throws IllegalArgumentException
 	{
 		if (getClosestParent(component, parentType) == null) {
@@ -721,11 +728,12 @@ public final class Components {
 
 	/**
 	 * Validate if the given component has a direct parent of the given parent type.
+	 * @param <C> The generic component type.
 	 * @param component The component to be validated.
 	 * @param parentType The parent type to be checked.
 	 * @throws IllegalArgumentException When the given component doesn't have a direct parent of the given type.
 	 */
-	public static <T extends UIComponent> void validateHasDirectParent(UIComponent component, Class<T> parentType)
+	public static <C extends UIComponent> void validateHasDirectParent(UIComponent component, Class<C> parentType)
 		throws IllegalArgumentException
 	{
 		if (!parentType.isInstance(component.getParent())) {
