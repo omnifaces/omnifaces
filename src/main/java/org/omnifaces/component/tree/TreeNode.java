@@ -23,7 +23,8 @@ import org.omnifaces.model.tree.TreeModel;
 import org.omnifaces.util.State;
 
 /**
- * <strong>TreeNode</strong> is an {@link UIComponent} that represents a single tree node within a parent
+ * <p>
+ * The <code>&lt;o:treeNode&gt;</code> is an {@link UIComponent} that represents a single tree node within a parent
  * {@link Tree} component. Within this component, the <code>var</code> attribute of the parent {@link Tree}
  * component will expose the tree node. Each of its children is processed by {@link TreeNodeItem}.
  * <p>
