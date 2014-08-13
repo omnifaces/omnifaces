@@ -23,6 +23,7 @@ import javax.servlet.annotation.MultipartConfig;
 
 import org.omnifaces.config.BeanManager;
 import org.omnifaces.facesviews.FacesViews;
+import org.omnifaces.util.Hacks;
 
 /**
  * <p>
@@ -50,7 +51,7 @@ public class ApplicationInitializer implements ServletContainerInitializer {
 	public void onStartup(Set<Class<?>> c, ServletContext servletContext) throws ServletException {
 		logOmniFacesVersion();
 		checkJSF22Available(); // Already implies Servlet 3.0 (and EL 2.2).
-		checkCDIAvailable();
+		checkCDIAvailable(servletContext);
 		FacesViews.registerFilter(servletContext);
 	}
 
@@ -73,11 +74,16 @@ public class ApplicationInitializer implements ServletContainerInitializer {
 				+ "\n█░░░█░░░█▄░░░░░░▄█░░░░████▄░░░░░▄█                                             ▐"
 				+ "\n████████████████████████████████████████████████████████████████████████████████"
 			);
+
 			throw new ServletException(e);
 		}
 	}
 
-	private void checkCDIAvailable() throws ServletException {
+	private void checkCDIAvailable(ServletContext servletContext) throws ServletException {
+		if (Hacks.isCDIAvailableInGlassFish(servletContext)) {
+			return; // Okay. Don't proceed, because GF4 fails to scan JNDI during servlet container initialization.
+		}
+
 		try {
 			BeanManager.INSTANCE.toString();
 		}
