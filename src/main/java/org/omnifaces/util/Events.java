@@ -38,7 +38,7 @@ import org.omnifaces.eventlistener.DefaultViewEventListener;
  * <pre>
  * // Add a callback to the current view which should run during every after phase of the render response on same view.
  * Events.subscribeToViewAfterPhase(PhaseId.RENDER_RESPONSE, new Callback.Void() {
- *    {@literal @}Override
+ *    &#64;Override
  *    public void invoke() {
  *        // ...
  *    }
@@ -47,7 +47,7 @@ import org.omnifaces.eventlistener.DefaultViewEventListener;
  * <pre>
  * // Add a callback to the current request which should run during before phase of the render response on current request.
  * Events.subscribeToRequestBeforePhase(PhaseId.RENDER_RESPONSE, new Callback.Void() {
- *     {@literal @}Override
+ *     &#64;Override
  *     public void invoke() {
  *         // ...
  *     }
@@ -56,7 +56,7 @@ import org.omnifaces.eventlistener.DefaultViewEventListener;
  * <pre>
  * // Add a callback to the current view which should run during the pre render view event.
  * Events.subscribeToViewEvent(PreRenderViewEvent.class, new Callback.Void() {
- *     {@literal @}Override
+ *     &#64;Override
  *     public void invoke() {
  *         // ...
  *     }

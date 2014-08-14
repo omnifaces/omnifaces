@@ -62,11 +62,11 @@ import org.omnifaces.cdi.eager.EagerBeansWebListener;
  * E.g.
  * The following bean will be instantiated during application's startup:
  * <pre>
- * {@literal @}Eager
- * {@literal @}ApplicationScoped
+ * &#64;Eager
+ * &#64;ApplicationScoped
  * public class MyEagerApplicationScopedBean {
  *
- *     {@literal @}PostConstruct
+ *     &#64;PostConstruct
  *     public void init() {
  *         System.out.println("Application scoped init!");
  *     }
@@ -77,13 +77,13 @@ import org.omnifaces.cdi.eager.EagerBeansWebListener;
  * <p>
  * The following bean will be instantiated whenever a session is created:
  * <pre>
- * {@literal @}Eager
- * {@literal @}SessionScoped
+ * &#64;Eager
+ * &#64;SessionScoped
  * public class MyEagerSessionScopedBean implements Serializable {
  *
  *     private static final long serialVersionUID = 1L;
  *
- *     {@literal @}PostConstruct
+ *     &#64;PostConstruct
  *     public void init() {
  *         System.out.println("Session scoped init!");
  *     }
@@ -94,11 +94,11 @@ import org.omnifaces.cdi.eager.EagerBeansWebListener;
  * application root) is requested, i.e. when an app is deployed to <code>/myapp</code> at localhost this will correspond to
  * a URL like <code>http://localhost:8080/myapp/components/cache</code>:
  * <pre>
- * {@literal @}Eager(requestURI = "/components/cache")
- * {@literal @}RequestScoped
+ * &#64;Eager(requestURI = "/components/cache")
+ * &#64;RequestScoped
  * public class MyEagerRequestScopedBean {
  *
- *     {@literal @}PostConstruct
+ *     &#64;PostConstruct
  *     public void init() {
  *         System.out.println("/components/cache requested");
  *     }

@@ -1516,10 +1516,10 @@ public boolean validateValues(FacesContext context, List&lt;UIInput&gt; componen
 &lt;h:inputText id="baz" /&gt;
 				</pre>
 				<pre>
-{@literal @}ManagedBean
-{@literal @}RequestScoped
+@ManagedBean
+@RequestScoped
 public class ValidateValuesBean implements MultiFieldValidator {
-    {@literal @}Override
+    @Override
     boolean validateValues(FacesContext context, List&lt;UIInput&gt; components, List&lt;Object&gt; values) {
         // ...
     }

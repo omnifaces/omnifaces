@@ -41,8 +41,8 @@ import org.omnifaces.cdi.viewscope.ViewScopeManager;
  * import javax.inject.Named;
  * import org.omnifaces.cdi.ViewScoped;
  *
- * {@literal @}Named
- * {@literal @}ViewScoped
+ * &#64;Named
+ * &#64;ViewScoped
  * public class OmniCDIViewScopedBean implements Serializable {}
  * </pre>
  * <p>

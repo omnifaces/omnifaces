@@ -43,7 +43,7 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
  * the instance during the conversion. This is sufficient if your (abstract base) entity has a
  * <code>toString()</code> implementation which looks something like this:
  * <pre>
- * {@literal @}Override
+ * &#64;Override
  * public String toString() {
  *     return String.format("%s[id=%d]", getClass().getSimpleName(), getId());
  * }
@@ -62,10 +62,10 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
  * <code>SelectItemsConverter</code> class and override <b>only</b> the <code>getAsString</code> method wherein
  * the desired implementation is provided. For example:
  * <pre>
- * {@literal @}FacesConverter("exampleEntitySelectItemsConverter")
+ * &#64;FacesConverter("exampleEntitySelectItemsConverter")
  * public class ExampleEntitySelectItemsConverter extends SelectItemsConverter {
  *
- *     {@literal @}Override
+ *     &#64;Override
  *     public String getAsString(FacesContext context, UIComponent component, Object value) {
  *         Long id = (value instanceof ExampleEntity) ? ((ExampleEntity) value).getId() : null;
  *         return (id != null) ? String.valueOf(id) : null;

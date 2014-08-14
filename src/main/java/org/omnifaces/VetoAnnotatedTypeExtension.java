@@ -29,8 +29,8 @@ import javax.enterprise.inject.spi.ProcessAnnotatedType;
  * Weld 2.x will during startup log a warning like below on this class:
  * <blockquote>
  * WARN: WELD-000411: Observer method [BackedAnnotatedMethod] public
- * org.omnifaces.VetoAnnotatedTypeExtension.processAnnotatedType({@literal @}Observes ProcessAnnotatedType&lt;Object&gt;)
- * receives events for all annotated types. Consider restricting events using {@literal @}WithAnnotations or a generic
+ * org.omnifaces.VetoAnnotatedTypeExtension.processAnnotatedType(&#64;Observes ProcessAnnotatedType&lt;Object&gt;)
+ * receives events for all annotated types. Consider restricting events using &#64;WithAnnotations or a generic
  * type with bounds.
  * </blockquote>
  * <p>
@@ -52,7 +52,7 @@ import javax.enterprise.inject.spi.ProcessAnnotatedType;
  * {@link ProcessAnnotatedType} on <strong>all</strong> classes. However, in this specific case, it's just the whole
  * purpose to scan every single class, because classes which needs to be excluded from being registered as CDI managed
  * beans are obviously not explicitly registered as a CDI managed bean (for which you could otherwise use a more
- * specific <code>T</code> or <code>{@literal @}WithAnnotations</code> as suggested in the warning message).
+ * specific <code>T</code> or <code>&#64;WithAnnotations</code> as suggested in the warning message).
  * <p>
  * Theoretically, the solution in this specific case would be to use <code>&lt;weld:include&gt;</code> or
  * <code>&lt;weld:exclude&gt;</code> in <code>beans.xml</code> instead of an <code>Extension</code>. However, this is

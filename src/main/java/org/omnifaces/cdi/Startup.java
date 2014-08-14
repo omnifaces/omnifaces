@@ -31,7 +31,7 @@ import javax.enterprise.inject.Stereotype;
  * <pre>
  * import org.omnifaces.cdi.Startup;
  *
- * {@literal @}Startup
+ * &#64;Startup
  * public class MyStartupBean {}
  * </pre>
  * <p>
@@ -40,8 +40,8 @@ import javax.enterprise.inject.Stereotype;
  * import javax.enterprise.context.ApplicationScoped;
  * import org.omnifaces.cdi.Eager;
  *
- * {@literal @}Eager
- * {@literal @}ApplicationScoped
+ * &#64;Eager
+ * &#64;ApplicationScoped
  * public class MyStartupBean {}
  * </pre>
  * <p>

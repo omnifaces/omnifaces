@@ -44,10 +44,10 @@ import javax.servlet.http.HttpSession;
  * To use it, just let your custom filter extend from {@link HttpFilter} instead of implement {@link Filter}.
  * For example:
  * <pre>
- * {@literal @}WebFilter("/app/*")
+ * &#64;WebFilter("/app/*")
  * public class LoginFilter extends HttpFilter {
  *
- *     {@literal @}Override
+ *     &#64;Override
  *     public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
  *         throws ServletException, IOException
  *     {

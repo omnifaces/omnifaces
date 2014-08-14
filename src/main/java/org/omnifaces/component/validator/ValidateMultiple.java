@@ -49,10 +49,10 @@ import org.omnifaces.validator.MultiFieldValidator;
  * &lt;h:inputText id="baz" /&gt;
  * </pre>
  * <pre>
- * {@literal @}ManagedBean
- * {@literal @}RequestScoped
+ * &#64;ManagedBean
+ * &#64;RequestScoped
  * public class ValidateValuesBean implements MultiFieldValidator {
- *     {@literal @}Override
+ *     &#64;Override
  *     public boolean validateValues(FacesContext context, List&lt;UIInput&gt; components, List&lt;Object&gt; values) {
  *         // ...
  *     }

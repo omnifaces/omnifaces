@@ -37,7 +37,7 @@ import javax.faces.convert.FacesConverter;
  * restrictions (e.g. JPA <code>@ElementCollection</code>, etc), then you'd need to create an explicit converter for the
  * enum type like follows:
  * <pre>
- * {@literal @}FacesConverter("roleConverter")
+ * &#64;FacesConverter("roleConverter")
  * public class RoleConverter extends EnumConverter {
  *     public RoleConverter() {
  *         super(Role.class);
