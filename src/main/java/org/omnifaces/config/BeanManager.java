@@ -57,7 +57,7 @@ public enum BeanManager {
 	private static final String ERROR_JNDI_UNAVAILABLE =
 		"JNDI is not available in this environment.";
 	private static final String ERROR_CDI_IMPL_UNAVAILABLE =
-		"CDI BeanManager instance is not available in this environment.";
+		"CDI BeanManager instance is not available in JNDI.";
 	private static final String ERROR_INITIALIZATION_FAIL =
 		"CDI BeanManager instance is available, but preparing getReference() method failed.";
 
