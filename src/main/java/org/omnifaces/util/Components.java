@@ -338,24 +338,6 @@ public final class Components {
 		return parentType.cast(parent);
 	}
 
-	/**
-	 * Returns <code>true</code> if the given visit context contains the visit hint that iteration should be skipped.
-	 * @param context The involved visit context.
-	 * @return <code>true</code> if the given visit context contains the visit hint that iteration should be skipped.
-	 * @since 1.3
-	 */
-	public static boolean shouldVisitSkipIteration(VisitContext context) {
-		try {
-			// JSF 2.1.
-			return context.getHints().contains(VisitHint.valueOf("SKIP_ITERATION"));
-		}
-		catch (IllegalArgumentException e) {
-			// JSF 2.0.
-			return context.getFacesContext().getAttributes().get("javax.faces.visit.SKIP_ITERATION") == Boolean.TRUE;
-		}
-	}
-
-
 	// Iteration / Visiting -------------------------------------------------------------------------------------------
 
 	/**

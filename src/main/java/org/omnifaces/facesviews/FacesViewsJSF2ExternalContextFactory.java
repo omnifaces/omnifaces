@@ -30,13 +30,15 @@ import javax.faces.context.ExternalContextWrapper;
  * like the {@link FacesViewsResolver} does.
  * <p>
  * <b>This is only needed for JSF 2.0 implementations and is not needed for JSF 2.1+.</b>
- * 
+ *
+ * TODO: remove this?
+ *
  * @since 1.6
  * @author Arjan Tijms
  *
  */
 public class FacesViewsJSF2ExternalContextFactory extends ExternalContextFactory {
-	
+
 	private ExternalContextFactory parent;
 
 	public FacesViewsJSF2ExternalContextFactory(ExternalContextFactory parent) {
@@ -52,18 +54,18 @@ public class FacesViewsJSF2ExternalContextFactory extends ExternalContextFactory
 	public ExternalContextFactory getWrapped() {
 		return parent;
 	}
-	
+
 	public static class FacesViewsJSF2ExternalContext extends ExternalContextWrapper {
-	    
+
 		private ExternalContext wrapped;
-	   
+
 	    public FacesViewsJSF2ExternalContext(ExternalContext wrapped) {
 	        this.wrapped = wrapped;
 	    }
-	    
+
 	    @Override
 	    public URL getResource(String path) throws MalformedURLException {
-	    	
+
 	    	  URL resource = getWrapped().getResource(getMappedPath(path));
 
 	          if (resource == null && isDevelopment()) {
@@ -75,11 +77,11 @@ public class FacesViewsJSF2ExternalContextFactory extends ExternalContextFactory
 
 	          return resource;
 	    }
-	    
+
 	    @Override
 	    public ExternalContext getWrapped() {
 	        return wrapped;
 	    }
 	}
-	
+
 }

@@ -12,8 +12,8 @@
  */
 package org.omnifaces.component.tree;
 
+import static javax.faces.component.visit.VisitHint.SKIP_ITERATION;
 import static org.omnifaces.util.Components.getClosestParent;
-import static org.omnifaces.util.Components.shouldVisitSkipIteration;
 import static org.omnifaces.util.Components.validateHasNoChildren;
 import static org.omnifaces.util.Components.validateHasParent;
 
@@ -70,7 +70,7 @@ public class TreeInsertChildren extends TreeFamily {
 	 */
 	@Override
 	public boolean visitTree(VisitContext context, VisitCallback callback) {
-		if (shouldVisitSkipIteration(context)) {
+		if (context.getHints().contains(SKIP_ITERATION)) {
 			return super.visitTree(context, callback);
 		}
 
