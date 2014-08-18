@@ -15,6 +15,7 @@ package org.omnifaces.taghandler;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -135,10 +136,13 @@ public class MassAttribute extends TagHandler {
 
 	@Override
 	public void apply(FaceletContext context, UIComponent parent) throws IOException {
+		List<UIComponent> oldChildren = new ArrayList<>(parent.getChildren());
 		nextHandler.apply(context, parent);
 
 		if (ComponentHandler.isNew(parent)) {
-			applyMassAttribute(context, parent.getChildren());
+			List<UIComponent> newChildren = new ArrayList<>(parent.getChildren());
+			newChildren.removeAll(oldChildren);
+			applyMassAttribute(context, newChildren);
 		}
 	}
 
