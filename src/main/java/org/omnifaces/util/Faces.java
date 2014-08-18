@@ -132,7 +132,7 @@ public final class Faces {
 	/**
 	 * Returns <code>true</code> when the current faces context is available (i.e. it is not <code>null</code>).
 	 * @return <code>true</code> when the current faces context is available.
-	 * @since 2.0
+	 * @since 1.10
 	 */
 	public static boolean hasContext() {
 		return getContext() != null;
@@ -275,7 +275,7 @@ public final class Faces {
 	 * Returns the current EL context.
 	 * @return The current EL context.
 	 * @see FacesContext#getELContext()
-	 * @since 2.0
+	 * @since 1.10
 	 */
 	public static ELContext getELContext() {
 		return getContext().getELContext();
@@ -498,7 +498,7 @@ public final class Faces {
 	 * The instance is already localized via {@link Faces#getLocale()}. If there is no
 	 * <code>&lt;message-bundle&gt;</code>, then this method just returns <code>null</code>.
 	 * @return The message bundle as identified by <code>&lt;message-bundle&gt;</code> in <code>faces-config.xml</code>.
-	 * @since 2.0
+	 * @since 1.10
 	 * @throws MissingResourceException When the <code>&lt;message-bundle&gt;</code> in <code>faces-config.xml</code>
 	 * does not refer an existing resource in the classpath.
 	 */

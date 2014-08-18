@@ -15,12 +15,9 @@ package org.omnifaces.exceptionhandler;
 import static org.omnifaces.util.Exceptions.unwrap;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.FacesLocal.normalizeViewId;
-import static org.omnifaces.util.Servlets.toParameterMap;
 
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -358,7 +355,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 		String[] parts = errorPageLocation.split("\\?", 2);
 
 		if (parts.length == 2) {
-			Map<String, List<String>> params = toParameterMap(parts[1]);
+			// Map<String, List<String>> params = toParameterMap(parts[1]);
 			// TODO: #287: make available via #{param(Values)}. Request wrapper needed :|
 		}
 
