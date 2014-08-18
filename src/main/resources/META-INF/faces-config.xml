@@ -25,21 +25,14 @@
 			<system-event-listener-class>org.omnifaces.VersionLoggerEventListener</system-event-listener-class>
 			<system-event-class>javax.faces.event.PostConstructApplicationEvent</system-event-class>
 		</system-event-listener>
-		<system-event-listener>
-			<system-event-listener-class>org.omnifaces.application.ViewScopeEventListener</system-event-listener-class>
-			<system-event-class>javax.faces.event.PreDestroyViewMapEvent</system-event-class>
-			<source-class>javax.faces.component.UIViewRoot</source-class>
-		</system-event-listener>
 	</application>
 
 	<lifecycle>
 		<phase-listener>org.omnifaces.eventlistener.InvokeActionEventListener</phase-listener>
 		<phase-listener>org.omnifaces.eventlistener.CallbackPhaseListener</phase-listener>
-		<phase-listener>org.omnifaces.cdi.eager.EagerBeansPhaseListener</phase-listener>
 	</lifecycle>
 
 	<factory>
-		<application-factory>org.omnifaces.application.OmniApplicationFactory</application-factory>
 		<partial-view-context-factory>org.omnifaces.context.OmniPartialViewContextFactory</partial-view-context-factory>
 	</factory>
 

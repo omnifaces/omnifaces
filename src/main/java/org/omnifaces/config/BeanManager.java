@@ -25,9 +25,6 @@ import org.omnifaces.util.JNDI;
 /**
  * Get reference to CDI managed beans without having any CDI dependency. It's using JNDI to grab the CDI bean manager
  * and if it's not <code>null</code>, then it's using reflection to get the necessary methods and invoke them.
- * <p>
- * If you already have a CDI bean manager instance at hands (and thus having a CDI dependency is no problem), then use
- * {@link org.omnifaces.util.Beans} instead.
  *
  * @author Bauke Scholtz
  * @since 1.6.1
