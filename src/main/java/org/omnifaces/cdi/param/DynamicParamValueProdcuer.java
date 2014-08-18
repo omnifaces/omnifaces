@@ -68,7 +68,7 @@ public class DynamicParamValueProdcuer implements Bean<Object> {
 
     @Override
     public Object create(CreationalContext<Object> creationalContext) {
-    	ParamValue<?> paramValue = new RequestParameterProducer().produce(getCurrentInjectionPoint(beanManager), beanManager);
+    	ParamValue<?> paramValue = new RequestParameterProducer().produce(getCurrentInjectionPoint(beanManager));
     	return paramValue.getValue();
     }
 

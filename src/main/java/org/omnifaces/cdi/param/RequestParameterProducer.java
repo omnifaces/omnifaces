@@ -40,7 +40,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.enterprise.inject.Produces;
-import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.faces.application.Application;
 import javax.faces.application.FacesMessage;
@@ -67,8 +66,8 @@ public class RequestParameterProducer {
 	@SuppressWarnings("unchecked")
 	@Produces
 	@Param
-	public <V> ParamValue<V> produce(InjectionPoint injectionPoint, BeanManager beanManager) {
-		
+	public <V> ParamValue<V> produce(InjectionPoint injectionPoint) {
+
 		// @Param is the annotation on the injection point that holds all data for this request parameter
 		Param requestParameter = getQualifier(injectionPoint, Param.class);
 

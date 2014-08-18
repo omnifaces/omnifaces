@@ -22,7 +22,6 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.net.URLDecoder;
@@ -36,7 +35,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -701,22 +699,6 @@ public final class Utils {
 		}
 
 		return builder.toString();
-	}
-
-	// Nested classes -------------------------------------------------------------------------------------------------
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static class NullComparator implements Comparator<Comparable>, Serializable {
-
-		private static final long serialVersionUID = 304919481351409790L;
-
-		@Override
-		public int compare(Comparable o1, Comparable o2) {
-			return (o1 == null) ? 1
-				: (o2 == null) ? -1
-				: o1.compareTo(o2);
-		}
-
 	}
 
 }
