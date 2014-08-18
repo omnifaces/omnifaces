@@ -133,11 +133,11 @@ public class MassAttribute extends TagHandler {
 
 	@Override
 	public void apply(FaceletContext context, UIComponent parent) throws IOException {
-		List<UIComponent> oldChildren = new ArrayList<>(parent.getChildren());
+		List<UIComponent> oldChildren = new ArrayList<UIComponent>(parent.getChildren());
 		nextHandler.apply(context, parent);
 
 		if (ComponentHandler.isNew(parent)) {
-			List<UIComponent> newChildren = new ArrayList<>(parent.getChildren());
+			List<UIComponent> newChildren = new ArrayList<UIComponent>(parent.getChildren());
 			newChildren.removeAll(oldChildren);
 			applyMassAttribute(context, newChildren);
 		}
