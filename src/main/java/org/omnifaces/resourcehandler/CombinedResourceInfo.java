@@ -12,7 +12,6 @@
  */
 package org.omnifaces.resourcehandler;
 
-import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.FacesLocal.getRequestDomainURL;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.serializeURLSafe;
@@ -51,19 +50,8 @@ final class CombinedResourceInfo {
 	// ConcurrentHashMap was considered, but duplicate inserts technically don't harm and a HashMap is faster on read.
 	private static final Map<String, CombinedResourceInfo> CACHE = new HashMap<String, CombinedResourceInfo>();
 
-	private static final String MOJARRA_DEFAULT_RESOURCE_MAX_AGE = "com.sun.faces.defaultResourceMaxAge";
-	private static final String MYFACES_DEFAULT_RESOURCE_MAX_AGE = "org.apache.myfaces.RESOURCE_MAX_TIME_EXPIRES";
-	private static final long DEFAULT_RESOURCE_MAX_AGE = 604800000L; // 1 week.
-	private static final String[] PARAM_NAMES_RESOURCE_MAX_AGE = {
-		MOJARRA_DEFAULT_RESOURCE_MAX_AGE, MYFACES_DEFAULT_RESOURCE_MAX_AGE
-	};
-	private static final String LOG_RESOURCE_NOT_FOUND =
-		"CombinedResourceHandler: The resource %s cannot be found"
+	private static final String LOG_RESOURCE_NOT_FOUND = "CombinedResourceHandler: The resource %s cannot be found"
 			+ " and therefore a 404 will be returned for the combined resource ID %s";
-
-	// Static variables -----------------------------------------------------------------------------------------------
-
-	private static Long maxAge;
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -271,27 +259,6 @@ final class CombinedResourceInfo {
 	public long getLastModified() {
 		loadResources();
 		return lastModified;
-	}
-
-	/**
-	 * Returns the maximum age in milliseconds of this combined resource info. This will be calculated lazily once
-	 * and re-returned everytime; the faces context is namely not available during class' initialization/construction.
-	 * @return The maximum age in milliseconds of this combined resource info.
-	 */
-	public long getMaxAge() {
-		if (maxAge != null) {
-			return maxAge;
-		}
-
-		for (String name : PARAM_NAMES_RESOURCE_MAX_AGE) {
-			String value = getInitParameter(name);
-
-			if (value != null && value.matches("[0-9]+")) {
-				return (maxAge = Long.valueOf(value));
-			}
-		}
-
-		return (maxAge = DEFAULT_RESOURCE_MAX_AGE);
 	}
 
 	// Helpers ----------------------------------------------------------------------------------------------------
