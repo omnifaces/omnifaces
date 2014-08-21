@@ -12,6 +12,8 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static org.omnifaces.util.Faces.getMapping;
+import static org.omnifaces.util.Faces.isPrefixMapping;
 import static org.omnifaces.util.Utils.stream;
 
 import java.io.IOException;
@@ -151,7 +153,23 @@ public class UnmappedResourceHandler extends ResourceHandlerWrapper {
 			return null;
 		}
 
-		return new UnmappedResource(resource);
+		return new DefaultResource(resource) {
+			@Override
+			public String getRequestPath() {
+				String path = getWrapped().getRequestPath();
+				String mapping = getMapping();
+
+				if (isPrefixMapping(mapping)) {
+					return path.replaceFirst(mapping, "");
+				}
+				else if (path.contains("?")) {
+					return path.replace(mapping + "?", "?");
+				}
+				else {
+					return path.substring(0, path.length() - mapping.length());
+				}
+			}
+		};
 	}
 
 	/**

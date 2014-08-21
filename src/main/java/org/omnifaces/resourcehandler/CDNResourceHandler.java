@@ -23,7 +23,6 @@ import javax.faces.application.Resource;
 import javax.faces.application.ResourceDependency;
 import javax.faces.application.ResourceHandler;
 import javax.faces.application.ResourceHandlerWrapper;
-import javax.faces.application.ResourceWrapper;
 
 /**
  * <p>
@@ -220,16 +219,10 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 
 		final String finalRequestPath = evaluateExpressionGet(requestPath);
 
-		return new ResourceWrapper() {
-
+		return new DefaultResource(resource) {
 			@Override
 			public String getRequestPath() {
 				return finalRequestPath;
-			}
-
-			@Override
-			public Resource getWrapped() {
-				return resource;
 			}
 		};
 	}

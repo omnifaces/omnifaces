@@ -17,6 +17,7 @@ import static org.omnifaces.util.Faces.getELContext;
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Faces.hasContext;
 import static org.omnifaces.util.FacesLocal.getContextAttribute;
+import static org.omnifaces.util.FacesLocal.getInitParameter;
 import static org.omnifaces.util.FacesLocal.setContextAttribute;
 
 import java.lang.reflect.AccessibleObject;
@@ -86,6 +87,15 @@ public final class Hacks {
 			MYFACES_RENDERED_SCRIPT_RESOURCES_KEY,
 			MYFACES_RENDERED_STYLESHEET_RESOURCES_KEY);
 
+	private static final String MOJARRA_DEFAULT_RESOURCE_MAX_AGE = "com.sun.faces.defaultResourceMaxAge";
+	private static final String MYFACES_DEFAULT_RESOURCE_MAX_AGE = "org.apache.myfaces.RESOURCE_MAX_TIME_EXPIRES";
+	private static final long DEFAULT_RESOURCE_MAX_AGE = 604800000L; // 1 week.
+	private static final String[] PARAM_NAMES_RESOURCE_MAX_AGE = {
+		MOJARRA_DEFAULT_RESOURCE_MAX_AGE, MYFACES_DEFAULT_RESOURCE_MAX_AGE
+	};
+
+	private static final String ERROR_MAX_AGE =
+		"The '%s' init param must be a number. Encountered an invalid value of '%s'.";
 	private static final String ERROR_CREATE_INSTANCE =
 		"Cannot create instance of class '%s'.";
 	private static final String ERROR_ACCESS_FIELD =
@@ -99,6 +109,7 @@ public final class Hacks {
 
 	private static Boolean richFacesResourceOptimizationEnabled;
 	private static Boolean myFacesUsed;
+	private static Long defaultResourceMaxAge;
 
 	// Constructors/init ----------------------------------------------------------------------------------------------
 
@@ -504,6 +515,37 @@ public final class Hacks {
 		// Mojarra and PrimeFaces puts "namelibrary=true" for every processed resource dependency.
 		// TODO: This may possibly conflict with other keys with value=true. So far tested, this is harmless.
 		context.getAttributes().values().removeAll(Collections.singleton(true));
+	}
+
+	/**
+	 * Returns the default resource maximum age in milliseconds.
+	 * @return The default resource maximum age in milliseconds.
+	 */
+	public static long getDefaultResourceMaxAge() {
+		if (defaultResourceMaxAge != null) {
+			return defaultResourceMaxAge;
+		}
+
+		FacesContext context = FacesContext.getCurrentInstance();
+
+		if (context == null) {
+			return DEFAULT_RESOURCE_MAX_AGE;
+		}
+
+		for (String name : PARAM_NAMES_RESOURCE_MAX_AGE) {
+			String value = getInitParameter(context, name);
+
+			if (value != null) {
+				try {
+					return (defaultResourceMaxAge = Long.valueOf(value));
+				}
+				catch (NumberFormatException e) {
+					throw new IllegalArgumentException(String.format(ERROR_MAX_AGE, name, value), e);
+				}
+			}
+		}
+
+		return (defaultResourceMaxAge = DEFAULT_RESOURCE_MAX_AGE);
 	}
 
 	// PrimeFaces related ---------------------------------------------------------------------------------------------

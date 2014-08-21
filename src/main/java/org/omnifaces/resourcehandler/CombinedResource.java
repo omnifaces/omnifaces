@@ -34,6 +34,8 @@ import javax.faces.application.ResourceHandler;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 
+import org.omnifaces.util.Hacks;
+
 /**
  * This {@link Resource} implementation holds all the necessary information about combined resources in order to
  * properly serve combined resources on a single HTTP request.
@@ -107,7 +109,7 @@ final class CombinedResource extends Resource {
 		Map<String, String> responseHeaders = new HashMap<>(3);
 		long lastModified = info.getLastModified();
 		responseHeaders.put("Last-Modified", formatRFC1123(new Date(lastModified)));
-		responseHeaders.put("Expires", formatRFC1123(new Date(System.currentTimeMillis() + info.getMaxAge())));
+		responseHeaders.put("Expires", formatRFC1123(new Date(System.currentTimeMillis() + Hacks.getDefaultResourceMaxAge())));
 		responseHeaders.put("Etag", String.format("W/\"%d-%d\"", info.getContentLength(), lastModified));
 		responseHeaders.put("Pragma", ""); // Explicitly set empty pragma to prevent some containers from setting it.
 		return responseHeaders;
