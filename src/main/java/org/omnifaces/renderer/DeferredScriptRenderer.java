@@ -12,6 +12,7 @@
  */
 package org.omnifaces.renderer;
 
+import static org.omnifaces.resourcehandler.DefaultResource.RES_NOT_FOUND;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
@@ -88,7 +89,7 @@ public class DeferredScriptRenderer extends Renderer {
 			writer.write(");");
 		}
 		else {
-			writer.writeURIAttribute("src", "RES_NOT_FOUND", "src");
+			writer.writeURIAttribute("src", RES_NOT_FOUND, "src");
 		}
 
 		writer.endElement("script");
