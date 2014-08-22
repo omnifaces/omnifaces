@@ -14,32 +14,25 @@ package org.omnifaces.resourcehandler;
 
 import static org.omnifaces.util.Events.subscribeToEvent;
 import static org.omnifaces.util.Faces.getInitParameter;
-import static org.omnifaces.util.Faces.getRequestURI;
-import static org.omnifaces.util.Utils.stream;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
-import javax.faces.application.ResourceHandlerWrapper;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIOutput;
 import javax.faces.component.UIViewRoot;
-import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.PreRenderViewEvent;
 import javax.faces.event.SystemEvent;
 import javax.faces.event.SystemEventListener;
-import javax.servlet.http.HttpServletResponse;
 
 import org.omnifaces.component.script.DeferredScript;
 import org.omnifaces.renderer.DeferredScriptRenderer;
@@ -133,7 +126,7 @@ import org.omnifaces.util.Hacks;
  *
  * @author Bauke Scholtz
  */
-public class CombinedResourceHandler extends ResourceHandlerWrapper implements SystemEventListener {
+public class CombinedResourceHandler extends DefaultResourceHandler implements SystemEventListener {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
@@ -161,7 +154,6 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
-	private ResourceHandler wrapped;
 	private Set<ResourceIdentifier> excludedResources;
 	private Set<ResourceIdentifier> suppressedResources;
 	private boolean inlineCSS;
@@ -176,7 +168,7 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	 * @param wrapped The resource handler to be wrapped.
 	 */
 	public CombinedResourceHandler(ResourceHandler wrapped) {
-		this.wrapped = wrapped;
+		super(wrapped);
 		excludedResources = initResources(PARAM_NAME_EXCLUDED_RESOURCES);
 		excludedResources.addAll(initCDNResources());
 		suppressedResources = initResources(PARAM_NAME_SUPPRESSED_RESOURCES);
@@ -232,43 +224,13 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	}
 
 	@Override
-	public Resource createResource(String resourceName) {
-		return createResource(resourceName, null, null);
-	}
-
-	@Override
-	public Resource createResource(String resourceName, String libraryName) {
-		return createResource(resourceName, libraryName, null);
-	}
-
-	@Override
 	public Resource createResource(String resourceName, String libraryName, String contentType) {
 		if (LIBRARY_NAME.equals(libraryName)) {
 			return new CombinedResource(resourceName);
 		}
 		else {
-			return wrapped.createResource(resourceName, libraryName, contentType);
+			return getWrapped().createResource(resourceName, libraryName, contentType);
 		}
-	}
-
-	@Override
-	public void handleResourceRequest(FacesContext context) throws IOException {
-		if (LIBRARY_NAME.equals(context.getExternalContext().getRequestParameterMap().get("ln"))) {
-			try {
-				streamResource(context, new CombinedResource(context));
-			}
-			catch (IllegalArgumentException e) {
-				context.getExternalContext().responseSendError(HttpServletResponse.SC_NOT_FOUND, getRequestURI());
-			}
-		}
-		else {
-			wrapped.handleResourceRequest(context);
-		}
-	}
-
-	@Override
-	public ResourceHandler getWrapped() {
-		return wrapped;
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
@@ -299,29 +261,6 @@ public class CombinedResourceHandler extends ResourceHandlerWrapper implements S
 	private static Set<ResourceIdentifier> initCDNResources() {
 		Map<ResourceIdentifier, String> cdnResources = CDNResourceHandler.initCDNResources();
 		return (cdnResources != null) ? cdnResources.keySet() : Collections.<ResourceIdentifier>emptySet();
-	}
-
-	/**
-	 * Stream the given resource to the response associated with the given faces context.
-	 * @param context The involved faces context.
-	 * @param resource The resource to be streamed.
-	 * @throws IOException If something fails at I/O level.
-	 */
-	private static void streamResource(FacesContext context, Resource resource) throws IOException {
-		ExternalContext externalContext = context.getExternalContext();
-
-		if (!resource.userAgentNeedsUpdate(context)) {
-			externalContext.setResponseStatus(HttpServletResponse.SC_NOT_MODIFIED);
-			return;
-		}
-
-		externalContext.setResponseContentType(resource.getContentType());
-
-		for (Entry<String, String> header : resource.getResponseHeaders().entrySet()) {
-			externalContext.setResponseHeader(header.getKey(), header.getValue());
-		}
-
-		stream(resource.getInputStream(), externalContext.getResponseOutputStream());
 	}
 
 	// Inner classes --------------------------------------------------------------------------------------------------

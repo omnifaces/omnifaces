@@ -22,7 +22,6 @@ import java.util.Map;
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceDependency;
 import javax.faces.application.ResourceHandler;
-import javax.faces.application.ResourceHandlerWrapper;
 
 /**
  * This {@link ResourceHandler} implementation allows the developer to provide CDN URLs instead of the default local
@@ -120,7 +119,7 @@ import javax.faces.application.ResourceHandlerWrapper;
  * @author Bauke Scholtz
  * @since 1.2
  */
-public class CDNResourceHandler extends ResourceHandlerWrapper {
+public class CDNResourceHandler extends DefaultResourceHandler {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
@@ -139,7 +138,6 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
-	private ResourceHandler wrapped;
 	private Map<ResourceIdentifier, String> cdnResources;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
@@ -153,7 +151,7 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 	 * @throws IllegalArgumentException When the context parameter is missing or is in invalid format.
 	 */
 	public CDNResourceHandler(ResourceHandler wrapped) {
-		this.wrapped = wrapped;
+		super(wrapped);
 		cdnResources = initCDNResources();
 
 		if (cdnResources == null) {
@@ -162,23 +160,6 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
-
-	/**
-	 * Delegate to {@link #createResource(String, String, String)} with <code>null</code> as library name and content
-	 * type.
-	 */
-	@Override
-	public Resource createResource(String resourceName) {
-		return createResource(resourceName, null, null);
-	}
-
-	/**
-	 * Delegate to {@link #createResource(String, String, String)} with <code>null</code> as content type.
-	 */
-	@Override
-	public Resource createResource(String resourceName, String libraryName) {
-		return createResource(resourceName, libraryName, null);
-	}
 
 	/**
 	 * Delegate to {@link #createResource(String, String, String)} of the wrapped resource handler. If it returns
@@ -190,7 +171,7 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 	 */
 	@Override
 	public Resource createResource(String resourceName, String libraryName, String contentType) {
-		final Resource resource = getWrapped().createResource(resourceName, libraryName, contentType);
+		Resource resource = getWrapped().createResource(resourceName, libraryName, contentType);
 
 		if (resource == null) {
 			return null;
@@ -214,19 +195,14 @@ public class CDNResourceHandler extends ResourceHandlerWrapper {
 			return resource;
 		}
 
-		final String finalRequestPath = evaluateExpressionGet(requestPath);
+		final String evaluatedRequestPath = evaluateExpressionGet(requestPath);
 
 		return new DefaultResource(resource) {
 			@Override
 			public String getRequestPath() {
-				return finalRequestPath;
+				return evaluatedRequestPath;
 			}
 		};
-	}
-
-	@Override
-	public ResourceHandler getWrapped() {
-		return wrapped;
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------

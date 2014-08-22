@@ -29,6 +29,8 @@ import javax.faces.application.ResourceWrapper;
  */
 public abstract class DefaultResource extends ResourceWrapper implements Externalizable {
 
+	public static final String RES_NOT_FOUND = "RES_NOT_FOUND";
+
 	private Resource wrapped;
 
 	/**

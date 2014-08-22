@@ -12,20 +12,21 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
 import static org.omnifaces.util.Faces.getMapping;
 import static org.omnifaces.util.Faces.isPrefixMapping;
 import static org.omnifaces.util.Utils.stream;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Map.Entry;
 
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
-import javax.faces.application.ResourceHandlerWrapper;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.webapp.FacesServlet;
-import javax.servlet.http.HttpServletResponse;
 
 import org.omnifaces.util.Hacks;
 
@@ -97,11 +98,7 @@ import org.omnifaces.util.Hacks;
  * @author Bauke Scholtz
  * @since 1.4
  */
-public class UnmappedResourceHandler extends ResourceHandlerWrapper {
-
-	// Properties -----------------------------------------------------------------------------------------------------
-
-	private ResourceHandler wrapped;
+public class UnmappedResourceHandler extends DefaultResourceHandler {
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -110,27 +107,10 @@ public class UnmappedResourceHandler extends ResourceHandlerWrapper {
 	 * @param wrapped The resource handler to be wrapped.
 	 */
 	public UnmappedResourceHandler(ResourceHandler wrapped) {
-		this.wrapped = wrapped;
+		super(wrapped);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
-
-	/**
-	 * Delegate to {@link #createResource(String, String, String)} with <code>null</code> as library name and content
-	 * type.
-	 */
-	@Override
-	public Resource createResource(String resourceName) {
-		return createResource(resourceName, null, null);
-	}
-
-	/**
-	 * Delegate to {@link #createResource(String, String, String)} with <code>null</code> as content type.
-	 */
-	@Override
-	public Resource createResource(String resourceName, String libraryName) {
-		return createResource(resourceName, libraryName, null);
-	}
 
 	/**
 	 * Delegate to {@link #createResource(String, String, String)} of the wrapped resource handler. If it returns
@@ -169,7 +149,7 @@ public class UnmappedResourceHandler extends ResourceHandlerWrapper {
 	 */
 	@Override
 	public boolean isResourceRequest(FacesContext context) {
-		return ResourceHandler.RESOURCE_IDENTIFIER.equals(context.getExternalContext().getRequestServletPath());
+		return RESOURCE_IDENTIFIER.equals(context.getExternalContext().getRequestServletPath());
 	}
 
 	@Override
@@ -184,7 +164,14 @@ public class UnmappedResourceHandler extends ResourceHandlerWrapper {
 		ExternalContext externalContext = context.getExternalContext();
 
 		if (!resource.userAgentNeedsUpdate(context)) {
-			externalContext.setResponseStatus(HttpServletResponse.SC_NOT_MODIFIED);
+			externalContext.setResponseStatus(SC_NOT_MODIFIED);
+			return;
+		}
+
+		InputStream inputStream = resource.getInputStream();
+
+		if (inputStream == null) {
+			externalContext.setResponseStatus(SC_NOT_FOUND);
 			return;
 		}
 
@@ -194,7 +181,7 @@ public class UnmappedResourceHandler extends ResourceHandlerWrapper {
 			externalContext.setResponseHeader(header.getKey(), header.getValue());
 		}
 
-		stream(resource.getInputStream(), externalContext.getResponseOutputStream());
+		stream(inputStream, externalContext.getResponseOutputStream());
 	}
 
 	private Resource createResource(FacesContext context) {
@@ -211,11 +198,6 @@ public class UnmappedResourceHandler extends ResourceHandlerWrapper {
 
 		String libraryName = context.getExternalContext().getRequestParameterMap().get("ln");
 		return context.getApplication().getResourceHandler().createResource(resourceName, libraryName);
-	}
-
-	@Override
-	public ResourceHandler getWrapped() {
-		return wrapped;
 	}
 
 }
