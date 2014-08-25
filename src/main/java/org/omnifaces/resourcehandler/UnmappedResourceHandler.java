@@ -123,7 +123,7 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 
 	/**
 	 * Delegate to {@link #createResource(String, String, String)} of the wrapped resource handler. If it returns
-	 * non-<code>null</code>, then return a new instanceof {@link UnmappedResource}.
+	 * non-<code>null</code>, then return an unmapped resource.
 	 */
 	@Override
 	public Resource createResource(String resourceName, String libraryName, String contentType) {

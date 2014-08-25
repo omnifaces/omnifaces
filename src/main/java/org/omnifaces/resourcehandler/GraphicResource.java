@@ -94,7 +94,7 @@ public class GraphicResource extends DynamicResource {
 
 	/**
 	 * Construct a new graphic resource which uses the given content as data URI.
-	 * @param name The graphic resource content, to be represented as data URI.
+	 * @param content The graphic resource content, to be represented as data URI.
 	 */
 	public GraphicResource(Object content) {
 		super("", GraphicResourceHandler.LIBRARY_NAME, "image");
