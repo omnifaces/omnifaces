@@ -87,8 +87,8 @@ import javax.faces.application.ResourceHandler;
  * <code>/*</code>. Here's an example:
  * <pre>
  * &lt;context-param&gt;
- *   &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_URLS&lt;/param-name&gt;
- *   &lt;param-value&gt;jquery-cdn:*=http://code.jquery.com/*&lt;/param-value&gt;
+ *     &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_URLS&lt;/param-name&gt;
+ *     &lt;param-value&gt;jquery-cdn:*=http://code.jquery.com/*&lt;/param-value&gt;
  * &lt;/context-param&gt;
  * </pre>
  * With the above configuration, the following resources:
@@ -107,8 +107,30 @@ import javax.faces.application.ResourceHandler;
  * <p>The CDN resource handler supports evaluating EL expessions in the CDN URL. Here's an example:</p>
  * <pre>
  * &lt;context-param&gt;
- *   &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_URLS&lt;/param-name&gt;
- *   &lt;param-value&gt;jquery-cdn:*=http://#{settings.jqueryCDN}/*&lt;/param-value&gt;
+ *     &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_URLS&lt;/param-name&gt;
+ *     &lt;param-value&gt;jquery-cdn:*=http://#{settings.jqueryCDN}/*&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * </pre>
+ * <p>The EL expression is resolved on a per-request basis.</p>
+ *
+ * <h3>Conditionally disable CDN resource handler</h3>
+ * <p>
+ * If you'd like to supply a context parameter which conditionally disables the CDN resource handler, then set the
+ * context parameter {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_DISABLED} accordingly.
+ * <pre>
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_DISABLED&lt;/param-name&gt;
+ *     &lt;param-value&gt;true&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * &lt;!-- or --&gt;
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_DISABLED&lt;/param-name&gt;
+ *     &lt;param-value&gt;#{facesContext.application.projectStage eq 'Development'}&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * &lt;!-- or --&gt;
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_DISABLED&lt;/param-name&gt;
+ *     &lt;param-value&gt;#{someBean.someBooleanProperty}&lt;/param-value&gt;
  * &lt;/context-param&gt;
  * </pre>
  * <p>The EL expression is resolved on a per-request basis.</p>
@@ -129,6 +151,9 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 	/** The context parameter name to specify CDN URLs for the given resource identifiers. */
 	public static final String PARAM_NAME_CDN_RESOURCES = "org.omnifaces.CDN_RESOURCE_HANDLER_URLS";
 
+	/** The context parameter name to conditionally disable CDN resource handler. @since 2.0 */
+	public static final String PARAM_NAME_CDN_DISABLED = "org.omnifaces.CDN_RESOURCE_HANDLER_DISABLED";
+
 	private static final String ERROR_MISSING_INIT_PARAM =
 		"Context parameter '" + PARAM_NAME_CDN_RESOURCES + "' is missing in web.xml or web-fragment.xml.";
 	private static final String ERROR_INVALID_INIT_PARAM =
@@ -141,6 +166,7 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
+	private String disabledParam;
 	private Map<ResourceIdentifier, String> cdnResources;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
@@ -155,6 +181,7 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 	 */
 	public CDNResourceHandler(ResourceHandler wrapped) {
 		super(wrapped);
+		disabledParam = getInitParameter(PARAM_NAME_CDN_DISABLED);
 		cdnResources = initCDNResources();
 
 		if (cdnResources == null) {
@@ -176,8 +203,8 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 	public Resource createResource(String resourceName, String libraryName, String contentType) {
 		Resource resource = getWrapped().createResource(resourceName, libraryName, contentType);
 
-		if (resource == null) {
-			return null;
+		if (resource == null || (disabledParam != null && Boolean.valueOf(String.valueOf(evaluateExpressionGet(disabledParam))))) {
+			return resource;
 		}
 
 		String requestPath = null;

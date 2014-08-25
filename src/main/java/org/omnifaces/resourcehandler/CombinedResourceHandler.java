@@ -13,6 +13,7 @@
 package org.omnifaces.resourcehandler;
 
 import static org.omnifaces.util.Events.subscribeToApplicationEvent;
+import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getInitParameter;
 
 import java.util.ArrayList;
@@ -133,6 +134,28 @@ import org.omnifaces.util.Hacks;
  * will use an internal workaround to get it to work anyway, but this involves firing a HTTP request for every resource.
  * The impact should however be relatively negligible as this is performed on localhost.
  *
+ * <h3>Conditionally disable combined resource handler</h3>
+ * <p>
+ * If you'd like to supply a context parameter which conditionally disables the combined resource handler, then set the
+ * context parameter {@value org.omnifaces.resourcehandler.CombinedResourceHandler#PARAM_NAME_DISABLED} accordingly.
+ * <pre>
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.COMBINED_RESOURCE_HANDLER_DISABLED&lt;/param-name&gt;
+ *     &lt;param-value&gt;true&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * &lt;!-- or --&gt;
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.COMBINED_RESOURCE_HANDLER_DISABLED&lt;/param-name&gt;
+ *     &lt;param-value&gt;#{facesContext.application.projectStage eq 'Development'}&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * &lt;!-- or --&gt;
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.COMBINED_RESOURCE_HANDLER_DISABLED&lt;/param-name&gt;
+ *     &lt;param-value&gt;#{someApplicationScopedBean.someBooleanProperty}&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * </pre>
+ * <p>The EL expression is resolved on a per-request basis.</p>
+ *
  * <h3>CDNResourceHandler</h3>
  * <p>
  * If you're also using the {@link CDNResourceHandler} or, at least, have configured its context parameter
@@ -147,6 +170,10 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 	/** The default library name of a combined resource. Make sure that this is never used for other libraries. */
 	public static final String LIBRARY_NAME = "omnifaces.combined";
+
+	/** The context parameter name to conditionally disable combined resource handler. @since 2.0 */
+	public static final String PARAM_NAME_DISABLED =
+		"org.omnifaces.COMBINED_RESOURCE_HANDLER_DISABLED";
 
 	/** The context parameter name to specify resource identifiers which needs to be excluded from combining. */
 	public static final String PARAM_NAME_EXCLUDED_RESOURCES =
@@ -169,6 +196,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
+	private String disabledParam;
 	private Set<ResourceIdentifier> excludedResources;
 	private Set<ResourceIdentifier> suppressedResources;
 	private boolean inlineCSS;
@@ -184,6 +212,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 	 */
 	public CombinedResourceHandler(ResourceHandler wrapped) {
 		super(wrapped);
+		disabledParam = getInitParameter(PARAM_NAME_DISABLED);
 		excludedResources = initResources(PARAM_NAME_EXCLUDED_RESOURCES);
 		excludedResources.addAll(initCDNResources());
 		suppressedResources = initResources(PARAM_NAME_SUPPRESSED_RESOURCES);
@@ -215,6 +244,10 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 	 */
 	@Override
 	public void processEvent(SystemEvent event) throws AbortProcessingException {
+		if (disabledParam != null && Boolean.valueOf(String.valueOf(evaluateExpressionGet(disabledParam)))) {
+			return;
+		}
+
 		FacesContext context = FacesContext.getCurrentInstance();
 		UIViewRoot view = context.getViewRoot();
 		CombinedResourceBuilder builder = new CombinedResourceBuilder();
