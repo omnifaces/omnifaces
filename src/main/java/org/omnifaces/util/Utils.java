@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -263,18 +264,33 @@ public final class Utils {
 	}
 
 	/**
-	 * Returns <code>true</code> if an instance of the given clazz would be an instance of an instance of
-	 * one of the given clazzes.
-	 * @param <T> The generic object type.
-	 * @param clazz The class to be checked if it would be an instance of one of the given clazzes.
-	 * @param clazzes The argument list of clazzes to be tested for instance of.
+	 * Returns <code>true</code> if an instance of the given class could also be an instance of one of the given classes.
+	 * @param cls The class to be checked if it could also be an instance of one of the given classes.
+	 * @param classes The argument list of classes to be tested.
+	 * @return <code>true</code> if the given class could also be an instance of one of the given classes.
+	 * @since 2.0
+	 */
+	public static boolean isOneInstanceOf(Class<?> cls, Class<?>... classes) {
+		for (Class<?> other : classes) {
+			if (cls == null ? other == null : other.isAssignableFrom(cls)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Returns <code>true</code> if the given class has at least one of the given annotations.
+	 * @param cls The class to be checked if it has at least one of the given annotations.
+	 * @param annotations The argument list of annotations to be tested on the given class.
 	 * @return <code>true</code> if the given clazz would be an instance of one of the given clazzes.
 	 * @since 2.0
 	 */
 	@SafeVarargs
-	public static <T> boolean isOneInstanceOf(Class<?> clazz, Class<?>... clazzes) {
-		for (Class<?> other : clazzes) {
-			if (clazz == null ? other == null :	other.isAssignableFrom(clazz)) {
+	public static boolean isOneAnnotationPresent(Class<?> cls, Class<? extends Annotation>... annotations) {
+		for (Class<? extends Annotation> annotation : annotations) {
+			if (cls.isAnnotationPresent(annotation)) {
 				return true;
 			}
 		}

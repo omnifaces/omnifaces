@@ -13,9 +13,10 @@
 package org.omnifaces.util;
 
 import static org.omnifaces.util.Components.getAttribute;
-import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.faces.component.UIComponent;
 import javax.faces.context.ResponseWriter;
@@ -113,6 +114,7 @@ public final class Renderers {
 	 * @param html The HTML attribute name to be written.
 	 * @param value The HTML attribute value to be written.
 	 * @throws IOException When an I/O error occurs.
+	 * @see ResponseWriter#writeAttribute(String, Object, String)
 	 */
 	public static void writeAttribute(ResponseWriter writer, String html, Object value) throws IOException {
 		writeAttribute(writer, html, value, html);
@@ -126,17 +128,18 @@ public final class Renderers {
 	 * @param value The HTML attribute value to be written.
 	 * @param property The associated component property name.
 	 * @throws IOException When an I/O error occurs.
+	 * @see ResponseWriter#writeAttribute(String, Object, String)
 	 */
 	public static void writeAttribute(ResponseWriter writer, String html, Object value, String property)
 		throws IOException
 	{
-		if (!isEmpty(value)) {
+		if (value != null) {
 			writer.writeAttribute(html, value, property);
 		}
 	}
 
 	/**
-	 * Write component attribute of the given names, if it's not empty.
+	 * Write component attributes of the given names, if it's not empty.
 	 * Both HTML attribute name and component property name defaults to the given component attribute name.
 	 * @param writer The involved response writer.
 	 * @param component The associated UI component, usually the parent component.
@@ -149,6 +152,25 @@ public final class Renderers {
 	{
 		for (String name : names) {
 			writeAttribute(writer, name, getAttribute(component, name), name);
+		}
+	}
+
+	/**
+	 * Write component attributes of the given property-HTML mapping of names, if it's not empty.
+	 * Map key will be used as component property name and map value will be used as HTML attribute name.
+	 * @param writer The involved response writer.
+	 * @param component The associated UI component, usually the parent component.
+	 * @param names Mapping of component property-HTML attribute names of the attributes to be written.
+	 * @throws IOException When an I/O error occurs.
+	 * @see ResponseWriter#writeAttribute(String, Object, String)
+	 */
+	public static void writeAttributes(ResponseWriter writer, UIComponent component, Map<String, String> names)
+		throws IOException
+	{
+		for (Entry<String, String> entry : names.entrySet()) {
+			String name = entry.getKey();
+			String html = entry.getValue();
+			writeAttribute(writer, html, getAttribute(component, name), name);
 		}
 	}
 

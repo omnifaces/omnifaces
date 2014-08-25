@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.faces.context.FacesContext;
@@ -209,9 +210,9 @@ public final class Servlets {
 	}
 
 	/**
-	 * Converts the given query string to request parameter values map.
-	 * @param queryString The query string.
-	 * @return The query string as parameter values map.
+	 * Converts the given request query string to request parameter values map.
+	 * @param queryString The request query string.
+	 * @return The request query string as request parameter values map.
 	 * @since 1.7
 	 */
 	public static Map<String, List<String>> toParameterMap(String queryString) {
@@ -235,6 +236,30 @@ public final class Servlets {
 		}
 
 		return parameterMap;
+	}
+
+	/**
+	 * Converts the given request parameter values map to request query string.
+	 * @param parameterMap The request parameter values map.
+	 * @return The request parameter values map as request query string.
+	 * @since 2.0
+	 */
+	public static String toQueryString(Map<String, List<String>> parameterMap) {
+		StringBuilder queryString = new StringBuilder();
+
+		for (Entry<String, List<String>> entry : parameterMap.entrySet()) {
+			String name = encodeURL(entry.getKey());
+
+			for (String value : entry.getValue()) {
+				if (queryString.length() > 0) {
+					queryString.append("&");
+				}
+
+				queryString.append(name).append("=").append(encodeURL(value));
+			}
+		}
+
+		return queryString.toString();
 	}
 
 	// Cookies --------------------------------------------------------------------------------------------------------

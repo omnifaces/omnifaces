@@ -2627,6 +2627,284 @@ public class ValidateValuesBean implements MultiFieldValidator {
         </attribute>
     </tag>
 
+	<tag>
+        <description>
+        	<![CDATA[
+				The <code>&lt;o:graphicImage&gt;</code> is a component that extends the standard <code>&lt;h:graphicImage&gt;</code>
+				with support for referencing an <code>InputStream</code> or <code>byte[]</code> property in <code>value</code> attribute.
+				This property must point to a <strong>stateless</strong> <code>@ApplicationScoped</code> bean (both JSF and CDI
+				scopes are supported).
+             ]]>
+        </description>
+        <tag-name>graphicImage</tag-name>
+        <component>
+            <component-type>org.omnifaces.component.output.GraphicImage</component-type>
+        </component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+        <attribute>
+            <description>
+				<![CDATA[
+	                The value that will be rendered as the content of the HTML img element. It must represent a method
+	                expression referring a stateless backing bean method returning either byte[] or InputStream.
+	                Thus, NOT a view or session scoped bean, but a request or application scoped one.
+	                This attribute is ignored when 'name' attribute is specified.
+	            ]]>
+            </description>
+            <name>value</name>
+            <required>false</required>
+            <type>java.lang.Object</type>
+        </attribute>
+        <attribute>
+            <description>
+				<![CDATA[
+	                The "last modified" timestamp, can be either a java.lang.Long, or java.util.Date, or java.lang.String
+	                which is parseable as java.lang.Long. This attribute is ignored when 'name' attribute is specified.
+	            ]]>
+            </description>
+            <name>lastModified</name>
+            <required>false</required>
+            <type>java.lang.Object</type>
+        </attribute>
+        <attribute>
+            <description>
+				<![CDATA[
+	                The resource name of the resource. Works the same way as on <code>&lt;h:graphicImage&gt;</code>.
+	                When this attribute is specified, 'value' and 'lastModified' attributes are ignored.
+	            ]]>
+            </description>
+            <name>name</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+				<![CDATA[
+	                The resource library name of the resource. Works the same way as on <code>&lt;h:graphicImage&gt;</code>.
+	                This attribtue is only used when 'name' attribute is specified.
+	            ]]>
+            </description>
+            <name>library</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Alternate textual description of the element rendered by this component.
+            </description>
+            <name>alt</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Direction indication for text that does not inherit directionality.
+                Valid values are "LTR" (left-to-right) and "RTL" (right-to-left).
+                These attributes are case sensitive when rendering to XHTML, so care must be taken to have the correct case.
+            </description>
+            <name>dir</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Override for the height of this image.
+            </description>
+            <name>height</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Flag indicating that this image is to be used as a server side image map.
+                Such an image must be enclosed within a hyperlink ("a").
+                A value of false causes no attribute to be rendered, while a value of true causes the attribute to be rendered as ismap="ismap".
+            </description>
+            <name>ismap</name>
+            <required>false</required>
+            <type>boolean</type>
+        </attribute>
+        <attribute>
+            <description>
+                Code describing the language used in the generated markup for this component.
+            </description>
+            <name>lang</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+				URI to a long description of the image represented by this element.
+            </description>
+            <name>longdesc</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is clicked over this element.
+            </description>
+            <name>onclick</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is double clicked over this element.
+            </description>
+            <name>ondblclick</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a key is pressed down over this element.
+            </description>
+            <name>onkeydown</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a key is pressed and released over this element.
+            </description>
+            <name>onkeypress</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a key is released over this element.
+            </description>
+            <name>onkeyup</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is pressed down over this element.
+            </description>
+            <name>onmousedown</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is moved within this element.
+            </description>
+            <name>onmousemove</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is moved away from this element.
+            </description>
+            <name>onmouseout</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is moved onto this element.
+            </description>
+            <name>onmouseover</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Javascript code executed when a pointer button is released over this element.
+            </description>
+            <name>onmouseup</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Per the WAI-ARIA spec and its relationship to HTML5 (Section title ARIA Role Attriubute),
+                every HTML element may have a "role" attribute whose value must be passed through unmodified on the element on which it is declared in the final rendered markup.
+                The attribute, if specified, must have a value that is a string literal that is,
+                or an EL Expression that evaluates to, a set of space-separated tokens representing the various WAI-ARIA roles that the element belongs to.
+				It is the page author's responsibility to ensure that the user agent is capable of correctly interpreting the value of this attribute.
+            </description>
+            <name>role</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                CSS style(s) to be applied when this component is rendered.
+            </description>
+            <name>style</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Space-separated list of CSS style class(es) to be applied when this element is rendered.
+                This value must be passed through as the "class" attribute on generated markup.
+            </description>
+            <name>styleClass</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+                Advisory title information about markup elements generated for this component (simply put: the tooltip).
+            </description>
+            <name>title</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+				The name of a client side image map (an HTML "map" element) for which this element provides the image.
+            </description>
+            <name>usemap</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+				Override for the width of this image.
+            </description>
+            <name>width</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+    </tag>
+
     <tag>
         <description>
         	<![CDATA[

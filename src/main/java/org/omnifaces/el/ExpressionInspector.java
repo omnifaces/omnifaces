@@ -1,5 +1,7 @@
 package org.omnifaces.el;
 
+import static org.omnifaces.el.functions.Strings.capitalize;
+
 import java.lang.reflect.Method;
 
 import javax.el.ELContext;
@@ -56,7 +58,8 @@ public class ExpressionInspector {
 	}
 
 	/**
-	 * Finds a method based on the method name only. Does not support overloaded methods.
+	 * Finds a method based on the method name only, if necessary prefixed with "get".
+	 * Does not support overloaded methods.
 	 *
 	 * @param base the object in which the method is to be found
 	 * @param methodName name of the method to be found
@@ -68,6 +71,10 @@ public class ExpressionInspector {
 			if (method.getName().equals(methodName)) {
 				return method;
 			}
+		}
+
+		if (!methodName.startsWith("get")) {
+			return findMethod(base, "get" + capitalize(methodName));
 		}
 
 		return null;
