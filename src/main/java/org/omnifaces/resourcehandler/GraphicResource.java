@@ -12,6 +12,7 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static org.omnifaces.util.Faces.getContext;
@@ -20,7 +21,7 @@ import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isNumber;
 import static org.omnifaces.util.Utils.isOneAnnotationPresent;
-import static org.omnifaces.util.Utils.isOneInstanceOf;
+import static org.omnifaces.util.Utils.stream;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -33,12 +34,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.el.ValueExpression;
+import javax.faces.FacesException;
 import javax.faces.application.Application;
 import javax.faces.application.Resource;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
+import javax.xml.bind.DatatypeConverter;
 
+import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.omnifaces.component.output.GraphicImage;
 import org.omnifaces.el.ExpressionInspector;
 import org.omnifaces.el.MethodReference;
@@ -76,9 +80,6 @@ public class GraphicResource extends DynamicResource {
 	private static final Class<? extends Annotation>[] REQUIRED_ANNOTATION_TYPES = new Class[] {
 		javax.faces.bean.ApplicationScoped.class, javax.enterprise.context.ApplicationScoped.class
 	};
-	private static final Class<?>[] REQUIRED_RETURN_TYPES = new Class[] {
-		InputStream.class, byte[].class
-	};
 
 	private static final Map<String, MethodReference> ALLOWED_METHODS = new HashMap<>();
 	private static final GraphicImage DUMMY_COMPONENT = new GraphicImage();
@@ -86,13 +87,24 @@ public class GraphicResource extends DynamicResource {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
+	private Object content;
 	private String[] params;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Construct a new graphic resource based on the given name and the "last modified" representation.
-	 * @param name The graphic resource name, usually an encrypted representation of an EL method returning content.
+	 * Construct a new graphic resource which uses the given content as data URI.
+	 * @param name The graphic resource content, to be represented as data URI.
+	 */
+	public GraphicResource(Object content) {
+		super("", GraphicResourceHandler.LIBRARY_NAME, "image");
+		this.content = content;
+	}
+
+	/**
+	 * Construct a new graphic resource based on the given name, EL method parameters converted as string, and the
+	 * "last modified" representation.
+	 * @param name The graphic resource name, usually representing the base and method of EL method expression.
 	 * @param params The graphic resource method parameters.
 	 * @param lastModified The "last modified" representation of the graphic resource, can be {@link Long} or
 	 * {@link Date}, or otherwise an attempt will be made to parse it as {@link Long}.
@@ -132,6 +144,10 @@ public class GraphicResource extends DynamicResource {
 			throw new IllegalArgumentException(ERROR_MISSING_VALUE);
 		}
 
+		if (Boolean.valueOf(String.valueOf(component.getAttributes().get("dataURI"))) == TRUE) {
+			return new GraphicResource(component.getAttributes().get("value"));
+		}
+
 		MethodReference methodReference = ExpressionInspector.getMethodReference(context.getELContext(), value);
 
 		if (methodReference.getMethod() == null) {
@@ -141,12 +157,6 @@ public class GraphicResource extends DynamicResource {
 		String name = getResourceName(methodReference);
 
 		if (!ALLOWED_METHODS.containsKey(name)) { // No need to validate everytime when already known.
-			Class<?> returnType = methodReference.getMethod().getReturnType();
-
-			if (!isOneInstanceOf(returnType, REQUIRED_RETURN_TYPES)) {
-				throw new IllegalArgumentException(String.format(ERROR_INVALID_RETURNTYPE, returnType));
-			}
-
 			Class<? extends Object> beanClass = methodReference.getBase().getClass();
 
 			if (!isOneAnnotationPresent(beanClass, REQUIRED_ANNOTATION_TYPES)) {
@@ -167,7 +177,39 @@ public class GraphicResource extends DynamicResource {
 	 */
 	@Override
 	public String getRequestPath() {
-		return super.getRequestPath() + (isEmpty(params) ? "" : ("&" + toQueryString(singletonMap("p", asList(params)))));
+		if (content != null) {
+			return getDataURI();
+		}
+		else {
+			return super.getRequestPath() + (isEmpty(params) ? "" : ("&" + toQueryString(singletonMap("p", asList(params)))));
+		}
+	}
+
+	/**
+	 * Returns the data URI for resource's content.
+	 * @return The data URI for resource's content.
+	 */
+	protected String getDataURI() {
+		byte[] bytes = null;
+
+		try {
+			if (content instanceof InputStream) {
+				ByteArrayOutputStream output = new ByteArrayOutputStream();
+				stream((InputStream) content, output);
+				bytes = output.toByteArray();
+			}
+			else if (content instanceof byte[]) {
+				bytes = (byte[]) content;
+			}
+			else {
+				throw new IllegalArgumentException(String.format(ERROR_INVALID_RETURNTYPE, content));
+			}
+		}
+		catch (Exception e) {
+			throw new FacesException(e);
+		}
+
+		return "data:image;base64," + DatatypeConverter.printBase64Binary(bytes);
 	}
 
 	/**
@@ -194,7 +236,7 @@ public class GraphicResource extends DynamicResource {
 				return new ByteArrayInputStream((byte[]) content);
 			}
 			else {
-				return null; // Should never hit this. The create() method already throws IAE on invalid return type.
+				throw new IllegalArgumentException(String.format(ERROR_INVALID_RETURNTYPE, content));
 			}
 		}
 		catch (Exception e) {

@@ -2688,8 +2688,20 @@ public class ValidateValuesBean implements MultiFieldValidator {
         <attribute>
             <description>
 				<![CDATA[
+	                When set to <code>true</code> then the value will be rendered in data URI format instead of request URI format.
+	                This attribute is ignored when 'name' attribute is specified.
+	            ]]>
+            </description>
+            <name>dataURI</name>
+            <required>false</required>
+            <type>boolean</type>
+        </attribute>
+        <attribute>
+            <description>
+				<![CDATA[
 	                The "last modified" timestamp, can be either a java.lang.Long, or java.util.Date, or java.lang.String
-	                which is parseable as java.lang.Long. This attribute is ignored when 'name' attribute is specified.
+	                which is parseable as java.lang.Long. This attribute is ignored when 'name' attribute is specified
+	                or when 'dataURI' attribute is set to 'true'.
 	            ]]>
             </description>
             <name>lastModified</name>

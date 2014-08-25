@@ -36,9 +36,15 @@ import org.omnifaces.resourcehandler.GraphicResourceHandler;
 /**
  * <p>
  * The <code>&lt;o:graphicImage&gt;</code> is a component that extends the standard <code>&lt;h:graphicImage&gt;</code>
- * with support for referencing an {@link InputStream} or <code>byte[]</code> property in <code>value</code> attribute.
- * This property must point to a <strong>stateless</strong> <code>@ApplicationScoped</code> bean (both JSF and CDI
- * scopes are supported). E.g.
+ * with support for referencing an {@link InputStream} or <code>byte[]</code> property in <code>value</code> attribute,
+ * optionally as data URI (not recommended for "large" images, ~10KB is cornercase, the less so if there are more of
+ * such images in the same page).
+ * <pre>
+ * &lt;o:graphicImage value="#{bean.icon}" dataURI="true" /&gt;
+ * </pre>
+ * <p>
+ * When not served as data URI, then the property must point to a <b>stateless</b> <code>@ApplicationScoped</code> bean
+ * (both JSF and CDI scopes are supported). E.g.
  * <pre>
  * &#64;Named
  * &#64;ApplicationScoped
