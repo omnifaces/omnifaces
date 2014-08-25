@@ -59,7 +59,7 @@ public class GraphicResource extends DynamicResource {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final String ERROR_INVALID_LASTMODIFIED =
-		"o:graphicImage 'lastModified' attribute must be an instance of Number or Date."
+		"o:graphicImage 'lastModified' attribute must be an instance of Long or Date."
 			+ " Encountered an invalid value of '%s'.";
 	private static final String ERROR_MISSING_VALUE =
 		"o:graphicImage 'value' attribute is required.";
@@ -173,7 +173,7 @@ public class GraphicResource extends DynamicResource {
 	}
 
 	/**
-	 * An override which appends the converted method parameters to the query string.
+	 * An override which either returns the data URI or appends the converted method parameters to the query string.
 	 */
 	@Override
 	public String getRequestPath() {
@@ -212,10 +212,6 @@ public class GraphicResource extends DynamicResource {
 		return "data:image;base64," + DatatypeConverter.printBase64Binary(bytes);
 	}
 
-	/**
-	 * @throws IllegalArgumentException When the "value" attribute of the initial component does not represent a method
-	 * expression returning an {@link InputStream} or <code>byte[]</code>.
-	 */
 	@Override
 	public InputStream getInputStream() throws IOException {
 		MethodReference methodReference = ALLOWED_METHODS.get(getResourceName().split("\\.", 2)[0]);
