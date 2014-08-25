@@ -24,6 +24,7 @@ import static org.omnifaces.util.Utils.isOneAnnotationPresent;
 import static org.omnifaces.util.Utils.stream;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -42,7 +43,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.xml.bind.DatatypeConverter;
 
-import org.apache.tomcat.util.http.fileupload.ByteArrayOutputStream;
 import org.omnifaces.component.output.GraphicImage;
 import org.omnifaces.el.ExpressionInspector;
 import org.omnifaces.el.MethodReference;
