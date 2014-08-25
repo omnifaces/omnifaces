@@ -36,14 +36,14 @@ import org.omnifaces.resourcehandler.GraphicResourceHandler;
 /**
  * <p>
  * The <code>&lt;o:graphicImage&gt;</code> is a component that extends the standard <code>&lt;h:graphicImage&gt;</code>
- * with support for referencing an {@link InputStream} or <code>byte[]</code> property in <code>value</code> attribute,
- * optionally as data URI (not recommended for "large" images, ~10KB is cornercase, the less so if there are more of
- * such images in the same page).
+ * with support for referencing an {@link InputStream} or <code>byte[]</code> property in the <code>value</code> attribute,
+ * optionally as a data URI (not recommended for "large" images, ~10KB would typically be the max, even less so if there are more
+ * such images on the same page).
  * <pre>
  * &lt;o:graphicImage value="#{bean.icon}" dataURI="true" /&gt;
  * </pre>
  * <p>
- * When not served as data URI, then the property must point to a <b>stateless</b> <code>@ApplicationScoped</code> bean
+ * When not served as data URI, the property must point to a <b>stateless</b> <code>@ApplicationScoped</code> bean
  * (both JSF and CDI scopes are supported). E.g.
  * <pre>
  * &#64;Named
@@ -65,24 +65,24 @@ import org.omnifaces.resourcehandler.GraphicResourceHandler;
  * &lt;/ui:repeat&gt;
  * </pre>
  * <p>
- * In case your "thumbnail" supports it, you can also supply the "last modified" property which will be used in
+ * In case your "thumbnail" supports it, you can also supply the "last modified" property which will be used in the
  * <code>ETag</code> and <code>Last-Modified</code> headers and in <code>If-Modified-Since</code> checks, hereby
- * improving the browser caching. The <code>lastModified</code> attribute supports both {@link Long} and {@link Date}.
+ * improving browser caching. The <code>lastModified</code> attribute supports both {@link Long} and {@link Date}.
  * <pre>
  * &lt;ui:repeat value="#{bean.thumbnails}" var="thumbnail"&gt;
  *     &lt;o:graphicImage value="#{imageStreamer.getById(thumbnail.id)}" lastModified="#{thumbnail.lastModified}" /&gt;
  * &lt;/ui:repeat&gt;
  * </pre>
  * <p>
- * In case the property is a method expression taking arguments, each of those arguments will be converted to string
+ * In case the property is a method expression taking arguments, each of those arguments will be converted to a string
  * HTTP request parameter and back to actual objects using the converters registered by class as available via
  * {@link Application#createConverter(Class)}. So, most of standard types like {@link Long} are already implicitly
  * supported. In case you need to supply a custom object as argument for some reason, you need to explicitly register
  * a converter for it yourself via <code>&#64;FacesConverter(forClass)</code>.
  * <p>
- * Note: the bean class name and method name will end up in image source URL. Although this is technically harmless and
- * not tamperable by hackers, you might want to choose a "safe" class and method name for the purpose.
- * Note: like as in <code>&lt;h:graphicImage&gt;</code>, the <code>value</code> attribute is <strong>ignored</strong>
+ * Note: the bean class name and method name will end up in the image source URL. Although this is technically harmless and
+ * not tamperable by hackers, you might want to choose a "safe" class and method name for this purpose.
+ * Note: like <code>&lt;h:graphicImage&gt;</code>, the <code>value</code> attribute is <strong>ignored</strong>
  * when the <code>name</code> attribute is specified (for JSF resources).
  *
  * @author Bauke Scholtz
