@@ -125,10 +125,12 @@ public class GraphicResource extends DynamicResource {
 	}
 
 	/**
-	 * Create a new graphic resource based on the given graphic image component.
+	 * Create a new graphic resource based on the given value expression.
 	 * This is called by {@link GraphicImage} component.
 	 * @param context The involved faces context.
-	 * @param component The graphic image component to create a new graphic resource for.
+	 * @param value The value expression representing content to create a new graphic resource for.
+	 * @param lastModified The "last modified" representation of the graphic resource, can be {@link Long} or
+	 * {@link Date}, or otherwise an attempt will be made to parse it as {@link Long}.
 	 * @return The new graphic resource.
 	 * @throws IllegalArgumentException When the "value" attribute of the given component is absent or does not
 	 * represent a method expression referring an existing method taking at least one argument.
