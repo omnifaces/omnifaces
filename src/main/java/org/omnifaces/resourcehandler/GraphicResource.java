@@ -12,7 +12,6 @@
  */
 package org.omnifaces.resourcehandler;
 
-import static java.lang.Boolean.TRUE;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static org.omnifaces.util.Faces.getContext;
@@ -38,7 +37,6 @@ import javax.el.ValueExpression;
 import javax.faces.FacesException;
 import javax.faces.application.Application;
 import javax.faces.application.Resource;
-import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.xml.bind.DatatypeConverter;
@@ -61,8 +59,6 @@ public class GraphicResource extends DynamicResource {
 	private static final String ERROR_INVALID_LASTMODIFIED =
 		"o:graphicImage 'lastModified' attribute must be an instance of Long or Date."
 			+ " Encountered an invalid value of '%s'.";
-	private static final String ERROR_MISSING_VALUE =
-		"o:graphicImage 'value' attribute is required.";
 	private static final String ERROR_UNKNOWN_METHOD =
 		"o:graphicImage 'value' attribute must refer an existing method."
 			+ " Encountered an unknown method of '%s'.";
@@ -137,17 +133,7 @@ public class GraphicResource extends DynamicResource {
 	 * @throws IllegalArgumentException When the "value" attribute of the given component is absent or does not
 	 * represent a method expression referring an existing method taking at least one argument.
 	 */
-	public static GraphicResource create(FacesContext context, GraphicImage component) {
-		ValueExpression value = component.getValueExpression("value");
-
-		if (value == null) {
-			throw new IllegalArgumentException(ERROR_MISSING_VALUE);
-		}
-
-		if (Boolean.valueOf(String.valueOf(component.getAttributes().get("dataURI"))) == TRUE) {
-			return new GraphicResource(component.getAttributes().get("value"));
-		}
-
+	public static GraphicResource create(FacesContext context, ValueExpression value, Object lastModified) {
 		MethodReference methodReference = ExpressionInspector.getMethodReference(context.getELContext(), value);
 
 		if (methodReference.getMethod() == null) {
@@ -168,8 +154,8 @@ public class GraphicResource extends DynamicResource {
 
 		String[] params = extractParams(value.getExpressionString());
 		Class<?>[] paramTypes = methodReference.getMethod().getParameterTypes();
-		String[] evaluatedParams = evaluateParams(context, component, params, paramTypes);
-		return new GraphicResource(name, evaluatedParams, component.getAttributes().get("lastModified"));
+		String[] evaluatedParams = evaluateParams(context, params, paramTypes);
+		return new GraphicResource(name, evaluatedParams, lastModified);
 	}
 
 	/**
@@ -267,7 +253,7 @@ public class GraphicResource extends DynamicResource {
 	 * registered on given parameter types.
 	 * @throws IllegalArgumentException When The length of given parameters doesn't match those of given types.
 	 */
-	private static String[] evaluateParams(FacesContext context, UIComponent component, String[] params, Class<?>[] paramTypes) {
+	private static String[] evaluateParams(FacesContext context, String[] params, Class<?>[] paramTypes) {
 		if (params.length != paramTypes.length) {
 			throw new IllegalArgumentException(String.format(ERROR_INVALID_PARAMS, Arrays.toString(params)));
 		}
@@ -279,7 +265,7 @@ public class GraphicResource extends DynamicResource {
 			Object value = application.evaluateExpressionGet(context, "#{" + params[i] + "}", paramTypes[i]);
 			Converter converter = application.createConverter(paramTypes[i]);
 			evaluatedParams[i] = (converter != null)
-				? converter.getAsString(context, component, value)
+				? converter.getAsString(context, DUMMY_COMPONENT, value)
 				: (value != null) ? value.toString() : "";
 		}
 

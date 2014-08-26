@@ -23,6 +23,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.el.ValueExpression;
 import javax.faces.application.Application;
 import javax.faces.application.Resource;
 import javax.faces.component.FacesComponent;
@@ -108,6 +109,8 @@ public class GraphicImage extends HtmlGraphicImage {
 		return Collections.unmodifiableMap(attributeNames);
 	}
 
+	private static final String ERROR_MISSING_VALUE = "o:graphicImage 'value' attribute is required.";
+
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
@@ -140,18 +143,35 @@ public class GraphicImage extends HtmlGraphicImage {
 	 * Returns the URL needed for the 'src' attribute.
 	 * @param context The involved faces context.
 	 * @return The URL needed for the 'src' attribute.
+	 * @throws IOException When something fails at I/O level.
 	 */
-	protected String getSrc(FacesContext context) {
+	protected String getSrc(FacesContext context) throws IOException {
 		String name = (String) getAttributes().get("name");
-		String library = (String) getAttributes().get("library");
+		boolean dataURI = Boolean.valueOf(String.valueOf(getAttributes().get("dataURI")));
 
 		Resource resource = null;
 
 		if (name != null) {
+			String library = (String) getAttributes().get("library");
 			resource = context.getApplication().getResourceHandler().createResource(name, library);
+
+			if (dataURI && resource.getContentType().startsWith("image")) {
+				resource = new GraphicResource(resource.getInputStream());
+			}
 		}
 		else {
-			resource = GraphicResource.create(context, this);
+			ValueExpression value = getValueExpression("value");
+
+			if (value == null) {
+				throw new IllegalArgumentException(ERROR_MISSING_VALUE);
+			}
+
+			if (dataURI) {
+				resource = new GraphicResource(value.getValue(context.getELContext()));
+			}
+			else {
+				resource = GraphicResource.create(context, value, getAttributes().get("lastModified"));
+			}
 		}
 
 		if (resource != null) {
