@@ -326,6 +326,19 @@ public final class Utils {
 	}
 
 	/**
+	 * Read the given input stream into a byte array.
+	 * @param input The input stream.
+	 * @return The input stream as a byte array.
+	 * @throws IOException When an I/O error occurs.
+	 * @since 2.0
+	 */
+	public static byte[] toByteArray(InputStream input) throws IOException {
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		stream(input, output);
+		return output.toByteArray();
+	}
+
+	/**
 	 * Check if the given resource is not <code>null</code> and then close it, whereby any caught {@link IOException}
 	 * is been returned instead of thrown, so that the caller can if necessary handle (log) or just ignore it without
 	 * the need to put another try-catch.
@@ -580,9 +593,7 @@ public final class Utils {
 		try {
 			String base64 = string.replace('-', '+').replace('_', '/').replace('~', '=');
 			InputStream deflated = new ByteArrayInputStream(DatatypeConverter.parseBase64Binary(base64));
-			ByteArrayOutputStream raw = new ByteArrayOutputStream();
-			stream(new InflaterInputStream(deflated), raw);
-			return new String(raw.toByteArray(), UTF_8);
+			return new String(toByteArray(new InflaterInputStream(deflated)), UTF_8);
 		}
 		catch (UnsupportedEncodingException e) {
 			// This will occur when UTF-8 is not supported, but this is not to be expected these days.

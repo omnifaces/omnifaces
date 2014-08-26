@@ -20,10 +20,9 @@ import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isNumber;
 import static org.omnifaces.util.Utils.isOneAnnotationPresent;
-import static org.omnifaces.util.Utils.stream;
+import static org.omnifaces.util.Utils.toByteArray;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
@@ -182,9 +181,7 @@ public class GraphicResource extends DynamicResource {
 
 		try {
 			if (content instanceof InputStream) {
-				ByteArrayOutputStream output = new ByteArrayOutputStream();
-				stream((InputStream) content, output);
-				bytes = output.toByteArray();
+				bytes = toByteArray((InputStream) content);
 			}
 			else if (content instanceof byte[]) {
 				bytes = (byte[]) content;
