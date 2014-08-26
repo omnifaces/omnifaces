@@ -36,6 +36,7 @@ import javax.faces.validator.Validator;
 import javax.inject.Inject;
 
 import org.omnifaces.application.OmniApplication;
+import org.omnifaces.application.OmniApplicationFactory;
 
 /**
  * <p>
@@ -63,6 +64,7 @@ import org.omnifaces.application.OmniApplication;
  * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz
  * @see OmniApplication
+ * @see OmniApplicationFactory
  * @since 1.6
  */
 @ApplicationScoped

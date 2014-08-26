@@ -28,6 +28,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.omnifaces.servlet.GzipHttpServletResponse;
+import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
 
 /**
  * <p>
@@ -107,6 +108,8 @@ import org.omnifaces.servlet.GzipHttpServletResponse;
  *
  * @author Bauke Scholtz
  * @since 1.1
+ * @see GzipHttpServletResponse
+ * @see HttpServletResponseOutputWrapper
  */
 public class GzipResponseFilter extends HttpFilter {
 

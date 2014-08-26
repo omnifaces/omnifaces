@@ -29,6 +29,7 @@ import javax.enterprise.context.NormalScope;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
 
+import org.omnifaces.application.ViewScopeEventListener;
 import org.omnifaces.cdi.viewscope.ViewScopeContext;
 import org.omnifaces.cdi.viewscope.ViewScopeExtension;
 import org.omnifaces.cdi.viewscope.ViewScopeManager;
@@ -90,6 +91,7 @@ import org.omnifaces.cdi.viewscope.ViewScopeManager;
  * @see ViewScopeExtension
  * @see ViewScopeContext
  * @see ViewScopeManager
+ * @see ViewScopeEventListener
  * @since 1.6
  */
 @Inherited

@@ -112,6 +112,7 @@ import org.omnifaces.util.State;
  *
  * @author Bauke Scholtz
  * @since 1.5
+ * @see MessagesRenderer
  */
 @FacesComponent(OmniMessages.COMPONENT_TYPE)
 public class OmniMessages extends HtmlMessages {

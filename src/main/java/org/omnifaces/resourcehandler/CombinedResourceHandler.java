@@ -163,6 +163,11 @@ import org.omnifaces.util.Hacks;
  * automatically be added to the set of excluded resources.
  *
  * @author Bauke Scholtz
+ * @see CombinedResource
+ * @see CombinedResourceInfo
+ * @see CombinedResourceInputStream
+ * @see DefaultResource
+ * @see DefaultResourceHandler
  */
 public class CombinedResourceHandler extends DefaultResourceHandler implements SystemEventListener {
 

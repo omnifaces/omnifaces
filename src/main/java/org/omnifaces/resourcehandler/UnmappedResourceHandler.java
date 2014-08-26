@@ -106,6 +106,8 @@ import org.omnifaces.util.Hacks;
  *
  * @author Bauke Scholtz
  * @since 1.4
+ * @see DefaultResource
+ * @see DefaultResourceHandler
  */
 public class UnmappedResourceHandler extends DefaultResourceHandler {
 

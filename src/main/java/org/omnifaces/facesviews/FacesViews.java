@@ -90,6 +90,10 @@ import org.omnifaces.config.WebXml;
  * aforementioned <a href="http://ocpsoft.org/prettyfaces">PrettyFaces</a>.
  *
  * @author Arjan Tijms
+ * @see FacesViewsForwardingFilter
+ * @see FacesViewsViewHandler
+ * @see FacesViewsViewHandlerInstaller
+ * @see FacesViewsResolver
  */
 public final class FacesViews {
 

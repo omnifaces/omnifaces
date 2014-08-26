@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.omnifaces.servlet.BufferedHttpServletResponse;
+import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
 
 /**
  * <p>
@@ -37,6 +38,8 @@ import org.omnifaces.servlet.BufferedHttpServletResponse;
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz
+ * @see BufferedHttpServletResponse
+ * @see HttpServletResponseOutputWrapper
  */
 @FacesComponent(ResourceInclude.COMPONENT_TYPE)
 public class ResourceInclude extends OutputFamily {

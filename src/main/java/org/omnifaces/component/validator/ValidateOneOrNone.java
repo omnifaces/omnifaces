@@ -20,6 +20,8 @@ import javax.faces.component.FacesComponent;
 import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
 
+import org.omnifaces.validator.MultiFieldValidator;
+
 /**
  * <p>
  * The <code>&lt;o:validateOneOrNone&gt;</code> validates if ONLY ONE of the given {@link UIInput} components has been
@@ -32,6 +34,9 @@ import javax.faces.context.FacesContext;
  *
  * @author Bauke Scholtz
  * @since 1.2
+ * @see ValidateMultipleFields
+ * @see ValidatorFamily
+ * @see MultiFieldValidator
  */
 @FacesComponent(ValidateOneOrNone.COMPONENT_TYPE)
 public class ValidateOneOrNone extends ValidateMultipleFields {

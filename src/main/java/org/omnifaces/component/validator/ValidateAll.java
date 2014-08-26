@@ -20,6 +20,8 @@ import javax.faces.component.FacesComponent;
 import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
 
+import org.omnifaces.validator.MultiFieldValidator;
+
 /**
  * <p>
  * The <code>&lt;o:validateAll&gt;</code> validates if ALL of the given {@link UIInput} components have been filled out.
@@ -34,6 +36,9 @@ import javax.faces.context.FacesContext;
  *
  * @author Bauke Scholtz
  * @since 1.1
+ * @see ValidateMultipleFields
+ * @see ValidatorFamily
+ * @see MultiFieldValidator
  */
 @FacesComponent(ValidateAll.COMPONENT_TYPE)
 public class ValidateAll extends ValidateMultipleFields {

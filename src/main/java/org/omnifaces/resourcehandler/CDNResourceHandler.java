@@ -143,6 +143,8 @@ import javax.faces.application.ResourceHandler;
  *
  * @author Bauke Scholtz
  * @since 1.2
+ * @see DefaultResource
+ * @see DefaultResourceHandler
  */
 public class CDNResourceHandler extends DefaultResourceHandler {
 

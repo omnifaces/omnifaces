@@ -39,6 +39,7 @@ import javax.faces.event.SystemEvent;
 
 import org.omnifaces.component.output.cache.CacheFactory;
 import org.omnifaces.component.output.cache.CacheInitializer;
+import org.omnifaces.component.output.cache.el.CacheValue;
 import org.omnifaces.filter.OnDemandResponseBufferFilter;
 import org.omnifaces.servlet.BufferedHttpServletResponse;
 import org.omnifaces.util.Callback;
@@ -64,6 +65,7 @@ import org.omnifaces.util.State;
  *
  * @since 1.1
  * @author Arjan Tijms
+ * @see CacheValue
  */
 @FacesComponent(Cache.COMPONENT_TYPE)
 public class Cache extends OutputFamily {

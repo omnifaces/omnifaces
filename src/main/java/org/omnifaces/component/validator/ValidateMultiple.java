@@ -70,6 +70,9 @@ import org.omnifaces.validator.MultiFieldValidator;
  * @author Bauke Scholtz
  * @since 1.7
  * @see ValidateMultipleHandler
+ * @see ValidateMultipleFields
+ * @see ValidatorFamily
+ * @see MultiFieldValidator
  */
 @FacesComponent(ValidateMultiple.COMPONENT_TYPE)
 public class ValidateMultiple extends ValidateMultipleFields {

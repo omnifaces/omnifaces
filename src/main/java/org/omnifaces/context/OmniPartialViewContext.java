@@ -60,6 +60,7 @@ import org.omnifaces.util.Json;
  *
  * @author Bauke Scholtz
  * @since 1.2
+ * @see OmniPartialViewContextFactory
  */
 public class OmniPartialViewContext extends PartialViewContextWrapper {
 

@@ -67,6 +67,7 @@ import org.omnifaces.util.Messages;
  * </pre>
  *
  * @author Bauke Scholtz
+ * @see DeferredTagHandlerHelper
  */
 public class Validator extends ValidatorHandler implements DeferredTagHandler {
 

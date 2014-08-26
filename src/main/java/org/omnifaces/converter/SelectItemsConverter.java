@@ -17,6 +17,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 
+import org.omnifaces.util.selectitems.SelectItemsCollector;
 import org.omnifaces.util.selectitems.SelectItemsUtils;
 
 /**
@@ -83,6 +84,8 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
  * of the selected item in the list instead of the {@link #toString()} of the selected item.
  *
  * @author Arjan Tijms
+ * @see SelectItemsUtils
+ * @see SelectItemsCollector
  */
 @FacesConverter("omnifaces.SelectItemsConverter")
 public class SelectItemsConverter implements Converter {

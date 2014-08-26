@@ -128,6 +128,8 @@ import org.omnifaces.component.ParamHolder;
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz
+ * @see FacesLocal
+ * @see Servlets
  */
 public final class Faces {
 

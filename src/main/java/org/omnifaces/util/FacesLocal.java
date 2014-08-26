@@ -98,6 +98,7 @@ import org.omnifaces.component.ParamHolder;
  * @author Arjan Tijms
  * @author Bauke Scholtz
  * @since 1.6
+ * @see Servlets
  */
 public final class FacesLocal {
 

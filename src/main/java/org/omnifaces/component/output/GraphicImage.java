@@ -31,6 +31,8 @@ import javax.faces.component.html.HtmlGraphicImage;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 
+import org.omnifaces.resourcehandler.DefaultResourceHandler;
+import org.omnifaces.resourcehandler.DynamicResource;
 import org.omnifaces.resourcehandler.GraphicResource;
 import org.omnifaces.resourcehandler.GraphicResourceHandler;
 
@@ -132,7 +134,9 @@ import org.omnifaces.resourcehandler.GraphicResourceHandler;
  * @author Bauke Scholtz
  * @since 2.0
  * @see GraphicResource
+ * @see DynamicResource
  * @see GraphicResourceHandler
+ * @see DefaultResourceHandler
  */
 @FacesComponent(GraphicImage.COMPONENT_TYPE)
 public class GraphicImage extends HtmlGraphicImage {

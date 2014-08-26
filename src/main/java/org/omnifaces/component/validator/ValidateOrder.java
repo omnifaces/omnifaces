@@ -25,6 +25,7 @@ import javax.faces.context.FacesContext;
 
 import org.omnifaces.util.Callback;
 import org.omnifaces.util.State;
+import org.omnifaces.validator.MultiFieldValidator;
 
 /**
  * <p>
@@ -50,6 +51,9 @@ import org.omnifaces.util.State;
  * For general usage instructions, refer {@link ValidateMultipleFields} documentation.
  *
  * @author Bauke Scholtz
+ * @see ValidateMultipleFields
+ * @see ValidatorFamily
+ * @see MultiFieldValidator
  */
 @FacesComponent(ValidateOrder.COMPONENT_TYPE)
 @SuppressWarnings({ "unchecked", "rawtypes" }) // We don't care about the actual Comparable type.

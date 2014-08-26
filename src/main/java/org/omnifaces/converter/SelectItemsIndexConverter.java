@@ -25,6 +25,7 @@ import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
 import javax.faces.convert.FacesConverter;
 
+import org.omnifaces.util.selectitems.SelectItemsCollector;
 import org.omnifaces.util.selectitems.SelectItemsUtils;
 
 /**
@@ -64,6 +65,8 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
  * @author Patrick Dobler
  * @author Bauke Scholtz
  * @since 1.3
+ * @see SelectItemsUtils
+ * @see SelectItemsCollector
  */
 @FacesConverter("omnifaces.SelectItemsIndexConverter")
 public class SelectItemsIndexConverter implements Converter {

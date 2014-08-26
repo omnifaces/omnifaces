@@ -29,6 +29,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.PartialViewContext;
 
 import org.omnifaces.context.OmniPartialViewContext;
+import org.omnifaces.context.OmniPartialViewContextFactory;
 
 /**
  * <p>
@@ -50,6 +51,9 @@ import org.omnifaces.context.OmniPartialViewContext;
  *
  * @author Bauke Scholtz
  * @since 1.2
+ * @see Json
+ * @see OmniPartialViewContext
+ * @see OmniPartialViewContextFactory
  */
 public final class Ajax {
 

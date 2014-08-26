@@ -58,6 +58,7 @@ import org.omnifaces.util.Callback;
  * </pre>
  *
  * @author Bauke Scholtz
+ * @see BeanValidationEventListener
  */
 public class ValidateBean extends TagHandler {
 

@@ -31,7 +31,10 @@ import javax.servlet.ServletRequestListener;
 import javax.servlet.http.HttpSessionListener;
 
 import org.omnifaces.cdi.eager.EagerBeansFilter;
+import org.omnifaces.cdi.eager.EagerBeansPhaseListener;
+import org.omnifaces.cdi.eager.EagerBeansRepository;
 import org.omnifaces.cdi.eager.EagerBeansWebListener;
+import org.omnifaces.cdi.eager.EagerExtension;
 
 /**
  * <p>
@@ -148,6 +151,11 @@ import org.omnifaces.cdi.eager.EagerBeansWebListener;
  *
  * @since 1.8
  * @author Arjan Tijms
+ * @see EagerExtension
+ * @see EagerBeansRepository
+ * @see EagerBeansPhaseListener
+ * @see EagerBeansWebListener
+ * @see EagerBeansFilter
  *
  */
 @Retention(RUNTIME)

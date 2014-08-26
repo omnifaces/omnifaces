@@ -32,7 +32,9 @@ import javax.faces.event.PhaseId;
 
 import org.omnifaces.component.EditableValueHolderStateHelper;
 import org.omnifaces.event.FacesEventWrapper;
+import org.omnifaces.model.tree.AbstractTreeModel;
 import org.omnifaces.model.tree.ListTreeModel;
+import org.omnifaces.model.tree.SortedTreeModel;
 import org.omnifaces.model.tree.TreeModel;
 import org.omnifaces.util.Callback;
 import org.omnifaces.util.State;
@@ -68,8 +70,14 @@ import org.omnifaces.util.State;
  * </pre>
  *
  * @author Bauke Scholtz
- * @see TreeModel
  * @see TreeNode
+ * @see TreeNodeItem
+ * @see TreeInsertChildren
+ * @see TreeFamily
+ * @see TreeModel
+ * @see AbstractTreeModel
+ * @see ListTreeModel
+ * @see SortedTreeModel
  */
 @FacesComponent(Tree.COMPONENT_TYPE)
 @SuppressWarnings("rawtypes") // For TreeModel. We don't care about its actual type anyway.
