@@ -31,6 +31,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import javax.el.ValueExpression;
 import javax.faces.FacesException;
@@ -55,6 +56,18 @@ public class GraphicResource extends DynamicResource {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
+	private static final String DEFAULT_CONTENT_TYPE = "image";
+	private static final Pattern PATTERN_METHOD_EXPRESSION = Pattern.compile("#\\{.+\\..+\\(.+\\)\\}");
+	private static final Pattern PATTERN_METHOD_ARGUMENTS = Pattern.compile("\\s*,\\s*(?![^()]*+\\))");
+	private static final Map<String, MethodReference> ALLOWED_METHODS = new HashMap<>();
+	private static final GraphicImage DUMMY_COMPONENT = new GraphicImage();
+	private static final String[] EMPTY_PARAMS = new String[0];
+
+	@SuppressWarnings("unchecked")
+	private static final Class<? extends Annotation>[] REQUIRED_ANNOTATION_TYPES = new Class[] {
+		javax.faces.bean.ApplicationScoped.class, javax.enterprise.context.ApplicationScoped.class
+	};
+
 	private static final String ERROR_INVALID_LASTMODIFIED =
 		"o:graphicImage 'lastModified' attribute must be an instance of Long or Date."
 			+ " Encountered an invalid value of '%s'.";
@@ -71,15 +84,6 @@ public class GraphicResource extends DynamicResource {
 		"o:graphicImage 'value' attribute must specify valid method parameters."
 			+ " Encountered invalid method parameters '%s'.";
 
-	@SuppressWarnings("unchecked")
-	private static final Class<? extends Annotation>[] REQUIRED_ANNOTATION_TYPES = new Class[] {
-		javax.faces.bean.ApplicationScoped.class, javax.enterprise.context.ApplicationScoped.class
-	};
-
-	private static final Map<String, MethodReference> ALLOWED_METHODS = new HashMap<>();
-	private static final GraphicImage DUMMY_COMPONENT = new GraphicImage();
-	private static final String[] EMPTY_PARAMS = new String[0];
-
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private Object content;
@@ -92,7 +96,7 @@ public class GraphicResource extends DynamicResource {
 	 * @param content The graphic resource content, to be represented as data URI.
 	 */
 	public GraphicResource(Object content) {
-		super("", GraphicResourceHandler.LIBRARY_NAME, "image");
+		super("", GraphicResourceHandler.LIBRARY_NAME, DEFAULT_CONTENT_TYPE);
 		this.content = content;
 	}
 
@@ -106,7 +110,7 @@ public class GraphicResource extends DynamicResource {
 	 * @throws IllegalArgumentException If "last modified" can not be parsed to a timestamp.
 	 */
 	public GraphicResource(String name, String[] params, Object lastModified) {
-		super(name, GraphicResourceHandler.LIBRARY_NAME, "image");
+		super(name, GraphicResourceHandler.LIBRARY_NAME, DEFAULT_CONTENT_TYPE);
 		this.params = coalesce(params, EMPTY_PARAMS);
 
 		if (lastModified instanceof Long) {
@@ -168,7 +172,8 @@ public class GraphicResource extends DynamicResource {
 			return getDataURI();
 		}
 		else {
-			return super.getRequestPath() + (isEmpty(params) ? "" : ("&" + toQueryString(singletonMap("p", asList(params)))));
+			String queryString = isEmpty(params) ? "" : ("&" + toQueryString(singletonMap("p", asList(params))));
+			return super.getRequestPath() + queryString;
 		}
 	}
 
@@ -194,7 +199,7 @@ public class GraphicResource extends DynamicResource {
 			throw new FacesException(e);
 		}
 
-		return "data:image;base64," + DatatypeConverter.printBase64Binary(bytes);
+		return "data:" + getContentType() + ";base64," + DatatypeConverter.printBase64Binary(bytes);
 	}
 
 	@Override
@@ -239,8 +244,9 @@ public class GraphicResource extends DynamicResource {
 	 * This returns an empty array when none is found.
 	 */
 	private static String[] extractParams(String expression) {
-		if (expression.matches("#\\{.+\\..+\\(.+\\)\\}")) { // "Does it look like #{bean.method(...)}?". True, not a super exact match, but all others cause EL exception anyway before ever hitting this method.
-			return expression.substring(expression.indexOf('(') + 1, expression.lastIndexOf(')')).split("\\s*,\\s*(?![^()]*+\\))"); // "Split on comma as long as comma isn't inside parentheses".
+		if (PATTERN_METHOD_EXPRESSION.matcher(expression).matches()) { // "Does it look like #{bean.method(...)}?". True, not a super exact match, but all others cause EL exception anyway before ever hitting this method.
+			String params = expression.substring(expression.indexOf('(') + 1, expression.lastIndexOf(')'));
+			return PATTERN_METHOD_ARGUMENTS.split(params); // "Split on comma as long as comma isn't inside parentheses".
 		}
 		else {
 			return EMPTY_PARAMS;
