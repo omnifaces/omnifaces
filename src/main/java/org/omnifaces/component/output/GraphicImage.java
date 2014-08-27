@@ -52,8 +52,10 @@ import org.omnifaces.resourcehandler.GraphicResourceHandler;
  * </pre>
  * <p>
  * This basically renders the image inline in HTML output immediately during JSF render response phase. This approach
- * is not recommended for "large" images, ~10KB would typically be the max, even less so if there are more such images
- * on the same page.
+ * is very useful for a "preview" feature of uploaded images and works also in combination with view scoped beans. This
+ * approach is however <em>not</em> recommended for "permanent" and/or "large" images as it doesn't offer the browser
+ * any opportunity to cache the images for reuse, ~10KB would typically be the max even less so if there are more such
+ * images on the same page.
  *
  * <h3>Image streaming</h3>
  * <p>
