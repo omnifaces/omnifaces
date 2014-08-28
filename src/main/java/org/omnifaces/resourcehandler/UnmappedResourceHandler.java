@@ -113,18 +113,34 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
+	 * Delegate to {@link #createResource(String)} of the wrapped resource handler. If it returns
+	 * non-<code>null</code>, then return an unmapped resource.
+	 */
+	@Override
+	public Resource createResource(String resourceName) {
+		return unmapIfNecessary(super.createResource(resourceName));
+	}
+
+	/**
+	 * Delegate to {@link #createResource(String, String)} of the wrapped resource handler. If it returns
+	 * non-<code>null</code>, then return an unmapped resource.
+	 */
+	@Override
+	public Resource createResource(String resourceName, String libraryName) {
+		return unmapIfNecessary(super.createResource(resourceName, libraryName));
+	}
+
+	/**
 	 * Delegate to {@link #createResource(String, String, String)} of the wrapped resource handler. If it returns
 	 * non-<code>null</code>, then return a new instanceof {@link UnmappedResource}.
 	 */
 	@Override
 	public Resource createResource(String resourceName, String libraryName, String contentType) {
-		Resource resource = super.createResource(resourceName, libraryName, contentType);
+		return unmapIfNecessary(super.createResource(resourceName, libraryName, contentType));
+	}
 
-		if (resource == null) {
-			return null;
-		}
-
-		return new DefaultResource(resource) {
+	private static Resource unmapIfNecessary(Resource resource) {
+		return (resource == null) ? null : new DefaultResource(resource) {
 			@Override
 			public String getRequestPath() {
 				String path = getWrapped().getRequestPath();
