@@ -30,8 +30,8 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import javax.el.ValueExpression;
 import javax.faces.FacesException;
@@ -57,8 +57,6 @@ public class GraphicResource extends DynamicResource {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final String DEFAULT_CONTENT_TYPE = "image";
-	private static final Pattern PATTERN_METHOD_EXPRESSION = Pattern.compile("#\\{.+\\..+\\(.+\\)\\}");
-	private static final Pattern PATTERN_METHOD_ARGUMENTS = Pattern.compile("\\s*,\\s*(?![^()]*+\\))");
 	private static final Map<String, MethodReference> ALLOWED_METHODS = new HashMap<>();
 	private static final GraphicImage DUMMY_COMPONENT = new GraphicImage();
 	private static final String[] EMPTY_PARAMS = new String[0];
@@ -156,11 +154,12 @@ public class GraphicResource extends DynamicResource {
 
 			ALLOWED_METHODS.put(name, methodReference);
 		}
-
-		String[] params = extractParams(value.getExpressionString());
-		Class<?>[] paramTypes = methodReference.getMethod().getParameterTypes();
-		String[] evaluatedParams = evaluateParams(context, params, paramTypes);
-		return new GraphicResource(name, evaluatedParams, lastModified);
+		
+		return new GraphicResource(
+			name, 
+			convertToStrings(context, methodReference.getActualParameters(), methodReference.getMethodInfo().getParamTypes()), 
+			lastModified
+		);
 	}
 
 	/**
@@ -238,43 +237,25 @@ public class GraphicResource extends DynamicResource {
 	private static String getResourceName(MethodReference methodReference) {
 		return methodReference.getBase().getClass().getSimpleName() + "_" + methodReference.getMethod().getName();
 	}
-
-	/**
-	 * Extract the individual method parameters from the given EL expression.
-	 * This returns an empty array when none is found.
-	 */
-	private static String[] extractParams(String expression) {
-		if (PATTERN_METHOD_EXPRESSION.matcher(expression).matches()) { // "Does it look like #{bean.method(...)}?". True, not a super exact match, but all others cause EL exception anyway before ever hitting this method.
-			String params = expression.substring(expression.indexOf('(') + 1, expression.lastIndexOf(')'));
-			return PATTERN_METHOD_ARGUMENTS.split(params); // "Split on comma as long as comma isn't inside parentheses".
-		}
-		else {
-			return EMPTY_PARAMS;
-		}
-	}
-
-	/**
-	 * Evaluate the given individual method parameters and convert them to HTTP request parameters using converters
-	 * registered on given parameter types.
-	 * @throws IllegalArgumentException When The length of given parameters doesn't match those of given types.
-	 */
-	private static String[] evaluateParams(FacesContext context, String[] params, Class<?>[] paramTypes) {
-		if (params.length != paramTypes.length) {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_PARAMS, Arrays.toString(params)));
+	
+	private static String[] convertToStrings(FacesContext context, List<Object> params, Class<?>[] paramTypes) {
+		if (params.size() != paramTypes.length) {
+			throw new IllegalArgumentException(String.format(ERROR_INVALID_PARAMS, params));
 		}
 
-		String[] evaluatedParams = new String[params.length];
+		String[] stringParams = new String[params.size()];
 		Application application = context.getApplication();
 
-		for (int i = 0; i < params.length; i++) {
-			Object value = application.evaluateExpressionGet(context, "#{" + params[i] + "}", paramTypes[i]);
+		for (int i = 0; i < params.size(); i++) {
+			Object value = params.get(i);
 			Converter converter = application.createConverter(paramTypes[i]);
-			evaluatedParams[i] = (converter != null)
+			
+			stringParams[i] = (converter != null)
 				? converter.getAsString(context, DUMMY_COMPONENT, value)
 				: (value != null) ? value.toString() : "";
 		}
 
-		return evaluatedParams;
+		return stringParams;
 	}
 
 	/**

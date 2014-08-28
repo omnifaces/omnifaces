@@ -13,6 +13,7 @@
 package org.omnifaces.el;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -39,7 +40,10 @@ public class MethodReference {
 		this.method = method;
 		if (actualParameters != null) {
 			this.actualParameters = asList(actualParameters);
+		} else {
+			this.actualParameters = emptyList();
 		}
+		
 		this.fromMethod = fromMethod;
 		
 		methodInfo =  new MethodInfo(method.getName(), method.getReturnType(), method.getParameterTypes());
