@@ -52,9 +52,25 @@ public class ExpressionInspector {
 	 * @return a MethodReference holding the final base and Method where the value expression evaluated to.
 	 */
 	public static MethodReference getMethodReference(ELContext context, ValueExpression valueExpression) {
-		ValueReference valueReference = getValueReference(context, valueExpression);
+		InspectorElContext inspectorElContext = new InspectorElContext(context);
 
-		return new MethodReference(valueReference.getBase(), findMethod(valueReference.getBase(), valueReference.getProperty().toString()));
+		
+		if (valueExpression.getType(inspectorElContext) != InspectorElContext.class) {
+			
+			// The EL implementation has shortcutted the chain, likely because it
+			// discovered the final target was a method. E.g.
+			// #{a.b.c().d.f('1')}
+			// If everything went well, we do have the length of the chain now.
+			
+			// Flag that indicated that we now resolve the entire chain, so we
+			// can capture the last element (the special resolver makes sure that
+			// we don't actually invoke the last element)
+			inspectorElContext.setFindOneButLast(false);
+			
+			valueExpression.getValue(inspectorElContext);
+		}
+		
+		return new MethodReference(inspectorElContext.getBase(), findMethod(inspectorElContext.getBase(), inspectorElContext.getProperty().toString()));
 	}
 
 	/**
@@ -167,7 +183,9 @@ public class ExpressionInspector {
 			lastProperty = property;
 
 			context.setPropertyResolved(true);
-			return null;
+			
+			// Special value to signal that getType() has actually been called.
+			return InspectorElContext.class;
 		}
 
 		private boolean recordCall(Object base, Object property) {
