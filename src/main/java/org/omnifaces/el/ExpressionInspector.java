@@ -34,6 +34,7 @@ public class ExpressionInspector {
 	public static ValueReference getValueReference(ELContext context, ValueExpression valueExpression) {
 
 		InspectorElContext inspectorElContext = new InspectorElContext(context);
+		inspectorElContext.setFindOneButLast(false); // TODO: or use same approach as getMethodReference?
 
 		valueExpression.getType(inspectorElContext);
 
@@ -41,11 +42,11 @@ public class ExpressionInspector {
 	}
 
 	/**
-	 * Gets a MethodReference from a ValueExpression. This assumes that this expression references a method.
+	 * Gets a MethodReference from a ValueExpression. If the ValueExpression refers to a method, this will
+	 * contain the actual method. If it refers to a property, this will contain the corresponding getter method.
 	 * <p>
-	 * Note that the method reference contains <em>a</em> method with the name the expression refers to.
-	 * Overloads are not supported.
-	 *
+	 * Note that in case the expression refers to a method, the method reference contains <em>a</em> method with 
+	 * the name the expression refers to. Overloads are not supported.
 	 *
 	 * @param context the context of this evaluation
 	 * @param valueExpression the value expression being evaluated
@@ -54,23 +55,31 @@ public class ExpressionInspector {
 	public static MethodReference getMethodReference(ELContext context, ValueExpression valueExpression) {
 		InspectorElContext inspectorElContext = new InspectorElContext(context);
 
+		// Invoke getType() on the value expression to have the expression chain resolved.
+		// The InspectorElContext contains a special resolver that will record the one but last
+		// base and property. The EL implementation may shortcut the chain when it
+		// discovers the final target was a method. E.g. #{a.b.c().d.f('1')}
+		// In that case too, the result will be that the inspectorElContext contains the 
+		// one but last base and property, and the length of the expression chain.
+		valueExpression.getType(inspectorElContext);
 		
-		if (valueExpression.getType(inspectorElContext) != InspectorElContext.class) {
-			
-			// The EL implementation has shortcutted the chain, likely because it
-			// discovered the final target was a method. E.g.
-			// #{a.b.c().d.f('1')}
-			// If everything went well, we do have the length of the chain now.
-			
-			// Flag that indicated that we now resolve the entire chain, so we
-			// can capture the last element (the special resolver makes sure that
-			// we don't actually invoke the last element)
-			inspectorElContext.setFindOneButLast(false);
-			
-			valueExpression.getValue(inspectorElContext);
-		}
+		// If everything went well, we thus have the length of the chain now.
 		
-		return new MethodReference(inspectorElContext.getBase(), findMethod(inspectorElContext.getBase(), inspectorElContext.getProperty().toString()));
+		// Flag that indicates that we now want to resolve the entire chain, so we
+		// can capture the last element (the special resolver makes sure that
+		// we don't actually invoke that last element)
+		inspectorElContext.setFindOneButLast(false);
+		
+		// Calling getValue() will cause getValue() to be called on the resolver in case the
+		// value expresses referred to a property, and invoke() when it's a method.
+		ValueExpressionType type = (ValueExpressionType) valueExpression.getValue(inspectorElContext);
+		
+		return new MethodReference(
+			inspectorElContext.getBase(), 
+			findMethod(inspectorElContext.getBase(), inspectorElContext.getProperty().toString()),
+			inspectorElContext.getParams(),
+			type == ValueExpressionType.METHOD
+		);
 	}
 
 	/**
@@ -94,6 +103,15 @@ public class ExpressionInspector {
 		}
 
 		return null;
+	}
+	
+	/**
+	 * Types of a value expression
+	 *
+	 */
+	private enum ValueExpressionType {
+		METHOD,  // Value expression that refers to a method, e.g. #{foo.bar(1)}
+		PROPERTY // Value expression that refers to a property, e.g. #{foo.bar}
 	}
 
 	/**
@@ -130,6 +148,10 @@ public class ExpressionInspector {
 		public Object getProperty() {
 			return inspectorElResolver.getProperty();
 		}
+		
+		public Object[] getParams() {
+			return inspectorElResolver.getParams();
+		}
 
 	}
 
@@ -143,7 +165,8 @@ public class ExpressionInspector {
 		private int findOneButLastCallCount;
 		private int findLastCallCount;
 		private Object lastBase;
-		private Object lastProperty;
+		private Object lastProperty; // Method name in case VE referenced a method, otherwise property name
+		private Object[] lastParams; 	// Actual parameters supplied to a method (if any)
 
 		private boolean findOneButLast = true;
 
@@ -159,7 +182,8 @@ public class ExpressionInspector {
 			}
 
 			context.setPropertyResolved(true);
-			return null;
+			
+			return ValueExpressionType.PROPERTY;
 		}
 
 		@Override
@@ -167,20 +191,32 @@ public class ExpressionInspector {
 
 			if (recordCall(base, method)) {
 				return super.invoke(context, base, method, paramTypes, params);
+			} else {
+				lastParams = params;
 			}
 
 			context.setPropertyResolved(true);
-			return null;
+			return ValueExpressionType.METHOD;
 		}
 
 		@Override
 		public Class<?> getType(ELContext context, Object base, Object property) {
 
-			// getType is only called on the last element in the chain, so this immediately gives
-			// us our targets.
+			// getType is only called on the last element in the chain (if the EL
+			// implementation actually calls this, which might not be the case if the
+			// value expression references a method)
+			// We thus do know the size of the chain now, and the lastBase and lastProperty
+			// that were set before this call are the one but last now.
 
-			lastBase = base;
-			lastProperty = property;
+			if (!findOneButLast) {
+				// If findOneButLast is set to false and ValueExpression#getType() is called,
+				// it will immediately give us the final lastBase and lastProperty when the
+				// ValueExpression is guaranteed to reference a property. If it references
+				// a method instead it's up to the EL implementation what happens. 
+				// UEL (Sun/GlassFish) 3.0 will NOT do the final getType() call in that case.
+				lastBase = base;
+				lastProperty = property;
+			}
 
 			context.setPropertyResolved(true);
 			
@@ -248,6 +284,10 @@ public class ExpressionInspector {
 
 		public Object getProperty() {
 			return lastProperty;
+		}
+		
+		public Object[] getParams() {
+			return lastParams;
 		}
 
 	}

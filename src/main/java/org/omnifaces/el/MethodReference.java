@@ -12,7 +12,12 @@
  */
 package org.omnifaces.el;
 
+import static java.util.Arrays.asList;
+
 import java.lang.reflect.Method;
+import java.util.List;
+
+import javax.el.MethodInfo;
 
 /**
  * This encapsulates a base model object and one of its methods.
@@ -23,10 +28,21 @@ public class MethodReference {
 
 	private Object base;
 	private Method method;
+	private List<Object> actualParameters;
+	// True if this method reference is from an actual method and not the getter from a property.
+	boolean fromMethod;
+	private MethodInfo methodInfo; 
+	
 
-	public MethodReference(Object base, Method method) {
+	public MethodReference(Object base, Method method, Object[] actualParameters, boolean fromMethod) {
 		this.base = base;
 		this.method = method;
+		if (actualParameters != null) {
+			this.actualParameters = asList(actualParameters);
+		}
+		this.fromMethod = fromMethod;
+		
+		methodInfo =  new MethodInfo(method.getName(), method.getReturnType(), method.getParameterTypes());
 	}
 
 	public Object getBase() {
@@ -35,6 +51,18 @@ public class MethodReference {
 
 	public Method getMethod() {
 		return method;
+	}
+	
+	public List<Object> getActualParameters() {
+		return actualParameters;
+	}
+
+	public boolean isFromMethod() {
+		return fromMethod;
+	}
+
+	public MethodInfo getMethodInfo() {
+		return methodInfo;
 	}
 
 }
