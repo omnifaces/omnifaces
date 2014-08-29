@@ -23,6 +23,8 @@ import javax.el.MethodInfo;
  * @since 1.4
  */
 public class MethodReference {
+    
+    public final static Object[] NO_PARAMS = new Object[0]; 
 
 	private Object base;
 	private Method method;
@@ -33,7 +35,7 @@ public class MethodReference {
 	public MethodReference(Object base, Method method, Object[] actualParameters, boolean fromMethod) {
 		this.base = base;
 		this.method = method;
-		this.actualParameters = (actualParameters != null) ? actualParameters : new Object[0];
+		this.actualParameters = (actualParameters != null) ? actualParameters : NO_PARAMS;
 		this.fromMethod = fromMethod;
 		methodInfo =  new MethodInfo(method.getName(), method.getReturnType(), method.getParameterTypes());
 	}
