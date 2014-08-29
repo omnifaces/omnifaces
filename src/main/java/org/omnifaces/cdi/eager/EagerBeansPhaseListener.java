@@ -16,7 +16,7 @@
 package org.omnifaces.cdi.eager;
 
 import static javax.faces.event.PhaseId.RESTORE_VIEW;
-import static org.omnifaces.util.Faces.getViewId;
+import static org.omnifaces.util.FacesLocal.getViewId;
 
 import javax.faces.event.PhaseEvent;
 
@@ -47,7 +47,7 @@ public class EagerBeansPhaseListener extends DefaultPhaseListener {
 
 	@Override
 	public void afterPhase(PhaseEvent event) {
-		eagerBeansRepository.instantiateByViewID(getViewId());
+		eagerBeansRepository.instantiateByViewID(getViewId(event.getFacesContext()));
 	}
 
 }
