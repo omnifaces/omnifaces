@@ -201,6 +201,7 @@ public class ExpressionInspector {
 		private Object lastBase;
 		private Object lastProperty; // Method name in case VE referenced a method, otherwise property name
 		private Object[] lastParams; 	// Actual parameters supplied to a method (if any)
+		private boolean subchainResolving;
 
 		private boolean findOneButLast = true;
 
@@ -210,6 +211,18 @@ public class ExpressionInspector {
 
 		@Override
 		public Object getValue(ELContext context, Object base, Object property) {
+		    
+		    if (!findOneButLast && base == null && findLastCallCount > 0) {
+		        subchainResolving = true;
+            }
+		    
+		    if (subchainResolving && base != null && base.equals(lastProperty)) {
+		        subchainResolving = false;
+		    }
+		    
+		    if (subchainResolving) {
+		        return super.getValue(context, base, property);
+		    }
 
 			if (recordCall(base, property)) {
 				return super.getValue(context, base, property);
@@ -222,7 +235,7 @@ public class ExpressionInspector {
 
 		@Override
 		public Object invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
-
+		    
 			if (recordCall(base, method)) {
 				return super.invoke(context, base, method, paramTypes, params);
 			} else {
