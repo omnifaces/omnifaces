@@ -30,7 +30,6 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.el.ValueExpression;
@@ -154,12 +153,10 @@ public class GraphicResource extends DynamicResource {
 
 			ALLOWED_METHODS.put(name, methodReference);
 		}
-		
-		return new GraphicResource(
-			name, 
-			convertToStrings(context, methodReference.getActualParameters(), methodReference.getMethodInfo().getParamTypes()), 
-			lastModified
-		);
+
+		Object[] params = methodReference.getActualParameters();
+		String[] convertedParams = convertToStrings(context, params, methodReference.getMethod().getParameterTypes());
+		return new GraphicResource(name, convertedParams, lastModified);
 	}
 
 	/**
@@ -211,7 +208,7 @@ public class GraphicResource extends DynamicResource {
 
 		try {
 			Method method = methodReference.getMethod();
-			Object[] convertedParams = convertParams(getContext(), params, method.getParameterTypes());
+			Object[] convertedParams = convertToObjects(getContext(), params, method.getParameterTypes());
 			Object content = method.invoke(methodReference.getBase(), convertedParams);
 
 			if (content instanceof InputStream) {
@@ -237,48 +234,51 @@ public class GraphicResource extends DynamicResource {
 	private static String getResourceName(MethodReference methodReference) {
 		return methodReference.getBase().getClass().getSimpleName() + "_" + methodReference.getMethod().getName();
 	}
-	
-	private static String[] convertToStrings(FacesContext context, List<Object> params, Class<?>[] paramTypes) {
-		if (params.size() != paramTypes.length) {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_PARAMS, params));
-		}
 
-		String[] stringParams = new String[params.size()];
+	/**
+	 * Convert the given objects to strings using converters registered on given types.
+	 * @throws IllegalArgumentException When the length of given params doesn't match those of given types.
+	 */
+	private static String[] convertToStrings(FacesContext context, Object[] values, Class<?>[] types) {
+		validateParamLength(values, types);
+		String[] strings = new String[values.length];
 		Application application = context.getApplication();
 
-		for (int i = 0; i < params.size(); i++) {
-			Object value = params.get(i);
-			Converter converter = application.createConverter(paramTypes[i]);
-			
-			stringParams[i] = (converter != null)
+		for (int i = 0; i < values.length; i++) {
+			Object value = values[i];
+			Converter converter = application.createConverter(types[i]);
+			strings[i] = (converter != null)
 				? converter.getAsString(context, DUMMY_COMPONENT, value)
 				: (value != null) ? value.toString() : "";
 		}
 
-		return stringParams;
+		return strings;
 	}
 
 	/**
-	 * Convert the given HTTP request parameters back to objects using converters registered on given parameter types.
-	 * @throws IllegalArgumentException When The length of given parameters doesn't match those of given types.
+	 * Convert the given strings to objects using converters registered on given types.
+	 * @throws IllegalArgumentException When the length of given params doesn't match those of given types.
 	 */
-	private static Object[] convertParams(FacesContext context, String[] params, Class<?>[] paramTypes) {
-		if (params.length != paramTypes.length) {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_PARAMS, Arrays.toString(params)));
-		}
-
-		Object[] convertedParams = new Object[params.length];
+	private static Object[] convertToObjects(FacesContext context, String[] values, Class<?>[] types) {
+		validateParamLength(values, types);
+		Object[] objects = new Object[values.length];
 		Application application = context.getApplication();
 
-		for (int i = 0; i < params.length; i++) {
-			String param = isEmpty(params[i]) ? null : params[i];
-			Converter converter = application.createConverter(paramTypes[i]);
-			convertedParams[i] = (converter != null)
-				? converter.getAsObject(context, DUMMY_COMPONENT, param)
-				: param;
+		for (int i = 0; i < values.length; i++) {
+			String value = isEmpty(values[i]) ? null : values[i];
+			Converter converter = application.createConverter(types[i]);
+			objects[i] = (converter != null)
+				? converter.getAsObject(context, DUMMY_COMPONENT, value)
+				: value;
 		}
 
-		return convertedParams;
+		return objects;
+	}
+
+	private static void validateParamLength(Object[] params, Class<?>[] types) {
+		if (params.length != types.length) {
+			throw new IllegalArgumentException(String.format(ERROR_INVALID_PARAMS, Arrays.toString(params)));
+		}
 	}
 
 }
