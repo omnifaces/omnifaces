@@ -37,9 +37,9 @@ public class ExpressionInspector {
 	public static ValueReference getValueReference(ELContext context, ValueExpression valueExpression) {
 
 		InspectorElContext inspectorElContext = new InspectorElContext(context);
-		inspectorElContext.setFindOneButLast(false); // TODO: or use same approach as getMethodReference?
-
 		valueExpression.getType(inspectorElContext);
+		inspectorElContext.setPass(InspectorPass.PASS2_FIND_FINAL_NODE);
+		valueExpression.getValue(inspectorElContext);
 
 		return new ValueReference(inspectorElContext.getBase(), inspectorElContext.getProperty());
 	}
@@ -48,8 +48,11 @@ public class ExpressionInspector {
 	 * Gets a MethodReference from a ValueExpression. If the ValueExpression refers to a method, this will
 	 * contain the actual method. If it refers to a property, this will contain the corresponding getter method.
 	 * <p>
-	 * Note that in case the expression refers to a method, the method reference contains <em>a</em> method with 
-	 * the name the expression refers to. Overloads are not supported.
+	 * Note that in case the expression refers to a method, the method reference contains the method with 
+	 * the name the expression refers to, with a matching number of arguments and <i>a</i> match of types. 
+	 * Overloads with the same amount of parameters are supported, but if the actual arguments match with 
+	 * the types of multiple overloads (e.g. actual argument Long, overloads for Number and Long) a random
+	 * method will be chosen.
 	 *
 	 * @param context the context of this evaluation
 	 * @param valueExpression the value expression being evaluated
@@ -59,7 +62,7 @@ public class ExpressionInspector {
 		InspectorElContext inspectorElContext = new InspectorElContext(context);
 
 		// Invoke getType() on the value expression to have the expression chain resolved.
-		// The InspectorElContext contains a special resolver that will record the one but last
+		// The InspectorElContext contains a special resolver that will record the next to last
 		// base and property. The EL implementation may shortcut the chain when it
 		// discovers the final target was a method. E.g. #{a.b.c().d.f('1')}
 		// In that case too, the result will be that the inspectorElContext contains the 
@@ -68,18 +71,25 @@ public class ExpressionInspector {
 		
 		// If everything went well, we thus have the length of the chain now.
 		
-		// Flag that indicates that we now want to resolve the entire chain, so we
-		// can capture the last element (the special resolver makes sure that
+		// Indicate that we're now at pass 2 and want to resolve the entire chain. 
+		// We can then capture the last element (the special resolver makes sure that
 		// we don't actually invoke that last element)
-		inspectorElContext.setFindOneButLast(false);
+		inspectorElContext.setPass(InspectorPass.PASS2_FIND_FINAL_NODE);
 		
 		// Calling getValue() will cause getValue() to be called on the resolver in case the
 		// value expresses referred to a property, and invoke() when it's a method.
 		ValueExpressionType type = (ValueExpressionType) valueExpression.getValue(inspectorElContext);
 		
+		String methodName = inspectorElContext.getProperty().toString();
+		Object[] params = inspectorElContext.getParams();
+		if (type == ValueExpressionType.PROPERTY) {
+			methodName = "get" + capitalize(methodName); // support for "is"?
+			params = NO_PARAMS;
+		}
+		
 		return new MethodReference(
 			inspectorElContext.getBase(), 
-			findMethod(inspectorElContext.getBase(), inspectorElContext.getProperty().toString(), inspectorElContext.getParams()),
+			findMethod(inspectorElContext.getBase(), methodName, params),
 			inspectorElContext.getParams(),
 			type == ValueExpressionType.METHOD
 		);
@@ -132,10 +142,6 @@ public class ExpressionInspector {
 		    }
 		}
 
-		if (!methodName.startsWith("get")) {
-			return findMethod(base, "get" + capitalize(methodName), NO_PARAMS);
-		}
-
 		return null;
 	}
 	
@@ -146,6 +152,31 @@ public class ExpressionInspector {
 	private enum ValueExpressionType {
 		METHOD,  // Value expression that refers to a method, e.g. #{foo.bar(1)}
 		PROPERTY // Value expression that refers to a property, e.g. #{foo.bar}
+	}
+
+	/**
+	 * Due to the nature of how the EL Resolver and EL 3.0 ValueExpressions work, the final
+	 * node of a resolved expression chain has to be found in two passes.
+	 * 
+	 * <p>
+	 * In pass 1 the caller has to call {@link ValueExpression#getType(ELContext)} on the ValueExpression
+	 * in question. The EL Resolver will then be able to find the next to last node without risk of actually
+	 * invoking the final node (which is the node most likely to have an unwanted side-effect when from
+	 * the user's point of view called at random).
+	 * 
+	 * <p>
+	 * In pass 2 the caller has to call {@link ValueExpression#getValue(ELContext)} on the ValueExpression
+	 * in question. Using data obtained in pass 1, the EL Resolver will be able to find the final node again
+	 * without needing to actually invoke it. With the final node found, the EL resolver can capture the
+	 * base and property in case the final node represented a property, or the base, method and the actual
+	 * arguments for said method in case the final repesented a method.
+	 * 
+	 * @author arjan
+	 *
+	 */
+	private enum InspectorPass {
+		PASS1_FIND_NEXT_TO_LAST_NODE,
+		PASS2_FIND_FINAL_NODE
 	}
 
 	/**
@@ -166,13 +197,13 @@ public class ExpressionInspector {
 		public ELResolver getELResolver() {
 			return inspectorElResolver;
 		}
-
-		public boolean isFindOneButLast() {
-			return inspectorElResolver.isFindOneButLast();
+		
+		public InspectorPass getPass() {
+			return inspectorElResolver.getPass();
 		}
 
-		public void setFindOneButLast(boolean findOneButLast) {
-			inspectorElResolver.setFindOneButLast(findOneButLast);
+		public void setPass(InspectorPass pass) {
+			inspectorElResolver.setPass(pass);
 		}
 
 		public Object getBase() {
@@ -189,6 +220,18 @@ public class ExpressionInspector {
 
 	}
 
+	static class FinalBaseHolder {
+		private Object base;
+
+		public FinalBaseHolder(Object base) {
+			this.base = base;
+		}
+
+		public Object getBase() {
+			return base;
+		}
+	}
+	
 	/**
 	 * Custom EL Resolver that can be used for inspecting expressions by means of recording the calls
 	 * made on this resolved by the EL implementation.
@@ -196,14 +239,23 @@ public class ExpressionInspector {
 	 */
 	static class InspectorElResolver extends ELResolverWrapper {
 
-		private int findOneButLastCallCount;
-		private int findLastCallCount;
+		private int passOneCallCount;
+		private int passTwoCallCount;
+		
 		private Object lastBase;
 		private Object lastProperty; // Method name in case VE referenced a method, otherwise property name
-		private Object[] lastParams; 	// Actual parameters supplied to a method (if any)
+		private Object[] lastParams; // Actual parameters supplied to a method (if any)
+		
 		private boolean subchainResolving;
-
-		private boolean findOneButLast = true;
+		
+		// Marker holder via which we can track our last base. This should become
+		// the last base in a next iteration. This is needed because if the very last property is a
+		// method node with a variable, we can't track resolving that variable anymore since it will not have been processed by the
+		// getType() call of the first pass.
+		// E.g. a.b.c(var.foo())
+		private FinalBaseHolder finalBaseHolder;
+		
+		private InspectorPass pass = InspectorPass.PASS1_FIND_NEXT_TO_LAST_NODE;
 
 		public InspectorElResolver(ELResolver elResolver) {
 			super(elResolver);
@@ -211,39 +263,51 @@ public class ExpressionInspector {
 
 		@Override
 		public Object getValue(ELContext context, Object base, Object property) {
+			
+			if (base instanceof FinalBaseHolder) {
+				// If we get called with a FinalBaseHolder, which was set in the next to last node,
+				// we know we're done and can set the base and property as the final ones.
+				lastBase = ((FinalBaseHolder) base).getBase();
+				lastProperty = property;
+				
+				context.setPropertyResolved(true);
+				return ValueExpressionType.PROPERTY;
+			}
 		    
-		    if (!findOneButLast && base == null && findLastCallCount > 0) {
-		        subchainResolving = true;
-            }
-		    
-		    if (subchainResolving && base != null && base.equals(lastProperty)) {
-		        subchainResolving = false;
-		    }
+		    checkSubchainStarted(base);
 		    
 		    if (subchainResolving) {
 		        return super.getValue(context, base, property);
 		    }
 
-			if (recordCall(base, property)) {
-				return super.getValue(context, base, property);
-			}
-
-			context.setPropertyResolved(true);
-			
-			return ValueExpressionType.PROPERTY;
+		    recordCall(base, property);
+		    
+		    return wrapOutcomeIfNeeded(super.getValue(context, base, property));
 		}
 
 		@Override
 		public Object invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
-		    
-			if (recordCall(base, method)) {
-				return super.invoke(context, base, method, paramTypes, params);
-			} else {
+			
+			if (base instanceof FinalBaseHolder) {
+				// If we get called with a FinalBaseHolder, which was set in the next to last node,
+				// we know we're done and can set the base, method and params as the final ones.
+				lastBase = ((FinalBaseHolder) base).getBase();
+				lastProperty = method;
 				lastParams = params;
+				
+				context.setPropertyResolved(true);
+				return ValueExpressionType.METHOD;
 			}
-
-			context.setPropertyResolved(true);
-			return ValueExpressionType.METHOD;
+			
+			checkSubchainStarted(base);
+			
+			if (subchainResolving) {
+				return super.invoke(context, base, method, paramTypes, params);
+			}
+			
+			recordCall(base, method);
+			
+			return wrapOutcomeIfNeeded(super.invoke(context, base, method, paramTypes, params));
 		}
 
 		@Override
@@ -252,77 +316,100 @@ public class ExpressionInspector {
 			// getType is only called on the last element in the chain (if the EL
 			// implementation actually calls this, which might not be the case if the
 			// value expression references a method)
-			// We thus do know the size of the chain now, and the lastBase and lastProperty
-			// that were set before this call are the one but last now.
-
-			if (!findOneButLast) {
-				// If findOneButLast is set to false and ValueExpression#getType() is called,
-				// it will immediately give us the final lastBase and lastProperty when the
-				// ValueExpression is guaranteed to reference a property. If it references
-				// a method instead it's up to the EL implementation what happens. 
-				// UEL (Sun/GlassFish) 3.0 will NOT do the final getType() call in that case.
-				lastBase = base;
-				lastProperty = property;
-			}
+			//
+			// We thus do know the size of the chain now, and the "lastBase" and "lastProperty"
+			// that were set *before* this call are the next to last now.
+			//
+			// Alternatively, this method is NOT called by the EL implementation, but then
+			// "lastBase" and "lastProperty" are still the next to last.
+			//
+			// Independent of what the EL implementation does, "passOneCallCount" should thus represent
+			// the total size of the call chain minus 1. We use this in pass two to capture the
+			// final base, property/method and optionally parameters.
 
 			context.setPropertyResolved(true);
 			
-			// Special value to signal that getType() has actually been called.
+			// Special value to signal that getType() has actually been called (this value is
+			// not used by the algorithm now, but may be useful when debugging)
 			return InspectorElContext.class;
 		}
+		
+		private boolean isAtNextToLastNode() {
+			return passTwoCallCount == passOneCallCount;
+		}
+		
+		private void checkSubchainStarted(Object base) {
+		  if (pass == InspectorPass.PASS2_FIND_FINAL_NODE && base == null && isAtNextToLastNode()) {
+		    	// If "base" is null it means a new chain is being resolved.
+		        // The main expression chain likely has ended with a method that has one or more EL variables
+		    	// as parameters that now need to be resolved.
+		    	// E.g. a.b().c.d(var1)
+		    	subchainResolving = true;
+            }
+		}
 
-		private boolean recordCall(Object base, Object property) {
+		private void recordCall(Object base, Object property) {
+			
+			switch (pass) {
+				case PASS1_FIND_NEXT_TO_LAST_NODE:
+					
+					// In the first "find next to last" pass, we'll be collecting the next to last element
+					// in an expression.
+					// E.g. given the expression a.b().c.d, we'll end up with the base returned by b() and "c" as
+					// the last property.
 
-			if (findOneButLast) {
-
-				// In the first "findOneButLast" pass, we'll collecting the one but last element
-				// in an expression.
-				// E.g. given the expression a.b().c.d, we'll end up with the base returned by b() and "c" as
-				// the last property.
-
-				findOneButLastCallCount++;
-				lastBase = base;
-				lastProperty = property;
-			} else {
-
-				// In the second "findLast" pass, we'll collecting the final element
-				// in an expression. We need to make care that we're not actually calling / invoking
-				// that last element as it may have a side-effect that the user doesn't want to happen
-				// twice (like storing something in a DB etc).
-
-				findLastCallCount++;
-
-				if (findLastCallCount == findOneButLastCallCount) {
-
-					// We're at the same call count as the first phase ended with.
-					// If the chain has resolved the same, we should be dealing with the same base and property now
-
-					if (base != lastBase || property != lastProperty) {
-						System.out.print("Error! Not equal!"); // tmp
-					}
-
-				} else if (findLastCallCount == findOneButLastCallCount + 1) {
-
-					// We're at the (supposedly!) last element of our expression chain.
+					passOneCallCount++;
 					lastBase = base;
 					lastProperty = property;
+					
+					break;
+					
+				case PASS2_FIND_FINAL_NODE:
+					
+					// In the second "find final node" pass, we'll collecting the final node
+					// in an expression. We need to take care that we're not actually calling / invoking
+					// that last element as it may have a side-effect that the user doesn't want to happen
+					// twice (like storing something in a DB etc).
 
-					// Don't continue with the call, as we'll otherwise invoke the last element of the chain
-					// which has the possible side-effect.
-					return false;
-				}
+					passTwoCallCount++;
+
+					if (passTwoCallCount == passOneCallCount) {
+
+						// We're at the same call count as the first phase ended with.
+						// If the chain has resolved the same, we should be dealing with the same base and property now
+
+						if (base != lastBase || property != lastProperty) {
+							throw new IllegalStateException(
+								"First and second pass of resolver at call #" + passTwoCallCount + 
+								" resolved to different base or property.");
+						}
+
+					}
+					
+					break;
 			}
-
-			// Continue with the call, as we're on an intermediate node that's save to invoke multiple times.
-			return true;
+		}
+		
+		private Object wrapOutcomeIfNeeded(Object outcome) {
+			if (pass == InspectorPass.PASS2_FIND_FINAL_NODE && finalBaseHolder == null && isAtNextToLastNode()) {
+				// We're at the second pass and at the next to last node in the expression chain.
+				// "outcome" which we have just resolved should thus represent our final base.
+				
+				// Wrap our final base in a special class that we can recognize when the EL implementation
+				// invokes this resolver later again with it.
+				finalBaseHolder = new FinalBaseHolder(outcome);
+				return finalBaseHolder;
+			} 
+			
+			return outcome;
+		}
+		
+		public InspectorPass getPass() {
+			return pass;
 		}
 
-		public boolean isFindOneButLast() {
-			return findOneButLast;
-		}
-
-		public void setFindOneButLast(boolean findOneButLast) {
-			this.findOneButLast = findOneButLast;
+		public void setPass(InspectorPass pass) {
+			this.pass = pass;
 		}
 
 		public Object getBase() {
