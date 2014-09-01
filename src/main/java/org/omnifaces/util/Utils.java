@@ -53,11 +53,20 @@ import java.util.zip.InflaterInputStream;
 import javax.xml.bind.DatatypeConverter;
 
 /**
+ * <p>
  * Collection of general utility methods that do not fit in one of the more specific classes.
+ *
+ * <h3>This class is not listed in showcase! Should I use it?</h3>
+ * <p>
+ * This class is indeed intented for internal usage only. We won't add methods here on user request. We only add methods
+ * here once we encounter non-DRY code in OmniFaces codebase. The methods may be renamed/changed without notice.
+ * <p>
+ * We don't stop you from using it if you think you find it useful, but you'd really better pick e.g. Google Guava or
+ * perhaps the good 'ol Apache Commons. This Utils class exists because OmniFaces intends to be free of 3rd party
+ * dependencies.
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz
- *
  */
 public final class Utils {
 
