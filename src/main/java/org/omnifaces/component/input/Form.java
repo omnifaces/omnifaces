@@ -265,11 +265,9 @@ public class Form extends UIForm {
 
 				@Override
 				public ViewHandler getViewHandler() {
-					final ApplicationWrapper outer = this;
-
 					return new ViewHandlerWrapper() {
 
-						private final ViewHandler viewHandler = outer.getWrapped().getViewHandler();
+						private final ViewHandler viewHandler = application.getViewHandler();
 
 						/**
 						 * The actual method we're decorating in order to either include the view parameters into the

@@ -266,7 +266,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 			return new CombinedResource(resourceName);
 		}
 		else {
-			return getWrapped().createResource(resourceName, libraryName, contentType);
+			return super.createResource(resourceName, libraryName, contentType);
 		}
 	}
 

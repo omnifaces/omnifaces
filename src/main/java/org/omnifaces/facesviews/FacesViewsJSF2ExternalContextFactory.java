@@ -30,13 +30,13 @@ import javax.faces.context.ExternalContextWrapper;
  * like the {@link FacesViewsResolver} does.
  * <p>
  * <b>This is only needed for JSF 2.0 implementations and is not needed for JSF 2.1+.</b>
- * 
+ *
  * @since 1.6
  * @author Arjan Tijms
  *
  */
 public class FacesViewsJSF2ExternalContextFactory extends ExternalContextFactory {
-	
+
 	private ExternalContextFactory parent;
 
 	public FacesViewsJSF2ExternalContextFactory(ExternalContextFactory parent) {
@@ -52,34 +52,33 @@ public class FacesViewsJSF2ExternalContextFactory extends ExternalContextFactory
 	public ExternalContextFactory getWrapped() {
 		return parent;
 	}
-	
+
 	public static class FacesViewsJSF2ExternalContext extends ExternalContextWrapper {
-	    
+
 		private ExternalContext wrapped;
-	   
+
 	    public FacesViewsJSF2ExternalContext(ExternalContext wrapped) {
 	        this.wrapped = wrapped;
 	    }
-	    
+
 	    @Override
 	    public URL getResource(String path) throws MalformedURLException {
-	    	
-	    	  URL resource = getWrapped().getResource(getMappedPath(path));
+	    	  URL resource = super.getResource(getMappedPath(path));
 
 	          if (resource == null && isDevelopment()) {
 	          	// If "resource" is null it means it wasn't found. Check if the resource was dynamically added by
 	          	// scanning the faces-views location(s) again.
 	          	scanAndStoreViews(getServletContext());
-	          	resource = getWrapped().getResource(getMappedPath(path));
+	          	resource = super.getResource(getMappedPath(path));
 	          }
 
 	          return resource;
 	    }
-	    
+
 	    @Override
 	    public ExternalContext getWrapped() {
 	        return wrapped;
 	    }
 	}
-	
+
 }
