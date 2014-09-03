@@ -203,7 +203,7 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 	 */
 	@Override
 	public Resource createResource(String resourceName, String libraryName, String contentType) {
-		Resource resource = getWrapped().createResource(resourceName, libraryName, contentType);
+		Resource resource = super.createResource(resourceName, libraryName, contentType);
 
 		if (resource == null || (disabledParam != null && Boolean.valueOf(String.valueOf(evaluateExpressionGet(disabledParam))))) {
 			return resource;

@@ -129,7 +129,7 @@ public class ViewParam extends UIViewParameter {
 
 				private Object getLabel() {
 					// First check if our wrapped Map has the label
-					Object label = getWrapped().get("label");
+					Object label = super.get("label");
 					if (label == null || (label instanceof String && ((String) label).isEmpty())) {
 
 						// Next check if our outer component has a value expression for the label

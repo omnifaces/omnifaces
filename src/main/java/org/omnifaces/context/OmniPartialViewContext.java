@@ -92,15 +92,10 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 	@Override
 	public PartialResponseWriter getPartialResponseWriter() {
 		if (writer == null) {
-			writer = new OmniPartialResponseWriter(this, getWrapped().getPartialResponseWriter());
+			writer = new OmniPartialResponseWriter(this, super.getPartialResponseWriter());
 		}
 
 		return writer;
-	}
-
-	@Override
-	public void setPartialRequest(boolean isPartialRequest) {
-		getWrapped().setPartialRequest(isPartialRequest);
 	}
 
 	@Override

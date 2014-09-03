@@ -154,7 +154,7 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 		return (resource == null) ? null : new DefaultResource(resource) {
 			@Override
 			public String getRequestPath() {
-				String path = getWrapped().getRequestPath();
+				String path = super.getRequestPath();
 				String mapping = getMapping();
 
 				if (isPrefixMapping(mapping)) {
@@ -184,7 +184,7 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 		Resource resource = createResource(context);
 
 		if (resource == null) {
-			getWrapped().handleResourceRequest(context);
+			super.handleResourceRequest(context);
 			return;
 		}
 

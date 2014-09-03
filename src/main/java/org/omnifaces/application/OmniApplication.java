@@ -89,7 +89,7 @@ public class OmniApplication extends ApplicationWrapper {
 			return converter;
 		}
 
-		return getWrapped().createConverter(converterId);
+		return super.createConverter(converterId);
 	}
 
 	/**
@@ -105,7 +105,7 @@ public class OmniApplication extends ApplicationWrapper {
 			return converter;
 		}
 
-		return getWrapped().createConverter(forClass);
+		return super.createConverter(forClass);
 	}
 
 	/**
@@ -120,7 +120,7 @@ public class OmniApplication extends ApplicationWrapper {
 			return validator;
 		}
 
-		return getWrapped().createValidator(validatorId);
+		return super.createValidator(validatorId);
 	}
 
 	@Override

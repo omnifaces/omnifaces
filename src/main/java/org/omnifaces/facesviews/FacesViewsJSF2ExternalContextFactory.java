@@ -66,13 +66,13 @@ public class FacesViewsJSF2ExternalContextFactory extends ExternalContextFactory
 	    @Override
 	    public URL getResource(String path) throws MalformedURLException {
 
-	    	  URL resource = getWrapped().getResource(getMappedPath(path));
+	    	  URL resource = super.getResource(getMappedPath(path));
 
 	          if (resource == null && isDevelopment()) {
 	          	// If "resource" is null it means it wasn't found. Check if the resource was dynamically added by
 	          	// scanning the faces-views location(s) again.
 	          	scanAndStoreViews(getServletContext());
-	          	resource = getWrapped().getResource(getMappedPath(path));
+	          	resource = super.getResource(getMappedPath(path));
 	          }
 
 	          return resource;
