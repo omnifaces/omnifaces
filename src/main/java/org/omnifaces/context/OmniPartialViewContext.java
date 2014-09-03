@@ -98,6 +98,11 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		return writer;
 	}
 
+	@Override // Necessary because this is missing in PartialViewContextWrapper (will be fixed in JSF 2.2).
+	public void setPartialRequest(boolean partialRequest) {
+		getWrapped().setPartialRequest(partialRequest);
+	}
+
 	@Override
 	public PartialViewContext getWrapped() {
 		return wrapped;
