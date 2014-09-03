@@ -16,6 +16,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static org.omnifaces.util.Beans.getCurrentInjectionPoint;
 
+import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Collections;
@@ -27,6 +28,7 @@ import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
+import javax.enterprise.inject.spi.PassivationCapable;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.faces.convert.Converter;
 import javax.faces.validator.Validator;
@@ -46,12 +48,14 @@ import org.omnifaces.cdi.Param;
  * @author Arjan Tijms
  *
  */
-public class DynamicParamValueProdcuer implements Bean<Object> {
+public class DynamicParamValueProducer implements Bean<Object>, Serializable, PassivationCapable {
 
+    private static final long serialVersionUID = 1L;
+    
     private BeanManager beanManager;
     private Set<Type> types;
 
-    public DynamicParamValueProdcuer(BeanManager beanManager, Type type) {
+    public DynamicParamValueProducer(BeanManager beanManager, Type type) {
     	this.beanManager = beanManager;
     	types = new HashSet<>(asList(type, Object.class));
     }
@@ -110,6 +114,11 @@ public class DynamicParamValueProdcuer implements Bean<Object> {
     @Override
     public void destroy(Object instance, CreationalContext<Object> creationalContext) {
     	// NOOP
+    }
+    
+    @Override
+    public String getId() {
+        return DynamicParamValueProducer.class.getName() + "_" + (types != null ? types.toString() : "");
     }
 
     @SuppressWarnings("all")

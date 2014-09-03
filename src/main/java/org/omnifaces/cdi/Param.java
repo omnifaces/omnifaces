@@ -32,7 +32,7 @@ import javax.faces.validator.Validator;
 import javax.inject.Qualifier;
 
 import org.omnifaces.cdi.param.Attribute;
-import org.omnifaces.cdi.param.DynamicParamValueProdcuer;
+import org.omnifaces.cdi.param.DynamicParamValueProducer;
 import org.omnifaces.cdi.param.ParamExtension;
 import org.omnifaces.cdi.param.ParamValue;
 import org.omnifaces.cdi.param.RequestParameterProducer;
@@ -72,7 +72,7 @@ import org.omnifaces.util.Utils;
  * @see Attribute
  * @see ParamExtension
  * @see RequestParameterProducer
- * @see DynamicParamValueProdcuer
+ * @see DynamicParamValueProducer
  *
  */
 @Qualifier
