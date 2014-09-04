@@ -581,7 +581,7 @@ public final class Faces {
 	 * Returns the application resource bundle as identified by the given <code>&lt;var&gt;</code> in
 	 * <code>faces-config.xml</code>. If the <code>&lt;var&gt;</code> is not registered, then this method just returns
 	 * <code>null</code>.
-	 * @return The application resource bundle as identified by the given <code>var</code> in
+	 * @return The application resource bundle as identified by the given <code>&lt;var&gt;</code> in
 	 * <code>faces-config.xml</code>.
 	 * @since 2.0
 	 * @throws MissingResourceException When the <code>&lt;resource-bundle&gt;</code> in <code>faces-config.xml</code>
@@ -680,7 +680,7 @@ public final class Faces {
 	 * @since 1.1
 	 */
 	public static FaceletContext getFaceletContext() {
-	    return FacesLocal.getFaceletContext(getContext());
+		return FacesLocal.getFaceletContext(getContext());
 	}
 
 	/**
