@@ -424,6 +424,14 @@ public final class FacesLocal {
 
 	/**
      * {@inheritDoc}
+	 * @see Faces#getResourceBundle(String)
+	 */
+	public static ResourceBundle getResourceBundle(FacesContext context, String var) {
+		return context.getApplication().getResourceBundle(context, var);
+	}
+
+	/**
+     * {@inheritDoc}
 	 * @see Faces#navigate(String)
 	 */
 	public static void navigate(FacesContext context, String outcome) {
