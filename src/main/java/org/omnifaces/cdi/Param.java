@@ -40,31 +40,31 @@ import org.omnifaces.util.Utils;
 
 /**
  * <p>
- * The CDI annotation {@link Param} allows you to inject, convert and validate a HTTP request parameter
- * in a CDI managed bean. It's basically like <code>&lt;f:viewParam&gt;</code>, but with the major difference
- * that the injected HTTP request parameter is available during {@link PostConstruct}, allowing a much easier
- * way of processing without the need for a <code>&lt;f:event type="preRenderView"&gt;</code> or
- * <code>&lt;f:viewAction&gt;</code>.
+ * The CDI annotation {@link Param} allows you to inject, convert and validate a HTTP request parameter in a CDI managed
+ * bean. It's basically like <code>&lt;f:viewParam&gt;</code>, but with the major difference that the injected HTTP
+ * request parameter is directly available during {@link PostConstruct}, allowing a much easier way of processing
+ * without the need for a <code>&lt;f:event type="preRenderView"&gt;</code> or <code>&lt;f:viewAction&gt;</code> in the
+ * view.
  * <p>
- * By default the name of the request parameter is taken from the name of the variable into which
- * injection takes place. It can be optionally specified.
+ * By default the name of the request parameter is taken from the name of the variable into which injection takes place.
+ * It can be optionally specified.
  * <p>
- * String values can be injected without a converter, other types need a converter.
+ * Standard types for which JSF has already a builtin converter like {@link String}, {@link Long}, {@link Boolean}, etc
+ * or for which there's already a converter registered via <code>forClass</code>, can be injected without explicitly
+ * specifying a converter. Other types need a converter.
  * <p>
- * Injection should be into a field of type {@link ParamValue}, with <code>V</code> the actual type of the
- * (converted) request parameter.
+ * In case the converted parameter value is not serializable, while the managed bean is serializable, you could inject
+ * it into a field of type {@link ParamValue}, with <code>V</code> the actual type of the converted request parameter.
  * <p>
- * The following is an example of the injection of a request parameter <code>user</code> following
- * a request such as <code>http://example.com/mypage?user=100</code>:
- *
+ * The following is an example of the injection of a request parameter <code>user</code> following a request such as
+ * <code>http://example.com/mypage?user=100</code>:
  * <pre>
  * &#64;Inject &#64;Param(converter="#{userconverter}", validator="#{priviledgedUser}")
- * private ParamValue&lt;User&gt; user;
+ * private User user;
  * </pre>
  * <p>
- * If conversion or validation fails, a {@link ParamValue} is injected, but it will contain a null value. The
- * conversion and validation messages (if any) will be set in the JSF context then, and {@link FacesContext#isValidationFailed()}
- * will return true;
+ * If conversion or validation fails, <code>null</code> is injected. The conversion and validation messages (if any)
+ * will be set in the JSF context then, and {@link FacesContext#isValidationFailed()} will return <code>true</code>;
  *
  * @since 1.6
  * @author Arjan Tijms
