@@ -48,9 +48,9 @@ public class ExpressionInspector {
 	 * Gets a MethodReference from a ValueExpression. If the ValueExpression refers to a method, this will
 	 * contain the actual method. If it refers to a property, this will contain the corresponding getter method.
 	 * <p>
-	 * Note that in case the expression refers to a method, the method reference contains the method with 
-	 * the name the expression refers to, with a matching number of arguments and <i>a</i> match of types. 
-	 * Overloads with the same amount of parameters are supported, but if the actual arguments match with 
+	 * Note that in case the expression refers to a method, the method reference contains the method with
+	 * the name the expression refers to, with a matching number of arguments and <i>a</i> match of types.
+	 * Overloads with the same amount of parameters are supported, but if the actual arguments match with
 	 * the types of multiple overloads (e.g. actual argument Long, overloads for Number and Long) a random
 	 * method will be chosen.
 	 *
@@ -65,30 +65,30 @@ public class ExpressionInspector {
 		// The InspectorElContext contains a special resolver that will record the next to last
 		// base and property. The EL implementation may shortcut the chain when it
 		// discovers the final target was a method. E.g. #{a.b.c().d.f('1')}
-		// In that case too, the result will be that the inspectorElContext contains the 
+		// In that case too, the result will be that the inspectorElContext contains the
 		// one but last base and property, and the length of the expression chain.
 		valueExpression.getType(inspectorElContext);
-		
+
 		// If everything went well, we thus have the length of the chain now.
-		
-		// Indicate that we're now at pass 2 and want to resolve the entire chain. 
+
+		// Indicate that we're now at pass 2 and want to resolve the entire chain.
 		// We can then capture the last element (the special resolver makes sure that
 		// we don't actually invoke that last element)
 		inspectorElContext.setPass(InspectorPass.PASS2_FIND_FINAL_NODE);
-		
+
 		// Calling getValue() will cause getValue() to be called on the resolver in case the
 		// value expresses referred to a property, and invoke() when it's a method.
 		ValueExpressionType type = (ValueExpressionType) valueExpression.getValue(inspectorElContext);
-		
+
 		String methodName = inspectorElContext.getProperty().toString();
 		Object[] params = inspectorElContext.getParams();
 		if (type == ValueExpressionType.PROPERTY) {
 			methodName = "get" + capitalize(methodName); // support for "is"?
 			params = NO_PARAMS;
 		}
-		
+
 		return new MethodReference(
-			inspectorElContext.getBase(), 
+			inspectorElContext.getBase(),
 			findMethod(inspectorElContext.getBase(), methodName, params),
 			inspectorElContext.getParams(),
 			type == ValueExpressionType.METHOD
@@ -104,6 +104,7 @@ public class ExpressionInspector {
 	 *
 	 * @param base the object in which the method is to be found
 	 * @param methodName name of the method to be found
+	 * @param params the method parameters
 	 * @return a method if one is found, null otherwise
 	 */
 	public static Method findMethod(Object base, String methodName, Object[] params) {
@@ -114,11 +115,11 @@ public class ExpressionInspector {
 			    methods.add(method);
 			}
 		}
-		
+
 		if (methods.size() == 1) {
 		    return methods.get(0);
 		}
-		
+
 		if (methods.size() > 1) {
 		    // Overloaded methods were found. Try to get a match
 		    for (Method method : methods) {
@@ -130,13 +131,13 @@ public class ExpressionInspector {
 		                break;
 		            }
 		        }
-                
+
                 // If all candidate parameters were expected and for none of them the actual
                 // parameter was NOT an instance, we have a match
                 if (match) {
                     return method;
                 }
-                
+
                 // Else, at least one parameter was not an instance
                 // Go ahead a test then next methods
 		    }
@@ -144,7 +145,7 @@ public class ExpressionInspector {
 
 		return null;
 	}
-	
+
 	/**
 	 * Types of a value expression
 	 *
@@ -157,20 +158,20 @@ public class ExpressionInspector {
 	/**
 	 * Due to the nature of how the EL Resolver and EL 3.0 ValueExpressions work, the final
 	 * node of a resolved expression chain has to be found in two passes.
-	 * 
+	 *
 	 * <p>
 	 * In pass 1 the caller has to call {@link ValueExpression#getType(ELContext)} on the ValueExpression
 	 * in question. The EL Resolver will then be able to find the next to last node without risk of actually
 	 * invoking the final node (which is the node most likely to have an unwanted side-effect when from
 	 * the user's point of view called at random).
-	 * 
+	 *
 	 * <p>
 	 * In pass 2 the caller has to call {@link ValueExpression#getValue(ELContext)} on the ValueExpression
 	 * in question. Using data obtained in pass 1, the EL Resolver will be able to find the final node again
 	 * without needing to actually invoke it. With the final node found, the EL resolver can capture the
 	 * base and property in case the final node represented a property, or the base, method and the actual
 	 * arguments for said method in case the final repesented a method.
-	 * 
+	 *
 	 * @author arjan
 	 *
 	 */
@@ -197,7 +198,7 @@ public class ExpressionInspector {
 		public ELResolver getELResolver() {
 			return inspectorElResolver;
 		}
-		
+
 		public InspectorPass getPass() {
 			return inspectorElResolver.getPass();
 		}
@@ -213,7 +214,7 @@ public class ExpressionInspector {
 		public Object getProperty() {
 			return inspectorElResolver.getProperty();
 		}
-		
+
 		public Object[] getParams() {
 			return inspectorElResolver.getParams();
 		}
@@ -231,7 +232,7 @@ public class ExpressionInspector {
 			return base;
 		}
 	}
-	
+
 	/**
 	 * Custom EL Resolver that can be used for inspecting expressions by means of recording the calls
 	 * made on this resolved by the EL implementation.
@@ -241,20 +242,20 @@ public class ExpressionInspector {
 
 		private int passOneCallCount;
 		private int passTwoCallCount;
-		
+
 		private Object lastBase;
 		private Object lastProperty; // Method name in case VE referenced a method, otherwise property name
 		private Object[] lastParams; // Actual parameters supplied to a method (if any)
-		
+
 		private boolean subchainResolving;
-		
+
 		// Marker holder via which we can track our last base. This should become
 		// the last base in a next iteration. This is needed because if the very last property is a
 		// method node with a variable, we can't track resolving that variable anymore since it will not have been processed by the
 		// getType() call of the first pass.
 		// E.g. a.b.c(var.foo())
 		private FinalBaseHolder finalBaseHolder;
-		
+
 		private InspectorPass pass = InspectorPass.PASS1_FIND_NEXT_TO_LAST_NODE;
 
 		public InspectorElResolver(ELResolver elResolver) {
@@ -263,50 +264,50 @@ public class ExpressionInspector {
 
 		@Override
 		public Object getValue(ELContext context, Object base, Object property) {
-			
+
 			if (base instanceof FinalBaseHolder) {
 				// If we get called with a FinalBaseHolder, which was set in the next to last node,
 				// we know we're done and can set the base and property as the final ones.
 				lastBase = ((FinalBaseHolder) base).getBase();
 				lastProperty = property;
-				
+
 				context.setPropertyResolved(true);
 				return ValueExpressionType.PROPERTY;
 			}
-		    
+
 		    checkSubchainStarted(base);
-		    
+
 		    if (subchainResolving) {
 		        return super.getValue(context, base, property);
 		    }
 
 		    recordCall(base, property);
-		    
+
 		    return wrapOutcomeIfNeeded(super.getValue(context, base, property));
 		}
 
 		@Override
 		public Object invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
-			
+
 			if (base instanceof FinalBaseHolder) {
 				// If we get called with a FinalBaseHolder, which was set in the next to last node,
 				// we know we're done and can set the base, method and params as the final ones.
 				lastBase = ((FinalBaseHolder) base).getBase();
 				lastProperty = method;
 				lastParams = params;
-				
+
 				context.setPropertyResolved(true);
 				return ValueExpressionType.METHOD;
 			}
-			
+
 			checkSubchainStarted(base);
-			
+
 			if (subchainResolving) {
 				return super.invoke(context, base, method, paramTypes, params);
 			}
-			
+
 			recordCall(base, method);
-			
+
 			return wrapOutcomeIfNeeded(super.invoke(context, base, method, paramTypes, params));
 		}
 
@@ -328,16 +329,16 @@ public class ExpressionInspector {
 			// final base, property/method and optionally parameters.
 
 			context.setPropertyResolved(true);
-			
+
 			// Special value to signal that getType() has actually been called (this value is
 			// not used by the algorithm now, but may be useful when debugging)
 			return InspectorElContext.class;
 		}
-		
+
 		private boolean isAtNextToLastNode() {
 			return passTwoCallCount == passOneCallCount;
 		}
-		
+
 		private void checkSubchainStarted(Object base) {
 		  if (pass == InspectorPass.PASS2_FIND_FINAL_NODE && base == null && isAtNextToLastNode()) {
 		    	// If "base" is null it means a new chain is being resolved.
@@ -349,10 +350,10 @@ public class ExpressionInspector {
 		}
 
 		private void recordCall(Object base, Object property) {
-			
+
 			switch (pass) {
 				case PASS1_FIND_NEXT_TO_LAST_NODE:
-					
+
 					// In the first "find next to last" pass, we'll be collecting the next to last element
 					// in an expression.
 					// E.g. given the expression a.b().c.d, we'll end up with the base returned by b() and "c" as
@@ -361,11 +362,11 @@ public class ExpressionInspector {
 					passOneCallCount++;
 					lastBase = base;
 					lastProperty = property;
-					
+
 					break;
-					
+
 				case PASS2_FIND_FINAL_NODE:
-					
+
 					// In the second "find final node" pass, we'll collecting the final node
 					// in an expression. We need to take care that we're not actually calling / invoking
 					// that last element as it may have a side-effect that the user doesn't want to happen
@@ -380,30 +381,30 @@ public class ExpressionInspector {
 
 						if (base != lastBase || property != lastProperty) {
 							throw new IllegalStateException(
-								"First and second pass of resolver at call #" + passTwoCallCount + 
+								"First and second pass of resolver at call #" + passTwoCallCount +
 								" resolved to different base or property.");
 						}
 
 					}
-					
+
 					break;
 			}
 		}
-		
+
 		private Object wrapOutcomeIfNeeded(Object outcome) {
 			if (pass == InspectorPass.PASS2_FIND_FINAL_NODE && finalBaseHolder == null && isAtNextToLastNode()) {
 				// We're at the second pass and at the next to last node in the expression chain.
 				// "outcome" which we have just resolved should thus represent our final base.
-				
+
 				// Wrap our final base in a special class that we can recognize when the EL implementation
 				// invokes this resolver later again with it.
 				finalBaseHolder = new FinalBaseHolder(outcome);
 				return finalBaseHolder;
-			} 
-			
+			}
+
 			return outcome;
 		}
-		
+
 		public InspectorPass getPass() {
 			return pass;
 		}
@@ -419,7 +420,7 @@ public class ExpressionInspector {
 		public Object getProperty() {
 			return lastProperty;
 		}
-		
+
 		public Object[] getParams() {
 			return lastParams;
 		}
