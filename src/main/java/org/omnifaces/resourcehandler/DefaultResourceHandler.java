@@ -12,6 +12,8 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static java.util.Arrays.fill;
+
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
 import javax.faces.application.ResourceHandlerWrapper;
@@ -19,7 +21,10 @@ import javax.faces.application.ResourceHandlerWrapper;
 /**
  * A default {@link ResourceHandler} implementation, delegating both {@link #createResource(String)} and
  * {@link #createResource(String, String)} to {@link #createResource(String, String, String)}. Implementors should
- * only need to override {@link #createResource(String, String, String)}.
+ * only need to override {@link #createResource(String, String, String)}. Additionally, the constructor checks if the
+ * wrapped resource handler has the {@link #createResource(String, String, String)} properly implemented, otherwise
+ * fall back to either {@link #createResource(String, String)} or {@link #createResource(String)} on the wrapped
+ * resource handler.
  *
  * @author Bauke Scholtz
  * @since 2.0
@@ -29,15 +34,32 @@ public class DefaultResourceHandler extends ResourceHandlerWrapper {
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	private ResourceHandler wrapped;
+	private int args;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Creates a new instance of this unmapped resource handler which wraps the given resource handler.
+	 * Creates a new instance of this unmapped resource handler which wraps the given resource handler. Additionally,
+	 * check which <code>createResource</code> method is being declared on the wrapped resource handler.
 	 * @param wrapped The resource handler to be wrapped.
 	 */
 	public DefaultResourceHandler(ResourceHandler wrapped) {
 		this.wrapped = wrapped;
+		Class<? extends ResourceHandler> cls = wrapped.getClass();
+
+		for (int args = 3; args > 1; args--) {
+			Class<?>[] paramTypes = new Class[args];
+			fill(paramTypes, String.class);
+
+			try {
+				cls.getDeclaredMethod("createResource", paramTypes);
+				this.args = args;
+				break;
+			}
+			catch (NoSuchMethodException ignore) {
+				//
+			}
+		}
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -57,6 +79,19 @@ public class DefaultResourceHandler extends ResourceHandlerWrapper {
 	@Override
 	public Resource createResource(String resourceName, String libraryName) {
 		return createResource(resourceName, libraryName, null);
+	}
+
+	/**
+	 * Delegate to the right <code>createResource()</code> method of the wrapped resource handler. Some resource handler
+	 * implementations namely doesn't implement all the three <code>createResource()</code> methods.
+	 */
+	@Override
+	public Resource createResource(String resourceName, String libraryName, String contentType) {
+		switch (args) {
+			case 3: return getWrapped().createResource(resourceName, libraryName, contentType);
+			case 2: return getWrapped().createResource(resourceName, libraryName);
+			default: return getWrapped().createResource(resourceName);
+		}
 	}
 
 	@Override
