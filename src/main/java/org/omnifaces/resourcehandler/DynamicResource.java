@@ -115,7 +115,7 @@ public abstract class DynamicResource extends Resource {
 
 		if (ifModifiedSince != null) {
 			try {
-				return getLastModified() > parseRFC1123(ifModifiedSince).getTime();
+				return getLastModified() > parseRFC1123(ifModifiedSince).getTime() + 1000; // RFC1123 doesn't store millis.
 			}
 			catch (ParseException ignore) {
 				return true;
