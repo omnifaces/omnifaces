@@ -345,9 +345,11 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
 	private void resetResponse(FacesContext context) {
 		ExternalContext externalContext = context.getExternalContext();
+		String contentType = externalContext.getResponseContentType(); // Remember content type.
 		String characterEncoding = externalContext.getResponseCharacterEncoding(); // Remember encoding.
 		externalContext.responseReset();
 		OmniPartialViewContext.getCurrentInstance(context).resetPartialResponse();
+		externalContext.setResponseContentType(contentType);
 		externalContext.setResponseCharacterEncoding(characterEncoding);
 	}
 
