@@ -91,9 +91,10 @@ public class GraphicResource extends DynamicResource {
 	/**
 	 * Construct a new graphic resource which uses the given content as data URI.
 	 * @param content The graphic resource content, to be represented as data URI.
+	 * @param string
 	 */
-	public GraphicResource(Object content) {
-		super("", GraphicResourceHandler.LIBRARY_NAME, DEFAULT_CONTENT_TYPE);
+	public GraphicResource(Object content, String contentType) {
+		super("", GraphicResourceHandler.LIBRARY_NAME, coalesce(contentType, DEFAULT_CONTENT_TYPE));
 		this.content = content;
 	}
 
