@@ -49,12 +49,13 @@ import org.omnifaces.util.Utils;
  * By default the name of the request parameter is taken from the name of the variable into which injection takes place.
  * It can be optionally specified.
  * <p>
- * Standard types for which JSF has already a builtin converter like {@link String}, {@link Long}, {@link Boolean}, etc
+ * Standard types for which JSF already has a build in converter like {@link String}, {@link Long}, {@link Boolean}, etc
  * or for which there's already a converter registered via <code>forClass</code>, can be injected without explicitly
- * specifying a converter. Other types need a converter.
+ * specifying a converter. Other types do need a converter.
  * <p>
  * In case the converted parameter value is not serializable, while the managed bean is serializable, you could inject
  * it into a field of type {@link ParamValue}, with <code>V</code> the actual type of the converted request parameter.
+ * Deserialization in this case works by converting from the original request parameter again. This however has the lim
  * <p>
  * The following is an example of the injection of a request parameter <code>user</code> following a request such as
  * <code>http://example.com/mypage?user=100</code>:
@@ -63,8 +64,10 @@ import org.omnifaces.util.Utils;
  * private User user;
  * </pre>
  * <p>
- * If conversion or validation fails, <code>null</code> is injected. The conversion and validation messages (if any)
- * will be set in the JSF context then, and {@link FacesContext#isValidationFailed()} will return <code>true</code>;
+ * If conversion or validation fails, <code>null</code> is injected if the injection target it <b>NOT</b> {@link ParamValue}.
+ * Otherwise a {@link ParamValue} instance is injected, but it will contain a null value. 
+ * In both cases, the conversion and validation messages (if any) will be set in the JSF context then, and 
+ * {@link FacesContext#isValidationFailed()} will return <code>true</code>.
  *
  * @since 1.6
  * @author Arjan Tijms
