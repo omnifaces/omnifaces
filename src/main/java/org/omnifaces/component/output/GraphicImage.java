@@ -198,11 +198,15 @@ public class GraphicImage extends HtmlGraphicImage {
 		String name = (String) getAttributes().get("name");
 		boolean dataURI = Boolean.valueOf(String.valueOf(getAttributes().get("dataURI")));
 
-		Resource resource = null;
+		Resource resource;
 
 		if (name != null) {
 			String library = (String) getAttributes().get("library");
 			resource = context.getApplication().getResourceHandler().createResource(name, library);
+
+			if (resource == null) {
+				return RES_NOT_FOUND;
+			}
 
 			if (dataURI && resource.getContentType().startsWith("image")) {
 				resource = new GraphicResource(resource.getInputStream(), resource.getContentType());
@@ -223,12 +227,7 @@ public class GraphicImage extends HtmlGraphicImage {
 			}
 		}
 
-		if (resource != null) {
-			return context.getExternalContext().encodeResourceURL(resource.getRequestPath());
-		}
-		else {
-			return RES_NOT_FOUND;
-		}
+		return context.getExternalContext().encodeResourceURL(resource.getRequestPath());
 	}
 
 	/**
