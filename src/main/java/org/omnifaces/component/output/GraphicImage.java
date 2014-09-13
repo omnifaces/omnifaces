@@ -13,7 +13,6 @@
 package org.omnifaces.component.output;
 
 import static org.omnifaces.resourcehandler.DefaultResource.RES_NOT_FOUND;
-import static org.omnifaces.util.Faces.getMimeType;
 import static org.omnifaces.util.Renderers.writeAttributes;
 import static org.omnifaces.util.Utils.coalesce;
 
@@ -206,7 +205,7 @@ public class GraphicImage extends HtmlGraphicImage {
 			resource = context.getApplication().getResourceHandler().createResource(name, library);
 
 			if (dataURI && resource.getContentType().startsWith("image")) {
-				resource = new GraphicResource(resource.getInputStream(), getMimeType(name));
+				resource = new GraphicResource(resource.getInputStream(), resource.getContentType());
 			}
 		}
 		else {

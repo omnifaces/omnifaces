@@ -28,9 +28,11 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.el.ValueExpression;
 import javax.faces.FacesException;
@@ -56,6 +58,7 @@ public class GraphicResource extends DynamicResource {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final String DEFAULT_CONTENT_TYPE = "image";
+	private static final Map<String, String> CONTENT_TYPES_BY_BASE64_HEADER = createContentTypesByBase64Header();
 	private static final Map<String, MethodReference> ALLOWED_METHODS = new HashMap<>();
 	private static final GraphicImage DUMMY_COMPONENT = new GraphicImage();
 	private static final String[] EMPTY_PARAMS = new String[0];
@@ -81,6 +84,21 @@ public class GraphicResource extends DynamicResource {
 		"o:graphicImage 'value' attribute must specify valid method parameters."
 			+ " Encountered invalid method parameters '%s'.";
 
+	private static final Map<String, String> createContentTypesByBase64Header() {
+		Map<String, String> contentTypesByBase64Header = new HashMap<>();
+		contentTypesByBase64Header.put("/9j/", "image/jpeg");
+		contentTypesByBase64Header.put("iVBORw", "image/png");
+		contentTypesByBase64Header.put("R0lGOD", "image/gif");
+		contentTypesByBase64Header.put("AAABAA", "image/x-icon");
+
+		// BMP and TIFF are unlikely used as web image formats due to ineffective large sizes.
+		// contentTypesByBase64Header.put("Qk0", "image/bmp");
+		// contentTypesByBase64Header.put("SUkqAA", "image/tiff");
+		// contentTypesByBase64Header.put("TU0AKg", "image/tiff");
+
+		return Collections.unmodifiableMap(contentTypesByBase64Header);
+	}
+
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private Object content;
@@ -94,7 +112,7 @@ public class GraphicResource extends DynamicResource {
 	 * @param string
 	 */
 	public GraphicResource(Object content, String contentType) {
-		super("", GraphicResourceHandler.LIBRARY_NAME, coalesce(contentType, DEFAULT_CONTENT_TYPE));
+		super("", GraphicResourceHandler.LIBRARY_NAME, contentType);
 		this.content = content;
 	}
 
@@ -196,7 +214,14 @@ public class GraphicResource extends DynamicResource {
 			throw new FacesException(e);
 		}
 
-		return "data:" + getContentType() + ";base64," + DatatypeConverter.printBase64Binary(bytes);
+		String base64 = DatatypeConverter.printBase64Binary(bytes);
+		String contentType = getContentType();
+
+		if (contentType == null) {
+			contentType = guessContentType(base64);
+		}
+
+		return "data:" + contentType + ";base64," + base64;
 	}
 
 	@Override
@@ -234,6 +259,19 @@ public class GraphicResource extends DynamicResource {
 	 */
 	private static String getResourceName(MethodReference methodReference) {
 		return methodReference.getBase().getClass().getSimpleName() + "_" + methodReference.getMethod().getName();
+	}
+
+	/**
+	 * Guess the image content type based on given base64 encoded content for data URI.
+	 */
+	private static String guessContentType(String base64) {
+		for (Entry<String, String> contentTypeByBase64Header : CONTENT_TYPES_BY_BASE64_HEADER.entrySet()) {
+			if (base64.startsWith(contentTypeByBase64Header.getKey())) {
+				return contentTypeByBase64Header.getValue();
+			}
+		}
+
+		return DEFAULT_CONTENT_TYPE;
 	}
 
 	/**
