@@ -130,8 +130,11 @@ import org.omnifaces.resourcehandler.GraphicResourceHandler;
  * <p>
  * The bean class name and method name will end up in the image source URL. Although this is technically harmless and
  * not tamperable by hackers, you might want to choose a "sensible" class and method name for this purpose.
+ * <p>
  * Like <code>&lt;h:graphicImage&gt;</code>, the <code>value</code> attribute is <strong>ignored</strong>
- * when the <code>name</code> attribute is specified (for JSF resources).
+ * when the <code>name</code> attribute is specified (for JSF resources). And, the <code>value</code> attribute of
+ * <code>&lt;o:graphicImage&gt;</code> does <strong>not</strong> support URLs anymore. For that, just keep using
+ * <code>&lt;h:graphicImage&gt;</code> or even plain <code>&lt;img&gt;</code>.
  *
  * @author Bauke Scholtz
  * @since 2.0

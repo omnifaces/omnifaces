@@ -565,27 +565,32 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the message bundle as identified by <code>&lt;message-bundle&gt;</code> in <code>faces-config.xml</code>.
-	 * The instance is already localized via {@link Faces#getLocale()}. If there is no
+	 * Returns the application message bundle as identified by <code>&lt;message-bundle&gt;</code> in
+	 * <code>faces-config.xml</code>. The instance is already localized via {@link Faces#getLocale()}. If there is no
 	 * <code>&lt;message-bundle&gt;</code>, then this method just returns <code>null</code>.
 	 * @return The message bundle as identified by <code>&lt;message-bundle&gt;</code> in <code>faces-config.xml</code>.
-	 * @since 2.0
 	 * @throws MissingResourceException When the <code>&lt;message-bundle&gt;</code> in <code>faces-config.xml</code>
 	 * does not refer an existing resource in the classpath.
+	 * @see Application#getMessageBundle()
+	 * @since 2.0
 	 */
 	public static ResourceBundle getMessageBundle() {
 		return FacesLocal.getMessageBundle(getContext());
 	}
 
 	/**
-	 * Returns the application resource bundle as identified by the given <code>&lt;var&gt;</code> in
-	 * <code>faces-config.xml</code>. If the <code>&lt;var&gt;</code> is not registered, then this method just returns
+	 * Returns the application resource bundle as identified by the given <code>&lt;var&gt;</code> of the
+	 * <code>&lt;resource-bundle&gt;</code> in <code>faces-config.xml</code>. If there is no
+	 * <code>&lt;resource-bundle&gt;</code> with the given <code>&lt;var&gt;</code>, then this method just returns
 	 * <code>null</code>.
-	 * @return The application resource bundle as identified by the given <code>&lt;var&gt;</code> in
+	 * @param var The value of the <code>&lt;var&gt;</code> which identifies the <code>&lt;resource-bundle&gt;</code> in
 	 * <code>faces-config.xml</code>.
+	 * @return The application resource bundle as identified by the given <code>&lt;var&gt;</code> of the
+	 * <code>&lt;resource-bundle&gt;</code> in <code>faces-config.xml</code>.
+	 * @throws MissingResourceException When the <code>&lt;resource-bundle&gt;</code> as identified by the given
+	 * <code>&lt;var&gt;</code> in <code>faces-config.xml</code> does not refer an existing resource in the classpath.
+	 * @see Application#getResourceBundle(FacesContext, String)
 	 * @since 2.0
-	 * @throws MissingResourceException When the <code>&lt;resource-bundle&gt;</code> in <code>faces-config.xml</code>
-	 * does not refer an existing resource in the classpath.
 	 */
 	public static ResourceBundle getResourceBundle(String var) {
 		return FacesLocal.getResourceBundle(getContext(), var);
@@ -608,9 +613,9 @@ public final class Faces {
 	 * @param params The parameters to be URL-encoded in the query string. Can be <code>null</code>.
 	 * @param includeViewParams Whether the view parameters of the current view should be included as well.
 	 * @return The concrete domain-relative URL to the current view.
-	 * @see ViewHandler#getBookmarkableURL(FacesContext, String, Map, boolean)
 	 * @throws IllegalStateException When there is no view (i.e. when it is <code>null</code>). This can happen if the
 	 * method is called at the wrong moment in the JSF lifecycle, e.g. before the view has been restored/created.
+	 * @see ViewHandler#getBookmarkableURL(FacesContext, String, Map, boolean)
 	 * @since 1.6
 	 */
 	public static String getBookmarkableURL(Map<String, List<String>> params, boolean includeViewParams) {
@@ -641,9 +646,9 @@ public final class Faces {
 	 * @param params The parameters to be URL-encoded in the query string. Can be <code>null</code>.
 	 * @param includeViewParams Whether the view parameters of the current view should be included as well.
 	 * @return The concrete domain-relative URL to the current view.
-	 * @see ViewHandler#getBookmarkableURL(FacesContext, String, Map, boolean)
 	 * @throws IllegalStateException When there is no view (i.e. when it is <code>null</code>). This can happen if the
 	 * method is called at the wrong moment in the JSF lifecycle, e.g. before the view has been restored/created.
+	 * @see ViewHandler#getBookmarkableURL(FacesContext, String, Map, boolean)
 	 * @since 1.7
 	 */
 	public static String getBookmarkableURL(Collection<ParamHolder> params, boolean includeViewParams) {

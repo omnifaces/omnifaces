@@ -109,7 +109,8 @@ public class GraphicResource extends DynamicResource {
 	/**
 	 * Construct a new graphic resource which uses the given content as data URI.
 	 * @param content The graphic resource content, to be represented as data URI.
-	 * @param string
+	 * @param contentType The graphic resource content type. If this is <code>null</code>, then it will be guessed
+	 * based on the content type signature in the content header. So far, JPEG, PNG, GIF and ICO are supported.
 	 */
 	public GraphicResource(Object content, String contentType) {
 		super("", GraphicResourceHandler.LIBRARY_NAME, contentType);
