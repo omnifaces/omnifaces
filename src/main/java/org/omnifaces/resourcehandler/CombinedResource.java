@@ -42,14 +42,18 @@ final class CombinedResource extends DynamicResource {
 		String[] resourcePathParts = resourceName.split("\\.", 2)[0].split("/");
 		String resourceId = resourcePathParts[resourcePathParts.length - 1];
 		info = CombinedResourceInfo.get(resourceId);
-		setLastModified(info.getLastModified());
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
+	public long getLastModified() {
+		return (info != null) ? info.getLastModified() : super.getLastModified();
+	}
+
+	@Override
 	public InputStream getInputStream() throws IOException {
-		if (!info.getResources().isEmpty()) {
+		if (info != null && !info.getResources().isEmpty()) {
 			return new CombinedResourceInputStream(info.getResources());
 		}
 		else {
