@@ -23,14 +23,19 @@ import javax.el.MethodInfo;
  * @since 1.4
  */
 public class MethodReference {
-    
-    public final static Object[] NO_PARAMS = new Object[0]; 
+
+    public final static Object[] NO_PARAMS = new Object[0];
 
 	private Object base;
 	private Method method;
 	private Object[] actualParameters;
 	private boolean fromMethod;
 	private MethodInfo methodInfo;
+
+	public MethodReference(Object base, Method method) {
+		this.base = base;
+		this.method = method;
+	}
 
 	public MethodReference(Object base, Method method, Object[] actualParameters, boolean fromMethod) {
 		this.base = base;

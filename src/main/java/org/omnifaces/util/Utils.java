@@ -335,7 +335,8 @@ public final class Utils {
 	}
 
 	/**
-	 * Read the given input stream into a byte array.
+	 * Read the given input stream into a byte array. The given input stream will implicitly be closed after streaming,
+	 * regardless of whether an exception is been thrown or not.
 	 * @param input The input stream.
 	 * @return The input stream as a byte array.
 	 * @throws IOException When an I/O error occurs.

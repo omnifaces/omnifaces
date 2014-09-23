@@ -171,7 +171,7 @@ public class GraphicResource extends DynamicResource {
 				throw new IllegalArgumentException(String.format(ERROR_INVALID_SCOPE, beanClass));
 			}
 
-			ALLOWED_METHODS.put(name, methodReference);
+			ALLOWED_METHODS.put(name, new MethodReference(methodReference.getBase(), methodReference.getMethod()));
 		}
 
 		Object[] params = methodReference.getActualParameters();
@@ -198,21 +198,21 @@ public class GraphicResource extends DynamicResource {
 	 * @return The data URI for resource's content.
 	 */
 	protected String getDataURI() {
-		byte[] bytes = null;
+		byte[] bytes;
 
-		try {
-			if (content instanceof InputStream) {
+		if (content instanceof InputStream) {
+			try {
 				bytes = toByteArray((InputStream) content);
 			}
-			else if (content instanceof byte[]) {
-				bytes = (byte[]) content;
-			}
-			else {
-				throw new IllegalArgumentException(String.format(ERROR_INVALID_RETURNTYPE, content));
+			catch (IOException e) {
+				throw new FacesException(e);
 			}
 		}
-		catch (Exception e) {
-			throw new FacesException(e);
+		else if (content instanceof byte[]) {
+			bytes = (byte[]) content;
+		}
+		else {
+			throw new IllegalArgumentException(String.format(ERROR_INVALID_RETURNTYPE, content));
 		}
 
 		String base64 = DatatypeConverter.printBase64Binary(bytes);
@@ -233,23 +233,25 @@ public class GraphicResource extends DynamicResource {
 			return null; // Ignore hacker attempts. I'd rather return 400 here, but JSF spec doesn't support it.
 		}
 
-		try {
-			Method method = methodReference.getMethod();
-			Object[] convertedParams = convertToObjects(getContext(), params, method.getParameterTypes());
-			Object content = method.invoke(methodReference.getBase(), convertedParams);
+		Method method = methodReference.getMethod();
+		Object[] convertedParams = convertToObjects(getContext(), params, method.getParameterTypes());
+		Object content;
 
-			if (content instanceof InputStream) {
-				return (InputStream) content;
-			}
-			else if (content instanceof byte[]) {
-				return new ByteArrayInputStream((byte[]) content);
-			}
-			else {
-				throw new IllegalArgumentException(String.format(ERROR_INVALID_RETURNTYPE, content));
-			}
+		try {
+			content = method.invoke(methodReference.getBase(), convertedParams);
 		}
 		catch (Exception e) {
-			throw new IOException(e); // I'd rather return 400 here, but JSF spec doesn't support it.
+			throw new FacesException(e);
+		}
+
+		if (content instanceof InputStream) {
+			return (InputStream) content;
+		}
+		else if (content instanceof byte[]) {
+			return new ByteArrayInputStream((byte[]) content);
+		}
+		else {
+			throw new IllegalArgumentException(String.format(ERROR_INVALID_RETURNTYPE, content));
 		}
 	}
 

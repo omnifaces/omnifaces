@@ -119,7 +119,8 @@ import org.omnifaces.resourcehandler.GraphicResourceHandler;
  * <p>
  * In case your "image" entity supports it, you can also supply the "last modified" property which will be used in the
  * <code>ETag</code> and <code>Last-Modified</code> headers and in <code>If-Modified-Since</code> checks, hereby
- * improving browser caching. The <code>lastModified</code> attribute supports both {@link Long} and {@link Date}.
+ * improving browser caching. The <code>lastModified</code> attribute supports both {@link Date} and {@link Long} as
+ * timestamp in milliseconds.
  * <pre>
  * &lt;ui:repeat value="#{bean.images}" var="image"&gt;
  *     &lt;o:graphicImage value="#{imageStreamer.getById(image.id)}" lastModified="#{image.lastModified}" /&gt;
