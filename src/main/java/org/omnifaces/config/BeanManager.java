@@ -129,6 +129,11 @@ public enum BeanManager {
 	public <T> T getReference(Class<T> beanClass) {
 		try {
 			Object bean = resolve.invoke(beanManager, getBeans.invoke(beanManager, beanClass, NO_ANNOTATIONS));
+
+			if (bean == null) {
+				return null;
+			}
+
 			Object creationalContext = createCreationalContext.invoke(beanManager, bean);
 			Object reference = getReference.invoke(beanManager, bean, beanClass, creationalContext);
 			return beanClass.cast(reference);

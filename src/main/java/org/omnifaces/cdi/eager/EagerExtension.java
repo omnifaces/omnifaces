@@ -64,6 +64,9 @@ public class EagerExtension implements Extension {
 		"Bean %s with scope %s was annotated with @Eager, but required attribute 'viewId' is missing."
 			+ " Bean will not be eagerly instantiated.";
 
+	private static final String ERROR_EAGER_UNAVAILABLE =
+		"@Eager is unavailable. The EagerBeansRepository could not be obtained from CDI bean manager.";
+
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private List<Bean<?>> applicationScopedBeans = new ArrayList<>();
@@ -109,6 +112,11 @@ public class EagerExtension implements Extension {
 	public void load(@SuppressWarnings("unused") @Observes AfterDeploymentValidation event, BeanManager beanManager) {
 
 		EagerBeansRepository eagerBeansRepository = getReference(beanManager, EagerBeansRepository.class);
+
+		if (eagerBeansRepository == null) {
+			logger.warning(ERROR_EAGER_UNAVAILABLE);
+			return;
+		}
 
 		if (!applicationScopedBeans.isEmpty()) {
 			eagerBeansRepository.setApplicationScopedBeans(unmodifiableList(applicationScopedBeans));

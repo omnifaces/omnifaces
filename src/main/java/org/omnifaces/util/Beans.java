@@ -85,7 +85,8 @@ public final class Beans {
 	 * @return The CDI managed bean reference of the given class from the given bean manager.
 	 */
 	public static <T> T getReference(BeanManager beanManager, Class<T> beanClass) {
-		return getReference(beanManager, resolve(beanManager, beanClass));
+		Bean<T> bean = resolve(beanManager, beanClass);
+		return (bean != null) ? getReference(beanManager, bean) : null;
 	}
 
 	/**
@@ -111,7 +112,8 @@ public final class Beans {
 	 * @since 1.8
 	 */
 	public static <T> T getInstance(BeanManager beanManager, Class<T> beanClass) {
-		return getInstance(beanManager, resolve(beanManager, beanClass), true);
+		Bean<T> bean = resolve(beanManager, beanClass);
+		return (bean != null) ? getInstance(beanManager, bean, true) : null;
 	}
 
 	/**
@@ -127,7 +129,8 @@ public final class Beans {
 	 * @since 1.7
 	 */
 	public static <T> T getInstance(BeanManager beanManager, Class<T> beanClass, boolean create) {
-		return getInstance(beanManager, resolve(beanManager, beanClass), create);
+		Bean<T> bean = resolve(beanManager, beanClass);
+		return (bean != null) ? getInstance(beanManager, bean, create) : null;
 	}
 
 	/**
