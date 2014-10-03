@@ -71,6 +71,14 @@ public class MessagesRenderer extends Renderer {
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
+	/**
+	 * Returns <code>true</code>.
+	 */
+	@Override
+	public boolean getRendersChildren() {
+		return true;
+	}
+
 	@Override
 	public void encodeChildren(FacesContext context, UIComponent component) throws IOException {
 		if (!component.isRendered()) {

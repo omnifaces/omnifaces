@@ -12,13 +12,10 @@
  */
 package org.omnifaces.component.messages;
 
-import java.io.IOException;
-
 import javax.el.ValueExpression;
 import javax.faces.application.FacesMessage;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.html.HtmlMessages;
-import javax.faces.context.FacesContext;
 
 import org.omnifaces.renderer.MessagesRenderer;
 import org.omnifaces.util.Messages;
@@ -149,14 +146,6 @@ public class OmniMessages extends HtmlMessages {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns <code>true</code>.
-	 */
-	@Override
-	public boolean getRendersChildren() {
-		return true;
-	}
-
-	/**
 	 * An override which checks if this isn't been invoked on <code>var</code> attribute.
 	 * Finally it delegates to the super method.
 	 * @throws IllegalArgumentException When this value expression is been set on <code>var</code> attribute.
@@ -168,14 +157,6 @@ public class OmniMessages extends HtmlMessages {
 		}
 
 		super.setValueExpression(name, binding);
-	}
-
-	/**
-	 * An override which delegates directly to {@link #encodeChildren(FacesContext)}.
-	 */
-	@Override
-	public void encodeAll(FacesContext context) throws IOException {
-		encodeChildren(context);
 	}
 
 	// Attribute getters/setters --------------------------------------------------------------------------------------
