@@ -33,7 +33,6 @@ import javax.faces.application.ResourceHandler;
 import javax.faces.context.FacesContext;
 
 import org.omnifaces.el.functions.Converters;
-import org.omnifaces.util.Hacks;
 import org.omnifaces.util.Utils;
 
 /**
@@ -176,9 +175,14 @@ final class CombinedResourceInfo {
 			resources.add(resource);
 
 			try {
-				URLConnection connection = !Hacks.isRichFacesResourceOptimizationEnabled()
-					? resource.getURL().openConnection()
-					: new URL(getRequestDomainURL(context) + resource.getRequestPath()).openConnection();
+				URLConnection connection;
+
+				try {
+					connection = resource.getURL().openConnection();
+				}
+				catch (Exception richFacesDoesNotSupportThis) {
+					connection = new URL(getRequestDomainURL(context) + resource.getRequestPath()).openConnection();
+				}
 
 				contentLength += connection.getContentLength();
 				long lastModified = connection.getLastModified();
