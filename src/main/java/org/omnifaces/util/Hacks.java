@@ -14,8 +14,6 @@ package org.omnifaces.util;
 
 import static org.omnifaces.util.Faces.getApplication;
 import static org.omnifaces.util.Faces.getELContext;
-import static org.omnifaces.util.Faces.getInitParameter;
-import static org.omnifaces.util.Faces.hasContext;
 import static org.omnifaces.util.FacesLocal.getContextAttribute;
 import static org.omnifaces.util.FacesLocal.getInitParameter;
 import static org.omnifaces.util.FacesLocal.setContextAttribute;
@@ -41,7 +39,6 @@ import javax.el.ELResolver;
 import javax.el.ExpressionFactory;
 import javax.el.MethodExpression;
 import javax.el.MethodInfo;
-import javax.faces.application.Resource;
 import javax.faces.context.FacesContext;
 import javax.faces.context.PartialViewContext;
 import javax.faces.context.PartialViewContextWrapper;
@@ -61,8 +58,6 @@ public final class Hacks {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final boolean RICHFACES_INSTALLED = initRichFacesInstalled();
-	private static final String RICHFACES_RO_INIT_PARAM =
-		"org.richfaces.resourceOptimization.enabled";
 	private static final String RICHFACES_PVC_CLASS_NAME =
 		"org.richfaces.context.ExtendedPartialViewContextImpl";
 	private static final String RICHFACES_RLR_RENDERER_TYPE =
@@ -107,7 +102,6 @@ public final class Hacks {
 
 	// Lazy loaded properties (will only be initialized when FacesContext is available) -------------------------------
 
-	private static Boolean richFacesResourceOptimizationEnabled;
 	private static Boolean myFacesUsed;
 	private static Long defaultResourceMaxAge;
 
@@ -144,10 +138,15 @@ public final class Hacks {
 	// RichFaces related ----------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns true if RichFaces is installed. That is, when the RichFaces specific ExtendedPartialViewContextImpl is
-	 * present in the runtime classpath -which is present in RF 4.x. As this is usually auto-registered, we may safely
-	 * assume that RichFaces is installed.
-	 * @return Whether RichFaces is installed.
+	 * Returns true if RichFaces 4.0-4.3 is installed. That is, when the RichFaces 4.0-4.3 specific
+	 * ExtendedPartialViewContextImpl is present in the runtime classpath. As this is usually auto-registered, we may
+	 * safely assume that RichFaces 4.0-4.3 is installed.
+	 * <p>
+	 * Note: in RichFaces 4.5, this class has changed to ExtendedPartialViewContext which finally properly extends
+	 * PartialViewContextWrapper with among others the correct implementation for getRenderIds(), so the
+	 * {@link #getRichFacesPartialViewContext()} hack isn't anymore necessary for the purpose.
+	 * Also note that RichFaces 4.4 doesn't exist.
+	 * @return Whether RichFaces 4.0-4.3 is installed.
 	 */
 	public static boolean isRichFacesInstalled() {
 		return RICHFACES_INSTALLED;
@@ -209,28 +208,6 @@ public final class Hacks {
 		}
 
 		return null;
-	}
-
-	/**
-	 * RichFaces "resource optimization" do not support {@link Resource#getURL()} and {@link Resource#getInputStream()}.
-	 * The combined resource handler has to manually create the URL based on {@link Resource#getRequestPath()} and the
-	 * current request domain URL whenever RichFaces "resource optimization" is enabled.
-	 * @return Whether RichFaces resource optimization is enabled.
-	 */
-	public static boolean isRichFacesResourceOptimizationEnabled() {
-		if (richFacesResourceOptimizationEnabled == null) {
-			if (!RICHFACES_INSTALLED) {
-				richFacesResourceOptimizationEnabled = false;
-			}
-			else if (hasContext()) {
-				richFacesResourceOptimizationEnabled = Boolean.valueOf(getInitParameter(RICHFACES_RO_INIT_PARAM));
-			}
-			else {
-				return false;
-			}
-		}
-
-		return richFacesResourceOptimizationEnabled;
 	}
 
 	/**
