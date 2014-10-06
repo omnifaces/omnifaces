@@ -42,63 +42,77 @@ import org.omnifaces.renderer.InlineStylesheetRenderer;
 import org.omnifaces.util.Hacks;
 
 /**
+ * <p>
  * This {@link ResourceHandler} implementation will remove all separate script and stylesheet resources which have the
- * <code>target</code> attribute set to <code>"head"</code> from the <code>UIViewRoot</code> and create a combined one
+ * <code>target</code> attribute set to <code>"head"</code> from the {@link UIViewRoot} and create a combined one
  * for all scripts and another combined one for all stylesheets.
+ *
+ * <h3>Installation</h3>
  * <p>
  * To get it to run, this handler needs be registered as follows in <code>faces-config.xml</code>:
  * <pre>
  * &lt;application&gt;
- *   &lt;resource-handler&gt;org.omnifaces.resourcehandler.CombinedResourceHandler&lt;/resource-handler&gt;
+ *     &lt;resource-handler&gt;org.omnifaces.resourcehandler.CombinedResourceHandler&lt;/resource-handler&gt;
  * &lt;/application&gt;
  * </pre>
+ *
+ * <h3>Usage</h3>
  * <p>
- * Note that the <code>target</code> attribute of <code>&lt;h:outputStylesheet&gt;</code> already defaults to
+ * Noted shuold be that the <code>target</code> attribute of <code>&lt;h:outputStylesheet&gt;</code> already defaults to
  * <code>"head"</code> but the one of <code>&lt;h:outputScript&gt;</code> not. So if you have placed this inside the
  * <code>&lt;h:head&gt;</code>, then you would still need to explicitly set its <code>target</code> attribute to
  * <code>"head"</code>, otherwise it will be treated as an inline script and not be combined. This is a design
- * limitation.
+ * limitation. This is not necessary for <code>&lt;o:deferredScript&gt;</code>.
  * <pre>
  * &lt;h:head&gt;
- *   &lt;h:outputStylesheet name="style.css" /&gt;
- *   &lt;h:outputScript name="script.js" target="head" /&gt;
+ *     ...
+ *     &lt;h:outputStylesheet name="style.css" /&gt;
+ *     &lt;h:outputScript name="script.js" target="head" /&gt;
+ *     &lt;o:deferredScript name="onload.js" /&gt;
  * &lt;/h:head&gt;
  * </pre>
  * <p>
- * If you want them to appear <em>after</em> any auto-included resources, then move the declarations to the
- * <code>&lt;h:body&gt;</code>.
+ * If you want them to appear <em>after</em> any auto-included resources of standard JSF implementation or JSF component
+ * libraries, then move the declarations to top of the <code>&lt;h:body&gt;</code>. This is not necessary for
+ * <code>&lt;o:deferredScript&gt;</code>.
  * <pre>
  * &lt;h:body&gt;
- *   &lt;h:outputStylesheet name="style.css" /&gt;
- *   &lt;h:outputScript name="script.js" target="head" /&gt;
+ *     &lt;h:outputStylesheet name="style.css" /&gt;
+ *     &lt;h:outputScript name="script.js" target="head" /&gt;
+ *     ...
  * &lt;/h:body&gt;
  * </pre>
+ * <p>
+ * The generated combined resource URL also includes the "<code>v</code>" request parameter which is the last modified
+ * time of the newest individual resource in minutes, so that the browser will always be forced to request the latest
+ * version whenever one of the individual resources has changed.
+ *
  * <h3>Configuration</h3>
  * <p>
  * The following context parameters are available:
- * <table>
- * <tr><td nowrap>
+ * <table summary="All available context parameters">
+ * <tr><td class="colFirst">
  * <code>{@value org.omnifaces.resourcehandler.CombinedResourceHandler#PARAM_NAME_EXCLUDED_RESOURCES}</code>
  * </td><td>
  * Comma separated string of resource identifiers of <code>&lt;h:head&gt;</code> resources which needs to be excluded
  * from combining. For example:
- * <br/><code>&lt;param-value&gt;primefaces:primefaces.css, javax.faces:jsf.js&lt;/param-value&gt;</code><br/>
- * Any combined resource will be included <i>after</i> any of those excluded resources.
+ * <br><code>&lt;param-value&gt;primefaces:primefaces.css, javax.faces:jsf.js&lt;/param-value&gt;</code>
+ * <br>Any combined resource will be included <i>after</i> any of those excluded resources.
  * </td></tr>
- * <tr><td nowrap>
+ * <tr><td class="colFirst">
  * <code>{@value org.omnifaces.resourcehandler.CombinedResourceHandler#PARAM_NAME_SUPPRESSED_RESOURCES}</code>
  * </td><td>
  * Comma separated string of resource identifiers of <code>&lt;h:head&gt;</code> resources which needs to be suppressed
  * and removed. For example:
- * <br/><code>&lt;param-value&gt;skinning.ecss, primefaces:jquery/jquery.js&lt;/param-value&gt;</code>
+ * <br><code>&lt;param-value&gt;skinning.ecss, primefaces:jquery/jquery.js&lt;/param-value&gt;</code>
  * </td></tr>
- * <tr><td nowrap>
+ * <tr><td class="colFirst">
  * <code>{@value org.omnifaces.resourcehandler.CombinedResourceHandler#PARAM_NAME_INLINE_CSS}</code>
  * </td><td>
  * Set to <code>true</code> if you want to render the combined CSS resources inline (embedded in HTML) instead of as a
  * resource.
  * </td></tr>
- * <tr><td nowrap>
+ * <tr><td class="colFirst">
  * <code>{@value org.omnifaces.resourcehandler.CombinedResourceHandler#PARAM_NAME_INLINE_JS}</code>
  * </td><td>
  * Set to <code>true</code> if you want to render the combined JS resources inline (embedded in HTML) instead of as a
@@ -119,8 +133,6 @@ import org.omnifaces.util.Hacks;
  * resource cannot be resolved by a classpath URL due to RichFaces design limitations, so this combined resource handler
  * will use an internal workaround to get it to work anyway, but this involves firing a HTTP request for every resource.
  * The impact should however be relatively negligible as this is performed on localhost.
-<<<<<<< 1.x
-=======
  *
  * <h3>Conditionally disable combined resource handler</h3>
  * <p>
@@ -144,7 +156,6 @@ import org.omnifaces.util.Hacks;
  * </pre>
  * <p>The EL expression is resolved on a per-request basis.</p>
  *
->>>>>>> 3cda0b2 Add support to conditionally disable CDN and Combined resource handlers via context param (supporting EL expressions).
  * <h3>CDNResourceHandler</h3>
  * <p>
  * If you're also using the {@link CDNResourceHandler} or, at least, have configured its context parameter
@@ -152,6 +163,11 @@ import org.omnifaces.util.Hacks;
  * automatically be added to the set of excluded resources.
  *
  * @author Bauke Scholtz
+ * @see CombinedResource
+ * @see CombinedResourceInfo
+ * @see CombinedResourceInputStream
+ * @see DefaultResource
+ * @see DefaultResourceHandler
  */
 public class CombinedResourceHandler extends DefaultResourceHandler implements SystemEventListener {
 
