@@ -31,6 +31,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.faces.application.ResourceHandler;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
@@ -40,7 +42,23 @@ import javax.servlet.http.HttpServletResponse;
 import org.omnifaces.filter.CacheControlFilter;
 
 /**
- * Collection of utility methods for the Servlet API in general.
+ * <p>
+ * Collection of utility methods for the Servlet API in general. Most of them are internally used by {@link Faces}
+ * and {@link FacesLocal}, however they may also be useful in a "plain vanilla" servlet or servlet filter.
+ * <p>
+ * There are as of now also three special methods related to JSF without needing a {@link FacesContext}:
+ * <ul>
+ * <li>The {@link #isFacesAjaxRequest(HttpServletRequest)} which is capable of checking if the current request is a JSF
+ * ajax request.
+ * <li>The {@link #isFacesResourceRequest(HttpServletRequest)} which is capable of checking if the current request is a
+ * JSF resource request.
+ * <li>The {@link #facesRedirect(HttpServletRequest, HttpServletResponse, String, String...)} which is capable
+ * of distinguishing JSF ajax requests from regular requests and altering the redirect logic on it, exactly like as
+ * {@link ExternalContext#redirect(String)} does. In other words, this method behaves exactly the same as
+ * {@link Faces#redirect(String, String...)}.
+ * </ul>
+ * <p>
+ * Those methods can be used in for example a servlet filter.
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz
@@ -422,6 +440,17 @@ public final class Servlets {
 	 */
 	public static boolean isFacesAjaxRequest(HttpServletRequest request) {
 		return FACES_AJAX_HEADERS.contains(request.getHeader("Faces-Request"));
+	}
+
+	/**
+	 * Returns <code>true</code> if the given HTTP servlet request is a JSF resource request. I.e. this request will
+	 * trigger the JSF {@link ResourceHandler} for among others CSS/JS/image resources.
+	 * @return <code>true</code> if the given HTTP servlet request is a JSF resource request.
+	 * @since 2.0
+	 * @see ResourceHandler#RESOURCE_IDENTIFIER
+	 */
+	public static boolean isFacesResourceRequest(HttpServletRequest request) {
+		return request.getRequestURI().startsWith(request.getContextPath() + ResourceHandler.RESOURCE_IDENTIFIER + "/");
 	}
 
 	/**

@@ -151,7 +151,7 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 	}
 
 	/**
-	 * Returns <code>true</code> if {@link ExternalContext#getRequestServletPath()} starts with value of
+	 * Returns <code>true</code> if {@link ExternalContext#getRequestServletPath()} equals
 	 * {@link ResourceHandler#RESOURCE_IDENTIFIER}.
 	 */
 	@Override

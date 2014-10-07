@@ -16,10 +16,10 @@ import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.HOURS;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.omnifaces.util.Servlets.isFacesResourceRequest;
 
 import java.io.IOException;
 
-import javax.faces.application.ResourceHandler;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -219,7 +219,7 @@ public class CacheControlFilter extends HttpFilter {
 		(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
 			throws ServletException, IOException
 	{
-		if (!request.getRequestURI().startsWith(request.getContextPath() + ResourceHandler.RESOURCE_IDENTIFIER)) {
+		if (!isFacesResourceRequest(request)) {
 			setCacheHeaders(response, expires);
 		}
 
