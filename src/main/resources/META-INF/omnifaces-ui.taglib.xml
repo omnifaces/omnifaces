@@ -2045,7 +2045,7 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-					The destination relative to the target component where the source component(s) are move to. Valid values are
+					The destination relative to the target component where the source component(s) are moved to. Valid values are
 					<ul>
 						<li> <code>BEFORE</code>    - Component is moved right before target component, i.e. as a sibling with an index that's 1 position lower 
 						<li> <code>ADD_FIRST</code> - Component is added as the first child of the target component, any other children will have their index increased by 1

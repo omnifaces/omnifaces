@@ -43,8 +43,22 @@ import javax.faces.event.SystemEventListener;
 import org.omnifaces.util.State;
 
 /**
- * <strong>MoveComponent</strong> is a utility component via which a components and behaviors can be moved to 
- * a target component at various ways.
+ * The <code>&lt;o:cache&gt;</code> component is a utility component via which components, facets and behaviors can be moved at runtime 
+ * to a target component in various ways. This allows for simple programmatic composition of components using a declarative page author
+ * centric approach. 
+ * 
+ * <p>
+ * The destination of a move operation is specified in terms of a location that's relative to a given target component. The following
+ * shows a list of supported destinations:
+ * 
+ * <ul>
+ * 		<li> <code>BEFORE</code>    - Component is moved right before target component, i.e. as a sibling with an index that's 1 position lower 
+ *		<li> <code>ADD_FIRST</code> - Component is added as the first child of the target component, any other children will have their index increased by 1
+ *		<li> <code>ADD_LAST</code>  - Component is added as the last child of the target component, any other children will stay at their original location
+ *		<li> <code>FACET</code>     - Component will be moved to the facet section of the target component under the name denoted by "facet" 
+ *		<li> <code>BEHAVIOR</code>  - A Behavior will be moved to the behavior section of the target component
+ *		<li> <code>AFTER</code>     - Component is moved right after target component, i.e. as a sibling with an index that's 1 position higher
+ * </ul>				
  *
  * @since 2.0
  * @author Arjan Tijms
@@ -66,12 +80,12 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 	}
 	
 	public enum Destination {
-		BEFORE, 	// Component is moved right before target component, i.e. as a sibling with an index that's 1 position lower 
-		ADD_FIRST, 	// Component is added as the first child of the target component, any other children will have their index increased by 1
-		ADD_LAST, 	// Component is added as the last child of the target component, any other children will stay at their original location
-		FACET,		// Component will be moved to the facet section of the target component under the name denoted by "facet" 
-		BEHAVIOR,	// A Behavior will be moved to the behavior section of the target component
-		AFTER		// Component is moved right after target component, i.e. as a sibling with an index that's 1 position higher 
+		BEFORE, 
+		ADD_FIRST,
+		ADD_LAST,
+		FACET, 
+		BEHAVIOR,
+		AFTER 
 	}
 	
 	private String attachedEventName;
