@@ -445,6 +445,7 @@ public final class Servlets {
 	/**
 	 * Returns <code>true</code> if the given HTTP servlet request is a JSF resource request. I.e. this request will
 	 * trigger the JSF {@link ResourceHandler} for among others CSS/JS/image resources.
+	 * @param request The involved HTTP servlet request.
 	 * @return <code>true</code> if the given HTTP servlet request is a JSF resource request.
 	 * @since 2.0
 	 * @see ResourceHandler#RESOURCE_IDENTIFIER

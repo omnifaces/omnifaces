@@ -43,22 +43,23 @@ import javax.faces.event.SystemEventListener;
 import org.omnifaces.util.State;
 
 /**
- * The <code>&lt;o:cache&gt;</code> component is a utility component via which components, facets and behaviors can be moved at runtime 
+ * <p>
+ * The <code>&lt;o:moveComponent&gt;</code> component is a utility component via which components, facets and behaviors can be moved at runtime
  * to a target component in various ways. This allows for simple programmatic composition of components using a declarative page author
- * centric approach. 
- * 
+ * centric approach.
+ *
  * <p>
  * The destination of a move operation is specified in terms of a location that's relative to a given target component. The following
  * shows a list of supported destinations:
- * 
+ *
  * <ul>
- * 		<li> <code>BEFORE</code>    - Component is moved right before target component, i.e. as a sibling with an index that's 1 position lower 
+ * 		<li> <code>BEFORE</code>    - Component is moved right before target component, i.e. as a sibling with an index that's 1 position lower
  *		<li> <code>ADD_FIRST</code> - Component is added as the first child of the target component, any other children will have their index increased by 1
  *		<li> <code>ADD_LAST</code>  - Component is added as the last child of the target component, any other children will stay at their original location
- *		<li> <code>FACET</code>     - Component will be moved to the facet section of the target component under the name denoted by "facet" 
+ *		<li> <code>FACET</code>     - Component will be moved to the facet section of the target component under the name denoted by "facet"
  *		<li> <code>BEHAVIOR</code>  - A Behavior will be moved to the behavior section of the target component
  *		<li> <code>AFTER</code>     - Component is moved right after target component, i.e. as a sibling with an index that's 1 position higher
- * </ul>				
+ * </ul>
  *
  * @since 2.0
  * @author Arjan Tijms
@@ -70,40 +71,40 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 
     private static final String ERROR_COMPONENT_NOT_FOUND =
         "A component with ID '%s' as specified by the 'for' attribute of the MoveComponent with Id '%s' could not be found.";
-    
+
     public static final String DEFAULT_SCOPE = "facelet";
-    
+
     private final State state = new State(getStateHelper());
 
 	enum PropertyKeys {
 		/* for */ facet, destination, behaviorDefaultEvent, behaviorEvents
 	}
-	
+
 	public enum Destination {
-		BEFORE, 
+		BEFORE,
 		ADD_FIRST,
 		ADD_LAST,
-		FACET, 
+		FACET,
 		BEHAVIOR,
-		AFTER 
+		AFTER
 	}
-	
+
 	private String attachedEventName;
 	private ClientBehavior attachedBehavior;
-	
+
 	// Used to fool over-eager tag handlers that check in advance whether a given component indeed
 	// supports the event for which a behavior is attached.
 	private List<String> containsTrueList = new ArrayList<String>() {
 		private static final long serialVersionUID = 1L;
 			@Override
 	   		public boolean contains(Object o) {
-	   			return true;       		
+	   			return true;
 	   		}
    	};
-   	
-	
+
+
 	// Actions --------------------------------------------------------------------------------------------------------
-    
+
     public MoveComponent() {
         if (!isPostback()) {
             subscribeToViewEvent(PreRenderViewEvent.class, this);
@@ -113,45 +114,45 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
         	subscribeToViewEvent(PostAddToViewEvent.class, this);
         }
     }
-   
+
     @Override
     public boolean isListenerForSource(Object source) {
         return source instanceof UIViewRoot;
     }
-   
+
     @Override
     public void processEvent(SystemEvent event) throws AbortProcessingException {
     	if (event instanceof PreRenderViewEvent || (event instanceof PostAddToViewEvent && getDestination() == BEHAVIOR)) {
     		doProcess();
     	}
     }
-    
+
     @Override
     public void addClientBehavior(String eventName, ClientBehavior behavior) {
     	attachedEventName = eventName;
     	attachedBehavior = behavior;
     }
-    
+
     @Override
     public String getDefaultEventName() {
     	return getBehaviorDefaultEvent();
     }
-    
+
     @Override
     public Collection<String> getEventNames() {
     	if (isEmpty(getBehaviorEvents())) {
 	       	return containsTrueList;
        	}
-    	
+
     	return csvToList(getBehaviorEvents());
     }
-   
+
     public void doProcess() {
         String forValue = getFor();
-        
+
         if (!isEmpty(forValue)) {
             UIComponent component = findComponentRelatively(this, forValue);
-            
+
             if (component == null) {
             	component = findComponent(forValue);
             }
@@ -159,7 +160,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
             if (component == null) {
                 throw new IllegalArgumentException(format(ERROR_COMPONENT_NOT_FOUND, forValue, getId()));
             }
-            
+
             switch (getDestination()) {
             	case BEFORE:
             		for (int i = 0; i < getChildren().size(); i++) {
@@ -183,10 +184,10 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
             		break;
             	case BEHAVIOR:
             		if (component instanceof ClientBehaviorHolder) {
-            			
+
             			ClientBehaviorHolder clientBehaviorHolder = (ClientBehaviorHolder) component;
             			List<ClientBehavior> behaviors = clientBehaviorHolder.getClientBehaviors().get(attachedEventName);
-            			
+
             			if (behaviors == null || !behaviors.contains(this)) { // Guard against adding ourselves twice
             				clientBehaviorHolder.addClientBehavior(attachedEventName, attachedBehavior);
             			}
@@ -198,13 +199,13 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 					}
             		break;
             }
-            
+
         }
     }
-    
-    
+
+
     // Attribute getters/setters --------------------------------------------------------------------------------------
- 
+
   	public String getFor() {
 		return state.get("for");
 	}
@@ -212,7 +213,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 	public void setFor(String nameValue) {
 		state.put("for", nameValue);
 	}
-    
+
 	public Destination getDestination() {
 		return state.get(destination, ADD_LAST);
 	}
@@ -220,7 +221,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 	public void setDestination(Destination destinationValue) {
 		state.put(destination, destinationValue);
 	}
-	
+
 	public String getFacet() {
 		return state.get(facet);
 	}
@@ -228,7 +229,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 	public void setFacet(String facetValue) {
 		state.put(facet, facetValue);
 	}
-	
+
 	public String getBehaviorDefaultEvent() {
 		return state.get(behaviorDefaultEvent, "");
 	}
@@ -236,7 +237,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 	public void setBehaviorDefaultEvent(String behaviorDefaultEventValue) {
 		state.put(behaviorDefaultEvent, behaviorDefaultEventValue);
 	}
-	
+
 	public String getBehaviorEvents() {
 		return state.get(behaviorEvents);
 	}
@@ -244,4 +245,5 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 	public void setBehaviorEvents(String behaviorEventsValue) {
 		state.put(behaviorEvents, behaviorEventsValue);
 	}
+
 }
