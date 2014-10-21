@@ -24,7 +24,7 @@ import javax.faces.component.UIComponent;
  * @author Arjan Tijms
  */
 public class Components {
-	
+
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	private Components() {
@@ -33,17 +33,27 @@ public class Components {
 
 	// Utility --------------------------------------------------------------------------------------------------------
 
+	/**
+	 * Evaluates an attribute of a component by first checking if there's a value expression associated with it, and only if there isn't one
+	 * look at a component property with that name.
+	 * <p>
+	 * The regular attribute collection ({@link UIComponent#getAttributes()}) does exactly the reverse; it looks at a component property
+	 * first, then at the attribute collection and only looks at a value binding as the last option.
+	 * 
+	 * @param component The component for which the attribute is to be evaluated
+	 * @param name Name of attribute that is to be evaluated
+	 * @return The value of the attribute, or null if either the component is null or if there's isn't an attribute by that name
+	 */
 	public static Object evalAttribute(UIComponent component, String name) {
 		if (component == null) {
 			return null;
 		}
-		
+
 		ValueExpression valueExpression = component.getValueExpression(name);
 		if (valueExpression != null) {
 			return valueExpression.getValue(getELContext());
 		} else {
 			return component.getAttributes().get(name);
 		}
-		
 	}
 }
