@@ -76,6 +76,7 @@ public final class Utils {
 	private static final String PATTERN_RFC1123_DATE = "EEE, dd MMM yyyy HH:mm:ss zzz";
 	private static final TimeZone TIMEZONE_GMT = TimeZone.getTimeZone("GMT");
 	private static final String ERROR_UNSUPPORTED_ENCODING = "UTF-8 is apparently not supported on this platform.";
+	private static final String ERROR_CLASS_NOT_FOUND = "Class not found: ";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -306,6 +307,19 @@ public final class Utils {
 
 		return false;
 	}
+	
+	public static Class<?> toClass(String type) {
+		try {
+			return (Class.forName(type, true, Thread.currentThread().getContextClassLoader()));
+		} catch (ClassNotFoundException e1) {
+			try {
+				return Class.forName(type);
+			} catch (ClassNotFoundException e2) {
+				throw new IllegalStateException(ERROR_CLASS_NOT_FOUND + type);
+			}
+		}
+	}
+	
 
 	// I/O ------------------------------------------------------------------------------------------------------------
 

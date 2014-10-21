@@ -12,24 +12,36 @@
  */
 package org.omnifaces.taghandler;
 
+import static javax.faces.event.PhaseId.PROCESS_VALIDATIONS;
+import static javax.faces.view.facelets.ComponentHandler.isNew;
+import static org.omnifaces.util.Components.getClosestParent;
+import static org.omnifaces.util.Components.getCurrentForm;
 import static org.omnifaces.util.Components.hasInvokedSubmit;
 import static org.omnifaces.util.Events.subscribeToViewBeforePhase;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
+import static org.omnifaces.util.Messages.createError;
+import static org.omnifaces.util.Platform.getBeanValidator;
+import static org.omnifaces.util.Utils.csvToList;
+import static org.omnifaces.util.Utils.toClass;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
+import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
-import javax.faces.event.PhaseId;
+import javax.faces.context.FacesContext;
 import javax.faces.event.PostValidateEvent;
 import javax.faces.event.PreValidateEvent;
 import javax.faces.event.SystemEventListener;
-import javax.faces.view.facelets.ComponentHandler;
 import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagAttribute;
 import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
+import javax.validation.ConstraintViolation;
 
 import org.omnifaces.eventlistener.BeanValidationEventListener;
 import org.omnifaces.util.Callback;
@@ -66,12 +78,15 @@ public class ValidateBean extends TagHandler {
 
 	private static final String ERROR_INVALID_PARENT =
 		"Parent component of o:validateBean must be an instance of UICommand or UIInput.";
+	
+	 private static final Class<?>[] CLASS_ARRAY = new Class<?>[0];
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private TagAttribute validationGroups;
 	private TagAttribute disabled;
-
+	private TagAttribute value;
+	
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
@@ -91,27 +106,92 @@ public class ValidateBean extends TagHandler {
 	 */
 	@Override
 	public void apply(FaceletContext context, final UIComponent parent) throws IOException {
-		if (!(parent instanceof UICommand || parent instanceof UIInput)) {
+		if (value == null && !(parent instanceof UICommand || parent instanceof UIInput)) {
 			throw new IllegalArgumentException(ERROR_INVALID_PARENT);
 		}
 
-		if (!ComponentHandler.isNew(parent)) {
+		if (!isNew(parent)) {
 			return;
 		}
 
 		final String validationGroups = this.validationGroups != null ? this.validationGroups.getValue(context) : null;
 		final boolean disabled = this.disabled != null ? this.disabled.getBoolean(context) : false;
-		subscribeToViewBeforePhase(PhaseId.PROCESS_VALIDATIONS, new Callback.Void() {
-
-			@Override
-			public void invoke() {
-				if (hasInvokedSubmit(parent)) {
-					SystemEventListener listener = new BeanValidationEventListener(validationGroups, disabled);
-					subscribeToViewEvent(PreValidateEvent.class, listener);
-					subscribeToViewEvent(PostValidateEvent.class, listener);
+		
+		final Object value = this.value.getObject(context);
+		
+		if (value != null) {
+			final List<Class<?>> groups = toClasses(validationGroups);
+	
+			Callback.Void callback = new Callback.Void() {
+	            @Override
+	            public void invoke() {
+	
+					// Check if any form has been submitted at all
+					UIForm submittedForm = getCurrentForm();
+					if (submittedForm == null) {
+						return;
+					}
+	           
+	                // A form has been submitted, get the form we're nested in
+	                UIForm targetForm = getTargetForm(parent);
+	               
+	                // Check if the form that was submitted is the same one as we're nested in
+	                if (submittedForm.equals(targetForm)) {
+	                    Set<ConstraintViolation<?>> violations = validate(groups);
+	                    
+	                    if (!violations.isEmpty()) {
+		                    FacesContext context = FacesContext.getCurrentInstance();
+		                    
+		                    for (ConstraintViolation<?> violation : violations) {
+		    					context.addMessage(targetForm.getClientId(context), createError(violation.getMessage(), ""));
+		    				}
+	                    }
+	                }
+	            }
+	        };
+	        
+	        subscribeToViewBeforePhase(PROCESS_VALIDATIONS, callback);
+		} else {
+			subscribeToViewBeforePhase(PROCESS_VALIDATIONS, new Callback.Void() {
+	
+				@Override
+				public void invoke() {
+					if (hasInvokedSubmit(parent)) {
+						SystemEventListener listener = new BeanValidationEventListener(validationGroups, disabled);
+						subscribeToViewEvent(PreValidateEvent.class, listener);
+						subscribeToViewEvent(PostValidateEvent.class, listener);
+					}
 				}
-			}
-		});
+			});
+		}
+	}
+	
+	private List<Class<?>> toClasses(String validationGroups) {
+		final List<Class<?>> groups = new ArrayList<>();
+		
+		for (String type : csvToList(validationGroups)) {
+			groups.add(toClass(type));
+		}
+		
+		return groups;
+	}
+	
+	private UIForm getTargetForm(UIComponent parent) {
+		 if (parent instanceof UIForm) {
+             return (UIForm) parent;
+         } 
+		 
+         return getClosestParent(parent, UIForm.class);
+	}
+	
+	private Set<ConstraintViolation<?>> validate(List<Class<?>> groups) {
+		@SuppressWarnings("rawtypes")
+        Set violationsRaw = getBeanValidator().validate(value, groups.toArray(CLASS_ARRAY));
+
+        @SuppressWarnings("unchecked")
+        Set<ConstraintViolation<?>> violations = violationsRaw;
+        
+        return violations;
 	}
 
 }
