@@ -13,12 +13,17 @@
 package org.omnifaces.taghandler;
 
 import static javax.faces.event.PhaseId.PROCESS_VALIDATIONS;
+import static javax.faces.event.PhaseId.UPDATE_MODEL_VALUES;
 import static javax.faces.view.facelets.ComponentHandler.isNew;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Components.getCurrentForm;
 import static org.omnifaces.util.Components.hasInvokedSubmit;
+import static org.omnifaces.util.Events.subscribeToViewAfterPhase;
 import static org.omnifaces.util.Events.subscribeToViewBeforePhase;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
+import static org.omnifaces.util.Facelets.getBoolean;
+import static org.omnifaces.util.Facelets.getObject;
+import static org.omnifaces.util.Facelets.getString;
 import static org.omnifaces.util.Messages.createError;
 import static org.omnifaces.util.Platform.getBeanValidator;
 import static org.omnifaces.util.Utils.csvToList;
@@ -114,12 +119,13 @@ public class ValidateBean extends TagHandler {
 		if (!isNew(parent)) {
 			return;
 		}
-
-		final String validationGroups = this.validationGroups != null ? this.validationGroups.getValue(context) : null;
-		final boolean disabled = this.disabled != null ? this.disabled.getBoolean(context) : false;
-		final Object value = this.value!= null ? this.value.getObject(context) : null;
+		
+		final boolean disabled = getBoolean(this.disabled, context);
+		final String validationGroups = getString(this.validationGroups, context);
+		final Object value = getObject(this.value, context);
 		
 		if (value != null) {
+			
 			final List<Class<?>> groups = toClasses(validationGroups);
 	
 			Callback.Void callback = new Callback.Void() {
@@ -137,20 +143,20 @@ public class ValidateBean extends TagHandler {
 	               
 	                // Check if the form that was submitted is the same one as we're nested in
 	                if (submittedForm.equals(targetForm)) {
-	                    Set<ConstraintViolation<?>> violations = validate(groups);
+	                    Set<ConstraintViolation<?>> violations = validate(value, groups);
 	                    
 	                    if (!violations.isEmpty()) {
 		                    FacesContext context = FacesContext.getCurrentInstance();
-		                    
+		                    context.validationFailed();
 		                    for (ConstraintViolation<?> violation : violations) {
-		    					context.addMessage(targetForm.getClientId(context), createError(violation.getMessage(), ""));
+		    					context.addMessage(targetForm.getClientId(context), createError(violation.getMessage()));
 		    				}
 	                    }
 	                }
 	            }
 	        };
 	        
-	        subscribeToViewBeforePhase(PROCESS_VALIDATIONS, callback);
+	        subscribeToViewAfterPhase(UPDATE_MODEL_VALUES, callback);
 		} else {
 			subscribeToViewBeforePhase(PROCESS_VALIDATIONS, new Callback.Void() {
 	
@@ -184,7 +190,7 @@ public class ValidateBean extends TagHandler {
          return getClosestParent(parent, UIForm.class);
 	}
 	
-	private Set<ConstraintViolation<?>> validate(List<Class<?>> groups) {
+	private Set<ConstraintViolation<?>> validate(Object value, List<Class<?>> groups) {
 		@SuppressWarnings("rawtypes")
         Set violationsRaw = getBeanValidator().validate(value, groups.toArray(CLASS_ARRAY));
 
