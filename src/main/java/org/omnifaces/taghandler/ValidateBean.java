@@ -97,6 +97,7 @@ public class ValidateBean extends TagHandler {
 		super(config);
 		validationGroups = getAttribute("validationGroups");
 		disabled = getAttribute("disabled");
+		value = getAttribute("value");
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -116,8 +117,7 @@ public class ValidateBean extends TagHandler {
 
 		final String validationGroups = this.validationGroups != null ? this.validationGroups.getValue(context) : null;
 		final boolean disabled = this.disabled != null ? this.disabled.getBoolean(context) : false;
-		
-		final Object value = this.value.getObject(context);
+		final Object value = this.value!= null ? this.value.getObject(context) : null;
 		
 		if (value != null) {
 			final List<Class<?>> groups = toClasses(validationGroups);
