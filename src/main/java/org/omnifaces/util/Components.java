@@ -387,7 +387,7 @@ public final class Components {
 		private UIComponent root;
 		private Collection<String> ids;
 		private Set<VisitHint> hints;
-		private Class<? extends UIComponent>[] types;
+		private Class<?>[] types;
 
 		public ForEach() {
 			facesContext = Faces.getContext();
@@ -468,7 +468,7 @@ public final class Components {
 		 * @return the intermediate builder object to continue the builder chain
 		 */
 		@SafeVarargs
-		public final ForEach ofTypes(Class<? extends UIComponent>... types) {
+		public final ForEach ofTypes(Class<?>... types) {
 			this.types = types;
 			return this;
 		}
@@ -537,10 +537,10 @@ public final class Components {
 
 		private static class TypesVisitCallback implements VisitCallback {
 
-			private Class<? extends UIComponent>[] types;
+			private Class<?>[] types;
 			private VisitCallback next;
 
-			public TypesVisitCallback(Class<? extends UIComponent>[] types, VisitCallback next) {
+			public TypesVisitCallback(Class<?>[] types, VisitCallback next) {
 				this.types = types;
 				this.next = next;
 			}

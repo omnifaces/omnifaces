@@ -13,8 +13,9 @@
 package org.omnifaces.taghandler;
 
 import static javax.faces.event.PhaseId.PROCESS_VALIDATIONS;
-import static javax.faces.event.PhaseId.UPDATE_MODEL_VALUES;
 import static javax.faces.view.facelets.ComponentHandler.isNew;
+import static org.omnifaces.el.ExpressionInspector.getValueReference;
+import static org.omnifaces.util.Components.forEachComponent;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Components.getCurrentForm;
 import static org.omnifaces.util.Components.hasInvokedSubmit;
@@ -31,9 +32,14 @@ import static org.omnifaces.util.Utils.toClass;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import javax.el.ValueExpression;
+import javax.el.ValueReference;
+import javax.faces.component.EditableValueHolder;
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
@@ -42,6 +48,8 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.PostValidateEvent;
 import javax.faces.event.PreValidateEvent;
 import javax.faces.event.SystemEventListener;
+import javax.faces.validator.Validator;
+import javax.faces.validator.ValidatorException;
 import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagAttribute;
 import javax.faces.view.facelets.TagConfig;
@@ -156,7 +164,99 @@ public class ValidateBean extends TagHandler {
 	            }
 	        };
 	        
-	        subscribeToViewAfterPhase(UPDATE_MODEL_VALUES, callback);
+	        final Map<String, Object> propertyValues = new HashMap<>();
+	        
+	        Callback.Void collectPropertyValues = new Callback.Void() {
+	            @Override
+	            public void invoke() {
+	
+					// Check if any form has been submitted at all
+					UIForm submittedForm = getCurrentForm();
+					if (submittedForm == null) {
+						return;
+					}
+	           
+	                // A form has been submitted, get the form we're nested in
+	                UIForm targetForm = getTargetForm(parent);
+	               
+	                // Check if the form that was submitted is the same one as we're nested in
+	                if (submittedForm.equals(targetForm)) {
+	                	
+	                	final FacesContext context = FacesContext.getCurrentInstance();
+	                	
+	                	forEachComponent(context)
+                			  .fromRoot(targetForm)
+                			  .ofTypes(EditableValueHolder.class)
+                			  .invoke(new Callback.WithArgument<UIComponent>() { @Override public void invoke(UIComponent component) {
+                				  
+                				  ValueExpression valueExpression = component.getValueExpression("value");
+                				  if (valueExpression != null) {
+                					  ValueReference valueReference = getValueReference(context.getELContext(), valueExpression);
+                					  if (valueReference.getBase().equals(value)) {
+                						  ((EditableValueHolder) component).addValidator(new CollectingValidator(propertyValues, valueReference.getProperty().toString()));
+                					  }
+                				  }
+                					
+                			  }}
+                		);
+	                   
+	                }
+	            }
+	        };
+	        
+	        Callback.Void checkConstraints = new Callback.Void() {
+	            @Override
+	            public void invoke() {
+	
+					// Check if any form has been submitted at all
+					UIForm submittedForm = getCurrentForm();
+					if (submittedForm == null) {
+						return;
+					}
+	           
+	                // A form has been submitted, get the form we're nested in
+	                UIForm targetForm = getTargetForm(parent);
+	               
+	                // Check if the form that was submitted is the same one as we're nested in
+	                if (submittedForm.equals(targetForm)) {
+	            
+	                	final FacesContext context = FacesContext.getCurrentInstance();
+	                	
+	                	forEachComponent(context)
+		          			  .fromRoot(targetForm)
+		          			  .ofTypes(EditableValueHolder.class)
+		          			  .invoke(new Callback.WithArgument<UIComponent>() { @Override public void invoke(UIComponent component) {
+		          				  
+									ValueExpression valueExpression = component.getValueExpression("value");
+									if (valueExpression != null) {
+										ValueReference valueReference = getValueReference(context.getELContext(), valueExpression);
+										if (valueReference.getBase().equals(value)) {
+											removeCollectingValidator((EditableValueHolder) component);
+										}
+									}
+		          					
+		          			  }}
+		          					  
+		          		);
+	                	
+	                	for (Map.Entry<String, Object> entry : propertyValues.entrySet()) {
+	                		System.out.println("key:" + entry.getKey() + " value:" + entry.getValue());
+	                	}
+	                	
+	                    Set<ConstraintViolation<?>> violations = validate(value, groups);
+	                    
+	                    if (!violations.isEmpty()) {
+		                    context.validationFailed();
+		                    for (ConstraintViolation<?> violation : violations) {
+		    					context.addMessage(targetForm.getClientId(context), createError(violation.getMessage()));
+		    				}
+	                    }
+	                }
+	            }
+	        };
+	        
+	        subscribeToViewBeforePhase(PROCESS_VALIDATIONS, collectPropertyValues);
+	        subscribeToViewAfterPhase(PROCESS_VALIDATIONS, checkConstraints);
 		} else {
 			subscribeToViewBeforePhase(PROCESS_VALIDATIONS, new Callback.Void() {
 	
@@ -169,6 +269,36 @@ public class ValidateBean extends TagHandler {
 					}
 				}
 			});
+		}
+	}
+	
+	public final static class CollectingValidator implements Validator {
+		
+		private final Map<String, Object> propertyValues;
+		private final String property;
+		
+		public CollectingValidator(Map<String, Object> propertyValues, String property) {
+			this.propertyValues = propertyValues;
+			this.property = property;
+		}
+		
+		@Override
+		public void validate(FacesContext context, UIComponent component, Object value) throws ValidatorException {
+			propertyValues.put(property, value);
+		}
+	}
+	
+	private static void removeCollectingValidator(EditableValueHolder valueHolder) {
+		Validator collectingValidator = null;
+		for (Validator validator : valueHolder.getValidators()) {
+			if (validator instanceof CollectingValidator) {
+				collectingValidator = validator;
+				break;
+			}
+		}
+		
+		if (collectingValidator != null) {
+			valueHolder.removeValidator(collectingValidator);
 		}
 	}
 	
