@@ -58,6 +58,7 @@ import javax.validation.ConstraintViolation;
 
 import org.omnifaces.eventlistener.BeanValidationEventListener;
 import org.omnifaces.util.Callback;
+import org.omnifaces.util.Callback.WithArgument;
 
 /**
  * <p>
@@ -136,124 +137,63 @@ public class ValidateBean extends TagHandler {
 			
 			final List<Class<?>> groups = toClasses(validationGroups);
 	
-			Callback.Void callback = new Callback.Void() {
-	            @Override
-	            public void invoke() {
-	
-					// Check if any form has been submitted at all
-					UIForm submittedForm = getCurrentForm();
-					if (submittedForm == null) {
-						return;
-					}
-	           
-	                // A form has been submitted, get the form we're nested in
-	                UIForm targetForm = getTargetForm(parent);
-	               
-	                // Check if the form that was submitted is the same one as we're nested in
-	                if (submittedForm.equals(targetForm)) {
-	                    Set<ConstraintViolation<?>> violations = validate(value, groups);
-	                    
-	                    if (!violations.isEmpty()) {
-		                    FacesContext context = FacesContext.getCurrentInstance();
-		                    context.validationFailed();
-		                    for (ConstraintViolation<?> violation : violations) {
-		    					context.addMessage(targetForm.getClientId(context), createError(violation.getMessage()));
-		    				}
-	                    }
-	                }
-	            }
-	        };
+			Callback.Void callback = new TargetFormInvoker(parent, new WithArgument<UIForm>() { @Override	public void invoke(UIForm targetForm) {
+	        	
+	        	final FacesContext context = FacesContext.getCurrentInstance();
+            	
+                Set<ConstraintViolation<?>> violations = validate(value, groups);
+                
+                if (!violations.isEmpty()) {
+                    context.validationFailed();
+                    for (ConstraintViolation<?> violation : violations) {
+    					context.addMessage(targetForm.getClientId(context), createError(violation.getMessage()));
+    				}
+                }
+				
+			}});
 	        
 	        final Map<String, Object> propertyValues = new HashMap<>();
 	        
-	        Callback.Void collectPropertyValues = new Callback.Void() {
-	            @Override
-	            public void invoke() {
-	
-					// Check if any form has been submitted at all
-					UIForm submittedForm = getCurrentForm();
-					if (submittedForm == null) {
-						return;
-					}
-	           
-	                // A form has been submitted, get the form we're nested in
-	                UIForm targetForm = getTargetForm(parent);
-	               
-	                // Check if the form that was submitted is the same one as we're nested in
-	                if (submittedForm.equals(targetForm)) {
-	                	
-	                	final FacesContext context = FacesContext.getCurrentInstance();
-	                	
-	                	forEachComponent(context)
-                			  .fromRoot(targetForm)
-                			  .ofTypes(EditableValueHolder.class)
-                			  .invoke(new Callback.WithArgument<UIComponent>() { @Override public void invoke(UIComponent component) {
-                				  
-                				  ValueExpression valueExpression = component.getValueExpression("value");
-                				  if (valueExpression != null) {
-                					  ValueReference valueReference = getValueReference(context.getELContext(), valueExpression);
-                					  if (valueReference.getBase().equals(value)) {
-                						  ((EditableValueHolder) component).addValidator(new CollectingValidator(propertyValues, valueReference.getProperty().toString()));
-                					  }
-                				  }
-                					
-                			  }}
-                		);
-	                   
-	                }
-	            }
-	        };
+	        // Callback that adds a validator to each input for which its value binding resolves to a base that is the same as the target
+	        // of the o:validateBean. This validator will then not actually validate, but just capture the value for that input.
+	        //
+	        // E.g. in h:inputText value=#{bean.target.property} and o:validateBean value=#{bean.target}, this will collect {"property", [captured value]}
 	        
-	        Callback.Void checkConstraints = new Callback.Void() {
-	            @Override
-	            public void invoke() {
-	
-					// Check if any form has been submitted at all
-					UIForm submittedForm = getCurrentForm();
-					if (submittedForm == null) {
-						return;
-					}
-	           
-	                // A form has been submitted, get the form we're nested in
-	                UIForm targetForm = getTargetForm(parent);
-	               
-	                // Check if the form that was submitted is the same one as we're nested in
-	                if (submittedForm.equals(targetForm)) {
-	            
-	                	final FacesContext context = FacesContext.getCurrentInstance();
-	                	
-	                	forEachComponent(context)
-		          			  .fromRoot(targetForm)
-		          			  .ofTypes(EditableValueHolder.class)
-		          			  .invoke(new Callback.WithArgument<UIComponent>() { @Override public void invoke(UIComponent component) {
-		          				  
-									ValueExpression valueExpression = component.getValueExpression("value");
-									if (valueExpression != null) {
-										ValueReference valueReference = getValueReference(context.getELContext(), valueExpression);
-										if (valueReference.getBase().equals(value)) {
-											removeCollectingValidator((EditableValueHolder) component);
-										}
-									}
-		          					
-		          			  }}
-		          					  
-		          		);
-	                	
-	                	for (Map.Entry<String, Object> entry : propertyValues.entrySet()) {
-	                		System.out.println("key:" + entry.getKey() + " value:" + entry.getValue());
-	                	}
-	                	
-	                    Set<ConstraintViolation<?>> violations = validate(value, groups);
-	                    
-	                    if (!violations.isEmpty()) {
-		                    context.validationFailed();
-		                    for (ConstraintViolation<?> violation : violations) {
-		    					context.addMessage(targetForm.getClientId(context), createError(violation.getMessage()));
-		    				}
-	                    }
-	                }
-	            }
-	        };
+	        Callback.Void collectPropertyValues = new TargetFormInvoker(parent, new WithArgument<UIForm>() { @Override	public void invoke(UIForm targetForm) {
+	        	
+	        	final FacesContext context = FacesContext.getCurrentInstance();
+	        	
+	        	forEachInputWithMatchingBase(context, targetForm, value, propertyValues, new op2() { @Override public void invoke(EditableValueHolder v, ValueReference vr) {
+	        		/* (v, vr) -> */ addCollectingValidator(v, vr, propertyValues);
+            	}});
+				
+			}});
+	        		
+	        
+	        Callback.Void checkConstraints = new TargetFormInvoker(parent, new WithArgument<UIForm>() { @Override	public void invoke(UIForm targetForm) {
+	        	
+	        	final FacesContext context = FacesContext.getCurrentInstance();
+	        	
+	        	// First remove the collecting validator again, since it will otherwise be state saved with the component at the end of the lifecycle.
+	        	
+	        	forEachInputWithMatchingBase(context, targetForm, value, propertyValues, new op2() { @Override public void invoke(EditableValueHolder v, ValueReference vr) {
+	        		/* (v, vr) -> */ removeCollectingValidator(v);
+            	}});
+	        	
+	        	for (Map.Entry<String, Object> entry : propertyValues.entrySet()) {
+            		System.out.println("key:" + entry.getKey() + " value:" + entry.getValue());
+            	}
+            	
+                Set<ConstraintViolation<?>> violations = validate(value, groups);
+                
+                if (!violations.isEmpty()) {
+                    context.validationFailed();
+                    for (ConstraintViolation<?> violation : violations) {
+    					context.addMessage(targetForm.getClientId(context), createError(violation.getMessage()));
+    				}
+                }
+				
+			}});
 	        
 	        subscribeToViewBeforePhase(PROCESS_VALIDATIONS, collectPropertyValues);
 	        subscribeToViewAfterPhase(PROCESS_VALIDATIONS, checkConstraints);
@@ -272,6 +212,24 @@ public class ValidateBean extends TagHandler {
 		}
 	}
 	
+	public void forEachInputWithMatchingBase(final FacesContext context, UIComponent targetForm, final Object targetBase, final Map<String, Object> propertyValues, final Callback.With2Arguments<EditableValueHolder, ValueReference> operation) {
+		forEachComponent(context)
+			.fromRoot(targetForm)
+			.ofTypes(EditableValueHolder.class)
+			.invoke(new Callback.WithArgument<UIComponent>() { @Override public void invoke(UIComponent component) {
+			  
+				ValueExpression valueExpression = component.getValueExpression("value");
+				if (valueExpression != null) {
+					ValueReference valueReference = getValueReference(context.getELContext(), valueExpression);
+					if (valueReference.getBase().equals(targetBase)) {
+						operation.invoke((EditableValueHolder) component, valueReference);
+					}
+				}
+			}}
+	  );
+	}
+
+	
 	public final static class CollectingValidator implements Validator {
 		
 		private final Map<String, Object> propertyValues;
@@ -286,6 +244,41 @@ public class ValidateBean extends TagHandler {
 		public void validate(FacesContext context, UIComponent component, Object value) throws ValidatorException {
 			propertyValues.put(property, value);
 		}
+	}
+	
+	public final class TargetFormInvoker implements Callback.Void {
+
+		private final UIComponent parent;
+		private WithArgument<UIForm> operation;
+
+		public TargetFormInvoker(UIComponent parent, WithArgument<UIForm> operation) {
+			this.parent = parent;
+			this.operation = operation;
+		}
+
+		@Override
+		public void invoke() {
+
+			// Check if any form has been submitted at all
+			UIForm submittedForm = getCurrentForm();
+			if (submittedForm == null) {
+				return;
+			}
+
+			// A form has been submitted, get the form we're nested in
+			UIForm targetForm = getTargetForm(parent);
+
+			// Check if the form that was submitted is the same one as we're nested in
+			if (submittedForm.equals(targetForm)) {
+				operation.invoke(targetForm);
+			}
+		}
+	}
+	
+	public abstract class op2 implements Callback.With2Arguments<EditableValueHolder, ValueReference> {}
+	
+	private static void addCollectingValidator(EditableValueHolder valueHolder, ValueReference valueReference,  Map<String, Object> propertyValues) {
+		valueHolder.addValidator(new CollectingValidator(propertyValues, valueReference.getProperty().toString()));
 	}
 	
 	private static void removeCollectingValidator(EditableValueHolder valueHolder) {
