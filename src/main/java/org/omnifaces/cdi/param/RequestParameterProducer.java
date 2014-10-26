@@ -23,6 +23,7 @@ import static org.omnifaces.util.FacesLocal.getRequestParameter;
 import static org.omnifaces.util.Messages.createError;
 import static org.omnifaces.util.Platform.getBeanValidator;
 import static org.omnifaces.util.Platform.isBeanValidationAvailable;
+import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Utils.containsByClassName;
 import static org.omnifaces.util.Utils.isEmpty;
 
@@ -422,15 +423,7 @@ public class RequestParameterProducer {
 			}
 		}
 	}
-
-	private static <T> T instance(Class<T> clazz) {
-		try {
-			return clazz.newInstance();
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
-	}
-
+	
 	private static List<FacesMessage> getFacesMessages(ValidatorException ve) {
 		List<FacesMessage> facesMessages = new ArrayList<>();
 		if (ve.getFacesMessages() != null) {

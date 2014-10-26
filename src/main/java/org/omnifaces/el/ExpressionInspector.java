@@ -2,10 +2,7 @@ package org.omnifaces.el;
 
 import static org.omnifaces.el.MethodReference.NO_PARAMS;
 import static org.omnifaces.el.functions.Strings.capitalize;
-
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.List;
+import static org.omnifaces.util.Reflection.findMethod;
 
 import javax.el.ELContext;
 import javax.el.ELResolver;
@@ -95,56 +92,7 @@ public class ExpressionInspector {
 		);
 	}
 
-	/**
-	 * Finds a method based on the method name, amount of parameters and limited typing, if necessary prefixed with "get".
-	 * <p>
-	 * Note that this supports overloading, but a limited one. Given an actual parameter of type Long, this will select
-	 * a method accepting Number when the choice is between Number and a non-compatible type like String. However,
-	 * it will NOT select the best match if the choice is between Number and Long.
-	 *
-	 * @param base the object in which the method is to be found
-	 * @param methodName name of the method to be found
-	 * @param params the method parameters
-	 * @return a method if one is found, null otherwise
-	 */
-	public static Method findMethod(Object base, String methodName, Object[] params) {
 
-	    List<Method> methods = new ArrayList<>();
-		for (Method method : base.getClass().getMethods()) {
-			if (method.getName().equals(methodName) && method.getParameterTypes().length == params.length) {
-			    methods.add(method);
-			}
-		}
-
-		if (methods.size() == 1) {
-		    return methods.get(0);
-		}
-
-		if (methods.size() > 1) {
-		    // Overloaded methods were found. Try to get a match
-		    for (Method method : methods) {
-		        boolean match = true;
-		        Class<?>[] candidateParams = method.getParameterTypes();
-                for (int i = 0; i < params.length; i++) {
-		            if (!candidateParams[i].isInstance(params[i])) {
-		                match = false;
-		                break;
-		            }
-		        }
-
-                // If all candidate parameters were expected and for none of them the actual
-                // parameter was NOT an instance, we have a match
-                if (match) {
-                    return method;
-                }
-
-                // Else, at least one parameter was not an instance
-                // Go ahead a test then next methods
-		    }
-		}
-
-		return null;
-	}
 
 	/**
 	 * Types of a value expression
