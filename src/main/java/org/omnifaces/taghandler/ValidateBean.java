@@ -12,7 +12,9 @@
  */
 package org.omnifaces.taghandler;
 
+import static java.util.logging.Level.SEVERE;
 import static javax.faces.event.PhaseId.PROCESS_VALIDATIONS;
+import static javax.faces.event.PhaseId.UPDATE_MODEL_VALUES;
 import static javax.faces.view.facelets.ComponentHandler.isNew;
 import static org.omnifaces.el.ExpressionInspector.getValueReference;
 import static org.omnifaces.util.Components.forEachComponent;
@@ -25,9 +27,13 @@ import static org.omnifaces.util.Events.subscribeToViewEvent;
 import static org.omnifaces.util.Facelets.getBoolean;
 import static org.omnifaces.util.Facelets.getObject;
 import static org.omnifaces.util.Facelets.getString;
+import static org.omnifaces.util.FacesLocal.evaluateExpressionGet;
 import static org.omnifaces.util.Messages.createError;
 import static org.omnifaces.util.Platform.getBeanValidator;
+import static org.omnifaces.util.Reflection.instance;
+import static org.omnifaces.util.Reflection.setProperties;
 import static org.omnifaces.util.Utils.csvToList;
+import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.toClass;
 
 import java.io.IOException;
@@ -36,6 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.el.ValueExpression;
 import javax.el.ValueReference;
@@ -59,13 +66,23 @@ import javax.validation.ConstraintViolation;
 import org.omnifaces.eventlistener.BeanValidationEventListener;
 import org.omnifaces.util.Callback;
 import org.omnifaces.util.Callback.WithArgument;
+import org.omnifaces.util.Faces;
+import org.omnifaces.util.copier.Copier;
+import org.omnifaces.util.copier.MultiStrategyCopier;
 
 /**
  * <p>
  * The <code>&lt;o:validateBean&gt;</code> allows the developer to control bean validation on a per-{@link UICommand}
- * or {@link UIInput} component basis. The standard <code>&lt;f:validateBean&gt;</code> only allows that on a per-form
+ * or {@link UIInput} component basis, as well as validating a given bean at the class level.
+ * 
+ * <p>
+ * The standard <code>&lt;f:validateBean&gt;</code> only allows validation control on a per-form
  * or a per-request basis (by using multiple tags and conditional EL expressions in its attributes) which may end up in
  * boilerplate code.
+ * 
+ * <p>
+ * The standard <code>&lt;f:validateBean&gt;</code> also, despite its name, does not actually have any facilities to
+ * validate a bean at all.
  *
  * <h3>Usage</h3>
  * <p>
@@ -84,6 +101,7 @@ import org.omnifaces.util.Callback.WithArgument;
  * </pre>
  *
  * @author Bauke Scholtz
+ * @author Arjan Tijms
  * @see BeanValidationEventListener
  */
 public class ValidateBean extends TagHandler {
@@ -93,12 +111,24 @@ public class ValidateBean extends TagHandler {
 	private static final String ERROR_INVALID_PARENT =
 		"Parent component of o:validateBean must be an instance of UICommand or UIInput.";
 	
-	 private static final Class<?>[] CLASS_ARRAY = new Class<?>[0];
+	private static final Logger logger = Logger.getLogger(ValidateBean.class.getName());
+	
+	private static final Class<?>[] CLASS_ARRAY = new Class<?>[0];
+	
+	
+	// Enums ----------------------------------------------------------------------------------------------------------
+	
+	private static enum ValidateMethod {
+		validateCopy, validateActual
+	}
+	
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private TagAttribute validationGroups;
 	private TagAttribute disabled;
+	private TagAttribute copier;
+	private TagAttribute method;
 	private TagAttribute value;
 	
 	// Constructors ---------------------------------------------------------------------------------------------------
@@ -111,7 +141,10 @@ public class ValidateBean extends TagHandler {
 		super(config);
 		validationGroups = getAttribute("validationGroups");
 		disabled = getAttribute("disabled");
+		copier = getAttribute("copier");
+		method = getAttribute("method");
 		value = getAttribute("value");
+		
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -131,72 +164,92 @@ public class ValidateBean extends TagHandler {
 		
 		final boolean disabled = getBoolean(this.disabled, context);
 		final String validationGroups = getString(this.validationGroups, context);
-		final Object value = getObject(this.value, context);
+		final Object targetBase = getObject(this.value, context);
+		final String copierName = getString(this.copier, context);
+		final String method = getString(this.method, context);
 		
-		if (value != null) {
+		if (targetBase != null) {
 			
 			final List<Class<?>> groups = toClasses(validationGroups);
 	
-			Callback.Void callback = new TargetFormInvoker(parent, new WithArgument<UIForm>() { @Override	public void invoke(UIForm targetForm) {
-	        	
-	        	final FacesContext context = FacesContext.getCurrentInstance();
-            	
-                Set<ConstraintViolation<?>> violations = validate(value, groups);
-                
-                if (!violations.isEmpty()) {
-                    context.validationFailed();
-                    for (ConstraintViolation<?> violation : violations) {
-    					context.addMessage(targetForm.getClientId(context), createError(violation.getMessage()));
-    				}
-                }
-				
-			}});
-	        
-	        final Map<String, Object> propertyValues = new HashMap<>();
-	        
-	        // Callback that adds a validator to each input for which its value binding resolves to a base that is the same as the target
-	        // of the o:validateBean. This validator will then not actually validate, but just capture the value for that input.
-	        //
-	        // E.g. in h:inputText value=#{bean.target.property} and o:validateBean value=#{bean.target}, this will collect {"property", [captured value]}
-	        
-	        Callback.Void collectPropertyValues = new TargetFormInvoker(parent, new WithArgument<UIForm>() { @Override	public void invoke(UIForm targetForm) {
-	        	
-	        	final FacesContext context = FacesContext.getCurrentInstance();
-	        	
-	        	forEachInputWithMatchingBase(context, targetForm, value, propertyValues, new op2() { @Override public void invoke(EditableValueHolder v, ValueReference vr) {
-	        		/* (v, vr) -> */ addCollectingValidator(v, vr, propertyValues);
-            	}});
-				
-			}});
-	        		
-	        
-	        Callback.Void checkConstraints = new TargetFormInvoker(parent, new WithArgument<UIForm>() { @Override	public void invoke(UIForm targetForm) {
-	        	
-	        	final FacesContext context = FacesContext.getCurrentInstance();
-	        	
-	        	// First remove the collecting validator again, since it will otherwise be state saved with the component at the end of the lifecycle.
-	        	
-	        	forEachInputWithMatchingBase(context, targetForm, value, propertyValues, new op2() { @Override public void invoke(EditableValueHolder v, ValueReference vr) {
-	        		/* (v, vr) -> */ removeCollectingValidator(v);
-            	}});
-	        	
-	        	for (Map.Entry<String, Object> entry : propertyValues.entrySet()) {
-            		System.out.println("key:" + entry.getKey() + " value:" + entry.getValue());
-            	}
-            	
-                Set<ConstraintViolation<?>> violations = validate(value, groups);
-                
-                if (!violations.isEmpty()) {
-                    context.validationFailed();
-                    for (ConstraintViolation<?> violation : violations) {
-    					context.addMessage(targetForm.getClientId(context), createError(violation.getMessage()));
-    				}
-                }
-				
-			}});
-	        
-	        subscribeToViewBeforePhase(PROCESS_VALIDATIONS, collectPropertyValues);
-	        subscribeToViewAfterPhase(PROCESS_VALIDATIONS, checkConstraints);
+			switch (getMethod(method)) {
+				case validateActual:
+					Callback.Void validateTargetBase = new TargetFormInvoker(parent, new WithArgument<UIForm>() { @Override	public void invoke(UIForm targetForm) {
+			        	
+			        	final FacesContext context = FacesContext.getCurrentInstance();
+		            	
+		                Set<ConstraintViolation<?>> violations = validate(targetBase, groups);
+		                
+		                if (!violations.isEmpty()) {
+		                    context.validationFailed();
+		                    for (ConstraintViolation<?> violation : violations) {
+		    					context.addMessage(targetForm.getClientId(context), createError(violation.getMessage()));
+		    				}
+		                }
+						
+					}});
+					
+					subscribeToViewAfterPhase(UPDATE_MODEL_VALUES, validateTargetBase);
+					break;
+					
+				case validateCopy:
+					final Map<String, Object> properties = new HashMap<>();
+				        
+					// Callback that adds a validator to each input for which its value binding resolves to a base that is the same as the target
+			        // of the o:validateBean. This validator will then not actually validate, but just capture the value for that input.
+			        //
+			        // E.g. in h:inputText value=#{bean.target.property} and o:validateBean value=#{bean.target}, this will collect {"property", [captured value]}
+				        
+			        Callback.Void collectPropertyValues = new TargetFormInvoker(parent, new WithArgument<UIForm>() { @Override	public void invoke(UIForm targetForm) {
+			        	
+			        	final FacesContext context = FacesContext.getCurrentInstance();
+			        	
+			        	forEachInputWithMatchingBase(context, targetForm, targetBase, properties, new op2() { @Override public void invoke(EditableValueHolder v, ValueReference vr) {
+			        		/* (v, vr) -> */ addCollectingValidator(v, vr, properties);
+		            	}});
+						
+					}});
+				        		
+				    
+			        // Callback that uses the values collected by our previous callback (collectPropertyValues) to initialize a copied bean with, and which
+			        // then validated this copy.
+			        
+			        Callback.Void checkConstraints = new TargetFormInvoker(parent, new WithArgument<UIForm>() { @Override	public void invoke(UIForm targetForm) {
+			        	
+			        	final FacesContext context = FacesContext.getCurrentInstance();
+			        	
+			        	// First remove the collecting validator again, since it will otherwise be state saved with the component at the end of the lifecycle.
+			        	
+			        	forEachInputWithMatchingBase(context, targetForm, targetBase, properties, new op2() { @Override public void invoke(EditableValueHolder v, ValueReference vr) {
+			        		/* (v, vr) -> */ removeCollectingValidator(v);
+		            	}});
+
+			        	// Copy our target base instance, so validation can be done against that instead of against the real instance.
+			        	// This is done so that in case of a validation error the real base (model) isn't polluted with invalid values. 
+			        	
+			        	Object targetBaseCopy = getCopier(context, copierName).copy(targetBase);
+			        	
+			        	// Set all properties on the copied base instance exactly as the input components are
+			        	// going to do this on the real base
+			        	setProperties(targetBaseCopy, properties);
+		            	
+		                Set<ConstraintViolation<?>> violations = validate(targetBaseCopy, groups);
+		                
+		                if (!violations.isEmpty()) {
+		                    context.validationFailed();
+		                    context.renderResponse();
+		                    for (ConstraintViolation<?> violation : violations) {
+		    					context.addMessage(targetForm.getClientId(context), createError(violation.getMessage()));
+		    				}
+		                }
+						
+					}});
+				        
+			        subscribeToViewBeforePhase(PROCESS_VALIDATIONS, collectPropertyValues);
+			        subscribeToViewAfterPhase(PROCESS_VALIDATIONS, checkConstraints);
+			        
+			        break;
+			}
 		} else {
 			subscribeToViewBeforePhase(PROCESS_VALIDATIONS, new Callback.Void() {
 	
@@ -270,7 +323,16 @@ public class ValidateBean extends TagHandler {
 
 			// Check if the form that was submitted is the same one as we're nested in
 			if (submittedForm.equals(targetForm)) {
-				operation.invoke(targetForm);
+				try {
+					operation.invoke(targetForm);
+				} catch (Exception e) {
+					// Log and set validation to failed, since exceptions in PhaseListeners will
+					// be largely swallowed and ignored by JSF runtime
+					logger.log(SEVERE, "Exception occured while doing validation", e);
+					Faces.validationFailed();
+					Faces.renderResponse();
+					throw e; // Rethrow, but JSF runtime will do little with it.
+				}
 			}
 		}
 	}
@@ -304,6 +366,35 @@ public class ValidateBean extends TagHandler {
 		
 		return groups;
 	}
+	
+	private Copier getCopier(FacesContext context, String copierName) {
+	
+		Copier copier = null;
+		
+		if (!isEmpty(copierName)) {
+			Object expressionResult = evaluateExpressionGet(context, copierName);
+			if (expressionResult instanceof Copier) {
+				copier = (Copier) expressionResult;
+			} else if (expressionResult instanceof String) {
+				copier = instance((String) expressionResult);
+			}
+		}
+		
+		if (copier == null) {
+			copier = new MultiStrategyCopier();
+		}
+		
+		return copier;
+	}
+	
+	private ValidateMethod getMethod(String methodName) {
+		if (isEmpty(methodName)) {
+			return ValidateMethod.validateCopy;
+		}
+		
+		return ValidateMethod.valueOf(methodName);
+	}
+	
 	
 	private UIForm getTargetForm(UIComponent parent) {
 		 if (parent instanceof UIForm) {
