@@ -32,9 +32,9 @@ import static org.omnifaces.util.Messages.createError;
 import static org.omnifaces.util.Platform.getBeanValidator;
 import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Reflection.setProperties;
+import static org.omnifaces.util.Reflection.toClass;
 import static org.omnifaces.util.Utils.csvToList;
 import static org.omnifaces.util.Utils.isEmpty;
-import static org.omnifaces.util.Utils.toClass;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -204,7 +204,7 @@ public class ValidateBean extends TagHandler {
 			        	
 			        	final FacesContext context = FacesContext.getCurrentInstance();
 			        	
-			        	forEachInputWithMatchingBase(context, targetForm, targetBase, properties, new op2() { @Override public void invoke(EditableValueHolder v, ValueReference vr) {
+			        	forEachInputWithMatchingBase(context, targetForm, targetBase, new op2() { @Override public void invoke(EditableValueHolder v, ValueReference vr) {
 			        		/* (v, vr) -> */ addCollectingValidator(v, vr, properties);
 		            	}});
 						
@@ -220,7 +220,7 @@ public class ValidateBean extends TagHandler {
 			        	
 			        	// First remove the collecting validator again, since it will otherwise be state saved with the component at the end of the lifecycle.
 			        	
-			        	forEachInputWithMatchingBase(context, targetForm, targetBase, properties, new op2() { @Override public void invoke(EditableValueHolder v, ValueReference vr) {
+			        	forEachInputWithMatchingBase(context, targetForm, targetBase, new op2() { @Override public void invoke(EditableValueHolder v, ValueReference vr) {
 			        		/* (v, vr) -> */ removeCollectingValidator(v);
 		            	}});
 
@@ -265,7 +265,7 @@ public class ValidateBean extends TagHandler {
 		}
 	}
 	
-	public void forEachInputWithMatchingBase(final FacesContext context, UIComponent targetForm, final Object targetBase, final Map<String, Object> propertyValues, final Callback.With2Arguments<EditableValueHolder, ValueReference> operation) {
+	private void forEachInputWithMatchingBase(final FacesContext context, UIComponent targetForm, final Object targetBase, final Callback.With2Arguments<EditableValueHolder, ValueReference> operation) {
 		forEachComponent(context)
 			.fromRoot(targetForm)
 			.ofTypes(EditableValueHolder.class)
@@ -281,7 +281,6 @@ public class ValidateBean extends TagHandler {
 			}}
 	  );
 	}
-
 	
 	public final static class CollectingValidator implements Validator {
 		
