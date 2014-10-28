@@ -163,10 +163,10 @@ public class ImportConstants extends TagHandler {
 
 			if (i > 0) {
 				try {
-					return Class.forName(
+					return toClass(
 						new StringBuilder(type.substring(0, i)).append('$').append(type.substring(i + 1)).toString());
 				}
-				catch (ClassNotFoundException ignore) {
+				catch (IllegalArgumentException ignore) {
 					// Just continue to the IllegalArgumentException on the original ClassNotFoundException.
 				}
 			}
