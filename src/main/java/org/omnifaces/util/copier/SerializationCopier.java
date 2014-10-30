@@ -27,19 +27,20 @@ import java.io.Serializable;
  * <p>
  * As per the platform serialization rules, the object and all its non transient dependencies have
  * to implement the {@link Serializable} interface.
- * 
+ *
  * @since 2.0
  * @author Arjan Tijms
  *
  */
 public class SerializationCopier implements Copier {
 
+	@Override
 	public Object copy(Object object) {
-		
+
 		if (!(object instanceof Serializable)) {
 			throw new IllegalStateException("Can't copy object of type " + object.getClass() + " since it doesn't implement Serializable");
 		}
-		
+
 		try {
 			ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 			new ObjectOutputStream(outputStream).writeObject(object);

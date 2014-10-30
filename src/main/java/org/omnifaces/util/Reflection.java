@@ -28,14 +28,14 @@ import javax.enterprise.inject.Typed;
 
 /**
  * Collection of utility methods for working with reflection.
- * 
+ *
  * @since 2.0
  * @author Arjan Tijms
  *
  */
 @Typed
 public final class Reflection {
-	
+
 	private static final String ERROR_CLASS_NOT_FOUND = "Class not found: ";
 
 	private Reflection() {
@@ -49,28 +49,28 @@ public final class Reflection {
 	 * <p>
 	 * E.g. map entry key = foo, value = "bar", which "bar" an instance of String, will conceptually result in the
 	 * following call: <code>object.setFoo("string");</code>
-	 * 
+	 *
 	 * <p>
 	 * NOTE: This particular method assumes that there's a write method for each property in the map with the right
 	 * type. No specific checking is done whether this is indeed the case.
-	 * 
+	 *
 	 * @param object
 	 *            the object on which properties will be set
 	 * @param propertiesToSet
 	 *            the map containing properties and their values to be set on the object
 	 */
 	public static void setProperties(Object object, Map<String, Object> propertiesToSet) {
-		
+
 	  try {
 	        Map<String, PropertyDescriptor> availableProperties = new HashMap<>();
 	        for (PropertyDescriptor propertyDescriptor : getBeanInfo(object.getClass()).getPropertyDescriptors()) {
 	            availableProperties.put(propertyDescriptor.getName(), propertyDescriptor);
 	        }
-	        
+
 	        for (Entry<String, Object> propertyToSet : propertiesToSet.entrySet()) {
 	        	availableProperties.get(propertyToSet.getKey()).getWriteMethod().invoke(object, propertyToSet.getValue());
 	        }
-	 
+
 	    } catch (IntrospectionException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 	        throw new IllegalStateException(e);
 	    }
@@ -126,12 +126,12 @@ public final class Reflection {
 
 		return null;
 	}
-	
+
 	/**
 	 * Returns the Class instance associated with the class of the given string, using the context class
 	 * loader and if that fails the defining class loader of the current class.
-	 * 
-	 * @param type fully qualified class name of the class for which a Class instance needs to be created
+	 *
+	 * @param className fully qualified class name of the class for which a Class instance needs to be created
 	 * @return the Class object for the class with the given name.
 	 */
 	public static Class<?> toClass(String className) {
@@ -148,7 +148,8 @@ public final class Reflection {
 
 	/**
 	 * Creates an instance of a class with the given fully qualified class name.
-	 * 
+	 *
+	 * @param <T> The generic object type.
 	 * @param className fully qualified class name of the class for which an instance needs to be created
 	 * @return an instance of the class denoted by className
 	 * @throws IllegalStateException if the class cannot be found
@@ -160,7 +161,8 @@ public final class Reflection {
 
 	/**
 	 * Creates a new instance of the class represented by the given Class object
-	 * 
+	 *
+	 * @param <T> The generic object type.
 	 * @param clazz the Class object for which an instance needs to be created
 	 * @return an instance of the class as given by the clazz parameter
 	 * @throws IllegalStateException if the class cannot be found, or cannot be instantiated or when a security manager prevents this operation
