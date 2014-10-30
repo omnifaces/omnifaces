@@ -27,7 +27,7 @@ import java.util.Map.Entry;
 import javax.enterprise.inject.Typed;
 
 /**
- * Collection of utility methods for the JSF API with respect to working with reflection.
+ * Collection of utility methods for working with reflection.
  * 
  * @since 2.0
  * @author Arjan Tijms
@@ -35,6 +35,8 @@ import javax.enterprise.inject.Typed;
  */
 @Typed
 public final class Reflection {
+	
+	private static final String ERROR_CLASS_NOT_FOUND = "Class not found: ";
 
 	private Reflection() {
 	}
@@ -124,6 +126,25 @@ public final class Reflection {
 
 		return null;
 	}
+	
+	/**
+	 * Returns the Class instance associated with the class of the given string, using the context class
+	 * loader and if that fails the defining class loader of the current class.
+	 * 
+	 * @param type fully qualified class name of the class for which a Class instance needs to be created
+	 * @return the Class object for the class with the given name.
+	 */
+	public static Class<?> toClass(String className) {
+		try {
+			return (Class.forName(className, true, Thread.currentThread().getContextClassLoader()));
+		} catch (ClassNotFoundException e1) {
+			try {
+				return Class.forName(className);
+			} catch (ClassNotFoundException e2) {
+				throw new IllegalStateException(ERROR_CLASS_NOT_FOUND + className);
+			}
+		}
+	}
 
 	/**
 	 * Creates an instance of a class with the given fully qualified class name.
@@ -134,11 +155,7 @@ public final class Reflection {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T instance(String className) {
-		try {
-			return (T) instance(Class.forName(className));
-		} catch (ClassNotFoundException e) {
-			throw new IllegalStateException(e);
-		}
+		return (T) instance(toClass(className));
 	}
 
 	/**
