@@ -18,7 +18,6 @@ import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.zip.GZIPOutputStream;
 
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -39,7 +38,7 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 
 	private int threshold;
 	private Set<String> mimetypes;
-	private int contentLength;
+	private long contentLength;
 	private String vary;
 	private boolean noGzip;
 	private boolean closing;
@@ -63,6 +62,12 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 
 	@Override
 	public void setContentLength(int contentLength) {
+		// Get hold of content length locally to avoid it from being set on responses which will actually be gzipped.
+		this.contentLength = contentLength;
+	}
+
+	// @Override Servlet 3.1.
+	public void setContentLengthLong(long contentLength) {
 		// Get hold of content length locally to avoid it from being set on responses which will actually be gzipped.
 		this.contentLength = contentLength;
 	}
@@ -244,7 +249,7 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 		 * <code>null</code> and the content type matches one of the mimetypes.
 		 */
 		private OutputStream createGzipOutputStreamIfNecessary(boolean gzip) throws IOException {
-			ServletResponse originalResponse = getResponse();
+			HttpServletResponse originalResponse = (HttpServletResponse) getResponse();
 
 			if (gzip && !noGzip && (closing || !isCommitted())) {
 				String contentType = getContentType();
@@ -257,7 +262,7 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 			}
 
 			if (contentLength > 0) {
-				originalResponse.setContentLength(contentLength);
+				originalResponse.setHeader("Content-Length", String.valueOf(contentLength));
 			}
 
 			return originalResponse.getOutputStream();
