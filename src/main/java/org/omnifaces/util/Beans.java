@@ -21,7 +21,6 @@ import javax.enterprise.inject.Typed;
 import javax.enterprise.inject.spi.Annotated;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
-import javax.inject.Inject;
 
 /**
  * <p>
@@ -29,15 +28,25 @@ import javax.inject.Inject;
  * {@link BeanManager}.
  *
  * <h3>Usage</h3>
+ * <p>
+ * Some examples:
  * <pre>
- * // Get the CDI managed bean reference of the given bean class.
+ * // Get the CDI managed bean reference (proxy) of the given bean class.
  * SomeBean someBean = Beans.getReference(SomeBean.class);
+ *
+ * // Get the CDI managed bean instance (actual) of the given bean class.
+ * SomeBean someBean = Beans.getInstance(SomeBean.class);
+ *
+ * // Get all currently active CDI managed bean instances in the session scope.
+ * Map<Object, String> activeSessionScopedBeans = Beans.getActiveInstances(SessionScope.class);
+ *
+ * // Destroy any currently active CDI managed bean instance of given bean class.
+ * Beans.destroy(SomeBean.class);
  * </pre>
  * <p>
- * The "native" CDI way would otherwise look like this, provided that you can't use {@link Inject} for some
- * technical reason.
+ * The "native" CDI way would otherwise look like this:
  * <pre>
- * // Get the CDI managed bean instance of the given bean class.
+ * // Get the CDI managed bean reference (proxy) of the given bean class.
  * Set&lt;Bean&lt;?&gt;&gt; beans = beanManager.getBeans(SomeBean.class);
  * Bean&lt;SomeBean&gt; bean = (Bean&lt;SomeBean&gt;) beanManager.resolve(beans);
  * CreationalContext&lt;SomeBean&gt; context = beanManager.createCreationalContext(bean);
@@ -49,6 +58,7 @@ import javax.inject.Inject;
  *
  * @author Bauke Scholtz
  * @since 1.6.1
+ * @see BeansLocal
  */
 @Typed
 public final class Beans {
