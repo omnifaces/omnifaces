@@ -53,7 +53,9 @@ public enum BeanManager {
 	private static final Annotation[] NO_ANNOTATIONS = new Annotation[0];
 
 	private static final String ERROR_CDI_API_UNAVAILABLE =
-		"CDI BeanManager API is not available in this environment.";
+		"CDI API is not available in this environment.";
+	private static final String ERROR_CDI11_API_UNAVAILABLE =
+		"CDI API is available in this environment, but it is outdated. At least CDI 1.1 is required.";
 	private static final String ERROR_JNDI_UNAVAILABLE =
 		"JNDI is not available in this environment.";
 	private static final String ERROR_CDI_IMPL_UNAVAILABLE =
@@ -89,6 +91,13 @@ public enum BeanManager {
 		}
 
 		try {
+			Class.forName("javax.enterprise.context.spi.AlterableContext");
+		}
+		catch (Throwable e) {
+			throw new IllegalStateException(ERROR_CDI11_API_UNAVAILABLE, e);
+		}
+
+		try {
 			beanManager = JNDI.lookup("java:comp/BeanManager"); // CDI spec.
 
 			if (beanManager == null) {
@@ -120,11 +129,22 @@ public enum BeanManager {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns the CDI managed bean instance of the given class, or <code>null</code> if there is none.
-	 * @param <T> The generic bean type.
-	 * @param beanClass The type of the CDI managed bean instance.
-	 * @return The CDI managed bean instance of the given class, or <code>null</code> if there is none.
-	 * @throws UnsupportedOperationException When obtaining the CDI managed bean instance failed with an exception.
+	 * Returns the CDI bean manager.
+	 * @return The CDI bean manager.
+	 * @throws ClassCastException When you assign it to a variable which is not declared as CDI BeanManager.
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> T get() {
+		return (T) beanManager;
+	}
+
+	/**
+	 * Returns the CDI managed bean reference (proxy) of the given class.
+	 * Note that this actually returns a client proxy and the underlying actual instance is thus always auto-created.
+	 * @param <T> The expected return type.
+	 * @param beanClass The CDI managed bean class.
+	 * @return The CDI managed bean reference (proxy) of the given class, or <code>null</code> if there is none.
+	 * @throws UnsupportedOperationException When obtaining the CDI managed bean reference failed with an exception.
 	 */
 	public <T> T getReference(Class<T> beanClass) {
 		try {
