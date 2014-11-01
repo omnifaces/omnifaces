@@ -15,7 +15,7 @@
  */
 package org.omnifaces.cdi.viewscope;
 
-import static org.omnifaces.util.Beans.getReference;
+import static org.omnifaces.util.BeansLocal.getReference;
 
 import java.lang.annotation.Annotation;
 

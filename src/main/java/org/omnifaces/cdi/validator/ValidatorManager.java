@@ -15,8 +15,8 @@
  */
 package org.omnifaces.cdi.validator;
 
-import static org.omnifaces.util.Beans.getReference;
-import static org.omnifaces.util.Beans.resolve;
+import static org.omnifaces.util.BeansLocal.getReference;
+import static org.omnifaces.util.BeansLocal.resolve;
 
 import java.util.HashMap;
 import java.util.Map;

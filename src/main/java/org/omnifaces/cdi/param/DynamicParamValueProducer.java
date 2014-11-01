@@ -14,7 +14,7 @@ package org.omnifaces.cdi.param;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
-import static org.omnifaces.util.Beans.getCurrentInjectionPoint;
+import static org.omnifaces.util.BeansLocal.getInstance;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
@@ -51,7 +51,7 @@ import org.omnifaces.cdi.Param;
 public class DynamicParamValueProducer implements Bean<Object>, Serializable, PassivationCapable {
 
     private static final long serialVersionUID = 1L;
-    
+
     private BeanManager beanManager;
     private Set<Type> types;
 
@@ -72,7 +72,7 @@ public class DynamicParamValueProducer implements Bean<Object>, Serializable, Pa
 
     @Override
     public Object create(CreationalContext<Object> creationalContext) {
-    	ParamValue<?> paramValue = new RequestParameterProducer().produce(getCurrentInjectionPoint(beanManager));
+    	ParamValue<?> paramValue = new RequestParameterProducer().produce(getInstance(beanManager, InjectionPoint.class));
     	return paramValue.getValue();
     }
 
@@ -115,7 +115,7 @@ public class DynamicParamValueProducer implements Bean<Object>, Serializable, Pa
     public void destroy(Object instance, CreationalContext<Object> creationalContext) {
     	// NOOP
     }
-    
+
     @Override
     public String getId() {
         return DynamicParamValueProducer.class.getName() + "_" + (types != null ? types.toString() : "");

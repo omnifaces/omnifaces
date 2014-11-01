@@ -18,8 +18,8 @@ package org.omnifaces.cdi.eager;
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Collections.unmodifiableMap;
-import static org.omnifaces.util.Beans.getAnnotation;
-import static org.omnifaces.util.Beans.getReference;
+import static org.omnifaces.util.BeansLocal.getAnnotation;
+import static org.omnifaces.util.BeansLocal.getReference;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.util.ArrayList;

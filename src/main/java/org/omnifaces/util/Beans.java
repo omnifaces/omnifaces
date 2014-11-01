@@ -13,35 +13,29 @@
 package org.omnifaces.util;
 
 import java.lang.annotation.Annotation;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
 
-import javax.enterprise.context.spi.Context;
-import javax.enterprise.inject.Produces;
+import javax.enterprise.context.NormalScope;
 import javax.enterprise.inject.Stereotype;
+import javax.enterprise.inject.Typed;
 import javax.enterprise.inject.spi.Annotated;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
 
 /**
  * <p>
- * Collection of utility methods for the CDI API with respect to working with <code>BeanManager</code>.
+ * Collection of utility methods for the CDI API that are mainly shortcuts for obtaining stuff from the
+ * {@link BeanManager}.
  *
  * <h3>Usage</h3>
  * <pre>
- * // Get the CDI managed bean instance of the given bean class.
- * SomeBean someBean = Beans.getReference(beanManager, SomeBean.class);
+ * // Get the CDI managed bean reference of the given bean class.
+ * SomeBean someBean = Beans.getReference(SomeBean.class);
  * </pre>
  * <p>
- * The "native" CDI way would otherwise look like this (...), provided that you can't use {@link Inject} for some
- * technical reasons.
+ * The "native" CDI way would otherwise look like this, provided that you can't use {@link Inject} for some
+ * technical reason.
  * <pre>
  * // Get the CDI managed bean instance of the given bean class.
  * Set&lt;Bean&lt;?&gt;&gt; beans = beanManager.getBeans(SomeBean.class);
@@ -56,221 +50,134 @@ import javax.inject.Inject;
  * @author Bauke Scholtz
  * @since 1.6.1
  */
+@Typed
 public final class Beans {
 
 	/**
-	 * Resolve and returns the CDI managed bean of the given class from the given bean manager.
-	 * @param <T> The generic bean type.
-	 * @param beanManager The involved CDI bean manager.
-	 * @param beanClass The type of the CDI managed bean instance.
-	 * @return The resolved CDI managed bean of the given class from the given bean manager.
+	 * Returns the CDI bean manager.
+	 * @return The CDI bean manager.
+	 * @since 2.0
 	 */
-	@SuppressWarnings("unchecked")
-	public static <T> Bean<T> resolve(BeanManager beanManager, Class<T> beanClass) {
-		for (Bean<?> bean : beanManager.getBeans(beanClass)) {
-			if (bean.getBeanClass() == beanClass) {
-				return (Bean<T>) beanManager.resolve(Collections.<Bean<?>>singleton(bean));
-			}
-		}
-
-		return null;
+	public static BeanManager getManager() {
+		return org.omnifaces.config.BeanManager.INSTANCE.get();
 	}
 
 	/**
-	 * Returns the CDI managed bean reference of the given class from the given bean manager.
-	 * Note that this actually returns a client proxy and the underlying instance is thus always auto-created.
-	 * @param <T> The generic bean type.
-	 * @param beanManager The involved CDI bean manager.
-	 * @param beanClass The type of the CDI managed bean instance.
-	 * @return The CDI managed bean reference of the given class from the given bean manager.
+	 * Returns the CDI managed bean representation of the given bean class.
+	 * @param <T> The generic CDI managed bean type.
+	 * @param beanClass The CDI managed bean class.
+	 * @return The CDI managed bean representation of the given bean class, or <code>null</code> if there is none.
 	 */
-	public static <T> T getReference(BeanManager beanManager, Class<T> beanClass) {
-		Bean<T> bean = resolve(beanManager, beanClass);
-		return (bean != null) ? getReference(beanManager, bean) : null;
+	public static <T> Bean<T> resolve(Class<T> beanClass) {
+		return BeansLocal.resolve(getManager(), beanClass);
 	}
 
 	/**
-	 * Returns the CDI managed bean reference of the given resolved bean from the given bean manager.
-	 * Note that this actually returns a client proxy and the underlying instance is thus always auto-created.
-	 * @param <T> The generic return type.
-	 * @param beanManager The involved CDI bean manager.
-	 * @param bean The resolved bean of the CDI managed bean instance.
-	 * @return The CDI managed bean reference of the given resolved bean from the given bean manager.
+	 * Returns the CDI managed bean reference (proxy) of the given class.
+	 * Note that this actually returns a client proxy and the underlying actual instance is thus always auto-created.
+	 * @param <T> The expected return type.
+	 * @param beanClass The CDI managed bean class.
+	 * @return The CDI managed bean reference (proxy) of the given class, or <code>null</code> if there is none.
 	 */
-	@SuppressWarnings("unchecked")
-	public static <T> T getReference(BeanManager beanManager, Bean<T> bean) {
-		return (T) beanManager.getReference(bean, bean.getBeanClass(), beanManager.createCreationalContext(bean));
+	public static <T> T getReference(Class<T> beanClass) {
+		return BeansLocal.getReference(getManager(), beanClass);
 	}
 
 	/**
-	 * Returns the CDI managed bean instance of the given class from the given bean manager and creates one if
-	 * one doesn't exist.
-	 * @param <T> The generic bean type.
-	 * @param beanManager The involved CDI bean manager.
-	 * @param beanClass The type of the CDI managed bean instance.
-	 * @return The CDI managed bean instance of the given class from the given bean manager.
+	 * Returns the CDI managed bean reference (proxy) of the given bean.
+	 * Note that this actually returns a client proxy and the underlying actual instance is thus always auto-created.
+	 * @param <T> The expected return type.
+	 * @param bean The CDI managed bean representation.
+	 * @return The CDI managed bean reference (proxy) of the given bean, or <code>null</code> if there is none.
+	 */
+	public static <T> T getReference(Bean<T> bean) {
+		return BeansLocal.getReference(getManager(), bean);
+	}
+
+	/**
+	 * Returns the CDI managed bean instance (actual) of the given class and creates one if one doesn't exist.
+	 * @param <T> The expected return type.
+	 * @param beanClass The CDI managed bean class.
+	 * @return The CDI managed bean instance (actual) of the given class, or <code>null</code> if there is none.
 	 * @since 1.8
 	 */
-	public static <T> T getInstance(BeanManager beanManager, Class<T> beanClass) {
-		Bean<T> bean = resolve(beanManager, beanClass);
-		return (bean != null) ? getInstance(beanManager, bean, true) : null;
+	public static <T> T getInstance(Class<T> beanClass) {
+		return BeansLocal.getInstance(getManager(), beanClass);
 	}
 
 	/**
-	 * Returns the CDI managed bean instance of the given class from the given bean manager and creates one if
-	 * one doesn't exist and <code>create</code> argument is <code>true</code>, otherwise don't create one and return
-	 * <code>null</code> if there's no current instance.
+	 * Returns the CDI managed bean instance (actual) of the given class and creates one if one doesn't exist and
+	 * <code>create</code> argument is <code>true</code>, otherwise don't create one and return <code>null</code> if
+	 * there's no current instance.
 	 * @param <T> The expected return type.
-	 * @param beanManager The involved CDI bean manager.
-	 * @param beanClass The type of the CDI managed bean instance.
-	 * @param create If <code>true</code>, then create one if one doesn't exist, otherwise don't create one and return
-	 * <code>null</code> if there's no current instance.
-	 * @return The CDI managed bean instance of the given class from the given bean manager.
+	 * @param beanClass The CDI managed bean class.
+	 * @param create Whether to create create CDI managed bean instance if one doesn't exist.
+	 * @return The CDI managed bean instance (actual) of the given class, or <code>null</code> if there is none and/or
+	 * the <code>create</code> argument is <code>false</code>.
 	 * @since 1.7
 	 */
-	public static <T> T getInstance(BeanManager beanManager, Class<T> beanClass, boolean create) {
-		Bean<T> bean = resolve(beanManager, beanClass);
-		return (bean != null) ? getInstance(beanManager, bean, create) : null;
+	public static <T> T getInstance(Class<T> beanClass, boolean create) {
+		return BeansLocal.getInstance(getManager(), beanClass, create);
 	}
 
 	/**
 	 * Returns the CDI managed bean instance of the given resolved bean from the given bean manager and creates one if
 	 * one doesn't exist and <code>create</code> argument is <code>true</code>, otherwise don't create one and return
 	 * <code>null</code> if there's no current instance.
-	 * @param <T> The generic bean type.
-	 * @param beanManager The involved CDI bean manager.
-	 * @param bean The resolved bean of the CDI managed bean instance.
-	 * @param create If <code>true</code>, then create one if one doesn't exist, otherwise don't create one and return
-	 * <code>null</code> if there's no current instance.
-	 * @return The CDI managed bean instance of the given class from the given bean manager.
+	 * @param <T> The expected return type.
+	 * @param bean The CDI managed bean representation.
+	 * @param create Whether to create create CDI managed bean instance if one doesn't exist.
+	 * @return The CDI managed bean instance (actual) of the given bean, or <code>null</code> if there is none and/or
+	 * the <code>create</code> argument is <code>false</code>.
 	 * @since 1.7
 	 */
-	public static <T> T getInstance(BeanManager beanManager, Bean<T> bean, boolean create) {
-		Context context = beanManager.getContext(bean.getScope());
-
-		if (create) {
-			return context.get(bean, beanManager.createCreationalContext(bean));
-		}
-		else {
-			return context.get(bean);
-		}
+	public static <T> T getInstance(Bean<T> bean, boolean create) {
+		return BeansLocal.getInstance(getManager(), bean, create);
 	}
 
 	/**
 	 * Returns all active CDI managed bean instances in the given CDI managed bean scope. The map key represents
 	 * the active CDI managed bean instance and the map value represents the CDI managed bean name, if any.
-	 * @param beanManager The involved CDI bean manager.
+	 * @param <S> The generic CDI managed bean scope type.
 	 * @param scope The CDI managed bean scope, e.g. <code>RequestScoped.class</code>.
 	 * @return All active CDI managed bean instances in the given CDI managed bean scope.
 	 * @since 1.7
 	 */
-	public static Map<Object, String> getActiveInstances(BeanManager beanManager, Class<? extends Annotation> scope) {
-		Map<Object, String> activeInstances = new HashMap<>();
-		Set<Bean<?>> beans = beanManager.getBeans(Object.class);
-		Context context = beanManager.getContext(scope);
-
-		for (Bean<?> bean : beans) {
-			Object instance = context.get(bean);
-
-			if (instance != null) {
-				activeInstances.put(instance, bean.getName());
-			}
-		}
-
-		return Collections.unmodifiableMap(activeInstances);
+	public static <S extends NormalScope> Map<Object, String> getActiveInstances(Class<S> scope) {
+		return BeansLocal.getActiveInstances(getManager(), scope);
 	}
 
 	/**
-	 * Get program element annotation of a certain annotation type.
-	 * <p>
-	 * The difference with {@link Annotated#getAnnotation(Class)} is that this method will recursively search inside
-	 * all {@link Stereotype} annotations.
-	 *
-	 * @param <T> The generic annotation type.
-	 * @param beanManager The involved CDI bean manager.
-	 * @param annotated a Java program element that can be annotated
-	 * @param annotationType the class of the annotation type
-	 *
-	 * @return the program element annotation of the given annotation type if it could be found, otherwise <code>null</code>
-	 *
+	 * Destroy the currently active instance of the given CDI managed bean class.
+	 * @param beanClass The CDI managed bean class.
+	 * @since 2.0
+	 */
+	public static <T> void destroy(Class<T> beanClass) {
+		BeansLocal.destroy(getManager(), beanClass);
+	}
+
+	/**
+	 * Destroy the currently active instance of the given CDI managed bean representation.
+	 * @param bean The CDI managed bean representation.
+	 * @since 2.0
+	 */
+	public static <T> void destroy(Bean<T> bean) {
+		BeansLocal.destroy(getManager(), bean);
+	}
+
+	/**
+	 * Get program element annotation of a certain annotation type. The difference with
+	 * {@link Annotated#getAnnotation(Class)} is that this method will recursively search inside all {@link Stereotype}
+	 * annotations.
+	 * @param <A> The generic annotation type.
+	 * @param annotated A Java program element that can be annotated.
+	 * @param annotationType The class of the annotation type.
+	 * @return The program element annotation of the given annotation type if it could be found, otherwise
+	 * <code>null</code>.
 	 * @since 1.8
 	 */
-	public static <T extends Annotation> T getAnnotation(BeanManager beanManager, Annotated annotated, Class<T> annotationType) {
-
-		annotated.getAnnotation(annotationType);
-
-		if (annotated.getAnnotations().isEmpty()) {
-			return null;
-		}
-
-		if (annotated.isAnnotationPresent(annotationType)) {
-			return annotated.getAnnotation(annotationType);
-		}
-
-		return getAnnotation(beanManager, annotated.getAnnotations(), annotationType);
+	public static <A extends Annotation> A getAnnotation(Annotated annotated, Class<A> annotationType) {
+		return BeansLocal.getAnnotation(getManager(), annotated, annotationType);
 	}
-
-	/**
-	 * Get program element annotation of a certain annotation type from a collection of annotations.
-	 * <p>
-	 * This method will investigate the list of the initial annotations and for every such annotation that's a stereo type
-	 * will recursively investigate the annotations represented by the stereo type as long as the given annotation type hasn't been
-	 * encountered.
-	 *
-	 * @param <T> The generic annotation type.
-	 * @param beanManager The involved CDI bean manager.
-	 * @param initialAnnotations collection of annotations to investigate
-	 * @param annotationType the class of the annotation type
-	 *
-	 * @return the annotation of the given annotation type if it could be found, otherwise <code>null</code>
-	 *
-	 * @since 1.8
-	 */
-	public static <T extends Annotation> T getAnnotation(BeanManager beanManager, Collection<Annotation> initialAnnotations, Class<T> annotationType) {
-
-		if (initialAnnotations.isEmpty()) {
-			return null;
-		}
-
-		Queue<Annotation> annotations = new LinkedList<>(initialAnnotations);
-
-		while (!annotations.isEmpty()) {
-
-			Annotation annotation = annotations.remove();
-
-			if (annotation.annotationType().equals(annotationType)) {
-				return annotationType.cast(annotation);
-			}
-
-			if (beanManager.isStereotype(annotation.annotationType())) {
-				annotations.addAll(beanManager.getStereotypeDefinition(annotation.annotationType()));
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * Returns the current {@link InjectionPoint} if any is available.
-	 * <p>
-	 * An <code>InjectionPoint</code> is available in code that's called in the context of CDI performing an injection,
-	 * e.g. by calling a producer ({@link Produces}) method or the {@link Bean#create(javax.enterprise.context.spi.CreationalContext)}
-	 * method.
-	 *
-	 * @param beanManager The involved CDI bean manager.
-	 * @return the current {@link InjectionPoint} if any is available, otherwise <code>null</code>.
-	 *
-	 * Since 2.0
-	 */
-	public static InjectionPoint getCurrentInjectionPoint(BeanManager beanManager) {
-		@SuppressWarnings("unchecked")
-		Bean<InjectionPoint> resolvedBean = (Bean<InjectionPoint>) beanManager.resolve(beanManager.getBeans(InjectionPoint.class));
-		if (resolvedBean == null) {
-			return null;
-		}
-
-		return beanManager.getContext(resolvedBean.getScope()).get(resolvedBean, beanManager.createCreationalContext(resolvedBean));
-	}
-
 
 }
