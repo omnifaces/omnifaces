@@ -49,13 +49,15 @@ public final class BeansLocal {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> Bean<T> resolve(BeanManager beanManager, Class<T> beanClass) {
-		for (Bean<?> bean : beanManager.getBeans(beanClass)) {
+		Set<Bean<?>> beans = beanManager.getBeans(beanClass);
+
+		for (Bean<?> bean : beans) {
 			if (bean.getBeanClass() == beanClass) {
 				return (Bean<T>) beanManager.resolve(Collections.<Bean<?>>singleton(bean));
 			}
 		}
 
-		return null;
+		return (Bean<T>) beanManager.resolve(beans);
 	}
 
 	/**
