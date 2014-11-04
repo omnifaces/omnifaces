@@ -54,8 +54,6 @@ public enum BeanManager {
 
 	private static final String ERROR_CDI_API_UNAVAILABLE =
 		"CDI API is not available in this environment.";
-	private static final String ERROR_CDI11_API_UNAVAILABLE =
-		"CDI API is available in this environment, but it is outdated. At least CDI 1.1 is required.";
 	private static final String ERROR_JNDI_UNAVAILABLE =
 		"JNDI is not available in this environment.";
 	private static final String ERROR_CDI_IMPL_UNAVAILABLE =
@@ -88,13 +86,6 @@ public enum BeanManager {
 		}
 		catch (Throwable e) {
 			throw new IllegalStateException(ERROR_CDI_API_UNAVAILABLE, e);
-		}
-
-		try {
-			Class.forName("javax.enterprise.context.spi.AlterableContext");
-		}
-		catch (Throwable e) {
-			throw new IllegalStateException(ERROR_CDI11_API_UNAVAILABLE, e);
 		}
 
 		try {
