@@ -131,14 +131,6 @@ public class CommandScript extends UICommand {
 	}
 
 	/**
-	 * Returns <code>true</code>.
-	 */
-	@Override
-	public boolean getRendersChildren() {
-		return true;
-	}
-
-	/**
 	 * If this command script was invoked, queue the {@link ActionEvent} accordingly.
 	 */
 	@Override
@@ -159,7 +151,7 @@ public class CommandScript extends UICommand {
 	 * missing, or when the <code>name</code> attribute does not represent a valid script function name.
 	 */
 	@Override
-	public void encodeChildren(FacesContext context) throws IOException {
+	public void encodeBegin(FacesContext context) throws IOException {
 		validateHasParent(this, UIForm.class);
 		String name = getName();
 
@@ -177,6 +169,11 @@ public class CommandScript extends UICommand {
 		writer.startElement("script", this);
 		writer.writeAttribute("type", "text/javascript", "type");
 		encodeFunction(context, name);
+	}
+
+	@Override
+	public void encodeEnd(FacesContext context) throws IOException {
+		ResponseWriter writer = context.getResponseWriter();
 		writer.endElement("script");
 		writer.endElement("span");
 	}
