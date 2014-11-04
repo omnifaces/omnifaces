@@ -175,20 +175,17 @@ public class GraphicImage extends HtmlGraphicImage {
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * Returns <code>true</code>.
-	 */
 	@Override
-	public boolean getRendersChildren() {
-		return true;
-	}
-
-	@Override
-	public void encodeChildren(FacesContext context) throws IOException {
+	public void encodeBegin(FacesContext context) throws IOException {
 		ResponseWriter writer = context.getResponseWriter();
 		writer.startElement("img", this);
 		writer.writeURIAttribute("src", getSrc(context), "value");
 		writeAttributes(writer, this, GraphicImage.ATTRIBUTE_NAMES);
+	}
+
+	@Override
+	public void encodeEnd(FacesContext context) throws IOException {
+		ResponseWriter writer = context.getResponseWriter();
 		writer.endElement("img");
 	}
 

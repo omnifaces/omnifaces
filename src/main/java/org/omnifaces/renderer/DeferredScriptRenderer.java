@@ -52,7 +52,7 @@ public class DeferredScriptRenderer extends Renderer {
 	 * not resolvable, then a <code>RES_NOT_FOUND</code> will be written to <code>src</code> attribute instead.
 	 */
 	@Override
-	public void encodeChildren(FacesContext context, UIComponent component) throws IOException {
+	public void encodeBegin(FacesContext context, UIComponent component) throws IOException {
 		Map<String, Object> attributes = component.getAttributes();
 		String library = (String) attributes.get("library");
 		String name = (String) attributes.get("name");
@@ -91,8 +91,6 @@ public class DeferredScriptRenderer extends Renderer {
 		else {
 			writer.writeURIAttribute("src", RES_NOT_FOUND, "src");
 		}
-
-		writer.endElement("script");
 	}
 
 	private void encodeFunctionArgument(ResponseWriter writer, String function, boolean hasFunction) throws IOException {
@@ -104,6 +102,12 @@ public class DeferredScriptRenderer extends Renderer {
 		else {
 			writer.write(",null");
 		}
+	}
+
+	@Override
+	public void encodeEnd(FacesContext context, UIComponent component) throws IOException {
+		ResponseWriter writer = context.getResponseWriter();
+		writer.endElement("script");
 	}
 
 }

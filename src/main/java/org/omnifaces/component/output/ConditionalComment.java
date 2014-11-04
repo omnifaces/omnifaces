@@ -90,11 +90,10 @@ public class ConditionalComment extends OutputFamily {
 	// UIComponent overrides ------------------------------------------------------------------------------------------
 
 	/**
-	 * Encode the conditional comment.
 	 * @throws IllegalArgumentException When <code>if</code> attribute is not specified.
 	 */
 	@Override
-	public void encodeChildren(FacesContext context) throws IOException {
+	public void encodeBegin(FacesContext context) throws IOException {
 		String _if = getIf();
 
 		if (isEmpty(_if)) {
@@ -105,7 +104,11 @@ public class ConditionalComment extends OutputFamily {
 		writer.write("<!--[if ");
 		writer.write(_if);
 		writer.write("]>");
-		super.encodeChildren(context);
+	}
+
+	@Override
+	public void encodeEnd(FacesContext context) throws IOException {
+		ResponseWriter writer = context.getResponseWriter();
 		writer.write("<![endif]-->");
 	}
 
