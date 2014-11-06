@@ -54,7 +54,7 @@ import org.omnifaces.util.Faces;
  * <code>&lt;o:viewParamValidationFailed&gt;</code> allows the developer to handle a view parameter validation failure
  * with either a redirect or an HTTP error status, optionally with respectively a flash message or HTTP error message.
  * This tag can be placed inside <code>&lt;f:metadata&gt;</code> or <code>&lt;f|o:viewParam&gt;</code>. When placed in
- * <code>&lt;f|o:viewParam&gt;</code> it will be applied when the particular view parameter has a validation
+ * <code>&lt;f|o:viewParam&gt;</code>, it will be applied when the particular view parameter has a validation
  * error as per {@link UIViewParameter#isValid()}. When placed in <code>&lt;f:metadata&gt;</code>, and no one view
  * parameter has already handled the validation error via its own <code>&lt;o:viewParamValidationFailed&gt;</code>,
  * it will be applied when there's a general validation error as per {@link FacesContext#isValidationFailed()}.
@@ -69,15 +69,15 @@ import org.omnifaces.util.Faces;
  * <p>
  * As a precaution; be aware that <code>&lt;f:viewParam required="true"&gt;</code> has a design error in current
  * Mojarra and MyFaces releases (as of now, Mojarra 2.2.7 and MyFaces 2.2.4). When the parameter is not specified in
- * the query string it is retrieved as <code>null</code>, which causes an internal <code>isRequired()</code> check to be
- * performed instead of delegating the check to the standard <code>UIInput</code> implementation. This has the
+ * the query string, it is retrieved as <code>null</code>, which causes an internal <code>isRequired()</code> check to
+ * be performed instead of delegating the check to the standard <code>UIInput</code> implementation. This has the
  * consequence that <code>PreValidateEvent</code> and <code>PostValidateEvent</code> listeners are never invoked, which
  * the <code>&lt;o:viewParamValidationFailed&gt;</code> is actually relying on. This is fixed in
  * <code>&lt;o:viewParam&gt;</code>.
  *
  * <h3>Examples</h3>
  * <p>
- * In the example shown below an HTTP 400 error will be returned to the client when at least one view param is absent.
+ * In the example below the client will be presented an HTTP 400 error when at least one view param is absent.
  * <pre>
  * &lt;f:metadata&gt;
  *     &lt;o:viewParam name="foo" required="true" /&gt;
@@ -86,9 +86,10 @@ import org.omnifaces.util.Faces;
  * &lt;/f:metadata&gt;
  * </pre>
  * <p>
- * In the example below, only when the "foo" parameter is absent will the client be redirected to "login.xhtml".
- * When the "bar" parameter is absent, nothing new will happen. The process will proceed "as usual". I.e. the validation
- * error will end up as a faces message in the current view the usual way.
+ * In the example below the client will be redirected to "login.xhtml" when the "foo" parameter is absent, regardless of
+ * the "bar" parameter. When the "foo" parameter is present, but the "bar" parameter is absent, nothing new will happen.
+ * The process will proceed "as usual". I.e. the validation error will end up as a faces message in the current view the
+ * usual way.
  * <pre>
  * &lt;f:metadata&gt;
  *     &lt;o:viewParam name="foo" required="true"&gt;
@@ -98,9 +99,9 @@ import org.omnifaces.util.Faces;
  * &lt;/f:metadata&gt;
  * </pre>
  * <p>
- * In the example below, only when the "foo" parameter is absent, regardless of the "bar" or "baz" parameters
- * an HTTP 401 error will be returned to the client. When the "foo" parameter is present, but either the "bar" or
- * "baz" parameter is absent, the client will be redirected to "search.xhtml".
+ * In the example below the client will be presented an HTTP 401 error when the "foo" parameter is absent, regardless of
+ * the "bar" or "baz" parameters. When the "foo" parameter is present, but either the "bar" or "baz" parameter is
+ * absent, the client will be redirected to "search.xhtml".
  * <pre>
  * &lt;f:metadata&gt;
  *     &lt;o:viewParam name="foo" required="true"&gt;
@@ -118,9 +119,9 @@ import org.omnifaces.util.Faces;
  *
  * <h3>Messaging</h3>
  * <p>
- * By default, the first occurring faces message on the parent component will be copied, or when there is none the first
- * occurring global faces message will be copied. When <code>sendRedirect</code> is used it will be set
- * as a global flash error message. When <code>sendError</code> is used it will be set as HTTP status message.
+ * By default, the first occurring faces message on the parent component will be copied, or when there is none then the
+ * first occurring global faces message will be copied. When <code>sendRedirect</code> is used, it will be set
+ * as a global flash error message. When <code>sendError</code> is used, it will be set as HTTP status message.
  * <p>
  * You can override this message by explicitly specifying the <code>message</code> attribute. This is applicable for
  * both <code>sendRedirect</code> and <code>sendError</code>.
@@ -133,7 +134,7 @@ import org.omnifaces.util.Faces;
  * <p>
  * Note, although all of above examples use <code>required="true"</code>, this does not mean that you can only use
  * <code>&lt;o:viewParamValidationFailed&gt;</code> in combination with <code>required="true"</code> validation. You
- * can use it in combination with any kind of conversion/validation on <code>&lt;f|o:viewParam</code>, even bean
+ * can use it in combination with any kind of conversion/validation on <code>&lt;f|o:viewParam&gt;</code>, even bean
  * validation.
  *
  * <h3>Design notes</h3>
