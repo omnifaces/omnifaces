@@ -38,7 +38,7 @@ import javax.enterprise.inject.spi.BeanManager;
  * SomeBean someBean = Beans.getInstance(SomeBean.class);
  *
  * // Get all currently active CDI managed bean instances in the session scope.
- * Map<Object, String> activeSessionScopedBeans = Beans.getActiveInstances(SessionScope.class);
+ * Map&lt;Object, String&gt; activeSessionScopedBeans = Beans.getActiveInstances(SessionScope.class);
  *
  * // Destroy any currently active CDI managed bean instance of given bean class.
  * Beans.destroy(SomeBean.class);
@@ -53,7 +53,7 @@ import javax.enterprise.inject.spi.BeanManager;
  * SomeBean someBean = (SomeBean) beanManager.getReference(bean, SomeBean.class, context);
  * </pre>
  * <p>
- * If you need a dependency-free way of obtaining the CDI managed bean instance (e.g. when you want to write code which
+ * If you need a dependency-free way of obtaining the CDI managed bean reference (e.g. when you want to write code which
  * should also run on Tomcat), use {@link org.omnifaces.config.BeanManager} enum instead.
  *
  * @author Bauke Scholtz
@@ -83,7 +83,7 @@ public final class Beans {
 	}
 
 	/**
-	 * Returns the CDI managed bean reference (proxy) of the given class.
+	 * Returns the CDI managed bean reference (proxy) of the given bean class.
 	 * Note that this actually returns a client proxy and the underlying actual instance is thus always auto-created.
 	 * @param <T> The expected return type.
 	 * @param beanClass The CDI managed bean class.
@@ -94,7 +94,7 @@ public final class Beans {
 	}
 
 	/**
-	 * Returns the CDI managed bean reference (proxy) of the given bean.
+	 * Returns the CDI managed bean reference (proxy) of the given bean representation.
 	 * Note that this actually returns a client proxy and the underlying actual instance is thus always auto-created.
 	 * @param <T> The expected return type.
 	 * @param bean The CDI managed bean representation.
@@ -105,10 +105,10 @@ public final class Beans {
 	}
 
 	/**
-	 * Returns the CDI managed bean instance (actual) of the given class and creates one if one doesn't exist.
+	 * Returns the CDI managed bean instance (actual) of the given bean class and creates one if one doesn't exist.
 	 * @param <T> The expected return type.
 	 * @param beanClass The CDI managed bean class.
-	 * @return The CDI managed bean instance (actual) of the given class, or <code>null</code> if there is none.
+	 * @return The CDI managed bean instance (actual) of the given bean class, or <code>null</code> if there is none.
 	 * @since 1.8
 	 */
 	public static <T> T getInstance(Class<T> beanClass) {
@@ -116,14 +116,14 @@ public final class Beans {
 	}
 
 	/**
-	 * Returns the CDI managed bean instance (actual) of the given class and creates one if one doesn't exist and
+	 * Returns the CDI managed bean instance (actual) of the given bean class and creates one if one doesn't exist and
 	 * <code>create</code> argument is <code>true</code>, otherwise don't create one and return <code>null</code> if
 	 * there's no current instance.
 	 * @param <T> The expected return type.
 	 * @param beanClass The CDI managed bean class.
 	 * @param create Whether to create create CDI managed bean instance if one doesn't exist.
-	 * @return The CDI managed bean instance (actual) of the given class, or <code>null</code> if there is none and/or
-	 * the <code>create</code> argument is <code>false</code>.
+	 * @return The CDI managed bean instance (actual) of the given bean class, or <code>null</code> if there is none
+	 * and/or the <code>create</code> argument is <code>false</code>.
 	 * @since 1.7
 	 */
 	public static <T> T getInstance(Class<T> beanClass, boolean create) {
@@ -131,8 +131,8 @@ public final class Beans {
 	}
 
 	/**
-	 * Returns the CDI managed bean instance of the given resolved bean from the given bean manager and creates one if
-	 * one doesn't exist and <code>create</code> argument is <code>true</code>, otherwise don't create one and return
+	 * Returns the CDI managed bean instance (actual) of the given bean representation and creates one if one doesn't
+	 * exist and <code>create</code> argument is <code>true</code>, otherwise don't create one and return
 	 * <code>null</code> if there's no current instance.
 	 * @param <T> The expected return type.
 	 * @param bean The CDI managed bean representation.
@@ -159,6 +159,7 @@ public final class Beans {
 
 	/**
 	 * Destroy the currently active instance of the given CDI managed bean class.
+	 * @param <T> The generic CDI managed bean type.
 	 * @param beanClass The CDI managed bean class.
 	 * @since 2.0
 	 */
@@ -168,6 +169,7 @@ public final class Beans {
 
 	/**
 	 * Destroy the currently active instance of the given CDI managed bean representation.
+	 * @param <T> The generic CDI managed bean type.
 	 * @param bean The CDI managed bean representation.
 	 * @since 2.0
 	 */

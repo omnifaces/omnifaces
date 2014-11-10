@@ -33,7 +33,7 @@ import org.omnifaces.util.JNDI;
  * </pre>
  * <p>
  * If you however already have a CDI bean manager instance at hands via <code>@Inject</code>, use
- * {@link org.omnifaces.util.Beans#getReference(javax.enterprise.inject.spi.BeanManager, Class)} instead.
+ * {@link org.omnifaces.util.BeansLocal#getReference(javax.enterprise.inject.spi.BeanManager, Class)} instead.
  *
  * @author Bauke Scholtz
  * @since 1.6.1
@@ -121,6 +121,7 @@ public enum BeanManager {
 
 	/**
 	 * Returns the CDI bean manager.
+	 * @param <T> The <code>javax.enterprise.inject.spi.BeanManager</code>.
 	 * @return The CDI bean manager.
 	 * @throws ClassCastException When you assign it to a variable which is not declared as CDI BeanManager.
 	 */
