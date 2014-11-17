@@ -43,6 +43,19 @@ import javax.enterprise.inject.spi.BeanManager;
 @Typed
 public final class BeansLocal {
 
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final String ERROR_NO_ALTERABLE_CONTEXT =
+		"Bean '%s' is put in context '%s' which is not an alterable context.";
+
+	// Constructors ---------------------------------------------------------------------------------------------------
+
+	private BeansLocal() {
+		// Hide constructor.
+	}
+
+	// Utility --------------------------------------------------------------------------------------------------------
+
 	/**
 	 * {@inheritDoc}
 	 * @see Beans#resolve(Class)
@@ -147,8 +160,15 @@ public final class BeansLocal {
 	 * @see Beans#destroy(Bean)
 	 */
 	public static <T> void destroy(BeanManager beanManager, Bean<T> bean) {
-		AlterableContext context = (AlterableContext) beanManager.getContext(bean.getScope());
-		context.destroy(bean);
+		Context context = beanManager.getContext(bean.getScope());
+
+		if (context instanceof AlterableContext) {
+			((AlterableContext) context).destroy(bean);
+		}
+		else {
+			throw new IllegalArgumentException(
+				String.format(ERROR_NO_ALTERABLE_CONTEXT, bean.getBeanClass(), context.getClass()));
+		}
 	}
 
 	/**

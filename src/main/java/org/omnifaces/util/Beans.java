@@ -16,6 +16,8 @@ import java.lang.annotation.Annotation;
 import java.util.Map;
 
 import javax.enterprise.context.NormalScope;
+import javax.enterprise.context.spi.AlterableContext;
+import javax.enterprise.context.spi.Context;
 import javax.enterprise.inject.Stereotype;
 import javax.enterprise.inject.Typed;
 import javax.enterprise.inject.spi.Annotated;
@@ -63,10 +65,19 @@ import javax.enterprise.inject.spi.BeanManager;
 @Typed
 public final class Beans {
 
+	// Constructors ---------------------------------------------------------------------------------------------------
+
+	private Beans() {
+		// Hide constructor.
+	}
+
+	// Utility --------------------------------------------------------------------------------------------------------
+
 	/**
 	 * Returns the CDI bean manager.
 	 * @return The CDI bean manager.
 	 * @since 2.0
+	 * @see org.omnifaces.config.BeanManager#get()
 	 */
 	public static BeanManager getManager() {
 		return org.omnifaces.config.BeanManager.INSTANCE.get();
@@ -77,6 +88,8 @@ public final class Beans {
 	 * @param <T> The generic CDI managed bean type.
 	 * @param beanClass The CDI managed bean class.
 	 * @return The CDI managed bean representation of the given bean class, or <code>null</code> if there is none.
+	 * @see BeanManager#getBeans(String)
+	 * @see BeanManager#resolve(java.util.Set)
 	 */
 	public static <T> Bean<T> resolve(Class<T> beanClass) {
 		return BeansLocal.resolve(getManager(), beanClass);
@@ -88,6 +101,8 @@ public final class Beans {
 	 * @param <T> The expected return type.
 	 * @param beanClass The CDI managed bean class.
 	 * @return The CDI managed bean reference (proxy) of the given class, or <code>null</code> if there is none.
+	 * @see #resolve(Class)
+	 * @see #getReference(Bean)
 	 */
 	public static <T> T getReference(Class<T> beanClass) {
 		return BeansLocal.getReference(getManager(), beanClass);
@@ -99,6 +114,8 @@ public final class Beans {
 	 * @param <T> The expected return type.
 	 * @param bean The CDI managed bean representation.
 	 * @return The CDI managed bean reference (proxy) of the given bean, or <code>null</code> if there is none.
+	 * @see BeanManager#createCreationalContext(javax.enterprise.context.spi.Contextual)
+	 * @see BeanManager#getReference(Bean, java.lang.reflect.Type, javax.enterprise.context.spi.CreationalContext)
 	 */
 	public static <T> T getReference(Bean<T> bean) {
 		return BeansLocal.getReference(getManager(), bean);
@@ -110,6 +127,7 @@ public final class Beans {
 	 * @param beanClass The CDI managed bean class.
 	 * @return The CDI managed bean instance (actual) of the given bean class, or <code>null</code> if there is none.
 	 * @since 1.8
+	 * @see #getInstance(Class, boolean)
 	 */
 	public static <T> T getInstance(Class<T> beanClass) {
 		return BeansLocal.getInstance(getManager(), beanClass);
@@ -125,6 +143,8 @@ public final class Beans {
 	 * @return The CDI managed bean instance (actual) of the given bean class, or <code>null</code> if there is none
 	 * and/or the <code>create</code> argument is <code>false</code>.
 	 * @since 1.7
+	 * @see #resolve(Class)
+	 * @see #getInstance(Bean, boolean)
 	 */
 	public static <T> T getInstance(Class<T> beanClass, boolean create) {
 		return BeansLocal.getInstance(getManager(), beanClass, create);
@@ -140,6 +160,9 @@ public final class Beans {
 	 * @return The CDI managed bean instance (actual) of the given bean, or <code>null</code> if there is none and/or
 	 * the <code>create</code> argument is <code>false</code>.
 	 * @since 1.7
+	 * @see BeanManager#getContext(Class)
+	 * @see BeanManager#createCreationalContext(javax.enterprise.context.spi.Contextual)
+	 * @see Context#get(javax.enterprise.context.spi.Contextual, javax.enterprise.context.spi.CreationalContext)
 	 */
 	public static <T> T getInstance(Bean<T> bean, boolean create) {
 		return BeansLocal.getInstance(getManager(), bean, create);
@@ -152,6 +175,9 @@ public final class Beans {
 	 * @param scope The CDI managed bean scope, e.g. <code>RequestScoped.class</code>.
 	 * @return All active CDI managed bean instances in the given CDI managed bean scope.
 	 * @since 1.7
+	 * @see BeanManager#getBeans(String)
+	 * @see BeanManager#getContext(Class)
+	 * @see Context#get(javax.enterprise.context.spi.Contextual)
 	 */
 	public static <S extends NormalScope> Map<Object, String> getActiveInstances(Class<S> scope) {
 		return BeansLocal.getActiveInstances(getManager(), scope);
@@ -162,6 +188,8 @@ public final class Beans {
 	 * @param <T> The generic CDI managed bean type.
 	 * @param beanClass The CDI managed bean class.
 	 * @since 2.0
+	 * @see #resolve(Class)
+	 * @see #destroy(Bean)
 	 */
 	public static <T> void destroy(Class<T> beanClass) {
 		BeansLocal.destroy(getManager(), beanClass);
@@ -171,7 +199,11 @@ public final class Beans {
 	 * Destroy the currently active instance of the given CDI managed bean representation.
 	 * @param <T> The generic CDI managed bean type.
 	 * @param bean The CDI managed bean representation.
+	 * @throws IllegalArgumentException When the given CDI managed bean type is actually not put in an alterable
+	 * context.
 	 * @since 2.0
+	 * @see BeanManager#getContext(Class)
+	 * @see AlterableContext#destroy(javax.enterprise.context.spi.Contextual)
 	 */
 	public static <T> void destroy(Bean<T> bean) {
 		BeansLocal.destroy(getManager(), bean);
