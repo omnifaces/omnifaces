@@ -47,12 +47,12 @@ import javax.enterprise.inject.Stereotype;
  * <p>
  * This bean type effectively functions as a CDI based startup listener for the web application.
  * <p>
- * Note that Java EE thus also provides the {@link javax.ejb.Startup} and {@link javax.ejb.Singleton} annotations
- * which together provide similar functionality, but it requires an EJB dependency (which may not be applicable on e.g.
- * Tomcat+Weld) and it will result in the bean annotated with these annotations to become an EJB session bean (with
- * automatic transaction management and automatic locking which you might need to turn off with yet more additional
- * {@link javax.ejb.TransactionAttribute} and {@link javax.ejb.Lock} annotations if these are not appropriate for some
- * situation).
+ * Note that Java EE thus also provides the <code>javax.ejb.Startup</code> and <code>javax.ejb.Singleton</code>
+ * annotations which together provide similar functionality, but it requires an EJB dependency (which may not be
+ * applicable on e.g. Tomcat+Weld) and it will result in the bean annotated with these annotations to become an EJB
+ * session bean (with automatic transaction management and automatic locking which you might need to turn off with yet
+ * more additional <code>javax.ejb.TransactionAttribute</code> and <code>javax.ejb.Lock</code> annotations if these are
+ * not appropriate for some situation).
  *
  * @since 1.8
  * @author Arjan Tijms
