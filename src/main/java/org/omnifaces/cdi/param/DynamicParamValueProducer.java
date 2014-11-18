@@ -27,6 +27,7 @@ import javax.enterprise.context.Dependent;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.CDI;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.inject.spi.PassivationCapable;
 import javax.enterprise.util.AnnotationLiteral;
@@ -34,6 +35,7 @@ import javax.faces.convert.Converter;
 import javax.faces.validator.Validator;
 
 import org.omnifaces.cdi.Param;
+import org.omnifaces.util.BeansLocal;
 
 /**
  * Dynamic CDI producer used to work around CDI's restriction to create true generic producers.
@@ -72,7 +74,18 @@ public class DynamicParamValueProducer implements Bean<Object>, Serializable, Pa
 
     @Override
     public Object create(CreationalContext<Object> creationalContext) {
-    	ParamValue<?> paramValue = new RequestParameterProducer().produce(getInstance(beanManager, InjectionPoint.class));
+    	
+    	Bean<RequestParameterProducer> bean = BeansLocal.resolve(beanManager, RequestParameterProducer.class);
+    	
+    	Set<InjectionPoint> points = bean.getInjectionPoints();
+    	
+    	InjectionPoint point = points.iterator().next();
+    	
+    	InjectionPoint injectionPoint = (InjectionPoint) beanManager.getInjectableReference(point, creationalContext);
+    	
+    	// getInstance(beanManager, InjectionPoint.class)
+    	
+    	ParamValue<?> paramValue = new RequestParameterProducer().produce(injectionPoint);
     	return paramValue.getValue();
     }
 

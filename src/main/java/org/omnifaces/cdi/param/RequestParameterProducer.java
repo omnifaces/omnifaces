@@ -52,6 +52,7 @@ import javax.faces.validator.BeanValidator;
 import javax.faces.validator.RequiredValidator;
 import javax.faces.validator.Validator;
 import javax.faces.validator.ValidatorException;
+import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
 
 import org.omnifaces.cdi.Param;
@@ -63,6 +64,9 @@ import org.omnifaces.cdi.Param;
  * @author Arjan Tijms
  */
 public class RequestParameterProducer {
+	
+	@Inject
+	private InjectionPoint injectionPoint;
 
 	@SuppressWarnings("unchecked")
 	@Produces
