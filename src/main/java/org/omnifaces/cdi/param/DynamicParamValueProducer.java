@@ -124,20 +124,24 @@ public class DynamicParamValueProducer implements Bean<Object>, Serializable, Pa
     @SuppressWarnings("all")
     public static class DefaultParamAnnotationLiteral extends AnnotationLiteral<Param> implements Param {
         private static final long serialVersionUID = 1L;
+        
+        private static final String[] EMPTY_STRING_ARRAY = {}; 
+        private static final Class<? extends Validator>[] EMPTY_VALIDATOR_ARRAY = new Class[0];
+        private static final Attribute[] EMPTY_ATTRIBUTE_ARRAY = {};
 
 		@Override
 		public String name() {
-			return null;
+			return "";
 		}
 
 		@Override
 		public String label() {
-			return null;
+			return "";
 		}
 
 		@Override
 		public String converter() {
-			return null;
+			return "";
 		}
 
 		@Override
@@ -147,42 +151,42 @@ public class DynamicParamValueProducer implements Bean<Object>, Serializable, Pa
 
 		@Override
 		public String[] validators() {
-			return null;
+			return EMPTY_STRING_ARRAY;
 		}
 
 		@Override
 		public Class<? extends Converter> converterClass() {
-			return null;
+			return Converter.class;
 		}
 
 		@Override
 		public Class<? extends Validator>[] validatorClasses() {
-			return null;
+			return EMPTY_VALIDATOR_ARRAY;
 		}
 
 		@Override
 		public Attribute[] converterAttributes() {
-			return null;
+			return EMPTY_ATTRIBUTE_ARRAY;
 		}
 
 		@Override
 		public Attribute[] validatorAttributes() {
-			return null;
+			return EMPTY_ATTRIBUTE_ARRAY;
 		}
 
 		@Override
 		public String converterMessage() {
-			return null;
+			return "";
 		}
 
 		@Override
 		public String validatorMessage() {
-			return null;
+			return "";
 		}
 
 		@Override
 		public String requiredMessage() {
-			return null;
+			return "";
 		}
 
 		@Override
