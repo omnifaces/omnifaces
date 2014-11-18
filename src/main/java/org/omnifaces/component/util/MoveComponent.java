@@ -161,24 +161,26 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
                 throw new IllegalArgumentException(format(ERROR_COMPONENT_NOT_FOUND, forValue, getId()));
             }
 
+            List<UIComponent> children = getChildrenInNewList();
+            
             switch (getDestination()) {
             	case BEFORE:
-            		for (int i = 0; i < getChildren().size(); i++) {
-                    	component.getParent().getChildren().add(i, getChildren().get(i));
+            		for (int i = 0; i < children.size(); i++) {
+                    	component.getParent().getChildren().add(i, children.get(i));
                     }
             		break;
             	case ADD_FIRST:
-            		for (int i = 0; i < getChildren().size(); i++) {
-                    	component.getChildren().add(i, getChildren().get(i));
+            		for (int i = 0; i < children.size(); i++) {
+                    	component.getChildren().add(i, children.get(i));
                     }
             		break;
             	case ADD_LAST:
-            		for (UIComponent childComponent : getChildren()) {
+            		for (UIComponent childComponent : children) {
 						component.getChildren().add(childComponent);
 					}
             		break;
             	case FACET:
-            		for (UIComponent childComponent : getChildren()) {
+            		for (UIComponent childComponent : children) {
 						component.getFacets().put(getFacet(), childComponent);
 					}
             		break;
@@ -194,7 +196,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
             		}
             		break;
             	case AFTER:
-					for (UIComponent childComponent : getChildren()) {
+					for (UIComponent childComponent : children) {
 						component.getParent().getChildren().add(childComponent);
 					}
             		break;
@@ -203,6 +205,9 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
         }
     }
 
+    private List<UIComponent> getChildrenInNewList() {
+    	return new ArrayList<>(getChildren());
+    }
 
     // Attribute getters/setters --------------------------------------------------------------------------------------
 
