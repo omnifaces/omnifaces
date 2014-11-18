@@ -166,22 +166,31 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
             switch (getDestination()) {
             	case BEFORE:
             		for (int i = 0; i < children.size(); i++) {
-                    	component.getParent().getChildren().add(i, children.get(i));
+            			UIComponent childComponent = children.get(i);
+                    	component.getParent().getChildren().add(i, childComponent);
+                    	// Setting a component's ID to its own ID is necessary for MyFaces, who doesn't update the client-id
+                    	// for the new location of the component in the tree. This action causes the client id to be nulled
+                    	// and recreated when referenced.
+                    	childComponent.setId(childComponent.getId());
                     }
             		break;
             	case ADD_FIRST:
             		for (int i = 0; i < children.size(); i++) {
-                    	component.getChildren().add(i, children.get(i));
+            			UIComponent childComponent = children.get(i);
+                    	component.getChildren().add(i, childComponent);
+                    	childComponent.setId(childComponent.getId());
                     }
             		break;
             	case ADD_LAST:
             		for (UIComponent childComponent : children) {
 						component.getChildren().add(childComponent);
+						childComponent.setId(childComponent.getId());
 					}
             		break;
             	case FACET:
             		for (UIComponent childComponent : children) {
 						component.getFacets().put(getFacet(), childComponent);
+						childComponent.setId(childComponent.getId());
 					}
             		break;
             	case BEHAVIOR:
@@ -198,6 +207,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
             	case AFTER:
 					for (UIComponent childComponent : children) {
 						component.getParent().getChildren().add(childComponent);
+						childComponent.setId(childComponent.getId());
 					}
             		break;
             }
