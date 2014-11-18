@@ -13,9 +13,11 @@
 package org.omnifaces.util;
 
 import static java.beans.Introspector.getBeanInfo;
+import static java.beans.PropertyEditorManager.findEditor;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
+import java.beans.PropertyEditor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -74,6 +76,65 @@ public final class Reflection {
 	    } catch (IntrospectionException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 	        throw new IllegalStateException(e);
 	    }
+	}
+	
+	/**
+	 * Sets a collection of properties of a given object to the (optionally coerced) values associated with those properties.
+	 * <p>
+	 * In the map that represents these properties, each key represents the name of the property, with the value
+	 * associated with that key being the value that is set for the property.
+	 * <p>
+	 * E.g. map entry key = foo, value = "bar", which "bar" an instance of String, will conceptually result in the
+	 * following call: <code>object.setFoo("string");</code>
+	 *
+	 * <p>
+	 * NOTE 1: In case the value is a String, and the target type is not String, the standard property editor mechanism
+	 * will be used to attempt a conversion.
+	 * 
+	 * <p>
+	 * Note 2: This method operates somewhat as the reverse of {@link Reflection#setProperties(Object, Map)}. Here only
+	 * the available writable properties of the object are matched against the map with properties to set. Properties
+	 * in the map for which there isn't a corresponding writable property on the object are ignored.
+	 * 
+	 * <p>
+	 * Following the above two notes, use this method when attempting to set properties on an object in a lenient best effort 
+	 * basis. Use {@link Reflection#setProperties(Object, Map)} when all properties need to be set with the exact type as the value
+	 * appears in the map.
+	 *  
+	 *
+	 * @param object
+	 *            the object on which properties will be set
+	 * @param propertiesToSet
+	 *            the map containing properties and their values to be set on the object
+	 */
+	public static void setPropertiesWithCoercion(Object object, Map<String, Object> propertiesToSet) {
+		try {
+			for (PropertyDescriptor property : getBeanInfo(object.getClass()).getPropertyDescriptors()) {
+				Method setter = property.getWriteMethod();
+
+				if (setter == null) {
+					continue;
+				}
+
+				if (propertiesToSet.containsKey(property.getName())) {
+
+					Object value = propertiesToSet.get(property.getName());
+					if (value instanceof String && !property.getPropertyType().equals(String.class)) {
+
+						// Try to convert Strings to the type expected by the converter
+
+						PropertyEditor editor = findEditor(property.getPropertyType());
+						editor.setAsText((String) value);
+						value = editor.getValue();
+					}
+
+					property.getWriteMethod().invoke(object, value);
+				}
+
+			}
+		} catch (Exception e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
 	/**

@@ -12,8 +12,6 @@
  */
 package org.omnifaces.cdi.param;
 
-import static java.beans.Introspector.getBeanInfo;
-import static java.beans.PropertyEditorManager.findEditor;
 import static java.lang.Boolean.valueOf;
 import static javax.faces.validator.BeanValidator.DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME;
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
@@ -24,13 +22,11 @@ import static org.omnifaces.util.Messages.createError;
 import static org.omnifaces.util.Platform.getBeanValidator;
 import static org.omnifaces.util.Platform.isBeanValidationAvailable;
 import static org.omnifaces.util.Reflection.instance;
+import static org.omnifaces.util.Reflection.setPropertiesWithCoercion;
 import static org.omnifaces.util.Utils.containsByClassName;
 import static org.omnifaces.util.Utils.isEmpty;
 
-import java.beans.PropertyDescriptor;
-import java.beans.PropertyEditor;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -170,7 +166,7 @@ public class RequestParameterProducer {
 		}
 
 		if (converter != null) {
-			setAttributes(converter, getConverterAttributes(requestParameter));
+			setPropertiesWithCoercion(converter, getConverterAttributes(requestParameter));
 		}
 
 		return converter;
@@ -324,7 +320,7 @@ public class RequestParameterProducer {
 		// which attribute should go to which validator.
 		Map<String, Object> validatorAttributes = getValidatorAttributes(requestParameter);
 		for (Validator validator : validators) {
-			setAttributes(validator, validatorAttributes);
+			setPropertiesWithCoercion(validator, validatorAttributes);
 		}
 
 		return validators;
@@ -354,35 +350,7 @@ public class RequestParameterProducer {
 		return attributeMap;
 	}
 
-	private static void setAttributes(Object object, Map<String, Object> attributes) {
-		try {
-			for (PropertyDescriptor property : getBeanInfo(object.getClass()).getPropertyDescriptors()) {
-				Method setter = property.getWriteMethod();
-
-				if (setter == null) {
-					continue;
-				}
-
-				if (attributes.containsKey(property.getName())) {
-
-					Object value = attributes.get(property.getName());
-					if (value instanceof String && !property.getPropertyType().equals(String.class)) {
-
-						// Try to convert Strings to the type expected by the converter
-
-						PropertyEditor editor = findEditor(property.getPropertyType());
-						editor.setAsText((String) value);
-						value = editor.getValue();
-					}
-
-					property.getWriteMethod().invoke(object, value);
-				}
-
-			}
-		} catch (Exception e) {
-			throw new IllegalStateException(e);
-		}
-	}
+	
 
 	private void addConverterMessage(FacesContext context, UIComponent component, String label, String submittedValue, ConverterException ce, String converterMessage) {
 		FacesMessage message = null;
