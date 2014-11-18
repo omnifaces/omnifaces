@@ -65,6 +65,7 @@ import org.omnifaces.cdi.Param;
  */
 public class RequestParameterProducer {
 	
+	@SuppressWarnings("unused")
 	@Inject
 	private InjectionPoint injectionPoint;
 
@@ -111,7 +112,7 @@ public class RequestParameterProducer {
 			// 1. Use Bean Validation validators
 			if (shouldDoBeanValidation(requestParameter)) {
 
-				Set<ConstraintViolation<?>> violations = doBeanValidation(injectionPoint.getBean().getBeanClass(), injectionPoint.getMember().getName(), convertedValue);
+				Set<ConstraintViolation<?>> violations = doBeanValidation(convertedValue, injectionPoint);
 
 				valid = violations.isEmpty();
 
@@ -258,15 +259,25 @@ public class RequestParameterProducer {
 		return isBeanValidationAvailable();
 	}
 
-	private Set<ConstraintViolation<?>> doBeanValidation(Class<?> base, String property, Object value) {
+	private Set<ConstraintViolation<?>> doBeanValidation(Object value, InjectionPoint injectionPoint) {
 
-		ParamValue<?> paramValue = null;
-		if (value != null) {
-			paramValue = new ParamValue<>(null, null, null, value);
+		Class<?> base = injectionPoint.getBean().getBeanClass();
+		String property = injectionPoint.getMember().getName();
+		Type type = injectionPoint.getType();
+		
+		// Check if the target property in which we are injecting in our special holder/wrapper type
+		// ParamValue or not. If it's the latter, pre-wrap our value (otherwise types for bean validation
+		// would not match)
+		Object valueOrWrapper = value;
+		if (type instanceof ParameterizedType) {
+			Type propertyRawType = ((ParameterizedType) type).getRawType();
+			if (propertyRawType.equals(ParamValue.class)) {
+				valueOrWrapper = new ParamValue<>(null, null, null, value);
+			}
 		}
 
 		@SuppressWarnings("rawtypes")
-		Set violationsRaw = getBeanValidator().validateValue(base, property, paramValue);
+		Set violationsRaw = getBeanValidator().validateValue(base, property, valueOrWrapper);
 
 		@SuppressWarnings("unchecked")
 		Set<ConstraintViolation<?>> violations = violationsRaw;
