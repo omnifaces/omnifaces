@@ -23,10 +23,14 @@ import java.util.Set;
 import javax.enterprise.context.NormalScope;
 import javax.enterprise.context.spi.AlterableContext;
 import javax.enterprise.context.spi.Context;
+import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.Typed;
 import javax.enterprise.inject.spi.Annotated;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.InjectionPoint;
+
+import org.omnifaces.cdi.beans.InjectionPointGenerator;
 
 /**
  * <p>
@@ -202,6 +206,16 @@ public final class BeansLocal {
 		}
 
 		return null;
+	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see Beans#getAnnotation(Annotated, Class)
+	 */
+	public static InjectionPoint getCurrentInjectionPoint(BeanManager beanManager, CreationalContext<?> creationalContext) {
+    	return (InjectionPoint) beanManager.getInjectableReference(
+			resolve(beanManager, InjectionPointGenerator.class).getInjectionPoints().iterator().next(), creationalContext
+		);
 	}
 
 }

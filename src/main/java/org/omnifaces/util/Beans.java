@@ -18,11 +18,14 @@ import java.util.Map;
 import javax.enterprise.context.NormalScope;
 import javax.enterprise.context.spi.AlterableContext;
 import javax.enterprise.context.spi.Context;
+import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.Stereotype;
 import javax.enterprise.inject.Typed;
 import javax.enterprise.inject.spi.Annotated;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.InjectionPoint;
 
 /**
  * <p>
@@ -222,6 +225,21 @@ public final class Beans {
 	 */
 	public static <A extends Annotation> A getAnnotation(Annotated annotated, Class<A> annotationType) {
 		return BeansLocal.getAnnotation(getManager(), annotated, annotationType);
+	}
+	
+	/**
+	 * Gets the current injection point when called from a context where injection is taking place (e.g. from a producer).
+	 * <p>
+	 * This is mostly intended to be used from within a dynamic producer {@link Bean}. For a "regular" producer (using {@link Produces})
+	 * an <code>InjectionPoint</code> can either be injected into the bean that contains the producer method, or directly provided as argument
+	 * of said method.
+	 *  
+	 * @param creationalContext a {@link CreationalContext} used to manage objects with a
+     *        {@link javax.enterprise.context.Dependent} scope
+	 * @return the current injection point when called from a context where injection is taking place (e.g. from a producer)
+	 */
+	public static InjectionPoint getCurrentInjectionPoint(CreationalContext<?> creationalContext) {
+		return BeansLocal.getCurrentInjectionPoint(getManager(), creationalContext);
 	}
 
 }
