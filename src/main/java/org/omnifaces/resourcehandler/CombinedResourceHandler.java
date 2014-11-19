@@ -353,7 +353,9 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		private void add(FacesContext context, UIComponent component, String rendererType, ResourceIdentifier id, String target) {
 			if (LIBRARY_NAME.equals(id.getLibrary())) {
 				// Found an already combined resource. Extract and recombine it.
-				CombinedResourceInfo info = CombinedResourceInfo.get(id.getName());
+				String[] resourcePathParts = id.getName().split("\\.", 2)[0].split("/");
+				String resourceId = resourcePathParts[resourcePathParts.length - 1];
+				CombinedResourceInfo info = CombinedResourceInfo.get(resourceId);
 
 				if (info != null) {
 					for (ResourceIdentifier combinedId : info.getResourceIdentifiers()) {
