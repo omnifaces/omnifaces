@@ -37,6 +37,7 @@ import static org.omnifaces.util.Utils.csvToList;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -67,8 +68,12 @@ import org.omnifaces.eventlistener.BeanValidationEventListener;
 import org.omnifaces.util.Callback;
 import org.omnifaces.util.Callback.WithArgument;
 import org.omnifaces.util.Faces;
+import org.omnifaces.util.copier.CloneCopier;
 import org.omnifaces.util.copier.Copier;
+import org.omnifaces.util.copier.CopyCtorCopier;
 import org.omnifaces.util.copier.MultiStrategyCopier;
+import org.omnifaces.util.copier.NewInstanceCopier;
+import org.omnifaces.util.copier.SerializationCopier;
 
 /**
  * <p>
@@ -86,7 +91,10 @@ import org.omnifaces.util.copier.MultiStrategyCopier;
  *
  * <h3>Usage</h3>
  * <p>
- * Some examples:
+ * Some examples
+ * 
+ * <p>
+ * <b>Control bean validation per component</b>
  * <pre>
  * &lt;h:commandButton value="submit" action="#{bean.submit}"&gt;
  *     &lt;o:validateBean validationGroups="javax.validation.groups.Default,com.example.MyGroup"/&gt;
@@ -99,6 +107,40 @@ import org.omnifaces.util.copier.MultiStrategyCopier;
  *     &lt;f:ajax execute="@form" listener="#{bean.itemChanged}" render="@form" /&gt;
  * &lt;/h:commandButton&gt;
  * </pre>
+ * 
+ * <p>
+ * <b>Validate a bean at the class level</b>
+ * <pre>
+ *  &lt;h:inputText value="#{bean.product.item}" / &gt;
+ *  &lt;h:inputText value="#{bean.product.order}" / &gt;
+ * 
+ *  &lt;o:validateBean value="#{bean.product}" validationGroups="com.example.MyGroup" / &gt; 
+ * </pre>
+ * 
+ * <h3>Class level validation details</h3>
+ * <p>
+ * In order to validate a bean at the class level, all values from input components should first be actually set on that bean
+ * and only thereafter should the bean be validated. This however does not play well with the JSF approach where a model
+ * is only updated when validation passes. But for class level validation we seemingly can not validate until the model
+ * is updated. To break this tie, a <em>copy</em> of the model bean is made first, and then values are stored in this copy
+ * and validated there. If validation passes, the original bean is updated.
+ * 
+ * <p>
+ * A bean is copied using the following strategies (in the order indicated):
+ * <ol>
+ * <li> <b>Cloning</b> - Bean must implement the {@link Cloneable} interface and support cloning according to the rules of that interface. See {@link CloneCopier}
+ * <li> <b>Serialization</b> - Bean must implement the {@link Serializable} interface and support serialization according to the rules of that interface. See {@link SerializationCopier}
+ * <li> <b>Copy constructor</b> - Bean must have an additional constructor (next to the default constructor) taking a single argument of its own 
+ *      type that initializes itself with the values of that passed in type. See {@link CopyCtorCopier}
+ * <li> <b>New instance</b> - Bean should have a public no arguments (default) constructor. Every official JavaBean satisfies this requirement. Note
+ *      that in this case no copy is made of the original bean, but just a new instance is created. See {@link NewInstanceCopier}
+ * </ol>
+ * 
+ * <p>
+ * If the above order is not ideal, or if an custom copy strategy is needed (e.g. when it's only needed to copy a few fields for the validation)
+ * a strategy can be supplied explicitly via the <code>copier</code> attribute. The value of this attribute can be any of the build-in copier implementations 
+ * given above, or can be a custom implementation of the {@link Copier} interface.
+ *
  *
  * @author Bauke Scholtz
  * @author Arjan Tijms
