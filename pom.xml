@@ -167,6 +167,9 @@
 				<version>2.10.1</version>
 				<configuration>
 					<javadocVersion>1.8</javadocVersion>
+					<links>
+						<link>https://docs.oracle.com/javaee/7/api/</link>
+					</links>
 				</configuration>
 				<executions>
 					<execution>
