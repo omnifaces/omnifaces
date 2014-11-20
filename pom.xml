@@ -168,6 +168,8 @@
 				<configuration>
 					<javadocVersion>1.8</javadocVersion>
 					<notimestamp>true</notimestamp>
+					<splitindex>true</splitindex>
+					<doctitle>OmniFaces API documentation</doctitle>
 					<links>
 						<link>https://docs.oracle.com/javaee/7/api/</link>
 					</links>
