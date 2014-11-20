@@ -167,6 +167,7 @@
 				<version>2.10.1</version>
 				<configuration>
 					<javadocVersion>1.8</javadocVersion>
+					<notimestamp>true</notimestamp>
 					<links>
 						<link>https://docs.oracle.com/javaee/7/api/</link>
 					</links>
