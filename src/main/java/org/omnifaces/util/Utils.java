@@ -504,8 +504,8 @@ public final class Utils {
 	/**
 	 * Serialize the given string to the short possible unique URL-safe representation. The current implementation will
 	 * decode the given string with UTF-8 and then compress it with ZLIB using "best compression" algorithm and then
-	 * Base64-encode the resulting bytes whereafter the Base64 characters <code>+</code>, <code>/</code> and
-	 * <code>=</code> are been replaced by respectively <code>-</code>, <code>_</code> and <code>~</code> to make it
+	 * Base64-encode the resulting bytes without the <code>=</code> padding, whereafter the Base64 characters
+	 * <code>+</code> and <code>/</code> are been replaced by respectively <code>-</code> and <code>_</code> to make it
 	 * URL-safe (so that no platform-sensitive URL-encoding needs to be done when used in URLs).
 	 * @param string The string to be serialized.
 	 * @return The serialized URL-safe string, or <code>null</code> when the given string is itself <code>null</code>.
@@ -521,7 +521,7 @@ public final class Utils {
 			ByteArrayOutputStream deflated = new ByteArrayOutputStream();
 			stream(raw, new DeflaterOutputStream(deflated, new Deflater(Deflater.BEST_COMPRESSION)));
 			String base64 = DatatypeConverter.printBase64Binary(deflated.toByteArray());
-			return base64.replace('+', '-').replace('/', '_').replace('=', '~');
+			return base64.replace('+', '-').replace('/', '_').replace("=", "");
 		}
 		catch (IOException e) {
 			// This will occur when ZLIB and/or UTF-8 are not supported, but this is not to be expected these days.
@@ -543,7 +543,7 @@ public final class Utils {
 		}
 
 		try {
-			String base64 = string.replace('-', '+').replace('_', '/').replace('~', '=');
+			String base64 = string.replace('-', '+').replace('_', '/') + "===".substring(0, string.length() % 4);
 			InputStream deflated = new ByteArrayInputStream(DatatypeConverter.parseBase64Binary(base64));
 			ByteArrayOutputStream raw = new ByteArrayOutputStream();
 			stream(new InflaterInputStream(deflated), raw);
