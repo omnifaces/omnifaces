@@ -12,9 +12,8 @@
 	<version>1.10-RC1</version>
 	<packaging>jar</packaging>
 	
-	<name>Omnifaces</name>
+	<name>OmniFaces</name>
 	<description>JSF 2.x utility library</description>
-	
 	<url>http://omnifaces.org</url>
 	<organization>
 		<name>OmniFaces</name>
@@ -74,6 +73,18 @@
 	</dependencies>
 
 	<build>
+
+		<!-- We know we don't want *.jsfdia, git knows we don't want them, now let's tell Maven as well -->
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<excludes>
+					<exclude>**/*.jsfdia</exclude>
+				</excludes>
+				<filtering>false</filtering>
+			</resource>
+		</resources>
+	
 		<plugins>
 		
 			<!-- Set the Java compiler versions -->
@@ -126,6 +137,9 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>2.10.1</version>
+				<configuration>
+					<javadocVersion>1.8</javadocVersion>
+				</configuration>
 				<executions>
 					<execution>
 						<id>attach-javadocs</id>
@@ -136,7 +150,11 @@
 				</executions>
 			</plugin>
 			
-
+			<!-- Deploying is done via sonatype's Nexus  
+			
+				 Snapshot deploy: mvn clean deploy
+				 Release deploy: mvn clean deploy -P release
+			-->
 			<plugin>
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>nexus-staging-maven-plugin</artifactId>
