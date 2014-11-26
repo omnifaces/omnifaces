@@ -350,8 +350,8 @@ public class Cache extends OutputFamily {
 	 * @param disabled Whether this cache is disabled.
 	 * @since 1.8
 	 */
-	public void setDisabled(Boolean disabled) {
-		state.put(disabled, disabled);
+	public void setDisabled(Boolean disabledValue) {
+		state.put(disabled, disabledValue);
 	}
 
 }
