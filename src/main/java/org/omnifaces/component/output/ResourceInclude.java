@@ -16,6 +16,9 @@ import static org.omnifaces.util.Components.validateHasNoChildren;
 
 import java.io.IOException;
 
+import javax.el.ELContext;
+import javax.el.ExpressionFactory;
+import javax.el.ValueExpression;
 import javax.faces.FacesException;
 import javax.faces.component.FacesComponent;
 import javax.faces.context.ExternalContext;
@@ -66,12 +69,17 @@ public class ResourceInclude extends OutputFamily {
 
 		try {
 			request.getRequestDispatcher((String) getAttributes().get("path")).include(request, bufferedResponse);
-		}
-		catch (ServletException e) {
+			if(getAttributes().containsKey("resolveEl") && Boolean.parseBoolean((String) getAttributes().get("resolveEl"))){
+		        ExpressionFactory ef = context.getApplication().getExpressionFactory();
+		        ValueExpression ve = ef.createValueExpression(context.getELContext(), bufferedResponse.getBufferAsString(), String.class);
+		        context.getResponseWriter().write((String) ve.getValue(context.getELContext()));
+			}else{
+				context.getResponseWriter().write(bufferedResponse.getBufferAsString());
+			}
+		}catch (ServletException e) {
 			throw new FacesException(e);
 		}
-
-		context.getResponseWriter().write(bufferedResponse.getBufferAsString());
+		
 	}
 
 }

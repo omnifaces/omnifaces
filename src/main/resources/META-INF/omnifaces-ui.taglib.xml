@@ -295,6 +295,12 @@
 			<required>true</required>
 			<type>java.lang.String</type>
 		</attribute>
+		 <attribute>
+			<description>A Boolean specifying the el expression to resolve the included content or not (useful for i18n)</description>
+			<name>resolveEl</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
 	</tag>
 
 	<tag>
