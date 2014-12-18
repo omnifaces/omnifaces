@@ -18,10 +18,10 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.el.FunctionMapper;
 import javax.faces.component.UIComponent;
@@ -83,7 +83,7 @@ public class ImportFunctions extends TagHandler {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static Map<String, Method> FUNCTIONS_CACHE = new HashMap<>();
+	private static final Map<String, Method> FUNCTIONS_CACHE = new ConcurrentHashMap<>();
 
 	private static final String ERROR_INVALID_VAR = "The 'var' attribute may not be an EL expression.";
 

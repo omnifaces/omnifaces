@@ -21,10 +21,10 @@ import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -45,9 +45,7 @@ final class CombinedResourceInfo {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final Logger logger = Logger.getLogger(CombinedResourceHandler.class.getName());
-
-	// ConcurrentHashMap was considered, but duplicate inserts technically don't harm and a HashMap is faster on read.
-	private static final Map<String, CombinedResourceInfo> CACHE = new HashMap<>();
+	private static final Map<String, CombinedResourceInfo> CACHE = new ConcurrentHashMap<>();
 
 	private static final String LOG_RESOURCE_NOT_FOUND = "CombinedResourceHandler: The resource %s cannot be found"
 			+ " and therefore a 404 will be returned for the combined resource ID %s";

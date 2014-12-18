@@ -33,6 +33,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.el.ValueExpression;
 import javax.faces.FacesException;
@@ -59,7 +60,7 @@ public class GraphicResource extends DynamicResource {
 
 	private static final String DEFAULT_CONTENT_TYPE = "image";
 	private static final Map<String, String> CONTENT_TYPES_BY_BASE64_HEADER = createContentTypesByBase64Header();
-	private static final Map<String, MethodReference> ALLOWED_METHODS = new HashMap<>();
+	private static final Map<String, MethodReference> ALLOWED_METHODS = new ConcurrentHashMap<>();
 	private static final GraphicImage DUMMY_COMPONENT = new GraphicImage();
 	private static final String[] EMPTY_PARAMS = new String[0];
 

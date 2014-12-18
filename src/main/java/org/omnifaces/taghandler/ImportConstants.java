@@ -16,9 +16,9 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.faces.component.UIComponent;
 import javax.faces.view.facelets.FaceletContext;
@@ -74,7 +74,7 @@ public class ImportConstants extends TagHandler {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static Map<String, Map<String, Object>> CONSTANTS_CACHE = new HashMap<>();
+	private static final Map<String, Map<String, Object>> CONSTANTS_CACHE = new ConcurrentHashMap<>();
 
 	private static final String ERROR_INVALID_VAR = "The 'var' attribute may not be an EL expression.";
 	private static final String ERROR_MISSING_CLASS = "Cannot find type '%s' in classpath.";
