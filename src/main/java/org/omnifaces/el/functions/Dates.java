@@ -18,13 +18,14 @@ import java.text.DateFormat;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TimeZone;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 import org.omnifaces.util.Faces;
@@ -38,10 +39,10 @@ public final class Dates {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final Map<Locale, Map<String, Integer>> MONTHS_CACHE = new HashMap<Locale, Map<String, Integer>>(3);
-	private static final Map<Locale, Map<String, Integer>> SHORT_MONTHS_CACHE = new HashMap<Locale, Map<String, Integer>>(3);
-	private static final Map<Locale, Map<String, Integer>> DAYS_OF_WEEK_CACHE = new HashMap<Locale, Map<String, Integer>>(3);
-	private static final Map<Locale, Map<String, Integer>> SHORT_DAYS_OF_WEEK_CACHE = new HashMap<Locale, Map<String, Integer>>(3);
+	private static final Map<Locale, Map<String, Integer>> MONTHS_CACHE = new ConcurrentHashMap<Locale, Map<String, Integer>>(3);
+	private static final Map<Locale, Map<String, Integer>> SHORT_MONTHS_CACHE = new ConcurrentHashMap<Locale, Map<String, Integer>>(3);
+	private static final Map<Locale, Map<String, Integer>> DAYS_OF_WEEK_CACHE = new ConcurrentHashMap<Locale, Map<String, Integer>>(3);
+	private static final Map<Locale, Map<String, Integer>> SHORT_DAYS_OF_WEEK_CACHE = new ConcurrentHashMap<Locale, Map<String, Integer>>(3);
 	private static final TimeZone TIMEZONE_DEFAULT = TimeZone.getDefault();
 	private static final TimeZone TIMEZONE_UTC = TimeZone.getTimeZone("UTC");
 
@@ -401,7 +402,7 @@ public final class Dates {
 			}
 		}
 
-		return mapping;
+		return Collections.unmodifiableMap(mapping);
 	}
 
 	/**
@@ -456,7 +457,7 @@ public final class Dates {
 		mapping.put(weekdays[Calendar.FRIDAY], 5);
 		mapping.put(weekdays[Calendar.SATURDAY], 6);
 		mapping.put(weekdays[Calendar.SUNDAY], 7);
-		return mapping;
+		return Collections.unmodifiableMap(mapping);
 	}
 
 	/**
