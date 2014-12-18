@@ -328,6 +328,8 @@ public class Cache extends OutputFamily {
 	}
 
 	/**
+	 * Sets whether this cache is disabled.
+	 * @param disabledValue Whether this cache is disabled.
 	 * @since 1.8
 	 */
 	public void setDisabled(Boolean disabledValue) {
