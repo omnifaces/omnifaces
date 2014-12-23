@@ -14,13 +14,12 @@ package org.omnifaces.component.script;
 
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
-import javax.faces.component.UIViewRoot;
-import javax.faces.context.FacesContext;
-import javax.faces.context.PartialViewContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.ListenerFor;
+import javax.faces.event.ListenersFor;
 import javax.faces.event.PostAddToViewEvent;
+import javax.faces.event.PostRestoreStateEvent;
 
 import org.omnifaces.renderer.DeferredScriptRenderer;
 import org.omnifaces.resourcehandler.ResourceIdentifier;
@@ -54,7 +53,10 @@ import org.omnifaces.util.Hacks;
  */
 @FacesComponent(DeferredScript.COMPONENT_TYPE)
 @ResourceDependency(library="omnifaces", name="omnifaces.js", target="head")
-@ListenerFor(systemEventClass=PostAddToViewEvent.class)
+@ListenersFor({
+	@ListenerFor(systemEventClass=PostAddToViewEvent.class),
+	@ListenerFor(systemEventClass=PostRestoreStateEvent.class)
+})
 public class DeferredScript extends ScriptFamily {
 
 	// Public constants -----------------------------------------------------------------------------------------------
@@ -76,19 +78,8 @@ public class DeferredScript extends ScriptFamily {
 
 	@Override
 	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
-		if (event instanceof PostAddToViewEvent) {
-			FacesContext context = FacesContext.getCurrentInstance();
-			PartialViewContext ajaxContext = context.getPartialViewContext();
-			UIViewRoot view = context.getViewRoot();
-
-			boolean ajaxRequest = ajaxContext.isAjaxRequest();
-			boolean ajaxRenderAll = ajaxContext.isRenderAll();
-			boolean alreadyAdded = view.getComponentResources(context, "body").contains(this);
-
-			if (!(ajaxRequest && !ajaxRenderAll) || !alreadyAdded) {
-				view.addComponentResource(context, this, "body");
-				Hacks.setScriptResourceRendered(context, new ResourceIdentifier(this));
-			}
+		if (moveToBody(event, this)) {
+			Hacks.setScriptResourceRendered(getFacesContext(), new ResourceIdentifier(this));
 		}
 	}
 
