@@ -66,14 +66,6 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns <code>true</code> if the given source is an instance of {@link OnloadScript} or {@link UIViewRoot}.
-	 */
-	@Override
-	public boolean isListenerForSource(Object source) {
-        return source instanceof OnloadScript || source instanceof UIViewRoot;
-	}
-
-	/**
 	 * If the event is a {@link PostAddToViewEvent}, then relocate the component to end of body, so that we can make
 	 * sure that the script is executed after all HTML DOM elements are been created. Else if the event is a
 	 * {@link PostRestoreStateEvent} and the current request is an ajax request, then subscribe to the
@@ -81,20 +73,19 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 	 */
 	@Override
 	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
-		FacesContext context = FacesContext.getCurrentInstance();
-		UIViewRoot view = context.getViewRoot();
-		boolean ajaxRequest = context.getPartialViewContext().isAjaxRequest();
+		moveToBody(event, this);
 
-		if (event instanceof PostAddToViewEvent) {
-			if (!ajaxRequest || !view.getComponentResources(context, "body").contains(this)) {
-				view.addComponentResource(context, this, "body");
-			}
+		if (event instanceof PostRestoreStateEvent) {
+			subscribeToViewEvent(PreRenderViewEvent.class, this);
 		}
-		else if (event instanceof PostRestoreStateEvent) {
-			if (ajaxRequest) {
-				subscribeToViewEvent(PreRenderViewEvent.class, this);
-			}
-		}
+	}
+
+	/**
+	 * Returns <code>true</code> if the given source is an instance of {@link OnloadScript} or {@link UIViewRoot}.
+	 */
+	@Override
+	public boolean isListenerForSource(Object source) {
+        return source instanceof OnloadScript || source instanceof UIViewRoot;
 	}
 
 	/**
@@ -107,7 +98,7 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 			return;
 		}
 
-		FacesContext context = FacesContext.getCurrentInstance();
+		FacesContext context = getFacesContext();
 
 		if (!shouldEncodeOncomplete(context.getPartialViewContext())) {
 			return;
@@ -137,12 +128,13 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 			throw new FacesException(e);
 		}
 		finally {
+			popComponentFromEL(context);
+
 			if (originalResponseWriter != null) {
 				context.setResponseWriter(originalResponseWriter);
 			}
 		}
 
-		popComponentFromEL(context);
 		String script = buffer.toString().trim();
 
 		if (!script.isEmpty()) {

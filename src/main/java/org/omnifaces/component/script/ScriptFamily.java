@@ -13,6 +13,11 @@
 package org.omnifaces.component.script;
 
 import javax.faces.component.UIComponentBase;
+import javax.faces.component.UIViewRoot;
+import javax.faces.context.FacesContext;
+import javax.faces.event.ComponentSystemEvent;
+import javax.faces.event.PostAddToViewEvent;
+import javax.faces.event.PostRestoreStateEvent;
 
 /**
  * Base class which is to be shared between all components of the Script family.
@@ -42,6 +47,34 @@ public abstract class ScriptFamily extends UIComponentBase {
 	@Override
 	public boolean getRendersChildren() {
 		return true;
+	}
+
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Move the given ScriptFamily component to end of body and returns <code>true</code> if done so. This helper method
+	 * needs to be called from {@link #processEvent(ComponentSystemEvent)} during {@link PostAddToViewEvent} or
+	 * {@link PostRestoreStateEvent}. This has basically the same effect as setting <code>target="body"</code> on a
+	 * component resource.
+	 * @param event The involved event, which can be either {@link PostAddToViewEvent} or {@link PostRestoreStateEvent}.
+	 * @param component The component to be moved to body.
+	 * @return <code>true</code> if the move has taken place.
+	 */
+	protected static boolean moveToBody(ComponentSystemEvent event, ScriptFamily component) {
+		if (!(event instanceof PostAddToViewEvent || event instanceof PostRestoreStateEvent)) {
+			return false;
+		}
+
+		FacesContext context = component.getFacesContext();
+		UIViewRoot view = context.getViewRoot();
+
+		if (context.isPostback() ? !view.getComponentResources(context, "body").contains(component) : event instanceof PostAddToViewEvent) {
+			view.addComponentResource(context, component, "body");
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 }
