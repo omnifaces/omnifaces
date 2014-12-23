@@ -36,7 +36,7 @@ public class OmniApplicationFactory extends ApplicationFactory {
 	private static final Logger logger = Logger.getLogger(OmniApplicationFactory.class.getName());
 
 	private static final String WARNING_BAD_APPLICATION =
-		"There is an Application implementation in the chain which does not properly implement ApplicationWrapper:"
+		"There is an Application implementation in the chain which does not properly extend from ApplicationWrapper:"
 			+ " '%s'. This may potentially result in compatibility problems."
 			+ " See also among others https://github.com/omnifaces/omnifaces/issues/75";
 
