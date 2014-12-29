@@ -1,14 +1,3 @@
 Manifest-Version: 1.0
-Implementation-Title: Omnifaces
-Implementation-Version: 2.0-SNAPSHOT
-Archiver-Version: Plexus Archiver
-Specification-Vendor: OmniFaces
-Specification-Title: Omnifaces
-Implementation-Vendor-Id: org.omnifaces
-URL: http://omnifaces.org
-Implementation-Vendor: OmniFaces
-Extension-Name: omnifaces
-Created-By: Apache Maven 3.2.1
-Build-Jdk: 1.8.0_05
-Specification-Version: 2.0-SNAPSHOT
-
+Specification-Version: 2.1-SNAPSHOT
+Comment: This file exists because Eclipse 4.4 + M2E doesn't generate this file while building the showcase app, causing trouble in App#initVersion().
