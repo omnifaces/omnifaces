@@ -15,7 +15,6 @@ package org.omnifaces.util;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
-import javax.enterprise.context.NormalScope;
 import javax.enterprise.context.spi.AlterableContext;
 import javax.enterprise.context.spi.Context;
 import javax.enterprise.context.spi.CreationalContext;
@@ -182,7 +181,7 @@ public final class Beans {
 	 * @see BeanManager#getContext(Class)
 	 * @see Context#get(javax.enterprise.context.spi.Contextual)
 	 */
-	public static <S extends NormalScope> Map<Object, String> getActiveInstances(Class<S> scope) {
+	public static <S extends Annotation> Map<Object, String> getActiveInstances(Class<S> scope) {
 		return BeansLocal.getActiveInstances(getManager(), scope);
 	}
 
@@ -226,14 +225,14 @@ public final class Beans {
 	public static <A extends Annotation> A getAnnotation(Annotated annotated, Class<A> annotationType) {
 		return BeansLocal.getAnnotation(getManager(), annotated, annotationType);
 	}
-	
+
 	/**
 	 * Gets the current injection point when called from a context where injection is taking place (e.g. from a producer).
 	 * <p>
 	 * This is mostly intended to be used from within a dynamic producer {@link Bean}. For a "regular" producer (using {@link Produces})
 	 * an <code>InjectionPoint</code> can either be injected into the bean that contains the producer method, or directly provided as argument
 	 * of said method.
-	 *  
+	 *
 	 * @param creationalContext a {@link CreationalContext} used to manage objects with a
      *        {@link javax.enterprise.context.Dependent} scope
 	 * @return the current injection point when called from a context where injection is taking place (e.g. from a producer)
