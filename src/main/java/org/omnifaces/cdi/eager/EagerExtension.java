@@ -38,9 +38,9 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessBean;
+import javax.faces.view.ViewScoped;
 
 import org.omnifaces.cdi.Eager;
-import org.omnifaces.cdi.ViewScoped;
 
 /**
  * CDI extension that collects beans annotated with {@link Eager}. After deployment
@@ -91,7 +91,6 @@ public class EagerExtension implements Extension {
 			} else if (getAnnotation(beanManager, annotated, SessionScoped.class) != null) {
 				sessionScopedBeans.add(bean);
 			} else if (getAnnotation(beanManager, annotated, RequestScoped.class) != null) {
-
 				if (!isEmpty(eager.requestURI())) {
 					getRequestScopedBeansByRequestURI(eager.requestURI()).add(bean);
 				} else if (!isEmpty(eager.viewId())) {
@@ -104,6 +103,12 @@ public class EagerExtension implements Extension {
 					getRequestScopedBeansByViewId(eager.viewId()).add(bean);
 				} else {
 					logger.severe(format(MISSING_VIEW_ID, bean.getBeanClass().getName(), ViewScoped.class.getName()));
+				}
+			} else if (getAnnotation(beanManager, annotated, org.omnifaces.cdi.ViewScoped.class) != null) {
+				if (!isEmpty(eager.viewId())) {
+					getRequestScopedBeansByViewId(eager.viewId()).add(bean);
+				} else {
+					logger.severe(format(MISSING_VIEW_ID, bean.getBeanClass().getName(), org.omnifaces.cdi.ViewScoped.class.getName()));
 				}
 			}
 		}
