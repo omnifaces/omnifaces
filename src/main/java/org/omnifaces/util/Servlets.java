@@ -14,6 +14,10 @@ package org.omnifaces.util;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.regex.Pattern.quote;
+import static javax.faces.application.ProjectStage.Development;
+import static javax.faces.application.ProjectStage.PROJECT_STAGE_JNDI_NAME;
+import static javax.faces.application.ProjectStage.PROJECT_STAGE_PARAM_NAME;
+import static org.omnifaces.util.JNDI.getEnvEntry;
 import static org.omnifaces.util.Utils.decodeURL;
 import static org.omnifaces.util.Utils.encodeURL;
 import static org.omnifaces.util.Utils.isEmpty;
@@ -31,6 +35,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.faces.application.Application;
 import javax.faces.application.ResourceHandler;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
@@ -71,6 +76,10 @@ public final class Servlets {
 	private static final Set<String> FACES_AJAX_HEADERS = unmodifiableSet("partial/ajax", "partial/process");
 	private static final String FACES_AJAX_REDIRECT_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 		+ "<partial-response><redirect url=\"%s\"></redirect></partial-response>";
+
+	// Variables ------------------------------------------------------------------------------------------------------
+
+	private static Boolean facesDevelopment;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -452,6 +461,29 @@ public final class Servlets {
 	 */
 	public static boolean isFacesResourceRequest(HttpServletRequest request) {
 		return request.getRequestURI().startsWith(request.getContextPath() + ResourceHandler.RESOURCE_IDENTIFIER + "/");
+	}
+
+	/**
+	 * Returns <code>true</code> if we're in JSF development stage. This will be the case when the
+	 * <code>javax.faces.PROJECT_STAGE</code> context parameter in <code>web.xml</code> is set to
+	 * <code>Development</code>.
+	 * @param context The involved servlet context.
+	 * @return <code>true</code> if we're in development stage, otherwise <code>false</code>.
+	 * @since 2.1
+	 * @see Application#getProjectStage()
+	 */
+	public static boolean isFacesDevelopment(ServletContext context) {
+		if (facesDevelopment != null) {
+			return facesDevelopment;
+		}
+
+		String projectStage = getEnvEntry(PROJECT_STAGE_JNDI_NAME);
+
+		if (projectStage == null) {
+			projectStage = context.getInitParameter(PROJECT_STAGE_PARAM_NAME);
+		}
+
+		return (facesDevelopment = Development.name().equals(projectStage));
 	}
 
 	/**

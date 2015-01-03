@@ -16,8 +16,6 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Locale.US;
 import static java.util.regex.Pattern.quote;
-import static javax.faces.application.ProjectStage.Development;
-import static javax.faces.application.ProjectStage.PROJECT_STAGE_PARAM_NAME;
 import static javax.faces.view.facelets.ResourceResolver.FACELETS_RESOURCE_RESOLVER_PARAM_NAME;
 import static org.omnifaces.facesviews.FacesServletDispatchMethod.DO_FILTER;
 import static org.omnifaces.util.Faces.getApplicationAttribute;
@@ -31,6 +29,7 @@ import static org.omnifaces.util.ResourcePaths.stripExtension;
 import static org.omnifaces.util.ResourcePaths.stripPrefixPath;
 import static org.omnifaces.util.Servlets.getApplicationAttribute;
 import static org.omnifaces.util.Servlets.getRequestBaseURL;
+import static org.omnifaces.util.Servlets.isFacesDevelopment;
 import static org.omnifaces.util.Utils.csvToList;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.reverse;
@@ -223,8 +222,7 @@ public final class FacesViews {
 				// See FacesViewsForwardingFilter#init
 
 
-				if (Development.name().equals(servletContext.getInitParameter(PROJECT_STAGE_PARAM_NAME)) &&
-					getFacesServletDispatchMethod(servletContext) != DO_FILTER) {
+				if (isFacesDevelopment(servletContext) && getFacesServletDispatchMethod(servletContext) != DO_FILTER) {
 
 					// In development mode map this Filter to "*", so we can catch requests to extensionless resources that
 			        // have been dynamically added. Note that resources with mapped extensions are already handled by the FacesViewsResolver.
