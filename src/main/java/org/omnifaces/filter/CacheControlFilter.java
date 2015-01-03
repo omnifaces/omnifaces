@@ -16,6 +16,7 @@ import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.HOURS;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.omnifaces.util.Servlets.isFacesDevelopment;
 import static org.omnifaces.util.Servlets.isFacesResourceRequest;
 
 import java.io.IOException;
@@ -25,6 +26,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import org.omnifaces.util.Servlets;
 
 /**
  * <p>
@@ -153,6 +156,10 @@ import javax.servlet.http.HttpSession;
  * <li><code>Pragma: no-cache</code></li>
  * </ul>
  *
+ * <h3>JSF development stage</h3>
+ * <p>To speed up development, caching by this filter is <strong>disabled</string> when JSF project stage is set to
+ * <code>Development</code> as per {@link Servlets#isFacesDevelopment(javax.servlet.ServletContext)}.
+ *
  * @author Bauke Scholtz
  * @since 1.7
  */
@@ -192,6 +199,10 @@ public class CacheControlFilter extends HttpFilter {
 	 */
 	@Override
 	public void init() throws ServletException {
+		if (isFacesDevelopment(getServletContext())) {
+			return; // Don't cache during development.
+		}
+
 		String expires = getInitParameter(INIT_PARAM_EXPIRES);
 
 		if (expires != null) {
