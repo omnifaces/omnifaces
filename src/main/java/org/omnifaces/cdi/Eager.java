@@ -56,6 +56,7 @@ import org.omnifaces.cdi.eager.EagerExtension;
  * Currently supported scopes:
  * <ol>
  * <li> CDI {@link RequestScoped}
+ * <li> CDI {@link javax.faces.view.ViewScoped}
  * <li> OmniFaces {@link ViewScoped}
  * <li> CDI {@link SessionScoped}
  * <li> CDI {@link ApplicationScoped}
@@ -170,7 +171,7 @@ public @interface Eager {
 	 * JSF services will not be available (yet) when the bean is instantiated this way.
 	 * <p>
 	 * If both this attribute and {@link Eager#viewId()} is specified, this attribute takes precedence for {@link RequestScoped}.
-	 * This attribute <b>can not</b> be used for {@link ViewScoped} beans.
+	 * This attribute <b>can not</b> be used for <code>ViewScoped</code> beans.
 	 *
 	 * @return The request URI relative to the context root.
 	 */
@@ -178,7 +179,7 @@ public @interface Eager {
 	String requestURI() default "";
 
 	/**
-	 * (Required when combined with {@link RequestScoped} or {@link ViewScoped}) The id of the view for which a request or view scoped bean
+	 * (Required when combined with {@link RequestScoped} or <code>ViewScoped</code>) The id of the view for which a request or view scoped bean
 	 * should be instantiated. When this attribute is specified the bean will be instantiated during invocation of the
 	 * {@link FacesServlet}, namely right after the RESTORE_VIEW phase (see {@link PhaseId#RESTORE_VIEW}).
 	 *
@@ -187,7 +188,7 @@ public @interface Eager {
 	 *
 	 * <p>
 	 * If both this attribute and {@link Eager#requestURI()} is specified and the scope is {@link RequestScoped}, the
-	 * <code>requestURI</code> attribute takes precedence. If the scope is {@link ViewScoped} <code>requestURI</code> is ignored and only
+	 * <code>requestURI</code> attribute takes precedence. If the scope is <code>ViewScoped</code> <code>requestURI</code> is ignored and only
 	 * this attribute is considered.
 	 *
 	 * @return The view ID.

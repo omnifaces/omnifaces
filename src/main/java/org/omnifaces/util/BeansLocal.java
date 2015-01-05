@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
-import javax.enterprise.context.NormalScope;
 import javax.enterprise.context.spi.AlterableContext;
 import javax.enterprise.context.spi.Context;
 import javax.enterprise.context.spi.CreationalContext;
@@ -131,7 +130,7 @@ public final class BeansLocal {
 	 * {@inheritDoc}
 	 * @see Beans#getActiveInstances(Class)
 	 */
-	public static <S extends NormalScope> Map<Object, String> getActiveInstances(BeanManager beanManager, Class<S> scope) {
+	public static <S extends Annotation> Map<Object, String> getActiveInstances(BeanManager beanManager, Class<S> scope) {
 		Map<Object, String> activeInstances = new HashMap<>();
 		Set<Bean<?>> beans = beanManager.getBeans(Object.class);
 		Context context = beanManager.getContext(scope);
@@ -207,7 +206,7 @@ public final class BeansLocal {
 
 		return null;
 	}
-	
+
 	/**
 	 * {@inheritDoc}
 	 * @see Beans#getAnnotation(Annotated, Class)

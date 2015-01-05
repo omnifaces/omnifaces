@@ -174,10 +174,9 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Creates a new instance of this CDN resource handler which wraps the given resource handler. If the current JSF
-	 * project stage is <strong>not</strong> set to <code>Development</code>, then the CDN resources will be initialized
-	 * based on the {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_RESOURCES} context
-	 * parameter.
+	 * Creates a new instance of this CDN resource handler which wraps the given resource handler. The CDN resources
+	 * will be initialized based on the {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_RESOURCES}
+	 * context parameter.
 	 * @param wrapped The resource handler to be wrapped.
 	 * @throws IllegalArgumentException When the context parameter is missing or is in invalid format.
 	 */
@@ -195,8 +194,8 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 
 	/**
 	 * Delegate to {@link #createResource(String, String, String)} of the wrapped resource handler. If it returns
-	 * non-<code>null</code> and the current JSF project stage is <strong>not</strong> set to <code>Development</code>,
-	 * then the properties file will be consulted if any CDN URL is available for the given resource. If there is none,
+	 * non-<code>null</code> and the CDN resource handler is not (conditionally) disabled for the current request,
+	 * then the CDN resources will be consulted if any CDN URL is available for the given resource. If there is none,
 	 * then just return the JSF default resource, otherwise return a wrapped resource whose
 	 * {@link Resource#getRequestPath()} returns the CDN URL as is been set in the
 	 * {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_RESOURCES} context parameter.
