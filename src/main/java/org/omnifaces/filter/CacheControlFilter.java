@@ -157,7 +157,7 @@ import org.omnifaces.util.Servlets;
  * </ul>
  *
  * <h3>JSF development stage</h3>
- * <p>To speed up development, caching by this filter is <strong>disabled</string> when JSF project stage is set to
+ * <p>To speed up development, caching by this filter is <strong>disabled</strong> when JSF project stage is set to
  * <code>Development</code> as per {@link Servlets#isFacesDevelopment(javax.servlet.ServletContext)}.
  *
  * @author Bauke Scholtz
