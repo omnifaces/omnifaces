@@ -10,6 +10,8 @@ import javax.faces.view.facelets.TagAttribute;
 import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
 
+import org.omnifaces.el.DelegatingVariableMapper;
+
 public class TagParameter extends TagHandler {
 	
 	private final TagAttribute name;
@@ -50,6 +52,11 @@ public class TagParameter extends TagHandler {
 		
 		// Our current parent marker
 		ValueExpression valueExpressionParentMarker = variableMapper.resolveVariable("OmniFaces-marker");
+		if (valueExpressionParentMarker == null) {
+		    // We're the outer faces tag, or parent didn't mark. 
+		    ctx.setAttribute("OmniFaces-marker", ctx.hashCode());
+		    return;
+		}
 		
 		// Remove the variable locally
 		// If we have our own mapper, this will not affect our parent mapper
@@ -60,9 +67,17 @@ public class TagParameter extends TagHandler {
 		
 		if (valueExpressionParentMarkerCheck == null || !valueExpressionParentMarkerCheck.equals(valueExpressionParentMarker)) {
 			// We were able to remove our parent's mapper, so we share it
-		}
+		    
+		    // First put parent marker back
+		    variableMapper.setVariable("OmniFaces-marker", valueExpressionParentMarker);
+		    
+		    // Then add our own variable mapper
+		    ctx.setVariableMapper(new DelegatingVariableMapper(variableMapper));
+		} 
+		
+		// We (now) have our own mapper, mark it
+		ctx.setAttribute("OmniFaces-marker", ctx.hashCode());
+		
 	}
-	
-	
 
 }
