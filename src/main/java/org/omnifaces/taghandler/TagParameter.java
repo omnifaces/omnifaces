@@ -22,6 +22,8 @@ public class TagParameter extends TagHandler {
 	@Override
 	public void apply(FaceletContext ctx, UIComponent parent) throws IOException {
 		
+		checkAndMarkMapper(ctx);
+		
 		String nameStr = name.getValue(ctx);
 		
 		VariableMapper variableMapper = ctx.getVariableMapper();
@@ -35,7 +37,32 @@ public class TagParameter extends TagHandler {
 		}
 		
 		variableMapper.setVariable(nameStr, valueExpressionLocal);
-				
 	}
+	
+	public void checkAndMarkMapper(FaceletContext ctx) {
+		Integer marker = (Integer) ctx.getAttribute("OmniFaces-marker");
+		if (marker != null && marker.equals(ctx.hashCode())) {
+			// Marked and our own
+			return;
+		}
+		
+		VariableMapper variableMapper = ctx.getVariableMapper();
+		
+		// Our current parent marker
+		ValueExpression valueExpressionParentMarker = variableMapper.resolveVariable("OmniFaces-marker");
+		
+		// Remove the variable locally
+		// If we have our own mapper, this will not affect our parent mapper
+		variableMapper.setVariable("OmniFaces-marker", null);
+		
+		// Obtain parent again
+		ValueExpression valueExpressionParentMarkerCheck = variableMapper.resolveVariable("OmniFaces-marker");
+		
+		if (valueExpressionParentMarkerCheck == null || !valueExpressionParentMarkerCheck.equals(valueExpressionParentMarker)) {
+			// We were able to remove our parent's mapper, so we share it
+		}
+	}
+	
+	
 
 }
