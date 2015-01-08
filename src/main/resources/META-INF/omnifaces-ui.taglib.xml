@@ -2165,26 +2165,36 @@ public class ValidateValuesBean implements MultiFieldValidator {
 			<type>java.lang.String</type>
 		</attribute>
 	</tag>
-	
+
 	<tag>
 		<description>
 			<![CDATA[
-				Experimental tag to shield Facelets tags from attributes set on parent tags
+				Declare a tagfile attribute. This should in nested tags shield same attributes set on parent tags.
+				This also offers the possibility to declare a default value.
 			]]>
 		</description>
-		<tag-name>tagParameter</tag-name>
-		<handler-class>org.omnifaces.taghandler.TagParameter</handler-class>
+		<tag-name>tagAttribute</tag-name>
+		<handler-class>org.omnifaces.taghandler.TagAttribute</handler-class>
 		<attribute>
 			<description>
 				<![CDATA[
-	               
-	            ]]>
-            </description>
+					The declared attribute name.
+				]]>
+			</description>
 			<name>name</name>
 			<required>true</required>
 			<type>java.lang.String</type>
 		</attribute>
-		
+		<attribute>
+			<description>
+				<![CDATA[
+					The default value to be used when actual value is <code>null</code>.
+				]]>
+			</description>
+			<name>default</name>
+			<required>false</required>
+			<type>java.lang.Object</type>
+		</attribute>
 	</tag>
 
 	<tag>
