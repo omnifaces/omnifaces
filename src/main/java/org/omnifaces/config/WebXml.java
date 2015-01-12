@@ -437,7 +437,7 @@ public enum WebXml {
 		List<String> welcomeFiles = new ArrayList<>(welcomeFileList.getLength());
 
 		for (int i = 0; i < welcomeFileList.getLength(); i++) {
-			welcomeFiles.add(welcomeFileList.item(i).getTextContent().trim());
+			welcomeFiles.add(getTextContent(welcomeFileList.item(i)));
 		}
 
 		return Collections.unmodifiableList(welcomeFiles);
@@ -453,7 +453,7 @@ public enum WebXml {
 
 		for (int i = 0; i < exceptionTypes.getLength(); i++) {
 			Node node = exceptionTypes.item(i);
-			Class<Throwable> exceptionClass = (Class<Throwable>) Class.forName(node.getTextContent().trim());
+			Class<Throwable> exceptionClass = (Class<Throwable>) Class.forName(getTextContent(node));
 			String exceptionLocation = xpath.compile(XPATH_LOCATION).evaluate(node.getParentNode()).trim();
 			Class<Throwable> key = (exceptionClass == Throwable.class) ? null : exceptionClass;
 
@@ -510,7 +510,7 @@ public enum WebXml {
 				roles = new HashSet<>(authRoles.getLength());
 
 				for (int j = 0; j < authRoles.getLength(); j++) {
-					roles.add(authRoles.item(j).getTextContent().trim());
+					roles.add(getTextContent(authRoles.item(j)));
 				}
 
 				roles = Collections.unmodifiableSet(roles);
@@ -519,7 +519,7 @@ public enum WebXml {
 			NodeList urlPatterns = getNodeList(constraint, xpath, XPATH_WEB_RESOURCE_URL_PATTERN);
 
 			for (int j = 0; j < urlPatterns.getLength(); j++) {
-				String urlPattern = urlPatterns.item(j).getTextContent().trim();
+				String urlPattern = getTextContent(urlPatterns.item(j));
 				securityConstraints.put(urlPattern, roles);
 			}
 		}
@@ -539,6 +539,10 @@ public enum WebXml {
 
 	private static NodeList getNodeList(Node node, XPath xpath, String expression) throws Exception {
 		return (NodeList) xpath.compile(expression).evaluate(node, XPathConstants.NODESET);
+	}
+
+	private static String getTextContent(Node node) {
+		return node.getFirstChild().getNodeValue().trim();
 	}
 
 }
