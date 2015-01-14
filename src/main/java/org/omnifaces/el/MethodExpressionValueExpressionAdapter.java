@@ -150,7 +150,7 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 
 			// If base is null, we're resolving it. Base should always be resolved as a value expression.
 			if (base == null) {
-				return super.getValue(context, base, property);
+				return super.getValue(context, null, property);
 			}
 
 			// Turn getValue calls into invoke.
