@@ -56,6 +56,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.omnifaces.component.ParamHolder;
+import org.omnifaces.config.FacesConfigXml;
 
 /**
  * <p>
