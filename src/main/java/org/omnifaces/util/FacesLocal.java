@@ -429,6 +429,49 @@ public final class FacesLocal {
 	public static ResourceBundle getResourceBundle(FacesContext context, String var) {
 		return context.getApplication().getResourceBundle(context, var);
 	}
+	
+	/**
+	 * {@inheritDoc}
+	 * @see Faces#getResourceBundles()
+	 */
+    public static Map<String, ResourceBundle> getResourceBundles(FacesContext context)
+    {
+        Locale locale = getLocale(context);
+		Map<String, String> resourceBundles = FacesConfigXml.INSTANCE.getResourceBundles();
+        Map<String, ResourceBundle> map = new HashMap<>(resourceBundles.size());
+
+        for(Entry<String, String> entry : resourceBundles.entrySet())
+        {
+            String var = entry.getKey();
+            String baseName = entry.getValue();
+            ResourceBundle bundle = ResourceBundle.getBundle(baseName, locale);
+
+            map.put(var, bundle);
+        }
+
+        return map;
+    }
+
+	/**
+	 * {@inheritDoc}
+	 * @see Faces#getBundleString(String)
+	 */
+    public static String getBundleString(FacesContext context, String key)
+    {
+        for(ResourceBundle bundle : getResourceBundles(context).values())
+        {
+            try
+            {
+                return bundle.getString(key);
+            }
+            catch(MissingResourceException e)
+            {
+                // ignore
+            }
+        }
+
+        return "???" + key + "???";
+    }	
 
 	/**
 	 * {@inheritDoc}
