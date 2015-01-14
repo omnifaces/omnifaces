@@ -65,7 +65,7 @@ public final class Converters {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String ERROR_NOT_AN_ARRAY = "The given type '%' is not an array at all.";
+	private static final String ERROR_NOT_AN_ARRAY = "The given type '%s' is not an array at all.";
     private static final String ERROR_INVALID_FRAGMENT_SIZE = "The given fragment size '%s' must be at least 1.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
