@@ -616,6 +616,7 @@ public final class Faces {
 	 * Gets a string for the given key searching declared resource bundles, order by declaration in
 	 * <code>faces-config.xml</code>.
 	 * If the string is missing, then this method returns <code>???key???</code>.
+	 * @param key The bundle key.
 	 * @return a string for the given key searching declared resource bundles, order by declaration in
 	 * <code>faces-config.xml</code>.
 	 * @since 2.1
