@@ -177,7 +177,7 @@ final class DeferredTagHandlerHelper {
 		 * @param name The attribute name.
 		 * @return The tag attribute associated with given attribute name.
 		 */
-		public TagAttribute getTagAttribute(String name);
+		TagAttribute getTagAttribute(String name);
 
 		/**
 		 * Create the concrete {@link Converter} or {@link Validator}.
@@ -186,7 +186,7 @@ final class DeferredTagHandlerHelper {
 		 * @param id The converter or validator ID.
 		 * @return The concrete {@link Converter} or {@link Validator}.
 		 */
-		public <T> T create(Application application, String id);
+		<T> T create(Application application, String id);
 
 	}
 
