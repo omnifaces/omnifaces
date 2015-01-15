@@ -14,14 +14,15 @@ package org.omnifaces.config;
 
 import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.Faces.hasContext;
+import static org.omnifaces.util.Xml.getNodeList;
+import static org.omnifaces.util.Xml.createDocument;
 
-import java.io.InputStream;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.Collections;
-import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -31,10 +32,7 @@ import javax.faces.webapp.FacesServlet;
 import javax.servlet.Filter;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextListener;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
@@ -165,51 +163,10 @@ public enum FacesConfigXml {
      * into a single {@link Document}.
      */
     private static Document loadFacesConfigXml(ServletContext context) throws Exception {
-        DocumentBuilder builder = createDocumentBuilder();
-        Document document = builder.newDocument();
-        document.appendChild(document.createElement("all-faces-configs"));
-        URL url = context.getResource(APP_FACES_CONFIG_XML);
-
-        if (url != null) { // faces-config.xml is optional.
-            parseAndAppendChildren(url, builder, document);
-        }
-
-        Enumeration<URL> urls = Thread.currentThread().getContextClassLoader().getResources(LIB_FACES_CONFIG_XML);
-
-        while (urls.hasMoreElements()) {
-            parseAndAppendChildren(urls.nextElement(), builder, document);
-        }
-
-        return document;
-    }
-
-    /**
-     * Returns an instance of {@link DocumentBuilder} which doesn't validate, nor is namespace aware nor expands entity
-     * references (to keep it as lenient as possible).
-     */
-    private static DocumentBuilder createDocumentBuilder() throws Exception {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setValidating(false);
-        factory.setNamespaceAware(false);
-        factory.setExpandEntityReferences(false);
-        return factory.newDocumentBuilder();
-    }
-
-    /**
-     * Parse the given URL as a document using the given builder and then append all its child nodes to the given
-     * document.
-     */
-    private static void parseAndAppendChildren(URL url, DocumentBuilder builder, Document document) throws Exception {
-        URLConnection connection = url.openConnection();
-        connection.setUseCaches(false);
-
-        try (InputStream input = connection.getInputStream()) {
-            NodeList children = builder.parse(input).getDocumentElement().getChildNodes();
-
-            for (int i = 0; i < children.getLength(); i++) {
-                document.getDocumentElement().appendChild(document.importNode(children.item(i), true));
-            }
-        }
+		Set<URL> facesConfigURLs = new HashSet<>();
+		facesConfigURLs.add(context.getResource(APP_FACES_CONFIG_XML));
+		facesConfigURLs.addAll(Collections.list(Thread.currentThread().getContextClassLoader().getResources(LIB_FACES_CONFIG_XML)));
+		return createDocument(facesConfigURLs);
     }
 
     /**
@@ -231,12 +188,6 @@ public enum FacesConfigXml {
         }
 
         return Collections.unmodifiableMap(resourceBundles);
-    }
-
-    // Helpers of helpers (JAXP hell) ---------------------------------------------------------------------------------
-
-    private static NodeList getNodeList(Node node, XPath xpath, String expression) throws Exception {
-        return (NodeList) xpath.compile(expression).evaluate(node, XPathConstants.NODESET);
     }
 
 }

@@ -16,14 +16,13 @@ import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.Faces.hasContext;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isNumber;
+import static org.omnifaces.util.Xml.getNodeList;
+import static org.omnifaces.util.Xml.getTextContent;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -39,14 +38,12 @@ import javax.faces.webapp.FacesServlet;
 import javax.servlet.Filter;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextListener;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.omnifaces.util.Xml;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -389,51 +386,10 @@ public enum WebXml {
 	 * @throws IOException
 	 */
 	private static Document loadWebXml(ServletContext context) throws ParserConfigurationException, IOException, SAXException {
-		DocumentBuilder builder = createDocumentBuilder();
-		Document document = builder.newDocument();
-		document.appendChild(document.createElement("web"));
-		URL url = context.getResource(WEB_XML);
-
-		if (url != null) { // Since Servlet 3.0, web.xml is optional.
-			parseAndAppendChildren(url, builder, document);
-		}
-
-		Enumeration<URL> urls = Thread.currentThread().getContextClassLoader().getResources(WEB_FRAGMENT_XML);
-
-		while (urls.hasMoreElements()) {
-			parseAndAppendChildren(urls.nextElement(), builder, document);
-		}
-
-		return document;
-	}
-
-	/**
-	 * Returns an instance of {@link DocumentBuilder} which doesn't validate, nor is namespace aware nor expands entity
-	 * references (to keep it as lenient as possible).
-	 */
-	private static DocumentBuilder createDocumentBuilder() throws ParserConfigurationException {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		factory.setValidating(false);
-		factory.setNamespaceAware(false);
-		factory.setExpandEntityReferences(false);
-		return factory.newDocumentBuilder();
-	}
-
-	/**
-	 * Parse the given URL as a document using the given builder and then append all its child nodes to the given
-	 * document.
-	 */
-	private static void parseAndAppendChildren(URL url, DocumentBuilder builder, Document document) throws IOException, SAXException {
-		URLConnection connection = url.openConnection();
-		connection.setUseCaches(false);
-
-		try (InputStream input = connection.getInputStream()) {
-			NodeList children = builder.parse(input).getDocumentElement().getChildNodes();
-
-			for (int i = 0; i < children.getLength(); i++) {
-				document.getDocumentElement().appendChild(document.importNode(children.item(i), true));
-			}
-		}
+		Set<URL> webXmlURLs = new HashSet<>();
+		webXmlURLs.add(context.getResource(WEB_XML));
+		webXmlURLs.addAll(Collections.list(Thread.currentThread().getContextClassLoader().getResources(WEB_FRAGMENT_XML)));
+		return Xml.createDocument(webXmlURLs);
 	}
 
 	/**
@@ -541,16 +497,6 @@ public enum WebXml {
 	private static int parseSessionTimeout(Element webXml, XPath xpath) throws XPathExpressionException {
 		String sessionTimeout = xpath.compile(XPATH_SESSION_TIMEOUT).evaluate(webXml).trim();
 		return isNumber(sessionTimeout) ? Integer.parseInt(sessionTimeout) : -1;
-	}
-
-	// Helpers of helpers (JAXP hell) ---------------------------------------------------------------------------------
-
-	private static NodeList getNodeList(Node node, XPath xpath, String expression) throws XPathExpressionException {
-		return (NodeList) xpath.compile(expression).evaluate(node, XPathConstants.NODESET);
-	}
-
-	private static String getTextContent(Node node) {
-		return node.getFirstChild().getNodeValue().trim();
 	}
 
 }
