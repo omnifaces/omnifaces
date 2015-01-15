@@ -222,48 +222,69 @@ public class MessagesRenderer extends Renderer {
 		boolean tooltip = component.isTooltip() && isEmpty(component.getTitle());
 
 		for (FacesMessage message : messages) {
-			if (message.isRendered() && !component.isRedisplay()) {
-				continue;
-			}
-
-			writer.startElement(table ? "tr" : "li", component);
-			String severityName = SEVERITY_NAMES.get(message.getSeverity());
-			writeAttribute(writer, component, severityName + "Style", "style");
-			writeAttribute(writer, component, severityName + "Class", "class", "styleClass");
-
-			if (table) {
-				writer.startElement("td", component);
-			}
-
-			String summary = coalesce(message.getSummary(), "");
-			String detail = coalesce(message.getDetail(), summary);
-
-			if (tooltip) {
-				writeAttribute(writer, "title", detail);
-			}
-
-			if (showSummary) {
-				writeText(writer, component, summary, escape);
-
-				if (showDetail) {
-					writer.write(" ");
-				}
-			}
-
-			if (showDetail) {
-				writeText(writer, component, detail, escape);
-			}
-
-			message.rendered();
-
-			if (table) {
-				writer.endElement("td");
-			}
-
-			writer.endElement(table ? "tr" : "li");
+			encodeMessage(context, component, message, table, showSummary, showDetail, escape, tooltip);
 		}
 
 		writer.endElement(table ? "table" : "ul");
+	}
+
+	/**
+	 * Encode a single faces message.
+	 * @param context The involved faces context.
+	 * @param component The messages component.
+	 * @param message The queued faces message.
+	 * @param table Whether to render the messages as a HTML table or a HTML list.
+	 * @param showSummary Whether to show summary.
+	 * @param showDetail Whether to show detail.
+	 * @param escape Whether to HTML-escape message.
+	 * @param tooltip Whether to show tooltip.
+	 * @throws IOException When an I/O error occurs.
+	 */
+	protected void encodeMessage
+		(FacesContext context, OmniMessages component, FacesMessage message, boolean table,
+				boolean showSummary, boolean showDetail, boolean escape, boolean tooltip)
+			throws IOException
+	{
+		if (message.isRendered() && !component.isRedisplay()) {
+			return;
+		}
+
+		ResponseWriter writer = context.getResponseWriter();
+		writer.startElement(table ? "tr" : "li", component);
+		String severityName = SEVERITY_NAMES.get(message.getSeverity());
+		writeAttribute(writer, component, severityName + "Style", "style");
+		writeAttribute(writer, component, severityName + "Class", "class", "styleClass");
+
+		if (table) {
+			writer.startElement("td", component);
+		}
+
+		String summary = coalesce(message.getSummary(), "");
+		String detail = coalesce(message.getDetail(), summary);
+
+		if (tooltip) {
+			writeAttribute(writer, "title", detail);
+		}
+
+		if (showSummary) {
+			writeText(writer, component, summary, escape);
+
+			if (showDetail) {
+				writer.write(" ");
+			}
+		}
+
+		if (showDetail) {
+			writeText(writer, component, detail, escape);
+		}
+
+		message.rendered();
+
+		if (table) {
+			writer.endElement("td");
+		}
+
+		writer.endElement(table ? "tr" : "li");
 	}
 
 }

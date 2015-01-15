@@ -42,7 +42,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.omnifaces.filter.HttpFilter;
-import org.omnifaces.util.Servlets;
 
 /**
  * This filter makes sure extensionless requests arrive at the FacesServlet using an extension on which that Servlet is mapped,
@@ -81,24 +80,17 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 
     @Override
     public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException, IOException {
-    	ServletContext context = getServletContext();
         String resource = request.getServletPath();
 
-        if (isExtensionless(resource)) {
-        	if (filterExtensionLess(request, response, chain, resource)) {
-        		return;
-        	}
-        }
-        else if (Servlets.<Map<String, String>>getApplicationAttribute(getServletContext(), FACES_VIEWS_RESOURCES).containsKey(resource)) {
-        	if (filterExtension(request, response)) {
-        		return;
-        	}
-        }
-        else if (isResourceInPublicPath(context, resource)) {
-        	if (filterPublicPath(request, response, context, resource)) {
-        		return;
-        	}
-        }
+    	if (filterExtensionLess(request, response, chain, resource)) {
+    		return;
+    	}
+        else if (filterExtension(request, response, resource)) {
+    		return;
+    	}
+        else if (filterPublicPath(request, response, resource)) {
+    		return;
+    	}
 
         chain.doFilter(request, response);
     }
@@ -108,6 +100,10 @@ public class FacesViewsForwardingFilter extends HttpFilter {
      * The user setting "dispatchMethod" determines how we handle this.
      */
 	private boolean filterExtensionLess(HttpServletRequest request, HttpServletResponse response, FilterChain chain, String resource) throws IOException, ServletException {
+		if (!isExtensionless(resource)) {
+			return false;
+		}
+
         Map<String, String> resources = getApplicationAttribute(getServletContext(), FACES_VIEWS_RESOURCES);
 
         if (getApplicationFromFactory().getProjectStage() == Development && !resources.containsKey(resource)) {
@@ -152,19 +148,23 @@ public class FacesViewsForwardingFilter extends HttpFilter {
      * A mapped resource request with extension is encountered.
      * The user setting "extensionAction" determines how we handle this.
      */
-	private boolean filterExtension(HttpServletRequest request, HttpServletResponse response) throws IOException {
-		switch (extensionAction) {
-			case REDIRECT_TO_EXTENSIONLESS:
-				redirectPermanent(response, getExtensionlessURLWithQuery(request));
-				return true;
-			case SEND_404:
-				response.sendError(SC_NOT_FOUND);
-				return true;
-			case PROCEED:
-				break;
-			default:
-				break;
-		}
+	private boolean filterExtension(HttpServletRequest request, HttpServletResponse response, String resource) throws IOException {
+        Map<String, String> resources = getApplicationAttribute(getServletContext(), FACES_VIEWS_RESOURCES);
+
+        if (resources.containsKey(resource)) {
+            switch (extensionAction) {
+    			case REDIRECT_TO_EXTENSIONLESS:
+    				redirectPermanent(response, getExtensionlessURLWithQuery(request));
+    				return true;
+    			case SEND_404:
+    				response.sendError(SC_NOT_FOUND);
+    				return true;
+    			case PROCEED:
+    				break;
+    			default:
+    				break;
+    		}
+        }
 
 		return false;
 	}
@@ -173,8 +173,12 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 	 * A direct request to one of the public paths (excluding /) from where we scanned resources is encountered.
 	 * The user setting "pathAction" determines how we handle this.
 	 */
-	private boolean filterPublicPath(HttpServletRequest request, HttpServletResponse response, ServletContext context, String resource) throws IOException {
-		Map<String, String> reverseResources = getApplicationAttribute(context, FACES_VIEWS_REVERSE_RESOURCES);
+	private boolean filterPublicPath(HttpServletRequest request, HttpServletResponse response, String resource) throws IOException {
+		if (!isResourceInPublicPath(getServletContext(), resource)) {
+			return false;
+		}
+
+		Map<String, String> reverseResources = getApplicationAttribute(getServletContext(), FACES_VIEWS_REVERSE_RESOURCES);
 
 		if (reverseResources.containsKey(resource)) {
 			switch (pathAction) {

@@ -75,7 +75,7 @@ public class EagerExtension implements Extension {
 	private Map<String, List<Bean<?>>> requestScopedBeansViewId = new HashMap<>();
 	private Map<String, List<Bean<?>>> requestScopedBeansRequestURI = new HashMap<>();
 
-	// Methods --------------------------------------------------------------------------------------------------------
+	// Actions --------------------------------------------------------------------------------------------------------
 
 	public <T> void collect(@Observes ProcessBean<T> event, BeanManager beanManager) {
 
@@ -91,25 +91,11 @@ public class EagerExtension implements Extension {
 			} else if (getAnnotation(beanManager, annotated, SessionScoped.class) != null) {
 				sessionScopedBeans.add(bean);
 			} else if (getAnnotation(beanManager, annotated, RequestScoped.class) != null) {
-				if (!isEmpty(eager.requestURI())) {
-					getRequestScopedBeansByRequestURI(eager.requestURI()).add(bean);
-				} else if (!isEmpty(eager.viewId())) {
-					getRequestScopedBeansByViewId(eager.viewId()).add(bean);
-				} else {
-					logger.severe(format(MISSING_REQUEST_URI_OR_VIEW_ID, bean.getBeanClass().getName(), RequestScoped.class.getName()));
-				}
+				addRequestScopedBean(eager, bean);
 			} else if (getAnnotation(beanManager, annotated, ViewScoped.class) != null) {
-				if (!isEmpty(eager.viewId())) {
-					getRequestScopedBeansByViewId(eager.viewId()).add(bean);
-				} else {
-					logger.severe(format(MISSING_VIEW_ID, bean.getBeanClass().getName(), ViewScoped.class.getName()));
-				}
+				addViewScopedBean(eager, bean);
 			} else if (getAnnotation(beanManager, annotated, org.omnifaces.cdi.ViewScoped.class) != null) {
-				if (!isEmpty(eager.viewId())) {
-					getRequestScopedBeansByViewId(eager.viewId()).add(bean);
-				} else {
-					logger.severe(format(MISSING_VIEW_ID, bean.getBeanClass().getName(), org.omnifaces.cdi.ViewScoped.class.getName()));
-				}
+				addOmniViewScopedBean(eager, bean);
 			}
 		}
 	}
@@ -137,6 +123,34 @@ public class EagerExtension implements Extension {
 
 		if (!requestScopedBeansViewId.isEmpty()) {
 			eagerBeansRepository.setRequestScopedBeansViewId(unmodifiableMap(requestScopedBeansViewId));
+		}
+	}
+
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	private void addRequestScopedBean(Eager eager, Bean<?> bean) {
+		if (!isEmpty(eager.requestURI())) {
+			getRequestScopedBeansByRequestURI(eager.requestURI()).add(bean);
+		} else if (!isEmpty(eager.viewId())) {
+			getRequestScopedBeansByViewId(eager.viewId()).add(bean);
+		} else {
+			logger.severe(format(MISSING_REQUEST_URI_OR_VIEW_ID, bean.getBeanClass().getName(), RequestScoped.class.getName()));
+		}
+	}
+
+	private void addViewScopedBean(Eager eager, Bean<?> bean) {
+		if (!isEmpty(eager.viewId())) {
+			getRequestScopedBeansByViewId(eager.viewId()).add(bean);
+		} else {
+			logger.severe(format(MISSING_VIEW_ID, bean.getBeanClass().getName(), ViewScoped.class.getName()));
+		}
+	}
+
+	private void addOmniViewScopedBean(Eager eager, Bean<?> bean) {
+		if (!isEmpty(eager.viewId())) {
+			getRequestScopedBeansByViewId(eager.viewId()).add(bean);
+		} else {
+			logger.severe(format(MISSING_VIEW_ID, bean.getBeanClass().getName(), org.omnifaces.cdi.ViewScoped.class.getName()));
 		}
 	}
 
