@@ -141,7 +141,7 @@ public class Converter extends ConverterHandler implements DeferredTagHandler {
 	 *
 	 * @author Bauke Scholtz
 	 */
-	protected static abstract class DeferredConverter implements javax.faces.convert.Converter, Serializable {
+	protected abstract static class DeferredConverter implements javax.faces.convert.Converter, Serializable {
 		private static final long serialVersionUID = 1L;
 	}
 

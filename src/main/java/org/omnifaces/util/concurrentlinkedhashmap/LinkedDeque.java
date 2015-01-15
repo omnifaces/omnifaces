@@ -188,7 +188,8 @@ final class LinkedDeque<E extends Linked<E>> extends AbstractCollection<E> imple
       e.setNext(null);
       e = next;
     }
-    first = last = null;
+    first = null;
+    last = null;
   }
 
   @Override

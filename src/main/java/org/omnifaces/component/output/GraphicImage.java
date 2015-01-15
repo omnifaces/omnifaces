@@ -151,7 +151,7 @@ public class GraphicImage extends HtmlGraphicImage {
 
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.GraphicImage";
 	public static final Map<String, String> ATTRIBUTE_NAMES = collectAttributeNames();
-	private static final Map<String, String> collectAttributeNames() {
+	private static Map<String, String> collectAttributeNames() {
 		Map<String, String> attributeNames = new HashMap<>();
 
 		for (PropertyKeys propertyKey : PropertyKeys.values()) {

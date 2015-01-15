@@ -75,6 +75,13 @@ public final class Utils {
 	private static final int DEFAULT_STREAM_BUFFER_SIZE = 10240;
 	private static final String PATTERN_RFC1123_DATE = "EEE, dd MMM yyyy HH:mm:ss zzz";
 	private static final TimeZone TIMEZONE_GMT = TimeZone.getTimeZone("GMT");
+	private static final int BASE64_SEGMENT_LENGTH = 4;
+	private static final int UNICODE_3_BYTES = 0xfff;
+	private static final int UNICODE_2_BYTES = 0xff;
+	private static final int UNICODE_1_BYTE = 0xf;
+	private static final int UNICODE_END_PRINTABLE_ASCII = 0x7f;
+	private static final int UNICODE_BEGIN_PRINTABLE_ASCII = 0x20;
+
 	private static final String ERROR_UNSUPPORTED_ENCODING = "UTF-8 is apparently not supported on this platform.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
@@ -602,7 +609,7 @@ public final class Utils {
 		}
 
 		try {
-			String base64 = string.replace('-', '+').replace('_', '/') + "===".substring(0, string.length() % 4);
+			String base64 = string.replace('-', '+').replace('_', '/') + "===".substring(0, string.length() % BASE64_SEGMENT_LENGTH);
 			InputStream deflated = new ByteArrayInputStream(DatatypeConverter.parseBase64Binary(base64));
 			return new String(toByteArray(new InflaterInputStream(deflated)), UTF_8);
 		}
@@ -675,16 +682,16 @@ public final class Utils {
 		StringBuilder builder = new StringBuilder(string.length());
 
 		for (char c : string.toCharArray()) {
-			if (c > 0xfff) {
+			if (c > UNICODE_3_BYTES) {
 				builder.append("\\u").append(Integer.toHexString(c));
 			}
-			else if (c > 0xff) {
+			else if (c > UNICODE_2_BYTES) {
 				builder.append("\\u0").append(Integer.toHexString(c));
 			}
-			else if (c > 0x7f) {
+			else if (c > UNICODE_END_PRINTABLE_ASCII) {
 				builder.append("\\u00").append(Integer.toHexString(c));
 			}
-			else if (c < 32) {
+			else if (c < UNICODE_BEGIN_PRINTABLE_ASCII) {
 				switch (c) {
 					case '\b':
 						builder.append('\\').append('b');
@@ -702,7 +709,7 @@ public final class Utils {
 						builder.append('\\').append('r');
 						break;
 					default:
-						if (c > 0xf) {
+						if (c > UNICODE_1_BYTE) {
 							builder.append("\\u00").append(Integer.toHexString(c));
 						}
 						else {

@@ -117,7 +117,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 	 */
 	public void addArgument(String name, Object value) {
 		if (arguments == null) {
-			arguments = new HashMap<>(3);
+			arguments = new HashMap<>();
 		}
 
 		arguments.put(name, value);
@@ -130,7 +130,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 	 */
 	public void addCallbackScript(String callbackScript) {
 		if (callbackScripts == null) {
-			callbackScripts = new ArrayList<>(3);
+			callbackScripts = new ArrayList<>();
 		}
 
 		callbackScripts.add(callbackScript);

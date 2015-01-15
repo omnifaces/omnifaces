@@ -12,6 +12,7 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.faces.application.ResourceHandler.RESOURCE_IDENTIFIER;
 import static org.omnifaces.util.Faces.getMapping;
 import static org.omnifaces.util.Faces.getRequestContextPath;
@@ -40,6 +41,10 @@ import org.omnifaces.util.Hacks;
  * @since 2.0
  */
 public abstract class DynamicResource extends Resource {
+
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final int RESPONSE_HEADERS_SIZE = 4;
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -85,7 +90,7 @@ public abstract class DynamicResource extends Resource {
 
 	@Override
 	public Map<String, String> getResponseHeaders() {
-		Map<String, String> responseHeaders = new HashMap<>(4);
+		Map<String, String> responseHeaders = new HashMap<>(RESPONSE_HEADERS_SIZE);
 		responseHeaders.put("Last-Modified", formatRFC1123(new Date(getLastModified())));
 		responseHeaders.put("Expires", formatRFC1123(new Date(System.currentTimeMillis() + Hacks.getDefaultResourceMaxAge())));
 		responseHeaders.put("Etag", String.format("W/\"%d-%d\"", getResourceName().hashCode(), getLastModified()));
@@ -115,7 +120,7 @@ public abstract class DynamicResource extends Resource {
 
 		if (ifModifiedSince != null) {
 			try {
-				return getLastModified() > parseRFC1123(ifModifiedSince).getTime() + 1000; // RFC1123 doesn't store millis.
+				return getLastModified() > parseRFC1123(ifModifiedSince).getTime() + SECONDS.toMillis(1); // RFC1123 doesn't store millis.
 			}
 			catch (ParseException ignore) {
 				return true;

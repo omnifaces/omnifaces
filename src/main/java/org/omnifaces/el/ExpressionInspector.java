@@ -327,17 +327,13 @@ public final class ExpressionInspector {
 
 					passTwoCallCount++;
 
-					if (passTwoCallCount == passOneCallCount) {
-
+					if (passTwoCallCount == passOneCallCount && (base != lastBase || property != lastProperty)) {
 						// We're at the same call count as the first phase ended with.
 						// If the chain has resolved the same, we should be dealing with the same base and property now
-
-						if (base != lastBase || property != lastProperty) {
-							throw new IllegalStateException(
-								"First and second pass of resolver at call #" + passTwoCallCount +
-								" resolved to different base or property.");
-						}
-
+						// If that is not the case, then throw ISE.
+						throw new IllegalStateException(
+							"First and second pass of resolver at call #" + passTwoCallCount +
+							" resolved to different base or property.");
 					}
 
 					break;

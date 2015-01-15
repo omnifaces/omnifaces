@@ -163,7 +163,8 @@ public class ViewScopeManager implements Serializable {
 
 			if (value != null) {
 				try {
-					return (maxActiveViewScopes = Integer.valueOf(value));
+					maxActiveViewScopes = Integer.valueOf(value);
+					return maxActiveViewScopes;
 				}
 				catch (NumberFormatException e) {
 					throw new IllegalArgumentException(String.format(ERROR_MAX_ACTIVE_VIEW_SCOPES, name, value), e);
@@ -171,7 +172,8 @@ public class ViewScopeManager implements Serializable {
 			}
 		}
 
-		return (maxActiveViewScopes = DEFAULT_MAX_ACTIVE_VIEW_SCOPES);
+		maxActiveViewScopes = DEFAULT_MAX_ACTIVE_VIEW_SCOPES;
+		return maxActiveViewScopes;
 	}
 
 	/**

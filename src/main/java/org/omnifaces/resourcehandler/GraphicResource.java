@@ -85,7 +85,7 @@ public class GraphicResource extends DynamicResource {
 		"o:graphicImage 'value' attribute must specify valid method parameters."
 			+ " Encountered invalid method parameters '%s'.";
 
-	private static final Map<String, String> createContentTypesByBase64Header() {
+	private static Map<String, String> createContentTypesByBase64Header() {
 		Map<String, String> contentTypesByBase64Header = new HashMap<>();
 		contentTypesByBase64Header.put("/9j/", "image/jpeg");
 		contentTypesByBase64Header.put("iVBORw", "image/png");

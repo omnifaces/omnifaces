@@ -122,7 +122,7 @@ public final class Messages {
 	 *
 	 * @author Bauke Scholtz
 	 */
-	public static interface Resolver {
+	public interface Resolver {
 
 		/**
 		 * Returns the resolved message based on the given message and parameters.
@@ -130,7 +130,7 @@ public final class Messages {
 		 * @param params The message format parameters, if any.
 		 * @return The resolved message.
 		 */
-		public String getMessage(String message, Object... params);
+		String getMessage(String message, Object... params);
 
 	}
 

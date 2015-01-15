@@ -31,6 +31,12 @@ import javax.faces.application.ResourceHandlerWrapper;
  */
 public class DefaultResourceHandler extends ResourceHandlerWrapper {
 
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final int ARGUMENT_COUNT_3 = 3;
+	private static final int ARGUMENT_COUNT_2 = 2;
+	private static final int ARGUMENT_COUNT_1 = 1;
+
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	private ResourceHandler wrapped;
@@ -47,7 +53,7 @@ public class DefaultResourceHandler extends ResourceHandlerWrapper {
 		this.wrapped = wrapped;
 		Class<? extends ResourceHandler> cls = wrapped.getClass();
 
-		for (int i = 3; i > 1; i--) {
+		for (int i = ARGUMENT_COUNT_3; i > ARGUMENT_COUNT_1; i--) {
 			Class<?>[] paramTypes = new Class[i];
 			fill(paramTypes, String.class);
 
@@ -88,8 +94,8 @@ public class DefaultResourceHandler extends ResourceHandlerWrapper {
 	@Override
 	public Resource createResource(String resourceName, String libraryName, String contentType) {
 		switch (argumentCount) {
-			case 3: return getWrapped().createResource(resourceName, libraryName, contentType);
-			case 2: return getWrapped().createResource(resourceName, libraryName);
+			case ARGUMENT_COUNT_3: return getWrapped().createResource(resourceName, libraryName, contentType);
+			case ARGUMENT_COUNT_2: return getWrapped().createResource(resourceName, libraryName);
 			default: return getWrapped().createResource(resourceName);
 		}
 	}

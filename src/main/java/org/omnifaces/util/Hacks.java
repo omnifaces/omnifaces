@@ -514,7 +514,8 @@ public final class Hacks {
 
 			if (value != null) {
 				try {
-					return (defaultResourceMaxAge = Long.valueOf(value));
+					defaultResourceMaxAge = Long.valueOf(value);
+					return defaultResourceMaxAge;
 				}
 				catch (NumberFormatException e) {
 					throw new IllegalArgumentException(String.format(ERROR_MAX_AGE, name, value), e);
@@ -522,7 +523,8 @@ public final class Hacks {
 			}
 		}
 
-		return (defaultResourceMaxAge = DEFAULT_RESOURCE_MAX_AGE);
+		defaultResourceMaxAge = DEFAULT_RESOURCE_MAX_AGE;
+		return defaultResourceMaxAge;
 	}
 
 	// PrimeFaces related ---------------------------------------------------------------------------------------------

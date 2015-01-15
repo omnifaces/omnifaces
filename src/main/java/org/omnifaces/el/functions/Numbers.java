@@ -30,6 +30,10 @@ import org.omnifaces.util.Faces;
  */
 public final class Numbers {
 
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final int BYTES_1K = 1024;
+
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	private Numbers() {
@@ -56,12 +60,12 @@ public final class Numbers {
 			return "0 B";
 		}
 
-	    if (bytes < 1024) {
+	    if (bytes < BYTES_1K) {
 	    	return bytes + " B";
 	    }
 
-	    int exp = (int) (Math.log(bytes) / Math.log(1024));
-	    return String.format(getLocale(), "%.1f %ciB", bytes / Math.pow(1024, exp), "KMGTPE".charAt(exp - 1));
+	    int exp = (int) (Math.log(bytes) / Math.log(BYTES_1K));
+	    return String.format(getLocale(), "%.1f %ciB", bytes / Math.pow(BYTES_1K, exp), "KMGTPE".charAt(exp - 1));
 	}
 
 	/**

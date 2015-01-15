@@ -24,7 +24,7 @@ import javax.el.MethodInfo;
  */
 public class MethodReference {
 
-    public final static Object[] NO_PARAMS = new Object[0];
+    public static final Object[] NO_PARAMS = new Object[0];
 
 	private Object base;
 	private Method method;

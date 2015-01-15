@@ -50,7 +50,7 @@ public class ParamExtension implements Extension {
 		}
 	}
 
-	public void afterBean(final @Observes AfterBeanDiscovery afterBeanDiscovery, BeanManager beanManager) {
+	public void afterBean(@Observes AfterBeanDiscovery afterBeanDiscovery, BeanManager beanManager) {
 		for (Type type : types) {
 			afterBeanDiscovery.addBean(new DynamicParamValueProducer(beanManager, type));
 		}

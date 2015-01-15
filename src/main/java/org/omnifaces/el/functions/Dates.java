@@ -430,13 +430,13 @@ public final class Dates {
 	 */
 	private static Map<String, Integer> mapDaysOfWeek(String[] weekdays) {
 		Map<String, Integer> mapping = new LinkedHashMap<>();
-		mapping.put(weekdays[Calendar.MONDAY], 1);
-		mapping.put(weekdays[Calendar.TUESDAY], 2);
-		mapping.put(weekdays[Calendar.WEDNESDAY], 3);
-		mapping.put(weekdays[Calendar.THURSDAY], 4);
-		mapping.put(weekdays[Calendar.FRIDAY], 5);
-		mapping.put(weekdays[Calendar.SATURDAY], 6);
-		mapping.put(weekdays[Calendar.SUNDAY], 7);
+		mapping.put(weekdays[Calendar.MONDAY], mapping.size() + 1);
+		mapping.put(weekdays[Calendar.TUESDAY], mapping.size() + 1);
+		mapping.put(weekdays[Calendar.WEDNESDAY], mapping.size() + 1);
+		mapping.put(weekdays[Calendar.THURSDAY], mapping.size() + 1);
+		mapping.put(weekdays[Calendar.FRIDAY], mapping.size() + 1);
+		mapping.put(weekdays[Calendar.SATURDAY], mapping.size() + 1);
+		mapping.put(weekdays[Calendar.SUNDAY], mapping.size() + 1);
 		return Collections.unmodifiableMap(mapping);
 	}
 

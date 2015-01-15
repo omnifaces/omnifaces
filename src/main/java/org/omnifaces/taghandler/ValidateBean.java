@@ -324,7 +324,7 @@ public class ValidateBean extends TagHandler {
 	  );
 	}
 
-	public final static class CollectingValidator implements Validator {
+	public static final class CollectingValidator implements Validator {
 
 		private final Map<String, Object> propertyValues;
 		private final String property;
@@ -378,7 +378,7 @@ public class ValidateBean extends TagHandler {
 		}
 	}
 
-	private static abstract class Operation implements Callback.WithArgument<Object[]> {
+	private abstract static class Operation implements Callback.WithArgument<Object[]> {
 		@Override
 		public void invoke(Object[] args) {
 			invoke((EditableValueHolder) args[0], (ValueReference) args[1]);

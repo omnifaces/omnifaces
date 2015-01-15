@@ -170,7 +170,7 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
 	 *
 	 * @author Bauke Scholtz
 	 */
-	protected static abstract class DeferredValidator implements javax.faces.validator.Validator, Serializable {
+	protected abstract static class DeferredValidator implements javax.faces.validator.Validator, Serializable {
 		private static final long serialVersionUID = 1L;
 	}
 

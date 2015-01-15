@@ -169,7 +169,7 @@ final class DeferredTagHandlerHelper {
 	 *
 	 * @author Bauke Scholtz
 	 */
-	static interface DeferredTagHandler {
+	interface DeferredTagHandler {
 
 		/**
 		 * Just return TagHandler#getAttribute() via a public method (it's by default protected and otherwise thus

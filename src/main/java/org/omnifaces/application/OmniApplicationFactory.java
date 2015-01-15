@@ -103,7 +103,8 @@ public class OmniApplicationFactory extends ApplicationFactory {
 			newApplication = new OmniApplication(application);
 		}
 
-		return (this.application = newApplication);
+		this.application = newApplication;
+		return this.application;
 	}
 
 }

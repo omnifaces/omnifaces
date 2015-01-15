@@ -57,19 +57,16 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 		String actionURL = super.getActionURL(context, viewId);
 
 		Map<String, String> mappedResources = getApplicationAttribute(context, FACES_VIEWS_RESOURCES);
-		if (mappedResources.containsKey(viewId)) {
+		if (mappedResources.containsKey(viewId) && (isScannedViewsAlwaysExtensionless(context) || isOriginalViewExtensionless(context))) {
 
-			if (isScannedViewsAlwaysExtensionless(context) || isOriginalViewExtensionless(context)) {
-				
-				// User has requested to always render extensionless, or the requested viewId was mapped and the current
-				// request is extensionless; render the action URL extensionless as well.
-				
-				switch (getViewHandlerMode(getServletContext(context))) {
-					case STRIP_EXTENSION_FROM_PARENT:
-						return removeExtension(context, actionURL, viewId);
-					case BUILD_WITH_PARENT_QUERY_PARAMETERS:
-						return getRequestContextPath(context) + stripExtension(viewId) + getQueryParameters(actionURL);
-				}
+			// User has requested to always render extensionless, or the requested viewId was mapped and the current
+			// request is extensionless; render the action URL extensionless as well.
+
+			switch (getViewHandlerMode(getServletContext(context))) {
+				case STRIP_EXTENSION_FROM_PARENT:
+					return removeExtension(context, actionURL, viewId);
+				case BUILD_WITH_PARENT_QUERY_PARAMETERS:
+					return getRequestContextPath(context) + stripExtension(viewId) + getQueryParameters(actionURL);
 			}
 		}
 

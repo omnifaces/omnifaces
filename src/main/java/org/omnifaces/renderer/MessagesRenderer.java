@@ -60,7 +60,7 @@ public class MessagesRenderer extends Renderer {
 
 	private static final Map<Severity, String> SEVERITY_NAMES = createSeverityNames();
 
-	private static final Map<Severity, String> createSeverityNames() {
+	private static Map<Severity, String> createSeverityNames() {
 		Map<Severity, String> severityNames = new HashMap<>();
 		severityNames.put(FacesMessage.SEVERITY_INFO, "info");
 		severityNames.put(FacesMessage.SEVERITY_WARN, "warn");

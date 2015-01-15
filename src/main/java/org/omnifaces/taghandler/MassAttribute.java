@@ -148,14 +148,12 @@ public class MassAttribute extends TagHandler {
 
 	private void applyMassAttribute(FaceletContext context, List<UIComponent> children) {
 		for (UIComponent component : children) {
-			if (targetClass == null || targetClass.isAssignableFrom(component.getClass())) {
-				if (component.getValueExpression(name) == null) {
-					Object literalValue = component.getAttributes().get(name);
+			if ((targetClass == null || targetClass.isAssignableFrom(component.getClass())) && component.getValueExpression(name) == null) {
+				Object literalValue = component.getAttributes().get(name);
 
-					if (literalValue == null || literalValue instanceof Boolean) {
-						Class<?> type = (literalValue == null) ? Object.class : Boolean.class;
-						component.setValueExpression(name, value.getValueExpression(context, type));
-					}
+				if (literalValue == null || literalValue instanceof Boolean) {
+					Class<?> type = (literalValue == null) ? Object.class : Boolean.class;
+					component.setValueExpression(name, value.getValueExpression(context, type));
 				}
 			}
 

@@ -181,7 +181,7 @@ public final class Faces {
 	 * Inner class so that the protected {@link FacesContext#setCurrentInstance(FacesContext)} method can be invoked.
 	 * @author Bauke Scholtz
 	 */
-	private static abstract class FacesContextSetter extends FacesContext {
+	private abstract static class FacesContextSetter extends FacesContext {
 		protected static void setCurrentInstance(FacesContext context) {
 			FacesContext.setCurrentInstance(context);
 		}

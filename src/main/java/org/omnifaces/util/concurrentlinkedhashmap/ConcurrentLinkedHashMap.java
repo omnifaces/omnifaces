@@ -146,10 +146,16 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
   static final long MAXIMUM_CAPACITY = Long.MAX_VALUE - Integer.MAX_VALUE;
 
   /** The maximum number of pending operations per buffer. */
-  static final int MAXIMUM_BUFFER_SIZE = 1 << 20;
+  static final int MAXIMUM_BUFFER_SIZE = 1048576;
 
   /** The number of pending operations per buffer before attempting to drain. */
   static final int BUFFER_THRESHOLD = 16;
+
+  /** The default initial capacity. */
+  static final int DEFAULT_INITIAL_CAPACITY = 16;
+
+  /** The default load factor. */
+  static final float DEFAULT_LOAD_FACTOR = 0.75f;
 
   /** The number of buffers to use. */
   static final int NUMBER_OF_BUFFERS;
@@ -227,7 +233,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
     // The data store and its maximum capacity
     concurrencyLevel = builder.concurrencyLevel;
     capacity = Math.min(builder.capacity, MAXIMUM_CAPACITY);
-    data = new ConcurrentHashMap<>(builder.initialCapacity, 0.75f, concurrencyLevel);
+    data = new ConcurrentHashMap<>(builder.initialCapacity, DEFAULT_LOAD_FACTOR, concurrencyLevel);
 
     // The eviction support
     weigher = builder.weigher;
@@ -891,8 +897,11 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 
   @Override
   public Set<K> keySet() {
-    Set<K> ks = keySet;
-    return (ks == null) ? (keySet = new KeySet()) : ks;
+    if (keySet == null) {
+      keySet = new KeySet();
+    }
+
+    return keySet;
   }
 
   /**
@@ -975,7 +984,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 
       int initialCapacity = (weigher == Weighers.entrySingleton())
           ? Math.min(limit, (int) weightedSize())
-          : 16;
+          : DEFAULT_INITIAL_CAPACITY;
       Set<K> keys = new LinkedHashSet<>(initialCapacity);
       Iterator<Node> iterator = ascending
           ? evictionDeque.iterator()
@@ -991,14 +1000,20 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 
   @Override
   public Collection<V> values() {
-    Collection<V> vs = values;
-    return (vs == null) ? (values = new Values()) : vs;
+    if (values == null) {
+      values = new Values();
+    }
+
+    return values;
   }
 
   @Override
   public Set<Entry<K, V>> entrySet() {
-    Set<Entry<K, V>> es = entrySet;
-    return (es == null) ? (entrySet = new EntrySet()) : es;
+    if (entrySet == null) {
+      entrySet = new EntrySet();
+    }
+
+    return entrySet;
   }
 
   /**
@@ -1085,7 +1100,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 
       int initialCapacity = (weigher == Weighers.entrySingleton())
           ? Math.min(limit, (int) weightedSize())
-          : 16;
+          : DEFAULT_INITIAL_CAPACITY;
       Map<K, V> map = new LinkedHashMap<>(initialCapacity);
       Iterator<Node> iterator = ascending
           ? evictionDeque.iterator()

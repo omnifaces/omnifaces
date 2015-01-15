@@ -141,7 +141,8 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 
 	@Override
 	protected OutputStream createOutputStream() {
-		return output = new GzipThresholdOutputStream(threshold);
+		output = new GzipThresholdOutputStream(threshold);
+		return output;
 	}
 
 	// Inner classes --------------------------------------------------------------------------------------------------

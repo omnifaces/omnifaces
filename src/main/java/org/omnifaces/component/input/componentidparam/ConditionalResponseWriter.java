@@ -220,7 +220,8 @@ public class ConditionalResponseWriter extends ResponseWriterWrapper {
 
 		// Check if a rendering decision already made for this component by checking the cache
 		if (renderedIdCache.containsKey(currentComponent.getClientId())) {
-			return lastRendered = renderedIdCache.get(currentComponent.getClientId());
+			lastRendered = renderedIdCache.get(currentComponent.getClientId());
+			return lastRendered;
 		}
 
 		// No decision made, check for an explicit id match

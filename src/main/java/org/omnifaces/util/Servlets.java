@@ -483,7 +483,8 @@ public final class Servlets {
 			projectStage = context.getInitParameter(PROJECT_STAGE_PARAM_NAME);
 		}
 
-		return (facesDevelopment = Development.name().equals(projectStage));
+		facesDevelopment = Development.name().equals(projectStage);
+		return facesDevelopment;
 	}
 
 	/**

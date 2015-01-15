@@ -136,7 +136,7 @@ public class BeanValidationEventListener implements SystemEventListener {
 	/**
 	 * Dummy validation group to disable any validation.
 	 */
-	private static interface NoValidationGroup {
+	private interface NoValidationGroup {
 		//
 	}
 
