@@ -253,7 +253,7 @@ public class ViewParamValidationFailed extends TagHandler implements ComponentSy
 			return; // Validation has not failed.
 		}
 
-		if (context.getAttributes().put(getClass().getName(), TRUE) == TRUE) {
+		if (TRUE.equals(context.getAttributes().put(getClass().getName(), TRUE))) {
 			return; // Validation fail has already been handled before. We can't send redirect or error multiple times.
 		}
 

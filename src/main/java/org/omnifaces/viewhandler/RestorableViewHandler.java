@@ -87,7 +87,7 @@ public class RestorableViewHandler extends ViewHandlerWrapper {
 			setContext(context);
 		}
 
-		if (createdView.getAttributes().get(EnableRestorableView.class.getName()) == TRUE) {
+		if (TRUE.equals(createdView.getAttributes().get(EnableRestorableView.class.getName()))) {
 			return createdView;
 		}
 		else {

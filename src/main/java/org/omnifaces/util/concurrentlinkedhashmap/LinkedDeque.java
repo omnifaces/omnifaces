@@ -60,14 +60,14 @@ final class LinkedDeque<E extends Linked<E>> extends AbstractCollection<E> imple
    * Invariant: (first == null && last == null) ||
    *            (first.prev == null)
    */
-  E first;
+  private E first;
 
   /**
    * Pointer to last node.
    * Invariant: (first == null && last == null) ||
    *            (last.next == null)
    */
-  E last;
+  private E last;
 
   /**
    * Links the element to the front of the deque so that it becomes the first
@@ -384,7 +384,7 @@ final class LinkedDeque<E extends Linked<E>> extends AbstractCollection<E> imple
   public Iterator<E> iterator() {
     return new AbstractLinkedIterator(first) {
       @Override E computeNext() {
-        return cursor.getNext();
+        return getCursor().getNext();
       }
     };
   }
@@ -393,13 +393,13 @@ final class LinkedDeque<E extends Linked<E>> extends AbstractCollection<E> imple
   public Iterator<E> descendingIterator() {
     return new AbstractLinkedIterator(last) {
       @Override E computeNext() {
-        return cursor.getPrevious();
+        return getCursor().getPrevious();
       }
     };
   }
 
-  abstract class AbstractLinkedIterator implements Iterator<E> {
-    E cursor;
+  private abstract class AbstractLinkedIterator implements Iterator<E> {
+	private E cursor;
 
     /**
      * Creates an iterator that can can traverse the deque.
@@ -408,6 +408,10 @@ final class LinkedDeque<E extends Linked<E>> extends AbstractCollection<E> imple
      */
     AbstractLinkedIterator(E start) {
       cursor = start;
+    }
+
+    public E getCursor() {
+    	return cursor;
     }
 
     @Override

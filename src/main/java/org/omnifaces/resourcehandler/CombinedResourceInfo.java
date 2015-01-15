@@ -188,10 +188,10 @@ final class CombinedResourceInfo {
 			}
 
 			contentLength += connection.getContentLength();
-			long lastModified = connection.getLastModified();
+			long resourceLastModified = connection.getLastModified();
 
-			if (lastModified > this.lastModified) {
-				this.lastModified = lastModified;
+			if (resourceLastModified > this.lastModified) {
+				this.lastModified = resourceLastModified;
 			}
 		}
 	}

@@ -73,14 +73,8 @@ public class ConditionalComment extends OutputFamily {
 		"ConditionalComment attribute 'if' must be specified.";
 
 	private enum PropertyKeys {
-		// Cannot be uppercased. They have to match the attribute names exactly.
-		_if("if");
-
-		// The below mess is necessary because "if" is a keyword in Java and cannot be used as enum value.
-		private String toString;
-		PropertyKeys() {}
-		PropertyKeys(String toString) { this.toString = toString; }
-		@Override public String toString() { return (toString != null) ? toString : super.toString(); }
+		IF;
+		@Override public String toString() { return name().toLowerCase(); }
 	}
 
 	// Variables ------------------------------------------------------------------------------------------------------
@@ -94,15 +88,15 @@ public class ConditionalComment extends OutputFamily {
 	 */
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
-		String _if = getIf();
+		String condition = getIf();
 
-		if (isEmpty(_if)) {
+		if (isEmpty(condition)) {
 			throw new IllegalArgumentException(ERROR_MISSING_IF);
 		}
 
 		ResponseWriter writer = context.getResponseWriter();
 		writer.write("<!--[if ");
-		writer.write(_if);
+		writer.write(condition);
 		writer.write("]>");
 	}
 
@@ -119,15 +113,15 @@ public class ConditionalComment extends OutputFamily {
 	 * @return The if condition.
 	 */
 	public String getIf() {
-		return state.get(PropertyKeys._if);
+		return state.get(PropertyKeys.IF);
 	}
 
 	/**
 	 * Sets the if condition.
-	 * @param _if The if condition.
+	 * @param IF The if condition.
 	 */
-	public void setIf(String _if) {
-		state.put(PropertyKeys._if, _if);
+	public void setIf(String condition) {
+		state.put(PropertyKeys.IF, condition);
 	}
 
 }

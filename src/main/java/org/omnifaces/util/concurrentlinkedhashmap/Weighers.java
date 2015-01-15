@@ -198,9 +198,9 @@ public final class Weighers {
     return (Weigher<Map<A, B>>) (Weigher<?>) MapWeigher.INSTANCE;
   }
 
-  static final class EntryWeigherView<K, V> implements EntryWeigher<K, V>, Serializable {
+  private static final class EntryWeigherView<K, V> implements EntryWeigher<K, V>, Serializable {
     static final long serialVersionUID = 1;
-    final Weigher<? super V> weigher;
+    private final Weigher<? super V> weigher;
 
     EntryWeigherView(Weigher<? super V> weigher) {
       checkNotNull(weigher);
@@ -213,7 +213,7 @@ public final class Weighers {
     }
   }
 
-  enum SingletonEntryWeigher implements EntryWeigher<Object, Object> {
+  private enum SingletonEntryWeigher implements EntryWeigher<Object, Object> {
     INSTANCE;
 
     @Override
@@ -222,7 +222,7 @@ public final class Weighers {
     }
   }
 
-  enum SingletonWeigher implements Weigher<Object> {
+  private enum SingletonWeigher implements Weigher<Object> {
     INSTANCE;
 
     @Override
@@ -231,7 +231,7 @@ public final class Weighers {
     }
   }
 
-  enum ByteArrayWeigher implements Weigher<byte[]> {
+  private enum ByteArrayWeigher implements Weigher<byte[]> {
     INSTANCE;
 
     @Override
@@ -240,7 +240,7 @@ public final class Weighers {
     }
   }
 
-  enum IterableWeigher implements Weigher<Iterable<?>> {
+  private enum IterableWeigher implements Weigher<Iterable<?>> {
     INSTANCE;
 
     @Override
@@ -257,7 +257,7 @@ public final class Weighers {
     }
   }
 
-  enum CollectionWeigher implements Weigher<Collection<?>> {
+  private enum CollectionWeigher implements Weigher<Collection<?>> {
     INSTANCE;
 
     @Override
@@ -266,7 +266,7 @@ public final class Weighers {
     }
   }
 
-  enum ListWeigher implements Weigher<List<?>> {
+  private enum ListWeigher implements Weigher<List<?>> {
     INSTANCE;
 
     @Override
@@ -275,7 +275,7 @@ public final class Weighers {
     }
   }
 
-  enum SetWeigher implements Weigher<Set<?>> {
+  private enum SetWeigher implements Weigher<Set<?>> {
     INSTANCE;
 
     @Override
@@ -284,7 +284,7 @@ public final class Weighers {
     }
   }
 
-  enum MapWeigher implements Weigher<Map<?, ?>> {
+  private enum MapWeigher implements Weigher<Map<?, ?>> {
     INSTANCE;
 
     @Override

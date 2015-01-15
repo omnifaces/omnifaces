@@ -17,6 +17,7 @@ import static org.omnifaces.util.Faces.hasContext;
 import static org.omnifaces.util.Xml.createDocument;
 import static org.omnifaces.util.Xml.getNodeList;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,12 +34,14 @@ import javax.servlet.Filter;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextListener;
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * <p>
@@ -162,7 +165,7 @@ public enum FacesConfigXml {
      * Load, merge and return all <code>faces-config.xml</code> files found in the classpath
      * into a single {@link Document}.
      */
-    private static Document loadFacesConfigXml(ServletContext context) throws Exception {
+    private static Document loadFacesConfigXml(ServletContext context) throws IOException, SAXException {
     	List<URL> facesConfigURLs = new ArrayList<>();
 		facesConfigURLs.add(context.getResource(APP_FACES_CONFIG_XML));
 		facesConfigURLs.addAll(Collections.list(Thread.currentThread().getContextClassLoader().getResources(LIB_FACES_CONFIG_XML)));
@@ -171,8 +174,9 @@ public enum FacesConfigXml {
 
     /**
      * Create and return a mapping of all resource bundle base names by var found in the given document.
+     * @throws XPathExpressionException
      */
-    private static Map<String, String> parseResourceBundles(Element facesConfigXml, XPath xpath) throws Exception {
+    private static Map<String, String> parseResourceBundles(Element facesConfigXml, XPath xpath) throws XPathExpressionException {
         Map<String, String> resourceBundles = new LinkedHashMap<>();
         NodeList resourceBundleNodes = getNodeList(facesConfigXml, xpath, XPATH_RESOURCE_BUNDLE);
 

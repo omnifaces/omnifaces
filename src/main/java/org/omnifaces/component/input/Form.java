@@ -147,7 +147,7 @@ public class Form extends UIForm {
 	}
 
 	private boolean isIgnoreValidationFailed(FacesContext context) {
-		return context.getAttributes().get(IgnoreValidationFailed.class.getName()) == TRUE;
+		return TRUE.equals(context.getAttributes().get(IgnoreValidationFailed.class.getName()));
 	}
 
 

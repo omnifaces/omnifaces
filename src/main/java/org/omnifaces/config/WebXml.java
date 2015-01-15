@@ -39,7 +39,6 @@ import javax.faces.webapp.FacesServlet;
 import javax.servlet.Filter;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextListener;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
@@ -381,11 +380,8 @@ public enum WebXml {
 	/**
 	 * Load, merge and return all <code>web.xml</code> and <code>web-fragment.xml</code> files found in the classpath
 	 * into a single {@link Document}.
-	 * @throws ParserConfigurationException
-	 * @throws SAXException
-	 * @throws IOException
 	 */
-	private static Document loadWebXml(ServletContext context) throws ParserConfigurationException, IOException, SAXException {
+	private static Document loadWebXml(ServletContext context) throws IOException, SAXException {
 		List<URL> webXmlURLs = new ArrayList<>();
 		webXmlURLs.add(context.getResource(WEB_XML));
 		webXmlURLs.addAll(Collections.list(Thread.currentThread().getContextClassLoader().getResources(WEB_FRAGMENT_XML)));

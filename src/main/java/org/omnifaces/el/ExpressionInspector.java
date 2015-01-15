@@ -143,7 +143,8 @@ public final class ExpressionInspector {
 
 		public InspectorElContext(ELContext elContext) {
 			super(elContext);
-			inspectorElResolver = new InspectorElResolver(super.getELResolver());
+			ELResolver elResolver = super.getELResolver();
+			inspectorElResolver = new InspectorElResolver(elResolver);
 		}
 
 		@Override
