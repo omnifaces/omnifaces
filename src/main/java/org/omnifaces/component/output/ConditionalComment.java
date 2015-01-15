@@ -118,7 +118,7 @@ public class ConditionalComment extends OutputFamily {
 
 	/**
 	 * Sets the if condition.
-	 * @param IF The if condition.
+	 * @param condition The if condition.
 	 */
 	public void setIf(String condition) {
 		state.put(PropertyKeys.IF, condition);
