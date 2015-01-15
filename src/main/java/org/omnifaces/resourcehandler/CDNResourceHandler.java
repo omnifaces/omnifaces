@@ -143,7 +143,7 @@ import javax.faces.application.ResourceHandler;
  *
  * @author Bauke Scholtz
  * @since 1.2
- * @see DefaultResource
+ * @see RemappedResource
  * @see DefaultResourceHandler
  */
 public class CDNResourceHandler extends DefaultResourceHandler {
@@ -226,14 +226,8 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 			return resource;
 		}
 
-		final String evaluatedRequestPath = evaluateExpressionGet(requestPath);
-
-		return new DefaultResource(resource) {
-			@Override
-			public String getRequestPath() {
-				return evaluatedRequestPath;
-			}
-		};
+		String evaluatedRequestPath = evaluateExpressionGet(requestPath);
+		return new RemappedResource(resource, evaluatedRequestPath);
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------

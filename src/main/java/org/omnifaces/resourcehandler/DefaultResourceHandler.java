@@ -33,6 +33,8 @@ public class DefaultResourceHandler extends ResourceHandlerWrapper {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
+	public static final String RES_NOT_FOUND = "RES_NOT_FOUND";
+
 	private static final int ARGUMENT_COUNT_3 = 3;
 	private static final int ARGUMENT_COUNT_2 = 2;
 	private static final int ARGUMENT_COUNT_1 = 1;

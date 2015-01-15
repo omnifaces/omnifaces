@@ -106,7 +106,7 @@ import org.omnifaces.util.Hacks;
  *
  * @author Bauke Scholtz
  * @since 1.4
- * @see DefaultResource
+ * @see RemappedResource
  * @see DefaultResourceHandler
  */
 public class UnmappedResourceHandler extends DefaultResourceHandler {
@@ -131,23 +131,12 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 	public Resource createResource(String resourceName, String libraryName, String contentType) {
 		Resource resource = super.createResource(resourceName, libraryName, contentType);
 
-		return (resource == null) ? null : new DefaultResource(resource) {
-			@Override
-			public String getRequestPath() {
-				String path = super.getRequestPath();
-				String mapping = getMapping();
+		if (resource == null) {
+			return resource;
+		}
 
-				if (isPrefixMapping(mapping)) {
-					return path.replaceFirst(mapping, "");
-				}
-				else if (path.contains("?")) {
-					return path.replace(mapping + "?", "?");
-				}
-				else {
-					return path.substring(0, path.length() - mapping.length());
-				}
-			}
-		};
+		String unmappedRequestPath = unmapRequestPath(resource.getRequestPath());
+		return new RemappedResource(resource, unmappedRequestPath);
 	}
 
 	/**
@@ -191,7 +180,23 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 		stream(inputStream, externalContext.getResponseOutputStream());
 	}
 
-	private Resource createResource(FacesContext context) {
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	private static String unmapRequestPath(String path) {
+		String mapping = getMapping();
+
+		if (isPrefixMapping(mapping)) {
+			return path.replaceFirst(mapping, "");
+		}
+		else if (path.contains("?")) {
+			return path.replace(mapping + "?", "?");
+		}
+		else {
+			return path.substring(0, path.length() - mapping.length());
+		}
+	}
+
+	private static Resource createResource(FacesContext context) {
 		if (Hacks.isPrimeFacesDynamicResourceRequest(context)) {
 			return null;
 		}

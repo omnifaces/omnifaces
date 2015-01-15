@@ -247,17 +247,19 @@ public enum WebXml {
 			throw new IllegalArgumentException(String.format(ERROR_URL_MUST_START_WITH_SLASH, url));
 		}
 
+		String uri = url;
+
 		if (url.length() > 1 && url.charAt(url.length() - 1) == '/') {
-			url = url.substring(0, url.length() - 1); // Trim trailing slash.
+			uri = url.substring(0, url.length() - 1); // Trim trailing slash.
 		}
 
 		for (Entry<String, Set<String>> entry : securityConstraints.entrySet()) {
-			if (isExactMatch(entry.getKey(), url)) {
+			if (isExactMatch(entry.getKey(), uri)) {
 				return isRoleMatch(entry.getValue(), role);
 			}
 		}
 
-		for (String path = url, urlMatch = ""; !path.isEmpty(); path = path.substring(0, path.lastIndexOf('/'))) {
+		for (String path = uri, urlMatch = ""; !path.isEmpty(); path = path.substring(0, path.lastIndexOf('/'))) {
 			Boolean roleMatch = null;
 
 			for (Entry<String, Set<String>> entry : securityConstraints.entrySet()) {
@@ -272,9 +274,9 @@ public enum WebXml {
 			}
 		}
 
-		if (url.contains(".")) {
+		if (uri.contains(".")) {
 			for (Entry<String, Set<String>> entry : securityConstraints.entrySet()) {
-				if (isSuffixMatch(url, entry.getKey())) {
+				if (isSuffixMatch(uri, entry.getKey())) {
 					return isRoleMatch(entry.getValue(), role);
 				}
 			}

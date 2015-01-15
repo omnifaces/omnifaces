@@ -12,7 +12,7 @@
  */
 package org.omnifaces.renderer;
 
-import static org.omnifaces.resourcehandler.DefaultResource.RES_NOT_FOUND;
+import static org.omnifaces.resourcehandler.DefaultResourceHandler.RES_NOT_FOUND;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;

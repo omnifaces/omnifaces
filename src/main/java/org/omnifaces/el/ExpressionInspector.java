@@ -65,7 +65,7 @@ public final class ExpressionInspector {
 		// Invoke getType() on the value expression to have the expression chain resolved.
 		// The InspectorElContext contains a special resolver that will record the next to last
 		// base and property. The EL implementation may shortcut the chain when it
-		// discovers the final target was a method. E.g. #{a.b.c().d.f('1')}
+		// discovers the final target was a method. E.g. a.b.c().d.f('1')
 		// In that case too, the result will be that the inspectorElContext contains the
 		// one but last base and property, and the length of the expression chain.
 		valueExpression.getType(inspectorElContext);
@@ -103,8 +103,11 @@ public final class ExpressionInspector {
 	 *
 	 */
 	private enum ValueExpressionType {
-		METHOD,  // Value expression that refers to a method, e.g. #{foo.bar(1)}
-		PROPERTY // Value expression that refers to a property, e.g. #{foo.bar}
+		/** Value expression that refers to a method, e.g. <code>#{foo.bar(1)}</code>. */
+		METHOD,
+
+		/** Value expression that refers to a property, e.g. <code>#{foo.bar}</code>. */
+		PROPERTY
 	}
 
 	/**
@@ -143,8 +146,7 @@ public final class ExpressionInspector {
 
 		public InspectorElContext(ELContext elContext) {
 			super(elContext);
-			ELResolver elResolver = super.getELResolver();
-			inspectorElResolver = new InspectorElResolver(elResolver);
+			inspectorElResolver = new InspectorElResolver(elContext.getELResolver());
 		}
 
 		@Override

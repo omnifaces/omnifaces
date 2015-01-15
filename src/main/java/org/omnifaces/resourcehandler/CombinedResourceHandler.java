@@ -164,7 +164,7 @@ import org.omnifaces.util.Hacks;
  * @see CombinedResource
  * @see CombinedResourceInfo
  * @see CombinedResourceInputStream
- * @see DefaultResource
+ * @see RemappedResource
  * @see DefaultResourceHandler
  */
 public class CombinedResourceHandler extends DefaultResourceHandler implements SystemEventListener {

@@ -170,9 +170,11 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 					// Wrap into new ELException since down the call chain, ElExceptions might be caught, unwrapped one level and then wrapped in
 					// a new ELException. E.g. Mojarra 2.1's TagValueExpression does the following:
 					//
+					// <pre>
 					// catch (ELException e) {
 		            //     throw new ELException(this.attr + ": " + e.getMessage(), e.getCause());
 					// }
+					// </pre>
 		            //
 					// Without wrapping here, we'll then loose this exception.
 

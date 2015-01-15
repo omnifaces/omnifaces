@@ -91,12 +91,9 @@ public class GraphicResource extends DynamicResource {
 		contentTypesByBase64Header.put("iVBORw", "image/png");
 		contentTypesByBase64Header.put("R0lGOD", "image/gif");
 		contentTypesByBase64Header.put("AAABAA", "image/x-icon");
-
-		// BMP and TIFF are unlikely used as web image formats due to ineffective large sizes.
-		// contentTypesByBase64Header.put("Qk0", "image/bmp");
-		// contentTypesByBase64Header.put("SUkqAA", "image/tiff");
-		// contentTypesByBase64Header.put("TU0AKg", "image/tiff");
-
+		contentTypesByBase64Header.put("Qk0", "image/bmp");
+		contentTypesByBase64Header.put("SUkqAA", "image/tiff");
+		contentTypesByBase64Header.put("TU0AKg", "image/tiff");
 		return Collections.unmodifiableMap(contentTypesByBase64Header);
 	}
 

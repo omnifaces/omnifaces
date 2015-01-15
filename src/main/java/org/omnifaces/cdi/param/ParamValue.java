@@ -38,7 +38,7 @@ public class ParamValue<V> implements Serializable {
 	private final Class<?> targetType;
 
 	private transient V value;
-	private transient boolean valueSet;
+	private boolean valueSet;
 
 	private V serializableValue;
 	private boolean valueIsSerializable;

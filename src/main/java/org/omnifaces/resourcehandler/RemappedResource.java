@@ -21,31 +21,36 @@ import javax.faces.application.Resource;
 import javax.faces.application.ResourceWrapper;
 
 /**
- * A default {@link Resource} implementation, fixing broken {@link ResourceWrapper} and implementing
- * {@link Externalizable} to avoid JSF state saving trouble.
+ * This {@link Resource} implementation remaps the given wrapped resource to the given request path.
  *
  * @author Bauke Scholtz
- * @since 2.0
+ * @since 2.1
  */
-public abstract class DefaultResource extends ResourceWrapper implements Externalizable {
-
-	public static final String RES_NOT_FOUND = "RES_NOT_FOUND";
+public class RemappedResource extends ResourceWrapper implements Externalizable {
 
 	private Resource wrapped;
+	private String requestPath;
 
 	/**
-	 * Constructs a new default resource.
+	 * Do not use this constructor.
 	 */
-	public DefaultResource() {
+	public RemappedResource() {
 		// Keep default c'tor alive for Externalizable.
 	}
 
 	/**
-	 * Constructs a new default resource wrapping the given resource.
+	 * Constructs a new resource which remaps the given wrapped resource to the given request path.
 	 * @param wrapped The resource to be wrapped.
+	 * @param requestPath The remapped request path.
 	 */
-	public DefaultResource(Resource wrapped) {
+	public RemappedResource(Resource wrapped, String requestPath) {
 		this.wrapped = wrapped;
+		this.requestPath = requestPath;
+	}
+
+	@Override
+	public String getRequestPath() {
+		return requestPath;
 	}
 
 	@Override // Necessary because this is missing in ResourceWrapper (will be fixed in JSF 2.2).
@@ -71,11 +76,13 @@ public abstract class DefaultResource extends ResourceWrapper implements Externa
 	@Override
 	public void readExternal(ObjectInput input) throws IOException, ClassNotFoundException {
 		wrapped = (Resource) input.readObject();
+		requestPath = (String) input.readObject();
 	}
 
 	@Override
 	public void writeExternal(ObjectOutput output) throws IOException {
 		output.writeObject(wrapped);
+		output.writeObject(requestPath);
 	}
 
 }

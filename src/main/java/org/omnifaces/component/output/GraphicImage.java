@@ -12,7 +12,7 @@
  */
 package org.omnifaces.component.output;
 
-import static org.omnifaces.resourcehandler.DefaultResource.RES_NOT_FOUND;
+import static org.omnifaces.resourcehandler.DefaultResourceHandler.RES_NOT_FOUND;
 import static org.omnifaces.util.Renderers.writeAttributes;
 import static org.omnifaces.util.Utils.coalesce;
 
