@@ -16,7 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.Set;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -55,7 +55,7 @@ public final class Xml {
 	 * @throws IOException When an I/O error occurs.
 	 * @throws SAXException When a XML parsing error occurs.
 	 */
-	public static Document createDocument(Set<URL> urls) throws IOException, SAXException {
+	public static Document createDocument(List<URL> urls) throws IOException, SAXException {
 		DocumentBuilder builder = createDocumentBuilder();
 		Document document = builder.newDocument();
 		document.appendChild(document.createElement("root"));
@@ -93,7 +93,7 @@ public final class Xml {
 	 * @throws IOException When an I/O error occurs.
 	 * @throws SAXException When a XML parsing error occurs.
 	 */
-	public static void parseAndAppendChildren(DocumentBuilder builder, Document document, Set<URL> urls) throws IOException, SAXException {
+	public static void parseAndAppendChildren(DocumentBuilder builder, Document document, List<URL> urls) throws IOException, SAXException {
 		for (URL url : urls) {
 			if (url == null) {
 				continue;

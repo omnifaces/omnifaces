@@ -75,7 +75,7 @@ public class SelectItemsIndexConverter implements Converter {
 
 	private static final String ATTRIBUTE_SELECT_ITEMS = "SelectItemsIndexConverter.%s";
 
-	private static final String ERROR_SELECT_ITEMS_LIST_NULL =
+	private static final String ERROR_SELECT_ITEMS_LIST_EMPTY =
 		"Could not determine select items list for component {0}";
 	private static final String ERROR_SELECT_ITEMS_LIST_INDEX =
 		"Could not determine index for value {0} in component {1}";
@@ -123,10 +123,10 @@ public class SelectItemsIndexConverter implements Converter {
 		if (selectItemValues == null) {
 			selectItemValues = SelectItemsUtils.collectAllValuesFromSelectItems(context, component);
 			setContextAttribute(key, selectItemValues);
+		}
 
-			if (selectItemValues == null) {
-				throw new ConverterException(createError(ERROR_SELECT_ITEMS_LIST_NULL, component.getClientId(context)));
-			}
+		if (selectItemValues.isEmpty()) {
+			throw new ConverterException(createError(ERROR_SELECT_ITEMS_LIST_EMPTY, component.getClientId(context)));
 		}
 
 		return selectItemValues;

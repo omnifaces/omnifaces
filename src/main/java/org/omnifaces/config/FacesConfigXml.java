@@ -14,15 +14,15 @@ package org.omnifaces.config;
 
 import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.Faces.hasContext;
-import static org.omnifaces.util.Xml.getNodeList;
 import static org.omnifaces.util.Xml.createDocument;
+import static org.omnifaces.util.Xml.getNodeList;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -163,7 +163,7 @@ public enum FacesConfigXml {
      * into a single {@link Document}.
      */
     private static Document loadFacesConfigXml(ServletContext context) throws Exception {
-		Set<URL> facesConfigURLs = new HashSet<>();
+    	List<URL> facesConfigURLs = new ArrayList<>();
 		facesConfigURLs.add(context.getResource(APP_FACES_CONFIG_XML));
 		facesConfigURLs.addAll(Collections.list(Thread.currentThread().getContextClassLoader().getResources(LIB_FACES_CONFIG_XML)));
 		return createDocument(facesConfigURLs);

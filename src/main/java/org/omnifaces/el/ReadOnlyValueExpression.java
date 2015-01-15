@@ -93,15 +93,25 @@ public class ReadOnlyValueExpression extends ValueExpression {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		return (obj instanceof ReadOnlyValueExpression && equals((ReadOnlyValueExpression) obj));
-	}
+	public boolean equals(Object object) {
+		// Basic checks.
+		if (object == this) {
+			return true;
+		}
+		if (object == null || object.getClass() != getClass()) {
+			return false;
+		}
 
-	private boolean equals(ReadOnlyValueExpression other) {
+		// Property checks.
+		ReadOnlyValueExpression other = (ReadOnlyValueExpression) object;
 		Object value = getValue(null);
-		Object otherValue = other == null ? null : other.getValue(null);
+		Object otherValue = other.getValue(null);
+		if (value == null ? otherValue != null : !value.equals(otherValue)) {
+			return false;
+		}
 
-		return other != null && (value != null && otherValue != null && (value == otherValue || value.equals(otherValue)));
+		// All passed.
+		return true;
 	}
 
 	@Override

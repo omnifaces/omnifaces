@@ -41,7 +41,7 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Set<RuntimeException> EXCEPTIONS_TO_UNWRAP = unmodifiableSet(
+	private static final Set<Throwable> EXCEPTIONS_TO_UNWRAP = unmodifiableSet(
 		MethodNotFoundException.class, // Needed for proper action listener error handling.
 		ConverterException.class, // Needed for proper conversion error handling.
 		ValidatorException.class); // Needed for proper validation error handling.

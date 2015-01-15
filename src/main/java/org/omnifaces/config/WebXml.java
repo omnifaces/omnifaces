@@ -16,6 +16,7 @@ import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.Faces.hasContext;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isNumber;
+import static org.omnifaces.util.Xml.createDocument;
 import static org.omnifaces.util.Xml.getNodeList;
 import static org.omnifaces.util.Xml.getTextContent;
 
@@ -43,7 +44,6 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.omnifaces.util.Xml;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -386,10 +386,10 @@ public enum WebXml {
 	 * @throws IOException
 	 */
 	private static Document loadWebXml(ServletContext context) throws ParserConfigurationException, IOException, SAXException {
-		Set<URL> webXmlURLs = new HashSet<>();
+		List<URL> webXmlURLs = new ArrayList<>();
 		webXmlURLs.add(context.getResource(WEB_XML));
 		webXmlURLs.addAll(Collections.list(Thread.currentThread().getContextClassLoader().getResources(WEB_FRAGMENT_XML)));
-		return Xml.createDocument(webXmlURLs);
+		return createDocument(webXmlURLs);
 	}
 
 	/**

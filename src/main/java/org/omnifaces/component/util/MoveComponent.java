@@ -162,15 +162,15 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
             }
 
             List<UIComponent> children = getChildrenInNewList();
-            
+
             switch (getDestination()) {
             	case BEFORE: {
-            		
+
 	            		// Find the index the target component has among its siblings, this directly
             			// becomes the target index of where to insert all the components that are
             			// to be moved.
 	            		int targetIndex = component.getParent().getChildren().indexOf(component);
-	            		
+
 	            		for (int i = 0; i < children.size(); i++) {
 	            			UIComponent childComponent = children.get(i);
 	                    	component.getParent().getChildren().add(targetIndex + i, childComponent);
@@ -206,7 +206,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
             			ClientBehaviorHolder clientBehaviorHolder = (ClientBehaviorHolder) component;
             			List<ClientBehavior> behaviors = clientBehaviorHolder.getClientBehaviors().get(attachedEventName);
 
-            			if (behaviors == null || !behaviors.contains(this)) { // Guard against adding ourselves twice
+            			if (behaviors == null || !behaviors.contains(attachedBehavior)) { // Guard against adding ourselves twice
             				clientBehaviorHolder.addClientBehavior(attachedEventName, attachedBehavior);
             			}
             		}
@@ -214,10 +214,10 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
             	case AFTER: {
 	            		// Find the index the target component has among its siblings
 	            		int targetComponentIndex = component.getParent().getChildren().indexOf(component);
-	            		
+
 	            		// The insertion point will be AFTER the target component
 	            		int targetIndex = targetComponentIndex + 1;
-	            			
+
             			// If the target component was not the last sibling, add all the components that are to be moved
             			// to the position after the target component, continuously shifting the subsequent siblings
             			// to the right, otherwise they will be added as the last siblings

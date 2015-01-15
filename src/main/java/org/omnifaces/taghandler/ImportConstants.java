@@ -172,8 +172,9 @@ public class ImportConstants extends TagHandler {
 				try {
 					return toClass(new StringBuilder(type).replace(i, i + 1, "$").toString());
 				}
-				catch (IllegalArgumentException ignore) {
+				catch (Exception ignore) {
 					// Just continue to the IllegalArgumentException on the original ClassNotFoundException.
+					ignore = e;
 				}
 			}
 
