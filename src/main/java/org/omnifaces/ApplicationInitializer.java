@@ -63,7 +63,7 @@ public class ApplicationInitializer implements ServletContainerInitializer {
 		try {
 			BeanManager.INSTANCE.toString();
 		}
-		catch (Throwable e) {
+		catch (IllegalStateException e) {
 			logger.severe(""
 				+ "\n████████████████████████████████████████████████████████████████████████████████"
 				+ "\n▌                         ▐█     ▐                                             ▐"

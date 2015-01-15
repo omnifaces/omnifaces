@@ -38,8 +38,6 @@ import javax.enterprise.inject.Typed;
 @Typed
 public final class Reflection {
 
-	private static final String ERROR_CLASS_NOT_FOUND = "Class not found: ";
-
 	private Reflection() {
 	}
 
@@ -77,7 +75,7 @@ public final class Reflection {
 	        throw new IllegalStateException(e);
 	    }
 	}
-	
+
 	/**
 	 * Sets a collection of properties of a given object to the (optionally coerced) values associated with those properties.
 	 * <p>
@@ -90,17 +88,17 @@ public final class Reflection {
 	 * <p>
 	 * NOTE 1: In case the value is a String, and the target type is not String, the standard property editor mechanism
 	 * will be used to attempt a conversion.
-	 * 
+	 *
 	 * <p>
 	 * Note 2: This method operates somewhat as the reverse of {@link Reflection#setProperties(Object, Map)}. Here only
 	 * the available writable properties of the object are matched against the map with properties to set. Properties
 	 * in the map for which there isn't a corresponding writable property on the object are ignored.
-	 * 
+	 *
 	 * <p>
-	 * Following the above two notes, use this method when attempting to set properties on an object in a lenient best effort 
+	 * Following the above two notes, use this method when attempting to set properties on an object in a lenient best effort
 	 * basis. Use {@link Reflection#setProperties(Object, Map)} when all properties need to be set with the exact type as the value
 	 * appears in the map.
-	 *  
+	 *
 	 *
 	 * @param object
 	 *            the object on which properties will be set
@@ -194,15 +192,16 @@ public final class Reflection {
 	 *
 	 * @param className fully qualified class name of the class for which a Class instance needs to be created
 	 * @return the Class object for the class with the given name.
+	 * @throws IllegalStateException if the class cannot be found.
 	 */
 	public static Class<?> toClass(String className) {
 		try {
 			return (Class.forName(className, true, Thread.currentThread().getContextClassLoader()));
-		} catch (ClassNotFoundException e1) {
+		} catch (ClassNotFoundException e) {
 			try {
 				return Class.forName(className);
-			} catch (ClassNotFoundException e2) {
-				throw new IllegalStateException(ERROR_CLASS_NOT_FOUND + className);
+			} catch (ClassNotFoundException ignore) {
+				throw new IllegalStateException(e);
 			}
 		}
 	}

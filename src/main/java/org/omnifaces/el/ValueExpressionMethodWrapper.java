@@ -69,7 +69,7 @@ public final class ValueExpressionMethodWrapper extends ValueExpression {
 		return true;
 	}
 
-	public boolean equals(ValueExpressionMethodWrapper other) {
+	private boolean equals(ValueExpressionMethodWrapper other) {
 		return other != null
 				&& (methodExpression != null && other.methodExpression != null && (methodExpression == other.methodExpression || methodExpression
 						.equals(other.methodExpression)));

@@ -78,7 +78,7 @@ public final class Platform {
 				Class.forName("javax.validation.Validation");
 				getBeanValidator();
 				beanValidationAvailable = TRUE;
-			} catch (Throwable e) {
+			} catch (Exception | LinkageError e) {
 				beanValidationAvailable = FALSE;
 				logger.warning("Bean validation not available.");
 			}

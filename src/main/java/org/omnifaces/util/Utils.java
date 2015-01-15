@@ -584,7 +584,7 @@ public final class Utils {
 		}
 		catch (IOException e) {
 			// This will occur when ZLIB and/or UTF-8 are not supported, but this is not to be expected these days.
-			throw new RuntimeException(e);
+			throw new UnsupportedOperationException(e);
 		}
 	}
 
@@ -608,7 +608,7 @@ public final class Utils {
 		}
 		catch (UnsupportedEncodingException e) {
 			// This will occur when UTF-8 is not supported, but this is not to be expected these days.
-			throw new RuntimeException(e);
+			throw new UnsupportedOperationException(e);
 		}
 		catch (Exception e) {
 			// This will occur when the string is not in valid Base64 or ZLIB format.
@@ -676,13 +676,13 @@ public final class Utils {
 
 		for (char c : string.toCharArray()) {
 			if (c > 0xfff) {
-				builder.append("\\u" + Integer.toHexString(c));
+				builder.append("\\u").append(Integer.toHexString(c));
 			}
 			else if (c > 0xff) {
-				builder.append("\\u0" + Integer.toHexString(c));
+				builder.append("\\u0").append(Integer.toHexString(c));
 			}
 			else if (c > 0x7f) {
-				builder.append("\\u00" + Integer.toHexString(c));
+				builder.append("\\u00").append(Integer.toHexString(c));
 			}
 			else if (c < 32) {
 				switch (c) {
@@ -703,10 +703,10 @@ public final class Utils {
 						break;
 					default:
 						if (c > 0xf) {
-							builder.append("\\u00" + Integer.toHexString(c));
+							builder.append("\\u00").append(Integer.toHexString(c));
 						}
 						else {
-							builder.append("\\u000" + Integer.toHexString(c));
+							builder.append("\\u000").append(Integer.toHexString(c));
 						}
 
 						break;

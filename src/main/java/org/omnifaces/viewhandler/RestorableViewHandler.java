@@ -12,6 +12,7 @@
  */
 package org.omnifaces.viewhandler;
 
+import static java.lang.Boolean.TRUE;
 import static org.omnifaces.util.Faces.normalizeViewId;
 import static org.omnifaces.util.Faces.setContext;
 
@@ -86,7 +87,7 @@ public class RestorableViewHandler extends ViewHandlerWrapper {
 			setContext(context);
 		}
 
-		if (createdView.getAttributes().get(EnableRestorableView.class.getName()) == Boolean.TRUE) {
+		if (createdView.getAttributes().get(EnableRestorableView.class.getName()) == TRUE) {
 			return createdView;
 		}
 		else {

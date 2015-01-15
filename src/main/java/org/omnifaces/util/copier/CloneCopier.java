@@ -1,5 +1,3 @@
-package org.omnifaces.util.copier;
-
 /*
  * Copyright 2014 OmniFaces.
  *
@@ -15,6 +13,8 @@ package org.omnifaces.util.copier;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.omnifaces.util.copier;
+
 import static java.lang.String.format;
 
 import java.lang.reflect.InvocationTargetException;
@@ -22,45 +22,39 @@ import java.lang.reflect.Method;
 
 /**
  * Copier that copies an object using the {@link Cloneable} facility.
- * 
+ *
  * @since 2.0
  * @author Arjan Tijms
  *
  */
 public class CloneCopier implements Copier {
-	
+
 	private static final String ERROR_CANT_CLONE =
 			"Can not clone object of type %s since it doesn't implement Cloneable";
-	
+
 	@Override
 	public Object copy(Object object) {
-		
+
 		if (!(object instanceof Cloneable)) {
 			throw new IllegalStateException(format(ERROR_CANT_CLONE, object.getClass()));
 		}
-		
-		if (object instanceof Cloneable) {
-			
-			try {
-				
-				Method cloneMethod = getMethod(object, "clone");
-				
-				if (!cloneMethod.isAccessible()) {
-					cloneMethod.setAccessible(true);
-				}
-				
-				return cloneMethod.invoke(object);
-				
-				
-			} catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-				throw new IllegalStateException(e);
+
+		try {
+
+			Method cloneMethod = getMethod(object, "clone");
+
+			if (!cloneMethod.isAccessible()) {
+				cloneMethod.setAccessible(true);
 			}
-			
+
+			return cloneMethod.invoke(object);
+
+
+		} catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			throw new IllegalStateException(e);
 		}
-		
-		return null;
 	}
-	
+
 	private Method getMethod(Object object, String name) {
 		for (Class<?> c = object.getClass(); c != null; c = c.getSuperclass()) {
 			for (Method method : c.getDeclaredMethods()) {
@@ -69,7 +63,7 @@ public class CloneCopier implements Copier {
 				}
 			}
 		}
-		
+
 		return null;
 	}
 

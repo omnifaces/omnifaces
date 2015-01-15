@@ -200,7 +200,7 @@ public final class Messages {
 	 * @author Bauke Scholtz
 	 * @since 1.1
 	 */
-	public static class Message {
+	public static final class Message {
 
 		private FacesMessage message;
 

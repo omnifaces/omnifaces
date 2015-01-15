@@ -92,18 +92,18 @@ public class BeanValidationEventListener implements SystemEventListener {
 	 */
 	private void handlePreValidate(UIInput component) {
 		final BeanValidator beanValidator = getBeanValidator(component);
-		final String validationGroups = disabled ? NoValidationGroup.class.getName() : this.validationGroups;
+		final String newValidationGroups = disabled ? NoValidationGroup.class.getName() : validationGroups;
 		final String originalValidationGroups = beanValidator.getValidationGroups();
 
 		if (originalValidationGroups != null) {
 			component.getAttributes().put(ATTRIBUTE_ORIGINAL_VALIDATION_GROUPS, originalValidationGroups);
 		}
 
-		beanValidator.setValidationGroups(validationGroups);
+		beanValidator.setValidationGroups(newValidationGroups);
 
 		if (LOGGER.isLoggable(Level.FINER)) {
 			LOGGER.finer(String.format(LOG_VALIDATION_GROUPS_OVERRIDDEN,
-				component.getClientId(), originalValidationGroups, validationGroups));
+				component.getClientId(), originalValidationGroups, newValidationGroups));
 		}
 	}
 

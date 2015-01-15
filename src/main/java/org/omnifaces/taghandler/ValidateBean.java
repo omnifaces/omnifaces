@@ -92,7 +92,7 @@ import org.omnifaces.util.copier.SerializationCopier;
  * <h3>Usage</h3>
  * <p>
  * Some examples
- * 
+ *
  * <p>
  * <b>Control bean validation per component</b>
  * <pre>
@@ -107,16 +107,16 @@ import org.omnifaces.util.copier.SerializationCopier;
  *     &lt;f:ajax execute="@form" listener="#{bean.itemChanged}" render="@form" /&gt;
  * &lt;/h:commandButton&gt;
  * </pre>
- * 
+ *
  * <p>
  * <b>Validate a bean at the class level</b>
  * <pre>
  *  &lt;h:inputText value="#{bean.product.item}" / &gt;
  *  &lt;h:inputText value="#{bean.product.order}" / &gt;
- * 
- *  &lt;o:validateBean value="#{bean.product}" validationGroups="com.example.MyGroup" / &gt; 
+ *
+ *  &lt;o:validateBean value="#{bean.product}" validationGroups="com.example.MyGroup" / &gt;
  * </pre>
- * 
+ *
  * <h3>Class level validation details</h3>
  * <p>
  * In order to validate a bean at the class level, all values from input components should first be actually set on that bean
@@ -124,21 +124,21 @@ import org.omnifaces.util.copier.SerializationCopier;
  * is only updated when validation passes. But for class level validation we seemingly can not validate until the model
  * is updated. To break this tie, a <em>copy</em> of the model bean is made first, and then values are stored in this copy
  * and validated there. If validation passes, the original bean is updated.
- * 
+ *
  * <p>
  * A bean is copied using the following strategies (in the order indicated):
  * <ol>
  * <li> <b>Cloning</b> - Bean must implement the {@link Cloneable} interface and support cloning according to the rules of that interface. See {@link CloneCopier}
  * <li> <b>Serialization</b> - Bean must implement the {@link Serializable} interface and support serialization according to the rules of that interface. See {@link SerializationCopier}
- * <li> <b>Copy constructor</b> - Bean must have an additional constructor (next to the default constructor) taking a single argument of its own 
+ * <li> <b>Copy constructor</b> - Bean must have an additional constructor (next to the default constructor) taking a single argument of its own
  *      type that initializes itself with the values of that passed in type. See {@link CopyCtorCopier}
  * <li> <b>New instance</b> - Bean should have a public no arguments (default) constructor. Every official JavaBean satisfies this requirement. Note
  *      that in this case no copy is made of the original bean, but just a new instance is created. See {@link NewInstanceCopier}
  * </ol>
- * 
+ *
  * <p>
  * If the above order is not ideal, or if an custom copy strategy is needed (e.g. when it's only needed to copy a few fields for the validation)
- * a strategy can be supplied explicitly via the <code>copier</code> attribute. The value of this attribute can be any of the build-in copier implementations 
+ * a strategy can be supplied explicitly via the <code>copier</code> attribute. The value of this attribute can be any of the build-in copier implementations
  * given above, or can be a custom implementation of the {@link Copier} interface.
  *
  *
@@ -167,11 +167,11 @@ public class ValidateBean extends TagHandler {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private TagAttribute validationGroups;
-	private TagAttribute disabled;
-	private TagAttribute copier;
-	private TagAttribute method;
-	private TagAttribute value;
+	private TagAttribute validationGroupsAttribute;
+	private TagAttribute disabledAttribute;
+	private TagAttribute copierAttribute;
+	private TagAttribute methodAttribute;
+	private TagAttribute valueAttribute;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -181,11 +181,11 @@ public class ValidateBean extends TagHandler {
 	 */
 	public ValidateBean(TagConfig config) {
 		super(config);
-		validationGroups = getAttribute("validationGroups");
-		disabled = getAttribute("disabled");
-		copier = getAttribute("copier");
-		method = getAttribute("method");
-		value = getAttribute("value");
+		validationGroupsAttribute = getAttribute("validationGroups");
+		disabledAttribute = getAttribute("disabled");
+		copierAttribute = getAttribute("copier");
+		methodAttribute = getAttribute("method");
+		valueAttribute = getAttribute("value");
 
 	}
 
@@ -196,7 +196,7 @@ public class ValidateBean extends TagHandler {
 	 */
 	@Override
 	public void apply(FaceletContext context, final UIComponent parent) throws IOException {
-		if (value == null && !(parent instanceof UICommand || parent instanceof UIInput)) {
+		if (valueAttribute == null && !(parent instanceof UICommand || parent instanceof UIInput)) {
 			throw new IllegalArgumentException(ERROR_INVALID_PARENT);
 		}
 
@@ -204,11 +204,11 @@ public class ValidateBean extends TagHandler {
 			return;
 		}
 
-		final boolean disabled = getBoolean(this.disabled, context);
-		final String validationGroups = getString(this.validationGroups, context);
-		final Object targetBase = getObject(value, context);
-		final String copierName = getString(copier, context);
-		final String method = getString(this.method, context);
+		final boolean disabled = getBoolean(disabledAttribute, context);
+		final String validationGroups = getString(validationGroupsAttribute, context);
+		final Object targetBase = getObject(valueAttribute, context);
+		final String copierName = getString(copierAttribute, context);
+		final String method = getString(methodAttribute, context);
 
 		if (targetBase != null) {
 
@@ -246,7 +246,7 @@ public class ValidateBean extends TagHandler {
 
 			        	final FacesContext context = FacesContext.getCurrentInstance();
 
-			        	forEachInputWithMatchingBase(context, targetForm, targetBase, new op2() { @Override public void invoke(EditableValueHolder v, ValueReference vr) {
+			        	forEachInputWithMatchingBase(context, targetForm, targetBase, new Operation() { @Override public void invoke(EditableValueHolder v, ValueReference vr) {
 			        		/* (v, vr) -> */ addCollectingValidator(v, vr, properties);
 		            	}});
 
@@ -262,7 +262,7 @@ public class ValidateBean extends TagHandler {
 
 			        	// First remove the collecting validator again, since it will otherwise be state saved with the component at the end of the lifecycle.
 
-			        	forEachInputWithMatchingBase(context, targetForm, targetBase, new op2() { @Override public void invoke(EditableValueHolder v, ValueReference vr) {
+			        	forEachInputWithMatchingBase(context, targetForm, targetBase, new Operation() { @Override public void invoke(EditableValueHolder v, ValueReference vr) {
 			        		/* (v, vr) -> */ removeCollectingValidator(v);
 		            	}});
 
@@ -307,7 +307,7 @@ public class ValidateBean extends TagHandler {
 		}
 	}
 
-	private void forEachInputWithMatchingBase(final FacesContext context, UIComponent targetForm, final Object targetBase, final Callback.With2Arguments<EditableValueHolder, ValueReference> operation) {
+	private void forEachInputWithMatchingBase(final FacesContext context, UIComponent targetForm, final Object targetBase, final Operation operation) {
 		forEachComponent(context)
 			.fromRoot(targetForm)
 			.ofTypes(EditableValueHolder.class)
@@ -378,8 +378,13 @@ public class ValidateBean extends TagHandler {
 		}
 	}
 
-	public abstract class op2 implements Callback.With2Arguments<EditableValueHolder, ValueReference> {
-		//
+	private static abstract class Operation implements Callback.WithArgument<Object[]> {
+		@Override
+		public void invoke(Object[] args) {
+			invoke((EditableValueHolder) args[0], (ValueReference) args[1]);
+		}
+
+		public abstract void invoke(EditableValueHolder valueHolder, ValueReference valueReference);
 	}
 
 	private static void addCollectingValidator(EditableValueHolder valueHolder, ValueReference valueReference,  Map<String, Object> propertyValues) {

@@ -83,8 +83,8 @@ public class ImportConstants extends TagHandler {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private String var;
-	private TagAttribute type;
+	private String varValue;
+	private TagAttribute typeAttribute;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -98,14 +98,14 @@ public class ImportConstants extends TagHandler {
 
 		if (var != null) {
 			if (var.isLiteral()) {
-				this.var = var.getValue();
+				varValue = var.getValue();
 			}
 			else {
 				throw new IllegalArgumentException(ERROR_INVALID_VAR);
 			}
 		}
 
-		type = getRequiredAttribute("type");
+		typeAttribute = getRequiredAttribute("type");
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -118,7 +118,7 @@ public class ImportConstants extends TagHandler {
 	 */
 	@Override
 	public void apply(FaceletContext context, UIComponent parent) throws IOException {
-		String type = this.type.getValue(context);
+		String type = typeAttribute.getValue(context);
 		Map<String, Object> constants = CONSTANTS_CACHE.get(type);
 
 		if (constants == null) {
@@ -126,7 +126,7 @@ public class ImportConstants extends TagHandler {
 			CONSTANTS_CACHE.put(type, constants);
 		}
 
-		context.setAttribute(var != null ? var : type.substring(type.lastIndexOf('.') + 1), constants);
+		context.setAttribute(varValue != null ? varValue : type.substring(type.lastIndexOf('.') + 1), constants);
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
@@ -170,8 +170,7 @@ public class ImportConstants extends TagHandler {
 
 			if (i > 0) {
 				try {
-					return toClass(
-						new StringBuilder(type.substring(0, i)).append('$').append(type.substring(i + 1)).toString());
+					return toClass(new StringBuilder(type).replace(i, i + 1, "$").toString());
 				}
 				catch (IllegalArgumentException ignore) {
 					// Just continue to the IllegalArgumentException on the original ClassNotFoundException.

@@ -251,7 +251,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		// Variables --------------------------------------------------------------------------------------------------
 
 		private OmniPartialViewContext context;
-		PartialResponseWriter wrapped;
+		private PartialResponseWriter wrapped;
 		private boolean updating;
 
 		// Constructors -----------------------------------------------------------------------------------------------
@@ -276,11 +276,11 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 			String loginURL = WebXml.INSTANCE.getFormLoginPage();
 
 			if (loginURL != null) {
-				FacesContext context = FacesContext.getCurrentInstance();
-				String loginViewId = normalizeViewId(context, loginURL);
+				FacesContext facesContext = FacesContext.getCurrentInstance();
+				String loginViewId = normalizeViewId(facesContext, loginURL);
 
-				if (loginViewId.equals(getViewId(context))) {
-					String originalURL = getRequestAttribute(context, "javax.servlet.forward.request_uri");
+				if (loginViewId.equals(getViewId(facesContext))) {
+					String originalURL = getRequestAttribute(facesContext, "javax.servlet.forward.request_uri");
 
 					if (originalURL != null) {
 						redirect(originalURL);

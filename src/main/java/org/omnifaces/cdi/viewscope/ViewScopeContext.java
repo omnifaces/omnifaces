@@ -87,9 +87,8 @@ public class ViewScopeContext implements Context {
 
 	@Override
 	public <T> T get(Contextual<T> type, CreationalContext<T> context) {
-		checkActive();
-		T bean = viewScopeManager.getBean(type);
-		return (bean != null) ? bean : viewScopeManager.createBean(type, context);
+		T instance = get(type);
+		return (instance != null) ? instance : viewScopeManager.createBean(type, context);
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------

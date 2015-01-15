@@ -80,7 +80,7 @@ public class Cache extends OutputFamily {
 		"No buffered response found in request, but 'useBuffer' set to true. Check setting the '%s' context parameter or installing the '%s' filter manually.",
 		CacheInitializer.CACHE_INSTALL_BUFFER_FILTER, OnDemandResponseBufferFilter.class
 	);
-	private static Class<? extends SystemEvent> PRE_RENDER = PreRenderViewEvent.class;
+	private static final Class<? extends SystemEvent> PRE_RENDER = PreRenderViewEvent.class;
 
 	private final State state = new State(getStateHelper());
 

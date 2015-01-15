@@ -84,7 +84,7 @@ public enum BeanManager {
 			beanClass = Class.forName("javax.enterprise.inject.spi.Bean");
 			creationalContextClass = Class.forName("javax.enterprise.context.spi.CreationalContext");
 		}
-		catch (Throwable e) {
+		catch (Exception | LinkageError e) {
 			throw new IllegalStateException(ERROR_CDI_API_UNAVAILABLE, e);
 		}
 
@@ -98,7 +98,7 @@ public enum BeanManager {
 		catch (IllegalStateException e) {
 			throw new IllegalStateException(ERROR_CDI_IMPL_UNAVAILABLE, e.getCause());
 		}
-		catch (Throwable e) {
+		catch (Exception | LinkageError e) {
 			throw new IllegalStateException(ERROR_JNDI_UNAVAILABLE, e);
 		}
 
@@ -112,7 +112,7 @@ public enum BeanManager {
 			createCreationalContext = beanManagerClass.getMethod("createCreationalContext", contextualClass);
 			getReference = beanManagerClass.getMethod("getReference", beanClass, Type.class, creationalContextClass);
 		}
-		catch (Throwable e) {
+		catch (Exception e) {
 			throw new IllegalStateException(ERROR_INITIALIZATION_FAIL, e);
 		}
 	}

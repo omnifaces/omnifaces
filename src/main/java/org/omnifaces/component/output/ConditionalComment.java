@@ -77,7 +77,7 @@ public class ConditionalComment extends OutputFamily {
 		_if("if");
 
 		// The below mess is necessary because "if" is a keyword in Java and cannot be used as enum value.
-		String toString;
+		private String toString;
 		PropertyKeys() {}
 		PropertyKeys(String toString) { this.toString = toString; }
 		@Override public String toString() { return (toString != null) ? toString : super.toString(); }

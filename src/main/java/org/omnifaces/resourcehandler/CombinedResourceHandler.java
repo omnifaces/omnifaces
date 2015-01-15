@@ -424,13 +424,13 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 		private String extension;
 		private String target;
-		private CombinedResourceInfo.Builder info;
+		private CombinedResourceInfo.Builder infoBuilder;
 		private UIComponent componentResource;
 
 		private CombinedResourceBuilder(String extension, String target) {
 			this.extension = extension;
 			this.target = target;
-			info = new CombinedResourceInfo.Builder();
+			infoBuilder = new CombinedResourceInfo.Builder();
 		}
 
 		private boolean add(UIComponent componentResource, ResourceIdentifier resourceIdentifier) {
@@ -438,7 +438,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 				return true;
 			}
 			else if (excludedResources.isEmpty() || !excludedResources.contains(resourceIdentifier)) {
-				info.add(resourceIdentifier);
+				infoBuilder.add(resourceIdentifier);
 
 				if (this.componentResource == null) {
 					this.componentResource = componentResource;
@@ -473,14 +473,14 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		}
 
 		private void create(FacesContext context, String rendererType) {
-			if (!info.isEmpty()) {
+			if (!infoBuilder.isEmpty()) {
 				if (componentResource == null) {
 					componentResource = new UIOutput();
 					context.getViewRoot().addComponentResource(context, componentResource, target);
 				}
 
 				componentResource.getAttributes().put("library", LIBRARY_NAME);
-				componentResource.getAttributes().put("name", info.create() + extension);
+				componentResource.getAttributes().put("name", infoBuilder.create() + extension);
 				componentResource.setRendererType(rendererType);
 				componentResource.setRendered(true);
 			}

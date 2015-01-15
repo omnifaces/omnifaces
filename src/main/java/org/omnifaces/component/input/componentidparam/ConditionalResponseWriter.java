@@ -181,8 +181,9 @@ public class ConditionalResponseWriter extends ResponseWriterWrapper {
 
 	@Override
 	public void write(char[] cbuf) throws IOException {
-		// TODO Auto-generated method stub
-		super.write(cbuf);
+		if (isForRenderedComponent()) {
+			super.write(cbuf);
+		}
 	}
 
 	@Override

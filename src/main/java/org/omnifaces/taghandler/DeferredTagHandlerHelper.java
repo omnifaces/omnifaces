@@ -89,7 +89,7 @@ final class DeferredTagHandlerHelper {
 			}
 			catch (FacesException e) {
 				throw new IllegalArgumentException(
-					String.format(ERROR_INVALID_ID, tag.getClass().getSimpleName(), instanceId, id));
+					String.format(ERROR_INVALID_ID, tag.getClass().getSimpleName(), instanceId, id), e);
 			}
 
 			if (binding != null) {
@@ -195,7 +195,7 @@ final class DeferredTagHandlerHelper {
 	 *
 	 * @author Bauke Scholtz
 	 */
-	static class DeferredAttributes {
+	static final class DeferredAttributes {
 
 		private Map<Method, ValueExpression> attributes;
 

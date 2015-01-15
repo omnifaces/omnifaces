@@ -74,24 +74,6 @@ public final class Callback {
 	}
 
 	/**
-	 * Use this if you need a callback which takes two arguments.
-	 *
-	 * @author Arjan Tijms
-	 * @param <A> The first argument type.
-	 * @param <B> The second argument type.
-	 */
-	public interface With2Arguments<A, B> {
-
-		/**
-		 * This method should be invoked by the method where you're passing this callback instance to.
-		 * @param a The first callback argument to work with.
-		 * @param b The second callback argument to work with.
-		 */
-		void invoke(A a, B b);
-
-	}
-
-	/**
 	 * Use this if you need a callback which takes an argument and returns a value.
 	 *
 	 * @author Bauke Scholtz

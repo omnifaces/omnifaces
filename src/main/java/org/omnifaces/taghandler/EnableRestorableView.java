@@ -12,6 +12,8 @@
  */
 package org.omnifaces.taghandler;
 
+import static java.lang.Boolean.TRUE;
+
 import java.io.IOException;
 
 import javax.faces.application.ViewExpiredException;
@@ -105,7 +107,7 @@ public class EnableRestorableView extends TagHandler {
 			return;
 		}
 
-		parent.getAttributes().put(EnableRestorableView.class.getName(), true);
+		parent.getAttributes().put(EnableRestorableView.class.getName(), TRUE);
 	}
 
 }

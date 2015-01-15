@@ -112,7 +112,7 @@ public class GenericEnumConverter implements Converter {
 			return Enum.valueOf(enumType, submittedValue);
 		}
 		catch (IllegalArgumentException e) {
-			throw new ConverterException(createError(ERROR_NO_ENUM_VALUE, submittedValue, enumType));
+			throw new ConverterException(createError(ERROR_NO_ENUM_VALUE, submittedValue, enumType), e);
 		}
 	}
 

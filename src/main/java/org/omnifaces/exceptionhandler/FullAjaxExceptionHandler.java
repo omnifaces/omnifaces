@@ -398,10 +398,10 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	private String getViewIdAndPrepareParamsIfNecessary(FacesContext context, String errorPageLocation) {
 		String[] parts = errorPageLocation.split("\\?", 2);
 
-		if (parts.length == 2) {
+		//if (parts.length == 2) {
 			// Map<String, List<String>> params = toParameterMap(parts[1]);
 			// TODO: #287: make those params available via #{param(Values)}. Request wrapper needed :|
-		}
+		//}
 
 		return normalizeViewId(context, parts[0]);
 	}

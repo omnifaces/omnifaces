@@ -236,7 +236,6 @@ public class GraphicResource extends DynamicResource {
 
 		Method method = methodReference.getMethod();
 		Object[] convertedParams = convertToObjects(getContext(), params, method.getParameterTypes());
-		Object content;
 
 		try {
 			content = method.invoke(methodReference.getBase(), convertedParams);

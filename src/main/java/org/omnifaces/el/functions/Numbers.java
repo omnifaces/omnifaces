@@ -79,10 +79,6 @@ public final class Numbers {
 			return null;
 		}
 
-		if (currencySymbol == null) {
-			throw new NullPointerException("currencySymbol");
-		}
-
 		DecimalFormat formatter = (DecimalFormat) NumberFormat.getCurrencyInstance(getLocale());
 		DecimalFormatSymbols symbols = formatter.getDecimalFormatSymbols();
 		symbols.setCurrencySymbol(currencySymbol);
@@ -103,10 +99,6 @@ public final class Numbers {
 	public static String formatNumber(Number number, String pattern) {
 		if (number == null) {
 			return null;
-		}
-
-		if (pattern == null) {
-			throw new NullPointerException("pattern");
 		}
 
 		DecimalFormat formatter = (DecimalFormat) NumberFormat.getNumberInstance(getLocale());

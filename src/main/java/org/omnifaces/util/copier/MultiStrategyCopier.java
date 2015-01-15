@@ -24,13 +24,13 @@ import java.util.List;
  * <p>
  * The strategies that will be attempted in order are:
  * <ol>
- * <li> Cloning 
+ * <li> Cloning
  * <li> Serialization
  * <li> Copy constructor
  * <li> New instance
  * </ol>
- * 
- * 
+ *
+ *
  * @since 2.0
  * @author Arjan Tijms
  *
@@ -40,20 +40,20 @@ public class MultiStrategyCopier implements Copier {
 	private final static List<Copier> copiers = asList( // Note: copier instances used here must be thread-safe!
 		new CloneCopier(), new SerializationCopier(), new CopyCtorCopier(), new NewInstanceCopier()
 	);
-	
+
 	@Override
 	public Object copy(Object object) {
-		
+
 		for (Copier copier : copiers) {
-			
+
 			try {
 				return copier.copy(object);
-			} catch (Exception e) {
-				// Ignore
+			} catch (Exception ignore) {
+				continue;
 			}
-			
+
 		}
-		
+
 		throw new IllegalStateException("Can't copy object of type " + object.getClass() + ". No copier appeared to be capable of copying it.");
 	}
 

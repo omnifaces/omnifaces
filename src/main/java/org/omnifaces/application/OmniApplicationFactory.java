@@ -70,7 +70,7 @@ public class OmniApplicationFactory extends ApplicationFactory {
 	 * nor wraps the {@link OmniApplication}, then it will be wrapped by a new instance of {@link OmniApplication}.
 	 */
 	@Override
-	public synchronized void setApplication(Application application) {
+	public void setApplication(Application application) {
 		wrapped.setApplication(createOmniApplication(application));
 	}
 
@@ -88,7 +88,7 @@ public class OmniApplicationFactory extends ApplicationFactory {
 	 * If the given application not an instance of {@link OmniApplication}, nor wraps the {@link OmniApplication}, then
 	 * it will be wrapped by a new instance of {@link OmniApplication} and set as the current instance and returned.
 	 */
-	private Application createOmniApplication(final Application application) {
+	private synchronized Application createOmniApplication(final Application application) {
 		Application newApplication = application;
 
 		while (!(newApplication instanceof OmniApplication) && newApplication instanceof ApplicationWrapper) {

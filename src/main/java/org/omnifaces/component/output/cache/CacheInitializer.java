@@ -35,7 +35,11 @@ import org.omnifaces.filter.OnDemandResponseBufferFilter;
  * @author Arjan Tijms
  * @see ApplicationListener
  */
-public class CacheInitializer {
+public final class CacheInitializer {
+
+	private CacheInitializer() {
+		// Hide constructor.
+	}
 
 	// Web context parameter to set the cache provider implementation
 	public static final String CACHE_PROVIDER_INIT_PARAM_NAME = "org.omnifaces.CACHE_PROVIDER";

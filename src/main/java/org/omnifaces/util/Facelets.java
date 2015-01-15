@@ -13,7 +13,11 @@ import javax.faces.view.facelets.TagAttribute;
 */
 @Typed
 public final class Facelets {
-	
+
+	private Facelets() {
+		// Hide constructor.
+	}
+
 	/**
 	 * Return the String value of the given attribute
 	 * @param tagAttribute The attribute to retrieve the value from
@@ -23,7 +27,7 @@ public final class Facelets {
 	public static String getString(TagAttribute tagAttribute, FaceletContext context) {
 		return tagAttribute != null ? tagAttribute.getValue(context) : null;
 	}
-	
+
 	/**
 	 * Return the boolean value of the given attribute
 	 * @param tagAttribute The attribute to retrieve the value from
@@ -33,7 +37,7 @@ public final class Facelets {
 	public static boolean getBoolean(TagAttribute tagAttribute, FaceletContext context) {
 		return tagAttribute != null ? tagAttribute.getBoolean(context) : false;
 	}
-	
+
 	/**
 	 * Return the Object value of the given attribute
 	 * @param tagAttribute The attribute to retrieve the value from

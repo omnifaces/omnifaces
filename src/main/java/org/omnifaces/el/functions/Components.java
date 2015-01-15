@@ -19,11 +19,11 @@ import javax.faces.component.UIComponent;
 
 /**
  * Collection of EL functions for working with components.
- * 
+ *
  * @since 2.0
  * @author Arjan Tijms
  */
-public class Components {
+public final class Components {
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -39,7 +39,7 @@ public class Components {
 	 * <p>
 	 * The regular attribute collection ({@link UIComponent#getAttributes()}) does exactly the reverse; it looks at a component property
 	 * first, then at the attribute collection and only looks at a value binding as the last option.
-	 * 
+	 *
 	 * @param component The component for which the attribute is to be evaluated
 	 * @param name Name of attribute that is to be evaluated
 	 * @return The value of the attribute, or null if either the component is null or if there's isn't an attribute by that name

@@ -123,10 +123,10 @@ public class SelectItemsIndexConverter implements Converter {
 		if (selectItemValues == null) {
 			selectItemValues = SelectItemsUtils.collectAllValuesFromSelectItems(context, component);
 			setContextAttribute(key, selectItemValues);
-		}
 
-		if (selectItemValues == null) {
-			throw new ConverterException(createError(ERROR_SELECT_ITEMS_LIST_NULL, component.getClientId(context)));
+			if (selectItemValues == null) {
+				throw new ConverterException(createError(ERROR_SELECT_ITEMS_LIST_NULL, component.getClientId(context)));
+			}
 		}
 
 		return selectItemValues;

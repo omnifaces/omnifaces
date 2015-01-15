@@ -21,36 +21,36 @@ import org.omnifaces.util.Callback;
 /**
  * Implementation of a read only value expression that can be used when the value is not yet available at construction time, or when the
  * value would be too expensive to create and it's not yet clear if the expression will actually be evaluated.
- * 
+ *
  * <p>
  * A callback (lambda in Java 8) that obtains the value can be provided, or the getValue() method can be overridden.
- * 
+ *
  * @since 2.0
  * @author Arjan Tijms
  */
 public class ReadOnlyValueExpression extends ValueExpression {
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	private Callback.ReturningWithArgument<Object, ELContext> callbackWithArgument;
 	private Callback.Returning<Object> callbackReturning;
-	
+
 	private Class<?> expectedType;
-	
+
 	public ReadOnlyValueExpression(Class<?> expectedType, Callback.Returning<Object> callbackReturning) {
 		this(expectedType);
 		this.callbackReturning = callbackReturning;
 	}
-	
+
 	public ReadOnlyValueExpression(Class<?> expectedType, Callback.ReturningWithArgument<Object, ELContext> callbackWithArgument) {
 		this(expectedType);
 		this.callbackWithArgument = callbackWithArgument;
 	}
-	
+
 	public ReadOnlyValueExpression(Class<?> expectedType) {
 		this.expectedType = expectedType;
 	}
-	
+
 	public ReadOnlyValueExpression() {}
 
 	@Override
@@ -58,11 +58,11 @@ public class ReadOnlyValueExpression extends ValueExpression {
 		if (callbackReturning != null) {
 			return callbackReturning.invoke();
 		}
-		
+
 		if (callbackWithArgument != null) {
 			return callbackWithArgument.invoke(context);
 		}
-		
+
 		return null;
 	}
 
@@ -96,11 +96,11 @@ public class ReadOnlyValueExpression extends ValueExpression {
 	public boolean equals(Object obj) {
 		return (obj instanceof ReadOnlyValueExpression && equals((ReadOnlyValueExpression) obj));
 	}
-	
-	public boolean equals(ReadOnlyValueExpression other) {
+
+	private boolean equals(ReadOnlyValueExpression other) {
 		Object value = getValue(null);
 		Object otherValue = other == null ? null : other.getValue(null);
-		
+
 		return other != null && (value != null && otherValue != null && (value == otherValue || value.equals(otherValue)));
 	}
 
@@ -114,5 +114,5 @@ public class ReadOnlyValueExpression extends ValueExpression {
 	public boolean isLiteralText() {
 		return true;
 	}
-	
+
 }

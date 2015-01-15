@@ -34,7 +34,7 @@ public class DefaultResourceHandler extends ResourceHandlerWrapper {
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	private ResourceHandler wrapped;
-	private int args;
+	private int argumentCount;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -47,17 +47,17 @@ public class DefaultResourceHandler extends ResourceHandlerWrapper {
 		this.wrapped = wrapped;
 		Class<? extends ResourceHandler> cls = wrapped.getClass();
 
-		for (int args = 3; args > 1; args--) {
-			Class<?>[] paramTypes = new Class[args];
+		for (int i = 3; i > 1; i--) {
+			Class<?>[] paramTypes = new Class[i];
 			fill(paramTypes, String.class);
 
 			try {
 				cls.getDeclaredMethod("createResource", paramTypes);
-				this.args = args;
+				argumentCount = i;
 				break;
 			}
 			catch (NoSuchMethodException ignore) {
-				//
+				continue;
 			}
 		}
 	}
@@ -87,7 +87,7 @@ public class DefaultResourceHandler extends ResourceHandlerWrapper {
 	 */
 	@Override
 	public Resource createResource(String resourceName, String libraryName, String contentType) {
-		switch (args) {
+		switch (argumentCount) {
 			case 3: return getWrapped().createResource(resourceName, libraryName, contentType);
 			case 2: return getWrapped().createResource(resourceName, libraryName);
 			default: return getWrapped().createResource(resourceName);

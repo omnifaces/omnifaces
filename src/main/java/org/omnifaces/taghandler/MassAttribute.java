@@ -121,7 +121,7 @@ public class MassAttribute extends TagHandler {
 				cls = Class.forName(className);
 			}
 			catch (ClassNotFoundException e) {
-				throw new IllegalArgumentException(String.format(ERROR_UNAVAILABLE_TARGET, className));
+				throw new IllegalArgumentException(String.format(ERROR_UNAVAILABLE_TARGET, className), e);
 			}
 
 			if (!UIComponent.class.isAssignableFrom(cls)) {

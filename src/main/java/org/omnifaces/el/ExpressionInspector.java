@@ -16,7 +16,11 @@ import javax.el.ValueReference;
  *
  * @since 1.4
  */
-public class ExpressionInspector {
+public final class ExpressionInspector {
+
+	private ExpressionInspector() {
+		// Hide constructor.
+	}
 
 	/**
 	 * Gets the ValueReference from a ValueExpression, without any checks whether the property is actually

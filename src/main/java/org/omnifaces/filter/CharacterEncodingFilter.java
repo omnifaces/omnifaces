@@ -95,14 +95,14 @@ public class CharacterEncodingFilter extends HttpFilter {
 	 */
 	@Override
 	public void init() throws ServletException {
-		String encoding = getInitParameter(INIT_PARAM_ENCODING);
+		String encodingParam = getInitParameter(INIT_PARAM_ENCODING);
 
-		if (encoding != null) {
+		if (encodingParam != null) {
 			try {
-				this.encoding = Charset.forName(encoding);
+				encoding = Charset.forName(encodingParam);
 			}
 			catch (Exception e) {
-				throw new IllegalArgumentException(String.format(ERROR_ENCODING, encoding), e);
+				throw new IllegalArgumentException(String.format(ERROR_ENCODING, encodingParam), e);
 			}
 		}
 	}

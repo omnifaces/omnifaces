@@ -171,27 +171,27 @@ final class CombinedResourceInfo {
 			}
 
 			resources.add(resource);
+			URLConnection connection;
 
 			try {
-				URLConnection connection;
-
+				connection = resource.getURL().openConnection();
+			}
+			catch (Exception richFacesDoesNotSupportThis) {
 				try {
-					connection = resource.getURL().openConnection();
-				}
-				catch (Exception richFacesDoesNotSupportThis) {
 					connection = new URL(getRequestDomainURL(context) + resource.getRequestPath()).openConnection();
 				}
-
-				contentLength += connection.getContentLength();
-				long lastModified = connection.getLastModified();
-
-				if (lastModified > this.lastModified) {
-					this.lastModified = lastModified;
+				catch (IOException ignore) {
+					// Can't and shouldn't handle it at this point.
+					// It would be thrown during resource streaming anyway which is a better moment.
+					return;
 				}
 			}
-			catch (IOException e) {
-				// Can't and shouldn't handle it at this point.
-				// It would be thrown during resource streaming anyway which is a better moment.
+
+			contentLength += connection.getContentLength();
+			long lastModified = connection.getLastModified();
+
+			if (lastModified > this.lastModified) {
+				this.lastModified = lastModified;
 			}
 		}
 	}

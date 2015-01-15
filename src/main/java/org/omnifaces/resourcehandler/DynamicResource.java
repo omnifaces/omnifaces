@@ -79,7 +79,7 @@ public abstract class DynamicResource extends Resource {
 		}
 		catch (MalformedURLException e) {
 			// This exception should never occur.
-			throw new RuntimeException(e);
+			throw new UnsupportedOperationException(e);
 		}
 	}
 

@@ -96,10 +96,10 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 				parent.children.remove(this);
 
 				// Fix the indexes of the children (that's why it needs to be synchronized).
-				int index = 0;
+				int newIndex = 0;
 				for (TreeModel<T> child : parent.children) {
-					((AbstractTreeModel<T>) child).index = index;
-					index++;
+					((AbstractTreeModel<T>) child).index = newIndex;
+					newIndex++;
 				}
 			}
 		}

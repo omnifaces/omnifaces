@@ -139,21 +139,21 @@ public class GzipResponseFilter extends HttpFilter {
 	 */
 	@Override
 	public void init() throws ServletException {
-		String threshold = getInitParameter(INIT_PARAM_THRESHOLD);
+		String thresholdParam = getInitParameter(INIT_PARAM_THRESHOLD);
 
-		if (threshold != null) {
-			if (!threshold.matches("[0-9]{1,4}")) {
-				throw new ServletException(String.format(ERROR_THRESHOLD, threshold));
+		if (thresholdParam != null) {
+			if (!thresholdParam.matches("[0-9]{1,4}")) {
+				throw new ServletException(String.format(ERROR_THRESHOLD, thresholdParam));
 			}
 			else {
-				this.threshold = Integer.valueOf(threshold);
+				threshold = Integer.valueOf(thresholdParam);
 			}
 		}
 
-		String mimetypes = getInitParameter(INIT_PARAM_MIMETYPES);
+		String mimetypesParam = getInitParameter(INIT_PARAM_MIMETYPES);
 
-		if (mimetypes != null) {
-			this.mimetypes = new HashSet<>(Arrays.asList(mimetypes.split("\\s*,\\s*")));
+		if (mimetypesParam != null) {
+			mimetypes = new HashSet<>(Arrays.asList(mimetypesParam.split("\\s*,\\s*")));
 		}
 	}
 

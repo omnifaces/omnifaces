@@ -398,7 +398,7 @@ public final class FacesViews {
 				String.format(
 					"Value '%s' is not valid for context parameter for '%s'",
 					extensionActionString, FACES_VIEWS_EXTENSION_ACTION_PARAM_NAME
-				)
+				), e
 			);
 		}
 	}
@@ -416,7 +416,7 @@ public final class FacesViews {
 				String.format(
 					"Value '%s' is not valid for context parameter for '%s'",
 					pathActionString, FACES_VIEWS_PATH_ACTION_PARAM_NAME
-				)
+				), e
 			);
 		}
 	}
@@ -434,7 +434,7 @@ public final class FacesViews {
 				String.format(
 					"Value '%s' is not valid for context parameter for '%s'",
 					dispatchMethodString, FACES_VIEWS_DISPATCH_METHOD_PARAM_NAME
-				)
+				), e
 			);
 		}
 	}
@@ -456,7 +456,7 @@ public final class FacesViews {
 				String.format(
 					"Value '%s' is not valid for context parameter for '%s'",
 					viewHandlerModeString, FACES_VIEWS_VIEW_HANDLER_MODE_PARAM_NAME
-				)
+				), e
 			);
 		}
 	}

@@ -203,14 +203,14 @@ public class CacheControlFilter extends HttpFilter {
 			return; // Don't cache during development.
 		}
 
-		String expires = getInitParameter(INIT_PARAM_EXPIRES);
+		String expiresParam = getInitParameter(INIT_PARAM_EXPIRES);
 
-		if (expires != null) {
-			if (!expires.matches("[0-9]{1,9}[wdhms]?")) {
-				throw new ServletException(String.format(ERROR_EXPIRES, expires));
+		if (expiresParam != null) {
+			if (!expiresParam.matches("[0-9]{1,9}[wdhms]?")) {
+				throw new ServletException(String.format(ERROR_EXPIRES, expiresParam));
 			}
 
-			String[] parts = expires.split("(?=[wdhms])");
+			String[] parts = expiresParam.split("(?=[wdhms])");
 			long number = Long.valueOf(parts[0]);
 
 			if (parts.length > 1) {
@@ -218,7 +218,7 @@ public class CacheControlFilter extends HttpFilter {
 				number = Unit.valueOf(unit.toUpperCase()).toSeconds(number);
 			}
 
-			this.expires = number;
+			expires = number;
 		}
 	}
 
