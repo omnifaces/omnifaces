@@ -226,12 +226,14 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 	}
 
 	private static OmniPartialViewContext unwrap(PartialViewContext context) {
-		while (!(context instanceof OmniPartialViewContext) && context instanceof PartialViewContextWrapper) {
-			context = ((PartialViewContextWrapper) context).getWrapped();
+		PartialViewContext unwrappedContext = context;
+
+		while (!(unwrappedContext instanceof OmniPartialViewContext) && unwrappedContext instanceof PartialViewContextWrapper) {
+			unwrappedContext = ((PartialViewContextWrapper) unwrappedContext).getWrapped();
 		}
 
-		if (context instanceof OmniPartialViewContext) {
-			return (OmniPartialViewContext) context;
+		if (unwrappedContext instanceof OmniPartialViewContext) {
+			return (OmniPartialViewContext) unwrappedContext;
 		}
 		else {
 			return null;

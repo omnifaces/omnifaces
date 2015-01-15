@@ -400,8 +400,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 				ResourceHandler handler = context.getApplication().getResourceHandler();
 
 				for (ResourceIdentifier identifier : resourceIdentifiers) {
-					rendererType = handler.getRendererTypeForResourceName(identifier.getName());
-					add(context, null, rendererType, identifier, target);
+					add(context, null, handler.getRendererTypeForResourceName(identifier.getName()), identifier, target);
 				}
 
 				return true;

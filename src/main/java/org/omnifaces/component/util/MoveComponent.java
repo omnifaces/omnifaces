@@ -164,74 +164,93 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
             List<UIComponent> children = getChildrenInNewList();
 
             switch (getDestination()) {
-            	case BEFORE: {
-
-	            		// Find the index the target component has among its siblings, this directly
-            			// becomes the target index of where to insert all the components that are
-            			// to be moved.
-	            		int targetIndex = component.getParent().getChildren().indexOf(component);
-
-	            		for (int i = 0; i < children.size(); i++) {
-	            			UIComponent childComponent = children.get(i);
-	                    	component.getParent().getChildren().add(targetIndex + i, childComponent);
-	                    	// Setting a component's ID to its own ID is necessary for MyFaces, who doesn't update the client-id
-	                    	// for the new location of the component in the tree. This action causes the client id to be nulled
-	                    	// and recreated when referenced.
-	                    	childComponent.setId(childComponent.getId());
-	                    }
-            		}
+            	case BEFORE:
+            		moveBefore(component, children);
             		break;
             	case ADD_FIRST:
-            		for (int i = 0; i < children.size(); i++) {
-            			UIComponent childComponent = children.get(i);
-                    	component.getChildren().add(i, childComponent);
-                    	childComponent.setId(childComponent.getId());
-                    }
+            		moveAddFirst(component, children);
             		break;
             	case ADD_LAST:
-            		for (UIComponent childComponent : children) {
-						component.getChildren().add(childComponent);
-						childComponent.setId(childComponent.getId());
-					}
+            		moveAddLast(component, children);
             		break;
             	case FACET:
-            		for (UIComponent childComponent : children) {
-						component.getFacets().put(getFacet(), childComponent);
-						childComponent.setId(childComponent.getId());
-					}
+            		moveFacet(component, children);
             		break;
             	case BEHAVIOR:
-            		if (component instanceof ClientBehaviorHolder) {
-
-            			ClientBehaviorHolder clientBehaviorHolder = (ClientBehaviorHolder) component;
-            			List<ClientBehavior> behaviors = clientBehaviorHolder.getClientBehaviors().get(attachedEventName);
-
-            			if (behaviors == null || !behaviors.contains(attachedBehavior)) { // Guard against adding ourselves twice
-            				clientBehaviorHolder.addClientBehavior(attachedEventName, attachedBehavior);
-            			}
-            		}
+            		moveBehavior(component, attachedEventName, attachedBehavior);
             		break;
-            	case AFTER: {
-	            		// Find the index the target component has among its siblings
-	            		int targetComponentIndex = component.getParent().getChildren().indexOf(component);
-
-	            		// The insertion point will be AFTER the target component
-	            		int targetIndex = targetComponentIndex + 1;
-
-            			// If the target component was not the last sibling, add all the components that are to be moved
-            			// to the position after the target component, continuously shifting the subsequent siblings
-            			// to the right, otherwise they will be added as the last siblings
-            			for (int i = 0; i < children.size(); i++) {
-                			UIComponent childComponent = children.get(i);
-                        	component.getParent().getChildren().add(targetIndex + i, childComponent);
-                        	childComponent.setId(childComponent.getId());
-                        }
-            		}
+            	case AFTER:
+            		moveAfter(component, children);
             		break;
             }
-
         }
     }
+
+	private void moveBefore(UIComponent component, List<UIComponent> children) {
+		// Find the index the target component has among its siblings, this directly
+		// becomes the target index of where to insert all the components that are
+		// to be moved.
+		int targetIndex = component.getParent().getChildren().indexOf(component);
+
+		for (int i = 0; i < children.size(); i++) {
+			UIComponent childComponent = children.get(i);
+			component.getParent().getChildren().add(targetIndex + i, childComponent);
+			// Setting a component's ID to its own ID is necessary for MyFaces, who doesn't update the client-id
+			// for the new location of the component in the tree. This action causes the client id to be nulled
+			// and recreated when referenced.
+			childComponent.setId(childComponent.getId());
+		}
+	}
+
+	private void moveAddFirst(UIComponent component, List<UIComponent> children) {
+		for (int i = 0; i < children.size(); i++) {
+			UIComponent childComponent = children.get(i);
+			component.getChildren().add(i, childComponent);
+			childComponent.setId(childComponent.getId());
+		}
+	}
+
+	private void moveAddLast(UIComponent component, List<UIComponent> children) {
+		for (UIComponent childComponent : children) {
+			component.getChildren().add(childComponent);
+			childComponent.setId(childComponent.getId());
+		}
+	}
+
+	private void moveFacet(UIComponent component, List<UIComponent> children) {
+		for (UIComponent childComponent : children) {
+			component.getFacets().put(getFacet(), childComponent);
+			childComponent.setId(childComponent.getId());
+		}
+	}
+
+	private void moveBehavior(UIComponent component, String event, ClientBehavior behavior) {
+		if (component instanceof ClientBehaviorHolder) {
+			ClientBehaviorHolder clientBehaviorHolder = (ClientBehaviorHolder) component;
+			List<ClientBehavior> behaviors = clientBehaviorHolder.getClientBehaviors().get(event);
+
+			if (behaviors == null || !behaviors.contains(behavior)) { // Guard against adding ourselves twice
+				clientBehaviorHolder.addClientBehavior(event, behavior);
+			}
+		}
+	}
+
+	private void moveAfter(UIComponent component, List<UIComponent> children) {
+		// Find the index the target component has among its siblings
+		int targetComponentIndex = component.getParent().getChildren().indexOf(component);
+
+		// The insertion point will be AFTER the target component
+		int targetIndex = targetComponentIndex + 1;
+
+		// If the target component was not the last sibling, add all the components that are to be moved
+		// to the position after the target component, continuously shifting the subsequent siblings
+		// to the right, otherwise they will be added as the last siblings
+		for (int i = 0; i < children.size(); i++) {
+			UIComponent childComponent = children.get(i);
+			component.getParent().getChildren().add(targetIndex + i, childComponent);
+			childComponent.setId(childComponent.getId());
+		}
+	}
 
     private List<UIComponent> getChildrenInNewList() {
     	return new ArrayList<>(getChildren());

@@ -52,7 +52,7 @@ public final class Strings {
 		}
 
 		if (text.length() > size) {
-			text = text.substring(0, size).trim() + "...";
+			return text.substring(0, size).trim() + "...";
 		}
 
 		return text;

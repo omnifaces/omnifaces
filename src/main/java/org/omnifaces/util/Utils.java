@@ -692,58 +692,66 @@ public final class Utils {
 				builder.append("\\u00").append(Integer.toHexString(c));
 			}
 			else if (c < UNICODE_BEGIN_PRINTABLE_ASCII) {
-				switch (c) {
-					case '\b':
-						builder.append('\\').append('b');
-						break;
-					case '\n':
-						builder.append('\\').append('n');
-						break;
-					case '\t':
-						builder.append('\\').append('t');
-						break;
-					case '\f':
-						builder.append('\\').append('f');
-						break;
-					case '\r':
-						builder.append('\\').append('r');
-						break;
-					default:
-						if (c > UNICODE_1_BYTE) {
-							builder.append("\\u00").append(Integer.toHexString(c));
-						}
-						else {
-							builder.append("\\u000").append(Integer.toHexString(c));
-						}
-
-						break;
-				}
+				escapeJSControlCharacter(builder, c);
 			}
 			else {
-				switch (c) {
-					case '\'':
-						if (escapeSingleQuote) {
-							builder.append('\\');
-						}
-						builder.append('\'');
-						break;
-					case '"':
-						builder.append('\\').append('"');
-						break;
-					case '\\':
-						builder.append('\\').append('\\');
-						break;
-					case '/':
-						builder.append('\\').append('/');
-						break;
-					default:
-						builder.append(c);
-						break;
-				}
+				escapeJSASCIICharacter(builder, c, escapeSingleQuote);
 			}
 		}
 
 		return builder.toString();
+	}
+
+	private static void escapeJSControlCharacter(StringBuilder builder, char c) {
+		switch (c) {
+			case '\b':
+				builder.append('\\').append('b');
+				break;
+			case '\n':
+				builder.append('\\').append('n');
+				break;
+			case '\t':
+				builder.append('\\').append('t');
+				break;
+			case '\f':
+				builder.append('\\').append('f');
+				break;
+			case '\r':
+				builder.append('\\').append('r');
+				break;
+			default:
+				if (c > UNICODE_1_BYTE) {
+					builder.append("\\u00").append(Integer.toHexString(c));
+				}
+				else {
+					builder.append("\\u000").append(Integer.toHexString(c));
+				}
+
+				break;
+		}
+	}
+
+	private static void escapeJSASCIICharacter(StringBuilder builder, char c, boolean escapeSingleQuote) {
+		switch (c) {
+			case '\'':
+				if (escapeSingleQuote) {
+					builder.append('\\');
+				}
+				builder.append('\'');
+				break;
+			case '"':
+				builder.append('\\').append('"');
+				break;
+			case '\\':
+				builder.append('\\').append('\\');
+				break;
+			case '/':
+				builder.append('\\').append('/');
+				break;
+			default:
+				builder.append(c);
+				break;
+		}
 	}
 
 }

@@ -72,13 +72,13 @@ public class RestorableViewHandler extends ViewHandlerWrapper {
 			return restoredView;
 		}
 
-		viewId = normalizeViewId(viewId);
-		UIViewRoot createdView = createView(context, viewId);
+		String normalizedViewId = normalizeViewId(viewId);
+		UIViewRoot createdView = createView(context, normalizedViewId);
 		FacesContext temporaryContext = new TemporaryViewFacesContext(context, createdView);
 
 		try {
 			setContext(temporaryContext);
-			getViewDeclarationLanguage(temporaryContext, viewId).buildView(temporaryContext, createdView);
+			getViewDeclarationLanguage(temporaryContext, normalizedViewId).buildView(temporaryContext, createdView);
 		}
 		catch (IOException e) {
 			throw new FacesException(e);

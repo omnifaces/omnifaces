@@ -539,11 +539,12 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
    */
   @GuardedBy("evictionLock")
   void runTasksInChain(Task task) {
-    while (task != null) {
-      Task current = task;
-      task = task.getNext();
-      current.setNext(null);
-      current.run();
+    Task nextTask = task;
+    while (nextTask != null) {
+      Task currentTask = nextTask;
+      nextTask = nextTask.getNext();
+      currentTask.setNext(null);
+      currentTask.run();
     }
   }
 

@@ -34,7 +34,14 @@ public abstract class DefaultResource extends ResourceWrapper implements Externa
 	private Resource wrapped;
 
 	/**
-	 * Constructs a new resource wrapping the given resource.
+	 * Constructs a new default resource.
+	 */
+	public DefaultResource() {
+		// Keep default c'tor alive for Externalizable.
+	}
+
+	/**
+	 * Constructs a new default resource wrapping the given resource.
 	 * @param wrapped The resource to be wrapped.
 	 */
 	public DefaultResource(Resource wrapped) {

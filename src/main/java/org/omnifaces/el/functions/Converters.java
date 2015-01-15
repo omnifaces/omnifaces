@@ -172,14 +172,10 @@ public final class Converters {
 			throw new IllegalArgumentException(String.format(ERROR_NOT_AN_ARRAY, array.getClass()));
 		}
 
-		if (separator == null) {
-			separator = "";
-		}
-
 		StringBuilder builder = new StringBuilder();
 
 		for (int i = 0; i < Array.getLength(array); i++) {
-			if (i > 0) {
+			if (i > 0 && separator != null) {
 				builder.append(separator);
 			}
 
@@ -202,15 +198,11 @@ public final class Converters {
 			return null;
 		}
 
-		if (separator == null) {
-			separator = "";
-		}
-
 		StringBuilder builder = new StringBuilder();
 		int i = 0;
 
 		for (E element : collection) {
-			if (i++ > 0) {
+			if (i++ > 0 && separator != null) {
 				builder.append(separator);
 			}
 
@@ -236,23 +228,21 @@ public final class Converters {
 			return null;
 		}
 
-		if (pairSeparator == null) {
-			pairSeparator = "";
-		}
-
-		if (entrySeparator == null) {
-			entrySeparator = "";
-		}
-
 		StringBuilder builder = new StringBuilder();
 		int i = 0;
 
 		for (Entry<K, V> entry : map.entrySet()) {
-			if (i++ > 0) {
+			if (i++ > 0 && entrySeparator != null) {
 				builder.append(entrySeparator);
 			}
 
-			builder.append(entry.getKey()).append(pairSeparator).append(entry.getValue());
+			builder.append(entry.getKey());
+
+			if (pairSeparator != null) {
+				builder.append(pairSeparator);
+			}
+
+			builder.append(entry.getValue());
 		}
 
 		return builder.toString();

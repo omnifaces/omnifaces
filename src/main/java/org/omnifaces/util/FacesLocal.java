@@ -966,10 +966,6 @@ public final class FacesLocal {
 	 * @see Faces#addResponseCookie(String, String, String, String, int)
 	 */
 	public static void addResponseCookie(FacesContext context, String name, String value, String domain, String path, int maxAge) {
-		if (value != null) {
-			value = encodeURL(value);
-		}
-
 		ExternalContext externalContext = context.getExternalContext();
 		Map<String, Object> properties = new HashMap<>();
 
@@ -983,7 +979,7 @@ public final class FacesLocal {
 
 		properties.put("maxAge", maxAge);
 		properties.put("secure", ((HttpServletRequest) externalContext.getRequest()).isSecure());
-		externalContext.addResponseCookie(name, value, properties);
+		externalContext.addResponseCookie(name, encodeURL(value), properties);
 	}
 
 	/**

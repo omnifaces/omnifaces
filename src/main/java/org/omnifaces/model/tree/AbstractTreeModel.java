@@ -135,7 +135,8 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 			return parent.getChildren().get(index);
 		}
 		else {
-			return getNextSibling(parent.getNextSibling(), 0);
+			TreeModel<T> nextParent = parent.getNextSibling();
+			return getNextSibling(nextParent, 0);
 		}
 	}
 
@@ -155,8 +156,8 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 			return parent.getChildren().get(index);
 		}
 		else {
-			parent = parent.getPreviousSibling();
-			return getPreviousSibling(parent, (parent != null ? parent.getChildCount() : 0) - 1);
+			TreeModel<T> previousParent = parent.getPreviousSibling();
+			return getPreviousSibling(previousParent, (previousParent != null ? previousParent.getChildCount() : 0) - 1);
 		}
 	}
 

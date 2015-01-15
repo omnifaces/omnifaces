@@ -386,11 +386,7 @@ public final class Servlets {
 	public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response,
 		String name, String value, String domain, String path, int maxAge)
 	{
-		if (value != null) {
-			value = encodeURL(value);
-		}
-
-		Cookie cookie = new Cookie(name, value);
+		Cookie cookie = new Cookie(name, encodeURL(value));
 
 		if (domain != null) {
 			cookie.setDomain(domain);
@@ -538,12 +534,14 @@ public final class Servlets {
 	 * Helper method to prepare redirect URL. Package-private so that {@link FacesLocal} can also use it.
 	 */
 	static String prepareRedirectURL(HttpServletRequest request, String url, String... paramValues) {
+		String redirectURL = url;
+
 		if (!startsWithOneOf(url, "http://", "https://", "/")) {
-			url = request.getContextPath() + "/" + url;
+			redirectURL = request.getContextPath() + "/" + url;
 		}
 
 		if (isEmpty(paramValues)) {
-			return url;
+			return redirectURL;
 		}
 
 		Object[] encodedParams = new Object[paramValues.length];
@@ -552,7 +550,7 @@ public final class Servlets {
 			encodedParams[i] = encodeURL(paramValues[i]);
 		}
 
-		return String.format(url, encodedParams);
+		return String.format(redirectURL, encodedParams);
 	}
 
 }
