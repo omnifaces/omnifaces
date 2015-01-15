@@ -595,24 +595,28 @@ public final class Faces {
 	public static ResourceBundle getResourceBundle(String var) {
 		return FacesLocal.getResourceBundle(getContext(), var);
 	}
-	
+
 	/**
-	 * Returns the application resource bundle mapping as identified by the given <code>&lt;var&gt;</code> and 
-	 * <code>&lt;base-name&gt;</code> of the <code>&lt;resource-bundle&gt;</code> in <code>faces-config.xml</code>. 
-	 * If there is no <code>&lt;resource-bundle&gt;</code>, then this method just returns an empty map.
-	 * @return The application resource bundle mapping as identified by the given <code>&lt;var&gt;</code> and 
+	 * Returns all application resource bundles registered as <code>&lt;resource-bundle&gt;</code> in
+	 * <code>faces-config.xml</code>. If there are no resource bundles registered, then this method just returns an
+	 * empty map.
+	 * @return all application resource bundles registered as <code>&lt;resource-bundle&gt;</code> in
+	 * <code>faces-config.xml</code>.
 	 * <code>&lt;base-name&gt;</code> of the <code>&lt;resource-bundle&gt;</code> in <code>faces-config.xml</code>.
+	 * @throws MissingResourceException When the <code>&lt;resource-bundle&gt;</code> in <code>faces-config.xml</code>
+	 * does not refer an existing resource in the classpath.
+	 * @see Application#getResourceBundle(FacesContext, String)
 	 * @since 2.1
 	 */
     public static Map<String, ResourceBundle> getResourceBundles() {
     	return FacesLocal.getResourceBundles(getContext());
     }
-    
+
     /**
-	 * Gets a string for the given key searching declared resource bundles, order by declaration in 
-	 * <code>faces-config.xml</code>. 
+	 * Gets a string for the given key searching declared resource bundles, order by declaration in
+	 * <code>faces-config.xml</code>.
 	 * If the string is missing, then this method returns <code>???key???</code>.
-	 * @return a string for the given key searching declared resource bundles, order by declaration in 
+	 * @return a string for the given key searching declared resource bundles, order by declaration in
 	 * <code>faces-config.xml</code>.
 	 * @since 2.1
 	 */

@@ -1,22 +1,31 @@
+/*
+ * Copyright 2015 OmniFaces.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
+ */
 package org.omnifaces.config;
 
 import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.Faces.hasContext;
+
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.faces.context.FacesContext;
 import javax.faces.webapp.FacesServlet;
 import javax.servlet.Filter;
@@ -27,12 +36,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
-import org.omnifaces.util.Faces;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
 
 /**
  * <p>
@@ -52,8 +60,8 @@ import org.w3c.dom.NodeList;
  * @author Michele Mariotti
  * @since 2.1
  */
-public enum FacesConfigXml
-{
+public enum FacesConfigXml {
+
     // Enum singleton -------------------------------------------------------------------------------------------------
 
     /**
@@ -99,10 +107,8 @@ public enum FacesConfigXml
     /**
      * Perform automatic initialization whereby the servlet context is obtained from the faces context.
      */
-    private void init()
-    {
-        if(!initialized.get() && hasContext())
-        {
+    private void init() {
+        if (!initialized.get() && hasContext()) {
             init(getServletContext());
         }
     }
@@ -112,18 +118,14 @@ public enum FacesConfigXml
      * @param servletContext The servlet context to obtain the faces-config.xml from.
      * @return The current {@link FacesConfigXml} instance, initialized and all.
      */
-    public FacesConfigXml init(ServletContext servletContext)
-    {
-        if(servletContext != null && !initialized.getAndSet(true))
-        {
-            try
-            {
+    public FacesConfigXml init(ServletContext servletContext) {
+        if (servletContext != null && !initialized.getAndSet(true)) {
+            try {
                 Element facesConfigXml = loadFacesConfigXml(servletContext).getDocumentElement();
                 XPath xpath = XPathFactory.newInstance().newXPath();
                 resourceBundles = parseResourceBundles(facesConfigXml, xpath);
             }
-            catch(Exception e)
-            {
+            catch (Exception e) {
                 initialized.set(false);
                 logger.log(Level.SEVERE, LOG_INITIALIZATION_ERROR, e);
                 throw new RuntimeException(e);
@@ -133,32 +135,25 @@ public enum FacesConfigXml
         return this;
     }
 
-    // Actions --------------------------------------------------------------------------------------------------------
-
-    // currently no action. 
-
     // Getters --------------------------------------------------------------------------------------------------------
 
     /**
      * Returns a mapping of all resource bundle base names by var.
      * @return A mapping of all resource bundle base names by var.
      */
-    public Map<String, String> getResourceBundles()
-    {
+    public Map<String, String> getResourceBundles() {
         checkInitialized();
         return resourceBundles;
     }
 
-    private void checkInitialized()
-    {
+    private void checkInitialized() {
         // This init() call is performed here instead of in constructor, because WebLogic loads this enum as a CDI
         // managed bean (in spite of having a VetoAnnotatedTypeExtension) which in turn implicitly invokes the enum
         // constructor and thus causes an init while JSF context isn't fully initialized and thus the faces context
         // isn't available yet. Perhaps it's fixed in newer WebLogic versions.
         init();
 
-        if(!initialized.get())
-        {
+        if (!initialized.get()) {
             throw new IllegalStateException(ERROR_NOT_INITIALIZED);
         }
     }
@@ -169,22 +164,19 @@ public enum FacesConfigXml
      * Load, merge and return all <code>faces-config.xml</code> files found in the classpath
      * into a single {@link Document}.
      */
-    private static Document loadFacesConfigXml(ServletContext context) throws Exception
-    {
+    private static Document loadFacesConfigXml(ServletContext context) throws Exception {
         DocumentBuilder builder = createDocumentBuilder();
         Document document = builder.newDocument();
         document.appendChild(document.createElement("all-faces-configs"));
         URL url = context.getResource(APP_FACES_CONFIG_XML);
 
-        if(url != null)
-        { // faces-config.xml is optional.
+        if (url != null) { // faces-config.xml is optional.
             parseAndAppendChildren(url, builder, document);
         }
 
         Enumeration<URL> urls = Thread.currentThread().getContextClassLoader().getResources(LIB_FACES_CONFIG_XML);
 
-        while(urls.hasMoreElements())
-        {
+        while (urls.hasMoreElements()) {
             parseAndAppendChildren(urls.nextElement(), builder, document);
         }
 
@@ -195,8 +187,7 @@ public enum FacesConfigXml
      * Returns an instance of {@link DocumentBuilder} which doesn't validate, nor is namespace aware nor expands entity
      * references (to keep it as lenient as possible).
      */
-    private static DocumentBuilder createDocumentBuilder() throws Exception
-    {
+    private static DocumentBuilder createDocumentBuilder() throws Exception {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setValidating(false);
         factory.setNamespaceAware(false);
@@ -208,17 +199,14 @@ public enum FacesConfigXml
      * Parse the given URL as a document using the given builder and then append all its child nodes to the given
      * document.
      */
-    private static void parseAndAppendChildren(URL url, DocumentBuilder builder, Document document) throws Exception
-    {
+    private static void parseAndAppendChildren(URL url, DocumentBuilder builder, Document document) throws Exception {
         URLConnection connection = url.openConnection();
         connection.setUseCaches(false);
 
-        try(InputStream input = connection.getInputStream())
-        {
+        try (InputStream input = connection.getInputStream()) {
             NodeList children = builder.parse(input).getDocumentElement().getChildNodes();
 
-            for(int i = 0; i < children.getLength(); i++)
-            {
+            for (int i = 0; i < children.getLength(); i++) {
                 document.getDocumentElement().appendChild(document.importNode(children.item(i), true));
             }
         }
@@ -227,20 +215,17 @@ public enum FacesConfigXml
     /**
      * Create and return a mapping of all resource bundle base names by var found in the given document.
      */
-    private static Map<String, String> parseResourceBundles(Element facesConfigXml, XPath xpath) throws Exception
-    {
+    private static Map<String, String> parseResourceBundles(Element facesConfigXml, XPath xpath) throws Exception {
         Map<String, String> resourceBundles = new LinkedHashMap<>();
         NodeList resourceBundleNodes = getNodeList(facesConfigXml, xpath, XPATH_RESOURCE_BUNDLE);
 
-        for(int i = 0; i < resourceBundleNodes.getLength(); i++)
-        {
+        for (int i = 0; i < resourceBundleNodes.getLength(); i++) {
             Node node = resourceBundleNodes.item(i);
 
             String var = xpath.compile(XPATH_VAR).evaluate(node).trim();
             String baseName = xpath.compile(XPATH_BASE_NAME).evaluate(node).trim();
 
-            if(!resourceBundles.containsKey(var))
-            {
+            if (!resourceBundles.containsKey(var)) {
                 resourceBundles.put(var, baseName);
             }
         }
@@ -250,8 +235,8 @@ public enum FacesConfigXml
 
     // Helpers of helpers (JAXP hell) ---------------------------------------------------------------------------------
 
-    private static NodeList getNodeList(Node node, XPath xpath, String expression) throws Exception
-    {
+    private static NodeList getNodeList(Node node, XPath xpath, String expression) throws Exception {
         return (NodeList) xpath.compile(expression).evaluate(node, XPathConstants.NODESET);
     }
+
 }
