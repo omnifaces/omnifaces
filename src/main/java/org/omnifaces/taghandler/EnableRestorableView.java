@@ -13,6 +13,7 @@
 package org.omnifaces.taghandler;
 
 import static java.lang.Boolean.TRUE;
+import static org.omnifaces.util.Faces.setApplicationAttribute;
 
 import java.io.IOException;
 
@@ -87,6 +88,7 @@ public class EnableRestorableView extends TagHandler {
 	 */
 	public EnableRestorableView(TagConfig config) {
 		super(config);
+		setApplicationAttribute(RestorableViewHandler.class.getName(), TRUE);
 	}
 
     // Actions --------------------------------------------------------------------------------------------------------
