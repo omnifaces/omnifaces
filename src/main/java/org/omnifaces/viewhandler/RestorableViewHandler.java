@@ -12,8 +12,10 @@
  */
 package org.omnifaces.viewhandler;
 
+import static java.lang.Boolean.TRUE;
 import static org.omnifaces.util.Faces.normalizeViewId;
 import static org.omnifaces.util.Faces.setContext;
+import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 
 import java.io.IOException;
 
@@ -59,25 +61,26 @@ public class RestorableViewHandler extends ViewHandlerWrapper {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * First try to restore the view. If it returns null and the current request is a postback, then recreate and build
-	 * the view. If it contains the <code>&lt;o:enableRestoreView&gt;</code>, then return the newly created view, else
+	 * First try to restore the view. If the <code>&lt;o:enableRestoreView&gt;</code> is used once in the application,
+	 * and the restored view returns null and the current request is a postback, then recreate and build the view.
+	 * If it contains the <code>&lt;o:enableRestoreView&gt;</code>, then return the newly created view, else
 	 * return <code>null</code>.
 	 */
 	@Override
 	public UIViewRoot restoreView(FacesContext context, String viewId) {
 		UIViewRoot restoredView = super.restoreView(context, viewId);
 
-		if (!(restoredView == null && context.isPostback())) {
+		if (!(isEnabled(context) && restoredView == null && context.isPostback())) {
 			return restoredView;
 		}
 
-		viewId = normalizeViewId(viewId);
-		UIViewRoot createdView = createView(context, viewId);
+		String normalizedViewId = normalizeViewId(viewId);
+		UIViewRoot createdView = createView(context, normalizedViewId);
 		FacesContext temporaryContext = new TemporaryViewFacesContext(context, createdView);
 
 		try {
 			setContext(temporaryContext);
-			getViewDeclarationLanguage(temporaryContext, viewId).buildView(temporaryContext, createdView);
+			getViewDeclarationLanguage(temporaryContext, normalizedViewId).buildView(temporaryContext, createdView);
 		}
 		catch (IOException e) {
 			throw new FacesException(e);
@@ -86,12 +89,16 @@ public class RestorableViewHandler extends ViewHandlerWrapper {
 			setContext(context);
 		}
 
-		if (createdView.getAttributes().get(EnableRestorableView.class.getName()) == Boolean.TRUE) {
+		if (TRUE.equals(createdView.getAttributes().get(EnableRestorableView.class.getName()))) {
 			return createdView;
 		}
 		else {
 			return null;
 		}
+	}
+
+	private boolean isEnabled(FacesContext context) {
+		return TRUE.equals(getApplicationAttribute(context, RestorableViewHandler.class.getName()));
 	}
 
 	@Override

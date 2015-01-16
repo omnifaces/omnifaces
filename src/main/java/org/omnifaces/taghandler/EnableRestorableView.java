@@ -12,6 +12,9 @@
  */
 package org.omnifaces.taghandler;
 
+import static java.lang.Boolean.TRUE;
+import static org.omnifaces.util.Faces.setApplicationAttribute;
+
 import java.io.IOException;
 
 import javax.faces.application.ViewExpiredException;
@@ -28,24 +31,42 @@ import org.omnifaces.viewhandler.RestorableViewHandler;
 
 /**
  * <p>
- * The <code>&lt;o:enableRestorableView&gt;</code> instructs the view handler to recreate the entire view whenever the
- * view has been expired, i.e. whenever {@link ViewHandler#restoreView(FacesContext, String)} returns <code>null</code>
- * and the current request is a postback. This effectively prevents {@link ViewExpiredException} on the view. This tag
- * needs to be placed in <code>&lt;f:metadata&gt;</code> of the view.
+ * The <code>&lt;o:enableRestorableView&gt;</code> taghandler instructs the view handler to recreate the entire view
+ * whenever the view has been expired, i.e. whenever {@link ViewHandler#restoreView(FacesContext, String)} returns
+ * <code>null</code> and the current request is a postback. This effectively prevents {@link ViewExpiredException} on
+ * the view. This tag needs to be placed in <code>&lt;f:metadata&gt;</code> of the view.
  * <p>
- * There are however technical design limitations: the recreated view is exactly the same as during the initial request,
- * so any modifications which are made thereafter, either by taghandlers or conditionally rendered components based on
- * some view or even session scoped variables, are completely lost. In order to recreate exactly the desired view, you
- * would need to make sure that those modifications are made based on request scoped variables (read: request
- * parameters) instead of view or session scoped variables. In other words, the state of the restorable view should not
- * depend on view or session scoped managed beans, but purely on request scoped managed beans.
+ * There are however technical design limitations: the recreated view is <b>exactly</b> the same as during the initial
+ * request. In other words, the view has lost its state. Any modifications which were made after the original initial
+ * request, either by taghandlers or (ajax) conditionally rendered components based on some view or even session
+ * scoped variables, are completely lost. Thus, the view should be designed that way that it can be used with a request
+ * scoped bean. You <em>can</em> use it with a view scoped bean, but then you should add a <code>@PostConstruct</code>
+ * which checks if the request is a postback and then fill the missing bean properties based on request parameters.
+ *
+ * <h3>Usage</h3>
  * <p>
  * To enable the restorable view, just add the <code>&lt;enableRestorableView&gt;</code> to the view metadata.
  * <pre>
  * &lt;f:metadata&gt;
- *   &lt;o:enableRestorableView/&gt;
+ *     &lt;o:enableRestorableView/&gt;
  * &lt;/f:metadata&gt;
  * </pre>
+ *
+ * <h3>Mojarra's new stateless mode</h3>
+ * <p>
+ * Since Mojarra 2.1.19, about 2 months after OmniFaces introduced the <code>&lt;o:enableRestorableView&gt;</code>,
+ * it's possible to enable a stateless mode on the view by simply setting its <code>transient</code> attribute to
+ * <code>true</code>:
+ * <pre>
+ * &lt;f:view transient="true"&gt;
+ *     ...
+ * &lt;/f:view&gt;
+ * </pre>
+ * <p>
+ * This goes actually a step further than <code>&lt;o:enableRestorableView&gt;</code> as no state would be saved at all.
+ * However, on those kind of pages where <code>&lt;o:enableRestorableView&gt;</code> would work just fine, this
+ * statelessness should not form any problem at all. So, if you have at least Mojarra 2.1.19 at hands, use the
+ * <code>transient="true"</code> instead.
  *
  * @author Bauke Scholtz
  * @since 1.3
@@ -67,6 +88,7 @@ public class EnableRestorableView extends TagHandler {
 	 */
 	public EnableRestorableView(TagConfig config) {
 		super(config);
+		setApplicationAttribute(RestorableViewHandler.class.getName(), TRUE);
 	}
 
     // Actions --------------------------------------------------------------------------------------------------------
@@ -87,7 +109,7 @@ public class EnableRestorableView extends TagHandler {
 			return;
 		}
 
-		parent.getAttributes().put(EnableRestorableView.class.getName(), true);
+		parent.getAttributes().put(EnableRestorableView.class.getName(), TRUE);
 	}
 
 }
