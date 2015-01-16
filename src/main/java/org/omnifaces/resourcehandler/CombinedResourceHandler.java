@@ -16,9 +16,11 @@ import static org.omnifaces.util.Events.subscribeToApplicationEvent;
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getInitParameter;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -164,7 +166,7 @@ import org.omnifaces.util.Hacks;
  * @see CombinedResource
  * @see CombinedResourceInfo
  * @see CombinedResourceInputStream
- * @see RemappedResource
+ * @see DynamicResource
  * @see DefaultResourceHandler
  */
 public class CombinedResourceHandler extends DefaultResourceHandler implements SystemEventListener {
@@ -335,31 +337,31 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		private CombinedResourceBuilder stylesheets;
 		private CombinedResourceBuilder scripts;
 		private Map<String, CombinedResourceBuilder> deferredScripts;
+		private List<UIComponent> componentResourcesToRemove;
 
 		public CombinedResourceBuilder() {
 			stylesheets = new CombinedResourceBuilder(EXTENSION_CSS, TARGET_HEAD);
 			scripts = new CombinedResourceBuilder(EXTENSION_JS, TARGET_HEAD);
 			deferredScripts = new LinkedHashMap<>(2);
+			componentResourcesToRemove = new ArrayList<>(3);
 		}
 
 		public void add(FacesContext context, UIComponent component, String target) {
-			if (add(context, component, component.getRendererType(), new ResourceIdentifier(component), target)) {
-				component.setRendered(false);
-			}
+			add(context, component, component.getRendererType(), new ResourceIdentifier(component), target);
 		}
 
-		private boolean add(FacesContext context, UIComponent component, String rendererType, ResourceIdentifier id, String target) {
+		private void add(FacesContext context, UIComponent component, String rendererType, ResourceIdentifier id, String target) {
 			if (LIBRARY_NAME.equals(id.getLibrary())) {
-				return addCombined(context, rendererType, id, target); // Found an already combined resource. Extract and recombine it.
+				addCombined(context, component, rendererType, id, target); // Found an already combined resource. Extract and recombine it.
 			}
 			else if (rendererType.equals(RENDERER_TYPE_CSS)) {
-				return addStylesheet(context, component, id);
+				addStylesheet(context, component, id);
 			}
 			else if (rendererType.equals(RENDERER_TYPE_JS)) {
-				return addScript(context, component, id);
+				addScript(context, component, id);
 			}
 			else if (component instanceof DeferredScript) {
-				return addDeferredScript(component, id);
+				addDeferredScript(component, id);
 			}
 
 			// WARNING: START OF HACK! --------------------------------------------------------------------------------
@@ -375,14 +377,12 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 					add(context, null, handler.getRendererTypeForResourceName(identifier.getName()), identifier, target);
 				}
 
-				return true;
+				componentResourcesToRemove.add(component);
 			}
 			// --------------------------------------------------------------------------------------------------------
-
-			return false;
 		}
 
-		private boolean addCombined(FacesContext context, String rendererType, ResourceIdentifier id, String target) {
+		private void addCombined(FacesContext context, UIComponent component, String rendererType, ResourceIdentifier id, String target) {
 			String[] resourcePathParts = id.getName().split("\\.", 2)[0].split("/");
 			String resourceId = resourcePathParts[resourcePathParts.length - 1];
 			CombinedResourceInfo info = CombinedResourceInfo.get(resourceId);
@@ -391,37 +391,27 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 				for (ResourceIdentifier combinedId : info.getResourceIdentifiers()) {
 					add(context, null, rendererType, combinedId, target);
 				}
-				return true;
 			}
-			else {
-				return false;
-			}
+
+			componentResourcesToRemove.add(component);
 		}
 
-		private boolean addStylesheet(FacesContext context, UIComponent component, ResourceIdentifier id) {
+		private void addStylesheet(FacesContext context, UIComponent component, ResourceIdentifier id) {
 			if (stylesheets.add(component, id)) {
 				Hacks.setStylesheetResourceRendered(context, id); // Prevents future forced additions by libs.
-				return true;
-			}
-			else {
-				return false;
 			}
 		}
 
-		private boolean addScript(FacesContext context, UIComponent component, ResourceIdentifier id) {
+		private void addScript(FacesContext context, UIComponent component, ResourceIdentifier id) {
 			if (Hacks.isScriptResourceRendered(context, id)) { // This is true when o:deferredScript is used.
-				return true;
+				componentResourcesToRemove.add(component);
 			}
 			else if (scripts.add(component, id)) {
 				Hacks.setScriptResourceRendered(context, id); // Prevents future forced additions by libs.
-				return true;
-			}
-			else {
-				return false;
 			}
 		}
 
-		private boolean addDeferredScript(UIComponent component, ResourceIdentifier id) {
+		private void addDeferredScript(UIComponent component, ResourceIdentifier id) {
 			String group = (String) component.getAttributes().get("group");
 			CombinedResourceBuilder builder = deferredScripts.get(group);
 
@@ -430,7 +420,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 				deferredScripts.put(group, builder);
 			}
 
-			return builder.add(component, id);
+			builder.add(component, id);
 		}
 
 		public void create(FacesContext context) {
@@ -440,6 +430,8 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 			for (CombinedResourceBuilder builder : deferredScripts.values()) {
 				builder.create(context, DeferredScriptRenderer.RENDERER_TYPE);
 			}
+
+			removeComponentResources(context, componentResourcesToRemove, TARGET_HEAD);
 		}
 
 		// Specific stylesheet/script builder -------------------------------------------------------------------------
@@ -453,10 +445,12 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 			this.extension = extension;
 			this.target = target;
 			infoBuilder = new CombinedResourceInfo.Builder();
+			componentResourcesToRemove = new ArrayList<>(3);
 		}
 
 		private boolean add(UIComponent componentResource, ResourceIdentifier resourceIdentifier) {
 			if (componentResource != null && !componentResource.isRendered()) {
+				componentResourcesToRemove.add(componentResource);
 				return true;
 			}
 			else if (excludedResources.isEmpty() || !excludedResources.contains(resourceIdentifier)) {
@@ -471,11 +465,13 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 						mergeAttribute(this.componentResource, componentResource, "onsuccess");
 						mergeAttribute(this.componentResource, componentResource, "onerror");
 					}
+					componentResourcesToRemove.add(componentResource);
 				}
 
 				return true;
 			}
 			else if (suppressedResources.contains(resourceIdentifier)) {
+				componentResourcesToRemove.add(componentResource);
 				return true;
 			}
 
@@ -504,10 +500,21 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 				componentResource.getAttributes().put("library", LIBRARY_NAME);
 				componentResource.getAttributes().put("name", infoBuilder.create() + extension);
 				componentResource.setRendererType(rendererType);
-				componentResource.setRendered(true);
 			}
+
+			removeComponentResources(context, componentResourcesToRemove, target);
 		}
 
+	}
+
+	private static void removeComponentResources(FacesContext context, List<UIComponent> componentResourcesToRemove, String target) {
+		UIViewRoot view = context.getViewRoot();
+
+		for (UIComponent resourceToRemove : componentResourcesToRemove) {
+			if (resourceToRemove != null) {
+				view.removeComponentResource(context, resourceToRemove, target);
+			}
+		}
 	}
 
 }
