@@ -257,20 +257,20 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		UIViewRoot view = context.getViewRoot();
 		CombinedResourceBuilder builder = new CombinedResourceBuilder();
 
-		for (UIComponent componentResource : view.getComponentResources(context, TARGET_HEAD)) {
-			if (componentResource.getAttributes().get("name") == null) {
+		for (UIComponent component : view.getComponentResources(context, TARGET_HEAD)) {
+			if (component.getAttributes().get("name") == null) {
 				continue; // It's likely an inline script, they can't be combined as it might contain EL expressions.
 			}
 
-			builder.add(context, componentResource, TARGET_HEAD);
+			builder.add(context, component, component.getRendererType(), new ResourceIdentifier(component), TARGET_HEAD);
 		}
 
-		for (UIComponent componentResource : view.getComponentResources(context, TARGET_BODY)) {
-			if (!(componentResource instanceof DeferredScript)) {
+		for (UIComponent component : view.getComponentResources(context, TARGET_BODY)) {
+			if (!(component instanceof DeferredScript)) {
 				continue; // We currently only support deferred scripts. TODO: support body scripts as well?
 			}
 
-			builder.add(context, componentResource, TARGET_BODY);
+			builder.add(context, component, component.getRendererType(), new ResourceIdentifier(component), TARGET_BODY);
 		}
 
 		builder.create(context);
@@ -342,12 +342,8 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		public CombinedResourceBuilder() {
 			stylesheets = new CombinedResourceBuilder(EXTENSION_CSS, TARGET_HEAD);
 			scripts = new CombinedResourceBuilder(EXTENSION_JS, TARGET_HEAD);
-			deferredScripts = new LinkedHashMap<>(2);
-			componentResourcesToRemove = new ArrayList<>(3);
-		}
-
-		public void add(FacesContext context, UIComponent component, String target) {
-			add(context, component, component.getRendererType(), new ResourceIdentifier(component), target);
+			deferredScripts = new LinkedHashMap<>();
+			componentResourcesToRemove = new ArrayList<>();
 		}
 
 		private void add(FacesContext context, UIComponent component, String rendererType, ResourceIdentifier id, String target) {
@@ -445,7 +441,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 			this.extension = extension;
 			this.target = target;
 			infoBuilder = new CombinedResourceInfo.Builder();
-			componentResourcesToRemove = new ArrayList<>(3);
+			componentResourcesToRemove = new ArrayList<>();
 		}
 
 		private boolean add(UIComponent componentResource, ResourceIdentifier resourceIdentifier) {

@@ -163,6 +163,7 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 			try {
 				return super.getValue(context, base, property);
 			} catch (PropertyNotFoundException ignore) {
+				ignore = null; // We're not interested in it.
 				try {
 					return super.invoke(context, base, property, null, callerProvidedParameters != null ? callerProvidedParameters : EMPTY_PARAMETERS);
 				} catch (MethodNotFoundException e) {

@@ -122,10 +122,10 @@ public final class SelectItemsUtils {
 
 		@Override
 		public SelectItem next() {
-			try {
+			if (hasNext()) {
 				return (items[index++]);
 			}
-			catch (IndexOutOfBoundsException e) {
+			else {
 				throw new NoSuchElementException();
 			}
 		}

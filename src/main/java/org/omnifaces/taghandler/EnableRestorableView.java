@@ -88,7 +88,7 @@ public class EnableRestorableView extends TagHandler {
 	 */
 	public EnableRestorableView(TagConfig config) {
 		super(config);
-		setApplicationAttribute(RestorableViewHandler.class.getName(), TRUE);
+		setApplicationAttribute(EnableRestorableView.class.getName(), TRUE);
 	}
 
     // Actions --------------------------------------------------------------------------------------------------------

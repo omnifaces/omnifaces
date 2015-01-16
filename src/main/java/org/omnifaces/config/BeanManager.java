@@ -96,7 +96,7 @@ public enum BeanManager {
 			}
 		}
 		catch (IllegalStateException e) {
-			throw new IllegalStateException(ERROR_CDI_IMPL_UNAVAILABLE, e.getCause());
+			throw new IllegalStateException(ERROR_CDI_IMPL_UNAVAILABLE, e);
 		}
 		catch (Exception | LinkageError e) {
 			throw new IllegalStateException(ERROR_JNDI_UNAVAILABLE, e);
