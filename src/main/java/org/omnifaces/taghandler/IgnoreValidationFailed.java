@@ -15,7 +15,6 @@ package org.omnifaces.taghandler;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Components.hasInvokedSubmit;
 import static org.omnifaces.util.Events.subscribeToViewBeforePhase;
-import static org.omnifaces.util.Faces.setContextAttribute;
 
 import java.io.IOException;
 
@@ -98,7 +97,7 @@ public class IgnoreValidationFailed extends TagHandler {
 				@Override
 				public void invoke() {
 					if (hasInvokedSubmit(parent)) {
-						setContextAttribute(IgnoreValidationFailed.class.getName(), true);
+						getClosestParent(parent, Form.class).setIgnoreValidationFailed(true);
 					}
 				}
 			});
