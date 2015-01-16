@@ -6,3 +6,4 @@ dist/
 /.settings
 /.project
 /.classpath
+rebel.xml
