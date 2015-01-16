@@ -45,15 +45,15 @@ import org.xml.sax.SAXException;
 
 /**
  * <p>
- * This configuration enum parses the <code>/WEB-INF/faces-config.xml</code> and all <code>/META-INF/faces-config.xml</code> files
- * found in the classpath and offers methods to obtain information from them which is not available by the standard
- * JSF API.
+ * This configuration enum parses the <code>/WEB-INF/faces-config.xml</code> and all
+ * <code>/META-INF/faces-config.xml</code> files found in the classpath and offers methods to obtain information from
+ * them which is not available by the standard JSF API.
  *
  * <h3>Usage</h3>
  * <p>
  * Some examples:
  * <pre>
- * // Get the &lt;resource-bundle&gt; (which are essentially mappings of resource bundle base name and variable name).
+ * // Get a mapping of all &lt;resource-bundle&gt; vars and base names.
  * Map&lt;String, String&gt; resourceBundles = FacesConfigXml.INSTANCE.getResourceBundles();
  * </pre>
  *
@@ -81,26 +81,24 @@ public enum FacesConfigXml {
 
     private static final Logger logger = Logger.getLogger(FacesConfigXml.class.getName());
 
-    private static final String APP_FACES_CONFIG_XML = "/WEB-INF/faces-config.xml";
-
-    private static final String LIB_FACES_CONFIG_XML = "META-INF/faces-config.xml";
-
-    private static final String XPATH_RESOURCE_BUNDLE = "application/resource-bundle";
-
-    private static final String XPATH_VAR = "var";
-
-    private static final String XPATH_BASE_NAME = "base-name";
-
+    private static final String APP_FACES_CONFIG_XML =
+    	"/WEB-INF/faces-config.xml";
+    private static final String LIB_FACES_CONFIG_XML =
+    	"META-INF/faces-config.xml";
+    private static final String XPATH_RESOURCE_BUNDLE =
+    	"application/resource-bundle";
+    private static final String XPATH_VAR =
+    	"var";
+    private static final String XPATH_BASE_NAME =
+    	"base-name";
     private static final String ERROR_NOT_INITIALIZED =
         "FacesConfigXml is not initialized yet. Please use #init(ServletContext) method to manually initialize it.";
-
     private static final String LOG_INITIALIZATION_ERROR =
         "FacesConfigXml failed to initialize. Perhaps your faces-config.xml contains a typo?";
 
     // Properties -----------------------------------------------------------------------------------------------------
 
     private final AtomicBoolean initialized = new AtomicBoolean();
-
     private Map<String, String> resourceBundles;
 
     // Init -----------------------------------------------------------------------------------------------------------

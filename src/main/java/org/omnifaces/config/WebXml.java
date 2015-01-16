@@ -143,7 +143,7 @@ public enum WebXml {
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
-	private AtomicBoolean initialized = new AtomicBoolean();
+	private final AtomicBoolean initialized = new AtomicBoolean();
 	private List<String> welcomeFiles;
 	private Map<Class<Throwable>, String> errorPageLocations;
 	private String formLoginPage;
