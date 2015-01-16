@@ -197,12 +197,16 @@ public final class Reflection {
 	public static Class<?> toClass(String className) {
 		try {
 			return (Class.forName(className, true, Thread.currentThread().getContextClassLoader()));
-		} catch (ClassNotFoundException e) {
+		}
+		catch (ClassNotFoundException e) {
 			try {
 				return Class.forName(className);
-			} catch (ClassNotFoundException ignore) {
-				throw new IllegalStateException(e);
 			}
+			catch (Exception ignore) {
+				ignore = null; // Just continue to IllegalStateException on original ClassNotFoundException.
+			}
+
+			throw new IllegalStateException(e);
 		}
 	}
 
