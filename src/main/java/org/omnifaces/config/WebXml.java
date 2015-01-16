@@ -253,13 +253,31 @@ public enum WebXml {
 			uri = url.substring(0, url.length() - 1); // Trim trailing slash.
 		}
 
+		Boolean roleMatch = isExactRoleMatch(uri, role);
+
+		if (roleMatch == null) {
+			roleMatch = isPrefixRoleMatch(uri, role);
+		}
+
+		if (roleMatch == null) {
+			roleMatch = isSuffixRoleMatch(uri, role);
+		}
+
+		return (roleMatch == null) || roleMatch;
+	}
+
+	private Boolean isExactRoleMatch(String url, String role) {
 		for (Entry<String, Set<String>> entry : securityConstraints.entrySet()) {
-			if (isExactMatch(entry.getKey(), uri)) {
+			if (isExactMatch(entry.getKey(), url)) {
 				return isRoleMatch(entry.getValue(), role);
 			}
 		}
 
-		for (String path = uri, urlMatch = ""; !path.isEmpty(); path = path.substring(0, path.lastIndexOf('/'))) {
+		return null;
+	}
+
+	private Boolean isPrefixRoleMatch(String url, String role) {
+		for (String path = url, urlMatch = ""; !path.isEmpty(); path = path.substring(0, path.lastIndexOf('/'))) {
 			Boolean roleMatch = null;
 
 			for (Entry<String, Set<String>> entry : securityConstraints.entrySet()) {
@@ -274,15 +292,19 @@ public enum WebXml {
 			}
 		}
 
-		if (uri.contains(".")) {
+		return null;
+	}
+
+	private Boolean isSuffixRoleMatch(String url, String role) {
+		if (url.contains(".")) {
 			for (Entry<String, Set<String>> entry : securityConstraints.entrySet()) {
-				if (isSuffixMatch(uri, entry.getKey())) {
+				if (isSuffixMatch(url, entry.getKey())) {
 					return isRoleMatch(entry.getValue(), role);
 				}
 			}
 		}
 
-		return true;
+		return null;
 	}
 
 	private static boolean isExactMatch(String urlPattern, String url) {

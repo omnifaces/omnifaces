@@ -222,7 +222,10 @@ public class MessagesRenderer extends Renderer {
 		boolean tooltip = component.isTooltip() && isEmpty(component.getTitle());
 
 		for (FacesMessage message : messages) {
-			encodeMessage(context, component, message, table, showSummary, showDetail, escape, tooltip);
+			if (!message.isRendered() || component.isRedisplay()) {
+				encodeMessage(context, component, message, table, showSummary, showDetail, escape, tooltip);
+				message.rendered();
+			}
 		}
 
 		writer.endElement(table ? "table" : "ul");
@@ -245,10 +248,6 @@ public class MessagesRenderer extends Renderer {
 				boolean showSummary, boolean showDetail, boolean escape, boolean tooltip)
 			throws IOException
 	{
-		if (message.isRendered() && !component.isRedisplay()) {
-			return;
-		}
-
 		ResponseWriter writer = context.getResponseWriter();
 		writer.startElement(table ? "tr" : "li", component);
 		String severityName = SEVERITY_NAMES.get(message.getSeverity());
@@ -277,8 +276,6 @@ public class MessagesRenderer extends Renderer {
 		if (showDetail) {
 			writeText(writer, component, detail, escape);
 		}
-
-		message.rendered();
 
 		if (table) {
 			writer.endElement("td");

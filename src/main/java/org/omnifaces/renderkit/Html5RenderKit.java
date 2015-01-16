@@ -129,7 +129,7 @@ public class Html5RenderKit extends RenderKitWrapper {
 		// "novalidate" attribute is not useable in a JSF form.
 	);
 
-	private static final Set<String> HTML5_UISELECT_ATTRIBUTES = unmodifiableSet(
+	private static final Set<String> HTML5_SELECT_ATTRIBUTES = unmodifiableSet(
 		"autofocus"
 		// "form" attribute is not useable in a JSF form.
 	);
@@ -338,7 +338,7 @@ public class Html5RenderKit extends RenderKitWrapper {
 		// Helpers ----------------------------------------------------------------------------------------------------
 
 		private void writeHtml5AttributesIfNecessary(UIInput component, String name) throws IOException {
-			if (component instanceof HtmlInputText && "input".equals(name)) {
+			if (isInput(component, name)) {
 				Map<String, Object> attributes = component.getAttributes();
 				writeHtml5AttributesIfNecessary(attributes, HTML5_INPUT_ATTRIBUTES);
 
@@ -346,14 +346,14 @@ public class Html5RenderKit extends RenderKitWrapper {
 					writeHtml5AttributesIfNecessary(attributes, HTML5_INPUT_RANGE_ATTRIBUTES);
 				}
 			}
-			else if (component instanceof HtmlInputSecret && "input".equals(name)) {
+			else if (isInputPassword(component, name)) {
 				writeHtml5AttributesIfNecessary(component.getAttributes(), HTML5_INPUT_PASSWORD_ATTRIBUTES);
 			}
-			else if (component instanceof HtmlInputTextarea && "textarea".equals(name)) {
+			else if (isTextarea(component, name)) {
 				writeHtml5AttributesIfNecessary(component.getAttributes(), HTML5_TEXTAREA_ATTRIBUTES);
 			}
-			else if (isInstanceofUISelect(component) && ("input".equals(name) || "select".equals(name))) {
-				writeHtml5AttributesIfNecessary(component.getAttributes(), HTML5_UISELECT_ATTRIBUTES);
+			else if (isSelect(component, name)) {
+				writeHtml5AttributesIfNecessary(component.getAttributes(), HTML5_SELECT_ATTRIBUTES);
 			}
 		}
 
@@ -367,10 +367,24 @@ public class Html5RenderKit extends RenderKitWrapper {
 			}
 		}
 
-		private boolean isInstanceofUISelect(UIInput component) {
-			return component instanceof UISelectBoolean
-				|| component instanceof UISelectOne
-				|| component instanceof UISelectMany;
+		private boolean isInput(UIInput component, String name) {
+			return component instanceof HtmlInputText && "input".equals(name);
+		}
+
+		private boolean isInputPassword(UIInput component, String name) {
+			return component instanceof HtmlInputSecret && "input".equals(name);
+		}
+
+		private boolean isTextarea(UIInput component, String name) {
+			return component instanceof HtmlInputTextarea && "textarea".equals(name);
+		}
+
+		private boolean isSelect(UIInput component, String name) {
+			return (component instanceof UISelectBoolean
+					|| component instanceof UISelectOne
+					|| component instanceof UISelectMany)
+				&& ("input".equals(name)
+					|| "select".equals(name));
 		}
 	}
 

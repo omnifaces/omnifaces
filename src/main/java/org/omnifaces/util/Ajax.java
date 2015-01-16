@@ -155,6 +155,10 @@ public final class Ajax {
 			return;
 		}
 
+		updateRowCells(table, index);
+	}
+
+	private static void updateRowCells(UIData table, int index) {
 		FacesContext context = FacesContext.getCurrentInstance();
 		String tableId = table.getClientId(context);
 		char separator = UINamingContainer.getSeparatorChar(context);
@@ -196,6 +200,10 @@ public final class Ajax {
 			return;
 		}
 
+		updateColumnCells(table, index, rowCount);
+	}
+
+	private static void updateColumnCells(UIData table, int index, int rowCount) {
 		FacesContext context = FacesContext.getCurrentInstance();
 		String tableId = table.getClientId(context);
 		char separator = UINamingContainer.getSeparatorChar(context);

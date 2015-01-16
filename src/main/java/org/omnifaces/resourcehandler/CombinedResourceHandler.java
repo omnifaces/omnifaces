@@ -350,44 +350,16 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 		private boolean add(FacesContext context, UIComponent component, String rendererType, ResourceIdentifier id, String target) {
 			if (LIBRARY_NAME.equals(id.getLibrary())) {
-				// Found an already combined resource. Extract and recombine it.
-				String[] resourcePathParts = id.getName().split("\\.", 2)[0].split("/");
-				String resourceId = resourcePathParts[resourcePathParts.length - 1];
-				CombinedResourceInfo info = CombinedResourceInfo.get(resourceId);
-
-				if (info != null) {
-					for (ResourceIdentifier combinedId : info.getResourceIdentifiers()) {
-						add(context, null, rendererType, combinedId, target);
-					}
-				}
-
-				return true;
+				return addCombined(context, rendererType, id, target); // Found an already combined resource. Extract and recombine it.
 			}
 			else if (rendererType.equals(RENDERER_TYPE_CSS)) {
-				if (stylesheets.add(component, id)) {
-					Hacks.setStylesheetResourceRendered(context, id); // Prevents future forced additions by libs.
-					return true;
-				}
+				return addStylesheet(context, component, id);
 			}
 			else if (rendererType.equals(RENDERER_TYPE_JS)) {
-				if (Hacks.isScriptResourceRendered(context, id)) { // This is true when o:deferredScript is used.
-					return true;
-				}
-				else if (scripts.add(component, id)) {
-					Hacks.setScriptResourceRendered(context, id); // Prevents future forced additions by libs.
-					return true;
-				}
+				return addScript(context, component, id);
 			}
 			else if (component instanceof DeferredScript) {
-				String group = (String) component.getAttributes().get("group");
-				CombinedResourceBuilder builder = deferredScripts.get(group);
-
-				if (builder == null) {
-					builder = new CombinedResourceBuilder(EXTENSION_JS, TARGET_BODY);
-					deferredScripts.put(group, builder);
-				}
-
-				return builder.add(component, id);
+				return addDeferredScript(component, id);
 			}
 
 			// WARNING: START OF HACK! --------------------------------------------------------------------------------
@@ -408,6 +380,57 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 			// --------------------------------------------------------------------------------------------------------
 
 			return false;
+		}
+
+		private boolean addCombined(FacesContext context, String rendererType, ResourceIdentifier id, String target) {
+			String[] resourcePathParts = id.getName().split("\\.", 2)[0].split("/");
+			String resourceId = resourcePathParts[resourcePathParts.length - 1];
+			CombinedResourceInfo info = CombinedResourceInfo.get(resourceId);
+
+			if (info != null) {
+				for (ResourceIdentifier combinedId : info.getResourceIdentifiers()) {
+					add(context, null, rendererType, combinedId, target);
+				}
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+
+		private boolean addStylesheet(FacesContext context, UIComponent component, ResourceIdentifier id) {
+			if (stylesheets.add(component, id)) {
+				Hacks.setStylesheetResourceRendered(context, id); // Prevents future forced additions by libs.
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+
+		private boolean addScript(FacesContext context, UIComponent component, ResourceIdentifier id) {
+			if (Hacks.isScriptResourceRendered(context, id)) { // This is true when o:deferredScript is used.
+				return true;
+			}
+			else if (scripts.add(component, id)) {
+				Hacks.setScriptResourceRendered(context, id); // Prevents future forced additions by libs.
+				return true;
+			}
+			else {
+				return false;
+			}
+		}
+
+		private boolean addDeferredScript(UIComponent component, ResourceIdentifier id) {
+			String group = (String) component.getAttributes().get("group");
+			CombinedResourceBuilder builder = deferredScripts.get(group);
+
+			if (builder == null) {
+				builder = new CombinedResourceBuilder(EXTENSION_JS, TARGET_BODY);
+				deferredScripts.put(group, builder);
+			}
+
+			return builder.add(component, id);
 		}
 
 		public void create(FacesContext context) {
