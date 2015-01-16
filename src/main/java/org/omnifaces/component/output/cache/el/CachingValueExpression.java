@@ -61,4 +61,9 @@ public class CachingValueExpression extends ValueExpressionWrapper {
 		return super.equals(object) && Objects.equals(name, ((CachingValueExpression) object).name);
 	}
 
+	@Override
+	public int hashCode() {
+		return super.hashCode() + Objects.hashCode(name);
+	}
+
 }

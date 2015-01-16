@@ -15,6 +15,7 @@ package org.omnifaces.renderkit;
 import static org.omnifaces.util.Components.getCurrentComponent;
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.isOneInstanceOf;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.IOException;
@@ -380,11 +381,8 @@ public class Html5RenderKit extends RenderKitWrapper {
 		}
 
 		private boolean isSelect(UIInput component, String name) {
-			return (component instanceof UISelectBoolean
-					|| component instanceof UISelectOne
-					|| component instanceof UISelectMany)
-				&& ("input".equals(name)
-					|| "select".equals(name));
+			return isOneInstanceOf(component.getClass(), UISelectBoolean.class, UISelectOne.class, UISelectMany.class)
+				&& ("input".equals(name) || "select".equals(name));
 		}
 	}
 

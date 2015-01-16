@@ -253,53 +253,53 @@ public enum WebXml {
 			uri = url.substring(0, url.length() - 1); // Trim trailing slash.
 		}
 
-		Boolean roleMatch = isExactRoleMatch(uri, role);
+		Set<String> roles = findExactMatchRoles(uri);
 
-		if (roleMatch == null) {
-			roleMatch = isPrefixRoleMatch(uri, role);
+		if (roles == null) {
+			roles = findPrefixMatchRoles(uri);
 		}
 
-		if (roleMatch == null) {
-			roleMatch = isSuffixRoleMatch(uri, role);
+		if (roles == null) {
+			roles = findSuffixMatchRoles(uri);
 		}
 
-		return (roleMatch == null) || roleMatch;
+		return isRoleMatch(roles, role);
 	}
 
-	private Boolean isExactRoleMatch(String url, String role) {
+	private Set<String> findExactMatchRoles(String url) {
 		for (Entry<String, Set<String>> entry : securityConstraints.entrySet()) {
 			if (isExactMatch(entry.getKey(), url)) {
-				return isRoleMatch(entry.getValue(), role);
+				return entry.getValue();
 			}
 		}
 
 		return null;
 	}
 
-	private Boolean isPrefixRoleMatch(String url, String role) {
+	private Set<String> findPrefixMatchRoles(String url) {
 		for (String path = url, urlMatch = ""; !path.isEmpty(); path = path.substring(0, path.lastIndexOf('/'))) {
-			Boolean roleMatch = null;
+			Set<String> roles = null;
 
 			for (Entry<String, Set<String>> entry : securityConstraints.entrySet()) {
 				if (urlMatch.length() < entry.getKey().length() && isPrefixMatch(entry.getKey(), path)) {
 					urlMatch = entry.getKey();
-					roleMatch = isRoleMatch(entry.getValue(), role);
+					roles = entry.getValue();
 				}
 			}
 
-			if (roleMatch != null) {
-				return roleMatch;
+			if (roles != null) {
+				return roles;
 			}
 		}
 
 		return null;
 	}
 
-	private Boolean isSuffixRoleMatch(String url, String role) {
+	private Set<String> findSuffixMatchRoles(String url) {
 		if (url.contains(".")) {
 			for (Entry<String, Set<String>> entry : securityConstraints.entrySet()) {
 				if (isSuffixMatch(url, entry.getKey())) {
-					return isRoleMatch(entry.getValue(), role);
+					return entry.getValue();
 				}
 			}
 		}
