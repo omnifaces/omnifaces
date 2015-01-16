@@ -318,8 +318,9 @@ public final class Utils {
 	// I/O ------------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Stream the given input to the given output by NIO {@link ByteBuffer}. Both the input and output streams will
-	 * implicitly be closed after streaming, regardless of whether an exception is been thrown or not.
+	 * Stream the given input to the given output via a directly allocated NIO {@link ByteBuffer}.
+	 * Both the input and output streams will implicitly be closed after streaming,
+	 * regardless of whether an exception is been thrown or not.
 	 * @param input The input stream.
 	 * @param output The output stream.
 	 * @return The length of the written bytes.

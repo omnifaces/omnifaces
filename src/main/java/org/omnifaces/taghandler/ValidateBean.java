@@ -240,7 +240,7 @@ public class ValidateBean extends TagHandler {
 					// Callback that adds a validator to each input for which its value binding resolves to a base that is the same as the target
 			        // of the o:validateBean. This validator will then not actually validate, but just capture the value for that input.
 			        //
-			        // E.g. in "h:inputText value=#{bean.target.property} and o:validateBean value=#{bean.target}", this will collect {"property", [captured value]}
+			        // E.g. in "h:inputText value=bean.target.property and o:validateBean value=bean.target", this will collect property=[captured value].
 
 			        Callback.Void collectPropertyValues = new TargetFormInvoker(parent, new WithArgument<UIForm>() { @Override	public void invoke(UIForm targetForm) {
 

@@ -14,6 +14,7 @@ package org.omnifaces.renderer;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.CharBuffer;
 
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIOutput;
@@ -51,10 +52,12 @@ public class InlineStylesheetRenderer extends InlineResourceRenderer {
 
 	@Override
 	public void writeResource(Reader reader, ResponseWriter writer) throws IOException {
-		char[] buffer = new char[BUFFER_SIZE];
+		CharBuffer buffer = CharBuffer.allocate(BUFFER_SIZE);
 
-		for (int length = 0; (length = reader.read(buffer)) > -1;) {
-			writer.write(buffer, 0, length);
+		while (reader.read(buffer) != -1) {
+			buffer.flip();
+			writer.append(buffer);
+			buffer.clear();
 		}
 	}
 

@@ -46,7 +46,7 @@ public class ResettableBufferedOutputStream extends OutputStream implements Rese
 	public ResettableBufferedOutputStream(OutputStream output, int bufferSize) {
 		this.output = output;
 		this.bufferSize = bufferSize;
-		this.buffer = new ByteArrayOutputStream(bufferSize);
+		buffer = new ByteArrayOutputStream(bufferSize);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -64,7 +64,9 @@ public class ResettableBufferedOutputStream extends OutputStream implements Rese
 	@Override
 	public void write(byte[] bytes, int offset, int length) throws IOException {
 		if (buffer != null) {
-			if ((writtenBytes += (length - offset)) > bufferSize) {
+			writtenBytes += (length - offset);
+
+			if (writtenBytes > bufferSize) {
 				output.write(buffer.toByteArray());
 				output.write(bytes, offset, length);
 				buffer = null;

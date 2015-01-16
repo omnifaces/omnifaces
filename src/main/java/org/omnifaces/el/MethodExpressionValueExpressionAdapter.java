@@ -162,22 +162,12 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 			// method expression takes no parameters, but is specified with parentheses, e.g. "#{mybean.doAction()}".
 			try {
 				return super.getValue(context, base, property);
-			} catch (PropertyNotFoundException pnfe) {
+			} catch (PropertyNotFoundException ignore) {
 				try {
 					return super.invoke(context, base, property, null, callerProvidedParameters != null ? callerProvidedParameters : EMPTY_PARAMETERS);
 				} catch (MethodNotFoundException e) {
-
 					// Wrap into new ELException since down the call chain, ElExceptions might be caught, unwrapped one level and then wrapped in
-					// a new ELException. E.g. Mojarra 2.1's TagValueExpression does the following:
-					//
-					// <pre>
-					// catch (ELException e) {
-		            //     throw new ELException(this.attr + ": " + e.getMessage(), e.getCause());
-					// }
-					// </pre>
-		            //
-					// Without wrapping here, we'll then loose this exception.
-
+					// a new ELException. Without wrapping here, we'll then loose this exception.
 					throw new ELException(e.getMessage(), e);
 				}
 			}
