@@ -300,14 +300,6 @@ public final class FacesLocal {
 
 	/**
      * {@inheritDoc}
-	 * @see Faces#getMetadataAttributes()
-	 */
-	public static Map<String, Object> getMetadataAttributes(FacesContext context) {
-		return context.getViewRoot().getAttributes();
-	}
-
-	/**
-     * {@inheritDoc}
 	 * @see Faces#getMetadataAttribute(String, String)
 	 */
 	@SuppressWarnings("unchecked")

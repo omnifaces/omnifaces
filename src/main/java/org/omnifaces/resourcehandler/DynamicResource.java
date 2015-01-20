@@ -12,6 +12,7 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.faces.application.ResourceHandler.RESOURCE_IDENTIFIER;
 import static org.omnifaces.util.Faces.getMapping;
 import static org.omnifaces.util.Faces.getRequestContextPath;
@@ -41,6 +42,10 @@ import org.omnifaces.util.Hacks;
  */
 public abstract class DynamicResource extends Resource {
 
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final int RESPONSE_HEADERS_SIZE = 4;
+
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	private long lastModified;
@@ -48,9 +53,10 @@ public abstract class DynamicResource extends Resource {
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Constructs a new combined resource based on the given resource name. This constructor is only used by
-	 * {@link CombinedResourceHandler#createResource(String, String)}.
-	 * @param name The resource name of the combined resource.
+	 * Constructs a new dynamic resource based on the given resource name, library name and content type.
+	 * @param resourceName The resource name.
+	 * @param libraryName The library name.
+	 * @param contentType The content type.
 	 */
 	public DynamicResource(String resourceName, String libraryName, String contentType) {
 		setResourceName(resourceName);
@@ -78,13 +84,13 @@ public abstract class DynamicResource extends Resource {
 		}
 		catch (MalformedURLException e) {
 			// This exception should never occur.
-			throw new RuntimeException(e);
+			throw new UnsupportedOperationException(e);
 		}
 	}
 
 	@Override
 	public Map<String, String> getResponseHeaders() {
-		Map<String, String> responseHeaders = new HashMap<String, String>(4);
+		Map<String, String> responseHeaders = new HashMap<String, String>(RESPONSE_HEADERS_SIZE);
 		responseHeaders.put("Last-Modified", formatRFC1123(new Date(getLastModified())));
 		responseHeaders.put("Expires", formatRFC1123(new Date(System.currentTimeMillis() + Hacks.getDefaultResourceMaxAge())));
 		responseHeaders.put("Etag", String.format("W/\"%d-%d\"", getResourceName().hashCode(), getLastModified()));
@@ -114,7 +120,7 @@ public abstract class DynamicResource extends Resource {
 
 		if (ifModifiedSince != null) {
 			try {
-				return getLastModified() > parseRFC1123(ifModifiedSince).getTime();
+				return getLastModified() > parseRFC1123(ifModifiedSince).getTime() + SECONDS.toMillis(1); // RFC1123 doesn't store millis.
 			}
 			catch (ParseException ignore) {
 				return true;

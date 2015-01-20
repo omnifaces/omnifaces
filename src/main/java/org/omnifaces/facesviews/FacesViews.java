@@ -78,7 +78,6 @@ import javax.servlet.http.HttpServletRequest;
  * @author Arjan Tijms
  * @see FacesViewsForwardingFilter
  * @see FacesViewsViewHandler
- * @see FacesViewsViewHandlerInstaller
  * @see FacesViewsResolver
  */
 public final class FacesViews {
