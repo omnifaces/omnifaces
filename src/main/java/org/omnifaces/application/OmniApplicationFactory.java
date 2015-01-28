@@ -92,7 +92,7 @@ public class OmniApplicationFactory extends ApplicationFactory {
 		Application newApplication = application;
 
 		while (!(newApplication instanceof OmniApplication) && newApplication instanceof ApplicationWrapper) {
-			newApplication = ((ApplicationWrapper) application).getWrapped();
+			newApplication = ((ApplicationWrapper) newApplication).getWrapped();
 		}
 
 		if (!(newApplication instanceof OmniApplication)) {
