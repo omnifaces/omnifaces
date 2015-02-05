@@ -2730,6 +2730,17 @@ public class ValidateValuesBean implements MultiFieldValidator {
         <attribute>
             <description>
 				<![CDATA[
+	                The image type, represented as file extension. E.g. "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc.
+	                This attribute is ignored when 'name' attribute is specified.
+	            ]]>
+            </description>
+            <name>type</name>
+            <required>false</required>
+            <type>java.lang.String</type>
+        </attribute>
+        <attribute>
+            <description>
+				<![CDATA[
 	                The "last modified" timestamp, can be either a java.lang.Long, or java.util.Date, or java.lang.String
 	                which is parseable as java.lang.Long. This attribute is ignored when 'name' attribute is specified
 	                or when 'dataURI' attribute is set to 'true'.
@@ -2743,7 +2754,7 @@ public class ValidateValuesBean implements MultiFieldValidator {
             <description>
 				<![CDATA[
 	                The resource name of the resource. Works the same way as on <code>&lt;h:graphicImage&gt;</code>.
-	                When this attribute is specified, 'value' and 'lastModified' attributes are ignored.
+	                When this attribute is specified, 'value', 'type' and 'lastModified' attributes are ignored.
 	            ]]>
             </description>
             <name>name</name>

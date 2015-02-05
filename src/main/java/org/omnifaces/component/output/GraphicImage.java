@@ -35,6 +35,7 @@ import org.omnifaces.resourcehandler.DefaultResourceHandler;
 import org.omnifaces.resourcehandler.DynamicResource;
 import org.omnifaces.resourcehandler.GraphicResource;
 import org.omnifaces.resourcehandler.GraphicResourceHandler;
+import org.omnifaces.util.Faces;
 
 /**
  * <p>
@@ -125,6 +126,27 @@ import org.omnifaces.resourcehandler.GraphicResourceHandler;
  * &lt;ui:repeat value="#{bean.images}" var="image"&gt;
  *     &lt;o:graphicImage value="#{imageStreamer.getById(image.id)}" lastModified="#{image.lastModified}" /&gt;
  * &lt;/ui:repeat&gt;
+ * </pre>
+ *
+ * <h3>Image types</h3>
+ * <p>
+ * When rendered as data URI, the content type will be guessed based on content header. So far, JPEG, PNG, GIF, ICO,
+ * SVG, BMP and TIFF are recognized. If the content header is unrecognized, or when the image is rendered as regular
+ * image source, then the content type will default to <code>"image"</code> without any subtype. This should work for
+ * most images in most browsers. This may however fail on newer images or in older browsers. In that case, you can
+ * explicitly specify the image type via the <code>type</code> attribute which must represent a valid file extension.
+ * E.g.
+ * <pre>
+ * &lt;o:graphicImage value="#{imageStreamer.getById(image.id)}" type="svg" /&gt;
+ * </pre>
+ * <p>
+ * The content type will be resolved via {@link Faces#getMimeType(String)}. You can add unrecognized ones as
+ * <code>&lt;mime-mapping&gt;</code> in <code>web.xml</code>. E.g.
+ * <pre>
+ * &lt;mime-mapping&gt;
+ *     &lt;extension&gt;svg&lt;/extension&gt;
+ *     &lt;mime-type&gt;image/svg+xml&lt;/mime-type&gt;
+ * &lt;/mime-mapping&gt;
  * </pre>
  *
  * <h3>Design notes</h3>
@@ -220,11 +242,13 @@ public class GraphicImage extends HtmlGraphicImage {
 				throw new IllegalArgumentException(ERROR_MISSING_VALUE);
 			}
 
-			if (dataURI) {
-				resource = new GraphicResource(value.getValue(context.getELContext()), null);
+            String type = (String) getAttributes().get("type");
+
+            if (dataURI) {
+				resource = new GraphicResource(value.getValue(context.getELContext()), type);
 			}
 			else {
-				resource = GraphicResource.create(context, value, getAttributes().get("lastModified"));
+				resource = GraphicResource.create(context, value, type, getAttributes().get("lastModified"));
 			}
 		}
 

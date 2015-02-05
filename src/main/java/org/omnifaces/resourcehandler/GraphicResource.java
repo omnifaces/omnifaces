@@ -46,6 +46,7 @@ import javax.xml.bind.DatatypeConverter;
 import org.omnifaces.component.output.GraphicImage;
 import org.omnifaces.el.ExpressionInspector;
 import org.omnifaces.el.MethodReference;
+import org.omnifaces.util.Faces;
 
 /**
  * <p>
@@ -69,9 +70,12 @@ public class GraphicResource extends DynamicResource {
 		javax.faces.bean.ApplicationScoped.class, javax.enterprise.context.ApplicationScoped.class
 	};
 
-	private static final String ERROR_INVALID_LASTMODIFIED =
-		"o:graphicImage 'lastModified' attribute must be an instance of Long or Date."
-			+ " Encountered an invalid value of '%s'.";
+    private static final String ERROR_INVALID_LASTMODIFIED =
+            "o:graphicImage 'lastModified' attribute must be an instance of Long or Date."
+                + " Encountered an invalid value of '%s'.";
+    private static final String ERROR_INVALID_TYPE =
+            "o:graphicImage 'type' attribute must represent a valid file extension."
+                + " Encountered an invalid value of '%s'.";
 	private static final String ERROR_UNKNOWN_METHOD =
 		"o:graphicImage 'value' attribute must refer an existing method."
 			+ " Encountered an unknown method of '%s'.";
@@ -91,6 +95,7 @@ public class GraphicResource extends DynamicResource {
 		contentTypesByBase64Header.put("iVBORw", "image/png");
 		contentTypesByBase64Header.put("R0lGOD", "image/gif");
 		contentTypesByBase64Header.put("AAABAA", "image/x-icon");
+		contentTypesByBase64Header.put("PD94bW", "image/svg+xml");
 		contentTypesByBase64Header.put("Qk0", "image/bmp");
 		contentTypesByBase64Header.put("SUkqAA", "image/tiff");
 		contentTypesByBase64Header.put("TU0AKg", "image/tiff");
@@ -99,7 +104,7 @@ public class GraphicResource extends DynamicResource {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private Object content;
+	private String base64;
 	private String[] params;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
@@ -108,11 +113,19 @@ public class GraphicResource extends DynamicResource {
 	 * Construct a new graphic resource which uses the given content as data URI.
 	 * @param content The graphic resource content, to be represented as data URI.
 	 * @param contentType The graphic resource content type. If this is <code>null</code>, then it will be guessed
-	 * based on the content type signature in the content header. So far, JPEG, PNG, GIF and ICO are supported.
+	 * based on the content type signature in the content header. So far, JPEG, PNG, GIF, ICO, SVG, BMP and TIFF are
+	 * recognized. Else if this represents the file extension, then it will be resolved based on mime mappings.
 	 */
 	public GraphicResource(Object content, String contentType) {
 		super("", GraphicResourceHandler.LIBRARY_NAME, contentType);
-		this.content = content;
+		base64 = convertToBase64(content);
+
+        if (contentType == null) {
+            setContentType(guessContentType(base64));
+        }
+        else if (!contentType.contains("/")) {
+            setContentType(resolveContentType(contentType));
+        }
 	}
 
 	/**
@@ -125,7 +138,7 @@ public class GraphicResource extends DynamicResource {
 	 * @throws IllegalArgumentException If "last modified" can not be parsed to a timestamp.
 	 */
 	public GraphicResource(String name, String[] params, Object lastModified) {
-		super(name, GraphicResourceHandler.LIBRARY_NAME, DEFAULT_CONTENT_TYPE);
+		super(name, GraphicResourceHandler.LIBRARY_NAME, getContentType(name));
 		this.params = coalesce(params, EMPTY_PARAMS);
 
 		if (lastModified instanceof Long) {
@@ -147,20 +160,24 @@ public class GraphicResource extends DynamicResource {
 	 * This is called by {@link GraphicImage} component.
 	 * @param context The involved faces context.
 	 * @param value The value expression representing content to create a new graphic resource for.
+	 * @param type  The image type, represented as file extension. E.g. "jpg", "png", "gif", "ico", "svg", "bmp",
+	 * "tiff", etc.
 	 * @param lastModified The "last modified" representation of the graphic resource, can be {@link Long} or
 	 * {@link Date}, or otherwise an attempt will be made to parse it as {@link Long}.
 	 * @return The new graphic resource.
 	 * @throws IllegalArgumentException When the "value" attribute of the given component is absent or does not
-	 * represent a method expression referring an existing method taking at least one argument.
+	 * represent a method expression referring an existing method taking at least one argument. Or, when the "type"
+	 * attribute does not represent a valid file extension (you can add unrecognized ones as
+	 * <code>&lt;mime-mapping&gt;</code> in <code>web.xml</code>).
 	 */
-	public static GraphicResource create(FacesContext context, ValueExpression value, Object lastModified) {
+	public static GraphicResource create(FacesContext context, ValueExpression value, String type, Object lastModified) {
 		MethodReference methodReference = ExpressionInspector.getMethodReference(context.getELContext(), value);
 
 		if (methodReference.getMethod() == null) {
 			throw new IllegalArgumentException(String.format(ERROR_UNKNOWN_METHOD, value.getExpressionString()));
 		}
 
-		String name = getResourceName(methodReference);
+		String name = getResourceName(methodReference, type);
 
 		if (!ALLOWED_METHODS.containsKey(name)) { // No need to validate everytime when already known.
 			Class<? extends Object> beanClass = methodReference.getBase().getClass();
@@ -182,45 +199,13 @@ public class GraphicResource extends DynamicResource {
 	 */
 	@Override
 	public String getRequestPath() {
-		if (content != null) {
-			return getDataURI();
+		if (base64 != null) {
+			return "data:" + getContentType() + ";base64," + base64;
 		}
 		else {
 			String queryString = isEmpty(params) ? "" : ("&" + toQueryString(singletonMap("p", asList(params))));
 			return super.getRequestPath() + queryString;
 		}
-	}
-
-	/**
-	 * Returns the data URI for resource's content.
-	 * @return The data URI for resource's content.
-	 */
-	protected String getDataURI() {
-		byte[] bytes;
-
-		if (content instanceof InputStream) {
-			try {
-				bytes = toByteArray((InputStream) content);
-			}
-			catch (IOException e) {
-				throw new FacesException(e);
-			}
-		}
-		else if (content instanceof byte[]) {
-			bytes = (byte[]) content;
-		}
-		else {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_RETURNTYPE, content));
-		}
-
-		String base64 = DatatypeConverter.printBase64Binary(bytes);
-		String contentType = getContentType();
-
-		if (contentType == null) {
-			contentType = guessContentType(base64);
-		}
-
-		return "data:" + contentType + ";base64," + base64;
 	}
 
 	@Override
@@ -233,6 +218,7 @@ public class GraphicResource extends DynamicResource {
 
 		Method method = methodReference.getMethod();
 		Object[] convertedParams = convertToObjects(getContext(), params, method.getParameterTypes());
+		Object content;
 
 		try {
 			content = method.invoke(methodReference.getBase(), convertedParams);
@@ -241,7 +227,10 @@ public class GraphicResource extends DynamicResource {
 			throw new FacesException(e);
 		}
 
-		if (content instanceof InputStream) {
+		if (content == null) {
+		    return null;
+		}
+		else if (content instanceof InputStream) {
 			return (InputStream) content;
 		}
 		else if (content instanceof byte[]) {
@@ -254,12 +243,21 @@ public class GraphicResource extends DynamicResource {
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * This must return an unique and URL-safe identifier of the bean+method without any periods.
-	 */
-	private static String getResourceName(MethodReference methodReference) {
-		return methodReference.getBase().getClass().getSimpleName() + "_" + methodReference.getMethod().getName();
-	}
+    /**
+     * This must return an unique and URL-safe identifier of the bean+method+type without any periods.
+     */
+    private static String getResourceName(MethodReference methodReference, String type) {
+        return methodReference.getBase().getClass().getSimpleName() + "_" + methodReference.getMethod().getName()
+            + (isEmpty(type) ? "" : ("_" + type));
+    }
+
+    /**
+     * This must extract the content type from the resource name, if any, else return the default content type.
+     */
+    private static String getContentType(String resourceName) {
+        String[] parts = resourceName.split("_");
+        return (parts.length == 3) ? resolveContentType(parts[2]) : DEFAULT_CONTENT_TYPE;
+    }
 
 	/**
 	 * Guess the image content type based on given base64 encoded content for data URI.
@@ -272,6 +270,45 @@ public class GraphicResource extends DynamicResource {
 		}
 
 		return DEFAULT_CONTENT_TYPE;
+	}
+
+	/**
+	 * Resolve image content type based on given type attribute.
+	 * @throws IllegalArgumentException When given type is unrecognized.
+	 */
+	private static String resolveContentType(String type) {
+        String contentType = Faces.getExternalContext().getMimeType("image." + type);
+
+        if (contentType == null) {
+            throw new IllegalArgumentException(String.format(ERROR_INVALID_TYPE, type));
+        }
+
+        return contentType;
+	}
+
+	/**
+	 * Convert the given resource content to base64 encoded string.
+     * @throws IllegalArgumentException When given content is unrecognized.
+	 */
+	private static String convertToBase64(Object content) {
+        byte[] bytes;
+
+        if (content instanceof InputStream) {
+            try {
+                bytes = toByteArray((InputStream) content);
+            }
+            catch (IOException e) {
+                throw new FacesException(e);
+            }
+        }
+        else if (content instanceof byte[]) {
+            bytes = (byte[]) content;
+        }
+        else {
+            throw new IllegalArgumentException(String.format(ERROR_INVALID_RETURNTYPE, content));
+        }
+
+        return DatatypeConverter.printBase64Binary(bytes);
 	}
 
 	/**
