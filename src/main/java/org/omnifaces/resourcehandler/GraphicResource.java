@@ -70,12 +70,12 @@ public class GraphicResource extends DynamicResource {
 		javax.faces.bean.ApplicationScoped.class, javax.enterprise.context.ApplicationScoped.class
 	};
 
-    private static final String ERROR_INVALID_LASTMODIFIED =
-            "o:graphicImage 'lastModified' attribute must be an instance of Long or Date."
-                + " Encountered an invalid value of '%s'.";
-    private static final String ERROR_INVALID_TYPE =
-            "o:graphicImage 'type' attribute must represent a valid file extension."
-                + " Encountered an invalid value of '%s'.";
+	private static final String ERROR_INVALID_LASTMODIFIED =
+		"o:graphicImage 'lastModified' attribute must be an instance of Long or Date."
+			+ " Encountered an invalid value of '%s'.";
+	private static final String ERROR_INVALID_TYPE =
+		"o:graphicImage 'type' attribute must represent a valid file extension."
+			+ " Encountered an invalid value of '%s'.";
 	private static final String ERROR_UNKNOWN_METHOD =
 		"o:graphicImage 'value' attribute must refer an existing method."
 			+ " Encountered an unknown method of '%s'.";
@@ -120,12 +120,12 @@ public class GraphicResource extends DynamicResource {
 		super("", GraphicResourceHandler.LIBRARY_NAME, contentType);
 		base64 = convertToBase64(content);
 
-        if (contentType == null) {
-            setContentType(guessContentType(base64));
-        }
-        else if (!contentType.contains("/")) {
-            setContentType(resolveContentType(contentType));
-        }
+		if (contentType == null) {
+			setContentType(guessContentType(base64));
+		}
+		else if (!contentType.contains("/")) {
+			setContentType(resolveContentType(contentType));
+		}
 	}
 
 	/**
@@ -228,7 +228,7 @@ public class GraphicResource extends DynamicResource {
 		}
 
 		if (content == null) {
-		    return null;
+			return null;
 		}
 		else if (content instanceof InputStream) {
 			return (InputStream) content;
@@ -243,21 +243,21 @@ public class GraphicResource extends DynamicResource {
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
-    /**
-     * This must return an unique and URL-safe identifier of the bean+method+type without any periods.
-     */
-    private static String getResourceName(MethodReference methodReference, String type) {
-        return methodReference.getBase().getClass().getSimpleName() + "_" + methodReference.getMethod().getName()
-            + (isEmpty(type) ? "" : ("_" + type));
-    }
+	/**
+	 * This must return an unique and URL-safe identifier of the bean+method+type without any periods.
+	 */
+	private static String getResourceName(MethodReference methodReference, String type) {
+		return methodReference.getBase().getClass().getSimpleName() + "_" + methodReference.getMethod().getName()
+			+ (isEmpty(type) ? "" : ("_" + type));
+	}
 
-    /**
-     * This must extract the content type from the resource name, if any, else return the default content type.
-     */
-    private static String getContentType(String resourceName) {
-        String[] parts = resourceName.split("_");
-        return (parts.length == 3) ? resolveContentType(parts[2]) : DEFAULT_CONTENT_TYPE;
-    }
+	/**
+	 * This must extract the content type from the resource name, if any, else return the default content type.
+	 */
+	private static String getContentType(String resourceName) {
+		String[] parts = resourceName.split("_");
+		return (parts.length == 3) ? resolveContentType(parts[2]) : DEFAULT_CONTENT_TYPE;
+	}
 
 	/**
 	 * Guess the image content type based on given base64 encoded content for data URI.
@@ -277,38 +277,38 @@ public class GraphicResource extends DynamicResource {
 	 * @throws IllegalArgumentException When given type is unrecognized.
 	 */
 	private static String resolveContentType(String type) {
-        String contentType = Faces.getExternalContext().getMimeType("image." + type);
+		String contentType = Faces.getExternalContext().getMimeType("image." + type);
 
-        if (contentType == null) {
-            throw new IllegalArgumentException(String.format(ERROR_INVALID_TYPE, type));
-        }
+		if (contentType == null) {
+			throw new IllegalArgumentException(String.format(ERROR_INVALID_TYPE, type));
+		}
 
-        return contentType;
+		return contentType;
 	}
 
 	/**
 	 * Convert the given resource content to base64 encoded string.
-     * @throws IllegalArgumentException When given content is unrecognized.
+	 * @throws IllegalArgumentException When given content is unrecognized.
 	 */
 	private static String convertToBase64(Object content) {
-        byte[] bytes;
+		byte[] bytes;
 
-        if (content instanceof InputStream) {
-            try {
-                bytes = toByteArray((InputStream) content);
-            }
-            catch (IOException e) {
-                throw new FacesException(e);
-            }
-        }
-        else if (content instanceof byte[]) {
-            bytes = (byte[]) content;
-        }
-        else {
-            throw new IllegalArgumentException(String.format(ERROR_INVALID_RETURNTYPE, content));
-        }
+		if (content instanceof InputStream) {
+			try {
+				bytes = toByteArray((InputStream) content);
+			}
+			catch (IOException e) {
+				throw new FacesException(e);
+			}
+		}
+		else if (content instanceof byte[]) {
+			bytes = (byte[]) content;
+		}
+		else {
+			throw new IllegalArgumentException(String.format(ERROR_INVALID_RETURNTYPE, content));
+		}
 
-        return DatatypeConverter.printBase64Binary(bytes);
+		return DatatypeConverter.printBase64Binary(bytes);
 	}
 
 	/**

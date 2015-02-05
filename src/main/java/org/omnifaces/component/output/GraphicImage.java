@@ -242,9 +242,9 @@ public class GraphicImage extends HtmlGraphicImage {
 				throw new IllegalArgumentException(ERROR_MISSING_VALUE);
 			}
 
-            String type = (String) getAttributes().get("type");
+			String type = (String) getAttributes().get("type");
 
-            if (dataURI) {
+			if (dataURI) {
 				resource = new GraphicResource(value.getValue(context.getELContext()), type);
 			}
 			else {
