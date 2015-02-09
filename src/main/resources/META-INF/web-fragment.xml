@@ -19,6 +19,8 @@
 >
 	<name>omnifaces</name>
 
+	<distributable />
+
 	<ordering>
 		<after>
 			<others />
