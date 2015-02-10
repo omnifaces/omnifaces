@@ -52,11 +52,7 @@ public class MethodParam extends TagHandler {
 
 	@Override
 	public void apply(FaceletContext ctx, UIComponent parent) throws IOException {
-
-		// If param was not specified, skip it (assume it optional).
-		if (ctx.getVariableMapper().resolveVariable(value.getValue().replaceAll("^#\\{|\\}$", "")) == null) {
-			return;
-		}
+		String nameStr = name.getValue(ctx);
 
 		// The original value expression we get inside the Facelets tag, that's actually the method expression passed-in by the user.
 		ValueExpression valueExpression = value.getValueExpression(ctx, Object.class);
@@ -77,7 +73,7 @@ public class MethodParam extends TagHandler {
 			valueExpressionWrapper = ctx.getExpressionFactory().createValueExpression(methodExpression, MethodExpression.class);
 		}
 
-		ctx.getVariableMapper().setVariable(name.getValue(ctx), valueExpressionWrapper);
+		ctx.getVariableMapper().setVariable(nameStr, valueExpressionWrapper);
 	}
 
 }
