@@ -33,7 +33,6 @@ import java.io.IOException;
 import java.util.Map;
 
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -70,12 +69,17 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 	private FacesServletDispatchMethod dispatchMethod;
 
 	@Override
-	public void init(FilterConfig filterConfig) throws ServletException {
-		super.init(filterConfig);
-		ServletContext servletContext = filterConfig.getServletContext();
-		extensionAction = getExtensionAction(servletContext);
-		pathAction = getPathAction(servletContext);
-		dispatchMethod = getFacesServletDispatchMethod(servletContext);
+	public void init() throws ServletException {
+		ServletContext servletContext = getServletContext();
+
+		try {
+			extensionAction = getExtensionAction(servletContext);
+			pathAction = getPathAction(servletContext);
+			dispatchMethod = getFacesServletDispatchMethod(servletContext);
+		}
+		catch (IllegalStateException e) {
+			throw new ServletException(e);
+		}
 	}
 
     @Override

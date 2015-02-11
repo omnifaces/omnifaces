@@ -102,7 +102,7 @@ public class CharacterEncodingFilter extends HttpFilter {
 				encoding = Charset.forName(encodingParam);
 			}
 			catch (Exception e) {
-				throw new IllegalArgumentException(String.format(ERROR_ENCODING, encodingParam), e);
+				throw new ServletException(String.format(ERROR_ENCODING, encodingParam), e);
 			}
 		}
 	}
