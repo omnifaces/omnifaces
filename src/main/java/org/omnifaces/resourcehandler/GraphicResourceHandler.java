@@ -44,14 +44,20 @@ public class GraphicResourceHandler extends DefaultResourceHandler {
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
+	/**
+	 * Returns {@link #LIBRARY_NAME}.
+	 */
 	@Override
-	public Resource createResource(String resourceName, String libraryName, String contentType) {
-		if (LIBRARY_NAME.equals(libraryName)) {
-			return new GraphicResource(resourceName, getRequestParameterValues("p"), getRequestParameter("v"));
-		}
-		else {
-			return super.createResource(resourceName, libraryName, contentType);
-		}
+	public String getLibraryName() {
+		return LIBRARY_NAME;
+	}
+
+	/**
+	 * Returns a new {@link GraphicResource}.
+	 */
+	@Override
+	public Resource createResourceFromLibrary(String resourceName, String contentType) {
+		return new GraphicResource(resourceName, getRequestParameterValues("p"), getRequestParameter("v"));
 	}
 
 }

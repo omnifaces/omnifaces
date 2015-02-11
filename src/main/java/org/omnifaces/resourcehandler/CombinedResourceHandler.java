@@ -276,14 +276,20 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		builder.create(context);
 	}
 
+	/**
+	 * Returns {@link #LIBRARY_NAME}.
+	 */
 	@Override
-	public Resource createResource(String resourceName, String libraryName, String contentType) {
-		if (LIBRARY_NAME.equals(libraryName)) {
-			return new CombinedResource(resourceName);
-		}
-		else {
-			return super.createResource(resourceName, libraryName, contentType);
-		}
+	public String getLibraryName() {
+		return LIBRARY_NAME;
+	}
+
+	/**
+	 * Returns a new {@link CombinedResource}.
+	 */
+	@Override
+	public Resource createResourceFromLibrary(String resourceName, String contentType) {
+		return new CombinedResource(resourceName);
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------

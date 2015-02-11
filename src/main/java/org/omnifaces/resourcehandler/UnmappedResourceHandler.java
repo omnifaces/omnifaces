@@ -124,13 +124,10 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Delegate to {@link #createResource(String, String, String)} of the wrapped resource handler. If it returns
-	 * non-<code>null</code>, then return an unmapped resource.
+	 * If the given resource is not <code>null</code>, then decorate it as an unmapped resource.
 	 */
 	@Override
-	public Resource createResource(String resourceName, String libraryName, String contentType) {
-		Resource resource = super.createResource(resourceName, libraryName, contentType);
-
+	public Resource decorateResource(Resource resource) {
 		if (resource == null) {
 			return resource;
 		}

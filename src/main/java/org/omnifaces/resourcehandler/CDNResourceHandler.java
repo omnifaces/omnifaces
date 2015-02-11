@@ -193,17 +193,14 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Delegate to {@link #createResource(String, String, String)} of the wrapped resource handler. If it returns
-	 * non-<code>null</code> and the CDN resource handler is not (conditionally) disabled for the current request,
-	 * then the CDN resources will be consulted if any CDN URL is available for the given resource. If there is none,
-	 * then just return the JSF default resource, otherwise return a wrapped resource whose
+	 * If the given resource is not <code>null</code> and the CDN resource handler is not (conditionally) disabled for
+	 * the current request, then the CDN resources will be consulted if any CDN URL is available for the given resource.
+	 * If there is none, then just return the JSF default resource, otherwise return a wrapped resource whose
 	 * {@link Resource#getRequestPath()} returns the CDN URL as is been set in the
 	 * {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_RESOURCES} context parameter.
 	 */
 	@Override
-	public Resource createResource(String resourceName, String libraryName, String contentType) {
-		Resource resource = super.createResource(resourceName, libraryName, contentType);
-
+	public Resource decorateResource(Resource resource) {
 		if (resource == null || (disabledParam != null && Boolean.valueOf(String.valueOf(evaluateExpressionGet(disabledParam))))) {
 			return resource;
 		}
@@ -211,6 +208,9 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 		String requestPath = null;
 
 		if (cdnResources != null) {
+			String libraryName = resource.getLibraryName();
+			String resourceName = resource.getResourceName();
+
 			requestPath = cdnResources.get(new ResourceIdentifier(libraryName, resourceName));
 
 			if (requestPath == null) {
