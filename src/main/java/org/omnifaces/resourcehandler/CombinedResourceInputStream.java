@@ -62,7 +62,6 @@ final class CombinedResourceInputStream extends InputStream {
     /* 16.02.2015 Caching added by Stephan Rauh, http://www.beyondjava.net */
     private byte[] combinedResource = null;
     private int pointer = 0;
-
     /* 16.02.2015 end of pull request */
 
     // Constructors ---------------------------------------------------------------------------------------------------
@@ -85,10 +84,20 @@ final class CombinedResourceInputStream extends InputStream {
             pointer = 0;
             currentStream = null;
         }
+        else
+        {
+            streamIterator.hasNext(); // We assume it to be always true, see also CombinedResource#getInputStream().
+            currentStream = streamIterator.next();
+        }
         /* 16.02.2015 end of pull request */
     }
 
-    private void prepareStreaming(Set<Resource> resources) throws IOException, MalformedURLException {
+    /**
+     * Collects the list of Stream that have to be read.
+     * @param resources The resources to be read.
+     * @throws IOException If something fails at I/O level.
+     */
+    private void prepareStreaming(Set<Resource> resources) throws IOException {
         streams = new ArrayList<>();
         String domainURL = getRequestDomainURL();
 
@@ -106,15 +115,21 @@ final class CombinedResourceInputStream extends InputStream {
         }
 
         streamIterator = streams.iterator();
-        streamIterator.hasNext(); // We assume it to be always true, see also CombinedResource#getInputStream().
-        currentStream = streamIterator.next();
     }
 
     /* 16.02.2015 Caching added by Stephan Rauh, http://www.beyondjava.net */
     // Eclipse doesn't detect that the resource are closed in the close() method
+    /**
+     * This method collects the resources eagerly and combines them into a byte array. The byte array is cached.
+     * @param streamIterator The stream iterator iterates over the resources to be read.
+     * @param resources The resources to be read.
+     * @return a byte array containing the combined resources. Can't be null.
+     * @throws IOException
+            If something fails at I/O level.
+     */
     @SuppressWarnings("resource")
     private static byte[] prepareStreamingFromCache(Iterator<InputStream> streamIterator, Set<Resource> resources)
-            throws IOException, MalformedURLException {
+            throws IOException {
         String key = "";
 
         for (Resource resource : resources) {
@@ -167,6 +182,10 @@ final class CombinedResourceInputStream extends InputStream {
         return _combinedResource;
     }
 
+    /**
+     * How many seconds are cache entries supposed to live in the cache? Default: 1 hour.
+     * @return the number of seconds
+     */
     private static int getTimeToLiveOfCacheEntries() {
         int timeToLive=3600; // one hour by default
         
@@ -176,13 +195,12 @@ final class CombinedResourceInputStream extends InputStream {
                 timeToLive=Integer.parseInt(ttl);
             }
             catch (Exception weirdEntry) {
-                // todo: log the error
+                // this error has already been reported on startup, so we can safely ignore it here
             }
         
         }
         return timeToLive;
     }
-
     /* 16.02.2015 end of pull request */
 
     // Actions --------------------------------------------------------------------------------------------------------
