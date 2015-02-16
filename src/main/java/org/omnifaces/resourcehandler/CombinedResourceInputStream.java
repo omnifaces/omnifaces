@@ -15,108 +15,243 @@ package org.omnifaces.resourcehandler;
 import static org.omnifaces.util.Faces.getRequestDomainURL;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.faces.application.Resource;
+import javax.faces.context.FacesContext;
+import javax.faces.event.ScopeContext;
 
+import org.omnifaces.component.output.cache.CacheFactory;
+import org.omnifaces.util.Faces;
 import org.omnifaces.util.Utils;
 
 /**
- * This {@link InputStream} implementation takes care that all in the constructor given resources are been read in
- * sequence.
+ * This {@link InputStream} implementation takes care that all in the constructor given resources are been read in sequence.
+ * 
  * @author Bauke Scholtz
  */
 final class CombinedResourceInputStream extends InputStream {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+    // Constants ------------------------------------------------------------------------------------------------------
 
-	private static final byte[] CRLF = { '\r', '\n' };
+    /* 16.02.2015 Caching added by Stephan Rauh, http://www.beyondjava.net */
+    /** The context parameter name to specify whether the resources are to be cached or not. */
+    public static final String PARAM_NAME_ACTIVATE_RESOURCE_CACHING = "org.omnifaces.COMBINED_RESOURCE_ACTIVATE_RESOURCE_CACHING";
+    /* 16.02.2015 end of modification */
 
-	// Properties -----------------------------------------------------------------------------------------------------
+    private static final byte[] CRLF = { '\r', '\n' };
 
-	private List<InputStream> streams;
-	private Iterator<InputStream> streamIterator;
-	private InputStream currentStream;
+    // Properties -----------------------------------------------------------------------------------------------------
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    private List<InputStream> streams;
+    private Iterator<InputStream> streamIterator;
+    private InputStream currentStream;
 
-	/**
-	 * Creates an instance of {@link CombinedResourceInputStream} based on the given resources. For each resource, the
-	 * {@link InputStream} will be obtained and hold in an iterable collection.
-	 * @param resources The resources to be read.
-	 * @throws IOException If something fails at I/O level.
-	 */
-	public CombinedResourceInputStream(Set<Resource> resources) throws IOException {
-		streams = new ArrayList<>();
-		String domainURL = getRequestDomainURL();
+    static Map<String, byte[]> cachedResources = new HashMap<String, byte[]>();
 
-		for (Resource resource : resources) {
-			InputStream stream;
+    /* 16.02.2015 Caching added by Stephan Rauh, http://www.beyondjava.net */
+    private byte[] combinedResource = null;
+    private int pointer = 0;
 
-			try {
-				stream = resource.getInputStream();
-			}
-			catch (Exception richFacesDoesNotSupportThis) {
-				stream = new URL(domainURL + resource.getRequestPath()).openStream();
-			}
+    /* 16.02.2015 end of pull request */
 
-			streams.add(stream);
-			streams.add(new ByteArrayInputStream(CRLF));
-		}
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-		streamIterator = streams.iterator();
-		streamIterator.hasNext(); // We assume it to be always true, see also CombinedResource#getInputStream().
-		currentStream = streamIterator.next();
-	}
+    /**
+     * Creates an instance of {@link CombinedResourceInputStream} based on the given resources. For each resource, the {@link InputStream}
+     * will be obtained and hold in an iterable collection.
+     * 
+     * @param resources
+     *            The resources to be read.
+     * @throws IOException
+     *             If something fails at I/O level.
+     */
+    public CombinedResourceInputStream(Set<Resource> resources) throws IOException {
+        prepareStreaming(resources);
 
-	// Actions --------------------------------------------------------------------------------------------------------
+        /* 16.02.2015 Caching added by Stephan Rauh, http://www.beyondjava.net */
+        if ("true".equals(Faces.getInitParameter(PARAM_NAME_ACTIVATE_RESOURCE_CACHING))) {
+            combinedResource = prepareStreamingFromCache(streamIterator, resources);
+            pointer = 0;
+            currentStream = null;
+        }
+        /* 16.02.2015 end of pull request */
+    }
 
-	/**
-	 * For each resource, read until its {@link InputStream#read()} returns <code>-1</code> and then iterate to the
-	 * {@link InputStream} of the next resource, if any available, else return <code>-1</code>.
-	 */
-	@Override
-	public int read() throws IOException {
-		int read = -1;
+    private void prepareStreaming(Set<Resource> resources) throws IOException, MalformedURLException {
+        streams = new ArrayList<>();
+        String domainURL = getRequestDomainURL();
 
-		while ((read = currentStream.read()) == -1) {
-			if (streamIterator.hasNext()) {
-				currentStream = streamIterator.next();
-			}
-			else {
-				break;
-			}
-		}
+        for (Resource resource : resources) {
+            InputStream stream;
 
-		return read;
-	}
+            try {
+                stream = resource.getInputStream();
+            } catch (Exception richFacesDoesNotSupportThis) {
+                stream = new URL(domainURL + resource.getRequestPath()).openStream();
+            }
 
-	/**
-	 * Closes the {@link InputStream} of each resource. Whenever the {@link InputStream#close()} throws an
-	 * {@link IOException} for the first time, it will be caught and be thrown after all resources have been closed.
-	 * Any {@link IOException} which is thrown by a subsequent close will be ignored by design.
-	 */
-	@Override
-	public void close() throws IOException {
-		IOException caught = null;
+            streams.add(stream);
+            streams.add(new ByteArrayInputStream(CRLF));
+        }
 
-		for (InputStream stream : streams) {
-			IOException e = Utils.close(stream);
+        streamIterator = streams.iterator();
+        streamIterator.hasNext(); // We assume it to be always true, see also CombinedResource#getInputStream().
+        currentStream = streamIterator.next();
+    }
 
-			if (caught == null) {
-				caught = e; // Don't throw it yet. We have to continue closing all other streams.
-			}
-		}
+    /* 16.02.2015 Caching added by Stephan Rauh, http://www.beyondjava.net */
+    // Eclipse doesn't detect that the resource are closed in the close() method
+    @SuppressWarnings("resource")
+    private static byte[] prepareStreamingFromCache(Iterator<InputStream> streamIterator, Set<Resource> resources)
+            throws IOException, MalformedURLException {
+        String key = "";
 
-		if (caught != null) {
-			throw caught;
-		}
-	}
+        for (Resource resource : resources) {
+            key += resource.getLibraryName() + "/" + resource.getResourceName() + " ";
+        }
+
+        // No need to synchronize!
+        
+        org.omnifaces.component.output.cache.Cache scopedCache = CacheFactory.getCache(FacesContext.getCurrentInstance(), "application");
+
+        byte[] _combinedResource;
+        synchronized(CombinedResourceHandler.class){
+            _combinedResource = (byte[]) scopedCache.getAttribute(key,  key);
+        }
+
+        
+//        byte[] combinedResource = cachedResources.get(key);
+        if (null != _combinedResource) {
+            System.out.println("Taking resource from cache: " + key);
+            return _combinedResource;
+        }
+        else System.out.println("Cache miss");
+
+        streamIterator.hasNext(); // We assume it to be always true, see also CombinedResource#getInputStream().
+        InputStream currentStream = streamIterator.next();
+        // Caching added by Stephan Rauh, www.beyondjava.net, Feb 02, 2015
+        if (null == _combinedResource) {
+            ByteArrayOutputStream collector = new ByteArrayOutputStream();
+            int read = -1;
+
+            while (true) {
+                read = currentStream.read();
+                if (read == -1) {
+                    if (streamIterator.hasNext()) {
+                        // currentStream.close();
+                        currentStream = streamIterator.next();
+                    } else {
+                        break;
+                    }
+                } else
+                    collector.write(read);
+            }
+            _combinedResource = collector.toByteArray();
+            synchronized(CombinedResourceHandler.class){
+                
+                if (null==scopedCache.getAttribute(key, key))
+                    scopedCache.putAttribute(key, key, _combinedResource,getTimeToLiveOfCacheEntries());
+            }
+        }
+        return _combinedResource;
+    }
+
+    private static int getTimeToLiveOfCacheEntries() {
+        int timeToLive=3600; // one hour by default
+        
+        String ttl = Faces.getInitParameter("org.omnifaces.CACHE_SETTING_APPLICATION_TTL");
+        if (null !=ttl) {
+            try {
+                timeToLive=Integer.parseInt(ttl);
+            }
+            catch (Exception weirdEntry) {
+                // todo: log the error
+            }
+        
+        }
+        return timeToLive;
+    }
+
+    /* 16.02.2015 end of pull request */
+
+    // Actions --------------------------------------------------------------------------------------------------------
+
+    // Caching added by Stephan Rauh, www.beyondjava.net, Feb 02, 2015
+    /**
+     * For each resource, read until its {@link InputStream#read()} returns <code>-1</code> and then iterate to the {@link InputStream} of
+     * the next resource, if any available, else return <code>-1</code>.
+     */
+    @Override
+    public int read() throws IOException {
+        // Hint on performance: this method will run "hot", i.e. will be inlined and compiled to assembler code by the JIT. So introducing
+        // the additional methods doesn't
+        // reduce performance.
+        if (null != combinedResource)
+            return readFromCache();
+        else
+            return readFromStreamIterator();
+    }
+
+    /**
+     * For each resource, read until its {@link InputStream#read()} returns <code>-1</code> and then iterate to the {@link InputStream} of
+     * the next resource, if any available, else return <code>-1</code>.
+     */
+    public int readFromStreamIterator() throws IOException {
+        int read = -1;
+
+        while ((read = currentStream.read()) == -1) {
+            if (streamIterator.hasNext()) {
+                currentStream = streamIterator.next();
+            } else {
+                break;
+            }
+        }
+
+        return read;
+    }
+
+    public int readFromCache() throws IOException {
+        // Caching added by Stephan Rauh, www.beyondjava.net, Feb 02, 2015
+        if (pointer < combinedResource.length) {
+            return combinedResource[pointer++];
+        } else {
+            return -1;
+        }
+    }
+
+    /* 16.02.2015 end of pull request */
+
+    /**
+     * Closes the {@link InputStream} of each resource. Whenever the {@link InputStream#close()} throws an {@link IOException} for the first
+     * time, it will be caught and be thrown after all resources have been closed. Any {@link IOException} which is thrown by a subsequent
+     * close will be ignored by design.
+     */
+    @Override
+    public void close() throws IOException {
+        IOException caught = null;
+
+        for (InputStream stream : streams) {
+            IOException e = Utils.close(stream);
+
+            if (caught == null) {
+                caught = e; // Don't throw it yet. We have to continue closing all other streams.
+            }
+        }
+
+        if (caught != null) {
+            throw caught;
+        }
+    }
 
 }
