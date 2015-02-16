@@ -47,5 +47,4 @@ public class DefaultCache extends TimeToLiveCache {
 			return new ConcurrentHashMap<>();
 		}
 	}
-
 }

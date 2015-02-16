@@ -18,7 +18,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,7 +28,6 @@ import java.util.Set;
 
 import javax.faces.application.Resource;
 import javax.faces.context.FacesContext;
-import javax.faces.event.ScopeContext;
 
 import org.omnifaces.component.output.cache.CacheFactory;
 import org.omnifaces.util.Faces;
@@ -43,6 +41,9 @@ import org.omnifaces.util.Utils;
 final class CombinedResourceInputStream extends InputStream {
 
     // Constants ------------------------------------------------------------------------------------------------------
+
+    private static final String TIME_TO_LIVE_CONTEXT_PARAM = "org.omnifaces.CACHE_SETTING_APPLICATION_TTL";
+    private final static String DEFAULT_SCOPE = "application";
 
     /* 16.02.2015 Caching added by Stephan Rauh, http://www.beyondjava.net */
     /** The context parameter name to specify whether the resources are to be cached or not. */
@@ -136,22 +137,16 @@ final class CombinedResourceInputStream extends InputStream {
             key += resource.getLibraryName() + "/" + resource.getResourceName() + " ";
         }
 
-        // No need to synchronize!
-        
-        org.omnifaces.component.output.cache.Cache scopedCache = CacheFactory.getCache(FacesContext.getCurrentInstance(), "application");
+        org.omnifaces.component.output.cache.Cache scopedCache = CacheFactory.getCache(FacesContext.getCurrentInstance(), DEFAULT_SCOPE);
 
         byte[] _combinedResource;
         synchronized(CombinedResourceHandler.class){
-            _combinedResource = (byte[]) scopedCache.getAttribute(key,  key);
+            _combinedResource = (byte[]) scopedCache.getObject(key);
         }
-
         
-//        byte[] combinedResource = cachedResources.get(key);
         if (null != _combinedResource) {
-            System.out.println("Taking resource from cache: " + key);
             return _combinedResource;
         }
-        else System.out.println("Cache miss");
 
         streamIterator.hasNext(); // We assume it to be always true, see also CombinedResource#getInputStream().
         InputStream currentStream = streamIterator.next();
@@ -164,7 +159,6 @@ final class CombinedResourceInputStream extends InputStream {
                 read = currentStream.read();
                 if (read == -1) {
                     if (streamIterator.hasNext()) {
-                        // currentStream.close();
                         currentStream = streamIterator.next();
                     } else {
                         break;
@@ -174,9 +168,8 @@ final class CombinedResourceInputStream extends InputStream {
             }
             _combinedResource = collector.toByteArray();
             synchronized(CombinedResourceHandler.class){
-                
                 if (null==scopedCache.getAttribute(key, key))
-                    scopedCache.putAttribute(key, key, _combinedResource,getTimeToLiveOfCacheEntries());
+                    scopedCache.putObject(key, _combinedResource, getTimeToLiveOfCacheEntries());
             }
         }
         return _combinedResource;
@@ -189,7 +182,7 @@ final class CombinedResourceInputStream extends InputStream {
     private static int getTimeToLiveOfCacheEntries() {
         int timeToLive=3600; // one hour by default
         
-        String ttl = Faces.getInitParameter("org.omnifaces.CACHE_SETTING_APPLICATION_TTL");
+        String ttl = Faces.getInitParameter(TIME_TO_LIVE_CONTEXT_PARAM);
         if (null !=ttl) {
             try {
                 timeToLive=Integer.parseInt(ttl);
@@ -271,5 +264,4 @@ final class CombinedResourceInputStream extends InputStream {
             throw caught;
         }
     }
-
 }
