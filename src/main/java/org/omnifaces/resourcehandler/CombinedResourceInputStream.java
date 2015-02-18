@@ -168,7 +168,7 @@ final class CombinedResourceInputStream extends InputStream {
             }
             _combinedResource = collector.toByteArray();
             synchronized(CombinedResourceHandler.class){
-                if (null==scopedCache.getAttribute(key, key))
+                if (null==scopedCache.getObject(key))
                     scopedCache.putObject(key, _combinedResource, getTimeToLiveOfCacheEntries());
             }
         }
