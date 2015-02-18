@@ -45,7 +45,9 @@ import org.omnifaces.util.Hacks;
  * <p>
  * This {@link ResourceHandler} implementation will remove all separate script and stylesheet resources which have the
  * <code>target</code> attribute set to <code>"head"</code> from the {@link UIViewRoot} and create a combined one
- * for all scripts and another combined one for all stylesheets.
+ * for all scripts and another combined one for all stylesheets. In most cases your application's pages
+ * will load considerably. Optionally the combined resource files
+ * can be cached on the server, giving your application another boost (at the expense of some heap memory on the server side).
  *
  * <h3>Installation</h3>
  * <p>
@@ -58,7 +60,7 @@ import org.omnifaces.util.Hacks;
  *
  * <h3>Usage</h3>
  * <p>
- * Noted shuold be that the <code>target</code> attribute of <code>&lt;h:outputStylesheet&gt;</code> already defaults to
+ * Noted should be that the <code>target</code> attribute of <code>&lt;h:outputStylesheet&gt;</code> already defaults to
  * <code>"head"</code> but the one of <code>&lt;h:outputScript&gt;</code> not. So if you have placed this inside the
  * <code>&lt;h:head&gt;</code>, then you would still need to explicitly set its <code>target</code> attribute to
  * <code>"head"</code>, otherwise it will be treated as an inline script and not be combined. This is a design
@@ -86,6 +88,15 @@ import org.omnifaces.util.Hacks;
  * The generated combined resource URL also includes the "<code>v</code>" request parameter which is the last modified
  * time of the newest individual resource in minutes, so that the browser will always be forced to request the latest
  * version whenever one of the individual resources has changed.
+ * 
+ * <h3>Caching</h3>
+ * <p>
+ * Optionally you can activate server-side caching. This can speed up the initial page load considerably. In general,
+ * subsequent page loads are served from the browser cache, so caching doesn't make a difference on postbacks.
+ * Therefore the combined resources are always stored in the application scope. Note that the combined resources
+ * require some heap space (the size of the resource file plus a few bytes overhead). However, without caching
+ * the same amount of heap space is allocated and freed for each request that can't be served from the browser cache,
+ * so chances are you won't notice the memory penalty of caching.</p> 
  *
  * <h3>Configuration</h3>
  * <p>
@@ -118,6 +129,28 @@ import org.omnifaces.util.Hacks;
  * Set to <code>true</code> if you want to render the combined JS resources inline (embedded in HTML) instead of as a
  * resource.
  * </td></tr>
+ * 
+ * <tr><td class="colFirst">
+ * <code>org.omnifaces.COMBINED_RESOURCE_ACTIVATE_RESOURCE_CACHING</code>
+ * </td><td>
+ * Set to <code>true</code> if you want to activate server-side caching of the resource files.
+ * </td></tr>
+ * 
+ * <tr><td class="colFirst">
+ * <code>org.omnifaces.CACHE_SETTING_APPLICATION_MAX_CAPACITY</code>
+ * </td><td>
+ * Maximum number of resource files to be hold simultaneously in the cache. If nothing is specified, it's 10 by default. 
+ * Note this parameter is also responsible for <code>&lt;o:cache&gt;</code>.
+ * </td></tr>
+ * 
+ * <tr><td class="colFirst">
+ * <code>org.omnifaces.CACHE_SETTING_APPLICATION_TTL</code>
+ * </td><td>
+ * Resource files are removed from the cache if they are older than this parameter indicates. The parameter is the
+ * maximum age of the file in seconds. If nothing is specified, the default is one hour by default (3600 seconds).
+ *  Note this parameter is also responsible for <code>&lt;o:cache&gt;</code>.
+ * </td></tr>
+ * 
  * </table>
  * <p>
  * Here, the "resource identifier" is the unique combination of library name and resource name, separated by a colon,
