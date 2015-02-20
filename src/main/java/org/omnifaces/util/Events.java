@@ -272,6 +272,8 @@ public final class Events {
 
 	private static <A> Callback.WithArgument<A> wrap(final Callback.Void callback) {
 		return new Callback.WithArgument<A>() {
+			
+			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void invoke(A argument) {

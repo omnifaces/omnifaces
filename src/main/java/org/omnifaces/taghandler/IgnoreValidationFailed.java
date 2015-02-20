@@ -12,8 +12,12 @@
  */
 package org.omnifaces.taghandler;
 
+import static javax.faces.event.PhaseId.PROCESS_VALIDATIONS;
+import static javax.faces.event.PhaseId.RENDER_RESPONSE;
+import static org.omnifaces.util.Components.findComponent;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Components.hasInvokedSubmit;
+import static org.omnifaces.util.Events.subscribeToRequestAfterPhase;
 import static org.omnifaces.util.Events.subscribeToViewBeforePhase;
 
 import java.io.IOException;
@@ -92,13 +96,15 @@ public class IgnoreValidationFailed extends TagHandler {
 		}
 
 		if (ComponentHandler.isNew(parent)) {
-			subscribeToViewBeforePhase(PhaseId.PROCESS_VALIDATIONS, new Callback.Void() {
+		
+			subscribeToRequestAfterPhase(RENDER_RESPONSE, new Callback.Void() {
+				
+				private static final long serialVersionUID = 1L;
 
 				@Override
 				public void invoke() {
-					if (hasInvokedSubmit(parent)) {
-						getClosestParent(parent, Form.class).setIgnoreValidationFailed(true);
-					}
+					subscribeToViewBeforePhase(PROCESS_VALIDATIONS, new IgnoreValidationFailedSetter(parent.getClientId()));
+					
 				}
 			});
 		}
@@ -108,5 +114,27 @@ public class IgnoreValidationFailed extends TagHandler {
 			}
 		}
 	}
+	
+	public static class IgnoreValidationFailedSetter implements Callback.Void {
+		
+		private static final long serialVersionUID = 1L;
+		
+		private final String parentId;
+		
+		public IgnoreValidationFailedSetter(String parentId) {
+			this.parentId = parentId;	
+		}
+
+		@Override
+		public void invoke() {
+			
+			UIComponent parent = findComponent(parentId);
+			
+			if (hasInvokedSubmit(parent)) {
+				getClosestParent(parent, Form.class).setIgnoreValidationFailed(true);
+			}
+		}
+	}
+	
 
 }

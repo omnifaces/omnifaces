@@ -239,6 +239,9 @@ public class ViewParamValidationFailed extends TagHandler implements ComponentSy
 		FacesContext context = getContext();
 		final UIComponent component = event.getComponent();
 		subscribeToRequestAfterPhase(context.getCurrentPhaseId(), new Callback.Void() {
+			
+			private static final long serialVersionUID = 1L;
+			
 			@Override
 			public void invoke() {
 				// We can't unsubscribe immediately inside processEvent() itself, as it would otherwise end up in a

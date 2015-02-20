@@ -12,6 +12,8 @@
  */
 package org.omnifaces.util;
 
+import java.io.Serializable;
+
 /**
  * Collection of callback interfaces. Useful in (mini) visitor and strategy patterns.
  *
@@ -26,7 +28,7 @@ public final class Callback {
 	 *
 	 * @author Bauke Scholtz
 	 */
-	public interface Void {
+	public interface Void extends Serializable {
 
 		/**
 		 * This method should be invoked by the method where you're passing this callback instance to.
@@ -41,7 +43,7 @@ public final class Callback {
 	 * @author Bauke Scholtz
 	 * @param <R> The return type.
 	 */
-	public interface Returning<R> {
+	public interface Returning<R> extends Serializable {
 
 		/**
 		 * This method should be invoked by the method where you're passing this callback instance to.
@@ -57,7 +59,7 @@ public final class Callback {
 	 * @author Bauke Scholtz
 	 * @param <A> The argument type.
 	 */
-	public interface WithArgument<A> {
+	public interface WithArgument<A> extends Serializable {
 
 		/**
 		 * This method should be invoked by the method where you're passing this callback instance to.
@@ -74,7 +76,7 @@ public final class Callback {
 	 * @param <R> The return type.
 	 * @param <A> The argument type.
 	 */
-	public interface ReturningWithArgument<R, A> {
+	public interface ReturningWithArgument<R, A> extends Serializable {
 
 		/**
 		 * This method should be invoked by the method where you're passing this callback instance to.

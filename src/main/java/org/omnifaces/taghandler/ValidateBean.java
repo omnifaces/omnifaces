@@ -216,18 +216,22 @@ public class ValidateBean extends TagHandler {
 
 			switch (getMethod(method)) {
 				case validateActual:
-					Callback.Void validateTargetBase = new TargetFormInvoker(parent, new WithArgument<UIForm>() { @Override	public void invoke(UIForm targetForm) {
+					Callback.Void validateTargetBase = new TargetFormInvoker(parent, new WithArgument<UIForm>() { 
+						
+						private static final long serialVersionUID = 1L;
+						
+						@Override public void invoke(UIForm targetForm) {
 
-			        	final FacesContext context = FacesContext.getCurrentInstance();
-
-		                Set<ConstraintViolation<?>> violations = validate(targetBase, groups);
-
-		                if (!violations.isEmpty()) {
-		                    context.validationFailed();
-		                    for (ConstraintViolation<?> violation : violations) {
-		    					context.addMessage(targetForm.getClientId(context), createError(violation.getMessage()));
-		    				}
-		                }
+				        	final FacesContext context = FacesContext.getCurrentInstance();
+	
+			                Set<ConstraintViolation<?>> violations = validate(targetBase, groups);
+	
+			                if (!violations.isEmpty()) {
+			                    context.validationFailed();
+			                    for (ConstraintViolation<?> violation : violations) {
+			    					context.addMessage(targetForm.getClientId(context), createError(violation.getMessage()));
+			    				}
+			                }
 
 					}});
 
@@ -242,11 +246,11 @@ public class ValidateBean extends TagHandler {
 			        //
 			        // E.g. in "h:inputText value=bean.target.property and o:validateBean value=bean.target", this will collect property=[captured value].
 
-			        Callback.Void collectPropertyValues = new TargetFormInvoker(parent, new WithArgument<UIForm>() { @Override	public void invoke(UIForm targetForm) {
+			        Callback.Void collectPropertyValues = new TargetFormInvoker(parent, new WithArgument<UIForm>() { private static final long serialVersionUID = 1L; @Override	public void invoke(UIForm targetForm) {
 
 			        	final FacesContext context = FacesContext.getCurrentInstance();
 
-			        	forEachInputWithMatchingBase(context, targetForm, targetBase, new Operation() { @Override public void invoke(EditableValueHolder v, ValueReference vr) {
+			        	forEachInputWithMatchingBase(context, targetForm, targetBase, new Operation() { private static final long serialVersionUID = 1L; @Override public void invoke(EditableValueHolder v, ValueReference vr) {
 			        		/* (v, vr) -> */ addCollectingValidator(v, vr, properties);
 		            	}});
 
@@ -256,13 +260,13 @@ public class ValidateBean extends TagHandler {
 			        // Callback that uses the values collected by our previous callback (collectPropertyValues) to initialize a copied bean with, and which
 			        // then validated this copy.
 
-			        Callback.Void checkConstraints = new TargetFormInvoker(parent, new WithArgument<UIForm>() { @Override	public void invoke(UIForm targetForm) {
+			        Callback.Void checkConstraints = new TargetFormInvoker(parent, new WithArgument<UIForm>() { private static final long serialVersionUID = 1L; @Override	public void invoke(UIForm targetForm) {
 
 			        	final FacesContext context = FacesContext.getCurrentInstance();
 
 			        	// First remove the collecting validator again, since it will otherwise be state saved with the component at the end of the lifecycle.
 
-			        	forEachInputWithMatchingBase(context, targetForm, targetBase, new Operation() { @Override public void invoke(EditableValueHolder v, ValueReference vr) {
+			        	forEachInputWithMatchingBase(context, targetForm, targetBase, new Operation() { private static final long serialVersionUID = 1L; @Override public void invoke(EditableValueHolder v, ValueReference vr) {
 			        		/* (v, vr) -> */ removeCollectingValidator(v);
 		            	}});
 
@@ -295,6 +299,8 @@ public class ValidateBean extends TagHandler {
 		} else {
 			subscribeToViewBeforePhase(PROCESS_VALIDATIONS, new Callback.Void() {
 
+				private static final long serialVersionUID = 1L;
+				
 				@Override
 				public void invoke() {
 					if (hasInvokedSubmit(parent)) {
@@ -311,7 +317,7 @@ public class ValidateBean extends TagHandler {
 		forEachComponent(context)
 			.fromRoot(targetForm)
 			.ofTypes(EditableValueHolder.class)
-			.invoke(new Callback.WithArgument<UIComponent>() { @Override public void invoke(UIComponent component) {
+			.invoke(new Callback.WithArgument<UIComponent>() { private static final long serialVersionUID = 1L; @Override public void invoke(UIComponent component) {
 
 				ValueExpression valueExpression = component.getValueExpression("value");
 				if (valueExpression != null) {
@@ -341,6 +347,8 @@ public class ValidateBean extends TagHandler {
 	}
 
 	public final class TargetFormInvoker implements Callback.Void {
+		
+		private static final long serialVersionUID = 1L;
 
 		private final UIComponent parent;
 		private WithArgument<UIForm> operation;
@@ -379,6 +387,9 @@ public class ValidateBean extends TagHandler {
 	}
 
 	private abstract static class Operation implements Callback.WithArgument<Object[]> {
+		
+		private static final long serialVersionUID = 1L;
+		
 		@Override
 		public void invoke(Object[] args) {
 			invoke((EditableValueHolder) args[0], (ValueReference) args[1]);

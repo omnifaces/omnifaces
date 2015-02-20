@@ -68,6 +68,7 @@ public class ValidateOrder extends ValidateMultipleFields {
 
 	private enum Type {
 		LT(new Callback.ReturningWithArgument<Boolean, List<Comparable>>() {
+			private static final long serialVersionUID = 1L;
 			@Override
 			public Boolean invoke(List<Comparable> values) {
 				return new ArrayList<>(new TreeSet<>(values)).equals(values);
@@ -75,6 +76,7 @@ public class ValidateOrder extends ValidateMultipleFields {
 		}),
 
 		LTE(new Callback.ReturningWithArgument<Boolean, List<Comparable>>() {
+			private static final long serialVersionUID = 1L;
 			@Override
 			public Boolean invoke(List<Comparable> values) {
 				List<Comparable> sortedValues = new ArrayList<>(values);
@@ -84,6 +86,7 @@ public class ValidateOrder extends ValidateMultipleFields {
 		}),
 
 		GT(new Callback.ReturningWithArgument<Boolean, List<Comparable>>() {
+			private static final long serialVersionUID = 1L;
 			@Override
 			public Boolean invoke(List<Comparable> values) {
 				List<Comparable> sortedValues = new ArrayList<>(new TreeSet<>(values));
@@ -93,6 +96,7 @@ public class ValidateOrder extends ValidateMultipleFields {
 		}),
 
 		GTE(new Callback.ReturningWithArgument<Boolean, List<Comparable>>() {
+			private static final long serialVersionUID = 1L;
 			@Override
 			public Boolean invoke(List<Comparable> values) {
 				List<Comparable> sortedValues = new ArrayList<>(values);

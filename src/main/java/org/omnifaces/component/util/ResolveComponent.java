@@ -66,7 +66,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
     @Override
     public void setFaceletContext(FaceletContext faceletContext) {
     	if (getScope().equals("facelet")) {
-	    	faceletContext.getVariableMapper().setVariable(getName(), new ReadOnlyValueExpression(UIComponent.class, new Returning<Object>() { @Override public Object invoke() {
+	    	faceletContext.getVariableMapper().setVariable(getName(), new ReadOnlyValueExpression(UIComponent.class, new Returning<Object>() { private static final long serialVersionUID = 1L; @Override public Object invoke() {
 				return foundComponent;
 			}}));
     	}

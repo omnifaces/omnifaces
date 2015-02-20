@@ -96,6 +96,8 @@ public class Cache extends OutputFamily {
 		// have not been set, and there is no @PostContruct for UIComponents.
 		subscribeToViewEvent(PRE_RENDER, new Callback.Void() {
 
+			private static final long serialVersionUID = 1L;
+			
 			@Override
 			public void invoke() {
 
@@ -113,6 +115,8 @@ public class Cache extends OutputFamily {
 					// After the RENDER_RESPONSE phase, copy the area we need to cache from the response buffer
 					// and insert it into our cache
 					subscribeToRequestAfterPhase(RENDER_RESPONSE, new Callback.Void() {
+						
+						private static final long serialVersionUID = 1L;
 
 						@Override
 						public void invoke() {
