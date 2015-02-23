@@ -15,8 +15,6 @@
  */
 package org.omnifaces.application;
 
-import java.util.logging.Logger;
-
 import javax.faces.application.Application;
 import javax.faces.application.ApplicationFactory;
 import javax.faces.application.ApplicationWrapper;
@@ -30,15 +28,6 @@ import javax.faces.application.ApplicationWrapper;
  * @since 1.6
  */
 public class OmniApplicationFactory extends ApplicationFactory {
-
-	// Private constants ----------------------------------------------------------------------------------------------
-
-	private static final Logger logger = Logger.getLogger(OmniApplicationFactory.class.getName());
-
-	private static final String WARNING_BAD_APPLICATION =
-		"There is an Application implementation in the chain which does not properly extend from ApplicationWrapper:"
-			+ " '%s'. This may potentially result in compatibility problems."
-			+ " See also among others https://github.com/omnifaces/omnifaces/issues/75";
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
@@ -87,6 +76,7 @@ public class OmniApplicationFactory extends ApplicationFactory {
 	/**
 	 * If the given application not an instance of {@link OmniApplication}, nor wraps the {@link OmniApplication}, then
 	 * it will be wrapped by a new instance of {@link OmniApplication} and set as the current instance and returned.
+	 * Additionally, it will check if all Application implementations properly extend from ApplicationWrapper.
 	 */
 	private synchronized Application createOmniApplication(final Application application) {
 		Application newApplication = application;
@@ -96,10 +86,6 @@ public class OmniApplicationFactory extends ApplicationFactory {
 		}
 
 		if (!(newApplication instanceof OmniApplication)) {
-			if (!(newApplication instanceof ApplicationWrapper)) {
-				logger.warning(String.format(WARNING_BAD_APPLICATION, newApplication.getClass().getName()));
-			}
-
 			newApplication = new OmniApplication(application);
 		}
 
