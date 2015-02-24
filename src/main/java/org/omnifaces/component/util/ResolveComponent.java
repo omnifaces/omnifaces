@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 OmniFaces.
+ * Copyright 2015 OmniFaces.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -33,6 +33,7 @@ import javax.faces.view.facelets.FaceletContext;
 
 import org.omnifaces.el.ReadOnlyValueExpression;
 import org.omnifaces.util.Callback.Returning;
+import org.omnifaces.util.Components;
 import org.omnifaces.util.State;
 
 /**
@@ -52,8 +53,8 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
         "A component with ID '%s' as specified by the 'for' attribute of the ResolveComponent with Id '%s' could not be found.";
 
     public static final String DEFAULT_SCOPE = "facelet";
-
-    private UIComponent foundComponent;
+    
+    private ReadOnlyValueExpression readOnlyValueExpression;
 
     private final State state = new State(getStateHelper());
 
@@ -66,9 +67,10 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
     @Override
     public void setFaceletContext(FaceletContext faceletContext) {
     	if (getScope().equals("facelet")) {
-	    	faceletContext.getVariableMapper().setVariable(getName(), new ReadOnlyValueExpression(UIComponent.class, new Returning<Object>() { private static final long serialVersionUID = 1L; @Override public Object invoke() {
-				return foundComponent;
-			}}));
+    		
+    		readOnlyValueExpression = new ReadOnlyValueExpression(UIComponent.class);
+    		
+	    	faceletContext.getVariableMapper().setVariable(getName(), readOnlyValueExpression);
     	}
     }
 
@@ -109,13 +111,40 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
                 throw new IllegalArgumentException(format(ERROR_COMPONENT_NOT_FOUND, forValue, getId()));
             }
 
-            foundComponent = component;
-
-            if (getScope().equals("request")) {
-            	setRequestAttribute(getName(), foundComponent);
+            switch (getScope()) {
+            	case "facelet":
+            		// Component will be resolved again dynamically when the value expression is evaluated
+            		if (readOnlyValueExpression != null) {
+            			readOnlyValueExpression.setCallbackReturning(new ComponentClientIdResolver(component.getClientId()));
+            		}
+            		break;
+            		
+            	case "request":
+            		setRequestAttribute(getName(), component);
+            		break;
             }
         }
     }
+    
+    public static class ComponentClientIdResolver implements Returning<Object> {
+		
+		private static final long serialVersionUID = 1L;
+		
+		private final String foundComponentId;
+		private transient UIComponent foundComponent;
+		
+		public ComponentClientIdResolver(String foundComponentId) {
+			this.foundComponentId = foundComponentId;	
+		}
+
+		@Override
+		public Object invoke() {
+			if (foundComponent == null) {
+				foundComponent = Components.findComponent(foundComponentId);
+			}
+			return foundComponent;
+		}
+	}
 
 
     // Attribute getters/setters --------------------------------------------------------------------------------------

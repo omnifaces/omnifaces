@@ -34,7 +34,6 @@ public class ReadOnlyValueExpression extends ValueExpression {
 
 	private Callback.ReturningWithArgument<Object, ELContext> callbackWithArgument;
 	private Callback.Returning<Object> callbackReturning;
-
 	private Class<?> expectedType;
 
 	public ReadOnlyValueExpression(Class<?> expectedType, Callback.Returning<Object> callbackReturning) {
@@ -123,6 +122,48 @@ public class ReadOnlyValueExpression extends ValueExpression {
 	@Override
 	public boolean isLiteralText() {
 		return true;
+	}
+	
+	/**
+	 * Returns the functional interface that will be called when the value expression is resolved
+	 * and which receives the proper ELContext.
+	 * 
+	 * @return the functional interface that will be called when the value expression is resolved
+	 * @since 2.1
+	 */
+	public Callback.ReturningWithArgument<Object, ELContext> getCallbackWithArgument() {
+		return callbackWithArgument;
+	}
+
+	/**
+	 * Sets the functional interface that will be called when the value expression is resolved and
+	 * which receives the proper ELContext. 
+	 * 
+	 * @param callbackWithArgument functional interface returning what the value expression will return
+	 * @since 2.1
+	 */
+	public void setCallbackWithArgument(Callback.ReturningWithArgument<Object, ELContext> callbackWithArgument) {
+		this.callbackWithArgument = callbackWithArgument;
+	}
+	
+	/**
+	 * Returns the functional interface that will be called when the value expression is resolved
+	 * 
+	 * @return the functional interface that will be called when the value expression is resolved
+	 * @since 2.1
+	 */
+	public Callback.Returning<Object> getCallbackReturning() {
+		return callbackReturning;
+	}
+
+	/**
+	 * Sets the functional interface that will be called when the value expression is resolved
+	 * 
+	 * @param callbackReturning functional interface returning what the value expression will return
+	 * @since 2.1
+	 */
+	public void setCallbackReturning(Callback.Returning<Object> callbackReturning) {
+		this.callbackReturning = callbackReturning;
 	}
 
 }
