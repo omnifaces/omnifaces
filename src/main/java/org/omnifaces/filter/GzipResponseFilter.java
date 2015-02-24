@@ -82,22 +82,23 @@ import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
  * as follows:
  * <pre>
  * &lt;init-param&gt;
- *     &lt;description&gt;The threshold size in bytes. Must be a number between 0 and 9999. Defaults to 500.&lt;/description&gt;
+ *     &lt;description&gt;The threshold size in bytes. Must be a number between 0 and 9999. Defaults to 150.&lt;/description&gt;
  *     &lt;param-name&gt;threshold&lt;/param-name&gt;
- *     &lt;param-value&gt;500&lt;/param-value&gt;
+ *     &lt;param-value&gt;150&lt;/param-value&gt;
  * &lt;/init-param&gt;
  * &lt;init-param&gt;
  *     &lt;description&gt;The mimetypes which needs to be compressed. Must be a commaseparated string. Defaults to the below values.&lt;/description&gt;
  *     &lt;param-name&gt;mimetypes&lt;/param-name&gt;
  *     &lt;param-value&gt;
  *         text/plain, text/html, text/xml, text/css, text/javascript, text/csv, text/rtf,
- *         application/xml, application/xhtml+xml, application/javascript, application/json
+ *         application/xml, application/xhtml+xml, application/javascript, application/json,
+ *         image/svg+xml
  *     &lt;/param-value&gt;
  * &lt;/init-param&gt;
  * </pre>
  * <p>
- * The default <code>threshold</code> is thus 500 bytes. This means that when the response is not larger than 500 bytes,
- * then it will not be compressed with GZIP. Only when it's larger than 500 bytes, then it will be compressed. A
+ * The default <code>threshold</code> is thus 150 bytes. This means that when the response is not larger than 150 bytes,
+ * then it will not be compressed with GZIP. Only when it's larger than 150 bytes, then it will be compressed. A
  * threshold of between 150 and 1000 bytes is recommended due to overhead and latency of compression/decompression.
  * The value must be a number between 0 and 9999. A value larger than 2000 is not recommended.
  * <p>
@@ -118,10 +119,11 @@ public class GzipResponseFilter extends HttpFilter {
 	private static final String INIT_PARAM_THRESHOLD = "threshold";
 	private static final String INIT_PARAM_MIMETYPES = "mimetypes";
 
-	private static final int DEFAULT_THRESHOLD = 500;
+	private static final int DEFAULT_THRESHOLD = 150;
 	private static final Set<String> DEFAULT_MIMETYPES = unmodifiableSet(
 		"text/plain", "text/html", "text/xml", "text/css", "text/javascript", "text/csv", "text/rtf",
-		"application/xml", "application/xhtml+xml", "application/javascript", "application/json"
+		"application/xml", "application/xhtml+xml", "application/javascript", "application/json",
+		"image/svg+xml"
 	);
 
 	private static final String ERROR_THRESHOLD = "The 'threshold' init param must be a number between 0 and 9999."
