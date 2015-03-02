@@ -81,19 +81,19 @@ public class EagerBeansRepository {
 		}
 	}
 
-	public void setApplicationScopedBeans(List<Bean<?>> applicationScopedBeans) {
+	void setApplicationScopedBeans(List<Bean<?>> applicationScopedBeans) {
 		this.applicationScopedBeans = applicationScopedBeans;
 	}
 
-	public void setSessionScopedBeans(List<Bean<?>> sessionScopedBeans) {
+	void setSessionScopedBeans(List<Bean<?>> sessionScopedBeans) {
 		this.sessionScopedBeans = sessionScopedBeans;
 	}
 
-	public void setRequestScopedBeansViewId(Map<String, List<Bean<?>>> requestScopedBeansViewId) {
+	void setRequestScopedBeansViewId(Map<String, List<Bean<?>>> requestScopedBeansViewId) {
 		this.requestScopedBeansViewId = requestScopedBeansViewId;
 	}
 
-	public void setRequestScopedBeansRequestURI(Map<String, List<Bean<?>>> requestScopedBeansRequestURI) {
+	void setRequestScopedBeansRequestURI(Map<String, List<Bean<?>>> requestScopedBeansRequestURI) {
 		this.requestScopedBeansRequestURI = requestScopedBeansRequestURI;
 	}
 
