@@ -26,6 +26,7 @@ import static org.omnifaces.util.Utils.isOneInstanceOf;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,7 @@ import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
 import javax.faces.component.UINamingContainer;
 import javax.faces.component.UIPanel;
+import javax.faces.component.UIParameter;
 import javax.faces.component.UIViewRoot;
 import javax.faces.component.behavior.AjaxBehavior;
 import javax.faces.component.behavior.ClientBehavior;
@@ -59,6 +61,10 @@ import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.AjaxBehaviorListener;
 import javax.faces.event.MethodExpressionActionListener;
 import javax.faces.view.facelets.FaceletContext;
+
+import org.omnifaces.component.ParamHolder;
+import org.omnifaces.component.SimpleParam;
+import org.omnifaces.component.output.Param;
 
 /**
  * <p>
@@ -833,6 +839,42 @@ public final class Components {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Returns all child {@link UIParameter} components (<code>&lt;f|o:param&gt;</code>) of the given parent component
+	 * as a list of {@link ParamHolder} instances. Those with <code>disabled=true</code> and an empty name are
+	 * skipped.
+	 * @param component The parent component to retrieve all child {@link UIParameter} components from.
+	 * @return All child {@link UIParameter} components having a non-empty name and not disabled.
+	 * @since 2.1
+	 */
+	public static List<ParamHolder> getParams(UIComponent component) {
+		if (component.getChildCount() > 0) {
+			List<ParamHolder> params = new ArrayList<>(component.getChildCount());
+
+			for (UIComponent child : component.getChildren()) {
+				if (child instanceof UIParameter) {
+					UIParameter param = (UIParameter) child;
+					String name = param.getName();
+
+					if (!isEmpty(name) && !param.isDisable()) {
+						ParamHolder paramHolder = new SimpleParam(name, param.getValue());
+
+						if (param instanceof Param) {
+							paramHolder.setConverter(((Param) param).getConverter());
+						}
+
+						params.add(paramHolder);
+					}
+				}
+			}
+
+			return Collections.unmodifiableList(params);
+		}
+		else {
+			return Collections.emptyList();
+		}
 	}
 
 	// Expressions ----------------------------------------------------------------------------------------------------

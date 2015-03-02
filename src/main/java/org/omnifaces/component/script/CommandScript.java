@@ -23,12 +23,13 @@ import javax.faces.component.FacesComponent;
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
-import javax.faces.component.UIParameter;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.PhaseId;
 
+import org.omnifaces.component.ParamHolder;
+import org.omnifaces.util.Components;
 import org.omnifaces.util.Json;
 import org.omnifaces.util.State;
 
@@ -218,18 +219,9 @@ public class CommandScript extends UICommand {
 	protected void encodeOptions(FacesContext context) throws IOException {
 		ResponseWriter writer = context.getResponseWriter();
 
-		if (getChildCount() > 0) {
-			for (UIComponent child : getChildren()) {
-				if (child instanceof UIParameter) {
-					UIParameter param = (UIParameter) child;
-					String name = param.getName();
-
-					if (!isEmpty(name)) {
-						writer.append("o[").append(Json.encode(name)).append("]=")
-							.append(Json.encode(param.getValue())).append(";");
-					}
-				}
-			}
+		for (ParamHolder param : Components.getParams(this)) {
+			writer.append("o[").append(Json.encode(param.getName())).append("]=")
+				.append(Json.encode(param.getValue())).append(";");
 		}
 
 		writer.append("o['javax.faces.behavior.event']='action';");
