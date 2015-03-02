@@ -523,7 +523,7 @@ public final class FacesLocal {
 	 * @see Faces#getBookmarkableURL(Collection, boolean)
 	 */
 	public static String getBookmarkableURL
-		(FacesContext context, Collection<ParamHolder> params, boolean includeViewParams)
+		(FacesContext context, Collection<? extends ParamHolder> params, boolean includeViewParams)
 	{
 		String viewId = getViewId(context);
 
@@ -539,7 +539,7 @@ public final class FacesLocal {
 	 * @see Faces#getBookmarkableURL(String, Collection, boolean)
 	 */
 	public static String getBookmarkableURL
-		(FacesContext context, String viewId, Collection<ParamHolder> params, boolean includeViewParams)
+		(FacesContext context, String viewId, Collection<? extends ParamHolder> params, boolean includeViewParams)
 	{
 		Map<String, List<String>> convertedParams = new HashMap<>();
 

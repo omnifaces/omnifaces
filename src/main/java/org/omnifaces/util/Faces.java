@@ -706,7 +706,7 @@ public final class Faces {
 	 * @see ViewHandler#getBookmarkableURL(FacesContext, String, Map, boolean)
 	 * @since 1.7
 	 */
-	public static String getBookmarkableURL(Collection<ParamHolder> params, boolean includeViewParams) {
+	public static String getBookmarkableURL(Collection<? extends ParamHolder> params, boolean includeViewParams) {
 		return FacesLocal.getBookmarkableURL(getContext(), params, includeViewParams);
 	}
 
@@ -723,7 +723,7 @@ public final class Faces {
 	 * @see ViewHandler#getBookmarkableURL(FacesContext, String, Map, boolean)
 	 * @since 1.7
 	 */
-	public static String getBookmarkableURL(String viewId, Collection<ParamHolder> params, boolean includeViewParams) {
+	public static String getBookmarkableURL(String viewId, Collection<? extends ParamHolder> params, boolean includeViewParams) {
 		return FacesLocal.getBookmarkableURL(getContext(), viewId, params, includeViewParams);
 	}
 
