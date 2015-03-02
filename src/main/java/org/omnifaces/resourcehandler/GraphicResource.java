@@ -64,6 +64,7 @@ public class GraphicResource extends DynamicResource {
 	private static final Map<String, MethodReference> ALLOWED_METHODS = new ConcurrentHashMap<>();
 	private static final GraphicImage DUMMY_COMPONENT = new GraphicImage();
 	private static final String[] EMPTY_PARAMS = new String[0];
+	private static final int RESOURCE_NAME_FULL_PARTS_LENGTH = 3;
 
 	@SuppressWarnings("unchecked")
 	private static final Class<? extends Annotation>[] REQUIRED_ANNOTATION_TYPES = new Class[] {
@@ -256,7 +257,9 @@ public class GraphicResource extends DynamicResource {
 	 */
 	private static String getContentType(String resourceName) {
 		String[] parts = resourceName.split("_");
-		return (parts.length == 3) ? resolveContentType(parts[2]) : DEFAULT_CONTENT_TYPE;
+		return (parts.length == RESOURCE_NAME_FULL_PARTS_LENGTH)
+			? resolveContentType(parts[RESOURCE_NAME_FULL_PARTS_LENGTH - 1])
+			: DEFAULT_CONTENT_TYPE;
 	}
 
 	/**

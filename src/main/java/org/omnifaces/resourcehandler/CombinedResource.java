@@ -37,11 +37,11 @@ public class CombinedResource extends DynamicResource {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-    private final static String CACHE_SCOPE = "application";
+	private static final String CACHE_SCOPE = "application";
 
-    // Properties -----------------------------------------------------------------------------------------------------
+	// Properties -----------------------------------------------------------------------------------------------------
 
-    private String resourceId;
+	private String resourceId;
 	private CombinedResourceInfo info;
 	private Integer cacheTTL;
 
@@ -83,28 +83,28 @@ public class CombinedResource extends DynamicResource {
 		}
 	}
 
-    /**
-     * Returns the cached input stream, or if there is none, then create one.
-     */
-    private InputStream getInputStreamFromCache() throws IOException {
-        Cache combinedResourceCache = CacheFactory.getCache(FacesContext.getCurrentInstance(), CACHE_SCOPE);
-        byte[] cachedCombinedResource;
+	/**
+	 * Returns the cached input stream, or if there is none, then create one.
+	 */
+	private InputStream getInputStreamFromCache() throws IOException {
+		Cache combinedResourceCache = CacheFactory.getCache(FacesContext.getCurrentInstance(), CACHE_SCOPE);
+		byte[] cachedCombinedResource;
 
-        synchronized(CombinedResourceHandler.class) {
-            cachedCombinedResource = (byte[]) combinedResourceCache.getObject(resourceId);
-        }
+		synchronized (CombinedResourceHandler.class) {
+			cachedCombinedResource = (byte[]) combinedResourceCache.getObject(resourceId);
+		}
 
-        if (cachedCombinedResource == null) {
-            cachedCombinedResource = toByteArray(new CombinedResourceInputStream(info.getResources()));
+		if (cachedCombinedResource == null) {
+			cachedCombinedResource = toByteArray(new CombinedResourceInputStream(info.getResources()));
 
-            synchronized(CombinedResourceHandler.class) {
-                if (combinedResourceCache.getObject(resourceId) == null) {
-    				combinedResourceCache.putObject(resourceId, cachedCombinedResource, cacheTTL);
-    			}
-            }
-        }
+			synchronized (CombinedResourceHandler.class) {
+				if (combinedResourceCache.getObject(resourceId) == null) {
+					combinedResourceCache.putObject(resourceId, cachedCombinedResource, cacheTTL);
+				}
+			}
+		}
 
-        return new ByteArrayInputStream(cachedCombinedResource);
-    }
+		return new ByteArrayInputStream(cachedCombinedResource);
+	}
 
 }

@@ -38,8 +38,8 @@ import org.omnifaces.util.State;
 
 /**
  * <p>
- * The <code>&lt;o:resolveComponent&gt;</code> component is a utility component via which a component can be looked up by its ID and
- * a reference to it put in either the "facelet scope" (default) or the request scope.
+ * The <code>&lt;o:resolveComponent&gt;</code> component is a utility component via which a component can be looked up
+ * by its ID and a reference to it put in either the "facelet scope" (default) or the request scope.
  *
  * @since 2.0
  * @author Arjan Tijms
@@ -47,16 +47,19 @@ import org.omnifaces.util.State;
 @FacesComponent(ResolveComponent.COMPONENT_TYPE)
 public class ResolveComponent extends UtilFamily implements FaceletContextConsumer, SystemEventListener {
 
-    public static final String COMPONENT_TYPE = "org.omnifaces.component.util.ResolveComponent";
+	public static final String COMPONENT_TYPE = "org.omnifaces.component.util.ResolveComponent";
 
-    private static final String ERROR_COMPONENT_NOT_FOUND =
-        "A component with ID '%s' as specified by the 'for' attribute of the ResolveComponent with Id '%s' could not be found.";
+	private static final String ERROR_COMPONENT_NOT_FOUND =
+		"A component with ID '%s' as specified by the 'for' attribute of the ResolveComponent with Id '%s' could not be found.";
 
-    public static final String DEFAULT_SCOPE = "facelet";
-    
-    private ReadOnlyValueExpression readOnlyValueExpression;
+	private static final String ERROR_ILLEGAL_SCOPE =
+		"o:resolveComponent 'scope' attribute only supports 'facelet' (default) or 'request'. Encountered an invalid value of '%s'.";
 
-    private final State state = new State(getStateHelper());
+	public static final String DEFAULT_SCOPE = "facelet";
+
+	private ReadOnlyValueExpression readOnlyValueExpression;
+
+	private final State state = new State(getStateHelper());
 
 	enum PropertyKeys {
 		name, scope, /* for */
@@ -64,77 +67,83 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
-    @Override
-    public void setFaceletContext(FaceletContext faceletContext) {
-    	if (getScope().equals("facelet")) {
-    		
-    		readOnlyValueExpression = new ReadOnlyValueExpression(UIComponent.class);
-    		
-	    	faceletContext.getVariableMapper().setVariable(getName(), readOnlyValueExpression);
-    	}
-    }
+	@Override
+	public void setFaceletContext(FaceletContext faceletContext) {
+		if (getScope().equals("facelet")) {
 
-    public ResolveComponent() {
-        if (!isPostback()) { // For an initial (GET) request, there's no restore state event and we use pre-render view
-            subscribeToViewEvent(PreRenderViewEvent.class, this);
-        }
-    }
+			readOnlyValueExpression = new ReadOnlyValueExpression(UIComponent.class);
 
-    @Override
-    public boolean isListenerForSource(Object source) {
-        return true;
-    }
+			faceletContext.getVariableMapper().setVariable(getName(), readOnlyValueExpression);
+		}
+	}
 
-    @Override
-    public void processEvent(SystemEvent event) throws AbortProcessingException {
-        doProcess();
-    }
+	public ResolveComponent() {
+		if (!isPostback()) { // For an initial (GET) request, there's no restore
+								// state event and we use pre-render view
+			subscribeToViewEvent(PreRenderViewEvent.class, this);
+		}
+	}
 
-    @Override
-    public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
-        if (event instanceof PostRestoreStateEvent) { // For a postback we use the post-restore state event
-             doProcess();
-        }
-    }
+	@Override
+	public boolean isListenerForSource(Object source) {
+		return true;
+	}
 
-    public void doProcess() {
-        String forValue = getFor();
+	@Override
+	public void processEvent(SystemEvent event) throws AbortProcessingException {
+		doProcess();
+	}
 
-        if (!isEmpty(forValue)) {
-            UIComponent component = findComponentRelatively(this, forValue);
+	@Override
+	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
+		if (event instanceof PostRestoreStateEvent) { // For a postback we use the post-restore state event.
+			doProcess();
+		}
+	}
 
-            if (component == null) {
-            	component = findComponent(forValue);
-            }
+	public void doProcess() {
+		String forValue = getFor();
 
-            if (component == null) {
-                throw new IllegalArgumentException(format(ERROR_COMPONENT_NOT_FOUND, forValue, getId()));
-            }
+		if (!isEmpty(forValue)) {
+			UIComponent component = findComponentRelatively(this, forValue);
 
-            switch (getScope()) {
-            	case "facelet":
-            		// Component will be resolved again dynamically when the value expression is evaluated
-            		if (readOnlyValueExpression != null) {
-            			readOnlyValueExpression.setCallbackReturning(new ComponentClientIdResolver(component.getClientId()));
-            		}
-            		break;
-            		
-            	case "request":
-            		setRequestAttribute(getName(), component);
-            		break;
-            }
-        }
-    }
-    
-    public static class ComponentClientIdResolver implements Returning<Object> {
-		
+			if (component == null) {
+				component = findComponent(forValue);
+			}
+
+			if (component == null) {
+				throw new IllegalArgumentException(format(ERROR_COMPONENT_NOT_FOUND, forValue, getId()));
+			}
+
+			String scope = getScope();
+
+			switch (scope) { // TODO: refactor "scope" to a reusable enum, together with those of a.o. Cache.
+				case "facelet":
+					// Component will be resolved again dynamically when the value expression is evaluated.
+					if (readOnlyValueExpression != null) {
+						readOnlyValueExpression.setCallbackReturning(new ComponentClientIdResolver(component.getClientId()));
+					}
+					break;
+
+				case "request":
+					setRequestAttribute(getName(), component);
+					break;
+
+				default:
+					throw new IllegalArgumentException(format(ERROR_ILLEGAL_SCOPE, scope));
+			}
+		}
+	}
+
+	public static class ComponentClientIdResolver implements Returning<Object> {
+
 		private static final long serialVersionUID = 1L;
-		
+
 		private final String foundComponentId;
 		private transient UIComponent foundComponent;
-		
+
 		public ComponentClientIdResolver(String foundComponentId) {
-			this.foundComponentId = foundComponentId;	
+			this.foundComponentId = foundComponentId;
 		}
 
 		@Override
@@ -146,10 +155,9 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 		}
 	}
 
+	// Attribute getters/setters --------------------------------------------------------------------------------------
 
-    // Attribute getters/setters --------------------------------------------------------------------------------------
-
-    public String getName() {
+	public String getName() {
 		return state.get(name);
 	}
 
@@ -157,7 +165,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 		state.put(name, nameValue);
 	}
 
-  	public String getFor() {
+	public String getFor() {
 		return state.get("for");
 	}
 
@@ -172,4 +180,5 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 	public void setScope(String scopeValue) {
 		state.put(scope, scopeValue);
 	}
+
 }
