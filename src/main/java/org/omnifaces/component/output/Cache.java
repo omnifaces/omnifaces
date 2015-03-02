@@ -63,6 +63,85 @@ import org.omnifaces.util.State;
  * Via a cache provider mechanism an alternative cache implementation can be configured in web.xml. The default
  * cache is based on <a href="http://code.google.com/p/concurrentlinkedhashmap">http://code.google.com/p/concurrentlinkedhashmap</a>.
  *
+ * <h3>Setting a custom caching provider</h3>
+ * <p>
+ * A custom caching provider can be set by using the <code>org.omnifaces.CACHE_PROVIDER</code> context
+ * parameter in web.xml to point to an implementation of <code>org.omnifaces.component.output.cache.CacheProvider</code>.
+ * For example:
+ * <pre>
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.CACHE_PROVIDER&lt;/param-name&gt;
+ *     &lt;param-value&gt;com.example.MyProvider&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * </pre>
+ * <p>
+ * The default provider, <code>org.omnifaces.component.output.cache.DefaultCacheProvider</code> can be used as an
+ * example.
+ *
+ * <h3>Global settings</h3>
+ * <p>
+ * For the default provider, the maximum capacity and the default time to live can be specified for the
+ * supported scopes "session" and "application". If the maximum capacity is reached, an entry will be
+ * evicted following a least recently used policy. The default time to live specifies for how long
+ * entries are considered to be valid. A value for the <code>time</code> attribute on this component
+ * will override this global default time to live. The following context parameters can be used in web.xml:
+ * <p>
+ * <table summary="All available context parameters">
+ * <tr><td class="colFirst">
+ * <code>org.omnifaces.CACHE_SETTING_APPLICATION_MAX_CAPACITY</code>
+ * </td><td>
+ * Sets the maximum number of elements that will be stored per web module (application scope).
+ * Default: no limit
+ * </td></tr>
+ * <tr><td class="colFirst">
+ * <code>org.omnifaces.CACHE_SETTING_SESSION_MAX_CAPACITY</code>
+ * </td><td>
+ * Sets the maximum number of elements that will be stored per session.
+ * Default: no limit.
+ * </td></tr>
+ * <tr><td class="colFirst">
+ * <code>org.omnifaces.CACHE_SETTING_APPLICATION_TTL</code>
+ * </td><td>
+ * Sets the maximum amount of time in seconds that cached content is valid for the application scope.
+ * Can be overriden by individal cache components.
+ * Default: no limit.
+ * </td></tr>
+ * <tr><td class="colFirst">
+ * <code>org.omnifaces.CACHE_SETTING_SESSION_TTL</code>
+ * </td><td>
+ * Sets the maximum amount of time in seconds that cached content is valid for the session scope.
+ * Can be overriden by individal cache components.
+ * Default: no limit.
+ * </td></tr>
+ * <tr><td class="colFirst">
+ * <code>org.omnifaces.CACHE_INSTALL_BUFFER_FILTER</code>
+ * </td><td>
+ * Boolean that when <code>true</code> installs a Servlet Filter (Servlet 3.0+ only) that works in conjunction with the
+ * <code>useBuffer</code> attribute of the Cache component to enable an alternative way to grab the content that needs
+ * to be cached. This is a convenience setting that is a short-cut for installing the
+ * <code>org.omnifaces.servlet.BufferedHttpServletResponse</code> filter manually. If more finegrained control is needed
+ * regarding which place in the filter chain the filter appears and which resources it exactly filters, this setting
+ * should not be used and the mentioned filter should be manually configured.
+ * Default: <code>false</code>.
+ * </td></tr>
+ * </table>
+ *
+ * <h3>Servlet 2.5 configuration</h3>
+ * <p>
+ * If no custom caching provider or global settings are used, no specific configuration is needed. Otherwise
+ * <code>org.omnifaces.component.output.cache.CacheInitializerListener</code> needs to be installed as a listener in
+ * <code>web.xml</code>:
+ * <pre>
+ * &lt;listener&gt;
+ *     &lt;listener-class&gt;org.omnifaces.component.output.cache.CacheInitializerListener&lt;/listener-class&gt;
+ * &lt;/listener&gt;
+ * </pre>
+ * <p>
+ * In case the alternative caching method via buffering is used,
+ * <code>org.omnifaces.servlet.BufferedHttpServletResponse</code> needs to be installed as a Servlet Filter in
+ * <code>web.xml</code>, filtering either the <code>FacesServlet</code> itself or any page on which the alternative
+ * caching method is required.
+ *
  * @since 1.1
  * @author Arjan Tijms
  * @see CacheValue
@@ -97,7 +176,7 @@ public class Cache extends OutputFamily {
 		subscribeToViewEvent(PRE_RENDER, new Callback.Void() {
 
 			private static final long serialVersionUID = 1L;
-			
+
 			@Override
 			public void invoke() {
 
@@ -115,7 +194,7 @@ public class Cache extends OutputFamily {
 					// After the RENDER_RESPONSE phase, copy the area we need to cache from the response buffer
 					// and insert it into our cache
 					subscribeToRequestAfterPhase(RENDER_RESPONSE, new Callback.Void() {
-						
+
 						private static final long serialVersionUID = 1L;
 
 						@Override

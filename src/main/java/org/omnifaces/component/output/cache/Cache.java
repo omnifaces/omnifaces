@@ -26,43 +26,43 @@ import java.io.Serializable;
  */
 public interface Cache extends Serializable {
 
-    /**
-     * Gets a value from the cache
-     *
-     * @param key
-     *            the key under which a value was previously stored
-     * @return The previously stored value, or null if no such value exists
-     */
-    String get(String key);
+	/**
+	 * Gets a value from the cache
+	 *
+	 * @param key
+	 *            the key under which a value was previously stored
+	 * @return The previously stored value, or null if no such value exists
+	 */
+	String get(String key);
 
-    /**
-     * Gets a value from the cache
-     *
-     * @param key
-     *            the key under which a value was previously stored
-     * @return The previously stored value, or null if no such value exists
-     */
-    Object getObject(String key);
+	/**
+	 * Gets a value from the cache
+	 *
+	 * @param key
+	 *            the key under which a value was previously stored
+	 * @return The previously stored value, or null if no such value exists
+	 */
+	Object getObject(String key);
 
-    /**
-     * Stores a value in the cache
-     *
-     * @param key
-     *            the key under which a value is to be stored
-     * @param value
-     *            the value that is to be stored
-     */
-    void put(String key, String value);
+	/**
+	 * Stores a value in the cache
+	 *
+	 * @param key
+	 *            the key under which a value is to be stored
+	 * @param value
+	 *            the value that is to be stored
+	 */
+	void put(String key, String value);
 
-    /**
-     * Stores a value in the cache
-     *
-     * @param key
-     *            the key under which a value is to be stored
-     * @param value
-     *            the value that is to be stored
-     */
-    void putObject(String key, Object value, int timeToLive);
+	/**
+	 * Stores a value in the cache
+	 *
+	 * @param key
+	 *            the key under which a value is to be stored
+	 * @param value
+	 *            the value that is to be stored
+	 */
+	void putObject(String key, Object value, int timeToLive);
 
 	/**
 	 * Stores a value in the cache
@@ -118,4 +118,5 @@ public interface Cache extends Serializable {
 	 *            the key under which a value is to be stored
 	 */
 	void remove(String key);
+
 }

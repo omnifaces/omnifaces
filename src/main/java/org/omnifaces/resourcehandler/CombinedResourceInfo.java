@@ -36,11 +36,13 @@ import org.omnifaces.el.functions.Converters;
 import org.omnifaces.util.Utils;
 
 /**
+ * <p>
  * This class is a wrapper which collects all combined resources and stores it in the cache. A builder has been provided
  * to create an instance of combined resource info and put it in the cache if absent.
+ *
  * @author Bauke Scholtz
  */
-final class CombinedResourceInfo {
+public final class CombinedResourceInfo {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
@@ -190,8 +192,8 @@ final class CombinedResourceInfo {
 			contentLength += connection.getContentLength();
 			long resourceLastModified = connection.getLastModified();
 
-			if (resourceLastModified > this.lastModified) {
-				this.lastModified = resourceLastModified;
+			if (resourceLastModified > lastModified) {
+				lastModified = resourceLastModified;
 			}
 		}
 	}

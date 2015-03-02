@@ -41,10 +41,11 @@ public class DefaultCache extends TimeToLiveCache {
 	private Map<String, CacheEntry> createCacheStore(Integer maxCapacity) {
 		if (maxCapacity != null) {
 			return new ConcurrentLinkedHashMap.Builder<String, CacheEntry>()
-						    .maximumWeightedCapacity(maxCapacity)
-						    .build();
+							.maximumWeightedCapacity(maxCapacity)
+							.build();
 		} else {
 			return new ConcurrentHashMap<>();
 		}
 	}
+
 }
