@@ -17,7 +17,7 @@ import static java.util.regex.Pattern.quote;
 import static javax.faces.application.ProjectStage.Development;
 import static javax.faces.application.ProjectStage.PROJECT_STAGE_JNDI_NAME;
 import static javax.faces.application.ProjectStage.PROJECT_STAGE_PARAM_NAME;
-import static org.omnifaces.util.JNDI.getEnvEntry;
+import static org.omnifaces.util.JNDI.lookup;
 import static org.omnifaces.util.Utils.decodeURL;
 import static org.omnifaces.util.Utils.encodeURL;
 import static org.omnifaces.util.Utils.isEmpty;
@@ -473,7 +473,14 @@ public final class Servlets {
 			return facesDevelopment;
 		}
 
-		String projectStage = getEnvEntry(PROJECT_STAGE_JNDI_NAME);
+		String projectStage = null;
+
+		try {
+			projectStage = lookup(PROJECT_STAGE_JNDI_NAME);
+		}
+		catch (IllegalStateException ignore) {
+			return false; // May happen in a.o. GlassFish 4.1 during startup.
+		}
 
 		if (projectStage == null) {
 			projectStage = context.getInitParameter(PROJECT_STAGE_PARAM_NAME);
