@@ -29,6 +29,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.el.ELContext;
+import javax.el.ELResolver;
 import javax.el.ExpressionFactory;
 import javax.el.ValueExpression;
 import javax.faces.FactoryFinder;
@@ -354,7 +355,7 @@ public final class Faces {
 	/**
 	 * Programmatically evaluate the given EL expression and set the given value.
 	 * @param expression The EL expression to be evaluated.
-	 * @param value The value to be set in the property behind the EL expression.
+	 * @param value The value to be set in the property behind the given EL expression.
 	 * @see Application#getExpressionFactory()
 	 * @see ExpressionFactory#createValueExpression(ELContext, String, Class)
 	 * @see ValueExpression#setValue(ELContext, Object)
@@ -362,6 +363,31 @@ public final class Faces {
 	 */
 	public static void evaluateExpressionSet(String expression, Object value) {
 		FacesLocal.evaluateExpressionSet(getContext(), expression, value);
+	}
+
+	/**
+	 * Programmatically EL-resolve the given property on the given base object and return the resolved value.
+	 * @param base The base object whose property value is to be returned, or null to resolve a top-level variable.
+	 * @param property The property or variable to be resolved on the given base.
+	 * @see Application#getELResolver()
+	 * @see ELResolver#getValue(ELContext, Object, Object)
+	 * @since 2.1
+	 */
+	public static <T> T resolveExpressionGet(Object base, String property) {
+		return FacesLocal.resolveExpressionGet(getContext(), base, property);
+	}
+
+	/**
+	 * Programmatically EL-resolve the given property on the given base object and set the given value.
+	 * @param base The base object whose property value is to be set, or null to set a top-level variable.
+	 * @param property The property or variable to be set on the given base.
+	 * @param value The value to be set in the property on the given base.
+	 * @see Application#getELResolver()
+	 * @see ELResolver#setValue(ELContext, Object, Object, Object)
+	 * @since 2.1
+	 */
+	public static void resolveExpressionSet(Object base, String property, Object value) {
+		FacesLocal.resolveExpressionSet(getContext(), base, property, value);
 	}
 
 	/**

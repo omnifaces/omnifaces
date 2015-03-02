@@ -36,6 +36,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.el.ELContext;
+import javax.el.ELResolver;
 import javax.el.ValueExpression;
 import javax.faces.application.Application;
 import javax.faces.application.ProjectStage;
@@ -186,6 +187,25 @@ public final class FacesLocal {
 		ValueExpression valueExpression = context.getApplication().getExpressionFactory()
 			.createValueExpression(elContext, expression, Object.class);
 		valueExpression.setValue(elContext, value);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Faces#resolveExpressionGet(Object, String)
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T resolveExpressionGet(FacesContext context, Object base, String property) {
+		ELResolver elResolver = context.getApplication().getELResolver();
+		return (T) elResolver.getValue(context.getELContext(), base, property);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Faces#resolveExpressionSet(Object, String, Object)
+	 */
+	public static void resolveExpressionSet(FacesContext context, Object base, String property, Object value) {
+		ELResolver elResolver = context.getApplication().getELResolver();
+		elResolver.setValue(context.getELContext(), base, property, value);
 	}
 
 	/**
