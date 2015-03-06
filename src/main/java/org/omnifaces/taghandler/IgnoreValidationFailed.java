@@ -14,18 +14,14 @@ package org.omnifaces.taghandler;
 
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Components.hasInvokedSubmit;
-import static org.omnifaces.util.Events.subscribeToRequestAfterPhase;
-import static org.omnifaces.util.Faces.getContext;
+import static org.omnifaces.util.Events.subscribeToRequestComponentEvent;
 
 import java.io.IOException;
 
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
-import javax.faces.context.FacesContext;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
-import javax.faces.event.ComponentSystemEventListener;
 import javax.faces.event.PostAddToViewEvent;
 import javax.faces.view.facelets.ComponentHandler;
 import javax.faces.view.facelets.FaceletContext;
@@ -63,7 +59,7 @@ import org.omnifaces.util.Callback;
  * @author Bauke Scholtz
  * @see Form
  */
-public class IgnoreValidationFailed extends TagHandler implements ComponentSystemEventListener {
+public class IgnoreValidationFailed extends TagHandler {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
@@ -87,7 +83,7 @@ public class IgnoreValidationFailed extends TagHandler implements ComponentSyste
 	/**
 	 * If the parent component is an instance of {@link UICommand} and is new and the current request is a postback,
 	 * then subscribe the parent component to the {@link PostAddToViewEvent}. This will invoke the
-	 * {@link #processEvent(ComponentSystemEvent)} method before validation.
+	 * {@link #processIgnoreValidationFailed(UIComponent)} method before validation.
 	 * @throws IllegalArgumentException When the parent component is not an instance of {@link UICommand}.
 	 */
 	@Override
@@ -100,37 +96,26 @@ public class IgnoreValidationFailed extends TagHandler implements ComponentSyste
 			return;
 		}
 
-		parent.subscribeToEvent(PostAddToViewEvent.class, this);
+		subscribeToRequestComponentEvent(parent, PostAddToViewEvent.class, new Callback.WithArgument<ComponentSystemEvent>() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void invoke(ComponentSystemEvent event) {
+				processIgnoreValidationFailed(event);
+			}
+		});
 	}
 
 	/**
 	 * This should only be invoked on {@link PostAddToViewEvent} of a postback. Check if the parent {@link UICommand}
 	 * component has been invoked during the postback and if so, then set a context attribute which informs the
 	 * <code>&lt;o:form&gt;</code> to ignore the validation.
+	 * @param event The component system event.
 	 * @throws IllegalArgumentException When parent {@link UICommand} component is not inside
 	 * <code>&lt;o:form&gt;</code>.
 	 */
-	@Override
-	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
-		if (!(event instanceof PostAddToViewEvent)) {
-			return; // Should never occur, but you never know.
-		}
-
-		FacesContext context = getContext();
-		final UIComponent component = event.getComponent();
-		subscribeToRequestAfterPhase(context.getCurrentPhaseId(), new Callback.Void() {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void invoke() {
-				// We can't unsubscribe immediately inside processEvent() itself, as it would otherwise end up in a
-				// ConcurrentModificationException while JSF is iterating over all system event listeners.
-				// The unsubscribe is necessary in order to avoid InstantiationException on this tag during restore
-				// view of a postback, because ComponentSystemEventListener instances are also saved in JSF view state.
-				component.unsubscribeFromEvent(PostAddToViewEvent.class, IgnoreValidationFailed.this);
-			}
-		});
+	protected void processIgnoreValidationFailed(ComponentSystemEvent event) {
+		UIComponent component = event.getComponent();
 
 		if (hasInvokedSubmit(component)) {
 			Form form = getClosestParent(component, Form.class);

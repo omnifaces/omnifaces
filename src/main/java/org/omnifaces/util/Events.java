@@ -13,11 +13,15 @@
 package org.omnifaces.util;
 
 import static org.omnifaces.util.Faces.getApplication;
+import static org.omnifaces.util.Faces.getCurrentPhaseId;
 import static org.omnifaces.util.Faces.getViewRoot;
 
 import javax.faces.application.Application;
+import javax.faces.component.UIComponent;
 import javax.faces.component.UIViewRoot;
 import javax.faces.event.AbortProcessingException;
+import javax.faces.event.ComponentSystemEvent;
+import javax.faces.event.ComponentSystemEventListener;
 import javax.faces.event.PhaseEvent;
 import javax.faces.event.PhaseId;
 import javax.faces.event.PhaseListener;
@@ -210,6 +214,34 @@ public final class Events {
 		addViewPhaseListener(createAfterPhaseListener(phaseId, callback));
 	}
 
+	// Request scoped component event listeners -----------------------------------------------------------------------
+
+	/**
+	 * Subscribe the given callback instance to the given component that get invoked only in the current request when
+	 * the given component system event type is published on the given component. The difference with
+	 * {@link UIComponent#subscribeToEvent(Class, ComponentSystemEventListener)} is that this listener is request
+	 * scoped instead of view scoped as component system event listeners are by default saved in JSF state and thus
+	 * inherently view scoped.
+	 * @param component The component to subscribe the given callback instance to.
+	 * @param type The system event type to be observed.
+	 * @param callback The callback to be invoked.
+	 * @since 2.1
+	 * @see UIComponent#subscribeToEvent(Class, ComponentSystemEventListener)
+	 * @see #unsubscribeFromComponentEvent(UIComponent, Class, ComponentSystemEventListener)
+	 */
+	public static void subscribeToRequestComponentEvent(final UIComponent component,
+		final Class<? extends ComponentSystemEvent> type, final Callback.WithArgument<ComponentSystemEvent> callback)
+	{
+		component.subscribeToEvent(type, new ComponentSystemEventListener() {
+
+			@Override
+			public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
+				unsubscribeFromComponentEvent(component, type, this); // Prevent it from being saved in JSF state.
+				callback.invoke(event);
+			}
+		});
+	}
+
 	// Request scoped phase listeners ---------------------------------------------------------------------------------
 
 	/**
@@ -268,11 +300,41 @@ public final class Events {
 		addRequestPhaseListener(createAfterPhaseListener(phaseId, callback));
 	}
 
+	// Component scoped event listeners -------------------------------------------------------------------------------
+
+	/**
+	 * Unsubscribe the given event listener on the given event from the given component. Normally, you would use
+	 * {@link UIComponent#unsubscribeFromEvent(Class, ComponentSystemEventListener)} for this, but this wouldn't work
+	 * when executed inside {@link ComponentSystemEventListener#processEvent(javax.faces.event.ComponentSystemEvent)},
+	 * as it would otherwise end up in a <code>ConcurrentModificationException</code> while JSF is iterating over all
+	 * system event listeners. The trick is to perform the unsubscribe during the after phase of the current request
+	 * phase {@link #subscribeToRequestAfterPhase(PhaseId, org.omnifaces.util.Callback.Void)}.
+	 * @param component The component to unsubscribe the given event listener from.
+	 * @param event The event associated with the given event listener.
+	 * @param listener The event listener to be unsubscribed from the given component.
+	 * @since 2.1
+	 * @see #subscribeToRequestAfterPhase(PhaseId, org.omnifaces.util.Callback.Void)
+	 * @see UIComponent#unsubscribeFromEvent(Class, ComponentSystemEventListener)
+	 */
+	public static void unsubscribeFromComponentEvent
+		(final UIComponent component, final Class<? extends SystemEvent> event, final ComponentSystemEventListener listener)
+	{
+		subscribeToRequestAfterPhase(getCurrentPhaseId(), new Callback.Void() {
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void invoke() {
+				component.unsubscribeFromEvent(event, listener);
+			}
+		});
+	}
+
 	// Helpers --------------------------------------------------------------------------------------------------------
 
 	private static <A> Callback.WithArgument<A> wrap(final Callback.Void callback) {
 		return new Callback.WithArgument<A>() {
-			
+
 			private static final long serialVersionUID = 1L;
 
 			@Override

@@ -16,7 +16,7 @@
 package org.omnifaces.taghandler;
 
 import static java.lang.Boolean.TRUE;
-import static org.omnifaces.util.Events.subscribeToRequestAfterPhase;
+import static org.omnifaces.util.Events.subscribeToRequestComponentEvent;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.FacesLocal.redirect;
 import static org.omnifaces.util.FacesLocal.responseSendError;
@@ -36,9 +36,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.UIViewParameter;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
-import javax.faces.event.ComponentSystemEventListener;
 import javax.faces.event.PostValidateEvent;
 import javax.faces.view.facelets.ComponentHandler;
 import javax.faces.view.facelets.FaceletContext;
@@ -150,7 +148,7 @@ import org.omnifaces.util.Faces;
  * @author Bauke Scholtz
  * @since 2.0
  */
-public class ViewParamValidationFailed extends TagHandler implements ComponentSystemEventListener {
+public class ViewParamValidationFailed extends TagHandler {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
@@ -190,7 +188,7 @@ public class ViewParamValidationFailed extends TagHandler implements ComponentSy
 	 * If the parent component is an instance of {@link UIViewRoot} or {@link UIViewParameter} and is new, and the
 	 * current request is <strong>not</strong> a postback, and <strong>not</strong> in render response, and all required
 	 * attributes are set, then subscribe the parent component to the {@link PostValidateEvent}. This will invoke the
-	 * {@link #processEvent(ComponentSystemEvent)} method after validation.
+	 * {@link #processViewParamValidationFailed(ComponentSystemEvent)} method after validation.
 	 * @throws IllegalArgumentException When the parent component is not an instance of {@link UIViewRoot} or
 	 * {@link UIViewParameter}, or when there's already another <code>&lt;o:viewParamValidationFailed&gt;</code> tag
 	 * registered on the same parent, or when both <code>sendRedirect</code> and <code>sendError</code> attributes are
@@ -219,7 +217,15 @@ public class ViewParamValidationFailed extends TagHandler implements ComponentSy
 		}
 
 		message = getValueExpression(context, "message");
-		parent.subscribeToEvent(PostValidateEvent.class, this);
+
+		subscribeToRequestComponentEvent(parent, PostValidateEvent.class, new Callback.WithArgument<ComponentSystemEvent>() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void invoke(ComponentSystemEvent event) {
+				processViewParamValidationFailed(event);
+			}
+		});
 	}
 
 	/**
@@ -227,30 +233,13 @@ public class ViewParamValidationFailed extends TagHandler implements ComponentSy
 	 * already completed, and validation on the parent component has failed (for {@link UIViewRoot} this is checked by
 	 * {@link FacesContext#isValidationFailed()} and for {@link UIViewParameter} this is checked by
 	 * {@link UIViewParameter#isValid()}), then send either a redirect or error depending on the tag attributes set.
+	 * @param event The component system event.
 	 * @throws IllegalArgumentException When the <code>sendError</code> attribute does not represent a valid 3-digit
 	 * HTTP status code.
 	 */
-	@Override
-	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
-		if (!(event instanceof PostValidateEvent)) {
-			return; // Should never occur, but you never know.
-		}
-
+	protected void processViewParamValidationFailed(ComponentSystemEvent event) {
 		FacesContext context = getContext();
-		final UIComponent component = event.getComponent();
-		subscribeToRequestAfterPhase(context.getCurrentPhaseId(), new Callback.Void() {
-			
-			private static final long serialVersionUID = 1L;
-			
-			@Override
-			public void invoke() {
-				// We can't unsubscribe immediately inside processEvent() itself, as it would otherwise end up in a
-				// ConcurrentModificationException while JSF is iterating over all system event listeners.
-				// The unsubscribe is necessary in order to avoid InstantiationException on this tag during restore
-				// view of a postback, because ComponentSystemEventListener instances are also saved in JSF view state.
-				component.unsubscribeFromEvent(PostValidateEvent.class, ViewParamValidationFailed.this);
-			}
-		});
+		UIComponent component = event.getComponent();
 
 		if (component instanceof UIViewParameter ? ((UIViewParameter) component).isValid() : !context.isValidationFailed()) {
 			return; // Validation has not failed.
