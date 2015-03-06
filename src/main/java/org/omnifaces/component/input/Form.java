@@ -100,13 +100,13 @@ public class Form extends UIForm {
 	enum PropertyKeys {
 		includeViewParams,
 		includeRequestParams,
-		useRequestURI,
-		ignoreValidationFailed
+		useRequestURI
 	}
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private final State state = new State(getStateHelper());
+	private boolean ignoreValidationFailed;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -213,17 +213,17 @@ public class Form extends UIForm {
 	 * @since 2.1
 	 */
 	public boolean isIgnoreValidationFailed() {
-		return state.get(PropertyKeys.ignoreValidationFailed, FALSE);
+		return ignoreValidationFailed;
 	}
 
 	/**
 	 * Set whether or not the form should ignore validation fail.
 	 * @param ignoreValidationFailed Whether or not the form should ignore validation fail.
+	 * @since 2.1
 	 */
 	public void setIgnoreValidationFailed(boolean ignoreValidationFailed) {
-		state.put(PropertyKeys.ignoreValidationFailed, ignoreValidationFailed);
+		this.ignoreValidationFailed = ignoreValidationFailed;
 	}
-
 
 	// Nested classes -------------------------------------------------------------------------------------------------
 
