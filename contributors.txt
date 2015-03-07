@@ -18,6 +18,12 @@ Howard Smith
 Juliano Marques
 	For the work on the <o:validateMultiple> tag.
 
+Michele Mariotti
+	For the work on FacesConfigXml utility class.
+
+Stephan Rauh
+	For his idea and code to cache combined resources.
+	
 And of course a general thank you to everyone who contributed by creating an issue, pointing out a defect, etc.
 
 If you think anyone else who is not in the list should be there, please create an issue for this at 
