@@ -116,6 +116,13 @@ import org.omnifaces.util.copier.SerializationCopier;
  *
  *  &lt;o:validateBean value="#{bean.product}" validationGroups="com.example.MyGroup" / &gt;
  * </pre>
+ * 
+ *<p>
+ * It is possible to specify a <code>for</code> attribute to choose where to show the validation messages.
+ * <pre>
+ * &lt;o:validateBean value="#{bean.product}" validationGroups="com.example.MyGroup" for="form:component" / &gt;
+ * </pre>
+ * <p>
  *
  * <h3>Class level validation details</h3>
  * <p>
@@ -172,6 +179,7 @@ public class ValidateBean extends TagHandler {
 	private TagAttribute copierAttribute;
 	private TagAttribute methodAttribute;
 	private TagAttribute valueAttribute;
+	private TagAttribute forAttribute;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -186,7 +194,7 @@ public class ValidateBean extends TagHandler {
 		copierAttribute = getAttribute("copier");
 		methodAttribute = getAttribute("method");
 		valueAttribute = getAttribute("value");
-
+		forAttribute = getAttribute("for");
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -209,6 +217,7 @@ public class ValidateBean extends TagHandler {
 		final Object targetBase = getObject(valueAttribute, context);
 		final String copierName = getString(copierAttribute, context);
 		final String method = getString(methodAttribute, context);
+		final String forAttr = getString(forAttribute, context);
 
 		if (targetBase != null) {
 
@@ -228,8 +237,9 @@ public class ValidateBean extends TagHandler {
 	
 			                if (!violations.isEmpty()) {
 			                    context.validationFailed();
+			                    String clientId = getClientId(forAttr, targetForm, context);
 			                    for (ConstraintViolation<?> violation : violations) {
-			    					context.addMessage(targetForm.getClientId(context), createError(violation.getMessage()));
+			    					context.addMessage(clientId, createError(violation.getMessage()));
 			    				}
 			                }
 
@@ -284,8 +294,9 @@ public class ValidateBean extends TagHandler {
 		                if (!violations.isEmpty()) {
 		                    context.validationFailed();
 		                    context.renderResponse();
+		                    String clientId = getClientId(forAttr, targetForm, context);
 		                    for (ConstraintViolation<?> violation : violations) {
-		    					context.addMessage(targetForm.getClientId(context), createError(violation.getMessage()));
+		    					context.addMessage(clientId, createError(violation.getMessage()));
 		    				}
 		                }
 
@@ -310,6 +321,14 @@ public class ValidateBean extends TagHandler {
 					}
 				}
 			});
+		}
+	}
+	
+	private String getClientId(final String forAttr, UIForm targetForm, final FacesContext context) {
+		if (forAttr == null) {
+			return targetForm.getClientId(context);
+		} else {
+			return forAttr;
 		}
 	}
 
