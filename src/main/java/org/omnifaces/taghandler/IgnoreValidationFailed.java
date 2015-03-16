@@ -83,7 +83,7 @@ public class IgnoreValidationFailed extends TagHandler {
 	/**
 	 * If the parent component is an instance of {@link UICommand} and is new and the current request is a postback,
 	 * then subscribe the parent component to the {@link PostAddToViewEvent}. This will invoke the
-	 * {@link #processIgnoreValidationFailed(UIComponent)} method before validation.
+	 * {@link #processIgnoreValidationFailed(ComponentSystemEvent)} method before validation.
 	 * @throws IllegalArgumentException When the parent component is not an instance of {@link UICommand}.
 	 */
 	@Override

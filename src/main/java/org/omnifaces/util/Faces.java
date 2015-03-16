@@ -367,8 +367,11 @@ public final class Faces {
 
 	/**
 	 * Programmatically EL-resolve the given property on the given base object and return the resolved value.
+	 * @param <T> The expected return type.
 	 * @param base The base object whose property value is to be returned, or null to resolve a top-level variable.
 	 * @param property The property or variable to be resolved on the given base.
+	 * @return The resolved value of the given property on the given base object.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see Application#getELResolver()
 	 * @see ELResolver#getValue(ELContext, Object, Object)
 	 * @since 2.1

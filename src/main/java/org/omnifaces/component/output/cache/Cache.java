@@ -61,6 +61,12 @@ public interface Cache extends Serializable {
 	 *            the key under which a value is to be stored
 	 * @param value
 	 *            the value that is to be stored
+	 * @param timeToLive
+	 *            the amount of time in seconds for which the cached value is valid from the time it's being added to
+	 *            the cache. It's provider specific whether the cache implementation will actually remove (evict) the
+	 *            entry after this time has elapsed or will only perform a check upon accessing the cache entry.
+	 *            Whatever method the implementation chooses; after this time is elapsed a call to
+	 *            {@link Cache#get(String)} should return null.
 	 */
 	void putObject(String key, Object value, int timeToLive);
 
