@@ -15,6 +15,7 @@ package org.omnifaces.component.output;
 import static org.omnifaces.resourcehandler.DefaultResourceHandler.RES_NOT_FOUND;
 import static org.omnifaces.util.Renderers.writeAttributes;
 import static org.omnifaces.util.Utils.coalesce;
+import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -201,7 +202,7 @@ public class GraphicImage extends HtmlGraphicImage {
 	public void encodeBegin(FacesContext context) throws IOException {
 		ResponseWriter writer = context.getResponseWriter();
 		writer.startElement("img", this);
-		writer.writeURIAttribute("src", getSrc(context), "value");
+		writer.writeAttribute("src", getSrc(context), "value"); // writeURIAttribute kills URL fragment identifiers.
 		writeAttributes(writer, this, GraphicImage.ATTRIBUTE_NAMES);
 	}
 
@@ -252,7 +253,9 @@ public class GraphicImage extends HtmlGraphicImage {
 			}
 		}
 
-		return context.getExternalContext().encodeResourceURL(resource.getRequestPath());
+		String fragment = (String) getAttributes().get("fragment");
+		String fragmentString = dataURI || isEmpty(fragment) ? "" : ((fragment.charAt(0) == '#' ? "" : "#") + fragment);
+		return context.getExternalContext().encodeResourceURL(resource.getRequestPath()) + fragmentString;
 	}
 
 	/**

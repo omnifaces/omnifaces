@@ -2720,7 +2720,8 @@ public class ValidateValuesBean implements MultiFieldValidator {
             <description>
 				<![CDATA[
 	                When set to <code>true</code> then the value will be rendered in data URI format instead of request URI format.
-	                This attribute is ignored when 'name' attribute is specified.
+	                This attribute is ignored when 'name' attribute is specified. When this attribute is set to 'true',
+	                'lastModified' and 'fragment' attributes are ignored.
 	            ]]>
             </description>
             <name>dataURI</name>
@@ -2749,6 +2750,18 @@ public class ValidateValuesBean implements MultiFieldValidator {
             <name>lastModified</name>
             <required>false</required>
             <type>java.lang.Object</type>
+        </attribute>
+        <attribute>
+            <description>
+				<![CDATA[
+	                The URL fragment identifier, which will be appended to generated resource URL. This is particularly
+	                useful with SVG images with view modes. The value does not necessarily need to start with '#', this
+	                will be checked. This attribute is ignored when 'dataURI' attribute is set to 'true'.
+	            ]]>
+            </description>
+            <name>fragment</name>
+            <required>false</required>
+            <type>java.lang.String</type>
         </attribute>
         <attribute>
             <description>
