@@ -15,6 +15,7 @@ package org.omnifaces.util;
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 import static org.omnifaces.util.Servlets.prepareRedirectURL;
 import static org.omnifaces.util.Utils.encodeURL;
+import static org.omnifaces.util.Utils.isAnyEmpty;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -31,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -515,7 +517,15 @@ public final class FacesLocal {
 	public static String getBookmarkableURL
 		(FacesContext context, String viewId, Map<String, List<String>> params, boolean includeViewParams)
 	{
-		return context.getApplication().getViewHandler().getBookmarkableURL(context, viewId, params, includeViewParams);
+		Map<String, List<String>> map = new HashMap<>();
+
+		if (params != null) {
+			for (Entry<String, List<String>> param : params.entrySet()) {
+				addParamToMapIfNecessary(map, param.getKey(), param.getValue());
+			}
+		}
+
+		return context.getApplication().getViewHandler().getBookmarkableURL(context, viewId, map, includeViewParams);
 	}
 
 	/**
@@ -541,14 +551,30 @@ public final class FacesLocal {
 	public static String getBookmarkableURL
 		(FacesContext context, String viewId, Collection<? extends ParamHolder> params, boolean includeViewParams)
 	{
-		Map<String, List<String>> convertedParams = new HashMap<>();
+		Map<String, List<String>> map = new HashMap<>();
 
-		for (ParamHolder param : params) {
-			Object value = param.getValue();
-			convertedParams.put(param.getName(), Collections.singletonList(value != null ? value.toString() : ""));
+		if (params != null) {
+			for (ParamHolder param : params) {
+				addParamToMapIfNecessary(map, param.getName(), param.getValue());
+			}
 		}
 
-		return getBookmarkableURL(context, viewId, convertedParams, includeViewParams);
+		return context.getApplication().getViewHandler().getBookmarkableURL(context, viewId, map, includeViewParams);
+	}
+
+	private static void addParamToMapIfNecessary(Map<String, List<String>> map, String name, Object value) {
+		if (isAnyEmpty(name, value)) {
+			return;
+		}
+
+		List<String> values = map.get(name);
+
+		if (values == null) {
+			values = new ArrayList<>(1);
+			map.put(name, values);
+		}
+
+		values.add(value.toString());
 	}
 
 	// Facelets -------------------------------------------------------------------------------------------------------

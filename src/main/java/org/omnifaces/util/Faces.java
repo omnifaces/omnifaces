@@ -667,7 +667,8 @@ public final class Faces {
 	/**
 	 * Returns the concrete domain-relative URL to the current view with the given params URL-encoded in the query
 	 * string and optionally include view parameters as well. This URL can ultimately be used as redirect URL, or in
-	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>.
+	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>. Any parameter with an empty name or value
+	 * will be skipped. To skip empty view parameters as well, use <code>&lt;o:viewParam&gt;</code> instead.
 	 * @param params The parameters to be URL-encoded in the query string. Can be <code>null</code>.
 	 * @param includeViewParams Whether the view parameters of the current view should be included as well.
 	 * @return The concrete domain-relative URL to the current view.
@@ -683,7 +684,8 @@ public final class Faces {
 	/**
 	 * Returns the concrete domain-relative URL to the given view with the given params URL-encoded in the query
 	 * string and optionally include view parameters as well. This URL can ultimately be used as redirect URL, or in
-	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>.
+	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>. Any parameter with an empty name or value
+	 * will be skipped. To skip empty view parameters as well, use <code>&lt;o:viewParam&gt;</code> instead.
 	 * @param viewId The view ID to create the bookmarkable URL for.
 	 * @param params The parameters to be URL-encoded in the query string. Can be <code>null</code>.
 	 * @param includeViewParams Whether the view parameters of the current view which are also declared in the target
@@ -700,7 +702,8 @@ public final class Faces {
 	/**
 	 * Returns the concrete domain-relative URL to the current view with the given params URL-encoded in the query
 	 * string and optionally include view parameters as well. This URL can ultimately be used as redirect URL, or in
-	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>.
+	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>. Any parameter with an empty name or value
+	 * will be skipped. To skip empty view parameters as well, use <code>&lt;o:viewParam&gt;</code> instead.
 	 * @param params The parameters to be URL-encoded in the query string. Can be <code>null</code>.
 	 * @param includeViewParams Whether the view parameters of the current view should be included as well.
 	 * @return The concrete domain-relative URL to the current view.
@@ -716,7 +719,8 @@ public final class Faces {
 	/**
 	 * Returns the concrete domain-relative URL to the given view with the given params URL-encoded in the query
 	 * string and optionally include view parameters as well. This URL can ultimately be used as redirect URL, or in
-	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>.
+	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>. Any parameter with an empty name or value
+	 * will be skipped. To skip empty view parameters as well, use <code>&lt;o:viewParam&gt;</code> instead.
 	 * @param viewId The view ID to create the bookmarkable URL for.
 	 * @param params The parameters to be URL-encoded in the query string. Can be <code>null</code>.
 	 * @param includeViewParams Whether the view parameters of the current view which are also declared in the target
