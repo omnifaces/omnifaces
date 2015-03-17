@@ -31,8 +31,8 @@ import org.omnifaces.util.MapWrapper;
 /**
  * <p>
  * The <code>&lt;o:importConstants&gt;</code> taghandler allows the developer to have a mapping of all constant field
- * values of the given fully qualified name of a type in the EL scope. The constant field values are those public static
- * final fields. This works for classes, interfaces and enums.
+ * values of the given fully qualified name of a type in the request scope. The constant field values are those public
+ * static final fields. This works for classes, interfaces and enums.
  *
  * <h3>Usage</h3>
  * <p>
@@ -52,7 +52,7 @@ import org.omnifaces.util.MapWrapper;
  *     BAZ1, BAZ2;
  * }
  * </pre>
- * <p>The constant field values of the above types can be mapped into the EL scope as follows:
+ * <p>The constant field values of the above types can be mapped into the request scope as follows:
  * <pre>
  * &lt;o:importConstants type="com.example.Foo" /&gt;
  * &lt;o:importConstants type="com.example.Bar" /&gt;
@@ -60,7 +60,7 @@ import org.omnifaces.util.MapWrapper;
  * ...
  * #{Foo.FOO1}, #{Foo.FOO2}, #{Bar.BAR1}, #{Bar.BAR2}, #{Bazzz.BAZ1}, #{Bazzz.BAZ2}
  * </pre>
- * <p>The map is by default stored in the EL scope by the simple name of the type as variable name. You can override
+ * <p>The map is by default stored in the request scope by the simple name of the type as variable name. You can override
  * this by explicitly specifying the <code>var</code> attribute, as demonstrated for <code>com.example.Baz</code> in
  * the above example.
  * <p>
@@ -113,7 +113,7 @@ public class ImportConstants extends TagHandler {
 	/**
 	 * First obtain the constants of the class by its fully qualified name as specified in the <code>type</code>
 	 * attribute from the cache. If it hasn't been collected yet and is thus not present in the cache, then collect
-	 * them and store in cache. Finally set the constants in the EL scope by the simple name of the type, or by the
+	 * them and store in cache. Finally set the constants in the request scope by the simple name of the type, or by the
 	 * name as specified in the <code>var</code> attribute, if any.
 	 */
 	@Override
@@ -126,7 +126,8 @@ public class ImportConstants extends TagHandler {
 			CONSTANTS_CACHE.put(type, constants);
 		}
 
-		context.setAttribute(varValue != null ? varValue : type.substring(type.lastIndexOf('.') + 1), constants);
+		String var = varValue != null ? varValue : type.substring(type.lastIndexOf('.') + 1);
+		context.getFacesContext().getExternalContext().getRequestMap().put(var, constants);
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
