@@ -21,8 +21,8 @@ import static org.omnifaces.util.Components.forEachComponent;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Components.getCurrentForm;
 import static org.omnifaces.util.Components.hasInvokedSubmit;
-import static org.omnifaces.util.Events.subscribeToViewAfterPhase;
-import static org.omnifaces.util.Events.subscribeToViewBeforePhase;
+import static org.omnifaces.util.Events.subscribeToRequestAfterPhase;
+import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
 import static org.omnifaces.util.Facelets.getBoolean;
 import static org.omnifaces.util.Facelets.getObject;
@@ -150,8 +150,11 @@ public class ValidateBean extends TagHandler {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
+	private static final String ERROR_MISSING_FORM =
+			"o:validateBean must be nested in an UIForm.";
+
 	private static final String ERROR_INVALID_PARENT =
-		"Parent component of o:validateBean must be an instance of UICommand or UIInput.";
+			"Parent component of o:validateBean must be an instance of UICommand or UIInput.";
 
 	private static final Logger logger = Logger.getLogger(ValidateBean.class.getName());
 
@@ -196,7 +199,13 @@ public class ValidateBean extends TagHandler {
 	 */
 	@Override
 	public void apply(FaceletContext context, final UIComponent parent) throws IOException {
-		if (valueAttribute == null && !(parent instanceof UICommand || parent instanceof UIInput)) {
+		UIForm currentForm = (parent instanceof UIForm) ? ((UIForm) parent) : getClosestParent(parent, UIForm.class);
+
+		if (currentForm == null) {
+			throw new IllegalArgumentException(ERROR_MISSING_FORM);
+		}
+
+		if (valueAttribute == null && (!(parent instanceof UICommand || parent instanceof UIInput))) {
 			throw new IllegalArgumentException(ERROR_INVALID_PARENT);
 		}
 
@@ -216,16 +225,16 @@ public class ValidateBean extends TagHandler {
 
 			switch (getMethod(method)) {
 				case validateActual:
-					Callback.Void validateTargetBase = new TargetFormInvoker(parent, new WithArgument<UIForm>() { 
-						
+					Callback.Void validateTargetBase = new TargetFormInvoker(parent, new WithArgument<UIForm>() {
+
 						private static final long serialVersionUID = 1L;
-						
+
 						@Override public void invoke(UIForm targetForm) {
 
 				        	final FacesContext context = FacesContext.getCurrentInstance();
-	
+
 			                Set<ConstraintViolation<?>> violations = validate(targetBase, groups);
-	
+
 			                if (!violations.isEmpty()) {
 			                    context.validationFailed();
 			                    for (ConstraintViolation<?> violation : violations) {
@@ -235,7 +244,7 @@ public class ValidateBean extends TagHandler {
 
 					}});
 
-					subscribeToViewAfterPhase(UPDATE_MODEL_VALUES, validateTargetBase);
+					subscribeToRequestAfterPhase(UPDATE_MODEL_VALUES, validateTargetBase);
 					break;
 
 				case validateCopy:
@@ -291,16 +300,16 @@ public class ValidateBean extends TagHandler {
 
 					}});
 
-			        subscribeToViewBeforePhase(PROCESS_VALIDATIONS, collectPropertyValues);
-			        subscribeToViewAfterPhase(PROCESS_VALIDATIONS, checkConstraints);
+			        subscribeToRequestBeforePhase(PROCESS_VALIDATIONS, collectPropertyValues);
+			        subscribeToRequestAfterPhase(PROCESS_VALIDATIONS, checkConstraints);
 
 			        break;
 			}
 		} else {
-			subscribeToViewBeforePhase(PROCESS_VALIDATIONS, new Callback.Void() {
+			subscribeToRequestBeforePhase(PROCESS_VALIDATIONS, new Callback.Void() {
 
 				private static final long serialVersionUID = 1L;
-				
+
 				@Override
 				public void invoke() {
 					if (hasInvokedSubmit(parent)) {
@@ -346,8 +355,8 @@ public class ValidateBean extends TagHandler {
 		}
 	}
 
-	public final class TargetFormInvoker implements Callback.Void {
-		
+	public static final class TargetFormInvoker implements Callback.Void {
+
 		private static final long serialVersionUID = 1L;
 
 		private final UIComponent parent;
@@ -387,9 +396,9 @@ public class ValidateBean extends TagHandler {
 	}
 
 	private abstract static class Operation implements Callback.WithArgument<Object[]> {
-		
+
 		private static final long serialVersionUID = 1L;
-		
+
 		@Override
 		public void invoke(Object[] args) {
 			invoke((EditableValueHolder) args[0], (ValueReference) args[1]);
@@ -455,7 +464,7 @@ public class ValidateBean extends TagHandler {
 	}
 
 
-	private UIForm getTargetForm(UIComponent parent) {
+	private static UIForm getTargetForm(UIComponent parent) {
 		 if (parent instanceof UIForm) {
              return (UIForm) parent;
          }
