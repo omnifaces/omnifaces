@@ -96,6 +96,8 @@ public class IgnoreValidationFailed extends TagHandler {
 			return;
 		}
 
+		// We can't use hasInvokedSubmit() before the component is added to view, because the client ID isn't available.
+		// Hence, we subscribe this check to the PostAddToViewEvent.
 		subscribeToRequestComponentEvent(parent, PostAddToViewEvent.class, new Callback.WithArgument<ComponentSystemEvent>() {
 			private static final long serialVersionUID = 1L;
 
