@@ -66,6 +66,7 @@ import javax.validation.ConstraintViolation;
 
 import org.omnifaces.eventlistener.BeanValidationEventListener;
 import org.omnifaces.util.Callback;
+import org.omnifaces.util.Components;
 import org.omnifaces.util.Callback.WithArgument;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.copier.CloneCopier;
@@ -241,6 +242,8 @@ public class ValidateBean extends TagHandler {
 			                    for (ConstraintViolation<?> violation : violations) {
 			    					context.addMessage(clientId, createError(violation.getMessage()));
 			    				}
+			                    
+			                    setComponentToInvalidState(clientId);
 			                }
 
 					}});
@@ -298,6 +301,8 @@ public class ValidateBean extends TagHandler {
 		                    for (ConstraintViolation<?> violation : violations) {
 		    					context.addMessage(clientId, createError(violation.getMessage()));
 		    				}
+		                    
+		                    setComponentToInvalidState(clientId);
 		                }
 
 					}});
@@ -490,6 +495,17 @@ public class ValidateBean extends TagHandler {
         Set<ConstraintViolation<?>> violations = violationsRaw;
 
         return violations;
+	}
+
+	private void setComponentToInvalidState(String clientId) {
+		if (forAttribute == null) {
+			return;
+		}
+		
+		UIComponent component = Components.findComponent(clientId);
+		if (component instanceof UIInput) {
+			((UIInput)component).setValid(false);
+		}
 	}
 
 }
