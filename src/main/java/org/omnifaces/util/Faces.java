@@ -846,7 +846,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestParameterValuesMap()
 	 */
 	public static String[] getRequestParameterValues(String name) {
-		return FacesLocal.getRequestParameterValues(getContext(), name);
+		return FacesLocal.getRequestParameterValuesMap(getContext()).get(name);
 	}
 
 	/**
@@ -865,7 +865,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestHeaderMap()
 	 */
 	public static String getRequestHeader(String name) {
-		return FacesLocal.getRequestHeader(getContext(), name);
+		return FacesLocal.getRequestHeaderMap(getContext()).get(name);
 	}
 
 	/**
@@ -884,7 +884,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestHeaderValuesMap()
 	 */
 	public static String[] getRequestHeaderValues(String name) {
-		return FacesLocal.getRequestHeaderValues(getContext(), name);
+		return FacesLocal.getRequestHeaderValuesMap(getContext()).get(name);
 	}
 
 	/**
