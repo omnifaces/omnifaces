@@ -17,6 +17,7 @@ package org.omnifaces.taghandler;
 
 import static java.lang.Boolean.TRUE;
 import static org.omnifaces.util.Events.subscribeToRequestComponentEvent;
+import static org.omnifaces.util.Facelets.getValueExpression;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.FacesLocal.redirect;
 import static org.omnifaces.util.FacesLocal.responseSendError;
@@ -40,7 +41,6 @@ import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.PostValidateEvent;
 import javax.faces.view.facelets.ComponentHandler;
 import javax.faces.view.facelets.FaceletContext;
-import javax.faces.view.facelets.TagAttribute;
 import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
 
@@ -206,8 +206,9 @@ public class ViewParamValidationFailed extends TagHandler {
 			return;
 		}
 
-		sendRedirect = getValueExpression(context, "sendRedirect");
-		sendError = getValueExpression(context, "sendError");
+		sendRedirect = getValueExpression(context, getAttribute("sendRedirect"), String.class);
+		sendError = getValueExpression(context, getAttribute("sendError"), String.class);
+		message = getValueExpression(context, getAttribute("message"), String.class);
 
 		if (sendRedirect == null && sendError == null) {
 			throw new IllegalArgumentException(String.format(ERROR_MISSING_ATTRIBUTE, this));
@@ -215,8 +216,6 @@ public class ViewParamValidationFailed extends TagHandler {
 		else if (sendRedirect != null && sendError != null) {
 			throw new IllegalArgumentException(String.format(ERROR_DOUBLE_ATTRIBUTE, this));
 		}
-
-		message = getValueExpression(context, "message");
 
 		subscribeToRequestComponentEvent(parent, PostValidateEvent.class, new Callback.WithArgument<ComponentSystemEvent>() {
 			private static final long serialVersionUID = 1L;
@@ -309,14 +308,6 @@ public class ViewParamValidationFailed extends TagHandler {
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
-
-	/**
-	 * Get the value of the tag attribute associated with the given attribute name as a value expression.
-	 */
-	private ValueExpression getValueExpression(FaceletContext context, String attributeName) {
-		TagAttribute attribute = getAttribute(attributeName);
-		return (attribute != null) ? attribute.getValueExpression(context, Object.class) : null;
-	}
 
 	/**
 	 * Evaluate the given value expression as string.
