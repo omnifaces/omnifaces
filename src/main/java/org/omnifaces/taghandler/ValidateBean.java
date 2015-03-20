@@ -203,7 +203,9 @@ public class ValidateBean extends TagHandler {
 			throw new IllegalArgumentException(ERROR_INVALID_PARENT);
 		}
 
-		if (!ComponentHandler.isNew(parent) || !context.getFacesContext().isPostback()) {
+		FacesContext facesContext = context.getFacesContext();
+
+		if (!ComponentHandler.isNew(parent) || !facesContext.isPostback() || facesContext.getRenderResponse()) {
 			return;
 		}
 
