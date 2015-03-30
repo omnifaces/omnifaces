@@ -21,6 +21,7 @@ import java.io.IOException;
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.PostAddToViewEvent;
 import javax.faces.view.facelets.ComponentHandler;
@@ -92,7 +93,9 @@ public class IgnoreValidationFailed extends TagHandler {
 			throw new IllegalArgumentException(ERROR_INVALID_PARENT);
 		}
 
-		if (!ComponentHandler.isNew(parent) || !context.getFacesContext().isPostback()) {
+		FacesContext facesContext = context.getFacesContext();
+
+		if (!ComponentHandler.isNew(parent) || !facesContext.isPostback() || facesContext.getRenderResponse()) {
 			return;
 		}
 
