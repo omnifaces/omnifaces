@@ -458,33 +458,33 @@ public final class FacesLocal {
 	 * {@inheritDoc}
 	 * @see Faces#getResourceBundles()
 	 */
-    public static Map<String, ResourceBundle> getResourceBundles(FacesContext context) {
-    	Map<String, String> resourceBundles = FacesConfigXml.INSTANCE.getResourceBundles();
-        Map<String, ResourceBundle> map = new HashMap<>(resourceBundles.size());
+	public static Map<String, ResourceBundle> getResourceBundles(FacesContext context) {
+		Map<String, String> resourceBundles = FacesConfigXml.INSTANCE.getResourceBundles();
+		Map<String, ResourceBundle> map = new HashMap<>(resourceBundles.size());
 
-        for (String var : resourceBundles.keySet()) {
-            map.put(var, getResourceBundle(context, var));
-        }
+		for (String var : resourceBundles.keySet()) {
+			map.put(var, getResourceBundle(context, var));
+		}
 
-        return map;
-    }
+		return map;
+	}
 
 	/**
 	 * {@inheritDoc}
 	 * @see Faces#getBundleString(String)
 	 */
-    public static String getBundleString(FacesContext context, String key) {
-        for (ResourceBundle bundle : getResourceBundles(context).values()) {
-            try {
-                return bundle.getString(key);
-            }
-            catch (MissingResourceException ignore) {
-            	continue;
-            }
-        }
+	public static String getBundleString(FacesContext context, String key) {
+		for (ResourceBundle bundle : getResourceBundles(context).values()) {
+			try {
+				return bundle.getString(key);
+			}
+			catch (MissingResourceException ignore) {
+				continue;
+			}
+		}
 
-        return "???" + key + "???";
-    }
+		return "???" + key + "???";
+	}
 
 	/**
 	 * {@inheritDoc}

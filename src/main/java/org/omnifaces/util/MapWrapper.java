@@ -32,128 +32,128 @@ public class MapWrapper<K, V> implements Map<K, V>, Serializable {
 
 	private Map<K, V> map;
 
-    /**
-     * Initializes the wrapper with its wrapped map.
-     * @param map the map to wrap.
-     */
-    public MapWrapper(Map<K, V> map) {
-        this.map = map;
-    }
+	/**
+	 * Initializes the wrapper with its wrapped map.
+	 * @param map the map to wrap.
+	 */
+	public MapWrapper(Map<K, V> map) {
+		this.map = map;
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void clear() {
-    	getWrapped().clear();
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void clear() {
+		getWrapped().clear();
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean containsKey(Object key) {
-        return getWrapped().containsKey(key);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean containsKey(Object key) {
+		return getWrapped().containsKey(key);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean containsValue(Object value) {
-        return getWrapped().containsValue(value);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean containsValue(Object value) {
+		return getWrapped().containsValue(value);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Set<Entry<K, V>> entrySet() {
-        return getWrapped().entrySet();
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<Entry<K, V>> entrySet() {
+		return getWrapped().entrySet();
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object object) {
-        return getWrapped().equals(object);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object object) {
+		return getWrapped().equals(object);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public V get(Object key) {
-        return getWrapped().get(key);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public V get(Object key) {
+		return getWrapped().get(key);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode() {
-        return getWrapped().hashCode();
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int hashCode() {
+		return getWrapped().hashCode();
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isEmpty() {
-        return getWrapped().isEmpty();
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean isEmpty() {
+		return getWrapped().isEmpty();
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Set<K> keySet() {
-        return getWrapped().keySet();
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Set<K> keySet() {
+		return getWrapped().keySet();
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public V put(K key, V value) {
-        return getWrapped().put(key, value);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public V put(K key, V value) {
+		return getWrapped().put(key, value);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void putAll(Map< ? extends K, ? extends V> m) {
-    	getWrapped().putAll(m);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public void putAll(Map< ? extends K, ? extends V> m) {
+		getWrapped().putAll(m);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public V remove(Object key) {
-        return getWrapped().remove(key);
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public V remove(Object key) {
+		return getWrapped().remove(key);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int size() {
-        return getWrapped().size();
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public int size() {
+		return getWrapped().size();
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Collection<V> values() {
-        return getWrapped().values();
-    }
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public Collection<V> values() {
+		return getWrapped().values();
+	}
 
-    public Map<K, V> getWrapped() {
-    	return map;
-    }
+	public Map<K, V> getWrapped() {
+		return map;
+	}
 
 }

@@ -683,26 +683,26 @@ public final class Components {
 		}
 
 		UIViewRoot viewRoot = context.getViewRoot();
-	    Map<String, String> params = context.getExternalContext().getRequestParameterMap();
+		Map<String, String> params = context.getExternalContext().getRequestParameterMap();
 
-	    if (context.getPartialViewContext().isAjaxRequest()) {
-	    	String source = params.get("javax.faces.source");
+		if (context.getPartialViewContext().isAjaxRequest()) {
+			String source = params.get("javax.faces.source");
 
-	    	if (source != null) {
-    	        UIComponent component = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(source));
+			if (source != null) {
+				UIComponent component = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(source));
 
 				if (component instanceof UICommand) {
 					return (UICommand) component;
 				}
-	    	}
-	    }
+			}
+		}
 
-	    for (String name : params.keySet()) {
+		for (String name : params.keySet()) {
 			if (name.startsWith("javax.faces.")) {
 				continue; // Quick skip.
 			}
 
-	        UIComponent component = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(name));
+			UIComponent component = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(name));
 
 			if (component instanceof UICommand) {
 				return (UICommand) component;
@@ -827,14 +827,14 @@ public final class Components {
 		}
 
 		if (component instanceof UICommand) {
-		    for (String name : params.keySet()) {
+			for (String name : params.keySet()) {
 				if (name.startsWith("javax.faces.")) {
 					continue; // Quick skip.
 				}
 
-		        if (clientId.equals(stripIterationIndexFromClientId(name))) {
-		        	return true;
-		        }
+				if (clientId.equals(stripIterationIndexFromClientId(name))) {
+					return true;
+				}
 			}
 		}
 

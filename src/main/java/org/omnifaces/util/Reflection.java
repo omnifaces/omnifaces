@@ -62,18 +62,18 @@ public final class Reflection {
 	public static void setProperties(Object object, Map<String, Object> propertiesToSet) {
 
 	  try {
-	        Map<String, PropertyDescriptor> availableProperties = new HashMap<>();
-	        for (PropertyDescriptor propertyDescriptor : getBeanInfo(object.getClass()).getPropertyDescriptors()) {
-	            availableProperties.put(propertyDescriptor.getName(), propertyDescriptor);
-	        }
+			Map<String, PropertyDescriptor> availableProperties = new HashMap<>();
+			for (PropertyDescriptor propertyDescriptor : getBeanInfo(object.getClass()).getPropertyDescriptors()) {
+				availableProperties.put(propertyDescriptor.getName(), propertyDescriptor);
+			}
 
-	        for (Entry<String, Object> propertyToSet : propertiesToSet.entrySet()) {
-	        	availableProperties.get(propertyToSet.getKey()).getWriteMethod().invoke(object, propertyToSet.getValue());
-	        }
+			for (Entry<String, Object> propertyToSet : propertiesToSet.entrySet()) {
+				availableProperties.get(propertyToSet.getKey()).getWriteMethod().invoke(object, propertyToSet.getValue());
+			}
 
-	    } catch (IntrospectionException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-	        throw new IllegalStateException(e);
-	    }
+		} catch (IntrospectionException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			throw new IllegalStateException(e);
+		}
 	}
 
 	/**
@@ -149,38 +149,38 @@ public final class Reflection {
 	 */
 	public static Method findMethod(Object base, String methodName, Object[] params) {
 
-	    List<Method> methods = new ArrayList<>();
+		List<Method> methods = new ArrayList<>();
 		for (Method method : base.getClass().getMethods()) {
 			if (method.getName().equals(methodName) && method.getParameterTypes().length == params.length) {
-			    methods.add(method);
+				methods.add(method);
 			}
 		}
 
 		if (methods.size() == 1) {
-		    return methods.get(0);
+			return methods.get(0);
 		}
 
 		if (methods.size() > 1) {
-		    // Overloaded methods were found. Try to get a match
-		    for (Method method : methods) {
-		        boolean match = true;
-		        Class<?>[] candidateParams = method.getParameterTypes();
-                for (int i = 0; i < params.length; i++) {
-		            if (!candidateParams[i].isInstance(params[i])) {
-		                match = false;
-		                break;
-		            }
-		        }
+			// Overloaded methods were found. Try to get a match
+			for (Method method : methods) {
+				boolean match = true;
+				Class<?>[] candidateParams = method.getParameterTypes();
+				for (int i = 0; i < params.length; i++) {
+					if (!candidateParams[i].isInstance(params[i])) {
+						match = false;
+						break;
+					}
+				}
 
-                // If all candidate parameters were expected and for none of them the actual
-                // parameter was NOT an instance, we have a match
-                if (match) {
-                    return method;
-                }
+				// If all candidate parameters were expected and for none of them the actual
+				// parameter was NOT an instance, we have a match
+				if (match) {
+					return method;
+				}
 
-                // Else, at least one parameter was not an instance
-                // Go ahead a test then next methods
-		    }
+				// Else, at least one parameter was not an instance
+				// Go ahead a test then next methods
+			}
 		}
 
 		return null;

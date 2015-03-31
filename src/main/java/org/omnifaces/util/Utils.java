@@ -155,7 +155,7 @@ public final class Utils {
 			return Array.getLength(value) == 0;
 		}
 		else {
-		    return value.toString() == null || value.toString().isEmpty();
+			return value.toString() == null || value.toString().isEmpty();
 		}
 	}
 

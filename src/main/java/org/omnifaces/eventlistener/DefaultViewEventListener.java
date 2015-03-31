@@ -33,7 +33,7 @@ public abstract class DefaultViewEventListener implements SystemEventListener {
 
 	@Override
 	public void processEvent(SystemEvent event) throws AbortProcessingException {
-	    // NOOP
+		// NOOP
 	}
 
 	@Override

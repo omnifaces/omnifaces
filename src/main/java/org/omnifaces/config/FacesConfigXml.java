@@ -63,133 +63,133 @@ import org.xml.sax.SAXException;
  */
 public enum FacesConfigXml {
 
-    // Enum singleton -------------------------------------------------------------------------------------------------
+	// Enum singleton -------------------------------------------------------------------------------------------------
 
-    /**
-     * Returns the lazily loaded enum singleton instance.
-     * <p>
-     * Note: if this is needed in e.g. a {@link Filter} which is called before the {@link FacesServlet} is invoked,
-     * then it won't work if the <code>INSTANCE</code> hasn't been referenced before. Since JSF installs a special
-     * "init" {@link FacesContext} during startup, one option for doing this initial referencing is in a
-     * {@link ServletContextListener}. The data this enum encapsulates will then be available even where there is no
-     * {@link FacesContext} available. If there's no other option, then you need to manually invoke
-     * {@link #init(ServletContext)} whereby you pass the desired {@link ServletContext}.
-     */
-    INSTANCE;
+	/**
+	 * Returns the lazily loaded enum singleton instance.
+	 * <p>
+	 * Note: if this is needed in e.g. a {@link Filter} which is called before the {@link FacesServlet} is invoked,
+	 * then it won't work if the <code>INSTANCE</code> hasn't been referenced before. Since JSF installs a special
+	 * "init" {@link FacesContext} during startup, one option for doing this initial referencing is in a
+	 * {@link ServletContextListener}. The data this enum encapsulates will then be available even where there is no
+	 * {@link FacesContext} available. If there's no other option, then you need to manually invoke
+	 * {@link #init(ServletContext)} whereby you pass the desired {@link ServletContext}.
+	 */
+	INSTANCE;
 
-    // Private constants ----------------------------------------------------------------------------------------------
+	// Private constants ----------------------------------------------------------------------------------------------
 
-    private static final Logger logger = Logger.getLogger(FacesConfigXml.class.getName());
+	private static final Logger logger = Logger.getLogger(FacesConfigXml.class.getName());
 
-    private static final String APP_FACES_CONFIG_XML =
-    	"/WEB-INF/faces-config.xml";
-    private static final String LIB_FACES_CONFIG_XML =
-    	"META-INF/faces-config.xml";
-    private static final String XPATH_RESOURCE_BUNDLE =
-    	"application/resource-bundle";
-    private static final String XPATH_VAR =
-    	"var";
-    private static final String XPATH_BASE_NAME =
-    	"base-name";
-    private static final String ERROR_NOT_INITIALIZED =
-        "FacesConfigXml is not initialized yet. Please use #init(ServletContext) method to manually initialize it.";
-    private static final String LOG_INITIALIZATION_ERROR =
-        "FacesConfigXml failed to initialize. Perhaps your faces-config.xml contains a typo?";
+	private static final String APP_FACES_CONFIG_XML =
+		"/WEB-INF/faces-config.xml";
+	private static final String LIB_FACES_CONFIG_XML =
+		"META-INF/faces-config.xml";
+	private static final String XPATH_RESOURCE_BUNDLE =
+		"application/resource-bundle";
+	private static final String XPATH_VAR =
+		"var";
+	private static final String XPATH_BASE_NAME =
+		"base-name";
+	private static final String ERROR_NOT_INITIALIZED =
+		"FacesConfigXml is not initialized yet. Please use #init(ServletContext) method to manually initialize it.";
+	private static final String LOG_INITIALIZATION_ERROR =
+		"FacesConfigXml failed to initialize. Perhaps your faces-config.xml contains a typo?";
 
-    // Properties -----------------------------------------------------------------------------------------------------
+	// Properties -----------------------------------------------------------------------------------------------------
 
-    private final AtomicBoolean initialized = new AtomicBoolean();
-    private Map<String, String> resourceBundles;
+	private final AtomicBoolean initialized = new AtomicBoolean();
+	private Map<String, String> resourceBundles;
 
-    // Init -----------------------------------------------------------------------------------------------------------
+	// Init -----------------------------------------------------------------------------------------------------------
 
-    /**
-     * Perform automatic initialization whereby the servlet context is obtained from the faces context.
-     */
-    private void init() {
-        if (!initialized.get() && hasContext()) {
-            init(getServletContext());
-        }
-    }
+	/**
+	 * Perform automatic initialization whereby the servlet context is obtained from the faces context.
+	 */
+	private void init() {
+		if (!initialized.get() && hasContext()) {
+			init(getServletContext());
+		}
+	}
 
-    /**
-     * Perform manual initialization with the given servlet context, if not null and not already initialized yet.
-     * @param servletContext The servlet context to obtain the faces-config.xml from.
-     * @return The current {@link FacesConfigXml} instance, initialized and all.
-     */
-    public FacesConfigXml init(ServletContext servletContext) {
-        if (servletContext != null && !initialized.getAndSet(true)) {
-            try {
-                Element facesConfigXml = loadFacesConfigXml(servletContext).getDocumentElement();
-                XPath xpath = XPathFactory.newInstance().newXPath();
-                resourceBundles = parseResourceBundles(facesConfigXml, xpath);
-            }
-            catch (Exception e) {
-                initialized.set(false);
-                logger.log(Level.SEVERE, LOG_INITIALIZATION_ERROR, e);
-                throw new UnsupportedOperationException(e);
-            }
-        }
+	/**
+	 * Perform manual initialization with the given servlet context, if not null and not already initialized yet.
+	 * @param servletContext The servlet context to obtain the faces-config.xml from.
+	 * @return The current {@link FacesConfigXml} instance, initialized and all.
+	 */
+	public FacesConfigXml init(ServletContext servletContext) {
+		if (servletContext != null && !initialized.getAndSet(true)) {
+			try {
+				Element facesConfigXml = loadFacesConfigXml(servletContext).getDocumentElement();
+				XPath xpath = XPathFactory.newInstance().newXPath();
+				resourceBundles = parseResourceBundles(facesConfigXml, xpath);
+			}
+			catch (Exception e) {
+				initialized.set(false);
+				logger.log(Level.SEVERE, LOG_INITIALIZATION_ERROR, e);
+				throw new UnsupportedOperationException(e);
+			}
+		}
 
-        return this;
-    }
+		return this;
+	}
 
-    // Getters --------------------------------------------------------------------------------------------------------
+	// Getters --------------------------------------------------------------------------------------------------------
 
-    /**
-     * Returns a mapping of all resource bundle base names by var.
-     * @return A mapping of all resource bundle base names by var.
-     */
-    public Map<String, String> getResourceBundles() {
-        checkInitialized();
-        return resourceBundles;
-    }
+	/**
+	 * Returns a mapping of all resource bundle base names by var.
+	 * @return A mapping of all resource bundle base names by var.
+	 */
+	public Map<String, String> getResourceBundles() {
+		checkInitialized();
+		return resourceBundles;
+	}
 
-    private void checkInitialized() {
-        // This init() call is performed here instead of in constructor, because WebLogic loads this enum as a CDI
-        // managed bean (in spite of having a VetoAnnotatedTypeExtension) which in turn implicitly invokes the enum
-        // constructor and thus causes an init while JSF context isn't fully initialized and thus the faces context
-        // isn't available yet. Perhaps it's fixed in newer WebLogic versions.
-        init();
+	private void checkInitialized() {
+		// This init() call is performed here instead of in constructor, because WebLogic loads this enum as a CDI
+		// managed bean (in spite of having a VetoAnnotatedTypeExtension) which in turn implicitly invokes the enum
+		// constructor and thus causes an init while JSF context isn't fully initialized and thus the faces context
+		// isn't available yet. Perhaps it's fixed in newer WebLogic versions.
+		init();
 
-        if (!initialized.get()) {
-            throw new IllegalStateException(ERROR_NOT_INITIALIZED);
-        }
-    }
+		if (!initialized.get()) {
+			throw new IllegalStateException(ERROR_NOT_INITIALIZED);
+		}
+	}
 
-    // Helpers --------------------------------------------------------------------------------------------------------
+	// Helpers --------------------------------------------------------------------------------------------------------
 
-    /**
-     * Load, merge and return all <code>faces-config.xml</code> files found in the classpath
-     * into a single {@link Document}.
-     */
-    private static Document loadFacesConfigXml(ServletContext context) throws IOException, SAXException {
-    	List<URL> facesConfigURLs = new ArrayList<>();
+	/**
+	 * Load, merge and return all <code>faces-config.xml</code> files found in the classpath
+	 * into a single {@link Document}.
+	 */
+	private static Document loadFacesConfigXml(ServletContext context) throws IOException, SAXException {
+		List<URL> facesConfigURLs = new ArrayList<>();
 		facesConfigURLs.add(context.getResource(APP_FACES_CONFIG_XML));
 		facesConfigURLs.addAll(Collections.list(Thread.currentThread().getContextClassLoader().getResources(LIB_FACES_CONFIG_XML)));
 		return createDocument(facesConfigURLs);
-    }
+	}
 
-    /**
-     * Create and return a mapping of all resource bundle base names by var found in the given document.
-     * @throws XPathExpressionException
-     */
-    private static Map<String, String> parseResourceBundles(Element facesConfigXml, XPath xpath) throws XPathExpressionException {
-        Map<String, String> resourceBundles = new LinkedHashMap<>();
-        NodeList resourceBundleNodes = getNodeList(facesConfigXml, xpath, XPATH_RESOURCE_BUNDLE);
+	/**
+	 * Create and return a mapping of all resource bundle base names by var found in the given document.
+	 * @throws XPathExpressionException
+	 */
+	private static Map<String, String> parseResourceBundles(Element facesConfigXml, XPath xpath) throws XPathExpressionException {
+		Map<String, String> resourceBundles = new LinkedHashMap<>();
+		NodeList resourceBundleNodes = getNodeList(facesConfigXml, xpath, XPATH_RESOURCE_BUNDLE);
 
-        for (int i = 0; i < resourceBundleNodes.getLength(); i++) {
-            Node node = resourceBundleNodes.item(i);
+		for (int i = 0; i < resourceBundleNodes.getLength(); i++) {
+			Node node = resourceBundleNodes.item(i);
 
-            String var = xpath.compile(XPATH_VAR).evaluate(node).trim();
-            String baseName = xpath.compile(XPATH_BASE_NAME).evaluate(node).trim();
+			String var = xpath.compile(XPATH_VAR).evaluate(node).trim();
+			String baseName = xpath.compile(XPATH_BASE_NAME).evaluate(node).trim();
 
-            if (!resourceBundles.containsKey(var)) {
-                resourceBundles.put(var, baseName);
-            }
-        }
+			if (!resourceBundles.containsKey(var)) {
+				resourceBundles.put(var, baseName);
+			}
+		}
 
-        return Collections.unmodifiableMap(resourceBundles);
-    }
+		return Collections.unmodifiableMap(resourceBundles);
+	}
 
 }

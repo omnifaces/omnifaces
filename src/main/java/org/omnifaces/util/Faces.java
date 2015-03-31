@@ -637,11 +637,11 @@ public final class Faces {
 	 * @see Application#getResourceBundle(FacesContext, String)
 	 * @since 2.1
 	 */
-    public static Map<String, ResourceBundle> getResourceBundles() {
-    	return FacesLocal.getResourceBundles(getContext());
-    }
+	public static Map<String, ResourceBundle> getResourceBundles() {
+		return FacesLocal.getResourceBundles(getContext());
+	}
 
-    /**
+	/**
 	 * Gets a string for the given key searching declared resource bundles, order by declaration in
 	 * <code>faces-config.xml</code>.
 	 * If the string is missing, then this method returns <code>???key???</code>.
@@ -650,9 +650,9 @@ public final class Faces {
 	 * <code>faces-config.xml</code>.
 	 * @since 2.1
 	 */
-    public static String getBundleString(String key) {
-    	return FacesLocal.getBundleString(getContext(), key);
-    }
+	public static String getBundleString(String key) {
+		return FacesLocal.getBundleString(getContext(), key);
+	}
 
 	/**
 	 * Perform the JSF navigation to the given outcome.

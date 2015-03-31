@@ -234,7 +234,7 @@ public final class Beans {
 	 * of said method.
 	 *
 	 * @param creationalContext a {@link CreationalContext} used to manage objects with a
-     *        {@link javax.enterprise.context.Dependent} scope
+	 *        {@link javax.enterprise.context.Dependent} scope
 	 * @return the current injection point when called from a context where injection is taking place (e.g. from a producer)
 	 */
 	public static InjectionPoint getCurrentInjectionPoint(CreationalContext<?> creationalContext) {

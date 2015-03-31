@@ -82,35 +82,35 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 		}
 	}
 
-    @Override
-    public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException, IOException {
-        String resource = request.getServletPath();
+	@Override
+	public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException, IOException {
+		String resource = request.getServletPath();
 
-    	if (filterExtensionLess(request, response, chain, resource)) {
-    		return;
-    	}
-        else if (filterExtension(request, response, resource)) {
-    		return;
-    	}
-        else if (filterPublicPath(request, response, resource)) {
-    		return;
-    	}
+		if (filterExtensionLess(request, response, chain, resource)) {
+			return;
+		}
+		else if (filterExtension(request, response, resource)) {
+			return;
+		}
+		else if (filterPublicPath(request, response, resource)) {
+			return;
+		}
 
-        chain.doFilter(request, response);
-    }
+		chain.doFilter(request, response);
+	}
 
-    /**
-     * A mapped resource request without extension is encountered.
-     * The user setting "dispatchMethod" determines how we handle this.
-     */
+	/**
+	 * A mapped resource request without extension is encountered.
+	 * The user setting "dispatchMethod" determines how we handle this.
+	 */
 	private boolean filterExtensionLess(HttpServletRequest request, HttpServletResponse response, FilterChain chain, String resource) throws IOException, ServletException {
 		if (!isExtensionless(resource)) {
 			return false;
 		}
 
-        Map<String, String> resources = getApplicationAttribute(getServletContext(), FACES_VIEWS_RESOURCES);
+		Map<String, String> resources = getApplicationAttribute(getServletContext(), FACES_VIEWS_RESOURCES);
 
-        if (getApplicationFromFactory().getProjectStage() == Development && !resources.containsKey(resource)) {
+		if (getApplicationFromFactory().getProjectStage() == Development && !resources.containsKey(resource)) {
 			// Check if the resource was dynamically added by scanning the faces-views location(s) again.
 			resources = scanAndStoreViews(getServletContext());
 		}
@@ -134,13 +134,13 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 					return true;
 				case FORWARD:
 					// Forward the resource (view) using its original extension, on which the Facelets Servlet
-		            // is mapped. Technically it matters most that the Facelets Servlet picks up the
-		            // request, and the exact extension or even prefix is perhaps less relevant.
+					// is mapped. Technically it matters most that the Facelets Servlet picks up the
+					// request, and the exact extension or even prefix is perhaps less relevant.
 					RequestDispatcher requestDispatcher = getServletContext().getRequestDispatcher(resource + extension);
 
 					if (requestDispatcher != null) {
-		                requestDispatcher.forward(request, response);
-		                return true;
+						requestDispatcher.forward(request, response);
+						return true;
 					}
 			}
 		}
@@ -148,27 +148,27 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 		return false;
 	}
 
-    /**
-     * A mapped resource request with extension is encountered.
-     * The user setting "extensionAction" determines how we handle this.
-     */
+	/**
+	 * A mapped resource request with extension is encountered.
+	 * The user setting "extensionAction" determines how we handle this.
+	 */
 	private boolean filterExtension(HttpServletRequest request, HttpServletResponse response, String resource) throws IOException {
-        Map<String, String> resources = getApplicationAttribute(getServletContext(), FACES_VIEWS_RESOURCES);
+		Map<String, String> resources = getApplicationAttribute(getServletContext(), FACES_VIEWS_RESOURCES);
 
-        if (resources.containsKey(resource)) {
-            switch (extensionAction) {
-    			case REDIRECT_TO_EXTENSIONLESS:
-    				redirectPermanent(response, getExtensionlessURLWithQuery(request));
-    				return true;
-    			case SEND_404:
-    				response.sendError(SC_NOT_FOUND);
-    				return true;
-    			case PROCEED:
-    				break;
-    			default:
-    				break;
-    		}
-        }
+		if (resources.containsKey(resource)) {
+			switch (extensionAction) {
+				case REDIRECT_TO_EXTENSIONLESS:
+					redirectPermanent(response, getExtensionlessURLWithQuery(request));
+					return true;
+				case SEND_404:
+					response.sendError(SC_NOT_FOUND);
+					return true;
+				case PROCEED:
+					break;
+				default:
+					break;
+			}
+		}
 
 		return false;
 	}
@@ -202,10 +202,10 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 		return false;
 	}
 
-    private static void redirectPermanent(HttpServletResponse response, String url) {
-    	response.setStatus(SC_MOVED_PERMANENTLY);
-    	response.setHeader("Location", url);
-    	response.setHeader("Connection", "close");
-    }
+	private static void redirectPermanent(HttpServletResponse response, String url) {
+		response.setStatus(SC_MOVED_PERMANENTLY);
+		response.setHeader("Location", url);
+		response.setHeader("Connection", "close");
+	}
 
 }

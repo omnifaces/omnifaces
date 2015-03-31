@@ -26,12 +26,12 @@ public abstract class DefaultSystemEventListener implements SystemEventListener 
 
 	@Override
 	public void processEvent(SystemEvent event) throws AbortProcessingException {
-	    // NOOP
+		// NOOP
 	}
 
 	@Override
 	public boolean isListenerForSource(Object source) {
-	    return true;
+		return true;
 	}
 
 }

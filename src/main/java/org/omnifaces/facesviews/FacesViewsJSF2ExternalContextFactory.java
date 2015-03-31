@@ -59,29 +59,29 @@ public class FacesViewsJSF2ExternalContextFactory extends ExternalContextFactory
 
 		private ExternalContext wrapped;
 
-	    public FacesViewsJSF2ExternalContext(ExternalContext wrapped) {
-	        this.wrapped = wrapped;
-	    }
+		public FacesViewsJSF2ExternalContext(ExternalContext wrapped) {
+			this.wrapped = wrapped;
+		}
 
-	    @Override
-	    public URL getResource(String path) throws MalformedURLException {
+		@Override
+		public URL getResource(String path) throws MalformedURLException {
 
-	    	  URL resource = super.getResource(getMappedPath(path));
+			  URL resource = super.getResource(getMappedPath(path));
 
-	          if (resource == null && isDevelopment()) {
-	          	// If "resource" is null it means it wasn't found. Check if the resource was dynamically added by
-	          	// scanning the faces-views location(s) again.
-	          	scanAndStoreViews(getServletContext());
-	          	resource = super.getResource(getMappedPath(path));
-	          }
+			  if (resource == null && isDevelopment()) {
+			  	// If "resource" is null it means it wasn't found. Check if the resource was dynamically added by
+			  	// scanning the faces-views location(s) again.
+			  	scanAndStoreViews(getServletContext());
+			  	resource = super.getResource(getMappedPath(path));
+			  }
 
-	          return resource;
-	    }
+			  return resource;
+		}
 
-	    @Override
-	    public ExternalContext getWrapped() {
-	        return wrapped;
-	    }
+		@Override
+		public ExternalContext getWrapped() {
+			return wrapped;
+		}
 	}
 
 }

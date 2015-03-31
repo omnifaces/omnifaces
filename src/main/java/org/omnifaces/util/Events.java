@@ -349,7 +349,7 @@ public final class Events {
 
 			@Override
 			public void processEvent(SystemEvent event) throws AbortProcessingException {
-			    callback.invoke(event);
+				callback.invoke(event);
 			}
 		};
 	}

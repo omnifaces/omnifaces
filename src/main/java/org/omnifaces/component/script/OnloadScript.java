@@ -92,7 +92,7 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 	 */
 	@Override
 	public boolean isListenerForSource(Object source) {
-        return source instanceof OnloadScript || source instanceof UIViewRoot;
+		return source instanceof OnloadScript || source instanceof UIViewRoot;
 	}
 
 	/**

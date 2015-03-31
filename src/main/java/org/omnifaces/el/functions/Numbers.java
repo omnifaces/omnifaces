@@ -60,12 +60,12 @@ public final class Numbers {
 			return "0 B";
 		}
 
-	    if (bytes < BYTES_1K) {
-	    	return bytes + " B";
-	    }
+		if (bytes < BYTES_1K) {
+			return bytes + " B";
+		}
 
-	    int exp = (int) (Math.log(bytes) / Math.log(BYTES_1K));
-	    return String.format(getLocale(), "%.1f %ciB", bytes / Math.pow(BYTES_1K, exp), "KMGTPE".charAt(exp - 1));
+		int exp = (int) (Math.log(bytes) / Math.log(BYTES_1K));
+		return String.format(getLocale(), "%.1f %ciB", bytes / Math.pow(BYTES_1K, exp), "KMGTPE".charAt(exp - 1));
 	}
 
 	/**

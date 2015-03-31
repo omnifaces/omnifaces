@@ -104,8 +104,8 @@ public class TagAttribute extends TagHandler {
 		ValueExpression valueExpressionParentMarker = variableMapper.resolveVariable(MARKER);
 
 		if (valueExpressionParentMarker == null) { // We're the outer faces tag, or parent didn't mark because it didn't have any attributes set.
-		    context.setAttribute(MARKER, context.hashCode());
-		    return;
+			context.setAttribute(MARKER, context.hashCode());
+			return;
 		}
 
 		variableMapper.setVariable(MARKER, null); // If we have our own mapper, this will not affect our parent mapper.
@@ -114,8 +114,8 @@ public class TagAttribute extends TagHandler {
 		if (valueExpressionParentMarkerCheck == null || !valueExpressionParentMarkerCheck.equals(valueExpressionParentMarker)) {
 			// We were able to remove our parent's mapper, so we share it.
 
-		    variableMapper.setVariable(MARKER, valueExpressionParentMarker); // First put parent marker back ...
-		    context.setVariableMapper(new DelegatingVariableMapper(variableMapper)); // ... then add our own variable mapper.
+			variableMapper.setVariable(MARKER, valueExpressionParentMarker); // First put parent marker back ...
+			context.setVariableMapper(new DelegatingVariableMapper(variableMapper)); // ... then add our own variable mapper.
 		}
 
 		context.setAttribute(MARKER, context.hashCode());

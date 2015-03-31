@@ -216,7 +216,7 @@ public class Cache extends OutputFamily {
 				}
 			}
 		});
-    }
+	}
 
 	@Override
 	public void encodeChildren(FacesContext context) throws IOException {
@@ -403,20 +403,20 @@ public class Cache extends OutputFamily {
 	}
 
 	public Boolean isUseBuffer() {
-    	return state.get(useBuffer, FALSE);
-    }
+		return state.get(useBuffer, FALSE);
+	}
 
 	public void setUseBuffer(Boolean useBufferValue) {
-    	state.put(useBuffer, useBufferValue);
-    }
+		state.put(useBuffer, useBufferValue);
+	}
 
 	public Boolean isReset() {
-    	return state.get(reset, FALSE);
-    }
+		return state.get(reset, FALSE);
+	}
 
 	public void setReset(Boolean resetValue) {
-    	state.put(reset, resetValue);
-    }
+		state.put(reset, resetValue);
+	}
 
 	/**
 	 * Returns whether this cache is disabled.

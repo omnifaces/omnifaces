@@ -245,7 +245,7 @@ public class ValidateBean extends TagHandler {
 
 					case validateCopy:
 						validateCopiedBean(form, bean, copier, groups);
-				        break;
+						break;
 				}
 			}
 		}
@@ -260,7 +260,7 @@ public class ValidateBean extends TagHandler {
 	private void validateActualBean(final UIForm form, final Object bean, final String groups) {
 		ValidateBeanCallback validateActualBean = new ValidateBeanCallback() { private static final long serialVersionUID = 1L; @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
-		    validate(context, form, bean, groups, false);
+			validate(context, form, bean, groups, false);
 		}};
 
 		subscribeToRequestAfterPhase(UPDATE_MODEL_VALUES, validateActualBean);
@@ -292,7 +292,7 @@ public class ValidateBean extends TagHandler {
 
 			Object copiedBean = getCopier(context, copier).copy(bean);
 			setProperties(copiedBean, properties);
-		    validate(context, form, copiedBean, groups, true);
+			validate(context, form, copiedBean, groups, true);
 		}};
 
 		subscribeToRequestBeforePhase(PROCESS_VALIDATIONS, collectBeanProperties);
@@ -380,21 +380,21 @@ public class ValidateBean extends TagHandler {
 			groupClasses.add(toClass(group));
 		}
 
-        Set violationsRaw = Platform.getBeanValidator().validate(bean, groupClasses.toArray(new Class[groupClasses.size()]));
-        Set<ConstraintViolation<?>> violations = violationsRaw;
+		Set violationsRaw = Platform.getBeanValidator().validate(bean, groupClasses.toArray(new Class[groupClasses.size()]));
+		Set<ConstraintViolation<?>> violations = violationsRaw;
 
-	    if (!violations.isEmpty()) {
-	        context.validationFailed();
-	        String formId = form.getClientId(context);
+		if (!violations.isEmpty()) {
+			context.validationFailed();
+			String formId = form.getClientId(context);
 
-	        for (ConstraintViolation<?> violation : violations) {
+			for (ConstraintViolation<?> violation : violations) {
 				context.addMessage(formId, createError(violation.getMessage()));
 			}
 
-	        if (renderResponseOnFail) {
-	        	context.renderResponse();
-	        }
-	    }
+			if (renderResponseOnFail) {
+				context.renderResponse();
+			}
+		}
 	}
 
 	// Nested classes -------------------------------------------------------------------------------------------------

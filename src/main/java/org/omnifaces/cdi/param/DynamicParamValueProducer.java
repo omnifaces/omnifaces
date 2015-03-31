@@ -50,86 +50,86 @@ import org.omnifaces.cdi.Param;
  */
 public class DynamicParamValueProducer implements Bean<Object>, Serializable, PassivationCapable {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private BeanManager beanManager;
-    private Set<Type> types;
+	private BeanManager beanManager;
+	private Set<Type> types;
 
-    public DynamicParamValueProducer(BeanManager beanManager, Type type) {
-    	this.beanManager = beanManager;
-    	types = new HashSet<>(asList(type, Object.class));
-    }
+	public DynamicParamValueProducer(BeanManager beanManager, Type type) {
+		this.beanManager = beanManager;
+		types = new HashSet<>(asList(type, Object.class));
+	}
 
-    @Override
-    public Class<?> getBeanClass() {
-        return RequestParameterProducer.class;
-    }
+	@Override
+	public Class<?> getBeanClass() {
+		return RequestParameterProducer.class;
+	}
 
-    @Override
-    public Set<Type> getTypes() {
-        return types;
-    }
+	@Override
+	public Set<Type> getTypes() {
+		return types;
+	}
 
-    @Override
-    public Object create(CreationalContext<Object> creationalContext) {
-    	InjectionPoint injectionPoint = getCurrentInjectionPoint(beanManager, creationalContext);
-    	
-    	ParamValue<?> paramValue = new RequestParameterProducer().produce(injectionPoint);
-    	return paramValue.getValue();
-    }
+	@Override
+	public Object create(CreationalContext<Object> creationalContext) {
+		InjectionPoint injectionPoint = getCurrentInjectionPoint(beanManager, creationalContext);
 
-    @Override
-    public Set<Annotation> getQualifiers() {
-        return Collections.singleton((Annotation) new DefaultParamAnnotationLiteral());
-    }
+		ParamValue<?> paramValue = new RequestParameterProducer().produce(injectionPoint);
+		return paramValue.getValue();
+	}
 
-    @Override
-    public Class<? extends Annotation> getScope() {
-        return Dependent.class;
-    }
+	@Override
+	public Set<Annotation> getQualifiers() {
+		return Collections.singleton((Annotation) new DefaultParamAnnotationLiteral());
+	}
 
-    @Override
-    public Set<Class<? extends Annotation>> getStereotypes() {
-        return emptySet();
-    }
+	@Override
+	public Class<? extends Annotation> getScope() {
+		return Dependent.class;
+	}
 
-    @Override
-    public Set<InjectionPoint> getInjectionPoints() {
-        return emptySet();
-    }
+	@Override
+	public Set<Class<? extends Annotation>> getStereotypes() {
+		return emptySet();
+	}
 
-    @Override
-    public boolean isAlternative() {
-        return false;
-    }
+	@Override
+	public Set<InjectionPoint> getInjectionPoints() {
+		return emptySet();
+	}
 
-    @Override
-    public boolean isNullable() {
-        return false;
-    }
+	@Override
+	public boolean isAlternative() {
+		return false;
+	}
 
-    @Override
-    public String getName() {
-        return null;
-    }
+	@Override
+	public boolean isNullable() {
+		return false;
+	}
 
-    @Override
-    public void destroy(Object instance, CreationalContext<Object> creationalContext) {
-    	// NOOP
-    }
+	@Override
+	public String getName() {
+		return null;
+	}
 
-    @Override
-    public String getId() {
-        return DynamicParamValueProducer.class.getName() + "_" + (types != null ? types.toString() : "");
-    }
+	@Override
+	public void destroy(Object instance, CreationalContext<Object> creationalContext) {
+		// NOOP
+	}
 
-    @SuppressWarnings("all")
-    public static class DefaultParamAnnotationLiteral extends AnnotationLiteral<Param> implements Param {
-        private static final long serialVersionUID = 1L;
-        
-        private static final String[] EMPTY_STRING_ARRAY = {}; 
-        private static final Class<? extends Validator>[] EMPTY_VALIDATOR_ARRAY = new Class[0];
-        private static final Attribute[] EMPTY_ATTRIBUTE_ARRAY = {};
+	@Override
+	public String getId() {
+		return DynamicParamValueProducer.class.getName() + "_" + (types != null ? types.toString() : "");
+	}
+
+	@SuppressWarnings("all")
+	public static class DefaultParamAnnotationLiteral extends AnnotationLiteral<Param> implements Param {
+		private static final long serialVersionUID = 1L;
+
+		private static final String[] EMPTY_STRING_ARRAY = {};
+		private static final Class<? extends Validator>[] EMPTY_VALIDATOR_ARRAY = new Class[0];
+		private static final Attribute[] EMPTY_ATTRIBUTE_ARRAY = {};
 
 		@Override
 		public String name() {
@@ -200,5 +200,5 @@ public class DynamicParamValueProducer implements Bean<Object>, Serializable, Pa
 		public boolean overrideGlobalBeanValidationDisabled() {
 			return false;
 		}
-    }
+	}
 }

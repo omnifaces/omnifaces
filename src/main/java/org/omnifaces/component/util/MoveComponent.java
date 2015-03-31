@@ -67,14 +67,14 @@ import org.omnifaces.util.State;
 @FacesComponent(MoveComponent.COMPONENT_TYPE)
 public class MoveComponent extends UtilFamily implements SystemEventListener, ClientBehaviorHolder {
 
-    public static final String COMPONENT_TYPE = "org.omnifaces.component.util.MoveComponent";
+	public static final String COMPONENT_TYPE = "org.omnifaces.component.util.MoveComponent";
 
-    private static final String ERROR_COMPONENT_NOT_FOUND =
-        "A component with ID '%s' as specified by the 'for' attribute of the MoveComponent with Id '%s' could not be found.";
+	private static final String ERROR_COMPONENT_NOT_FOUND =
+		"A component with ID '%s' as specified by the 'for' attribute of the MoveComponent with Id '%s' could not be found.";
 
-    public static final String DEFAULT_SCOPE = "facelet";
+	public static final String DEFAULT_SCOPE = "facelet";
 
-    private final State state = new State(getStateHelper());
+	private final State state = new State(getStateHelper());
 
 	enum PropertyKeys {
 		/* for */ facet, destination, behaviorDefaultEvent, behaviorEvents
@@ -105,86 +105,86 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
-    public MoveComponent() {
-        if (!isPostback()) {
-            subscribeToViewEvent(PreRenderViewEvent.class, this);
-        } else {
-        	// Behaviors added during the PreRenderViewEvent aren't properly restored, so we add them again
-        	// in the PostAddToViewEvent during a postback.
-        	subscribeToViewEvent(PostAddToViewEvent.class, this);
-        }
-    }
+	public MoveComponent() {
+		if (!isPostback()) {
+			subscribeToViewEvent(PreRenderViewEvent.class, this);
+		} else {
+			// Behaviors added during the PreRenderViewEvent aren't properly restored, so we add them again
+			// in the PostAddToViewEvent during a postback.
+			subscribeToViewEvent(PostAddToViewEvent.class, this);
+		}
+	}
 
-    @Override
-    public boolean isListenerForSource(Object source) {
-        return source instanceof UIViewRoot;
-    }
+	@Override
+	public boolean isListenerForSource(Object source) {
+		return source instanceof UIViewRoot;
+	}
 
-    @Override
-    public void processEvent(SystemEvent event) throws AbortProcessingException {
-    	if (event instanceof PreRenderViewEvent || (event instanceof PostAddToViewEvent && getDestination() == BEHAVIOR)) {
-    		doProcess();
-    	}
-    }
+	@Override
+	public void processEvent(SystemEvent event) throws AbortProcessingException {
+		if (event instanceof PreRenderViewEvent || (event instanceof PostAddToViewEvent && getDestination() == BEHAVIOR)) {
+			doProcess();
+		}
+	}
 
-    @Override
-    public void addClientBehavior(String eventName, ClientBehavior behavior) {
-    	attachedEventName = eventName;
-    	attachedBehavior = behavior;
-    }
+	@Override
+	public void addClientBehavior(String eventName, ClientBehavior behavior) {
+		attachedEventName = eventName;
+		attachedBehavior = behavior;
+	}
 
-    @Override
-    public String getDefaultEventName() {
-    	return getBehaviorDefaultEvent();
-    }
+	@Override
+	public String getDefaultEventName() {
+		return getBehaviorDefaultEvent();
+	}
 
-    @Override
-    public Collection<String> getEventNames() {
-    	if (isEmpty(getBehaviorEvents())) {
-	       	return containsTrueList;
-       	}
+	@Override
+	public Collection<String> getEventNames() {
+		if (isEmpty(getBehaviorEvents())) {
+		   	return containsTrueList;
+	   	}
 
-    	return csvToList(getBehaviorEvents());
-    }
+		return csvToList(getBehaviorEvents());
+	}
 
-    public void doProcess() {
-        String forValue = getFor();
+	public void doProcess() {
+		String forValue = getFor();
 
-        if (!isEmpty(forValue)) {
-            UIComponent component = findComponentRelatively(this, forValue);
+		if (!isEmpty(forValue)) {
+			UIComponent component = findComponentRelatively(this, forValue);
 
-            if (component == null) {
-            	component = findComponent(forValue);
-            }
+			if (component == null) {
+				component = findComponent(forValue);
+			}
 
-            if (component == null) {
-                throw new IllegalArgumentException(format(ERROR_COMPONENT_NOT_FOUND, forValue, getId()));
-            }
+			if (component == null) {
+				throw new IllegalArgumentException(format(ERROR_COMPONENT_NOT_FOUND, forValue, getId()));
+			}
 
-            List<UIComponent> children = getChildrenInNewList();
+			List<UIComponent> children = getChildrenInNewList();
 
-            switch (getDestination()) {
-            	case BEFORE:
-            		moveBefore(component, children);
-            		break;
-            	case ADD_FIRST:
-            		moveAddFirst(component, children);
-            		break;
-            	case ADD_LAST:
-            		moveAddLast(component, children);
-            		break;
-            	case FACET:
-            		moveFacet(component, children);
-            		break;
-            	case BEHAVIOR:
-            		moveBehavior(component, attachedEventName, attachedBehavior);
-            		break;
-            	case AFTER:
-            		moveAfter(component, children);
-            		break;
-            }
-        }
-    }
+			switch (getDestination()) {
+				case BEFORE:
+					moveBefore(component, children);
+					break;
+				case ADD_FIRST:
+					moveAddFirst(component, children);
+					break;
+				case ADD_LAST:
+					moveAddLast(component, children);
+					break;
+				case FACET:
+					moveFacet(component, children);
+					break;
+				case BEHAVIOR:
+					moveBehavior(component, attachedEventName, attachedBehavior);
+					break;
+				case AFTER:
+					moveAfter(component, children);
+					break;
+			}
+		}
+	}
 
 	private void moveBefore(UIComponent component, List<UIComponent> children) {
 		// Find the index the target component has among its siblings, this directly
@@ -252,11 +252,11 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 		}
 	}
 
-    private List<UIComponent> getChildrenInNewList() {
-    	return new ArrayList<>(getChildren());
-    }
+	private List<UIComponent> getChildrenInNewList() {
+		return new ArrayList<>(getChildren());
+	}
 
-    // Attribute getters/setters --------------------------------------------------------------------------------------
+	// Attribute getters/setters --------------------------------------------------------------------------------------
 
   	public String getFor() {
 		return state.get("for");

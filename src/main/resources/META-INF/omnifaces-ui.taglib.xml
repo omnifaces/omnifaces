@@ -38,14 +38,14 @@
 				<pre>
 &lt;o:tree value="#{bean.treeModel}" var="item" varNode="node"&gt;
   &lt;o:treeNode&gt;
-    &lt;ul&gt;
-      &lt;o:treeNodeItem&gt;
-        &lt;li&gt;
-          #{node.index} #{item.someProperty}
-          &lt;o:treeInsertChildren /&gt;
-        &lt;/li&gt;
-      &lt;/o:treeNodeItem&gt;
-    &lt;/ul&gt;
+	&lt;ul&gt;
+	  &lt;o:treeNodeItem&gt;
+		&lt;li&gt;
+		  #{node.index} #{item.someProperty}
+		  &lt;o:treeInsertChildren /&gt;
+		&lt;/li&gt;
+	  &lt;/o:treeNodeItem&gt;
+	&lt;/ul&gt;
   &lt;/o:treeNode&gt;
 &lt;/o:tree&gt;
 				</pre>
@@ -712,7 +712,7 @@ input.error, select.error, textarea.error {
 				<pre>
 &lt;o:validateMultipleFields id="myId" binding="#{myId}" components="foo bar baz" /&gt;
 &lt;h:panelGroup rendered="#{myId.validationFailed}"&gt;
-    Validation has failed! &lt;h:message for="myId" /&gt;
+	Validation has failed! &lt;h:message for="myId" /&gt;
 &lt;/h:panelGroup&gt;
 				</pre>
 			]]>
@@ -1504,7 +1504,7 @@ input.error, select.error, textarea.error {
 				</pre>
 				<pre>
 public boolean validateValues(FacesContext context, List&lt;UIInput&gt; components, List&lt;Object&gt; values) {
-    // ...
+	// ...
 }
 				</pre>
 				<p>Or by a managed bean instance which implements the <code>MultiFieldValidator</code> interface:
@@ -1519,10 +1519,10 @@ public boolean validateValues(FacesContext context, List&lt;UIInput&gt; componen
 @ManagedBean
 @RequestScoped
 public class ValidateValuesBean implements MultiFieldValidator {
-    @Override
-    boolean validateValues(FacesContext context, List&lt;UIInput&gt; components, List&lt;Object&gt; values) {
-        // ...
-    }
+	@Override
+	boolean validateValues(FacesContext context, List&lt;UIInput&gt; components, List&lt;Object&gt; values) {
+		// ...
+	}
 }
 				</pre>
 			]]>
@@ -1795,10 +1795,10 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-	                The name of the request parameter from which the value for this component
-	                is retrieved on an initial request or to override the stored value on a
-	                postback.
-		        ]]>
+					The name of the request parameter from which the value for this component
+					is retrieved on an initial request or to override the stored value on a
+					postback.
+				]]>
 			</description>
 			<name>name</name>
 			<required>true</required>
@@ -1807,8 +1807,8 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-	                Converter instance registered with this component.
-	            ]]></description>
+					Converter instance registered with this component.
+				]]></description>
 			<name>converter</name>
 			<required>false</required>
 			<type>javax.faces.convert.Converter</type>
@@ -1816,10 +1816,10 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-	                A ValueExpression enabled attribute that, if present, will be
-	                used as the text of the converter message, replacing any message
-	                that comes from the converter.
-	            ]]>
+					A ValueExpression enabled attribute that, if present, will be
+					used as the text of the converter message, replacing any message
+					that comes from the converter.
+				]]>
 			</description>
 			<name>converterMessage</name>
 			<required>false</required>
@@ -1828,10 +1828,10 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-	                The component identifier for this component. This value must be
-	                unique within the closest parent component that is a naming
-	                container.
-	            ]]>
+					The component identifier for this component. This value must be
+					unique within the closest parent component that is a naming
+					container.
+				]]>
 			</description>
 			<name>id</name>
 			<required>false</required>
@@ -1840,10 +1840,10 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-	                Flag indicating that the user is required to provide a submitted
-	                value for this input component. This component extends the behavior of
-	                this by only making this required for a non-faces request.
-	            ]]>
+					Flag indicating that the user is required to provide a submitted
+					value for this input component. This component extends the behavior of
+					this by only making this required for a non-faces request.
+				]]>
 			</description>
 			<name>required</name>
 			<required>false</required>
@@ -1852,10 +1852,10 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-	                A ValueExpression enabled attribute that, if present, will be
-	                used as the text of the validation message for the "required"
-	                facility, if the "required" facility is used.
-	            ]]>
+					A ValueExpression enabled attribute that, if present, will be
+					used as the text of the validation message for the "required"
+					facility, if the "required" facility is used.
+				]]>
 			</description>
 			<name>requiredMessage</name>
 			<required>false</required>
@@ -1864,15 +1864,15 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-	                MethodExpression representing a validator method that will be
-	                called
-	                during Process Validations to perform correctness checks on the
-	                value of this component. The expression must evaluate to a
-	                public
-	                method that takes FacesContext, UIComponent, and Object
-	                parameters,
-	                with a return type of void.
-	            ]]>
+					MethodExpression representing a validator method that will be
+					called
+					during Process Validations to perform correctness checks on the
+					value of this component. The expression must evaluate to a
+					public
+					method that takes FacesContext, UIComponent, and Object
+					parameters,
+					with a return type of void.
+				]]>
 			</description>
 			<name>validator</name>
 			<required>false</required>
@@ -1883,10 +1883,10 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-	                A ValueExpression enabled attribute that, if present, will be
-	                used as the text of the validator message, replacing any
-	                message that comes from the validator.
-	            ]]>
+					A ValueExpression enabled attribute that, if present, will be
+					used as the text of the validator message, replacing any
+					message that comes from the validator.
+				]]>
 			</description>
 			<name>validatorMessage</name>
 			<required>false</required>
@@ -1895,14 +1895,14 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-	                A ValueExpression to which the value of the request parameter, as
-	                determined by the name attribute, is bound. The resolved value of this
-	                expression is used when encoding the view parameter into a bookmarkable link or
-	                redirect URL with view parameter encoding enabled. If this attribute is omitted,
-	                the value of the request parameter will instead be the local value of the
-	                UIViewParameter.
-	            ]]>
-            </description>
+					A ValueExpression to which the value of the request parameter, as
+					determined by the name attribute, is bound. The resolved value of this
+					expression is used when encoding the view parameter into a bookmarkable link or
+					redirect URL with view parameter encoding enabled. If this attribute is omitted,
+					the value of the request parameter will instead be the local value of the
+					UIViewParameter.
+				]]>
+			</description>
 			<name>value</name>
 			<required>false</required>
 			<type>java.lang.Object</type>
@@ -1910,22 +1910,22 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-	                <p>
+					<p>
 
-	                MethodExpression representing a value change listener method
-	                that will be notified when a new value has been set for this
-	                input component. The expression must evaluate to a public
-	                method that takes a <code>ValueChangeEvent</code>
-	                parameter,
-	                with a return type of void, or
-	                to a public method that takes no arguments with a return type
-	                of void. In the latter case, the method has no way of easily
-	                knowing what the new value is, but this can be useful in cases
-	                where a notification is needed that "this value
-	                changed".
+					MethodExpression representing a value change listener method
+					that will be notified when a new value has been set for this
+					input component. The expression must evaluate to a public
+					method that takes a <code>ValueChangeEvent</code>
+					parameter,
+					with a return type of void, or
+					to a public method that takes no arguments with a return type
+					of void. In the latter case, the method has no way of easily
+					knowing what the new value is, but this can be useful in cases
+					where a notification is needed that "this value
+					changed".
 
-	                </p>
-	            ]]>
+					</p>
+				]]>
 			</description>
 			<name>valueChangeListener</name>
 			<required>false</required>
@@ -1936,9 +1936,9 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-	                The maximum number of characters that may
-	                be entered in this field.
-	            ]]>
+					The maximum number of characters that may
+					be entered in this field.
+				]]>
 			</description>
 			<name>maxlength</name>
 			<required>false</required>
@@ -1947,9 +1947,9 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-	                The ValueExpression linking this component to a property in a
-	                backing bean
-	            ]]>
+					The ValueExpression linking this component to a property in a
+					backing bean
+				]]>
 			</description>
 			<name>binding</name>
 			<required>false</required>
@@ -1958,11 +1958,11 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-	                If present, this attribute refers to the value of one of the exposed
-	                attached objects within the composite component inside
-	                of which this tag is nested.
-	            ]]>
-            </description>
+					If present, this attribute refers to the value of one of the exposed
+					attached objects within the composite component inside
+					of which this tag is nested.
+				]]>
+			</description>
 			<name>for</name>
 			<required>false</required>
 			<type>java.lang.String</type>
@@ -1985,10 +1985,10 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-	               Name under which the component will be made available to EL, scoped to the body of the Facelets tag (default)
-	               or to the request.
-	            ]]>
-            </description>
+				   Name under which the component will be made available to EL, scoped to the body of the Facelets tag (default)
+				   or to the request.
+				]]>
+			</description>
 			<name>name</name>
 			<required>true</required>
 			<type>java.lang.String</type>
@@ -1996,9 +1996,9 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-	               ID of the component that will be resolved (looked-up) and if found a reference of it made available to EL.
-	            ]]>
-            </description>
+				   ID of the component that will be resolved (looked-up) and if found a reference of it made available to EL.
+				]]>
+			</description>
 			<name>for</name>
 			<required>true</required>
 			<type>java.lang.String</type>
@@ -2011,7 +2011,7 @@ public class ValidateValuesBean implements MultiFieldValidator {
 					<p>
 					Values values are "facelet" (default) and "request".					
 				 ]]>
-            </description>
+			</description>
 			<name>scope</name>
 			<required>false</required>
 			<type>java.lang.String</type>
@@ -2034,9 +2034,9 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-	               ID of the target component for which the component moving will be done
-	            ]]>
-            </description>
+				   ID of the target component for which the component moving will be done
+				]]>
+			</description>
 			<name>for</name>
 			<required>true</required>
 			<type>java.lang.String</type>
@@ -2055,7 +2055,7 @@ public class ValidateValuesBean implements MultiFieldValidator {
 						<li> <code>AFTER</code>     - Component is moved right after target component, i.e. as a sibling with an index that's 1 position higher
 					</ul>				
 				 ]]>
-            </description>
+			</description>
 			<name>destination</name>
 			<required>false</required>
 			<type>java.lang.String</type>
@@ -2064,9 +2064,9 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-				    In case the <code>destination</code> is set to FACET, the name of the facet in the target component to which the components should be moved		
+					In case the <code>destination</code> is set to FACET, the name of the facet in the target component to which the components should be moved		
 				 ]]>
-            </description>
+			</description>
 			<name>facet</name>
 			<required>false</required>
 			<type>java.lang.String</type>
@@ -2075,11 +2075,11 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-				    In case the <code>destination</code> is set to BEHAVIOR, the name of the default event that the <b>target</b> component is 'supposed' to have.
-				    This normally does not need to be set, but might be needed for some over-eager tag handlers associated with a behavior that in advance try
-				    to check whether the behavior event matches with what the component supports.	
+					In case the <code>destination</code> is set to BEHAVIOR, the name of the default event that the <b>target</b> component is 'supposed' to have.
+					This normally does not need to be set, but might be needed for some over-eager tag handlers associated with a behavior that in advance try
+					to check whether the behavior event matches with what the component supports.	
 				 ]]>
-            </description>
+			</description>
 			<name>behaviorDefaultEvent</name>
 			<required>false</required>
 			<type>java.lang.String</type>
@@ -2088,11 +2088,11 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-				    In case the <code>destination</code> is set to BEHAVIOR, the comma separated list events that the <b>target</b> component is 'supposed' to support.
-				    This normally does not need to be set, but might be needed for some over-eager tag handlers associated with a behavior that in advance try
-				    to check whether the behavior event matches with what the component supports.	
+					In case the <code>destination</code> is set to BEHAVIOR, the comma separated list events that the <b>target</b> component is 'supposed' to support.
+					This normally does not need to be set, but might be needed for some over-eager tag handlers associated with a behavior that in advance try
+					to check whether the behavior event matches with what the component supports.	
 				 ]]>
-            </description>
+			</description>
 			<name>behaviorEvents</name>
 			<required>false</required>
 			<type>java.lang.String</type>
@@ -2146,9 +2146,9 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-	               Name under which the method expression will be made available to EL, scoped to the body of the Facelets tag.
-	            ]]>
-            </description>
+				   Name under which the method expression will be made available to EL, scoped to the body of the Facelets tag.
+				]]>
+			</description>
 			<name>name</name>
 			<required>true</required>
 			<type>java.lang.String</type>
@@ -2156,10 +2156,10 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-	               The value expression that is to be interpreted and invoked as a method expression. This is typically the
-	               name of the parameter by which a value is passed into the Facelets tag.
-	            ]]>
-            </description>
+				   The value expression that is to be interpreted and invoked as a method expression. This is typically the
+				   name of the parameter by which a value is passed into the Facelets tag.
+				]]>
+			</description>
 			<name>value</name>
 			<required>true</required>
 			<type>java.lang.String</type>
@@ -2221,10 +2221,10 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-	                The name of the request parameters from which the values are retrieved on an initial request that
-	                represent component ids of those components from which the markup should appear in the response (i.e. which
-	                should be rendered)
-		        ]]>
+					The name of the request parameters from which the values are retrieved on an initial request that
+					represent component ids of those components from which the markup should appear in the response (i.e. which
+					should be rendered)
+				]]>
 			</description>
 			<name>componentIdName</name>
 			<required>false</required>
@@ -2233,10 +2233,10 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-	                The name of the request parameters from which the values are retrieved on an initial request that
-	                represent client ids of those components from which the markup should appear in the response (i.e. which
-	                should be rendered)
-		        ]]>
+					The name of the request parameters from which the values are retrieved on an initial request that
+					represent client ids of those components from which the markup should appear in the response (i.e. which
+					should be rendered)
+				]]>
 			</description>
 			<name>clientIdName</name>
 			<required>false</required>
@@ -2245,10 +2245,10 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-	                Whether children of the components identified by <code>clientIdName</code> or
-	                <code>componentIdName</code> are rendered in addition to the component itself.
-	                Defaults to <code>true</code>
-		        ]]>
+					Whether children of the components identified by <code>clientIdName</code> or
+					<code>componentIdName</code> are rendered in addition to the component itself.
+					Defaults to <code>true</code>
+				]]>
 			</description>
 			<name>renderChildren</name>
 			<required>false</required>
@@ -2257,10 +2257,10 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-	                The component identifier for this component. This value must be
-	                unique within the closest parent component that is a naming
-	                container.
-	            ]]>
+					The component identifier for this component. This value must be
+					unique within the closest parent component that is a naming
+					container.
+				]]>
 			</description>
 			<name>id</name>
 			<required>false</required>
@@ -2269,9 +2269,9 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-	                The ValueExpression linking this component to a property in a
-	                backing bean
-	            ]]>
+					The ValueExpression linking this component to a property in a
+					backing bean
+				]]>
 			</description>
 			<name>binding</name>
 			<required>false</required>
@@ -2280,17 +2280,17 @@ public class ValidateValuesBean implements MultiFieldValidator {
 	</tag>
 
 	<tag>
-        <description>
-        	<![CDATA[
+		<description>
+			<![CDATA[
 				<strong>OutputFormat</strong> is a component that extends the standard <code>HtmlOutputFormat</code> and provides support
 				for capturing the output and exposing it into the request scope by the variable name as specified by the
 				<code>var</code> attribute.
-             ]]>
-        </description>
-        <tag-name>outputFormat</tag-name>
-        <component>
-            <component-type>org.omnifaces.component.output.OutputFormat</component-type>
-        </component>
+			 ]]>
+		</description>
+		<tag-name>outputFormat</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.output.OutputFormat</component-type>
+		</component>
 		<attribute>
 			<description>
 				Converter instance registered with this	component.
@@ -2404,273 +2404,273 @@ public class ValidateValuesBean implements MultiFieldValidator {
 	</tag>
 
 	<tag>
-        <description>
-        	<![CDATA[
-	        	<strong><code>o:outputLabel</code></strong> is a component that extends the standard outputLabel and provides extra support for
+		<description>
+			<![CDATA[
+				<strong><code>o:outputLabel</code></strong> is a component that extends the standard outputLabel and provides extra support for
 	 			automatically setting its value as the label of the component identified by its <code>for</code> attribute.
-	        	<p>
-	            It renders an HTML "label" element. If a "for" attribute is specified, the component specified by the value of the "for"
-	            attribute is queried for its client id, which is then rendered as the value of the "for" attribute of the HTML label element.
-             ]]>
-        </description>
-        <tag-name>outputLabel</tag-name>
-        <component>
-            <component-type>org.omnifaces.component.output.OutputLabel</component-type>
-        </component>
-        <attribute>
-            <description>
-                Converter instance registered with this component.
-            </description>
-            <name>converter</name>
-            <required>false</required>
-            <type>javax.faces.convert.Converter</type>
-        </attribute>
-        <attribute>
-            <description>
-                The component identifier for this component. This value must be
-                unique within the closest parent component that is a naming
-                container.
-            </description>
-            <name>id</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Flag indicating whether or not this component should be rendered
-                (during Render Response Phase), or processed on any subsequent
-                form submit. The default value for this property is true.
-            </description>
-            <name>rendered</name>
-            <required>false</required>
-            <type>java.lang.Boolean</type>
-        </attribute>
-        <attribute>
-            <description>
-                The value that will be rendered as the content of the HTML label element. If the for attribute
-                is specified the component identified by it will have its label attribute set to this value.
-                (both literals and value expressions are supported)
-            </description>
-            <name>value</name>
-            <required>false</required>
-            <type>java.lang.Object</type>
-        </attribute>
-        <attribute>
-            <description>
-                Access key that, when pressed, transfers focus
-                to this element.
-            </description>
-            <name>accesskey</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Direction indication for text that does not inherit
-                directionality.
-                Valid values are "LTR" (left-to-right) and "RTL"
-                (right-to-left).
-            </description>
-            <name>dir</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Flag indicating that characters that are sensitive
-                in HTML and XML markup must be escaped. If omitted, this
-                flag is assumed to be "true".
-            </description>
-            <name>escape</name>
-            <required>false</required>
-            <type>java.lang.Boolean</type>
-        </attribute>
-        <attribute>
-            <description>
-                Client identifier of the component for which this element
-                is a label. The label attribute of that component will be set
-                to the value of this component.
-            </description>
-            <name>for</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Code describing the language used in the generated markup
-                for this component.
-            </description>
-            <name>lang</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when this element loses focus.
-            </description>
-            <name>onblur</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a pointer button is
-                clicked over this element.
-            </description>
-            <name>onclick</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a pointer button is
-                double clicked over this element.
-            </description>
-            <name>ondblclick</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when this element receives focus.
-            </description>
-            <name>onfocus</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a key is
-                pressed down over this element.
-            </description>
-            <name>onkeydown</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a key is
-                pressed and released over this element.
-            </description>
-            <name>onkeypress</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a key is
-                released over this element.
-            </description>
-            <name>onkeyup</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a pointer button is
-                pressed down over this element.
-            </description>
-            <name>onmousedown</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a pointer button is
-                moved within this element.
-            </description>
-            <name>onmousemove</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a pointer button is
-                moved away from this element.
-            </description>
-            <name>onmouseout</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a pointer button is
-                moved onto this element.
-            </description>
-            <name>onmouseover</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a pointer button is
-                released over this element.
-            </description>
-            <name>onmouseup</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                CSS style(s) to be applied when this component is rendered.
-            </description>
-            <name>style</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Space-separated list of CSS style class(es) to be applied when
-                this element is rendered. This value must be passed through
-                as the "class" attribute on generated markup.
-            </description>
-            <name>styleClass</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Position of this element in the tabbing order
-                for the current document. This value must be
-                an integer between 0 and 32767.
-            </description>
-            <name>tabindex</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Advisory title information about markup elements generated
-                for this component.
-            </description>
-            <name>title</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                The ValueExpression linking this component to a property in a
-                backing bean
-            </description>
-            <name>binding</name>
-            <required>false</required>
-            <type>javax.faces.component.UIComponent</type>
-        </attribute>
-    </tag>
+				<p>
+				It renders an HTML "label" element. If a "for" attribute is specified, the component specified by the value of the "for"
+				attribute is queried for its client id, which is then rendered as the value of the "for" attribute of the HTML label element.
+			 ]]>
+		</description>
+		<tag-name>outputLabel</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.output.OutputLabel</component-type>
+		</component>
+		<attribute>
+			<description>
+				Converter instance registered with this component.
+			</description>
+			<name>converter</name>
+			<required>false</required>
+			<type>javax.faces.convert.Converter</type>
+		</attribute>
+		<attribute>
+			<description>
+				The component identifier for this component. This value must be
+				unique within the closest parent component that is a naming
+				container.
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Flag indicating whether or not this component should be rendered
+				(during Render Response Phase), or processed on any subsequent
+				form submit. The default value for this property is true.
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				The value that will be rendered as the content of the HTML label element. If the for attribute
+				is specified the component identified by it will have its label attribute set to this value.
+				(both literals and value expressions are supported)
+			</description>
+			<name>value</name>
+			<required>false</required>
+			<type>java.lang.Object</type>
+		</attribute>
+		<attribute>
+			<description>
+				Access key that, when pressed, transfers focus
+				to this element.
+			</description>
+			<name>accesskey</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Direction indication for text that does not inherit
+				directionality.
+				Valid values are "LTR" (left-to-right) and "RTL"
+				(right-to-left).
+			</description>
+			<name>dir</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Flag indicating that characters that are sensitive
+				in HTML and XML markup must be escaped. If omitted, this
+				flag is assumed to be "true".
+			</description>
+			<name>escape</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				Client identifier of the component for which this element
+				is a label. The label attribute of that component will be set
+				to the value of this component.
+			</description>
+			<name>for</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Code describing the language used in the generated markup
+				for this component.
+			</description>
+			<name>lang</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when this element loses focus.
+			</description>
+			<name>onblur</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a pointer button is
+				clicked over this element.
+			</description>
+			<name>onclick</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a pointer button is
+				double clicked over this element.
+			</description>
+			<name>ondblclick</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when this element receives focus.
+			</description>
+			<name>onfocus</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a key is
+				pressed down over this element.
+			</description>
+			<name>onkeydown</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a key is
+				pressed and released over this element.
+			</description>
+			<name>onkeypress</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a key is
+				released over this element.
+			</description>
+			<name>onkeyup</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a pointer button is
+				pressed down over this element.
+			</description>
+			<name>onmousedown</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a pointer button is
+				moved within this element.
+			</description>
+			<name>onmousemove</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a pointer button is
+				moved away from this element.
+			</description>
+			<name>onmouseout</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a pointer button is
+				moved onto this element.
+			</description>
+			<name>onmouseover</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a pointer button is
+				released over this element.
+			</description>
+			<name>onmouseup</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				CSS style(s) to be applied when this component is rendered.
+			</description>
+			<name>style</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Space-separated list of CSS style class(es) to be applied when
+				this element is rendered. This value must be passed through
+				as the "class" attribute on generated markup.
+			</description>
+			<name>styleClass</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Position of this element in the tabbing order
+				for the current document. This value must be
+				an integer between 0 and 32767.
+			</description>
+			<name>tabindex</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Advisory title information about markup elements generated
+				for this component.
+			</description>
+			<name>title</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				The ValueExpression linking this component to a property in a
+				backing bean
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+	</tag>
 
 	<tag>
-        <description>
-        	<![CDATA[
+		<description>
+			<![CDATA[
 				The <code>&lt;o:graphicImage&gt;</code> is a component that extends the standard <code>&lt;h:graphicImage&gt;</code>
 				with support for referencing an <code>InputStream</code> or <code>byte[]</code> property in <code>value</code> attribute.
 				This property must point to a <strong>stateless</strong> <code>@ApplicationScoped</code> bean (both JSF and CDI
 				scopes are supported).
-             ]]>
-        </description>
-        <tag-name>graphicImage</tag-name>
-        <component>
-            <component-type>org.omnifaces.component.output.GraphicImage</component-type>
-        </component>
+			 ]]>
+		</description>
+		<tag-name>graphicImage</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.output.GraphicImage</component-type>
+		</component>
 		<attribute>
 			<description>
 				<![CDATA[
@@ -2703,562 +2703,562 @@ public class ValidateValuesBean implements MultiFieldValidator {
 			<required>false</required>
 			<type>javax.faces.component.UIComponent</type>
 		</attribute>
-        <attribute>
-            <description>
+		<attribute>
+			<description>
 				<![CDATA[
-	                The value that will be rendered as the content of the HTML img element. It must represent a method
-	                expression referring a stateless backing bean method returning either byte[] or InputStream.
-	                Thus, NOT a view or session scoped bean, but a request or application scoped one.
-	                This attribute is ignored when 'name' attribute is specified.
-	            ]]>
-            </description>
-            <name>value</name>
-            <required>false</required>
-            <type>java.lang.Object</type>
-        </attribute>
-        <attribute>
-            <description>
+					The value that will be rendered as the content of the HTML img element. It must represent a method
+					expression referring a stateless backing bean method returning either byte[] or InputStream.
+					Thus, NOT a view or session scoped bean, but a request or application scoped one.
+					This attribute is ignored when 'name' attribute is specified.
+				]]>
+			</description>
+			<name>value</name>
+			<required>false</required>
+			<type>java.lang.Object</type>
+		</attribute>
+		<attribute>
+			<description>
 				<![CDATA[
-	                When set to <code>true</code> then the value will be rendered in data URI format instead of request URI format.
-	                This attribute is ignored when 'name' attribute is specified. When this attribute is set to 'true',
-	                'lastModified' and 'fragment' attributes are ignored.
-	            ]]>
-            </description>
-            <name>dataURI</name>
-            <required>false</required>
-            <type>boolean</type>
-        </attribute>
-        <attribute>
-            <description>
+					When set to <code>true</code> then the value will be rendered in data URI format instead of request URI format.
+					This attribute is ignored when 'name' attribute is specified. When this attribute is set to 'true',
+					'lastModified' and 'fragment' attributes are ignored.
+				]]>
+			</description>
+			<name>dataURI</name>
+			<required>false</required>
+			<type>boolean</type>
+		</attribute>
+		<attribute>
+			<description>
 				<![CDATA[
-	                The image type, represented as file extension. E.g. "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc.
-	                This attribute is ignored when 'name' attribute is specified.
-	            ]]>
-            </description>
-            <name>type</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
+					The image type, represented as file extension. E.g. "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc.
+					This attribute is ignored when 'name' attribute is specified.
+				]]>
+			</description>
+			<name>type</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
 				<![CDATA[
-	                The "last modified" timestamp, can be either a java.lang.Long, or java.util.Date, or java.lang.String
-	                which is parseable as java.lang.Long. This attribute is ignored when 'name' attribute is specified
-	                or when 'dataURI' attribute is set to 'true'.
-	            ]]>
-            </description>
-            <name>lastModified</name>
-            <required>false</required>
-            <type>java.lang.Object</type>
-        </attribute>
-        <attribute>
-            <description>
+					The "last modified" timestamp, can be either a java.lang.Long, or java.util.Date, or java.lang.String
+					which is parseable as java.lang.Long. This attribute is ignored when 'name' attribute is specified
+					or when 'dataURI' attribute is set to 'true'.
+				]]>
+			</description>
+			<name>lastModified</name>
+			<required>false</required>
+			<type>java.lang.Object</type>
+		</attribute>
+		<attribute>
+			<description>
 				<![CDATA[
-	                The URL fragment identifier, which will be appended to generated resource URL. This is particularly
-	                useful with SVG images with view modes. The value does not necessarily need to start with '#', this
-	                will be checked. This attribute is ignored when 'dataURI' attribute is set to 'true'.
-	            ]]>
-            </description>
-            <name>fragment</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
+					The URL fragment identifier, which will be appended to generated resource URL. This is particularly
+					useful with SVG images with view modes. The value does not necessarily need to start with '#', this
+					will be checked. This attribute is ignored when 'dataURI' attribute is set to 'true'.
+				]]>
+			</description>
+			<name>fragment</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
 				<![CDATA[
-	                The resource name of the resource. Works the same way as on <code>&lt;h:graphicImage&gt;</code>.
-	                When this attribute is specified, 'value', 'type' and 'lastModified' attributes are ignored.
-	            ]]>
-            </description>
-            <name>name</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
+					The resource name of the resource. Works the same way as on <code>&lt;h:graphicImage&gt;</code>.
+					When this attribute is specified, 'value', 'type' and 'lastModified' attributes are ignored.
+				]]>
+			</description>
+			<name>name</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
 				<![CDATA[
-	                The resource library name of the resource. Works the same way as on <code>&lt;h:graphicImage&gt;</code>.
-	                This attribtue is only used when 'name' attribute is specified.
-	            ]]>
-            </description>
-            <name>library</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Alternate textual description of the element rendered by this component.
-            </description>
-            <name>alt</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Direction indication for text that does not inherit directionality.
-                Valid values are "LTR" (left-to-right) and "RTL" (right-to-left).
-                These attributes are case sensitive when rendering to XHTML, so care must be taken to have the correct case.
-            </description>
-            <name>dir</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Override for the height of this image.
-            </description>
-            <name>height</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Flag indicating that this image is to be used as a server side image map.
-                Such an image must be enclosed within a hyperlink ("a").
-                A value of false causes no attribute to be rendered, while a value of true causes the attribute to be rendered as ismap="ismap".
-            </description>
-            <name>ismap</name>
-            <required>false</required>
-            <type>boolean</type>
-        </attribute>
-        <attribute>
-            <description>
-                Code describing the language used in the generated markup for this component.
-            </description>
-            <name>lang</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
+					The resource library name of the resource. Works the same way as on <code>&lt;h:graphicImage&gt;</code>.
+					This attribtue is only used when 'name' attribute is specified.
+				]]>
+			</description>
+			<name>library</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Alternate textual description of the element rendered by this component.
+			</description>
+			<name>alt</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Direction indication for text that does not inherit directionality.
+				Valid values are "LTR" (left-to-right) and "RTL" (right-to-left).
+				These attributes are case sensitive when rendering to XHTML, so care must be taken to have the correct case.
+			</description>
+			<name>dir</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Override for the height of this image.
+			</description>
+			<name>height</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Flag indicating that this image is to be used as a server side image map.
+				Such an image must be enclosed within a hyperlink ("a").
+				A value of false causes no attribute to be rendered, while a value of true causes the attribute to be rendered as ismap="ismap".
+			</description>
+			<name>ismap</name>
+			<required>false</required>
+			<type>boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				Code describing the language used in the generated markup for this component.
+			</description>
+			<name>lang</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
 				URI to a long description of the image represented by this element.
-            </description>
-            <name>longdesc</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a pointer button is clicked over this element.
-            </description>
-            <name>onclick</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a pointer button is double clicked over this element.
-            </description>
-            <name>ondblclick</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a key is pressed down over this element.
-            </description>
-            <name>onkeydown</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a key is pressed and released over this element.
-            </description>
-            <name>onkeypress</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a key is released over this element.
-            </description>
-            <name>onkeyup</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a pointer button is pressed down over this element.
-            </description>
-            <name>onmousedown</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a pointer button is moved within this element.
-            </description>
-            <name>onmousemove</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a pointer button is moved away from this element.
-            </description>
-            <name>onmouseout</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a pointer button is moved onto this element.
-            </description>
-            <name>onmouseover</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a pointer button is released over this element.
-            </description>
-            <name>onmouseup</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Per the WAI-ARIA spec and its relationship to HTML5 (Section title ARIA Role Attriubute),
-                every HTML element may have a "role" attribute whose value must be passed through unmodified on the element on which it is declared in the final rendered markup.
-                The attribute, if specified, must have a value that is a string literal that is,
-                or an EL Expression that evaluates to, a set of space-separated tokens representing the various WAI-ARIA roles that the element belongs to.
+			</description>
+			<name>longdesc</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a pointer button is clicked over this element.
+			</description>
+			<name>onclick</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a pointer button is double clicked over this element.
+			</description>
+			<name>ondblclick</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a key is pressed down over this element.
+			</description>
+			<name>onkeydown</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a key is pressed and released over this element.
+			</description>
+			<name>onkeypress</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a key is released over this element.
+			</description>
+			<name>onkeyup</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a pointer button is pressed down over this element.
+			</description>
+			<name>onmousedown</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a pointer button is moved within this element.
+			</description>
+			<name>onmousemove</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a pointer button is moved away from this element.
+			</description>
+			<name>onmouseout</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a pointer button is moved onto this element.
+			</description>
+			<name>onmouseover</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a pointer button is released over this element.
+			</description>
+			<name>onmouseup</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Per the WAI-ARIA spec and its relationship to HTML5 (Section title ARIA Role Attriubute),
+				every HTML element may have a "role" attribute whose value must be passed through unmodified on the element on which it is declared in the final rendered markup.
+				The attribute, if specified, must have a value that is a string literal that is,
+				or an EL Expression that evaluates to, a set of space-separated tokens representing the various WAI-ARIA roles that the element belongs to.
 				It is the page author's responsibility to ensure that the user agent is capable of correctly interpreting the value of this attribute.
-            </description>
-            <name>role</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                CSS style(s) to be applied when this component is rendered.
-            </description>
-            <name>style</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Space-separated list of CSS style class(es) to be applied when this element is rendered.
-                This value must be passed through as the "class" attribute on generated markup.
-            </description>
-            <name>styleClass</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Advisory title information about markup elements generated for this component (simply put: the tooltip).
-            </description>
-            <name>title</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
+			</description>
+			<name>role</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				CSS style(s) to be applied when this component is rendered.
+			</description>
+			<name>style</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Space-separated list of CSS style class(es) to be applied when this element is rendered.
+				This value must be passed through as the "class" attribute on generated markup.
+			</description>
+			<name>styleClass</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Advisory title information about markup elements generated for this component (simply put: the tooltip).
+			</description>
+			<name>title</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
 				The name of a client side image map (an HTML "map" element) for which this element provides the image.
-            </description>
-            <name>usemap</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
+			</description>
+			<name>usemap</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
 				Override for the width of this image.
-            </description>
-            <name>width</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-    </tag>
-
-    <tag>
-        <description>
-        	<![CDATA[
-        		<strong>Form</strong> is a component that extends the standard <code>UIForm</code> and provides a way to keep view
-				parameters in the request URL after a post-back and offers in combination with the
-				<code>&lt;o:ignoreValidationFailed&gt;</code> tag on an <code>UICommand</code> component the possibility to ignore
-				validation failures so that the invoke action phase will be executed anyway.
-             ]]>
-        </description>
-        <tag-name>form</tag-name>
-        <component>
-            <component-type>org.omnifaces.component.input.Form</component-type>
-        </component>
-        <attribute>
-            <description>
-                The component identifier for this component. This value must be
-                unique within the closest parent component that is a naming
-                container.
-            </description>
-            <name>id</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Whether to include view parameters in the action URI.
-            </description>
-            <name>includeViewParams</name>
-            <required>false</required>
-            <type>java.lang.Boolean</type>
-        </attribute>
-        <attribute>
-            <description>
-                Whether to include all URL (GET) request parameters in the action URI. This overrides includeViewParams.
-            </description>
-            <name>includeRequestParams</name>
-            <required>false</required>
-            <type>boolean</type>
-        </attribute>
-        <attribute>
-            <description>
-                Whether to use current request URI with query string as action URI. This overrides includeViewParams and includeRequestParams.
-            </description>
-            <name>useRequestURI</name>
-            <required>false</required>
-            <type>boolean</type>
-        </attribute>
-        <attribute>
-            <description>
-                Flag indicating whether or not this form should prepend its id
-                to its descendent's id during the clientId generation process.
-                If this flag is not set, the default value is true.
-            </description>
-            <name>prependId</name>
-            <required>false</required>
-            <type>java.lang.Boolean</type>
-        </attribute>
-        <attribute>
-            <description>
-                Flag indicating whether or not this component should be rendered
-                (during Render Response Phase), or processed on any subsequent
-                form submit. The default value for this property is true.
-            </description>
-            <name>rendered</name>
-            <required>false</required>
-            <type>java.lang.Boolean</type>
-        </attribute>
-        <attribute>
-            <description>
-                List of content types that a server processing this form
-                will handle correctly
-            </description>
-            <name>accept</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                List of character encodings for input data
-                that are accepted by the server processing
-                this form.
-            </description>
-            <name>acceptcharset</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Direction indication for text that does not inherit
-                directionality.
-                Valid values are "LTR" (left-to-right) and "RTL"
-                (right-to-left).
-            </description>
-            <name>dir</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Content type used to submit the form to the server. If not
-                specified, the default value is
-                "application/x-www-form-urlencoded".
-            </description>
-            <name>enctype</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Code describing the language used in the generated markup
-                for this component.
-            </description>
-            <name>lang</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a pointer button is
-                clicked over this element.
-            </description>
-            <name>onclick</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a pointer button is
-                double clicked over this element.
-            </description>
-            <name>ondblclick</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a key is
-                pressed down over this element.
-            </description>
-            <name>onkeydown</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a key is
-                pressed and released over this element.
-            </description>
-            <name>onkeypress</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a key is
-                released over this element.
-            </description>
-            <name>onkeyup</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a pointer button is
-                pressed down over this element.
-            </description>
-            <name>onmousedown</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a pointer button is
-                moved within this element.
-            </description>
-            <name>onmousemove</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a pointer button is
-                moved away from this element.
-            </description>
-            <name>onmouseout</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a pointer button is
-                moved onto this element.
-            </description>
-            <name>onmouseover</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when a pointer button is
-                released over this element.
-            </description>
-            <name>onmouseup</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when this form is reset.
-            </description>
-            <name>onreset</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Javascript code executed when this form is submitted.
-            </description>
-            <name>onsubmit</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                CSS style(s) to be applied when this component is rendered.
-            </description>
-            <name>style</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Space-separated list of CSS style class(es) to be applied when
-                this element is rendered. This value must be passed through
-                as the "class" attribute on generated markup.
-            </description>
-            <name>styleClass</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Name of a frame where the response
-                retrieved after this form submit is to
-                be displayed.
-            </description>
-            <name>target</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                Advisory title information about markup elements generated
-                for this component.
-            </description>
-            <name>title</name>
-            <required>false</required>
-            <type>java.lang.String</type>
-        </attribute>
-        <attribute>
-            <description>
-                The ValueExpression linking this component to a property in a
-                backing bean
-            </description>
-            <name>binding</name>
-            <required>false</required>
-            <type>javax.faces.component.UIComponent</type>
-        </attribute>
-    </tag>
+			</description>
+			<name>width</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+	</tag>
 
 	<tag>
 		<description>
-	       	<![CDATA[
-	       		<strong>Cache</strong> is a component that initially renders the output of its children into a buffer
-	       		instead of to the response. This output is then inserted into a cache and on subsequent requests the
-	       		content retrieved from the cache is used.
-	       		<p>
-	       		By default the viewid concatenated to the component id via an underscore is used as the cache key.
-	       		<p>
-	       		Note that this component <strong>does not</strong> support a cache loader and locking mechanism. This mean several
-	       		simultaenous page requests may render the same content and it's undetermined which of those will end up being cached.
-	       		<p>
-	       		An optional caching provider (see below) can be set to control the caching implementation that is used for the actual caching.
-	       		If no such provider is installed, a default caching implementation is used that's based on
-	       		<a href="http://code.google.com/p/concurrentlinkedhashmap">http://code.google.com/p/concurrentlinkedhashmap</a> in case
-	       		a maximum cache capacity is set, or on a plain ConcurrentMap if no capacity is set.
-	       		<hr>
+			<![CDATA[
+				<strong>Form</strong> is a component that extends the standard <code>UIForm</code> and provides a way to keep view
+				parameters in the request URL after a post-back and offers in combination with the
+				<code>&lt;o:ignoreValidationFailed&gt;</code> tag on an <code>UICommand</code> component the possibility to ignore
+				validation failures so that the invoke action phase will be executed anyway.
+			 ]]>
+		</description>
+		<tag-name>form</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.input.Form</component-type>
+		</component>
+		<attribute>
+			<description>
+				The component identifier for this component. This value must be
+				unique within the closest parent component that is a naming
+				container.
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Whether to include view parameters in the action URI.
+			</description>
+			<name>includeViewParams</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				Whether to include all URL (GET) request parameters in the action URI. This overrides includeViewParams.
+			</description>
+			<name>includeRequestParams</name>
+			<required>false</required>
+			<type>boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				Whether to use current request URI with query string as action URI. This overrides includeViewParams and includeRequestParams.
+			</description>
+			<name>useRequestURI</name>
+			<required>false</required>
+			<type>boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				Flag indicating whether or not this form should prepend its id
+				to its descendent's id during the clientId generation process.
+				If this flag is not set, the default value is true.
+			</description>
+			<name>prependId</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				Flag indicating whether or not this component should be rendered
+				(during Render Response Phase), or processed on any subsequent
+				form submit. The default value for this property is true.
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				List of content types that a server processing this form
+				will handle correctly
+			</description>
+			<name>accept</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				List of character encodings for input data
+				that are accepted by the server processing
+				this form.
+			</description>
+			<name>acceptcharset</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Direction indication for text that does not inherit
+				directionality.
+				Valid values are "LTR" (left-to-right) and "RTL"
+				(right-to-left).
+			</description>
+			<name>dir</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Content type used to submit the form to the server. If not
+				specified, the default value is
+				"application/x-www-form-urlencoded".
+			</description>
+			<name>enctype</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Code describing the language used in the generated markup
+				for this component.
+			</description>
+			<name>lang</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a pointer button is
+				clicked over this element.
+			</description>
+			<name>onclick</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a pointer button is
+				double clicked over this element.
+			</description>
+			<name>ondblclick</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a key is
+				pressed down over this element.
+			</description>
+			<name>onkeydown</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a key is
+				pressed and released over this element.
+			</description>
+			<name>onkeypress</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a key is
+				released over this element.
+			</description>
+			<name>onkeyup</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a pointer button is
+				pressed down over this element.
+			</description>
+			<name>onmousedown</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a pointer button is
+				moved within this element.
+			</description>
+			<name>onmousemove</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a pointer button is
+				moved away from this element.
+			</description>
+			<name>onmouseout</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a pointer button is
+				moved onto this element.
+			</description>
+			<name>onmouseover</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when a pointer button is
+				released over this element.
+			</description>
+			<name>onmouseup</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when this form is reset.
+			</description>
+			<name>onreset</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Javascript code executed when this form is submitted.
+			</description>
+			<name>onsubmit</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				CSS style(s) to be applied when this component is rendered.
+			</description>
+			<name>style</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Space-separated list of CSS style class(es) to be applied when
+				this element is rendered. This value must be passed through
+				as the "class" attribute on generated markup.
+			</description>
+			<name>styleClass</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Name of a frame where the response
+				retrieved after this form submit is to
+				be displayed.
+			</description>
+			<name>target</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				Advisory title information about markup elements generated
+				for this component.
+			</description>
+			<name>title</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				The ValueExpression linking this component to a property in a
+				backing bean
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+		   	<![CDATA[
+		   		<strong>Cache</strong> is a component that initially renders the output of its children into a buffer
+		   		instead of to the response. This output is then inserted into a cache and on subsequent requests the
+		   		content retrieved from the cache is used.
+		   		<p>
+		   		By default the viewid concatenated to the component id via an underscore is used as the cache key.
+		   		<p>
+		   		Note that this component <strong>does not</strong> support a cache loader and locking mechanism. This mean several
+		   		simultaenous page requests may render the same content and it's undetermined which of those will end up being cached.
+		   		<p>
+		   		An optional caching provider (see below) can be set to control the caching implementation that is used for the actual caching.
+		   		If no such provider is installed, a default caching implementation is used that's based on
+		   		<a href="http://code.google.com/p/concurrentlinkedhashmap">http://code.google.com/p/concurrentlinkedhashmap</a> in case
+		   		a maximum cache capacity is set, or on a plain ConcurrentMap if no capacity is set.
+		   		<hr>
 				<h3>Setting a custom caching provider</h3>
 				<p>A custom caching provider can be set by using the <code>org.omnifaces.CACHE_PROVIDER</code> context
 				parameter in web.xml to point to an implementation of <code>org.omnifaces.component.output.cache.CacheProvider</code>.
@@ -3302,10 +3302,10 @@ public class ValidateValuesBean implements MultiFieldValidator {
  				<tr>
  				<td nowrap><code>org.omnifaces.CACHE_INSTALL_BUFFER_FILTER</code></td>
 				<td>Boolean that when true installs a Servlet Filter (Servlet 3.0+ only) that works in conjunction with the <code>useBuffer</code> attribute of the Cache component
-				    to enable an alternative way to grab the content that needs to be cached. This is a convenience setting that is a short-cut
-				    for installing the <code>org.omnifaces.servlet.BufferedHttpServletResponse</code> filter manually. If more finegrained control
-				    is needed regarding which place in the filter chain the filter appears and which resources it exactly filters, this setting
-				    should not be used and the mentioned filter should be manually configured. Default: <code>false</code>)
+					to enable an alternative way to grab the content that needs to be cached. This is a convenience setting that is a short-cut
+					for installing the <code>org.omnifaces.servlet.BufferedHttpServletResponse</code> filter manually. If more finegrained control
+					is needed regarding which place in the filter chain the filter appears and which resources it exactly filters, this setting
+					should not be used and the mentioned filter should be manually configured. Default: <code>false</code>)
 				 </td>
  				</tr>
  				</table>
@@ -3340,7 +3340,7 @@ public class ValidateValuesBean implements MultiFieldValidator {
 					Keys are relative to the scope for which they are defined, meaning a key "foo" for the a session scoped
 					cache will not conflict with a key of the same name for an application scoped cache.
 				 ]]>
-            </description>
+			</description>
 			<name>key</name>
 			<required>false</required>
 			<type>java.lang.String</type>
@@ -3357,7 +3357,7 @@ public class ValidateValuesBean implements MultiFieldValidator {
 					<p>
 					A runtime exception will be thrown if an unsupported value for scope is used.
 				 ]]>
-            </description>
+			</description>
 			<name>scope</name>
 			<required>false</required>
 			<type>java.lang.String</type>
@@ -3381,7 +3381,7 @@ public class ValidateValuesBean implements MultiFieldValidator {
 					Note that this component <strong>does not</strong> support a cache loader and locking mechanism. This means after content times out,
 					several simultaneous page requests may render the same content and it's undetermined which of those will end up being cached.
 				 ]]>
-            </description>
+			</description>
 			<name>time</name>
 			<required>false</required>
 			<type>java.lang.String</type>
@@ -3405,7 +3405,7 @@ public class ValidateValuesBean implements MultiFieldValidator {
 					Servlet Filter needs to be configured to filter the Faces Servlet (or alternatively just the pages for which the buffering
 					method should be used).
 				 ]]>
-            </description>
+			</description>
 			<name>useBuffer</name>
 			<required>false</required>
 			<type>java.lang.Boolean</type>
@@ -3422,28 +3422,28 @@ public class ValidateValuesBean implements MultiFieldValidator {
 					Note that this value has to remain true until the cache component is rendered, after that it should be set to false
 					again otherwise the cached content will be reset again at the next rendering.
 				 ]]>
-            </description>
+			</description>
 			<name>reset</name>
 			<required>false</required>
 			<type>java.lang.Boolean</type>
 		</attribute>
-        <attribute>
-            <description>
-                <![CDATA[
-                    Disables the cache when set to <code>true</code>. Default is <code>false</code>.
-                    <p>
-                    This attribute can be used to disable the cache (temporarily). In disabled state the children will be rendered directly
-                    and cached content (if any) will not be used, nor will the rendering outcome of the children be cached.
-                    <p>
-                    When the attribute is set to <code>false</code> again any content that was cached before the cache was disabled will be
-                    shown again if said content is still available in the cache. The content that was rendered when the cache was disabled
-                    has no effect on any such previously cached content.
-                 ]]>
-            </description>
-            <name>disabled</name>
-            <required>false</required>
-            <type>java.lang.Boolean</type>
-        </attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Disables the cache when set to <code>true</code>. Default is <code>false</code>.
+					<p>
+					This attribute can be used to disable the cache (temporarily). In disabled state the children will be rendered directly
+					and cached content (if any) will not be used, nor will the rendering outcome of the children be cached.
+					<p>
+					When the attribute is set to <code>false</code> again any content that was cached before the cache was disabled will be
+					shown again if said content is still available in the cache. The content that was rendered when the cache was disabled
+					has no effect on any such previously cached content.
+				 ]]>
+			</description>
+			<name>disabled</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
 	</tag>
 
 	<tag>
@@ -3468,9 +3468,9 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-	               Name under which the value expression will be made available to EL, scoped to the Facelet in which this tag occurs.
-	            ]]>
-            </description>
+				   Name under which the value expression will be made available to EL, scoped to the Facelet in which this tag occurs.
+				]]>
+			</description>
 			<name>name</name>
 			<required>true</required>
 			<type>java.lang.String</type>
@@ -3478,9 +3478,9 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-	               The value expression for which its value will be cached on demand and made available as a new value expression.
-	            ]]>
-            </description>
+				   The value expression for which its value will be cached on demand and made available as a new value expression.
+				]]>
+			</description>
 			<name>value</name>
 			<required>true</required>
 			<type>java.lang.String</type>
@@ -3495,17 +3495,17 @@ public class ValidateValuesBean implements MultiFieldValidator {
 				classes, interfaces and enums. For example:
 				<pre>
 public class Foo {
-    public static final String FOO1 = "foo1";
-    public static final String FOO2 = "foo2";
+	public static final String FOO1 = "foo1";
+	public static final String FOO2 = "foo2";
 }
 
 public interface Bar {
-    public static final String BAR1 = "bar1";
-    public static final String BAR2 = "bar2";
+	public static final String BAR1 = "bar1";
+	public static final String BAR2 = "bar2";
 }
 
 public enum Baz {
-    BAZ1, BAZ2;
+	BAZ1, BAZ2;
 }
 				</pre>
 				<p>The constant field values of the above types can be mapped into the EL scope as follows:
@@ -3528,9 +3528,9 @@ public enum Baz {
 		<attribute>
 			<description>
 				<![CDATA[
-	               The fully qualified name of the class/interface/enum to import the constant field values for.
-	            ]]>
-            </description>
+				   The fully qualified name of the class/interface/enum to import the constant field values for.
+				]]>
+			</description>
 			<name>type</name>
 			<required>true</required>
 			<type>java.lang.String</type>
@@ -3538,9 +3538,9 @@ public enum Baz {
 		<attribute>
 			<description>
 				<![CDATA[
-	               The name of the Facelet attribute which exposes the mapping of the constants in the EL scope.
-	            ]]>
-            </description>
+				   The name of the Facelet attribute which exposes the mapping of the constants in the EL scope.
+				]]>
+			</description>
 			<name>var</name>
 			<required>false</required>
 			<type>java.lang.String</type>
@@ -3583,9 +3583,9 @@ public enum Baz {
 		<attribute>
 			<description>
 				<![CDATA[
-	               The fully qualified name of the class to import the public static non-void methods for.
-	            ]]>
-            </description>
+				   The fully qualified name of the class to import the public static non-void methods for.
+				]]>
+			</description>
 			<name>type</name>
 			<required>true</required>
 			<type>java.lang.String</type>
@@ -3593,9 +3593,9 @@ public enum Baz {
 		<attribute>
 			<description>
 				<![CDATA[
-	               The EL functions prefix which exposes the functions in the EL scope.
-	            ]]>
-            </description>
+				   The EL functions prefix which exposes the functions in the EL scope.
+				]]>
+			</description>
 			<name>var</name>
 			<required>false</required>
 			<type>java.lang.String</type>
@@ -3640,9 +3640,9 @@ public enum Baz {
 				per-<code>UICommand</code> or <code>UIInput</code> component basis. Usage example:
 				<pre>
 &lt;h:commandButton&gt;
-    &lt;o:validateBean groups="javax.validation.groups.Default,com.example.MyGroup"/&gt;
+	&lt;o:validateBean groups="javax.validation.groups.Default,com.example.MyGroup"/&gt;
 &lt;/h:commandButton&gt;
-		        </pre>
+				</pre>
 			]]>
 		</description>
 		<tag-name>validateBean</tag-name>
@@ -3684,9 +3684,9 @@ public enum Baz {
 				<pre>
 &lt;h:dataTable value="#{bean.items}" var="item"&gt;
   &lt;h:column&gt;
-    &lt;h:inputText value="#{item.value}"&gt;
-      &lt;o:validateUniqueColumn /&gt;
-    &lt;/h:inputText&gt;
+	&lt;h:inputText value="#{item.value}"&gt;
+	  &lt;o:validateUniqueColumn /&gt;
+	&lt;/h:inputText&gt;
   &lt;/h:column&gt;
 &lt;/h:dataTable&gt;
 				</pre>
@@ -3741,11 +3741,11 @@ public enum Baz {
 				For example, the following setup
 				<pre>
 &lt;o:massAttribute name="disabled" value="true"&gt;
-    &lt;h:inputText id="input1" /&gt;
-    &lt;h:inputText id="input2" disabled="true" /&gt;
-    &lt;h:inputText id="input3" disabled="false" /&gt;
-    &lt;h:inputText id="input4" disabled="#{true}" /&gt;
-    &lt;h:inputText id="input5" disabled="#{false}" /&gt;
+	&lt;h:inputText id="input1" /&gt;
+	&lt;h:inputText id="input2" disabled="true" /&gt;
+	&lt;h:inputText id="input3" disabled="false" /&gt;
+	&lt;h:inputText id="input4" disabled="#{true}" /&gt;
+	&lt;h:inputText id="input5" disabled="#{false}" /&gt;
 &lt;/o:massAttribute&gt;
 				</pre>
 				will set the <code>disabled="true"</code> attribute in <code>input1</code>, <code>input2</code> and
@@ -3754,10 +3754,10 @@ public enum Baz {
 				As another general example without booleans, the following setup
 				<pre>
 &lt;o:massAttribute name="styleClass" value="#{component.valid ? '' : 'error'}"&gt;
-    &lt;h:inputText id="input1" /&gt;
-    &lt;h:inputText id="input2" styleClass="some" /&gt;
-    &lt;h:inputText id="input3" styleClass="#{'some'}" /&gt;
-    &lt;h:inputText id="input4" styleClass="#{null}" /&gt;
+	&lt;h:inputText id="input1" /&gt;
+	&lt;h:inputText id="input2" styleClass="some" /&gt;
+	&lt;h:inputText id="input3" styleClass="#{'some'}" /&gt;
+	&lt;h:inputText id="input4" styleClass="#{null}" /&gt;
 &lt;/o:massAttribute&gt;
 				</pre>
 				will only set the <code>styleClass="#{component.valid ? '' : 'error'}"</code> attribute in <code>input1</code> as
@@ -3768,12 +3768,12 @@ public enum Baz {
 				(as that would otherwise fail in the example below because they don't have a <code>valid</code> property):
 				<pre>
 &lt;o:massAttribute name="styleClass" value="#{component.valid ? '' : 'error'}" target="javax.faces.component.UIInput"&gt;
-    &lt;h:outputLabel for="input1" /&gt;
-    &lt;h:inputText id="input1" /&gt;
-    &lt;h:outputLabel for="input2" /&gt;
-    &lt;h:inputText id="input2" /&gt;
-    &lt;h:outputLabel for="input3" /&gt;
-    &lt;h:inputText id="input3" /&gt;
+	&lt;h:outputLabel for="input1" /&gt;
+	&lt;h:inputText id="input1" /&gt;
+	&lt;h:outputLabel for="input2" /&gt;
+	&lt;h:inputText id="input2" /&gt;
+	&lt;h:outputLabel for="input3" /&gt;
+	&lt;h:inputText id="input3" /&gt;
 &lt;/o:massAttribute&gt;
 				</pre>
 			]]>
@@ -3850,9 +3850,9 @@ public enum Baz {
 				With the example below, when at least one view param is absent, then the client will be returned a HTTP 400 error.
 				<pre>
 				&lt;f:metadata&gt;
-				    &lt;o:viewParam name="foo" required="true" /&gt;
-				    &lt;o:viewParam name="bar" required="true" /&gt;
-				    &lt;o:viewParamValidationFailed sendError="400" /&gt;
+					&lt;o:viewParam name="foo" required="true" /&gt;
+					&lt;o:viewParam name="bar" required="true" /&gt;
+					&lt;o:viewParamValidationFailed sendError="400" /&gt;
 				&lt;/f:metadata&gt;
 				</pre>
 				<p>
@@ -3861,10 +3861,10 @@ public enum Baz {
 				error will end up as a faces message in the current view the usual way.
 				<pre>
 				&lt;f:metadata&gt;
-				    &lt;o:viewParam name="foo" required="true"&gt;
-				        &lt;o:viewParamValidationFailed sendRedirect="login.xhtml" /&gt;
-				    &lt;/o:viewParam&gt;
-				    &lt;o:viewParam name="bar" required="true" /&gt;
+					&lt;o:viewParam name="foo" required="true"&gt;
+						&lt;o:viewParamValidationFailed sendRedirect="login.xhtml" /&gt;
+					&lt;/o:viewParam&gt;
+					&lt;o:viewParam name="bar" required="true" /&gt;
 				&lt;/f:metadata&gt;
 				</pre>
 				<p>
@@ -3873,12 +3873,12 @@ public enum Baz {
 				parameter is absent, then the client will be redirected to "search.xhtml".
 				<pre>
 				&lt;f:metadata&gt;
-				    &lt;o:viewParam name="foo" required="true"&gt;
-				        &lt;o:viewParamValidationFailed sendError="401" /&gt;
-				    &lt;/o:viewParam&gt;
-				    &lt;o:viewParam name="bar" required="true" /&gt;
-				    &lt;o:viewParam name="baz" required="true" /&gt;
-				    &lt;o:viewParamValidationFailed sendRedirect="search.xhtml" /&gt;
+					&lt;o:viewParam name="foo" required="true"&gt;
+						&lt;o:viewParamValidationFailed sendError="401" /&gt;
+					&lt;/o:viewParam&gt;
+					&lt;o:viewParam name="bar" required="true" /&gt;
+					&lt;o:viewParam name="baz" required="true" /&gt;
+					&lt;o:viewParamValidationFailed sendRedirect="search.xhtml" /&gt;
 				&lt;/f:metadata&gt;
 				</pre>
 				<p>
@@ -4244,8 +4244,8 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 &lt;h:form&gt;
   &lt;o:messages for="inputs" /&gt;
   &lt;h:panelGroup id="inputs"&gt;
-    &lt;h:inputText id="input1" /&gt;
-    &lt;h:inputText id="input2" /&gt;
+	&lt;h:inputText id="input1" /&gt;
+	&lt;h:inputText id="input2" /&gt;
   &lt;/h:panelGroup&gt;
   &lt;h:inputText id="input3" /&gt;
   &lt;h:inputText id="input4" /&gt;
@@ -4257,8 +4257,8 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 &lt;h:form&gt;
   &lt;o:messages for="inputs input4" /&gt;
   &lt;h:panelGroup id="inputs"&gt;
-    &lt;h:inputText id="input1" /&gt;
-    &lt;h:inputText id="input2" /&gt;
+	&lt;h:inputText id="input1" /&gt;
+	&lt;h:inputText id="input2" /&gt;
   &lt;/h:panelGroup&gt;
   &lt;h:inputText id="input3" /&gt;
   &lt;h:inputText id="input4" /&gt;
@@ -4291,8 +4291,8 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 				<pre><code>
 &lt;dl&gt;
   &lt;o:messages var="message"&gt;
-    &lt;dt&gt;#{message.severity}&lt;/dt&gt;
-    &lt;dd title="#{message.detail}"&gt;#{message.summary}&lt;/dd&gt;
+	&lt;dt&gt;#{message.severity}&lt;/dt&gt;
+	&lt;dd title="#{message.detail}"&gt;#{message.summary}&lt;/dd&gt;
   &lt;/o:messages&gt;
 &lt;/dl&gt;
 				</code></pre>
