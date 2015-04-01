@@ -14,6 +14,7 @@ package org.omnifaces.taghandler;
 
 import static java.util.logging.Level.SEVERE;
 import static javax.faces.event.PhaseId.PROCESS_VALIDATIONS;
+import static javax.faces.event.PhaseId.RESTORE_VIEW;
 import static javax.faces.event.PhaseId.UPDATE_MODEL_VALUES;
 import static org.omnifaces.el.ExpressionInspector.getValueReference;
 import static org.omnifaces.util.Components.forEachComponent;
@@ -22,7 +23,6 @@ import static org.omnifaces.util.Components.getCurrentForm;
 import static org.omnifaces.util.Components.hasInvokedSubmit;
 import static org.omnifaces.util.Events.subscribeToRequestAfterPhase;
 import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
-import static org.omnifaces.util.Events.subscribeToRequestComponentEvent;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
 import static org.omnifaces.util.Facelets.getBoolean;
 import static org.omnifaces.util.Facelets.getString;
@@ -55,8 +55,6 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
-import javax.faces.event.ComponentSystemEvent;
-import javax.faces.event.PostAddToViewEvent;
 import javax.faces.event.PostValidateEvent;
 import javax.faces.event.PreValidateEvent;
 import javax.faces.event.SystemEventListener;
@@ -195,7 +193,11 @@ public class ValidateBean extends TagHandler {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 *
+	 * If the parent component has the <code>value</code> attribute or is an instance of {@link UICommand} or
+	 * {@link UIInput} and is new and we're in the restore view phase of a postback, then delegate to
+	 * {@link #processValidateBean(UIComponent)}.
+	 * @throws IllegalArgumentException When the <code>value</code> attribute is absent and the parent component is not
+	 * an instance of {@link UICommand} or {@link UIInput}.
 	 */
 	@Override
 	public void apply(FaceletContext context, final UIComponent parent) throws IOException {
@@ -205,7 +207,7 @@ public class ValidateBean extends TagHandler {
 
 		FacesContext facesContext = context.getFacesContext();
 
-		if (!ComponentHandler.isNew(parent) || !facesContext.isPostback() || facesContext.getRenderResponse()) {
+		if (!(ComponentHandler.isNew(parent) && facesContext.isPostback() && facesContext.getCurrentPhaseId() == RESTORE_VIEW)) {
 			return;
 		}
 
@@ -216,21 +218,26 @@ public class ValidateBean extends TagHandler {
 		copier = getString(context, getAttribute("copier"));
 
 		// We can't use getCurrentForm() or hasInvokedSubmit() before the component is added to view, because the client ID isn't available.
-		// Hence, we subscribe this check to the PostAddToViewEvent.
-		subscribeToRequestComponentEvent(parent, PostAddToViewEvent.class, new Callback.WithArgument<ComponentSystemEvent>() { private static final long serialVersionUID = 1L; @Override public void invoke(ComponentSystemEvent event) {
-			processValidateBean(event);
+		// Hence, we subscribe this check to after phase of restore view.
+		subscribeToRequestAfterPhase(RESTORE_VIEW, new Callback.Void() { private static final long serialVersionUID = 1L; @Override public void invoke() {
+			processValidateBean(parent);
 		}});
 	}
 
-	protected void processValidateBean(ComponentSystemEvent event) {
-		UIComponent parent = event.getComponent();
-		UIForm form = (parent instanceof UIForm) ? ((UIForm) parent) : getClosestParent(parent, UIForm.class);
+	/**
+	 * Check if the given component has participated in submitting the current form or action and if so, then perform
+	 * the bean validation depending on the attributes set.
+	 * @param component The involved component.
+	 * @throws IllegalArgumentException When the parent form is missing.
+	 */
+	protected void processValidateBean(UIComponent component) {
+		UIForm form = (component instanceof UIForm) ? ((UIForm) component) : getClosestParent(component, UIForm.class);
 
 		if (form == null) {
 			throw new IllegalArgumentException(ERROR_MISSING_FORM);
 		}
 
-		if (!form.equals(getCurrentForm()) || (parent instanceof UICommand && !hasInvokedSubmit(parent))) {
+		if (!form.equals(getCurrentForm()) || (component instanceof UICommand && !hasInvokedSubmit(component))) {
 			return;
 		}
 
