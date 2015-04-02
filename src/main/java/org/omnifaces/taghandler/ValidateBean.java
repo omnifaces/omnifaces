@@ -49,6 +49,7 @@ import java.util.logging.Logger;
 
 import javax.el.ValueExpression;
 import javax.el.ValueReference;
+import javax.faces.FacesException;
 import javax.faces.component.EditableValueHolder;
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
@@ -441,7 +442,7 @@ public class ValidateBean extends TagHandler {
 				validationFailed();
 				renderResponse();
 
-				throw e; // Rethrow, but JSF runtime will do little with it.
+				throw new FacesException(e); // Rethrow, but JSF runtime will do little with it.
 			}
 
 		}
