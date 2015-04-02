@@ -14,6 +14,7 @@ package org.omnifaces.cdi.param;
 
 import static java.lang.Boolean.valueOf;
 import static javax.faces.validator.BeanValidator.DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME;
+import static org.omnifaces.util.Beans.getQualifier;
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getApplication;
 import static org.omnifaces.util.Faces.getInitParameter;
@@ -26,7 +27,6 @@ import static org.omnifaces.util.Reflection.setPropertiesWithCoercion;
 import static org.omnifaces.util.Utils.containsByClassName;
 import static org.omnifaces.util.Utils.isEmpty;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -60,7 +60,7 @@ import org.omnifaces.cdi.Param;
  * @author Arjan Tijms
  */
 public class RequestParameterProducer {
-	
+
 	@SuppressWarnings("unused")
 	@Inject
 	private InjectionPoint injectionPoint;
@@ -260,7 +260,7 @@ public class RequestParameterProducer {
 		Class<?> base = injectionPoint.getBean().getBeanClass();
 		String property = injectionPoint.getMember().getName();
 		Type type = injectionPoint.getType();
-		
+
 		// Check if the target property in which we are injecting in our special holder/wrapper type
 		// ParamValue or not. If it's the latter, pre-wrap our value (otherwise types for bean validation
 		// would not match)
@@ -350,7 +350,7 @@ public class RequestParameterProducer {
 		return attributeMap;
 	}
 
-	
+
 
 	private void addConverterMessage(FacesContext context, UIComponent component, String label, String submittedValue, ConverterException ce, String converterMessage) {
 		FacesMessage message = null;
@@ -406,7 +406,7 @@ public class RequestParameterProducer {
 			}
 		}
 	}
-	
+
 	private static List<FacesMessage> getFacesMessages(ValidatorException ve) {
 		List<FacesMessage> facesMessages = new ArrayList<>();
 		if (ve.getFacesMessages() != null) {
@@ -416,17 +416,6 @@ public class RequestParameterProducer {
 		}
 
 		return facesMessages;
-	}
-
-	@SuppressWarnings("unchecked")
-	private static <T> T getQualifier(InjectionPoint injectionPoint, Class<T> annotationClass) {
-		for (Annotation annotation : injectionPoint.getQualifiers()) {
-			if (annotationClass.isAssignableFrom(annotation.getClass())) {
-				return (T) annotation;
-			}
-		}
-
-		return null;
 	}
 
 }
