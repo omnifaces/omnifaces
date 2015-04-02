@@ -243,6 +243,7 @@ public final class Beans {
 
 	/**
 	 * Returns the qualifier annotation of the given qualifier class from the given injection point.
+	 * @param <A> The generic annotation type.
 	 * @param injectionPoint The injection point to obtain the qualifier annotation of the given qualifier class from.
 	 * @param qualifierClass The class of the qualifier annotation to be looked up in the given injection point.
 	 * @return The qualifier annotation of the given qualifier class from the given injection point.
