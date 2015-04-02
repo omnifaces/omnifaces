@@ -33,8 +33,8 @@ import javax.faces.view.facelets.TagHandler;
 /**
  * <p>
  * The <code>&lt;o:importFunctions&gt;</code> taghandler allows the developer to have access to all functions of the
- * given fully qualified name of a type in the EL scope using the usual EL functions syntax without the need to register
- * them in <code>.taglib.xml</code> file. The functions are those <code>public static</code> methods with a
+ * given fully qualified name of a type in the Facelet scope using the usual EL functions syntax without the need to
+ * register them in <code>.taglib.xml</code> file. The functions are those <code>public static</code> methods with a
  * <strong>non</strong>-<code>void</code> return type.
  *
  * <h3>Usage</h3>
@@ -89,8 +89,8 @@ public class ImportFunctions extends TagHandler {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private String var;
-	private TagAttribute type;
+	private String varValue;
+	private TagAttribute typeAttribute;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -104,14 +104,14 @@ public class ImportFunctions extends TagHandler {
 
 		if (var != null) {
 			if (var.isLiteral()) {
-				this.var = var.getValue();
+				varValue = var.getValue();
 			}
 			else {
 				throw new IllegalArgumentException(ERROR_INVALID_VAR);
 			}
 		}
 
-		type = getRequiredAttribute("type");
+		typeAttribute = getRequiredAttribute("type");
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -122,9 +122,9 @@ public class ImportFunctions extends TagHandler {
 	 */
 	@Override
 	public void apply(FaceletContext context, UIComponent parent) throws IOException {
-		String type = this.type.getValue(context);
+		String type = typeAttribute.getValue(context);
 		final Class<?> cls = toClass(type);
-		final String var = (this.var != null) ? this.var : type.substring(type.lastIndexOf('.') + 1);
+		final String var = (varValue != null) ? varValue : type.substring(type.lastIndexOf('.') + 1);
 		final FunctionMapper originalFunctionMapper = context.getFunctionMapper();
 		context.setFunctionMapper(new FunctionMapper() {
 

@@ -340,11 +340,11 @@ public final class Hacks {
 			Class<?> methodAccessorClass = Class.forName("sun.reflect.MethodAccessor");
 
 			// Create a proxy for our MethodAccessor, so we don't have to reference the actual type at compile-time.
-			Object MethodAccessor = Proxy.newProxyInstance(Method.class.getClassLoader(), new Class[] { methodAccessorClass },
+			Object methodAccessor = Proxy.newProxyInstance(Method.class.getClassLoader(), new Class[] { methodAccessorClass },
 					new InvocationHandler() {
 
 						@Override
-						public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+						public Object invoke(Object proxy, Method method, Object[] args) {
 
 							Object[] params = null;
 							if (args != null && args.length > 1) {
@@ -361,7 +361,7 @@ public final class Hacks {
 
 			Method setMethodAccessor = Method.class.getDeclaredMethod("setMethodAccessor", methodAccessorClass);
 			setMethodAccessor.setAccessible(true);
-			setMethodAccessor.invoke(staticMethod, MethodAccessor);
+			setMethodAccessor.invoke(staticMethod, methodAccessor);
 
 			// Another private implementation detail of the Sun/Oracle/OpenJDK Method - unless override is set
 			// to true, a couple of nasty language checks are done before invoking the MethodAccessor
@@ -512,7 +512,8 @@ public final class Hacks {
 
 			if (value != null) {
 				try {
-					return (defaultResourceMaxAge = Long.valueOf(value));
+					defaultResourceMaxAge = Long.valueOf(value);
+					return defaultResourceMaxAge;
 				}
 				catch (NumberFormatException e) {
 					throw new IllegalArgumentException(String.format(ERROR_MAX_AGE, name, value), e);
@@ -520,7 +521,8 @@ public final class Hacks {
 			}
 		}
 
-		return (defaultResourceMaxAge = DEFAULT_RESOURCE_MAX_AGE);
+		defaultResourceMaxAge = DEFAULT_RESOURCE_MAX_AGE;
+		return defaultResourceMaxAge;
 	}
 
 	// PrimeFaces related ---------------------------------------------------------------------------------------------
@@ -546,7 +548,7 @@ public final class Hacks {
 			return Class.forName(className).newInstance();
 		}
 		catch (Exception e) {
-			throw new RuntimeException(
+			throw new IllegalArgumentException(
 				String.format(ERROR_CREATE_INSTANCE, className), e);
 		}
 	}
@@ -562,7 +564,7 @@ public final class Hacks {
 			return (T) field.get(instance);
 		}
 		catch (Exception e) {
-			throw new RuntimeException(
+			throw new IllegalArgumentException(
 				String.format(ERROR_ACCESS_FIELD, fieldName, instance.getClass()), e);
 		}
 	}
@@ -587,7 +589,7 @@ public final class Hacks {
 			return (T) method.invoke(instance, parameters);
 		}
 		catch (Exception e) {
-			throw new RuntimeException(
+			throw new IllegalArgumentException(
 				String.format(ERROR_INVOKE_METHOD, methodName, instance.getClass(), Arrays.toString(parameters)), e);
 		}
 	}

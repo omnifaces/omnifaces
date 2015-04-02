@@ -12,6 +12,8 @@
  */
 package org.omnifaces.filter;
 
+import static org.omnifaces.util.Utils.UTF_8;
+
 import java.io.IOException;
 import java.nio.charset.Charset;
 
@@ -78,13 +80,13 @@ public class CharacterEncodingFilter extends HttpFilter {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final String INIT_PARAM_ENCODING = "encoding";
-	private static final String DEFAULT_ENCODING = "UTF-8";
+	private static final Charset DEFAULT_ENCODING = UTF_8;
 	private static final String ERROR_ENCODING =
 		"The 'encoding' init param must represent a valid charset. Encountered an invalid charset of '%s'.";
 
 	// Vars -----------------------------------------------------------------------------------------------------------
 
-	private String encoding = DEFAULT_ENCODING;
+	private Charset encoding = DEFAULT_ENCODING;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -93,17 +95,15 @@ public class CharacterEncodingFilter extends HttpFilter {
 	 */
 	@Override
 	public void init() throws ServletException {
-		String encoding = getInitParameter(INIT_PARAM_ENCODING);
+		String encodingParam = getInitParameter(INIT_PARAM_ENCODING);
 
-		if (encoding != null) {
+		if (encodingParam != null) {
 			try {
-				Charset.forName(encoding);
+				encoding = Charset.forName(encodingParam);
 			}
 			catch (Exception e) {
-				throw new IllegalArgumentException(String.format(ERROR_ENCODING, encoding), e);
+				throw new ServletException(String.format(ERROR_ENCODING, encodingParam), e);
 			}
-
-			this.encoding = encoding;
 		}
 	}
 
@@ -116,7 +116,7 @@ public class CharacterEncodingFilter extends HttpFilter {
 			throws ServletException, IOException
 	{
 		if (request.getCharacterEncoding() == null) {
-			request.setCharacterEncoding(encoding);
+			request.setCharacterEncoding(encoding.name());
 		}
 
 		chain.doFilter(request, response);

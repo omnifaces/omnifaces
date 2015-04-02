@@ -41,7 +41,7 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Set<RuntimeException> EXCEPTIONS_TO_UNWRAP = unmodifiableSet(
+	private static final Set<Class<? extends Throwable>> EXCEPTIONS_TO_UNWRAP = unmodifiableSet(
 		MethodNotFoundException.class, // Needed for proper action listener error handling.
 		ConverterException.class, // Needed for proper conversion error handling.
 		ValidatorException.class); // Needed for proper validation error handling.
@@ -150,7 +150,7 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 
 			// If base is null, we're resolving it. Base should always be resolved as a value expression.
 			if (base == null) {
-				return super.getValue(context, base, property);
+				return super.getValue(context, null, property);
 			}
 
 			// Turn getValue calls into invoke.
@@ -162,20 +162,13 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 			// method expression takes no parameters, but is specified with parentheses, e.g. "#{mybean.doAction()}".
 			try {
 				return super.getValue(context, base, property);
-			} catch (PropertyNotFoundException pnfe) {
+			} catch (PropertyNotFoundException ignore) {
+				ignore = null; // We're not interested in it.
 				try {
 					return super.invoke(context, base, property, null, callerProvidedParameters != null ? callerProvidedParameters : EMPTY_PARAMETERS);
 				} catch (MethodNotFoundException e) {
-
 					// Wrap into new ELException since down the call chain, ElExceptions might be caught, unwrapped one level and then wrapped in
-					// a new ELException. E.g. Mojarra 2.1's TagValueExpression does the following:
-					//
-					// catch (ELException e) {
-		            //     throw new ELException(this.attr + ": " + e.getMessage(), e.getCause());
-					// }
-		            //
-					// Without wrapping here, we'll then loose this exception.
-
+					// a new ELException. Without wrapping here, we'll then loose this exception.
 					throw new ELException(e.getMessage(), e);
 				}
 			}

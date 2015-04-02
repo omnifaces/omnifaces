@@ -29,6 +29,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.PartialViewContext;
 
 import org.omnifaces.context.OmniPartialViewContext;
+import org.omnifaces.context.OmniPartialViewContextFactory;
 
 /**
  * <p>
@@ -50,6 +51,9 @@ import org.omnifaces.context.OmniPartialViewContext;
  *
  * @author Bauke Scholtz
  * @since 1.2
+ * @see Json
+ * @see OmniPartialViewContext
+ * @see OmniPartialViewContextFactory
  */
 public final class Ajax {
 
@@ -103,18 +107,18 @@ public final class Ajax {
 				context.setRenderAll(true);
 			}
 			else if (clientId.equals("@form")) {
-			    UIComponent currentForm = getCurrentForm();
+				UIComponent currentForm = getCurrentForm();
 
-			    if (currentForm != null) {
-			    	renderIds.add(currentForm.getClientId());
-			    }
+				if (currentForm != null) {
+					renderIds.add(currentForm.getClientId());
+				}
 			}
 			else if (clientId.equals("@this")) {
-			    UIComponent currentComponent = getCurrentComponent();
+				UIComponent currentComponent = getCurrentComponent();
 
-			    if (currentComponent != null) {
-			    	renderIds.add(currentComponent.getClientId());
-			    }
+				if (currentComponent != null) {
+					renderIds.add(currentComponent.getClientId());
+				}
 			}
 		}
 	}
@@ -151,6 +155,10 @@ public final class Ajax {
 			return;
 		}
 
+		updateRowCells(table, index);
+	}
+
+	private static void updateRowCells(UIData table, int index) {
 		FacesContext context = FacesContext.getCurrentInstance();
 		String tableId = table.getClientId(context);
 		char separator = UINamingContainer.getSeparatorChar(context);
@@ -192,6 +200,10 @@ public final class Ajax {
 			return;
 		}
 
+		updateColumnCells(table, index, rowCount);
+	}
+
+	private static void updateColumnCells(UIData table, int index, int rowCount) {
 		FacesContext context = FacesContext.getCurrentInstance();
 		String tableId = table.getClientId(context);
 		char separator = UINamingContainer.getSeparatorChar(context);

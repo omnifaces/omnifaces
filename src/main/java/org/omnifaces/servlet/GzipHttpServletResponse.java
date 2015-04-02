@@ -77,15 +77,15 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 		super.setHeader(name, value);
 
 		if (name != null) {
-			name = name.toLowerCase();
+			String lowerCasedName = name.toLowerCase();
 
-			if ("vary".equals(name)) {
+			if ("vary".equals(lowerCasedName)) {
 				vary = value;
 			}
-			else if ("content-range".equals(name)) {
+			else if ("content-range".equals(lowerCasedName)) {
 				noGzip = (value != null);
 			}
-			else if ("cache-control".equals(name)) {
+			else if ("cache-control".equals(lowerCasedName)) {
 				noGzip = (value != null && NO_TRANSFORM.matcher(value).matches());
 			}
 		}
@@ -96,15 +96,15 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 		super.addHeader(name, value);
 
 		if (name != null && value != null) {
-			name = name.toLowerCase();
+			String lowerCasedName = name.toLowerCase();
 
-			if ("vary".equals(name)) {
+			if ("vary".equals(lowerCasedName)) {
 				vary = ((vary != null) ? (vary + ",") : "") + value;
 			}
-			else if ("content-range".equals(name)) {
+			else if ("content-range".equals(lowerCasedName)) {
 				noGzip = true;
 			}
-			else if ("cache-control".equals(name)) {
+			else if ("cache-control".equals(lowerCasedName)) {
 				noGzip = (noGzip || NO_TRANSFORM.matcher(value).matches());
 			}
 		}
@@ -141,7 +141,8 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 
 	@Override
 	protected OutputStream createOutputStream() {
-		return output = new GzipThresholdOutputStream(threshold);
+		output = new GzipThresholdOutputStream(threshold);
+		return output;
 	}
 
 	// Inner classes --------------------------------------------------------------------------------------------------

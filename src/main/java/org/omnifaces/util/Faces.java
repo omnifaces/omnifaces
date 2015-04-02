@@ -29,6 +29,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.el.ELContext;
+import javax.el.ELResolver;
 import javax.el.ExpressionFactory;
 import javax.el.ValueExpression;
 import javax.faces.FactoryFinder;
@@ -128,6 +129,8 @@ import org.omnifaces.component.ParamHolder;
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz
+ * @see FacesLocal
+ * @see Servlets
  */
 public final class Faces {
 
@@ -179,7 +182,7 @@ public final class Faces {
 	 * Inner class so that the protected {@link FacesContext#setCurrentInstance(FacesContext)} method can be invoked.
 	 * @author Bauke Scholtz
 	 */
-	private static abstract class FacesContextSetter extends FacesContext {
+	private abstract static class FacesContextSetter extends FacesContext {
 		protected static void setCurrentInstance(FacesContext context) {
 			FacesContext.setCurrentInstance(context);
 		}
@@ -352,7 +355,7 @@ public final class Faces {
 	/**
 	 * Programmatically evaluate the given EL expression and set the given value.
 	 * @param expression The EL expression to be evaluated.
-	 * @param value The value to be set in the property behind the EL expression.
+	 * @param value The value to be set in the property behind the given EL expression.
 	 * @see Application#getExpressionFactory()
 	 * @see ExpressionFactory#createValueExpression(ELContext, String, Class)
 	 * @see ValueExpression#setValue(ELContext, Object)
@@ -360,6 +363,34 @@ public final class Faces {
 	 */
 	public static void evaluateExpressionSet(String expression, Object value) {
 		FacesLocal.evaluateExpressionSet(getContext(), expression, value);
+	}
+
+	/**
+	 * Programmatically EL-resolve the given property on the given base object and return the resolved value.
+	 * @param <T> The expected return type.
+	 * @param base The base object whose property value is to be returned, or null to resolve a top-level variable.
+	 * @param property The property or variable to be resolved on the given base.
+	 * @return The resolved value of the given property on the given base object.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see Application#getELResolver()
+	 * @see ELResolver#getValue(ELContext, Object, Object)
+	 * @since 2.1
+	 */
+	public static <T> T resolveExpressionGet(Object base, String property) {
+		return FacesLocal.resolveExpressionGet(getContext(), base, property);
+	}
+
+	/**
+	 * Programmatically EL-resolve the given property on the given base object and set the given value.
+	 * @param base The base object whose property value is to be set, or null to set a top-level variable.
+	 * @param property The property or variable to be set on the given base.
+	 * @param value The value to be set in the property on the given base.
+	 * @see Application#getELResolver()
+	 * @see ELResolver#setValue(ELContext, Object, Object, Object)
+	 * @since 2.1
+	 */
+	public static void resolveExpressionSet(Object base, String property, Object value) {
+		FacesLocal.resolveExpressionSet(getContext(), base, property, value);
 	}
 
 	/**
@@ -478,6 +509,16 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the metadata attribute map of the current view, or an empty map if there is no view metadata.
+	 * @return The metadata attribute map of the current view, or an empty map if there is no view metadata.
+	 * @see UIViewRoot#getAttributes()
+	 * @since 2.0
+	 */
+	public static Map<String, Object> getMetadataAttributes() {
+		return FacesLocal.getMetadataAttributes(getContext());
+	}
+
+	/**
 	 * Returns the metadata attribute of the given view ID associated with the given name.
 	 * Note: this is not the same as the view scope, for that use {@link #getViewAttribute(String)}.
 	 * @param <T> The expected return type.
@@ -553,16 +594,35 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the message bundle as identified by <code>&lt;message-bundle&gt;</code> in <code>faces-config.xml</code>.
-	 * The instance is already localized via {@link Faces#getLocale()}. If there is no
+	 * Returns the application message bundle as identified by <code>&lt;message-bundle&gt;</code> in
+	 * <code>faces-config.xml</code>. The instance is already localized via {@link Faces#getLocale()}. If there is no
 	 * <code>&lt;message-bundle&gt;</code>, then this method just returns <code>null</code>.
 	 * @return The message bundle as identified by <code>&lt;message-bundle&gt;</code> in <code>faces-config.xml</code>.
-	 * @since 2.0
 	 * @throws MissingResourceException When the <code>&lt;message-bundle&gt;</code> in <code>faces-config.xml</code>
 	 * does not refer an existing resource in the classpath.
+	 * @see Application#getMessageBundle()
+	 * @since 2.0
 	 */
 	public static ResourceBundle getMessageBundle() {
 		return FacesLocal.getMessageBundle(getContext());
+	}
+
+	/**
+	 * Returns the application resource bundle as identified by the given <code>&lt;var&gt;</code> of the
+	 * <code>&lt;resource-bundle&gt;</code> in <code>faces-config.xml</code>. If there is no
+	 * <code>&lt;resource-bundle&gt;</code> with the given <code>&lt;var&gt;</code>, then this method just returns
+	 * <code>null</code>.
+	 * @param var The value of the <code>&lt;var&gt;</code> which identifies the <code>&lt;resource-bundle&gt;</code> in
+	 * <code>faces-config.xml</code>.
+	 * @return The application resource bundle as identified by the given <code>&lt;var&gt;</code> of the
+	 * <code>&lt;resource-bundle&gt;</code> in <code>faces-config.xml</code>.
+	 * @throws MissingResourceException When the <code>&lt;resource-bundle&gt;</code> as identified by the given
+	 * <code>&lt;var&gt;</code> in <code>faces-config.xml</code> does not refer an existing resource in the classpath.
+	 * @see Application#getResourceBundle(FacesContext, String)
+	 * @since 2.0
+	 */
+	public static ResourceBundle getResourceBundle(String var) {
+		return FacesLocal.getResourceBundle(getContext(), var);
 	}
 
 	/**
@@ -578,13 +638,14 @@ public final class Faces {
 	/**
 	 * Returns the concrete domain-relative URL to the current view with the given params URL-encoded in the query
 	 * string and optionally include view parameters as well. This URL can ultimately be used as redirect URL, or in
-	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>.
+	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>. Any parameter with an empty name or value
+	 * will be skipped. To skip empty view parameters as well, use <code>&lt;o:viewParam&gt;</code> instead.
 	 * @param params The parameters to be URL-encoded in the query string. Can be <code>null</code>.
 	 * @param includeViewParams Whether the view parameters of the current view should be included as well.
 	 * @return The concrete domain-relative URL to the current view.
-	 * @see ViewHandler#getBookmarkableURL(FacesContext, String, Map, boolean)
 	 * @throws IllegalStateException When there is no view (i.e. when it is <code>null</code>). This can happen if the
 	 * method is called at the wrong moment in the JSF lifecycle, e.g. before the view has been restored/created.
+	 * @see ViewHandler#getBookmarkableURL(FacesContext, String, Map, boolean)
 	 * @since 1.6
 	 */
 	public static String getBookmarkableURL(Map<String, List<String>> params, boolean includeViewParams) {
@@ -594,7 +655,8 @@ public final class Faces {
 	/**
 	 * Returns the concrete domain-relative URL to the given view with the given params URL-encoded in the query
 	 * string and optionally include view parameters as well. This URL can ultimately be used as redirect URL, or in
-	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>.
+	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>. Any parameter with an empty name or value
+	 * will be skipped. To skip empty view parameters as well, use <code>&lt;o:viewParam&gt;</code> instead.
 	 * @param viewId The view ID to create the bookmarkable URL for.
 	 * @param params The parameters to be URL-encoded in the query string. Can be <code>null</code>.
 	 * @param includeViewParams Whether the view parameters of the current view which are also declared in the target
@@ -611,23 +673,25 @@ public final class Faces {
 	/**
 	 * Returns the concrete domain-relative URL to the current view with the given params URL-encoded in the query
 	 * string and optionally include view parameters as well. This URL can ultimately be used as redirect URL, or in
-	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>.
+	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>. Any parameter with an empty name or value
+	 * will be skipped. To skip empty view parameters as well, use <code>&lt;o:viewParam&gt;</code> instead.
 	 * @param params The parameters to be URL-encoded in the query string. Can be <code>null</code>.
 	 * @param includeViewParams Whether the view parameters of the current view should be included as well.
 	 * @return The concrete domain-relative URL to the current view.
-	 * @see ViewHandler#getBookmarkableURL(FacesContext, String, Map, boolean)
 	 * @throws IllegalStateException When there is no view (i.e. when it is <code>null</code>). This can happen if the
 	 * method is called at the wrong moment in the JSF lifecycle, e.g. before the view has been restored/created.
+	 * @see ViewHandler#getBookmarkableURL(FacesContext, String, Map, boolean)
 	 * @since 1.7
 	 */
-	public static String getBookmarkableURL(Collection<ParamHolder> params, boolean includeViewParams) {
+	public static String getBookmarkableURL(Collection<? extends ParamHolder> params, boolean includeViewParams) {
 		return FacesLocal.getBookmarkableURL(getContext(), params, includeViewParams);
 	}
 
 	/**
 	 * Returns the concrete domain-relative URL to the given view with the given params URL-encoded in the query
 	 * string and optionally include view parameters as well. This URL can ultimately be used as redirect URL, or in
-	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>.
+	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>. Any parameter with an empty name or value
+	 * will be skipped. To skip empty view parameters as well, use <code>&lt;o:viewParam&gt;</code> instead.
 	 * @param viewId The view ID to create the bookmarkable URL for.
 	 * @param params The parameters to be URL-encoded in the query string. Can be <code>null</code>.
 	 * @param includeViewParams Whether the view parameters of the current view which are also declared in the target
@@ -637,7 +701,7 @@ public final class Faces {
 	 * @see ViewHandler#getBookmarkableURL(FacesContext, String, Map, boolean)
 	 * @since 1.7
 	 */
-	public static String getBookmarkableURL(String viewId, Collection<ParamHolder> params, boolean includeViewParams) {
+	public static String getBookmarkableURL(String viewId, Collection<? extends ParamHolder> params, boolean includeViewParams) {
 		return FacesLocal.getBookmarkableURL(getContext(), viewId, params, includeViewParams);
 	}
 
@@ -654,7 +718,7 @@ public final class Faces {
 	 * @since 1.1
 	 */
 	public static FaceletContext getFaceletContext() {
-	    return FacesLocal.getFaceletContext(getContext());
+		return FacesLocal.getFaceletContext(getContext());
 	}
 
 	/**
@@ -753,7 +817,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestParameterValuesMap()
 	 */
 	public static String[] getRequestParameterValues(String name) {
-		return FacesLocal.getRequestParameterValues(getContext(), name);
+		return FacesLocal.getRequestParameterValuesMap(getContext()).get(name);
 	}
 
 	/**
@@ -772,7 +836,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestHeaderMap()
 	 */
 	public static String getRequestHeader(String name) {
-		return FacesLocal.getRequestHeader(getContext(), name);
+		return FacesLocal.getRequestHeaderMap(getContext()).get(name);
 	}
 
 	/**
@@ -791,7 +855,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestHeaderValuesMap()
 	 */
 	public static String[] getRequestHeaderValues(String name) {
-		return FacesLocal.getRequestHeaderValues(getContext(), name);
+		return FacesLocal.getRequestHeaderValuesMap(getContext()).get(name);
 	}
 
 	/**
@@ -1021,10 +1085,13 @@ public final class Faces {
 	}
 
 	/**
-	 * Sends a temporary (302) redirect to the given URL. If the given URL does not start with <code>http://</code>,
+	 * Sends a temporary (302) redirect to the given URL. If the given URL does <b>not</b> start with <code>http://</code>,
 	 * <code>https://</code> or <code>/</code>, then the request context path will be prepended, otherwise it will be
 	 * the unmodified redirect URL. So, when redirecting to another page in the same web application, always specify the
 	 * full path from the context root on (which in turn does not need to start with <code>/</code>).
+	 * <pre>
+	 * Faces.redirect("other.xhtml");
+	 * </pre>
 	 * <p>
 	 * You can use {@link String#format(String, Object...)} placeholder <code>%s</code> in the redirect URL to represent
 	 * placeholders for any request parameter values which needs to be URL-encoded. Here's a concrete example:
@@ -1046,10 +1113,13 @@ public final class Faces {
 	}
 
 	/**
-	 * Sends a permanent (301) redirect to the given URL. If the given URL does not start with <code>http://</code>,
+	 * Sends a permanent (301) redirect to the given URL. If the given URL does <b>not</b> start with <code>http://</code>,
 	 * <code>https://</code> or <code>/</code>, then the request context path will be prepended, otherwise it will be
 	 * the unmodified redirect URL. So, when redirecting to another page in the same web application, always specify the
 	 * full path from the context root on (which in turn does not need to start with <code>/</code>).
+	 * <pre>
+	 * Faces.redirectPermanent("other.xhtml");
+	 * </pre>
 	 * <p>
 	 * You can use {@link String#format(String, Object...)} placeholder <code>%s</code> in the redirect URL to represent
 	 * placeholders for any request parameter values which needs to be URL-encoded. Here's a concrete example:
@@ -1234,7 +1304,7 @@ public final class Faces {
 	 * with a charset of UTF-8.
 	 * @param name The HTTP request cookie name.
 	 * @return The value of the HTTP request cookie associated with the given name.
-	 * @throws UnsupportedOperationException If UTF-8 is not supported on this machine.
+	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
 	 * @see ExternalContext#getRequestCookieMap()
 	 */
 	public static String getRequestCookie(String name) {
@@ -1252,7 +1322,7 @@ public final class Faces {
 	 * removed. Note that the name and path must be exactly the same as it was when the cookie was created. If this is
 	 * <code>-1</code> then the cookie will become a session cookie and thus live as long as the established HTTP
 	 * session.
-	 * @throws UnsupportedOperationException If UTF-8 is not supported on this machine.
+	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
 	 * @see ExternalContext#addResponseCookie(String, String, Map)
 	 * @since 1.8
 	 */
@@ -1273,7 +1343,7 @@ public final class Faces {
 	 * removed. Note that the name and path must be exactly the same as it was when the cookie was created. If this is
 	 * <code>-1</code> then the cookie will become a session cookie and thus live as long as the established HTTP
 	 * session.
-	 * @throws UnsupportedOperationException If UTF-8 is not supported on this machine.
+	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
 	 * @see ExternalContext#addResponseCookie(String, String, Map)
 	 */
 	public static void addResponseCookie(String name, String value, String path, int maxAge) {
@@ -1294,7 +1364,7 @@ public final class Faces {
 	 * removed. Note that the name and path must be exactly the same as it was when the cookie was created. If this is
 	 * <code>-1</code> then the cookie will become a session cookie and thus live as long as the established HTTP
 	 * session.
-	 * @throws UnsupportedOperationException If UTF-8 is not supported on this machine.
+	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
 	 * @see ExternalContext#addResponseCookie(String, String, Map)
 	 * @since 1.8
 	 */

@@ -38,6 +38,6 @@ public interface MultiFieldValidator {
 	 * @param values The values of the input components to be validated.
 	 * @return <code>true</code> if validation is successful, otherwise <code>false</code> (and thus show the message).
 	 */
-	public boolean validateValues(FacesContext context, List<UIInput> components, List<Object> values);
+	boolean validateValues(FacesContext context, List<UIInput> components, List<Object> values);
 
 }

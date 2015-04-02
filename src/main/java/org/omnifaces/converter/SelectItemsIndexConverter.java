@@ -25,6 +25,7 @@ import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
 import javax.faces.convert.FacesConverter;
 
+import org.omnifaces.util.selectitems.SelectItemsCollector;
 import org.omnifaces.util.selectitems.SelectItemsUtils;
 
 /**
@@ -38,7 +39,7 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
  * This converter is available by converter ID <code>omnifaces.SelectItemsIndexConverter</code>. Just specify it in the
  * <code>converter</code> attribute of the selection component holding <code>&lt;f:selectItems&gt;</code>.
  * <pre>
- * &lt;h:selectOneMenu value="#{bean.selectedItem}" converter="omnifaces.SelectItemsConverter"&gt;
+ * &lt;h:selectOneMenu value="#{bean.selectedItem}" converter="omnifaces.SelectItemsIndexConverter"&gt;
  *     &lt;f:selectItems value="#{bean.availableItems}" /&gt;
  * &lt;/h:selectOneMenu&gt;
  * </pre>
@@ -64,6 +65,8 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
  * @author Patrick Dobler
  * @author Bauke Scholtz
  * @since 1.3
+ * @see SelectItemsUtils
+ * @see SelectItemsCollector
  */
 @FacesConverter("omnifaces.SelectItemsIndexConverter")
 public class SelectItemsIndexConverter implements Converter {
@@ -72,7 +75,7 @@ public class SelectItemsIndexConverter implements Converter {
 
 	private static final String ATTRIBUTE_SELECT_ITEMS = "SelectItemsIndexConverter.%s";
 
-	private static final String ERROR_SELECT_ITEMS_LIST_NULL =
+	private static final String ERROR_SELECT_ITEMS_LIST_EMPTY =
 		"Could not determine select items list for component {0}";
 	private static final String ERROR_SELECT_ITEMS_LIST_INDEX =
 		"Could not determine index for value {0} in component {1}";
@@ -122,8 +125,8 @@ public class SelectItemsIndexConverter implements Converter {
 			setContextAttribute(key, selectItemValues);
 		}
 
-		if (selectItemValues == null) {
-			throw new ConverterException(createError(ERROR_SELECT_ITEMS_LIST_NULL, component.getClientId(context)));
+		if (selectItemValues.isEmpty()) {
+			throw new ConverterException(createError(ERROR_SELECT_ITEMS_LIST_EMPTY, component.getClientId(context)));
 		}
 
 		return selectItemValues;

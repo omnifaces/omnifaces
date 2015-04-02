@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
@@ -29,6 +30,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.nio.charset.Charset;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -51,20 +53,38 @@ import java.util.zip.InflaterInputStream;
 import javax.xml.bind.DatatypeConverter;
 
 /**
+ * <p>
  * Collection of general utility methods that do not fit in one of the more specific classes.
+ *
+ * <h3>This class is not listed in showcase! Should I use it?</h3>
+ * <p>
+ * This class is indeed intented for internal usage only. We won't add methods here on user request. We only add methods
+ * here once we encounter non-DRY code in OmniFaces codebase. The methods may be renamed/changed without notice.
+ * <p>
+ * We don't stop you from using it if you think you find it useful, but you'd really better pick e.g. Google Guava or
+ * perhaps the good 'ol Apache Commons. This Utils class exists because OmniFaces intends to be free of 3rd party
+ * dependencies.
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz
- *
  */
 public final class Utils {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
+	public static final Charset UTF_8 = Charset.forName("UTF-8");
+
 	private static final int DEFAULT_STREAM_BUFFER_SIZE = 10240;
 	private static final String PATTERN_RFC1123_DATE = "EEE, dd MMM yyyy HH:mm:ss zzz";
 	private static final TimeZone TIMEZONE_GMT = TimeZone.getTimeZone("GMT");
-	private static final String ERROR_UNSUPPORTED_ENCODING = "UTF-8 is apparently not supported on this machine.";
+	private static final int BASE64_SEGMENT_LENGTH = 4;
+	private static final int UNICODE_3_BYTES = 0xfff;
+	private static final int UNICODE_2_BYTES = 0xff;
+	private static final int UNICODE_1_BYTE = 0xf;
+	private static final int UNICODE_END_PRINTABLE_ASCII = 0x7f;
+	private static final int UNICODE_BEGIN_PRINTABLE_ASCII = 0x20;
+
+	private static final String ERROR_UNSUPPORTED_ENCODING = "UTF-8 is apparently not supported on this platform.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -137,7 +157,7 @@ public final class Utils {
 			return Array.getLength(value) == 0;
 		}
 		else {
-		    return value.toString() == null || value.toString().isEmpty();
+			return value.toString() == null || value.toString().isEmpty();
 		}
 	}
 
@@ -259,11 +279,47 @@ public final class Utils {
 		return false;
 	}
 
+	/**
+	 * Returns <code>true</code> if an instance of the given class could also be an instance of one of the given classes.
+	 * @param cls The class to be checked if it could also be an instance of one of the given classes.
+	 * @param classes The argument list of classes to be tested.
+	 * @return <code>true</code> if the given class could also be an instance of one of the given classes.
+	 * @since 2.0
+	 */
+	public static boolean isOneInstanceOf(Class<?> cls, Class<?>... classes) {
+		for (Class<?> other : classes) {
+			if (cls == null ? other == null : other.isAssignableFrom(cls)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Returns <code>true</code> if the given class has at least one of the given annotations.
+	 * @param cls The class to be checked if it has at least one of the given annotations.
+	 * @param annotations The argument list of annotations to be tested on the given class.
+	 * @return <code>true</code> if the given clazz would be an instance of one of the given clazzes.
+	 * @since 2.0
+	 */
+	public static boolean isOneAnnotationPresent(Class<?> cls, Class<? extends Annotation>... annotations) {
+		for (Class<? extends Annotation> annotation : annotations) {
+			if (cls.isAnnotationPresent(annotation)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+
 	// I/O ------------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Stream the given input to the given output by NIO {@link ByteBuffer}. Both the input and output streams will
-	 * implicitly be closed after streaming, regardless of whether an exception is been thrown or not.
+	 * Stream the given input to the given output via a directly allocated NIO {@link ByteBuffer}.
+	 * Both the input and output streams will implicitly be closed after streaming,
+	 * regardless of whether an exception is been thrown or not.
 	 * @param input The input stream.
 	 * @param output The output stream.
 	 * @return The length of the written bytes.
@@ -291,6 +347,20 @@ public final class Utils {
 			close(outputChannel);
 			close(inputChannel);
 		}
+	}
+
+	/**
+	 * Read the given input stream into a byte array. The given input stream will implicitly be closed after streaming,
+	 * regardless of whether an exception is been thrown or not.
+	 * @param input The input stream.
+	 * @return The input stream as a byte array.
+	 * @throws IOException When an I/O error occurs.
+	 * @since 2.0
+	 */
+	public static byte[] toByteArray(InputStream input) throws IOException {
+		ByteArrayOutputStream output = new ByteArrayOutputStream();
+		stream(input, output);
+		return output.toByteArray();
 	}
 
 	/**
@@ -520,7 +590,7 @@ public final class Utils {
 		}
 
 		try {
-			InputStream raw = new ByteArrayInputStream(string.getBytes("UTF-8"));
+			InputStream raw = new ByteArrayInputStream(string.getBytes(UTF_8));
 			ByteArrayOutputStream deflated = new ByteArrayOutputStream();
 			stream(raw, new DeflaterOutputStream(deflated, new Deflater(Deflater.BEST_COMPRESSION)));
 			String base64 = DatatypeConverter.printBase64Binary(deflated.toByteArray());
@@ -528,7 +598,7 @@ public final class Utils {
 		}
 		catch (IOException e) {
 			// This will occur when ZLIB and/or UTF-8 are not supported, but this is not to be expected these days.
-			throw new RuntimeException(e);
+			throw new UnsupportedOperationException(e);
 		}
 	}
 
@@ -546,15 +616,13 @@ public final class Utils {
 		}
 
 		try {
-			String base64 = string.replace('-', '+').replace('_', '/') + "===".substring(0, string.length() % 4);
+			String base64 = string.replace('-', '+').replace('_', '/') + "===".substring(0, string.length() % BASE64_SEGMENT_LENGTH);
 			InputStream deflated = new ByteArrayInputStream(DatatypeConverter.parseBase64Binary(base64));
-			ByteArrayOutputStream raw = new ByteArrayOutputStream();
-			stream(new InflaterInputStream(deflated), raw);
-			return new String(raw.toByteArray(), "UTF-8");
+			return new String(toByteArray(new InflaterInputStream(deflated)), UTF_8);
 		}
 		catch (UnsupportedEncodingException e) {
 			// This will occur when UTF-8 is not supported, but this is not to be expected these days.
-			throw new RuntimeException(e);
+			throw new UnsupportedOperationException(e);
 		}
 		catch (Exception e) {
 			// This will occur when the string is not in valid Base64 or ZLIB format.
@@ -566,7 +634,7 @@ public final class Utils {
 	 * URL-encode the given string using UTF-8.
 	 * @param string The string to be URL-encoded using UTF-8.
 	 * @return The given string, URL-encoded using UTF-8, or <code>null</code> if <code>null</code> was given.
-	 * @throws UnsupportedOperationException When UTF-8 is not supported.
+	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
 	 * @since 1.4
 	 */
 	public static String encodeURL(String string) {
@@ -575,7 +643,7 @@ public final class Utils {
 		}
 
 		try {
-			return URLEncoder.encode(string, "UTF-8");
+			return URLEncoder.encode(string, UTF_8.name());
 		}
 		catch (UnsupportedEncodingException e) {
 			throw new UnsupportedOperationException(ERROR_UNSUPPORTED_ENCODING, e);
@@ -586,7 +654,7 @@ public final class Utils {
 	 * URL-decode the given string using UTF-8.
 	 * @param string The string to be URL-decode using UTF-8.
 	 * @return The given string, URL-decode using UTF-8, or <code>null</code> if <code>null</code> was given.
-	 * @throws UnsupportedOperationException When UTF-8 is not supported.
+	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
 	 * @since 1.4
 	 */
 	public static String decodeURL(String string) {
@@ -595,7 +663,7 @@ public final class Utils {
 		}
 
 		try {
-			return URLDecoder.decode(string, "UTF-8");
+			return URLDecoder.decode(string, UTF_8.name());
 		}
 		catch (UnsupportedEncodingException e) {
 			throw new UnsupportedOperationException(ERROR_UNSUPPORTED_ENCODING, e);
@@ -621,68 +689,76 @@ public final class Utils {
 		StringBuilder builder = new StringBuilder(string.length());
 
 		for (char c : string.toCharArray()) {
-			if (c > 0xfff) {
-				builder.append("\\u" + Integer.toHexString(c));
+			if (c > UNICODE_3_BYTES) {
+				builder.append("\\u").append(Integer.toHexString(c));
 			}
-			else if (c > 0xff) {
-				builder.append("\\u0" + Integer.toHexString(c));
+			else if (c > UNICODE_2_BYTES) {
+				builder.append("\\u0").append(Integer.toHexString(c));
 			}
-			else if (c > 0x7f) {
-				builder.append("\\u00" + Integer.toHexString(c));
+			else if (c > UNICODE_END_PRINTABLE_ASCII) {
+				builder.append("\\u00").append(Integer.toHexString(c));
 			}
-			else if (c < 32) {
-				switch (c) {
-					case '\b':
-						builder.append('\\').append('b');
-						break;
-					case '\n':
-						builder.append('\\').append('n');
-						break;
-					case '\t':
-						builder.append('\\').append('t');
-						break;
-					case '\f':
-						builder.append('\\').append('f');
-						break;
-					case '\r':
-						builder.append('\\').append('r');
-						break;
-					default:
-						if (c > 0xf) {
-							builder.append("\\u00" + Integer.toHexString(c));
-						}
-						else {
-							builder.append("\\u000" + Integer.toHexString(c));
-						}
-
-						break;
-				}
+			else if (c < UNICODE_BEGIN_PRINTABLE_ASCII) {
+				escapeJSControlCharacter(builder, c);
 			}
 			else {
-				switch (c) {
-					case '\'':
-						if (escapeSingleQuote) {
-							builder.append('\\');
-						}
-						builder.append('\'');
-						break;
-					case '"':
-						builder.append('\\').append('"');
-						break;
-					case '\\':
-						builder.append('\\').append('\\');
-						break;
-					case '/':
-						builder.append('\\').append('/');
-						break;
-					default:
-						builder.append(c);
-						break;
-				}
+				escapeJSASCIICharacter(builder, c, escapeSingleQuote);
 			}
 		}
 
 		return builder.toString();
+	}
+
+	private static void escapeJSControlCharacter(StringBuilder builder, char c) {
+		switch (c) {
+			case '\b':
+				builder.append('\\').append('b');
+				break;
+			case '\n':
+				builder.append('\\').append('n');
+				break;
+			case '\t':
+				builder.append('\\').append('t');
+				break;
+			case '\f':
+				builder.append('\\').append('f');
+				break;
+			case '\r':
+				builder.append('\\').append('r');
+				break;
+			default:
+				if (c > UNICODE_1_BYTE) {
+					builder.append("\\u00").append(Integer.toHexString(c));
+				}
+				else {
+					builder.append("\\u000").append(Integer.toHexString(c));
+				}
+
+				break;
+		}
+	}
+
+	private static void escapeJSASCIICharacter(StringBuilder builder, char c, boolean escapeSingleQuote) {
+		switch (c) {
+			case '\'':
+				if (escapeSingleQuote) {
+					builder.append('\\');
+				}
+				builder.append('\'');
+				break;
+			case '"':
+				builder.append('\\').append('"');
+				break;
+			case '\\':
+				builder.append('\\').append('\\');
+				break;
+			case '/':
+				builder.append('\\').append('/');
+				break;
+			default:
+				builder.append(c);
+				break;
+		}
 	}
 
 }

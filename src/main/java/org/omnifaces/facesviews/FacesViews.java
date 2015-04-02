@@ -94,7 +94,7 @@ public final class FacesViews {
 	/**
 	 * Web context parameter to switch auto-scanning completely off for Servlet 3.0 containers.
 	 */
-    public static final String FACES_VIEWS_ENABLED_PARAM_NAME = "org.omnifaces.FACES_VIEWS_ENABLED";
+	public static final String FACES_VIEWS_ENABLED_PARAM_NAME = "org.omnifaces.FACES_VIEWS_ENABLED";
 
 	/**
 	 * The name of the init parameter (in web.xml) where the value holds a comma separated list of paths that are to be
@@ -167,11 +167,11 @@ public final class FacesViews {
 
 	public static final String FACES_VIEWS_RESOURCES = "org.omnifaces.facesviews";
 	public static final String FACES_VIEWS_REVERSE_RESOURCES = "org.omnifaces.facesviews.reverse.resources";
-    public static final String FACES_VIEWS_RESOURCES_EXTENSIONS = "org.omnifaces.facesviews.extensions";
+	public static final String FACES_VIEWS_RESOURCES_EXTENSIONS = "org.omnifaces.facesviews.extensions";
 
-    public static final String FACES_VIEWS_ORIGINAL_SERVLET_PATH = "org.omnifaces.facesviews.original.servlet_path";
+	public static final String FACES_VIEWS_ORIGINAL_SERVLET_PATH = "org.omnifaces.facesviews.original.servlet_path";
 
-    public static void scanViewsFromRootPaths(ServletContext servletContext, Map<String, String> collectedViews, Set<String> collectedExtensions) {
+	public static void scanViewsFromRootPaths(ServletContext servletContext, Map<String, String> collectedViews, Set<String> collectedExtensions) {
 		for (String rootPath : getRootPaths(servletContext)) {
 
 			String extensionToScan = null;
@@ -239,12 +239,12 @@ public final class FacesViews {
 
 	public static boolean isResourceInPublicPath(ServletContext servletContext, String resource) {
 		Set<String> publicPaths = getPublicRootPaths(servletContext);
-    	for (String path : publicPaths) {
-    		if (resource.startsWith(path)) {
-    			return true;
-    		}
-    	}
-    	return false;
+		for (String path : publicPaths) {
+			if (resource.startsWith(path)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public static ExtensionAction getExtensionAction(ServletContext servletContext) {
@@ -488,15 +488,15 @@ public final class FacesViews {
 	 */
 	public static void mapFacesServlet(ServletContext servletContext, Set<String> extensions) {
 
-	    ServletRegistration facesServletRegistration = getFacesServletRegistration(servletContext);
-	    if (facesServletRegistration != null) {
-	        Collection<String> mappings = facesServletRegistration.getMappings();
-	        for (String extension : extensions) {
-	            if (!mappings.contains(extension)) {
-	                facesServletRegistration.addMapping(extension);
-	            }
-	        }
-	    }
+		ServletRegistration facesServletRegistration = getFacesServletRegistration(servletContext);
+		if (facesServletRegistration != null) {
+			Collection<String> mappings = facesServletRegistration.getMappings();
+			for (String extension : extensions) {
+				if (!mappings.contains(extension)) {
+					facesServletRegistration.addMapping(extension);
+				}
+			}
+		}
 	}
 
 	public static Set<String> getFacesServletExtensions(FacesContext context) {
@@ -511,15 +511,15 @@ public final class FacesViews {
 		if (extensions == null) {
 			extensions = new HashSet<String>();
 			ServletRegistration facesServletRegistration = getFacesServletRegistration(servletContext);
-		    if (facesServletRegistration != null) {
-		        Collection<String> mappings = facesServletRegistration.getMappings();
-		        for (String mapping : mappings) {
-		        	if (mapping.startsWith("*")) {
-		        		extensions.add(mapping.substring(1));
-		        	}
-		        }
-		    }
-		    servletContext.setAttribute(FACES_SERVLET_EXTENSIONS, unmodifiableSet(extensions));
+			if (facesServletRegistration != null) {
+				Collection<String> mappings = facesServletRegistration.getMappings();
+				for (String mapping : mappings) {
+					if (mapping.startsWith("*")) {
+						extensions.add(mapping.substring(1));
+					}
+				}
+			}
+			servletContext.setAttribute(FACES_SERVLET_EXTENSIONS, unmodifiableSet(extensions));
 		}
 
 		return extensions;

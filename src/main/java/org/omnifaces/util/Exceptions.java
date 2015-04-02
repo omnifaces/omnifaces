@@ -64,11 +64,13 @@ public final class Exceptions {
 	 * @return The unwrapped root cause.
 	 */
 	public static <T extends Throwable> Throwable unwrap(Throwable exception, Class<T> type) {
-		while (type.isInstance(exception) && exception.getCause() != null) {
-			exception = exception.getCause();
+		Throwable unwrappedException = exception;
+
+		while (type.isInstance(unwrappedException) && unwrappedException.getCause() != null) {
+			unwrappedException = unwrappedException.getCause();
 		}
 
-		return exception;
+		return unwrappedException;
 	}
 
 	/**
@@ -92,13 +94,17 @@ public final class Exceptions {
 	 * @return <code>true</code> if the given exception or one of its nested causes is an instance of the given type.
 	 */
 	public static <T extends Throwable> boolean is(Throwable exception, Class<T> type) {
-	    for (;exception != null; exception = exception.getCause()) {
-	        if (type.isInstance(exception)) {
-	            return true;
-	        }
-	    }
+		Throwable unwrappedException = exception;
 
-	    return false;
+		while (unwrappedException != null) {
+			if (type.isInstance(unwrappedException)) {
+				return true;
+			}
+
+			unwrappedException = unwrappedException.getCause();
+		}
+
+		return false;
 	}
 
 }

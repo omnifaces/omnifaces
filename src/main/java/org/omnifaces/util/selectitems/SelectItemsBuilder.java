@@ -25,7 +25,7 @@ import javax.faces.model.SelectItem;
  */
 public class SelectItemsBuilder {
 
-	List<SelectItem> selectItems = new ArrayList<SelectItem>();
+	private List<SelectItem> selectItems = new ArrayList<SelectItem>();
 
 	public SelectItemsBuilder add(Object value, String label) {
 		selectItems.add(new SelectItem(value, label));

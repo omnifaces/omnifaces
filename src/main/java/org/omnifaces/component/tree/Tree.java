@@ -32,7 +32,9 @@ import javax.faces.event.PhaseId;
 
 import org.omnifaces.component.EditableValueHolderStateHelper;
 import org.omnifaces.event.FacesEventWrapper;
+import org.omnifaces.model.tree.AbstractTreeModel;
 import org.omnifaces.model.tree.ListTreeModel;
+import org.omnifaces.model.tree.SortedTreeModel;
 import org.omnifaces.model.tree.TreeModel;
 import org.omnifaces.util.Callback;
 import org.omnifaces.util.State;
@@ -68,8 +70,14 @@ import org.omnifaces.util.State;
  * </pre>
  *
  * @author Bauke Scholtz
- * @see TreeModel
  * @see TreeNode
+ * @see TreeNodeItem
+ * @see TreeInsertChildren
+ * @see TreeFamily
+ * @see TreeModel
+ * @see AbstractTreeModel
+ * @see ListTreeModel
+ * @see SortedTreeModel
  */
 @FacesComponent(Tree.COMPONENT_TYPE)
 @SuppressWarnings("rawtypes") // For TreeModel. We don't care about its actual type anyway.
@@ -178,7 +186,9 @@ public class Tree extends TreeFamily implements NamingContainer {
 			return;
 		}
 
-		process(context, phaseId, getModel(phaseId), new Callback.Returning<Void>() {
+		process(context, getModel(phaseId), new Callback.Returning<Void>() {
+
+			private static final long serialVersionUID = 1L;
 
 			@Override
 			public Void invoke() {
@@ -200,8 +210,9 @@ public class Tree extends TreeFamily implements NamingContainer {
 			return false;
 		}
 
-		PhaseId phaseId = PhaseId.ANY_PHASE;
-		return process(context.getFacesContext(), phaseId, getModel(phaseId), new Callback.Returning<Boolean>() {
+		return process(context.getFacesContext(), getModel(PhaseId.ANY_PHASE), new Callback.Returning<Boolean>() {
+
+			private static final long serialVersionUID = 1L;
 
 			@Override
 			public Boolean invoke() {
@@ -232,7 +243,9 @@ public class Tree extends TreeFamily implements NamingContainer {
 			TreeFacesEvent treeEvent = (TreeFacesEvent) event;
 			final FacesEvent wrapped = treeEvent.getWrapped();
 
-			process(context, event.getPhaseId(), treeEvent.getNode(), new Callback.Returning<Void>() {
+			process(context, treeEvent.getNode(), new Callback.Returning<Void>() {
+
+				private static final long serialVersionUID = 1L;
 
 				@Override
 				public Void invoke() {
@@ -259,6 +272,8 @@ public class Tree extends TreeFamily implements NamingContainer {
 	protected void processTreeNode(final FacesContext context, final PhaseId phaseId) {
 		processTreeNode(phaseId, new Callback.ReturningWithArgument<Void, TreeNode>() {
 
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public Void invoke(TreeNode treeNode) {
 				if (treeNode != null) {
@@ -284,6 +299,8 @@ public class Tree extends TreeFamily implements NamingContainer {
 	protected boolean visitTreeNode(final VisitContext context, final VisitCallback callback) {
 		return processTreeNode(PhaseId.ANY_PHASE, new Callback.ReturningWithArgument<Boolean, TreeNode>() {
 
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public Boolean invoke(TreeNode treeNode) {
 				if (treeNode != null) {
@@ -299,12 +316,11 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * Convenience method to handle {@link #process(FacesContext, PhaseId)},
 	 * {@link #visitTree(VisitContext, VisitCallback)} and {@link #broadcast(FacesEvent)} without code duplication.
 	 * @param context The faces context to work with.
-	 * @param phaseId The current phase ID.
 	 * @param node The current tree model node.
 	 * @param callback The callback to be invoked.
 	 * @return The callback result.
 	 */
-	private <R> R process(FacesContext context, PhaseId phaseId, TreeModel node, Callback.Returning<R> callback) {
+	private <R> R process(FacesContext context, TreeModel node, Callback.Returning<R> callback) {
 		Object[] originalVars = captureOriginalVars(context);
 		TreeModel originalModelNode = currentModelNode;
 		pushComponentToEL(context, null);
@@ -331,11 +347,10 @@ public class Tree extends TreeFamily implements NamingContainer {
 		TreeNode treeNode = null;
 
 		if (!currentModelNode.isLeaf()) {
-			Map<Integer, TreeNode> nodes = getNodes(phaseId);
-			treeNode = nodes.get(currentModelNode.getLevel());
+			treeNode = getNodes(phaseId).get(currentModelNode.getLevel());
 
 			if (treeNode == null) {
-				treeNode = nodes.get(null);
+				treeNode = getNodes(phaseId).get(null);
 			}
 		}
 

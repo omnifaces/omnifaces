@@ -83,10 +83,10 @@ public final class ResourcePaths {
 	public static boolean isExtensionless(final String viewId) {
 		return viewId != null && !viewId.contains(".");
 	}
-	
+
 	/**
 	 * Filters away every resource in the given set that has an extension.
-	 * 
+	 *
 	 * @param resources A set of resources to be filtered
 	 * @return A set where no resource has an extension. May be empty, but never null.
 	 */
@@ -97,7 +97,7 @@ public final class ResourcePaths {
 				filteredResources.add(resource);
 			}
 		}
-		
+
 		return filteredResources;
 	}
 

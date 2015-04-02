@@ -52,8 +52,8 @@ public class ResettableBufferedWriter extends Writer implements ResettableBuffer
 	public ResettableBufferedWriter(Writer writer, int bufferSize, String characterEncoding) {
 		this.writer = writer;
 		this.bufferSize = bufferSize;
-		this.charset = Charset.forName(characterEncoding);
-		this.buffer = new CharArrayWriter(bufferSize);
+		charset = Charset.forName(characterEncoding);
+		buffer = new CharArrayWriter(bufferSize);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -61,7 +61,9 @@ public class ResettableBufferedWriter extends Writer implements ResettableBuffer
 	@Override
 	public void write(char[] chars, int offset, int length) throws IOException {
 		if (buffer != null) {
-			if ((writtenBytes += charset.encode(CharBuffer.wrap(chars, offset, length)).limit()) > bufferSize) {
+			writtenBytes += charset.encode(CharBuffer.wrap(chars, offset, length)).limit();
+
+			if (writtenBytes > bufferSize) {
 				writer.write(buffer.toCharArray());
 				writer.write(chars, offset, length);
 				buffer = null;

@@ -29,11 +29,11 @@ public class CacheEntry implements Serializable {
 
 	private static final long serialVersionUID = -4602586599152573869L;
 
-	private String value;
+	private Object value;
 	private Date validTill;
 	private Map<String, Object> attributes;
 
-	public CacheEntry(String value, Date validTill) {
+	public CacheEntry(Object value, Date validTill) {
 		super();
 		this.value = value;
 		this.validTill = validTill;
@@ -44,7 +44,7 @@ public class CacheEntry implements Serializable {
 	 *
 	 * @return The value for which meta data is kept
 	 */
-	public String getValue() {
+	public Object getValue() {
 		return value;
 	}
 
@@ -54,7 +54,7 @@ public class CacheEntry implements Serializable {
 	 * @param value
 	 *            The value for which meta data is kept
 	 */
-	public void setValue(String value) {
+	public void setValue(Object value) {
 		this.value = value;
 	}
 

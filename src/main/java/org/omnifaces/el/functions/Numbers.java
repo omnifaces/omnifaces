@@ -30,6 +30,10 @@ import org.omnifaces.util.Faces;
  */
 public final class Numbers {
 
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final int BYTES_1K = 1024;
+
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	private Numbers() {
@@ -56,12 +60,12 @@ public final class Numbers {
 			return "0 B";
 		}
 
-	    if (bytes < 1024) {
-	    	return bytes + " B";
-	    }
+		if (bytes < BYTES_1K) {
+			return bytes + " B";
+		}
 
-	    int exp = (int) (Math.log(bytes) / Math.log(1024));
-	    return String.format(getLocale(), "%.1f %ciB", bytes / Math.pow(1024, exp), "KMGTPE".charAt(exp - 1));
+		int exp = (int) (Math.log(bytes) / Math.log(BYTES_1K));
+		return String.format(getLocale(), "%.1f %ciB", bytes / Math.pow(BYTES_1K, exp), "KMGTPE".charAt(exp - 1));
 	}
 
 	/**
@@ -77,10 +81,6 @@ public final class Numbers {
 	public static String formatCurrency(Number number, String currencySymbol) {
 		if (number == null) {
 			return null;
-		}
-
-		if (currencySymbol == null) {
-			throw new NullPointerException("currencySymbol");
 		}
 
 		DecimalFormat formatter = (DecimalFormat) NumberFormat.getCurrencyInstance(getLocale());
@@ -103,10 +103,6 @@ public final class Numbers {
 	public static String formatNumber(Number number, String pattern) {
 		if (number == null) {
 			return null;
-		}
-
-		if (pattern == null) {
-			throw new NullPointerException("pattern");
 		}
 
 		DecimalFormat formatter = (DecimalFormat) NumberFormat.getNumberInstance(getLocale());

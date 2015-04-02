@@ -36,6 +36,15 @@ public interface Cache extends Serializable {
 	String get(String key);
 
 	/**
+	 * Gets a value from the cache
+	 *
+	 * @param key
+	 *            the key under which a value was previously stored
+	 * @return The previously stored value, or null if no such value exists
+	 */
+	Object getObject(String key);
+
+	/**
 	 * Stores a value in the cache
 	 *
 	 * @param key
@@ -44,6 +53,22 @@ public interface Cache extends Serializable {
 	 *            the value that is to be stored
 	 */
 	void put(String key, String value);
+
+	/**
+	 * Stores a value in the cache
+	 *
+	 * @param key
+	 *            the key under which a value is to be stored
+	 * @param value
+	 *            the value that is to be stored
+	 * @param timeToLive
+	 *            the amount of time in seconds for which the cached value is valid from the time it's being added to
+	 *            the cache. It's provider specific whether the cache implementation will actually remove (evict) the
+	 *            entry after this time has elapsed or will only perform a check upon accessing the cache entry.
+	 *            Whatever method the implementation chooses; after this time is elapsed a call to
+	 *            {@link Cache#get(String)} should return null.
+	 */
+	void putObject(String key, Object value, int timeToLive);
 
 	/**
 	 * Stores a value in the cache
@@ -99,4 +124,5 @@ public interface Cache extends Serializable {
 	 *            the key under which a value is to be stored
 	 */
 	void remove(String key);
+
 }

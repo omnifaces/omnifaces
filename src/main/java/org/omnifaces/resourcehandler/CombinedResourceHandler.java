@@ -12,9 +12,11 @@
  */
 package org.omnifaces.resourcehandler;
 
-import static org.omnifaces.util.Events.subscribeToEvent;
+import static org.omnifaces.util.Events.subscribeToApplicationEvent;
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getInitParameter;
+import static org.omnifaces.util.Faces.isDevelopment;
+import static org.omnifaces.util.Utils.isNumber;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,17 +37,21 @@ import javax.faces.event.PreRenderViewEvent;
 import javax.faces.event.SystemEvent;
 import javax.faces.event.SystemEventListener;
 
+import org.omnifaces.component.output.cache.Cache;
 import org.omnifaces.component.script.DeferredScript;
 import org.omnifaces.renderer.DeferredScriptRenderer;
 import org.omnifaces.renderer.InlineScriptRenderer;
 import org.omnifaces.renderer.InlineStylesheetRenderer;
+import org.omnifaces.util.Faces;
 import org.omnifaces.util.Hacks;
 
 /**
  * <p>
  * This {@link ResourceHandler} implementation will remove all separate script and stylesheet resources which have the
  * <code>target</code> attribute set to <code>"head"</code> from the {@link UIViewRoot} and create a combined one
- * for all scripts and another combined one for all stylesheets.
+ * for all scripts and another combined one for all stylesheets. In most cases your application's pages will load
+ * considerably. Optionally, the combined resource files can be cached on the server during non-development stage,
+ * giving your application another boost (at the expense of some heap memory on the server side).
  *
  * <h3>Installation</h3>
  * <p>
@@ -58,7 +64,7 @@ import org.omnifaces.util.Hacks;
  *
  * <h3>Usage</h3>
  * <p>
- * Noted shuold be that the <code>target</code> attribute of <code>&lt;h:outputStylesheet&gt;</code> already defaults to
+ * Noted should be that the <code>target</code> attribute of <code>&lt;h:outputStylesheet&gt;</code> already defaults to
  * <code>"head"</code> but the one of <code>&lt;h:outputScript&gt;</code> not. So if you have placed this inside the
  * <code>&lt;h:head&gt;</code>, then you would still need to explicitly set its <code>target</code> attribute to
  * <code>"head"</code>, otherwise it will be treated as an inline script and not be combined. This is a design
@@ -86,6 +92,19 @@ import org.omnifaces.util.Hacks;
  * The generated combined resource URL also includes the "<code>v</code>" request parameter which is the last modified
  * time of the newest individual resource in minutes, so that the browser will always be forced to request the latest
  * version whenever one of the individual resources has changed.
+ *
+ * <h3>Caching</h3>
+ * <p>
+ * Optionally you can activate server-side caching of the combined resource content by specifying the context parameter
+ * <code>{@value org.omnifaces.resourcehandler.CombinedResourceHandler#PARAM_NAME_CACHE_TTL}</code> while the JSF
+ * project stage is <strong>not</strong> set to <code>Development</code> as per {@link Faces#isDevelopment()}.
+ * <p>
+ * This can speed up the initial page load considerably. In general, subsequent page loads are served from the browser
+ * cache, so caching doesn't make a difference on postbacks, but only on initial requests. The combined resource content
+ * is by default cached in an application scoped cache in heap space. This can be customized as per instructions in
+ * {@link Cache} javadoc. As to the heap space consumption, note that without caching the same amount of heap space is
+ * allocated and freed for each request that can't be served from the browser cache, so chances are you won't notice the
+ * memory penalty of caching.
  *
  * <h3>Configuration</h3>
  * <p>
@@ -117,6 +136,15 @@ import org.omnifaces.util.Hacks;
  * </td><td>
  * Set to <code>true</code> if you want to render the combined JS resources inline (embedded in HTML) instead of as a
  * resource.
+ * </td></tr>
+ * <tr><td class="colFirst">
+ * <code>{@value org.omnifaces.resourcehandler.CombinedResourceHandler#PARAM_NAME_CACHE_TTL}</code>
+ * </td><td>
+ * Set with a value greater than 0 to activate server-side caching of the combined resource files. The value is
+ * interpreted as cache TTL (time to live) in seconds and is only effective when the JSF project stage is
+ * <strong>not</strong> set to <code>Development</code> as per {@link Faces#isDevelopment()}. Combined resource files
+ * are removed from the cache if they are older than this parameter indicates (and regenerated if newly requested).
+ * The default value is 0 (i.e. not cached). For global cache settings refer {@link Cache} javadoc.
  * </td></tr>
  * </table>
  * <p>
@@ -163,6 +191,8 @@ import org.omnifaces.util.Hacks;
  * automatically be added to the set of excluded resources.
  *
  * @author Bauke Scholtz
+ * @author Stephan Rauh {@literal <www.beyondjava.net>}
+ *
  * @see CombinedResource
  * @see CombinedResourceInfo
  * @see CombinedResourceInputStream
@@ -196,6 +226,15 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 	public static final String PARAM_NAME_INLINE_JS =
 		"org.omnifaces.COMBINED_RESOURCE_HANDLER_INLINE_JS";
 
+	/** The context parameter name to specify cache TTL of combined resources. @since 2.1 */
+	public static final String PARAM_NAME_CACHE_TTL =
+		"org.omnifaces.COMBINED_RESOURCE_HANDLER_CACHE_TTL";
+
+	private static final String ERROR_INVALID_CACHE_TTL_PARAM =
+		"Context parameter '" + PARAM_NAME_CACHE_TTL + "' is in invalid syntax."
+			+ " It must represent a valid time in seconds between 0 and " + Integer.MAX_VALUE + "."
+			+ " Encountered an invalid value of '%s'.";
+
 	private static final String TARGET_HEAD = "head";
 	private static final String TARGET_BODY = "body";
 
@@ -206,6 +245,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 	private Set<ResourceIdentifier> suppressedResources;
 	private boolean inlineCSS;
 	private boolean inlineJS;
+	private Integer cacheTTL;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -224,7 +264,8 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		excludedResources.addAll(suppressedResources);
 		inlineCSS = Boolean.valueOf(getInitParameter(PARAM_NAME_INLINE_CSS));
 		inlineJS = Boolean.valueOf(getInitParameter(PARAM_NAME_INLINE_JS));
-		subscribeToEvent(PreRenderViewEvent.class, this);
+		cacheTTL = initCacheTTL(getInitParameter(PARAM_NAME_CACHE_TTL));
+		subscribeToApplicationEvent(PreRenderViewEvent.class, this);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -276,14 +317,20 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		builder.create(context);
 	}
 
+	/**
+	 * Returns {@link #LIBRARY_NAME}.
+	 */
 	@Override
-	public Resource createResource(String resourceName, String libraryName, String contentType) {
-		if (LIBRARY_NAME.equals(libraryName)) {
-			return new CombinedResource(resourceName);
-		}
-		else {
-			return super.createResource(resourceName, libraryName, contentType);
-		}
+	public String getLibraryName() {
+		return LIBRARY_NAME;
+	}
+
+	/**
+	 * Returns a new {@link CombinedResource}.
+	 */
+	@Override
+	public Resource createResourceFromLibrary(String resourceName, String contentType) {
+		return new CombinedResource(resourceName, cacheTTL);
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
@@ -314,6 +361,26 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 	private static Set<ResourceIdentifier> initCDNResources() {
 		Map<ResourceIdentifier, String> cdnResources = CDNResourceHandler.initCDNResources();
 		return (cdnResources != null) ? cdnResources.keySet() : Collections.<ResourceIdentifier>emptySet();
+	}
+
+	/**
+	 * Initialize combined resource content cache TTL based on given application initialization parameter value.
+	 */
+	private static Integer initCacheTTL(String cacheTTLParam) {
+		if (!isDevelopment() && cacheTTLParam != null) {
+			if (isNumber(cacheTTLParam)) {
+				int cacheTTL = Integer.valueOf(cacheTTLParam);
+
+				if (cacheTTL > 0) {
+					return cacheTTL;
+				}
+			}
+
+			throw new IllegalArgumentException(String.format(ERROR_INVALID_CACHE_TTL_PARAM, cacheTTLParam));
+		}
+		else {
+			return null;
+		}
 	}
 
 	// Inner classes --------------------------------------------------------------------------------------------------

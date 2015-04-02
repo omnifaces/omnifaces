@@ -12,9 +12,9 @@
  */
 package org.omnifaces.taghandler;
 
-import static org.omnifaces.taghandler.RenderTimeTagHandlerHelper.collectRenderTimeAttributes;
-import static org.omnifaces.taghandler.RenderTimeTagHandlerHelper.createInstance;
-import static org.omnifaces.taghandler.RenderTimeTagHandlerHelper.getValueExpression;
+import static org.omnifaces.taghandler.DeferredTagHandlerHelper.collectDeferredAttributes;
+import static org.omnifaces.taghandler.DeferredTagHandlerHelper.createInstance;
+import static org.omnifaces.taghandler.DeferredTagHandlerHelper.getValueExpression;
 import static org.omnifaces.util.Components.getLabel;
 
 import java.io.IOException;
@@ -34,24 +34,21 @@ import javax.faces.view.facelets.TagHandlerDelegate;
 import javax.faces.view.facelets.ValidatorConfig;
 import javax.faces.view.facelets.ValidatorHandler;
 
-import org.omnifaces.taghandler.RenderTimeTagHandlerHelper.RenderTimeAttributes;
-import org.omnifaces.taghandler.RenderTimeTagHandlerHelper.RenderTimeTagHandler;
-import org.omnifaces.taghandler.RenderTimeTagHandlerHelper.RenderTimeTagHandlerDelegate;
+import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredAttributes;
+import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandler;
+import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDelegate;
 import org.omnifaces.util.Messages;
 
 /**
- * The <code>&lt;o:validator&gt;</code> basically extends the <code>&lt;f:validator&gt;</code> tag family with the
- * possibility to evaluate the value expression in all attributes on a per request basis instead of on a per view
- * build time basis. This allows the developer to change the attributes on a per request basis, such as the
- * <code>disabled</code> attribute.
- * <pre>
- * &lt;o:validator validatorId="someValidatorId" disabled="#{param.disableValidation}" /&gt;
- * </pre>
+ * <p>
+ * The <code>&lt;o:validator&gt;</code> is a taghandler that extends the standard <code>&lt;f:validator&gt;</code> tag
+ * family with support for deferred value expressions in all attributes. In other words, the validator attributes are
+ * not evaluated anymore on a per view build time basis, but just on every access like as with UI components.
  * <p>
  * When you specify for example the standard <code>&lt;f:validateLongRange&gt;</code> by
  * <code>validatorId="javax.faces.LongRange"</code>, then you'll be able to use all its attributes such as
  * <code>minimum</code> and <code>maximum</code> as per its documentation, but then with the possibility to supply
- * request based value expressions.
+ * deferred value expressions.
  * <pre>
  * &lt;o:validator validatorId="javax.faces.LongRange" minimum="#{item.minimum}" maximum="#{item.maximum}" /&gt;
  * </pre>
@@ -66,12 +63,13 @@ import org.omnifaces.util.Messages;
  * Note that this attribute is ignored when the parent component has already <code>validatorMessage</code> specified.
  * <pre>
  * &lt;o:validator validatorId="javax.faces.LongRange" minimum="#{item.minimum}" maximum="#{item.maximum}"
- *   message="Please enter between #{item.minimum} and #{item.maximum} characters" /&gt;
+ *     message="Please enter between #{item.minimum} and #{item.maximum} characters" /&gt;
  * </pre>
  *
  * @author Bauke Scholtz
+ * @see DeferredTagHandlerHelper
  */
-public class Validator extends ValidatorHandler implements RenderTimeTagHandler {
+public class Validator extends ValidatorHandler implements DeferredTagHandler {
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -110,10 +108,10 @@ public class Validator extends ValidatorHandler implements RenderTimeTagHandler 
 		}
 
 		final javax.faces.validator.Validator validator = createInstance(context, this, "validatorId");
-		final RenderTimeAttributes attributes = collectRenderTimeAttributes(context, this, validator);
+		final DeferredAttributes attributes = collectDeferredAttributes(context, this, validator);
 		final ValueExpression disabled = getValueExpression(context, this, "disabled", Boolean.class);
 		final ValueExpression message = getValueExpression(context, this, "message", String.class);
-		((EditableValueHolder) parent).addValidator(new RenderTimeValidator() {
+		((EditableValueHolder) parent).addValidator(new DeferredValidator() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -157,12 +155,12 @@ public class Validator extends ValidatorHandler implements RenderTimeTagHandler 
 
 	@Override
 	protected TagHandlerDelegate getTagHandlerDelegate() {
-		return new RenderTimeTagHandlerDelegate(this, super.getTagHandlerDelegate());
+		return new DeferredTagHandlerDelegate(this, super.getTagHandlerDelegate());
 	}
 
 	@Override
 	public boolean isDisabled(FaceletContext context) {
-		return false; // Let the render time validator handle it.
+		return false; // Let the deferred validator handle it.
 	}
 
 	// Nested classes -------------------------------------------------------------------------------------------------
@@ -172,7 +170,7 @@ public class Validator extends ValidatorHandler implements RenderTimeTagHandler 
 	 *
 	 * @author Bauke Scholtz
 	 */
-	protected static abstract class RenderTimeValidator implements javax.faces.validator.Validator, Serializable {
+	protected abstract static class DeferredValidator implements javax.faces.validator.Validator, Serializable {
 		private static final long serialVersionUID = 1L;
 	}
 

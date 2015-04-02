@@ -25,7 +25,8 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 
 /**
- * <strong>TreeInsertChildren</strong> is an {@link UIComponent} that represents the insertion point for the
+ * <p>
+ * The <code>&lt;o:treeInsertChildren&gt;</code> is an {@link UIComponent} that represents the insertion point for the
  * children of a parent tree node which is represented by {@link TreeNodeItem}.
  * <p>
  * This component does not allow any children.

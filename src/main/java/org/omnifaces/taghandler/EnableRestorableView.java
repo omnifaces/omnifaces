@@ -68,35 +68,19 @@ import org.omnifaces.viewhandler.RestorableViewHandler;
  * statelessness should not form any problem at all. So, if you have at least Mojarra 2.1.19 at hands, use the
  * <code>transient="true"</code> instead.
  *
- * <h3>Mojarra's new stateless mode</h3>
- * <p>
- * Since Mojarra 2.1.19, about 2 months after OmniFaces introduced the <code>&lt;o:enableRestorableView&gt;</code>,
- * it's possible to enable a stateless mode on the view by simply setting its <code>transient</code> attribute to
- * <code>true</code>:
- * <pre>
- * &lt;f:view transient="true"&gt;
- *     ...
- * &lt;/f:view&gt;
- * </pre>
- * <p>
- * This goes actually a step further than <code>&lt;o:enableRestorableView&gt;</code> as no state would be saved at all.
- * However, on those kind of pages where <code>&lt;o:enableRestorableView&gt;</code> would work just fine, this
- * statelessness should not form any problem at all. So, if you have at least Mojarra 2.1.19 at hands, use the
- * <code>transient="true"</code> instead.
- *
  * @author Bauke Scholtz
  * @since 1.3
  * @see RestorableViewHandler
  */
 public class EnableRestorableView extends TagHandler {
 
-    // Constants ------------------------------------------------------------------------------------------------------
+	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final String ERROR_INVALID_PARENT =
 		"EnableRestorableView must be a child of UIViewRoot. Encountered parent of type '%s'."
 			+ " It is recommended to enclose o:enableRestorableView in f:metadata.";
 
-    // Constructors ---------------------------------------------------------------------------------------------------
+	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
 	 * The tag constructor.
@@ -104,10 +88,10 @@ public class EnableRestorableView extends TagHandler {
 	 */
 	public EnableRestorableView(TagConfig config) {
 		super(config);
-		setApplicationAttribute(RestorableViewHandler.class.getName(), TRUE);
+		setApplicationAttribute(EnableRestorableView.class.getName(), TRUE);
 	}
 
-    // Actions --------------------------------------------------------------------------------------------------------
+	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Enable the current view to be restorable. This basically sets a specific view attribute which the

@@ -155,7 +155,7 @@ public final class SelectItemsCollector {
 			}
 
 			// During each iteration, just resolve all attributes again.
-			scopedRunner.invoke(new Callback.Void() { @Override public void invoke() {
+			scopedRunner.invoke(new Callback.Void() { private static final long serialVersionUID = 1L; @Override public void invoke() {
 
 				Object itemValue = getItemValue(attributes, item);
 				Object noSelectionValue = attributes.get("noSelectionValue");

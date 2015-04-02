@@ -65,8 +65,8 @@ public final class Converters {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String ERROR_NOT_AN_ARRAY = "The given type '%' is not an array at all.";
-    private static final String ERROR_INVALID_FRAGMENT_SIZE = "The given fragment size '%s' must be at least 1.";
+	private static final String ERROR_NOT_AN_ARRAY = "The given type '%s' is not an array at all.";
+	private static final String ERROR_INVALID_FRAGMENT_SIZE = "The given fragment size '%s' must be at least 1.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -105,7 +105,7 @@ public final class Converters {
 			return null;
 		}
 
-		return new ArrayList<Map.Entry<K, V>>(map.entrySet());
+		return new ArrayList<Entry<K, V>>(map.entrySet());
 	}
 
 	/**
@@ -172,14 +172,10 @@ public final class Converters {
 			throw new IllegalArgumentException(String.format(ERROR_NOT_AN_ARRAY, array.getClass()));
 		}
 
-		if (separator == null) {
-			separator = "";
-		}
-
 		StringBuilder builder = new StringBuilder();
 
 		for (int i = 0; i < Array.getLength(array); i++) {
-			if (i > 0) {
+			if (i > 0 && separator != null) {
 				builder.append(separator);
 			}
 
@@ -202,15 +198,11 @@ public final class Converters {
 			return null;
 		}
 
-		if (separator == null) {
-			separator = "";
-		}
-
 		StringBuilder builder = new StringBuilder();
 		int i = 0;
 
 		for (E element : collection) {
-			if (i++ > 0) {
+			if (i++ > 0 && separator != null) {
 				builder.append(separator);
 			}
 
@@ -236,23 +228,21 @@ public final class Converters {
 			return null;
 		}
 
-		if (pairSeparator == null) {
-			pairSeparator = "";
-		}
-
-		if (entrySeparator == null) {
-			entrySeparator = "";
-		}
-
 		StringBuilder builder = new StringBuilder();
 		int i = 0;
 
 		for (Entry<K, V> entry : map.entrySet()) {
-			if (i++ > 0) {
+			if (i++ > 0 && entrySeparator != null) {
 				builder.append(entrySeparator);
 			}
 
-			builder.append(entry.getKey()).append(pairSeparator).append(entry.getValue());
+			builder.append(entry.getKey());
+
+			if (pairSeparator != null) {
+				builder.append(pairSeparator);
+			}
+
+			builder.append(entry.getValue());
 		}
 
 		return builder.toString();
@@ -322,7 +312,7 @@ public final class Converters {
 		return lists;
 	}
 
-    /**
+	/**
 	 * Encode given object as JSON.
 	 * Currently, this delegates directly to {@link Json#encode(Object)}.
 	 * @param object Object to be encoded as JSON.

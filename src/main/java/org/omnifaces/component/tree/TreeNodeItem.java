@@ -29,8 +29,9 @@ import org.omnifaces.model.tree.TreeModel;
 import org.omnifaces.util.Callback;
 
 /**
- * <strong>TreeNodeItem</strong> is an {@link UIComponent} that represents a single child tree node within a parent
- * {@link TreeNode} component. Within this component, the <code>var</code> attribute of the parent {@link Tree}
+ * <p>
+ * The <code>&lt;o:treeNodeItem&gt;</code> is an {@link UIComponent} that represents a single child tree node within a
+ * parent {@link TreeNode} component. Within this component, the <code>var</code> attribute of the parent {@link Tree}
  * component will expose the child tree node.
  * <p>
  * This component allows a child component of type {@link TreeInsertChildren} which indicates the place to insert
@@ -95,6 +96,8 @@ public class TreeNodeItem extends TreeFamily {
 
 		process(context, new Callback.ReturningWithArgument<Void, Tree>() {
 
+			private static final long serialVersionUID = 1L;
+
 			@Override
 			public Void invoke(Tree tree) {
 				if (tree.getCurrentModelNode() != null) {
@@ -131,6 +134,8 @@ public class TreeNodeItem extends TreeFamily {
 		}
 
 		return process(context.getFacesContext(), new Callback.ReturningWithArgument<Boolean, Tree>() {
+
+			private static final long serialVersionUID = 1L;
 
 			@Override
 			public Boolean invoke(Tree tree) {

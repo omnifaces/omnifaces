@@ -12,17 +12,25 @@
  */
 package org.omnifaces.util;
 
+import static java.util.Arrays.asList;
 import static java.util.regex.Pattern.quote;
+import static javax.faces.component.visit.VisitContext.createVisitContext;
+import static javax.faces.component.visit.VisitResult.ACCEPT;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getELContext;
 import static org.omnifaces.util.Faces.getFaceletContext;
 import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.isOneInstanceOf;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.el.MethodExpression;
 import javax.el.ValueExpression;
@@ -38,11 +46,14 @@ import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
 import javax.faces.component.UINamingContainer;
 import javax.faces.component.UIPanel;
+import javax.faces.component.UIParameter;
 import javax.faces.component.UIViewRoot;
 import javax.faces.component.behavior.AjaxBehavior;
 import javax.faces.component.behavior.ClientBehavior;
+import javax.faces.component.visit.VisitCallback;
 import javax.faces.component.visit.VisitContext;
 import javax.faces.component.visit.VisitHint;
+import javax.faces.component.visit.VisitResult;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
@@ -50,6 +61,10 @@ import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.AjaxBehaviorListener;
 import javax.faces.event.MethodExpressionActionListener;
 import javax.faces.view.facelets.FaceletContext;
+
+import org.omnifaces.component.ParamHolder;
+import org.omnifaces.component.SimpleParam;
+import org.omnifaces.component.output.Param;
 
 /**
  * <p>
@@ -346,6 +361,223 @@ public final class Components {
 		}
 	}
 
+	// Iteration / Visiting -------------------------------------------------------------------------------------------
+
+	/**
+	 * Invokes an operation on every component in the component tree.
+	 * <p>
+	 * This is a simplified version of regular component visiting that uses the builder pattern to provide the various
+	 * optional parameters. Includes supports for only visiting components of a certain class type and two
+	 * simplified functional interfaces / lambdas.
+	 * <p>
+	 * See {@link UIComponent#visitTree(VisitContext, VisitCallback)}
+	 *
+	 * @return A new instance of {@link ForEach}.
+	 * @since 2.0
+	 */
+	public static ForEach forEachComponent() {
+		return new ForEach();
+	}
+
+	/**
+	 * Invokes an operation on every component in the component tree.
+	 * <p>
+	 * This is a simplified version of regular component visiting that uses the builder pattern to provide the various
+	 * optional parameters. Includes supports for only visiting components of a certain class type and two
+	 * simplified functional interfaces / lambdas.
+	 * <p>
+	 * See {@link UIComponent#visitTree(VisitContext, VisitCallback)}
+	 *
+	 * @param facesContext the faces context used for tree visiting
+	 * @return A new instance of {@link ForEach}, using the given faces context.
+	 * @since 2.0
+	 */
+	public static ForEach forEachComponent(FacesContext facesContext) {
+		return new ForEach(facesContext);
+	}
+
+	/**
+	 * Builder class used to collect a number of query parameters for a visit (for each) of components in the JSF
+	 * component tree. The chain of collecting parameters is terminated by calling one of the invoke methods.
+	 *
+	 * @since 2.0
+	 * @author Arjan Tijms
+	 *
+	 */
+	public static class ForEach {
+
+		private FacesContext facesContext;
+		private UIComponent root;
+		private Collection<String> ids;
+		private Set<VisitHint> hints;
+		private Class<?>[] types;
+
+		public ForEach() {
+			facesContext = Faces.getContext();
+		}
+
+		public ForEach(FacesContext facesContext) {
+			this.facesContext = facesContext;
+		}
+
+		/**
+		 * The root component where tree visiting starts
+		 *
+		 * @param root the root component where tree visiting starts
+		 * @return the intermediate builder object to continue the builder chain
+		 */
+		public ForEach fromRoot(UIComponent root) {
+			this.root = root;
+			return this;
+		}
+
+		/**
+		 * The IDs of the components that are visited
+		 *
+		 * @param ids the IDs of the components that are visited
+		 * @return the intermediate builder object to continue the builder chain
+		 */
+		public ForEach havingIds(Collection<String> ids) {
+			this.ids = ids;
+			return this;
+		}
+
+		/**
+		 * The IDs of the components that are to be visited
+		 *
+		 * @param ids the IDs of the components that are to be visited
+		 * @return the intermediate builder object to continue the builder chain
+		 */
+		public ForEach havingIds(String... ids) {
+			this.ids = asList(ids);
+			return this;
+		}
+
+		/**
+		 * The VisitHints that are used for the visit.
+		 *
+		 * @param hints the VisitHints that are used for the visit.
+		 * @return the intermediate builder object to continue the builder chain
+		 */
+		public ForEach withHints(Set<VisitHint> hints) {
+			this.hints = hints;
+			return this;
+		}
+
+		/**
+		 * The VisitHints that are used for the visit.
+		 *
+		 * @param hints the VisitHints that are used for the visit.
+		 * @return the intermediate builder object to continue the builder chain
+		 */
+		public ForEach withHints(VisitHint... hints) {
+
+			if (hints.length > 0) {
+				EnumSet<VisitHint> hintsSet = EnumSet.noneOf(hints[0].getDeclaringClass());
+				for (VisitHint hint : hints) {
+					hintsSet.add(hint);
+				}
+
+				this.hints = hintsSet;
+
+			}
+			return this;
+		}
+
+		/**
+		 * The types of the components that are to be visited
+		 *
+		 * @param types the types of the components that are to be visited
+		 * @return the intermediate builder object to continue the builder chain
+		 */
+		public final ForEach ofTypes(Class<?>... types) {
+			this.types = types;
+			return this;
+		}
+
+		/**
+		 * Invokes the given operation on the components as specified by the
+		 * query parameters set via this builder.
+		 *
+		 * @param operation the operation to invoke on each component
+		 */
+		public void invoke(final Callback.WithArgument<UIComponent> operation) {
+			invoke(new VisitCallback() {
+				@Override
+				public VisitResult visit(VisitContext context, UIComponent target) {
+					operation.invoke(target);
+					return ACCEPT;
+				}
+			});
+		}
+
+		/**
+		 * Invokes the given operation on the components as specified by the
+		 * query parameters set via this builder.
+		 *
+		 * @param operation the operation to invoke on each component
+		 */
+		public void invoke(final Callback.ReturningWithArgument<VisitResult, UIComponent> operation) {
+			invoke(new VisitCallback() {
+				@Override
+				public VisitResult visit(VisitContext context, UIComponent target) {
+					return operation.invoke(target);
+				}
+			});
+		}
+
+		/**
+		 * Invokes the given operation on the components as specified by the
+		 * query parameters set via this builder.
+		 *
+		 * @param operation the operation to invoke on each component
+		 */
+		public void invoke(final VisitCallback operation) {
+			VisitCallback callback = operation;
+			if (types != null) {
+				callback = new TypesVisitCallback(types, callback);
+			}
+
+			getRoot().visitTree(createVisitContext(getContext(), getIds(), getHints()), callback);
+		}
+
+		protected FacesContext getFacesContext() {
+			return facesContext;
+		}
+
+		protected UIComponent getRoot() {
+			return root != null ? root : getFacesContext().getViewRoot();
+		}
+
+		protected Collection<String> getIds() {
+			return ids;
+		}
+
+		protected Set<VisitHint> getHints() {
+			return hints;
+		}
+
+		private static class TypesVisitCallback implements VisitCallback {
+
+			private Class<?>[] types;
+			private VisitCallback next;
+
+			public TypesVisitCallback(Class<?>[] types, VisitCallback next) {
+				this.types = types;
+				this.next = next;
+			}
+
+			@Override
+			public VisitResult visit(VisitContext context, UIComponent target) {
+				if (isOneInstanceOf(target.getClass(), types)) {
+					return next.visit(context, target);
+				}
+				return ACCEPT;
+			}
+		}
+	}
+
+
 	// Manipulation ---------------------------------------------------------------------------------------------------
 
 	/**
@@ -467,26 +699,26 @@ public final class Components {
 		}
 
 		UIViewRoot viewRoot = context.getViewRoot();
-	    Map<String, String> params = context.getExternalContext().getRequestParameterMap();
+		Map<String, String> params = context.getExternalContext().getRequestParameterMap();
 
-	    if (context.getPartialViewContext().isAjaxRequest()) {
-	    	String source = params.get("javax.faces.source");
+		if (context.getPartialViewContext().isAjaxRequest()) {
+			String source = params.get("javax.faces.source");
 
-	    	if (source != null) {
-    	        UIComponent component = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(source));
+			if (source != null) {
+				UIComponent component = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(source));
 
 				if (component instanceof UICommand) {
 					return (UICommand) component;
 				}
-	    	}
-	    }
+			}
+		}
 
-	    for (String name : params.keySet()) {
+		for (String name : params.keySet()) {
 			if (name.startsWith("javax.faces.")) {
 				continue; // Quick skip.
 			}
 
-	        UIComponent component = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(name));
+			UIComponent component = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(name));
 
 			if (component instanceof UICommand) {
 				return (UICommand) component;
@@ -611,18 +843,55 @@ public final class Components {
 		}
 
 		if (component instanceof UICommand) {
-		    for (String name : params.keySet()) {
+			for (String name : params.keySet()) {
 				if (name.startsWith("javax.faces.")) {
 					continue; // Quick skip.
 				}
 
-		        if (clientId.equals(stripIterationIndexFromClientId(name))) {
-		        	return true;
-		        }
+				if (clientId.equals(stripIterationIndexFromClientId(name))) {
+					return true;
+				}
 			}
 		}
 
 		return false;
+	}
+
+	/**
+	 * Returns an unmodifiable list with all child {@link UIParameter} components (<code>&lt;f|o:param&gt;</code>) of
+	 * the given parent component as a list of {@link ParamHolder} instances. Those with <code>disabled=true</code> and
+	 * an empty name are skipped.
+	 * @param component The parent component to retrieve all child {@link UIParameter} components from.
+	 * @return An unmodifiable list with all child {@link UIParameter} components having a non-empty name and not
+	 * disabled.
+	 * @since 2.1
+	 */
+	public static List<ParamHolder> getParams(UIComponent component) {
+		if (component.getChildCount() > 0) {
+			List<ParamHolder> params = new ArrayList<ParamHolder>(component.getChildCount());
+
+			for (UIComponent child : component.getChildren()) {
+				if (child instanceof UIParameter) {
+					UIParameter param = (UIParameter) child;
+					String name = param.getName();
+
+					if (!isEmpty(name) && !param.isDisable()) {
+						ParamHolder paramHolder = new SimpleParam(name, param.getValue());
+
+						if (param instanceof Param) {
+							paramHolder.setConverter(((Param) param).getConverter());
+						}
+
+						params.add(paramHolder);
+					}
+				}
+			}
+
+			return Collections.unmodifiableList(params);
+		}
+		else {
+			return Collections.emptyList();
+		}
 	}
 
 	// Expressions ----------------------------------------------------------------------------------------------------

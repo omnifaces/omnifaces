@@ -70,6 +70,7 @@ import org.omnifaces.util.State;
  * </pre>
  *
  * @author Bauke Scholtz
+ * @see OnloadScript
  */
 @FacesComponent(Highlight.COMPONENT_TYPE)
 @ResourceDependencies({

@@ -118,7 +118,7 @@ public final class Messages {
 	 *
 	 * @author Bauke Scholtz
 	 */
-	public static interface Resolver {
+	public interface Resolver {
 
 		/**
 		 * Returns the resolved message based on the given message and parameters.
@@ -126,7 +126,7 @@ public final class Messages {
 		 * @param params The message format parameters, if any.
 		 * @return The resolved message.
 		 */
-		public String getMessage(String message, Object... params);
+		String getMessage(String message, Object... params);
 
 	}
 
@@ -195,7 +195,7 @@ public final class Messages {
 	 * @author Bauke Scholtz
 	 * @since 1.1
 	 */
-	public static class Message {
+	public static final class Message {
 
 		private FacesMessage message;
 

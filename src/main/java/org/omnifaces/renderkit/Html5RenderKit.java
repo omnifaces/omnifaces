@@ -15,6 +15,7 @@ package org.omnifaces.renderkit;
 import static org.omnifaces.util.Components.getCurrentComponent;
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.isOneInstanceOf;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.IOException;
@@ -71,8 +72,8 @@ import javax.faces.render.RenderKitWrapper;
  * <h3>Configuration</h3>
  * <p>
  * You can also configure additional passthrough attributes via the
- * {@value org.omnifaces.renderkit.Html5RenderKit#PARAM_NAME_PASSTHROUGH_ATTRIBUTES} context parameter, wherein the
- * passthrough attributes are been specified in semicolon-separated
+ * {@value org.omnifaces.renderkit.Html5RenderKit#PARAM_NAME_PASSTHROUGH_ATTRIBUTES} context parameter in
+ * <code>web.xml</code>, wherein the passthrough attributes are been specified in semicolon-separated
  * <code>com.example.SomeComponent=attr1,attr2,attr3</code> key=value pairs. The key represents the fully qualified
  * name of a class whose {@link Class#isInstance(Object)} must return <code>true</code> for the particular component
  * and the value represents the commaseparated string of names of passthrough attributes. Here's an example:
@@ -129,7 +130,7 @@ public class Html5RenderKit extends RenderKitWrapper {
 		// "novalidate" attribute is not useable in a JSF form.
 	);
 
-	private static final Set<String> HTML5_UISELECT_ATTRIBUTES = unmodifiableSet(
+	private static final Set<String> HTML5_SELECT_ATTRIBUTES = unmodifiableSet(
 		"autofocus"
 		// "form" attribute is not useable in a JSF form.
 	);
@@ -285,23 +286,7 @@ public class Html5RenderKit extends RenderKitWrapper {
 				writeHtml5AttributesIfNecessary(component.getAttributes(), HTML5_UIFORM_ATTRIBUTES);
 			}
 			else if (component instanceof UIInput) {
-				if (component instanceof HtmlInputText && "input".equals(name)) {
-					Map<String, Object> attributes = component.getAttributes();
-					writeHtml5AttributesIfNecessary(attributes, HTML5_INPUT_ATTRIBUTES);
-
-					if (HTML5_INPUT_RANGE_TYPES.contains(attributes.get("type"))) {
-						writeHtml5AttributesIfNecessary(attributes, HTML5_INPUT_RANGE_ATTRIBUTES);
-					}
-				}
-				else if (component instanceof HtmlInputSecret && "input".equals(name)) {
-					writeHtml5AttributesIfNecessary(component.getAttributes(), HTML5_INPUT_PASSWORD_ATTRIBUTES);
-				}
-				else if (component instanceof HtmlInputTextarea && "textarea".equals(name)) {
-					writeHtml5AttributesIfNecessary(component.getAttributes(), HTML5_TEXTAREA_ATTRIBUTES);
-				}
-				else if (isInstanceofUISelect(component) && ("input".equals(name) || "select".equals(name))) {
-					writeHtml5AttributesIfNecessary(component.getAttributes(), HTML5_UISELECT_ATTRIBUTES);
-				}
+				writeHtml5AttributesIfNecessary((UIInput) component, name);
 			}
 			else if (component instanceof UICommand && "input".equals(name)) {
 				writeHtml5AttributesIfNecessary(component.getAttributes(), HTML5_BUTTON_ATTRIBUTES);
@@ -353,15 +338,27 @@ public class Html5RenderKit extends RenderKitWrapper {
 
 		// Helpers ----------------------------------------------------------------------------------------------------
 
-		private boolean isInstanceofUISelect(UIComponent component) {
-			return component instanceof UISelectBoolean
-				|| component instanceof UISelectOne
-				|| component instanceof UISelectMany;
+		private void writeHtml5AttributesIfNecessary(UIInput component, String name) throws IOException {
+			if (isInput(component, name)) {
+				Map<String, Object> attributes = component.getAttributes();
+				writeHtml5AttributesIfNecessary(attributes, HTML5_INPUT_ATTRIBUTES);
+
+				if (HTML5_INPUT_RANGE_TYPES.contains(attributes.get("type"))) {
+					writeHtml5AttributesIfNecessary(attributes, HTML5_INPUT_RANGE_ATTRIBUTES);
+				}
+			}
+			else if (isInputPassword(component, name)) {
+				writeHtml5AttributesIfNecessary(component.getAttributes(), HTML5_INPUT_PASSWORD_ATTRIBUTES);
+			}
+			else if (isTextarea(component, name)) {
+				writeHtml5AttributesIfNecessary(component.getAttributes(), HTML5_TEXTAREA_ATTRIBUTES);
+			}
+			else if (isSelect(component, name)) {
+				writeHtml5AttributesIfNecessary(component.getAttributes(), HTML5_SELECT_ATTRIBUTES);
+			}
 		}
 
-		private void writeHtml5AttributesIfNecessary(Map<String, Object> attributes, Set<String> names)
-			throws IOException
-		{
+		private void writeHtml5AttributesIfNecessary(Map<String, Object> attributes, Set<String> names) throws IOException {
 			for (String name : names) {
 				Object value = attributes.get(name);
 
@@ -371,6 +368,22 @@ public class Html5RenderKit extends RenderKitWrapper {
 			}
 		}
 
+		private boolean isInput(UIInput component, String name) {
+			return component instanceof HtmlInputText && "input".equals(name);
+		}
+
+		private boolean isInputPassword(UIInput component, String name) {
+			return component instanceof HtmlInputSecret && "input".equals(name);
+		}
+
+		private boolean isTextarea(UIInput component, String name) {
+			return component instanceof HtmlInputTextarea && "textarea".equals(name);
+		}
+
+		private boolean isSelect(UIInput component, String name) {
+			return isOneInstanceOf(component.getClass(), UISelectBoolean.class, UISelectOne.class, UISelectMany.class)
+				&& ("input".equals(name) || "select".equals(name));
+		}
 	}
 
 }

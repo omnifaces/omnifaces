@@ -98,7 +98,7 @@ public class RestorableViewHandler extends ViewHandlerWrapper {
 	}
 
 	private boolean isEnabled(FacesContext context) {
-		return TRUE.equals(getApplicationAttribute(context, RestorableViewHandler.class.getName()));
+		return TRUE.equals(getApplicationAttribute(context, EnableRestorableView.class.getName()));
 	}
 
 	@Override

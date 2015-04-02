@@ -19,6 +19,12 @@
 >
 	<name>omnifaces</name>
 
+	<ordering>
+		<after>
+			<others />
+		</after>
+	</ordering>
+
 	<application>
 		<view-handler>org.omnifaces.viewhandler.RestorableViewHandler</view-handler>
 		<system-event-listener>

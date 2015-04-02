@@ -12,86 +12,123 @@
  */
 package org.omnifaces.resourcehandler;
 
-import static java.util.Arrays.fill;
-
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
 import javax.faces.application.ResourceHandlerWrapper;
 
 /**
- * A default {@link ResourceHandler} implementation, delegating both {@link #createResource(String)} and
- * {@link #createResource(String, String)} to {@link #createResource(String, String, String)}. Implementors should
- * only need to override {@link #createResource(String, String, String)}. Additionally, the constructor checks if the
- * wrapped resource handler has the {@link #createResource(String, String, String)} properly implemented, otherwise
- * fall back to either {@link #createResource(String, String)} or {@link #createResource(String)} on the wrapped
- * resource handler.
+ * <p>
+ * A default {@link ResourceHandler} implementation which hooks on all three {@link #createResource(String)},
+ * {@link #createResource(String, String)} and {@link #createResource(String, String, String)} methods. Implementors
+ * should only need to override <strong>either</strong> {@link #getLibraryName()} and
+ * {@link #createResourceFromLibrary(String, String)}, <strong>or</strong> {@link #decorateResource(Resource)}.
  *
  * @author Bauke Scholtz
  * @since 2.0
  */
 public class DefaultResourceHandler extends ResourceHandlerWrapper {
 
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	public static final String RES_NOT_FOUND = "RES_NOT_FOUND";
+
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	private ResourceHandler wrapped;
-	private int args;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Creates a new instance of this unmapped resource handler which wraps the given resource handler. Additionally,
-	 * check which <code>createResource</code> method is being declared on the wrapped resource handler.
+	 * Creates a new instance of this default resource handler which wraps the given resource handler.
 	 * @param wrapped The resource handler to be wrapped.
 	 */
 	public DefaultResourceHandler(ResourceHandler wrapped) {
 		this.wrapped = wrapped;
-		Class<? extends ResourceHandler> cls = wrapped.getClass();
-
-		for (int args = 3; args > 1; args--) {
-			Class<?>[] paramTypes = new Class[args];
-			fill(paramTypes, String.class);
-
-			try {
-				cls.getDeclaredMethod("createResource", paramTypes);
-				this.args = args;
-				break;
-			}
-			catch (NoSuchMethodException ignore) {
-				//
-			}
-		}
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Delegate to {@link #createResource(String, String, String)} with <code>null</code> as library name and content
-	 * type.
+	 * Delegate to {@link #decorateResource(Resource)} with result of {@link #createResource(String)} from the wrapped
+	 * resource handler.
+	 * <p>
+	 * Implementors should <strong>not</strong> override this.
 	 */
 	@Override
 	public Resource createResource(String resourceName) {
-		return createResource(resourceName, null, null);
+		return decorateResource(getWrapped().createResource(resourceName));
 	}
 
 	/**
-	 * Delegate to {@link #createResource(String, String, String)} with <code>null</code> as content type.
+	 * If library name is not null and it equals {@link #getLibraryName()}, then delegate to
+	 * {@link #createResourceFromLibrary(String, String)} with <code>null</code> as content type, else delegate to
+	 * {@link #decorateResource(Resource)} with result of {@link #createResource(String, String)} from the wrapped
+	 * resource handler.
+	 * <p>
+	 * Implementors should <strong>not</strong> override this.
 	 */
 	@Override
 	public Resource createResource(String resourceName, String libraryName) {
-		return createResource(resourceName, libraryName, null);
+		if (libraryName != null && libraryName.equals(getLibraryName())) {
+			return createResourceFromLibrary(resourceName, null);
+		}
+		else {
+			return decorateResource(getWrapped().createResource(resourceName, libraryName));
+		}
 	}
 
 	/**
-	 * Delegate to the right <code>createResource()</code> method of the wrapped resource handler. Some resource handler
-	 * implementations namely doesn't implement all the three <code>createResource()</code> methods.
+	 * If library name is not null and it equals {@link #getLibraryName()}, then delegate to
+	 * {@link #createResourceFromLibrary(String, String)}, else delegate to {@link #decorateResource(Resource)} with
+	 * result of {@link #createResource(String, String, String)} from the wrapped resource handler.
+	 * <p>
+	 * Implementors should <strong>not</strong> override this.
 	 */
 	@Override
 	public Resource createResource(String resourceName, String libraryName, String contentType) {
-		switch (args) {
-			case 3: return getWrapped().createResource(resourceName, libraryName, contentType);
-			case 2: return getWrapped().createResource(resourceName, libraryName);
-			default: return getWrapped().createResource(resourceName);
+		if (libraryName != null && libraryName.equals(getLibraryName())) {
+			return createResourceFromLibrary(resourceName, contentType);
 		}
+		else {
+			return decorateResource(getWrapped().createResource(resourceName, libraryName, contentType));
+		}
+	}
+
+	/**
+	 * Returns the library name on which this resource handler implementation should listen. If a resource from
+	 * specifically this library name is requested, then {@link #createResourceFromLibrary(String, String)} will be
+	 * called to create the resource, else {@link #decorateResource(Resource)} will be called with result of the call
+	 * from the wrapped resource handler.
+	 * <p>
+	 * The default implementation returns <code>null</code>.
+	 * @return The library name on which this resource handler implementation should listen.
+	 */
+	public String getLibraryName() {
+		return null;
+	}
+
+	/**
+	 * Returns the library-specific resource in case a resource from specifically the library name as identified by
+	 * {@link #getLibraryName()} is requested.
+	 * <p>
+	 * The default implementation returns <code>null</code>.
+	 * @param resourceName The resource name.
+	 * @param contentType The content type.
+	 * @return The library-specific resource.
+	 */
+	public Resource createResourceFromLibrary(String resourceName, String contentType) {
+		return null;
+	}
+
+	/**
+	 * Decorate the given resource. This will only be called if no library-specific resource has been requested.
+	 * <p>
+	 * The default implementation just returns the given resource unmodified.
+	 * @param resource The resource to be decorated.
+	 * @return The decorated resource.
+	 */
+	public Resource decorateResource(Resource resource) {
+		return resource;
 	}
 
 	@Override

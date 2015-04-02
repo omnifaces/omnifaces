@@ -33,14 +33,14 @@ public interface ParamHolder extends ValueHolder {
 	 * Returns the name of the parameter.
 	 * @return The name of the parameter.
 	 */
-	public String getName();
+	String getName();
 
 	/**
 	 * Returns the original, unconverted value of the parameter.
 	 * @return The original, unconverted value of the parameter.
 	 */
 	@Override
-	public Object getLocalValue();
+	Object getLocalValue();
 
 	/**
 	 * Returns the converted value of the parameter. If the converter is set, or if any converter is available by
@@ -51,6 +51,6 @@ public interface ParamHolder extends ValueHolder {
 	 * @see Converter#getAsString(javax.faces.context.FacesContext, javax.faces.component.UIComponent, Object)
 	 */
 	@Override
-	public Object getValue();
+	Object getValue();
 
 }

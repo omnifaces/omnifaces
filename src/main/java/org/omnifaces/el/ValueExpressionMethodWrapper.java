@@ -55,8 +55,23 @@ public final class ValueExpressionMethodWrapper extends ValueExpression {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		return (obj instanceof ValueExpressionMethodWrapper && equals((ValueExpressionMethodWrapper) obj));
+	public boolean equals(Object object) {
+		// Basic checks.
+		if (object == this) {
+			return true;
+		}
+		if (object == null || object.getClass() != getClass()) {
+			return false;
+		}
+
+		// Property checks.
+		ValueExpressionMethodWrapper other = (ValueExpressionMethodWrapper) object;
+		if (methodExpression == null ? other.methodExpression != null : !methodExpression.equals(other.methodExpression)) {
+			return false;
+		}
+
+		// All passed.
+		return true;
 	}
 
 	@Override
@@ -67,12 +82,6 @@ public final class ValueExpressionMethodWrapper extends ValueExpression {
 	@Override
 	public boolean isLiteralText() {
 		return true;
-	}
-
-	public boolean equals(ValueExpressionMethodWrapper other) {
-		return other != null
-				&& (methodExpression != null && other.methodExpression != null && (methodExpression == other.methodExpression || methodExpression
-						.equals(other.methodExpression)));
 	}
 
 }

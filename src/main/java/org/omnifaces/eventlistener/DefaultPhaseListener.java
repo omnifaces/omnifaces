@@ -12,6 +12,10 @@
  */
 package org.omnifaces.eventlistener;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import javax.faces.event.PhaseEvent;
 import javax.faces.event.PhaseId;
 import javax.faces.event.PhaseListener;
@@ -24,7 +28,7 @@ import javax.faces.event.PhaseListener;
 public abstract class DefaultPhaseListener implements PhaseListener {
 
 	private static final long serialVersionUID = -7252366571645029385L;
-	private	PhaseId phaseId;
+	private	transient PhaseId phaseId; // PhaseId is not serializable
 
 	public DefaultPhaseListener(PhaseId phaseId) {
 		this.phaseId = phaseId;
@@ -43,6 +47,16 @@ public abstract class DefaultPhaseListener implements PhaseListener {
 	@Override
 	public void beforePhase(PhaseEvent event) {
 		// NOOP.
+	}
+
+	private void writeObject(ObjectOutputStream out) throws IOException {
+		out.defaultWriteObject();
+		out.writeInt(PhaseId.VALUES.indexOf(phaseId));
+	}
+
+	private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
+		in.defaultReadObject();
+		phaseId = PhaseId.VALUES.get(in.readInt());
 	}
 
 }

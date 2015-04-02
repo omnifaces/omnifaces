@@ -12,6 +12,8 @@
  */
 package org.omnifaces.renderer;
 
+import static org.omnifaces.util.Utils.close;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -23,7 +25,6 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.render.Renderer;
 
 import org.omnifaces.resourcehandler.CombinedResourceHandler;
-import org.omnifaces.util.Utils;
 
 /**
  * Base renderer which is to be shared between inline CSS and JS renderers.
@@ -63,7 +64,7 @@ public abstract class InlineResourceRenderer extends Renderer {
 			writeResource(reader, writer);
 		}
 		finally {
-			Utils.close(reader);
+			close(reader);
 		}
 
 		endElement(writer);

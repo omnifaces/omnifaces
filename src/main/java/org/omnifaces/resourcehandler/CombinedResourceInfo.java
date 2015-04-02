@@ -36,11 +36,13 @@ import org.omnifaces.el.functions.Converters;
 import org.omnifaces.util.Utils;
 
 /**
+ * <p>
  * This class is a wrapper which collects all combined resources and stores it in the cache. A builder has been provided
  * to create an instance of combined resource info and put it in the cache if absent.
+ *
  * @author Bauke Scholtz
  */
-final class CombinedResourceInfo {
+public final class CombinedResourceInfo {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
@@ -171,27 +173,27 @@ final class CombinedResourceInfo {
 			}
 
 			resources.add(resource);
+			URLConnection connection;
 
 			try {
-				URLConnection connection;
-
+				connection = resource.getURL().openConnection();
+			}
+			catch (Exception richFacesDoesNotSupportThis) {
 				try {
-					connection = resource.getURL().openConnection();
-				}
-				catch (Exception richFacesDoesNotSupportThis) {
 					connection = new URL(getRequestDomainURL(context) + resource.getRequestPath()).openConnection();
 				}
-
-				contentLength += connection.getContentLength();
-				long lastModified = connection.getLastModified();
-
-				if (lastModified > this.lastModified) {
-					this.lastModified = lastModified;
+				catch (IOException ignore) {
+					// Can't and shouldn't handle it at this point.
+					// It would be thrown during resource streaming anyway which is a better moment.
+					return;
 				}
 			}
-			catch (IOException e) {
-				// Can't and shouldn't handle it at this point.
-				// It would be thrown during resource streaming anyway which is a better moment.
+
+			contentLength += connection.getContentLength();
+			long resourceLastModified = connection.getLastModified();
+
+			if (resourceLastModified > lastModified) {
+				lastModified = resourceLastModified;
 			}
 		}
 	}

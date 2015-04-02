@@ -19,6 +19,8 @@ import javax.faces.component.FacesComponent;
 import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
 
+import org.omnifaces.validator.MultiFieldValidator;
+
 /**
  * <p>
  * The <code>&lt;o:validateUnique&gt;</code> validates if ALL of the given {@link UIInput} components have an unique
@@ -30,6 +32,9 @@ import javax.faces.context.FacesContext;
  * For general usage instructions, refer {@link ValidateMultipleFields} documentation.
  *
  * @author Bauke Scholtz
+ * @see ValidateMultipleFields
+ * @see ValidatorFamily
+ * @see MultiFieldValidator
  */
 @FacesComponent(ValidateUnique.COMPONENT_TYPE)
 public class ValidateUnique extends ValidateMultipleFields {

@@ -54,4 +54,14 @@ public class CachingValueExpression extends ValueExpressionWrapper {
 		return value;
 	}
 
+	@Override
+	public boolean equals(Object object) {
+		return super.equals(object) && ((name == ((CachingValueExpression) object).name) || (name != null && name.equals(((CachingValueExpression) object).name)));
+	}
+
+	@Override
+	public int hashCode() {
+		return super.hashCode() + (name != null ? name.hashCode() : 0);
+	}
+
 }

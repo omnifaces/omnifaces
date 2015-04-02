@@ -51,13 +51,13 @@ public class InlineScriptRenderer extends InlineResourceRenderer {
 
 	@Override
 	public void writeResource(Reader reader, ResponseWriter writer) throws IOException {
-		for (int c = 0; (c = reader.read()) != -1;) {
+		for (int c = reader.read(); c != -1; c = reader.read()) {
 			writer.write(c);
 
 			if (c == '<') {
 				int ch, length = 0;
 
-				while ((ch = reader.read()) != -1 && length < END_SCRIPT.length && Character.toLowerCase(ch) == END_SCRIPT[length]) {
+				for (ch = reader.read(); ch != -1 && length < END_SCRIPT.length && Character.toLowerCase(ch) == END_SCRIPT[length]; ch = reader.read()) {
 					length++;
 				}
 

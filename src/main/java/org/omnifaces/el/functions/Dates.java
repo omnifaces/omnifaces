@@ -98,10 +98,6 @@ public final class Dates {
 			return null;
 		}
 
-		if (pattern == null) {
-			throw new NullPointerException("pattern");
-		}
-
 		DateFormat formatter = new SimpleDateFormat(pattern, getLocale());
 		formatter.setTimeZone(timezone);
 		return formatter.format(date);
@@ -191,10 +187,6 @@ public final class Dates {
 	 * calendar field.
 	 */
 	private static Date add(Date date, int units, int field) {
-		if (date == null) {
-			throw new NullPointerException("date");
-		}
-
 		Calendar calendar = Calendar.getInstance();
 		calendar.clear();
 		calendar.setTime(date);
@@ -258,14 +250,6 @@ public final class Dates {
 	 * given calendar field.
 	 */
 	private static int dateDiff(Date startDate, Date endDate, int field) {
-		if (startDate == null) {
-			throw new NullPointerException("start");
-		}
-
-		if (endDate == null) {
-			throw new NullPointerException("end");
-		}
-
 		Calendar start = toUTCCalendarWithoutTime(startDate);
 		Calendar end = toUTCCalendarWithoutTime(endDate);
 		int elapsed = 0;
@@ -341,14 +325,6 @@ public final class Dates {
 	 * Helper method which calculates the time difference of the given two dates in given time unit.
 	 */
 	private static long timeDiff(Date startDate, Date endDate, TimeUnit timeUnit) {
-		if (startDate == null) {
-			throw new NullPointerException("start");
-		}
-
-		if (endDate == null) {
-			throw new NullPointerException("end");
-		}
-
 		return timeUnit.convert(endDate.getTime() - startDate.getTime(), TimeUnit.MILLISECONDS);
 	}
 
@@ -454,13 +430,13 @@ public final class Dates {
 	 */
 	private static Map<String, Integer> mapDaysOfWeek(String[] weekdays) {
 		Map<String, Integer> mapping = new LinkedHashMap<String, Integer>();
-		mapping.put(weekdays[Calendar.MONDAY], 1);
-		mapping.put(weekdays[Calendar.TUESDAY], 2);
-		mapping.put(weekdays[Calendar.WEDNESDAY], 3);
-		mapping.put(weekdays[Calendar.THURSDAY], 4);
-		mapping.put(weekdays[Calendar.FRIDAY], 5);
-		mapping.put(weekdays[Calendar.SATURDAY], 6);
-		mapping.put(weekdays[Calendar.SUNDAY], 7);
+		mapping.put(weekdays[Calendar.MONDAY], mapping.size() + 1);
+		mapping.put(weekdays[Calendar.TUESDAY], mapping.size() + 1);
+		mapping.put(weekdays[Calendar.WEDNESDAY], mapping.size() + 1);
+		mapping.put(weekdays[Calendar.THURSDAY], mapping.size() + 1);
+		mapping.put(weekdays[Calendar.FRIDAY], mapping.size() + 1);
+		mapping.put(weekdays[Calendar.SATURDAY], mapping.size() + 1);
+		mapping.put(weekdays[Calendar.SUNDAY], mapping.size() + 1);
 		return Collections.unmodifiableMap(mapping);
 	}
 

@@ -20,6 +20,8 @@ import javax.faces.component.FacesComponent;
 import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
 
+import org.omnifaces.validator.MultiFieldValidator;
+
 /**
  * <p>
  * The <code>&lt;o:validateOne&gt;</code> validates if ONLY ONE of the given {@link UIInput} components have been filled
@@ -32,6 +34,9 @@ import javax.faces.context.FacesContext;
  *
  * @author Bauke Scholtz
  * @since 1.2
+ * @see ValidateMultipleFields
+ * @see ValidatorFamily
+ * @see MultiFieldValidator
  */
 @FacesComponent(ValidateOne.COMPONENT_TYPE)
 public class ValidateOne extends ValidateMultipleFields {

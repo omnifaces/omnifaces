@@ -143,6 +143,8 @@ import javax.faces.application.ResourceHandler;
  *
  * @author Bauke Scholtz
  * @since 1.2
+ * @see RemappedResource
+ * @see DefaultResourceHandler
  */
 public class CDNResourceHandler extends DefaultResourceHandler {
 
@@ -172,10 +174,9 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Creates a new instance of this CDN resource handler which wraps the given resource handler. If the current JSF
-	 * project stage is <strong>not</strong> set to <code>Development</code>, then the CDN resources will be initialized
-	 * based on the {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_RESOURCES} context
-	 * parameter.
+	 * Creates a new instance of this CDN resource handler which wraps the given resource handler. The CDN resources
+	 * will be initialized based on the {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_RESOURCES}
+	 * context parameter.
 	 * @param wrapped The resource handler to be wrapped.
 	 * @throws IllegalArgumentException When the context parameter is missing or is in invalid format.
 	 */
@@ -192,17 +193,14 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Delegate to {@link #createResource(String, String, String)} of the wrapped resource handler. If it returns
-	 * non-<code>null</code> and the current JSF project stage is <strong>not</strong> set to <code>Development</code>,
-	 * then the properties file will be consulted if any CDN URL is available for the given resource. If there is none,
-	 * then just return the JSF default resource, otherwise return a wrapped resource whose
+	 * If the given resource is not <code>null</code> and the CDN resource handler is not (conditionally) disabled for
+	 * the current request, then the CDN resources will be consulted if any CDN URL is available for the given resource.
+	 * If there is none, then just return the JSF default resource, otherwise return a wrapped resource whose
 	 * {@link Resource#getRequestPath()} returns the CDN URL as is been set in the
 	 * {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_RESOURCES} context parameter.
 	 */
 	@Override
-	public Resource createResource(String resourceName, String libraryName, String contentType) {
-		Resource resource = super.createResource(resourceName, libraryName, contentType);
-
+	public Resource decorateResource(Resource resource) {
 		if (resource == null || (disabledParam != null && Boolean.valueOf(String.valueOf(evaluateExpressionGet(disabledParam))))) {
 			return resource;
 		}
@@ -210,6 +208,9 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 		String requestPath = null;
 
 		if (cdnResources != null) {
+			String libraryName = resource.getLibraryName();
+			String resourceName = resource.getResourceName();
+
 			requestPath = cdnResources.get(new ResourceIdentifier(libraryName, resourceName));
 
 			if (requestPath == null) {
@@ -225,14 +226,8 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 			return resource;
 		}
 
-		final String evaluatedRequestPath = evaluateExpressionGet(requestPath);
-
-		return new DefaultResource(resource) {
-			@Override
-			public String getRequestPath() {
-				return evaluatedRequestPath;
-			}
-		};
+		String evaluatedRequestPath = evaluateExpressionGet(requestPath);
+		return new RemappedResource(resource, evaluatedRequestPath);
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------

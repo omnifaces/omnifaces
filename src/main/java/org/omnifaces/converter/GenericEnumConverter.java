@@ -37,7 +37,7 @@ import javax.faces.convert.FacesConverter;
  * restrictions (e.g. JPA <code>@ElementCollection</code>, etc), then you'd need to create an explicit converter for the
  * enum type like follows:
  * <pre>
- * {@literal @}FacesConverter("roleConverter")
+ * &#64;FacesConverter("roleConverter")
  * public class RoleConverter extends EnumConverter {
  *     public RoleConverter() {
  *         super(Role.class);
@@ -55,6 +55,7 @@ import javax.faces.convert.FacesConverter;
  * to create a new enum converter every time.
  *
  * <h3>Usage</h3>
+ * <p>
  * This converter is available by converter ID <code>omnifaces.GenericEnumConverter</code>. Just specify it in the
  * <code>converter</code> attribute of the multi-selection component holding <code>&lt;f:selectItems&gt;</code>.
  * example:
@@ -111,7 +112,7 @@ public class GenericEnumConverter implements Converter {
 			return Enum.valueOf(enumType, submittedValue);
 		}
 		catch (IllegalArgumentException e) {
-			throw new ConverterException(createError(ERROR_NO_ENUM_VALUE, submittedValue, enumType));
+			throw new ConverterException(createError(ERROR_NO_ENUM_VALUE, submittedValue, enumType), e);
 		}
 	}
 

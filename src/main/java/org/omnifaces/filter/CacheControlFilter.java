@@ -16,15 +16,18 @@ import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.HOURS;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.omnifaces.util.Servlets.isFacesDevelopment;
+import static org.omnifaces.util.Servlets.isFacesResourceRequest;
 
 import java.io.IOException;
 
-import javax.faces.application.ResourceHandler;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import org.omnifaces.util.Servlets;
 
 /**
  * <p>
@@ -153,6 +156,10 @@ import javax.servlet.http.HttpSession;
  * <li><code>Pragma: no-cache</code></li>
  * </ul>
  *
+ * <h3>JSF development stage</h3>
+ * <p>To speed up development, caching by this filter is <strong>disabled</strong> when JSF project stage is set to
+ * <code>Development</code> as per {@link Servlets#isFacesDevelopment(javax.servlet.ServletContext)}.
+ *
  * @author Bauke Scholtz
  * @since 1.7
  */
@@ -192,14 +199,18 @@ public class CacheControlFilter extends HttpFilter {
 	 */
 	@Override
 	public void init() throws ServletException {
-		String expires = getInitParameter(INIT_PARAM_EXPIRES);
+		if (isFacesDevelopment(getServletContext())) {
+			return; // Don't cache during development.
+		}
 
-		if (expires != null) {
-			if (!expires.matches("[0-9]{1,9}[wdhms]?")) {
-				throw new ServletException(String.format(ERROR_EXPIRES, expires));
+		String expiresParam = getInitParameter(INIT_PARAM_EXPIRES);
+
+		if (expiresParam != null) {
+			if (!expiresParam.matches("[0-9]{1,9}[wdhms]?")) {
+				throw new ServletException(String.format(ERROR_EXPIRES, expiresParam));
 			}
 
-			String[] parts = expires.split("(?=[wdhms])");
+			String[] parts = expiresParam.split("(?=[wdhms])");
 			long number = Long.valueOf(parts[0]);
 
 			if (parts.length > 1) {
@@ -207,7 +218,7 @@ public class CacheControlFilter extends HttpFilter {
 				number = Unit.valueOf(unit.toUpperCase()).toSeconds(number);
 			}
 
-			this.expires = number;
+			expires = number;
 		}
 	}
 
@@ -219,7 +230,7 @@ public class CacheControlFilter extends HttpFilter {
 		(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain)
 			throws ServletException, IOException
 	{
-		if (!request.getRequestURI().startsWith(request.getContextPath() + ResourceHandler.RESOURCE_IDENTIFIER)) {
+		if (!isFacesResourceRequest(request)) {
 			setCacheHeaders(response, expires);
 		}
 

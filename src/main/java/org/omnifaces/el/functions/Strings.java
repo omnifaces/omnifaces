@@ -14,8 +14,6 @@ package org.omnifaces.el.functions;
 
 import static org.omnifaces.util.Faces.getLocale;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
@@ -33,10 +31,6 @@ import org.omnifaces.util.Utils;
  * @author Bauke Scholtz
  */
 public final class Strings {
-
-	// Constants ------------------------------------------------------------------------------------------------------
-
-	private static final String ERROR_UNSUPPORTED_ENCODING = "UTF-8 is apparently not supported on this machine.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -58,7 +52,7 @@ public final class Strings {
 		}
 
 		if (text.length() > size) {
-			text = text.substring(0, size).trim() + "...";
+			return text.substring(0, size).trim() + "...";
 		}
 
 		return text;
@@ -164,16 +158,7 @@ public final class Strings {
 	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
 	 */
 	public static String encodeURL(String string) {
-		if (string == null) {
-			return null;
-		}
-
-		try {
-			return URLEncoder.encode(string, "UTF-8");
-		}
-		catch (UnsupportedEncodingException e) {
-			throw new UnsupportedOperationException(ERROR_UNSUPPORTED_ENCODING);
-		}
+		return Utils.encodeURL(string);
 	}
 
 	/**
@@ -189,7 +174,7 @@ public final class Strings {
 
 	/**
 	 * Format the given string with 1 parameter. The locale is obtained by {@link Faces#getLocale()}. Design notice:
-	 * There are five formatX() methods, each taking 1 to 5 format parameters because EL functions does not support
+	 * There are five formatX() methods, each taking 1 to 5 format parameters because EL functions do not support
 	 * varargs methods nor overloaded function names.
 	 * @param pattern The format pattern.
 	 * @param param1 The first parameter.
@@ -202,7 +187,7 @@ public final class Strings {
 
 	/**
 	 * Format the given string with 2 parameters. The locale is obtained by {@link Faces#getLocale()}. Design notice:
-	 * There are five formatX() methods, each taking 1 to 5 format parameters because EL functions does not support
+	 * There are five formatX() methods, each taking 1 to 5 format parameters because EL functions do not support
 	 * varargs methods nor overloaded function names.
 	 * @param pattern The format pattern.
 	 * @param param1 The first parameter.
@@ -216,7 +201,7 @@ public final class Strings {
 
 	/**
 	 * Format the given string with 3 parameters. The locale is obtained by {@link Faces#getLocale()}. Design notice:
-	 * There are five formatX() methods, each taking 1 to 5 format parameters because EL functions does not support
+	 * There are five formatX() methods, each taking 1 to 5 format parameters because EL functions do not support
 	 * varargs methods nor overloaded function names.
 	 * @param pattern The format pattern.
 	 * @param param1 The first parameter.
@@ -231,7 +216,7 @@ public final class Strings {
 
 	/**
 	 * Format the given string with 4 parameters. The locale is obtained by {@link Faces#getLocale()}. Design notice:
-	 * There are five formatX() methods, each taking 1 to 5 format parameters because EL functions does not support
+	 * There are five formatX() methods, each taking 1 to 5 format parameters because EL functions do not support
 	 * varargs methods nor overloaded function names.
 	 * @param pattern The format pattern.
 	 * @param param1 The first parameter.
@@ -247,7 +232,7 @@ public final class Strings {
 
 	/**
 	 * Format the given string with 5 parameters. The locale is obtained by {@link Faces#getLocale()}. Design notice:
-	 * There are five formatX() methods, each taking 1 to 5 format parameters because EL functions does not support
+	 * There are five formatX() methods, each taking 1 to 5 format parameters because EL functions do not support
 	 * varargs methods nor overloaded function names.
 	 * @param pattern The format pattern.
 	 * @param param1 The first parameter.

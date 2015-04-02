@@ -106,6 +106,8 @@ import org.omnifaces.util.Hacks;
  *
  * @author Bauke Scholtz
  * @since 1.4
+ * @see RemappedResource
+ * @see DefaultResourceHandler
  */
 public class UnmappedResourceHandler extends DefaultResourceHandler {
 
@@ -122,34 +124,20 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Delegate to {@link #createResource(String, String, String)} of the wrapped resource handler. If it returns
-	 * non-<code>null</code>, then return a new instanceof {@link UnmappedResource}.
+	 * If the given resource is not <code>null</code>, then decorate it as an unmapped resource.
 	 */
 	@Override
-	public Resource createResource(String resourceName, String libraryName, String contentType) {
-		Resource resource = super.createResource(resourceName, libraryName, contentType);
+	public Resource decorateResource(Resource resource) {
+		if (resource == null) {
+			return resource;
+		}
 
-		return (resource == null) ? null : new DefaultResource(resource) {
-			@Override
-			public String getRequestPath() {
-				String path = super.getRequestPath();
-				String mapping = getMapping();
-
-				if (isPrefixMapping(mapping)) {
-					return path.replaceFirst(mapping, "");
-				}
-				else if (path.contains("?")) {
-					return path.replace(mapping + "?", "?");
-				}
-				else {
-					return path.substring(0, path.length() - mapping.length());
-				}
-			}
-		};
+		String unmappedRequestPath = unmapRequestPath(resource.getRequestPath());
+		return new RemappedResource(resource, unmappedRequestPath);
 	}
 
 	/**
-	 * Returns <code>true</code> if {@link ExternalContext#getRequestServletPath()} starts with value of
+	 * Returns <code>true</code> if {@link ExternalContext#getRequestServletPath()} equals
 	 * {@link ResourceHandler#RESOURCE_IDENTIFIER}.
 	 */
 	@Override
@@ -189,7 +177,23 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 		stream(inputStream, externalContext.getResponseOutputStream());
 	}
 
-	private Resource createResource(FacesContext context) {
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	private static String unmapRequestPath(String path) {
+		String mapping = getMapping();
+
+		if (isPrefixMapping(mapping)) {
+			return path.replaceFirst(mapping, "");
+		}
+		else if (path.contains("?")) {
+			return path.replace(mapping + "?", "?");
+		}
+		else {
+			return path.substring(0, path.length() - mapping.length());
+		}
+	}
+
+	private static Resource createResource(FacesContext context) {
 		if (Hacks.isPrimeFacesDynamicResourceRequest(context)) {
 			return null;
 		}

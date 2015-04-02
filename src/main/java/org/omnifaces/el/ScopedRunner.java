@@ -28,9 +28,9 @@ import org.omnifaces.util.Callback;
  */
 public class ScopedRunner {
 
-	FacesContext context;
-	Map<String, Object> scopedVariables;
-	Map<String, Object> previousVariables = new HashMap<String, Object>();
+	private FacesContext context;
+	private Map<String, Object> scopedVariables;
+	private Map<String, Object> previousVariables = new HashMap<String, Object>();
 
 	public ScopedRunner(FacesContext context) {
 		this(context, new HashMap<String, Object>());

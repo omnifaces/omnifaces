@@ -17,6 +17,7 @@ import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.FacesLocal.getRequestAttribute;
 import static org.omnifaces.util.FacesLocal.setRequestAttribute;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,27 +26,23 @@ import javax.faces.event.PhaseEvent;
 import javax.faces.event.PhaseId;
 import javax.faces.event.PhaseListener;
 
-import org.omnifaces.util.Events;
-
 /**
- * This phase listener picks up phase listener instances from the request scope by <code>addCallbackXxx()</code> methods
- * of the {@link Events} utility class and calls them back for each matching phase.
  * <p>
- * This differs in a few subtle ways from {@link Events#addPhaseListener(PhaseListener)}. Namely, the phase listener
- * registered here will be called via the global phase listener, which executes slightly earlier for its before phase
- * and slightly later for its after phase as compared to phase listeners attached to the view root.
+ * This phase listener picks up phase listener instances and phase event callbacks from the request scope subscribed via
+ * <code>subscribeToRequestXxxPhase()</code> methods of the {@link org.omnifaces.util.Events} utility class and calls
+ * them back for each matching phase.
  * <p>
- * Additionally, a phase listener registered via this method will not become part of the view state, but will execute
- * only once. Phase listeners attached to the view root will come back after each postback and have to be removed
- * manually (in Mojarra this can be difficult due to the fact iterators over listeners are kept 'open' during each
- * phase).
+ * This differs in a few subtle ways from <code>subscribeToViewXxxPhase()</code> methods of the
+ * {@link org.omnifaces.util.Events} class which subscribes to the view scope. Namely, this phase listener will execute
+ * slightly earlier for its before phase and slightly later for its after phase as compared to the view scoped ones.
+ * Additionally, the phase listener instances and phase event callbacks registered via this phase listener will not
+ * become part of the view state, but will execute only once during the current request instead of during every
+ * (postback) request on the same view.
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz
  * @since 1.2
- * @see Events#addCallbackPhaseListener(PhaseListener)
- * @see Events#addCallbackBeforePhaseListener(PhaseId, org.omnifaces.util.Callback.Void)
- * @see Events#addCallbackAfterPhaseListener(PhaseId, org.omnifaces.util.Callback.Void)
+ * @see org.omnifaces.util.Events
  */
 public class CallbackPhaseListener implements PhaseListener {
 
@@ -62,31 +59,15 @@ public class CallbackPhaseListener implements PhaseListener {
 
 	@Override
 	public void beforePhase(final PhaseEvent event) {
-		Set<PhaseListener> phaseListeners = getCallbackPhaseListeners(event.getFacesContext(), false);
-
-		if (phaseListeners == null) {
-			return;
-		}
-
-		for (PhaseListener phaseListener : phaseListeners) {
-			if (isPhaseMatch(event, phaseListener.getPhaseId())) {
-				phaseListener.beforePhase(event);
-			}
+		for (PhaseListener phaseListener : getCallbackPhaseListenersForEvent(event)) {
+			phaseListener.beforePhase(event);
 		}
 	}
 
 	@Override
 	public void afterPhase(PhaseEvent event) {
-		Set<PhaseListener> phaseListeners = getCallbackPhaseListeners(event.getFacesContext(), false);
-
-		if (phaseListeners == null) {
-			return;
-		}
-
-		for (PhaseListener phaseListener : phaseListeners) {
-			if (isPhaseMatch(event, phaseListener.getPhaseId())) {
-				phaseListener.afterPhase(event);
-			}
+		for (PhaseListener phaseListener : getCallbackPhaseListenersForEvent(event)) {
+			phaseListener.afterPhase(event);
 		}
 	}
 
@@ -121,6 +102,24 @@ public class CallbackPhaseListener implements PhaseListener {
 		}
 
 		return set;
+	}
+
+	private static Set<PhaseListener> getCallbackPhaseListenersForEvent(PhaseEvent event) {
+		Set<PhaseListener> phaseListeners = getCallbackPhaseListeners(event.getFacesContext(), false);
+
+		if (phaseListeners == null) {
+			return Collections.emptySet();
+		}
+
+		Set<PhaseListener> phaseListenersForEvent = new HashSet<PhaseListener>();
+
+		for (PhaseListener phaseListener : phaseListeners) {
+			if (isPhaseMatch(event, phaseListener.getPhaseId())) {
+				phaseListenersForEvent.add(phaseListener);
+			}
+		}
+
+		return Collections.unmodifiableSet(phaseListenersForEvent);
 	}
 
 	private static boolean isPhaseMatch(PhaseEvent event, PhaseId phaseId) {

@@ -83,14 +83,25 @@ public class ResourceIdentifier {
 
 	@Override
 	public boolean equals(Object object) {
-		if (this == object) return true;
-		if (object == null || getClass() != object.getClass()) return false;
+		// Basic checks.
+		if (object == this) {
+			return true;
+		}
+		if (object == null || object.getClass() != getClass()) {
+			return false;
+		}
 
+		// Property checks.
 		ResourceIdentifier other = (ResourceIdentifier) object;
-        if (library == null ? other.library != null : !library.equals(other.library)) return false;
-        if (name == null ? other.name != null : !name.equals(other.name)) return false;
+		if (library == null ? other.library != null : !library.equals(other.library)) {
+			return false;
+		}
+		if (name == null ? other.name != null : !name.equals(other.name)) {
+			return false;
+		}
 
-        return true;
+		// All passed.
+		return true;
 	}
 
 	@Override

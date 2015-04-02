@@ -49,7 +49,7 @@ public class ConditionalResponseWriter extends ResponseWriterWrapper {
 	private Map<UIComponent, Boolean> renderedReferenceCache = new HashMap<UIComponent, Boolean>();
 
 	public ConditionalResponseWriter(ResponseWriter responseWriter, FacesContext facesContext, List<String> componentIds, List<String> clientIds,
-	        boolean renderChildren) {
+			boolean renderChildren) {
 		this.responseWriter = responseWriter;
 		this.facesContext = facesContext;
 		this.componentIds = componentIds;
@@ -181,8 +181,9 @@ public class ConditionalResponseWriter extends ResponseWriterWrapper {
 
 	@Override
 	public void write(char[] cbuf) throws IOException {
-		// TODO Auto-generated method stub
-		super.write(cbuf);
+		if (isForRenderedComponent()) {
+			super.write(cbuf);
+		}
 	}
 
 	@Override
@@ -219,7 +220,8 @@ public class ConditionalResponseWriter extends ResponseWriterWrapper {
 
 		// Check if a rendering decision already made for this component by checking the cache
 		if (renderedIdCache.containsKey(currentComponent.getClientId())) {
-			return lastRendered = renderedIdCache.get(currentComponent.getClientId());
+			lastRendered = renderedIdCache.get(currentComponent.getClientId());
+			return lastRendered;
 		}
 
 		// No decision made, check for an explicit id match

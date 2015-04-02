@@ -13,6 +13,9 @@
 package org.omnifaces.util;
 
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
+import static org.omnifaces.util.Servlets.prepareRedirectURL;
+import static org.omnifaces.util.Utils.encodeURL;
+import static org.omnifaces.util.Utils.isAnyEmpty;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -29,10 +32,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.el.ELContext;
+import javax.el.ELResolver;
 import javax.el.ValueExpression;
 import javax.faces.application.Application;
 import javax.faces.application.ProjectStage;
@@ -96,6 +101,7 @@ import org.omnifaces.component.ParamHolder;
  * @author Arjan Tijms
  * @author Bauke Scholtz
  * @since 1.6
+ * @see Servlets
  */
 public final class FacesLocal {
 
@@ -120,7 +126,7 @@ public final class FacesLocal {
 	// JSF general ----------------------------------------------------------------------------------------------------
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getServerInfo()
 	 */
 	public static String getServerInfo(FacesContext context) {
@@ -128,7 +134,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#isDevelopment()
 	 */
 	public static boolean isDevelopment(FacesContext context) {
@@ -136,7 +142,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getMapping()
 	 */
 	public static String getMapping(FacesContext context) {
@@ -152,7 +158,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#isPrefixMapping()
 	 */
 	public static boolean isPrefixMapping(FacesContext context) {
@@ -160,7 +166,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#evaluateExpressionGet(String)
 	 */
 	@SuppressWarnings("unchecked")
@@ -173,18 +179,37 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#evaluateExpressionSet(String, Object)
 	 */
 	public static void evaluateExpressionSet(FacesContext context, String expression, Object value) {
 		ELContext elContext = context.getELContext();
 		ValueExpression valueExpression = context.getApplication().getExpressionFactory()
-		    .createValueExpression(elContext, expression, Object.class);
+			.createValueExpression(elContext, expression, Object.class);
 		valueExpression.setValue(elContext, value);
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
+	 * @see Faces#resolveExpressionGet(Object, String)
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T resolveExpressionGet(FacesContext context, Object base, String property) {
+		ELResolver elResolver = context.getApplication().getELResolver();
+		return (T) elResolver.getValue(context.getELContext(), base, property);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Faces#resolveExpressionSet(Object, String, Object)
+	 */
+	public static void resolveExpressionSet(FacesContext context, Object base, String property, Object value) {
+		ELResolver elResolver = context.getApplication().getELResolver();
+		elResolver.setValue(context.getELContext(), base, property, value);
+	}
+
+	/**
+	 * {@inheritDoc}
 	 * @see Faces#getContextAttribute(String)
 	 */
 	@SuppressWarnings("unchecked")
@@ -193,7 +218,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#setContextAttribute(String, Object)
 	 */
 	public static void setContextAttribute(FacesContext context, String name, Object value) {
@@ -203,7 +228,7 @@ public final class FacesLocal {
 	// JSF views ------------------------------------------------------------------------------------------------------
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#setViewRoot(String)
 	 */
 	public static void setViewRoot(FacesContext context, String viewId) {
@@ -211,7 +236,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getViewId()
 	 */
 	public static String getViewId(FacesContext context) {
@@ -220,17 +245,17 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getViewDeclarationLanguage()
 	 */
 	public static ViewDeclarationLanguage getViewDeclarationLanguage(FacesContext context) {
 		return context.getApplication()
-                	  .getViewHandler()
-                	  .getViewDeclarationLanguage(context, context.getViewRoot().getViewId());
+					  .getViewHandler()
+					  .getViewDeclarationLanguage(context, context.getViewRoot().getViewId());
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#normalizeViewId(String)
 	 */
 	public static String normalizeViewId(FacesContext context, String path) {
@@ -250,7 +275,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getViewParameters()
 	 */
 	public static Collection<UIViewParameter> getViewParameters(FacesContext context) {
@@ -259,7 +284,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getViewParameterMap()
 	 */
 	public static Map<String, List<String>> getViewParameterMap(FacesContext context) {
@@ -285,7 +310,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getMetadataAttributes(String)
 	 */
 	public static Map<String, Object> getMetadataAttributes(FacesContext context, String viewId) {
@@ -299,7 +324,15 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
+	 * @see Faces#getMetadataAttributes()
+	 */
+	public static Map<String, Object> getMetadataAttributes(FacesContext context) {
+		return context.getViewRoot().getAttributes();
+	}
+
+	/**
+	 * {@inheritDoc}
 	 * @see Faces#getMetadataAttribute(String, String)
 	 */
 	@SuppressWarnings("unchecked")
@@ -308,16 +341,16 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getMetadataAttribute(String)
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T getMetadataAttribute(FacesContext context, String name) {
-		return (T) context.getViewRoot().getAttributes().get(name);
+		return (T) getMetadataAttributes(context).get(name);
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getLocale()
 	 */
 	public static Locale getLocale(FacesContext context) {
@@ -352,7 +385,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getDefaultLocale()
 	 */
 	public static Locale getDefaultLocale(FacesContext context) {
@@ -360,7 +393,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getSupportedLocales()
 	 */
 	public static List<Locale> getSupportedLocales(FacesContext context) {
@@ -384,7 +417,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#setLocale(Locale)
 	 */
 	public static void setLocale(FacesContext context, Locale locale) {
@@ -398,7 +431,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getMessageBundle()
 	 */
 	public static ResourceBundle getMessageBundle(FacesContext context) {
@@ -412,7 +445,15 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
+	 * @see Faces#getResourceBundle(String)
+	 */
+	public static ResourceBundle getResourceBundle(FacesContext context, String var) {
+		return context.getApplication().getResourceBundle(context, var);
+	}
+
+	/**
+	 * {@inheritDoc}
 	 * @see Faces#navigate(String)
 	 */
 	public static void navigate(FacesContext context, String outcome) {
@@ -420,7 +461,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getBookmarkableURL(Map, boolean)
 	 */
 	public static String getBookmarkableURL
@@ -436,21 +477,29 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getBookmarkableURL(String, Map, boolean)
 	 */
 	public static String getBookmarkableURL
 		(FacesContext context, String viewId, Map<String, List<String>> params, boolean includeViewParams)
 	{
-		return context.getApplication().getViewHandler().getBookmarkableURL(context, viewId, params, includeViewParams);
+		Map<String, List<String>> map = new HashMap<String, List<String>>();
+
+		if (params != null) {
+			for (Entry<String, List<String>> param : params.entrySet()) {
+				addParamToMapIfNecessary(map, param.getKey(), param.getValue());
+			}
+		}
+
+		return context.getApplication().getViewHandler().getBookmarkableURL(context, viewId, map, includeViewParams);
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getBookmarkableURL(Collection, boolean)
 	 */
 	public static String getBookmarkableURL
-		(FacesContext context, Collection<ParamHolder> params, boolean includeViewParams)
+		(FacesContext context, Collection<? extends ParamHolder> params, boolean includeViewParams)
 	{
 		String viewId = getViewId(context);
 
@@ -462,44 +511,60 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getBookmarkableURL(String, Collection, boolean)
 	 */
 	public static String getBookmarkableURL
-		(FacesContext context, String viewId, Collection<ParamHolder> params, boolean includeViewParams)
+		(FacesContext context, String viewId, Collection<? extends ParamHolder> params, boolean includeViewParams)
 	{
-		Map<String, List<String>> convertedParams = new HashMap<String, List<String>>();
+		Map<String, List<String>> map = new HashMap<String, List<String>>();
 
-		for (ParamHolder param : params) {
-			Object value = param.getValue();
-			convertedParams.put(param.getName(), Collections.singletonList(value != null ? value.toString() : ""));
+		if (params != null) {
+			for (ParamHolder param : params) {
+				addParamToMapIfNecessary(map, param.getName(), param.getValue());
+			}
 		}
 
-		return getBookmarkableURL(context, viewId, convertedParams, includeViewParams);
+		return context.getApplication().getViewHandler().getBookmarkableURL(context, viewId, map, includeViewParams);
+	}
+
+	private static void addParamToMapIfNecessary(Map<String, List<String>> map, String name, Object value) {
+		if (isAnyEmpty(name, value)) {
+			return;
+		}
+
+		List<String> values = map.get(name);
+
+		if (values == null) {
+			values = new ArrayList<String>(1);
+			map.put(name, values);
+		}
+
+		values.add(value.toString());
 	}
 
 	// Facelets -------------------------------------------------------------------------------------------------------
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getFaceletContext()
 	 */
 	public static FaceletContext getFaceletContext(FacesContext context) {
-	    Map<Object, Object> contextAttributes = context.getAttributes();
+		Map<Object, Object> contextAttributes = context.getAttributes();
 
-	    for (String key : FACELET_CONTEXT_KEYS) {
+		for (String key : FACELET_CONTEXT_KEYS) {
 			FaceletContext faceletContext = (FaceletContext) contextAttributes.get(key);
 
 			if (faceletContext != null) {
 				return faceletContext;
 			}
-	    }
+		}
 
-	    return null;
+		return null;
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getFaceletAttribute(String)
 	 */
 	@SuppressWarnings("unchecked")
@@ -508,7 +573,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#setFaceletAttribute(String, Object)
 	 */
 	public static void setFaceletAttribute(FacesContext context, String name, Object value) {
@@ -518,7 +583,7 @@ public final class FacesLocal {
 	// HTTP request ---------------------------------------------------------------------------------------------------
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRequest()
 	 */
 	public static HttpServletRequest getRequest(FacesContext context) {
@@ -526,7 +591,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#isAjaxRequest()
 	 */
 	public static boolean isAjaxRequest(FacesContext context) {
@@ -534,7 +599,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRequestParameterMap()
 	 */
 	public static Map<String, String> getRequestParameterMap(FacesContext context) {
@@ -542,7 +607,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRequestParameter(String)
 	 */
 	public static String getRequestParameter(FacesContext context, String name) {
@@ -550,7 +615,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRequestParameterValuesMap()
 	 */
 	public static Map<String, String[]> getRequestParameterValuesMap(FacesContext context) {
@@ -558,7 +623,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRequestParameterValues(String)
 	 */
 	public static String[] getRequestParameterValues(FacesContext context, String name) {
@@ -566,7 +631,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRequestHeaderMap()
 	 */
 	public static Map<String, String> getRequestHeaderMap(FacesContext context) {
@@ -574,7 +639,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRequestHeader(String)
 	 */
 	public static String getRequestHeader(FacesContext context, String name) {
@@ -582,7 +647,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRequestHeaderValuesMap()
 	 */
 	public static Map<String, String[]> getRequestHeaderValuesMap(FacesContext context) {
@@ -590,7 +655,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRequestHeaderValues(String)
 	 */
 	public static String[] getRequestHeaderValues(FacesContext context, String name) {
@@ -598,7 +663,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRequestContextPath()
 	 */
 	public static String getRequestContextPath(FacesContext context) {
@@ -606,7 +671,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRequestServletPath()
 	 */
 	public static String getRequestServletPath(FacesContext context) {
@@ -614,7 +679,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRequestPathInfo()
 	 */
 	public static String getRequestPathInfo(FacesContext context) {
@@ -622,7 +687,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRequestHostname()
 	 */
 	public static String getRequestHostname(FacesContext context) {
@@ -630,7 +695,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRequestBaseURL()
 	 */
 	public static String getRequestBaseURL(FacesContext context) {
@@ -638,7 +703,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRequestDomainURL()
 	 */
 	public static String getRequestDomainURL(FacesContext context) {
@@ -646,7 +711,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRequestURL()
 	 */
 	public static String getRequestURL(FacesContext context) {
@@ -654,7 +719,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRequestURI()
 	 */
 	public static String getRequestURI(FacesContext context) {
@@ -662,7 +727,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRequestQueryString()
 	 */
 	public static String getRequestQueryString(FacesContext context) {
@@ -670,7 +735,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRequestQueryStringMap()
 	 */
 	public static Map<String, List<String>> getRequestQueryStringMap(FacesContext context) {
@@ -678,7 +743,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRequestURLWithQueryString()
 	 */
 	public static String getRequestURLWithQueryString(FacesContext context) {
@@ -686,7 +751,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRequestURIWithQueryString()
 	 */
 	public static String getRequestURIWithQueryString(FacesContext context) {
@@ -694,7 +759,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getForwardRequestURI()
 	 */
 	public static String getForwardRequestURI(FacesContext context) {
@@ -702,7 +767,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getForwardRequestQueryString()
 	 */
 	public static String getForwardRequestQueryString(FacesContext context) {
@@ -710,7 +775,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getForwardRequestURIWithQueryString()
 	 */
 	public static String getForwardRequestURIWithQueryString(FacesContext context) {
@@ -718,7 +783,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRemoteAddr()
 	 */
 	public static String getRemoteAddr(FacesContext context) {
@@ -734,7 +799,7 @@ public final class FacesLocal {
 	// HTTP response --------------------------------------------------------------------------------------------------
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getResponse()
 	 */
 	public static HttpServletResponse getResponse(FacesContext context) {
@@ -742,7 +807,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getResponseBufferSize()
 	 */
 	public static int getResponseBufferSize(FacesContext context) {
@@ -750,7 +815,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getResponseCharacterEncoding()
 	 */
 	public static String getResponseCharacterEncoding(FacesContext context) {
@@ -758,7 +823,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#setResponseStatus(int)
 	 */
 	public static void setResponseStatus(FacesContext context, int status) {
@@ -766,69 +831,30 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#redirect(String, String...)
 	 */
 	public static void redirect(FacesContext context, String url, String... paramValues) throws IOException {
-		String normalizedURL = normalizeRedirectURL(context, url);
-		Object[] params = encodeURLParams(paramValues);
-		String redirectURL = (params.length == 0) ? normalizedURL : String.format(normalizedURL, params);
-
 		ExternalContext externalContext = context.getExternalContext();
 		externalContext.getFlash().setRedirect(true);
-		externalContext.redirect(redirectURL);
+		externalContext.redirect(prepareRedirectURL(getRequest(context), url, paramValues));
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#redirectPermanent(String, String...)
 	 */
 	public static void redirectPermanent(FacesContext context, String url, String... paramValues) {
-		String normalizedURL = normalizeRedirectURL(context, url);
-		Object[] params = encodeURLParams(paramValues);
-		String redirectURL = (params.length == 0) ? normalizedURL : String.format(normalizedURL, params);
-
 		ExternalContext externalContext = context.getExternalContext();
 		externalContext.getFlash().setRedirect(true);
 		externalContext.setResponseStatus(SC_MOVED_PERMANENTLY);
-		externalContext.setResponseHeader("Location", redirectURL);
+		externalContext.setResponseHeader("Location", prepareRedirectURL(getRequest(context), url, paramValues));
 		externalContext.setResponseHeader("Connection", "close");
 		context.responseComplete();
 	}
 
 	/**
-	 * Helper method to normalize the given URL for a redirect. If the given URL does not start with
-	 * <code>http://</code>, <code>https://</code> or <code>/</code>, then the request context path will be prepended,
-	 * otherwise it will be unmodified.
-	 */
-	private static String normalizeRedirectURL(FacesContext context, String url) {
-		if (!url.startsWith("http://") && !url.startsWith("https://") && !url.startsWith("/")) {
-			url = getRequestContextPath(context) + "/" + url;
-		}
-
-		return url;
-	}
-
-	/**
-	 * Helper method to encode the given URL parameters using UTF-8.
-	 */
-	private static Object[] encodeURLParams(String... params) {
-		if (params == null) {
-			return new Object[0];
-		}
-		else {
-			Object[] encodedParams = new Object[params.length];
-
-			for (int i = 0; i < params.length; i++) {
-				encodedParams[i] = Utils.encodeURL(params[i]);
-			}
-
-			return encodedParams;
-		}
-	}
-
-	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#responseSendError(int, String)
 	 */
 	public static void responseSendError(FacesContext context, int status, String message) throws IOException {
@@ -847,7 +873,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#addResponseHeader(String, String)
 	 */
 	public static void addResponseHeader(FacesContext context, String name, String value) {
@@ -855,7 +881,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#isResponseCommitted()
 	 */
 	public static boolean isResponseCommitted(FacesContext context) {
@@ -863,7 +889,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#responseReset()
 	 */
 	public static void responseReset(FacesContext context) {
@@ -871,7 +897,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#isRenderResponse()
 	 */
 	public static boolean isRenderResponse(FacesContext context) {
@@ -881,7 +907,7 @@ public final class FacesLocal {
 	// FORM based authentication --------------------------------------------------------------------------------------
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#login(String, String)
 	 */
 	public static void login(FacesContext context, String username, String password) throws ServletException {
@@ -889,7 +915,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#authenticate()
 	 */
 	public static boolean authenticate(FacesContext context) throws ServletException, IOException {
@@ -897,7 +923,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#logout()
 	 */
 	public static void logout(FacesContext context) throws ServletException {
@@ -905,7 +931,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRemoteUser()
 	 */
 	public static String getRemoteUser(FacesContext context) {
@@ -913,7 +939,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#isUserInRole(String)
 	 */
 	public static boolean isUserInRole(FacesContext context, String role) {
@@ -923,7 +949,7 @@ public final class FacesLocal {
 	// HTTP cookies ---------------------------------------------------------------------------------------------------
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRequestCookie(String)
 	 */
 	public static String getRequestCookie(FacesContext context, String name) {
@@ -932,7 +958,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#addResponseCookie(String, String, int)
 	 */
 	public static void addResponseCookie(FacesContext context, String name, String value, int maxAge) {
@@ -940,7 +966,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#addResponseCookie(String, String, String, int)
 	 */
 	public static void addResponseCookie(FacesContext context, String name, String value, String path, int maxAge) {
@@ -948,14 +974,10 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#addResponseCookie(String, String, String, String, int)
 	 */
 	public static void addResponseCookie(FacesContext context, String name, String value, String domain, String path, int maxAge) {
-		if (value != null) {
-			value = Utils.encodeURL(value);
-		}
-
 		ExternalContext externalContext = context.getExternalContext();
 		Map<String, Object> properties = new HashMap<String, Object>();
 
@@ -969,11 +991,11 @@ public final class FacesLocal {
 
 		properties.put("maxAge", maxAge);
 		properties.put("secure", ((HttpServletRequest) externalContext.getRequest()).isSecure());
-		externalContext.addResponseCookie(name, value, properties);
+		externalContext.addResponseCookie(name, encodeURL(value), properties);
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#removeResponseCookie(String, String)
 	 */
 	public static void removeResponseCookie(FacesContext context, String name, String path) {
@@ -983,7 +1005,7 @@ public final class FacesLocal {
 	// HTTP session ---------------------------------------------------------------------------------------------------
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getSession()
 	 */
 	public static HttpSession getSession(FacesContext context) {
@@ -991,7 +1013,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getSession(boolean)
 	 */
 	public static HttpSession getSession(FacesContext context, boolean create) {
@@ -999,7 +1021,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getSessionId()
 	 */
 	public static String getSessionId(FacesContext context) {
@@ -1008,7 +1030,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#invalidateSession()
 	 */
 	public static void invalidateSession(FacesContext context) {
@@ -1016,7 +1038,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#hasSession()
 	 */
 	public static boolean hasSession(FacesContext context) {
@@ -1024,7 +1046,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#isSessionNew()
 	 */
 	public static boolean isSessionNew(FacesContext context) {
@@ -1033,7 +1055,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getSessionCreationTime()
 	 */
 	public static long getSessionCreationTime(FacesContext context) {
@@ -1041,7 +1063,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getSessionLastAccessedTime()
 	 */
 	public static long getSessionLastAccessedTime(FacesContext context) {
@@ -1049,7 +1071,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getSessionMaxInactiveInterval()
 	 */
 	public static int getSessionMaxInactiveInterval(FacesContext context) {
@@ -1058,7 +1080,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#setSessionMaxInactiveInterval(int)
 	 */
 	public static void setSessionMaxInactiveInterval(FacesContext context, int seconds) {
@@ -1067,7 +1089,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#hasSessionTimedOut()
 	 */
 	public static boolean hasSessionTimedOut(FacesContext context) {
@@ -1078,7 +1100,7 @@ public final class FacesLocal {
 	// Servlet context ------------------------------------------------------------------------------------------------
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getServletContext()
 	 */
 	public static ServletContext getServletContext(FacesContext context) {
@@ -1086,7 +1108,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getInitParameterMap()
 	 */
 	@SuppressWarnings("unchecked")
@@ -1095,7 +1117,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getInitParameter(String)
 	 */
 	public static String getInitParameter(FacesContext context, String name) {
@@ -1103,7 +1125,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getMimeType(String)
 	 */
 	public static String getMimeType(FacesContext context, String name) {
@@ -1117,7 +1139,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getResource(String)
 	 */
 	public static URL getResource(FacesContext context, String path) throws MalformedURLException {
@@ -1125,7 +1147,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getResourceAsStream(String)
 	 */
 	public static InputStream getResourceAsStream(FacesContext context, String path) {
@@ -1133,7 +1155,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getResourcePaths(String)
 	 */
 	public static Set<String> getResourcePaths(FacesContext context, String path) {
@@ -1141,7 +1163,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRealPath(String)
 	 */
 	public static String getRealPath(FacesContext context, String webContentPath) {
@@ -1151,7 +1173,7 @@ public final class FacesLocal {
 	// Request scope --------------------------------------------------------------------------------------------------
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRequestMap()
 	 */
 	public static Map<String, Object> getRequestMap(FacesContext context) {
@@ -1159,7 +1181,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getRequestAttribute(String)
 	 */
 	@SuppressWarnings("unchecked")
@@ -1168,7 +1190,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#setRequestAttribute(String, Object)
 	 */
 	public static void setRequestAttribute(FacesContext context, String name, Object value) {
@@ -1176,7 +1198,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#removeRequestAttribute(String)
 	 */
 	@SuppressWarnings("unchecked")
@@ -1187,7 +1209,7 @@ public final class FacesLocal {
 	// Flash scope ----------------------------------------------------------------------------------------------------
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getFlash()
 	 */
 	public static Flash getFlash(FacesContext context) {
@@ -1195,7 +1217,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getFlashAttribute(String)
 	 */
 	@SuppressWarnings("unchecked")
@@ -1204,7 +1226,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#setFlashAttribute(String, Object)
 	 */
 	public static void setFlashAttribute(FacesContext context, String name, Object value) {
@@ -1212,7 +1234,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#removeFlashAttribute(String)
 	 */
 	@SuppressWarnings("unchecked")
@@ -1223,7 +1245,7 @@ public final class FacesLocal {
 	// View scope -----------------------------------------------------------------------------------------------------
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getViewMap()
 	 */
 	public static Map<String, Object> getViewMap(FacesContext context) {
@@ -1231,7 +1253,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getViewAttribute(String)
 	 */
 	@SuppressWarnings("unchecked")
@@ -1240,7 +1262,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#setViewAttribute(String, Object)
 	 */
 	public static void setViewAttribute(FacesContext context, String name, Object value) {
@@ -1248,7 +1270,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#removeViewAttribute(String)
 	 */
 	@SuppressWarnings("unchecked")
@@ -1259,7 +1281,7 @@ public final class FacesLocal {
 	// Session scope --------------------------------------------------------------------------------------------------
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getSessionMap()
 	 */
 	public static Map<String, Object> getSessionMap(FacesContext context) {
@@ -1267,7 +1289,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getSessionAttribute(String)
 	 */
 	@SuppressWarnings("unchecked")
@@ -1276,7 +1298,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#setSessionAttribute(String, Object)
 	 */
 	public static void setSessionAttribute(FacesContext context, String name, Object value) {
@@ -1284,7 +1306,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#removeSessionAttribute(String)
 	 */
 	@SuppressWarnings("unchecked")
@@ -1295,7 +1317,7 @@ public final class FacesLocal {
 	// Application scope ----------------------------------------------------------------------------------------------
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getApplicationMap()
 	 */
 	public static Map<String, Object> getApplicationMap(FacesContext context) {
@@ -1303,7 +1325,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#getApplicationAttribute(String)
 	 */
 	@SuppressWarnings("unchecked")
@@ -1312,7 +1334,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#setApplicationAttribute(String, Object)
 	 */
 	public static void setApplicationAttribute(FacesContext context, String name, Object value) {
@@ -1320,7 +1342,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#removeApplicationAttribute(String)
 	 */
 	@SuppressWarnings("unchecked")
@@ -1331,7 +1353,7 @@ public final class FacesLocal {
 	// File download --------------------------------------------------------------------------------------------------
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#sendFile(File, boolean)
 	 */
 	public static void sendFile(FacesContext context, File file, boolean attachment) throws IOException {
@@ -1339,7 +1361,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#sendFile(byte[], String, boolean)
 	 */
 	public static void sendFile(FacesContext context, byte[] content, String filename, boolean attachment)
@@ -1349,7 +1371,7 @@ public final class FacesLocal {
 	}
 
 	/**
-     * {@inheritDoc}
+	 * {@inheritDoc}
 	 * @see Faces#sendFile(InputStream, String, boolean)
 	 */
 	public static void sendFile(FacesContext context, InputStream content, String filename, boolean attachment)
@@ -1377,7 +1399,7 @@ public final class FacesLocal {
 		externalContext.setResponseBufferSize(DEFAULT_SENDFILE_BUFFER_SIZE);
 		externalContext.setResponseContentType(getMimeType(context, filename));
 		externalContext.setResponseHeader("Content-Disposition", String.format(SENDFILE_HEADER,
-			(attachment ? "attachment" : "inline"), Utils.encodeURL(filename)));
+			(attachment ? "attachment" : "inline"), encodeURL(filename)));
 
 		// Not exactly mandatory, but this fixes at least a MSIE quirk: http://support.microsoft.com/kb/316431
 		if (((HttpServletRequest) externalContext.getRequest()).isSecure()) {

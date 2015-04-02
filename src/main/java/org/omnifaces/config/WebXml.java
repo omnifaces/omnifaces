@@ -14,16 +14,16 @@ package org.omnifaces.config;
 
 import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.Faces.hasContext;
-import static org.omnifaces.util.Utils.close;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isNumber;
+import static org.omnifaces.util.Xml.createDocument;
+import static org.omnifaces.util.Xml.getNodeList;
+import static org.omnifaces.util.Xml.getTextContent;
 
-import java.io.InputStream;
+import java.io.IOException;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -39,16 +39,15 @@ import javax.faces.webapp.FacesServlet;
 import javax.servlet.Filter;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextListener;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * <p>
@@ -121,9 +120,9 @@ public enum WebXml {
 	private static final String XPATH_ERROR_PAGE_DEFAULT_LOCATION =
 		"error-page[not(error-code) and not(exception-type)]/location";
 	private static final String XPATH_FORM_LOGIN_PAGE =
-			"login-config[auth-method='FORM']/form-login-config/form-login-page";
+		"login-config[auth-method='FORM']/form-login-config/form-login-page";
 	private static final String XPATH_FORM_ERROR_PAGE =
-			"login-config[auth-method='FORM']/form-login-config/form-error-page";
+		"login-config[auth-method='FORM']/form-login-config/form-error-page";
 	private static final String XPATH_SECURITY_CONSTRAINT =
 		"security-constraint";
 	private static final String XPATH_WEB_RESOURCE_URL_PATTERN =
@@ -144,7 +143,7 @@ public enum WebXml {
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
-	private AtomicBoolean initialized = new AtomicBoolean();
+	private final AtomicBoolean initialized = new AtomicBoolean();
 	private List<String> welcomeFiles;
 	private Map<Class<Throwable>, String> errorPageLocations;
 	private String formLoginPage;
@@ -183,7 +182,7 @@ public enum WebXml {
 			catch (Exception e) {
 				initialized.set(false);
 				logger.log(Level.SEVERE, LOG_INITIALIZATION_ERROR, e);
-				throw new RuntimeException(e);
+				throw new UnsupportedOperationException(e);
 			}
 		}
 
@@ -206,7 +205,7 @@ public enum WebXml {
 	 * @return The right error page location for the given exception.
 	 */
 	public String findErrorPageLocation(Throwable exception) {
-		Map<Class<Throwable>, String> errorPageLocations = getErrorPageLocations();
+		checkInitialized();
 
 		for (Entry<Class<Throwable>, String> entry : errorPageLocations.entrySet()) {
 			if (entry.getKey() == exception.getClass()) {
@@ -242,46 +241,70 @@ public enum WebXml {
 	 * @since 1.4
 	 */
 	public boolean isAccessAllowed(String url, String role) {
-		Map<String, Set<String>> securityConstraints = getSecurityConstraints();
+		checkInitialized();
 
 		if (url.charAt(0) != ('/')) {
 			throw new IllegalArgumentException(String.format(ERROR_URL_MUST_START_WITH_SLASH, url));
 		}
 
+		String uri = url;
+
 		if (url.length() > 1 && url.charAt(url.length() - 1) == '/') {
-			url = url.substring(0, url.length() - 1); // Trim trailing slash.
+			uri = url.substring(0, url.length() - 1); // Trim trailing slash.
 		}
 
+		Set<String> roles = findExactMatchRoles(uri);
+
+		if (roles == null) {
+			roles = findPrefixMatchRoles(uri);
+		}
+
+		if (roles == null) {
+			roles = findSuffixMatchRoles(uri);
+		}
+
+		return isRoleMatch(roles, role);
+	}
+
+	private Set<String> findExactMatchRoles(String url) {
 		for (Entry<String, Set<String>> entry : securityConstraints.entrySet()) {
 			if (isExactMatch(entry.getKey(), url)) {
-				return isRoleMatch(entry.getValue(), role);
+				return entry.getValue();
 			}
 		}
 
+		return null;
+	}
+
+	private Set<String> findPrefixMatchRoles(String url) {
 		for (String path = url, urlMatch = ""; !path.isEmpty(); path = path.substring(0, path.lastIndexOf('/'))) {
-			Boolean roleMatch = null;
+			Set<String> roles = null;
 
 			for (Entry<String, Set<String>> entry : securityConstraints.entrySet()) {
 				if (urlMatch.length() < entry.getKey().length() && isPrefixMatch(entry.getKey(), path)) {
 					urlMatch = entry.getKey();
-					roleMatch = isRoleMatch(entry.getValue(), role);
+					roles = entry.getValue();
 				}
 			}
 
-			if (roleMatch != null) {
-				return roleMatch;
+			if (roles != null) {
+				return roles;
 			}
 		}
 
+		return null;
+	}
+
+	private Set<String> findSuffixMatchRoles(String url) {
 		if (url.contains(".")) {
 			for (Entry<String, Set<String>> entry : securityConstraints.entrySet()) {
 				if (isSuffixMatch(url, entry.getKey())) {
-					return isRoleMatch(entry.getValue(), role);
+					return entry.getValue();
 				}
 			}
 		}
 
-		return true;
+		return null;
 	}
 
 	private static boolean isExactMatch(String urlPattern, String url) {
@@ -382,65 +405,17 @@ public enum WebXml {
 	 * Load, merge and return all <code>web.xml</code> and <code>web-fragment.xml</code> files found in the classpath
 	 * into a single {@link Document}.
 	 */
-	private static Document loadWebXml(ServletContext context) throws Exception {
-		DocumentBuilder builder = createDocumentBuilder();
-		Document document = builder.newDocument();
-		document.appendChild(document.createElement("web"));
-		URL url = context.getResource(WEB_XML);
-
-		if (url != null) { // Since Servlet 3.0, web.xml is optional.
-			parseAndAppendChildren(url, builder, document);
-		}
-
-		if (context.getMajorVersion() >= 3) { // web-fragment.xml exist only since Servlet 3.0.
-			Enumeration<URL> urls = Thread.currentThread().getContextClassLoader().getResources(WEB_FRAGMENT_XML);
-
-			while (urls.hasMoreElements()) {
-				parseAndAppendChildren(urls.nextElement(), builder, document);
-			}
-		}
-
-		return document;
-	}
-
-	/**
-	 * Returns an instance of {@link DocumentBuilder} which doesn't validate, nor is namespace aware nor expands entity
-	 * references (to keep it as lenient as possible).
-	 */
-	private static DocumentBuilder createDocumentBuilder() throws Exception {
-		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		factory.setValidating(false);
-		factory.setNamespaceAware(false);
-		factory.setExpandEntityReferences(false);
-		return factory.newDocumentBuilder();
-	}
-
-	/**
-	 * Parse the given URL as a document using the given builder and then append all its child nodes to the given
-	 * document.
-	 */
-	private static void parseAndAppendChildren(URL url, DocumentBuilder builder, Document document) throws Exception {
-		URLConnection connection = url.openConnection();
-		connection.setUseCaches(false);
-		InputStream input = null;
-
-		try {
-			input = connection.getInputStream();
-			NodeList children = builder.parse(input).getDocumentElement().getChildNodes();
-
-			for (int i = 0; i < children.getLength(); i++) {
-				document.getDocumentElement().appendChild(document.importNode(children.item(i), true));
-			}
-		}
-		finally {
-			close(input);
-		}
+	private static Document loadWebXml(ServletContext context) throws IOException, SAXException {
+		List<URL> webXmlURLs = new ArrayList<URL>();
+		webXmlURLs.add(context.getResource(WEB_XML));
+		webXmlURLs.addAll(Collections.list(Thread.currentThread().getContextClassLoader().getResources(WEB_FRAGMENT_XML)));
+		return createDocument(webXmlURLs);
 	}
 
 	/**
 	 * Create and return a list of all welcome files.
 	 */
-	private static List<String> parseWelcomeFiles(Element webXml, XPath xpath) throws Exception {
+	private static List<String> parseWelcomeFiles(Element webXml, XPath xpath) throws XPathExpressionException {
 		NodeList welcomeFileList = getNodeList(webXml, xpath, XPATH_WELCOME_FILE);
 		List<String> welcomeFiles = new ArrayList<String>(welcomeFileList.getLength());
 
@@ -453,9 +428,10 @@ public enum WebXml {
 
 	/**
 	 * Create and return a mapping of all error page locations by exception type found in the given document.
+	 * @throws ClassNotFoundException
 	 */
 	@SuppressWarnings("unchecked") // For the cast on Class<Throwable>.
-	private static Map<Class<Throwable>, String> parseErrorPageLocations(Element webXml, XPath xpath) throws Exception {
+	private static Map<Class<Throwable>, String> parseErrorPageLocations(Element webXml, XPath xpath) throws XPathExpressionException, ClassNotFoundException {
 		Map<Class<Throwable>, String> errorPageLocations = new LinkedHashMap<Class<Throwable>, String>();
 		NodeList exceptionTypes = getNodeList(webXml, xpath, XPATH_EXCEPTION_TYPE);
 
@@ -488,7 +464,7 @@ public enum WebXml {
 	/**
 	 * Return the location of the FORM authentication login page.
 	 */
-	private static String parseFormLoginPage(Element webXml, XPath xpath) throws Exception {
+	private static String parseFormLoginPage(Element webXml, XPath xpath) throws XPathExpressionException {
 		String formLoginPage = xpath.compile(XPATH_FORM_LOGIN_PAGE).evaluate(webXml).trim();
 		return isEmpty(formLoginPage) ? null : formLoginPage;
 	}
@@ -496,7 +472,7 @@ public enum WebXml {
 	/**
 	 * Return the location of the FORM authentication error page.
 	 */
-	private static String parseFormErrorPage(Element webXml, XPath xpath) throws Exception {
+	private static String parseFormErrorPage(Element webXml, XPath xpath) throws XPathExpressionException {
 		String formErrorPage = xpath.compile(XPATH_FORM_ERROR_PAGE).evaluate(webXml).trim();
 		return isEmpty(formErrorPage) ? null : formErrorPage;
 	}
@@ -504,7 +480,7 @@ public enum WebXml {
 	/**
 	 * Create and return a mapping of all security constraint URL patterns and the associated roles.
 	 */
-	private static Map<String, Set<String>> parseSecurityConstraints(Element webXml, XPath xpath) throws Exception {
+	private static Map<String, Set<String>> parseSecurityConstraints(Element webXml, XPath xpath) throws XPathExpressionException {
 		Map<String, Set<String>> securityConstraints = new LinkedHashMap<String, Set<String>>();
 		NodeList constraints = getNodeList(webXml, xpath, XPATH_SECURITY_CONSTRAINT);
 
@@ -538,19 +514,9 @@ public enum WebXml {
 	/**
 	 * Return the configured session timeout in minutes, or <code>-1</code> if it is not defined.
 	 */
-	private static int parseSessionTimeout(Element webXml, XPath xpath) throws Exception {
+	private static int parseSessionTimeout(Element webXml, XPath xpath) throws XPathExpressionException {
 		String sessionTimeout = xpath.compile(XPATH_SESSION_TIMEOUT).evaluate(webXml).trim();
 		return isNumber(sessionTimeout) ? Integer.parseInt(sessionTimeout) : -1;
-	}
-
-	// Helpers of helpers (JAXP hell) ---------------------------------------------------------------------------------
-
-	private static NodeList getNodeList(Node node, XPath xpath, String expression) throws Exception {
-		return (NodeList) xpath.compile(expression).evaluate(node, XPathConstants.NODESET);
-	}
-
-	private static String getTextContent(Node node) {
-		return node.getFirstChild().getNodeValue().trim();
 	}
 
 }

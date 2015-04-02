@@ -13,7 +13,6 @@
 package org.omnifaces.component.input;
 
 import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeRequestParams;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeViewParams;
 import static org.omnifaces.component.input.Form.PropertyKeys.useRequestURI;
@@ -107,12 +106,13 @@ public class Form extends UIForm {
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private final State state = new State(getStateHelper());
+	private boolean ignoreValidationFailed;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
 	public void processValidators(FacesContext context) {
-		if (isIgnoreValidationFailed(context)) {
+		if (isIgnoreValidationFailed()) {
 			super.processValidators(new IgnoreValidationFailedFacesContext(context));
 		}
 		else {
@@ -122,7 +122,7 @@ public class Form extends UIForm {
 
 	@Override
 	public void processUpdates(FacesContext context) {
-		if (isIgnoreValidationFailed(context)) {
+		if (isIgnoreValidationFailed()) {
 			super.processUpdates(new IgnoreValidationFailedFacesContext(context));
 		}
 		else {
@@ -144,10 +144,6 @@ public class Form extends UIForm {
 		else {
 			super.encodeBegin(context);
 		}
-	}
-
-	private boolean isIgnoreValidationFailed(FacesContext context) {
-		return context.getAttributes().get(IgnoreValidationFailed.class.getName()) == TRUE;
 	}
 
 
@@ -209,6 +205,24 @@ public class Form extends UIForm {
 	 */
 	public void setUseRequestURI(boolean useRequestURI) {
 		state.put(PropertyKeys.useRequestURI, useRequestURI);
+	}
+
+	/**
+	 * Returns whether or not the form should ignore validation fail (and thus proceed to update model/invoke action).
+	 * @return Whether or not the form should ignore validation fail.
+	 * @since 2.1
+	 */
+	public boolean isIgnoreValidationFailed() {
+		return ignoreValidationFailed;
+	}
+
+	/**
+	 * Set whether or not the form should ignore validation fail.
+	 * @param ignoreValidationFailed Whether or not the form should ignore validation fail.
+	 * @since 2.1
+	 */
+	public void setIgnoreValidationFailed(boolean ignoreValidationFailed) {
+		this.ignoreValidationFailed = ignoreValidationFailed;
 	}
 
 	// Nested classes -------------------------------------------------------------------------------------------------

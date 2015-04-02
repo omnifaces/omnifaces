@@ -28,11 +28,13 @@ import javax.faces.application.Resource;
 import org.omnifaces.util.Utils;
 
 /**
+ * <p>
  * This {@link InputStream} implementation takes care that all in the constructor given resources are been read in
  * sequence.
+ *
  * @author Bauke Scholtz
  */
-final class CombinedResourceInputStream extends InputStream {
+public final class CombinedResourceInputStream extends InputStream {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
