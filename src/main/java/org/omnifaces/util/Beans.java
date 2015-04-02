@@ -241,4 +241,21 @@ public final class Beans {
 		return BeansLocal.getCurrentInjectionPoint(getManager(), creationalContext);
 	}
 
+	/**
+	 * Returns the qualifier annotation of the given qualifier class from the given injection point.
+	 * @param injectionPoint The injection point to obtain the qualifier annotation of the given qualifier class from.
+	 * @param qualifierClass The class of the qualifier annotation to be looked up in the given injection point.
+	 * @return The qualifier annotation of the given qualifier class from the given injection point.
+	 * @since 2.1
+	 */
+	public static <A extends Annotation> A getQualifier(InjectionPoint injectionPoint, Class<A> qualifierClass) {
+		for (Annotation annotation : injectionPoint.getQualifiers()) {
+			if (qualifierClass.isAssignableFrom(annotation.getClass())) {
+				return qualifierClass.cast(annotation);
+			}
+		}
+
+		return null;
+	}
+
 }
