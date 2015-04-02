@@ -150,6 +150,16 @@ import org.omnifaces.util.Faces;
  * &lt;/mime-mapping&gt;
  * </pre>
  *
+ * <h3>SVG view modes</h3>
+ * <p>
+ * When serving a SVG image, you can use <code>fragment</code> attribute to trigger
+ * <a href="http://www.w3.org/TR/SVG/linking.html#LinksIntoSVG">SVG view modes</a>
+ * (beware of <a href="http://caniuse.com/#feat=svg-fragment">browser support</a>).
+ * E.g.
+ * <pre>
+ * &lt;o:graphicImage value="#{imageStreamer.getById(image.id)}" type="svg" fragment="svgView(viewBox(0,50,200,200))" /&gt;
+ * </pre>
+ *
  * <h3>Design notes</h3>
  * <p>
  * The bean class name and method name will end up in the image source URL. Although this is technically harmless and
