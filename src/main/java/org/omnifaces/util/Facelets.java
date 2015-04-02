@@ -57,7 +57,7 @@ public final class Facelets {
 	 * @param type The expected type of the value behind the value expression.
 	 * @return The value of the given tag attribute as a value expression, or null if the tag attribute is null.
 	 */
-	public static <T> ValueExpression getValueExpression(FaceletContext context, TagAttribute tagAttribute, Class<T> type) {
+	public static ValueExpression getValueExpression(FaceletContext context, TagAttribute tagAttribute, Class<?> type) {
 		return tagAttribute != null ? tagAttribute.getValueExpression(context, type) : null;
 	}
 
