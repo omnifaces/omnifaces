@@ -43,7 +43,12 @@ import org.omnifaces.util.Messages;
  * <p>
  * The <code>&lt;o:validator&gt;</code> is a taghandler that extends the standard <code>&lt;f:validator&gt;</code> tag
  * family with support for deferred value expressions in all attributes. In other words, the validator attributes are
- * not evaluated anymore on a per view build time basis, but just on every access like as with UI components.
+ * not evaluated anymore on a per view build time basis, but just on every access like as with UI components and bean
+ * properties. This has among others the advantage that they can be evaluated on a per-iteration basis inside an
+ * iterating component, and that they can be set on a custom converter without needing to explicitly register it in a
+ * tagfile.
+ *
+ * <h3>Usage</h3>
  * <p>
  * When you specify for example the standard <code>&lt;f:validateLongRange&gt;</code> by
  * <code>validatorId="javax.faces.LongRange"</code>, then you'll be able to use all its attributes such as

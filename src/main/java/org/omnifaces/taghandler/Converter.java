@@ -37,7 +37,10 @@ import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDeleg
  * <p>
  * The <code>&lt;o:converter&gt;</code> is a taghandler that extends the standard <code>&lt;f:converter&gt;</code> tag
  * family with support for deferred value expressions in all attributes. In other words, the converter attributes are
- * not evaluated anymore on a per view build time basis, but just on every access like as with UI components.
+ * not evaluated anymore on a per view build time basis, but just on every access like as with UI components and bean
+ * properties. This has among others the advantage that they can be evaluated on a per-iteration basis inside an
+ * iterating component, and that they can be set on a custom converter without needing to explicitly register it in a
+ * tagfile.
  *
  * <h3>Usage</h3>
  * <p>

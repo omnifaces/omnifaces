@@ -867,6 +867,7 @@ public final class FacesLocal {
 		// creates another FacesContext which overrides the current FacesContext in the same thread! So, when the
 		// FacesContext which is created during the forward is released, it leaves the current FacesContext as null,
 		// causing NPE over all place which is relying on FacesContext#getCurrentInstance().
+		// This is already fixed in WildFly 8.2 / Undertow 1.1.0 as per https://issues.jboss.org/browse/UNDERTOW-322.
 		if (!Faces.hasContext()) {
 			Faces.setContext(context);
 		}

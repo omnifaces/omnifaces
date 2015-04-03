@@ -69,6 +69,33 @@ import org.omnifaces.util.State;
  * &lt;/o:tree&gt;
  * </pre>
  *
+ * <h3>treeNode</h3>
+ * <p>
+ * The <code>&lt;o:treeNode&gt;</code> is an {@link UIComponent} that represents a single tree node within a parent
+ * {@link Tree} component. Within this component, the <code>var</code> attribute of the parent {@link Tree}
+ * component will expose the tree node. Each of its children is processed by {@link TreeNodeItem}.
+ * <p>
+ * The <code>level</code> attribute can be used to specify for which tree node level as obtained by
+ * {@link TreeModel#getLevel()} this component should render the children by {@link TreeNodeItem}. The root tree node
+ * has level 0.
+ *
+ * <h3>treeNodeItem</h3>
+ * <p>
+ * The <code>&lt;o:treeNodeItem&gt;</code> is an {@link UIComponent} that represents a single child tree node within a
+ * parent {@link TreeNode} component. Within this component, the <code>var</code> attribute of the parent {@link Tree}
+ * component will expose the child tree node.
+ * <p>
+ * This component allows a child component of type {@link TreeInsertChildren} which indicates the place to insert
+ * the children of the current child tree node recursively by a {@link TreeNode} component associated with the
+ * children's level in the same parent {@link Tree} component.
+ *
+ * <h3>treeInsertChildren</h3>
+ * <p>
+ * The <code>&lt;o:treeInsertChildren&gt;</code> is an {@link UIComponent} that represents the insertion point for the
+ * children of a parent tree node which is represented by {@link TreeNodeItem}.
+ * <p>
+ * This component does not allow any children.
+ *
  * @author Bauke Scholtz
  * @see TreeNode
  * @see TreeNodeItem
