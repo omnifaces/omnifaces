@@ -60,7 +60,6 @@ public final class BeansLocal {
 	// Utility --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * {@inheritDoc}
 	 * @see Beans#resolve(Class)
 	 */
 	@SuppressWarnings("unchecked")
@@ -77,7 +76,6 @@ public final class BeansLocal {
 	}
 
 	/**
-	 * {@inheritDoc}
 	 * @see Beans#getReference(Class)
 	 */
 	public static <T> T getReference(BeanManager beanManager, Class<T> beanClass) {
@@ -86,7 +84,6 @@ public final class BeansLocal {
 	}
 
 	/**
-	 * {@inheritDoc}
 	 * @see Beans#getReference(Bean)
 	 */
 	@SuppressWarnings("unchecked")
@@ -95,7 +92,6 @@ public final class BeansLocal {
 	}
 
 	/**
-	 * {@inheritDoc}
 	 * @see Beans#getInstance(Class)
 	 */
 	public static <T> T getInstance(BeanManager beanManager, Class<T> beanClass) {
@@ -103,7 +99,6 @@ public final class BeansLocal {
 	}
 
 	/**
-	 * {@inheritDoc}
 	 * @see Beans#getInstance(Class, boolean)
 	 */
 	public static <T> T getInstance(BeanManager beanManager, Class<T> beanClass, boolean create) {
@@ -112,7 +107,6 @@ public final class BeansLocal {
 	}
 
 	/**
-	 * {@inheritDoc}
 	 * @see Beans#getInstance(Bean, boolean)
 	 */
 	public static <T> T getInstance(BeanManager beanManager, Bean<T> bean, boolean create) {
@@ -127,7 +121,6 @@ public final class BeansLocal {
 	}
 
 	/**
-	 * {@inheritDoc}
 	 * @see Beans#getActiveInstances(Class)
 	 */
 	public static <S extends Annotation> Map<Object, String> getActiveInstances(BeanManager beanManager, Class<S> scope) {
@@ -147,7 +140,6 @@ public final class BeansLocal {
 	}
 
 	/**
-	 * {@inheritDoc}
 	 * @see Beans#destroy(Class)
 	 */
 	public static <T> void destroy(BeanManager beanManager, Class<T> beanClass) {
@@ -159,7 +151,6 @@ public final class BeansLocal {
 	}
 
 	/**
-	 * {@inheritDoc}
 	 * @see Beans#destroy(Bean)
 	 */
 	public static <T> void destroy(BeanManager beanManager, Bean<T> bean) {
@@ -175,7 +166,6 @@ public final class BeansLocal {
 	}
 
 	/**
-	 * {@inheritDoc}
 	 * @see Beans#getAnnotation(Annotated, Class)
 	 */
 	public static <A extends Annotation> A getAnnotation(BeanManager beanManager, Annotated annotated, Class<A> annotationType) {
@@ -208,7 +198,6 @@ public final class BeansLocal {
 	}
 
 	/**
-	 * {@inheritDoc}
 	 * @see Beans#getAnnotation(Annotated, Class)
 	 */
 	public static InjectionPoint getCurrentInjectionPoint(BeanManager beanManager, CreationalContext<?> creationalContext) {
