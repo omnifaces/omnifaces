@@ -107,7 +107,7 @@ import org.omnifaces.util.copier.SerializationCopier;
  *     &lt;f:selectItems value="#{bean.availableItems}" /&gt;
  *     &lt;o:validateBean disabled="true" /&gt;
  *     &lt;f:ajax execute="@form" listener="#{bean.itemChanged}" render="@form" /&gt;
- * &lt;/h:commandButton&gt;
+ * &lt;/h:selectOneMenu&gt;
  * </pre>
  *
  * <p>
