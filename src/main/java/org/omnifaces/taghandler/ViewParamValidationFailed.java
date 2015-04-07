@@ -218,8 +218,6 @@ public class ViewParamValidationFailed extends TagHandler {
 		}
 
 		subscribeToRequestComponentEvent(parent, PostValidateEvent.class, new Callback.WithArgument<ComponentSystemEvent>() {
-			private static final long serialVersionUID = 1L;
-
 			@Override
 			public void invoke(ComponentSystemEvent event) {
 				processViewParamValidationFailed(event);

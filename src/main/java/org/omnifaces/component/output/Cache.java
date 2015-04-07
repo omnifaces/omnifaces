@@ -172,7 +172,7 @@ public class Cache extends OutputFamily {
 
 		// Execute the following code in PreRenderView, since at construction time the "useBuffer" and "key" attributes
 		// have not been set, and there is no @PostContruct for UIComponents.
-		subscribeToViewEvent(PRE_RENDER, new Callback.Void() {
+		subscribeToViewEvent(PRE_RENDER, new Callback.SerializableVoid() {
 
 			private static final long serialVersionUID = 1L;
 
@@ -193,9 +193,6 @@ public class Cache extends OutputFamily {
 					// After the RENDER_RESPONSE phase, copy the area we need to cache from the response buffer
 					// and insert it into our cache
 					subscribeToRequestAfterPhase(RENDER_RESPONSE, new Callback.Void() {
-
-						private static final long serialVersionUID = 1L;
-
 						@Override
 						public void invoke() {
 							String content = null;

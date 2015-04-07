@@ -74,6 +74,11 @@ import org.omnifaces.eventlistener.DefaultViewEventListener;
  */
 public final class Events {
 
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final String ERROR_UNSUBSCRIBE_TOO_LATE =
+		"The render response phase is too late to unsubscribe the view event listener. Do it in an earlier phase.";
+
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	private Events() {
@@ -102,7 +107,7 @@ public final class Events {
 	 * @since 2.0
 	 * @see #subscribeToApplicationEvent(Class, SystemEventListener)
 	 */
-	public static void subscribeToApplicationEvent(Class<? extends SystemEvent> type, Callback.Void callback) {
+	public static void subscribeToApplicationEvent(Class<? extends SystemEvent> type, Callback.SerializableVoid callback) {
 		subscribeToApplicationEvent(type, createSystemEventListener(Events.<SystemEvent>wrap(callback)));
 	}
 
@@ -114,7 +119,7 @@ public final class Events {
 	 * @since 2.0
 	 * @see #subscribeToApplicationEvent(Class, SystemEventListener)
 	 */
-	public static void subscribeToApplicationEvent(Class<? extends SystemEvent> type, Callback.WithArgument<SystemEvent> callback) {
+	public static void subscribeToApplicationEvent(Class<? extends SystemEvent> type, Callback.SerializableWithArgument<SystemEvent> callback) {
 		subscribeToApplicationEvent(type, createSystemEventListener(callback));
 	}
 
@@ -140,7 +145,7 @@ public final class Events {
 	 * @since 1.2
 	 * @see #subscribeToViewEvent(Class, SystemEventListener)
 	 */
-	public static void subscribeToViewEvent(Class<? extends SystemEvent> type, Callback.Void callback) {
+	public static void subscribeToViewEvent(Class<? extends SystemEvent> type, Callback.SerializableVoid callback) {
 		subscribeToViewEvent(type, createSystemEventListener(Events.<SystemEvent>wrap(callback)));
 	}
 
@@ -152,7 +157,7 @@ public final class Events {
 	 * @since 2.0
 	 * @see #subscribeToViewEvent(Class, SystemEventListener)
 	 */
-	public static void subscribeToViewEvent(Class<? extends SystemEvent> type, Callback.WithArgument<SystemEvent> callback) {
+	public static void subscribeToViewEvent(Class<? extends SystemEvent> type, Callback.SerializableWithArgument<SystemEvent> callback) {
 		subscribeToViewEvent(type, createSystemEventListener(callback));
 	}
 
@@ -312,6 +317,8 @@ public final class Events {
 	 * @param component The component to unsubscribe the given event listener from.
 	 * @param event The event associated with the given event listener.
 	 * @param listener The event listener to be unsubscribed from the given component.
+	 * @throws IllegalStateException When this method is invoked during render response phase, because it would be too
+	 * late to remove it from the view state.
 	 * @since 2.1
 	 * @see #subscribeToRequestAfterPhase(PhaseId, org.omnifaces.util.Callback.Void)
 	 * @see UIComponent#unsubscribeFromEvent(Class, ComponentSystemEventListener)
@@ -319,9 +326,13 @@ public final class Events {
 	public static void unsubscribeFromComponentEvent
 		(final UIComponent component, final Class<? extends SystemEvent> event, final ComponentSystemEventListener listener)
 	{
-		subscribeToRequestAfterPhase(getCurrentPhaseId(), new Callback.Void() {
+		PhaseId currentPhaseId = getCurrentPhaseId();
 
-			private static final long serialVersionUID = 1L;
+		if (currentPhaseId == PhaseId.RENDER_RESPONSE) {
+			throw new IllegalStateException(ERROR_UNSUBSCRIBE_TOO_LATE);
+		}
+
+		subscribeToRequestAfterPhase(currentPhaseId, new Callback.Void() {
 
 			@Override
 			public void invoke() {
@@ -335,6 +346,16 @@ public final class Events {
 	private static <A> Callback.WithArgument<A> wrap(final Callback.Void callback) {
 		return new Callback.WithArgument<A>() {
 
+			@Override
+			public void invoke(A argument) {
+				callback.invoke();
+			}
+		};
+	}
+
+	private static <A> Callback.SerializableWithArgument<A> wrap(final Callback.SerializableVoid callback) {
+		return new Callback.SerializableWithArgument<A>() {
+
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -344,7 +365,7 @@ public final class Events {
 		};
 	}
 
-	private static SystemEventListener createSystemEventListener(final Callback.WithArgument<SystemEvent> callback) {
+	private static SystemEventListener createSystemEventListener(final Callback.SerializableWithArgument<SystemEvent> callback) {
 		return new DefaultViewEventListener() {
 
 			@Override

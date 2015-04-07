@@ -155,21 +155,23 @@ public final class SelectItemsCollector {
 			}
 
 			// During each iteration, just resolve all attributes again.
-			scopedRunner.invoke(new Callback.Void() { private static final long serialVersionUID = 1L; @Override public void invoke() {
+			scopedRunner.invoke(new Callback.Void() {
+				@Override
+				public void invoke() {
+					Object itemValue = getItemValue(attributes, item);
+					Object noSelectionValue = attributes.get("noSelectionValue");
+					boolean itemValueIsNoSelectionValue = noSelectionValue != null && noSelectionValue.equals(itemValue);
 
-				Object itemValue = getItemValue(attributes, item);
-				Object noSelectionValue = attributes.get("noSelectionValue");
-				boolean itemValueIsNoSelectionValue = noSelectionValue != null && noSelectionValue.equals(itemValue);
-
-				selectItems.add(new SelectItem(
-					itemValue,
-					getItemLabel(attributes, itemValue),
-					getItemDescription(attributes),
-					getBooleanAttribute(attributes, "itemDisabled", false),
-					getBooleanAttribute(attributes, "itemLabelEscaped", true),
-					getBooleanAttribute(attributes, "noSelectionOption", false) || itemValueIsNoSelectionValue
-				));
-			}});
+					selectItems.add(new SelectItem(
+						itemValue,
+						getItemLabel(attributes, itemValue),
+						getItemDescription(attributes),
+						getBooleanAttribute(attributes, "itemDisabled", false),
+						getBooleanAttribute(attributes, "itemLabelEscaped", true),
+						getBooleanAttribute(attributes, "noSelectionOption", false) || itemValueIsNoSelectionValue
+					));
+				}
+			});
 		}
 
 		return selectItems;
