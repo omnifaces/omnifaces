@@ -244,21 +244,18 @@ public class ValidateBean extends TagHandler {
 
 		Object bean = (value != null) ? value.getValue(getELContext()) : null;
 
-		if (bean != null) {
-			if (!disabled) {
-				switch (method) {
-					case validateActual:
-						validateActualBean(form, bean, groups);
-						break;
-
-					case validateCopy:
-						validateCopiedBean(form, bean, copier, groups);
-						break;
-				}
-			}
-		}
-		else {
+		if (bean == null) {
 			validateForm(groups, disabled);
+			return;
+		}
+
+		if (disabled) {
+			return;
+		}
+
+		switch (method) {
+			case validateActual: validateActualBean(form, bean, groups); break;
+			case validateCopy: validateCopiedBean(form, bean, copier, groups); break;
 		}
 	}
 

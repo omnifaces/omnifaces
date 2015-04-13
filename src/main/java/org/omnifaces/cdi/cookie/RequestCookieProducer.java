@@ -40,8 +40,7 @@ public class RequestCookieProducer {
 	public String produce(InjectionPoint injectionPoint) {
 		Cookie cookie = getQualifier(injectionPoint, Cookie.class);
 		String name = cookie.name().isEmpty() ? injectionPoint.getMember().getName() : cookie.name();
-		String value = getRequestCookie(name);
-		return value;
+		return getRequestCookie(name);
 	}
 
 }
