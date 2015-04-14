@@ -39,18 +39,19 @@ import javax.el.ValueExpression;
 import javax.faces.FacesException;
 import javax.faces.application.Application;
 import javax.faces.application.Resource;
+import javax.faces.component.UIComponent;
+import javax.faces.component.UIOutput;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.xml.bind.DatatypeConverter;
 
-import org.omnifaces.component.output.GraphicImage;
 import org.omnifaces.el.ExpressionInspector;
 import org.omnifaces.el.MethodReference;
 import org.omnifaces.util.Faces;
 
 /**
  * <p>
- * This {@link Resource} implementation is used by the {@link GraphicImage} component.
+ * This {@link Resource} implementation is used by the {@link org.omnifaces.component.output.GraphicImage} component.
  *
  * @author Bauke Scholtz
  * @since 2.0
@@ -62,7 +63,6 @@ public class GraphicResource extends DynamicResource {
 	private static final String DEFAULT_CONTENT_TYPE = "image";
 	private static final Map<String, String> CONTENT_TYPES_BY_BASE64_HEADER = createContentTypesByBase64Header();
 	private static final Map<String, MethodReference> ALLOWED_METHODS = new ConcurrentHashMap<>();
-	private static final GraphicImage DUMMY_COMPONENT = new GraphicImage();
 	private static final String[] EMPTY_PARAMS = new String[0];
 	private static final int RESOURCE_NAME_FULL_PARTS_LENGTH = 3;
 
@@ -112,6 +112,7 @@ public class GraphicResource extends DynamicResource {
 
 	/**
 	 * Construct a new graphic resource which uses the given content as data URI.
+	 * This constructor is called during render time of <code>&lt;o:graphicImage ... dataURI="true"&gt;</code>.
 	 * @param content The graphic resource content, to be represented as data URI.
 	 * @param contentType The graphic resource content type. If this is <code>null</code>, then it will be guessed
 	 * based on the content type signature in the content header. So far, JPEG, PNG, GIF, ICO, SVG, BMP and TIFF are
@@ -132,6 +133,8 @@ public class GraphicResource extends DynamicResource {
 	/**
 	 * Construct a new graphic resource based on the given name, EL method parameters converted as string, and the
 	 * "last modified" representation.
+	 * This constructor is called during render time of <code>&lt;o:graphicImage value="..." dataURI="false"&gt;</code>
+	 * and during handling the resource request by {@link GraphicResourceHandler}.
 	 * @param name The graphic resource name, usually representing the base and method of EL method expression.
 	 * @param params The graphic resource method parameters.
 	 * @param lastModified The "last modified" representation of the graphic resource, can be {@link Long} or
@@ -158,7 +161,6 @@ public class GraphicResource extends DynamicResource {
 
 	/**
 	 * Create a new graphic resource based on the given value expression.
-	 * This is called by {@link GraphicImage} component.
 	 * @param context The involved faces context.
 	 * @param value The value expression representing content to create a new graphic resource for.
 	 * @param type  The image type, represented as file extension. E.g. "jpg", "png", "gif", "ico", "svg", "bmp",
@@ -322,12 +324,13 @@ public class GraphicResource extends DynamicResource {
 		validateParamLength(values, types);
 		String[] strings = new String[values.length];
 		Application application = context.getApplication();
+		UIComponent dummyComponent = new UIOutput();
 
 		for (int i = 0; i < values.length; i++) {
 			Object value = values[i];
 			Converter converter = application.createConverter(types[i]);
 			strings[i] = (converter != null)
-				? converter.getAsString(context, DUMMY_COMPONENT, value)
+				? converter.getAsString(context, dummyComponent, value)
 				: (value != null) ? value.toString() : "";
 		}
 
@@ -342,12 +345,13 @@ public class GraphicResource extends DynamicResource {
 		validateParamLength(values, types);
 		Object[] objects = new Object[values.length];
 		Application application = context.getApplication();
+		UIComponent dummyComponent = new UIOutput();
 
 		for (int i = 0; i < values.length; i++) {
 			String value = isEmpty(values[i]) ? null : values[i];
 			Converter converter = application.createConverter(types[i]);
 			objects[i] = (converter != null)
-				? converter.getAsObject(context, DUMMY_COMPONENT, value)
+				? converter.getAsObject(context, dummyComponent, value)
 				: value;
 		}
 

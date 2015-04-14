@@ -20,11 +20,9 @@ import java.lang.annotation.Target;
 import javax.faces.convert.Converter;
 import javax.faces.validator.Validator;
 
-import org.omnifaces.cdi.Param;
-
 /**
  * Attribute for a {@link Converter} or {@link Validator} that is applied to a value retrieved from an HTTP request and
- * injected via the {@link Param} qualifier.
+ * injected via the {@link org.omnifaces.cdi.Param} qualifier.
  *
  * @since 1.6
  * @author Arjan Tijms
