@@ -98,7 +98,7 @@ public final class Events {
 	 * @since 2.0
 	 * @see #subscribeToApplicationEvent(Class, SystemEventListener)
 	 */
-	public static void subscribeToApplicationEvent(Class<? extends SystemEvent> type, Callback.Void callback) {
+	public static void subscribeToApplicationEvent(Class<? extends SystemEvent> type, Callback.SerializableVoid callback) {
 		subscribeToApplicationEvent(type, createSystemEventListener(Events.<SystemEvent>wrap(callback)));
 	}
 
@@ -110,7 +110,7 @@ public final class Events {
 	 * @since 2.0
 	 * @see #subscribeToApplicationEvent(Class, SystemEventListener)
 	 */
-	public static void subscribeToApplicationEvent(Class<? extends SystemEvent> type, Callback.WithArgument<SystemEvent> callback) {
+	public static void subscribeToApplicationEvent(Class<? extends SystemEvent> type, Callback.SerializableWithArgument<SystemEvent> callback) {
 		subscribeToApplicationEvent(type, createSystemEventListener(callback));
 	}
 
@@ -136,7 +136,7 @@ public final class Events {
 	 * @since 1.2
 	 * @see #subscribeToViewEvent(Class, SystemEventListener)
 	 */
-	public static void subscribeToViewEvent(Class<? extends SystemEvent> type, Callback.Void callback) {
+	public static void subscribeToViewEvent(Class<? extends SystemEvent> type, Callback.SerializableVoid callback) {
 		subscribeToViewEvent(type, createSystemEventListener(Events.<SystemEvent>wrap(callback)));
 	}
 
@@ -148,7 +148,7 @@ public final class Events {
 	 * @since 2.0
 	 * @see #subscribeToViewEvent(Class, SystemEventListener)
 	 */
-	public static void subscribeToViewEvent(Class<? extends SystemEvent> type, Callback.WithArgument<SystemEvent> callback) {
+	public static void subscribeToViewEvent(Class<? extends SystemEvent> type, Callback.SerializableWithArgument<SystemEvent> callback) {
 		subscribeToViewEvent(type, createSystemEventListener(callback));
 	}
 
@@ -273,6 +273,16 @@ public final class Events {
 	private static <A> Callback.WithArgument<A> wrap(final Callback.Void callback) {
 		return new Callback.WithArgument<A>() {
 
+			@Override
+			public void invoke(A argument) {
+				callback.invoke();
+			}
+		};
+	}
+
+	private static <A> Callback.SerializableWithArgument<A> wrap(final Callback.SerializableVoid callback) {
+		return new Callback.SerializableWithArgument<A>() {
+
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -282,7 +292,7 @@ public final class Events {
 		};
 	}
 
-	private static SystemEventListener createSystemEventListener(final Callback.WithArgument<SystemEvent> callback) {
+	private static SystemEventListener createSystemEventListener(final Callback.SerializableWithArgument<SystemEvent> callback) {
 		return new DefaultViewEventListener() {
 
 			@Override

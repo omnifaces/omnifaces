@@ -107,7 +107,7 @@ import org.omnifaces.util.copier.SerializationCopier;
  *     &lt;f:selectItems value="#{bean.availableItems}" /&gt;
  *     &lt;o:validateBean disabled="true" /&gt;
  *     &lt;f:ajax execute="@form" listener="#{bean.itemChanged}" render="@form" /&gt;
- * &lt;/h:commandButton&gt;
+ * &lt;/h:selectOneMenu&gt;
  * </pre>
  *
  * <p>
@@ -220,7 +220,7 @@ public class ValidateBean extends TagHandler {
 
 		// We can't use getCurrentForm() or hasInvokedSubmit() before the component is added to view, because the client ID isn't available.
 		// Hence, we subscribe this check to after phase of restore view.
-		subscribeToRequestAfterPhase(RESTORE_VIEW, new Callback.Void() { private static final long serialVersionUID = 1L; @Override public void invoke() {
+		subscribeToRequestAfterPhase(RESTORE_VIEW, new Callback.Void() { @Override public void invoke() {
 			processValidateBean(parent);
 		}});
 	}
@@ -244,21 +244,18 @@ public class ValidateBean extends TagHandler {
 
 		Object bean = (value != null) ? value.getValue(getELContext()) : null;
 
-		if (bean != null) {
-			if (!disabled) {
-				switch (method) {
-					case validateActual:
-						validateActualBean(form, bean, groups);
-						break;
-
-					case validateCopy:
-						validateCopiedBean(form, bean, copier, groups);
-						break;
-				}
-			}
-		}
-		else {
+		if (bean == null) {
 			validateForm(groups, disabled);
+			return;
+		}
+
+		if (disabled) {
+			return;
+		}
+
+		switch (method) {
+			case validateActual: validateActualBean(form, bean, groups); break;
+			case validateCopy: validateCopiedBean(form, bean, copier, groups); break;
 		}
 	}
 
@@ -266,7 +263,7 @@ public class ValidateBean extends TagHandler {
 	 * After update model values phase, validate actual bean. But don't proceed to render response on fail.
 	 */
 	private void validateActualBean(final UIForm form, final Object bean, final String groups) {
-		ValidateBeanCallback validateActualBean = new ValidateBeanCallback() { private static final long serialVersionUID = 1L; @Override public void run() {
+		ValidateBeanCallback validateActualBean = new ValidateBeanCallback() { @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
 			validate(context, form, bean, groups, false);
 		}};
@@ -283,18 +280,18 @@ public class ValidateBean extends TagHandler {
 	private void validateCopiedBean(final UIForm form, final Object bean, final String copier, final String groups) {
 		final Map<String, Object> properties = new HashMap<String, Object>();
 
-		ValidateBeanCallback collectBeanProperties = new ValidateBeanCallback() { private static final long serialVersionUID = 1L; @Override public void run() {
+		ValidateBeanCallback collectBeanProperties = new ValidateBeanCallback() { @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
 
-			forEachInputWithMatchingBase(context, form, bean, new Operation() { private static final long serialVersionUID = 1L; @Override public void run(EditableValueHolder v, ValueReference vr) {
+			forEachInputWithMatchingBase(context, form, bean, new Operation() { @Override public void run(EditableValueHolder v, ValueReference vr) {
 				addCollectingValidator(v, vr, properties);
 			}});
 		}};
 
-		ValidateBeanCallback checkConstraints = new ValidateBeanCallback() { private static final long serialVersionUID = 1L; @Override public void run() {
+		ValidateBeanCallback checkConstraints = new ValidateBeanCallback() { @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
 
-			forEachInputWithMatchingBase(context, form, bean, new Operation() { private static final long serialVersionUID = 1L; @Override public void run(EditableValueHolder v, ValueReference vr) {
+			forEachInputWithMatchingBase(context, form, bean, new Operation() { @Override public void run(EditableValueHolder v, ValueReference vr) {
 				removeCollectingValidator(v);
 			}});
 
@@ -311,7 +308,7 @@ public class ValidateBean extends TagHandler {
 	 * Before validations phase of current request, subscribe the {@link BeanValidationEventListener} to validate the form based on groups.
 	 */
 	private void validateForm(final String validationGroups, final boolean disabled) {
-		ValidateBeanCallback validateForm = new ValidateBeanCallback() { private static final long serialVersionUID = 1L; @Override public void run() {
+		ValidateBeanCallback validateForm = new ValidateBeanCallback() { @Override public void run() {
 			SystemEventListener listener = new BeanValidationEventListener(validationGroups, disabled);
 			subscribeToViewEvent(PreValidateEvent.class, listener);
 			subscribeToViewEvent(PostValidateEvent.class, listener);
@@ -326,7 +323,7 @@ public class ValidateBean extends TagHandler {
 		forEachComponent(context)
 			.fromRoot(form)
 			.ofTypes(EditableValueHolder.class)
-			.invoke(new Callback.WithArgument<UIComponent>() { private static final long serialVersionUID = 1L; @Override public void invoke(UIComponent component) {
+			.invoke(new Callback.WithArgument<UIComponent>() { @Override public void invoke(UIComponent component) {
 
 				ValueExpression valueExpression = component.getValueExpression("value");
 
@@ -427,8 +424,6 @@ public class ValidateBean extends TagHandler {
 
 	private abstract static class ValidateBeanCallback implements Callback.Void {
 
-		private static final long serialVersionUID = 1L;
-
 		@Override
 		public void invoke() {
 			try {
@@ -451,8 +446,6 @@ public class ValidateBean extends TagHandler {
 	}
 
 	private abstract static class Operation implements Callback.WithArgument<Object[]> {
-
-		private static final long serialVersionUID = 1L;
 
 		@Override
 		public void invoke(Object[] args) {

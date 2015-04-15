@@ -99,9 +99,12 @@ public class IgnoreValidationFailed extends TagHandler {
 
 		// We can't use hasInvokedSubmit() before the component is added to view, because the client ID isn't available.
 		// Hence, we subscribe this check to after phase of restore view.
-		subscribeToRequestAfterPhase(RESTORE_VIEW, new Callback.Void() { private static final long serialVersionUID = 1L; @Override public void invoke() {
-			processIgnoreValidationFailed((UICommand) parent);
-		}});
+		subscribeToRequestAfterPhase(RESTORE_VIEW, new Callback.Void() {
+			@Override
+			public void invoke() {
+				processIgnoreValidationFailed((UICommand) parent);
+			}
+		});
 	}
 
 	/**

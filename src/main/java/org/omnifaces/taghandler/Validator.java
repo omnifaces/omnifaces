@@ -101,13 +101,15 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
 	 */
 	@Override
 	public void apply(FaceletContext context, UIComponent parent) throws IOException {
-		if (!ComponentHandler.isNew(parent) && UIComponent.getCompositeComponentParent(parent) == null) {
+		boolean insideCompositeComponent = UIComponent.getCompositeComponentParent(parent) != null;
+
+		if (!ComponentHandler.isNew(parent) && !insideCompositeComponent) {
 			// If it's not new nor inside a composite component, we're finished.
 			return;
 		}
 
-		if (!(parent instanceof EditableValueHolder)) {
-			// It's likely a composite component. TagHandlerDelegate will pickup it and pass the target component back.
+		if (!(parent instanceof EditableValueHolder) || (insideCompositeComponent && getAttribute("for") == null)) {
+			// It's inside a composite component and not reattached. TagHandlerDelegate will pickup it and pass the target component back if necessary.
 			super.apply(context, parent);
 			return;
 		}

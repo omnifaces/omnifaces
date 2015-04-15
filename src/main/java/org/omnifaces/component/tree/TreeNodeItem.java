@@ -95,9 +95,6 @@ public class TreeNodeItem extends TreeFamily {
 		}
 
 		process(context, new Callback.ReturningWithArgument<Void, Tree>() {
-
-			private static final long serialVersionUID = 1L;
-
 			@Override
 			public Void invoke(Tree tree) {
 				if (tree.getCurrentModelNode() != null) {
@@ -134,9 +131,6 @@ public class TreeNodeItem extends TreeFamily {
 		}
 
 		return process(context.getFacesContext(), new Callback.ReturningWithArgument<Boolean, Tree>() {
-
-			private static final long serialVersionUID = 1L;
-
 			@Override
 			public Boolean invoke(Tree tree) {
 				if (tree.getCurrentModelNode() != null) {
@@ -151,7 +145,6 @@ public class TreeNodeItem extends TreeFamily {
 
 				return false;
 			}
-
 		});
 	}
 
