@@ -125,22 +125,6 @@ import org.omnifaces.util.State;
  * </td></tr>
  * </table>
  *
- * <h3>Servlet 2.5 configuration</h3>
- * <p>
- * If no custom caching provider or global settings are used, no specific configuration is needed. Otherwise
- * <code>org.omnifaces.component.output.cache.CacheInitializerListener</code> needs to be installed as a listener in
- * <code>web.xml</code>:
- * <pre>
- * &lt;listener&gt;
- *     &lt;listener-class&gt;org.omnifaces.component.output.cache.CacheInitializerListener&lt;/listener-class&gt;
- * &lt;/listener&gt;
- * </pre>
- * <p>
- * In case the alternative caching method via buffering is used,
- * <code>org.omnifaces.servlet.BufferedHttpServletResponse</code> needs to be installed as a Servlet Filter in
- * <code>web.xml</code>, filtering either the <code>FacesServlet</code> itself or any page on which the alternative
- * caching method is required.
- *
  * @since 1.1
  * @author Arjan Tijms
  * @see CacheValue

@@ -3306,19 +3306,6 @@ public class ValidateValuesBean implements MultiFieldValidator {
 				 </td>
  				</tr>
  				</table>
- 				<hr>
-				<h3>Servlet 2.5 configuration</h3>
-				<p>If no custom caching provider or global settings are used, no specific configuration is needed. Otherwise
-				<code>org.omnifaces.component.output.cache.CacheInitializerListener</code> needs to be installed as a
-				listener in web.xml:
-				<pre>
-&lt;listener&gt;
-	&lt;listener-class&gt;org.omnifaces.component.output.cache.CacheInitializerListener&lt;/listener-class&gt;
-&lt;/listener&gt;
-				</pre>
-				<p>In case the alternative caching method via buffering is used, <code>org.omnifaces.servlet.BufferedHttpServletResponse</code> needs
-				to be installed as a Servlet Filter in web.xml, filtering either the FacesServlet itself or any page on which the alternative caching
-				method is required.
 			]]>
 		</description>
 		<tag-name>cache</tag-name>
