@@ -23,8 +23,6 @@ import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
 
 import org.omnifaces.el.MethodExpressionValueExpressionAdapter;
-import org.omnifaces.el.ValueExpressionMethodWrapper;
-import org.omnifaces.util.Hacks;
 
 /**
  * <p>
@@ -62,16 +60,7 @@ public class MethodParam extends TagHandler {
 
 		// Using the variable mapper so the expression is scoped to the body of the Facelets tag. Since the variable mapper only accepts
 		// value expressions, we once again wrap it by a value expression that directly returns the method expression.
-
-		ValueExpression valueExpressionWrapper;
-
-		// JUEL older than 2.2.6 had the expectation that the value expression only wraps a Method instance that can be statically called.
-		if (Hacks.isJUELUsed(ctx.getExpressionFactory()) && !Hacks.isJUELSupportingMethodExpression()) {
-			valueExpressionWrapper = new ValueExpressionMethodWrapper(methodExpression);
-		} else {
-			// Sun/Apache EL and JUEL 2.2.6 and higher can call a method expression wrapped in a value expression.
-			valueExpressionWrapper = ctx.getExpressionFactory().createValueExpression(methodExpression, MethodExpression.class);
-		}
+		ValueExpression valueExpressionWrapper = ctx.getExpressionFactory().createValueExpression(methodExpression, MethodExpression.class);
 
 		ctx.getVariableMapper().setVariable(nameStr, valueExpressionWrapper);
 	}
