@@ -80,8 +80,6 @@ public final class Hacks {
 	private static final String ERROR_INVOKE_METHOD =
 		"Cannot invoke method '%s' of class '%s' with arguments %s.";
 
-	private static final Object[] EMPTY_PARAMETERS = new Object[0];
-
 	// Lazy loaded properties (will only be initialized when FacesContext is available) -------------------------------
 
 	private static Boolean myFacesUsed;
