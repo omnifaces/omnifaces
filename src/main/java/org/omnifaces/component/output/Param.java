@@ -80,7 +80,7 @@ public class Param extends UIParameter implements ParamHolder {
 
 	@Override
 	public void setConverter(Converter converter) {
-		this.localConverter = converter;
+		localConverter = converter;
 	}
 
 	@Override
@@ -125,7 +125,12 @@ public class Param extends UIParameter implements ParamHolder {
 	}
 
 	@Override
-	public void encodeAll(FacesContext context) throws IOException {
+	public boolean getRendersChildren() {
+		return true;
+	}
+
+	@Override
+	public void encodeChildren(FacesContext context) throws IOException {
 		// This override which does nothing effectively blocks the children from being encoded during JSF render.
 	}
 

@@ -982,7 +982,7 @@ public final class FacesLocal {
 		ExternalContext externalContext = context.getExternalContext();
 		Map<String, Object> properties = new HashMap<String, Object>();
 
-		if (domain != null) {
+		if (domain != null && !domain.equals("localhost")) { // Chrome doesn't like domain:"localhost" on cookies.
 			properties.put("domain", domain);
 		}
 

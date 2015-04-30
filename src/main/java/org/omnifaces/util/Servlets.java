@@ -390,7 +390,7 @@ public final class Servlets {
 	{
 		Cookie cookie = new Cookie(name, encodeURL(value));
 
-		if (domain != null) {
+		if (domain != null && !domain.equals("localhost")) { // Chrome doesn't like domain:"localhost" on cookies.
 			cookie.setDomain(domain);
 		}
 

@@ -25,9 +25,10 @@ import org.omnifaces.util.State;
  * <p>
  * The <code>&lt;o:messages&gt;</code> is a component that extends the standard <code>&lt;h:messages&gt;</code> with
  * the following new features:
- * <dl>
- * <dt>Multiple <code>for</code> components</dt>
- * <dd>Possibility to specify multiple client IDs space separated in the <code>for</code> attribute. The example below
+ *
+ * <h3>Multiple <code>for</code> components</h3>
+ * <p>
+ * Possibility to specify multiple client IDs space separated in the <code>for</code> attribute. The example below
  * would only display messages for <code>input1</code> and <code>input3</code>:
  * <pre>
  * &lt;h:form&gt;
@@ -38,6 +39,7 @@ import org.omnifaces.util.State;
  *     &lt;h:inputText id="input4" /&gt;
  * &lt;/h:form&gt;
  * </pre>
+ * <p>
  * It can even refer non-input components which in turn contains input components. The example below would only display
  * messages for <code>input1</code> and <code>input2</code>:
  * <pre>
@@ -51,6 +53,7 @@ import org.omnifaces.util.State;
  *     &lt;h:inputText id="input4" /&gt;
  * &lt;/h:form&gt;
  * </pre>
+ * <p>
  * You can even combine them. The example below would only display messages for <code>input1</code>,
  * <code>input2</code> and <code>input4</code>.
  * <pre>
@@ -64,9 +67,10 @@ import org.omnifaces.util.State;
  *     &lt;h:inputText id="input4" /&gt;
  * &lt;/h:form&gt;
  * </pre>
- * </dd>
- * <dt>Displaying single message</dt>
- * <dd>Show a single custom message whenever the component has received any faces message. This is particularly useful
+ *
+ * <h3>Displaying single message</h3>
+ * <p>
+ * Show a single custom message whenever the component has received any faces message. This is particularly useful
  * when you want to display a global message in case any of the in <code>for</code> specified components has a faces
  * message. For example:
  * <pre>
@@ -77,16 +81,16 @@ import org.omnifaces.util.State;
  *     &lt;h:inputText id="input3" /&gt;&lt;h:message for="input3" /&gt;
  * &lt;/h:form&gt;
  * </pre>
- * </dd>
- * <dt>HTML escaping</dt>
- * <dd>Control HTML escaping by the new <code>escape</code> attribute.
+ *
+ * <h3>HTML escaping</h3>
+ * <p>Control HTML escaping by the new <code>escape</code> attribute.
  * <pre>
  * &lt;o:messages escape="false" /&gt;
  * </pre>
- * Beware of potential XSS attack holes when user-controlled input is redisplayed through messages!
- * </dd>
- * <dt>Iteration markup control</dt>
- * <dd>Control iteration markup fully by the new <code>var</code> attribute which sets the current {@link FacesMessage}
+ * <p>Beware of potential XSS attack holes when user-controlled input is redisplayed through messages!
+ *
+ * <h3>Iteration markup control</h3>
+ * <p>Control iteration markup fully by the new <code>var</code> attribute which sets the current {@link FacesMessage}
  * in the request scope and disables the default table/list rendering. For example,
  * <pre>
  * &lt;dl&gt;
@@ -96,15 +100,14 @@ import org.omnifaces.util.State;
  *     &lt;/o:messages&gt;
  * &lt;/dl&gt;
  * </pre>
- * Note: the iteration is by design completely stateless. It's therefore not recommended to nest form components inside
+ * <p>Note: the iteration is by design completely stateless. It's therefore not recommended to nest form components inside
  * the <code>&lt;o:messages&gt;</code> component. It should be used for pure output only, like as the standard
  * <code>&lt;h:messages&gt;</code>. Plain output links are however no problem. Also note that the <code>message</code>
  * and <code>escape</code> attributes have in this case no effect. With a single message, there's no point of
  * iteration. As to escaping, just use <code>&lt;h:outputText escape="false"&gt;</code> the usual way.
- * </dd>
- * </dl>
- * <p>
- * Design notice: the component class is named <code>OmniMessages</code> instead of <code>Messages</code> to avoid
+ *
+ * <h3>Design notice</h3>
+ * <p>The component class is named <code>OmniMessages</code> instead of <code>Messages</code> to avoid
  * confusion with the {@link Messages} utility class.
  *
  * @author Bauke Scholtz
