@@ -383,19 +383,19 @@ public class Cache extends OutputFamily {
 		state.put(time, timeValue);
 	}
 
-	public Boolean isUseBuffer() {
+	public boolean isUseBuffer() {
 		return state.get(useBuffer, FALSE);
 	}
 
-	public void setUseBuffer(Boolean useBufferValue) {
+	public void setUseBuffer(boolean useBufferValue) {
 		state.put(useBuffer, useBufferValue);
 	}
 
-	public Boolean isReset() {
+	public boolean isReset() {
 		return state.get(reset, FALSE);
 	}
 
-	public void setReset(Boolean resetValue) {
+	public void setReset(boolean resetValue) {
 		state.put(reset, resetValue);
 	}
 
@@ -404,7 +404,7 @@ public class Cache extends OutputFamily {
 	 * @return Whether this cache is disabled.
 	 * @since 1.8
 	 */
-	public Boolean isDisabled() {
+	public boolean isDisabled() {
 		return state.get(disabled, FALSE);
 	}
 
@@ -413,7 +413,7 @@ public class Cache extends OutputFamily {
 	 * @param disabledValue Whether this cache is disabled.
 	 * @since 1.8
 	 */
-	public void setDisabled(Boolean disabledValue) {
+	public void setDisabled(boolean disabledValue) {
 		state.put(disabled, disabledValue);
 	}
 

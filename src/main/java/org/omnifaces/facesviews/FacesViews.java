@@ -471,7 +471,7 @@ public final class FacesViews {
 		return Boolean.valueOf(filterAfterDeclaredFilters);
 	}
 
-	public static Boolean isScannedViewsAlwaysExtensionless(final FacesContext context) {
+	public static boolean isScannedViewsAlwaysExtensionless(final FacesContext context) {
 
 		ExternalContext externalContext = context.getExternalContext();
 		Map<String, Object> applicationMap = externalContext.getApplicationMap();

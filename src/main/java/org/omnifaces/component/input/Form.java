@@ -153,7 +153,7 @@ public class Form extends UIForm {
 	 * Returns whether or not the view parameters should be encoded into the form's action URL.
 	 * @return Whether or not the view parameters should be encoded into the form's action URL.
 	 */
-	public Boolean isIncludeViewParams() {
+	public boolean isIncludeViewParams() {
 		return state.get(includeViewParams, FALSE);
 	}
 
@@ -172,7 +172,7 @@ public class Form extends UIForm {
 	 * @return Whether or not the request parameters should be encoded into the form's action URL.
 	 * @since 1.5
 	 */
-	public Boolean isIncludeRequestParams() {
+	public boolean isIncludeRequestParams() {
 		return state.get(includeRequestParams, FALSE);
 	}
 
@@ -192,7 +192,7 @@ public class Form extends UIForm {
 	 * @return Whether or not the request URI should be used as form's action URL.
 	 * @since 1.6
 	 */
-	public Boolean isUseRequestURI() {
+	public boolean isUseRequestURI() {
 		return state.get(useRequestURI, FALSE);
 	}
 

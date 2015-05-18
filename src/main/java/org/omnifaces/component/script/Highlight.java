@@ -176,7 +176,7 @@ public class Highlight extends OnloadScript {
 	 * Returns whether the first error element should gain focus. Defaults to <code>true</code>.
 	 * @return Whether the first error element should gain focus.
 	 */
-	public Boolean isFocus() {
+	public boolean isFocus() {
 		return state.get(PropertyKeys.focus, DEFAULT_FOCUS);
 	}
 
@@ -184,7 +184,7 @@ public class Highlight extends OnloadScript {
 	 * Sets whether the first error element should gain focus.
 	 * @param focus Whether the first error element should gain focus.
 	 */
-	public void setFocus(Boolean focus) {
+	public void setFocus(boolean focus) {
 		state.put(PropertyKeys.focus, focus);
 	}
 
