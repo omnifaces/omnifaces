@@ -50,7 +50,7 @@
 		<partial-view-context-factory>org.omnifaces.context.OmniPartialViewContextFactory</partial-view-context-factory>
 	</factory>
 
-	<managed-bean>
+	<managed-bean eager="true">
 		<description>
 			<![CDATA[
 				This makes an instance of <code>java.util.Date</code> as startup datetime available by 
