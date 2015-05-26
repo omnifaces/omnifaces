@@ -26,11 +26,9 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.el.ELResolver;
 import javax.faces.context.FacesContext;
 import javax.faces.context.PartialViewContext;
 import javax.faces.context.PartialViewContextWrapper;
-import javax.servlet.ServletContext;
 
 import org.omnifaces.resourcehandler.ResourceIdentifier;
 
@@ -367,17 +365,6 @@ public final class Hacks {
 	public static boolean isPrimeFacesDynamicResourceRequest(FacesContext context) {
 		Map<String, String> params = context.getExternalContext().getRequestParameterMap();
 		return "primefaces".equals(params.get("ln")) && params.get("pfdrid") != null;
-	}
-
-	// GlassFish related ----------------------------------------------------------------------------------------------
-
-	/**
-	 * Returns <code>true</code> if CDI is available in GlassFish.
-	 * @param servletContext The involved servlet context.
-	 * @return <code>true</code> if CDI is available in GlassFish.
-	 */
-	public static boolean isCDIAvailableInGlassFish(ServletContext servletContext) {
-		return servletContext.getAttribute("org.glassfish.jsp.beanManagerELResolver") instanceof ELResolver;
 	}
 
 	// Some reflection helpers ----------------------------------------------------------------------------------------
