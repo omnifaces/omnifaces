@@ -541,7 +541,7 @@ input.error, select.error, textarea.error {
 				]]>
 			</description>
 			<name>styleClass</name>
-			<required>true</required>
+			<required>false</required>
 			<type>java.lang.String</type>
 		</attribute>
 		<attribute>
@@ -3349,7 +3349,6 @@ public enum Baz {
 			</description>
 			<name>name</name>
 			<required>true</required>
-			<type>java.lang.String</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -3373,7 +3372,6 @@ public enum Baz {
 			</description>
 			<name>target</name>
 			<required>false</required>
-			<type>java.lang.String</type>
 		</attribute>
 	</tag>
 	

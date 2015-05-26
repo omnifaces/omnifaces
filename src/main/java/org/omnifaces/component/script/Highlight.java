@@ -115,33 +115,43 @@ public class Highlight extends OnloadScript {
 	 */
 	@Override
 	public void encodeChildren(FacesContext context) throws IOException {
-		if (context.isPostback() && context.isValidationFailed()) {
-			UIForm form = getCurrentForm();
+		UIForm form = getCurrentForm();
 
-			if (form != null) {
-				final StringBuilder clientIdsAsJSON = new StringBuilder();
-				form.visitTree(VisitContext.createVisitContext(context, null, VISIT_HINTS), new VisitCallback() {
-
-					@Override
-					public VisitResult visit(VisitContext context, UIComponent component) {
-						if (component instanceof UIInput && !((UIInput) component).isValid()) {
-							if (clientIdsAsJSON.length() > 0) {
-								clientIdsAsJSON.append(',');
-							}
-
-							String clientId = component.getClientId(context.getFacesContext());
-							clientIdsAsJSON.append('"').append(clientId).append('"');
-						}
-
-						return VisitResult.ACCEPT;
-					}
-				});
-
-				if (clientIdsAsJSON.length() > 0) {
-					context.getResponseWriter().write(String.format(SCRIPT, clientIdsAsJSON, getStyleClass(), isFocus()));
-				}
-			}
+		if (form == null) {
+			return;
 		}
+
+		final StringBuilder clientIds = new StringBuilder();
+		form.visitTree(VisitContext.createVisitContext(context, null, VISIT_HINTS), new VisitCallback() {
+
+			@Override
+			public VisitResult visit(VisitContext context, UIComponent component) {
+				if (component instanceof UIInput && !((UIInput) component).isValid()) {
+					if (clientIds.length() > 0) {
+						clientIds.append(',');
+					}
+
+					String clientId = component.getClientId(context.getFacesContext());
+					clientIds.append('"').append(clientId).append('"');
+				}
+
+				return VisitResult.ACCEPT;
+			}
+		});
+
+		if (clientIds.length() > 0) {
+			context.getResponseWriter().write(String.format(SCRIPT, clientIds, getStyleClass(), isFocus()));
+		}
+	}
+
+	/**
+	 * This component is per definiton only rendered when the current request is a postback request and the
+	 * validation has failed.
+	 */
+	@Override
+	public boolean isRendered() {
+		FacesContext context = getFacesContext();
+		return context.isPostback() && context.isValidationFailed() && super.isRendered();
 	}
 
 	// Getters/setters ------------------------------------------------------------------------------------------------
@@ -166,7 +176,7 @@ public class Highlight extends OnloadScript {
 	 * Returns whether the first error element should gain focus. Defaults to <code>true</code>.
 	 * @return Whether the first error element should gain focus.
 	 */
-	public Boolean isFocus() {
+	public boolean isFocus() {
 		return state.get(PropertyKeys.focus, DEFAULT_FOCUS);
 	}
 
@@ -174,7 +184,7 @@ public class Highlight extends OnloadScript {
 	 * Sets whether the first error element should gain focus.
 	 * @param focus Whether the first error element should gain focus.
 	 */
-	public void setFocus(Boolean focus) {
+	public void setFocus(boolean focus) {
 		state.put(PropertyKeys.focus, focus);
 	}
 

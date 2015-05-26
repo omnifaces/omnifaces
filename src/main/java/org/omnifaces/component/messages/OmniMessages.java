@@ -202,7 +202,7 @@ public class OmniMessages extends HtmlMessages {
 	 * Returns whether the message detail and summary should be HTML-escaped. Defaults to <code>true</code>.
 	 * @return Whether the message detail and summary should be HTML-escaped.
 	 */
-	public Boolean isEscape() {
+	public boolean isEscape() {
 		return state.get(PropertyKeys.escape, true);
 	}
 
@@ -210,7 +210,7 @@ public class OmniMessages extends HtmlMessages {
 	 * Sets whether the message detail and summary should be HTML-escaped.
 	 * @param escape Whether the message detail and summary should be HTML-escaped.
 	 */
-	public void setEscape(Boolean escape) {
+	public void setEscape(boolean escape) {
 		state.put(PropertyKeys.escape, escape);
 	}
 
