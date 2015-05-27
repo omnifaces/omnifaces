@@ -75,25 +75,25 @@ public class SelectItemsIndexConverter implements Converter {
 
 	private static final String ATTRIBUTE_SELECT_ITEMS = "SelectItemsIndexConverter.%s";
 
-	private static final String ERROR_SELECT_ITEMS_LIST_EMPTY =
-		"Could not determine select items list for component {0}";
 	private static final String ERROR_SELECT_ITEMS_LIST_INDEX =
-		"Could not determine index for value {0} in component {1}";
+		"Could not determine index for value ''{0}'' in component {1}.";
 	private static final String ERROR_GET_AS_OBJECT =
-		"Could not convert value {0} for component {1}";
+		"Could not convert value ''{0}'' for component {1}.";
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
 	public Object getAsObject(FacesContext context, UIComponent component, String submittedValue) {
-		final List<Object> selectItemValues = getSelectItemValues(context, component);
+		List<Object> selectItemValues = SelectItemsUtils.collectAllValuesFromSelectItems(context, component);
 
 		try {
 			return selectItemValues.get(Integer.parseInt(submittedValue));
-		} catch (NumberFormatException e) {
+		}
+		catch (NumberFormatException e) {
 			throw new ConverterException(
 				createError(ERROR_SELECT_ITEMS_LIST_INDEX, submittedValue, component.getClientId(context)), e);
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new ConverterException(
 				createError(ERROR_GET_AS_OBJECT, submittedValue, component.getClientId(context)), e);
 		}
@@ -101,7 +101,13 @@ public class SelectItemsIndexConverter implements Converter {
 
 	@Override
 	public String getAsString(FacesContext context, UIComponent component, Object modelValue) {
-		final List<Object> selectItemValues = getSelectItemValues(context, component);
+		String key = String.format(ATTRIBUTE_SELECT_ITEMS, component.getClientId(context));
+		List<Object> selectItemValues = getContextAttribute(key);
+
+		if (selectItemValues == null) {
+			selectItemValues = SelectItemsUtils.collectAllValuesFromSelectItems(context, component);
+			setContextAttribute(key, selectItemValues); // Cache it as it's a rather expensive job.
+		}
 
 		for (int i = 0; i < selectItemValues.size(); i++) {
 			Object selectItemValue = selectItemValues.get(i);
@@ -112,24 +118,6 @@ public class SelectItemsIndexConverter implements Converter {
 		}
 
 		return "";
-	}
-
-	// Helpers --------------------------------------------------------------------------------------------------------
-
-	private static List<Object> getSelectItemValues(FacesContext context, UIComponent component) {
-		String key = String.format(ATTRIBUTE_SELECT_ITEMS, component.getClientId(context));
-		List<Object> selectItemValues = getContextAttribute(key);
-
-		if (selectItemValues == null) {
-			selectItemValues = SelectItemsUtils.collectAllValuesFromSelectItems(context, component);
-			setContextAttribute(key, selectItemValues);
-		}
-
-		if (selectItemValues.isEmpty()) {
-			throw new ConverterException(createError(ERROR_SELECT_ITEMS_LIST_EMPTY, component.getClientId(context)));
-		}
-
-		return selectItemValues;
 	}
 
 }
