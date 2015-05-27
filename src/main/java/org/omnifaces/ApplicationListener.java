@@ -49,19 +49,14 @@ public class ApplicationListener extends DefaultServletContextListener {
 
 	private static final Logger logger = Logger.getLogger(ApplicationListener.class.getName());
 
-	// Properties -----------------------------------------------------------------------------------------------------
-
-	@Inject
-	private EagerBeansRepository eagerBeansRepository;
-
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
 		checkCDIAvailable();
+		BeanManager.INSTANCE.getReference(EagerBeansRepository.class).instantiateApplicationScoped();
 		FacesViews.addMappings(event.getServletContext());
 		CacheInitializer.loadProviderAndRegisterFilter(event.getServletContext());
-		eagerBeansRepository.instantiateApplicationScoped();
 	}
 
 	private void checkCDIAvailable() {
