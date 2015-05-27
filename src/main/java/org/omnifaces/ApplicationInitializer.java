@@ -28,7 +28,6 @@ import org.omnifaces.facesviews.FacesViews;
  * <ol>
  * <li>Log OmniFaces version.
  * <li>Register {@link FacesViews} filter.
- * <li>Register {@link ApplicationListener}.
  * </ol>
  *
  * @author Bauke Scholtz
@@ -46,7 +45,6 @@ public class ApplicationInitializer implements ServletContainerInitializer {
 	public void onStartup(Set<Class<?>> c, ServletContext servletContext) throws ServletException {
 		logOmniFacesVersion();
 		FacesViews.registerFilter(servletContext);
-		servletContext.addListener(ApplicationListener.class);
 	}
 
 	private void logOmniFacesVersion() {

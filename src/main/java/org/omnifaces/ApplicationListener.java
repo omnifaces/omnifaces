@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 import javax.faces.webapp.FacesServlet;
 import javax.inject.Inject;
 import javax.servlet.ServletContextEvent;
+import javax.servlet.annotation.WebListener;
 
 import org.omnifaces.cdi.Eager;
 import org.omnifaces.cdi.eager.EagerBeansRepository;
@@ -29,8 +30,7 @@ import org.omnifaces.facesviews.FacesViews;
 /**
  * <p>
  * OmniFaces application listener. This runs when the servlet context is created and thus after the
- * {@link ApplicationInitializer} and the {@link FacesServlet}. This is installed by {@link ApplicationInitializer} to
- * guarantee that it also runs with <code>metadata-complete="false"</code> in <code>web.xml</code>.
+ * {@link ApplicationInitializer} and the {@link FacesServlet}.
  * This performs the following tasks:
  * <ol>
  * <li>Check if CDI is available, otherwise log and fail.
@@ -42,6 +42,7 @@ import org.omnifaces.facesviews.FacesViews;
  * @author Bauke Scholtz
  * @since 2.0
  */
+@WebListener
 public class ApplicationListener extends DefaultServletContextListener {
 
 	// Constants ------------------------------------------------------------------------------------------------------
