@@ -21,7 +21,6 @@ import static org.omnifaces.util.Servlets.getRequestRelativeURIWithoutPathParame
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import javax.inject.Inject;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequestListener;
@@ -54,9 +53,6 @@ import org.omnifaces.filter.HttpFilter;
  */
 public class EagerBeansFilter extends HttpFilter {
 
-	@Inject
-	private EagerBeansRepository eagerBeansRepository;
-
 	@Override
 	public void init() throws ServletException {
 		EagerBeansWebListener.disable();
@@ -64,7 +60,7 @@ public class EagerBeansFilter extends HttpFilter {
 
 	@Override
 	public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session,	FilterChain chain) throws ServletException, IOException {
-		eagerBeansRepository.instantiateByRequestURI(getRequestRelativeURIWithoutPathParameters(request));
+		EagerBeansRepository.getInstance().instantiateByRequestURI(getRequestRelativeURIWithoutPathParameters(request));
 
 		chain.doFilter(request, response);
 
@@ -82,7 +78,7 @@ public class EagerBeansFilter extends HttpFilter {
 				// Even if we remove it immediately there's still a chance for a race, so test the boolean atomically
 				// and make sure only one thread sees the initial value of "true" returned.
 				if (sessionCreated.getAndSet(false)) {
-					eagerBeansRepository.instantiateSessionScoped();
+					EagerBeansRepository.getInstance().instantiateSessionScoped();
 				}
 			}
 		}

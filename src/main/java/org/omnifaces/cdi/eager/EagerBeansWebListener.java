@@ -22,7 +22,6 @@ import static org.omnifaces.util.Servlets.getRequestRelativeURIWithoutPathParame
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
-import javax.inject.Inject;
 import javax.servlet.ServletRequestEvent;
 import javax.servlet.ServletRequestListener;
 import javax.servlet.annotation.WebListener;
@@ -53,19 +52,16 @@ public class EagerBeansWebListener implements HttpSessionListener, ServletReques
 
 	private static boolean disabled;
 
-	@Inject
-	private EagerBeansRepository eagerBeansRepository;
-
 	// Actions --------------------------------------------------------------------------------------------------------
 
-	public static void disable() {
-		EagerBeansWebListener.disabled = true;
+	static void disable() {
+		disabled = true;
 	}
 
 	@Override
 	public void sessionCreated(HttpSessionEvent event) {
 		if (!disabled) {
-			eagerBeansRepository.instantiateSessionScoped();
+			EagerBeansRepository.getInstance().instantiateSessionScoped();
 		}
 		else {
 			// Record a "session created" marker manually. HttpSession#isNew() not entirely accurate for our purpose.
@@ -79,7 +75,7 @@ public class EagerBeansWebListener implements HttpSessionListener, ServletReques
 			String uri = getRequestRelativeURIWithoutPathParameters((HttpServletRequest) event.getServletRequest());
 
 			try {
-				eagerBeansRepository.instantiateByRequestURI(uri);
+				EagerBeansRepository.getInstance().instantiateByRequestURI(uri);
 			}
 			catch (Exception e) {
 				logger.log(SEVERE, format(POSSIBLY_REQUEST_SCOPE_NOT_ACTIVE, uri), e);

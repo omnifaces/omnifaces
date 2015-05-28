@@ -15,7 +15,6 @@ package org.omnifaces;
 import java.util.logging.Logger;
 
 import javax.faces.webapp.FacesServlet;
-import javax.inject.Inject;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.annotation.WebListener;
 
@@ -54,7 +53,7 @@ public class ApplicationListener extends DefaultServletContextListener {
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
 		checkCDIAvailable();
-		BeanManager.INSTANCE.getReference(EagerBeansRepository.class).instantiateApplicationScoped();
+		EagerBeansRepository.getInstance().instantiateApplicationScoped();
 		FacesViews.addMappings(event.getServletContext());
 		CacheInitializer.loadProviderAndRegisterFilter(event.getServletContext());
 	}

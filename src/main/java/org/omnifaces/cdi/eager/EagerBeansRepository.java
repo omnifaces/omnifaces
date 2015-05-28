@@ -35,6 +35,8 @@ import javax.inject.Inject;
 @ApplicationScoped
 public class EagerBeansRepository {
 
+	private static EagerBeansRepository instance;
+
 	@Inject
 	private BeanManager beanManager;
 
@@ -42,6 +44,14 @@ public class EagerBeansRepository {
 	private List<Bean<?>> sessionScopedBeans;
 	private Map<String, List<Bean<?>>> requestScopedBeansViewId;
 	private Map<String, List<Bean<?>>> requestScopedBeansRequestURI;
+
+	public static EagerBeansRepository getInstance() { // Awkward workaround for it being unavailable via @Inject in listeners/filters in Tomcat+OWB.
+		if (instance == null) {
+			instance = org.omnifaces.config.BeanManager.INSTANCE.getReference(EagerBeansRepository.class);
+		}
+
+		return instance;
+	}
 
 	public void instantiateApplicationScoped() {
 		if (isAnyEmpty(applicationScopedBeans, beanManager)) {

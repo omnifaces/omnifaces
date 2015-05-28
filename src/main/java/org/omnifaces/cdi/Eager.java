@@ -146,8 +146,7 @@ import org.omnifaces.cdi.eager.EagerExtension;
  *</pre>
  *
  * <p>
- * Note that the {@link EagerBeansFilter} will automatically disable the request/session listener by calling
- * {@link EagerBeansWebListener#disable()}.
+ * Note that the {@link EagerBeansFilter} will automatically disable the {@link EagerBeansWebListener}.
  *
  *
  * @since 1.8
