@@ -367,8 +367,11 @@ public final class Faces {
 
 	/**
 	 * Programmatically EL-resolve the given property on the given base object and return the resolved value.
+	 * @param <T> The expected return type.
 	 * @param base The base object whose property value is to be returned, or null to resolve a top-level variable.
 	 * @param property The property or variable to be resolved on the given base.
+	 * @return The resolved value of the given property on the given base object.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see Application#getELResolver()
 	 * @see ELResolver#getValue(ELContext, Object, Object)
 	 * @since 2.1
@@ -634,11 +637,11 @@ public final class Faces {
 	 * @see Application#getResourceBundle(FacesContext, String)
 	 * @since 2.1
 	 */
-    public static Map<String, ResourceBundle> getResourceBundles() {
-    	return FacesLocal.getResourceBundles(getContext());
-    }
+	public static Map<String, ResourceBundle> getResourceBundles() {
+		return FacesLocal.getResourceBundles(getContext());
+	}
 
-    /**
+	/**
 	 * Gets a string for the given key searching declared resource bundles, order by declaration in
 	 * <code>faces-config.xml</code>.
 	 * If the string is missing, then this method returns <code>???key???</code>.
@@ -647,9 +650,9 @@ public final class Faces {
 	 * <code>faces-config.xml</code>.
 	 * @since 2.1
 	 */
-    public static String getBundleString(String key) {
-    	return FacesLocal.getBundleString(getContext(), key);
-    }
+	public static String getBundleString(String key) {
+		return FacesLocal.getBundleString(getContext(), key);
+	}
 
 	/**
 	 * Perform the JSF navigation to the given outcome.
@@ -664,7 +667,8 @@ public final class Faces {
 	/**
 	 * Returns the concrete domain-relative URL to the current view with the given params URL-encoded in the query
 	 * string and optionally include view parameters as well. This URL can ultimately be used as redirect URL, or in
-	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>.
+	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>. Any parameter with an empty name or value
+	 * will be skipped. To skip empty view parameters as well, use <code>&lt;o:viewParam&gt;</code> instead.
 	 * @param params The parameters to be URL-encoded in the query string. Can be <code>null</code>.
 	 * @param includeViewParams Whether the view parameters of the current view should be included as well.
 	 * @return The concrete domain-relative URL to the current view.
@@ -680,7 +684,8 @@ public final class Faces {
 	/**
 	 * Returns the concrete domain-relative URL to the given view with the given params URL-encoded in the query
 	 * string and optionally include view parameters as well. This URL can ultimately be used as redirect URL, or in
-	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>.
+	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>. Any parameter with an empty name or value
+	 * will be skipped. To skip empty view parameters as well, use <code>&lt;o:viewParam&gt;</code> instead.
 	 * @param viewId The view ID to create the bookmarkable URL for.
 	 * @param params The parameters to be URL-encoded in the query string. Can be <code>null</code>.
 	 * @param includeViewParams Whether the view parameters of the current view which are also declared in the target
@@ -697,7 +702,8 @@ public final class Faces {
 	/**
 	 * Returns the concrete domain-relative URL to the current view with the given params URL-encoded in the query
 	 * string and optionally include view parameters as well. This URL can ultimately be used as redirect URL, or in
-	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>.
+	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>. Any parameter with an empty name or value
+	 * will be skipped. To skip empty view parameters as well, use <code>&lt;o:viewParam&gt;</code> instead.
 	 * @param params The parameters to be URL-encoded in the query string. Can be <code>null</code>.
 	 * @param includeViewParams Whether the view parameters of the current view should be included as well.
 	 * @return The concrete domain-relative URL to the current view.
@@ -713,7 +719,8 @@ public final class Faces {
 	/**
 	 * Returns the concrete domain-relative URL to the given view with the given params URL-encoded in the query
 	 * string and optionally include view parameters as well. This URL can ultimately be used as redirect URL, or in
-	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>.
+	 * <code>&lt;form action&gt;</code>, or in <code>&lt;a href&gt;</code>. Any parameter with an empty name or value
+	 * will be skipped. To skip empty view parameters as well, use <code>&lt;o:viewParam&gt;</code> instead.
 	 * @param viewId The view ID to create the bookmarkable URL for.
 	 * @param params The parameters to be URL-encoded in the query string. Can be <code>null</code>.
 	 * @param includeViewParams Whether the view parameters of the current view which are also declared in the target
@@ -839,7 +846,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestParameterValuesMap()
 	 */
 	public static String[] getRequestParameterValues(String name) {
-		return FacesLocal.getRequestParameterValues(getContext(), name);
+		return FacesLocal.getRequestParameterValuesMap(getContext()).get(name);
 	}
 
 	/**
@@ -858,7 +865,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestHeaderMap()
 	 */
 	public static String getRequestHeader(String name) {
-		return FacesLocal.getRequestHeader(getContext(), name);
+		return FacesLocal.getRequestHeaderMap(getContext()).get(name);
 	}
 
 	/**
@@ -877,7 +884,7 @@ public final class Faces {
 	 * @see ExternalContext#getRequestHeaderValuesMap()
 	 */
 	public static String[] getRequestHeaderValues(String name) {
-		return FacesLocal.getRequestHeaderValues(getContext(), name);
+		return FacesLocal.getRequestHeaderValuesMap(getContext()).get(name);
 	}
 
 	/**

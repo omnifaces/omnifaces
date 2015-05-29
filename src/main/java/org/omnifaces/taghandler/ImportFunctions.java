@@ -33,8 +33,8 @@ import javax.faces.view.facelets.TagHandler;
 /**
  * <p>
  * The <code>&lt;o:importFunctions&gt;</code> taghandler allows the developer to have access to all functions of the
- * given fully qualified name of a type in the EL scope using the usual EL functions syntax without the need to register
- * them in <code>.taglib.xml</code> file. The functions are those <code>public static</code> methods with a
+ * given fully qualified name of a type in the Facelet scope using the usual EL functions syntax without the need to
+ * register them in <code>.taglib.xml</code> file. The functions are those <code>public static</code> methods with a
  * <strong>non</strong>-<code>void</code> return type.
  *
  * <h3>Usage</h3>

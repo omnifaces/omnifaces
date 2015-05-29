@@ -87,24 +87,24 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 
 		Set<String> extensions = getFacesServletExtensions(context);
 
-	    if (!isExtensionless(viewId)) {
-	    	String viewIdExtension = getExtension(viewId);
-	    	if (!extensions.contains(viewIdExtension)) {
-	    		extensions = new HashSet<>(extensions);
-	    		extensions.add(viewIdExtension);
-	    	}
-	    }
+		if (!isExtensionless(viewId)) {
+			String viewIdExtension = getExtension(viewId);
+			if (!extensions.contains(viewIdExtension)) {
+				extensions = new HashSet<>(extensions);
+				extensions.add(viewIdExtension);
+			}
+		}
 
-	    int lastSlashPos = resource.lastIndexOf('/');
-	    int lastQuestionMarkPos = resource.lastIndexOf('?'); // so we don't remove "extension" from parameter value
-	    for (String extension : extensions) {
+		int lastSlashPos = resource.lastIndexOf('/');
+		int lastQuestionMarkPos = resource.lastIndexOf('?'); // so we don't remove "extension" from parameter value
+		for (String extension : extensions) {
 
-	    	int extensionPos = resource.lastIndexOf(extension);
-	    	if (extensionPos > lastSlashPos && (lastQuestionMarkPos == -1 || extensionPos < lastQuestionMarkPos)) {
-	    		return resource.substring(0, extensionPos) + resource.substring(extensionPos + extension.length());
-	    	}
+			int extensionPos = resource.lastIndexOf(extension);
+			if (extensionPos > lastSlashPos && (lastQuestionMarkPos == -1 || extensionPos < lastQuestionMarkPos)) {
+				return resource.substring(0, extensionPos) + resource.substring(extensionPos + extension.length());
+			}
 
-	    }
+		}
 
 		return resource;
 	}

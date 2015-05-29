@@ -49,7 +49,7 @@ public class ConditionalResponseWriter extends ResponseWriterWrapper {
 	private Map<UIComponent, Boolean> renderedReferenceCache = new HashMap<>();
 
 	public ConditionalResponseWriter(ResponseWriter responseWriter, FacesContext facesContext, List<String> componentIds, List<String> clientIds,
-	        boolean renderChildren) {
+			boolean renderChildren) {
 		this.responseWriter = responseWriter;
 		this.facesContext = facesContext;
 		this.componentIds = componentIds;

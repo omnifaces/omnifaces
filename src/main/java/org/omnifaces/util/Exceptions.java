@@ -96,15 +96,15 @@ public final class Exceptions {
 	public static <T extends Throwable> boolean is(Throwable exception, Class<T> type) {
 		Throwable unwrappedException = exception;
 
-	    while (unwrappedException != null) {
-	        if (type.isInstance(unwrappedException)) {
-	            return true;
-	        }
+		while (unwrappedException != null) {
+			if (type.isInstance(unwrappedException)) {
+				return true;
+			}
 
-	        unwrappedException = unwrappedException.getCause();
-	    }
+			unwrappedException = unwrappedException.getCause();
+		}
 
-	    return false;
+		return false;
 	}
 
 }

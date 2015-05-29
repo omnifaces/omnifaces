@@ -44,82 +44,53 @@ public class ELContextWrapper extends ELContext implements FacesWrapper<ELContex
 	}
 
 	@Override
-    public ELContext getWrapped() {
-    	return elContext;
-    }
+	public ELContext getWrapped() {
+		return elContext;
+	}
 
-	 /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setPropertyResolved(boolean resolved) {
-        getWrapped().setPropertyResolved(resolved);
-    }
+	@Override
+	public void setPropertyResolved(boolean resolved) {
+		getWrapped().setPropertyResolved(resolved);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isPropertyResolved() {
-        return getWrapped().isPropertyResolved();
-    }
+	@Override
+	public boolean isPropertyResolved() {
+		return getWrapped().isPropertyResolved();
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void putContext(@SuppressWarnings("rawtypes") Class key, Object contextObject) {
-    	getWrapped().putContext(key, contextObject);
-    }
+	@Override
+	public void putContext(@SuppressWarnings("rawtypes") Class key, Object contextObject) {
+		getWrapped().putContext(key, contextObject);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Object getContext(@SuppressWarnings("rawtypes") Class key) {
-       return getWrapped().getContext(key);
-    }
+	@Override
+	public Object getContext(@SuppressWarnings("rawtypes") Class key) {
+	   return getWrapped().getContext(key);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public ELResolver getELResolver() {
-    	return getWrapped().getELResolver();
-    }
+	@Override
+	public ELResolver getELResolver() {
+		return getWrapped().getELResolver();
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public FunctionMapper getFunctionMapper() {
-    	return getWrapped().getFunctionMapper();
-    }
+	@Override
+	public FunctionMapper getFunctionMapper() {
+		return getWrapped().getFunctionMapper();
+	}
 
+	@Override
+	public Locale getLocale() {
+		return getWrapped().getLocale();
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Locale getLocale() {
-    	return getWrapped().getLocale();
-    }
+	@Override
+	public void setLocale(Locale locale) {
+		getWrapped().setLocale(locale);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void setLocale(Locale locale) {
-    	getWrapped().setLocale(locale);
-    }
-
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public VariableMapper getVariableMapper() {
-    	return getWrapped().getVariableMapper();
-    }
+	@Override
+	public VariableMapper getVariableMapper() {
+		return getWrapped().getVariableMapper();
+	}
 
 }

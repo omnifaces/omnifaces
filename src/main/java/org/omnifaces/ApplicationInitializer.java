@@ -19,17 +19,14 @@ import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
-import org.omnifaces.config.BeanManager;
 import org.omnifaces.facesviews.FacesViews;
-import org.omnifaces.util.Hacks;
 
 /**
  * <p>
  * OmniFaces application initializer. This runs when the servlet container starts up.
  * This performs the following tasks:
  * <ol>
- * <li>Log the OmniFaces version.
- * <li>Check if CDI is available, otherwise log and fail.
+ * <li>Log OmniFaces version.
  * <li>Register {@link FacesViews} filter.
  * </ol>
  *
@@ -47,59 +44,11 @@ public class ApplicationInitializer implements ServletContainerInitializer {
 	@Override
 	public void onStartup(Set<Class<?>> c, ServletContext servletContext) throws ServletException {
 		logOmniFacesVersion();
-		checkCDIAvailable(servletContext);
 		FacesViews.registerFilter(servletContext);
 	}
 
 	private void logOmniFacesVersion() {
 		logger.info("Using OmniFaces version " + getClass().getPackage().getSpecificationVersion());
-	}
-
-	private void checkCDIAvailable(ServletContext servletContext) throws ServletException {
-		if (Hacks.isCDIAvailableInGlassFish(servletContext)) {
-			return; // Okay. Don't proceed, because GF4 fails to scan JNDI during servlet container initialization.
-		}
-
-		try {
-			BeanManager.INSTANCE.toString();
-		}
-		catch (IllegalStateException e) {
-			logger.severe(""
-				+ "\n████████████████████████████████████████████████████████████████████████████████"
-				+ "\n▌                         ▐█     ▐                                             ▐"
-				+ "\n▌    ▄                  ▄█▓█▌    ▐ OmniFaces failed to initialize!             ▐"
-				+ "\n▌   ▐██▄               ▄▓░░▓▓    ▐                                             ▐"
-				+ "\n▌   ▐█░██▓            ▓▓░░░▓▌    ▐ This OmniFaces version requires CDI, but    ▐"
-				+ "\n▌   ▐█▌░▓██          █▓░░░░▓     ▐ none was found on this environment.         ▐"
-				+ "\n▌    ▓█▌░░▓█▄███████▄███▓░▓█     ▐                                             ▐"
-				+ "\n▌    ▓██▌░▓██░░░░░░░░░░▓█░▓▌     ▐ OmniFaces 2.x requires a minimum of JSF 2.2.▐"
-				+ "\n▌     ▓█████░░░░░░░░░░░░▓██      ▐ Since this JSF version, the JSF managed bean▐"
-				+ "\n▌     ▓██▓░░░░░░░░░░░░░░░▓█      ▐ facility @ManagedBean is semi-official      ▐"
-				+ "\n▌     ▐█▓░░░░░░█▓░░▓█░░░░▓█▌     ▐ deprecated in favour of CDI. JSF 2.2 users  ▐"
-				+ "\n▌     ▓█▌░▓█▓▓██▓░█▓▓▓▓▓░▓█▌     ▐ are strongly encouraged to move to CDI.     ▐"
-				+ "\n▌     ▓▓░▓██████▓░▓███▓▓▌░█▓     ▐                                             ▐"
-				+ "\n▌    ▐▓▓░█▄▐▓▌█▓░░▓█▐▓▌▄▓░██     ▐ OmniFaces goes a step further by making CDI ▐"
-				+ "\n▌    ▓█▓░▓█▄▄▄█▓░░▓█▄▄▄█▓░██▌    ▐ a REQUIRED dependency next to JSF 2.2. This ▐"
-				+ "\n▌    ▓█▌░▓█████▓░░░▓███▓▀░▓█▓    ▐ not only ensures that your web application  ▐"
-				+ "\n▌   ▐▓█░░░▀▓██▀░░░░░ ▀▓▀░░▓█▓    ▐ represents the state of art, but this also  ▐"
-				+ "\n▌   ▓██░░░░░░░░▀▄▄▄▄▀░░░░░░▓▓    ▐ makes for us easier to develop OmniFaces,   ▐"
-				+ "\n▌   ▓█▌░░░░░░░░░░▐▌░░░░░░░░▓▓▌   ▐ without the need for all sorts of hacks in  ▐"
-				+ "\n▌   ▓█░░░░░░░░░▄▀▀▀▀▄░░░░░░░█▓   ▐ in order to get OmniFaces to deploy on      ▐"
-				+ "\n▌  ▐█▌░░░░░░░░▀░░░░░░▀░░░░░░█▓▌  ▐ environments without CDI.                   ▐"
-				+ "\n▌  ▓█░░░░░░░░░░░░░░░░░░░░░░░██▓  ▐                                             ▐"
-				+ "\n▌  ▓█░░░░░░░░░░░░░░░░░░░░░░░▓█▓  ▐ You have 3 options:                         ▐"
-				+ "\n██████████████████████████████████ 1. Downgrade to OmniFaces 1.x.              ▐"
-				+ "\n█░▀░░░░▀█▀░░░░░░▀█░░░░░░▀█▀░░░░░▀█ 2. Install CDI in this environment.         ▐"
-				+ "\n█░░▐█▌░░█░░░██░░░█░░██░░░█░░░██░░█ 3. Switch to a CDI capable environment.     ▐"
-				+ "\n█░░▐█▌░░█░░░██░░░█░░██░░░█░░░██░░█                                             ▐"
-				+ "\n█░░▐█▌░░█░░░██░░░█░░░░░░▄█░░▄▄▄▄▄█ For additional instructions, check          ▐"
-				+ "\n█░░▐█▌░░█░░░██░░░█░░░░████░░░░░░░█ http://omnifaces.org/cdi                    ▐"
-				+ "\n█░░░█░░░█▄░░░░░░▄█░░░░████▄░░░░░▄█                                             ▐"
-				+ "\n████████████████████████████████████████████████████████████████████████████████"
-			);
-
-			throw new ServletException(e);
-		}
 	}
 
 }

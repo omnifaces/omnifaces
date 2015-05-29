@@ -51,7 +51,7 @@ import org.omnifaces.filter.CacheControlFilter;
  * Collection of utility methods for the Servlet API in general. Most of them are internally used by {@link Faces}
  * and {@link FacesLocal}, however they may also be useful in a "plain vanilla" servlet or servlet filter.
  * <p>
- * There are as of now also three special methods related to JSF without needing a {@link FacesContext}:
+ * There are as of now also four special methods related to JSF without needing a {@link FacesContext}:
  * <ul>
  * <li>The {@link #isFacesAjaxRequest(HttpServletRequest)} which is capable of checking if the current request is a JSF
  * ajax request.
@@ -61,6 +61,8 @@ import org.omnifaces.filter.CacheControlFilter;
  * of distinguishing JSF ajax requests from regular requests and altering the redirect logic on it, exactly like as
  * {@link ExternalContext#redirect(String)} does. In other words, this method behaves exactly the same as
  * {@link Faces#redirect(String, String...)}.
+ * <li>The {@link #isFacesDevelopment(ServletContext)} which is capable of checking if the current JSF application
+ * configuration is set to development project stage.
  * </ul>
  * <p>
  * Those methods can be used in for example a servlet filter.
@@ -388,7 +390,7 @@ public final class Servlets {
 	{
 		Cookie cookie = new Cookie(name, encodeURL(value));
 
-		if (domain != null) {
+		if (domain != null && !domain.equals("localhost")) { // Chrome doesn't like domain:"localhost" on cookies.
 			cookie.setDomain(domain);
 		}
 

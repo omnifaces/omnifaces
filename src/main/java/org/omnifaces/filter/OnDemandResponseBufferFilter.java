@@ -47,7 +47,7 @@ public class OnDemandResponseBufferFilter extends HttpFilter {
 
 	@Override
 	public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException,
-	        IOException {
+			IOException {
 
 		BufferedHttpServletResponse bufferedResponse = new BufferedHttpServletResponse(response);
 

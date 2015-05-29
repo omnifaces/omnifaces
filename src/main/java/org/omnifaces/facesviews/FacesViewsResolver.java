@@ -32,25 +32,25 @@ import javax.faces.view.facelets.ResourceResolver;
  */
 public class FacesViewsResolver extends ResourceResolver {
 
-    private final ResourceResolver resourceResolver;
+	private final ResourceResolver resourceResolver;
 
-    public FacesViewsResolver(ResourceResolver resourceResolver) {
-        this.resourceResolver = resourceResolver;
-    }
+	public FacesViewsResolver(ResourceResolver resourceResolver) {
+		this.resourceResolver = resourceResolver;
+	}
 
-    @Override
-    public URL resolveUrl(String path) {
+	@Override
+	public URL resolveUrl(String path) {
 
-        URL resource = resourceResolver.resolveUrl(getMappedPath(path));
+		URL resource = resourceResolver.resolveUrl(getMappedPath(path));
 
-        if (resource == null && isDevelopment()) {
-        	// If "resource" is null it means it wasn't found. Check if the resource was dynamically added by
-        	// scanning the faces-views location(s) again.
-        	scanAndStoreViews(getServletContext());
-        	resource = resourceResolver.resolveUrl(getMappedPath(path));
-        }
+		if (resource == null && isDevelopment()) {
+			// If "resource" is null it means it wasn't found. Check if the resource was dynamically added by
+			// scanning the faces-views location(s) again.
+			scanAndStoreViews(getServletContext());
+			resource = resourceResolver.resolveUrl(getMappedPath(path));
+		}
 
-        return resource;
-    }
+		return resource;
+	}
 
 }

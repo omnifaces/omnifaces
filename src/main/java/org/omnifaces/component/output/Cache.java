@@ -85,7 +85,6 @@ import org.omnifaces.util.State;
  * evicted following a least recently used policy. The default time to live specifies for how long
  * entries are considered to be valid. A value for the <code>time</code> attribute on this component
  * will override this global default time to live. The following context parameters can be used in web.xml:
- * <p>
  * <table summary="All available context parameters">
  * <tr><td class="colFirst">
  * <code>org.omnifaces.CACHE_SETTING_APPLICATION_MAX_CAPACITY</code>
@@ -126,22 +125,6 @@ import org.omnifaces.util.State;
  * </td></tr>
  * </table>
  *
- * <h3>Servlet 2.5 configuration</h3>
- * <p>
- * If no custom caching provider or global settings are used, no specific configuration is needed. Otherwise
- * <code>org.omnifaces.component.output.cache.CacheInitializerListener</code> needs to be installed as a listener in
- * <code>web.xml</code>:
- * <pre>
- * &lt;listener&gt;
- *     &lt;listener-class&gt;org.omnifaces.component.output.cache.CacheInitializerListener&lt;/listener-class&gt;
- * &lt;/listener&gt;
- * </pre>
- * <p>
- * In case the alternative caching method via buffering is used,
- * <code>org.omnifaces.servlet.BufferedHttpServletResponse</code> needs to be installed as a Servlet Filter in
- * <code>web.xml</code>, filtering either the <code>FacesServlet</code> itself or any page on which the alternative
- * caching method is required.
- *
  * @since 1.1
  * @author Arjan Tijms
  * @see CacheValue
@@ -173,7 +156,7 @@ public class Cache extends OutputFamily {
 
 		// Execute the following code in PreRenderView, since at construction time the "useBuffer" and "key" attributes
 		// have not been set, and there is no @PostContruct for UIComponents.
-		subscribeToViewEvent(PRE_RENDER, new Callback.Void() {
+		subscribeToViewEvent(PRE_RENDER, new Callback.SerializableVoid() {
 
 			private static final long serialVersionUID = 1L;
 
@@ -194,9 +177,6 @@ public class Cache extends OutputFamily {
 					// After the RENDER_RESPONSE phase, copy the area we need to cache from the response buffer
 					// and insert it into our cache
 					subscribeToRequestAfterPhase(RENDER_RESPONSE, new Callback.Void() {
-
-						private static final long serialVersionUID = 1L;
-
 						@Override
 						public void invoke() {
 							String content = null;
@@ -217,7 +197,7 @@ public class Cache extends OutputFamily {
 				}
 			}
 		});
-    }
+	}
 
 	@Override
 	public void encodeChildren(FacesContext context) throws IOException {
@@ -403,28 +383,28 @@ public class Cache extends OutputFamily {
 		state.put(time, timeValue);
 	}
 
-	public Boolean isUseBuffer() {
-    	return state.get(useBuffer, FALSE);
-    }
+	public boolean isUseBuffer() {
+		return state.get(useBuffer, FALSE);
+	}
 
-	public void setUseBuffer(Boolean useBufferValue) {
-    	state.put(useBuffer, useBufferValue);
-    }
+	public void setUseBuffer(boolean useBufferValue) {
+		state.put(useBuffer, useBufferValue);
+	}
 
-	public Boolean isReset() {
-    	return state.get(reset, FALSE);
-    }
+	public boolean isReset() {
+		return state.get(reset, FALSE);
+	}
 
-	public void setReset(Boolean resetValue) {
-    	state.put(reset, resetValue);
-    }
+	public void setReset(boolean resetValue) {
+		state.put(reset, resetValue);
+	}
 
 	/**
 	 * Returns whether this cache is disabled.
 	 * @return Whether this cache is disabled.
 	 * @since 1.8
 	 */
-	public Boolean isDisabled() {
+	public boolean isDisabled() {
 		return state.get(disabled, FALSE);
 	}
 
@@ -433,7 +413,7 @@ public class Cache extends OutputFamily {
 	 * @param disabledValue Whether this cache is disabled.
 	 * @since 1.8
 	 */
-	public void setDisabled(Boolean disabledValue) {
+	public void setDisabled(boolean disabledValue) {
 		state.put(disabled, disabledValue);
 	}
 

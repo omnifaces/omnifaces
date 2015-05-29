@@ -752,4 +752,55 @@
 		<function-signature>java.lang.Object evalAttribute(javax.faces.component.UIComponent, java.lang.String)</function-signature>
 	</function>
 
+
+	<!-- Faces (request URL/header shortcuts) ===================================================================== -->
+	
+	<function>
+		<description>
+			<![CDATA[
+				Returns the HTTP request base URL. This is the URL from the scheme, domain until with context path, including
+				the trailing slash. This is the value you could use in HTML <code>&lt;base&gt;</code> tag.
+			]]>
+		</description>
+		<function-name>getRequestBaseURL</function-name>
+		<function-class>org.omnifaces.util.Faces</function-class>
+		<function-signature>java.lang.String getRequestBaseURL()</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns the HTTP request domain URL. This is the URL with the scheme and domain, without any trailing slash.
+			]]>
+		</description>
+		<function-name>getRequestDomainURL</function-name>
+		<function-class>org.omnifaces.util.Faces</function-class>
+		<function-signature>java.lang.String getRequestDomainURL()</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns the HTTP request URL with query string. This is the full request URL with query string as the enduser
+				sees in browser address bar.
+			]]>
+		</description>
+		<function-name>getRequestURLWithQueryString</function-name>
+		<function-class>org.omnifaces.util.Faces</function-class>
+		<function-signature>java.lang.String getRequestURLWithQueryString()</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns the Internet Protocol (IP) address of the client that sent the request. This will first check the
+				<code>X-Forwarded-For</code> request header and if it's present, then return its first IP address, else just
+				return <code>HttpServletRequest#getRemoteAddr()</code> unmodified.
+			]]>
+		</description>
+		<function-name>getRemoteAddr</function-name>
+		<function-class>org.omnifaces.util.Faces</function-class>
+		<function-signature>java.lang.String getRemoteAddr()</function-signature>
+	</function>
+
 </facelet-taglib>

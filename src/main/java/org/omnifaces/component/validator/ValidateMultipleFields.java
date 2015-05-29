@@ -37,6 +37,8 @@ import javax.faces.component.UIInput;
 import javax.faces.component.UISelectBoolean;
 import javax.faces.context.FacesContext;
 
+import org.omnifaces.el.ScopedRunner;
+import org.omnifaces.util.Callback;
 import org.omnifaces.util.State;
 import org.omnifaces.validator.MultiFieldValidator;
 
@@ -307,11 +309,17 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 	 * @param inputs The validated input components.
 	 */
 	protected void showMessage(FacesContext context, List<UIInput> inputs) {
-		StringBuilder labels = new StringBuilder();
+		final StringBuilder labels = new StringBuilder();
 
 		for (Iterator<UIInput> iterator = inputs.iterator(); iterator.hasNext();) {
-			UIInput input = iterator.next();
-			labels.append(getLabel(input));
+			final UIInput input = iterator.next();
+
+			new ScopedRunner(context).with("cc", UIComponent.getCompositeComponentParent(input)).invoke(new Callback.Void() { // TODO: check if this can't better be placed in Components#getLabel().
+				@Override
+				public void invoke() {
+					labels.append(getLabel(input));
+				}
+			});
 
 			if (iterator.hasNext()) {
 				labels.append(", ");
@@ -385,7 +393,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 	 * @return Whether to invalidate all fields or only those which are actually invalid.
 	 * @since 1.7
 	 */
-	public Boolean isInvalidateAll() {
+	public boolean isInvalidateAll() {
 		return state.get(PropertyKeys.invalidateAll, DEFAULT_INVALIDATEALL);
 	}
 
@@ -395,7 +403,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 	 * @param invalidateAll Whether to invalidate all fields or only those which are actually invalid.
 	 * @since 1.7
 	 */
-	public void setInvalidateAll(Boolean invalidateAll) {
+	public void setInvalidateAll(boolean invalidateAll) {
 		state.put(PropertyKeys.invalidateAll, invalidateAll);
 	}
 
@@ -435,7 +443,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 	 * Returns whether the validation should be disabled or not.
 	 * @return Whether the validation should be disabled or not.
 	 */
-	public Boolean isDisabled() {
+	public boolean isDisabled() {
 		return state.get(PropertyKeys.disabled, DEFAULT_DISABLED);
 	}
 
@@ -443,7 +451,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 	 * Sets whether the validation should be disabled or not.
 	 * @param disabled Whether the validation should be disabled or not.
 	 */
-	public void setDisabled(Boolean disabled) {
+	public void setDisabled(boolean disabled) {
 		state.put(PropertyKeys.disabled, disabled);
 	}
 

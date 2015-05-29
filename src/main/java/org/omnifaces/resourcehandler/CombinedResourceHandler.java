@@ -226,9 +226,9 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 	public static final String PARAM_NAME_INLINE_JS =
 		"org.omnifaces.COMBINED_RESOURCE_HANDLER_INLINE_JS";
 
-    /** The context parameter name to specify cache TTL of combined resources. @since 2.1 */
-    public static final String PARAM_NAME_CACHE_TTL =
-    	"org.omnifaces.COMBINED_RESOURCE_HANDLER_CACHE_TTL";
+	/** The context parameter name to specify cache TTL of combined resources. @since 2.1 */
+	public static final String PARAM_NAME_CACHE_TTL =
+		"org.omnifaces.COMBINED_RESOURCE_HANDLER_CACHE_TTL";
 
 	private static final String ERROR_INVALID_CACHE_TTL_PARAM =
 		"Context parameter '" + PARAM_NAME_CACHE_TTL + "' is in invalid syntax."

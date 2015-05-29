@@ -34,6 +34,8 @@ import org.omnifaces.util.MapWrapper;
  * provides a stateless mode of operation and fixes the issue wherein null model values are converted to empty string
  * parameters in query string (e.g. when <code>includeViewParams=true</code>) and the (bean) validation never being
  * triggered when the parameter is completely absent in query string, causing e.g. <code>@NotNull</code> to fail.
+ *
+ * <h3>Stateless mode to avoid unnecessary conversion, validation and model updating on postbacks</h3>
  * <p>
  * The standard {@link UIViewParameter} implementation calls the model setter again after postback. This is not always
  * desired when being bound to a view scoped bean and can lead to performance problems when combined with an expensive
@@ -43,19 +45,28 @@ import org.omnifaces.util.MapWrapper;
  * The standard {@link UIViewParameter} implementation calls the converter and validators again on postbacks. This is
  * not always desired when you have e.g. a <code>required="true"</code>, but the parameter is not retained on form
  * submit. You would need to retain it on every single command link/button by <code>&lt;f:param&gt;</code>. To solve
- * this, this component doesn't call the converter and validators again on postbacks. Further it also provides a default
- * for the <code>label</code> atrribute. When the <code>label</code> attribute is omitted, the <code>name</code>
- * attribute will be used as label.
+ * this, this component doesn't call the converter and validators again on postbacks.
+ *
+ * <h3>Using name as default for label</h3>
+ * <p>
+ * The <code>&lt;o:viewParam&gt;</code> also provides a default for the <code>label</code> atrribute. When the
+ * <code>label</code> attribute is omitted, the <code>name</code> attribute will be used as label.
+ *
+ * <h3>Avoid unnecessary empty parameter in query string</h3>
  * <p>
  * The standard {@link UIViewParameter} implementation calls the converter regardless of whether the evaluated model
  * value is <code>null</code> or not. As converters by specification return an empty string in case of <code>null</code>
  * value, this is being added to the query string as an empty parameter when e.g. <code>includeViewParams=true</code> is
  * used. This is not desired. The workaround was added in OmniFaces 1.8.
+ *
+ * <h3>Support bean validation and triggering validate events on null value</h3>
  * <p>
  * The standard {@link UIViewParameter} implementation uses an internal "is required" check when the submitted value is
  * <code>null</code>, hereby completely bypassing the standard {@link UIInput} validation, including any bean
  * validation annotations and even the {@link PreValidateEvent} and {@link PostValidateEvent} events. This is not
  * desired. The workaround was added in OmniFaces 2.0.
+ *
+ * <h3>Usage</h3>
  * <p>
  * You can use it the same way as <code>&lt;f:viewParam&gt;</code>, you only need to change <code>f:</code> to
  * <code>o:</code>.

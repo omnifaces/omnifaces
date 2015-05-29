@@ -32,7 +32,7 @@ import javax.faces.event.SystemEventListener;
 import javax.faces.view.facelets.FaceletContext;
 
 import org.omnifaces.el.ReadOnlyValueExpression;
-import org.omnifaces.util.Callback.Returning;
+import org.omnifaces.util.Callback.SerializableReturning;
 import org.omnifaces.util.Components;
 import org.omnifaces.util.State;
 
@@ -135,7 +135,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 		}
 	}
 
-	public static class ComponentClientIdResolver implements Returning<Object> {
+	public static class ComponentClientIdResolver implements SerializableReturning<Object> {
 
 		private static final long serialVersionUID = 1L;
 

@@ -17,6 +17,7 @@ import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.FacesLocal.getRequestAttribute;
 import static org.omnifaces.util.FacesLocal.setRequestAttribute;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -58,31 +59,15 @@ public class CallbackPhaseListener implements PhaseListener {
 
 	@Override
 	public void beforePhase(final PhaseEvent event) {
-		Set<PhaseListener> phaseListeners = getCallbackPhaseListeners(event.getFacesContext(), false);
-
-		if (phaseListeners == null) {
-			return;
-		}
-
-		for (PhaseListener phaseListener : phaseListeners) {
-			if (isPhaseMatch(event, phaseListener.getPhaseId())) {
-				phaseListener.beforePhase(event);
-			}
+		for (PhaseListener phaseListener : getCallbackPhaseListenersForEvent(event)) {
+			phaseListener.beforePhase(event);
 		}
 	}
 
 	@Override
 	public void afterPhase(PhaseEvent event) {
-		Set<PhaseListener> phaseListeners = getCallbackPhaseListeners(event.getFacesContext(), false);
-
-		if (phaseListeners == null) {
-			return;
-		}
-
-		for (PhaseListener phaseListener : phaseListeners) {
-			if (isPhaseMatch(event, phaseListener.getPhaseId())) {
-				phaseListener.afterPhase(event);
-			}
+		for (PhaseListener phaseListener : getCallbackPhaseListenersForEvent(event)) {
+			phaseListener.afterPhase(event);
 		}
 	}
 
@@ -117,6 +102,24 @@ public class CallbackPhaseListener implements PhaseListener {
 		}
 
 		return set;
+	}
+
+	private static Set<PhaseListener> getCallbackPhaseListenersForEvent(PhaseEvent event) {
+		Set<PhaseListener> phaseListeners = getCallbackPhaseListeners(event.getFacesContext(), false);
+
+		if (phaseListeners == null) {
+			return Collections.emptySet();
+		}
+
+		Set<PhaseListener> phaseListenersForEvent = new HashSet<>();
+
+		for (PhaseListener phaseListener : phaseListeners) {
+			if (isPhaseMatch(event, phaseListener.getPhaseId())) {
+				phaseListenersForEvent.add(phaseListener);
+			}
+		}
+
+		return Collections.unmodifiableSet(phaseListenersForEvent);
 	}
 
 	private static boolean isPhaseMatch(PhaseEvent event, PhaseId phaseId) {

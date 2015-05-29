@@ -74,13 +74,13 @@ import org.omnifaces.viewhandler.RestorableViewHandler;
  */
 public class EnableRestorableView extends TagHandler {
 
-    // Constants ------------------------------------------------------------------------------------------------------
+	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final String ERROR_INVALID_PARENT =
 		"EnableRestorableView must be a child of UIViewRoot. Encountered parent of type '%s'."
 			+ " It is recommended to enclose o:enableRestorableView in f:metadata.";
 
-    // Constructors ---------------------------------------------------------------------------------------------------
+	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
 	 * The tag constructor.
@@ -91,7 +91,7 @@ public class EnableRestorableView extends TagHandler {
 		setApplicationAttribute(EnableRestorableView.class.getName(), TRUE);
 	}
 
-    // Actions --------------------------------------------------------------------------------------------------------
+	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Enable the current view to be restorable. This basically sets a specific view attribute which the

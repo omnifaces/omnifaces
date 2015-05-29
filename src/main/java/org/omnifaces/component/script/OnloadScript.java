@@ -73,10 +73,9 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * If the event is a {@link PostAddToViewEvent}, then relocate the component to end of body, so that we can make
-	 * sure that the script is executed after all HTML DOM elements are been created. Else if the event is a
-	 * {@link PostRestoreStateEvent} and the current request is an ajax request, then subscribe to the
-	 * {@link PreRenderViewEvent} event.
+	 * Move this component to body using {@link #moveToBody(ComponentSystemEvent, ScriptFamily)}, and if the event is a
+	 * {@link PostRestoreStateEvent}, then subscribe this component to {@link PreRenderViewEvent}, which will invoke
+	 * {@link #processEvent(SystemEvent)}.
 	 */
 	@Override
 	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
@@ -92,22 +91,22 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 	 */
 	@Override
 	public boolean isListenerForSource(Object source) {
-        return source instanceof OnloadScript || source instanceof UIViewRoot;
+		return source instanceof OnloadScript || source instanceof UIViewRoot;
 	}
 
 	/**
-	 * If the event is a {@link PreRenderViewEvent} and the current request is an ajax request and this component is
-	 * rendered and there are any children, then encode the children as {@link Ajax#oncomplete(String...)}.
+	 * If the event is a {@link PreRenderViewEvent}, and this component is rendered, and the current request is an ajax
+	 * request with partial rendering, then encode the children as {@link Ajax#oncomplete(String...)}.
 	 */
 	@Override
 	public void processEvent(SystemEvent event) throws AbortProcessingException {
-		if (!(event instanceof PreRenderViewEvent)) {
+		if (!(event instanceof PreRenderViewEvent) || !isRendered()) {
 			return;
 		}
 
 		FacesContext context = getFacesContext();
 
-		if (!shouldEncodeOncomplete(context.getPartialViewContext())) {
+		if (!isAjaxRequestWithPartialRendering(context)) {
 			return;
 		}
 
@@ -150,12 +149,12 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 	}
 
 	/**
-	 * If the current request is not an ajax request, and this component is rendered, and there are any children, then
-	 * start the <code>&lt;script&gt;</code> element.
+	 * If this component is rendered, and the current request is not an ajax request with partial rendering, then start
+	 * the <code>&lt;script&gt;</code> element.
 	 */
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
-		if (!shouldEncodeHtml(context.getPartialViewContext())) {
+		if (!isRendered() || isAjaxRequestWithPartialRendering(context)) {
 			return;
 		}
 
@@ -166,12 +165,12 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 	}
 
 	/**
-	 * If the current request is not an ajax request, and this component is rendered, and there are any children, then
-	 * end the <code>&lt;script&gt;</code> element.
+	 * If this component is rendered, and the current request is not an ajax request with partial rendering, then end
+	 * the <code>&lt;script&gt;</code> element.
 	 */
 	@Override
 	public void encodeEnd(FacesContext context) throws IOException {
-		if (!shouldEncodeHtml(context.getPartialViewContext())) {
+		if (!isRendered() || isAjaxRequestWithPartialRendering(context)) {
 			return;
 		}
 
@@ -179,12 +178,9 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 		popComponentFromEL(context);
 	}
 
-	private boolean shouldEncodeHtml(PartialViewContext pvc) {
-		return isRendered() && !(pvc.isAjaxRequest() && !pvc.isRenderAll());
-	}
-
-	private boolean shouldEncodeOncomplete(PartialViewContext pvc) {
-		return isRendered() && pvc.isAjaxRequest() && !pvc.isRenderAll();
+	private boolean isAjaxRequestWithPartialRendering(FacesContext context) {
+		PartialViewContext pvc = context.getPartialViewContext();
+		return pvc.isAjaxRequest() && !pvc.isRenderAll();
 	}
 
 }

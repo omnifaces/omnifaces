@@ -92,6 +92,14 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 					((OutputStream) buffer).write(b);
 				}
 				@Override
+				public void write(byte[] bytes) throws IOException {
+					((OutputStream) buffer).write(bytes);
+				}
+				@Override
+				public void write(byte[] bytes, int offset, int length) throws IOException {
+					((OutputStream) buffer).write(bytes, offset, length);
+				}
+				@Override
 				public void flush() throws IOException {
 					((OutputStream) buffer).flush();
 				}

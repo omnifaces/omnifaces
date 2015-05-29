@@ -77,7 +77,7 @@ public class ConverterManager {
 	@Inject
 	private BeanManager manager;
 	private Map<String, Bean<Converter>> convertersById = new HashMap<>();
-    private Map<Class<?>, Bean<Converter>> convertersByForClass = new HashMap<>();
+	private Map<Class<?>, Bean<Converter>> convertersByForClass = new HashMap<>();
 
 	// Actions --------------------------------------------------------------------------------------------------------
 

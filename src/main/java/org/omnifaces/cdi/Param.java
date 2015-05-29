@@ -130,14 +130,14 @@ public @interface Param {
 	 * A converter can be specified in 3 ways:
 	 * <ol>
 	 * <li>A string value representing the <em>converter-id</em> as used by {@link
-     * javax.faces.application.Application#createConverter(String)}
-     * <li>An EL expression that resolves to a String representing the <em>converter-id</em>
-     * <li>An EL expression that resolves to a {@link Converter} instance.
-     * </ol>
-     * <p>
-     * If this attribute is specified in addition to {@link Param#converterClass()}, this attribute takes precedence.
-     *
-     * @return The converter used to convert the request parameter to model value.
+	 * javax.faces.application.Application#createConverter(String)}
+	 * <li>An EL expression that resolves to a String representing the <em>converter-id</em>
+	 * <li>An EL expression that resolves to a {@link Converter} instance.
+	 * </ol>
+	 * <p>
+	 * If this attribute is specified in addition to {@link Param#converterClass()}, this attribute takes precedence.
+	 *
+	 * @return The converter used to convert the request parameter to model value.
 	 */
 	@Nonbinding String converter() default "";
 
@@ -157,24 +157,24 @@ public @interface Param {
 	 * A validator can be specified in 3 ways:
 	 * <ol>
 	 * <li>A string value representing the <em>validator-id</em> as used by {@link
-     * javax.faces.application.Application#createValidator(String)}
-     * <li>An EL expression that resolves to a String representing the <em>validator-id</em>
-     * <li>An EL expression that resolves to a {@link Validator} instance.
-     * </ol>
-     * <p>
-     * If this attribute is specified in addition to {@link Param#validatorClasses()} then the validators from both
-     * attributes will be added to the final collection of validators. The validators from this attribute will however
-     * be called first.
-     *
-     * @return The validators used to validate the (converted) request parameter.
+	 * javax.faces.application.Application#createValidator(String)}
+	 * <li>An EL expression that resolves to a String representing the <em>validator-id</em>
+	 * <li>An EL expression that resolves to a {@link Validator} instance.
+	 * </ol>
+	 * <p>
+	 * If this attribute is specified in addition to {@link Param#validatorClasses()} then the validators from both
+	 * attributes will be added to the final collection of validators. The validators from this attribute will however
+	 * be called first.
+	 *
+	 * @return The validators used to validate the (converted) request parameter.
 	 */
 	@Nonbinding String[] validators() default {};
 
 	/**
 	 * (Optional) Class of the converter to be used for converting the request parameter to the type that is to be injected.
 	 * This is ignored when {@link #converter()} is specified.
-     *
-     * @return The converter class used to convert the request parameter to model value.
+	 *
+	 * @return The converter class used to convert the request parameter to model value.
 	 */
 	@Nonbinding Class<? extends Converter> converterClass() default Converter.class;
 

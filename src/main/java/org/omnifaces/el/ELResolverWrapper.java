@@ -46,58 +46,37 @@ public class ELResolverWrapper extends ELResolver implements FacesWrapper<ELReso
 		return elResolver;
 	}
 
-	 /**
-     * {@inheritDoc}
-     */
-    @Override
+	@Override
 	public Object getValue(ELContext context, Object base, Object property) {
 		return getWrapped().getValue(context, base, property);
 	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
+	@Override
 	public Object invoke(ELContext context, Object base, Object method, Class<?>[] paramTypes, Object[] params) {
 		return getWrapped().invoke(context, base, method, paramTypes, params);
 	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
+	@Override
 	public Class<?> getType(ELContext context, Object base, Object property) {
-    	return getWrapped().getType(context, base, property);
-    }
+		return getWrapped().getType(context, base, property);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
+	@Override
 	public void setValue(ELContext context, Object base, Object property, Object value) {
-    	getWrapped().setValue(context, base, property, value);
-    }
+		getWrapped().setValue(context, base, property, value);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
+	@Override
 	public boolean isReadOnly(ELContext context, Object base, Object property) {
 		return getWrapped().isReadOnly(context, base, property);
 	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
+	@Override
 	public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object base) {
-    	return getWrapped().getFeatureDescriptors(context, base);
-    }
+		return getWrapped().getFeatureDescriptors(context, base);
+	}
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
+	@Override
 	public Class<?> getCommonPropertyType(ELContext context, Object base) {
 		return getWrapped().getCommonPropertyType(context, base);
 	}

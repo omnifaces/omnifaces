@@ -43,7 +43,12 @@ import org.omnifaces.util.Messages;
  * <p>
  * The <code>&lt;o:validator&gt;</code> is a taghandler that extends the standard <code>&lt;f:validator&gt;</code> tag
  * family with support for deferred value expressions in all attributes. In other words, the validator attributes are
- * not evaluated anymore on a per view build time basis, but just on every access like as with UI components.
+ * not evaluated anymore on a per view build time basis, but just on every access like as with UI components and bean
+ * properties. This has among others the advantage that they can be evaluated on a per-iteration basis inside an
+ * iterating component, and that they can be set on a custom validator without needing to explicitly register it in a
+ * tagfile.
+ *
+ * <h3>Usage</h3>
  * <p>
  * When you specify for example the standard <code>&lt;f:validateLongRange&gt;</code> by
  * <code>validatorId="javax.faces.LongRange"</code>, then you'll be able to use all its attributes such as
@@ -96,13 +101,15 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
 	 */
 	@Override
 	public void apply(FaceletContext context, UIComponent parent) throws IOException {
-		if (!ComponentHandler.isNew(parent) && UIComponent.getCompositeComponentParent(parent) == null) {
+		boolean insideCompositeComponent = UIComponent.getCompositeComponentParent(parent) != null;
+
+		if (!ComponentHandler.isNew(parent) && !insideCompositeComponent) {
 			// If it's not new nor inside a composite component, we're finished.
 			return;
 		}
 
-		if (!(parent instanceof EditableValueHolder)) {
-			// It's likely a composite component. TagHandlerDelegate will pickup it and pass the target component back.
+		if (!(parent instanceof EditableValueHolder) || (insideCompositeComponent && getAttribute("for") == null)) {
+			// It's inside a composite component and not reattached. TagHandlerDelegate will pickup it and pass the target component back if necessary.
 			super.apply(context, parent);
 			return;
 		}

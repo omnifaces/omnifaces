@@ -28,7 +28,22 @@ public final class Callback {
 	 *
 	 * @author Bauke Scholtz
 	 */
-	public interface Void extends Serializable {
+	public interface Void {
+
+		/**
+		 * This method should be invoked by the method where you're passing this callback instance to.
+		 */
+		void invoke();
+
+	}
+
+	/**
+	 * Use this if you need a serializable void callback.
+	 *
+	 * @author Bauke Scholtz
+	 * @since 2.1
+	 */
+	public interface SerializableVoid extends Serializable {
 
 		/**
 		 * This method should be invoked by the method where you're passing this callback instance to.
@@ -43,7 +58,24 @@ public final class Callback {
 	 * @author Bauke Scholtz
 	 * @param <R> The return type.
 	 */
-	public interface Returning<R> extends Serializable {
+	public interface Returning<R> {
+
+		/**
+		 * This method should be invoked by the method where you're passing this callback instance to.
+		 * @return The callback result.
+		 */
+		R invoke();
+
+	}
+
+	/**
+	 * Use this if you need a serializable callback which returns a value.
+	 *
+	 * @author Bauke Scholtz
+	 * @param <R> The return type.
+	 * @since 2.1
+	 */
+	public interface SerializableReturning<R> extends Serializable {
 
 		/**
 		 * This method should be invoked by the method where you're passing this callback instance to.
@@ -59,7 +91,24 @@ public final class Callback {
 	 * @author Bauke Scholtz
 	 * @param <A> The argument type.
 	 */
-	public interface WithArgument<A> extends Serializable {
+	public interface WithArgument<A> {
+
+		/**
+		 * This method should be invoked by the method where you're passing this callback instance to.
+		 * @param a The callback argument to work with.
+		 */
+		void invoke(A a);
+
+	}
+
+	/**
+	 * Use this if you need a serializable callback which takes an argument.
+	 *
+	 * @author Bauke Scholtz
+	 * @param <A> The argument type.
+	 * @since 2.1
+	 */
+	public interface SerializableWithArgument<A> extends Serializable {
 
 		/**
 		 * This method should be invoked by the method where you're passing this callback instance to.
@@ -76,7 +125,26 @@ public final class Callback {
 	 * @param <R> The return type.
 	 * @param <A> The argument type.
 	 */
-	public interface ReturningWithArgument<R, A> extends Serializable {
+	public interface ReturningWithArgument<R, A> {
+
+		/**
+		 * This method should be invoked by the method where you're passing this callback instance to.
+		 * @param a The callback argument to work with.
+		 * @return The callback result.
+		 */
+		R invoke(A a);
+
+	}
+
+	/**
+	 * Use this if you need a serializable callback which takes an argument and returns a value.
+	 *
+	 * @author Bauke Scholtz
+	 * @param <R> The return type.
+	 * @param <A> The argument type.
+	 * @since 2.1
+	 */
+	public interface SerializableReturningWithArgument<R, A> extends Serializable {
 
 		/**
 		 * This method should be invoked by the method where you're passing this callback instance to.

@@ -212,7 +212,7 @@ public final class BeansLocal {
 	 * @see Beans#getAnnotation(Annotated, Class)
 	 */
 	public static InjectionPoint getCurrentInjectionPoint(BeanManager beanManager, CreationalContext<?> creationalContext) {
-    	return (InjectionPoint) beanManager.getInjectableReference(
+		return (InjectionPoint) beanManager.getInjectableReference(
 			resolve(beanManager, InjectionPointGenerator.class).getInjectionPoints().iterator().next(), creationalContext
 		);
 	}

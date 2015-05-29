@@ -15,6 +15,7 @@ package org.omnifaces.util;
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 import static org.omnifaces.util.Servlets.prepareRedirectURL;
 import static org.omnifaces.util.Utils.encodeURL;
+import static org.omnifaces.util.Utils.isAnyEmpty;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -31,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -456,33 +458,33 @@ public final class FacesLocal {
 	 * {@inheritDoc}
 	 * @see Faces#getResourceBundles()
 	 */
-    public static Map<String, ResourceBundle> getResourceBundles(FacesContext context) {
-    	Map<String, String> resourceBundles = FacesConfigXml.INSTANCE.getResourceBundles();
-        Map<String, ResourceBundle> map = new HashMap<>(resourceBundles.size());
+	public static Map<String, ResourceBundle> getResourceBundles(FacesContext context) {
+		Map<String, String> resourceBundles = FacesConfigXml.INSTANCE.getResourceBundles();
+		Map<String, ResourceBundle> map = new HashMap<>(resourceBundles.size());
 
-        for (String var : resourceBundles.keySet()) {
-            map.put(var, getResourceBundle(context, var));
-        }
+		for (String var : resourceBundles.keySet()) {
+			map.put(var, getResourceBundle(context, var));
+		}
 
-        return map;
-    }
+		return map;
+	}
 
 	/**
 	 * {@inheritDoc}
 	 * @see Faces#getBundleString(String)
 	 */
-    public static String getBundleString(FacesContext context, String key) {
-        for (ResourceBundle bundle : getResourceBundles(context).values()) {
-            try {
-                return bundle.getString(key);
-            }
-            catch (MissingResourceException ignore) {
-            	continue;
-            }
-        }
+	public static String getBundleString(FacesContext context, String key) {
+		for (ResourceBundle bundle : getResourceBundles(context).values()) {
+			try {
+				return bundle.getString(key);
+			}
+			catch (MissingResourceException ignore) {
+				continue;
+			}
+		}
 
-        return "???" + key + "???";
-    }
+		return "???" + key + "???";
+	}
 
 	/**
 	 * {@inheritDoc}
@@ -515,7 +517,15 @@ public final class FacesLocal {
 	public static String getBookmarkableURL
 		(FacesContext context, String viewId, Map<String, List<String>> params, boolean includeViewParams)
 	{
-		return context.getApplication().getViewHandler().getBookmarkableURL(context, viewId, params, includeViewParams);
+		Map<String, List<String>> map = new HashMap<>();
+
+		if (params != null) {
+			for (Entry<String, List<String>> param : params.entrySet()) {
+				addParamToMapIfNecessary(map, param.getKey(), param.getValue());
+			}
+		}
+
+		return context.getApplication().getViewHandler().getBookmarkableURL(context, viewId, map, includeViewParams);
 	}
 
 	/**
@@ -541,14 +551,30 @@ public final class FacesLocal {
 	public static String getBookmarkableURL
 		(FacesContext context, String viewId, Collection<? extends ParamHolder> params, boolean includeViewParams)
 	{
-		Map<String, List<String>> convertedParams = new HashMap<>();
+		Map<String, List<String>> map = new HashMap<>();
 
-		for (ParamHolder param : params) {
-			Object value = param.getValue();
-			convertedParams.put(param.getName(), Collections.singletonList(value != null ? value.toString() : ""));
+		if (params != null) {
+			for (ParamHolder param : params) {
+				addParamToMapIfNecessary(map, param.getName(), param.getValue());
+			}
 		}
 
-		return getBookmarkableURL(context, viewId, convertedParams, includeViewParams);
+		return context.getApplication().getViewHandler().getBookmarkableURL(context, viewId, map, includeViewParams);
+	}
+
+	private static void addParamToMapIfNecessary(Map<String, List<String>> map, String name, Object value) {
+		if (isAnyEmpty(name, value)) {
+			return;
+		}
+
+		List<String> values = map.get(name);
+
+		if (values == null) {
+			values = new ArrayList<>(1);
+			map.put(name, values);
+		}
+
+		values.add(value.toString());
 	}
 
 	// Facelets -------------------------------------------------------------------------------------------------------
@@ -875,6 +901,7 @@ public final class FacesLocal {
 		// creates another FacesContext which overrides the current FacesContext in the same thread! So, when the
 		// FacesContext which is created during the forward is released, it leaves the current FacesContext as null,
 		// causing NPE over all place which is relying on FacesContext#getCurrentInstance().
+		// This is already fixed in WildFly 8.2 / Undertow 1.1.0 as per https://issues.jboss.org/browse/UNDERTOW-322.
 		if (!Faces.hasContext()) {
 			Faces.setContext(context);
 		}
@@ -989,7 +1016,7 @@ public final class FacesLocal {
 		ExternalContext externalContext = context.getExternalContext();
 		Map<String, Object> properties = new HashMap<>();
 
-		if (domain != null) {
+		if (domain != null && !domain.equals("localhost")) { // Chrome doesn't like domain:"localhost" on cookies.
 			properties.put("domain", domain);
 		}
 

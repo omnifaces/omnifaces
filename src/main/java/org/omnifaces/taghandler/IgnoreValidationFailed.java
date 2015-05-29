@@ -12,17 +12,17 @@
  */
 package org.omnifaces.taghandler;
 
+import static javax.faces.event.PhaseId.RESTORE_VIEW;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Components.hasInvokedSubmit;
-import static org.omnifaces.util.Events.subscribeToRequestComponentEvent;
+import static org.omnifaces.util.Events.subscribeToRequestAfterPhase;
 
 import java.io.IOException;
 
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
-import javax.faces.event.ComponentSystemEvent;
-import javax.faces.event.PostAddToViewEvent;
+import javax.faces.context.FacesContext;
 import javax.faces.view.facelets.ComponentHandler;
 import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagConfig;
@@ -81,9 +81,8 @@ public class IgnoreValidationFailed extends TagHandler {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * If the parent component is an instance of {@link UICommand} and is new and the current request is a postback,
-	 * then subscribe the parent component to the {@link PostAddToViewEvent}. This will invoke the
-	 * {@link #processIgnoreValidationFailed(UIComponent)} method before validation.
+	 * If the parent component is an instance of {@link UICommand} and is new and we're in the restore view phase of
+	 * a postback, then delegate to {@link #processIgnoreValidationFailed(UICommand)}.
 	 * @throws IllegalArgumentException When the parent component is not an instance of {@link UICommand}.
 	 */
 	@Override
@@ -92,40 +91,40 @@ public class IgnoreValidationFailed extends TagHandler {
 			throw new IllegalArgumentException(ERROR_INVALID_PARENT);
 		}
 
-		if (!ComponentHandler.isNew(parent) || !context.getFacesContext().isPostback()) {
+		FacesContext facesContext = context.getFacesContext();
+
+		if (!(ComponentHandler.isNew(parent) && facesContext.isPostback() && facesContext.getCurrentPhaseId() == RESTORE_VIEW)) {
 			return;
 		}
 
-		subscribeToRequestComponentEvent(parent, PostAddToViewEvent.class, new Callback.WithArgument<ComponentSystemEvent>() {
-			private static final long serialVersionUID = 1L;
-
+		// We can't use hasInvokedSubmit() before the component is added to view, because the client ID isn't available.
+		// Hence, we subscribe this check to after phase of restore view.
+		subscribeToRequestAfterPhase(RESTORE_VIEW, new Callback.Void() {
 			@Override
-			public void invoke(ComponentSystemEvent event) {
-				processIgnoreValidationFailed(event);
+			public void invoke() {
+				processIgnoreValidationFailed((UICommand) parent);
 			}
 		});
 	}
 
 	/**
-	 * This should only be invoked on {@link PostAddToViewEvent} of a postback. Check if the parent {@link UICommand}
-	 * component has been invoked during the postback and if so, then set a context attribute which informs the
-	 * <code>&lt;o:form&gt;</code> to ignore the validation.
-	 * @param event The component system event.
-	 * @throws IllegalArgumentException When parent {@link UICommand} component is not inside
-	 * <code>&lt;o:form&gt;</code>.
+	 * Check if the given command component has been invoked during the current request and if so, then instruct the
+	 * parent <code>&lt;o:form&gt;</code> to ignore the validation.
+	 * @param command The command component.
+	 * @throws IllegalArgumentException When the given command component is not inside a <code>&lt;o:form&gt;</code>.
 	 */
-	protected void processIgnoreValidationFailed(ComponentSystemEvent event) {
-		UIComponent component = event.getComponent();
-
-		if (hasInvokedSubmit(component)) {
-			Form form = getClosestParent(component, Form.class);
-
-			if (form == null) {
-				throw new IllegalArgumentException(ERROR_INVALID_FORM);
-			}
-
-			form.setIgnoreValidationFailed(true);
+	protected void processIgnoreValidationFailed(UICommand command) {
+		if (!hasInvokedSubmit(command)) {
+			return;
 		}
+
+		Form form = getClosestParent(command, Form.class);
+
+		if (form == null) {
+			throw new IllegalArgumentException(ERROR_INVALID_FORM);
+		}
+
+		form.setIgnoreValidationFailed(true);
 	}
 
 }

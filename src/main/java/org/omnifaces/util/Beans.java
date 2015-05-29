@@ -234,11 +234,29 @@ public final class Beans {
 	 * of said method.
 	 *
 	 * @param creationalContext a {@link CreationalContext} used to manage objects with a
-     *        {@link javax.enterprise.context.Dependent} scope
+	 *        {@link javax.enterprise.context.Dependent} scope
 	 * @return the current injection point when called from a context where injection is taking place (e.g. from a producer)
 	 */
 	public static InjectionPoint getCurrentInjectionPoint(CreationalContext<?> creationalContext) {
 		return BeansLocal.getCurrentInjectionPoint(getManager(), creationalContext);
+	}
+
+	/**
+	 * Returns the qualifier annotation of the given qualifier class from the given injection point.
+	 * @param <A> The generic annotation type.
+	 * @param injectionPoint The injection point to obtain the qualifier annotation of the given qualifier class from.
+	 * @param qualifierClass The class of the qualifier annotation to be looked up in the given injection point.
+	 * @return The qualifier annotation of the given qualifier class from the given injection point.
+	 * @since 2.1
+	 */
+	public static <A extends Annotation> A getQualifier(InjectionPoint injectionPoint, Class<A> qualifierClass) {
+		for (Annotation annotation : injectionPoint.getQualifiers()) {
+			if (qualifierClass.isAssignableFrom(annotation.getClass())) {
+				return qualifierClass.cast(annotation);
+			}
+		}
+
+		return null;
 	}
 
 }

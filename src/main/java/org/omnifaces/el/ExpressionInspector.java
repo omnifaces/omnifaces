@@ -230,15 +230,15 @@ public final class ExpressionInspector {
 				return ValueExpressionType.PROPERTY;
 			}
 
-		    checkSubchainStarted(base);
+			checkSubchainStarted(base);
 
-		    if (subchainResolving) {
-		        return super.getValue(context, base, property);
-		    }
+			if (subchainResolving) {
+				return super.getValue(context, base, property);
+			}
 
-		    recordCall(base, property);
+			recordCall(base, property);
 
-		    return wrapOutcomeIfNeeded(super.getValue(context, base, property));
+			return wrapOutcomeIfNeeded(super.getValue(context, base, property));
 		}
 
 		@Override
@@ -296,12 +296,12 @@ public final class ExpressionInspector {
 
 		private void checkSubchainStarted(Object base) {
 		  if (pass == InspectorPass.PASS2_FIND_FINAL_NODE && base == null && isAtNextToLastNode()) {
-		    	// If "base" is null it means a new chain is being resolved.
-		        // The main expression chain likely has ended with a method that has one or more EL variables
-		    	// as parameters that now need to be resolved.
-		    	// E.g. a.b().c.d(var1)
-		    	subchainResolving = true;
-            }
+				// If "base" is null it means a new chain is being resolved.
+				// The main expression chain likely has ended with a method that has one or more EL variables
+				// as parameters that now need to be resolved.
+				// E.g. a.b().c.d(var1)
+				subchainResolving = true;
+			}
 		}
 
 		private void recordCall(Object base, Object property) {

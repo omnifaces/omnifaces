@@ -36,7 +36,7 @@ import java.util.Set;
 public final class Weighers {
 
   private Weighers() {
-    throw new AssertionError();
+	throw new AssertionError();
   }
 
   /**
@@ -49,10 +49,10 @@ public final class Weighers {
    * @return A entry weigher view of the specified weigher.
    */
   public static <K, V> EntryWeigher<K, V> asEntryWeigher(
-      final Weigher<? super V> weigher) {
-    return (weigher == singleton())
-        ? Weighers.<K, V>entrySingleton()
-        : new EntryWeigherView<K, V>(weigher);
+	  final Weigher<? super V> weigher) {
+	return (weigher == singleton())
+		? Weighers.<K, V>entrySingleton()
+		: new EntryWeigherView<K, V>(weigher);
   }
 
   /**
@@ -66,7 +66,7 @@ public final class Weighers {
    */
   @SuppressWarnings("unchecked")
   public static <K, V> EntryWeigher<K, V> entrySingleton() {
-    return (EntryWeigher<K, V>) SingletonEntryWeigher.INSTANCE;
+	return (EntryWeigher<K, V>) SingletonEntryWeigher.INSTANCE;
   }
 
   /**
@@ -79,7 +79,7 @@ public final class Weighers {
    */
   @SuppressWarnings("unchecked")
   public static <V> Weigher<V> singleton() {
-    return (Weigher<V>) SingletonWeigher.INSTANCE;
+	return (Weigher<V>) SingletonWeigher.INSTANCE;
   }
 
   /**
@@ -98,7 +98,7 @@ public final class Weighers {
    * @return A weigher where each byte takes one unit of capacity.
    */
   public static Weigher<byte[]> byteArray() {
-    return ByteArrayWeigher.INSTANCE;
+	return ByteArrayWeigher.INSTANCE;
   }
 
   /**
@@ -118,7 +118,7 @@ public final class Weighers {
    */
   @SuppressWarnings("unchecked")
   public static <E> Weigher<? super Iterable<E>> iterable() {
-    return (Weigher<Iterable<E>>) (Weigher<?>) IterableWeigher.INSTANCE;
+	return (Weigher<Iterable<E>>) (Weigher<?>) IterableWeigher.INSTANCE;
   }
 
   /**
@@ -137,7 +137,7 @@ public final class Weighers {
    */
   @SuppressWarnings("unchecked")
   public static <E> Weigher<? super Collection<E>> collection() {
-    return (Weigher<Collection<E>>) (Weigher<?>) CollectionWeigher.INSTANCE;
+	return (Weigher<Collection<E>>) (Weigher<?>) CollectionWeigher.INSTANCE;
   }
 
   /**
@@ -156,7 +156,7 @@ public final class Weighers {
    */
   @SuppressWarnings("unchecked")
   public static <E> Weigher<? super List<E>> list() {
-    return (Weigher<List<E>>) (Weigher<?>) ListWeigher.INSTANCE;
+	return (Weigher<List<E>>) (Weigher<?>) ListWeigher.INSTANCE;
   }
 
   /**
@@ -175,7 +175,7 @@ public final class Weighers {
    */
   @SuppressWarnings("unchecked")
   public static <E> Weigher<? super Set<E>> set() {
-    return (Weigher<Set<E>>) (Weigher<?>) SetWeigher.INSTANCE;
+	return (Weigher<Set<E>>) (Weigher<?>) SetWeigher.INSTANCE;
   }
 
   /**
@@ -195,101 +195,101 @@ public final class Weighers {
    */
   @SuppressWarnings("unchecked")
   public static <A, B> Weigher<? super Map<A, B>> map() {
-    return (Weigher<Map<A, B>>) (Weigher<?>) MapWeigher.INSTANCE;
+	return (Weigher<Map<A, B>>) (Weigher<?>) MapWeigher.INSTANCE;
   }
 
   private static final class EntryWeigherView<K, V> implements EntryWeigher<K, V>, Serializable {
-    static final long serialVersionUID = 1;
-    private final Weigher<? super V> weigher;
+	static final long serialVersionUID = 1;
+	private final Weigher<? super V> weigher;
 
-    EntryWeigherView(Weigher<? super V> weigher) {
-      checkNotNull(weigher);
-      this.weigher = weigher;
-    }
+	EntryWeigherView(Weigher<? super V> weigher) {
+	  checkNotNull(weigher);
+	  this.weigher = weigher;
+	}
 
-    @Override
-    public int weightOf(K key, V value) {
-      return weigher.weightOf(value);
-    }
+	@Override
+	public int weightOf(K key, V value) {
+	  return weigher.weightOf(value);
+	}
   }
 
   private enum SingletonEntryWeigher implements EntryWeigher<Object, Object> {
-    INSTANCE;
+	INSTANCE;
 
-    @Override
-    public int weightOf(Object key, Object value) {
-      return 1;
-    }
+	@Override
+	public int weightOf(Object key, Object value) {
+	  return 1;
+	}
   }
 
   private enum SingletonWeigher implements Weigher<Object> {
-    INSTANCE;
+	INSTANCE;
 
-    @Override
-    public int weightOf(Object value) {
-      return 1;
-    }
+	@Override
+	public int weightOf(Object value) {
+	  return 1;
+	}
   }
 
   private enum ByteArrayWeigher implements Weigher<byte[]> {
-    INSTANCE;
+	INSTANCE;
 
-    @Override
-    public int weightOf(byte[] value) {
-      return value.length;
-    }
+	@Override
+	public int weightOf(byte[] value) {
+	  return value.length;
+	}
   }
 
   private enum IterableWeigher implements Weigher<Iterable<?>> {
-    INSTANCE;
+	INSTANCE;
 
-    @Override
-    public int weightOf(Iterable<?> values) {
-      if (values instanceof Collection<?>) {
-        return ((Collection<?>) values).size();
-      }
-      int size = 0;
-      for (Iterator<?> i = values.iterator(); i.hasNext();) {
-        i.next();
-        size++;
-      }
-      return size;
-    }
+	@Override
+	public int weightOf(Iterable<?> values) {
+	  if (values instanceof Collection<?>) {
+		return ((Collection<?>) values).size();
+	  }
+	  int size = 0;
+	  for (Iterator<?> i = values.iterator(); i.hasNext();) {
+		i.next();
+		size++;
+	  }
+	  return size;
+	}
   }
 
   private enum CollectionWeigher implements Weigher<Collection<?>> {
-    INSTANCE;
+	INSTANCE;
 
-    @Override
-    public int weightOf(Collection<?> values) {
-      return values.size();
-    }
+	@Override
+	public int weightOf(Collection<?> values) {
+	  return values.size();
+	}
   }
 
   private enum ListWeigher implements Weigher<List<?>> {
-    INSTANCE;
+	INSTANCE;
 
-    @Override
-    public int weightOf(List<?> values) {
-      return values.size();
-    }
+	@Override
+	public int weightOf(List<?> values) {
+	  return values.size();
+	}
   }
 
   private enum SetWeigher implements Weigher<Set<?>> {
-    INSTANCE;
+	INSTANCE;
 
-    @Override
-    public int weightOf(Set<?> values) {
-      return values.size();
-    }
+	@Override
+	public int weightOf(Set<?> values) {
+	  return values.size();
+	}
   }
 
   private enum MapWeigher implements Weigher<Map<?, ?>> {
-    INSTANCE;
+	INSTANCE;
 
-    @Override
-    public int weightOf(Map<?, ?> values) {
-      return values.size();
-    }
+	@Override
+	public int weightOf(Map<?, ?> values) {
+	  return values.size();
+	}
   }
 }
