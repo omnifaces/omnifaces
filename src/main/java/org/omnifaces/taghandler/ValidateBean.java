@@ -69,6 +69,7 @@ import javax.validation.ConstraintViolation;
 
 import org.omnifaces.eventlistener.BeanValidationEventListener;
 import org.omnifaces.util.Callback;
+import org.omnifaces.util.Components;
 import org.omnifaces.util.Platform;
 import org.omnifaces.util.copier.CloneCopier;
 import org.omnifaces.util.copier.Copier;
@@ -118,6 +119,13 @@ import org.omnifaces.util.copier.SerializationCopier;
  *
  * &lt;o:validateBean value="#{bean.product}" validationGroups="com.example.MyGroup" /&gt;
  * </pre>
+ * 
+ * <p>
+ * It is possible to specify a <code>for</code> attribute to choose where to show the validation messages.
+ * <pre>
+ * &lt;o:validateBean value="#{bean.product}" validationGroups="com.example.MyGroup" for="form:component" / &gt;
+ * </pre>
+ * <p>
  *
  * <h3>Class level validation details</h3>
  * <p>
@@ -180,6 +188,7 @@ public class ValidateBean extends TagHandler {
 	private ValidateMethod method;
 	private String groups;
 	private String copier;
+	private String forAttr;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -217,6 +226,7 @@ public class ValidateBean extends TagHandler {
 		method = ValidateMethod.of(getString(context, getAttribute("method")));
 		groups = getString(context, getAttribute("validationGroups"));
 		copier = getString(context, getAttribute("copier"));
+		forAttr = getString(context, getAttribute("for"));
 
 		// We can't use getCurrentForm() or hasInvokedSubmit() before the component is added to view, because the client ID isn't available.
 		// Hence, we subscribe this check to after phase of restore view.
@@ -265,7 +275,7 @@ public class ValidateBean extends TagHandler {
 	private void validateActualBean(final UIForm form, final Object bean, final String groups) {
 		ValidateBeanCallback validateActualBean = new ValidateBeanCallback() { @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
-			validate(context, form, bean, groups, false);
+			validate(context, form, bean, groups, false, forAttr);
 		}};
 
 		subscribeToRequestAfterPhase(UPDATE_MODEL_VALUES, validateActualBean);
@@ -297,7 +307,7 @@ public class ValidateBean extends TagHandler {
 
 			Object copiedBean = getCopier(context, copier).copy(bean);
 			setProperties(copiedBean, properties);
-			validate(context, form, copiedBean, groups, true);
+			validate(context, form, copiedBean, groups, true, forAttr);
 		}};
 
 		subscribeToRequestBeforePhase(PROCESS_VALIDATIONS, collectBeanProperties);
@@ -378,7 +388,7 @@ public class ValidateBean extends TagHandler {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private static void validate(FacesContext context, UIForm form, Object bean, String groups, boolean renderResponseOnFail) {
+	private static void validate(FacesContext context, UIForm form, Object bean, String groups, boolean renderResponseOnFail, String forAttr) {
 		List<Class> groupClasses = new ArrayList<>();
 
 		for (String group : csvToList(groups)) {
@@ -390,7 +400,12 @@ public class ValidateBean extends TagHandler {
 
 		if (!violations.isEmpty()) {
 			context.validationFailed();
-			String formId = form.getClientId(context);
+			String formId;
+			if (forAttr == null) {
+				formId = form.getClientId(context);
+			} else {
+				formId = forAttr;
+			}
 
 			for (ConstraintViolation<?> violation : violations) {
 				context.addMessage(formId, createError(violation.getMessage()));
@@ -399,6 +414,12 @@ public class ValidateBean extends TagHandler {
 			if (renderResponseOnFail) {
 				context.renderResponse();
 			}
+			
+			UIComponent component = Components.findComponent(formId);
+			if (component instanceof UIInput) {
+				((UIInput)component).setValid(false);
+			}
+			
 		}
 	}
 
