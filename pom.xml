@@ -3,18 +3,13 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
 >
 	<modelVersion>4.0.0</modelVersion>
-	<prerequisites>
-		<maven>3.0.0</maven>
-	</prerequisites>
 
 	<groupId>org.omnifaces</groupId>
 	<artifactId>omnifaces</artifactId>
-	<version>1.8.2</version>
 	<packaging>jar</packaging>
-
-	<name>OmniFaces</name>
+	<name>Omnifaces</name>
+	<version>1.8.3</version>
 	<description>JSF 2.x utility library</description>
-
 	<url>http://omnifaces.org</url>
 	<organization>
 		<name>OmniFaces</name>
@@ -30,13 +25,6 @@
 		</license>
 	</licenses>
 
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-	</distributionManagement>
-
 	<scm>
 		<url>https://github.com/omnifaces/omnifaces</url>
 		<connection>scm:git:git://github.com/omnifaces/omnifaces.git</connection>
@@ -46,7 +34,8 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<javase.version>1.6</javase.version>
+		<jdk.version>1.6</jdk.version>
+		<jee.version>6.0</jee.version>
 	</properties>
 
 	<developers>
@@ -67,42 +56,58 @@
 		<dependency>
 			<groupId>javax</groupId>
 			<artifactId>javaee-web-api</artifactId>
-			<version>6.0</version>
+			<version>${jee.version}</version>
 			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 
+	<!-- Build part provided by mellowaredev (http://code.google.com/u/mellowaredev) -->
 	<build>
-
-		<!-- We know we don't want *.jsfdia, git knows we don't want them, now let's tell Maven as well -->
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<excludes>
-					<exclude>**/*.jsfdia</exclude>
-				</excludes>
-				<filtering>false</filtering>
-			</resource>
-		</resources>
-	
+		<sourceDirectory>${basedir}/src</sourceDirectory>
 		<plugins>
-		
-			<!-- Set the Java compiler versions -->
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.2</version>
+				<version>2.3.2</version>
 				<configuration>
-					<source>${javase.version}</source>
-					<target>${javase.version}</target>
+					<source>${jdk.version}</source>
+					<target>${jdk.version}</target>
+					<compilerVersion>${jdk.version}</compilerVersion>
 				</configuration>
 			</plugin>
-			
-			<!-- Configure the jar with the binaries -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-jar-plugin</artifactId>
+				<artifactId>maven-resources-plugin</artifactId>
 				<version>2.5</version>
+				<executions>
+					<execution>
+						<id>copy-resources</id>
+						<!-- here the phase you need -->
+						<phase>validate</phase>
+						<goals>
+							<goal>copy-resources</goal>
+						</goals>
+						<configuration>
+							<outputDirectory>${basedir}/target/classes/META-INF</outputDirectory>
+							<resources>          
+								<resource>
+									<directory>${basedir}/src/META-INF</directory>
+								</resource>
+							</resources>              
+						</configuration>            
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.2.2</version>
+				<configuration>
+					<preparationGoals>clean verify javadoc:jar source:jar</preparationGoals>
+					<completionGoals>deploy</completionGoals>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.4</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -116,40 +121,18 @@
 					</archive>
 				</configuration>
 			</plugin>
-
-			<!-- Configure the jar with the sources (or rather, convince Maven that we want sources at all) -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<version>2.4</version>
-				<executions>
-					<execution>
-						<id>attach-sources</id>
-						<goals>
-							<goal>jar-no-fork</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-
-			<!-- Configure the jar with the javadoc (or rather, convince Maven that we want javadoc at all) -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.10.1</version>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.9</version>
 				<configuration>
-					<javadocVersion>1.7</javadocVersion>
+					<addGroupIdToProjectName>true</addGroupIdToProjectName>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>true</downloadJavadocs>
+					<ajdtVersion>none</ajdtVersion>
 				</configuration>
-				<executions>
-					<execution>
-						<id>attach-javadocs</id>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
-			
+
 			<!-- Deploying is done via sonatype's Nexus  
 			
 				 Snapshot deploy: mvn clean deploy
@@ -166,33 +149,7 @@
 					<autoReleaseAfterClose>true</autoReleaseAfterClose>
 				</configuration>
 			</plugin>
-			
 		</plugins>
 	</build>
-
-	<profiles>
-		<profile>
-			<id>release</id>
-			<build>
-				<plugins>
-					<!-- Signing with GPG is a requirement for a release deployment (to Maven central) -->
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.5</version>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 
 </project>
