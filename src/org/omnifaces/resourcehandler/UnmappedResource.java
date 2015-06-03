@@ -82,6 +82,25 @@ public class UnmappedResource extends ResourceWrapper implements Externalizable 
 	}
 
 	@Override
+	public boolean equals(Object object) {
+		if (object == this) {
+			return true;
+		}
+
+		if (object == null || getClass() != object.getClass()) {
+			return false;
+		}
+
+		UnmappedResource other = (UnmappedResource) object;
+		return wrapped.equals(other.wrapped);
+	}
+
+	@Override
+	public int hashCode() {
+		return wrapped.hashCode();
+	}
+
+	@Override
 	public void readExternal(ObjectInput input) throws IOException, ClassNotFoundException {
 		wrapped = (Resource) input.readObject();
 	}
