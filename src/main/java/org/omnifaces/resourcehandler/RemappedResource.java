@@ -74,6 +74,25 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
 	}
 
 	@Override
+	public boolean equals(Object object) {
+		if (object == this) {
+			return true;
+		}
+
+		if (object == null || getClass() != object.getClass()) {
+			return false;
+		}
+
+		RemappedResource other = (RemappedResource) object;
+		return wrapped.equals(other.wrapped) && requestPath.equals(other.requestPath);
+	}
+
+	@Override
+	public int hashCode() {
+		return wrapped.hashCode() + requestPath.hashCode();
+	}
+
+	@Override
 	public void readExternal(ObjectInput input) throws IOException, ClassNotFoundException {
 		wrapped = (Resource) input.readObject();
 		requestPath = (String) input.readObject();
