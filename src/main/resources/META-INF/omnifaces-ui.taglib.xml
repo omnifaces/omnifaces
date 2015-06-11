@@ -4628,4 +4628,19 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 			<type>java.lang.String</type>
 		</attribute>
 	</tag>
+	<tag>
+		<tag-name>attribute</tag-name>
+		<handler-class>com.xqvier.showcase.core.ui.jsf.taghandler.AttributeHandler</handler-class>
+		<attribute>
+			<name>name</name>
+			<required>true</required>			
+		</attribute>
+		<attribute>
+			<name>value</name>
+			<required>true</required>			
+		</attribute>
+		<attribute>
+			<name>applied</name>			
+		</attribute>
+	</tag>
 </facelet-taglib>
