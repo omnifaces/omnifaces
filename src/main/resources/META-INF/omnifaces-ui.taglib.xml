@@ -4630,7 +4630,7 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 	</tag>
 	<tag>
 		<tag-name>attribute</tag-name>
-		<handler-class>com.xqvier.showcase.core.ui.jsf.taghandler.AttributeHandler</handler-class>
+		<handler-class>org.omnifaces.taghandler.AttributeHandler</handler-class>
 		<attribute>
 			<name>name</name>
 			<required>true</required>			
