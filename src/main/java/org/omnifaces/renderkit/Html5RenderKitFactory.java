@@ -31,7 +31,10 @@ import javax.faces.render.RenderKitFactory;
  *
  * @author Bauke Scholtz
  * @since 1.1
+ * @deprecated
+ * @see Html5RenderKit
  */
+@Deprecated
 public class Html5RenderKitFactory extends RenderKitFactory {
 
 	// Variables ------------------------------------------------------------------------------------------------------
