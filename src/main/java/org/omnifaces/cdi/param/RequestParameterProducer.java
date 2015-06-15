@@ -18,6 +18,7 @@ import static org.omnifaces.util.Beans.getQualifier;
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getApplication;
 import static org.omnifaces.util.Faces.getInitParameter;
+import static org.omnifaces.util.FacesLocal.getMessageBundle;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
 import static org.omnifaces.util.Messages.createError;
 import static org.omnifaces.util.Platform.getBeanValidator;
@@ -34,6 +35,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.ResourceBundle;
 import java.util.Set;
 
 import javax.enterprise.inject.Produces;
@@ -41,6 +43,7 @@ import javax.enterprise.inject.spi.InjectionPoint;
 import javax.faces.application.Application;
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
+import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
@@ -61,6 +64,8 @@ import org.omnifaces.cdi.Param;
  */
 public class RequestParameterProducer {
 
+	private static final String DEFAULT_REQUIRED_MESSAGE = "{0}: Value is required";
+
 	@SuppressWarnings("unused")
 	@Inject
 	private InjectionPoint injectionPoint;
@@ -77,12 +82,22 @@ public class RequestParameterProducer {
 		UIComponent component = context.getViewRoot();
 
 		String label = getLabel(requestParameter, injectionPoint);
-
-		// TODO: Save/restore existing potentially existing label?
-		component.getAttributes().put("label", label);
-
-		// Get raw submitted value from the request
+		Object originalLabel = component.getAttributes().get("label");
 		String submittedValue = getRequestParameter(context, getName(requestParameter, injectionPoint));
+		Object convertedValue = null;
+
+		try {
+			component.getAttributes().put("label", label);
+			convertedValue = getConvertedValue(context, component, label, submittedValue, injectionPoint, requestParameter);
+		}
+		finally {
+			component.getAttributes().put("label", originalLabel);
+		}
+
+		return (ParamValue<V>) new ParamValue<>(submittedValue, requestParameter, getTargetType(injectionPoint), convertedValue);
+	}
+
+	private Object getConvertedValue(FacesContext context, UIComponent component, String label, String submittedValue, InjectionPoint injectionPoint, Param requestParameter) {
 		Object convertedValue = null;
 		boolean valid = true;
 
@@ -135,8 +150,7 @@ public class RequestParameterProducer {
 			context.validationFailed();
 			convertedValue = null;
 		}
-
-		return (ParamValue<V>) new ParamValue<>(submittedValue, requestParameter, getTargetType(injectionPoint), convertedValue);
+		return convertedValue;
 	}
 
 	public static Converter getConverter(Param requestParameter, Class<?> targetType) {
@@ -375,19 +389,26 @@ public class RequestParameterProducer {
 		if (!isEmpty(requiredMessage)) {
 			message = createError(requiredMessage, submittedValue, label);
 		} else {
-			// Use RequiredValidator to get the same message that all required attributes are using.
-			// TODO: this is a little convoluted :X
+			// (Ab)use RequiredValidator to get the same message that all required attributes are using.
 			try {
-				new RequiredValidator().validate(context, component, submittedValue);
+				new RequiredValidator().validate(context, component, null);
 			} catch (ValidatorException ve) {
 				message = ve.getFacesMessage();
 			}
 
 			if (message == null) {
 				// RequiredValidator didn't throw or its exception did not have a message set.
-				// Use a generic fallback message
-				// TODO: Use OmniFaces resource bundle to override this globally
-				message = createError("{0}: A value is required!", label);
+				ResourceBundle messageBundle = getMessageBundle(context);
+
+				if (messageBundle != null) {
+					requiredMessage = messageBundle.getString(UIInput.REQUIRED_MESSAGE_ID);
+				}
+
+				if (requiredMessage == null) {
+					requiredMessage = DEFAULT_REQUIRED_MESSAGE;
+				}
+
+				message = createError(requiredMessage, label);
 			}
 		}
 
