@@ -249,8 +249,10 @@ public final class FacesViews {
 				}
 
 				// We now need to map the Faces Servlet to the extensions we found, but at this point in time
-				// this Faces Servlet might not be created yet, so we do this part in FacesViewInitializedListener.
-			}
+                // this Faces Servlet might not be created yet, so we do this part in the 
+                // org.omnifaces.facesviews.FacesViews.addMappings(ServletContext) method below, which is called from 
+                // org.omnifaces.ApplicationListener.contextInitialized(ServletContextEvent) later
+            }
 		}
 	}
 
