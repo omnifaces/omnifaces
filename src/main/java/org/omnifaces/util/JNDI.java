@@ -1,5 +1,7 @@
 package org.omnifaces.util;
 
+import static org.omnifaces.util.Exceptions.is;
+
 import javax.annotation.Resource;
 import javax.faces.application.ProjectStage;
 import javax.naming.InitialContext;
@@ -86,10 +88,12 @@ public final class JNDI {
 		try {
 			context = new InitialContext();
 			return (T) context.lookup(name);
-		} catch (NameNotFoundException e) {
-			return null;
 		} catch (NamingException e) {
-			throw new IllegalStateException(e);
+			if (is(e, NameNotFoundException.class)) {
+				return null;
+			} else {
+				throw new IllegalStateException(e);
+			}
 		} finally {
 			close(context);
 		}
