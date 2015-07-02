@@ -64,7 +64,6 @@ import javax.faces.view.facelets.FaceletContext;
 
 import org.omnifaces.component.ParamHolder;
 import org.omnifaces.component.SimpleParam;
-import org.omnifaces.component.output.Param;
 
 /**
  * <p>
@@ -857,16 +856,9 @@ public final class Components {
 			for (UIComponent child : component.getChildren()) {
 				if (child instanceof UIParameter) {
 					UIParameter param = (UIParameter) child;
-					String name = param.getName();
 
-					if (!isEmpty(name) && !param.isDisable()) {
-						ParamHolder paramHolder = new SimpleParam(name, param.getValue());
-
-						if (param instanceof Param) {
-							paramHolder.setConverter(((Param) param).getConverter());
-						}
-
-						params.add(paramHolder);
+					if (!isEmpty(param.getName()) && !param.isDisable()) {
+						params.add(new SimpleParam(param));
 					}
 				}
 			}
