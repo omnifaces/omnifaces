@@ -4108,6 +4108,19 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 		<attribute>
 			<description>
 				<![CDATA[
+					Whether the command script should automatically run inline during page load.
+					Note that this thus runs immediately at the moment the script is been interpreted by the web browser
+					and thus not in end of HTML body or during window load event. So if the script logic depends on the
+					HTML DOM tree composition, then it will depend on location of the command script component itself.
+				]]>
+			</description>
+			<name>autorun</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
 					<code>MethodExpression</code> representing the application action to invoke when this component is
 					activated by the user. The expression must evaluate to a public method that takes no parameters, and
 					returns an <code>Object</code> (the <code>toString()</code> of which is called to derive the logical

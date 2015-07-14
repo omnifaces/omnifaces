@@ -28,28 +28,9 @@ OmniFaces.DeferredScript = (function() {
 		deferredScripts.push({ url: url, begin: begin, success: success, error: error });
 
 		if (deferredScripts.length == 1) {
-			addOnloadListener(function() {
+			OmniFaces.Util.addOnloadListener(function() {
 				loadDeferredScript(0);
 			});
-		}
-	}
-
-	function addOnloadListener(listener) {
-		if (document.readyState === "complete") {
-			setTimeout(listener);
-		}
-		else if (window.addEventListener) {
-			window.addEventListener("load", listener, false);
-		}
-		else if (window.attachEvent) {
-			window.attachEvent("onload", listener);
-		}
-		else if (typeof window.onload === "function") {
-			var oldListener = window.onload;
-			window.onload = function() { oldListener(); listener(); };
-		}
-		else {
-			window.onload = listener;
 		}
 	}
 
