@@ -3673,17 +3673,17 @@ public enum Baz {
 					This attribute is ignored when the 'value' attribute is unspecified.
 				]]>
 			</description>
-			<name>validateMethod</name>
+			<name>method</name>
 			<required>false</required>
 			<type>java.lang.String</type>
 		</attribute>
 		<attribute>
 			<description>
 				<![CDATA[
-					Set the bean copy strategy to use in case 'value' attribute is specified and the 'validateMethod' attribute is set (or defaulted) to 'validateCopy'.
+					Set the bean copy strategy to use in case 'value' attribute is specified and the 'method' attribute is set (or defaulted) to 'validateCopy'.
 					This can be either an EL expression referring a concrete instance, or a String representing the fully qualified name of the instance of the org.omnifaces.util.copier.Copier interface, which must be stateless and/or threadsafe.
 					If unspecified, then it defaults to the best possibility in this order: Cloneable, or Serializable, or copy constructor, or default constructor.
-					This attribute is ignored when the 'value' attribute is unspecified, or when the 'validateMethod' attribute is not set to 'validateCopy'.
+					This attribute is ignored when the 'value' attribute is unspecified, or when the 'method' attribute is not set to 'validateCopy'.
 				]]>
 			</description>
 			<name>copier</name>
