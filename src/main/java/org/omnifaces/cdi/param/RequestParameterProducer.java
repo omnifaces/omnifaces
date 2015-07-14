@@ -91,7 +91,12 @@ public class RequestParameterProducer {
 			convertedValue = getConvertedValue(context, component, label, submittedValue, injectionPoint, requestParameter);
 		}
 		finally {
-			component.getAttributes().put("label", originalLabel);
+			if (originalLabel == null) {
+				component.getAttributes().remove("label");
+			}
+			else {
+				component.getAttributes().put("label", originalLabel);
+			}
 		}
 
 		return (ParamValue<V>) new ParamValue<>(submittedValue, requestParameter, getTargetType(injectionPoint), convertedValue);
