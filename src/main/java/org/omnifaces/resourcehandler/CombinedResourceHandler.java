@@ -575,6 +575,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 		for (UIComponent resourceToRemove : componentResourcesToRemove) {
 			if (resourceToRemove != null) {
+				resourceToRemove.setInView(false); // #135
 				view.removeComponentResource(context, resourceToRemove, target);
 			}
 		}
