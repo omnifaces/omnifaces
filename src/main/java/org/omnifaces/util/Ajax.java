@@ -145,13 +145,7 @@ public final class Ajax {
 	 * @since 1.3
 	 */
 	public static void updateRow(UIData table, int index) {
-		if (index < 0 || table.getRowCount() < 1 || table.getChildCount() == 0) {
-			return;
-		}
-
-		int rowCount = (table.getRows() == 0) ? table.getRowCount() : table.getRows();
-
-		if (index >= rowCount) {
+		if (index < 0 || table.getRowCount() < 1 || index >= table.getRowCount() || table.getChildCount() == 0) {
 			return;
 		}
 
