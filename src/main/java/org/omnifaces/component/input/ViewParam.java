@@ -80,27 +80,16 @@ import org.omnifaces.util.MapWrapper;
 @FacesComponent(ViewParam.COMPONENT_TYPE)
 public class ViewParam extends UIViewParameter {
 
+	// Public constants -----------------------------------------------------------------------------------------------
+
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.input.ViewParam";
+
+	// Variables ------------------------------------------------------------------------------------------------------
 
 	private String submittedValue;
 	private Map<String, Object> attributeInterceptMap;
 
-	@Override
-	public void setSubmittedValue(Object submittedValue) {
-		this.submittedValue = (String) submittedValue;
-	}
-
-	@Override
-	public String getSubmittedValue() {
-		return submittedValue;
-	}
-
-	@Override
-	public boolean isRequired() {
-		// The request parameter is ignored on postbacks, however it's already present in the view scoped bean.
-		// So we can safely skip the required validation on postbacks.
-		return !isPostback() && super.isRequired();
-	}
+	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
 	public void processDecodes(FacesContext context) {
@@ -113,6 +102,10 @@ public class ViewParam extends UIViewParameter {
 	@Override
 	public void processValidators(FacesContext context) {
 		if (!context.isPostback()) {
+			if (isEmpty(getSubmittedValue())) {
+				setSubmittedValue(getDefault());
+			}
+
 			if (getSubmittedValue() == null) {
 				setSubmittedValue(""); // Workaround for it never triggering the (bean) validation when unspecified.
 			}
@@ -175,6 +168,43 @@ public class ViewParam extends UIViewParameter {
 		ValueExpression ve = getValueExpression("value");
 		Object value = (ve != null) ? ve.getValue(context.getELContext()) : null;
 		return (value != null) ? super.getStringValueFromModel(context) : null;
+	}
+
+	// Attribute getters/setters --------------------------------------------------------------------------------------
+
+	@Override
+	public String getSubmittedValue() {
+		return submittedValue;
+	}
+
+	@Override
+	public void setSubmittedValue(Object submittedValue) {
+		this.submittedValue = (String) submittedValue; // Don't delegate to statehelper to keep it stateless.
+	}
+
+	/**
+	 * Returns the default value in case the actual request parameter is <code>null</code> or empty.
+	 * @return The default value in case the actual request parameter is <code>null</code> or empty.
+	 * @since 2.2
+	 */
+	public String getDefault() {
+		return (String) getStateHelper().eval("default");
+	}
+
+	/**
+	 * Sets the default value in case the actual request parameter is <code>null</code> or empty.
+	 * @param defaultValue The default value in case the actual request parameter is <code>null</code> or empty.
+	 * @since 2.2
+	 */
+	public void setDefault(String defaultValue) {
+		getStateHelper().put("default", defaultValue);
+	}
+
+	@Override
+	public boolean isRequired() {
+		// The request parameter is ignored on postbacks, however it's already present in the view scoped bean.
+		// So we can safely skip the required validation on postbacks.
+		return !isPostback() && super.isRequired();
 	}
 
 }

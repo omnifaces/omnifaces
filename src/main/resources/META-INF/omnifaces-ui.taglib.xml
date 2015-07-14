@@ -1908,6 +1908,16 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
+					The default value to be used when actual value of the request parameter is <code>null</code> or empty.
+				]]>
+			</description>
+			<name>default</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
 					<p>
 
 					MethodExpression representing a value change listener method
