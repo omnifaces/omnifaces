@@ -395,7 +395,7 @@ public class CommandScript extends UICommand {
 
 	/**
 	 * Sets whether the command script should automatically run inline during page load.
-	 * @param name Whether the command script should automatically run inline during page load.
+	 * @param autorun Whether the command script should automatically run inline during page load.
 	 * @since 2.2
 	 */
 	public void setAutorun(boolean autorun) {
