@@ -12,6 +12,7 @@
  */
 package org.omnifaces.component.script;
 
+import static java.lang.Boolean.FALSE;
 import static org.omnifaces.util.Components.validateHasParent;
 import static org.omnifaces.util.Utils.isEmpty;
 
@@ -390,7 +391,7 @@ public class CommandScript extends UICommand {
 	 * @since 2.2
 	 */
 	public boolean isAutorun() {
-		return state.get(PropertyKeys.autorun);
+		return state.get(PropertyKeys.autorun, FALSE);
 	}
 
 	/**
