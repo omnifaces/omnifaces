@@ -330,7 +330,8 @@ public class ValidateBean extends TagHandler {
 				if (valueExpression != null) {
 					ValueReference valueReference = getValueReference(context.getELContext(), valueExpression);
 
-					if (valueReference.getBase().equals(base)) {
+					Object valueReferenceBase = valueReference.getBase();
+					if (valueReferenceBase != null && valueReferenceBase.equals(base)) {
 						operation.run((EditableValueHolder) component, valueReference);
 					}
 				}
