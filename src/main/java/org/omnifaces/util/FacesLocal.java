@@ -889,6 +889,22 @@ public final class FacesLocal {
 
 	/**
 	 * {@inheritDoc}
+	 * @see Faces#refresh()
+	 */
+	public static void refresh(FacesContext context) throws IOException {
+		redirect(context, getRequestURI(context));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Faces#refreshWithQueryString()
+	 */
+	public static void refreshWithQueryString(FacesContext context) throws IOException {
+		redirect(context, getRequestURIWithQueryString(context));
+	}
+
+	/**
+	 * {@inheritDoc}
 	 * @see Faces#responseSendError(int, String)
 	 */
 	public static void responseSendError(FacesContext context, int status, String message) throws IOException {
