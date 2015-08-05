@@ -1172,6 +1172,33 @@ public final class Faces {
 	}
 
 	/**
+	 * Refresh the current page by a GET request. This basically sends a temporary (302) redirect to current request
+	 * URI, without query string.
+	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
+	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @see ExternalContext#redirect(String)
+	 * @see HttpServletRequest#getRequestURI()
+	 * @since 2.2
+	 */
+	public static void refresh() throws IOException {
+		FacesLocal.refresh(getContext());
+	}
+
+	/**
+	 * Refresh the current page by a GET request, maintaining the query string. This basically sends a temporary (302)
+	 * redirect to current request URI, with the current query string.
+	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
+	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @see ExternalContext#redirect(String)
+	 * @see HttpServletRequest#getRequestURI()
+	 * @see HttpServletRequest#getQueryString()
+	 * @since 2.2
+	 */
+	public static void refreshWithQueryString() throws IOException {
+		FacesLocal.refreshWithQueryString(getContext());
+	}
+
+	/**
 	 * Sends a HTTP response error with the given status and message. This will end up in either a custom
 	 * <code>&lt;error-page&gt;</code> whose <code>&lt;error-code&gt;</code> matches the given status, or in a servlet
 	 * container specific default error page if there is none. The message will be available in the error page as a
