@@ -13,6 +13,7 @@
 package org.omnifaces.taghandler;
 
 import static java.util.logging.Level.SEVERE;
+import static javax.faces.component.visit.VisitHint.SKIP_UNRENDERED;
 import static javax.faces.event.PhaseId.PROCESS_VALIDATIONS;
 import static javax.faces.event.PhaseId.RESTORE_VIEW;
 import static javax.faces.event.PhaseId.UPDATE_MODEL_VALUES;
@@ -323,8 +324,8 @@ public class ValidateBean extends TagHandler {
 		forEachComponent(context)
 			.fromRoot(form)
 			.ofTypes(EditableValueHolder.class)
+			.withHints(SKIP_UNRENDERED)
 			.invoke(new Callback.WithArgument<UIComponent>() { @Override public void invoke(UIComponent component) {
-
 				ValueExpression valueExpression = component.getValueExpression("value");
 
 				if (valueExpression != null) {
