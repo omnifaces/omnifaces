@@ -11,7 +11,7 @@
    an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
    specific language governing permissions and limitations under the License.
  -->
-<facelet-taglib id="of"
+<facelet-taglib
 	xmlns="http://xmlns.jcp.org/xml/ns/javaee"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facelettaglibrary_2_2.xsd"
@@ -19,6 +19,7 @@
 >
 	<description>OmniFaces EL functions.</description>
 	<namespace>http://omnifaces.org/functions</namespace>
+	<short-name>of</short-name>
 
 	<!-- Strings ================================================================================================== -->
 
