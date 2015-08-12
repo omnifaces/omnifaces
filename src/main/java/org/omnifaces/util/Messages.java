@@ -640,4 +640,37 @@ public final class Messages {
 		addFlashGlobal(createFatal(message, params));
 	}
 
+	// Shortcuts - check messages -------------------------------------------------------------------------------------
+
+	/**
+	 * Returns <code>true</code> if there are no faces messages, otherwise <code>false</code>.
+	 * @return <code>true</code> if there are no faces messages, otherwise <code>false</code>.
+	 * @see FacesContext#getMessageList()
+	 * @since 2.2
+	 */
+	public static boolean isEmpty() {
+		return getContext().getMessageList().isEmpty();
+	}
+
+	/**
+	 * Returns <code>true</code> if there are no faces messages for the given client ID, otherwise <code>false</code>.
+	 * @return <code>true</code> if there are no faces messages for the given client ID, otherwise <code>false</code>.
+	 * @param clientId The client ID to check the messages for.
+	 * @see FacesContext#getMessageList(String)
+	 * @since 2.2
+	 */
+	public static boolean isEmpty(String clientId) {
+		return getContext().getMessageList(clientId).isEmpty();
+	}
+
+	/**
+	 * Returns <code>true</code> if there are no global faces messages, otherwise <code>false</code>.
+	 * @return <code>true</code> if there are no global faces messages, otherwise <code>false</code>.
+	 * @see FacesContext#getMessageList(String)
+	 * @since 2.2
+	 */
+	public static boolean isGlobalEmpty() {
+		return isEmpty(null);
+	}
+
 }
