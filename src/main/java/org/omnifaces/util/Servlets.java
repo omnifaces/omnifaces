@@ -44,6 +44,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.omnifaces.component.ParamHolder;
 import org.omnifaces.filter.CacheControlFilter;
 
 /**
@@ -268,7 +269,7 @@ public final class Servlets {
 	}
 
 	/**
-	 * Converts the given request parameter values map to request query string.
+	 * Converts the given request parameter values map to request query string. Empty names and values will be skipped.
 	 * @param parameterMap The request parameter values map.
 	 * @return The request parameter values map as request query string.
 	 * @since 2.0
@@ -277,15 +278,53 @@ public final class Servlets {
 		StringBuilder queryString = new StringBuilder();
 
 		for (Entry<String, List<String>> entry : parameterMap.entrySet()) {
+			if (isEmpty(entry.getKey())) {
+				continue;
+			}
+
 			String name = encodeURL(entry.getKey());
 
 			for (String value : entry.getValue()) {
+				if (isEmpty(value)) {
+					continue;
+				}
+
 				if (queryString.length() > 0) {
 					queryString.append("&");
 				}
 
 				queryString.append(name).append("=").append(encodeURL(value));
 			}
+		}
+
+		return queryString.toString();
+	}
+
+	/**
+	 * Converts the given parameter values list to request query string. Empty names and values will be skipped.
+	 * @param params The parameter values list.
+	 * @return The parameter values list as request query string.
+	 * @since 2.2
+	 */
+	public static String toQueryString(List<ParamHolder> params) {
+		StringBuilder queryString = new StringBuilder();
+
+		for (ParamHolder param : params) {
+			if (isEmpty(param.getName())) {
+				continue;
+			}
+
+			Object value = param.getValue();
+
+			if (isEmpty(value)) {
+				continue;
+			}
+
+			if (queryString.length() > 0) {
+				queryString.append("&");
+			}
+
+			queryString.append(encodeURL(param.getName())).append("=").append(encodeURL(value.toString()));
 		}
 
 		return queryString.toString();

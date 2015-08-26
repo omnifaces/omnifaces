@@ -16,9 +16,12 @@ import static java.lang.Boolean.FALSE;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeRequestParams;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeViewParams;
 import static org.omnifaces.component.input.Form.PropertyKeys.useRequestURI;
-import static org.omnifaces.util.FacesLocal.getRequestQueryStringMap;
+import static org.omnifaces.util.Components.getParams;
+import static org.omnifaces.util.FacesLocal.getRequestQueryString;
 import static org.omnifaces.util.FacesLocal.getRequestURIWithQueryString;
 import static org.omnifaces.util.FacesLocal.getViewParameterMap;
+import static org.omnifaces.util.Servlets.toQueryString;
+import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
 
@@ -132,18 +135,7 @@ public class Form extends UIForm {
 
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
-		if (isUseRequestURI()) {
-			super.encodeBegin(new ActionURLDecorator(context, useRequestURI));
-		}
-		else if (isIncludeRequestParams()) {
-			super.encodeBegin(new ActionURLDecorator(context, includeRequestParams));
-		}
-		else if (isIncludeViewParams()) {
-			super.encodeBegin(new ActionURLDecorator(context, includeViewParams));
-		}
-		else {
-			super.encodeBegin(context);
-		}
+		super.encodeBegin(new ActionURLDecorator(context, this));
 	}
 
 
@@ -267,12 +259,12 @@ public class Form extends UIForm {
 	static class ActionURLDecorator extends FacesContextWrapper {
 
 		private final FacesContext facesContext;
-		private final PropertyKeys type;
+		private final Form form;
 
 
-		public ActionURLDecorator(FacesContext facesContext, PropertyKeys type) {
+		public ActionURLDecorator(FacesContext facesContext, Form form) {
 			this.facesContext = facesContext;
-			this.type = type;
+			this.form = form;
 		}
 
 		@Override
@@ -294,20 +286,26 @@ public class Form extends UIForm {
 						 */
 						@Override
 						public String getActionURL(FacesContext context, String viewId) {
-							if (type == useRequestURI) {
+							if (form.isUseRequestURI()) {
 								return getRequestURIWithQueryString(context);
 							}
-							else if (type == includeRequestParams) {
-								return context.getExternalContext().encodeBookmarkableURL(
-									super.getActionURL(context, viewId), getRequestQueryStringMap(context));
-							}
-							else if (type == includeViewParams) {
-								return context.getExternalContext().encodeBookmarkableURL(
-									super.getActionURL(context, viewId), getViewParameterMap(context));
-							}
 							else {
-								return super.getActionURL(context, viewId);
+								String url = super.getActionURL(context, viewId);
+
+								if (form.isIncludeRequestParams()) {
+									return appendQueryString(url, getRequestQueryString(context));
+								}
+								else if (form.isIncludeViewParams()) {
+									return appendQueryString(url, toQueryString(getViewParameterMap(context)));
+								}
+								else {
+									return appendQueryString(url, toQueryString(getParams(form)));
+								}
 							}
+						}
+
+						private String appendQueryString(String url, String queryString) {
+							return isEmpty(queryString) ? url : url + (url.contains("?") ? "&" : "?") + queryString;
 						}
 
 						@Override
