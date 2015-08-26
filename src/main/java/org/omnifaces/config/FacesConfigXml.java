@@ -16,6 +16,7 @@ import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.Faces.hasContext;
 import static org.omnifaces.util.Xml.createDocument;
 import static org.omnifaces.util.Xml.getNodeList;
+import static org.omnifaces.util.Xml.getTextContent;
 
 import java.io.IOException;
 import java.net.URL;
@@ -23,11 +24,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.faces.application.Application;
 import javax.faces.context.FacesContext;
 import javax.faces.webapp.FacesServlet;
 import javax.servlet.Filter;
@@ -37,6 +40,7 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.omnifaces.util.Utils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -87,6 +91,10 @@ public enum FacesConfigXml {
 		"META-INF/faces-config.xml";
 	private static final String XPATH_RESOURCE_BUNDLE =
 		"application/resource-bundle";
+	private static final String XPATH_DEFAULT_LOCALE =
+		"application/locale-config/default-locale";
+	private static final String XPATH_SUPPORTED_LOCALE =
+		"application/locale-config/supported-locale";
 	private static final String XPATH_VAR =
 		"var";
 	private static final String XPATH_BASE_NAME =
@@ -100,6 +108,7 @@ public enum FacesConfigXml {
 
 	private final AtomicBoolean initialized = new AtomicBoolean();
 	private Map<String, String> resourceBundles;
+	private List<Locale> supportedLocales;
 
 	// Init -----------------------------------------------------------------------------------------------------------
 
@@ -123,6 +132,7 @@ public enum FacesConfigXml {
 				Element facesConfigXml = loadFacesConfigXml(servletContext).getDocumentElement();
 				XPath xpath = XPathFactory.newInstance().newXPath();
 				resourceBundles = parseResourceBundles(facesConfigXml, xpath);
+				supportedLocales = parseSupportedLocales(facesConfigXml, xpath);
 			}
 			catch (Exception e) {
 				initialized.set(false);
@@ -143,6 +153,20 @@ public enum FacesConfigXml {
 	public Map<String, String> getResourceBundles() {
 		checkInitialized();
 		return resourceBundles;
+	}
+
+	/**
+	 * Returns an ordered list of all supported locales on this application, with the default locale as the first
+	 * item, if any. This will return an empty list if there are no locales definied in <code>faces-config.xml</code>.
+	 * @return An ordered list of all supported locales on this application, with the default locale as the first
+	 * item, if any.
+	 * @see Application#getDefaultLocale()
+	 * @see Application#getSupportedLocales()
+	 * @since 2.2
+	 */
+	public List<Locale> getSupportedLocales() {
+		checkInitialized();
+		return supportedLocales;
 	}
 
 	private void checkInitialized() {
@@ -190,6 +214,31 @@ public enum FacesConfigXml {
 		}
 
 		return Collections.unmodifiableMap(resourceBundles);
+	}
+
+	/**
+	 * Create and return a list of default locale and all supported locales in same order as in the given document.
+	 * @throws XPathExpressionException
+	 */
+	private static List<Locale> parseSupportedLocales(Element facesConfigXml, XPath xpath) throws XPathExpressionException {
+		List<Locale> supportedLocales = new ArrayList<>();
+		String defaultLocale = xpath.compile(XPATH_DEFAULT_LOCALE).evaluate(facesConfigXml).trim();
+
+		if (!Utils.isEmpty(defaultLocale)) {
+			supportedLocales.add(new Locale(defaultLocale));
+		}
+
+		NodeList supportedLocaleNodes = getNodeList(facesConfigXml, xpath, XPATH_SUPPORTED_LOCALE);
+
+		for (int i = 0; i < supportedLocaleNodes.getLength(); i++) {
+			Locale supportedLocale = new Locale(getTextContent(supportedLocaleNodes.item(i)));
+
+			if (!supportedLocales.contains(supportedLocale)) {
+				supportedLocales.add(supportedLocale);
+			}
+		}
+
+		return Collections.unmodifiableList(supportedLocales);
 	}
 
 }

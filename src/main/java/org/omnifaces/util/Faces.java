@@ -55,6 +55,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.omnifaces.component.ParamHolder;
+import org.omnifaces.config.FacesConfigXml;
 
 /**
  * <p>
@@ -571,9 +572,10 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns a list of all supported locales on this application, with the default locale as the first item, if any.
-	 * This will return an empty list if there are no locales definied in <code>faces-config.xml</code>.
-	 * @return A list of all supported locales on this application, with the default locale as the first item, if any.
+	 * Returns an unordered list of all supported locales on this application, with the default locale as the first
+	 * item, if any. This will return an empty list if there are no locales definied in <code>faces-config.xml</code>.
+	 * @return An unordered list of all supported locales on this application, with the default locale as the first
+	 * item, if any. If you need an ordered list, use {@link FacesConfigXml#getSupportedLocales()} instead.
 	 * @see Application#getDefaultLocale()
 	 * @see Application#getSupportedLocales()
 	 */
