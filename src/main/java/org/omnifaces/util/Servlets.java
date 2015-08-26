@@ -269,7 +269,8 @@ public final class Servlets {
 	}
 
 	/**
-	 * Converts the given request parameter values map to request query string. Empty names and values will be skipped.
+	 * Converts the given request parameter values map to request query string.
+	 * Empty names and null values will be skipped.
 	 * @param parameterMap The request parameter values map.
 	 * @return The request parameter values map as request query string.
 	 * @since 2.0
@@ -285,7 +286,7 @@ public final class Servlets {
 			String name = encodeURL(entry.getKey());
 
 			for (String value : entry.getValue()) {
-				if (isEmpty(value)) {
+				if (value == null) {
 					continue;
 				}
 
@@ -301,7 +302,8 @@ public final class Servlets {
 	}
 
 	/**
-	 * Converts the given parameter values list to request query string. Empty names and values will be skipped.
+	 * Converts the given parameter values list to request query string.
+	 * Empty names and null values will be skipped.
 	 * @param params The parameter values list.
 	 * @return The parameter values list as request query string.
 	 * @since 2.2
@@ -316,7 +318,7 @@ public final class Servlets {
 
 			Object value = param.getValue();
 
-			if (isEmpty(value)) {
+			if (value == null) {
 				continue;
 			}
 
