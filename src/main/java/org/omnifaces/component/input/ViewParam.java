@@ -61,10 +61,11 @@ import org.omnifaces.util.MapWrapper;
  *
  * <h3>Support bean validation and triggering validate events on null value</h3>
  * <p>
- * The standard {@link UIViewParameter} implementation uses an internal "is required" check when the submitted value is
- * <code>null</code>, hereby completely bypassing the standard {@link UIInput} validation, including any bean
- * validation annotations and even the {@link PreValidateEvent} and {@link PostValidateEvent} events. This is not
- * desired. The workaround was added in OmniFaces 2.0.
+ * The standard {@link UIViewParameter} implementation uses in JSF 2.0-2.2 an internal "is required" check when the
+ * submitted value is <code>null</code>, hereby completely bypassing the standard {@link UIInput} validation, including
+ * any bean validation annotations and even the {@link PreValidateEvent} and {@link PostValidateEvent} events. This is
+ * not desired. The workaround was added in OmniFaces 2.0. In JSF 2.3, this has been fixed and has only effect when
+ * <code>javax.faces.INTERPRET_EMPTY_STRING_SUBMITTED_VALUES_AS_NULL</code> context param is set to <code>true</code>.
  *
  * <h3>Usage</h3>
  * <p>
