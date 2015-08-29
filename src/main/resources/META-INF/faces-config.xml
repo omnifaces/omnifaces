@@ -37,6 +37,11 @@
 			<system-event-class>javax.faces.event.PreDestroyViewMapEvent</system-event-class>
 			<source-class>javax.faces.component.UIViewRoot</source-class>
 		</system-event-listener>
+		<system-event-listener>
+			<system-event-listener-class>org.omnifaces.application.ViewScopeEventListener</system-event-listener-class>
+			<system-event-class>javax.faces.event.PostRestoreStateEvent</system-event-class>
+			<source-class>javax.faces.component.UIViewRoot</source-class>
+		</system-event-listener>
 	</application>
 
 	<lifecycle>

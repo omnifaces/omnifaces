@@ -15,6 +15,8 @@
  */
 package org.omnifaces.cdi.viewscope;
 
+import static org.omnifaces.util.Components.addScriptResourceToBody;
+import static org.omnifaces.util.Components.addScriptToBody;
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Faces.getViewAttribute;
 import static org.omnifaces.util.Faces.setViewAttribute;
@@ -182,19 +184,25 @@ public class ViewScopeManager implements Serializable {
 	 * CDI bean storage will also be auto-created.
 	 */
 	private UUID getBeanStorageId(boolean create) {
-		UUID id = (UUID) getViewAttribute(ViewScopeManager.class.getName());
+		UUID id = getViewAttribute(ViewScopeManager.class.getName());
 
 		if (id == null || activeViewScopes.get(id) == null) {
 			id = UUID.randomUUID();
 
 			if (create) {
-				activeViewScopes.put(id, new BeanStorage(DEFAULT_BEANS_PER_VIEW_SCOPE));
+				createViewScope(id);
 			}
 
 			setViewAttribute(ViewScopeManager.class.getName(), id);
 		}
 
 		return id;
+	}
+
+	private void createViewScope(UUID id) {
+		activeViewScopes.put(id, new BeanStorage(DEFAULT_BEANS_PER_VIEW_SCOPE));
+		addScriptResourceToBody("omnifaces", "unload.js");
+		addScriptToBody("OmniFaces.Unload.init()");
 	}
 
 	// Nested classes -------------------------------------------------------------------------------------------------

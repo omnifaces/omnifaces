@@ -45,6 +45,7 @@ import javax.faces.component.UIComponentBase;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
 import javax.faces.component.UINamingContainer;
+import javax.faces.component.UIOutput;
 import javax.faces.component.UIPanel;
 import javax.faces.component.UIParameter;
 import javax.faces.component.UIViewRoot;
@@ -621,6 +622,40 @@ public final class Components {
 		}
 
 		return composite;
+	}
+
+	/**
+	 * Add given JavaScript code as inline script to end of body of the current view.
+	 * Note: this doesn't have any effect during ajax postbacks. Rather use {@link Ajax#oncomplete(String...)}.
+	 * @param script JavaScript code to be added as inline script to end of body of the current view.
+	 * @since 2.2
+	 */
+	public static void addScriptToBody(String script) {
+		UIOutput outputScript = new UIOutput();
+		outputScript.setRendererType("javax.faces.resource.Script");
+		UIOutput content = new UIOutput();
+		content.setValue(script);
+		outputScript.getChildren().add(content);
+		addComponentResourceToBody(outputScript);
+	}
+
+	/**
+	 * Add given JavaScript resource to end of body of the current view.
+	 * Note: this doesn't have any effect during non-@all ajax postbacks.
+	 * @param script JavaScript resource to be added to end of body of the current view.
+	 * @since 2.2
+	 */
+	public static void addScriptResourceToBody(String libraryName, String resourceName) {
+		UIOutput outputScript = new UIOutput();
+		outputScript.setRendererType("javax.faces.resource.Script");
+		outputScript.getAttributes().put("library", libraryName);
+		outputScript.getAttributes().put("name", resourceName);
+		addComponentResourceToBody(outputScript);
+	}
+
+	private static void addComponentResourceToBody(UIComponent resource) {
+		FacesContext context = FacesContext.getCurrentInstance();
+		context.getViewRoot().addComponentResource(context, resource, "body");
 	}
 
 	// Forms ----------------------------------------------------------------------------------------------------------
