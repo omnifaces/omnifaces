@@ -16,9 +16,11 @@ var OmniFaces = OmniFaces || {};
  * <p>Fire "unload" event to server side via synchronous XHR when the window is about to be unloaded as result of a 
  * non-submit event, so that e.g. any view scoped beans will immediately be destroyed when enduser refreshes page,
  * or navigates away, or closes browser.
- * <p>This script is automatically included when an org.omnifaces.cdi.ViewScoped managed bean is created.
+ * <p>This script is automatically included when an <code>org.omnifaces.cdi.ViewScoped</code> managed bean is created
+ * during render response, otherwise the one already in <code>omnifaces.js</code> will be used.
  * 
  * @author Bauke Scholtz
+ * @see org.omnifaces.cdi.ViewScopeManager
  * @since 2.2
  */
 OmniFaces.Unload = (function() {
