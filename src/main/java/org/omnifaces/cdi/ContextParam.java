@@ -24,6 +24,8 @@ import java.lang.annotation.Target;
 import javax.enterprise.util.Nonbinding;
 import javax.inject.Qualifier;
 
+import org.omnifaces.cdi.contextparam.ContextParamProducer;
+
 /**
  * <p>
  * The CDI annotation {@link ContextParam} allows you to inject a <code>web.xml</code> context parameter from the
