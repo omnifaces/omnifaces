@@ -16,6 +16,7 @@
 package org.omnifaces.cdi.viewscope;
 
 import static org.omnifaces.util.Components.addScriptResourceToBody;
+import static org.omnifaces.util.Components.addScriptResourceToHead;
 import static org.omnifaces.util.Components.addScriptToBody;
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Faces.getViewAttribute;
@@ -31,11 +32,15 @@ import javax.enterprise.context.SessionScoped;
 import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.faces.context.FacesContext;
+import javax.faces.event.PhaseId;
 import javax.inject.Inject;
 
 import org.omnifaces.application.ViewScopeEventListener;
 import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
+import org.omnifaces.resourcehandler.ResourceIdentifier;
+import org.omnifaces.util.Hacks;
 import org.omnifaces.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import org.omnifaces.util.concurrentlinkedhashmap.EvictionListener;
 
@@ -201,7 +206,16 @@ public class ViewScopeManager implements Serializable {
 
 	private void createViewScope(UUID id) {
 		activeViewScopes.put(id, new BeanStorage(DEFAULT_BEANS_PER_VIEW_SCOPE));
-		addScriptResourceToBody("omnifaces", "unload.js");
+
+		FacesContext context = FacesContext.getCurrentInstance();
+
+		if (context.getCurrentPhaseId() != PhaseId.RENDER_RESPONSE) {
+			addScriptResourceToHead("omnifaces", "omnifaces.js");
+		}
+		else if (!Hacks.isScriptResourceRendered(context, new ResourceIdentifier("omnifaces", "omnifaces.js"))) {
+			addScriptResourceToBody("omnifaces", "unload.js");
+		}
+
 		addScriptToBody("OmniFaces.Unload.init()");
 	}
 

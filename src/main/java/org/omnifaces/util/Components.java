@@ -632,12 +632,11 @@ public final class Components {
 	 * @since 2.2
 	 */
 	public static void addScriptToBody(String script) {
-		UIOutput outputScript = new UIOutput();
-		outputScript.setRendererType(RENDERER_TYPE_JS);
+		UIOutput outputScript = createScriptResource();
 		UIOutput content = new UIOutput();
 		content.setValue(script);
 		outputScript.getChildren().add(content);
-		addComponentResourceToBody(outputScript);
+		addComponentResource(outputScript, "body");
 	}
 
 	/**
@@ -648,16 +647,36 @@ public final class Components {
 	 * @since 2.2
 	 */
 	public static void addScriptResourceToBody(String libraryName, String resourceName) {
-		UIOutput outputScript = new UIOutput();
-		outputScript.setRendererType(RENDERER_TYPE_JS);
-		outputScript.getAttributes().put("library", libraryName);
-		outputScript.getAttributes().put("name", resourceName);
-		addComponentResourceToBody(outputScript);
+		addScriptResource(libraryName, resourceName, "body");
 	}
 
-	private static void addComponentResourceToBody(UIComponent resource) {
+	/**
+	 * Add given JavaScript resource to end of head of the current view.
+	 * Note: this doesn't have any effect during non-@all ajax postbacks.
+	 * @param libraryName Library name of the JavaScript resource.
+	 * @param resourceName Resource name of the JavaScript resource.
+	 * @since 2.2
+	 */
+	public static void addScriptResourceToHead(String libraryName, String resourceName) {
+		addScriptResource(libraryName, resourceName, "head");
+	}
+
+	private static UIOutput createScriptResource() {
+		UIOutput outputScript = new UIOutput();
+		outputScript.setRendererType(RENDERER_TYPE_JS);
+		return outputScript;
+	}
+
+	private static void addScriptResource(String libraryName, String resourceName, String target) {
+		UIOutput outputScript = createScriptResource();
+		outputScript.getAttributes().put("library", libraryName);
+		outputScript.getAttributes().put("name", resourceName);
+		addComponentResource(outputScript, target);
+	}
+
+	private static void addComponentResource(UIComponent resource, String target) {
 		FacesContext context = FacesContext.getCurrentInstance();
-		context.getViewRoot().addComponentResource(context, resource, "body");
+		context.getViewRoot().addComponentResource(context, resource, target);
 	}
 
 	// Forms ----------------------------------------------------------------------------------------------------------
