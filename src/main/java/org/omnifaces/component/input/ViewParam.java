@@ -67,6 +67,12 @@ import org.omnifaces.util.MapWrapper;
  * not desired. The workaround was added in OmniFaces 2.0. In JSF 2.3, this has been fixed and has only effect when
  * <code>javax.faces.INTERPRET_EMPTY_STRING_SUBMITTED_VALUES_AS_NULL</code> context param is set to <code>true</code>.
  *
+ * <h3>Default value when no parameter is set</h3>
+ * <p>
+ * The <code>&lt;o:viewParam&gt;</code> also supports providing a default value via the new <code>default</code>
+ * attribute. When the parameter is not available, then the value specified in <code>default</code> attribute will be
+ * set in the model instead. The support was added in OmniFaces 2.2.
+ *
  * <h3>Usage</h3>
  * <p>
  * You can use it the same way as <code>&lt;f:viewParam&gt;</code>, you only need to change <code>f:</code> to
