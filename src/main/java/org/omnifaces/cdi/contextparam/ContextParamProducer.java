@@ -20,7 +20,6 @@ import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
 
 import org.omnifaces.cdi.ContextParam;
-import org.omnifaces.cdi.Cookie;
 
 /**
  * <p>
@@ -36,7 +35,7 @@ public class ContextParamProducer {
 	private InjectionPoint injectionPoint;
 
 	@Produces
-	@Cookie
+	@ContextParam
 	public String produce(InjectionPoint injectionPoint) {
 		ContextParam param = getQualifier(injectionPoint, ContextParam.class);
 		String name = param.name().isEmpty() ? injectionPoint.getMember().getName() : param.name();
