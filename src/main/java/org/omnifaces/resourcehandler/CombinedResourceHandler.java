@@ -16,6 +16,8 @@ import static org.omnifaces.util.Events.subscribeToApplicationEvent;
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Faces.isDevelopment;
+import static org.omnifaces.util.Renderers.RENDERER_TYPE_CSS;
+import static org.omnifaces.util.Renderers.RENDERER_TYPE_JS;
 import static org.omnifaces.util.Utils.isNumber;
 
 import java.util.ArrayList;
@@ -394,8 +396,6 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 		// Constants --------------------------------------------------------------------------------------------------
 
-		private static final String RENDERER_TYPE_CSS = "javax.faces.resource.Stylesheet";
-		private static final String RENDERER_TYPE_JS = "javax.faces.resource.Script";
 		private static final String EXTENSION_CSS = ".css";
 		private static final String EXTENSION_JS = ".js";
 

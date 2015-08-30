@@ -20,6 +20,7 @@ import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getELContext;
 import static org.omnifaces.util.Faces.getFaceletContext;
 import static org.omnifaces.util.Faces.getViewRoot;
+import static org.omnifaces.util.Renderers.RENDERER_TYPE_JS;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isOneInstanceOf;
 
@@ -632,7 +633,7 @@ public final class Components {
 	 */
 	public static void addScriptToBody(String script) {
 		UIOutput outputScript = new UIOutput();
-		outputScript.setRendererType("javax.faces.resource.Script");
+		outputScript.setRendererType(RENDERER_TYPE_JS);
 		UIOutput content = new UIOutput();
 		content.setValue(script);
 		outputScript.getChildren().add(content);
@@ -642,12 +643,13 @@ public final class Components {
 	/**
 	 * Add given JavaScript resource to end of body of the current view.
 	 * Note: this doesn't have any effect during non-@all ajax postbacks.
-	 * @param script JavaScript resource to be added to end of body of the current view.
+	 * @param libraryName Library name of the JavaScript resource.
+	 * @param resourceName Resource name of the JavaScript resource.
 	 * @since 2.2
 	 */
 	public static void addScriptResourceToBody(String libraryName, String resourceName) {
 		UIOutput outputScript = new UIOutput();
-		outputScript.setRendererType("javax.faces.resource.Script");
+		outputScript.setRendererType(RENDERER_TYPE_JS);
 		outputScript.getAttributes().put("library", libraryName);
 		outputScript.getAttributes().put("name", resourceName);
 		addComponentResourceToBody(outputScript);
