@@ -27,7 +27,6 @@ import org.omnifaces.cdi.Cookie;
  *
  * @since 2.1
  * @author Bauke Scholtz
- * @see RequestCookieProducer
  */
 public class RequestCookieProducer {
 
