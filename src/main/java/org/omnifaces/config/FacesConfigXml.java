@@ -60,6 +60,10 @@ import org.xml.sax.SAXException;
  * // Get a mapping of all &lt;resource-bundle&gt; vars and base names.
  * Map&lt;String, String&gt; resourceBundles = FacesConfigXml.INSTANCE.getResourceBundles();
  * </pre>
+ * <pre>
+ * // Get an ordered list of all &lt;supported-locale&gt; values with &lt;default-locale&gt; as first item.
+ * List&lt;Locale&gt; supportedLocales = FacesConfigXml.INSTANCE.getSupportedLocales();
+ * </pre>
  *
  * @author Bauke Scholtz
  * @author Michele Mariotti
