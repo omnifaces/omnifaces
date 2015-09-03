@@ -62,7 +62,7 @@ public class ApplicationListener extends DefaultServletContextListener {
 		try {
 			BeanManager.INSTANCE.toString();
 		}
-		catch (IllegalStateException e) {
+		catch (Throwable e) {
 			logger.severe(""
 				+ "\n████████████████████████████████████████████████████████████████████████████████"
 				+ "\n▌                         ▐█     ▐                                             ▐"
