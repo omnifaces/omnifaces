@@ -669,7 +669,11 @@ public final class Components {
 
 	private static void addScriptResource(String libraryName, String resourceName, String target) {
 		UIOutput outputScript = createScriptResource();
-		outputScript.getAttributes().put("library", libraryName);
+
+		if (libraryName != null) {
+			outputScript.getAttributes().put("library", libraryName);
+		}
+
 		outputScript.getAttributes().put("name", resourceName);
 		addComponentResource(outputScript, target);
 	}
