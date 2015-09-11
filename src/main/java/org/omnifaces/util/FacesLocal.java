@@ -40,6 +40,7 @@ import java.util.Set;
 import javax.el.ELContext;
 import javax.el.ELResolver;
 import javax.el.ValueExpression;
+import javax.faces.FactoryFinder;
 import javax.faces.application.Application;
 import javax.faces.application.ProjectStage;
 import javax.faces.application.ViewHandler;
@@ -49,6 +50,8 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
 import javax.faces.event.PhaseId;
+import javax.faces.render.RenderKit;
+import javax.faces.render.RenderKitFactory;
 import javax.faces.view.ViewDeclarationLanguage;
 import javax.faces.view.ViewMetadata;
 import javax.faces.view.facelets.FaceletContext;
@@ -254,6 +257,16 @@ public final class FacesLocal {
 		return context.getApplication()
 					  .getViewHandler()
 					  .getViewDeclarationLanguage(context, context.getViewRoot().getViewId());
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Faces#getRenderKit()
+	 */
+	public static RenderKit getRenderKit(FacesContext context) {
+		UIViewRoot view = context.getViewRoot();
+		String renderKitId = (view != null) ? view.getRenderKitId() : context.getApplication().getViewHandler().calculateRenderKitId(context);
+		return ((RenderKitFactory) FactoryFinder.getFactory(FactoryFinder.RENDER_KIT_FACTORY)).getRenderKit(context, renderKitId);
 	}
 
 	/**

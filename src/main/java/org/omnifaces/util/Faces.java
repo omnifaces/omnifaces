@@ -45,6 +45,7 @@ import javax.faces.context.FacesContextWrapper;
 import javax.faces.context.Flash;
 import javax.faces.context.PartialViewContext;
 import javax.faces.event.PhaseId;
+import javax.faces.render.RenderKit;
 import javax.faces.view.ViewDeclarationLanguage;
 import javax.faces.view.ViewMetadata;
 import javax.faces.view.facelets.FaceletContext;
@@ -461,6 +462,22 @@ public final class Faces {
 	 */
 	public static ViewDeclarationLanguage getViewDeclarationLanguage() {
 		return FacesLocal.getViewDeclarationLanguage(getContext());
+	}
+
+	/**
+	 * Returns the {@link RenderKit} associated with the "current" view ID or view handler.
+	 * <p>
+	 * The current view ID is the view ID that's set for the view root that's associated with the current faces context.
+	 * Or if there is none, then the current view handler will be assumed, which is the view handler that's associated
+	 * with the requested view.
+	 *
+	 * @return The {@link RenderKit} associated with the "current" view ID or view handler.
+	 * @since 2.2
+	 * @see UIViewRoot#getRenderKitId()
+	 * @see ViewHandler#calculateRenderKitId(FacesContext)
+	 */
+	public static RenderKit getRenderKit() {
+		return FacesLocal.getRenderKit(getContext());
 	}
 
 	/**
