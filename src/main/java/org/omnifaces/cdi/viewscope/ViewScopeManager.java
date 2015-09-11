@@ -21,6 +21,7 @@ import static org.omnifaces.util.Components.addScriptToBody;
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Faces.getViewAttribute;
 import static org.omnifaces.util.Faces.setViewAttribute;
+import static org.omnifaces.util.FacesLocal.getRequestParameter;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -217,6 +218,16 @@ public class ViewScopeManager implements Serializable {
 		}
 
 		addScriptToBody("OmniFaces.Unload.init()");
+	}
+
+	/**
+	 * Returns <code>true</code> if the current request is triggered by an unload request.
+	 * @param context The involved faces context.
+	 * @return <code>true</code> if the current request is triggered by an unload request.
+	 * @since 2.2
+	 */
+	public static boolean isUnloadRequest(FacesContext context) {
+		return "unload".equals(getRequestParameter(context, "omnifaces.event"));
 	}
 
 	// Nested classes -------------------------------------------------------------------------------------------------

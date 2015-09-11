@@ -15,7 +15,7 @@
  */
 package org.omnifaces.application;
 
-import static org.omnifaces.util.Faces.getRequestParameter;
+import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.responseComplete;
 
 import javax.faces.component.UIViewRoot;
@@ -51,13 +51,17 @@ public class ViewScopeEventListener implements ViewMapListener {
 	 * If the event is an instance of {@link PreDestroyViewMapEvent}, which means that the JSF view scope is about to
 	 * be destroyed, then find the current instance of {@link ViewScopeManager} and invoke its
 	 * {@link ViewScopeManager#preDestroyView()} method.
+	 * <p>
+	 * Or, if the event is an instance of {@link PostRestoreStateEvent}, which means that the JSF view scope has
+	 * recently restored, then check if the current request is an unload request and if so, then destroy the JSF view
+	 * scope the same way as described above.
 	 */
 	@Override
 	public void processEvent(SystemEvent event) throws AbortProcessingException {
 		if (event instanceof PreDestroyViewMapEvent) {
 			processPreDestroyView();
 		}
-		else if (event instanceof PostRestoreStateEvent && "unload".equals(getRequestParameter("omnifaces.event"))) {
+		else if (event instanceof PostRestoreStateEvent && ViewScopeManager.isUnloadRequest(getContext())) {
 			processPreDestroyView();
 			responseComplete();
 		}

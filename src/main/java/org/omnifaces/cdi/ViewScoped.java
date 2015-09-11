@@ -33,6 +33,7 @@ import org.omnifaces.application.ViewScopeEventListener;
 import org.omnifaces.cdi.viewscope.ViewScopeContext;
 import org.omnifaces.cdi.viewscope.ViewScopeExtension;
 import org.omnifaces.cdi.viewscope.ViewScopeManager;
+import org.omnifaces.viewhandler.RestorableViewHandler;
 
 /**
  * <p>
@@ -95,6 +96,7 @@ import org.omnifaces.cdi.viewscope.ViewScopeManager;
  * @see ViewScopeContext
  * @see ViewScopeManager
  * @see ViewScopeEventListener
+ * @see RestorableViewHandler
  * @since 1.6
  */
 @Inherited
