@@ -595,6 +595,25 @@ public final class Components {
 	 * @since 1.5
 	 */
 	public static UIComponent includeCompositeComponent(UIComponent parent, String libraryName, String resourceName, String id) {
+		return includeCompositeComponent(parent, libraryName, resourceName, id, null);
+	}
+
+	/**
+	 * Create and include the composite component of the given library and resource name as child of the given UI
+	 * component parent, set the given attributes on it and return the created composite component.
+	 * This has the same effect as using <code>&lt;my:resourceName&gt;</code>. The given component ID must be unique
+	 * relative to the current naming container parent and is mandatory for functioning of input components inside the
+	 * composite, if any.
+	 * @param parent The parent component to include the composite component in.
+	 * @param libraryName The library name of the composite component.
+	 * @param resourceName The resource name of the composite component.
+	 * @param id The component ID of the composite component.
+	 * @param attributes The attributes to be set on the composite component.
+	 * @return The created composite component, which can if necessary be further used to set more custom attributes or
+	 * value expressions on it.
+	 * @since 2.2
+	 */
+	public static UIComponent includeCompositeComponent(UIComponent parent, String libraryName, String resourceName, String id, Map<String, Object> attributes) {
 		FacesContext context = FacesContext.getCurrentInstance();
 		Application application = context.getApplication();
 		FaceletContext faceletContext = FacesLocal.getFaceletContext(context);
@@ -603,6 +622,11 @@ public final class Components {
 		Resource resource = application.getResourceHandler().createResource(resourceName, libraryName);
 		UIComponent composite = application.createComponent(context, resource);
 		composite.setId(id); // Mandatory for the case composite is part of UIForm! Otherwise JSF can't find inputs.
+
+		// Set the <composite:attribute>s, if any.
+		if (attributes != null) {
+			composite.getAttributes().putAll(attributes);
+		}
 
 		// This basically creates <composite:implementation>.
 		UIComponent implementation = application.createComponent(UIPanel.COMPONENT_TYPE);
@@ -627,7 +651,7 @@ public final class Components {
 
 	/**
 	 * Add given JavaScript code as inline script to end of body of the current view.
-	 * Note: this doesn't have any effect during ajax postbacks. Rather use {@link Ajax#oncomplete(String...)}.
+	 * Note: this doesn't have any effect during ajax postbacks. Rather use {@link Ajax#oncomplete(String...)} instead.
 	 * @param script JavaScript code to be added as inline script to end of body of the current view.
 	 * @since 2.2
 	 */
@@ -652,7 +676,9 @@ public final class Components {
 
 	/**
 	 * Add given JavaScript resource to end of head of the current view.
-	 * Note: this doesn't have any effect during non-@all ajax postbacks.
+	 * Note: this doesn't have any effect during non-@all ajax postbacks, nor during render response phase when the
+	 * <code>&lt;h:head&gt;</code> has already been encoded. During render response, rather use
+	 * {@link #addScriptResourceToBody(String, String)} instead.
 	 * @param libraryName Library name of the JavaScript resource.
 	 * @param resourceName Resource name of the JavaScript resource.
 	 * @since 2.2
