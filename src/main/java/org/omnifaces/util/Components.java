@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.el.MethodExpression;
@@ -634,7 +635,17 @@ public final class Components {
 
 		// Set the <composite:attribute>s, if any.
 		if (attributes != null) {
-			composite.getAttributes().putAll(attributes);
+			for (Entry<String, Object> attribute : attributes.entrySet()) {
+				String key = attribute.getKey();
+				Object value = attribute.getValue();
+
+				if (value instanceof ValueExpression) {
+					composite.setValueExpression(key, (ValueExpression) value);
+				}
+				else {
+					composite.getAttributes().put(key, value);
+				}
+			}
 		}
 
 		// This basically creates <composite:implementation>.
