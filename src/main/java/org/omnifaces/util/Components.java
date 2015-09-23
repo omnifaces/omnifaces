@@ -20,11 +20,15 @@ import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getELContext;
 import static org.omnifaces.util.Faces.getFaceletContext;
 import static org.omnifaces.util.Faces.getViewRoot;
+import static org.omnifaces.util.Faces.setContext;
+import static org.omnifaces.util.FacesLocal.getRenderKit;
+import static org.omnifaces.util.FacesLocal.normalizeViewId;
 import static org.omnifaces.util.Renderers.RENDERER_TYPE_JS;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isOneInstanceOf;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,6 +42,7 @@ import javax.el.ValueExpression;
 import javax.faces.FacesException;
 import javax.faces.application.Application;
 import javax.faces.application.Resource;
+import javax.faces.application.ViewHandler;
 import javax.faces.component.EditableValueHolder;
 import javax.faces.component.NamingContainer;
 import javax.faces.component.UICommand;
@@ -57,11 +62,15 @@ import javax.faces.component.visit.VisitContext;
 import javax.faces.component.visit.VisitHint;
 import javax.faces.component.visit.VisitResult;
 import javax.faces.context.FacesContext;
+import javax.faces.context.FacesContextWrapper;
+import javax.faces.context.ResponseWriter;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.AjaxBehaviorListener;
 import javax.faces.event.MethodExpressionActionListener;
+import javax.faces.render.RenderKit;
+import javax.faces.view.ViewDeclarationLanguage;
 import javax.faces.view.facelets.FaceletContext;
 
 import org.omnifaces.component.ParamHolder;
@@ -709,6 +718,69 @@ public final class Components {
 		context.getViewRoot().addComponentResource(context, resource, target);
 	}
 
+	// Building / rendering -------------------------------------------------------------------------------------------
+
+	/**
+	 * Creates and builds a local view for the given view ID independently from the current view.
+	 * @param viewId The ID of the view which needs to be created and built.
+	 * @return A fully populated component tree of the given view ID.
+	 * @throws IOException Whenever something fails at I/O level. This can happen when the given view ID is unavailable or malformed.
+	 * @since 2.2
+	 * @see ViewHandler#createView(FacesContext, String)
+	 * @see ViewDeclarationLanguage#buildView(FacesContext, UIViewRoot)
+	 */
+	public static UIViewRoot buildView(String viewId) throws IOException {
+		FacesContext context = FacesContext.getCurrentInstance();
+		String normalizedViewId = normalizeViewId(context, viewId);
+		ViewHandler viewHandler = context.getApplication().getViewHandler();
+		UIViewRoot view = viewHandler.createView(context, normalizedViewId);
+		FacesContext temporaryContext = new TemporaryViewFacesContext(context, view);
+
+		try {
+			setContext(temporaryContext);
+			viewHandler.getViewDeclarationLanguage(temporaryContext, normalizedViewId).buildView(temporaryContext, view);
+		}
+		finally {
+			setContext(context);
+		}
+
+		return view;
+	}
+
+	/**
+	 * Encodes the given component locally as HTML, with UTF-8 character encoding, independently from the current view.
+	 * The current implementation, however, uses the current faces context. The same managed beans as in the current
+	 * faces context will be available as well, including request scoped ones. But, depending on the nature of the
+	 * provided component, the state of the faces context may be affected because the attributes of the context,
+	 * request, view, session and application scope could be (in)directly manipulated during the encode. This may or may
+	 * not have the desired effect. If the given view does not have any component resources, JSF forms, dynamically
+	 * added components, component event listeners, then it should mostly be safe.
+	 * In other words, use this at most for "simple templates" only, e.g. a HTML based mail template, which usually
+	 * already doesn't have a HTML head nor body.
+	 * @param component The component to capture HTML output for.
+	 * @return The encoded HTML output of the given component.
+	 * @throws IOException Whenever something fails at I/O level. This would be quite unexpected as it happens locally.
+	 * @since 2.2
+	 * @see UIComponent#encodeAll(FacesContext)
+	 */
+	public static String encodeHtml(UIComponent component) throws IOException {
+		FacesContext context = FacesContext.getCurrentInstance();
+		ResponseWriter originalWriter = context.getResponseWriter();
+		StringWriter output = new StringWriter();
+		context.setResponseWriter(getRenderKit(context).createResponseWriter(output, "text/html", "UTF-8"));
+
+		try {
+			component.encodeAll(context);
+		}
+		finally {
+			if (originalWriter != null) {
+				context.setResponseWriter(originalWriter);
+			}
+		}
+
+		return output.toString();
+	}
+
 	// Forms ----------------------------------------------------------------------------------------------------------
 
 	/**
@@ -1157,6 +1229,44 @@ public final class Components {
 			// May occur when view has changed by for example a successful navigation.
 			return null;
 		}
+	}
+
+	// Inner classes --------------------------------------------------------------------------------------------------
+
+	/**
+	 * This faces context wrapper allows returning the given temporary view on {@link #getViewRoot()} and its
+	 * associated renderer in {@link #getRenderKit()}. This can then be used in cases when a different view needs to be
+	 * built within the current view. Using {@link FacesContext#setViewRoot(UIViewRoot)} isn't desired as it can't be
+	 * cleared afterwards when the current view is actually <code>null</code>. The {@link #setViewRoot(UIViewRoot)}
+	 * doesn't accept a <code>null</code> being set.
+	 *
+	 * @author Bauke Scholtz
+	 */
+	private static class TemporaryViewFacesContext extends FacesContextWrapper {
+
+		private FacesContext wrapped;
+		private UIViewRoot temporaryView;
+
+		public TemporaryViewFacesContext(FacesContext wrapped, UIViewRoot temporaryView) {
+			this.wrapped = wrapped;
+			this.temporaryView = temporaryView;
+		}
+
+		@Override
+		public UIViewRoot getViewRoot() {
+			return temporaryView;
+		}
+
+		@Override
+		public RenderKit getRenderKit() {
+			return FacesLocal.getRenderKit(this);
+		}
+
+		@Override
+		public FacesContext getWrapped() {
+			return wrapped;
+		}
+
 	}
 
 }

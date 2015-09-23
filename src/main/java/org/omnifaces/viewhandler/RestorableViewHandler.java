@@ -14,8 +14,7 @@ package org.omnifaces.viewhandler;
 
 import static java.lang.Boolean.TRUE;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.isUnloadRequest;
-import static org.omnifaces.util.Faces.normalizeViewId;
-import static org.omnifaces.util.Faces.setContext;
+import static org.omnifaces.util.Components.buildView;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getRenderKit;
 
@@ -27,12 +26,9 @@ import javax.faces.application.ViewHandler;
 import javax.faces.application.ViewHandlerWrapper;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
-import javax.faces.context.FacesContextWrapper;
-import javax.faces.render.RenderKit;
 
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.taghandler.EnableRestorableView;
-import org.omnifaces.util.FacesLocal;
 
 /**
  * This view handler implementation will recreate the entire view state whenever the view has apparently been expired,
@@ -89,19 +85,13 @@ public class RestorableViewHandler extends ViewHandlerWrapper {
 			return restoredView;
 		}
 
-		String normalizedViewId = normalizeViewId(viewId);
-		UIViewRoot createdView = createView(context, normalizedViewId);
-		FacesContext temporaryContext = new TemporaryViewFacesContext(context, createdView);
+		UIViewRoot createdView;
 
 		try {
-			setContext(temporaryContext);
-			getViewDeclarationLanguage(temporaryContext, normalizedViewId).buildView(temporaryContext, createdView);
+			createdView = buildView(viewId);
 		}
 		catch (IOException e) {
 			throw new FacesException(e);
-		}
-		finally {
-			setContext(context);
 		}
 
 		if (TRUE.equals(createdView.getAttributes().get(EnableRestorableView.class.getName()))) {
@@ -119,43 +109,6 @@ public class RestorableViewHandler extends ViewHandlerWrapper {
 	@Override
 	public ViewHandler getWrapped() {
 		return wrapped;
-	}
-
-	// Inner classes --------------------------------------------------------------------------------------------------
-
-	/**
-	 * This faces context wrapper allows returning the given (temporary) view on {@link #getViewRoot()} and its
-	 * associated renderer in {@link #getRenderKit()}. This can then be used in cases when
-	 * {@link FacesContext#setViewRoot(UIViewRoot)} isn't desired as it can't be cleared afterwards (the
-	 * {@link #setViewRoot(UIViewRoot)} doesn't accept a <code>null</code> being set).
-	 *
-	 * @author Bauke Scholtz
-	 */
-	private static class TemporaryViewFacesContext extends FacesContextWrapper {
-
-		private FacesContext wrapped;
-		private UIViewRoot temporaryView;
-
-		public TemporaryViewFacesContext(FacesContext wrapped, UIViewRoot temporaryView) {
-			this.wrapped = wrapped;
-			this.temporaryView = temporaryView;
-		}
-
-		@Override
-		public UIViewRoot getViewRoot() {
-			return temporaryView;
-		}
-
-		@Override
-		public RenderKit getRenderKit() {
-			return FacesLocal.getRenderKit(this);
-		}
-
-		@Override
-		public FacesContext getWrapped() {
-			return wrapped;
-		}
-
 	}
 
 }
