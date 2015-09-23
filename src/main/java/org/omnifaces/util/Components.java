@@ -119,6 +119,10 @@ import org.omnifaces.component.SimpleParam;
  * command.addActionListener(Components.createActionListenerMethodExpression("#{bean.actionListener}"));
  * command.setActionExpression(Components.createVoidMethodExpression("#{bean.action}"));
  * </pre>
+ * <pre>
+ * // Programmatically capture HTML output of a given view.
+ * String mailHtml = Components.encodeHtml(Components.buildView("/WEB-INF/mail-template.xhtml"));
+ * </pre>
  *
  * @author Bauke Scholtz
  * @author Arjan Tijms
