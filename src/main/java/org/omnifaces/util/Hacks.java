@@ -44,11 +44,11 @@ public final class Hacks {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final boolean RICHFACES_INSTALLED = initRichFacesInstalled();
 	private static final Set<String> RICHFACES_PVC_CLASS_NAMES =
 		unmodifiableSet(
 			"org.richfaces.context.ExtendedPartialViewContextImpl", // RichFaces 4.0-4.3.
 			"org.richfaces.context.ExtendedPartialViewContext"); // RichFaces 4.5+.
+	private static final boolean RICHFACES_INSTALLED = initRichFacesInstalled();
 	private static final String RICHFACES_RLR_RENDERER_TYPE =
 		"org.richfaces.renderkit.ResourceLibraryRenderer";
 	private static final String RICHFACES_RLF_CLASS_NAME =
