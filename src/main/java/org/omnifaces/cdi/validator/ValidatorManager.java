@@ -64,10 +64,11 @@ import org.omnifaces.application.OmniApplicationFactory;
  *
  * <h3>bean-discovery-mode</h3>
  * <p>
- * In Java EE 7's CDI 1.2, by default only classes with an explicit CDI managed bean scope annotation will be registered
- * for dependency injection support. In order to cover {@link FacesValidator} annotated classes as well, you need to put
- * <code>bean-discovery-mode="all"</code> in webapp's <code>beans.xml</code>. This was not necessary in Mojarra versions
- * older than 2.2.9 due to an <a href="http://stackoverflow.com/q/29458023/157882">oversight</a>.
+ * In Java EE 7's CDI 1.1, when having a CDI 1.1 compatible <code>beans.xml</code>, by default only classes with an
+ * explicit CDI managed bean scope annotation will be registered for dependency injection support. In order to cover
+ * {@link FacesValidator} annotated classes as well, you need to explicitly set <code>bean-discovery-mode="all"</code>
+ * attribute in <code>beans.xml</code>. This was not necessary in Mojarra versions older than 2.2.9 due to an
+ * <a href="http://stackoverflow.com/q/29458023/157882">oversight</a>.
  *
  * <h3>AmbiguousResolutionException</h3>
  * <p>
