@@ -38,6 +38,7 @@ import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.Set;
 
+import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.faces.application.Application;
@@ -62,6 +63,7 @@ import org.omnifaces.cdi.Param;
  * @since 1.6
  * @author Arjan Tijms
  */
+@Dependent
 public class RequestParameterProducer {
 
 	private static final String DEFAULT_REQUIRED_MESSAGE = "{0}: Value is required";

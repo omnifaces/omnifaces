@@ -15,6 +15,7 @@ package org.omnifaces.cdi.cookie;
 import static org.omnifaces.util.Beans.getQualifier;
 import static org.omnifaces.util.Faces.getRequestCookie;
 
+import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
@@ -28,6 +29,7 @@ import org.omnifaces.cdi.Cookie;
  * @since 2.1
  * @author Bauke Scholtz
  */
+@Dependent
 public class RequestCookieProducer {
 
 	@SuppressWarnings("unused") // Workaround for OpenWebBeans not properly passing it as produce() method argument.

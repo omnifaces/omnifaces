@@ -15,6 +15,7 @@ package org.omnifaces.cdi.contextparam;
 import static org.omnifaces.util.Beans.getQualifier;
 import static org.omnifaces.util.Faces.getInitParameter;
 
+import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
@@ -28,6 +29,7 @@ import org.omnifaces.cdi.ContextParam;
  * @since 2.2
  * @author Bauke Scholtz
  */
+@Dependent
 public class ContextParamProducer {
 
 	@SuppressWarnings("unused") // Workaround for OpenWebBeans not properly passing it as produce() method argument.

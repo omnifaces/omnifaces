@@ -48,6 +48,7 @@ import org.omnifaces.cdi.Param;
  * @author Arjan Tijms
  *
  */
+@Dependent
 public class DynamicParamValueProducer implements Bean<Object>, Serializable, PassivationCapable {
 
 	private static final long serialVersionUID = 1L;
