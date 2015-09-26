@@ -127,7 +127,7 @@ public final class Beans {
 	 * Returns the CDI managed bean instance (actual) of the given bean class and creates one if one doesn't exist.
 	 * @param <T> The expected return type.
 	 * @param beanClass The CDI managed bean class.
-	 * @return The CDI managed bean instance (actual) of the given bean class, or <code>null</code> if there is none.
+	 * @return The CDI managed bean instance (actual) of the given bean class.
 	 * @since 1.8
 	 * @see #getInstance(Class, boolean)
 	 */
