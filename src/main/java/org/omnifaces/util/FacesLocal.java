@@ -12,6 +12,7 @@
  */
 package org.omnifaces.util;
 
+import static java.util.Arrays.asList;
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 import static org.omnifaces.util.Servlets.prepareRedirectURL;
 import static org.omnifaces.util.Utils.encodeURL;
@@ -29,6 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -306,10 +308,10 @@ public final class FacesLocal {
 		Collection<UIViewParameter> viewParameters = getViewParameters(context);
 
 		if (viewParameters.isEmpty()) {
-			return Collections.<String, List<String>>emptyMap();
+			return new LinkedHashMap<>(0);
 		}
 
-		Map<String, List<String>> parameterMap = new HashMap<>();
+		Map<String, List<String>> parameterMap = new LinkedHashMap<>(viewParameters.size());
 
 		for (UIViewParameter viewParameter : viewParameters) {
 			String value = viewParameter.getStringValue(context);
@@ -317,7 +319,7 @@ public final class FacesLocal {
 			if (value != null) {
 				// <f:viewParam> doesn't support multiple values anyway, so having multiple <f:viewParam> on the
 				// same request parameter shouldn't end up in repeated parameters in action URL.
-				parameterMap.put(viewParameter.getName(), Collections.singletonList(value));
+				parameterMap.put(viewParameter.getName(), asList(value));
 			}
 		}
 
