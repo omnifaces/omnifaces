@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.AmbiguousResolutionException;
+import javax.enterprise.inject.Specializes;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.faces.application.Application;
@@ -56,10 +58,23 @@ import org.omnifaces.application.OmniApplicationFactory;
  * <a href="http://myfaces.apache.org/extensions/cdi/">MyFaces CODI</a> has support for it,
  * but it requires an additional <code>@Advanced</code> annotation.
  * OmniFaces solves this by implicitly making all {@link FacesValidator} instances eligible for dependency injection
- * <strong>without any further modification</strong>, like as JSF 2.2 would initially do, hereby providing a transparent
- * bridge of the code to the upcoming JSF 2.3.
+ * <strong>without any further modification</strong>.
  * <p>
  * The {@link ValidatorManager} provides access to all {@link FacesValidator} annotated {@link Validator} instances which are made eligible for CDI.
+ *
+ * <h3>bean-discovery-mode</h3>
+ * <p>
+ * In Java EE 7's CDI 1.1, when having a CDI 1.1 compatible <code>beans.xml</code>, by default only classes with an
+ * explicit CDI managed bean scope annotation will be registered for dependency injection support. In order to cover
+ * {@link FacesValidator} annotated classes as well, you need to explicitly set <code>bean-discovery-mode="all"</code>
+ * attribute in <code>beans.xml</code>. This was not necessary in Mojarra versions older than 2.2.9 due to an
+ * <a href="http://stackoverflow.com/q/29458023/157882">oversight</a>.
+ *
+ * <h3>AmbiguousResolutionException</h3>
+ * <p>
+ * In case you have a {@link FacesValidator} annotated class extending another {@link FacesValidator} annotated class
+ * which in turn extends a standard validator, then you may with <code>bean-discovery-mode="all"</code> face an
+ * {@link AmbiguousResolutionException}. This can be solved by placing {@link Specializes} annotation on the subclass.
  *
  * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz
