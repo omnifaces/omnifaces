@@ -16,11 +16,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.faces.webapp.FacesServlet;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.annotation.WebListener;
 
 import org.omnifaces.cdi.Eager;
 import org.omnifaces.cdi.eager.EagerBeansRepository;
+import org.omnifaces.cdi.eager.EagerBeansWebListener;
 import org.omnifaces.component.output.Cache;
 import org.omnifaces.component.output.cache.CacheInitializer;
 import org.omnifaces.config.BeanManager;
@@ -34,7 +36,7 @@ import org.omnifaces.facesviews.FacesViews;
  * This performs the following tasks:
  * <ol>
  * <li>Check if CDI is available, otherwise log and fail.
- * <li>Instantiate {@link Eager} application scoped beans.
+ * <li>Instantiate {@link Eager} application scoped beans and register its {@link EagerBeansWebListener} if necessary.
  * <li>Add {@link FacesViews} mappings to FacesServlet.
  * <li>Load {@link Cache} provider and register its filter.
  * </ol>
@@ -56,9 +58,10 @@ public class ApplicationListener extends DefaultServletContextListener {
 		checkCDIAvailable();
 
 		try {
-			EagerBeansRepository.getInstance().instantiateApplicationScoped();
-			FacesViews.addMappings(event.getServletContext());
-			CacheInitializer.loadProviderAndRegisterFilter(event.getServletContext());
+			ServletContext servletContext = event.getServletContext();
+			EagerBeansRepository.instantiateApplicationScopedAndRegisterListener(servletContext);
+			FacesViews.addMappings(servletContext);
+			CacheInitializer.loadProviderAndRegisterFilter(servletContext);
 		}
 		catch (Throwable e) {
 			logger.log(Level.SEVERE, "OmniFaces failed to initialize! Report an issue to OmniFaces.", e);
@@ -104,7 +107,6 @@ public class ApplicationListener extends DefaultServletContextListener {
 				+ "\n█░░░█░░░█▄░░░░░░▄█░░░░████▄░░░░░▄█                                             ▐"
 				+ "\n████████████████████████████████████████████████████████████████████████████████"
 			);
-
 			throw e;
 		}
 	}

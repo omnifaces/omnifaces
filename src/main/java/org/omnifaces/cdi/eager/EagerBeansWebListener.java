@@ -16,7 +16,7 @@
 package org.omnifaces.cdi.eager;
 
 import static java.lang.String.format;
-import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
 import static org.omnifaces.util.Servlets.getRequestRelativeURIWithoutPathParameters;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -24,20 +24,20 @@ import java.util.logging.Logger;
 
 import javax.servlet.ServletRequestEvent;
 import javax.servlet.ServletRequestListener;
-import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
 /**
  * <p>
- * A web listener that instantiates eager session and request scoped beans.
+ * A web listener that instantiates eager session and request scoped beans. This is auto-registered by
+ * {@link EagerBeansRepository#instantiateApplicationScopedAndRegisterListener(javax.servlet.ServletContext)} when
+ * any eager session and request scoped beans are available.
  *
  * @since 2.0
  * @author Arjan Tijms
  *
  */
-@WebListener
 public class EagerBeansWebListener implements HttpSessionListener, ServletRequestListener {
 
 	// Constants ------------------------------------------------------------------------------------------------------
@@ -78,7 +78,7 @@ public class EagerBeansWebListener implements HttpSessionListener, ServletReques
 				EagerBeansRepository.getInstance().instantiateByRequestURI(uri);
 			}
 			catch (Exception e) {
-				logger.log(SEVERE, format(POSSIBLY_REQUEST_SCOPE_NOT_ACTIVE, uri), e);
+				logger.log(WARNING, format(POSSIBLY_REQUEST_SCOPE_NOT_ACTIVE, uri), e);
 			}
 		}
 	}

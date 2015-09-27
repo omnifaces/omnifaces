@@ -15,15 +15,20 @@
  */
 package org.omnifaces.cdi.eager;
 
+import static java.lang.String.format;
+import static java.util.logging.Level.WARNING;
 import static org.omnifaces.util.Utils.isAnyEmpty;
+import static org.omnifaces.util.Utils.isEmpty;
 
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
+import javax.servlet.ServletContext;
 
 /**
  * Bean repository via which various types of eager beans can be instantiated on demand.
@@ -35,6 +40,12 @@ import javax.inject.Inject;
 @ApplicationScoped
 public class EagerBeansRepository {
 
+	private static final Logger logger = Logger.getLogger(EagerBeansRepository.class.getName());
+
+	private static final String POSSIBLY_APPLICATION_SCOPE_NOT_ACTIVE =
+		"Could not instantiate eager application scoped beans. Possibly the CDI application scope is not active."
+			+ " This is known to be the case in certain Tomcat and Jetty based configurations.";
+
 	private static EagerBeansRepository instance;
 
 	@Inject
@@ -45,12 +56,25 @@ public class EagerBeansRepository {
 	private Map<String, List<Bean<?>>> requestScopedBeansViewId;
 	private Map<String, List<Bean<?>>> requestScopedBeansRequestURI;
 
-	public static EagerBeansRepository getInstance() { // Awkward workaround for it being unavailable via @Inject in listeners/filters in Tomcat+OWB.
+	public static EagerBeansRepository getInstance() { // Awkward workaround for it being unavailable via @Inject in listeners in Tomcat+OWB and Jetty.
 		if (instance == null) {
 			instance = org.omnifaces.config.BeanManager.INSTANCE.getReference(EagerBeansRepository.class);
 		}
 
 		return instance;
+	}
+
+	public static void instantiateApplicationScopedAndRegisterListener(ServletContext servletContext) {
+		try {
+			getInstance().instantiateApplicationScoped();
+		}
+		catch (Exception e) {
+			logger.log(WARNING, format(POSSIBLY_APPLICATION_SCOPE_NOT_ACTIVE), e);
+		}
+
+		if (instance == null || instance.hasAnySessionOrRequestScopedBeans()) {
+			servletContext.addListener(EagerBeansWebListener.class);
+		}
 	}
 
 	public void instantiateApplicationScoped() {
@@ -105,6 +129,10 @@ public class EagerBeansRepository {
 
 	void setRequestScopedBeansRequestURI(Map<String, List<Bean<?>>> requestScopedBeansRequestURI) {
 		this.requestScopedBeansRequestURI = requestScopedBeansRequestURI;
+	}
+
+	boolean hasAnySessionOrRequestScopedBeans() {
+		return !(isEmpty(sessionScopedBeans) && isEmpty(requestScopedBeansRequestURI));
 	}
 
 }
