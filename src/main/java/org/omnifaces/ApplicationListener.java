@@ -12,6 +12,7 @@
  */
 package org.omnifaces;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.faces.webapp.FacesServlet;
@@ -33,9 +34,9 @@ import org.omnifaces.facesviews.FacesViews;
  * This performs the following tasks:
  * <ol>
  * <li>Check if CDI is available, otherwise log and fail.
+ * <li>Instantiate {@link Eager} application scoped beans.
  * <li>Add {@link FacesViews} mappings to FacesServlet.
  * <li>Load {@link Cache} provider and register its filter.
- * <li>Instantiate {@link Eager} application scoped beans.
  * </ol>
  *
  * @author Bauke Scholtz
@@ -53,9 +54,16 @@ public class ApplicationListener extends DefaultServletContextListener {
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
 		checkCDIAvailable();
-		EagerBeansRepository.getInstance().instantiateApplicationScoped();
-		FacesViews.addMappings(event.getServletContext());
-		CacheInitializer.loadProviderAndRegisterFilter(event.getServletContext());
+
+		try {
+			EagerBeansRepository.getInstance().instantiateApplicationScoped();
+			FacesViews.addMappings(event.getServletContext());
+			CacheInitializer.loadProviderAndRegisterFilter(event.getServletContext());
+		}
+		catch (Throwable e) {
+			logger.log(Level.SEVERE, "OmniFaces failed to initialize! Report an issue to OmniFaces.", e);
+			throw e;
+		}
 	}
 
 	private void checkCDIAvailable() {
