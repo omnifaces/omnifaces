@@ -2041,10 +2041,20 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-					Like all children of <code>&lt;f:metadata&gt;</code>, a view action has no visual representation in
-					the view. This attribute has exactly the same effect on a view action as the rendered attribute has
-					on a visual component. Specifically, if the value of this attribute evaluates to false the component
-					has no effect.
+					Specifies the phase in which the action invocation should occur using the name of the phase constant
+					in the PhaseId class (the case does not matter). The value must be one of APPLY_REQUEST_VALUES,
+					PROCESS_VALIDATIONS, UPDATE_MODEL_VALUES, or INVOKE_APPLICATION. The default is INVOKE_APPLICATION.
+				]]>
+			</description>
+			<name>phase</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Invoke the application action only when this attribute evaluates true during the specified phase.
+					The default is true.
 				]]>
 			</description>
 			<name>if</name>
@@ -2061,18 +2071,6 @@ public class ValidateValuesBean implements MultiFieldValidator {
 			<name>onPostback</name>
 			<required>false</required>
 			<type>java.lang.Boolean</type>
-		</attribute>
-		<attribute>
-			<description>
-				<![CDATA[
-					Specifies the phase in which the action invocation should occur using the name of the phase constant
-					in the PhaseId class (the case does not matter). The value must be one of APPLY_REQUEST_VALUES,
-					PROCESS_VALIDATIONS, UPDATE_MODEL_VALUES, or INVOKE_APPLICATION. The default is INVOKE_APPLICATION.
-				]]>
-			</description>
-			<name>phase</name>
-			<required>false</required>
-			<type>java.lang.String</type>
 		</attribute>
 		<attribute>
 			<description>
