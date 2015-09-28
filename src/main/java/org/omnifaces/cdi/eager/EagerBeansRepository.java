@@ -70,6 +70,7 @@ public class EagerBeansRepository {
 		}
 		catch (Exception e) {
 			logger.log(WARNING, format(POSSIBLY_APPLICATION_SCOPE_NOT_ACTIVE), e);
+			instance = null;
 		}
 
 		if (instance == null || instance.hasAnySessionOrRequestScopedBeans()) {

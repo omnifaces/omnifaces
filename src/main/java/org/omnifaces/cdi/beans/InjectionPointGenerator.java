@@ -12,6 +12,7 @@
  */
 package org.omnifaces.cdi.beans;
 
+import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
 
@@ -22,10 +23,11 @@ import org.omnifaces.util.Beans;
  * {@link Beans#getCurrentInjectionPoint(javax.enterprise.context.spi.CreationalContext)}.
  * <p>
  * The actual injectionPoint being injected is not used.
- * 
+ *
  * @author Arjan Tijms
  * @since 2.0
  */
+@Dependent
 public class InjectionPointGenerator {
 
 	@Inject
