@@ -1980,6 +1980,116 @@ public class ValidateValuesBean implements MultiFieldValidator {
 	
 	<tag>
 		<description>
+				<![CDATA[
+					The <code>&lt;o:viewAction&gt;</code> is a component that extends the standard <code>&lt;f:viewAction&gt;</code> and
+					changes the <code>if</code> attribute to be evaluated during <code>INVOKE_APPLICATION</code> phase instead of the
+					<code>APPLY_REQUEST_VALUES</code> phase. This allows developers to let the <code>if</code> attribute check the
+					converted and validated model values before performing the view action, which results in much more intuitive behavior.
+					<p>
+					In below example, the <code>FooConverter</code> may convert a non-null parameter to <code>null</code> without causing
+					a validation or conversion error, and the intent is to redirect the current page to <code>otherpage.xhtml</code> when
+					the converted result is <code>null</code>.
+					<pre>
+					&lt;f:viewParam name="foo" value="#{bean.foo}" converter="fooConverter" /&gt;
+					&lt;f:viewAction action="otherpage" if="#{bean.foo eq null}" /&gt;
+					</pre>
+					<p>
+					This is however not possible with standard <code>&lt;f:viewAction&gt;</code> as it evaluates the <code>if</code>
+					attribute already before the conversion has taken place. This component solves that by postponing the evaluation of
+					the <code>if</code> attribute to the <code>INVOKE_APPLICATION</code> phase.
+					<pre>
+					&lt;f:viewParam name="foo" value="#{bean.foo}" converter="fooConverter" /&gt;
+					&lt;o:viewAction action="otherpage" if="#{bean.foo eq null}" /&gt;
+					<p>
+					Only when you set <code>immediate="true"</code>, then it will behave the same as the standard
+					<code>&lt;f:viewAction&gt;</code>.
+ 				]]>
+		</description>
+		<tag-name>viewAction</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.input.ViewAction</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					<code>MethodExpression</code> representing the application action to invoke when this component is
+					activated by the user. The expression must evaluate to a public method that takes no parameters, and
+					returns an <code>Object</code> (the <code>toString()</code> of which is called to derive the logical
+					outcome) which is passed to the <code>NavigationHandler</code> for this application.
+				]]>
+			</description>
+			<name>action</name>
+			<required>false</required>
+			<method-signature>java.lang.Object action()</method-signature>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					<code>MethodExpression</code> representing an action listener method that will be notified when this
+					component is activated by the user. The expression must evaluate to a public method that takes an 
+					<code>ActionEvent</code> parameter, with a return type of void, or to a public method that takes no
+					arguments with a return type of void. In the latter case, the method has no way of easily knowing
+					where the event came from, but this can be useful in cases where a notification is needed that
+					"some action happened".
+				]]>
+			</description>
+			<name>actionListener</name>
+			<required>false</required>
+			<method-signature>void actionListener(javax.faces.event.ActionEvent)
+			</method-signature>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Like all children of <code>&lt;f:metadata&gt;</code>, a view action has no visual representation in
+					the view. This attribute has exactly the same effect on a view action as the rendered attribute has
+					on a visual component. Specifically, if the value of this attribute evaluates to false the component
+					has no effect.
+				]]>
+			</description>
+			<name>if</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					View actions are most commonly used on the initial view request. Therefore, view actions do not
+					operate on postback, by default. This attribute enables a view action to operate on postback.
+				]]>
+			</description>
+			<name>onPostback</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Specifies the phase in which the action invocation should occur using the name of the phase constant
+					in the PhaseId class (the case does not matter). The value must be one of APPLY_REQUEST_VALUES,
+					PROCESS_VALIDATIONS, UPDATE_MODEL_VALUES, or INVOKE_APPLICATION. The default is INVOKE_APPLICATION.
+				]]>
+			</description>
+			<name>phase</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating that, if this component is activated by the user, notifications should be delivered
+					to interested listeners and actions immediately (that is, during Apply Request Values phase) rather
+					than waiting until Invoke Application phase.
+				]]>
+			</description>
+			<name>immediate</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+	</tag>
+	
+	<tag>
+		<description>
 			<![CDATA[
 				<strong>ResolveComponent</strong> is a utility component via which a component can be looked up by its ID and
  				a reference to it put in either the "facelet scope" (default) or the request scope.
