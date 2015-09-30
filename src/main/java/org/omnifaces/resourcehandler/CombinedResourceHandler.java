@@ -449,14 +449,18 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 			String[] resourcePathParts = id.getName().split("\\.", 2)[0].split("/");
 			String resourceId = resourcePathParts[resourcePathParts.length - 1];
 			CombinedResourceInfo info = CombinedResourceInfo.get(resourceId);
+			boolean added = false;
 
 			if (info != null) {
 				for (ResourceIdentifier combinedId : info.getResourceIdentifiers()) {
-					add(context, null, rendererType, combinedId, target);
+					add(context, added ? null : component, rendererType, combinedId, target);
+					added = true;
 				}
 			}
 
-			componentResourcesToRemove.add(component);
+			if (!added) {
+				componentResourcesToRemove.add(component);
+			}
 		}
 
 		private void addStylesheet(FacesContext context, UIComponent component, ResourceIdentifier id) {
