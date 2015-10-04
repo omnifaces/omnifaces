@@ -25,9 +25,13 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.util.Nonbinding;
+import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 import javax.faces.webapp.FacesServlet;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletRequestListener;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionListener;
 
 import org.omnifaces.cdi.eager.EagerBeansFilter;
@@ -52,6 +56,8 @@ import org.omnifaces.cdi.eager.EagerExtension;
  * In case of <code>@RequestScoped</code> and <code>@ViewScoped</code> beans instantiation happens per request URI / view
  * and an extra attribute is required for specifying this.
  *
+ * <h3>Supported scopes</h3>
+ *
  * <p>
  * Currently supported scopes:
  * <ol>
@@ -61,6 +67,8 @@ import org.omnifaces.cdi.eager.EagerExtension;
  * <li> CDI {@link SessionScoped}
  * <li> CDI {@link ApplicationScoped}
  * </ol>
+ *
+ * <h3>Usage</h3>
  *
  * <p>
  * E.g.
@@ -109,7 +117,20 @@ import org.omnifaces.cdi.eager.EagerExtension;
  * }
  * </pre>
  *
- * <h3> Compatibility </h3>
+ * <h3><code>FacesContext</code> in <code>&#64;PostConstruct</code></h3>
+ *
+ * <p>
+ * When using <code>&#64;Eager</code> or <code>&#64;Eager(requestURI)</code>, be aware that the {@link FacesContext} is
+ * <strong>not</strong> available in the <code>&#64;PostConstruct</code>. Reason is, the {@link FacesServlet} isn't
+ * invoked yet at the moment <code>&#64;Eager</code> bean is constructed. Only in <code>&#64;Eager(viewId)</code>, the
+ * {@link FacesContext} is available in the <code>&#64;PostConstruct</code>.
+ * <p>
+ * In case you need information from {@link HttpServletRequest}, {@link HttpSession} and/or {@link ServletContext}, then
+ * you can just <code>&#64;Inject</code> it right away. Also, all other CDI managed beans are available the usual way
+ * via <code>&#64;Inject</code>, as long as they do also not depend on {@link FacesContext} in their
+ * <code>&#64;PostConstruct</code>.
+ *
+ * <h3>Compatibility</h3>
  *
  * <p>
  * In some (older) containers, most notably GlassFish 3, the CDI request scope is not available in a {@link ServletRequestListener}
