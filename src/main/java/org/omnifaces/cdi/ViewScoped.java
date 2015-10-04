@@ -27,7 +27,6 @@ import java.util.UUID;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.NormalScope;
 import javax.faces.component.UIViewRoot;
-import javax.faces.context.FacesContext;
 
 import org.omnifaces.application.ViewScopeEventListener;
 import org.omnifaces.cdi.viewscope.ViewScopeContext;
@@ -37,9 +36,38 @@ import org.omnifaces.viewhandler.RestorableViewHandler;
 
 /**
  * <p>
- * The CDI view scope annotation, with more optimal handling of bean destroy as compared to standard JSF one. Just use
- * it the usual way as all other CDI scopes. Watch out with IDE autocomplete on import that you don't accidentally
- * import standard JSF's own one.
+ * The CDI view scope annotation, with more optimal handling of bean destroy as compared to standard JSF one.
+ * <p>
+ * In standard JSF 2.0/2.1, the {@link PreDestroy} annotated method on a view scoped bean was never invoked when
+ * the session expires. Since OmniFaces 1.6, this CDI view scope annotation will guarantee that the {@link PreDestroy}
+ * annotated method is also invoked on session expire. Since JSF 2.2, this problem is solved on native JSF view scoped
+ * beans, hereby making this annotation superflous in JSF 2.2.
+ * <p>
+ * However, there may be cases when it's desirable to immediately destroy a view scoped bean as well when the browser
+ * <code>unload</code> event is invoked. I.e. when the user navigates away by GET, or closes the browser tab/window.
+ * None of the both JSF 2.2 view scope annotations support this. Since OmniFaces 2.2, this CDI view scope annotation
+ * will guarantee that the {@link PreDestroy} annotated method is also invoked on browser unload. This trick is done by
+ * a synchronous XHR request via an automatically included helper script <code>omnifaces:unload.js</code>. There's
+ * however a small caveat: on slow network and/or poor server hardware, there may be a noticeable lag between the
+ * enduser action of unloading the page and the desired result. If this is undesireable, then better stick to JSF 2.2's
+ * own view scope annotations and accept the postponed destroy.
+ * <p>
+ * In a nutshell: if you're on JSF 2.0/2.1, and you can't upgrade to JSF 2.2, and you want the {@link PreDestroy} to be
+ * invoked on sesison expire too, then use OmniFaces 1.6+ with this view scope annotation. Or, if you're on JSF 2.2
+ * already, and you want the {@link PreDestroy} to be invoked on browser unload too, then use OmniFaces 2.2+ with this
+ * view scope annotation.
+ * <p>
+ * Related JSF issues:
+ * <ul>
+ * <li><a href="https://java.net/jira/browse/JAVASERVERFACES-1351">Mojarra issue 1351</a>
+ * <li><a href="https://java.net/jira/browse/JAVASERVERFACES-1839">Mojarra issue 1839</a>
+ * <li><a href="https://java.net/jira/browse/JAVASERVERFACES_SPEC_PUBLIC-905">JSF spec issue 905</a>
+ * </ul>
+ *
+ * <h3>Usage</h3>
+ *
+ * Just use it the usual way as all other CDI scopes. Watch out with IDE autocomplete on import that you don't
+ * accidentally import standard JSF's own one.
  * <pre>
  * import javax.inject.Named;
  * import org.omnifaces.cdi.ViewScoped;
@@ -55,27 +83,6 @@ import org.omnifaces.viewhandler.RestorableViewHandler;
  * Under the covers, CDI managed beans with this scope are via {@link ViewScopeManager} stored in the session scope by
  * an {@link UUID} based key which is referenced in JSF's own view map as available by {@link UIViewRoot#getViewMap()}.
  * They are not stored in the JSF view map itself as that would be rather expensive in case of client side state saving.
- * <p>
- * In effects, this CDI view scope annotation has exactly the same lifecycle as JSF's own view scope. Only the bean
- * destroy is more optimal handled. In standard JSF, the {@link PreDestroy} annotated method on a CDI view scoped bean
- * isn't <em>immediately</em> invoked in all cases when the view scope ends. For detail, see the following JSF issues
- * related to the matter:
- * <ul>
- * <li><a href="https://java.net/jira/browse/JAVASERVERFACES-1351">Mojarra issue 1351</a>
- * <li><a href="https://java.net/jira/browse/JAVASERVERFACES-1839">Mojarra issue 1839</a>
- * <li><a href="https://java.net/jira/browse/JAVASERVERFACES_SPEC_PUBLIC-905">JSF spec issue 905</a>
- * </ul>
- * <p>
- * Summarized, it's only <em>immediately</em> invoked when the view is either explicitly changed by a non-null/void
- * navigation on a postback, or when the view is explicitly rebuilt by {@link FacesContext#setViewRoot(UIViewRoot)}.
- * It's not <em>immediately</em> invoked on a GET navigation, nor a close of browser tab/window. In JSF 2.0/2.1, it's
- * even not afterwards invoked on session expire (JSF 2.2 does).
- * <p>
- * This CDI view scope annotation not only guarantees that the {@link PreDestroy} annotated method is also invoked on
- * session expire, but it also hooks on the browser <code>beforeunload</code> event so that the bean destroy is yet more
- * optimally handled. I.e. when the user navigates away by GET, or closes the browser tab/window, then the
- * {@link PreDestroy} annotated method will instantly be invoked. This trick is done by a synchronous XHR request via
- * an automatically included helper script <code>omnifaces:unload.js</code>.
  *
  * <h3>Configuration</h3>
  * <p>
