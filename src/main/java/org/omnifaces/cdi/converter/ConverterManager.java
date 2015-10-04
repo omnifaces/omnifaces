@@ -43,7 +43,7 @@ import org.omnifaces.application.OmniApplicationFactory;
 /**
  * <p>
  * The <code>@FacesConverter</code> is by default not eligible for dependency injection by <code>@Inject</code> nor <code>@EJB</code>.
- * There is a <a href="http://balusc.blogspot.com/2011/09/communication-in-jsf-20.html#GettingAnEJBInFacesConverterAndFacesValidator">workaround</a>
+ * There is a <a href="http://balusc.omnifaces.org/2011/09/communication-in-jsf-20.html#GettingAnEJBInFacesConverterAndFacesValidator">workaround</a>
  * for EJB, but this is nasty and doesn't work out for CDI. <a href="http://stackoverflow.com/q/7531449/157882">Another way</a>
  * would be to make it a JSF or CDI managed bean, however this doesn't register the converter instance into the JSF application context,
  * and hence you won't be able to make use of {@link Application#createConverter(String)} on it. Further it also breaks
