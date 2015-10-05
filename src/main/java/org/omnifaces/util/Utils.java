@@ -19,6 +19,8 @@ import static java.util.regex.Pattern.quote;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -29,8 +31,11 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -318,8 +323,8 @@ public final class Utils {
 	// I/O ------------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Stream the given input to the given output via a directly allocated NIO {@link ByteBuffer}.
-	 * Both the input and output streams will implicitly be closed after streaming,
+	 * Stream the given input to the given output via NIO {@link Channels} and a directly allocated NIO
+	 * {@link ByteBuffer}. Both the input and output streams will implicitly be closed after streaming,
 	 * regardless of whether an exception is been thrown or not.
 	 * @param input The input stream.
 	 * @param output The output stream.
@@ -336,6 +341,49 @@ public final class Utils {
 			while (inputChannel.read(buffer) != -1) {
 				buffer.flip();
 				size += outputChannel.write(buffer);
+				buffer.clear();
+			}
+
+			return size;
+		}
+	}
+
+	/**
+	 * Stream a specified range of the given file to the given output via {@link Channels} and a directly allocated NIO
+	 * {@link ByteBuffer}. The output stream will implicitly be closed after streaming,
+	 * regardless of whether an exception is been thrown or not.
+	 * @param file The file.
+	 * @param output The output stream.
+	 * @param start The start position (offset).
+	 * @param length The (intented) length of written bytes.
+	 * @return The (actual) length of the written bytes.
+	 * @throws IOException When an I/O error occurs.
+	 * @since 2.2
+	 */
+	public static long stream(File file, OutputStream output, long start, long length) throws IOException {
+		if (start == 0 && length == file.length()) {
+			return stream(new FileInputStream(file), output);
+		}
+
+		try (FileChannel fileChannel = (FileChannel) Files.newByteChannel(file.toPath(), StandardOpenOption.READ);
+			WritableByteChannel outputChannel = Channels.newChannel(output))
+		{
+			ByteBuffer buffer = ByteBuffer.allocateDirect(DEFAULT_STREAM_BUFFER_SIZE);
+			long size = 0;
+
+			while (fileChannel.read(buffer, start + size) != -1) {
+				buffer.flip();
+
+				if (size + buffer.limit() > length) {
+					buffer.limit((int) (length - size));
+				}
+
+				size += outputChannel.write(buffer);
+
+				if (size == length) {
+					break;
+				}
+
 				buffer.clear();
 			}
 
