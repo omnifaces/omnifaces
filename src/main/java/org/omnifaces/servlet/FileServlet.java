@@ -42,7 +42,8 @@ import org.omnifaces.filter.GzipResponseFilter;
  * This servlet properly deals with <code>ETag</code>, <code>If-None-Match</code> and <code>If-Modified-Since</code>
  * caching requests, hereby improving browser caching. This servlet also properly deals with <code>Range</code> and
  * <code>If-Range</code> ranging requests, which is required by most media players for proper audio/video streaming
- * and by clients for a proper resume of an aborted/paused download. This servlet is ideal for media files.
+ * and by clients for a proper resume of an aborted/paused download. This servlet is ideal when you have media files
+ * placed outside the web application and you can't use the default servlet.
  *
  * <h3>Usage</h3>
  * <p>
