@@ -25,9 +25,14 @@ import javax.faces.application.ResourceHandler;
 
 /**
  * <p>
- * This {@link ResourceHandler} implementation allows the developer to provide CDN URLs instead of the default local
- * URLs for JSF resources as provided by <code>&lt;h:outputScript&gt;</code>, <code>&lt;h:outputStylesheet&gt;</code>
- * and <code>&lt;h:graphicImage&gt;</code>.
+ * This {@link ResourceHandler} implementation allows the developer to provide external (CDN) URLs instead of the
+ * default local URLs for JSF resources. This also works on auto-included resources provided as
+ * {@link ResourceDependency} by the JSF implementation and/or component libraries. For example, JSF's own
+ * <code>javax.faces:jsf.js</code> resource or PrimeFaces' <code>primefaces:jquery/jquery.js</code> resource could be
+ * pointed to a CDN.
+ * <p>
+ * For non-JSF resources, you can just keep using plain HTML <code>&lt;script&gt;</code> and <code>&lt;link&gt;</code>
+ * elements referring the external URL.
  *
  * <h3>Installation</h3>
  * <p>
@@ -52,7 +57,7 @@ import javax.faces.application.ResourceHandler;
  *         js/script1.js=http://cdn.example.com/js/script1.js,
  *         somelib:js/script2.js=http://cdn.example.com/somelib/js/script2.js,
  *         otherlib:style.css=http://cdn.example.com/otherlib/style.css,
- *         images/logo.png=http://cdn.example.com/logo.png
+ *         somelib:images/logo.png=http://cdn.example.com/somelib/logo.png
  *     &lt;/param-value&gt;
  * &lt;/context-param&gt;
  * </pre>
@@ -62,7 +67,7 @@ import javax.faces.application.ResourceHandler;
  * &lt;h:outputScript name="js/script1.js" /&gt;
  * &lt;h:outputScript library="somelib" name="js/script2.js" /&gt;
  * &lt;h:outputStylesheet library="otherlib" name="style.css" /&gt;
- * &lt;h:graphicImage name="images/logo.png" /&gt;
+ * &lt;h:graphicImage library="somelib" name="images/logo.png" /&gt;
  * </pre>
  * <p>
  * Will be rendered as:
@@ -71,13 +76,6 @@ import javax.faces.application.ResourceHandler;
  * &lt;script type="text/javascript" src="http://cdn.example.com/somelib/js/script2.js"&gt;&lt;/script&gt;
  * &lt;link type="text/css" rel="stylesheet" href="http://cdn.example.com/otherlib/style.css" /&gt;
  * &lt;img src="http://cdn.example.com/logo.png" /&gt;
- * </pre>
- * <p>
- * Note that you can also use this on resources provided as {@link ResourceDependency} by the JSF implementation and/or
- * component libraries. For example, JSF's own <code>javax.faces:jsf.js</code> resource which is been used by
- * <code>&lt;f:ajax&gt;</code> can be provided by a CDN URL using the following syntax:
- * <pre>
- * javax.faces:jsf.js=http://cdn.example.com/jsf.js
  * </pre>
  *
  * <h3>Wildcard configuration</h3>

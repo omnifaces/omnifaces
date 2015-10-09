@@ -206,7 +206,7 @@
 	<function>
 		<description>
 			<![CDATA[
-				Creates and an integer array which starts at the given integer and ends at the given integer, inclusive. This is
+				Creates and returns an integer array which starts at the given integer and ends at the given integer, inclusive. This is
 				useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows an integer range to
 				represent days and years.
 			]]>
