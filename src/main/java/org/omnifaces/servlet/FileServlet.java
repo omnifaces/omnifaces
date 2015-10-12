@@ -82,10 +82,22 @@ import org.omnifaces.filter.GzipResponseFilter;
  * <pre>
  * &lt;video src="#{request.contextPath}/media/video.mp4" controls="controls" /&gt;
  * </pre>
+ * <p>
+ * You can optionally override the default cache expire time of 30 days by calling {@link #setExpires(long)} in the
+ * {@link #init()} method of your servlet. E.g. to 7 days:
+ * <pre>
+ *     &#64;Override
+ *     public void init() throws ServletException {
+ *         folder = new File("/var/webapp/media");
+ *         setExpires(TimeUnit.DAYS.toMillis(7));
+ *     }
+ * </pre>
  *
  * <p><strong>See also</strong>:
- * <br><a href="http://stackoverflow.com/q/13588149/157882">How to stream audio/video files such as MP3, MP4, AVI, etc using a Servlet</a>
- * <br><a href="http://stackoverflow.com/a/29991447/157882">Abstract template for a static resource servlet</a>
+ * <ul>
+ * <li><a href="http://stackoverflow.com/q/13588149/157882">How to stream audio/video files such as MP3, MP4, AVI, etc using a Servlet</a>
+ * <li><a href="http://stackoverflow.com/a/29991447/157882">Abstract template for a static resource servlet</a>
+ * </ul>
  *
  * @author Bauke Scholtz
  * @since 2.2

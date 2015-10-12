@@ -350,8 +350,8 @@ public final class Utils {
 
 	/**
 	 * Stream a specified range of the given file to the given output via {@link Channels} and a directly allocated NIO
-	 * {@link ByteBuffer}. The output stream will implicitly be closed after streaming,
-	 * regardless of whether an exception is been thrown or not.
+	 * {@link ByteBuffer}. The output stream will only implicitly be closed after streaming when the specified range
+	 * represents the whole file, regardless of whether an exception is been thrown or not.
 	 * @param file The file.
 	 * @param output The output stream.
 	 * @param start The start position (offset).
@@ -365,9 +365,8 @@ public final class Utils {
 			return stream(new FileInputStream(file), output);
 		}
 
-		try (FileChannel fileChannel = (FileChannel) Files.newByteChannel(file.toPath(), StandardOpenOption.READ);
-			WritableByteChannel outputChannel = Channels.newChannel(output))
-		{
+		try (FileChannel fileChannel = (FileChannel) Files.newByteChannel(file.toPath(), StandardOpenOption.READ)) {
+			WritableByteChannel outputChannel = Channels.newChannel(output);
 			ByteBuffer buffer = ByteBuffer.allocateDirect(DEFAULT_STREAM_BUFFER_SIZE);
 			long size = 0;
 
