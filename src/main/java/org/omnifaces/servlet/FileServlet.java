@@ -121,7 +121,7 @@ public abstract class FileServlet extends HttpServlet {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private static long expires = DEFAULT_EXPIRE_TIME_IN_MILLIS;
+	private long expires = DEFAULT_EXPIRE_TIME_IN_MILLIS;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -211,8 +211,8 @@ public abstract class FileServlet extends HttpServlet {
 	 * @throws IllegalStateException When the cache expire time has already been set.
 	 */
 	protected void setExpires(long expires) {
-		if (FileServlet.expires == DEFAULT_EXPIRE_TIME_IN_MILLIS) {
-			FileServlet.expires = expires;
+		if (this.expires == DEFAULT_EXPIRE_TIME_IN_MILLIS) {
+			this.expires = expires;
 		}
 		else {
 			throw new IllegalStateException(ERROR_EXPIRES_ALREADY_SET);
