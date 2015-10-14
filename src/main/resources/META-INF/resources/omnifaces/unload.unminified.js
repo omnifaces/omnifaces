@@ -51,7 +51,7 @@ OmniFaces.Unload = (function() {
 
 			try {
 				var xhr = new XMLHttpRequest();
-				xhr.open("POST", document.location, false);
+				xhr.open("POST", window.location.href.split(/[?#;]/)[0], false);
 				xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 				xhr.send("omnifaces.event=unload&" + VIEW_STATE_PARAM + "=" + viewState);
 			}
