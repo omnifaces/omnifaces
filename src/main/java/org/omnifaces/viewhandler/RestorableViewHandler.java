@@ -26,7 +26,9 @@ import javax.faces.application.ViewHandler;
 import javax.faces.application.ViewHandlerWrapper;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
+import javax.faces.event.PostRestoreStateEvent;
 
+import org.omnifaces.application.ViewScopeEventListener;
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.taghandler.EnableRestorableView;
 
@@ -36,9 +38,9 @@ import org.omnifaces.taghandler.EnableRestorableView;
  * postback and the view in question has <code>&lt;enableRestorableView&gt;</code> in the metadata. This effectively
  * prevents the {@link ViewExpiredException} on the view.
  * <p>
- * This view handler implementation also detects unload requests coming from {@link ViewScoped} beans and will prevent
- * any attempt to restore the view when the view state is already absent. This prevents unnecessary
- * {@link ViewExpiredException} during unload on an expired view.
+ * Since OmniFaces 2.2, this view handler implementation also detects unload requests coming from {@link ViewScoped}
+ * beans and will only create a dummy view and restore the view scoped state instead of building and restoring the
+ * entire view.
  *
  * @author Bauke Scholtz
  * @since 1.3
@@ -64,13 +66,13 @@ public class RestorableViewHandler extends ViewHandlerWrapper {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * First check if this is an unload request from {@link ViewScoped}. If so, and the JSF view state is absent or
-	 * expired, then don't try to restore the view and return a dummy view (to avoid {@link ViewExpiredException}) and
-	 * immediately complete response.
-	 * Then restore the view and check if the <code>&lt;o:enableRestoreView&gt;</code> is used once in the application,
-	 * and the restored view is null and the current request is a postback, then recreate and build the view. If it
-	 * indeed contains the <code>&lt;o:enableRestoreView&gt;</code>, then return the newly created view, else return
-	 * <code>null</code>.
+	 * First check if this is an unload request from {@link ViewScoped}.
+	 * If so, then create a dummy view and restore the view scope state. The {@link ViewScopeEventListener} will take
+	 * care of actual destroy during {@link PostRestoreStateEvent}.
+	 * If not, then restore the view as usual and check if the <code>&lt;o:enableRestoreView&gt;</code> is used once in
+	 * the application, and the restored view is null and the current request is a postback. If not, then return the
+	 * restored view unmodified. If so, then recreate and rebuild the view from scratsh. If it indeed contains the
+	 * <code>&lt;o:enableRestoreView&gt;</code>, then return the newly created view, else return <code>null</code>.
 	 */
 	@Override
 	public UIViewRoot restoreView(FacesContext context, String viewId) {
