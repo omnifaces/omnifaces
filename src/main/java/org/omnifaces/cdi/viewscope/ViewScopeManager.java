@@ -190,6 +190,12 @@ public class ViewScopeManager implements Serializable {
 	 * CDI bean storage will also be auto-created.
 	 */
 	private UUID getBeanStorageId(boolean create) {
+		FacesContext context = FacesContext.getCurrentInstance();
+
+		if (isUnloadRequest(context)) {
+			return UUID.fromString(getRequestParameter(context, "id"));
+		}
+
 		UUID id = getViewAttribute(ViewScopeManager.class.getName());
 
 		if (id == null || activeViewScopes.get(id) == null) {
@@ -205,6 +211,9 @@ public class ViewScopeManager implements Serializable {
 		return id;
 	}
 
+	/**
+	 * Create CDI bean storage and register unload script.
+	 */
 	private void createViewScope(UUID id) {
 		activeViewScopes.put(id, new BeanStorage(DEFAULT_BEANS_PER_VIEW_SCOPE));
 
@@ -217,7 +226,7 @@ public class ViewScopeManager implements Serializable {
 			addScriptResourceToBody("omnifaces", "unload.js");
 		}
 
-		addScriptToBody("OmniFaces.Unload.init()");
+		addScriptToBody("OmniFaces.Unload.init('" + id + "')");
 	}
 
 	/**

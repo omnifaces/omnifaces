@@ -32,7 +32,7 @@ OmniFaces.Unload = (function() {
 	/**
 	 * Initialize the "unload" event listener on the current document.
 	 */
-	unload.init = function() {
+	unload.init = function(id) {
 		if (!window.XMLHttpRequest) {
 			return; // Native XHR not supported (IE6/7 not supported). End of story. Let session expiration do its job.
 		}
@@ -53,7 +53,7 @@ OmniFaces.Unload = (function() {
 				var xhr = new XMLHttpRequest();
 				xhr.open("POST", window.location.href.split(/[?#;]/)[0], false);
 				xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-				xhr.send("omnifaces.event=unload&" + VIEW_STATE_PARAM + "=" + viewState);
+				xhr.send("omnifaces.event=unload&id=" + id + "&" + VIEW_STATE_PARAM + "=" + viewState);
 			}
 			catch (e) {
 				// Fail silently. You never know.

@@ -74,9 +74,10 @@ public class RestorableViewHandler extends ViewHandlerWrapper {
 	 */
 	@Override
 	public UIViewRoot restoreView(FacesContext context, String viewId) {
-		if (isUnloadRequest(context) && getRenderKit(context).getResponseStateManager().getState(context, viewId) == null) {
-			context.responseComplete();
-			return new UIViewRoot();
+		if (isUnloadRequest(context)) {
+			UIViewRoot createdView = createView(context, viewId);
+			createdView.restoreViewScopeState(context, getRenderKit(context).getResponseStateManager().getState(context, viewId));
+			return createdView;
 		}
 
 		UIViewRoot restoredView = super.restoreView(context, viewId);
@@ -85,25 +86,21 @@ public class RestorableViewHandler extends ViewHandlerWrapper {
 			return restoredView;
 		}
 
-		UIViewRoot createdView;
-
 		try {
-			createdView = buildView(viewId);
+			UIViewRoot createdView = buildView(viewId);
+			return isRestorableView(createdView) ? createdView : null;
 		}
 		catch (IOException e) {
 			throw new FacesException(e);
-		}
-
-		if (TRUE.equals(createdView.getAttributes().get(EnableRestorableView.class.getName()))) {
-			return createdView;
-		}
-		else {
-			return null;
 		}
 	}
 
 	private boolean isRestorableViewEnabled(FacesContext context) {
 		return TRUE.equals(getApplicationAttribute(context, EnableRestorableView.class.getName()));
+	}
+
+	private boolean isRestorableView(UIViewRoot view) {
+		return TRUE.equals(view.getAttributes().get(EnableRestorableView.class.getName()));
 	}
 
 	@Override
