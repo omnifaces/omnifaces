@@ -83,7 +83,8 @@ public final class ExpressionInspector {
 
 		String methodName = inspectorElContext.getProperty().toString();
 		Object[] params = inspectorElContext.getParams();
-		if (type == ValueExpressionType.PROPERTY) {
+
+		if (type != ValueExpressionType.METHOD) {
 			methodName = "get" + capitalize(methodName); // support for "is"?
 			params = NO_PARAMS;
 		}
@@ -227,7 +228,11 @@ public final class ExpressionInspector {
 				lastProperty = property;
 
 				context.setPropertyResolved(true);
-				return ValueExpressionType.PROPERTY;
+
+				// Normally, we'd return ValueExpressionType.PROPERTY here, but this causes trouble with EL coercion.
+				// TODO: When on EL 3.0, implement InspectorELContext#convertToType() to always return original value,
+				// so we can "nicely" return ValueExpressionType.PROPERTY here.
+				return null;
 			}
 
 			checkSubchainStarted(base);

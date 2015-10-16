@@ -101,7 +101,6 @@ import org.omnifaces.filter.GzipResponseFilter;
  *
  * @author Bauke Scholtz
  * @since 2.2
- *
  */
 public abstract class FileServlet extends HttpServlet {
 
@@ -110,11 +109,11 @@ public abstract class FileServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	public static final String DEFAULT_CHARSET = StandardCharsets.UTF_8.name();
-    public static final Long DEFAULT_EXPIRE_TIME_IN_MILLIS = new Long(TimeUnit.DAYS.toMillis(30));
+	public static final Long DEFAULT_EXPIRE_TIME_IN_MILLIS = new Long(TimeUnit.DAYS.toMillis(30));
 
 	private static final long ONE_SECOND_IN_MILLIS = TimeUnit.SECONDS.toMillis(1);
-    private static final String ETAG_HEADER = "W/\"%s-%s\"";
-    private static final String CONTENT_DISPOSITION_HEADER = "%s;filename=\"%2$s\"; filename*=" + DEFAULT_CHARSET + "''%2$s";
+	private static final String ETAG_HEADER = "W/\"%s-%s\"";
+	private static final String CONTENT_DISPOSITION_HEADER = "%s;filename=\"%2$s\"; filename*=" + DEFAULT_CHARSET + "''%2$s";
 	private static final String MULTIPART_BOUNDARY = "MULTIPART_BYTERANGES";
 
 	private static final String ERROR_EXPIRES_ALREADY_SET =
@@ -122,7 +121,7 @@ public abstract class FileServlet extends HttpServlet {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private static long expires = DEFAULT_EXPIRE_TIME_IN_MILLIS;
+	private long expires = DEFAULT_EXPIRE_TIME_IN_MILLIS;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -138,28 +137,28 @@ public abstract class FileServlet extends HttpServlet {
 
 	private void doRequest(HttpServletRequest request, HttpServletResponse response, boolean head) throws IOException {
 		response.reset();
-        File file;
+		File file;
 
-        try {
-        	file = getFile(request);
-        }
-        catch (IllegalArgumentException e) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
+		try {
+			file = getFile(request);
+		}
+		catch (IllegalArgumentException e) {
+			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+			return;
+		}
 
-        if (file == null || !file.exists() || !file.isFile()) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
-        }
+		if (file == null || !file.exists() || !file.isFile()) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			return;
+		}
 
-        String fileName = URLEncoder.encode(file.getName(), DEFAULT_CHARSET);
-        long lastModified = file.lastModified();
+		String fileName = URLEncoder.encode(file.getName(), DEFAULT_CHARSET);
+		long lastModified = file.lastModified();
 		String eTag = String.format(ETAG_HEADER, fileName, lastModified);
 
 		if (preconditionFailed(request, eTag, lastModified)) {
-            response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
-            return;
+			response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
+			return;
 		}
 
 		if (setCacheHeaders(request, response, eTag, lastModified)) {
@@ -191,58 +190,58 @@ public abstract class FileServlet extends HttpServlet {
 		writeContent(response, file, contentType, ranges);
 	}
 
-    /**
-     * Returns the file associated with the given HTTP servlet request. If this method returns <code>null</code>, or if
-     * {@link File#exists()} or {@link File#isFile()} returns <code>false</code>, then the servlet will then return a
-     * HTTP 404 error. If this method throws {@link IllegalArgumentException}, then the servlet will return a HTTP 400
-     * error.
-     * @param request The involved HTTP servlet request.
-     * @return The file associated with the given HTTP servlet request. If the file is invalid, then the servlet will
-     * return a HTTP 404 error.
-     * @throws IllegalArgumentException When the request is mangled in such way that it's not recognizable as a valid
-     * file request. The servlet will then return a HTTP 400 error.
-     */
-    protected abstract File getFile(HttpServletRequest request) throws IllegalArgumentException;
+	/**
+	 * Returns the file associated with the given HTTP servlet request. If this method returns <code>null</code>, or if
+	 * {@link File#exists()} or {@link File#isFile()} returns <code>false</code>, then the servlet will then return a
+	 * HTTP 404 error. If this method throws {@link IllegalArgumentException}, then the servlet will return a HTTP 400
+	 * error.
+	 * @param request The involved HTTP servlet request.
+	 * @return The file associated with the given HTTP servlet request. If the file is invalid, then the servlet will
+	 * return a HTTP 404 error.
+	 * @throws IllegalArgumentException When the request is mangled in such way that it's not recognizable as a valid
+	 * file request. The servlet will then return a HTTP 400 error.
+	 */
+	protected abstract File getFile(HttpServletRequest request) throws IllegalArgumentException;
 
-    /**
-     * Sets how long the resource may be cached by the client before it expires, in milliseconds. When not set, then a
-     * default value of 30 days will be assumed. It can be set only once. It's recommended to do that during
-     * {@link #init()} method of the servlet (and absolutely not in one of <code>doXxx()</code> methods).
-     * @param expires Cache expire time in milliseconds.
+	/**
+	 * Sets how long the resource may be cached by the client before it expires, in milliseconds. When not set, then a
+	 * default value of 30 days will be assumed. It can be set only once. It's recommended to do that during
+	 * {@link #init()} method of the servlet (and absolutely not in one of <code>doXxx()</code> methods).
+	 * @param expires Cache expire time in milliseconds.
 	 * @throws IllegalStateException When the cache expire time has already been set.
-     */
-    protected void setExpires(long expires) {
-    	if (FileServlet.expires == DEFAULT_EXPIRE_TIME_IN_MILLIS) {
-    		FileServlet.expires = expires;
-    	}
-    	else {
+	 */
+	protected void setExpires(long expires) {
+		if (this.expires == DEFAULT_EXPIRE_TIME_IN_MILLIS) {
+			this.expires = expires;
+		}
+		else {
 			throw new IllegalStateException(ERROR_EXPIRES_ALREADY_SET);
 		}
-    }
+	}
 
 	// Sub-actions ----------------------------------------------------------------------------------------------------
 
-    /**
-     * Returns true if it's a conditional request which must return 412.
-     */
-    private boolean preconditionFailed(HttpServletRequest request, String eTag, long lastModified) {
+	/**
+	 * Returns true if it's a conditional request which must return 412.
+	 */
+	private boolean preconditionFailed(HttpServletRequest request, String eTag, long lastModified) {
 		String match = request.getHeader("If-Match");
-        long unmodified = request.getDateHeader("If-Unmodified-Since");
-        return (match != null) ? !matches(match, eTag) : (unmodified != -1 && modified(unmodified, lastModified));
-    }
+		long unmodified = request.getDateHeader("If-Unmodified-Since");
+		return (match != null) ? !matches(match, eTag) : (unmodified != -1 && modified(unmodified, lastModified));
+	}
 
-    /**
-     * Set cache headers and returns true if it's a conditional request which must return 304.
-     */
-    private boolean setCacheHeaders(HttpServletRequest request, HttpServletResponse response, String eTag, long lastModified) {
-        response.setHeader("ETag", eTag);
-        response.setDateHeader("Last-Modified", lastModified);
-        response.setDateHeader("Expires", System.currentTimeMillis() + expires);
+	/**
+	 * Set cache headers and returns true if it's a conditional request which must return 304.
+	 */
+	private boolean setCacheHeaders(HttpServletRequest request, HttpServletResponse response, String eTag, long lastModified) {
+		response.setHeader("ETag", eTag);
+		response.setDateHeader("Last-Modified", lastModified);
+		response.setDateHeader("Expires", System.currentTimeMillis() + expires);
 
-        String noMatch = request.getHeader("If-None-Match");
-        long modified = request.getDateHeader("If-Modified-Since");
-        return (noMatch != null) ? matches(noMatch, eTag) : (modified != -1 && !modified(modified, lastModified));
-    }
+		String noMatch = request.getHeader("If-None-Match");
+		long modified = request.getDateHeader("If-Modified-Since");
+		return (noMatch != null) ? matches(noMatch, eTag) : (modified != -1 && !modified(modified, lastModified));
+	}
 
 	/**
 	 * Returns requested ranges. If this is null, then we must return 416. If this is empty, then we must return full file.
@@ -378,7 +377,7 @@ public abstract class FileServlet extends HttpServlet {
 	 * Returns true if the given modified header is older than the given last modified value.
 	 */
 	private static boolean modified(long modifiedHeader, long lastModified) {
-        return (modifiedHeader + ONE_SECOND_IN_MILLIS <= lastModified); // That second is because the header is in seconds, not millis.
+		return (modifiedHeader + ONE_SECOND_IN_MILLIS <= lastModified); // That second is because the header is in seconds, not millis.
 	}
 
 	/**
