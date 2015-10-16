@@ -1481,7 +1481,7 @@ public final class FacesLocal {
 		long size = Utils.stream(input, externalContext.getResponseOutputStream());
 
 		// This may be on time for files smaller than the default buffer size, but is otherwise ignored anyway.
-		if (contentLength == -1) {
+		if (contentLength == -1 && !externalContext.isResponseCommitted()) {
 			externalContext.setResponseHeader("Content-Length", String.valueOf(size));
 		}
 
