@@ -12,18 +12,21 @@
  */
 package org.omnifaces.servlet;
 
+import static org.omnifaces.util.Utils.coalesce;
+import static org.omnifaces.util.Utils.encodeURL;
+import static org.omnifaces.util.Utils.startsWithOneOf;
 import static org.omnifaces.util.Utils.stream;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -41,9 +44,10 @@ import org.omnifaces.filter.GzipResponseFilter;
  * <p>
  * This servlet properly deals with <code>ETag</code>, <code>If-None-Match</code> and <code>If-Modified-Since</code>
  * caching requests, hereby improving browser caching. This servlet also properly deals with <code>Range</code> and
- * <code>If-Range</code> ranging requests, which is required by most media players for proper audio/video streaming
- * and by clients for a proper resume of an aborted/paused download. This servlet is ideal when you have media files
- * placed outside the web application and you can't use the default servlet.
+ * <code>If-Range</code> ranging requests (<a href="https://tools.ietf.org/html/rfc7233">RFC7233</a>), which is required
+ * by most media players for proper audio/video streaming, and by webbrowsers and for a proper resume of an paused
+ * download, and by download accelerators to be able to request smaller parts simultaneously. This servlet is ideal when
+ * you have large files like media files placed outside the web application and you can't use the default servlet.
  *
  * <h3>Usage</h3>
  * <p>
@@ -108,13 +112,13 @@ public abstract class FileServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String DEFAULT_CHARSET = StandardCharsets.UTF_8.name();
 	public static final Long DEFAULT_EXPIRE_TIME_IN_MILLIS = new Long(TimeUnit.DAYS.toMillis(30));
 
 	private static final long ONE_SECOND_IN_MILLIS = TimeUnit.SECONDS.toMillis(1);
-	private static final String ETAG_HEADER = "W/\"%s-%s\"";
-	private static final String CONTENT_DISPOSITION_HEADER = "%s;filename=\"%2$s\"; filename*=" + DEFAULT_CHARSET + "''%2$s";
-	private static final String MULTIPART_BOUNDARY = "MULTIPART_BYTERANGES";
+	private static final String ETAG = "W/\"%s-%s\"";
+	private static final Pattern RANGE_PATTERN = Pattern.compile("^bytes=[0-9]*-[0-9]*(,[0-9]*-[0-9]*)*$");
+	private static final String CONTENT_DISPOSITION_HEADER = "%s;filename=\"%2$s\"; filename*=UTF-8''%2$s";
+	private static final String MULTIPART_BOUNDARY = UUID.randomUUID().toString();
 
 	private static final String ERROR_EXPIRES_ALREADY_SET =
 		"The cache expire time can be set only once. You need to set it in init() method.";
@@ -137,64 +141,62 @@ public abstract class FileServlet extends HttpServlet {
 
 	private void doRequest(HttpServletRequest request, HttpServletResponse response, boolean head) throws IOException {
 		response.reset();
-		File file;
+		Resource resource;
 
 		try {
-			file = getFile(request);
+			resource = new Resource(getFile(request));
 		}
 		catch (IllegalArgumentException e) {
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 		}
 
-		if (file == null || !file.exists() || !file.isFile()) {
+		if (resource.file == null) {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND);
 			return;
 		}
 
-		String fileName = URLEncoder.encode(file.getName(), DEFAULT_CHARSET);
-		long lastModified = file.lastModified();
-		String eTag = String.format(ETAG_HEADER, fileName, lastModified);
-
-		if (preconditionFailed(request, eTag, lastModified)) {
+		if (preconditionFailed(request, resource)) {
 			response.sendError(HttpServletResponse.SC_PRECONDITION_FAILED);
 			return;
 		}
 
-		if (setCacheHeaders(request, response, eTag, lastModified)) {
+		setCacheHeaders(response, resource);
+
+		if (notModified(request, resource)) {
 			response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
 			return;
 		}
 
-		long contentLength = file.length();
-		List<Range> ranges = getRanges(request, eTag, lastModified, contentLength);
+		List<Range> ranges = getRanges(request, resource);
 
 		if (ranges == null) {
-			response.setHeader("Content-Range", "bytes */" + contentLength);
+			response.setHeader("Content-Range", "bytes */" + resource.length);
 			response.sendError(HttpServletResponse.SC_REQUESTED_RANGE_NOT_SATISFIABLE);
 			return;
 		}
-		else if (ranges.isEmpty()) {
-			ranges.add(new Range(0, contentLength - 1, contentLength)); // Full file.
-		}
-		else {
+
+		if (!ranges.isEmpty()) {
 			response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
 		}
+		else {
+			ranges.add(new Range(0, resource.length - 1)); // Full content.
+		}
 
-		String contentType = setContentHeaders(request, response, fileName, ranges);
+		String contentType = getContentType(request, resource.name);
+		setContentHeaders(response, resource, ranges, contentType, isAttachment(request, contentType));
 
 		if (head) {
 			return;
 		}
 
-		writeContent(response, file, contentType, ranges);
+		writeContent(response, resource, ranges, contentType);
 	}
 
 	/**
 	 * Returns the file associated with the given HTTP servlet request. If this method returns <code>null</code>, or if
-	 * {@link File#exists()} or {@link File#isFile()} returns <code>false</code>, then the servlet will then return a
-	 * HTTP 404 error. If this method throws {@link IllegalArgumentException}, then the servlet will return a HTTP 400
-	 * error.
+	 * {@link File#isFile()} returns <code>false</code>, then the servlet will then return a HTTP 404 error. If this
+	 * method throws {@link IllegalArgumentException}, then the servlet will return a HTTP 400 error.
 	 * @param request The involved HTTP servlet request.
 	 * @return The file associated with the given HTTP servlet request. If the file is invalid, then the servlet will
 	 * return a HTTP 404 error.
@@ -224,46 +226,51 @@ public abstract class FileServlet extends HttpServlet {
 	/**
 	 * Returns true if it's a conditional request which must return 412.
 	 */
-	private boolean preconditionFailed(HttpServletRequest request, String eTag, long lastModified) {
+	private boolean preconditionFailed(HttpServletRequest request, Resource resource) {
 		String match = request.getHeader("If-Match");
 		long unmodified = request.getDateHeader("If-Unmodified-Since");
-		return (match != null) ? !matches(match, eTag) : (unmodified != -1 && modified(unmodified, lastModified));
+		return (match != null) ? !matches(match, resource.eTag) : (unmodified != -1 && modified(unmodified, resource.lastModified));
 	}
 
 	/**
-	 * Set cache headers and returns true if it's a conditional request which must return 304.
+	 * Set cache headers.
 	 */
-	private boolean setCacheHeaders(HttpServletRequest request, HttpServletResponse response, String eTag, long lastModified) {
-		response.setHeader("ETag", eTag);
-		response.setDateHeader("Last-Modified", lastModified);
+	private void setCacheHeaders(HttpServletResponse response, Resource resource) {
+		response.setHeader("ETag", resource.eTag);
+		response.setDateHeader("Last-Modified", resource.lastModified);
 		response.setDateHeader("Expires", System.currentTimeMillis() + expires);
+	}
 
+	/**
+	 * Returns true if it's a conditional request which must return 304.
+	 */
+	private boolean notModified(HttpServletRequest request, Resource resource) {
 		String noMatch = request.getHeader("If-None-Match");
 		long modified = request.getDateHeader("If-Modified-Since");
-		return (noMatch != null) ? matches(noMatch, eTag) : (modified != -1 && !modified(modified, lastModified));
+		return (noMatch != null) ? matches(noMatch, resource.eTag) : (modified != -1 && !modified(modified, resource.lastModified));
 	}
 
 	/**
-	 * Returns requested ranges. If this is null, then we must return 416. If this is empty, then we must return full file.
+	 * Get requested ranges. If this is null, then we must return 416. If this is empty, then we must return full file.
 	 */
-	private List<Range> getRanges(HttpServletRequest request, String eTag, long lastModified, long contentLength) {
+	private List<Range> getRanges(HttpServletRequest request, Resource resource) {
 		List<Range> ranges = new ArrayList<>(1);
 		String range = request.getHeader("Range");
 
 		if (range == null) {
 			return ranges;
 		}
-		else if (!range.matches("^bytes=\\d*-\\d*(,\\d*-\\d*)*$")) { // Syntax error.
-			return null;
+		else if (!RANGE_PATTERN.matcher(range).matches()) {
+			return null; // Syntax error.
 		}
 
 		String ifRange = request.getHeader("If-Range");
 
-		if (ifRange != null && !ifRange.equals(eTag)) {
+		if (ifRange != null && !ifRange.equals(resource.eTag)) {
 			try {
 				long ifRangeTime = request.getDateHeader("If-Range");
 
-				if (ifRangeTime != -1 && modified(ifRangeTime, lastModified)) {
+				if (ifRangeTime != -1 && modified(ifRangeTime, resource.lastModified)) {
 					return ranges;
 				}
 			}
@@ -272,78 +279,71 @@ public abstract class FileServlet extends HttpServlet {
 			}
 		}
 
-		for (String part : range.substring(6).split(",")) {
-			// Assuming a file with length of 100, the following examples returns bytes at:
-			// 50-80 (50 to 80), 40- (40 to length=100), -20 (length-20=80 to length=100).
+		for (String part : range.split("=")[1].split(",")) {
 			long start = sublong(part, 0, part.indexOf("-"));
 			long end = sublong(part, part.indexOf("-") + 1, part.length());
 
 			if (start == -1) {
-				start = contentLength - end;
-				end = contentLength - 1;
+				start = resource.length - end;
+				end = resource.length - 1;
 			}
-			else if (end == -1 || end > contentLength - 1) {
-				end = contentLength - 1;
-			}
-
-			if (start > end) { // Logic error.
-				return null;
+			else if (end == -1 || end > resource.length - 1) {
+				end = resource.length - 1;
 			}
 
-			ranges.add(new Range(start, end, contentLength));
+			if (start > end) {
+				return null; // Logic error.
+			}
+
+			ranges.add(new Range(start, end));
 		}
 
 		return ranges;
 	}
 
 	/**
-	 * Set content headers and returns the content type.
+	 * Get content type.
 	 */
-	private String setContentHeaders(HttpServletRequest request, HttpServletResponse response, String fileName, List<Range> ranges) {
-		String contentType = request.getServletContext().getMimeType(fileName);
+	private String getContentType(HttpServletRequest request, String name) {
+		return coalesce(request.getServletContext().getMimeType(name), "application/octet-stream");
+	}
 
-		if (contentType == null) {
-			contentType = "application/octet-stream";
-		}
-		else if (contentType.startsWith("text")) {
-			contentType += ";charset=" + DEFAULT_CHARSET;
-		}
+	/**
+	 * Returns true if we must force a "Save As" dialog.
+	 */
+	private boolean isAttachment(HttpServletRequest request, String contentType) {
+		String accept = request.getHeader("Accept");
+		return !startsWithOneOf(contentType, "text", "image") && (accept == null || !accepts(accept, contentType));
+	}
 
-		String disposition = "inline";
-
-		if (!(contentType.startsWith("text") || contentType.startsWith("image"))) {
-			String accept = request.getHeader("Accept");
-
-			if (accept == null || !accepts(accept, contentType)) {
-				disposition = "attachment";
-			}
-		}
-
-		response.setHeader("Content-Disposition", String.format(CONTENT_DISPOSITION_HEADER, disposition, fileName));
+	/**
+	 * Set content headers.
+	 */
+	private void setContentHeaders(HttpServletResponse response, Resource resource, List<Range> ranges, String contentType, boolean attachment) {
+		String disposition = attachment ? "attachment" : "inline";
+		response.setHeader("Content-Disposition", String.format(CONTENT_DISPOSITION_HEADER, disposition, resource.name));
 		response.setHeader("Accept-Ranges", "bytes");
 
 		if (ranges.size() == 1) {
 			Range range = ranges.get(0);
 			response.setContentType(contentType);
-			response.setHeader("Content-Range", "bytes " + range.start + "-" + range.end + "/" + range.total);
+			response.setHeader("Content-Range", "bytes " + range.start + "-" + range.end + "/" + resource.length);
 			response.setHeader("Content-Length", String.valueOf(range.length));
 		}
 		else {
 			response.setContentType("multipart/byteranges; boundary=" + MULTIPART_BOUNDARY);
 		}
-
-		return contentType;
 	}
 
 	/**
 	 * Write given file to response with given content type and ranges.
 	 */
-	private void writeContent(HttpServletResponse response, File file, String contentType, List<Range> ranges) throws IOException, FileNotFoundException {
+	private void writeContent(HttpServletResponse response, Resource resource, List<Range> ranges, String contentType) throws IOException, FileNotFoundException {
 		OutputStream output = response.getOutputStream();
 
 		if (ranges.size() == 1) {
 			Range range = ranges.get(0);
-			stream(file, output, range.start, range.length);
+			stream(resource.file, output, range.start, range.length);
 		}
 		else {
 			ServletOutputStream sos = (ServletOutputStream) output;
@@ -352,8 +352,8 @@ public abstract class FileServlet extends HttpServlet {
 				sos.println();
 				sos.println("--" + MULTIPART_BOUNDARY);
 				sos.println("Content-Type: " + contentType);
-				sos.println("Content-Range: bytes " + range.start + "-" + range.end + "/" + range.total);
-				stream(file, output, range.start, range.length);
+				sos.println("Content-Range: bytes " + range.start + "-" + range.end + "/" + resource.length);
+				stream(resource.file, output, range.start, range.length);
 			}
 
 			sos.println();
@@ -386,7 +386,7 @@ public abstract class FileServlet extends HttpServlet {
 	 */
 	private static long sublong(String value, int beginIndex, int endIndex) {
 		String substring = value.substring(beginIndex, endIndex);
-		return (substring.length() > 0) ? Long.parseLong(substring) : -1;
+		return substring.isEmpty() ? -1 : Long.parseLong(substring);
 	}
 
 	/**
@@ -403,25 +403,39 @@ public abstract class FileServlet extends HttpServlet {
 	// Nested classes -------------------------------------------------------------------------------------------------
 
 	/**
+	 * Convenience class for a file resource.
+	 */
+	private static class Resource {
+		File file;
+		String name;
+		long length;
+		long lastModified;
+		String eTag;
+
+		public Resource(File file) {
+			if (file != null && file.isFile()) {
+				this.file = file;
+				name = encodeURL(file.getName());
+				length = file.length();
+				lastModified = file.lastModified();
+				eTag = String.format(ETAG, name, lastModified);
+			}
+		}
+
+	}
+
+	/**
 	 * Convenience class for a byte range.
 	 */
 	private static class Range {
 		long start;
 		long end;
 		long length;
-		long total;
 
-		/**
-		 * Construct a byte range.
-		 * @param start Start of the byte range.
-		 * @param end End of the byte range.
-		 * @param total Total length of the byte source.
-		 */
-		public Range(long start, long end, long total) {
+		public Range(long start, long end) {
 			this.start = start;
 			this.end = end;
 			length = end - start + 1;
-			this.total = total;
 		}
 
 	}
