@@ -28,6 +28,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServlet;
@@ -183,7 +184,7 @@ public abstract class FileServlet extends HttpServlet {
 			ranges.add(new Range(0, resource.length - 1)); // Full content.
 		}
 
-		String contentType = getContentType(request, resource.name);
+		String contentType = getContentType(request, resource.file);
 		setContentHeaders(response, resource, ranges, contentType, isAttachment(request, contentType));
 
 		if (head) {
@@ -219,6 +220,34 @@ public abstract class FileServlet extends HttpServlet {
 		else {
 			throw new IllegalStateException(ERROR_EXPIRES_ALREADY_SET);
 		}
+	}
+
+	/**
+	 * Returns the content type associated with the given HTTP servlet request and file. The default implementation
+	 * delegates {@link File#getName()} to {@link ServletContext#getMimeType(String)} with a fallback default value of
+	 * <code>application/octet-stream</code>.
+	 * @param request The involved HTTP servlet request.
+	 * @param file The involved file.
+	 * @return The content type associated with the given HTTP servlet request and file.
+	 */
+	protected String getContentType(HttpServletRequest request, File file) {
+		return coalesce(request.getServletContext().getMimeType(file.getName()), "application/octet-stream");
+	}
+
+	/**
+	 * Returns <code>true</code> if we must force a "Save As" dialog based on the given HTTP servlet request and content
+	 * type as obtained from {@link #getContentType(HttpServletRequest, File)}. The default implementation will return
+	 * <code>true</code> if the content type does <strong>not</strong> start with <code>text</code> or
+	 * <code>image</code>, and the <code>Accept</code> request header is either <code>null</code> or does not match the
+	 * given content type.
+	 * @param request The involved HTTP servlet request.
+	 * @param contentType The content type of the involved file.
+	 * @return <code>true</code> if we must force a "Save As" dialog based on the given HTTP servlet request and content
+	 * type.
+	 */
+	protected boolean isAttachment(HttpServletRequest request, String contentType) {
+		String accept = request.getHeader("Accept");
+		return !startsWithOneOf(contentType, "text", "image") && (accept == null || !accepts(accept, contentType));
 	}
 
 	// Sub-actions ----------------------------------------------------------------------------------------------------
@@ -299,21 +328,6 @@ public abstract class FileServlet extends HttpServlet {
 		}
 
 		return ranges;
-	}
-
-	/**
-	 * Get content type.
-	 */
-	private String getContentType(HttpServletRequest request, String name) {
-		return coalesce(request.getServletContext().getMimeType(name), "application/octet-stream");
-	}
-
-	/**
-	 * Returns true if we must force a "Save As" dialog.
-	 */
-	private boolean isAttachment(HttpServletRequest request, String contentType) {
-		String accept = request.getHeader("Accept");
-		return !startsWithOneOf(contentType, "text", "image") && (accept == null || !accepts(accept, contentType));
 	}
 
 	/**
