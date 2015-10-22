@@ -87,16 +87,17 @@ import org.omnifaces.filter.GzipResponseFilter;
  * <pre>
  * &lt;video src="#{request.contextPath}/media/video.mp4" controls="controls" /&gt;
  * </pre>
+ *
+ * <h3>Customizing <code>FileServlet</code></h3>
  * <p>
- * You can optionally override the default cache expire time of 30 days by calling {@link #setExpires(long)} in the
- * {@link #init()} method of your servlet. E.g. to 7 days:
- * <pre>
- *     &#64;Override
- *     public void init() throws ServletException {
- *         folder = new File("/var/webapp/media");
- *         setExpires(TimeUnit.DAYS.toMillis(7));
- *     }
- * </pre>
+ * If more fine grained control is desired for determining the cache expire time, the content type and whether the
+ * file should be supplied as an attachment, then the developer can opt to override one or more of the following
+ * protected methods:
+ * <ul>
+ * <li>{@link #getExpireTime(HttpServletRequest, File)}
+ * <li>{@link #getContentType(HttpServletRequest, File)}
+ * <li>{@link #isAttachment(HttpServletRequest, String)}
+ * </ul>
  *
  * <p><strong>See also</strong>:
  * <ul>
@@ -113,20 +114,12 @@ public abstract class FileServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final Long DEFAULT_EXPIRE_TIME_IN_MILLIS = new Long(TimeUnit.DAYS.toMillis(30));
-
+	private static final Long DEFAULT_EXPIRE_TIME_IN_MILLIS = TimeUnit.DAYS.toMillis(30);
 	private static final long ONE_SECOND_IN_MILLIS = TimeUnit.SECONDS.toMillis(1);
 	private static final String ETAG = "W/\"%s-%s\"";
 	private static final Pattern RANGE_PATTERN = Pattern.compile("^bytes=[0-9]*-[0-9]*(,[0-9]*-[0-9]*)*$");
 	private static final String CONTENT_DISPOSITION_HEADER = "%s;filename=\"%2$s\"; filename*=UTF-8''%2$s";
 	private static final String MULTIPART_BOUNDARY = UUID.randomUUID().toString();
-
-	private static final String ERROR_EXPIRES_ALREADY_SET =
-		"The cache expire time can be set only once. You need to set it in init() method.";
-
-	// Variables ------------------------------------------------------------------------------------------------------
-
-	private long expires = DEFAULT_EXPIRE_TIME_IN_MILLIS;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -162,7 +155,7 @@ public abstract class FileServlet extends HttpServlet {
 			return;
 		}
 
-		setCacheHeaders(response, resource);
+		setCacheHeaders(response, resource, getExpireTime(request, resource.file));
 
 		if (notModified(request, resource)) {
 			response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
@@ -207,25 +200,22 @@ public abstract class FileServlet extends HttpServlet {
 	protected abstract File getFile(HttpServletRequest request) throws IllegalArgumentException;
 
 	/**
-	 * Sets how long the resource may be cached by the client before it expires, in milliseconds. When not set, then a
-	 * default value of 30 days will be assumed. It can be set only once. It's recommended to do that during
-	 * {@link #init()} method of the servlet (and absolutely not in one of <code>doXxx()</code> methods).
-	 * @param expires Cache expire time in milliseconds.
-	 * @throws IllegalStateException When the cache expire time has already been set.
+	 * Returns how long the resource may be cached by the client before it expires, in milliseconds.
+	 * <p>
+	 * The default implementation returns 30 days in milliseconds.
+	 * @param request The involved HTTP servlet request.
+	 * @param file The involved file.
+	 * @return The client cache expire time in milliseconds.
 	 */
-	protected void setExpires(long expires) {
-		if (this.expires == DEFAULT_EXPIRE_TIME_IN_MILLIS) {
-			this.expires = expires;
-		}
-		else {
-			throw new IllegalStateException(ERROR_EXPIRES_ALREADY_SET);
-		}
+	protected long getExpireTime(HttpServletRequest request, File file) {
+		return DEFAULT_EXPIRE_TIME_IN_MILLIS;
 	}
 
 	/**
-	 * Returns the content type associated with the given HTTP servlet request and file. The default implementation
-	 * delegates {@link File#getName()} to {@link ServletContext#getMimeType(String)} with a fallback default value of
-	 * <code>application/octet-stream</code>.
+	 * Returns the content type associated with the given HTTP servlet request and file.
+	 * <p>
+	 * The default implementation delegates {@link File#getName()} to {@link ServletContext#getMimeType(String)} with a
+	 * fallback default value of <code>application/octet-stream</code>.
 	 * @param request The involved HTTP servlet request.
 	 * @param file The involved file.
 	 * @return The content type associated with the given HTTP servlet request and file.
@@ -236,10 +226,11 @@ public abstract class FileServlet extends HttpServlet {
 
 	/**
 	 * Returns <code>true</code> if we must force a "Save As" dialog based on the given HTTP servlet request and content
-	 * type as obtained from {@link #getContentType(HttpServletRequest, File)}. The default implementation will return
-	 * <code>true</code> if the content type does <strong>not</strong> start with <code>text</code> or
-	 * <code>image</code>, and the <code>Accept</code> request header is either <code>null</code> or does not match the
-	 * given content type.
+	 * type as obtained from {@link #getContentType(HttpServletRequest, File)}.
+	 * <p>
+	 * The default implementation will return <code>true</code> if the content type does <strong>not</strong> start with
+	 * <code>text</code> or <code>image</code>, and the <code>Accept</code> request header is either <code>null</code>
+	 * or does not match the given content type.
 	 * @param request The involved HTTP servlet request.
 	 * @param contentType The content type of the involved file.
 	 * @return <code>true</code> if we must force a "Save As" dialog based on the given HTTP servlet request and content
@@ -264,7 +255,7 @@ public abstract class FileServlet extends HttpServlet {
 	/**
 	 * Set cache headers.
 	 */
-	private void setCacheHeaders(HttpServletResponse response, Resource resource) {
+	private void setCacheHeaders(HttpServletResponse response, Resource resource, long expires) {
 		response.setHeader("ETag", resource.eTag);
 		response.setDateHeader("Last-Modified", resource.lastModified);
 		response.setDateHeader("Expires", System.currentTimeMillis() + expires);
