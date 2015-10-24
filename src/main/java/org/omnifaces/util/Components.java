@@ -33,16 +33,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.el.MethodExpression;
 import javax.el.ValueExpression;
-import javax.faces.FacesException;
-import javax.faces.application.Application;
-import javax.faces.application.Resource;
 import javax.faces.application.ViewHandler;
 import javax.faces.component.EditableValueHolder;
 import javax.faces.component.NamingContainer;
@@ -53,7 +50,6 @@ import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
 import javax.faces.component.UINamingContainer;
 import javax.faces.component.UIOutput;
-import javax.faces.component.UIPanel;
 import javax.faces.component.UIParameter;
 import javax.faces.component.UIViewRoot;
 import javax.faces.component.behavior.AjaxBehavior;
@@ -597,79 +593,52 @@ public final class Components {
 	/**
 	 * Create and include the composite component of the given library and resource name as child of the given UI
 	 * component parent and return the created composite component.
-	 * This has the same effect as using <code>&lt;my:resourceName&gt;</code>. The given component ID must be unique
-	 * relative to the current naming container parent and is mandatory for functioning of input components inside the
-	 * composite, if any.
+	 * This has the same effect as using <code>xmlns:my="http://xmlns.jcp.org/jsf/composite/libraryName</code> and
+	 * <code>&lt;my:resourceName&gt;</code>. The given component ID must be unique relative to the current naming
+	 * container parent and is mandatory for functioning of input components inside the composite, if any.
 	 * @param parent The parent component to include the composite component in.
-	 * @param libraryName The library name of the composite component.
-	 * @param resourceName The resource name of the composite component.
+	 * @param libraryName The library name of the composite component (path after "http://xmlns.jcp.org/jsf/composite/").
+	 * @param tagName The tag name of the composite component.
 	 * @param id The component ID of the composite component.
-	 * @return The created composite component, which can if necessary be further used to set custom attributes or
-	 * value expressions on it.
+	 * @return The created composite component, which can if necessary be used to set more custom attributes on it.
 	 * @since 1.5
 	 */
-	public static UIComponent includeCompositeComponent(UIComponent parent, String libraryName, String resourceName, String id) {
-		return includeCompositeComponent(parent, libraryName, resourceName, id, null);
+	public static UIComponent includeCompositeComponent(UIComponent parent, String libraryName, String tagName, String id) {
+		return includeCompositeComponent(parent, libraryName, tagName, id, null);
 	}
 
 	/**
 	 * Create and include the composite component of the given library and resource name as child of the given UI
 	 * component parent, set the given attributes on it and return the created composite component.
-	 * This has the same effect as using <code>&lt;my:resourceName&gt;</code>. The given component ID must be unique
-	 * relative to the current naming container parent and is mandatory for functioning of input components inside the
-	 * composite, if any.
+	 * This has the same effect as using <code>xmlns:my="http://xmlns.jcp.org/jsf/composite/libraryName</code> and
+	 * <code>&lt;my:resourceName&gt;</code>. The given component ID must be unique relative to the current naming
+	 * container parent and is mandatory for functioning of input components inside the composite, if any.
+	 * <p>
+	 * The attribute values must represent literal values or literal EL expressions, exactly like as you would declare
+	 * in the view file. E.g.
+	 * <pre>
+	 * attributes.put("foo", "#{bean.foo}");
+	 * attributes.put("bar", "true");
+	 * attributes.put("baz", "#{bean.baz(" + someId + ")}");
+	 * </pre>
 	 * @param parent The parent component to include the composite component in.
-	 * @param libraryName The library name of the composite component.
-	 * @param resourceName The resource name of the composite component.
+	 * @param libraryName The library name of the composite component (path after "http://xmlns.jcp.org/jsf/composite/").
+	 * @param tagName The tag name of the composite component.
 	 * @param id The component ID of the composite component.
 	 * @param attributes The attributes to be set on the composite component.
-	 * @return The created composite component, which can if necessary be further used to set more custom attributes or
-	 * value expressions on it.
+	 * @return The created composite component, which can if necessary be used to set more custom attributes on it.
 	 * @since 2.2
 	 */
-	public static UIComponent includeCompositeComponent(UIComponent parent, String libraryName, String resourceName, String id, Map<String, Object> attributes) {
-		FacesContext context = FacesContext.getCurrentInstance();
-		Application application = context.getApplication();
-		FaceletContext faceletContext = FacesLocal.getFaceletContext(context);
+	public static UIComponent includeCompositeComponent(UIComponent parent, String libraryName, String tagName, String id, Map<String, String> attributes) {
+	    String taglibURI = "http://xmlns.jcp.org/jsf/composite/" + libraryName;
+	    Map<String, Object> attrs = (attributes == null) ? null : new HashMap<String, Object>(attributes);
 
-		// This basically creates <ui:component> based on <composite:interface>.
-		Resource resource = application.getResourceHandler().createResource(resourceName, libraryName);
-		UIComponent composite = application.createComponent(context, resource);
-		composite.setId(id); // Mandatory for the case composite is part of UIForm! Otherwise JSF can't find inputs.
-
-		// Set the <composite:attribute>s, if any.
-		if (attributes != null) {
-			for (Entry<String, Object> attribute : attributes.entrySet()) {
-				String key = attribute.getKey();
-				Object value = attribute.getValue();
-
-				if (value instanceof ValueExpression) {
-					composite.setValueExpression(key, (ValueExpression) value);
-				}
-				else {
-					composite.getAttributes().put(key, value);
-				}
-			}
-		}
-
-		// This basically creates <composite:implementation>.
-		UIComponent implementation = application.createComponent(UIPanel.COMPONENT_TYPE);
-		implementation.setRendererType("javax.faces.Group");
-		composite.getFacets().put(UIComponent.COMPOSITE_FACET_NAME, implementation);
-
-		// Now include the composite component file in the given parent.
-		parent.getChildren().add(composite);
-		parent.pushComponentToEL(context, composite); // This makes #{cc} available.
-		try {
-			faceletContext.includeFacelet(implementation, resource.getURL());
-		}
-		catch (IOException e) {
-			throw new FacesException(e);
-		}
-		finally {
-			parent.popComponentFromEL(context);
-		}
-
+	    FacesContext context = FacesContext.getCurrentInstance();
+	    UIComponent composite = context.getApplication().getViewHandler()
+	    	.getViewDeclarationLanguage(context, context.getViewRoot().getViewId())
+	        .createComponent(context, taglibURI, tagName, attrs);
+	    composite.setId(id);
+	    parent.getChildren().add(composite);
 		return composite;
 	}
 
