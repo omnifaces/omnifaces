@@ -33,6 +33,7 @@ import javax.enterprise.context.SessionScoped;
 import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.faces.application.StateManager;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 import javax.inject.Inject;
@@ -219,7 +220,7 @@ public class ViewScopeManager implements Serializable {
 
 		FacesContext context = FacesContext.getCurrentInstance();
 
-		if (context.getCurrentPhaseId() != PhaseId.RENDER_RESPONSE) {
+		if (context.getCurrentPhaseId() != PhaseId.RENDER_RESPONSE || context.getAttributes().get(StateManager.IS_BUILDING_INITIAL_STATE) == Boolean.TRUE) {
 			addScriptResourceToHead("omnifaces", "omnifaces.js");
 		}
 		else if (!Hacks.isScriptResourceRendered(context, new ResourceIdentifier("omnifaces", "omnifaces.js"))) {
