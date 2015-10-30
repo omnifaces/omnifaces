@@ -28,6 +28,7 @@
 	<application>
 		<view-handler>org.omnifaces.viewhandler.RestorableViewHandler</view-handler>
 		<resource-handler>org.omnifaces.resourcehandler.GraphicResourceHandler</resource-handler>
+		<resource-handler>org.omnifaces.resourcehandler.OmniVersionResourceHandler</resource-handler>
 		<system-event-listener>
 			<system-event-listener-class>org.omnifaces.facesviews.FacesViewsViewHandlerInstaller</system-event-listener-class>
 			<system-event-class>javax.faces.event.PostConstructApplicationEvent</system-event-class>
