@@ -121,7 +121,7 @@ public class ReadOnlyValueExpression extends ValueExpression {
 
 	@Override
 	public boolean isLiteralText() {
-		return true;
+		return callbackReturning == null && callbackWithArgument == null;
 	}
 
 	/**

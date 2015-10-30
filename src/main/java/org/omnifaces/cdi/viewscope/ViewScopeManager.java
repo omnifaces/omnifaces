@@ -18,6 +18,7 @@ package org.omnifaces.cdi.viewscope;
 import static org.omnifaces.util.Components.addScriptResourceToBody;
 import static org.omnifaces.util.Components.addScriptResourceToHead;
 import static org.omnifaces.util.Components.addScriptToBody;
+import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Faces.getViewAttribute;
 import static org.omnifaces.util.Faces.setViewAttribute;
@@ -34,13 +35,14 @@ import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.faces.context.FacesContext;
-import javax.faces.event.PhaseId;
 import javax.inject.Inject;
 
 import org.omnifaces.application.ViewScopeEventListener;
 import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
+import org.omnifaces.el.ReadOnlyValueExpression;
 import org.omnifaces.resourcehandler.ResourceIdentifier;
+import org.omnifaces.util.Callback;
 import org.omnifaces.util.Hacks;
 import org.omnifaces.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
 import org.omnifaces.util.concurrentlinkedhashmap.EvictionListener;
@@ -190,7 +192,7 @@ public class ViewScopeManager implements Serializable {
 	 * CDI bean storage will also be auto-created.
 	 */
 	private UUID getBeanStorageId(boolean create) {
-		FacesContext context = FacesContext.getCurrentInstance();
+		FacesContext context = getContext();
 
 		if (isUnloadRequest(context)) {
 			return UUID.fromString(getRequestParameter(context, "id"));
@@ -217,15 +219,10 @@ public class ViewScopeManager implements Serializable {
 	private void createViewScope(UUID id) {
 		activeViewScopes.put(id, new BeanStorage(DEFAULT_BEANS_PER_VIEW_SCOPE));
 
-		FacesContext context = FacesContext.getCurrentInstance();
-
-		if (context.getCurrentPhaseId() != PhaseId.RENDER_RESPONSE) {
-			addScriptResourceToHead("omnifaces", "omnifaces.js");
-		}
-		else if (!Hacks.isScriptResourceRendered(context, new ResourceIdentifier("omnifaces", "omnifaces.js"))) {
-			addScriptResourceToBody("omnifaces", "unload.js");
-		}
-
+		addScriptResourceToHead("omnifaces", "omnifaces.js");
+		addScriptResourceToBody("omnifaces", "unload.js").setValueExpression("rendered", new ReadOnlyValueExpression(Boolean.class, new Callback.SerializableReturning<Object>() { private static final long serialVersionUID = 1L; @Override public Object invoke() {
+			return !Hacks.isScriptResourceRendered(getContext(), new ResourceIdentifier("omnifaces", "omnifaces.js"));
+		}}));
 		addScriptToBody("OmniFaces.Unload.init('" + id + "')");
 	}
 
