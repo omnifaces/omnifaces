@@ -1,31 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans
-	xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+	xmlns="http://java.sun.com/xml/ns/javaee"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/beans_1_1.xsd"
-	version="1.1" bean-discovery-mode="all"
+	xmlns:weld="http://jboss.org/schema/weld/beans"
+	xsi:schemaLocation="
+		http://java.sun.com/xml/ns/javaee http://jboss.org/schema/cdi/beans_1_0.xsd
+		http://jboss.org/schema/weld/beans http://jboss.org/schema/weld/beans_1_1.xsd"
 >
-	<scan>
-		<exclude name="org.omnifaces.application.**" />
-		<exclude name="org.omnifaces.component.**" />
-		<exclude name="org.omnifaces.config.**" />
-		<exclude name="org.omnifaces.context.**" />
-		<exclude name="org.omnifaces.converter.**" />
-		<exclude name="org.omnifaces.el.**" />
-		<exclude name="org.omnifaces.event.**" />
-		<exclude name="org.omnifaces.eventlistener.**" />
-		<exclude name="org.omnifaces.exceptionhandler.**" />
-		<exclude name="org.omnifaces.facesviews.**" />
-		<exclude name="org.omnifaces.filter.**" />
-		<exclude name="org.omnifaces.io.**" />
-		<exclude name="org.omnifaces.model.**" />
-		<exclude name="org.omnifaces.renderer.**" />
-		<exclude name="org.omnifaces.renderkit.**" />
-		<exclude name="org.omnifaces.resourcehandler.**" />
-		<exclude name="org.omnifaces.servlet.**" />
-		<exclude name="org.omnifaces.taghandler.**" />
-		<exclude name="org.omnifaces.util.**" />
-		<exclude name="org.omnifaces.validator.**" />
-		<exclude name="org.omnifaces.viewhandler.**" />
-	</scan>
+	<weld:scan>
+		<!-- weld:include on org.omnifaces.cdi.** fails in Tomcat+Weld; it causes to bypass /WEB-INF/classes as well. Latest tested versions: Tomcat 7.0.55 + Weld 2.2.0. -->
+		<weld:exclude name="org.omnifaces.application.**" />
+		<weld:exclude name="org.omnifaces.component.**" />
+		<weld:exclude name="org.omnifaces.config.**" />
+		<weld:exclude name="org.omnifaces.context.**" />
+		<weld:exclude name="org.omnifaces.converter.**" />
+		<weld:exclude name="org.omnifaces.el.**" />
+		<weld:exclude name="org.omnifaces.event.**" />
+		<weld:exclude name="org.omnifaces.eventlistener.**" />
+		<weld:exclude name="org.omnifaces.exceptionhandler.**" />
+		<weld:exclude name="org.omnifaces.facesviews.**" />
+		<weld:exclude name="org.omnifaces.filter.**" />
+		<weld:exclude name="org.omnifaces.io.**" />
+		<weld:exclude name="org.omnifaces.model.**" />
+		<weld:exclude name="org.omnifaces.renderer.**" />
+		<weld:exclude name="org.omnifaces.renderkit.**" />
+		<weld:exclude name="org.omnifaces.resourcehandler.**" />
+		<weld:exclude name="org.omnifaces.servlet.**" />
+		<weld:exclude name="org.omnifaces.taghandler.**" />
+		<weld:exclude name="org.omnifaces.util.**" />
+		<weld:exclude name="org.omnifaces.validator.**" />
+		<weld:exclude name="org.omnifaces.viewhandler.**" />
+	</weld:scan>
 </beans>
