@@ -646,14 +646,15 @@ public final class Components {
 	 * Add given JavaScript code as inline script to end of body of the current view.
 	 * Note: this doesn't have any effect during ajax postbacks. Rather use {@link Ajax#oncomplete(String...)} instead.
 	 * @param script JavaScript code to be added as inline script to end of body of the current view.
+	 * @return The created script component.
 	 * @since 2.2
 	 */
-	public static void addScriptToBody(String script) {
+	public static UIComponent addScriptToBody(String script) {
 		UIOutput outputScript = createScriptResource();
 		UIOutput content = new UIOutput();
 		content.setValue(script);
 		outputScript.getChildren().add(content);
-		addComponentResource(outputScript, "body");
+		return addComponentResource(outputScript, "body");
 	}
 
 	/**
@@ -661,10 +662,11 @@ public final class Components {
 	 * Note: this doesn't have any effect during non-@all ajax postbacks.
 	 * @param libraryName Library name of the JavaScript resource.
 	 * @param resourceName Resource name of the JavaScript resource.
+	 * @return The created script component resource.
 	 * @since 2.2
 	 */
-	public static void addScriptResourceToBody(String libraryName, String resourceName) {
-		addScriptResource(libraryName, resourceName, "body");
+	public static UIComponent addScriptResourceToBody(String libraryName, String resourceName) {
+		return addScriptResource(libraryName, resourceName, "body");
 	}
 
 	/**
@@ -674,10 +676,11 @@ public final class Components {
 	 * {@link #addScriptResourceToBody(String, String)} instead.
 	 * @param libraryName Library name of the JavaScript resource.
 	 * @param resourceName Resource name of the JavaScript resource.
+	 * @return The created script component resource.
 	 * @since 2.2
 	 */
-	public static void addScriptResourceToHead(String libraryName, String resourceName) {
-		addScriptResource(libraryName, resourceName, "head");
+	public static UIComponent addScriptResourceToHead(String libraryName, String resourceName) {
+		return addScriptResource(libraryName, resourceName, "head");
 	}
 
 	private static UIOutput createScriptResource() {
@@ -686,7 +689,7 @@ public final class Components {
 		return outputScript;
 	}
 
-	private static void addScriptResource(String libraryName, String resourceName, String target) {
+	private static UIComponent addScriptResource(String libraryName, String resourceName, String target) {
 		UIOutput outputScript = createScriptResource();
 
 		if (libraryName != null) {
@@ -694,12 +697,13 @@ public final class Components {
 		}
 
 		outputScript.getAttributes().put("name", resourceName);
-		addComponentResource(outputScript, target);
+		return addComponentResource(outputScript, target);
 	}
 
-	private static void addComponentResource(UIComponent resource, String target) {
+	private static UIComponent addComponentResource(UIComponent resource, String target) {
 		FacesContext context = FacesContext.getCurrentInstance();
 		context.getViewRoot().addComponentResource(context, resource, target);
+		return resource;
 	}
 
 	// Building / rendering -------------------------------------------------------------------------------------------
