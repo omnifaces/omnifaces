@@ -48,15 +48,6 @@ import javax.enterprise.inject.spi.InjectionPoint;
  * Beans.destroy(SomeBean.class);
  * </pre>
  * <p>
- * The "native" CDI way would otherwise look like this:
- * <pre>
- * // Get the CDI managed bean reference (proxy) of the given bean class.
- * Set&lt;Bean&lt;?&gt;&gt; beans = beanManager.getBeans(SomeBean.class);
- * Bean&lt;SomeBean&gt; bean = (Bean&lt;SomeBean&gt;) beanManager.resolve(beans);
- * CreationalContext&lt;SomeBean&gt; context = beanManager.createCreationalContext(bean);
- * SomeBean someBean = (SomeBean) beanManager.getReference(bean, SomeBean.class, context);
- * </pre>
- * <p>
  * If you need a dependency-free way of obtaining the CDI managed bean reference (e.g. when you want to write code which
  * should also run on Tomcat), use {@link org.omnifaces.config.BeanManager} enum instead.
  *
