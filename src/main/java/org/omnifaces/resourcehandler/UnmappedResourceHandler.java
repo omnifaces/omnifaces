@@ -125,12 +125,11 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * If the given resource is not <code>null</code> nor an instance of {@link RemappedResource}, then decorate it as
-	 * an unmapped resource.
+	 * If the given resource is not <code>null</code>, then decorate it as an unmapped resource.
 	 */
 	@Override
 	public Resource decorateResource(Resource resource) {
-		if (resource == null || resource instanceof RemappedResource) {
+		if (resource == null) {
 			return resource;
 		}
 
