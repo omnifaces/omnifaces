@@ -189,8 +189,11 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 		else if (path.contains("?")) {
 			return path.replace(mapping + "?", "?");
 		}
-		else {
+		else if (path.endsWith(mapping)) {
 			return path.substring(0, path.length() - mapping.length());
+		}
+		else {
+			return path;
 		}
 	}
 
