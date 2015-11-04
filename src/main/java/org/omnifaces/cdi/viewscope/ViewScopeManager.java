@@ -138,7 +138,22 @@ public class ViewScopeManager implements Serializable {
 	 * current active view scope.
 	 */
 	public void preDestroyView() {
-		BeanStorage storage = activeViewScopes.remove(getBeanStorageId(false));
+		FacesContext context = FacesContext.getCurrentInstance();
+		UUID beanStorageId = null;
+
+		if (isUnloadRequest(context)) {
+			try {
+				beanStorageId = UUID.fromString(getRequestParameter(context, "id"));
+			}
+			catch (Exception ignore) {
+				return; // Ignore hacker attempts.
+			}
+		}
+		else {
+			beanStorageId = getBeanStorageId(false);
+		}
+
+		BeanStorage storage = activeViewScopes.remove(beanStorageId);
 
 		if (storage != null) {
 			storage.destroyBeans();
@@ -191,12 +206,6 @@ public class ViewScopeManager implements Serializable {
 	 * CDI bean storage will also be auto-created.
 	 */
 	private UUID getBeanStorageId(boolean create) {
-		FacesContext context = FacesContext.getCurrentInstance();
-
-		if (isUnloadRequest(context)) {
-			return UUID.fromString(getRequestParameter(context, "id"));
-		}
-
 		UUID id = getViewAttribute(ViewScopeManager.class.getName());
 
 		if (id == null || activeViewScopes.get(id) == null) {
