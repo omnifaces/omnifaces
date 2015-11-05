@@ -171,6 +171,34 @@ public class Form extends UIForm {
 		super.encodeBegin(new ActionURLDecorator(context, this));
 	}
 
+	/**
+	 * Collect the necessary parameters for query string in action URL.
+	 */
+	private Map<String, List<String>> collectParams(FacesContext context) {
+		Map<String, List<String>> params;
+
+		if (isUseRequestURI() || isIncludeRequestParams()) {
+			params = getRequestQueryStringMap(context);
+		}
+		else if (isIncludeViewParams()) {
+			params = getViewParameterMap(context);
+		}
+		else {
+			params = new LinkedHashMap<>(0);
+		}
+
+		for (ParamHolder param : getParams(this)) {
+			Object value = param.getValue();
+
+			if (isEmpty(value)) {
+				continue;
+			}
+
+			params.put(param.getName(), asList(value.toString()));
+		}
+
+		return params;
+	}
 
 	// Getters/setters ------------------------------------------------------------------------------------------------
 
@@ -320,30 +348,8 @@ public class Form extends UIForm {
 						 */
 						@Override
 						public String getActionURL(FacesContext context, String viewId) {
-							Map<String, List<String>> params;
-
-							if (form.isUseRequestURI() || form.isIncludeRequestParams()) {
-								params = getRequestQueryStringMap(context);
-							}
-							else if (form.isIncludeViewParams()) {
-								params = getViewParameterMap(context);
-							}
-							else {
-								params = new LinkedHashMap<>(0);
-							}
-
-							for (ParamHolder param : getParams(form)) {
-								Object value = param.getValue();
-
-								if (isEmpty(value)) {
-									continue;
-								}
-
-								params.put(param.getName(), asList(value.toString()));
-							}
-
 							String url = form.isUseRequestURI() ? getRequestURI(context) : super.getActionURL(context, viewId);
-							String queryString = toQueryString(params);
+							String queryString = toQueryString(form.collectParams(context));
 							return isEmpty(queryString) ? url : url + (url.contains("?") ? "&" : "?") + queryString;
 						}
 

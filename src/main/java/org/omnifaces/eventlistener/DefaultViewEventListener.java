@@ -17,13 +17,11 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.SystemEvent;
 import javax.faces.event.SystemEventListener;
 
-import org.omnifaces.util.Events;
-
 /**
  * Default implementation for the SystemEventListener interface that's used for the subset of system events
  * that are registered as "view event" on the component tree's view root.
  *
- * @see Events#subscribeToViewEvent(Class, SystemEventListener)
+ * @see org.omnifaces.util.Events#subscribeToViewEvent(Class, SystemEventListener)
  * @see UIViewRoot#subscribeToViewEvent(Class, SystemEventListener)
  *
  * @author Arjan Tijms

@@ -13,6 +13,7 @@
 package org.omnifaces.util;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.regex.Pattern.quote;
 import static javax.faces.application.ProjectStage.Development;
 import static javax.faces.application.ProjectStage.PROJECT_STAGE_JNDI_NAME;
@@ -44,7 +45,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.omnifaces.component.ParamHolder;
-import org.omnifaces.filter.CacheControlFilter;
 
 /**
  * <p>
@@ -331,6 +331,48 @@ public final class Servlets {
 		return queryString.toString();
 	}
 
+	// HttpServletResponse --------------------------------------------------------------------------------------------
+
+	/**
+	 * <p>Set the cache headers. If the <code>expires</code> argument is larger than 0 seconds, then the following headers
+	 * will be set:
+	 * <ul>
+	 * <li><code>Cache-Control: public,max-age=[expiration time in seconds],must-revalidate</code></li>
+	 * <li><code>Expires: [expiration date of now plus expiration time in seconds]</code></li>
+	 * </ul>
+	 * <p>Else the method will delegate to {@link #setNoCacheHeaders(HttpServletResponse)}.
+	 * @param response The HTTP servlet response to set the headers on.
+	 * @param expires The expire time in seconds (not milliseconds!).
+	 * @since 2.2
+	 */
+	public static void setCacheHeaders(HttpServletResponse response, long expires) {
+		if (expires > 0) {
+			response.setHeader("Cache-Control", "public,max-age=" + expires + ",must-revalidate");
+			response.setDateHeader("Expires", System.currentTimeMillis() + SECONDS.toMillis(expires));
+			response.setHeader("Pragma", ""); // Explicitly set pragma to prevent container from overriding it.
+		}
+		else {
+			setNoCacheHeaders(response);
+		}
+	}
+
+	/**
+	 * <p>Set the no-cache headers. The following headers will be set:
+	 * <ul>
+	 * <li><code>Cache-Control: no-cache,no-store,must-revalidate</code></li>
+	 * <li><code>Expires: [expiration date of 0]</code></li>
+	 * <li><code>Pragma: no-cache</code></li>
+	 * </ul>
+	 * Set the no-cache headers.
+	 * @param response The HTTP servlet response to set the headers on.
+	 * @since 2.2
+	 */
+	public static void setNoCacheHeaders(HttpServletResponse response) {
+		response.setHeader("Cache-Control", "no-cache,no-store,must-revalidate");
+		response.setDateHeader("Expires", 0);
+		response.setHeader("Pragma", "no-cache"); // Backwards compatibility for HTTP 1.0.
+	}
+
 	// Cookies --------------------------------------------------------------------------------------------------------
 
 	/**
@@ -567,7 +609,7 @@ public final class Servlets {
 		String redirectURL = prepareRedirectURL(request, url, paramValues);
 
 		if (isFacesAjaxRequest(request)) {
-			CacheControlFilter.setNoCacheHeaders(response);
+			setNoCacheHeaders(response);
 			response.setContentType("text/xml");
 			response.setCharacterEncoding(UTF_8.name());
 			response.getWriter().printf(FACES_AJAX_REDIRECT_XML, redirectURL);

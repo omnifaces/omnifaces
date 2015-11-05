@@ -59,7 +59,7 @@ import org.omnifaces.eventlistener.DefaultViewEventListener;
  * </pre>
  * <pre>
  * // Add a callback to the current view which should run during the pre render view event.
- * Events.subscribeToViewEvent(PreRenderViewEvent.class, new Callback.Void() {
+ * Events.subscribeToViewEvent(PreRenderViewEvent.class, new Callback.SerializableVoid() {
  *     &#64;Override
  *     public void invoke() {
  *         // ...

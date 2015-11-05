@@ -35,7 +35,6 @@ import javax.faces.context.PartialViewContextWrapper;
 
 import org.omnifaces.config.WebXml;
 import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
-import org.omnifaces.util.Ajax;
 import org.omnifaces.util.Hacks;
 import org.omnifaces.util.Json;
 
@@ -52,7 +51,7 @@ import org.omnifaces.util.Json;
  * redirected to the login page instead of retrieving an ajax response with only a changed view state (and effectively
  * thus no visual feedback at all).</li>
  * </ul>
- * You can use the {@link Ajax} utility class to easily add callback scripts and arguments.
+ * You can use the {@link org.omnifaces.util.Ajax} utility class to easily add callback scripts and arguments.
  * <p>
  * This partial view context is already registered by OmniFaces' own <code>faces-config.xml</code> and thus gets
  * auto-initialized when the OmniFaces JAR is bundled in a web application, so end-users do not need to register this

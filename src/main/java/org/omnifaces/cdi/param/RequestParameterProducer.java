@@ -25,6 +25,7 @@ import static org.omnifaces.util.Platform.getBeanValidator;
 import static org.omnifaces.util.Platform.isBeanValidationAvailable;
 import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Reflection.setPropertiesWithCoercion;
+import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.containsByClassName;
 import static org.omnifaces.util.Utils.isEmpty;
 
@@ -406,16 +407,8 @@ public class RequestParameterProducer {
 			if (message == null) {
 				// RequiredValidator didn't throw or its exception did not have a message set.
 				ResourceBundle messageBundle = getMessageBundle(context);
-
-				if (messageBundle != null) {
-					requiredMessage = messageBundle.getString(UIInput.REQUIRED_MESSAGE_ID);
-				}
-
-				if (requiredMessage == null) {
-					requiredMessage = DEFAULT_REQUIRED_MESSAGE;
-				}
-
-				message = createError(requiredMessage, label);
+				String defaultRequiredMessage = (messageBundle != null) ? messageBundle.getString(UIInput.REQUIRED_MESSAGE_ID) : null;
+				message = createError(coalesce(defaultRequiredMessage, requiredMessage, DEFAULT_REQUIRED_MESSAGE), label);
 			}
 		}
 

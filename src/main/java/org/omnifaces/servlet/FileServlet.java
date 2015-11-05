@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.omnifaces.filter.GzipResponseFilter;
+import org.omnifaces.util.Servlets;
 
 /**
  * <p>
@@ -114,7 +115,7 @@ public abstract class FileServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	private static final Long DEFAULT_EXPIRE_TIME_IN_MILLIS = TimeUnit.DAYS.toMillis(30);
+	private static final Long DEFAULT_EXPIRE_TIME_IN_SECONDS = TimeUnit.DAYS.toSeconds(30);
 	private static final long ONE_SECOND_IN_MILLIS = TimeUnit.SECONDS.toMillis(1);
 	private static final String ETAG = "W/\"%s-%s\"";
 	private static final Pattern RANGE_PATTERN = Pattern.compile("^bytes=[0-9]*-[0-9]*(,[0-9]*-[0-9]*)*$");
@@ -200,15 +201,15 @@ public abstract class FileServlet extends HttpServlet {
 	protected abstract File getFile(HttpServletRequest request) throws IllegalArgumentException;
 
 	/**
-	 * Returns how long the resource may be cached by the client before it expires, in milliseconds.
+	 * Returns how long the resource may be cached by the client before it expires, in seconds.
 	 * <p>
-	 * The default implementation returns 30 days in milliseconds.
+	 * The default implementation returns 30 days in seconds.
 	 * @param request The involved HTTP servlet request.
 	 * @param file The involved file.
-	 * @return The client cache expire time in milliseconds.
+	 * @return The client cache expire time in seconds (not milliseconds!).
 	 */
 	protected long getExpireTime(HttpServletRequest request, File file) {
-		return DEFAULT_EXPIRE_TIME_IN_MILLIS;
+		return DEFAULT_EXPIRE_TIME_IN_SECONDS;
 	}
 
 	/**
@@ -256,9 +257,9 @@ public abstract class FileServlet extends HttpServlet {
 	 * Set cache headers.
 	 */
 	private void setCacheHeaders(HttpServletResponse response, Resource resource, long expires) {
+		Servlets.setCacheHeaders(response, expires);
 		response.setHeader("ETag", resource.eTag);
 		response.setDateHeader("Last-Modified", resource.lastModified);
-		response.setDateHeader("Expires", System.currentTimeMillis() + expires);
 	}
 
 	/**
@@ -275,12 +276,12 @@ public abstract class FileServlet extends HttpServlet {
 	 */
 	private List<Range> getRanges(HttpServletRequest request, Resource resource) {
 		List<Range> ranges = new ArrayList<>(1);
-		String range = request.getHeader("Range");
+		String rangeHeader = request.getHeader("Range");
 
-		if (range == null) {
+		if (rangeHeader == null) {
 			return ranges;
 		}
-		else if (!RANGE_PATTERN.matcher(range).matches()) {
+		else if (!RANGE_PATTERN.matcher(rangeHeader).matches()) {
 			return null; // Syntax error.
 		}
 
@@ -299,26 +300,39 @@ public abstract class FileServlet extends HttpServlet {
 			}
 		}
 
-		for (String part : range.split("=")[1].split(",")) {
-			long start = sublong(part, 0, part.indexOf("-"));
-			long end = sublong(part, part.indexOf("-") + 1, part.length());
+		for (String rangeHeaderPart : rangeHeader.split("=")[1].split(",")) {
+			Range range = parseRange(rangeHeaderPart, resource.length);
 
-			if (start == -1) {
-				start = resource.length - end;
-				end = resource.length - 1;
-			}
-			else if (end == -1 || end > resource.length - 1) {
-				end = resource.length - 1;
-			}
-
-			if (start > end) {
+			if (range == null) {
 				return null; // Logic error.
 			}
 
-			ranges.add(new Range(start, end));
+			ranges.add(range);
 		}
 
 		return ranges;
+	}
+
+	/**
+	 * Parse range header part. Returns null if there's a logic error (i.e. start after end).
+	 */
+	private Range parseRange(String range, long length) {
+		long start = sublong(range, 0, range.indexOf('-'));
+		long end = sublong(range, range.indexOf('-') + 1, range.length());
+
+		if (start == -1) {
+			start = length - end;
+			end = length - 1;
+		}
+		else if (end == -1 || end > length - 1) {
+			end = length - 1;
+		}
+
+		if (start > end) {
+			return null; // Logic error.
+		}
+
+		return new Range(start, end);
 	}
 
 	/**
@@ -411,11 +425,11 @@ public abstract class FileServlet extends HttpServlet {
 	 * Convenience class for a file resource.
 	 */
 	private static class Resource {
-		File file;
-		String name;
-		long length;
-		long lastModified;
-		String eTag;
+		final File file;
+		final String name;
+		final long length;
+		final long lastModified;
+		final String eTag;
 
 		public Resource(File file) {
 			if (file != null && file.isFile()) {
@@ -425,6 +439,13 @@ public abstract class FileServlet extends HttpServlet {
 				lastModified = file.lastModified();
 				eTag = String.format(ETAG, name, lastModified);
 			}
+			else {
+				this.file = null;
+				name = null;
+				length = 0;
+				lastModified = 0;
+				eTag = null;
+			}
 		}
 
 	}
@@ -433,9 +454,9 @@ public abstract class FileServlet extends HttpServlet {
 	 * Convenience class for a byte range.
 	 */
 	private static class Range {
-		long start;
-		long end;
-		long length;
+		final long start;
+		final long end;
+		final long length;
 
 		public Range(long start, long end) {
 			this.start = start;

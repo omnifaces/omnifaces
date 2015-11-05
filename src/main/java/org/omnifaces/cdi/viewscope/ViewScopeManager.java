@@ -15,6 +15,7 @@
  */
 package org.omnifaces.cdi.viewscope;
 
+import static java.lang.Boolean.TRUE;
 import static org.omnifaces.util.Components.addScriptResourceToBody;
 import static org.omnifaces.util.Components.addScriptResourceToHead;
 import static org.omnifaces.util.Components.addScriptToBody;
@@ -229,7 +230,7 @@ public class ViewScopeManager implements Serializable {
 
 		FacesContext context = FacesContext.getCurrentInstance();
 
-		if (context.getCurrentPhaseId() != PhaseId.RENDER_RESPONSE || context.getAttributes().get(StateManager.IS_BUILDING_INITIAL_STATE) == Boolean.TRUE) {
+		if (context.getCurrentPhaseId() != PhaseId.RENDER_RESPONSE || TRUE.equals(context.getAttributes().get(StateManager.IS_BUILDING_INITIAL_STATE))) {
 			addScriptResourceToHead("omnifaces", "omnifaces.js");
 		}
 		else if (!Hacks.isScriptResourceRendered(context, new ResourceIdentifier("omnifaces", "omnifaces.js"))) {
