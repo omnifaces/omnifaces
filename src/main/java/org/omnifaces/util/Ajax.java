@@ -159,12 +159,20 @@ public final class Ajax {
 		Collection<String> renderIds = getContext().getRenderIds();
 
 		for (UIComponent column : table.getChildren()) {
-			if (!(column instanceof UIColumn)) {
-				continue;
+			if (column instanceof UIColumn) {
+				for (UIComponent cell : column.getChildren()) {
+					renderIds.add(String.format("%s%c%d%c%s", tableId, separator, index, separator, cell.getId()));
+				}
 			}
+			else if (column instanceof UIData) { // <p:columns>.
+				String columnId = column.getId();
+				int columnCount = ((UIData) column).getRowCount();
 
-			for (UIComponent cell : column.getChildren()) {
-				renderIds.add(String.format("%s%c%d%c%s", tableId, separator, index, separator, cell.getId()));
+				for (UIComponent cell : column.getChildren()) {
+					for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+						renderIds.add(String.format("%s%c%d%c%s%c%d%c%s", tableId, separator, index, separator, columnId, separator, columnIndex, separator, cell.getId()));
+					}
+				}
 			}
 		}
 	}
