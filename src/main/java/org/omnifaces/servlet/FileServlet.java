@@ -425,11 +425,11 @@ public abstract class FileServlet extends HttpServlet {
 	 * Convenience class for a file resource.
 	 */
 	private static class Resource {
-		final File file;
-		final String name;
-		final long length;
-		final long lastModified;
-		final String eTag;
+		private final File file;
+		private final String name;
+		private final long length;
+		private final long lastModified;
+		private final String eTag;
 
 		public Resource(File file) {
 			if (file != null && file.isFile()) {
@@ -454,9 +454,9 @@ public abstract class FileServlet extends HttpServlet {
 	 * Convenience class for a byte range.
 	 */
 	private static class Range {
-		final long start;
-		final long end;
-		final long length;
+		private final long start;
+		private final long end;
+		private final long length;
 
 		public Range(long start, long end) {
 			this.start = start;
