@@ -15,6 +15,7 @@ package org.omnifaces.viewhandler;
 import static java.lang.Boolean.TRUE;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.isUnloadRequest;
 import static org.omnifaces.util.Components.buildView;
+import static org.omnifaces.util.Faces.responseComplete;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getRenderKit;
 
@@ -26,10 +27,10 @@ import javax.faces.application.ViewHandler;
 import javax.faces.application.ViewHandlerWrapper;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
-import javax.faces.event.PostRestoreStateEvent;
 
-import org.omnifaces.application.ViewScopeEventListener;
 import org.omnifaces.cdi.ViewScoped;
+import org.omnifaces.cdi.viewscope.ViewScopeManager;
+import org.omnifaces.config.BeanManager;
 import org.omnifaces.taghandler.EnableRestorableView;
 
 /**
@@ -39,7 +40,7 @@ import org.omnifaces.taghandler.EnableRestorableView;
  * prevents the {@link ViewExpiredException} on the view.
  * <p>
  * Since OmniFaces 2.2, this view handler implementation also detects unload requests coming from {@link ViewScoped}
- * beans and will only create a dummy view and restore the view scoped state instead of building and restoring the
+ * beans and will create a dummy view and only restore the view scoped state instead of building and restoring the
  * entire view.
  *
  * @author Bauke Scholtz
@@ -47,7 +48,7 @@ import org.omnifaces.taghandler.EnableRestorableView;
  * @see EnableRestorableView
  * @see ViewScoped
  */
-public class RestorableViewHandler extends ViewHandlerWrapper {
+public class RestorableViewHandler extends ViewHandlerWrapper { // TODO: rename to OmniViewHandler.
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -66,19 +67,19 @@ public class RestorableViewHandler extends ViewHandlerWrapper {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * First check if this is an unload request from {@link ViewScoped}.
-	 * If so, then create a dummy view and restore the view scope state. The {@link ViewScopeEventListener} will take
-	 * care of actual destroy during {@link PostRestoreStateEvent}.
-	 * If not, then restore the view as usual and check if the <code>&lt;o:enableRestoreView&gt;</code> is used once in
-	 * the application, and the restored view is null and the current request is a postback. If not, then return the
-	 * restored view unmodified. If so, then recreate and rebuild the view from scratsh. If it indeed contains the
-	 * <code>&lt;o:enableRestoreView&gt;</code>, then return the newly created view, else return <code>null</code>.
+	 * If the current request is an unload request from {@link ViewScoped}, then create a dummy view, restore only the
+	 * view scope state and destroy the view, else restore the view as usual. If the <code>&lt;o:enableRestoreView&gt;</code>
+	 * is used once in the application, and the restored view is null and the current request is a postback, then
+	 * recreate and rebuild the view from scratch. If it indeed contains the <code>&lt;o:enableRestoreView&gt;</code>,
+	 * then return the newly created view, else return <code>null</code>.
 	 */
 	@Override
 	public UIViewRoot restoreView(FacesContext context, String viewId) {
 		if (isUnloadRequest(context)) {
 			UIViewRoot createdView = createView(context, viewId);
 			createdView.restoreViewScopeState(context, getRenderKit(context).getResponseStateManager().getState(context, viewId));
+			BeanManager.INSTANCE.getReference(ViewScopeManager.class).preDestroyView();
+			responseComplete();
 			return createdView;
 		}
 
