@@ -885,7 +885,7 @@ public final class FacesLocal {
 	 */
 	public static void redirect(FacesContext context, String url, String... paramValues) throws IOException {
 		ExternalContext externalContext = context.getExternalContext();
-		externalContext.getFlash().setRedirect(true);
+		externalContext.getFlash().setRedirect(true); // MyFaces also requires this for a redirect in current request (which is incorrect).
 		externalContext.redirect(prepareRedirectURL(getRequest(context), url, paramValues));
 	}
 
@@ -895,7 +895,7 @@ public final class FacesLocal {
 	 */
 	public static void redirectPermanent(FacesContext context, String url, String... paramValues) {
 		ExternalContext externalContext = context.getExternalContext();
-		externalContext.getFlash().setRedirect(true);
+		externalContext.getFlash().setRedirect(true); // MyFaces also requires this for a redirect in current request (which is incorrect).
 		externalContext.setResponseStatus(SC_MOVED_PERMANENTLY);
 		externalContext.setResponseHeader("Location", prepareRedirectURL(getRequest(context), url, paramValues));
 		externalContext.setResponseHeader("Connection", "close");

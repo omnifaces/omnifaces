@@ -1146,9 +1146,6 @@ public final class Faces {
 	 * <pre>
 	 * Faces.redirect("other.xhtml?foo=%s&amp;bar=%s", foo, bar);
 	 * </pre>
-	 * <p>
-	 * This method implicitly also calls {@link Flash#setRedirect(boolean)} with <code>true</code> so that any flash
-	 * scoped attributes will survive the redirect.
 	 * @param url The URL to redirect the current response to.
 	 * @param paramValues The request parameter values which you'd like to put URL-encoded in the given URL.
 	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
@@ -1174,9 +1171,6 @@ public final class Faces {
 	 * <pre>
 	 * Faces.redirectPermanent("other.xhtml?foo=%s&amp;bar=%s", foo, bar);
 	 * </pre>
-	 * <p>
-	 * This method implicitly also calls {@link Flash#setRedirect(boolean)} with <code>true</code> so that any flash
-	 * scoped attributes will survive the redirect.
 	 * <p>
 	 * This method does by design not work on ajax requests. It is not possible to return a "permanent redirect" via
 	 * JSF ajax XML response.
