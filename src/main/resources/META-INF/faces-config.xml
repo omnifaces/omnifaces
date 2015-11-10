@@ -48,6 +48,7 @@
 
 	<factory>
 		<application-factory>org.omnifaces.application.OmniApplicationFactory</application-factory>
+		<external-context-factory>org.omnifaces.context.OmniExternalContextFactory</external-context-factory>
 		<partial-view-context-factory>org.omnifaces.context.OmniPartialViewContextFactory</partial-view-context-factory>
 	</factory>
 
