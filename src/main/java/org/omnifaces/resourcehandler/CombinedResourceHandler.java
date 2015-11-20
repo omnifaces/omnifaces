@@ -520,7 +520,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 				componentResourcesToRemove.add(componentResource);
 				return true;
 			}
-			else if (excludedResources.isEmpty() || !excludedResources.contains(resourceIdentifier)) {
+			else if (!containsResourceIdentifier(excludedResources, resourceIdentifier)) {
 				infoBuilder.add(resourceIdentifier);
 
 				if (this.componentResource == null) {
@@ -537,12 +537,16 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 				return true;
 			}
-			else if (suppressedResources.contains(resourceIdentifier)) {
+			else if (containsResourceIdentifier(suppressedResources, resourceIdentifier)) {
 				componentResourcesToRemove.add(componentResource);
 				return true;
 			}
 
 			return false;
+		}
+
+		private boolean containsResourceIdentifier(Set<ResourceIdentifier> ids, ResourceIdentifier id) {
+			return !ids.isEmpty() && (ids.contains(id) || ids.contains(new ResourceIdentifier(id.getLibrary(), "*")));
 		}
 
 		private void mergeAttribute(UIComponent originalComponent, UIComponent newComponent, String name) {
