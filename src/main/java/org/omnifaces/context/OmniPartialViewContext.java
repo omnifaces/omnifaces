@@ -16,9 +16,12 @@ import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.responseReset;
 import static org.omnifaces.util.Faces.setContextAttribute;
 import static org.omnifaces.util.FacesLocal.getContextAttribute;
+import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestAttribute;
+import static org.omnifaces.util.FacesLocal.getResponse;
 import static org.omnifaces.util.FacesLocal.getViewId;
 import static org.omnifaces.util.FacesLocal.normalizeViewId;
+import static org.omnifaces.util.Servlets.facesRedirect;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,6 +35,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.PartialResponseWriter;
 import javax.faces.context.PartialViewContext;
 import javax.faces.context.PartialViewContextWrapper;
+import javax.faces.event.PhaseId;
 
 import org.omnifaces.config.WebXml;
 import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
@@ -95,6 +99,41 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		}
 
 		return writer;
+	}
+
+	/**
+	 * An override which checks if the web.xml security constraint has been triggered during this ajax request
+	 * (which can happen when the session has been timed out) and if so, then perform a redirect to the originally
+	 * requested page. Otherwise the enduser ends up with an ajax response containing only the new view state
+	 * without any form of visual feedback.
+	 */
+	@Override
+	public void processPartial(PhaseId phaseId) {
+		if (phaseId == PhaseId.RENDER_RESPONSE) {
+			String loginURL = WebXml.INSTANCE.getFormLoginPage();
+
+			if (loginURL != null) {
+				FacesContext facesContext = FacesContext.getCurrentInstance();
+				String loginViewId = normalizeViewId(facesContext, loginURL);
+
+				if (loginViewId.equals(getViewId(facesContext))) {
+					String originalURL = getRequestAttribute(facesContext, "javax.servlet.forward.request_uri");
+
+					if (originalURL != null) {
+                        try {
+							facesRedirect(getRequest(facesContext), getResponse(facesContext), originalURL);
+						}
+                        catch (IOException e) {
+							throw new FacesException(e);
+						}
+
+                        return;
+					}
+				}
+			}
+		}
+
+		super.processPartial(phaseId);
 	}
 
 	@Override // Necessary because this is missing in PartialViewContextWrapper (will be fixed in JSF 2.2).
@@ -264,31 +303,6 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		}
 
 		// Overridden actions -----------------------------------------------------------------------------------------
-
-		/**
-		 * An override which checks if the web.xml security constraint has been triggered during this ajax request
-		 * (which can happen when the session has been timed out) and if so, then perform a redirect to the originally
-		 * requested page. Otherwise the enduser ends up with an ajax response containing only the new view state
-		 * without any form of visual feedback.
-		 */
-		@Override
-		public void startDocument() throws IOException {
-			wrapped.startDocument();
-			String loginURL = WebXml.INSTANCE.getFormLoginPage();
-
-			if (loginURL != null) {
-				FacesContext facesContext = FacesContext.getCurrentInstance();
-				String loginViewId = normalizeViewId(facesContext, loginURL);
-
-				if (loginViewId.equals(getViewId(facesContext))) {
-					String originalURL = getRequestAttribute(facesContext, "javax.servlet.forward.request_uri");
-
-					if (originalURL != null) {
-						redirect(originalURL);
-					}
-				}
-			}
-		}
 
 		/**
 		 * An override which remembers if we're updating or not.
