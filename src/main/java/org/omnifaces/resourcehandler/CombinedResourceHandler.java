@@ -16,6 +16,8 @@ import static org.omnifaces.util.Events.subscribeToApplicationEvent;
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Faces.isDevelopment;
+import static org.omnifaces.util.Renderers.RENDERER_TYPE_CSS;
+import static org.omnifaces.util.Renderers.RENDERER_TYPE_JS;
 import static org.omnifaces.util.Utils.isNumber;
 
 import java.util.ArrayList;
@@ -394,8 +396,6 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 		// Constants --------------------------------------------------------------------------------------------------
 
-		private static final String RENDERER_TYPE_CSS = "javax.faces.resource.Stylesheet";
-		private static final String RENDERER_TYPE_JS = "javax.faces.resource.Script";
 		private static final String EXTENSION_CSS = ".css";
 		private static final String EXTENSION_JS = ".js";
 
@@ -449,14 +449,18 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 			String[] resourcePathParts = id.getName().split("\\.", 2)[0].split("/");
 			String resourceId = resourcePathParts[resourcePathParts.length - 1];
 			CombinedResourceInfo info = CombinedResourceInfo.get(resourceId);
+			boolean added = false;
 
 			if (info != null) {
 				for (ResourceIdentifier combinedId : info.getResourceIdentifiers()) {
-					add(context, null, rendererType, combinedId, target);
+					add(context, added ? null : component, rendererType, combinedId, target);
+					added = true;
 				}
 			}
 
-			componentResourcesToRemove.add(component);
+			if (!added) {
+				componentResourcesToRemove.add(component);
+			}
 		}
 
 		private void addStylesheet(FacesContext context, UIComponent component, ResourceIdentifier id) {
@@ -516,7 +520,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 				componentResourcesToRemove.add(componentResource);
 				return true;
 			}
-			else if (excludedResources.isEmpty() || !excludedResources.contains(resourceIdentifier)) {
+			else if (!containsResourceIdentifier(excludedResources, resourceIdentifier)) {
 				infoBuilder.add(resourceIdentifier);
 
 				if (this.componentResource == null) {
@@ -533,12 +537,16 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 				return true;
 			}
-			else if (suppressedResources.contains(resourceIdentifier)) {
+			else if (containsResourceIdentifier(suppressedResources, resourceIdentifier)) {
 				componentResourcesToRemove.add(componentResource);
 				return true;
 			}
 
 			return false;
+		}
+
+		private boolean containsResourceIdentifier(Set<ResourceIdentifier> ids, ResourceIdentifier id) {
+			return !ids.isEmpty() && (ids.contains(id) || ids.contains(new ResourceIdentifier(id.getLibrary(), "*")));
 		}
 
 		private void mergeAttribute(UIComponent originalComponent, UIComponent newComponent, String name) {
@@ -575,6 +583,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 		for (UIComponent resourceToRemove : componentResourcesToRemove) {
 			if (resourceToRemove != null) {
+				resourceToRemove.setInView(false); // #135
 				view.removeComponentResource(context, resourceToRemove, target);
 			}
 		}

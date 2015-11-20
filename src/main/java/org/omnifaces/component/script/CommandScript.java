@@ -12,12 +12,14 @@
  */
 package org.omnifaces.component.script;
 
+import static java.lang.Boolean.FALSE;
 import static org.omnifaces.util.Components.validateHasParent;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
 import java.util.regex.Pattern;
 
+import javax.faces.application.ResourceDependencies;
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UICommand;
@@ -90,7 +92,10 @@ import org.omnifaces.util.State;
  * @since 1.3
  */
 @FacesComponent(CommandScript.COMPONENT_TYPE)
-@ResourceDependency(library="javax.faces", name="jsf.js", target="head")
+@ResourceDependencies({
+	@ResourceDependency(library="javax.faces", name="jsf.js", target="head"), // Required for jsf.ajax.request.
+	@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head") // Specifically util.js.
+})
 public class CommandScript extends UICommand {
 
 	// Public constants -----------------------------------------------------------------------------------------------
@@ -111,7 +116,7 @@ public class CommandScript extends UICommand {
 
 	private enum PropertyKeys {
 		// Cannot be uppercased. They have to exactly match the attribute names.
-		name, execute, render, onbegin, oncomplete;
+		name, execute, render, onbegin, oncomplete, autorun;
 	}
 
 	// Variables ------------------------------------------------------------------------------------------------------
@@ -207,6 +212,10 @@ public class CommandScript extends UICommand {
 		writer.append("var ").append(name).append('=').append("function(o){var o=(typeof o==='object')&&o?o:{};");
 		encodeOptions(context);
 		writer.append("jsf.ajax.request('").append(getClientId(context)).append("',null,o)}");
+
+		if (isAutorun()) {
+			writer.append(";OmniFaces.Util.addOnloadListener(").append(name).append(")");
+		}
 	}
 
 	/**
@@ -374,6 +383,24 @@ public class CommandScript extends UICommand {
 	 */
 	public void setOncomplete(String oncomplete) {
 		state.put(PropertyKeys.oncomplete, oncomplete);
+	}
+
+	/**
+	 * Returns whether the command script should automatically run inline during page load.
+	 * @return Whether the command script should automatically run inline during page load.
+	 * @since 2.2
+	 */
+	public boolean isAutorun() {
+		return state.get(PropertyKeys.autorun, FALSE);
+	}
+
+	/**
+	 * Sets whether the command script should automatically run inline during page load.
+	 * @param autorun Whether the command script should automatically run inline during page load.
+	 * @since 2.2
+	 */
+	public void setAutorun(boolean autorun) {
+		state.put(PropertyKeys.autorun, autorun);
 	}
 
 }

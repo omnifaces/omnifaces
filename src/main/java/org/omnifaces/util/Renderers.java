@@ -30,6 +30,14 @@ import javax.faces.render.Renderer;
  */
 public final class Renderers {
 
+	// Constants --------------------------------------------------------------------------------------------------
+
+	/** Renderer type of standard JSF stylesheet component resource. */
+	public static final String RENDERER_TYPE_CSS = "javax.faces.resource.Stylesheet";
+
+	/** Renderer type of standard JSF script component resource. */
+	public static final String RENDERER_TYPE_JS = "javax.faces.resource.Script";
+
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	private Renderers() {

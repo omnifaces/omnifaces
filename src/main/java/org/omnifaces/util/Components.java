@@ -20,10 +20,15 @@ import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getELContext;
 import static org.omnifaces.util.Faces.getFaceletContext;
 import static org.omnifaces.util.Faces.getViewRoot;
+import static org.omnifaces.util.Faces.setContext;
+import static org.omnifaces.util.FacesLocal.getRenderKit;
+import static org.omnifaces.util.FacesLocal.normalizeViewId;
+import static org.omnifaces.util.Renderers.RENDERER_TYPE_JS;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isOneInstanceOf;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -37,6 +42,7 @@ import javax.el.ValueExpression;
 import javax.faces.FacesException;
 import javax.faces.application.Application;
 import javax.faces.application.Resource;
+import javax.faces.application.ViewHandler;
 import javax.faces.component.EditableValueHolder;
 import javax.faces.component.NamingContainer;
 import javax.faces.component.UICommand;
@@ -45,6 +51,7 @@ import javax.faces.component.UIComponentBase;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
 import javax.faces.component.UINamingContainer;
+import javax.faces.component.UIOutput;
 import javax.faces.component.UIPanel;
 import javax.faces.component.UIParameter;
 import javax.faces.component.UIViewRoot;
@@ -55,16 +62,19 @@ import javax.faces.component.visit.VisitContext;
 import javax.faces.component.visit.VisitHint;
 import javax.faces.component.visit.VisitResult;
 import javax.faces.context.FacesContext;
+import javax.faces.context.FacesContextWrapper;
+import javax.faces.context.ResponseWriter;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.AjaxBehaviorListener;
 import javax.faces.event.MethodExpressionActionListener;
+import javax.faces.render.RenderKit;
+import javax.faces.view.ViewDeclarationLanguage;
 import javax.faces.view.facelets.FaceletContext;
 
 import org.omnifaces.component.ParamHolder;
 import org.omnifaces.component.SimpleParam;
-import org.omnifaces.component.output.Param;
 
 /**
  * <p>
@@ -107,6 +117,10 @@ import org.omnifaces.component.output.Param;
  * command.addClientBehavior("action", Components.createAjaxBehavior("#{bean.ajaxListener}"));
  * command.addActionListener(Components.createActionListenerMethodExpression("#{bean.actionListener}"));
  * command.setActionExpression(Components.createVoidMethodExpression("#{bean.action}"));
+ * </pre>
+ * <pre>
+ * // Programmatically capture HTML output of a given view.
+ * String mailHtml = Components.encodeHtml(Components.buildView("/WEB-INF/mail-template.xhtml"));
  * </pre>
  *
  * @author Bauke Scholtz
@@ -598,15 +612,14 @@ public final class Components {
 	/**
 	 * Create and include the composite component of the given library and resource name as child of the given UI
 	 * component parent and return the created composite component.
-	 * This has the same effect as using <code>&lt;my:resourceName&gt;</code>. The given component ID must be unique
-	 * relative to the current naming container parent and is mandatory for functioning of input components inside the
-	 * composite, if any.
+	 * This has the same effect as using <code>xmlns:my="http://xmlns.jcp.org/jsf/composite/libraryName</code> and
+	 * <code>&lt;my:resourceName&gt;</code>. The given component ID must be unique relative to the current naming
+	 * container parent and is mandatory for functioning of input components inside the composite, if any.
 	 * @param parent The parent component to include the composite component in.
-	 * @param libraryName The library name of the composite component.
-	 * @param resourceName The resource name of the composite component.
+	 * @param libraryName The library name of the composite component (path after "http://xmlns.jcp.org/jsf/composite/").
+	 * @param tagName The tag name of the composite component.
 	 * @param id The component ID of the composite component.
-	 * @return The created composite component, which can if necessary be further used to set custom attributes or
-	 * value expressions on it.
+	 * @return The created composite component, which can if necessary be used to set more custom attributes on it.
 	 * @since 1.5
 	 */
 	public static UIComponent includeCompositeComponent(UIComponent parent, String libraryName, String resourceName, String id) {
@@ -638,6 +651,133 @@ public final class Components {
 		}
 
 		return composite;
+	}
+
+	/**
+	 * Add given JavaScript code as inline script to end of body of the current view.
+	 * Note: this doesn't have any effect during ajax postbacks. Rather use {@link Ajax#oncomplete(String...)} instead.
+	 * @param script JavaScript code to be added as inline script to end of body of the current view.
+	 * @return The created script component.
+	 * @since 2.2
+	 */
+	public static UIComponent addScriptToBody(String script) {
+		UIOutput outputScript = createScriptResource();
+		UIOutput content = new UIOutput();
+		content.setValue(script);
+		outputScript.getChildren().add(content);
+		return addComponentResource(outputScript, "body");
+	}
+
+	/**
+	 * Add given JavaScript resource to end of body of the current view.
+	 * Note: this doesn't have any effect during non-@all ajax postbacks.
+	 * @param libraryName Library name of the JavaScript resource.
+	 * @param resourceName Resource name of the JavaScript resource.
+	 * @return The created script component resource.
+	 * @since 2.2
+	 */
+	public static UIComponent addScriptResourceToBody(String libraryName, String resourceName) {
+		return addScriptResource(libraryName, resourceName, "body");
+	}
+
+	/**
+	 * Add given JavaScript resource to end of head of the current view.
+	 * Note: this doesn't have any effect during non-@all ajax postbacks, nor during render response phase when the
+	 * <code>&lt;h:head&gt;</code> has already been encoded. During render response, rather use
+	 * {@link #addScriptResourceToBody(String, String)} instead.
+	 * @param libraryName Library name of the JavaScript resource.
+	 * @param resourceName Resource name of the JavaScript resource.
+	 * @return The created script component resource.
+	 * @since 2.2
+	 */
+	public static UIComponent addScriptResourceToHead(String libraryName, String resourceName) {
+		return addScriptResource(libraryName, resourceName, "head");
+	}
+
+	private static UIOutput createScriptResource() {
+		UIOutput outputScript = new UIOutput();
+		outputScript.setRendererType(RENDERER_TYPE_JS);
+		return outputScript;
+	}
+
+	private static UIComponent addScriptResource(String libraryName, String resourceName, String target) {
+		UIOutput outputScript = createScriptResource();
+
+		if (libraryName != null) {
+			outputScript.getAttributes().put("library", libraryName);
+		}
+
+		outputScript.getAttributes().put("name", resourceName);
+		return addComponentResource(outputScript, target);
+	}
+
+	private static UIComponent addComponentResource(UIComponent resource, String target) {
+		FacesContext context = FacesContext.getCurrentInstance();
+		context.getViewRoot().addComponentResource(context, resource, target);
+		return resource;
+	}
+
+	// Building / rendering -------------------------------------------------------------------------------------------
+
+	/**
+	 * Creates and builds a local view for the given view ID independently from the current view.
+	 * @param viewId The ID of the view which needs to be created and built.
+	 * @return A fully populated component tree of the given view ID.
+	 * @throws IOException Whenever something fails at I/O level. This can happen when the given view ID is unavailable or malformed.
+	 * @since 2.2
+	 * @see ViewHandler#createView(FacesContext, String)
+	 * @see ViewDeclarationLanguage#buildView(FacesContext, UIViewRoot)
+	 */
+	public static UIViewRoot buildView(String viewId) throws IOException {
+		FacesContext context = FacesContext.getCurrentInstance();
+		String normalizedViewId = normalizeViewId(context, viewId);
+		ViewHandler viewHandler = context.getApplication().getViewHandler();
+		UIViewRoot view = viewHandler.createView(context, normalizedViewId);
+		FacesContext temporaryContext = new TemporaryViewFacesContext(context, view);
+
+		try {
+			setContext(temporaryContext);
+			viewHandler.getViewDeclarationLanguage(temporaryContext, normalizedViewId).buildView(temporaryContext, view);
+		}
+		finally {
+			setContext(context);
+		}
+
+		return view;
+	}
+
+	/**
+	 * Encodes the given component locally as HTML, with UTF-8 character encoding, independently from the current view.
+	 * The current implementation, however, uses the current faces context. The same managed beans as in the current
+	 * faces context will be available as well, including request scoped ones. But, depending on the nature of the
+	 * provided component, the state of the faces context may be affected because the attributes of the context,
+	 * request, view, session and application scope could be (in)directly manipulated during the encode. This may or may
+	 * not have the desired effect. If the given view does not have any component resources, JSF forms, dynamically
+	 * added components, component event listeners, then it should mostly be safe.
+	 * In other words, use this at most for "simple templates" only, e.g. a HTML based mail template, which usually
+	 * already doesn't have a HTML head nor body.
+	 * @param component The component to capture HTML output for.
+	 * @return The encoded HTML output of the given component.
+	 * @throws IOException Whenever something fails at I/O level. This would be quite unexpected as it happens locally.
+	 * @since 2.2
+	 * @see UIComponent#encodeAll(FacesContext)
+	 */
+	public static String encodeHtml(UIComponent component) throws IOException {
+		FacesContext context = FacesContext.getCurrentInstance();
+		ResponseWriter originalWriter = context.getResponseWriter();
+		StringWriter output = new StringWriter();
+		context.setResponseWriter(getRenderKit(context).createResponseWriter(output, "text/html", "UTF-8"));
+
+		try {
+			component.encodeAll(context);
+		}
+		finally {
+			if (originalWriter != null) {
+				context.setResponseWriter(originalWriter);
+			}
+		}
+
+		return output.toString();
 	}
 
 	// Forms ----------------------------------------------------------------------------------------------------------
@@ -873,16 +1013,9 @@ public final class Components {
 			for (UIComponent child : component.getChildren()) {
 				if (child instanceof UIParameter) {
 					UIParameter param = (UIParameter) child;
-					String name = param.getName();
 
-					if (!isEmpty(name) && !param.isDisable()) {
-						ParamHolder paramHolder = new SimpleParam(name, param.getValue());
-
-						if (param instanceof Param) {
-							paramHolder.setConverter(((Param) param).getConverter());
-						}
-
-						params.add(paramHolder);
+					if (!isEmpty(param.getName()) && !param.isDisable()) {
+						params.add(new SimpleParam(param));
 					}
 				}
 			}
@@ -1095,6 +1228,44 @@ public final class Components {
 			// May occur when view has changed by for example a successful navigation.
 			return null;
 		}
+	}
+
+	// Inner classes --------------------------------------------------------------------------------------------------
+
+	/**
+	 * This faces context wrapper allows returning the given temporary view on {@link #getViewRoot()} and its
+	 * associated renderer in {@link #getRenderKit()}. This can then be used in cases when a different view needs to be
+	 * built within the current view. Using {@link FacesContext#setViewRoot(UIViewRoot)} isn't desired as it can't be
+	 * cleared afterwards when the current view is actually <code>null</code>. The {@link #setViewRoot(UIViewRoot)}
+	 * doesn't accept a <code>null</code> being set.
+	 *
+	 * @author Bauke Scholtz
+	 */
+	private static class TemporaryViewFacesContext extends FacesContextWrapper {
+
+		private FacesContext wrapped;
+		private UIViewRoot temporaryView;
+
+		public TemporaryViewFacesContext(FacesContext wrapped, UIViewRoot temporaryView) {
+			this.wrapped = wrapped;
+			this.temporaryView = temporaryView;
+		}
+
+		@Override
+		public UIViewRoot getViewRoot() {
+			return temporaryView;
+		}
+
+		@Override
+		public RenderKit getRenderKit() {
+			return FacesLocal.getRenderKit(this);
+		}
+
+		@Override
+		public FacesContext getWrapped() {
+			return wrapped;
+		}
+
 	}
 
 }

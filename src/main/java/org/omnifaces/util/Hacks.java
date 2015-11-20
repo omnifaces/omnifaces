@@ -17,6 +17,7 @@ import static org.omnifaces.util.Faces.getELContext;
 import static org.omnifaces.util.FacesLocal.getContextAttribute;
 import static org.omnifaces.util.FacesLocal.getInitParameter;
 import static org.omnifaces.util.FacesLocal.setContextAttribute;
+import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Constructor;
@@ -55,9 +56,11 @@ public final class Hacks {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
+	private static final Set<String> RICHFACES_PVC_CLASS_NAMES =
+		unmodifiableSet(
+			"org.richfaces.context.ExtendedPartialViewContextImpl", // RichFaces 4.0-4.3.
+			"org.richfaces.context.ExtendedPartialViewContext"); // RichFaces 4.5+.
 	private static final boolean RICHFACES_INSTALLED = initRichFacesInstalled();
-	private static final String RICHFACES_PVC_CLASS_NAME =
-		"org.richfaces.context.ExtendedPartialViewContextImpl";
 	private static final String RICHFACES_RLR_RENDERER_TYPE =
 		"org.richfaces.renderkit.ResourceLibraryRenderer";
 	private static final String RICHFACES_RLF_CLASS_NAME =
@@ -75,7 +78,7 @@ public final class Hacks {
 	private static final String MYFACES_RENDERED_STYLESHEET_RESOURCES_KEY =
 		"org.apache.myfaces.RENDERED_STYLESHEET_RESOURCES_SET";
 	private static final Set<String> MOJARRA_MYFACES_RESOURCE_DEPENDENCY_KEYS =
-		Utils.unmodifiableSet(
+		unmodifiableSet(
 			"com.sun.faces.PROCESSED_RESOURCE_DEPENDENCIES",
 			MYFACES_RENDERED_SCRIPT_RESOURCES_KEY,
 			MYFACES_RENDERED_STYLESHEET_RESOURCES_KEY);
@@ -110,13 +113,17 @@ public final class Hacks {
 	}
 
 	private static boolean initRichFacesInstalled() {
-		try {
-			Class.forName(RICHFACES_PVC_CLASS_NAME);
-			return true;
+		for (String richFacesPvcClassName : RICHFACES_PVC_CLASS_NAMES) {
+			try {
+				Class.forName(richFacesPvcClassName);
+				return true;
+			}
+			catch (ClassNotFoundException ignore) {
+				continue;
+			}
 		}
-		catch (ClassNotFoundException ignore) {
-			return false;
-		}
+
+		return false;
 	}
 
 	private static boolean initJUELSupportsMethodExpression() {
@@ -136,36 +143,33 @@ public final class Hacks {
 	// RichFaces related ----------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns true if RichFaces 4.0-4.3 is installed. That is, when the RichFaces 4.0-4.3 specific
-	 * ExtendedPartialViewContextImpl is present in the runtime classpath. As this is usually auto-registered, we may
-	 * safely assume that RichFaces 4.0-4.3 is installed.
+	 * Returns true if RichFaces 4.x is installed. That is, when the RichFaces 4.0-4.3 specific
+	 * ExtendedPartialViewContextImpl, or RichFaces 4.5+ specific ExtendedPartialViewContext is present in the runtime
+	 * classpath. As this is usually auto-registered, we may safely assume that RichFaces 4.x is installed.
 	 * <p>
-	 * Note: in RichFaces 4.5, this class has changed to ExtendedPartialViewContext which finally properly extends
-	 * PartialViewContextWrapper with among others the correct implementation for getRenderIds(), so the
-	 * {@link #getRichFacesPartialViewContext()} hack isn't anymore necessary for the purpose.
-	 * Also note that RichFaces 4.4 doesn't exist.
-	 * @return Whether RichFaces 4.0-4.3 is installed.
+	 * Note that RichFaces 4.4 doesn't exist.
+	 * @return Whether RichFaces 4.x is installed.
 	 */
 	public static boolean isRichFacesInstalled() {
 		return RICHFACES_INSTALLED;
 	}
 
 	/**
-	 * RichFaces PartialViewContext implementation does not extend from PartialViewContextWrapper. So a hack wherin the
-	 * exact fully qualified class name needs to be known has to be used to properly extract it from the
+	 * RichFaces 4.0-4.3 ExtendedPartialViewContextImpl does not extend from PartialViewContextWrapper. So a hack wherin
+	 * the exact fully qualified class name needs to be known has to be used to properly extract it from the
 	 * {@link FacesContext#getPartialViewContext()}.
 	 * @return The RichFaces PartialViewContext implementation.
 	 */
 	public static PartialViewContext getRichFacesPartialViewContext() {
 		PartialViewContext context = Ajax.getContext();
 
-		while (!context.getClass().getName().equals(RICHFACES_PVC_CLASS_NAME)
+		while (!RICHFACES_PVC_CLASS_NAMES.contains(context.getClass().getName())
 			&& context instanceof PartialViewContextWrapper)
 		{
 			context = ((PartialViewContextWrapper) context).getWrapped();
 		}
 
-		if (context.getClass().getName().equals(RICHFACES_PVC_CLASS_NAME)) {
+		if (RICHFACES_PVC_CLASS_NAMES.contains(context.getClass().getName())) {
 			return context;
 		}
 		else {
@@ -194,9 +198,9 @@ public final class Hacks {
 	}
 
 	/**
-	 * RichFaces PartialViewContext implementation does not have any getWrapped() method to return the wrapped
+	 * RichFaces 4.0-4.3 ExtendedPartialViewContextImpl does not have any getWrapped() method to return the wrapped
 	 * PartialViewContext. So a reflection hack is necessary to return it from the private field.
-	 * @return The wrapped PartialViewContext from the RichFaces PartialViewContext implementation.
+	 * @return The wrapped PartialViewContext from the RichFaces 4.0-4.3 ExtendedPartialViewContextImpl.
 	 */
 	public static PartialViewContext getRichFacesWrappedPartialViewContext() {
 		PartialViewContext richFacesContext = getRichFacesPartialViewContext();

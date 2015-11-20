@@ -145,13 +145,7 @@ public final class Ajax {
 	 * @since 1.3
 	 */
 	public static void updateRow(UIData table, int index) {
-		if (index < 0 || table.getRowCount() < 1 || table.getChildCount() == 0) {
-			return;
-		}
-
-		int rowCount = (table.getRows() == 0) ? table.getRowCount() : table.getRows();
-
-		if (index >= rowCount) {
+		if (index < 0 || table.getRowCount() < 1 || index >= table.getRowCount() || table.getChildCount() == 0) {
 			return;
 		}
 
@@ -165,12 +159,20 @@ public final class Ajax {
 		Collection<String> renderIds = getContext().getRenderIds();
 
 		for (UIComponent column : table.getChildren()) {
-			if (!(column instanceof UIColumn)) {
-				continue;
+			if (column instanceof UIColumn) {
+				for (UIComponent cell : column.getChildren()) {
+					renderIds.add(String.format("%s%c%d%c%s", tableId, separator, index, separator, cell.getId()));
+				}
 			}
+			else if (column instanceof UIData) { // <p:columns>.
+				String columnId = column.getId();
+				int columnCount = ((UIData) column).getRowCount();
 
-			for (UIComponent cell : column.getChildren()) {
-				renderIds.add(String.format("%s%c%d%c%s", tableId, separator, index, separator, cell.getId()));
+				for (UIComponent cell : column.getChildren()) {
+					for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+						renderIds.add(String.format("%s%c%d%c%s%c%d%c%s", tableId, separator, index, separator, columnId, separator, columnIndex, separator, cell.getId()));
+					}
+				}
 			}
 		}
 	}

@@ -13,14 +13,21 @@
 package org.omnifaces.component.input;
 
 import static java.lang.Boolean.FALSE;
+import static java.util.Arrays.asList;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeRequestParams;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeViewParams;
 import static org.omnifaces.component.input.Form.PropertyKeys.useRequestURI;
+import static org.omnifaces.util.Components.getParams;
 import static org.omnifaces.util.FacesLocal.getRequestQueryStringMap;
-import static org.omnifaces.util.FacesLocal.getRequestURIWithQueryString;
+import static org.omnifaces.util.FacesLocal.getRequestURI;
 import static org.omnifaces.util.FacesLocal.getViewParameterMap;
+import static org.omnifaces.util.Servlets.toQueryString;
+import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.faces.application.Application;
 import javax.faces.application.ApplicationWrapper;
@@ -33,6 +40,7 @@ import javax.faces.component.UIViewParameter;
 import javax.faces.context.FacesContext;
 import javax.faces.context.FacesContextWrapper;
 
+import org.omnifaces.component.ParamHolder;
 import org.omnifaces.taghandler.IgnoreValidationFailed;
 import org.omnifaces.util.State;
 
@@ -41,7 +49,8 @@ import org.omnifaces.util.State;
  * The <code>&lt;o:form&gt;</code> is a component that extends the standard <code>&lt;h:form&gt;</code> and provides a
  * way to keep view or request parameters in the request URL after a post-back and offers in combination with the
  * <code>&lt;o:ignoreValidationFailed&gt;</code> tag on an {@link UICommand} component the possibility to ignore
- * validation failures so that the invoke action phase will be executed anyway.
+ * validation failures so that the invoke action phase will be executed anyway. This component also supports adding
+ * query string parameters to the action URL via nested <code>&lt;f:param&gt;</code> and <code>&lt;o:param&gt;</code>.
  * <p>
  * You can use it the same way as <code>&lt;h:form&gt;</code>, you only need to change <code>h:</code> to
  * <code>o:</code>.
@@ -60,6 +69,9 @@ import org.omnifaces.util.State;
  * To solve this, this component offers an attribute <code>includeViewParams="true"</code> that will optionally include
  * all view parameters, in exactly the same way that this can be done for <code>&lt;h:link&gt;</code> and
  * <code>&lt;h:button&gt;</code>.
+ * <pre>
+ * &lt;o:form includeViewParams="true"&gt;
+ * </pre>
  * <p>
  * This setting is ignored when <code>includeRequestParams="true"</code> or <code>useRequestURI="true"</code> is used.
  *
@@ -67,6 +79,9 @@ import org.omnifaces.util.State;
  * <p>
  * As an alternative to <code>includeViewParams</code>, you can use <code>includeRequestParams="true"</code> to
  * optionally include the current GET request query string.
+ * <pre>
+ * &lt;o:form includeRequestParams="true"&gt;
+ * </pre>
  * <p>
  * This setting overrides the <code>includeViewParams</code>.
  * This setting is ignored when <code>useRequestURI="true"</code> is used.
@@ -77,8 +92,29 @@ import org.omnifaces.util.State;
  * <code>useRequestURI="true"</code> to use the current request URI, including with the GET request query string, if
  * any. This is particularly useful if you're using FacesViews or forwarding everything to 1 page. Otherwise, by default
  * the current view ID will be used.
+ * <pre>
+ * &lt;o:form useRequestURI="true"&gt;
+ * </pre>
  * <p>
  * This setting overrides the <code>includeViewParams</code> and <code>includeRequestParams</code>.
+ *
+ * <h3>Add query string parameters to action URL</h3>
+ * <p>
+ * The standard {@link UIForm} doesn't support adding query string parameters to the action URL. This component offers
+ * this possibility via nested <code>&lt;f:param&gt;</code> and <code>&lt;o:param&gt;</code>.
+ * <pre>
+ * &lt;o:form&gt;
+ *     &lt;f:param name="somename" value="somevalue" /&gt;
+ *     ...
+ * &lt;/o:form&gt;
+ * </pre>
+ * <p>
+ * This can be used in combination with <code>useRequestURI</code>, <code>includeViewParams</code> and
+ * <code>includeRequestParams</code>. The <code>&lt;f|o:param&gt;</code> will override any included view or request
+ * parameters on the same name. To conditionally add or override, use the <code>disabled</code> attribute of
+ * <code>&lt;f|o:param&gt;</code>.
+ * <p>
+ * The support was added in OmniFaces 2.2.
  *
  * <h3>Ignore Validation Failed</h3>
  * <p>
@@ -132,20 +168,37 @@ public class Form extends UIForm {
 
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
-		if (isUseRequestURI()) {
-			super.encodeBegin(new ActionURLDecorator(context, useRequestURI));
-		}
-		else if (isIncludeRequestParams()) {
-			super.encodeBegin(new ActionURLDecorator(context, includeRequestParams));
-		}
-		else if (isIncludeViewParams()) {
-			super.encodeBegin(new ActionURLDecorator(context, includeViewParams));
-		}
-		else {
-			super.encodeBegin(context);
-		}
+		super.encodeBegin(new ActionURLDecorator(context, this));
 	}
 
+	/**
+	 * Collect the necessary parameters for query string in action URL.
+	 */
+	private Map<String, List<String>> collectParams(FacesContext context) {
+		Map<String, List<String>> params;
+
+		if (isUseRequestURI() || isIncludeRequestParams()) {
+			params = getRequestQueryStringMap(context);
+		}
+		else if (isIncludeViewParams()) {
+			params = getViewParameterMap(context);
+		}
+		else {
+			params = new LinkedHashMap<String, List<String>>(0);
+		}
+
+		for (ParamHolder param : getParams(this)) {
+			Object value = param.getValue();
+
+			if (isEmpty(value)) {
+				continue;
+			}
+
+			params.put(param.getName(), asList(value.toString()));
+		}
+
+		return params;
+	}
 
 	// Getters/setters ------------------------------------------------------------------------------------------------
 
@@ -267,12 +320,12 @@ public class Form extends UIForm {
 	static class ActionURLDecorator extends FacesContextWrapper {
 
 		private final FacesContext facesContext;
-		private final PropertyKeys type;
+		private final Form form;
 
 
-		public ActionURLDecorator(FacesContext facesContext, PropertyKeys type) {
+		public ActionURLDecorator(FacesContext facesContext, Form form) {
 			this.facesContext = facesContext;
-			this.type = type;
+			this.form = form;
 		}
 
 		@Override
@@ -290,24 +343,14 @@ public class Form extends UIForm {
 						/**
 						 * The actual method we're decorating in order to either include the view parameters into the
 						 * action URL, or include the request parameters into the action URL, or use request URI as
-						 * action URL.
+						 * action URL. Any <code>&lt;f|o:param&gt;</code> nested in the form component will be included
+						 * in the query string, overriding any existing view or request parameters on same name.
 						 */
 						@Override
 						public String getActionURL(FacesContext context, String viewId) {
-							if (type == useRequestURI) {
-								return getRequestURIWithQueryString(context);
-							}
-							else if (type == includeRequestParams) {
-								return context.getExternalContext().encodeBookmarkableURL(
-									super.getActionURL(context, viewId), getRequestQueryStringMap(context));
-							}
-							else if (type == includeViewParams) {
-								return context.getExternalContext().encodeBookmarkableURL(
-									super.getActionURL(context, viewId), getViewParameterMap(context));
-							}
-							else {
-								return super.getActionURL(context, viewId);
-							}
+							String url = form.isUseRequestURI() ? getRequestURI(context) : super.getActionURL(context, viewId);
+							String queryString = toQueryString(form.collectParams(context));
+							return isEmpty(queryString) ? url : url + (url.contains("?") ? "&" : "?") + queryString;
 						}
 
 						@Override

@@ -12,6 +12,7 @@
  */
 package org.omnifaces.util;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.regex.Pattern.quote;
 import static javax.faces.application.ProjectStage.Development;
 import static javax.faces.application.ProjectStage.PROJECT_STAGE_JNDI_NAME;
@@ -28,7 +29,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,7 +44,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.omnifaces.filter.CacheControlFilter;
+import org.omnifaces.component.ParamHolder;
 
 /**
  * <p>
@@ -199,7 +199,7 @@ public final class Servlets {
 		String queryString = request.getQueryString();
 
 		if (isEmpty(queryString)) {
-			return Collections.<String, List<String>>emptyMap();
+			return new LinkedHashMap<String, List<String>>(0);
 		}
 
 		return toParameterMap(queryString);
@@ -269,6 +269,7 @@ public final class Servlets {
 
 	/**
 	 * Converts the given request parameter values map to request query string.
+	 * Empty names and null values will be skipped.
 	 * @param parameterMap The request parameter values map.
 	 * @return The request parameter values map as request query string.
 	 * @since 2.0
@@ -277,9 +278,17 @@ public final class Servlets {
 		StringBuilder queryString = new StringBuilder();
 
 		for (Entry<String, List<String>> entry : parameterMap.entrySet()) {
+			if (isEmpty(entry.getKey())) {
+				continue;
+			}
+
 			String name = encodeURL(entry.getKey());
 
 			for (String value : entry.getValue()) {
+				if (value == null) {
+					continue;
+				}
+
 				if (queryString.length() > 0) {
 					queryString.append("&");
 				}
@@ -289,6 +298,79 @@ public final class Servlets {
 		}
 
 		return queryString.toString();
+	}
+
+	/**
+	 * Converts the given parameter values list to request query string.
+	 * Empty names and null values will be skipped.
+	 * @param params The parameter values list.
+	 * @return The parameter values list as request query string.
+	 * @since 2.2
+	 */
+	public static String toQueryString(List<ParamHolder> params) {
+		StringBuilder queryString = new StringBuilder();
+
+		for (ParamHolder param : params) {
+			if (isEmpty(param.getName())) {
+				continue;
+			}
+
+			Object value = param.getValue();
+
+			if (value == null) {
+				continue;
+			}
+
+			if (queryString.length() > 0) {
+				queryString.append("&");
+			}
+
+			queryString.append(encodeURL(param.getName())).append("=").append(encodeURL(value.toString()));
+		}
+
+		return queryString.toString();
+	}
+
+	// HttpServletResponse --------------------------------------------------------------------------------------------
+
+	/**
+	 * <p>Set the cache headers. If the <code>expires</code> argument is larger than 0 seconds, then the following headers
+	 * will be set:
+	 * <ul>
+	 * <li><code>Cache-Control: public,max-age=[expiration time in seconds],must-revalidate</code></li>
+	 * <li><code>Expires: [expiration date of now plus expiration time in seconds]</code></li>
+	 * </ul>
+	 * <p>Else the method will delegate to {@link #setNoCacheHeaders(HttpServletResponse)}.
+	 * @param response The HTTP servlet response to set the headers on.
+	 * @param expires The expire time in seconds (not milliseconds!).
+	 * @since 2.2
+	 */
+	public static void setCacheHeaders(HttpServletResponse response, long expires) {
+		if (expires > 0) {
+			response.setHeader("Cache-Control", "public,max-age=" + expires + ",must-revalidate");
+			response.setDateHeader("Expires", System.currentTimeMillis() + SECONDS.toMillis(expires));
+			response.setHeader("Pragma", ""); // Explicitly set pragma to prevent container from overriding it.
+		}
+		else {
+			setNoCacheHeaders(response);
+		}
+	}
+
+	/**
+	 * <p>Set the no-cache headers. The following headers will be set:
+	 * <ul>
+	 * <li><code>Cache-Control: no-cache,no-store,must-revalidate</code></li>
+	 * <li><code>Expires: [expiration date of 0]</code></li>
+	 * <li><code>Pragma: no-cache</code></li>
+	 * </ul>
+	 * Set the no-cache headers.
+	 * @param response The HTTP servlet response to set the headers on.
+	 * @since 2.2
+	 */
+	public static void setNoCacheHeaders(HttpServletResponse response) {
+		response.setHeader("Cache-Control", "no-cache,no-store,must-revalidate");
+		response.setDateHeader("Expires", 0);
+		response.setHeader("Pragma", "no-cache"); // Backwards compatibility for HTTP 1.0.
 	}
 
 	// Cookies --------------------------------------------------------------------------------------------------------
@@ -527,7 +609,7 @@ public final class Servlets {
 		String redirectURL = prepareRedirectURL(request, url, paramValues);
 
 		if (isFacesAjaxRequest(request)) {
-			CacheControlFilter.setNoCacheHeaders(response);
+			setNoCacheHeaders(response);
 			response.setContentType("text/xml");
 			response.setCharacterEncoding(UTF_8.name());
 			response.getWriter().printf(FACES_AJAX_REDIRECT_XML, redirectURL);

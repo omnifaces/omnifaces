@@ -50,10 +50,10 @@ public final class Arrays {
 	}
 
 	/**
-	 * Creates and an integer array which starts at the given integer and ends at the given integer, inclusive. This is
-	 * useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows an integer range to
-	 * represent days and years. If the begin is greater than end, then the array will be decremental. If the begin
-	 * equals end, then the array will contain only one item.
+	 * Creates and returns an integer array which starts at the given integer and ends at the given integer, inclusive.
+	 * This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows an integer
+	 * range to represent days and years. If the begin is greater than end, then the array will be decremental. If the
+	 * begin equals end, then the array will contain only one item.
 	 * @param begin The begin integer.
 	 * @param end The end integer.
 	 * @return An integer array which starts at the given integer and ends at the given integer, inclusive

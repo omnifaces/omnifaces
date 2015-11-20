@@ -124,7 +124,7 @@
 	<function>
 		<description>
 			<![CDATA[
-				Format the given string with 1 parameter.
+				Format the given string with 1 parameter using <code>javax.text.MessageFormat</code> API.
 				Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
 				functions does not support varargs methods nor overloaded function names.
 			]]>
@@ -137,7 +137,7 @@
 	<function>
 		<description>
 			<![CDATA[
-				Format the given string with 2 parameters.
+				Format the given string with 2 parameters using <code>javax.text.MessageFormat</code> API.
 				Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
 				functions does not support varargs methods nor overloaded function names.
 			]]>
@@ -150,7 +150,7 @@
 	<function>
 		<description>
 			<![CDATA[
-				Format the given string with 3 parameters.
+				Format the given string with 3 parameters using <code>javax.text.MessageFormat</code> API.
 				Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
 				functions does not support varargs methods nor overloaded function names.
 			]]>
@@ -163,7 +163,7 @@
 	<function>
 		<description>
 			<![CDATA[
-				Format the given string with 4 parameters.
+				Format the given string with 4 parameters using <code>javax.text.MessageFormat</code> API.
 				Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
 				functions does not support varargs methods nor overloaded function names.
 			]]>
@@ -176,7 +176,7 @@
 	<function>
 		<description>
 			<![CDATA[
-				Format the given string with 5 parameters.
+				Format the given string with 5 parameters using <code>javax.text.MessageFormat</code> API.
 				Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
 				functions does not support varargs methods nor overloaded function names.
 			]]>
@@ -204,7 +204,7 @@
 	<function>
 		<description>
 			<![CDATA[
-				Creates and an integer array which starts at the given integer and ends at the given integer, inclusive. This is
+				Creates and returns an integer array which starts at the given integer and ends at the given integer, inclusive. This is
 				useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows an integer range to
 				represent days and years.
 			]]>

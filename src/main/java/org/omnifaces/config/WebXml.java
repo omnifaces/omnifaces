@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -193,11 +194,10 @@ public enum WebXml {
 
 	/**
 	 * Find for the given exception the right error page location. Exception types are matched as per Servlet 3.0
-	 * specification 10.9.2:
+	 * specification 10.9.2 with the exception that the given exception is already unwrapped:
 	 * <ul>
-	 *   <li>Make a first pass through all specific exception types. If an exact match is found, use its location.
-	 *   <li>Else make a second pass through all specific exception types in the order as they are declared in
-	 *       web.xml. If the current exception is an instance of it, then use its location.
+	 *   <li>Make a pass through all specific exception types. If a match is found in the exception class hierarchy,
+	 *       use its location. The closest match in the class hierarchy wins.
 	 *   <li>Else use the default error page location, which can be either the java.lang.Throwable or HTTP 500 or
 	 *       default one.
 	 * </ul>
@@ -206,20 +206,13 @@ public enum WebXml {
 	 */
 	public String findErrorPageLocation(Throwable exception) {
 		checkInitialized();
+		String location = null;
 
-		for (Entry<Class<Throwable>, String> entry : errorPageLocations.entrySet()) {
-			if (entry.getKey() == exception.getClass()) {
-				return entry.getValue();
-			}
+		for (Class<?> cls = exception.getClass(); cls != null && location == null; cls = cls.getSuperclass()) {
+		    location = errorPageLocations.get(cls);
 		}
 
-		for (Entry<Class<Throwable>, String> entry : errorPageLocations.entrySet()) {
-			if (entry.getKey() != null && entry.getKey().isInstance(exception)) {
-				return entry.getValue();
-			}
-		}
-
-		return errorPageLocations.get(null);
+		return (location == null) ? errorPageLocations.get(null) : location;
 	}
 
 	/**
@@ -432,7 +425,7 @@ public enum WebXml {
 	 */
 	@SuppressWarnings("unchecked") // For the cast on Class<Throwable>.
 	private static Map<Class<Throwable>, String> parseErrorPageLocations(Element webXml, XPath xpath) throws XPathExpressionException, ClassNotFoundException {
-		Map<Class<Throwable>, String> errorPageLocations = new LinkedHashMap<Class<Throwable>, String>();
+		Map<Class<Throwable>, String> errorPageLocations = new HashMap<Class<Throwable>, String>();
 		NodeList exceptionTypes = getNodeList(webXml, xpath, XPATH_EXCEPTION_TYPE);
 
 		for (int i = 0; i < exceptionTypes.getLength(); i++) {

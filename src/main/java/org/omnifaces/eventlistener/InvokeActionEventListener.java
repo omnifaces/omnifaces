@@ -48,7 +48,7 @@ import org.omnifaces.event.PreInvokeActionEvent;
  * the concrete functional requirement for which a <code>&lt;f:event type="preRenderView"&gt;</code> workaround is often
  * been used in JSF 2.0 and 2.1.
  * <p>
- * This event is not only supported on {@link UIViewRoot}, but it is also supported on {@link UIForm}, {@link UIInput}
+ * This event is supported on any {@link UIComponent}, including {@link UIViewRoot}, {@link UIForm}, {@link UIInput} and
  * {@link UICommand} components. This thus also provides the possibility to invoke multiple action listeners on a single
  * {@link UIInput} and {@link UICommand} component on an easy manner.
  * <p>
@@ -83,15 +83,19 @@ public class InvokeActionEventListener extends DefaultPhaseListener implements S
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns <code>true</code> only when the given source is an instance of {@link UIViewRoot}, {@link UIForm},
-	 * {@link UIInput} or {@link UICommand}.
+	 * Returns <code>true</code> only when the given source is an {@link UIComponent} which has listeners for
+	 * {@link PreInvokeActionEvent} or {@link PostInvokeActionEvent}.
 	 */
 	@Override
 	public boolean isListenerForSource(Object source) {
-		return source instanceof UIViewRoot
-			|| source instanceof UIForm
-			|| source instanceof UIInput
-			|| source instanceof UICommand;
+		if (!(source instanceof UIComponent)) {
+			return false;
+		}
+
+		UIComponent component = (UIComponent) source;
+
+		return !isEmpty(component.getListenersForEventClass(PreInvokeActionEvent.class))
+			|| !isEmpty(component.getListenersForEventClass(PostInvokeActionEvent.class));
 	}
 
 	/**

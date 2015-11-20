@@ -45,6 +45,7 @@ import javax.faces.context.FacesContextWrapper;
 import javax.faces.context.Flash;
 import javax.faces.context.PartialViewContext;
 import javax.faces.event.PhaseId;
+import javax.faces.render.RenderKit;
 import javax.faces.view.ViewDeclarationLanguage;
 import javax.faces.view.ViewMetadata;
 import javax.faces.view.facelets.FaceletContext;
@@ -463,6 +464,22 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the {@link RenderKit} associated with the "current" view ID or view handler.
+	 * <p>
+	 * The current view ID is the view ID that's set for the view root that's associated with the current faces context.
+	 * Or if there is none, then the current view handler will be assumed, which is the view handler that's associated
+	 * with the requested view.
+	 *
+	 * @return The {@link RenderKit} associated with the "current" view ID or view handler.
+	 * @since 2.2
+	 * @see UIViewRoot#getRenderKitId()
+	 * @see ViewHandler#calculateRenderKitId(FacesContext)
+	 */
+	public static RenderKit getRenderKit() {
+		return FacesLocal.getRenderKit(getContext());
+	}
+
+	/**
 	 * Normalize the given path as a valid view ID based on the current mapping, if necessary.
 	 * <ul>
 	 * <li>If the current mapping is a prefix mapping and the given path starts with it, then remove it.
@@ -571,9 +588,10 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns a list of all supported locales on this application, with the default locale as the first item, if any.
-	 * This will return an empty list if there are no locales definied in <code>faces-config.xml</code>.
-	 * @return A list of all supported locales on this application, with the default locale as the first item, if any.
+	 * Returns an unordered list of all supported locales on this application, with the default locale as the first
+	 * item, if any. This will return an empty list if there are no locales definied in <code>faces-config.xml</code>.
+	 * @return An unordered list of all supported locales on this application, with the default locale as the first
+	 * item, if any.
 	 * @see Application#getDefaultLocale()
 	 * @see Application#getSupportedLocales()
 	 */
@@ -1098,9 +1116,6 @@ public final class Faces {
 	 * <pre>
 	 * Faces.redirect("other.xhtml?foo=%s&amp;bar=%s", foo, bar);
 	 * </pre>
-	 * <p>
-	 * This method implicitly also calls {@link Flash#setRedirect(boolean)} with <code>true</code> so that any flash
-	 * scoped attributes will survive the redirect.
 	 * @param url The URL to redirect the current response to.
 	 * @param paramValues The request parameter values which you'd like to put URL-encoded in the given URL.
 	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
@@ -1127,9 +1142,6 @@ public final class Faces {
 	 * Faces.redirectPermanent("other.xhtml?foo=%s&amp;bar=%s", foo, bar);
 	 * </pre>
 	 * <p>
-	 * This method implicitly also calls {@link Flash#setRedirect(boolean)} with <code>true</code> so that any flash
-	 * scoped attributes will survive the redirect.
-	 * <p>
 	 * This method does by design not work on ajax requests. It is not possible to return a "permanent redirect" via
 	 * JSF ajax XML response.
 	 * @param url The URL to redirect the current response to.
@@ -1140,6 +1152,33 @@ public final class Faces {
 	 */
 	public static void redirectPermanent(String url, String... paramValues) {
 		FacesLocal.redirectPermanent(getContext(), url, paramValues);
+	}
+
+	/**
+	 * Refresh the current page by a GET request. This basically sends a temporary (302) redirect to current request
+	 * URI, without query string.
+	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
+	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @see ExternalContext#redirect(String)
+	 * @see HttpServletRequest#getRequestURI()
+	 * @since 2.2
+	 */
+	public static void refresh() throws IOException {
+		FacesLocal.refresh(getContext());
+	}
+
+	/**
+	 * Refresh the current page by a GET request, maintaining the query string. This basically sends a temporary (302)
+	 * redirect to current request URI, with the current query string.
+	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
+	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @see ExternalContext#redirect(String)
+	 * @see HttpServletRequest#getRequestURI()
+	 * @see HttpServletRequest#getQueryString()
+	 * @since 2.2
+	 */
+	public static void refreshWithQueryString() throws IOException {
+		FacesLocal.refreshWithQueryString(getContext());
 	}
 
 	/**

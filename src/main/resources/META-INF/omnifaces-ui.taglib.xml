@@ -1908,6 +1908,17 @@ public class ValidateValuesBean implements MultiFieldValidator {
 			<description>
 				<![CDATA[
 	                <p>
+					The default value to be used when actual value of the request parameter is <code>null</code> or empty.
+				]]>
+			</description>
+			<name>default</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					<p>
 
 	                MethodExpression representing a value change listener method
 	                that will be notified when a new value has been set for this
@@ -3011,7 +3022,7 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<description>
 			<![CDATA[
 				<p>The <code>&lt;o:importConstants&gt;</code> allows the developer to have a mapping of all constant field values of
-				the given type in the EL scope. The constant field values are those public static final fields. This works for
+				the given type in the request scope. The constant field values are those public static final fields. This works for
 				classes, interfaces and enums. For example:
 				<pre>
 public class Foo {
@@ -3028,7 +3039,7 @@ public enum Baz {
     BAZ1, BAZ2;
 }
 				</pre>
-				<p>The constant field values of the above types can be mapped into the EL scope as follows:
+				<p>The constant field values of the above types can be mapped into the request scope as follows:
 				<pre>
 &lt;o:importConstants type="com.example.Foo" /&gt;
 &lt;o:importConstants type="com.example.Bar" /&gt;
@@ -3036,7 +3047,7 @@ public enum Baz {
 ...
 #{Foo.FOO1}, #{Foo.FOO2}, #{Bar.BAR1}, #{Bar.BAR2}, #{Bazzz.BAZ1}, #{Bazzz.BAZ2}
 				</pre>
-				<p>The map is by default stored in the EL scope by the simple name of the type as variable name. You can override
+				<p>The map is by default stored in the request scope by the simple name of the type as variable name. You can override
 				this by explicitly specifying the <code>var</code> attribute, as demonstrated for <code>com.example.Baz</code> in
 				the above example.
 				<p>
@@ -3058,9 +3069,9 @@ public enum Baz {
 		<attribute>
 			<description>
 				<![CDATA[
-	               The name of the Facelet attribute which exposes the mapping of the constants in the EL scope.
-	            ]]>
-            </description>
+				   The name of the request attribute which exposes the mapping of the constants in the request scope.
+				]]>
+			</description>
 			<name>var</name>
 			<required>false</required>
 		</attribute>
@@ -3070,7 +3081,7 @@ public enum Baz {
 		<description>
 			<![CDATA[
 				<p>The <code>&lt;o:importFunctions&gt;</code> allows the developer to have access to all functions of the given
-				fully qualified name of a type in the EL scope using the usual EL functions syntax without the need to register them
+				fully qualified name of a type in the Facelet scope using the usual EL functions syntax without the need to register them
 				in <code>.taglib.xml</code> file. The functions are those <code>public static</code> methods with a
 				<strong>non</strong>-<code>void</code> return type. For example:
 				<pre>
@@ -3112,9 +3123,9 @@ public enum Baz {
 		<attribute>
 			<description>
 				<![CDATA[
-	               The EL functions prefix which exposes the functions in the EL scope.
-	            ]]>
-            </description>
+				   The EL functions prefix which exposes the functions in the Facelet scope.
+				]]>
+			</description>
 			<name>var</name>
 			<required>false</required>
 		</attribute>
@@ -3209,17 +3220,17 @@ public enum Baz {
 					This attribute is ignored when the 'value' attribute is unspecified.
 				]]>
 			</description>
-			<name>validateMethod</name>
+			<name>method</name>
 			<required>false</required>
 			<type>java.lang.String</type>
 		</attribute>
 		<attribute>
 			<description>
 				<![CDATA[
-					Set the bean copy strategy to use in case 'value' attribute is specified and the 'validateMethod' attribute is set (or defaulted) to 'validateCopy'.
+					Set the bean copy strategy to use in case 'value' attribute is specified and the 'method' attribute is set (or defaulted) to 'validateCopy'.
 					This can be either an EL expression referring a concrete instance, or a String representing the fully qualified name of the instance of the org.omnifaces.util.copier.Copier interface, which must be stateless and/or threadsafe.
 					If unspecified, then it defaults to the best possibility in this order: Cloneable, or Serializable, or copy constructor, or default constructor.
-					This attribute is ignored when the 'value' attribute is unspecified, or when the 'validateMethod' attribute is not set to 'validateCopy'.
+					This attribute is ignored when the 'value' attribute is unspecified, or when the 'method' attribute is not set to 'validateCopy'.
 				]]>
 			</description>
 			<name>copier</name>
@@ -3509,6 +3520,19 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 			<name>oncomplete</name>
 			<required>false</required>
 			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether the command script should automatically run inline during page load.
+					Note that this thus runs immediately at the moment the script is been interpreted by the web browser
+					and thus not in end of HTML body or during window load event. So if the script logic depends on the
+					HTML DOM tree composition, then it will depend on location of the command script component itself.
+				]]>
+			</description>
+			<name>autorun</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
 		</attribute>
 		<attribute>
 			<description>

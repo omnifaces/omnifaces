@@ -12,6 +12,7 @@
  */
 package org.omnifaces.util;
 
+import static java.util.Arrays.asList;
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 import static org.omnifaces.util.Servlets.prepareRedirectURL;
 import static org.omnifaces.util.Utils.encodeURL;
@@ -29,6 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -39,6 +41,7 @@ import java.util.Set;
 import javax.el.ELContext;
 import javax.el.ELResolver;
 import javax.el.ValueExpression;
+import javax.faces.FactoryFinder;
 import javax.faces.application.Application;
 import javax.faces.application.ProjectStage;
 import javax.faces.application.ViewHandler;
@@ -48,6 +51,8 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
 import javax.faces.event.PhaseId;
+import javax.faces.render.RenderKit;
+import javax.faces.render.RenderKitFactory;
 import javax.faces.view.ViewDeclarationLanguage;
 import javax.faces.view.ViewMetadata;
 import javax.faces.view.facelets.FaceletContext;
@@ -256,6 +261,16 @@ public final class FacesLocal {
 
 	/**
 	 * {@inheritDoc}
+	 * @see Faces#getRenderKit()
+	 */
+	public static RenderKit getRenderKit(FacesContext context) {
+		UIViewRoot view = context.getViewRoot();
+		String renderKitId = (view != null) ? view.getRenderKitId() : context.getApplication().getViewHandler().calculateRenderKitId(context);
+		return ((RenderKitFactory) FactoryFinder.getFactory(FactoryFinder.RENDER_KIT_FACTORY)).getRenderKit(context, renderKitId);
+	}
+
+	/**
+	 * {@inheritDoc}
 	 * @see Faces#normalizeViewId(String)
 	 */
 	public static String normalizeViewId(FacesContext context, String path) {
@@ -291,10 +306,10 @@ public final class FacesLocal {
 		Collection<UIViewParameter> viewParameters = getViewParameters(context);
 
 		if (viewParameters.isEmpty()) {
-			return Collections.<String, List<String>>emptyMap();
+			return new LinkedHashMap<String, List<String>>(0);
 		}
 
-		Map<String, List<String>> parameterMap = new HashMap<String, List<String>>();
+		Map<String, List<String>> parameterMap = new LinkedHashMap<String, List<String>>(viewParameters.size());
 
 		for (UIViewParameter viewParameter : viewParameters) {
 			String value = viewParameter.getStringValue(context);
@@ -302,7 +317,7 @@ public final class FacesLocal {
 			if (value != null) {
 				// <f:viewParam> doesn't support multiple values anyway, so having multiple <f:viewParam> on the
 				// same request parameter shouldn't end up in repeated parameters in action URL.
-				parameterMap.put(viewParameter.getName(), Collections.singletonList(value));
+				parameterMap.put(viewParameter.getName(), asList(value));
 			}
 		}
 
@@ -836,7 +851,7 @@ public final class FacesLocal {
 	 */
 	public static void redirect(FacesContext context, String url, String... paramValues) throws IOException {
 		ExternalContext externalContext = context.getExternalContext();
-		externalContext.getFlash().setRedirect(true);
+		externalContext.getFlash().setRedirect(true); // MyFaces also requires this for a redirect in current request (which is incorrect).
 		externalContext.redirect(prepareRedirectURL(getRequest(context), url, paramValues));
 	}
 
@@ -846,11 +861,27 @@ public final class FacesLocal {
 	 */
 	public static void redirectPermanent(FacesContext context, String url, String... paramValues) {
 		ExternalContext externalContext = context.getExternalContext();
-		externalContext.getFlash().setRedirect(true);
+		externalContext.getFlash().setRedirect(true); // MyFaces also requires this for a redirect in current request (which is incorrect).
 		externalContext.setResponseStatus(SC_MOVED_PERMANENTLY);
 		externalContext.setResponseHeader("Location", prepareRedirectURL(getRequest(context), url, paramValues));
 		externalContext.setResponseHeader("Connection", "close");
 		context.responseComplete();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Faces#refresh()
+	 */
+	public static void refresh(FacesContext context) throws IOException {
+		redirect(context, getRequestURI(context));
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Faces#refreshWithQueryString()
+	 */
+	public static void refreshWithQueryString(FacesContext context) throws IOException {
+		redirect(context, getRequestURIWithQueryString(context));
 	}
 
 	/**
@@ -1416,7 +1447,7 @@ public final class FacesLocal {
 		long size = Utils.stream(input, externalContext.getResponseOutputStream());
 
 		// This may be on time for files smaller than the default buffer size, but is otherwise ignored anyway.
-		if (contentLength == -1) {
+		if (contentLength == -1 && !externalContext.isResponseCommitted()) {
 			externalContext.setResponseHeader("Content-Length", String.valueOf(size));
 		}
 

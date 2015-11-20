@@ -79,7 +79,7 @@ public abstract class DynamicResource extends Resource {
 	@Override
 	public URL getURL() {
 		try {
-			// Yes, this returns a HTTP URL, not a classpath URL. There's no other way anyway as dynamic resources are not present in classpath..
+			// Yes, this returns a HTTP URL, not a classpath URL. There's no other way anyway as dynamic resources are not present in classpath.
 			return new URL(getRequestDomainURL() + getRequestPath());
 		}
 		catch (MalformedURLException e) {

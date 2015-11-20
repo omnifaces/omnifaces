@@ -63,6 +63,27 @@ public class SimpleParam implements ParamHolder {
 		this.converter = converter;
 	}
 
+	/**
+	 * Construct a simple param with name and value of given {@link UIParameter} component.
+	 * @param param The {@link UIParameter} to copy.
+	 * @since 2.2
+	 */
+	public SimpleParam(UIParameter param) {
+		name = param.getName();
+		value = param.getValue();
+	}
+
+	/**
+	 * Construct a simple param with name, value and converter of given {@link ParamHolder} instance.
+	 * @param param The {@link ParamHolder} to copy.
+	 * @since 2.2
+	 */
+	public SimpleParam(ParamHolder param) {
+		name = param.getName();
+		value = param.getLocalValue();
+		converter = param.getConverter();
+	}
+
 	// Getters/setters ------------------------------------------------------------------------------------------------
 
 	@Override

@@ -114,9 +114,17 @@ import javax.faces.render.RenderKitWrapper;
  * &lt;/h:inputText&gt;
  * </pre>
  *
+ * <h3>Deprecation</h3>
+ * <p>
+ * As per OmniFaces 2.2 (actually technically already since OmniFaces 2.0), this HTML5 render kit is deprecated. Users
+ * are encouraged to migrate to new JSF 2.2 support for passthrough attributes as described above. The HTML5 render kit
+ * is scheduled to be removed in a future OmniFaces 3.0 (for JSF 2.3).
+ *
  * @author Bauke Scholtz
  * @since 1.1
+ * @deprecated
  */
+@Deprecated
 public class Html5RenderKit extends RenderKitWrapper {
 
 	// Constants ------------------------------------------------------------------------------------------------------

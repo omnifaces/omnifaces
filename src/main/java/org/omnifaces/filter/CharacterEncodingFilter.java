@@ -70,7 +70,7 @@ import javax.servlet.http.HttpSession;
  *
  * <p><strong>See also</strong>:
  * <br><a href="http://code.google.com/p/primefaces/issues/detail?id=2223">PrimeFaces issue 2223</a>
- * <br><a href="http://stackoverflow.com/q/9634230/157882">Typing Chinese with PrimeFaces' &lt;p:editor&gt; component</a>
+ * <br><a href="http://stackoverflow.com/q/9634230/157882">Unicode input retrieved via PrimeFaces input components become corrupted</a>
  *
  * @author Bauke Scholtz
  * @since 1.2

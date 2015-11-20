@@ -86,6 +86,7 @@ public class ImportFunctions extends TagHandler {
 	private static final Map<String, Method> FUNCTIONS_CACHE = new ConcurrentHashMap<String, Method>();
 
 	private static final String ERROR_INVALID_VAR = "The 'var' attribute may not be an EL expression.";
+	private static final String ERROR_INVALID_FUNCTION = "Type '%s' does not have the function '%s'.";
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
@@ -122,7 +123,7 @@ public class ImportFunctions extends TagHandler {
 	 */
 	@Override
 	public void apply(FaceletContext context, UIComponent parent) throws IOException {
-		String type = typeAttribute.getValue(context);
+		final String type = typeAttribute.getValue(context);
 		final Class<?> cls = toClass(type);
 		final String var = (varValue != null) ? varValue : type.substring(type.lastIndexOf('.') + 1);
 		final FunctionMapper originalFunctionMapper = context.getFunctionMapper();
@@ -136,6 +137,11 @@ public class ImportFunctions extends TagHandler {
 
 					if (function == null) {
 						function = findMethod(cls, name);
+
+						if (function == null) {
+							throw new IllegalArgumentException(String.format(ERROR_INVALID_FUNCTION, type, name));
+						}
+
 						FUNCTIONS_CACHE.put(key, function);
 					}
 

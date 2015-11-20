@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <!-- 
    Copyright 2012 OmniFaces.
 
@@ -27,6 +27,7 @@
 
 	<application>
 		<view-handler>org.omnifaces.viewhandler.RestorableViewHandler</view-handler>
+		<resource-handler>org.omnifaces.resourcehandler.OmniVersionResourceHandler</resource-handler>
 		<system-event-listener>
 			<system-event-listener-class>org.omnifaces.VersionLoggerEventListener</system-event-listener-class>
 			<system-event-class>javax.faces.event.PostConstructApplicationEvent</system-event-class>

@@ -66,7 +66,7 @@ OmniFaces.FixViewState = (function() {
 
 		for (var i = 0; i < document.forms.length; i++) {
 			var form = document.forms[i];
-			var viewStateElement = getViewStateElement(form);
+			var viewStateElement = form[VIEW_STATE_PARAM];
 
 			if (form.method == "post" && !viewStateElement) {
 				// This POST form doesn't have a view state. This isn't right. Create it.
@@ -88,21 +88,6 @@ OmniFaces.FixViewState = (function() {
 		for (var i = 0; i < updates.length; i++) {
 			if (VIEW_STATE_REGEX.exec(updates[i].getAttribute("id"))) {
 				return updates[i].firstChild.nodeValue;
-			}
-		}
-
-		return null;
-	}
-
-	/**
-	 * Get the view state hidden input element from the given form.
-	 */
-	function getViewStateElement(form) {
-		var elements = form.elements;
-
-		for (var i = 0; i < elements.length; i++) {
-			if (elements[i].name == VIEW_STATE_PARAM) {
-				return elements[i];
 			}
 		}
 

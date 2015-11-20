@@ -80,10 +80,11 @@ import org.omnifaces.util.Hacks;
  * </pre>
  * <p>
  * And the {@link FacesServlet} needs to have an additional mapping <code>/javax.faces.resource/*</code> in
- * <code>web.xml</code>. For example, assuming that you've already a mapping on <code>*.xhtml</code>:
+ * <code>web.xml</code>. You can just add it as a new <code>&lt;url-pattern&gt;</code> entry to the existing mapping
+ * of the {@link FacesServlet}. For example, assuming that you've already a mapping on <code>*.xhtml</code>:
  * <pre>
  * &lt;servlet-mapping&gt;
- *     &lt;servlet-name&gt;facesServlet&lt;/servlet-name&gt;
+ *     ...
  *     &lt;url-pattern&gt;*.xhtml&lt;/url-pattern&gt;
  *     &lt;url-pattern&gt;/javax.faces.resource/*&lt;/url-pattern&gt;
  * &lt;/servlet-mapping&gt;
@@ -188,8 +189,11 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 		else if (path.contains("?")) {
 			return path.replace(mapping + "?", "?");
 		}
-		else {
+		else if (path.endsWith(mapping)) {
 			return path.substring(0, path.length() - mapping.length());
+		}
+		else {
+			return path;
 		}
 	}
 

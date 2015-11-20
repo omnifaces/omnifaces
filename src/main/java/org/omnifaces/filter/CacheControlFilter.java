@@ -15,9 +15,9 @@ package org.omnifaces.filter;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.HOURS;
 import static java.util.concurrent.TimeUnit.MINUTES;
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.omnifaces.util.Servlets.isFacesDevelopment;
 import static org.omnifaces.util.Servlets.isFacesResourceRequest;
+import static org.omnifaces.util.Servlets.setCacheHeaders;
 
 import java.io.IOException;
 
@@ -235,44 +235,6 @@ public class CacheControlFilter extends HttpFilter {
 		}
 
 		chain.doFilter(request, response);
-	}
-
-	/**
-	 * <p>Set the cache headers. If the <code>expires</code> argument is larger than 0 seconds, then the following headers
-	 * will be set:
-	 * <ul>
-	 * <li><code>Cache-Control: public,max-age=[expiration time in seconds],must-revalidate</code></li>
-	 * <li><code>Expires: [expiration date of now plus expiration time in seconds]</code></li>
-	 * </ul>
-	 * <p>Else the method will delegate to {@link #setNoCacheHeaders(HttpServletResponse)}.
-	 * @param response The HTTP servlet response to set the headers on.
-	 * @param expires The expire time in seconds (not milliseconds!).
-	 */
-	public static void setCacheHeaders(HttpServletResponse response, long expires) {
-		if (expires > 0) {
-			response.setHeader("Cache-Control", "public,max-age=" + expires + ",must-revalidate");
-			response.setDateHeader("Expires", System.currentTimeMillis() + SECONDS.toMillis(expires));
-			response.setHeader("Pragma", ""); // Explicitly set pragma to prevent container from overriding it.
-		}
-		else {
-			setNoCacheHeaders(response);
-		}
-	}
-
-	/**
-	 * <p>Set the no-cache headers. The following headers will be set:
-	 * <ul>
-	 * <li><code>Cache-Control: no-cache,no-store,must-revalidate</code></li>
-	 * <li><code>Expires: [expiration date of 0]</code></li>
-	 * <li><code>Pragma: no-cache</code></li>
-	 * </ul>
-	 * Set the no-cache headers.
-	 * @param response The HTTP servlet response to set the headers on.
-	 */
-	public static void setNoCacheHeaders(HttpServletResponse response) {
-		response.setHeader("Cache-Control", "no-cache,no-store,must-revalidate");
-		response.setDateHeader("Expires", 0);
-		response.setHeader("Pragma", "no-cache"); // Backwards compatibility for HTTP 1.0.
 	}
 
 }
