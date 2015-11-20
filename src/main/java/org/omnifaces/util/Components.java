@@ -104,7 +104,7 @@ import org.omnifaces.component.SimpleParam;
  * </pre>
  * <pre>
  * // Programmatically include composite component.
- * Components.includeCompositeComponent(someParentComponent, libraryName, resourceName, id);
+ * Components.includeCompositeComponent(someParentComponent, libraryName, tagName, id);
  * </pre>
  * <pre>
  * // Programmatically create value and action expressions.
@@ -594,7 +594,7 @@ public final class Components {
 	 * Create and include the composite component of the given library and resource name as child of the given UI
 	 * component parent and return the created composite component.
 	 * This has the same effect as using <code>xmlns:my="http://xmlns.jcp.org/jsf/composite/libraryName</code> and
-	 * <code>&lt;my:resourceName&gt;</code>. The given component ID must be unique relative to the current naming
+	 * <code>&lt;my:tagName&gt;</code>. The given component ID must be unique relative to the current naming
 	 * container parent and is mandatory for functioning of input components inside the composite, if any.
 	 * @param parent The parent component to include the composite component in.
 	 * @param libraryName The library name of the composite component (path after "http://xmlns.jcp.org/jsf/composite/").
@@ -611,7 +611,7 @@ public final class Components {
 	 * Create and include the composite component of the given library and resource name as child of the given UI
 	 * component parent, set the given attributes on it and return the created composite component.
 	 * This has the same effect as using <code>xmlns:my="http://xmlns.jcp.org/jsf/composite/libraryName</code> and
-	 * <code>&lt;my:resourceName&gt;</code>. The given component ID must be unique relative to the current naming
+	 * <code>&lt;my:tagName&gt;</code>. The given component ID must be unique relative to the current naming
 	 * container parent and is mandatory for functioning of input components inside the composite, if any.
 	 * <p>
 	 * The attribute values must represent literal values or literal EL expressions, exactly like as you would declare
