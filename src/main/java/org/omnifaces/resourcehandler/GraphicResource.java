@@ -250,7 +250,8 @@ public class GraphicResource extends DynamicResource {
 	 * This must return an unique and URL-safe identifier of the bean+method+type without any periods.
 	 */
 	private static String getResourceName(MethodReference methodReference, String type) {
-		return methodReference.getBase().getClass().getSimpleName() + "_" + methodReference.getMethod().getName()
+		return methodReference.getBase().getClass().getSimpleName().replaceAll("\\W", "")
+			+ "_" + methodReference.getMethod().getName()
 			+ (isEmpty(type) ? "" : ("_" + type));
 	}
 
