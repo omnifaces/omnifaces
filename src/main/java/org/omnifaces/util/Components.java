@@ -107,7 +107,7 @@ import org.omnifaces.component.SimpleParam;
  * </pre>
  * <pre>
  * // Programmatically include composite component.
- * Components.includeCompositeComponent(someParentComponent, libraryName, resourceName, id);
+ * Components.includeCompositeComponent(someParentComponent, libraryName, tagName, id);
  * </pre>
  * <pre>
  * // Programmatically create value and action expressions.
