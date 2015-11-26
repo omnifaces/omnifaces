@@ -9,9 +9,9 @@
 
 	<groupId>org.omnifaces</groupId>
 	<artifactId>omnifaces</artifactId>
-	<version>1.12</version>
+	<version>1.12.1</version>
 	<packaging>jar</packaging>
-	
+
 	<name>OmniFaces</name>
 	<description>JSF 2.x utility library</description>
 	<url>http://omnifaces.org</url>
