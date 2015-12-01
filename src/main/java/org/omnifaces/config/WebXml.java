@@ -305,11 +305,11 @@ public enum WebXml {
 	}
 
 	private static boolean isPrefixMatch(String urlPattern, String url) {
-		return urlPattern.endsWith("/*") ? url.startsWith(urlPattern.substring(0, urlPattern.length() - 2)) : false;
+		return urlPattern.endsWith("/*") && (url + "/").startsWith(urlPattern.substring(0, urlPattern.length() - 1));
 	}
 
 	private static boolean isSuffixMatch(String urlPattern, String url) {
-		return urlPattern.startsWith("*.") ? url.endsWith(urlPattern.substring(1)) : false;
+		return urlPattern.startsWith("*.") && url.endsWith(urlPattern.substring(1));
 	}
 
 	private static boolean isRoleMatch(Set<String> roles, String role) {
