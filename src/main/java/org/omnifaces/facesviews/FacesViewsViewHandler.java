@@ -52,6 +52,12 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 	}
 
 	@Override
+	public String deriveLogicalViewId(FacesContext context, String viewId) {
+		Map<String, String> mappedResources = getApplicationAttribute(context, FACES_VIEWS_RESOURCES);
+		return mappedResources.containsKey(viewId) ? super.deriveLogicalViewId(context, viewId) : viewId;
+	}
+
+	@Override
 	public String getActionURL(FacesContext context, String viewId) {
 
 		String actionURL = super.getActionURL(context, viewId);
