@@ -4798,7 +4798,7 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 					close reason code if an error occurred and which one (i.e. when the code is not 1000). See also
 					<a href="http://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and
 					<a href="http://docs.oracle.com/javaee/7/api/javax/websocket/CloseReason.CloseCodes.html">CloseCodes</a> API
-					for an elaborate list.
+					for an elaborate list of all close codes.
 				]]>
 			</description>
 			<name>onclose</name>

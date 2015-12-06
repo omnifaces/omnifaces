@@ -56,7 +56,7 @@ import org.omnifaces.util.Json;
  * }
  * </pre>
  * <p>
- * Here's an example which declares an inline <code>onmessage</code> JS listener function.
+ * Here's an example which declares an inline JS listener function.
  * <pre>
  * &lt;o:socket channel="global" onmessage="function(message) { console.log(message); }" /&gt;
  * </pre>
@@ -65,11 +65,13 @@ import org.omnifaces.util.Json;
  * <ul>
  * <li><code>message</code>: the push message as JSON object.</li>
  * <li><code>channel</code>: the channel name, useful in case you intend to have a global listener.</li>
- * <li><code>event</code>: the raw <code>MessageEvent</code> instance, useful in case you intend to inspect it.</li>
+ * <li><code>event</code>: the raw <a href="https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent"><code>
+ * MessageEvent</code></a> instance, useful in case you intend to inspect it.</li>
  * </ul>
  * <p>
- * You can explicitly close the channel from client side by invoking <code>OmniFaces.Push.close(channel)</code>, passing
- * the channel name. For example, in the <code>onmessage</code> JS listener function as below:
+ * The web socket is by default open as long as the page is open. You can optionally explicitly close the channel from
+ * client side by invoking <code>OmniFaces.Push.close(channel)</code>, passing the channel name. For example, in the
+ * <code>onmessage</code> JS listener function as below:
  * <pre>
  * function socketListener(message, channel) {
  *     console.log(message);
@@ -78,7 +80,7 @@ import org.omnifaces.util.Json;
  * }
  * </pre>
  * <p>
- * The optional <code>onclose</code> JS listener can be used to listen on (ab)normal close of a web socket.
+ * The optional <code>onclose</code> JS listener function can be used to listen on (ab)normal close of a web socket.
  * <pre>
  * &lt;o:socket ... onclose="socketCloseListener" /&gt;
  * </pre>
@@ -94,13 +96,14 @@ import org.omnifaces.util.Json;
  * <p>
  * The <code>onclose</code> JS listener function will be invoked with three arguments:
  * <ul>
- * <li><code>code</code>: the close reason code as unsigned short. If this is <code>-1</code>, then the web socket
+ * <li><code>code</code>: the close reason code as integer. If this is <code>-1</code>, then the web socket
  * is simply not supported by the client. If this is <code>1000</code>, then it was normally closed. Else if this is not
  * <code>1000</code>, then there may be an error. See also
  * <a href="http://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and {@link CloseCodes} API for
- * an elaborate list.</li>
+ * an elaborate list of all close codes.</li>
  * <li><code>channel</code>: the channel name, useful in case you intend to have a global listener.</li>
- * <li><code>event</code>: the raw <code>CloseEvent</code> instance, useful in case you intend to inspect it.</li>
+ * <li><code>event</code>: the raw <a href="https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent"><code>
+ * CloseEvent</code> instance, useful in case you intend to inspect it.</li>
  * </ul>
  *
  * <h3>Usage (server)</h3>
@@ -124,13 +127,17 @@ import org.omnifaces.util.Json;
  *
  * <h3>Channel name design hints</h3>
  * <p>
+ * With the channel name you can less or more specify the desired push scope. With a static channel name, basically
+ * anyone having a push socket open on the same channel will receive the same push message. This is OK for global push
+ * messages, but this may not be OK for push messages with sensitive information restricted to specific user(s).
+ * <p>
  * To send a push message to a specific user session, append the session ID to channel ID.
  * <pre>
- * &lt;o:socket channel="session_#{session.id}" ... /&gt;
+ * &lt;o:socket channel="foo_#{session.id}" ... /&gt;
  * </pre>
  * <pre>
  * public void sendMessage(Object message) {
- *     pushContext.send("session_" + Faces.getSessionId(), message);
+ *     pushContext.send("foo_" + Faces.getSessionId(), message);
  * }
  * </pre>
  * <p>
@@ -168,6 +175,9 @@ import org.omnifaces.util.Json;
  * <p>
  * Finally just {@link Observes} it in some CDI managed bean in WAR and delegate to {@link PushContext} as below.
  * <pre>
+ * &#64;Inject
+ * private PushContext pushContext;
+ *
  * public void onPushEvent(@Observes PushEvent event) {
  *     pushContext.send("someChannel", event.getMessage());
  * }
@@ -176,8 +186,9 @@ import org.omnifaces.util.Json;
  * <h3>UI update design hints</h3>
  * <p>
  * In case you'd like to perform complex UI updates, which would be a piece of cake with JSF ajax, then easiest would
- * be to combine push with <code>&lt;o:commandScript&gt;</code> or perhaps <code>&lt;p:remoteCommand&gt;</code> or
- * similar which simply invokes a bean action and ajax-updates the UI. The combination may then look like below:
+ * be to combine <code>&lt;o:socket&gt;</code> with <code>&lt;o:commandScript&gt;</code> or perhaps
+ * <code>&lt;p:remoteCommand&gt;</code> or similar which simply invokes a bean action and ajax-updates the UI. The
+ * combination may then look like below:
  * <pre>
  * &lt;h:panelGroup id="foo"&gt;
  *     ... (some complex UI here) ...
