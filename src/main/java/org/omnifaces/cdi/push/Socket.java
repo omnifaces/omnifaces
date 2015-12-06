@@ -103,7 +103,7 @@ import org.omnifaces.util.Json;
  * an elaborate list of all close codes.</li>
  * <li><code>channel</code>: the channel name, useful in case you intend to have a global listener.</li>
  * <li><code>event</code>: the raw <a href="https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent"><code>
- * CloseEvent</code> instance, useful in case you intend to inspect it.</li>
+ * CloseEvent</code></a> instance, useful in case you intend to inspect it.</li>
  * </ul>
  *
  * <h3>Usage (server)</h3>
