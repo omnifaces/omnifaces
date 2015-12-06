@@ -78,6 +78,12 @@
 			<version>1.1</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>javax.websocket</groupId>
+			<artifactId>javax.websocket-api</artifactId>
+			<version>1.0</version>
+			<scope>provided</scope>
+		</dependency>
 		
 		<!-- Java EE 6 dependencies -->
 		<dependency>
