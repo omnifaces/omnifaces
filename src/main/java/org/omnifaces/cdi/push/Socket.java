@@ -64,17 +64,19 @@ import org.omnifaces.util.Json;
  * The <code>onmessage</code> JS listener function will be invoked with three arguments:
  * <ul>
  * <li><code>message</code>: the push message as JSON object.</li>
- * <li><code>channel</code>: the channel name, useful in case you intend to have a global listener.</li>
+ * <li><code>channel</code>: the channel name, useful in case you intend to have a global listener, or want to manually
+ * control the close.</li>
  * <li><code>event</code>: the raw <a href="https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent"><code>
  * MessageEvent</code></a> instance, useful in case you intend to inspect it.</li>
  * </ul>
  * <p>
- * The web socket is by default open as long as the page is open. You can optionally explicitly close the channel from
- * client side by invoking <code>OmniFaces.Push.close(channel)</code>, passing the channel name. For example, in the
- * <code>onmessage</code> JS listener function as below:
+ * The web socket is by default open as long as the document is open. It will be implicitly closed once the document is
+ * unloaded (e.g. navigating away, close of browser window/tab, etc). In case you intend to have an one-time push,
+ * usually because you only wanted to present the result of an one-time asynchronous action, you can optionally
+ * explicitly close the channel from client side by invoking <code>OmniFaces.Push.close(channel)</code>, passing the
+ * channel name. For example, in the <code>onmessage</code> JS listener function as below:
  * <pre>
  * function socketListener(message, channel) {
- *     console.log(message);
  *     // ...
  *     OmniFaces.Push.close(channel);
  * }
@@ -197,6 +199,9 @@ import org.omnifaces.util.Json;
  * &lt;o:socket channel="someChannel" onmessage="someCommandScript" /&gt;
  * &lt;o:commandScript name="someCommandScript" action="#{bean.pushed}" render="foo" /&gt;
  * </pre>
+ * <p>
+ * If you pass a <code>Map&lt;K,V&gt;</code> or a JavaBean as push message object, then all entries/properties will
+ * transparently be available as request parameters in the command script method <code>#{bean.pushed}</code>.
  *
  * @author Bauke Scholtz
  * @see SocketEndpoint
