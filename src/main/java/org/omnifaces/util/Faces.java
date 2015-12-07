@@ -822,6 +822,19 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns whether the current request is an ajax request with partial rendering. That is, when it's an ajax request
+	 * without <code>render="@all"</code>.
+	 * @return <code>true</code> for an ajax request with partial rendering, <code>false</code> an ajax request with
+	 * <code>render="@all"</code> or a non-ajax (synchronous) request.
+	 * @see PartialViewContext#isAjaxRequest()
+	 * @see PartialViewContext#isRenderAll()
+	 * @since 2.3
+	 */
+	public static boolean isAjaxRequestWithPartialRendering() {
+		return FacesLocal.isAjaxRequestWithPartialRendering(getContext());
+	}
+
+	/**
 	 * Returns whether the current request is a postback.
 	 * @return <code>true</code> for a postback, <code>false</code> for a non-postback (GET) request.
 	 * @see FacesContext#isPostback()

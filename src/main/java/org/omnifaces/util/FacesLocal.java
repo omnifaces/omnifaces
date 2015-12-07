@@ -51,6 +51,7 @@ import javax.faces.component.UIViewRoot;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
+import javax.faces.context.PartialViewContext;
 import javax.faces.event.PhaseId;
 import javax.faces.render.RenderKit;
 import javax.faces.render.RenderKitFactory;
@@ -645,6 +646,15 @@ public final class FacesLocal {
 	 */
 	public static boolean isAjaxRequest(FacesContext context) {
 		return context.getPartialViewContext().isAjaxRequest();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Faces#isAjaxRequestWithPartialRendering()
+	 */
+	public static boolean isAjaxRequestWithPartialRendering(FacesContext context) {
+		PartialViewContext pvc = context.getPartialViewContext();
+		return pvc.isAjaxRequest() && !pvc.isRenderAll();
 	}
 
 	/**
