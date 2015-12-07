@@ -40,7 +40,7 @@ public class SocketEndpoint {
 	 */
 	@OnOpen
 	public void open(Session session, @PathParam("channel") String channel) {
-		BeanManager.INSTANCE.getReference(PushContextImpl.class).add(session, channel); // @Inject in @ServerEndpoint doesn't work in Tomcat+Weld.
+		BeanManager.INSTANCE.getReference(SocketPushContext.class).add(session, channel); // @Inject in @ServerEndpoint doesn't work in Tomcat+Weld.
 	}
 
 	/**
@@ -49,7 +49,7 @@ public class SocketEndpoint {
 	 */
 	@OnClose
 	public void close(Session session) {
-		BeanManager.INSTANCE.getReference(PushContextImpl.class).remove(session); // @Inject in @ServerEndpoint doesn't work in Tomcat+Weld.
+		BeanManager.INSTANCE.getReference(SocketPushContext.class).remove(session); // @Inject in @ServerEndpoint doesn't work in Tomcat+Weld.
 	}
 
 }

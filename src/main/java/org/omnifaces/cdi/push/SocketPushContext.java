@@ -36,7 +36,7 @@ import org.omnifaces.util.Json;
  * @since 2.3
  */
 @ApplicationScoped
-public class PushContextImpl implements PushContext {
+public class SocketPushContext implements PushContext {
 
 	private static final ConcurrentMap<String, Set<Session>> SESSIONS = new ConcurrentHashMap<>();
 

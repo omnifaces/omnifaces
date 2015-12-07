@@ -201,7 +201,7 @@ import org.omnifaces.util.Json;
  * @author Bauke Scholtz
  * @see SocketEndpoint
  * @see PushContext
- * @see PushContextImpl
+ * @see SocketPushContext
  * @since 2.3
  */
 public class Socket extends TagHandler {
