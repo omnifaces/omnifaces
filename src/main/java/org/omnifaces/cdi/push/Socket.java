@@ -12,11 +12,14 @@
  */
 package org.omnifaces.cdi.push;
 
+import static java.lang.Boolean.TRUE;
+import static org.omnifaces.util.Ajax.oncomplete;
 import static org.omnifaces.util.Components.addScriptResourceToHead;
 import static org.omnifaces.util.Components.addScriptToBody;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
 import static org.omnifaces.util.Facelets.getValueExpression;
-import static org.omnifaces.util.Faces.getRequestContextPath;
+import static org.omnifaces.util.FacesLocal.getRequestContextPath;
+import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
@@ -26,7 +29,9 @@ import javax.el.ValueExpression;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
 import javax.faces.event.PostAddToViewEvent;
+import javax.faces.event.PreRenderViewEvent;
 import javax.faces.view.facelets.ComponentHandler;
 import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagAttribute;
@@ -290,16 +295,38 @@ public class Socket extends TagHandler {
 
 		String onmessageFunction = quoteIfNecessary(onmessage.getValue(context));
 		String oncloseFunction = (onclose != null) ? quoteIfNecessary(onclose.getValue(context)) : null;
-		final String functions = onmessageFunction + (oncloseFunction != null ? ("," + oncloseFunction) : "");
-		final ValueExpression rendered = getValueExpression(context, enabled, Boolean.class);
+		String functions = onmessageFunction + (oncloseFunction != null ? ("," + oncloseFunction) : "");
 
+		final ValueExpression rendered = getValueExpression(context, enabled, Boolean.class);
+		final String script = String.format(SCRIPT, getRequestContextPath(context.getFacesContext()), name, functions);
+
+		// Given the component events below, it's after all cleaner if this were an UIComponent instead of a TagHandler.
+		// TODO: Perhaps change to UIComponent. Would also enable referencing it in ajax updates instead of a parent.
 		subscribeToViewEvent(PostAddToViewEvent.class, new Callback.SerializableVoid() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void invoke() {
 				addScriptResourceToHead("omnifaces", "omnifaces.js");
-				addScriptToBody(String.format(SCRIPT, getRequestContextPath(), name, functions)).setValueExpression("rendered", rendered);
+
+			}
+		});
+
+		subscribeToViewEvent(PreRenderViewEvent.class, new Callback.SerializableVoid() {
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public void invoke() {
+				FacesContext context = FacesContext.getCurrentInstance();
+
+				if (TRUE.equals(rendered.getValue(context.getELContext()))) {
+					if (isAjaxRequestWithPartialRendering(context)) {
+						oncomplete(script);
+					}
+					else {
+						addScriptToBody(script);
+					}
+				}
 			}
 		});
 	}
