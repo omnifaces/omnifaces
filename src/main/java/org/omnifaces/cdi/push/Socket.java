@@ -184,6 +184,35 @@ import org.omnifaces.util.Json;
  *     pushContext.send("someChannel", event.getMessage());
  * }
  * </pre>
+ * <p>
+ * The alternative would be to make use of callbacks. Let the business service method take a callback instance as
+ * argument, e.g {@link Runnable}.
+ * <pre>
+ * &#64;Asynchronous
+ * public void someAsyncServiceMethod(Entity entity, Runnable callback) {
+ *     // ... (some long process)
+ *     entity.setSomeProperty(someProperty);
+ *     callback.run();
+ * }
+ * </pre>
+ * <p>
+ * And invoke the service method as below.
+ * <pre>
+ * &#64;Inject
+ * private SomeService someService;
+ *
+ * &#64;Inject
+ * private PushContext pushContext;
+ *
+ * public void submit() {
+ *     someService.someAsyncServiceMethod(entity, new Runnable() {
+ *         public void run() {
+ *             pushContext.send("someChannel", entity.getSomeProperty());
+ *         }
+ *     });
+ * }
+ * </pre>
+ *
  *
  * <h3>UI update design hints</h3>
  * <p>
