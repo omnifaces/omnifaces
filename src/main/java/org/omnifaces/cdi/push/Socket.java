@@ -44,7 +44,7 @@ import org.omnifaces.util.Json;
 
 /**
  * <p>
- * Creates a web socket based push connection in client side which can be reached via {@link PushContext}.
+ * Creates an one-way web socket based push connection in client side which can be reached via {@link PushContext}.
  *
  * <h3>Usage (client)</h3>
  * <p>
@@ -131,6 +131,11 @@ import org.omnifaces.util.Json;
  * <code>onmessage</code> JavaScript listener function associated with the <code>channel</code> name. It can be a
  * plain vanilla <code>String</code>, but it can also be a collection, map and even a javabean. For supported argument
  * types, see also {@link Json#encode(Object)}.
+ * <p>
+ * The push is one-way, from server to client. In case you intend to send some data from client to server, just continue
+ * using Ajax the usual way, if necessary with <code>&lt;o:commandScript&gt;</code> or perhaps
+ * <code>&lt;p:remoteCommand&gt;</code> or similar. This has among others the advantage of maintaining the JSF view
+ * state.
  *
  * <h3>Channel name design hints</h3>
  * <p>
@@ -168,19 +173,36 @@ import org.omnifaces.util.Json;
  *
  * <h3>EJB design hints</h3>
  * <p>
- * In case you'd like to trigger a push from EAR/EJB side, make use of CDI events. First create a custom bean class
- * representing the push event something like <code>PushEvent</code> taking whatever you'd like to pass as push message.
+ * In case you'd like to trigger a push from EAR/EJB side, you could make use of CDI events. First create a custom bean
+ * class representing the push event something like <code>PushEvent</code> taking whatever you'd like to pass as push
+ * message.
+ * <pre>
+ * public class PushEvent {
+ *
+ *     private String message;
+ *
+ *     public PushEvent(String message) {
+ *         this.message = message;
+ *     }
+ *
+ *     public String getMessage() {
+ *         return message;
+ *     }
+ * }
+ * </pre>
+ * <p>
  * Then use {@link BeanManager#fireEvent(Object, java.lang.annotation.Annotation...)} to fire the CDI event.
  * <pre>
  * &#64;Inject
  * private BeanManager beanManager;
  *
  * public void onSomeEntityChange(Entity entity) {
- *     beanManager.fireEvent(new PushEvent(entity));
+ *     beanManager.fireEvent(new PushEvent(entity.getSomeProperty()));
  * }
  * </pre>
  * <p>
- * Finally just {@link Observes} it in some CDI managed bean in WAR and delegate to {@link PushContext} as below.
+ * Finally just {@link Observes} it in some request or application scoped CDI managed bean in WAR and delegate to
+ * {@link PushContext} as below.
  * <pre>
  * &#64;Inject
  * private PushContext pushContext;
@@ -189,6 +211,11 @@ import org.omnifaces.util.Json;
  *     pushContext.send("someChannel", event.getMessage());
  * }
  * </pre>
+ * <p>
+ * Note that a request scoped bean wouldn't be the same one as from the originating page for the simple reason that
+ * there's no means of a HTTP request anywhere at that moment. For exactly this reason a view and session scoped bean
+ * would not work at all (as they require respectively the JSF view state and HTTP session which can only be identified
+ * by a HTTP request). Also, the {@link FacesContext} will be unavailable in the method.
  * <p>
  * The alternative would be to make use of callbacks. Let the business service method take a callback instance as
  * argument, e.g {@link Runnable}.
@@ -217,14 +244,19 @@ import org.omnifaces.util.Json;
  *     });
  * }
  * </pre>
- *
+ * <p>
+ * This would be the only way in case you intend to pass something from {@link FacesContext} or the initial
+ * request/view/session scope along as (<code>final</code>) argument.
+ * <p>
+ * Note that OmniFaces {@link Callback} interfaces are insuitable as you're not supposed to use WAR (front end)
+ * frameworks and libraries like JSF and OmniFaces in EAR/EJB (back end) side!
  *
  * <h3>UI update design hints</h3>
  * <p>
  * In case you'd like to perform complex UI updates, which would be a piece of cake with JSF ajax, then easiest would
  * be to combine <code>&lt;o:socket&gt;</code> with <code>&lt;o:commandScript&gt;</code> or perhaps
- * <code>&lt;p:remoteCommand&gt;</code> or similar which simply invokes a bean action and ajax-updates the UI. The
- * combination may then look like below:
+ * <code>&lt;p:remoteCommand&gt;</code> or similar which simply invokes a bean action and ajax-updates the UI once a
+ * push message arrives. The combination can look like below:
  * <pre>
  * &lt;h:panelGroup id="foo"&gt;
  *     ... (some complex UI here) ...
@@ -234,7 +266,7 @@ import org.omnifaces.util.Json;
  * &lt;o:commandScript name="someCommandScript" action="#{bean.pushed}" render="foo" /&gt;
  * </pre>
  * <p>
- * If you pass a <code>Map&lt;K,V&gt;</code> or a JavaBean as push message object, then all entries/properties will
+ * If you pass a <code>Map&lt;String,V&gt;</code> or a JavaBean as push message object, then all entries/properties will
  * transparently be available as request parameters in the command script method <code>#{bean.pushed}</code>.
  *
  * @author Bauke Scholtz
