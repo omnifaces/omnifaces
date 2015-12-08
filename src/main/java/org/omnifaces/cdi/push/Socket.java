@@ -44,7 +44,8 @@ import org.omnifaces.util.Json;
 
 /**
  * <p>
- * Creates an one-way web socket based push connection in client side which can be reached via {@link PushContext}.
+ * Opens an one-way (server to client) web socket based push connection in client side which can be reached from
+ * server side via {@link PushContext} interface injected in any CDI/container managed artifact.
  *
  * <h3>Usage (client)</h3>
  * <p>
@@ -78,8 +79,8 @@ import org.omnifaces.util.Json;
  * The web socket is by default open as long as the document is open. It will be implicitly closed once the document is
  * unloaded (e.g. navigating away, close of browser window/tab, etc). In case you intend to have an one-time push,
  * usually because you only wanted to present the result of an one-time asynchronous action, you can optionally
- * explicitly close the channel from client side by invoking <code>OmniFaces.Push.close(channel)</code>, passing the
- * channel name. For example, in the <code>onmessage</code> JS listener function as below:
+ * explicitly close the push connection from client side by invoking <code>OmniFaces.Push.close(channel)</code>, passing
+ * the channel name. For example, in the <code>onmessage</code> JS listener function as below:
  * <pre>
  * function socketListener(message, channel) {
  *     // ...
@@ -136,6 +137,19 @@ import org.omnifaces.util.Json;
  * using Ajax the usual way, if necessary with <code>&lt;o:commandScript&gt;</code> or perhaps
  * <code>&lt;p:remoteCommand&gt;</code> or similar. This has among others the advantage of maintaining the JSF view
  * state.
+ *
+ * <h3>Conditionally enabling push</h3>
+ * <p>
+ * You can use the <code>enabled</code> attribute for that.
+ * <pre>
+ * &lt;o:socket ... enabled="#{bean.pushable}" /&gt;
+ * </pre>
+ * <p>
+ * It defaults to <code>true</code> and it's interpreted as a script instruction to open the web socket push connection.
+ * If it becomes <code>false</code> during an ajax request, then the push connection will explicitly be closed during
+ * the complete of that ajax request, even though you did not cover the <code>&lt;o:socket&gt;</code> tag in ajax
+ * render/update. So make sure it's tied to at least a view scoped property in case you intend to control it during the
+ * view scope.
  *
  * <h3>Channel name design hints</h3>
  * <p>
@@ -269,18 +283,6 @@ import org.omnifaces.util.Json;
  * If you pass a <code>Map&lt;String,V&gt;</code> or a JavaBean as push message object, then all entries/properties will
  * transparently be available as request parameters in the command script method <code>#{bean.pushed}</code>.
  *
- * <h3>Conditionally enabling push</h3>
- * <p>
- * You can use the <code>enabled</code> attribute for that.
- * <pre>
- * &lt;o:socket ... enabled="#{bean.pushable}" /&gt;
- * </pre>
- * <p>
- * It's interpreted as if it's the <code>rendered</code> attribute of a <code>&lt;o:onloadScript&gt;</code> on the
- * script responsible for opening the push. If it becomes <code>false</code> during an ajax request, then the push
- * channel will explicitly be closed, even though you did not reference it in ajax render/update. So make sure it's tied
- * to at least a view scoped property in case you intend to control it during the view scope.
- *
  * @author Bauke Scholtz
  * @see SocketEndpoint
  * @see PushContext
@@ -362,7 +364,7 @@ public class Socket extends TagHandler {
 			@Override
 			public void invoke() {
 				FacesContext context = FacesContext.getCurrentInstance();
-				String script = TRUE.equals(rendered.getValue(context.getELContext())) ? openScript : closeScript;
+				String script = rendered == null || TRUE.equals(rendered.getValue(context.getELContext())) ? openScript : closeScript;
 
 				if (isAjaxRequestWithPartialRendering(context)) {
 					oncomplete(script);
