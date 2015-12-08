@@ -236,6 +236,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 			return; // Let JSF handle it itself.
 		}
 
+		unhandledExceptionQueuedEvents.remove();
 		exception = findExceptionRootCause(context, exception);
 
 		if (!shouldHandleExceptionRootCause(context, exception)) {
@@ -247,8 +248,6 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 		if (errorPageLocation == null) {
 			throw new IllegalArgumentException(ERROR_DEFAULT_LOCATION_MISSING);
 		}
-
-		unhandledExceptionQueuedEvents.remove();
 
 		if (!canRenderErrorPageView(context, exception, errorPageLocation)) {
 			return; // If error page cannot be rendered, then it's end of story.
