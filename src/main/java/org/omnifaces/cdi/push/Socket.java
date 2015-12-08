@@ -269,6 +269,18 @@ import org.omnifaces.util.Json;
  * If you pass a <code>Map&lt;String,V&gt;</code> or a JavaBean as push message object, then all entries/properties will
  * transparently be available as request parameters in the command script method <code>#{bean.pushed}</code>.
  *
+ * <h3>Conditionally enabling push</h3>
+ * <p>
+ * You can use the <code>enabled</code> attribute for that.
+ * <pre>
+ * &lt;o:socket ... enabled="#{bean.pushable}" /&gt;
+ * </pre>
+ * <p>
+ * It's interpreted as if it's the <code>rendered</code> attribute of a <code>&lt;o:onloadScript&gt;</code> on the
+ * script responsible for opening the push. If it becomes <code>false</code> during an ajax request, then the push
+ * channel will explicitly be closed, even though you did not reference it in ajax render/update. So make sure it's tied
+ * to at least a view scoped property in case you intend to control it during the view scope.
+ *
  * @author Bauke Scholtz
  * @see SocketEndpoint
  * @see PushContext
@@ -279,7 +291,8 @@ public class Socket extends TagHandler {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String SCRIPT = "OmniFaces.Push.open('%s','%s',%s);";
+	private static final String SCRIPT_OPEN = "OmniFaces.Push.open('%s','%s',%s);";
+	private static final String SCRIPT_CLOSE = "OmniFaces.Push.close('%s');";
 	private static final Pattern PATTERN_CHANNEL_NAME = Pattern.compile("[\\w.-]+");
 	private static final Pattern PATTERN_SCRIPT_NAME = Pattern.compile("[$a-z_][$\\w]*", Pattern.CASE_INSENSITIVE);
 	private static final String ERROR_ILLEGAL_CHANNEL_NAME =
@@ -319,7 +332,7 @@ public class Socket extends TagHandler {
 			return;
 		}
 
-		final String name = channel.getValue(context);
+		String name = channel.getValue(context);
 
 		if (!PATTERN_CHANNEL_NAME.matcher(name).matches()) {
 			throw new IllegalArgumentException(String.format(ERROR_ILLEGAL_CHANNEL_NAME, name));
@@ -330,10 +343,9 @@ public class Socket extends TagHandler {
 		String functions = onmessageFunction + (oncloseFunction != null ? ("," + oncloseFunction) : "");
 
 		final ValueExpression rendered = getValueExpression(context, enabled, Boolean.class);
-		final String script = String.format(SCRIPT, getRequestContextPath(context.getFacesContext()), name, functions);
+		final String openScript = String.format(SCRIPT_OPEN, getRequestContextPath(context.getFacesContext()), name, functions);
+		final String closeScript = String.format(SCRIPT_CLOSE, name);
 
-		// Given the component events below, it's after all cleaner if this were an UIComponent instead of a TagHandler.
-		// TODO: Perhaps change to UIComponent. Would also enable referencing it in ajax updates instead of a parent.
 		subscribeToViewEvent(PostAddToViewEvent.class, new Callback.SerializableVoid() {
 			private static final long serialVersionUID = 1L;
 
@@ -350,14 +362,13 @@ public class Socket extends TagHandler {
 			@Override
 			public void invoke() {
 				FacesContext context = FacesContext.getCurrentInstance();
+				String script = TRUE.equals(rendered.getValue(context.getELContext())) ? openScript : closeScript;
 
-				if (TRUE.equals(rendered.getValue(context.getELContext()))) {
-					if (isAjaxRequestWithPartialRendering(context)) {
-						oncomplete(script);
-					}
-					else {
-						addScriptToBody(script);
-					}
+				if (isAjaxRequestWithPartialRendering(context)) {
+					oncomplete(script);
+				}
+				else {
+					addScriptToBody(script);
 				}
 			}
 		});

@@ -87,14 +87,9 @@ OmniFaces.Push = (function() {
 
 		/**
 		 * Close the web socket on the given channel.
-		 * @param channel The name of the web socket channel. Required.
-		 * @throws Error When channel argument is not a string.
+		 * @param channel Required; the name of the web socket channel.
 		 */
 		close: function(channel) {
-			if (typeof channel !== "string") {
-				throw new Error("channel");
-			}
-
 			var path = encodeURIComponent(channel);
 			var socket = sockets[path];
 
