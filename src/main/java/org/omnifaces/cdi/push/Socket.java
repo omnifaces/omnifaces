@@ -12,21 +12,11 @@
  */
 package org.omnifaces.cdi.push;
 
-import static java.lang.Boolean.TRUE;
-import static org.omnifaces.util.Ajax.oncomplete;
-import static org.omnifaces.util.Components.addScriptResourceToHead;
-import static org.omnifaces.util.Components.addScriptToBody;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
 import static org.omnifaces.util.Facelets.getValueExpression;
-import static org.omnifaces.util.FacesLocal.getRequestContextPath;
-import static org.omnifaces.util.FacesLocal.getViewAttribute;
-import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
-import static org.omnifaces.util.FacesLocal.setViewAttribute;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.el.ValueExpression;
@@ -36,6 +26,7 @@ import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PostAddToViewEvent;
 import javax.faces.event.PreRenderViewEvent;
+import javax.faces.event.SystemEventListener;
 import javax.faces.view.facelets.ComponentHandler;
 import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagAttribute;
@@ -288,6 +279,7 @@ import org.omnifaces.util.Json;
  * transparently be available as request parameters in the command script method <code>#{bean.pushed}</code>.
  *
  * @author Bauke Scholtz
+ * @see SocketEventListener
  * @see SocketEndpoint
  * @see PushContext
  * @see SocketPushContext
@@ -297,8 +289,6 @@ public class Socket extends TagHandler {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String SCRIPT_OPEN = "OmniFaces.Push.open('%s','%s',%s);";
-	private static final String SCRIPT_CLOSE = "OmniFaces.Push.close('%s');";
 	private static final Pattern PATTERN_CHANNEL_NAME = Pattern.compile("[\\w.-]+");
 	private static final Pattern PATTERN_SCRIPT_NAME = Pattern.compile("[$a-z_][$\\w]*", Pattern.CASE_INSENSITIVE);
 	private static final String ERROR_ILLEGAL_CHANNEL_NAME =
@@ -338,69 +328,26 @@ public class Socket extends TagHandler {
 			return;
 		}
 
-		final String name = channel.getValue(context);
+		String channelName = channel.getValue(context);
 
-		if (!PATTERN_CHANNEL_NAME.matcher(name).matches()) {
-			throw new IllegalArgumentException(String.format(ERROR_ILLEGAL_CHANNEL_NAME, name));
+		if (!PATTERN_CHANNEL_NAME.matcher(channelName).matches()) {
+			throw new IllegalArgumentException(String.format(ERROR_ILLEGAL_CHANNEL_NAME, channelName));
 		}
 
 		String onmessageFunction = quoteIfNecessary(onmessage.getValue(context));
 		String oncloseFunction = (onclose != null) ? quoteIfNecessary(onclose.getValue(context)) : null;
-		final String functions = onmessageFunction + (oncloseFunction != null ? ("," + oncloseFunction) : "");
-		final ValueExpression enabledExpression = getValueExpression(context, enabled, Boolean.class);
+		String functions = onmessageFunction + (oncloseFunction != null ? ("," + oncloseFunction) : "");
+		ValueExpression enabledExpression = getValueExpression(context, enabled, Boolean.class);
 
-		subscribeToViewEvent(PostAddToViewEvent.class, new Callback.SerializableVoid() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void invoke() {
-				addScriptResourceToHead("omnifaces", "omnifaces.js");
-
-			}
-		});
-
-		subscribeToViewEvent(PreRenderViewEvent.class, new Callback.SerializableVoid() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void invoke() {
-				FacesContext context = FacesContext.getCurrentInstance();
-				boolean enabled = (enabledExpression == null) || TRUE.equals(enabledExpression.getValue(context.getELContext()));
-
-				if (hasSwitched(context, name, enabled)) {
-					String script = enabled ? String.format(SCRIPT_OPEN, getRequestContextPath(context), name, functions) : String.format(SCRIPT_CLOSE, name);
-
-					if (isAjaxRequestWithPartialRendering(context)) {
-						oncomplete(script);
-					}
-					else {
-						addScriptToBody(script);
-					}
-				}
-			}
-		});
+		SystemEventListener listener = new SocketEventListener(channelName, functions, enabledExpression);
+		subscribeToViewEvent(PostAddToViewEvent.class, listener);
+		subscribeToViewEvent(PreRenderViewEvent.class, listener);
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
 	private static String quoteIfNecessary(String script) {
 		return isEmpty(script) ? "null" : PATTERN_SCRIPT_NAME.matcher(script).matches() ? ("'" + script + "'") : script;
-	}
-
-	/**
-	 * Helper to remember which channels are opened on the view and returns <code>true</code> if it is new, or has
-	 * switched its <code>enabled</code> attribute.
-	 */
-	private static boolean hasSwitched(FacesContext context, String channel, boolean enabled) {
-		Map<String, Boolean> channels = getViewAttribute(context, Socket.class.getName());
-
-		if (channels == null) {
-			channels = new HashMap<>();
-			setViewAttribute(context, Socket.class.getName(), channels);
-		}
-
-		Boolean previouslyEnabled = channels.put(channel, enabled);
-		return (previouslyEnabled == null) ? enabled : (previouslyEnabled != enabled);
 	}
 
 }
