@@ -19,10 +19,14 @@ import static org.omnifaces.util.Components.addScriptToBody;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
 import static org.omnifaces.util.Facelets.getValueExpression;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
+import static org.omnifaces.util.FacesLocal.getViewAttribute;
 import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
+import static org.omnifaces.util.FacesLocal.setViewAttribute;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.el.ValueExpression;
@@ -334,7 +338,7 @@ public class Socket extends TagHandler {
 			return;
 		}
 
-		String name = channel.getValue(context);
+		final String name = channel.getValue(context);
 
 		if (!PATTERN_CHANNEL_NAME.matcher(name).matches()) {
 			throw new IllegalArgumentException(String.format(ERROR_ILLEGAL_CHANNEL_NAME, name));
@@ -342,11 +346,8 @@ public class Socket extends TagHandler {
 
 		String onmessageFunction = quoteIfNecessary(onmessage.getValue(context));
 		String oncloseFunction = (onclose != null) ? quoteIfNecessary(onclose.getValue(context)) : null;
-		String functions = onmessageFunction + (oncloseFunction != null ? ("," + oncloseFunction) : "");
-
-		final ValueExpression rendered = getValueExpression(context, enabled, Boolean.class);
-		final String openScript = String.format(SCRIPT_OPEN, getRequestContextPath(context.getFacesContext()), name, functions);
-		final String closeScript = String.format(SCRIPT_CLOSE, name);
+		final String functions = onmessageFunction + (oncloseFunction != null ? ("," + oncloseFunction) : "");
+		final ValueExpression enabledExpression = getValueExpression(context, enabled, Boolean.class);
 
 		subscribeToViewEvent(PostAddToViewEvent.class, new Callback.SerializableVoid() {
 			private static final long serialVersionUID = 1L;
@@ -364,13 +365,17 @@ public class Socket extends TagHandler {
 			@Override
 			public void invoke() {
 				FacesContext context = FacesContext.getCurrentInstance();
-				String script = rendered == null || TRUE.equals(rendered.getValue(context.getELContext())) ? openScript : closeScript;
+				boolean enabled = (enabledExpression == null) || TRUE.equals(enabledExpression.getValue(context.getELContext()));
 
-				if (isAjaxRequestWithPartialRendering(context)) {
-					oncomplete(script);
-				}
-				else {
-					addScriptToBody(script);
+				if (hasSwitched(context, name, enabled)) {
+					String script = enabled ? String.format(SCRIPT_OPEN, getRequestContextPath(context), name, functions) : String.format(SCRIPT_CLOSE, name);
+
+					if (isAjaxRequestWithPartialRendering(context)) {
+						oncomplete(script);
+					}
+					else {
+						addScriptToBody(script);
+					}
 				}
 			}
 		});
@@ -380,6 +385,22 @@ public class Socket extends TagHandler {
 
 	private static String quoteIfNecessary(String script) {
 		return isEmpty(script) ? "null" : PATTERN_SCRIPT_NAME.matcher(script).matches() ? ("'" + script + "'") : script;
+	}
+
+	/**
+	 * Helper to remember which channels are opened on the view and returns <code>true</code> if it is new, or has
+	 * switched its <code>enabled</code> attribute.
+	 */
+	private static boolean hasSwitched(FacesContext context, String channel, boolean enabled) {
+		Map<String, Boolean> channels = getViewAttribute(context, Socket.class.getName());
+
+		if (channels == null) {
+			channels = new HashMap<>();
+			setViewAttribute(context, Socket.class.getName(), channels);
+		}
+
+		Boolean previouslyEnabled = channels.put(channel, enabled);
+		return (previouslyEnabled == null) ? enabled : (previouslyEnabled != enabled);
 	}
 
 }
