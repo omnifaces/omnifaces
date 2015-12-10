@@ -17,14 +17,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.http.HttpSession;
+import javax.websocket.CloseReason;
+import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.HandshakeResponse;
-import javax.websocket.OnClose;
-import javax.websocket.OnError;
-import javax.websocket.OnOpen;
 import javax.websocket.Session;
 import javax.websocket.server.HandshakeRequest;
-import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpointConfig;
 import javax.websocket.server.ServerEndpointConfig.Configurator;
 
@@ -39,7 +37,7 @@ import org.omnifaces.config.BeanManager;
  * @see Socket
  * @since 2.3
  */
-public class SocketEndpoint {
+public class SocketEndpoint extends Endpoint {
 
 	public static final String URI_TEMPLATE = PushContext.URI_PREFIX + "/{channel}";
 
@@ -48,14 +46,15 @@ public class SocketEndpoint {
 	private static final String ERROR_EXCEPTION = "SocketEndpoint: An exception occurred during processing web socket request.";
 
 	/**
-	 * Add given web socket session to the push context associated with given channel.
+	 * Add given web socket session to the push context associated with its channel.
 	 * @param session The opened web socket session.
 	 * @param config The endpoint configuration.
-	 * @param channel The push channel name.
-	 * @throws IllegalArgumentException When given channel is not known as a registered channel (i.e. it's nowhere used in an o:socket).
+	 * @throws IllegalArgumentException When the channel is not known as a registered channel (i.e. it's nowhere used in an o:socket).
 	 */
-	@OnOpen
-	public void open(Session session, EndpointConfig config, @PathParam("channel") String channel) {
+	@Override
+	public void onOpen(Session session, EndpointConfig config) {
+		String channel = session.getPathParameters().get("channel");
+
 		if (!HttpSessionAwareConfigurator.isRegisteredChannel(config, channel)) {
 			new IllegalArgumentException(String.format(ERROR_UNKNOWN_CHANNEL, channel));
 		}
@@ -65,19 +64,21 @@ public class SocketEndpoint {
 
 	/**
 	 * Delegate exceptions to logger.
+	 * @param session The errored web socket session.
 	 * @param throwable The cause.
 	 */
-	@OnError
-	public void error(Throwable throwable) {
+	@Override
+	public void onError(Session session, Throwable throwable) {
 		logger.log(Level.SEVERE, ERROR_EXCEPTION, throwable);
 	}
 
 	/**
 	 * Remove given web socket session from the push context.
 	 * @param session The closed web socket session.
+	 * @param reason The close reason.
 	 */
-	@OnClose
-	public void close(Session session) {
+	@Override
+	public void onClose(Session session, CloseReason reason) {
 		BeanManager.INSTANCE.getReference(SocketPushContext.class).remove(session); // @Inject in @ServerEndpoint doesn't work in Tomcat+Weld.
 	}
 
