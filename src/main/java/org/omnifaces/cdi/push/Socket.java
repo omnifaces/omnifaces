@@ -121,6 +121,13 @@ import org.omnifaces.util.Json;
  * <li><code>event</code>: the raw <a href="https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent"><code>
  * CloseEvent</code></a> instance, useful in case you intend to inspect it.</li>
  * </ul>
+ * <p>
+ * In case your server is configured to run WS container on a different TCP port than the HTTP container, then you can
+ * use the <code>port</code> attribute to explicitly specify the port.
+ * <pre>
+ * &lt;o:socket ... port="8000" /&gt;
+ * </pre>
+ *
  *
  * <h3>Usage (server)</h3>
  * <p>
