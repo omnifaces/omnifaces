@@ -35,6 +35,7 @@ import javax.faces.view.facelets.TagHandler;
 import javax.websocket.CloseReason.CloseCodes;
 
 import org.omnifaces.util.Callback;
+import org.omnifaces.util.Facelets;
 import org.omnifaces.util.Json;
 
 /**
@@ -297,6 +298,7 @@ public class Socket extends TagHandler {
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
+	private TagAttribute port;
 	private TagAttribute channel;
 	private TagAttribute onmessage;
 	private TagAttribute onclose;
@@ -307,10 +309,12 @@ public class Socket extends TagHandler {
 	/**
 	 * The tag constructor. It will extract and validate the attributes.
 	 * @param config The tag config.
-	 * @throws IllegalArgumentException When the channel name is invalid. It must be URL safe.
+	 * @throws IllegalArgumentException When the channel name is invalid.
+	 * It may only contain alphanumeric characters, hyphens, underscores and periods.
 	 */
 	public Socket(TagConfig config) {
 		super(config);
+		port = getAttribute("port");
 		channel = getRequiredAttribute("channel");
 		onmessage = getRequiredAttribute("onmessage");
 		onclose = getAttribute("onclose");
@@ -334,12 +338,13 @@ public class Socket extends TagHandler {
 			throw new IllegalArgumentException(String.format(ERROR_ILLEGAL_CHANNEL_NAME, channelName));
 		}
 
+		Integer portNumber = Facelets.getObject(context, port, Integer.class);
 		String onmessageFunction = quoteIfNecessary(onmessage.getValue(context));
 		String oncloseFunction = (onclose != null) ? quoteIfNecessary(onclose.getValue(context)) : null;
 		String functions = onmessageFunction + (oncloseFunction != null ? ("," + oncloseFunction) : "");
 		ValueExpression enabledExpression = getValueExpression(context, enabled, Boolean.class);
 
-		SystemEventListener listener = new SocketEventListener(channelName, functions, enabledExpression);
+		SystemEventListener listener = new SocketEventListener(portNumber, channelName, functions, enabledExpression);
 		subscribeToViewEvent(PostAddToViewEvent.class, listener);
 		subscribeToViewEvent(PreRenderViewEvent.class, listener);
 	}

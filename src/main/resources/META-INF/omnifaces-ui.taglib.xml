@@ -4767,6 +4767,17 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 		<attribute>
 			<description>
 				<![CDATA[
+					The port number of the web socket host, in case it is different from the port number in the request URI.
+					Defaults to the port number of the request URI.
+				]]>
+			</description>
+			<name>port</name>
+			<required>false</required>
+			<type>java.lang.Integer</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
 					The name of the web socket channel.
 					It may only contain alphanumeric characters, hyphens, underscores and periods.
 					All open websockets on the same channel name will receive the same push notification from the server.
@@ -4808,7 +4819,8 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 		<attribute>
 			<description>
 				<![CDATA[
-					Whether the web socket should be enabled or not. Defaults to <code>true</code>.
+					Whether the web socket should be enabled or not.
+					Defaults to <code>true</code>.
 					This effectively controls the <code>rendered</code> attribute of the auto-included push script.
 				]]>
 			</description>

@@ -50,6 +50,7 @@ public class SocketEventListener implements SystemEventListener {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
+	private Integer port;
 	private String channel;
 	private String functions;
 	private ValueExpression enabledExpression;
@@ -58,11 +59,13 @@ public class SocketEventListener implements SystemEventListener {
 
 	/**
 	 * Construct an instance of socket event listener based on the given channel name, functions and enabled expression.
+	 * @param port The port number.
 	 * @param channel The channel name.
 	 * @param functions The onmessage and onclose functions.
 	 * @param enabledExpression The enabled expression.
 	 */
-	public SocketEventListener(String channel, String functions, ValueExpression enabledExpression) {
+	public SocketEventListener(Integer port, String channel, String functions, ValueExpression enabledExpression) {
+		this.port = port;
 		this.channel = channel;
 		this.functions = functions;
 		this.enabledExpression = enabledExpression;
@@ -97,7 +100,7 @@ public class SocketEventListener implements SystemEventListener {
 
 			if (hasSwitched(context, channel, enabled)) {
 				String script = enabled
-					? String.format(SCRIPT_OPEN, getRequestContextPath(context), channel, functions)
+					? String.format(SCRIPT_OPEN, (port != null ? ":" + port : "") + getRequestContextPath(context), channel, functions)
 					: String.format(SCRIPT_CLOSE, channel);
 
 				if (isAjaxRequestWithPartialRendering(context)) {
