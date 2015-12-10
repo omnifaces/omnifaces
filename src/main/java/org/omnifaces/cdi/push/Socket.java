@@ -12,16 +12,25 @@
  */
 package org.omnifaces.cdi.push;
 
+import static java.lang.Boolean.TRUE;
+import static java.util.Collections.synchronizedSet;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
 import static org.omnifaces.util.Facelets.getValueExpression;
+import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
+import static org.omnifaces.util.FacesLocal.getSessionAttribute;
+import static org.omnifaces.util.FacesLocal.setApplicationAttribute;
+import static org.omnifaces.util.FacesLocal.setSessionAttribute;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.el.ValueExpression;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.faces.FacesException;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PostAddToViewEvent;
@@ -33,6 +42,9 @@ import javax.faces.view.facelets.TagAttribute;
 import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
 import javax.websocket.CloseReason.CloseCodes;
+import javax.websocket.DeploymentException;
+import javax.websocket.server.ServerContainer;
+import javax.websocket.server.ServerEndpointConfig;
 
 import org.omnifaces.util.Callback;
 import org.omnifaces.util.Facelets;
@@ -295,6 +307,7 @@ public class Socket extends TagHandler {
 	private static final String ERROR_ILLEGAL_CHANNEL_NAME =
 		"o:socket 'channel' attribute '%s' does not represent a valid channel name."
 			+ " It may only contain alphanumeric characters, hyphens, underscores and periods.";
+	private static final String ERROR_ENDPOINT_REGISTRATION = "o:socket endpoint cannot be registered.";
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -324,7 +337,7 @@ public class Socket extends TagHandler {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Register the push script and add initialization script to end of body.
+	 * Register the push channel and endpoint if necessary and then subcribe the {@link SocketEventListener}.
 	 */
 	@Override
 	public void apply(FaceletContext context, UIComponent parent) throws IOException {
@@ -333,11 +346,8 @@ public class Socket extends TagHandler {
 		}
 
 		String channelName = channel.getValue(context);
-
-		if (!PATTERN_CHANNEL_NAME.matcher(channelName).matches()) {
-			throw new IllegalArgumentException(String.format(ERROR_ILLEGAL_CHANNEL_NAME, channelName));
-		}
-
+		registerChannel(context.getFacesContext(), channelName);
+		registerEndpointIfNecessary(context.getFacesContext());
 		Integer portNumber = Facelets.getObject(context, port, Integer.class);
 		String onmessageFunction = quoteIfNecessary(onmessage.getValue(context));
 		String oncloseFunction = (onclose != null) ? quoteIfNecessary(onclose.getValue(context)) : null;
@@ -350,6 +360,40 @@ public class Socket extends TagHandler {
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
+
+	private static void registerChannel(FacesContext context, String channelName) {
+		if (!PATTERN_CHANNEL_NAME.matcher(channelName).matches()) {
+			throw new IllegalArgumentException(String.format(ERROR_ILLEGAL_CHANNEL_NAME, channelName));
+		}
+
+		Set<String> registeredChannels = getSessionAttribute(context, Socket.class.getName());
+
+		if (registeredChannels == null) {
+			registeredChannels = synchronizedSet(new HashSet<String>());
+			setSessionAttribute(context, Socket.class.getName(), registeredChannels);
+		}
+
+		registeredChannels.add(channelName);
+	}
+
+	private static void registerEndpointIfNecessary(FacesContext context) {
+		if (TRUE.equals(getApplicationAttribute(context, Socket.class.getName()))) {
+			return;
+		}
+
+		try {
+			ServerContainer serverContainer = getApplicationAttribute(context, ServerContainer.class.getName());
+			ServerEndpointConfig serverEndpointConfig = ServerEndpointConfig.Builder
+				.create(SocketEndpoint.class, SocketEndpoint.URI_TEMPLATE)
+				.configurator(new SocketEndpoint.HttpSessionAwareConfigurator())
+				.build();
+			serverContainer.addEndpoint(serverEndpointConfig);
+			setApplicationAttribute(context, Socket.class.getName(), TRUE);
+		}
+		catch (DeploymentException e) {
+			throw new FacesException(ERROR_ENDPOINT_REGISTRATION, e);
+		}
+	}
 
 	private static String quoteIfNecessary(String script) {
 		return isEmpty(script) ? "null" : PATTERN_SCRIPT_NAME.matcher(script).matches() ? ("'" + script + "'") : script;

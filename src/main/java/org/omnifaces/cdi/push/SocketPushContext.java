@@ -83,10 +83,13 @@ public class SocketPushContext implements PushContext {
 	protected void remove(Session session) {
 		Map<String, Object> userProperties = session.getUserProperties();
 		String channel = (String) userProperties.get("channel");
-		Set<Session> sessions = SESSIONS.get(channel);
 
-		if (sessions != null) {
-			sessions.remove(session);
+		if (channel != null) {
+			Set<Session> sessions = SESSIONS.get(channel);
+
+			if (sessions != null) {
+				sessions.remove(session);
+			}
 		}
 	}
 
