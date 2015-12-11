@@ -15,6 +15,7 @@ package org.omnifaces.cdi.push;
 import static java.lang.Boolean.TRUE;
 import static java.util.Collections.synchronizedSet;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
+import static org.omnifaces.util.Facelets.getObject;
 import static org.omnifaces.util.Facelets.getValueExpression;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getSessionAttribute;
@@ -47,7 +48,6 @@ import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
 
 import org.omnifaces.util.Callback;
-import org.omnifaces.util.Facelets;
 import org.omnifaces.util.Json;
 
 /**
@@ -279,6 +279,20 @@ import org.omnifaces.util.Json;
  * <p>
  * Note that OmniFaces {@link Callback} interfaces are insuitable as you're not supposed to use WAR (front end)
  * frameworks and libraries like JSF and OmniFaces in EAR/EJB (back end) side!
+ * <p>
+ * In case you're already on Java 8, of course make use of the <code>Consumer</code> functional interface.
+ * <pre>
+ * &#64;Asynchronous
+ * public void someAsyncServiceMethod(Entity entity, Consumer&lt;Object&gt; callback) {
+ *     // ... (some long process)
+ *     callback.accept(entity.getSomeProperty());
+ * }
+ * </pre>
+ * <pre>
+ * public void submit() {
+ *     someService.someAsyncServiceMethod(entity, someProperty -> pushContext.send("someChannel", someProperty);
+ * }
+ * </pre>
  *
  * <h3>UI update design hints</h3>
  * <p>
@@ -345,6 +359,8 @@ public class Socket extends TagHandler {
 
 	/**
 	 * Register the push channel and endpoint if necessary and then subcribe the {@link SocketEventListener}.
+	 * Note thus that any manually triggered push requests on unregistered channels will cause an exception, and that
+	 * the push endpoint is only activated when the <code>&lt;o:socket&gt;</code> is actually used in the application.
 	 */
 	@Override
 	public void apply(FaceletContext context, UIComponent parent) throws IOException {
@@ -353,9 +369,12 @@ public class Socket extends TagHandler {
 		}
 
 		String channelName = channel.getValue(context);
-		registerChannel(context.getFacesContext(), channelName);
-		registerEndpointIfNecessary(context.getFacesContext());
-		Integer portNumber = Facelets.getObject(context, port, Integer.class);
+
+		FacesContext facesContext = context.getFacesContext();
+		validateAndRegisterChannel(facesContext, channelName);
+		registerEndpointIfNecessary(facesContext);
+
+		Integer portNumber = getObject(context, port, Integer.class);
 		String onmessageFunction = quoteIfNecessary(onmessage.getValue(context));
 		String oncloseFunction = (onclose != null) ? quoteIfNecessary(onclose.getValue(context)) : null;
 		String functions = onmessageFunction + (oncloseFunction != null ? ("," + oncloseFunction) : "");
@@ -368,7 +387,7 @@ public class Socket extends TagHandler {
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
-	private static void registerChannel(FacesContext context, String channelName) {
+	private static void validateAndRegisterChannel(FacesContext context, String channelName) {
 		if (!PATTERN_CHANNEL_NAME.matcher(channelName).matches()) {
 			throw new IllegalArgumentException(String.format(ERROR_ILLEGAL_CHANNEL_NAME, channelName));
 		}
