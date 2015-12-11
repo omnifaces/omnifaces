@@ -24,7 +24,7 @@ OmniFaces.Push = (function() {
 	var WS_SUPPORTED = !!window.WebSocket;
 	var URL_PROTOCOL = window.location.protocol.replace("http", "ws") + "//";
 	var URI_PREFIX = "/omnifaces.push";
-	
+
 	var RECONNECT_INTERVAL = 1000;
 	var MAX_RECONNECT_INTERVAL = 10000;
 
@@ -35,11 +35,11 @@ OmniFaces.Push = (function() {
 		var self = this;
 		var socket;
 
-		this.open = function(attempts) {
+		this.open = function(reconnectAttempts) {
 			socket = new WebSocket(url);
 
             socket.onopen = function(event) {
-                attempts = 0;
+            	reconnectAttempts = 0;
             };
 
 			socket.onmessage = function(event) {
@@ -48,15 +48,13 @@ OmniFaces.Push = (function() {
 
 			socket.onclose = function(event) {
 				if (!socket) {
-	                if (onclose) {
-						onclose(event.code, channel, event);
-					}
+					onclose(event.code, channel, event);
 				}
 				else if (event.code != 1011) { // SocketEndpoint returns 1011 on unregistered channel.
-					attempts++;
+					reconnectAttempts++;
 					setTimeout(function() {
-						self.open(attempts);
-					}, Math.min(RECONNECT_INTERVAL * attempts, MAX_RECONNECT_INTERVAL));
+						self.open(reconnectAttempts);
+					}, Math.min(RECONNECT_INTERVAL * reconnectAttempts, MAX_RECONNECT_INTERVAL));
 				}
 			};
 		};
@@ -70,6 +68,10 @@ OmniFaces.Push = (function() {
 		};
 
 		self.open(0);
+	}
+
+	function resolveFunction(func) {
+		return (typeof func !== "function") && (func = window[func] || function(){}), func;
 	}
 
 	function getBaseURL(host) {
@@ -105,32 +107,22 @@ OmniFaces.Push = (function() {
 		 * for an elaborate list.
 		 */
 		open: function(host, channel, onmessage, onclose) {
-			if (onclose && (typeof onclose !== "function")) {
-				onclose = window[onclose];
-			}
+			onclose = resolveFunction(onclose);
 
 			if (!WS_SUPPORTED) { // IE6-9.
-				if (onclose) {
-					onclose(-1, channel);
-				}
-
+				onclose(-1, channel);
 				return;
 			}
 
-			var path = encodeURIComponent(channel);
-			var socket = sockets[path];
+			var socket = sockets[channel];
 
 			if (socket) {
 				socket.close();
 			}
 
-			var url = getBaseURL(host) + path;
+			var url = getBaseURL(host) + encodeURIComponent(channel);
 
-			if (typeof onmessage !== "function") {
-				onmessage = window[onmessage];
-			}
-
-			sockets[path] = new Socket(url, channel, onmessage, onclose);
+			sockets[channel] = new Socket(url, channel, resolveFunction(onmessage), onclose);
 		},
 
 		/**
@@ -138,11 +130,10 @@ OmniFaces.Push = (function() {
 		 * @param channel Required; the name of the web socket channel.
 		 */
 		close: function(channel) {
-			var path = encodeURIComponent(channel);
-			var socket = sockets[path];
+			var socket = sockets[channel];
 
 			if (socket) {
-				delete sockets[path];
+				delete sockets[channel];
 				socket.close();
 			}
 		}
