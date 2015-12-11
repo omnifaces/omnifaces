@@ -290,7 +290,7 @@ import org.omnifaces.util.Json;
  * </pre>
  * <pre>
  * public void submit() {
- *     someService.someAsyncServiceMethod(entity, someProperty -> pushContext.send("someChannel", someProperty);
+ *     someService.someAsyncServiceMethod(entity, someProperty -&gt; pushContext.send("someChannel", someProperty);
  * }
  * </pre>
  *
