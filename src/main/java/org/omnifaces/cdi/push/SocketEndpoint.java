@@ -13,11 +13,14 @@
 package org.omnifaces.cdi.push;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static javax.websocket.CloseReason.CloseCodes.UNEXPECTED_CONDITION;
 
+import java.io.IOException;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.faces.FacesException;
 import javax.servlet.http.HttpSession;
 import javax.websocket.CloseReason;
 import javax.websocket.Endpoint;
@@ -58,11 +61,17 @@ public class SocketEndpoint extends Endpoint {
 		String channel = session.getPathParameters().get("channel");
 
 		if (!HttpSessionAwareConfigurator.isRegisteredChannel(config, channel)) {
-			new IllegalArgumentException(String.format(ERROR_UNKNOWN_CHANNEL, channel));
+			try {
+				session.close(new CloseReason(UNEXPECTED_CONDITION, String.format(ERROR_UNKNOWN_CHANNEL, channel)));
+				return;
+			}
+			catch (IOException e) {
+				throw new FacesException(e);
+			}
 		}
 
 		HttpSessionAwareConfigurator.alignMaxIdleTimeout(config, session);
-		BeanManager.INSTANCE.getReference(SocketPushContext.class).add(session, channel); // @Inject in @ServerEndpoint doesn't work in Tomcat+Weld.
+		BeanManager.INSTANCE.getReference(SocketPushContext.class).add(session, channel); // @Inject in Endpoint doesn't work in Tomcat+Weld.
 	}
 
 	/**
@@ -82,7 +91,7 @@ public class SocketEndpoint extends Endpoint {
 	 */
 	@Override
 	public void onClose(Session session, CloseReason reason) {
-		BeanManager.INSTANCE.getReference(SocketPushContext.class).remove(session); // @Inject in @ServerEndpoint doesn't work in Tomcat+Weld.
+		BeanManager.INSTANCE.getReference(SocketPushContext.class).remove(session); // @Inject in Endpoint doesn't work in Tomcat+Weld.
 	}
 
     // Nested classes -------------------------------------------------------------------------------------------------

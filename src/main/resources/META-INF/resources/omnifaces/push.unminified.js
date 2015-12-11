@@ -16,7 +16,7 @@ var OmniFaces = OmniFaces || {};
  * Manage web socket push channels. This script is used by <code>&lt;o:socket&gt;</code>.
  * 
  * @author Bauke Scholtz
- * @see org.omnifaces.push.Socket
+ * @see org.omnifaces.cdi.push.Socket
  * @since 2.3
  */
 OmniFaces.Push = (function() {
@@ -24,8 +24,61 @@ OmniFaces.Push = (function() {
 	var WS_SUPPORTED = !!window.WebSocket;
 	var URL_PROTOCOL = window.location.protocol.replace("http", "ws") + "//";
 	var URI_PREFIX = "/omnifaces.push";
+	
+	var RECONNECT_INTERVAL = 1000;
+	var MAX_RECONNECT_INTERVAL = 10000;
 
 	var sockets = {};
+
+	function Socket(url, channel, onmessage, onclose) {
+
+		var self = this;
+		var socket;
+
+		this.open = function(attempts) {
+			socket = new WebSocket(url);
+
+            socket.onopen = function(event) {
+                attempts = 0;
+            };
+
+			socket.onmessage = function(event) {
+				onmessage(JSON.parse(event.data), channel, event);
+			};
+
+			socket.onclose = function(event) {
+				if (!socket) {
+	                if (onclose) {
+						onclose(event.code, channel, event);
+					}
+				}
+				else if (event.code != 1011) { // SocketEndpoint returns 1011 on unregistered channel.
+					attempts++;
+					setTimeout(function() {
+						self.open(attempts);
+					}, Math.min(RECONNECT_INTERVAL * attempts, MAX_RECONNECT_INTERVAL));
+				}
+			};
+		};
+
+		this.close = function() {
+			if (socket) {
+				var s = socket;
+				socket = null;
+				s.close();
+			}
+		};
+
+		self.open(0);
+	}
+
+	function getBaseURL(host) {
+		host = host || "";
+		var base = (!host || host.indexOf("/") == 0) ? window.location.host + host
+				: (host.indexOf(":") == 0) ? window.location.hostname + host
+				: host;
+		return URL_PROTOCOL + base + URI_PREFIX + "/";
+	}
 
 	return {
 
@@ -52,13 +105,9 @@ OmniFaces.Push = (function() {
 		 * for an elaborate list.
 		 */
 		open: function(host, channel, onmessage, onclose) {
-			if (typeof onmessage !== "function") {
-				onmessage = window[onmessage];
-			}
-
 			if (onclose && (typeof onclose !== "function")) {
 				onclose = window[onclose];
-			} 
+			}
 
 			if (!WS_SUPPORTED) { // IE6-9.
 				if (onclose) {
@@ -71,32 +120,17 @@ OmniFaces.Push = (function() {
 			var path = encodeURIComponent(channel);
 			var socket = sockets[path];
 
-			if (!socket) {
-				host = host || "";
-				var base = (!host || host.indexOf("/") == 0) ? window.location.host + host
-						: (host.indexOf(":") == 0) ? window.location.hostname + host
-						: host;
-				socket = sockets[path] = new WebSocket(URL_PROTOCOL + base + URI_PREFIX + "/" + path);
+			if (socket) {
+				socket.close();
 			}
 
-			socket.onmessage = function(event) {
-				onmessage(JSON.parse(event.data), channel, event);
-			};
+			var url = getBaseURL(host) + path;
 
-			socket.onclose = function(event) {
-				if (event.code == 1000 && sockets[path]) {
-					// If we end up here, normal closure was apparently triggered from server side instead of client side via OmniFaces.Push.close().
-					// Some servers have an overzealously short server-side timeout on push sockets like OpenShift (only 1 minute!).
-					// Let's be persistent and reopen it. TODO: add persistent="true" to configure this?
-					delete sockets[path];
-					OmniFaces.Push.open(host, channel, onmessage, onclose);
-					return;
-				}
+			if (typeof onmessage !== "function") {
+				onmessage = window[onmessage];
+			}
 
-				if (onclose) {
-					onclose(event.code, channel, event);
-				}
-			};
+			sockets[path] = new Socket(url, channel, onmessage, onclose);
 		},
 
 		/**
