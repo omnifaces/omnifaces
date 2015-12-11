@@ -83,14 +83,20 @@ OmniFaces.Push = (function() {
 				onmessage(JSON.parse(event.data), channel, event);
 			};
 
-			if (onclose) {
-				socket.onclose = function(event) {
+			socket.onclose = function(event) {
+				if (event.code == 1000 && sockets[path]) {
+					// If we end up here, normal closure was apparently triggered from server side instead of client side via OmniFaces.Push.close().
+					// Some servers have an overzealously short server-side timeout on push sockets like OpenShift (only 1 minute!).
+					// Let's be persistent and reopen it. TODO: add persistent="true" to configure this?
+					delete sockets[path];
+					OmniFaces.Push.open(host, channel, onmessage, onclose);
+					return;
+				}
+
+				if (onclose) {
 					onclose(event.code, channel, event);
-				};
-			}
-			else {
-				delete socket.onclose;
-			}
+				}
+			};
 		},
 
 		/**
@@ -102,8 +108,8 @@ OmniFaces.Push = (function() {
 			var socket = sockets[path];
 
 			if (socket) {
-				socket.close();
 				delete sockets[path];
+				socket.close();
 			}
 		}
 	};
