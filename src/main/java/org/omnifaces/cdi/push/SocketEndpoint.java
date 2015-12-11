@@ -12,6 +12,8 @@
  */
 package org.omnifaces.cdi.push;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -59,6 +61,7 @@ public class SocketEndpoint extends Endpoint {
 			new IllegalArgumentException(String.format(ERROR_UNKNOWN_CHANNEL, channel));
 		}
 
+		HttpSessionAwareConfigurator.alignMaxIdleTimeout(config, session);
 		BeanManager.INSTANCE.getReference(SocketPushContext.class).add(session, channel); // @Inject in @ServerEndpoint doesn't work in Tomcat+Weld.
 	}
 
@@ -97,6 +100,11 @@ public class SocketEndpoint extends Endpoint {
 			Set<String> registeredChannels = (Set<String>) httpSession.getAttribute(Socket.class.getName());
 	    	return registeredChannels != null && registeredChannels.contains(channel);
 	    }
+
+		static void alignMaxIdleTimeout(EndpointConfig config, Session session) {
+	    	HttpSession httpSession = (HttpSession) config.getUserProperties().get("httpSession");
+	    	session.setMaxIdleTimeout(SECONDS.toMillis(httpSession.getMaxInactiveInterval()));
+		}
 
 	}
 
