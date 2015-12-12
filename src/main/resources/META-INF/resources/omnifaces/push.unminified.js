@@ -69,6 +69,15 @@ OmniFaces.Push = (function() {
 
 		self.open(0);
 	}
+	
+	function close(channel) {
+		var socket = sockets[channel];
+
+		if (socket) {
+			delete sockets[channel];
+			socket.close();
+		}
+	}
 
 	function resolveFunction(func) {
 		return (typeof func !== "function") && (func = window[func] || function(){}), func;
@@ -123,14 +132,7 @@ OmniFaces.Push = (function() {
 		 * Close the web socket on the given channel.
 		 * @param channel Required; the name of the web socket channel.
 		 */
-		close: function(channel) {
-			var socket = sockets[channel];
-
-			if (socket) {
-				delete sockets[channel];
-				socket.close();
-			}
-		}
+		close: close
 	};
 
 })();
