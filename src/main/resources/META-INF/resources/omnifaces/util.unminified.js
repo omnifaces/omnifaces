@@ -20,6 +20,8 @@ var OmniFaces = OmniFaces || {};
  */
 OmniFaces.Util = {
 
+	// Public static functions ----------------------------------------------------------------------------------------
+		
 	/**
 	 * Register the given function as window onload listener function.
 	 */
@@ -41,4 +43,5 @@ OmniFaces.Util = {
 			window.onload = listener;
 		}
 	}
+
 };

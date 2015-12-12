@@ -46,14 +46,21 @@ var OmniFaces = OmniFaces || {};
  */
 OmniFaces.FixViewState = (function() {
 
-	var fixViewState = {};
+	// "Constant" fields ----------------------------------------------------------------------------------------------
+
 	var VIEW_STATE_PARAM = "javax.faces.ViewState";
 	var VIEW_STATE_REGEX = new RegExp("^([\\w]+:)?" + VIEW_STATE_PARAM.replace(/\./g, "\\.") + "(:[0-9]+)?$");
+
+	// Private static fields ------------------------------------------------------------------------------------------
+
+	var self = {};
+
+	// Public static functions ----------------------------------------------------------------------------------------
 
 	/**
 	 * Apply the "fix view state" on the current document based on the given XML response.
 	 */
-	fixViewState.apply = function(responseXML) {
+	self.apply = function(responseXML) {
 		if (typeof responseXML === "undefined") {
 			return;
 		}
@@ -72,12 +79,10 @@ OmniFaces.FixViewState = (function() {
 				// This POST form doesn't have a view state. This isn't right. Create it.
 				createViewStateElement(form, viewStateValue);
 			}
-			else if (form.method == "get" && viewStateElement) {
-				// PrimeFaces < 3.5.23 and < 4.0.7 also adds them to GET forms! This isn't right. Remove it.
-				viewStateElement.parentNode.removeChild(viewStateElement);
-			}
 		}
-	};
+	}
+
+	// Private static functions ---------------------------------------------------------------------------------------
 
 	/**
 	 * Get the view state value from the given XML response.
@@ -113,25 +118,27 @@ OmniFaces.FixViewState = (function() {
 		hidden.setAttribute("autocomplete", "off");
 		form.appendChild(hidden);
 	}
+
+	// Global initialization ------------------------------------------------------------------------------------------
+
+	if (window.jsf) { // Standard JSF ajax API present?
+		jsf.ajax.addOnEvent(function(data) {
+			if (data.status == "success") {
+				self.apply(data.responseXML);
+			}
+		});
+	}
+
+	if (window.jQuery) { // jQuery ajax API present?
+		jQuery(document).ajaxComplete(function(event, xhr, options) {
+			if (typeof xhr !== "undefined") {
+				self.apply(xhr.responseXML);
+			}
+		});
+	}
 	
-	return fixViewState;
+	// Expose self to public ------------------------------------------------------------------------------------------
+
+	return self;
 
 })();
-
-// Global initialization for standard JSF ajax API.
-if (typeof jsf !== "undefined") {
-	jsf.ajax.addOnEvent(function(data) {
-		if (data.status == "success") {
-			OmniFaces.FixViewState.apply(data.responseXML);
-		}
-	});
-}
-
-// Global initialization for jQuery ajax API.
-if (typeof jQuery !== "undefined") {
-	jQuery(document).ajaxComplete(function(event, xhr, options) {
-		if (typeof xhr !== "undefined") {
-			OmniFaces.FixViewState.apply(xhr.responseXML);
-		}
-	});
-}

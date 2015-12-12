@@ -21,10 +21,14 @@ var OmniFaces = OmniFaces || {};
  */
 OmniFaces.DeferredScript = (function() {
 
-	var deferredScript = {};
-	var deferredScripts = [];
+	// Private static fields ------------------------------------------------------------------------------------------
 
-	deferredScript.add = function(url, begin, success, error) {
+	var deferredScripts = [];
+	var self = {};
+
+	// Public static functions ----------------------------------------------------------------------------------------
+
+	self.add = function(url, begin, success, error) {
 		deferredScripts.push({ url: url, begin: begin, success: success, error: error });
 
 		if (deferredScripts.length == 1) {
@@ -33,6 +37,8 @@ OmniFaces.DeferredScript = (function() {
 			});
 		}
 	}
+
+	// Private static functions ---------------------------------------------------------------------------------------
 
 	function loadDeferredScript(index) {
 		if (index < 0 || index >= deferredScripts.length) {
@@ -45,11 +51,13 @@ OmniFaces.DeferredScript = (function() {
 
 		script.async = true;
 		script.src = deferredScript.url;
+
 		script.onerror = function() {
 			if (deferredScript.error) {
 				deferredScript.error();
 			}
-		};
+		}
+
 		script.onload = script.onreadystatechange = function(_, abort) {
 			if (abort || !script.readyState || /loaded|complete/.test(script.readyState)) {
 				script.onload = script.onreadystatechange = null; // IE memory leak fix.
@@ -64,7 +72,7 @@ OmniFaces.DeferredScript = (function() {
 				script = null;
 				loadDeferredScript(index + 1); // Load next deferred script (regardless of current state).
 			}
-		};
+		}
 
 		if (deferredScript.begin) {
 			deferredScript.begin();
@@ -73,6 +81,8 @@ OmniFaces.DeferredScript = (function() {
 		head.insertBefore(script, null); // IE6 has trouble with appendChild.
 	}
 
-	return deferredScript;
+	// Expose self to public ------------------------------------------------------------------------------------------
+
+	return self;
 
 })();

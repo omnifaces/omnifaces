@@ -25,14 +25,21 @@ var OmniFaces = OmniFaces || {};
  */
 OmniFaces.Unload = (function() {
 
-	var unload = {};
-	var disabled = false;
+	// "Constant" fields ----------------------------------------------------------------------------------------------
+
 	var VIEW_STATE_PARAM = "javax.faces.ViewState";
+
+	// Private static fields ------------------------------------------------------------------------------------------
+
+	var disabled = false;
+	var self = {};
+
+	// Public static functions ----------------------------------------------------------------------------------------
 
 	/**
 	 * Initialize the "unload" event listener on the current document.
 	 */
-	unload.init = function(id) {
+	self.init = function(id) {
 		if (!window.XMLHttpRequest) {
 			return; // Native XHR not supported (IE6/7 not supported). End of story. Let session expiration do its job.
 		}
@@ -61,17 +68,19 @@ OmniFaces.Unload = (function() {
 		});
 
 		addEventListener(document, "submit", function() {
-			OmniFaces.Unload.disable(); // Disable unload event on any (propagated!) submit event.
+			self.disable(); // Disable unload event on any (propagated!) submit event.
 		});
-	};
+	}
 
 	/**
 	 * Disable the "unload" event listener on the current document.
 	 * It will be re-enabled when the DOM has not changed during the "unload" event.
 	 */
-	unload.disable = function() {
+	self.disable = function() {
 		disabled = true;
 	}
+
+	// Private static functions ---------------------------------------------------------------------------------------
 
 	/**
 	 * Get the view state value from the current document.
@@ -100,6 +109,8 @@ OmniFaces.Unload = (function() {
 		}
 	}
 
-	return unload;
+	// Expose self to public ------------------------------------------------------------------------------------------
+
+	return self;
 
 })();

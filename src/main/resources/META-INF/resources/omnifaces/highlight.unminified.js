@@ -20,6 +20,8 @@ var OmniFaces = OmniFaces || {};
  */
 OmniFaces.Highlight = {
 
+	// Public static functions ----------------------------------------------------------------------------------------
+		
 	/**
 	 * Add the given error style class to all input elements of the given client IDs and their associated labels.
 	 * If doFocus is <code>true</code>, then also set the focus on the first input element. All non-existing input 
@@ -37,7 +39,7 @@ OmniFaces.Highlight = {
 				labelsByFor[htmlFor] = label;
 			}
 		}
-		
+
 		for (var i = 0; i < clientIds.length; i++) {
 			var clientId = clientIds[i];
 			var element = document.getElementById(clientId);
@@ -65,4 +67,5 @@ OmniFaces.Highlight = {
 			}
 		}
 	}
+
 };
