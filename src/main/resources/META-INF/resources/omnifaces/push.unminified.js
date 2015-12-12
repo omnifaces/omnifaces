@@ -38,9 +38,9 @@ OmniFaces.Push = (function() {
 		this.open = function(reconnectAttempts) {
 			socket = new WebSocket(url);
 
-            socket.onopen = function(event) {
-            	reconnectAttempts = 0;
-            };
+			socket.onopen = function(event) {
+				reconnectAttempts = 0;
+			};
 
 			socket.onmessage = function(event) {
 				onmessage(JSON.parse(event.data), channel, event);
@@ -85,7 +85,8 @@ OmniFaces.Push = (function() {
 	return {
 
 		/**
-		 * Open a web socket on the given channel.
+		 * Open a web socket on the given channel. It will stay open and reconnect as long as channel is valid and
+		 * <code>OmniFaces.Push.close()</code> hasn't explicitly been called on the same channel.
 		 * @param host Required; the host of the web socket in either the format 
 		 * <code>example.com:8080/context</code>, or <code>:8080/context</code>, or <code>/context</code>.
 		 * If the value is falsey, then it will default to <code>window.location.host</code>.
@@ -120,9 +121,7 @@ OmniFaces.Push = (function() {
 				socket.close();
 			}
 
-			var url = getBaseURL(host) + encodeURIComponent(channel);
-
-			sockets[channel] = new Socket(url, channel, resolveFunction(onmessage), onclose);
+			sockets[channel] = new Socket(getBaseURL(host) + encodeURIComponent(channel), channel, resolveFunction(onmessage), onclose);
 		},
 
 		/**
