@@ -21,7 +21,6 @@ import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getSessionAttribute;
 import static org.omnifaces.util.FacesLocal.setApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.setSessionAttribute;
-import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -324,7 +323,6 @@ public class Socket extends TagHandler {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final Pattern PATTERN_CHANNEL_NAME = Pattern.compile("[\\w.-]+");
-	private static final Pattern PATTERN_SCRIPT_NAME = Pattern.compile("[$a-z_][$\\w]*", Pattern.CASE_INSENSITIVE);
 	private static final String ERROR_ILLEGAL_CHANNEL_NAME =
 		"o:socket 'channel' attribute '%s' does not represent a valid channel name."
 			+ " It may only contain alphanumeric characters, hyphens, underscores and periods.";
@@ -375,8 +373,8 @@ public class Socket extends TagHandler {
 		registerEndpointIfNecessary(facesContext);
 
 		Integer portNumber = getObject(context, port, Integer.class);
-		String onmessageFunction = quoteIfNecessary(onmessage.getValue(context));
-		String oncloseFunction = (onclose != null) ? quoteIfNecessary(onclose.getValue(context)) : null;
+		String onmessageFunction = onmessage.getValue(context);
+		String oncloseFunction = (onclose != null) ? onclose.getValue(context) : null;
 		String functions = onmessageFunction + (oncloseFunction != null ? ("," + oncloseFunction) : "");
 		ValueExpression enabledExpression = getValueExpression(context, enabled, Boolean.class);
 
@@ -419,10 +417,6 @@ public class Socket extends TagHandler {
 		catch (DeploymentException e) {
 			throw new FacesException(ERROR_ENDPOINT_REGISTRATION, e);
 		}
-	}
-
-	private static String quoteIfNecessary(String script) {
-		return isEmpty(script) ? "null" : PATTERN_SCRIPT_NAME.matcher(script).matches() ? ("'" + script + "'") : script;
 	}
 
 }

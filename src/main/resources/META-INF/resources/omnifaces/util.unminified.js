@@ -24,6 +24,7 @@ OmniFaces.Util = {
 		
 	/**
 	 * Register the given function as window onload listener function.
+	 * @param {function} listener The function to be invoked during window load event.
 	 */
 	addOnloadListener: function(listener) {
 		if (document.readyState === "complete") {
@@ -42,6 +43,15 @@ OmniFaces.Util = {
 		else {
 			window.onload = listener;
 		}
-	}
+	},
 
+	/**
+	 * If given function is actually not a function, then try to interpret it as name of a global function.
+	 * If it still doesn't resolve to anything, then return a NOOP function.
+	 * @param {Object} fn Can be function, or string representing function name, or undefined.
+	 */
+	resolveFunction: function(fn) {
+		return (typeof fn !== "function") && (fn = window[fn] || function(){}), fn;
+	}
+	
 };

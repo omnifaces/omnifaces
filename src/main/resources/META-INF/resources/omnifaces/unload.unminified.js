@@ -23,7 +23,7 @@ var OmniFaces = OmniFaces || {};
  * @see org.omnifaces.cdi.ViewScopeManager
  * @since 2.2
  */
-OmniFaces.Unload = (function() {
+OmniFaces.Unload = (function(window, document) {
 
 	// "Constant" fields ----------------------------------------------------------------------------------------------
 
@@ -37,7 +37,11 @@ OmniFaces.Unload = (function() {
 	// Public static functions ----------------------------------------------------------------------------------------
 
 	/**
-	 * Initialize the "unload" event listener on the current document.
+	 * Initialize the unload event listener on the current document. This will check if XHR is supported and if the
+	 * current document has a JSF view state element. If so, then register the <code>beforeunload</code> event to send
+	 * a synchronous XHR request with the OmniFaces view scope ID and the JSF view state value as parameters. Also
+	 * register the <code>submit</code> event to disable the unload event listener.
+	 * @param {string} id The OmniFaces view scope ID.
 	 */
 	self.init = function(id) {
 		if (!window.XMLHttpRequest) {
@@ -73,8 +77,8 @@ OmniFaces.Unload = (function() {
 	}
 
 	/**
-	 * Disable the "unload" event listener on the current document.
-	 * It will be re-enabled when the DOM has not changed during the "unload" event.
+	 * Disable the unload event listener on the current document.
+	 * It will be re-enabled when the DOM has not changed during the unload event.
 	 */
 	self.disable = function() {
 		disabled = true;
@@ -84,6 +88,7 @@ OmniFaces.Unload = (function() {
 
 	/**
 	 * Get the view state value from the current document.
+	 * @return {string} The view state value from the current document.
 	 */
 	function getViewState() {
 		for (var i = 0; i < document.forms.length; i++) {
@@ -99,12 +104,15 @@ OmniFaces.Unload = (function() {
 
 	/**
 	 * Add an event listener on the given event to the given element.
+	 * @param {HTMLElement} HTML element to add event listener to.
+	 * @param {string} The event name.
+	 * @param {function} The event listener.
 	 */
 	function addEventListener(element, event, listener) {
 		if (element.addEventListener) {
 			element.addEventListener(event, listener, false);
 		}
-		else if (element.attachEvent) {
+		else if (element.attachEvent) { // IE6-8.
 			element.attachEvent("on" + event, listener);
 		}
 	}
@@ -113,4 +121,4 @@ OmniFaces.Unload = (function() {
 
 	return self;
 
-})();
+})(window, document);

@@ -18,39 +18,27 @@ var OmniFaces = OmniFaces || {};
  * @author Bauke Scholtz
  * @see org.omnifaces.component.script.Highlight
  */
-OmniFaces.Highlight = {
+OmniFaces.Highlight = (function(document) {
+
+	// Private static fields ------------------------------------------------------------------------------------------
+
+	var self = {};
 
 	// Public static functions ----------------------------------------------------------------------------------------
-		
+
 	/**
-	 * Add the given error style class to all input elements of the given client IDs and their associated labels.
-	 * If doFocus is <code>true</code>, then also set the focus on the first input element. All non-existing input 
-	 * elements are ignored.
+	 * Apply the highlight. Add the given error style class to all input elements of the given client IDs and their
+	 * associated labels. If doFocus is <code>true</code>, then also set the focus on the first input element. All
+	 * non-existing input elements are ignored.
+	 * @param {string[]} clientIds Array of client IDs of elements to highlight.
+	 * @param {string} styleClass CSS style class to be set on the elements and the associated label elements.
+	 * @param {boolean} doFocus Whether or not to put focus on the first highlighted element.
 	 */
-	addErrorClass: function(clientIds, styleClass, doFocus) {
-		var labels = document.getElementsByTagName('LABEL');
-		var labelsByFor = {};
-
-		for ( var i = 0; i < labels.length; i++) {
-			var label = labels[i];
-			var htmlFor = label.htmlFor;
-
-			if (htmlFor) {
-				labelsByFor[htmlFor] = label;
-			}
-		}
+	self.apply = function(clientIds, styleClass, doFocus) {
+		var labelsByFor = getLabelsByFor();
 
 		for (var i = 0; i < clientIds.length; i++) {
-			var clientId = clientIds[i];
-			var element = document.getElementById(clientId);
-
-			if (!element) {
-				var elements = document.getElementsByName(clientId); // #21
-
-				if (elements && elements.length) {
-					element = elements[0];
-				}
-			}
+			var element = getElementByIdOrName(clientIds[i]);
 
 			if (element) {
 				element.className += ' ' + styleClass;
@@ -68,4 +56,49 @@ OmniFaces.Highlight = {
 		}
 	}
 
-};
+	// Private static functions ---------------------------------------------------------------------------------------
+
+	/**
+	 * Return a mapping of all <code>label</code> elements keyed by their <code>for</code> attribute.
+	 * @return {Object} A mapping of all <code>label</code> elements keyed by their <code>for</code> attribute.
+	 */
+	function getLabelsByFor() {
+		var labels = document.getElementsByTagName('LABEL');
+		var labelsByFor = {};
+
+		for ( var i = 0; i < labels.length; i++) {
+			var label = labels[i];
+			var htmlFor = label.htmlFor;
+
+			if (htmlFor) {
+				labelsByFor[htmlFor] = label;
+			}
+		}
+
+		return labelsByFor;
+	}
+
+	/**
+	 * Returns an element by ID or name.
+	 * @param {string} Client ID.
+	 * @return {HTMLElement} HTML element identified by given client ID. 
+	 */
+	function getElementByIdOrName(clientId) {
+		var element = document.getElementById(clientId);
+
+		if (!element) {
+			var elements = document.getElementsByName(clientId); // #21
+
+			if (elements && elements.length) {
+				element = elements[0];
+			}
+		}
+
+		return element;
+	}
+	
+	// Expose self to public ------------------------------------------------------------------------------------------
+
+	return self;
+
+})(document);

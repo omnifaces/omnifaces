@@ -44,7 +44,7 @@ var OmniFaces = OmniFaces || {};
  * @link https://java.net/jira/browse/JAVASERVERFACES_SPEC_PUBLIC-790
  * @since 1.7
  */
-OmniFaces.FixViewState = (function() {
+OmniFaces.FixViewState = (function(window, document) {
 
 	// "Constant" fields ----------------------------------------------------------------------------------------------
 
@@ -59,6 +59,7 @@ OmniFaces.FixViewState = (function() {
 
 	/**
 	 * Apply the "fix view state" on the current document based on the given XML response.
+	 * @param {Document} responseXML The XML response of the XMLHttpRequest.
 	 */
 	self.apply = function(responseXML) {
 		if (typeof responseXML === "undefined") {
@@ -85,7 +86,9 @@ OmniFaces.FixViewState = (function() {
 	// Private static functions ---------------------------------------------------------------------------------------
 
 	/**
-	 * Get the view state value from the given XML response.
+	 * Returns the view state value from the given XML response.
+	 * @param {Document} responseXML The XML response of the XMLHttpRequest.
+	 * @return {string} The view state value from the given XML response.
 	 */
 	function getViewStateValue(responseXML) {
 		var updates = responseXML.getElementsByTagName("update");
@@ -101,6 +104,8 @@ OmniFaces.FixViewState = (function() {
 
 	/**
 	 * Create view state hidden input element with given view state value and add it to given form.
+	 * @param {HTMLFormElement} form The form to add the view state hidden input element to.
+	 * @param {string} viewStateValue The view state value to be added to the newly created view state hidden input element.
 	 */
 	function createViewStateElement(form, viewStateValue) {
 		var hidden;
@@ -141,4 +146,4 @@ OmniFaces.FixViewState = (function() {
 
 	return self;
 
-})();
+})(window, document);
