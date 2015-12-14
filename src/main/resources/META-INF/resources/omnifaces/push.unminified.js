@@ -71,9 +71,7 @@ OmniFaces.Push = (function(Util, window) {
 				}
 				else if (event.code != 1011) { // SocketEndpoint returns 1011 on unregistered channel.
 					reconnectAttempts++;
-					setTimeout(function() {
-						self.open();
-					}, Math.min(RECONNECT_INTERVAL * reconnectAttempts, MAX_RECONNECT_INTERVAL));
+					setTimeout(self.open, Math.min(RECONNECT_INTERVAL * reconnectAttempts, MAX_RECONNECT_INTERVAL));
 				}
 			}
 		}
