@@ -19,14 +19,14 @@ var OmniFaces = OmniFaces || {};
  * @see org.omnifaces.cdi.push.Socket
  * @since 2.3
  */
-OmniFaces.Push = (function(Util, location) {
+OmniFaces.Push = (function(Util, window) {
 
 	// "Constant" fields ----------------------------------------------------------------------------------------------
 
 	var WS_SUPPORTED = !!window.WebSocket;
-	var URL_PROTOCOL = location.protocol.replace("http", "ws") + "//";
+	var URL_PROTOCOL = window.location.protocol.replace("http", "ws") + "//";
 	var URI_PREFIX = "/omnifaces.push";
-	var RECONNECT_INTERVAL = 1000;
+	var RECONNECT_INTERVAL = 500;
 	var MAX_RECONNECT_INTERVAL = 10000;
 
 	// Private static fields ------------------------------------------------------------------------------------------
@@ -49,11 +49,12 @@ OmniFaces.Push = (function(Util, location) {
 		// Private fields -----------------------------------------------------------------------------------------
 
 		var socket;
+		var reconnectAttempts = 0;
 		var self = this;
 
 		// Public functions ---------------------------------------------------------------------------------------
 
-		self.open = function(reconnectAttempts) {
+		self.open = function() {
 			socket = new WebSocket(url);
 
 			socket.onopen = function(event) {
@@ -71,7 +72,7 @@ OmniFaces.Push = (function(Util, location) {
 				else if (event.code != 1011) { // SocketEndpoint returns 1011 on unregistered channel.
 					reconnectAttempts++;
 					setTimeout(function() {
-						self.open(reconnectAttempts);
+						self.open();
 					}, Math.min(RECONNECT_INTERVAL * reconnectAttempts, MAX_RECONNECT_INTERVAL));
 				}
 			}
@@ -87,7 +88,8 @@ OmniFaces.Push = (function(Util, location) {
 
 		// Init ---------------------------------------------------------------------------------------------------
 
-		self.open(0);
+		self.open();
+
 	}
 	
 	// Public static functions ----------------------------------------------------------------------------------------
@@ -153,8 +155,8 @@ OmniFaces.Push = (function(Util, location) {
 	 */
 	function getBaseURL(host) {
 		host = host || "";
-		var base = (!host || host.indexOf("/") == 0) ? location.host + host
-				: (host.indexOf(":") == 0) ? location.hostname + host
+		var base = (!host || host.indexOf("/") == 0) ? window.location.host + host
+				: (host.indexOf(":") == 0) ? window.location.hostname + host
 				: host;
 		return URL_PROTOCOL + base + URI_PREFIX + "/";
 	}
@@ -163,4 +165,4 @@ OmniFaces.Push = (function(Util, location) {
 
 	return self;
 
-})(OmniFaces.Util, window.location);
+})(OmniFaces.Util, window);
