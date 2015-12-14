@@ -17,9 +17,8 @@ import static java.util.Collections.synchronizedSet;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
 import static org.omnifaces.util.Facelets.getObject;
 import static org.omnifaces.util.Facelets.getValueExpression;
-import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
+import static org.omnifaces.util.FacesLocal.getServletContext;
 import static org.omnifaces.util.FacesLocal.getSessionAttribute;
-import static org.omnifaces.util.FacesLocal.setApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.setSessionAttribute;
 
 import java.io.IOException;
@@ -41,6 +40,7 @@ import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagAttribute;
 import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
+import javax.servlet.ServletContext;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.DeploymentException;
 import javax.websocket.server.ServerContainer;
@@ -311,6 +311,32 @@ import org.omnifaces.util.Json;
  * If you pass a <code>Map&lt;String,V&gt;</code> or a JavaBean as push message object, then all entries/properties will
  * transparently be available as request parameters in the command script method <code>#{bean.pushed}</code>.
  *
+ * <h3>Configuration</h3>
+ * <p>
+ * The web socket endpoint associated with <code>&lt;o:socket&gt;</code> is only lazily initialized. So as long as
+ * you don't use <code>&lt;o:socket&gt;</code> anywhere in the application, then the web socket endpoint is not open.
+ * However, the lazy initialization fails in case Tyrus is used as web socket implementation (GlassFish/Payara). It
+ * only supports programmatic initialization during webapp's startup, otherwise it will throw the below exception:
+ * <pre>
+ * java.lang.IllegalStateException: Not in 'deploy' scope.
+ *     at org.glassfish.tyrus.server.TyrusServerContainer.addEndpoint
+ *     at org.omnifaces.cdi.push.Socket.registerEndpointIfNecessary
+ *     at org.omnifaces.cdi.push.Socket.apply
+ * </pre>
+ * <p>
+ * If you're facing this exception, then you need to add the below context parameter to your webapp's
+ * <code>web.xml</code> to explicitly register the web socket endpoint during webapp's startup.
+ * <pre>
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.SOCKET_ENDPOINT_ALWAYS_ENABLED&lt;/param-name&gt;
+ *     &lt;param-value&gt;true&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * </pre>
+ * <p>
+ * This is not necessary if you're not facing an exception like above, but may be useful if you always want to keep it
+ * open as it's not automatically reopened after a server restart until a page with <code>&lt;o:socket&gt;</code> has
+ * been requested.
+ *
  * @author Bauke Scholtz
  * @see SocketEventListener
  * @see SocketEndpoint
@@ -321,6 +347,9 @@ import org.omnifaces.util.Json;
 public class Socket extends TagHandler {
 
 	// Constants ------------------------------------------------------------------------------------------------------
+
+	/** The context parameter name to explicitly register web socket endpoint during startup (only required in some containers). */
+	public static final String PARAM_SOCKET_ENDPOINT_ALWAYS_ENABLED = "org.omnifaces.SOCKET_ENDPOINT_ALWAYS_ENABLED";
 
 	private static final Pattern PATTERN_CHANNEL_NAME = Pattern.compile("[\\w.-]+");
 	private static final String ERROR_ILLEGAL_CHANNEL_NAME =
@@ -370,7 +399,7 @@ public class Socket extends TagHandler {
 
 		FacesContext facesContext = context.getFacesContext();
 		validateAndRegisterChannel(facesContext, channelName);
-		registerEndpointIfNecessary(facesContext);
+		registerEndpointIfNecessary(getServletContext(facesContext));
 
 		Integer portNumber = getObject(context, port, Integer.class);
 		String onmessageFunction = onmessage.getValue(context);
@@ -385,6 +414,29 @@ public class Socket extends TagHandler {
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
+	/**
+	 * Register web socket endpoint if necessary (i.e. when it's not registered yet).
+	 * @param context The involved servlet context.
+	 */
+	public static void registerEndpointIfNecessary(ServletContext context) {
+		if (TRUE.equals(context.getAttribute(Socket.class.getName()))) {
+			return;
+		}
+
+		try {
+			ServerContainer serverContainer = (ServerContainer) context.getAttribute(ServerContainer.class.getName());
+			ServerEndpointConfig serverEndpointConfig = ServerEndpointConfig.Builder
+				.create(SocketEndpoint.class, SocketEndpoint.URI_TEMPLATE)
+				.configurator(new SocketEndpoint.HttpSessionAwareConfigurator())
+				.build();
+			serverContainer.addEndpoint(serverEndpointConfig);
+			context.setAttribute(Socket.class.getName(), TRUE);
+		}
+		catch (DeploymentException e) {
+			throw new FacesException(ERROR_ENDPOINT_REGISTRATION, e);
+		}
+	}
+
 	private static void validateAndRegisterChannel(FacesContext context, String channelName) {
 		if (!PATTERN_CHANNEL_NAME.matcher(channelName).matches()) {
 			throw new IllegalArgumentException(String.format(ERROR_ILLEGAL_CHANNEL_NAME, channelName));
@@ -398,25 +450,6 @@ public class Socket extends TagHandler {
 		}
 
 		registeredChannels.add(channelName);
-	}
-
-	private static void registerEndpointIfNecessary(FacesContext context) {
-		if (TRUE.equals(getApplicationAttribute(context, Socket.class.getName()))) {
-			return;
-		}
-
-		try {
-			ServerContainer serverContainer = getApplicationAttribute(context, ServerContainer.class.getName());
-			ServerEndpointConfig serverEndpointConfig = ServerEndpointConfig.Builder
-				.create(SocketEndpoint.class, SocketEndpoint.URI_TEMPLATE)
-				.configurator(new SocketEndpoint.HttpSessionAwareConfigurator())
-				.build();
-			serverContainer.addEndpoint(serverEndpointConfig);
-			setApplicationAttribute(context, Socket.class.getName(), TRUE);
-		}
-		catch (DeploymentException e) {
-			throw new FacesException(ERROR_ENDPOINT_REGISTRATION, e);
-		}
 	}
 
 }
