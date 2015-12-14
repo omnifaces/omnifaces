@@ -100,13 +100,17 @@ public class SocketEndpoint extends Endpoint {
 
 	    @Override
 	    public void modifyHandshake(ServerEndpointConfig config, HandshakeRequest request, HandshakeResponse response) {
-	        config.getUserProperties().put("httpSession", request.getHttpSession());
+	    	Object httpSession = request.getHttpSession();
+
+	    	if (httpSession != null) { // May happen when session is cleared after server restart while socket is still open in client side.
+		        config.getUserProperties().put("httpSession", request.getHttpSession());
+	    	}
 	    }
 
 		@SuppressWarnings("unchecked")
 	    static boolean isRegisteredChannel(EndpointConfig config, String channel) {
 	    	HttpSession httpSession = (HttpSession) config.getUserProperties().get("httpSession");
-			Set<String> registeredChannels = (Set<String>) httpSession.getAttribute(Socket.class.getName());
+			Set<String> registeredChannels = (httpSession != null) ? (Set<String>) httpSession.getAttribute(Socket.class.getName()) : null;
 	    	return registeredChannels != null && registeredChannels.contains(channel);
 	    }
 
