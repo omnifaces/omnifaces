@@ -4819,12 +4819,12 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 		<attribute>
 			<description>
 				<![CDATA[
-					Whether the web socket should be enabled or not.
-					Defaults to <code>true</code>.
-					This effectively controls the <code>rendered</code> attribute of the auto-included push script.
+					Whether the web socket should be disabled or not.
+					Defaults to <code>false</code>.
+					It's interpreted as a JavaScript instruction whether to open or close the web socket push connection.
 				]]>
 			</description>
-			<name>enabled</name>
+			<name>disabled</name>
 			<required>false</required>
 			<type>java.lang.Boolean</type>
 		</attribute>

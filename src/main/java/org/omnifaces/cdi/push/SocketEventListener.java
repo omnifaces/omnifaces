@@ -53,22 +53,22 @@ public class SocketEventListener implements SystemEventListener {
 	private Integer port;
 	private String channel;
 	private String functions;
-	private ValueExpression enabledExpression;
+	private ValueExpression disabledExpression;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Construct an instance of socket event listener based on the given channel name, functions and enabled expression.
+	 * Construct an instance of socket event listener based on the given channel name, functions and disabled expression.
 	 * @param port The port number.
 	 * @param channel The channel name.
 	 * @param functions The onmessage and onclose functions.
-	 * @param enabledExpression The enabled expression.
+	 * @param disabledExpression The disabled expression.
 	 */
-	public SocketEventListener(Integer port, String channel, String functions, ValueExpression enabledExpression) {
+	public SocketEventListener(Integer port, String channel, String functions, ValueExpression disabledExpression) {
 		this.port = port;
 		this.channel = channel;
 		this.functions = functions;
-		this.enabledExpression = enabledExpression;
+		this.disabledExpression = disabledExpression;
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -83,8 +83,8 @@ public class SocketEventListener implements SystemEventListener {
 
 	/**
 	 * If event is an instance of {@link PostAddToViewEvent}, then add the main <code>omnifaces.js</code> script
-	 * resource. Else if event is an instance of {@link PreRenderViewEvent}, and the socket is new and enabled, or has
-	 * just switched the <code>enabled</code> attribute, then render either the <code>open()</code> script or the
+	 * resource. Else if event is an instance of {@link PreRenderViewEvent}, and the socket is new and not disabled, or
+	 * has just switched the <code>disabled</code> attribute, then render either the <code>open()</code> script or the
 	 * <code>close()</code> script. During an ajax request with partial rendering, it's added as
 	 * <code>&lt;eval&gt;</code> by partial response writer, else it's just added as a script component with
 	 * <code>target="body"</code>.
@@ -96,12 +96,12 @@ public class SocketEventListener implements SystemEventListener {
 		}
 		else if (event instanceof PreRenderViewEvent) {
 			FacesContext context = FacesContext.getCurrentInstance();
-			boolean enabled = (enabledExpression == null) || TRUE.equals(enabledExpression.getValue(context.getELContext()));
+			boolean disabled = disabledExpression != null && TRUE.equals(disabledExpression.getValue(context.getELContext()));
 
-			if (hasSwitched(context, channel, enabled)) {
-				String script = enabled
-					? String.format(SCRIPT_OPEN, (port != null ? ":" + port : "") + getRequestContextPath(context), channel, functions)
-					: String.format(SCRIPT_CLOSE, channel);
+			if (hasSwitched(context, channel, disabled)) {
+				String script = disabled
+					? String.format(SCRIPT_CLOSE, channel)
+					: String.format(SCRIPT_OPEN, (port != null ? ":" + port : "") + getRequestContextPath(context), channel, functions);
 
 				if (isAjaxRequestWithPartialRendering(context)) {
 					oncomplete(script);
@@ -116,10 +116,10 @@ public class SocketEventListener implements SystemEventListener {
 	// Helpers --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Helper to remember which channels are opened on the view and returns <code>true</code> if it is new and enabled,
-	 * or has switched its <code>enabled</code> attribute.
+	 * Helper to remember which channels are opened on the view and returns <code>true</code> if it is new and not
+	 * disabled, or has switched its <code>disabled</code> attribute.
 	 */
-	private static boolean hasSwitched(FacesContext context, String channel, boolean enabled) {
+	private static boolean hasSwitched(FacesContext context, String channel, boolean disabled) {
 		Map<String, Boolean> channels = getViewAttribute(context, Socket.class.getName());
 
 		if (channels == null) {
@@ -127,8 +127,8 @@ public class SocketEventListener implements SystemEventListener {
 			setViewAttribute(context, Socket.class.getName(), channels);
 		}
 
-		Boolean previouslyEnabled = channels.put(channel, enabled);
-		return (previouslyEnabled == null) ? enabled : (previouslyEnabled != enabled);
+		Boolean previouslyDisabled = channels.put(channel, disabled);
+		return (previouslyDisabled == null) ? !disabled : (previouslyDisabled != disabled);
 	}
 
 }

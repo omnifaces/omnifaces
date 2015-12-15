@@ -153,18 +153,18 @@ import org.omnifaces.util.Json;
  * <code>&lt;p:remoteCommand&gt;</code> or similar. This has among others the advantage of maintaining the JSF view
  * state.
  *
- * <h3>Conditionally enabling push</h3>
+ * <h3>Conditionally disabling push</h3>
  * <p>
- * You can use the <code>enabled</code> attribute for that.
+ * You can use the <code>disabled</code> attribute for that.
  * <pre>
- * &lt;o:socket ... enabled="#{bean.pushable}" /&gt;
+ * &lt;o:socket ... disabled="#{not bean.pushable}" /&gt;
  * </pre>
  * <p>
- * It defaults to <code>true</code> and it's interpreted as a script instruction to open the web socket push connection.
- * If it becomes <code>false</code> during an ajax request, then the push connection will explicitly be closed during
- * the complete of that ajax request, even though you did not cover the <code>&lt;o:socket&gt;</code> tag in ajax
- * render/update. So make sure it's tied to at least a view scoped property in case you intend to control it during the
- * view scope.
+ * It defaults to <code>false</code> and it's interpreted as a JavaScript instruction whether to open or close the web
+ * socket push connection. If it becomes <code>true</code> during an ajax request, then the push connection will
+ * explicitly be closed during oncomplete of that ajax request, even though you did not cover the
+ * <code>&lt;o:socket&gt;</code> tag in ajax render/update. So make sure it's tied to at least a view scoped property in
+ * case you intend to control it during the view scope.
  *
  * <h3>Channel name design hints</h3>
  * <p>
@@ -364,7 +364,7 @@ public class Socket extends TagHandler {
 	private TagAttribute channel;
 	private TagAttribute onmessage;
 	private TagAttribute onclose;
-	private TagAttribute enabled;
+	private TagAttribute disabled;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -380,7 +380,7 @@ public class Socket extends TagHandler {
 		channel = getRequiredAttribute("channel");
 		onmessage = getRequiredAttribute("onmessage");
 		onclose = getAttribute("onclose");
-		enabled = getAttribute("enabled");
+		disabled = getAttribute("disabled");
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -406,9 +406,9 @@ public class Socket extends TagHandler {
 		String onmessageFunction = onmessage.getValue(context);
 		String oncloseFunction = (onclose != null) ? onclose.getValue(context) : null;
 		String functions = onmessageFunction + (oncloseFunction != null ? ("," + oncloseFunction) : "");
-		ValueExpression enabledExpression = getValueExpression(context, enabled, Boolean.class);
+		ValueExpression disabledExpression = getValueExpression(context, disabled, Boolean.class);
 
-		SystemEventListener listener = new SocketEventListener(portNumber, channelName, functions, enabledExpression);
+		SystemEventListener listener = new SocketEventListener(portNumber, channelName, functions, disabledExpression);
 		subscribeToViewEvent(PostAddToViewEvent.class, listener);
 		subscribeToViewEvent(PreRenderViewEvent.class, listener);
 	}
