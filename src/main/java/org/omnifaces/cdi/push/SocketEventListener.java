@@ -17,12 +17,7 @@ import static org.omnifaces.util.Ajax.oncomplete;
 import static org.omnifaces.util.Components.addScriptResourceToHead;
 import static org.omnifaces.util.Components.addScriptToBody;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
-import static org.omnifaces.util.FacesLocal.getViewAttribute;
 import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
-import static org.omnifaces.util.FacesLocal.setViewAttribute;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.el.ValueExpression;
 import javax.faces.component.UIViewRoot;
@@ -98,10 +93,17 @@ public class SocketEventListener implements SystemEventListener {
 			FacesContext context = FacesContext.getCurrentInstance();
 			boolean disabled = disabledExpression != null && TRUE.equals(disabledExpression.getValue(context.getELContext()));
 
-			if (hasSwitched(context, channel, disabled)) {
-				String script = disabled
-					? String.format(SCRIPT_CLOSE, channel)
-					: String.format(SCRIPT_OPEN, (port != null ? ":" + port : "") + getRequestContextPath(context), channel, functions);
+			if (SocketConfigurator.hasSwitched(context, channel, disabled)) {
+				String script;
+
+				if (!disabled) {
+					SocketConfigurator.registerChannel(context, channel);
+					String base = (port != null ? ":" + port : "") + getRequestContextPath(context);
+					script = String.format(SCRIPT_OPEN, base, channel, functions);
+				}
+				else {
+					script = String.format(SCRIPT_CLOSE, channel);
+				}
 
 				if (isAjaxRequestWithPartialRendering(context)) {
 					oncomplete(script);
@@ -111,24 +113,6 @@ public class SocketEventListener implements SystemEventListener {
 				}
 			}
 		}
-	}
-
-	// Helpers --------------------------------------------------------------------------------------------------------
-
-	/**
-	 * Helper to remember which channels are opened on the view and returns <code>true</code> if it is new and not
-	 * disabled, or has switched its <code>disabled</code> attribute.
-	 */
-	private static boolean hasSwitched(FacesContext context, String channel, boolean disabled) {
-		Map<String, Boolean> channels = getViewAttribute(context, Socket.class.getName());
-
-		if (channels == null) {
-			channels = new HashMap<>();
-			setViewAttribute(context, Socket.class.getName(), channels);
-		}
-
-		Boolean previouslyDisabled = channels.put(channel, disabled);
-		return (previouslyDisabled == null) ? !disabled : (previouslyDisabled != disabled);
 	}
 
 }

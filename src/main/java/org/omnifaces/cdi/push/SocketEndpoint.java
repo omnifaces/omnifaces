@@ -12,24 +12,17 @@
  */
 package org.omnifaces.cdi.push;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.websocket.CloseReason.CloseCodes.UNEXPECTED_CONDITION;
 
 import java.io.IOException;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.faces.FacesException;
-import javax.servlet.http.HttpSession;
 import javax.websocket.CloseReason;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
-import javax.websocket.HandshakeResponse;
 import javax.websocket.Session;
-import javax.websocket.server.HandshakeRequest;
-import javax.websocket.server.ServerEndpointConfig;
-import javax.websocket.server.ServerEndpointConfig.Configurator;
 
 import org.omnifaces.cdi.PushContext;
 import org.omnifaces.config.BeanManager;
@@ -61,7 +54,7 @@ public class SocketEndpoint extends Endpoint {
 	public void onOpen(Session session, EndpointConfig config) {
 		String channel = session.getPathParameters().get("channel");
 
-		if (!HttpSessionAwareConfigurator.isRegisteredChannel(config, channel)) {
+		if (!SocketConfigurator.isRegisteredChannel(config, channel)) {
 			try {
 				session.close(new CloseReason(UNEXPECTED_CONDITION, String.format(ERROR_UNKNOWN_CHANNEL, channel)));
 				return;
@@ -71,7 +64,7 @@ public class SocketEndpoint extends Endpoint {
 			}
 		}
 
-		HttpSessionAwareConfigurator.alignMaxIdleTimeout(config, session);
+		SocketConfigurator.alignMaxIdleTimeout(config, session);
 		BeanManager.INSTANCE.getReference(SocketPushContext.class).add(session, channel); // @Inject in Endpoint doesn't work in Tomcat+Weld.
 	}
 
@@ -93,33 +86,6 @@ public class SocketEndpoint extends Endpoint {
 	@Override
 	public void onClose(Session session, CloseReason reason) {
 		BeanManager.INSTANCE.getReference(SocketPushContext.class).remove(session); // @Inject in Endpoint doesn't work in Tomcat+Weld.
-	}
-
-	// Nested classes -------------------------------------------------------------------------------------------------
-
-	static class HttpSessionAwareConfigurator extends Configurator {
-
-		@Override
-		public void modifyHandshake(ServerEndpointConfig config, HandshakeRequest request, HandshakeResponse response) {
-			Object httpSession = request.getHttpSession();
-
-			if (httpSession != null) { // May be null when session is cleared after server restart while socket is still open in client side.
-				config.getUserProperties().put("httpSession", httpSession);
-			}
-		}
-
-		@SuppressWarnings("unchecked")
-		static boolean isRegisteredChannel(EndpointConfig config, String channel) {
-			HttpSession httpSession = (HttpSession) config.getUserProperties().get("httpSession");
-			Set<String> registeredChannels = (httpSession != null) ? (Set<String>) httpSession.getAttribute(Socket.class.getName()) : null;
-			return registeredChannels != null && registeredChannels.contains(channel);
-		}
-
-		static void alignMaxIdleTimeout(EndpointConfig config, Session session) {
-			HttpSession httpSession = (HttpSession) config.getUserProperties().get("httpSession");
-			session.setMaxIdleTimeout(SECONDS.toMillis(httpSession.getMaxInactiveInterval()));
-		}
-
 	}
 
 }

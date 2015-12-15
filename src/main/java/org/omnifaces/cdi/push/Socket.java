@@ -12,24 +12,17 @@
  */
 package org.omnifaces.cdi.push;
 
-import static java.lang.Boolean.TRUE;
-import static java.util.Collections.synchronizedSet;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
 import static org.omnifaces.util.Facelets.getObject;
 import static org.omnifaces.util.Facelets.getValueExpression;
 import static org.omnifaces.util.FacesLocal.getServletContext;
-import static org.omnifaces.util.FacesLocal.getSessionAttribute;
-import static org.omnifaces.util.FacesLocal.setSessionAttribute;
 
 import java.io.IOException;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.el.ValueExpression;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.BeanManager;
-import javax.faces.FacesException;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PostAddToViewEvent;
@@ -40,11 +33,7 @@ import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagAttribute;
 import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
-import javax.servlet.ServletContext;
 import javax.websocket.CloseReason.CloseCodes;
-import javax.websocket.DeploymentException;
-import javax.websocket.server.ServerContainer;
-import javax.websocket.server.ServerEndpointConfig;
 
 import org.omnifaces.cdi.PushContext;
 import org.omnifaces.util.Callback;
@@ -349,14 +338,10 @@ public class Socket extends TagHandler {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	/** The context parameter name to explicitly register web socket endpoint during startup (only required in some containers). */
-	public static final String PARAM_SOCKET_ENDPOINT_ALWAYS_ENABLED = "org.omnifaces.SOCKET_ENDPOINT_ALWAYS_ENABLED";
-
 	private static final Pattern PATTERN_CHANNEL_NAME = Pattern.compile("[\\w.-]+");
 	private static final String ERROR_ILLEGAL_CHANNEL_NAME =
 		"o:socket 'channel' attribute '%s' does not represent a valid channel name."
 			+ " It may only contain alphanumeric characters, hyphens, underscores and periods.";
-	private static final String ERROR_ENDPOINT_REGISTRATION = "o:socket endpoint cannot be registered.";
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -371,8 +356,6 @@ public class Socket extends TagHandler {
 	/**
 	 * The tag constructor. It will extract and validate the attributes.
 	 * @param config The tag config.
-	 * @throws IllegalArgumentException When the channel name is invalid.
-	 * It may only contain alphanumeric characters, hyphens, underscores and periods.
 	 */
 	public Socket(TagConfig config) {
 		super(config);
@@ -389,6 +372,8 @@ public class Socket extends TagHandler {
 	 * Register the push channel and endpoint if necessary and then subcribe the {@link SocketEventListener}.
 	 * Note thus that any manually triggered push requests on unregistered channels will cause an exception, and that
 	 * the push endpoint is only activated when the <code>&lt;o:socket&gt;</code> is actually used in the application.
+	 * @throws IllegalArgumentException When the channel name is invalid.
+	 * It may only contain alphanumeric characters, hyphens, underscores and periods.
 	 */
 	@Override
 	public void apply(FaceletContext context, UIComponent parent) throws IOException {
@@ -398,9 +383,12 @@ public class Socket extends TagHandler {
 
 		String channelName = channel.getValue(context);
 
+		if (!PATTERN_CHANNEL_NAME.matcher(channelName).matches()) {
+			throw new IllegalArgumentException(String.format(ERROR_ILLEGAL_CHANNEL_NAME, channelName));
+		}
+
 		FacesContext facesContext = context.getFacesContext();
-		validateAndRegisterChannel(facesContext, channelName);
-		registerEndpointIfNecessary(getServletContext(facesContext));
+		SocketConfigurator.registerEndpointIfNecessary(getServletContext(facesContext), false);
 
 		Integer portNumber = getObject(context, port, Integer.class);
 		String onmessageFunction = onmessage.getValue(context);
@@ -411,46 +399,6 @@ public class Socket extends TagHandler {
 		SystemEventListener listener = new SocketEventListener(portNumber, channelName, functions, disabledExpression);
 		subscribeToViewEvent(PostAddToViewEvent.class, listener);
 		subscribeToViewEvent(PreRenderViewEvent.class, listener);
-	}
-
-	// Helpers --------------------------------------------------------------------------------------------------------
-
-	/**
-	 * Register web socket endpoint if necessary (i.e. when it's not registered yet).
-	 * @param context The involved servlet context.
-	 */
-	public static void registerEndpointIfNecessary(ServletContext context) {
-		if (TRUE.equals(context.getAttribute(Socket.class.getName()))) {
-			return;
-		}
-
-		try {
-			ServerContainer serverContainer = (ServerContainer) context.getAttribute(ServerContainer.class.getName());
-			ServerEndpointConfig serverEndpointConfig = ServerEndpointConfig.Builder
-				.create(SocketEndpoint.class, SocketEndpoint.URI_TEMPLATE)
-				.configurator(new SocketEndpoint.HttpSessionAwareConfigurator())
-				.build();
-			serverContainer.addEndpoint(serverEndpointConfig);
-			context.setAttribute(Socket.class.getName(), TRUE);
-		}
-		catch (DeploymentException e) {
-			throw new FacesException(ERROR_ENDPOINT_REGISTRATION, e);
-		}
-	}
-
-	private static void validateAndRegisterChannel(FacesContext context, String channelName) {
-		if (!PATTERN_CHANNEL_NAME.matcher(channelName).matches()) {
-			throw new IllegalArgumentException(String.format(ERROR_ILLEGAL_CHANNEL_NAME, channelName));
-		}
-
-		Set<String> registeredChannels = getSessionAttribute(context, Socket.class.getName());
-
-		if (registeredChannels == null) {
-			registeredChannels = synchronizedSet(new HashSet<String>());
-			setSessionAttribute(context, Socket.class.getName(), registeredChannels);
-		}
-
-		registeredChannels.add(channelName);
 	}
 
 }
