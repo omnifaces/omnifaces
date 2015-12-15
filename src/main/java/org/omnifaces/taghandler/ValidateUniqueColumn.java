@@ -12,6 +12,7 @@
  */
 package org.omnifaces.taghandler;
 
+import static java.lang.Boolean.parseBoolean;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Components.getLabel;
 import static org.omnifaces.util.Faces.getELContext;
@@ -198,7 +199,7 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
 		}
 
 		if (disabled.isLiteralText()) {
-			return Boolean.valueOf(disabled.getExpressionString());
+			return parseBoolean(disabled.getExpressionString());
 		}
 
 		return getValue(disabled, false);

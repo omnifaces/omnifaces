@@ -12,6 +12,7 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static java.lang.Boolean.parseBoolean;
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Utils.isEmpty;
@@ -199,7 +200,7 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 	 */
 	@Override
 	public Resource decorateResource(Resource resource) {
-		if (resource == null || (disabledParam != null && Boolean.valueOf(String.valueOf(evaluateExpressionGet(disabledParam))))) {
+		if (resource == null || (disabledParam != null && parseBoolean(String.valueOf(evaluateExpressionGet(disabledParam))))) {
 			return resource;
 		}
 

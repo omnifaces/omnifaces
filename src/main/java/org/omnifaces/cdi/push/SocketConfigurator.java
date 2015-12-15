@@ -13,6 +13,7 @@
 package org.omnifaces.cdi.push;
 
 import static java.lang.Boolean.TRUE;
+import static java.lang.Boolean.parseBoolean;
 import static java.util.Collections.synchronizedSet;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.omnifaces.util.FacesLocal.getSessionAttribute;
@@ -65,10 +66,7 @@ public class SocketConfigurator extends Configurator {
 	public static void registerEndpointIfNecessary(ServletContext context, boolean checkParam) {
 		Boolean registered = (Boolean) context.getAttribute(KEY);
 
-		if (TRUE.equals(registered)) {
-			return;
-		}
-		else if (checkParam && !TRUE.equals(Boolean.valueOf(context.getInitParameter(PARAM_SOCKET_ENDPOINT_ALWAYS_ENABLED)))) {
+		if (TRUE.equals(registered) || (checkParam && !parseBoolean(context.getInitParameter(PARAM_SOCKET_ENDPOINT_ALWAYS_ENABLED)))) {
 			return;
 		}
 

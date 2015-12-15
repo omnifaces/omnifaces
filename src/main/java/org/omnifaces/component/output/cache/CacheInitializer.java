@@ -12,6 +12,7 @@
  */
 package org.omnifaces.component.output.cache;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.util.Collections.list;
 import static org.omnifaces.util.Platform.getFacesServletRegistration;
 
@@ -57,7 +58,7 @@ public final class CacheInitializer {
 
 		// Installs a filter that on demands buffers the response from the Faces Servlet, in order to grab child content
 		// from the buffer.
-		if (Boolean.TRUE.equals(Boolean.valueOf(context.getInitParameter(CACHE_INSTALL_BUFFER_FILTER)))) {
+		if (parseBoolean(context.getInitParameter(CACHE_INSTALL_BUFFER_FILTER))) {
 			ServletRegistration facesServletRegistration = getFacesServletRegistration(context);
 			FilterRegistration bufferFilterRegistration = context.addFilter(OnDemandResponseBufferFilter.class.getName(), OnDemandResponseBufferFilter.class);
 			bufferFilterRegistration.addMappingForServletNames(null, true, facesServletRegistration.getName());

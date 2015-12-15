@@ -12,7 +12,7 @@
  */
 package org.omnifaces.cdi.param;
 
-import static java.lang.Boolean.valueOf;
+import static java.lang.Boolean.parseBoolean;
 import static javax.faces.validator.BeanValidator.DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME;
 import static org.omnifaces.util.Beans.getQualifier;
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
@@ -269,7 +269,7 @@ public class RequestParameterProducer {
 		}
 
 		// Next check if bean validation has been disabled globally, but only if this hasn't been overridden locally
-		if (!requestParameter.overrideGlobalBeanValidationDisabled() && valueOf(getInitParameter(DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME))) {
+		if (!requestParameter.overrideGlobalBeanValidationDisabled() && parseBoolean(getInitParameter(DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME))) {
 			return false;
 		}
 

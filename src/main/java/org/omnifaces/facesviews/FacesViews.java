@@ -12,6 +12,7 @@
  */
 package org.omnifaces.facesviews;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Locale.US;
@@ -249,8 +250,8 @@ public final class FacesViews {
 				}
 
 				// We now need to map the Faces Servlet to the extensions we found, but at this point in time
-                // this Faces Servlet might not be created yet, so we do this part in the 
-                // org.omnifaces.facesviews.FacesViews.addMappings(ServletContext) method below, which is called from 
+                // this Faces Servlet might not be created yet, so we do this part in the
+                // org.omnifaces.facesviews.FacesViews.addMappings(ServletContext) method below, which is called from
                 // org.omnifaces.ApplicationListener.contextInitialized(ServletContextEvent) later
             }
 		}
@@ -465,12 +466,7 @@ public final class FacesViews {
 
 	public static boolean isFilterAfterDeclaredFilters(ServletContext servletContext) {
 		String filterAfterDeclaredFilters = servletContext.getInitParameter(FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS_PARAM_NAME);
-
-		if (filterAfterDeclaredFilters == null) {
-			return true;
-		}
-
-		return Boolean.valueOf(filterAfterDeclaredFilters);
+		return filterAfterDeclaredFilters == null || parseBoolean(filterAfterDeclaredFilters);
 	}
 
 	public static boolean isScannedViewsAlwaysExtensionless(final FacesContext context) {
@@ -480,11 +476,7 @@ public final class FacesViews {
 
 		Boolean scannedViewsExtensionless = (Boolean) applicationMap.get(SCANNED_VIEWS_EXTENSIONLESS);
 		if (scannedViewsExtensionless == null) {
-			if (externalContext.getInitParameter(FACES_VIEWS_SCANNED_VIEWS_EXTENSIONLESS_PARAM_NAME) == null) {
-				scannedViewsExtensionless = true;
-			} else {
-				scannedViewsExtensionless = Boolean.valueOf(externalContext.getInitParameter(FACES_VIEWS_SCANNED_VIEWS_EXTENSIONLESS_PARAM_NAME));
-			}
+			scannedViewsExtensionless = Boolean.valueOf(externalContext.getInitParameter(FACES_VIEWS_SCANNED_VIEWS_EXTENSIONLESS_PARAM_NAME));
 			applicationMap.put(SCANNED_VIEWS_EXTENSIONLESS, scannedViewsExtensionless);
 		}
 

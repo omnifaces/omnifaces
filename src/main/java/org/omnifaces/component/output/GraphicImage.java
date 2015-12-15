@@ -12,6 +12,7 @@
  */
 package org.omnifaces.component.output;
 
+import static java.lang.Boolean.parseBoolean;
 import static org.omnifaces.resourcehandler.DefaultResourceHandler.RES_NOT_FOUND;
 import static org.omnifaces.util.Renderers.writeAttributes;
 import static org.omnifaces.util.Utils.coalesce;
@@ -230,7 +231,7 @@ public class GraphicImage extends HtmlGraphicImage {
 	 */
 	protected String getSrc(FacesContext context) throws IOException {
 		String name = (String) getAttributes().get("name");
-		boolean dataURI = Boolean.valueOf(String.valueOf(getAttributes().get("dataURI")));
+		boolean dataURI = parseBoolean(String.valueOf(getAttributes().get("dataURI")));
 
 		Resource resource;
 
