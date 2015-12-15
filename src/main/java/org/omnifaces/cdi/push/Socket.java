@@ -142,18 +142,29 @@ import org.omnifaces.util.Json;
  * <code>&lt;p:remoteCommand&gt;</code> or similar. This has among others the advantage of maintaining the JSF view
  * state.
  *
- * <h3>Conditionally disabling push</h3>
+ * <h3>Conditionally connecting socket</h3>
  * <p>
- * You can use the <code>disabled</code> attribute for that.
+ * You can use the <code>connected</code> attribute for that.
  * <pre>
- * &lt;o:socket ... disabled="#{not bean.pushable}" /&gt;
+ * &lt;o:socket ... connected="#{bean.pushable}" /&gt;
  * </pre>
  * <p>
- * It defaults to <code>false</code> and it's interpreted as a JavaScript instruction whether to open or close the web
- * socket push connection. If it becomes <code>true</code> during an ajax request, then the push connection will
- * explicitly be closed during oncomplete of that ajax request, even though you did not cover the
- * <code>&lt;o:socket&gt;</code> tag in ajax render/update. So make sure it's tied to at least a view scoped property in
- * case you intend to control it during the view scope.
+ * It defaults to <code>true</code> and it's interpreted as a JavaScript instruction whether to open or close the web
+ * socket push connection. If the value is an EL expression and it becomes <code>false</code> during an ajax request,
+ * then the push connection will explicitly be closed during oncomplete of that ajax request, even though you did not
+ * cover the <code>&lt;o:socket&gt;</code> tag in ajax render/update. So make sure it's tied to at least a view scoped
+ * property in case you intend to control it during the view scope. You can also explicitly set it to <code>false</code>
+ * and manually open the push connection from client side by invoking <code>OmniFaces.Push.open(channel)</code>, passing
+ * the channel name.
+ * <pre>
+ * &lt;o:socket channel="foo" ... connected="false" /&gt;
+ * </pre>
+ * <pre>
+ * function someFunction() {
+ *     // ...
+ *     OmniFaces.Push.open("foo");
+ * }
+ * </pre>
  *
  * <h3>Channel name design hints</h3>
  * <p>
@@ -349,7 +360,7 @@ public class Socket extends TagHandler {
 	private TagAttribute channel;
 	private TagAttribute onmessage;
 	private TagAttribute onclose;
-	private TagAttribute disabled;
+	private TagAttribute connected;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -363,7 +374,7 @@ public class Socket extends TagHandler {
 		channel = getRequiredAttribute("channel");
 		onmessage = getRequiredAttribute("onmessage");
 		onclose = getAttribute("onclose");
-		disabled = getAttribute("disabled");
+		connected = getAttribute("connected");
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -393,10 +404,10 @@ public class Socket extends TagHandler {
 		Integer portNumber = getObject(context, port, Integer.class);
 		String onmessageFunction = onmessage.getValue(context);
 		String oncloseFunction = (onclose != null) ? onclose.getValue(context) : null;
-		String functions = onmessageFunction + (oncloseFunction != null ? ("," + oncloseFunction) : "");
-		ValueExpression disabledExpression = getValueExpression(context, disabled, Boolean.class);
+		String functions = onmessageFunction + "," + oncloseFunction;
+		ValueExpression connectedExpression = getValueExpression(context, connected, Boolean.class);
 
-		SystemEventListener listener = new SocketEventListener(portNumber, channelName, functions, disabledExpression);
+		SystemEventListener listener = new SocketEventListener(portNumber, channelName, functions, connectedExpression);
 		subscribeToViewEvent(PostAddToViewEvent.class, listener);
 		subscribeToViewEvent(PreRenderViewEvent.class, listener);
 	}

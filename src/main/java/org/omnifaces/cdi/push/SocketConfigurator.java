@@ -97,10 +97,10 @@ public class SocketConfigurator extends Configurator {
 	}
 
 	/**
-	 * Helper to remember which channels are opened on the view and returns <code>true</code> if it is new and not
-	 * disabled, or has switched its <code>disabled</code> attribute.
+	 * Helper to remember which channels are opened on the view and returns <code>null</code> if it is new, or
+	 * <code>true</code> or <code>false</code> if it has switched its <code>connected</code> attribute.
 	 */
-	static boolean hasSwitched(FacesContext context, String channel, boolean disabled) {
+	static Boolean hasSwitched(FacesContext context, String channel, boolean connected) {
 		Map<String, Boolean> channels = getViewAttribute(context, KEY);
 
 		if (channels == null) {
@@ -108,8 +108,8 @@ public class SocketConfigurator extends Configurator {
 			setViewAttribute(context, KEY, channels);
 		}
 
-		Boolean previouslyDisabled = channels.put(channel, disabled);
-		return (previouslyDisabled == null) ? !disabled : (previouslyDisabled != disabled);
+		Boolean previouslyConnected = channels.put(channel, connected);
+		return (previouslyConnected == null) ? null : (previouslyConnected != connected);
 	}
 
 	/**

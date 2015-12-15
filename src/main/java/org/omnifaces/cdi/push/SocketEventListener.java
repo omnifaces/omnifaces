@@ -40,7 +40,8 @@ public class SocketEventListener implements SystemEventListener {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String SCRIPT_OPEN = "OmniFaces.Push.open('%s','%s',%s);";
+	private static final String SCRIPT_INIT = "OmniFaces.Push.init('%s','%s',%s,%s);";
+	private static final String SCRIPT_OPEN = "OmniFaces.Push.open('%s');";
 	private static final String SCRIPT_CLOSE = "OmniFaces.Push.close('%s');";
 
 	// Variables ------------------------------------------------------------------------------------------------------
@@ -48,22 +49,23 @@ public class SocketEventListener implements SystemEventListener {
 	private Integer port;
 	private String channel;
 	private String functions;
-	private ValueExpression disabledExpression;
+	private ValueExpression connectedExpression;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Construct an instance of socket event listener based on the given channel name, functions and disabled expression.
+	 * Construct an instance of socket event listener based on the given channel name, functions and connected
+	 * expression.
 	 * @param port The port number.
 	 * @param channel The channel name.
 	 * @param functions The onmessage and onclose functions.
-	 * @param disabledExpression The disabled expression.
+	 * @param connectedExpression The connected expression.
 	 */
-	public SocketEventListener(Integer port, String channel, String functions, ValueExpression disabledExpression) {
+	public SocketEventListener(Integer port, String channel, String functions, ValueExpression connectedExpression) {
 		this.port = port;
 		this.channel = channel;
 		this.functions = functions;
-		this.disabledExpression = disabledExpression;
+		this.connectedExpression = connectedExpression;
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -78,11 +80,11 @@ public class SocketEventListener implements SystemEventListener {
 
 	/**
 	 * If event is an instance of {@link PostAddToViewEvent}, then add the main <code>omnifaces.js</code> script
-	 * resource. Else if event is an instance of {@link PreRenderViewEvent}, and the socket is new and not disabled, or
-	 * has just switched the <code>disabled</code> attribute, then render either the <code>open()</code> script or the
-	 * <code>close()</code> script. During an ajax request with partial rendering, it's added as
-	 * <code>&lt;eval&gt;</code> by partial response writer, else it's just added as a script component with
-	 * <code>target="body"</code>.
+	 * resource. Else if event is an instance of {@link PreRenderViewEvent}, and the socket is new, then render the
+	 * <code>init()</code> script, or if it has just switched the <code>connected</code> attribute, then render either
+	 * the <code>open()</code> script or the <code>close()</code> script. During an ajax request with partial rendering,
+	 * it's added as <code>&lt;eval&gt;</code> by partial response writer, else it's just added as a script component
+	 * with <code>target="body"</code>.
 	 */
 	@Override
 	public void processEvent(SystemEvent event) throws AbortProcessingException {
@@ -91,20 +93,20 @@ public class SocketEventListener implements SystemEventListener {
 		}
 		else if (event instanceof PreRenderViewEvent) {
 			FacesContext context = FacesContext.getCurrentInstance();
-			boolean disabled = disabledExpression != null && TRUE.equals(disabledExpression.getValue(context.getELContext()));
+			boolean connected = connectedExpression == null || TRUE.equals(connectedExpression.getValue(context.getELContext()));
+			Boolean switched = SocketConfigurator.hasSwitched(context, channel, connected);
+			String script = null;
 
-			if (SocketConfigurator.hasSwitched(context, channel, disabled)) {
-				String script;
+			if (switched == null) {
+				SocketConfigurator.registerChannel(context, channel);
+				String base = (port != null ? ":" + port : "") + getRequestContextPath(context);
+				script = String.format(SCRIPT_INIT, base, channel, functions, connected);
+			}
+			else if (switched) {
+				script = String.format(connected ? SCRIPT_OPEN : SCRIPT_CLOSE, channel);
+			}
 
-				if (!disabled) {
-					SocketConfigurator.registerChannel(context, channel);
-					String base = (port != null ? ":" + port : "") + getRequestContextPath(context);
-					script = String.format(SCRIPT_OPEN, base, channel, functions);
-				}
-				else {
-					script = String.format(SCRIPT_CLOSE, channel);
-				}
-
+			if (script != null) {
 				if (isAjaxRequestWithPartialRendering(context)) {
 					oncomplete(script);
 				}

@@ -4819,12 +4819,15 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 		<attribute>
 			<description>
 				<![CDATA[
-					Whether the web socket should be disabled or not.
-					Defaults to <code>false</code>.
+					Whether to (auto)connect the web socket or not.
+					Defaults to <code>true</code>.
 					It's interpreted as a JavaScript instruction whether to open or close the web socket push connection.
+					Note that this attribute is re-evaluated on every ajax request.
+					You can also manually control it in JavaScript by <code>OmniFaces.Push.open('channelName')</code> and
+					<code>OmniFaces.Push.close('channelName')</code>.
 				]]>
 			</description>
-			<name>disabled</name>
+			<name>connected</name>
 			<required>false</required>
 			<type>java.lang.Boolean</type>
 		</attribute>

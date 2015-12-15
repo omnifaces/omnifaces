@@ -37,7 +37,8 @@ OmniFaces.Push = (function(Util, window) {
 	// Private constructor functions ----------------------------------------------------------------------------------
 
 	/**
-	 * Creates a reconnecting web socket.
+	 * Creates a reconnecting web socket. When the web socket successfully connects on first attempt, then it will
+	 * automatically reconnect on close/timeout.
 	 * @constructor
 	 * @param {string} url The URL of the web socket 
 	 * @param {string} channel The name of the web socket channel.
@@ -49,16 +50,20 @@ OmniFaces.Push = (function(Util, window) {
 		// Private fields -----------------------------------------------------------------------------------------
 
 		var socket;
-		var reconnectAttempts = 0;
+		var connectAttempts;
 		var self = this;
 
 		// Public functions ---------------------------------------------------------------------------------------
 
 		self.open = function() {
+			if (socket && socket.readyState == 1) {
+				return;
+			}
+
 			socket = new WebSocket(url);
 
 			socket.onopen = function(event) {
-				reconnectAttempts = 0;
+				connectAttempts = 1;
 			}
 
 			socket.onmessage = function(event) {
@@ -69,9 +74,9 @@ OmniFaces.Push = (function(Util, window) {
 				if (!socket) {
 					onclose(event.code, channel, event);
 				}
-				else if (event.code != 1011) { // SocketEndpoint returns 1011 on unregistered channel.
-					reconnectAttempts++;
-					setTimeout(self.open, Math.min(RECONNECT_INTERVAL * reconnectAttempts, MAX_RECONNECT_INTERVAL));
+				else if (connectAttempts) {
+					setTimeout(self.open, Math.min(RECONNECT_INTERVAL * connectAttempts, MAX_RECONNECT_INTERVAL));
+					connectAttempts++;
 				}
 			}
 		}
@@ -84,17 +89,13 @@ OmniFaces.Push = (function(Util, window) {
 			}
 		}
 
-		// Init ---------------------------------------------------------------------------------------------------
-
-		self.open();
-
 	}
-	
+
 	// Public static functions ----------------------------------------------------------------------------------------
-	
+
 	/**
-	 * Open a web socket on the given channel. It will stay open and reconnect as long as channel is valid and
-	 * <code>OmniFaces.Push.close()</code> hasn't explicitly been called on the same channel.
+	 * Initialize a web socket on the given channel. When connected, it will stay open and reconnect as long as channel
+	 * is valid and <code>OmniFaces.Push.close()</code> hasn't explicitly been called on the same channel.
 	 * @param {string} host Required; The host of the web socket in either the format 
 	 * <code>example.com:8080/context</code>, or <code>:8080/context</code>, or <code>/context</code>.
 	 * If the value is falsey, then it will default to <code>window.location.host</code>.
@@ -114,8 +115,10 @@ OmniFaces.Push = (function(Util, window) {
 	 * <a href="http://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and
 	 * <a href="http://docs.oracle.com/javaee/7/api/javax/websocket/CloseReason.CloseCodes.html">CloseCodes</a> API
 	 * for an elaborate list.
+	 * @param {boolean} autoconnect Optional; Whether or not to automatically connect the socket. Defaults to
+	 * <code>true</code>.
 	 */
-	self.open = function(host, channel, onmessage, onclose) {
+	self.init = function(host, channel, onmessage, onclose, autoconnect) {
 		onclose = Util.resolveFunction(onclose);
 
 		if (!WS_SUPPORTED) { // IE6-9.
@@ -126,6 +129,22 @@ OmniFaces.Push = (function(Util, window) {
 		self.close(channel); // Forcibly close any opened socket on same channel.
 		var url = getBaseURL(host) + encodeURIComponent(channel);
 		sockets[channel] = new Socket(url, channel, Util.resolveFunction(onmessage), onclose);
+
+		if (autoconnect) {
+			self.open(channel);
+		}
+	}
+
+	/**
+	 * Open the web socket on the given channel. This does nothing if there's no socket or if it's already open.
+	 * @param {string} channel Required; the name of the web socket channel.
+	 */
+	self.open = function(channel) {
+		var socket = sockets[channel];
+
+		if (socket) {
+			socket.open();
+		}
 	}
 
 	/**
@@ -136,7 +155,6 @@ OmniFaces.Push = (function(Util, window) {
 		var socket = sockets[channel];
 
 		if (socket) {
-			delete sockets[channel];
 			socket.close();
 		}
 	}
