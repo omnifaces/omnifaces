@@ -31,6 +31,7 @@ import javax.websocket.server.HandshakeRequest;
 import javax.websocket.server.ServerEndpointConfig;
 import javax.websocket.server.ServerEndpointConfig.Configurator;
 
+import org.omnifaces.cdi.PushContext;
 import org.omnifaces.config.BeanManager;
 
 /**

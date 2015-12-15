@@ -46,6 +46,7 @@ import javax.websocket.DeploymentException;
 import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
 
+import org.omnifaces.cdi.PushContext;
 import org.omnifaces.util.Callback;
 import org.omnifaces.util.Json;
 
@@ -340,8 +341,8 @@ import org.omnifaces.util.Json;
  * @author Bauke Scholtz
  * @see SocketEventListener
  * @see SocketEndpoint
- * @see PushContext
  * @see SocketPushContext
+ * @see PushContext
  * @since 2.3
  */
 public class Socket extends TagHandler {

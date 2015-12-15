@@ -23,6 +23,7 @@ import java.util.concurrent.ConcurrentMap;
 import javax.enterprise.context.ApplicationScoped;
 import javax.websocket.Session;
 
+import org.omnifaces.cdi.PushContext;
 import org.omnifaces.util.Json;
 
 /**
