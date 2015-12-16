@@ -4823,8 +4823,8 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 					Defaults to <code>true</code>.
 					It's interpreted as a JavaScript instruction whether to open or close the web socket push connection.
 					Note that this attribute is re-evaluated on every ajax request.
-					You can also manually control it in JavaScript by <code>OmniFaces.Push.open('channelName')</code> and
-					<code>OmniFaces.Push.close('channelName')</code>.
+					You can also explicitly set it to <code>false</code> and then manually control in JavaScript by
+					<code>OmniFaces.Push.open('channelName')</code> and <code>OmniFaces.Push.close('channelName')</code>.
 				]]>
 			</description>
 			<name>connected</name>

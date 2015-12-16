@@ -51,6 +51,7 @@ import org.omnifaces.util.Json;
  * Opens an one-way (server to client) web socket based push connection in client side which can be reached from
  * server side via {@link PushContext} interface injected in any CDI/container managed artifact.
  *
+ *
  * <h3>Usage (client)</h3>
  * <p>
  * Declare <code>&lt;o:socket&gt;</code> in the view with at least a <code>channel</code> name and an
@@ -79,18 +80,6 @@ import org.omnifaces.util.Json;
  * <li><code>event</code>: the raw <a href="https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent"><code>
  * MessageEvent</code></a> instance, useful in case you intend to inspect it.</li>
  * </ul>
- * <p>
- * The web socket is by default open as long as the document is open. It will be implicitly closed once the document is
- * unloaded (e.g. navigating away, close of browser window/tab, etc). In case you intend to have an one-time push,
- * usually because you only wanted to present the result of an one-time asynchronous action, you can optionally
- * explicitly close the push connection from client side by invoking <code>OmniFaces.Push.close(channel)</code>, passing
- * the channel name. For example, in the <code>onmessage</code> JS listener function as below:
- * <pre>
- * function socketListener(message, channel) {
- *     // ...
- *     OmniFaces.Push.close(channel);
- * }
- * </pre>
  * <p>
  * The optional <code>onclose</code> JS listener function can be used to listen on (ab)normal close of a web socket.
  * <pre>
@@ -149,6 +138,7 @@ import org.omnifaces.util.Json;
  * <code>&lt;p:remoteCommand&gt;</code> or similar. This has among others the advantage of maintaining the JSF view
  * state.
  *
+ *
  * <h3>Conditionally connecting socket</h3>
  * <p>
  * You can use the <code>connected</code> attribute for that.
@@ -160,9 +150,10 @@ import org.omnifaces.util.Json;
  * socket push connection. If the value is an EL expression and it becomes <code>false</code> during an ajax request,
  * then the push connection will explicitly be closed during oncomplete of that ajax request, even though you did not
  * cover the <code>&lt;o:socket&gt;</code> tag in ajax render/update. So make sure it's tied to at least a view scoped
- * property in case you intend to control it during the view scope. You can also explicitly set it to <code>false</code>
- * and manually open the push connection from client side by invoking <code>OmniFaces.Push.open(channel)</code>, passing
- * the channel name.
+ * property in case you intend to control it during the view scope.
+ * <p>
+ * You can also explicitly set it to <code>false</code> and manually open the push connection from client side by
+ * invoking <code>OmniFaces.Push.open(channel)</code>, passing the channel name.
  * <pre>
  * &lt;o:socket channel="foo" ... connected="false" /&gt;
  * </pre>
@@ -172,6 +163,23 @@ import org.omnifaces.util.Json;
  *     OmniFaces.Push.open("foo");
  * }
  * </pre>
+ * <p>
+ * The web socket is by default open as long as the document is open. It will be implicitly closed once the document is
+ * unloaded (e.g. navigating away, close of browser window/tab, etc). In case you intend to have an one-time push,
+ * usually because you only wanted to present the result of an one-time asynchronous action, you can optionally
+ * explicitly close the push connection from client side by invoking <code>OmniFaces.Push.close(channel)</code>, passing
+ * the channel name. For example, in the <code>onmessage</code> JS listener function as below:
+ * <pre>
+ * function socketListener(message, channel) {
+ *     // ...
+ *     OmniFaces.Push.close(channel);
+ * }
+ * </pre>
+ * <p>
+ * Noted should be that both ways should not be mixed. Choose either the server side way of an EL expression in
+ * <code>connected</code> attribute, or the client side way of manually invoking <code>OmniFaces.Push</code> functions.
+ * Mixing them may end up in undefined behavior.
+ *
  *
  * <h3>Channel name design hints</h3>
  * <p>
@@ -206,6 +214,7 @@ import org.omnifaces.util.Json;
  * Otherwise people can easily manually open a web socket listening on a guessed channel name. For example, in case you
  * intend to push a message to users of only a specific role, then encrypt that role name or map it to an UUID and use
  * it in place of the session ID in above examples.
+ *
  *
  * <h3>EJB design hints</h3>
  * <p>
@@ -301,6 +310,7 @@ import org.omnifaces.util.Json;
  * }
  * </pre>
  *
+ *
  * <h3>UI update design hints</h3>
  * <p>
  * In case you'd like to perform complex UI updates, which would be a piece of cake with JSF ajax, then easiest would
@@ -318,6 +328,7 @@ import org.omnifaces.util.Json;
  * <p>
  * If you pass a <code>Map&lt;String,V&gt;</code> or a JavaBean as push message object, then all entries/properties will
  * transparently be available as request parameters in the command script method <code>#{bean.pushed}</code>.
+ *
  *
  * <h3>Configuration</h3>
  * <p>

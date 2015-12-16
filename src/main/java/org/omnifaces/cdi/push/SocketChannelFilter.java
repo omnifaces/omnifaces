@@ -27,8 +27,8 @@ import org.omnifaces.filter.HttpFilter;
 
 /**
  * <p>
- * This filter checks if the socket channel is registered and returns HTTP 400 error otherwise.
- * In other words, only channels explicitly declared in <code>&lt;o:socket channel&gt;</code> are allowed.
+ * This filter checks if the socket channel is registered and returns HTTP 400 error otherwise. In other words, only
+ * channels explicitly declared in <code>&lt;o:socket channel&gt;</code> during the current HTTP session are allowed.
  *
  * @author Bauke Scholtz
  * @see Socket

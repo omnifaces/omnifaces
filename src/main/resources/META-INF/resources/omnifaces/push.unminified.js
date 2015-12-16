@@ -126,9 +126,10 @@ OmniFaces.Push = (function(Util, window) {
 			return;
 		}
 
-		self.close(channel); // Forcibly close any opened socket on same channel.
-		var url = getBaseURL(host) + encodeURIComponent(channel);
-		sockets[channel] = new Socket(url, channel, Util.resolveFunction(onmessage), onclose);
+		if (!sockets[channel]) {
+			var url = getBaseURL(host) + encodeURIComponent(channel);
+			sockets[channel] = new Socket(url, channel, Util.resolveFunction(onmessage), onclose);
+		}
 
 		if (autoconnect) {
 			self.open(channel);
@@ -138,25 +139,19 @@ OmniFaces.Push = (function(Util, window) {
 	/**
 	 * Open the web socket on the given channel. This does nothing if there's no socket or if it's already open.
 	 * @param {string} channel Required; the name of the web socket channel.
+	 * @throws {Error} When channel is unknown.
 	 */
 	self.open = function(channel) {
-		var socket = sockets[channel];
-
-		if (socket) {
-			socket.open();
-		}
+		getSocket(channel).open();
 	}
 
 	/**
 	 * Close the web socket on the given channel.
 	 * @param {string} channel Required; the name of the web socket channel.
+	 * @throws {Error} When channel is unknown.
 	 */
 	self.close = function(channel) {
-		var socket = sockets[channel];
-
-		if (socket) {
-			socket.close();
-		}
+		getSocket(channel).close();
 	}
 
 	// Private static functions ---------------------------------------------------------------------------------------
@@ -175,6 +170,22 @@ OmniFaces.Push = (function(Util, window) {
 				: (host.indexOf(":") == 0) ? window.location.hostname + host
 				: host;
 		return URL_PROTOCOL + base + URI_PREFIX + "/";
+	}
+
+	/**
+	 * Get socket associated with given channel.
+	 * @return {Socket} Socket associated with given channel.
+	 * @throws {Error} When channel is unknown.
+	 */
+	function getSocket(channel) {
+		var socket = sockets[channel];
+
+		if (socket) {
+			return socket;
+		}
+		else {
+			throw new Error("Unknown channel: " + channel);
+		}
 	}
 
 	// Expose self to public ------------------------------------------------------------------------------------------
