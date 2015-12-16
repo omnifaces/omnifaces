@@ -13,6 +13,7 @@
 package org.omnifaces.cdi.push;
 
 import static java.util.Collections.synchronizedSet;
+import static org.omnifaces.cdi.push.SocketEndpoint.PARAM_CHANNEL;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -45,8 +46,9 @@ public class SocketPushContext implements PushContext {
 	 * @param session The opened web socket session.
 	 * @param channel The push channel name.
 	 */
-	protected void add(Session session, String channel) {
-		session.getUserProperties().put("channel", channel);
+	protected void add(Session session) {
+ 		String channel = session.getPathParameters().get(PARAM_CHANNEL);
+		session.getUserProperties().put(PARAM_CHANNEL, channel);
 
 		if (!SESSIONS.containsKey(channel)) {
 			SESSIONS.putIfAbsent(channel, synchronizedSet(new HashSet<Session>()));
@@ -61,10 +63,11 @@ public class SocketPushContext implements PushContext {
 	 */
 	@Override
 	public void send(String channel, Object message) {
-		String json = Json.encode(message);
 		Set<Session> sessions = SESSIONS.get(channel);
 
 		if (sessions != null) {
+			String json = Json.encode(message);
+
 			synchronized(sessions) {
 				for (Session session : sessions) {
 					if (session.isOpen()) {
@@ -80,7 +83,7 @@ public class SocketPushContext implements PushContext {
 	 * @param session The closed web socket session.
 	 */
 	protected void remove(Session session) {
-		String channel = (String) session.getUserProperties().get("channel");
+		String channel = (String) session.getUserProperties().get(PARAM_CHANNEL);
 
 		if (channel != null) {
 			Set<Session> sessions = SESSIONS.get(channel);

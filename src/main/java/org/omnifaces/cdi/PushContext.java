@@ -26,6 +26,7 @@ import org.omnifaces.util.Json;
  */
 public interface PushContext {
 
+	/** The context-relative web socket URI prefix where the endpoint should listen on. */
 	public static final String URI_PREFIX = "/omnifaces.push";
 
 	/**

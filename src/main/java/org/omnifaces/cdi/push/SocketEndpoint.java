@@ -26,7 +26,6 @@ import org.omnifaces.config.BeanManager;
 /**
  * <p>
  * The web socket server endpoint of <code>&lt;o:socket&gt;</code>.
- * This is programmatically registered once a <code>&lt;o:socket&gt;</code> is used for first time in application.
  *
  * @author Bauke Scholtz
  * @see Socket
@@ -34,21 +33,23 @@ import org.omnifaces.config.BeanManager;
  */
 public class SocketEndpoint extends Endpoint {
 
-	public static final String URI_TEMPLATE = PushContext.URI_PREFIX + "/{channel}";
+	/** The URI path parameter name of the web socket channel. */
+	static final String PARAM_CHANNEL = "channel";
+
+	/** The URI template of the web socket endpoint. */
+	static final String URI_TEMPLATE = PushContext.URI_PREFIX + "/{" + PARAM_CHANNEL + "}";
 
 	private static final Logger logger = Logger.getLogger(SocketEndpoint.class.getName());
 	private static final String ERROR_EXCEPTION = "SocketEndpoint: An exception occurred during processing web socket request.";
 
 	/**
-	 * Add given web socket session to the push context associated with its channel.
+	 * Add given web socket session to the push context.
 	 * @param session The opened web socket session.
 	 * @param config The endpoint configuration.
-	 * @throws IllegalArgumentException When the channel is not known as a registered channel (i.e. it's nowhere used in an o:socket).
 	 */
 	@Override
 	public void onOpen(Session session, EndpointConfig config) {
- 		String channel = session.getPathParameters().get("channel");
-		BeanManager.INSTANCE.getReference(SocketPushContext.class).add(session, channel); // @Inject in Endpoint doesn't work in Tomcat+Weld.
+		BeanManager.INSTANCE.getReference(SocketPushContext.class).add(session); // @Inject in Endpoint doesn't work in Tomcat+Weld.
 	}
 
 	/**
