@@ -46,14 +46,14 @@ public class SocketChannelFilter extends HttpFilter {
 			if (registeredChannels != null) {
 				String channel = request.getRequestURI().substring((request.getContextPath() + PushContext.URI_PREFIX + "/").length());
 
-				if (!registeredChannels.contains(channel)) {
-					response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+				if (registeredChannels.contains(channel)) {
+					chain.doFilter(request, response);
 					return;
 				}
 			}
 		}
 
-		chain.doFilter(request, response);
+		response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 	}
 
 }
