@@ -359,6 +359,7 @@ import org.omnifaces.util.Json;
  * @author Bauke Scholtz
  * @see SocketEventListener
  * @see SocketEndpoint
+ * @see SocketChannelFilter
  * @see SocketPushContext
  * @see PushContext
  * @since 2.3
