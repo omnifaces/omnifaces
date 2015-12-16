@@ -15,7 +15,6 @@ package org.omnifaces.cdi.push;
 import static java.util.Collections.synchronizedSet;
 
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -47,8 +46,7 @@ public class SocketPushContext implements PushContext {
 	 * @param channel The push channel name.
 	 */
 	protected void add(Session session, String channel) {
-		Map<String, Object> userProperties = session.getUserProperties();
-		userProperties.put("channel", channel);
+		session.getUserProperties().put("channel", channel);
 
 		if (!SESSIONS.containsKey(channel)) {
 			SESSIONS.putIfAbsent(channel, synchronizedSet(new HashSet<Session>()));
@@ -82,8 +80,7 @@ public class SocketPushContext implements PushContext {
 	 * @param session The closed web socket session.
 	 */
 	protected void remove(Session session) {
-		Map<String, Object> userProperties = session.getUserProperties();
-		String channel = (String) userProperties.get("channel");
+		String channel = (String) session.getUserProperties().get("channel");
 
 		if (channel != null) {
 			Set<Session> sessions = SESSIONS.get(channel);

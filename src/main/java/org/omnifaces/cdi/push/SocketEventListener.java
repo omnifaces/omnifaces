@@ -13,11 +13,21 @@
 package org.omnifaces.cdi.push;
 
 import static java.lang.Boolean.TRUE;
+import static java.util.Collections.synchronizedSet;
 import static org.omnifaces.util.Ajax.oncomplete;
 import static org.omnifaces.util.Components.addScriptResourceToHead;
 import static org.omnifaces.util.Components.addScriptToBody;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
+import static org.omnifaces.util.FacesLocal.getSessionAttribute;
+import static org.omnifaces.util.FacesLocal.getViewAttribute;
 import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
+import static org.omnifaces.util.FacesLocal.setSessionAttribute;
+import static org.omnifaces.util.FacesLocal.setViewAttribute;
+
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import javax.el.ValueExpression;
 import javax.faces.component.UIViewRoot;
@@ -94,11 +104,11 @@ public class SocketEventListener implements SystemEventListener {
 		else if (event instanceof PreRenderViewEvent) {
 			FacesContext context = FacesContext.getCurrentInstance();
 			boolean connected = connectedExpression == null || TRUE.equals(connectedExpression.getValue(context.getELContext()));
-			Boolean switched = SocketConfigurator.hasSwitched(context, channel, connected);
+			Boolean switched = hasSwitched(context, channel, connected);
 			String script = null;
 
 			if (switched == null) {
-				SocketConfigurator.registerChannel(context, channel);
+				registerChannel(context, channel);
 				String base = (port != null ? ":" + port : "") + getRequestContextPath(context);
 				script = String.format(SCRIPT_INIT, base, channel, functions, connected);
 			}
@@ -115,6 +125,38 @@ public class SocketEventListener implements SystemEventListener {
 				}
 			}
 		}
+	}
+
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Helper to remember which channels are opened on the view and returns <code>null</code> if it is new, or
+	 * <code>true</code> or <code>false</code> if it has switched its <code>connected</code> attribute.
+	 */
+	private static Boolean hasSwitched(FacesContext context, String channel, boolean connected) {
+		Map<String, Boolean> channels = getViewAttribute(context, Socket.class.getName());
+
+		if (channels == null) {
+			channels = new HashMap<>();
+			setViewAttribute(context, Socket.class.getName(), channels);
+		}
+
+		Boolean previouslyConnected = channels.put(channel, connected);
+		return (previouslyConnected == null) ? null : (previouslyConnected != connected);
+	}
+
+	/**
+	 * Register given web socket channel name in user session.
+	 */
+	private static void registerChannel(FacesContext context, String channel) {
+		Set<String> registeredChannels = getSessionAttribute(context, Socket.class.getName());
+
+		if (registeredChannels == null) {
+			registeredChannels = synchronizedSet(new HashSet<String>());
+			setSessionAttribute(context, Socket.class.getName(), registeredChannels);
+		}
+
+		registeredChannels.add(channel);
 	}
 
 }

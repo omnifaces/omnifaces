@@ -12,6 +12,8 @@
  */
 package org.omnifaces.cdi.push;
 
+import static java.lang.Boolean.TRUE;
+import static java.lang.Boolean.parseBoolean;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
 import static org.omnifaces.util.Facelets.getObject;
 import static org.omnifaces.util.Facelets.getValueExpression;
@@ -23,6 +25,7 @@ import java.util.regex.Pattern;
 import javax.el.ValueExpression;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.faces.FacesException;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PostAddToViewEvent;
@@ -33,7 +36,11 @@ import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagAttribute;
 import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
+import javax.servlet.ServletContext;
 import javax.websocket.CloseReason.CloseCodes;
+import javax.websocket.DeploymentException;
+import javax.websocket.server.ServerContainer;
+import javax.websocket.server.ServerEndpointConfig;
 
 import org.omnifaces.cdi.PushContext;
 import org.omnifaces.util.Callback;
@@ -349,7 +356,14 @@ public class Socket extends TagHandler {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
+	/** The context parameter name to explicitly register web socket endpoint during startup (only required in some containers). */
+	public static final String PARAM_SOCKET_ENDPOINT_ALWAYS_ENABLED = "org.omnifaces.SOCKET_ENDPOINT_ALWAYS_ENABLED";
+
 	private static final Pattern PATTERN_CHANNEL_NAME = Pattern.compile("[\\w.-]+");
+
+	private static final String ERROR_ENDPOINT_REGISTRATION =
+		"o:socket endpoint cannot be registered at this moment."
+			+ " To solve this, add context param '" + PARAM_SOCKET_ENDPOINT_ALWAYS_ENABLED + "' with value 'true'.";
 	private static final String ERROR_ILLEGAL_CHANNEL_NAME =
 		"o:socket 'channel' attribute '%s' does not represent a valid channel name."
 			+ " It may only contain alphanumeric characters, hyphens, underscores and periods.";
@@ -399,7 +413,7 @@ public class Socket extends TagHandler {
 		}
 
 		FacesContext facesContext = context.getFacesContext();
-		SocketConfigurator.registerEndpointIfNecessary(getServletContext(facesContext), false);
+		registerEndpointIfNecessary(getServletContext(facesContext), false);
 
 		Integer portNumber = getObject(context, port, Integer.class);
 		String onmessageFunction = onmessage.getValue(context);
@@ -410,6 +424,32 @@ public class Socket extends TagHandler {
 		SystemEventListener listener = new SocketEventListener(portNumber, channelName, functions, connectedExpression);
 		subscribeToViewEvent(PostAddToViewEvent.class, listener);
 		subscribeToViewEvent(PreRenderViewEvent.class, listener);
+	}
+
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Register web socket endpoint if necessary, i.e. when it's not registered yet, or is explicitly enabled via
+	 * context param.
+	 * @param context The involved servlet context.
+	 * @param checkParam Whether to check the context param or not.
+	 */
+	public static void registerEndpointIfNecessary(ServletContext context, boolean checkParam) {
+		Boolean registered = (Boolean) context.getAttribute(Socket.class.getName());
+
+		if (TRUE.equals(registered) || (checkParam && !parseBoolean(context.getInitParameter(PARAM_SOCKET_ENDPOINT_ALWAYS_ENABLED)))) {
+			return;
+		}
+
+		try {
+			ServerContainer serverContainer = (ServerContainer) context.getAttribute(ServerContainer.class.getName());
+			ServerEndpointConfig serverEndpointConfig = ServerEndpointConfig.Builder.create(SocketEndpoint.class, SocketEndpoint.URI_TEMPLATE).build();
+			serverContainer.addEndpoint(serverEndpointConfig);
+			context.setAttribute(Socket.class.getName(), TRUE);
+		}
+		catch (DeploymentException e) {
+			throw new FacesException(ERROR_ENDPOINT_REGISTRATION, e);
+		}
 	}
 
 }

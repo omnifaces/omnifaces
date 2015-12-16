@@ -12,13 +12,9 @@
  */
 package org.omnifaces.cdi.push;
 
-import static javax.websocket.CloseReason.CloseCodes.UNEXPECTED_CONDITION;
-
-import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.faces.FacesException;
 import javax.websocket.CloseReason;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
@@ -41,7 +37,6 @@ public class SocketEndpoint extends Endpoint {
 	public static final String URI_TEMPLATE = PushContext.URI_PREFIX + "/{channel}";
 
 	private static final Logger logger = Logger.getLogger(SocketEndpoint.class.getName());
-	private static final String ERROR_UNKNOWN_CHANNEL = "Unknown channel '%s'.";
 	private static final String ERROR_EXCEPTION = "SocketEndpoint: An exception occurred during processing web socket request.";
 
 	/**
@@ -52,19 +47,7 @@ public class SocketEndpoint extends Endpoint {
 	 */
 	@Override
 	public void onOpen(Session session, EndpointConfig config) {
-		String channel = session.getPathParameters().get("channel");
-
-		if (!SocketConfigurator.isRegisteredChannel(config, channel)) {
-			try {
-				session.close(new CloseReason(UNEXPECTED_CONDITION, String.format(ERROR_UNKNOWN_CHANNEL, channel)));
-				return;
-			}
-			catch (IOException e) {
-				throw new FacesException(e);
-			}
-		}
-
-		SocketConfigurator.alignMaxIdleTimeout(config, session);
+ 		String channel = session.getPathParameters().get("channel");
 		BeanManager.INSTANCE.getReference(SocketPushContext.class).add(session, channel); // @Inject in Endpoint doesn't work in Tomcat+Weld.
 	}
 

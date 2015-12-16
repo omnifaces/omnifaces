@@ -24,7 +24,6 @@ import org.omnifaces.cdi.Eager;
 import org.omnifaces.cdi.eager.EagerBeansRepository;
 import org.omnifaces.cdi.eager.EagerBeansWebListener;
 import org.omnifaces.cdi.push.Socket;
-import org.omnifaces.cdi.push.SocketConfigurator;
 import org.omnifaces.component.output.Cache;
 import org.omnifaces.component.output.cache.CacheInitializer;
 import org.omnifaces.config.BeanManager;
@@ -65,7 +64,7 @@ public class ApplicationListener extends DefaultServletContextListener {
 			EagerBeansRepository.instantiateApplicationScopedAndRegisterListener(servletContext);
 			FacesViews.addMappings(servletContext);
 			CacheInitializer.loadProviderAndRegisterFilter(servletContext);
-			SocketConfigurator.registerEndpointIfNecessary(servletContext, true);
+			Socket.registerEndpointIfNecessary(servletContext, true);
 		}
 		catch (Throwable e) {
 			logger.log(Level.SEVERE, "OmniFaces failed to initialize! Report an issue to OmniFaces.", e);
