@@ -37,6 +37,8 @@ import org.omnifaces.filter.HttpFilter;
 @WebFilter(PushContext.URI_PREFIX + "/*")
 public class SocketChannelFilter extends HttpFilter {
 
+	// Actions --------------------------------------------------------------------------------------------------------
+
 	@Override
 	@SuppressWarnings("unchecked")
 	public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException, IOException {

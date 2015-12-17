@@ -33,6 +33,8 @@ import org.omnifaces.config.BeanManager;
  */
 public class SocketEndpoint extends Endpoint {
 
+	// Constants ------------------------------------------------------------------------------------------------------
+
 	/** The URI path parameter name of the web socket channel. */
 	static final String PARAM_CHANNEL = "channel";
 
@@ -41,6 +43,8 @@ public class SocketEndpoint extends Endpoint {
 
 	private static final Logger logger = Logger.getLogger(SocketEndpoint.class.getName());
 	private static final String ERROR_EXCEPTION = "SocketEndpoint: An exception occurred during processing web socket request.";
+
+	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Add given web socket session to the push context.
@@ -69,7 +73,7 @@ public class SocketEndpoint extends Endpoint {
 	 */
 	@Override
 	public void onClose(Session session, CloseReason reason) {
-		BeanManager.INSTANCE.getReference(SocketPushContext.class).remove(session); // @Inject in Endpoint doesn't work in Tomcat+Weld.
+		BeanManager.INSTANCE.getReference(SocketPushContext.class).remove(session); // @Inject in Endpoint doesn't work in Tomcat+Weld and CDI.current() doesn't work in WildFly.
 	}
 
 }

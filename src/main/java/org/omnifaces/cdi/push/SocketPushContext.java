@@ -39,14 +39,18 @@ import org.omnifaces.util.Json;
 @ApplicationScoped
 public class SocketPushContext implements PushContext {
 
+	// Constants ------------------------------------------------------------------------------------------------------
+
 	private static final ConcurrentMap<String, Set<Session>> SESSIONS = new ConcurrentHashMap<>();
+
+	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
 	 * On open, add given web socket session to the mapping associated with given channel.
 	 * @param session The opened web socket session.
 	 * @param channel The push channel name.
 	 */
-	protected void add(Session session) {
+	void add(Session session) {
  		String channel = session.getPathParameters().get(PARAM_CHANNEL);
 		session.getUserProperties().put(PARAM_CHANNEL, channel);
 
@@ -82,7 +86,7 @@ public class SocketPushContext implements PushContext {
 	 * On close, remove given web socket session from the mapping.
 	 * @param session The closed web socket session.
 	 */
-	protected void remove(Session session) {
+	void remove(Session session) {
 		String channel = (String) session.getUserProperties().get(PARAM_CHANNEL);
 
 		if (channel != null) {

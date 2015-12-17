@@ -121,7 +121,7 @@ OmniFaces.Push = (function(Util, window) {
 	 * <a href="http://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and
 	 * <a href="http://docs.oracle.com/javaee/7/api/javax/websocket/CloseReason.CloseCodes.html">CloseCodes</a> API
 	 * for an elaborate list.
-	 * @param {boolean} autoconnect Whether or not to automatically connect the socket. Defaults to <code>false</code>.
+	 * @param {boolean} autoconnect Whether or not to immediately open the socket. Defaults to <code>false</code>.
 	 */
 	self.init = function(host, channel, onmessage, onclose, autoconnect) {
 		onclose = Util.resolveFunction(onclose);
@@ -142,8 +142,8 @@ OmniFaces.Push = (function(Util, window) {
 	}
 
 	/**
-	 * Open the web socket on the given channel. This does nothing if there's no socket or if it's already open.
-	 * @param {string} channel Required; the name of the web socket channel.
+	 * Open the web socket on the given channel.
+	 * @param {string} channel The name of the web socket channel.
 	 * @throws {Error} When channel is unknown.
 	 */
 	self.open = function(channel) {
@@ -152,7 +152,7 @@ OmniFaces.Push = (function(Util, window) {
 
 	/**
 	 * Close the web socket on the given channel.
-	 * @param {string} channel Required; the name of the web socket channel.
+	 * @param {string} channel The name of the web socket channel.
 	 * @throws {Error} When channel is unknown.
 	 */
 	self.close = function(channel) {
@@ -179,6 +179,7 @@ OmniFaces.Push = (function(Util, window) {
 
 	/**
 	 * Get socket associated with given channel.
+	 * @param {string} channel The name of the web socket channel.
 	 * @return {Socket} Socket associated with given channel.
 	 * @throws {Error} When channel is unknown. You may need to initialize it first via <code>init()</code> function.
 	 */

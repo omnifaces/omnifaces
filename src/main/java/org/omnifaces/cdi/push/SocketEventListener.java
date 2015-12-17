@@ -39,6 +39,7 @@ import javax.faces.event.SystemEvent;
 import javax.faces.event.SystemEventListener;
 
 /**
+ * <p>
  * This system event listener for {@link UIViewRoot} ensures that the necessary scripts for <code>&lt;o:socket&gt;</code>
  * are properly rendered.
  *
