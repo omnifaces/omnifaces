@@ -12,6 +12,9 @@
  */
 package org.omnifaces.cdi.push;
 
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.websocket.server.HandshakeRequest.SEC_WEBSOCKET_KEY;
+
 import java.io.IOException;
 import java.util.Set;
 
@@ -34,19 +37,24 @@ import org.omnifaces.filter.HttpFilter;
  * @see Socket
  * @since 2.3
  */
-@WebFilter(PushContext.URI_PREFIX + "/*")
+@WebFilter(SocketChannelFilter.URL_PATTERN)
 public class SocketChannelFilter extends HttpFilter {
+
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	/** The context-relative filter URL pattern where the web socket channel filter should listen on. */
+	public static final String URL_PATTERN = PushContext.URI_PREFIX + "/*";
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException, IOException {
-		if (session != null) {
+		if (session != null && request.getHeader(SEC_WEBSOCKET_KEY) != null) {
 			Set<String> registeredChannels = (Set<String>) session.getAttribute(Socket.class.getName());
 
 			if (registeredChannels != null) {
-				String channel = request.getRequestURI().substring((request.getContextPath() + PushContext.URI_PREFIX + "/").length());
+				String channel = request.getRequestURI().substring((request.getContextPath() + URL_PATTERN).length() - 1);
 
 				if (registeredChannels.contains(channel)) {
 					chain.doFilter(request, response);
@@ -55,7 +63,7 @@ public class SocketChannelFilter extends HttpFilter {
 			}
 		}
 
-		response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+		response.sendError(SC_BAD_REQUEST);
 	}
 
 }
