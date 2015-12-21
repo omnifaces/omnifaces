@@ -38,9 +38,9 @@ import org.omnifaces.facesviews.FacesViews;
  * <ol>
  * <li>Check if CDI is available, otherwise log and fail.
  * <li>Instantiate {@link Eager} application scoped beans and register its {@link EagerBeansWebListener} if necessary.
- * <li>Add {@link FacesViews} mappings to FacesServlet.
- * <li>Load {@link Cache} provider and register its filter.
- * <li>Register {@link Socket} endpoint if necessary.
+ * <li>Add {@link FacesViews} mappings to FacesServlet if necessary.
+ * <li>Load {@link Cache} provider and register its filter if necessary.
+ * <li>Register {@link Socket} endpoint and filter if necessary.
  * </ol>
  *
  * @author Bauke Scholtz
@@ -64,7 +64,7 @@ public class ApplicationListener extends DefaultServletContextListener {
 			EagerBeansRepository.instantiateApplicationScopedAndRegisterListener(servletContext);
 			FacesViews.addMappings(servletContext);
 			CacheInitializer.loadProviderAndRegisterFilter(servletContext);
-			Socket.registerEndpointIfNecessary(servletContext, true);
+			Socket.registerEndpointAndFilterIfNecessary(servletContext);
 		}
 		catch (Throwable e) {
 			logger.log(Level.SEVERE, "OmniFaces failed to initialize! Report an issue to OmniFaces.", e);

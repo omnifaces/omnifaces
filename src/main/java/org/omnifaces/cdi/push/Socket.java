@@ -14,12 +14,15 @@ package org.omnifaces.cdi.push;
 
 import static java.lang.Boolean.TRUE;
 import static java.lang.Boolean.parseBoolean;
+import static javax.servlet.DispatcherType.ASYNC;
+import static javax.servlet.DispatcherType.REQUEST;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
 import static org.omnifaces.util.Facelets.getObject;
 import static org.omnifaces.util.Facelets.getValueExpression;
-import static org.omnifaces.util.FacesLocal.getServletContext;
+import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.regex.Pattern;
 
 import javax.el.ValueExpression;
@@ -36,9 +39,9 @@ import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagAttribute;
 import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
+import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
 import javax.websocket.CloseReason.CloseCodes;
-import javax.websocket.DeploymentException;
 import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
 
@@ -50,6 +53,20 @@ import org.omnifaces.util.Json;
  * <p>
  * Opens an one-way (server to client) web socket based push connection in client side which can be reached from
  * server side via {@link PushContext} interface injected in any CDI/container managed artifact.
+ *
+ *
+ * <h3>Configuration</h3>
+ * <p>
+ * First enable the web socket endpoint by below boolean context parameter in <code>web.xml</code>:
+ * <pre>
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.ENABLE_SOCKET_ENDPOINT&lt;/param-name&gt;
+ *     &lt;param-value&gt;true&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * </pre>
+ * <p>
+ * It will install a web socket endpoint and a security filter on channel name. Lazy initialization of the endpoint and
+ * filter is not possible (yet).
  *
  *
  * <h3>Usage (client)</h3>
@@ -136,7 +153,9 @@ import org.omnifaces.util.Json;
  * The push is one-way, from server to client. In case you intend to send some data from client to server, just continue
  * using Ajax the usual way, if necessary with <code>&lt;o:commandScript&gt;</code> or perhaps
  * <code>&lt;p:remoteCommand&gt;</code> or similar. This has among others the advantage of maintaining the JSF view
- * state.
+ * state, the HTTP session and, importantingly, all security constraints on business service methods (namely, those are
+ * not available during an incoming web socket message per se! see also a.o.
+ * <a href="https://java.net/jira/browse/WEBSOCKET_SPEC-238">WS spec issue 238</a>).
  *
  *
  * <h3>Conditionally connecting socket</h3>
@@ -214,6 +233,10 @@ import org.omnifaces.util.Json;
  * Otherwise people can easily manually open a web socket listening on a guessed channel name. For example, in case you
  * intend to push a message to users of only a specific role, then encrypt that role name or map it to an UUID and use
  * it in place of the session ID in above examples.
+ * <p>
+ * As extra security, the <code>&lt;o:socket&gt;</code> will remember all so far opened channels in the current HTTP
+ * session and the aforementioned security filter will check all incoming web socket handshake requests whether they
+ * match the so far opened channels in the current HTTP session, and otherwise send a HTTP 400 error back.
  *
  *
  * <h3>EJB design hints</h3>
@@ -330,36 +353,10 @@ import org.omnifaces.util.Json;
  * transparently be available as request parameters in the command script method <code>#{bean.pushed}</code>.
  *
  *
- * <h3>Configuration</h3>
- * <p>
- * The web socket endpoint associated with <code>&lt;o:socket&gt;</code> is only lazily initialized. So as long as
- * you don't use <code>&lt;o:socket&gt;</code> anywhere in the application, then the web socket endpoint is not open.
- * However, the lazy initialization fails in case Tyrus is used as web socket implementation (GlassFish/Payara). It
- * only supports programmatic initialization during webapp's startup, otherwise it will throw the below exception:
- * <pre>
- * java.lang.IllegalStateException: Not in 'deploy' scope.
- *     at org.glassfish.tyrus.server.TyrusServerContainer.addEndpoint
- *     at org.omnifaces.cdi.push.Socket.registerEndpointIfNecessary
- *     at org.omnifaces.cdi.push.Socket.apply
- * </pre>
- * <p>
- * If you're facing this exception, then you need to add the below context parameter to your webapp's
- * <code>web.xml</code> to explicitly register the web socket endpoint during webapp's startup.
- * <pre>
- * &lt;context-param&gt;
- *     &lt;param-name&gt;org.omnifaces.SOCKET_ENDPOINT_ALWAYS_ENABLED&lt;/param-name&gt;
- *     &lt;param-value&gt;true&lt;/param-value&gt;
- * &lt;/context-param&gt;
- * </pre>
- * <p>
- * This is not necessary if you're not facing an exception like above, but may be useful if you always want to keep it
- * open as it's not automatically reopened after a server restart until a page with <code>&lt;o:socket&gt;</code> has
- * been requested.
- *
  * @author Bauke Scholtz
- * @see SocketEventListener
  * @see SocketEndpoint
  * @see SocketChannelFilter
+ * @see SocketEventListener
  * @see SocketPushContext
  * @see PushContext
  * @since 2.3
@@ -368,14 +365,14 @@ public class Socket extends TagHandler {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	/** The context parameter name to explicitly register web socket endpoint during startup (only required in some containers). */
-	public static final String PARAM_SOCKET_ENDPOINT_ALWAYS_ENABLED = "org.omnifaces.SOCKET_ENDPOINT_ALWAYS_ENABLED";
+	/** The boolean context parameter name to register web socket endpoint during startup. */
+	public static final String PARAM_ENABLE_SOCKET_ENDPOINT = "org.omnifaces.ENABLE_SOCKET_ENDPOINT";
 
 	private static final Pattern PATTERN_CHANNEL_NAME = Pattern.compile("[\\w.-]+");
 
-	private static final String ERROR_ENDPOINT_REGISTRATION =
-		"o:socket endpoint cannot be registered at this moment."
-			+ " To solve this, add context param '" + PARAM_SOCKET_ENDPOINT_ALWAYS_ENABLED + "' with value 'true'.";
+	private static final String ERROR_ENDPOINT_NOT_ENABLED =
+		"o:socket endpoint is not enabled."
+			+ " You need to set web.xml context param '" + PARAM_ENABLE_SOCKET_ENDPOINT + "' with value 'true'.";
 	private static final String ERROR_ILLEGAL_CHANNEL_NAME =
 		"o:socket 'channel' attribute '%s' does not represent a valid channel name."
 			+ " It may only contain alphanumeric characters, hyphens, underscores and periods.";
@@ -409,6 +406,7 @@ public class Socket extends TagHandler {
 	 * Register the push channel and endpoint if necessary and then subcribe the {@link SocketEventListener}.
 	 * Note thus that any manually triggered push requests on unregistered channels will cause an exception, and that
 	 * the push endpoint is only activated when the <code>&lt;o:socket&gt;</code> is actually used in the application.
+	 * @throws IllegalStateException When the web socket endpoint is not enabled.
 	 * @throws IllegalArgumentException When the channel name is invalid.
 	 * It may only contain alphanumeric characters, hyphens, underscores and periods.
 	 */
@@ -418,14 +416,15 @@ public class Socket extends TagHandler {
 			return;
 		}
 
+		if (!TRUE.equals(getApplicationAttribute(context.getFacesContext(), Socket.class.getName()))) {
+			throw new IllegalStateException(ERROR_ENDPOINT_NOT_ENABLED);
+		}
+
 		String channelName = channel.getValue(context);
 
 		if (!PATTERN_CHANNEL_NAME.matcher(channelName).matches()) {
 			throw new IllegalArgumentException(String.format(ERROR_ILLEGAL_CHANNEL_NAME, channelName));
 		}
-
-		FacesContext facesContext = context.getFacesContext();
-		registerEndpointIfNecessary(getServletContext(facesContext), false);
 
 		Integer portNumber = getObject(context, port, Integer.class);
 		String onmessageFunction = onmessage.getValue(context);
@@ -441,26 +440,26 @@ public class Socket extends TagHandler {
 	// Helpers --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Register web socket endpoint if necessary, i.e. when it's not registered yet, or is explicitly enabled via
-	 * context param.
+	 * Register web socket endpoint and channel filter if necessary, i.e. when it's enabled via context param.
 	 * @param context The involved servlet context.
-	 * @param checkParam Whether to check the context param or not.
 	 */
-	public static void registerEndpointIfNecessary(ServletContext context, boolean checkParam) {
-		Boolean registered = (Boolean) context.getAttribute(Socket.class.getName());
-
-		if (TRUE.equals(registered) || (checkParam && !parseBoolean(context.getInitParameter(PARAM_SOCKET_ENDPOINT_ALWAYS_ENABLED)))) {
+	public static void registerEndpointAndFilterIfNecessary(ServletContext context) {
+		if (!parseBoolean(context.getInitParameter(PARAM_ENABLE_SOCKET_ENDPOINT))) {
 			return;
 		}
 
 		try {
 			ServerContainer serverContainer = (ServerContainer) context.getAttribute(ServerContainer.class.getName());
-			ServerEndpointConfig serverEndpointConfig = ServerEndpointConfig.Builder.create(SocketEndpoint.class, SocketEndpoint.URI_TEMPLATE).build();
-			serverContainer.addEndpoint(serverEndpointConfig);
+			ServerEndpointConfig config = ServerEndpointConfig.Builder.create(SocketEndpoint.class, SocketEndpoint.URI_TEMPLATE).build();
+			serverContainer.addEndpoint(config);
+
+			FilterRegistration filter = context.addFilter(SocketChannelFilter.class.getName(), SocketChannelFilter.class);
+			filter.addMappingForUrlPatterns(EnumSet.of(REQUEST, ASYNC), false, SocketChannelFilter.URL_PATTERN);
+
 			context.setAttribute(Socket.class.getName(), TRUE);
 		}
-		catch (DeploymentException e) {
-			throw new FacesException(ERROR_ENDPOINT_REGISTRATION, e);
+		catch (Exception e) {
+			throw new FacesException(e);
 		}
 	}
 

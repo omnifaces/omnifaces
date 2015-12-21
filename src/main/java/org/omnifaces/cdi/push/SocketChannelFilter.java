@@ -20,7 +20,6 @@ import java.util.Set;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -37,7 +36,6 @@ import org.omnifaces.filter.HttpFilter;
  * @see Socket
  * @since 2.3
  */
-@WebFilter(SocketChannelFilter.URL_PATTERN)
 public class SocketChannelFilter extends HttpFilter {
 
 	// Constants ------------------------------------------------------------------------------------------------------
