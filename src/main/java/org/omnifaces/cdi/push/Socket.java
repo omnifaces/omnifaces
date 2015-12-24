@@ -65,8 +65,9 @@ import org.omnifaces.util.Json;
  * &lt;/context-param&gt;
  * </pre>
  * <p>
- * It will install a web socket endpoint and a security filter on channel name. Lazy initialization of the endpoint and
- * filter is not possible (yet).
+ * It will install the {@link SocketEndpoint} and {@link SocketChannelFilter}. Lazy initialization of the endpoint and
+ * filter is unfortunately not possible across all containers (yet).
+ * See also <a href="https://java.net/jira/browse/WEBSOCKET_SPEC-211">WS spec issue 211</a>.
  *
  *
  * <h3>Usage (client)</h3>
@@ -79,7 +80,7 @@ import org.omnifaces.util.Json;
  * &lt;o:socket channel="global" onmessage="socketListener" /&gt;
  * </pre>
  * <pre>
- * function socketListener(message) {
+ * function socketListener(message, channel, event) {
  *     console.log(message);
  * }
  * </pre>
@@ -103,7 +104,7 @@ import org.omnifaces.util.Json;
  * &lt;o:socket ... onclose="socketCloseListener" /&gt;
  * </pre>
  * <pre>
- * function socketCloseListener(code) {
+ * function socketCloseListener(code, channel, event) {
  *     if (code == -1) {
  *         // Web sockets not supported by client.
  *     } else if (code != 1000) {
@@ -153,9 +154,9 @@ import org.omnifaces.util.Json;
  * The push is one-way, from server to client. In case you intend to send some data from client to server, just continue
  * using Ajax the usual way, if necessary with <code>&lt;o:commandScript&gt;</code> or perhaps
  * <code>&lt;p:remoteCommand&gt;</code> or similar. This has among others the advantage of maintaining the JSF view
- * state, the HTTP session and, importantingly, all security constraints on business service methods (namely, those are
- * not available during an incoming web socket message per se! see also a.o.
- * <a href="https://java.net/jira/browse/WEBSOCKET_SPEC-238">WS spec issue 238</a>).
+ * state, the HTTP session and, importantingly, all security constraints on business service methods. Namely, those are
+ * not available during an incoming web socket message per se. See also a.o.
+ * <a href="https://java.net/jira/browse/WEBSOCKET_SPEC-238">WS spec issue 238</a>.
  *
  *
  * <h3>Conditionally connecting socket</h3>
@@ -196,8 +197,8 @@ import org.omnifaces.util.Json;
  * </pre>
  * <p>
  * Noted should be that both ways should not be mixed. Choose either the server side way of an EL expression in
- * <code>connected</code> attribute, or the client side way of manually invoking <code>OmniFaces.Push</code> functions.
- * Mixing them may end up in undefined behavior.
+ * <code>connected</code> attribute, or the client side way of explicitly setting <code>connected="false"</code> and
+ * manually invoking <code>OmniFaces.Push</code> functions. Mixing them may end up in undefined behavior.
  *
  *
  * <h3>Channel name design hints</h3>
@@ -235,8 +236,8 @@ import org.omnifaces.util.Json;
  * it in place of the session ID in above examples.
  * <p>
  * As extra security, the <code>&lt;o:socket&gt;</code> will remember all so far opened channels in the current HTTP
- * session and the aforementioned security filter will check all incoming web socket handshake requests whether they
- * match the so far opened channels in the current HTTP session, and otherwise send a HTTP 400 error back.
+ * session and the aforementioned {@link SocketChannelFilter} will check all incoming web socket handshake requests
+ * whether they match the so far opened channels in the current HTTP session, and otherwise send a HTTP 400 error back.
  *
  *
  * <h3>EJB design hints</h3>
@@ -316,8 +317,8 @@ import org.omnifaces.util.Json;
  * This would be the only way in case you intend to pass something from {@link FacesContext} or the initial
  * request/view/session scope along as (<code>final</code>) argument.
  * <p>
- * Note that OmniFaces {@link Callback} interfaces are insuitable as you're not supposed to use WAR (front end)
- * frameworks and libraries like JSF and OmniFaces in EAR/EJB (back end) side!
+ * Note that OmniFaces own {@link Callback} interfaces are insuitable as you're not supposed to use WAR (front end)
+ * frameworks and libraries like JSF and OmniFaces in EAR/EJB (back end) side.
  * <p>
  * In case you're already on Java 8, of course make use of the <code>Consumer</code> functional interface.
  * <pre>
@@ -329,7 +330,7 @@ import org.omnifaces.util.Json;
  * </pre>
  * <pre>
  * public void submit() {
- *     someService.someAsyncServiceMethod(entity, someProperty -&gt; pushContext.send("someChannel", someProperty);
+ *     someService.someAsyncServiceMethod(entity, message -&gt; pushContext.send("someChannel", message);
  * }
  * </pre>
  *
@@ -337,9 +338,8 @@ import org.omnifaces.util.Json;
  * <h3>UI update design hints</h3>
  * <p>
  * In case you'd like to perform complex UI updates, which would be a piece of cake with JSF ajax, then easiest would
- * be to combine <code>&lt;o:socket&gt;</code> with <code>&lt;o:commandScript&gt;</code> or perhaps
- * <code>&lt;p:remoteCommand&gt;</code> or similar which simply invokes a bean action and ajax-updates the UI once a
- * push message arrives. The combination can look like below:
+ * be to combine <code>&lt;o:socket&gt;</code> with <code>&lt;o:commandScript&gt;</code>which simply invokes a bean
+ * action and ajax-updates the UI once a push message arrives. The combination can look like below:
  * <pre>
  * &lt;h:panelGroup id="foo"&gt;
  *     ... (some complex UI here) ...
@@ -403,10 +403,9 @@ public class Socket extends TagHandler {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Register the push channel and endpoint if necessary and then subcribe the {@link SocketEventListener}.
-	 * Note thus that any manually triggered push requests on unregistered channels will cause an exception, and that
-	 * the push endpoint is only activated when the <code>&lt;o:socket&gt;</code> is actually used in the application.
-	 * @throws IllegalStateException When the web socket endpoint is not enabled.
+	 * First check if the web socket endpoint is enabled in <code>web.xml</code> and the channel name is valid, then
+	 * subcribe the {@link SocketEventListener}.
+	 * @throws IllegalStateException When the web socket endpoint is not enabled in <code>web.xml</code>.
 	 * @throws IllegalArgumentException When the channel name is invalid.
 	 * It may only contain alphanumeric characters, hyphens, underscores and periods.
 	 */
@@ -440,11 +439,12 @@ public class Socket extends TagHandler {
 	// Helpers --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Register web socket endpoint and channel filter if necessary, i.e. when it's enabled via context param.
+	 * Register web socket endpoint and channel filter if necessary, i.e. when it's enabled via context param and not
+	 * already installed.
 	 * @param context The involved servlet context.
 	 */
 	public static void registerEndpointAndFilterIfNecessary(ServletContext context) {
-		if (!parseBoolean(context.getInitParameter(PARAM_ENABLE_SOCKET_ENDPOINT))) {
+		if (TRUE.equals(context.getAttribute(Socket.class.getName())) || !parseBoolean(context.getInitParameter(PARAM_ENABLE_SOCKET_ENDPOINT))) {
 			return;
 		}
 

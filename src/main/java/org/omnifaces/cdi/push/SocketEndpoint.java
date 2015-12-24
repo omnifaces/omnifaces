@@ -35,11 +35,8 @@ public class SocketEndpoint extends Endpoint {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	/** The URI path parameter name of the web socket channel. */
-	static final String PARAM_CHANNEL = "channel";
-
 	/** The URI template of the web socket endpoint. */
-	static final String URI_TEMPLATE = PushContext.URI_PREFIX + "/{" + PARAM_CHANNEL + "}";
+	static final String URI_TEMPLATE = PushContext.URI_PREFIX + "/{" + SocketPushContext.PARAM_CHANNEL + "}";
 
 	private static final Logger logger = Logger.getLogger(SocketEndpoint.class.getName());
 	private static final String ERROR_EXCEPTION = "SocketEndpoint: An exception occurred during processing web socket request.";

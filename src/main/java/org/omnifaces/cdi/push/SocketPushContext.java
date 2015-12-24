@@ -13,7 +13,6 @@
 package org.omnifaces.cdi.push;
 
 import static java.util.Collections.synchronizedSet;
-import static org.omnifaces.cdi.push.SocketEndpoint.PARAM_CHANNEL;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -40,6 +39,9 @@ import org.omnifaces.util.Json;
 public class SocketPushContext implements PushContext {
 
 	// Constants ------------------------------------------------------------------------------------------------------
+
+	/** The URI path parameter name of the web socket channel. */
+	static final String PARAM_CHANNEL = "channel";
 
 	private static final ConcurrentMap<String, Set<Session>> SESSIONS = new ConcurrentHashMap<>();
 

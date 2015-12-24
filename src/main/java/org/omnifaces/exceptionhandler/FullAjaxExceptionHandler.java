@@ -77,28 +77,25 @@ import org.omnifaces.util.Hacks;
  * This exception handler will parse the <code>web.xml</code> and <code>web-fragment.xml</code> files to find the error
  * page locations of the HTTP error code <code>500</code> and all declared specific exception types. Those locations
  * need to point to Facelets files (JSP is not supported) and the URL must match the {@link FacesServlet} mapping (just
- * mapping it on <code>*.xhtml</code> should eliminate confusion about virtual URLs).
+ * mapping it on <code>*.xhtml</code> should eliminate confusion about virtual URLs). E.g.
+ * <pre>
+ * &lt;error-page&gt;
+ *     &lt;exception-type&gt;javax.faces.application.ViewExpiredException&lt;/exception-type&gt;
+ *     &lt;location&gt;/WEB-INF/errorpages/expired.xhtml&lt;/location&gt;
+ * &lt;/error-page&gt;
+ * </pre>
  * <p>
  * The location of the HTTP error code <code>500</code> or the exception type <code>java.lang.Throwable</code> is
  * <b>required</b> in order to get the {@link FullAjaxExceptionHandler} to work, because there's then at least a fall
- * back error page whenever there's no match with any of the declared specific exceptions. So, you must at least have
- * either
+ * back error page when there's no match with any of the declared specific exceptions types. You can have both, but the
+ * <code>java.lang.Throwable</code> one will always get precedence over all others. When you have error pages for
+ * specific exception types, then you'd better use the <code>500</code> one as fallback error page.
  * <pre>
  * &lt;error-page&gt;
  *     &lt;error-code&gt;500&lt;/error-code&gt;
  *     &lt;location&gt;/WEB-INF/errorpages/500.xhtml&lt;/location&gt;
  * &lt;/error-page&gt;
  * </pre>
- * <p>or
- * <pre>
- * &lt;error-page&gt;
- *     &lt;exception-type&gt;java.lang.Throwable&lt;/exception-type&gt;
- *     &lt;location&gt;/WEB-INF/errorpages/500.xhtml&lt;/location&gt;
- * &lt;/error-page&gt;
- * </pre>
- * <p>
- * You can have both, but the <code>java.lang.Throwable</code> one will always get precedence over the <code>500</code>
- * one, as per the Servlet API specification, so the <code>500</code> one would be basically superfluous.
  * <p>
  * The exception detail is available in the request scope by the standard Servlet error request attributes like as in a
  * normal synchronous error page response. You could for example show them in the error page as follows:
