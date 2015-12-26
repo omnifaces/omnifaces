@@ -37,6 +37,7 @@ import javax.faces.component.FacesComponent;
 import javax.faces.component.UICommand;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIViewParameter;
+import javax.faces.component.html.HtmlForm;
 import javax.faces.context.FacesContext;
 import javax.faces.context.FacesContextWrapper;
 
@@ -127,7 +128,7 @@ import org.omnifaces.util.State;
  * @author Bauke Scholtz
  */
 @FacesComponent(Form.COMPONENT_TYPE)
-public class Form extends UIForm {
+public class Form extends HtmlForm {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
