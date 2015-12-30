@@ -250,4 +250,15 @@ public final class Beans {
 		return null;
 	}
 
+	/**
+	 * Fires the given CDI event, optionally with the given qualifiers.
+	 * @param event The event object.
+	 * @param qualifiers The event qualifiers, if any.
+	 * @since 2.3
+	 * @see BeanManager#fireEvent(Object, Annotation...)
+	 */
+	public static void fireEvent(Object event, Annotation... qualifiers) {
+		BeansLocal.fireEvent(getManager(), event, qualifiers);
+	}
+
 }

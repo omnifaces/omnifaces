@@ -217,4 +217,12 @@ public final class BeansLocal {
 		);
 	}
 
+	/**
+	 * {@inheritDoc}
+	 * @see Beans#fireEvent(Object, Annotation...)
+	 */
+	public static void fireEvent(BeanManager beanManager, Object event, Annotation... qualifiers) {
+		beanManager.fireEvent(event, qualifiers);
+	}
+
 }
