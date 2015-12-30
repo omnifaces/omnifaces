@@ -331,6 +331,20 @@ public final class Servlets {
 		return queryString.toString();
 	}
 
+	/**
+	 * Returns the Internet Protocol (IP) address of the client that sent the request. This will first check the
+	 * <code>X-Forwarded-For</code> request header and if it's present, then return its first IP address, else just
+	 * return {@link HttpServletRequest#getRemoteAddr()} unmodified.
+	 * @param request The involved HTTP servlet request.
+	 * @return The IP address of the client.
+	 * @see HttpServletRequest#getRemoteAddr()
+	 * @since 2.3
+	 */
+	public static String getRemoteAddr(HttpServletRequest request) {
+		String forwardedFor = request.getHeader("X-Forwarded-For");
+		return isEmpty(forwardedFor) ? request.getRemoteAddr() : forwardedFor.split("\\s*,\\s*", 2)[0]; // It's a comma separated string: client,proxy1,proxy2,...
+	}
+
 	// HttpServletResponse --------------------------------------------------------------------------------------------
 
 	/**

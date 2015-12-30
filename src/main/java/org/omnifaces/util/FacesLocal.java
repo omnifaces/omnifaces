@@ -846,13 +846,7 @@ public final class FacesLocal {
 	 * @see Faces#getRemoteAddr()
 	 */
 	public static String getRemoteAddr(FacesContext context) {
-		String forwardedFor = getRequestHeader(context, "X-Forwarded-For");
-
-		if (!Utils.isEmpty(forwardedFor)) {
-			return forwardedFor.split("\\s*,\\s*", 2)[0]; // It's a comma separated string: client,proxy1,proxy2,...
-		}
-
-		return getRequest(context).getRemoteAddr();
+		return Servlets.getRemoteAddr(getRequest(context));
 	}
 
 	// HTTP response --------------------------------------------------------------------------------------------------
