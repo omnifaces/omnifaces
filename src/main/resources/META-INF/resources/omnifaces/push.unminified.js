@@ -27,7 +27,7 @@ OmniFaces.Push = (function(Util, window) {
 	var URL_PROTOCOL = window.location.protocol.replace("http", "ws") + "//";
 	var URI_PREFIX = "/omnifaces.push";
 	var RECONNECT_INTERVAL = 500;
-	var MAX_RECONNECT_INTERVAL = 10000;
+	var MAX_RECONNECT_ATTEMPTS = 25;
 
 	// Private static fields ------------------------------------------------------------------------------------------
 
@@ -38,7 +38,8 @@ OmniFaces.Push = (function(Util, window) {
 
 	/**
 	 * Creates a reconnecting web socket. When the web socket successfully connects on first attempt, then it will
-	 * automatically reconnect on timeout.
+	 * automatically reconnect on timeout with cumulative intervals of 500ms with a maximum of 25 attempts (~3 minutes).
+	 * The <code>onclose</code> function will be called with the error code of the last attempt.
 	 * @constructor
 	 * @param {string} url The URL of the web socket 
 	 * @param {string} channel The name of the web socket channel.
@@ -50,7 +51,7 @@ OmniFaces.Push = (function(Util, window) {
 		// Private fields -----------------------------------------------------------------------------------------
 
 		var socket;
-		var connectAttempts;
+		var reconnectAttempts;
 		var self = this;
 
 		// Public functions ---------------------------------------------------------------------------------------
@@ -66,7 +67,7 @@ OmniFaces.Push = (function(Util, window) {
 			socket = new WebSocket(url);
 
 			socket.onopen = function(event) {
-				connectAttempts = 1;
+				reconnectAttempts = 0;
 			}
 
 			socket.onmessage = function(event) {
@@ -74,12 +75,11 @@ OmniFaces.Push = (function(Util, window) {
 			}
 
 			socket.onclose = function(event) {
-				if (!socket) {
+				if (!socket || reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
 					onclose(event.code, channel, event);
 				}
-				else if (connectAttempts) {
-					setTimeout(self.open, Math.min(RECONNECT_INTERVAL * connectAttempts, MAX_RECONNECT_INTERVAL));
-					connectAttempts++;
+				else if (reconnectAttempts >= 0) {
+					setTimeout(self.open, RECONNECT_INTERVAL * reconnectAttempts++);
 				}
 			}
 		}
