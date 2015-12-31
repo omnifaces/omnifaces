@@ -23,7 +23,6 @@ OmniFaces.Push = (function(Util, window) {
 
 	// "Constant" fields ----------------------------------------------------------------------------------------------
 
-	var WS_SUPPORTED = !!window.WebSocket;
 	var URL_PROTOCOL = window.location.protocol.replace("http", "ws") + "//";
 	var URI_PREFIX = "/omnifaces.push";
 	var RECONNECT_INTERVAL = 500;
@@ -75,10 +74,10 @@ OmniFaces.Push = (function(Util, window) {
 			}
 
 			socket.onclose = function(event) {
-				if (!socket || reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+				if (!socket || reconnectAttempts == null || reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
 					onclose(event.code, channel, event);
 				}
-				else if (reconnectAttempts >= 0) {
+				else {
 					setTimeout(self.open, RECONNECT_INTERVAL * reconnectAttempts++);
 				}
 			}
@@ -126,7 +125,7 @@ OmniFaces.Push = (function(Util, window) {
 	self.init = function(host, channel, onmessage, onclose, autoconnect) {
 		onclose = Util.resolveFunction(onclose);
 
-		if (!WS_SUPPORTED) { // IE6-9.
+		if (!window.WebSocket) { // IE6-9.
 			onclose(-1, channel);
 			return;
 		}
