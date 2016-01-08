@@ -103,7 +103,7 @@ public final class SelectItemsCollector {
 					// A map has its own algorithm for how it should be turned into a list of SelectItems
 					selectItems.addAll(SelectItemsBuilder.fromMap((Map<?, ?>)value));
 
-				} else {
+				} else if (value != null) {
 
 					// A value binding was specified, but of a type we don't support.
 					throw new IllegalArgumentException(String.format(ERROR_UNKNOWN_SELECT_TYPE, value.getClass().toString()));
