@@ -131,8 +131,7 @@ OmniFaces.Push = (function(Util, window) {
 		}
 
 		if (!sockets[channel]) {
-			var url = getBaseURL(host) + encodeURIComponent(channel);
-			sockets[channel] = new Socket(url, channel, Util.resolveFunction(onmessage), onclose);
+			sockets[channel] = new Socket(getBaseURL(host) + channel, channel, Util.resolveFunction(onmessage), onclose);
 		}
 
 		if (autoconnect) {

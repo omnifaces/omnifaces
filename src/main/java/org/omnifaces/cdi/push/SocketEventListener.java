@@ -105,7 +105,7 @@ public class SocketEventListener implements SystemEventListener {
 
 			if (switched == null) {
 				String base = (port != null ? ":" + port : "") + getRequestContextPath(context);
-				script = String.format(SCRIPT_INIT, base, channel, functions, connected);
+				script = String.format(SCRIPT_INIT, base, channel + (channel.contains("/") ? "" : "/"), functions, connected);
 			}
 			else if (switched) {
 				script = String.format(connected ? SCRIPT_OPEN : SCRIPT_CLOSE, channel);

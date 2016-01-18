@@ -12,6 +12,10 @@
  */
 package org.omnifaces.cdi.push;
 
+import static org.omnifaces.cdi.PushContext.URI_PREFIX;
+import static org.omnifaces.cdi.push.SocketPushContext.PARAM_CHANNEL;
+import static org.omnifaces.cdi.push.SocketPushContext.PARAM_SUFFIX;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -20,7 +24,6 @@ import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
 
-import org.omnifaces.cdi.PushContext;
 import org.omnifaces.config.BeanManager;
 
 /**
@@ -36,7 +39,7 @@ public class SocketEndpoint extends Endpoint {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	/** The URI template of the web socket endpoint. */
-	static final String URI_TEMPLATE = PushContext.URI_PREFIX + "/{" + SocketPushContext.PARAM_CHANNEL + "}";
+	static final String URI_TEMPLATE = URI_PREFIX + "/{" + PARAM_CHANNEL + "}/{" + PARAM_SUFFIX + "}";
 
 	private static final Logger logger = Logger.getLogger(SocketEndpoint.class.getName());
 	private static final String ERROR_EXCEPTION = "SocketEndpoint: An exception occurred during processing web socket request.";

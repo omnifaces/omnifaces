@@ -13,6 +13,7 @@
 package org.omnifaces.cdi.push;
 
 import static java.util.Collections.synchronizedSet;
+import static org.omnifaces.util.Utils.isEmpty;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -43,6 +44,9 @@ public class SocketPushContext implements PushContext {
 	/** The URI path parameter name of the web socket channel. */
 	static final String PARAM_CHANNEL = "channel";
 
+	/** The URI path parameter name of the web socket channel suffix (usually, an unique identifier). */
+	static final String PARAM_SUFFIX = "suffix";
+
 	private static final ConcurrentMap<String, Set<Session>> SESSIONS = new ConcurrentHashMap<>();
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -54,6 +58,12 @@ public class SocketPushContext implements PushContext {
 	 */
 	void add(Session session) {
  		String channel = session.getPathParameters().get(PARAM_CHANNEL);
+ 		String suffix = session.getPathParameters().get(PARAM_SUFFIX);
+
+ 		if (!isEmpty(suffix)) {
+ 			channel += "/" + suffix;
+ 		}
+
 		session.getUserProperties().put(PARAM_CHANNEL, channel);
 
 		if (!SESSIONS.containsKey(channel)) {

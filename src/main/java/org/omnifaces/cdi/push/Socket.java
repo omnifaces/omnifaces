@@ -385,7 +385,7 @@ public class Socket extends TagHandler {
 	/** The boolean context parameter name to register web socket endpoint during startup. */
 	public static final String PARAM_ENABLE_SOCKET_ENDPOINT = "org.omnifaces.ENABLE_SOCKET_ENDPOINT";
 
-	private static final Pattern PATTERN_CHANNEL_NAME = Pattern.compile("[\\w.-]+");
+	private static final Pattern PATTERN_CHANNEL_NAME = Pattern.compile("[\\w./-]+");
 
 	private static final String ERROR_ENDPOINT_NOT_ENABLED =
 		"o:socket endpoint is not enabled."
