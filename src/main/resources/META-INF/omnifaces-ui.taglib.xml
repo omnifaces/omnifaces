@@ -4762,6 +4762,12 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 	</tag>
 
 	<tag>
+		<description>
+			<![CDATA[
+				Opens an one-way (server to client) web socket based push connection in client side which can be reached from
+				server side via <code>PushContext</code> interface injected in any CDI/container managed artifact.
+			]]>
+		</description>
 		<tag-name>socket</tag-name>
 		<handler-class>org.omnifaces.cdi.push.Socket</handler-class>
 		<attribute>
