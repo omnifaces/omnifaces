@@ -40,7 +40,7 @@ import org.omnifaces.facesviews.FacesViews;
  * <li>Instantiate {@link Eager} application scoped beans and register its {@link EagerBeansWebListener} if necessary.
  * <li>Add {@link FacesViews} mappings to FacesServlet if necessary.
  * <li>Load {@link Cache} provider and register its filter if necessary.
- * <li>Register {@link Socket} endpoint and filter if necessary.
+ * <li>Register {@link Socket} endpoint if necessary.
  * </ol>
  *
  * @author Bauke Scholtz
@@ -64,7 +64,7 @@ public class ApplicationListener extends DefaultServletContextListener {
 			EagerBeansRepository.instantiateApplicationScopedAndRegisterListener(servletContext);
 			FacesViews.addMappings(servletContext);
 			CacheInitializer.loadProviderAndRegisterFilter(servletContext);
-			Socket.registerEndpointAndFilterIfNecessary(servletContext);
+			Socket.registerEndpointIfNecessary(servletContext);
 		}
 		catch (Throwable e) {
 			logger.log(Level.SEVERE, "OmniFaces failed to initialize! Report an issue to OmniFaces.", e);

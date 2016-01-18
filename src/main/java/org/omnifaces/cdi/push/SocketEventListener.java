@@ -13,21 +13,16 @@
 package org.omnifaces.cdi.push;
 
 import static java.lang.Boolean.TRUE;
-import static java.util.Collections.synchronizedSet;
 import static org.omnifaces.util.Ajax.oncomplete;
 import static org.omnifaces.util.Components.addScriptResourceToHead;
 import static org.omnifaces.util.Components.addScriptToBody;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
-import static org.omnifaces.util.FacesLocal.getSessionAttribute;
 import static org.omnifaces.util.FacesLocal.getViewAttribute;
 import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
-import static org.omnifaces.util.FacesLocal.setSessionAttribute;
 import static org.omnifaces.util.FacesLocal.setViewAttribute;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import javax.el.ValueExpression;
 import javax.faces.component.UIViewRoot;
@@ -109,7 +104,6 @@ public class SocketEventListener implements SystemEventListener {
 			String script = null;
 
 			if (switched == null) {
-				registerChannel(context, channel);
 				String base = (port != null ? ":" + port : "") + getRequestContextPath(context);
 				script = String.format(SCRIPT_INIT, base, channel, functions, connected);
 			}
@@ -144,20 +138,6 @@ public class SocketEventListener implements SystemEventListener {
 
 		Boolean previouslyConnected = channels.put(channel, connected);
 		return (previouslyConnected == null) ? null : (previouslyConnected != connected);
-	}
-
-	/**
-	 * Register given web socket channel name in user session.
-	 */
-	private static void registerChannel(FacesContext context, String channel) {
-		Set<String> registeredChannels = getSessionAttribute(context, Socket.class.getName());
-
-		if (registeredChannels == null) {
-			registeredChannels = synchronizedSet(new HashSet<String>());
-			setSessionAttribute(context, Socket.class.getName(), registeredChannels);
-		}
-
-		registeredChannels.add(channel);
 	}
 
 }

@@ -14,15 +14,12 @@ package org.omnifaces.cdi.push;
 
 import static java.lang.Boolean.TRUE;
 import static java.lang.Boolean.parseBoolean;
-import static javax.servlet.DispatcherType.ASYNC;
-import static javax.servlet.DispatcherType.REQUEST;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
 import static org.omnifaces.util.Facelets.getObject;
 import static org.omnifaces.util.Facelets.getValueExpression;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 
 import java.io.IOException;
-import java.util.EnumSet;
 import java.util.regex.Pattern;
 
 import javax.el.ValueExpression;
@@ -39,7 +36,6 @@ import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagAttribute;
 import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
-import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.server.ServerContainer;
@@ -65,8 +61,8 @@ import org.omnifaces.util.Json;
  * &lt;/context-param&gt;
  * </pre>
  * <p>
- * It will install the {@link SocketEndpoint} and {@link SocketChannelFilter}. Lazy initialization of the endpoint and
- * filter is unfortunately not possible across all containers (yet).
+ * It will install the {@link SocketEndpoint}. Lazy initialization of the endpoint is unfortunately not possible across
+ * all containers (yet).
  * See also <a href="https://java.net/jira/browse/WEBSOCKET_SPEC-211">WS spec issue 211</a>.
  *
  *
@@ -207,37 +203,59 @@ import org.omnifaces.util.Json;
  * anyone having a push socket open on the same channel will receive the same push message. This is OK for global push
  * messages, but this may not be OK for push messages with sensitive information restricted to specific user(s).
  * <p>
- * To send a push message to a specific user session, append the session ID to channel ID.
+ * To send a push message to a specific user session, append the session ID to channel ID, preferably separated by a
+ * forward slash (so you could configure security constraints on it, see later).
  * <pre>
- * &lt;o:socket channel="foo_#{session.id}" ... /&gt;
+ * &lt;o:socket channel="foo/#{session.id}" ... /&gt;
  * </pre>
  * <pre>
  * public void sendMessage(Object message) {
- *     pushContext.send("foo_" + Faces.getSessionId(), message);
+ *     pushContext.send("foo/" + Faces.getSessionId(), message);
  * }
  * </pre>
+ * <p>
+ * Although in a decent server the session ID is usually URL safe, caution must be taken that it is indeed really the
+ * case, otherwise you need to URL-encode the session ID part, or substitute with an UUID which is stored in session.
  * <p>
  * If you intend to send only to a specific page within the specific user session, make sure that the channel name
  * prefix is specific to the particular page.
  * <pre>
- * &lt;o:socket channel="pagename_#{session.id}" ... /&gt;
+ * &lt;o:socket channel="pagename/#{session.id}" ... /&gt;
  * </pre>
  * <pre>
  * public void sendMessage(Object message) {
- *     pushContext.send("pagename_" + Faces.getSessionId(), message);
+ *     pushContext.send("pagename/" + Faces.getSessionId(), message);
  * }
  * </pre>
  * <p>
  * Noted should be that the channel name may only contain alphanumeric characters, hyphens, underscores and periods.
+ *
+ *
+ * <h3>Security considerations</h3>
  * <p>
- * Whatever you do, make sure that the user-restricted channel name has an unguessable value, such as the session ID.
- * Otherwise people can easily manually open a web socket listening on a guessed channel name. For example, in case you
- * intend to push a message to users of only a specific role, then encrypt that role name or map it to an UUID and use
- * it in place of the session ID in above examples.
+ * Whatever you do, make sure that the user-restricted channel name has an unguessable value, such as the session ID
+ * suffix in above examples and thus definitely not e.g. the user name. Otherwise people can easily manually open a web
+ * socket listening on a guessed channel name. For example, in case you intend to push a message to users of only a
+ * specific role, then encrypt that role name or map it to an UUID and use it in place of the session ID in above
+ * examples.
  * <p>
- * As extra security, the <code>&lt;o:socket&gt;</code> will remember all so far opened channels in the current HTTP
- * session and the aforementioned {@link SocketChannelFilter} will check all incoming web socket handshake requests
- * whether they match the so far opened channels in the current HTTP session, and otherwise send a HTTP 400 error back.
+ * If the socket is declared in a page which is only restricted to logged-in users with a specific role, then you may
+ * need to add the URL of the push handshake request URL to the set of restricted URLs. The push handshake request URL
+ * is composed of the URI prefix <code>/omnifaces.push/</code>, followed by channel name. So, in case of for example
+ * container managed security, you could restrict push handshake requests of <code>&lt;o:socket channel="foo"&gt;</code>
+ * to users with role <code>USER</code> in <code>web.xml</code> like below, irrespective of any channel name suffix
+ * separated by a forward slash such as the session ID in above examples.
+ * <pre>
+ * &lt;security-constraint&gt;
+ *     &lt;web-resource-collection&gt;
+ *         &lt;web-resource-name&gt;Push channel foo.&lt;/web-resource-name&gt;
+ *         &lt;url-pattern&gt;/omnifaces.push/foo/*&lt;/url-pattern&gt;
+ *     &lt;/web-resource-collection&gt;
+ *     &lt;auth-constraint&gt;
+ *         &lt;role-name&gt;USER&lt;/role-name&gt;
+ *     &lt;/auth-constraint&gt;
+ * &lt;/security-constraint&gt;
+ * </pre>
  *
  *
  * <h3>EJB design hints</h3>
@@ -355,7 +373,6 @@ import org.omnifaces.util.Json;
  *
  * @author Bauke Scholtz
  * @see SocketEndpoint
- * @see SocketChannelFilter
  * @see SocketEventListener
  * @see SocketPushContext
  * @see PushContext
@@ -439,11 +456,10 @@ public class Socket extends TagHandler {
 	// Helpers --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Register web socket endpoint and channel filter if necessary, i.e. when it's enabled via context param and not
-	 * already installed.
+	 * Register web socket endpoint if necessary, i.e. when it's enabled via context param and not already installed.
 	 * @param context The involved servlet context.
 	 */
-	public static void registerEndpointAndFilterIfNecessary(ServletContext context) {
+	public static void registerEndpointIfNecessary(ServletContext context) {
 		if (TRUE.equals(context.getAttribute(Socket.class.getName())) || !parseBoolean(context.getInitParameter(PARAM_ENABLE_SOCKET_ENDPOINT))) {
 			return;
 		}
@@ -452,10 +468,6 @@ public class Socket extends TagHandler {
 			ServerContainer serverContainer = (ServerContainer) context.getAttribute(ServerContainer.class.getName());
 			ServerEndpointConfig config = ServerEndpointConfig.Builder.create(SocketEndpoint.class, SocketEndpoint.URI_TEMPLATE).build();
 			serverContainer.addEndpoint(config);
-
-			FilterRegistration filter = context.addFilter(SocketChannelFilter.class.getName(), SocketChannelFilter.class);
-			filter.addMappingForUrlPatterns(EnumSet.of(REQUEST, ASYNC), false, SocketChannelFilter.URL_PATTERN);
-
 			context.setAttribute(Socket.class.getName(), TRUE);
 		}
 		catch (Exception e) {
