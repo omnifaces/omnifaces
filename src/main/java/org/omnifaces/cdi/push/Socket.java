@@ -203,8 +203,9 @@ import org.omnifaces.util.Json;
  * anyone having a push socket open on the same channel will receive the same push message. This is OK for global push
  * messages, but this may not be OK for push messages with sensitive information restricted to specific user(s).
  * <p>
- * To send a push message to a specific user session, append the session ID to channel ID, preferably separated by a
- * forward slash (so you could configure security constraints on it, see later).
+ * To send a push message to a specific user session, append a session based unique identifier to the channel name,
+ * preferably separated by a forward slash (so you could configure security constraints on it, see later). The session
+ * ID is a good candidate.
  * <pre>
  * &lt;o:socket channel="foo/#{session.id}" ... /&gt;
  * </pre>
@@ -215,7 +216,7 @@ import org.omnifaces.util.Json;
  * </pre>
  * <p>
  * Although in a decent server the session ID is usually URL safe, caution must be taken that it is indeed really the
- * case, otherwise you need to URL-encode the session ID part, or substitute with an UUID which is stored in session.
+ * case, otherwise you may want to substitute with an UUID which in turn is stored in a session scoped managed bean.
  * <p>
  * If you intend to send only to a specific page within the specific user session, make sure that the channel name
  * prefix is specific to the particular page.
@@ -228,7 +229,8 @@ import org.omnifaces.util.Json;
  * }
  * </pre>
  * <p>
- * Noted should be that the channel name may only contain alphanumeric characters, hyphens, underscores and periods.
+ * Noted should be that the channel name may only contain alphanumeric characters, hyphens, underscores, periods and
+ * at most one forward slash.
  *
  *
  * <h3>Security considerations</h3>
@@ -385,14 +387,14 @@ public class Socket extends TagHandler {
 	/** The boolean context parameter name to register web socket endpoint during startup. */
 	public static final String PARAM_ENABLE_SOCKET_ENDPOINT = "org.omnifaces.ENABLE_SOCKET_ENDPOINT";
 
-	private static final Pattern PATTERN_CHANNEL_NAME = Pattern.compile("[\\w./-]+");
+	private static final Pattern PATTERN_CHANNEL_NAME = Pattern.compile("[\\w.-]+(/[\\w.-]+)?");
 
 	private static final String ERROR_ENDPOINT_NOT_ENABLED =
 		"o:socket endpoint is not enabled."
 			+ " You need to set web.xml context param '" + PARAM_ENABLE_SOCKET_ENDPOINT + "' with value 'true'.";
 	private static final String ERROR_ILLEGAL_CHANNEL_NAME =
-		"o:socket 'channel' attribute '%s' does not represent a valid channel name."
-			+ " It may only contain alphanumeric characters, hyphens, underscores and periods.";
+		"o:socket 'channel' attribute '%s' does not represent a valid channel name. It may only contain alphanumeric"
+			+ " characters, hyphens, underscores, periods and at most one intermediate forward slash.";
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
