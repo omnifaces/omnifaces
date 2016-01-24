@@ -14,6 +14,7 @@ package org.omnifaces.cdi.push;
 
 import static org.omnifaces.util.Beans.isActive;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 
@@ -31,7 +32,9 @@ import org.omnifaces.cdi.PushContext;
  * @see Push
  * @since 2.3
  */
-public class SocketPushContext implements PushContext {
+public class SocketPushContext implements PushContext, Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	private String channel;
 	private Map<String, String> sessionScopedChannelIds;
