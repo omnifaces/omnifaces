@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
+import javax.enterprise.context.ContextNotActiveException;
 import javax.enterprise.context.spi.AlterableContext;
 import javax.enterprise.context.spi.Context;
 import javax.enterprise.context.spi.CreationalContext;
@@ -123,6 +124,19 @@ public final class BeansLocal {
 		}
 		else {
 			return context.get(bean);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Beans#isActive(Class)
+	 */
+	public static <S extends Annotation> boolean isActive(BeanManager beanManager, Class<S> scope) {
+		try {
+			return beanManager.getContext(scope).isActive();
+		}
+		catch (ContextNotActiveException ignore) {
+			return false;
 		}
 	}
 

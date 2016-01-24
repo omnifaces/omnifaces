@@ -15,6 +15,7 @@ package org.omnifaces.util;
 import java.lang.annotation.Annotation;
 import java.util.Map;
 
+import javax.enterprise.context.ContextNotActiveException;
 import javax.enterprise.context.spi.AlterableContext;
 import javax.enterprise.context.spi.Context;
 import javax.enterprise.context.spi.CreationalContext;
@@ -81,7 +82,7 @@ public final class Beans {
 	 * @param <T> The generic CDI managed bean type.
 	 * @param beanClass The CDI managed bean class.
 	 * @return The CDI managed bean representation of the given bean class, or <code>null</code> if there is none.
-	 * @see BeanManager#getBeans(String)
+	 * @see BeanManager#getBeans(java.lang.reflect.Type, Annotation...)
 	 * @see BeanManager#resolve(java.util.Set)
 	 */
 	public static <T> Bean<T> resolve(Class<T> beanClass) {
@@ -162,13 +163,27 @@ public final class Beans {
 	}
 
 	/**
+	 * Returns <code>true</code> when the given CDI managed bean scope is active. I.e., all beans therein can be
+	 * accessed without facing {@link ContextNotActiveException}.
+	 * @param <S> The generic CDI managed bean scope type.
+	 * @param scope The CDI managed bean scope, e.g. <code>SessionScoped.class</code>.
+	 * @return <code>true</code> when the given CDI managed bean scope is active.
+	 * @since 2.3
+	 * @see BeanManager#getContext(Class)
+	 * @see Context#isActive()
+	 */
+	public static <S extends Annotation> boolean isActive(Class<S> scope) {
+		return BeansLocal.isActive(getManager(), scope);
+	}
+
+	/**
 	 * Returns all active CDI managed bean instances in the given CDI managed bean scope. The map key represents
 	 * the active CDI managed bean instance and the map value represents the CDI managed bean name, if any.
 	 * @param <S> The generic CDI managed bean scope type.
 	 * @param scope The CDI managed bean scope, e.g. <code>RequestScoped.class</code>.
 	 * @return All active CDI managed bean instances in the given CDI managed bean scope.
 	 * @since 1.7
-	 * @see BeanManager#getBeans(String)
+	 * @see BeanManager#getBeans(java.lang.reflect.Type, Annotation...)
 	 * @see BeanManager#getContext(Class)
 	 * @see Context#get(javax.enterprise.context.spi.Contextual)
 	 */
