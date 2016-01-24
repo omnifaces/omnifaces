@@ -14,8 +14,10 @@ package org.omnifaces.cdi.push;
 
 import static java.lang.Boolean.TRUE;
 import static java.lang.Boolean.parseBoolean;
+import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
 import static org.omnifaces.util.Facelets.getObject;
+import static org.omnifaces.util.Facelets.getString;
 import static org.omnifaces.util.Facelets.getValueExpression;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 
@@ -24,7 +26,6 @@ import java.util.regex.Pattern;
 
 import javax.el.ValueExpression;
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.spi.BeanManager;
 import javax.faces.FacesException;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
@@ -41,6 +42,7 @@ import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.server.ServerContainer;
 import javax.websocket.server.ServerEndpointConfig;
 
+import org.omnifaces.cdi.Push;
 import org.omnifaces.cdi.PushContext;
 import org.omnifaces.util.Callback;
 import org.omnifaces.util.Json;
@@ -69,11 +71,12 @@ import org.omnifaces.util.Json;
  * <h3>Usage (client)</h3>
  * <p>
  * Declare <code>&lt;o:socket&gt;</code> in the view with at least a <code>channel</code> name and an
- * <code>onmessage</code> JavaScript listener function.
+ * <code>onmessage</code> JavaScript listener function. The channel name may only contain alphanumeric characters,
+ * hyphens, underscores and periods.
  * <p>
  * Here's an example which refers an existing JS listener function.
  * <pre>
- * &lt;o:socket channel="global" onmessage="socketListener" /&gt;
+ * &lt;o:socket channel="someChannel" onmessage="socketListener" /&gt;
  * </pre>
  * <pre>
  * function socketListener(message, channel, event) {
@@ -83,7 +86,7 @@ import org.omnifaces.util.Json;
  * <p>
  * Here's an example which declares an inline JS listener function.
  * <pre>
- * &lt;o:socket channel="global" onmessage="function(message) { console.log(message); }" /&gt;
+ * &lt;o:socket channel="someChannel" onmessage="function(message) { console.log(message); }" /&gt;
  * </pre>
  * <p>
  * The <code>onmessage</code> JS listener function will be invoked with three arguments:
@@ -120,6 +123,12 @@ import org.omnifaces.util.Json;
  * <li><code>event</code>: the raw <a href="https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent"><code>
  * CloseEvent</code></a> instance, useful in case you intend to inspect it.</li>
  * </ul>
+ * <p>By default the web socket is application scoped, i.e. any view/session having the same web socket channel open
+ * will receive the same push message. The optional <code>scope</code> attribute can be set to <code>session</code> to
+ * restrict the push messages to all views in the current user session only.
+ * <pre>
+ * &lt;o:socket channel="someChannel" scope="session" ... /&gt;
+ * </pre>
  * <p>
  * In case your server is configured to run WS container on a different TCP port than the HTTP container, then you can
  * use the <code>port</code> attribute to explicitly specify the port.
@@ -130,16 +139,25 @@ import org.omnifaces.util.Json;
  *
  * <h3>Usage (server)</h3>
  * <p>
- * In the WAR side (not in EAR/EJB side!), you can inject {@link PushContext} in any CDI/container managed artifact
- * such as <code>@Named</code>, <code>@WebServlet</code>, etc wherever you'd like to send a push message and then invoke
- * {@link PushContext#send(String, Object)} with the channel name and any Java object representing the push message.
+ * In the WAR side (not in EAR/EJB side!), you can inject {@link PushContext} via {@link Push} on the given channel name
+ * in any CDI/container managed artifact such as <code>@Named</code>, <code>@WebServlet</code>, etc wherever you'd like
+ * to send a push message and then invoke {@link PushContext#send(Object)} and any Java object representing the push
+ * message.
  * <pre>
- * &#64;Inject
- * private PushContext pushContext;
+ * &#64;Inject &#64;Push
+ * private PushContext someChannel;
  *
  * public void sendMessage(Object message) {
- *     pushContext.send("global", message);
+ *     someChannel.send(message);
  * }
+ * </pre>
+ * <p>
+ * By default the name of the channel is taken from the name of the variable into which injection takes place. The
+ * channel name can be optionally specified via the <code>channel</code> attribute. The example below injects the push
+ * context for channel name <code>foo</code> into a variable named <code>bar</code>.
+ * <pre>
+ * &#64;Inject &#64;Push(channel="foo")
+ * private PushContext bar;
  * </pre>
  * <p>
  * The message object will be encoded as JSON and be delivered as <code>message</code> argument of the
@@ -197,61 +215,18 @@ import org.omnifaces.util.Json;
  * manually invoking <code>OmniFaces.Push</code> functions. Mixing them may end up in undefined behavior.
  *
  *
- * <h3>Channel name design hints</h3>
- * <p>
- * With the channel name you can less or more specify the desired push scope. With a static channel name, basically
- * anyone having a push socket open on the same channel will receive the same push message. This is OK for global push
- * messages, but this may not be OK for push messages with sensitive information restricted to specific user(s).
- * <p>
- * To send a push message to a specific user session, append a session based unique identifier to the channel name,
- * preferably separated by a forward slash (so you could configure security constraints on it, see later). The session
- * ID is a good candidate.
- * <pre>
- * &lt;o:socket channel="foo/#{session.id}" ... /&gt;
- * </pre>
- * <pre>
- * public void sendMessage(Object message) {
- *     pushContext.send("foo/" + Faces.getSessionId(), message);
- * }
- * </pre>
- * <p>
- * Although in a decent server the session ID is usually URL safe, caution must be taken that it is indeed really the
- * case, otherwise you may want to substitute with an UUID which in turn is stored in a session scoped managed bean.
- * <p>
- * If you intend to send only to a specific page within the specific user session, make sure that the channel name
- * prefix is specific to the particular page.
- * <pre>
- * &lt;o:socket channel="pagename/#{session.id}" ... /&gt;
- * </pre>
- * <pre>
- * public void sendMessage(Object message) {
- *     pushContext.send("pagename/" + Faces.getSessionId(), message);
- * }
- * </pre>
- * <p>
- * Noted should be that the channel name may only contain alphanumeric characters, hyphens, underscores, periods and
- * at most one forward slash.
- *
- *
  * <h3>Security considerations</h3>
- * <p>
- * Whatever you do, make sure that the user-restricted channel name has an unguessable value, such as the session ID
- * suffix in above examples and thus definitely not e.g. the user name. Otherwise people can easily manually open a web
- * socket listening on a guessed channel name. For example, in case you intend to push a message to users of only a
- * specific role, then encrypt that role name or map it to an UUID and use it in place of the session ID in above
- * examples.
  * <p>
  * If the socket is declared in a page which is only restricted to logged-in users with a specific role, then you may
  * need to add the URL of the push handshake request URL to the set of restricted URLs. The push handshake request URL
  * is composed of the URI prefix <code>/omnifaces.push/</code>, followed by channel name. So, in case of for example
  * container managed security, you could restrict push handshake requests of <code>&lt;o:socket channel="foo"&gt;</code>
- * to users with role <code>USER</code> in <code>web.xml</code> like below, irrespective of any channel name suffix
- * separated by a forward slash such as the session ID in above examples.
+ * to users with role <code>USER</code> in <code>web.xml</code> like below.
  * <pre>
  * &lt;security-constraint&gt;
  *     &lt;web-resource-collection&gt;
  *         &lt;web-resource-name&gt;Push channel foo.&lt;/web-resource-name&gt;
- *         &lt;url-pattern&gt;/omnifaces.push/foo/*&lt;/url-pattern&gt;
+ *         &lt;url-pattern&gt;/omnifaces.push/foo&lt;/url-pattern&gt;
  *     &lt;/web-resource-collection&gt;
  *     &lt;auth-constraint&gt;
  *         &lt;role-name&gt;USER&lt;/role-name&gt;
@@ -262,9 +237,9 @@ import org.omnifaces.util.Json;
  *
  * <h3>EJB design hints</h3>
  * <p>
- * In case you'd like to trigger a push from EAR/EJB side, you could make use of CDI events. First create a custom bean
- * class representing the push event something like <code>PushEvent</code> taking whatever you'd like to pass as push
- * message.
+ * In case you'd like to trigger a push from EAR/EJB side to an application scoped push socket, you could make use of
+ * CDI events. First create a custom bean class representing the push event something like <code>PushEvent</code> taking
+ * whatever you'd like to pass as push message.
  * <pre>
  * public class PushEvent {
  *
@@ -280,7 +255,8 @@ import org.omnifaces.util.Json;
  * }
  * </pre>
  * <p>
- * Then use {@link BeanManager#fireEvent(Object, java.lang.annotation.Annotation...)} to fire the CDI event.
+ * Then use {@link javax.enterprise.inject.spi.BeanManager#fireEvent(Object, java.lang.annotation.Annotation...)} to
+ * fire the CDI event.
  * <pre>
  * &#64;Inject
  * private BeanManager beanManager;
@@ -293,18 +269,19 @@ import org.omnifaces.util.Json;
  * Finally just {@link Observes} it in some request or application scoped CDI managed bean in WAR and delegate to
  * {@link PushContext} as below.
  * <pre>
- * &#64;Inject
- * private PushContext pushContext;
+ * &#64;Inject &#64;Push
+ * private PushContext someChannel;
  *
  * public void onPushEvent(@Observes PushEvent event) {
- *     pushContext.send("someChannel", event.getMessage());
+ *     someChannel.send(event.getMessage());
  * }
  * </pre>
  * <p>
  * Note that a request scoped bean wouldn't be the same one as from the originating page for the simple reason that
  * there's no means of a HTTP request anywhere at that moment. For exactly this reason a view and session scoped bean
  * would not work at all (as they require respectively the JSF view state and HTTP session which can only be identified
- * by a HTTP request). Also, the {@link FacesContext} will be unavailable in the method.
+ * by a HTTP request), and a session scoped push socket also not (so the push socket really needs to be application
+ * scoped). Also, the {@link FacesContext} will be unavailable in the method.
  * <p>
  * The alternative would be to make use of callbacks. Let the business service method take a callback instance as
  * argument, e.g {@link Runnable}.
@@ -322,25 +299,27 @@ import org.omnifaces.util.Json;
  * &#64;Inject
  * private SomeService someService;
  *
- * &#64;Inject
- * private PushContext pushContext;
+ * &#64;Inject &#64;Push
+ * private PushContext someChannel;
  *
  * public void submit() {
  *     someService.someAsyncServiceMethod(entity, new Runnable() {
  *         public void run() {
- *             pushContext.send("someChannel", entity.getSomeProperty());
+ *             someChannel.send(entity.getSomeProperty());
  *         }
  *     });
  * }
  * </pre>
  * <p>
- * This would be the only way in case you intend to pass something from {@link FacesContext} or the initial
- * request/view/session scope along as (<code>final</code>) argument.
+ * This would be the only way in case you intend to asynchronously send a message to a session scoped push socket,
+ * and/or want to pass something from {@link FacesContext} or the initial request/view/session scope along as
+ * (<code>final</code>) argument.
  * <p>
  * Note that OmniFaces own {@link Callback} interfaces are insuitable as you're not supposed to use WAR (front end)
  * frameworks and libraries like JSF and OmniFaces in EAR/EJB (back end) side.
  * <p>
- * In case you're already on Java 8, of course make use of the <code>Consumer</code> functional interface.
+ * In case you're already on Java 8, of course make use of the <code>Consumer</code> functional interface instead of
+ * the above {@link Runnable} example.
  * <pre>
  * &#64;Asynchronous
  * public void someAsyncServiceMethod(Entity entity, Consumer&lt;Object&gt; callback) {
@@ -350,7 +329,7 @@ import org.omnifaces.util.Json;
  * </pre>
  * <pre>
  * public void submit() {
- *     someService.someAsyncServiceMethod(entity, message -&gt; pushContext.send("someChannel", message);
+ *     someService.someAsyncServiceMethod(entity, message -&gt; someChannel.send(message);
  * }
  * </pre>
  *
@@ -375,9 +354,13 @@ import org.omnifaces.util.Json;
  *
  * @author Bauke Scholtz
  * @see SocketEndpoint
+ * @see SocketScope
  * @see SocketEventListener
- * @see SocketPushContext
+ * @see SocketManager
+ * @see Push
  * @see PushContext
+ * @see SocketPushContext
+ * @see SocketPushContextProducer
  * @since 2.3
  */
 public class Socket extends TagHandler {
@@ -387,19 +370,44 @@ public class Socket extends TagHandler {
 	/** The boolean context parameter name to register web socket endpoint during startup. */
 	public static final String PARAM_ENABLE_SOCKET_ENDPOINT = "org.omnifaces.ENABLE_SOCKET_ENDPOINT";
 
-	private static final Pattern PATTERN_CHANNEL_NAME = Pattern.compile("[\\w.-]+(/[\\w.-]+)?");
+	enum Scope {
+		APPLICATION, SESSION;
+
+		public static Scope of(String value) {
+			if (value == null) {
+				return APPLICATION;
+			}
+
+			for (Scope scope : values()) {
+				if (scope.name().equalsIgnoreCase(value)) {
+					return scope;
+				}
+			}
+
+			throw new IllegalArgumentException(String.format(ERROR_ILLEGAL_SCOPE, value));
+		}
+	}
+
+	private static final Pattern PATTERN_CHANNEL_NAME = Pattern.compile("[\\w.-]+");
 
 	private static final String ERROR_ENDPOINT_NOT_ENABLED =
 		"o:socket endpoint is not enabled."
 			+ " You need to set web.xml context param '" + PARAM_ENABLE_SOCKET_ENDPOINT + "' with value 'true'.";
 	private static final String ERROR_ILLEGAL_CHANNEL_NAME =
-		"o:socket 'channel' attribute '%s' does not represent a valid channel name. It may only contain alphanumeric"
-			+ " characters, hyphens, underscores, periods and at most one intermediate forward slash.";
+		"o:socket 'channel' attribute '%s' does not represent a valid channel name."
+			+ " It may only contain alphanumeric characters, hyphens, underscores, periods.";
+	private static final String ERROR_ILLEGAL_SCOPE =
+		"o:socket 'scope' attribute '%s' does not represent a valid scope."
+			+ " Allowed values are 'application' and 'session', case insensitive. The default is 'application'.";
+	private static final String ERROR_DUPLICATE_CHANNEL =
+		"o:socket channel '%s' is already registered on a different scope. Choose an unique channel name for a"
+			+ " different channel (or shutdown all browsers and restart the server if you were just testing).";
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	private TagAttribute port;
 	private TagAttribute channel;
+	private TagAttribute scope;
 	private TagAttribute onmessage;
 	private TagAttribute onclose;
 	private TagAttribute connected;
@@ -414,6 +422,7 @@ public class Socket extends TagHandler {
 		super(config);
 		port = getAttribute("port");
 		channel = getRequiredAttribute("channel");
+		scope = getAttribute("scope");
 		onmessage = getRequiredAttribute("onmessage");
 		onclose = getAttribute("onclose");
 		connected = getAttribute("connected");
@@ -422,11 +431,13 @@ public class Socket extends TagHandler {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * First check if the web socket endpoint is enabled in <code>web.xml</code> and the channel name is valid, then
-	 * subcribe the {@link SocketEventListener}.
+	 * First check if the web socket endpoint is enabled in <code>web.xml</code> and the channel name and scope is
+	 * valid, then subcribe the {@link SocketEventListener}.
 	 * @throws IllegalStateException When the web socket endpoint is not enabled in <code>web.xml</code>.
-	 * @throws IllegalArgumentException When the channel name is invalid.
-	 * It may only contain alphanumeric characters, hyphens, underscores and periods.
+	 * @throws IllegalArgumentException When the channel name or scope is invalid.
+	 * The channel name may only contain alphanumeric characters, hyphens, underscores and periods.
+	 * The channel scope allowed values are <code>application</code> and <code>session</code>, case insensitive.
+	 * The channel name must be uniquely tied to the channel scope.
 	 */
 	@Override
 	public void apply(FaceletContext context, UIComponent parent) throws IOException {
@@ -444,13 +455,19 @@ public class Socket extends TagHandler {
 			throw new IllegalArgumentException(String.format(ERROR_ILLEGAL_CHANNEL_NAME, channelName));
 		}
 
+		String channelId = getReference(SocketScope.class).register(channelName, Scope.of(getString(context, scope)));
+
+		if (channelId == null) {
+			throw new IllegalArgumentException(String.format(ERROR_DUPLICATE_CHANNEL, channelName));
+		}
+
 		Integer portNumber = getObject(context, port, Integer.class);
 		String onmessageFunction = onmessage.getValue(context);
-		String oncloseFunction = (onclose != null) ? onclose.getValue(context) : null;
+		String oncloseFunction = getString(context, onclose);
 		String functions = onmessageFunction + "," + oncloseFunction;
 		ValueExpression connectedExpression = getValueExpression(context, connected, Boolean.class);
 
-		SystemEventListener listener = new SocketEventListener(portNumber, channelName, functions, connectedExpression);
+		SystemEventListener listener = new SocketEventListener(portNumber, channelId, functions, connectedExpression);
 		subscribeToViewEvent(PostAddToViewEvent.class, listener);
 		subscribeToViewEvent(PreRenderViewEvent.class, listener);
 	}
@@ -467,9 +484,9 @@ public class Socket extends TagHandler {
 		}
 
 		try {
-			ServerContainer serverContainer = (ServerContainer) context.getAttribute(ServerContainer.class.getName());
+			ServerContainer container = (ServerContainer) context.getAttribute(ServerContainer.class.getName());
 			ServerEndpointConfig config = ServerEndpointConfig.Builder.create(SocketEndpoint.class, SocketEndpoint.URI_TEMPLATE).build();
-			serverContainer.addEndpoint(config);
+			container.addEndpoint(config);
 			context.setAttribute(Socket.class.getName(), TRUE);
 		}
 		catch (Exception e) {

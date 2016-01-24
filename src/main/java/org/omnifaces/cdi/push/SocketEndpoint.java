@@ -12,9 +12,8 @@
  */
 package org.omnifaces.cdi.push;
 
+import static javax.websocket.CloseReason.CloseCodes.GOING_AWAY;
 import static org.omnifaces.cdi.PushContext.URI_PREFIX;
-import static org.omnifaces.cdi.push.SocketPushContext.PARAM_CHANNEL;
-import static org.omnifaces.cdi.push.SocketPushContext.PARAM_SUFFIX;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -23,8 +22,6 @@ import javax.websocket.CloseReason;
 import javax.websocket.Endpoint;
 import javax.websocket.EndpointConfig;
 import javax.websocket.Session;
-
-import org.omnifaces.config.BeanManager;
 
 /**
  * <p>
@@ -38,8 +35,11 @@ public class SocketEndpoint extends Endpoint {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	/** The URI template of the web socket endpoint. */
-	static final String URI_TEMPLATE = URI_PREFIX + "/{" + PARAM_CHANNEL + "}/{" + PARAM_SUFFIX + "}";
+	/** The URI path parameter name of the web socket channel. */
+	static final String PARAM_CHANNEL = "channel";
+
+	/** The context-relative URI template where the web socket endpoint should listen on. */
+	public static final String URI_TEMPLATE = URI_PREFIX + "/{" + PARAM_CHANNEL + "}";
 
 	private static final Logger logger = Logger.getLogger(SocketEndpoint.class.getName());
 	private static final String ERROR_EXCEPTION = "SocketEndpoint: An exception occurred during processing web socket request.";
@@ -47,33 +47,42 @@ public class SocketEndpoint extends Endpoint {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Add given web socket session to the push context.
+	 * Add given web socket session to the socket manager.
 	 * @param session The opened web socket session.
 	 * @param config The endpoint configuration.
 	 */
 	@Override
 	public void onOpen(Session session, EndpointConfig config) {
-		BeanManager.INSTANCE.getReference(SocketPushContext.class).add(session); // @Inject in Endpoint doesn't work in Tomcat+Weld.
+		String channel = SocketScope.getChannelId(session.getPathParameters().get(PARAM_CHANNEL), session.getQueryString());
+		SocketManager.getInstance().add(channel, session); // @Inject in Endpoint doesn't work in Tomcat+Weld/OWB.
 	}
 
 	/**
-	 * Delegate exceptions to logger.
+	 * Delegate exception to onClose.
 	 * @param session The errored web socket session.
 	 * @param throwable The cause.
 	 */
 	@Override
 	public void onError(Session session, Throwable throwable) {
-		logger.log(Level.SEVERE, ERROR_EXCEPTION, throwable);
+		session.getUserProperties().put(Throwable.class.getName(), throwable);
 	}
 
 	/**
-	 * Remove given web socket session from the push context.
+	 * Remove given web socket session from the socket manager. If there is any exception from onError which was not
+	 * caused by a GOING_AWAY, then log it. Tomcat &lt;= 8.0.30 is known to throw an unnecessary exception when client
+	 * abruptly disconnects, see also <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=57489">issue 57489</a>.
 	 * @param session The closed web socket session.
 	 * @param reason The close reason.
 	 */
 	@Override
 	public void onClose(Session session, CloseReason reason) {
-		BeanManager.INSTANCE.getReference(SocketPushContext.class).remove(session); // @Inject in Endpoint doesn't work in Tomcat+Weld and CDI.current() doesn't work in WildFly.
+		SocketManager.getInstance().remove(session); // @Inject in Endpoint doesn't work in Tomcat+Weld/OWB and CDI.current() doesn't work in WildFly.
+
+		Throwable throwable = (Throwable) session.getUserProperties().get(Throwable.class.getName());
+
+		if (throwable != null && reason.getCloseCode() != GOING_AWAY) {
+			logger.log(Level.SEVERE, ERROR_EXCEPTION, throwable);
+		}
 	}
 
 }

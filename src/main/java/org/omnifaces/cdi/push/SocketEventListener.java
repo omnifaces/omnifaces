@@ -60,10 +60,9 @@ public class SocketEventListener implements SystemEventListener {
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Construct an instance of socket event listener based on the given channel name, functions and connected
-	 * expression.
+	 * Construct an instance of socket event listener based on the given channel, functions and connected expression.
 	 * @param port The port number.
-	 * @param channel The channel name.
+	 * @param channel The channel identifier.
 	 * @param functions The onmessage and onclose functions.
 	 * @param connectedExpression The connected expression.
 	 */
@@ -105,7 +104,7 @@ public class SocketEventListener implements SystemEventListener {
 
 			if (switched == null) {
 				String base = (port != null ? ":" + port : "") + getRequestContextPath(context);
-				script = String.format(SCRIPT_INIT, base, channel + (channel.contains("/") ? "" : "/"), functions, connected);
+				script = String.format(SCRIPT_INIT, base, channel, functions, connected);
 			}
 			else if (switched) {
 				script = String.format(connected ? SCRIPT_OPEN : SCRIPT_CLOSE, channel);

@@ -17,8 +17,10 @@ import org.omnifaces.util.Json;
 
 /**
  * <p>
- * CDI interface to send a message object to a push socket channel.
- * This can be injected in any container managed artifact in WAR (not in EAR/EJB!).
+ * CDI interface to send a message object to the push socket channel as identified by {@link Push}.
+ * This can be injected via {@link Push} in any container managed artifact in WAR (not in EAR/EJB!).
+ * <p>
+ * For detailed usage instructions, see {@link Socket} javadoc.
  *
  * @author Bauke Scholtz
  * @see Socket
@@ -34,13 +36,13 @@ public interface PushContext {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Send given message object to given push socket channel. This will be encoded as JSON and be available as first
-	 * argument of the JavaScript listener function declared in <code>&lt;o:socket onmessage&gt;</code>.
-	 * @param channel The push channel name.
+	 * Send given message object to the push socket channel as identified by {@link Push}. This will be encoded as JSON
+	 * and be available as first argument of the JavaScript listener function declared in
+	 * <code>&lt;o:socket onmessage&gt;</code>.
 	 * @param message The push message object.
 	 * @throws IllegalArgumentException If given message object cannot be encoded as JSON.
 	 * @see Json#encode(Object)
 	 */
-	public void send(String channel, Object message);
+	public void send(Object message);
 
 }

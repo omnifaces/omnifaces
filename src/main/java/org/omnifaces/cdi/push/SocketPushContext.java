@@ -12,102 +12,43 @@
  */
 package org.omnifaces.cdi.push;
 
-import static java.util.Collections.synchronizedSet;
-import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Beans.isActive;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import java.util.Collections;
+import java.util.Map;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.websocket.Session;
+import javax.enterprise.context.SessionScoped;
 
+import org.omnifaces.cdi.Push;
 import org.omnifaces.cdi.PushContext;
-import org.omnifaces.util.Json;
 
 /**
  * <p>
- * Concrete implementation of {@link PushContext} which is used by {@link SocketEndpoint}.
- * <p>
- * <strong>Do not inject this! Inject {@link PushContext} interface instead.</strong>
+ * Concrete implementation of {@link PushContext} which is to be injected by {@link Push}.
+ * This is produced by {@link SocketPushContextProducer}.
  *
  * @author Bauke Scholtz
- * @see SocketEndpoint
+ * @see Push
  * @since 2.3
  */
-@ApplicationScoped
 public class SocketPushContext implements PushContext {
 
-	// Constants ------------------------------------------------------------------------------------------------------
-
-	/** The URI path parameter name of the web socket channel. */
-	static final String PARAM_CHANNEL = "channel";
-
-	/** The URI path parameter name of the web socket channel suffix (usually, an unique identifier). */
-	static final String PARAM_SUFFIX = "suffix";
-
-	private static final ConcurrentMap<String, Set<Session>> SESSIONS = new ConcurrentHashMap<>();
-
-	// Actions --------------------------------------------------------------------------------------------------------
+	private String channel;
+	private Map<String, String> sessionScopedChannelIds;
 
 	/**
-	 * On open, add given web socket session to the mapping associated with given channel.
-	 * @param session The opened web socket session.
-	 * @param channel The push channel name.
+	 * Creates a socket push context whereby the mutable map of scoped channel IDs is referenced, so it's still
+	 * available when another thread invokes {@link #send(Object)} where the scope isn't active.
 	 */
-	void add(Session session) {
- 		String channel = session.getPathParameters().get(PARAM_CHANNEL);
- 		String suffix = session.getPathParameters().get(PARAM_SUFFIX);
-
- 		if (!isEmpty(suffix)) {
- 			channel += "/" + suffix;
- 		}
-
-		session.getUserProperties().put(PARAM_CHANNEL, channel);
-
-		if (!SESSIONS.containsKey(channel)) {
-			SESSIONS.putIfAbsent(channel, synchronizedSet(new HashSet<Session>()));
-		}
-
-		SESSIONS.get(channel).add(session);
+	SocketPushContext(String channel, SocketScope scope) {
+		this.channel = channel;
+		sessionScopedChannelIds = isActive(SessionScoped.class) ? scope.getSessionScopedChannelIds() : Collections.<String, String>emptyMap();
 	}
 
-	/**
-	 * Encode the given message object as JSON and send it to all open web socket sessions associated with the given
-	 * channel name.
-	 */
 	@Override
-	public void send(String channel, Object message) {
-		Set<Session> sessions = SESSIONS.get(channel);
-
-		if (sessions != null) {
-			String json = Json.encode(message);
-
-			synchronized(sessions) {
-				for (Session session : sessions) {
-					if (session.isOpen()) {
-						session.getAsyncRemote().sendText(json);
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * On close, remove given web socket session from the mapping.
-	 * @param session The closed web socket session.
-	 */
-	void remove(Session session) {
-		String channel = (String) session.getUserProperties().get(PARAM_CHANNEL);
-
-		if (channel != null) {
-			Set<Session> sessions = SESSIONS.get(channel);
-
-			if (sessions != null) {
-				sessions.remove(session);
-			}
-		}
+	public void send(Object message) {
+		String channelId = SocketScope.getChannelId(channel, sessionScopedChannelIds.get(channel));
+		SocketManager.getInstance().send(channelId, message);
 	}
 
 }
