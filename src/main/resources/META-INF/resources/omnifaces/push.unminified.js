@@ -106,8 +106,9 @@ OmniFaces.Push = (function(Util, window) {
 	 * If the value is falsey, then it will default to <code>window.location.host</code>.
 	 * If the value starts with <code>:</code>, then <code>window.location.hostname</code> will be prepended.
 	 * If the value starts with <code>/</code>, then <code>window.location.host</code> will be prepended.
-	 * @param {string} channel The name of the web socket channel. All open websockets on the same channel name will
-	 * receive the same push notification from the server.
+	 * @param {string} uri The uri of the web socket representing the channel name and optional scope identifier. All
+	 * open websockets on the same uri name will receive the same push notification from the server. The scope
+	 * identifier needs to be separated by a question mark.
 	 * @param {function} onmessage The JavaScript event handler function that is invoked when a message is received from
 	 * the server. The function will be invoked with three arguments: the push message, the channel name and the raw
 	 * <code>MessageEvent</code> itself.
@@ -120,8 +121,9 @@ OmniFaces.Push = (function(Util, window) {
 	 * for an elaborate list.
 	 * @param {boolean} autoconnect Whether or not to immediately open the socket. Defaults to <code>false</code>.
 	 */
-	self.init = function(host, channel, onmessage, onclose, autoconnect) {
+	self.init = function(host, uri, onmessage, onclose, autoconnect) {
 		onclose = Util.resolveFunction(onclose);
+		var channel = uri.split(/\?/)[0];
 
 		if (!window.WebSocket) { // IE6-9.
 			onclose(-1, channel);
@@ -129,7 +131,7 @@ OmniFaces.Push = (function(Util, window) {
 		}
 
 		if (!sockets[channel]) {
-			sockets[channel] = new Socket(getBaseURL(host) + channel, channel, Util.resolveFunction(onmessage), onclose);
+			sockets[channel] = new Socket(getBaseURL(host) + uri, channel, Util.resolveFunction(onmessage), onclose);
 		}
 
 		if (autoconnect) {
