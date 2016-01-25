@@ -47,7 +47,7 @@ public class SocketEndpoint extends Endpoint {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Add given web socket session to the socket manager.
+	 * Add given web socket session to the {@link SocketManager}.
 	 * @param session The opened web socket session.
 	 * @param config The endpoint configuration.
 	 */
@@ -68,8 +68,8 @@ public class SocketEndpoint extends Endpoint {
 	}
 
 	/**
-	 * Remove given web socket session from the socket manager. If there is any exception from onError which was not
-	 * caused by a GOING_AWAY, then log it. Tomcat &lt;= 8.0.30 is known to throw an unnecessary exception when client
+	 * Remove given web socket session from the {@link SocketManager}. If there is any exception from onError which was
+	 * not caused by GOING_AWAY, then log it. Tomcat &lt;= 8.0.30 is known to throw an unnecessary exception when client
 	 * abruptly disconnects, see also <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=57489">issue 57489</a>.
 	 * @param session The closed web socket session.
 	 * @param reason The close reason.

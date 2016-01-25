@@ -50,7 +50,7 @@ import org.omnifaces.util.Json;
 /**
  * <p>
  * Opens an one-way (server to client) web socket based push connection in client side which can be reached from
- * server side via {@link PushContext} interface injected in any CDI/container managed artifact.
+ * server side via {@link PushContext} interface injected in any CDI/container managed artifact via {@link Push}.
  *
  *
  * <h3>Configuration</h3>
@@ -70,11 +70,11 @@ import org.omnifaces.util.Json;
  *
  * <h3>Usage (client)</h3>
  * <p>
- * Declare <code>&lt;o:socket&gt;</code> in the view with at least a <code>channel</code> name and an
+ * Declare <code>&lt;o:socket&gt;</code> tag in the view with at least a <code>channel</code> name and an
  * <code>onmessage</code> JavaScript listener function. The channel name may only contain alphanumeric characters,
  * hyphens, underscores and periods.
  * <p>
- * Here's an example which refers an existing JS listener function.
+ * Here's an example which refers an existing JS listener function (do not include the parentheses!).
  * <pre>
  * &lt;o:socket channel="someChannel" onmessage="socketListener" /&gt;
  * </pre>
@@ -123,9 +123,9 @@ import org.omnifaces.util.Json;
  * <li><code>event</code>: the raw <a href="https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent"><code>
  * CloseEvent</code></a> instance, useful in case you intend to inspect it.</li>
  * </ul>
- * <p>By default the web socket is application scoped, i.e. any view/session having the same web socket channel open
- * will receive the same push message. The optional <code>scope</code> attribute can be set to <code>session</code> to
- * restrict the push messages to all views in the current user session only.
+ * <p>By default the web socket is application scoped, i.e. any view/session throughout the web application having the
+ * same web socket channel open will receive the same push message. The optional <code>scope</code> attribute can be set
+ * to <code>session</code> to restrict the push messages to all views in the current user session only.
  * <pre>
  * &lt;o:socket channel="someChannel" scope="session" ... /&gt;
  * </pre>
@@ -212,7 +212,7 @@ import org.omnifaces.util.Json;
  * <p>
  * Noted should be that both ways should not be mixed. Choose either the server side way of an EL expression in
  * <code>connected</code> attribute, or the client side way of explicitly setting <code>connected="false"</code> and
- * manually invoking <code>OmniFaces.Push</code> functions. Mixing them may end up in undefined behavior.
+ * manually invoking <code>OmniFaces.Push</code> functions. Mixing them ends up in undefined behavior.
  *
  *
  * <h3>Security considerations</h3>
@@ -283,8 +283,8 @@ import org.omnifaces.util.Json;
  * by a HTTP request), and a session scoped push socket also not (so the push socket really needs to be application
  * scoped). Also, the {@link FacesContext} will be unavailable in the method.
  * <p>
- * The alternative would be to make use of callbacks. Let the business service method take a callback instance as
- * argument, e.g {@link Runnable}.
+ * The alternative would be to make use of callbacks from WAR side. Let the business service method take a callback
+ * instance as argument, e.g {@link Runnable}.
  * <pre>
  * &#64;Asynchronous
  * public void someAsyncServiceMethod(Entity entity, Runnable callback) {
@@ -436,7 +436,7 @@ public class Socket extends TagHandler {
 	 * @throws IllegalStateException When the web socket endpoint is not enabled in <code>web.xml</code>.
 	 * @throws IllegalArgumentException When the channel name or scope is invalid.
 	 * The channel name may only contain alphanumeric characters, hyphens, underscores and periods.
-	 * The channel scope allowed values are <code>application</code> and <code>session</code>, case insensitive.
+	 * The allowed channel scope values are "application" and "session", case insensitive.
 	 * The channel name must be uniquely tied to the channel scope.
 	 */
 	@Override

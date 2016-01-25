@@ -14,7 +14,6 @@ package org.omnifaces.cdi.push;
 
 import static org.omnifaces.util.Beans.isActive;
 
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.Map;
 
@@ -32,12 +31,18 @@ import org.omnifaces.cdi.PushContext;
  * @see Push
  * @since 2.3
  */
-public class SocketPushContext implements PushContext, Serializable {
+public class SocketPushContext implements PushContext {
+
+	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final long serialVersionUID = 1L;
 
+	// Variables ------------------------------------------------------------------------------------------------------
+
 	private String channel;
 	private Map<String, String> sessionScopedChannelIds;
+
+	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
 	 * Creates a socket push context whereby the mutable map of scoped channel IDs is referenced, so it's still
@@ -47,6 +52,8 @@ public class SocketPushContext implements PushContext, Serializable {
 		this.channel = channel;
 		sessionScopedChannelIds = isActive(SessionScoped.class) ? scope.getSessionScopedChannelIds() : Collections.<String, String>emptyMap();
 	}
+
+	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
 	public void send(Object message) {

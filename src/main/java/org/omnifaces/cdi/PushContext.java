@@ -12,6 +12,8 @@
  */
 package org.omnifaces.cdi;
 
+import java.io.Serializable;
+
 import org.omnifaces.cdi.push.Socket;
 import org.omnifaces.util.Json;
 
@@ -26,7 +28,7 @@ import org.omnifaces.util.Json;
  * @see Socket
  * @since 2.3
  */
-public interface PushContext {
+public interface PushContext extends Serializable {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 

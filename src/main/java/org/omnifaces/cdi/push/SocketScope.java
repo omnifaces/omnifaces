@@ -16,6 +16,9 @@ import static java.util.Collections.synchronizedSet;
 import static org.omnifaces.cdi.push.Socket.Scope.APPLICATION;
 import static org.omnifaces.util.Utils.isEmpty;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
@@ -85,6 +88,17 @@ public class SocketScope implements Serializable {
 
 	static String getChannelId(String channel, String scopeId) {
 		return channel + (isEmpty(scopeId) ? "" : ("?" + scopeId));
+	}
+
+	private void writeObject(ObjectOutputStream output) throws IOException {
+		output.defaultWriteObject();
+		output.writeObject(applicationScopedChannels); // Just in case server restarts with session persistence.
+	}
+
+	@SuppressWarnings("unchecked")
+	private void readObject(ObjectInputStream input) throws IOException, ClassNotFoundException {
+		input.defaultReadObject();
+		applicationScopedChannels.addAll((Set<String>) input.readObject());
 	}
 
 }

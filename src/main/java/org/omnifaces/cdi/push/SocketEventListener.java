@@ -89,7 +89,7 @@ public class SocketEventListener implements SystemEventListener {
 	 * <code>init()</code> script, or if it has just switched the <code>connected</code> attribute, then render either
 	 * the <code>open()</code> script or the <code>close()</code> script. During an ajax request with partial rendering,
 	 * it's added as <code>&lt;eval&gt;</code> by partial response writer, else it's just added as a script component
-	 * with <code>target="body"</code>.
+	 * with <code>target="body"</code>. Those scripts will in turn hit {@link SocketEndpoint}.
 	 */
 	@Override
 	public void processEvent(SystemEvent event) throws AbortProcessingException {

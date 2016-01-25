@@ -33,12 +33,16 @@ import org.omnifaces.cdi.PushContext;
 @Dependent
 public class SocketPushContextProducer {
 
+	// Variables ------------------------------------------------------------------------------------------------------
+
 	@SuppressWarnings("unused") // Workaround for OpenWebBeans not properly passing it as produce() method argument.
 	@Inject
 	private InjectionPoint injectionPoint;
 
 	@Inject
 	private SocketScope scope;
+
+	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Produces
 	@Push
