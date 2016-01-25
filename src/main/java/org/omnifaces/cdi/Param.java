@@ -15,7 +15,6 @@ package org.omnifaces.cdi;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.beans.PropertyEditor;
@@ -106,7 +105,7 @@ import org.omnifaces.util.Utils;
  */
 @Qualifier
 @Retention(RUNTIME)
-@Target({ TYPE, METHOD, FIELD, PARAMETER })
+@Target({ METHOD, FIELD, PARAMETER })
 public @interface Param {
 
 	/**
