@@ -16,6 +16,7 @@
 package org.omnifaces.cdi.viewscope;
 
 import static java.lang.Boolean.TRUE;
+import static org.omnifaces.util.Ajax.oncomplete;
 import static org.omnifaces.util.Components.addScriptResourceToBody;
 import static org.omnifaces.util.Components.addScriptResourceToHead;
 import static org.omnifaces.util.Components.addScriptToBody;
@@ -23,6 +24,7 @@ import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Faces.getViewAttribute;
 import static org.omnifaces.util.Faces.setViewAttribute;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
+import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -85,6 +87,8 @@ public class ViewScopeManager implements Serializable {
 		PARAM_NAME_MAX_ACTIVE_VIEW_SCOPES, PARAM_NAME_MOJARRA_NUMBER_OF_VIEWS, PARAM_NAME_MYFACES_NUMBER_OF_VIEWS
 	};
 	private static final int DEFAULT_BEANS_PER_VIEW_SCOPE = 3;
+	private static final String SCRIPT_INIT = "OmniFaces.Unload.init('%s')";
+
 	private static final String ERROR_MAX_ACTIVE_VIEW_SCOPES = "The '%s' init param must be a number."
 		+ " Encountered an invalid value of '%s'.";
 
@@ -237,7 +241,14 @@ public class ViewScopeManager implements Serializable {
 			addScriptResourceToBody("omnifaces", "unload.js");
 		}
 
-		addScriptToBody("OmniFaces.Unload.init('" + id + "')");
+		String script = String.format(SCRIPT_INIT, id);
+
+		if (isAjaxRequestWithPartialRendering(context)) {
+			oncomplete(script);
+		}
+		else {
+			addScriptToBody(script);
+		}
 	}
 
 	/**
