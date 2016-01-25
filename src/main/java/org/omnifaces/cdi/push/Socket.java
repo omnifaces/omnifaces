@@ -218,14 +218,33 @@ import org.omnifaces.util.Json;
  * <h3>Security considerations</h3>
  * <p>
  * If the socket is declared in a page which is only restricted to logged-in users with a specific role, then you may
- * need to add the URL of the push handshake request URL to the set of restricted URLs. The push handshake request URL
- * is composed of the URI prefix <code>/omnifaces.push/</code>, followed by channel name. So, in case of for example
- * container managed security, you could restrict push handshake requests of <code>&lt;o:socket channel="foo"&gt;</code>
- * to users with role <code>USER</code> in <code>web.xml</code> like below.
+ * need to add the URL of the push handshake request URL to the set of restricted URLs. Otherwise anyone having manually
+ * opened a push socket on the same channel will receive the same push message. This may be OK for global push messages,
+ * but this may not be OK for push messages with sensitive information restricted to specific user(s).
+ * <p>
+ * The push handshake request URL is composed of the URI prefix <code>/omnifaces.push/</code>, followed by channel name.
+ * So, in case of for example container managed security which has already restricted the page <code>/user/foo.xhtml</code>
+ * itself to logged-in users with the example role <code>USER</code> on the example URL pattern <code>/user/*</code> in
+ * <code>web.xml</code> like below,
  * <pre>
  * &lt;security-constraint&gt;
  *     &lt;web-resource-collection&gt;
- *         &lt;web-resource-name&gt;Push channel foo.&lt;/web-resource-name&gt;
+ *         &lt;web-resource-name&gt;Restrict access to role USER.&lt;/web-resource-name&gt;
+ *         &lt;url-pattern&gt;/user/*&lt;/url-pattern&gt;
+ *     &lt;/web-resource-collection&gt;
+ *     &lt;auth-constraint&gt;
+ *         &lt;role-name&gt;USER&lt;/role-name&gt;
+ *     &lt;/auth-constraint&gt;
+ * &lt;/security-constraint&gt;
+ * </pre>
+ * <p>
+ * .. and the page <code>/user/foo.xhtml</code> contains a <code>&lt;o:socket channel="foo"&gt;</code>, then you need to
+ * add a restriction on push handshake request URL pattern of <code>/omnifaces.push/foo</code> like below.
+ * <pre>
+ * &lt;security-constraint&gt;
+ *     &lt;web-resource-collection&gt;
+ *         &lt;web-resource-name&gt;Restrict access to role USER.&lt;/web-resource-name&gt;
+ *         &lt;url-pattern&gt;/user/*&lt;/url-pattern&gt;
  *         &lt;url-pattern&gt;/omnifaces.push/foo&lt;/url-pattern&gt;
  *     &lt;/web-resource-collection&gt;
  *     &lt;auth-constraint&gt;
@@ -280,11 +299,11 @@ import org.omnifaces.util.Json;
  * Note that a request scoped bean wouldn't be the same one as from the originating page for the simple reason that
  * there's no means of a HTTP request anywhere at that moment. For exactly this reason a view and session scoped bean
  * would not work at all (as they require respectively the JSF view state and HTTP session which can only be identified
- * by a HTTP request), and a session scoped push socket also not (so the push socket really needs to be application
- * scoped). Also, the {@link FacesContext} will be unavailable in the method.
+ * by a HTTP request). A session scoped push socket would also not work at all (so the push socket really needs to be
+ * application scoped). The {@link FacesContext} will be also unavailable in the method.
  * <p>
- * The alternative would be to make use of callbacks from WAR side. Let the business service method take a callback
- * instance as argument, e.g {@link Runnable}.
+ * In case the trigger in EAR/EJB side is in turn initiated in WAR side, then you could make use of callbacks from WAR
+ * side. Let the business service method take a callback instance as argument, e.g. {@link Runnable}.
  * <pre>
  * &#64;Asynchronous
  * public void someAsyncServiceMethod(Entity entity, Runnable callback) {
