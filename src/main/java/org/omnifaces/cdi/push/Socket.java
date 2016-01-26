@@ -141,7 +141,7 @@ import org.omnifaces.util.Json;
  * <p>
  * In the WAR side (not in EAR/EJB side!), you can inject {@link PushContext} via {@link Push} on the given channel name
  * in any CDI/container managed artifact such as <code>@Named</code>, <code>@WebServlet</code>, etc wherever you'd like
- * to send a push message and then invoke {@link PushContext#send(Object)} and any Java object representing the push
+ * to send a push message and then invoke {@link PushContext#send(Object)} with any Java object representing the push
  * message.
  * <pre>
  * &#64;Inject &#64;Push
