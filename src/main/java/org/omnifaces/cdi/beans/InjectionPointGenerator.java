@@ -28,7 +28,7 @@ import org.omnifaces.util.Beans;
  * @since 2.0
  */
 @Dependent
-public class InjectionPointGenerator {
+public class InjectionPointGenerator { // TODO: This is actually a work around for older CDI impls. Remove in OmniFaces 3.0
 
 	@Inject
 	private InjectionPoint injectionPoint;
