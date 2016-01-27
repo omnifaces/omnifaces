@@ -54,12 +54,12 @@ public class SocketScope implements Serializable {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Register given channel on given scope and returns the web socket channel identifier if channel does not already
+	 * Register given channel on given scope and returns the web socket scope identifier if channel does not already
 	 * exist on a different scope, else <code>null</code>.
 	 * @param channel The web socket channel.
 	 * @param scope The web socket scope.
-	 * @return The web socket channel identifier if channel does not already exist on a different scope, else
-	 * <code>null</code>.
+	 * @return The web socket scope identifier if channel does not already exist on a different scope, else
+	 * <code>null</code>. An empty string is valid (it represents the application scope).
 	 */
 	public String register(String channel, Scope scope) {
 		if (scope == APPLICATION) {
@@ -68,6 +68,7 @@ public class SocketScope implements Serializable {
 			}
 
 			applicationScopedChannels.add(channel);
+			return "";
 		}
 		else {
 			if (applicationScopedChannels.contains(channel)) {
@@ -77,9 +78,9 @@ public class SocketScope implements Serializable {
 			if (!sessionScopedChannelIds.containsKey(channel)) {
 				sessionScopedChannelIds.putIfAbsent(channel, UUID.randomUUID().toString());
 			}
-		}
 
-		return getChannelId(channel, sessionScopedChannelIds.get(channel));
+			return sessionScopedChannelIds.get(channel);
+		}
 	}
 
 	Map<String, String> getSessionScopedChannelIds() {

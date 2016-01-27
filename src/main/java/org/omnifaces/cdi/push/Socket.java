@@ -474,9 +474,9 @@ public class Socket extends TagHandler {
 			throw new IllegalArgumentException(String.format(ERROR_ILLEGAL_CHANNEL_NAME, channelName));
 		}
 
-		String channelId = getReference(SocketScope.class).register(channelName, Scope.of(getString(context, scope)));
+		String scopeId = getReference(SocketScope.class).register(channelName, Scope.of(getString(context, scope)));
 
-		if (channelId == null) {
+		if (scopeId == null) {
 			throw new IllegalArgumentException(String.format(ERROR_DUPLICATE_CHANNEL, channelName));
 		}
 
@@ -486,7 +486,7 @@ public class Socket extends TagHandler {
 		String functions = onmessageFunction + "," + oncloseFunction;
 		ValueExpression connectedExpression = getValueExpression(context, connected, Boolean.class);
 
-		SystemEventListener listener = new SocketEventListener(portNumber, channelId, functions, connectedExpression);
+		SystemEventListener listener = new SocketEventListener(portNumber, channelName, scopeId, functions, connectedExpression);
 		subscribeToViewEvent(PostAddToViewEvent.class, listener);
 		subscribeToViewEvent(PreRenderViewEvent.class, listener);
 	}
