@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -1451,17 +1452,11 @@ public final class FacesLocal {
 	}
 
 	/**
-	 * Internal global method to send the given input stream to the response.
-	 * @param input The file content as input stream.
-	 * @param filename The file name which should appear in content disposition header.
-	 * @param contentLength The content length, or -1 if it is unknown.
-	 * @param attachment Whether the file should be provided as attachment, or just inline.
-	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
-	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * {@inheritDoc}
+	 * @see Faces#sendFile(String, boolean, org.omnifaces.util.Callback.Output)
 	 */
-	private static void sendFile
-		(FacesContext context, InputStream input, String filename, long contentLength, boolean attachment)
-			throws IOException
+	public static void sendFile(FacesContext context, String filename, boolean attachment, Callback.Output outputCallback)
+		throws IOException
 	{
 		ExternalContext externalContext = context.getExternalContext();
 
@@ -1477,19 +1472,44 @@ public final class FacesLocal {
 			externalContext.setResponseHeader("Pragma", "public");
 		}
 
-		// If content length is known, set it. Note that setResponseContentLength() cannot be used as it takes only int.
-		if (contentLength != -1) {
-			externalContext.setResponseHeader("Content-Length", String.valueOf(contentLength));
-		}
-
-		long size = Utils.stream(input, externalContext.getResponseOutputStream());
-
-		// This may be on time for files smaller than the default buffer size, but is otherwise ignored anyway.
-		if (contentLength == -1 && !externalContext.isResponseCommitted()) {
-			externalContext.setResponseHeader("Content-Length", String.valueOf(size));
+		try (OutputStream output = externalContext.getResponseOutputStream()) {
+			outputCallback.writeTo(output);
 		}
 
 		context.responseComplete();
+	}
+
+	/**
+	 * Internal global method to send the given input stream to the response.
+	 * @param input The file content as input stream.
+	 * @param filename The file name which should appear in content disposition header.
+	 * @param contentLength The content length, or -1 if it is unknown.
+	 * @param attachment Whether the file should be provided as attachment, or just inline.
+	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
+	 * redeclare it in the action method. The servletcontainer will handle it.
+	 */
+	private static void sendFile
+		(final FacesContext context, final InputStream input, String filename, final long contentLength, boolean attachment)
+			throws IOException
+	{
+		sendFile(context, filename, attachment, new Callback.Output() {
+			@Override
+			public void writeTo(OutputStream output) throws IOException {
+				ExternalContext externalContext = context.getExternalContext();
+
+				// If content length is known, set it. Note that setResponseContentLength() cannot be used as it takes only int.
+				if (contentLength != -1) {
+					externalContext.setResponseHeader("Content-Length", String.valueOf(contentLength));
+				}
+
+				long size = Utils.stream(input, output);
+
+				// This may be on time for files smaller than the default buffer size, but is otherwise ignored anyway.
+				if (contentLength == -1 && !externalContext.isResponseCommitted()) {
+					externalContext.setResponseHeader("Content-Length", String.valueOf(size));
+				}
+			}
+		});
 	}
 
 }

@@ -12,6 +12,8 @@
  */
 package org.omnifaces.util;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Serializable;
 
 /**
@@ -152,6 +154,24 @@ public final class Callback {
 		 * @return The callback result.
 		 */
 		R invoke(A a);
+
+	}
+
+
+	/**
+	 * Use this if you need an output stream callback.
+	 *
+	 * @author Bauke Scholtz
+	 * @since 2.3
+	 */
+	public interface Output {
+
+		/**
+		 * This method should be invoked by the method where you're passing this callback instance to.
+		 * @param o The callback output stream to write to.
+		 * @throws IOException Whenever something fails at I/O level.
+		 */
+		void writeTo(OutputStream output) throws IOException;
 
 	}
 
