@@ -246,8 +246,7 @@ public final class Components {
 			return null;
 		}
 
-		UIComponent parent = component;
-		while (parent != null) {
+		for (UIComponent parent = component; parent != null; parent = parent.getParent()) {
 
 			UIComponent result = null;
 			if (parent instanceof NamingContainer) {
@@ -261,8 +260,6 @@ public final class Components {
 			if (result != null) {
 				return (C) result;
 			}
-
-			parent = parent.getParent();
 		}
 
 		return null;
