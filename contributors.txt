@@ -19,7 +19,7 @@ Juliano Marques
 	For the work on the <o:validateMultiple> tag.
 
 Michele Mariotti
-	For the work on FacesConfigXml utility class.
+	For the work on FacesConfigXml utility class and the <o:skipValidators> tag.
 
 Stephan Rauh
 	For his idea and code to cache combined resources.
