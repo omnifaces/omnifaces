@@ -126,7 +126,13 @@ public class ImportConstants extends TagHandler {
 			CONSTANTS_CACHE.put(type, constants);
 		}
 
-		String var = varValue != null ? varValue : type.substring(type.lastIndexOf('.') + 1);
+		String var = varValue;
+		if(var == null){
+			int innerClass = type.lastIndexOf('$');
+			int outerClass = type.lastIndexOf('.');
+			int className = Math.max(innerClass, outerClass)
+			var = type.substring(className + 1);
+		}
 		context.getFacesContext().getExternalContext().getRequestMap().put(var, constants);
 	}
 
