@@ -3723,7 +3723,7 @@ public enum Baz {
 			<![CDATA[
 				The <code>&lt;o:skipValidators&gt;</code> allows the developer to skip validators when
 				executing a submit. This taghandler must be placed inside the component that invokes the submit, may be an 
-                <code>UICommand</code> (both ajaxified or not) as well as any ajax enabled component.
+                <code>UICommand</code> (both ajaxified or not) as well as any <code>ClientBehaviorHolder</code> (ajax enabled) component.
 				<p>
 				Validation will happen, but no validator will be executed since they will be temporary detached from processed components. 
                 Conversion errors could still occur. Note that the model values will be updated for all processed components.
