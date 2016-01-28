@@ -119,6 +119,7 @@ public class SkipValidators extends TagHandler {
 	 * Check if the given component has been invoked during the current request and if so, then register the skip
 	 * validators event listener which removes the validators during {@link PreValidateEvent} and restores them during
 	 * {@link PostValidateEvent}.
+	 * @param parent The parent component of this tag.
 	 */
 	protected void processSkipValidators(UIComponent parent) {
 		if (!hasInvokedSubmit(parent)) {
