@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.el.ValueExpression;
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIInput;
@@ -39,6 +40,7 @@ import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
 
 import org.omnifaces.util.Callback;
+import org.omnifaces.util.Faces;
 
 /**
  * <p>
@@ -136,7 +138,7 @@ public class SkipValidators extends TagHandler {
 	 */
 	static class SkipValidatorsEventListener implements SystemEventListener {
 
-		private Map<String, Boolean> required = new HashMap<>();
+		private Map<String, Object> required = new HashMap<>();
 		private Map<String, Validator[]> allValidators = new HashMap<>();
 
 		@Override
@@ -150,8 +152,16 @@ public class SkipValidators extends TagHandler {
 			String clientId = input.getClientId();
 
 			if (event instanceof PreValidateEvent) {
-				required.put(clientId, input.isRequired());
-				input.setRequired(false);
+				ValueExpression requiredVE = input.getValueExpression("required");
+				if(requiredVE != null) {
+					required.put(clientId, requiredVE);
+					input.setValueExpression("required", Faces.getApplication().getExpressionFactory().createValueExpression(false, Boolean.class));
+				} 
+				else {
+					required.put(clientId, input.isRequired()); 
+					input.setRequired(false);
+				}
+                
 				Validator[] validators = input.getValidators();
 				allValidators.put(clientId, validators);
 
@@ -160,7 +170,13 @@ public class SkipValidators extends TagHandler {
 				}
 			}
 			else if (event instanceof PostValidateEvent) {
-				input.setRequired(TRUE.equals(required.remove(clientId)));
+				Object requiredValue = required.remove(clientId);
+				if(requiredValue instanceof ValueExpression) {
+					input.setValueExpression("required", (ValueExpression) requiredValue);
+				} 
+				else {
+					input.setRequired(TRUE.equals(requiredValue));
+				}
 
 				for (Validator validator : allValidators.remove(clientId)) {
 					input.addValidator(validator);
