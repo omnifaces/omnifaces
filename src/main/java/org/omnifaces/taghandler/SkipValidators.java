@@ -40,7 +40,6 @@ import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
 
 import org.omnifaces.util.Callback;
-import org.omnifaces.util.Faces;
 
 /**
  * <p>
@@ -152,16 +151,9 @@ public class SkipValidators extends TagHandler {
 			String clientId = input.getClientId();
 
 			if (event instanceof PreValidateEvent) {
-				ValueExpression requiredVE = input.getValueExpression("required");
-				if(requiredVE != null) {
-					required.put(clientId, requiredVE);
-					input.setValueExpression("required", Faces.getApplication().getExpressionFactory().createValueExpression(false, Boolean.class));
-				} 
-				else {
-					required.put(clientId, input.isRequired()); 
-					input.setRequired(false);
-				}
-                
+				ValueExpression requiredExpression = input.getValueExpression("required");
+				required.put(clientId, (requiredExpression != null) ? requiredExpression : input.isRequired());
+				input.setRequired(false);
 				Validator[] validators = input.getValidators();
 				allValidators.put(clientId, validators);
 
@@ -171,9 +163,10 @@ public class SkipValidators extends TagHandler {
 			}
 			else if (event instanceof PostValidateEvent) {
 				Object requiredValue = required.remove(clientId);
-				if(requiredValue instanceof ValueExpression) {
+
+				if (requiredValue instanceof ValueExpression) {
 					input.setValueExpression("required", (ValueExpression) requiredValue);
-				} 
+				}
 				else {
 					input.setRequired(TRUE.equals(requiredValue));
 				}
