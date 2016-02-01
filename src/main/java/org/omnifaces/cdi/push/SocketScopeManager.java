@@ -71,7 +71,7 @@ public class SocketScopeManager implements Serializable {
 	 * exist on a different scope, else <code>null</code>.
 	 * @param channel The web socket channel.
 	 * @param scope The web socket scope. Supported values are <code>application</code> and <code>session</code>, case
-	 * insensitive. If <code>null</code>, the default is <code>application<code>.
+	 * insensitive. If <code>null</code>, the default is <code>application</code>.
 	 * @return The web socket scope identifier if channel does not already exist on a different scope, else
 	 * <code>null</code>.
 	 * @throws IllegalArgumentException When the scope is invalid.

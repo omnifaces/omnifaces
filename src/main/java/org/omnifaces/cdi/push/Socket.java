@@ -387,6 +387,7 @@ import org.omnifaces.util.Json;
  *
  * @author Bauke Scholtz
  * @see SocketEndpoint
+ * @see SocketChannelFilter
  * @see SocketScopeManager
  * @see SocketEventListener
  * @see SocketManager
