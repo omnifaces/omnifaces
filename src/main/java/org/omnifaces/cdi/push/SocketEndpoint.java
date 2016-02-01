@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 OmniFaces.
+ * Copyright 2016 OmniFaces.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -53,7 +53,7 @@ public class SocketEndpoint extends Endpoint {
 	 */
 	@Override
 	public void onOpen(Session session, EndpointConfig config) {
-		String channel = SocketScope.getChannelId(session.getPathParameters().get(PARAM_CHANNEL), session.getQueryString());
+		String channel = session.getPathParameters().get(PARAM_CHANNEL) + "?" + session.getQueryString();
 		SocketManager.getInstance().add(channel, session); // @Inject in Endpoint doesn't work in Tomcat+Weld/OWB.
 	}
 

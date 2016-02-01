@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 OmniFaces.
+ * Copyright 2016 OmniFaces.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -40,25 +40,25 @@ public class SocketPushContext implements PushContext {
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private String channel;
-	private Map<String, String> sessionScopedChannelIds;
+	private Map<String, String> sessionScopeIds;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Creates a socket push context whereby the mutable map of scoped channel IDs is referenced, so it's still
-	 * available when another thread invokes {@link #send(Object)} where the scope isn't active.
+	 * Creates a socket push context whereby the mutable map of scope IDs is referenced, so it's still available when
+	 * another thread invokes {@link #send(Object)} where the scope isn't active.
 	 */
-	SocketPushContext(String channel, SocketScope scope) {
+	SocketPushContext(String channel, SocketScopeManager scope) {
 		this.channel = channel;
-		sessionScopedChannelIds = isActive(SessionScoped.class) ? scope.getSessionScopedChannelIds() : Collections.<String, String>emptyMap();
+		sessionScopeIds = isActive(SessionScoped.class) ? scope.getSessionScopeIds() : Collections.<String, String>emptyMap();
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
 	public void send(Object message) {
-		String channelId = SocketScope.getChannelId(channel, sessionScopedChannelIds.get(channel));
-		SocketManager.getInstance().send(channelId, message);
+		String scopeId = SocketScopeManager.getScopeId(channel, sessionScopeIds);
+		SocketManager.getInstance().send(channel + "?" + scopeId, message);
 	}
 
 }

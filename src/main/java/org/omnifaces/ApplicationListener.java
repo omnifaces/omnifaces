@@ -64,7 +64,7 @@ public class ApplicationListener extends DefaultServletContextListener {
 			EagerBeansRepository.instantiateApplicationScopedAndRegisterListener(servletContext);
 			FacesViews.addMappings(servletContext);
 			CacheInitializer.loadProviderAndRegisterFilter(servletContext);
-			Socket.registerEndpointIfNecessary(servletContext);
+			Socket.registerEndpointAndFilterIfNecessary(servletContext);
 		}
 		catch (Throwable e) {
 			logger.log(Level.SEVERE, "OmniFaces failed to initialize! Report an issue to OmniFaces.", e);

@@ -40,7 +40,7 @@ public class SocketPushContextProducer {
 	private InjectionPoint injectionPoint;
 
 	@Inject
-	private SocketScope scope;
+	private SocketScopeManager scope;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 

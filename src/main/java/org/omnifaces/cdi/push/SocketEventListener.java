@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 OmniFaces.
+ * Copyright 2016 OmniFaces.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -13,7 +13,6 @@
 package org.omnifaces.cdi.push;
 
 import static java.lang.Boolean.TRUE;
-import static org.omnifaces.cdi.push.SocketScope.getChannelId;
 import static org.omnifaces.util.Ajax.oncomplete;
 import static org.omnifaces.util.Components.addScriptResourceToHead;
 import static org.omnifaces.util.Components.addScriptToBody;
@@ -55,7 +54,7 @@ public class SocketEventListener implements SystemEventListener {
 
 	private Integer port;
 	private String channel;
-	private String scope;
+	private String scopeId;
 	private String functions;
 	private ValueExpression connectedExpression;
 
@@ -65,14 +64,14 @@ public class SocketEventListener implements SystemEventListener {
 	 * Construct an instance of socket event listener based on the given channel, functions and connected expression.
 	 * @param port The port number.
 	 * @param channel The channel name.
-	 * @param scope The scope identifier.
+	 * @param scopeId The scope identifier.
 	 * @param functions The onmessage and onclose functions.
 	 * @param connectedExpression The connected expression.
 	 */
-	public SocketEventListener(Integer port, String channel, String scope, String functions, ValueExpression connectedExpression) {
+	public SocketEventListener(Integer port, String channel, String scopeId, String functions, ValueExpression connectedExpression) {
 		this.port = port;
 		this.channel = channel;
-		this.scope = scope;
+		this.scopeId = scopeId;
 		this.functions = functions;
 		this.connectedExpression = connectedExpression;
 	}
@@ -108,7 +107,7 @@ public class SocketEventListener implements SystemEventListener {
 
 			if (switched == null) {
 				String base = (port != null ? ":" + port : "") + getRequestContextPath(context);
-				script = String.format(SCRIPT_INIT, base, getChannelId(channel, scope), functions, connected);
+				script = String.format(SCRIPT_INIT, base, channel + "?" + scopeId, functions, connected);
 			}
 			else if (switched) {
 				script = String.format(connected ? SCRIPT_OPEN : SCRIPT_CLOSE, channel);
