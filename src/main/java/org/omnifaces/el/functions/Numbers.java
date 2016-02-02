@@ -149,7 +149,7 @@ public final class Numbers {
 
 	/**
 	 * Format the given number to nearest 10<sup>n</sup> (rounded to thousands), immediately suffixed (without space)
-	 * with lowercased IEC unit (k, m, g, t, p and e), rounding half up with a precision of 3 digits, whereafter
+	 * with lowercased metric unit (k, m, g, t, p and e), rounding half up with a precision of 3 digits, whereafter
 	 * trailing zeroes in fraction part are stripped. Numbers lower than thousand are not affected.
 	 * For example (with English locale):
 	 * <ul>
