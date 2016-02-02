@@ -38,15 +38,26 @@ import javax.enterprise.inject.spi.InjectionPoint;
  * <pre>
  * // Get the CDI managed bean reference (proxy) of the given bean class.
  * SomeBean someBean = Beans.getReference(SomeBean.class);
- *
+ * </pre>
+ * <pre>
  * // Get the CDI managed bean instance (actual) of the given bean class.
  * SomeBean someBean = Beans.getInstance(SomeBean.class);
- *
+ * </pre>
+ * <pre>
+ * // Check if CDI session scope is active in current context.
+ * Beans.isActive(SessionScope.class);
+ * </pre>
+ * <pre>
  * // Get all currently active CDI managed bean instances in the session scope.
  * Map&lt;Object, String&gt; activeSessionScopedBeans = Beans.getActiveInstances(SessionScope.class);
- *
+ * </pre>
+ * <pre>
  * // Destroy any currently active CDI managed bean instance of given bean class.
  * Beans.destroy(SomeBean.class);
+ * </pre>
+ * <pre>
+ * // Fire a CDI event.
+ * Beans.fireEvent(someEvent);
  * </pre>
  * <p>
  * If you need a dependency-free way of obtaining the CDI managed bean reference (e.g. when you want to write code which
