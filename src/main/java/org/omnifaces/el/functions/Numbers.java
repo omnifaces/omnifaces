@@ -149,8 +149,8 @@ public final class Numbers {
 
 	/**
 	 * Format the given number to nearest 10<sup>n</sup> (rounded to thousands), immediately suffixed (without space)
-	 * with lowercased metric unit (k, m, g, t, p and e), rounding half up with a precision of 3 digits, whereafter
-	 * trailing zeroes in fraction part are stripped. Numbers lower than thousand are not affected.
+	 * with metric unit (k, M, G, T, P or E), rounding half up with a precision of 3 digits, whereafter trailing zeroes
+	 * in fraction part are stripped. Numbers lower than thousand are not affected.
 	 * For example (with English locale):
 	 * <ul>
 	 * <li>999.999 will appear as 999.999
@@ -194,7 +194,7 @@ public final class Numbers {
 		int exp = (int) (Math.log(decimal.longValue()) / Math.log(NUMBER_1K));
 		BigDecimal divided = decimal.divide(BigDecimal.valueOf(Math.pow(NUMBER_1K, exp)));
 		int maxfractions = 3 - String.valueOf(divided.longValue()).length();
-		return String.format(getLocale(), "%." + maxfractions + "f", divided).replaceAll("\\D?0+$", "") + "kmgtpe".charAt(exp - 1);
+		return String.format(getLocale(), "%." + maxfractions + "f", divided).replaceAll("\\D?0+$", "") + "kMGTPE".charAt(exp - 1);
 	}
 
 }

@@ -728,7 +728,7 @@
 		<description>
 			<![CDATA[
 				Format the given number to nearest 10<sup>n</sup> (rounded to thousands), immediately suffixed (without space)
-				with lowercased metric unit (k, m, g, t, p and e), rounding half up with a precision of 3 digits, whereafter
+				with metric unit (k, M, G, T, P or E), rounding half up with a precision of 3 digits, whereafter
 				trailing zeroes in fraction part are stripped. Numbers lower than thousand are not affected.
 				For example (with English locale):
 				<ul>
@@ -744,7 +744,7 @@
 					<li>9995 will appear as 10k
 					<li>99990 will appear as 100k
 					<li>9994999 will appear as 9.99m
-					<li>9995000 will appear as 10.0m
+					<li>9995000 will appear as 10m
 				</ul>
 				The format locale will be set to the one as obtained by <code>Faces#getLocale()</code>.
 				If the value is <code>null</code>, <code>NaN</code> or infinity, then this will return <code>null</code>.
