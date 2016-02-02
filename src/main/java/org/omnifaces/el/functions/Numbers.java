@@ -164,8 +164,8 @@ public final class Numbers {
 	 * <li>9994 will appear as 9.99k
 	 * <li>9995 will appear as 10k
 	 * <li>99990 will appear as 100k
-	 * <li>9994999 will appear as 9.99m
-	 * <li>9995000 will appear as 10m
+	 * <li>9994999 will appear as 9.99M
+	 * <li>9995000 will appear as 10M
 	 * </ul>
 	 * The format locale will be set to the one as obtained by {@link Faces#getLocale()}.
 	 * If the value is <code>null</code>, <code>NaN</code> or infinity, then this will return <code>null</code>.
