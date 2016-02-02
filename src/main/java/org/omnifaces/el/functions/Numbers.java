@@ -14,6 +14,7 @@ package org.omnifaces.el.functions;
 
 import static org.omnifaces.util.Faces.getLocale;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
@@ -33,6 +34,7 @@ public final class Numbers {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final int BYTES_1K = 1024;
+	private static final long NUMBER_1K = 1000;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -142,6 +144,56 @@ public final class Numbers {
 		}
 
 		return NumberFormat.getPercentInstance(getLocale()).format(number);
+	}
+
+	/**
+	 * Format the given number to nearest 10<sup>n</sup> (rounded to thousands), immediately suffixed (without space)
+	 * with lowercased IEC unit (k, m, g, t, p and e), rounding half up with a precision of 3 digits, whereafter
+	 * trailing zeroes in fraction part are stripped. Numbers lower than thousand are not affected.
+	 * For example (with English locale):
+	 * <ul>
+	 * <li>999.999 will appear as 999.999
+	 * <li>1000 will appear as 1k
+	 * <li>1004 will appear as 1k
+	 * <li>1005 will appear as 1.01k
+	 * <li>1594 will appear as 1.59k
+	 * <li>1595 will appear as 1.6k
+	 * <li>9000 will appear as 9k
+	 * <li>9900 will appear as 9.9k
+	 * <li>9994 will appear as 9.99k
+	 * <li>9995 will appear as 10k
+	 * <li>99990 will appear as 100k
+	 * <li>9994999 will appear as 9.99m
+	 * <li>9995000 will appear as 10.0m
+	 * </ul>
+	 * The format locale will be set to the one as obtained by {@link Faces#getLocale()}.
+	 * If the value is <code>null</code>, <code>NaN</code> or infinity, then this will return <code>null</code>.
+	 * @param number The number to be formatted.
+	 * @return The formatted number.
+	 * @since 2.3
+	 */
+	public static String formatThousands(Number number) {
+		if (number == null) {
+			return null;
+		}
+
+		BigDecimal decimal;
+
+		try {
+			decimal = new BigDecimal(number.toString());
+		}
+		catch (NumberFormatException e) {
+			return null;
+		}
+
+		if (decimal.longValue() < NUMBER_1K) {
+			return number.toString();
+		}
+
+		int exp = (int) (Math.log(decimal.longValue()) / Math.log(NUMBER_1K));
+		BigDecimal divided = decimal.divide(BigDecimal.valueOf(Math.pow(NUMBER_1K, exp)));
+		int maxfractions = 3 - String.valueOf(divided.longValue()).length();
+		return String.format(getLocale(), "%." + maxfractions + "f", divided).replaceAll("\\D?0+$", "") + "kmgtpe".charAt(exp - 1);
 	}
 
 }
