@@ -12,8 +12,6 @@
  */
 package org.omnifaces.cdi.push;
 
-import static org.omnifaces.util.Utils.isEmpty;
-
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -28,7 +26,6 @@ import javax.enterprise.context.SessionScoped;
 /**
  * <p>
  * This manages all web socket scope identifiers explicitly registered by <code>&lt;o:socket&gt;</code>.
- * Any incoming web socket handshake request is here validated via {@link SocketChannelFilter}.
  *
  * @author Bauke Scholtz
  * @see Socket
@@ -94,16 +91,6 @@ public class SocketScopeManager implements Serializable {
 		}
 
 		return targetScope.get(channel);
-	}
-
-	/**
-	 * Returns <code>true</code> if the given channel and scope identifier combination is already registered.
-	 * @param channel The web socket channel.
-	 * @param scopeId The web socket scope identifier.
-	 * @return <code>true</code> if the given channel and scope identifier combination is already registered.
-	 */
-	public boolean isRegistered(String channel, String scopeId) {
-		return !isEmpty(scopeId) && (scopeId.equals(applicationScopeIds.get(channel)) || scopeId.equals(sessionScopeIds.get(channel)));
 	}
 
 	/**

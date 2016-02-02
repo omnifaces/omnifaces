@@ -14,8 +14,6 @@ package org.omnifaces.cdi.push;
 
 import static java.lang.Boolean.TRUE;
 import static java.lang.Boolean.parseBoolean;
-import static javax.servlet.DispatcherType.ASYNC;
-import static javax.servlet.DispatcherType.REQUEST;
 import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
 import static org.omnifaces.util.Facelets.getObject;
@@ -24,7 +22,6 @@ import static org.omnifaces.util.Facelets.getValueExpression;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 
 import java.io.IOException;
-import java.util.EnumSet;
 import java.util.regex.Pattern;
 
 import javax.el.ValueExpression;
@@ -40,7 +37,6 @@ import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagAttribute;
 import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
-import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.server.ServerContainer;
@@ -59,7 +55,7 @@ import org.omnifaces.util.Json;
  *
  * <h3>Configuration</h3>
  * <p>
- * First enable the web socket endpoint and channel filter by below boolean context parameter in <code>web.xml</code>:
+ * First enable the web socket endpoint by below boolean context parameter in <code>web.xml</code>:
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.ENABLE_SOCKET_ENDPOINT&lt;/param-name&gt;
@@ -67,8 +63,8 @@ import org.omnifaces.util.Json;
  * &lt;/context-param&gt;
  * </pre>
  * <p>
- * It will install the {@link SocketEndpoint} and {@link SocketChannelFilter}. Lazy initialization of the endpoint is
- * unfortunately not possible across all containers (yet).
+ * It will install the {@link SocketEndpoint}. Lazy initialization of the endpoint is unfortunately not possible across
+ * all containers (yet).
  * See also <a href="https://java.net/jira/browse/WEBSOCKET_SPEC-211">WS spec issue 211</a>.
  *
  *
@@ -260,12 +256,6 @@ import org.omnifaces.util.Json;
  *     &lt;/auth-constraint&gt;
  * &lt;/security-constraint&gt;
  * </pre>
- * <p>
- * As extra security, the <code>&lt;o:socket&gt;</code> will remember all so far opened channels in
- * {@link SocketScopeManager} and the aforementioned {@link SocketChannelFilter} will check all incoming web socket
- * handshake requests whether they match the so far opened channels in both the application and session scopes, and
- * otherwise send a HTTP 400 error back. This should prevent users from manually opening arbitrary channels which are
- * nowhere declared via <code>&lt;o:socket channel="..."&gt;</code>.
  *
  *
  * <h3>EJB design hints</h3>
@@ -387,7 +377,6 @@ import org.omnifaces.util.Json;
  *
  * @author Bauke Scholtz
  * @see SocketEndpoint
- * @see SocketChannelFilter
  * @see SocketScopeManager
  * @see SocketEventListener
  * @see SocketManager
@@ -500,11 +489,10 @@ public class Socket extends TagHandler {
 	// Helpers --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Register web socket endpoint and channel filter if necessary, i.e. when it's enabled via context param and not
-	 * already installed.
+	 * Register web socket endpoint if necessary, i.e. when it's enabled via context param and not already installed.
 	 * @param context The involved servlet context.
 	 */
-	public static void registerEndpointAndFilterIfNecessary(ServletContext context) {
+	public static void registerEndpointIfNecessary(ServletContext context) {
 		if (TRUE.equals(context.getAttribute(Socket.class.getName())) || !parseBoolean(context.getInitParameter(PARAM_ENABLE_SOCKET_ENDPOINT))) {
 			return;
 		}
@@ -513,8 +501,6 @@ public class Socket extends TagHandler {
 			ServerContainer container = (ServerContainer) context.getAttribute(ServerContainer.class.getName());
 			ServerEndpointConfig config = ServerEndpointConfig.Builder.create(SocketEndpoint.class, SocketEndpoint.URI_TEMPLATE).build();
 			container.addEndpoint(config);
-			FilterRegistration filter = context.addFilter(SocketChannelFilter.class.getName(), SocketChannelFilter.class);
-			filter.addMappingForUrlPatterns(EnumSet.of(REQUEST, ASYNC), false, SocketChannelFilter.URL_PATTERN);
 			context.setAttribute(Socket.class.getName(), TRUE);
 		}
 		catch (Exception e) {
