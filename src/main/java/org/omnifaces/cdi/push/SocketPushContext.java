@@ -12,6 +12,7 @@
  */
 package org.omnifaces.cdi.push;
 
+import static org.omnifaces.cdi.push.SocketChannelManager.getChannelId;
 import static org.omnifaces.util.Beans.isActive;
 
 import java.util.Collections;
@@ -45,20 +46,20 @@ public class SocketPushContext implements PushContext {
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Creates a socket push context whereby the mutable map of scope IDs is referenced, so it's still available when
-	 * another thread invokes {@link #send(Object)} where the scope isn't active.
+	 * Creates a socket push context whereby the mutable map of session scope channel identifiers is referenced, so it's
+	 * still available when another thread invokes {@link #send(Object)} during which the session scope is not
+	 * necessarily active anymore.
 	 */
-	SocketPushContext(String channel, SocketScopeManager scope) {
+	SocketPushContext(String channel, SocketChannelManager manager) {
 		this.channel = channel;
-		sessionScopeIds = isActive(SessionScoped.class) ? scope.getSessionScopeIds() : Collections.<String, String>emptyMap();
+		sessionScopeIds = isActive(SessionScoped.class) ? manager.getSessionScopeIds() : Collections.<String, String>emptyMap();
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
 	public void send(Object message) {
-		String scopeId = SocketScopeManager.getScopeId(channel, sessionScopeIds);
-		SocketManager.getInstance().send(channel + "?" + scopeId, message);
+		SocketManager.getInstance().send(getChannelId(channel, sessionScopeIds), message);
 	}
 
 }

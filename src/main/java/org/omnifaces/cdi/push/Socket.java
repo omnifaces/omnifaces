@@ -256,6 +256,11 @@ import org.omnifaces.util.Json;
  *     &lt;/auth-constraint&gt;
  * &lt;/security-constraint&gt;
  * </pre>
+ * <p>
+ * As extra security, the <code>&lt;o:socket&gt;</code> will register all so far declared channels in the current HTTP
+ * session and any incoming web socket open request will be checked whether they match the so far registered channels in
+ * the current HTTP session. In case the channel is unknown (e.g. randomly guessed or spoofed by endusers), then the web
+ * socket will immediately be closed with close code {@link CloseCodes#VIOLATED_POLICY} (error code <code>1008</code>).
  *
  *
  * <h3>EJB design hints</h3>
@@ -377,7 +382,7 @@ import org.omnifaces.util.Json;
  *
  * @author Bauke Scholtz
  * @see SocketEndpoint
- * @see SocketScopeManager
+ * @see SocketChannelManager
  * @see SocketEventListener
  * @see SocketManager
  * @see Push
@@ -460,18 +465,18 @@ public class Socket extends TagHandler {
 			throw new IllegalArgumentException(String.format(ERROR_INVALID_CHANNEL, channelName));
 		}
 
-		SocketScopeManager scopeManager = getReference(SocketScopeManager.class);
+		SocketChannelManager channelManager = getReference(SocketChannelManager.class);
 		String scopeName = getString(context, scope);
-		String scopeId;
+		String channelId;
 
 		try {
-			scopeId = scopeManager.register(channelName, scopeName);
+			channelId = channelManager.register(channelName, scopeName);
 		}
 		catch (IllegalArgumentException ignore) {
 			throw new IllegalArgumentException(String.format(ERROR_INVALID_SCOPE, scopeName));
 		}
 
-		if (scopeId == null) {
+		if (channelId == null) {
 			throw new IllegalArgumentException(String.format(ERROR_DUPLICATE_CHANNEL, channelName));
 		}
 
@@ -481,7 +486,7 @@ public class Socket extends TagHandler {
 		String functions = onmessageFunction + "," + oncloseFunction;
 		ValueExpression connectedExpression = getValueExpression(context, connected, Boolean.class);
 
-		SystemEventListener listener = new SocketEventListener(portNumber, channelName, scopeId, functions, connectedExpression);
+		SystemEventListener listener = new SocketEventListener(portNumber, channelName, channelId, functions, connectedExpression);
 		subscribeToViewEvent(PostAddToViewEvent.class, listener);
 		subscribeToViewEvent(PreRenderViewEvent.class, listener);
 	}

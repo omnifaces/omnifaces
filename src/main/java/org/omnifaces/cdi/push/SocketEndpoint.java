@@ -13,8 +13,10 @@
 package org.omnifaces.cdi.push;
 
 import static javax.websocket.CloseReason.CloseCodes.GOING_AWAY;
+import static javax.websocket.CloseReason.CloseCodes.VIOLATED_POLICY;
 import static org.omnifaces.cdi.PushContext.URI_PREFIX;
 
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,19 +44,27 @@ public class SocketEndpoint extends Endpoint {
 	public static final String URI_TEMPLATE = URI_PREFIX + "/{" + PARAM_CHANNEL + "}";
 
 	private static final Logger logger = Logger.getLogger(SocketEndpoint.class.getName());
+	private static final CloseReason REASON_UNKNOWN_CHANNEL = new CloseReason(VIOLATED_POLICY, "Unknown channel");
 	private static final String ERROR_EXCEPTION = "SocketEndpoint: An exception occurred during processing web socket request.";
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Add given web socket session to the {@link SocketManager}.
+	 * Add given web socket session to the {@link SocketManager}. If web socket session is not accepted (i.e. the
+	 * channel identifier is unknown), then immediately close with reason VIOLATED_POLICY (close code 1008).
 	 * @param session The opened web socket session.
 	 * @param config The endpoint configuration.
 	 */
 	@Override
 	public void onOpen(Session session, EndpointConfig config) {
-		String channel = session.getPathParameters().get(PARAM_CHANNEL) + "?" + session.getQueryString();
-		SocketManager.getInstance().add(channel, session); // @Inject in Endpoint doesn't work in Tomcat+Weld/OWB.
+		if (!SocketManager.getInstance().add(session)) { // @Inject in Endpoint doesn't work in Tomcat+Weld/OWB.
+			try {
+				session.close(REASON_UNKNOWN_CHANNEL);
+			}
+			catch (IOException e) {
+				onError(session, e);
+			}
+		}
 	}
 
 	/**
@@ -76,7 +86,7 @@ public class SocketEndpoint extends Endpoint {
 	 */
 	@Override
 	public void onClose(Session session, CloseReason reason) {
-		SocketManager.getInstance().remove(session); // @Inject in Endpoint doesn't work in Tomcat+Weld/OWB and CDI.current() doesn't work in WildFly.
+		SocketManager.getInstance().remove(session); // @Inject in Endpoint doesn't work in Tomcat+Weld/OWB and CDI.current() during WS close doesn't work in WildFly.
 
 		Throwable throwable = (Throwable) session.getUserProperties().remove(Throwable.class.getName());
 

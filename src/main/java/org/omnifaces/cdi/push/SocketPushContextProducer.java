@@ -40,7 +40,7 @@ public class SocketPushContextProducer {
 	private InjectionPoint injectionPoint;
 
 	@Inject
-	private SocketScopeManager scope;
+	private SocketChannelManager manager;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -49,7 +49,7 @@ public class SocketPushContextProducer {
 	public PushContext produce(InjectionPoint injectionPoint) {
 		Push push = getQualifier(injectionPoint, Push.class);
 		String channel = push.channel().isEmpty() ? injectionPoint.getMember().getName() : push.channel();
-		return new SocketPushContext(channel, scope);
+		return new SocketPushContext(channel, manager);
 	}
 
 }

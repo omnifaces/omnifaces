@@ -13,22 +13,25 @@
 package org.omnifaces.cdi.push;
 
 import static java.util.Collections.synchronizedSet;
+import static javax.websocket.CloseReason.CloseCodes.GOING_AWAY;
 import static org.omnifaces.cdi.push.SocketEndpoint.PARAM_CHANNEL;
 import static org.omnifaces.util.Beans.getReference;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.websocket.CloseReason;
 import javax.websocket.Session;
 
 import org.omnifaces.util.Json;
 
 /**
  * <p>
- * The web socket manager. It holds all web socket sessions by their channel/scope identifier.
+ * The web socket manager. It holds all web socket sessions by their channel identifier.
  *
  * @author Bauke Scholtz
  * @see SocketEndpoint
@@ -40,6 +43,7 @@ public class SocketManager {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final ConcurrentMap<String, Set<Session>> SESSIONS = new ConcurrentHashMap<>();
+	private static final CloseReason REASON_SESSION_EXPIRED = new CloseReason(GOING_AWAY, "Session expired");
 	private static SocketManager instance;
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -57,37 +61,56 @@ public class SocketManager {
 	}
 
 	/**
-	 * On open, add given web socket session to the mapping associated with its channel identifier.
-	 * @param channel The web socket channel identifier.
-	 * @param session The opened web socket session.
+	 * Register given channel identifier.
+	 * @param channelId The channel identifier to register.
 	 */
-	public void add(String channel, Session session) {
-		session.getUserProperties().put(PARAM_CHANNEL, channel);
-
-		if (!SESSIONS.containsKey(channel)) {
-			SESSIONS.putIfAbsent(channel, synchronizedSet(new HashSet<Session>()));
+	public void register(String channelId) {
+		if (!SESSIONS.containsKey(channelId)) {
+			SESSIONS.putIfAbsent(channelId, synchronizedSet(new HashSet<Session>()));
 		}
+	}
 
-		SESSIONS.get(channel).add(session);
+	/**
+	 * Register given channel identifiers.
+	 * @param channelIds The channel identifiers to register.
+	 */
+	public void register(Iterable<String> channelIds) {
+		for (String channelId : channelIds) {
+			register(channelId);
+		}
+	}
+
+	/**
+	 * On open, add given web socket session to the mapping associated with its channel identifier and returns
+	 * <code>true</code> if it's accepted (i.e. the channel identifier is known) and the same session hasn't been added
+	 * before, otherwise <code>false</code>.
+	 * @param session The opened web socket session.
+	 * @return <code>true</code> if given web socket session is accepted and is new, otherwise <code>false</code>.
+	 */
+	public boolean add(Session session) {
+		Set<Session> sessions = SESSIONS.get(getChannelId(session));
+		return (sessions != null) && sessions.add(session);
 	}
 
 	/**
 	 * Encode the given message object as JSON and send it to all open web socket sessions associated with given web
 	 * socket channel identifier.
-	 * @param channel The web socket channel identifier.
+	 * @param channelId The web socket channel identifier.
 	 * @param message The push message object.
 	 */
-	public void send(String channel, Object message) {
-		Set<Session> sessions = SESSIONS.get(channel);
+	public void send(String channelId, Object message) {
+		Set<Session> sessions = (channelId != null) ? SESSIONS.get(channelId) : null;
 
-		if (sessions != null) {
-			String json = Json.encode(message);
+		if (sessions == null) {
+			return; // TODO: Log warning? In any case, push is usually just "fire and forget".
+		}
 
-			synchronized(sessions) {
-				for (Session session : sessions) {
-					if (session.isOpen()) {
-						session.getAsyncRemote().sendText(json);
-					}
+		String json = Json.encode(message);
+
+		synchronized(sessions) {
+			for (Session session : sessions) {
+				if (session.isOpen()) {
+					session.getAsyncRemote().sendText(json);
 				}
 			}
 		}
@@ -96,17 +119,40 @@ public class SocketManager {
 	/**
 	 * On close, remove given web socket session from the mapping.
 	 * @param session The closed web socket session.
+	 * @return <code>true</code> if given web socket session was known in the mapping, otherwise <code>false</code>.
 	 */
-	public void remove(Session session) {
-		String channel = (String) session.getUserProperties().get(PARAM_CHANNEL);
+	public boolean remove(Session session) {
+		Set<Session> sessions = SESSIONS.get(getChannelId(session));
+		return (sessions != null) && sessions.remove(session);
+	}
 
-		if (channel != null) {
-			Set<Session> sessions = SESSIONS.get(channel);
+	/**
+	 * Deregister given channel identifiers and explicitly close all open web socket sessions associated with it.
+	 * @param channelIds The channel identifiers to deregister.
+	 */
+	public void deregister(Iterable<String> channelIds) {
+		for (String channelId : channelIds) {
+			Set<Session> sessions = SESSIONS.remove(channelId);
 
 			if (sessions != null) {
-				sessions.remove(session);
+				for (Session session : sessions) {
+					if (session.isOpen()) {
+						try {
+							session.close(REASON_SESSION_EXPIRED);
+						}
+						catch (IOException ignore) {
+							continue;
+						}
+					}
+				}
 			}
 		}
+	}
+
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	private static String getChannelId(Session session) {
+		return session.getPathParameters().get(PARAM_CHANNEL) + "?" + session.getQueryString();
 	}
 
 }

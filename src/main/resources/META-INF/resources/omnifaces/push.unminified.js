@@ -74,7 +74,7 @@ OmniFaces.Push = (function(Util, window) {
 			}
 
 			socket.onclose = function(event) {
-				if (!socket || reconnectAttempts == null || reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+				if (!socket || event.code == 1008 || reconnectAttempts == null || reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
 					onclose(event.code, channel, event);
 				}
 				else {
@@ -106,9 +106,8 @@ OmniFaces.Push = (function(Util, window) {
 	 * If the value is falsey, then it will default to <code>window.location.host</code>.
 	 * If the value starts with <code>:</code>, then <code>window.location.hostname</code> will be prepended.
 	 * If the value starts with <code>/</code>, then <code>window.location.host</code> will be prepended.
-	 * @param {string} uri The uri of the web socket representing the channel name and optional scope identifier. All
-	 * open websockets on the same uri name will receive the same push notification from the server. The scope
-	 * identifier needs to be separated by a question mark.
+	 * @param {string} uri The uri of the web socket representing the channel name and identifier, separated by a 
+	 * question mark. All open websockets on the same uri will receive the same push notification from the server.
 	 * @param {function} onmessage The JavaScript event handler function that is invoked when a message is received from
 	 * the server. The function will be invoked with three arguments: the push message, the channel name and the raw
 	 * <code>MessageEvent</code> itself.

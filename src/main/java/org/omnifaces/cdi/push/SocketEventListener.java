@@ -54,24 +54,26 @@ public class SocketEventListener implements SystemEventListener {
 
 	private Integer port;
 	private String channel;
-	private String scopeId;
+	private String uri;
 	private String functions;
 	private ValueExpression connectedExpression;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Construct an instance of socket event listener based on the given channel, functions and connected expression.
+	 * Construct an instance of socket event listener based on the given channel, uri, functions and connected expression.
 	 * @param port The port number.
 	 * @param channel The channel name.
-	 * @param scopeId The scope identifier.
+	 * @param uri The uri of the web socket representing the channel identifier, which is composed of channel name and
+	 * scope identifier, separated by a question mark.
+	 * All open websockets on the same uri will receive the same push notification from the server.
 	 * @param functions The onmessage and onclose functions.
 	 * @param connectedExpression The connected expression.
 	 */
-	public SocketEventListener(Integer port, String channel, String scopeId, String functions, ValueExpression connectedExpression) {
+	public SocketEventListener(Integer port, String channel, String uri, String functions, ValueExpression connectedExpression) {
 		this.port = port;
 		this.channel = channel;
-		this.scopeId = scopeId;
+		this.uri = uri;
 		this.functions = functions;
 		this.connectedExpression = connectedExpression;
 	}
@@ -106,8 +108,8 @@ public class SocketEventListener implements SystemEventListener {
 			String script = null;
 
 			if (switched == null) {
-				String base = (port != null ? ":" + port : "") + getRequestContextPath(context);
-				script = String.format(SCRIPT_INIT, base, channel + "?" + scopeId, functions, connected);
+				String host = (port != null ? ":" + port : "") + getRequestContextPath(context);
+				script = String.format(SCRIPT_INIT, host, uri, functions, connected);
 			}
 			else if (switched) {
 				script = String.format(connected ? SCRIPT_OPEN : SCRIPT_CLOSE, channel);
