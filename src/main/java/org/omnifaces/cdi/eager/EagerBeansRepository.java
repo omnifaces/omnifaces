@@ -17,6 +17,7 @@ package org.omnifaces.cdi.eager;
 
 import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
+import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Utils.isAnyEmpty;
 import static org.omnifaces.util.Utils.isEmpty;
 
@@ -58,7 +59,7 @@ public class EagerBeansRepository {
 
 	public static EagerBeansRepository getInstance() { // Awkward workaround for it being unavailable via @Inject in listeners in Tomcat+OWB and Jetty.
 		if (instance == null) {
-			instance = org.omnifaces.config.BeanManager.INSTANCE.getReference(EagerBeansRepository.class);
+			instance = getReference(EagerBeansRepository.class);
 		}
 
 		return instance;

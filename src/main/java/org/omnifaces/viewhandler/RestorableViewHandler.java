@@ -14,6 +14,7 @@ package org.omnifaces.viewhandler;
 
 import static java.lang.Boolean.TRUE;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.isUnloadRequest;
+import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Components.buildView;
 import static org.omnifaces.util.Faces.responseComplete;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
@@ -30,7 +31,6 @@ import javax.faces.context.FacesContext;
 
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.cdi.viewscope.ViewScopeManager;
-import org.omnifaces.config.BeanManager;
 import org.omnifaces.taghandler.EnableRestorableView;
 
 /**
@@ -78,7 +78,7 @@ public class RestorableViewHandler extends ViewHandlerWrapper { // TODO: rename 
 		if (isUnloadRequest(context)) {
 			UIViewRoot createdView = createView(context, viewId);
 			createdView.restoreViewScopeState(context, getRenderKit(context).getResponseStateManager().getState(context, viewId));
-			BeanManager.INSTANCE.getReference(ViewScopeManager.class).preDestroyView();
+			getReference(ViewScopeManager.class).preDestroyView();
 			responseComplete();
 			return createdView;
 		}

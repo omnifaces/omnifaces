@@ -17,6 +17,7 @@ package org.omnifaces.application;
 
 import static java.lang.Boolean.parseBoolean;
 import static javax.faces.convert.Converter.DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE_PARAM_NAME;
+import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Faces.getInitParameter;
 
 import java.util.TimeZone;
@@ -30,7 +31,6 @@ import javax.faces.validator.Validator;
 
 import org.omnifaces.cdi.converter.ConverterManager;
 import org.omnifaces.cdi.validator.ValidatorManager;
-import org.omnifaces.config.BeanManager;
 
 /**
  * <p>
@@ -67,8 +67,8 @@ public class OmniApplication extends ApplicationWrapper {
 	 */
 	public OmniApplication(Application wrapped) {
 		this.wrapped = wrapped;
-		converterManager = BeanManager.INSTANCE.getReference(ConverterManager.class);
-		validatorManager = BeanManager.INSTANCE.getReference(ValidatorManager.class);
+		converterManager = getReference(ConverterManager.class);
+		validatorManager = getReference(ValidatorManager.class);
 		dateTimeConverterDefaultTimeZone =
 			parseBoolean(getInitParameter(DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE_PARAM_NAME))
 				? TimeZone.getDefault()

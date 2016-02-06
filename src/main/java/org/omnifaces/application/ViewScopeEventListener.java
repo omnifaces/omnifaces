@@ -15,6 +15,8 @@
  */
 package org.omnifaces.application;
 
+import static org.omnifaces.util.Beans.getReference;
+
 import javax.faces.component.UIViewRoot;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.PreDestroyViewMapEvent;
@@ -22,7 +24,6 @@ import javax.faces.event.SystemEvent;
 import javax.faces.event.ViewMapListener;
 
 import org.omnifaces.cdi.viewscope.ViewScopeManager;
-import org.omnifaces.config.BeanManager;
 
 /**
  * Listener for JSF view scope destroy events so that view scope manager can be notified.
@@ -51,7 +52,7 @@ public class ViewScopeEventListener implements ViewMapListener {
 	@Override
 	public void processEvent(SystemEvent event) throws AbortProcessingException {
 		if (event instanceof PreDestroyViewMapEvent) {
-			BeanManager.INSTANCE.getReference(ViewScopeManager.class).preDestroyView();
+			getReference(ViewScopeManager.class).preDestroyView();
 		}
 	}
 
