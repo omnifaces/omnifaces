@@ -174,6 +174,38 @@ public final class Numbers {
 	 * @since 2.3
 	 */
 	public static String formatThousands(Number number) {
+		return formatThousandsUnit(number, null);
+	}
+
+	/**
+	 * Format the given number to nearest 10<sup>n</sup> (rounded to thousands), suffixed with a space, the metric unit
+	 * prefix (k, M, G, T, P or E) and the given unit, rounding half up with a precision of 3 digits, whereafter
+	 * trailing zeroes in fraction part are stripped.
+	 * For example (with English locale and unit <code>B</code>):
+	 * <ul>
+	 * <li>999 will appear as 999 B
+	 * <li>1000 will appear as 1 kB
+	 * <li>1004 will appear as 1 kB
+	 * <li>1005 will appear as 1.01 kB
+	 * <li>1594 will appear as 1.59 kB
+	 * <li>1595 will appear as 1.6 kB
+	 * <li>9000 will appear as 9 kB
+	 * <li>9900 will appear as 9.9 kB
+	 * <li>9994 will appear as 9.99 kB
+	 * <li>9995 will appear as 10 kB
+	 * <li>99990 will appear as 100 kB
+	 * <li>9994999 will appear as 9.99 MB
+	 * <li>9995000 will appear as 10 MB
+	 * </ul>
+	 * The format locale will be set to the one as obtained by {@link Faces#getLocale()}.
+	 * If the value is <code>null</code>, <code>NaN</code> or infinity, then this will return <code>null</code>.
+	 * @param number The number to be formatted.
+	 * @param unit The unit used in the format. E.g. <code>B</code> for Bytes, <code>W</code> for Watt, etc. If the unit
+	 * is <code>null</code>, then this method will behave exactly as described in {@link #formatThousands(Number)}.
+	 * @return The formatted number with unit.
+	 * @since 2.3
+	 */
+	public static String formatThousandsUnit(Number number, String unit) {
 		if (number == null) {
 			return null;
 		}
@@ -187,14 +219,18 @@ public final class Numbers {
 			return null;
 		}
 
-		if (decimal.longValue() < NUMBER_1K) {
-			return number.toString();
+		String separator = (unit == null) ? "" : " ";
+        String unitString = (unit == null) ? "" : unit;
+
+        if (decimal.longValue() < NUMBER_1K) {
+			return number.toString() + separator + unitString;
 		}
 
 		int exp = (int) (Math.log(decimal.longValue()) / Math.log(NUMBER_1K));
 		BigDecimal divided = decimal.divide(BigDecimal.valueOf(Math.pow(NUMBER_1K, exp)));
 		int maxfractions = 3 - String.valueOf(divided.longValue()).length();
-		return String.format(getLocale(), "%." + maxfractions + "f", divided).replaceAll("\\D?0+$", "") + "kMGTPE".charAt(exp - 1);
+		return String.format(getLocale(), "%." + maxfractions + "f", divided).replaceAll("\\D?0+$", "")
+			+ separator + "kMGTPE".charAt(exp - 1) + unitString;
 	}
 
 }

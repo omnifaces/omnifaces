@@ -755,6 +755,37 @@
 		<function-signature>java.lang.String formatThousands(java.lang.Number)</function-signature>
 	</function>
 
+	<function>
+		<description>
+			<![CDATA[
+				Format the given number to nearest 10<sup>n</sup> (rounded to thousands), suffixed with a space, the metric unit
+				prefix (k, M, G, T, P or E) and the given unit, rounding half up with a precision of 3 digits, whereafter
+				trailing zeroes in fraction part are stripped.
+				For example (with English locale and unit <code>B</code>):
+				<ul>
+				<li>999 will appear as 999 B
+				<li>1000 will appear as 1 kB
+				<li>1004 will appear as 1 kB
+				<li>1005 will appear as 1.01 kB
+				<li>1594 will appear as 1.59 kB
+				<li>1595 will appear as 1.6 kB
+				<li>9000 will appear as 9 kB
+				<li>9900 will appear as 9.9 kB
+				<li>9994 will appear as 9.99 kB
+				<li>9995 will appear as 10 kB
+				<li>99990 will appear as 100 kB
+				<li>9994999 will appear as 9.99 MB
+				<li>9995000 will appear as 10 MB
+				</ul>
+				The format locale will be set to the one as obtained by <code>Faces#getLocale()</code>.
+				If the value is <code>null</code>, <code>NaN</code> or infinity, then this will return <code>null</code>.
+			]]>
+		</description>
+		<function-name>formatThousandsUnit</function-name>
+		<function-class>org.omnifaces.el.functions.Numbers</function-class>
+		<function-signature>java.lang.String formatThousandsUnit(java.lang.Number, java.lang.String)</function-signature>
+	</function>
+
 	<!-- Objects ================================================================================================== -->
 
 	<function>
