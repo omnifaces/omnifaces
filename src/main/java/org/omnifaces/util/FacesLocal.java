@@ -255,6 +255,15 @@ public final class FacesLocal {
 
 	/**
 	 * {@inheritDoc}
+	 * @see Faces#getViewName()
+	 */
+	public static String getViewName(FacesContext context) {
+		String viewId = getViewId(context);
+		return (viewId != null) ? viewId.substring(viewId.lastIndexOf('/') + 1).split("\\.")[0] : null;
+	}
+
+	/**
+	 * {@inheritDoc}
 	 * @see Faces#getViewDeclarationLanguage()
 	 */
 	public static ViewDeclarationLanguage getViewDeclarationLanguage(FacesContext context) {
