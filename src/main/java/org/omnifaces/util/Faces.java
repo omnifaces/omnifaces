@@ -462,6 +462,7 @@ public final class Faces {
 	 * E.g. if the view ID is <code>/path/to/some.xhtml</code>, then this will return <code>some</code>.
 	 * @return The base name of the current view, without extension, or <code>null</code> if there is no view.
 	 * @see UIViewRoot#getViewId()
+	 * @since 2.3
 	 */
 	public static String getViewName() {
 		return FacesLocal.getViewName(getContext());
