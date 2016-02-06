@@ -51,6 +51,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
@@ -80,6 +81,7 @@ public final class Utils {
 	private static final int DEFAULT_STREAM_BUFFER_SIZE = 10240;
 	private static final String PATTERN_RFC1123_DATE = "EEE, dd MMM yyyy HH:mm:ss zzz";
 	private static final TimeZone TIMEZONE_GMT = TimeZone.getTimeZone("GMT");
+	private static final Pattern PATTERN_ISO639_ISO3166_LOCALE = Pattern.compile("[a-z]{2,3}(_[A-Z]{2})?");
 	private static final int BASE64_SEGMENT_LENGTH = 4;
 	private static final int UNICODE_3_BYTES = 0xfff;
 	private static final int UNICODE_2_BYTES = 0xff;
@@ -611,6 +613,41 @@ public final class Utils {
 	public static Date parseRFC1123(String string) throws ParseException {
 		SimpleDateFormat sdf = new SimpleDateFormat(PATTERN_RFC1123_DATE, Locale.US);
 		return sdf.parse(string);
+	}
+
+	// Locale ---------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Parses the given object representing the locale to a {@link Locale} object.
+	 * If it is <code>null</code>, then return <code>null</code>.
+	 * Else if it is already an instance of <code>Locale</code>, then just return it.
+	 * Else if it is in pattern ISO 639 alpha-2/3, optionally followed by "_" and ISO 3166-1 alpha-2 country code, then
+	 * split the language/country and construct a new <code>Locale</code> with it.
+	 * Else parse it via {@link Locale#forLanguageTag(String)} and return it.
+	 * @param locale The object representing the locale.
+	 * @return The parsed <code>Locale</code>.
+	 * @since 2.3
+	 */
+	public static Locale parseLocale(Object locale) {
+		if (locale == null) {
+			return null;
+		}
+		else if (locale instanceof Locale) {
+			return (Locale) locale;
+		}
+		else {
+			String localeString = locale.toString();
+
+			if (PATTERN_ISO639_ISO3166_LOCALE.matcher(localeString).matches()) {
+				String[] languageAndCountry = localeString.split("_");
+				String language = languageAndCountry[0];
+				String country = languageAndCountry.length > 1 ? languageAndCountry[1] : "";
+				return new Locale(language, country);
+			}
+			else {
+				return Locale.forLanguageTag(localeString);
+			}
+		}
 	}
 
 	// Encoding/decoding ----------------------------------------------------------------------------------------------

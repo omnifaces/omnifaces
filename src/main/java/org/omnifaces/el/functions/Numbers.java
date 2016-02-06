@@ -13,11 +13,13 @@
 package org.omnifaces.el.functions;
 
 import static org.omnifaces.util.Faces.getLocale;
+import static org.omnifaces.util.Utils.parseLocale;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.util.Locale;
 
 import org.omnifaces.util.Faces;
 
@@ -114,20 +116,34 @@ public final class Numbers {
 	}
 
 	/**
-	 * Format the given number in the locale-default pattern. This is useful when you want to format numbers in for
-	 * example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select
-	 * item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The format locale will be set to
-	 * the one as obtained by {@link Faces#getLocale()}.
-	 * @param number The number to be formatted in the locale-default pattern.
-	 * @return The number which is formatted in the locale-default pattern.
+	 * Format the given number in the default pattern of the default locale. This is useful when you want to format
+	 * numbers in for example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code>
+	 * attribute of select item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The default
+	 * locale is the one as obtained by {@link Faces#getLocale()}.
+	 * @param number The number to be formatted in the default pattern of the default locale.
+	 * @return The number which is formatted in the default pattern of the default locale.
 	 * @since 1.3
 	 */
 	public static String formatNumberDefault(Number number) {
+		return formatNumberDefaultForLocale(number, getLocale());
+	}
+
+	/**
+	 * Format the given number in the default pattern of the given locale. This is useful when you want to format
+	 * numbers in for example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code>
+	 * attribute of select item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The given
+	 * locale can be a {@link Locale} object or a string representation.
+	 * @param number The number to be formatted in the default pattern of the given locale.
+	 * @param locale The locale to obtain the default pattern from.
+	 * @return The number which is formatted in the default pattern of the given locale.
+	 * @since 2.3
+	 */
+	public static String formatNumberDefaultForLocale(Number number, Object locale) {
 		if (number == null) {
 			return null;
 		}
 
-		return NumberFormat.getNumberInstance(getLocale()).format(number);
+		return NumberFormat.getNumberInstance(parseLocale(locale)).format(number);
 	}
 
 	/**
