@@ -26,8 +26,8 @@ import org.omnifaces.util.Faces;
 /**
  * <p>
  * Collection of EL functions for number formatting: <code>of:formatBytes()</code>, <code>of:formatCurrency()</code>,
- * <code>of:formatNumber()</code>, <code>of:formatNumberDefault()</code>, <code>of:formatPercent()</code> and
- * <code>of:formatThousands()</code>.
+ * <code>of:formatNumber()</code>, <code>of:formatNumberDefault()</code>, <code>of:formatPercent()</code>,
+ * <code>of:formatThousands()</code> and <code>of:formatThousandsUnit()</code>.
  *
  * @author Bauke Scholtz
  * @since 1.2
@@ -37,7 +37,7 @@ public final class Numbers {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final int BYTES_1K = 1024;
-	private static final long NUMBER_1K = 1000;
+	private static final int NUMBER_1K = 1000;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -61,16 +61,7 @@ public final class Numbers {
 	 * @return The formatted bytes.
 	 */
 	public static String formatBytes(Long bytes) {
-		if (bytes == null) {
-			return "0 B";
-		}
-
-		if (bytes < BYTES_1K) {
-			return bytes + " B";
-		}
-
-		int exp = (int) (Math.log(bytes) / Math.log(BYTES_1K));
-		return String.format(getLocale(), "%.1f %ciB", bytes / Math.pow(BYTES_1K, exp), "KMGTPE".charAt(exp - 1));
+		return formatBaseUnit(bytes, BYTES_1K, 1, true, "B");
 	}
 
 	/**
@@ -222,6 +213,17 @@ public final class Numbers {
 	 * @since 2.3
 	 */
 	public static String formatThousandsUnit(Number number, String unit) {
+		return formatBaseUnit(number, NUMBER_1K, null, false, unit);
+	}
+
+	/**
+	 * @param number Number to be formatted.
+	 * @param base Rounding base.
+	 * @param fractions Fraction length. If null, then precision of 3 digits will be assumed and all trailing zeroes will be stripped.
+	 * @param iec IEC or metric. If IEC, then unit prefix "Ki", "Mi", "Gi", etc will be used, else "k", "M", "G", etc.
+	 * @param unit Unit suffix. If null, then there is no space separator between number and unit prefix.
+	 */
+	private static String formatBaseUnit(Number number, int base, Integer fractions, boolean iec, String unit) {
 		if (number == null) {
 			return null;
 		}
@@ -238,15 +240,20 @@ public final class Numbers {
 		String separator = (unit == null) ? "" : " ";
         String unitString = (unit == null) ? "" : unit;
 
-        if (decimal.longValue() < NUMBER_1K) {
+        if (decimal.longValue() < base) {
 			return number.toString() + separator + unitString;
 		}
 
-		int exp = (int) (Math.log(decimal.longValue()) / Math.log(NUMBER_1K));
-		BigDecimal divided = decimal.divide(BigDecimal.valueOf(Math.pow(NUMBER_1K, exp)));
-		int maxfractions = 3 - String.valueOf(divided.longValue()).length();
-		return String.format(getLocale(), "%." + maxfractions + "f", divided).replaceAll("\\D?0+$", "")
-			+ separator + "kMGTPE".charAt(exp - 1) + unitString;
+		int exp = (int) (Math.log(decimal.longValue()) / Math.log(base));
+		BigDecimal divided = decimal.divide(BigDecimal.valueOf(Math.pow(base, exp)));
+		int maxfractions = (fractions != null) ? fractions : (3 - String.valueOf(divided.longValue()).length());
+		String formatted = String.format(getLocale(), "%." + maxfractions + "f", divided);
+
+		if (fractions == null) {
+			formatted = formatted.replaceAll("\\D?0+$", "");
+		}
+
+		return formatted + separator + ((iec ? "K" : "k") + "MGTPE").charAt(exp - 1) + (iec ? "i" : "") + unitString;
 	}
 
 }
