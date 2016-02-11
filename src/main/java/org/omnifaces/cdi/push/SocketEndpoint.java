@@ -57,7 +57,10 @@ public class SocketEndpoint extends Endpoint {
 	 */
 	@Override
 	public void onOpen(Session session, EndpointConfig config) {
-		if (!SocketManager.getInstance().add(session)) { // @Inject in Endpoint doesn't work in Tomcat+Weld/OWB.
+		if (SocketManager.getInstance().add(session)) { // @Inject in Endpoint doesn't work in Tomcat+Weld/OWB.
+			session.setMaxIdleTimeout(0);
+		}
+		else {
 			try {
 				session.close(REASON_UNKNOWN_CHANNEL);
 			}
@@ -74,7 +77,9 @@ public class SocketEndpoint extends Endpoint {
 	 */
 	@Override
 	public void onError(Session session, Throwable throwable) {
-		session.getUserProperties().put(Throwable.class.getName(), throwable);
+		if (session.isOpen()) {
+			session.getUserProperties().put(Throwable.class.getName(), throwable);
+		}
 	}
 
 	/**
