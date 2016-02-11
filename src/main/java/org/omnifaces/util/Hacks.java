@@ -14,6 +14,7 @@ package org.omnifaces.util;
 
 import static org.omnifaces.util.FacesLocal.getContextAttribute;
 import static org.omnifaces.util.FacesLocal.getInitParameter;
+import static org.omnifaces.util.FacesLocal.getSessionAttribute;
 import static org.omnifaces.util.FacesLocal.setContextAttribute;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
@@ -27,6 +28,7 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.faces.application.StateManager;
 import javax.faces.context.FacesContext;
 import javax.faces.context.PartialViewContext;
 import javax.faces.context.PartialViewContextWrapper;
@@ -71,6 +73,9 @@ public final class Hacks {
 	private static final String[] PARAM_NAMES_RESOURCE_MAX_AGE = {
 		MOJARRA_DEFAULT_RESOURCE_MAX_AGE, MYFACES_DEFAULT_RESOURCE_MAX_AGE
 	};
+
+	private static final String MOJARRA_LOGICAL_VIEW_MAP_ID = "com.sun.faces.renderkit.ServerSideStateHelper.LogicalViewMap";
+	private static final String MOJARRA_LOGICAL_VIEW_ID = "com.sun.faces.logicalViewMap";
 
 	private static final String ERROR_MAX_AGE =
 		"The '%s' init param must be a number. Encountered an invalid value of '%s'.";
@@ -357,6 +362,31 @@ public final class Hacks {
 		defaultResourceMaxAge = DEFAULT_RESOURCE_MAX_AGE;
 		return defaultResourceMaxAge;
 	}
+
+	//  JSF state saving related --------------------------------------------------------------------------------------
+
+	/**
+	 * Remove server side JSF view state associated with current request.
+	 * @param context The involved faces context.
+	 * @since 2.3
+	 */
+	public static void removeViewState(FacesContext context) {
+		if ("client".equals(context.getExternalContext().getInitParameter(StateManager.STATE_SAVING_METHOD_PARAM_NAME))) {
+			return;
+		}
+
+		if (isMyFacesUsed()) {
+			// TODO: implement.
+		}
+		else { // Well, let's assume Mojarra.
+			Map<String, Object> logicalViewMap = getSessionAttribute(context, MOJARRA_LOGICAL_VIEW_MAP_ID);
+
+			if (logicalViewMap != null) {
+				logicalViewMap.remove(context.getAttributes().get(MOJARRA_LOGICAL_VIEW_ID));
+			}
+		}
+	}
+
 
 	// PrimeFaces related ---------------------------------------------------------------------------------------------
 

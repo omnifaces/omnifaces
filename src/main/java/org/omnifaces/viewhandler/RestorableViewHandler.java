@@ -31,6 +31,7 @@ import javax.faces.event.PreDestroyViewMapEvent;
 
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.taghandler.EnableRestorableView;
+import org.omnifaces.util.Hacks;
 
 /**
  * This view handler implementation will recreate the entire view state whenever the view has apparently been expired,
@@ -76,9 +77,11 @@ public class RestorableViewHandler extends ViewHandlerWrapper { // TODO: rename 
 	public UIViewRoot restoreView(FacesContext context, String viewId) {
 		if (isUnloadRequest(context)) {
 			UIViewRoot createdView = createView(context, viewId);
-			createdView.restoreViewScopeState(context, getRenderKit(context).getResponseStateManager().getState(context, viewId));
+			Object state = getRenderKit(context).getResponseStateManager().getState(context, viewId);
+			createdView.restoreViewScopeState(context, state);
 			context.setProcessingEvents(true);
             context.getApplication().publishEvent(context, PreDestroyViewMapEvent.class, UIViewRoot.class, createdView);
+            Hacks.removeViewState(context);
 			responseComplete();
 			return createdView;
 		}
