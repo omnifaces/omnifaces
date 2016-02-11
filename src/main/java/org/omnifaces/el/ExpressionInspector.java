@@ -4,8 +4,11 @@ import static org.omnifaces.el.MethodReference.NO_PARAMS;
 import static org.omnifaces.el.functions.Strings.capitalize;
 import static org.omnifaces.util.Reflection.findMethod;
 
+import java.lang.reflect.Method;
+
 import javax.el.ELContext;
 import javax.el.ELResolver;
+import javax.el.MethodNotFoundException;
 import javax.el.ValueExpression;
 import javax.el.ValueReference;
 
@@ -89,12 +92,13 @@ public final class ExpressionInspector {
 			params = NO_PARAMS;
 		}
 
-		return new MethodReference(
-			inspectorElContext.getBase(),
-			findMethod(inspectorElContext.getBase(), methodName, params),
-			inspectorElContext.getParams(),
-			type == ValueExpressionType.METHOD
-		);
+		Method method = findMethod(inspectorElContext.getBase(), methodName, params);
+
+		if (method == null) {
+			throw new MethodNotFoundException(inspectorElContext.getBase() + "." + methodName + " " + valueExpression);
+		}
+
+		return new MethodReference(inspectorElContext.getBase(), method, inspectorElContext.getParams(), type == ValueExpressionType.METHOD);
 	}
 
 
