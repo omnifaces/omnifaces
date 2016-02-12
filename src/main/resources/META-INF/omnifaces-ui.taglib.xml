@@ -3731,6 +3731,16 @@ public enum Baz {
 		</description>
 		<tag-name>skipValidators</tag-name>
 		<handler-class>org.omnifaces.taghandler.SkipValidators</handler-class>
+		<attribute>
+			<description>
+				<![CDATA[
+					Execute validation after update the models and before render component, allowing you to show validation error messages and still update models. Defaults to <code>false</code>.
+				]]>
+			</description>
+			<name>showMessages</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
 	</tag>
 
 	<tag>

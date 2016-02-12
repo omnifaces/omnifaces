@@ -17,6 +17,7 @@ import static javax.faces.event.PhaseId.RESTORE_VIEW;
 import static org.omnifaces.util.Components.hasInvokedSubmit;
 import static org.omnifaces.util.Events.subscribeToRequestAfterPhase;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
+import static org.omnifaces.util.Facelets.getBoolean;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ import javax.faces.component.behavior.ClientBehaviorHolder;
 import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.PostValidateEvent;
+import javax.faces.event.PreRenderComponentEvent;
 import javax.faces.event.PreValidateEvent;
 import javax.faces.event.SystemEvent;
 import javax.faces.event.SystemEventListener;
@@ -79,6 +81,10 @@ public class SkipValidators extends TagHandler {
 	private static final String ERROR_INVALID_PARENT =
 		"Parent component of o:skipValidators must be an instance of UICommand or ClientBehaviorHolder.";
 
+	// Variables ------------------------------------------------------------------------------------------------------
+
+		private boolean showMessages;
+
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
@@ -103,16 +109,18 @@ public class SkipValidators extends TagHandler {
 			throw new IllegalArgumentException(ERROR_INVALID_PARENT);
 		}
 
-		FacesContext facesContext = context.getFacesContext();
+		final FacesContext facesContext = context.getFacesContext();
 
 		if (!(ComponentHandler.isNew(parent) && facesContext.isPostback() && facesContext.getCurrentPhaseId() == RESTORE_VIEW)) {
 			return;
 		}
 
+		showMessages = getBoolean(context, getAttribute("showMessages"));
+
 		// We can't use hasInvokedSubmit() before the component is added to view, because the client ID isn't available.
 		// Hence, we subscribe this check to after phase of restore view.
 		subscribeToRequestAfterPhase(RESTORE_VIEW, new Callback.Void() { @Override public void invoke() {
-			processSkipValidators(parent);
+			processSkipValidators(facesContext, parent);
 		}});
 	}
 
@@ -120,16 +128,18 @@ public class SkipValidators extends TagHandler {
 	 * Check if the given component has been invoked during the current request and if so, then register the skip
 	 * validators event listener which removes the validators during {@link PreValidateEvent} and restores them during
 	 * {@link PostValidateEvent}.
+	 * @param facesContext 
 	 * @param parent The parent component of this tag.
 	 */
-	protected void processSkipValidators(UIComponent parent) {
+	protected void processSkipValidators(FacesContext facesContext, UIComponent parent) {
 		if (!hasInvokedSubmit(parent)) {
 			return;
 		}
 
-		SkipValidatorsEventListener listener = new SkipValidatorsEventListener();
+		SkipValidatorsEventListener listener = new SkipValidatorsEventListener(facesContext);
 		subscribeToViewEvent(PreValidateEvent.class, listener);
 		subscribeToViewEvent(PostValidateEvent.class, listener);
+		if (showMessages) subscribeToViewEvent(PreRenderComponentEvent.class, listener);
 	}
 
 	/**
@@ -139,6 +149,11 @@ public class SkipValidators extends TagHandler {
 
 		private Map<String, Object> required = new HashMap<>();
 		private Map<String, Validator[]> allValidators = new HashMap<>();
+		private FacesContext facesContext;
+		private Object submittedValue;
+		public SkipValidatorsEventListener(FacesContext facesContext) {
+			this.facesContext = facesContext;
+		}
 
 		@Override
 		public boolean isListenerForSource(Object source) {
@@ -154,6 +169,7 @@ public class SkipValidators extends TagHandler {
 				ValueExpression requiredExpression = input.getValueExpression("required");
 				required.put(clientId, (requiredExpression != null) ? requiredExpression : input.isRequired());
 				input.setRequired(false);
+				submittedValue = input.getSubmittedValue();
 				Validator[] validators = input.getValidators();
 				allValidators.put(clientId, validators);
 
@@ -173,6 +189,12 @@ public class SkipValidators extends TagHandler {
 
 				for (Validator validator : allValidators.remove(clientId)) {
 					input.addValidator(validator);
+				}
+			}
+			else if (event instanceof PreRenderComponentEvent) {
+				if (input.isValid()) { // Check if there was a conversion error
+					input.setSubmittedValue(submittedValue);
+					input.validate(facesContext);
 				}
 			}
 		}
