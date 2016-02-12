@@ -14,8 +14,10 @@ package org.omnifaces.util;
 
 import static org.omnifaces.util.FacesLocal.getContextAttribute;
 import static org.omnifaces.util.FacesLocal.getInitParameter;
+import static org.omnifaces.util.FacesLocal.getRenderKit;
 import static org.omnifaces.util.FacesLocal.getSessionAttribute;
 import static org.omnifaces.util.FacesLocal.setContextAttribute;
+import static org.omnifaces.util.Reflection.findMethod;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.lang.reflect.Field;
@@ -25,6 +27,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,6 +35,7 @@ import javax.faces.application.StateManager;
 import javax.faces.context.FacesContext;
 import javax.faces.context.PartialViewContext;
 import javax.faces.context.PartialViewContextWrapper;
+import javax.faces.render.ResponseStateManager;
 
 import org.omnifaces.resourcehandler.ResourceIdentifier;
 
@@ -74,8 +78,9 @@ public final class Hacks {
 		MOJARRA_DEFAULT_RESOURCE_MAX_AGE, MYFACES_DEFAULT_RESOURCE_MAX_AGE
 	};
 
-	private static final String MOJARRA_LOGICAL_VIEW_MAP_ID = "com.sun.faces.renderkit.ServerSideStateHelper.LogicalViewMap";
-	private static final String MOJARRA_LOGICAL_VIEW_ID = "com.sun.faces.logicalViewMap";
+	private static final String MOJARRA_SERIALIZED_VIEWS = "com.sun.faces.renderkit.ServerSideStateHelper.LogicalViewMap";
+	private static final String MOJARRA_SERIALIZED_VIEW_ID = "com.sun.faces.logicalViewMap";
+	private static final String MYFACES_SERIALIZED_VIEWS = "org.apache.myfaces.application.viewstate.ServerSideStateCacheImpl.SERIALIZED_VIEW";
 
 	private static final String ERROR_MAX_AGE =
 		"The '%s' init param must be a number. Encountered an invalid value of '%s'.";
@@ -370,19 +375,57 @@ public final class Hacks {
 	 * @param context The involved faces context.
 	 * @since 2.3
 	 */
-	public static void removeViewState(FacesContext context) {
+	public static void removeViewState(FacesContext context, String viewId) {
 		if ("client".equals(context.getExternalContext().getInitParameter(StateManager.STATE_SAVING_METHOD_PARAM_NAME))) {
 			return;
 		}
 
 		if (isMyFacesUsed()) {
-			// TODO: implement.
+			ResponseStateManager stateManager = getRenderKit(context).getResponseStateManager();
+			String stateId = invokeMethod(stateManager, "getSavedState", context);
+
+			if (stateId != null) {
+				Object views = getSessionAttribute(context, MYFACES_SERIALIZED_VIEWS);
+
+				if (views != null) {
+					Integer sequence = Integer.valueOf(stateId, Character.MAX_RADIX);
+					Object stateCache = invokeMethod(stateManager, "getStateCache", context);
+					Object K = invokeMethod(invokeMethod(stateCache, "getSessionViewStorageFactory"), "createSerializedViewKey", context, viewId, sequence);
+
+					// Non-nullable fields.
+					List<?> keys = accessField(views, "_keys"); // List<K>
+					Map<Object, Object> states = accessField(views, "_serializedViews"); // Map<K, view>
+					Map<Object, Object> precedence = accessField(views, "_precedence"); // Map<K, K>
+
+					synchronized (views) {
+						keys.remove(K);
+						states.remove(K);
+						precedence.remove(K);
+						precedence.values().remove(K);
+
+						// Nullable fields.
+						Map<Object, String> ids = accessField(views, "_viewScopeIds"); // Map<K, String>
+						Map<String, Object> lastKeys = accessField(views, "_lastWindowKeys"); // Map<String, K>
+
+						if (ids != null) {
+							Map<Object, Integer> counts = accessField(views, "_viewScopeIdCounts"); // Map<viewScopeId, Integer>
+							Object id = ids.remove(K);
+							counts.put(id, counts.get(id) - 1);
+						}
+
+						if (lastKeys != null) {
+							lastKeys.values().remove(K);
+						}
+					}
+				}
+			}
+
 		}
 		else { // Well, let's assume Mojarra.
-			Map<String, Object> logicalViewMap = getSessionAttribute(context, MOJARRA_LOGICAL_VIEW_MAP_ID);
+			Map<String, Object> views = getSessionAttribute(context, MOJARRA_SERIALIZED_VIEWS);
 
-			if (logicalViewMap != null) {
-				logicalViewMap.remove(context.getAttributes().get(MOJARRA_LOGICAL_VIEW_ID));
+			if (views != null) {
+				views.remove(context.getAttributes().get(MOJARRA_SERIALIZED_VIEW_ID));
 			}
 		}
 	}
@@ -438,16 +481,10 @@ public final class Hacks {
 	 * them is still null, a NullPointerException will be thrown. The implementation should be changed accordingly to
 	 * take that into account (but then varargs cannot be used anymore and you end up creating ugly arrays).
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings("unchecked")
 	private static <T> T invokeMethod(Object instance, String methodName, Object... parameters) {
-		Class[] parameterTypes = new Class[parameters.length];
-
-		for (int i = 0; i < parameters.length; i++) {
-			parameterTypes[i] = parameters[i].getClass();
-		}
-
 		try {
-			Method method = instance.getClass().getMethod(methodName, parameterTypes);
+			Method method = findMethod(instance, methodName, parameters);
 			method.setAccessible(true);
 			return (T) method.invoke(instance, parameters);
 		}

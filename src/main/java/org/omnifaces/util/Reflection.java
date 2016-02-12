@@ -136,7 +136,7 @@ public final class Reflection {
 	}
 
 	/**
-	 * Finds a method based on the method name, amount of parameters and limited typing, if necessary prefixed with "get".
+	 * Finds a method based on the method name, amount of parameters and limited typing.
 	 * <p>
 	 * Note that this supports overloading, but a limited one. Given an actual parameter of type Long, this will select
 	 * a method accepting Number when the choice is between Number and a non-compatible type like String. However,
@@ -153,6 +153,14 @@ public final class Reflection {
 		for (Method method : base.getClass().getMethods()) {
 			if (method.getName().equals(methodName) && method.getParameterTypes().length == params.length) {
 				methods.add(method);
+			}
+		}
+
+		if (methods.isEmpty()) {
+			for (Method method : base.getClass().getDeclaredMethods()) {
+				if (method.getName().equals(methodName) && method.getParameterTypes().length == params.length) {
+					methods.add(method);
+				}
 			}
 		}
 

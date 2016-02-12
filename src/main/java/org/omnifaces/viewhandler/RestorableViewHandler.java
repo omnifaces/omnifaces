@@ -77,11 +77,10 @@ public class RestorableViewHandler extends ViewHandlerWrapper { // TODO: rename 
 	public UIViewRoot restoreView(FacesContext context, String viewId) {
 		if (isUnloadRequest(context)) {
 			UIViewRoot createdView = createView(context, viewId);
-			Object state = getRenderKit(context).getResponseStateManager().getState(context, viewId);
-			createdView.restoreViewScopeState(context, state);
+			createdView.restoreViewScopeState(context, getRenderKit(context).getResponseStateManager().getState(context, viewId));
 			context.setProcessingEvents(true);
-            context.getApplication().publishEvent(context, PreDestroyViewMapEvent.class, UIViewRoot.class, createdView);
-            Hacks.removeViewState(context);
+			context.getApplication().publishEvent(context, PreDestroyViewMapEvent.class, UIViewRoot.class, createdView);
+			Hacks.removeViewState(context, viewId);
 			responseComplete();
 			return createdView;
 		}
