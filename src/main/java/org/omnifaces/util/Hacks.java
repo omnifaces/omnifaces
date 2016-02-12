@@ -31,7 +31,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.faces.application.StateManager;
 import javax.faces.context.FacesContext;
 import javax.faces.context.PartialViewContext;
 import javax.faces.context.PartialViewContextWrapper;
@@ -368,18 +367,16 @@ public final class Hacks {
 		return defaultResourceMaxAge;
 	}
 
+
 	//  JSF state saving related --------------------------------------------------------------------------------------
 
 	/**
 	 * Remove server side JSF view state associated with current request.
 	 * @param context The involved faces context.
+	 * @param viewId The view ID of the involved view.
 	 * @since 2.3
 	 */
 	public static void removeViewState(FacesContext context, String viewId) {
-		if ("client".equals(context.getExternalContext().getInitParameter(StateManager.STATE_SAVING_METHOD_PARAM_NAME))) {
-			return;
-		}
-
 		if (isMyFacesUsed()) {
 			ResponseStateManager stateManager = getRenderKit(context).getResponseStateManager();
 			String stateId = invokeMethod(stateManager, "getSavedState", context);
@@ -397,7 +394,7 @@ public final class Hacks {
 					Map<Object, Object> states = accessField(views, "_serializedViews"); // Map<K, view>
 					Map<Object, Object> precedence = accessField(views, "_precedence"); // Map<K, K>
 
-					synchronized (views) {
+					synchronized (views) { // Those fields are not concurrent maps.
 						keys.remove(K);
 						states.remove(K);
 						precedence.remove(K);
@@ -419,7 +416,6 @@ public final class Hacks {
 					}
 				}
 			}
-
 		}
 		else { // Well, let's assume Mojarra.
 			Map<String, Object> views = getSessionAttribute(context, MOJARRA_SERIALIZED_VIEWS);
