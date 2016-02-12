@@ -12,6 +12,7 @@
  */
 package org.omnifaces.util;
 
+import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getContextAttribute;
 import static org.omnifaces.util.FacesLocal.getInitParameter;
 import static org.omnifaces.util.FacesLocal.getRenderKit;
@@ -20,6 +21,7 @@ import static org.omnifaces.util.FacesLocal.setContextAttribute;
 import static org.omnifaces.util.Reflection.findMethod;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -29,6 +31,7 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.faces.context.FacesContext;
@@ -78,8 +81,9 @@ public final class Hacks {
 	};
 
 	private static final String MOJARRA_SERIALIZED_VIEWS = "com.sun.faces.renderkit.ServerSideStateHelper.LogicalViewMap";
-	private static final String MOJARRA_SERIALIZED_VIEW_ID = "com.sun.faces.logicalViewMap";
+	private static final String MOJARRA_SERIALIZED_VIEW_KEY = "com.sun.faces.logicalViewMap";
 	private static final String MYFACES_SERIALIZED_VIEWS = "org.apache.myfaces.application.viewstate.ServerSideStateCacheImpl.SERIALIZED_VIEW";
+	private static final String MYFACES_VIEW_SCOPE_PROVIDER = "org.apache.myfaces.spi.ViewScopeProvider.INSTANCE";
 
 	private static final String ERROR_MAX_AGE =
 		"The '%s' init param must be a number. Encountered an invalid value of '%s'.";
@@ -379,39 +383,47 @@ public final class Hacks {
 	public static void removeViewState(FacesContext context, String viewId) {
 		if (isMyFacesUsed()) {
 			ResponseStateManager stateManager = getRenderKit(context).getResponseStateManager();
-			String stateId = invokeMethod(stateManager, "getSavedState", context);
+			Object state = invokeMethod(stateManager, "getSavedState", context);
 
-			if (stateId != null) {
-				Object views = getSessionAttribute(context, MYFACES_SERIALIZED_VIEWS);
+			if (state instanceof String) {
+				Object viewCollection = getSessionAttribute(context, MYFACES_SERIALIZED_VIEWS);
 
-				if (views != null) {
-					Integer sequence = Integer.valueOf(stateId, Character.MAX_RADIX);
+				if (viewCollection != null) {
 					Object stateCache = invokeMethod(stateManager, "getStateCache", context);
-					Object K = invokeMethod(invokeMethod(stateCache, "getSessionViewStorageFactory"), "createSerializedViewKey", context, viewId, sequence);
+					Integer stateId = invokeMethod(stateCache, "getServerStateId", context, state);
+					Serializable key = invokeMethod(invokeMethod(stateCache, "getSessionViewStorageFactory"), "createSerializedViewKey", context, viewId, stateId);
 
-					// Non-nullable fields.
-					List<?> keys = accessField(views, "_keys"); // List<K>
-					Map<Object, Object> states = accessField(views, "_serializedViews"); // Map<K, view>
-					Map<Object, Object> precedence = accessField(views, "_precedence"); // Map<K, K>
+					List<Serializable> keys = accessField(viewCollection, "_keys");
+					Map<Serializable, Object> serializedViews = accessField(viewCollection, "_serializedViews");
+					Map<Serializable, Serializable> precedence = accessField(viewCollection, "_precedence");
 
-					synchronized (views) { // Those fields are not concurrent maps.
-						keys.remove(K);
-						states.remove(K);
-						precedence.remove(K);
-						precedence.values().remove(K);
+					synchronized (viewCollection) { // Those fields are not concurrent maps.
+						keys.remove(key);
+						serializedViews.remove(key);
+						Serializable previousKey = precedence.remove(key);
 
-						// Nullable fields.
-						Map<Object, String> ids = accessField(views, "_viewScopeIds"); // Map<K, String>
-						Map<String, Object> lastKeys = accessField(views, "_lastWindowKeys"); // Map<String, K>
-
-						if (ids != null) {
-							Map<Object, Integer> counts = accessField(views, "_viewScopeIdCounts"); // Map<viewScopeId, Integer>
-							Object id = ids.remove(K);
-							counts.put(id, counts.get(id) - 1);
+						if (previousKey != null) {
+							for (Entry<Serializable, Serializable> entry : precedence.entrySet()) {
+								if (entry.getValue().equals(key)) {
+									entry.setValue(previousKey);
+								}
+							}
 						}
 
-						if (lastKeys != null) {
-							lastKeys.values().remove(K);
+						Map<Serializable, String> viewScopeIds = accessField(viewCollection, "_viewScopeIds");
+
+						if (viewScopeIds != null) {
+							String viewScopeId = viewScopeIds.remove(key);
+							Map<String, Integer> viewScopeIdCounts = accessField(viewCollection, "_viewScopeIdCounts");
+							int count = viewScopeIdCounts.get(viewScopeId) - 1;
+
+							if (count < 1) {
+								viewScopeIdCounts.remove(viewScopeId);
+								invokeMethod(getApplicationAttribute(context, MYFACES_VIEW_SCOPE_PROVIDER), "destroyViewScopeMap", context, viewScopeId);
+							}
+							else {
+								viewScopeIdCounts.put(viewScopeId, count);
+							}
 						}
 					}
 				}
@@ -421,7 +433,7 @@ public final class Hacks {
 			Map<String, Object> views = getSessionAttribute(context, MOJARRA_SERIALIZED_VIEWS);
 
 			if (views != null) {
-				views.remove(context.getAttributes().get(MOJARRA_SERIALIZED_VIEW_ID));
+				views.remove(context.getAttributes().get(MOJARRA_SERIALIZED_VIEW_KEY));
 			}
 		}
 	}
