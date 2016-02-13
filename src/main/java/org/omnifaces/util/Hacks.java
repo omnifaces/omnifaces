@@ -385,47 +385,53 @@ public final class Hacks {
 			ResponseStateManager stateManager = getRenderKit(context).getResponseStateManager();
 			Object state = invokeMethod(stateManager, "getSavedState", context);
 
-			if (state instanceof String) {
-				Object viewCollection = getSessionAttribute(context, MYFACES_SERIALIZED_VIEWS);
+			if (!(state instanceof String)) {
+				return;
+			}
 
-				if (viewCollection != null) {
-					Object stateCache = invokeMethod(stateManager, "getStateCache", context);
-					Integer stateId = invokeMethod(stateCache, "getServerStateId", context, state);
-					Serializable key = invokeMethod(invokeMethod(stateCache, "getSessionViewStorageFactory"), "createSerializedViewKey", context, viewId, stateId);
+			Object viewCollection = getSessionAttribute(context, MYFACES_SERIALIZED_VIEWS);
 
-					List<Serializable> keys = accessField(viewCollection, "_keys");
-					Map<Serializable, Object> serializedViews = accessField(viewCollection, "_serializedViews");
-					Map<Serializable, Serializable> precedence = accessField(viewCollection, "_precedence");
+			if (viewCollection == null) {
+				return;
+			}
 
-					synchronized (viewCollection) { // Those fields are not concurrent maps.
-						keys.remove(key);
-						serializedViews.remove(key);
-						Serializable previousKey = precedence.remove(key);
+			Object stateCache = invokeMethod(stateManager, "getStateCache", context);
+			Integer stateId = invokeMethod(stateCache, "getServerStateId", context, state);
+			Serializable key = invokeMethod(invokeMethod(stateCache, "getSessionViewStorageFactory"), "createSerializedViewKey", context, viewId, stateId);
 
-						if (previousKey != null) {
-							for (Entry<Serializable, Serializable> entry : precedence.entrySet()) {
-								if (entry.getValue().equals(key)) {
-									entry.setValue(previousKey);
-								}
-							}
-						}
+			List<Serializable> keys = accessField(viewCollection, "_keys");
+			Map<Serializable, Object> serializedViews = accessField(viewCollection, "_serializedViews");
+			Map<Serializable, Serializable> precedence = accessField(viewCollection, "_precedence");
 
-						Map<Serializable, String> viewScopeIds = accessField(viewCollection, "_viewScopeIds");
+			synchronized (viewCollection) { // Those fields are not concurrent maps.
+				keys.remove(key);
+				serializedViews.remove(key);
+				Serializable previousKey = precedence.remove(key);
 
-						if (viewScopeIds != null) {
-							String viewScopeId = viewScopeIds.remove(key);
-							Map<String, Integer> viewScopeIdCounts = accessField(viewCollection, "_viewScopeIdCounts");
-							int count = viewScopeIdCounts.get(viewScopeId) - 1;
-
-							if (count < 1) {
-								viewScopeIdCounts.remove(viewScopeId);
-								invokeMethod(getApplicationAttribute(context, MYFACES_VIEW_SCOPE_PROVIDER), "destroyViewScopeMap", context, viewScopeId);
-							}
-							else {
-								viewScopeIdCounts.put(viewScopeId, count);
-							}
+				if (previousKey != null) {
+					for (Entry<Serializable, Serializable> entry : precedence.entrySet()) {
+						if (entry.getValue().equals(key)) {
+							entry.setValue(previousKey);
 						}
 					}
+				}
+
+				Map<Serializable, String> viewScopeIds = accessField(viewCollection, "_viewScopeIds");
+
+				if (viewScopeIds == null) {
+					return;
+				}
+
+				Map<String, Integer> viewScopeIdCounts = accessField(viewCollection, "_viewScopeIdCounts");
+				String viewScopeId = viewScopeIds.remove(key);
+				int count = viewScopeIdCounts.get(viewScopeId) - 1;
+
+				if (count < 1) {
+					viewScopeIdCounts.remove(viewScopeId);
+					invokeMethod(getApplicationAttribute(context, MYFACES_VIEW_SCOPE_PROVIDER), "destroyViewScopeMap", context, viewScopeId);
+				}
+				else {
+					viewScopeIdCounts.put(viewScopeId, count);
 				}
 			}
 		}
