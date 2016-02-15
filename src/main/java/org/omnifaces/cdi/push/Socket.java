@@ -131,6 +131,11 @@ import org.omnifaces.util.Json;
  * &lt;o:socket channel="someChannel" scope="session" ... /&gt;
  * </pre>
  * <p>
+ * Or to <code>view</code> to restrict the push messages to the current view only.
+ * <pre>
+ * &lt;o:socket channel="someChannel" scope="view" ... /&gt;
+ * </pre>
+ * <p>
  * In case your server is configured to run WS container on a different TCP port than the HTTP container, then you can
  * use the <code>port</code> attribute to explicitly specify the port.
  * <pre>
@@ -308,8 +313,8 @@ import org.omnifaces.util.Json;
  * Note that a request scoped bean wouldn't be the same one as from the originating page for the simple reason that
  * there's no means of a HTTP request anywhere at that moment. For exactly this reason a view and session scoped bean
  * would not work at all (as they require respectively the JSF view state and HTTP session which can only be identified
- * by a HTTP request). A session scoped push socket would also not work at all (so the push socket really needs to be
- * application scoped). The {@link FacesContext} will also be unavailable in the method.
+ * by a HTTP request). A view and session scoped push socket would also not work at all (so the push socket really needs
+ * to be application scoped). The {@link FacesContext} will also be unavailable in the method.
  * <p>
  * In case the trigger in EAR/EJB side is in turn initiated in WAR side, then you could make use of callbacks from WAR
  * side. Let the business service method take a callback instance as argument, e.g. {@link Runnable}.
@@ -339,8 +344,8 @@ import org.omnifaces.util.Json;
  * }
  * </pre>
  * <p>
- * This would be the only way in case you intend to asynchronously send a message to a session scoped push socket,
- * and/or want to pass something from {@link FacesContext} or the initial request/view/session scope along as
+ * This would be the only way in case you intend to asynchronously send a message to a view or session scoped push
+ * socket, and/or want to pass something from {@link FacesContext} or the initial request/view/session scope along as
  * (<code>final</code>) argument.
  * <p>
  * Note that OmniFaces own {@link Callback} interfaces are insuitable as you're not supposed to use WAR (front end)
@@ -408,7 +413,7 @@ public class Socket extends TagHandler {
 			+ " It may only contain alphanumeric characters, hyphens, underscores, periods.";
 	private static final String ERROR_INVALID_SCOPE =
 		"o:socket 'scope' attribute '%s' does not represent a valid scope."
-			+ " Allowed values are 'application' and 'session', case insensitive. The default is 'application'.";
+			+ " Allowed values are 'application', 'session' and 'view', case insensitive. The default is 'application'.";
 	private static final String ERROR_DUPLICATE_CHANNEL =
 		"o:socket channel '%s' is already registered on a different scope. Choose an unique channel name for a"
 			+ " different channel (or shutdown all browsers and restart the server if you were just testing).";
@@ -446,7 +451,7 @@ public class Socket extends TagHandler {
 	 * @throws IllegalStateException When the web socket endpoint is not enabled in <code>web.xml</code>.
 	 * @throws IllegalArgumentException When the channel name or scope is invalid.
 	 * The channel name may only contain alphanumeric characters, hyphens, underscores and periods.
-	 * The allowed channel scope values are "application" and "session", case insensitive.
+	 * The allowed channel scope values are "application", "session" and "view", case insensitive.
 	 * The channel name must be uniquely tied to the channel scope.
 	 */
 	@Override

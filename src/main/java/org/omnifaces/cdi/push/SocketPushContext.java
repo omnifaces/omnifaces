@@ -12,16 +12,17 @@
  */
 package org.omnifaces.cdi.push;
 
+import static java.util.Collections.emptyMap;
 import static org.omnifaces.cdi.push.SocketChannelManager.getChannelId;
 import static org.omnifaces.util.Beans.isActive;
 
-import java.util.Collections;
 import java.util.Map;
 
 import javax.enterprise.context.SessionScoped;
 
 import org.omnifaces.cdi.Push;
 import org.omnifaces.cdi.PushContext;
+import org.omnifaces.util.Faces;
 
 /**
  * <p>
@@ -37,29 +38,32 @@ public class SocketPushContext implements PushContext {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final long serialVersionUID = 1L;
+	private static final Map<String, String> EMPTY_SCOPE = emptyMap();
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private String channel;
 	private Map<String, String> sessionScopeIds;
+	private Map<String, String> viewScopeIds;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Creates a socket push context whereby the mutable map of session scope channel identifiers is referenced, so it's
-	 * still available when another thread invokes {@link #send(Object)} during which the session scope is not
-	 * necessarily active anymore.
+	 * Creates a socket push context whereby the mutable map of session and view scope channel identifiers is
+	 * referenced, so it's still available when another thread invokes {@link #send(Object)} during which the session
+	 * and view scope is not necessarily active anymore.
 	 */
 	SocketPushContext(String channel, SocketChannelManager manager) {
 		this.channel = channel;
-		sessionScopeIds = isActive(SessionScoped.class) ? manager.getSessionScopeIds() : Collections.<String, String>emptyMap();
+		sessionScopeIds = isActive(SessionScoped.class) ? manager.getSessionScopeIds() : EMPTY_SCOPE;
+		viewScopeIds = Faces.hasContext() ? SocketChannelManager.getViewScopeIds() : EMPTY_SCOPE;
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
 	public void send(Object message) {
-		SocketManager.getInstance().send(getChannelId(channel, sessionScopeIds), message);
+		SocketManager.getInstance().send(getChannelId(channel, sessionScopeIds, viewScopeIds), message);
 	}
 
 }
