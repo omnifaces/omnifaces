@@ -115,7 +115,7 @@ public class RestorableViewHandler extends ViewHandlerWrapper { // TODO: rename 
 	private boolean restoreViewRootState(FacesContext context, ResponseStateManager manager, UIViewRoot view) {
 		Object[] state = (Object[]) manager.getState(context, view.getViewId());
 
-		if (state == null) {
+		if (state == null || state.length < 2 || !(state[1] instanceof Map)) {
 			return false;
 		}
 
