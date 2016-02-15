@@ -15,7 +15,6 @@ package org.omnifaces.util;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getContextAttribute;
 import static org.omnifaces.util.FacesLocal.getInitParameter;
-import static org.omnifaces.util.FacesLocal.getRenderKit;
 import static org.omnifaces.util.FacesLocal.getSessionAttribute;
 import static org.omnifaces.util.FacesLocal.setContextAttribute;
 import static org.omnifaces.util.Reflection.findMethod;
@@ -377,13 +376,13 @@ public final class Hacks {
 	/**
 	 * Remove server side JSF view state associated with current request.
 	 * @param context The involved faces context.
+	 * @param manager The involved response state manager.
 	 * @param viewId The view ID of the involved view.
 	 * @since 2.3
 	 */
-	public static void removeViewState(FacesContext context, String viewId) {
+	public static void removeViewState(FacesContext context, ResponseStateManager manager, String viewId) {
 		if (isMyFacesUsed()) {
-			ResponseStateManager stateManager = getRenderKit(context).getResponseStateManager();
-			Object state = invokeMethod(stateManager, "getSavedState", context);
+			Object state = invokeMethod(manager, "getSavedState", context);
 
 			if (!(state instanceof String)) {
 				return;
@@ -395,7 +394,7 @@ public final class Hacks {
 				return;
 			}
 
-			Object stateCache = invokeMethod(stateManager, "getStateCache", context);
+			Object stateCache = invokeMethod(manager, "getStateCache", context);
 			Integer stateId = invokeMethod(stateCache, "getServerStateId", context, state);
 			Serializable key = invokeMethod(invokeMethod(stateCache, "getSessionViewStorageFactory"), "createSerializedViewKey", context, viewId, stateId);
 
