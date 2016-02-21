@@ -12,6 +12,7 @@
  */
 package org.omnifaces.cdi.push;
 
+import static java.util.Collections.emptySet;
 import static java.util.Collections.synchronizedSet;
 import static javax.websocket.CloseReason.CloseCodes.GOING_AWAY;
 import static org.omnifaces.cdi.push.SocketEndpoint.PARAM_CHANNEL;
@@ -23,6 +24,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.websocket.CloseReason;
@@ -98,26 +101,29 @@ public class SocketSessionManager {
 	 * socket channel identifier.
 	 * @param channelId The web socket channel identifier.
 	 * @param message The push message object.
-	 * @return <code>true</code> if the message is "successfully" sent to at least one open channel.
+	 * @return The results of the send operation. If it returns an empty set, then there was no open session associated
+	 * with given channel identifier. The returned futures will return <code>null</code> on {@link Future#get()} if the
+	 * message was successfully delivered and otherwise throw {@link ExecutionException}.
 	 */
-	public boolean send(String channelId, Object message) {
+	public Set<Future<Void>> send(String channelId, Object message) {
 		Set<Session> sessions = (channelId != null) ? SESSIONS.get(channelId) : null;
-		boolean sent = false;
 
 		if (!isEmpty(sessions)) {
+			Set<Future<Void>> results = new HashSet<>(sessions.size());
 			String json = Json.encode(message);
 
 			synchronized(sessions) {
 				for (Session session : sessions) {
 					if (session.isOpen()) {
-						session.getAsyncRemote().sendText(json);
-						sent = true;
+						results.add(session.getAsyncRemote().sendText(json));
 					}
 				}
 			}
+
+			return results;
 		}
 
-		return sent;
+		return emptySet();
 	}
 
 	/**

@@ -18,7 +18,11 @@ import static org.omnifaces.util.Beans.isActive;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Future;
 
 import javax.enterprise.context.SessionScoped;
 
@@ -64,24 +68,32 @@ public class SocketPushContext implements PushContext {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
-	public void send(Object message) {
-		SocketSessionManager.getInstance().send(SocketChannelManager.getChannelId(channel, sessionScopeIds, viewScopeIds), message);
+	public Set<Future<Void>> send(Object message) {
+		return SocketSessionManager.getInstance().send(SocketChannelManager.getChannelId(channel, sessionScopeIds, viewScopeIds), message);
 	}
 
 	@Override
-	public void send(Object message, Serializable user) {
-		send(message, asList(user));
+	public Set<Future<Void>> send(Object message, Serializable user) {
+		return send(message, asList(user)).get(user);
 	}
 
 	@Override
-	public void send(Object message, Collection<Serializable> users) {
+	public Map<Serializable, Set<Future<Void>>> send(Object message, Collection<Serializable> users) {
 		SocketSessionManager manager = SocketSessionManager.getInstance();
+		Map<Serializable, Set<Future<Void>>> resultsByUser = new HashMap<>(users.size());
 
 		for (Serializable user : users) {
-			for (String channelId : SocketChannelManager.getUserChannelIds(user, channel)) {
-				manager.send(channelId, message);
+			Set<String> userChannelIds = SocketChannelManager.getUserChannelIds(user, channel);
+			Set<Future<Void>> results = new HashSet<>(userChannelIds.size());
+
+			for (String channelId : userChannelIds) {
+				results.addAll(manager.send(channelId, message));
 			}
+
+			resultsByUser.put(user, results);
 		}
+
+		return resultsByUser;
 	}
 
 }

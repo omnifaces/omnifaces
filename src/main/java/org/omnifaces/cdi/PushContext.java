@@ -14,6 +14,10 @@ package org.omnifaces.cdi;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import org.omnifaces.cdi.push.Socket;
 import org.omnifaces.util.Json;
@@ -43,10 +47,13 @@ public interface PushContext extends Serializable {
 	 * The message object will be encoded as JSON and be available as first argument of the JavaScript listener function
 	 * declared in <code>&lt;o:socket onmessage&gt;</code>.
 	 * @param message The push message object.
+	 * @return The results of the send operation. If it returns an empty set, then there was no open web socket session
+	 * associated with given socket channel. The returned futures will return <code>null</code> on {@link Future#get()}
+	 * if the message was successfully delivered and otherwise throw {@link ExecutionException}.
 	 * @throws IllegalArgumentException If given message object cannot be encoded as JSON.
 	 * @see Json#encode(Object)
 	 */
-	public void send(Object message);
+	public Set<Future<Void>> send(Object message);
 
 	/**
 	 * Send given message object to the push socket channel as identified by {@link Push}, targeted to the given user as
@@ -55,10 +62,13 @@ public interface PushContext extends Serializable {
 	 * declared in <code>&lt;o:socket onmessage&gt;</code>.
 	 * @param message The push message object.
 	 * @param user The user to which the push message object must be delivered to.
+	 * @return The results of the send operation. If it returns an empty set, then there was no open web socket session
+	 * associated with given socket channel and user. The returned futures will return <code>null</code> on
+	 * {@link Future#get()} if the message was successfully delivered and otherwise throw {@link ExecutionException}.
 	 * @throws IllegalArgumentException If given message object cannot be encoded as JSON.
 	 * @see Json#encode(Object)
 	 */
-	public void send(Object message, Serializable user);
+	public Set<Future<Void>> send(Object message, Serializable user);
 
 	/**
 	 * Send given message object to the push socket channel as identified by {@link Push}, targeted to the given users
@@ -67,9 +77,13 @@ public interface PushContext extends Serializable {
 	 * declared in <code>&lt;o:socket onmessage&gt;</code>.
 	 * @param message The push message object.
 	 * @param users The users to which the push message object must be delivered to.
+	 * @return The results of the send operation grouped by user. If it contains an empty set, then there was no open
+	 * web socket session associated with given socket channel and user. The returned futures will return
+	 * <code>null</code> on {@link Future#get()} if the message was successfully delivered and otherwise throw
+	 * {@link ExecutionException}.
 	 * @throws IllegalArgumentException If given message object cannot be encoded as JSON.
 	 * @see Json#encode(Object)
 	 */
-	public void send(Object message, Collection<Serializable> users);
+	public Map<Serializable, Set<Future<Void>>> send(Object message, Collection<Serializable> users);
 
 }
