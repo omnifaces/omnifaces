@@ -4781,6 +4781,7 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 			<![CDATA[
 				Opens an one-way (server to client) web socket based push connection in client side which can be reached from
 				server side via <code>PushContext</code> interface injected in any CDI/container managed artifact.
+				For detailed usage instructions, see <code>Socket</code> javadoc.
 			]]>
 		</description>
 		<tag-name>socket</tag-name>
@@ -4815,12 +4816,25 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 					Allowed values are <code>application</code> and <code>session</code>, case insensitive.
 					When the value is <code>application</code>, then all channels with the same name throughout the application will receive the same push message.
 					When the value is <code>session</code>, then only the channels with the same name in the current user session will receive the same push message.
-					The default value is <code>application</code>.
+					The default scope is <code>application</code>.
+					When the <code>user</code> attribute is specified, then the default scope is <code>session</code>.
 				]]>
 			</description>
 			<name>scope</name>
 			<required>false</required>
 			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The user identifier of the web socket channel, so that user-targeted push messages can be sent.
+					It must implement <code>Serializable</code> and preferably have low memory footprint.
+					Suggestion: use <code>#{request.remoteUser}</code> or <code>#{someLoggedInUser.id}</code>.
+				]]>
+			</description>
+			<name>user</name>
+			<required>false</required>
+			<type>java.io.Serializable</type>
 		</attribute>
 		<attribute>
 			<description>

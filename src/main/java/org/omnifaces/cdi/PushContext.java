@@ -13,6 +13,7 @@
 package org.omnifaces.cdi;
 
 import java.io.Serializable;
+import java.util.Collection;
 
 import org.omnifaces.cdi.push.Socket;
 import org.omnifaces.util.Json;
@@ -38,13 +39,37 @@ public interface PushContext extends Serializable {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Send given message object to the push socket channel as identified by {@link Push}. This will be encoded as JSON
-	 * and be available as first argument of the JavaScript listener function declared in
-	 * <code>&lt;o:socket onmessage&gt;</code>.
+	 * Send given message object to the push socket channel as identified by {@link Push}.
+	 * The message object will be encoded as JSON and be available as first argument of the JavaScript listener function
+	 * declared in <code>&lt;o:socket onmessage&gt;</code>.
 	 * @param message The push message object.
 	 * @throws IllegalArgumentException If given message object cannot be encoded as JSON.
 	 * @see Json#encode(Object)
 	 */
 	public void send(Object message);
+
+	/**
+	 * Send given message object to the push socket channel as identified by {@link Push}, targeted to the given user as
+	 * identified by <code>&lt;o:socket user&gt;</code>.
+	 * The message object will be encoded as JSON and be available as first argument of the JavaScript listener function
+	 * declared in <code>&lt;o:socket onmessage&gt;</code>.
+	 * @param message The push message object.
+	 * @param user The user to which the push message object must be delivered to.
+	 * @throws IllegalArgumentException If given message object cannot be encoded as JSON.
+	 * @see Json#encode(Object)
+	 */
+	public void send(Object message, Serializable user);
+
+	/**
+	 * Send given message object to the push socket channel as identified by {@link Push}, targeted to the given users
+	 * as identified by <code>&lt;o:socket user&gt;</code>.
+	 * The message object will be encoded as JSON and be available as first argument of the JavaScript listener function
+	 * declared in <code>&lt;o:socket onmessage&gt;</code>.
+	 * @param message The push message object.
+	 * @param users The users to which the push message object must be delivered to.
+	 * @throws IllegalArgumentException If given message object cannot be encoded as JSON.
+	 * @see Json#encode(Object)
+	 */
+	public void send(Object message, Collection<Serializable> users);
 
 }

@@ -16,6 +16,7 @@ import static java.util.Collections.synchronizedSet;
 import static javax.websocket.CloseReason.CloseCodes.GOING_AWAY;
 import static org.omnifaces.cdi.push.SocketEndpoint.PARAM_CHANNEL;
 import static org.omnifaces.util.Beans.getReference;
+import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -31,7 +32,7 @@ import org.omnifaces.util.Json;
 
 /**
  * <p>
- * The web socket manager. It holds all web socket sessions by their channel identifier.
+ * The web socket session manager. It holds all web socket sessions by their channel identifier.
  *
  * @author Bauke Scholtz
  * @see SocketEndpoint
@@ -101,7 +102,7 @@ public class SocketManager {
 	public void send(String channelId, Object message) {
 		Set<Session> sessions = (channelId != null) ? SESSIONS.get(channelId) : null;
 
-		if (sessions == null) {
+		if (isEmpty(sessions)) {
 			return; // TODO: Log warning? In any case, push is usually just "fire and forget".
 		}
 

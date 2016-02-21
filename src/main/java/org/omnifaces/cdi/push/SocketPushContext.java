@@ -12,10 +12,12 @@
  */
 package org.omnifaces.cdi.push;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
-import static org.omnifaces.cdi.push.SocketChannelManager.getChannelId;
 import static org.omnifaces.util.Beans.isActive;
 
+import java.io.Serializable;
+import java.util.Collection;
 import java.util.Map;
 
 import javax.enterprise.context.SessionScoped;
@@ -63,7 +65,23 @@ public class SocketPushContext implements PushContext {
 
 	@Override
 	public void send(Object message) {
-		SocketManager.getInstance().send(getChannelId(channel, sessionScopeIds, viewScopeIds), message);
+		SocketManager.getInstance().send(SocketChannelManager.getChannelId(channel, sessionScopeIds, viewScopeIds), message);
+	}
+
+	@Override
+	public void send(Object message, Serializable user) {
+		send(message, asList(user));
+	}
+
+	@Override
+	public void send(Object message, Collection<Serializable> users) {
+		SocketManager manager = SocketManager.getInstance();
+
+		for (Serializable user : users) {
+			for (String channelId : SocketChannelManager.getUserChannelIds(user, channel)) {
+				manager.send(channelId, message);
+			}
+		}
 	}
 
 }

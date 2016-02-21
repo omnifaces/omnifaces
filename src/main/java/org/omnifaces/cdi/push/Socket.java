@@ -22,6 +22,8 @@ import static org.omnifaces.util.Facelets.getValueExpression;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.Collection;
 import java.util.regex.Pattern;
 
 import javax.el.ValueExpression;
@@ -124,17 +126,6 @@ import org.omnifaces.util.Json;
  * <li><code>event</code>: the raw <a href="https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent"><code>
  * CloseEvent</code></a> instance, useful in case you intend to inspect it.</li>
  * </ul>
- * <p>By default the web socket is application scoped, i.e. any view/session throughout the web application having the
- * same web socket channel open will receive the same push message. The optional <code>scope</code> attribute can be set
- * to <code>session</code> to restrict the push messages to all views in the current user session only.
- * <pre>
- * &lt;o:socket channel="someChannel" scope="session" ... /&gt;
- * </pre>
- * <p>
- * Or to <code>view</code> to restrict the push messages to the current view only.
- * <pre>
- * &lt;o:socket channel="someChannel" scope="view" ... /&gt;
- * </pre>
  * <p>
  * In case your server is configured to run WS container on a different TCP port than the HTTP container, then you can
  * use the <code>port</code> attribute to explicitly specify the port.
@@ -178,6 +169,59 @@ import org.omnifaces.util.Json;
  * state, the HTTP session and, importantingly, all security constraints on business service methods. Namely, those are
  * not available during an incoming web socket message per se. See also a.o.
  * <a href="https://java.net/jira/browse/WEBSOCKET_SPEC-238">WS spec issue 238</a>.
+ *
+ *
+ * <h3>Scopes and users</h3>
+ * <p>
+ * By default the web socket is application scoped, i.e. any view/session throughout the web application having the
+ * same web socket channel open will receive the same push message. This is useful for application-wide feedback
+ * triggered by site itself. The optional <code>scope</code> attribute can be set to <code>session</code> to restrict
+ * the push messages to all views in the current user session only. This is useful for session-wide feedback triggered
+ * by user itself (e.g. asynchronous updates tied to user specific action).
+ * <pre>
+ * &lt;o:socket channel="someChannel" scope="session" ... /&gt;
+ * </pre>
+ * <p>
+ * Or to <code>view</code> to restrict the push messages to the current view only. This is useful for view-wide feedback
+ * triggered by user itself (e.g. progress bar tied to a view specific action).
+ * <pre>
+ * &lt;o:socket channel="someChannel" scope="view" ... /&gt;
+ * </pre>
+ * <p>
+ * Additionally, the optional <code>user</code> attribute can be set to the unique user identifier, usually the login
+ * name or the user ID. It must at least implement {@link Serializable} and have a low memory footprint, so putting
+ * entire user entity is discouraged.
+ * <pre>
+ * &lt;o:socket channel="someChannel" user="#{request.remoteUser}" ... /&gt;
+ * </pre>
+ * <pre>
+ * &lt;o:socket channel="someChannel" user="#{someLoggedInUser.id}" ... /&gt;
+ * </pre>
+ * <p>
+ * When the <code>user</code> attribute is specified, then the <code>scope</code> defaults to <code>session</code> and
+ * cannot be set to <code>application</code>. It can be set to <code>view</code>, but this is kind of unusual and should
+ * only be used if the logged-in user represented by <code>user</code> is not session scoped but view scoped, otherwise
+ * undefined behavior may occur when the logged-in user changes during the same HTTP session without invalidating it.
+ * <p>
+ * In the server side, the push message can be targeted to the user via {@link PushContext#send(Object, Serializable)}.
+ * This is useful for user-specific feedback triggered by other users (e.g. chat).
+ * <pre>
+ * &#64;Inject &#64;Push
+ * private PushContext someChannel;
+ *
+ * public void sendMessage(Object message) {
+ *     someChannel.send(message, recipientUserId);
+ * }
+ * </pre>
+ * <p>
+ * Multiple users can be targeted by passing a {@link Collection} holding user identifiers to
+ * {@link PushContext#send(Object, Collection)}.
+ * <pre>
+ * public void sendMessage(Object message) {
+ *     Collection&lt;Serializable&gt; userIds = group.getUserIds();
+ *     someChannel.send(message, userIds);
+ * }
+ * </pre>
  *
  *
  * <h3>Conditionally connecting socket</h3>
@@ -409,11 +453,15 @@ public class Socket extends TagHandler {
 		"o:socket endpoint is not enabled."
 			+ " You need to set web.xml context param '" + PARAM_ENABLE_SOCKET_ENDPOINT + "' with value 'true'.";
 	private static final String ERROR_INVALID_CHANNEL =
-		"o:socket 'channel' attribute '%s' does not represent a valid channel name."
-			+ " It may only contain alphanumeric characters, hyphens, underscores, periods.";
+		"o:socket 'channel' attribute '%s' does not represent a valid channel name. It may not be an EL expression and"
+			+ " it may only contain alphanumeric characters, hyphens, underscores and periods.";
 	private static final String ERROR_INVALID_SCOPE =
-		"o:socket 'scope' attribute '%s' does not represent a valid scope."
-			+ " Allowed values are 'application', 'session' and 'view', case insensitive. The default is 'application'.";
+		"o:socket 'scope' attribute '%s' does not represent a valid scope. It may not be an EL expression and allowed"
+			+ " values are 'application', 'session' and 'view', case insensitive. The default is 'application'. When"
+			+ " 'user' attribute is specified, then scope defaults to 'session' and may not be 'application'.";
+	private static final String ERROR_INVALID_USER =
+		"o:socket 'user' attribute '%s' does not represent a valid user identifier. It must implement Serializable and"
+			+ " preferably have low memory footprint. Suggestion: use #{request.remoteUser} or #{someLoggedInUser.id}.";
 	private static final String ERROR_DUPLICATE_CHANNEL =
 		"o:socket channel '%s' is already registered on a different scope. Choose an unique channel name for a"
 			+ " different channel (or shutdown all browsers and restart the server if you were just testing).";
@@ -423,6 +471,7 @@ public class Socket extends TagHandler {
 	private TagAttribute port;
 	private TagAttribute channel;
 	private TagAttribute scope;
+	private TagAttribute user;
 	private TagAttribute onmessage;
 	private TagAttribute onclose;
 	private TagAttribute connected;
@@ -438,6 +487,7 @@ public class Socket extends TagHandler {
 		port = getAttribute("port");
 		channel = getRequiredAttribute("channel");
 		scope = getAttribute("scope");
+		user = getAttribute("user");
 		onmessage = getRequiredAttribute("onmessage");
 		onclose = getAttribute("onclose");
 		connected = getAttribute("connected");
@@ -449,10 +499,11 @@ public class Socket extends TagHandler {
 	 * First check if the web socket endpoint is enabled in <code>web.xml</code> and the channel name and scope is
 	 * valid, then subcribe the {@link SocketEventListener}.
 	 * @throws IllegalStateException When the web socket endpoint is not enabled in <code>web.xml</code>.
-	 * @throws IllegalArgumentException When the channel name or scope is invalid.
+	 * @throws IllegalArgumentException When the channel name, scope or user is invalid.
 	 * The channel name may only contain alphanumeric characters, hyphens, underscores and periods.
 	 * The allowed channel scope values are "application", "session" and "view", case insensitive.
 	 * The channel name must be uniquely tied to the channel scope.
+	 * The user, if any, must implement <code>Serializable</code>.
 	 */
 	@Override
 	public void apply(FaceletContext context, UIComponent parent) throws IOException {
@@ -464,18 +515,24 @@ public class Socket extends TagHandler {
 			throw new IllegalStateException(ERROR_ENDPOINT_NOT_ENABLED);
 		}
 
-		String channelName = channel.getValue(context);
+		String channelName = channel.isLiteral() ? channel.getValue(context) : null;
 
-		if (!PATTERN_CHANNEL.matcher(channelName).matches()) {
+		if (channelName == null || !PATTERN_CHANNEL.matcher(channelName).matches()) {
 			throw new IllegalArgumentException(String.format(ERROR_INVALID_CHANNEL, channelName));
 		}
 
+		Object userObject = getObject(context, user);
+
+		if (userObject != null && !(userObject instanceof Serializable)) {
+			throw new IllegalArgumentException(String.format(ERROR_INVALID_USER, userObject));
+		}
+
 		SocketChannelManager channelManager = getReference(SocketChannelManager.class);
-		String scopeName = getString(context, scope);
+		String scopeName = (scope == null) ? null : scope.isLiteral() ? getString(context, scope) : "";
 		String channelId;
 
 		try {
-			channelId = channelManager.register(channelName, scopeName);
+			channelId = channelManager.register(channelName, scopeName, (Serializable) userObject);
 		}
 		catch (IllegalArgumentException ignore) {
 			throw new IllegalArgumentException(String.format(ERROR_INVALID_SCOPE, scopeName));
