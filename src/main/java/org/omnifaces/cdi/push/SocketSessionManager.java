@@ -39,13 +39,13 @@ import org.omnifaces.util.Json;
  * @since 2.3
  */
 @ApplicationScoped
-public class SocketManager {
+public class SocketSessionManager {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final ConcurrentMap<String, Set<Session>> SESSIONS = new ConcurrentHashMap<>();
 	private static final CloseReason REASON_SESSION_EXPIRED = new CloseReason(GOING_AWAY, "Session expired");
-	private static SocketManager instance;
+	private static SocketSessionManager instance;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -53,9 +53,9 @@ public class SocketManager {
 	 * Returns the CDI managed instance of this class.
 	 * @return The CDI managed instance of this class.
 	 */
-	public static SocketManager getInstance() {
+	public static SocketSessionManager getInstance() {
 		if (instance == null) {
-			instance = getReference(SocketManager.class); // Awkward workaround for it being unavailable via @Inject in endpoint in Tomcat+Weld/OWB.
+			instance = getReference(SocketSessionManager.class); // Awkward workaround for it being unavailable via @Inject in endpoint in Tomcat+Weld/OWB.
 		}
 
 		return instance;
@@ -98,23 +98,26 @@ public class SocketManager {
 	 * socket channel identifier.
 	 * @param channelId The web socket channel identifier.
 	 * @param message The push message object.
+	 * @return <code>true</code> if the message is "successfully" sent to at least one open channel.
 	 */
-	public void send(String channelId, Object message) {
+	public boolean send(String channelId, Object message) {
 		Set<Session> sessions = (channelId != null) ? SESSIONS.get(channelId) : null;
+		boolean sent = false;
 
-		if (isEmpty(sessions)) {
-			return; // TODO: Log warning? In any case, push is usually just "fire and forget".
-		}
+		if (!isEmpty(sessions)) {
+			String json = Json.encode(message);
 
-		String json = Json.encode(message);
-
-		synchronized(sessions) {
-			for (Session session : sessions) {
-				if (session.isOpen()) {
-					session.getAsyncRemote().sendText(json);
+			synchronized(sessions) {
+				for (Session session : sessions) {
+					if (session.isOpen()) {
+						session.getAsyncRemote().sendText(json);
+						sent = true;
+					}
 				}
 			}
 		}
+
+		return sent;
 	}
 
 	/**

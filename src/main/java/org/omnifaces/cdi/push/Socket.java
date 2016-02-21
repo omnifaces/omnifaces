@@ -433,7 +433,7 @@ import org.omnifaces.util.Json;
  * @see SocketEndpoint
  * @see SocketChannelManager
  * @see SocketEventListener
- * @see SocketManager
+ * @see SocketSessionManager
  * @see Push
  * @see PushContext
  * @see SocketPushContext

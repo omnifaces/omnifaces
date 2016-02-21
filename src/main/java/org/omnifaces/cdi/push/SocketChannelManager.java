@@ -82,7 +82,7 @@ public class SocketChannelManager implements Serializable {
 	private ConcurrentMap<Serializable, String> sessionUserIds = new ConcurrentHashMap<>(1); // A session can have more than one user (bad security practice, but technically not impossible).
 
 	@Inject
-	private SocketManager manager;
+	private SocketSessionManager manager;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -201,7 +201,7 @@ public class SocketChannelManager implements Serializable {
 
 		@Override
 		public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
-			SocketManager.getInstance().deregister(getViewScopeIds().values());
+			SocketSessionManager.getInstance().deregister(getViewScopeIds().values());
 		}
 
 	}
@@ -301,7 +301,7 @@ public class SocketChannelManager implements Serializable {
 			applicationUserChannelIds.put(userId, sessionUserChannelIds.get(userId));
 		}
 
-		// Below awkwardness is because SocketChannelManager can't be injected in SocketManager (the CDI session scope
+		// Below awkwardness is because SocketChannelManager can't be injected in SocketSessionManager (CDI session scope
 		// is not necessarily active during WS session). So it can't just ask us for channel IDs and we have to tell it.
 		// And, for application scope IDs we take benefit of session persistence to re-register them on server restart.
 		manager.register(sessionScopeIds.values());

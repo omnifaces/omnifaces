@@ -65,7 +65,7 @@ public class SocketPushContext implements PushContext {
 
 	@Override
 	public void send(Object message) {
-		SocketManager.getInstance().send(SocketChannelManager.getChannelId(channel, sessionScopeIds, viewScopeIds), message);
+		SocketSessionManager.getInstance().send(SocketChannelManager.getChannelId(channel, sessionScopeIds, viewScopeIds), message);
 	}
 
 	@Override
@@ -75,7 +75,7 @@ public class SocketPushContext implements PushContext {
 
 	@Override
 	public void send(Object message, Collection<Serializable> users) {
-		SocketManager manager = SocketManager.getInstance();
+		SocketSessionManager manager = SocketSessionManager.getInstance();
 
 		for (Serializable user : users) {
 			for (String channelId : SocketChannelManager.getUserChannelIds(user, channel)) {
