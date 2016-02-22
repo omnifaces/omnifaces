@@ -46,6 +46,8 @@ import javax.websocket.server.ServerEndpointConfig;
 
 import org.omnifaces.cdi.Push;
 import org.omnifaces.cdi.PushContext;
+import org.omnifaces.cdi.push.event.Closed;
+import org.omnifaces.cdi.push.event.Opened;
 import org.omnifaces.util.Callback;
 import org.omnifaces.util.Json;
 
@@ -268,6 +270,33 @@ import org.omnifaces.util.Json;
  * manually invoking <code>OmniFaces.Push</code> functions. Mixing them ends up in undefined behavior.
  *
  *
+ * <h3>Events</h3>
+ * <p>
+ * When a web socket has been opened, a new CDI {@link SocketEvent} will be fired with {@link Opened} qualifier.
+ * When a web socket has been closed, a new CDI {@link SocketEvent} will be fired with {@link Closed} qualifier.
+ * They can only be observed and collected in an application scoped CDI bean as below. A request scoped one is useless
+ * and a view/session scoped one wouldn't work as there's no means of a HTTP request anywhere at that moment.
+ * <pre>
+ * &#64;ApplicationScoped
+ * public class SocketObserver {
+ *
+ *     public void onOpen(&#64;Observes &#64;Opened SocketEvent event) {
+ *         String channel = event.getChannel(); // Returns &lt;o:socket channel&gt;.
+ *         Serializable user = event.getUser(); // Returns &lt;o:socket user&gt;, if any.
+ *         // Do your thing with it. E.g. collecting them in a concurrent/synchronized collection.
+ *         // Do note that a single person can open multiple sockets on same channel/user.
+ *     }
+ *
+ *     public void onClose(&#64;Observes &#64;Closed SocketEvent event) {
+ *         String channel = event.getChannel(); // Returns &lt;o:socket channel&gt;.
+ *         Serializable user = event.getUser(); // Returns &lt;o:socket user&gt;, if any.
+ *         // Do your thing with it. E.g. removing them from collection.
+ *     }
+ *
+ * }
+ * </pre>
+ *
+ *
  * <h3>Security considerations</h3>
  * <p>
  * If the socket is declared in a page which is only restricted to logged-in users with a specific role, then you may
@@ -434,6 +463,9 @@ import org.omnifaces.util.Json;
  * @see SocketChannelManager
  * @see SocketEventListener
  * @see SocketSessionManager
+ * @see SocketEvent
+ * @see Opened
+ * @see Closed
  * @see Push
  * @see PushContext
  * @see SocketPushContext

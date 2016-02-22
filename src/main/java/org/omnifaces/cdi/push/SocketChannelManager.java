@@ -12,6 +12,7 @@
  */
 package org.omnifaces.cdi.push;
 
+import static java.util.Collections.emptySet;
 import static java.util.Collections.synchronizedSet;
 import static org.omnifaces.util.Faces.getViewAttribute;
 import static org.omnifaces.util.Faces.getViewRoot;
@@ -38,6 +39,9 @@ import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.ComponentSystemEventListener;
 import javax.faces.event.PreDestroyViewMapEvent;
 import javax.inject.Inject;
+
+import org.omnifaces.cdi.push.event.Closed;
+import org.omnifaces.cdi.push.event.Opened;
 
 /**
  * <p>
@@ -124,22 +128,12 @@ public class SocketChannelManager implements Serializable {
 		if (user != null && !sessionUserIds.containsKey(user)) {
 			sessionUserIds.putIfAbsent(user, UUID.randomUUID().toString());
 			String userId = sessionUserIds.get(user);
-			registerApplicationUser(user, userId);
 			registerUserChannelId(userId, channel, channelId);
+			registerApplicationUser(user, userId);
 		}
 
 		manager.register(channelId);
 		return channelId;
-	}
-
-	private void registerApplicationUser(Serializable user, String userId) {
-		synchronized (applicationUserIds) {
-			if (!applicationUserIds.containsKey(user)) {
-				applicationUserIds.putIfAbsent(user, synchronizedSet(new HashSet<String>(1)));
-			}
-
-			applicationUserIds.get(user).add(userId);
-		}
 	}
 
 	private void registerUserChannelId(String userId, String channel, String channelId) {
@@ -156,8 +150,14 @@ public class SocketChannelManager implements Serializable {
 		channelIds.get(channel).add(channelId);
 	}
 
-	private void deregisterUserChannelIds(String userId) {
-		applicationUserChannelIds.remove(userId);
+	private void registerApplicationUser(Serializable user, String userId) {
+		synchronized (applicationUserIds) {
+			if (!applicationUserIds.containsKey(user)) {
+				applicationUserIds.putIfAbsent(user, synchronizedSet(new HashSet<String>(1)));
+			}
+
+			applicationUserIds.get(user).add(userId);
+		}
 	}
 
 	private void deregisterApplicationUser(Serializable user, String userId) {
@@ -169,6 +169,10 @@ public class SocketChannelManager implements Serializable {
 				applicationUserIds.remove(user);
 			}
 		}
+	}
+
+	private void deregisterUserChannelIds(String userId) {
+		applicationUserChannelIds.remove(userId);
 	}
 
 	/**
@@ -260,26 +264,50 @@ public class SocketChannelManager implements Serializable {
 
 		if (userIds != null) {
 			for (String userId : userIds) {
-				Map<String, Set<String>> userChannels = applicationUserChannelIds.get(userId);
-
-				if (userChannels != null) {
-					Set<String> channelIds = userChannels.get(channel);
-
-					if (channelIds != null) {
-						userChannelIds.addAll(channelIds);
-					}
-				}
+				userChannelIds.addAll(getApplicationUserChannelIds(userId, channel));
 			}
 		}
 
 		return userChannelIds;
 	}
 
+	/**
+	 * For internal usage only. This makes it possible to resolve the user associated with given channel ID during
+	 * firing the {@link Opened} and {@link Closed} events in {@link SocketSessionManager}.
+	 */
+	static Serializable getUser(String channel, String channelId) {
+		for (Entry<Serializable, Set<String>> applicationUserId : applicationUserIds.entrySet()) {
+			for (String userId : applicationUserId.getValue()) { // "Normally" this contains only 1 item, so it isn't that inefficient as it looks like.
+				if (getApplicationUserChannelIds(userId, channel).contains(channelId)) {
+					return applicationUserId.getKey();
+				}
+			}
+		}
+
+		return null;
+	}
+
+	private static Set<String> getApplicationUserChannelIds(String userId, String channel) {
+		Map<String, Set<String>> userChannels = applicationUserChannelIds.get(userId);
+
+		if (userChannels != null) {
+			Set<String> channelIds = userChannels.get(channel);
+
+			if (channelIds != null) {
+				return channelIds;
+			}
+		}
+
+		return emptySet();
+	}
+
 	// Serialization --------------------------------------------------------------------------------------------------
 
 	private void writeObject(ObjectOutputStream output) throws IOException {
 		output.defaultWriteObject();
-		output.writeObject(applicationScopeIds); // Just in case server restarts with session persistence.
+
+		// All of below is just in case server restarts with session persistence or failovers/synchronizes to another server.
+		output.writeObject(applicationScopeIds);
 		Map<String, ConcurrentMap<String, Set<String>>> sessionUserChannelIds = new HashMap<>(sessionUserIds.size());
 
 		for (String userId : sessionUserIds.values()) {
@@ -292,6 +320,8 @@ public class SocketChannelManager implements Serializable {
 	@SuppressWarnings("unchecked")
 	private void readObject(ObjectInputStream input) throws IOException, ClassNotFoundException {
 		input.defaultReadObject();
+
+		// Below is just in case server restarts with session persistence or failovers/synchronizes from another server.
 		applicationScopeIds.putAll((Map<String, String>) input.readObject());
 		Map<String, ConcurrentMap<String, Set<String>>> sessionUserChannelIds = (Map<String, ConcurrentMap<String, Set<String>>>) input.readObject();
 
@@ -303,7 +333,7 @@ public class SocketChannelManager implements Serializable {
 
 		// Below awkwardness is because SocketChannelManager can't be injected in SocketSessionManager (CDI session scope
 		// is not necessarily active during WS session). So it can't just ask us for channel IDs and we have to tell it.
-		// And, for application scope IDs we take benefit of session persistence to re-register them on server restart.
+		// And, for application scope IDs we make sure they're re-registered after server restart/failover.
 		manager.register(sessionScopeIds.values());
 		manager.register(applicationScopeIds.values());
 	}
