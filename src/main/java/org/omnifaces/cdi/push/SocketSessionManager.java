@@ -154,7 +154,7 @@ public class SocketSessionManager {
 	/**
 	 * On close, remove given web socket session from the mapping.
 	 * @param session The closed web socket session.
-	 * @param reason The close reason.
+	 * @param closeCode The close code.
 	 */
 	public void remove(Session session, CloseCode closeCode) {
 		Set<Session> sessions = channelSessions.get(getChannelId(session));
