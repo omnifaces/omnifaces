@@ -62,7 +62,7 @@ public class SocketPushContext implements PushContext {
 	SocketPushContext(String channel, SocketChannelManager manager) {
 		this.channel = channel;
 		sessionScopeIds = isActive(SessionScoped.class) ? manager.getSessionScopeIds() : EMPTY_SCOPE;
-		viewScopeIds = Faces.hasContext() ? SocketChannelManager.getViewScopeIds() : EMPTY_SCOPE;
+		viewScopeIds = Faces.hasContext() ? SocketChannelManager.getViewScopeIds(false) : EMPTY_SCOPE;
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------

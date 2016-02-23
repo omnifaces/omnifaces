@@ -78,12 +78,12 @@ public class SocketChannelManager implements Serializable {
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
-	private static ConcurrentMap<String, String> applicationScopeIds = new ConcurrentHashMap<>();
-	private ConcurrentMap<String, String> sessionScopeIds = new ConcurrentHashMap<>(3);
+	private static final ConcurrentMap<String, String> applicationScopeIds = new ConcurrentHashMap<>(3); // size=3 as an average developer will unlikely declare more push channels in same application.
+	private final ConcurrentMap<String, String> sessionScopeIds = new ConcurrentHashMap<>(3); // size=3 as an average developer will unlikely declare more push channels in same application.
 
-	private static ConcurrentMap<String, ConcurrentMap<String, Set<String>>> applicationUserChannelIds = new ConcurrentHashMap<>();
-	private static ConcurrentMap<Serializable, Set<String>> applicationUserIds = new ConcurrentHashMap<>(); // An user can have more than one session (multiple browsers, account sharing).
-	private ConcurrentMap<Serializable, String> sessionUserIds = new ConcurrentHashMap<>(1); // A session can have more than one user (bad security practice, but technically not impossible).
+	private static final ConcurrentMap<String, ConcurrentMap<String, Set<String>>> applicationUserChannelIds = new ConcurrentHashMap<>();
+	private static final ConcurrentMap<Serializable, Set<String>> applicationUserIds = new ConcurrentHashMap<>(); // An user can have more than one session (multiple browsers, account sharing).
+	private final ConcurrentMap<Serializable, String> sessionUserIds = new ConcurrentHashMap<>(1); // A session can have more than one user (bad security practice, but technically not impossible).
 
 	@Inject
 	private SocketSessionManager manager;
@@ -104,9 +104,9 @@ public class SocketChannelManager implements Serializable {
 	 */
 	public String register(String channel, String scope, Serializable user) {
 		switch (Scope.of(scope, user)) {
-			case APPLICATION: return register(null, channel, applicationScopeIds, sessionScopeIds, getViewScopeIds());
-			case SESSION: return register(user, channel, sessionScopeIds, applicationScopeIds, getViewScopeIds());
-			case VIEW: return register(user, channel, getViewScopeIds(), applicationScopeIds, sessionScopeIds);
+			case APPLICATION: return register(null, channel, applicationScopeIds, sessionScopeIds, getViewScopeIds(false));
+			case SESSION: return register(user, channel, sessionScopeIds, applicationScopeIds, getViewScopeIds(false));
+			case VIEW: return register(user, channel, getViewScopeIds(true), applicationScopeIds, sessionScopeIds);
 			default: throw new UnsupportedOperationException();
 		}
 	}
@@ -138,13 +138,13 @@ public class SocketChannelManager implements Serializable {
 
 	private void registerUserChannelId(String userId, String channel, String channelId) {
 		if (!applicationUserChannelIds.containsKey(userId)) {
-			applicationUserChannelIds.putIfAbsent(userId, new ConcurrentHashMap<String, Set<String>>(3));
+			applicationUserChannelIds.putIfAbsent(userId, new ConcurrentHashMap<String, Set<String>>(3)); // size=3 as an average developer will unlikely declare more push channels in same application.
 		}
 
 		ConcurrentMap<String, Set<String>> channelIds = applicationUserChannelIds.get(userId);
 
 		if (!channelIds.containsKey(channel)) {
-			channelIds.putIfAbsent(channel, synchronizedSet(new HashSet<String>(1)));
+			channelIds.putIfAbsent(channel, synchronizedSet(new HashSet<String>(1))); // size=1 as an average developer will unlikely declare multiple user-targeted channels in same session.
 		}
 
 		channelIds.get(channel).add(channelId);
@@ -153,7 +153,7 @@ public class SocketChannelManager implements Serializable {
 	private void registerApplicationUser(Serializable user, String userId) {
 		synchronized (applicationUserIds) {
 			if (!applicationUserIds.containsKey(user)) {
-				applicationUserIds.putIfAbsent(user, synchronizedSet(new HashSet<String>(1)));
+				applicationUserIds.putIfAbsent(user, synchronizedSet(new HashSet<String>(1))); // size=1 as an average user will unlikely login in multiple sessions.
 			}
 
 			applicationUserIds.get(user).add(userId);
@@ -181,13 +181,13 @@ public class SocketChannelManager implements Serializable {
 	 */
 	@PreDestroy
 	public void deregisterSessionScopeChannels() {
-		manager.deregister(sessionScopeIds.values());
-
 		for (Entry<Serializable, String> sessionUserId : sessionUserIds.entrySet()) {
 			String userId = sessionUserId.getValue();
 			deregisterUserChannelIds(userId);
 			deregisterApplicationUser(sessionUserId.getKey(), userId);
 		}
+
+		manager.deregister(sessionScopeIds.values());
 	}
 
 	// Nested classes -------------------------------------------------------------------------------------------------
@@ -201,11 +201,11 @@ public class SocketChannelManager implements Serializable {
 	 * @see SocketChannelManager
 	 * @since 2.3
 	 */
-	public static class DeregisterViewScopeChannels implements ComponentSystemEventListener {
+	static class DeregisterViewScopeChannels implements ComponentSystemEventListener {
 
 		@Override
 		public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
-			SocketSessionManager.getInstance().deregister(getViewScopeIds().values());
+			SocketSessionManager.getInstance().deregister(getViewScopeIds(false).values());
 		}
 
 	}
@@ -224,13 +224,16 @@ public class SocketChannelManager implements Serializable {
 	 * For internal usage only. This makes it possible to remember view scope channel IDs during injection time of
 	 * {@link SocketPushContext} (the CDI view scope is not necessarily active during push send time).
 	 */
-	static ConcurrentMap<String, String> getViewScopeIds() {
+	static ConcurrentMap<String, String> getViewScopeIds(boolean create) {
 		ConcurrentMap<String, String> viewScopeIds = getViewAttribute(SocketChannelManager.class.getName());
 
 		if (viewScopeIds == null) {
-			viewScopeIds = new ConcurrentHashMap<>(1);
-			setViewAttribute(SocketChannelManager.class.getName(), viewScopeIds);
-			getViewRoot().subscribeToEvent(PreDestroyViewMapEvent.class, new DeregisterViewScopeChannels());
+			viewScopeIds = new ConcurrentHashMap<>(1); // size=1 as an average developer will unlikely declare multiple view scoped channels in same view.
+
+			if (create) {
+				setViewAttribute(SocketChannelManager.class.getName(), viewScopeIds);
+				getViewRoot().subscribeToEvent(PreDestroyViewMapEvent.class, new DeregisterViewScopeChannels());
+			}
 		}
 
 		return viewScopeIds;
@@ -277,7 +280,7 @@ public class SocketChannelManager implements Serializable {
 	 */
 	static Serializable getUser(String channel, String channelId) {
 		for (Entry<Serializable, Set<String>> applicationUserId : applicationUserIds.entrySet()) {
-			for (String userId : applicationUserId.getValue()) { // "Normally" this contains only 1 item, so it isn't that inefficient as it looks like.
+			for (String userId : applicationUserId.getValue()) { // "Normally" this contains only 1 entry, so it isn't that inefficient as it looks like.
 				if (getApplicationUserChannelIds(userId, channel).contains(channelId)) {
 					return applicationUserId.getKey();
 				}
