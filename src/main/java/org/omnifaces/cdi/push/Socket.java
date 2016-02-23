@@ -76,8 +76,8 @@ import org.omnifaces.util.Json;
  * <h3>Usage (client)</h3>
  * <p>
  * Declare <code>&lt;o:socket&gt;</code> tag in the view with at least a <code>channel</code> name and an
- * <code>onmessage</code> JavaScript listener function. The channel name may only contain alphanumeric characters,
- * hyphens, underscores and periods.
+ * <code>onmessage</code> JavaScript listener function. The channel name may not be an EL expression and it may only
+ * contain alphanumeric characters, hyphens, underscores and periods.
  * <p>
  * Here's an example which refers an existing JavaScript listener function (do not include the parentheses!).
  * <pre>
@@ -177,20 +177,26 @@ import org.omnifaces.util.Json;
  * <h3>Scopes and users</h3>
  * <p>
  * By default the web socket is application scoped, i.e. any view/session throughout the web application having the
- * same web socket channel open will receive the same push message. This is useful for application-wide feedback
- * triggered by site itself. The optional <code>scope</code> attribute can be set to <code>session</code> to restrict
- * the push messages to all views in the current user session only. This is useful for session-wide feedback triggered
- * by user itself (e.g. asynchronous updates tied to user specific action).
+ * same web socket channel open will receive the same push message. The push message can be sent by both the application
+ * and the user itself. This is useful for application-wide feedback triggered by site itself.
+ * <p>
+ * The optional <code>scope</code> attribute can be set to <code>session</code> to restrict the push messages to all
+ * views in the current user session only. The push message can only be sent by the user itself and not by the
+ * application. This is useful for session-wide feedback triggered by user itself (e.g. as result of asynchronous tasks
+ * triggered by user specific action).
  * <pre>
  * &lt;o:socket channel="someChannel" scope="session" ... /&gt;
  * </pre>
  * <p>
- * The optional <code>scope</code> attribute can be set to <code>view</code> to restrict the push messages to the
- * current view only. This is useful for view-wide feedback triggered by user itself (e.g. progress bar tied to a view
- * specific action).
+ * The <code>scope</code> attribute can also be set to <code>view</code> to restrict the push messages to the current
+ * view only. The push message can only be sent by the user itself and not by the application. This is useful for
+ * view-wide feedback triggered by user itself (e.g. progress bar tied to a user specific action on current view).
  * <pre>
  * &lt;o:socket channel="someChannel" scope="view" ... /&gt;
  * </pre>
+ * <p>
+ * The <code>scope</code> attribute may not be an EL expression and allowed values are <code>application</code>,
+ * <code>session</code> and <code>view</code>, case insensitive.
  * <p>
  * Additionally, the optional <code>user</code> attribute can be set to the unique identifier of the logged-in user,
  * usually the login name or the user ID. It must at least implement {@link Serializable} and have a low memory
@@ -201,7 +207,7 @@ import org.omnifaces.util.Json;
  * &lt;o:socket channel="someChannel" user="#{request.remoteUser}" ... /&gt;
  * </pre>
  * <p>
- * Or when you're using homegrown authentication and have the user entity around as <code>#{someLoggedInUser}</code>:
+ * Or when you have the user entity around as <code>#{someLoggedInUser}</code>:
  * <pre>
  * &lt;o:socket channel="someChannel" user="#{someLoggedInUser.id}" ... /&gt;
  * </pre>
@@ -211,15 +217,18 @@ import org.omnifaces.util.Json;
  * only be used if the logged-in user represented by <code>user</code> is not session scoped but view scoped (e.g. when
  * your application allows changing a logged-in user during same HTTP session without invaliding it &mdash; which is in
  * turn poor security practice). If in such case a session scoped socket is reused, undefined behavior may occur when
- * user-targeted push message is sent.
+ * user-targeted push message is sent. It may target previously logged-in user only. This can be solved by setting the
+ * scope to <code>view</code>, but better is to fix the logout/login to invalidate the HTTP session altogether.
  * <p>
  * In the server side, the push message can be targeted to the user via {@link PushContext#send(Object, Serializable)}.
- * This is useful for user-specific feedback triggered by other users (e.g. chat).
+ * The push message can be sent by the user itself, other users, and even the application (e.g. EJB). This is useful for
+ * user-specific feedback triggered by other users (e.g. chat).
  * <pre>
  * &#64;Inject &#64;Push
  * private PushContext someChannel;
  *
  * public void sendMessage(Object message) {
+ *     Long recipientUserId = recipientUser.getId();
  *     someChannel.send(message, recipientUserId);
  * }
  * </pre>
@@ -228,15 +237,43 @@ import org.omnifaces.util.Json;
  * {@link PushContext#send(Object, Collection)}.
  * <pre>
  * public void sendMessage(Object message) {
- *     Collection&lt;Serializable&gt; userIds = group.getUserIds();
+ *     Collection&lt;Long&gt; userIds = group.getUserIds();
  *     someChannel.send(message, userIds);
  * }
+ * </pre>
+ * <p>
+ * You can declare multiple push channels on different scopes with or without user target throughout the application.
+ * Be however aware that the same channel name can easily be reused across multiple views, even if it's view scoped.
+ * It's more efficient if you use as few different channel names as possible and have a global JavaScript listener
+ * which can distinguish its task based on the delivered message. E.g. by sending the message in server as below:
+ * <pre>
+ * Map&lt;String, Object&gt; message = new HashMap&lt;&gt;();
+ * message.put("functionName", "someFunction");
+ * message.put("functionData", functionData); // Can be Map or Bean.
+ * someChannel.send(message);
+ * </pre>
+ * <p>
+ * And processing it in the <code>onmessage</code> JavaScript listener function as below:
+ * <pre>
+ * function someSocketListener(message) {
+ *     window[message.functionName](message.functionData);
+ * }
+ *
+ * function someFunction(data) {
+ *     // ...
+ * }
+ *
+ * function otherFunction(data) {
+ *     // ...
+ * }
+ *
+ * // ...
  * </pre>
  *
  *
  * <h3>Conditionally connecting socket</h3>
  * <p>
- * You can use the <code>connected</code> attribute for that.
+ * You can use the <code>connected</code> attribute for that. This is particularly useful on view scoped sockets.
  * <pre>
  * &lt;o:socket ... connected="#{bean.pushable}" /&gt;
  * </pre>
