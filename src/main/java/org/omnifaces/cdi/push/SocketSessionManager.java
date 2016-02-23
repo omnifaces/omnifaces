@@ -33,6 +33,7 @@ import java.util.concurrent.Future;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.websocket.CloseReason;
+import javax.websocket.CloseReason.CloseCode;
 import javax.websocket.Session;
 
 import org.omnifaces.cdi.push.event.Closed;
@@ -112,7 +113,7 @@ public class SocketSessionManager {
 			String channel = getChannel(session);
 			Serializable user = getUser(channel, channelId);
 			session.getUserProperties().put("user", user);
-			fireEvent(new SocketEvent(channel, user), SESSION_OPENED);
+			fireEvent(new SocketEvent(channel, user, null), SESSION_OPENED);
 			return true;
 		}
 
@@ -152,14 +153,15 @@ public class SocketSessionManager {
 	/**
 	 * On close, remove given web socket session from the mapping.
 	 * @param session The closed web socket session.
+	 * @param reason The close reason.
 	 */
-	public void remove(Session session) {
+	public void remove(Session session, CloseCode closeCode) {
 		String channelId = getChannelId(session);
 		Set<Session> sessions = SESSIONS.get(channelId);
 
 		if (sessions != null && sessions.remove(session)) {
 			Serializable user = (Serializable) session.getUserProperties().get("user");
-			fireEvent(new SocketEvent(getChannel(session), user), SESSION_CLOSED);
+			fireEvent(new SocketEvent(getChannel(session), user, closeCode), SESSION_CLOSED);
 		}
 	}
 

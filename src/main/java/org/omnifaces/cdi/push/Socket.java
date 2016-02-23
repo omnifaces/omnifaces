@@ -54,7 +54,8 @@ import org.omnifaces.util.Json;
 /**
  * <p>
  * Opens an one-way (server to client) web socket based push connection in client side which can be reached from
- * server side via {@link PushContext} interface injected in any CDI/container managed artifact via {@link Push}.
+ * server side via {@link PushContext} interface injected in any CDI/container managed artifact via {@link Push}
+ * annotation.
  *
  *
  * <h3>Configuration</h3>
@@ -138,10 +139,10 @@ import org.omnifaces.util.Json;
  *
  * <h3>Usage (server)</h3>
  * <p>
- * In the WAR side (not in EAR/EJB side!), you can inject {@link PushContext} via {@link Push} on the given channel name
- * in any CDI/container managed artifact such as <code>@Named</code>, <code>@WebServlet</code>, etc wherever you'd like
- * to send a push message and then invoke {@link PushContext#send(Object)} with any Java object representing the push
- * message.
+ * In WAR side (not in EAR/EJB side!), you can inject {@link PushContext} via {@link Push} annotation on the given
+ * channel name in any CDI/container managed artifact such as <code>@Named</code>, <code>@WebServlet</code>, etc
+ * wherever you'd like to send a push message and then invoke {@link PushContext#send(Object)} with any Java object
+ * representing the push message.
  * <pre>
  * &#64;Inject &#64;Push
  * private PushContext someChannel;
@@ -184,26 +185,33 @@ import org.omnifaces.util.Json;
  * &lt;o:socket channel="someChannel" scope="session" ... /&gt;
  * </pre>
  * <p>
- * Or to <code>view</code> to restrict the push messages to the current view only. This is useful for view-wide feedback
- * triggered by user itself (e.g. progress bar tied to a view specific action).
+ * The optional <code>scope</code> attribute can be set to <code>view</code> to restrict the push messages to the
+ * current view only. This is useful for view-wide feedback triggered by user itself (e.g. progress bar tied to a view
+ * specific action).
  * <pre>
  * &lt;o:socket channel="someChannel" scope="view" ... /&gt;
  * </pre>
  * <p>
- * Additionally, the optional <code>user</code> attribute can be set to the unique user identifier, usually the login
- * name or the user ID. It must at least implement {@link Serializable} and have a low memory footprint, so putting
- * entire user entity is discouraged.
+ * Additionally, the optional <code>user</code> attribute can be set to the unique identifier of the logged-in user,
+ * usually the login name or the user ID. It must at least implement {@link Serializable} and have a low memory
+ * footprint, so putting entire user entity is not recommended.
+ * <p>
+ * E.g. when you're using container managed authentication or a related framework/library:
  * <pre>
  * &lt;o:socket channel="someChannel" user="#{request.remoteUser}" ... /&gt;
  * </pre>
+ * <p>
+ * Or when you're using homegrown authentication and have the user entity around as <code>#{someLoggedInUser}</code>:
  * <pre>
  * &lt;o:socket channel="someChannel" user="#{someLoggedInUser.id}" ... /&gt;
  * </pre>
  * <p>
  * When the <code>user</code> attribute is specified, then the <code>scope</code> defaults to <code>session</code> and
  * cannot be set to <code>application</code>. It can be set to <code>view</code>, but this is kind of unusual and should
- * only be used if the logged-in user represented by <code>user</code> is not session scoped but view scoped, otherwise
- * undefined behavior may occur when the logged-in user changes during the same HTTP session without invalidating it.
+ * only be used if the logged-in user represented by <code>user</code> is not session scoped but view scoped (e.g. when
+ * your application allows changing a logged-in user during same HTTP session without invaliding it &mdash; which is in
+ * turn poor security practice). If in such case a session scoped socket is reused, undefined behavior may occur when
+ * user-targeted push message is sent.
  * <p>
  * In the server side, the push message can be targeted to the user via {@link PushContext#send(Object, Serializable)}.
  * This is useful for user-specific feedback triggered by other users (e.g. chat).
@@ -233,11 +241,11 @@ import org.omnifaces.util.Json;
  * &lt;o:socket ... connected="#{bean.pushable}" /&gt;
  * </pre>
  * <p>
- * It defaults to <code>true</code> and it's interpreted as a JavaScript instruction whether to open or close the web
- * socket push connection. If the value is an EL expression and it becomes <code>false</code> during an ajax request,
- * then the push connection will explicitly be closed during oncomplete of that ajax request, even though you did not
- * cover the <code>&lt;o:socket&gt;</code> tag in ajax render/update. So make sure it's tied to at least a view scoped
- * property in case you intend to control it during the view scope.
+ * It defaults to <code>true</code> and it's under the covers interpreted as a JavaScript instruction whether to open or
+ * close the web socket push connection. If the value is an EL expression and it becomes <code>false</code> during an
+ * ajax request, then the push connection will explicitly be closed during oncomplete of that ajax request, even though
+ * you did not cover the <code>&lt;o:socket&gt;</code> tag in ajax render/update. So make sure it's tied to at least a
+ * view scoped property in case you intend to control it during the view scope.
  * <p>
  * You can also explicitly set it to <code>false</code> and manually open the push connection in client side by
  * invoking <code>OmniFaces.Push.open(channel)</code>, passing the channel name, for example in an onclick listener
@@ -290,6 +298,7 @@ import org.omnifaces.util.Json;
  *     public void onClose(&#64;Observes &#64;Closed SocketEvent event) {
  *         String channel = event.getChannel(); // Returns &lt;o:socket channel&gt;.
  *         Serializable user = event.getUser(); // Returns &lt;o:socket user&gt;, if any.
+ *         CloseCode code = event.getCloseCode(); // Returns close code.
  *         // Do your thing with it. E.g. removing them from collection.
  *     }
  *
@@ -343,9 +352,9 @@ import org.omnifaces.util.Json;
  *
  * <h3>EJB design hints</h3>
  * <p>
- * In case you'd like to trigger a push from EAR/EJB side to an application scoped push socket, you could make use of
- * CDI events. First create a custom bean class representing the push event something like <code>PushEvent</code> taking
- * whatever you'd like to pass as push message.
+ * In case you'd like to trigger a push from EAR/EJB side to an application scoped push socket, then you could make use
+ * of CDI events. First create a custom bean class representing the push event something like <code>PushEvent</code>
+ * below taking whatever you'd like to pass as push message.
  * <pre>
  * public class PushEvent {
  *

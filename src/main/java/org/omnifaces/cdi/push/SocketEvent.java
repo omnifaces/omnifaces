@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import javax.enterprise.event.Observes;
+import javax.websocket.CloseReason.CloseCode;
 
 import org.omnifaces.cdi.push.event.Closed;
 import org.omnifaces.cdi.push.event.Opened;
@@ -37,35 +38,56 @@ public final class SocketEvent implements Serializable {
 
 	private final String channel;
 	private final Serializable user;
+	private final CloseCode closeCode;
 
-	SocketEvent(String channel, Serializable user) {
+	SocketEvent(String channel, Serializable user, CloseCode closeCode) {
 		this.channel = channel;
 		this.user = user;
+		this.closeCode = closeCode;
 	}
 
+	/**
+	 * Returns the <code>&lt;o:socket channel&gt;</code>.
+	 * @return The web socket channel name.
+	 */
 	public String getChannel() {
 		return channel;
 	}
 
+	/**
+	 * Returns the <code>&lt;o:socket user&gt;</code>, if any.
+	 * @return The web socket user identifier, if any.
+	 */
 	public Serializable getUser() {
 		return user;
 	}
 
+	/**
+	 * Returns the close code.
+	 * If this returns <code>null</code>, then it was {@link Opened}.
+	 * If this returns non-<code>null</code>, then it was {@link Closed}.
+	 * @return The close code.
+	 */
+	public CloseCode getCloseCode() {
+		return closeCode;
+	}
+
 	@Override
 	public int hashCode() {
-		return super.hashCode() + Objects.hash(channel, user);
+		return super.hashCode() + Objects.hash(channel, user, closeCode);
 	}
 
 	@Override
 	public boolean equals(Object other) {
-		return super.equals(other)
+		return other != null && getClass() == other.getClass()
 			&& Objects.equals(channel, ((SocketEvent) other).channel)
-			&& Objects.equals(user, ((SocketEvent) other).user);
+			&& Objects.equals(user, ((SocketEvent) other).user)
+			&& Objects.equals(closeCode, ((SocketEvent) other).closeCode);
 	}
 
 	@Override
 	public String toString() {
-		return String.format("SocketEvent[channel=%s, user=%s]", channel, user);
+		return String.format("SocketEvent[channel=%s, user=%s, closeCode=%s]", channel, user, closeCode);
 	}
 
 }
