@@ -113,7 +113,11 @@ public class SocketSessionManager {
 		if (sessions != null && sessions.add(session)) {
 			String channel = getChannel(session);
 			Serializable user = getUser(channel, channelId);
-			session.getUserProperties().put("user", user);
+
+			if (user != null) {
+				session.getUserProperties().put("user", user);
+			}
+
 			fireEvent(new SocketEvent(channel, user, null), SESSION_OPENED);
 			return true;
 		}

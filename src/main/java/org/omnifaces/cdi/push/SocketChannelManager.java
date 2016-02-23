@@ -201,7 +201,7 @@ public class SocketChannelManager implements Serializable {
 	 * @see SocketChannelManager
 	 * @since 2.3
 	 */
-	static class DeregisterViewScopeChannels implements ComponentSystemEventListener {
+	public static class DeregisterViewScopeChannels implements ComponentSystemEventListener {
 
 		@Override
 		public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
