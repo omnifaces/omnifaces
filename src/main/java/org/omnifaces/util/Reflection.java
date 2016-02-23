@@ -150,14 +150,8 @@ public final class Reflection {
 	public static Method findMethod(Object base, String methodName, Object[] params) {
 
 		List<Method> methods = new ArrayList<>();
-		for (Method method : base.getClass().getMethods()) {
-			if (method.getName().equals(methodName) && method.getParameterTypes().length == params.length) {
-				methods.add(method);
-			}
-		}
-
-		if (methods.isEmpty()) {
-			for (Method method : base.getClass().getDeclaredMethods()) {
+		for (Class<?> cls = base.getClass(); cls != null; cls = cls.getSuperclass()) {
+			for (Method method : cls.getDeclaredMethods()) {
 				if (method.getName().equals(methodName) && method.getParameterTypes().length == params.length) {
 					methods.add(method);
 				}
