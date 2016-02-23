@@ -15,11 +15,14 @@ package org.omnifaces.cdi.push;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.synchronizedSet;
 import static javax.websocket.CloseReason.CloseCodes.GOING_AWAY;
+import static org.omnifaces.cdi.push.SocketChannelManager.getUser;
 import static org.omnifaces.cdi.push.SocketEndpoint.PARAM_CHANNEL;
+import static org.omnifaces.util.Beans.fireEvent;
 import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,9 +31,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.util.AnnotationLiteral;
 import javax.websocket.CloseReason;
 import javax.websocket.Session;
 
+import org.omnifaces.cdi.push.event.Closed;
+import org.omnifaces.cdi.push.event.Opened;
 import org.omnifaces.util.Json;
 
 /**
@@ -48,6 +54,13 @@ public class SocketSessionManager {
 
 	private static final ConcurrentMap<String, Set<Session>> SESSIONS = new ConcurrentHashMap<>();
 	private static final CloseReason REASON_SESSION_EXPIRED = new CloseReason(GOING_AWAY, "Session expired");
+	private static final AnnotationLiteral<Opened> SESSION_OPENED = new AnnotationLiteral<Opened>() {
+		private static final long serialVersionUID = 1L;
+	};
+	private static final AnnotationLiteral<Closed> SESSION_CLOSED = new AnnotationLiteral<Closed>() {
+		private static final long serialVersionUID = 1L;
+	};
+
 	private static SocketSessionManager instance;
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -92,8 +105,18 @@ public class SocketSessionManager {
 	 * @return <code>true</code> if given web socket session is accepted and is new, otherwise <code>false</code>.
 	 */
 	public boolean add(Session session) {
-		Set<Session> sessions = SESSIONS.get(getChannelId(session));
-		return (sessions != null) && sessions.add(session);
+		String channelId = getChannelId(session);
+		Set<Session> sessions = SESSIONS.get(channelId);
+
+		if (sessions != null && sessions.add(session)) {
+			String channel = getChannel(session);
+			Serializable user = getUser(channel, channelId);
+			session.getUserProperties().put("user", user);
+			fireEvent(new SocketEvent(channel, user), SESSION_OPENED);
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
@@ -129,11 +152,15 @@ public class SocketSessionManager {
 	/**
 	 * On close, remove given web socket session from the mapping.
 	 * @param session The closed web socket session.
-	 * @return <code>true</code> if given web socket session was known in the mapping, otherwise <code>false</code>.
 	 */
-	public boolean remove(Session session) {
-		Set<Session> sessions = SESSIONS.get(getChannelId(session));
-		return (sessions != null) && sessions.remove(session);
+	public void remove(Session session) {
+		String channelId = getChannelId(session);
+		Set<Session> sessions = SESSIONS.get(channelId);
+
+		if (sessions != null && sessions.remove(session)) {
+			Serializable user = (Serializable) session.getUserProperties().get("user");
+			fireEvent(new SocketEvent(getChannel(session), user), SESSION_CLOSED);
+		}
 	}
 
 	/**
@@ -161,8 +188,12 @@ public class SocketSessionManager {
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
+	private static String getChannel(Session session) {
+		return session.getPathParameters().get(PARAM_CHANNEL);
+	}
+
 	private static String getChannelId(Session session) {
-		return session.getPathParameters().get(PARAM_CHANNEL) + "?" + session.getQueryString();
+		return getChannel(session) + "?" + session.getQueryString();
 	}
 
 }
