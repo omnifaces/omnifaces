@@ -33,6 +33,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.faces.component.StateHelper;
+import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.PartialViewContext;
 import javax.faces.context.PartialViewContextWrapper;
@@ -441,6 +443,16 @@ public final class Hacks {
 				views.remove(context.getAttributes().get(MOJARRA_SERIALIZED_VIEW_KEY));
 			}
 		}
+	}
+
+	/**
+	 * Expose protected state helper into public.
+	 * @param component The component to obtain state helper for.
+	 * @return The state helper of the given component.
+	 * @since 2.3
+	 */
+	public static StateHelper getStateHelper(UIComponent component) {
+		return invokeMethod(component, "getStateHelper");
 	}
 
 
