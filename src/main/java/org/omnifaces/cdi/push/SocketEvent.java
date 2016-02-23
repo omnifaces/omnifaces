@@ -56,10 +56,13 @@ public final class SocketEvent implements Serializable {
 
 	/**
 	 * Returns the <code>&lt;o:socket user&gt;</code>, if any.
+	 * @param <S> The generic type of the user identifier.
 	 * @return The web socket user identifier, if any.
+	 * @throws ClassCastException When <code>S</code> is of wrong type.
 	 */
-	public Serializable getUser() {
-		return user;
+	@SuppressWarnings("unchecked")
+	public <S extends Serializable> S getUser() {
+		return (S) user;
 	}
 
 	/**

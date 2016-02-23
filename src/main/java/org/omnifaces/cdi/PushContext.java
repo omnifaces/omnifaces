@@ -60,6 +60,7 @@ public interface PushContext extends Serializable {
 	 * identified by <code>&lt;o:socket user&gt;</code>.
 	 * The message object will be encoded as JSON and be available as first argument of the JavaScript listener function
 	 * declared in <code>&lt;o:socket onmessage&gt;</code>.
+	 * @param <S> The generic type of the user identifier.
 	 * @param message The push message object.
 	 * @param user The user to which the push message object must be delivered to.
 	 * @return The results of the send operation. If it returns an empty set, then there was no open web socket session
@@ -68,13 +69,14 @@ public interface PushContext extends Serializable {
 	 * @throws IllegalArgumentException If given message object cannot be encoded as JSON.
 	 * @see Json#encode(Object)
 	 */
-	public Set<Future<Void>> send(Object message, Serializable user);
+	public <S extends Serializable> Set<Future<Void>> send(Object message, S user);
 
 	/**
 	 * Send given message object to the push socket channel as identified by {@link Push}, targeted to the given users
 	 * as identified by <code>&lt;o:socket user&gt;</code>.
 	 * The message object will be encoded as JSON and be available as first argument of the JavaScript listener function
 	 * declared in <code>&lt;o:socket onmessage&gt;</code>.
+	 * @param <S> The generic type of the user identifier.
 	 * @param message The push message object.
 	 * @param users The users to which the push message object must be delivered to.
 	 * @return The results of the send operation grouped by user. If it contains an empty set, then there was no open
@@ -84,6 +86,6 @@ public interface PushContext extends Serializable {
 	 * @throws IllegalArgumentException If given message object cannot be encoded as JSON.
 	 * @see Json#encode(Object)
 	 */
-	public Map<Serializable, Set<Future<Void>>> send(Object message, Collection<Serializable> users);
+	public <S extends Serializable> Map<S, Set<Future<Void>>> send(Object message, Collection<S> users);
 
 }

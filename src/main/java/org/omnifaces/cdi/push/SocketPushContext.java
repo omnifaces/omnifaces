@@ -73,16 +73,16 @@ public class SocketPushContext implements PushContext {
 	}
 
 	@Override
-	public Set<Future<Void>> send(Object message, Serializable user) {
+	public <S extends Serializable> Set<Future<Void>> send(Object message, S user) {
 		return send(message, asList(user)).get(user);
 	}
 
 	@Override
-	public Map<Serializable, Set<Future<Void>>> send(Object message, Collection<Serializable> users) {
+	public <S extends Serializable> Map<S, Set<Future<Void>>> send(Object message, Collection<S> users) {
 		SocketSessionManager manager = SocketSessionManager.getInstance();
-		Map<Serializable, Set<Future<Void>>> resultsByUser = new HashMap<>(users.size());
+		Map<S, Set<Future<Void>>> resultsByUser = new HashMap<>(users.size());
 
-		for (Serializable user : users) {
+		for (S user : users) {
 			Set<String> userChannelIds = SocketChannelManager.getUserChannelIds(user, channel);
 			Set<Future<Void>> results = new HashSet<>(userChannelIds.size());
 
