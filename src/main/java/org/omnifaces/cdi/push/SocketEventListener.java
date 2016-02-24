@@ -27,7 +27,6 @@ import java.util.Map;
 import javax.el.ValueExpression;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.PostAddToViewEvent;
 import javax.faces.event.PreRenderViewEvent;
 import javax.faces.event.SystemEvent;
@@ -97,7 +96,7 @@ public class SocketEventListener implements SystemEventListener {
 	 * with <code>target="body"</code>. Those scripts will in turn hit {@link SocketEndpoint}.
 	 */
 	@Override
-	public void processEvent(SystemEvent event) throws AbortProcessingException {
+	public void processEvent(SystemEvent event) {
 		if (event instanceof PostAddToViewEvent) {
 			addScriptResourceToHead("omnifaces", "omnifaces.js");
 		}

@@ -34,7 +34,6 @@ import java.util.concurrent.ConcurrentMap;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.component.UIViewRoot;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.ComponentSystemEventListener;
 import javax.faces.event.PreDestroyViewMapEvent;
@@ -125,18 +124,20 @@ public class SocketChannelManager implements Serializable {
 
 		String channelId = targetScope.get(channel);
 
-		if (user != null && !sessionUserIds.containsKey(user)) {
-			sessionUserIds.putIfAbsent(user, UUID.randomUUID().toString());
-			String userId = sessionUserIds.get(user);
-			registerUserChannelId(userId, channel, channelId);
-			registerApplicationUser(user, userId);
+		if (user != null) {
+			if (!sessionUserIds.containsKey(user)) {
+				sessionUserIds.putIfAbsent(user, UUID.randomUUID().toString());
+				registerApplicationUser(user, sessionUserIds.get(user));
+			}
+
+			registerUserChannelId(sessionUserIds.get(user), channel, channelId);
 		}
 
 		manager.register(channelId);
 		return channelId;
 	}
 
-	private void registerUserChannelId(String userId, String channel, String channelId) {
+	private static void registerUserChannelId(String userId, String channel, String channelId) {
 		if (!applicationUserChannelIds.containsKey(userId)) {
 			applicationUserChannelIds.putIfAbsent(userId, new ConcurrentHashMap<String, Set<String>>(3)); // size=3 as an average developer will unlikely declare more push channels in same application.
 		}
@@ -150,7 +151,7 @@ public class SocketChannelManager implements Serializable {
 		channelIds.get(channel).add(channelId);
 	}
 
-	private void registerApplicationUser(Serializable user, String userId) {
+	private static void registerApplicationUser(Serializable user, String userId) {
 		synchronized (applicationUserIds) {
 			if (!applicationUserIds.containsKey(user)) {
 				applicationUserIds.putIfAbsent(user, synchronizedSet(new HashSet<String>(1))); // size=1 as an average user will unlikely login in multiple sessions.
@@ -160,7 +161,7 @@ public class SocketChannelManager implements Serializable {
 		}
 	}
 
-	private void deregisterApplicationUser(Serializable user, String userId) {
+	private static void deregisterApplicationUser(Serializable user, String userId) {
 		synchronized (applicationUserIds) {
 			Set<String> userIds = applicationUserIds.get(user);
 			userIds.remove(userId);
@@ -171,7 +172,7 @@ public class SocketChannelManager implements Serializable {
 		}
 	}
 
-	private void deregisterUserChannelIds(String userId) {
+	private static void deregisterUserChannelIds(String userId) {
 		applicationUserChannelIds.remove(userId);
 	}
 
@@ -204,7 +205,7 @@ public class SocketChannelManager implements Serializable {
 	public static class DeregisterViewScopeChannels implements ComponentSystemEventListener {
 
 		@Override
-		public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
+		public void processEvent(ComponentSystemEvent event) {
 			SocketSessionManager.getInstance().deregister(getViewScopeIds(false).values());
 		}
 
