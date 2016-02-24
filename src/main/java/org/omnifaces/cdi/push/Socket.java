@@ -177,8 +177,8 @@ import org.omnifaces.util.Json;
  * <h3>Scopes and users</h3>
  * <p>
  * By default the web socket is application scoped, i.e. any view/session throughout the web application having the
- * same web socket channel open will receive the same push message. The push message can be sent by both the application
- * and the user itself. This is useful for application-wide feedback triggered by site itself.
+ * same web socket channel open will receive the same push message. The push message can be sent by all users and the
+ * application itself. This is useful for application-wide feedback triggered by site itself.
  * <p>
  * The optional <code>scope</code> attribute can be set to <code>session</code> to restrict the push messages to all
  * views in the current user session only. The push message can only be sent by the user itself and not by the
@@ -189,8 +189,9 @@ import org.omnifaces.util.Json;
  * </pre>
  * <p>
  * The <code>scope</code> attribute can also be set to <code>view</code> to restrict the push messages to the current
- * view only. The push message can only be sent by the user itself and not by the application. This is useful for
- * view-wide feedback triggered by user itself (e.g. progress bar tied to a user specific action on current view).
+ * view only. The push message will not show up in other views in the same session. The push message can only be sent
+ * by the user itself and not by the application. This is useful for view-wide feedback triggered by user itself (e.g.
+ * progress bar tied to a user specific action on current view).
  * <pre>
  * &lt;o:socket channel="someChannel" scope="view" ... /&gt;
  * </pre>
@@ -199,15 +200,17 @@ import org.omnifaces.util.Json;
  * <code>session</code> and <code>view</code>, case insensitive.
  * <p>
  * Additionally, the optional <code>user</code> attribute can be set to the unique identifier of the logged-in user,
- * usually the login name or the user ID. It must at least implement {@link Serializable} and have a low memory
- * footprint, so putting entire user entity is not recommended.
+ * usually the login name or the user ID. This way the push message can be targeted to a specific user and be sent by
+ * other users. The value of the <code>user</code> attribute must at least implement {@link Serializable} and have a
+ * low memory footprint, so putting entire user entity is not recommended.
  * <p>
  * E.g. when you're using container managed authentication or a related framework/library:
  * <pre>
  * &lt;o:socket channel="someChannel" user="#{request.remoteUser}" ... /&gt;
  * </pre>
  * <p>
- * Or when you have the user entity around as <code>#{someLoggedInUser}</code>:
+ * Or when you have a custom user entity around in EL as <code>#{someLoggedInUser}</code> which has an <code>id</code>
+ * property representing its identifier:
  * <pre>
  * &lt;o:socket channel="someChannel" user="#{someLoggedInUser.id}" ... /&gt;
  * </pre>
@@ -222,7 +225,7 @@ import org.omnifaces.util.Json;
  * <p>
  * In the server side, the push message can be targeted to the user via {@link PushContext#send(Object, Serializable)}.
  * The push message can be sent by the user itself, other users, and even the application (e.g. EJB). This is useful for
- * user-specific feedback triggered by other users (e.g. chat).
+ * user-specific feedback triggered by other users (e.g. chat or admin messages).
  * <pre>
  * &#64;Inject &#64;Push
  * private PushContext someChannel;
@@ -244,8 +247,10 @@ import org.omnifaces.util.Json;
  * <p>
  * You can declare multiple push channels on different scopes with or without user target throughout the application.
  * Be however aware that the same channel name can easily be reused across multiple views, even if it's view scoped.
- * It's more efficient if you use as few different channel names as possible and have a global JavaScript listener
- * which can distinguish its task based on the delivered message. E.g. by sending the message in server as below:
+ * It's more efficient if you use as few different channel names as possible and tie the channel name to a specific
+ * scope/user combination, not to a specific view. In case you have "multiple" view scoped channels, best is to use only
+ * one view scoped channel and have a global JavaScript listener which can distinguish its task based on the delivered
+ * message. E.g. by sending the message in server as below:
  * <pre>
  * Map&lt;String, Object&gt; message = new HashMap&lt;&gt;();
  * message.put("functionName", "someFunction");
@@ -273,7 +278,7 @@ import org.omnifaces.util.Json;
  *
  * <h3>Conditionally connecting socket</h3>
  * <p>
- * You can use the <code>connected</code> attribute for that. This is particularly useful on view scoped sockets.
+ * You can use the <code>connected</code> attribute for that.
  * <pre>
  * &lt;o:socket ... connected="#{bean.pushable}" /&gt;
  * </pre>
@@ -286,7 +291,8 @@ import org.omnifaces.util.Json;
  * <p>
  * You can also explicitly set it to <code>false</code> and manually open the push connection in client side by
  * invoking <code>OmniFaces.Push.open(channel)</code>, passing the channel name, for example in an onclick listener
- * function of a command button which initiates a long running asynchronous task in server side.
+ * function of a command button which initiates a long running asynchronous task in server side. This is particularly
+ * useful on view scoped sockets.
  * <pre>
  * &lt;o:socket channel="foo" ... connected="false" /&gt;
  * </pre>
@@ -297,12 +303,13 @@ import org.omnifaces.util.Json;
  * }
  * </pre>
  * <p>
- * The web socket is by default open as long as the document is open. It will be implicitly closed once the document is
- * unloaded (e.g. navigating away, close of browser window/tab, etc). In case you intend to have an one-time push,
- * usually because you only wanted to present the result of an one-time asynchronous action in a manually opened push
- * socket as in above example, you can optionally explicitly close the push connection from client side by invoking
- * <code>OmniFaces.Push.close(channel)</code>, passing the channel name. For example, in the <code>onmessage</code>
- * JavaScript listener function as below:
+ * The web socket is by default open as long as the document is open (and it will auto-reconnect when the connection is
+ * unintentionally closed/aborted as result of e.g. a timeout or a network error). The web socket will be implicitly
+ * closed once the document is unloaded (e.g. navigating away, close of browser window/tab, etc). In case you intend to
+ * have an one-time push, usually because you only wanted to present the result of an one-time asynchronous action in a
+ * manually opened push socket as in above example, you can optionally explicitly close the push connection from client
+ * side by invoking <code>OmniFaces.Push.close(channel)</code>, passing the channel name. For example, in the
+ * <code>onmessage</code> JavaScript listener function as below:
  * <pre>
  * function someSocketListener(message, channel) {
  *     // ...
