@@ -15,13 +15,6 @@
  */
 package org.omnifaces.cdi.eager;
 
-import static java.lang.String.format;
-import static java.util.Collections.unmodifiableList;
-import static java.util.Collections.unmodifiableMap;
-import static org.omnifaces.util.Beans.getAnnotation;
-import static org.omnifaces.util.Beans.getReference;
-import static org.omnifaces.util.Utils.isEmpty;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +34,13 @@ import javax.enterprise.inject.spi.ProcessBean;
 
 import org.omnifaces.cdi.Eager;
 import org.omnifaces.cdi.ViewScoped;
+
+import static java.lang.String.format;
+import static java.util.Collections.unmodifiableList;
+import static java.util.Collections.unmodifiableMap;
+import static org.omnifaces.util.Beans.getAnnotation;
+import static org.omnifaces.util.Beans.getReference;
+import static org.omnifaces.util.Utils.isEmpty;
 
 /**
  * CDI extension that collects beans annotated with {@link Eager}. After deployment
@@ -108,7 +108,12 @@ public class EagerExtension implements Extension {
 
 	public void load(@SuppressWarnings("unused") @Observes AfterDeploymentValidation event, BeanManager beanManager) {
 
-		EagerBeansRepository eagerBeansRepository = getReference(beanManager, EagerBeansRepository.class);
+        EagerBeansRepository eagerBeansRepository;
+        try {
+            eagerBeansRepository = getReference(beanManager, EagerBeansRepository.class);
+        } catch (NullPointerException ex) {
+            return;
+        }
 
 		if (!applicationScopedBeans.isEmpty()) {
 			eagerBeansRepository.setApplicationScopedBeans(unmodifiableList(applicationScopedBeans));
