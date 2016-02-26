@@ -53,9 +53,9 @@ import org.omnifaces.util.Json;
 
 /**
  * <p>
- * Opens an one-way (server to client) web socket based push connection in client side which can be reached from
- * server side via {@link PushContext} interface injected in any CDI/container managed artifact via {@link Push}
- * annotation.
+ * The JSF <code>&lt;o:socket&gt;</code> tag opens an one-way (server to client) web socket based push connection in
+ * client side which can be reached from server side via {@link PushContext} interface injected in any CDI/container
+ * managed artifact via {@link Push} annotation.
  *
  *
  * <h3>Configuration</h3>
@@ -68,14 +68,14 @@ import org.omnifaces.util.Json;
  * &lt;/context-param&gt;
  * </pre>
  * <p>
- * It will install the {@link SocketEndpoint}. Lazy initialization of the endpoint is unfortunately not possible across
- * all containers (yet).
+ * It will install the {@link SocketEndpoint}. Lazy initialization of the endpoint via taghandler is unfortunately not
+ * possible across all containers (yet).
  * See also <a href="https://java.net/jira/browse/WEBSOCKET_SPEC-211">WS spec issue 211</a>.
  *
  *
  * <h3>Usage (client)</h3>
  * <p>
- * Declare <code>&lt;o:socket&gt;</code> tag in the view with at least a <code>channel</code> name and an
+ * Declare <code>&lt;o:socket&gt;</code> tag in the JSF view with at least a <code>channel</code> name and an
  * <code>onmessage</code> JavaScript listener function. The channel name may not be an EL expression and it may only
  * contain alphanumeric characters, hyphens, underscores and periods.
  * <p>
@@ -169,8 +169,8 @@ import org.omnifaces.util.Json;
  * communication, from server to client. In case you intend to send some data from client to server, just continue
  * using JSF ajax the usual way, if necessary from JavaScript on with <code>&lt;o:commandScript&gt;</code> or perhaps
  * <code>&lt;p:remoteCommand&gt;</code> or similar. This has among others the advantage of maintaining the JSF view
- * state, the HTTP session and, importantingly, all security constraints on business service methods. Namely, those are
- * not available during an incoming web socket message per se. See also a.o.
+ * state, the HTTP session and, importantingly, all security constraints on business service methods. Namely, those
+ * security constraints are not available during an incoming web socket message per se. See also a.o.
  * <a href="https://java.net/jira/browse/WEBSOCKET_SPEC-238">WS spec issue 238</a>.
  *
  *
@@ -200,9 +200,9 @@ import org.omnifaces.util.Json;
  * <code>session</code> and <code>view</code>, case insensitive.
  * <p>
  * Additionally, the optional <code>user</code> attribute can be set to the unique identifier of the logged-in user,
- * usually the login name or the user ID. This way the push message can be targeted to a specific user and be sent by
- * other users. The value of the <code>user</code> attribute must at least implement {@link Serializable} and have a
- * low memory footprint, so putting entire user entity is not recommended.
+ * usually the login name or the user ID. This way the push message can be targeted to a specific user and can be sent
+ * by other users and the application itself. The value of the <code>user</code> attribute must at least implement
+ * {@link Serializable} and have a low memory footprint, so putting entire user entity is not recommended.
  * <p>
  * E.g. when you're using container managed authentication or a related framework/library:
  * <pre>
@@ -217,11 +217,11 @@ import org.omnifaces.util.Json;
  * <p>
  * When the <code>user</code> attribute is specified, then the <code>scope</code> defaults to <code>session</code> and
  * cannot be set to <code>application</code>. It can be set to <code>view</code>, but this is kind of unusual and should
- * only be used if the logged-in user represented by <code>user</code> is not session scoped but view scoped (e.g. when
- * your application allows changing a logged-in user during same HTTP session without invaliding it &mdash; which is in
- * turn poor security practice). If in such case a session scoped socket is reused, undefined behavior may occur when
- * user-targeted push message is sent. It may target previously logged-in user only. This can be solved by setting the
- * scope to <code>view</code>, but better is to fix the logout/login to invalidate the HTTP session altogether.
+ * only be used if the logged-in user represented by <code>user</code> has a shorter lifetime than the HTTP session
+ * (e.g. when your application allows changing a logged-in user during same HTTP session without invaliding it &mdash;
+ * which is in turn poor security practice). If in such case a session scoped socket is reused, undefined behavior may
+ * occur when user-targeted push message is sent. It may target previously logged-in user only. This can be solved by
+ * setting the scope to <code>view</code>, but better is to fix the logout to invalidate the HTTP session altogether.
  * <p>
  * In the server side, the push message can be targeted to the user via {@link PushContext#send(Object, Serializable)}.
  * The push message can be sent by the user itself, other users, and even the application (e.g. EJB). This is useful for
@@ -513,8 +513,8 @@ import org.omnifaces.util.Json;
  *
  * @author Bauke Scholtz
  * @see SocketEndpoint
+ * @see SocketFacesListener
  * @see SocketChannelManager
- * @see SocketEventListener
  * @see SocketSessionManager
  * @see SocketEvent
  * @see Opened
@@ -582,7 +582,7 @@ public class Socket extends TagHandler {
 
 	/**
 	 * First check if the web socket endpoint is enabled in <code>web.xml</code> and the channel name and scope is
-	 * valid, then subcribe the {@link SocketEventListener}.
+	 * valid, then subcribe the {@link SocketFacesListener}.
 	 * @throws IllegalStateException When the web socket endpoint is not enabled in <code>web.xml</code>.
 	 * @throws IllegalArgumentException When the channel name, scope or user is invalid.
 	 * The channel name may only contain alphanumeric characters, hyphens, underscores and periods.
@@ -633,7 +633,7 @@ public class Socket extends TagHandler {
 		String functions = onmessageFunction + "," + oncloseFunction;
 		ValueExpression connectedExpression = getValueExpression(context, connected, Boolean.class);
 
-		SystemEventListener listener = new SocketEventListener(portNumber, channelName, channelId, functions, connectedExpression);
+		SystemEventListener listener = new SocketFacesListener(portNumber, channelName, channelId, functions, connectedExpression);
 		subscribeToViewEvent(PostAddToViewEvent.class, listener);
 		subscribeToViewEvent(PreRenderViewEvent.class, listener);
 	}

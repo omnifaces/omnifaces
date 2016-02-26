@@ -34,14 +34,14 @@ import javax.faces.event.SystemEventListener;
 
 /**
  * <p>
- * This system event listener for {@link UIViewRoot} ensures that the necessary scripts for <code>&lt;o:socket&gt;</code>
- * are properly rendered.
+ * This JSF system event listener for {@link UIViewRoot} ensures that the necessary scripts for
+ * <code>&lt;o:socket&gt;</code> are properly rendered.
  *
  * @author Bauke Scholtz
  * @see Socket
  * @since 2.3
  */
-public class SocketEventListener implements SystemEventListener {
+public class SocketFacesListener implements SystemEventListener {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
@@ -69,7 +69,7 @@ public class SocketEventListener implements SystemEventListener {
 	 * @param functions The onmessage and onclose functions.
 	 * @param connectedExpression The connected expression.
 	 */
-	public SocketEventListener(Integer port, String channel, String uri, String functions, ValueExpression connectedExpression) {
+	public SocketFacesListener(Integer port, String channel, String uri, String functions, ValueExpression connectedExpression) {
 		this.port = port;
 		this.channel = channel;
 		this.uri = uri;
