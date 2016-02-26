@@ -4843,6 +4843,17 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 		<attribute>
 			<description>
 				<![CDATA[
+					The JavaScript event handler function that is invoked when the web socket is opened.
+					The function will be invoked with one argument: the channel name.
+				]]>
+			</description>
+			<name>onopen</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
 					The JavaScript event handler function that is invoked when a push message is received from the server.
 					The function will be invoked with three arguments: the push message, the channel name and the raw MessageEvent itself.
 				]]>

@@ -103,6 +103,21 @@ import org.omnifaces.util.Json;
  * MessageEvent</code></a> instance, useful in case you intend to inspect it.</li>
  * </ul>
  * <p>
+ * The optional <code>onopen</code> JavaScript listener function can be used to listen on open of a web socket.
+ * <pre>
+ * &lt;o:socket ... onopen="socketOpenListener" /&gt;
+ * </pre>
+ * <pre>
+ * function socketOpenListener(channel) {
+ *     // ...
+ * }
+ * </pre>
+ * <p>
+ * The <code>onopen</code> JS listener function will be invoked with one argument:
+ * <ul>
+ * <li><code>channel</code>: the channel name, useful in case you intend to have a global listener.</li>
+ * </ul>
+ * <p>
  * The optional <code>onclose</code> JavaScript listener function can be used to listen on (ab)normal close of a web
  * socket.
  * <pre>
@@ -557,6 +572,7 @@ public class Socket extends TagHandler {
 	private TagAttribute channel;
 	private TagAttribute scope;
 	private TagAttribute user;
+	private TagAttribute onopen;
 	private TagAttribute onmessage;
 	private TagAttribute onclose;
 	private TagAttribute connected;
@@ -573,6 +589,7 @@ public class Socket extends TagHandler {
 		channel = getRequiredAttribute("channel");
 		scope = getAttribute("scope");
 		user = getAttribute("user");
+		onopen = getAttribute("onopen");
 		onmessage = getRequiredAttribute("onmessage");
 		onclose = getAttribute("onclose");
 		connected = getAttribute("connected");
@@ -628,9 +645,10 @@ public class Socket extends TagHandler {
 		}
 
 		Integer portNumber = getObject(context, port, Integer.class);
+		String onopenFunction = getString(context, onopen);
 		String onmessageFunction = onmessage.getValue(context);
 		String oncloseFunction = getString(context, onclose);
-		String functions = onmessageFunction + "," + oncloseFunction;
+		String functions = onopenFunction + "," + onmessageFunction + "," + oncloseFunction;
 		ValueExpression connectedExpression = getValueExpression(context, connected, Boolean.class);
 
 		SystemEventListener listener = new SocketFacesListener(portNumber, channelName, channelId, functions, connectedExpression);

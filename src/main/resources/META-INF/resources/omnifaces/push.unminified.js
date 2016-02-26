@@ -42,10 +42,11 @@ OmniFaces.Push = (function(Util, window) {
 	 * @constructor
 	 * @param {string} url The URL of the web socket 
 	 * @param {string} channel The name of the web socket channel.
+	 * @param {function} onopen The function to be invoked when the web socket is opened.
 	 * @param {function} onmessage The function to be invoked when a message is received.
 	 * @param {function} onclose The function to be invoked when the web socket is closed.
 	 */
-	function Socket(url, channel, onmessage, onclose) {
+	function Socket(url, channel, onopen, onmessage, onclose) {
 
 		// Private fields -----------------------------------------------------------------------------------------
 
@@ -66,6 +67,10 @@ OmniFaces.Push = (function(Util, window) {
 			socket = new WebSocket(url);
 
 			socket.onopen = function(event) {
+				if (reconnectAttempts == null) {
+					onopen(channel);
+				}
+
 				reconnectAttempts = 0;
 			}
 
@@ -108,6 +113,8 @@ OmniFaces.Push = (function(Util, window) {
 	 * If the value starts with <code>/</code>, then <code>window.location.host</code> will be prepended.
 	 * @param {string} uri The uri of the web socket representing the channel name and identifier, separated by a 
 	 * question mark. All open websockets on the same uri will receive the same push notification from the server.
+	 * @param {function} onopen The JavaScript event handler function that is invoked when the web socket is opened.
+	 * The function will be invoked with one argument: the channel name.
 	 * @param {function} onmessage The JavaScript event handler function that is invoked when a message is received from
 	 * the server. The function will be invoked with three arguments: the push message, the channel name and the raw
 	 * <code>MessageEvent</code> itself.
@@ -120,7 +127,7 @@ OmniFaces.Push = (function(Util, window) {
 	 * for an elaborate list.
 	 * @param {boolean} autoconnect Whether or not to immediately open the socket. Defaults to <code>false</code>.
 	 */
-	self.init = function(host, uri, onmessage, onclose, autoconnect) {
+	self.init = function(host, uri, onopen, onmessage, onclose, autoconnect) {
 		onclose = Util.resolveFunction(onclose);
 		var channel = uri.split(/\?/)[0];
 
@@ -130,7 +137,7 @@ OmniFaces.Push = (function(Util, window) {
 		}
 
 		if (!sockets[channel]) {
-			sockets[channel] = new Socket(getBaseURL(host) + uri, channel, Util.resolveFunction(onmessage), onclose);
+			sockets[channel] = new Socket(getBaseURL(host) + uri, channel, Util.resolveFunction(onopen), Util.resolveFunction(onmessage), onclose);
 		}
 
 		if (autoconnect) {
