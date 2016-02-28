@@ -157,23 +157,23 @@ import org.omnifaces.util.Json;
  *
  * <h3 id="scopes-and-users"><a href="#scopes-and-users">Scopes and users</a></h3>
  * <p>
- * By default the web socket is application scoped, i.e. any view/session throughout the web application having the
- * same web socket channel open will receive the same push message. The push message can be sent by all users and the
- * application itself. This is useful for application-wide feedback triggered by site itself such as real time updates
- * of a certain page (e.g. site-wide statistics, top100 lists, stock updates, etc).
+ * By default the web socket is <strong><code>application</code></strong> scoped, i.e. any view/session throughout the
+ * web application having the same web socket channel open will receive the same push message. The push message can be
+ * sent by all users and the application itself. This is useful for application-wide feedback triggered by site itself
+ * such as real time updates of a certain page (e.g. site-wide statistics, top100 lists, stock updates, etc).
  * <p>
- * The optional <strong><code>scope</code></strong> attribute can be set to <code>session</code> to restrict the push
- * messages to all views in the current user session only. The push message can only be sent by the user itself and not
- * by the application. This is useful for session-wide feedback triggered by user itself (e.g. as result of asynchronous
- * tasks triggered by user specific action).
+ * The optional <strong><code>scope</code></strong> attribute can be set to <strong><code>session</code></strong> to
+ * restrict the push messages to all views in the current user session only. The push message can only be sent by the
+ * user itself and not by the application. This is useful for session-wide feedback triggered by user itself (e.g. as
+ * result of asynchronous tasks triggered by user specific action).
  * <pre>
  * &lt;o:socket channel="someChannel" scope="session" ... /&gt;
  * </pre>
  * <p>
- * The <code>scope</code> attribute can also be set to <code>view</code> to restrict the push messages to the current
- * view only. The push message will not show up in other views in the same session even if it's the same URL. The push
- * message can only be sent by the user itself and not by the application. This is useful for view-wide feedback
- * triggered by user itself (e.g. progress bar tied to a user specific action on current view).
+ * The <code>scope</code> attribute can also be set to <strong><code>view</code></strong> to restrict the push messages
+ * to the current view only. The push message will not show up in other views in the same session even if it's the same
+ * URL. The push message can only be sent by the user itself and not by the application. This is useful for view-wide
+ * feedback triggered by user itself (e.g. progress bar tied to a user specific action on current view).
  * <pre>
  * &lt;o:socket channel="someChannel" scope="view" ... /&gt;
  * </pre>
@@ -188,13 +188,13 @@ import org.omnifaces.util.Json;
  * <p>
  * E.g. when you're using container managed authentication or a related framework/library:
  * <pre>
- * &lt;o:socket channel="someChannel" scope="session" user="#{request.remoteUser}" ... /&gt;
+ * &lt;o:socket channel="someChannel" user="#{request.remoteUser}" ... /&gt;
  * </pre>
  * <p>
  * Or when you have a custom user entity around in EL as <code>#{someLoggedInUser}</code> which has an <code>id</code>
  * property representing its identifier:
  * <pre>
- * &lt;o:socket channel="someChannel" scope="session" user="#{someLoggedInUser.id}" ... /&gt;
+ * &lt;o:socket channel="someChannel" user="#{someLoggedInUser.id}" ... /&gt;
  * </pre>
  * <p>
  * When the <code>user</code> attribute is specified, then the <code>scope</code> defaults to <code>session</code> and
@@ -357,7 +357,7 @@ import org.omnifaces.util.Json;
  * (and thus not manually by the client via <code>OmniFaces.Push.close(channel)</code>), then it means that the session
  * or view has expired. In case of a session scoped socket you could take the opportunity to show a "Session expired"
  * message and/or immediately redirect to the login page via <code>window.location</code>. In case of a view scoped
- * socket this is quite rare as it actually means "view expired" while the page is still open, but it could happen if
+ * socket this is quite rare as it actually means "View expired" while the page is still open, but it could happen if
  * the JSF "views per session" configuration setting is set relatively low. You might take the opportunity to reload
  * the page.
  *
@@ -437,7 +437,8 @@ import org.omnifaces.util.Json;
  * immediately be closed with close reason code {@link CloseCodes#VIOLATED_POLICY} (<code>1008</code>). Also, when the
  * HTTP session gets destroyed, all session and view scoped channels which are still open will explicitly be closed
  * from server side with close reason code {@link CloseCodes#NORMAL_CLOSURE} (<code>1000</code>). Only application
- * scoped sockets remain open and are still reachable from server end even when the session is expired on client side.
+ * scoped sockets remain open and are still reachable from server end even when the session or view is expired on client
+ * side.
  *
  *
  * <h3 id="ejb"><a href="#ejb">EJB design hints</a></h3>
@@ -492,9 +493,36 @@ import org.omnifaces.util.Json;
  * HTTP request). A view and session scoped push socket would also not work, so the push socket really needs to be
  * application scoped). The {@link FacesContext} will also be unavailable in the above event listener method.
  * <p>
- * In case the trigger in EAR/EJB side is an asynchronous method which is in turn initiated in WAR side, then you could
- * make use of callbacks from WAR side. Let the business service method take a callback instance as argument, e.g.
- * {@link Runnable}.
+ * In case the trigger in EAR/EJB side is an asynchronous service method which is in turn initiated in WAR side, then
+ * you could make use of callbacks from WAR side. Let the business service method take a callback instance as argument,
+ * e.g. the <code>java.util.function.Consumer</code> functional interface.
+ * <pre>
+ * &#64;Asynchronous
+ * public void someAsyncServiceMethod(Entity entity, Consumer&lt;Object&gt; callback) {
+ *     // ... (some long process)
+ *     callback.accept(entity.getSomeProperty());
+ * }
+ * </pre>
+ * <p>
+ * And invoke the asynchronous service method in WAR as below.
+ * <pre>
+ * &#64;Inject
+ * private SomeService someService;
+ *
+ * &#64;Inject &#64;Push
+ * private PushContext someChannel;
+ *
+ * public void submit() {
+ *     someService.someAsyncServiceMethod(entity, message -&gt; someChannel.send(message));
+ * }
+ * </pre>
+ * <p>
+ * This would be the only way in case you intend to asynchronously send a message to a view or session scoped push
+ * socket, and/or want to pass something from {@link FacesContext} or the initial request/view/session scope along as
+ * (<code>final</code>) argument.
+ * <p>
+ * In case you're not on Java 8 yet, then you can make use of {@link Runnable} as callback instance instead of the
+ * above <code>Consumer</code> functional interface example.
  * <pre>
  * &#64;Asynchronous
  * public void someAsyncServiceMethod(Entity entity, Runnable callback) {
@@ -503,15 +531,7 @@ import org.omnifaces.util.Json;
  *     callback.run();
  * }
  * </pre>
- * <p>
- * And invoke the service method in WAR as below.
  * <pre>
- * &#64;Inject
- * private SomeService someService;
- *
- * &#64;Inject &#64;Push
- * private PushContext someChannel;
- *
  * public void submit() {
  *     someService.someAsyncServiceMethod(entity, new Runnable() {
  *         public void run() {
@@ -521,27 +541,8 @@ import org.omnifaces.util.Json;
  * }
  * </pre>
  * <p>
- * This would be the only way in case you intend to asynchronously send a message to a view or session scoped push
- * socket, and/or want to pass something from {@link FacesContext} or the initial request/view/session scope along as
- * (<code>final</code>) argument.
- * <p>
  * Note that OmniFaces own {@link Callback} interfaces are insuitable as you're not supposed to use WAR (front end)
  * frameworks and libraries like JSF and OmniFaces in EAR/EJB (back end) side.
- * <p>
- * In case you're already on Java 8, of course make use of the <code>Consumer</code> functional interface instead of
- * the above {@link Runnable} example.
- * <pre>
- * &#64;Asynchronous
- * public void someAsyncServiceMethod(Entity entity, Consumer&lt;Object&gt; callback) {
- *     // ... (some long process)
- *     callback.accept(entity.getSomeProperty());
- * }
- * </pre>
- * <pre>
- * public void submit() {
- *     someService.someAsyncServiceMethod(entity, message -&gt; someChannel.send(message);
- * }
- * </pre>
  *
  *
  * <h3 id="ui"><a href="#ui">UI update design hints</a></h3>
