@@ -91,7 +91,7 @@ public class SocketEndpoint extends Endpoint {
 	 */
 	@Override
 	public void onClose(Session session, CloseReason reason) {
-		SocketSessionManager.getInstance().remove(session, reason.getCloseCode()); // @Inject in Endpoint doesn't work in Tomcat+Weld/OWB and CDI.current() during WS close doesn't work in WildFly.
+		SocketSessionManager.getInstance().remove(session, reason); // @Inject in Endpoint doesn't work in Tomcat+Weld/OWB and CDI.current() during WS close doesn't work in WildFly.
 
 		Throwable throwable = (Throwable) session.getUserProperties().remove(Throwable.class.getName());
 

@@ -16,7 +16,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import javax.enterprise.event.Observes;
-import javax.websocket.CloseReason.CloseCode;
+import javax.websocket.CloseReason;
 
 import org.omnifaces.cdi.push.event.Closed;
 import org.omnifaces.cdi.push.event.Opened;
@@ -25,6 +25,8 @@ import org.omnifaces.cdi.push.event.Opened;
  * <p>
  * The socket event. This will be created by {@link SocketSessionManager} when a new socket has been {@link Opened} or
  * {@link Closed}. An application scoped CDI bean can {@link Observes} them.
+ * <p>
+ * For detailed usage instructions, see {@link Socket} javadoc.
  *
  * @author Bauke Scholtz
  * @see Socket
@@ -38,12 +40,12 @@ public final class SocketEvent implements Serializable {
 
 	private final String channel;
 	private final Serializable user;
-	private final CloseCode closeCode;
+	private final CloseReason reason;
 
-	SocketEvent(String channel, Serializable user, CloseCode closeCode) {
+	SocketEvent(String channel, Serializable user, CloseReason reason) {
 		this.channel = channel;
 		this.user = user;
-		this.closeCode = closeCode;
+		this.reason = reason;
 	}
 
 	/**
@@ -66,18 +68,18 @@ public final class SocketEvent implements Serializable {
 	}
 
 	/**
-	 * Returns the close code.
+	 * Returns the close reason.
 	 * If this returns <code>null</code>, then it was {@link Opened}.
 	 * If this returns non-<code>null</code>, then it was {@link Closed}.
-	 * @return The close code.
+	 * @return The close reason.
 	 */
-	public CloseCode getCloseCode() {
-		return closeCode;
+	public CloseReason getCloseReason() {
+		return reason;
 	}
 
 	@Override
 	public int hashCode() {
-		return super.hashCode() + Objects.hash(channel, user, closeCode);
+		return super.hashCode() + Objects.hash(channel, user, reason);
 	}
 
 	@Override
@@ -85,12 +87,12 @@ public final class SocketEvent implements Serializable {
 		return other != null && getClass() == other.getClass()
 			&& Objects.equals(channel, ((SocketEvent) other).channel)
 			&& Objects.equals(user, ((SocketEvent) other).user)
-			&& Objects.equals(closeCode, ((SocketEvent) other).closeCode);
+			&& Objects.equals(reason, ((SocketEvent) other).reason);
 	}
 
 	@Override
 	public String toString() {
-		return String.format("SocketEvent[channel=%s, user=%s, closeCode=%s]", channel, user, closeCode);
+		return String.format("SocketEvent[channel=%s, user=%s, closeReason=%s]", channel, user, reason);
 	}
 
 }

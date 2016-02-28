@@ -79,7 +79,7 @@ OmniFaces.Push = (function(Util, window) {
 			}
 
 			socket.onclose = function(event) {
-				if (!socket || event.code == 1008 || reconnectAttempts == null || reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+				if (!socket || event.code == 1000 || event.code == 1008 || reconnectAttempts == null || reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
 					onclose(event.code, channel, event);
 				}
 				else {

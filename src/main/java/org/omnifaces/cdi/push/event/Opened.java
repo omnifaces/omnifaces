@@ -26,6 +26,8 @@ import org.omnifaces.cdi.push.Socket;
 /**
  * <p>
  * Indicates that a socket has opened.
+ * <p>
+ * For detailed usage instructions, see {@link Socket} javadoc.
  *
  * @author Bauke Scholtz
  * @see Socket

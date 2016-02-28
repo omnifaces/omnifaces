@@ -12,11 +12,9 @@
  */
 package org.omnifaces.cdi.push;
 
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.synchronizedSet;
-import static org.omnifaces.util.Faces.getViewAttribute;
-import static org.omnifaces.util.Faces.getViewRoot;
-import static org.omnifaces.util.Faces.setViewAttribute;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -33,14 +31,12 @@ import java.util.concurrent.ConcurrentMap;
 
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.SessionScoped;
-import javax.faces.component.UIViewRoot;
-import javax.faces.event.ComponentSystemEvent;
-import javax.faces.event.ComponentSystemEventListener;
-import javax.faces.event.PreDestroyViewMapEvent;
+import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
 
 import org.omnifaces.cdi.push.event.Closed;
 import org.omnifaces.cdi.push.event.Opened;
+import org.omnifaces.util.Beans;
 
 /**
  * <p>
@@ -56,6 +52,7 @@ public class SocketChannelManager implements Serializable {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final long serialVersionUID = 1L;
+	static final Map<String, String> EMPTY_SCOPE = emptyMap();
 
 	private enum Scope {
 		APPLICATION, SESSION, VIEW;
@@ -111,7 +108,7 @@ public class SocketChannelManager implements Serializable {
 	}
 
 	@SafeVarargs
-	private final String register(Serializable user, String channel, ConcurrentMap<String, String> targetScope, Map<String, String>... otherScopes) {
+	private final String register(Serializable user, String channel, Map<String, String> targetScope, Map<String, String>... otherScopes) {
 		if (!targetScope.containsKey(channel)) {
 			for (Map<String, String> otherScope : otherScopes) {
 				if (otherScope.containsKey(channel)) {
@@ -119,7 +116,7 @@ public class SocketChannelManager implements Serializable {
 				}
 			}
 
-			targetScope.putIfAbsent(channel, channel + "?" + UUID.randomUUID().toString());
+			((ConcurrentMap<String, String>) targetScope).putIfAbsent(channel, channel + "?" + UUID.randomUUID().toString());
 		}
 
 		String channelId = targetScope.get(channel);
@@ -194,19 +191,24 @@ public class SocketChannelManager implements Serializable {
 	// Nested classes -------------------------------------------------------------------------------------------------
 
 	/**
-	 * When current view scope is about to be destroyed, deregister all view scope channels and explicitly close
-	 * any open web sockets associated with it to avoid stale websockets. This component system event listener is
-	 * intented to be registered on the {@link UIViewRoot}.
-	 *
+	 * The web socket channel manager for view scoped web socket channels.
 	 * @author Bauke Scholtz
 	 * @see SocketChannelManager
 	 * @since 2.3
 	 */
-	public static class DeregisterViewScopeChannels implements ComponentSystemEventListener {
+	@ViewScoped
+	public static class SocketChannelManagerViewScopeIds implements Serializable {
 
-		@Override
-		public void processEvent(ComponentSystemEvent event) {
-			SocketSessionManager.getInstance().deregister(getViewScopeIds(false).values());
+		private static final long serialVersionUID = 1L;
+		private ConcurrentMap<String, String> viewScopeIds = new ConcurrentHashMap<>(1); // size=1 as an average developer will unlikely declare multiple view scoped channels in same view.
+
+		/**
+		 * When current view scope is about to be destroyed, deregister all view scope channels and explicitly close
+		 * any open web sockets associated with it to avoid stale websockets.
+		 */
+		@PreDestroy
+		public void deregisterViewScopeChannels() {
+			SocketSessionManager.getInstance().deregister(viewScopeIds.values());
 		}
 
 	}
@@ -217,7 +219,7 @@ public class SocketChannelManager implements Serializable {
 	 * For internal usage only. This makes it possible to remember session scope channel IDs during injection time of
 	 * {@link SocketPushContext} (the CDI session scope is not necessarily active during push send time).
 	 */
-	ConcurrentMap<String, String> getSessionScopeIds() {
+	Map<String, String> getSessionScopeIds() {
 		return sessionScopeIds;
 	}
 
@@ -225,19 +227,9 @@ public class SocketChannelManager implements Serializable {
 	 * For internal usage only. This makes it possible to remember view scope channel IDs during injection time of
 	 * {@link SocketPushContext} (the CDI view scope is not necessarily active during push send time).
 	 */
-	static ConcurrentMap<String, String> getViewScopeIds(boolean create) {
-		ConcurrentMap<String, String> viewScopeIds = getViewAttribute(SocketChannelManager.class.getName());
-
-		if (viewScopeIds == null) {
-			viewScopeIds = new ConcurrentHashMap<>(1); // size=1 as an average developer will unlikely declare multiple view scoped channels in same view.
-
-			if (create) {
-				setViewAttribute(SocketChannelManager.class.getName(), viewScopeIds);
-				getViewRoot().subscribeToEvent(PreDestroyViewMapEvent.class, new DeregisterViewScopeChannels());
-			}
-		}
-
-		return viewScopeIds;
+	static Map<String, String> getViewScopeIds(boolean create) {
+		SocketChannelManagerViewScopeIds bean = Beans.getInstance(SocketChannelManagerViewScopeIds.class, create);
+		return (bean == null) ? EMPTY_SCOPE : bean.viewScopeIds;
 	}
 
 	/**

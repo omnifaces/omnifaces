@@ -13,7 +13,7 @@
 package org.omnifaces.cdi.push;
 
 import static java.util.Arrays.asList;
-import static java.util.Collections.emptyMap;
+import static org.omnifaces.cdi.push.SocketChannelManager.EMPTY_SCOPE;
 import static org.omnifaces.util.Beans.isActive;
 
 import java.io.Serializable;
@@ -44,7 +44,6 @@ public class SocketPushContext implements PushContext {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final long serialVersionUID = 1L;
-	private static final Map<String, String> EMPTY_SCOPE = emptyMap();
 
 	// Variables ------------------------------------------------------------------------------------------------------
 

@@ -14,10 +14,9 @@ package org.omnifaces.cdi.push;
 
 import static java.util.Collections.emptySet;
 import static java.util.Collections.synchronizedSet;
-import static javax.websocket.CloseReason.CloseCodes.GOING_AWAY;
+import static javax.websocket.CloseReason.CloseCodes.NORMAL_CLOSURE;
 import static org.omnifaces.cdi.push.SocketChannelManager.getUser;
 import static org.omnifaces.cdi.push.SocketEndpoint.PARAM_CHANNEL;
-import static org.omnifaces.util.Beans.fireEvent;
 import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Utils.isEmpty;
 
@@ -33,11 +32,11 @@ import java.util.concurrent.Future;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.websocket.CloseReason;
-import javax.websocket.CloseReason.CloseCode;
 import javax.websocket.Session;
 
 import org.omnifaces.cdi.push.event.Closed;
 import org.omnifaces.cdi.push.event.Opened;
+import org.omnifaces.util.Beans;
 import org.omnifaces.util.Json;
 
 /**
@@ -55,7 +54,7 @@ public class SocketSessionManager {
 
 	private static final ConcurrentMap<String, Set<Session>> channelSessions = new ConcurrentHashMap<>();
 
-	private static final CloseReason REASON_SESSION_EXPIRED = new CloseReason(GOING_AWAY, "Session expired");
+	private static final CloseReason REASON_EXPIRED = new CloseReason(NORMAL_CLOSURE, "Expired");
 	private static final AnnotationLiteral<Opened> SESSION_OPENED = new AnnotationLiteral<Opened>() {
 		private static final long serialVersionUID = 1L;
 	};
@@ -111,14 +110,13 @@ public class SocketSessionManager {
 		Set<Session> sessions = channelSessions.get(channelId);
 
 		if (sessions != null && sessions.add(session)) {
-			String channel = getChannel(session);
-			Serializable user = getUser(channel, channelId);
+			Serializable user = getUser(getChannel(session), channelId);
 
 			if (user != null) {
 				session.getUserProperties().put("user", user);
 			}
 
-			fireEvent(new SocketEvent(channel, user, null), SESSION_OPENED);
+			fireEvent(session, null, SESSION_OPENED);
 			return true;
 		}
 
@@ -158,14 +156,13 @@ public class SocketSessionManager {
 	/**
 	 * On close, remove given web socket session from the mapping.
 	 * @param session The closed web socket session.
-	 * @param closeCode The close code.
+	 * @param reason The close reason.
 	 */
-	public void remove(Session session, CloseCode closeCode) {
+	public void remove(Session session, CloseReason reason) {
 		Set<Session> sessions = channelSessions.get(getChannelId(session));
 
 		if (sessions != null && sessions.remove(session)) {
-			Serializable user = (Serializable) session.getUserProperties().get("user");
-			fireEvent(new SocketEvent(getChannel(session), user, closeCode), SESSION_CLOSED);
+			fireEvent(session, reason, SESSION_CLOSED);
 		}
 	}
 
@@ -180,8 +177,10 @@ public class SocketSessionManager {
 			if (sessions != null) {
 				for (Session session : sessions) {
 					if (session.isOpen()) {
+						fireEvent(session, REASON_EXPIRED, SESSION_CLOSED);
+
 						try {
-							session.close(REASON_SESSION_EXPIRED);
+							session.close(REASON_EXPIRED);
 						}
 						catch (IOException ignore) {
 							continue;
@@ -200,6 +199,11 @@ public class SocketSessionManager {
 
 	private static String getChannelId(Session session) {
 		return getChannel(session) + "?" + session.getQueryString();
+	}
+
+	private static void fireEvent(Session session, CloseReason reason, AnnotationLiteral<?> qualifier) {
+		Serializable user = (Serializable) session.getUserProperties().get("user");
+		Beans.fireEvent(new SocketEvent(getChannel(session), user, reason), qualifier);
 	}
 
 }

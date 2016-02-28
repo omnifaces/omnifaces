@@ -66,7 +66,7 @@ public class SocketFacesListener implements SystemEventListener {
 	 * @param uri The uri of the web socket representing the channel identifier, which is composed of channel name and
 	 * scope identifier, separated by a question mark.
 	 * All open websockets on the same uri will receive the same push notification from the server.
-	 * @param functions The onmessage and onclose functions.
+	 * @param functions The onopen, onmessage and onclose functions.
 	 * @param connectedExpression The connected expression.
 	 */
 	public SocketFacesListener(Integer port, String channel, String uri, String functions, ValueExpression connectedExpression) {
