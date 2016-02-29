@@ -42,7 +42,7 @@ public interface PushContext extends Serializable {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	/** The context-relative web socket URI prefix where the endpoint should listen on. */
-	public static final String URI_PREFIX = "/omnifaces.push";
+	static final String URI_PREFIX = "/omnifaces.push";
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -57,7 +57,7 @@ public interface PushContext extends Serializable {
 	 * @throws IllegalArgumentException If given message object cannot be encoded as JSON.
 	 * @see Json#encode(Object)
 	 */
-	public Set<Future<Void>> send(Object message);
+	Set<Future<Void>> send(Object message);
 
 	/**
 	 * Send given message object to the push socket channel as identified by {@link Push}, targeted to the given user as
@@ -73,7 +73,7 @@ public interface PushContext extends Serializable {
 	 * @throws IllegalArgumentException If given message object cannot be encoded as JSON.
 	 * @see Json#encode(Object)
 	 */
-	public <S extends Serializable> Set<Future<Void>> send(Object message, S user);
+	<S extends Serializable> Set<Future<Void>> send(Object message, S user);
 
 	/**
 	 * Send given message object to the push socket channel as identified by {@link Push}, targeted to the given users
@@ -90,6 +90,6 @@ public interface PushContext extends Serializable {
 	 * @throws IllegalArgumentException If given message object cannot be encoded as JSON.
 	 * @see Json#encode(Object)
 	 */
-	public <S extends Serializable> Map<S, Set<Future<Void>>> send(Object message, Collection<S> users);
+	<S extends Serializable> Map<S, Set<Future<Void>>> send(Object message, Collection<S> users);
 
 }
