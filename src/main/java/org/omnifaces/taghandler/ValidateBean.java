@@ -250,13 +250,13 @@ public class ValidateBean extends TagHandler {
 			return;
 		}
 
-		if (disabled) {
-			return;
-		}
-
-		switch (method) {
-			case validateActual: validateActualBean(form, bean, groups); break;
-			case validateCopy: validateCopiedBean(form, bean, copier, groups); break;
+		if (!disabled) {
+			if (method == ValidateMethod.validateActual) {
+				validateActualBean(form, bean, groups);
+			}
+			else {
+				validateCopiedBean(form, bean, copier, groups);
+			}
 		}
 	}
 
