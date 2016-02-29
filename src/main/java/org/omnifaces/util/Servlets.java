@@ -567,24 +567,23 @@ public final class Servlets {
 	 * @see Application#getProjectStage()
 	 */
 	public static boolean isFacesDevelopment(ServletContext context) {
-		if (facesDevelopment != null) {
-			return facesDevelopment;
+		if (facesDevelopment == null) {
+			String projectStage = null;
+
+			try {
+				projectStage = lookup(PROJECT_STAGE_JNDI_NAME);
+			}
+			catch (IllegalStateException ignore) {
+				return false; // May happen in a.o. GlassFish 4.1 during startup.
+			}
+
+			if (projectStage == null) {
+				projectStage = context.getInitParameter(PROJECT_STAGE_PARAM_NAME);
+			}
+
+			facesDevelopment = Development.name().equals(projectStage);
 		}
 
-		String projectStage = null;
-
-		try {
-			projectStage = lookup(PROJECT_STAGE_JNDI_NAME);
-		}
-		catch (IllegalStateException ignore) {
-			return false; // May happen in a.o. GlassFish 4.1 during startup.
-		}
-
-		if (projectStage == null) {
-			projectStage = context.getInitParameter(PROJECT_STAGE_PARAM_NAME);
-		}
-
-		facesDevelopment = Development.name().equals(projectStage);
 		return facesDevelopment;
 	}
 

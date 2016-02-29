@@ -344,31 +344,30 @@ public final class Hacks {
 	 * @return The default resource maximum age in milliseconds.
 	 */
 	public static long getDefaultResourceMaxAge() {
-		if (defaultResourceMaxAge != null) {
-			return defaultResourceMaxAge;
-		}
+		if (defaultResourceMaxAge == null) {
+			FacesContext context = FacesContext.getCurrentInstance();
 
-		FacesContext context = FacesContext.getCurrentInstance();
+			if (context == null) {
+				return DEFAULT_RESOURCE_MAX_AGE;
+			}
 
-		if (context == null) {
-			return DEFAULT_RESOURCE_MAX_AGE;
-		}
+			for (String name : PARAM_NAMES_RESOURCE_MAX_AGE) {
+				String value = getInitParameter(context, name);
 
-		for (String name : PARAM_NAMES_RESOURCE_MAX_AGE) {
-			String value = getInitParameter(context, name);
-
-			if (value != null) {
-				try {
-					defaultResourceMaxAge = Long.valueOf(value);
-					return defaultResourceMaxAge;
-				}
-				catch (NumberFormatException e) {
-					throw new IllegalArgumentException(String.format(ERROR_MAX_AGE, name, value), e);
+				if (value != null) {
+					try {
+						defaultResourceMaxAge = Long.valueOf(value);
+						return defaultResourceMaxAge;
+					}
+					catch (NumberFormatException e) {
+						throw new IllegalArgumentException(String.format(ERROR_MAX_AGE, name, value), e);
+					}
 				}
 			}
+
+			defaultResourceMaxAge = DEFAULT_RESOURCE_MAX_AGE;
 		}
 
-		defaultResourceMaxAge = DEFAULT_RESOURCE_MAX_AGE;
 		return defaultResourceMaxAge;
 	}
 
