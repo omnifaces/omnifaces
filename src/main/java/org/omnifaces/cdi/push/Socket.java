@@ -56,7 +56,7 @@ import org.omnifaces.util.Json;
  * <p>
  * The <code>&lt;o:socket&gt;</code> tag opens an one-way (server to client) web socket based push connection in client
  * side which can be reached from server side via {@link PushContext} interface injected in any CDI/container managed
- * artifact via {@link Push} annotation.
+ * artifact via <code>&#64;</code>{@link Push} annotation.
  *
  *
  * <h3 id="configuration"><a href="#configuration">Configuration</a></h3>
@@ -106,24 +106,23 @@ import org.omnifaces.util.Json;
  * </ul>
  * <p>
  * In case your server is configured to run WS container on a different TCP port than the HTTP container, then you can
- * use the <code>port</code> attribute to explicitly specify the port.
+ * use the <strong><code>port</code></strong> attribute to explicitly specify the port.
  * <pre>
  * &lt;o:socket port="8000" ... /&gt;
  * </pre>
  * <p>
  * When successfully connected, the web socket is by default open as long as the document is open, and it will
- * auto-reconnect at increasing intervals when the connection is unintentionally closed/aborted as result of e.g. a
- * timeout or a network error. It will not auto-reconnect when the very first connection attempt already fails. The web
- * socket will be implicitly closed once the document is unloaded (e.g. navigating away, close of browser window/tab,
- * etc).
+ * auto-reconnect at increasing intervals when the connection is closed/aborted as result of e.g. a network error or
+ * server restart. It will not auto-reconnect when the very first connection attempt already fails. The web socket will
+ * be implicitly closed once the document is unloaded (e.g. navigating away, close of browser window/tab, etc).
  *
  *
  * <h3 id="usage-server"><a href="#usage-server">Usage (server)</a></h3>
  * <p>
- * In WAR side, you can inject <strong>{@link PushContext}</strong> via <strong>{@link Push}</strong> annotation on the
- * given channel name in any CDI/container managed artifact such as <code>@Named</code>, <code>@WebServlet</code>, etc
- * wherever you'd like to send a push message and then invoke <strong>{@link PushContext#send(Object)}</strong> with any
- * Java object representing the push message.
+ * In WAR side, you can inject <strong>{@link PushContext}</strong> via <strong><code>&#64;</code>{@link Push}</strong>
+ * annotation on the given channel name in any CDI/container managed artifact such as <code>@Named</code>,
+ * <code>@WebServlet</code>, etc wherever you'd like to send a push message and then invoke
+ * <strong>{@link PushContext#send(Object)}</strong> with any Java object representing the push message.
  * <pre>
  * &#64;Inject &#64;Push
  * private PushContext someChannel;
@@ -157,23 +156,23 @@ import org.omnifaces.util.Json;
  *
  * <h3 id="scopes-and-users"><a href="#scopes-and-users">Scopes and users</a></h3>
  * <p>
- * By default the web socket is <strong><code>application</code></strong> scoped, i.e. any view/session throughout the
- * web application having the same web socket channel open will receive the same push message. The push message can be
- * sent by all users and the application itself. This is useful for application-wide feedback triggered by site itself
- * such as real time updates of a certain page (e.g. site-wide statistics, top100 lists, stock updates, etc).
+ * By default the web socket is <code>application</code> scoped, i.e. any view/session throughout the web application
+ * having the same web socket channel open will receive the same push message. The push message can be sent by all users
+ * and the application itself. This is useful for application-wide feedback triggered by site itself such as real time
+ * updates of a certain page (e.g. site-wide statistics, top100 lists, stock updates, etc).
  * <p>
- * The optional <strong><code>scope</code></strong> attribute can be set to <strong><code>session</code></strong> to
- * restrict the push messages to all views in the current user session only. The push message can only be sent by the
- * user itself and not by the application. This is useful for session-wide feedback triggered by user itself (e.g. as
- * result of asynchronous tasks triggered by user specific action).
+ * The optional <strong><code>scope</code></strong> attribute can be set to <code>session</code> to restrict the push
+ * messages to all views in the current user session only. The push message can only be sent by the user itself and not
+ * by the application. This is useful for session-wide feedback triggered by user itself (e.g. as result of asynchronous
+ * tasks triggered by user specific action).
  * <pre>
  * &lt;o:socket channel="someChannel" scope="session" ... /&gt;
  * </pre>
  * <p>
- * The <code>scope</code> attribute can also be set to <strong><code>view</code></strong> to restrict the push messages
- * to the current view only. The push message will not show up in other views in the same session even if it's the same
- * URL. The push message can only be sent by the user itself and not by the application. This is useful for view-wide
- * feedback triggered by user itself (e.g. progress bar tied to a user specific action on current view).
+ * The <code>scope</code> attribute can also be set to <code>view</code> to restrict the push messages to the current
+ * view only. The push message will not show up in other views in the same session even if it's the same URL. The push
+ * message can only be sent by the user itself and not by the application. This is useful for view-wide feedback
+ * triggered by user itself (e.g. progress bar tied to a user specific action on current view).
  * <pre>
  * &lt;o:socket channel="someChannel" scope="view" ... /&gt;
  * </pre>
@@ -183,8 +182,9 @@ import org.omnifaces.util.Json;
  * <p>
  * Additionally, the optional <strong><code>user</code></strong> attribute can be set to the unique identifier of the
  * logged-in user, usually the login name or the user ID. This way the push message can be targeted to a specific user
- * and can be sent by other users and the application itself. The value of the <code>user</code> attribute must at least
- * implement {@link Serializable} and have a low memory footprint, so putting entire user entity is not recommended.
+ * and can also be sent by other users and the application itself. The value of the <code>user</code> attribute must at
+ * least implement {@link Serializable} and have a low memory footprint, so putting entire user entity is not
+ * recommended.
  * <p>
  * E.g. when you're using container managed authentication or a related framework/library:
  * <pre>
@@ -206,9 +206,9 @@ import org.omnifaces.util.Json;
  * setting the scope to <code>view</code>, but better is to fix the logout to invalidate the HTTP session altogether.
  * <p>
  * In the server side, the push message can be targeted to the user specified in the <code>user</code> attribute via
- * <strong>{@link PushContext#send(Object, Serializable)}</strong>. The push message can be sent by the user itself,
- * other users, and even the application itself. This is useful for user-specific feedback triggered by other users
- * (e.g. chat, admin messages, etc) or by application's background tasks (e.g. notifications, event listeners, etc).
+ * <strong>{@link PushContext#send(Object, Serializable)}</strong>. The push message can be sent by all users and the
+ * application itself. This is useful for user-specific feedback triggered by other users (e.g. chat, admin messages,
+ * etc) or by application's background tasks (e.g. notifications, event listeners, etc).
  * <pre>
  * &#64;Inject &#64;Push
  * private PushContext someChannel;
@@ -308,8 +308,9 @@ import org.omnifaces.util.Json;
  * <h3 id="events-client"><a href="#events-client">Events (client)</a></h3>
  * <p>
  * The optional <strong><code>onopen</code></strong> JavaScript listener function can be used to listen on open of a web
- * socket in client side. This will not be invoked when the web socket auto-reconnects a broken connection after the
- * first succesful connection.
+ * socket in client side. This will be invoked on the very first connection attempt, regardless of whether it will be
+ * successful or not. This will not be invoked when the web socket auto-reconnects a broken connection after the first
+ * successful connection.
  * <pre>
  * &lt;o:socket ... onopen="socketOpenListener" /&gt;
  * </pre>
@@ -325,9 +326,11 @@ import org.omnifaces.util.Json;
  * </ul>
  * <p>
  * The optional <strong><code>onclose</code></strong> JavaScript listener function can be used to listen on (ab)normal
- * close of a web socket. This will not be invoked when the web socket auto-reconnects a broken connection after the
- * first succesful connection. This will only be invoked when the very first connection attempt fails, or the maximum
- * reconnect attempts has exceeded, or the server has returned close reason code <code>1008</code> (policy violated).
+ * close of a web socket. This will be invoked when the very first connection attempt fails, or the maximum reconnect
+ * attempts has exceeded, or the server has returned close reason code <code>1000</code> or <code>1008</code> (policy
+ * violated, which usually only happens when the channel name is unknown, or the session has expired). This will not be
+ * invoked when the web socket can make an auto-reconnect attempt on a broken connection after the first successful
+ * connection.
  * <pre>
  * &lt;o:socket ... onclose="socketCloseListener" /&gt;
  * </pre>
@@ -344,8 +347,8 @@ import org.omnifaces.util.Json;
  * The <code>onclose</code> JavaScript listener function will be invoked with three arguments:
  * <ul>
  * <li><code>code</code>: the close reason code as integer. If this is <code>-1</code>, then the web socket
- * is simply not supported by the client. If this is <code>1000</code>, then it was normally closed. Else if this is not
- * <code>1000</code>, then there may be an error. See also
+ * is simply not <a href="http://caniuse.com/websockets">supported</a> by the client. If this is <code>1000</code>,
+ * then it was normally closed. Else if this is not <code>1000</code>, then there may be an error. See also
  * <a href="http://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and {@link CloseCodes} API for
  * an elaborate list of all close codes.</li>
  * <li><code>channel</code>: the channel name, useful in case you intend to have a global listener.</li>
@@ -355,20 +358,21 @@ import org.omnifaces.util.Json;
  * <p>
  * When a session or view scoped socket is automatically closed with close reason code <code>1000</code> by the server
  * (and thus not manually by the client via <code>OmniFaces.Push.close(channel)</code>), then it means that the session
- * or view has expired. In case of a session scoped socket you could take the opportunity to show a "Session expired"
- * message and/or immediately redirect to the login page via <code>window.location</code>. In case of a view scoped
- * socket this is quite rare as it actually means "View expired" while the page is still open, but it could happen if
- * the JSF "views per session" configuration setting is set relatively low. You might take the opportunity to reload
- * the page.
+ * or view has expired. In case of a session scoped socket you could take the opportunity to let JavaScript show a
+ * "Session expired" message and/or immediately redirect to the login page via <code>window.location</code>. In case of
+ * a view scoped socket the handling depends on the reason of the view expiration. A view can be expired when the
+ * associated session has expired, but it can also be expired as result of (accidental) navigation or rebuild, or when
+ * the JSF "views per session" configuration setting is set relatively low and the client has many views (windows/tabs)
+ * open in the same session. You might take the opportunity to let JavaScript reload the page.
  *
  *
  * <h3 id="events-server"><a href="#events-server">Events (server)</a></h3>
  * <p>
  * When a web socket has been opened, a new CDI <strong>{@link SocketEvent}</strong> will be fired with
- * <strong>{@link Opened}</strong> qualifier. When a web socket has been closed, a new CDI {@link SocketEvent} will be
- * fired with <strong>{@link Closed}</strong> qualifier. They can only be observed and collected in an application
- * scoped CDI bean as below. A request scoped one is useless and a view/session scoped one wouldn't work as there's no
- * means of a HTTP request anywhere at that moment.
+ * <strong><code>&#64;</code>{@link Opened}</strong> qualifier. When a web socket has been closed, a new CDI
+ * {@link SocketEvent} will be fired with <strong><code>&#64;</code>{@link Closed}</strong> qualifier. They can only be
+ * observed and collected in an application scoped CDI bean as below. A request scoped one is useless and a view/session
+ * scoped one wouldn't work as there's no means of a HTTP request anywhere at that moment.
  * <pre>
  * &#64;ApplicationScoped
  * public class SocketObserver {
@@ -383,15 +387,15 @@ import org.omnifaces.util.Json;
  *     public void onClose(&#64;Observes &#64;Closed SocketEvent event) {
  *         String channel = event.getChannel(); // Returns &lt;o:socket channel&gt;.
  *         Long userId = event.getUser(); // Returns &lt;o:socket user&gt;, if any.
- *         CloseReason reason = event.getCloseReason(); // Returns close reason.
+ *         CloseCode code = event.getCloseCode(); // Returns close reason code.
  *         // Do your thing with it. E.g. removing them from collection.
  *     }
  *
  * }
  * </pre>
  * <p>
- * You could even use it to send another push message to an application scoped socket, e.g. "User X has been logged in"
- * (or out) when a session scoped socket is opened (or closed).
+ * You could take the opportunity to send another push message to an application scoped socket, e.g. "User X has been
+ * logged in" (or out) when a session scoped socket is opened (or closed).
  *
  *
  * <h3 id="security"><a href="#security">Security considerations</a></h3>
@@ -473,11 +477,11 @@ import org.omnifaces.util.Json;
  * </pre>
  * <p>
  * Note that OmniFaces own {@link Beans#fireEvent(Object, java.lang.annotation.Annotation...)} utility method is
- * insuitable as you're not supposed to use WAR (front end) frameworks and libraries like JSF and OmniFaces in EAR/EJB
+ * insuitable as it is not allowed to use WAR (front end) frameworks and libraries like JSF and OmniFaces in EAR/EJB
  * (back end) side.
  * <p>
- * Finally just {@link Observes} it in some request or application scoped CDI managed bean in WAR and delegate to
- * {@link PushContext} as below.
+ * Finally just <code>&#64;</code>{@link Observes} it in some request or application scoped CDI managed bean in WAR and
+ * delegate to {@link PushContext} as below.
  * <pre>
  * &#64;Inject &#64;Push
  * private PushContext someChannel;
@@ -531,6 +535,8 @@ import org.omnifaces.util.Json;
  *     callback.run();
  * }
  * </pre>
+ * <p>
+ * Which is invoked in WAR as below.
  * <pre>
  * public void submit() {
  *     someService.someAsyncServiceMethod(entity, new Runnable() {
@@ -541,7 +547,7 @@ import org.omnifaces.util.Json;
  * }
  * </pre>
  * <p>
- * Note that OmniFaces own {@link Callback} interfaces are insuitable as you're not supposed to use WAR (front end)
+ * Note that OmniFaces own {@link Callback} interfaces are insuitable as it is not allowed to use WAR (front end)
  * frameworks and libraries like JSF and OmniFaces in EAR/EJB (back end) side.
  *
  *
@@ -636,7 +642,8 @@ public class Socket extends TagHandler {
 
 	/**
 	 * First check if the web socket endpoint is enabled in <code>web.xml</code> and the channel name and scope is
-	 * valid, then subcribe the {@link SocketFacesListener}.
+	 * valid, then register it in {@link SocketChannelManager} and get the channel ID, then subcribe the
+	 * {@link SocketFacesListener}.
 	 * @throws IllegalStateException When the web socket endpoint is not enabled in <code>web.xml</code>.
 	 * @throws IllegalArgumentException When the channel name, scope or user is invalid.
 	 * The channel name may only contain alphanumeric characters, hyphens, underscores and periods.
@@ -654,12 +661,28 @@ public class Socket extends TagHandler {
 			throw new IllegalStateException(ERROR_ENDPOINT_NOT_ENABLED);
 		}
 
+		Integer portNumber = getObject(context, port, Integer.class);
+		String channelName = getChannelName(context, channel);
+		String channelId = getChannelId(context, channelName, scope, user);
+		String functions = getString(context, onopen) + "," + onmessage.getValue(context) + "," + getString(context, onclose);
+		ValueExpression connectedExpression = getValueExpression(context, connected, Boolean.class);
+
+		SystemEventListener listener = new SocketFacesListener(portNumber, channelName, channelId, functions, connectedExpression);
+		subscribeToViewEvent(PostAddToViewEvent.class, listener);
+		subscribeToViewEvent(PreRenderViewEvent.class, listener);
+	}
+
+	private static String getChannelName(FaceletContext context, TagAttribute channel) {
 		String channelName = channel.isLiteral() ? channel.getValue(context) : null;
 
 		if (channelName == null || !PATTERN_CHANNEL.matcher(channelName).matches()) {
 			throw new IllegalArgumentException(String.format(ERROR_INVALID_CHANNEL, channelName));
 		}
 
+		return channelName;
+	}
+
+	private static String getChannelId(FaceletContext context, String channelName, TagAttribute scope, TagAttribute user) {
 		Object userObject = getObject(context, user);
 
 		if (userObject != null && !(userObject instanceof Serializable)) {
@@ -681,16 +704,7 @@ public class Socket extends TagHandler {
 			throw new IllegalArgumentException(String.format(ERROR_DUPLICATE_CHANNEL, channelName));
 		}
 
-		Integer portNumber = getObject(context, port, Integer.class);
-		String onopenFunction = getString(context, onopen);
-		String onmessageFunction = onmessage.getValue(context);
-		String oncloseFunction = getString(context, onclose);
-		String functions = onopenFunction + "," + onmessageFunction + "," + oncloseFunction;
-		ValueExpression connectedExpression = getValueExpression(context, connected, Boolean.class);
-
-		SystemEventListener listener = new SocketFacesListener(portNumber, channelName, channelId, functions, connectedExpression);
-		subscribeToViewEvent(PostAddToViewEvent.class, listener);
-		subscribeToViewEvent(PreRenderViewEvent.class, listener);
+		return channelId;
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------

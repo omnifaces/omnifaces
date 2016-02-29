@@ -27,8 +27,8 @@ import org.omnifaces.cdi.push.Socket;
 
 /**
  * <p>
- * The CDI annotation {@link Push} allows you to inject a {@link PushContext} associated with a given channel in a
- * CDI managed bean.
+ * The CDI annotation <code>&#64;</code>{@link Push} allows you to inject a {@link PushContext} associated with a given
+ * channel in any container managed artifact in WAR (not in EAR/EJB!).
  * <pre>
  * &#64;Inject &#64;Push
  * private PushContext channelName;

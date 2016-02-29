@@ -24,8 +24,12 @@ import org.omnifaces.util.Json;
 
 /**
  * <p>
- * CDI interface to send a message object to the push socket channel as identified by {@link Push}.
- * This can be injected via {@link Push} in any container managed artifact in WAR (not in EAR/EJB!).
+ * CDI interface to send a message object to the push socket channel as identified by <code>&#64;</code>{@link Push}.
+ * This can be injected via <code>&#64;</code>{@link Push} in any container managed artifact in WAR (not in EAR/EJB!).
+ * <pre>
+ * &#64;Inject &#64;Push
+ * private PushContext channelName;
+ * </pre>
  * <p>
  * For detailed usage instructions, see {@link Socket} javadoc.
  *
