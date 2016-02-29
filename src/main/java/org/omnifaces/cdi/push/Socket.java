@@ -696,8 +696,8 @@ public class Socket extends TagHandler {
 		try {
 			channelId = channelManager.register(channelName, scopeName, (Serializable) userObject);
 		}
-		catch (IllegalArgumentException ignore) {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_SCOPE, scopeName));
+		catch (IllegalArgumentException e) {
+			throw new IllegalArgumentException(String.format(ERROR_INVALID_SCOPE, scopeName), e);
 		}
 
 		if (channelId == null) {
