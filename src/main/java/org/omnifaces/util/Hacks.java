@@ -97,8 +97,8 @@ public final class Hacks {
 
 	// Lazy loaded properties (will only be initialized when FacesContext is available) -------------------------------
 
-	private static Boolean myFacesUsed;
-	private static Long defaultResourceMaxAge;
+	private static volatile Boolean myFacesUsed;
+	private static volatile Long defaultResourceMaxAge;
 
 	// Constructors/init ----------------------------------------------------------------------------------------------
 
