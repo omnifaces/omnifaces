@@ -203,7 +203,7 @@ public class SocketSessionManager {
 
 	private static void fireEvent(Session session, CloseReason reason, AnnotationLiteral<?> qualifier) {
 		Serializable user = (Serializable) session.getUserProperties().get("user");
-		Beans.fireEvent(new SocketEvent(getChannel(session), user, reason), qualifier);
+		Beans.fireEvent(new SocketEvent(getChannel(session), user, reason.getCloseCode()), qualifier);
 	}
 
 }

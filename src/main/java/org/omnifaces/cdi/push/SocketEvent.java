@@ -16,7 +16,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 import javax.enterprise.event.Observes;
-import javax.websocket.CloseReason;
+import javax.websocket.CloseReason.CloseCode;
 
 import org.omnifaces.cdi.push.event.Closed;
 import org.omnifaces.cdi.push.event.Opened;
@@ -40,12 +40,12 @@ public final class SocketEvent implements Serializable {
 
 	private final String channel;
 	private final Serializable user;
-	private final CloseReason reason;
+	private final CloseCode code;
 
-	SocketEvent(String channel, Serializable user, CloseReason reason) {
+	SocketEvent(String channel, Serializable user, CloseCode code) {
 		this.channel = channel;
 		this.user = user;
-		this.reason = reason;
+		this.code = code;
 	}
 
 	/**
@@ -68,18 +68,18 @@ public final class SocketEvent implements Serializable {
 	}
 
 	/**
-	 * Returns the close reason.
+	 * Returns the close code.
 	 * If this returns <code>null</code>, then it was {@link Opened}.
 	 * If this returns non-<code>null</code>, then it was {@link Closed}.
-	 * @return The close reason.
+	 * @return The close code.
 	 */
-	public CloseReason getCloseReason() {
-		return reason;
+	public CloseCode getCloseCode() {
+		return code;
 	}
 
 	@Override
 	public int hashCode() {
-		return super.hashCode() + Objects.hash(channel, user, reason);
+		return super.hashCode() + Objects.hash(channel, user, code);
 	}
 
 	@Override
@@ -87,12 +87,12 @@ public final class SocketEvent implements Serializable {
 		return other != null && getClass() == other.getClass()
 			&& Objects.equals(channel, ((SocketEvent) other).channel)
 			&& Objects.equals(user, ((SocketEvent) other).user)
-			&& Objects.equals(reason, ((SocketEvent) other).reason);
+			&& Objects.equals(code, ((SocketEvent) other).code);
 	}
 
 	@Override
 	public String toString() {
-		return String.format("SocketEvent[channel=%s, user=%s, closeReason=%s]", channel, user, reason);
+		return String.format("SocketEvent[channel=%s, user=%s, closeCode=%s]", channel, user, code);
 	}
 
 }
