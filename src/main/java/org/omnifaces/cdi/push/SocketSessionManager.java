@@ -52,7 +52,7 @@ public class SocketSessionManager {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final ConcurrentMap<String, Set<Session>> channelSessions = new ConcurrentHashMap<>();
+	private static final ConcurrentMap<String, Set<Session>> SESSIONS = new ConcurrentHashMap<>();
 
 	private static final CloseReason REASON_EXPIRED = new CloseReason(NORMAL_CLOSURE, "Expired");
 	private static final AnnotationLiteral<Opened> SESSION_OPENED = new AnnotationLiteral<Opened>() {
@@ -83,8 +83,8 @@ public class SocketSessionManager {
 	 * @param channelId The channel identifier to register.
 	 */
 	public void register(String channelId) {
-		if (!channelSessions.containsKey(channelId)) {
-			channelSessions.putIfAbsent(channelId, synchronizedSet(new HashSet<Session>()));
+		if (!SESSIONS.containsKey(channelId)) {
+			SESSIONS.putIfAbsent(channelId, synchronizedSet(new HashSet<Session>()));
 		}
 	}
 
@@ -107,7 +107,7 @@ public class SocketSessionManager {
 	 */
 	public boolean add(Session session) {
 		String channelId = getChannelId(session);
-		Set<Session> sessions = channelSessions.get(channelId);
+		Set<Session> sessions = SESSIONS.get(channelId);
 
 		if (sessions != null && sessions.add(session)) {
 			Serializable user = getUser(getChannel(session), channelId);
@@ -133,7 +133,7 @@ public class SocketSessionManager {
 	 * message was successfully delivered and otherwise throw {@link ExecutionException}.
 	 */
 	public Set<Future<Void>> send(String channelId, Object message) {
-		Set<Session> sessions = (channelId != null) ? channelSessions.get(channelId) : null;
+		Set<Session> sessions = (channelId != null) ? SESSIONS.get(channelId) : null;
 
 		if (!isEmpty(sessions)) {
 			Set<Future<Void>> results = new HashSet<>(sessions.size());
@@ -159,7 +159,7 @@ public class SocketSessionManager {
 	 * @param reason The close reason.
 	 */
 	public void remove(Session session, CloseReason reason) {
-		Set<Session> sessions = channelSessions.get(getChannelId(session));
+		Set<Session> sessions = SESSIONS.get(getChannelId(session));
 
 		if (sessions != null && sessions.remove(session)) {
 			fireEvent(session, reason, SESSION_CLOSED);
@@ -172,7 +172,7 @@ public class SocketSessionManager {
 	 */
 	public void deregister(Iterable<String> channelIds) {
 		for (String channelId : channelIds) {
-			Set<Session> sessions = channelSessions.remove(channelId);
+			Set<Session> sessions = SESSIONS.remove(channelId);
 
 			if (sessions != null) {
 				for (Session session : sessions) {

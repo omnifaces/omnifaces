@@ -38,6 +38,7 @@ public final class Numbers {
 
 	private static final int BYTES_1K = 1024;
 	private static final int NUMBER_1K = 1000;
+	private static final int PRECISION = 3;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -246,7 +247,7 @@ public final class Numbers {
 
 		int exp = (int) (Math.log(decimal.longValue()) / Math.log(base));
 		BigDecimal divided = decimal.divide(BigDecimal.valueOf(Math.pow(base, exp)));
-		int maxfractions = (fractions != null) ? fractions : (3 - String.valueOf(divided.longValue()).length());
+		int maxfractions = (fractions != null) ? fractions : (PRECISION - String.valueOf(divided.longValue()).length());
 		String formatted = String.format(getLocale(), "%." + maxfractions + "f", divided);
 
 		if (fractions == null) {
