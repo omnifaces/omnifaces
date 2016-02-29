@@ -345,19 +345,21 @@ public final class Hacks {
 	 */
 	public static long getDefaultResourceMaxAge() {
 		if (defaultResourceMaxAge == null) {
+			Long resourceMaxAge = DEFAULT_RESOURCE_MAX_AGE;
 			FacesContext context = FacesContext.getCurrentInstance();
 
 			if (context == null) {
-				return DEFAULT_RESOURCE_MAX_AGE;
+				return resourceMaxAge;
 			}
+
 
 			for (String name : PARAM_NAMES_RESOURCE_MAX_AGE) {
 				String value = getInitParameter(context, name);
 
 				if (value != null) {
 					try {
-						defaultResourceMaxAge = Long.valueOf(value);
-						return defaultResourceMaxAge;
+						resourceMaxAge = Long.valueOf(value);
+						break;
 					}
 					catch (NumberFormatException e) {
 						throw new IllegalArgumentException(String.format(ERROR_MAX_AGE, name, value), e);
@@ -365,7 +367,7 @@ public final class Hacks {
 				}
 			}
 
-			defaultResourceMaxAge = DEFAULT_RESOURCE_MAX_AGE;
+			defaultResourceMaxAge = resourceMaxAge;
 		}
 
 		return defaultResourceMaxAge;
