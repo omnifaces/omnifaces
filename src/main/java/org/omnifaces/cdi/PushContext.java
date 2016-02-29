@@ -42,7 +42,7 @@ public interface PushContext extends Serializable {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	/** The context-relative web socket URI prefix where the endpoint should listen on. */
-	static final String URI_PREFIX = "/omnifaces.push";
+	String URI_PREFIX = "/omnifaces.push";
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
