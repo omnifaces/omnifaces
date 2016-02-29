@@ -62,7 +62,7 @@ public class SocketSessionManager {
 		private static final long serialVersionUID = 1L;
 	};
 
-	private static SocketSessionManager instance;
+	private static volatile SocketSessionManager instance;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -203,7 +203,7 @@ public class SocketSessionManager {
 
 	private static void fireEvent(Session session, CloseReason reason, AnnotationLiteral<?> qualifier) {
 		Serializable user = (Serializable) session.getUserProperties().get("user");
-		Beans.fireEvent(new SocketEvent(getChannel(session), user, reason.getCloseCode()), qualifier);
+		Beans.fireEvent(new SocketEvent(getChannel(session), user, reason != null ? reason.getCloseCode() : null), qualifier);
 	}
 
 }
