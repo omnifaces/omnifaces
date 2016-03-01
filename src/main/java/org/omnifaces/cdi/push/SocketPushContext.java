@@ -15,6 +15,7 @@ package org.omnifaces.cdi.push;
 import static java.util.Arrays.asList;
 import static org.omnifaces.cdi.push.SocketChannelManager.EMPTY_SCOPE;
 import static org.omnifaces.util.Beans.isActive;
+import static org.omnifaces.util.Faces.hasContext;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -28,7 +29,6 @@ import javax.enterprise.context.SessionScoped;
 
 import org.omnifaces.cdi.Push;
 import org.omnifaces.cdi.PushContext;
-import org.omnifaces.util.Faces;
 
 /**
  * <p>
@@ -60,8 +60,9 @@ public class SocketPushContext implements PushContext {
 	 */
 	SocketPushContext(String channel, SocketChannelManager manager) {
 		this.channel = channel;
-		sessionScopeIds = isActive(SessionScoped.class) ? manager.getSessionScopeIds() : EMPTY_SCOPE;
-		viewScopeIds = Faces.hasContext() ? SocketChannelManager.getViewScopeIds(false) : EMPTY_SCOPE;
+		boolean hasSession = isActive(SessionScoped.class);
+		sessionScopeIds = hasSession ? manager.getSessionScopeIds() : EMPTY_SCOPE;
+		viewScopeIds = hasSession && hasContext() ? SocketChannelManager.getViewScopeIds(false) : EMPTY_SCOPE;
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
