@@ -27,6 +27,7 @@ OmniFaces.Push = (function(Util, window) {
 	var URI_PREFIX = "/omnifaces.push";
 	var RECONNECT_INTERVAL = 500;
 	var MAX_RECONNECT_ATTEMPTS = 25;
+	var REASON_EXPIRED = "Expired";
 
 	// Private static fields ------------------------------------------------------------------------------------------
 
@@ -79,7 +80,7 @@ OmniFaces.Push = (function(Util, window) {
 			}
 
 			socket.onclose = function(event) {
-				if (!socket || event.code == 1000 || event.code == 1008 || reconnectAttempts == null || reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+				if (!socket || (event.code == 1000 && event.reason == REASON_EXPIRED) || event.code == 1008 || reconnectAttempts == null || reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
 					onclose(event.code, channel, event);
 				}
 				else {
