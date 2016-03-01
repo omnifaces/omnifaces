@@ -14,6 +14,10 @@ package org.omnifaces.cdi.push;
 
 import static java.util.Arrays.asList;
 import static org.omnifaces.cdi.push.SocketChannelManager.EMPTY_SCOPE;
+import static org.omnifaces.cdi.push.SocketChannelManager.getChannelId;
+import static org.omnifaces.cdi.push.SocketChannelManager.getSessionScopeIds;
+import static org.omnifaces.cdi.push.SocketChannelManager.getUserChannelIds;
+import static org.omnifaces.cdi.push.SocketChannelManager.getViewScopeIds;
 import static org.omnifaces.util.Beans.isActive;
 import static org.omnifaces.util.Faces.hasContext;
 
@@ -58,18 +62,18 @@ public class SocketPushContext implements PushContext {
 	 * referenced, so it's still available when another thread invokes {@link #send(Object)} during which the session
 	 * and view scope is not necessarily active anymore.
 	 */
-	SocketPushContext(String channel, SocketChannelManager manager) {
+	SocketPushContext(String channel) {
 		this.channel = channel;
 		boolean hasSession = isActive(SessionScoped.class);
-		sessionScopeIds = hasSession ? manager.getSessionScopeIds() : EMPTY_SCOPE;
-		viewScopeIds = hasSession && hasContext() ? SocketChannelManager.getViewScopeIds(false) : EMPTY_SCOPE;
+		sessionScopeIds = hasSession ? getSessionScopeIds() : EMPTY_SCOPE;
+		viewScopeIds = hasSession && hasContext() ? getViewScopeIds(false) : EMPTY_SCOPE;
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
 	public Set<Future<Void>> send(Object message) {
-		return SocketSessionManager.getInstance().send(SocketChannelManager.getChannelId(channel, sessionScopeIds, viewScopeIds), message);
+		return SocketSessionManager.getInstance().send(getChannelId(channel, sessionScopeIds, viewScopeIds), message);
 	}
 
 	@Override
@@ -83,7 +87,7 @@ public class SocketPushContext implements PushContext {
 		Map<S, Set<Future<Void>>> resultsByUser = new HashMap<>(users.size());
 
 		for (S user : users) {
-			Set<String> userChannelIds = SocketChannelManager.getUserChannelIds(user, channel);
+			Set<String> userChannelIds = getUserChannelIds(user, channel);
 			Set<Future<Void>> results = new HashSet<>(userChannelIds.size());
 
 			for (String channelId : userChannelIds) {
