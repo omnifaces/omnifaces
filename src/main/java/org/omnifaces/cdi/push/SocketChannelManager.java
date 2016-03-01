@@ -329,7 +329,6 @@ public class SocketChannelManager implements Serializable {
 		// Below awkwardness is because SocketChannelManager can't be injected in SocketSessionManager (CDI session scope
 		// is not necessarily active during WS session). So it can't just ask us for channel IDs and we have to tell it.
 		// And, for application scope IDs we make sure they're re-registered after server restart/failover.
-		// TODO: This fails in OWB (but works fine in Weld). Check CDI spec on this.
 		SocketSessionManager.register(sessionScopeIds.values());
 		SocketSessionManager.register(APP_SCOPE_IDS.values());
 	}
