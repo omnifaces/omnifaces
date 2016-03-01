@@ -82,7 +82,7 @@ public class SocketSessionManager {
 	 * Register given channel identifier.
 	 * @param channelId The channel identifier to register.
 	 */
-	public void register(String channelId) {
+	static void register(String channelId) {
 		if (!SESSIONS.containsKey(channelId)) {
 			SESSIONS.putIfAbsent(channelId, synchronizedSet(new HashSet<Session>()));
 		}
@@ -92,7 +92,7 @@ public class SocketSessionManager {
 	 * Register given channel identifiers.
 	 * @param channelIds The channel identifiers to register.
 	 */
-	public void register(Iterable<String> channelIds) {
+	static void register(Iterable<String> channelIds) {
 		for (String channelId : channelIds) {
 			register(channelId);
 		}
@@ -170,7 +170,7 @@ public class SocketSessionManager {
 	 * Deregister given channel identifiers and explicitly close all open web socket sessions associated with it.
 	 * @param channelIds The channel identifiers to deregister.
 	 */
-	public void deregister(Iterable<String> channelIds) {
+	static void deregister(Iterable<String> channelIds) {
 		for (String channelId : channelIds) {
 			Set<Session> sessions = SESSIONS.remove(channelId);
 

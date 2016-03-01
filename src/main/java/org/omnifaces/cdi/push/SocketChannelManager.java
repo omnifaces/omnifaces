@@ -32,7 +32,6 @@ import java.util.concurrent.ConcurrentMap;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.view.ViewScoped;
-import javax.inject.Inject;
 
 import org.omnifaces.cdi.push.event.Closed;
 import org.omnifaces.cdi.push.event.Opened;
@@ -51,7 +50,7 @@ public class SocketChannelManager implements Serializable {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 2L;
 	static final Map<String, String> EMPTY_SCOPE = emptyMap();
 	private static final int ONE_ENTRY = 1;
 	private static final int THREE_ENTRIES = 3;
@@ -82,9 +81,6 @@ public class SocketChannelManager implements Serializable {
 	private static final ConcurrentMap<String, ConcurrentMap<String, Set<String>>> APP_USER_CHANNEL_IDS = new ConcurrentHashMap<>();
 	private static final ConcurrentMap<Serializable, Set<String>> APP_USER_IDS = new ConcurrentHashMap<>(); // An user can have more than one session (multiple browsers, account sharing).
 	private final ConcurrentMap<Serializable, String> sessionUserIds = new ConcurrentHashMap<>(ONE_ENTRY); // A session can have more than one user (bad security practice, but technically not impossible).
-
-	@Inject
-	private SocketSessionManager manager;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -132,7 +128,7 @@ public class SocketChannelManager implements Serializable {
 			registerUserChannelId(sessionUserIds.get(user), channel, channelId);
 		}
 
-		manager.register(channelId);
+		SocketSessionManager.register(channelId);
 		return channelId;
 	}
 
@@ -187,7 +183,7 @@ public class SocketChannelManager implements Serializable {
 			deregisterApplicationUser(sessionUserId.getKey(), userId);
 		}
 
-		manager.deregister(sessionScopeIds.values());
+		SocketSessionManager.deregister(sessionScopeIds.values());
 	}
 
 	// Nested classes -------------------------------------------------------------------------------------------------
@@ -210,7 +206,8 @@ public class SocketChannelManager implements Serializable {
 		 */
 		@PreDestroy
 		public void deregisterViewScopeChannels() {
-			SocketSessionManager.getInstance().deregister(viewScopeIds.values());
+			SocketSessionManager.getInstance();
+			SocketSessionManager.deregister(viewScopeIds.values());
 		}
 
 	}
@@ -332,8 +329,9 @@ public class SocketChannelManager implements Serializable {
 		// Below awkwardness is because SocketChannelManager can't be injected in SocketSessionManager (CDI session scope
 		// is not necessarily active during WS session). So it can't just ask us for channel IDs and we have to tell it.
 		// And, for application scope IDs we make sure they're re-registered after server restart/failover.
-		manager.register(sessionScopeIds.values());
-		manager.register(APP_SCOPE_IDS.values());
+		// TODO: This fails in OWB (but works fine in Weld). Check CDI spec on this.
+		SocketSessionManager.register(sessionScopeIds.values());
+		SocketSessionManager.register(APP_SCOPE_IDS.values());
 	}
 
 }
