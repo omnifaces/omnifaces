@@ -573,6 +573,7 @@ import org.omnifaces.util.Json;
  * @see SocketEndpoint
  * @see SocketFacesListener
  * @see SocketChannelManager
+ * @see SocketUserManager
  * @see SocketSessionManager
  * @see SocketEvent
  * @see Opened

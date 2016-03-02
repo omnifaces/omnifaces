@@ -16,7 +16,6 @@ import static java.util.Arrays.asList;
 import static org.omnifaces.cdi.push.SocketChannelManager.EMPTY_SCOPE;
 import static org.omnifaces.cdi.push.SocketChannelManager.getChannelId;
 import static org.omnifaces.cdi.push.SocketChannelManager.getSessionScopeIds;
-import static org.omnifaces.cdi.push.SocketChannelManager.getUserChannelIds;
 import static org.omnifaces.cdi.push.SocketChannelManager.getViewScopeIds;
 import static org.omnifaces.util.Beans.isActive;
 import static org.omnifaces.util.Faces.hasContext;
@@ -55,6 +54,9 @@ public class SocketPushContext implements PushContext {
 	private Map<String, String> sessionScopeIds;
 	private Map<String, String> viewScopeIds;
 
+	private SocketSessionManager sessionManager;
+	private SocketUserManager userManager;
+
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
@@ -62,11 +64,13 @@ public class SocketPushContext implements PushContext {
 	 * referenced, so it's still available when another thread invokes {@link #send(Object)} during which the session
 	 * and view scope is not necessarily active anymore.
 	 */
-	SocketPushContext(String channel) {
+	SocketPushContext(String channel, SocketSessionManager sessionManager, SocketUserManager userManager) {
 		this.channel = channel;
 		boolean hasSession = isActive(SessionScoped.class);
 		sessionScopeIds = hasSession ? getSessionScopeIds() : EMPTY_SCOPE;
 		viewScopeIds = hasSession && hasContext() ? getViewScopeIds(false) : EMPTY_SCOPE;
+		this.sessionManager = sessionManager;
+		this.userManager = userManager;
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -83,15 +87,14 @@ public class SocketPushContext implements PushContext {
 
 	@Override
 	public <S extends Serializable> Map<S, Set<Future<Void>>> send(Object message, Collection<S> users) {
-		SocketSessionManager manager = SocketSessionManager.getInstance();
 		Map<S, Set<Future<Void>>> resultsByUser = new HashMap<>(users.size());
 
 		for (S user : users) {
-			Set<String> userChannelIds = getUserChannelIds(user, channel);
+			Set<String> userChannelIds = userManager.getUserChannelIds(user, channel);
 			Set<Future<Void>> results = new HashSet<>(userChannelIds.size());
 
 			for (String channelId : userChannelIds) {
-				results.addAll(manager.send(channelId, message));
+				results.addAll(sessionManager.send(channelId, message));
 			}
 
 			resultsByUser.put(user, results);

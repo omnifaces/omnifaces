@@ -13,8 +13,7 @@
 package org.omnifaces.cdi.push;
 
 import static java.util.Collections.emptyMap;
-import static java.util.Collections.emptySet;
-import static java.util.Collections.synchronizedSet;
+import static org.omnifaces.cdi.push.SocketUserManager.getUserChannelIds;
 import static org.omnifaces.util.Beans.getInstance;
 
 import java.io.IOException;
@@ -22,7 +21,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -34,9 +32,6 @@ import javax.annotation.PreDestroy;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
-
-import org.omnifaces.cdi.push.event.Closed;
-import org.omnifaces.cdi.push.event.Opened;
 
 /**
  * <p>
@@ -51,10 +46,11 @@ public class SocketChannelManager implements Serializable {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 2L;
+	private static final long serialVersionUID = 1L;
+
 	static final Map<String, String> EMPTY_SCOPE = emptyMap();
-	private static final int ONE_ENTRY = 1;
-	private static final int THREE_ENTRIES = 3;
+	static final int ONE_ENTRY = 1;
+	static final int THREE_ENTRIES = 3;
 
 	private enum Scope {
 		APPLICATION, SESSION, VIEW;
@@ -78,13 +74,13 @@ public class SocketChannelManager implements Serializable {
 
 	private static final ConcurrentMap<String, String> APP_SCOPE_IDS = new ConcurrentHashMap<>(THREE_ENTRIES); // size=3 as an average developer will unlikely declare more push channels in same application.
 	private final ConcurrentMap<String, String> sessionScopeIds = new ConcurrentHashMap<>(THREE_ENTRIES); // size=3 as an average developer will unlikely declare more push channels in same application.
-
-	private static final ConcurrentMap<String, ConcurrentMap<String, Set<String>>> APP_USER_CHANNEL_IDS = new ConcurrentHashMap<>();
-	private static final ConcurrentMap<Serializable, Set<String>> APP_USER_IDS = new ConcurrentHashMap<>(); // An user can have more than one session (multiple browsers, account sharing).
 	private final ConcurrentMap<Serializable, String> sessionUserIds = new ConcurrentHashMap<>(ONE_ENTRY); // A session can have more than one user (bad security practice, but technically not impossible).
 
 	@Inject
-	private SocketSessionManager manager;
+	private SocketSessionManager sessionManager;
+
+	@Inject
+	private SocketUserManager userManager;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -100,7 +96,7 @@ public class SocketChannelManager implements Serializable {
 	 * <code>null</code>. This can be used as web socket URI.
 	 * @throws IllegalArgumentException When the scope is invalid.
 	 */
-	public String register(String channel, String scope, Serializable user) {
+	protected String register(String channel, String scope, Serializable user) {
 		switch (Scope.of(scope, user)) {
 			case APPLICATION: return register(null, channel, APP_SCOPE_IDS, sessionScopeIds, getViewScopeIds(false));
 			case SESSION: return register(user, channel, sessionScopeIds, APP_SCOPE_IDS, getViewScopeIds(false));
@@ -126,53 +122,14 @@ public class SocketChannelManager implements Serializable {
 		if (user != null) {
 			if (!sessionUserIds.containsKey(user)) {
 				sessionUserIds.putIfAbsent(user, UUID.randomUUID().toString());
-				registerApplicationUser(user, sessionUserIds.get(user));
+				userManager.registerUser(user, sessionUserIds.get(user));
 			}
 
-			registerUserChannelId(sessionUserIds.get(user), channel, channelId);
+			userManager.registerUserChannelId(sessionUserIds.get(user), channel, channelId);
 		}
 
-		manager.register(channelId);
+		sessionManager.register(channelId);
 		return channelId;
-	}
-
-	private static void registerUserChannelId(String userId, String channel, String channelId) {
-		if (!APP_USER_CHANNEL_IDS.containsKey(userId)) {
-			APP_USER_CHANNEL_IDS.putIfAbsent(userId, new ConcurrentHashMap<String, Set<String>>(THREE_ENTRIES)); // size=3 as an average developer will unlikely declare more push channels in same application.
-		}
-
-		ConcurrentMap<String, Set<String>> channelIds = APP_USER_CHANNEL_IDS.get(userId);
-
-		if (!channelIds.containsKey(channel)) {
-			channelIds.putIfAbsent(channel, synchronizedSet(new HashSet<String>(ONE_ENTRY))); // size=1 as an average developer will unlikely declare multiple user-targeted channels in same session.
-		}
-
-		channelIds.get(channel).add(channelId);
-	}
-
-	private static void registerApplicationUser(Serializable user, String userId) {
-		synchronized (APP_USER_IDS) {
-			if (!APP_USER_IDS.containsKey(user)) {
-				APP_USER_IDS.putIfAbsent(user, synchronizedSet(new HashSet<String>(ONE_ENTRY))); // size=1 as an average user will unlikely login in multiple sessions.
-			}
-
-			APP_USER_IDS.get(user).add(userId);
-		}
-	}
-
-	private static void deregisterApplicationUser(Serializable user, String userId) {
-		synchronized (APP_USER_IDS) {
-			Set<String> userIds = APP_USER_IDS.get(user);
-			userIds.remove(userId);
-
-			if (userIds.isEmpty()) {
-				APP_USER_IDS.remove(user);
-			}
-		}
-	}
-
-	private static void deregisterUserChannelIds(String userId) {
-		APP_USER_CHANNEL_IDS.remove(userId);
 	}
 
 	/**
@@ -180,14 +137,14 @@ public class SocketChannelManager implements Serializable {
 	 * any open web sockets associated with it to avoid stale websockets. If any, also deregister user IDs.
 	 */
 	@PreDestroy
-	public void deregisterSessionScopeChannels() {
+	protected void deregisterSessionScopeChannels() {
 		for (Entry<Serializable, String> sessionUserId : sessionUserIds.entrySet()) {
 			String userId = sessionUserId.getValue();
-			deregisterUserChannelIds(userId);
-			deregisterApplicationUser(sessionUserId.getKey(), userId);
+			userManager.deregisterUserChannelIds(userId);
+			userManager.deregisterUser(sessionUserId.getKey(), userId);
 		}
 
-		manager.deregister(sessionScopeIds.values());
+		sessionManager.deregister(sessionScopeIds.values());
 	}
 
 	// Nested classes -------------------------------------------------------------------------------------------------
@@ -199,7 +156,7 @@ public class SocketChannelManager implements Serializable {
 	 * @since 2.3
 	 */
 	@ViewScoped
-	public static class SocketChannelManagerViewScopeIds implements Serializable {
+	protected static class SocketChannelManagerViewScopeIds implements Serializable {
 
 		private static final long serialVersionUID = 1L;
 		private ConcurrentMap<String, String> viewScopeIds = new ConcurrentHashMap<>(ONE_ENTRY); // size=1 as an average developer will unlikely declare multiple view scoped channels in same view.
@@ -252,53 +209,6 @@ public class SocketChannelManager implements Serializable {
 		return channelId;
 	}
 
-	/**
-	 * For internal usage only. This makes it possible to resolve the user-specific channel IDs during push send time in
-	 * {@link SocketPushContext}.
-	 */
-	static Set<String> getUserChannelIds(Serializable user, String channel) {
-		Set<String> userChannelIds = new HashSet<>(THREE_ENTRIES);
-		Set<String> userIds = APP_USER_IDS.get(user);
-
-		if (userIds != null) {
-			for (String userId : userIds) {
-				userChannelIds.addAll(getApplicationUserChannelIds(userId, channel));
-			}
-		}
-
-		return userChannelIds;
-	}
-
-	/**
-	 * For internal usage only. This makes it possible to resolve the user associated with given channel ID during
-	 * firing the {@link Opened} and {@link Closed} events in {@link SocketSessionManager}.
-	 */
-	static Serializable getUser(String channel, String channelId) {
-		for (Entry<Serializable, Set<String>> applicationUserId : APP_USER_IDS.entrySet()) {
-			for (String userId : applicationUserId.getValue()) { // "Normally" this contains only 1 entry, so it isn't that inefficient as it looks like.
-				if (getApplicationUserChannelIds(userId, channel).contains(channelId)) {
-					return applicationUserId.getKey();
-				}
-			}
-		}
-
-		return null;
-	}
-
-	private static Set<String> getApplicationUserChannelIds(String userId, String channel) {
-		Map<String, Set<String>> userChannels = APP_USER_CHANNEL_IDS.get(userId);
-
-		if (userChannels != null) {
-			Set<String> channelIds = userChannels.get(channel);
-
-			if (channelIds != null) {
-				return channelIds;
-			}
-		}
-
-		return emptySet();
-	}
-
 	// Serialization --------------------------------------------------------------------------------------------------
 
 	private void writeObject(ObjectOutputStream output) throws IOException {
@@ -309,7 +219,7 @@ public class SocketChannelManager implements Serializable {
 		Map<String, ConcurrentMap<String, Set<String>>> sessionUserChannelIds = new HashMap<>(sessionUserIds.size());
 
 		for (String userId : sessionUserIds.values()) {
-			sessionUserChannelIds.put(userId, APP_USER_CHANNEL_IDS.get(userId));
+			sessionUserChannelIds.put(userId, getUserChannelIds().get(userId));
 		}
 
 		output.writeObject(sessionUserChannelIds);
@@ -325,15 +235,15 @@ public class SocketChannelManager implements Serializable {
 
 		for (Entry<Serializable, String> sessionUserId : sessionUserIds.entrySet()) {
 			String userId = sessionUserId.getValue();
-			registerApplicationUser(sessionUserId.getKey(), userId);
-			APP_USER_CHANNEL_IDS.put(userId, sessionUserChannelIds.get(userId));
+			userManager.registerUser(sessionUserId.getKey(), userId);
+			getUserChannelIds().put(userId, sessionUserChannelIds.get(userId));
 		}
 
 		// Below awkwardness is because SocketChannelManager can't be injected in SocketSessionManager (CDI session scope
 		// is not necessarily active during WS session). So it can't just ask us for channel IDs and we have to tell it.
 		// And, for application scope IDs we make sure they're re-registered after server restart/failover.
-		manager.register(sessionScopeIds.values());
-		manager.register(APP_SCOPE_IDS.values());
+		sessionManager.register(sessionScopeIds.values());
+		sessionManager.register(APP_SCOPE_IDS.values());
 	}
 
 }

@@ -15,10 +15,8 @@ package org.omnifaces.cdi.push;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.synchronizedSet;
 import static javax.websocket.CloseReason.CloseCodes.NORMAL_CLOSURE;
-import static org.omnifaces.cdi.push.SocketChannelManager.getUser;
 import static org.omnifaces.cdi.push.SocketEndpoint.PARAM_CHANNEL;
 import static org.omnifaces.util.Beans.getReference;
-import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -31,6 +29,7 @@ import java.util.concurrent.Future;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.util.AnnotationLiteral;
+import javax.inject.Inject;
 import javax.websocket.CloseReason;
 import javax.websocket.Session;
 
@@ -63,13 +62,18 @@ public class SocketSessionManager {
 	private final ConcurrentMap<String, Set<Session>> channelSessions = new ConcurrentHashMap<>();
 	private static volatile SocketSessionManager instance;
 
+	// Properties -----------------------------------------------------------------------------------------------------
+
+	@Inject
+	private SocketUserManager userManager;
+
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Returns the CDI managed instance of this class.
 	 * @return The CDI managed instance of this class.
 	 */
-	public static SocketSessionManager getInstance() {
+	protected static SocketSessionManager getInstance() {
 		if (instance == null) {
 			instance = getReference(SocketSessionManager.class); // Awkward workaround for it being unavailable via @Inject in endpoint in Tomcat+Weld/OWB.
 		}
@@ -81,7 +85,7 @@ public class SocketSessionManager {
 	 * Register given channel identifier.
 	 * @param channelId The channel identifier to register.
 	 */
-	public void register(String channelId) {
+	protected void register(String channelId) {
 		if (!channelSessions.containsKey(channelId)) {
 			channelSessions.putIfAbsent(channelId, synchronizedSet(new HashSet<Session>()));
 		}
@@ -91,7 +95,7 @@ public class SocketSessionManager {
 	 * Register given channel identifiers.
 	 * @param channelIds The channel identifiers to register.
 	 */
-	public void register(Iterable<String> channelIds) {
+	protected void register(Iterable<String> channelIds) {
 		for (String channelId : channelIds) {
 			register(channelId);
 		}
@@ -104,12 +108,12 @@ public class SocketSessionManager {
 	 * @param session The opened web socket session.
 	 * @return <code>true</code> if given web socket session is accepted and is new, otherwise <code>false</code>.
 	 */
-	public boolean add(Session session) {
+	protected boolean add(Session session) {
 		String channelId = getChannelId(session);
 		Set<Session> sessions = channelSessions.get(channelId);
 
 		if (sessions != null && sessions.add(session)) {
-			Serializable user = getUser(getChannel(session), channelId);
+			Serializable user = userManager.getUser(getChannel(session), channelId);
 
 			if (user != null) {
 				session.getUserProperties().put("user", user);
@@ -131,10 +135,10 @@ public class SocketSessionManager {
 	 * with given channel identifier. The returned futures will return <code>null</code> on {@link Future#get()} if the
 	 * message was successfully delivered and otherwise throw {@link ExecutionException}.
 	 */
-	public Set<Future<Void>> send(String channelId, Object message) {
+	protected Set<Future<Void>> send(String channelId, Object message) {
 		Set<Session> sessions = (channelId != null) ? channelSessions.get(channelId) : null;
 
-		if (!isEmpty(sessions)) {
+		if (sessions != null && !sessions.isEmpty()) {
 			Set<Future<Void>> results = new HashSet<>(sessions.size());
 			String json = Json.encode(message);
 
@@ -157,7 +161,7 @@ public class SocketSessionManager {
 	 * @param session The closed web socket session.
 	 * @param reason The close reason.
 	 */
-	public void remove(Session session, CloseReason reason) {
+	protected void remove(Session session, CloseReason reason) {
 		Set<Session> sessions = channelSessions.get(getChannelId(session));
 
 		if (sessions != null && sessions.remove(session)) {
@@ -169,7 +173,7 @@ public class SocketSessionManager {
 	 * Deregister given channel identifiers and explicitly close all open web socket sessions associated with it.
 	 * @param channelIds The channel identifiers to deregister.
 	 */
-	public void deregister(Iterable<String> channelIds) {
+	protected void deregister(Iterable<String> channelIds) {
 		for (String channelId : channelIds) {
 			Set<Session> sessions = channelSessions.remove(channelId);
 
