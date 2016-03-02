@@ -35,7 +35,7 @@ import org.omnifaces.cdi.PushContext;
 
 /**
  * <p>
- * Concrete implementation of {@link PushContext} which is to be injected by {@link Push}.
+ * Concrete implementation of {@link PushContext} which is to be injected by <code>&#64;</code>{@link Push}.
  * This is produced by {@link SocketPushContextProducer}.
  *
  * @author Bauke Scholtz
@@ -53,7 +53,6 @@ public class SocketPushContext implements PushContext {
 	private String channel;
 	private Map<String, String> sessionScopeIds;
 	private Map<String, String> viewScopeIds;
-
 	private SocketSessionManager sessionManager;
 	private SocketUserManager userManager;
 
@@ -77,7 +76,7 @@ public class SocketPushContext implements PushContext {
 
 	@Override
 	public Set<Future<Void>> send(Object message) {
-		return SocketSessionManager.getInstance().send(getChannelId(channel, sessionScopeIds, viewScopeIds), message);
+		return sessionManager.send(getChannelId(channel, sessionScopeIds, viewScopeIds), message);
 	}
 
 	@Override

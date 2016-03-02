@@ -371,8 +371,8 @@ import org.omnifaces.util.Json;
  * When a web socket has been opened, a new CDI <strong>{@link SocketEvent}</strong> will be fired with
  * <strong><code>&#64;</code>{@link Opened}</strong> qualifier. When a web socket has been closed, a new CDI
  * {@link SocketEvent} will be fired with <strong><code>&#64;</code>{@link Closed}</strong> qualifier. They can only be
- * observed and collected in an application scoped CDI bean as below. A request scoped one is useless and a view/session
- * scoped one wouldn't work as there's no means of a HTTP request anywhere at that moment.
+ * observed and collected in an application scoped CDI bean as below. A request/view/session scoped one wouldn't work as
+ * there's no means of a HTTP request anywhere at that moment.
  * <pre>
  * &#64;ApplicationScoped
  * public class SocketObserver {
@@ -495,7 +495,7 @@ import org.omnifaces.util.Json;
  * there's no means of a HTTP request anywhere at that moment. For exactly this reason a view and session scoped bean
  * would not work (as they require respectively the JSF view state and HTTP session which can only be identified by a
  * HTTP request). A view and session scoped push socket would also not work, so the push socket really needs to be
- * application scoped). The {@link FacesContext} will also be unavailable in the above event listener method.
+ * application scoped. The {@link FacesContext} will also be unavailable in the above event listener method.
  * <p>
  * In case the trigger in EAR/EJB side is an asynchronous service method which is in turn initiated in WAR side, then
  * you could make use of callbacks from WAR side. Let the business service method take a callback instance as argument,

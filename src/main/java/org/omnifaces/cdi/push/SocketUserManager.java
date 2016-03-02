@@ -47,12 +47,27 @@ public class SocketUserManager {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Register given user channel ID on given application user ID and channel name.
+	 * Register application user based on given user and application user ID.
+	 * @param user The user.
+	 * @param userId The application user ID.
+	 */
+	protected void register(Serializable user, String userId) {
+		synchronized (applicationUserIds) {
+			if (!applicationUserIds.containsKey(user)) {
+				applicationUserIds.putIfAbsent(user, synchronizedSet(new HashSet<String>(ONE_ENTRY))); // size=1 as an average user will unlikely login in multiple sessions.
+			}
+
+			applicationUserIds.get(user).add(userId);
+		}
+	}
+
+	/**
+	 * Add user channel ID associated with given application user ID and channel name.
 	 * @param userId The application user ID.
 	 * @param channel The channel name.
 	 * @param channelId The channel identifier.
 	 */
-	protected void registerUserChannelId(String userId, String channel, String channelId) {
+	protected void addChannelId(String userId, String channel, String channelId) {
 		if (!userChannelIds.containsKey(userId)) {
 			userChannelIds.putIfAbsent(userId, new ConcurrentHashMap<String, Set<String>>(THREE_ENTRIES)); // size=3 as an average developer will unlikely declare more push channels in same application.
 		}
@@ -64,21 +79,6 @@ public class SocketUserManager {
 		}
 
 		channelIds.get(channel).add(channelId);
-	}
-
-	/**
-	 * Register application user based on given user and application user ID.
-	 * @param user The user.
-	 * @param userId The application user ID.
-	 */
-	protected void registerUser(Serializable user, String userId) {
-		synchronized (applicationUserIds) {
-			if (!applicationUserIds.containsKey(user)) {
-				applicationUserIds.putIfAbsent(user, synchronizedSet(new HashSet<String>(ONE_ENTRY))); // size=1 as an average user will unlikely login in multiple sessions.
-			}
-
-			applicationUserIds.get(user).add(userId);
-		}
 	}
 
 	/**
@@ -121,7 +121,9 @@ public class SocketUserManager {
 	 * @param user The user.
 	 * @param userId The application user ID.
 	 */
-	protected void deregisterUser(Serializable user, String userId) {
+	protected void deregister(Serializable user, String userId) {
+		userChannelIds.remove(userId);
+
 		synchronized (applicationUserIds) {
 			Set<String> userIds = applicationUserIds.get(user);
 			userIds.remove(userId);
@@ -130,14 +132,6 @@ public class SocketUserManager {
 				applicationUserIds.remove(user);
 			}
 		}
-	}
-
-	/**
-	 * Deregister user channel IDs associated with given application user ID.
-	 * @param userId The application user ID.
-	 */
-	protected void deregisterUserChannelIds(String userId) {
-		userChannelIds.remove(userId);
 	}
 
 	// Internal (static because package private methods in CDI beans are subject to memory leaks) ---------------------

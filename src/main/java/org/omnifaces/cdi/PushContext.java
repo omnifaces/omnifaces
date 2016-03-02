@@ -47,7 +47,7 @@ public interface PushContext extends Serializable {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Send given message object to the push socket channel as identified by {@link Push}.
+	 * Send given message object to the push socket channel as identified by <code>&#64;</code>{@link Push}.
 	 * The message object will be encoded as JSON and be available as first argument of the JavaScript listener function
 	 * declared in <code>&lt;o:socket onmessage&gt;</code>.
 	 * @param message The push message object.
@@ -60,8 +60,8 @@ public interface PushContext extends Serializable {
 	Set<Future<Void>> send(Object message);
 
 	/**
-	 * Send given message object to the push socket channel as identified by {@link Push}, targeted to the given user as
-	 * identified by <code>&lt;o:socket user&gt;</code>.
+	 * Send given message object to the push socket channel as identified by <code>&#64;</code>{@link Push}, targeted
+	 * to the given user as identified by <code>&lt;o:socket user&gt;</code>.
 	 * The message object will be encoded as JSON and be available as first argument of the JavaScript listener function
 	 * declared in <code>&lt;o:socket onmessage&gt;</code>.
 	 * @param <S> The generic type of the user identifier.
@@ -76,8 +76,8 @@ public interface PushContext extends Serializable {
 	<S extends Serializable> Set<Future<Void>> send(Object message, S user);
 
 	/**
-	 * Send given message object to the push socket channel as identified by {@link Push}, targeted to the given users
-	 * as identified by <code>&lt;o:socket user&gt;</code>.
+	 * Send given message object to the push socket channel as identified by <code>&#64;</code>{@link Push}, targeted
+	 * to the given users as identified by <code>&lt;o:socket user&gt;</code>.
 	 * The message object will be encoded as JSON and be available as first argument of the JavaScript listener function
 	 * declared in <code>&lt;o:socket onmessage&gt;</code>.
 	 * @param <S> The generic type of the user identifier.

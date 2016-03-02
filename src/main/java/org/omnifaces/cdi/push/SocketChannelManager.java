@@ -55,7 +55,7 @@ public class SocketChannelManager implements Serializable {
 	private enum Scope {
 		APPLICATION, SESSION, VIEW;
 
-		public static Scope of(String value, Serializable user) {
+		static Scope of(String value, Serializable user) {
 			if (value == null) {
 				return (user == null) ? APPLICATION : SESSION;
 			}
@@ -122,10 +122,10 @@ public class SocketChannelManager implements Serializable {
 		if (user != null) {
 			if (!sessionUserIds.containsKey(user)) {
 				sessionUserIds.putIfAbsent(user, UUID.randomUUID().toString());
-				userManager.registerUser(user, sessionUserIds.get(user));
+				userManager.register(user, sessionUserIds.get(user));
 			}
 
-			userManager.registerUserChannelId(sessionUserIds.get(user), channel, channelId);
+			userManager.addChannelId(sessionUserIds.get(user), channel, channelId);
 		}
 
 		sessionManager.register(channelId);
@@ -139,9 +139,7 @@ public class SocketChannelManager implements Serializable {
 	@PreDestroy
 	protected void deregisterSessionScopeChannels() {
 		for (Entry<Serializable, String> sessionUserId : sessionUserIds.entrySet()) {
-			String userId = sessionUserId.getValue();
-			userManager.deregisterUserChannelIds(userId);
-			userManager.deregisterUser(sessionUserId.getKey(), userId);
+			userManager.deregister(sessionUserId.getKey(), sessionUserId.getValue());
 		}
 
 		sessionManager.deregister(sessionScopeIds.values());
@@ -166,7 +164,7 @@ public class SocketChannelManager implements Serializable {
 		 * any open web sockets associated with it to avoid stale websockets.
 		 */
 		@PreDestroy
-		public void deregisterViewScopeChannels() {
+		protected void deregisterViewScopeChannels() {
 			SocketSessionManager.getInstance().deregister(viewScopeIds.values());
 		}
 
@@ -235,7 +233,7 @@ public class SocketChannelManager implements Serializable {
 
 		for (Entry<Serializable, String> sessionUserId : sessionUserIds.entrySet()) {
 			String userId = sessionUserId.getValue();
-			userManager.registerUser(sessionUserId.getKey(), userId);
+			userManager.register(sessionUserId.getKey(), userId);
 			getUserChannelIds().put(userId, sessionUserChannelIds.get(userId));
 		}
 

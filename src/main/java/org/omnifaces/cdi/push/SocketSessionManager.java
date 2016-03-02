@@ -60,7 +60,6 @@ public class SocketSessionManager {
 	};
 
 	private final ConcurrentMap<String, Set<Session>> channelSessions = new ConcurrentHashMap<>();
-	private static volatile SocketSessionManager instance;
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -68,18 +67,6 @@ public class SocketSessionManager {
 	private SocketUserManager userManager;
 
 	// Actions --------------------------------------------------------------------------------------------------------
-
-	/**
-	 * Returns the CDI managed instance of this class.
-	 * @return The CDI managed instance of this class.
-	 */
-	protected static SocketSessionManager getInstance() {
-		if (instance == null) {
-			instance = getReference(SocketSessionManager.class); // Awkward workaround for it being unavailable via @Inject in endpoint in Tomcat+Weld/OWB.
-		}
-
-		return instance;
-	}
 
 	/**
 	 * Register given channel identifier.
@@ -192,6 +179,21 @@ public class SocketSessionManager {
 				}
 			}
 		}
+	}
+
+	// Internal -------------------------------------------------------------------------------------------------------
+
+	private static volatile SocketSessionManager instance;
+
+	/**
+	 * Internal usage only. Awkward workaround for it being unavailable via @Inject in endpoint in Tomcat+Weld/OWB.
+	 */
+	static SocketSessionManager getInstance() {
+		if (instance == null) {
+			instance = getReference(SocketSessionManager.class);
+		}
+
+		return instance;
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
