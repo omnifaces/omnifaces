@@ -40,7 +40,7 @@ import org.omnifaces.util.Json;
 
 /**
  * <p>
- * The web socket session manager. It holds all web socket sessions by their channel identifier.
+ * This web socket session manager holds all web socket sessions by their channel identifier.
  *
  * @author Bauke Scholtz
  * @see SocketEndpoint
@@ -59,12 +59,12 @@ public class SocketSessionManager {
 		private static final long serialVersionUID = 1L;
 	};
 
-	private final ConcurrentMap<String, Set<Session>> channelSessions = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, Set<Session>> socketSessions = new ConcurrentHashMap<>();
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	@Inject
-	private SocketUserManager userManager;
+	private SocketUserManager socketUsers;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -73,8 +73,8 @@ public class SocketSessionManager {
 	 * @param channelId The channel identifier to register.
 	 */
 	protected void register(String channelId) {
-		if (!channelSessions.containsKey(channelId)) {
-			channelSessions.putIfAbsent(channelId, synchronizedSet(new HashSet<Session>()));
+		if (!socketSessions.containsKey(channelId)) {
+			socketSessions.putIfAbsent(channelId, synchronizedSet(new HashSet<Session>()));
 		}
 	}
 
@@ -97,10 +97,10 @@ public class SocketSessionManager {
 	 */
 	protected boolean add(Session session) {
 		String channelId = getChannelId(session);
-		Set<Session> sessions = channelSessions.get(channelId);
+		Set<Session> sessions = socketSessions.get(channelId);
 
 		if (sessions != null && sessions.add(session)) {
-			Serializable user = userManager.getUser(getChannel(session), channelId);
+			Serializable user = socketUsers.getUser(getChannel(session), channelId);
 
 			if (user != null) {
 				session.getUserProperties().put("user", user);
@@ -123,7 +123,7 @@ public class SocketSessionManager {
 	 * message was successfully delivered and otherwise throw {@link ExecutionException}.
 	 */
 	protected Set<Future<Void>> send(String channelId, Object message) {
-		Set<Session> sessions = (channelId != null) ? channelSessions.get(channelId) : null;
+		Set<Session> sessions = (channelId != null) ? socketSessions.get(channelId) : null;
 
 		if (sessions != null && !sessions.isEmpty()) {
 			Set<Future<Void>> results = new HashSet<>(sessions.size());
@@ -149,7 +149,7 @@ public class SocketSessionManager {
 	 * @param reason The close reason.
 	 */
 	protected void remove(Session session, CloseReason reason) {
-		Set<Session> sessions = channelSessions.get(getChannelId(session));
+		Set<Session> sessions = socketSessions.get(getChannelId(session));
 
 		if (sessions != null && sessions.remove(session)) {
 			fireEvent(session, reason, SESSION_CLOSED);
@@ -162,13 +162,11 @@ public class SocketSessionManager {
 	 */
 	protected void deregister(Iterable<String> channelIds) {
 		for (String channelId : channelIds) {
-			Set<Session> sessions = channelSessions.remove(channelId);
+			Set<Session> sessions = socketSessions.get(channelId);
 
 			if (sessions != null) {
 				for (Session session : sessions) {
 					if (session.isOpen()) {
-						fireEvent(session, REASON_EXPIRED, SESSION_CLOSED);
-
 						try {
 							session.close(REASON_EXPIRED);
 						}
@@ -208,7 +206,7 @@ public class SocketSessionManager {
 
 	private static void fireEvent(Session session, CloseReason reason, AnnotationLiteral<?> qualifier) {
 		Serializable user = (Serializable) session.getUserProperties().get("user");
-		Beans.fireEvent(new SocketEvent(getChannel(session), user, reason != null ? reason.getCloseCode() : null), qualifier);
+		Beans.fireEvent(new SocketEvent(getChannel(session), user, (reason != null) ? reason.getCloseCode() : null), qualifier);
 	}
 
 }

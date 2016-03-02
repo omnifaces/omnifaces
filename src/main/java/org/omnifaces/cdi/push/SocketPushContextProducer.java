@@ -24,7 +24,7 @@ import org.omnifaces.cdi.PushContext;
 
 /**
  * <p>
- * Producer for injecting a {@link PushContext} as defined by the <code>&#64;</code>{@link Push} annotation.
+ * This producer prepares the {@link SocketPushContext} instance for injection by <code>&#64;</code>{@link Push}.
  *
  * @author Bauke Scholtz
  * @see Push

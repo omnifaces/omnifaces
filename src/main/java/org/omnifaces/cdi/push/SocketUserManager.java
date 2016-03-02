@@ -14,8 +14,7 @@ package org.omnifaces.cdi.push;
 
 import static java.util.Collections.emptySet;
 import static java.util.Collections.synchronizedSet;
-import static org.omnifaces.cdi.push.SocketChannelManager.ONE_ENTRY;
-import static org.omnifaces.cdi.push.SocketChannelManager.THREE_ENTRIES;
+import static org.omnifaces.cdi.push.SocketChannelManager.ESTIMATED_CHANNELS_PER_APPLICATION;
 import static org.omnifaces.util.Beans.getInstance;
 
 import java.io.Serializable;
@@ -30,7 +29,7 @@ import javax.enterprise.context.ApplicationScoped;
 
 /**
  * <p>
- * The web socket user manager. It holds all web socket users registered by <code>&lt;o:socket&gt;</code>.
+ * This web socket user manager holds all web socket users registered by <code>&lt;o:socket&gt;</code>.
  *
  * @author Bauke Scholtz
  * @see Socket
@@ -39,10 +38,18 @@ import javax.enterprise.context.ApplicationScoped;
 @ApplicationScoped
 public class SocketUserManager {
 
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	/** An average developer will unlikely declare multiple user-targeted channels in same session. */
+	private static final int ESTIMATED_USER_CHANNELS_PER_SESSION = 1;
+
+	/** An average user will unlikely login in multiple sessions. */
+	private static final int ESTIMATED_SESSIONS_PER_USER = 1;
+
 	// Properties -----------------------------------------------------------------------------------------------------
 
-	private final ConcurrentMap<String, ConcurrentMap<String, Set<String>>> userChannelIds = new ConcurrentHashMap<>();
-	private final ConcurrentMap<Serializable, Set<String>> applicationUserIds = new ConcurrentHashMap<>(); // An user can have more than one session (multiple browsers, account sharing).
+	private final ConcurrentMap<String, ConcurrentMap<String, Set<String>>> userChannels = new ConcurrentHashMap<>();
+	private final ConcurrentMap<Serializable, Set<String>> applicationUsers = new ConcurrentHashMap<>(); // An user can have more than one session (multiple browsers, account sharing).
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -52,12 +59,12 @@ public class SocketUserManager {
 	 * @param userId The application user ID.
 	 */
 	protected void register(Serializable user, String userId) {
-		synchronized (applicationUserIds) {
-			if (!applicationUserIds.containsKey(user)) {
-				applicationUserIds.putIfAbsent(user, synchronizedSet(new HashSet<String>(ONE_ENTRY))); // size=1 as an average user will unlikely login in multiple sessions.
+		synchronized (applicationUsers) {
+			if (!applicationUsers.containsKey(user)) {
+				applicationUsers.putIfAbsent(user, synchronizedSet(new HashSet<String>(ESTIMATED_SESSIONS_PER_USER)));
 			}
 
-			applicationUserIds.get(user).add(userId);
+			applicationUsers.get(user).add(userId);
 		}
 	}
 
@@ -68,14 +75,14 @@ public class SocketUserManager {
 	 * @param channelId The channel identifier.
 	 */
 	protected void addChannelId(String userId, String channel, String channelId) {
-		if (!userChannelIds.containsKey(userId)) {
-			userChannelIds.putIfAbsent(userId, new ConcurrentHashMap<String, Set<String>>(THREE_ENTRIES)); // size=3 as an average developer will unlikely declare more push channels in same application.
+		if (!userChannels.containsKey(userId)) {
+			userChannels.putIfAbsent(userId, new ConcurrentHashMap<String, Set<String>>(ESTIMATED_CHANNELS_PER_APPLICATION)); // size=3 as an average developer will unlikely declare more push channels in same application.
 		}
 
-		ConcurrentMap<String, Set<String>> channelIds = userChannelIds.get(userId);
+		ConcurrentMap<String, Set<String>> channelIds = userChannels.get(userId);
 
 		if (!channelIds.containsKey(channel)) {
-			channelIds.putIfAbsent(channel, synchronizedSet(new HashSet<String>(ONE_ENTRY))); // size=1 as an average developer will unlikely declare multiple user-targeted channels in same session.
+			channelIds.putIfAbsent(channel, synchronizedSet(new HashSet<String>(ESTIMATED_USER_CHANNELS_PER_SESSION)));
 		}
 
 		channelIds.get(channel).add(channelId);
@@ -85,12 +92,13 @@ public class SocketUserManager {
 	 * Resolve the user associated with given channel name and ID.
 	 * @param channel The channel name.
 	 * @param channelId The channel identifier.
+	 * @return The user associated with given channel name and ID.
 	 */
 	protected Serializable getUser(String channel, String channelId) {
-		for (Entry<Serializable, Set<String>> applicationUserId : applicationUserIds.entrySet()) {
-			for (String userId : applicationUserId.getValue()) { // "Normally" this contains only 1 entry, so it isn't that inefficient as it looks like.
+		for (Entry<Serializable, Set<String>> applicationUser : applicationUsers.entrySet()) {
+			for (String userId : applicationUser.getValue()) { // "Normally" this contains only 1 entry, so it isn't that inefficient as it looks like.
 				if (getApplicationUserChannelIds(userId, channel).contains(channelId)) {
-					return applicationUserId.getKey();
+					return applicationUser.getKey();
 				}
 			}
 		}
@@ -99,13 +107,14 @@ public class SocketUserManager {
 	}
 
 	/**
-	 * Resolve the user-specific channel IDs based on given user and channel name.
+	 * Resolve the user-specific channel IDs associated with given user and channel name.
 	 * @param user The user.
 	 * @param channel The channel name.
+	 * @return The user-specific channel IDs associated with given user and channel name.
 	 */
-	protected Set<String> getUserChannelIds(Serializable user, String channel) {
-		Set<String> channelIds = new HashSet<>(THREE_ENTRIES);
-		Set<String> userIds = applicationUserIds.get(user);
+	protected Set<String> getChannelIds(Serializable user, String channel) {
+		Set<String> channelIds = new HashSet<>(ESTIMATED_CHANNELS_PER_APPLICATION);
+		Set<String> userIds = applicationUsers.get(user);
 
 		if (userIds != null) {
 			for (String userId : userIds) {
@@ -122,14 +131,14 @@ public class SocketUserManager {
 	 * @param userId The application user ID.
 	 */
 	protected void deregister(Serializable user, String userId) {
-		userChannelIds.remove(userId);
+		userChannels.remove(userId);
 
-		synchronized (applicationUserIds) {
-			Set<String> userIds = applicationUserIds.get(user);
+		synchronized (applicationUsers) {
+			Set<String> userIds = applicationUsers.get(user);
 			userIds.remove(userId);
 
 			if (userIds.isEmpty()) {
-				applicationUserIds.remove(user);
+				applicationUsers.remove(user);
 			}
 		}
 	}
@@ -137,20 +146,20 @@ public class SocketUserManager {
 	// Internal (static because package private methods in CDI beans are subject to memory leaks) ---------------------
 
 	/**
-	 * For internal usage only. This makes it possible to save and restore user specific channel IDs during server
+	 * For internal usage only. This makes it possible to save and restore user specific channels during server
 	 * restart/failover in {@link SocketChannelManager}.
 	 */
-	static ConcurrentMap<String, ConcurrentMap<String, Set<String>>> getUserChannelIds() {
-		return getInstance(SocketUserManager.class).userChannelIds;
+	static ConcurrentMap<String, ConcurrentMap<String, Set<String>>> getUserChannels() {
+		return getInstance(SocketUserManager.class).userChannels;
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
 	private Set<String> getApplicationUserChannelIds(String userId, String channel) {
-		Map<String, Set<String>> userChannels = userChannelIds.get(userId);
+		Map<String, Set<String>> channels = userChannels.get(userId);
 
-		if (userChannels != null) {
-			Set<String> channelIds = userChannels.get(channel);
+		if (channels != null) {
+			Set<String> channelIds = channels.get(channel);
 
 			if (channelIds != null) {
 				return channelIds;

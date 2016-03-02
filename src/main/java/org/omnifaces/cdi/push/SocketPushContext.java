@@ -15,8 +15,8 @@ package org.omnifaces.cdi.push;
 import static java.util.Arrays.asList;
 import static org.omnifaces.cdi.push.SocketChannelManager.EMPTY_SCOPE;
 import static org.omnifaces.cdi.push.SocketChannelManager.getChannelId;
-import static org.omnifaces.cdi.push.SocketChannelManager.getSessionScopeIds;
-import static org.omnifaces.cdi.push.SocketChannelManager.getViewScopeIds;
+import static org.omnifaces.cdi.push.SocketChannelManager.getSessionScope;
+import static org.omnifaces.cdi.push.SocketChannelManager.getViewScope;
 import static org.omnifaces.util.Beans.isActive;
 import static org.omnifaces.util.Faces.hasContext;
 
@@ -35,8 +35,8 @@ import org.omnifaces.cdi.PushContext;
 
 /**
  * <p>
- * Concrete implementation of {@link PushContext} which is to be injected by <code>&#64;</code>{@link Push}.
- * This is produced by {@link SocketPushContextProducer}.
+ * This is a concrete implementation of {@link PushContext} interface which is to be injected by
+ * <code>&#64;</code>{@link Push}.
  *
  * @author Bauke Scholtz
  * @see Push
@@ -51,10 +51,10 @@ public class SocketPushContext implements PushContext {
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private String channel;
-	private Map<String, String> sessionScopeIds;
-	private Map<String, String> viewScopeIds;
-	private SocketSessionManager sessionManager;
-	private SocketUserManager userManager;
+	private Map<String, String> sessionScope;
+	private Map<String, String> viewScope;
+	private SocketSessionManager socketSessions;
+	private SocketUserManager socketUsers;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -63,20 +63,20 @@ public class SocketPushContext implements PushContext {
 	 * referenced, so it's still available when another thread invokes {@link #send(Object)} during which the session
 	 * and view scope is not necessarily active anymore.
 	 */
-	SocketPushContext(String channel, SocketSessionManager sessionManager, SocketUserManager userManager) {
+	SocketPushContext(String channel, SocketSessionManager socketSessions, SocketUserManager socketUsers) {
 		this.channel = channel;
 		boolean hasSession = isActive(SessionScoped.class);
-		sessionScopeIds = hasSession ? getSessionScopeIds() : EMPTY_SCOPE;
-		viewScopeIds = hasSession && hasContext() ? getViewScopeIds(false) : EMPTY_SCOPE;
-		this.sessionManager = sessionManager;
-		this.userManager = userManager;
+		sessionScope = hasSession ? getSessionScope() : EMPTY_SCOPE;
+		viewScope = hasSession && hasContext() ? getViewScope(false) : EMPTY_SCOPE;
+		this.socketSessions = socketSessions;
+		this.socketUsers = socketUsers;
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
 	public Set<Future<Void>> send(Object message) {
-		return sessionManager.send(getChannelId(channel, sessionScopeIds, viewScopeIds), message);
+		return socketSessions.send(getChannelId(channel, sessionScope, viewScope), message);
 	}
 
 	@Override
@@ -89,11 +89,11 @@ public class SocketPushContext implements PushContext {
 		Map<S, Set<Future<Void>>> resultsByUser = new HashMap<>(users.size());
 
 		for (S user : users) {
-			Set<String> userChannelIds = userManager.getUserChannelIds(user, channel);
-			Set<Future<Void>> results = new HashSet<>(userChannelIds.size());
+			Set<String> channelIds = socketUsers.getChannelIds(user, channel);
+			Set<Future<Void>> results = new HashSet<>(channelIds.size());
 
-			for (String channelId : userChannelIds) {
-				results.addAll(sessionManager.send(channelId, message));
+			for (String channelId : channelIds) {
+				results.addAll(socketSessions.send(channelId, message));
 			}
 
 			resultsByUser.put(user, results);

@@ -27,7 +27,7 @@ import javax.websocket.Session;
 
 /**
  * <p>
- * The web socket server endpoint of <code>&lt;o:socket&gt;</code>.
+ * This web socket server endpoint handles web socket requests coming from <code>&lt;o:socket&gt;</code>.
  *
  * @author Bauke Scholtz
  * @see Socket

@@ -23,8 +23,9 @@ import org.omnifaces.cdi.push.event.Opened;
 
 /**
  * <p>
- * The socket event. This will be created by {@link SocketSessionManager} when a new socket has been {@link Opened} or
- * {@link Closed}. An application scoped CDI bean can {@link Observes} them.
+ * This web socket event will be fired by {@link SocketSessionManager} when a new socket has been
+ * <code>&#64;</code>{@link Opened} or <code>&#64;</code>{@link Closed}. An application scoped CDI bean can
+ * <code>&#64;</code>{@link Observes} them.
  * <p>
  * For detailed usage instructions, see {@link Socket} javadoc.
  *
