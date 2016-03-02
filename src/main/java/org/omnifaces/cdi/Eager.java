@@ -43,7 +43,7 @@ import org.omnifaces.cdi.eager.EagerExtension;
 
 /**
  * <p>
- * The CDI annotation {@link Eager} specifies that a scoped bean is to be eagerly instantiated.
+ * The CDI annotation <code>&#64;</code>{@link Eager} specifies that a scoped bean is to be eagerly instantiated.
  * <p>
  * JSF's own native managed beans are being deprecated in favor of CDI managed beans. One feature that those native JSF
  * managed beans had that's not directly available for CDI managed beans is the ability to eagerly instantiate
@@ -86,7 +86,7 @@ import org.omnifaces.cdi.eager.EagerExtension;
  * }
  * </pre>
  * <p>
- * <em>Note: you can also use the stereotype {@link Startup} for this instead.</em>
+ * <em>Note: you can also use the stereotype <code>&#64;</code>{@link Startup} for this instead.</em>
  * <p>
  * The following bean will be instantiated whenever a session is created:
  * <pre>

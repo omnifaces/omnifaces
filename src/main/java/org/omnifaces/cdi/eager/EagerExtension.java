@@ -43,7 +43,7 @@ import javax.faces.view.ViewScoped;
 import org.omnifaces.cdi.Eager;
 
 /**
- * CDI extension that collects beans annotated with {@link Eager}. After deployment
+ * CDI extension that collects beans annotated with <code>&#64;</code>{@link Eager}. After deployment
  * collected beans are transferred to the {@link EagerBeansRepository}.
  *
  * @author Arjan Tijms

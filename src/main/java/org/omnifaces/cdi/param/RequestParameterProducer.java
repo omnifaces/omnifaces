@@ -59,7 +59,7 @@ import javax.validation.ConstraintViolation;
 import org.omnifaces.cdi.Param;
 
 /**
- * Producer for a request parameter as defined by the {@link Param} annotation.
+ * Producer for a request parameter as defined by the <code>&#64;</code>{@link Param} annotation.
  *
  * @since 1.6
  * @author Arjan Tijms

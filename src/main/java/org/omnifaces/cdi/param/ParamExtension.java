@@ -32,7 +32,7 @@ import org.omnifaces.cdi.Param;
  * the target type.
  * <p>
  * This extension collects the target types of each injection point qualified with
- * the {@link Param} annotation and dynamically registers Beans that effectively
+ * the <code>&#64;</code>{@link Param} annotation and dynamically registers Beans that effectively
  * represents producers for each type.
  *
  * @since 2.0

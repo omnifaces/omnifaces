@@ -39,11 +39,11 @@ import org.omnifaces.util.Utils;
 
 /**
  * <p>
- * The CDI annotation {@link Param} allows you to inject, convert and validate a HTTP request parameter in a CDI managed
- * bean. It's basically like <code>&lt;f:viewParam&gt;</code>, but with the major difference that the injected HTTP
- * request parameter is directly available during {@link PostConstruct}, allowing a much easier way of processing
- * without the need for a <code>&lt;f:event type="preRenderView"&gt;</code> or <code>&lt;f:viewAction&gt;</code> in the
- * view.
+ * The CDI annotation <code>&#64;</code>{@link Param} allows you to inject, convert and validate a HTTP request
+ * parameter in a CDI managed bean. It's basically like <code>&lt;f:viewParam&gt;</code>, but with the major difference
+ * that the injected HTTP request parameter is directly available during {@link PostConstruct}, allowing a much easier
+ * way of processing without the need for a <code>&lt;f:event type="preRenderView"&gt;</code> or
+ * <code>&lt;f:viewAction&gt;</code> in the view.
  * <p>
  * By default the name of the request parameter is taken from the name of the variable into which injection takes place.
  * The example below injects the request parameter with name <code>foo</code>.

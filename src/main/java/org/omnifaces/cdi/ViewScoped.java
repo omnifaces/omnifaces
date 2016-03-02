@@ -38,24 +38,24 @@ import org.omnifaces.viewhandler.RestorableViewHandler;
  * <p>
  * The CDI view scope annotation, with more optimal handling of bean destroy as compared to standard JSF one.
  * <p>
- * In standard JSF 2.0/2.1, the {@link PreDestroy} annotated method on a view scoped bean was never invoked when
- * the session expires. Since OmniFaces 1.6, this CDI view scope annotation will guarantee that the {@link PreDestroy}
- * annotated method is also invoked on session expire. Since JSF 2.2, this problem is solved on native JSF view scoped
- * beans, hereby making this annotation superflous in JSF 2.2.
+ * In standard JSF 2.0/2.1, the <code>&#64;</code>{@link PreDestroy} annotated method on a view scoped bean was never
+ * invoked when the session expires. Since OmniFaces 1.6, this CDI view scope annotation will guarantee that the
+ * <code>&#64;PreDestroy</code> annotated method is also invoked on session expire. Since JSF 2.2, this problem is
+ * solved on native JSF view scoped beans, hereby making this annotation superflous in JSF 2.2.
  * <p>
  * However, there may be cases when it's desirable to immediately destroy a view scoped bean as well when the browser
  * <code>unload</code> event is invoked. I.e. when the user navigates away by GET, or closes the browser tab/window.
  * None of the both JSF 2.2 view scope annotations support this. Since OmniFaces 2.2, this CDI view scope annotation
- * will guarantee that the {@link PreDestroy} annotated method is also invoked on browser unload. This trick is done by
- * a synchronous XHR request via an automatically included helper script <code>omnifaces:unload.js</code>. There's
- * however a small caveat: on slow network and/or poor server hardware, there may be a noticeable lag between the
- * enduser action of unloading the page and the desired result. If this is undesireable, then better stick to JSF 2.2's
- * own view scope annotations and accept the postponed destroy.
+ * will guarantee that the <code>&#64;PreDestroy</code> annotated method is also invoked on browser unload. This trick
+ * is done by a synchronous XHR request via an automatically included helper script <code>omnifaces:unload.js</code>.
+ * There's however a small caveat: on slow network and/or poor server hardware, there may be a noticeable lag between
+ * the enduser action of unloading the page and the desired result. If this is undesireable, then better stick to JSF
+ * 2.2's own view scope annotations and accept the postponed destroy.
  * <p>
- * In a nutshell: if you're on JSF 2.0/2.1, and you can't upgrade to JSF 2.2, and you want the {@link PreDestroy} to be
- * invoked on sesison expire too, then use OmniFaces 1.6+ with this view scope annotation. Or, if you're on JSF 2.2
- * already, and you want the {@link PreDestroy} to be invoked on browser unload too, then use OmniFaces 2.2+ with this
- * view scope annotation.
+ * In a nutshell: if you're on JSF 2.0/2.1, and you can't upgrade to JSF 2.2, and you want the
+ * <code>&#64;PreDestroy</code> to be invoked on sesison expire too, then use OmniFaces 1.6+ with this view scope
+ * annotation. Or, if you're on JSF 2.2 already, and you want the <code>&#64;PreDestroy</code> to be invoked on browser
+ * unload too, then use OmniFaces 2.2+ with this view scope annotation.
  * <p>
  * Related JSF issues:
  * <ul>
@@ -65,7 +65,7 @@ import org.omnifaces.viewhandler.RestorableViewHandler;
  * </ul>
  *
  * <h3>Usage</h3>
- *
+ * <p>
  * Just use it the usual way as all other CDI scopes. Watch out with IDE autocomplete on import that you don't
  * accidentally import standard JSF's own one.
  * <pre>
@@ -95,7 +95,7 @@ import org.omnifaces.viewhandler.RestorableViewHandler;
  * </ul>
  * <p>If none of those context parameters are present, then a default size of
  * {@value org.omnifaces.cdi.viewscope.ViewScopeManager#DEFAULT_MAX_ACTIVE_VIEW_SCOPES} will be used. When a view scoped
- * bean is evicted from the LRU map, then its {@link PreDestroy} will also guaranteed to be invoked.
+ * bean is evicted from the LRU map, then its <code>&#64;PreDestroy</code> will also guaranteed to be invoked.
  *
  * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz

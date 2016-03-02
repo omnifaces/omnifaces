@@ -20,7 +20,7 @@ import javax.faces.convert.Converter;
 import org.omnifaces.cdi.Param;
 
 /**
- * The type that's injected via the {@link Param} qualifier.
+ * The type that's injected via the <code>&#64;</code>{@link Param} qualifier.
  * <p>
  * This acts as a wrapper for the actual value that is retrieved from the request and optionally converted.
  *
