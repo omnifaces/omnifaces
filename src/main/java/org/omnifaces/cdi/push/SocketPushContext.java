@@ -63,10 +63,10 @@ public class SocketPushContext implements PushContext {
 	 * referenced, so it's still available when another thread invokes {@link #send(Object)} during which the session
 	 * and view scope is not necessarily active anymore.
 	 */
-	SocketPushContext(String channel, SocketChannelManager socketChannels, SocketSessionManager socketSessions, SocketUserManager socketUsers) {
+	SocketPushContext(String channel, SocketSessionManager socketSessions, SocketUserManager socketUsers) {
 		this.channel = channel;
 		boolean hasSession = isActive(SessionScoped.class);
-		sessionScope = hasSession ? getSessionScope(socketChannels) : EMPTY_SCOPE;
+		sessionScope = hasSession ? getSessionScope() : EMPTY_SCOPE;
 		viewScope = hasSession && hasContext() ? getViewScope(false) : EMPTY_SCOPE;
 		this.socketSessions = socketSessions;
 		this.socketUsers = socketUsers;

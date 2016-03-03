@@ -197,8 +197,8 @@ public class SocketChannelManager implements Serializable {
 	 * For internal usage only. This makes it possible to remember session scope channel IDs during injection time of
 	 * {@link SocketPushContext} (the CDI session scope is not necessarily active during push send time).
 	 */
-	static Map<String, String> getSessionScope(SocketChannelManager that) {
-		return that.sessionScope;
+	static Map<String, String> getSessionScope() {
+		return getInstance(SocketChannelManager.class).sessionScope;
 	}
 
 	/**
@@ -238,7 +238,7 @@ public class SocketChannelManager implements Serializable {
 		Map<String, ConcurrentMap<String, Set<String>>> sessionUserChannels = new HashMap<>(sessionUsers.size());
 
 		for (String userId : sessionUsers.values()) {
-			sessionUserChannels.put(userId, getUserChannels(socketUsers).get(userId));
+			sessionUserChannels.put(userId, getUserChannels().get(userId));
 		}
 
 		output.writeObject(sessionUserChannels);
@@ -255,7 +255,7 @@ public class SocketChannelManager implements Serializable {
 		for (Entry<Serializable, String> sessionUser : sessionUsers.entrySet()) {
 			String userId = sessionUser.getValue();
 			socketUsers.register(sessionUser.getKey(), userId);
-			getUserChannels(socketUsers).put(userId, sessionUserChannels.get(userId));
+			getUserChannels().put(userId, sessionUserChannels.get(userId));
 		}
 
 		// Below awkwardness is because SocketChannelManager can't be injected in SocketSessionManager (CDI session scope
