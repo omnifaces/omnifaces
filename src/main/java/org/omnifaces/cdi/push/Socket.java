@@ -599,16 +599,9 @@ public class Socket extends TagHandler {
 	private static final String ERROR_INVALID_CHANNEL =
 		"o:socket 'channel' attribute '%s' does not represent a valid channel name. It may not be an EL expression and"
 			+ " it may only contain alphanumeric characters, hyphens, underscores and periods.";
-	private static final String ERROR_INVALID_SCOPE =
-		"o:socket 'scope' attribute '%s' does not represent a valid scope. It may not be an EL expression and allowed"
-			+ " values are 'application', 'session' and 'view', case insensitive. The default is 'application'. When"
-			+ " 'user' attribute is specified, then scope defaults to 'session' and may not be 'application'.";
 	private static final String ERROR_INVALID_USER =
 		"o:socket 'user' attribute '%s' does not represent a valid user identifier. It must implement Serializable and"
 			+ " preferably have low memory footprint. Suggestion: use #{request.remoteUser} or #{someLoggedInUser.id}.";
-	private static final String ERROR_DUPLICATE_CHANNEL =
-		"o:socket channel '%s' is already registered on a different scope. Choose an unique channel name for a"
-			+ " different channel (or shutdown all browsers and restart the server if you were just testing).";
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -692,20 +685,7 @@ public class Socket extends TagHandler {
 
 		SocketChannelManager channelManager = getReference(SocketChannelManager.class);
 		String scopeName = (scope == null) ? null : scope.isLiteral() ? getString(context, scope) : "";
-		String channelId;
-
-		try {
-			channelId = channelManager.register(channelName, scopeName, (Serializable) userObject);
-		}
-		catch (IllegalArgumentException e) {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_SCOPE, scopeName), e);
-		}
-
-		if (channelId == null) {
-			throw new IllegalArgumentException(String.format(ERROR_DUPLICATE_CHANNEL, channelName));
-		}
-
-		return channelId;
+		return channelManager.register(channelName, scopeName, (Serializable) userObject);
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
