@@ -106,7 +106,7 @@ import org.omnifaces.util.Json;
  * </ul>
  * <p>
  * In case your server is configured to run WS container on a different TCP port than the HTTP container, then you can
- * use the <strong><code>port</code></strong> attribute to explicitly specify the port.
+ * use the optional <strong><code>port</code></strong> attribute to explicitly specify the port.
  * <pre>
  * &lt;o:socket port="8000" ... /&gt;
  * </pre>

@@ -12,7 +12,7 @@
  */
 package org.omnifaces.cdi.push;
 
-import static java.util.Arrays.asList;
+import static java.util.Collections.singleton;
 import static org.omnifaces.cdi.push.SocketChannelManager.EMPTY_SCOPE;
 import static org.omnifaces.cdi.push.SocketChannelManager.getChannelId;
 import static org.omnifaces.cdi.push.SocketChannelManager.getSessionScope;
@@ -81,7 +81,7 @@ public class SocketPushContext implements PushContext {
 
 	@Override
 	public <S extends Serializable> Set<Future<Void>> send(Object message, S user) {
-		return send(message, asList(user)).get(user);
+		return send(message, singleton(user)).get(user);
 	}
 
 	@Override
