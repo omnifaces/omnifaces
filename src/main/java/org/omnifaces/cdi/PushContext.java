@@ -19,6 +19,8 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import javax.websocket.RemoteEndpoint.Async;
+
 import org.omnifaces.cdi.push.Socket;
 import org.omnifaces.util.Json;
 
@@ -56,6 +58,7 @@ public interface PushContext extends Serializable {
 	 * if the message was successfully delivered and otherwise throw {@link ExecutionException}.
 	 * @throws IllegalArgumentException If given message object cannot be encoded as JSON.
 	 * @see Json#encode(Object)
+	 * @see Async#sendText(String)
 	 */
 	Set<Future<Void>> send(Object message);
 
@@ -72,6 +75,7 @@ public interface PushContext extends Serializable {
 	 * {@link Future#get()} if the message was successfully delivered and otherwise throw {@link ExecutionException}.
 	 * @throws IllegalArgumentException If given message object cannot be encoded as JSON.
 	 * @see Json#encode(Object)
+	 * @see Async#sendText(String)
 	 */
 	<S extends Serializable> Set<Future<Void>> send(Object message, S user);
 
@@ -89,6 +93,7 @@ public interface PushContext extends Serializable {
 	 * {@link ExecutionException}.
 	 * @throws IllegalArgumentException If given message object cannot be encoded as JSON.
 	 * @see Json#encode(Object)
+	 * @see Async#sendText(String)
 	 */
 	<S extends Serializable> Map<S, Set<Future<Void>>> send(Object message, Collection<S> users);
 

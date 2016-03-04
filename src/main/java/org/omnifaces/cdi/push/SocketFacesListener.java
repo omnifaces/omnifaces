@@ -13,7 +13,7 @@
 package org.omnifaces.cdi.push;
 
 import static java.lang.Boolean.TRUE;
-import static org.omnifaces.cdi.push.SocketChannelManager.ESTIMATED_CHANNELS_PER_APPLICATION;
+import static org.omnifaces.cdi.push.SocketChannelManager.ESTIMATED_TOTAL_CHANNELS;
 import static org.omnifaces.util.Ajax.oncomplete;
 import static org.omnifaces.util.Components.addScriptResourceToHead;
 import static org.omnifaces.util.Components.addScriptToBody;
@@ -136,7 +136,7 @@ public class SocketFacesListener implements SystemEventListener {
 		Map<String, Boolean> channels = getViewAttribute(context, Socket.class.getName());
 
 		if (channels == null) {
-			channels = new HashMap<>(ESTIMATED_CHANNELS_PER_APPLICATION); // size=3 as an average developer will unlikely declare more push channels in same application.
+			channels = new HashMap<>(ESTIMATED_TOTAL_CHANNELS);
 			setViewAttribute(context, Socket.class.getName(), channels);
 		}
 

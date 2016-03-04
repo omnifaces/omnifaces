@@ -49,14 +49,28 @@ public class SocketChannelManager implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	/** An average developer will unlikely declare more than 3 different push channels in same application. */
-	static final int ESTIMATED_CHANNELS_PER_APPLICATION = 3;
+	private static final String ERROR_INVALID_SCOPE =
+		"o:socket 'scope' attribute '%s' does not represent a valid scope. It may not be an EL expression and allowed"
+			+ " values are 'application', 'session' and 'view', case insensitive. The default is 'application'. When"
+			+ " 'user' attribute is specified, then scope defaults to 'session' and may not be 'application'.";
+	private static final String ERROR_DUPLICATE_CHANNEL =
+		"o:socket channel '%s' is already registered on a different scope. Choose an unique channel name for a"
+			+ " different channel (or shutdown all browsers and restart the server if you were just testing).";
 
-	/** An average developer will unlikely declare multiple view scoped channels in same view. */
+	/** A good developer will unlikely declare multiple application scoped push channels in same application (a global JS listener is more efficient). */
+	private static final int ESTIMATED_CHANNELS_PER_APPLICATION = 1;
+
+	/** A good developer will unlikely declare multiple session scoped push channels in same session (a global JS listener is more efficient). */
+	private static final int ESTIMATED_CHANNELS_PER_SESSION = 1;
+
+	/** A good developer will unlikely declare multiple view scoped channels in same view (a global JS listener is more efficient). */
 	private static final int ESTIMATED_CHANNELS_PER_VIEW = 1;
 
-	/** A session will unlikely have more than one user (bad security practice, but technically not impossible). */
+	/** A good developer will unlikely allow the session to have more than one user (bad security practice, but technically not impossible). */
 	private static final int ESTIMATED_USERS_PER_SESSION = 1;
+
+	/** A good developer will unlikely declare more than three push channels in same application (one for each scope with each a global JS listener). */
+	static final int ESTIMATED_TOTAL_CHANNELS = ESTIMATED_CHANNELS_PER_APPLICATION + ESTIMATED_CHANNELS_PER_SESSION + ESTIMATED_CHANNELS_PER_VIEW;
 
 	static final Map<String, String> EMPTY_SCOPE = emptyMap();
 
@@ -74,14 +88,14 @@ public class SocketChannelManager implements Serializable {
 				}
 			}
 
-			throw new IllegalArgumentException();
+			throw new IllegalArgumentException(String.format(ERROR_INVALID_SCOPE, value));
 		}
 	}
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	private static final ConcurrentMap<String, String> APPLICATION_SCOPE = new ConcurrentHashMap<>(ESTIMATED_CHANNELS_PER_APPLICATION);
-	private final ConcurrentMap<String, String> sessionScope = new ConcurrentHashMap<>(ESTIMATED_CHANNELS_PER_APPLICATION);
+	private final ConcurrentMap<String, String> sessionScope = new ConcurrentHashMap<>(ESTIMATED_CHANNELS_PER_SESSION);
 	private final ConcurrentMap<Serializable, String> sessionUsers = new ConcurrentHashMap<>(ESTIMATED_USERS_PER_SESSION);
 
 	@Inject
@@ -93,16 +107,14 @@ public class SocketChannelManager implements Serializable {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Register given channel on given scope and returns the web socket channel identifier if channel does not already
-	 * exist on a different scope, else <code>null</code>.
+	 * Register given channel on given scope and returns the web socket channel identifier.
 	 * @param channel The web socket channel.
 	 * @param scope The web socket scope. Supported values are <code>application</code>, <code>session</code> and
 	 * <code>view</code>, case insensitive. If <code>null</code>, the default is <code>application</code>.
 	 * @param user The user object representing the owner of the given channel. If not <code>null</code>, then scope
 	 * may not be <code>application</code>.
-	 * @return The web socket channel identifier if channel does not already exist on a different scope, else
-	 * <code>null</code>. This can be used as web socket URI.
-	 * @throws IllegalArgumentException When the scope is invalid.
+	 * @return The web socket channel identifier. This can be used as web socket URI.
+	 * @throws IllegalArgumentException When the scope is invalid or when channel already exists on a different scope.
 	 */
 	protected String register(String channel, String scope, Serializable user) {
 		switch (Scope.of(scope, user)) {
@@ -118,7 +130,7 @@ public class SocketChannelManager implements Serializable {
 		if (!targetScope.containsKey(channel)) {
 			for (Map<String, String> otherScope : otherScopes) {
 				if (otherScope.containsKey(channel)) {
-					return null;
+					throw new IllegalArgumentException(String.format(ERROR_DUPLICATE_CHANNEL, channel));
 				}
 			}
 
