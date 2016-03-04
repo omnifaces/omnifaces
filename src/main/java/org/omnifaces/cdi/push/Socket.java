@@ -326,11 +326,10 @@ import org.omnifaces.util.Json;
  * </ul>
  * <p>
  * The optional <strong><code>onclose</code></strong> JavaScript listener function can be used to listen on (ab)normal
- * close of a web socket. This will be invoked when the very first connection attempt fails, or the maximum reconnect
- * attempts has exceeded, or the server has returned close reason code <code>1000</code> or <code>1008</code> (policy
- * violated, which usually only happens when the channel name is unknown, or the session has expired). This will not be
- * invoked when the web socket can make an auto-reconnect attempt on a broken connection after the first successful
- * connection.
+ * close of a web socket. This will be invoked when the very first connection attempt fails, or the server has returned
+ * close reason code <code>1000</code> (normal closure) or <code>1008</code> (policy violated), or the maximum reconnect
+ * attempts has exceeded. This will not be invoked when the web socket can make an auto-reconnect attempt on a broken
+ * connection after the first successful connection.
  * <pre>
  * &lt;o:socket ... onclose="socketCloseListener" /&gt;
  * </pre>
@@ -338,8 +337,10 @@ import org.omnifaces.util.Json;
  * function socketCloseListener(code, channel, event) {
  *     if (code == -1) {
  *         // Web sockets not supported by client.
- *     } else if (code != 1000) {
- *         // Abnormal close reason.
+ *     } else if (code == 1000) {
+ *         // Normal close (as result of expired session or view).
+ *     } else {
+ *         // Abnormal close reason (as result of an error).
  *     }
  * }
  * </pre>
@@ -363,7 +364,8 @@ import org.omnifaces.util.Json;
  * a view scoped socket the handling depends on the reason of the view expiration. A view can be expired when the
  * associated session has expired, but it can also be expired as result of (accidental) navigation or rebuild, or when
  * the JSF "views per session" configuration setting is set relatively low and the client has many views (windows/tabs)
- * open in the same session. You might take the opportunity to let JavaScript reload the page.
+ * open in the same session. You might take the opportunity to warn the client and/or let JavaScript reload the page as
+ * submitting any form in it would throw <code>ViewExpiredException</code> anyway.
  *
  *
  * <h3 id="events-server"><a href="#events-server">Events (server)</a></h3>
@@ -371,8 +373,8 @@ import org.omnifaces.util.Json;
  * When a web socket has been opened, a new CDI <strong>{@link SocketEvent}</strong> will be fired with
  * <strong><code>&#64;</code>{@link Opened}</strong> qualifier. When a web socket has been closed, a new CDI
  * {@link SocketEvent} will be fired with <strong><code>&#64;</code>{@link Closed}</strong> qualifier. They can only be
- * observed and collected in an application scoped CDI bean as below. A request/view/session scoped one wouldn't work as
- * there's no means of a HTTP request anywhere at that moment.
+ * observed and collected in an application scoped CDI bean as below. Observing in a request/view/session scoped CDI
+ * bean is not possible as there's no means of a HTTP request anywhere at that moment.
  * <pre>
  * &#64;ApplicationScoped
  * public class SocketObserver {
@@ -437,12 +439,12 @@ import org.omnifaces.util.Json;
  * As extra security, particularly for those public channels which can't be restricted by security constraints, the
  * <code>&lt;o:socket&gt;</code> will register all so far declared channels in the current HTTP session, and any
  * incoming web socket open request will be checked whether they match the so far registered channels in the current
- * HTTP session. In case the channel is unknown (e.g. randomly guessed or spoofed by endusers), then the web socket will
- * immediately be closed with close reason code {@link CloseCodes#VIOLATED_POLICY} (<code>1008</code>). Also, when the
- * HTTP session gets destroyed, all session and view scoped channels which are still open will explicitly be closed
- * from server side with close reason code {@link CloseCodes#NORMAL_CLOSURE} (<code>1000</code>). Only application
- * scoped sockets remain open and are still reachable from server end even when the session or view is expired on client
- * side.
+ * HTTP session. In case the channel is unknown (e.g. randomly guessed or spoofed by endusers or manually reconnected
+ * after the session is expired), then the web socket will immediately be closed with close reason code
+ * {@link CloseCodes#VIOLATED_POLICY} (<code>1008</code>). Also, when the HTTP session gets destroyed, all session and
+ * view scoped channels which are still open will explicitly be closed from server side with close reason code
+ * {@link CloseCodes#NORMAL_CLOSURE} (<code>1000</code>). Only application scoped sockets remain open and are still
+ * reachable from server end even when the session or view associated with the page in client side is expired.
  *
  *
  * <h3 id="ejb"><a href="#ejb">EJB design hints</a></h3>
@@ -451,7 +453,7 @@ import org.omnifaces.util.Json;
  * of CDI events. First create a custom bean class representing the push event something like <code>PushEvent</code>
  * below taking whatever you'd like to pass as push message.
  * <pre>
- * public class PushEvent {
+ * public final class PushEvent {
  *
  *     private final String message;
  *
@@ -516,7 +518,7 @@ import org.omnifaces.util.Json;
  * &#64;Inject &#64;Push
  * private PushContext someChannel;
  *
- * public void submit() {
+ * public void someAction() {
  *     someService.someAsyncServiceMethod(entity, message -&gt; someChannel.send(message));
  * }
  * </pre>
@@ -538,7 +540,7 @@ import org.omnifaces.util.Json;
  * <p>
  * Which is invoked in WAR as below.
  * <pre>
- * public void submit() {
+ * public void someAction() {
  *     someService.someAsyncServiceMethod(entity, new Runnable() {
  *         public void run() {
  *             someChannel.send(entity.getSomeProperty());
