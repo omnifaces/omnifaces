@@ -194,7 +194,7 @@ public class SocketChannelManager implements Serializable {
 	// Internal (static because package private methods in CDI beans are subject to memory leaks) ---------------------
 
 	/**
-	 * For internal usage only. This makes it possible to remember session scope channel IDs during injection time of
+	 * For internal usage only. This makes it possible to reference session scope channel IDs during injection time of
 	 * {@link SocketPushContext} (the CDI session scope is not necessarily active during push send time).
 	 */
 	static Map<String, String> getSessionScope() {
@@ -202,7 +202,7 @@ public class SocketChannelManager implements Serializable {
 	}
 
 	/**
-	 * For internal usage only. This makes it possible to remember view scope channel IDs during injection time of
+	 * For internal usage only. This makes it possible to reference view scope channel IDs during injection time of
 	 * {@link SocketPushContext} (the CDI view scope is not necessarily active during push send time).
 	 */
 	static Map<String, String> getViewScope(boolean create) {
