@@ -44,16 +44,24 @@ var OmniFaces = OmniFaces || {};
  * @link https://java.net/jira/browse/JAVASERVERFACES_SPEC_PUBLIC-790
  * @since 1.7
  */
-OmniFaces.FixViewState = (function() {
+OmniFaces.FixViewState = (function(window, document) {
 
-	var fixViewState = {};
+	// "Constant" fields ----------------------------------------------------------------------------------------------
+
 	var VIEW_STATE_PARAM = "javax.faces.ViewState";
 	var VIEW_STATE_REGEX = new RegExp("^([\\w]+:)?" + VIEW_STATE_PARAM.replace(/\./g, "\\.") + "(:[0-9]+)?$");
 
+	// Private static fields ------------------------------------------------------------------------------------------
+
+	var self = {};
+
+	// Public static functions ----------------------------------------------------------------------------------------
+
 	/**
 	 * Apply the "fix view state" on the current document based on the given XML response.
+	 * @param {Document} responseXML The XML response of the XMLHttpRequest.
 	 */
-	fixViewState.apply = function(responseXML) {
+	self.apply = function(responseXML) {
 		if (typeof responseXML === "undefined") {
 			return;
 		}
@@ -72,22 +80,24 @@ OmniFaces.FixViewState = (function() {
 				// This POST form doesn't have a view state. This isn't right. Create it.
 				createViewStateElement(form, viewStateValue);
 			}
-			else if (form.method == "get" && viewStateElement) {
-				// PrimeFaces < 3.5.23 and < 4.0.7 also adds them to GET forms! This isn't right. Remove it.
-				viewStateElement.parentNode.removeChild(viewStateElement);
-			}
 		}
-	};
+	}
+
+	// Private static functions ---------------------------------------------------------------------------------------
 
 	/**
-	 * Get the view state value from the given XML response.
+	 * Returns the view state value from the given XML response.
+	 * @param {Document} responseXML The XML response of the XMLHttpRequest.
+	 * @return {string} The view state value from the given XML response.
 	 */
 	function getViewStateValue(responseXML) {
 		var updates = responseXML.getElementsByTagName("update");
 
 		for (var i = 0; i < updates.length; i++) {
-			if (VIEW_STATE_REGEX.exec(updates[i].getAttribute("id"))) {
-				return updates[i].firstChild.nodeValue;
+			var update = updates[i];
+			
+			if (VIEW_STATE_REGEX.exec(update.getAttribute("id"))) {
+				return update.textContent || update.innerText;
 			}
 		}
 
@@ -96,6 +106,8 @@ OmniFaces.FixViewState = (function() {
 
 	/**
 	 * Create view state hidden input element with given view state value and add it to given form.
+	 * @param {HTMLFormElement} form The form to add the view state hidden input element to.
+	 * @param {string} viewStateValue The view state value to be added to the newly created view state hidden input element.
 	 */
 	function createViewStateElement(form, viewStateValue) {
 		var hidden;
@@ -113,25 +125,27 @@ OmniFaces.FixViewState = (function() {
 		hidden.setAttribute("autocomplete", "off");
 		form.appendChild(hidden);
 	}
+
+	// Global initialization ------------------------------------------------------------------------------------------
+
+	if (window.jsf) { // Standard JSF ajax API present?
+		jsf.ajax.addOnEvent(function(data) {
+			if (data.status == "success") {
+				self.apply(data.responseXML);
+			}
+		});
+	}
+
+	if (window.jQuery) { // jQuery ajax API present?
+		jQuery(document).ajaxComplete(function(event, xhr, options) {
+			if (typeof xhr !== "undefined") {
+				self.apply(xhr.responseXML);
+			}
+		});
+	}
 	
-	return fixViewState;
+	// Expose self to public ------------------------------------------------------------------------------------------
 
-})();
+	return self;
 
-// Global initialization for standard JSF ajax API.
-if (typeof jsf !== "undefined") {
-	jsf.ajax.addOnEvent(function(data) {
-		if (data.status == "success") {
-			OmniFaces.FixViewState.apply(data.responseXML);
-		}
-	});
-}
-
-// Global initialization for jQuery ajax API.
-if (typeof jQuery !== "undefined") {
-	jQuery(document).ajaxComplete(function(event, xhr, options) {
-		if (typeof xhr !== "undefined") {
-			OmniFaces.FixViewState.apply(xhr.responseXML);
-		}
-	});
-}
+})(window, document);

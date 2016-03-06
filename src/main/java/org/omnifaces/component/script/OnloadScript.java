@@ -14,6 +14,7 @@ package org.omnifaces.component.script;
 
 import static org.omnifaces.util.Ajax.oncomplete;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
+import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -22,7 +23,6 @@ import javax.faces.FacesException;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
-import javax.faces.context.PartialViewContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.context.ResponseWriterWrapper;
 import javax.faces.event.AbortProcessingException;
@@ -176,11 +176,6 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 
 		context.getResponseWriter().endElement("script");
 		popComponentFromEL(context);
-	}
-
-	private boolean isAjaxRequestWithPartialRendering(FacesContext context) {
-		PartialViewContext pvc = context.getPartialViewContext();
-		return pvc.isAjaxRequest() && !pvc.isRenderAll();
 	}
 
 }

@@ -13,17 +13,21 @@
 package org.omnifaces.el.functions;
 
 import static org.omnifaces.util.Faces.getLocale;
+import static org.omnifaces.util.Utils.parseLocale;
 
+import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.util.Locale;
 
 import org.omnifaces.util.Faces;
 
 /**
  * <p>
  * Collection of EL functions for number formatting: <code>of:formatBytes()</code>, <code>of:formatCurrency()</code>,
- * <code>of:formatNumber()</code>, <code>of:formatNumberDefault()</code> and <code>of:formatPercent()</code>.
+ * <code>of:formatNumber()</code>, <code>of:formatNumberDefault()</code>, <code>of:formatPercent()</code>,
+ * <code>of:formatThousands()</code> and <code>of:formatThousandsUnit()</code>.
  *
  * @author Bauke Scholtz
  * @since 1.2
@@ -33,6 +37,8 @@ public final class Numbers {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final int BYTES_1K = 1024;
+	private static final int NUMBER_1K = 1000;
+	private static final int PRECISION = 3;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -56,16 +62,7 @@ public final class Numbers {
 	 * @return The formatted bytes.
 	 */
 	public static String formatBytes(Long bytes) {
-		if (bytes == null) {
-			return "0 B";
-		}
-
-		if (bytes < BYTES_1K) {
-			return bytes + " B";
-		}
-
-		int exp = (int) (Math.log(bytes) / Math.log(BYTES_1K));
-		return String.format(getLocale(), "%.1f %ciB", bytes / Math.pow(BYTES_1K, exp), "KMGTPE".charAt(exp - 1));
+		return formatBaseUnit(bytes, BYTES_1K, 1, true, "B");
 	}
 
 	/**
@@ -111,20 +108,34 @@ public final class Numbers {
 	}
 
 	/**
-	 * Format the given number in the locale-default pattern. This is useful when you want to format numbers in for
-	 * example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select
-	 * item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The format locale will be set to
-	 * the one as obtained by {@link Faces#getLocale()}.
-	 * @param number The number to be formatted in the locale-default pattern.
-	 * @return The number which is formatted in the locale-default pattern.
+	 * Format the given number in the default pattern of the default locale. This is useful when you want to format
+	 * numbers in for example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code>
+	 * attribute of select item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The default
+	 * locale is the one as obtained by {@link Faces#getLocale()}.
+	 * @param number The number to be formatted in the default pattern of the default locale.
+	 * @return The number which is formatted in the default pattern of the default locale.
 	 * @since 1.3
 	 */
 	public static String formatNumberDefault(Number number) {
+		return formatNumberDefaultForLocale(number, getLocale());
+	}
+
+	/**
+	 * Format the given number in the default pattern of the given locale. This is useful when you want to format
+	 * numbers in for example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code>
+	 * attribute of select item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The given
+	 * locale can be a {@link Locale} object or a string representation.
+	 * @param number The number to be formatted in the default pattern of the given locale.
+	 * @param locale The locale to obtain the default pattern from.
+	 * @return The number which is formatted in the default pattern of the given locale.
+	 * @since 2.3
+	 */
+	public static String formatNumberDefaultForLocale(Number number, Object locale) {
 		if (number == null) {
 			return null;
 		}
 
-		return NumberFormat.getNumberInstance(getLocale()).format(number);
+		return NumberFormat.getNumberInstance(parseLocale(locale)).format(number);
 	}
 
 	/**
@@ -142,6 +153,108 @@ public final class Numbers {
 		}
 
 		return NumberFormat.getPercentInstance(getLocale()).format(number);
+	}
+
+	/**
+	 * Format the given number to nearest 10<sup>n</sup> (rounded to thousands), immediately suffixed (without space)
+	 * with metric unit (k, M, G, T, P or E), rounding half up with a precision of 3 digits, whereafter trailing zeroes
+	 * in fraction part are stripped. Numbers lower than thousand are not affected.
+	 * For example (with English locale):
+	 * <ul>
+	 * <li>999.999 will appear as 999.999
+	 * <li>1000 will appear as 1k
+	 * <li>1004 will appear as 1k
+	 * <li>1005 will appear as 1.01k
+	 * <li>1594 will appear as 1.59k
+	 * <li>1595 will appear as 1.6k
+	 * <li>9000 will appear as 9k
+	 * <li>9900 will appear as 9.9k
+	 * <li>9994 will appear as 9.99k
+	 * <li>9995 will appear as 10k
+	 * <li>99990 will appear as 100k
+	 * <li>9994999 will appear as 9.99M
+	 * <li>9995000 will appear as 10M
+	 * </ul>
+	 * The format locale will be set to the one as obtained by {@link Faces#getLocale()}.
+	 * If the value is <code>null</code>, <code>NaN</code> or infinity, then this will return <code>null</code>.
+	 * @param number The number to be formatted.
+	 * @return The formatted number.
+	 * @since 2.3
+	 */
+	public static String formatThousands(Number number) {
+		return formatThousandsUnit(number, null);
+	}
+
+	/**
+	 * Format the given number to nearest 10<sup>n</sup> (rounded to thousands), suffixed with a space, the metric unit
+	 * prefix (k, M, G, T, P or E) and the given unit, rounding half up with a precision of 3 digits, whereafter
+	 * trailing zeroes in fraction part are stripped.
+	 * For example (with English locale and unit <code>B</code>):
+	 * <ul>
+	 * <li>999 will appear as 999 B
+	 * <li>1000 will appear as 1 kB
+	 * <li>1004 will appear as 1 kB
+	 * <li>1005 will appear as 1.01 kB
+	 * <li>1594 will appear as 1.59 kB
+	 * <li>1595 will appear as 1.6 kB
+	 * <li>9000 will appear as 9 kB
+	 * <li>9900 will appear as 9.9 kB
+	 * <li>9994 will appear as 9.99 kB
+	 * <li>9995 will appear as 10 kB
+	 * <li>99990 will appear as 100 kB
+	 * <li>9994999 will appear as 9.99 MB
+	 * <li>9995000 will appear as 10 MB
+	 * </ul>
+	 * The format locale will be set to the one as obtained by {@link Faces#getLocale()}.
+	 * If the value is <code>null</code>, <code>NaN</code> or infinity, then this will return <code>null</code>.
+	 * @param number The number to be formatted.
+	 * @param unit The unit used in the format. E.g. <code>B</code> for Bytes, <code>W</code> for Watt, etc. If the unit
+	 * is <code>null</code>, then this method will behave exactly as described in {@link #formatThousands(Number)}.
+	 * @return The formatted number with unit.
+	 * @since 2.3
+	 */
+	public static String formatThousandsUnit(Number number, String unit) {
+		return formatBaseUnit(number, NUMBER_1K, null, false, unit);
+	}
+
+	/**
+	 * @param number Number to be formatted.
+	 * @param base Rounding base.
+	 * @param fractions Fraction length. If null, then precision of 3 digits will be assumed and all trailing zeroes will be stripped.
+	 * @param iec IEC or metric. If IEC, then unit prefix "Ki", "Mi", "Gi", etc will be used, else "k", "M", "G", etc.
+	 * @param unit Unit suffix. If null, then there is no space separator between number and unit prefix.
+	 */
+	private static String formatBaseUnit(Number number, int base, Integer fractions, boolean iec, String unit) {
+		if (number == null) {
+			return null;
+		}
+
+		BigDecimal decimal;
+
+		try {
+			decimal = new BigDecimal(number.toString());
+		}
+		catch (NumberFormatException e) {
+			return null;
+		}
+
+		String separator = (unit == null) ? "" : " ";
+        String unitString = (unit == null) ? "" : unit;
+
+        if (decimal.longValue() < base) {
+			return number.toString() + separator + unitString;
+		}
+
+		int exp = (int) (Math.log(decimal.longValue()) / Math.log(base));
+		BigDecimal divided = decimal.divide(BigDecimal.valueOf(Math.pow(base, exp)));
+		int maxfractions = (fractions != null) ? fractions : (PRECISION - String.valueOf(divided.longValue()).length());
+		String formatted = String.format(getLocale(), "%." + maxfractions + "f", divided);
+
+		if (fractions == null) {
+			formatted = formatted.replaceAll("\\D?0+$", "");
+		}
+
+		return formatted + separator + ((iec ? "K" : "k") + "MGTPE").charAt(exp - 1) + (iec ? "i" : "") + unitString;
 	}
 
 }

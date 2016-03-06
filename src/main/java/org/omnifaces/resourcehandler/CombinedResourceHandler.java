@@ -12,6 +12,7 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static java.lang.Boolean.parseBoolean;
 import static org.omnifaces.util.Events.subscribeToApplicationEvent;
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getInitParameter;
@@ -264,8 +265,8 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		excludedResources.addAll(initCDNResources());
 		suppressedResources = initResources(PARAM_NAME_SUPPRESSED_RESOURCES);
 		excludedResources.addAll(suppressedResources);
-		inlineCSS = Boolean.valueOf(getInitParameter(PARAM_NAME_INLINE_CSS));
-		inlineJS = Boolean.valueOf(getInitParameter(PARAM_NAME_INLINE_JS));
+		inlineCSS = parseBoolean(getInitParameter(PARAM_NAME_INLINE_CSS));
+		inlineJS = parseBoolean(getInitParameter(PARAM_NAME_INLINE_JS));
 		cacheTTL = initCacheTTL(getInitParameter(PARAM_NAME_CACHE_TTL));
 		subscribeToApplicationEvent(PreRenderViewEvent.class, this);
 	}
@@ -292,7 +293,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 	 */
 	@Override
 	public void processEvent(SystemEvent event) throws AbortProcessingException {
-		if (disabledParam != null && Boolean.valueOf(String.valueOf(evaluateExpressionGet(disabledParam)))) {
+		if (disabledParam != null && parseBoolean(String.valueOf(evaluateExpressionGet(disabledParam)))) {
 			return;
 		}
 

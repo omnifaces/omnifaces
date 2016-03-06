@@ -12,6 +12,8 @@
  */
 package org.omnifaces.taghandler;
 
+import static java.lang.Math.max;
+
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -126,7 +128,14 @@ public class ImportConstants extends TagHandler {
 			CONSTANTS_CACHE.put(type, constants);
 		}
 
-		String var = varValue != null ? varValue : type.substring(type.lastIndexOf('.') + 1);
+		String var = varValue;
+
+		if (var == null) {
+			int innerClass = type.lastIndexOf('$');
+			int outerClass = type.lastIndexOf('.');
+			var = type.substring(max(innerClass, outerClass) + 1);
+		}
+
 		context.getFacesContext().getExternalContext().getRequestMap().put(var, constants);
 	}
 

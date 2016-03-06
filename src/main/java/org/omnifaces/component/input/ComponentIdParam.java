@@ -12,6 +12,8 @@
  */
 package org.omnifaces.component.input;
 
+import static java.lang.Boolean.parseBoolean;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -103,11 +105,7 @@ public class ComponentIdParam extends ViewParam {
 	 */
 	private boolean getBooleanAttribute(PropertyKeys propertyKey) {
 		String attribute = (String) getAttributes().get(propertyKey.name());
-		if (attribute == null) {
-			return true;
-		}
-
-		return Boolean.valueOf(attribute);
+		return attribute == null || parseBoolean(attribute);
 	}
 
 }

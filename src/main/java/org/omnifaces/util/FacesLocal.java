@@ -15,6 +15,7 @@ package org.omnifaces.util;
 import static java.util.Arrays.asList;
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 import static org.omnifaces.util.Servlets.prepareRedirectURL;
+import static org.omnifaces.util.Utils.close;
 import static org.omnifaces.util.Utils.encodeURL;
 import static org.omnifaces.util.Utils.isAnyEmpty;
 
@@ -23,6 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -50,6 +52,7 @@ import javax.faces.component.UIViewRoot;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
+import javax.faces.context.PartialViewContext;
 import javax.faces.event.PhaseId;
 import javax.faces.render.RenderKit;
 import javax.faces.render.RenderKitFactory;
@@ -247,6 +250,15 @@ public final class FacesLocal {
 	public static String getViewId(FacesContext context) {
 		UIViewRoot viewRoot = context.getViewRoot();
 		return (viewRoot != null) ? viewRoot.getViewId() : null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Faces#getViewName()
+	 */
+	public static String getViewName(FacesContext context) {
+		String viewId = getViewId(context);
+		return (viewId != null) ? viewId.substring(viewId.lastIndexOf('/') + 1).split("\\.")[0] : null;
 	}
 
 	/**
@@ -615,6 +627,15 @@ public final class FacesLocal {
 
 	/**
 	 * {@inheritDoc}
+	 * @see Faces#isAjaxRequestWithPartialRendering()
+	 */
+	public static boolean isAjaxRequestWithPartialRendering(FacesContext context) {
+		PartialViewContext pvc = context.getPartialViewContext();
+		return pvc.isAjaxRequest() && !pvc.isRenderAll();
+	}
+
+	/**
+	 * {@inheritDoc}
 	 * @see Faces#getRequestParameterMap()
 	 */
 	public static Map<String, String> getRequestParameterMap(FacesContext context) {
@@ -802,13 +823,7 @@ public final class FacesLocal {
 	 * @see Faces#getRemoteAddr()
 	 */
 	public static String getRemoteAddr(FacesContext context) {
-		String forwardedFor = getRequestHeader(context, "X-Forwarded-For");
-
-		if (!Utils.isEmpty(forwardedFor)) {
-			return forwardedFor.split("\\s*,\\s*", 2)[0]; // It's a comma separated string: client,proxy1,proxy2,...
-		}
-
-		return getRequest(context).getRemoteAddr();
+		return Servlets.getRemoteAddr(getRequest(context));
 	}
 
 	// HTTP response --------------------------------------------------------------------------------------------------
@@ -1413,17 +1428,11 @@ public final class FacesLocal {
 	}
 
 	/**
-	 * Internal global method to send the given input stream to the response.
-	 * @param input The file content as input stream.
-	 * @param filename The file name which should appear in content disposition header.
-	 * @param contentLength The content length, or -1 if it is unknown.
-	 * @param attachment Whether the file should be provided as attachment, or just inline.
-	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
-	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * {@inheritDoc}
+	 * @see Faces#sendFile(String, boolean, org.omnifaces.util.Callback.Output)
 	 */
-	private static void sendFile
-		(FacesContext context, InputStream input, String filename, long contentLength, boolean attachment)
-			throws IOException
+	public static void sendFile(FacesContext context, String filename, boolean attachment, Callback.Output outputCallback)
+		throws IOException
 	{
 		ExternalContext externalContext = context.getExternalContext();
 
@@ -1439,19 +1448,50 @@ public final class FacesLocal {
 			externalContext.setResponseHeader("Pragma", "public");
 		}
 
-		// If content length is known, set it. Note that setResponseContentLength() cannot be used as it takes only int.
-		if (contentLength != -1) {
-			externalContext.setResponseHeader("Content-Length", String.valueOf(contentLength));
+		OutputStream output = null;
+
+		try {
+			output = externalContext.getResponseOutputStream();
+			outputCallback.writeTo(output);
 		}
-
-		long size = Utils.stream(input, externalContext.getResponseOutputStream());
-
-		// This may be on time for files smaller than the default buffer size, but is otherwise ignored anyway.
-		if (contentLength == -1 && !externalContext.isResponseCommitted()) {
-			externalContext.setResponseHeader("Content-Length", String.valueOf(size));
+		finally {
+			close(output);
 		}
 
 		context.responseComplete();
+	}
+
+	/**
+	 * Internal global method to send the given input stream to the response.
+	 * @param input The file content as input stream.
+	 * @param filename The file name which should appear in content disposition header.
+	 * @param contentLength The content length, or -1 if it is unknown.
+	 * @param attachment Whether the file should be provided as attachment, or just inline.
+	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
+	 * redeclare it in the action method. The servletcontainer will handle it.
+	 */
+	private static void sendFile
+		(final FacesContext context, final InputStream input, String filename, final long contentLength, boolean attachment)
+			throws IOException
+	{
+		sendFile(context, filename, attachment, new Callback.Output() {
+			@Override
+			public void writeTo(OutputStream output) throws IOException {
+				ExternalContext externalContext = context.getExternalContext();
+
+				// If content length is known, set it. Note that setResponseContentLength() cannot be used as it takes only int.
+				if (contentLength != -1) {
+					externalContext.setResponseHeader("Content-Length", String.valueOf(contentLength));
+				}
+
+				long size = Utils.stream(input, output);
+
+				// This may be on time for files smaller than the default buffer size, but is otherwise ignored anyway.
+				if (contentLength == -1 && !externalContext.isResponseCommitted()) {
+					externalContext.setResponseHeader("Content-Length", String.valueOf(size));
+				}
+			}
+		});
 	}
 
 }

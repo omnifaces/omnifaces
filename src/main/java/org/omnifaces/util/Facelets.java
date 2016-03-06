@@ -48,6 +48,20 @@ public final class Facelets {
 	}
 
 	/**
+	 * Returns the typed Object value of the given tag attribute
+	 * @param <T> The expected return type.
+	 * @param context The involved Facelet context.
+	 * @param tagAttribute The tag attribute to retrieve the value from.
+	 * @param type The expected type of the Object value.
+	 * @return The typed Object value of the given tag attribute, or null if the tag attribute is null.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getObject(FaceletContext context, TagAttribute tagAttribute, Class<?> type) {
+		return tagAttribute != null ? (T) tagAttribute.getValueExpression(context, type).getValue(context) : null;
+	}
+
+	/**
 	 * Returns the value of the given tag attribute as a value expression, so it can be carried around and evaluated at
 	 * a later moment in the lifecycle without needing the Facelet context.
 	 * @param context The involved Facelet context.

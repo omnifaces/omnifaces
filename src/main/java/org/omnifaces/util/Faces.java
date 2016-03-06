@@ -116,6 +116,12 @@ import org.omnifaces.component.ParamHolder;
  *     Faces.sendFile(new File("/path/to/file.ext"), true);
  * }
  * </pre>
+ * <pre>
+ * // Provide a file as attachment via output stream callback.
+ * public void download() throws IOException {
+ *     Faces.sendFile("file.ext", true, o -&gt; Files.copy(Paths.get("/path/to/file.ext"), o));
+ * }
+ * </pre>
  *
  * <h3>FacesLocal</h3>
  * <p>
@@ -448,6 +454,17 @@ public final class Faces {
 	 */
 	public static String getViewId() {
 		return FacesLocal.getViewId(getContext());
+	}
+
+	/**
+	 * Returns the base name of the current view, without extension, or <code>null</code> if there is no view.
+	 * E.g. if the view ID is <code>/path/to/some.xhtml</code>, then this will return <code>some</code>.
+	 * @return The base name of the current view, without extension, or <code>null</code> if there is no view.
+	 * @see UIViewRoot#getViewId()
+	 * @since 2.3
+	 */
+	public static String getViewName() {
+		return FacesLocal.getViewName(getContext());
 	}
 
 	/**
@@ -789,6 +806,19 @@ public final class Faces {
 	 */
 	public static boolean isAjaxRequest() {
 		return FacesLocal.isAjaxRequest(getContext());
+	}
+
+	/**
+	 * Returns whether the current request is an ajax request with partial rendering. That is, when it's an ajax request
+	 * without <code>render="@all"</code>.
+	 * @return <code>true</code> for an ajax request with partial rendering, <code>false</code> an ajax request with
+	 * <code>render="@all"</code> or a non-ajax (synchronous) request.
+	 * @see PartialViewContext#isAjaxRequest()
+	 * @see PartialViewContext#isRenderAll()
+	 * @since 2.3
+	 */
+	public static boolean isAjaxRequestWithPartialRendering() {
+		return FacesLocal.isAjaxRequestWithPartialRendering(getContext());
 	}
 
 	/**
@@ -1941,6 +1971,24 @@ public final class Faces {
 	 */
 	public static void sendFile(InputStream content, String filename, boolean attachment) throws IOException {
 		FacesLocal.sendFile(getContext(), content, filename, attachment);
+	}
+
+	/**
+	 * Send a file to the response whose content is provided via given output stream callback. The content type will be
+	 * determined based on file name. The content length will not be set because that would require buffering the entire
+	 * file in memory or temp disk. The client may receive a download of an unknown length and thus the download
+	 * progress may be unknown to the client. If this is undesirable, write to a temp file instead and then use
+	 * {@link Faces#sendFile(File, boolean)}. The {@link FacesContext#responseComplete()} will implicitly be called
+	 * after successful streaming.
+	 * @param filename The file name which should appear in content disposition header.
+	 * @param attachment Whether the file should be provided as attachment, or just inline.
+	 * @param outputCallback The output stream callback to write the file content to.
+	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
+	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @since 2.3
+	 */
+	public static void sendFile(String filename, boolean attachment, Callback.Output outputCallback) throws IOException {
+		FacesLocal.sendFile(getContext(), filename, attachment, outputCallback);
 	}
 
 }

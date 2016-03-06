@@ -19,21 +19,43 @@ var OmniFaces = OmniFaces || {};
  * @see org.omnifaces.component.script.DeferredScript
  * @since 1.8
  */
-OmniFaces.DeferredScript = (function() {
+OmniFaces.DeferredScript = (function(Util, document) {
 
-	var deferredScript = {};
+	// Private static fields ------------------------------------------------------------------------------------------
+
 	var deferredScripts = [];
+	var self = {};
 
-	deferredScript.add = function(url, begin, success, error) {
-		deferredScripts.push({ url: url, begin: begin, success: success, error: error });
+	// Public static functions ----------------------------------------------------------------------------------------
+
+	/**
+	 * Add a deferred script to the loader and registers the onload listener to load the first deferred script.
+	 * @param {string} url Required; The URL of the deferred script.
+	 * @param {function} begin Optional; Function to invoke before deferred script is loaded.
+	 * @param {function} success Optional; Function to invoke after deferred script is successfully loaded.
+	 * @param {function} error Optional; Function to invoke when loading of deferred script failed.
+	 */
+	self.add = function(url, begin, success, error) {
+		deferredScripts.push({
+			url: url, 
+			begin: Util.resolveFunction(begin), 
+			success: Util.resolveFunction(success), 
+			error: Util.resolveFunction(error)
+		});
 
 		if (deferredScripts.length == 1) {
-			OmniFaces.Util.addOnloadListener(function() {
+			Util.addOnloadListener(function() {
 				loadDeferredScript(0);
 			});
 		}
 	}
 
+	// Private static functions ---------------------------------------------------------------------------------------
+
+	/**
+	 * Load the deferred script of the given index. When loaded, then it will implicitly load the next deferred script.
+	 * @param {int} index The index of the deferred script to be loaded. If no one exists, then the method returns.
+	 */
 	function loadDeferredScript(index) {
 		if (index < 0 || index >= deferredScripts.length) {
 			return; // No such script.
@@ -45,11 +67,11 @@ OmniFaces.DeferredScript = (function() {
 
 		script.async = true;
 		script.src = deferredScript.url;
+
 		script.onerror = function() {
-			if (deferredScript.error) {
-				deferredScript.error();
-			}
-		};
+			deferredScript.error();
+		}
+
 		script.onload = script.onreadystatechange = function(_, abort) {
 			if (abort || !script.readyState || /loaded|complete/.test(script.readyState)) {
 				script.onload = script.onreadystatechange = null; // IE memory leak fix.
@@ -57,22 +79,22 @@ OmniFaces.DeferredScript = (function() {
 				if (abort) {
 					script.onerror();
 				}
-				else if (deferredScript.success) {
+				else {
 					deferredScript.success();
 				}
 
 				script = null;
 				loadDeferredScript(index + 1); // Load next deferred script (regardless of current state).
 			}
-		};
-
-		if (deferredScript.begin) {
-			deferredScript.begin();
 		}
+
+		deferredScript.begin();
 
 		head.insertBefore(script, null); // IE6 has trouble with appendChild.
 	}
 
-	return deferredScript;
+	// Expose self to public ------------------------------------------------------------------------------------------
 
-})();
+	return self;
+
+})(OmniFaces.Util, document);
