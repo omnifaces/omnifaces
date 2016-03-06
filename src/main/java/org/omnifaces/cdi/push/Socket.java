@@ -46,8 +46,8 @@ import javax.websocket.server.ServerEndpointConfig;
 
 import org.omnifaces.cdi.Push;
 import org.omnifaces.cdi.PushContext;
-import org.omnifaces.cdi.push.event.Closed;
-import org.omnifaces.cdi.push.event.Opened;
+import org.omnifaces.cdi.push.SocketEvent.Closed;
+import org.omnifaces.cdi.push.SocketEvent.Opened;
 import org.omnifaces.util.Beans;
 import org.omnifaces.util.Callback;
 import org.omnifaces.util.Json;

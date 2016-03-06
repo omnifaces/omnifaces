@@ -12,14 +12,18 @@
  */
 package org.omnifaces.cdi.push;
 
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 import java.io.Serializable;
+import java.lang.annotation.Documented;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 import java.util.Objects;
 
 import javax.enterprise.event.Observes;
+import javax.inject.Qualifier;
 import javax.websocket.CloseReason.CloseCode;
-
-import org.omnifaces.cdi.push.event.Closed;
-import org.omnifaces.cdi.push.event.Opened;
 
 /**
  * <p>
@@ -31,8 +35,6 @@ import org.omnifaces.cdi.push.event.Opened;
  *
  * @author Bauke Scholtz
  * @see Socket
- * @see Opened
- * @see Closed
  * @since 2.3
  */
 public final class SocketEvent implements Serializable {
@@ -94,6 +96,42 @@ public final class SocketEvent implements Serializable {
 	@Override
 	public String toString() {
 		return String.format("SocketEvent[channel=%s, user=%s, closeCode=%s]", channel, user, code);
+	}
+
+	/**
+	 * <p>
+	 * Indicates that a socket has opened.
+	 * <p>
+	 * For detailed usage instructions, see {@link Socket} javadoc.
+	 *
+	 * @author Bauke Scholtz
+	 * @see Socket
+	 * @since 2.3
+	 */
+	@Qualifier
+	@Target(PARAMETER)
+	@Retention(RUNTIME)
+	@Documented
+	public @interface Opened {
+		//
+	}
+
+	/**
+	 * <p>
+	 * Indicates that a socket has closed.
+	 * <p>
+	 * For detailed usage instructions, see {@link Socket} javadoc.
+	 *
+	 * @author Bauke Scholtz
+	 * @see Socket
+	 * @since 2.3
+	 */
+	@Qualifier
+	@Target(PARAMETER)
+	@Retention(RUNTIME)
+	@Documented
+	public @interface Closed {
+		//
 	}
 
 }

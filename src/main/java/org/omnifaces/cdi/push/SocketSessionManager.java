@@ -33,8 +33,8 @@ import javax.inject.Inject;
 import javax.websocket.CloseReason;
 import javax.websocket.Session;
 
-import org.omnifaces.cdi.push.event.Closed;
-import org.omnifaces.cdi.push.event.Opened;
+import org.omnifaces.cdi.push.SocketEvent.Closed;
+import org.omnifaces.cdi.push.SocketEvent.Opened;
 import org.omnifaces.util.Beans;
 import org.omnifaces.util.Json;
 
