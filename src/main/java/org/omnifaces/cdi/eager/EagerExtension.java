@@ -100,7 +100,7 @@ public class EagerExtension implements Extension {
 		}
 	}
 
-	public void load(@SuppressWarnings("unused") @Observes AfterDeploymentValidation event, BeanManager beanManager) {
+	public void load(@Observes AfterDeploymentValidation event, BeanManager beanManager) {
 
 		EagerBeansRepository eagerBeansRepository = getReference(beanManager, EagerBeansRepository.class);
 

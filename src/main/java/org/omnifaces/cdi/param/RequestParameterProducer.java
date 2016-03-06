@@ -69,7 +69,7 @@ public class RequestParameterProducer {
 
 	private static final String DEFAULT_REQUIRED_MESSAGE = "{0}: Value is required";
 
-	@SuppressWarnings("unused")
+	@SuppressWarnings("unused") // Workaround for OpenWebBeans not properly passing it as produce() method argument.
 	@Inject
 	private InjectionPoint injectionPoint;
 
