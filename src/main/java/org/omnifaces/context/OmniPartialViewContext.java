@@ -20,6 +20,7 @@ import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestAttribute;
 import static org.omnifaces.util.FacesLocal.getResponse;
 import static org.omnifaces.util.FacesLocal.getViewId;
+import static org.omnifaces.util.FacesLocal.invalidateSession;
 import static org.omnifaces.util.FacesLocal.normalizeViewId;
 import static org.omnifaces.util.Servlets.facesRedirect;
 
@@ -121,6 +122,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
 					if (originalURL != null) {
                         try {
+                        	invalidateSession(facesContext);
 							facesRedirect(getRequest(facesContext), getResponse(facesContext), originalURL);
 						}
                         catch (IOException e) {
