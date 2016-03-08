@@ -74,6 +74,13 @@ OmniFaces.Unload = (function(window, document) {
 		addEventListener(document, "submit", function() {
 			self.disable(); // Disable unload event on any (propagated!) submit event.
 		});
+
+		if (window.mojarra) {
+			decorateFacesSubmit(mojarra, "jsfcljs"); // Decorate Mojarra's submit handler to disable unload event when invoked.
+		}
+		else if (window.myfaces) {
+ 			decorateFacesSubmit(myfaces.oam, "submitForm"); // Decorate MyFaces' submit handler to disable unload event when invoked.
+		}
 	}
 
 	/**
@@ -114,6 +121,22 @@ OmniFaces.Unload = (function(window, document) {
 		}
 		else if (element.attachEvent) { // IE6-8.
 			element.attachEvent("on" + event, listener);
+		}
+	}
+
+	/**
+	 * Decorate the JavaScript submit function of JSF implementation.
+	 * @param {object} facesImpl The JSF implementation script object holding the submit function.
+	 * @param {string} functionName The name of the submit function to decorate.
+	 */
+	function decorateFacesSubmit(facesImpl, functionName) {
+		var submitFunction = facesImpl[functionName];
+
+		if (submitFunction) {
+			facesImpl[functionName] = function() {
+				self.disable();
+				submitFunction.apply(this, arguments);
+			};
 		}
 	}
 
