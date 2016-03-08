@@ -688,6 +688,7 @@ public final class Components {
 
 	private static UIComponent addScriptResource(String libraryName, String resourceName, String target) {
 		UIOutput outputScript = createScriptResource();
+		outputScript.setId(libraryName + "_" + resourceName.replaceAll("\\W+", "_"));
 
 		if (libraryName != null) {
 			outputScript.getAttributes().put("library", libraryName);
