@@ -193,7 +193,7 @@ public abstract class FileServlet extends HttpServlet {
 	 * Returns the file associated with the given HTTP servlet request.
 	 * If this method throws {@link IllegalArgumentException}, then the servlet will return a HTTP 400 error.
 	 * If this method returns <code>null</code>, or if {@link File#isFile()} returns <code>false</code>, then the
-	 * servlet will invoke {@link #handleFileNotFound(HttpServletResponse)}.
+	 * servlet will invoke {@link #handleFileNotFound(HttpServletRequest, HttpServletResponse)}.
 	 * @param request The involved HTTP servlet request.
 	 * @return The file associated with the given HTTP servlet request.
 	 * @throws IllegalArgumentException When the request is mangled in such way that it's not recognizable as a valid
