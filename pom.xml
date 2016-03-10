@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
->
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>org.omnifaces</groupId>
+    <groupId>ru.dmdevelopment</groupId>
 	<artifactId>omnifaces</artifactId>
 	<packaging>jar</packaging>
 	<name>Omnifaces</name>
 	<version>1.8.4</version>
-	<description>JSF 2.x utility library</description>
+
+    <description>JSF 2.x utility library</description>
 	<url>http://omnifaces.org</url>
+
 	<organization>
 		<name>OmniFaces</name>
 		<url>http://omnifaces.org</url>
@@ -24,6 +25,19 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
+
+    <distributionManagement>
+        <repository>
+            <id>dmd-nexus</id>
+            <name>dmd-nexus</name>
+            <url>dav:http://dmd-dev.dmd.local:8083/nexus/content/repositories/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>dmd-nexus</id>
+            <name>dmd-nexus</name>
+            <url>dav:http://dmd-dev.dmd.local:8083/nexus/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 	<scm>
 		<url>https://github.com/omnifaces/omnifaces</url>
@@ -119,34 +133,6 @@
 							<Extension-Name>${project.artifactId}</Extension-Name>
 						</manifestEntries>
 					</archive>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-eclipse-plugin</artifactId>
-				<version>2.9</version>
-				<configuration>
-					<addGroupIdToProjectName>true</addGroupIdToProjectName>
-					<downloadSources>true</downloadSources>
-					<downloadJavadocs>true</downloadJavadocs>
-					<ajdtVersion>none</ajdtVersion>
-				</configuration>
-			</plugin>
-
-			<!-- Deploying is done via sonatype's Nexus  
-			
-				 Snapshot deploy: mvn clean deploy
-				 Release deploy: mvn clean deploy -P release
-			-->
-			<plugin>
-				<groupId>org.sonatype.plugins</groupId>
-				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.5</version>
-				<extensions>true</extensions>
-				<configuration>
-					<serverId>ossrh</serverId>
-					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
-					<autoReleaseAfterClose>true</autoReleaseAfterClose>
 				</configuration>
 			</plugin>
 		</plugins>
