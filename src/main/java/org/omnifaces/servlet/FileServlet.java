@@ -95,9 +95,11 @@ import org.omnifaces.util.Servlets;
  * file should be supplied as an attachment, then the developer can opt to override one or more of the following
  * protected methods:
  * <ul>
+ * <li>{@link #handleFileNotFound(HttpServletRequest, HttpServletResponse)}
  * <li>{@link #getExpireTime(HttpServletRequest, File)}
  * <li>{@link #getContentType(HttpServletRequest, File)}
  * <li>{@link #isAttachment(HttpServletRequest, String)}
+ * <li>{@link #getAttachmentName(HttpServletRequest, File)}
  * </ul>
  *
  * <p><strong>See also</strong>:
@@ -147,7 +149,7 @@ public abstract class FileServlet extends HttpServlet {
 		}
 
 		if (resource.file == null) {
-			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			handleFileNotFound(request, response);
 			return;
 		}
 
@@ -178,8 +180,7 @@ public abstract class FileServlet extends HttpServlet {
 			ranges.add(new Range(0, resource.length - 1)); // Full content.
 		}
 
-		String contentType = getContentType(request, resource.file);
-		setContentHeaders(response, resource, ranges, contentType, isAttachment(request, contentType));
+		String contentType = setContentHeaders(request, response, resource, ranges);
 
 		if (head) {
 			return;
@@ -189,16 +190,29 @@ public abstract class FileServlet extends HttpServlet {
 	}
 
 	/**
-	 * Returns the file associated with the given HTTP servlet request. If this method returns <code>null</code>, or if
-	 * {@link File#isFile()} returns <code>false</code>, then the servlet will then return a HTTP 404 error. If this
-	 * method throws {@link IllegalArgumentException}, then the servlet will return a HTTP 400 error.
+	 * Returns the file associated with the given HTTP servlet request.
+	 * If this method throws {@link IllegalArgumentException}, then the servlet will return a HTTP 400 error.
+	 * If this method returns <code>null</code>, or if {@link File#isFile()} returns <code>false</code>, then the
+	 * servlet will invoke {@link #handleFileNotFound(HttpServletResponse)}.
 	 * @param request The involved HTTP servlet request.
-	 * @return The file associated with the given HTTP servlet request. If the file is invalid, then the servlet will
-	 * return a HTTP 404 error.
+	 * @return The file associated with the given HTTP servlet request.
 	 * @throws IllegalArgumentException When the request is mangled in such way that it's not recognizable as a valid
 	 * file request. The servlet will then return a HTTP 400 error.
 	 */
 	protected abstract File getFile(HttpServletRequest request) throws IllegalArgumentException;
+
+	/**
+	 * Handles the case when the file is not found.
+	 * <p>
+	 * The default implementation sends a HTTP 404 error.
+	 * @param request The involved HTTP servlet request.
+	 * @param response The involved HTTP servlet response.
+	 * @throws IOException When something fails at I/O level.
+	 * @since 2.3
+	 */
+	protected void handleFileNotFound(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		response.sendError(HttpServletResponse.SC_NOT_FOUND);
+	}
 
 	/**
 	 * Returns how long the resource may be cached by the client before it expires, in seconds.
@@ -240,6 +254,20 @@ public abstract class FileServlet extends HttpServlet {
 	protected boolean isAttachment(HttpServletRequest request, String contentType) {
 		String accept = request.getHeader("Accept");
 		return !startsWithOneOf(contentType, "text", "image") && (accept == null || !accepts(accept, contentType));
+	}
+
+	/**
+	 * Returns the file name to be used in <code>Content-Disposition</code> header.
+	 * This does not need to be URL-encoded as this will be taken care of.
+	 * <p>
+	 * The default implementation returns {@link File#getName()}.
+	 * @param request The involved HTTP servlet request.
+	 * @param file The involved file.
+	 * @return The file name to be used in <code>Content-Disposition</code> header.
+	 * @since 2.3
+	 */
+	protected String getAttachmentName(HttpServletRequest request, File file) {
+		return file.getName();
 	}
 
 	// Sub-actions ----------------------------------------------------------------------------------------------------
@@ -338,9 +366,11 @@ public abstract class FileServlet extends HttpServlet {
 	/**
 	 * Set content headers.
 	 */
-	private void setContentHeaders(HttpServletResponse response, Resource resource, List<Range> ranges, String contentType, boolean attachment) {
-		String disposition = attachment ? "attachment" : "inline";
-		response.setHeader("Content-Disposition", String.format(CONTENT_DISPOSITION_HEADER, disposition, resource.name));
+	private String setContentHeaders(HttpServletRequest request, HttpServletResponse response, Resource resource, List<Range> ranges) {
+		String contentType = getContentType(request, resource.file);
+		String disposition = isAttachment(request, contentType) ? "attachment" : "inline";
+		String filename = encodeURL(getAttachmentName(request, resource.file));
+		response.setHeader("Content-Disposition", String.format(CONTENT_DISPOSITION_HEADER, disposition, filename));
 		response.setHeader("Accept-Ranges", "bytes");
 
 		if (ranges.size() == 1) {
@@ -352,6 +382,8 @@ public abstract class FileServlet extends HttpServlet {
 		else {
 			response.setContentType("multipart/byteranges; boundary=" + MULTIPART_BOUNDARY);
 		}
+
+		return contentType;
 	}
 
 	/**
@@ -426,7 +458,6 @@ public abstract class FileServlet extends HttpServlet {
 	 */
 	private static class Resource {
 		private final File file;
-		private final String name;
 		private final long length;
 		private final long lastModified;
 		private final String eTag;
@@ -434,14 +465,12 @@ public abstract class FileServlet extends HttpServlet {
 		public Resource(File file) {
 			if (file != null && file.isFile()) {
 				this.file = file;
-				name = encodeURL(file.getName());
 				length = file.length();
 				lastModified = file.lastModified();
-				eTag = String.format(ETAG, name, lastModified);
+				eTag = String.format(ETAG, encodeURL(file.getName()), lastModified);
 			}
 			else {
 				this.file = null;
-				name = null;
 				length = 0;
 				lastModified = 0;
 				eTag = null;
