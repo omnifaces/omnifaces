@@ -20,7 +20,6 @@ import static org.omnifaces.util.Utils.stream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -390,25 +389,23 @@ public abstract class FileServlet extends HttpServlet {
 	 * Write given file to response with given content type and ranges.
 	 */
 	private void writeContent(HttpServletResponse response, Resource resource, List<Range> ranges, String contentType) throws IOException, FileNotFoundException {
-		OutputStream output = response.getOutputStream();
+		ServletOutputStream output = response.getOutputStream();
 
 		if (ranges.size() == 1) {
 			Range range = ranges.get(0);
 			stream(resource.file, output, range.start, range.length);
 		}
 		else {
-			ServletOutputStream sos = (ServletOutputStream) output;
-
 			for (Range range : ranges) {
-				sos.println();
-				sos.println("--" + MULTIPART_BOUNDARY);
-				sos.println("Content-Type: " + contentType);
-				sos.println("Content-Range: bytes " + range.start + "-" + range.end + "/" + resource.length);
+				output.println();
+				output.println("--" + MULTIPART_BOUNDARY);
+				output.println("Content-Type: " + contentType);
+				output.println("Content-Range: bytes " + range.start + "-" + range.end + "/" + resource.length);
 				stream(resource.file, output, range.start, range.length);
 			}
 
-			sos.println();
-			sos.println("--" + MULTIPART_BOUNDARY + "--");
+			output.println();
+			output.println("--" + MULTIPART_BOUNDARY + "--");
 		}
 	}
 
