@@ -135,9 +135,8 @@ public class ConverterManager {
 			if (converter != null) {
 				converter = prepareBeanAndInjectDependencies(converter);
 				converterClassMap.put(converterForClass, converter);
-			}else{
-				throw new IllegalAccessError("Converter was not created");
 			}
+			// If converter is null it means a class without converter interface was sent in, throw no exception
 		}
 		return converter;
 	}
