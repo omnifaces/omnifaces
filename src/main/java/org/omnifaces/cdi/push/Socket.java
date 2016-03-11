@@ -578,8 +578,6 @@ import org.omnifaces.util.Json;
  * @see SocketUserManager
  * @see SocketSessionManager
  * @see SocketEvent
- * @see Opened
- * @see Closed
  * @see Push
  * @see PushContext
  * @see SocketPushContext
