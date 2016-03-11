@@ -20,6 +20,7 @@ import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestAttribute;
 import static org.omnifaces.util.FacesLocal.getResponse;
 import static org.omnifaces.util.FacesLocal.getViewId;
+import static org.omnifaces.util.FacesLocal.invalidateSession;
 import static org.omnifaces.util.FacesLocal.normalizeViewId;
 import static org.omnifaces.util.Servlets.facesRedirect;
 
@@ -120,14 +121,15 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 					String originalURL = getRequestAttribute(facesContext, "javax.servlet.forward.request_uri");
 
 					if (originalURL != null) {
-                        try {
-							facesRedirect(getRequest(facesContext), getResponse(facesContext), originalURL);
+						try {
+							invalidateSession(facesContext); // Prevent server from remembering security constraint fail caused by ajax.
+							facesRedirect(getRequest(facesContext), getResponse(facesContext), originalURL); // This also clears cache.
 						}
-                        catch (IOException e) {
+						catch (IOException e) {
 							throw new FacesException(e);
 						}
 
-                        return;
+						return;
 					}
 				}
 			}

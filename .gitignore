@@ -2,6 +2,7 @@ build/
 dist/
 *.jsfdia
 *.asc
+*.tern-project
 /target
 /.settings
 /.project
