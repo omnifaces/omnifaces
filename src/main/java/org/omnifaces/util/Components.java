@@ -687,8 +687,17 @@ public final class Components {
 	}
 
 	private static UIComponent addScriptResource(String libraryName, String resourceName, String target) {
+		FacesContext context = FacesContext.getCurrentInstance();
+		String id = libraryName + "_" + resourceName.replaceAll("\\W+", "_");
+
+		for (UIComponent existingResource : context.getViewRoot().getComponentResources(context, target)) {
+			if (id.equals(existingResource.getId())) {
+				return existingResource;
+			}
+		}
+
 		UIOutput outputScript = createScriptResource();
-		outputScript.setId(libraryName + "_" + resourceName.replaceAll("\\W+", "_"));
+		outputScript.setId(id);
 
 		if (libraryName != null) {
 			outputScript.getAttributes().put("library", libraryName);
