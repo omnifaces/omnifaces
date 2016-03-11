@@ -104,7 +104,7 @@ public class CommandScript extends UICommand {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
-	private static final Pattern PATTERN_NAME = Pattern.compile("[$a-z_][$\\w]*", Pattern.CASE_INSENSITIVE);
+	private static final Pattern PATTERN_NAME = Pattern.compile("[$a-z_](\\.?[$\\w])*", Pattern.CASE_INSENSITIVE);
 
 	private static final String ERROR_MISSING_NAME =
 		"o:commandScript 'name' attribute must be specified.";
@@ -209,7 +209,12 @@ public class CommandScript extends UICommand {
 	 */
 	protected void encodeFunction(FacesContext context, String name) throws IOException {
 		ResponseWriter writer = context.getResponseWriter();
-		writer.append("var ").append(name).append('=').append("function(o){var o=(typeof o==='object')&&o?o:{};");
+
+		if (!name.contains(".")) {
+			writer.append("var ");
+		}
+
+		writer.append(name).append('=').append("function(o){var o=(typeof o==='object')&&o?o:{};");
 		encodeOptions(context);
 		writer.append("jsf.ajax.request('").append(getClientId(context)).append("',null,o)}");
 
