@@ -79,17 +79,30 @@ public final class CombinedResourceInputStream extends InputStream {
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
+	@Override
+	public int read() throws IOException {
+		byte[] bytes = new byte[1];
+		read(bytes);
+		return bytes[0];
+	}
+
+	@Override
+	public int read(byte[] bytes) throws IOException {
+		return read(bytes, 0, bytes.length);
+	}
+
 	/**
 	 * For each resource, read until its {@link InputStream#read()} returns <code>-1</code> and then iterate to the
 	 * {@link InputStream} of the next resource, if any available, else return <code>-1</code>.
 	 */
 	@Override
-	public int read() throws IOException {
-		int read = -1;
+	public int read(byte[] bytes, int offset, int length) throws IOException {
+		int read = currentStream.read(bytes, offset, length);
 
-		while ((read = currentStream.read()) == -1) {
+		while (read < length) {
 			if (streamIterator.hasNext()) {
 				currentStream = streamIterator.next();
+				read += currentStream.read(bytes, read, length - read);
 			}
 			else {
 				break;
