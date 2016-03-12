@@ -15,8 +15,6 @@ package org.omnifaces.cdi.push;
 import static java.util.Collections.singleton;
 import static org.omnifaces.cdi.push.SocketChannelManager.EMPTY_SCOPE;
 import static org.omnifaces.cdi.push.SocketChannelManager.getChannelId;
-import static org.omnifaces.cdi.push.SocketChannelManager.getSessionScope;
-import static org.omnifaces.cdi.push.SocketChannelManager.getViewScope;
 import static org.omnifaces.util.Beans.isActive;
 import static org.omnifaces.util.Faces.hasContext;
 
@@ -63,11 +61,11 @@ public class SocketPushContext implements PushContext {
 	 * referenced, so it's still available when another thread invokes {@link #send(Object)} during which the session
 	 * and view scope is not necessarily active anymore.
 	 */
-	SocketPushContext(String channel, SocketSessionManager socketSessions, SocketUserManager socketUsers) {
+	SocketPushContext(String channel, SocketChannelManager socketChannels, SocketSessionManager socketSessions, SocketUserManager socketUsers) {
 		this.channel = channel;
 		boolean hasSession = isActive(SessionScoped.class);
-		sessionScope = hasSession ? getSessionScope() : EMPTY_SCOPE;
-		viewScope = hasSession && hasContext() ? getViewScope(false) : EMPTY_SCOPE;
+		sessionScope = hasSession ? socketChannels.getSessionScope() : EMPTY_SCOPE;
+		viewScope = hasSession && hasContext() ? socketChannels.getViewScope(false) : EMPTY_SCOPE;
 		this.socketSessions = socketSessions;
 		this.socketUsers = socketUsers;
 	}

@@ -14,7 +14,6 @@ package org.omnifaces.cdi.push;
 
 import static java.util.Collections.emptySet;
 import static java.util.Collections.synchronizedSet;
-import static org.omnifaces.util.Beans.getInstance;
 
 import java.io.Serializable;
 import java.util.HashSet;
@@ -148,14 +147,15 @@ public class SocketUserManager {
 		}
 	}
 
-	// Internal (static because package private methods in CDI beans are subject to memory leaks) ---------------------
+	// Internal -------------------------------------------------------------------------------------------------------
 
 	/**
 	 * For internal usage only. This makes it possible to save and restore user specific channels during server
 	 * restart/failover in {@link SocketChannelManager}.
+	 * This should actually be package private, but package private methods in CDI beans are subject to memory leaks.
 	 */
-	static ConcurrentMap<String, ConcurrentMap<String, Set<String>>> getUserChannels() {
-		return getInstance(SocketUserManager.class).userChannels;
+	protected ConcurrentMap<String, ConcurrentMap<String, Set<String>>> getUserChannels() {
+		return userChannels;
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------

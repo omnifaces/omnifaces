@@ -13,7 +13,6 @@
 package org.omnifaces.cdi.push;
 
 import static java.util.Collections.emptyMap;
-import static org.omnifaces.cdi.push.SocketUserManager.getUserChannels;
 import static org.omnifaces.util.Beans.getInstance;
 
 import java.io.IOException;
@@ -181,7 +180,14 @@ public class SocketChannelManager implements Serializable {
 		private ConcurrentMap<String, String> viewScope = new ConcurrentHashMap<>(ESTIMATED_CHANNELS_PER_VIEW);
 
 		/**
-		 * When current view scope is about to be destroyed, deregister all view scope channels and explicitly close
+		 * Returns the view scoped channels.
+		 */
+		protected Map<String, String> getViewScope() {
+			return viewScope;
+		}
+
+		/**
+		 * When current view scope is about to be destroyed, deregister all view scoped channels and explicitly close
 		 * any open web sockets associated with it to avoid stale websockets.
 		 */
 		@PreDestroy
@@ -191,28 +197,30 @@ public class SocketChannelManager implements Serializable {
 
 	}
 
-	// Internal (static because package private methods in CDI beans are subject to memory leaks) ---------------------
+	// Internal -------------------------------------------------------------------------------------------------------
 
 	/**
 	 * For internal usage only. This makes it possible to reference session scope channel IDs during injection time of
 	 * {@link SocketPushContext} (the CDI session scope is not necessarily active during push send time).
+	 * This should actually be package private, but package private methods in CDI beans are subject to memory leaks.
 	 */
-	static Map<String, String> getSessionScope() {
-		return getInstance(SocketChannelManager.class).sessionScope;
+	protected Map<String, String> getSessionScope() {
+		return sessionScope;
 	}
 
 	/**
 	 * For internal usage only. This makes it possible to reference view scope channel IDs during injection time of
-	 * {@link SocketPushContext} (the CDI view scope is not necessarily active during push send time).
+	 * {@link SocketPushContext} (the JSF view scope is not necessarily active during push send time).
+	 * This should actually be package private, but package private methods in CDI beans are subject to memory leaks.
 	 */
-	static Map<String, String> getViewScope(boolean create) {
+	protected Map<String, String> getViewScope(boolean create) {
 		ViewScope bean = getInstance(ViewScope.class, create);
-		return (bean == null) ? EMPTY_SCOPE : bean.viewScope;
+		return (bean == null) ? EMPTY_SCOPE : bean.getViewScope();
 	}
 
 	/**
-	 * For internal usage only. This makes it possible to resolve the session and view scope channel ID during push send
-	 * time in {@link SocketPushContext}.
+	 * For internal usage only. This makes it possible to resolve the session and view scoped channel ID during push
+	 * send time in {@link SocketPushContext}.
 	 */
 	static String getChannelId(String channel, Map<String, String> sessionScope, Map<String, String> viewScope) {
 		String channelId = viewScope.get(channel);
@@ -238,7 +246,7 @@ public class SocketChannelManager implements Serializable {
 		Map<String, ConcurrentMap<String, Set<String>>> sessionUserChannels = new HashMap<>(sessionUsers.size());
 
 		for (String userId : sessionUsers.values()) {
-			sessionUserChannels.put(userId, getUserChannels().get(userId));
+			sessionUserChannels.put(userId, socketUsers.getUserChannels().get(userId));
 		}
 
 		output.writeObject(sessionUserChannels);
@@ -255,7 +263,7 @@ public class SocketChannelManager implements Serializable {
 		for (Entry<Serializable, String> sessionUser : sessionUsers.entrySet()) {
 			String userId = sessionUser.getValue();
 			socketUsers.register(sessionUser.getKey(), userId);
-			getUserChannels().put(userId, sessionUserChannels.get(userId));
+			socketUsers.getUserChannels().put(userId, sessionUserChannels.get(userId));
 		}
 
 		// Below awkwardness is because SocketChannelManager can't be injected in SocketSessionManager (CDI session scope
