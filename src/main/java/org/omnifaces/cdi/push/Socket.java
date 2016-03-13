@@ -441,9 +441,9 @@ import org.omnifaces.util.Json;
  * incoming web socket open request will be checked whether they match the so far registered channels in the current
  * HTTP session. In case the channel is unknown (e.g. randomly guessed or spoofed by endusers or manually reconnected
  * after the session is expired), then the web socket will immediately be closed with close reason code
- * {@link CloseCodes#VIOLATED_POLICY} (<code>1008</code>). Also, when the HTTP session gets destroyed, all session and
+ * <code>1008</code> ({@link CloseCodes#VIOLATED_POLICY}). Also, when the HTTP session gets destroyed, all session and
  * view scoped channels which are still open will explicitly be closed from server side with close reason code
- * {@link CloseCodes#NORMAL_CLOSURE} (<code>1000</code>). Only application scoped sockets remain open and are still
+ * <code>1000</code> ({@link CloseCodes#NORMAL_CLOSURE}). Only application scoped sockets remain open and are still
  * reachable from server end even when the session or view associated with the page in client side is expired.
  *
  *
