@@ -12,11 +12,19 @@
  */
 package org.omnifaces.cdi.push;
 
+import static java.util.Collections.singleton;
+import static org.omnifaces.cdi.push.SocketChannelManager.EMPTY_SCOPE;
 import static org.omnifaces.cdi.push.SocketChannelManager.getChannelId;
 import static org.omnifaces.util.Beans.isActive;
+import static org.omnifaces.util.Faces.hasContext;
 
-import java.util.Collections;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Future;
 
 import javax.enterprise.context.SessionScoped;
 
@@ -25,8 +33,8 @@ import org.omnifaces.cdi.PushContext;
 
 /**
  * <p>
- * Concrete implementation of {@link PushContext} which is to be injected by {@link Push}.
- * This is produced by {@link SocketPushContextProducer}.
+ * This is a concrete implementation of {@link PushContext} interface which is to be injected by
+ * <code>&#64;</code>{@link Push}.
  *
  * @author Bauke Scholtz
  * @see Push
@@ -41,25 +49,55 @@ public class SocketPushContext implements PushContext {
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private String channel;
-	private Map<String, String> sessionScopeIds;
+	private Map<String, String> sessionScope;
+	private Map<String, String> viewScope;
+	private SocketSessionManager socketSessions;
+	private SocketUserManager socketUsers;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Creates a socket push context whereby the mutable map of session scope channel identifiers is referenced, so it's
-	 * still available when another thread invokes {@link #send(Object)} during which the session scope is not
-	 * necessarily active anymore.
+	 * Creates a socket push context whereby the mutable map of session and view scope channel identifiers is
+	 * referenced, so it's still available when another thread invokes {@link #send(Object)} during which the session
+	 * and view scope is not necessarily active anymore.
 	 */
-	SocketPushContext(String channel, SocketChannelManager manager) {
+	SocketPushContext(String channel, SocketChannelManager socketChannels, SocketSessionManager socketSessions, SocketUserManager socketUsers) {
 		this.channel = channel;
-		sessionScopeIds = isActive(SessionScoped.class) ? manager.getSessionScopeIds() : Collections.<String, String>emptyMap();
+		boolean hasSession = isActive(SessionScoped.class);
+		sessionScope = hasSession ? socketChannels.getSessionScope() : EMPTY_SCOPE;
+		viewScope = hasSession && hasContext() ? socketChannels.getViewScope(false) : EMPTY_SCOPE;
+		this.socketSessions = socketSessions;
+		this.socketUsers = socketUsers;
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
-	public void send(Object message) {
-		SocketManager.getInstance().send(getChannelId(channel, sessionScopeIds), message);
+	public Set<Future<Void>> send(Object message) {
+		return socketSessions.send(getChannelId(channel, sessionScope, viewScope), message);
+	}
+
+	@Override
+	public <S extends Serializable> Set<Future<Void>> send(Object message, S user) {
+		return send(message, singleton(user)).get(user);
+	}
+
+	@Override
+	public <S extends Serializable> Map<S, Set<Future<Void>>> send(Object message, Collection<S> users) {
+		Map<S, Set<Future<Void>>> resultsByUser = new HashMap<>(users.size());
+
+		for (S user : users) {
+			Set<String> channelIds = socketUsers.getChannelIds(user, channel);
+			Set<Future<Void>> results = new HashSet<>(channelIds.size());
+
+			for (String channelId : channelIds) {
+				results.addAll(socketSessions.send(channelId, message));
+			}
+
+			resultsByUser.put(user, results);
+		}
+
+		return resultsByUser;
 	}
 
 }

@@ -24,7 +24,7 @@ import org.omnifaces.cdi.PushContext;
 
 /**
  * <p>
- * Producer for injecting a {@link PushContext} as defined by the {@link Push} annotation.
+ * This producer prepares the {@link SocketPushContext} instance for injection by <code>&#64;</code>{@link Push}.
  *
  * @author Bauke Scholtz
  * @see Push
@@ -40,7 +40,13 @@ public class SocketPushContextProducer {
 	private InjectionPoint injectionPoint;
 
 	@Inject
-	private SocketChannelManager manager;
+	private SocketChannelManager socketChannels;
+
+	@Inject
+	private SocketSessionManager socketSessions;
+
+	@Inject
+	private SocketUserManager socketUsers;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -49,7 +55,7 @@ public class SocketPushContextProducer {
 	public PushContext produce(InjectionPoint injectionPoint) {
 		Push push = getQualifier(injectionPoint, Push.class);
 		String channel = push.channel().isEmpty() ? injectionPoint.getMember().getName() : push.channel();
-		return new SocketPushContext(channel, manager);
+		return new SocketPushContext(channel, socketChannels, socketSessions, socketUsers);
 	}
 
 }

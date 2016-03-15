@@ -31,7 +31,8 @@ import javax.faces.context.FacesContext;
 import org.omnifaces.cdi.ViewScoped;
 
 /**
- * Provide a context for the {@link ViewScoped} annotation wherein beans are managed by {@link ViewScopeManager}.
+ * Provide a context for the <code>&#64;</code>{@link ViewScoped} annotation wherein beans are managed by
+ * {@link ViewScopeManager}.
  *
  * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz

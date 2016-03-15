@@ -13,6 +13,7 @@
 package org.omnifaces.cdi.push;
 
 import static java.lang.Boolean.TRUE;
+import static org.omnifaces.cdi.push.SocketChannelManager.ESTIMATED_TOTAL_CHANNELS;
 import static org.omnifaces.util.Ajax.oncomplete;
 import static org.omnifaces.util.Components.addScriptResourceToHead;
 import static org.omnifaces.util.Components.addScriptToBody;
@@ -27,7 +28,6 @@ import java.util.Map;
 import javax.el.ValueExpression;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.PostAddToViewEvent;
 import javax.faces.event.PreRenderViewEvent;
 import javax.faces.event.SystemEvent;
@@ -35,14 +35,14 @@ import javax.faces.event.SystemEventListener;
 
 /**
  * <p>
- * This system event listener for {@link UIViewRoot} ensures that the necessary scripts for <code>&lt;o:socket&gt;</code>
- * are properly rendered.
+ * This JSF listener for {@link UIViewRoot} ensures that the necessary JavaScript code to initialize, open or close
+ * the <code>WebSocket</code> is properly rendered.
  *
  * @author Bauke Scholtz
  * @see Socket
  * @since 2.3
  */
-public class SocketEventListener implements SystemEventListener {
+public class SocketFacesListener implements SystemEventListener {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
@@ -67,10 +67,10 @@ public class SocketEventListener implements SystemEventListener {
 	 * @param uri The uri of the web socket representing the channel identifier, which is composed of channel name and
 	 * scope identifier, separated by a question mark.
 	 * All open websockets on the same uri will receive the same push notification from the server.
-	 * @param functions The onmessage and onclose functions.
+	 * @param functions The onopen, onmessage and onclose functions.
 	 * @param connectedExpression The connected expression.
 	 */
-	public SocketEventListener(Integer port, String channel, String uri, String functions, ValueExpression connectedExpression) {
+	public SocketFacesListener(Integer port, String channel, String uri, String functions, ValueExpression connectedExpression) {
 		this.port = port;
 		this.channel = channel;
 		this.uri = uri;
@@ -97,7 +97,7 @@ public class SocketEventListener implements SystemEventListener {
 	 * with <code>target="body"</code>. Those scripts will in turn hit {@link SocketEndpoint}.
 	 */
 	@Override
-	public void processEvent(SystemEvent event) throws AbortProcessingException {
+	public void processEvent(SystemEvent event) {
 		if (event instanceof PostAddToViewEvent) {
 			addScriptResourceToHead("omnifaces", "omnifaces.js");
 		}
@@ -136,7 +136,7 @@ public class SocketEventListener implements SystemEventListener {
 		Map<String, Boolean> channels = getViewAttribute(context, Socket.class.getName());
 
 		if (channels == null) {
-			channels = new HashMap<>();
+			channels = new HashMap<>(ESTIMATED_TOTAL_CHANNELS);
 			setViewAttribute(context, Socket.class.getName(), channels);
 		}
 

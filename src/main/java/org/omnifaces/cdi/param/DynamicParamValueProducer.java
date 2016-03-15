@@ -38,7 +38,7 @@ import org.omnifaces.cdi.Param;
 /**
  * Dynamic CDI producer used to work around CDI's restriction to create true generic producers.
  * <p>
- * This dynamic producer calls through to the "real" producer for {@link Param}
+ * This dynamic producer calls through to the "real" producer for <code>&#64;</code>{@link Param}
  * annotated injection points.
  *
  * @see ParamExtension

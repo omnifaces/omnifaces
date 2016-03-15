@@ -22,7 +22,7 @@ import javax.faces.validator.Validator;
 
 /**
  * Attribute for a {@link Converter} or {@link Validator} that is applied to a value retrieved from an HTTP request and
- * injected via the {@link org.omnifaces.cdi.Param} qualifier.
+ * injected via the <code>&#64;</code>{@link org.omnifaces.cdi.Param} qualifier.
  *
  * @since 1.6
  * @author Arjan Tijms

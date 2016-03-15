@@ -12,6 +12,8 @@
  */
 package org.omnifaces.util;
 
+import static org.omnifaces.util.Utils.isOneInstanceOf;
+
 import javax.el.ELException;
 import javax.faces.FacesException;
 import javax.servlet.ServletException;
@@ -53,20 +55,20 @@ public final class Exceptions {
 	// Utility --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Unwrap the nested causes of given exception as long as until it is not an instance of the given type and then
-	 * return it. If the given exception is already not an instance of the given type, then it will directly be
+	 * Unwrap the nested causes of given exception as long as until it is not an instance of the given types and then
+	 * return it. If the given exception is already not an instance of the given types, then it will directly be
 	 * returned. Or if the exception, unwrapped or not, does not have a nested cause anymore, then it will be returned.
 	 * This is particularly useful if you want to unwrap the real root cause out of a nested hierarchy of
 	 * {@link ServletException} or {@link FacesException}.
-	 * @param <T> The generic throwable type.
 	 * @param exception The exception to be unwrapped.
-	 * @param type The type which needs to be unwrapped.
+	 * @param types The types which need to be unwrapped.
 	 * @return The unwrapped root cause.
 	 */
-	public static <T extends Throwable> Throwable unwrap(Throwable exception, Class<T> type) {
+	@SafeVarargs
+	public static Throwable unwrap(Throwable exception, Class<? extends Throwable>... types) {
 		Throwable unwrappedException = exception;
 
-		while (type.isInstance(unwrappedException) && unwrappedException.getCause() != null) {
+		while (isOneInstanceOf(unwrappedException.getClass(), types) && unwrappedException.getCause() != null) {
 			unwrappedException = unwrappedException.getCause();
 		}
 
@@ -83,7 +85,7 @@ public final class Exceptions {
 	 * @since 1.4
 	 */
 	public static Throwable unwrap(Throwable exception) {
-		return unwrap(unwrap(exception, FacesException.class), ELException.class);
+		return unwrap(exception, FacesException.class, ELException.class);
 	}
 
 	/**

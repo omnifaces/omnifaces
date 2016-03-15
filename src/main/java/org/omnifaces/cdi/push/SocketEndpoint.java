@@ -27,7 +27,7 @@ import javax.websocket.Session;
 
 /**
  * <p>
- * The web socket server endpoint of <code>&lt;o:socket&gt;</code>.
+ * This web socket server endpoint handles web socket requests coming from <code>&lt;o:socket&gt;</code>.
  *
  * @author Bauke Scholtz
  * @see Socket
@@ -50,14 +50,14 @@ public class SocketEndpoint extends Endpoint {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Add given web socket session to the {@link SocketManager}. If web socket session is not accepted (i.e. the
+	 * Add given web socket session to the {@link SocketSessionManager}. If web socket session is not accepted (i.e. the
 	 * channel identifier is unknown), then immediately close with reason VIOLATED_POLICY (close code 1008).
 	 * @param session The opened web socket session.
 	 * @param config The endpoint configuration.
 	 */
 	@Override
 	public void onOpen(Session session, EndpointConfig config) {
-		if (SocketManager.getInstance().add(session)) { // @Inject in Endpoint doesn't work in Tomcat+Weld/OWB.
+		if (SocketSessionManager.getInstance().add(session)) { // @Inject in Endpoint doesn't work in Tomcat+Weld/OWB.
 			session.setMaxIdleTimeout(0);
 		}
 		else {
@@ -83,7 +83,7 @@ public class SocketEndpoint extends Endpoint {
 	}
 
 	/**
-	 * Remove given web socket session from the {@link SocketManager}. If there is any exception from onError which was
+	 * Remove given web socket session from the {@link SocketSessionManager}. If there is any exception from onError which was
 	 * not caused by GOING_AWAY, then log it. Tomcat &lt;= 8.0.30 is known to throw an unnecessary exception when client
 	 * abruptly disconnects, see also <a href="https://bz.apache.org/bugzilla/show_bug.cgi?id=57489">issue 57489</a>.
 	 * @param session The closed web socket session.
@@ -91,7 +91,7 @@ public class SocketEndpoint extends Endpoint {
 	 */
 	@Override
 	public void onClose(Session session, CloseReason reason) {
-		SocketManager.getInstance().remove(session); // @Inject in Endpoint doesn't work in Tomcat+Weld/OWB and CDI.current() during WS close doesn't work in WildFly.
+		SocketSessionManager.getInstance().remove(session, reason); // @Inject in Endpoint doesn't work in Tomcat+Weld/OWB and CDI.current() during WS close doesn't work in WildFly.
 
 		Throwable throwable = (Throwable) session.getUserProperties().remove(Throwable.class.getName());
 

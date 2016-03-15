@@ -24,7 +24,7 @@ import org.omnifaces.cdi.Cookie;
 
 /**
  * <p>
- * Producer for injecting a JSF request cookie as defined by the {@link Cookie} annotation.
+ * Producer for injecting a JSF request cookie as defined by the <code>&#64;</code>{@link Cookie} annotation.
  *
  * @since 2.1
  * @author Bauke Scholtz

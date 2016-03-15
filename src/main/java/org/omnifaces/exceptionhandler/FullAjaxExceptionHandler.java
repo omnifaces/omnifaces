@@ -19,11 +19,16 @@ import static javax.servlet.RequestDispatcher.ERROR_REQUEST_URI;
 import static javax.servlet.RequestDispatcher.ERROR_STATUS_CODE;
 import static org.omnifaces.util.Exceptions.unwrap;
 import static org.omnifaces.util.Faces.getContext;
+import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.normalizeViewId;
+import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -42,6 +47,7 @@ import javax.faces.event.PhaseId;
 import javax.faces.event.PreRenderViewEvent;
 import javax.faces.view.ViewDeclarationLanguage;
 import javax.faces.webapp.FacesServlet;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -134,6 +140,21 @@ import org.omnifaces.util.Hacks;
  * {@link ServletException} further to the container (the container will namely use the first root cause of
  * {@link ServletException} to match an error page by exception in web.xml).
  *
+ * <h3>Configuration</h3>
+ * <p>
+ * By default only {@link FacesException} and {@link ELException} are unwrapped. You can supply a context parameter
+ * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP} to specify
+ * additional exception types to unwrap. The context parameter value must be a commaseparated string of fully qualified
+ * names of additional exception types.
+ * <pre>
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.EXCEPTION_TYPES_TO_UNWRAP&lt;/param-name&gt;
+ *     &lt;param-value&gt;javax.ejb.EJBException,javax.persistence.RollbackException&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * </pre>
+ * <p>
+ * This context parameter will also be read and used by {@link FacesExceptionFilter}.
+ *
  * <h3>Customizing <code>FullAjaxExceptionHandler</code></h3>
  * <p>
  * If more fine grained control is desired for determining the root cause of the caught exception, or whether it should
@@ -159,6 +180,18 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
 	private static final Logger logger = Logger.getLogger(FullAjaxExceptionHandler.class.getName());
 
+	/**
+	 * The context parameter name to specify additional exception types to unwrap by both {@link FullAjaxExceptionHandler}
+	 * and {@link FacesExceptionFilter}. Those will be added to exception types {@link FacesException} and {@link ELException}.
+	 */
+	public static final String PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP = "org.omnifaces.EXCEPTION_TYPES_TO_UNWRAP";
+
+	private static final Set<Class<? extends Throwable>> STANDARD_TYPES_TO_UNWRAP =
+		unmodifiableSet(FacesException.class, ELException.class);
+
+	private static final String ERROR_INVALID_UNWRAP_PARAM_CLASS =
+		"Context parameter '" + PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP + "'"
+			+ " references a class which cannot be found in runtime classpath: '%s'";
 	private static final String ERROR_DEFAULT_LOCATION_MISSING =
 		"Either HTTP 500 or java.lang.Throwable error page is required in web.xml or web-fragment.xml."
 			+ " Neither was found.";
@@ -186,6 +219,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private ExceptionHandler wrapped;
+	private Class<? extends Throwable>[] exceptionTypesToUnwrap;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -195,6 +229,34 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	 */
 	public FullAjaxExceptionHandler(ExceptionHandler wrapped) {
 		this.wrapped = wrapped;
+		exceptionTypesToUnwrap = getExceptionTypesToUnwrap(getServletContext());
+	}
+
+	/**
+	 * Get the exception types to unwrap. This contains at least the standard types to unwrap {@link FacesException} and
+	 * {@link ELException}. Additional types can be specified via context parameter
+	 * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP}, if any.
+	 * @param context The involved servlet context.
+	 * @return Exception types to unwrap.
+	 * @since 2.3
+	 */
+	@SuppressWarnings("unchecked")
+	public static Class<? extends Throwable>[] getExceptionTypesToUnwrap(ServletContext context) {
+		Set<Class<? extends Throwable>> typesToUnwrap = new HashSet<>(STANDARD_TYPES_TO_UNWRAP);
+		String typesToUnwrapParam = context.getInitParameter(PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP);
+
+		if (!isEmpty(typesToUnwrapParam)) {
+			for (String typeToUnwrap : typesToUnwrapParam.split("\\s*,\\s*")) {
+				try {
+					typesToUnwrap.add((Class<? extends Throwable>) Class.forName(typeToUnwrap));
+				}
+				catch (ClassNotFoundException e) {
+					throw new IllegalArgumentException(String.format(ERROR_INVALID_UNWRAP_PARAM_CLASS, typeToUnwrap), e);
+				}
+			}
+		}
+
+		return typesToUnwrap.toArray(new Class[typesToUnwrap.size()]);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -274,14 +336,16 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
 	/**
 	 * Determine the root cause based on the caught exception, which will then be used to find the error page location.
-	 * The default implementation delegates to {@link Exceptions#unwrap(Throwable)}.
+	 * The default implementation delegates to {@link Exceptions#unwrap(Throwable, Class...)} with {@link FacesException},
+	 * {@link ELException} and the types specified in context parameter
+	 * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP}, if any.
 	 * @param context The involved faces context.
 	 * @param exception The caught exception to determine the root cause for.
 	 * @return The root cause of the caught exception.
 	 * @since 1.5
 	 */
 	protected Throwable findExceptionRootCause(FacesContext context, Throwable exception) {
-		return unwrap(exception);
+		return unwrap(exception, exceptionTypesToUnwrap);
 	}
 
 	/**

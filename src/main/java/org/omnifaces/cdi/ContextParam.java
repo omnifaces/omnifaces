@@ -27,8 +27,8 @@ import org.omnifaces.cdi.contextparam.ContextParamProducer;
 
 /**
  * <p>
- * The CDI annotation {@link ContextParam} allows you to inject a <code>web.xml</code> context parameter from the
- * current application in a CDI managed bean. It's basically like
+ * The CDI annotation <code>&#64;</code>{@link ContextParam} allows you to inject a <code>web.xml</code> context
+ * parameter from the current application in a CDI managed bean. It's basically like
  * <code>&#64;ManagedProperty("#{initParam['some.key']}") private String someKey;</code>
  * in a "plain old" JSF managed bean.
  * <p>

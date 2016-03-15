@@ -136,7 +136,7 @@ public final class Reflection {
 	}
 
 	/**
-	 * Finds a method based on the method name, amount of parameters and limited typing, if necessary prefixed with "get".
+	 * Finds a method based on the method name, amount of parameters and limited typing.
 	 * <p>
 	 * Note that this supports overloading, but a limited one. Given an actual parameter of type Long, this will select
 	 * a method accepting Number when the choice is between Number and a non-compatible type like String. However,
@@ -150,9 +150,11 @@ public final class Reflection {
 	public static Method findMethod(Object base, String methodName, Object[] params) {
 
 		List<Method> methods = new ArrayList<>();
-		for (Method method : base.getClass().getMethods()) {
-			if (method.getName().equals(methodName) && method.getParameterTypes().length == params.length) {
-				methods.add(method);
+		for (Class<?> cls = base.getClass(); cls != null; cls = cls.getSuperclass()) {
+			for (Method method : cls.getDeclaredMethods()) {
+				if (method.getName().equals(methodName) && method.getParameterTypes().length == params.length) {
+					methods.add(method);
+				}
 			}
 		}
 
@@ -160,27 +162,24 @@ public final class Reflection {
 			return methods.get(0);
 		}
 
-		if (methods.size() > 1) {
-			// Overloaded methods were found. Try to get a match
-			for (Method method : methods) {
-				boolean match = true;
-				Class<?>[] candidateParams = method.getParameterTypes();
-				for (int i = 0; i < params.length; i++) {
-					if (!candidateParams[i].isInstance(params[i])) {
-						match = false;
-						break;
-					}
+		for (Method method : methods) { // Overloaded methods were found. Try to get a match
+			boolean match = true;
+			Class<?>[] candidateParams = method.getParameterTypes();
+			for (int i = 0; i < params.length; i++) {
+				if (!candidateParams[i].isInstance(params[i])) {
+					match = false;
+					break;
 				}
-
-				// If all candidate parameters were expected and for none of them the actual
-				// parameter was NOT an instance, we have a match
-				if (match) {
-					return method;
-				}
-
-				// Else, at least one parameter was not an instance
-				// Go ahead a test then next methods
 			}
+
+			// If all candidate parameters were expected and for none of them the actual
+			// parameter was NOT an instance, we have a match
+			if (match) {
+				return method;
+			}
+
+			// Else, at least one parameter was not an instance
+			// Go ahead a test then next methods
 		}
 
 		return null;

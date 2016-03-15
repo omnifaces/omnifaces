@@ -26,6 +26,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
+
 /**
  * <p>
  * The {@link FacesExceptionFilter} will solve 2 problems with exceptions thrown in JSF methods.
@@ -34,6 +36,9 @@ import javax.servlet.http.HttpSession;
  * <li>Root cause needs to be unwrapped from {@link FacesException} and {@link ELException} to utilize standard
  * Servlet API error page handling.
  * </ol>
+ * <p>
+ * Noted should be that this filter won't run on exceptions thrown during ajax requests. To handle them using
+ * <code>web.xml</code> configured error pages, use {@link FullAjaxExceptionHandler}.
  *
  * <h3>Installation</h3>
  * <p>
@@ -50,9 +55,32 @@ import javax.servlet.http.HttpSession;
  * &lt;/filter-mapping&gt;
  * </pre>
  *
+ * <h3>Configuration</h3>
+ * <p>
+ * By default only {@link FacesException} and {@link ELException} are unwrapped. You can supply a context parameter
+ * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP} to specify
+ * additional exception types to unwrap. The context parameter value must be a commaseparated string of fully qualified
+ * names of additional exception types.
+ * <pre>
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.EXCEPTION_TYPES_TO_UNWRAP&lt;/param-name&gt;
+ *     &lt;param-value&gt;javax.ejb.EJBException,javax.persistence.RollbackException&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * </pre>
+ * <p>
+ * This context parameter will also be read and used by {@link FullAjaxExceptionHandler}.
+ *
+ *
  * @author Bauke Scholtz
  */
 public class FacesExceptionFilter extends HttpFilter {
+
+	private Class<? extends Throwable>[] exceptionTypesToUnwrap;
+
+	@Override
+	public void init() throws ServletException {
+		exceptionTypesToUnwrap = FullAjaxExceptionHandler.getExceptionTypesToUnwrap(getServletContext());
+	}
 
 	@Override
 	public void doFilter
@@ -66,7 +94,7 @@ public class FacesExceptionFilter extends HttpFilter {
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, request.getRequestURI());
 		}
 		catch (ServletException e) {
-			throw new ServletException(unwrap(e.getRootCause()));
+			throw new ServletException(unwrap(e.getRootCause(), exceptionTypesToUnwrap));
 		}
 	}
 

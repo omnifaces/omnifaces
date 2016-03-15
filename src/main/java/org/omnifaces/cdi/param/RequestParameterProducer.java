@@ -59,7 +59,7 @@ import javax.validation.ConstraintViolation;
 import org.omnifaces.cdi.Param;
 
 /**
- * Producer for a request parameter as defined by the {@link Param} annotation.
+ * Producer for a request parameter as defined by the <code>&#64;</code>{@link Param} annotation.
  *
  * @since 1.6
  * @author Arjan Tijms
@@ -69,7 +69,7 @@ public class RequestParameterProducer {
 
 	private static final String DEFAULT_REQUIRED_MESSAGE = "{0}: Value is required";
 
-	@SuppressWarnings("unused")
+	@SuppressWarnings("unused") // Workaround for OpenWebBeans not properly passing it as produce() method argument.
 	@Inject
 	private InjectionPoint injectionPoint;
 

@@ -12,12 +12,15 @@
  */
 package org.omnifaces.util;
 
+import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getContextAttribute;
 import static org.omnifaces.util.FacesLocal.getInitParameter;
 import static org.omnifaces.util.FacesLocal.getSessionAttribute;
 import static org.omnifaces.util.FacesLocal.setContextAttribute;
+import static org.omnifaces.util.Reflection.findMethod;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -25,13 +28,17 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.faces.application.StateManager;
+import javax.faces.component.StateHelper;
+import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.context.PartialViewContext;
 import javax.faces.context.PartialViewContextWrapper;
+import javax.faces.render.ResponseStateManager;
 
 import org.omnifaces.resourcehandler.ResourceIdentifier;
 
@@ -74,8 +81,10 @@ public final class Hacks {
 		MOJARRA_DEFAULT_RESOURCE_MAX_AGE, MYFACES_DEFAULT_RESOURCE_MAX_AGE
 	};
 
-	private static final String MOJARRA_LOGICAL_VIEW_MAP_ID = "com.sun.faces.renderkit.ServerSideStateHelper.LogicalViewMap";
-	private static final String MOJARRA_LOGICAL_VIEW_ID = "com.sun.faces.logicalViewMap";
+	private static final String MOJARRA_SERIALIZED_VIEWS = "com.sun.faces.renderkit.ServerSideStateHelper.LogicalViewMap";
+	private static final String MOJARRA_SERIALIZED_VIEW_KEY = "com.sun.faces.logicalViewMap";
+	private static final String MYFACES_SERIALIZED_VIEWS = "org.apache.myfaces.application.viewstate.ServerSideStateCacheImpl.SERIALIZED_VIEW";
+	private static final String MYFACES_VIEW_SCOPE_PROVIDER = "org.apache.myfaces.spi.ViewScopeProvider.INSTANCE";
 
 	private static final String ERROR_MAX_AGE =
 		"The '%s' init param must be a number. Encountered an invalid value of '%s'.";
@@ -88,8 +97,8 @@ public final class Hacks {
 
 	// Lazy loaded properties (will only be initialized when FacesContext is available) -------------------------------
 
-	private static Boolean myFacesUsed;
-	private static Long defaultResourceMaxAge;
+	private static volatile Boolean myFacesUsed;
+	private static volatile Long defaultResourceMaxAge;
 
 	// Constructors/init ----------------------------------------------------------------------------------------------
 
@@ -335,56 +344,116 @@ public final class Hacks {
 	 * @return The default resource maximum age in milliseconds.
 	 */
 	public static long getDefaultResourceMaxAge() {
-		if (defaultResourceMaxAge != null) {
-			return defaultResourceMaxAge;
-		}
+		if (defaultResourceMaxAge == null) {
+			Long resourceMaxAge = DEFAULT_RESOURCE_MAX_AGE;
+			FacesContext context = FacesContext.getCurrentInstance();
 
-		FacesContext context = FacesContext.getCurrentInstance();
+			if (context == null) {
+				return resourceMaxAge;
+			}
 
-		if (context == null) {
-			return DEFAULT_RESOURCE_MAX_AGE;
-		}
 
-		for (String name : PARAM_NAMES_RESOURCE_MAX_AGE) {
-			String value = getInitParameter(context, name);
+			for (String name : PARAM_NAMES_RESOURCE_MAX_AGE) {
+				String value = getInitParameter(context, name);
 
-			if (value != null) {
-				try {
-					defaultResourceMaxAge = Long.valueOf(value);
-					return defaultResourceMaxAge;
-				}
-				catch (NumberFormatException e) {
-					throw new IllegalArgumentException(String.format(ERROR_MAX_AGE, name, value), e);
+				if (value != null) {
+					try {
+						resourceMaxAge = Long.valueOf(value);
+						break;
+					}
+					catch (NumberFormatException e) {
+						throw new IllegalArgumentException(String.format(ERROR_MAX_AGE, name, value), e);
+					}
 				}
 			}
+
+			defaultResourceMaxAge = resourceMaxAge;
 		}
 
-		defaultResourceMaxAge = DEFAULT_RESOURCE_MAX_AGE;
 		return defaultResourceMaxAge;
 	}
+
 
 	//  JSF state saving related --------------------------------------------------------------------------------------
 
 	/**
 	 * Remove server side JSF view state associated with current request.
 	 * @param context The involved faces context.
+	 * @param manager The involved response state manager.
+	 * @param viewId The view ID of the involved view.
 	 * @since 2.3
 	 */
-	public static void removeViewState(FacesContext context) {
-		if ("client".equals(context.getExternalContext().getInitParameter(StateManager.STATE_SAVING_METHOD_PARAM_NAME))) {
-			return;
-		}
-
+	public static void removeViewState(FacesContext context, ResponseStateManager manager, String viewId) {
 		if (isMyFacesUsed()) {
-			// TODO: implement.
-		}
-		else { // Well, let's assume Mojarra.
-			Map<String, Object> logicalViewMap = getSessionAttribute(context, MOJARRA_LOGICAL_VIEW_MAP_ID);
+			Object state = invokeMethod(manager, "getSavedState", context);
 
-			if (logicalViewMap != null) {
-				logicalViewMap.remove(context.getAttributes().get(MOJARRA_LOGICAL_VIEW_ID));
+			if (!(state instanceof String)) {
+				return;
+			}
+
+			Object viewCollection = getSessionAttribute(context, MYFACES_SERIALIZED_VIEWS);
+
+			if (viewCollection == null) {
+				return;
+			}
+
+			Object stateCache = invokeMethod(manager, "getStateCache", context);
+			Integer stateId = invokeMethod(stateCache, "getServerStateId", context, state);
+			Serializable key = invokeMethod(invokeMethod(stateCache, "getSessionViewStorageFactory"), "createSerializedViewKey", context, viewId, stateId);
+
+			List<Serializable> keys = accessField(viewCollection, "_keys");
+			Map<Serializable, Object> serializedViews = accessField(viewCollection, "_serializedViews");
+			Map<Serializable, Serializable> precedence = accessField(viewCollection, "_precedence");
+
+			synchronized (viewCollection) { // Those fields are not concurrent maps.
+				keys.remove(key);
+				serializedViews.remove(key);
+				Serializable previousKey = precedence.remove(key);
+
+				if (previousKey != null) {
+					for (Entry<Serializable, Serializable> entry : precedence.entrySet()) {
+						if (entry.getValue().equals(key)) {
+							entry.setValue(previousKey);
+						}
+					}
+				}
+
+				Map<Serializable, String> viewScopeIds = accessField(viewCollection, "_viewScopeIds");
+
+				if (viewScopeIds == null) {
+					return;
+				}
+
+				Map<String, Integer> viewScopeIdCounts = accessField(viewCollection, "_viewScopeIdCounts");
+				String viewScopeId = viewScopeIds.remove(key);
+				int count = viewScopeIdCounts.get(viewScopeId) - 1;
+
+				if (count < 1) {
+					viewScopeIdCounts.remove(viewScopeId);
+					invokeMethod(getApplicationAttribute(context, MYFACES_VIEW_SCOPE_PROVIDER), "destroyViewScopeMap", context, viewScopeId);
+				}
+				else {
+					viewScopeIdCounts.put(viewScopeId, count);
+				}
 			}
 		}
+		else { // Well, let's assume Mojarra.
+			Map<String, Object> views = getSessionAttribute(context, MOJARRA_SERIALIZED_VIEWS);
+
+			if (views != null) {
+				views.remove(context.getAttributes().get(MOJARRA_SERIALIZED_VIEW_KEY));
+			}
+		}
+	}
+
+	/**
+	 * Expose protected state helper into public.
+	 * @param component The component to obtain state helper for.
+	 * @return The state helper of the given component.
+	 * @since 2.3
+	 */
+	public static StateHelper getStateHelper(UIComponent component) {
+		return invokeMethod(component, "getStateHelper");
 	}
 
 
@@ -438,16 +507,10 @@ public final class Hacks {
 	 * them is still null, a NullPointerException will be thrown. The implementation should be changed accordingly to
 	 * take that into account (but then varargs cannot be used anymore and you end up creating ugly arrays).
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings("unchecked")
 	private static <T> T invokeMethod(Object instance, String methodName, Object... parameters) {
-		Class[] parameterTypes = new Class[parameters.length];
-
-		for (int i = 0; i < parameters.length; i++) {
-			parameterTypes[i] = parameters[i].getClass();
-		}
-
 		try {
-			Method method = instance.getClass().getMethod(methodName, parameterTypes);
+			Method method = findMethod(instance, methodName, parameters);
 			method.setAccessible(true);
 			return (T) method.invoke(instance, parameters);
 		}

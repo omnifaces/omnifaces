@@ -94,8 +94,10 @@ OmniFaces.FixViewState = (function(window, document) {
 		var updates = responseXML.getElementsByTagName("update");
 
 		for (var i = 0; i < updates.length; i++) {
-			if (VIEW_STATE_REGEX.exec(updates[i].getAttribute("id"))) {
-				return updates[i].firstChild.nodeValue;
+			var update = updates[i];
+			
+			if (VIEW_STATE_REGEX.exec(update.getAttribute("id"))) {
+				return update.textContent || update.innerText;
 			}
 		}
 

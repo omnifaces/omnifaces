@@ -27,8 +27,8 @@ import org.omnifaces.cdi.cookie.RequestCookieProducer;
 
 /**
  * <p>
- * The CDI annotation {@link Cookie} allows you to inject a HTTP request cookie value from the current JSF context in
- * a CDI managed bean. It's basically like
+ * The CDI annotation <code>&#64;</code>{@link Cookie} allows you to inject a HTTP request cookie value from the current
+ * JSF context in a CDI managed bean. It's basically like
  * <code>&#64;ManagedProperty("#{cookie.cookieName.value}") private String cookieName;</code>
  * in a "plain old" JSF managed bean.
  * <p>
