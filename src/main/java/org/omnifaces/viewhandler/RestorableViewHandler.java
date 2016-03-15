@@ -113,13 +113,13 @@ public class RestorableViewHandler extends ViewHandlerWrapper { // TODO: rename 
 	 */
 	@SuppressWarnings("unchecked")
 	private boolean restoreViewRootState(FacesContext context, ResponseStateManager manager, UIViewRoot view) {
-		Object[] state = (Object[]) manager.getState(context, view.getViewId());
+		Object state = manager.getState(context, view.getViewId());
 
-		if (state == null || state.length < 2 || !(state[1] instanceof Map)) {
+		if (state == null || !(state instanceof Object[]) || ((Object[]) state).length < 2 || !(((Object[]) state)[1] instanceof Map)) {
 			return false;
 		}
 
-		Map<String, Object> states = (Map<String, Object>) state[1]; // Fortunately Mojarra and MyFaces have same structure.
+		Map<String, Object> states = (Map<String, Object>) ((Object[]) state)[1]; // Fortunately both Mojarra and MyFaces have same structure, otherwise this had to be in Hacks.
 
 		if (view.getId() == null) {
 			view.setId(view.createUniqueId(context, null));
