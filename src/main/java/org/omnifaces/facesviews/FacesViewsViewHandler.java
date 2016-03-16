@@ -12,6 +12,7 @@
  */
 package org.omnifaces.facesviews;
 
+import static javax.servlet.RequestDispatcher.FORWARD_SERVLET_PATH;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_SERVLET_PATH;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES;
 import static org.omnifaces.facesviews.FacesViews.getFacesServletExtensions;
@@ -81,7 +82,7 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 	}
 
 	private boolean isOriginalViewExtensionless(FacesContext context) {
-		String originalViewId = getRequestAttribute(context, "javax.servlet.forward.servlet_path");
+		String originalViewId = getRequestAttribute(context, FORWARD_SERVLET_PATH);
 		if (originalViewId == null) {
 			originalViewId = getRequestAttribute(context, FACES_VIEWS_ORIGINAL_SERVLET_PATH);
 		}
