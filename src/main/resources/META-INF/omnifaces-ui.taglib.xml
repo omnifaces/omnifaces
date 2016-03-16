@@ -4904,4 +4904,74 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 			<type>java.lang.Boolean</type>
 		</attribute>
 	</tag>
+	<tag>
+		<description>
+			<![CDATA[
+				The <code>&lt;o:bootstrapValidation&gt;</code> allows the developer to show feedback in Bootstrap like-style.
+			]]>
+		</description>
+		<tag-name>bootstrapValidation</tag-name>
+		<handler-class>org.omnifaces.taghandler.BootstrapValidation</handler-class>
+		<attribute>
+			<name>componentStyleClassName</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<name>parentStyleClassName</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		
+		<attribute>
+			<name>parentErrorStyleClass</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<name>controlErrorStyleClass</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<name>parentSuccessStyleClass</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<name>controlSuccessStyleClass</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<name>showSuccess</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<name>showIcons</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<name>validate</name>
+			<required>false</required>
+			<type>br.gov.dprf.taghandler.BootstrapValidation.ValidateType</type>
+		</attribute>
+		<attribute>
+			<name>revalidate</name>
+			<required>false</required>
+			<type>br.gov.dprf.taghandler.BootstrapValidation.RevalidateType</type>
+		</attribute>
+		<attribute>
+			<name>componentClientId</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<name>parentClientId</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+	</tag>
 </facelet-taglib>

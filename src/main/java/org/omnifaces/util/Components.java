@@ -1207,7 +1207,7 @@ public final class Components {
 	/**
 	 * Strip UIData/UIRepeat iteration index in pattern <code>:[0-9+]:</code> from given component client ID.
 	 */
-	private static String stripIterationIndexFromClientId(String clientId) {
+	public static String stripIterationIndexFromClientId(String clientId) {
 		String separatorChar = Character.toString(UINamingContainer.getSeparatorChar(getContext()));
 		return clientId.replaceAll(quote(separatorChar) + "[0-9]+" + quote(separatorChar), separatorChar);
 	}
