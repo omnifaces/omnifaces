@@ -52,6 +52,10 @@ import org.omnifaces.viewhandler.RestorableViewHandler;
  * the enduser action of unloading the page and the desired result. If this is undesireable, then better stick to JSF
  * 2.2's own view scope annotations and accept the postponed destroy.
  * <p>
+ * Since OmniFaces 2.3, the unload has been further improved to also physically remove the associated JSF view state
+ * from JSF implementation's internal LRU map in case of server side state saving, hereby further decreasing the risk
+ * at <code>ViewExpiredException</code> on the other views which were created/opened earlier.
+ * <p>
  * In a nutshell: if you're on JSF 2.0/2.1, and you can't upgrade to JSF 2.2, and you want the
  * <code>&#64;PreDestroy</code> to be invoked on sesison expire too, then use OmniFaces 1.6+ with this view scope
  * annotation. Or, if you're on JSF 2.2 already, and you want the <code>&#64;PreDestroy</code> to be invoked on browser
