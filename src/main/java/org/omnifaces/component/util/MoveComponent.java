@@ -125,6 +125,10 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 		if (event instanceof PreRenderViewEvent || (event instanceof PostAddToViewEvent && getDestination() == BEHAVIOR)) {
 			doProcess();
 		}
+		
+		// this is invoked on PostAddToView while postback, effectively removing restored components
+		// and on PreRenderView with no effect, since components have been moved already
+		getChildren().clear();
 	}
 
 	@Override
