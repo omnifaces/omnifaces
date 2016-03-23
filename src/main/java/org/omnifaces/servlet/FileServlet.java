@@ -90,9 +90,9 @@ import org.omnifaces.util.Servlets;
  *
  * <h3>Customizing <code>FileServlet</code></h3>
  * <p>
- * If more fine grained control is desired for determining the cache expire time, the content type and whether the
- * file should be supplied as an attachment, then the developer can opt to override one or more of the following
- * protected methods:
+ * If more fine grained control is desired for handling "file not found" error, determining the cache expire time, the
+ * content type, whether the file should be supplied as an attachment and the attachment's file name, then the developer
+ * can opt to override one or more of the following protected methods:
  * <ul>
  * <li>{@link #handleFileNotFound(HttpServletRequest, HttpServletResponse)}
  * <li>{@link #getExpireTime(HttpServletRequest, File)}
