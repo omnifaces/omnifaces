@@ -115,6 +115,7 @@ public class RestorableViewHandler extends ViewHandlerWrapper { // TODO: rename 
 	private boolean restoreViewRootState(FacesContext context, ResponseStateManager manager, UIViewRoot view) {
 		Object state = manager.getState(context, view.getViewId());
 
+		// TODO: this assumes partial state saving not full state saving (thus doesn't work on full state saving).
 		if (state == null || !(state instanceof Object[]) || ((Object[]) state).length < 2 || !(((Object[]) state)[1] instanceof Map)) {
 			return false;
 		}

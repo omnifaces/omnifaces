@@ -16,6 +16,7 @@
 package org.omnifaces.cdi.viewscope;
 
 import static java.lang.Boolean.TRUE;
+import static org.omnifaces.util.Ajax.load;
 import static org.omnifaces.util.Ajax.oncomplete;
 import static org.omnifaces.util.Components.addScriptResourceToBody;
 import static org.omnifaces.util.Components.addScriptResourceToHead;
@@ -233,17 +234,23 @@ public class ViewScopeManager implements Serializable {
 		activeViewScopes.put(id, new BeanStorage(DEFAULT_BEANS_PER_VIEW_SCOPE));
 
 		FacesContext context = FacesContext.getCurrentInstance();
+		boolean ajaxRequestWithPartialRendering = isAjaxRequestWithPartialRendering(context);
 
-		if (context.getCurrentPhaseId() != PhaseId.RENDER_RESPONSE || TRUE.equals(context.getAttributes().get(StateManager.IS_BUILDING_INITIAL_STATE))) {
-			addScriptResourceToHead("omnifaces", "omnifaces.js");
-		}
-		else if (!Hacks.isScriptResourceRendered(context, new ResourceIdentifier("omnifaces", "omnifaces.js"))) {
-			addScriptResourceToBody("omnifaces", "unload.js");
+		if (!Hacks.isScriptResourceRendered(context, new ResourceIdentifier("omnifaces", "omnifaces.js"))) {
+			if (ajaxRequestWithPartialRendering) {
+				load("omnifaces", "unload.js");
+			}
+			else if (context.getCurrentPhaseId() != PhaseId.RENDER_RESPONSE || TRUE.equals(context.getAttributes().get(StateManager.IS_BUILDING_INITIAL_STATE))) {
+				addScriptResourceToHead("omnifaces", "omnifaces.js");
+			}
+			else {
+				addScriptResourceToBody("omnifaces", "unload.js");
+			}
 		}
 
 		String script = String.format(SCRIPT_INIT, id);
 
-		if (isAjaxRequestWithPartialRendering(context)) {
+		if (ajaxRequestWithPartialRendering) {
 			oncomplete(script);
 		}
 		else {
