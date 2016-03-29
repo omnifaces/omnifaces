@@ -260,14 +260,23 @@ public class Tree extends TreeFamily implements NamingContainer {
 	@Override
 	public void broadcast(FacesEvent event) throws AbortProcessingException {
 		if (event instanceof TreeFacesEvent) {
-			FacesContext context = FacesContext.getCurrentInstance();
+			final FacesContext context = FacesContext.getCurrentInstance();
 			TreeFacesEvent treeEvent = (TreeFacesEvent) event;
 			final FacesEvent wrapped = treeEvent.getWrapped();
 
 			process(context, treeEvent.getNode(), new Callback.Returning<Void>() {
 				@Override
 				public Void invoke() {
-					wrapped.getComponent().broadcast(wrapped);
+					UIComponent source = wrapped.getComponent();
+					pushComponentToEL(context, getCompositeComponentParent(source));
+
+					try {
+						source.broadcast(wrapped);
+					}
+					finally {
+						popComponentFromEL(context);
+					}
+
 					return null;
 				}
 			});
