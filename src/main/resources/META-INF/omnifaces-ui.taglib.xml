@@ -2775,21 +2775,21 @@ public class ValidateValuesBean implements MultiFieldValidator {
 
 	<tag>
 		<description>
-	       	<![CDATA[
-	       		<strong>Cache</strong> is a component that initially renders the output of its children into a buffer
-	       		instead of to the response. This output is then inserted into a cache and on subsequent requests the
-	       		content retrieved from the cache is used.
-	       		<p>
-	       		By default the viewid concatenated to the component id via an underscore is used as the cache key.
-	       		<p>
-	       		Note that this component <strong>does not</strong> support a cache loader and locking mechanism. This mean several
-	       		simultaenous page requests may render the same content and it's undetermined which of those will end up being cached.
-	       		<p>
-	       		An optional caching provider (see below) can be set to control the caching implementation that is used for the actual caching.
-	       		If no such provider is installed, a default caching implementation is used that's based on
-	       		<a href="http://code.google.com/p/concurrentlinkedhashmap">http://code.google.com/p/concurrentlinkedhashmap</a> in case
-	       		a maximum cache capacity is set, or on a plain ConcurrentMap if no capacity is set.
-	       		<hr>
+			<![CDATA[
+				<strong>Cache</strong> is a component that initially renders the output of its children into a buffer
+				instead of to the response. This output is then inserted into a cache and on subsequent requests the
+				content retrieved from the cache is used.
+				<p>
+				By default the viewid concatenated to the component id via an underscore is used as the cache key.
+				<p>
+				Note that this component <strong>does not</strong> support a cache loader and locking mechanism. This mean several
+				simultaenous page requests may render the same content and it's undetermined which of those will end up being cached.
+				<p>
+				An optional caching provider (see below) can be set to control the caching implementation that is used for the actual caching.
+				If no such provider is installed, a default caching implementation is used that's based on
+				<a href="https://github.com/ben-manes/concurrentlinkedhashmap">https://github.com/ben-manes/concurrentlinkedhashmap</a> in case
+				a maximum cache capacity is set, or on a plain ConcurrentMap if no capacity is set.
+				<hr>
 				<h3>Setting a custom caching provider</h3>
 				<p>A custom caching provider can be set by using the <code>org.omnifaces.CACHE_PROVIDER</code> context
 				parameter in web.xml to point to an implementation of <code>org.omnifaces.component.output.cache.CacheProvider</code>.

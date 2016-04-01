@@ -42,8 +42,8 @@ import java.util.NoSuchElementException;
  *
  * @author ben.manes@gmail.com (Ben Manes)
  * @param <E> the type of elements held in this collection
- * @see <a href="http://code.google.com/p/concurrentlinkedhashmap/">
- *      http://code.google.com/p/concurrentlinkedhashmap/</a>
+ * @see <a href="https://github.com/ben-manes/concurrentlinkedhashmap">
+ *      https://github.com/ben-manes/concurrentlinkedhashmap</a>
  */
 @NotThreadSafe
 final class LinkedDeque<E extends Linked<E>> extends AbstractCollection<E> implements Deque<E> {

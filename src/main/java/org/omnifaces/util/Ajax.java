@@ -12,15 +12,23 @@
  */
 package org.omnifaces.util;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.omnifaces.util.Components.getCurrentComponent;
 import static org.omnifaces.util.Components.getCurrentForm;
+import static org.omnifaces.util.Faces.getApplication;
+import static org.omnifaces.util.Faces.isAjaxRequestWithPartialRendering;
+import static org.omnifaces.util.Utils.close;
 
 import java.beans.Introspector;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Scanner;
 
+import javax.faces.FacesException;
+import javax.faces.application.Resource;
 import javax.faces.component.UIColumn;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIData;
@@ -59,6 +67,11 @@ public final class Ajax {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
+	private static final String ERROR_NO_SCRIPT_RESOURCE =
+		"";
+	private static final String ERROR_NO_PARTIAL_RENDERING =
+		"The current request is not an ajax request with partial rendering."
+			+ " Use Components#addScriptXxx() methods instead.";
 	private static final String ERROR_ARGUMENTS_LENGTH =
 		"The arguments length must be even. Encountered %d items.";
 	private static final String ERROR_ARGUMENT_TYPE =
@@ -230,11 +243,49 @@ public final class Ajax {
 	}
 
 	/**
+	 * Load given script resource on complete of the current ajax response. Basically, it loads the script resource as
+	 * a {@link String} and then delegates it to {@link #oncomplete(String...)}.
+	 * @param libraryName Library name of the JavaScript resource.
+	 * @param resourceName Resource name of the JavaScript resource.
+	 * @throws IllegalArgumentException When given script resource cannot be found.
+	 * @throws IllegalStateException When current request is not an ajax request with partial rendering. You should use
+	 * either {@link Components#addScriptResourceToBody(String, String)}
+	 * or {@link Components#addScriptResourceToHead(String, String)} instead.
+	 * @since 2.3
+	 */
+	public static void load(String libraryName, String resourceName) {
+		Resource resource = getApplication().getResourceHandler().createResource(resourceName, libraryName);
+
+		if (resource == null) {
+			throw new IllegalArgumentException(ERROR_NO_SCRIPT_RESOURCE);
+		}
+
+		Scanner scanner = null;
+
+		try {
+			scanner = new Scanner(resource.getInputStream(), UTF_8.name());
+			oncomplete(scanner.useDelimiter("\\A").next());
+		}
+		catch (IOException e) {
+			throw new FacesException(e);
+		}
+		finally {
+			close(scanner);
+		}
+	}
+
+	/**
 	 * Execute the given scripts on complete of the current ajax response.
 	 * @param scripts The scripts to be executed.
+	 * @throws IllegalStateException When current request is not an ajax request with partial rendering. You should use
+	 * {@link Components#addScriptToBody(String)} instead.
 	 * @see OmniPartialViewContext#addCallbackScript(String)
 	 */
 	public static void oncomplete(String... scripts) {
+		if (!isAjaxRequestWithPartialRendering()) {
+			throw new IllegalStateException(ERROR_NO_PARTIAL_RENDERING);
+		}
+
 		OmniPartialViewContext context = OmniPartialViewContext.getCurrentInstance();
 
 		for (String script : scripts) {

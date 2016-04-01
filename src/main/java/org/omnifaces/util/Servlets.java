@@ -17,6 +17,8 @@ import static java.util.regex.Pattern.quote;
 import static javax.faces.application.ProjectStage.Development;
 import static javax.faces.application.ProjectStage.PROJECT_STAGE_JNDI_NAME;
 import static javax.faces.application.ProjectStage.PROJECT_STAGE_PARAM_NAME;
+import static javax.servlet.RequestDispatcher.FORWARD_QUERY_STRING;
+import static javax.servlet.RequestDispatcher.FORWARD_REQUEST_URI;
 import static org.omnifaces.util.JNDI.lookup;
 import static org.omnifaces.util.Utils.UTF_8;
 import static org.omnifaces.util.Utils.decodeURL;
@@ -213,7 +215,7 @@ public final class Servlets {
 	 * @since 1.8
 	 */
 	public static String getForwardRequestURI(HttpServletRequest request) {
-		return (String) request.getAttribute("javax.servlet.forward.request_uri");
+		return (String) request.getAttribute(FORWARD_REQUEST_URI);
 	}
 
 	/**
@@ -223,7 +225,7 @@ public final class Servlets {
 	 * @since 1.8
 	 */
 	public static String getForwardRequestQueryString(HttpServletRequest request) {
-		return (String) request.getAttribute("javax.servlet.forward.query_string");
+		return (String) request.getAttribute(FORWARD_QUERY_STRING);
 	}
 
 	/**

@@ -98,9 +98,17 @@ import org.omnifaces.util.Hacks;
  *
  * <h3>Caching</h3>
  * <p>
- * Optionally you can activate server-side caching of the combined resource content by specifying the context parameter
- * <code>{@value org.omnifaces.resourcehandler.CombinedResourceHandler#PARAM_NAME_CACHE_TTL}</code> while the JSF
- * project stage is <strong>not</strong> set to <code>Development</code> as per {@link Faces#isDevelopment()}.
+ * Optionally you can activate server-side caching of the combined resource content by specifying the below context
+ * parameter in <code>web.xml</code> with the amount of seconds to cache the combined resource content.
+ * <pre>
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.COMBINED_RESOURCE_HANDLER_CACHE_TTL&lt;/param-name&gt;
+ *     &lt;param-value&gt;3628800&lt;/param-value&gt; &lt;!-- 6 weeks --&gt;
+ * &lt;/context-param&gt;
+ * </pre>
+ * <p>
+ * This is only considered when the JSF project stage is <strong>not</strong> set to <code>Development</code> as per
+ * {@link Faces#isDevelopment()}.
  * <p>
  * This can speed up the initial page load considerably. In general, subsequent page loads are served from the browser
  * cache, so caching doesn't make a difference on postbacks, but only on initial requests. The combined resource content

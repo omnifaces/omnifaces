@@ -23,7 +23,7 @@ import org.omnifaces.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
  * For the actual implementation, a repackaged {@link ConcurrentLinkedHashMap} is used if a maximum capacity is requested,
  * otherwise a plain {@link ConcurrentHashMap} is used.
  * <p>
- * <b>See:</b> <a href="http://code.google.com/p/concurrentlinkedhashmap">http://code.google.com/p/concurrentlinkedhashmap</a>
+ * <b>See:</b> <a href="https://github.com/ben-manes/concurrentlinkedhashmap">https://github.com/ben-manes/concurrentlinkedhashmap</a>
  *
  * @since 1.1
  * @author Arjan Tijms

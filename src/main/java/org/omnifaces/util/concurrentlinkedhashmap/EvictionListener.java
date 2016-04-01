@@ -32,8 +32,8 @@ package org.omnifaces.util.concurrentlinkedhashmap;
  * {@link java.util.concurrent.ExecutorService}.
  *
  * @author ben.manes@gmail.com (Ben Manes)
- * @see <a href="http://code.google.com/p/concurrentlinkedhashmap/">
- *      http://code.google.com/p/concurrentlinkedhashmap/</a>
+ * @see <a href="https://github.com/ben-manes/concurrentlinkedhashmap">
+ *      https://github.com/ben-manes/concurrentlinkedhashmap</a>
  */
 @ThreadSafe
 public interface EvictionListener<K, V> {
