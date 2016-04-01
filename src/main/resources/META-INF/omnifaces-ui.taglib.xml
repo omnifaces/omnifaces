@@ -3372,7 +3372,7 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		   		<p>
 		   		An optional caching provider (see below) can be set to control the caching implementation that is used for the actual caching.
 		   		If no such provider is installed, a default caching implementation is used that's based on
-		   		<a href="http://code.google.com/p/concurrentlinkedhashmap">http://code.google.com/p/concurrentlinkedhashmap</a> in case
+		   		<a href="https://github.com/ben-manes/concurrentlinkedhashmap">https://github.com/ben-manes/concurrentlinkedhashmap</a> in case
 		   		a maximum cache capacity is set, or on a plain ConcurrentMap if no capacity is set.
 		   		<hr>
 				<h3>Setting a custom caching provider</h3>

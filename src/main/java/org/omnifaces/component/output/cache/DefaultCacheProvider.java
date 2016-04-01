@@ -20,7 +20,7 @@ import org.omnifaces.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
  * <p>
  * This will create a Cache instance that uses a repackaged {@link ConcurrentLinkedHashMap} for the actual implementation.
  * <p>
- * <b>See:</b> <a href="http://code.google.com/p/concurrentlinkedhashmap">http://code.google.com/p/concurrentlinkedhashmap</a>
+ * <b>See:</b> <a href="https://github.com/ben-manes/concurrentlinkedhashmap">https://github.com/ben-manes/concurrentlinkedhashmap</a>
  *
  * @since 1.1
  * @author Arjan Tijms

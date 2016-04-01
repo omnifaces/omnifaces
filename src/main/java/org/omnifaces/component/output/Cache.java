@@ -61,7 +61,7 @@ import org.omnifaces.util.State;
  * removed following a least recently used policy (LRU).
  * <p>
  * Via a cache provider mechanism an alternative cache implementation can be configured in web.xml. The default
- * cache is based on <a href="http://code.google.com/p/concurrentlinkedhashmap">http://code.google.com/p/concurrentlinkedhashmap</a>.
+ * cache is based on <a href="https://github.com/ben-manes/concurrentlinkedhashmap">https://github.com/ben-manes/concurrentlinkedhashmap</a>.
  *
  * <h3>Setting a custom caching provider</h3>
  * <p>

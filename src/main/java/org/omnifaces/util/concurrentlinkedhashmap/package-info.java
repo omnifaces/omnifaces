@@ -40,7 +40,7 @@
  * {@link java.util.concurrent.ConcurrentHashMap} implementation that is
  * available at runtime.
  *
- * @see <a href="http://code.google.com/p/concurrentlinkedhashmap/">
- *      http://code.google.com/p/concurrentlinkedhashmap/</a>
+ * @see <a href="https://github.com/ben-manes/concurrentlinkedhashmap">
+ *      https://github.com/ben-manes/concurrentlinkedhashmap</a>
  */
 package org.omnifaces.util.concurrentlinkedhashmap;
