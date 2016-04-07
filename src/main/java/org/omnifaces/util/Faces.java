@@ -1421,12 +1421,14 @@ public final class Faces {
 	 * removed. Note that the name and path must be exactly the same as it was when the cookie was created. If this is
 	 * <code>-1</code> then the cookie will become a session cookie and thus live as long as the established HTTP
 	 * session.
+     * @param isHttpOnly Mark the cookie as <code>HttpOnly</code>. <i>HttpOnly</i> cookies are not supposed to be exposed
+     * to client-side scripting code, and may therefore help mitigate certain kinds of cross-site scripting attacks.
 	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
 	 * @see ExternalContext#addResponseCookie(String, String, Map)
 	 * @since 1.8
 	 */
-	public static void addResponseCookie(String name, String value, int maxAge) {
-		FacesLocal.addResponseCookie(getContext(), name, value, maxAge);
+	public static void addResponseCookie(String name, String value, int maxAge, boolean isHttpOnly) {
+		FacesLocal.addResponseCookie(getContext(), name, value, maxAge, isHttpOnly);
 	}
 
 	/**
@@ -1442,11 +1444,13 @@ public final class Faces {
 	 * removed. Note that the name and path must be exactly the same as it was when the cookie was created. If this is
 	 * <code>-1</code> then the cookie will become a session cookie and thus live as long as the established HTTP
 	 * session.
+     * @param isHttpOnly Mark the cookie as <code>HttpOnly</code>. <i>HttpOnly</i> cookies are not supposed to be exposed
+     * to client-side scripting code, and may therefore help mitigate certain kinds of cross-site scripting attacks.
 	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
 	 * @see ExternalContext#addResponseCookie(String, String, Map)
 	 */
-	public static void addResponseCookie(String name, String value, String path, int maxAge) {
-		FacesLocal.addResponseCookie(getContext(), name, value, path, maxAge);
+	public static void addResponseCookie(String name, String value, String path, int maxAge, boolean isHttpOnly) {
+		FacesLocal.addResponseCookie(getContext(), name, value, path, maxAge, isHttpOnly);
 	}
 
 	/**
@@ -1463,12 +1467,15 @@ public final class Faces {
 	 * removed. Note that the name and path must be exactly the same as it was when the cookie was created. If this is
 	 * <code>-1</code> then the cookie will become a session cookie and thus live as long as the established HTTP
 	 * session.
+     * @param isHttpOnly Mark the cookie as <code>HttpOnly</code>. <i>HttpOnly</i> cookies are not supposed to be exposed
+     * to client-side scripting code, and may therefore help mitigate certain kinds of cross-site scripting attacks.
 	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
 	 * @see ExternalContext#addResponseCookie(String, String, Map)
 	 * @since 1.8
 	 */
-	public static void addResponseCookie(String name, String value, String domain, String path, int maxAge) {
-		FacesLocal.addResponseCookie(getContext(), name, value, domain, path, maxAge);
+	public static void addResponseCookie(String name, String value, String domain, String path, int maxAge,
+	        boolean isHttpOnly) {
+		FacesLocal.addResponseCookie(getContext(), name, value, domain, path, maxAge, isHttpOnly);
 	}
 
 	/**

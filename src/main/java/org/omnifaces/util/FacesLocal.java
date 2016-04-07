@@ -1039,25 +1039,27 @@ public final class FacesLocal {
 
 	/**
 	 * {@inheritDoc}
-	 * @see Faces#addResponseCookie(String, String, int)
+	 * @see Faces#addResponseCookie(String, String, int, boolean)
 	 */
-	public static void addResponseCookie(FacesContext context, String name, String value, int maxAge) {
-		addResponseCookie(context, name, value, getRequestHostname(context), null, maxAge);
+	public static void addResponseCookie(FacesContext context, String name, String value, int maxAge, boolean isHttpOnly) {
+		addResponseCookie(context, name, value, getRequestHostname(context), null, maxAge, isHttpOnly);
 	}
 
 	/**
 	 * {@inheritDoc}
-	 * @see Faces#addResponseCookie(String, String, String, int)
+	 * @see Faces#addResponseCookie(String, String, String, int, boolean)
 	 */
-	public static void addResponseCookie(FacesContext context, String name, String value, String path, int maxAge) {
-		addResponseCookie(context, name, value, getRequestHostname(context), path, maxAge);
+	public static void addResponseCookie(FacesContext context, String name, String value, String path, int maxAge,
+	        boolean isHttpOnly) {
+		addResponseCookie(context, name, value, getRequestHostname(context), path, maxAge, isHttpOnly);
 	}
 
 	/**
 	 * {@inheritDoc}
-	 * @see Faces#addResponseCookie(String, String, String, String, int)
+	 * @see Faces#addResponseCookie(String, String, String, String, int, boolean)
 	 */
-	public static void addResponseCookie(FacesContext context, String name, String value, String domain, String path, int maxAge) {
+	public static void addResponseCookie(FacesContext context, String name, String value, String domain, String path, int maxAge,
+	        boolean isHttpOnly) {
 		ExternalContext externalContext = context.getExternalContext();
 		Map<String, Object> properties = new HashMap<>();
 
@@ -1070,6 +1072,7 @@ public final class FacesLocal {
 		}
 
 		properties.put("maxAge", maxAge);
+		properties.put("httpOnly", isHttpOnly);
 		properties.put("secure", ((HttpServletRequest) externalContext.getRequest()).isSecure());
 		externalContext.addResponseCookie(name, encodeURL(value), properties);
 	}
@@ -1079,7 +1082,7 @@ public final class FacesLocal {
 	 * @see Faces#removeResponseCookie(String, String)
 	 */
 	public static void removeResponseCookie(FacesContext context, String name, String path) {
-		addResponseCookie(context, name, null, path, 0);
+		addResponseCookie(context, name, null, path, 0, true);
 	}
 
 	// HTTP session ---------------------------------------------------------------------------------------------------
