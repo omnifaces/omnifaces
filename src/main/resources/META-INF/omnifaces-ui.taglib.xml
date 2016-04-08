@@ -24,18 +24,25 @@
 	<tag>
 		<description>
 			<![CDATA[
-				<strong><code>o:tree</code></strong> is an <code>UIComponent</code> that supports data binding to a tree
-				of data objects represented by a <code>TreeModel</code> instance, which is the current value of this
-				component itself (typically established via a <code>ValueExpression</code>). During iterative processing
-				over the nodes of tree in the tree model, the object for the current node is exposed as a request
-				attribute under the key specified by the <code>var</code> attribute. The node itself is exposed as a
-				request attribute under the key specified by the <code>varNode</code> attribute.
+				The <code>&lt;o:tree&gt;</code> allows the developers to have full control over the markup of a tree
+				hierarchy by declaring the appropriate JSF components or HTML elements in the markup. The <code>&lt;o:tree&gt;</code>
+				does namely not render any HTML markup by itself.
 				<p>
-				Only children of type <code>TreeNode</code> are allowed and processed by this component.
+				The component value must point to a tree of data objects represented by a {@link TreeModel} instance, typically
+				established via a {@link ValueExpression}. During iterative processing over the nodes of tree in the tree model,
+				the object for the current node is exposed as a request attribute under the key specified by the <code>var</code>
+				attribute. The node itself is exposed as a request attribute under the key specified by the <code>varNode</code>
+				attribute.
 				<p>
-				This component does not have a renderer since it does not render any markup by itself. This allows the
-				developers to have full control over the markup of the tree by declaring the appropriate JSF components
-				or HTML elements in the markup. Here is a basic usage example:
+				The <code>&lt;o:tree&gt;</code> tag supports only child tags of type <code>&lt;o:treeNode&gt;</code>, representing
+				parent tree nodes. There can be multiple <code>&lt;o:treeNode&gt;</code> tags, each representing a separate parent
+				tree node level, so that different markup could be declared for each tree node level, if necessary. The
+				<code>&lt;o:treeNode&gt;</code> tag in turn supports child tag <code>&lt;o:treeNodeItem&gt;</code> which represents
+				each child of the current parent tree node. The <code>&lt;o:treeNodeItem&gt;</code> in turn supports child tag
+				<code>&lt;o:treeInsertChildren&gt;</code> which represents the insertion point of the grand children.
+				<p>
+				Here is a basic usage example where each parent tree node level is treated the same way via a single
+				<code>&lt;o:treeNode&gt;</code>:
 				<pre>
 &lt;o:tree value="#{bean.treeModel}" var="item" varNode="node"&gt;
   &lt;o:treeNode&gt;
@@ -122,14 +129,15 @@
 	<tag>
 		<description>
 			<![CDATA[
-				<strong><code>o:treeNode</code></strong> is an <code>UIComponent</code> that represents a single tree node
-				within a parent <code>Tree</code> component. Within this component, the <code>var</code> attribute of
-				the parent <code>Tree</code> component will expose the tree node. Each of its children is processed by
-				<code>TreeNodeItem</code>.
+				The <code>&lt;o:treeNode&gt;</code> represents the parent tree node. Within this component, the <code>var</code>
+				attribute of the <code>&lt;o:tree&gt;</code> will expose the parent tree node. Each of its children is processed by
+				<code>&lt;o:treeNodeItem&gt;</code> on which the <code>var</code> attribute of the <code>&lt;o:tree&gt;</code> in
+				turn exposes each child of the parent tree node.
 				<p>
-				The <code>level</code> attribute can be used to specify for which tree node level as obtained by
-				<code>TreeModel#getLevel()</code> this component should render the children by
-				<code>TreeNodeItem</code>. The root tree node has level 0.
+				The optional <code>level</code> attribute can be used to specify for which tree node level as obtained by
+				{@link TreeModel#getLevel()} the <code>&lt;o:treeNode&gt;</code> should be rendered. The root tree node has level 0.
+				If the <code>level</code> attribute is unspecified, then the <code>&lt;o:treeNode&gt;</code> will be rendered for any
+				tree node level which hasn't already a <code>&lt;o:treeNode level="x"&gt;</code> specified.
 			]]>
 		</description>
 		<tag-name>treeNode</tag-name>
@@ -183,13 +191,13 @@
 	<tag>
 		<description>
 			<![CDATA[
-				<strong><code>o:treeNodeItem</code></strong> is an <code>UIComponent</code> that represents a single child
-				tree node within a parent <code>TreeNode</code> component. Within this component, the <code>var</code>
-				attribute of the parent <code>Tree</code> component will expose the child tree node.
+				The <code>&lt;o:treeNodeItem&gt;</code> represents the child item of the parent tree note as represented by
+				<code>&lt;o:treeNode&gt;</code>. Within this component, the <code>var</code> attribute of the parent
+				<code>&lt;o:tree&gt;</code> component will expose the child tree node.
 				<p>
-				This component allows a child component of type <code>TreeInsertChildren</code> which indicates the
-				place to insert the children of the current child tree node recursively by a <code>TreeNode</code>
-				component associated with the children's level in the same parent <code>Tree</code> component.
+				Within <code>&lt;o:treeNodeItem&gt;</code> you can use <code>&lt;o:treeInsertChildren&gt;</code> to declare the
+				place where to recursively render the <code>&lt;o:treeNode&gt;</code> whereby the current child item is in turn
+				interpreted as a parent tree node (i.e. where you'd like to insert the grand-children).
 			]]>
 		</description>
 		<tag-name>treeNodeItem</tag-name>
@@ -233,11 +241,8 @@
 	<tag>
 		<description>
 			<![CDATA[
-				<strong><code>o:treeInsertChildren</code></strong> is an <code>UIComponent</code> that represents the
-				insertion point for the children of a parent tree node which is represented by
-				<code>TreeNodeItem</code>.
-				<p>
-				This component does not allow any children.
+				The <code>&lt;o:treeInsertChildren&gt;</code> represents the insertion point for the grand children. This is in turn
+				further interpreted as <code>&lt;o:treeNode&gt;</code>.
 			]]>
 		</description>
 		<tag-name>treeInsertChildren</tag-name>
