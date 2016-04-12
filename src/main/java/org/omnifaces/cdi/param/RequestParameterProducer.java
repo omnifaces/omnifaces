@@ -124,6 +124,7 @@ public class RequestParameterProducer {
 
 			if (requestParameter.required() && isEmpty(convertedValue)) {
 				addRequiredMessage(context, component, label, submittedValue, getRequiredMessage(requestParameter));
+				valid = false;
 			}
 
 			// Validate the converted value
@@ -132,8 +133,9 @@ public class RequestParameterProducer {
 			if (shouldDoBeanValidation(requestParameter)) {
 
 				Set<ConstraintViolation<?>> violations = doBeanValidation(convertedValue, injectionPoint);
-
-				valid = violations.isEmpty();
+				if (!violations.isEmpty()) {
+					valid = false;
+				}
 
 				for (ConstraintViolation<?> violation : violations) {
 					context.addMessage(component.getClientId(context), createError(violation.getMessage(), label));

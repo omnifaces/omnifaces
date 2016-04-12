@@ -236,11 +236,17 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 */
 	@Override
 	public boolean visitTree(final VisitContext context, final VisitCallback callback) {
+		TreeModel model = getModel(PhaseId.ANY_PHASE);
+
+		if (model.isLeaf()) {
+		    return super.visitTree(context, callback);
+		}
+
 		if (!isVisitable(context)) {
 			return false;
 		}
 
-		return process(context.getFacesContext(), getModel(PhaseId.ANY_PHASE), new Callback.Returning<Boolean>() {
+		return process(context.getFacesContext(), model, new Callback.Returning<Boolean>() {
 			@Override
 			public Boolean invoke() {
 				VisitResult result = context.invokeVisitCallback(Tree.this, callback);
