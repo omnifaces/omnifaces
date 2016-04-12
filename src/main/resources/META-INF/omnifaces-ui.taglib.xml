@@ -46,14 +46,14 @@
 				<pre>
 &lt;o:tree value="#{bean.treeModel}" var="item" varNode="node"&gt;
   &lt;o:treeNode&gt;
-	&lt;ul&gt;
-	  &lt;o:treeNodeItem&gt;
-		&lt;li&gt;
-		  #{node.index} #{item.someProperty}
-		  &lt;o:treeInsertChildren /&gt;
-		&lt;/li&gt;
-	  &lt;/o:treeNodeItem&gt;
-	&lt;/ul&gt;
+    &lt;ul&gt;
+      &lt;o:treeNodeItem&gt;
+        &lt;li&gt;
+          #{node.index} #{item.someProperty}
+          &lt;o:treeInsertChildren /&gt;
+        &lt;/li&gt;
+      &lt;/o:treeNodeItem&gt;
+    &lt;/ul&gt;
   &lt;/o:treeNode&gt;
 &lt;/o:tree&gt;
 				</pre>
