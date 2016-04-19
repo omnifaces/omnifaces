@@ -748,6 +748,30 @@ public final class Utils {
 		}
 	}
 
+	/**
+	 * URI-encode the given string using UTF-8. URIs (paths and filenames) have different encoding rules as compared to
+	 * URLs. {@link URLEncoder} is actually only for www (HTML) form based query string parameter values. URI encoding
+	 * has a lot in common with URL encoding, but the space has to be %20 and some chars doesn't necessarily need to be
+	 * encoded.
+	 * @param string The string to be URI-encoded using UTF-8.
+	 * @return The given string, URI-encoded using UTF-8, or <code>null</code> if <code>null</code> was given.
+	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
+	 * @since 2.4
+	 */
+	public static String encodeURI(String string) {
+		if (string == null) {
+			return null;
+		}
+
+		return encodeURL(string)
+			.replace("+", "%20")
+			.replace("%21", "!")
+			.replace("%27", "'")
+			.replace("%28", "(")
+			.replace("%29", ")")
+			.replace("%7E", "~");
+	}
+
 	// Escaping/unescaping --------------------------------------------------------------------------------------------
 
 	/**
