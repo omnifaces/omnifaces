@@ -375,8 +375,11 @@ public abstract class FileServlet extends HttpServlet {
 		if (ranges.size() == 1) {
 			Range range = ranges.get(0);
 			response.setContentType(contentType);
-			response.setHeader("Content-Range", "bytes " + range.start + "-" + range.end + "/" + resource.length);
 			response.setHeader("Content-Length", String.valueOf(range.length));
+
+			if (range.length != resource.length) {
+				response.setHeader("Content-Range", "bytes " + range.start + "-" + range.end + "/" + resource.length);
+			}
 		}
 		else {
 			response.setContentType("multipart/byteranges; boundary=" + MULTIPART_BOUNDARY);
