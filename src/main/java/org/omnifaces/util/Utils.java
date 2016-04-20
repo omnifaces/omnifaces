@@ -750,9 +750,9 @@ public final class Utils {
 
 	/**
 	 * URI-encode the given string using UTF-8. URIs (paths and filenames) have different encoding rules as compared to
-	 * URLs. {@link URLEncoder} is actually only for www (HTML) form based query string parameter values. URI encoding
-	 * has a lot in common with URL encoding, but the space has to be %20 and some chars doesn't necessarily need to be
-	 * encoded.
+	 * URL query string parameters. {@link URLEncoder} is actually only for www (HTML) form based query string parameter
+	 * values (as used when a webbrowser submits a HTML form). URI encoding has a lot in common with URL encoding, but
+	 * the space has to be %20 and some chars doesn't necessarily need to be encoded.
 	 * @param string The string to be URI-encoded using UTF-8.
 	 * @return The given string, URI-encoded using UTF-8, or <code>null</code> if <code>null</code> was given.
 	 * @throws UnsupportedOperationException When this platform does not support UTF-8.

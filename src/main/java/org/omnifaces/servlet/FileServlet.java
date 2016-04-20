@@ -13,6 +13,7 @@
 package org.omnifaces.servlet;
 
 import static org.omnifaces.util.Utils.coalesce;
+import static org.omnifaces.util.Utils.encodeURI;
 import static org.omnifaces.util.Utils.encodeURL;
 import static org.omnifaces.util.Utils.startsWithOneOf;
 import static org.omnifaces.util.Utils.stream;
@@ -368,7 +369,7 @@ public abstract class FileServlet extends HttpServlet {
 	private String setContentHeaders(HttpServletRequest request, HttpServletResponse response, Resource resource, List<Range> ranges) {
 		String contentType = getContentType(request, resource.file);
 		String disposition = isAttachment(request, contentType) ? "attachment" : "inline";
-		String filename = encodeURL(getAttachmentName(request, resource.file));
+		String filename = encodeURI(getAttachmentName(request, resource.file));
 		response.setHeader("Content-Disposition", String.format(CONTENT_DISPOSITION_HEADER, disposition, filename));
 		response.setHeader("Accept-Ranges", "bytes");
 
