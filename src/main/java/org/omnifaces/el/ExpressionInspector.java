@@ -12,6 +12,7 @@ import javax.el.ELResolver;
 import javax.el.MethodNotFoundException;
 import javax.el.ValueExpression;
 import javax.el.ValueReference;
+import javax.faces.el.CompositeComponentExpressionHolder;
 
 /**
  * This class contains methods that inspect expressions to reveal information about them.
@@ -45,6 +46,10 @@ public final class ExpressionInspector {
 		valueExpression.getType(inspectorElContext);
 		inspectorElContext.setPass(InspectorPass.PASS2_FIND_FINAL_NODE);
 		valueExpression.getValue(inspectorElContext);
+
+		if (inspectorElContext.getBase() instanceof CompositeComponentExpressionHolder) {
+			return getValueReference(context, ((CompositeComponentExpressionHolder) inspectorElContext.getBase()).getExpression((String) inspectorElContext.getProperty()));
+		}
 
 		return new ValueReference(inspectorElContext.getBase(), inspectorElContext.getProperty());
 	}
