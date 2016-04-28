@@ -47,11 +47,14 @@ public final class ExpressionInspector {
 		inspectorElContext.setPass(InspectorPass.PASS2_FIND_FINAL_NODE);
 		valueExpression.getValue(inspectorElContext);
 
-		if (inspectorElContext.getBase() instanceof CompositeComponentExpressionHolder) {
-			return getValueReference(context, ((CompositeComponentExpressionHolder) inspectorElContext.getBase()).getExpression((String) inspectorElContext.getProperty()));
+		Object base = inspectorElContext.getBase();
+		Object property = inspectorElContext.getProperty();
+
+		if (base instanceof CompositeComponentExpressionHolder) {
+			return getValueReference(context, ((CompositeComponentExpressionHolder) base).getExpression(property.toString()));
 		}
 
-		return new ValueReference(inspectorElContext.getBase(), inspectorElContext.getProperty());
+		return new ValueReference(base, property);
 	}
 
 	/**
