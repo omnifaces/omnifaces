@@ -226,11 +226,12 @@ public final class ExpressionInspector {
 		@Override
 		public Object getValue(ELContext context, Object base, Object property) {
 
-			if (base instanceof FinalBaseHolder) {
+			if (base instanceof FinalBaseHolder || property instanceof FinalBaseHolder) {
 				// If we get called with a FinalBaseHolder, which was set in the next to last node,
 				// we know we're done and can set the base and property as the final ones.
-				lastBase = ((FinalBaseHolder) base).getBase();
-				lastProperty = property;
+				// A property can also be a FinalBaseHolder when it is a dynamic property (brace notation).
+				lastBase = (base instanceof FinalBaseHolder) ? ((FinalBaseHolder) base).getBase() : base;
+				lastProperty = (property instanceof FinalBaseHolder) ? ((FinalBaseHolder) property).getBase() : property;
 
 				context.setPropertyResolved(true);
 
