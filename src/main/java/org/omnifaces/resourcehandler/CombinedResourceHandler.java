@@ -580,6 +580,10 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 				componentResource.getAttributes().put("library", LIBRARY_NAME);
 				componentResource.getAttributes().put("name", infoBuilder.create() + extension);
 				componentResource.setRendererType(rendererType);
+
+				if (rendererType == RENDERER_TYPE_JS) {
+					componentResource.getPassThroughAttributes().put("crossorigin", "anonymous");
+				}
 			}
 
 			removeComponentResources(context, componentResourcesToRemove, target);
