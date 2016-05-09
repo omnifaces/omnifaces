@@ -14,6 +14,7 @@ package org.omnifaces.config;
 
 import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.Faces.hasContext;
+import static org.omnifaces.util.Utils.parseLocale;
 import static org.omnifaces.util.Xml.createDocument;
 import static org.omnifaces.util.Xml.getNodeList;
 import static org.omnifaces.util.Xml.getTextContent;
@@ -229,13 +230,13 @@ public enum FacesConfigXml {
 		String defaultLocale = xpath.compile(XPATH_DEFAULT_LOCALE).evaluate(facesConfigXml).trim();
 
 		if (!Utils.isEmpty(defaultLocale)) {
-			supportedLocales.add(new Locale(defaultLocale));
+			supportedLocales.add(parseLocale(defaultLocale));
 		}
 
 		NodeList supportedLocaleNodes = getNodeList(facesConfigXml, xpath, XPATH_SUPPORTED_LOCALE);
 
 		for (int i = 0; i < supportedLocaleNodes.getLength(); i++) {
-			Locale supportedLocale = new Locale(getTextContent(supportedLocaleNodes.item(i)));
+			Locale supportedLocale = parseLocale(getTextContent(supportedLocaleNodes.item(i)));
 
 			if (!supportedLocales.contains(supportedLocale)) {
 				supportedLocales.add(supportedLocale);
