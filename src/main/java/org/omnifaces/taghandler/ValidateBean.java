@@ -42,6 +42,7 @@ import static org.omnifaces.util.Utils.isEmpty;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,7 @@ import java.util.logging.Logger;
 import javax.el.ValueExpression;
 import javax.el.ValueReference;
 import javax.faces.FacesException;
+import javax.faces.application.FacesMessage;
 import javax.faces.component.EditableValueHolder;
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
@@ -70,6 +72,7 @@ import javax.validation.ConstraintViolation;
 
 import org.omnifaces.eventlistener.BeanValidationEventListener;
 import org.omnifaces.util.Callback;
+import org.omnifaces.util.Messages;
 import org.omnifaces.util.Platform;
 import org.omnifaces.util.copier.CloneCopier;
 import org.omnifaces.util.copier.Copier;
@@ -160,6 +163,8 @@ public class ValidateBean extends TagHandler {
 	private static final String ERROR_INVALID_PARENT =
 		"o:validateBean parent must be an instance of UIInput or UICommand.";
 
+	private static final String DETAIL_MESSAGE_ID = "org.omnifaces.taghandler.ValidateBean.MESSAGE";
+
 	// Enums ----------------------------------------------------------------------------------------------------------
 
 	private static enum ValidateMethod {
@@ -181,6 +186,8 @@ public class ValidateBean extends TagHandler {
 	private ValidateMethod method;
 	private String groups;
 	private String copier;
+	private boolean useMessageDetail;
+	private boolean decorateFields;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -218,6 +225,8 @@ public class ValidateBean extends TagHandler {
 		method = ValidateMethod.of(getString(context, getAttribute("method")));
 		groups = getString(context, getAttribute("validationGroups"));
 		copier = getString(context, getAttribute("copier"));
+		useMessageDetail = getBoolean(context, getAttribute("useMessageDetail"));
+		decorateFields = getBoolean(context, getAttribute("decorateFields"));
 
 		// We can't use getCurrentForm() or hasInvokedSubmit() before the component is added to view, because the client ID isn't available.
 		// Hence, we subscribe this check to after phase of restore view.
@@ -266,7 +275,7 @@ public class ValidateBean extends TagHandler {
 	private void validateActualBean(final UIForm form, final Object bean, final String groups) {
 		ValidateBeanCallback validateActualBean = new ValidateBeanCallback() { @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
-			validate(context, form, bean, groups, false);
+			validate(context, form, bean, groups, false, Collections.<String, String>emptyMap(), false, useMessageDetail);
 		}};
 
 		subscribeToRequestAfterPhase(UPDATE_MODEL_VALUES, validateActualBean);
@@ -280,12 +289,13 @@ public class ValidateBean extends TagHandler {
 	 */
 	private void validateCopiedBean(final UIForm form, final Object bean, final String copier, final String groups) {
 		final Map<String, Object> properties = new HashMap<>();
+		final Map<String, String> clientIds = new HashMap<>();
 
 		ValidateBeanCallback collectBeanProperties = new ValidateBeanCallback() { @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
 
 			forEachInputWithMatchingBase(context, form, bean, new Callback.WithArgument<EditableValueHolder>() { @Override public void invoke(EditableValueHolder v) {
-				addCollectingValidator(v, properties);
+				addCollectingValidator(v, properties, clientIds);
 			}});
 		}};
 
@@ -298,7 +308,7 @@ public class ValidateBean extends TagHandler {
 
 			Object copiedBean = getCopier(context, copier).copy(bean);
 			setProperties(copiedBean, properties);
-			validate(context, form, copiedBean, groups, true);
+			validate(context, form, copiedBean, groups, true, clientIds, decorateFields, useMessageDetail);
 		}};
 
 		subscribeToRequestBeforePhase(PROCESS_VALIDATIONS, collectBeanProperties);
@@ -338,8 +348,8 @@ public class ValidateBean extends TagHandler {
 			}});
 	}
 
-	private static void addCollectingValidator(EditableValueHolder valueHolder, Map<String, Object> propertyValues) {
-		valueHolder.addValidator(new CollectingValidator(propertyValues));
+	private static void addCollectingValidator(EditableValueHolder valueHolder, Map<String, Object> propertyValues, Map<String, String> clientIdValues) {
+		valueHolder.addValidator(new CollectingValidator(propertyValues, clientIdValues));
 	}
 
 	private static void removeCollectingValidator(EditableValueHolder valueHolder) {
@@ -379,7 +389,8 @@ public class ValidateBean extends TagHandler {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private static void validate(FacesContext context, UIForm form, Object bean, String groups, boolean renderResponseOnFail) {
+	private static void validate(FacesContext context, UIForm form, Object bean, String groups, boolean renderResponseOnFail,
+															 Map<String, String> components, boolean decorateFields, boolean useMessageDetail) {
 		List<Class> groupClasses = new ArrayList<>();
 
 		for (String group : csvToList(groups)) {
@@ -393,8 +404,26 @@ public class ValidateBean extends TagHandler {
 			context.validationFailed();
 			String formId = form.getClientId(context);
 
+			FacesMessage error;
+			String propertyPath;
 			for (ConstraintViolation<?> violation : violations) {
-				context.addMessage(formId, createError(violation.getMessage()));
+				propertyPath = violation.getPropertyPath().toString();
+				if (useMessageDetail) {
+					error = Messages.create(DETAIL_MESSAGE_ID).error().detail(violation.getMessage()).get();
+				} else {
+					error = createError(violation.getMessage());
+				}
+				if (decorateFields && !components.isEmpty() && components.containsKey(propertyPath)) {
+					String clientId = components.get(propertyPath);
+					context.addMessage(clientId, error);
+
+					UIComponent component = form.findComponent(clientId);
+					if (component != null && component instanceof UIInput) {
+						((UIInput)component).setValid(false);
+					}
+				} else {
+					context.addMessage(formId, error);
+				}
 			}
 
 			if (renderResponseOnFail) {
@@ -408,9 +437,11 @@ public class ValidateBean extends TagHandler {
 	public static final class CollectingValidator implements Validator {
 
 		private final Map<String, Object> propertyValues;
+		private final Map<String, String> clientIdValues;
 
-		public CollectingValidator(Map<String, Object> propertyValues) {
+		public CollectingValidator(Map<String, Object> propertyValues, Map<String, String> clientIdValues) {
 			this.propertyValues = propertyValues;
+			this.clientIdValues = clientIdValues;
 		}
 
 		@Override
@@ -419,7 +450,9 @@ public class ValidateBean extends TagHandler {
 
 			if (valueExpression != null) {
 				ValueReference valueReference = getValueReference(context.getELContext(), valueExpression);
-				propertyValues.put(valueReference.getProperty().toString(), value);
+				String propertyName = valueReference.getProperty().toString();
+				propertyValues.put(propertyName, value);
+				clientIdValues.put(propertyName, component.getClientId());
 			}
 		}
 	}

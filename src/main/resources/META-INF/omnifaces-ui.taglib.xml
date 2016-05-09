@@ -3829,6 +3829,26 @@ public enum Baz {
 			<required>false</required>
 			<type>java.lang.Object</type>
 		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					A boolean value enabling usage of org.omnifaces.taghandler.ValidateBean.MESSAGE translation string as detail message of the error faces message.
+				]]>
+			</description>
+			<name>useMessageDetail</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					A boolean value enabling the decoration of invalid input fields instead of form decoration. Does only work with copied bean.
+				]]>
+			</description>
+			<name>decorateFields</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
 	</tag>
 
 	<tag>
