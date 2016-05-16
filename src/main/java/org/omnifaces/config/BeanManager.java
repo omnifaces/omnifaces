@@ -86,6 +86,8 @@ public enum BeanManager {
 			throw new IllegalStateException(ERROR_CDI_API_UNAVAILABLE, e);
 		}
 
+        Throwable illegalStateException = null;
+
 		try {
 			beanManager = JNDI.lookup("java:comp/BeanManager"); // CDI spec.
 
@@ -94,15 +96,18 @@ public enum BeanManager {
 			}
 		}
 		catch (IllegalStateException e) {
-			throw new IllegalStateException(ERROR_CDI_IMPL_UNAVAILABLE, e);
+            illegalStateException = e;
 		}
 		catch (Exception | LinkageError e) {
 			throw new IllegalStateException(ERROR_JNDI_UNAVAILABLE, e);
 		}
 
-		if (beanManager == null) {
-			throw new IllegalStateException(ERROR_CDI_IMPL_UNAVAILABLE);
-		}
+        if (beanManager == null) {
+            beanManager = Faces.getApplicationMap().get("org.jboss.weld.environment.servlet.javax.enterprise.inject.spi.BeanManager");
+            if (beanManager == null) {
+                throw new IllegalStateException( ERROR_CDI_IMPL_UNAVAILABLE, illegalStateException );
+            }
+        }
 
 		try {
 			getBeans = beanManagerClass.getMethod("getBeans", Type.class, Annotation[].class);
