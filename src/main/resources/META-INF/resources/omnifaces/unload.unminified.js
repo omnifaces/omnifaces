@@ -76,10 +76,15 @@ OmniFaces.Unload = (function(window, document) {
 		});
 
 		if (window.mojarra) {
-			decorateFacesSubmit(mojarra, "jsfcljs"); // Decorate Mojarra's submit handler to disable unload event when invoked.
+			decorateFacesSubmit(mojarra, "jsfcljs"); // Decorate Mojarra h:commandLink submit handler to disable unload event when invoked.
 		}
-		else if (window.myfaces) {
- 			decorateFacesSubmit(myfaces.oam, "submitForm"); // Decorate MyFaces' submit handler to disable unload event when invoked.
+		
+		if (window.myfaces) {
+ 			decorateFacesSubmit(myfaces.oam, "submitForm"); // Decorate MyFaces h:commandLink submit handler to disable unload event when invoked.
+		}
+		
+		if (window.PrimeFaces) {
+ 			decorateFacesSubmit(PrimeFaces, "addSubmitParam"); // Decorate PrimeFaces p:commandLink submit handler to disable unload event when invoked.
 		}
 	}
 
@@ -135,7 +140,7 @@ OmniFaces.Unload = (function(window, document) {
 		if (submitFunction) {
 			facesImpl[functionName] = function() {
 				self.disable();
-				submitFunction.apply(this, arguments);
+				return submitFunction.apply(this, arguments);
 			};
 		}
 	}
