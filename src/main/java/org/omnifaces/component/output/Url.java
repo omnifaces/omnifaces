@@ -47,11 +47,13 @@ import org.omnifaces.util.State;
  * specific subdomain.
  * <p>
  * Valid formats and values are:
- * <li><code>http://example.com</code>
- * <li><code>//example.com</code>
- * <li><code>example.com</code>
- * <li><code>/</code>
- * <li><code>//</code>
+ * <ul>
+ * <li><code>http://example.com</code></li>
+ * <li><code>//example.com</code></li>
+ * <li><code>example.com</code></li>
+ * <li><code>/</code></li>
+ * <li><code>//</code></li>
+ * </ul>
  * <p>
  * The value will be validated by {@link URL}.
  * If the value equals <code>/</code>, then the URL becomes domain-relative.
