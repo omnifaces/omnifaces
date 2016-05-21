@@ -374,6 +374,8 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		 */
 		public void reset() {
 			try {
+				wrapped.flush(); // Note: this doesn't actually flush to writer, but clears internal state.
+
 				if (updating) {
 					// If reset() method is entered with updating=true, then it means that Mojarra is used and that
 					// an exception was been thrown during ajax render response. The following calls will gently close
