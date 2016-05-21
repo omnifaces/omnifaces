@@ -3102,6 +3102,98 @@ public class ValidateValuesBean implements MultiFieldValidator {
 				validation failures so that the invoke action phase will be executed anyway.
 			 ]]>
 		</description>
+		<tag-name>url</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.output.Url</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					If specified, then the URL will be exposed in the request scope by the given variable name.
+				]]>
+			</description>
+			<name>var</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The domain of the URL.
+					Valid formats are: <code>http://example.com</code>, <code>//example.com</code>, <code>example.com</code>, <code>/</code> and <code>//</code>.
+					If the value equals <code>/</code>, then the URL becomes domain-relative.
+					If the value equals <code>//</code>, then the URL becomes scheme-relative.
+					Defaults to current domain.
+				]]>
+			</description>
+			<name>domain</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The view ID to create URL for.
+					Defaults to current view ID.
+				]]>
+			</description>
+			<name>viewId</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether to include view parameters in the URL.
+					Defaults to false.
+				]]>
+			</description>
+			<name>includeViewParams</name>
+			<required>false</required>
+			<type>boolean</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				<strong>Form</strong> is a component that extends the standard <code>UIForm</code> and provides a way to keep view
+				parameters in the request URL after a post-back and offers in combination with the
+				<code>&lt;o:ignoreValidationFailed&gt;</code> tag on an <code>UICommand</code> component the possibility to ignore
+				validation failures so that the invoke action phase will be executed anyway.
+			 ]]>
+		</description>
 		<tag-name>form</tag-name>
 		<component>
 			<component-type>org.omnifaces.component.input.Form</component-type>
