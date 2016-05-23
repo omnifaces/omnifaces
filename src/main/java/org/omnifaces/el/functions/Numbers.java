@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.Locale;
 
 import org.omnifaces.util.Faces;
@@ -244,7 +245,15 @@ public final class Numbers {
 		BigDecimal divided = decimal.divide(BigDecimal.valueOf(Math.pow(base, exp)));
 		int maxfractions = (fractions != null) ? fractions : (PRECISION - String.valueOf(divided.longValue()).length());
 		String formatted = String.format(getLocale(), "%." + maxfractions + "f", divided);
-		decimal = new BigDecimal(formatted);
+
+		try {
+			DecimalFormat formatter = (DecimalFormat) NumberFormat.getNumberInstance(getLocale());
+			formatter.setParseBigDecimal(true);
+			decimal = (BigDecimal) formatter.parse(formatted);
+		}
+		catch (ParseException e) {
+			throw new IllegalStateException(e);
+		}
 
 		if (decimal.longValue() >= base) { // E.g. 999.5 becomes 1000 which needs to be reformatted as 1k.
 			return formatBaseUnit(decimal, base, fractions, iec, unit);
