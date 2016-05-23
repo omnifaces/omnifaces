@@ -20,6 +20,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.beans.PropertyEditor;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.util.Nonbinding;
@@ -59,6 +60,13 @@ import org.omnifaces.util.Utils;
  * private String bar;
  * </pre>
  * <p>
+ * Multi-valued parameters are also supported by specifying an array type. The support was added in OmniFaces 2.4.
+ * Generic collection types like {@link List} are currently not supported.
+ * <pre>
+ * &#64;Inject &#64;Param(name="bar")
+ * private String[] bars;
+ * </pre>
+ * <p>
  * Standard types for which JSF already has a build in converter like {@link String}, {@link Long}, {@link Boolean}, etc
  * or for which there's already a converter registered via <code>forClass</code>, can be injected without explicitly
  * specifying a converter.
@@ -72,6 +80,12 @@ import org.omnifaces.util.Utils;
  * <pre>
  * &#64;Inject &#64;Param(converter="userConverter", validator="priviledgedUser")
  * private User user;
+ * </pre>
+ * <p>
+ * This also works on multi-valued parameters.
+ * <pre>
+ * &#64;Inject &#64;Param(name="user", converter="userConverter")
+ * private User[] users;
  * </pre>
  * <p>
  * Note that the <code>converter</code> and <code>validator</code> attributes can be specified in 3 ways:
