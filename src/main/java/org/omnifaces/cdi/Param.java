@@ -88,6 +88,9 @@ import org.omnifaces.util.Utils;
  * private User[] users;
  * </pre>
  * <p>
+ * On multi-valued parameters, JSF native conversion and validation will run on each submitted value. Bean Validation,
+ * if any, will however be performed on the entire property.
+ * <p>
  * Note that the <code>converter</code> and <code>validator</code> attributes can be specified in 3 ways:
  * <ul>
  * <li>A string value representing the converter/validator ID like so <code>converter="userConverter"</code>.
