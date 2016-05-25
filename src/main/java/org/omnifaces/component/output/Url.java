@@ -57,17 +57,19 @@ import org.omnifaces.util.State;
  * <p>
  * The value will be validated by {@link URL}.
  * If the value equals <code>/</code>, then the URL becomes domain-relative.
- * If the value equals <code>//</code>, then the URL becomes scheme-relative.
+ * If the value equals or starts with <code>//</code>, or does not contain any scheme, then the URL becomes scheme-relative.
  *
  * <h3>Usage</h3>
  * <p>
  * Some examples:
  * <pre>
  * &lt;p&gt;Full URL of current page is: &lt;o:url /&gt;&lt;/p&gt;
+ * &lt;p&gt;Full URL of another page is: &lt;o:url viewId="/another.xhtml" /&gt;&lt;/p&gt;
  * &lt;p&gt;Full URL of current page including view params is: &lt;o:url includeViewParams="true" /&gt;&lt;/p&gt;
- * &lt;p&gt;Full URL of current page on a different domain is: &lt;o:url domain="sub.example.com" /&gt;&lt;/p&gt;
  * &lt;p&gt;Domain-relative URL of current page is: &lt;o:url domain="/" /&gt;&lt;/p&gt;
  * &lt;p&gt;Scheme-relative URL of current page is: &lt;o:url domain="//" /&gt;&lt;/p&gt;
+ * &lt;p&gt;Scheme-relative URL of current page on a different domain is: &lt;o:url domain="sub.example.com" /&gt;&lt;/p&gt;
+ * &lt;p&gt;Full URL of current page on a different domain is: &lt;o:url domain="https://sub.example.com" /&gt;&lt;/p&gt;
  * </pre>
  * <pre>
  * &lt;o:url var="_linkCanonical"&gt;

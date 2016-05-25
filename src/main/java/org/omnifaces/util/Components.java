@@ -127,6 +127,10 @@ import org.omnifaces.component.SimpleParam;
  * // Programmatically capture HTML output of a given view.
  * String mailHtml = Components.encodeHtml(Components.buildView("/WEB-INF/mail-template.xhtml"));
  * </pre>
+ * <pre>
+ * // Collecting all queued actions and action listeners as method expression strings in a logging phase listener.
+ * List&lt;String&gt; actions = Components.getActionExpressionsAndListeners(Components.getCurrentActionSource());
+ * </pre>
  *
  * @author Bauke Scholtz
  * @author Arjan Tijms
