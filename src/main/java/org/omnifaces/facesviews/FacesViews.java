@@ -37,6 +37,7 @@ import static org.omnifaces.util.Utils.reverse;
 import static org.omnifaces.util.Utils.startsWithOneOf;
 
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -46,6 +47,7 @@ import javax.faces.application.Application;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.webapp.FacesServlet;
+import javax.servlet.DispatcherType;
 import javax.servlet.FilterRegistration;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
@@ -239,7 +241,7 @@ public final class FacesViews {
 
 					// Map the forwarding filter to all the resources we found.
 					for (String resource : collectedViews.keySet()) {
-						facesViewsRegistration.addMappingForUrlPatterns(null, isFilterAfterDeclaredFilters(servletContext), resource);
+						facesViewsRegistration.addMappingForUrlPatterns(EnumSet.of(DispatcherType.REQUEST, DispatcherType.FORWARD), isFilterAfterDeclaredFilters(servletContext), resource);
 					}
 
 					// Additionally map the filter to all paths that were scanned and which are also directly
