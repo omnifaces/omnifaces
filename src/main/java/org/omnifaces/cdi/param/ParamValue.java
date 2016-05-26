@@ -16,7 +16,6 @@ import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.util.List;
 
 import org.omnifaces.cdi.Param;
@@ -37,7 +36,7 @@ public class ParamValue<V> implements Serializable {
 
 	private final String[] submittedValues;
 	private final Param param;
-	private final Class<?> targetType;
+	private final Class<V> targetType;
 
 	private transient List<V> values;
 	private transient V firstValue;
@@ -46,7 +45,7 @@ public class ParamValue<V> implements Serializable {
 	private boolean valuesAreSerializable;
 	private List<V> serializableValues;
 
-	public ParamValue(String[] submittedValues, Param param, Class<?> targetType, List<V> values) {
+	public ParamValue(String[] submittedValues, Param param, Class<V> targetType, List<V> values) {
 		this.submittedValues = submittedValues;
 		this.param = param;
 		this.targetType = targetType;
@@ -90,9 +89,7 @@ public class ParamValue<V> implements Serializable {
 		}
 
 		if (values != null && targetType.isArray()) {
-			Object[] array = (Object[]) Array.newInstance(targetType.getComponentType(), values.size());
-			System.arraycopy(values.toArray(), 0, array, 0, values.size());
-			return (V) array;
+			return (V) RequestParameterProducer.toArray(values, targetType);
 		}
 
 		return firstValue;

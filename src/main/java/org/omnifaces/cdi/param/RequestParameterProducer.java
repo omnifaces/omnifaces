@@ -30,6 +30,7 @@ import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.containsByClassName;
 import static org.omnifaces.util.Utils.isEmpty;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -133,6 +134,11 @@ public class RequestParameterProducer {
 		}
 
 		return convertedValues;
+	}
+
+	@SuppressWarnings("unchecked")
+	static <V> V[] toArray(List<V> convertedValues, Class<V> targetType) {
+		return convertedValues.toArray((V[]) Array.newInstance(targetType.getComponentType(), convertedValues.size()));
 	}
 
 	private static <V> boolean validateValues(FacesContext context, Param param, String label, String[] submittedValues, List<V> convertedValues, InjectionPoint injectionPoint) {
@@ -311,25 +317,27 @@ public class RequestParameterProducer {
 		return isBeanValidationAvailable();
 	}
 
-	private static Set<ConstraintViolation<?>> doBeanValidation(Object value, InjectionPoint injectionPoint) {
+	private static <V> Set<ConstraintViolation<?>> doBeanValidation(List<V> values, InjectionPoint injectionPoint) {
 
 		Class<?> base = injectionPoint.getBean().getBeanClass();
 		String property = injectionPoint.getMember().getName();
 		Type type = injectionPoint.getType();
+		Class<V> targetType = getTargetType(injectionPoint);
 
 		// Check if the target property in which we are injecting in our special holder/wrapper type
 		// ParamValue or not. If it's the latter, pre-wrap our value (otherwise types for bean validation
 		// would not match)
-		Object valueOrWrapper = value;
+		Object valueToValidate = (values == null || targetType.isArray()) ? toArray(values, targetType) : values.get(0);
+
 		if (type instanceof ParameterizedType) {
 			Type propertyRawType = ((ParameterizedType) type).getRawType();
 			if (propertyRawType.equals(ParamValue.class)) {
-				valueOrWrapper = new ParamValue<>(null, null, null, asList(value));
+				valueToValidate = new ParamValue<>(null, null, null, asList(valueToValidate));
 			}
 		}
 
 		@SuppressWarnings("rawtypes")
-		Set violationsRaw = getBeanValidator().validateValue(base, property, valueOrWrapper);
+		Set violationsRaw = getBeanValidator().validateValue(base, property, valueToValidate);
 
 		@SuppressWarnings("unchecked")
 		Set<ConstraintViolation<?>> violations = violationsRaw;
