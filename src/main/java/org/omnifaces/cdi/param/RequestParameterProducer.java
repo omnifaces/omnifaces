@@ -327,7 +327,7 @@ public class RequestParameterProducer {
 		// Check if the target property in which we are injecting in our special holder/wrapper type
 		// ParamValue or not. If it's the latter, pre-wrap our value (otherwise types for bean validation
 		// would not match)
-		Object valueToValidate = (values == null || targetType.isArray()) ? toArray(values, targetType) : values.get(0);
+		Object valueToValidate = (values == null) ? null : targetType.isArray() ? toArray(values, targetType) : values.get(0);
 
 		if (type instanceof ParameterizedType) {
 			Type propertyRawType = ((ParameterizedType) type).getRawType();
