@@ -123,14 +123,13 @@ import org.omnifaces.util.Hacks;
  * <p>
  * Exceptions during render response can only be handled when the <code>javax.faces.FACELETS_BUFFER_SIZE</code> is
  * large enough so that the so far rendered response until the occurrence of the exception fits in there and can
- * therefore safely be resetted. When rendering of the error page itself fails due to a bug in the error page itself
- * and the response can still be resetted, then a hardcoded message will be returned informing the developer about the
- * double mistake.
+ * therefore safely be resetted.
  *
  * <h3>Error in error page itself</h3>
  * <p>
- * When the rendering of the error page itself failed due to a bug in the error page itself, then the
- * {@link FullAjaxExceptionHandler} will reset the response and display a hardcoded error message in "plain text".
+ * When the rendering of the error page failed due to a bug in the error page itself, and the response can still be
+ * resetted, then the {@link FullAjaxExceptionHandler} will display a hardcoded error message in "plain text" informing
+ * the developer about the double mistake.
  *
  * <h3>Normal requests</h3>
  * <p>
