@@ -18,9 +18,13 @@ import static org.omnifaces.component.input.Form.PropertyKeys.includeRequestPara
 import static org.omnifaces.component.input.Form.PropertyKeys.includeViewParams;
 import static org.omnifaces.component.input.Form.PropertyKeys.useRequestURI;
 import static org.omnifaces.util.Components.getParams;
+import static org.omnifaces.util.FacesLocal.getForwardRequestURI;
+import static org.omnifaces.util.FacesLocal.getRequestContextPath;
 import static org.omnifaces.util.FacesLocal.getRequestQueryStringMap;
+import static org.omnifaces.util.FacesLocal.getRequestURI;
 import static org.omnifaces.util.FacesLocal.getViewParameterMap;
 import static org.omnifaces.util.Servlets.toQueryString;
+import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
@@ -42,7 +46,6 @@ import javax.faces.context.FacesContextWrapper;
 
 import org.omnifaces.component.ParamHolder;
 import org.omnifaces.taghandler.IgnoreValidationFailed;
-import org.omnifaces.util.FacesLocal;
 import org.omnifaces.util.State;
 
 /**
@@ -355,8 +358,8 @@ public class Form extends HtmlForm {
 						}
 
 						private String getActionURL(FacesContext context) {
- 							String requestURI = FacesLocal.getRequestURI(context);
-							String contextPath = FacesLocal.getRequestContextPath(context);
+ 							String requestURI = coalesce(getForwardRequestURI(context), getRequestURI(context));
+							String contextPath = getRequestContextPath(context);
 
 							// Request URI may refer /WEB-INF when request is dispatched to an error page.
 							String actionURL = requestURI.startsWith(contextPath + "/WEB-INF/") ? contextPath : requestURI;
