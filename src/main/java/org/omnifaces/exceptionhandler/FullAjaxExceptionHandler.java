@@ -163,6 +163,7 @@ import org.omnifaces.util.Hacks;
  * <li>{@link #findExceptionRootCause(FacesContext, Throwable)}
  * <li>{@link #shouldHandleExceptionRootCause(FacesContext, Throwable)}
  * <li>{@link #findErrorPageLocation(FacesContext, Throwable)}
+ * <li>{@link #logException(FacesContext, Throwable, String, LogReason)}
  * <li>{@link #logException(FacesContext, Throwable, String, String, Object...)}
  * </ul>
  * <p>
@@ -175,15 +176,51 @@ import org.omnifaces.util.Hacks;
  */
 public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
-	// Private constants ----------------------------------------------------------------------------------------------
-
-	private static final Logger logger = Logger.getLogger(FullAjaxExceptionHandler.class.getName());
+	// Public constants -----------------------------------------------------------------------------------------------
 
 	/**
 	 * The context parameter name to specify additional exception types to unwrap by both {@link FullAjaxExceptionHandler}
 	 * and {@link FacesExceptionFilter}. Those will be added to exception types {@link FacesException} and {@link ELException}.
 	 */
 	public static final String PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP = "org.omnifaces.EXCEPTION_TYPES_TO_UNWRAP";
+
+	/**
+	 * This is used in {@link FullAjaxExceptionHandler#logException(FacesContext, Throwable, String, LogReason)}.
+	 *
+	 * @author Bauke Scholtz
+	 * @since 2.4
+	 */
+	protected enum LogReason {
+		/** An exception occurred during processing JSF ajax request. Error page will be shown. */
+		EXCEPTION_HANDLED(LOG_EXCEPTION_HANDLED),
+
+		/** An exception occurred during rendering JSF ajax request. Error page will be shown. */
+		RENDER_EXCEPTION_HANDLED(LOG_RENDER_EXCEPTION_HANDLED),
+
+		/** An exception occurred during rendering JSF ajax request. Error page CANNOT be shown as response is already committed. */
+		RENDER_EXCEPTION_UNHANDLED(LOG_RENDER_EXCEPTION_UNHANDLED),
+
+		/** Another exception occurred during rendering error page. A hardcoded error page will be shown. */
+		ERROR_PAGE_ERROR(LOG_ERROR_PAGE_ERROR);
+
+		private final String message;
+
+		private LogReason(String message) {
+			this.message = message;
+		}
+
+		/**
+		 * Returns the default message associated with the log reason.
+		 * @return The default message associated with the log reason.
+		 */
+		public String getMessage() {
+			return message;
+		}
+	}
+
+	// Private constants ----------------------------------------------------------------------------------------------
+
+	private static final Logger logger = Logger.getLogger(FullAjaxExceptionHandler.class.getName());
 
 	private static final Set<Class<? extends Throwable>> STANDARD_TYPES_TO_UNWRAP =
 		unmodifiableSet(FacesException.class, ELException.class);
@@ -373,6 +410,20 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	}
 
 	/**
+	 * Log the thrown exception and determined error page location for the given log reason.
+	 * The default implementation delegates to {@link #logException(FacesContext, Throwable, String, String, Object...)}
+	 * with the default message associated with the log reason.
+	 * @param context The involved faces context.
+	 * @param exception The exception to log.
+	 * @param location The error page location.
+	 * @param reason The log reason.
+	 * @since 2.4
+	 */
+	protected void logException(FacesContext context, Throwable exception, String location, LogReason reason) {
+		logException(context, exception, location, reason.getMessage());
+	}
+
+	/**
 	 * Log the thrown exception and determined error page location with the given message, optionally parameterized
 	 * with the given parameters.
 	 * The default implementation logs through <code>java.util.logging</code> as SEVERE.
@@ -389,16 +440,16 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
 	private boolean canRenderErrorPageView(FacesContext context, Throwable exception, String errorPageLocation) {
 		if (context.getCurrentPhaseId() != PhaseId.RENDER_RESPONSE) {
-			logException(context, exception, errorPageLocation, LOG_EXCEPTION_HANDLED);
+			logException(context, exception, errorPageLocation, LogReason.EXCEPTION_HANDLED);
 			return true;
 		}
 		else if (!context.getExternalContext().isResponseCommitted()) {
-			logException(context, exception, errorPageLocation, LOG_RENDER_EXCEPTION_HANDLED);
+			logException(context, exception, errorPageLocation, LogReason.RENDER_EXCEPTION_HANDLED);
 			resetResponse(context); // If the exception was thrown in midst of rendering the JSF response, then reset (partial) response.
 			return true;
 		}
 		else {
-			logException(context, exception, errorPageLocation, LOG_RENDER_EXCEPTION_UNHANDLED);
+			logException(context, exception, errorPageLocation, LogReason.RENDER_EXCEPTION_UNHANDLED);
 
 			// Mojarra doesn't close the partial response during render exception. Let do it ourselves.
 			OmniPartialViewContext.getCurrentInstance(context).closePartialResponse();
@@ -435,7 +486,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 		}
 		catch (Exception e) {
 			// Apparently, the error page itself contained an error.
-			logException(context, e, errorPageLocation, LOG_ERROR_PAGE_ERROR);
+			logException(context, e, errorPageLocation, LogReason.ERROR_PAGE_ERROR);
 			ExternalContext externalContext = context.getExternalContext();
 
 			if (!externalContext.isResponseCommitted()) {
