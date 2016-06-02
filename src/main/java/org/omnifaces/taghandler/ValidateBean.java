@@ -17,6 +17,7 @@ import static javax.faces.component.visit.VisitHint.SKIP_UNRENDERED;
 import static javax.faces.event.PhaseId.PROCESS_VALIDATIONS;
 import static javax.faces.event.PhaseId.RESTORE_VIEW;
 import static javax.faces.event.PhaseId.UPDATE_MODEL_VALUES;
+import static javax.faces.view.facelets.ComponentHandler.isNew;
 import static org.omnifaces.el.ExpressionInspector.getValueReference;
 import static org.omnifaces.util.Components.forEachComponent;
 import static org.omnifaces.util.Components.getClosestParent;
@@ -62,7 +63,6 @@ import javax.faces.event.PreValidateEvent;
 import javax.faces.event.SystemEventListener;
 import javax.faces.validator.Validator;
 import javax.faces.validator.ValidatorException;
-import javax.faces.view.facelets.ComponentHandler;
 import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
@@ -209,7 +209,7 @@ public class ValidateBean extends TagHandler {
 
 		FacesContext facesContext = context.getFacesContext();
 
-		if (!(ComponentHandler.isNew(parent) && facesContext.isPostback() && facesContext.getCurrentPhaseId() == RESTORE_VIEW)) {
+		if (!(isNew(parent) && facesContext.isPostback() && facesContext.getCurrentPhaseId() == RESTORE_VIEW)) {
 			return;
 		}
 
@@ -217,7 +217,7 @@ public class ValidateBean extends TagHandler {
 		disabled = getBoolean(context, getAttribute("disabled"));
 		method = ValidateMethod.of(getString(context, getAttribute("method")));
 		groups = getString(context, getAttribute("validationGroups"));
-		copier = getString(context, getAttribute("copier"));
+		copier = getAttribute("copier") == null? null : getAttribute("copier").getValue();
 
 		// We can't use getCurrentForm() or hasInvokedSubmit() before the component is added to view, because the client ID isn't available.
 		// Hence, we subscribe this check to after phase of restore view.
