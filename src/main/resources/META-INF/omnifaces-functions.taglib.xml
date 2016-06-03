@@ -230,6 +230,17 @@
 		<function-signature>boolean contains(java.lang.Object[], java.lang.Object)</function-signature>
 	</function>
 
+	<function>
+		<description>
+			<![CDATA[
+				Returns a copy of the array with items in reversed order.
+			]]>
+		</description>
+		<function-name>reverseArray</function-name>
+		<function-class>org.omnifaces.el.functions.Arrays</function-class>
+		<function-signature>java.lang.Object[] reverseArray(java.lang.Object[])</function-signature>
+	</function>
+
 	<!-- Converters =============================================================================================== -->
 
 	<function>
