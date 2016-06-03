@@ -38,9 +38,9 @@ OmniFaces.Unload = (function(window, document) {
 
 	/**
 	 * Initialize the unload event listener on the current document. This will check if XHR is supported and if the
-	 * current document has a JSF view state element. If so, then register the <code>beforeunload</code> event to send
-	 * a synchronous XHR request with the OmniFaces view scope ID and the JSF view state value as parameters. Also
-	 * register the <code>submit</code> event to disable the unload event listener.
+	 * current document has a JSF form with a view state element. If so, then register the <code>beforeunload</code>
+	 * event to send a synchronous XHR request with the OmniFaces view scope ID and the JSF view state value as
+	 * parameters. Also register the <code>submit</code> event to disable the unload event listener.
 	 * @param {string} id The OmniFaces view scope ID.
 	 */
 	self.init = function(id) {
@@ -48,9 +48,9 @@ OmniFaces.Unload = (function(window, document) {
 			return; // Native XHR not supported (IE6/7 not supported). End of story. Let session expiration do its job.
 		}
 
-		var viewState = getViewState();
+		var facesForm = getFacesForm();
 
-		if (!viewState) {
+		if (!facesForm) {
 			return; // No JSF form in the document? Why is it referencing a view scoped bean then? ;)
 		}
 
@@ -62,9 +62,9 @@ OmniFaces.Unload = (function(window, document) {
 
 			try {
 				var xhr = new XMLHttpRequest();
-				xhr.open("POST", window.location.href.split(/[?#;]/)[0], false);
+				xhr.open("POST", facesForm.action.split(/[?#;]/)[0], false);
 				xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-				xhr.send("omnifaces.event=unload&id=" + id + "&" + VIEW_STATE_PARAM + "=" + encodeURIComponent(viewState));
+				xhr.send("omnifaces.event=unload&id=" + id + "&" + VIEW_STATE_PARAM + "=" + encodeURIComponent(facesForm[VIEW_STATE_PARAM].value));
 			}
 			catch (e) {
 				// Fail silently. You never know.
@@ -99,15 +99,13 @@ OmniFaces.Unload = (function(window, document) {
 	// Private static functions ---------------------------------------------------------------------------------------
 
 	/**
-	 * Get the view state value from the current document.
-	 * @return {string} The view state value from the current document.
+	 * Get the first JSF form containing view state param from the current document.
+	 * @return {string} The first JSF form of the current document.
 	 */
-	function getViewState() {
+	function getFacesForm() {
 		for (var i = 0; i < document.forms.length; i++) {
-			var viewStateElement = document.forms[i][VIEW_STATE_PARAM];
-
-			if (viewStateElement) {
-				return viewStateElement.value;
+			if (document.forms[i][VIEW_STATE_PARAM]) {
+				return document.forms[i];
 			}
 		}
 
