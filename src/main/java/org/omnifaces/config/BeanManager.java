@@ -12,6 +12,9 @@
  */
 package org.omnifaces.config;
 
+import static org.omnifaces.util.Faces.getApplicationAttribute;
+import static org.omnifaces.util.Faces.hasContext;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -48,6 +51,7 @@ public enum BeanManager {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
+	private static final String WELD_BEAN_MANAGER = "org.jboss.weld.environment.servlet.javax.enterprise.inject.spi.BeanManager";
 	private static final Annotation[] NO_ANNOTATIONS = new Annotation[0];
 
 	private static final String ERROR_CDI_API_UNAVAILABLE =
@@ -98,6 +102,10 @@ public enum BeanManager {
 		}
 		catch (Exception | LinkageError e) {
 			throw new IllegalStateException(ERROR_JNDI_UNAVAILABLE, e);
+		}
+
+		if (beanManager == null && hasContext()) {
+			beanManager = getApplicationAttribute(WELD_BEAN_MANAGER);
 		}
 
 		if (beanManager == null) {

@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
-import javax.servlet.annotation.WebListener;
 
 import org.omnifaces.cdi.Eager;
 import org.omnifaces.cdi.eager.EagerBeansRepository;
@@ -46,7 +45,6 @@ import org.omnifaces.facesviews.FacesViews;
  * @author Bauke Scholtz
  * @since 2.0
  */
-@WebListener
 public class ApplicationListener extends DefaultServletContextListener {
 
 	// Constants ------------------------------------------------------------------------------------------------------
