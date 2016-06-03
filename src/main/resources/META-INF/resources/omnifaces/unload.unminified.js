@@ -100,7 +100,7 @@ OmniFaces.Unload = (function(window, document) {
 
 	/**
 	 * Get the first JSF form containing view state param from the current document.
-	 * @return {string} The first JSF form of the current document.
+	 * @return {HTMLFormElement} The first JSF form of the current document.
 	 */
 	function getFacesForm() {
 		for (var i = 0; i < document.forms.length; i++) {
