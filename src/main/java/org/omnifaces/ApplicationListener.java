@@ -57,10 +57,10 @@ public class ApplicationListener extends DefaultServletContextListener {
 
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
-		ServletContext servletContext = event.getServletContext();
-		checkCDIAvailable(servletContext);
+		checkCDIAvailable();
 
 		try {
+			ServletContext servletContext = event.getServletContext();
 			EagerBeansRepository.instantiateApplicationScopedAndRegisterListener(servletContext);
 			FacesViews.addMappings(servletContext);
 			CacheInitializer.loadProviderAndRegisterFilter(servletContext);
@@ -72,9 +72,9 @@ public class ApplicationListener extends DefaultServletContextListener {
 		}
 	}
 
-	private void checkCDIAvailable(ServletContext servletContext) {
+	private void checkCDIAvailable() {
 		try {
-			BeanManager.INSTANCE.init(servletContext);
+			BeanManager.INSTANCE.toString();
 		}
 		catch (Throwable e) {
 			logger.severe(""

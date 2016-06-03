@@ -17,8 +17,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Set;
 
-import javax.servlet.ServletContext;
-
 import org.omnifaces.ApplicationListener;
 import org.omnifaces.util.Beans;
 import org.omnifaces.util.JNDI;
@@ -43,13 +41,13 @@ public enum BeanManager {
 	// Enum singleton -------------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns the enum singleton instance.
+	 * Returns the lazily loaded enum singleton instance.
+	 * Throws {@link IllegalStateException} when initialization fails.
 	 */
 	INSTANCE;
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
-	private static final String WELD_BEAN_MANAGER = "org.jboss.weld.environment.servlet.javax.enterprise.inject.spi.BeanManager";
 	private static final Annotation[] NO_ANNOTATIONS = new Annotation[0];
 
 	private static final String ERROR_CDI_API_UNAVAILABLE =
@@ -63,24 +61,19 @@ public enum BeanManager {
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
-	private volatile Object beanManager;
+	private Object beanManager;
 	private Method getBeans;
 	private Method resolve;
 	private Method createCreationalContext;
 	private Method getReference;
 
-	// Init -----------------------------------------------------------------------------------------------------------
+	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Perform manual initialization with the given servlet context, if not already initialized yet.
-	 * @param servletContext The servlet context to obtain the BeanManager from, if necessary.
+	 * Perform automatic initialization whereby the bean manager is looked up from the JNDI.
 	 * @throws IllegalStateException When initialization fails.
 	 */
-	public void init(ServletContext servletContext) {
-		if (beanManager != null) {
-			return;
-		}
-
+	private BeanManager() {
 		Class<?> beanManagerClass, contextualClass, beanClass, creationalContextClass;
 
 		try {
@@ -105,10 +98,6 @@ public enum BeanManager {
 		}
 		catch (Exception | LinkageError e) {
 			throw new IllegalStateException(ERROR_JNDI_UNAVAILABLE, e);
-		}
-
-		if (beanManager == null) {
-			beanManager = servletContext.getAttribute(WELD_BEAN_MANAGER);
 		}
 
 		if (beanManager == null) {
