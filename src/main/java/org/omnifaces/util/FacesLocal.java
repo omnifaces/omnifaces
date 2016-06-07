@@ -785,7 +785,7 @@ public final class FacesLocal {
 	 * @see Faces#getRequestURL()
 	 */
 	public static String getRequestURL(FacesContext context) {
-		return getRequest(context).getRequestURL().toString();
+		return Servlets.getRequestURL(getRequest(context));
 	}
 
 	/**
@@ -793,7 +793,7 @@ public final class FacesLocal {
 	 * @see Faces#getRequestURI()
 	 */
 	public static String getRequestURI(FacesContext context) {
-		return getRequest(context).getRequestURI();
+		return Servlets.getRequestURI(getRequest(context));
 	}
 
 	/**
@@ -801,7 +801,7 @@ public final class FacesLocal {
 	 * @see Faces#getRequestQueryString()
 	 */
 	public static String getRequestQueryString(FacesContext context) {
-		return getRequest(context).getQueryString();
+		return Servlets.getRequestQueryString(getRequest(context));
 	}
 
 	/**
@@ -831,7 +831,10 @@ public final class FacesLocal {
 	/**
 	 * {@inheritDoc}
 	 * @see Faces#getForwardRequestURI()
+	 * @deprecated Since 2.4. This is abstracted away by {@link #getRequestURI(FacesContext)}. Use it instead.
+	 * JSF has as to retrieving request URI no business of knowing if the request is forwarded/rewritten or not.
 	 */
+	@Deprecated // TODO: Remove in OmniFaces 3.0.
 	public static String getForwardRequestURI(FacesContext context) {
 		return Servlets.getForwardRequestURI(getRequest(context));
 	}
@@ -839,7 +842,10 @@ public final class FacesLocal {
 	/**
 	 * {@inheritDoc}
 	 * @see Faces#getForwardRequestQueryString()
+	 * @deprecated Since 2.4. This is abstracted away by {@link #getRequestQueryString(FacesContext)}. Use it instead.
+	 * JSF has as to retrieving request URI no business of knowing if the request is forwarded/rewritten or not.
 	 */
+	@Deprecated // TODO: Remove in OmniFaces 3.0.
 	public static String getForwardRequestQueryString(FacesContext context) {
 		return Servlets.getForwardRequestQueryString(getRequest(context));
 	}
@@ -847,7 +853,10 @@ public final class FacesLocal {
 	/**
 	 * {@inheritDoc}
 	 * @see Faces#getForwardRequestURIWithQueryString()
+	 * @deprecated Since 2.4. This is abstracted away by {@link #getRequestURIWithQueryString(FacesContext)}. Use it instead.
+	 * JSF has as to retrieving request URI no business of knowing if the request is forwarded/rewritten or not.
 	 */
+	@Deprecated // TODO: Remove in OmniFaces 3.0.
 	public static String getForwardRequestURIWithQueryString(FacesContext context) {
 		return Servlets.getForwardRequestURIWithQueryString(getRequest(context));
 	}
