@@ -18,6 +18,7 @@ import static java.util.regex.Pattern.quote;
 import static javax.faces.application.ProjectStage.Development;
 import static javax.faces.application.ProjectStage.PROJECT_STAGE_JNDI_NAME;
 import static javax.faces.application.ProjectStage.PROJECT_STAGE_PARAM_NAME;
+import static javax.servlet.RequestDispatcher.ERROR_REQUEST_URI;
 import static javax.servlet.RequestDispatcher.FORWARD_QUERY_STRING;
 import static javax.servlet.RequestDispatcher.FORWARD_REQUEST_URI;
 import static org.omnifaces.util.JNDI.lookup;
@@ -140,16 +141,17 @@ public final class Servlets {
 	}
 
 	/**
-	 * Returns the HTTP request URI, regardless of any forward. This is the part after the domain in the request URL,
-	 * including the leading slash.
+	 * Returns the HTTP request URI, regardless of any forward or error dispatch. This is the part after the domain in
+	 * the request URL, including the leading slash.
 	 * @param request The involved HTTP servlet request.
-	 * @return The HTTP request URI, regardless of any forward.
+	 * @return The HTTP request URI, regardless of any forward or error dispatch.
 	 * @since 2.4
 	 * @see HttpServletRequest#getRequestURI()
 	 * @see RequestDispatcher#FORWARD_REQUEST_URI
+	 * @see RequestDispatcher#ERROR_REQUEST_URI
 	 */
 	public static String getRequestURI(HttpServletRequest request) {
-		return coalesce((String) request.getAttribute(FORWARD_REQUEST_URI), request.getRequestURI());
+		return coalesce((String) request.getAttribute(ERROR_REQUEST_URI), (String) request.getAttribute(FORWARD_REQUEST_URI), request.getRequestURI());
 	}
 
 	/**
