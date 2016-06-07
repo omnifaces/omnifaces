@@ -24,6 +24,8 @@ import static org.omnifaces.util.Faces.getRequestParameter;
 import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.Faces.setContext;
 import static org.omnifaces.util.FacesLocal.getRenderKit;
+import static org.omnifaces.util.FacesLocal.getRequestQueryStringMap;
+import static org.omnifaces.util.FacesLocal.getViewParameterMap;
 import static org.omnifaces.util.FacesLocal.normalizeViewId;
 import static org.omnifaces.util.Renderers.RENDERER_TYPE_JS;
 import static org.omnifaces.util.Utils.isEmpty;
@@ -37,6 +39,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1016,6 +1019,43 @@ public final class Components {
 		else {
 			return Collections.emptyList();
 		}
+	}
+
+	/**
+	 * Returns an unmodifiable map with all request query string or view parameters, appended with all child
+	 * {@link UIParameter} components (<code>&lt;f|o:param&gt;</code>) of the given parent component. Those with
+	 * <code>disabled=true</code> or an empty name or an empty value are skipped. The <code>&lt;f|o:param&gt;</code>
+	 * will override any included view or request parameters on the same name.
+	 * @param component The parent component to retrieve all child {@link UIParameter} components from.
+	 * @return An unmodifiable list with all child {@link UIParameter} components having a non-empty name and not
+	 * disabled.
+	 * @since 2.4
+	 */
+	public static Map<String, List<String>> getParams(UIComponent component, boolean includeRequestParams, boolean includeViewParams) {
+		FacesContext context = FacesContext.getCurrentInstance();
+		Map<String, List<String>> params;
+
+		if (includeRequestParams) {
+			params = getRequestQueryStringMap(context);
+		}
+		else if (includeViewParams) {
+			params = getViewParameterMap(context);
+		}
+		else {
+			params = new LinkedHashMap<>(0);
+		}
+
+		for (ParamHolder param : getParams(component)) {
+			Object value = param.getValue();
+
+			if (isEmpty(value)) {
+				continue;
+			}
+
+			params.put(param.getName(), asList(value.toString()));
+		}
+
+		return Collections.unmodifiableMap(params);
 	}
 
 	// Expressions ----------------------------------------------------------------------------------------------------

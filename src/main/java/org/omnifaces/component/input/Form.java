@@ -13,24 +13,15 @@
 package org.omnifaces.component.input;
 
 import static java.lang.Boolean.FALSE;
-import static java.util.Arrays.asList;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeRequestParams;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeViewParams;
 import static org.omnifaces.component.input.Form.PropertyKeys.useRequestURI;
-import static org.omnifaces.util.Components.getParams;
-import static org.omnifaces.util.FacesLocal.getForwardRequestURI;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
-import static org.omnifaces.util.FacesLocal.getRequestQueryStringMap;
 import static org.omnifaces.util.FacesLocal.getRequestURI;
-import static org.omnifaces.util.FacesLocal.getViewParameterMap;
 import static org.omnifaces.util.Servlets.toQueryString;
-import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 import javax.faces.application.Application;
 import javax.faces.application.ApplicationWrapper;
@@ -44,8 +35,8 @@ import javax.faces.component.html.HtmlForm;
 import javax.faces.context.FacesContext;
 import javax.faces.context.FacesContextWrapper;
 
-import org.omnifaces.component.ParamHolder;
 import org.omnifaces.taghandler.IgnoreValidationFailed;
+import org.omnifaces.util.Components;
 import org.omnifaces.util.State;
 
 /**
@@ -173,35 +164,6 @@ public class Form extends HtmlForm {
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
 		super.encodeBegin(new ActionURLDecorator(context, this));
-	}
-
-	/**
-	 * Collect the necessary parameters for query string in action URL.
-	 */
-	private Map<String, List<String>> collectParams(FacesContext context) {
-		Map<String, List<String>> params;
-
-		if (isUseRequestURI() || isIncludeRequestParams()) {
-			params = getRequestQueryStringMap(context);
-		}
-		else if (isIncludeViewParams()) {
-			params = getViewParameterMap(context);
-		}
-		else {
-			params = new LinkedHashMap<>(0);
-		}
-
-		for (ParamHolder param : getParams(this)) {
-			Object value = param.getValue();
-
-			if (isEmpty(value)) {
-				continue;
-			}
-
-			params.put(param.getName(), asList(value.toString()));
-		}
-
-		return params;
 	}
 
 	// Getters/setters ------------------------------------------------------------------------------------------------
@@ -353,12 +315,12 @@ public class Form extends HtmlForm {
 						@Override
 						public String getActionURL(FacesContext context, String viewId) {
 							String url = form.isUseRequestURI() ? getActionURL(context) : super.getActionURL(context, viewId);
-							String queryString = toQueryString(form.collectParams(context));
+							String queryString = toQueryString(Components.getParams(form, form.isUseRequestURI() || form.isIncludeRequestParams(), form.isIncludeViewParams()));
 							return isEmpty(queryString) ? url : url + (url.contains("?") ? "&" : "?") + queryString;
 						}
 
 						private String getActionURL(FacesContext context) {
- 							String requestURI = coalesce(getForwardRequestURI(context), getRequestURI(context));
+ 							String requestURI = getRequestURI(context);
 							String contextPath = getRequestContextPath(context);
 
 							// Request URI may refer /WEB-INF when request is dispatched to an error page.
