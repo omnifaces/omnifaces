@@ -13,6 +13,7 @@
 package org.omnifaces.component.output;
 
 import static java.lang.Boolean.FALSE;
+import static org.omnifaces.util.Components.getParams;
 import static org.omnifaces.util.Faces.getRequestDomainURL;
 import static org.omnifaces.util.FacesLocal.getBookmarkableURL;
 import static org.omnifaces.util.FacesLocal.getRequestDomainURL;
@@ -26,7 +27,6 @@ import javax.el.ValueExpression;
 import javax.faces.component.FacesComponent;
 import javax.faces.context.FacesContext;
 
-import org.omnifaces.util.Components;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.State;
 
@@ -34,8 +34,13 @@ import org.omnifaces.util.State;
  * <p>
  * The <code>&lt;o:url&gt;</code> is a component which renders the given JSF view ID as a bookmarkable URL with support
  * for exposing it into the request scope by the variable name as specified by the <code>var</code> attribute instead of
- * rendering it. This component also supports adding query string parameters to the URL via nested
- * <code>&lt;f:param&gt;</code> and <code>&lt;o:param&gt;</code>.
+ * rendering it.
+ * <p>
+ * This component also supports adding query string parameters to the URL via nested <code>&lt;f:param&gt;</code> and
+ * <code>&lt;o:param&gt;</code>. This can be used in combination with <code>includeViewParams</code> and
+ * <code>includeRequestParams</code>. The <code>&lt;f|o:param&gt;</code> will override any included view or request
+ * parameters on the same name. To conditionally add or override, use the <code>disabled</code> attribute of
+ * <code>&lt;f|o:param&gt;</code>.
  * <p>
  * This component fills the gap caused by absence of JSTL <code>&lt;c:url&gt;</code> in Facelets. This component is
  * useful for generating URLs for usage in e.g. plain HTML <code>&lt;link&gt;</code> elements and JavaScript variables.
@@ -66,6 +71,7 @@ import org.omnifaces.util.State;
  * &lt;p&gt;Full URL of current page is: &lt;o:url /&gt;&lt;/p&gt;
  * &lt;p&gt;Full URL of another page is: &lt;o:url viewId="/another.xhtml" /&gt;&lt;/p&gt;
  * &lt;p&gt;Full URL of current page including view params is: &lt;o:url includeViewParams="true" /&gt;&lt;/p&gt;
+ * &lt;p&gt;Full URL of current page including query string is: &lt;o:url includeRequestParams="true" /&gt;&lt;/p&gt;
  * &lt;p&gt;Domain-relative URL of current page is: &lt;o:url domain="/" /&gt;&lt;/p&gt;
  * &lt;p&gt;Scheme-relative URL of current page is: &lt;o:url domain="//" /&gt;&lt;/p&gt;
  * &lt;p&gt;Scheme-relative URL of current page on a different domain is: &lt;o:url domain="sub.example.com" /&gt;&lt;/p&gt;
@@ -108,7 +114,8 @@ public class Url extends OutputFamily {
 		var,
 		domain,
 		viewId,
-		includeViewParams;
+		includeViewParams,
+		includeRequestParams;
 	}
 
 	// Variables ------------------------------------------------------------------------------------------------------
@@ -141,7 +148,7 @@ public class Url extends OutputFamily {
 
 	@Override
 	public void encodeEnd(FacesContext context) throws IOException {
-		String url = getBookmarkableURL(context, getViewId(), Components.getParams(this), isIncludeViewParams());
+		String url = getBookmarkableURL(context, getViewId(), getParams(this, isIncludeRequestParams(), isIncludeViewParams()), false);
 		String domain = getDomain();
 
 		if (domain.equals("//")) {
@@ -220,6 +227,7 @@ public class Url extends OutputFamily {
 
 	/**
 	 * Returns whether or not the view parameters should be encoded into the URL. Defaults to <code>false</code>.
+	 * This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
 	 * @return Whether or not the view parameters should be encoded into the URL.
 	 */
 	public boolean isIncludeViewParams() {
@@ -228,10 +236,29 @@ public class Url extends OutputFamily {
 
 	/**
 	 * Sets whether or not the view parameters should be encoded into the URL.
+	 * This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
 	 * @param includeViewParams Whether or not the view parameters should be encoded into the URL.
 	 */
 	public void setIncludeViewParams(boolean includeViewParams) {
 		state.put(PropertyKeys.includeViewParams, includeViewParams);
+	}
+
+	/**
+	 * Returns whether or not the request query string parameters should be encoded into the URL. Defaults to <code>false</code>.
+	 * When set to <code>true</code>, then this will override the <code>includeViewParams</code> setting.
+	 * @return Whether or not the request query string parameters should be encoded into the URL.
+	 */
+	public boolean isIncludeRequestParams() {
+		return state.get(PropertyKeys.includeRequestParams, FALSE);
+	}
+
+	/**
+	 * Sets whether or not the request query string parameters should be encoded into the URL.
+	 * When set to <code>true</code>, then this will override the <code>includeViewParams</code> setting.
+	 * @param includeRequestParams Whether or not the request query string parameters should be encoded into the URL.
+	 */
+	public void setIncludeRequestParams(boolean includeRequestParams) {
+		state.put(PropertyKeys.includeRequestParams, includeRequestParams);
 	}
 
 }

@@ -3177,9 +3177,22 @@ public class ValidateValuesBean implements MultiFieldValidator {
 				<![CDATA[
 					Whether to include view parameters in the URL.
 					Defaults to false.
+					This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
 				]]>
 			</description>
 			<name>includeViewParams</name>
+			<required>false</required>
+			<type>boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether to include request query string parameters in the URL.
+					Defaults to false.
+					When this setting is set to <code>true</code>, <code>includeViewParams</code> is ignored.
+				]]>
+			</description>
+			<name>includeRequestParams</name>
 			<required>false</required>
 			<type>boolean</type>
 		</attribute>

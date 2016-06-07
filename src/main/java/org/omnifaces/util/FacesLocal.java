@@ -548,7 +548,9 @@ public final class FacesLocal {
 
 		if (params != null) {
 			for (Entry<String, List<String>> param : params.entrySet()) {
-				addParamToMapIfNecessary(map, param.getKey(), param.getValue());
+				for (String value : param.getValue()) {
+					addParamToMapIfNecessary(map, param.getKey(), value);
+				}
 			}
 		}
 
