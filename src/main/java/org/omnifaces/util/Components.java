@@ -1027,8 +1027,11 @@ public final class Components {
 	 * <code>disabled=true</code> or an empty name or an empty value are skipped. The <code>&lt;f|o:param&gt;</code>
 	 * will override any included view or request parameters on the same name.
 	 * @param component The parent component to retrieve all child {@link UIParameter} components from.
-	 * @return An unmodifiable list with all child {@link UIParameter} components having a non-empty name and not
-	 * disabled.
+	 * @param includeRequestParams Whether or not to include request query string parameters.
+	 * When set to <code>true</code>, then this overrides the <code>includeViewParams</code>.
+	 * @param includeViewParams Whether or not to include view parameters.
+	 * @return An unmodifiable list with all request query string or view parameters, appended with all child
+	 * {@link UIParameter} components having a non-empty name and not disabled.
 	 * @since 2.4
 	 */
 	public static Map<String, List<String>> getParams(UIComponent component, boolean includeRequestParams, boolean includeViewParams) {
