@@ -12,6 +12,7 @@
  */
 package org.omnifaces.cdi.param;
 
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Set;
@@ -44,8 +45,12 @@ public class ParamExtension implements Extension {
 
 	public <T> void collect(@Observes ProcessManagedBean<T> event) {
 		for (AnnotatedField<? super T> field : event.getAnnotatedBeanClass().getFields()) {
-			if (field.isAnnotationPresent(Param.class) && field.getBaseType() instanceof Class) {
-				types.add(field.getBaseType());
+			if (field.isAnnotationPresent(Param.class)) {
+				Type type = field.getBaseType();
+
+				if (type instanceof Class || type instanceof ParameterizedType) {
+					types.add(type);
+				}
 			}
 		}
 	}

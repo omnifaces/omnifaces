@@ -16,6 +16,7 @@ import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.List;
 
 import org.omnifaces.cdi.Param;
@@ -36,7 +37,7 @@ public class ParamValue<V> implements Serializable {
 
 	private final String[] submittedValues;
 	private final Param param;
-	private final Class<V> targetType;
+	private final Type type;
 
 	private transient List<V> values;
 	private transient V firstValue;
@@ -45,10 +46,10 @@ public class ParamValue<V> implements Serializable {
 	private boolean valuesAreSerializable;
 	private List<V> serializableValues;
 
-	public ParamValue(String[] submittedValues, Param param, Class<V> targetType, List<V> values) {
+	public ParamValue(String[] submittedValues, Param param, Type type, List<V> values) {
 		this.submittedValues = submittedValues;
 		this.param = param;
-		this.targetType = targetType;
+		this.type = type;
 		setValues(values);
 
 		if (firstValue == null || firstValue instanceof Serializable) {
@@ -84,15 +85,11 @@ public class ParamValue<V> implements Serializable {
 			}
 			else {
 				// The original value was NOT serializable so we need to generate it from the raw submitted value again.
-				setValues(RequestParameterProducer.<V>getConvertedValues(getContext(), param, "param", submittedValues, targetType));
+				setValues(RequestParameterProducer.<V>getConvertedValues(getContext(), param, "param", submittedValues, type));
 			}
 		}
 
-		if (values != null && targetType.isArray()) {
-			return (V) RequestParameterProducer.toArray(values, targetType);
-		}
-
-		return firstValue;
+		return (V) RequestParameterProducer.coerceMultipleValues(values, firstValue, type);
 	}
 
 	public String getSubmittedValue() {

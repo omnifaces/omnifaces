@@ -81,21 +81,21 @@ public class RequestParameterProducer {
 		Param param = getQualifier(injectionPoint, Param.class);
 		String name = getName(param, injectionPoint);
 		String label = getLabel(param, injectionPoint);
-		Class<V> targetType = getTargetType(injectionPoint);
+		Type type = injectionPoint.getType();
 
 		FacesContext context = FacesContext.getCurrentInstance();
 		String[] submittedValues = getRequestParameterValues(context, name);
-		List<V> convertedValues = getConvertedValues(context, param, label, submittedValues, targetType);
+		List<V> convertedValues = getConvertedValues(context, param, label, submittedValues, type);
 
 		if (!validateValues(context, param, label, submittedValues, convertedValues, injectionPoint)) {
 			convertedValues = null;
 		}
 
-		return new ParamValue<>(submittedValues, param, targetType, convertedValues);
+		return new ParamValue<>(submittedValues, param, type, convertedValues);
 	}
 
 	@SuppressWarnings("unchecked")
-	static <V> List<V> getConvertedValues(FacesContext context, Param param, String label, String[] submittedValues, Class<?> targetType) {
+	static <V> List<V> getConvertedValues(FacesContext context, Param param, String label, String[] submittedValues, Type type) {
 		List<V> convertedValues = null;
 		boolean valid = true;
 
@@ -106,7 +106,7 @@ public class RequestParameterProducer {
 
 			try {
 				component.getAttributes().put("label", label);
-				Converter converter = getConverter(param, targetType);
+				Converter converter = getConverter(param, getTargetType(type));
 
 				for (String submittedValue : submittedValues) {
 					try {
@@ -136,9 +136,25 @@ public class RequestParameterProducer {
 		return convertedValues;
 	}
 
-	@SuppressWarnings("unchecked")
-	static <V> V[] toArray(List<V> convertedValues, Class<V> targetType) {
-		return convertedValues.toArray((V[]) Array.newInstance(targetType.getComponentType(), convertedValues.size()));
+	static Object coerceMultipleValues(List<?> values, Object first, Type type) {
+		if (values == null) {
+			return null;
+		}
+		else if (type instanceof ParameterizedType) {
+			return coerceMultipleValues(values, first, ((ParameterizedType) type).getRawType());
+		}
+		if (type instanceof Class) {
+			Class<?> cls = (Class<?>) type;
+
+			if (cls.isArray()) {
+				return values.toArray((Object[]) Array.newInstance(cls.getComponentType(), values.size()));
+			}
+			else if (List.class.isAssignableFrom(cls)) {
+				return values;
+			}
+		}
+
+		return first;
 	}
 
 	private static <V> boolean validateValues(FacesContext context, Param param, String label, String[] submittedValues, List<V> convertedValues, InjectionPoint injectionPoint) {
@@ -221,7 +237,7 @@ public class RequestParameterProducer {
 
 		if (converter == null) {
 			try {
-				converter = getApplication().createConverter(targetType.isArray() ? targetType.getComponentType() : targetType);
+				converter = getApplication().createConverter(targetType);
 			} catch (Exception e) {
 				return null;
 			}
@@ -235,17 +251,16 @@ public class RequestParameterProducer {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static <V> Class<V> getTargetType(InjectionPoint injectionPoint) {
-		Type type = injectionPoint.getType();
-		if (type instanceof ParameterizedType) {
-			// Assumes ParamValue now. Needs to be adjusted later.
-			return (Class<V>) ((ParameterizedType) type).getActualTypeArguments()[0];
-		} else if (type instanceof Class) {
-			// Direct injection into class type using dynamic producer
-			return  (Class<V>)  type;
+	private static <V> Class<V> getTargetType(Type type) {
+		if (type instanceof Class && ((Class<?>) type).isArray()) {
+			return (Class<V>) ((Class<?>) type).getComponentType();
 		}
-
-		return null;
+		else if (type instanceof ParameterizedType) {
+			return (Class<V>) ((ParameterizedType) type).getActualTypeArguments()[0];
+		}
+		else {
+			return (Class<V>) type;
+		}
 	}
 
 	private static String getName(Param requestParameter, InjectionPoint injectionPoint) {
@@ -322,12 +337,11 @@ public class RequestParameterProducer {
 		Class<?> base = injectionPoint.getBean().getBeanClass();
 		String property = injectionPoint.getMember().getName();
 		Type type = injectionPoint.getType();
-		Class<V> targetType = getTargetType(injectionPoint);
 
 		// Check if the target property in which we are injecting in our special holder/wrapper type
 		// ParamValue or not. If it's the latter, pre-wrap our value (otherwise types for bean validation
 		// would not match)
-		Object valueToValidate = (values == null) ? null : targetType.isArray() ? toArray(values, targetType) : values.get(0);
+		Object valueToValidate = coerceMultipleValues(values, values.get(0), type);
 
 		if (type instanceof ParameterizedType) {
 			Type propertyRawType = ((ParameterizedType) type).getRawType();

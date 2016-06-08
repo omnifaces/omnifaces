@@ -60,9 +60,12 @@ import org.omnifaces.util.Utils;
  * private String bar;
  * </pre>
  * <p>
- * Multi-valued parameters are also supported by specifying an array type. The support was added in OmniFaces 2.4.
- * Generic collection types like {@link List} are currently not supported.
+ * Multi-valued parameters are also supported by specifying a {@link List} or array type. The support was added in
+ * OmniFaces 2.4.
  * <pre>
+ * &#64;Inject &#64;Param(name="foo")
+ * private List&lt;String&gt; foos;
+ *
  * &#64;Inject &#64;Param(name="bar")
  * private String[] bars;
  * </pre>
@@ -85,7 +88,7 @@ import org.omnifaces.util.Utils;
  * This also works on multi-valued parameters.
  * <pre>
  * &#64;Inject &#64;Param(name="user", converter="userConverter")
- * private User[] users;
+ * private List&lt;User&gt; users;
  * </pre>
  * <p>
  * On multi-valued parameters, JSF native conversion and validation will run on each submitted value. Bean Validation,
