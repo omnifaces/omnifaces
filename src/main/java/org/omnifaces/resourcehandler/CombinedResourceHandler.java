@@ -581,7 +581,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 				componentResource.getAttributes().put("name", infoBuilder.create() + extension);
 				componentResource.setRendererType(rendererType);
 
-				if (rendererType == RENDERER_TYPE_JS) {
+				if (RENDERER_TYPE_JS.equals(rendererType)) {
 					componentResource.getPassThroughAttributes().put("crossorigin", "anonymous");
 				}
 			}

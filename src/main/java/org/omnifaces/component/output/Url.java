@@ -161,7 +161,7 @@ public class Url extends OutputFamily {
 				new URL(normalizedDomain.startsWith("//") ? ("http:" + normalizedDomain) : normalizedDomain);
 			}
 			catch (MalformedURLException e) {
-				throw new IllegalArgumentException(String.format(ERROR_INVALID_DOMAIN, domain));
+				throw new IllegalArgumentException(String.format(ERROR_INVALID_DOMAIN, domain), e);
 			}
 
 			url = normalizedDomain + (normalizedDomain.endsWith("/") ? url.substring(1) : url);

@@ -144,7 +144,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private final State state = new State(getStateHelper());
-	private TreeModel model;
+	private TreeModel currentModel;
 	private Map<Integer, TreeNode> nodes;
 	private TreeModel currentModelNode;
 
@@ -425,21 +425,21 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @throws IllegalArgumentException When the <code>value</code> isn't of type {@link TreeModel}.
 	 */
 	private TreeModel getModel(PhaseId phaseId) {
-		if (phaseId == PhaseId.RENDER_RESPONSE || model == null) {
+		if (phaseId == PhaseId.RENDER_RESPONSE || currentModel == null) {
 			Object value = getValue();
 
 			if (value == null) {
-				model = new ListTreeModel();
+				currentModel = new ListTreeModel();
 			}
 			else if (value instanceof TreeModel) {
-				model = (TreeModel) value;
+				currentModel = (TreeModel) value;
 			}
 			else {
 				throw new IllegalArgumentException(String.format(ERROR_INVALID_MODEL, value.getClass().getName()));
 			}
 		}
 
-		return model;
+		return currentModel;
 	}
 
 	/**
