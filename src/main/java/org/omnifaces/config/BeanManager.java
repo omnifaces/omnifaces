@@ -17,6 +17,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Set;
 
+import javax.servlet.ServletContext;
+
 import org.omnifaces.ApplicationListener;
 import org.omnifaces.util.Beans;
 import org.omnifaces.util.JNDI;
@@ -48,6 +50,7 @@ public enum BeanManager {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
+	private static final String WELD_BEAN_MANAGER = "org.jboss.weld.environment.servlet.javax.enterprise.inject.spi.BeanManager";
 	private static final Annotation[] NO_ANNOTATIONS = new Annotation[0];
 
 	private static final String ERROR_CDI_API_UNAVAILABLE =
@@ -61,7 +64,7 @@ public enum BeanManager {
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
-	private Object beanManager;
+	private volatile Object beanManager;
 	private Method getBeans;
 	private Method resolve;
 	private Method createCreationalContext;
@@ -100,10 +103,6 @@ public enum BeanManager {
 			throw new IllegalStateException(ERROR_JNDI_UNAVAILABLE, e);
 		}
 
-		if (beanManager == null) {
-			throw new IllegalStateException(ERROR_CDI_IMPL_UNAVAILABLE);
-		}
-
 		try {
 			getBeans = beanManagerClass.getMethod("getBeans", Type.class, Annotation[].class);
 			resolve = beanManagerClass.getMethod("resolve", Set.class);
@@ -112,6 +111,25 @@ public enum BeanManager {
 		}
 		catch (Exception e) {
 			throw new IllegalStateException(ERROR_INITIALIZATION_FAIL, e);
+		}
+	}
+
+	/**
+	 * Perform manual initialization whereby the bean manager is looked up from servlet context when not available.
+	 * @param servletContext The servlet context to obtain the BeanManager from, if necessary.
+	 * @throws IllegalStateException When initialization fails.
+	 */
+	public void init(ServletContext servletContext) {
+		if (beanManager != null) {
+			return;
+		}
+
+		if (beanManager == null) {
+			beanManager = servletContext.getAttribute(WELD_BEAN_MANAGER);
+		}
+
+		if (beanManager == null) {
+			throw new IllegalStateException(ERROR_CDI_IMPL_UNAVAILABLE);
 		}
 	}
 
