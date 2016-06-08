@@ -165,40 +165,14 @@ public class RequestParameterProducer {
 
 		try {
 			component.getAttributes().put("label", label);
+			valid = validateRequired(context, param, label, convertedValues);
 
-			// Check for required.
-			if (param.required() && isEmpty(convertedValues)) {
-				valid = false;
-				addRequiredMessage(context, component, label, getRequiredMessage(param));
+			if (valid) {
+				valid = validateBean(context, param, label, convertedValues, injectionPoint);
 			}
 
-			// Use Bean Validation.
-			if (shouldDoBeanValidation(param)) {
-				Set<ConstraintViolation<?>> violations = doBeanValidation(convertedValues, injectionPoint);
-
-				for (ConstraintViolation<?> violation : violations) {
-					valid = false;
-					context.addMessage(component.getClientId(context), createError(violation.getMessage(), label));
-				}
-			}
-
-			// Use JSF native validators.
-			if (convertedValues != null) {
-				for (Validator validator : getValidators(param)) {
-					int i = 0;
-
-					for (V convertedValue : convertedValues) {
-						try {
-							validator.validate(context, component, convertedValue);
-						}
-						catch (ValidatorException e) {
-							valid = false;
-							addValidatorMessages(context, component, label, submittedValues[i], e, getValidatorMessage(param));
-						}
-
-						i++;
-					}
-				}
+			if (valid && convertedValues != null) {
+				valid = validateFaces(context, param, label, convertedValues, submittedValues);
 			}
 		}
 		finally {
@@ -212,6 +186,53 @@ public class RequestParameterProducer {
 
 		if (!valid) {
 			context.validationFailed();
+		}
+
+		return valid;
+	}
+
+	private static <V> boolean validateRequired(FacesContext context, Param param, String label, List<V> convertedValues) {
+		if (param.required() && isEmpty(convertedValues)) {
+			addRequiredMessage(context, context.getViewRoot(), label, getRequiredMessage(param));
+			return false;
+		}
+
+		return true;
+	}
+
+	private static <V> boolean validateBean(FacesContext context, Param param, String label, List<V> convertedValues, InjectionPoint injectionPoint) {
+		if (shouldDoBeanValidation(param)) {
+			Set<ConstraintViolation<?>> violations = doBeanValidation(convertedValues, injectionPoint);
+
+			if (!violations.isEmpty()) {
+				for (ConstraintViolation<?> violation : violations) {
+					context.addMessage(context.getViewRoot().getClientId(context), createError(violation.getMessage(), label));
+				}
+
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private static <V> boolean validateFaces(FacesContext context, Param param, String label, List<V> convertedValues, String[] submittedValues) {
+		boolean valid = true;
+
+		for (Validator validator : getValidators(param)) {
+			int i = 0;
+
+			for (V convertedValue : convertedValues) {
+				try {
+					validator.validate(context, context.getViewRoot(), convertedValue);
+				}
+				catch (ValidatorException e) {
+					addValidatorMessages(context, context.getViewRoot(), label, submittedValues[i], e, getValidatorMessage(param));
+					valid = false;
+				}
+
+				i++;
+			}
 		}
 
 		return valid;

@@ -241,30 +241,41 @@ public final class Numbers {
 			return null;
 		}
 
-		int exp = (int) (Math.log(decimal.longValue()) / Math.log(base));
-		BigDecimal divided = decimal.divide(BigDecimal.valueOf(Math.pow(base, exp)));
+		return formatBase(decimal, base, fractions, iec, unit);
+	}
+
+	private static String formatBase(BigDecimal decimal, int base, Integer fractions, boolean iec, String unit) {
+		int exponent = (int) (Math.log(decimal.longValue()) / Math.log(base));
+		BigDecimal divided = decimal.divide(BigDecimal.valueOf(Math.pow(base, exponent)));
 		int maxfractions = (fractions != null) ? fractions : (PRECISION - String.valueOf(divided.longValue()).length());
-		String formatted = String.format(getLocale(), "%." + maxfractions + "f", divided);
+		BigDecimal formatted;
 
 		try {
 			DecimalFormat formatter = (DecimalFormat) NumberFormat.getNumberInstance(getLocale());
 			formatter.setParseBigDecimal(true);
-			decimal = (BigDecimal) formatter.parse(formatted);
+			formatted = (BigDecimal) formatter.parse(String.format(getLocale(), "%." + maxfractions + "f", divided));
 		}
 		catch (ParseException e) {
 			throw new IllegalStateException(e);
 		}
 
-		if (decimal.longValue() >= base) { // E.g. 999.5 becomes 1000 which needs to be reformatted as 1k.
-			return formatBaseUnit(decimal, base, fractions, iec, unit);
+		if (formatted.longValue() >= base) { // E.g. 999.5 becomes 1000 which needs to be reformatted as 1k.
+			return formatBase(formatted, base, fractions, iec, unit);
 		}
+		else {
+			return formatUnit(formatted, iec, unit, exponent, maxfractions > 0 && fractions == null);
+		}
+	}
 
-		if (maxfractions > 0 && fractions == null) {
+	private static String formatUnit(BigDecimal decimal, boolean iec, String unit, int exponent, boolean stripZeroes) {
+		String formatted = decimal.toString();
+
+		if (stripZeroes) {
 			formatted = formatted.replaceAll("\\D?0+$", "");
 		}
 
 		String separator = (unit == null) ? "" : " ";
-		String unitPrefix = ((exp > 0) ? ((iec ? "K" : "k") + "MGTPE").charAt(exp - 1) : "") + (iec ? "i" : "");
+		String unitPrefix = ((exponent > 0) ? ((iec ? "K" : "k") + "MGTPE").charAt(exponent - 1) : "") + (iec ? "i" : "");
 		String unitString = (unit == null) ? "" : unit;
 		return formatted + separator + unitPrefix + unitString;
 	}
