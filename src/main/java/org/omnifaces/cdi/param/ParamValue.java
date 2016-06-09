@@ -40,7 +40,6 @@ public class ParamValue<V> implements Serializable {
 	private final Type type;
 
 	private transient List<V> values;
-	private transient V firstValue;
 	private transient boolean valuesSet;
 
 	private boolean valuesAreSerializable;
@@ -52,7 +51,7 @@ public class ParamValue<V> implements Serializable {
 		this.type = type;
 		setValues(values);
 
-		if (firstValue == null || firstValue instanceof Serializable) {
+		if (isEmpty(values) || (values.get(0) instanceof Serializable)) {
 			valuesAreSerializable = true;
 			serializableValues = values;
 		}
@@ -60,7 +59,6 @@ public class ParamValue<V> implements Serializable {
 
 	private void setValues(List<V> values) {
 		this.values = values;
-		firstValue = isEmpty(values) ? null : values.get(0);
 		valuesSet = true;
 	}
 
@@ -89,7 +87,7 @@ public class ParamValue<V> implements Serializable {
 			}
 		}
 
-		return (V) RequestParameterProducer.coerceMultipleValues(values, firstValue, type);
+		return (V) RequestParameterProducer.coerceMultipleValues(values, type);
 	}
 
 	public String getSubmittedValue() {

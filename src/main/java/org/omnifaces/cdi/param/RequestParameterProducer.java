@@ -83,6 +83,10 @@ public class RequestParameterProducer {
 		String label = getLabel(param, injectionPoint);
 		Type type = injectionPoint.getType();
 
+		if (type instanceof ParameterizedType && ParamValue.class.isAssignableFrom((Class<?>) ((ParameterizedType) type).getRawType())) {
+			type = ((ParameterizedType) type).getActualTypeArguments()[0];
+		}
+
 		FacesContext context = FacesContext.getCurrentInstance();
 		String[] submittedValues = getRequestParameterValues(context, name);
 		List<V> convertedValues = getConvertedValues(context, param, label, submittedValues, type);
@@ -136,12 +140,12 @@ public class RequestParameterProducer {
 		return convertedValues;
 	}
 
-	static Object coerceMultipleValues(List<?> values, Object first, Type type) {
+	static Object coerceMultipleValues(List<?> values, Type type) {
 		if (values == null) {
 			return null;
 		}
 		else if (type instanceof ParameterizedType) {
-			return coerceMultipleValues(values, first, ((ParameterizedType) type).getRawType());
+			return coerceMultipleValues(values, ((ParameterizedType) type).getRawType());
 		}
 		if (type instanceof Class) {
 			Class<?> cls = (Class<?>) type;
@@ -154,7 +158,7 @@ public class RequestParameterProducer {
 			}
 		}
 
-		return first;
+		return values.isEmpty() ? null : values.get(0);
 	}
 
 	private static <V> boolean validateValues(FacesContext context, Param param, String label, String[] submittedValues, List<V> convertedValues, InjectionPoint injectionPoint) {
@@ -362,7 +366,7 @@ public class RequestParameterProducer {
 		// Check if the target property in which we are injecting in our special holder/wrapper type
 		// ParamValue or not. If it's the latter, pre-wrap our value (otherwise types for bean validation
 		// would not match)
-		Object valueToValidate = coerceMultipleValues(values, values.get(0), type);
+		Object valueToValidate = coerceMultipleValues(values, type);
 
 		if (type instanceof ParameterizedType) {
 			Type propertyRawType = ((ParameterizedType) type).getRawType();
