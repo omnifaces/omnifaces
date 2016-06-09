@@ -120,7 +120,11 @@ import org.omnifaces.config.FacesConfigXml;
  * <pre>
  * // Provide a file as attachment via output stream callback.
  * public void download() throws IOException {
- *     Faces.sendFile("file.ext", true, o -&gt; Files.copy(Paths.get("/path/to/file.ext"), o));
+ *     Faces.sendFile("file.txt", true, output -&gt; {
+ *         try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8))) {
+ *             writer.println("Hello world");
+ *         }
+ *     });
  * }
  * </pre>
  *
