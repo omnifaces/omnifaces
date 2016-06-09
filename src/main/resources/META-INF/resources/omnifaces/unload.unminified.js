@@ -31,6 +31,7 @@ OmniFaces.Unload = (function(window, document) {
 
 	// Private static fields ------------------------------------------------------------------------------------------
 
+	var id;
 	var disabled = false;
 	var self = {};
 
@@ -43,7 +44,7 @@ OmniFaces.Unload = (function(window, document) {
 	 * parameters. Also register the <code>submit</code> event to disable the unload event listener.
 	 * @param {string} id The OmniFaces view scope ID.
 	 */
-	self.init = function(id) {
+	self.init = function(viewScopeId) {
 		if (!window.XMLHttpRequest) {
 			return; // Native XHR not supported (IE6/7 not supported). End of story. Let session expiration do its job.
 		}
@@ -54,38 +55,42 @@ OmniFaces.Unload = (function(window, document) {
 			return; // No JSF form in the document? Why is it referencing a view scoped bean then? ;)
 		}
 
-		addEventListener(window, "beforeunload", function() {
-			if (disabled) {
-				disabled = false; // Just in case some custom JS explicitly triggered submit event while staying in same DOM.
-				return;
-			}
+		if (id == null) {
+			addEventListener(window, "beforeunload", function() {
+				if (disabled) {
+					disabled = false; // Just in case some custom JS explicitly triggered submit event while staying in same DOM.
+					return;
+				}
 
-			try {
-				var xhr = new XMLHttpRequest();
-				xhr.open("POST", facesForm.action.split(/[?#;]/)[0], false);
-				xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-				xhr.send("omnifaces.event=unload&id=" + id + "&" + VIEW_STATE_PARAM + "=" + encodeURIComponent(facesForm[VIEW_STATE_PARAM].value));
-			}
-			catch (e) {
-				// Fail silently. You never know.
-			}
-		});
+				try {
+					var xhr = new XMLHttpRequest();
+					xhr.open("POST", facesForm.action.split(/[?#;]/)[0], false);
+					xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+					xhr.send("omnifaces.event=unload&id=" + id + "&" + VIEW_STATE_PARAM + "=" + encodeURIComponent(facesForm[VIEW_STATE_PARAM].value));
+				}
+				catch (e) {
+					// Fail silently. You never know.
+				}
+			});
 
-		addEventListener(document, "submit", function() {
-			self.disable(); // Disable unload event on any (propagated!) submit event.
-		});
+			addEventListener(document, "submit", function() {
+				self.disable(); // Disable unload event on any (propagated!) submit event.
+			});
 
-		if (window.mojarra) {
-			decorateFacesSubmit(mojarra, "jsfcljs"); // Decorate Mojarra h:commandLink submit handler to disable unload event when invoked.
+			if (window.mojarra) {
+				decorateFacesSubmit(mojarra, "jsfcljs"); // Decorate Mojarra h:commandLink submit handler to disable unload event when invoked.
+			}
+			
+			if (window.myfaces) {
+	 			decorateFacesSubmit(myfaces.oam, "submitForm"); // Decorate MyFaces h:commandLink submit handler to disable unload event when invoked.
+			}
+			
+			if (window.PrimeFaces) {
+	 			decorateFacesSubmit(PrimeFaces, "addSubmitParam"); // Decorate PrimeFaces p:commandLink submit handler to disable unload event when invoked.
+			}
 		}
 		
-		if (window.myfaces) {
- 			decorateFacesSubmit(myfaces.oam, "submitForm"); // Decorate MyFaces h:commandLink submit handler to disable unload event when invoked.
-		}
-		
-		if (window.PrimeFaces) {
- 			decorateFacesSubmit(PrimeFaces, "addSubmitParam"); // Decorate PrimeFaces p:commandLink submit handler to disable unload event when invoked.
-		}
+		id = viewScopeId;
 	}
 
 	/**
