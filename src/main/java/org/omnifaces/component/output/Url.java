@@ -48,21 +48,28 @@ import org.omnifaces.util.State;
  * <h3>Domain</h3>
  * <p>
  * The domain of the URL defaults to the current domain. It is possible to provide a full qualified domain name (FQDN)
- * which the URL is prefixed with. This can be useful if a canonical page shall point to a different domain or a
- * specific subdomain.
+ * via the <code>domain</code> attribute which the URL is to be prefixed with. This can be useful if a canonical page
+ * shall point to a different domain or a specific subdomain.
  * <p>
- * Valid formats and values are:
+ * Valid formats and values for <code>domain</code> attribute are:
  * <ul>
- * <li><code>http://example.com</code></li>
- * <li><code>//example.com</code></li>
- * <li><code>example.com</code></li>
- * <li><code>/</code></li>
- * <li><code>//</code></li>
+ * <li><code>&lt;o:url domain="http://example.com" /&gt;</code></li>
+ * <li><code>&lt;o:url domain="//example.com" /&gt;</code></li>
+ * <li><code>&lt;o:url domain="example.com" /&gt;</code></li>
+ * <li><code>&lt;o:url domain="/" /&gt;</code></li>
+ * <li><code>&lt;o:url domain="//" /&gt;</code></li>
  * </ul>
  * <p>
- * The value will be validated by {@link URL}.
+ * The <code>domain</code> value will be validated by {@link URL} and throw an illegal argument exception when invalid.
  * If the value equals <code>/</code>, then the URL becomes domain-relative.
  * If the value equals or starts with <code>//</code>, or does not contain any scheme, then the URL becomes scheme-relative.
+ *
+ * <h3>Request and view parameters</h3>
+ * <p>You can optionally include all GET request query string parameters or only JSF view parameters in the resulting
+ * URL via <code>includeRequestParams="true"</code> or <code>includeViewParams="true"</code>.
+ * The <code>includeViewParams</code> is ignored when <code>includeRequestParams="true"</code>.
+ * The <code>&lt;f|o:param&gt;</code> will override any included request or view parameters on the same name.
+ *
  *
  * <h3>Usage</h3>
  * <p>
