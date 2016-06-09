@@ -48,9 +48,12 @@ public class ParamExtension implements Extension {
 			if (field.isAnnotationPresent(Param.class)) {
 				Type type = field.getBaseType();
 
-				if (type instanceof Class || type instanceof ParameterizedType) {
-					types.add(type);
+				// Skip ParamValue as it is already handled by RequestParameterProducer.
+				if (type instanceof ParameterizedType && ParamValue.class.isAssignableFrom((Class<?>) ((ParameterizedType) type).getRawType())) {
+					continue;
 				}
+
+				types.add(type);
 			}
 		}
 	}
