@@ -49,13 +49,13 @@ OmniFaces.Unload = (function(window, document) {
 			return; // Native XHR not supported (IE6/7 not supported). End of story. Let session expiration do its job.
 		}
 
-		var facesForm = getFacesForm();
-
-		if (!facesForm) {
-			return; // No JSF form in the document? Why is it referencing a view scoped bean then? ;)
-		}
-
 		if (id == null) {
+			var facesForm = getFacesForm();
+			
+			if (!facesForm) {
+				return; // No JSF form in the document? Why is it referencing a view scoped bean then? ;)
+			}
+			
 			addEventListener(window, "beforeunload", function() {
 				if (disabled) {
 					disabled = false; // Just in case some custom JS explicitly triggered submit event while staying in same DOM.
