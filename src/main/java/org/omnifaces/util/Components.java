@@ -1211,15 +1211,19 @@ public final class Components {
             String behaviorEvent = getRequestParameter("javax.faces.behavior.event");
 
             if (behaviorEvent != null) {
-                for (ClientBehavior behavior : ((ClientBehaviorHolder) component).getClientBehaviors().get(behaviorEvent)) {
-                    List<BehaviorListener> listeners = getField(BehaviorBase.class, List.class, behavior);
+            	List<ClientBehavior> behaviors = ((ClientBehaviorHolder) component).getClientBehaviors().get(behaviorEvent);
 
-                    if (listeners != null) {
-                        for (BehaviorListener listener : listeners) {
-                        	addExpressionStringIfNotNull(getField(listener.getClass(), MethodExpression.class, listener), actions);
-                        }
-                    }
-                }
+            	if (behaviors != null) {
+            		for (ClientBehavior behavior : behaviors) {
+            			List<BehaviorListener> listeners = getField(BehaviorBase.class, List.class, behavior);
+
+            			if (listeners != null) {
+            				for (BehaviorListener listener : listeners) {
+            					addExpressionStringIfNotNull(getField(listener.getClass(), MethodExpression.class, listener), actions);
+            				}
+            			}
+            		}
+            	}
             }
         }
 
