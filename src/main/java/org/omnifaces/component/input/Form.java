@@ -16,7 +16,6 @@ import static java.lang.Boolean.FALSE;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeRequestParams;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeViewParams;
 import static org.omnifaces.component.input.Form.PropertyKeys.useRequestURI;
-import static org.omnifaces.util.FacesLocal.getRequestContextPath;
 import static org.omnifaces.util.FacesLocal.getRequestURI;
 import static org.omnifaces.util.Servlets.toQueryString;
 import static org.omnifaces.util.Utils.isEmpty;
@@ -321,11 +320,7 @@ public class Form extends HtmlForm {
 
 						private String getActionURL(FacesContext context) {
  							String requestURI = getRequestURI(context);
-							String contextPath = getRequestContextPath(context);
-
-							// Request URI may refer /WEB-INF when request is dispatched to an error page.
-							String actionURL = requestURI.startsWith(contextPath + "/WEB-INF/") ? contextPath : requestURI;
-							return actionURL.isEmpty() ? "/" : actionURL;
+							return requestURI.isEmpty() ? "/" : requestURI;
 						}
 
 						@Override
