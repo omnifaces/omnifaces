@@ -17,17 +17,21 @@ import static org.omnifaces.util.Components.getParams;
 import static org.omnifaces.util.Faces.getRequestDomainURL;
 import static org.omnifaces.util.FacesLocal.getBookmarkableURL;
 import static org.omnifaces.util.FacesLocal.getRequestDomainURL;
+import static org.omnifaces.util.FacesLocal.getRequestURI;
 import static org.omnifaces.util.FacesLocal.setRequestAttribute;
+import static org.omnifaces.util.Servlets.toQueryString;
+import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 import javax.el.ValueExpression;
 import javax.faces.component.FacesComponent;
 import javax.faces.context.FacesContext;
 
-import org.omnifaces.util.Faces;
 import org.omnifaces.util.State;
 
 /**
@@ -155,7 +159,9 @@ public class Url extends OutputFamily {
 
 	@Override
 	public void encodeEnd(FacesContext context) throws IOException {
-		String url = getBookmarkableURL(context, getViewId(), getParams(this, isIncludeRequestParams(), isIncludeViewParams()), false);
+		String viewId = getViewId();
+		Map<String, List<String>> params = getParams(this, isIncludeRequestParams(), isIncludeViewParams());
+		String url = (viewId == null) ? getActionURL(context, params) : getBookmarkableURL(context, viewId, params, false);
 		String domain = getDomain();
 
 		if (domain.equals("//")) {
@@ -180,6 +186,13 @@ public class Url extends OutputFamily {
 		else {
 			context.getResponseWriter().writeText(url, null);
 		}
+	}
+
+	private static String getActionURL(FacesContext context, Map<String, List<String>> params) {
+		String url = getRequestURI(context);
+		url = url.isEmpty() ? "/" : url;
+		String queryString = toQueryString(params);
+		return isEmpty(queryString) ? url : url + (url.contains("?") ? "&" : "?") + queryString;
 	}
 
 	// Attribute getters/setters --------------------------------------------------------------------------------------
@@ -221,7 +234,7 @@ public class Url extends OutputFamily {
 	 * @return The view ID to create URL for.
 	 */
 	public String getViewId() {
-		return state.get(PropertyKeys.viewId, Faces.getViewId());
+		return state.get(PropertyKeys.viewId);
 	}
 
 	/**
