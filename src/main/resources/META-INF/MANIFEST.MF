@@ -1,3 +1,3 @@
 Manifest-Version: 1.0
-Specification-Version: 2.4-SNAPSHOT
+Specification-Version: 2.4-RC1
 Comment: This file exists because Eclipse 4.4 + M2E doesn't generate this file while building the showcase app, causing trouble in App#initVersion().
