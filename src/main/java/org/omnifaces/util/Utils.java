@@ -14,6 +14,7 @@ package org.omnifaces.util;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableMap;
 import static java.util.regex.Pattern.quote;
 
 import java.io.ByteArrayInputStream;
@@ -88,6 +89,19 @@ public final class Utils {
 	private static final int UNICODE_1_BYTE = 0xf;
 	private static final int UNICODE_END_PRINTABLE_ASCII = 0x7f;
 	private static final int UNICODE_BEGIN_PRINTABLE_ASCII = 0x20;
+	private static final Map<Class<?>, Object> PRIMITIVE_DEFAULTS = createPrimitiveDefaults();
+	private static Map<Class<?>, Object> createPrimitiveDefaults() {
+		Map<Class<?>, Object> primitiveDefaults = new HashMap<>();
+		primitiveDefaults.put(boolean.class, false);
+		primitiveDefaults.put(byte.class, (byte) 0);
+		primitiveDefaults.put(short.class, (short) 0);
+		primitiveDefaults.put(char.class, (char) 0);
+		primitiveDefaults.put(int.class, 0);
+		primitiveDefaults.put(long.class, (long) 0);
+		primitiveDefaults.put(float.class, (float) 0);
+		primitiveDefaults.put(double.class, (double) 0);
+		return unmodifiableMap(primitiveDefaults);
+	}
 
 	private static final String ERROR_UNSUPPORTED_ENCODING = "UTF-8 is apparently not supported on this platform.";
 
@@ -321,6 +335,17 @@ public final class Utils {
 		return false;
 	}
 
+	/**
+	 * Returns the default value of the given class, covering primitives.
+	 * E.g. if given class is <code>int.class</code>, then it will return <code>0</code>. Autoboxing will do the rest.
+	 * Non-primitives and <code>void.class</code> will return <code>null</code>.
+	 * @param cls The class to obtain the default value for.
+	 * @return The default value of the given class, covering primitives.
+	 * @since 2.4
+	 */
+	public static Object getDefaultValue(Class<?> cls) {
+		return cls.isPrimitive() ? PRIMITIVE_DEFAULTS.get(cls) : null;
+	}
 
 	// I/O ------------------------------------------------------------------------------------------------------------
 
