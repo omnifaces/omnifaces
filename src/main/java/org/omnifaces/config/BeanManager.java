@@ -120,10 +120,6 @@ public enum BeanManager {
 	 * @throws IllegalStateException When initialization fails.
 	 */
 	public void init(ServletContext servletContext) {
-		if (beanManager != null) {
-			return;
-		}
-
 		if (beanManager == null) {
 			beanManager = servletContext.getAttribute(WELD_BEAN_MANAGER);
 		}
