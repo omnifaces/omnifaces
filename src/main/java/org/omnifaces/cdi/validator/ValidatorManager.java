@@ -18,8 +18,8 @@ package org.omnifaces.cdi.validator;
 import static org.omnifaces.util.BeansLocal.getReference;
 import static org.omnifaces.util.BeansLocal.resolve;
 
-import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.AmbiguousResolutionException;
@@ -89,7 +89,7 @@ public class ValidatorManager {
 
 	@Inject
 	private BeanManager manager;
-	private Map<String, Bean<Validator>> validatorsById = new HashMap<>();
+	private Map<String, Bean<Validator>> validatorsById = new ConcurrentHashMap<>();
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
