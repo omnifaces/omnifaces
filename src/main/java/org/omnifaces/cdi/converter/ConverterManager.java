@@ -18,8 +18,8 @@ package org.omnifaces.cdi.converter;
 import static org.omnifaces.util.BeansLocal.getReference;
 import static org.omnifaces.util.BeansLocal.resolve;
 
+import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.AmbiguousResolutionException;
@@ -92,8 +92,8 @@ public class ConverterManager {
 
 	@Inject
 	private BeanManager manager;
-	private Map<String, Bean<Converter>> convertersById = new ConcurrentHashMap<>();
-	private Map<Class<?>, Bean<Converter>> convertersByForClass = new ConcurrentHashMap<>();
+	private Map<String, Bean<Converter>> convertersById = new HashMap<>();
+	private Map<Class<?>, Bean<Converter>> convertersByForClass = new HashMap<>();
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
