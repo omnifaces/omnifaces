@@ -43,6 +43,7 @@ import javax.faces.event.SystemEventListener;
 import org.omnifaces.component.output.cache.Cache;
 import org.omnifaces.component.script.DeferredScript;
 import org.omnifaces.renderer.DeferredScriptRenderer;
+import org.omnifaces.renderer.InlineResourceRenderer;
 import org.omnifaces.renderer.InlineScriptRenderer;
 import org.omnifaces.renderer.InlineStylesheetRenderer;
 import org.omnifaces.util.Faces;
@@ -209,6 +210,9 @@ import org.omnifaces.util.Hacks;
  * @see CombinedResourceInputStream
  * @see DynamicResource
  * @see DefaultResourceHandler
+ * @see InlineScriptRenderer
+ * @see InlineStylesheetRenderer
+ * @see InlineResourceRenderer
  */
 public class CombinedResourceHandler extends DefaultResourceHandler implements SystemEventListener {
 

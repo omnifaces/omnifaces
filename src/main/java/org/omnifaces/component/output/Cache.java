@@ -37,11 +37,22 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.event.PreRenderViewEvent;
 import javax.faces.event.SystemEvent;
 
+import org.omnifaces.component.output.cache.CacheEntry;
 import org.omnifaces.component.output.cache.CacheFactory;
 import org.omnifaces.component.output.cache.CacheInitializer;
+import org.omnifaces.component.output.cache.CacheInstancePerScopeProvider;
+import org.omnifaces.component.output.cache.CacheProvider;
+import org.omnifaces.component.output.cache.DefaultCache;
+import org.omnifaces.component.output.cache.DefaultCacheProvider;
+import org.omnifaces.component.output.cache.TimeToLiveCache;
 import org.omnifaces.component.output.cache.el.CacheValue;
+import org.omnifaces.component.output.cache.el.CachingValueExpression;
 import org.omnifaces.filter.OnDemandResponseBufferFilter;
+import org.omnifaces.io.ResettableBuffer;
+import org.omnifaces.io.ResettableBufferedOutputStream;
+import org.omnifaces.io.ResettableBufferedWriter;
 import org.omnifaces.servlet.BufferedHttpServletResponse;
+import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
 import org.omnifaces.util.Callback;
 import org.omnifaces.util.State;
 
@@ -127,7 +138,24 @@ import org.omnifaces.util.State;
  *
  * @since 1.1
  * @author Arjan Tijms
+ * @see org.omnifaces.component.output.cache.Cache
+ * @see CacheEntry
+ * @see CacheFactory
+ * @see CacheInitializer
+ * @see CacheInstancePerScopeProvider
+ * @see CacheProvider
+ * @see DefaultCache
+ * @see DefaultCacheProvider
+ * @see TimeToLiveCache
  * @see CacheValue
+ * @see CachingValueExpression
+ * @see OnDemandResponseBufferFilter
+ * @see BufferedHttpServletResponse
+ * @see HttpServletResponseOutputWrapper
+ * @see ResettableBuffer
+ * @see ResettableBufferedOutputStream
+ * @see ResettableBufferedWriter
+ * @see OutputFamily
  */
 @FacesComponent(Cache.COMPONENT_TYPE)
 public class Cache extends OutputFamily {

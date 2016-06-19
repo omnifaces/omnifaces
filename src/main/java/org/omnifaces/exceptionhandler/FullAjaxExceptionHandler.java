@@ -54,6 +54,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.omnifaces.config.WebXml;
 import org.omnifaces.context.OmniPartialViewContext;
+import org.omnifaces.context.OmniPartialViewContextFactory;
 import org.omnifaces.filter.FacesExceptionFilter;
 import org.omnifaces.util.Exceptions;
 import org.omnifaces.util.Hacks;
@@ -173,6 +174,11 @@ import org.omnifaces.util.Hacks;
  *
  * @author Bauke Scholtz
  * @see FullAjaxExceptionHandlerFactory
+ * @see DefaultExceptionHandlerFactory
+ * @see OmniPartialViewContext
+ * @see OmniPartialViewContextFactory
+ * @see WebXml
+ * @see FacesExceptionFilter
  */
 public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 

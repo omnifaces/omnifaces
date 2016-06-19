@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.omnifaces.component.output.Cache;
 import org.omnifaces.servlet.BufferedHttpServletResponse;
 
 /**
@@ -39,7 +40,7 @@ import org.omnifaces.servlet.BufferedHttpServletResponse;
  *
  * @author Arjan Tijms
  * @since 1.2
- *
+ * @see Cache
  */
 public class OnDemandResponseBufferFilter extends HttpFilter {
 

@@ -52,6 +52,7 @@ import org.omnifaces.component.ParamHolder;
  *
  * @author Bauke Scholtz
  * @since 1.4
+ * @see ParamHolder
  */
 @FacesComponent(Param.COMPONENT_TYPE)
 public class Param extends UIParameter implements ParamHolder {

@@ -32,6 +32,7 @@ import javax.faces.event.SystemEventListener;
 import javax.faces.view.facelets.FaceletContext;
 
 import org.omnifaces.el.ReadOnlyValueExpression;
+import org.omnifaces.taghandler.ComponentExtraHandler;
 import org.omnifaces.util.Callback.SerializableReturning;
 import org.omnifaces.util.Components;
 import org.omnifaces.util.State;
@@ -43,6 +44,9 @@ import org.omnifaces.util.State;
  *
  * @since 2.0
  * @author Arjan Tijms
+ * @see FaceletContextConsumer
+ * @see ComponentExtraHandler
+ * @see UtilFamily
  */
 @FacesComponent(ResolveComponent.COMPONENT_TYPE)
 public class ResolveComponent extends UtilFamily implements FaceletContextConsumer, SystemEventListener {

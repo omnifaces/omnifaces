@@ -96,6 +96,11 @@ import org.omnifaces.config.WebXml;
  * @see FacesViewsViewHandler
  * @see FacesViewsViewHandlerInstaller
  * @see FacesViewsResolver
+ * @see FacesServletDispatchMethod
+ * @see ExtensionAction
+ * @see PathAction
+ * @see UriExtensionRequestWrapper
+ * @see ViewHandlerMode
  */
 public final class FacesViews {
 
