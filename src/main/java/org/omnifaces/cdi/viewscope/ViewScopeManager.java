@@ -42,7 +42,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 import javax.inject.Inject;
 
-import org.omnifaces.application.ViewScopeEventListener;
 import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.resourcehandler.ResourceIdentifier;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.omnifaces.application;
+package org.omnifaces.cdi.viewscope;
 
 import static org.omnifaces.util.Beans.getReference;
 
@@ -22,8 +22,6 @@ import javax.faces.event.AbortProcessingException;
 import javax.faces.event.PreDestroyViewMapEvent;
 import javax.faces.event.SystemEvent;
 import javax.faces.event.ViewMapListener;
-
-import org.omnifaces.cdi.viewscope.ViewScopeManager;
 
 /**
  * Listener for JSF view scope destroy events so that view scope manager can be notified.
