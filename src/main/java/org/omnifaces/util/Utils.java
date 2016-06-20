@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
@@ -115,7 +116,6 @@ public final class Utils {
 
 	/**
 	 * Returns <code>true</code> if the given string is null or is empty.
-	 *
 	 * @param string The string to be checked on emptiness.
 	 * @return <code>true</code> if the given string is null or is empty.
 	 */
@@ -124,18 +124,7 @@ public final class Utils {
 	}
 
 	/**
-	 * Returns <code>true</code> if the given array is null or is empty.
-	 *
-	 * @param array The array to be checked on emptiness.
-	 * @return <code>true</code> if the given array is null or is empty.
-	 */
-	public static boolean isEmpty(Object[] array) {
-		return array == null || array.length == 0;
-	}
-
-	/**
 	 * Returns <code>true</code> if the given collection is null or is empty.
-	 *
 	 * @param collection The collection to be checked on emptiness.
 	 * @return <code>true</code> if the given collection is null or is empty.
 	 */
@@ -145,7 +134,6 @@ public final class Utils {
 
 	/**
 	 * Returns <code>true</code> if the given map is null or is empty.
-	 *
 	 * @param map The map to be checked on emptiness.
 	 * @return <code>true</code> if the given map is null or is empty.
 	 */
@@ -154,23 +142,13 @@ public final class Utils {
 	}
 
 	/**
-	 * Returns <code>true</code> if the given value is null or is empty. Types of String, Collection, Map and Array are
-	 * recognized. If none is recognized, then examine the emptiness of the toString() representation instead.
+	 * Returns <code>true</code> if the given object is null or an empty array or has an empty toString() result.
 	 * @param value The value to be checked on emptiness.
-	 * @return <code>true</code> if the given value is null or is empty.
+	 * @return <code>true</code> if the given object is null or an empty array or has an empty toString() result.
 	 */
 	public static boolean isEmpty(Object value) {
 		if (value == null) {
 			return true;
-		}
-		else if (value instanceof String) {
-			return ((String) value).isEmpty();
-		}
-		else if (value instanceof Collection<?>) {
-			return ((Collection<?>) value).isEmpty();
-		}
-		else if (value instanceof Map<?, ?>) {
-			return ((Map<?, ?>) value).isEmpty();
 		}
 		else if (value.getClass().isArray()) {
 			return Array.getLength(value) == 0;
@@ -182,7 +160,6 @@ public final class Utils {
 
 	/**
 	 * Returns <code>true</code> if at least one value is empty.
-	 *
 	 * @param values the values to be checked on emptiness
 	 * @return <code>true</code> if any value is empty and <code>false</code> if no values are empty
 	 * @since 1.8
@@ -201,7 +178,6 @@ public final class Utils {
 	 * Returns <code>true</code> if the given string is null or is empty or contains whitespace only. In addition to
 	 * {@link #isEmpty(String)}, this thus also returns <code>true</code> when <code>string.trim().isEmpty()</code>
 	 * returns <code>true</code>.
-	 *
 	 * @param string The string to be checked on blankness.
 	 * @return True if the given string is null or is empty or contains whitespace only.
 	 * @since 1.5
@@ -449,6 +425,37 @@ public final class Utils {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Returns <code>true</code> if the given object is serializable.
+	 * @param object The object to be tested.
+	 * @return <code>true</code> if the given object is serializable.
+	 * @since 2.4
+	 */
+	public static boolean isSerializable(Object object) {
+		try (ObjectOutputStream output = new ObjectOutputStream(new NullOutputStream())) {
+			output.writeObject(object);
+			return true;
+		}
+		catch (IOException e) {
+			return false;
+		}
+	}
+
+	private static final class NullOutputStream extends OutputStream {
+		@Override
+		public void write(int b) throws IOException {
+			// NOOP.
+		}
+		@Override
+		public void write(byte[] b) throws IOException {
+			// NOOP.
+		}
+		@Override
+		public void write(byte[] b, int off, int len) throws IOException {
+			// NOOP.
+		}
 	}
 
 	// Collections ----------------------------------------------------------------------------------------------------
