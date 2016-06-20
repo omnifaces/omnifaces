@@ -105,7 +105,7 @@ public class BeanStorage implements Serializable {
 	/**
 	 * This class represents a bean instance. It merely offers a hook to obtain and destroy the bean instance.
 	 */
-	static class Bean<T> implements Serializable {
+	static final class Bean<T> implements Serializable {
 
 		private static final long serialVersionUID = 42L;
 

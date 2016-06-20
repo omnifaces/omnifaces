@@ -16,11 +16,10 @@ import static org.omnifaces.cdi.param.RequestParameterProducer.coerceValues;
 import static org.omnifaces.cdi.param.RequestParameterProducer.getConvertedValues;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.isSerializable;
 
 import java.io.Serializable;
-import java.lang.reflect.Array;
 import java.lang.reflect.Type;
-import java.util.List;
 
 import org.omnifaces.cdi.Param;
 
@@ -54,11 +53,7 @@ public class ParamValue<V> implements Serializable {
 		this.type = type;
 		setValue(value);
 
-		if (isEmpty(value)
-			|| (value instanceof List && ((List<?>) value).get(0) instanceof Serializable)
-			|| (value.getClass().isArray() && Array.get(value, 0) instanceof Serializable)
-			|| (value instanceof Serializable)
-		) {
+		if (isSerializable(value)) {
 			valueIsSerializable = true;
 			serializableValue = value;
 		}
