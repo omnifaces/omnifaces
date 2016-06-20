@@ -378,7 +378,7 @@ public abstract class FileServlet extends HttpServlet {
 			response.setContentType(contentType);
 			response.setHeader("Content-Length", String.valueOf(range.length));
 
-			if (range.length != resource.length) {
+			if (response.getStatus() == HttpServletResponse.SC_PARTIAL_CONTENT) {
 				response.setHeader("Content-Range", "bytes " + range.start + "-" + range.end + "/" + resource.length);
 			}
 		}
