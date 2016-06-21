@@ -13,6 +13,7 @@
 package org.omnifaces.servlet;
 
 import static org.omnifaces.util.Utils.coalesce;
+import static org.omnifaces.util.Utils.encodeURI;
 import static org.omnifaces.util.Utils.encodeURL;
 import static org.omnifaces.util.Utils.startsWithOneOf;
 import static org.omnifaces.util.Utils.stream;
@@ -368,15 +369,18 @@ public abstract class FileServlet extends HttpServlet {
 	private String setContentHeaders(HttpServletRequest request, HttpServletResponse response, Resource resource, List<Range> ranges) {
 		String contentType = getContentType(request, resource.file);
 		String disposition = isAttachment(request, contentType) ? "attachment" : "inline";
-		String filename = encodeURL(getAttachmentName(request, resource.file));
+		String filename = encodeURI(getAttachmentName(request, resource.file));
 		response.setHeader("Content-Disposition", String.format(CONTENT_DISPOSITION_HEADER, disposition, filename));
 		response.setHeader("Accept-Ranges", "bytes");
 
 		if (ranges.size() == 1) {
 			Range range = ranges.get(0);
 			response.setContentType(contentType);
-			response.setHeader("Content-Range", "bytes " + range.start + "-" + range.end + "/" + resource.length);
 			response.setHeader("Content-Length", String.valueOf(range.length));
+
+			if (response.getStatus() == HttpServletResponse.SC_PARTIAL_CONTENT) {
+				response.setHeader("Content-Range", "bytes " + range.start + "-" + range.end + "/" + resource.length);
+			}
 		}
 		else {
 			response.setContentType("multipart/byteranges; boundary=" + MULTIPART_BOUNDARY);

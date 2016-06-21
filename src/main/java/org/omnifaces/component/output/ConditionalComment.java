@@ -58,6 +58,7 @@ import org.omnifaces.util.State;
  * direct child of <code>&lt;h:head&gt;</code>.
  *
  * @author Bauke Scholtz
+ * @see OutputFamily
  */
 @FacesComponent(ConditionalComment.COMPONENT_TYPE)
 public class ConditionalComment extends OutputFamily {

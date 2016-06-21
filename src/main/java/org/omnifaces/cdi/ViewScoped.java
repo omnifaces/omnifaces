@@ -28,10 +28,12 @@ import javax.annotation.PreDestroy;
 import javax.enterprise.context.NormalScope;
 import javax.faces.component.UIViewRoot;
 
-import org.omnifaces.application.ViewScopeEventListener;
 import org.omnifaces.cdi.viewscope.ViewScopeContext;
+import org.omnifaces.cdi.viewscope.ViewScopeEventListener;
 import org.omnifaces.cdi.viewscope.ViewScopeExtension;
 import org.omnifaces.cdi.viewscope.ViewScopeManager;
+import org.omnifaces.context.OmniExternalContext;
+import org.omnifaces.context.OmniExternalContextFactory;
 import org.omnifaces.viewhandler.RestorableViewHandler;
 
 /**
@@ -54,7 +56,9 @@ import org.omnifaces.viewhandler.RestorableViewHandler;
  * <p>
  * Since OmniFaces 2.3, the unload has been further improved to also physically remove the associated JSF view state
  * from JSF implementation's internal LRU map in case of server side state saving, hereby further decreasing the risk
- * at <code>ViewExpiredException</code> on the other views which were created/opened earlier.
+ * at <code>ViewExpiredException</code> on the other views which were created/opened earlier. As side effect of this
+ * change, the <code>&#64;PreDestroy</code> annotated method of any standard JSF view scoped beans referenced in the
+ * same view as the OmniFaces CDI view scoped bean will also guaranteed be invoked on browser unload.
  * <p>
  * In a nutshell: if you're on JSF 2.0/2.1, and you can't upgrade to JSF 2.2, and you want the
  * <code>&#64;PreDestroy</code> to be invoked on sesison expire too, then use OmniFaces 1.6+ with this view scope
@@ -107,7 +111,10 @@ import org.omnifaces.viewhandler.RestorableViewHandler;
  * @see ViewScopeContext
  * @see ViewScopeManager
  * @see ViewScopeEventListener
+ * @see BeanStorage
  * @see RestorableViewHandler
+ * @see OmniExternalContext
+ * @see OmniExternalContextFactory
  * @since 1.6
  */
 @Inherited

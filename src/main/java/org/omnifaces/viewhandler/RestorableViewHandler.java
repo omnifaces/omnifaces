@@ -122,8 +122,9 @@ public class RestorableViewHandler extends ViewHandlerWrapper { // TODO: rename 
 
 		Map<String, Object> states = (Map<String, Object>) ((Object[]) state)[1]; // Fortunately both Mojarra and MyFaces have same structure, otherwise this had to be in Hacks.
 
-		if (view.getId() == null) {
+		if (view.getId() == null) { // MyFaces.
 			view.setId(view.createUniqueId(context, null));
+			view.markInitialState();
 		}
 
 		Object viewRootState = states.get(view.getClientId(context));

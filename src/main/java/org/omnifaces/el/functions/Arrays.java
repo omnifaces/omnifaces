@@ -15,7 +15,7 @@ package org.omnifaces.el.functions;
 /**
  * <p>
  * Collection of EL functions for array manipulation: <code>of:createArray()</code>, <code>of:createIntegerArray()</code>,
- * and <code>of:contains()</code>.
+ * <code>of:contains()</code> and <code>of:reverseArray()</code>.
  *
  * @author Bauke Scholtz
  */
@@ -91,6 +91,27 @@ public final class Arrays {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Returns a copy of the array with items in reversed order.
+	 * @param array The array to reverse.
+	 * @return A copy of the array with items in reversed order.
+	 * @since 2.4
+	 */
+	public static Object[] reverseArray(Object[] array) {
+		if (array == null) {
+			return null;
+		}
+
+		int length = array.length;
+		Object[] reversed = new Object[length];
+
+		for (int i = 0; i < length; i++) {
+			reversed[i] = array[length - 1 - i];
+		}
+
+		return reversed;
 	}
 
 }

@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.Locale;
 
 import org.omnifaces.util.Faces;
@@ -158,11 +159,12 @@ public final class Numbers {
 	/**
 	 * Format the given number to nearest 10<sup>n</sup> (rounded to thousands), immediately suffixed (without space)
 	 * with metric unit (k, M, G, T, P or E), rounding half up with a precision of 3 digits, whereafter trailing zeroes
-	 * in fraction part are stripped. Numbers lower than thousand are not affected.
+	 * in fraction part are stripped.
 	 * For example (with English locale):
 	 * <ul>
-	 * <li>999.999 will appear as 999.999
-	 * <li>1000 will appear as 1k
+	 * <li>1.6666 will appear as 1.67
+	 * <li>999.4 will appear as 999
+	 * <li>999.5 will appear as 1k
 	 * <li>1004 will appear as 1k
 	 * <li>1005 will appear as 1.01k
 	 * <li>1594 will appear as 1.59k
@@ -191,8 +193,9 @@ public final class Numbers {
 	 * trailing zeroes in fraction part are stripped.
 	 * For example (with English locale and unit <code>B</code>):
 	 * <ul>
-	 * <li>999 will appear as 999 B
-	 * <li>1000 will appear as 1 kB
+	 * <li>1.6666 will appear as 1.67 B
+	 * <li>999.4 will appear as 999 B
+	 * <li>999.5 will appear as 1 kB
 	 * <li>1004 will appear as 1 kB
 	 * <li>1005 will appear as 1.01 kB
 	 * <li>1594 will appear as 1.59 kB
@@ -232,29 +235,49 @@ public final class Numbers {
 		BigDecimal decimal;
 
 		try {
-			decimal = new BigDecimal(number.toString());
+			decimal = (number instanceof BigDecimal) ? ((BigDecimal) number) : new BigDecimal(number.toString());
 		}
 		catch (NumberFormatException e) {
 			return null;
 		}
 
-		String separator = (unit == null) ? "" : " ";
-        String unitString = (unit == null) ? "" : unit;
+		return formatBase(decimal, base, fractions, iec, unit);
+	}
 
-        if (decimal.longValue() < base) {
-			return number.toString() + separator + unitString;
+	private static String formatBase(BigDecimal decimal, int base, Integer fractions, boolean iec, String unit) {
+		int exponent = (int) (Math.log(decimal.longValue()) / Math.log(base));
+		BigDecimal divided = decimal.divide(BigDecimal.valueOf(Math.pow(base, exponent)));
+		int maxfractions = (fractions != null) ? fractions : (PRECISION - String.valueOf(divided.longValue()).length());
+		BigDecimal formatted;
+
+		try {
+			DecimalFormat formatter = (DecimalFormat) NumberFormat.getNumberInstance(getLocale());
+			formatter.setParseBigDecimal(true);
+			formatted = (BigDecimal) formatter.parse(String.format(getLocale(), "%." + maxfractions + "f", divided));
+		}
+		catch (ParseException e) {
+			throw new IllegalStateException(e);
 		}
 
-		int exp = (int) (Math.log(decimal.longValue()) / Math.log(base));
-		BigDecimal divided = decimal.divide(BigDecimal.valueOf(Math.pow(base, exp)));
-		int maxfractions = (fractions != null) ? fractions : (PRECISION - String.valueOf(divided.longValue()).length());
-		String formatted = String.format(getLocale(), "%." + maxfractions + "f", divided);
+		if (formatted.longValue() >= base) { // E.g. 999.5 becomes 1000 which needs to be reformatted as 1k.
+			return formatBase(formatted, base, fractions, iec, unit);
+		}
+		else {
+			return formatUnit(formatted, iec, unit, exponent, maxfractions > 0 && fractions == null);
+		}
+	}
 
-		if (fractions == null) {
+	private static String formatUnit(BigDecimal decimal, boolean iec, String unit, int exponent, boolean stripZeroes) {
+		String formatted = decimal.toString();
+
+		if (stripZeroes) {
 			formatted = formatted.replaceAll("\\D?0+$", "");
 		}
 
-		return formatted + separator + ((iec ? "K" : "k") + "MGTPE").charAt(exp - 1) + (iec ? "i" : "") + unitString;
+		String separator = (unit == null) ? "" : " ";
+		String unitPrefix = ((exponent > 0) ? ((iec ? "K" : "k") + "MGTPE").charAt(exponent - 1) : "") + (iec ? "i" : "");
+		String unitString = (unit == null) ? "" : unit;
+		return formatted + separator + unitPrefix + unitString;
 	}
 
 }

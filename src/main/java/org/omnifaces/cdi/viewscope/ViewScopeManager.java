@@ -42,7 +42,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 import javax.inject.Inject;
 
-import org.omnifaces.application.ViewScopeEventListener;
 import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.resourcehandler.ResourceIdentifier;
@@ -88,6 +87,7 @@ public class ViewScopeManager implements Serializable {
 		PARAM_NAME_MAX_ACTIVE_VIEW_SCOPES, PARAM_NAME_MOJARRA_NUMBER_OF_VIEWS, PARAM_NAME_MYFACES_NUMBER_OF_VIEWS
 	};
 	private static final int DEFAULT_BEANS_PER_VIEW_SCOPE = 3;
+	private static final ResourceIdentifier SCRIPT_ID = new ResourceIdentifier("omnifaces", "omnifaces.js");
 	private static final String SCRIPT_INIT = "OmniFaces.Unload.init('%s')";
 
 	private static final String ERROR_MAX_ACTIVE_VIEW_SCOPES = "The '%s' init param must be a number."
@@ -156,6 +156,10 @@ public class ViewScopeManager implements Serializable {
 			}
 		}
 		else {
+			if (isAjaxRequestWithPartialRendering(context)) {
+				Hacks.setScriptResourceRendered(context, SCRIPT_ID); // Otherwise MyFaces will load a new one during createViewScope() when still in same document (e.g. navigation).
+			}
+
 			beanStorageId = getBeanStorageId(false);
 		}
 
@@ -236,7 +240,7 @@ public class ViewScopeManager implements Serializable {
 		FacesContext context = FacesContext.getCurrentInstance();
 		boolean ajaxRequestWithPartialRendering = isAjaxRequestWithPartialRendering(context);
 
-		if (!Hacks.isScriptResourceRendered(context, new ResourceIdentifier("omnifaces", "omnifaces.js"))) {
+		if (!Hacks.isScriptResourceRendered(context, SCRIPT_ID)) {
 			if (ajaxRequestWithPartialRendering) {
 				load("omnifaces", "unload.js");
 			}

@@ -74,6 +74,7 @@ import org.omnifaces.el.DelegatingVariableMapper;
  *
  * @author Arjan Tijms.
  * @since 2.1
+ * @see DelegatingVariableMapper
  */
 public class TagAttribute extends TagHandler {
 

@@ -115,6 +115,7 @@ public class SocketChannelManager implements Serializable {
 	 * @return The web socket channel identifier. This can be used as web socket URI.
 	 * @throws IllegalArgumentException When the scope is invalid or when channel already exists on a different scope.
 	 */
+	@SuppressWarnings("unchecked")
 	protected String register(String channel, String scope, Serializable user) {
 		switch (Scope.of(scope, user)) {
 			case APPLICATION: return register(null, channel, APPLICATION_SCOPE, sessionScope, getViewScope(false));
@@ -124,8 +125,8 @@ public class SocketChannelManager implements Serializable {
 		}
 	}
 
-	@SafeVarargs
-	private final String register(Serializable user, String channel, Map<String, String> targetScope, Map<String, String>... otherScopes) {
+	@SuppressWarnings("unchecked")
+	private String register(Serializable user, String channel, Map<String, String> targetScope, Map<String, String>... otherScopes) {
 		if (!targetScope.containsKey(channel)) {
 			for (Map<String, String> otherScope : otherScopes) {
 				if (otherScope.containsKey(channel)) {
@@ -181,6 +182,7 @@ public class SocketChannelManager implements Serializable {
 
 		/**
 		 * Returns the view scoped channels.
+		 * @return The view scoped channels.
 		 */
 		protected Map<String, String> getViewScope() {
 			return viewScope;
@@ -203,6 +205,7 @@ public class SocketChannelManager implements Serializable {
 	 * For internal usage only. This makes it possible to reference session scope channel IDs during injection time of
 	 * {@link SocketPushContext} (the CDI session scope is not necessarily active during push send time).
 	 * This should actually be package private, but package private methods in CDI beans are subject to memory leaks.
+	 * @return Session scope channel IDs.
 	 */
 	protected Map<String, String> getSessionScope() {
 		return sessionScope;
@@ -212,6 +215,8 @@ public class SocketChannelManager implements Serializable {
 	 * For internal usage only. This makes it possible to reference view scope channel IDs during injection time of
 	 * {@link SocketPushContext} (the JSF view scope is not necessarily active during push send time).
 	 * This should actually be package private, but package private methods in CDI beans are subject to memory leaks.
+	 * @param create Whether or not to auto-create the entry in JSF view scope.
+	 * @return View scope channel IDs.
 	 */
 	protected Map<String, String> getViewScope(boolean create) {
 		ViewScope bean = getInstance(ViewScope.class, create);

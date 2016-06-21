@@ -60,6 +60,8 @@ import org.omnifaces.util.Utils;
  * @author Bauke Scholtz
  * @author Arjan Tijms
  * @author Radu Creanga {@literal <rdcrng@gmail.com>}
+ * @see IterableDataModel
+ * @see Json
  */
 public final class Converters {
 

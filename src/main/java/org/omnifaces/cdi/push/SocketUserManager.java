@@ -153,6 +153,7 @@ public class SocketUserManager {
 	 * For internal usage only. This makes it possible to save and restore user specific channels during server
 	 * restart/failover in {@link SocketChannelManager}.
 	 * This should actually be package private, but package private methods in CDI beans are subject to memory leaks.
+	 * @return User specific channels.
 	 */
 	protected ConcurrentMap<String, ConcurrentMap<String, Set<String>>> getUserChannels() {
 		return userChannels;

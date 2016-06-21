@@ -162,6 +162,7 @@ import org.omnifaces.util.Servlets;
  *
  * @author Bauke Scholtz
  * @since 1.7
+ * @see HttpFilter
  */
 public class CacheControlFilter extends HttpFilter {
 

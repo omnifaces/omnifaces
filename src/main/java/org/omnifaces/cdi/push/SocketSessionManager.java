@@ -13,16 +13,17 @@
 package org.omnifaces.cdi.push;
 
 import static java.util.Collections.emptySet;
-import static java.util.Collections.synchronizedSet;
 import static javax.websocket.CloseReason.CloseCodes.NORMAL_CLOSURE;
 import static org.omnifaces.cdi.push.SocketEndpoint.PARAM_CHANNEL;
 import static org.omnifaces.util.Beans.getReference;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -59,7 +60,7 @@ public class SocketSessionManager {
 		private static final long serialVersionUID = 1L;
 	};
 
-	private final ConcurrentMap<String, Set<Session>> socketSessions = new ConcurrentHashMap<>();
+	private final ConcurrentMap<String, Collection<Session>> socketSessions = new ConcurrentHashMap<>();
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -74,7 +75,7 @@ public class SocketSessionManager {
 	 */
 	protected void register(String channelId) {
 		if (!socketSessions.containsKey(channelId)) {
-			socketSessions.putIfAbsent(channelId, synchronizedSet(new HashSet<Session>()));
+			socketSessions.putIfAbsent(channelId, new ConcurrentLinkedQueue<Session>());
 		}
 	}
 
@@ -97,7 +98,7 @@ public class SocketSessionManager {
 	 */
 	protected boolean add(Session session) {
 		String channelId = getChannelId(session);
-		Set<Session> sessions = socketSessions.get(channelId);
+		Collection<Session> sessions = socketSessions.get(channelId);
 
 		if (sessions != null && sessions.add(session)) {
 			Serializable user = socketUsers.getUser(getChannel(session), channelId);
@@ -123,15 +124,15 @@ public class SocketSessionManager {
 	 * message was successfully delivered and otherwise throw {@link ExecutionException}.
 	 */
 	protected Set<Future<Void>> send(String channelId, Object message) {
-		Set<Session> sessions = (channelId != null) ? socketSessions.get(channelId) : null;
+		Collection<Session> sessions = (channelId != null) ? socketSessions.get(channelId) : null;
 
 		if (sessions != null && !sessions.isEmpty()) {
 			Set<Future<Void>> results = new HashSet<>(sessions.size());
 			String json = Json.encode(message);
 
-			synchronized(sessions) {
-				for (Session session : sessions) {
-					if (session.isOpen()) {
+			for (Session session : sessions) {
+				if (session.isOpen()) {
+					synchronized (session) {
 						results.add(session.getAsyncRemote().sendText(json));
 					}
 				}
@@ -149,7 +150,7 @@ public class SocketSessionManager {
 	 * @param reason The close reason.
 	 */
 	protected void remove(Session session, CloseReason reason) {
-		Set<Session> sessions = socketSessions.get(getChannelId(session));
+		Collection<Session> sessions = socketSessions.get(getChannelId(session));
 
 		if (sessions != null && sessions.remove(session)) {
 			fireEvent(session, reason, SESSION_CLOSED);
@@ -162,7 +163,7 @@ public class SocketSessionManager {
 	 */
 	protected void deregister(Iterable<String> channelIds) {
 		for (String channelId : channelIds) {
-			Set<Session> sessions = socketSessions.get(channelId);
+			Collection<Session> sessions = socketSessions.get(channelId);
 
 			if (sessions != null) {
 				for (Session session : sessions) {

@@ -12,6 +12,7 @@ import javax.el.ELResolver;
 import javax.el.MethodNotFoundException;
 import javax.el.ValueExpression;
 import javax.el.ValueReference;
+import javax.faces.el.CompositeComponentExpressionHolder;
 
 /**
  * This class contains methods that inspect expressions to reveal information about them.
@@ -46,7 +47,14 @@ public final class ExpressionInspector {
 		inspectorElContext.setPass(InspectorPass.PASS2_FIND_FINAL_NODE);
 		valueExpression.getValue(inspectorElContext);
 
-		return new ValueReference(inspectorElContext.getBase(), inspectorElContext.getProperty());
+		Object base = inspectorElContext.getBase();
+		Object property = inspectorElContext.getProperty();
+
+		if (base instanceof CompositeComponentExpressionHolder) {
+			return getValueReference(context, ((CompositeComponentExpressionHolder) base).getExpression(property.toString()));
+		}
+
+		return new ValueReference(base, property);
 	}
 
 	/**
@@ -226,11 +234,12 @@ public final class ExpressionInspector {
 		@Override
 		public Object getValue(ELContext context, Object base, Object property) {
 
-			if (base instanceof FinalBaseHolder) {
+			if (base instanceof FinalBaseHolder || property instanceof FinalBaseHolder) {
 				// If we get called with a FinalBaseHolder, which was set in the next to last node,
 				// we know we're done and can set the base and property as the final ones.
-				lastBase = ((FinalBaseHolder) base).getBase();
-				lastProperty = property;
+				// A property can also be a FinalBaseHolder when it is a dynamic property (brace notation).
+				lastBase = (base instanceof FinalBaseHolder) ? ((FinalBaseHolder) base).getBase() : base;
+				lastProperty = (property instanceof FinalBaseHolder) ? ((FinalBaseHolder) property).getBase() : property;
 
 				context.setPropertyResolved(true);
 

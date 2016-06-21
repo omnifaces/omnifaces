@@ -136,7 +136,7 @@ public class ImportConstants extends TagHandler {
 			var = type.substring(max(innerClass, outerClass) + 1);
 		}
 
-		context.getFacesContext().getExternalContext().getRequestMap().put(var, constants);
+		context.setAttribute(var, constants);
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------

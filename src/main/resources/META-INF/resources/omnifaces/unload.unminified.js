@@ -31,6 +31,7 @@ OmniFaces.Unload = (function(window, document) {
 
 	// Private static fields ------------------------------------------------------------------------------------------
 
+	var id;
 	var disabled = false;
 	var self = {};
 
@@ -38,49 +39,58 @@ OmniFaces.Unload = (function(window, document) {
 
 	/**
 	 * Initialize the unload event listener on the current document. This will check if XHR is supported and if the
-	 * current document has a JSF view state element. If so, then register the <code>beforeunload</code> event to send
-	 * a synchronous XHR request with the OmniFaces view scope ID and the JSF view state value as parameters. Also
-	 * register the <code>submit</code> event to disable the unload event listener.
+	 * current document has a JSF form with a view state element. If so, then register the <code>beforeunload</code>
+	 * event to send a synchronous XHR request with the OmniFaces view scope ID and the JSF view state value as
+	 * parameters. Also register the <code>submit</code> event to disable the unload event listener.
 	 * @param {string} id The OmniFaces view scope ID.
 	 */
-	self.init = function(id) {
+	self.init = function(viewScopeId) {
 		if (!window.XMLHttpRequest) {
 			return; // Native XHR not supported (IE6/7 not supported). End of story. Let session expiration do its job.
 		}
 
-		var viewState = getViewState();
-
-		if (!viewState) {
-			return; // No JSF form in the document? Why is it referencing a view scoped bean then? ;)
-		}
-
-		addEventListener(window, "beforeunload", function() {
-			if (disabled) {
-				disabled = false; // Just in case some custom JS explicitly triggered submit event while staying in same DOM.
-				return;
+		if (id == null) {
+			var facesForm = getFacesForm();
+			
+			if (!facesForm) {
+				return; // No JSF form in the document? Why is it referencing a view scoped bean then? ;)
 			}
+			
+			addEventListener(window, "beforeunload", function() {
+				if (disabled) {
+					disabled = false; // Just in case some custom JS explicitly triggered submit event while staying in same DOM.
+					return;
+				}
 
-			try {
-				var xhr = new XMLHttpRequest();
-				xhr.open("POST", window.location.href.split(/[?#;]/)[0], false);
-				xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-				xhr.send("omnifaces.event=unload&id=" + id + "&" + VIEW_STATE_PARAM + "=" + encodeURIComponent(viewState));
+				try {
+					var xhr = new XMLHttpRequest();
+					xhr.open("POST", facesForm.action.split(/[?#;]/)[0], false);
+					xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+					xhr.send("omnifaces.event=unload&id=" + id + "&" + VIEW_STATE_PARAM + "=" + encodeURIComponent(facesForm[VIEW_STATE_PARAM].value));
+				}
+				catch (e) {
+					// Fail silently. You never know.
+				}
+			});
+
+			addEventListener(document, "submit", function() {
+				self.disable(); // Disable unload event on any (propagated!) submit event.
+			});
+
+			if (window.mojarra) {
+				decorateFacesSubmit(mojarra, "jsfcljs"); // Decorate Mojarra h:commandLink submit handler to disable unload event when invoked.
 			}
-			catch (e) {
-				// Fail silently. You never know.
+			
+			if (window.myfaces) {
+	 			decorateFacesSubmit(myfaces.oam, "submitForm"); // Decorate MyFaces h:commandLink submit handler to disable unload event when invoked.
 			}
-		});
-
-		addEventListener(document, "submit", function() {
-			self.disable(); // Disable unload event on any (propagated!) submit event.
-		});
-
-		if (window.mojarra) {
-			decorateFacesSubmit(mojarra, "jsfcljs"); // Decorate Mojarra's submit handler to disable unload event when invoked.
+			
+			if (window.PrimeFaces) {
+	 			decorateFacesSubmit(PrimeFaces, "addSubmitParam"); // Decorate PrimeFaces p:commandLink submit handler to disable unload event when invoked.
+			}
 		}
-		else if (window.myfaces) {
- 			decorateFacesSubmit(myfaces.oam, "submitForm"); // Decorate MyFaces' submit handler to disable unload event when invoked.
-		}
+		
+		id = viewScopeId;
 	}
 
 	/**
@@ -94,15 +104,13 @@ OmniFaces.Unload = (function(window, document) {
 	// Private static functions ---------------------------------------------------------------------------------------
 
 	/**
-	 * Get the view state value from the current document.
-	 * @return {string} The view state value from the current document.
+	 * Get the first JSF form containing view state param from the current document.
+	 * @return {HTMLFormElement} The first JSF form of the current document.
 	 */
-	function getViewState() {
+	function getFacesForm() {
 		for (var i = 0; i < document.forms.length; i++) {
-			var viewStateElement = document.forms[i][VIEW_STATE_PARAM];
-
-			if (viewStateElement) {
-				return viewStateElement.value;
+			if (document.forms[i][VIEW_STATE_PARAM]) {
+				return document.forms[i];
 			}
 		}
 
@@ -135,7 +143,7 @@ OmniFaces.Unload = (function(window, document) {
 		if (submitFunction) {
 			facesImpl[functionName] = function() {
 				self.disable();
-				submitFunction.apply(this, arguments);
+				return submitFunction.apply(this, arguments);
 			};
 		}
 	}

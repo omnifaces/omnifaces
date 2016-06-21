@@ -18,9 +18,11 @@ import static java.util.regex.Pattern.quote;
 import static javax.faces.application.ProjectStage.Development;
 import static javax.faces.application.ProjectStage.PROJECT_STAGE_JNDI_NAME;
 import static javax.faces.application.ProjectStage.PROJECT_STAGE_PARAM_NAME;
+import static javax.servlet.RequestDispatcher.ERROR_REQUEST_URI;
 import static javax.servlet.RequestDispatcher.FORWARD_QUERY_STRING;
 import static javax.servlet.RequestDispatcher.FORWARD_REQUEST_URI;
 import static org.omnifaces.util.JNDI.lookup;
+import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.decodeURL;
 import static org.omnifaces.util.Utils.encodeURL;
 import static org.omnifaces.util.Utils.isEmpty;
@@ -41,6 +43,7 @@ import javax.faces.application.Application;
 import javax.faces.application.ResourceHandler;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -138,55 +141,29 @@ public final class Servlets {
 	}
 
 	/**
-	 * Returns the HTTP request URI relative to the context root of a web application. This is the request URI
-	 * minus the context path. Note that this includes path parameters.
-	 *
+	 * Returns the HTTP request URI, regardless of any forward or error dispatch. This is the part after the domain in
+	 * the request URL, including the leading slash.
 	 * @param request The involved HTTP servlet request.
-	 * @return the request URI relative to the context root
-	 * @since 1.8
-	 */
-	public static String getRequestRelativeURI(HttpServletRequest request) {
-		return request.getRequestURI().substring(request.getContextPath().length());
-	}
-
-	/**
-	 * Returns the HTTP request URI relative to the context root of a web application. This is the servlet path
-	 * plus the path info (if any).
-	 *
-	 * @param request The involved HTTP servlet request.
-	 * @return the request URI relative to the context root
-	 * @since 1.8
-	 */
-	public static String getRequestRelativeURIWithoutPathParameters(HttpServletRequest request) {
-		return request.getPathInfo() == null? request.getServletPath() : request.getServletPath() + request.getPathInfo();
-	}
-
-	/**
-	 * Returns the HTTP request URL with query string. This is the full request URL with query string as the enduser
-	 * sees in browser address bar.
-	 * @param request The involved HTTP servlet request.
-	 * @return The HTTP request URL with query string.
-	 * @see HttpServletRequest#getRequestURL()
-	 * @see HttpServletRequest#getQueryString()
-	 */
-	public static String getRequestURLWithQueryString(HttpServletRequest request) {
-		StringBuffer requestURL = request.getRequestURL();
-		String queryString = request.getQueryString();
-		return (queryString == null) ? requestURL.toString() : requestURL.append('?').append(queryString).toString();
-	}
-
-	/**
-	 * Returns the HTTP request URI with query string. This is the part after the domain in the request URL, including
-	 * the leading slash and the request query string.
-	 * @param request The involved HTTP servlet request.
-	 * @return The HTTP request URI with query string.
+	 * @return The HTTP request URI, regardless of any forward or error dispatch.
+	 * @since 2.4
 	 * @see HttpServletRequest#getRequestURI()
-	 * @see HttpServletRequest#getQueryString()
+	 * @see RequestDispatcher#FORWARD_REQUEST_URI
+	 * @see RequestDispatcher#ERROR_REQUEST_URI
 	 */
-	public static String getRequestURIWithQueryString(HttpServletRequest request) {
-		String requestURI = request.getRequestURI();
-		String queryString = request.getQueryString();
-		return (queryString == null) ? requestURI : (requestURI + "?" + queryString);
+	public static String getRequestURI(HttpServletRequest request) {
+		return coalesce((String) request.getAttribute(ERROR_REQUEST_URI), (String) request.getAttribute(FORWARD_REQUEST_URI), request.getRequestURI());
+	}
+
+	/**
+	 * Returns the HTTP request query string, regardless of any forward.
+	 * @param request The involved HTTP servlet request.
+	 * @return The HTTP request query string, regardless of any forward.
+	 * @since 2.4
+	 * @see HttpServletRequest#getRequestURI()
+	 * @see RequestDispatcher#FORWARD_QUERY_STRING
+	 */
+	public static String getRequestQueryString(HttpServletRequest request) {
+		return coalesce((String) request.getAttribute(FORWARD_QUERY_STRING), request.getQueryString());
 	}
 
 	/**
@@ -194,11 +171,11 @@ public final class Servlets {
 	 * the request URL (GET) parameters, as opposed to {@link HttpServletRequest#getParameterMap()}, which contains both
 	 * the request URL (GET) parameters and and the request body (POST) parameters.
 	 * The map entries are in the same order as they appear in the query string.
-	 * @param request The request for which the base URL is computed.
+	 * @param request The involved HTTP servlet request.
 	 * @return The HTTP request query string as parameter values map.
 	 */
 	public static Map<String, List<String>> getRequestQueryStringMap(HttpServletRequest request) {
-		String queryString = request.getQueryString();
+		String queryString = getRequestQueryString(request);
 
 		if (isEmpty(queryString)) {
 			return new LinkedHashMap<>(0);
@@ -208,12 +185,74 @@ public final class Servlets {
 	}
 
 	/**
+	 * Returns the HTTP request URI with query string, regardless of any forward. This is the part after the domain in
+	 * the request URL, including the leading slash and the request query string.
+	 * @param request The involved HTTP servlet request.
+	 * @return The HTTP request URI with query string.
+	 * @see #getRequestURI(HttpServletRequest)
+	 * @see #getRequestQueryString(HttpServletRequest)
+	 */
+	public static String getRequestURIWithQueryString(HttpServletRequest request) {
+		String requestURI = getRequestURI(request);
+		String queryString = getRequestQueryString(request);
+		return (queryString == null) ? requestURI : (requestURI + "?" + queryString);
+	}
+
+	/**
+	 * Returns the HTTP request URI relative to the context root, regardless of any forward. This is the request URI
+	 * minus the context path. Note that this includes path parameters.
+	 * @param request The involved HTTP servlet request.
+	 * @return The HTTP request URI relative to the context root.
+	 * @since 1.8
+	 */
+	public static String getRequestRelativeURI(HttpServletRequest request) {
+		return getRequestURI(request).substring(request.getContextPath().length());
+	}
+
+	/**
+	 * Returns the HTTP request URI relative to the context root without path parameters, regardless of any forward.
+	 * This is the request URI minus the context path and path parameters.
+	 * @param request The involved HTTP servlet request.
+	 * @return The HTTP request URI relative to the context root without path parameters.
+	 * @since 1.8
+	 */
+	public static String getRequestRelativeURIWithoutPathParameters(HttpServletRequest request) {
+		return getRequestRelativeURI(request).split(";", 2)[0];
+	}
+
+	/**
+	 * Returns the HTTP request URL with query string, regardless of any forward. This is the full request URL without
+	 * query string as the enduser sees in browser address bar.
+	 * @param request The involved HTTP servlet request.
+	 * @return The HTTP request URL without query string, regardless of any forward.
+	 * @since 2.4
+	 * @see HttpServletRequest#getRequestURL()
+	 */
+	public static String getRequestURL(HttpServletRequest request) {
+		return getRequestDomainURL(request) + getRequestURI(request);
+	}
+
+	/**
+	 * Returns the HTTP request URL with query string. This is the full request URL with query string as the enduser
+	 * sees in browser address bar.
+	 * @param request The involved HTTP servlet request.
+	 * @return The HTTP request URL with query string, regardless of any forward.
+	 * @see HttpServletRequest#getRequestURL()
+	 * @see HttpServletRequest#getQueryString()
+	 */
+	public static String getRequestURLWithQueryString(HttpServletRequest request) {
+		return getRequestDomainURL(request) + getRequestURIWithQueryString(request);
+	}
+
+	/**
 	 * Returns the original HTTP request URI behind this forwarded request, if any.
 	 * This does not include the request query string.
 	 * @param request The involved HTTP servlet request.
 	 * @return The original HTTP request URI behind this forwarded request, if any.
 	 * @since 1.8
+	 * @deprecated Since 2.4. Use {@link #getRequestURI(HttpServletRequest)} instead.
 	 */
+	@Deprecated // TODO: Remove in OmniFaces 3.0.
 	public static String getForwardRequestURI(HttpServletRequest request) {
 		return (String) request.getAttribute(FORWARD_REQUEST_URI);
 	}
@@ -223,7 +262,9 @@ public final class Servlets {
 	 * @param request The involved HTTP servlet request.
 	 * @return The original HTTP request query string behind this forwarded request, if any.
 	 * @since 1.8
+	 * @deprecated Since 2.4. Use {@link #getRequestQueryString(HttpServletRequest)} instead.
 	 */
+	@Deprecated // TODO: Remove in OmniFaces 3.0.
 	public static String getForwardRequestQueryString(HttpServletRequest request) {
 		return (String) request.getAttribute(FORWARD_QUERY_STRING);
 	}
@@ -233,7 +274,9 @@ public final class Servlets {
 	 * @param request The involved HTTP servlet request.
 	 * @return The original HTTP request URI with query string behind this forwarded request, if any.
 	 * @since 1.8
+	 * @deprecated Since 2.4. Use {@link #getRequestURIWithQueryString(HttpServletRequest)} instead.
 	 */
+	@Deprecated // TODO: Remove in OmniFaces 3.0.
 	public static String getForwardRequestURIWithQueryString(HttpServletRequest request) {
 		String requestURI = getForwardRequestURI(request);
 		String queryString = getForwardRequestQueryString(request);
@@ -563,7 +606,7 @@ public final class Servlets {
 	 * @see ResourceHandler#RESOURCE_IDENTIFIER
 	 */
 	public static boolean isFacesResourceRequest(HttpServletRequest request) {
-		return request.getRequestURI().startsWith(request.getContextPath() + ResourceHandler.RESOURCE_IDENTIFIER + "/");
+		return getRequestURI(request).startsWith(request.getContextPath() + ResourceHandler.RESOURCE_IDENTIFIER + "/");
 	}
 
 	/**

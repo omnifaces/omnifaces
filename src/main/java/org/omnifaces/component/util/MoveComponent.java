@@ -63,6 +63,7 @@ import org.omnifaces.util.State;
  *
  * @since 2.0
  * @author Arjan Tijms
+ * @see UtilFamily
  */
 @FacesComponent(MoveComponent.COMPONENT_TYPE)
 public class MoveComponent extends UtilFamily implements SystemEventListener, ClientBehaviorHolder {

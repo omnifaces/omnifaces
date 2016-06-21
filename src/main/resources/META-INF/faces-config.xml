@@ -34,7 +34,7 @@
 			<system-event-class>javax.faces.event.PostConstructApplicationEvent</system-event-class>
 		</system-event-listener>
 		<system-event-listener>
-			<system-event-listener-class>org.omnifaces.application.ViewScopeEventListener</system-event-listener-class>
+			<system-event-listener-class>org.omnifaces.cdi.viewscope.ViewScopeEventListener</system-event-listener-class>
 			<system-event-class>javax.faces.event.PreDestroyViewMapEvent</system-event-class>
 			<source-class>javax.faces.component.UIViewRoot</source-class>
 		</system-event-listener>

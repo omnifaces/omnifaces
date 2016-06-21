@@ -15,6 +15,7 @@ package org.omnifaces.util;
 import static java.util.Arrays.asList;
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 import static org.omnifaces.util.Servlets.prepareRedirectURL;
+import static org.omnifaces.util.Utils.encodeURI;
 import static org.omnifaces.util.Utils.encodeURL;
 import static org.omnifaces.util.Utils.isAnyEmpty;
 
@@ -547,7 +548,9 @@ public final class FacesLocal {
 
 		if (params != null) {
 			for (Entry<String, List<String>> param : params.entrySet()) {
-				addParamToMapIfNecessary(map, param.getKey(), param.getValue());
+				for (String value : param.getValue()) {
+					addParamToMapIfNecessary(map, param.getKey(), value);
+				}
 			}
 		}
 
@@ -784,7 +787,7 @@ public final class FacesLocal {
 	 * @see Faces#getRequestURL()
 	 */
 	public static String getRequestURL(FacesContext context) {
-		return getRequest(context).getRequestURL().toString();
+		return Servlets.getRequestURL(getRequest(context));
 	}
 
 	/**
@@ -792,7 +795,7 @@ public final class FacesLocal {
 	 * @see Faces#getRequestURI()
 	 */
 	public static String getRequestURI(FacesContext context) {
-		return getRequest(context).getRequestURI();
+		return Servlets.getRequestURI(getRequest(context));
 	}
 
 	/**
@@ -800,7 +803,7 @@ public final class FacesLocal {
 	 * @see Faces#getRequestQueryString()
 	 */
 	public static String getRequestQueryString(FacesContext context) {
-		return getRequest(context).getQueryString();
+		return Servlets.getRequestQueryString(getRequest(context));
 	}
 
 	/**
@@ -830,7 +833,10 @@ public final class FacesLocal {
 	/**
 	 * {@inheritDoc}
 	 * @see Faces#getForwardRequestURI()
+	 * @deprecated Since 2.4. This is abstracted away by {@link #getRequestURI(FacesContext)}. Use it instead.
+	 * JSF has as to retrieving request URI no business of knowing if the request is forwarded/rewritten or not.
 	 */
+	@Deprecated // TODO: Remove in OmniFaces 3.0.
 	public static String getForwardRequestURI(FacesContext context) {
 		return Servlets.getForwardRequestURI(getRequest(context));
 	}
@@ -838,7 +844,10 @@ public final class FacesLocal {
 	/**
 	 * {@inheritDoc}
 	 * @see Faces#getForwardRequestQueryString()
+	 * @deprecated Since 2.4. This is abstracted away by {@link #getRequestQueryString(FacesContext)}. Use it instead.
+	 * JSF has as to retrieving request URI no business of knowing if the request is forwarded/rewritten or not.
 	 */
+	@Deprecated // TODO: Remove in OmniFaces 3.0.
 	public static String getForwardRequestQueryString(FacesContext context) {
 		return Servlets.getForwardRequestQueryString(getRequest(context));
 	}
@@ -846,7 +855,10 @@ public final class FacesLocal {
 	/**
 	 * {@inheritDoc}
 	 * @see Faces#getForwardRequestURIWithQueryString()
+	 * @deprecated Since 2.4. This is abstracted away by {@link #getRequestURIWithQueryString(FacesContext)}. Use it instead.
+	 * JSF has as to retrieving request URI no business of knowing if the request is forwarded/rewritten or not.
 	 */
+	@Deprecated // TODO: Remove in OmniFaces 3.0.
 	public static String getForwardRequestURIWithQueryString(FacesContext context) {
 		return Servlets.getForwardRequestURIWithQueryString(getRequest(context));
 	}
@@ -1476,7 +1488,7 @@ public final class FacesLocal {
 		externalContext.setResponseBufferSize(DEFAULT_SENDFILE_BUFFER_SIZE);
 		externalContext.setResponseContentType(getMimeType(context, filename));
 		externalContext.setResponseHeader("Content-Disposition", String.format(SENDFILE_HEADER,
-			(attachment ? "attachment" : "inline"), encodeURL(filename)));
+			(attachment ? "attachment" : "inline"), encodeURI(filename)));
 
 		// Not exactly mandatory, but this fixes at least a MSIE quirk: http://support.microsoft.com/kb/316431
 		if (((HttpServletRequest) externalContext.getRequest()).isSecure()) {

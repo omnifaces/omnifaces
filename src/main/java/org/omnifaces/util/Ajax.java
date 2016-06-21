@@ -44,17 +44,40 @@ import org.omnifaces.context.OmniPartialViewContextFactory;
  * {@link OmniPartialViewContext} instance.
  * <p>
  * This utility class allows an easy way of programmaticaly (from inside a managed bean method) specifying new client
- * IDs which should be ajax-updated, also {@link UIData} rows or columns on specific index, specifying callback scripts
- * which should be executed on complete of the ajax response and adding arguments to the JavaScript scope. The added
- * arguments are during the "on complete" phase as a JSON object available by <code>OmniFaces.Ajax.data</code> in
- * JavaScript context.
+ * IDs which should be ajax-updated via {@link #update(String...)}, also {@link UIData} rows or columns on specific
+ * index via {@link #updateRow(UIData, int)} and {@link #updateColumn(UIData, int)}, specifying callback scripts which
+ * should be executed on complete of the ajax response via {@link #oncomplete(String...)}, and loading new JavaScript
+ * resources on complete of the ajax response via {@link #load(String, String)}.
  * <p>
- * The JSON object is been encoded by {@link Json#encode(Object)} which supports standard Java types {@link Boolean},
- * {@link Number}, {@link CharSequence} and {@link Date} arrays, {@link Collection}s and {@link Map}s of them and as
- * last resort it will use the {@link Introspector} to examine it as a Javabean and encode it like a {@link Map}.
+ * It also supports adding arguments to the JavaScript scope via {@link #data(String, Object)}, {@link #data(Map)} and
+ * {@link #data(Object...)}. The added arguments are during the "on complete" phase as a JSON object available by
+ * <code>OmniFaces.Ajax.data</code> in JavaScript context. The JSON object is encoded by {@link Json#encode(Object)}
+ * which supports standard Java types {@link Boolean}, {@link Number}, {@link CharSequence} and {@link Date} arrays,
+ * {@link Collection}s and {@link Map}s of them and as last resort it will use the {@link Introspector} to examine it
+ * as a Javabean and encode it like a {@link Map}.
  * <p>
  * Note that {@link #updateRow(UIData, int)} and {@link #updateColumn(UIData, int)} can only update cell content when
  * it has been wrapped in some container component with a fixed ID.
+ *
+ * <h3>Usage</h3>
+ * <p>
+ * Some examples:
+ * <pre>
+ * // Update specific component on complete of ajax.
+ * Ajax.update("formId:someId");
+ * </pre>
+ * <pre>
+ * // Load script resource on complete of ajax.
+ * Ajax.load("libraryName", "js/resourceName.js");
+ * </pre>
+ * <pre>
+ * // Add variables to JavaScript scope.
+ * Ajax.data("foo", foo); // It will be available as OmniFaces.Ajax.data.foo in JavaScript.
+ * </pre>
+ * <pre>
+ * // Execute script on complete of ajax.
+ * Ajax.oncomplete("alert(OmniFaces.Ajax.data.foo)");
+ * </pre>
  *
  * @author Bauke Scholtz
  * @since 1.2

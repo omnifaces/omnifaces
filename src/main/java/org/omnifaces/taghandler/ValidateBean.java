@@ -17,6 +17,7 @@ import static javax.faces.component.visit.VisitHint.SKIP_UNRENDERED;
 import static javax.faces.event.PhaseId.PROCESS_VALIDATIONS;
 import static javax.faces.event.PhaseId.RESTORE_VIEW;
 import static javax.faces.event.PhaseId.UPDATE_MODEL_VALUES;
+import static javax.faces.view.facelets.ComponentHandler.isNew;
 import static org.omnifaces.el.ExpressionInspector.getValueReference;
 import static org.omnifaces.util.Components.forEachComponent;
 import static org.omnifaces.util.Components.getClosestParent;
@@ -62,7 +63,6 @@ import javax.faces.event.PreValidateEvent;
 import javax.faces.event.SystemEventListener;
 import javax.faces.validator.Validator;
 import javax.faces.validator.ValidatorException;
-import javax.faces.view.facelets.ComponentHandler;
 import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
@@ -209,7 +209,7 @@ public class ValidateBean extends TagHandler {
 
 		FacesContext facesContext = context.getFacesContext();
 
-		if (!(ComponentHandler.isNew(parent) && facesContext.isPostback() && facesContext.getCurrentPhaseId() == RESTORE_VIEW)) {
+		if (!(isNew(parent) && facesContext.isPostback() && facesContext.getCurrentPhaseId() == RESTORE_VIEW)) {
 			return;
 		}
 
@@ -217,7 +217,7 @@ public class ValidateBean extends TagHandler {
 		disabled = getBoolean(context, getAttribute("disabled"));
 		method = ValidateMethod.of(getString(context, getAttribute("method")));
 		groups = getString(context, getAttribute("validationGroups"));
-		copier = getString(context, getAttribute("copier"));
+		copier = getAttribute("copier") == null? null : getAttribute("copier").getValue();
 
 		// We can't use getCurrentForm() or hasInvokedSubmit() before the component is added to view, because the client ID isn't available.
 		// Hence, we subscribe this check to after phase of restore view.
@@ -284,15 +284,15 @@ public class ValidateBean extends TagHandler {
 		ValidateBeanCallback collectBeanProperties = new ValidateBeanCallback() { @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
 
-			forEachInputWithMatchingBase(context, form, bean, new Operation() { @Override public void run(EditableValueHolder v, ValueReference vr) {
-				addCollectingValidator(v, vr, properties);
+			forEachInputWithMatchingBase(context, form, bean, new Callback.WithArgument<EditableValueHolder>() { @Override public void invoke(EditableValueHolder v) {
+				addCollectingValidator(v, properties);
 			}});
 		}};
 
 		ValidateBeanCallback checkConstraints = new ValidateBeanCallback() { @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
 
-			forEachInputWithMatchingBase(context, form, bean, new Operation() { @Override public void run(EditableValueHolder v, ValueReference vr) {
+			forEachInputWithMatchingBase(context, form, bean, new Callback.WithArgument<EditableValueHolder>() { @Override public void invoke(EditableValueHolder v) {
 				removeCollectingValidator(v);
 			}});
 
@@ -320,11 +320,11 @@ public class ValidateBean extends TagHandler {
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
-	private static void forEachInputWithMatchingBase(final FacesContext context, UIComponent form, final Object base, final Operation operation) {
+	private static void forEachInputWithMatchingBase(final FacesContext context, UIComponent form, final Object base, final Callback.WithArgument<EditableValueHolder> callback) {
 		forEachComponent(context)
 			.fromRoot(form)
 			.ofTypes(EditableValueHolder.class)
-			.withHints(SKIP_UNRENDERED)
+			.withHints(SKIP_UNRENDERED/*, SKIP_ITERATION*/) // SKIP_ITERATION fails in Apache EL (Tomcat 8.0.32 tested) but works in Oracle EL.
 			.invoke(new Callback.WithArgument<UIComponent>() { @Override public void invoke(UIComponent component) {
 				ValueExpression valueExpression = component.getValueExpression("value");
 
@@ -332,14 +332,14 @@ public class ValidateBean extends TagHandler {
 					ValueReference valueReference = getValueReference(context.getELContext(), valueExpression);
 
 					if (valueReference.getBase().equals(base)) {
-						operation.run((EditableValueHolder) component, valueReference);
+						callback.invoke((EditableValueHolder) component);
 					}
 				}
 			}});
 	}
 
-	private static void addCollectingValidator(EditableValueHolder valueHolder, ValueReference valueReference,  Map<String, Object> propertyValues) {
-		valueHolder.addValidator(new CollectingValidator(propertyValues, valueReference.getProperty().toString()));
+	private static void addCollectingValidator(EditableValueHolder valueHolder, Map<String, Object> propertyValues) {
+		valueHolder.addValidator(new CollectingValidator(propertyValues));
 	}
 
 	private static void removeCollectingValidator(EditableValueHolder valueHolder) {
@@ -408,16 +408,19 @@ public class ValidateBean extends TagHandler {
 	public static final class CollectingValidator implements Validator {
 
 		private final Map<String, Object> propertyValues;
-		private final String property;
 
-		public CollectingValidator(Map<String, Object> propertyValues, String property) {
+		public CollectingValidator(Map<String, Object> propertyValues) {
 			this.propertyValues = propertyValues;
-			this.property = property;
 		}
 
 		@Override
 		public void validate(FacesContext context, UIComponent component, Object value) throws ValidatorException {
-			propertyValues.put(property, value);
+			ValueExpression valueExpression = component.getValueExpression("value");
+
+			if (valueExpression != null) {
+				ValueReference valueReference = getValueReference(context.getELContext(), valueExpression);
+				propertyValues.put(valueReference.getProperty().toString(), value);
+			}
 		}
 	}
 
@@ -444,16 +447,6 @@ public class ValidateBean extends TagHandler {
 		}
 
 		public abstract void run();
-	}
-
-	private abstract static class Operation implements Callback.WithArgument<Object[]> {
-
-		@Override
-		public void invoke(Object[] args) {
-			run((EditableValueHolder) args[0], (ValueReference) args[1]);
-		}
-
-		public abstract void run(EditableValueHolder valueHolder, ValueReference valueReference);
 	}
 
 }
