@@ -1082,6 +1082,7 @@ public final class FacesLocal {
 		}
 
 		properties.put("maxAge", maxAge);
+		properties.put("httpOnly", true);
 		properties.put("secure", ((HttpServletRequest) externalContext.getRequest()).isSecure());
 		externalContext.addResponseCookie(name, encodeURL(value), properties);
 	}
