@@ -52,6 +52,9 @@ import javax.faces.model.SelectItem;
 @FacesConverter("omnifaces.ListIndexConverter")
 public class ListIndexConverter implements Converter {
 
+	private static final String ERROR_LIST_INDEX =
+			"Could not determine index for value ''{0}'' in component {1}.";
+
 	private static final String ERROR_LIST_INDEX_BOUNDS =
 			"Index {0} for value {1} in component {2} is out of bounds.";
 
@@ -62,7 +65,16 @@ public class ListIndexConverter implements Converter {
 
 	@Override
 	public Object getAsObject(FacesContext context, UIComponent component, String value) {
-		int index = Integer.valueOf(value);
+		int index;
+
+		try {
+			index = Integer.valueOf(value);
+		}
+		catch (NumberFormatException e) {
+			throw new ConverterException(
+				createError(ERROR_LIST_INDEX, value, component.getClientId(context)), e);
+		}
+
 		if (index < 0 || index >= list.size()) {
 			throw new ConverterException(
 				createError(ERROR_LIST_INDEX_BOUNDS, index, value, component.getClientId(context))

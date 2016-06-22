@@ -53,6 +53,7 @@ import org.omnifaces.util.Messages;
  *
  * @author Bauke Scholtz
  * @see FacesMessageExceptionHandlerFactory
+ * @see DefaultExceptionHandlerFactory
  * @since 1.8
  */
 public class FacesMessageExceptionHandler extends ExceptionHandlerWrapper {

@@ -41,6 +41,7 @@ import javax.faces.event.PhaseId;
 
 import org.omnifaces.config.WebXml;
 import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
+import org.omnifaces.util.Ajax;
 import org.omnifaces.util.Hacks;
 import org.omnifaces.util.Json;
 
@@ -57,7 +58,7 @@ import org.omnifaces.util.Json;
  * redirected to the login page instead of retrieving an ajax response with only a changed view state (and effectively
  * thus no visual feedback at all).</li>
  * </ul>
- * You can use the {@link org.omnifaces.util.Ajax} utility class to easily add callback scripts and arguments.
+ * You can use the {@link Ajax} utility class to easily add callback scripts and arguments.
  * <p>
  * This partial view context is already registered by OmniFaces' own <code>faces-config.xml</code> and thus gets
  * auto-initialized when the OmniFaces JAR is bundled in a web application, so end-users do not need to register this
@@ -66,6 +67,10 @@ import org.omnifaces.util.Json;
  * @author Bauke Scholtz
  * @since 1.2
  * @see OmniPartialViewContextFactory
+ * @see FullAjaxExceptionHandler
+ * @see WebXml
+ * @see Ajax
+ * @see Json
  */
 public class OmniPartialViewContext extends PartialViewContextWrapper {
 
@@ -374,14 +379,16 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		 */
 		public void reset() {
 			try {
+				wrapped.flush(); // Note: this doesn't actually flush to writer, but clears internal state.
+
 				if (updating) {
 					// If reset() method is entered with updating=true, then it means that Mojarra is used and that
 					// an exception was been thrown during ajax render response. The following calls will gently close
 					// the partial response which Mojarra has left open.
 					// MyFaces never enters reset() method with updating=true, this is handled in endDocument() method.
-					endCDATA();
-					endUpdate();
-					wrapped.endDocument();
+					wrapped.startError("");
+					wrapped.endError();
+					wrapped.endElement("partial-response"); // Don't use endDocument() as it will flush.
 				}
 			}
 			catch (IOException e) {

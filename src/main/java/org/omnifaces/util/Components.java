@@ -13,15 +13,19 @@
 package org.omnifaces.util;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
 import static java.util.regex.Pattern.quote;
 import static javax.faces.component.visit.VisitContext.createVisitContext;
 import static javax.faces.component.visit.VisitResult.ACCEPT;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getELContext;
 import static org.omnifaces.util.Faces.getFaceletContext;
+import static org.omnifaces.util.Faces.getRequestParameter;
 import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.Faces.setContext;
 import static org.omnifaces.util.FacesLocal.getRenderKit;
+import static org.omnifaces.util.FacesLocal.getRequestQueryStringMap;
+import static org.omnifaces.util.FacesLocal.getViewParameterMap;
 import static org.omnifaces.util.FacesLocal.normalizeViewId;
 import static org.omnifaces.util.Renderers.RENDERER_TYPE_JS;
 import static org.omnifaces.util.Utils.isEmpty;
@@ -29,10 +33,13 @@ import static org.omnifaces.util.Utils.isOneInstanceOf;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -43,6 +50,7 @@ import javax.faces.FacesException;
 import javax.faces.application.Application;
 import javax.faces.application.Resource;
 import javax.faces.application.ViewHandler;
+import javax.faces.component.ActionSource2;
 import javax.faces.component.EditableValueHolder;
 import javax.faces.component.NamingContainer;
 import javax.faces.component.UICommand;
@@ -56,7 +64,9 @@ import javax.faces.component.UIPanel;
 import javax.faces.component.UIParameter;
 import javax.faces.component.UIViewRoot;
 import javax.faces.component.behavior.AjaxBehavior;
+import javax.faces.component.behavior.BehaviorBase;
 import javax.faces.component.behavior.ClientBehavior;
+import javax.faces.component.behavior.ClientBehaviorHolder;
 import javax.faces.component.visit.VisitCallback;
 import javax.faces.component.visit.VisitContext;
 import javax.faces.component.visit.VisitHint;
@@ -66,8 +76,10 @@ import javax.faces.context.FacesContextWrapper;
 import javax.faces.context.ResponseWriter;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
+import javax.faces.event.ActionListener;
 import javax.faces.event.AjaxBehaviorEvent;
 import javax.faces.event.AjaxBehaviorListener;
+import javax.faces.event.BehaviorListener;
 import javax.faces.event.MethodExpressionActionListener;
 import javax.faces.render.RenderKit;
 import javax.faces.view.ViewDeclarationLanguage;
@@ -121,6 +133,10 @@ import org.omnifaces.component.SimpleParam;
  * <pre>
  * // Programmatically capture HTML output of a given view.
  * String mailHtml = Components.encodeHtml(Components.buildView("/WEB-INF/mail-template.xhtml"));
+ * </pre>
+ * <pre>
+ * // Collecting all queued actions and action listeners as method expression strings in a logging phase listener.
+ * List&lt;String&gt; actions = Components.getActionExpressionsAndListeners(Components.getCurrentActionSource());
  * </pre>
  *
  * @author Bauke Scholtz
@@ -839,6 +855,18 @@ public final class Components {
 	 * @since 1.6
 	 */
 	public static UICommand getCurrentCommand() {
+		UIComponent source = getCurrentActionSource();
+		return source instanceof UICommand ? (UICommand) source : null;
+	}
+
+	/**
+	 * Returns the source of the currently invoked action, or <code>null</code> if there is none, which may happen when
+	 * the current request is not a postback request at all, or when the view has been changed by for example a
+	 * successful navigation. If the latter is the case, you'd better invoke this method before navigation.
+	 * @return The source of the currently invoked action.
+	 * @since 2.4
+	 */
+	public static UIComponent getCurrentActionSource() {
 		FacesContext context = FacesContext.getCurrentInstance();
 
 		if (!context.isPostback()) {
@@ -847,32 +875,31 @@ public final class Components {
 
 		UIViewRoot viewRoot = context.getViewRoot();
 		Map<String, String> params = context.getExternalContext().getRequestParameterMap();
+		UIComponent actionSource = null;
 
 		if (context.getPartialViewContext().isAjaxRequest()) {
-			String source = params.get("javax.faces.source");
+			String sourceClientId = params.get("javax.faces.source");
 
-			if (source != null) {
-				UIComponent component = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(source));
+			if (sourceClientId != null) {
+				actionSource = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(sourceClientId));
+			}
+		}
 
-				if (component instanceof UICommand) {
-					return (UICommand) component;
+		if (actionSource == null) {
+			for (String name : params.keySet()) {
+				if (name.startsWith("javax.faces.")) {
+					continue; // Quick skip.
+				}
+
+				actionSource = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(name));
+
+				if (actionSource instanceof UICommand) {
+					break;
 				}
 			}
 		}
 
-		for (String name : params.keySet()) {
-			if (name.startsWith("javax.faces.")) {
-				continue; // Quick skip.
-			}
-
-			UIComponent component = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(name));
-
-			if (component instanceof UICommand) {
-				return (UICommand) component;
-			}
-		}
-
-		return null;
+		return actionSource;
 	}
 
 	/**
@@ -972,36 +999,8 @@ public final class Components {
 	 * @since 1.3
 	 */
 	public static boolean hasInvokedSubmit(UIComponent component) {
-		FacesContext context = FacesContext.getCurrentInstance();
-
-		if (!context.isPostback()) {
-			return false;
-		}
-
-		String clientId = stripIterationIndexFromClientId(component.getClientId(context));
-		Map<String, String> params = context.getExternalContext().getRequestParameterMap();
-
-		if (context.getPartialViewContext().isAjaxRequest()) {
-			String source = params.get("javax.faces.source");
-
-			if (source != null) {
-				return clientId.equals(stripIterationIndexFromClientId(source));
-			}
-		}
-
-		if (component instanceof UICommand) {
-			for (String name : params.keySet()) {
-				if (name.startsWith("javax.faces.")) {
-					continue; // Quick skip.
-				}
-
-				if (clientId.equals(stripIterationIndexFromClientId(name))) {
-					return true;
-				}
-			}
-		}
-
-		return false;
+		UIComponent source = getCurrentActionSource();
+		return source != null && source.equals(component);
 	}
 
 	/**
@@ -1032,6 +1031,46 @@ public final class Components {
 		else {
 			return Collections.emptyList();
 		}
+	}
+
+	/**
+	 * Returns an unmodifiable map with all request query string or view parameters, appended with all child
+	 * {@link UIParameter} components (<code>&lt;f|o:param&gt;</code>) of the given parent component. Those with
+	 * <code>disabled=true</code> or an empty name or an empty value are skipped. The <code>&lt;f|o:param&gt;</code>
+	 * will override any included view or request parameters on the same name.
+	 * @param component The parent component to retrieve all child {@link UIParameter} components from.
+	 * @param includeRequestParams Whether or not to include request query string parameters.
+	 * When set to <code>true</code>, then this overrides the <code>includeViewParams</code>.
+	 * @param includeViewParams Whether or not to include view parameters.
+	 * @return An unmodifiable list with all request query string or view parameters, appended with all child
+	 * {@link UIParameter} components having a non-empty name and not disabled.
+	 * @since 2.4
+	 */
+	public static Map<String, List<String>> getParams(UIComponent component, boolean includeRequestParams, boolean includeViewParams) {
+		FacesContext context = FacesContext.getCurrentInstance();
+		Map<String, List<String>> params;
+
+		if (includeRequestParams) {
+			params = getRequestQueryStringMap(context);
+		}
+		else if (includeViewParams) {
+			params = getViewParameterMap(context);
+		}
+		else {
+			params = new LinkedHashMap<String, List<String>>(0);
+		}
+
+		for (ParamHolder param : getParams(component)) {
+			Object value = param.getValue();
+
+			if (isEmpty(value)) {
+				continue;
+			}
+
+			params.put(param.getName(), asList(value.toString()));
+		}
+
+		return Collections.unmodifiableMap(params);
 	}
 
 	// Expressions ----------------------------------------------------------------------------------------------------
@@ -1157,6 +1196,52 @@ public final class Components {
 		return behavior;
 	}
 
+	/**
+	 * Returns a list of all action expressions and listeners associated with given component. This covers expressions
+	 * in <code>action</code> attribute of command components and <code>listener</code> attribute of ajax components.
+	 * Any method expressions are in format <code>#{bean.method}</code> and any action listeners are added as fully
+	 * qualified class names. This list is primarily useful for logging postback actions in a phase listener. You can
+	 * use {@link #getCurrentActionSource()} to obtain the current action source.
+	 * @param component The component to retrieve all action expressions and listeners from.
+	 * @return A list of all action expressions and listeners associated with given component.
+	 * @since 2.4
+	 */
+	@SuppressWarnings("unchecked")
+	public static List<String> getActionExpressionsAndListeners(UIComponent component) {
+        List<String> actions = new ArrayList<String>();
+
+        if (component instanceof ActionSource2) {
+        	ActionSource2 source = (ActionSource2) component;
+        	addExpressionStringIfNotNull(source.getActionExpression(), actions);
+
+            for (ActionListener actionListener : source.getActionListeners()) {
+            	actions.add(actionListener.getClass().getName());
+            }
+        }
+
+        if (component instanceof ClientBehaviorHolder) {
+            String behaviorEvent = getRequestParameter("javax.faces.behavior.event");
+
+            if (behaviorEvent != null) {
+            	List<ClientBehavior> behaviors = ((ClientBehaviorHolder) component).getClientBehaviors().get(behaviorEvent);
+
+            	if (behaviors != null) {
+            		for (ClientBehavior behavior : behaviors) {
+            			List<BehaviorListener> listeners = getField(BehaviorBase.class, List.class, behavior);
+
+            			if (listeners != null) {
+            				for (BehaviorListener listener : listeners) {
+            					addExpressionStringIfNotNull(getField(listener.getClass(), MethodExpression.class, listener), actions);
+            				}
+            			}
+            		}
+            	}
+            }
+        }
+
+        return unmodifiableList(actions);
+	}
+
 	// Validation -----------------------------------------------------------------------------------------------------
 
 	/**
@@ -1236,6 +1321,37 @@ public final class Components {
 			return null;
 		}
 	}
+
+	/**
+	 * If given method expression is not null, extract expression string from it and add to given list.
+	 */
+	private static void addExpressionStringIfNotNull(MethodExpression expression, List<String> list) {
+		if (expression != null) {
+			list.add(expression.getExpressionString());
+		}
+	}
+
+	/**
+	 * Get first matching field of given field type from the given class type and get the value from the given instance.
+	 * (this is a rather specific helper for getActionExpressionsAndListeners() and may not work in other cases).
+	 */
+    @SuppressWarnings("unchecked")
+	private static <C, F> F getField(Class<? extends C> classType, Class<F> fieldType, C instance) {
+        for (Field field : classType.getDeclaredFields()) {
+            if (fieldType.isAssignableFrom(field.getType())) {
+                field.setAccessible(true);
+
+                try {
+                	return (F) field.get(instance);
+				}
+                catch (IllegalAccessException e) {
+					throw new IllegalStateException(e);
+				}
+            }
+        }
+
+        return null;
+    }
 
 	// Inner classes --------------------------------------------------------------------------------------------------
 

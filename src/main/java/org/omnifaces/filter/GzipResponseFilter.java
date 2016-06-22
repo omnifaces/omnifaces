@@ -27,6 +27,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.omnifaces.io.ResettableBuffer;
+import org.omnifaces.io.ResettableBufferedOutputStream;
+import org.omnifaces.io.ResettableBufferedWriter;
 import org.omnifaces.servlet.GzipHttpServletResponse;
 import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
 
@@ -111,6 +114,10 @@ import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
  * @since 1.1
  * @see GzipHttpServletResponse
  * @see HttpServletResponseOutputWrapper
+ * @see ResettableBuffer
+ * @see ResettableBufferedOutputStream
+ * @see ResettableBufferedWriter
+ * @see HttpFilter
  */
 public class GzipResponseFilter extends HttpFilter {
 

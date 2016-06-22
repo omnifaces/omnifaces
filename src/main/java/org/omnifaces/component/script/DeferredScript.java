@@ -50,6 +50,7 @@ import org.omnifaces.util.Hacks;
  * @author Bauke Scholtz
  * @since 1.8
  * @see DeferredScriptRenderer
+ * @see ScriptFamily
  */
 @FacesComponent(DeferredScript.COMPONENT_TYPE)
 @ResourceDependency(library="omnifaces", name="omnifaces.js", target="head")

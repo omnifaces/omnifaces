@@ -72,6 +72,8 @@ import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
  *
  *
  * @author Bauke Scholtz
+ * @see FullAjaxExceptionHandler
+ * @see HttpFilter
  */
 public class FacesExceptionFilter extends HttpFilter {
 

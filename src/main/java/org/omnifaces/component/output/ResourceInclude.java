@@ -24,6 +24,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.omnifaces.io.ResettableBuffer;
+import org.omnifaces.io.ResettableBufferedOutputStream;
+import org.omnifaces.io.ResettableBufferedWriter;
 import org.omnifaces.servlet.BufferedHttpServletResponse;
 import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
 
@@ -40,6 +43,10 @@ import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
  * @author Bauke Scholtz
  * @see BufferedHttpServletResponse
  * @see HttpServletResponseOutputWrapper
+ * @see ResettableBuffer
+ * @see ResettableBufferedOutputStream
+ * @see ResettableBufferedWriter
+ * @see OutputFamily
  */
 @FacesComponent(ResourceInclude.COMPONENT_TYPE)
 public class ResourceInclude extends OutputFamily {

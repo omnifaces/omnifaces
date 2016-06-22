@@ -45,7 +45,7 @@ import javax.enterprise.inject.spi.ProcessAnnotatedType;
  * <p>
  * In order to solve that, OmniFaces added this {@link VetoAnnotatedTypeExtension} which should "veto" any class from
  * <code>org.omnifaces</code> package which is <strong>not</strong> in either <code>org.omnifaces.cdi</code> or
- * <code>org.omnifaces.showcase</code> subpackage from being registered as a CDI managed bean. This happens via
+ * <code>org.omnifaces.showcase</code> package from being registered as a CDI managed bean. This happens via
  * {@link ProcessAnnotatedType#veto()}
  * <p>
  * In Weld 2.x as used in among others WildFly, there's apparently a new type of warning which occurs when you use
@@ -77,8 +77,8 @@ public class VetoAnnotatedTypeExtension implements Extension {
 		String packageName = typePackage.getName();
 
 		if (packageName.startsWith("org.omnifaces.")
-			&& !packageName.startsWith("org.omnifaces.cdi.")
-			&& !packageName.startsWith("org.omnifaces.showcase."))
+			&& !packageName.startsWith("org.omnifaces.cdi")
+			&& !packageName.startsWith("org.omnifaces.showcase"))
 		{
 			type.veto();
 		}

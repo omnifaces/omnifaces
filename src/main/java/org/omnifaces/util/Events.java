@@ -67,6 +67,7 @@ import org.omnifaces.eventlistener.DefaultViewEventListener;
  *
  * @author Arjan Tijms
  * @author Bauke Scholtz
+ * @see CallbackPhaseListener
  */
 public final class Events {
 

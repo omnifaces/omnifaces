@@ -74,6 +74,7 @@ import javax.servlet.http.HttpSession;
  *
  * @author Bauke Scholtz
  * @since 1.2
+ * @see HttpFilter
  */
 public class CharacterEncodingFilter extends HttpFilter {
 

@@ -13,6 +13,7 @@
 package org.omnifaces.util;
 
 import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableMap;
 import static java.util.regex.Pattern.quote;
 
 import java.io.ByteArrayInputStream;
@@ -20,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
@@ -85,6 +87,19 @@ public final class Utils {
 	private static final int UNICODE_1_BYTE = 0xf;
 	private static final int UNICODE_END_PRINTABLE_ASCII = 0x7f;
 	private static final int UNICODE_BEGIN_PRINTABLE_ASCII = 0x20;
+	private static final Map<Class<?>, Object> PRIMITIVE_DEFAULTS = createPrimitiveDefaults();
+	private static Map<Class<?>, Object> createPrimitiveDefaults() {
+		Map<Class<?>, Object> primitiveDefaults = new HashMap<Class<?>, Object>();
+		primitiveDefaults.put(boolean.class, false);
+		primitiveDefaults.put(byte.class, (byte) 0);
+		primitiveDefaults.put(short.class, (short) 0);
+		primitiveDefaults.put(char.class, (char) 0);
+		primitiveDefaults.put(int.class, 0);
+		primitiveDefaults.put(long.class, (long) 0);
+		primitiveDefaults.put(float.class, (float) 0);
+		primitiveDefaults.put(double.class, (double) 0);
+		return unmodifiableMap(primitiveDefaults);
+	}
 
 	private static final String ERROR_UNSUPPORTED_ENCODING = "UTF-8 is apparently not supported on this platform.";
 
@@ -98,7 +113,6 @@ public final class Utils {
 
 	/**
 	 * Returns <code>true</code> if the given string is null or is empty.
-	 *
 	 * @param string The string to be checked on emptiness.
 	 * @return <code>true</code> if the given string is null or is empty.
 	 */
@@ -107,18 +121,7 @@ public final class Utils {
 	}
 
 	/**
-	 * Returns <code>true</code> if the given array is null or is empty.
-	 *
-	 * @param array The array to be checked on emptiness.
-	 * @return <code>true</code> if the given array is null or is empty.
-	 */
-	public static boolean isEmpty(Object[] array) {
-		return array == null || array.length == 0;
-	}
-
-	/**
 	 * Returns <code>true</code> if the given collection is null or is empty.
-	 *
 	 * @param collection The collection to be checked on emptiness.
 	 * @return <code>true</code> if the given collection is null or is empty.
 	 */
@@ -128,7 +131,6 @@ public final class Utils {
 
 	/**
 	 * Returns <code>true</code> if the given map is null or is empty.
-	 *
 	 * @param map The map to be checked on emptiness.
 	 * @return <code>true</code> if the given map is null or is empty.
 	 */
@@ -137,23 +139,13 @@ public final class Utils {
 	}
 
 	/**
-	 * Returns <code>true</code> if the given value is null or is empty. Types of String, Collection, Map and Array are
-	 * recognized. If none is recognized, then examine the emptiness of the toString() representation instead.
+	 * Returns <code>true</code> if the given object is null or an empty array or has an empty toString() result.
 	 * @param value The value to be checked on emptiness.
-	 * @return <code>true</code> if the given value is null or is empty.
+	 * @return <code>true</code> if the given object is null or an empty array or has an empty toString() result.
 	 */
 	public static boolean isEmpty(Object value) {
 		if (value == null) {
 			return true;
-		}
-		else if (value instanceof String) {
-			return ((String) value).isEmpty();
-		}
-		else if (value instanceof Collection<?>) {
-			return ((Collection<?>) value).isEmpty();
-		}
-		else if (value instanceof Map<?, ?>) {
-			return ((Map<?, ?>) value).isEmpty();
 		}
 		else if (value.getClass().isArray()) {
 			return Array.getLength(value) == 0;
@@ -165,7 +157,6 @@ public final class Utils {
 
 	/**
 	 * Returns <code>true</code> if at least one value is empty.
-	 *
 	 * @param values the values to be checked on emptiness
 	 * @return <code>true</code> if any value is empty and <code>false</code> if no values are empty
 	 * @since 1.8
@@ -184,7 +175,6 @@ public final class Utils {
 	 * Returns <code>true</code> if the given string is null or is empty or contains whitespace only. In addition to
 	 * {@link #isEmpty(String)}, this thus also returns <code>true</code> when <code>string.trim().isEmpty()</code>
 	 * returns <code>true</code>.
-	 *
 	 * @param string The string to be checked on blankness.
 	 * @return True if the given string is null or is empty or contains whitespace only.
 	 * @since 1.5
@@ -315,6 +305,17 @@ public final class Utils {
 		return false;
 	}
 
+	/**
+	 * Returns the default value of the given class, covering primitives.
+	 * E.g. if given class is <code>int.class</code>, then it will return <code>0</code>. Autoboxing will do the rest.
+	 * Non-primitives and <code>void.class</code> will return <code>null</code>.
+	 * @param cls The class to obtain the default value for.
+	 * @return The default value of the given class, covering primitives.
+	 * @since 2.4
+	 */
+	public static Object getDefaultValue(Class<?> cls) {
+		return cls.isPrimitive() ? PRIMITIVE_DEFAULTS.get(cls) : null;
+	}
 
 	// I/O ------------------------------------------------------------------------------------------------------------
 
@@ -383,6 +384,43 @@ public final class Utils {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Returns <code>true</code> if the given object is serializable.
+	 * @param object The object to be tested.
+	 * @return <code>true</code> if the given object is serializable.
+	 * @since 2.4
+	 */
+	public static boolean isSerializable(Object object) {
+		ObjectOutputStream output = null;
+
+		try {
+			output = new ObjectOutputStream(new NullOutputStream());
+			output.writeObject(object);
+			return true;
+		}
+		catch (IOException e) {
+			return false;
+		}
+		finally {
+			close(output);
+		}
+	}
+
+	private static final class NullOutputStream extends OutputStream {
+		@Override
+		public void write(int b) throws IOException {
+			// NOOP.
+		}
+		@Override
+		public void write(byte[] b) throws IOException {
+			// NOOP.
+		}
+		@Override
+		public void write(byte[] b, int off, int len) throws IOException {
+			// NOOP.
+		}
 	}
 
 	// Collections ----------------------------------------------------------------------------------------------------
@@ -705,6 +743,30 @@ public final class Utils {
 		catch (UnsupportedEncodingException e) {
 			throw new UnsupportedOperationException(ERROR_UNSUPPORTED_ENCODING, e);
 		}
+	}
+
+	/**
+	 * URI-encode the given string using UTF-8. URIs (paths and filenames) have different encoding rules as compared to
+	 * URL query string parameters. {@link URLEncoder} is actually only for www (HTML) form based query string parameter
+	 * values (as used when a webbrowser submits a HTML form). URI encoding has a lot in common with URL encoding, but
+	 * the space has to be %20 and some chars doesn't necessarily need to be encoded.
+	 * @param string The string to be URI-encoded using UTF-8.
+	 * @return The given string, URI-encoded using UTF-8, or <code>null</code> if <code>null</code> was given.
+	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
+	 * @since 2.4
+	 */
+	public static String encodeURI(String string) {
+		if (string == null) {
+			return null;
+		}
+
+		return encodeURL(string)
+			.replace("+", "%20")
+			.replace("%21", "!")
+			.replace("%27", "'")
+			.replace("%28", "(")
+			.replace("%29", ")")
+			.replace("%7E", "~");
 	}
 
 	// Escaping/unescaping --------------------------------------------------------------------------------------------

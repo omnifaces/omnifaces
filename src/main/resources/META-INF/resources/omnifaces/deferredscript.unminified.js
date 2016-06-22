@@ -67,6 +67,7 @@ OmniFaces.DeferredScript = (function(Util, document) {
 
 		script.async = true;
 		script.src = deferredScript.url;
+		script.setAttribute("crossorigin", "anonymous");
 
 		script.onerror = function() {
 			deferredScript.error();

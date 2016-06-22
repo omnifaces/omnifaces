@@ -57,6 +57,7 @@ import org.omnifaces.util.Ajax;
  * is that the <code>&lt;o:onloadScript&gt;</code> is also executed on every ajax request.
  *
  * @author Bauke Scholtz
+ * @see ScriptFamily
  */
 @FacesComponent(OnloadScript.COMPONENT_TYPE)
 @ListenersFor({
