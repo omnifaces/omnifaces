@@ -12,7 +12,6 @@
  */
 package org.omnifaces.context;
 
-import static javax.servlet.RequestDispatcher.FORWARD_REQUEST_URI;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.responseReset;
 import static org.omnifaces.util.Faces.setContextAttribute;
@@ -124,7 +123,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 				String loginViewId = normalizeViewId(facesContext, loginURL);
 
 				if (loginViewId.equals(getViewId(facesContext))) {
-					String originalURL = getRequestAttribute(facesContext, FORWARD_REQUEST_URI);
+					String originalURL = getRequestAttribute(facesContext, "javax.servlet.forward.request_uri");
 
 					if (originalURL != null) {
 						try {

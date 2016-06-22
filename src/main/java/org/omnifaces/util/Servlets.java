@@ -17,9 +17,6 @@ import static java.util.regex.Pattern.quote;
 import static javax.faces.application.ProjectStage.Development;
 import static javax.faces.application.ProjectStage.PROJECT_STAGE_JNDI_NAME;
 import static javax.faces.application.ProjectStage.PROJECT_STAGE_PARAM_NAME;
-import static javax.servlet.RequestDispatcher.ERROR_REQUEST_URI;
-import static javax.servlet.RequestDispatcher.FORWARD_QUERY_STRING;
-import static javax.servlet.RequestDispatcher.FORWARD_REQUEST_URI;
 import static org.omnifaces.util.JNDI.lookup;
 import static org.omnifaces.util.Utils.UTF_8;
 import static org.omnifaces.util.Utils.coalesce;
@@ -43,7 +40,6 @@ import javax.faces.application.Application;
 import javax.faces.application.ResourceHandler;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -147,11 +143,9 @@ public final class Servlets {
 	 * @return The HTTP request URI, regardless of any forward or error dispatch.
 	 * @since 2.4
 	 * @see HttpServletRequest#getRequestURI()
-	 * @see RequestDispatcher#FORWARD_REQUEST_URI
-	 * @see RequestDispatcher#ERROR_REQUEST_URI
 	 */
 	public static String getRequestURI(HttpServletRequest request) {
-		return coalesce((String) request.getAttribute(ERROR_REQUEST_URI), (String) request.getAttribute(FORWARD_REQUEST_URI), request.getRequestURI());
+		return coalesce((String) request.getAttribute("javax.servlet.error.request_uri"), (String) request.getAttribute("javax.servlet.forward.request_uri"), request.getRequestURI());
 	}
 
 	/**
@@ -160,10 +154,9 @@ public final class Servlets {
 	 * @return The HTTP request query string, regardless of any forward.
 	 * @since 2.4
 	 * @see HttpServletRequest#getRequestURI()
-	 * @see RequestDispatcher#FORWARD_QUERY_STRING
 	 */
 	public static String getRequestQueryString(HttpServletRequest request) {
-		return coalesce((String) request.getAttribute(FORWARD_QUERY_STRING), request.getQueryString());
+		return coalesce((String) request.getAttribute("javax.servlet.forward.query_string"), request.getQueryString());
 	}
 
 	/**
@@ -254,7 +247,7 @@ public final class Servlets {
 	 */
 	@Deprecated // TODO: Remove in OmniFaces 3.0.
 	public static String getForwardRequestURI(HttpServletRequest request) {
-		return (String) request.getAttribute(FORWARD_REQUEST_URI);
+		return (String) request.getAttribute("javax.servlet.forward.request_uri");
 	}
 
 	/**
@@ -266,7 +259,7 @@ public final class Servlets {
 	 */
 	@Deprecated // TODO: Remove in OmniFaces 3.0.
 	public static String getForwardRequestQueryString(HttpServletRequest request) {
-		return (String) request.getAttribute(FORWARD_QUERY_STRING);
+		return (String) request.getAttribute("javax.servlet.forward.query_string");
 	}
 
 	/**

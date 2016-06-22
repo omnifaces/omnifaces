@@ -13,7 +13,6 @@
 package org.omnifaces.component.input;
 
 import static java.lang.Boolean.FALSE;
-import static javax.servlet.RequestDispatcher.ERROR_REQUEST_URI;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeRequestParams;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeViewParams;
 import static org.omnifaces.component.input.Form.PropertyKeys.useRequestURI;
@@ -322,7 +321,7 @@ public class Form extends HtmlForm {
 						}
 
 						private String getActionURL(FacesContext context) {
-							String actionURL = (getRequestAttribute(context, ERROR_REQUEST_URI) != null) ? getRequestContextPath(context) : getRequestURI(context);
+							String actionURL = (getRequestAttribute(context, "javax.servlet.error.request_uri") != null) ? getRequestContextPath(context) : getRequestURI(context);
 							return actionURL.isEmpty() ? "/" : actionURL;
 						}
 
