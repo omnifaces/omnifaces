@@ -471,16 +471,14 @@ public final class Servlets {
 	 * removed. Note that the name and path must be exactly the same as it was when the cookie was created. If this is
 	 * <code>-1</code> then the cookie will become a session cookie and thus live as long as the established HTTP
 	 * session.
-     * @param isHttpOnly Mark the cookie as <code>HttpOnly</code>. <i>HttpOnly</i> cookies are not supposed to be exposed
-     * to client-side scripting code, and may therefore help mitigate certain kinds of cross-site scripting attacks.
 	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
 	 * @see HttpServletResponse#addCookie(Cookie)
 	 * @since 2.0
 	 */
 	public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response,
-		String name, String value, int maxAge, boolean isHttpOnly)
+		String name, String value, int maxAge)
 	{
-		addResponseCookie(request, response, name, value, getRequestHostname(request), null, maxAge, isHttpOnly);
+		addResponseCookie(request, response, name, value, getRequestHostname(request), null, maxAge);
 	}
 
 	/**
@@ -498,16 +496,14 @@ public final class Servlets {
 	 * removed. Note that the name and path must be exactly the same as it was when the cookie was created. If this is
 	 * <code>-1</code> then the cookie will become a session cookie and thus live as long as the established HTTP
 	 * session.
-     * @param isHttpOnly Mark the cookie as <code>HttpOnly</code>. <i>HttpOnly</i> cookies are not supposed to be exposed
-     * to client-side scripting code, and may therefore help mitigate certain kinds of cross-site scripting attacks.
 	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
 	 * @see HttpServletResponse#addCookie(Cookie)
 	 * @since 2.0
 	 */
 	public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response,
-		String name, String value, String path, int maxAge, boolean isHttpOnly)
+		String name, String value, String path, int maxAge)
 	{
-		addResponseCookie(request, response, name, value, getRequestHostname(request), path, maxAge, isHttpOnly);
+		addResponseCookie(request, response, name, value, getRequestHostname(request), path, maxAge);
 	}
 
 	/**
@@ -526,14 +522,12 @@ public final class Servlets {
 	 * removed. Note that the name and path must be exactly the same as it was when the cookie was created. If this is
 	 * <code>-1</code> then the cookie will become a session cookie and thus live as long as the established HTTP
 	 * session.
-	 * @param isHttpOnly Mark the cookie as <code>HttpOnly</code>. <i>HttpOnly</i> cookies are not supposed to be exposed
-	 * to client-side scripting code, and may therefore help mitigate certain kinds of cross-site scripting attacks.
 	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
 	 * @see HttpServletResponse#addCookie(Cookie)
 	 * @since 2.0
 	 */
 	public static void addResponseCookie(HttpServletRequest request, HttpServletResponse response,
-		String name, String value, String domain, String path, int maxAge, boolean isHttpOnly)
+		String name, String value, String domain, String path, int maxAge)
 	{
 		Cookie cookie = new Cookie(name, encodeURL(value));
 
@@ -546,7 +540,6 @@ public final class Servlets {
 		}
 
 		cookie.setMaxAge(maxAge);
-		cookie.setHttpOnly(isHttpOnly);
 		cookie.setSecure(request.isSecure());
 		response.addCookie(cookie);
 	}
@@ -564,7 +557,7 @@ public final class Servlets {
 	public static void removeResponseCookie(HttpServletRequest request, HttpServletResponse response,
 		String name, String path)
 	{
-		addResponseCookie(request, response, name, null, path, 0, true);
+		addResponseCookie(request, response, name, null, path, 0);
 	}
 
 	// ServletContext -------------------------------------------------------------------------------------------------
