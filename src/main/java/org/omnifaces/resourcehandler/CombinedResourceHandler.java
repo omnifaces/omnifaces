@@ -17,6 +17,7 @@ import static org.omnifaces.util.Events.subscribeToApplicationEvent;
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Faces.isDevelopment;
+import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
 import static org.omnifaces.util.Renderers.RENDERER_TYPE_CSS;
 import static org.omnifaces.util.Renderers.RENDERER_TYPE_JS;
 import static org.omnifaces.util.Utils.isNumber;
@@ -310,6 +311,11 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		}
 
 		FacesContext context = FacesContext.getCurrentInstance();
+
+		if (isAjaxRequestWithPartialRendering(context)) {
+			return;
+		}
+
 		UIViewRoot view = context.getViewRoot();
 		CombinedResourceBuilder builder = new CombinedResourceBuilder();
 
