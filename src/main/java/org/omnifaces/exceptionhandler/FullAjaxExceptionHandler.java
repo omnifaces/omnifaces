@@ -23,6 +23,7 @@ import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.normalizeViewId;
 import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.isOneInstanceOf;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.IOException;
@@ -145,7 +146,7 @@ import org.omnifaces.util.Hacks;
  * By default only {@link FacesException} and {@link ELException} are unwrapped. You can supply a context parameter
  * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP} to specify
  * additional exception types to unwrap. The context parameter value must be a commaseparated string of fully qualified
- * names of additional exception types.
+ * names of additional exception types. Note that this also covers subclasses of specified exception types.
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.EXCEPTION_TYPES_TO_UNWRAP&lt;/param-name&gt;
@@ -154,6 +155,21 @@ import org.omnifaces.util.Hacks;
  * </pre>
  * <p>
  * This context parameter will also be read and used by {@link FacesExceptionFilter}.
+ * <p>
+ * By default all exceptions are logged. You can supply a context parameter
+ * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING} to
+ * specify exception types to ignore from logging. The context parameter value must be a commaseparated string of fully
+ * qualified names of exception types. Note that this also covers subclasses of specified exception types.
+ * <pre>
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING&lt;/param-name&gt;
+ *     &lt;param-value&gt;javax.faces.application.ViewExpiredException&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * </pre>
+ * <p>
+ * This context parameter will <strong>not</strong> suppress standard JSF and/or container builtin logging. This will
+ * only suppress <code>org.omnifaces.exceptionhandler.FullAjaxExceptionHandler</code> logging. So chances are that
+ * standard JSF and/or container will still log it. This may need to be configured separately.
  *
  * <h3>Customizing <code>FullAjaxExceptionHandler</code></h3>
  * <p>
@@ -187,8 +203,17 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	/**
 	 * The context parameter name to specify additional exception types to unwrap by both {@link FullAjaxExceptionHandler}
 	 * and {@link FacesExceptionFilter}. Those will be added to exception types {@link FacesException} and {@link ELException}.
+	 * @since 2.3
 	 */
-	public static final String PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP = "org.omnifaces.EXCEPTION_TYPES_TO_UNWRAP";
+	public static final String PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP =
+		"org.omnifaces.EXCEPTION_TYPES_TO_UNWRAP";
+
+	/**
+	 * The context parameter name to specify exception types to ignore in logging by {@link FullAjaxExceptionHandler}.
+	 * @since 2.5
+	 */
+	public static final String PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING =
+		"org.omnifaces.EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING";
 
 	/**
 	 * This is used in {@link FullAjaxExceptionHandler#logException(FacesContext, Throwable, String, LogReason)}.
@@ -231,9 +256,8 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	private static final Set<Class<? extends Throwable>> STANDARD_TYPES_TO_UNWRAP =
 		unmodifiableSet(FacesException.class, ELException.class);
 
-	private static final String ERROR_INVALID_UNWRAP_PARAM_CLASS =
-		"Context parameter '" + PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP + "'"
-			+ " references a class which cannot be found in runtime classpath: '%s'";
+	private static final String ERROR_INVALID_EXCEPTION_TYPES_PARAM_CLASS =
+		"Context parameter '%s' references a class which cannot be found in runtime classpath: '%s'";
 	private static final String ERROR_DEFAULT_LOCATION_MISSING =
 		"Either HTTP 500 or java.lang.Throwable error page is required in web.xml or web-fragment.xml."
 			+ " Neither was found.";
@@ -262,6 +286,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
 	private ExceptionHandler wrapped;
 	private Class<? extends Throwable>[] exceptionTypesToUnwrap;
+	private Class<? extends Throwable>[] exceptionTypesToIgnoreInLogging;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -272,6 +297,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	public FullAjaxExceptionHandler(ExceptionHandler wrapped) {
 		this.wrapped = wrapped;
 		exceptionTypesToUnwrap = getExceptionTypesToUnwrap(getServletContext());
+		exceptionTypesToIgnoreInLogging = getExceptionTypesToIgnoreInLogging(getServletContext());
 	}
 
 	/**
@@ -282,23 +308,44 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	 * @return Exception types to unwrap.
 	 * @since 2.3
 	 */
-	@SuppressWarnings("unchecked")
 	public static Class<? extends Throwable>[] getExceptionTypesToUnwrap(ServletContext context) {
-		Set<Class<? extends Throwable>> typesToUnwrap = new HashSet<>(STANDARD_TYPES_TO_UNWRAP);
-		String typesToUnwrapParam = context.getInitParameter(PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP);
+		return parseExceptionTypesParam(context, PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP, STANDARD_TYPES_TO_UNWRAP);
+	}
 
-		if (!isEmpty(typesToUnwrapParam)) {
-			for (String typeToUnwrap : typesToUnwrapParam.split("\\s*,\\s*")) {
+	/**
+	 * Get the exception types to ignore in logging. This can be specified via context parameter
+	 * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING}.
+	 * @param context The involved servlet context.
+	 * @return Exception types to ignore in logging.
+	 * @since 2.5
+	 */
+	private static Class<? extends Throwable>[] getExceptionTypesToIgnoreInLogging(ServletContext context) {
+		return parseExceptionTypesParam(context, PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING, null);
+	}
+
+	@SuppressWarnings("unchecked")
+	private static Class<? extends Throwable>[] parseExceptionTypesParam(ServletContext context, String paramName, Set<Class<? extends Throwable>> defaults) {
+		Set<Class<? extends Throwable>> types = new HashSet<>();
+
+		if (defaults != null) {
+			types.addAll(defaults);
+		}
+
+		String typesParam = context.getInitParameter(PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING);
+
+		if (!isEmpty(typesParam)) {
+			for (String typeParam : typesParam.split("\\s*,\\s*")) {
 				try {
-					typesToUnwrap.add((Class<? extends Throwable>) Class.forName(typeToUnwrap));
+					types.add((Class<? extends Throwable>) Class.forName(typeParam));
 				}
 				catch (ClassNotFoundException e) {
-					throw new IllegalArgumentException(String.format(ERROR_INVALID_UNWRAP_PARAM_CLASS, typeToUnwrap), e);
+					throw new IllegalArgumentException(
+						String.format(ERROR_INVALID_EXCEPTION_TYPES_PARAM_CLASS, paramName, typeParam), e);
 				}
 			}
 		}
 
-		return typesToUnwrap.toArray(new Class[typesToUnwrap.size()]);
+		return types.toArray(new Class[types.size()]);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -432,7 +479,9 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	/**
 	 * Log the thrown exception and determined error page location with the given message, optionally parameterized
 	 * with the given parameters.
-	 * The default implementation logs through <code>java.util.logging</code> as SEVERE.
+	 * The default implementation logs through <code>java.util.logging</code> as SEVERE when the thrown exception is
+	 * not an instance of any type specified in context parameter
+	 * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING}.
 	 * @param context The involved faces context.
 	 * @param exception The exception to log.
 	 * @param location The error page location.
@@ -441,7 +490,9 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	 * @since 1.6
 	 */
 	protected void logException(FacesContext context, Throwable exception, String location, String message, Object... parameters) {
-		logger.log(Level.SEVERE, String.format(message, location), exception);
+		if (!isOneInstanceOf(exception.getClass(), exceptionTypesToIgnoreInLogging)) {
+			logger.log(Level.SEVERE, String.format(message, location), exception);
+		}
 	}
 
 	private boolean canRenderErrorPageView(FacesContext context, Throwable exception, String errorPageLocation) {
