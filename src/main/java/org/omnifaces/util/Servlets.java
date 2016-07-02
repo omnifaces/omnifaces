@@ -538,7 +538,8 @@ public final class Servlets {
 		if (path != null) {
 			cookie.setPath(path);
 		}
-
+		
+		cookie.setHttpOnly(true);
 		cookie.setMaxAge(maxAge);
 		cookie.setSecure(request.isSecure());
 		response.addCookie(cookie);
