@@ -28,8 +28,12 @@ import org.omnifaces.util.Beans;
  * @since 2.0
  */
 @Dependent
-public class InjectionPointGenerator { // TODO: This is actually a work around for older CDI impls. Remove in OmniFaces 3.0
+public class InjectionPointGenerator {
 
+    // TODO: this is a workaround originally for older OWB versions, but while OWB is fixed, newer Weld versions
+    // are now broken. It seems this needs to be fixed in CDI 2.0. 
+    // See https://issues.jboss.org/browse/CDI-610
+    
 	@Inject
 	private InjectionPoint injectionPoint;
 
