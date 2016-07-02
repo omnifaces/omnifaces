@@ -9,6 +9,7 @@ import java.util.Objects;
 
 import javax.el.ELContext;
 import javax.el.ELResolver;
+import javax.el.MethodExpression;
 import javax.el.MethodNotFoundException;
 import javax.el.ValueExpression;
 import javax.el.ValueReference;
@@ -93,24 +94,40 @@ public final class ExpressionInspector {
 		// value expresses referred to a property, and invoke() when it's a method.
 		ValueExpressionType type = (ValueExpressionType) valueExpression.getValue(inspectorElContext);
 
-		String methodName = inspectorElContext.getProperty().toString();
-		Object[] params = inspectorElContext.getParams();
+		Object base = inspectorElContext.getBase();
+		String property = inspectorElContext.getProperty().toString();
+		boolean fromMethod = (type == ValueExpressionType.METHOD);
+		Object[] params = fromMethod ? inspectorElContext.getParams() : NO_PARAMS;
+		String methodName = fromMethod ? property : ("get" + capitalize(property));
+		Method method = findMethod(base, methodName, params);
 
-		if (type != ValueExpressionType.METHOD) {
-			methodName = "get" + capitalize(methodName); // support for "is"?
-			params = NO_PARAMS;
+		if (method == null && !fromMethod) {
+			method = findMethod(base, "is" + capitalize(property), params);
 		}
-
-		Method method = findMethod(inspectorElContext.getBase(), methodName, params);
 
 		if (method == null) {
-			throw new MethodNotFoundException(inspectorElContext.getBase() + "." + methodName + " " + valueExpression);
+			throw new MethodNotFoundException(base + "." + methodName + " " + valueExpression);
 		}
 
-		return new MethodReference(inspectorElContext.getBase(), method, inspectorElContext.getParams(), type == ValueExpressionType.METHOD);
+		return new MethodReference(base, method, params, fromMethod);
 	}
 
-
+	/**
+	 * Gets a MethodReference from a MethodExpression.
+	 * <p>
+	 * Note that the method reference contains the method with
+	 * the name the expression refers to, with a matching number of arguments and <i>a</i> match of types.
+	 * Overloads with the same amount of parameters are supported, but if the actual arguments match with
+	 * the types of multiple overloads (e.g. actual argument Long, overloads for Number and Long) a random
+	 * method will be chosen.
+	 *
+	 * @param context the context of this evaluation
+	 * @param methodExpression the method expression being evaluated
+	 * @return a MethodReference holding the final base and Method where the method expression evaluated to.
+	 */
+	public static MethodReference getMethodReference(ELContext context, MethodExpression methodExpression) {
+		return null;
+	}
 
 	/**
 	 * Types of a value expression
