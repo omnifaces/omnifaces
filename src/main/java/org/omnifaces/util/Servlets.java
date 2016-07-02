@@ -459,10 +459,11 @@ public final class Servlets {
 	}
 
 	/**
-	 * Add a cookie with given name, value and maxage to the HTTP response. The cookie value will implicitly be
-	 * URL-encoded with UTF-8 so that any special characters can be stored in the cookie. The cookie will implicitly
-	 * be set to secure when the current request is secure (i.e. when the current request is a HTTPS request). The
-	 * cookie will implicitly be set in the domain and path of the current request URL.
+	 * Add a cookie with given name, value and maxage to the HTTP response.
+	 * The cookie value will implicitly be URL-encoded with UTF-8 so that any special characters can be stored.
+	 * The cookie will implicitly be set in the domain and path of the current request URL.
+	 * The cookie will implicitly be set to HttpOnly as JavaScript is not supposed to manipulate server-created cookies.
+	 * The cookie will implicitly be set to secure when the current request is a HTTPS request.
 	 * @param request The involved HTTP servlet request.
 	 * @param response The involved HTTP servlet response.
 	 * @param name The cookie name.
@@ -482,10 +483,11 @@ public final class Servlets {
 	}
 
 	/**
-	 * Add a cookie with given name, value, path and maxage to the HTTP response. The cookie value will implicitly be
-	 * URL-encoded with UTF-8 so that any special characters can be stored in the cookie. The cookie will implicitly
-	 * be set to secure when the current request is secure (i.e. when the current request is a HTTPS request). The
-	 * cookie will implicitly be set in the domain of the current request URL.
+	 * Add a cookie with given name, value, path and maxage to the HTTP response.
+	 * The cookie value will implicitly be URL-encoded with UTF-8 so that any special characters can be stored.
+	 * The cookie will implicitly be set in the domain of the current request URL.
+	 * The cookie will implicitly be set to HttpOnly as JavaScript is not supposed to manipulate server-created cookies.
+	 * The cookie will implicitly be set to secure when the current request is a HTTPS request.
 	 * @param request The involved HTTP servlet request.
 	 * @param response The involved HTTP servlet response.
 	 * @param name The cookie name.
@@ -507,9 +509,10 @@ public final class Servlets {
 	}
 
 	/**
-	 * Add a cookie with given name, value, domain, path and maxage to the HTTP response. The cookie value will
-	 * implicitly be URL-encoded with UTF-8 so that any special characters can be stored in the cookie. The cookie will
-	 * implicitly be set to secure when the current request is secure (i.e. when the current request is a HTTPS request).
+	 * Add a cookie with given name, value, domain, path and maxage to the HTTP response.
+	 * The cookie value will implicitly be URL-encoded with UTF-8 so that any special characters can be stored.
+	 * The cookie will implicitly be set to HttpOnly as JavaScript is not supposed to manipulate server-created cookies.
+	 * The cookie will implicitly be set to secure when the current request is a HTTPS request.
 	 * @param request The involved HTTP servlet request.
 	 * @param response The involved HTTP servlet response.
 	 * @param name The cookie name.
@@ -538,9 +541,9 @@ public final class Servlets {
 		if (path != null) {
 			cookie.setPath(path);
 		}
-		
-		cookie.setHttpOnly(true);
+
 		cookie.setMaxAge(maxAge);
+		cookie.setHttpOnly(true);
 		cookie.setSecure(request.isSecure());
 		response.addCookie(cookie);
 	}

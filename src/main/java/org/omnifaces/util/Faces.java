@@ -1424,10 +1424,11 @@ public final class Faces {
 	}
 
 	/**
-	 * Add a cookie with given name, value and maxage to the HTTP response. The cookie value will implicitly be
-	 * URL-encoded with UTF-8 so that any special characters can be stored in the cookie. The cookie will implicitly
-	 * be set to secure when the current request is secure (i.e. when the current request is a HTTPS request). The
-	 * cookie will implicitly be set in the domain and path of the current request URL.
+	 * Add a cookie with given name, value and maxage to the HTTP response.
+	 * The cookie value will implicitly be URL-encoded with UTF-8 so that any special characters can be stored.
+	 * The cookie will implicitly be set in the domain and path of the current request URL.
+	 * The cookie will implicitly be set to HttpOnly as JavaScript is not supposed to manipulate server-created cookies.
+	 * The cookie will implicitly be set to secure when the current request is a HTTPS request.
 	 * @param name The cookie name.
 	 * @param value The cookie value.
 	 * @param maxAge The maximum age of the cookie, in seconds. If this is <code>0</code>, then the cookie will be
@@ -1443,10 +1444,11 @@ public final class Faces {
 	}
 
 	/**
-	 * Add a cookie with given name, value, path and maxage to the HTTP response. The cookie value will implicitly be
-	 * URL-encoded with UTF-8 so that any special characters can be stored in the cookie. The cookie will implicitly
-	 * be set to secure when the current request is secure (i.e. when the current request is a HTTPS request). The
-	 * cookie will implicitly be set in the domain of the current request URL.
+	 * Add a cookie with given name, value, path and maxage to the HTTP response.
+	 * The cookie value will implicitly be URL-encoded with UTF-8 so that any special characters can be stored.
+	 * The cookie will implicitly be set in the domain of the current request URL.
+	 * The cookie will implicitly be set to HttpOnly as JavaScript is not supposed to manipulate server-created cookies.
+	 * The cookie will implicitly be set to secure when the current request is a HTTPS request.
 	 * @param name The cookie name.
 	 * @param value The cookie value.
 	 * @param path The cookie path. If this is <code>/</code>, then the cookie is available in all pages of the webapp.
@@ -1463,9 +1465,10 @@ public final class Faces {
 	}
 
 	/**
-	 * Add a cookie with given name, value, domain, path and maxage to the HTTP response. The cookie value will
-	 * implicitly be URL-encoded with UTF-8 so that any special characters can be stored in the cookie. The cookie will
-	 * implicitly be set to secure when the current request is secure (i.e. when the current request is a HTTPS request).
+	 * Add a cookie with given name, value, domain, path and maxage to the HTTP response.
+	 * The cookie value will implicitly be URL-encoded with UTF-8 so that any special characters can be stored.
+	 * The cookie will implicitly be set to HttpOnly as JavaScript is not supposed to manipulate server-created cookies.
+	 * The cookie will implicitly be set to secure when the current request is a HTTPS request.
 	 * @param name The cookie name.
 	 * @param value The cookie value.
 	 * @param domain The cookie domain. You can use <code>.example.com</code> (with a leading period) if you'd like the
