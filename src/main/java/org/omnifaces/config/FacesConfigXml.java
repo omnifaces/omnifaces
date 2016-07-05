@@ -12,8 +12,6 @@
  */
 package org.omnifaces.config;
 
-import static org.omnifaces.util.Faces.getServletContext;
-import static org.omnifaces.util.Faces.hasContext;
 import static org.omnifaces.util.Utils.parseLocale;
 import static org.omnifaces.util.Xml.createDocument;
 import static org.omnifaces.util.Xml.getNodeList;
@@ -27,20 +25,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.faces.application.Application;
-import javax.faces.context.FacesContext;
-import javax.faces.webapp.FacesServlet;
-import javax.servlet.Filter;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletContextListener;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.omnifaces.util.Faces;
 import org.omnifaces.util.Utils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -76,19 +68,10 @@ public enum FacesConfigXml {
 
 	/**
 	 * Returns the lazily loaded enum singleton instance.
-	 * <p>
-	 * Note: if this is needed in e.g. a {@link Filter} which is called before the {@link FacesServlet} is invoked,
-	 * then it won't work if the <code>INSTANCE</code> hasn't been referenced before. Since JSF installs a special
-	 * "init" {@link FacesContext} during startup, one option for doing this initial referencing is in a
-	 * {@link ServletContextListener}. The data this enum encapsulates will then be available even where there is no
-	 * {@link FacesContext} available. If there's no other option, then you need to manually invoke
-	 * {@link #init(ServletContext)} whereby you pass the desired {@link ServletContext}.
 	 */
 	INSTANCE;
 
 	// Private constants ----------------------------------------------------------------------------------------------
-
-	private static final Logger logger = Logger.getLogger(FacesConfigXml.class.getName());
 
 	private static final String APP_FACES_CONFIG_XML =
 		"/WEB-INF/faces-config.xml";
@@ -104,14 +87,11 @@ public enum FacesConfigXml {
 		"var";
 	private static final String XPATH_BASE_NAME =
 		"base-name";
-	private static final String ERROR_NOT_INITIALIZED =
-		"FacesConfigXml is not initialized yet. Please use #init(ServletContext) method to manually initialize it.";
-	private static final String LOG_INITIALIZATION_ERROR =
+	private static final String ERROR_INITIALIZATION_FAIL =
 		"FacesConfigXml failed to initialize. Perhaps your faces-config.xml contains a typo?";
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
-	private final AtomicBoolean initialized = new AtomicBoolean();
 	private Map<String, String> resourceBundles;
 	private List<Locale> supportedLocales;
 
@@ -120,33 +100,18 @@ public enum FacesConfigXml {
 	/**
 	 * Perform automatic initialization whereby the servlet context is obtained from the faces context.
 	 */
-	private void init() {
-		if (!initialized.get() && hasContext()) {
-			init(getServletContext());
-		}
-	}
+	private FacesConfigXml() {
+		ServletContext servletContext = Faces.getServletContext();
 
-	/**
-	 * Perform manual initialization with the given servlet context, if not null and not already initialized yet.
-	 * @param servletContext The servlet context to obtain the faces-config.xml from.
-	 * @return The current {@link FacesConfigXml} instance, initialized and all.
-	 */
-	public FacesConfigXml init(ServletContext servletContext) {
-		if (servletContext != null && !initialized.getAndSet(true)) {
-			try {
-				Element facesConfigXml = loadFacesConfigXml(servletContext).getDocumentElement();
-				XPath xpath = XPathFactory.newInstance().newXPath();
-				resourceBundles = parseResourceBundles(facesConfigXml, xpath);
-				supportedLocales = parseSupportedLocales(facesConfigXml, xpath);
-			}
-			catch (Exception e) {
-				initialized.set(false);
-				logger.log(Level.SEVERE, LOG_INITIALIZATION_ERROR, e);
-				throw new UnsupportedOperationException(e);
-			}
+		try {
+			Element facesConfigXml = loadFacesConfigXml(servletContext).getDocumentElement();
+			XPath xpath = XPathFactory.newInstance().newXPath();
+			resourceBundles = parseResourceBundles(facesConfigXml, xpath);
+			supportedLocales = parseSupportedLocales(facesConfigXml, xpath);
 		}
-
-		return this;
+		catch (Exception e) {
+			throw new IllegalStateException(ERROR_INITIALIZATION_FAIL, e);
+		}
 	}
 
 	// Getters --------------------------------------------------------------------------------------------------------
@@ -156,7 +121,6 @@ public enum FacesConfigXml {
 	 * @return A mapping of all resource bundle base names by var.
 	 */
 	public Map<String, String> getResourceBundles() {
-		checkInitialized();
 		return resourceBundles;
 	}
 
@@ -170,20 +134,7 @@ public enum FacesConfigXml {
 	 * @since 2.2
 	 */
 	public List<Locale> getSupportedLocales() {
-		checkInitialized();
 		return supportedLocales;
-	}
-
-	private void checkInitialized() {
-		// This init() call is performed here instead of in constructor, because WebLogic loads this enum as a CDI
-		// managed bean (in spite of having a VetoAnnotatedTypeExtension) which in turn implicitly invokes the enum
-		// constructor and thus causes an init while JSF context isn't fully initialized and thus the faces context
-		// isn't available yet. Perhaps it's fixed in newer WebLogic versions.
-		init();
-
-		if (!initialized.get()) {
-			throw new IllegalStateException(ERROR_NOT_INITIALIZED);
-		}
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
