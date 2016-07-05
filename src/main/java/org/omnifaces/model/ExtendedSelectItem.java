@@ -40,7 +40,7 @@ public class ExtendedSelectItem extends SelectItem {
 	public ExtendedSelectItem(UISelectItem uiSelectItem) {
 		super(
 			uiSelectItem.getItemValue(),
-			uiSelectItem.getItemLabel() != null? uiSelectItem.getItemLabel() : uiSelectItem.getItemValue().toString(),
+			uiSelectItem.getItemLabel() != null ? uiSelectItem.getItemLabel() : uiSelectItem.getItemValue() != null ? uiSelectItem.getItemValue().toString() : null,
 			uiSelectItem.getItemDescription(),
 			uiSelectItem.isItemDisabled(),
 			uiSelectItem.isItemEscaped(),
