@@ -12,6 +12,8 @@
  */
 package org.omnifaces;
 
+import static org.omnifaces.util.Reflection.toClass;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -26,7 +28,6 @@ import org.omnifaces.cdi.eager.EagerBeansWebListener;
 import org.omnifaces.cdi.push.Socket;
 import org.omnifaces.component.output.Cache;
 import org.omnifaces.component.output.cache.CacheInitializer;
-import org.omnifaces.config.BeanManager;
 import org.omnifaces.eventlistener.DefaultServletContextListener;
 import org.omnifaces.facesviews.FacesViews;
 
@@ -53,14 +54,21 @@ public class ApplicationListener extends DefaultServletContextListener {
 
 	private static final Logger logger = Logger.getLogger(ApplicationListener.class.getName());
 
+	private static final String ERROR_CDI_API_UNAVAILABLE =
+		"CDI API is not available in this environment.";
+	private static final String ERROR_CDI_API_INCOMPATIBLE =
+		"CDI API of this environment is not CDI 1.1 compatible.";
+	private static final String ERROR_CDI_IMPL_UNAVAILABLE =
+		"CDI BeanManager instance is not available in this environment.";
+
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
-		ServletContext servletContext = event.getServletContext();
-		checkCDIAvailable(servletContext);
+		checkCDIAvailable();
 
 		try {
+			ServletContext servletContext = event.getServletContext();
 			EagerBeansRepository.instantiateApplicationScopedAndRegisterListener(servletContext);
 			FacesViews.addMappings(servletContext);
 			CacheInitializer.loadProviderAndRegisterFilter(servletContext);
@@ -72,9 +80,11 @@ public class ApplicationListener extends DefaultServletContextListener {
 		}
 	}
 
-	private void checkCDIAvailable(ServletContext servletContext) {
+	private void checkCDIAvailable() {
 		try {
-			BeanManager.INSTANCE.init(servletContext);
+			checkCDIAPIAvailable();
+			checkCDIAPICompatible();
+			checkCDIImplAvailable();
 		}
 		catch (Throwable e) {
 			logger.severe(""
@@ -82,8 +92,8 @@ public class ApplicationListener extends DefaultServletContextListener {
 				+ "\n▌                         ▐█     ▐                                             ▐"
 				+ "\n▌    ▄                  ▄█▓█▌    ▐ OmniFaces failed to initialize!             ▐"
 				+ "\n▌   ▐██▄               ▄▓░░▓▓    ▐                                             ▐"
-				+ "\n▌   ▐█░██▓            ▓▓░░░▓▌    ▐ This OmniFaces version requires CDI, but    ▐"
-				+ "\n▌   ▐█▌░▓██          █▓░░░░▓     ▐ none was found on this environment.         ▐"
+				+ "\n▌   ▐█░██▓            ▓▓░░░▓▌    ▐ This OmniFaces version requires CDI 1.1,    ▐"
+				+ "\n▌   ▐█▌░▓██          █▓░░░░▓     ▐ but none was found on this environment.     ▐"
 				+ "\n▌    ▓█▌░░▓█▄███████▄███▓░▓█     ▐                                             ▐"
 				+ "\n▌    ▓██▌░▓██░░░░░░░░░░▓█░▓▌     ▐ OmniFaces 2.x requires a minimum of JSF 2.2.▐"
 				+ "\n▌     ▓█████░░░░░░░░░░░░▓██      ▐ Since this JSF version, the JSF managed bean▐"
@@ -111,6 +121,35 @@ public class ApplicationListener extends DefaultServletContextListener {
 				+ "\n████████████████████████████████████████████████████████████████████████████████"
 			);
 			throw e;
+		}
+	}
+
+	private void checkCDIAPIAvailable() {
+		try {
+			toClass("javax.enterprise.inject.spi.BeanManager");
+		}
+		catch (Exception | LinkageError e) {
+			throw new IllegalStateException(ERROR_CDI_API_UNAVAILABLE, e);
+		}
+	}
+
+	private void checkCDIAPICompatible() {
+		try {
+			toClass("javax.enterprise.inject.spi.CDI");
+		}
+		catch (Exception | LinkageError e) {
+			throw new IllegalStateException(ERROR_CDI_API_INCOMPATIBLE, e);
+		}
+	}
+
+	private void checkCDIImplAvailable() {
+		try {
+			Class<Object> CDI = toClass("javax.enterprise.inject.spi.CDI");
+			Object current = CDI.getMethod("current").invoke(null);
+			CDI.getMethod("getBeanManager").invoke(current);
+		}
+		catch (Exception | LinkageError e) {
+			throw new IllegalStateException(ERROR_CDI_IMPL_UNAVAILABLE, e);
 		}
 	}
 
