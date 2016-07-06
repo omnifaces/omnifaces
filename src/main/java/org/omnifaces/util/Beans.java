@@ -25,6 +25,7 @@ import javax.enterprise.inject.Typed;
 import javax.enterprise.inject.spi.Annotated;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.CDI;
 import javax.enterprise.inject.spi.InjectionPoint;
 
 /**
@@ -60,8 +61,6 @@ import javax.enterprise.inject.spi.InjectionPoint;
  * Beans.fireEvent(someEvent);
  * </pre>
  * <p>
- * If you need a dependency-free way of obtaining the CDI managed bean reference (e.g. when you want to write code which
- * should also run on Tomcat), use {@link org.omnifaces.config.BeanManager} enum instead.
  *
  * @author Bauke Scholtz
  * @since 1.6.1
@@ -82,10 +81,10 @@ public final class Beans {
 	 * Returns the CDI bean manager.
 	 * @return The CDI bean manager.
 	 * @since 2.0
-	 * @see org.omnifaces.config.BeanManager#get()
+	 * @see CDI#getBeanManager()
 	 */
 	public static BeanManager getManager() {
-		return org.omnifaces.config.BeanManager.INSTANCE.get();
+		return CDI.current().getBeanManager();
 	}
 
 	/**
