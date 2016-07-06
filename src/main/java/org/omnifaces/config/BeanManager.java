@@ -27,17 +27,14 @@ import org.omnifaces.util.JNDI;
  * <p>
  * This configuration enum allows you to get the CDI <code>BeanManager</code> anyway in cases where
  * <code>&#64;Inject</code> and/or <code>CDI#current()</code> may not work, or when you'd like to test availability of
- * CDI without having any direct CDI dependency (as done in {@link ApplicationListener}). It will during initialization
- * grab the CDI bean manager instance as generic object from JNDI.
- * <p>
- * <strong>Do not use it directly.</strong> Use {@link Beans} utility class instead. It will under the covers use this
- * configuration enum. This configuration enum is basically a leftover from OmniFaces 1.x where the CDI dependency was
- * optional. The {@link #getReference(Class)} method is deprecated since OmniFaces 2.3 and will be removed in OmniFaces
- * 3.0.
+ * CDI without having any direct CDI dependency (as previously done in {@link ApplicationListener}). It will during
+ * initialization grab the CDI bean manager instance as generic object from JNDI.
  *
  * @author Bauke Scholtz
  * @since 1.6.1
+ * @deprecated Since 2.5. Use {@link Beans} utility class instead. This enum is a leftover from OmniFaces 1.x.
  */
+@Deprecated // TODO: Remove in OmniFaces 3.0.
 public enum BeanManager {
 
 	// Enum singleton -------------------------------------------------------------------------------------------------
@@ -150,9 +147,7 @@ public enum BeanManager {
 	 * @param beanClass The CDI managed bean class.
 	 * @return The CDI managed bean reference (proxy) of the given class, or <code>null</code> if there is none.
 	 * @throws UnsupportedOperationException When obtaining the CDI managed bean reference failed with an exception.
-	 * @deprecated Use {@link Beans#getReference(Class)} instead.
 	 */
-	@Deprecated // TODO: Remove in OmniFaces 3.0.
 	public <T> T getReference(Class<T> beanClass) {
 		try {
 			Object bean = resolve.invoke(beanManager, getBeans.invoke(beanManager, beanClass, NO_ANNOTATIONS));
