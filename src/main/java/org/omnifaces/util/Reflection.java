@@ -18,9 +18,11 @@ import static java.beans.PropertyEditorManager.findEditor;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +40,13 @@ import javax.enterprise.inject.Typed;
 @Typed
 public final class Reflection {
 
+	private static final String ERROR_LOAD_CLASS = "Cannot load class '%s'.";
+	private static final String ERROR_CREATE_INSTANCE = "Cannot create instance of class '%s'.";
+	private static final String ERROR_ACCESS_FIELD = "Cannot access field '%s' of class '%s'.";
+	private static final String ERROR_INVOKE_METHOD = "Cannot invoke method '%s' of class '%s' with arguments %s.";
+
 	private Reflection() {
+		// Hide constructor.
 	}
 
 	/**
@@ -186,36 +194,38 @@ public final class Reflection {
 	}
 
 	/**
-	 * Returns the Class instance associated with the class of the given string, using the context class
-	 * loader and if that fails the defining class loader of the current class.
-	 *
-	 * @param className fully qualified class name of the class for which a Class instance needs to be created
-	 * @return the Class object for the class with the given name.
-	 * @throws IllegalStateException if the class cannot be found.
+	 * Returns the class object associated with the given class name, using the context class loader and if
+	 * that fails the defining class loader of the current class.
+	 * @param <T> The expected class type.
+	 * @param className Fully qualified class name of the class for which a class object needs to be created.
+	 * @return The class object associated with the given class name.
+	 * @throws IllegalStateException If the class cannot be loaded.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 */
-	public static Class<?> toClass(String className) {
+	@SuppressWarnings("unchecked")
+	public static <T> Class<T> toClass(String className) {
 		try {
-			return (Class.forName(className, true, Thread.currentThread().getContextClassLoader()));
+			return (Class<T>) (Class.forName(className, true, Thread.currentThread().getContextClassLoader()));
 		}
-		catch (ClassNotFoundException e) {
+		catch (Exception e) {
 			try {
-				return Class.forName(className);
+				return (Class<T>) Class.forName(className);
 			}
 			catch (Exception ignore) {
 				ignore = null; // Just continue to IllegalStateException on original ClassNotFoundException.
 			}
 
-			throw new IllegalStateException(e);
+			throw new IllegalStateException(String.format(ERROR_LOAD_CLASS, className), e);
 		}
 	}
 
 	/**
-	 * Creates an instance of a class with the given fully qualified class name.
-	 *
-	 * @param <T> The generic object type.
-	 * @param className fully qualified class name of the class for which an instance needs to be created
-	 * @return an instance of the class denoted by className
-	 * @throws IllegalStateException if the class cannot be found
+	 * Returns a new instance of the given class name using the default constructor.
+	 * @param <T> The expected return type.
+	 * @param className Fully qualified class name of the class for which an instance needs to be created.
+	 * @return A new instance of the given class name using the default constructor.
+	 * @throws IllegalStateException If the class cannot be loaded.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T instance(String className) {
@@ -223,18 +233,69 @@ public final class Reflection {
 	}
 
 	/**
-	 * Creates a new instance of the class represented by the given Class object
-	 *
+	 * Returns a new instance of the given class object using the default constructor.
 	 * @param <T> The generic object type.
-	 * @param clazz the Class object for which an instance needs to be created
-	 * @return an instance of the class as given by the clazz parameter
-	 * @throws IllegalStateException if the class cannot be found, or cannot be instantiated or when a security manager prevents this operation
+	 * @param clazz The class object for which an instance needs to be created.
+	 * @return A new instance of the given class object using the default constructor.
+	 * @throws IllegalStateException If the class cannot be found, or cannot be instantiated, or when a security manager
+	 * prevents this operation.
 	 */
 	public static <T> T instance(Class<T> clazz) {
 		try {
 			return clazz.newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
-			throw new IllegalStateException(e);
+		}
+		catch (Exception e) {
+			throw new IllegalStateException(String.format(ERROR_CREATE_INSTANCE, clazz), e);
+		}
+	}
+
+	/**
+	 * Returns the value of the field of the given instance on the given field name.
+	 * @param <T> The expected return type.
+	 * @param instance The instance to access the given field on.
+	 * @param fieldName The name of the field to be accessed on the given instance.
+	 * @return The value of the field of the given instance on the given field name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @throws IllegalStateException If the field cannot be accessed.
+	 * @since 2.5
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T accessField(Object instance, String fieldName) {
+		try {
+			Field field = instance.getClass().getDeclaredField(fieldName);
+			field.setAccessible(true);
+			return (T) field.get(instance);
+		}
+		catch (Exception e) {
+			throw new IllegalStateException(String.format(ERROR_ACCESS_FIELD, fieldName, instance.getClass()), e);
+		}
+	}
+
+	/**
+	 * Invoke a method of the given instance on the given method name with the given parameters and return the result.
+	 * <p>
+	 * Note: the current implementation assumes for simplicity that no one of the given parameters is null. If one of
+	 * them is still null, a NullPointerException will be thrown.
+	 * @param <T> The expected return type.
+	 * @param instance The instance to invoke the given method on.
+	 * @param methodName The name of the method to be invoked on the given instance.
+	 * @param parameters The method parameters, if any.
+	 * @return The result of the method invocation, if any.
+	 * @throws NullPointerException When one of the given parameters is null.
+	 * @throws IllegalStateException If the method cannot be invoked.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @since 2.5
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T invokeMethod(Object instance, String methodName, Object... parameters) {
+		try {
+			Method method = findMethod(instance, methodName, parameters);
+			method.setAccessible(true);
+			return (T) method.invoke(instance, parameters);
+		}
+		catch (Exception e) {
+			throw new IllegalStateException(
+				String.format(ERROR_INVOKE_METHOD, methodName, instance.getClass(), Arrays.toString(parameters)), e);
 		}
 	}
 

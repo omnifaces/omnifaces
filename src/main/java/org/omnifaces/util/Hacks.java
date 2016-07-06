@@ -17,13 +17,12 @@ import static org.omnifaces.util.FacesLocal.getContextAttribute;
 import static org.omnifaces.util.FacesLocal.getInitParameter;
 import static org.omnifaces.util.FacesLocal.getSessionAttribute;
 import static org.omnifaces.util.FacesLocal.setContextAttribute;
-import static org.omnifaces.util.Reflection.findMethod;
+import static org.omnifaces.util.Reflection.accessField;
+import static org.omnifaces.util.Reflection.instance;
+import static org.omnifaces.util.Reflection.invokeMethod;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -88,12 +87,6 @@ public final class Hacks {
 
 	private static final String ERROR_MAX_AGE =
 		"The '%s' init param must be a number. Encountered an invalid value of '%s'.";
-	private static final String ERROR_CREATE_INSTANCE =
-		"Cannot create instance of class '%s'.";
-	private static final String ERROR_ACCESS_FIELD =
-		"Cannot access field '%s' of class '%s'.";
-	private static final String ERROR_INVOKE_METHOD =
-		"Cannot invoke method '%s' of class '%s' with arguments %s.";
 
 	// Lazy loaded properties (will only be initialized when FacesContext is available) -------------------------------
 
@@ -208,7 +201,7 @@ public final class Hacks {
 	 */
 	@SuppressWarnings("rawtypes")
 	public static Set<ResourceIdentifier> getRichFacesResourceLibraryResources(ResourceIdentifier id) {
-		Object resourceFactory = createInstance(RICHFACES_RLF_CLASS_NAME);
+		Object resourceFactory = instance(RICHFACES_RLF_CLASS_NAME);
 		String name = id.getName().split("\\.")[0];
 		Object resourceLibrary = invokeMethod(resourceFactory, "getResourceLibrary", name, id.getLibrary());
 		Iterable resources = invokeMethod(resourceLibrary, "getResources");
@@ -468,56 +461,6 @@ public final class Hacks {
 	public static boolean isPrimeFacesDynamicResourceRequest(FacesContext context) {
 		Map<String, String> params = context.getExternalContext().getRequestParameterMap();
 		return "primefaces".equals(params.get("ln")) && params.get("pfdrid") != null;
-	}
-
-	// Some reflection helpers ----------------------------------------------------------------------------------------
-
-	/**
-	 * Create an instance of the given class using the default constructor and return the instance.
-	 */
-	private static Object createInstance(String className) {
-		try {
-			return Class.forName(className).newInstance();
-		}
-		catch (Exception e) {
-			throw new IllegalArgumentException(
-				String.format(ERROR_CREATE_INSTANCE, className), e);
-		}
-	}
-
-	/**
-	 * Access a field of the given instance on the given field name and return the field value.
-	 */
-	@SuppressWarnings("unchecked")
-	private static <T> T accessField(Object instance, String fieldName) {
-		try {
-			Field field = instance.getClass().getDeclaredField(fieldName);
-			field.setAccessible(true);
-			return (T) field.get(instance);
-		}
-		catch (Exception e) {
-			throw new IllegalArgumentException(
-				String.format(ERROR_ACCESS_FIELD, fieldName, instance.getClass()), e);
-		}
-	}
-
-	/**
-	 * Invoke a method of the given instance on the given method name with the given parameters and return the result.
-	 * Note: the current implementation assumes for simplicity that no one of the given parameters is null. If one of
-	 * them is still null, a NullPointerException will be thrown. The implementation should be changed accordingly to
-	 * take that into account (but then varargs cannot be used anymore and you end up creating ugly arrays).
-	 */
-	@SuppressWarnings("unchecked")
-	private static <T> T invokeMethod(Object instance, String methodName, Object... parameters) {
-		try {
-			Method method = findMethod(instance, methodName, parameters);
-			method.setAccessible(true);
-			return (T) method.invoke(instance, parameters);
-		}
-		catch (Exception e) {
-			throw new IllegalArgumentException(
-				String.format(ERROR_INVOKE_METHOD, methodName, instance.getClass(), Arrays.toString(parameters)), e);
-		}
 	}
 
 }
