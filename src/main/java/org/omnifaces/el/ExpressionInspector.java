@@ -2,14 +2,18 @@ package org.omnifaces.el;
 
 import static org.omnifaces.el.MethodReference.NO_PARAMS;
 import static org.omnifaces.el.functions.Strings.capitalize;
+import static org.omnifaces.util.Faces.getApplication;
+import static org.omnifaces.util.Faces.getFaceletContext;
 import static org.omnifaces.util.Reflection.findMethod;
 
 import java.lang.reflect.Method;
 import java.util.Objects;
 
 import javax.el.ELContext;
+import javax.el.ELException;
 import javax.el.ELResolver;
 import javax.el.MethodExpression;
+import javax.el.MethodInfo;
 import javax.el.MethodNotFoundException;
 import javax.el.ValueExpression;
 import javax.el.ValueReference;
@@ -103,6 +107,14 @@ public final class ExpressionInspector {
 
 		if (method == null && !fromMethod) {
 			method = findMethod(base, "is" + capitalize(property), params);
+
+			if (method == null) {
+				method = findMethod(base, property, NO_PARAMS);
+
+				if (method != null) {
+					fromMethod = true; // From MethodExpressionValueExpressionAdapter.
+				}
+			}
 		}
 
 		if (method == null) {
@@ -124,9 +136,30 @@ public final class ExpressionInspector {
 	 * @param context the context of this evaluation
 	 * @param methodExpression the method expression being evaluated
 	 * @return a MethodReference holding the final base and Method where the method expression evaluated to.
+	 * @since 2.5
 	 */
 	public static MethodReference getMethodReference(ELContext context, MethodExpression methodExpression) {
-		return null;
+		MethodReference methodReference;
+
+		try {
+			MethodInfo methodInfo = methodExpression.getMethodInfo(context);
+
+			if (methodInfo instanceof MethodReference) {
+				methodReference = (MethodReference) methodInfo; // <o:methodParam>
+			}
+			else {
+				methodReference = getMethodReference(context, toValueExpression(context, methodExpression)); // #{bean.method}
+			}
+		}
+		catch (ELException ignore) {
+			methodReference = getMethodReference(context, toValueExpression(getFaceletContext(), methodExpression)); // #{bean[method]}
+		}
+
+		return methodReference;
+	}
+
+	private static ValueExpression toValueExpression(ELContext context, MethodExpression methodExpression) {
+		return getApplication().getExpressionFactory().createValueExpression(context, methodExpression.getExpressionString(), Object.class);
 	}
 
 	/**

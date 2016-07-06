@@ -14,7 +14,6 @@ package org.omnifaces.el;
 
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
-import java.lang.reflect.Method;
 import java.util.Set;
 
 import javax.el.ELContext;
@@ -70,10 +69,7 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 
 	@Override
 	public MethodInfo getMethodInfo(ELContext context) {
-
-		Method method = ExpressionInspector.getMethodReference(context, valueExpression).getMethod();
-
-		return new MethodInfo(method.getName(), method.getReturnType(), method.getParameterTypes());
+		return ExpressionInspector.getMethodReference(context, valueExpression);
 	}
 
 	@Override

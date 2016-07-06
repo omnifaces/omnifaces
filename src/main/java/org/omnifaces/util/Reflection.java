@@ -147,7 +147,7 @@ public final class Reflection {
 	 * @param params the method parameters
 	 * @return a method if one is found, null otherwise
 	 */
-	public static Method findMethod(Object base, String methodName, Object[] params) {
+	public static Method findMethod(Object base, String methodName, Object... params) {
 
 		List<Method> methods = new ArrayList<>();
 		for (Class<?> cls = base.getClass(); cls != null; cls = cls.getSuperclass()) {
