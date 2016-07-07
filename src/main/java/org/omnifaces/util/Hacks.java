@@ -38,12 +38,11 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.PartialViewContext;
 import javax.faces.context.PartialViewContextWrapper;
 import javax.faces.render.ResponseStateManager;
-import javax.websocket.Session;
 
 import org.omnifaces.resourcehandler.ResourceIdentifier;
 
 /**
- * Collection of JSF implementation and/or JSF component library and/or server specific hacks.
+ * Collection of JSF implementation and/or JSF component library specific hacks.
  *
  * @author Bauke Scholtz
  * @author Arjan Tijms
@@ -462,22 +461,6 @@ public final class Hacks {
 	public static boolean isPrimeFacesDynamicResourceRequest(FacesContext context) {
 		Map<String, String> params = context.getExternalContext().getRequestParameterMap();
 		return "primefaces".equals(params.get("ln")) && params.get("pfdrid") != null;
-	}
-
-	// Tomcat related -------------------------------------------------------------------------------------------------
-
-	/**
-	 * Returns true if the given WS session is from Tomcat and given illegal state exception is caused by a push bomb
-	 * which Tomcat couldn't handle. See also https://bz.apache.org/bugzilla/show_bug.cgi?id=56026 and
-	 * https://github.com/omnifaces/omnifaces/issues/234
-	 * @param session The WS session.
-	 * @param illegalStateException The illegal state exception.
-	 * @return Whether it was Tomcat who couldn't handle the push bomb.
-	 * @since 2.5
-	 */
-	public static boolean isTomcatWebSocketBombed(Session session, IllegalStateException illegalStateException) {
-		return session.getClass().getName().startsWith("org.apache.tomcat.websocket.")
-			&& illegalStateException.getMessage().contains("[TEXT_FULL_WRITING]");
 	}
 
 }

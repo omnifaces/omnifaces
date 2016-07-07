@@ -37,7 +37,6 @@ import javax.websocket.Session;
 import org.omnifaces.cdi.push.SocketEvent.Closed;
 import org.omnifaces.cdi.push.SocketEvent.Opened;
 import org.omnifaces.util.Beans;
-import org.omnifaces.util.Hacks;
 import org.omnifaces.util.Json;
 
 /**
@@ -133,16 +132,8 @@ public class SocketSessionManager {
 
 			for (Session session : sessions) {
 				if (session.isOpen()) {
-					try {
+					synchronized (session) {
 						results.add(session.getAsyncRemote().sendText(json));
-					}
-					catch (IllegalStateException e) {
-						if (Hacks.isTomcatWebSocketBombed(session, e)) {
-							// TODO: Log a warning?
-						}
-						else {
-							throw e;
-						}
 					}
 				}
 			}
@@ -194,8 +185,7 @@ public class SocketSessionManager {
 	private static volatile SocketSessionManager instance;
 
 	/**
-	 * Internal usage only. Awkward workaround for it being unavailable via &#64;Inject in endpoint in Tomcat+Weld/OWB
-	 * and CDI#current() being unavailable during close of endpoint in WildFly.
+	 * Internal usage only. Awkward workaround for it being unavailable via @Inject in endpoint in Tomcat+Weld/OWB.
 	 */
 	static SocketSessionManager getInstance() {
 		if (instance == null) {
