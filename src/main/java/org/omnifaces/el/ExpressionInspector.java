@@ -145,14 +145,14 @@ public final class ExpressionInspector {
 			MethodInfo methodInfo = methodExpression.getMethodInfo(context);
 
 			if (methodInfo instanceof MethodReference) {
-				methodReference = (MethodReference) methodInfo; // <o:methodParam>
+				methodReference = (MethodReference) methodInfo; // o:methodParam
 			}
 			else {
-				methodReference = getMethodReference(context, toValueExpression(context, methodExpression)); // #{bean.method}
+				methodReference = getMethodReference(context, toValueExpression(context, methodExpression)); // bean.method
 			}
 		}
 		catch (ELException ignore) {
-			methodReference = getMethodReference(context, toValueExpression(getFaceletContext(), methodExpression)); // #{bean[method]}
+			methodReference = getMethodReference(context, toValueExpression(getFaceletContext(), methodExpression)); // bean[method]
 		}
 
 		return methodReference;

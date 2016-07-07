@@ -144,9 +144,9 @@ public class ApplicationListener extends DefaultServletContextListener {
 
 	private void checkCDIImplAvailable() {
 		try {
-			Class<Object> CDI = toClass("javax.enterprise.inject.spi.CDI");
-			Object current = CDI.getMethod("current").invoke(null);
-			CDI.getMethod("getBeanManager").invoke(current);
+			Class<Object> cdi = toClass("javax.enterprise.inject.spi.CDI");
+			Object current = cdi.getMethod("current").invoke(null);
+			cdi.getMethod("getBeanManager").invoke(current);
 		}
 		catch (Exception | LinkageError e) {
 			throw new IllegalStateException(ERROR_CDI_IMPL_UNAVAILABLE, e);
