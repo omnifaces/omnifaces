@@ -158,7 +158,7 @@ public class SocketSessionManager {
 			catch (IllegalStateException e) {
 				if (Hacks.isTomcatWebSocketBombed(session, e)) {
 					synchronized (session) {
-						send(session, text, results, ++retries);
+						send(session, text, results, retries + 1);
 					}
 				}
 				else {
