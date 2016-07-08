@@ -107,8 +107,9 @@ public final class Beans {
 	 * @param beanClass The CDI managed bean class.
 	 * @param qualifiers The CDI managed bean qualifiers, if any.
 	 * @return The CDI managed bean reference (proxy) of the given class, or <code>null</code> if there is none.
-	 * @see #resolve(Class)
+	 * @see #resolve(Class, Annotation...)
 	 * @see #getReference(Bean)
+	 * @see #resolve(Class, Annotation...)
 	 */
 	public static <T> T getReference(Class<T> beanClass, Annotation... qualifiers) {
 		return BeansLocal.getReference(getManager(), beanClass, qualifiers);
@@ -135,7 +136,7 @@ public final class Beans {
 	 * @param qualifiers The CDI managed bean qualifiers, if any.
 	 * @return The CDI managed bean instance (actual) of the given bean class.
 	 * @since 1.8
-	 * @see #getInstance(Class, boolean)
+	 * @see #getInstance(Class, boolean, Annotation...)
 	 */
 	public static <T> T getInstance(Class<T> beanClass, Annotation... qualifiers) {
 		return BeansLocal.getInstance(getManager(), beanClass, qualifiers);
@@ -152,7 +153,7 @@ public final class Beans {
 	 * @return The CDI managed bean instance (actual) of the given bean class, or <code>null</code> if there is none
 	 * and/or the <code>create</code> argument is <code>false</code>.
 	 * @since 1.7
-	 * @see #resolve(Class)
+	 * @see #resolve(Class, Annotation...)
 	 * @see #getInstance(Bean, boolean)
 	 */
 	public static <T> T getInstance(Class<T> beanClass, boolean create, Annotation... qualifiers) {
@@ -212,7 +213,7 @@ public final class Beans {
 	 * @param beanClass The CDI managed bean class.
 	 * @param qualifiers The CDI managed bean qualifiers, if any.
 	 * @since 2.0
-	 * @see #resolve(Class)
+	 * @see #resolve(Class, Annotation...)
 	 * @see #destroy(Bean)
 	 */
 	public static <T> void destroy(Class<T> beanClass, Annotation... qualifiers) {

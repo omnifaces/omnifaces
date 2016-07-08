@@ -61,7 +61,7 @@ public final class BeansLocal {
 
 	/**
 	 * {@inheritDoc}
-	 * @see Beans#resolve(Class)
+	 * @see Beans#resolve(Class, Annotation...)
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> Bean<T> resolve(BeanManager beanManager, Class<T> beanClass, Annotation... qualifiers) {
@@ -78,7 +78,7 @@ public final class BeansLocal {
 
 	/**
 	 * {@inheritDoc}
-	 * @see Beans#getReference(Class)
+	 * @see Beans#getReference(Class, Annotation...)
 	 */
 	public static <T> T getReference(BeanManager beanManager, Class<T> beanClass, Annotation... qualifiers) {
 		Bean<T> bean = resolve(beanManager, beanClass, qualifiers);
@@ -96,7 +96,7 @@ public final class BeansLocal {
 
 	/**
 	 * {@inheritDoc}
-	 * @see Beans#getInstance(Class)
+	 * @see Beans#getInstance(Class, Annotation...)
 	 */
 	public static <T> T getInstance(BeanManager beanManager, Class<T> beanClass, Annotation... qualifiers) {
 		return getInstance(beanManager, beanClass, true, qualifiers);
@@ -104,7 +104,7 @@ public final class BeansLocal {
 
 	/**
 	 * {@inheritDoc}
-	 * @see Beans#getInstance(Class, boolean)
+	 * @see Beans#getInstance(Class, boolean, Annotation...)
 	 */
 	public static <T> T getInstance(BeanManager beanManager, Class<T> beanClass, boolean create, Annotation... qualifiers) {
 		Bean<T> bean = resolve(beanManager, beanClass, qualifiers);
@@ -161,7 +161,7 @@ public final class BeansLocal {
 
 	/**
 	 * {@inheritDoc}
-	 * @see Beans#destroy(Class)
+	 * @see Beans#destroy(Class, Annotation...)
 	 */
 	public static <T> void destroy(BeanManager beanManager, Class<T> beanClass, Annotation... qualifiers) {
 		Bean<T> bean = resolve(beanManager, beanClass, qualifiers);
