@@ -88,28 +88,30 @@ public final class Beans {
 	}
 
 	/**
-	 * Returns the CDI managed bean representation of the given bean class.
+	 * Returns the CDI managed bean representation of the given bean class, optionally with the given qualifiers.
 	 * @param <T> The generic CDI managed bean type.
 	 * @param beanClass The CDI managed bean class.
+	 * @param qualifiers The CDI managed bean qualifiers, if any.
 	 * @return The CDI managed bean representation of the given bean class, or <code>null</code> if there is none.
 	 * @see BeanManager#getBeans(java.lang.reflect.Type, Annotation...)
 	 * @see BeanManager#resolve(java.util.Set)
 	 */
-	public static <T> Bean<T> resolve(Class<T> beanClass) {
-		return BeansLocal.resolve(getManager(), beanClass);
+	public static <T> Bean<T> resolve(Class<T> beanClass, Annotation... qualifiers) {
+		return BeansLocal.resolve(getManager(), beanClass, qualifiers);
 	}
 
 	/**
-	 * Returns the CDI managed bean reference (proxy) of the given bean class.
+	 * Returns the CDI managed bean reference (proxy) of the given bean class, optionally with the given qualifiers.
 	 * Note that this actually returns a client proxy and the underlying actual instance is thus always auto-created.
 	 * @param <T> The expected return type.
 	 * @param beanClass The CDI managed bean class.
+	 * @param qualifiers The CDI managed bean qualifiers, if any.
 	 * @return The CDI managed bean reference (proxy) of the given class, or <code>null</code> if there is none.
 	 * @see #resolve(Class)
 	 * @see #getReference(Bean)
 	 */
-	public static <T> T getReference(Class<T> beanClass) {
-		return BeansLocal.getReference(getManager(), beanClass);
+	public static <T> T getReference(Class<T> beanClass, Annotation... qualifiers) {
+		return BeansLocal.getReference(getManager(), beanClass, qualifiers);
 	}
 
 	/**
@@ -126,32 +128,35 @@ public final class Beans {
 	}
 
 	/**
-	 * Returns the CDI managed bean instance (actual) of the given bean class and creates one if one doesn't exist.
+	 * Returns the CDI managed bean instance (actual) of the given bean class, optionally with the given qualifiers,
+	 * and creates one if one doesn't exist.
 	 * @param <T> The expected return type.
 	 * @param beanClass The CDI managed bean class.
+	 * @param qualifiers The CDI managed bean qualifiers, if any.
 	 * @return The CDI managed bean instance (actual) of the given bean class.
 	 * @since 1.8
 	 * @see #getInstance(Class, boolean)
 	 */
-	public static <T> T getInstance(Class<T> beanClass) {
-		return BeansLocal.getInstance(getManager(), beanClass);
+	public static <T> T getInstance(Class<T> beanClass, Annotation... qualifiers) {
+		return BeansLocal.getInstance(getManager(), beanClass, qualifiers);
 	}
 
 	/**
-	 * Returns the CDI managed bean instance (actual) of the given bean class and creates one if one doesn't exist and
-	 * <code>create</code> argument is <code>true</code>, otherwise don't create one and return <code>null</code> if
-	 * there's no current instance.
+	 * Returns the CDI managed bean instance (actual) of the given bean class, optionally with the given qualifiers,
+	 * and creates one if one doesn't exist and <code>create</code> argument is <code>true</code>, otherwise don't
+	 * create one and return <code>null</code> if there's no current instance.
 	 * @param <T> The expected return type.
 	 * @param beanClass The CDI managed bean class.
 	 * @param create Whether to create create CDI managed bean instance if one doesn't exist.
+	 * @param qualifiers The CDI managed bean qualifiers, if any.
 	 * @return The CDI managed bean instance (actual) of the given bean class, or <code>null</code> if there is none
 	 * and/or the <code>create</code> argument is <code>false</code>.
 	 * @since 1.7
 	 * @see #resolve(Class)
 	 * @see #getInstance(Bean, boolean)
 	 */
-	public static <T> T getInstance(Class<T> beanClass, boolean create) {
-		return BeansLocal.getInstance(getManager(), beanClass, create);
+	public static <T> T getInstance(Class<T> beanClass, boolean create, Annotation... qualifiers) {
+		return BeansLocal.getInstance(getManager(), beanClass, create, qualifiers);
 	}
 
 	/**
@@ -202,15 +207,16 @@ public final class Beans {
 	}
 
 	/**
-	 * Destroy the currently active instance of the given CDI managed bean class.
+	 * Destroy the currently active instance of the given CDI managed bean class, optionally with the given qualifiers.
 	 * @param <T> The generic CDI managed bean type.
 	 * @param beanClass The CDI managed bean class.
+	 * @param qualifiers The CDI managed bean qualifiers, if any.
 	 * @since 2.0
 	 * @see #resolve(Class)
 	 * @see #destroy(Bean)
 	 */
-	public static <T> void destroy(Class<T> beanClass) {
-		BeansLocal.destroy(getManager(), beanClass);
+	public static <T> void destroy(Class<T> beanClass, Annotation... qualifiers) {
+		BeansLocal.destroy(getManager(), beanClass, qualifiers);
 	}
 
 	/**

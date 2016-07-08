@@ -64,8 +64,8 @@ public final class BeansLocal {
 	 * @see Beans#resolve(Class)
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> Bean<T> resolve(BeanManager beanManager, Class<T> beanClass) {
-		Set<Bean<?>> beans = beanManager.getBeans(beanClass);
+	public static <T> Bean<T> resolve(BeanManager beanManager, Class<T> beanClass, Annotation... qualifiers) {
+		Set<Bean<?>> beans = beanManager.getBeans(beanClass, qualifiers);
 
 		for (Bean<?> bean : beans) {
 			if (bean.getBeanClass() == beanClass) {
@@ -80,8 +80,8 @@ public final class BeansLocal {
 	 * {@inheritDoc}
 	 * @see Beans#getReference(Class)
 	 */
-	public static <T> T getReference(BeanManager beanManager, Class<T> beanClass) {
-		Bean<T> bean = resolve(beanManager, beanClass);
+	public static <T> T getReference(BeanManager beanManager, Class<T> beanClass, Annotation... qualifiers) {
+		Bean<T> bean = resolve(beanManager, beanClass, qualifiers);
 		return (bean != null) ? getReference(beanManager, bean) : null;
 	}
 
@@ -98,16 +98,16 @@ public final class BeansLocal {
 	 * {@inheritDoc}
 	 * @see Beans#getInstance(Class)
 	 */
-	public static <T> T getInstance(BeanManager beanManager, Class<T> beanClass) {
-		return getInstance(beanManager, beanClass, true);
+	public static <T> T getInstance(BeanManager beanManager, Class<T> beanClass, Annotation... qualifiers) {
+		return getInstance(beanManager, beanClass, true, qualifiers);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 * @see Beans#getInstance(Class, boolean)
 	 */
-	public static <T> T getInstance(BeanManager beanManager, Class<T> beanClass, boolean create) {
-		Bean<T> bean = resolve(beanManager, beanClass);
+	public static <T> T getInstance(BeanManager beanManager, Class<T> beanClass, boolean create, Annotation... qualifiers) {
+		Bean<T> bean = resolve(beanManager, beanClass, qualifiers);
 		return (bean != null) ? getInstance(beanManager, bean, create) : null;
 	}
 
@@ -163,8 +163,8 @@ public final class BeansLocal {
 	 * {@inheritDoc}
 	 * @see Beans#destroy(Class)
 	 */
-	public static <T> void destroy(BeanManager beanManager, Class<T> beanClass) {
-		Bean<T> bean = resolve(beanManager, beanClass);
+	public static <T> void destroy(BeanManager beanManager, Class<T> beanClass, Annotation... qualifiers) {
+		Bean<T> bean = resolve(beanManager, beanClass, qualifiers);
 
 		if (bean != null) {
 			destroy(beanManager, bean);
