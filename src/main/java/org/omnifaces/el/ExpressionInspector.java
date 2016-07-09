@@ -2,21 +2,19 @@ package org.omnifaces.el;
 
 import static org.omnifaces.el.MethodReference.NO_PARAMS;
 import static org.omnifaces.el.functions.Strings.capitalize;
-import static org.omnifaces.util.Faces.getApplication;
-import static org.omnifaces.util.Faces.getFaceletContext;
 import static org.omnifaces.util.Reflection.findMethod;
 
 import java.lang.reflect.Method;
 import java.util.Objects;
 
 import javax.el.ELContext;
-import javax.el.ELException;
 import javax.el.ELResolver;
 import javax.el.MethodExpression;
 import javax.el.MethodInfo;
 import javax.el.MethodNotFoundException;
 import javax.el.ValueExpression;
 import javax.el.ValueReference;
+import javax.faces.FacesException;
 import javax.faces.el.CompositeComponentExpressionHolder;
 
 /**
@@ -126,12 +124,6 @@ public final class ExpressionInspector {
 
 	/**
 	 * Gets a MethodReference from a MethodExpression.
-	 * <p>
-	 * Note that the method reference contains the method with
-	 * the name the expression refers to, with a matching number of arguments and <i>a</i> match of types.
-	 * Overloads with the same amount of parameters are supported, but if the actual arguments match with
-	 * the types of multiple overloads (e.g. actual argument Long, overloads for Number and Long) a random
-	 * method will be chosen.
 	 *
 	 * @param context the context of this evaluation
 	 * @param methodExpression the method expression being evaluated
@@ -139,27 +131,27 @@ public final class ExpressionInspector {
 	 * @since 2.5
 	 */
 	public static MethodReference getMethodReference(ELContext context, MethodExpression methodExpression) {
-		MethodReference methodReference;
+		InspectorElContext inspectorElContext = new InspectorElContext(context);
 
-		try {
-			MethodInfo methodInfo = methodExpression.getMethodInfo(context);
+		// Invoke getMethodInfo() on the method expression to have the expression chain resolved.
+		// The InspectorElContext contains a special resolver that will record the last outcome before the method is
+		// resolved on it. It represents the base we are looking for and is missing in MethodInfo.
+		MethodInfo methodInfo = methodExpression.getMethodInfo(inspectorElContext);
 
-			if (methodInfo instanceof MethodReference) {
-				methodReference = (MethodReference) methodInfo; // o:methodParam
+		if (methodInfo instanceof MethodReference) {
+			return (MethodReference) methodInfo; // <o:methodParam>
+		}
+		else {
+			Object base = inspectorElContext.getOutcome();
+
+			try {
+				Method method = base.getClass().getMethod(methodInfo.getName(), methodInfo.getParamTypes());
+				return new MethodReference(base, method);
 			}
-			else {
-				methodReference = getMethodReference(context, toValueExpression(context, methodExpression)); // bean.method
+			catch (Exception e) {
+				throw new FacesException(e); // This is unexpected as getMethodInfo() would otherwise have thrown EL exception.
 			}
 		}
-		catch (ELException ignore) {
-			methodReference = getMethodReference(context, toValueExpression(getFaceletContext(), methodExpression)); // bean[method]
-		}
-
-		return methodReference;
-	}
-
-	private static ValueExpression toValueExpression(ELContext context, MethodExpression methodExpression) {
-		return getApplication().getExpressionFactory().createValueExpression(context, methodExpression.getExpressionString(), Object.class);
 	}
 
 	/**
@@ -238,6 +230,10 @@ public final class ExpressionInspector {
 			return inspectorElResolver.getParams();
 		}
 
+		public Object getOutcome() {
+			return inspectorElResolver.getOutcome();
+		}
+
 	}
 
 	static class FinalBaseHolder {
@@ -265,6 +261,7 @@ public final class ExpressionInspector {
 		private Object lastBase;
 		private Object lastProperty; // Method name in case VE referenced a method, otherwise property name
 		private Object[] lastParams; // Actual parameters supplied to a method (if any)
+		private Object lastOutcome;
 
 		private boolean subchainResolving;
 
@@ -300,14 +297,14 @@ public final class ExpressionInspector {
 			}
 
 			checkSubchainStarted(base);
+			lastOutcome = super.getValue(context, base, property);
 
 			if (subchainResolving) {
-				return super.getValue(context, base, property);
+				return lastOutcome;
 			}
 
 			recordCall(base, property);
-
-			return wrapOutcomeIfNeeded(super.getValue(context, base, property));
+			return wrapOutcomeIfNeeded(lastOutcome);
 		}
 
 		@Override
@@ -325,14 +322,14 @@ public final class ExpressionInspector {
 			}
 
 			checkSubchainStarted(base);
+			lastOutcome = super.invoke(context, base, method, paramTypes, params);
 
 			if (subchainResolving) {
-				return super.invoke(context, base, method, paramTypes, params);
+				return lastOutcome;
 			}
 
 			recordCall(base, method);
-
-			return wrapOutcomeIfNeeded(super.invoke(context, base, method, paramTypes, params));
+			return wrapOutcomeIfNeeded(lastOutcome);
 		}
 
 		@Override
@@ -443,6 +440,10 @@ public final class ExpressionInspector {
 
 		public Object[] getParams() {
 			return lastParams;
+		}
+
+		public Object getOutcome() {
+			return lastOutcome;
 		}
 
 	}
