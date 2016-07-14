@@ -2,6 +2,7 @@ package org.omnifaces.el;
 
 import static org.omnifaces.el.MethodReference.NO_PARAMS;
 import static org.omnifaces.el.functions.Strings.capitalize;
+import static org.omnifaces.util.Components.createValueExpression;
 import static org.omnifaces.util.Reflection.findMethod;
 
 import java.lang.reflect.Method;
@@ -136,10 +137,22 @@ public final class ExpressionInspector {
 		// Invoke getMethodInfo() on the method expression to have the expression chain resolved.
 		// The InspectorElContext contains a special resolver that will record the last outcome before the method is
 		// resolved on it. It represents the base we are looking for and is missing in MethodInfo.
-		MethodInfo methodInfo = methodExpression.getMethodInfo(inspectorElContext);
+		MethodInfo methodInfo;
+
+		try {
+			methodInfo = methodExpression.getMethodInfo(inspectorElContext); // Oracle EL will return null on methods with arguments.
+		}
+		catch (MethodNotFoundException ignore) {
+			methodInfo = null; // Apache EL will throw MNFE on methods with arguments.
+		}
+
+		if (methodInfo == null) { // Apparently method with arguments is used, let's retry with ME-VE adapter.
+			ValueExpression valueExpression = createValueExpression(methodExpression.getExpressionString(), Object.class);
+			methodInfo = new MethodExpressionValueExpressionAdapter(valueExpression).getMethodInfo(context);
+		}
 
 		if (methodInfo instanceof MethodReference) {
-			return (MethodReference) methodInfo; // <o:methodParam>
+			return (MethodReference) methodInfo; // From ME-VE adapter or <o:methodParam>.
 		}
 		else {
 			Object base = inspectorElContext.getOutcome();
