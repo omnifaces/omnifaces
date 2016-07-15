@@ -14,7 +14,6 @@ package org.omnifaces.component.util;
 
 import static java.lang.String.format;
 import static org.omnifaces.component.util.MoveComponent.Destination.ADD_LAST;
-import static org.omnifaces.component.util.MoveComponent.Destination.BEHAVIOR;
 import static org.omnifaces.component.util.MoveComponent.PropertyKeys.behaviorDefaultEvent;
 import static org.omnifaces.component.util.MoveComponent.PropertyKeys.behaviorEvents;
 import static org.omnifaces.component.util.MoveComponent.PropertyKeys.destination;
@@ -107,13 +106,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	public MoveComponent() {
-		if (!isPostback()) {
-			subscribeToViewEvent(PreRenderViewEvent.class, this);
-		} else {
-			// Behaviors added during the PreRenderViewEvent aren't properly restored, so we add them again
-			// in the PostAddToViewEvent during a postback.
-			subscribeToViewEvent(PostAddToViewEvent.class, this);
-		}
+		subscribeToViewEvent(isPostback() ? PostAddToViewEvent.class : PreRenderViewEvent.class, this);
 	}
 
 	@Override
@@ -123,7 +116,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 
 	@Override
 	public void processEvent(SystemEvent event) throws AbortProcessingException {
-		if (event instanceof PreRenderViewEvent || (event instanceof PostAddToViewEvent && getDestination() == BEHAVIOR)) {
+		if (event instanceof PreRenderViewEvent || event instanceof PostAddToViewEvent) {
 			doProcess();
 		}
 	}
