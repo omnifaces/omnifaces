@@ -14,6 +14,7 @@ package org.omnifaces.taghandler;
 
 import static java.lang.Boolean.TRUE;
 import static org.omnifaces.util.Faces.setApplicationAttribute;
+import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 
 import java.io.IOException;
 
@@ -27,7 +28,7 @@ import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
 
-import org.omnifaces.viewhandler.RestorableViewHandler;
+import org.omnifaces.viewhandler.OmniViewHandler;
 
 /**
  * <p>
@@ -70,7 +71,7 @@ import org.omnifaces.viewhandler.RestorableViewHandler;
  *
  * @author Bauke Scholtz
  * @since 1.3
- * @see RestorableViewHandler
+ * @see OmniViewHandler
  */
 public class EnableRestorableView extends TagHandler {
 
@@ -95,7 +96,7 @@ public class EnableRestorableView extends TagHandler {
 
 	/**
 	 * Enable the current view to be restorable. This basically sets a specific view attribute which the
-	 * {@link RestorableViewHandler} could intercept on.
+	 * {@link OmniViewHandler} could intercept on.
 	 * @throws IllegalArgumentException When given parent is not an instance of {@link UIViewRoot}.
 	 */
 	@Override
@@ -110,6 +111,25 @@ public class EnableRestorableView extends TagHandler {
 		}
 
 		parent.getAttributes().put(EnableRestorableView.class.getName(), TRUE);
+	}
+
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns true if given view is null, and this is a postback request, and {@link EnableRestorableView} has been
+	 * activated.
+	 */
+	public static boolean isRestorableViewRequest(FacesContext context, UIViewRoot view) {
+		return view == null
+			&& context.isPostback()
+			&& TRUE.equals(getApplicationAttribute(context, EnableRestorableView.class.getName()));
+	}
+
+	/**
+	 * Returns true if given view indeed contains {@link EnableRestorableView}.
+	 */
+	public static boolean isRestorableView(UIViewRoot view) {
+		return TRUE.equals(view.getAttributes().get(EnableRestorableView.class.getName()));
 	}
 
 }

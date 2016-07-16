@@ -26,7 +26,7 @@
 	</ordering>
 
 	<application>
-		<view-handler>org.omnifaces.viewhandler.RestorableViewHandler</view-handler>
+		<view-handler>org.omnifaces.viewhandler.OmniViewHandler</view-handler>
 		<resource-handler>org.omnifaces.resourcehandler.GraphicResourceHandler</resource-handler>
 		<resource-handler>org.omnifaces.resourcehandler.OmniVersionResourceHandler</resource-handler>
 		<system-event-listener>

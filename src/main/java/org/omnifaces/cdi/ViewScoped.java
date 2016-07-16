@@ -34,7 +34,7 @@ import org.omnifaces.cdi.viewscope.ViewScopeExtension;
 import org.omnifaces.cdi.viewscope.ViewScopeManager;
 import org.omnifaces.context.OmniExternalContext;
 import org.omnifaces.context.OmniExternalContextFactory;
-import org.omnifaces.viewhandler.RestorableViewHandler;
+import org.omnifaces.viewhandler.OmniViewHandler;
 
 /**
  * <p>
@@ -112,7 +112,7 @@ import org.omnifaces.viewhandler.RestorableViewHandler;
  * @see ViewScopeManager
  * @see ViewScopeEventListener
  * @see BeanStorage
- * @see RestorableViewHandler
+ * @see OmniViewHandler
  * @see OmniExternalContext
  * @see OmniExternalContextFactory
  * @since 1.6

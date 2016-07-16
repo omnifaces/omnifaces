@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2016 OmniFaces.
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,11 +12,11 @@
  */
 package org.omnifaces.viewhandler;
 
-import static java.lang.Boolean.TRUE;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.isUnloadRequest;
+import static org.omnifaces.taghandler.EnableRestorableView.isRestorableView;
+import static org.omnifaces.taghandler.EnableRestorableView.isRestorableViewRequest;
 import static org.omnifaces.util.Components.buildView;
 import static org.omnifaces.util.Faces.responseComplete;
-import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getRenderKit;
 
 import java.io.IOException;
@@ -36,21 +36,22 @@ import org.omnifaces.taghandler.EnableRestorableView;
 import org.omnifaces.util.Hacks;
 
 /**
- * This view handler implementation will recreate the entire view state whenever the view has apparently been expired,
- * i.e. whenever {@link #restoreView(FacesContext, String)} returns <code>null</code> and the current request is a
- * postback and the view in question has <code>&lt;enableRestorableView&gt;</code> in the metadata. This effectively
+ * OmniFaces view handler.
+ * This class was before version 2.5 known as <code>RestorableViewHandler</code>.
+ * This view handler performs the following tasks:
+ * <ol>
+ * <li>Since 1.3: Recreate entire view when {@link EnableRestorableView} tag is in the metadata. This effectively
  * prevents the {@link ViewExpiredException} on the view.
- * <p>
- * Since OmniFaces 2.2, this view handler implementation also detects unload requests coming from {@link ViewScoped}
- * beans and will create a dummy view and only restore the view scoped state instead of building and restoring the
- * entire view.
+ * <li>Since 2.2: Detect unload requests coming from {@link ViewScoped} beans. This will create a dummy view and only
+ * restore the view scoped state instead of building and restoring the entire view.
+ * </ol>
  *
  * @author Bauke Scholtz
  * @since 1.3
  * @see EnableRestorableView
  * @see ViewScoped
  */
-public class RestorableViewHandler extends ViewHandlerWrapper { // TODO: rename to OmniViewHandler.
+public class OmniViewHandler extends ViewHandlerWrapper {
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -59,10 +60,10 @@ public class RestorableViewHandler extends ViewHandlerWrapper { // TODO: rename 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Construct a new restorable view handler around the given wrapped view handler.
+	 * Construct a new OmniFaces view handler around the given wrapped view handler.
 	 * @param wrapped The wrapped view handler.
 	 */
-	public RestorableViewHandler(ViewHandler wrapped) {
+	public OmniViewHandler(ViewHandler wrapped) {
 		this.wrapped = wrapped;
 	}
 
@@ -78,38 +79,40 @@ public class RestorableViewHandler extends ViewHandlerWrapper { // TODO: rename 
 	@Override
 	public UIViewRoot restoreView(FacesContext context, String viewId) {
 		if (isUnloadRequest(context)) {
-			UIViewRoot createdView = createView(context, viewId);
-			ResponseStateManager manager = getRenderKit(context).getResponseStateManager();
-
-			if (restoreViewRootState(context, manager, createdView)) {
-				context.setProcessingEvents(true);
-				context.getApplication().publishEvent(context, PreDestroyViewMapEvent.class, UIViewRoot.class, createdView);
-				Hacks.removeViewState(context, manager, viewId);
-			}
-
-			responseComplete();
-			return createdView;
+			return unloadView(context, viewId);
 		}
 
 		UIViewRoot restoredView = super.restoreView(context, viewId);
 
-		if (!(isRestorableViewEnabled(context) && restoredView == null && context.isPostback())) {
-			return restoredView;
+		if (isRestorableViewRequest(context, restoredView)) {
+			return createRestorableViewIfNecessary(viewId);
 		}
 
-		try {
-			UIViewRoot createdView = buildView(viewId);
-			return isRestorableView(createdView) ? createdView : null;
+		return restoredView;
+	}
+
+	/**
+	 * Create a dummy view, restore only the view root state and then immediately explicitly destroy the view.
+	 */
+	private UIViewRoot unloadView(FacesContext context, String viewId) {
+		UIViewRoot createdView = createView(context, viewId);
+		ResponseStateManager manager = getRenderKit(context).getResponseStateManager();
+
+		if (restoreViewRootState(context, manager, createdView)) {
+			context.setProcessingEvents(true);
+			context.getApplication().publishEvent(context, PreDestroyViewMapEvent.class, UIViewRoot.class, createdView);
+			Hacks.removeViewState(context, manager, viewId);
 		}
-		catch (IOException e) {
-			throw new FacesException(e);
-		}
+
+		responseComplete();
+		return createdView;
 	}
 
 	/**
 	 * Restore only the view root state. This ensures that the view scope map and all view root component system event
-	 * listeners are also restored. Calling <code>super.restoreView()</code> would implicitly also build the entire view
-	 * and restore state of all other components in the tree. This is unnecessary during an unload request.
+	 * listeners are also restored (including those for {@link PreDestroyViewMapEvent}). This is done so because calling
+	 * <code>super.restoreView()</code> would implicitly also build the entire view and restore state of all other
+	 * components in the tree. This is unnecessary during an unload request.
 	 */
 	@SuppressWarnings("unchecked")
 	private boolean restoreViewRootState(FacesContext context, ResponseStateManager manager, UIViewRoot view) {
@@ -133,12 +136,17 @@ public class RestorableViewHandler extends ViewHandlerWrapper { // TODO: rename 
 		return true;
 	}
 
-	private boolean isRestorableViewEnabled(FacesContext context) {
-		return TRUE.equals(getApplicationAttribute(context, EnableRestorableView.class.getName()));
-	}
-
-	private boolean isRestorableView(UIViewRoot view) {
-		return TRUE.equals(view.getAttributes().get(EnableRestorableView.class.getName()));
+	/**
+	 * Create and build the view and return it if it indeed contains {@link EnableRestorableView}, else return null.
+	 */
+	private UIViewRoot createRestorableViewIfNecessary(String viewId) {
+		try {
+			UIViewRoot createdView = buildView(viewId);
+			return isRestorableView(createdView) ? createdView : null;
+		}
+		catch (IOException e) {
+			throw new FacesException(e);
+		}
 	}
 
 	@Override
