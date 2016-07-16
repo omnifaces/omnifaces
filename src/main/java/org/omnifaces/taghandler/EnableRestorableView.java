@@ -107,7 +107,7 @@ public class EnableRestorableView extends TagHandler {
 		}
 
 		if (!ComponentHandler.isNew(parent)) {
-			return;
+		//	return;
 		}
 
 		parent.getAttributes().put(EnableRestorableView.class.getName(), TRUE);

@@ -108,11 +108,12 @@
 
 	<build>
 
-		<!-- We know we don't want *.jsfdia, git knows we don't want them, now let's tell Maven as well -->
+		<!-- Exclude unminified JavaScript files (and Eclipse's jsfdia) from resources. -->
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
 				<excludes>
+					<exclude>**/*.unminified.js</exclude>
 					<exclude>**/*.jsfdia</exclude>
 				</excludes>
 				<filtering>false</filtering>
@@ -132,6 +133,65 @@
 				</configuration>
 			</plugin>
 
+			<!-- Configure the JavaScript minifier. -->
+			<plugin>
+				<groupId>com.samaxes.maven</groupId>
+				<artifactId>minify-maven-plugin</artifactId>
+				<version>1.7.4</version>
+				<configuration>
+					<webappSourceDir>${basedir}/src/main/resources</webappSourceDir>
+					<webappTargetDir>${project.build.outputDirectory}</webappTargetDir>
+					<jsSourceDir>META-INF/resources/omnifaces</jsSourceDir>
+					<nosuffix>true</nosuffix>
+					<jsEngine>CLOSURE</jsEngine>
+				</configuration>
+				<executions>
+					<execution>
+						<id>minify-omnifaces</id>
+						<configuration>
+							<jsSourceFiles>
+								<jsSourceFile>omnifaces.unminified.js</jsSourceFile>
+								<jsSourceFile>util.unminified.js</jsSourceFile>
+								<jsSourceFile>highlight.unminified.js</jsSourceFile>
+								<jsSourceFile>deferredscript.unminified.js</jsSourceFile>
+								<jsSourceFile>unload.unminified.js</jsSourceFile>
+								<jsSourceFile>push.unminified.js</jsSourceFile>
+							</jsSourceFiles>
+							<jsFinalFile>omnifaces.js</jsFinalFile>
+						</configuration>
+						<goals>
+							<goal>minify</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>minify-fixviewstate</id>
+						<configuration>
+							<jsSourceFiles>
+								<jsSourceFile>omnifaces.unminified.js</jsSourceFile>
+								<jsSourceFile>fixviewstate.unminified.js</jsSourceFile>
+							</jsSourceFiles>
+							<jsFinalFile>fixviewstate.js</jsFinalFile>
+						</configuration>
+						<goals>
+							<goal>minify</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>minify-unload</id>
+						<configuration>
+							<jsSourceFiles>
+								<jsSourceFile>omnifaces.unminified.js</jsSourceFile>
+								<jsSourceFile>unload.unminified.js</jsSourceFile>
+							</jsSourceFiles>
+							<jsFinalFile>unload.js</jsFinalFile>
+						</configuration>
+						<goals>
+							<goal>minify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
 			<!-- Configure the jar with the binaries -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -206,8 +266,41 @@
 					<autoReleaseAfterClose>true</autoReleaseAfterClose>
 				</configuration>
 			</plugin>
-
 		</plugins>
+
+		<pluginManagement>
+			<plugins>
+
+				<!-- Make sure Eclipse itself also runs minify during build. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>com.samaxes.maven</groupId>
+										<artifactId>minify-maven-plugin</artifactId>
+										<versionRange>[1.7.4,)</versionRange>
+										<goals>
+											<goal>minify</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute>
+											<runOnIncremental>false</runOnIncremental>
+											<runOnConfiguration>true</runOnConfiguration>
+										</execute>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 
 	<profiles>
