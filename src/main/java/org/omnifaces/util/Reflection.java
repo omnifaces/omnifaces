@@ -220,6 +220,25 @@ public final class Reflection {
 	}
 
 	/**
+	 * Returns the class object associated with the given class name, using the context class loader and if
+	 * that fails the defining class loader of the current class. If the class cannot be loaded, then return null
+	 * instead of throwing illegal state exception.
+	 * @param <T> The expected class type.
+	 * @param className Fully qualified class name of the class for which a class object needs to be created.
+	 * @return The class object associated with the given class name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @since 2.5
+	 */
+	public static <T> Class<T> toClassOrNull(String className) {
+		try {
+			return toClass(className);
+		}
+		catch (Exception e) {
+			return null;
+		}
+	}
+
+	/**
 	 * Returns a new instance of the given class name using the default constructor.
 	 * @param <T> The expected return type.
 	 * @param className Fully qualified class name of the class for which an instance needs to be created.

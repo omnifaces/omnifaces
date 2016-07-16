@@ -44,8 +44,10 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.FacesContextWrapper;
 import javax.faces.context.Flash;
 import javax.faces.context.PartialViewContext;
+import javax.faces.convert.Converter;
 import javax.faces.event.PhaseId;
 import javax.faces.render.RenderKit;
+import javax.faces.validator.Validator;
 import javax.faces.view.ViewDeclarationLanguage;
 import javax.faces.view.ViewMetadata;
 import javax.faces.view.facelets.FaceletContext;
@@ -427,6 +429,88 @@ public final class Faces {
 	 */
 	public static void setContextAttribute(String name, Object value) {
 		FacesLocal.setContextAttribute(getContext(), name, value);
+	}
+
+	/**
+	 * Creates and returns a Faces converter associated with given object identifier. If the given identifier is an
+	 * instance of string, then delegate to {@link #createConverter(String)}. If the given identifier is an instance of
+	 * class, then delegate to {@link #createConverter(Class)}. If the given identifier is a concrete converter
+	 * instance, then return it directly.
+	 * If no converter instance can be associated, then return null.
+	 * @param identifier The Faces converter object identifier. This can be a string representing the converter ID, or a
+	 * class representing the target type, or a class representing the converter class, or even the converter instance
+	 * itself.
+	 * @return A Faces converter associated with given object identifier.
+	 * @since 2.5
+	 */
+	public static Converter createConverter(Object identifier) {
+		return FacesLocal.createConverter(getContext(), identifier);
+	}
+
+	/**
+	 * Creates and returns a Faces converter associated with given string identifier. First use the identifier as
+	 * converter ID in {@link Application#createConverter(String)}. If that didn't return anything, then try to interpret
+	 * the string identifier as class name and delegate to {@link #createConverter(Class)}.
+	 * If no converter instance can be associated, then return null.
+	 * @param identifier The Faces converter string identifier.
+	 * @return A Faces converter associated with given string identifier.
+	 * @since 2.5
+	 */
+	public static Converter createConverter(String identifier) {
+		return FacesLocal.createConverter(getContext(), identifier);
+	}
+
+	/**
+	 * Creates and returns a Faces converter associated with given class identifier. If the given identifier is not
+	 * assignable to Converter.class, then use that as target type in {@link Application#createConverter(Class)}. If
+	 * the given identifier is assignable to Converter.class, then instantiate it using default constructor.
+	 * If no converter instance can be associated, then return null.
+	 * @param identifier The Faces converter class identifier.
+	 * @return A Faces converter associated with given class identifier.
+	 * @since 2.5
+	 */
+	public static Converter createConverter(Class<?> identifier) {
+		return FacesLocal.createConverter(getContext(), identifier);
+	}
+
+	/**
+	 * Creates and returns a Faces validator associated with given object identifier. If the given identifier is an
+	 * instance of string, then delegate to {@link #createValidator(String)}. If the given identifier is an instance of
+	 * class, then delegate to {@link #createValidator(Class)}. If the given identifier is a concrete validator
+	 * instance, then return it directly.
+	 * If no validator instance can be associated, then return null.
+	 * @param identifier The Faces validator object identifier. This can be a string representing the validator ID, or a
+	 * class representing the validator class, or even the validator instance itself.
+	 * @return A Faces validator associated with given object identifier.
+	 * @since 2.5
+	 */
+	public static Validator createValidator(Object identifier) {
+		return FacesLocal.createValidator(getContext(), identifier);
+	}
+
+	/**
+	 * Creates and returns a Faces validator associated with given string identifier. First use the identifier as
+	 * validator ID in {@link Application#createValidator(String)}. If that didn't return anything, then try to
+	 * interpret the string identifier as class name and delegate to {@link #createValidator(Class)}.
+	 * If no validator instance can be associated, then return null.
+	 * @param identifier The Faces validator string identifier.
+	 * @return A Faces validator associated with given string identifier.
+	 * @since 2.5
+	 */
+	public static Validator createValidator(String identifier) {
+		return FacesLocal.createValidator(getContext(), identifier);
+	}
+
+	/**
+	 * Creates and returns a Faces validator associated with given class identifier. If the given identifier is
+	 * assignable to Validator.class, then instantiate it using default constructor.
+	 * If no validator instance can be associated, then return null.
+	 * @param identifier The Faces validator class identifier.
+	 * @return A Faces validator associated with given class identifier.
+	 * @since 2.5
+	 */
+	public static Validator createValidator(Class<?> identifier) {
+		return FacesLocal.createValidator(getContext(), identifier);
 	}
 
 	// JSF views ------------------------------------------------------------------------------------------------------

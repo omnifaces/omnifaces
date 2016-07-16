@@ -14,10 +14,13 @@ package org.omnifaces.util;
 
 import static java.util.Arrays.asList;
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
+import static org.omnifaces.util.Reflection.instance;
+import static org.omnifaces.util.Reflection.toClassOrNull;
 import static org.omnifaces.util.Servlets.prepareRedirectURL;
 import static org.omnifaces.util.Utils.encodeURI;
 import static org.omnifaces.util.Utils.encodeURL;
 import static org.omnifaces.util.Utils.isAnyEmpty;
+import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -54,9 +57,11 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
 import javax.faces.context.PartialViewContext;
+import javax.faces.convert.Converter;
 import javax.faces.event.PhaseId;
 import javax.faces.render.RenderKit;
 import javax.faces.render.RenderKitFactory;
+import javax.faces.validator.Validator;
 import javax.faces.view.ViewDeclarationLanguage;
 import javax.faces.view.ViewMetadata;
 import javax.faces.view.facelets.FaceletContext;
@@ -181,7 +186,7 @@ public final class FacesLocal {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> T evaluateExpressionGet(FacesContext context, String expression) {
-		if (expression == null) {
+		if (isEmpty(expression)) {
 			return null;
 		}
 
@@ -233,6 +238,98 @@ public final class FacesLocal {
 	 */
 	public static void setContextAttribute(FacesContext context, String name, Object value) {
 		context.getAttributes().put(name, value);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Faces#createConverter(Object)
+	 */
+	public static Converter createConverter(FacesContext context, Object identifier) {
+		if (identifier instanceof String) {
+			return createConverter(context, (String) identifier);
+		}
+		else if (identifier instanceof Class) {
+			return createConverter(context, (Class<?>) identifier);
+		}
+		else if (identifier instanceof Converter) {
+			return (Converter) identifier;
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Faces#createConverter(String)
+	 */
+	public static Converter createConverter(FacesContext context, String identifier) {
+		Converter converter = context.getApplication().createConverter(identifier);
+
+		if (converter == null) {
+			converter = createConverter(context, toClassOrNull(identifier));
+		}
+
+		return converter;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Faces#createConverter(Class)
+	 */
+	public static Converter createConverter(FacesContext context, Class<?> identifier) {
+		if (Converter.class.isAssignableFrom(identifier)) {
+			return (Converter) instance(identifier);
+		}
+		else {
+			return context.getApplication().createConverter(identifier);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Faces#createValidator(Object)
+	 */
+	public static Validator createValidator(FacesContext context, Object identifier) {
+		if (identifier instanceof String) {
+			return createValidator(context, (String) identifier);
+		}
+		else if (identifier instanceof Class) {
+			return createValidator(context, (Class<?>) identifier);
+		}
+		else if (identifier instanceof Validator) {
+			return (Validator) identifier;
+		}
+		else {
+			return null;
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Faces#createValidator(String)
+	 */
+	public static Validator createValidator(FacesContext context, String identifier) {
+		Validator validator = context.getApplication().createValidator(identifier);
+
+		if (validator == null) {
+			validator = createValidator(context, toClassOrNull(identifier));
+		}
+
+		return validator;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Faces#createValidator(Class)
+	 */
+	public static Validator createValidator(FacesContext context, Class<?> identifier) {
+		if (Validator.class.isAssignableFrom(identifier)) {
+			return (Validator) instance(identifier);
+		}
+		else {
+			return null;
+		}
 	}
 
 	// JSF views ------------------------------------------------------------------------------------------------------
