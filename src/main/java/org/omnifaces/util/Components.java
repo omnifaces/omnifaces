@@ -506,13 +506,16 @@ public final class Components {
 		 * Invokes the given operation on the components as specified by the
 		 * query parameters set via this builder.
 		 *
+		 * @param <C> The expected component type.
 		 * @param operation the operation to invoke on each component
+		 * @throws ClassCastException When <code>C</code> is of wrong type.
 		 */
-		public void invoke(final Callback.WithArgument<UIComponent> operation) {
+		public <C extends UIComponent> void invoke(final Callback.WithArgument<C> operation) {
 			invoke(new VisitCallback() {
 				@Override
+				@SuppressWarnings("unchecked")
 				public VisitResult visit(VisitContext context, UIComponent target) {
-					operation.invoke(target);
+					operation.invoke((C) target);
 					return ACCEPT;
 				}
 			});
@@ -522,13 +525,16 @@ public final class Components {
 		 * Invokes the given operation on the components as specified by the
 		 * query parameters set via this builder.
 		 *
+		 * @param <C> The expected component type.
 		 * @param operation the operation to invoke on each component
+		 * @throws ClassCastException When <code>C</code> is of wrong type.
 		 */
-		public void invoke(final Callback.ReturningWithArgument<VisitResult, UIComponent> operation) {
+		public <C extends UIComponent> void invoke(final Callback.ReturningWithArgument<VisitResult, C> operation) {
 			invoke(new VisitCallback() {
 				@Override
+				@SuppressWarnings("unchecked")
 				public VisitResult visit(VisitContext context, UIComponent target) {
-					return operation.invoke(target);
+					return operation.invoke((C) target);
 				}
 			});
 		}

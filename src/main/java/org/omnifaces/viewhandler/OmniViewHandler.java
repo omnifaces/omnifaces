@@ -12,12 +12,14 @@
  */
 package org.omnifaces.viewhandler;
 
+import static javax.faces.component.visit.VisitHint.SKIP_ITERATION;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.isUnloadRequest;
 import static org.omnifaces.taghandler.EnableRestorableView.isRestorableView;
 import static org.omnifaces.taghandler.EnableRestorableView.isRestorableViewRequest;
 import static org.omnifaces.util.Components.buildView;
 import static org.omnifaces.util.Faces.responseComplete;
 import static org.omnifaces.util.FacesLocal.getRenderKit;
+import static org.omnifaces.util.FacesLocal.isDevelopment;
 
 import java.io.IOException;
 import java.util.Map;
@@ -26,6 +28,7 @@ import javax.faces.FacesException;
 import javax.faces.application.ViewExpiredException;
 import javax.faces.application.ViewHandler;
 import javax.faces.application.ViewHandlerWrapper;
+import javax.faces.component.UIForm;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PreDestroyViewMapEvent;
@@ -33,6 +36,8 @@ import javax.faces.render.ResponseStateManager;
 
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.taghandler.EnableRestorableView;
+import org.omnifaces.util.Callback;
+import org.omnifaces.util.Components;
 import org.omnifaces.util.Hacks;
 
 /**
@@ -44,6 +49,8 @@ import org.omnifaces.util.Hacks;
  * prevents the {@link ViewExpiredException} on the view.
  * <li>Since 2.2: Detect unload requests coming from {@link ViewScoped} beans. This will create a dummy view and only
  * restore the view scoped state instead of building and restoring the entire view.
+ * <li>Since 2.5: If project stage is development, then throw an {@link IllegalStateException} when there's a nested
+ * {@link UIForm} component.
  * </ol>
  *
  * @author Bauke Scholtz
@@ -52,6 +59,13 @@ import org.omnifaces.util.Hacks;
  * @see ViewScoped
  */
 public class OmniViewHandler extends ViewHandlerWrapper {
+
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final NestedFormsChecker NESTED_FORMS_CHECKER = new NestedFormsChecker();
+
+	private static final String ERROR_NESTED_FORM_ENCOUNTERED =
+		"Nested form with ID '%s' encountered inside parent form with ID '%s'. This is illegal in HTML.";
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -89,6 +103,15 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 		}
 
 		return restoredView;
+	}
+
+	@Override
+	public void renderView(FacesContext context, UIViewRoot viewToRender) throws IOException, FacesException {
+		if (isDevelopment(context)) {
+			validateComponentTreeStructure(context, viewToRender);
+		}
+
+		super.renderView(context, viewToRender);
 	}
 
 	/**
@@ -149,9 +172,31 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 		}
 	}
 
+	private void validateComponentTreeStructure(FacesContext context, UIViewRoot view) {
+		checkNestedForms(context, view);
+	}
+
+	private void checkNestedForms(FacesContext context, UIViewRoot view) {
+		Components.forEachComponent(context).fromRoot(view).ofTypes(UIForm.class).withHints(SKIP_ITERATION).invoke(NESTED_FORMS_CHECKER);
+	}
+
 	@Override
 	public ViewHandler getWrapped() {
 		return wrapped;
+	}
+
+	// Inner classes -------------------------------------------------------------------------------------------------
+
+	private static class NestedFormsChecker implements Callback.WithArgument<UIForm> {
+		@Override
+		public void invoke(UIForm form) {
+			UIForm nestedParent = Components.getClosestParent(form, UIForm.class);
+
+			if (nestedParent != null) {
+				throw new IllegalStateException(
+					String.format(ERROR_NESTED_FORM_ENCOUNTERED, form.getClientId(), nestedParent.getClientId()));
+			}
+		}
 	}
 
 }
