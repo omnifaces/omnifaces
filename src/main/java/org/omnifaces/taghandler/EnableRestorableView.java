@@ -116,8 +116,10 @@ public class EnableRestorableView extends TagHandler {
 	// Helpers --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns true if given view is null, and this is a postback request, and {@link EnableRestorableView} has been
-	 * activated.
+	 * Returns true if given view is null, and this is a postback, and {@link EnableRestorableView} has been activated.
+	 * @param context The involved faces context.
+	 * @param view The involved view.
+	 * @return true if given view is null, and this is a postback, and {@link EnableRestorableView} has been activated.
 	 */
 	public static boolean isRestorableViewRequest(FacesContext context, UIViewRoot view) {
 		return view == null
@@ -127,6 +129,8 @@ public class EnableRestorableView extends TagHandler {
 
 	/**
 	 * Returns true if given view indeed contains {@link EnableRestorableView}.
+	 * @param view The involved view.
+	 * @return true if given view indeed contains {@link EnableRestorableView}.
 	 */
 	public static boolean isRestorableView(UIViewRoot view) {
 		return TRUE.equals(view.getAttributes().get(EnableRestorableView.class.getName()));
