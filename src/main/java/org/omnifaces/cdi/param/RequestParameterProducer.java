@@ -16,6 +16,8 @@ import static java.lang.Boolean.parseBoolean;
 import static java.util.Arrays.asList;
 import static javax.faces.validator.BeanValidator.DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME;
 import static org.omnifaces.util.Beans.getQualifier;
+import static org.omnifaces.util.Faces.createConverter;
+import static org.omnifaces.util.Faces.createValidator;
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getApplication;
 import static org.omnifaces.util.Faces.getInitParameter;
@@ -24,7 +26,6 @@ import static org.omnifaces.util.FacesLocal.getRequestParameterValues;
 import static org.omnifaces.util.Messages.createError;
 import static org.omnifaces.util.Platform.getBeanValidator;
 import static org.omnifaces.util.Platform.isBeanValidationAvailable;
-import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Reflection.setPropertiesWithCoercion;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.containsByClassName;
@@ -260,30 +261,8 @@ public class RequestParameterProducer {
 	}
 
 	private static Converter getConverter(Param requestParameter, Class<?> targetType) {
-
-		Class<? extends Converter> converterClass = requestParameter.converterClass();
-		String converterName = requestParameter.converter();
-
-		Converter converter = null;
-
-		if (!isEmpty(converterName)) {
-			Object expressionResult = evaluateExpressionGet(converterName);
-			if (expressionResult instanceof Converter) {
-				converter = (Converter) expressionResult;
-			} else if (expressionResult instanceof String) {
-				converter = getApplication().createConverter((String) expressionResult);
-			}
-		} else if (!converterClass.equals(Converter.class)) { // Converter.class is default, representing null
-			converter = instance(converterClass);
-		}
-
-		if (converter == null) {
-			try {
-				converter = getApplication().createConverter(targetType);
-			} catch (Exception e) {
-				return null;
-			}
-		}
+		Class<?> classIdentifier = requestParameter.converterClass() == Converter.class ? targetType : requestParameter.converterClass();
+		Converter converter = createConverter(coalesce(evaluateExpressionGet(requestParameter.converter()), classIdentifier));
 
 		if (converter != null) {
 			setPropertiesWithCoercion(converter, getConverterAttributes(requestParameter));
@@ -400,20 +379,20 @@ public class RequestParameterProducer {
 
 		List<Validator> validators = new ArrayList<>();
 
-		Class<? extends Validator>[] validatorClasses = requestParameter.validatorClasses();
-		String[] validatorNames = requestParameter.validators();
+		for (String validatorIdentifier : requestParameter.validators()) {
+			Validator validator = createValidator(evaluateExpressionGet(validatorIdentifier));
 
-		for (String validatorName : validatorNames) {
-			Object validator = evaluateExpressionGet(validatorName);
-			if (validator instanceof Validator) {
-				validators.add((Validator) validator);
-			} else if (validator instanceof String) {
-				validators.add(getApplication().createValidator(validatorName));
+			if (validator != null) {
+				validators.add(validator);
 			}
 		}
 
-		for (Class<? extends Validator> validatorClass : validatorClasses) {
-			validators.add(instance(validatorClass));
+		for (Class<? extends Validator> validatorClass : requestParameter.validatorClasses()) {
+			Validator validator = createValidator(validatorClass);
+
+			if (validator != null) {
+				validators.add(validator);
+			}
 		}
 
 		// Process the default validators
