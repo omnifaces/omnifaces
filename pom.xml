@@ -14,13 +14,25 @@
 
 	<name>OmniFaces</name>
 	<description>JSF 2.2+ utility library</description>
-
 	<url>http://omnifaces.org</url>
 	<organization>
 		<name>OmniFaces</name>
 		<url>http://omnifaces.org</url>
 	</organization>
 	<inceptionYear>2012</inceptionYear>
+
+	<developers>
+		<developer>
+			<id>balusc</id>
+			<name>Bauke Scholtz</name>
+			<email>balusc@gmail.com</email>
+		</developer>
+		<developer>
+			<id>arjan.tijms</id>
+			<name>Arjan Tijms</name>
+			<email>arjan.tijms@gmail.com</email>
+		</developer>
+	</developers>
 
 	<licenses>
 		<license>
@@ -30,6 +42,12 @@
 		</license>
 	</licenses>
 
+	<scm>
+		<url>https://github.com/omnifaces/omnifaces</url>
+		<connection>scm:git:git://github.com/omnifaces/omnifaces.git</connection>
+		<developerConnection>scm:git:git@github.com:omnifaces/omnifaces.git</developerConnection>
+	</scm>
+
 	<distributionManagement>
 		<snapshotRepository>
 			<id>ossrh</id>
@@ -37,35 +55,17 @@
 		</snapshotRepository>
 	</distributionManagement>
 
-	<scm>
-		<url>https://github.com/omnifaces/omnifaces</url>
-		<connection>scm:git:git://github.com/omnifaces/omnifaces.git</connection>
-		<developerConnection>scm:git:git@github.com:omnifaces/omnifaces.git</developerConnection>
-	</scm>
-
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<javase.version>1.7</javase.version>
+		<maven.compiler.source>1.7</maven.compiler.source>
+		<maven.compiler.target>1.7</maven.compiler.target>
+		<maven.source.excludeResources>true</maven.source.excludeResources>
 	</properties>
-
-	<developers>
-		<developer>
-			<id>balusc</id>
-			<name>Bauke Scholtz</name>
-			<email>balusc@gmail.com</email>
-		</developer>
-
-		<developer>
-			<id>arjan.tijms</id>
-			<name>Arjan Tijms</name>
-			<email>arjan.tijms@gmail.com</email>
-		</developer>
-	</developers>
 
 	<dependencies>
 
-		<!-- Java EE 7 dependencies -->
+		<!-- Java EE 7 dependencies. -->
 		<dependency>
 			<groupId>javax.faces</groupId>
 			<artifactId>javax.faces-api</artifactId>
@@ -85,7 +85,7 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- Java EE 6 dependencies -->
+		<!-- Java EE 6 dependencies. -->
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
@@ -107,9 +107,9 @@
 	</dependencies>
 
 	<build>
-
-		<!-- Exclude unminified JavaScript files (and Eclipse's jsfdia) from resources. -->
 		<resources>
+
+			<!-- Exclude unminified JavaScript files (and Eclipse's jsfdia) from resources. -->
 			<resource>
 				<directory>src/main/resources</directory>
 				<excludes>
@@ -121,17 +121,6 @@
 		</resources>
 
 		<plugins>
-
-			<!-- Set the Java compiler versions -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.2</version>
-				<configuration>
-					<source>${javase.version}</source>
-					<target>${javase.version}</target>
-				</configuration>
-			</plugin>
 
 			<!-- Configure the JavaScript minifier. -->
 			<plugin>
@@ -191,12 +180,12 @@
 					</execution>
 				</executions>
 			</plugin>
-			
-			<!-- Configure the jar with the binaries -->
+
+			<!-- Configure the jar with the binaries. -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.5</version>
+				<version>3.0.2</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -211,11 +200,11 @@
 				</configuration>
 			</plugin>
 
-			<!-- Configure the jar with the sources (or rather, convince Maven that we want sources at all) -->
+			<!-- Configure the jar with the sources. -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>2.4</version>
+				<version>3.0.1</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -226,11 +215,11 @@
 				</executions>
 			</plugin>
 
-			<!-- Configure the jar with the javadoc (or rather, convince Maven that we want javadoc at all) -->
+			<!-- Configure the jar with the javadoc. -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.10.1</version>
+				<version>2.10.4</version>
 				<configuration>
 					<javadocVersion>1.8</javadocVersion>
 					<notimestamp>true</notimestamp>
@@ -250,11 +239,7 @@
 				</executions>
 			</plugin>
 
-			<!-- Deploying is done via sonatype's Nexus  
-			
-				 Snapshot deploy: mvn clean deploy
-				 Release deploy: mvn clean deploy -P release
-			-->
+			<!-- Configure deployment to Sonatype's Nexus. Snapshot deploy: mvn clean deploy -->
 			<plugin>
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>nexus-staging-maven-plugin</artifactId>
@@ -299,20 +284,24 @@
 						</lifecycleMappingMetadata>
 					</configuration>
 				</plugin>
+
 			</plugins>
 		</pluginManagement>
 	</build>
 
 	<profiles>
+
+		<!-- Release deploy: mvn clean deploy -P release -->
 		<profile>
 			<id>release</id>
 			<build>
 				<plugins>
-					<!-- Signing with GPG is a requirement for a release deployment (to Maven central) -->
+
+					<!-- Signing with GPG is a requirement for a release deployment to Maven central. -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.5</version>
+						<version>1.6</version>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>
