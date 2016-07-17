@@ -12,6 +12,8 @@
  */
 package org.omnifaces.component.tree;
 
+import static org.omnifaces.util.FacesLocal.isDevelopment;
+
 import java.io.IOException;
 
 import javax.faces.FacesException;
@@ -60,12 +62,10 @@ public abstract class TreeFamily extends UIComponentBase {
 	}
 
 	/**
-	 * Calls {@link #validateHierarchy()} and then {@link #process(FacesContext, PhaseId)} with
-	 * {@link PhaseId#APPLY_REQUEST_VALUES}.
+	 * Calls {@link #process(FacesContext, PhaseId)} with {@link PhaseId#APPLY_REQUEST_VALUES}.
 	 */
 	@Override
 	public void processDecodes(FacesContext context) {
-		validateHierarchy();
 		process(context, PhaseId.APPLY_REQUEST_VALUES);
 	}
 
@@ -86,19 +86,22 @@ public abstract class TreeFamily extends UIComponentBase {
 	}
 
 	/**
-	 * Calls {@link #validateHierarchy()} and then {@link #process(FacesContext, PhaseId)} with
-	 * {@link PhaseId#RENDER_RESPONSE}.
+	 * Calls {@link #validateHierarchy()} when project stage is <code>Development</code> and then
+	 * calls {@link #process(FacesContext, PhaseId)} with {@link PhaseId#RENDER_RESPONSE}.
 	 */
 	@Override
 	public void encodeChildren(FacesContext context) throws IOException {
-		validateHierarchy();
+		if (isDevelopment(context)) {
+			validateHierarchy();
+		}
+
 		process(context, PhaseId.RENDER_RESPONSE);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Validate the component hierarchy.
+	 * Validate the component hierarchy. This should only be called when project stage is <code>Development</code>.
 	 * @throws IllegalArgumentException When component hierarchy is wrong.
 	 */
 	protected abstract void validateHierarchy() throws IllegalArgumentException;
