@@ -22,6 +22,7 @@ import static org.omnifaces.util.Faces.getELContext;
 import static org.omnifaces.util.Faces.getFaceletContext;
 import static org.omnifaces.util.Faces.getRequestParameter;
 import static org.omnifaces.util.Faces.getViewRoot;
+import static org.omnifaces.util.Faces.isDevelopment;
 import static org.omnifaces.util.Faces.setContext;
 import static org.omnifaces.util.FacesLocal.getRenderKit;
 import static org.omnifaces.util.FacesLocal.getRequestQueryStringMap;
@@ -142,12 +143,18 @@ public final class Components {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String ERROR_INVALID_PARENT =
+	private static final String ERROR_MISSING_PARENT =
 		"Component '%s' must have a parent of type '%s', but it cannot be found.";
-	private static final String ERROR_INVALID_DIRECT_PARENT =
+	private static final String ERROR_MISSING_DIRECT_PARENT =
 		"Component '%s' must have a direct parent of type '%s', but it cannot be found.";
+	private static final String ERROR_MISSING_CHILD =
+		"Component '%s' must have at least one child of type '%s', but it cannot be found.";
+	private static final String ERROR_ILLEGAL_PARENT =
+		"Component '%s' may not have a parent of type '%s'.";
+	private static final String ERROR_ILLEGAL_CHILDREN =
+		"Component '%s' may only have children of type '%s'. Encountered children of types '%s'.";
 	private static final String ERROR_CHILDREN_DISALLOWED =
-		"Component '%s' must have no children. Encountered children of types '%s'.";
+		"Component '%s' may not have any children. Encountered children of types '%s'.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -1239,7 +1246,7 @@ public final class Components {
 	// Validation -----------------------------------------------------------------------------------------------------
 
 	/**
-	 * Validate if the given component has a parent of the given parent type.
+	 * Validate in development stage if the given component has a parent of given parent type.
 	 * @param <C> The generic component type.
 	 * @param component The component to be validated.
 	 * @param parentType The parent type to be checked.
@@ -1248,14 +1255,18 @@ public final class Components {
 	public static <C extends UIComponent> void validateHasParent(UIComponent component, Class<C> parentType)
 		throws IllegalArgumentException
 	{
+		if (!isDevelopment()) {
+			return;
+		}
+
 		if (getClosestParent(component, parentType) == null) {
 			throw new IllegalArgumentException(String.format(
-				ERROR_INVALID_PARENT, component.getClass().getSimpleName(), parentType));
+				ERROR_MISSING_PARENT, component.getClass().getSimpleName(), parentType));
 		}
 	}
 
 	/**
-	 * Validate if the given component has a direct parent of the given parent type.
+	 * Validate in development stage if the given component has a direct parent of given parent type.
 	 * @param <C> The generic component type.
 	 * @param component The component to be validated.
 	 * @param parentType The parent type to be checked.
@@ -1264,18 +1275,103 @@ public final class Components {
 	public static <C extends UIComponent> void validateHasDirectParent(UIComponent component, Class<C> parentType)
 		throws IllegalArgumentException
 	{
+		if (!isDevelopment()) {
+			return;
+		}
+
 		if (!parentType.isInstance(component.getParent())) {
 			throw new IllegalArgumentException(String.format(
-				ERROR_INVALID_DIRECT_PARENT, component.getClass().getSimpleName(), parentType));
+				ERROR_MISSING_DIRECT_PARENT, component.getClass().getSimpleName(), parentType));
 		}
 	}
 
 	/**
-	 * Validate if the given component has no children.
+	 * Validate in development stage if the given component has no parent of given parent type.
+	 * @param <C> The generic component type.
+	 * @param component The component to be validated.
+	 * @param parentType The parent type to be checked.
+	 * @throws IllegalArgumentException When the given component does have a parent of the given type.
+	 * @since 2.5
+	 */
+	public static <C extends UIComponent> void validateHasNoParent(UIComponent component, Class<C> parentType)
+		throws IllegalArgumentException
+	{
+		if (!isDevelopment()) {
+			return;
+		}
+
+		if (getClosestParent(component, parentType) != null) {
+			throw new IllegalArgumentException(String.format(
+				ERROR_ILLEGAL_PARENT, component.getClass().getSimpleName(), parentType));
+		}
+	}
+
+	/**
+	 * Validate in development stage if the given component has at least a child of given child type.
+	 * @param <C> The generic component type.
+	 * @param component The component to be validated.
+	 * @param childType The child type to be checked.
+	 * @throws IllegalArgumentException When the given component doesn't have any children of the given type.
+	 * @since 2.5
+	 */
+	public static <C extends UIComponent> void validateHasChild(UIComponent component, Class<C> childType)
+		throws IllegalArgumentException
+	{
+		if (!isDevelopment()) {
+			return;
+		}
+
+		if (findComponentsInChildren(component, childType).isEmpty()) {
+			throw new IllegalArgumentException(String.format(
+				ERROR_MISSING_CHILD, component.getClass().getSimpleName(), childType));
+		}
+	}
+
+	/**
+	 * Validate in development stage if the given component has only children of given child type.
+	 * @param <C> The generic component type.
+	 * @param component The component to be validated.
+	 * @param childType The child type to be checked.
+	 * @throws IllegalArgumentException When the given component has children of a different type.
+	 * @since 2.5
+	 */
+	public static <C extends UIComponent> void validateHasOnlyChildren(UIComponent component, Class<C> childType)
+		throws IllegalArgumentException
+	{
+		if (!isDevelopment()) {
+			return;
+		}
+
+		if (component.getChildCount() > 0) {
+			StringBuilder childClassNames = new StringBuilder();
+
+			for (UIComponent child : component.getChildren()) {
+				if (!childType.isAssignableFrom(child.getClass())) {
+					if (childClassNames.length() > 0) {
+						childClassNames.append(", ");
+					}
+
+					childClassNames.append(child.getClass().getName());
+				}
+			}
+
+			if (childClassNames.length() > 0) {
+				throw new IllegalArgumentException(String.format(
+					ERROR_ILLEGAL_CHILDREN, component.getClass().getSimpleName(), childType, childClassNames));
+			}
+		}
+	}
+
+	/**
+	 * Validate in development stage if the given component has no children.
 	 * @param component The component to be validated.
 	 * @throws IllegalArgumentException When the given component has any children.
 	 */
 	public static void validateHasNoChildren(UIComponent component) throws IllegalArgumentException {
+		if (!isDevelopment()) {
+			return;
+		}
+
 		if (component.getChildCount() > 0) {
 			StringBuilder childClassNames = new StringBuilder();
 
