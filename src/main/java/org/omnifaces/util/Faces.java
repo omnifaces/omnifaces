@@ -32,6 +32,7 @@ import javax.el.ELContext;
 import javax.el.ELResolver;
 import javax.el.ExpressionFactory;
 import javax.el.ValueExpression;
+import javax.faces.FacesException;
 import javax.faces.FactoryFinder;
 import javax.faces.application.Application;
 import javax.faces.application.ApplicationFactory;
@@ -56,6 +57,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
 import org.omnifaces.component.ParamHolder;
 import org.omnifaces.config.FacesConfigXml;
@@ -984,6 +986,46 @@ public final class Faces {
 	 */
 	public static String[] getRequestParameterValues(String name) {
 		return FacesLocal.getRequestParameterValuesMap(getContext()).get(name);
+	}
+
+	/**
+	 * Returns all HTTP request parts, provided that request is of type <code>multipart/form-data</code>. If there are
+	 * no parts, an empty collection is returned.
+	 * @return all HTTP request parts.
+	 * @throws FacesException Whenever something fails at servlet or I/O level. The caller should preferably not catch
+	 * it, but just let it go. The servletcontainer will handle it.
+	 * @see HttpServletRequest#getParts()
+	 * @since 2.5
+	 */
+	public static Collection<Part> getRequestParts() {
+		return FacesLocal.getRequestParts(getContext());
+	}
+
+	/**
+	 * Returns the HTTP request part associated with the given name, else return null.
+	 * @param name The HTTP request part name.
+	 * @return The HTTP request part associated with the given name.
+	 * @throws FacesException Whenever something fails at servlet or I/O level. The caller should preferably not catch
+	 * it, but just let it go. The servletcontainer will handle it.
+	 * @see HttpServletRequest#getPart(String)
+	 * @since 2.5
+	 */
+	public static Part getRequestPart(String name) {
+		return FacesLocal.getRequestPart(getContext(), name);
+	}
+
+	/**
+	 * Returns all HTTP request parts associated with the given name, provided that request is of type
+	 * <code>multipart/form-data</code>. If there are no parts, an empty collection is returned.
+	 * @param name The HTTP request part name.
+	 * @return All HTTP request parts associated with the given name.
+	 * @throws FacesException Whenever something fails at servlet or I/O level. The caller should preferably not catch
+	 * it, but just let it go. The servletcontainer will handle it.
+	 * @see HttpServletRequest#getParts()
+	 * @since 2.5
+	 */
+	public static Collection<Part> getRequestParts(String name) {
+		return FacesLocal.getRequestParts(getContext(), name);
 	}
 
 	/**

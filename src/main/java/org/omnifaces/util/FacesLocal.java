@@ -13,6 +13,7 @@
 package org.omnifaces.util;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Reflection.toClassOrNull;
@@ -47,6 +48,7 @@ import java.util.Set;
 import javax.el.ELContext;
 import javax.el.ELResolver;
 import javax.el.ValueExpression;
+import javax.faces.FacesException;
 import javax.faces.FactoryFinder;
 import javax.faces.application.Application;
 import javax.faces.application.ProjectStage;
@@ -71,6 +73,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
 import org.omnifaces.component.ParamHolder;
 import org.omnifaces.config.FacesConfigXml;
@@ -797,6 +800,53 @@ public final class FacesLocal {
 	 */
 	public static String[] getRequestParameterValues(FacesContext context, String name) {
 		return getRequestParameterValuesMap(context).get(name);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Faces#getRequestParts()
+	 */
+	public static Collection<Part> getRequestParts(FacesContext context) {
+		try {
+			return getRequest(context).getParts();
+		}
+		catch (IOException | ServletException e) {
+			throw new FacesException(e);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Faces#getRequestPart(String)
+	 */
+	public static Part getRequestPart(FacesContext context, String name) {
+		try {
+			return getRequest(context).getPart(name);
+		}
+		catch (ServletException | IOException e) {
+			throw new FacesException(e);
+		}
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Faces#getRequestParts(String)
+	 */
+	public static Collection<Part> getRequestParts(FacesContext context, String name) {
+		try {
+			List<Part> parts = new ArrayList<>();
+
+			for (Part part : getRequest(context).getParts()) {
+				if (name.equals(part.getName())) {
+					parts.add(part);
+				}
+			}
+
+			return unmodifiableList(parts);
+		}
+		catch (ServletException | IOException e) {
+			throw new FacesException(e);
+		}
 	}
 
 	/**

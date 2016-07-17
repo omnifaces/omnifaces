@@ -1767,6 +1767,24 @@ public class ValidateValuesBean implements MultiFieldValidator {
 	</tag>
 
 	<tag>
+		<description>TBD</description>
+		<tag-name>inputFile</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.input.InputFile</component-type>
+		</component>
+		<attribute>
+			<name>multiple</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<name>directory</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+	</tag>
+
+	<tag>
 		<description>
 				<![CDATA[
 					<strong>ViewParameter</strong> is a component that extends the standard <code>UIViewParameter</code> and provides a
@@ -2847,7 +2865,7 @@ public class ValidateValuesBean implements MultiFieldValidator {
 			</description>
 			<name>dataURI</name>
 			<required>false</required>
-			<type>boolean</type>
+			<type>java.lang.Boolean</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -2940,7 +2958,7 @@ public class ValidateValuesBean implements MultiFieldValidator {
 			</description>
 			<name>ismap</name>
 			<required>false</required>
-			<type>boolean</type>
+			<type>java.lang.Boolean</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -3182,7 +3200,7 @@ public class ValidateValuesBean implements MultiFieldValidator {
 			</description>
 			<name>includeViewParams</name>
 			<required>false</required>
-			<type>boolean</type>
+			<type>java.lang.Boolean</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -3194,7 +3212,7 @@ public class ValidateValuesBean implements MultiFieldValidator {
 			</description>
 			<name>includeRequestParams</name>
 			<required>false</required>
-			<type>boolean</type>
+			<type>java.lang.Boolean</type>
 		</attribute>
 	</tag>
 
@@ -3235,7 +3253,7 @@ public class ValidateValuesBean implements MultiFieldValidator {
 			</description>
 			<name>includeRequestParams</name>
 			<required>false</required>
-			<type>boolean</type>
+			<type>java.lang.Boolean</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -3243,7 +3261,7 @@ public class ValidateValuesBean implements MultiFieldValidator {
 			</description>
 			<name>useRequestURI</name>
 			<required>false</required>
-			<type>boolean</type>
+			<type>java.lang.Boolean</type>
 		</attribute>
 		<attribute>
 			<description>

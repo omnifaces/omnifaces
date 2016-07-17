@@ -48,6 +48,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.Part;
 
 import org.omnifaces.component.ParamHolder;
 
@@ -388,6 +389,24 @@ public final class Servlets {
 	public static String getRemoteAddr(HttpServletRequest request) {
 		String forwardedFor = request.getHeader("X-Forwarded-For");
 		return isEmpty(forwardedFor) ? request.getRemoteAddr() : forwardedFor.split("\\s*,\\s*", 2)[0]; // It's a comma separated string: client,proxy1,proxy2,...
+	}
+
+	/**
+	 * Returns the submitted file name of the given part, making sure that any path is stripped off. Some browsers
+	 * are known to incorrectly include the client side path along with it.
+	 * @param part The part of a multipart/form-data request.
+	 * @return The submitted file name of the given part, or null if there is none.
+	 * @since 2.5
+	 */
+	public static String getSubmittedFileName(Part part) {
+	    for (String cd : part.getHeader("Content-Disposition").split("\\s*;\\s*")) {
+	        if (cd.startsWith("filename")) {
+	            String fileName = cd.substring(cd.indexOf('=') + 1).trim().replace("\"", "");
+	            return fileName.substring(fileName.lastIndexOf('/') + 1).substring(fileName.lastIndexOf('\\') + 1); // MSIE fix.
+	        }
+	    }
+
+	    return null;
 	}
 
 	// HttpServletResponse --------------------------------------------------------------------------------------------
