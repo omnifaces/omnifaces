@@ -14,6 +14,7 @@ package org.omnifaces.component.tree;
 
 import static javax.faces.component.visit.VisitHint.SKIP_ITERATION;
 import static org.omnifaces.util.Components.getClosestParent;
+import static org.omnifaces.util.Components.validateHasNoParent;
 import static org.omnifaces.util.Components.validateHasParent;
 
 import java.io.IOException;
@@ -50,25 +51,17 @@ public class TreeNodeItem extends TreeFamily {
 	/** The standard component type. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.tree.TreeNodeItem";
 
-	// Private constants ----------------------------------------------------------------------------------------------
-
-	private static final String ERROR_NESTING_DISALLOWED =
-		"Nesting TreeNodeItem components is disallowed. Use TreeNode instead to markup specific levels.";
-
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Validate the component hierarchy.
-	 * @throws IllegalArgumentException When there is no parent of type {@link Tree}, or when this component is nested
-	 * in another {@link TreeNodeItem}.
+	 * @throws IllegalArgumentException When there is no parent of type {@link TreeNode}, or when this component is
+	 * nested in another {@link TreeNodeItem}.
 	 */
 	@Override
 	protected void validateHierarchy() {
-		validateHasParent(this, Tree.class);
-
-		if (getClosestParent(this, TreeNodeItem.class) != null) {
-			throw new IllegalArgumentException(ERROR_NESTING_DISALLOWED);
-		}
+		validateHasParent(this, TreeNode.class);
+		validateHasNoParent(this, TreeNodeItem.class);
 	}
 
 	/**

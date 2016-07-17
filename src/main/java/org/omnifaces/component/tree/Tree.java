@@ -12,7 +12,9 @@
  */
 package org.omnifaces.component.tree;
 
-import static org.omnifaces.util.Components.getClosestParent;
+import static org.omnifaces.util.Components.validateHasChild;
+import static org.omnifaces.util.Components.validateHasNoParent;
+import static org.omnifaces.util.Components.validateHasOnlyChildren;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -127,12 +129,6 @@ public class Tree extends TreeFamily implements NamingContainer {
 		"A value expression is disallowed on 'var' and 'varNode' attributes of Tree.";
 	private static final String ERROR_INVALID_MODEL =
 		"Tree accepts only model of type TreeModel. Encountered model of type '%s'.";
-	private static final String ERROR_NESTING_DISALLOWED =
-		"Nesting Tree components is disallowed. Use TreeNode instead to markup specific levels.";
-	private static final String ERROR_NO_CHILDREN =
-		"Tree must have children of type TreeNode. Currently none are encountered.";
-	private static final String ERROR_INVALID_CHILD =
-		"Tree accepts only children of type TreeNode. Encountered child of type '%s'.";
 	private static final String ERROR_DUPLICATE_NODE =
 		"TreeNode with level '%s' is already declared. Choose a different level or remove it.";
 
@@ -199,13 +195,9 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 */
 	@Override
 	protected void validateHierarchy() {
-		if (getClosestParent(this, Tree.class) != null) {
-			throw new IllegalArgumentException(ERROR_NESTING_DISALLOWED);
-		}
-
-		if (getChildCount() == 0) {
-			throw new IllegalArgumentException(ERROR_NO_CHILDREN);
-		}
+		validateHasNoParent(this, Tree.class);
+		validateHasChild(this, TreeNode.class);
+		validateHasOnlyChildren(this, TreeNode.class);
 	}
 
 	/**
@@ -408,9 +400,6 @@ public class Tree extends TreeFamily implements NamingContainer {
 					if (nodes.put(node.getLevel(), node) != null) {
 						throw new IllegalArgumentException(String.format(ERROR_DUPLICATE_NODE, node.getLevel()));
 					}
-				}
-				else {
-					throw new IllegalArgumentException(String.format(ERROR_INVALID_CHILD, child.getClass().getName()));
 				}
 			}
 		}
