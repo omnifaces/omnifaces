@@ -79,7 +79,12 @@ OmniFaces.Push = (function(Util, window) {
 			}
 
 			socket.onclose = function(event) {
-				if (!socket || (event.code == 1000 && event.reason == REASON_EXPIRED) || event.code == 1008 || reconnectAttempts == null || reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
+				if (!socket
+					|| (event.code == 1000 && event.reason == REASON_EXPIRED) 
+					|| (event.code == 1008) 
+					|| (reconnectAttempts == null) 
+					|| (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS))
+				{
 					onclose(event.code, channel, event);
 				}
 				else {
@@ -175,10 +180,10 @@ OmniFaces.Push = (function(Util, window) {
 	 */
 	function getBaseURL(host) {
 		host = host || "";
-		var base = (!host || host.indexOf("/") == 0) ? window.location.host + host
-				: (host.indexOf(":") == 0) ? window.location.hostname + host
-				: host;
-		return URL_PROTOCOL + base + URI_PREFIX + "/";
+		var base = (!host || host.indexOf("/") == 0) ? window.location.host
+				: (host.indexOf(":") == 0) ? window.location.hostname
+				: "";
+		return URL_PROTOCOL + base + host + URI_PREFIX + "/";
 	}
 
 	/**
