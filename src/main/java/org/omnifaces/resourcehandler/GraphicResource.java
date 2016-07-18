@@ -215,12 +215,17 @@ public class GraphicResource extends DynamicResource {
 	public InputStream getInputStream() throws IOException {
 		MethodReference methodReference = ALLOWED_METHODS.get(getResourceName().split("\\.", 2)[0]);
 
-		if (methodReference == null) {
+		Method method;
+		Object[] convertedParams;
+
+		try {
+			method = methodReference.getMethod();
+			convertedParams = convertToObjects(getContext(), params, method.getParameterTypes());
+		}
+		catch (Exception e) {
 			return null; // Ignore hacker attempts. I'd rather return 400 here, but JSF spec doesn't support it.
 		}
 
-		Method method = methodReference.getMethod();
-		Object[] convertedParams = convertToObjects(getContext(), params, method.getParameterTypes());
 		Object content;
 
 		try {
