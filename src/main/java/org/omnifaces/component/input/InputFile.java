@@ -15,14 +15,13 @@ package org.omnifaces.component.input;
 import static java.lang.Boolean.FALSE;
 import static org.omnifaces.util.Faces.isRenderResponse;
 import static org.omnifaces.util.FacesLocal.getRequestParts;
-import static org.omnifaces.util.Renderers.writeAttribute;
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.faces.component.FacesComponent;
 import javax.faces.component.html.HtmlInputFile;
 import javax.faces.context.FacesContext;
-import javax.faces.context.ResponseWriter;
 import javax.faces.convert.ConverterException;
 import javax.imageio.ImageIO;
 import javax.servlet.http.Part;
@@ -200,21 +199,29 @@ public class InputFile extends HtmlInputFile {
 	 * This override will render <code>multiple</code>, <code>directory</code> and <code>accept</code> attributes
 	 * accordingly. As the <code>directory</code> attribute is relatively new, for better browser compatibility the
 	 * <code>webkitdirectory</code> attribute will also be written along it.
+	 * <p>
+	 * They're written as passthrough attributes because in Mojarra the <code>startElement()</code> takes place in
+	 * {@link #encodeEnd(FacesContext)} instead of {@link #encodeBegin(FacesContext)}.
 	 */
 	@Override
 	public void encodeEnd(FacesContext context) throws IOException {
-		ResponseWriter writer = context.getResponseWriter();
+		Map<String, Object> passThroughAttributes = getPassThroughAttributes();
 
 		if (isMultiple()) {
-			writeAttribute(writer, this, "multiple"); // http://caniuse.com/#feat=input-file-multiple
+			passThroughAttributes.put("multiple", true); // http://caniuse.com/#feat=input-file-multiple
 		}
 
 		if (isDirectory()) {
-			writeAttribute(writer, this, "directory"); // Firefox 46+ (Firefox 42-45 requires enabling via about:config).
-			writeAttribute(writer, this, "directory", "webkitdirectory"); // Chrome 11+, Safari 4+ and Edge.
+			passThroughAttributes.put("directory", true); // Firefox 46+ (Firefox 42-45 requires enabling via about:config).
+			passThroughAttributes.put("webkitdirectory", true); // Chrome 11+, Safari 4+ and Edge.
 		}
 
-		writeAttribute(writer, this, "accept"); // http://caniuse.com/#feat=input-file-accept
+		String accept = getAccept();
+
+		if (accept != null) {
+			passThroughAttributes.put("accept", getAccept()); // http://caniuse.com/#feat=input-file-accept
+		}
+
 		super.encodeEnd(context);
 	}
 
