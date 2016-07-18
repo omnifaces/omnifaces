@@ -24,14 +24,129 @@ import javax.faces.component.html.HtmlInputFile;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.convert.ConverterException;
+import javax.imageio.ImageIO;
 import javax.servlet.http.Part;
 
+import org.omnifaces.util.Servlets;
 import org.omnifaces.util.State;
 
 /**
  * <p>
  * The <code>&lt;o:inputFile&gt;</code> is a component that extends the standard <code>&lt;h:inputFile&gt;</code> and
- * adds support for <code>multiple</code> and <code>directory</code> attributes.
+ * adds support for <code>multiple</code>, <code>directory</code> and <code>accept</code> attributes. Additionally, it
+ * makes sure that the value of HTML file input element is never rendered. The standard <code>&lt;h:inputFile&gt;</code>
+ * renders <code>Part#toString()</code> to it which is unnecessary.
+ *
+ * <h3>Usage</h3>
+ * <p>
+ * You can use it the same way as <code>&lt;h:inputFile&gt;</code>, you only need to change <code>h:</code> into
+ * <code>o:</code> to get the extra support for <code>multiple</code>, <code>directory</code> and <code>accept</code>
+ * attributes. Here's are some usage examples.
+ * <p>
+ * <strong>Single file selection</strong>
+ * <p>
+ * It is basically not different from <code>&lt;h:inputFile&gt;</code>. You might as good use it instead.
+ * <pre>
+ * &lt;h:form enctype="multipart/form-data"&gt;
+ *     &lt;o:inputFile value="#{bean.file}" /&gt;
+ *     &lt;h:commandButton value="Upload" action="#{bean.upload}" /&gt;
+ * &lt;/h:form&gt;
+ * </pre>
+ * <pre>
+ * private Part file; // +getter+setter
+ *
+ * public void upload() {
+ *     if (file != null) {
+ *         System.out.println("Name: " + Servlets.getSubmittedFileName(file));
+ *         System.out.println("Type: " + file.getContentType());
+ *         System.out.println("Size: " + file.getSize());
+ *     }
+ * }
+ * </pre>
+ * <p>
+ * Note that it's strongly recommended to use {@link Servlets#getSubmittedFileName(Part)} to obtain the submitted file
+ * name to make sure that any path is stripped off. Some browsers are known to incorrectly include the client side path
+ * or even a fake path along with the file name.
+ * <p>
+ * <strong>Multiple file selection</strong>
+ * <p>
+ * The <code>multiple</code> attribute can be set to <code>true</code> to enable multiple file selection.
+ * With this setting the enduser can use control/command/shift keys to select multiple files.
+ * <pre>
+ * &lt;h:form enctype="multipart/form-data"&gt;
+ *     &lt;o:inputFile value="#{bean.files}" multiple="true" /&gt;
+ *     &lt;h:commandButton value="Upload" action="#{bean.upload}" /&gt;
+ * &lt;/h:form&gt;
+ * </pre>
+ * <pre>
+ * private List&lt;Part&gt; files; // +getter+setter
+ *
+ * public void upload() {
+ *     if (files != null) {
+ *         for (Part file : files) {
+ *             System.out.println("Name: " + Servlets.getSubmittedFileName(file));
+ *             System.out.println("Type: " + file.getContentType());
+ *             System.out.println("Size: " + file.getSize());
+ *         }
+ *     }
+ * }
+ * </pre>
+ * <p>
+ * <strong>Folder selection</strong>
+ * <p>
+ * The <code>directory</code> attribute can be set to <code>true</code> to enable folder selection. This implicitly also
+ * sets <code>multiple</code> attribute to <code>true</code> and renders an additional <code>webkitdirectory</code>
+ * attribute to HTML for better browser compatibility.
+ * <pre>
+ * &lt;h:form enctype="multipart/form-data"&gt;
+ *     &lt;o:inputFile value="#{bean.files}" directory="true" /&gt;
+ *     &lt;h:commandButton value="Upload" action="#{bean.upload}" /&gt;
+ * &lt;/h:form&gt;
+ * </pre>
+ * <pre>
+ * private List&lt;Part&gt; files; // +getter+setter
+ *
+ * public void upload() {
+ *     if (files != null) {
+ *         for (Part file : files) {
+ *             System.out.println("Name: " + Servlets.getSubmittedFileName(file));
+ *             System.out.println("Type: " + file.getContentType());
+ *             System.out.println("Size: " + file.getSize());
+ *         }
+ *     }
+ * }
+ * </pre>
+ * <p>
+ * Do note that this does not send physical folders, but only files contained in those folders.
+ * <p>
+ * <strong>Media type filtering</strong>
+ * <p>
+ * The <code>accept</code> attribute can be set with a comma separated string of media types of files to filter in
+ * browse dialog. An overview of all registered media types can be found at
+ * <a href="http://www.iana.org/assignments/media-types">IANA</a>.
+ * <pre>
+ * &lt;h:form enctype="multipart/form-data"&gt;
+ *     &lt;o:inputFile value="#{bean.losslessImageFile}" accept="image/png,image/gif" /&gt;
+ *     &lt;h:commandButton value="Upload" action="#{bean.upload}" /&gt;
+ * &lt;/h:form&gt;
+ * </pre>
+ * <pre>
+ * &lt;h:form enctype="multipart/form-data"&gt;
+ *     &lt;o:inputFile value="#{bean.anyImageFile}" accept="image/*" /&gt;
+ *     &lt;h:commandButton value="Upload" action="#{bean.upload}" /&gt;
+ * &lt;/h:form&gt;
+ * </pre>
+ * <pre>
+ * &lt;h:form enctype="multipart/form-data"&gt;
+ *     &lt;o:inputFile value="#{bean.anyMediaFile}" accept="audio/*,image/*,video/*" /&gt;
+ *     &lt;h:commandButton value="Upload" action="#{bean.upload}" /&gt;
+ * &lt;/h:form&gt;
+ * </pre>
+ * <p>
+ * Do note that this does not strictly validate the file content type, but it only filters based on the file extension.
+ * You would still need to enforce server side validation on the desired media type(s). E.g. by just parsing it using
+ * the tool suited for the specific media type such as {@link ImageIO#read(java.io.InputStream)} for image files and
+ * then checking if it returns the expected result.
  *
  * @author Bauke Scholtz
  * @since 2.5
@@ -47,7 +162,7 @@ public class InputFile extends HtmlInputFile {
 
 	private enum PropertyKeys {
 		// Cannot be uppercased. They have to exactly match the attribute names.
-		multiple, directory;
+		multiple, directory, accept;
 	}
 
 	// Variables ------------------------------------------------------------------------------------------------------
@@ -72,8 +187,8 @@ public class InputFile extends HtmlInputFile {
 	}
 
 	/**
-	 * This override returns null during render response as it doesn't make sense to print {@link Part#toString()} as
-	 * value of file input, moreover it's for HTML security reasons disallowed to prefill the value of a file input
+	 * This override returns null during render response as it doesn't make sense to render <code>Part#toString()</code>
+	 * as value of file input, moreover it's for HTML security reasons discouraged to prefill the value of a file input
 	 * even though browsers will ignore it.
 	 */
 	@Override
@@ -82,9 +197,9 @@ public class InputFile extends HtmlInputFile {
 	}
 
 	/**
-	 * This override will render <code>multiple</code> and <code>directory</code> attributes accordingly. As the
-	 * <code>directory</code> attribute is relatively new, for better compatibility the <code>webkitdirectory</code>
-	 * attribute will also be written.
+	 * This override will render <code>multiple</code>, <code>directory</code> and <code>accept</code> attributes
+	 * accordingly. As the <code>directory</code> attribute is relatively new, for better browser compatibility the
+	 * <code>webkitdirectory</code> attribute will also be written along it.
 	 */
 	@Override
 	public void encodeEnd(FacesContext context) throws IOException {
@@ -99,6 +214,7 @@ public class InputFile extends HtmlInputFile {
 			writeAttribute(writer, this, "directory", "webkitdirectory"); // Chrome 11+, Safari 4+ and Edge.
 		}
 
+		writeAttribute(writer, this, "accept"); // http://caniuse.com/#feat=input-file-accept
 		super.encodeEnd(context);
 	}
 
@@ -131,11 +247,26 @@ public class InputFile extends HtmlInputFile {
 
 	/**
 	 * Sets whether or not to enable directory selection.
-	 * Do note that this does not send physical folders, but only files contained in those folders.
 	 * @param directory Whether or not to enable directory selection.
 	 */
 	public void setDirectory(boolean directory) {
 		state.put(PropertyKeys.directory, directory);
+	}
+
+	/**
+	 * Returns comma separated string of mime types of files to filter in browse dialog.
+	 * @return Comma separated string of mime types of files to filter in browse dialog.
+	 */
+	public String getAccept() {
+		return state.get(PropertyKeys.accept);
+	}
+
+	/**
+	 * Returns comma separated string of media types of files to filter in browse dialog.
+	 * @param accept Comma separated string of mime types of files to filter in browse dialog.
+	 */
+	public void setAccept(String accept) {
+		state.put(PropertyKeys.accept, accept);
 	}
 
 }
