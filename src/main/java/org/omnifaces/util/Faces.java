@@ -47,6 +47,8 @@ import javax.faces.context.Flash;
 import javax.faces.context.PartialViewContext;
 import javax.faces.convert.Converter;
 import javax.faces.event.PhaseId;
+import javax.faces.lifecycle.Lifecycle;
+import javax.faces.lifecycle.LifecycleFactory;
 import javax.faces.render.RenderKit;
 import javax.faces.validator.Validator;
 import javax.faces.view.ViewDeclarationLanguage;
@@ -513,6 +515,16 @@ public final class Faces {
 	 */
 	public static Validator createValidator(Class<?> identifier) {
 		return FacesLocal.createValidator(getContext(), identifier);
+	}
+
+	/**
+	 * Returns The {@link Lifecycle} associated with current Faces application.
+	 * @return The {@link Lifecycle} associated with current Faces application.
+	 * @see LifecycleFactory#getLifecycle(String)
+	 * @since 2.5
+	 */
+	public static Lifecycle getLifecycle() {
+		return FacesLocal.getLifecycle(getContext());
 	}
 
 	// JSF views ------------------------------------------------------------------------------------------------------
