@@ -137,26 +137,37 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 	 * <code>super.restoreView()</code> would implicitly also build the entire view and restore state of all other
 	 * components in the tree. This is unnecessary during an unload request.
 	 */
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings("rawtypes")
 	private boolean restoreViewRootState(FacesContext context, ResponseStateManager manager, UIViewRoot view) {
 		Object state = manager.getState(context, view.getViewId());
 
-		// TODO: this assumes partial state saving not full state saving (thus doesn't work on full state saving).
-		if (state == null || !(state instanceof Object[]) || ((Object[]) state).length < 2 || !(((Object[]) state)[1] instanceof Map)) {
+		if (state == null || !(state instanceof Object[]) || ((Object[]) state).length < 2) {
 			return false;
 		}
 
-		Map<String, Object> states = (Map<String, Object>) ((Object[]) state)[1]; // Fortunately both Mojarra and MyFaces have same structure, otherwise this had to be in Hacks.
+		Object componentState = ((Object[]) state)[1];
+		Object viewRootState = null;
 
-		if (view.getId() == null) { // MyFaces.
-			view.setId(view.createUniqueId(context, null));
-			view.markInitialState();
+		if (componentState instanceof Map) { // Partial state saving.
+			if (view.getId() == null) { // MyFaces.
+				view.setId(view.createUniqueId(context, null));
+				view.markInitialState();
+			}
+
+			viewRootState = ((Map) state).get(view.getClientId(context));
 		}
 
-		Object viewRootState = states.get(view.getClientId(context));
-		view.restoreState(context, viewRootState);
-		context.setViewRoot(view);
-		return true;
+		if (componentState instanceof Object[]) { // Full state saving.
+			viewRootState = ((Object[]) componentState)[0];
+		}
+
+		if (viewRootState != null) {
+			view.restoreState(context, viewRootState);
+			context.setViewRoot(view);
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
