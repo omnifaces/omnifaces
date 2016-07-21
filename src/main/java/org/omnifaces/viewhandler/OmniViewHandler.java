@@ -156,8 +156,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 
 			viewRootState = ((Map) componentState).get(view.getClientId(context));
 		}
-
-		if (componentState instanceof Object[]) { // Full state saving.
+		else if (componentState instanceof Object[]) { // Full state saving.
 			viewRootState = ((Object[]) componentState)[0];
 		}
 
