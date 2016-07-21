@@ -26,7 +26,7 @@ import javax.faces.application.ResourceHandlerWrapper;
  * @author Bauke Scholtz
  * @since 2.0
  */
-public class DefaultResourceHandler extends ResourceHandlerWrapper {
+public abstract class DefaultResourceHandler extends ResourceHandlerWrapper {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
