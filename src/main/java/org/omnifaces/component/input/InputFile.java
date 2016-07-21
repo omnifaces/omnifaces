@@ -56,9 +56,11 @@ import org.omnifaces.util.State;
  *
  * public void upload() {
  *     if (file != null) {
- *         System.out.println("Name: " + Servlets.getSubmittedFileName(file));
- *         System.out.println("Type: " + file.getContentType());
- *         System.out.println("Size: " + file.getSize());
+ *         String name = Servlets.getSubmittedFileName(file);
+ *         String type = file.getContentType();
+ *         long size = file.getSize();
+ *         InputStream content = file.getInputStream();
+ *         // ...
  *     }
  * }
  * </pre>
@@ -83,9 +85,11 @@ import org.omnifaces.util.State;
  * public void upload() {
  *     if (files != null) {
  *         for (Part file : files) {
- *             System.out.println("Name: " + Servlets.getSubmittedFileName(file));
- *             System.out.println("Type: " + file.getContentType());
- *             System.out.println("Size: " + file.getSize());
+ *             String name = Servlets.getSubmittedFileName(file);
+ *             String type = file.getContentType();
+ *             long size = file.getSize();
+ *             InputStream content = file.getInputStream();
+ *             // ...
  *         }
  *     }
  * }
@@ -108,9 +112,11 @@ import org.omnifaces.util.State;
  * public void upload() {
  *     if (files != null) {
  *         for (Part file : files) {
- *             System.out.println("Name: " + Servlets.getSubmittedFileName(file));
- *             System.out.println("Type: " + file.getContentType());
- *             System.out.println("Size: " + file.getSize());
+ *             String name = Servlets.getSubmittedFileName(file);
+ *             String type = file.getContentType();
+ *             long size = file.getSize();
+ *             InputStream content = file.getInputStream();
+ *             // ...
  *         }
  *     }
  * }
