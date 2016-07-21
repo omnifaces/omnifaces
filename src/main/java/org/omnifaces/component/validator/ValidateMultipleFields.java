@@ -37,8 +37,6 @@ import javax.faces.component.UIInput;
 import javax.faces.component.UISelectBoolean;
 import javax.faces.context.FacesContext;
 
-import org.omnifaces.el.ScopedRunner;
-import org.omnifaces.util.Callback;
 import org.omnifaces.util.State;
 import org.omnifaces.validator.MultiFieldValidator;
 
@@ -312,14 +310,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 		final StringBuilder labels = new StringBuilder();
 
 		for (Iterator<UIInput> iterator = inputs.iterator(); iterator.hasNext();) {
-			final UIInput input = iterator.next();
-
-			new ScopedRunner(context).with("cc", UIComponent.getCompositeComponentParent(input)).invoke(new Callback.Void() { // TODO: check if this can't better be placed in Components#getLabel().
-				@Override
-				public void invoke() {
-					labels.append(getLabel(input));
-				}
-			});
+			labels.append(getLabel(iterator.next()));
 
 			if (iterator.hasNext()) {
 				labels.append(", ");

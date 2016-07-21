@@ -15,6 +15,7 @@ package org.omnifaces.util;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.regex.Pattern.quote;
+import static javax.faces.component.UIComponent.getCompositeComponentParent;
 import static javax.faces.component.visit.VisitContext.createVisitContext;
 import static javax.faces.component.visit.VisitResult.ACCEPT;
 import static org.omnifaces.util.Faces.getContext;
@@ -84,6 +85,7 @@ import javax.faces.view.facelets.FaceletContext;
 
 import org.omnifaces.component.ParamHolder;
 import org.omnifaces.component.SimpleParam;
+import org.omnifaces.el.ScopedRunner;
 
 /**
  * <p>
@@ -934,18 +936,27 @@ public final class Components {
 	 * @return The value of the <code>label</code> attribute associated with the given UI component if any, else
 	 * null.
 	 */
-	public static String getOptionalLabel(UIComponent input) {
-		Object label = input.getAttributes().get("label");
+	public static String getOptionalLabel(final UIComponent input) {
+		final Object[] result = new Object[1];
 
-		if (Utils.isEmpty(label)) {
-			ValueExpression labelExpression = input.getValueExpression("label");
+		new ScopedRunner(getContext()).with("cc", getCompositeComponentParent(input)).invoke(new Callback.Void() {
+			@Override
+			public void invoke() {
+				Object label = input.getAttributes().get("label");
 
-			if (labelExpression != null) {
-				label = labelExpression.getValue(getELContext());
+				if (isEmpty(label)) {
+					ValueExpression labelExpression = input.getValueExpression("label");
+
+					if (labelExpression != null) {
+						label = labelExpression.getValue(getELContext());
+					}
+				}
+
+				result[0] = label;
 			}
-		}
+		});
 
-		return (label != null) ? label.toString() : null;
+		return (result[0] != null) ? result[0].toString() : null;
 	}
 
 	/**
