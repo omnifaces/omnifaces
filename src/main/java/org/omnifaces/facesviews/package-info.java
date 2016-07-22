@@ -128,13 +128,13 @@
  * filter based functionality such as security filters, compression filters, file upload filters, etc.
  *
  * <p>
- * With the forwarding method, filters typically have to be set to dispatch type <code>FORWARD</code> as well. If the FacesView filter is the first
+ * With the forwarding method, filters typically have to be set to dispatch type <code>FORWARD</code> as well. If the FacesViews filter is the first
  * in the chain other filters that are set to dispatch type <code>REQUEST</code> will <strong>NOT</strong> be invoked at all (the chain is ended). If the
- * FacesView filter is set to be the last, other filters will be invoked, but they should not modify the response (a forward clears
+ * FacesViews filter is set to be the last, other filters will be invoked, but they should not modify the response (a forward clears
  * the response buffer till so far if not committed).
  *
  * <p>
- * No such problems appear to exist when the FacesView filter simply continues the filtering chain. However, since it wraps the requess there
+ * No such problems appear to exist when the FacesViews filter simply continues the filtering chain. However, since it wraps the requess there
  * might be unforeseen problems with containers or other filters that get confused when the request URI changes in the middle of the chain.
  * Continuing the chain has been tested with JBoss EAP 6.0.1, GlassFish 3.1.2.2, WebLogic 12.1.1 and TomEE 1.5.2-snapshot and thus with both
  * Mojarra and MyFaces. However, since it's a new method for OmniFaces 1.4 we kept the existing forward as an alternative.
@@ -249,7 +249,7 @@
  * were done in 1.3
  *
  * <p>
- * Most notably is that the FacesServlet dispatch changed from forwarding to continuing the chain, the FacesView filter
+ * Most notably is that the FacesServlet dispatch changed from forwarding to continuing the chain, the FacesViews filter
  * moved from being the first in the chain to being the last, links are always rendered as their extensionless variant independent
  * of the request using an extension or not, and when a request with an extension is used anyway (e.g. by typing it directly into
  * the address bar) it's now redirected to the extensionless variant.
