@@ -823,10 +823,9 @@
 		<function-class>org.omnifaces.el.functions.Objects</function-class>
 		<function-signature>java.lang.Object coalesce(java.lang.Object, java.lang.Object)</function-signature>
 	</function>
-	
-	
+
 	<!-- Components =============================================================================================== -->
-	
+
 	<function>
 		<description>
 			<![CDATA[
@@ -840,9 +839,69 @@
 		<function-signature>java.lang.Object evalAttribute(javax.faces.component.UIComponent, java.lang.String)</function-signature>
 	</function>
 
+	<function>
+		<description>
+			<![CDATA[
+				Returns <code>&lt;o:graphicImage&gt;</code> URL based on given expression string.
+				The expression string must be a quoted string. Any nested quotes can be escaped with backslash.
+				<p>
+				Usage example:
+				<pre>
+&lt;a href="#{of:graphicImageURL('bean.getFullImage(image.id)')}"&gt;
+    &lt;o:graphicImage value="#{bean.getThumbnailImage(image.id)}" /&gt;
+&lt;/a&gt;
+				</pre>
+			]]>
+		</description>
+		<function-name>graphicImageURL</function-name>
+		<function-class>org.omnifaces.el.functions.Components</function-class>
+		<function-signature>java.lang.String graphicImageURL(java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns <code>&lt;o:graphicImage&gt;</code> URL based on given expression string and image type.
+				The expression string must be a quoted string. Any nested quotes can be escaped with backslash.
+				The image type is represented as file extension. E.g. "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc.
+				<p>
+				Usage example:
+				<pre>
+&lt;a href="#{of:graphicImageURL('bean.getFullImage(image.id)', 'png')}"&gt;
+    &lt;o:graphicImage value="#{bean.getThumbnailImage(image.id)}" type="png" /&gt;
+&lt;/a&gt;
+				</pre>
+			]]>
+		</description>
+		<function-name>graphicImageURLWithType</function-name>
+		<function-class>org.omnifaces.el.functions.Components</function-class>
+		<function-signature>java.lang.String graphicImageURLWithType(java.lang.String, java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns <code>&lt;o:graphicImage&gt;</code> URL based on given expression string, image type and last modified.
+				The expression string must be a quoted string. Any nested quotes can be escaped with backslash.
+				The image type is represented as file extension. E.g. "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc.
+				The "last modified" timestamp can be either a <code>java.lang.Long</code>, <code>java.util.Date</code>, 
+				or <code>java.lang.String</code> which is parseable as <code>java.lang.Long</code>.
+				<p>
+				Usage example:
+				<pre>
+&lt;a href="#{of:graphicImageURL('bean.getFullImage(image.id)', 'png', image.lastModified)}"&gt;
+    &lt;o:graphicImage value="#{bean.getThumbnailImage(image.id)}" type="png" lastModified="#{image.lastModified}" /&gt;
+&lt;/a&gt;
+				</pre>
+			]]>
+		</description>
+		<function-name>graphicImageURLWithTypeAndLastModified</function-name>
+		<function-class>org.omnifaces.el.functions.Components</function-class>
+		<function-signature>java.lang.String graphicImageURLWithTypeAndLastModified(java.lang.String, java.lang.String, java.lang.Object)</function-signature>
+	</function>
 
 	<!-- Faces (request URL/header shortcuts) ===================================================================== -->
-	
+
 	<function>
 		<description>
 			<![CDATA[

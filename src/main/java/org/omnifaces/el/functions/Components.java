@@ -12,10 +12,16 @@
  */
 package org.omnifaces.el.functions;
 
+import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getELContext;
+
+import java.util.Date;
 
 import javax.el.ValueExpression;
 import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+
+import org.omnifaces.resourcehandler.GraphicResource;
 
 /**
  * Collection of EL functions for working with components.
@@ -56,4 +62,72 @@ public final class Components {
 			return component.getAttributes().get(name);
 		}
 	}
+
+	/**
+	 * <p>
+	 * Returns <code>&lt;o:graphicImage&gt;</code> URL based on given expression string.
+	 * <p>
+	 * Usage example:
+	 * <pre>
+	 * &lt;a href="#{of:graphicImageURL('bean.getFullImage(image.id)')}"&gt;
+	 *     &lt;o:graphicImage value="#{bean.getThumbnailImage(image.id)}" /&gt;
+	 * &lt;/a&gt;
+	 * </pre>
+	 * @param expression Expression string representing the same value as you would use in
+	 * <code>&lt;o:graphicImage&gt;</code>. It must be a quoted string. Any nested quotes can be escaped with backslash.
+	 * @return <code>&lt;o:graphicImage&gt;</code> URL based on given expression string.
+	 * @since 2.5
+	 */
+	public static String graphicImageURL(String expression) {
+		return graphicImageURLWithTypeAndLastModified(expression, null, null);
+	}
+
+	/**
+	 * <p>
+	 * Returns <code>&lt;o:graphicImage&gt;</code> URL based on given expression string and image type.
+	 * <p>
+	 * Usage example:
+	 * <pre>
+	 * &lt;a href="#{of:graphicImageURL('bean.getFullImage(image.id)', 'png')}"&gt;
+	 *     &lt;o:graphicImage value="#{bean.getThumbnailImage(image.id)}" type="png" /&gt;
+	 * &lt;/a&gt;
+	 * </pre>
+	 * @param expression Expression string representing the same value as you would use in
+	 * <code>&lt;o:graphicImage&gt;</code>. It must be a quoted string. Any nested quotes can be escaped with backslash.
+	 * @param type The image type, represented as file extension.
+	 * E.g. "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc. This may be <code>null</code>.
+	 * @return <code>&lt;o:graphicImage&gt;</code> URL based on given expression string and image type.
+	 * @since 2.5
+	 */
+	public static String graphicImageURLWithType(String expression, String type) {
+		return graphicImageURLWithTypeAndLastModified(expression, type, null);
+	}
+
+	/**
+	 * <p>
+	 * Returns <code>&lt;o:graphicImage&gt;</code> URL based on given expression string, image type and last modified.
+	 * <p>
+	 * Usage example:
+	 * <pre>
+	 * &lt;a href="#{of:graphicImageURL('bean.getFullImage(image.id)', 'png', image.lastModified)}"&gt;
+	 *     &lt;o:graphicImage value="#{bean.getThumbnailImage(image.id)}" type="png" lastModified="#{image.lastModified}" /&gt;
+	 * &lt;/a&gt;
+	 * </pre>
+	 * @param expression Expression string representing the same value as you would use in
+	 * <code>&lt;o:graphicImage&gt;</code>. It must be a quoted string. Any nested quotes can be escaped with backslash.
+	 * @param type The image type, represented as file extension.
+	 * E.g. "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc. This may be <code>null</code>.
+	 * @param lastModified The "last modified" timestamp, can be either a {@link Long}, {@link Date}, or {@link String}
+	 * which is parseable as {@link Long}. This may be <code>null</code>.
+	 * @return <code>&lt;o:graphicImage&gt;</code> URL based on given expression string, image type and last modified.
+	 * @since 2.5
+	 */
+	@SuppressWarnings("all") // Eclipse el-syntax.
+	public static String graphicImageURLWithTypeAndLastModified(String expression, String type, Object lastModified) {
+		FacesContext context = getContext();
+		ValueExpression value = org.omnifaces.util.Components.createValueExpression("#{" + expression + "}", Object.class);
+		GraphicResource resource = GraphicResource.create(context, value, type, lastModified);
+		return context.getExternalContext().encodeResourceURL(resource.getRequestPath());
+	}
+
 }
