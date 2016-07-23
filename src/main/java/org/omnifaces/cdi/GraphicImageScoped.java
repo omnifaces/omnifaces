@@ -21,12 +21,19 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.util.Date;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Stereotype;
 import javax.inject.Qualifier;
 
 import org.omnifaces.component.output.GraphicImage;
+import org.omnifaces.el.ExpressionInspector;
+import org.omnifaces.el.MethodReference;
+import org.omnifaces.resourcehandler.DefaultResourceHandler;
+import org.omnifaces.resourcehandler.DynamicResource;
+import org.omnifaces.resourcehandler.GraphicResource;
+import org.omnifaces.resourcehandler.GraphicResourceHandler;
 
 /**
  * <p>
@@ -52,13 +59,61 @@ import org.omnifaces.component.output.GraphicImage;
  * <p>
  * When using {@link ApplicationScoped} instead, serving graphic images via a JSF page will continue to work, but
  * when the server restarts, then hotlinking/bookmarking will stop working until the JSF page referencing the same
- * bean method is requested for the first time. The {@link GraphicImageScoped} basically enables serving images without
- * the need to reference them via a JSF page.
+ * bean method is requested for the first time. This is caused by a security restriction which should prevent users from
+ * invoking arbitrary bean methods by manipulating the URL. The {@link GraphicImageScoped} basically enables endusers to
+ * invoke any public method returning a <code>byte[]</code> or <code>InputStream</code> on the bean by just a HTTP GET
+ * request.
+ *
+ * <h3>Usage</h3>
+ * <p>
+ * You can use <code>#{of:graphicImageURL()}</code> EL functions to generate URLs referring the
+ * {@link GraphicImageScoped} bean, optionally with the image <code>type</code> and <code>lastModified</code> arguments.
+ * Below are some usage examples:
+ * <pre>
+ * &lt;ui:repeat value="#{bean.products}" var="product"&gt;
+ *
+ *     &lt;!-- Basic, using default type and last modified. --&gt;
+ *     &lt;a href="#{of:graphicImageURL('images.full(product.imageId)')}"&gt;
+ *         &lt;o:graphicImage value="#{images.thumb(product.imageId)}" /&gt;
+ *     &lt;/a&gt;
+ *
+ *     &lt;!-- With specified type and default last modified. --&gt;
+ *     &lt;a href="#{of:graphicImageURLWithType('images.full(product.imageId)', 'png')}"&gt;
+ *         &lt;o:graphicImage value="#{images.thumb(product.imageId)}" type="png" /&gt;
+ *     &lt;/a&gt;
+ *
+ *     &lt;!-- With specified type and last modified. --&gt;
+ *     &lt;a href="#{of:graphicImageURLWithTypeAndLastModified('images.full(product.imageId)', 'png', product.lastModified)}"&gt;
+ *         &lt;o:graphicImage value="#{images.thumb(product.imageId)}" type="png" lastModified="#{product.lastModified}" /&gt;
+ *     &lt;/a&gt;
+ * &lt;/ui:repeat&gt;
+ * </pre>
+ * <p>
+ * Note that in the <code>#{of:graphicImageURL()}</code> EL functions the expression string represents the same value as
+ * you would use in <code>&lt;o:graphicImage&gt;</code> and that it must be a quoted string. Any nested quotes can be
+ * escaped with backslash.
+ * <p>
+ * The <code>type</code> argument/attribute is the image type represented as file extension. E.g. "jpg", "png", "gif",
+ * "ico", "svg", "bmp", "tiff", etc. When unspecified then the content type will default to <code>"image"</code>
+ * without any subtype. This should work for most images in most browsers. This may however fail on newer images or in
+ * older browsers. In that case, you can explicitly specify the image type via the <code>type</code> argument/attribute
+ * which must represent a valid file extension.
+ * <p>
+ * The <code>lastModified</code> argument/attribute is the "last modified" timestamp, can be {@link Long} or
+ * {@link Date}, or otherwise an attempt will be made to parse it as {@link Long}. When unspecified, then the "default
+ * resource maximum age" as set in either the Mojarra specific context parameter
+ * <code>com.sun.faces.defaultResourceMaxAge</code> or MyFaces specific context parameter
+ * <code>org.apache.myfaces.RESOURCE_MAX_TIME_EXPIRES</code> will be used, else a default of 1 week will be assumed.
  *
  * @since 2.5
  * @author Bauke Scholtz
  * @see GraphicImage
- *
+ * @see GraphicResource
+ * @see DynamicResource
+ * @see GraphicResourceHandler
+ * @see DefaultResourceHandler
+ * @see ExpressionInspector
+ * @see MethodReference
  */
 @Documented
 @Qualifier

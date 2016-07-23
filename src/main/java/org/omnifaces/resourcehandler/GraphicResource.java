@@ -12,6 +12,7 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static java.lang.reflect.Modifier.isPublic;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static org.omnifaces.util.Faces.getContext;
@@ -273,7 +274,7 @@ public class GraphicResource extends DynamicResource {
 	public static void registerGraphicImageScopedBeans() {
 		for (Object bean : CDI.current().select(GRAPHIC_IMAGE_SCOPED)) {
 			for (Method method : bean.getClass().getMethods()) {
-				if (isOneOf(method.getReturnType(), REQUIRED_RETURN_TYPES)) {
+				if (isPublic(method.getModifiers()) && isOneOf(method.getReturnType(), REQUIRED_RETURN_TYPES)) {
 					String resourceBaseName = getResourceBaseName(bean.getClass().getSuperclass(), method);
 					MethodReference methodReference = new MethodReference(bean, method);
 					ALLOWED_METHODS.put(resourceBaseName, methodReference);

@@ -132,6 +132,10 @@ import org.omnifaces.util.Faces;
  *     &lt;o:graphicImage value="#{images.get(image.id)}" lastModified="#{image.lastModified}" /&gt;
  * &lt;/ui:repeat&gt;
  * </pre>
+ * <p>
+ * When unspecified, then the "default resource maximum age" as set in either the Mojarra specific context parameter
+ * <code>com.sun.faces.defaultResourceMaxAge</code> or MyFaces specific context parameter
+ * <code>org.apache.myfaces.RESOURCE_MAX_TIME_EXPIRES</code> will be used, else a default of 1 week will be assumed.
  *
  * <h3>Image types</h3>
  * <p>
