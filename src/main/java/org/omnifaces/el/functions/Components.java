@@ -21,6 +21,8 @@ import javax.el.ValueExpression;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 
+import org.omnifaces.cdi.GraphicImageScoped;
+import org.omnifaces.component.output.GraphicImage;
 import org.omnifaces.resourcehandler.GraphicResource;
 
 /**
@@ -65,18 +67,20 @@ public final class Components {
 
 	/**
 	 * <p>
-	 * Returns <code>&lt;o:graphicImage&gt;</code> URL based on given expression string.
+	 * Returns {@link GraphicImageScoped} URL based on given expression string.
 	 * <p>
 	 * Usage example:
 	 * <pre>
-	 * &lt;a href="#{of:graphicImageURL('bean.getFullImage(image.id)')}"&gt;
-	 *     &lt;o:graphicImage value="#{bean.getThumbnailImage(image.id)}" /&gt;
+	 * &lt;a href="#{of:graphicImageURL('images.full(product.imageId)')}"&gt;
+	 *     &lt;o:graphicImage value="#{images.thumb(product.imageId)}" /&gt;
 	 * &lt;/a&gt;
 	 * </pre>
 	 * @param expression Expression string representing the same value as you would use in
 	 * <code>&lt;o:graphicImage&gt;</code>. It must be a quoted string. Any nested quotes can be escaped with backslash.
-	 * @return <code>&lt;o:graphicImage&gt;</code> URL based on given expression string.
+	 * @return {@link GraphicImageScoped} URL based on given expression string.
 	 * @since 2.5
+	 * @see GraphicImageScoped
+	 * @see GraphicImage
 	 */
 	public static String graphicImageURL(String expression) {
 		return graphicImageURLWithTypeAndLastModified(expression, null, null);
@@ -84,20 +88,22 @@ public final class Components {
 
 	/**
 	 * <p>
-	 * Returns <code>&lt;o:graphicImage&gt;</code> URL based on given expression string and image type.
+	 * Returns {@link GraphicImageScoped} URL based on given expression string and image type.
 	 * <p>
 	 * Usage example:
 	 * <pre>
-	 * &lt;a href="#{of:graphicImageURL('bean.getFullImage(image.id)', 'png')}"&gt;
-	 *     &lt;o:graphicImage value="#{bean.getThumbnailImage(image.id)}" type="png" /&gt;
+	 * &lt;a href="#{of:graphicImageURLWithType('images.full(product.imageId)', 'png')}"&gt;
+	 *     &lt;o:graphicImage value="#{images.thumb(product.imageId)}" type="png" /&gt;
 	 * &lt;/a&gt;
 	 * </pre>
 	 * @param expression Expression string representing the same value as you would use in
 	 * <code>&lt;o:graphicImage&gt;</code>. It must be a quoted string. Any nested quotes can be escaped with backslash.
 	 * @param type The image type, represented as file extension.
 	 * E.g. "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc. This may be <code>null</code>.
-	 * @return <code>&lt;o:graphicImage&gt;</code> URL based on given expression string and image type.
+	 * @return {@link GraphicImageScoped} URL based on given expression string and image type.
 	 * @since 2.5
+	 * @see GraphicImageScoped
+	 * @see GraphicImage
 	 */
 	public static String graphicImageURLWithType(String expression, String type) {
 		return graphicImageURLWithTypeAndLastModified(expression, type, null);
@@ -105,12 +111,12 @@ public final class Components {
 
 	/**
 	 * <p>
-	 * Returns <code>&lt;o:graphicImage&gt;</code> URL based on given expression string, image type and last modified.
+	 * Returns {@link GraphicImageScoped} URL based on given expression string, image type and last modified.
 	 * <p>
 	 * Usage example:
 	 * <pre>
-	 * &lt;a href="#{of:graphicImageURL('bean.getFullImage(image.id)', 'png', image.lastModified)}"&gt;
-	 *     &lt;o:graphicImage value="#{bean.getThumbnailImage(image.id)}" type="png" lastModified="#{image.lastModified}" /&gt;
+	 * &lt;a href="#{of:graphicImageURLWithTypeAndLastModified('images.full(product.imageId)', 'png', product.lastModified)}"&gt;
+	 *     &lt;o:graphicImage value="#{images.thumb(product.imageId)}" type="png" lastModified="#{product.lastModified}" /&gt;
 	 * &lt;/a&gt;
 	 * </pre>
 	 * @param expression Expression string representing the same value as you would use in
@@ -119,8 +125,10 @@ public final class Components {
 	 * E.g. "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc. This may be <code>null</code>.
 	 * @param lastModified The "last modified" timestamp, can be either a {@link Long}, {@link Date}, or {@link String}
 	 * which is parseable as {@link Long}. This may be <code>null</code>.
-	 * @return <code>&lt;o:graphicImage&gt;</code> URL based on given expression string, image type and last modified.
+	 * @return {@link GraphicImageScoped} URL based on given expression string, image type and last modified.
 	 * @since 2.5
+	 * @see GraphicImageScoped
+	 * @see GraphicImage
 	 */
 	@SuppressWarnings("all") // Eclipse el-syntax.
 	public static String graphicImageURLWithTypeAndLastModified(String expression, String type, Object lastModified) {
