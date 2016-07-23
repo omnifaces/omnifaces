@@ -51,7 +51,7 @@ import org.omnifaces.filter.HttpFilter;
  * @author Arjan Tijms
  *
  */
-public class EagerBeansFilter extends HttpFilter {
+public class EagerBeansFilter extends HttpFilter { // TODO: remove in OmniFaces 3.0
 
 	@Override
 	public void init() throws ServletException {
