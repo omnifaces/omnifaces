@@ -23,6 +23,7 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.annotation.WebListener;
 
 import org.omnifaces.cdi.Eager;
+import org.omnifaces.cdi.GraphicImageScoped;
 import org.omnifaces.cdi.eager.EagerBeansRepository;
 import org.omnifaces.cdi.eager.EagerBeansWebListener;
 import org.omnifaces.cdi.push.Socket;
@@ -30,6 +31,7 @@ import org.omnifaces.component.output.Cache;
 import org.omnifaces.component.output.cache.CacheInitializer;
 import org.omnifaces.eventlistener.DefaultServletContextListener;
 import org.omnifaces.facesviews.FacesViews;
+import org.omnifaces.resourcehandler.GraphicResource;
 
 /**
  * <p>
@@ -41,6 +43,7 @@ import org.omnifaces.facesviews.FacesViews;
  * <li>Add {@link FacesViews} mappings to FacesServlet if necessary.
  * <li>Load {@link Cache} provider and register its filter if necessary.
  * <li>Register {@link Socket} endpoint if necessary.
+ * <li>Register {@link GraphicImageScoped} beans in {@link GraphicResource}.
  * </ol>
  *
  * @author Bauke Scholtz
@@ -64,6 +67,7 @@ public class ApplicationListener extends DefaultServletContextListener {
 			FacesViews.addMappings(servletContext);
 			CacheInitializer.loadProviderAndRegisterFilter(servletContext);
 			Socket.registerEndpointIfNecessary(servletContext);
+			GraphicResource.registerGraphicImageScopedBeans();
 		}
 		catch (Throwable e) {
 			logger.log(SEVERE, ERROR_OMNIFACES_INITIALIZATION_FAIL, e);

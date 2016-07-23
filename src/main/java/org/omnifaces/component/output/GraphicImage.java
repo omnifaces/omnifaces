@@ -33,6 +33,7 @@ import javax.faces.component.html.HtmlGraphicImage;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 
+import org.omnifaces.cdi.GraphicImageScoped;
 import org.omnifaces.el.ExpressionInspector;
 import org.omnifaces.el.MethodReference;
 import org.omnifaces.resourcehandler.DefaultResourceHandler;
@@ -65,10 +66,10 @@ import org.omnifaces.util.Faces;
  * <h3>Image streaming</h3>
  * <p>
  * When not rendered as data URI, the {@link InputStream} or <code>byte[]</code> property <strong>must</strong> point to
- * a <em>stateless</em> <code>@ApplicationScoped</code> bean (both JSF and CDI scopes are supported). The property will
- * namely be evaluated at the moment the browser requests the image content based on the URL as specified in HTML
- * <code>&lt;img src&gt;</code>, which is usually a different request than the one which rendered the JSF page.
- * E.g.
+ * a <em>stateless</em> <code>@GraphicImageScoped</code> or <code>@ApplicationScoped</code> bean (both JSF and CDI
+ * application scopes are supported). The property will namely be evaluated at the moment the browser requests the image
+ * content based on the URL as specified in HTML <code>&lt;img src&gt;</code>, which is usually a different request than
+ * the one which rendered the JSF page. E.g.
  * <pre>
  * &#64;Named
  * &#64;RequestScoped
@@ -92,13 +93,13 @@ import org.omnifaces.util.Faces;
  * </pre>
  * <pre>
  * &#64;Named
- * &#64;ApplicationScoped
- * public class ImageStreamer {
+ * &#64;GraphicImageScoped
+ * public class Images {
  *
  *     &#64;Inject
  *     private ImageService service;
  *
- *     public byte[] getById(Long id) {
+ *     public byte[] get(Long id) {
  *         return service.getContent(id);
  *     }
  *
@@ -106,7 +107,7 @@ import org.omnifaces.util.Faces;
  * </pre>
  * <pre>
  * &lt;ui:repeat value="#{bean.images}" var="image"&gt;
- *     &lt;o:graphicImage value="#{imageStreamer.getById(image.id)}" /&gt;
+ *     &lt;o:graphicImage value="#{images.get(image.id)}" /&gt;
  * &lt;/ui:repeat&gt;
  * </pre>
  * <p>
@@ -128,7 +129,7 @@ import org.omnifaces.util.Faces;
  * timestamp in milliseconds.
  * <pre>
  * &lt;ui:repeat value="#{bean.images}" var="image"&gt;
- *     &lt;o:graphicImage value="#{imageStreamer.getById(image.id)}" lastModified="#{image.lastModified}" /&gt;
+ *     &lt;o:graphicImage value="#{images.get(image.id)}" lastModified="#{image.lastModified}" /&gt;
  * &lt;/ui:repeat&gt;
  * </pre>
  *
@@ -141,7 +142,7 @@ import org.omnifaces.util.Faces;
  * explicitly specify the image type via the <code>type</code> attribute which must represent a valid file extension.
  * E.g.
  * <pre>
- * &lt;o:graphicImage value="#{imageStreamer.getById(image.id)}" type="svg" /&gt;
+ * &lt;o:graphicImage value="#{images.get(image.id)}" type="svg" /&gt;
  * </pre>
  * <p>
  * The content type will be resolved via {@link Faces#getMimeType(String)}. You can add unrecognized ones as
@@ -160,7 +161,7 @@ import org.omnifaces.util.Faces;
  * (beware of <a href="http://caniuse.com/#feat=svg-fragment">browser support</a>).
  * E.g.
  * <pre>
- * &lt;o:graphicImage value="#{imageStreamer.getById(image.id)}" type="svg" fragment="svgView(viewBox(0,50,200,200))" /&gt;
+ * &lt;o:graphicImage value="#{images.get(image.id)}" type="svg" fragment="svgView(viewBox(0,50,200,200))" /&gt;
  * </pre>
  *
  * <h3>Design notes</h3>
@@ -175,6 +176,7 @@ import org.omnifaces.util.Faces;
  *
  * @author Bauke Scholtz
  * @since 2.0
+ * @see GraphicImageScoped
  * @see GraphicResource
  * @see DynamicResource
  * @see GraphicResourceHandler

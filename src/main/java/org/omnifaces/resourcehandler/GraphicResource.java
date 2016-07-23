@@ -20,6 +20,7 @@ import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isNumber;
 import static org.omnifaces.util.Utils.isOneAnnotationPresent;
+import static org.omnifaces.util.Utils.isOneOf;
 import static org.omnifaces.util.Utils.toByteArray;
 
 import java.io.ByteArrayInputStream;
@@ -36,6 +37,8 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.el.ValueExpression;
+import javax.enterprise.inject.spi.CDI;
+import javax.enterprise.util.AnnotationLiteral;
 import javax.faces.FacesException;
 import javax.faces.application.Application;
 import javax.faces.application.Resource;
@@ -45,6 +48,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.xml.bind.DatatypeConverter;
 
+import org.omnifaces.cdi.GraphicImageScoped;
 import org.omnifaces.el.ExpressionInspector;
 import org.omnifaces.el.MethodReference;
 import org.omnifaces.util.Faces;
@@ -64,14 +68,25 @@ public class GraphicResource extends DynamicResource {
 	private static final Map<String, String> CONTENT_TYPES_BY_BASE64_HEADER = createContentTypesByBase64Header();
 	private static final Map<String, MethodReference> ALLOWED_METHODS = new ConcurrentHashMap<>();
 	private static final String[] EMPTY_PARAMS = new String[0];
-	private static final int RESOURCE_NAME_FULL_PARTS_LENGTH = 3;
 
 	@SuppressWarnings("unchecked")
 	private static final Class<? extends Annotation>[] REQUIRED_ANNOTATION_TYPES = new Class[] {
-		javax.faces.bean.ApplicationScoped.class, javax.enterprise.context.ApplicationScoped.class
+		GraphicImageScoped.class,
+		javax.faces.bean.ApplicationScoped.class,
+		javax.enterprise.context.ApplicationScoped.class
 	};
 
-	private static final String ERROR_INVALID_LASTMODIFIED =
+	@SuppressWarnings("unchecked")
+	private static final Class<? extends Annotation>[] REQUIRED_RETURN_TYPES = new Class[] {
+		InputStream.class,
+		byte[].class
+	};
+
+    private static final AnnotationLiteral<GraphicImageScoped> GRAPHIC_IMAGE_SCOPED = new AnnotationLiteral<GraphicImageScoped>() {
+        private static final long serialVersionUID = 1L;
+    };
+
+    private static final String ERROR_INVALID_LASTMODIFIED =
 		"o:graphicImage 'lastModified' attribute must be an instance of Long or Date."
 			+ " Encountered an invalid value of '%s'.";
 	private static final String ERROR_INVALID_TYPE =
@@ -126,7 +141,7 @@ public class GraphicResource extends DynamicResource {
 			setContentType(guessContentType(base64));
 		}
 		else if (!contentType.contains("/")) {
-			setContentType(resolveContentType(contentType));
+			setContentType(getContentType("image." + contentType));
 		}
 	}
 
@@ -163,7 +178,7 @@ public class GraphicResource extends DynamicResource {
 	 * Create a new graphic resource based on the given value expression.
 	 * @param context The involved faces context.
 	 * @param value The value expression representing content to create a new graphic resource for.
-	 * @param type  The image type, represented as file extension. E.g. "jpg", "png", "gif", "ico", "svg", "bmp",
+	 * @param type The image type, represented as file extension. E.g. "jpg", "png", "gif", "ico", "svg", "bmp",
 	 * "tiff", etc.
 	 * @param lastModified The "last modified" representation of the graphic resource, can be {@link Long} or
 	 * {@link Date}, or otherwise an attempt will be made to parse it as {@link Long}.
@@ -175,26 +190,30 @@ public class GraphicResource extends DynamicResource {
 	 */
 	public static GraphicResource create(FacesContext context, ValueExpression value, String type, Object lastModified) {
 		MethodReference methodReference = ExpressionInspector.getMethodReference(context.getELContext(), value);
+		Method beanMethod = methodReference.getMethod();
 
-		if (methodReference.getMethod() == null) {
+		if (beanMethod == null) {
 			throw new IllegalArgumentException(String.format(ERROR_UNKNOWN_METHOD, value.getExpressionString()));
 		}
 
-		String name = getResourceName(methodReference, type);
+		Class<?> beanClass = methodReference.getBase().getClass();
+		String name = getResourceBaseName(beanClass, beanMethod);
 
 		if (!ALLOWED_METHODS.containsKey(name)) { // No need to validate everytime when already known.
-			Class<? extends Object> beanClass = methodReference.getBase().getClass();
-
 			if (!isOneAnnotationPresent(beanClass, REQUIRED_ANNOTATION_TYPES)) {
 				throw new IllegalArgumentException(String.format(ERROR_INVALID_SCOPE, beanClass));
 			}
 
-			ALLOWED_METHODS.put(name, new MethodReference(methodReference.getBase(), methodReference.getMethod()));
+			if (!isOneOf(beanMethod.getReturnType(), REQUIRED_RETURN_TYPES)) {
+				throw new IllegalArgumentException(String.format(ERROR_INVALID_RETURNTYPE, beanMethod.getReturnType()));
+			}
+
+			ALLOWED_METHODS.put(name, new MethodReference(methodReference.getBase(), beanMethod));
 		}
 
 		Object[] params = methodReference.getActualParameters();
-		String[] convertedParams = convertToStrings(context, params, methodReference.getMethod().getParameterTypes());
-		return new GraphicResource(name, convertedParams, lastModified);
+		String[] convertedParams = convertToStrings(context, params, beanMethod.getParameterTypes());
+		return new GraphicResource(name + (isEmpty(type) ? "" :  "." + type), convertedParams, lastModified);
 	}
 
 	/**
@@ -235,39 +254,56 @@ public class GraphicResource extends DynamicResource {
 			throw new FacesException(e);
 		}
 
-		if (content == null) {
-			return null;
-		}
-		else if (content instanceof InputStream) {
+		if (content instanceof InputStream) {
 			return (InputStream) content;
 		}
 		else if (content instanceof byte[]) {
 			return new ByteArrayInputStream((byte[]) content);
 		}
 		else {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_RETURNTYPE, content));
+			return null;
 		}
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * This must return an unique and URL-safe identifier of the bean+method+type without any periods.
+	 * Register graphic image scoped beans discovered so far.
 	 */
-	private static String getResourceName(MethodReference methodReference, String type) {
-		return methodReference.getBase().getClass().getSimpleName().replaceAll("\\W", "")
-			+ "_" + methodReference.getMethod().getName()
-			+ (isEmpty(type) ? "" : ("_" + type));
+	public static void registerGraphicImageScopedBeans() {
+		for (Object bean : CDI.current().select(GRAPHIC_IMAGE_SCOPED)) {
+			for (Method method : bean.getClass().getMethods()) {
+				if (isOneOf(method.getReturnType(), REQUIRED_RETURN_TYPES)) {
+					String resourceBaseName = getResourceBaseName(bean.getClass().getSuperclass(), method);
+					MethodReference methodReference = new MethodReference(bean, method);
+					ALLOWED_METHODS.put(resourceBaseName, methodReference);
+				}
+			}
+		}
+	}
+
+	/**
+	 * This must return an unique and URL-safe identifier of the bean+method without any periods.
+	 */
+	private static String getResourceBaseName(Class<?> beanClass, Method beanMethod) {
+		return beanClass.getSimpleName().replaceAll("\\W", "") + "_" + beanMethod.getName();
 	}
 
 	/**
 	 * This must extract the content type from the resource name, if any, else return the default content type.
 	 */
 	private static String getContentType(String resourceName) {
-		String[] parts = resourceName.split("_");
-		return (parts.length == RESOURCE_NAME_FULL_PARTS_LENGTH)
-			? resolveContentType(parts[RESOURCE_NAME_FULL_PARTS_LENGTH - 1])
-			: DEFAULT_CONTENT_TYPE;
+		if (!resourceName.contains(".")) {
+			return DEFAULT_CONTENT_TYPE;
+		}
+
+		String contentType = Faces.getExternalContext().getMimeType(resourceName);
+
+		if (contentType == null) {
+			throw new IllegalArgumentException(String.format(ERROR_INVALID_TYPE, resourceName.split("\\.", 2)[1]));
+		}
+
+		return contentType;
 	}
 
 	/**
@@ -281,20 +317,6 @@ public class GraphicResource extends DynamicResource {
 		}
 
 		return DEFAULT_CONTENT_TYPE;
-	}
-
-	/**
-	 * Resolve image content type based on given type attribute.
-	 * @throws IllegalArgumentException When given type is unrecognized.
-	 */
-	private static String resolveContentType(String type) {
-		String contentType = Faces.getExternalContext().getMimeType("image." + type);
-
-		if (contentType == null) {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_TYPE, type));
-		}
-
-		return contentType;
 	}
 
 	/**
