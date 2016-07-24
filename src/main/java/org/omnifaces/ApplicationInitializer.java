@@ -187,7 +187,7 @@ public class ApplicationInitializer implements ServletContainerInitializer {
 		try {
 			Class<Object> cdi = toClass("javax.enterprise.inject.spi.CDI");
 			Object current = cdi.getMethod("current").invoke(null);
-			cdi.getMethod("getBeanManager").invoke(current);
+			cdi.getMethod("getBeanManager").invoke(current).toString();
 		}
 		catch (Exception | LinkageError e) {
 			throw new IllegalStateException(ERROR_CDI_IMPL_UNAVAILABLE, e);

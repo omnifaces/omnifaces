@@ -23,17 +23,21 @@ import javax.faces.application.ResourceHandler;
  */
 public class OmniVersionResourceHandler extends DefaultResourceHandler {
 
+	private static final String LIBRARY_NAME = "omnifaces";
+	private final String version;
+
 	public OmniVersionResourceHandler(ResourceHandler wrapped) {
 		super(wrapped);
+		version = "&v=" + getClass().getPackage().getSpecificationVersion();
 	}
 
 	@Override
 	public Resource decorateResource(Resource resource) {
-		if (resource == null || !"omnifaces".equals(resource.getLibraryName())) {
+		if (resource == null || !LIBRARY_NAME.equals(resource.getLibraryName())) {
 			return resource;
 		}
 
-		return new RemappedResource(resource, resource.getRequestPath() + "&v=" + getClass().getPackage().getSpecificationVersion());
+		return new RemappedResource(resource, resource.getRequestPath() + version);
 	}
 
 }
