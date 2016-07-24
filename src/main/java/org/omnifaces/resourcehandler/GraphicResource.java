@@ -15,12 +15,14 @@ package org.omnifaces.resourcehandler;
 import static java.lang.reflect.Modifier.isPublic;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
+import static java.util.Collections.unmodifiableMap;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Servlets.toQueryString;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isNumber;
 import static org.omnifaces.util.Utils.isOneAnnotationPresent;
+import static org.omnifaces.util.Utils.isOneInstanceOf;
 import static org.omnifaces.util.Utils.isOneOf;
 import static org.omnifaces.util.Utils.toByteArray;
 
@@ -30,7 +32,6 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -87,6 +88,8 @@ public class GraphicResource extends DynamicResource {
         private static final long serialVersionUID = 1L;
     };
 
+    private static final String ERROR_MISSING_METHOD =
+		"@GraphicResourceScoped bean '%s' must have a method returning an InputStream or byte[].";
     private static final String ERROR_INVALID_LASTMODIFIED =
 		"o:graphicImage 'lastModified' attribute must be an instance of Long or Date."
 			+ " Encountered an invalid value of '%s'.";
@@ -97,7 +100,7 @@ public class GraphicResource extends DynamicResource {
 		"o:graphicImage 'value' attribute must refer an existing method."
 			+ " Encountered an unknown method of '%s'.";
 	private static final String ERROR_INVALID_SCOPE =
-		"o:graphicImage 'value' attribute must refer an @ApplicationScoped bean."
+		"o:graphicImage 'value' attribute must refer a @GraphicResourceScoped or @ApplicationScoped bean."
 			+ " Cannot find the right annotation on bean class '%s'.";
 	private static final String ERROR_INVALID_RETURNTYPE =
 		"o:graphicImage 'value' attribute must represent a method returning an InputStream or byte[]."
@@ -116,7 +119,7 @@ public class GraphicResource extends DynamicResource {
 		contentTypesByBase64Header.put("Qk0", "image/bmp");
 		contentTypesByBase64Header.put("SUkqAA", "image/tiff");
 		contentTypesByBase64Header.put("TU0AKg", "image/tiff");
-		return Collections.unmodifiableMap(contentTypesByBase64Header);
+		return unmodifiableMap(contentTypesByBase64Header);
 	}
 
 	// Variables ------------------------------------------------------------------------------------------------------
@@ -270,15 +273,23 @@ public class GraphicResource extends DynamicResource {
 
 	/**
 	 * Register graphic image scoped beans discovered so far.
+	 * @throws IllegalArgumentException When bean method is missing.
 	 */
 	public static void registerGraphicImageScopedBeans() {
 		for (Object bean : CDI.current().select(GRAPHIC_IMAGE_SCOPED)) {
+			boolean registered = false;
+
 			for (Method method : bean.getClass().getMethods()) {
-				if (isPublic(method.getModifiers()) && isOneOf(method.getReturnType(), REQUIRED_RETURN_TYPES)) {
+				if (isPublic(method.getModifiers()) && isOneInstanceOf(method.getReturnType(), REQUIRED_RETURN_TYPES)) {
 					String resourceBaseName = getResourceBaseName(bean.getClass().getSuperclass(), method);
 					MethodReference methodReference = new MethodReference(bean, method);
 					ALLOWED_METHODS.put(resourceBaseName, methodReference);
+					registered = true;
 				}
+			}
+
+			if (!registered) {
+				throw new IllegalArgumentException(String.format(ERROR_MISSING_METHOD, bean.getClass().getName()));
 			}
 		}
 	}
@@ -292,6 +303,7 @@ public class GraphicResource extends DynamicResource {
 
 	/**
 	 * This must extract the content type from the resource name, if any, else return the default content type.
+	 * @throws IllegalArgumentException When given type is unrecognized.
 	 */
 	private static String getContentType(String resourceName) {
 		if (!resourceName.contains(".")) {

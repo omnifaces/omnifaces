@@ -67,7 +67,7 @@ public final class Components {
 
 	/**
 	 * <p>
-	 * Returns {@link GraphicImageScoped} URL based on given expression string.
+	 * Returns <code>@GraphicImageScoped</code> URL based on given expression string.
 	 * <p>
 	 * Usage example:
 	 * <pre>
@@ -77,7 +77,7 @@ public final class Components {
 	 * </pre>
 	 * @param expression Expression string representing the same value as you would use in
 	 * <code>&lt;o:graphicImage&gt;</code>. It must be a quoted string. Any nested quotes can be escaped with backslash.
-	 * @return {@link GraphicImageScoped} URL based on given expression string.
+	 * @return <code>@GraphicImageScoped</code> URL based on given expression string.
 	 * @since 2.5
 	 * @see GraphicImageScoped
 	 * @see GraphicImage
@@ -88,7 +88,7 @@ public final class Components {
 
 	/**
 	 * <p>
-	 * Returns {@link GraphicImageScoped} URL based on given expression string and image type.
+	 * Returns <code>@GraphicImageScoped</code> URL based on given expression string and image type.
 	 * <p>
 	 * Usage example:
 	 * <pre>
@@ -100,7 +100,7 @@ public final class Components {
 	 * <code>&lt;o:graphicImage&gt;</code>. It must be a quoted string. Any nested quotes can be escaped with backslash.
 	 * @param type The image type, represented as file extension.
 	 * E.g. "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc. This may be <code>null</code>.
-	 * @return {@link GraphicImageScoped} URL based on given expression string and image type.
+	 * @return <code>@GraphicImageScoped</code> URL based on given expression string and image type.
 	 * @since 2.5
 	 * @see GraphicImageScoped
 	 * @see GraphicImage
@@ -111,7 +111,7 @@ public final class Components {
 
 	/**
 	 * <p>
-	 * Returns {@link GraphicImageScoped} URL based on given expression string, image type and last modified.
+	 * Returns <code>@GraphicImageScoped</code> URL based on given expression string, image type and last modified.
 	 * <p>
 	 * Usage example:
 	 * <pre>
@@ -125,7 +125,7 @@ public final class Components {
 	 * E.g. "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc. This may be <code>null</code>.
 	 * @param lastModified The "last modified" timestamp, can be either a {@link Long}, {@link Date}, or {@link String}
 	 * which is parseable as {@link Long}. This may be <code>null</code>.
-	 * @return {@link GraphicImageScoped} URL based on given expression string, image type and last modified.
+	 * @return <code>@GraphicImageScoped</code> URL based on given expression string, image type and last modified.
 	 * @since 2.5
 	 * @see GraphicImageScoped
 	 * @see GraphicImage
