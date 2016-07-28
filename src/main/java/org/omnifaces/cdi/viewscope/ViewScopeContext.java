@@ -15,7 +15,7 @@
  */
 package org.omnifaces.cdi.viewscope;
 
-import static org.omnifaces.util.BeansLocal.getReference;
+import static org.omnifaces.util.Beans.getReference;
 
 import java.lang.annotation.Annotation;
 
@@ -23,8 +23,6 @@ import javax.enterprise.context.ContextNotActiveException;
 import javax.enterprise.context.spi.Context;
 import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
 
@@ -44,21 +42,7 @@ public class ViewScopeContext implements Context {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private BeanManager manager;
-	private Bean<ViewScopeManager> bean;
 	private ViewScopeManager viewScopeManager;
-
-	// Constructors ---------------------------------------------------------------------------------------------------
-
-	/**
-	 * Construct a new view scope context.
-	 * @param manager The bean manager.
-	 * @param bean The view scope manager bean.
-	 */
-	public ViewScopeContext(BeanManager manager, Bean<ViewScopeManager> bean) {
-		this.manager = manager;
-		this.bean = bean;
-	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -100,7 +84,7 @@ public class ViewScopeContext implements Context {
 	 */
 	private boolean isInitialized() {
 		if (viewScopeManager == null) {
-			viewScopeManager = getReference(manager, bean);
+			viewScopeManager = getReference(ViewScopeManager.class);
 		}
 
 		return viewScopeManager != null;

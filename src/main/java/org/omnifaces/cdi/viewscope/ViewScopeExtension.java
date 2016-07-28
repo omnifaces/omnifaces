@@ -17,10 +17,8 @@ package org.omnifaces.cdi.viewscope;
 
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
-import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.Extension;
-import javax.enterprise.inject.spi.ProcessManagedBean;
 
 import org.omnifaces.cdi.ViewScoped;
 
@@ -36,19 +34,7 @@ import org.omnifaces.cdi.ViewScoped;
  */
 public class ViewScopeExtension implements Extension {
 
-	// Variables ------------------------------------------------------------------------------------------------------
-
-	private Bean<ViewScopeManager> bean;
-
 	// Actions --------------------------------------------------------------------------------------------------------
-
-	/**
-	 * Obtain an instance of the view scope manager bean.
-	 * @param event The process managed bean event.
-	 */
-	protected void processManagedBeans(@Observes ProcessManagedBean<ViewScopeManager> event) {
-		bean = event.getBean();
-	}
 
 	/**
 	 * Register a new view scope context, wrapping the given bean manager and view scope manager bean, in the current
@@ -57,7 +43,7 @@ public class ViewScopeExtension implements Extension {
 	 * @param manager The bean manager.
 	 */
 	protected void afterBeanDiscovery(@Observes AfterBeanDiscovery event, BeanManager manager) {
-		event.addContext(new ViewScopeContext(manager, bean));
+		event.addContext(new ViewScopeContext());
 	}
 
 }
