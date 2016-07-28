@@ -39,10 +39,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.faces.FactoryFinder;
 import javax.faces.application.Application;
 import javax.faces.application.ResourceHandler;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.faces.lifecycle.Lifecycle;
+import javax.faces.lifecycle.LifecycleFactory;
+import javax.faces.webapp.FacesServlet;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
@@ -57,8 +61,10 @@ import org.omnifaces.component.ParamHolder;
  * Collection of utility methods for the Servlet API in general. Most of them are internally used by {@link Faces}
  * and {@link FacesLocal}, however they may also be useful in a "plain vanilla" servlet or servlet filter.
  * <p>
- * There are as of now also four special methods related to JSF without needing a {@link FacesContext}:
+ * There are as of now also five special methods related to JSF without needing a {@link FacesContext}:
  * <ul>
+ * <li>The {@link #getFacesLifecycle(ServletContext)} which returns the JSF lifecycle, allowing you a.o. to
+ * programmatically register JSF application's phase listeners.
  * <li>The {@link #isFacesAjaxRequest(HttpServletRequest)} which is capable of checking if the current request is a JSF
  * ajax request.
  * <li>The {@link #isFacesResourceRequest(HttpServletRequest)} which is capable of checking if the current request is a
@@ -600,6 +606,18 @@ public final class Servlets {
 	}
 
 	// JSF ------------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns The {@link Lifecycle} associated with current Faces application.
+	 * @param context The involved servlet context.
+	 * @return The {@link Lifecycle} associated with current Faces application.
+	 * @see LifecycleFactory#getLifecycle(String)
+	 * @since 2.5
+	 */
+	public static Lifecycle getFacesLifecycle(ServletContext context) {
+		String lifecycleId = coalesce(context.getInitParameter(FacesServlet.LIFECYCLE_ID_ATTR), LifecycleFactory.DEFAULT_LIFECYCLE);
+		return ((LifecycleFactory) FactoryFinder.getFactory(FactoryFinder.LIFECYCLE_FACTORY)).getLifecycle(lifecycleId);
+	}
 
 	/**
 	 * Returns <code>true</code> if the given HTTP servlet request is a JSF ajax request. This does exactly the same as

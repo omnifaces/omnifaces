@@ -18,7 +18,6 @@ import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Reflection.toClassOrNull;
 import static org.omnifaces.util.Servlets.prepareRedirectURL;
-import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.encodeURI;
 import static org.omnifaces.util.Utils.encodeURL;
 import static org.omnifaces.util.Utils.isAnyEmpty;
@@ -63,14 +62,12 @@ import javax.faces.context.PartialViewContext;
 import javax.faces.convert.Converter;
 import javax.faces.event.PhaseId;
 import javax.faces.lifecycle.Lifecycle;
-import javax.faces.lifecycle.LifecycleFactory;
 import javax.faces.render.RenderKit;
 import javax.faces.render.RenderKitFactory;
 import javax.faces.validator.Validator;
 import javax.faces.view.ViewDeclarationLanguage;
 import javax.faces.view.ViewMetadata;
 import javax.faces.view.facelets.FaceletContext;
-import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -330,7 +327,7 @@ public final class FacesLocal {
 	 * {@inheritDoc}
 	 * @see Faces#createValidator(Class)
 	 */
-	@SuppressWarnings("unused")
+	@SuppressWarnings("all")
 	public static Validator createValidator(FacesContext context, Class<?> identifier) {
 		if (Validator.class.isAssignableFrom(identifier)) {
 			return (Validator) instance(identifier);
@@ -345,9 +342,7 @@ public final class FacesLocal {
 	 * @see Faces#getLifecycle()
 	 */
 	public static Lifecycle getLifecycle(FacesContext context) {
-		ServletContext servletContext = getServletContext(context);
-		String lifecycleId = coalesce(servletContext.getInitParameter(FacesServlet.LIFECYCLE_ID_ATTR), LifecycleFactory.DEFAULT_LIFECYCLE);
-		return ((LifecycleFactory) FactoryFinder.getFactory(FactoryFinder.LIFECYCLE_FACTORY)).getLifecycle(lifecycleId);
+		return Servlets.getFacesLifecycle(getServletContext(context));
 	}
 
 	// JSF views ------------------------------------------------------------------------------------------------------
