@@ -33,6 +33,9 @@ import org.omnifaces.facesviews.FacesViews;
  * <li>Log OmniFaces version.
  * <li>Check if JSF 2.2 is available, otherwise log and fail.
  * <li>Check if CDI 1.1 is available, otherwise log and fail.
+ * <li>Register {@link ApplicationListener} programmatically. This ensures that it's in at least Tomcat invoked AFTER
+ * all non-programmatic listeners, including those of a.o. Mojarra and Weld, so instantiating eager application scoped
+ * beans and registering the eager phase listener will work.
  * <li>Register {@link FacesViews} filter.
  * </ol>
  *
@@ -68,6 +71,7 @@ public class ApplicationInitializer implements ServletContainerInitializer {
 		checkCDI11Available();
 
 		try {
+			servletContext.addListener(ApplicationListener.class);
 			FacesViews.registerFilter(servletContext);
 		}
 		catch (Throwable e) {

@@ -20,10 +20,10 @@ import java.util.logging.Logger;
 import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
-import javax.servlet.annotation.WebListener;
 
 import org.omnifaces.cdi.Eager;
 import org.omnifaces.cdi.GraphicImageScoped;
+import org.omnifaces.cdi.eager.EagerBeansPhaseListener;
 import org.omnifaces.cdi.eager.EagerBeansRepository;
 import org.omnifaces.cdi.eager.EagerBeansWebListener;
 import org.omnifaces.cdi.push.Socket;
@@ -39,7 +39,8 @@ import org.omnifaces.resourcehandler.GraphicResource;
  * {@link ApplicationInitializer} and the {@link FacesServlet}.
  * This performs the following tasks:
  * <ol>
- * <li>Instantiate {@link Eager} application scoped beans and register its {@link EagerBeansWebListener} if necessary.
+ * <li>Instantiate {@link Eager} application scoped beans and register its {@link EagerBeansWebListener} and/or
+ * {@link EagerBeansPhaseListener} if necessary.
  * <li>Add {@link FacesViews} mappings to FacesServlet if necessary.
  * <li>Load {@link Cache} provider and register its filter if necessary.
  * <li>Register {@link Socket} endpoint if necessary.
@@ -49,7 +50,6 @@ import org.omnifaces.resourcehandler.GraphicResource;
  * @author Bauke Scholtz
  * @since 2.0
  */
-@WebListener
 public class ApplicationListener extends DefaultServletContextListener {
 
 	// Constants ------------------------------------------------------------------------------------------------------
@@ -63,7 +63,7 @@ public class ApplicationListener extends DefaultServletContextListener {
 		ServletContext servletContext = event.getServletContext();
 
 		try {
-			EagerBeansRepository.instantiateApplicationScopedAndRegisterListener(servletContext);
+			EagerBeansRepository.instantiateApplicationScopedAndRegisterListeners(servletContext);
 			FacesViews.addMappings(servletContext);
 			CacheInitializer.loadProviderAndRegisterFilter(servletContext);
 			Socket.registerEndpointIfNecessary(servletContext);

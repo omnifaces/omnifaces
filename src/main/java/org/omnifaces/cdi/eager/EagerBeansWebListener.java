@@ -30,9 +30,9 @@ import javax.servlet.http.HttpSessionListener;
 
 /**
  * <p>
- * A web listener that instantiates eager session and request scoped beans. This is auto-registered by
- * {@link EagerBeansRepository#instantiateApplicationScopedAndRegisterListener(javax.servlet.ServletContext)} when
- * any eager session and request scoped beans are available.
+ * A web listener that instantiates eager session beans and request/view beans by request URI. This is auto-registered
+ * by {@link EagerBeansRepository#instantiateApplicationScopedAndRegisterListeners(javax.servlet.ServletContext)} when
+ * any eager session beans or request/view beans by request URI are available.
  *
  * @since 2.0
  * @author Arjan Tijms

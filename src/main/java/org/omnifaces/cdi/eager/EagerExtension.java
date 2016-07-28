@@ -15,17 +15,9 @@
  */
 package org.omnifaces.cdi.eager;
 
-import static java.lang.String.format;
-import static java.util.Collections.unmodifiableList;
-import static java.util.Collections.unmodifiableMap;
 import static org.omnifaces.util.BeansLocal.getAnnotation;
 import static org.omnifaces.util.BeansLocal.getReference;
-import static org.omnifaces.util.Utils.isEmpty;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -56,24 +48,12 @@ public class EagerExtension implements Extension {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
-	private static final String MISSING_REQUEST_URI_OR_VIEW_ID =
-		"Bean %s with scope %s was annotated with @Eager, but required attribute 'requestURI' or 'viewId' is missing."
-			+ " Bean will not be eagerly instantiated.";
-
-	private static final String MISSING_VIEW_ID =
-		"Bean %s with scope %s was annotated with @Eager, but required attribute 'viewId' is missing."
-			+ " Bean will not be eagerly instantiated.";
-
 	private static final String ERROR_EAGER_UNAVAILABLE =
 		"@Eager is unavailable. The EagerBeansRepository could not be obtained from CDI bean manager.";
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private List<Bean<?>> applicationScopedBeans = new ArrayList<>();
-	private List<Bean<?>> sessionScopedBeans = new ArrayList<>();
-
-	private Map<String, List<Bean<?>>> requestScopedBeansViewId = new HashMap<>();
-	private Map<String, List<Bean<?>>> requestScopedBeansRequestURI = new HashMap<>();
+	private EagerBeansRepository.EagerBeans eagerBeans = new EagerBeansRepository.EagerBeans();
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -87,20 +67,28 @@ public class EagerExtension implements Extension {
 			Bean<?> bean = event.getBean();
 
 			if (getAnnotation(beanManager, annotated, ApplicationScoped.class) != null) {
-				applicationScopedBeans.add(bean);
-			} else if (getAnnotation(beanManager, annotated, SessionScoped.class) != null) {
-				sessionScopedBeans.add(bean);
-			} else if (getAnnotation(beanManager, annotated, RequestScoped.class) != null) {
-				addRequestScopedBean(eager, bean);
-			} else if (getAnnotation(beanManager, annotated, ViewScoped.class) != null) {
-				addViewScopedBean(eager, bean);
-			} else if (getAnnotation(beanManager, annotated, org.omnifaces.cdi.ViewScoped.class) != null) {
-				addOmniViewScopedBean(eager, bean);
+				eagerBeans.addApplicationScoped(bean);
+			}
+			else if (getAnnotation(beanManager, annotated, SessionScoped.class) != null) {
+				eagerBeans.addSessionScoped(bean);
+			}
+			else if (getAnnotation(beanManager, annotated, ViewScoped.class) != null) {
+				eagerBeans.addByViewId(bean, eager.viewId());
+			}
+			else if (getAnnotation(beanManager, annotated, org.omnifaces.cdi.ViewScoped.class) != null) {
+				eagerBeans.addByViewId(bean, eager.viewId());
+			}
+			else if (getAnnotation(beanManager, annotated, RequestScoped.class) != null) {
+				eagerBeans.addByRequestURIOrViewId(bean, eager.requestURI(), eager.viewId());
 			}
 		}
 	}
 
 	public void load(@Observes AfterDeploymentValidation event, BeanManager beanManager) {
+
+		if (eagerBeans.isEmpty()) {
+			return;
+		}
 
 		EagerBeansRepository eagerBeansRepository = getReference(beanManager, EagerBeansRepository.class);
 
@@ -109,69 +97,7 @@ public class EagerExtension implements Extension {
 			return;
 		}
 
-		if (!applicationScopedBeans.isEmpty()) {
-			eagerBeansRepository.setApplicationScopedBeans(unmodifiableList(applicationScopedBeans));
-		}
-
-		if (!sessionScopedBeans.isEmpty()) {
-			eagerBeansRepository.setSessionScopedBeans(unmodifiableList(sessionScopedBeans));
-		}
-
-		if (!requestScopedBeansRequestURI.isEmpty()) {
-			eagerBeansRepository.setRequestScopedBeansRequestURI(unmodifiableMap(requestScopedBeansRequestURI));
-		}
-
-		if (!requestScopedBeansViewId.isEmpty()) {
-			eagerBeansRepository.setRequestScopedBeansViewId(unmodifiableMap(requestScopedBeansViewId));
-		}
-	}
-
-	// Helpers --------------------------------------------------------------------------------------------------------
-
-	private void addRequestScopedBean(Eager eager, Bean<?> bean) {
-		if (!isEmpty(eager.requestURI())) {
-			getRequestScopedBeansByRequestURI(eager.requestURI()).add(bean);
-		} else if (!isEmpty(eager.viewId())) {
-			getRequestScopedBeansByViewId(eager.viewId()).add(bean);
-		} else {
-			logger.severe(format(MISSING_REQUEST_URI_OR_VIEW_ID, bean.getBeanClass().getName(), RequestScoped.class.getName()));
-		}
-	}
-
-	private void addViewScopedBean(Eager eager, Bean<?> bean) {
-		if (!isEmpty(eager.viewId())) {
-			getRequestScopedBeansByViewId(eager.viewId()).add(bean);
-		} else {
-			logger.severe(format(MISSING_VIEW_ID, bean.getBeanClass().getName(), ViewScoped.class.getName()));
-		}
-	}
-
-	private void addOmniViewScopedBean(Eager eager, Bean<?> bean) {
-		if (!isEmpty(eager.viewId())) {
-			getRequestScopedBeansByViewId(eager.viewId()).add(bean);
-		} else {
-			logger.severe(format(MISSING_VIEW_ID, bean.getBeanClass().getName(), org.omnifaces.cdi.ViewScoped.class.getName()));
-		}
-	}
-
-	private List<Bean<?>> getRequestScopedBeansByViewId(String viewId) {
-		List<Bean<?>> beans = requestScopedBeansViewId.get(viewId);
-		if (beans == null) {
-			beans = new ArrayList<>();
-			requestScopedBeansViewId.put(viewId, beans);
-		}
-
-		return beans;
-	}
-
-	private List<Bean<?>> getRequestScopedBeansByRequestURI(String requestURI) {
-		List<Bean<?>> beans = requestScopedBeansRequestURI.get(requestURI);
-		if (beans == null) {
-			beans = new ArrayList<>();
-			requestScopedBeansRequestURI.put(requestURI, beans);
-		}
-
-		return beans;
+		eagerBeansRepository.setEagerBeans(eagerBeans);
 	}
 
 }
