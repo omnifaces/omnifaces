@@ -17,9 +17,9 @@ import static org.omnifaces.ApplicationInitializer.ERROR_OMNIFACES_INITIALIZATIO
 
 import java.util.logging.Logger;
 
-import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
+import javax.servlet.annotation.WebListener;
 
 import org.omnifaces.cdi.Eager;
 import org.omnifaces.cdi.GraphicImageScoped;
@@ -36,7 +36,7 @@ import org.omnifaces.resourcehandler.GraphicResource;
 /**
  * <p>
  * OmniFaces application listener. This runs when the servlet context is created and thus after the
- * {@link ApplicationInitializer} and the {@link FacesServlet}.
+ * {@link ApplicationInitializer}.
  * This performs the following tasks:
  * <ol>
  * <li>Instantiate {@link Eager} application scoped beans and register its {@link EagerBeansWebListener} and/or
@@ -50,6 +50,7 @@ import org.omnifaces.resourcehandler.GraphicResource;
  * @author Bauke Scholtz
  * @since 2.0
  */
+@WebListener
 public class ApplicationListener extends DefaultServletContextListener {
 
 	// Constants ------------------------------------------------------------------------------------------------------

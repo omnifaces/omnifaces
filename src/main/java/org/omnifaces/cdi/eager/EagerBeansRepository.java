@@ -57,6 +57,9 @@ public class EagerBeansRepository {
 	private static final String WARNING_POSSIBLY_APPLICATION_SCOPE_NOT_ACTIVE =
 		"Could not instantiate eager application scoped beans. Possibly the CDI application scope is not active."
 			+ " This is known to be the case in certain Tomcat and Jetty based configurations.";
+	private static final String WARNING_POSSIBLY_FACES_LIFECYCLE_NOT_ACTIVE =
+		"Could not register eager request/view scoped beans by view ID. Possibly the JSF lifecycle is not active."
+			+ " This is known to be the case in certain Tomcat and Jetty based configurations.";
 
 	private static volatile EagerBeansRepository instance;
 
@@ -88,7 +91,12 @@ public class EagerBeansRepository {
 		}
 
 		if (instance == null || instance.hasAnyViewIdBeans()) {
-			getFacesLifecycle(servletContext).addPhaseListener(new EagerBeansPhaseListener());
+			try {
+				getFacesLifecycle(servletContext).addPhaseListener(new EagerBeansPhaseListener());
+			}
+			catch (Exception e) {
+				logger.log(WARNING, format(WARNING_POSSIBLY_FACES_LIFECYCLE_NOT_ACTIVE), e);
+			}
 		}
 	}
 
