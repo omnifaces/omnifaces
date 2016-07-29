@@ -25,9 +25,7 @@ import org.omnifaces.eventlistener.DefaultPhaseListener;
 
 /**
  * <p>
- * A PhaseListener that instantiates eager request/view beans by JSF view ID. This is auto-registered
- * by {@link EagerBeansRepository#instantiateApplicationScopedAndRegisterListeners(javax.servlet.ServletContext)} when
- * any eager request/view beans by JSF view ID are available.
+ * A PhaseListener that instantiates eager request/view beans by JSF view ID.
  * <p>
  * This instantiates beans relatively late during request processing but at a point that faces context and the view root
  * corresponding to the current view ID are available to the bean.
@@ -45,11 +43,17 @@ public class EagerBeansPhaseListener extends DefaultPhaseListener {
 	public EagerBeansPhaseListener() {
 		super(RESTORE_VIEW);
 		eagerBeansRepository = getReference(EagerBeansRepository.class);
+
+		if (eagerBeansRepository != null && !eagerBeansRepository.hasAnyViewIdBeans()) {
+			eagerBeansRepository = null;
+		}
 	}
 
 	@Override
 	public void afterPhase(PhaseEvent event) {
-		eagerBeansRepository.instantiateByViewID(getViewId(event.getFacesContext()));
+		if (eagerBeansRepository != null) {
+			eagerBeansRepository.instantiateByViewID(getViewId(event.getFacesContext()));
+		}
 	}
 
 }

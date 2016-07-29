@@ -18,7 +18,6 @@ package org.omnifaces.cdi.eager;
 import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
 import static org.omnifaces.util.Beans.getReference;
-import static org.omnifaces.util.Servlets.getFacesLifecycle;
 import static org.omnifaces.util.Utils.isAnyEmpty;
 import static org.omnifaces.util.Utils.isEmpty;
 
@@ -57,9 +56,6 @@ public class EagerBeansRepository {
 	private static final String WARNING_POSSIBLY_APPLICATION_SCOPE_NOT_ACTIVE =
 		"Could not instantiate eager application scoped beans. Possibly the CDI application scope is not active."
 			+ " This is known to be the case in certain Tomcat and Jetty based configurations.";
-	private static final String WARNING_POSSIBLY_FACES_LIFECYCLE_NOT_ACTIVE =
-		"Could not register eager request/view scoped beans by view ID. Possibly the JSF lifecycle is not active."
-			+ " This is known to be the case in certain Tomcat and Jetty based configurations.";
 
 	private static volatile EagerBeansRepository instance;
 
@@ -75,7 +71,7 @@ public class EagerBeansRepository {
 		return instance;
 	}
 
-	public static void instantiateApplicationScopedAndRegisterListeners(ServletContext servletContext) {
+	public static void instantiateApplicationScopedAndRegisterListener(ServletContext servletContext) {
 		if (getInstance() != null && instance.hasAnyApplicationScopedBeans()) {
 			try {
 				instance.instantiateApplicationScoped();
@@ -88,15 +84,6 @@ public class EagerBeansRepository {
 
 		if (instance == null || instance.hasAnySessionOrRequestURIBeans()) {
 			servletContext.addListener(EagerBeansWebListener.class);
-		}
-
-		if (instance == null || instance.hasAnyViewIdBeans()) {
-			try {
-				getFacesLifecycle(servletContext).addPhaseListener(new EagerBeansPhaseListener());
-			}
-			catch (Exception e) {
-				logger.log(WARNING, format(WARNING_POSSIBLY_FACES_LIFECYCLE_NOT_ACTIVE), e);
-			}
 		}
 	}
 

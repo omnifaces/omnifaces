@@ -64,7 +64,7 @@ public class ApplicationListener extends DefaultServletContextListener {
 		ServletContext servletContext = event.getServletContext();
 
 		try {
-			EagerBeansRepository.instantiateApplicationScopedAndRegisterListeners(servletContext);
+			EagerBeansRepository.instantiateApplicationScopedAndRegisterListener(servletContext);
 			FacesViews.addMappings(servletContext);
 			CacheInitializer.loadProviderAndRegisterFilter(servletContext);
 			Socket.registerEndpointIfNecessary(servletContext);
