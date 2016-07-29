@@ -27,7 +27,6 @@ import javax.enterprise.inject.Typed;
 import javax.enterprise.inject.spi.Annotated;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.CDI;
 import javax.enterprise.inject.spi.InjectionPoint;
 
 import org.omnifaces.cdi.beans.InjectionPointGenerator;
@@ -43,10 +42,8 @@ import org.omnifaces.cdi.beans.InjectionPointGenerator;
  *
  * @author Bauke Scholtz
  * @since 2.0
- * @deprecated Since 2.5 As the {@link Beans} utility class now uses {@link CDI#current()} which is already more efficient.
  */
 @Typed
-@Deprecated // TODO: remove in OmniFaces 3.0.
 public final class BeansLocal {
 
 	// Constants ------------------------------------------------------------------------------------------------------

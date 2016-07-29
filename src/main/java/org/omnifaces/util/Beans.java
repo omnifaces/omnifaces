@@ -66,7 +66,6 @@ import javax.enterprise.inject.spi.InjectionPoint;
  * @since 1.6.1
  */
 @Typed
-@SuppressWarnings("deprecation")
 public final class Beans {
 
 	// Constructors ---------------------------------------------------------------------------------------------------
