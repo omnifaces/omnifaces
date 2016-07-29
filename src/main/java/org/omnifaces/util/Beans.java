@@ -64,9 +64,9 @@ import javax.enterprise.inject.spi.InjectionPoint;
  *
  * @author Bauke Scholtz
  * @since 1.6.1
- * @see BeansLocal
  */
 @Typed
+@SuppressWarnings("deprecation")
 public final class Beans {
 
 	// Constructors ---------------------------------------------------------------------------------------------------
@@ -214,7 +214,8 @@ public final class Beans {
 	 * @param qualifiers The CDI managed bean qualifiers, if any.
 	 * @since 2.0
 	 * @see #resolve(Class, Annotation...)
-	 * @see #destroy(Bean)
+	 * @see BeanManager#getContext(Class)
+	 * @see AlterableContext#destroy(javax.enterprise.context.spi.Contextual)
 	 */
 	public static <T> void destroy(Class<T> beanClass, Annotation... qualifiers) {
 		BeansLocal.destroy(getManager(), beanClass, qualifiers);
@@ -232,6 +233,21 @@ public final class Beans {
 	 */
 	public static <T> void destroy(Bean<T> bean) {
 		BeansLocal.destroy(getManager(), bean);
+	}
+
+	/**
+	 * Destroy the currently active instance of the given CDI managed bean instance.
+	 * @param <T> The generic CDI managed bean type.
+	 * @param bean The CDI managed bean instance.
+	 * @throws IllegalArgumentException When the given CDI managed bean type is actually not put in an alterable
+	 * context.
+	 * @since 2.5
+	 * @see #resolve(Class, Annotation...)
+	 * @see BeanManager#getContext(Class)
+	 * @see AlterableContext#destroy(javax.enterprise.context.spi.Contextual)
+	 */
+	public static <T> void destroy(T instance) {
+		BeansLocal.destroy(getManager(), instance.getClass());
 	}
 
 	/**
