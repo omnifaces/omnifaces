@@ -238,7 +238,7 @@ public final class Beans {
 	/**
 	 * Destroy the currently active instance of the given CDI managed bean instance.
 	 * @param <T> The generic CDI managed bean type.
-	 * @param bean The CDI managed bean instance.
+	 * @param instance The CDI managed bean instance.
 	 * @throws IllegalArgumentException When the given CDI managed bean type is actually not put in an alterable
 	 * context.
 	 * @since 2.5
