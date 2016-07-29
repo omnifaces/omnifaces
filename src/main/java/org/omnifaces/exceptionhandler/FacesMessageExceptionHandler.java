@@ -12,15 +12,17 @@
  */
 package org.omnifaces.exceptionhandler;
 
+import static javax.faces.application.FacesMessage.SEVERITY_FATAL;
+import static org.omnifaces.util.Messages.addGlobal;
+
 import java.util.Iterator;
 
 import javax.faces.FacesException;
+import javax.faces.application.FacesMessage;
 import javax.faces.context.ExceptionHandler;
 import javax.faces.context.ExceptionHandlerWrapper;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ExceptionQueuedEvent;
-
-import org.omnifaces.util.Messages;
 
 /**
  * <p>
@@ -80,7 +82,7 @@ public class FacesMessageExceptionHandler extends ExceptionHandlerWrapper {
 	@Override
 	public void handle() throws FacesException {
 		for (Iterator<ExceptionQueuedEvent> iter = getUnhandledExceptionQueuedEvents().iterator(); iter.hasNext();) {
-			Messages.create(createFatalMessage(iter.next().getContext().getException())).fatal().add();
+			addGlobal(new FacesMessage(SEVERITY_FATAL, createFatalMessage(iter.next().getContext().getException()), null));
 			iter.remove();
 		}
 
