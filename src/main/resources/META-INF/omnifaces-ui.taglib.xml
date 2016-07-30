@@ -5328,7 +5328,6 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 			</description>
 			<name>channel</name>
 			<required>true</required>
-			<type>java.lang.String</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -5344,7 +5343,6 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 			</description>
 			<name>scope</name>
 			<required>false</required>
-			<type>java.lang.String</type>
 		</attribute>
 		<attribute>
 			<description>
