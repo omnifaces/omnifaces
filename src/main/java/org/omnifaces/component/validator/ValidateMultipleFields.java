@@ -171,10 +171,10 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 
 	/**
 	 * Validate our component hierarchy.
-	 * @throws IllegalArgumentException When there is no parent of type {@link UIForm}, or when there are any children.
+	 * @throws IllegalStateException When there is no parent of type {@link UIForm}, or when there are any children.
 	 */
 	@Override
-	protected void validateHierarchy() throws IllegalArgumentException {
+	protected void validateHierarchy() throws IllegalStateException {
 		validateHasParent(this, UIForm.class);
 		validateHasNoChildren(this);
 	}

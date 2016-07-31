@@ -55,7 +55,7 @@ public class TreeNodeItem extends TreeFamily {
 
 	/**
 	 * Validate the component hierarchy.
-	 * @throws IllegalArgumentException When there is no parent of type {@link TreeNode}, or when this component is
+	 * @throws IllegalStateException When there is no parent of type {@link TreeNode}, or when this component is
 	 * nested in another {@link TreeNodeItem}.
 	 */
 	@Override

@@ -230,13 +230,13 @@ public class ValidateBean extends TagHandler {
 	 * Check if the given component has participated in submitting the current form or action and if so, then perform
 	 * the bean validation depending on the attributes set.
 	 * @param component The involved component.
-	 * @throws IllegalArgumentException When the parent form is missing.
+	 * @throws IllegalStateException When the parent form is missing.
 	 */
 	protected void processValidateBean(UIComponent component) {
 		UIForm form = (component instanceof UIForm) ? ((UIForm) component) : getClosestParent(component, UIForm.class);
 
 		if (form == null) {
-			throw new IllegalArgumentException(ERROR_MISSING_FORM);
+			throw new IllegalStateException(ERROR_MISSING_FORM);
 		}
 
 		if (!form.equals(getCurrentForm()) || (component instanceof UICommand && !hasInvokedSubmit(component))) {

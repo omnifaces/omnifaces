@@ -190,7 +190,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 
 	/**
 	 * Validate the component hierarchy.
-	 * @throws IllegalArgumentException When this component is nested in another {@link Tree}, or when there aren't any
+	 * @throws IllegalStateException When this component is nested in another {@link Tree}, or when there aren't any
 	 * children of type {@link TreeNode}.
 	 */
 	@Override
@@ -386,7 +386,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * Returns the tree nodes by finding direct {@link TreeNode} children and collecting them by their level attribute.
 	 * @param phaseId The current phase ID.
 	 * @return The tree nodes.
-	 * @throws IllegalArgumentException When a direct child component isn't of type {@link TreeNode}, or when there are
+	 * @throws IllegalStateException When a direct child component isn't of type {@link TreeNode}, or when there are
 	 * multiple {@link TreeNode} components with the same level.
 	 */
 	private Map<Integer, TreeNode> getNodes(PhaseId phaseId) {
@@ -398,7 +398,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 					TreeNode node = (TreeNode) child;
 
 					if (nodes.put(node.getLevel(), node) != null) {
-						throw new IllegalArgumentException(String.format(ERROR_DUPLICATE_NODE, node.getLevel()));
+						throw new IllegalStateException(String.format(ERROR_DUPLICATE_NODE, node.getLevel()));
 					}
 				}
 			}

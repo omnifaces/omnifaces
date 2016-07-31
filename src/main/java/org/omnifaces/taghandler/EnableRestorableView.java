@@ -97,12 +97,12 @@ public class EnableRestorableView extends TagHandler {
 	/**
 	 * Enable the current view to be restorable. This basically sets a specific view attribute which the
 	 * {@link OmniViewHandler} could intercept on.
-	 * @throws IllegalArgumentException When given parent is not an instance of {@link UIViewRoot}.
+	 * @throws IllegalStateException When given parent is not an instance of {@link UIViewRoot}.
 	 */
 	@Override
 	public void apply(FaceletContext context, final UIComponent parent) throws IOException {
 		if (!(parent instanceof UIViewRoot)) {
-			throw new IllegalArgumentException(
+			throw new IllegalStateException(
 				String.format(ERROR_INVALID_PARENT, parent != null ? parent.getClass().getName() : null));
 		}
 

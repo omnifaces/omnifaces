@@ -94,13 +94,13 @@ public class SkipValidators extends TagHandler {
 	/**
 	 * If the parent component is an instance of {@link UICommand} or {@link ClientBehaviorHolder}, and is new, and
 	 * we're in the restore view phase of a postback, then delegate to {@link #processSkipValidators(UIComponent)}.
-	 * @throws IllegalArgumentException When the parent component is not an instance of {@link UICommand} or
+	 * @throws IllegalStateException When the parent component is not an instance of {@link UICommand} or
 	 * {@link ClientBehaviorHolder}.
 	 */
 	@Override
 	public void apply(FaceletContext context, final UIComponent parent) throws IOException {
 		if (!(parent instanceof UICommand || parent instanceof ClientBehaviorHolder)) {
-			throw new IllegalArgumentException(ERROR_INVALID_PARENT);
+			throw new IllegalStateException(ERROR_INVALID_PARENT);
 		}
 
 		FacesContext facesContext = context.getFacesContext();

@@ -83,12 +83,12 @@ public class IgnoreValidationFailed extends TagHandler {
 	/**
 	 * If the parent component is an instance of {@link UICommand} and is new and we're in the restore view phase of
 	 * a postback, then delegate to {@link #processIgnoreValidationFailed(UICommand)}.
-	 * @throws IllegalArgumentException When the parent component is not an instance of {@link UICommand}.
+	 * @throws IllegalStateException When the parent component is not an instance of {@link UICommand}.
 	 */
 	@Override
 	public void apply(FaceletContext context, final UIComponent parent) throws IOException {
 		if (!(parent instanceof UICommand)) {
-			throw new IllegalArgumentException(ERROR_INVALID_PARENT);
+			throw new IllegalStateException(ERROR_INVALID_PARENT);
 		}
 
 		FacesContext facesContext = context.getFacesContext();
@@ -111,7 +111,7 @@ public class IgnoreValidationFailed extends TagHandler {
 	 * Check if the given command component has been invoked during the current request and if so, then instruct the
 	 * parent <code>&lt;o:form&gt;</code> to ignore the validation.
 	 * @param command The command component.
-	 * @throws IllegalArgumentException When the given command component is not inside a <code>&lt;o:form&gt;</code>.
+	 * @throws IllegalStateException When the given command component is not inside a <code>&lt;o:form&gt;</code>.
 	 */
 	protected void processIgnoreValidationFailed(UICommand command) {
 		if (!hasInvokedSubmit(command)) {
@@ -121,7 +121,7 @@ public class IgnoreValidationFailed extends TagHandler {
 		Form form = getClosestParent(command, Form.class);
 
 		if (form == null) {
-			throw new IllegalArgumentException(ERROR_INVALID_FORM);
+			throw new IllegalStateException(ERROR_INVALID_FORM);
 		}
 
 		form.setIgnoreValidationFailed(true);

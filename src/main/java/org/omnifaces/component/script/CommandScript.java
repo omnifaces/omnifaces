@@ -159,8 +159,9 @@ public class CommandScript extends UICommand {
 	/**
 	 * Write a <code>&lt;span&gt;&lt;script&gt;</code> with therein the script function which allows the end-user to
 	 * execute a JSF ajax request by a just script function call <code>functionName()</code> in the JavaScript context.
-	 * @throws IllegalArgumentException When there is no parent form, or when the <code>name</code> attribute is
-	 * missing, or when the <code>name</code> attribute does not represent a valid script function name.
+	 * @throws IllegalStateException When there is no parent form.
+	 * @throws IllegalArgumentException When the <code>name</code> attribute is missing, or when the <code>name</code>
+	 * attribute does not represent a valid script function name.
 	 */
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException {

@@ -102,9 +102,9 @@ public abstract class TreeFamily extends UIComponentBase {
 
 	/**
 	 * Validate the component hierarchy. This should only be called when project stage is <code>Development</code>.
-	 * @throws IllegalArgumentException When component hierarchy is wrong.
+	 * @throws IllegalStateException When component hierarchy is wrong.
 	 */
-	protected abstract void validateHierarchy() throws IllegalArgumentException;
+	protected abstract void validateHierarchy() throws IllegalStateException;
 
 	/**
 	 * Process the component according to the rules of the given phase ID.

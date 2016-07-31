@@ -189,15 +189,16 @@ public class ViewParamValidationFailed extends TagHandler {
 	 * current request is <strong>not</strong> a postback, and <strong>not</strong> in render response, and all required
 	 * attributes are set, then subscribe the parent component to the {@link PostValidateEvent}. This will invoke the
 	 * {@link #processViewParamValidationFailed(ComponentSystemEvent)} method after validation.
-	 * @throws IllegalArgumentException When the parent component is not an instance of {@link UIViewRoot} or
+	 * @throws IllegalStateException When the parent component is not an instance of {@link UIViewRoot} or
 	 * {@link UIViewParameter}, or when there's already another <code>&lt;o:viewParamValidationFailed&gt;</code> tag
-	 * registered on the same parent, or when both <code>sendRedirect</code> and <code>sendError</code> attributes are
+	 * registered on the same parent.
+	 * @throws IllegalArgumentException When both <code>sendRedirect</code> and <code>sendError</code> attributes are
 	 * missing or simultaneously specified.
 	 */
 	@Override
 	public void apply(FaceletContext context, final UIComponent parent) throws IOException {
 		if (!(parent instanceof UIViewRoot || parent instanceof UIViewParameter)) {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_PARENT, this, parent.getClass().getName()));
+			throw new IllegalStateException(String.format(ERROR_INVALID_PARENT, this, parent.getClass().getName()));
 		}
 
 		FacesContext facesContext = context.getFacesContext();

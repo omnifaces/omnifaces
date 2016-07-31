@@ -46,7 +46,7 @@ public class TreeInsertChildren extends TreeFamily {
 
 	/**
 	 * Validate the component hierarchy.
-	 * @throws IllegalArgumentException When there is no parent of type {@link TreeNodeItem}, or when there are any
+	 * @throws IllegalStateException When there is no parent of type {@link TreeNodeItem}, or when there are any
 	 * children.
 	 */
 	@Override
