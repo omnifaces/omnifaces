@@ -21,7 +21,6 @@ import static org.omnifaces.util.Components.getCurrentActionSource;
 import static org.omnifaces.util.Components.getMessageComponent;
 import static org.omnifaces.util.Components.getMessagesComponent;
 import static org.omnifaces.util.Faces.isRenderResponse;
-import static org.omnifaces.util.Faces.validationFailed;
 import static org.omnifaces.util.FacesLocal.getMimeType;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
 import static org.omnifaces.util.FacesLocal.getRequestParts;
@@ -271,7 +270,7 @@ public class InputFile extends HtmlInputFile {
 			String fileName = getRequestParameter(context, "fileName");
 			addError(getClientId(context), getMaxsizeMessage(), Components.getLabel(this), fileName, formatBytes(getMaxsize()));
 			setValid(false);
-			validationFailed();
+			context.validationFailed();
 			update(getMessageComponentClientId());
 		}
 		else {
