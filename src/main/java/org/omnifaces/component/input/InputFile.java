@@ -17,7 +17,6 @@ import static java.util.Collections.singleton;
 import static org.omnifaces.config.OmniFaces.getMessage;
 import static org.omnifaces.el.functions.Numbers.formatBytes;
 import static org.omnifaces.util.Ajax.update;
-import static org.omnifaces.util.Components.getCurrentActionSource;
 import static org.omnifaces.util.Components.getMessageComponent;
 import static org.omnifaces.util.Components.getMessagesComponent;
 import static org.omnifaces.util.Faces.isRenderResponse;
@@ -266,7 +265,9 @@ public class InputFile extends HtmlInputFile {
 
 	@Override
 	public void decode(FacesContext context) {
-		if (equals(getCurrentActionSource()) && "validationFailed".equals(getRequestParameter(context, "omnifaces.event"))) {
+		if ("validationFailed".equals(getRequestParameter(context, "omnifaces.event"))
+			&& getClientId(context).equals(getRequestParameter(context, "javax.faces.source")))
+		{
 			String fileName = getRequestParameter(context, "fileName");
 			addError(getClientId(context), getMaxsizeMessage(), Components.getLabel(this), fileName, formatBytes(getMaxsize()));
 			setValid(false);
@@ -333,7 +334,7 @@ public class InputFile extends HtmlInputFile {
 			if (accept != null) {
 				String contentType = (fileName != null) ? getMimeType(context, fileName) : part.getContentType();
 
-				if (contentType == null || !contentType.matches(accept.replace("*", ".*"))) {
+				if (contentType == null || !contentType.matches(accept.trim().replace("*", ".*").replaceAll("\\s*,\\s*", "|"))) {
 					message = getAcceptMessage();
 					param = accept;
 				}

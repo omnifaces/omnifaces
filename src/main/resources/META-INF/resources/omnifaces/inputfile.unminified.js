@@ -20,10 +20,6 @@
  */
 OmniFaces.InputFile = (function(window) {
 
-	// "Constant" fields ----------------------------------------------------------------------------------------------
-
-	var VIEW_STATE_PARAM = "javax.faces.ViewState";
-
 	// Private static fields ------------------------------------------------------------------------------------------
 
 	var self = {};
