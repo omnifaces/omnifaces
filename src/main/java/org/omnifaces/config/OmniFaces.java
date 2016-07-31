@@ -31,6 +31,7 @@ public final class OmniFaces {
 
 	private static final String VERSION = OmniFaces.class.getPackage().getSpecificationVersion().replaceAll("-\\d+$", "");
 	private static final boolean SNAPSHOT = VERSION.endsWith("-SNAPSHOT");
+	private static final Long STARTUP_TIME = System.currentTimeMillis();
 	private static final String DEFAULT_MESSAGE_BUNDLE = "org.omnifaces.messages";
 
 	// Utility --------------------------------------------------------------------------------------------------------
@@ -52,9 +53,17 @@ public final class OmniFaces {
 	}
 
 	/**
+	 * Returns startup time in Epoch milli.
+	 * @return Startup time in Epoch milli.
+	 */
+	public static long getStartupTime() {
+		return STARTUP_TIME;
+	}
+
+	/**
 	 * Returns resource bundle message associated with given key from application message bundle as identified by
-	 * <code>&lt;message-bundle&gt; in <code>faces-config.xml</code>, or if it is absent, then return it from OmniFaces
-	 * internal <code>org.omnifaces.messages</code> bundle.
+	 * <code>&lt;message-bundle&gt;</code> in <code>faces-config.xml</code>, or if it is absent, then return it from
+	 * OmniFaces internal <code>org.omnifaces.messages</code> bundle.
 	 * @param key The message bundle key.
 	 * @return Resource bundle message associated with given key.
 	 */

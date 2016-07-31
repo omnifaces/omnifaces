@@ -15,6 +15,8 @@ package org.omnifaces.resourcehandler;
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
 
+import org.omnifaces.config.OmniFaces;
+
 /**
  * Appends OmniFaces version to resources with library name <code>omnifaces</code>.
  *
@@ -28,7 +30,7 @@ public class OmniVersionResourceHandler extends DefaultResourceHandler {
 
 	public OmniVersionResourceHandler(ResourceHandler wrapped) {
 		super(wrapped);
-		version = "&v=" + getClass().getPackage().getSpecificationVersion();
+		version = "&v=" + (OmniFaces.isSnapshot() ? OmniFaces.getStartupTime() : OmniFaces.getVersion());
 	}
 
 	@Override

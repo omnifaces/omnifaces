@@ -23,6 +23,7 @@ import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.facesviews.FacesViews;
 
 /**
@@ -77,7 +78,7 @@ public class ApplicationInitializer implements ServletContainerInitializer {
 	}
 
 	private void logOmniFacesVersion() {
-		logger.info("Using OmniFaces version " + getClass().getPackage().getSpecificationVersion());
+		logger.info("Using OmniFaces version " + OmniFaces.getVersion());
 	}
 
 	private void checkJSF22Available() {
