@@ -1848,10 +1848,43 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-					Comma separated string of mime types of files to filter in browse dialog.
+					Comma separated string of mime types of files to filter in client side file browse dialog.
+					This will also be validated in server side.
 				]]>
 			</description>
 			<name>accept</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Validation message to be displayed when the condition in <code>accept</code> attribute is violated.
+				]]>
+			</description>
+			<name>acceptMessage</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Maximum size in bytes for each selected file.
+					This will be validated in both client and server side.
+					The client side validation requires a message(s) component with an ID.
+				]]>
+			</description>
+			<name>maxsize</name>
+			<required>false</required>
+			<type>java.lang.Long</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Validation message to be displayed when the condition in <code>maxsize</code> attribute is violated.
+				]]>
+			</description>
+			<name>maxsizeMessage</name>
 			<required>false</required>
 			<type>java.lang.String</type>
 		</attribute>

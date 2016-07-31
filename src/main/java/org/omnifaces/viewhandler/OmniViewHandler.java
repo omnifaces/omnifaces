@@ -35,6 +35,7 @@ import javax.faces.event.PreDestroyViewMapEvent;
 import javax.faces.render.ResponseStateManager;
 
 import org.omnifaces.cdi.ViewScoped;
+import org.omnifaces.cdi.viewscope.ViewScopeManager;
 import org.omnifaces.taghandler.EnableRestorableView;
 import org.omnifaces.util.Callback;
 import org.omnifaces.util.Components;
@@ -56,7 +57,7 @@ import org.omnifaces.util.Hacks;
  * @author Bauke Scholtz
  * @since 1.3
  * @see EnableRestorableView
- * @see ViewScoped
+ * @see ViewScopeManager
  */
 public class OmniViewHandler extends ViewHandlerWrapper {
 

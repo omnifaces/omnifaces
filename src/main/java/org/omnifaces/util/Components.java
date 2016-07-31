@@ -17,6 +17,7 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.regex.Pattern.quote;
 import static javax.faces.component.UIComponent.getCompositeComponentParent;
 import static javax.faces.component.visit.VisitContext.createVisitContext;
+import static javax.faces.component.visit.VisitHint.SKIP_ITERATION;
 import static javax.faces.component.visit.VisitResult.ACCEPT;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getELContext;
@@ -57,6 +58,8 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.UIComponentBase;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
+import javax.faces.component.UIMessage;
+import javax.faces.component.UIMessages;
 import javax.faces.component.UINamingContainer;
 import javax.faces.component.UIOutput;
 import javax.faces.component.UIParameter;
@@ -1083,6 +1086,58 @@ public final class Components {
 		}
 
 		return Collections.unmodifiableMap(params);
+	}
+
+	/**
+	 * Returns the {@link UIMessage} component associated with given {@link UIInput} component.
+	 * This returns <code>null</code> if none can be found.
+	 * @param input The UI input component to find the associated message component for.
+	 * @return The {@link UIMessage} component associated with given {@link UIInput} component.
+	 * @since 2.5
+	 */
+	public static UIMessage getMessageComponent(final UIInput input) {
+		final UIMessage[] found = new UIMessage[1];
+
+		forEachComponent().ofTypes(UIMessage.class).withHints(SKIP_ITERATION).invoke(new VisitCallback() {
+			@Override
+			public VisitResult visit(VisitContext context, UIComponent target) {
+				UIMessage messageComponent = (UIMessage) target;
+				String forValue = messageComponent.getFor();
+
+				if (!isEmpty(forValue)) {
+					UIComponent forComponent = findComponentRelatively(messageComponent, forValue);
+
+					if (input.equals(forComponent)) {
+						found[0] = messageComponent;
+						return VisitResult.COMPLETE;
+					}
+				}
+
+				return VisitResult.ACCEPT;
+			}
+		});
+
+		return found[0];
+	}
+
+	/**
+	 * Returns the first {@link UIMessages} component found in the current view.
+	 * This returns <code>null</code> if none can be found.
+	 * @return The first {@link UIMessages} component found in the current view.
+	 * @since 2.5
+	 */
+	public static UIMessages getMessagesComponent() {
+		final UIMessages[] found = new UIMessages[1];
+
+		forEachComponent().ofTypes(UIMessages.class).withHints(SKIP_ITERATION).invoke(new VisitCallback() {
+			@Override
+			public VisitResult visit(VisitContext context, UIComponent target) {
+				found[0] = (UIMessages) target;
+				return VisitResult.COMPLETE;
+			}
+		});
+
+		return found[0];
 	}
 
 	// Expressions ----------------------------------------------------------------------------------------------------
