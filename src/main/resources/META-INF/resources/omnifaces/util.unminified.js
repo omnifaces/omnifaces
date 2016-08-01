@@ -29,11 +29,8 @@ OmniFaces.Util = {
 		if (document.readyState === "complete") {
 			setTimeout(listener);
 		}
-		else if (window.addEventListener) {
-			window.addEventListener("load", listener, false);
-		}
-		else if (window.attachEvent) {
-			window.attachEvent("onload", listener);
+		else if (window.addEventListener || window.attachEvent) {
+			addEventListener(window, "load", listener);
 		}
 		else if (typeof window.onload === "function") {
 			var oldListener = window.onload;
@@ -41,6 +38,36 @@ OmniFaces.Util = {
 		}
 		else {
 			window.onload = listener;
+		}
+	},
+
+	/**
+	 * Add given event listener on the given event to the given element.
+	 * @param {HTMLElement} HTML element to add event listener to.
+	 * @param {string} The event name.
+	 * @param {function} The event listener.
+	 */
+	addEventListener: function(element, event, listener) {
+		if (element.addEventListener) {
+			element.addEventListener(event, listener, false);
+		}
+		else if (element.attachEvent) { // IE6-8.
+			element.attachEvent("on" + event, listener);
+		}
+	},
+
+	/**
+	 * Remove given event listener on the given event from the given element.
+	 * @param {HTMLElement} HTML element to remove event listener from.
+	 * @param {string} The event name.
+	 * @param {function} The event listener.
+	 */
+	removeEventListener: function(element, event, listener) {
+		if (element.removeEventListener) {
+			element.removeEventListener(event, listener, false);
+		}
+		else if (element.detachEvent) { // IE6-8.
+			element.detachEvent("on" + event, listener);
 		}
 	},
 

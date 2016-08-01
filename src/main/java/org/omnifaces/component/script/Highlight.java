@@ -68,6 +68,9 @@ import org.omnifaces.util.State;
  * <pre>
  * &lt;o:highlight styleClass="invalid" focus="false" /&gt;
  * </pre>
+ * <p>
+ * Since version 2.5, the error style class will be removed from the input element and its associated label when the
+ * enduser starts using the input element.
  *
  * @author Bauke Scholtz
  * @see OnloadScript

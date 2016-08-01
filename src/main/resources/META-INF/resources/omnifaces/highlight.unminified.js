@@ -17,10 +17,16 @@
  * @author Bauke Scholtz
  * @see org.omnifaces.component.script.Highlight
  */
-OmniFaces.Highlight = (function(document) {
+OmniFaces.Highlight = (function(Util, document) {
+
+	// "Constant" fields ----------------------------------------------------------------------------------------------
+
+	var DATA_HIGHLIGHT_CLASS = "data-omnifaces-highlight-class";
+	var DATA_HIGHLIGHT_LABEL = "data-omnifaces-highlight-label";
 
 	// Private static fields ------------------------------------------------------------------------------------------
 
+	var labelsByFor;
 	var self = {};
 
 	// Public static functions ----------------------------------------------------------------------------------------
@@ -34,23 +40,27 @@ OmniFaces.Highlight = (function(document) {
 	 * @param {boolean} doFocus Whether or not to put focus on the first highlighted element.
 	 */
 	self.apply = function(clientIds, styleClass, doFocus) {
-		var labelsByFor = getLabelsByFor();
+		labelsByFor = getLabelsByFor();
 
 		for (var i = 0; i < clientIds.length; i++) {
-			var element = getElementByIdOrName(clientIds[i]);
+			var input = getElementByIdOrName(clientIds[i]);
 
-			if (element) {
-				element.className += ' ' + styleClass;
-				var label = labelsByFor[element.id];
+			if (input) {
+				input.className += " " + styleClass;
+				input.setAttribute(DATA_HIGHLIGHT_CLASS, styleClass);
+				var label = labelsByFor[input.id];
 
 				if (label) {
-					label.className += ' ' + styleClass;
+					label.className += " " + styleClass;
+					input.setAttribute(DATA_HIGHLIGHT_LABEL, label);
 				}
 
 				if (doFocus) {
-					element.focus();
+					input.focus();
 					doFocus = false;
 				}
+
+				Util.addEventListener(input, "input", removeHighlight);
 			}
 		}
 	}
@@ -62,7 +72,7 @@ OmniFaces.Highlight = (function(document) {
 	 * @return {Object} A mapping of all <code>label</code> elements keyed by their <code>for</code> attribute.
 	 */
 	function getLabelsByFor() {
-		var labels = document.getElementsByTagName('LABEL');
+		var labels = document.getElementsByTagName("LABEL");
 		var labelsByFor = {};
 
 		for ( var i = 0; i < labels.length; i++) {
@@ -95,9 +105,32 @@ OmniFaces.Highlight = (function(document) {
 
 		return element;
 	}
-	
+
+	/**
+	 * Remove the highlight. Remove the error style class from involved input element and its associated label.
+	 * @param {Event} The input event.
+	 */
+	function removeHighlight() {
+		var input = this;
+		Util.removeEventListener(input, "input", removeHighlight);
+		var styleClass = input.getAttribute(DATA_HIGHLIGHT_CLASS);
+
+		if (styleClass) {
+			input.removeAttribute(DATA_HIGHLIGHT_CLASS);
+			var regex = new RegExp(" " + styleClass, "g");
+			input.className = input.className.replace(regex, "");
+			var label = input.getAttribute(DATA_HIGHLIGHT_LABEL);
+
+			if (label) {
+				input.removeAttribute(DATA_HIGHLIGHT_LABEL);
+				label = labelsByFor[input.id];
+				label.className = label.className.replace(regex, "");
+			}
+		}
+	}
+
 	// Expose self to public ------------------------------------------------------------------------------------------
 
 	return self;
 
-})(document);
+})(OmniFaces.Util, document);
