@@ -19,6 +19,7 @@ import static org.omnifaces.el.functions.Numbers.formatBytes;
 import static org.omnifaces.util.Ajax.update;
 import static org.omnifaces.util.Components.getMessageComponent;
 import static org.omnifaces.util.Components.getMessagesComponent;
+import static org.omnifaces.util.Faces.isDevelopment;
 import static org.omnifaces.util.Faces.isRenderResponse;
 import static org.omnifaces.util.FacesLocal.getMimeType;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
@@ -263,6 +264,9 @@ public class InputFile extends HtmlInputFile {
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
+	/**
+	 * This override checks if client side validation on maxsize has failed and if so, then render the message.
+	 */
 	@Override
 	public void decode(FacesContext context) {
 		if ("validationFailed".equals(getRequestParameter(context, "omnifaces.event"))
@@ -405,7 +409,7 @@ public class InputFile extends HtmlInputFile {
 	 * @throws IllegalStateException When component hierarchy is wrong.
 	 */
 	protected void validateHierarchy() {
-		if (getMessageComponentClientId() == null) {
+		if (isDevelopment() && getMessageComponentClientId() == null) {
 			throw new IllegalStateException(ERROR_MISSING_MESSAGE_COMPONENT);
 		}
 	}
