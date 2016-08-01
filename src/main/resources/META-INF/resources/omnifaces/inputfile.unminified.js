@@ -32,7 +32,7 @@ OmniFaces.InputFile = (function(window) {
 	 */
 	self.validate = function(event, inputFile) {
 		if (!window.FileReader) {
-			return; // File API not supported, end of story. Server side will validate.
+			return; // File API not supported (IE6-9), end of story. Server side will validate.
 		}
 
 		if (!inputFile.value) {
@@ -40,7 +40,7 @@ OmniFaces.InputFile = (function(window) {
 		}
 
 		var files = inputFile.files;
-		var maxsize = parseInt(inputFile.dataset.maxsize);
+		var maxsize = parseInt(inputFile.getAttribute("data-maxsize")); // HTMLElement.dataset is only supported in IE11+.
 
 		for (var i = 0; i < files.length; i++) {
 			var size = files[i].size;
