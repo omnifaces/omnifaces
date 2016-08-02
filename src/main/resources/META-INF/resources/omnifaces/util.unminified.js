@@ -30,7 +30,7 @@ OmniFaces.Util = {
 			setTimeout(listener);
 		}
 		else if (window.addEventListener || window.attachEvent) {
-			addEventListener(window, "load", listener);
+			OmniFaces.Util.addEventListener(window, "load", listener);
 		}
 		else if (typeof window.onload === "function") {
 			var oldListener = window.onload;
