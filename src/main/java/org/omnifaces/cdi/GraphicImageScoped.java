@@ -19,6 +19,7 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.lang.annotation.Documented;
+import java.lang.annotation.Inherited;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.Date;
@@ -115,6 +116,7 @@ import org.omnifaces.resourcehandler.GraphicResourceHandler;
  * @see ExpressionInspector
  * @see MethodReference
  */
+@Inherited
 @Documented
 @Qualifier
 @Stereotype
