@@ -15,6 +15,7 @@ package org.omnifaces.component.output;
 import static java.lang.Boolean.parseBoolean;
 import static org.omnifaces.resourcehandler.DefaultResourceHandler.RES_NOT_FOUND;
 import static org.omnifaces.util.Renderers.writeAttributes;
+import static org.omnifaces.util.Renderers.writeIdAttributeIfNecessary;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isEmpty;
 
@@ -223,6 +224,7 @@ public class GraphicImage extends HtmlGraphicImage {
 	public void encodeBegin(FacesContext context) throws IOException {
 		ResponseWriter writer = context.getResponseWriter();
 		writer.startElement("img", this);
+		writeIdAttributeIfNecessary(writer, this);
 		writer.writeAttribute("src", getSrc(context), "value"); // writeURIAttribute kills URL fragment identifiers.
 		writeAttributes(writer, this, GraphicImage.ATTRIBUTE_NAMES);
 	}

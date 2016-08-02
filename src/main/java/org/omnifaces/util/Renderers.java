@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.faces.component.UIComponent;
+import javax.faces.component.behavior.ClientBehaviorHolder;
 import javax.faces.context.ResponseWriter;
 import javax.faces.render.Renderer;
 
@@ -179,6 +180,23 @@ public final class Renderers {
 			String name = entry.getKey();
 			String html = entry.getValue();
 			writeAttribute(writer, html, getAttribute(component, name), name);
+		}
+	}
+
+	/**
+	 * Write ID of component if necessary. That is, when it's explicitly set or the component has client behaviors.
+	 * @param writer The involved response writer.
+	 * @param component The associated UI component.
+	 * @throws IOException When an I/O error occurs.
+	 * @see ResponseWriter#writeAttribute(String, Object, String)
+	 * @since 2.5
+	 */
+	public static void writeIdAttributeIfNecessary(ResponseWriter writer, UIComponent component) throws IOException {
+		if (component.getId() != null
+			|| (component instanceof ClientBehaviorHolder
+				&& !((ClientBehaviorHolder) component).getClientBehaviors().isEmpty()))
+		{
+			writeAttribute(writer, "id", component.getClientId());
 		}
 	}
 
