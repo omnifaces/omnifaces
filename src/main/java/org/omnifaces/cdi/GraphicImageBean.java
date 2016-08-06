@@ -26,7 +26,7 @@ import java.util.Date;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Stereotype;
-import javax.inject.Qualifier;
+import javax.inject.Named;
 
 import org.omnifaces.component.output.GraphicImage;
 import org.omnifaces.el.ExpressionInspector;
@@ -38,14 +38,13 @@ import org.omnifaces.resourcehandler.GraphicResourceHandler;
 
 /**
  * <p>
- * Stereo type that designates a bean as an application scoped bean for serving graphic images via
- * <code>&lt;o:graphicImage&gt;</code> component or <code>#{of:graphicImageURL()}</code> EL functions.
+ * Stereo type that designates a bean with one or more methods returning <code>byte[]</code> or <code>InputStream</code>
+ * as a named application scoped bean specifically for serving graphic images via <code>&lt;o:graphicImage&gt;</code>
+ * component or <code>#{of:graphicImageURL()}</code> EL functions.
  * <pre>
- * import javax.inject.Named;
- * import org.omnifaces.cdi.GraphicImageScoped;
+ * import org.omnifaces.cdi.GraphicImageBean;
  *
- * &#64;Named
- * &#64;GraphicImageScoped
+ * &#64;GraphicImageBean
  * public class Images {
  *
  *     &#64;Inject
@@ -58,18 +57,18 @@ import org.omnifaces.resourcehandler.GraphicResourceHandler;
  * }
  * </pre>
  * <p>
- * When using {@link ApplicationScoped} instead, serving graphic images via a JSF page will continue to work, but
- * when the server restarts, then hotlinking/bookmarking will stop working until the JSF page referencing the same
- * bean method is requested for the first time. This is caused by a security restriction which should prevent users from
- * invoking arbitrary bean methods by manipulating the URL. The {@link GraphicImageScoped} basically enables endusers to
- * invoke any public method returning a <code>byte[]</code> or <code>InputStream</code> on the bean by just a HTTP GET
- * request.
+ * When using <code>@Named @ApplicationScoped</code> instead, serving graphic images via a JSF page will continue to
+ * work, but when the server restarts, then hotlinking/bookmarking will stop working until the JSF page referencing the
+ * same bean method is requested for the first time. This is caused by a security restriction which should prevent users
+ * from invoking arbitrary bean methods by manipulating the URL. The <code>@GraphicImageBean</code> basically enables
+ * endusers to invoke any public method returning a <code>byte[]</code> or <code>InputStream</code> on the bean by just
+ * a HTTP GET request.
  *
  * <h3>Usage</h3>
  * <p>
  * You can use <code>#{of:graphicImageURL()}</code> EL functions to generate URLs referring the
- * {@link GraphicImageScoped} bean, optionally with the image <code>type</code> and <code>lastModified</code> arguments.
- * Below are some usage examples:
+ * <code>&#64;GraphicImageBean</code> bean, optionally with the image <code>type</code> and <code>lastModified</code>
+ * arguments. Below are some usage examples:
  * <pre>
  * &lt;ui:repeat value="#{bean.products}" var="product"&gt;
  *
@@ -118,11 +117,11 @@ import org.omnifaces.resourcehandler.GraphicResourceHandler;
  */
 @Inherited
 @Documented
-@Qualifier
 @Stereotype
+@Named
 @ApplicationScoped
 @Retention(RUNTIME)
 @Target(TYPE)
-public @interface GraphicImageScoped {
+public @interface GraphicImageBean {
 	//
 }

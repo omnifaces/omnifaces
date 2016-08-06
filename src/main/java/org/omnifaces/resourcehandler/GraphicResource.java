@@ -16,6 +16,8 @@ import static java.lang.reflect.Modifier.isPublic;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.unmodifiableMap;
+import static org.omnifaces.util.Beans.getManager;
+import static org.omnifaces.util.BeansLocal.getReference;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Servlets.toQueryString;
 import static org.omnifaces.util.Utils.coalesce;
@@ -39,7 +41,9 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.el.ValueExpression;
-import javax.enterprise.inject.spi.CDI;
+import javax.enterprise.inject.Any;
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.faces.FacesException;
 import javax.faces.application.Application;
@@ -50,7 +54,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.xml.bind.DatatypeConverter;
 
-import org.omnifaces.cdi.GraphicImageScoped;
+import org.omnifaces.cdi.GraphicImageBean;
 import org.omnifaces.el.ExpressionInspector;
 import org.omnifaces.el.MethodReference;
 import org.omnifaces.util.Faces;
@@ -73,7 +77,7 @@ public class GraphicResource extends DynamicResource {
 
 	@SuppressWarnings("unchecked")
 	private static final Class<? extends Annotation>[] REQUIRED_ANNOTATION_TYPES = new Class[] {
-		GraphicImageScoped.class,
+		GraphicImageBean.class,
 		javax.faces.bean.ApplicationScoped.class,
 		javax.enterprise.context.ApplicationScoped.class
 	};
@@ -84,12 +88,12 @@ public class GraphicResource extends DynamicResource {
 		byte[].class
 	};
 
-    private static final AnnotationLiteral<GraphicImageScoped> GRAPHIC_IMAGE_SCOPED = new AnnotationLiteral<GraphicImageScoped>() {
+    private static final AnnotationLiteral<Any> ANY = new AnnotationLiteral<Any>() {
         private static final long serialVersionUID = 1L;
     };
 
     private static final String ERROR_MISSING_METHOD =
-		"@GraphicResourceScoped bean '%s' must have a method returning an InputStream or byte[].";
+		"@GraphicImageBean bean '%s' must have a method returning an InputStream or byte[].";
     private static final String ERROR_INVALID_LASTMODIFIED =
 		"o:graphicImage 'lastModified' attribute must be an instance of Long or Date."
 			+ " Encountered an invalid value of '%s'.";
@@ -100,7 +104,7 @@ public class GraphicResource extends DynamicResource {
 		"o:graphicImage 'value' attribute must refer an existing method."
 			+ " Encountered an unknown method of '%s'.";
 	private static final String ERROR_INVALID_SCOPE =
-		"o:graphicImage 'value' attribute must refer a @GraphicResourceScoped or @ApplicationScoped bean."
+		"o:graphicImage 'value' attribute must refer a @GraphicImageBean or @ApplicationScoped bean."
 			+ " Cannot find the right annotation on bean class '%s'.";
 	private static final String ERROR_INVALID_RETURNTYPE =
 		"o:graphicImage 'value' attribute must represent a method returning an InputStream or byte[]."
@@ -275,21 +279,30 @@ public class GraphicResource extends DynamicResource {
 	 * Register graphic image scoped beans discovered so far.
 	 * @throws IllegalArgumentException When bean method is missing.
 	 */
-	public static void registerGraphicImageScopedBeans() {
-		for (Object bean : CDI.current().select(GRAPHIC_IMAGE_SCOPED)) {
+	public static void registerGraphicImageBeans() {
+		BeanManager beanManager = getManager();
+
+		for (Bean<?> bean : beanManager.getBeans(Object.class, ANY)) {
+			Class<?> beanClass = bean.getBeanClass();
+
+			if (!isOneAnnotationPresent(beanClass, GraphicImageBean.class)) {
+				continue;
+			}
+
+			Object instance = getReference(beanManager, bean);
 			boolean registered = false;
 
-			for (Method method : bean.getClass().getMethods()) {
+			for (Method method : beanClass.getMethods()) {
 				if (isPublic(method.getModifiers()) && isOneInstanceOf(method.getReturnType(), REQUIRED_RETURN_TYPES)) {
-					String resourceBaseName = getResourceBaseName(bean.getClass().getSuperclass(), method);
-					MethodReference methodReference = new MethodReference(bean, method);
+					String resourceBaseName = getResourceBaseName(beanClass, method);
+					MethodReference methodReference = new MethodReference(instance, method);
 					ALLOWED_METHODS.put(resourceBaseName, methodReference);
 					registered = true;
 				}
 			}
 
 			if (!registered) {
-				throw new IllegalArgumentException(String.format(ERROR_MISSING_METHOD, bean.getClass().getName()));
+				throw new IllegalArgumentException(String.format(ERROR_MISSING_METHOD, beanClass.getName()));
 			}
 		}
 	}
