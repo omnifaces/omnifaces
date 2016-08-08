@@ -12,26 +12,26 @@
  */
 
 /**
- * <p>Fire "unload" event to server side via synchronous XHR when the window is about to be unloaded as result of a 
+ * Fire "unload" event to server side via synchronous XHR when the window is about to be unloaded as result of a 
  * non-submit event, so that e.g. any view scoped beans will immediately be destroyed when enduser refreshes page,
  * or navigates away, or closes browser.
- * <p>This script is automatically included when an <code>org.omnifaces.cdi.ViewScoped</code> managed bean is created
- * during render response, otherwise the one already in <code>omnifaces.js</code> will be used.
  * 
  * @author Bauke Scholtz
  * @see org.omnifaces.cdi.ViewScopeManager
  * @since 2.2
  */
-OmniFaces.Unload = (function(window, document) {
+OmniFaces.Unload = (function(Util, window, document) {
 
 	// "Constant" fields ----------------------------------------------------------------------------------------------
 
 	var VIEW_STATE_PARAM = "javax.faces.ViewState";
+	var ERROR_MISSING_FORM = "OmniFaces @ViewScoped: cannot find a JSF form in the document."
+		+ " Unload will not work. Either add a JSF form, or use @RequestScoped instead.";
 
 	// Private static fields ------------------------------------------------------------------------------------------
 
 	var id;
-	var disabled = false;
+	var disabled;
 	var self = {};
 
 	// Public static functions ----------------------------------------------------------------------------------------
@@ -40,8 +40,8 @@ OmniFaces.Unload = (function(window, document) {
 	 * Initialize the unload event listener on the current document. This will check if XHR is supported and if the
 	 * current document has a JSF form with a view state element. If so, then register the <code>beforeunload</code>
 	 * event to send a synchronous XHR request with the OmniFaces view scope ID and the JSF view state value as
-	 * parameters. Also register the <code>submit</code> event to disable the unload event listener.
-	 * @param {string} id The OmniFaces view scope ID.
+	 * parameters. Also register the all JSF <code>submit</code> events to disable the unload event listener.
+	 * @param {string} viewScopeId The OmniFaces view scope ID.
 	 */
 	self.init = function(viewScopeId) {
 		if (!window.XMLHttpRequest) {
@@ -49,47 +49,40 @@ OmniFaces.Unload = (function(window, document) {
 		}
 
 		if (id == null) {
-			var facesForm = getFacesForm();
-			
-			if (!facesForm) {
-				return; // No JSF form in the document? Why is it referencing a view scoped bean then? ;)
-			}
-			
-			addEventListener(window, "beforeunload", function() {
+			Util.addEventListener(window, "beforeunload", function() {
 				if (disabled) {
 					disabled = false; // Just in case some custom JS explicitly triggered submit event while staying in same DOM.
 					return;
 				}
 
+				var form = getFacesForm();
+
+				if (!form) {
+					if (jsf && jsf.getProjectStage() == "Development" && console && console.error) {
+						console.error(ERROR_MISSING_FORM);
+					}
+
+					return;
+				}
+
 				try {
 					var xhr = new XMLHttpRequest();
-					xhr.open("POST", facesForm.action.split(/[?#;]/)[0], false);
+					xhr.open("POST", form.action.split(/[?#;]/)[0], false);
 					xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-					xhr.send("omnifaces.event=unload&id=" + id + "&" + VIEW_STATE_PARAM + "=" + encodeURIComponent(facesForm[VIEW_STATE_PARAM].value));
+					xhr.send("omnifaces.event=unload&id=" + id + "&" + VIEW_STATE_PARAM + "=" + encodeURIComponent(form[VIEW_STATE_PARAM].value));
 				}
 				catch (e) {
 					// Fail silently. You never know.
 				}
 			});
 
-			addEventListener(document, "submit", function() {
-				self.disable(); // Disable unload event on any (propagated!) submit event.
+			Util.addSubmitListener(function() {
+				self.disable(); // Disable unload event on any submit event.
 			});
-
-			if (window.mojarra) {
-				decorateFacesSubmit(mojarra, "jsfcljs"); // Decorate Mojarra h:commandLink submit handler to disable unload event when invoked.
-			}
-			
-			if (window.myfaces) {
-	 			decorateFacesSubmit(myfaces.oam, "submitForm"); // Decorate MyFaces h:commandLink submit handler to disable unload event when invoked.
-			}
-			
-			if (window.PrimeFaces) {
-	 			decorateFacesSubmit(PrimeFaces, "addSubmitParam"); // Decorate PrimeFaces p:commandLink submit handler to disable unload event when invoked.
-			}
 		}
-		
+
 		id = viewScopeId;
+		disabled = false;
 	}
 
 	/**
@@ -116,39 +109,8 @@ OmniFaces.Unload = (function(window, document) {
 		return null;
 	}
 
-	/**
-	 * Add an event listener on the given event to the given element.
-	 * @param {HTMLElement} HTML element to add event listener to.
-	 * @param {string} The event name.
-	 * @param {function} The event listener.
-	 */
-	function addEventListener(element, event, listener) {
-		if (element.addEventListener) {
-			element.addEventListener(event, listener, false);
-		}
-		else if (element.attachEvent) { // IE6-8.
-			element.attachEvent("on" + event, listener);
-		}
-	}
-
-	/**
-	 * Decorate the JavaScript submit function of JSF implementation.
-	 * @param {object} facesImpl The JSF implementation script object holding the submit function.
-	 * @param {string} functionName The name of the submit function to decorate.
-	 */
-	function decorateFacesSubmit(facesImpl, functionName) {
-		var submitFunction = facesImpl[functionName];
-
-		if (submitFunction) {
-			facesImpl[functionName] = function() {
-				self.disable();
-				return submitFunction.apply(this, arguments);
-			};
-		}
-	}
-
 	// Expose self to public ------------------------------------------------------------------------------------------
 
 	return self;
 
-})(window, document);
+})(OmniFaces.Util, window, document);
