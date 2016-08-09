@@ -103,6 +103,11 @@ import org.omnifaces.validator.MultiFieldValidator;
  * &lt;o:validateMultipleFields components="foo bar baz" message="This is wrong!" showMessageFor="@invalid" /&gt;
  * </pre>
  * <p>
+ * The faces message can also be shown as global message using <code>showMessageFor="@global"</code>.
+ * <pre>
+ * &lt;o:validateMultipleFields components="foo bar baz" message="This is wrong!" showMessageFor="@global" /&gt;
+ * </pre>
+ * <p>
  * The faces message can also be shown for specific components referenced by a space separated collection of their
  * client IDs in <code>showMessageFor</code> attribute.
  * <pre>
@@ -326,7 +331,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 			}
 		}
 		else if (showMessageFor.equals("@global")) {
-		    addGlobalError(message, labels);
+			addGlobalError(message, labels);
 		}
 		else {
 			UIComponent namingContainerParent = getNamingContainer();
