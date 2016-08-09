@@ -20,6 +20,7 @@ import static org.omnifaces.util.Components.isEditable;
 import static org.omnifaces.util.Components.validateHasNoChildren;
 import static org.omnifaces.util.Components.validateHasParent;
 import static org.omnifaces.util.Messages.addError;
+import static org.omnifaces.util.Messages.addGlobalError;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -323,6 +324,9 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 					addError(input.getClientId(context), message, labels);
 				}
 			}
+		}
+		else if (showMessageFor.equals("@global")) {
+		    addGlobalError(message, labels);
 		}
 		else {
 			UIComponent namingContainerParent = getNamingContainer();
