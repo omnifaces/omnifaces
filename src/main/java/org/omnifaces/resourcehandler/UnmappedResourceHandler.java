@@ -15,7 +15,9 @@ package org.omnifaces.resourcehandler;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
 import static org.omnifaces.util.Faces.getMapping;
+import static org.omnifaces.util.Faces.getRequestContextPath;
 import static org.omnifaces.util.Faces.isPrefixMapping;
+import static org.omnifaces.util.FacesLocal.getRequestURI;
 import static org.omnifaces.util.Utils.stream;
 
 import java.io.IOException;
@@ -133,17 +135,13 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 			return resource;
 		}
 
-		String unmappedRequestPath = unmapRequestPath(resource.getRequestPath());
-		return new RemappedResource(resource, unmappedRequestPath);
+		String path = resource.getRequestPath();
+		return isResourceRequest(path) ? new RemappedResource(resource, unmapRequestPath(path)) : resource;
 	}
 
-	/**
-	 * Returns <code>true</code> if {@link ExternalContext#getRequestServletPath()} equals
-	 * {@link ResourceHandler#RESOURCE_IDENTIFIER}.
-	 */
 	@Override
 	public boolean isResourceRequest(FacesContext context) {
-		return RESOURCE_IDENTIFIER.equals(context.getExternalContext().getRequestServletPath());
+		return isResourceRequest(getRequestURI(context)) || super.isResourceRequest(context);
 	}
 
 	@Override
@@ -179,6 +177,10 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
+
+	private static boolean isResourceRequest(String path) {
+		return path.startsWith(getRequestContextPath() + RESOURCE_IDENTIFIER);
+	}
 
 	private static String unmapRequestPath(String path) {
 		String mapping = getMapping();
