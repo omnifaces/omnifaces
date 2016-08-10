@@ -1183,7 +1183,7 @@ public final class Faces {
 	/**
 	 * Returns the HTTP request query string as parameter values map. Note this method returns <strong>only</strong>
 	 * the request URL (GET) parameters, as opposed to {@link #getRequestParameterValuesMap()}, which contains both
-	 * the request URL (GET) parameters and and the request body (POST) parameters. This is ready for usage in among
+	 * the request URL (GET) parameters and the request body (POST) parameters. This is ready for usage in among
 	 * others {@link ViewHandler#getBookmarkableURL(FacesContext, String, Map, boolean)}.
 	 * @return The HTTP request query string as parameter values map.
 	 * @see HttpServletRequest#getQueryString()
