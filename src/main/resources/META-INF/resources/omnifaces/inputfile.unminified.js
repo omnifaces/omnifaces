@@ -12,7 +12,7 @@
  */
 
 /**
- * Input file client side validator and auto-upload handler with support for progress callback function.
+ * Input file client side validator (so far only maxsize is validated).
  * 
  * @author Bauke Scholtz
  * @see org.omnifaces.component.input.InputFile
