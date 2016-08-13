@@ -239,7 +239,7 @@ public class ValidateBean extends TagHandler {
 			throw new IllegalStateException(ERROR_MISSING_FORM);
 		}
 
-		if (!form.equals(getCurrentForm()) || (component instanceof UICommand && !hasInvokedSubmit(component))) {
+		if (!form.equals(getCurrentForm()) || !hasInvokedSubmit(component)) {
 			return;
 		}
 
