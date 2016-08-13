@@ -12,13 +12,13 @@
  */
 
 /**
- * Input file client side validator (so far only maxsize is validated).
+ * Input file client side validator and auto-upload handler with support for progress callback function.
  * 
  * @author Bauke Scholtz
  * @see org.omnifaces.component.input.InputFile
  * @since 2.5
  */
-OmniFaces.InputFile = (function(window) {
+OmniFaces.InputFile = (function(window, document) {
 
 	// Private static fields ------------------------------------------------------------------------------------------
 
@@ -27,31 +27,39 @@ OmniFaces.InputFile = (function(window) {
 	// Public static functions ----------------------------------------------------------------------------------------
 
 	/**
+	 * Validate size of selected files of given o:inputFile against given maxsize.
+	 * The faces message will be triggered server side.
 	 * @param {Event} event Required; The involved DOM event (expected: 'change').
-	 * @param {HTMLInputElement} inputFile Required; The input file element to be validated.
+	 * @param {HTMLInputElement} inputFile Required; The involved o:inputFile.
+	 * @param {string} messageClientId Required; The client ID of involved h:message.
+	 * @param {number} maxsize Required; The maximum size for each selected file.
 	 */
-	self.validate = function(event, inputFile) {
+	self.validate = function(event, inputFile, messageClientId, maxsize) {
 		if (!window.FileReader) {
-			return; // File API not supported (IE6-9), end of story. Server side will validate.
+			return true; // File API not supported (IE6-9). End of story. Let standard JSF code continue.
 		}
 
-		if (!inputFile.value) {
-			return; // No files selected.
-		}
+		document.getElementById(messageClientId).innerHTML = ""; // Clear out any previously rendered message.
 
-		var files = inputFile.files;
-		var maxsize = parseInt(inputFile.getAttribute("data-maxsize")); // HTMLElement.dataset is only supported in IE11+.
+		for (var i = 0; i < inputFile.files.length; i++) {
+			var file = inputFile.files[i];
 
-		for (var i = 0; i < files.length; i++) {
-			var size = files[i].size;
+			if (file.size > maxsize) {
+				var fileName = file.name;
+				var originalEnctype;
 
-			if (size > maxsize) {
-				var fileName = files[i].name;
-				var originalEnctype = inputFile.form.enctype;
-				inputFile.form.enctype = null;
-				inputFile.value = null;
+				if (window.mojarra) { // Mojarra doesn't add custom params when using iframe transport.
+					originalEnctype = inputFile.form.enctype;
+					inputFile.form.enctype = null;
+				}
+
+				inputFile.value = null; // Clear out selected files.
 				jsf.ajax.request(inputFile.id, event, { "omnifaces.event": "validationFailed", fileName: fileName });
-				inputFile.form.enctype = originalEnctype;
+
+				if (originalEnctype) {
+					inputFile.form.enctype = originalEnctype;
+				}
+
 				return false;
 			}
 		}
@@ -63,4 +71,4 @@ OmniFaces.InputFile = (function(window) {
 
 	return self;
 
-})(window);
+})(window, document);

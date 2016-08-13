@@ -14,29 +14,34 @@ package org.omnifaces.component.input;
 
 import static java.lang.Boolean.FALSE;
 import static java.util.Collections.singleton;
+import static java.util.Collections.unmodifiableList;
 import static org.omnifaces.config.OmniFaces.getMessage;
 import static org.omnifaces.el.functions.Numbers.formatBytes;
 import static org.omnifaces.util.Ajax.update;
 import static org.omnifaces.util.Components.getMessageComponent;
 import static org.omnifaces.util.Components.getMessagesComponent;
+import static org.omnifaces.util.Components.validateHasParent;
 import static org.omnifaces.util.Faces.isDevelopment;
 import static org.omnifaces.util.Faces.isRenderResponse;
 import static org.omnifaces.util.FacesLocal.getMimeType;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
 import static org.omnifaces.util.FacesLocal.getRequestParts;
+import static org.omnifaces.util.FacesLocal.isAjaxRequest;
 import static org.omnifaces.util.Messages.addError;
 import static org.omnifaces.util.Servlets.getSubmittedFileName;
 import static org.omnifaces.util.Utils.coalesce;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import javax.faces.application.ResourceDependencies;
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
-import javax.faces.component.UIMessage;
-import javax.faces.component.UIMessages;
+import javax.faces.component.UIComponent;
+import javax.faces.component.UIForm;
 import javax.faces.component.html.HtmlInputFile;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.ConverterException;
@@ -250,8 +255,10 @@ public class InputFile extends HtmlInputFile {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
+	private static final String SCRIPT_ONCHANGE = "if(!OmniFaces.InputFile.validate(event,this,'%s',%s))return false;%s";
+
 	private static final String ERROR_MISSING_MESSAGE_COMPONENT =
-		"o:inputFile client side validation of maxsize requires a message(s) component with an ID.";
+		"o:inputFile client side validation of maxsize requires a message(s) component with a fixed ID.";
 
 	private enum PropertyKeys {
 		// Cannot be uppercased. They have to exactly match the attribute names.
@@ -261,11 +268,14 @@ public class InputFile extends HtmlInputFile {
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private final State state = new State(getStateHelper());
+	private String messageComponentClientId;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * This override checks if client side validation on maxsize has failed and if so, then render the message.
+	 * This override checks if client side validation on maxsize has failed and if multi file upload is enabled.
+	 * If client side validation on maxsize has failed, then it will render the message. If multi file upload is
+	 * enabled, then it will set all parts as submitted value instead of only the last part as done in h:inputFile.
 	 */
 	@Override
 	public void decode(FacesContext context) {
@@ -280,22 +290,35 @@ public class InputFile extends HtmlInputFile {
 		}
 		else {
 			super.decode(context);
+			Object submittedValue = getSubmittedValue();
+
+			if (submittedValue instanceof Part && isMultiple()) {
+				setSubmittedValue(getRequestParts(context, ((Part) submittedValue).getName()));
+			}
 		}
 	}
 
 	/**
-	 * This override checks if multi file upload was enabled and if so, then return a collection of parts instead of
-	 * only the last part as done in h:inputFile.
+	 * This override will convert the individual parts if multi file upload is enabled and collect only non-null parts.
 	 */
 	@Override
-	protected Object getConvertedValue(FacesContext context, Object newSubmittedValue) throws ConverterException {
-		Object convertedValue = super.getConvertedValue(context, newSubmittedValue);
+	@SuppressWarnings("unchecked")
+	protected Object getConvertedValue(FacesContext context, Object submittedValue) throws ConverterException {
+		if (isMultiple()) {
+			List<Part> convertedParts = new ArrayList<>();
 
-		if ((convertedValue instanceof Part) && isMultiple()) {
-			return getRequestParts(context, ((Part) convertedValue).getName());
+			for (Part submittedPart : (List<Part>) submittedValue) {
+				Object convertedPart = super.getConvertedValue(context, submittedPart);
+
+				if (convertedPart instanceof Part) {
+					convertedParts.add((Part) convertedPart);
+				}
+			}
+
+			return unmodifiableList(convertedParts);
 		}
 
-		return convertedValue;
+		return super.getConvertedValue(context, submittedValue);
 	}
 
 	/**
@@ -304,55 +327,24 @@ public class InputFile extends HtmlInputFile {
 	@Override
 	@SuppressWarnings("unchecked")
 	protected void validateValue(FacesContext context, Object convertedValue) {
-		Collection<Part> parts = null;
+		Collection<Part> convertedParts = null;
 
 		if (convertedValue instanceof Part) {
-			parts = singleton((Part) convertedValue);
+			convertedParts = singleton((Part) convertedValue);
 		}
-		else if (convertedValue instanceof Collection) {
-			parts = (Collection<Part>) convertedValue;
+		else if (convertedValue instanceof List) {
+			convertedParts = (List<Part>) convertedValue;
 		}
 
-		if (parts != null) {
-			validateParts(context, parts);
+		if (convertedParts != null) {
+			validateParts(context, convertedParts);
 		}
 
 		if (isValid()) {
 			super.validateValue(context, convertedValue);
 		}
-	}
-
-	private void validateParts(FacesContext context, Collection<Part> parts) {
-		String accept = getAccept();
-		Long maxsize = getMaxsize();
-
-		if (accept == null && maxsize == null) {
-			return;
-		}
-
-		for (Part part : parts) {
-			String fileName = getSubmittedFileName(part);
-			String message = null;
-			String param = null;
-
-			if (accept != null) {
-				String contentType = (fileName != null) ? getMimeType(context, fileName) : part.getContentType();
-
-				if (contentType == null || !contentType.matches(accept.trim().replace("*", ".*").replaceAll("\\s*,\\s*", "|"))) {
-					message = getAcceptMessage();
-					param = accept;
-				}
-			}
-
-			if (message == null && maxsize != null && part.getSize() > maxsize) {
-				message = getMaxsizeMessage();
-				param = formatBytes(maxsize);
-			}
-
-			if (message != null) {
-				addError(getClientId(context), message, Components.getLabel(this), fileName, param);
-				setValid(false);
-			}
+		else if (isAjaxRequest(context)) {
+			update(getMessageComponentClientId());
 		}
 	}
 
@@ -397,8 +389,7 @@ public class InputFile extends HtmlInputFile {
 
 		if (maxsize != null) {
 			validateHierarchy();
-			passThroughAttributes.put("data-maxsize", maxsize); // Only used by OmniFaces.InputFile.validate.
-			setOnchange("if(!OmniFaces.InputFile.validate(event,this))return false;" + coalesce(getOnchange(), ""));
+			setOnchange(String.format(SCRIPT_ONCHANGE, getMessageComponentClientId(), maxsize, coalesce(getOnchange(), "")));
 		}
 
 		super.encodeEnd(context);
@@ -409,32 +400,18 @@ public class InputFile extends HtmlInputFile {
 	 * @throws IllegalStateException When component hierarchy is wrong.
 	 */
 	protected void validateHierarchy() {
+		validateHasParent(this, UIForm.class);
+
 		if (isDevelopment() && getMessageComponentClientId() == null) {
 			throw new IllegalStateException(ERROR_MISSING_MESSAGE_COMPONENT);
 		}
-	}
-
-	private String getMessageComponentClientId() {
-		UIMessage messageComponent = getMessageComponent(this);
-
-		if (messageComponent != null && messageComponent.getId() != null) {
-			return messageComponent.getClientId();
-		}
-
-		UIMessages messagesComponent = getMessagesComponent();
-
-		if (messagesComponent != null && messagesComponent.getId() != null) {
-			return messagesComponent.getClientId();
-		}
-
-		return null;
 	}
 
 	// Attribute getters/setters --------------------------------------------------------------------------------------
 
 	/**
 	 * Returns whether or not to allow multiple file selection.
-	 * This implicitly returns true when directory selection is enabled.
+	 * This implicitly defaults to <code>true</code> when <code>directory</code> attribute is <code>true</code>.
 	 * @return Whether or not to allow multiple file selection.
 	 */
 	public boolean isMultiple() {
@@ -459,6 +436,7 @@ public class InputFile extends HtmlInputFile {
 
 	/**
 	 * Sets whether or not to enable directory selection.
+	 * When <code>true</code>, this implicitly defaults the <code>multiple</code> attribute to <code>true</code>.
 	 * @param directory Whether or not to enable directory selection.
 	 */
 	public void setDirectory(boolean directory) {
@@ -531,6 +509,57 @@ public class InputFile extends HtmlInputFile {
 	 */
 	public void setMaxsizeMessage(String maxsizeMessage) {
 		state.put(PropertyKeys.maxsizeMessage, maxsizeMessage);
+	}
+
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	private void validateParts(FacesContext context, Collection<Part> parts) {
+		String accept = getAccept();
+		Long maxsize = getMaxsize();
+
+		if (accept == null && maxsize == null) {
+			return;
+		}
+
+		for (Part part : parts) {
+			String fileName = getSubmittedFileName(part);
+			String message = null;
+			String param = null;
+
+			if (accept != null) {
+				String contentType = isEmpty(fileName) ? part.getContentType() : getMimeType(context, fileName);
+
+				if (contentType == null || !contentType.matches(accept.trim().replace("*", ".*").replaceAll("\\s*,\\s*", "|"))) {
+					message = getAcceptMessage();
+					param = accept;
+				}
+			}
+
+			if (message == null && maxsize != null && part.getSize() > maxsize) {
+				message = getMaxsizeMessage();
+				param = formatBytes(maxsize);
+			}
+
+			if (message != null) {
+				addError(getClientId(context), message, Components.getLabel(this), fileName, param);
+				setValid(false);
+			}
+		}
+	}
+
+	private String getMessageComponentClientId() {
+		if (messageComponentClientId != null) {
+			return messageComponentClientId;
+		}
+
+		UIComponent component = getMessageComponent(this);
+
+		if (component == null || component.getId() == null) {
+			component = getMessagesComponent();
+		}
+
+		messageComponentClientId = (component != null && component.getId() != null) ? component.getClientId() : null;
+		return messageComponentClientId;
 	}
 
 }
