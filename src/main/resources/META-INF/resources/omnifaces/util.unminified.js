@@ -33,7 +33,7 @@ OmniFaces.Util = (function(window, document) {
 	 */
 	self.addEventListener = function(element, event, listener) {
 		if (element.addEventListener) {
-			element.addEventListener(event, listener, false);
+			element.addEventListener(event, listener);
 		}
 		else if (element.attachEvent) { // IE6-8.
 			element.attachEvent("on" + event, listener);
@@ -48,7 +48,7 @@ OmniFaces.Util = (function(window, document) {
 	 */
 	self.removeEventListener = function(element, event, listener) {
 		if (element.removeEventListener) {
-			element.removeEventListener(event, listener, false);
+			element.removeEventListener(event, listener);
 		}
 		else if (element.detachEvent) { // IE6-8.
 			element.detachEvent("on" + event, listener);
@@ -111,10 +111,10 @@ OmniFaces.Util = (function(window, document) {
 	// Private static functions ---------------------------------------------------------------------------------------
 
 	/**
-	 * Decorate the JavaScript submit function of JSF implementation to invoke the given listener first.
+	 * Decorate the JavaScript based submit function of the JSF implementation to invoke the given listener first.
 	 * @param {object} facesImpl The JSF implementation script object holding the submit function.
-	 * @param {string} functionName The name of the submit function to decorate.
-	 * @param {function} listener The name of the submit function to decorate.
+	 * @param {string} functionName The name of the JSF submit function to decorate.
+	 * @param {function} listener The listener to invoke before the JSF submit function.
 	 */
 	function decorateFacesSubmit(facesImpl, functionName, listener) {
 		var submitFunction = facesImpl[functionName];
