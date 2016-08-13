@@ -275,7 +275,7 @@ public final class Numbers {
 		}
 
 		String separator = (unit == null) ? "" : " ";
-		String unitPrefix = ((exponent > 0) ? ((iec ? "K" : "k") + "MGTPE").charAt(exponent - 1) : "") + (iec ? "i" : "");
+		String unitPrefix = (exponent > 0) ? ((iec ? "K" : "k") + "MGTPE").charAt(exponent - 1) + (iec ? "i" : "") : "";
 		String unitString = (unit == null) ? "" : unit;
 		return formatted + separator + unitPrefix + unitString;
 	}
