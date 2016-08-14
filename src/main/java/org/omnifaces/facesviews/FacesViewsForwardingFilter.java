@@ -15,6 +15,7 @@ package org.omnifaces.facesviews;
 import static javax.faces.application.ProjectStage.Development;
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_PATH_INFO;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_SERVLET_PATH;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_REVERSE_RESOURCES;
@@ -108,15 +109,17 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 			return false;
 		}
 
+		boolean multiViews = FacesViews.isMultiViewsEnabled(getServletContext());
 		Map<String, String> resources = getApplicationAttribute(getServletContext(), FACES_VIEWS_RESOURCES);
+		String path = resource + (multiViews ? "/*" : "");
 
-		if (getApplicationFromFactory().getProjectStage() == Development && !resources.containsKey(resource)) {
+		if (getApplicationFromFactory().getProjectStage() == Development && !resources.containsKey(path)) {
 			// Check if the resource was dynamically added by scanning the faces-views location(s) again.
 			resources = scanAndStoreViews(getServletContext());
 		}
 
-		if (resources.containsKey(resource)) {
-			String extension = getExtension(resources.get(resource));
+		if (resources.containsKey(path)) {
+			String extension = getExtension(resources.get(path));
 
 			switch (dispatchMethod) {
 				case DO_FILTER:
@@ -125,10 +128,12 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 					// request.
 					try {
 						request.setAttribute(FACES_VIEWS_ORIGINAL_SERVLET_PATH, request.getServletPath());
+						request.setAttribute(FACES_VIEWS_ORIGINAL_PATH_INFO, request.getPathInfo());
 						chain.doFilter(new UriExtensionRequestWrapper(request, extension), response);
 					}
 					finally {
 						request.removeAttribute(FACES_VIEWS_ORIGINAL_SERVLET_PATH);
+						request.removeAttribute(FACES_VIEWS_ORIGINAL_PATH_INFO);
 					}
 
 					return true;

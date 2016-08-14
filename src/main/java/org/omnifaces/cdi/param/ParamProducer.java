@@ -15,6 +15,7 @@ package org.omnifaces.cdi.param;
 import static java.lang.Boolean.parseBoolean;
 import static java.util.Arrays.asList;
 import static javax.faces.validator.BeanValidator.DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME;
+import static org.omnifaces.facesviews.FacesViews.isMultiViewsEnabled;
 import static org.omnifaces.util.Beans.getQualifier;
 import static org.omnifaces.util.Faces.createConverter;
 import static org.omnifaces.util.Faces.createValidator;
@@ -22,7 +23,10 @@ import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getApplication;
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.FacesLocal.getMessageBundle;
+import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestParameterValues;
+import static org.omnifaces.util.FacesLocal.getRequestPathInfo;
+import static org.omnifaces.util.FacesLocal.getServletContext;
 import static org.omnifaces.util.Messages.createError;
 import static org.omnifaces.util.Platform.getBeanValidator;
 import static org.omnifaces.util.Platform.isBeanValidationAvailable;
@@ -61,15 +65,16 @@ import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
 
 import org.omnifaces.cdi.Param;
+import org.omnifaces.facesviews.FacesViews;
 
 /**
- * Producer for a request parameter as defined by the <code>&#64;</code>{@link Param} annotation.
+ * Producer for a request or path parameter as defined by the <code>&#64;</code>{@link Param} annotation.
  *
  * @since 1.6
  * @author Arjan Tijms
  */
 @Dependent
-public class RequestParameterProducer {
+public class ParamProducer {
 
 	private static final String DEFAULT_REQUIRED_MESSAGE = "{0}: Value is required";
 
@@ -82,6 +87,7 @@ public class RequestParameterProducer {
 	public <V> ParamValue<V> produce(InjectionPoint injectionPoint) {
 		Param param = getQualifier(injectionPoint, Param.class);
 		String name = getName(param, injectionPoint);
+		int pathIndex = param.pathIndex();
 		String label = getLabel(param, injectionPoint);
 		Type type = injectionPoint.getType();
 
@@ -90,7 +96,7 @@ public class RequestParameterProducer {
 		}
 
 		FacesContext context = FacesContext.getCurrentInstance();
-		String[] submittedValues = getRequestParameterValues(context, name);
+		String[] submittedValues = pathIndex > -1 ? getPathParameter(context, pathIndex) : getRequestParameterValues(context, name);
 		Object[] convertedValues = getConvertedValues(context, param, label, submittedValues, type);
 		V paramValue = coerceValues(type, convertedValues);
 
@@ -99,6 +105,21 @@ public class RequestParameterProducer {
 		}
 
 		return new ParamValue<>(submittedValues, param, type, paramValue);
+	}
+
+	private static String[] getPathParameter(FacesContext context, int pathIndex) {
+		String pathInfo = isMultiViewsEnabled(getServletContext(context))
+			? FacesViews.getPathInfo(getRequest(context)) : getRequestPathInfo(context);
+
+		if (pathInfo != null) {
+			String[] pathParts = pathInfo.substring(1).split("/");
+
+			if (pathIndex < pathParts.length) {
+				return new String[] { pathParts[pathIndex] };
+			}
+		}
+
+		return null;
 	}
 
 	static Object[] getConvertedValues(FacesContext context, Param param, String label, String[] submittedValues, Type type) {

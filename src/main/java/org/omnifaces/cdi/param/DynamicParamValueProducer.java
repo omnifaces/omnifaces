@@ -43,7 +43,7 @@ import org.omnifaces.cdi.Param;
  * annotated injection points.
  *
  * @see ParamExtension
- * @see RequestParameterProducer
+ * @see ParamProducer
  *
  * @since 2.0
  * @author Arjan Tijms
@@ -64,7 +64,7 @@ public class DynamicParamValueProducer implements Bean<Object>, Serializable, Pa
 
 	@Override
 	public Class<?> getBeanClass() {
-		return RequestParameterProducer.class;
+		return ParamProducer.class;
 	}
 
 	@Override
@@ -76,7 +76,7 @@ public class DynamicParamValueProducer implements Bean<Object>, Serializable, Pa
 	public Object create(CreationalContext<Object> creationalContext) {
 		InjectionPoint injectionPoint = getCurrentInjectionPoint(beanManager, creationalContext);
 
-		ParamValue<?> paramValue = new RequestParameterProducer().produce(injectionPoint);
+		ParamValue<?> paramValue = new ParamProducer().produce(injectionPoint);
 		return paramValue.getValue();
 	}
 
@@ -136,6 +136,11 @@ public class DynamicParamValueProducer implements Bean<Object>, Serializable, Pa
 		@Override
 		public String name() {
 			return "";
+		}
+
+		@Override
+		public int pathIndex() {
+			return -1;
 		}
 
 		@Override

@@ -187,7 +187,7 @@
  * <td>Determines the action that is performed whenever a resource is requested WITH extension that's also available without an extension.
  * <br>Allowed values: {<code>SEND_404</code>,<code>REDIRECT_TO_EXTENSIONLESS</code>,<code>PROCEED</code>}, which have the following meaning:
  * <br>- <code>SEND_404</code>: Send a 404 (not found), makes it look like e.g. <code>/foo.xhtml</code> never existed and there's only <code>/foo</code>.
- * <br>- <code>REDIRECT_TO_EXTENSIONLESS</code>: Redirects to the same URL, but with the extension removed. E.g. <code>/foo.xhtml</code> is redirected to <code>/foo</code>.
+ * <br>- <code>REDIRECT_TO_EXTENSIONLESS</code>: Send a 301 (permanent) redirect to the same URL, but with the extension removed. E.g. <code>/foo.xhtml</code> redirects to <code>/foo</code>.
  * <br>- <code>PROCEED</code>: No special action is taken. Both <code>/foo.xhtml</code> and <code>/foo</code> are processed as-if they were separate views (with same content).
  * <br>Default value: <code>REDIRECT_TO_EXTENSIONLESS</code>
  * </td>
@@ -199,9 +199,9 @@
  * (e.g. the paths set by <code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_SCAN_PATHS_PARAM_NAME}</code>, but excluding the root path /).
  * <br>Allowed values: {<code>SEND_404</code>,<code>REDIRECT_TO_SCANNED_EXTENSIONLESS</code>,<code>PROCEED</code>}, which have the following meaning:
  * <br>- <code>SEND_404</code>: Send a 404 (not found), makes it look like e.g. <code>/path/foo.xhtml</code> never existed and there's only <code>/foo</code> and optionally <code>/foo.xhtml</code>.
- * <br>- <code>REDIRECT_TO_SCANNED_EXTENSIONLESS</code>: Redirects to the resource corresponding with the one that was scanned. e.g. <code>/path/foo.xml</code> redirects to <code>/foo</code>.
+ * <br>- <code>REDIRECT_TO_SCANNED_EXTENSIONLESS</code>: Send a 301 (permanent) redirect to the resource corresponding with the one that was scanned. E.g. <code>/path/foo.xml</code> redirects to <code>/foo</code>.
  * <br>- <code>PROCEED</code>: No special action is taken. <code>/path/foo.xml</code> and <code>/foo</code> (and optionally <code>/foo.xhtml</code>) will be accessible.
- * <br>Default value: <code>REDIRECT_TO_EXTENSIONLESS</code>
+ * <br>Default value: <code>SEND_404</code>
  * </td>
  * </tr>
  *

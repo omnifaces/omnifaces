@@ -29,27 +29,22 @@ import javax.servlet.http.HttpServletRequestWrapper;
  */
 public class UriExtensionRequestWrapper extends HttpServletRequestWrapper {
 
-	private final String extension;
+	private final String servletPath;
 
 	public UriExtensionRequestWrapper(HttpServletRequest request, String extension) {
 		super(request);
-		this.extension = extension;
+		String servletPath = super.getServletPath();
+		this.servletPath = servletPath.endsWith(extension) ? servletPath : servletPath + extension;
 	}
 
 	@Override
 	public String getServletPath() {
-
-		String servletPath = super.getServletPath();
-		if (servletPath.endsWith(extension)) {
-			return servletPath;
-		}
-
-		return servletPath + extension;
+		return servletPath;
 	}
 
 	@Override
 	public String getPathInfo() {
-		// Since we simulate that the request mapped to an extension and not to a prefix path, there
+		// Since we simulate that the request is mapped to an extension and not to a prefix path, there
 		// can be no path info.
 		return null;
 	}

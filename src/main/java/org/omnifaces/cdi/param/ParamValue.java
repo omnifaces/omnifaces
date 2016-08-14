@@ -12,8 +12,8 @@
  */
 package org.omnifaces.cdi.param;
 
-import static org.omnifaces.cdi.param.RequestParameterProducer.coerceValues;
-import static org.omnifaces.cdi.param.RequestParameterProducer.getConvertedValues;
+import static org.omnifaces.cdi.param.ParamProducer.coerceValues;
+import static org.omnifaces.cdi.param.ParamProducer.getConvertedValues;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isSerializable;
