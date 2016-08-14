@@ -84,8 +84,8 @@ import org.omnifaces.util.Utils;
  * </pre>
  * <p>
  * If {@link FacesViews} is enabled with <code>MultiViews</code> feature, or if an URL rewriting engine is used which
- * supports path parameters, then path parameters can also be injected by specifying the <code>path</code> attribute
- * which represents the zero-based index of the path parameter. This takes precedence over the <code>name</code>
+ * supports path parameters, then path parameters can also be injected by specifying the <code>pathIndex</code>
+ * attribute representing the zero-based index of the path parameter. This takes precedence over the <code>name</code>
  * attribute. On an example request <code>http://example.com/mypage/firstname.lastname</code>, which is mapped to
  * <code>/mypage.xhtml</code>, the below example injects the path parameter <code>firstname.lastname</code>.
  * <pre>
