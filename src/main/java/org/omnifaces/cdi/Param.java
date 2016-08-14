@@ -63,6 +63,16 @@ import org.omnifaces.util.Utils;
  * private String bar;
  * </pre>
  * <p>
+ * The <code>name</code> attribute is only mandatory when using constructor injection as there is no information about
+ * constructor parameter names.
+ * The example below injects the request parameter with name <code>foo</code> as a constructor parameter.
+ * <pre>
+ * &#64;Inject
+ * public Bean(&#64;Param(name="foo") String foo) {
+ *     // ...
+ * }
+ * </pre>
+ * <p>
  * Multi-valued parameters are also supported by specifying a {@link List} or array type. The support was added in
  * OmniFaces 2.4.
  * <pre>

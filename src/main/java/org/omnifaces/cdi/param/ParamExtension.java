@@ -19,7 +19,10 @@ import java.util.Set;
 
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
+import javax.enterprise.inject.spi.Annotated;
+import javax.enterprise.inject.spi.AnnotatedConstructor;
 import javax.enterprise.inject.spi.AnnotatedField;
+import javax.enterprise.inject.spi.AnnotatedParameter;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessManagedBean;
@@ -44,17 +47,27 @@ public class ParamExtension implements Extension {
 	private Set<Type> types = new HashSet<>();
 
 	public <T> void collect(@Observes ProcessManagedBean<T> event) {
-		for (AnnotatedField<? super T> field : event.getAnnotatedBeanClass().getFields()) {
-			if (field.isAnnotationPresent(Param.class)) {
-				Type type = field.getBaseType();
+		for (AnnotatedField<?> field : event.getAnnotatedBeanClass().getFields()) {
+			addAnnotatedTypeIfNecessary(field);
+		}
 
-				// Skip ParamValue as it is already handled by RequestParameterProducer.
-				if (type instanceof ParameterizedType && ParamValue.class.isAssignableFrom((Class<?>) ((ParameterizedType) type).getRawType())) {
-					continue;
-				}
-
-				types.add(type);
+		for (AnnotatedConstructor<?> constructor : event.getAnnotatedBeanClass().getConstructors()) {
+			for (AnnotatedParameter<?> parameter : constructor.getParameters()) {
+				addAnnotatedTypeIfNecessary(parameter);
 			}
+		}
+	}
+
+	private void addAnnotatedTypeIfNecessary(Annotated annotated) {
+		if (annotated.isAnnotationPresent(Param.class)) {
+			Type type = annotated.getBaseType();
+
+			// Skip ParamValue as it is already handled by RequestParameterProducer.
+			if (type instanceof ParameterizedType && ParamValue.class.isAssignableFrom((Class<?>) ((ParameterizedType) type).getRawType())) {
+				return;
+			}
+
+			types.add(type);
 		}
 	}
 
