@@ -14,14 +14,14 @@ package org.omnifaces.facesviews;
 
 import static javax.servlet.RequestDispatcher.FORWARD_SERVLET_PATH;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_SERVLET_PATH;
-import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES;
 import static org.omnifaces.facesviews.FacesViews.getFacesServletExtensions;
+import static org.omnifaces.facesviews.FacesViews.getMappedResources;
 import static org.omnifaces.facesviews.FacesViews.getViewHandlerMode;
 import static org.omnifaces.facesviews.FacesViews.isScannedViewsAlwaysExtensionless;
-import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
-import static org.omnifaces.util.FacesLocal.getRequest;
+import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.FacesLocal.getRequestAttribute;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
+import static org.omnifaces.util.FacesLocal.getRequestPathInfo;
 import static org.omnifaces.util.FacesLocal.getServletContext;
 import static org.omnifaces.util.ResourcePaths.getExtension;
 import static org.omnifaces.util.ResourcePaths.isExtensionless;
@@ -35,57 +35,70 @@ import java.util.Set;
 import javax.faces.application.ViewHandler;
 import javax.faces.application.ViewHandlerWrapper;
 import javax.faces.context.FacesContext;
+import javax.servlet.ServletContext;
 
 /**
- * View handler that renders an action URL extensionless if a resource is a mapped one, and faces views has been set to always
- * render extensionless or if the current request is extensionless, otherwise as-is.
- *
+ * View handler that renders an action URL extensionless if a resource is a mapped one, and faces views has been set to
+ * always render extensionless or if the current request is extensionless, otherwise as-is.
  * <p>
  * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
  *
  * @author Arjan Tijms
- *
+ * @since 1.3
+ * @see FacesViews
+ * @see FacesViewsViewHandlerInstaller
+ * @see ViewHandlerMode
  */
 public class FacesViewsViewHandler extends ViewHandlerWrapper {
 
 	private final ViewHandler wrapped;
+	private final ViewHandlerMode mode;
+	private final boolean extensionless;
 
 	public FacesViewsViewHandler(ViewHandler viewHandler) {
 		wrapped = viewHandler;
+		mode = getViewHandlerMode(getServletContext());
+		extensionless = isScannedViewsAlwaysExtensionless(getServletContext());
 	}
 
 	@Override
 	public String deriveLogicalViewId(FacesContext context, String viewId) {
-		Map<String, String> mappedResources = getApplicationAttribute(context, FACES_VIEWS_RESOURCES);
+		Map<String, String> mappedResources = getMappedResources(getServletContext(context));
 		return mappedResources.containsKey(viewId) ? super.deriveLogicalViewId(context, viewId) : viewId;
 	}
 
 	@Override
 	public String getActionURL(FacesContext context, String viewId) {
-
 		String actionURL = super.getActionURL(context, viewId);
+		ServletContext servletContext = getServletContext(context);
+		Map<String, String> mappedResources = getMappedResources(servletContext);
 
-		Map<String, String> mappedResources = getApplicationAttribute(context, FACES_VIEWS_RESOURCES);
-		if (mappedResources.containsKey(viewId) && (isScannedViewsAlwaysExtensionless(context) || isOriginalViewExtensionless(context))) {
-			String pathInfo = coalesce(FacesViews.getPathInfo(getRequest(context)), "");
+		if (mappedResources.containsKey(viewId) && (extensionless || isOriginalViewExtensionless(context))) {
+			String pathInfo = coalesce(getRequestPathInfo(context), "");
 
 			// User has requested to always render extensionless, or the requested viewId was mapped and the current
 			// request is extensionless; render the action URL extensionless as well.
 
-			switch (getViewHandlerMode(getServletContext(context))) {
+			switch (mode) {
 				case STRIP_EXTENSION_FROM_PARENT:
-					return removeExtension(context, actionURL, viewId) + pathInfo;
+					return removeExtension(servletContext, actionURL, viewId) + pathInfo;
 				case BUILD_WITH_PARENT_QUERY_PARAMETERS:
 					return getRequestContextPath(context) + stripExtension(viewId) + pathInfo + getQueryParameters(actionURL);
 			}
 		}
 
-		// Not a resource we mapped or not a forwarded one, take the version from the parent view handler
+		// Not a resource we mapped or not a forwarded one, take the version from the parent view handler.
 		return actionURL;
 	}
 
-	private boolean isOriginalViewExtensionless(FacesContext context) {
+	@Override
+	public ViewHandler getWrapped() {
+		return wrapped;
+	}
+
+	private static boolean isOriginalViewExtensionless(FacesContext context) {
 		String originalViewId = getRequestAttribute(context, FORWARD_SERVLET_PATH);
+
 		if (originalViewId == null) {
 			originalViewId = getRequestAttribute(context, FACES_VIEWS_ORIGINAL_SERVLET_PATH);
 		}
@@ -93,12 +106,12 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 		return isExtensionless(originalViewId);
 	}
 
-	public String removeExtension(FacesContext context, String resource, String viewId) {
-
-		Set<String> extensions = getFacesServletExtensions(context);
+	private static String removeExtension(ServletContext servletContext, String resource, String viewId) {
+		Set<String> extensions = getFacesServletExtensions(servletContext);
 
 		if (!isExtensionless(viewId)) {
 			String viewIdExtension = getExtension(viewId);
+
 			if (!extensions.contains(viewIdExtension)) {
 				extensions = new HashSet<>(extensions);
 				extensions.add(viewIdExtension);
@@ -106,38 +119,22 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 		}
 
 		int lastSlashPos = resource.lastIndexOf('/');
-		int lastQuestionMarkPos = resource.lastIndexOf('?'); // so we don't remove "extension" from parameter value
-		for (String extension : extensions) {
+		int lastQuestionMarkPos = resource.lastIndexOf('?'); // So we don't remove "extension" from parameter value.
 
+		for (String extension : extensions) {
 			int extensionPos = resource.lastIndexOf(extension);
+
 			if (extensionPos > lastSlashPos && (lastQuestionMarkPos == -1 || extensionPos < lastQuestionMarkPos)) {
 				return resource.substring(0, extensionPos) + resource.substring(extensionPos + extension.length());
 			}
-
 		}
 
 		return resource;
 	}
 
-	/**
-	 * Extracts the query string from a resource.
-	 *
-	 * @param resource
-	 *            A URL string
-	 * @return the query string part of the URL
-	 */
-	public static String getQueryParameters(final String resource) {
-		String queryParameters = "";
+	private static String getQueryParameters(String resource) {
 		int questionMarkPos = resource.indexOf('?');
-		if (questionMarkPos != -1) {
-			queryParameters = resource.substring(questionMarkPos);
-		}
-		return queryParameters;
-	}
-
-	@Override
-	public ViewHandler getWrapped() {
-		return wrapped;
+		return (questionMarkPos != -1) ? resource.substring(questionMarkPos) : "";
 	}
 
 }

@@ -23,9 +23,13 @@ import javax.servlet.http.HttpServletRequestWrapper;
  * prefix (path) or suffix (extension) mapping was used. If the request is neither
  * (in effect, an "exact and extensionless mapping), JSF will get confused and not
  * be able to derive view IDs etc correctly.
+ * <p>
+ * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
  *
  * @author Arjan Tijms
  * @since 1.4
+ * @see FacesViews
+ * @see FacesViewsForwardingFilter
  */
 public class UriExtensionRequestWrapper extends HttpServletRequestWrapper {
 

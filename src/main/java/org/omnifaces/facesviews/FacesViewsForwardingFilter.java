@@ -17,18 +17,18 @@ import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_PATH_INFO;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_SERVLET_PATH;
-import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_RESOURCES;
-import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_REVERSE_RESOURCES;
 import static org.omnifaces.facesviews.FacesViews.getExtensionAction;
 import static org.omnifaces.facesviews.FacesViews.getExtensionlessURLWithQuery;
 import static org.omnifaces.facesviews.FacesViews.getFacesServletDispatchMethod;
+import static org.omnifaces.facesviews.FacesViews.getMappedResources;
 import static org.omnifaces.facesviews.FacesViews.getPathAction;
+import static org.omnifaces.facesviews.FacesViews.getReverseMappedResources;
+import static org.omnifaces.facesviews.FacesViews.isMultiViewsEnabled;
 import static org.omnifaces.facesviews.FacesViews.isResourceInPublicPath;
 import static org.omnifaces.facesviews.FacesViews.scanAndStoreViews;
 import static org.omnifaces.util.Faces.getApplicationFromFactory;
 import static org.omnifaces.util.ResourcePaths.getExtension;
 import static org.omnifaces.util.ResourcePaths.isExtensionless;
-import static org.omnifaces.util.Servlets.getApplicationAttribute;
 
 import java.io.IOException;
 import java.util.Map;
@@ -44,16 +44,14 @@ import javax.servlet.http.HttpSession;
 import org.omnifaces.filter.HttpFilter;
 
 /**
- * This filter makes sure extensionless requests arrive at the FacesServlet using an extension on which that Servlet is mapped,
- * and that non-extensionless requests are handled according to a set preference.
+ * This filter makes sure extensionless requests arrive at the FacesServlet using an extension on which that Servlet is
+ * mapped, and that non-extensionless requests are handled according to a set preference.
  * <p>
  * For dispatching to the FacesServlet, 2 methods are available:
- *
  * <ul>
- * <li> DO_FILTER (continues the filter chain but modifies request) </li>
- * <li> FORWARD (starts a new filter chain by using a Servlet requestDispatcher.forward) </li>
+ * <li>DO_FILTER (continues the filter chain but modifies request)</li>
+ * <li>FORWARD (starts a new filter chain by using a Servlet requestDispatcher.forward)</li>
  * </ul>
- *
  * <p>
  * A filter like this is needed for extensionless requests, since the FacesServlet in at least JSF 2.1 and before
  * does not take into account any other mapping than prefix- and extension (suffix) mapping.
@@ -61,7 +59,11 @@ import org.omnifaces.filter.HttpFilter;
  * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
  *
  * @author Arjan Tijms
- *
+ * @see FacesViews
+ * @see ExtensionAction
+ * @see PathAction
+ * @see FacesServletDispatchMethod
+ * @see UriExtensionRequestWrapper
  */
 public class FacesViewsForwardingFilter extends HttpFilter {
 
@@ -109,13 +111,13 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 			return false;
 		}
 
-		boolean multiViews = FacesViews.isMultiViewsEnabled(getServletContext());
-		Map<String, String> resources = getApplicationAttribute(getServletContext(), FACES_VIEWS_RESOURCES);
+		boolean multiViews = isMultiViewsEnabled(getServletContext());
+		Map<String, String> resources = getMappedResources(getServletContext());
 		String path = resource + (multiViews ? "/*" : "");
 
 		if (getApplicationFromFactory().getProjectStage() == Development && !resources.containsKey(path)) {
 			// Check if the resource was dynamically added by scanning the faces-views location(s) again.
-			resources = scanAndStoreViews(getServletContext());
+			resources = scanAndStoreViews(getServletContext(), false);
 		}
 
 		if (resources.containsKey(path)) {
@@ -158,19 +160,17 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 	 * The user setting "extensionAction" determines how we handle this.
 	 */
 	private boolean filterExtension(HttpServletRequest request, HttpServletResponse response, String resource) throws IOException {
-		Map<String, String> resources = getApplicationAttribute(getServletContext(), FACES_VIEWS_RESOURCES);
+		Map<String, String> resources = getMappedResources(getServletContext());
 
 		if (resources.containsKey(resource)) {
 			switch (extensionAction) {
 				case REDIRECT_TO_EXTENSIONLESS:
-					redirectPermanent(response, getExtensionlessURLWithQuery(request));
+					redirectPermanent(response, getExtensionlessURLWithQuery(request, resource));
 					return true;
 				case SEND_404:
 					response.sendError(SC_NOT_FOUND);
 					return true;
 				case PROCEED:
-					break;
-				default:
 					break;
 			}
 		}
@@ -187,7 +187,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 			return false;
 		}
 
-		Map<String, String> reverseResources = getApplicationAttribute(getServletContext(), FACES_VIEWS_REVERSE_RESOURCES);
+		Map<String, String> reverseResources = getReverseMappedResources(getServletContext());
 
 		if (reverseResources.containsKey(resource)) {
 			switch (pathAction) {
@@ -198,8 +198,6 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 					response.sendError(SC_NOT_FOUND);
 					return true;
 				case PROCEED:
-					break;
-				default:
 					break;
 			}
 		}

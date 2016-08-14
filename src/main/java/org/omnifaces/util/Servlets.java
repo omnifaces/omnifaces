@@ -55,6 +55,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
 import org.omnifaces.component.ParamHolder;
+import org.omnifaces.facesviews.FacesViews;
 
 /**
  * <p>
@@ -159,6 +160,21 @@ public final class Servlets {
 	 */
 	public static String getRequestURI(HttpServletRequest request) {
 		return coalesce((String) request.getAttribute(ERROR_REQUEST_URI), (String) request.getAttribute(FORWARD_REQUEST_URI), request.getRequestURI());
+	}
+
+	/**
+	 * Returns the HTTP request path info, taking into account whether FacesViews is used with MultiViews enabled.
+	 * If the resource is prefix mapped (e.g. <code>/faces/*</code>), then this returns the whole part after the prefix
+	 * mapping, with a leading slash. If the resource is suffix mapped (e.g. <code>*.xhtml</code>), then this returns
+	 * <code>null</code>.
+	 * @param request The involved HTTP servlet request.
+	 * @return The HTTP request path info.
+	 * @since 2.5
+	 * @see HttpServletRequest#getPathInfo()
+	 * @see FacesViews#FACES_VIEWS_ORIGINAL_PATH_INFO
+	 */
+	public static String getRequestPathInfo(HttpServletRequest request) {
+		return coalesce((String) request.getAttribute(FacesViews.FACES_VIEWS_ORIGINAL_PATH_INFO), request.getPathInfo());
 	}
 
 	/**

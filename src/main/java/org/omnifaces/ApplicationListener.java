@@ -65,7 +65,7 @@ public class ApplicationListener extends DefaultServletContextListener {
 
 		try {
 			EagerBeansRepository.instantiateApplicationScopedAndRegisterListener(servletContext);
-			FacesViews.addMappings(servletContext);
+			FacesViews.addFacesServletMappings(servletContext);
 			CacheInitializer.loadProviderAndRegisterFilter(servletContext);
 			Socket.registerEndpointIfNecessary(servletContext);
 			GraphicResource.registerGraphicImageBeans();

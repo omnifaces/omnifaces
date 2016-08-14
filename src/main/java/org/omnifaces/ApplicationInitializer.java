@@ -34,7 +34,7 @@ import org.omnifaces.facesviews.FacesViews;
  * <li>Log OmniFaces version.
  * <li>Check if JSF 2.2 is available, otherwise log and fail.
  * <li>Check if CDI 1.1 is available, otherwise log and fail.
- * <li>Register {@link FacesViews} filter.
+ * <li>Register {@link FacesViews} forwarding filter.
  * </ol>
  *
  * @author Bauke Scholtz
@@ -69,7 +69,7 @@ public class ApplicationInitializer implements ServletContainerInitializer {
 		checkCDI11Available();
 
 		try {
-			FacesViews.registerFilter(servletContext);
+			FacesViews.registerForwardingFilter(servletContext);
 		}
 		catch (Throwable e) {
 			logger.log(SEVERE, ERROR_OMNIFACES_INITIALIZATION_FAIL, e);

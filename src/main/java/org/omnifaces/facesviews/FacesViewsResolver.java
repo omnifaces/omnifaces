@@ -28,7 +28,7 @@ import javax.faces.view.facelets.ResourceResolver;
  * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
  *
  * @author Arjan Tijms
- *
+ * @see FacesViews
  */
 public class FacesViewsResolver extends ResourceResolver {
 
@@ -40,13 +40,12 @@ public class FacesViewsResolver extends ResourceResolver {
 
 	@Override
 	public URL resolveUrl(String path) {
-
 		URL resource = resourceResolver.resolveUrl(getMappedPath(path));
 
 		if (resource == null && isDevelopment()) {
-			// If "resource" is null it means it wasn't found. Check if the resource was dynamically added by
-			// scanning the faces-views location(s) again.
-			scanAndStoreViews(getServletContext());
+			// If resource is null it means it wasn't found.
+			// Check if the resource was dynamically added by scanning the faces-views location(s) again.
+			scanAndStoreViews(getServletContext(), false);
 			resource = resourceResolver.resolveUrl(getMappedPath(path));
 		}
 

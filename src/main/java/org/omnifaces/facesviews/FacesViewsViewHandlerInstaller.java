@@ -24,9 +24,8 @@ import javax.servlet.ServletContextListener;
 
 /**
  * Installs the {@link FacesViewsViewHandler}.
- * 
  * <p>
- * <i>Implementation note</i>: this needs to be done during the {@link PostConstructApplicationEvent}, in 
+ * <i>Implementation note</i>: this needs to be done during the {@link PostConstructApplicationEvent}, in
  * which it's guaranteed that Faces initialization (typically done via a {@link ServletContextListener}) has
  * been done. Setting a view handler programmatically requires the Faces {@link Application} to be present
  * which isn't the case before Faces initialization has been done.
@@ -34,21 +33,24 @@ import javax.servlet.ServletContextListener;
  * Additionally, the view handler needs to be set BEFORE the first faces request is processed. Putting
  * the view handler setting code in a {@link Filter#init(javax.servlet.FilterConfig)} method only works
  * when all init methods are called during startup, OR when the filter filters every request.
- * 
+ * <p>
+ * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
  *
- * @since 2.0
  * @author Arjan Tijms
- *
+ * @since 2.0
+ * @see FacesViews
+ * @see FacesViewsViewHandler
  */
 public class FacesViewsViewHandlerInstaller implements SystemEventListener {
 
 	@Override
-	public boolean isListenerForSource(final Object source) {
+	public boolean isListenerForSource(Object source) {
 		return source instanceof Application;
 	}
 
 	@Override
-	public void processEvent(final SystemEvent event) throws AbortProcessingException {
-		FacesViews.setViewHander(getServletContext());
+	public void processEvent(SystemEvent event) throws AbortProcessingException {
+		FacesViews.registerViewHander(getServletContext());
 	}
+
 }

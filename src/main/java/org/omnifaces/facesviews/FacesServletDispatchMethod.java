@@ -17,34 +17,41 @@ import javax.servlet.FilterChain;
 
 /**
  * The method used by FacesViews to invoke the FacesServlet.
- * 
+ * <p>
+ * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
+ *
  * @since 1.4
  * @author Arjan Tijms
- *
+ * @see FacesViews
+ * @see FacesViewsForwardingFilter
  */
 public enum FacesServletDispatchMethod {
 
 	/**
-	 * With this method the {@link FacesViewsForwardingFilter} will use a forward to invoke the {@link FacesServlet}. Using this
-	 * method the FacesServlet does not have to be mapped to the (extensionless) requested resource or to everything (/*).
-	 * <p>
-	 * When forwarding any filters being used by the application do have to be taken into account. Filters defined to be run
-	 * <b>AFTER</b> the FacesViewsForwardingFilter will <b>NOT RUN</b> when they are not (also) set to dispatch on FORWARD.
-	 * Filters defined to be run <b>BEFORE</b> the FacesViewsForwardingFilter have to be careful in what they do; forwarding
-	 * is defined to clear the existing response buffer.
-	 * 
-	 */
-	FORWARD,
-	
-	/**
-	 * With this method the {@link FacesViewsForwardingFilter} will use a plain {@link FilterChain#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse)} 
-	 * to invoke the {@link FacesServlet}. Using this method necessitates the FacesServlet to be mapped to the (extensionless) requested 
-	 * resource or to everything (/*). 
+	 * With this method the {@link FacesViewsForwardingFilter} will use a plain
+	 * {@link FilterChain#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse)} to invoke the
+	 * {@link FacesServlet}. Using this method necessitates the FacesServlet to be mapped to the (extensionless)
+	 * requested resource or to everything (/*).
 	 * <p>
 	 * The first method is relatively easy using the Servlet 3.0 programmatic registration, but may be troublesome
-	 * for Servlet 2.5 or manual (declarative) registrations. Mapping the FacesServlet to everything (/*) is not recommenced, and mapping it to a path
-	 * (/somepath/*) with only Facelets views in it pretty much ruins the entire effect of using FacesViews in the first place.
+	 * for Servlet 2.5 or manual (declarative) registrations. Mapping the FacesServlet to everything (/*) is not
+	 * recommenced, and mapping it to a path (/somepath/*) with only Facelets views in it pretty much ruins the entire
+	 * effect of using FacesViews in the first place.
+	 * <p>
+	 * This is the default value.
 	 */
-	DO_FILTER;
-	
+	DO_FILTER,
+
+	/**
+	 * With this method the {@link FacesViewsForwardingFilter} will use a forward to invoke the {@link FacesServlet}.
+	 * Using this method the FacesServlet does not have to be mapped to the (extensionless) requested resource or to
+	 * everything (/*).
+	 * <p>
+	 * When forwarding any filters being used by the application do have to be taken into account. Filters defined to be
+	 * run <b>AFTER</b> the FacesViewsForwardingFilter will <b>NOT RUN</b> when they are not (also) set to dispatch on
+	 * <code>FORWARD</code>. Filters defined to be run <b>BEFORE</b> the FacesViewsForwardingFilter have to be careful
+	 * in what they do; forwarding is defined to clear the existing response buffer.
+	 */
+	FORWARD;
+
 }

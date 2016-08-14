@@ -15,21 +15,34 @@ package org.omnifaces.facesviews;
 /**
  * The action that is done when a Faces Views request with an extension is done.
  * <p>
- * Note that this is only used for views that were discovered via Faces Views. It has
- * no affect on other resources, even if they have the same extension.
+ * Note that this is only used for views that were discovered via Faces Views. It has no affect on other resources, even
+ * if they have the same extension.
+ * <p>
+ * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
  *
  * @author Arjan Tijms
  * @since 1.4
+ * @see FacesViews
+ * @see FacesViewsForwardingFilter
  */
 public enum ExtensionAction {
 
-	/** Send a 404 (not found), makes it look like e.g. "foo.xhtml" never existed and there's only "foo". */
-	SEND_404,
-
-	/** Redirects to the same URL, but with the extension removed. E.g. "/foo.xhtml" is redirected to "/foo". */
+	/**
+	 * Redirects to the same URL, but with the extension removed. E.g. "/foo.xhtml" is redirected to "/foo".
+	 * <p>
+	 * This is the default value.
+	 */
 	REDIRECT_TO_EXTENSIONLESS,
 
-	/** No special action is taken. Both "/foo.xhtml" and "/foo" are processed as-if they were separate views (with same content). */
+	/**
+	 * Send a 404 (not found), makes it look like e.g. "foo.xhtml" never existed and there's only "foo".
+	 */
+	SEND_404,
+
+	/**
+	 * No special action is taken. Both "/foo.xhtml" and "/foo" are processed as-if they were separate views (with same
+	 * content).
+	 */
 	PROCEED;
 
 }

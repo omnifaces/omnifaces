@@ -912,7 +912,7 @@ public final class FacesLocal {
 	 * @see Faces#getRequestPathInfo()
 	 */
 	public static String getRequestPathInfo(FacesContext context) {
-		return context.getExternalContext().getRequestPathInfo();
+		return Servlets.getRequestPathInfo(getRequest(context));
 	}
 
 	/**

@@ -15,7 +15,6 @@ package org.omnifaces.cdi.param;
 import static java.lang.Boolean.parseBoolean;
 import static java.util.Arrays.asList;
 import static javax.faces.validator.BeanValidator.DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME;
-import static org.omnifaces.facesviews.FacesViews.isMultiViewsEnabled;
 import static org.omnifaces.util.Beans.getQualifier;
 import static org.omnifaces.util.Faces.createConverter;
 import static org.omnifaces.util.Faces.createValidator;
@@ -23,10 +22,8 @@ import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getApplication;
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.FacesLocal.getMessageBundle;
-import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestParameterValues;
 import static org.omnifaces.util.FacesLocal.getRequestPathInfo;
-import static org.omnifaces.util.FacesLocal.getServletContext;
 import static org.omnifaces.util.Messages.createError;
 import static org.omnifaces.util.Platform.getBeanValidator;
 import static org.omnifaces.util.Platform.isBeanValidationAvailable;
@@ -65,7 +62,6 @@ import javax.inject.Inject;
 import javax.validation.ConstraintViolation;
 
 import org.omnifaces.cdi.Param;
-import org.omnifaces.facesviews.FacesViews;
 
 /**
  * Producer for a request or path parameter as defined by the <code>&#64;</code>{@link Param} annotation.
@@ -108,8 +104,7 @@ public class ParamProducer {
 	}
 
 	private static String[] getPathParameter(FacesContext context, int pathIndex) {
-		String pathInfo = isMultiViewsEnabled(getServletContext(context))
-			? FacesViews.getPathInfo(getRequest(context)) : getRequestPathInfo(context);
+		String pathInfo = getRequestPathInfo(context);
 
 		if (pathInfo != null) {
 			String[] pathParts = pathInfo.substring(1).split("/");

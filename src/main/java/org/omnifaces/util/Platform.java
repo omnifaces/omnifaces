@@ -19,6 +19,8 @@ import static javax.validation.Validation.buildDefaultValidatorFactory;
 import static org.omnifaces.util.Faces.getApplicationAttribute;
 import static org.omnifaces.util.Faces.setApplicationAttribute;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.logging.Logger;
 
 import javax.faces.webapp.FacesServlet;
@@ -106,6 +108,17 @@ public final class Platform {
 		}
 
 		return facesServletRegistration;
+	}
+
+	/**
+	 * Returns the mappings associated with the {@link FacesServlet}.
+	 * @param servletContext The context to get the {@link FacesServlet} from.
+	 * @return The mappings associated with the {@link FacesServlet}, or an empty set.
+	 * @since 2.5
+	 */
+	public static Collection<String> getFacesServletMappings(ServletContext servletContext) {
+		ServletRegistration facesServlet = getFacesServletRegistration(servletContext);
+		return (facesServlet != null) ? facesServlet.getMappings() : Collections.<String>emptySet();
 	}
 
 }

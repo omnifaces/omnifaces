@@ -14,19 +14,31 @@ package org.omnifaces.facesviews;
 
 /**
  * The action that is done when a request for a public path from which faces views where scanned is done.
+ * <p>
+ * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
  *
  * @author Arjan Tijms
  * @since 1.4
+ * @see FacesViewsForwardingFilter
  */
 public enum PathAction {
 
-	/** Send a 404 (not found), makes it look like e.g. "/path/foo.xhtml" never existed and there's only "/foo" and optionally "/foo.xhtml". */
+	/**
+	 * Send a 404 (not found), makes it look like e.g. "/path/foo.xhtml" never existed and there's only "/foo" and
+	 * optionally "/foo.xhtml".
+	 * <p>
+	 * This is the default value.
+	 */
 	SEND_404,
 
-	/** Redirects to the resource corresponding with the one that was scanned. e.g. "/path/foo.xml" redirects to "/foo". */
+	/**
+	 * Redirects to the resource corresponding with the one that was scanned. e.g. "/path/foo.xml" redirects to "/foo".
+	 */
 	REDIRECT_TO_SCANNED_EXTENSIONLESS,
 
-	/** No special action is taken. "/path/foo.xml" and "/foo" (and potentially "/foo.xhtml") will be accessible. */
+	/**
+	 * No special action is taken. "/path/foo.xml" and "/foo" (and potentially "/foo.xhtml") will be accessible.
+	 */
 	PROCEED;
 
 }
