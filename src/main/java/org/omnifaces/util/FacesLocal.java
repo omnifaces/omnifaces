@@ -18,6 +18,8 @@ import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Reflection.toClassOrNull;
 import static org.omnifaces.util.Servlets.prepareRedirectURL;
+import static org.omnifaces.util.Servlets.toQueryString;
+import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.encodeURI;
 import static org.omnifaces.util.Utils.encodeURL;
 import static org.omnifaces.util.Utils.isAnyEmpty;
@@ -362,6 +364,16 @@ public final class FacesLocal {
 	public static String getViewId(FacesContext context) {
 		UIViewRoot viewRoot = context.getViewRoot();
 		return (viewRoot != null) ? viewRoot.getViewId() : null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Faces#getViewIdWithParameters()
+	 */
+	public static String getViewIdWithParameters(FacesContext context) {
+		String viewId = coalesce(getViewId(context), "");
+		String viewParameters = toQueryString(getViewParameterMap(context));
+		return (viewParameters == null) ? viewId : (viewId + "?" + viewParameters);
 	}
 
 	/**

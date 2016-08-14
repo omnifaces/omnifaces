@@ -560,6 +560,17 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the ID of the current view root with view parameters.
+	 * @return The ID of the current view root with view parameters.
+	 * @see UIViewRoot#getViewId()
+	 * @see ViewMetadata#getViewParameters(UIViewRoot)
+	 * @since 2.5
+	 */
+	public static String getViewIdWithParameters() {
+		return FacesLocal.getViewIdWithParameters(getContext());
+	}
+
+	/**
 	 * Returns the base name of the current view, without extension, or <code>null</code> if there is no view.
 	 * E.g. if the view ID is <code>/path/to/some.xhtml</code>, then this will return <code>some</code>.
 	 * @return The base name of the current view, without extension, or <code>null</code> if there is no view.
