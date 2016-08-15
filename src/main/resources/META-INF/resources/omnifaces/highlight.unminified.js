@@ -52,7 +52,7 @@ OmniFaces.Highlight = (function(Util, document) {
 
 				if (label) {
 					label.className += " " + styleClass;
-					input.setAttribute(DATA_HIGHLIGHT_LABEL, label);
+					input.setAttribute(DATA_HIGHLIGHT_LABEL, true);
 				}
 
 				if (doFocus) {
@@ -60,7 +60,7 @@ OmniFaces.Highlight = (function(Util, document) {
 					doFocus = false;
 				}
 
-				Util.addEventListener(input, "input", removeHighlight);
+				Util.addEventListener(input, "click input", removeHighlight);
 			}
 		}
 	}
@@ -112,7 +112,7 @@ OmniFaces.Highlight = (function(Util, document) {
 	 */
 	function removeHighlight() {
 		var input = this;
-		Util.removeEventListener(input, "input", removeHighlight);
+		Util.removeEventListener(input, "click input", removeHighlight);
 		var styleClass = input.getAttribute(DATA_HIGHLIGHT_CLASS);
 
 		if (styleClass) {

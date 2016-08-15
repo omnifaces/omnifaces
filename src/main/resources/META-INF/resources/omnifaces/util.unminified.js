@@ -24,35 +24,25 @@ OmniFaces.Util = (function(window, document) {
 	var self = {};
 
 	// Public static functions ----------------------------------------------------------------------------------------
-	
+
 	/**
-	 * Add given event listener on the given event to the given element.
+	 * Add given event listener on the given events to the given element.
 	 * @param {HTMLElement} element HTML element to add event listener to.
-	 * @param {string} event The event name.
+	 * @param {string} events Space separated string of event names.
 	 * @param {function} listener The event listener.
 	 */
-	self.addEventListener = function(element, event, listener) {
-		if (element.addEventListener) {
-			element.addEventListener(event, listener);
-		}
-		else if (element.attachEvent) { // IE6-8.
-			element.attachEvent("on" + event, listener);
-		}
+	self.addEventListener = function(element, events, listener) {
+		alterEventListener(element, "addEventListener", "attachEvent", events, listener);
 	}
 
 	/**
-	 * Remove given event listener on the given event from the given element.
+	 * Remove given event listener on the given events from the given element.
 	 * @param {HTMLElement} element HTML element to remove event listener from.
-	 * @param {string} event The event name.
+	 * @param {string} events Space separated string of event names.
 	 * @param {function} listener The event listener.
 	 */
-	self.removeEventListener = function(element, event, listener) {
-		if (element.removeEventListener) {
-			element.removeEventListener(event, listener);
-		}
-		else if (element.detachEvent) { // IE6-8.
-			element.detachEvent("on" + event, listener);
-		}
+	self.removeEventListener = function(element, events, listener) {
+		alterEventListener(element, "removeEventListener", "detachEvent", events, listener);
 	}
 
 	/**
@@ -93,7 +83,7 @@ OmniFaces.Util = (function(window, document) {
 		if (window.myfaces) {
  			decorateFacesSubmit(myfaces.oam, "submitForm", listener); // Decorate MyFaces h:commandLink submit handler to invoke given listener first.
 		}
-		
+
 		if (window.PrimeFaces) {
  			decorateFacesSubmit(PrimeFaces, "addSubmitParam", listener); // Decorate PrimeFaces p:commandLink submit handler to invoke given listener first.
 		}
@@ -107,8 +97,32 @@ OmniFaces.Util = (function(window, document) {
 	self.resolveFunction = function(fn) {
 		return (typeof fn !== "function") && (fn = window[fn] || function(){}), fn;
 	}
-	
+
 	// Private static functions ---------------------------------------------------------------------------------------
+
+	/**
+	 * Alter the given element via the given standard (W3C) and MS (IE6-8) function names to add or remove the given
+	 * event listener on the given events.
+	 * @param {HTMLElement} element HTML element to be altered.
+	 * @param {string} standardFunctionName Standard (W3C) event handler function name to invoke on the given element.
+	 * @param {string} msFunctionName MS (IE6-8) event handler function name to invoke on the given element.
+	 * @param {string} events Space separated string of event names.
+	 * @param {function} listener The event listener to be added or removed on the given element via given functions.
+	 */
+	function alterEventListener(element, standardFunctionName, msFunctionName, events, listener) {
+		var eventParts = events.trim().split(/\s+/);
+
+		for (var i = 0; i < eventParts.length; i++) {
+			var event = eventParts[i];
+
+			if (element[standardFunctionName]) {
+				element[standardFunctionName](event, listener);
+			}
+			else if (element[msFunctionName]) { // IE6-8.
+				element[msFunctionName]("on" + event, listener);
+			}
+		}
+	}
 
 	/**
 	 * Decorate the JavaScript based submit function of the JSF implementation to invoke the given listener first.
