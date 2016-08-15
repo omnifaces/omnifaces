@@ -1,0 +1,9 @@
+language: java
+jdk:
+   - oraclejdk8
+
+deploy:
+   provider: script
+   script: mvn deploy -Dmaven.test.skip -s settings.xml
+   on:
+      branch: develop
