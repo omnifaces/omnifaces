@@ -91,10 +91,18 @@ import org.omnifaces.config.WebXml;
  *     &lt;param-value&gt;/*.xhtml&lt;/param-value&gt;
  * &lt;/context-param&gt;
  * </pre>
+ * <p>
+ * The path pattern <code>/*.xhtml</code> basically means that all files with the <code>.xhtml</code> extension from the
+ * directory <code>/</code> must be scanned, including all sub directories. In case you want to scan only
+ * <code>.xhtml</code> files in the directory <code>/foo</code>, then use path pattern of <code>/foo/*.xhtml</code>
+ * instead. In case you want to scan <em>all</em> files in the directory <code>/foo</code>, then use path pattern of
+ * <code>/foo</code>. You can specify multiple values separated by a comma.
  *
  * <h4>MultiViews configuration</h4>
  * <p>
- * Below is the <code>web.xml</code> configuration which extends the above minimal configuration with MultiViews support:
+ * Enabling MultiViews is a matter of suffixing the path pattern with <code>/*</code>. The support was added in
+ * OmniFaces 2.5. Below is the <code>web.xml</code> configuration which extends the above minimal configuration with
+ * MultiViews support:
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.FACES_VIEWS_SCAN_PATHS&lt;/param-name&gt;
@@ -162,8 +170,8 @@ public final class FacesViews {
 	public static final String FACES_VIEWS_ENABLED_PARAM_NAME = "org.omnifaces.FACES_VIEWS_ENABLED";
 
 	/**
-	 * The name of the CSV context parameter where the value holds a comma separated list of paths that are to be
-	 * scanned by faces views.
+	 * The name of the commaseparated context parameter where the value holds a comma separated list of paths that are
+	 * to be scanned by faces views.
 	 */
 	public static final String FACES_VIEWS_SCAN_PATHS_PARAM_NAME = "org.omnifaces.FACES_VIEWS_SCAN_PATHS";
 
@@ -297,9 +305,9 @@ public final class FacesViews {
 
 				// We now need to map the Faces Servlet to the extensions we found,
 				// but at this point in time this Faces Servlet might not be created yet,
-				// so we do this part in the FacesViews#installFacesServletMappings() method below,
+				// so we do this part in the FacesViews#addFacesServletMappings() method below,
 				// which is called from ApplicationListener#contextInitialized() later.
-            }
+			}
 		}
 	}
 
@@ -635,6 +643,7 @@ public final class FacesViews {
 	 * context parameter value does not equal <code>false</code>.
 	 * @param servletContext The involved servlet context.
 	 * @return Whether FacesViews feature is enabled.
+	 * @since 2.5
 	 */
 	public static boolean isFacesViewsEnabled(ServletContext servletContext) {
 		if (facesViewsEnabled == null) {
@@ -649,6 +658,7 @@ public final class FacesViews {
 	 * <code>org.omnifaces.FACES_VIEWS_SCAN_PATHS</code> context parameter value is suffixed with <code>/*</code>.
 	 * @param servletContext The involved servlet context.
 	 * @return Whether MultiViews feature is enabled.
+	 * @since 2.5
 	 */
 	public static boolean isMultiViewsEnabled(ServletContext servletContext) {
 		if (multiViewsEnabled == null) {

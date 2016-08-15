@@ -143,6 +143,9 @@
  *   private String bar;
  * </pre>
  *
+ * <p>
+ * The support for this feature was added in OmniFaces 2.5 and is not available in older versions.
+ *
  *
  * <h3>Welcome files</h3>
  *

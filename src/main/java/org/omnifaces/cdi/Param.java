@@ -36,7 +36,6 @@ import org.omnifaces.cdi.param.DynamicParamValueProducer;
 import org.omnifaces.cdi.param.ParamExtension;
 import org.omnifaces.cdi.param.ParamProducer;
 import org.omnifaces.cdi.param.ParamValue;
-import org.omnifaces.facesviews.FacesViews;
 import org.omnifaces.util.Utils;
 
 /**
@@ -48,30 +47,36 @@ import org.omnifaces.util.Utils;
  * the injected parameter is directly available during {@link PostConstruct}, allowing a much easier way of processing
  * without the need for a <code>&lt;f:event type="preRenderView"&gt;</code> or <code>&lt;f:viewAction&gt;</code> in the
  * view.
+ *
+ * <h3>Usage</h3>
+ *
+ * <h4>Request parameters</h4>
  * <p>
- * By default the name of the request parameter is taken from the name of the variable into which injection takes place.
  * The example below injects the request parameter with name <code>foo</code>.
  * <pre>
  * &#64;Inject &#64;Param
  * private String foo;
  * </pre>
  * <p>
- * The name can be optionally specified via the <code>name</code> attribute.
- * The example below injects the request parameter with name <code>foo</code> into a variable named <code>bar</code>.
+ * By default the name of the request parameter is taken from the name of the variable into which injection takes place.
+ * The name can be optionally specified via the <code>name</code> attribute. The example below injects the request
+ * parameter with name <code>foo</code> into a variable named <code>bar</code>.
  * <pre>
  * &#64;Inject &#64;Param(name="foo")
  * private String bar;
  * </pre>
  * <p>
  * The <code>name</code> attribute is only mandatory when using constructor injection as there is no information about
- * constructor parameter names.
- * The example below injects the request parameter with name <code>foo</code> as a constructor parameter.
+ * constructor parameter names. The example below injects the request parameter with name <code>foo</code> as a
+ * constructor parameter.
  * <pre>
  * &#64;Inject
  * public Bean(&#64;Param(name="foo") String foo) {
  *     // ...
  * }
  * </pre>
+ *
+ * <h4>Multi-valued request parameters</h4>
  * <p>
  * Multi-valued parameters are also supported by specifying a {@link List} or array type. The support was added in
  * OmniFaces 2.4.
@@ -82,16 +87,21 @@ import org.omnifaces.util.Utils;
  * &#64;Inject &#64;Param(name="bar")
  * private String[] bars;
  * </pre>
+ *
+ * <h4>Path parameters</h4>
  * <p>
- * If {@link FacesViews} is enabled with <code>MultiViews</code> feature, or if an URL rewriting engine is used which
- * supports path parameters, then path parameters can also be injected by specifying the <code>pathIndex</code>
- * attribute representing the zero-based index of the path parameter. This takes precedence over the <code>name</code>
- * attribute. On an example request <code>http://example.com/mypage/firstname.lastname</code>, which is mapped to
- * <code>/mypage.xhtml</code>, the below example injects the path parameter <code>firstname.lastname</code>.
+ * Path parameters can be injected by specifying the <code>pathIndex</code> attribute representing the zero-based index
+ * of the path parameter. The support was added in OmniFaces 2.5. On an example request
+ * <code>http://example.com/mypage/firstname.lastname</code>, which is mapped to <code>/mypage.xhtml</code>, the below
+ * example injects the path parameter <code>firstname.lastname</code>.
  * <pre>
  * &#64;Inject &#64;Param(pathIndex=0)
  * private String user;
  * </pre>
+ * <p>
+ * This takes precedence over the <code>name</code> attribute.
+ *
+ * <h3>Conversion and validation</h3>
  * <p>
  * Standard types for which JSF already has a build in converter like {@link String}, {@link Long}, {@link Boolean}, etc
  * or for which there's already a converter registered via <code>forClass</code>, can be injected without explicitly
@@ -168,6 +178,7 @@ public @interface Param {
 	 * over <code>name</code> attribute.
 	 *
 	 * @return The index of the path parameter.
+	 * @since 2.5
 	 */
 	@Nonbinding	int pathIndex() default -1;
 
