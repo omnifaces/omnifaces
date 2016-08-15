@@ -1275,38 +1275,38 @@ public final class Components {
 	 */
 	@SuppressWarnings("unchecked")
 	public static List<String> getActionExpressionsAndListeners(UIComponent component) {
-        List<String> actions = new ArrayList<>();
+		List<String> actions = new ArrayList<>();
 
-        if (component instanceof ActionSource2) {
-        	ActionSource2 source = (ActionSource2) component;
-        	addExpressionStringIfNotNull(source.getActionExpression(), actions);
+		if (component instanceof ActionSource2) {
+			ActionSource2 source = (ActionSource2) component;
+			addExpressionStringIfNotNull(source.getActionExpression(), actions);
 
-            for (ActionListener actionListener : source.getActionListeners()) {
-            	actions.add(actionListener.getClass().getName());
-            }
-        }
+			for (ActionListener actionListener : source.getActionListeners()) {
+				actions.add(actionListener.getClass().getName());
+			}
+		}
 
-        if (component instanceof ClientBehaviorHolder) {
-            String behaviorEvent = getRequestParameter("javax.faces.behavior.event");
+		if (component instanceof ClientBehaviorHolder) {
+			String behaviorEvent = getRequestParameter("javax.faces.behavior.event");
 
-            if (behaviorEvent != null) {
-            	List<ClientBehavior> behaviors = ((ClientBehaviorHolder) component).getClientBehaviors().get(behaviorEvent);
+			if (behaviorEvent != null) {
+				List<ClientBehavior> behaviors = ((ClientBehaviorHolder) component).getClientBehaviors().get(behaviorEvent);
 
-            	if (behaviors != null) {
-            		for (ClientBehavior behavior : behaviors) {
-            			List<BehaviorListener> listeners = getField(BehaviorBase.class, List.class, behavior);
+				if (behaviors != null) {
+					for (ClientBehavior behavior : behaviors) {
+						List<BehaviorListener> listeners = getField(BehaviorBase.class, List.class, behavior);
 
-            			if (listeners != null) {
-            				for (BehaviorListener listener : listeners) {
-            					addExpressionStringIfNotNull(getField(listener.getClass(), MethodExpression.class, listener), actions);
-            				}
-            			}
-            		}
-            	}
-            }
-        }
+						if (listeners != null) {
+							for (BehaviorListener listener : listeners) {
+								addExpressionStringIfNotNull(getField(listener.getClass(), MethodExpression.class, listener), actions);
+							}
+						}
+					}
+				}
+			}
+		}
 
-        return unmodifiableList(actions);
+		return unmodifiableList(actions);
 	}
 
 	// Hierarchy validation -------------------------------------------------------------------------------------------
@@ -1491,23 +1491,23 @@ public final class Components {
 	 * Get first matching field of given field type from the given class type and get the value from the given instance.
 	 * (this is a rather specific helper for getActionExpressionsAndListeners() and may not work in other cases).
 	 */
-    @SuppressWarnings("unchecked")
+	@SuppressWarnings("unchecked")
 	private static <C, F> F getField(Class<? extends C> classType, Class<F> fieldType, C instance) {
-        for (Field field : classType.getDeclaredFields()) {
-            if (fieldType.isAssignableFrom(field.getType())) {
-                field.setAccessible(true);
+		for (Field field : classType.getDeclaredFields()) {
+			if (fieldType.isAssignableFrom(field.getType())) {
+				field.setAccessible(true);
 
-                try {
-                	return (F) field.get(instance);
+				try {
+					return (F) field.get(instance);
 				}
-                catch (IllegalAccessException e) {
+				catch (IllegalAccessException e) {
 					throw new IllegalStateException(e);
 				}
-            }
-        }
+			}
+		}
 
-        return null;
-    }
+		return null;
+	}
 
 	// Inner classes --------------------------------------------------------------------------------------------------
 
