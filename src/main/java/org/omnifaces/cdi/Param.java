@@ -174,8 +174,8 @@ public @interface Param {
 
 	/**
 	 * (Optional) The index of the path parameter. If specified the parameter will be extracted from the request path
-	 * info on the given index, instead. The first path parameter has an index of <code>0</code>. This takes precedence
-	 * over <code>name</code> attribute.
+	 * info on the given index instead of as request parameter. The first path parameter has an index of <code>0</code>.
+	 * This takes precedence over <code>name</code> attribute.
 	 *
 	 * @return The index of the path parameter.
 	 * @since 2.5
