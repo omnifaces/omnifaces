@@ -243,6 +243,7 @@ public final class FacesViews {
 	private static final String MAPPED_RESOURCES = "org.omnifaces.facesviews.mapped_resources";
 	private static final String REVERSE_MAPPED_RESOURCES = "org.omnifaces.facesviews.reverse_mapped_resources";
 	private static final String ENCOUNTERED_EXTENSIONS = "org.omnifaces.facesviews.encountered_extensions";
+	private static final String MAPPED_WELCOME_FILES = "org.omnifaces.facesviews.mapped_welcome_files";
 
 	private static volatile Boolean facesViewsEnabled;
 	private static volatile Boolean multiViewsEnabled;
@@ -319,6 +320,7 @@ public final class FacesViews {
 	public static void addFacesServletMappings(ServletContext servletContext) {
 		if (isFacesViewsEnabled(servletContext)) {
 			Set<String> encounteredExtensions = getEncounteredExtensions(servletContext);
+			Set<String> mappedWelcomeFiles = new HashSet<>();
 
 			if (!isEmpty(encounteredExtensions)) {
 				Set<String> mappings = new HashSet<>(encounteredExtensions);
@@ -330,7 +332,7 @@ public final class FacesViews {
 						}
 
 						mappings.add(welcomeFile);
-						// TODO: Would be nice if we always permanently redirect exact welcome file request back to its root.
+						mappedWelcomeFiles.add(welcomeFile);
 					}
 				}
 
@@ -351,7 +353,10 @@ public final class FacesViews {
 						}
 					}
 				}
+
 			}
+
+			servletContext.setAttribute(MAPPED_WELCOME_FILES, unmodifiableSet(mappedWelcomeFiles));
 		}
 	}
 
@@ -557,14 +562,9 @@ public final class FacesViews {
 	 * E.g. <code>http://localhost/foo/bar.xhtml?kaz=1</code> becomes <code>http://localhost/foo/bar?kaz=1</code>
 	 */
 	static String getExtensionlessURLWithQuery(HttpServletRequest request, String resource) {
-		String queryString = !isEmpty(request.getQueryString()) ? "?" + request.getQueryString() : "";
+		String queryString = (request.getQueryString() == null) ? "" : ("?" + request.getQueryString());
 		String baseURL = getRequestBaseURL(request);
-
-		if (baseURL.endsWith("/")) {
-			baseURL = baseURL.substring(0, baseURL.length()-1);
-		}
-
-		return baseURL + stripExtension(resource) + queryString;
+		return baseURL.substring(0, baseURL.length() - 1) + stripExtension(resource) + queryString;
 	}
 
 
@@ -635,6 +635,10 @@ public final class FacesViews {
 		return getApplicationAttribute(servletContext, ENCOUNTERED_EXTENSIONS);
 	}
 
+	static Set<String> getMappedWelcomeFiles(ServletContext servletContext) {
+		return getApplicationAttribute(servletContext, MAPPED_WELCOME_FILES);
+	}
+
 
 	// Utility --------------------------------------------------------------------------------------------------------
 
@@ -669,12 +673,34 @@ public final class FacesViews {
 	}
 
 	/**
-	 * Strips the special '/WEB-INF/faces-views' prefix path from the resource if any.
-	 *
+	 * Strips any mapped welcome file prefix path from the given resource.
+	 * @param servletContext The involved servlet context.
+	 * @param resource The resource.
+	 * @return The resource without the welcome file prefix path, or as-is if it didn't start with this prefix.
+	 * @since 2.5
+	 */
+	public static String stripWelcomeFilePrefix(ServletContext servletContext, String resource) {
+		for (String mappedWelcomeFile : getMappedWelcomeFiles(servletContext)) {
+			if (resource.endsWith(mappedWelcomeFile)) {
+				resource = resource.substring(0, resource.length() - mappedWelcomeFile.length());
+
+				if (resource.isEmpty()) {
+					resource = "/";
+				}
+
+				return resource;
+			}
+		}
+
+		return resource;
+	}
+
+	/**
+	 * Strips any special '/WEB-INF/faces-views' prefix path from the given resource.
 	 * @param resource The resource.
 	 * @return The resource without the special prefix path, or as-is if it didn't start with this prefix.
 	 */
-	public static String stripFacesViewsPrefix(final String resource) {
+	public static String stripFacesViewsPrefix(String resource) {
 		return stripPrefixPath(WEB_INF_VIEWS, resource);
 	}
 

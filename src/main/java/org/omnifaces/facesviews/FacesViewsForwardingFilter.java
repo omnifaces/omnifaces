@@ -26,9 +26,11 @@ import static org.omnifaces.facesviews.FacesViews.getReverseMappedResources;
 import static org.omnifaces.facesviews.FacesViews.isMultiViewsEnabled;
 import static org.omnifaces.facesviews.FacesViews.isResourceInPublicPath;
 import static org.omnifaces.facesviews.FacesViews.scanAndStoreViews;
+import static org.omnifaces.facesviews.FacesViews.stripWelcomeFilePrefix;
 import static org.omnifaces.util.Faces.getApplicationFromFactory;
 import static org.omnifaces.util.ResourcePaths.getExtension;
 import static org.omnifaces.util.ResourcePaths.isExtensionless;
+import static org.omnifaces.util.Servlets.getRequestRelativeURI;
 
 import java.io.IOException;
 import java.util.Map;
@@ -111,16 +113,31 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 			return false;
 		}
 
-		boolean multiViews = isMultiViewsEnabled(getServletContext());
-		Map<String, String> resources = getMappedResources(getServletContext());
+		ServletContext servletContext = getServletContext();
+		boolean multiViews = isMultiViewsEnabled(servletContext);
+		Map<String, String> resources = getMappedResources(servletContext);
 		String path = resource + (multiViews ? "/*" : "");
 
 		if (getApplicationFromFactory().getProjectStage() == Development && !resources.containsKey(path)) {
 			// Check if the resource was dynamically added by scanning the faces-views location(s) again.
-			resources = scanAndStoreViews(getServletContext(), false);
+			resources = scanAndStoreViews(servletContext, false);
 		}
 
 		if (resources.containsKey(path)) {
+
+			// Check if a welcome file was explicitly requested.
+			if (getRequestRelativeURI(request).startsWith(resource)) {
+				String normalizedResource = stripWelcomeFilePrefix(servletContext, resource);
+
+				if (!resource.equals(normalizedResource)) {
+
+					// If so, redirect back to parent folder.
+					String queryString = request.getQueryString();
+					redirectPermanent(response, normalizedResource + ((queryString != null) ? "?" + queryString : ""));
+					return true;
+				}
+			}
+
 			String extension = getExtension(resources.get(path));
 
 			switch (dispatchMethod) {
@@ -143,7 +160,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 					// Forward the resource (view) using its original extension, on which the Facelets Servlet
 					// is mapped. Technically it matters most that the Facelets Servlet picks up the
 					// request, and the exact extension or even prefix is perhaps less relevant.
-					RequestDispatcher requestDispatcher = getServletContext().getRequestDispatcher(resource + extension);
+					RequestDispatcher requestDispatcher = servletContext.getRequestDispatcher(resource + extension);
 
 					if (requestDispatcher != null) {
 						requestDispatcher.forward(request, response);

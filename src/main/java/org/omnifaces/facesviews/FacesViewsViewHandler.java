@@ -18,6 +18,7 @@ import static org.omnifaces.facesviews.FacesViews.getFacesServletExtensions;
 import static org.omnifaces.facesviews.FacesViews.getMappedResources;
 import static org.omnifaces.facesviews.FacesViews.getViewHandlerMode;
 import static org.omnifaces.facesviews.FacesViews.isScannedViewsAlwaysExtensionless;
+import static org.omnifaces.facesviews.FacesViews.stripWelcomeFilePrefix;
 import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.FacesLocal.getRequestAttribute;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
@@ -83,7 +84,7 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 				case STRIP_EXTENSION_FROM_PARENT:
 					return removeExtension(servletContext, actionURL, viewId) + pathInfo;
 				case BUILD_WITH_PARENT_QUERY_PARAMETERS:
-					return getRequestContextPath(context) + stripExtension(viewId) + pathInfo + getQueryParameters(actionURL);
+					return getRequestContextPath(context) + stripExtension(viewId) + pathInfo + getQueryString(actionURL);
 			}
 		}
 
@@ -106,33 +107,32 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 		return isExtensionless(originalViewId);
 	}
 
-	private static String removeExtension(ServletContext servletContext, String resource, String viewId) {
+	private static String removeExtension(ServletContext servletContext, String actionURL, String viewId) {
 		Set<String> extensions = getFacesServletExtensions(servletContext);
 
 		if (!isExtensionless(viewId)) {
 			String viewIdExtension = getExtension(viewId);
 
+			// TODO Is this necessary? Which cases does this cover?
 			if (!extensions.contains(viewIdExtension)) {
 				extensions = new HashSet<>(extensions);
 				extensions.add(viewIdExtension);
 			}
 		}
 
-		int lastSlashPos = resource.lastIndexOf('/');
-		int lastQuestionMarkPos = resource.lastIndexOf('?'); // So we don't remove "extension" from parameter value.
+		String queryString = getQueryString(actionURL);
+		String resource = actionURL.split("\\?", 2)[0];
 
 		for (String extension : extensions) {
-			int extensionPos = resource.lastIndexOf(extension);
-
-			if (extensionPos > lastSlashPos && (lastQuestionMarkPos == -1 || extensionPos < lastQuestionMarkPos)) {
-				return resource.substring(0, extensionPos) + resource.substring(extensionPos + extension.length());
+			if (resource.endsWith(extension)) {
+				return stripWelcomeFilePrefix(servletContext, resource.substring(0, resource.length() - extension.length())) + queryString;
 			}
 		}
 
-		return resource;
+		return actionURL;
 	}
 
-	private static String getQueryParameters(String resource) {
+	private static String getQueryString(String resource) {
 		int questionMarkPos = resource.indexOf('?');
 		return (questionMarkPos != -1) ? resource.substring(questionMarkPos) : "";
 	}
