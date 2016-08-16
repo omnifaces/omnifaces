@@ -88,13 +88,13 @@ public class GraphicResource extends DynamicResource {
 		byte[].class
 	};
 
-    private static final AnnotationLiteral<Any> ANY = new AnnotationLiteral<Any>() {
-        private static final long serialVersionUID = 1L;
-    };
+	private static final AnnotationLiteral<Any> ANY = new AnnotationLiteral<Any>() {
+		private static final long serialVersionUID = 1L;
+	};
 
-    private static final String ERROR_MISSING_METHOD =
+	private static final String ERROR_MISSING_METHOD =
 		"@GraphicImageBean bean '%s' must have a method returning an InputStream or byte[].";
-    private static final String ERROR_INVALID_LASTMODIFIED =
+	private static final String ERROR_INVALID_LASTMODIFIED =
 		"o:graphicImage 'lastModified' attribute must be an instance of Long or Date."
 			+ " Encountered an invalid value of '%s'.";
 	private static final String ERROR_INVALID_TYPE =
