@@ -32,7 +32,7 @@ OmniFaces.Util = (function(window, document) {
 	 * @param {function} listener The event listener.
 	 */
 	self.addEventListener = function(element, events, listener) {
-		alterEventListener(element, "addEventListener", "attachEvent", events, listener);
+		handleEventListener(element, "addEventListener", "attachEvent", events, listener);
 	}
 
 	/**
@@ -42,7 +42,7 @@ OmniFaces.Util = (function(window, document) {
 	 * @param {function} listener The event listener.
 	 */
 	self.removeEventListener = function(element, events, listener) {
-		alterEventListener(element, "removeEventListener", "detachEvent", events, listener);
+		handleEventListener(element, "removeEventListener", "detachEvent", events, listener);
 	}
 
 	/**
@@ -54,7 +54,7 @@ OmniFaces.Util = (function(window, document) {
 			setTimeout(listener);
 		}
 		else if (window.addEventListener || window.attachEvent) {
-			OmniFaces.Util.addEventListener(window, "load", listener);
+			self.addEventListener(window, "load", listener);
 		}
 		else if (typeof window.onload === "function") {
 			var oldListener = window.onload;
@@ -70,7 +70,7 @@ OmniFaces.Util = (function(window, document) {
 	 * @param {string} functionName The name of the submit function to decorate.
 	 */
 	self.addSubmitListener = function(listener) {
-		addEventListener(document, "submit", listener); // Invoke given listener on any (propagated!) submit event (e.g. h:commandLink and p:commandButton ajax=false).
+		self.addEventListener(document, "submit", listener); // Invoke given listener on any (propagated!) submit event (e.g. h:commandLink and p:commandButton ajax=false).
 
 		if (window.jsf) {
 			decorateFacesSubmit(jsf.ajax, "request", listener); // Decorate JSF ajax submit handler to invoke given listener first.
@@ -101,7 +101,7 @@ OmniFaces.Util = (function(window, document) {
 	// Private static functions ---------------------------------------------------------------------------------------
 
 	/**
-	 * Alter the given element via the given standard (W3C) and MS (IE6-8) function names to add or remove the given
+	 * Handle the given element via the given standard (W3C) and MS (IE6-8) function names to add or remove the given
 	 * event listener on the given events.
 	 * @param {HTMLElement} element HTML element to be altered.
 	 * @param {string} standardFunctionName Standard (W3C) event handler function name to invoke on the given element.
@@ -109,7 +109,7 @@ OmniFaces.Util = (function(window, document) {
 	 * @param {string} events Space separated string of event names.
 	 * @param {function} listener The event listener to be added or removed on the given element via given functions.
 	 */
-	function alterEventListener(element, standardFunctionName, msFunctionName, events, listener) {
+	function handleEventListener(element, standardFunctionName, msFunctionName, events, listener) {
 		var eventParts = events.trim().split(/\s+/);
 
 		for (var i = 0; i < eventParts.length; i++) {
