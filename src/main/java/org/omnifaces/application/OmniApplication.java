@@ -22,13 +22,18 @@ import static org.omnifaces.util.Faces.getInitParameter;
 
 import java.util.TimeZone;
 
+import javax.el.ValueExpression;
+
 import javax.faces.FacesException;
 import javax.faces.application.Application;
 import javax.faces.application.ApplicationWrapper;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.DateTimeConverter;
 import javax.faces.validator.Validator;
 
+import org.omnifaces.cdi.component.ComponentManager;
 import org.omnifaces.cdi.converter.ConverterManager;
 import org.omnifaces.cdi.validator.ValidatorManager;
 
@@ -52,89 +57,135 @@ import org.omnifaces.cdi.validator.ValidatorManager;
  */
 public class OmniApplication extends ApplicationWrapper {
 
-	// Variables ------------------------------------------------------------------------------------------------------
+    // Variables ------------------------------------------------------------------------------------------------------
 
-	private final Application wrapped;
-	private final ConverterManager converterManager;
-	private final ValidatorManager validatorManager;
-	private final TimeZone dateTimeConverterDefaultTimeZone;
+    private final Application wrapped;
+    private final ConverterManager converterManager;
+    private final ValidatorManager validatorManager;
+    private final ComponentManager componentManager;
+    private final TimeZone dateTimeConverterDefaultTimeZone;
 
-	// Constructors ---------------------------------------------------------------------------------------------------
+    // Constructors ---------------------------------------------------------------------------------------------------
 
-	/**
-	 * Construct a new OmniFaces application around the given wrapped application.
-	 * @param wrapped The wrapped application.
-	 */
-	public OmniApplication(Application wrapped) {
-		this.wrapped = wrapped;
-		converterManager = getReference(ConverterManager.class);
-		validatorManager = getReference(ValidatorManager.class);
+    /**
+     * Construct a new OmniFaces application around the given wrapped application.
+     * @param wrapped The wrapped application.
+     */
+    public OmniApplication(Application wrapped) {
+        this.wrapped = wrapped;
+        converterManager = getReference(ConverterManager.class);
+        validatorManager = getReference(ValidatorManager.class);
+        componentManager = getReference(ComponentManager.class);
 		dateTimeConverterDefaultTimeZone =
 			parseBoolean(getInitParameter(DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE_PARAM_NAME))
 				? TimeZone.getDefault()
 				: null;
-	}
+    }
 
-	// Actions --------------------------------------------------------------------------------------------------------
+    // Actions --------------------------------------------------------------------------------------------------------
 
-	/**
+    /**
 	 * If the there's a CDI managed {@link Converter} instance available, then return it, else delegate to
 	 * {@link #getWrapped()} which may return the JSF managed {@link Converter} instance.
-	 */
-	@Override
-	public Converter createConverter(String converterId) {
-		Converter converter = converterManager.createConverter(getWrapped(), converterId);
+     */
+    @Override
+    public Converter createConverter(String converterId) {
+        Converter converter = converterManager.createConverter(getWrapped(), converterId);
 
-		if (converter != null) {
-			setDefaultPropertiesIfNecessary(converter);
-			return converter;
-		}
+        if (converter != null) {
+            setDefaultPropertiesIfNecessary(converter);
+            return converter;
+        }
 
-		return super.createConverter(converterId);
-	}
+        return super.createConverter(converterId);
+    }
 
-	/**
+    /**
 	 * If the there's a CDI managed {@link Converter} instance available, then return it, else delegate to
 	 * {@link #getWrapped()} which may return the JSF managed {@link Converter} instance.
-	 */
-	@Override
-	public Converter createConverter(Class<?> forClass) {
-		Converter converter = converterManager.createConverter(getWrapped(), forClass);
+     */
+    @Override
+    public Converter createConverter(Class<?> forClass) {
+        Converter converter = converterManager.createConverter(getWrapped(), forClass);
 
-		if (converter != null) {
-			setDefaultPropertiesIfNecessary(converter);
-			return converter;
-		}
+        if (converter != null) {
+            setDefaultPropertiesIfNecessary(converter);
+            return converter;
+        }
 
-		return super.createConverter(forClass);
-	}
+        return super.createConverter(forClass);
+    }
 
-	/**
+    /**
 	 * If the there's a CDI managed {@link Validator} instance available, then return it, else delegate to
 	 * {@link #getWrapped()} which may return the JSF managed {@link Validator} instance.
-	 */
-	@Override
-	public Validator createValidator(String validatorId) throws FacesException {
-		Validator validator = validatorManager.createValidator(getWrapped(), validatorId);
+     */
+    @Override
+    public Validator createValidator(String validatorId) throws FacesException {
+        Validator validator = validatorManager.createValidator(getWrapped(), validatorId);
 
-		if (validator != null) {
-			return validator;
-		}
+        if (validator != null) {
+            return validator;
+        }
 
-		return super.createValidator(validatorId);
-	}
+        return super.createValidator(validatorId);
+    }
 
-	@Override
-	public Application getWrapped() {
-		return wrapped;
-	}
+    @Override
+    public UIComponent createComponent(FacesContext context, String componentType, String rendererType) {
+        UIComponent component = componentManager.createComponent(getWrapped(), context, componentType, rendererType);
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+        if (component != null) {
+            return component;
+        }
 
-	private void setDefaultPropertiesIfNecessary(Converter converter) {
-		if (converter instanceof DateTimeConverter && dateTimeConverterDefaultTimeZone != null) {
-			((DateTimeConverter) converter).setTimeZone(dateTimeConverterDefaultTimeZone);
-		}
-	}
+        return super.createComponent(context, componentType, rendererType);
+    }
+
+    @Override
+    public UIComponent createComponent(String componentType) throws FacesException {
+        UIComponent component = componentManager.createComponent(getWrapped(), componentType);
+
+        if (component != null) {
+            return component;
+        }
+
+        return super.createComponent(componentType);
+    }
+
+    @Override
+    public UIComponent createComponent(ValueExpression componentExpression, FacesContext context, String componentType, String rendererType) {
+        UIComponent component = componentManager.createComponent(getWrapped(), componentExpression, context, componentType, rendererType);
+
+        if (component != null) {
+            return component;
+        }
+
+        return super.createComponent(componentExpression, context, componentType, rendererType);
+    }
+
+    @Override
+    public UIComponent createComponent(ValueExpression componentExpression, FacesContext context, String componentType) throws FacesException {
+        UIComponent component = componentManager.createComponent(getWrapped(), componentExpression, context, componentType);
+
+        if (component != null) {
+            return component;
+        }
+
+        return super.createComponent(componentExpression, context, componentType);
+    }
+
+    @Override
+    public Application getWrapped() {
+        return wrapped;
+    }
+
+    // Helpers --------------------------------------------------------------------------------------------------------
+
+    private void setDefaultPropertiesIfNecessary(Converter converter) {
+        if (converter instanceof DateTimeConverter && dateTimeConverterDefaultTimeZone != null) {
+            ((DateTimeConverter) converter).setTimeZone(dateTimeConverterDefaultTimeZone);
+        }
+    }
 
 }
