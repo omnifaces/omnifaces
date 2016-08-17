@@ -66,15 +66,11 @@ OmniFaces.Util = (function(window, document) {
 	}
 
 	/**
-	 * Add submit listener to the document and all JSF submit handler functions.
-	 * @param {string} functionName The name of the submit function to decorate.
+	 * Add submit listener to the document and all synchronous JSF submit handler functions.
+	 * @param {function} listener The listener to invoke before the (synchronous) submit.
 	 */
 	self.addSubmitListener = function(listener) {
 		self.addEventListener(document, "submit", listener); // Invoke given listener on any (propagated!) submit event (e.g. h:commandLink and p:commandButton ajax=false).
-
-		if (window.jsf) {
-			decorateFacesSubmit(jsf.ajax, "request", listener); // Decorate JSF ajax submit handler to invoke given listener first.
-		}
 
 		if (window.mojarra) {
 			decorateFacesSubmit(mojarra, "jsfcljs", listener); // Decorate Mojarra h:commandLink submit handler to invoke given listener first.
@@ -85,7 +81,7 @@ OmniFaces.Util = (function(window, document) {
 		}
 
 		if (window.PrimeFaces) {
- 			decorateFacesSubmit(PrimeFaces, "addSubmitParam", listener); // Decorate PrimeFaces p:commandLink submit handler to invoke given listener first.
+ 			decorateFacesSubmit(PrimeFaces, "addSubmitParam", listener); // Decorate PrimeFaces p:commandLink ajax=false submit handler to invoke given listener first.
 		}
 	}
 
