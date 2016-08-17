@@ -47,19 +47,19 @@ public class ViewScopedITBean implements Serializable {
 		return getViewId();
 	}
 
-    public void rebuild() {
+	public void rebuild() {
 		addGlobalInfo("rebuild");
-    	setViewRoot(getViewId());
-    }
+		setViewRoot(getViewId());
+	}
 
-    @PreDestroy
-    public void destroy() {
-    	if (hasContext() && isUnloadRequest(getContext())) {
-    		unloaded = true;
-    	}
-    	else {
-    		destroyed = true;
-    	}
-    }
+	@PreDestroy
+	public void destroy() {
+		if (hasContext() && isUnloadRequest(getContext())) {
+			unloaded = true;
+		}
+		else {
+			destroyed = true;
+		}
+	}
 
 }

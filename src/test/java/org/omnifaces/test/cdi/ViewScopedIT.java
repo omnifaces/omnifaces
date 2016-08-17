@@ -28,37 +28,37 @@ public class ViewScopedIT {
 	@Drone
 	private WebDriver browser;
 
-    @ArquillianResource
-    private URL contextPath;
+	@ArquillianResource
+	private URL contextPath;
 
-    @FindBy(id="bean")
-    private WebElement bean;
+	@FindBy(id="bean")
+	private WebElement bean;
 
-    @FindBy(id="messages")
-    private WebElement messages;
+	@FindBy(id="messages")
+	private WebElement messages;
 
-    @FindBy(id="refresh")
-    private WebElement refresh;
+	@FindBy(id="refresh")
+	private WebElement refresh;
 
-    @FindBy(id="non-ajax:submit")
-    private WebElement nonAjaxSubmit;
+	@FindBy(id="non-ajax:submit")
+	private WebElement nonAjaxSubmit;
 
-    @FindBy(id="non-ajax:navigate")
-    private WebElement nonAjaxNavigate;
+	@FindBy(id="non-ajax:navigate")
+	private WebElement nonAjaxNavigate;
 
-    @FindBy(id="non-ajax:rebuild")
-    private WebElement nonAjaxRebuild;
+	@FindBy(id="non-ajax:rebuild")
+	private WebElement nonAjaxRebuild;
 
-    @FindBy(id="ajax:submit")
-    private WebElement ajaxSubmit;
+	@FindBy(id="ajax:submit")
+	private WebElement ajaxSubmit;
 
-    @FindBy(id="ajax:navigate")
-    private WebElement ajaxNavigate;
+	@FindBy(id="ajax:navigate")
+	private WebElement ajaxNavigate;
 
-    @FindBy(id="ajax:rebuild")
-    private WebElement ajaxRebuild;
+	@FindBy(id="ajax:rebuild")
+	private WebElement ajaxRebuild;
 
-    @Deployment(testable = false)
+	@Deployment(testable = false)
 	public static Archive<?> createDeployment() {
 		return create(WebArchive.class, "ViewScopedIT.war")
 			.addClass(ViewScopedITBean.class)
@@ -68,7 +68,7 @@ public class ViewScopedIT {
 			.addAsLibrary(new File("target/" + System.getProperty("finalName") + ".jar"));
 	}
 
-    @Test
+	@Test
 	public void test(String formId) {
 		browser.get(contextPath + "ViewScopedIT.xhtml");
 		assertEquals("init", messages.getText());
@@ -125,6 +125,6 @@ public class ViewScopedIT {
 		guardHttp(refresh).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
 		assertEquals("unload init", messages.getText());
-    }
+	}
 
 }
