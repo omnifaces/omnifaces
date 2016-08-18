@@ -58,18 +58,18 @@ public class ViewScopedIT {
 	@FindBy(id="ajax:rebuild")
 	private WebElement ajaxRebuild;
 
-	@Deployment(testable = false)
+	@Deployment(testable=false)
 	public static Archive<?> createDeployment() {
 		return create(WebArchive.class, "ViewScopedIT.war")
 			.addClass(ViewScopedITBean.class)
 			.addAsWebResource("cdi/ViewScopedIT.xhtml")
 			.addAsWebInfResource(INSTANCE, "beans.xml")
 			.setWebXML("web.xml")
-			.addAsLibrary(new File("target/" + System.getProperty("finalName") + ".jar"));
+			.addAsLibrary(new File("target/" + System.getProperty("omnifaces.jar")));
 	}
 
 	@Test
-	public void test(String formId) {
+	public void test() {
 		browser.get(contextPath + "ViewScopedIT.xhtml");
 		assertEquals("init", messages.getText());
 		String previousBean = bean.getText();

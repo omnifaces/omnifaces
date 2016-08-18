@@ -58,11 +58,15 @@
 	</distributionManagement>
 
 	<properties>
+		<javase.version>1.7</javase.version>
+		<javadoc.version>1.8</javadoc.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<maven.compiler.source>1.7</maven.compiler.source>
-		<maven.compiler.target>1.7</maven.compiler.target>
+		<maven.compiler.source>${javase.version}</maven.compiler.source>
+		<maven.compiler.target>${javase.version}</maven.compiler.target>
 		<maven.source.excludeResources>true</maven.source.excludeResources>
+		<test.wildfly.version>10.0.0.Final</test.wildfly.version>
+		<test.tomee.version>7.0.1</test.tomee.version>
 	</properties>
 
 	<dependencies>
@@ -273,7 +277,7 @@
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>2.10.4</version>
 				<configuration>
-					<javadocVersion>1.8</javadocVersion>
+					<javadocVersion>${javadoc.version}</javadocVersion>
 					<notimestamp>true</notimestamp>
 					<splitindex>true</splitindex>
 					<doctitle>OmniFaces API documentation</doctitle>
@@ -356,7 +360,6 @@
 					<groupId>org.wildfly.arquillian</groupId>
 					<artifactId>wildfly-arquillian-container-managed</artifactId>
 					<version>2.0.0.Final</version>
-					<scope>test</scope>
 				</dependency>
 			</dependencies>
 			<build>
@@ -377,7 +380,7 @@
 										<artifactItem>
 											<groupId>org.wildfly</groupId>
 											<artifactId>wildfly-dist</artifactId>
-											<version>10.0.0.Final</version>
+											<version>${test.wildfly.version}</version>
 											<type>zip</type>
 											<overWrite>false</overWrite>
 											<outputDirectory>${project.build.directory}</outputDirectory>
@@ -401,10 +404,46 @@
 						</executions>
 						<configuration>
 							<systemPropertyVariables>
-								<finalName>${project.build.finalName}</finalName>
+								<omnifaces.jar>${project.build.finalName}.jar</omnifaces.jar>
+								<jboss.home>${project.build.directory}/wildfly-${test.wildfly.version}</jboss.home>
 								<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
 							</systemPropertyVariables>
-							<redirectTestOutputToFile>false</redirectTestOutputToFile>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!-- TomEE test profile. -->
+		<profile>
+			<id>tomee</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.apache.tomee</groupId>
+					<artifactId>arquillian-tomee-remote</artifactId>
+					<version>${test.tomee.version}</version>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<version>2.19.1</version>
+						<executions>
+							<execution>
+								<goals>
+									<goal>integration-test</goal>
+									<goal>verify</goal>
+								</goals>
+							</execution>
+						</executions>
+						<configuration>
+							<systemPropertyVariables>
+								<omnifaces.jar>${project.build.finalName}.jar</omnifaces.jar>
+								<tomee.version>${test.tomee.version}</tomee.version>
+								<tomee.classifier>webprofile</tomee.classifier>
+							</systemPropertyVariables>
 						</configuration>
 					</plugin>
 				</plugins>

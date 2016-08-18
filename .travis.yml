@@ -1,15 +1,17 @@
 language: java
-
 jdk:
    - oraclejdk8
 
+# Do integration test on configured servers.
 env:
-   - SERVER=wildfly
-
+   - SERVER = wildfly
+   - SERVER = tomee
 script: mvn verify -P $SERVER
 
+# Do snapshot deployment.
 deploy:
    provider: script
    script: mvn deploy -Dmaven.test.skip -s settings.xml
    on:
       branch: develop
+      condition: $SERVER = wildfly

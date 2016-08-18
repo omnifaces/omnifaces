@@ -27,28 +27,28 @@ public class ViewScopedITBean implements Serializable {
 	@PostConstruct
 	public void init() {
 		if (unloaded) {
-			addGlobalInfo("unload");
+			addGlobalInfo("unload ");
 			unloaded = false;
 		}
 		else if (destroyed) {
-			addGlobalInfo("destroy");
+			addGlobalInfo("destroy ");
 			destroyed = false;
 		}
 
-		addGlobalInfo("init");
+		addGlobalInfo("init ");
 	}
 
 	public void submit() {
-		addGlobalInfo("submit");
+		addGlobalInfo("submit ");
 	}
 
 	public String navigate() {
-		addGlobalInfo("navigate");
+		addGlobalInfo("navigate ");
 		return getViewId();
 	}
 
 	public void rebuild() {
-		addGlobalInfo("rebuild");
+		addGlobalInfo("rebuild ");
 		setViewRoot(getViewId());
 	}
 
