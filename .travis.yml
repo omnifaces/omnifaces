@@ -1,11 +1,12 @@
 language: java
+
 jdk:
    - oraclejdk8
 
 env:
-   - SERVER = test-wildfly
+   - SERVER=wildfly
 
-script: mvn verify -P $SERVER
+script: mvn verify -P test-$SERVER
 
 deploy:
    provider: script
