@@ -16,7 +16,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jboss.org/schema/arquillian http://jboss.org/schema/arquillian/arquillian_1_0.xsd"
 >
-	<container qualifier="test-wildfly" default="true">
+	<container qualifier="wildfly" default="true">
 		<configuration>
 			<property name="jbossHome">target/wildfly-10.0.0.Final/</property>
 		</configuration>

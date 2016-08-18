@@ -347,7 +347,7 @@
 
 		<!-- WildFly test profile. -->
 		<profile>
-			<id>test-wildfly</id>
+			<id>wildfly</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>

@@ -6,7 +6,7 @@ jdk:
 env:
    - SERVER=wildfly
 
-script: mvn verify -P test-$SERVER
+script: mvn verify -P $SERVER
 
 deploy:
    provider: script
