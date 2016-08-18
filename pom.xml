@@ -341,6 +341,9 @@
 	</build>
 
 	<profiles>
+		<!-- NOTE: If Eclipse shows "Plugin execution not covered by lifecycle configuration" error on below section -->
+		<!-- then you need to add a default lifecycle mapping as instructed in M2E documentation linked below:       -->
+		<!-- https://www.eclipse.org/m2e/documentation/m2e-execution-not-covered.html#common-problems                -->
 
 		<!-- WildFly test profile. -->
 		<profile>
