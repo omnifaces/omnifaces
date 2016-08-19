@@ -2,34 +2,22 @@ package org.omnifaces.test.cdi;
 
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.guardHttp;
-import static org.jboss.shrinkwrap.api.ShrinkWrap.create;
-import static org.jboss.shrinkwrap.api.asset.EmptyAsset.INSTANCE;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-
-import java.io.File;
-import java.net.URL;
+import static org.omnifaces.test.OmniFacesIT.ArchiveBuilder.createWebArchive;
 
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.arquillian.test.api.ArquillianResource;
-import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.arquillian.junit.InSequence;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.openqa.selenium.WebDriver;
+import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
 @RunWith(Arquillian.class)
-public class ViewScopedIT {
-
-	@Drone
-	private WebDriver browser;
-
-	@ArquillianResource
-	private URL contextPath;
+public class ViewScopedIT extends OmniFacesIT {
 
 	@FindBy(id="bean")
 	private WebElement bean;
@@ -59,18 +47,12 @@ public class ViewScopedIT {
 	private WebElement ajaxRebuild;
 
 	@Deployment(testable=false)
-	public static Archive<?> createDeployment() {
-		return create(WebArchive.class, "ViewScopedIT.war")
-			.addClass(ViewScopedITBean.class)
-			.addAsWebResource("cdi/ViewScopedIT.xhtml")
-			.addAsWebInfResource(INSTANCE, "beans.xml")
-			.setWebXML("web.xml")
-			.addAsLibrary(new File("target/" + System.getProperty("omnifaces.jar")));
+	public static WebArchive createDeployment() {
+		return createWebArchive(ViewScopedIT.class);
 	}
 
-	@Test
-	public void test() {
-		browser.get(contextPath + "ViewScopedIT.xhtml");
+	@Test @InSequence(1)
+	public void nonAjax() {
 		assertEquals("init", messages.getText());
 		String previousBean = bean.getText();
 
@@ -90,17 +72,15 @@ public class ViewScopedIT {
 		assertEquals(previousBean, previousBean = bean.getText());
 		assertEquals("submit", messages.getText());
 
-		guardHttp(nonAjaxRebuild).click();
-		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("rebuild destroy init", messages.getText());
-
-		guardHttp(nonAjaxSubmit).click();
-		assertEquals(previousBean, previousBean = bean.getText());
-		assertEquals("submit", messages.getText());
-
 		guardHttp(refresh).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
 		assertEquals(messages.getText(), "unload init");
+	}
+
+	@Test @InSequence(2)
+	public void ajax() {
+		assertEquals("unload init", messages.getText());
+		String previousBean = bean.getText();
 
 		guardAjax(ajaxSubmit).click();
 		assertEquals(previousBean, previousBean = bean.getText());
@@ -109,14 +89,6 @@ public class ViewScopedIT {
 		guardAjax(ajaxNavigate).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
 		assertEquals("navigate destroy init", messages.getText());
-
-		guardAjax(ajaxSubmit).click();
-		assertEquals(previousBean, previousBean = bean.getText());
-		assertEquals("submit", messages.getText());
-
-		guardAjax(ajaxRebuild).click();
-		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals("rebuild destroy init", messages.getText());
 
 		guardAjax(ajaxSubmit).click();
 		assertEquals(previousBean, previousBean = bean.getText());

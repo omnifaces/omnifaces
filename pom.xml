@@ -65,6 +65,7 @@
 		<maven.compiler.source>${javase.version}</maven.compiler.source>
 		<maven.compiler.target>${javase.version}</maven.compiler.target>
 		<maven.source.excludeResources>true</maven.source.excludeResources>
+		<omnifaces.jar>${project.build.directory}/${project.build.finalName}.jar</omnifaces.jar>
 		<test.wildfly.version>10.0.0.Final</test.wildfly.version>
 		<test.tomee.version>7.0.1</test.tomee.version>
 	</properties>
@@ -404,7 +405,7 @@
 						</executions>
 						<configuration>
 							<systemPropertyVariables>
-								<omnifaces.jar>${project.build.finalName}.jar</omnifaces.jar>
+								<omnifaces.jar>${omnifaces.jar}</omnifaces.jar>
 								<jboss.home>${project.build.directory}/wildfly-${test.wildfly.version}</jboss.home>
 								<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
 							</systemPropertyVariables>
@@ -440,7 +441,7 @@
 						</executions>
 						<configuration>
 							<systemPropertyVariables>
-								<omnifaces.jar>${project.build.finalName}.jar</omnifaces.jar>
+								<omnifaces.jar>${omnifaces.jar}</omnifaces.jar>
 								<tomee.version>${test.tomee.version}</tomee.version>
 								<tomee.classifier>webprofile</tomee.classifier>
 							</systemPropertyVariables>
