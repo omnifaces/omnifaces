@@ -14,4 +14,4 @@ deploy:
    script: mvn deploy -Dmaven.test.skip -s settings.xml
    on:
       branch: develop
-      condition: $SERVER=wildfly
+      condition: "$SERVER = wildfly"
