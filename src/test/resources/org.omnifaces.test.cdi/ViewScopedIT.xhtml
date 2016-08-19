@@ -15,19 +15,17 @@
 			<h:messages id="messages" globalOnly="true" />
 		</h:panelGroup>
 
-		<h:button id="refresh" />
+		<h:button id="unload" />
 
 		<h:form id="non-ajax">
 			<h:commandButton id="submit" action="#{viewScopedITBean.submit}" />
 			<h:commandButton id="navigate" action="#{viewScopedITBean.navigate}" />
-			<h:commandButton id="rebuild" action="#{viewScopedITBean.rebuild}" />
 		</h:form>
 
 		<h:form id="ajax">
 			<f:ajax render=":results">
 				<h:commandButton id="submit" action="#{viewScopedITBean.submit}" />
 				<h:commandButton id="navigate" action="#{viewScopedITBean.navigate}" />
-				<h:commandButton id="rebuild" action="#{viewScopedITBean.rebuild}" />
 			</f:ajax>
 		</h:form>
 	</h:body>

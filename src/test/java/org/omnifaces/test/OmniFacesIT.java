@@ -34,12 +34,12 @@ public abstract class OmniFacesIT {
 		private boolean facesConfigSet;
 		private boolean webXmlSet;
 
-		public static <T extends OmniFacesIT> ArchiveBuilder buildWebArchive(Class<T> testClass) {
-			return new ArchiveBuilder(testClass);
-		}
-
 		public static <T extends OmniFacesIT> WebArchive createWebArchive(Class<T> testClass) {
 			return buildWebArchive(testClass).createDeployment();
+		}
+
+		public static <T extends OmniFacesIT> ArchiveBuilder buildWebArchive(Class<T> testClass) {
+			return new ArchiveBuilder(testClass);
 		}
 
 		private <T extends OmniFacesIT> ArchiveBuilder(Class<T> testClass) {

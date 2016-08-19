@@ -25,8 +25,8 @@ public class ViewScopedIT extends OmniFacesIT {
 	@FindBy(id="messages")
 	private WebElement messages;
 
-	@FindBy(id="refresh")
-	private WebElement refresh;
+	@FindBy(id="unload")
+	private WebElement unload;
 
 	@FindBy(id="non-ajax:submit")
 	private WebElement nonAjaxSubmit;
@@ -34,17 +34,11 @@ public class ViewScopedIT extends OmniFacesIT {
 	@FindBy(id="non-ajax:navigate")
 	private WebElement nonAjaxNavigate;
 
-	@FindBy(id="non-ajax:rebuild")
-	private WebElement nonAjaxRebuild;
-
 	@FindBy(id="ajax:submit")
 	private WebElement ajaxSubmit;
 
 	@FindBy(id="ajax:navigate")
 	private WebElement ajaxNavigate;
-
-	@FindBy(id="ajax:rebuild")
-	private WebElement ajaxRebuild;
 
 	@Deployment(testable=false)
 	public static WebArchive createDeployment() {
@@ -56,10 +50,33 @@ public class ViewScopedIT extends OmniFacesIT {
 		assertEquals("init", messages.getText());
 		String previousBean = bean.getText();
 
-		guardHttp(refresh).click();
+		// Unload.
+		guardHttp(unload).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
 		assertEquals("unload init", messages.getText());
 
+
+		// Submit then unload.
+		guardHttp(nonAjaxSubmit).click();
+		assertEquals(previousBean, previousBean = bean.getText());
+		assertEquals("submit", messages.getText());
+
+		guardHttp(unload).click();
+		assertNotEquals(previousBean, previousBean = bean.getText());
+		assertEquals("unload init", messages.getText());
+
+
+		// Navigate then unload.
+		guardHttp(nonAjaxNavigate).click();
+		assertNotEquals(previousBean, previousBean = bean.getText());
+		assertEquals("navigate destroy init", messages.getText());
+
+		guardHttp(unload).click();
+		assertNotEquals(previousBean, previousBean = bean.getText());
+		assertEquals("unload init", messages.getText());
+
+
+		// Submit then navigate then unload.
 		guardHttp(nonAjaxSubmit).click();
 		assertEquals(previousBean, previousBean = bean.getText());
 		assertEquals("submit", messages.getText());
@@ -68,20 +85,54 @@ public class ViewScopedIT extends OmniFacesIT {
 		assertNotEquals(previousBean, previousBean = bean.getText());
 		assertEquals("navigate destroy init", messages.getText());
 
+		guardHttp(unload).click();
+		assertNotEquals(previousBean, previousBean = bean.getText());
+		assertEquals(messages.getText(), "unload init");
+
+
+		// Navigate then submit then unload.
+		guardHttp(nonAjaxNavigate).click();
+		assertNotEquals(previousBean, previousBean = bean.getText());
+		assertEquals("navigate destroy init", messages.getText());
+
 		guardHttp(nonAjaxSubmit).click();
 		assertEquals(previousBean, previousBean = bean.getText());
 		assertEquals("submit", messages.getText());
 
-		guardHttp(refresh).click();
+		guardHttp(unload).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
 		assertEquals(messages.getText(), "unload init");
 	}
 
 	@Test @InSequence(2)
 	public void ajax() {
+
+		// Unloaded bean is from previous test.
 		assertEquals("unload init", messages.getText());
 		String previousBean = bean.getText();
 
+
+		// Submit then unload.
+		guardAjax(ajaxSubmit).click();
+		assertEquals(previousBean, previousBean = bean.getText());
+		assertEquals("submit", messages.getText());
+
+		guardHttp(unload).click();
+		assertNotEquals(previousBean, previousBean = bean.getText());
+		assertEquals("unload init", messages.getText());
+
+
+		// Navigate then unload.
+		guardAjax(ajaxNavigate).click();
+		assertNotEquals(previousBean, previousBean = bean.getText());
+		assertEquals("navigate destroy init", messages.getText());
+
+		guardHttp(unload).click();
+		assertNotEquals(previousBean, previousBean = bean.getText());
+		assertEquals("unload init", messages.getText());
+
+
+		// Submit then navigate then unload.
 		guardAjax(ajaxSubmit).click();
 		assertEquals(previousBean, previousBean = bean.getText());
 		assertEquals("submit", messages.getText());
@@ -90,11 +141,21 @@ public class ViewScopedIT extends OmniFacesIT {
 		assertNotEquals(previousBean, previousBean = bean.getText());
 		assertEquals("navigate destroy init", messages.getText());
 
+		guardHttp(unload).click();
+		assertNotEquals(previousBean, previousBean = bean.getText());
+		assertEquals("unload init", messages.getText());
+
+
+		// Navigate then submit then unload.
+		guardAjax(ajaxNavigate).click();
+		assertNotEquals(previousBean, previousBean = bean.getText());
+		assertEquals("navigate destroy init", messages.getText());
+
 		guardAjax(ajaxSubmit).click();
 		assertEquals(previousBean, previousBean = bean.getText());
 		assertEquals("submit", messages.getText());
 
-		guardHttp(refresh).click();
+		guardHttp(unload).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
 		assertEquals("unload init", messages.getText());
 	}

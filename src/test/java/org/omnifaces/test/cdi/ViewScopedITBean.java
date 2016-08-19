@@ -4,7 +4,6 @@ import static org.omnifaces.cdi.viewscope.ViewScopeManager.isUnloadRequest;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getViewId;
 import static org.omnifaces.util.Faces.hasContext;
-import static org.omnifaces.util.Faces.setViewRoot;
 import static org.omnifaces.util.Messages.addGlobalInfo;
 
 import java.io.Serializable;
@@ -45,11 +44,6 @@ public class ViewScopedITBean implements Serializable {
 	public String navigate() {
 		addGlobalInfo("navigate ");
 		return getViewId();
-	}
-
-	public void rebuild() {
-		addGlobalInfo("rebuild ");
-		setViewRoot(getViewId());
 	}
 
 	@PreDestroy
