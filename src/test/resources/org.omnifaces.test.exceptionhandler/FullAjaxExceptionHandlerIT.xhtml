@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:o="http://omnifaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions"
+>
+	<h:head />
+
+	<h:body>
+		<h:form id="form">
+			<h:commandButton id="throwDuringInvokeApplication" action="#{fullAjaxExceptionHandlerITBean.throwDuringInvokeApplication}">
+				<f:ajax />
+			</h:commandButton>
+
+			<h:inputText id="input" value="#{fullAjaxExceptionHandlerITBean.throwDuringUpdateModelValues}" />
+			<h:commandButton id="throwDuringUpdateModelValues">
+				<f:ajax execute="input" />
+			</h:commandButton>
+
+			<h:commandButton id="throwDuringRenderResponse">
+				<f:ajax render="output" />
+			</h:commandButton>
+			<h:panelGroup id="output">
+				 <h:outputText value="#{fullAjaxExceptionHandlerITBean.throwDuringRenderResponse}" rendered="#{facesContext.postback}" />
+			</h:panelGroup>
+		</h:form>
+	</h:body>
+</html>
