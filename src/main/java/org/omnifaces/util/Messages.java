@@ -141,7 +141,7 @@ public final class Messages {
 
 		@Override
 		public String getMessage(String message, Object... params) {
-			return MessageFormat.format(message, params);
+			return Utils.isEmpty(params) ? message : MessageFormat.format(message, params);
 		}
 
 	};
