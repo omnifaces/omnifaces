@@ -8,7 +8,7 @@ import static org.omnifaces.test.OmniFacesIT.WebXml.withErrorPage;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.Archive;
+import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.omnifaces.test.OmniFacesIT;
@@ -31,7 +31,7 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	private WebElement throwDuringRenderResponse;
 
 	@Deployment(testable=false)
-	public static Archive<?> createDeployment() {
+	public static WebArchive createDeployment() {
 		return buildWebArchive(FullAjaxExceptionHandlerIT.class)
 			.withFacesConfig(withFullAjaxExceptionHandler)
 			.withWebXml(withErrorPage)
