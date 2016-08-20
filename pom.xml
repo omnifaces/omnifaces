@@ -170,11 +170,34 @@
 					<exclude>**/*.unminified.js</exclude>
 					<exclude>**/*.jsfdia</exclude>
 				</excludes>
-				<filtering>false</filtering>
 			</resource>
 		</resources>
 
 		<plugins>
+
+			<!-- Add missing license headers to source files. -->
+			<plugin>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>2.11</version>
+				<configuration>
+					<header>license.txt</header>
+					<excludes>
+						<exclude>*.*</exclude>
+					</excludes>
+					<mapping>
+						<java>SLASHSTAR_STYLE</java>
+					</mapping>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>format</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 
 			<!-- Configure the JavaScript minifier. -->
 			<plugin>
@@ -312,7 +335,7 @@
 		<pluginManagement>
 			<plugins>
 
-				<!-- Make sure Eclipse itself also runs minify during build. -->
+				<!-- Make sure Eclipse itself also runs license format and JavaScript minifier during build. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
 					<artifactId>lifecycle-mapping</artifactId>
@@ -320,6 +343,21 @@
 					<configuration>
 						<lifecycleMappingMetadata>
 							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>com.mycila</groupId>
+										<artifactId>license-maven-plugin</artifactId>
+										<versionRange>[2.11,)</versionRange>
+										<goals>
+											<goal>format</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute>
+											<runOnConfiguration>true</runOnConfiguration>
+										</execute>
+									</action>
+								</pluginExecution>
 								<pluginExecution>
 									<pluginExecutionFilter>
 										<groupId>com.samaxes.maven</groupId>
@@ -331,7 +369,6 @@
 									</pluginExecutionFilter>
 									<action>
 										<execute>
-											<runOnIncremental>false</runOnIncremental>
 											<runOnConfiguration>true</runOnConfiguration>
 										</execute>
 									</action>
