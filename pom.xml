@@ -65,7 +65,6 @@
 		<maven.compiler.source>${javase.version}</maven.compiler.source>
 		<maven.compiler.target>${javase.version}</maven.compiler.target>
 		<maven.source.excludeResources>true</maven.source.excludeResources>
-		<omnifaces.jar>${project.build.directory}/${project.build.finalName}.jar</omnifaces.jar>
 		<test.wildfly.version>10.0.0.Final</test.wildfly.version>
 		<test.tomee.version>7.0.1</test.tomee.version>
 	</properties>
@@ -296,7 +295,7 @@
 				</executions>
 			</plugin>
 
-			<!-- Configure deployment to Sonatype's Nexus. Snapshot deploy: mvn clean deploy -->
+			<!-- Configure snapshot deployment to Sonatype. -->
 			<plugin>
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>nexus-staging-maven-plugin</artifactId>
@@ -341,6 +340,34 @@
 						</lifecycleMappingMetadata>
 					</configuration>
 				</plugin>
+
+				<!-- Global configuration for integration test profiles. -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<version>2.19.1</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>integration-test</goal>
+								<goal>verify</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<systemPropertyVariables>
+							<omnifaces.jar>${project.build.directory}/${project.build.finalName}.jar</omnifaces.jar>
+
+							<!-- For Wildfly integration test profile. -->
+							<jboss.home>${project.build.directory}/wildfly-${test.wildfly.version}</jboss.home>
+							<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+
+							<!-- For TomEE integration test profile. -->
+							<tomee.version>${test.tomee.version}</tomee.version>
+							<tomee.classifier>webprofile</tomee.classifier>
+						</systemPropertyVariables>
+					</configuration>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
@@ -350,7 +377,7 @@
 		<!-- then you need to add a default lifecycle mapping as instructed in M2E documentation linked below:       -->
 		<!-- https://www.eclipse.org/m2e/documentation/m2e-execution-not-covered.html#common-problems                -->
 
-		<!-- WildFly test profile. -->
+		<!-- WildFly integration test profile: mvn verify -P wildfly -->
 		<profile>
 			<id>wildfly</id>
 			<activation>
@@ -394,28 +421,12 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
-						<version>2.19.1</version>
-						<executions>
-							<execution>
-								<goals>
-									<goal>integration-test</goal>
-									<goal>verify</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<systemPropertyVariables>
-								<omnifaces.jar>${omnifaces.jar}</omnifaces.jar>
-								<jboss.home>${project.build.directory}/wildfly-${test.wildfly.version}</jboss.home>
-								<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
-							</systemPropertyVariables>
-						</configuration>
 					</plugin>
 				</plugins>
 			</build>
 		</profile>
 
-		<!-- TomEE test profile. -->
+		<!-- TomEE integration test profile: mvn verify -P tomee -->
 		<profile>
 			<id>tomee</id>
 			<dependencies>
@@ -430,22 +441,6 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
-						<version>2.19.1</version>
-						<executions>
-							<execution>
-								<goals>
-									<goal>integration-test</goal>
-									<goal>verify</goal>
-								</goals>
-							</execution>
-						</executions>
-						<configuration>
-							<systemPropertyVariables>
-								<omnifaces.jar>${omnifaces.jar}</omnifaces.jar>
-								<tomee.version>${test.tomee.version}</tomee.version>
-								<tomee.classifier>webprofile</tomee.classifier>
-							</systemPropertyVariables>
-						</configuration>
 					</plugin>
 				</plugins>
 			</build>
