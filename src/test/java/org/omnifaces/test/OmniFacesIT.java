@@ -16,7 +16,6 @@
 package org.omnifaces.test;
 
 import static org.jboss.shrinkwrap.api.ShrinkWrap.create;
-import static org.omnifaces.util.Reflection.toClassOrNull;
 
 import java.io.File;
 import java.net.URL;
@@ -43,9 +42,7 @@ public abstract class OmniFacesIT {
 
 	public static class ArchiveBuilder {
 
-		private Class<?> testClass;
 		private WebArchive archive;
-		private boolean beanSet;
 		private boolean facesConfigSet;
 		private boolean webXmlSet;
 
@@ -58,22 +55,17 @@ public abstract class OmniFacesIT {
 		}
 
 		private <T extends OmniFacesIT> ArchiveBuilder(Class<T> testClass) {
-			this.testClass = testClass;
 			String packageName = testClass.getPackage().getName();
 			String className = testClass.getSimpleName();
 			String warName = className + ".war";
 			String xhtmlName = packageName + "/" + className + ".xhtml";
 
 			archive = create(WebArchive.class, warName)
+				.addPackage(packageName)
+				.deleteClass(testClass)
 				.addAsWebResource(xhtmlName)
 				.addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
 				.addAsLibrary(new File(System.getProperty("omnifaces.jar")));
-		}
-
-		public ArchiveBuilder withBean(Class<?> beanClass) {
-			archive.addClass(beanClass);
-			beanSet = true;
-			return this;
 		}
 
 		public ArchiveBuilder withFacesConfig(FacesConfig facesConfig) {
@@ -102,14 +94,6 @@ public abstract class OmniFacesIT {
 		}
 
 		public WebArchive createDeployment() {
-			if (!beanSet) {
-				Class<?> possibleBean = toClassOrNull(testClass.getName() + "Bean");
-
-				if (possibleBean != null) {
-					withBean(possibleBean);
-				}
-			}
-
 			if (!facesConfigSet) {
 				withFacesConfig(FacesConfig.basic);
 			}

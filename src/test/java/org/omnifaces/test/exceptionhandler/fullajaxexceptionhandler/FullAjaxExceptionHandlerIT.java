@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.omnifaces.test.exceptionhandler;
+package org.omnifaces.test.exceptionhandler.fullajaxexceptionhandler;
 
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.junit.Assert.assertTrue;
