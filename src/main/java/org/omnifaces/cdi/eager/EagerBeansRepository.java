@@ -27,8 +27,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.Initialized;
-import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
@@ -77,8 +75,8 @@ public class EagerBeansRepository {
 		}
 	}
 
-	public void registerListener(@Observes @Initialized(ApplicationScoped.class) ServletContext servletContext) {
-		if (hasAnySessionOrRequestURIBeans()) {
+	public static void registerListenerIfNecessary(ServletContext servletContext) {
+		if (getInstance().hasAnySessionOrRequestURIBeans()) {
 			servletContext.addListener(EagerBeansWebListener.class);
 		}
 	}
