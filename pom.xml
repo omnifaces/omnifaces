@@ -389,6 +389,22 @@
 				<!-- Global configuration for integration test profiles. -->
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>2.10</version>
+					<executions>
+						<execution>
+							<phase>process-test-classes</phase>
+							<goals>
+								<goal>unpack</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<outputDirectory>${project.build.directory}</outputDirectory>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-failsafe-plugin</artifactId>
 					<version>2.19.1</version>
 					<executions>
@@ -433,14 +449,8 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-dependency-plugin</artifactId>
-						<version>2.10</version>
 						<executions>
 							<execution>
-								<id>unpack</id>
-								<phase>process-test-classes</phase>
-								<goals>
-									<goal>unpack</goal>
-								</goals>
 								<configuration>
 									<artifactItems>
 										<artifactItem>
@@ -448,8 +458,6 @@
 											<artifactId>wildfly-dist</artifactId>
 											<version>${test.wildfly.version}</version>
 											<type>zip</type>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
 										</artifactItem>
 									</artifactItems>
 								</configuration>
@@ -513,14 +521,8 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-dependency-plugin</artifactId>
-						<version>2.10</version>
 						<executions>
 							<execution>
-								<id>unpack</id>
-								<phase>process-test-classes</phase>
-								<goals>
-									<goal>unpack</goal>
-								</goals>
 								<configuration>
 									<artifactItems>
 										<artifactItem>
@@ -528,8 +530,6 @@
 											<artifactId>payara-web</artifactId>
 											<version>${test.payara.version}</version>
 											<type>zip</type>
-											<overWrite>false</overWrite>
-											<outputDirectory>${project.build.directory}</outputDirectory>
 										</artifactItem>
 									</artifactItems>
 								</configuration>
