@@ -6,6 +6,7 @@ jdk:
 env:
    - SERVER=wildfly
    - SERVER=tomee
+   - SERVER=payara
 script: mvn verify -P $SERVER
 
 # Do snapshot deployment.

@@ -58,15 +58,23 @@
 	</distributionManagement>
 
 	<properties>
+
+		<!-- Java versions. -->
 		<javase.version>1.7</javase.version>
+		<javaee.version>7</javaee.version>
 		<javadoc.version>1.8</javadoc.version>
+		
+		<!-- Essential Maven defaults. -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.source>${javase.version}</maven.compiler.source>
 		<maven.compiler.target>${javase.version}</maven.compiler.target>
 		<maven.source.excludeResources>true</maven.source.excludeResources>
+
+		<!-- Test server versions. -->
 		<test.wildfly.version>10.0.0.Final</test.wildfly.version>
 		<test.tomee.version>7.0.1</test.tomee.version>
+		<test.payara.version>4.1.1.163</test.payara.version>
 	</properties>
 
 	<dependencies>
@@ -305,7 +313,7 @@
 					<splitindex>true</splitindex>
 					<doctitle>OmniFaces API documentation</doctitle>
 					<links>
-						<link>https://docs.oracle.com/javaee/7/api/</link>
+						<link>https://docs.oracle.com/javaee/${javaee.version}/api/</link>
 					</links>
 				</configuration>
 				<executions>
@@ -483,6 +491,58 @@
 								<tomee.version>${test.tomee.version}</tomee.version>
 								<tomee.classifier>webprofile</tomee.classifier>
 							</systemPropertyVariables>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!-- Payara integration test profile: mvn verify -P payara -->
+		<profile>
+			<id>payara</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.jboss.arquillian.container</groupId>
+					<artifactId>arquillian-glassfish-managed-3.1</artifactId>
+					<version>1.0.0.Final</version>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<version>2.10</version>
+						<executions>
+							<execution>
+								<id>unpack</id>
+								<phase>process-test-classes</phase>
+								<goals>
+									<goal>unpack</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>fish.payara.distributions</groupId>
+											<artifactId>payara-web</artifactId>
+											<version>${test.payara.version}</version>
+											<type>zip</type>
+											<overWrite>false</overWrite>
+											<outputDirectory>${project.build.directory}</outputDirectory>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<environmentVariables>
+								<GLASSFISH_HOME>${project.build.directory}/payara41</GLASSFISH_HOME>
+							</environmentVariables>
 						</configuration>
 					</plugin>
 				</plugins>
