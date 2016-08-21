@@ -26,11 +26,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.annotation.WebListener;
 
-import org.omnifaces.cdi.Eager;
 import org.omnifaces.cdi.GraphicImageBean;
-import org.omnifaces.cdi.eager.EagerBeansPhaseListener;
-import org.omnifaces.cdi.eager.EagerBeansRepository;
-import org.omnifaces.cdi.eager.EagerBeansWebListener;
 import org.omnifaces.cdi.push.Socket;
 import org.omnifaces.component.output.Cache;
 import org.omnifaces.component.output.cache.CacheInitializer;
@@ -46,8 +42,6 @@ import org.omnifaces.resourcehandler.GraphicResource;
  * <ol>
  * <li>Check if JSF 2.2 is available, otherwise log and fail.
  * <li>Check if CDI 1.1 is available, otherwise log and fail.
- * <li>Instantiate {@link Eager} application scoped beans and register its {@link EagerBeansWebListener} and/or
- * {@link EagerBeansPhaseListener} if necessary.
  * <li>Add {@link FacesViews} mappings to FacesServlet if necessary.
  * <li>Load {@link Cache} provider and register its filter if necessary.
  * <li>Register {@link Socket} endpoint if necessary.
@@ -84,7 +78,6 @@ public class ApplicationListener extends DefaultServletContextListener {
 
 		try {
 			ServletContext servletContext = event.getServletContext();
-			EagerBeansRepository.instantiateApplicationScopedAndRegisterListener(servletContext);
 			FacesViews.addFacesServletMappings(servletContext);
 			CacheInitializer.loadProviderAndRegisterFilter(servletContext);
 			Socket.registerEndpointIfNecessary(servletContext);

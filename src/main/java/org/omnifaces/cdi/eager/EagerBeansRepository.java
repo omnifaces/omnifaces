@@ -16,7 +16,6 @@
 package org.omnifaces.cdi.eager;
 
 import static java.lang.String.format;
-import static java.util.logging.Level.WARNING;
 import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Utils.isAnyEmpty;
 import static org.omnifaces.util.Utils.isEmpty;
@@ -28,6 +27,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Initialized;
+import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
@@ -53,9 +54,6 @@ public class EagerBeansRepository {
 	private static final String MISSING_VIEW_ID =
 		"Bean '%s' was annotated with @Eager, but required attribute 'viewId' is missing."
 			+ " Bean will not be eagerly instantiated.";
-	private static final String WARNING_POSSIBLY_APPLICATION_SCOPE_NOT_ACTIVE =
-		"Could not instantiate eager application scoped beans. Possibly the CDI application scope is not active."
-			+ " This is known to be the case in certain Tomcat and Jetty based configurations.";
 
 	private static volatile EagerBeansRepository instance;
 
@@ -71,24 +69,18 @@ public class EagerBeansRepository {
 		return instance;
 	}
 
-	public static void instantiateApplicationScopedAndRegisterListener(ServletContext servletContext) {
-		if (getInstance() != null && instance.hasAnyApplicationScopedBeans()) {
-			try {
-				instance.instantiateApplicationScoped();
-			}
-			catch (Exception e) {
-				logger.log(WARNING, format(WARNING_POSSIBLY_APPLICATION_SCOPE_NOT_ACTIVE), e);
-				instance = null; // Trigger to add listeners anyway as it may be available at later point.
-			}
-		}
+	protected void setEagerBeans(EagerBeans eagerBeans) {
+		this.eagerBeans = eagerBeans;
 
-		if (instance == null || instance.hasAnySessionOrRequestURIBeans()) {
-			servletContext.addListener(EagerBeansWebListener.class);
+		if (hasAnyApplicationScopedBeans()) {
+			instantiateApplicationScoped();
 		}
 	}
 
-	protected void setEagerBeans(EagerBeans eagerBeans) {
-		this.eagerBeans = eagerBeans;
+	public void registerListener(@Observes @Initialized(ApplicationScoped.class) ServletContext servletContext) {
+		if (hasAnySessionOrRequestURIBeans()) {
+			servletContext.addListener(EagerBeansWebListener.class);
+		}
 	}
 
 	protected boolean hasAnyApplicationScopedBeans() {
@@ -137,7 +129,7 @@ public class EagerBeansRepository {
 		}
 	}
 
-	static class EagerBeans {
+	protected static class EagerBeans {
 
 		private List<Bean<?>> applicationScoped = new ArrayList<>();
 		private List<Bean<?>> sessionScoped = new ArrayList<>();
