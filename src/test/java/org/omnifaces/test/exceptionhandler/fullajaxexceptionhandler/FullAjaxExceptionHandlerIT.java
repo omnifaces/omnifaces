@@ -22,15 +22,12 @@ import static org.omnifaces.test.OmniFacesIT.FacesConfig.withFullAjaxExceptionHa
 import static org.omnifaces.test.OmniFacesIT.WebXml.withErrorPage;
 
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-@RunWith(Arquillian.class)
 public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 
 	@FindBy(id="exception")

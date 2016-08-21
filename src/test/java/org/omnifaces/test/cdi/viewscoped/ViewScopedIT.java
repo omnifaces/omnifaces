@@ -22,16 +22,13 @@ import static org.junit.Assert.assertNotEquals;
 import static org.omnifaces.test.OmniFacesIT.ArchiveBuilder.createWebArchive;
 
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.junit.InSequence;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.omnifaces.test.OmniFacesIT;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
-@RunWith(Arquillian.class)
 public class ViewScopedIT extends OmniFacesIT {
 
 	@FindBy(id="bean")

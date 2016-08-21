@@ -21,12 +21,15 @@ import java.io.File;
 import java.net.URL;
 
 import org.jboss.arquillian.drone.api.annotation.Drone;
+import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Before;
+import org.junit.runner.RunWith;
 import org.openqa.selenium.WebDriver;
 
+@RunWith(Arquillian.class)
 public abstract class OmniFacesIT {
 
 	@Drone
