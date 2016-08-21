@@ -85,9 +85,15 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>1.1.0.Final</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>javax.websocket</groupId>
 			<artifactId>javax.websocket-api</artifactId>
-			<version>1.0</version>
+			<version>1.1</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -102,12 +108,6 @@
 			<groupId>javax.el</groupId>
 			<artifactId>el-api</artifactId>
 			<version>2.2</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.validation</groupId>
-			<artifactId>validation-api</artifactId>
-			<version>1.0.0.GA</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -394,14 +394,6 @@
 					<configuration>
 						<systemPropertyVariables>
 							<omnifaces.jar>${project.build.directory}/${project.build.finalName}.jar</omnifaces.jar>
-
-							<!-- For Wildfly integration test profile. -->
-							<jboss.home>${project.build.directory}/wildfly-${test.wildfly.version}</jboss.home>
-							<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
-
-							<!-- For TomEE integration test profile. -->
-							<tomee.version>${test.tomee.version}</tomee.version>
-							<tomee.classifier>webprofile</tomee.classifier>
 						</systemPropertyVariables>
 					</configuration>
 				</plugin>
@@ -410,9 +402,9 @@
 	</build>
 
 	<profiles>
-		<!-- NOTE: If Eclipse shows "Plugin execution not covered by lifecycle configuration" error on below section -->
-		<!-- then you need to add a default lifecycle mapping as instructed in M2E documentation linked below:       -->
-		<!-- https://www.eclipse.org/m2e/documentation/m2e-execution-not-covered.html#common-problems                -->
+		<!-- NOTE: If Eclipse+M2E shows "Plugin execution not covered by lifecycle configuration" error in one of -->
+		<!-- below sections, then you need to add a default lifecycle mapping as instructed in M2E documentation: -->
+		<!-- https://www.eclipse.org/m2e/documentation/m2e-execution-not-covered.html#common-problems -->
 
 		<!-- WildFly integration test profile: mvn verify -P wildfly -->
 		<profile>
@@ -425,6 +417,7 @@
 					<groupId>org.wildfly.arquillian</groupId>
 					<artifactId>wildfly-arquillian-container-managed</artifactId>
 					<version>2.0.0.Final</version>
+					<scope>test</scope>
 				</dependency>
 			</dependencies>
 			<build>
@@ -458,6 +451,12 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<systemPropertyVariables>
+								<jboss.home>${project.build.directory}/wildfly-${test.wildfly.version}</jboss.home>
+								<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+							</systemPropertyVariables>
+						</configuration>
 					</plugin>
 				</plugins>
 			</build>
@@ -471,6 +470,7 @@
 					<groupId>org.apache.tomee</groupId>
 					<artifactId>arquillian-tomee-remote</artifactId>
 					<version>${test.tomee.version}</version>
+					<scope>test</scope>
 				</dependency>
 			</dependencies>
 			<build>
@@ -478,6 +478,12 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<systemPropertyVariables>
+								<tomee.version>${test.tomee.version}</tomee.version>
+								<tomee.classifier>webprofile</tomee.classifier>
+							</systemPropertyVariables>
+						</configuration>
 					</plugin>
 				</plugins>
 			</build>
