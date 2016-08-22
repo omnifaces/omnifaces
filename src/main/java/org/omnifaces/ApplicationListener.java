@@ -26,6 +26,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.annotation.WebListener;
 
+import org.omnifaces.cdi.Eager;
 import org.omnifaces.cdi.GraphicImageBean;
 import org.omnifaces.cdi.eager.EagerBeansRepository;
 import org.omnifaces.cdi.eager.EagerBeansWebListener;
@@ -45,7 +46,7 @@ import org.omnifaces.resourcehandler.GraphicResource;
  * <li>Check if JSF 2.2 is available, otherwise log and fail.
  * <li>Check if CDI 1.1 is available, otherwise log and fail.
  * <li>Load {@link Cache} provider and register its filter if necessary.
- * <li>Register {@link EagerBeansWebListener} if necessary.
+ * <li>Instantiate {@link Eager} application scoed beans and register {@link EagerBeansWebListener} if necessary.
  * <li>Add {@link FacesViews} mappings to FacesServlet if necessary.
  * <li>Register {@link GraphicImageBean} beans in {@link GraphicResource}.
  * <li>Register {@link Socket} endpoint if necessary.
@@ -82,7 +83,7 @@ public class ApplicationListener extends DefaultServletContextListener {
 		try {
 			ServletContext servletContext = event.getServletContext();
 			CacheInitializer.loadProviderAndRegisterFilter(servletContext);
-			EagerBeansRepository.registerListenerIfNecessary(servletContext);
+			EagerBeansRepository.instantiateApplicationScopedAndRegisterListenerIfNecessary(servletContext);
 			FacesViews.addFacesServletMappings(servletContext);
 			GraphicResource.registerGraphicImageBeans();
 			Socket.registerEndpointIfNecessary(servletContext);
