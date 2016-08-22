@@ -314,11 +314,6 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		}
 
 		FacesContext context = FacesContext.getCurrentInstance();
-
-		if (isAjaxRequestWithPartialRendering(context)) {
-			return;
-		}
-
 		UIViewRoot view = context.getViewRoot();
 		CombinedResourceBuilder builder = new CombinedResourceBuilder();
 
@@ -584,7 +579,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		}
 
 		private void create(FacesContext context, String rendererType) {
-			if (!infoBuilder.isEmpty()) {
+			if (!infoBuilder.isEmpty() && !isAjaxRequestWithPartialRendering(context)) { // #273, #301
 				if (componentResource == null) {
 					componentResource = new UIOutput();
 					context.getViewRoot().addComponentResource(context, componentResource, target);
