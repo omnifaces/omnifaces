@@ -21,6 +21,7 @@ import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Faces.isDevelopment;
 import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
+import static org.omnifaces.util.Hacks.isMyFacesUsed;
 import static org.omnifaces.util.Renderers.RENDERER_TYPE_CSS;
 import static org.omnifaces.util.Renderers.RENDERER_TYPE_JS;
 import static org.omnifaces.util.Utils.isNumber;
@@ -604,8 +605,15 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 		for (UIComponent resourceToRemove : componentResourcesToRemove) {
 			if (resourceToRemove != null) {
-				resourceToRemove.setInView(false); // #135
+				UIComponent container = isMyFacesUsed() ? resourceToRemove.getParent() : resourceToRemove;
+
+				// setInView(false) forces JSF to not save dynamic remove action in state.
+				// Otherwise JSF will re-execute dynamic remove during restore view phase.
+				// This is unnecessary as CombinedResourceHandler already takes care of it.
+				// See also https://github.com/omnifaces/omnifaces/issues/135
+				container.setInView(false);
 				view.removeComponentResource(context, resourceToRemove, target);
+				container.setInView(true);
 			}
 		}
 	}
