@@ -15,6 +15,7 @@
  */
 package org.omnifaces.test;
 
+import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import static org.jboss.shrinkwrap.api.ShrinkWrap.create;
 
 import java.io.File;
@@ -41,6 +42,7 @@ public abstract class OmniFacesIT {
 	@Before
 	public void init() {
 		browser.get(contextPath + getClass().getSimpleName() + ".xhtml");
+		waitGui(browser);
 	}
 
 	public static class ArchiveBuilder {
@@ -61,14 +63,27 @@ public abstract class OmniFacesIT {
 			String packageName = testClass.getPackage().getName();
 			String className = testClass.getSimpleName();
 			String warName = className + ".war";
-			String xhtmlName = packageName + "/" + className + ".xhtml";
 
 			archive = create(WebArchive.class, warName)
 				.addPackage(packageName)
 				.deleteClass(testClass)
-				.addAsWebResource(xhtmlName)
 				.addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
 				.addAsLibrary(new File(System.getProperty("omnifaces.jar")));
+
+			addWebResources(new File(testClass.getClassLoader().getResource(packageName).getFile()), "");
+		}
+
+		private void addWebResources(File root, String directory) {
+			for (File file : root.listFiles()) {
+				String path = directory + "/" + file.getName();
+
+				if (file.isFile()) {
+					archive.addAsWebResource(file, path);
+				}
+				else if (file.isDirectory()) {
+					addWebResources(file, path);
+				}
+			}
 		}
 
 		public ArchiveBuilder withFacesConfig(FacesConfig facesConfig) {
@@ -111,7 +126,8 @@ public abstract class OmniFacesIT {
 
 	public static enum FacesConfig {
 		basic,
-		withFullAjaxExceptionHandler;
+		withFullAjaxExceptionHandler,
+		withCombinedResourceHandler;
 	}
 
 	public static enum WebXml {
