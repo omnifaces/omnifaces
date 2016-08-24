@@ -1144,13 +1144,16 @@ public final class Components {
 	}
 
 	/**
-	 * Reset all {@link UIInput} components enclosed in the closest {@link UIForm} parent of the given component.
-	 * @param component The component to find the closest {@link UIForm} parent for.
+	 * Reset all {@link UIInput} components enclosed in the given {@link UIForm} component, or the closest
+	 * {@link UIForm} parent of it.
+	 * @param component The component representing the {@link UIForm} itself, or to find the closest {@link UIForm}
+	 * parent for.
+	 * @throws IllegalArgumentException When given component is not an {@link UIForm}, or does not have a {@link UIForm}
+	 * parent.
 	 * @since 2.5
-	 * @throws IllegalArgumentException When given component does not have an {@link UIForm} parent.
 	 */
 	public static void resetInputs(UIComponent component) {
-		UIForm form = getClosestParent(component, UIForm.class);
+		UIForm form = (component instanceof UIForm) ? (UIForm) component : getClosestParent(component, UIForm.class);
 
 		if (form == null) {
 			throw new IllegalArgumentException(String.format(ERROR_MISSING_PARENT, component.getClass(), UIForm.class));
