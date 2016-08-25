@@ -135,8 +135,9 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 				if (!resource.equals(normalizedResource)) {
 
 					// If so, redirect back to parent folder.
+					String uri = request.getContextPath() + normalizedResource;
 					String queryString = request.getQueryString();
-					redirectPermanent(response, normalizedResource + ((queryString != null) ? "?" + queryString : ""));
+					redirectPermanent(response, uri + ((queryString != null) ? "?" + queryString : ""));
 					return true;
 				}
 			}
