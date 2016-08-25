@@ -1144,7 +1144,7 @@ public final class Components {
 	}
 
 	/**
-	 * Reset all {@link UIInput} components enclosed in the given {@link UIForm} component, or the closest
+	 * Reset all child {@link UIInput} components enclosed in the given {@link UIForm} component, or the closest
 	 * {@link UIForm} parent of it.
 	 * @param component The component representing the {@link UIForm} itself, or to find the closest {@link UIForm}
 	 * parent for.
@@ -1152,14 +1152,23 @@ public final class Components {
 	 * parent.
 	 * @since 2.5
 	 */
-	public static void resetInputs(UIComponent component) {
+	public static void resetForm(UIComponent component) {
 		UIForm form = (component instanceof UIForm) ? (UIForm) component : getClosestParent(component, UIForm.class);
 
 		if (form == null) {
 			throw new IllegalArgumentException(String.format(ERROR_MISSING_PARENT, component.getClass(), UIForm.class));
 		}
 
-		forEachComponent().fromRoot(form).ofTypes(UIInput.class).invoke(new Callback.WithArgument<UIInput>() {
+		resetInputs(form);
+	}
+
+	/**
+	 * Reset all child {@link UIInput} components enclosed in the given parent component.
+	 * @param component The parent component to reset all child {@link UIInput} components in.
+	 * @since 2.5
+	 */
+	public static void resetInputs(UIComponent component) {
+		forEachComponent().fromRoot(component).ofTypes(UIInput.class).invoke(new Callback.WithArgument<UIInput>() {
 			@Override
 			public void invoke(UIInput input) {
 				input.resetValue();
