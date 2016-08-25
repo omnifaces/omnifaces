@@ -15,6 +15,7 @@
  */
 package org.omnifaces.test.cdi.eager;
 
+import static java.lang.Boolean.parseBoolean;
 import static java.lang.Long.parseLong;
 import static org.junit.Assert.assertTrue;
 import static org.omnifaces.test.OmniFacesIT.ArchiveBuilder.createWebArchive;
@@ -52,6 +53,9 @@ public class EagerIT extends OmniFacesIT {
 	@FindBy(id="eagerRequestScopedBean")
 	private WebElement eagerRequestScopedBean;
 
+	@FindBy(id="ejbInjectedInStartupBean")
+	private WebElement ejbInjectedInStartupBean;
+
 	@Deployment(testable=false)
 	public static WebArchive createDeployment() {
 		return createWebArchive(EagerIT.class);
@@ -63,6 +67,7 @@ public class EagerIT extends OmniFacesIT {
 		assertTrue(parseLong(lazySessionScopedBean.getText()) > parseLong(eagerSessionScopedBean.getText()));
 		assertTrue(parseLong(lazyViewScopedBean.getText()) > parseLong(eagerViewScopedBean.getText()));
 		assertTrue(parseLong(lazyRequestScopedBean.getText()) > parseLong(eagerRequestScopedBean.getText()));
+		assertTrue(parseBoolean(ejbInjectedInStartupBean.getText()));
 	}
 
 }
