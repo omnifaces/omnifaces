@@ -88,6 +88,9 @@ public final class Json {
 		else if (object instanceof Map<?, ?>) {
 			encodeMap((Map<?, ?>) object, builder);
 		}
+		else if (object instanceof Class<?>) {
+			encode(((Class<?>) object).getName(), builder);
+		}
 		else {
 			encodeBean(object, builder);
 		}
