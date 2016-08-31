@@ -38,9 +38,8 @@ public class UriExtensionRequestWrapper extends HttpServletRequestWrapper {
 
 	private final String servletPath;
 
-	public UriExtensionRequestWrapper(HttpServletRequest request, String extension) {
+	public UriExtensionRequestWrapper(HttpServletRequest request, String servletPath, String extension) {
 		super(request);
-		String servletPath = super.getServletPath();
 		this.servletPath = servletPath.endsWith(extension) ? servletPath : servletPath + extension;
 	}
 
@@ -51,8 +50,7 @@ public class UriExtensionRequestWrapper extends HttpServletRequestWrapper {
 
 	@Override
 	public String getPathInfo() {
-		// Since we simulate that the request is mapped to an extension and not to a prefix path, there
-		// can be no path info.
+		// Since we simulate that the request is mapped to an extension and not to a prefix path, there can be no path info.
 		return null;
 	}
 

@@ -24,6 +24,7 @@ import static org.omnifaces.facesviews.FacesViews.getExtensionAction;
 import static org.omnifaces.facesviews.FacesViews.getExtensionlessURLWithQuery;
 import static org.omnifaces.facesviews.FacesViews.getFacesServletDispatchMethod;
 import static org.omnifaces.facesviews.FacesViews.getMappedResources;
+import static org.omnifaces.facesviews.FacesViews.getMultiViewsWelcomeFile;
 import static org.omnifaces.facesviews.FacesViews.getPathAction;
 import static org.omnifaces.facesviews.FacesViews.getReverseMappedResources;
 import static org.omnifaces.facesviews.FacesViews.isMultiViewsEnabled;
@@ -34,6 +35,7 @@ import static org.omnifaces.util.Faces.getApplicationFromFactory;
 import static org.omnifaces.util.ResourcePaths.getExtension;
 import static org.omnifaces.util.ResourcePaths.isExtensionless;
 import static org.omnifaces.util.Servlets.getRequestRelativeURI;
+import static org.omnifaces.util.Utils.coalesce;
 
 import java.io.IOException;
 import java.util.Map;
@@ -92,15 +94,15 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 
 	@Override
 	public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException, IOException {
-		String resource = request.getServletPath();
+		String servletPath = request.getServletPath();
 
-		if (filterExtensionLess(request, response, chain, resource)) {
+		if (filterExtensionLess(request, response, chain, servletPath)) {
 			return;
 		}
-		else if (filterExtension(request, response, resource)) {
+		else if (filterExtension(request, response, servletPath)) {
 			return;
 		}
-		else if (filterPublicPath(request, response, resource)) {
+		else if (filterPublicPath(request, response, servletPath)) {
 			return;
 		}
 
@@ -111,28 +113,39 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 	 * A mapped resource request without extension is encountered.
 	 * The user setting "dispatchMethod" determines how we handle this.
 	 */
-	private boolean filterExtensionLess(HttpServletRequest request, HttpServletResponse response, FilterChain chain, String resource) throws IOException, ServletException {
-		if (!isExtensionless(resource)) {
+	private boolean filterExtensionLess(HttpServletRequest request, HttpServletResponse response, FilterChain chain, String servletPath) throws IOException, ServletException {
+		if (!isExtensionless(servletPath)) {
 			return false;
 		}
 
 		ServletContext servletContext = getServletContext();
 		boolean multiViews = isMultiViewsEnabled(servletContext);
 		Map<String, String> resources = getMappedResources(servletContext);
-		String path = resource + (multiViews ? "/*" : "");
+		String resource = servletPath + (multiViews ? "/*" : "");
+		String pathInfo = coalesce(request.getPathInfo(), (String) request.getAttribute(FACES_VIEWS_ORIGINAL_PATH_INFO));
 
-		if (getApplicationFromFactory().getProjectStage() == Development && !resources.containsKey(path)) {
+		if (getApplicationFromFactory().getProjectStage() == Development && !resources.containsKey(resource)) {
 			// Check if the resource was dynamically added by scanning the faces-views location(s) again.
 			resources = scanAndStoreViews(servletContext, false);
 		}
 
-		if (resources.containsKey(path)) {
+		if (!resources.containsKey(resource) && multiViews) {
+			resource = getMultiViewsWelcomeFile(servletContext);
+
+			if (resource != null) {
+				request.setAttribute(FACES_VIEWS_ORIGINAL_PATH_INFO, servletPath);
+				request.getRequestDispatcher(resource).forward(request, response);
+				return true;
+			}
+		}
+
+		if (resources.containsKey(resource)) {
 
 			// Check if a welcome file was explicitly requested.
-			if (getRequestRelativeURI(request).startsWith(resource)) {
-				String normalizedResource = stripWelcomeFilePrefix(servletContext, resource);
+			if ((getRequestRelativeURI(request) + "/").startsWith(servletPath + "/")) {
+				String normalizedResource = stripWelcomeFilePrefix(servletContext, servletPath);
 
-				if (!resource.equals(normalizedResource)) {
+				if (!servletPath.equals(normalizedResource)) {
 
 					// If so, redirect back to parent folder.
 					String uri = request.getContextPath() + normalizedResource;
@@ -142,7 +155,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 				}
 			}
 
-			String extension = getExtension(resources.get(path));
+			String extension = getExtension(resources.get(resource));
 
 			switch (dispatchMethod) {
 				case DO_FILTER:
@@ -150,9 +163,9 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 					// This assumes that the FacesServlet has been mapped to something that includes the extensionless
 					// request.
 					try {
-						request.setAttribute(FACES_VIEWS_ORIGINAL_SERVLET_PATH, request.getServletPath());
-						request.setAttribute(FACES_VIEWS_ORIGINAL_PATH_INFO, request.getPathInfo());
-						chain.doFilter(new UriExtensionRequestWrapper(request, extension), response);
+						request.setAttribute(FACES_VIEWS_ORIGINAL_SERVLET_PATH, servletPath);
+						request.setAttribute(FACES_VIEWS_ORIGINAL_PATH_INFO, pathInfo);
+						chain.doFilter(new UriExtensionRequestWrapper(request, servletPath, extension), response);
 					}
 					finally {
 						request.removeAttribute(FACES_VIEWS_ORIGINAL_SERVLET_PATH);
@@ -164,7 +177,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 					// Forward the resource (view) using its original extension, on which the Facelets Servlet
 					// is mapped. Technically it matters most that the Facelets Servlet picks up the
 					// request, and the exact extension or even prefix is perhaps less relevant.
-					RequestDispatcher requestDispatcher = servletContext.getRequestDispatcher(resource + extension);
+					RequestDispatcher requestDispatcher = servletContext.getRequestDispatcher(servletPath + extension);
 
 					if (requestDispatcher != null) {
 						requestDispatcher.forward(request, response);

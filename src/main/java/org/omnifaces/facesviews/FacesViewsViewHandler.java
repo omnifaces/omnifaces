@@ -85,7 +85,8 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 
 			switch (mode) {
 				case STRIP_EXTENSION_FROM_PARENT:
-					return removeExtension(servletContext, actionURL, viewId) + pathInfo;
+					actionURL = removeExtension(servletContext, actionURL, viewId);
+					return actionURL + (pathInfo.isEmpty() ? "" : pathInfo.substring(actionURL.endsWith("/") ? 1 : 0));
 				case BUILD_WITH_PARENT_QUERY_PARAMETERS:
 					return getRequestContextPath(context) + stripExtension(viewId) + pathInfo + getQueryString(actionURL);
 			}
@@ -123,12 +124,11 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 			}
 		}
 
-		String queryString = getQueryString(actionURL);
 		String resource = actionURL.split("\\?", 2)[0];
 
 		for (String extension : extensions) {
 			if (resource.endsWith(extension)) {
-				return stripWelcomeFilePrefix(servletContext, resource.substring(0, resource.length() - extension.length())) + queryString;
+				return stripWelcomeFilePrefix(servletContext, resource.substring(0, resource.length() - extension.length()));
 			}
 		}
 
