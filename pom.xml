@@ -423,6 +423,7 @@
 					</executions>
 					<configuration>
 						<systemPropertyVariables>
+							<profile.id>${project.activeProfiles[0].id}</profile.id>
 							<omnifaces.jar>${project.build.directory}/${project.build.finalName}.jar</omnifaces.jar>
 						</systemPropertyVariables>
 					</configuration>

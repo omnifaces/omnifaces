@@ -37,12 +37,24 @@ public abstract class OmniFacesIT {
 	protected WebDriver browser;
 
 	@ArquillianResource
-	protected URL contextPath;
+	protected URL baseURL;
 
 	@Before
 	public void init() {
-		browser.get(contextPath + getClass().getSimpleName() + ".xhtml");
+		open(getClass().getSimpleName() + ".xhtml");
+	}
+
+	public void open(String pageName) {
+		browser.get(baseURL + pageName);
 		waitGui(browser);
+	}
+
+	public static String stripJsessionid(String url) {
+		return url.split(";", 2)[0];
+	}
+
+	public static boolean isTomee() {
+		return "tomee".equals(System.getProperty("profile.id"));
 	}
 
 	public static class ArchiveBuilder {
@@ -103,8 +115,16 @@ public abstract class OmniFacesIT {
 
 			archive.setWebXML("WEB-INF/web.xml/" + webXml.name() + ".xml");
 
-			if (webXml == WebXml.withErrorPage) {
-				archive.addAsWebInfResource("WEB-INF/500.xhtml");
+			switch (webXml) {
+				case withErrorPage:
+					archive.addAsWebInfResource("WEB-INF/500.xhtml");
+					break;
+				case withFacesViews:
+				case withMultiViews:
+					archive.addAsWebInfResource("WEB-INF/404.xhtml");
+					break;
+				default:
+					break;
 			}
 
 			webXmlSet = true;
@@ -132,7 +152,9 @@ public abstract class OmniFacesIT {
 
 	public static enum WebXml {
 		basic,
-		withErrorPage;
+		withErrorPage,
+		withFacesViews,
+		withMultiViews;
 	}
 
 }
