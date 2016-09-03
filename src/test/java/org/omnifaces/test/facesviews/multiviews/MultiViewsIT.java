@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.omnifaces.test.facesviews;
+package org.omnifaces.test.facesviews.multiviews;
 
 import static org.jboss.arquillian.graphene.Graphene.guardHttp;
 import static org.junit.Assert.assertEquals;
