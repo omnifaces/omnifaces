@@ -33,7 +33,7 @@ public final class OmniFaces {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final String VERSION = OmniFaces.class.getPackage().getSpecificationVersion().replaceAll("-\\d+$", "");
-	private static final boolean SNAPSHOT = VERSION.endsWith("-SNAPSHOT");
+	private static final boolean SNAPSHOT = VERSION.contains("-"); // -SNAPSHOT, -RCx
 	private static final Long STARTUP_TIME = System.currentTimeMillis();
 	private static final String DEFAULT_MESSAGE_BUNDLE = "org.omnifaces.messages";
 
@@ -48,8 +48,8 @@ public final class OmniFaces {
 	}
 
 	/**
-	 * Returns whether current OmniFaces version is a snapshot version.
-	 * @return Whether current OmniFaces version is a snapshot version.
+	 * Returns whether current OmniFaces version is a SNAPSHOT or RC version.
+	 * @return Whether current OmniFaces version is a SNAPSHOT or RC version.
 	 */
 	public static boolean isSnapshot() {
 		return SNAPSHOT;
