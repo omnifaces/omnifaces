@@ -154,7 +154,8 @@ public abstract class OmniFacesIT {
 		basic,
 		withErrorPage,
 		withFacesViews,
-		withMultiViews;
+		withMultiViews,
+		withThreeViewsInSession;
 	}
 
 }

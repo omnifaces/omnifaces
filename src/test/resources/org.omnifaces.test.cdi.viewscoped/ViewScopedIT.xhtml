@@ -33,16 +33,17 @@
 		</h:panelGroup>
 
 		<h:button id="unload" />
+		<h:link id="newtab" target="_blank" />
 
 		<h:form id="non-ajax">
 			<h:commandButton id="submit" action="#{viewScopedITBean.submit}" />
-			<h:commandButton id="navigate" action="#{viewScopedITBean.navigate}" />
+			<h:commandLink id="navigate" action="#{viewScopedITBean.navigate}" />
 		</h:form>
 
 		<h:form id="ajax">
 			<f:ajax render=":results">
 				<h:commandButton id="submit" action="#{viewScopedITBean.submit}" />
-				<h:commandButton id="navigate" action="#{viewScopedITBean.navigate}" />
+				<h:commandLink id="navigate" action="#{viewScopedITBean.navigate}" />
 			</f:ajax>
 		</h:form>
 	</h:body>

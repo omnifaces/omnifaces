@@ -17,9 +17,13 @@ package org.omnifaces.test.cdi.viewscoped;
 
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.guardHttp;
+import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.omnifaces.test.OmniFacesIT.ArchiveBuilder.createWebArchive;
+import static org.omnifaces.test.OmniFacesIT.ArchiveBuilder.buildWebArchive;
+import static org.omnifaces.test.OmniFacesIT.WebXml.withThreeViewsInSession;
+
+import java.util.Set;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.InSequence;
@@ -40,6 +44,9 @@ public class ViewScopedIT extends OmniFacesIT {
 	@FindBy(id="unload")
 	private WebElement unload;
 
+	@FindBy(id="newtab")
+	private WebElement newtab;
+
 	@FindBy(id="non-ajax:submit")
 	private WebElement nonAjaxSubmit;
 
@@ -54,7 +61,9 @@ public class ViewScopedIT extends OmniFacesIT {
 
 	@Deployment(testable=false)
 	public static WebArchive createDeployment() {
-		return createWebArchive(ViewScopedIT.class);
+		return buildWebArchive(ViewScopedIT.class)
+			.withWebXml(withThreeViewsInSession)
+			.createDeployment();
 	}
 
 	@Test @InSequence(1)
@@ -170,6 +179,51 @@ public class ViewScopedIT extends OmniFacesIT {
 		guardHttp(unload).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
 		assertEquals("unload init", messages.getText());
+	}
+
+	@Test @InSequence(3)
+	public void destroyViewState() {
+
+		// Unloaded bean is from previous test.
+		assertEquals("unload init", messages.getText());
+		String firstBean = bean.getText();
+		String firstTab = browser.getWindowHandle();
+
+		// Open three new tabs and close them immediately.
+		openNewTab(firstTab);
+		assertEquals("init", messages.getText());
+		assertNotEquals(firstBean, bean.getText());
+		closeNewTab(firstTab);
+
+		openNewTab(firstTab);
+		assertEquals("unload init", messages.getText()); // Unload was from previous tab.
+		assertNotEquals(firstBean, bean.getText());
+		closeNewTab(firstTab);
+
+		openNewTab(firstTab);
+		assertEquals("unload init", messages.getText()); // Unload was from previous tab.
+		assertNotEquals(firstBean, bean.getText());
+		closeNewTab(firstTab);
+
+		// Submit form in first tab. As JSF is instructed to store only 3 views in session,
+		// and the @ViewScoped unload in three previously opened tabs should also physically
+		// destroy the view state, the submit in first tab should not throw ViewExpiredException.
+		guardAjax(ajaxSubmit).click();
+		assertEquals(firstBean, bean.getText());
+		assertEquals("unload submit", messages.getText()); // Unload was from previous tab.
+	}
+
+	private void openNewTab(String firstTab) {
+		newtab.click();
+		Set<String> tabs = browser.getWindowHandles();
+		tabs.remove(firstTab); // Just to be sure; it's nowhere in Selenium API specified whether tabs are ordered.
+		browser.switchTo().window(tabs.iterator().next());
+		waitGui(browser);
+	}
+
+	private void closeNewTab(String firstTab) {
+		browser.close();
+		browser.switchTo().window(firstTab);
 	}
 
 }

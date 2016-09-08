@@ -40,6 +40,11 @@ public class ViewScopedITBean implements Serializable {
 
 	@PostConstruct
 	public void init() {
+		checkUnloadedOrDestroyed();
+		addGlobalInfo("init ");
+	}
+
+	public void checkUnloadedOrDestroyed() {
 		if (unloaded) {
 			addGlobalInfo("unload ");
 			unloaded = false;
@@ -48,11 +53,10 @@ public class ViewScopedITBean implements Serializable {
 			addGlobalInfo("destroy ");
 			destroyed = false;
 		}
-
-		addGlobalInfo("init ");
 	}
 
 	public void submit() {
+		checkUnloadedOrDestroyed();
 		addGlobalInfo("submit ");
 	}
 
