@@ -22,7 +22,7 @@ import javax.faces.model.SelectItem;
 
 /**
  * <p>
- * The <code>omnifaces.ListConverter</code> is intented for use in specialized selection components which doesn't
+ * The <code>omnifaces.ListConverter</code> is intended for use in specialized selection components which doesn't
  * use {@link SelectItem}s as the source for their selectable items, but work directly via a {@link List} of entities,
  * and therefore the {@link SelectItemsConverter} isn't usable on them.
  * <p>
