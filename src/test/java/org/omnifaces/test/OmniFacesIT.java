@@ -47,7 +47,7 @@ public abstract class OmniFacesIT {
 	}
 
 	public static String stripJsessionid(String url) {
-		return url.split(";", 2)[0];
+		return url.split(";jsessionid=", 2)[0];
 	}
 
 	public static boolean isTomee() {

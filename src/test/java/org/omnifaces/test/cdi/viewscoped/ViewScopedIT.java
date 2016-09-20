@@ -187,20 +187,20 @@ public class ViewScopedIT extends OmniFacesIT {
 		String firstTab = browser.getWindowHandle();
 
 		// Open three new tabs and close them immediately.
-		openNewTab(firstTab);
+		openNewTab();
 		assertEquals("init", messages.getText());
 		assertNotEquals(firstBean, bean.getText());
-		closeNewTab(firstTab);
+		closeCurrentTabAndSwitchTo(firstTab);
 
-		openNewTab(firstTab);
+		openNewTab();
 		assertEquals("unload init", messages.getText()); // Unload was from previous tab.
 		assertNotEquals(firstBean, bean.getText());
-		closeNewTab(firstTab);
+		closeCurrentTabAndSwitchTo(firstTab);
 
-		openNewTab(firstTab);
+		openNewTab();
 		assertEquals("unload init", messages.getText()); // Unload was from previous tab.
 		assertNotEquals(firstBean, bean.getText());
-		closeNewTab(firstTab);
+		closeCurrentTabAndSwitchTo(firstTab);
 
 		// Submit form in first tab. As JSF is instructed to store only 3 views in session,
 		// and the @ViewScoped unload in three previously opened tabs should also physically
@@ -210,17 +210,18 @@ public class ViewScopedIT extends OmniFacesIT {
 		assertEquals("unload submit", messages.getText()); // Unload was from previous tab.
 	}
 
-	private void openNewTab(String firstTab) {
+	private void openNewTab() {
+		Set<String> oldTabs = browser.getWindowHandles();
 		newtab.click();
-		Set<String> tabs = browser.getWindowHandles();
-		tabs.remove(firstTab); // Just to be sure; it's nowhere in Selenium API specified whether tabs are ordered.
-		browser.switchTo().window(tabs.iterator().next());
+		Set<String> newTabs = browser.getWindowHandles();
+		newTabs.removeAll(oldTabs); // Just to be sure; it's nowhere in Selenium API specified whether tabs are ordered.
+		browser.switchTo().window(newTabs.iterator().next());
 		waitGui(browser);
 	}
 
-	private void closeNewTab(String firstTab) {
+	private void closeCurrentTabAndSwitchTo(String tab) {
 		browser.close();
-		browser.switchTo().window(firstTab);
+		browser.switchTo().window(tab);
 	}
 
 }
