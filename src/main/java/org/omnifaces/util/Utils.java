@@ -16,6 +16,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.regex.Pattern.quote;
+import static org.omnifaces.util.Servlets.getSubmittedFileName;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -58,6 +59,7 @@ import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
+import javax.servlet.http.Part;
 import javax.xml.bind.DatatypeConverter;
 
 /**
@@ -142,6 +144,16 @@ public final class Utils {
 	}
 
 	/**
+	 * Returns <code>true</code> if the given part is null or is empty.
+	 * @param part The part to be checked on emptiness.
+	 * @return <code>true</code> if the given part is null or is empty.
+	 * @since 2.6
+	 */
+	public static boolean isEmpty(Part part) {
+		return part == null || (isEmpty(getSubmittedFileName(part)) && part.getSize() <= 0);
+	}
+
+	/**
 	 * Returns <code>true</code> if the given object is null or an empty array or has an empty toString() result.
 	 * @param value The value to be checked on emptiness.
 	 * @return <code>true</code> if the given object is null or an empty array or has an empty toString() result.
@@ -158,6 +170,9 @@ public final class Utils {
 		}
 		else if (value instanceof Map) {
 			return isEmpty((Map<?, ?>) value);
+		}
+		else if (value instanceof Part) {
+			return isEmpty((Part) value);
 		}
 		else if (value.getClass().isArray()) {
 			return Array.getLength(value) == 0;
