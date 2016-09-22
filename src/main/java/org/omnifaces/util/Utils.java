@@ -150,6 +150,15 @@ public final class Utils {
 		if (value == null) {
 			return true;
 		}
+		else if (value instanceof String) {
+			return isEmpty((String) value);
+		}
+		else if (value instanceof Collection) {
+			return isEmpty((Collection<?>) value);
+		}
+		else if (value instanceof Map) {
+			return isEmpty((Map<?, ?>) value);
+		}
 		else if (value.getClass().isArray()) {
 			return Array.getLength(value) == 0;
 		}
