@@ -1,0 +1,99 @@
+<!--
+
+    Copyright 2016 OmniFaces
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+    the License. You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+    an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+    specific language governing permissions and limitations under the License.
+
+-->
+<!DOCTYPE html>
+<html lang="en"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:o="http://omnifaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions"
+>
+	<h:head />
+
+	<h:body>
+		<h:messages id="messages" />
+
+		<h:form id="validateByCommand">
+			<h:inputText id="input" value="#{validateBeanITDefaultBean.input}" />
+
+			<f:ajax execute="@form" render=":messages">
+				<h:commandButton id="validateDefaultByCommand" action="#{validateBeanITDefaultBean.action}" />
+				<h:commandButton id="validateGroupByCommand" action="#{validateBeanITDefaultBean.action}">
+					<o:validateBean validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup" />
+				</h:commandButton>
+				<h:commandButton id="validateDefaultAndGroupByCommand" action="#{validateBeanITDefaultBean.action}">
+					<o:validateBean validationGroups="javax.validation.groups.Default,org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup" />
+				</h:commandButton>
+				<h:commandButton id="validateDisabledByCommand" action="#{validateBeanITDefaultBean.action}">
+					<o:validateBean disabled="true" />
+				</h:commandButton>
+			</f:ajax>
+		</h:form>
+
+		<h:form id="validateByInput">
+			<f:ajax execute="@this" listener="#{validateBeanITDefaultBean.action()}" render=":messages">
+				<h:inputText id="validateDefaultByInput" value="#{validateBeanITDefaultBean.input}" />
+				<h:inputText id="validateGroupByInput" value="#{validateBeanITDefaultBean.input}">
+					<o:validateBean validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup" />
+				</h:inputText>
+				<h:inputText id="validateDefaultAndGroupByInput" value="#{validateBeanITDefaultBean.input}">
+					<o:validateBean validationGroups="javax.validation.groups.Default,org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup" />
+				</h:inputText>
+				<h:inputText id="validateDisabledByInput" value="#{validateBeanITDefaultBean.input}">
+					<o:validateBean disabled="true" />
+				</h:inputText>
+			</f:ajax>
+		</h:form>
+
+		<h:form id="validateClassLevelDefault">
+			<h:inputText id="number1" value="#{validateBeanITClassLevelBean.entity.number1}" />
+			<h:inputText id="number2" value="#{validateBeanITClassLevelBean.entity.number2}" />
+
+			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+				<f:ajax execute="@form" render=":messages" />
+			</h:commandButton>
+
+			<o:validateBean value="#{validateBeanITClassLevelBean.entity}"
+				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup" />
+		</h:form>
+
+		<h:form id="validateClassLevelActual">
+			<h:inputText id="number1" value="#{validateBeanITClassLevelBean.entity.number1}" />
+			<h:inputText id="number2" value="#{validateBeanITClassLevelBean.entity.number2}" />
+
+			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+				<f:ajax execute="@form" render=":messages" />
+			</h:commandButton>
+
+			<o:validateBean value="#{validateBeanITClassLevelBean.entity}"
+				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup"
+				method="validateActual" />
+		</h:form>
+
+		<h:form id="validateClassLevelByCopier">
+			<h:inputText id="number1" value="#{validateBeanITClassLevelBean.entity.number1}" />
+			<h:inputText id="number2" value="#{validateBeanITClassLevelBean.entity.number2}" />
+
+			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+				<f:ajax execute="@form" render=":messages" />
+			</h:commandButton>
+
+			<o:validateBean value="#{validateBeanITClassLevelBean.entity}"
+				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup"
+				copier="org.omnifaces.test.taghandler.validatebean.ValidateBeanITEntityCopier" />
+		</h:form>
+	</h:body>
+</html>

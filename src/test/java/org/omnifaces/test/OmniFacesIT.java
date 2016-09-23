@@ -14,6 +14,7 @@ package org.omnifaces.test;
 
 import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import static org.jboss.shrinkwrap.api.ShrinkWrap.create;
+import static org.omnifaces.test.OmniFacesIT.FacesConfig.withMessageBundle;
 
 import java.io.File;
 import java.net.URL;
@@ -101,6 +102,11 @@ public abstract class OmniFacesIT {
 			}
 
 			archive.addAsWebInfResource("WEB-INF/faces-config.xml/" + facesConfig.name() + ".xml", "faces-config.xml");
+
+			if (facesConfig == withMessageBundle) {
+				archive.addAsResource("messages.properties");
+			}
+
 			facesConfigSet = true;
 			return this;
 		}
@@ -144,7 +150,8 @@ public abstract class OmniFacesIT {
 	public static enum FacesConfig {
 		basic,
 		withFullAjaxExceptionHandler,
-		withCombinedResourceHandler;
+		withCombinedResourceHandler,
+		withMessageBundle;
 	}
 
 	public static enum WebXml {
