@@ -50,6 +50,7 @@ import javax.servlet.http.Part;
 import org.omnifaces.util.Components;
 import org.omnifaces.util.Servlets;
 import org.omnifaces.util.State;
+import org.omnifaces.util.Utils;
 
 /**
  * <p>
@@ -299,7 +300,8 @@ public class InputFile extends HtmlInputFile {
 	}
 
 	/**
-	 * This override will convert the individual parts if multi file upload is enabled and collect only non-null parts.
+	 * This override will convert the individual parts if multi file upload is enabled and collect only non-null parts
+	 * having a non-empty file name and a file size above zero.
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
@@ -310,7 +312,7 @@ public class InputFile extends HtmlInputFile {
 			for (Part submittedPart : (List<Part>) submittedValue) {
 				Object convertedPart = super.getConvertedValue(context, submittedPart);
 
-				if (convertedPart instanceof Part) {
+				if (convertedPart instanceof Part && !Utils.isEmpty(convertedPart)) { // Do not import static! UIInput has an isEmpty() as well.
 					convertedParts.add((Part) convertedPart);
 				}
 			}
@@ -318,7 +320,8 @@ public class InputFile extends HtmlInputFile {
 			return unmodifiableList(convertedParts);
 		}
 
-		return super.getConvertedValue(context, submittedValue);
+		Object convertedPart = super.getConvertedValue(context, submittedValue);
+		return Utils.isEmpty(convertedPart) ? null : convertedPart;
 	}
 
 	/**
