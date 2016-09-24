@@ -1777,9 +1777,10 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<description>
 			<![CDATA[
 				The <code>&lt;o:inputFile&gt;</code> is a component that extends the standard <code>&lt;h:inputFile&gt;</code> and
-				adds support for <code>multiple</code>, <code>directory</code> and <code>accept</code> attributes. Additionally, it
-				makes sure that the value of HTML file input element is never rendered. The standard <code>&lt;h:inputFile&gt;</code>
-				renders <code>Part#toString()</code> to it which is unnecessary.
+				adds support for <code>multiple</code>, <code>directory</code>, <code>accept</code> and <code>maxsize</code>
+				attributes, along with built-in server side validation on <code>accept</code> and <code>maxsize</code> attributes.
+				Additionally, it makes sure that the value of HTML file input element is never rendered. The standard
+				<code>&lt;h:inputFile&gt;</code> renders <code>Part#toString()</code> to it which is unnecessary.
 			]]>
 		</description>
 		<tag-name>inputFile</tag-name>
