@@ -1,0 +1,77 @@
+<!--
+
+    Copyright 2016 OmniFaces
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+    the License. You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+    an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+    specific language governing permissions and limitations under the License.
+
+-->
+<!DOCTYPE html>
+<html lang="en"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:a="http://xmlns.jcp.org/jsf/passthrough"
+	xmlns:o="http://omnifaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions"
+>
+	<h:head />
+
+	<h:body>
+		<h:messages id="messages" />
+
+		<h:form id="uploadSingle" enctype="multipart/form-data">
+			<o:inputFile id="file" value="#{inputFileITBean.file}" />
+			<h:commandButton id="submit" action="#{inputFileITBean.uploadSingle}" />
+		</h:form>
+
+		<h:form id="uploadSingleAjax" enctype="multipart/form-data">
+			<o:inputFile id="file" value="#{inputFileITBean.file}" />
+			<h:commandButton id="submit" action="#{inputFileITBean.uploadSingle}">
+				<f:ajax execute="@form" render=":messages" />
+			</h:commandButton>
+		</h:form>
+
+		<h:form id="uploadSingleAccept" enctype="multipart/form-data">
+			<o:inputFile id="file" value="#{inputFileITBean.file}" label="label" 
+				accept="image/*" acceptMessage="{0}: {1} is not {2}" />
+			<h:commandButton id="submit" action="#{inputFileITBean.uploadSingle}" />
+		</h:form>
+
+		<h:form id="uploadSingleMaxsizeClient" enctype="multipart/form-data">
+			<o:inputFile id="file" value="#{inputFileITBean.file}" label="label" 
+				maxsize="10" maxsizeMessage="{0}: {1} larger than {2}" />
+			<h:commandButton id="submit" action="#{inputFileITBean.uploadSingle}" />
+		</h:form>
+
+		<h:form id="uploadSingleMaxsizeServer" enctype="multipart/form-data">
+			<o:inputFile id="file" value="#{inputFileITBean.file}" label="label" 
+				maxsize="#{facesContext.currentPhaseId.ordinal ne 6 ? 10 : null}" maxsizeMessage="{0}: {1} larger than {2}" />
+				<!-- Above maxsize value should skip client side validation. -->
+			<h:commandButton id="submit" action="#{inputFileITBean.uploadSingle}" />
+		</h:form>
+
+		<h:form id="uploadMultiple" enctype="multipart/form-data">
+			<o:inputFile id="file1" value="#{inputFileITBean.files}" multiple="true" />
+			<o:inputFile id="file2" a:name="uploadMultiple:file1" rendered="#{facesContext.currentPhaseId.ordinal eq 6}" />
+			<!-- Above additional input is a work around for Selenium WebDriver API not supporting multi file upload. -->
+			<h:commandButton id="submit" action="#{inputFileITBean.uploadMultiple}" />
+		</h:form>
+
+		<h:form id="uploadMultipleAjax" enctype="multipart/form-data">
+			<o:inputFile id="file1" value="#{inputFileITBean.files}" multiple="true" />
+			<o:inputFile id="file2" a:name="uploadMultipleAjax:file1" rendered="#{facesContext.currentPhaseId.ordinal eq 6}" />
+			<!-- Above additional input is a work around for Selenium WebDriver API not supporting multi file upload. -->
+			<h:commandButton id="submit" action="#{inputFileITBean.uploadMultiple}">
+				<f:ajax execute="@form" render=":messages" />
+			</h:commandButton>
+		</h:form>
+	</h:body>
+</html>
