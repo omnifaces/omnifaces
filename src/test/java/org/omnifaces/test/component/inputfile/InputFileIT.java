@@ -98,6 +98,12 @@ public class InputFileIT extends OmniFacesIT {
 	}
 
 	@Test
+	public void uploadSingleEmpty() throws IOException {
+		guardHttp(uploadSingleSubmit).click();
+		assertEquals("uploadSingle: null", messages.getText());
+	}
+
+	@Test
 	public void uploadSingleAjax() throws IOException {
 		File txtFile = createTempFile("file", "txt", "hello world");
 		uploadSingleAjaxFile.sendKeys(txtFile.getAbsolutePath());

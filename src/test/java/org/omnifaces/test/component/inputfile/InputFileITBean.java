@@ -29,7 +29,7 @@ public class InputFileITBean {
 	private List<Part> files;
 
 	public void uploadSingle() {
-		addGlobalInfo("uploadSingle: " + file.getSize() + ", " + getSubmittedFileName(file));
+		addGlobalInfo("uploadSingle: " + (file == null ? "null" : (file.getSize() + ", " + getSubmittedFileName(file))));
 	}
 
 	public void uploadMultiple() {
