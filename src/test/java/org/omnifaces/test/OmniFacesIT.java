@@ -26,7 +26,9 @@ import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Before;
 import org.junit.runner.RunWith;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 @RunWith(Arquillian.class)
 public abstract class OmniFacesIT {
@@ -42,16 +44,42 @@ public abstract class OmniFacesIT {
 		open(getClass().getSimpleName() + ".xhtml");
 	}
 
-	public void open(String pageName) {
+	protected void open(String pageName) {
 		browser.get(baseURL + pageName);
 		waitGui(browser);
 	}
 
-	public static String stripJsessionid(String url) {
+	/**
+	 * Work around because Selenium WebDriver API doesn't support triggering JS events.
+	 */
+	protected void triggerOnchange(WebElement input, WebElement messages) {
+		clearMessages(messages);
+		executeScript("document.getElementById('" + input.getAttribute("id") + "').onchange();");
+		waitGui(browser).until().element(messages).text().not().equalTo("");
+	}
+
+	/**
+	 * Work around because Selenium WebDriver API doesn't recognize iframe based ajax upload in guard.
+	 */
+	protected void guardAjaxUpload(WebElement submit, WebElement messages) {
+		clearMessages(messages);
+		submit.click();
+		waitGui(browser).until().element(messages).text().not().equalTo("");
+	}
+
+	private void executeScript(String script) {
+		((JavascriptExecutor) browser).executeScript(script);
+	}
+
+	private void clearMessages(WebElement messages) {
+		executeScript("document.getElementById('" + messages.getAttribute("id") + "').innerHTML='';");
+	}
+
+	protected static String stripJsessionid(String url) {
 		return url.split(";jsessionid=", 2)[0];
 	}
 
-	public static boolean isTomee() {
+	protected static boolean isTomee() {
 		return "tomee".equals(System.getProperty("profile.id"));
 	}
 

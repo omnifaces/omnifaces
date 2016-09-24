@@ -13,7 +13,6 @@
 package org.omnifaces.test.taghandler.validatebean;
 
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
-import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.omnifaces.test.OmniFacesIT.ArchiveBuilder.buildWebArchive;
@@ -23,7 +22,6 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.omnifaces.test.OmniFacesIT;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 
@@ -139,49 +137,41 @@ public class ValidateBeanIT extends OmniFacesIT {
 	@Test
 	public void validateByInput() {
 		validateDefaultByInput.sendKeys("x");
-		triggerOnchange(validateDefaultByInput);
+		triggerOnchange(validateDefaultByInput, messages);
 		assertEquals("default", messages.getText());
 
 		validateDefaultByInput.clear();
 		validateDefaultByInput.sendKeys("xx");
-		triggerOnchange(validateDefaultByInput);
+		triggerOnchange(validateDefaultByInput, messages);
 		assertEquals("actionSuccess", messages.getText());
 
 		validateGroupByInput.sendKeys("x");
-		triggerOnchange(validateGroupByInput);
+		triggerOnchange(validateGroupByInput, messages);
 		assertEquals("group", messages.getText());
 
 		validateGroupByInput.clear();
 		validateGroupByInput.sendKeys("xx");
-		triggerOnchange(validateGroupByInput);
+		triggerOnchange(validateGroupByInput, messages);
 		assertEquals("actionSuccess", messages.getText());
 
 		validateDefaultAndGroupByInput.sendKeys("x");
-		triggerOnchange(validateDefaultAndGroupByInput);
+		triggerOnchange(validateDefaultAndGroupByInput, messages);
 		String message = messages.getText();
 		assertTrue(message.contains("default") && message.contains("group")); // It's unordered.
 
 		validateDefaultAndGroupByInput.clear();
 		validateDefaultAndGroupByInput.sendKeys("xx");
-		triggerOnchange(validateDefaultAndGroupByInput);
+		triggerOnchange(validateDefaultAndGroupByInput, messages);
 		assertEquals("actionSuccess", messages.getText());
 
 		validateDisabledByInput.sendKeys("x");
-		triggerOnchange(validateDisabledByInput);
+		triggerOnchange(validateDisabledByInput, messages);
 		assertEquals("actionSuccess", messages.getText());
 
 		validateDisabledByInput.clear();
 		validateDisabledByInput.sendKeys("xx");
-		triggerOnchange(validateDisabledByInput);
+		triggerOnchange(validateDisabledByInput, messages);
 		assertEquals("actionSuccess", messages.getText());
-	}
-
-	private void triggerOnchange(WebElement element) {
-		((JavascriptExecutor) browser).executeScript(""
-			+ "document.getElementById('messages').innerHTML='';"
-			+ "document.getElementById('" + element.getAttribute("id") + "').onchange();"
-		);
-		waitGui(browser).until().element(messages).text().not().equalTo("");
 	}
 
 	@Test
