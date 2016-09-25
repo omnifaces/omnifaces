@@ -42,12 +42,9 @@ import javax.faces.view.facelets.TagHandler;
  * For example:
  * <pre>
  * &lt;o:importFunctions type="java.lang.Math" var="m" /&gt;
- * &lt;o:importFunctions type="org.omnifaces.util.Faces" /&gt;
  * ...
  * #{m:abs(-10)}
  * #{m:max(bean.number1, bean.number2)}
- * ...
- * &lt;base href="#{Faces:getRequestBaseURL()}" /&gt;
  * </pre>
  * <p>
  * The functions prefix becomes by default the simple name of the type. You can override this by explicitly
@@ -72,9 +69,9 @@ import javax.faces.view.facelets.TagHandler;
  * Note that the colon <code>:</code> operator to invoke the method is as required by EL functions spec. It's by
  * design not easily possible to change it to the period <code>.</code> operator. Also note that in case of
  * <code>org.omnifaces.util.Faces</code> it's considered poor practice if the same functionality is already available
- * through the implicit EL variables <code>#{facesContext}</code>, <code>#{view}</code>, <code>#{request}</code>, etc
- * such as <code>#{request.contextPath}</code> which should be preferred over
- * <code>#{Faces:getRequestContextPath()}</code>.</p>
+ * through the implicit EL objects <code>#{faces}</code>, <code>#{facesContext}</code>, <code>#{view}</code>,
+ * <code>#{request}</code>, etc such as <code>#{faces.development}</code> or <code>#{request.contextPath}</code> which
+ * should be preferred over <code>#{Faces:isDevelopment()}</code> or <code>#{Faces:getRequestContextPath()}</code>.
  *
  * @author Bauke Scholtz
  * @since 1.4

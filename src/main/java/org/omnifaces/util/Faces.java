@@ -63,6 +63,7 @@ import javax.servlet.http.Part;
 
 import org.omnifaces.component.ParamHolder;
 import org.omnifaces.config.FacesConfigXml;
+import org.omnifaces.el.FacesELResolver;
 
 /**
  * <p>
@@ -145,10 +146,26 @@ import org.omnifaces.config.FacesConfigXml;
  * {@link FacesLocal} obtains the {@link FacesContext} from the current thread by
  * {@link FacesContext#getCurrentInstance()}. This job is up to the caller.
  *
+ * <h3>#{faces} in EL</h3>
+ * <p>
+ * Since OmniFaces 2.6,
+ * all methods of {@link Faces} utility class which start with "get" or "is", and take no parameters, and return
+ * either <code>String</code> or <code>boolean</code>, and are not related to response nor to session or flash (for
+ * which already implicit EL objects <code>#{session}</code> and <code>#{flash}</code> exist), will be available as
+ * properties of the implicit object <code>#{faces}</code>. Examples are:
+ * <pre>
+ * #{faces.development}
+ * #{faces.serverInfo}
+ * #{faces.ajaxRequest}
+ * #{faces.requestBaseURL}
+ * #{faces.requestURLWithQueryString}
+ * </pre>
+ *
  * @author Arjan Tijms
  * @author Bauke Scholtz
  * @see FacesLocal
  * @see Servlets
+ * @see FacesELResolver
  */
 public final class Faces {
 
@@ -255,6 +272,8 @@ public final class Faces {
 
 	/**
 	 * Returns the implementation information of currently loaded JSF implementation. E.g. "Mojarra 2.1.7-FCS".
+	 * <p>
+	 * This is also available in EL as <code>#{faces.implInfo}</code>.
 	 * @return The implementation information of currently loaded JSF implementation.
 	 * @see Package#getImplementationTitle()
 	 * @see Package#getImplementationVersion()
@@ -266,6 +285,8 @@ public final class Faces {
 
 	/**
 	 * Returns the server information of currently running application server implementation.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.serverInfo}</code>.
 	 * @return The server information of currently running application server implementation.
 	 * @see ServletContext#getServerInfo()
 	 */
@@ -276,6 +297,8 @@ public final class Faces {
 	/**
 	 * Returns whether we're in development stage. This will be the case when the <code>javax.faces.PROJECT_STAGE</code>
 	 * context parameter in <code>web.xml</code> is set to <code>Development</code>.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.development}</code>.
 	 * @return <code>true</code> if we're in development stage, otherwise <code>false</code>.
 	 * @see Application#getProjectStage()
 	 */
@@ -287,6 +310,8 @@ public final class Faces {
 	 * Determines and returns the faces servlet mapping used in the current request. If JSF is prefix mapped (e.g.
 	 * <code>/faces/*</code>), then this returns the whole path, with a leading slash (e.g. <code>/faces</code>). If JSF
 	 * is suffix mapped (e.g. <code>*.xhtml</code>), then this returns the whole extension (e.g. <code>.xhtml</code>).
+	 * <p>
+	 * This is also available in EL as <code>#{faces.mapping}</code>.
 	 * @return The faces servlet mapping (without the wildcard).
 	 * @see #getRequestPathInfo()
 	 * @see #getRequestServletPath()
@@ -299,6 +324,8 @@ public final class Faces {
 	 * Returns whether the faces servlet mapping used in the current request is a prefix mapping.
 	 * @return <code>true</code> if the faces servlet mapping used in the current request is a prefix mapping, otherwise
 	 * <code>false</code>.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.prefixMapping}</code>.
 	 * @see #getMapping()
 	 * @see #isPrefixMapping(String)
 	 */
@@ -340,6 +367,8 @@ public final class Faces {
 
 	/**
 	 * Returns whether the validations phase of the current request has failed.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.validationFailed}</code>.
 	 * @return <code>true</code> if the validations phase of the current request has failed, otherwise
 	 * <code>false</code>.
 	 * @see FacesContext#isValidationFailed()
@@ -552,6 +581,8 @@ public final class Faces {
 
 	/**
 	 * Returns the ID of the current view root, or <code>null</code> if there is no view.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.viewId}</code>, although <code>#{view.viewId}</code> could be used.
 	 * @return The ID of the current view root, or <code>null</code> if there is no view.
 	 * @see UIViewRoot#getViewId()
 	 */
@@ -561,6 +592,8 @@ public final class Faces {
 
 	/**
 	 * Returns the ID of the current view root with view parameters.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.viewIdWithParameters}</code>.
 	 * @return The ID of the current view root with view parameters.
 	 * @see UIViewRoot#getViewId()
 	 * @see ViewMetadata#getViewParameters(UIViewRoot)
@@ -573,6 +606,8 @@ public final class Faces {
 	/**
 	 * Returns the base name of the current view, without extension, or <code>null</code> if there is no view.
 	 * E.g. if the view ID is <code>/path/to/some.xhtml</code>, then this will return <code>some</code>.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.viewName}</code>.
 	 * @return The base name of the current view, without extension, or <code>null</code> if there is no view.
 	 * @see UIViewRoot#getViewId()
 	 * @since 2.3
@@ -944,6 +979,8 @@ public final class Faces {
 
 	/**
 	 * Returns whether the current request is an ajax request.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.ajaxRequest}</code>.
 	 * @return <code>true</code> for an ajax request, <code>false</code> for a non-ajax (synchronous) request.
 	 * @see PartialViewContext#isAjaxRequest()
 	 */
@@ -954,6 +991,8 @@ public final class Faces {
 	/**
 	 * Returns whether the current request is an ajax request with partial rendering. That is, when it's an ajax request
 	 * without <code>render="@all"</code>.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.ajaxRequestWithPartialRendering}</code>.
 	 * @return <code>true</code> for an ajax request with partial rendering, <code>false</code> an ajax request with
 	 * <code>render="@all"</code> or a non-ajax (synchronous) request.
 	 * @see PartialViewContext#isAjaxRequest()
@@ -966,6 +1005,8 @@ public final class Faces {
 
 	/**
 	 * Returns whether the current request is a postback.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.postback}</code>.
 	 * @return <code>true</code> for a postback, <code>false</code> for a non-postback (GET) request.
 	 * @see FacesContext#isPostback()
 	 */
@@ -1092,6 +1133,8 @@ public final class Faces {
 	/**
 	 * Returns the HTTP request context path. It's the webapp context name, with a leading slash. If the webapp runs
 	 * on context root, then it returns an empty string.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.requestContextPath}</code>.
 	 * @return The HTTP request context path.
 	 * @see ExternalContext#getRequestContextPath()
 	 */
@@ -1103,6 +1146,8 @@ public final class Faces {
 	 * Returns the HTTP request servlet path. If JSF is prefix mapped (e.g. <code>/faces/*</code>), then this returns
 	 * the whole prefix mapping (e.g. <code>/faces</code>). If JSF is suffix mapped (e.g. <code>*.xhtml</code>), then
 	 * this returns the whole part after the context path, with a leading slash.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.requestServletPath}</code>.
 	 * @return The HTTP request servlet path.
 	 * @see ExternalContext#getRequestServletPath()
 	 */
@@ -1114,6 +1159,8 @@ public final class Faces {
 	 * Returns the HTTP request path info. If JSF is prefix mapped (e.g. <code>/faces/*</code>), then this returns the
 	 * whole part after the prefix mapping, with a leading slash. If JSF is suffix mapped (e.g. <code>*.xhtml</code>),
 	 * then this returns <code>null</code>.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.requestPathInfo}</code>.
 	 * @return The HTTP request path info.
 	 * @see ExternalContext#getRequestPathInfo()
 	 */
@@ -1125,6 +1172,8 @@ public final class Faces {
 	 * Returns the HTTP request hostname. This is the entire domain, without any scheme and slashes. Noted should be
 	 * that this value is extracted from the request URL, not from {@link HttpServletRequest#getServerName()} as its
 	 * outcome can be influenced by proxies.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.requestHostName}</code>.
 	 * @return The HTTP request hostname.
 	 * @throws IllegalArgumentException When the URL is malformed. This is however unexpected as the request would
 	 * otherwise not have hit the server at all.
@@ -1138,6 +1187,8 @@ public final class Faces {
 	/**
 	 * Returns the HTTP request base URL. This is the URL from the scheme, domain until with context path, including
 	 * the trailing slash. This is the value you could use in HTML <code>&lt;base&gt;</code> tag.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.requestBaseURL}</code>.
 	 * @return The HTTP request base URL.
 	 * @see HttpServletRequest#getRequestURL()
 	 * @see HttpServletRequest#getRequestURI()
@@ -1149,6 +1200,8 @@ public final class Faces {
 
 	/**
 	 * Returns the HTTP request domain URL. This is the URL with the scheme and domain, without any trailing slash.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.requestDomainURL}</code>.
 	 * @return The HTTP request domain URL.
 	 * @see HttpServletRequest#getRequestURL()
 	 * @see HttpServletRequest#getRequestURI()
@@ -1161,6 +1214,8 @@ public final class Faces {
 	/**
 	 * Returns the HTTP request URL. This is the full request URL as the enduser sees in browser address bar. This does
 	 * not include the request query string.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.requestURL}</code>.
 	 * @return The HTTP request URL.
 	 * @see HttpServletRequest#getRequestURL()
 	 * @since 1.1
@@ -1172,6 +1227,8 @@ public final class Faces {
 	/**
 	 * Returns the HTTP request URI. This is the part after the domain in the request URL, including the leading slash.
 	 * This does not include the request query string.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.requestURI}</code>.
 	 * @return The HTTP request URI.
 	 * @see HttpServletRequest#getRequestURI()
 	 * @since 1.1
@@ -1183,6 +1240,8 @@ public final class Faces {
 	/**
 	 * Returns the HTTP request query string. This is the part after the <code>?</code> in the request URL as the
 	 * enduser sees in browser address bar.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.requestQueryString}</code>.
 	 * @return The HTTP request query string.
 	 * @see HttpServletRequest#getQueryString()
 	 * @since 1.1
@@ -1207,6 +1266,8 @@ public final class Faces {
 	/**
 	 * Returns the HTTP request URL with query string. This is the full request URL with query string as the enduser
 	 * sees in browser address bar.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.requestURLWithQueryString}</code>.
 	 * @return The HTTP request URL with query string.
 	 * @see HttpServletRequest#getRequestURL()
 	 * @see HttpServletRequest#getQueryString()
@@ -1219,6 +1280,8 @@ public final class Faces {
 	/**
 	 * Returns the HTTP request URI with query string. This is the part after the domain in the request URL, including
 	 * the leading slash and the request query string.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.requestURIWithQueryString}</code>.
 	 * @return The HTTP request URI with query string.
 	 * @see HttpServletRequest#getRequestURI()
 	 * @see HttpServletRequest#getQueryString()
@@ -1269,6 +1332,8 @@ public final class Faces {
 	 * Returns the Internet Protocol (IP) address of the client that sent the request. This will first check the
 	 * <code>X-Forwarded-For</code> request header and if it's present, then return its first IP address, else just
 	 * return {@link HttpServletRequest#getRemoteAddr()} unmodified.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.remoteAddr}</code>.
 	 * @return The IP address of the client.
 	 * @see HttpServletRequest#getRemoteAddr()
 	 * @since 1.2
@@ -1467,6 +1532,8 @@ public final class Faces {
 	 * Returns <code>true</code> if we're currently in the render response phase. This explicitly checks the current
 	 * phase ID instead of {@link FacesContext#getRenderResponse()} as the latter may unexpectedly return false during
 	 * a GET request when <code>&lt;f:viewParam&gt;</code> is been used.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.renderResponse}</code>.
 	 * @return <code>true</code> if we're currently in the render response phase.
 	 * @see FacesContext#getCurrentPhaseId()
 	 * @since 1.4
@@ -1541,6 +1608,8 @@ public final class Faces {
 
 	/**
 	 * Returns the name of the logged-in user for container managed FORM based authentication, if any.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.remoteUser}</code>.
 	 * @return The name of the logged-in user for container managed FORM based authentication, if any.
 	 * @see ExternalContext#getRemoteUser()
 	 */

@@ -40,6 +40,7 @@
 			<system-event-class>javax.faces.event.PreDestroyViewMapEvent</system-event-class>
 			<source-class>javax.faces.component.UIViewRoot</source-class>
 		</system-event-listener>
+		<el-resolver>org.omnifaces.el.FacesELResolver</el-resolver>
 	</application>
 
 	<lifecycle>
