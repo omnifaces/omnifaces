@@ -33,17 +33,21 @@ import static org.omnifaces.util.Faces.getELContext;
 import static org.omnifaces.util.Faces.renderResponse;
 import static org.omnifaces.util.Faces.validationFailed;
 import static org.omnifaces.util.FacesLocal.evaluateExpressionGet;
-import static org.omnifaces.util.Messages.createError;
+import static org.omnifaces.util.Messages.addError;
+import static org.omnifaces.util.Messages.addGlobalError;
 import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Reflection.setProperties;
 import static org.omnifaces.util.Reflection.toClass;
+import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.csvToList;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -70,6 +74,7 @@ import javax.validation.ConstraintViolation;
 
 import org.omnifaces.eventlistener.BeanValidationEventListener;
 import org.omnifaces.util.Callback;
+import org.omnifaces.util.Components;
 import org.omnifaces.util.Platform;
 import org.omnifaces.util.copier.CloneCopier;
 import org.omnifaces.util.copier.Copier;
@@ -143,7 +148,66 @@ import org.omnifaces.util.copier.SerializationCopier;
  * If the above order is not ideal, or if an custom copy strategy is needed (e.g. when it's only needed to copy a few fields for the validation)
  * a strategy can be supplied explicitly via the <code>copier</code> attribute. The value of this attribute can be any of the build-in copier implementations
  * given above, or can be a custom implementation of the {@link Copier} interface.
+ * <p>
+ * If the copying strategy is not possible due to technical limitations, then you could set <code>method</code>
+ * attribute to <code>"validateActual"</code>.
+ * <pre>
+ * &lt;o:validateBean value="#{bean.product}" validationGroups="com.example.MyGroup" method="validateActual" /&gt;
+ * </pre>
+ * <p>
+ * This will update the model values and run the validation after update model values phase instead of the validations
+ * phase. The disadvantage is that the invalid values remain in the model and that the action method is anyway invoked.
+ * You would need an additional check for {@link FacesContext#isValidationFailed()} in the action method to see if it
+ * has failed or not.
  *
+ * <h3>Faces messages</h3>
+ * <p>
+ * By default, the faces message is added with client ID of the parent {@link UIForm}.
+ * <pre>
+ * &lt;h:form id="formId"&gt;
+ *     ...
+ *     &lt;h:message for="formId" /&gt;
+ *     &lt;o:validateBean ... /&gt;
+ * &lt;/h:form&gt;
+ * </pre>
+ * <p>
+ * The faces message can also be shown for all invalidated components using <code>showMessageFor="@all"</code>.
+ * <pre>
+ * &lt;h:form&gt;
+ *     &lt;h:inputText id="foo" /&gt;
+ *     &lt;h:message for="foo" /&gt;
+ *     &lt;h:inputText id="bar" /&gt;
+ *     &lt;h:message for="bar" /&gt;
+ *     ...
+ *     &lt;o:validateBean ... showMessageFor="@all" /&gt;
+ * &lt;/h:form&gt;
+ * </pre>
+ * <p>
+ * The faces message can also be shown as global message using <code>showMessageFor="@global"</code>.
+ * <pre>
+ * &lt;h:form&gt;
+ *     ...
+ *     &lt;o:validateBean ... showMessageFor="@global" /&gt;
+ * &lt;/h:form&gt;
+ * &lt;h:messages globalOnly="true" /&gt;
+ * </pre>
+ * <p>
+ * The faces message can also be shown for specific components referenced by a space separated collection of their
+ * client IDs in <code>showMessageFor</code> attribute.
+ * <pre>
+ * &lt;h:form&gt;
+ *     &lt;h:inputText id="foo" /&gt;
+ *     &lt;h:message for="foo" /&gt;
+ *     &lt;h:inputText id="bar" /&gt;
+ *     &lt;h:message for="bar" /&gt;
+ *     ...
+ *     &lt;o:validateBean ... showMessageFor="foo bar" /&gt;
+ * &lt;/h:form&gt;
+ * </pre>
+ * <p>
+ * The <code>showMessageFor</code> attribute is new since OmniFaces 2.5 and it defaults to <code>@form</code>. The
+ * <code>showMessageFor</code> attribute does by design not have any effect when <code>validateMethod="actual"</code>
+ * is used.
  *
  * @author Bauke Scholtz
  * @author Arjan Tijms
@@ -155,6 +219,7 @@ public class ValidateBean extends TagHandler {
 
 	private static final Logger logger = Logger.getLogger(ValidateBean.class.getName());
 
+	private static final String DEFAULT_SHOWMESSAGEFOR = "@form";
 	private static final String ERROR_MISSING_FORM =
 		"o:validateBean must be nested in an UIForm.";
 	private static final String ERROR_INVALID_PARENT =
@@ -181,6 +246,7 @@ public class ValidateBean extends TagHandler {
 	private ValidateMethod method;
 	private String groups;
 	private String copier;
+	private String showMessageFor;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -217,7 +283,8 @@ public class ValidateBean extends TagHandler {
 		disabled = getBoolean(context, getAttribute("disabled"));
 		method = ValidateMethod.of(getString(context, getAttribute("method")));
 		groups = getString(context, getAttribute("validationGroups"));
-		copier = getAttribute("copier") == null? null : getAttribute("copier").getValue();
+		copier = getString(context, getAttribute("copier"));
+		showMessageFor = coalesce(getString(context, getAttribute("showMessageFor")), DEFAULT_SHOWMESSAGEFOR);
 
 		// We can't use getCurrentForm() or hasInvokedSubmit() before the component is added to view, because the client ID isn't available.
 		// Hence, we subscribe this check to after phase of restore view.
@@ -266,7 +333,7 @@ public class ValidateBean extends TagHandler {
 	private void validateActualBean(final UIForm form, final Object bean, final String groups) {
 		ValidateBeanCallback validateActualBean = new ValidateBeanCallback() { @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
-			validate(context, form, bean, groups, false);
+			validate(context, form, bean, groups, Collections.<String>emptySet(), showMessageFor, false);
 		}};
 
 		subscribeToRequestAfterPhase(UPDATE_MODEL_VALUES, validateActualBean);
@@ -279,13 +346,14 @@ public class ValidateBean extends TagHandler {
 	 * then validate copied bean and proceed to render response on fail.
 	 */
 	private void validateCopiedBean(final UIForm form, final Object bean, final String copier, final String groups) {
+		final Set<String> clientIds = new HashSet<>();
 		final Map<String, Object> properties = new HashMap<>();
 
 		ValidateBeanCallback collectBeanProperties = new ValidateBeanCallback() { @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
 
 			forEachInputWithMatchingBase(context, form, bean, new Callback.WithArgument<EditableValueHolder>() { @Override public void invoke(EditableValueHolder v) {
-				addCollectingValidator(v, properties);
+				addCollectingValidator(v, clientIds, properties);
 			}});
 		}};
 
@@ -298,7 +366,7 @@ public class ValidateBean extends TagHandler {
 
 			Object copiedBean = getCopier(context, copier).copy(bean);
 			setProperties(copiedBean, properties);
-			validate(context, form, copiedBean, groups, true);
+			validate(context, form, copiedBean, groups, clientIds, showMessageFor, true);
 		}};
 
 		subscribeToRequestBeforePhase(PROCESS_VALIDATIONS, collectBeanProperties);
@@ -338,8 +406,8 @@ public class ValidateBean extends TagHandler {
 			}});
 	}
 
-	private static void addCollectingValidator(EditableValueHolder valueHolder, Map<String, Object> propertyValues) {
-		valueHolder.addValidator(new CollectingValidator(propertyValues));
+	private static void addCollectingValidator(EditableValueHolder valueHolder, Set<String> clientIds, Map<String, Object> properties) {
+		valueHolder.addValidator(new CollectingValidator(clientIds, properties));
 	}
 
 	private static void removeCollectingValidator(EditableValueHolder valueHolder) {
@@ -379,7 +447,7 @@ public class ValidateBean extends TagHandler {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private static void validate(FacesContext context, UIForm form, Object bean, String groups, boolean renderResponseOnFail) {
+	private static void validate(FacesContext context, UIForm form, Object bean, String groups, Set<String> clientIds, String showMessageFor, boolean renderResponseOnFail) {
 		List<Class> groupClasses = new ArrayList<>();
 
 		for (String group : csvToList(groups)) {
@@ -391,14 +459,56 @@ public class ValidateBean extends TagHandler {
 
 		if (!violations.isEmpty()) {
 			context.validationFailed();
-			String formId = form.getClientId(context);
+			final StringBuilder labels = new StringBuilder();
 
-			for (ConstraintViolation<?> violation : violations) {
-				context.addMessage(formId, createError(violation.getMessage()));
+			if (!clientIds.isEmpty()) {
+				forEachComponent(context).fromRoot(form).havingIds(clientIds).invoke(new Callback.WithArgument<UIInput>() {
+					@Override
+					public void invoke(UIInput input) {
+						input.setValid(false);
+
+						if (labels.length() > 0) {
+							labels.append(", ");
+						}
+
+						labels.append(Components.getLabel(input));
+					}
+				});
 			}
+
+			showMessages(context, form, violations, clientIds, labels.toString(), showMessageFor);
 
 			if (renderResponseOnFail) {
 				context.renderResponse();
+			}
+		}
+	}
+
+	private static void showMessages(FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, Set<String> clientIds, String labels, String showMessageFor) {
+		if (showMessageFor.equals("@form")) {
+			String formId = form.getClientId(context);
+
+			for (ConstraintViolation<?> violation : violations) {
+				addError(formId, violation.getMessage(), labels);
+			}
+		}
+		else if (showMessageFor.equals("@all")) {
+			for (String clientId : clientIds) {
+				for (ConstraintViolation<?> violation : violations) {
+					addError(clientId, violation.getMessage(), labels);
+				}
+			}
+		}
+		else if (showMessageFor.equals("@global")) {
+			for (ConstraintViolation<?> violation : violations) {
+				addGlobalError(violation.getMessage(), labels);
+			}
+		}
+		else {
+			for (String clientId : showMessageFor.split("\\s+")) {
+				for (ConstraintViolation<?> violation : violations) {
+					addError(clientId, violation.getMessage(), labels);
+				}
 			}
 		}
 	}
@@ -407,10 +517,12 @@ public class ValidateBean extends TagHandler {
 
 	public static final class CollectingValidator implements Validator {
 
-		private final Map<String, Object> propertyValues;
+		private final Set<String> clientIds;
+		private final Map<String, Object> properties;
 
-		public CollectingValidator(Map<String, Object> propertyValues) {
-			this.propertyValues = propertyValues;
+		public CollectingValidator(Set<String> clientIds, Map<String, Object> properties) {
+			this.clientIds = clientIds;
+			this.properties = properties;
 		}
 
 		@Override
@@ -419,7 +531,8 @@ public class ValidateBean extends TagHandler {
 
 			if (valueExpression != null) {
 				ValueReference valueReference = getValueReference(context.getELContext(), valueExpression);
-				propertyValues.put(valueReference.getProperty().toString(), value);
+				clientIds.add(component.getClientId(context));
+				properties.put(valueReference.getProperty().toString(), value);
 			}
 		}
 	}
