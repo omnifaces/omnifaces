@@ -26,7 +26,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.el.ELContext;
 import javax.el.ELResolver;
 import javax.el.PropertyNotFoundException;
-import javax.el.PropertyNotWritableException;
 
 import org.omnifaces.util.Faces;
 
@@ -123,7 +122,7 @@ public class FacesELResolver extends ELResolver {
 
 	@Override
 	public void setValue(ELContext context, Object base, Object property, Object val) {
-		throw new PropertyNotWritableException();
+		// NOOP.
 	}
 
 	@Override
