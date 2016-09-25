@@ -205,7 +205,7 @@ import org.omnifaces.util.copier.SerializationCopier;
  * &lt;/h:form&gt;
  * </pre>
  * <p>
- * The <code>showMessageFor</code> attribute is new since OmniFaces 2.5 and it defaults to <code>@form</code>. The
+ * The <code>showMessageFor</code> attribute is new since OmniFaces 2.6 and it defaults to <code>@form</code>. The
  * <code>showMessageFor</code> attribute does by design not have any effect when <code>validateMethod="actual"</code>
  * is used.
  *
