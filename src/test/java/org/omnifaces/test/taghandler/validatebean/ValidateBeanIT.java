@@ -84,6 +84,21 @@ public class ValidateBeanIT extends OmniFacesIT {
 	@FindBy(id="validateClassLevelByCopier:command")
 	private WebElement validateClassLevelByCopierCommand;
 
+	@FindBy(id="validateClassLevelWithMessage:number1")
+	private WebElement validateClassLevelWithMessageNumber1;
+
+	@FindBy(id="validateClassLevelWithMessage:number1Message")
+	private WebElement validateClassLevelWithMessageNumber1Message;
+
+	@FindBy(id="validateClassLevelWithMessage:number2")
+	private WebElement validateClassLevelWithMessageNumber2;
+
+	@FindBy(id="validateClassLevelWithMessage:number2Message")
+	private WebElement validateClassLevelWithMessageNumber2Message;
+
+	@FindBy(id="validateClassLevelWithMessage:command")
+	private WebElement validateClassLevelWithMessageCommand;
+
 	@Deployment(testable=false)
 	public static WebArchive createDeployment() {
 		return buildWebArchive(ValidateBeanIT.class)
@@ -175,7 +190,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void validateClassLevelCopy() {
+	public void validateClassLevelDefault() {
 		validateClassLevelDefaultNumber1.sendKeys("2");
 		validateClassLevelDefaultNumber2.sendKeys("1");
 		guardAjax(validateClassLevelDefaultCommand).click();
@@ -208,6 +223,20 @@ public class ValidateBeanIT extends OmniFacesIT {
 		validateClassLevelByCopierNumber2.sendKeys("0");
 		guardAjax(validateClassLevelByCopierCommand).click();
 		assertEquals("actionSuccess", messages.getText());
+	}
+
+	@Test
+	public void validateClassLevelWithMessage() {
+		validateClassLevelWithMessageNumber1.sendKeys("2");
+		validateClassLevelWithMessageNumber2.sendKeys("1");
+		guardAjax(validateClassLevelWithMessageCommand).click();
+		assertEquals("invalidEntity", validateClassLevelWithMessageNumber1Message.getText());
+		assertEquals("invalidEntity", validateClassLevelWithMessageNumber2Message.getText());
+
+		validateClassLevelWithMessageNumber2.sendKeys("0");
+		guardAjax(validateClassLevelWithMessageCommand).click();
+		assertEquals("", validateClassLevelWithMessageNumber1Message.getText());
+		assertEquals("", validateClassLevelWithMessageNumber2Message.getText());
 	}
 
 }
