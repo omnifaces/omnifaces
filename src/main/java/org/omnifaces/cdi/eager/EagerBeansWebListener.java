@@ -47,18 +47,22 @@ public class EagerBeansWebListener implements HttpSessionListener, ServletReques
 		"Could not instantiate eager request scoped beans for request %s. Possibly the CDI request scope is not active."
 			+ " If this is indeed the case, see JavaDoc on org.omnifaces.cdi.Eager on how to remedy this.";
 
-	private static boolean disabled;
+	private static boolean sessionListenerDisabled;
+	private static boolean requestListenerDisabled;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	static void disable() {
-		disabled = true;
+		sessionListenerDisabled = true;
+		requestListenerDisabled = true;
 	}
 
 	@Override
 	public void sessionCreated(HttpSessionEvent event) {
-		if (!disabled) {
-			EagerBeansRepository.getInstance().instantiateSessionScoped();
+		if (!sessionListenerDisabled) {
+			if (!EagerBeansRepository.getInstance().instantiateSessionScoped()) {
+				sessionListenerDisabled = true;
+			}
 		}
 		else {
 			// Record a "session created" marker manually. HttpSession#isNew() not entirely accurate for our purpose.
@@ -68,11 +72,13 @@ public class EagerBeansWebListener implements HttpSessionListener, ServletReques
 
 	@Override
 	public void requestInitialized(ServletRequestEvent event) {
-		if (!disabled) {
+		if (!requestListenerDisabled) {
 			String uri = getRequestRelativeURIWithoutPathParameters((HttpServletRequest) event.getServletRequest());
 
 			try {
-				EagerBeansRepository.getInstance().instantiateByRequestURI(uri);
+				if (!EagerBeansRepository.getInstance().instantiateByRequestURI(uri)) {
+					requestListenerDisabled = true;
+				}
 			}
 			catch (Exception e) {
 				logger.log(WARNING, format(POSSIBLY_REQUEST_SCOPE_NOT_ACTIVE, uri), e);

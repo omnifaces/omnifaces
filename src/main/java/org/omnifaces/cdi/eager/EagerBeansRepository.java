@@ -104,34 +104,37 @@ public class EagerBeansRepository {
 		instantiateBeans(eagerBeans.applicationScoped);
 	}
 
-	public void instantiateSessionScoped() {
-		instantiateBeans(eagerBeans.sessionScoped);
+	public boolean instantiateSessionScoped() {
+		return eagerBeans != null && instantiateBeans(eagerBeans.sessionScoped);
 	}
 
-	public void instantiateByRequestURI(String relativeRequestURI) {
-		instantiateBeans(eagerBeans.byRequestURI, relativeRequestURI);
+	public boolean instantiateByRequestURI(String relativeRequestURI) {
+		return eagerBeans != null && instantiateBeans(eagerBeans.byRequestURI, relativeRequestURI);
 	}
 
 	public void instantiateByViewID(String viewId) {
 		instantiateBeans(eagerBeans.byViewId, viewId);
 	}
 
-	private void instantiateBeans(Map<String, List<Bean<?>>> beansByKey, String key) {
+	private boolean instantiateBeans(Map<String, List<Bean<?>>> beansByKey, String key) {
 		if (isAnyEmpty(beansByKey, key)) {
-			return;
+			return false;
 		}
 
 		instantiateBeans(beansByKey.get(key));
+		return true;
 	}
 
-	private void instantiateBeans(List<Bean<?>> beans) {
+	private boolean instantiateBeans(List<Bean<?>> beans) {
 		if (isAnyEmpty(beans, beanManager)) {
-			return;
+			return false;
 		}
 
 		for (Bean<?> bean : beans) {
 			beanManager.getReference(bean, bean.getBeanClass(), beanManager.createCreationalContext(bean)).toString();
 		}
+
+		return true;
 	}
 
 	protected static class EagerBeans {
