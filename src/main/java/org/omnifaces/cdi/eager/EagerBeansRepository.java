@@ -73,14 +73,14 @@ public class EagerBeansRepository {
 	}
 
 	public static void instantiateApplicationScopedAndRegisterListenerIfNecessary(ServletContext servletContext) {
-		if (getInstance() != null && instance.hasAnyApplicationScopedBeans()) {
-			try {
+		try {
+			if (getInstance() != null && instance.hasAnyApplicationScopedBeans()) { // #318: getInstance() should stay in try block.
 				instance.instantiateApplicationScoped();
 			}
-			catch (Exception e) {
-				logger.log(WARNING, format(WARNING_POSSIBLY_APPLICATION_SCOPE_NOT_ACTIVE), e);
-				instance = null; // Trigger to add listeners anyway as it may be available at later point.
-			}
+		}
+		catch (Exception e) {
+			logger.log(WARNING, format(WARNING_POSSIBLY_APPLICATION_SCOPE_NOT_ACTIVE), e);
+			instance = null; // Trigger to add listeners anyway as it may be available at later point.
 		}
 
 		if (instance == null || instance.hasAnySessionOrRequestURIBeans()) {
