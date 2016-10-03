@@ -15,7 +15,6 @@ package org.omnifaces.test.cdi.eager;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Long.parseLong;
 import static org.junit.Assert.assertTrue;
-import static org.omnifaces.test.OmniFacesIT.ArchiveBuilder.createWebArchive;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;

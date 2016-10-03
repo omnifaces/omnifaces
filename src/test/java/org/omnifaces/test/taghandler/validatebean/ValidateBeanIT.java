@@ -15,7 +15,6 @@ package org.omnifaces.test.taghandler.validatebean;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.omnifaces.test.OmniFacesIT.ArchiveBuilder.buildWebArchive;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withMessageBundle;
 
 import org.jboss.arquillian.container.test.api.Deployment;

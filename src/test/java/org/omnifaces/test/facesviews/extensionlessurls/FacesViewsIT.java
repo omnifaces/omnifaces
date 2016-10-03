@@ -14,7 +14,6 @@ package org.omnifaces.test.facesviews.extensionlessurls;
 
 import static org.jboss.arquillian.graphene.Graphene.guardHttp;
 import static org.junit.Assert.assertEquals;
-import static org.omnifaces.test.OmniFacesIT.ArchiveBuilder.buildWebArchive;
 import static org.omnifaces.test.OmniFacesIT.WebXml.withFacesViews;
 
 import org.jboss.arquillian.container.test.api.Deployment;

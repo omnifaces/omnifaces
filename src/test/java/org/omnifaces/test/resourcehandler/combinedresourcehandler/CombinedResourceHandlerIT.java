@@ -15,7 +15,6 @@ package org.omnifaces.test.resourcehandler.combinedresourcehandler;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.guardHttp;
 import static org.junit.Assert.assertEquals;
-import static org.omnifaces.test.OmniFacesIT.ArchiveBuilder.buildWebArchive;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withCombinedResourceHandler;
 import static org.omnifaces.util.Utils.serializeURLSafe;
 

@@ -83,19 +83,19 @@ public abstract class OmniFacesIT {
 		return "tomee".equals(System.getProperty("profile.id"));
 	}
 
-	public static class ArchiveBuilder {
+	protected static <T extends OmniFacesIT> WebArchive createWebArchive(Class<T> testClass) {
+		return buildWebArchive(testClass).createDeployment();
+	}
+
+	protected static <T extends OmniFacesIT> ArchiveBuilder buildWebArchive(Class<T> testClass) {
+		return new ArchiveBuilder(testClass);
+	}
+
+	protected static class ArchiveBuilder {
 
 		private WebArchive archive;
 		private boolean facesConfigSet;
 		private boolean webXmlSet;
-
-		public static <T extends OmniFacesIT> WebArchive createWebArchive(Class<T> testClass) {
-			return buildWebArchive(testClass).createDeployment();
-		}
-
-		public static <T extends OmniFacesIT> ArchiveBuilder buildWebArchive(Class<T> testClass) {
-			return new ArchiveBuilder(testClass);
-		}
 
 		private <T extends OmniFacesIT> ArchiveBuilder(Class<T> testClass) {
 			String packageName = testClass.getPackage().getName();

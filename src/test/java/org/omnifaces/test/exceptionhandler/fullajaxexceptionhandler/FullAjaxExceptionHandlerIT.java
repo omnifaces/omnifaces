@@ -14,7 +14,6 @@ package org.omnifaces.test.exceptionhandler.fullajaxexceptionhandler;
 
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.junit.Assert.assertTrue;
-import static org.omnifaces.test.OmniFacesIT.ArchiveBuilder.buildWebArchive;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withFullAjaxExceptionHandler;
 import static org.omnifaces.test.OmniFacesIT.WebXml.withErrorPage;
 

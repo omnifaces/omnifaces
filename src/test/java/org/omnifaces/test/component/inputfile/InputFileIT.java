@@ -16,7 +16,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.jboss.arquillian.graphene.Graphene.guardHttp;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.omnifaces.test.OmniFacesIT.ArchiveBuilder.createWebArchive;
 
 import java.io.File;
 import java.io.IOException;
