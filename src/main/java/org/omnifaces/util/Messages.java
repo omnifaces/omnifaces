@@ -86,7 +86,7 @@ import org.omnifaces.cdi.Startup;
  *         if (bundle.containsKey(message)) {
  *             message = bundle.getString(message);
  *         }
- *         return MessageFormat.format(message, params);
+ *         return params.length > 0 ? MessageFormat.format(message, params) : message;
  *     }
  * });
  * </pre>
