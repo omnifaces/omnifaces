@@ -1,0 +1,92 @@
+<!--
+
+    Copyright 2016 OmniFaces
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+    the License. You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+    an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+    specific language governing permissions and limitations under the License.
+
+-->
+<!DOCTYPE html>
+<html lang="en"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:o="http://omnifaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions"
+>
+	<h:head />
+
+	<h:body>
+		<h:messages id="messages" />	
+		<h:link id="newtab" target="_blank" />
+
+		<div id="clientOpenedMessages" />
+		<div id="serverEventMessages" />
+		<div id="clientClosedMessages" />
+
+		<div id="applicationScopedMessage" />
+		<div id="sessionScopedMessage" />
+		<div id="viewScopedMessage" />
+		<div id="userTargetedMessage" />
+
+		<h:form id="push">
+			<f:ajax onevent="clearMessages" render=":messages">
+				<h:commandButton id="applicationScoped" action="#{socketITBean.pushApplicationScoped}" />
+				<h:commandButton id="sessionScoped" action="#{socketITBean.pushSessionScoped}" />
+				<h:commandButton id="viewScoped" action="#{socketITBean.pushViewScoped}" />
+				<h:commandButton id="userTargeted" action="#{socketITBean.pushUserTargeted('42')}" />
+			</f:ajax>
+		</h:form>
+
+		<h:link id="closeAllSockets" onclick="closeAllSockets();return false;" />
+
+		<o:socket channel="serverEvents" onopen="clientOpened" onmessage="serverEvent" onclose="clientClosed" />
+		<o:socket channel="applicationScoped" scope="application" onopen="clientOpened" onmessage="showMessage" onclose="clientClosed" />
+		<o:socket channel="sessionScoped" scope="session" onopen="clientOpened" onmessage="showMessage" onclose="clientClosed" />
+		<o:socket channel="viewScoped" scope="view" onopen="clientOpened" onmessage="showMessage" onclose="clientClosed" />
+		<o:socket channel="userTargeted" user="42" onopen="clientOpened" onmessage="showMessage" onclose="clientClosed" />
+
+		<script>
+			function clearMessages(data) {
+				if (data.status == "begin") {
+					document.getElementById("serverEventMessages").innerHTML = "";
+					document.getElementById("applicationScopedMessage").innerHTML = "";
+					document.getElementById("sessionScopedMessage").innerHTML = "";
+					document.getElementById("viewScopedMessage").innerHTML = "";
+					document.getElementById("userTargetedMessage").innerHTML = "";
+				}
+			}
+
+			function clientOpened(channel) {
+				document.getElementById("clientOpenedMessages").innerHTML += "|" + channel + "|";
+			}
+
+			function serverEvent(message) {
+				document.getElementById("serverEventMessages").innerHTML += "|" + message + "|";
+			}
+
+			function showMessage(message, channel) {
+				document.getElementById(channel + "Message").innerHTML = message;
+			}
+
+			function closeAllSockets() {
+				OmniFaces.Push.close("serverEvents");
+				OmniFaces.Push.close("applicationScoped");
+				OmniFaces.Push.close("sessionScoped");
+				OmniFaces.Push.close("viewScoped");
+				OmniFaces.Push.close("userTargeted");
+			}
+
+			function clientClosed(code, channel) {
+				document.getElementById("clientClosedMessages").innerHTML += "|" + channel + "|";
+			}
+		</script>
+	</h:body>
+</html>

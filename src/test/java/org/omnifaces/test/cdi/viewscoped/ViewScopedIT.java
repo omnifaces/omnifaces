@@ -14,12 +14,9 @@ package org.omnifaces.test.cdi.viewscoped;
 
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.guardHttp;
-import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.omnifaces.test.OmniFacesIT.WebXml.withThreeViewsInSession;
-
-import java.util.Set;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.InSequence;
@@ -186,17 +183,17 @@ public class ViewScopedIT extends OmniFacesIT {
 		String firstTab = browser.getWindowHandle();
 
 		// Open three new tabs and close them immediately.
-		openNewTab();
+		openNewTab(newtab);
 		assertEquals("init", messages.getText());
 		assertNotEquals(firstBean, bean.getText());
 		closeCurrentTabAndSwitchTo(firstTab);
 
-		openNewTab();
+		openNewTab(newtab);
 		assertEquals("unload init", messages.getText()); // Unload was from previous tab.
 		assertNotEquals(firstBean, bean.getText());
 		closeCurrentTabAndSwitchTo(firstTab);
 
-		openNewTab();
+		openNewTab(newtab);
 		assertEquals("unload init", messages.getText()); // Unload was from previous tab.
 		assertNotEquals(firstBean, bean.getText());
 		closeCurrentTabAndSwitchTo(firstTab);
@@ -207,20 +204,6 @@ public class ViewScopedIT extends OmniFacesIT {
 		guardAjax(ajaxSubmit).click();
 		assertEquals(firstBean, bean.getText());
 		assertEquals("unload submit", messages.getText()); // Unload was from previous tab.
-	}
-
-	private void openNewTab() {
-		Set<String> oldTabs = browser.getWindowHandles();
-		newtab.click();
-		Set<String> newTabs = browser.getWindowHandles();
-		newTabs.removeAll(oldTabs); // Just to be sure; it's nowhere in Selenium API specified whether tabs are ordered.
-		browser.switchTo().window(newTabs.iterator().next());
-		waitGui(browser);
-	}
-
-	private void closeCurrentTabAndSwitchTo(String tab) {
-		browser.close();
-		browser.switchTo().window(tab);
 	}
 
 }

@@ -12,12 +12,16 @@
  */
 package org.omnifaces.test;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
+import static org.jboss.arquillian.graphene.Graphene.guardNoRequest;
 import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import static org.jboss.shrinkwrap.api.ShrinkWrap.create;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withMessageBundle;
 
 import java.io.File;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.junit.Arquillian;
@@ -49,13 +53,29 @@ public abstract class OmniFacesIT {
 		waitGui(browser);
 	}
 
+	protected String openNewTab(WebElement elementWhichOpensNewTab) {
+		Set<String> oldTabs = browser.getWindowHandles();
+		guardNoRequest(elementWhichOpensNewTab).click();
+		Set<String> newTabs = new HashSet<>(browser.getWindowHandles());
+		newTabs.removeAll(oldTabs); // Just to be sure; it's nowhere in Selenium API specified whether tabs are ordered.
+		String newTab = newTabs.iterator().next();
+		browser.switchTo().window(newTab);
+		waitGui(browser);
+		return newTab;
+	}
+
+	protected void closeCurrentTabAndSwitchTo(String tabToSwitch) {
+		browser.close();
+		browser.switchTo().window(tabToSwitch);
+	}
+
 	/**
 	 * Work around because Selenium WebDriver API doesn't support triggering JS events.
 	 */
 	protected void triggerOnchange(WebElement input, WebElement messages) {
 		clearMessages(messages);
 		executeScript("document.getElementById('" + input.getAttribute("id") + "').onchange();");
-		waitGui(browser).until().element(messages).text().not().equalTo("");
+		waitUntilMessages(messages);
 	}
 
 	/**
@@ -64,7 +84,11 @@ public abstract class OmniFacesIT {
 	protected void guardAjaxUpload(WebElement submit, WebElement messages) {
 		clearMessages(messages);
 		submit.click();
-		waitGui(browser).until().element(messages).text().not().equalTo("");
+		waitUntilMessages(messages);
+	}
+
+	protected void waitUntilMessages(WebElement messages) {
+		waitGui(browser).withTimeout(3, SECONDS).until().element(messages).text().not().equalTo("");
 	}
 
 	private void executeScript(String script) {
@@ -187,7 +211,8 @@ public abstract class OmniFacesIT {
 		withErrorPage,
 		withFacesViews,
 		withMultiViews,
-		withThreeViewsInSession;
+		withThreeViewsInSession,
+		withSocket;
 	}
 
 }
