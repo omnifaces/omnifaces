@@ -96,11 +96,11 @@ public class SocketIT extends OmniFacesIT {
 		assertEquals(pushViewScoped(), "1," + viewScopedMessage.getText());
 		assertEquals(pushUserTargeted(), "2," + userTargetedMessage.getText());
 
-		testOnclose(firstTab);
+		// Unfortunately Selenium doesn't (seem to?) support starting a new HTTP session within the same IT, so
+		// application, session and user sockets can't be tested more extensively. If possible somehow, it's expected
+		// that numbers should equal respectively 3, 2, 1, 3 on first session and 3, 1, 1, 3 on second session.
 
-		// Unfortunately Selenium doesn't (seem to?) support starting a new HTTP session within the same IT,
-		// so application, session and user sockets can't be tested more extensively.
-		// If possible, it's expected that numbers should equal respectively 3, 2, 1, 3.
+		testOnclose(firstTab);
 	}
 
 	private void testOnopen() {
