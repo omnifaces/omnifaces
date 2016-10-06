@@ -5360,7 +5360,9 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 			]]>
 		</description>
 		<tag-name>socket</tag-name>
-		<handler-class>org.omnifaces.cdi.push.Socket</handler-class>
+		<component>
+			<component-type>org.omnifaces.cdi.push.Socket</component-type>
+		</component>
 		<attribute>
 			<description>
 				<![CDATA[

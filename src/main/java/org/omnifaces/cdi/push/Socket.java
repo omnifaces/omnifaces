@@ -14,31 +14,26 @@ package org.omnifaces.cdi.push;
 
 import static java.lang.Boolean.TRUE;
 import static java.lang.Boolean.parseBoolean;
+import static org.omnifaces.cdi.push.SocketChannelManager.ESTIMATED_TOTAL_CHANNELS;
 import static org.omnifaces.util.Beans.getReference;
-import static org.omnifaces.util.Events.subscribeToViewEvent;
-import static org.omnifaces.util.Facelets.getObject;
-import static org.omnifaces.util.Facelets.getString;
-import static org.omnifaces.util.Facelets.getValueExpression;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
+import static org.omnifaces.util.FacesLocal.getRequestContextPath;
+import static org.omnifaces.util.FacesLocal.getViewAttribute;
+import static org.omnifaces.util.FacesLocal.setViewAttribute;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import javax.el.ValueExpression;
 import javax.enterprise.event.Observes;
 import javax.faces.FacesException;
-import javax.faces.component.UIComponent;
+import javax.faces.application.ResourceDependency;
+import javax.faces.component.FacesComponent;
 import javax.faces.context.FacesContext;
-import javax.faces.event.PostAddToViewEvent;
-import javax.faces.event.PreRenderViewEvent;
-import javax.faces.event.SystemEventListener;
-import javax.faces.view.facelets.ComponentHandler;
-import javax.faces.view.facelets.FaceletContext;
-import javax.faces.view.facelets.TagAttribute;
-import javax.faces.view.facelets.TagConfig;
-import javax.faces.view.facelets.TagHandler;
 import javax.servlet.ServletContext;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.server.ServerContainer;
@@ -48,9 +43,11 @@ import org.omnifaces.cdi.Push;
 import org.omnifaces.cdi.PushContext;
 import org.omnifaces.cdi.push.SocketEvent.Closed;
 import org.omnifaces.cdi.push.SocketEvent.Opened;
+import org.omnifaces.component.script.OnloadScript;
 import org.omnifaces.util.Beans;
 import org.omnifaces.util.Callback;
 import org.omnifaces.util.Json;
+import org.omnifaces.util.State;
 
 /**
  * <p>
@@ -64,7 +61,7 @@ import org.omnifaces.util.Json;
  * First enable the web socket endpoint by below boolean context parameter in <code>web.xml</code>:
  * <pre>
  * &lt;context-param&gt;
- *     &lt;param-name&gt;org.omnifaces.ENABLE_SOCKET_ENDPOINT&lt;/param-name&gt;
+ *     &lt;param-name&gt;org.omnifaces.SOCKET_ENDPOINT_ENABLED&lt;/param-name&gt;
  *     &lt;param-value&gt;true&lt;/param-value&gt;
  * &lt;/context-param&gt;
  * </pre>
@@ -573,7 +570,6 @@ import org.omnifaces.util.Json;
  *
  * @author Bauke Scholtz
  * @see SocketEndpoint
- * @see SocketFacesListener
  * @see SocketChannelManager
  * @see SocketUserManager
  * @see SocketSessionManager
@@ -584,60 +580,82 @@ import org.omnifaces.util.Json;
  * @see SocketPushContextProducer
  * @since 2.3
  */
-public class Socket extends TagHandler {
+@FacesComponent(Socket.COMPONENT_TYPE)
+@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head")
+public class Socket extends OnloadScript {
 
-	// Constants ------------------------------------------------------------------------------------------------------
+	// Public constants -----------------------------------------------------------------------------------------------
+
+	/** The standard component type. */
+	public static final String COMPONENT_TYPE = "org.omnifaces.cdi.push.Socket";
 
 	/** The boolean context parameter name to register web socket endpoint during startup. */
+	public static final String PARAM_SOCKET_ENDPOINT_ENABLED = "org.omnifaces.SOCKET_ENDPOINT_ENABLED";
+
+	/** Naming convention was wrong. Use {@link #PARAM_SOCKET_ENDPOINT_ENABLED} instead. */
+	@Deprecated // TODO: remove in 3.0.
 	public static final String PARAM_ENABLE_SOCKET_ENDPOINT = "org.omnifaces.ENABLE_SOCKET_ENDPOINT";
+
+	// Private constants ----------------------------------------------------------------------------------------------
 
 	private static final Pattern PATTERN_CHANNEL = Pattern.compile("[\\w.-]+");
 
-	private static final String ERROR_ENDPOINT_NOT_ENABLED =
-		"o:socket endpoint is not enabled."
-			+ " You need to set web.xml context param '" + PARAM_ENABLE_SOCKET_ENDPOINT + "' with value 'true'.";
-	private static final String ERROR_INVALID_CHANNEL =
-		"o:socket 'channel' attribute '%s' does not represent a valid channel name. It may not be an EL expression and"
-			+ " it may only contain alphanumeric characters, hyphens, underscores and periods.";
+	private static final String ERROR_EXPRESSION_DISALLOWED =
+		"o:socket 'channel' and 'scope' attributes may not contain an EL expression.";
 	private static final String ERROR_INVALID_USER =
 		"o:socket 'user' attribute '%s' does not represent a valid user identifier. It must implement Serializable and"
 			+ " preferably have low memory footprint. Suggestion: use #{request.remoteUser} or #{someLoggedInUser.id}.";
+	private static final String ERROR_INVALID_CHANNEL =
+		"o:socket 'channel' attribute '%s' does not represent a valid channel name."
+			+ " It is required and it may only contain alphanumeric characters, hyphens, underscores and periods.";
+	private static final String ERROR_ENDPOINT_NOT_ENABLED =
+		"o:socket endpoint is not enabled."
+			+ " You need to set web.xml context param '" + PARAM_SOCKET_ENDPOINT_ENABLED + "' with value 'true'.";
 
-	// Properties -----------------------------------------------------------------------------------------------------
+	private static final String SCRIPT_INIT = "OmniFaces.Push.init('%s','%s',%s,%s);";
+	private static final String SCRIPT_OPEN = "OmniFaces.Push.open('%s');";
+	private static final String SCRIPT_CLOSE = "OmniFaces.Push.close('%s');";
 
-	private TagAttribute port;
-	private TagAttribute channel;
-	private TagAttribute scope;
-	private TagAttribute user;
-	private TagAttribute onopen;
-	private TagAttribute onmessage;
-	private TagAttribute onclose;
-	private TagAttribute connected;
-
-	// Constructors ---------------------------------------------------------------------------------------------------
-
-	/**
-	 * The tag constructor. It will extract and validate the attributes.
-	 * @param config The tag config.
-	 */
-	public Socket(TagConfig config) {
-		super(config);
-		port = getAttribute("port");
-		channel = getRequiredAttribute("channel");
-		scope = getAttribute("scope");
-		user = getAttribute("user");
-		onopen = getAttribute("onopen");
-		onmessage = getRequiredAttribute("onmessage");
-		onclose = getAttribute("onclose");
-		connected = getAttribute("connected");
+	private enum PropertyKeys {
+		// Cannot be uppercased. They have to exactly match the attribute names.
+		port, channel, scope, user, onopen, onmessage, onclose, connected;
 	}
+
+	// Variables ------------------------------------------------------------------------------------------------------
+
+	private final State state = new State(getStateHelper());
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
+	 * An override which checks if this isn't been invoked on <code>channel</code> or <code>scope</code> attribute, and
+	 * if the <code>user</code> attribute is <code>Serializable</code>.
+	 * Finally it delegates to the super method.
+	 * @throws IllegalArgumentException When this value expression is been set on <code>channel</code> or
+	 * <code>scope</code> attribute, or when the <code>user</code> attribute is not <code>Serializable</code>.
+	 */
+	@Override
+	public void setValueExpression(String name, ValueExpression binding) {
+		if (PropertyKeys.channel.toString().equals(name) || PropertyKeys.scope.toString().equals(name)) {
+			throw new IllegalArgumentException(ERROR_EXPRESSION_DISALLOWED);
+		}
+
+		Object user = binding.getValue(getFacesContext().getELContext());
+
+		if (user != null && !(user instanceof Serializable)) {
+			throw new IllegalArgumentException(String.format(ERROR_INVALID_USER, user));
+		}
+
+		super.setValueExpression(name, binding);
+	}
+
+	/**
 	 * First check if the web socket endpoint is enabled in <code>web.xml</code> and the channel name and scope is
-	 * valid, then register it in {@link SocketChannelManager} and get the channel ID, then subcribe the
-	 * {@link SocketFacesListener}.
+	 * valid, then register it in {@link SocketChannelManager} and get the channel ID, then render the
+	 * <code>init()</code> script, or if it has just switched the <code>connected</code> attribute, then render either
+	 * the <code>open()</code> script or the <code>close()</code> script. During an ajax request with partial rendering,
+	 * it's added as <code>&lt;eval&gt;</code> by partial response writer, else it's just added as a script component
+	 * with <code>target="body"</code>. Those scripts will in turn hit {@link SocketEndpoint}.
 	 * @throws IllegalStateException When the web socket endpoint is not enabled in <code>web.xml</code>.
 	 * @throws IllegalArgumentException When the channel name, scope or user is invalid.
 	 * The channel name may only contain alphanumeric characters, hyphens, underscores and periods.
@@ -646,46 +664,190 @@ public class Socket extends TagHandler {
 	 * The user, if any, must implement <code>Serializable</code>.
 	 */
 	@Override
-	public void apply(FaceletContext context, UIComponent parent) throws IOException {
-		if (!ComponentHandler.isNew(parent)) {
-			return;
-		}
-
-		if (!TRUE.equals(getApplicationAttribute(context.getFacesContext(), Socket.class.getName()))) {
+	public void encodeChildren(FacesContext context) throws IOException {
+		if (!TRUE.equals(getApplicationAttribute(context, Socket.class.getName()))) {
 			throw new IllegalStateException(ERROR_ENDPOINT_NOT_ENABLED);
 		}
 
-		Integer portNumber = getObject(context, port, Integer.class);
-		String channelName = getChannelName(context, channel);
-		String channelId = getChannelId(context, channelName, scope, user);
-		String functions = getString(context, onopen) + "," + onmessage.getValue(context) + "," + getString(context, onclose);
-		ValueExpression connectedExpression = getValueExpression(context, connected, Boolean.class);
+		String channel = getChannel();
 
-		SystemEventListener listener = new SocketFacesListener(portNumber, channelName, channelId, functions, connectedExpression);
-		subscribeToViewEvent(PostAddToViewEvent.class, listener);
-		subscribeToViewEvent(PreRenderViewEvent.class, listener);
-	}
-
-	private static String getChannelName(FaceletContext context, TagAttribute channel) {
-		String channelName = channel.isLiteral() ? channel.getValue(context) : null;
-
-		if (channelName == null || !PATTERN_CHANNEL.matcher(channelName).matches()) {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_CHANNEL, channelName));
+		if (channel == null || !PATTERN_CHANNEL.matcher(channel).matches()) {
+			throw new IllegalArgumentException(String.format(ERROR_INVALID_CHANNEL, channel));
 		}
 
-		return channelName;
-	}
 
-	private static String getChannelId(FaceletContext context, String channelName, TagAttribute scope, TagAttribute user) {
-		Object userObject = getObject(context, user);
+		boolean connected = isConnected();
+		Boolean switched = hasSwitched(context, channel, connected);
+		String script = null;
 
-		if (userObject != null && !(userObject instanceof Serializable)) {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_USER, userObject));
+		if (switched == null) {
+			Integer port = getPort();
+			String host = (port != null ? ":" + port : "") + getRequestContextPath(context);
+			String channelId = getReference(SocketChannelManager.class).register(channel, getScope(), getUser());
+			String functions = getOnopen() + "," + getOnmessage() + "," + getOnclose();
+			script = String.format(SCRIPT_INIT, host, channelId, functions, connected);
+		}
+		else if (switched) {
+			script = String.format(connected ? SCRIPT_OPEN : SCRIPT_CLOSE, channel);
 		}
 
-		SocketChannelManager channelManager = getReference(SocketChannelManager.class);
-		String scopeName = (scope == null) ? null : scope.isLiteral() ? getString(context, scope) : "";
-		return channelManager.register(channelName, scopeName, (Serializable) userObject);
+		if (script != null) {
+			context.getResponseWriter().write(script);
+		}
+	}
+
+	// Attribute getters/setters --------------------------------------------------------------------------------------
+
+	/**
+	 * Returns the port number of the web socket host.
+	 * @return The port number of the web socket host.
+	 */
+	public Integer getPort() {
+		return state.get(PropertyKeys.port);
+	}
+
+	/**
+	 * Sets the port number of the web socket host, in case it is different from the port number in the request URI.
+	 * Defaults to the port number of the request URI.
+	 * @param port The port number of the web socket host.
+	 */
+	public void setPort(Integer port) {
+		state.put(PropertyKeys.port, port);
+	}
+
+	/**
+	 * Returns the name of the web socket channel.
+	 * @return The name of the web socket channel.
+	 */
+	public String getChannel() {
+		return state.get(PropertyKeys.channel);
+	}
+
+	/**
+	 * Sets the name of the web socket channel.
+	 * It may not be an EL expression and it may only contain alphanumeric characters, hyphens, underscores and periods.
+	 * All open websockets on the same channel will receive the same push message from the server.
+	 * @param channel The name of the web socket channel.
+	 */
+	public void setChannel(String channel) {
+		state.put(PropertyKeys.channel, channel);
+	}
+
+	/**
+	 * Returns the scope of the web socket channel.
+	 * @return The scope of the web socket channel.
+	 */
+	public String getScope() {
+		return state.get(PropertyKeys.scope);
+	}
+
+	/**
+	 * Sets the scope of the web socket channel.
+	 * It may not be an EL expression and allowed values are <code>application</code>, <code>session</code> and
+	 * <code>view</code>, case insensitive. When the value is <code>application</code>, then all channels with the same
+	 * name throughout the application will receive the same push message. When the value is <code>session</code>, then
+	 * only the channels with the same name in the current user session will receive the same push message. When the
+	 * value is <code>view</code>, then only the channel in the current view will receive the push message. The default
+	 * scope is <code>application</code>. When the <code>user</code> attribute is specified, then the default scope is
+	 * <code>session</code>.
+	 * @param scope The scope of the web socket channel.
+	 */
+	public void setScope(String scope) {
+		state.put(PropertyKeys.scope, scope);
+	}
+
+	/**
+	 * Returns the user identifier of the web socket channel.
+	 * @return The user identifier of the web socket channel.
+	 */
+	public Serializable getUser() {
+		return state.get(PropertyKeys.user);
+	}
+
+	/**
+	 * Sets the user identifier of the web socket channel, so that user-targeted push messages can be sent.
+	 * All open websockets on the same channel and user will receive the same push message from the server.
+	 * It must implement <code>Serializable</code> and preferably have low memory footprint.
+	 * Suggestion: use <code>#{request.remoteUser}</code> or <code>#{someLoggedInUser.id}</code>.
+	 * @param user The user identifier of the web socket channel.
+	 */
+	public void setUser(Serializable user) {
+		state.put(PropertyKeys.user, user);
+	}
+
+	/**
+	 * Returns the JavaScript event handler function that is invoked when the web socket is opened.
+	 * @return The JavaScript event handler function that is invoked when the web socket is opened.
+	 */
+	public String getOnopen() {
+		return state.get(PropertyKeys.onopen);
+	}
+
+	/**
+	 * Sets the JavaScript event handler function that is invoked when the web socket is opened.
+	 * The function will be invoked with one argument: the channel name.
+	 * @param onopen The JavaScript event handler function that is invoked when the web socket is opened.
+	 */
+	public void setOnopen(String onopen) {
+		state.put(PropertyKeys.onopen, onopen);
+	}
+
+	/**
+	 * Returns the JavaScript event handler function that is invoked when a push message is received from the server.
+	 * @return The JavaScript event handler function that is invoked when a push message is received from the server.
+	 */
+	public String getOnmessage() {
+		return state.get(PropertyKeys.onmessage);
+	}
+
+	/**
+	 * Sets the JavaScript event handler function that is invoked when a push message is received from the server.
+	 * The function will be invoked with three arguments: the push message, the channel name and the raw MessageEvent itself.
+	 * @param onmessage The JavaScript event handler function that is invoked when a push message is received from the server.
+	 */
+	public void setOnmessage(String onmessage) {
+		state.put(PropertyKeys.onmessage, onmessage);
+	}
+
+	/**
+	 * Returns the JavaScript event handler function that is invoked when the web socket is closed.
+	 * @return The JavaScript event handler function that is invoked when the web socket is closed.
+	 */
+	public String getOnclose() {
+		return state.get(PropertyKeys.onclose);
+	}
+
+	/**
+	 * Sets the JavaScript event handler function that is invoked when the web socket is closed.
+	 * The function will be invoked with three arguments: the close reason code, the channel name and the raw
+	 * <code>CloseEvent</code> itself. Note that this will also be invoked on errors and that you can inspect the close
+	 * reason code if an error occurred and which one (i.e. when the code is not 1000). See also
+	 * <a href="http://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and {@link CloseCodes} API
+	 * for an elaborate list of all close codes.
+	 * @param onclose The JavaScript event handler function that is invoked when the web socket is closed.
+	 */
+	public void setOnclose(String onclose) {
+		state.put(PropertyKeys.onclose, onclose);
+	}
+
+	/**
+	 * Returns whether to (auto)connect the web socket or not.
+	 * @return Whether to (auto)connect the web socket or not.
+	 */
+	public boolean isConnected() {
+		return state.get(PropertyKeys.connected, TRUE);
+	}
+
+	/**
+	 * Sets whether to (auto)connect the web socket or not. Defaults to <code>true</code>. It's interpreted as a
+	 * JavaScript instruction whether to open or close the web socket push connection. Note that this attribute is
+	 * re-evaluated on every ajax request. You can also explicitly set it to <code>false</code> and then manually
+	 * control in JavaScript by <code>OmniFaces.Push.open("channelName")</code> and
+	 * <code>OmniFaces.Push.close("channelName")</code>.
+	 * @param connected Whether to (auto)connect the web socket or not.
+	 */
+	public void setConnected(boolean connected) {
+		state.put(PropertyKeys.connected, connected);
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
@@ -695,7 +857,9 @@ public class Socket extends TagHandler {
 	 * @param context The involved servlet context.
 	 */
 	public static void registerEndpointIfNecessary(ServletContext context) {
-		if (TRUE.equals(context.getAttribute(Socket.class.getName())) || !parseBoolean(context.getInitParameter(PARAM_ENABLE_SOCKET_ENDPOINT))) {
+		if (TRUE.equals(context.getAttribute(Socket.class.getName()))
+			|| !(parseBoolean(context.getInitParameter(PARAM_SOCKET_ENDPOINT_ENABLED))
+				|| parseBoolean(context.getInitParameter(PARAM_ENABLE_SOCKET_ENDPOINT)))) {
 			return;
 		}
 
@@ -708,6 +872,22 @@ public class Socket extends TagHandler {
 		catch (Exception e) {
 			throw new FacesException(e);
 		}
+	}
+
+	/**
+	 * Helper to remember which channels are opened on the view and returns <code>null</code> if it is new, or
+	 * <code>true</code> or <code>false</code> if it has switched its <code>connected</code> attribute.
+	 */
+	private static Boolean hasSwitched(FacesContext context, String channel, boolean connected) {
+		Map<String, Boolean> channels = getViewAttribute(context, Socket.class.getName());
+
+		if (channels == null) {
+			channels = new HashMap<>(ESTIMATED_TOTAL_CHANNELS);
+			setViewAttribute(context, Socket.class.getName(), channels);
+		}
+
+		Boolean previouslyConnected = channels.put(channel, connected);
+		return (previouslyConnected == null) ? null : (previouslyConnected != connected);
 	}
 
 }
