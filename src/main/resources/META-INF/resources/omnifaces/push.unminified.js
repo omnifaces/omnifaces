@@ -44,8 +44,9 @@ OmniFaces.Push = (function(Util, window) {
 	 * @param {function} onopen The function to be invoked when the web socket is opened.
 	 * @param {function} onmessage The function to be invoked when a message is received.
 	 * @param {function} onclose The function to be invoked when the web socket is closed.
+	 * @param {Object} behaviors Client behavior functions to be invoked when specific message is received.
 	 */
-	function Socket(url, channel, onopen, onmessage, onclose) {
+	function Socket(url, channel, onopen, onmessage, onclose, behaviors) {
 
 		// Private fields -----------------------------------------------------------------------------------------
 
@@ -74,14 +75,22 @@ OmniFaces.Push = (function(Util, window) {
 			}
 
 			socket.onmessage = function(event) {
-				onmessage(JSON.parse(event.data), channel, event);
+				var message = JSON.parse(event.data);
+				onmessage(message, channel, event);
+				var functions = behaviors[message];
+
+				if (functions && functions.length) {
+					for (var i = 0; i < functions.length; i++) {
+						functions[i]();
+					}
+				}
 			}
 
 			socket.onclose = function(event) {
 				if (!socket
-					|| (event.code == 1000 && event.reason == REASON_EXPIRED) 
-					|| (event.code == 1008) 
-					|| (reconnectAttempts == null) 
+					|| (event.code == 1000 && event.reason == REASON_EXPIRED)
+					|| (event.code == 1008)
+					|| (reconnectAttempts == null)
 					|| (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS))
 				{
 					onclose(event.code, channel, event);
@@ -129,9 +138,10 @@ OmniFaces.Push = (function(Util, window) {
 	 * <a href="http://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and
 	 * <a href="http://docs.oracle.com/javaee/7/api/javax/websocket/CloseReason.CloseCodes.html">CloseCodes</a> API
 	 * for an elaborate list.
+	 * @param {Object} behaviors Client behavior functions to be invoked when specific message is received.
 	 * @param {boolean} autoconnect Whether or not to immediately open the socket. Defaults to <code>false</code>.
 	 */
-	self.init = function(host, uri, onopen, onmessage, onclose, autoconnect) {
+	self.init = function(host, uri, onopen, onmessage, onclose, behaviors, autoconnect) {
 		onclose = Util.resolveFunction(onclose);
 		var channel = uri.split(/\?/)[0];
 
@@ -141,7 +151,7 @@ OmniFaces.Push = (function(Util, window) {
 		}
 
 		if (!sockets[channel]) {
-			sockets[channel] = new Socket(getBaseURL(host) + uri, channel, Util.resolveFunction(onopen), Util.resolveFunction(onmessage), onclose);
+			sockets[channel] = new Socket(getBaseURL(host) + uri, channel, Util.resolveFunction(onopen), Util.resolveFunction(onmessage), onclose, behaviors);
 		}
 
 		if (autoconnect) {

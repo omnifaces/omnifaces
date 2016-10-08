@@ -14,18 +14,25 @@ package org.omnifaces.cdi.push;
 
 import static java.lang.Boolean.TRUE;
 import static java.lang.Boolean.parseBoolean;
+import static java.util.Collections.unmodifiableList;
+import static javax.faces.component.behavior.ClientBehaviorContext.createClientBehaviorContext;
 import static org.omnifaces.cdi.push.SocketChannelManager.ESTIMATED_TOTAL_CHANNELS;
 import static org.omnifaces.util.Beans.getReference;
+import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
+import static org.omnifaces.util.FacesLocal.getRequestParameter;
 import static org.omnifaces.util.FacesLocal.getViewAttribute;
 import static org.omnifaces.util.FacesLocal.setViewAttribute;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
 import javax.el.ValueExpression;
@@ -33,7 +40,12 @@ import javax.enterprise.event.Observes;
 import javax.faces.FacesException;
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
+import javax.faces.component.UIForm;
+import javax.faces.component.behavior.ClientBehavior;
+import javax.faces.component.behavior.ClientBehaviorHolder;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AbortProcessingException;
+import javax.faces.event.ComponentSystemEvent;
 import javax.servlet.ServletContext;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.server.ServerContainer;
@@ -552,16 +564,35 @@ import org.omnifaces.util.State;
  *
  * <h3 id="ui"><a href="#ui">UI update design hints</a></h3>
  * <p>
- * In case you'd like to perform complex UI updates, which would be a piece of cake with JSF ajax, then easiest would
- * be to combine <code>&lt;o:socket&gt;</code> with <code>&lt;o:commandScript&gt;</code> which simply invokes a bean
- * action and ajax-updates the UI once a push message arrives. The combination can look like below:
+ * In case you'd like to perform complex UI updates, then easiest would be to put <code>&lt;f:ajax&gt;</code> inside
+ * <code>&lt;o:socket&gt;</code>. The support was added in OmniFaces 2.6. Here's an example:
+ * <pre>
+ * &lt;h:panelGroup id="foo"&gt;
+ *     ... (some complex UI here) ...
+ * &lt;/h:panelGroup&gt;
+ *
+ * &lt;h:form&gt;
+ *     &lt;o:socket channel="someChannel" scope="view"&gt;
+ *         &lt;f:ajax event="someEvent" listener="#{bean.pushed}" render=":foo" /&gt;
+ *     &lt;/o:socket&gt;
+ * &lt;/h:form&gt;
+ * </pre>
+ * <p>
+ * Here, the push message simply represents the ajax event name. You can use any custom event name.
+ * <pre>
+ * someChannel.send("someEvent");
+ * </pre>
+ * <p>
+ * An alternative is to combine <code>&lt;o:socket&gt;</code> with <code>&lt;o:commandScript&gt;</code>. E.g.
  * <pre>
  * &lt;h:panelGroup id="foo"&gt;
  *     ... (some complex UI here) ...
  * &lt;/h:panelGroup&gt;
  *
  * &lt;o:socket channel="someChannel" scope="view" onmessage="someCommandScript" /&gt;
- * &lt;o:commandScript name="someCommandScript" action="#{bean.pushed}" render="foo" /&gt;
+ * &lt;h:form&gt;
+ *     &lt;o:commandScript name="someCommandScript" action="#{bean.pushed}" render=":foo" /&gt;
+ * &lt;/h:form&gt;
  * </pre>
  * <p>
  * If you pass a <code>Map&lt;String,V&gt;</code> or a JavaBean as push message object, then all entries/properties will
@@ -582,7 +613,7 @@ import org.omnifaces.util.State;
  */
 @FacesComponent(Socket.COMPONENT_TYPE)
 @ResourceDependency(library="omnifaces", name="omnifaces.js", target="head")
-public class Socket extends OnloadScript {
+public class Socket extends OnloadScript implements ClientBehaviorHolder {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
@@ -612,9 +643,18 @@ public class Socket extends OnloadScript {
 		"o:socket endpoint is not enabled."
 			+ " You need to set web.xml context param '" + PARAM_SOCKET_ENDPOINT_ENABLED + "' with value 'true'.";
 
-	private static final String SCRIPT_INIT = "OmniFaces.Push.init('%s','%s',%s,%s);";
+	private static final String SCRIPT_INIT = "OmniFaces.Push.init('%s','%s',%s,%s,%s);";
 	private static final String SCRIPT_OPEN = "OmniFaces.Push.open('%s');";
 	private static final String SCRIPT_CLOSE = "OmniFaces.Push.close('%s');";
+
+	private static final Collection<String> CONTAINS_EVERYTHING = unmodifiableList(new ArrayList<String>() {
+		private static final long serialVersionUID = 1L;
+
+		@Override
+		public boolean contains(Object object) {
+			return true;
+		}
+	});
 
 	private enum PropertyKeys {
 		// Cannot be uppercased. They have to exactly match the attribute names.
@@ -650,6 +690,24 @@ public class Socket extends OnloadScript {
 	}
 
 	/**
+	 * Accept all event names.
+	 */
+	@Override
+	public Collection<String> getEventNames() {
+		return CONTAINS_EVERYTHING;
+	}
+
+	/**
+	 * Only move to body when not nested in a form.
+	 */
+	@Override
+	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
+		if (getClosestParent(this, UIForm.class) == null) {
+			super.processEvent(event);
+		}
+	}
+
+	/**
 	 * First check if the web socket endpoint is enabled in <code>web.xml</code> and the channel name and scope is
 	 * valid, then register it in {@link SocketChannelManager} and get the channel ID, then render the
 	 * <code>init()</code> script, or if it has just switched the <code>connected</code> attribute, then render either
@@ -675,7 +733,6 @@ public class Socket extends OnloadScript {
 			throw new IllegalArgumentException(String.format(ERROR_INVALID_CHANNEL, channel));
 		}
 
-
 		boolean connected = isConnected();
 		Boolean switched = hasSwitched(context, channel, connected);
 		String script = null;
@@ -685,7 +742,7 @@ public class Socket extends OnloadScript {
 			String host = (port != null ? ":" + port : "") + getRequestContextPath(context);
 			String channelId = getReference(SocketChannelManager.class).register(channel, getScope(), getUser());
 			String functions = getOnopen() + "," + getOnmessage() + "," + getOnclose();
-			script = String.format(SCRIPT_INIT, host, channelId, functions, connected);
+			script = String.format(SCRIPT_INIT, host, channelId, functions, getBehaviorScripts(), connected);
 		}
 		else if (switched) {
 			script = String.format(connected ? SCRIPT_OPEN : SCRIPT_CLOSE, channel);
@@ -693,6 +750,56 @@ public class Socket extends OnloadScript {
 
 		if (script != null) {
 			context.getResponseWriter().write(script);
+		}
+	}
+
+	private String getBehaviorScripts() {
+		Map<String, List<ClientBehavior>> clientBehaviorsByEvent = getClientBehaviors();
+
+		if (clientBehaviorsByEvent.isEmpty()) {
+			return "{}";
+		}
+
+		String clientId = getClientId(getFacesContext());
+		StringBuilder scripts = new StringBuilder("{");
+
+		for (Entry<String, List<ClientBehavior>> entry : clientBehaviorsByEvent.entrySet()) {
+			String event = entry.getKey();
+			List<ClientBehavior> clientBehaviors = entry.getValue();
+			scripts.append(scripts.length() > 1 ? "," : "").append(event).append(":[");
+
+			for (int i = 0; i < clientBehaviors.size(); i++) {
+				scripts.append(i > 0 ? "," : "").append("function(){");
+				scripts.append(clientBehaviors.get(i).getScript(createClientBehaviorContext(getFacesContext(), this, event, clientId, null)));
+				scripts.append("}");
+			}
+
+			scripts.append("]");
+		}
+
+		return scripts.append("}").toString();
+	}
+
+	@Override
+	public void decode(FacesContext context) {
+		Map<String, List<ClientBehavior>> clientBehaviors = getClientBehaviors();
+
+		if (clientBehaviors.isEmpty()) {
+			return;
+		}
+
+		if (!getClientId(context).equals(getRequestParameter(context, "javax.faces.source"))) {
+			return;
+		}
+
+		List<ClientBehavior> behaviors = clientBehaviors.get(getRequestParameter(context, "javax.faces.behavior.event"));
+
+		if (behaviors == null) {
+			return;
+		}
+
+		for (ClientBehavior behavior : behaviors) {
+			behavior.decode(context, this);
 		}
 	}
 

@@ -163,6 +163,10 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 		ResponseWriter writer = context.getResponseWriter();
 		writer.startElement("script", this);
 		writer.writeAttribute("type", "text/javascript", "type");
+
+		if (getId() != null || !getClientBehaviors().isEmpty()) {
+			writer.writeAttribute("id", getClientId(context), "id");
+		}
 	}
 
 	/**
