@@ -216,6 +216,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 			validationFailed = true;
 			context.validationFailed();
 			showMessage(context, inputs);
+			context.renderResponse();
 		}
 	}
 
