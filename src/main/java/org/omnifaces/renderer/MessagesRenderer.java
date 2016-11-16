@@ -12,7 +12,7 @@
  */
 package org.omnifaces.renderer;
 
-import static org.omnifaces.util.Components.findComponentsInChildren;
+import static org.omnifaces.util.Components.forEachComponent;
 import static org.omnifaces.util.Messages.createInfo;
 import static org.omnifaces.util.Renderers.writeAttribute;
 import static org.omnifaces.util.Renderers.writeAttributes;
@@ -39,6 +39,7 @@ import javax.faces.render.FacesRenderer;
 import javax.faces.render.Renderer;
 
 import org.omnifaces.component.messages.OmniMessages;
+import org.omnifaces.util.Callback;
 
 /**
  * This renderer is the default renderer of {@link OmniMessages}. It's basically copypasted from Mojarra 2.2,
@@ -112,14 +113,14 @@ public class MessagesRenderer extends Renderer {
 	 * @param component The messages component.
 	 * @return All messages associated with components identified by <code>for</code> attribute.
 	 */
-	protected List<FacesMessage> getMessages(FacesContext context, OmniMessages component) {
+	protected List<FacesMessage> getMessages(final FacesContext context, OmniMessages component) {
 		String forClientIds = component.getFor();
 
 		if (forClientIds == null) {
 			return component.isGlobalOnly() ? context.getMessageList(null) : context.getMessageList();
 		}
 
-		List<FacesMessage> messages = new ArrayList<>();
+		final List<FacesMessage> messages = new ArrayList<>();
 
 		for (String forClientId : forClientIds.split("\\s+")) {
 			UIComponent forComponent = component.findComponent(forClientId);
@@ -131,9 +132,12 @@ public class MessagesRenderer extends Renderer {
 			messages.addAll(context.getMessageList(forComponent.getClientId(context)));
 
 			if (!(forComponent instanceof UIInput)) {
-				for (UIInput child : findComponentsInChildren(forComponent, UIInput.class)) {
-					messages.addAll(context.getMessageList(child.getClientId(context)));
-				}
+				forEachComponent(context).fromRoot(forComponent).ofTypes(UIInput.class).invoke(new Callback.WithArgument<UIInput>() {
+					@Override
+					public void invoke(UIInput input) {
+						messages.addAll(context.getMessageList(input.getClientId(context)));
+					}
+				});
 			}
 		}
 
