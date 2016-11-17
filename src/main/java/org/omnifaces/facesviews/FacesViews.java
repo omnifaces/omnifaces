@@ -690,7 +690,7 @@ public final class FacesViews {
 
 	/**
 	 * Returns whether MultiViews feature is enabled on given request.
-	 * @param servletContext The involved servlet context.
+	 * @param request The involved HTTP servlet request.
 	 * @return Whether MultiViews feature is enabled on given request.
 	 * @since 2.6
 	 */
