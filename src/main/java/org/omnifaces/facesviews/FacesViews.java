@@ -707,7 +707,7 @@ public final class FacesViews {
 			String path = request.getServletPath() + "/";
 
 			for (String multiviewsPath : multiviewsPaths) {
-				if (path.startsWith(multiviewsPath + "/")) {
+				if (path.startsWith(multiviewsPath)) {
 					return true;
 				}
 			}
