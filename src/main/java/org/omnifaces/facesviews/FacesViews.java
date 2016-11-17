@@ -423,14 +423,19 @@ public final class FacesViews {
 			Set<String> multiViewsPaths = new HashSet<>();
 
 			for (String rootPath : csvToList(servletContext.getInitParameter(FACES_VIEWS_SCAN_PATHS_PARAM_NAME))) {
-				if (rootPath.endsWith("/*")) {
+				boolean multiViews = rootPath.endsWith("/*");
+
+				if (multiViews) {
 					rootPath = rootPath.substring(0, rootPath.lastIndexOf("/*"));
-					multiViewsPaths.add(rootPath);
 				}
 
 				String[] rootPathAndExtension = rootPath.contains("*") ? rootPath.split(quote("*")) : new String[] { rootPath, null };
 				rootPathAndExtension[0] = normalizeRootPath(rootPathAndExtension[0]);
 				rootPaths.add(rootPathAndExtension);
+
+				if (multiViews) {
+					multiViewsPaths.add(rootPathAndExtension[0]);
+				}
 			}
 
 			servletContext.setAttribute(SCAN_PATHS, unmodifiableSet(rootPaths));
