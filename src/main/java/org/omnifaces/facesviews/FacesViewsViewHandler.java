@@ -75,7 +75,7 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 		Map<String, String> mappedResources = getMappedResources(servletContext);
 
 		if (mappedResources.containsKey(viewId) && (extensionless || isOriginalViewExtensionless(context))) {
-			String pathInfo = coalesce(getRequestPathInfo(context), "");
+			String pathInfo = context.getViewRoot().getViewId().equals(viewId) ? coalesce(getRequestPathInfo(context), "") : "";
 
 			// User has requested to always render extensionless, or the requested viewId was mapped and the current
 			// request is extensionless; render the action URL extensionless as well.
