@@ -126,7 +126,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 			resources = scanAndStoreViews(servletContext, false);
 		}
 
-		if (!resources.containsKey(resource) && multiViews) {
+		if (!resources.containsKey(resource) && isMultiViewsEnabled(request)) {
 			resource = getMultiViewsWelcomeFile(servletContext);
 
 			if (resource != null) {

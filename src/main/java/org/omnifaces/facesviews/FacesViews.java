@@ -238,7 +238,7 @@ public final class FacesViews {
 	// TODO: those should be properties of an @ApplicationScoped bean.
 	private static final String SCAN_PATHS = "org.omnifaces.facesviews.scan_paths";
 	private static final String PUBLIC_SCAN_PATHS = "org.omnifaces.facesviews.public_scan_paths";
-	private static final String MULTIVIEWS_ENABLED = "org.omnifaces.facesviews.multiviews_enabled";
+	private static final String MULTIVIEWS_PATHS = "org.omnifaces.facesviews.multiviews_paths";
 	private static final String FACES_SERVLET_EXTENSIONS = "org.omnifaces.facesviews.faces_servlet_extensions";
 	private static final String MAPPED_RESOURCES = "org.omnifaces.facesviews.mapped_resources";
 	private static final String REVERSE_MAPPED_RESOURCES = "org.omnifaces.facesviews.reverse_mapped_resources";
@@ -420,11 +420,12 @@ public final class FacesViews {
 		if (rootPaths == null) {
 			rootPaths = new HashSet<>();
 			rootPaths.add(new String[] { WEB_INF_VIEWS, null });
+			Set<String> multiViewsPaths = new HashSet<>();
 
 			for (String rootPath : csvToList(servletContext.getInitParameter(FACES_VIEWS_SCAN_PATHS_PARAM_NAME))) {
 				if (rootPath.endsWith("/*")) {
-					servletContext.setAttribute(MULTIVIEWS_ENABLED, true);
 					rootPath = rootPath.substring(0, rootPath.lastIndexOf("/*"));
+					multiViewsPaths.add(rootPath);
 				}
 
 				String[] rootPathAndExtension = rootPath.contains("*") ? rootPath.split(quote("*")) : new String[] { rootPath, null };
@@ -433,6 +434,7 @@ public final class FacesViews {
 			}
 
 			servletContext.setAttribute(SCAN_PATHS, unmodifiableSet(rootPaths));
+			servletContext.setAttribute(MULTIVIEWS_PATHS, unmodifiableSet(multiViewsPaths));
 		}
 
 		return rootPaths;
@@ -680,10 +682,33 @@ public final class FacesViews {
 	 */
 	public static boolean isMultiViewsEnabled(ServletContext servletContext) {
 		if (multiViewsEnabled == null) {
-			multiViewsEnabled = (Boolean) servletContext.getAttribute(MULTIVIEWS_ENABLED);
+			multiViewsEnabled = !isEmpty((Set<?>) servletContext.getAttribute(MULTIVIEWS_PATHS));
 		}
 
 		return multiViewsEnabled == TRUE;
+	}
+
+	/**
+	 * Returns whether MultiViews feature is enabled on given request.
+	 * @param servletContext The involved servlet context.
+	 * @return Whether MultiViews feature is enabled on given request.
+	 * @since 2.6
+	 */
+	@SuppressWarnings("unchecked")
+	public static boolean isMultiViewsEnabled(HttpServletRequest request) {
+		Set<String> multiviewsPaths = (Set<String>) request.getServletContext().getAttribute(MULTIVIEWS_PATHS);
+
+		if (multiviewsPaths != null) {
+			String path = request.getServletPath() + "/";
+
+			for (String multiviewsPath : multiviewsPaths) {
+				if (path.startsWith(multiviewsPath + "/")) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	/**
