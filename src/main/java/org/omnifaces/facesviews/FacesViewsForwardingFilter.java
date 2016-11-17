@@ -93,6 +93,10 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 	public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException, IOException {
 		String servletPath = request.getServletPath();
 
+		if (servletPath.endsWith("/")) {
+			servletPath = servletPath.substring(0, servletPath.length() - 1);
+		}
+
 		if (filterExtensionLess(request, response, chain, servletPath)) {
 			return;
 		}
@@ -116,7 +120,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 		}
 
 		ServletContext servletContext = getServletContext();
-		boolean multiViews = isMultiViewsEnabled(servletContext);
+		boolean multiViews = isMultiViewsEnabled(request);
 		Map<String, String> resources = getMappedResources(servletContext);
 		String resource = servletPath + (multiViews ? "/*" : "");
 		String pathInfo = coalesce(request.getPathInfo(), (String) request.getAttribute(FACES_VIEWS_ORIGINAL_PATH_INFO));
@@ -126,7 +130,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 			resources = scanAndStoreViews(servletContext, false);
 		}
 
-		if (!resources.containsKey(resource) && isMultiViewsEnabled(request)) {
+		if (!resources.containsKey(resource) && multiViews) {
 			resource = getMultiViewsWelcomeFile(servletContext);
 
 			if (resource != null) {
@@ -137,19 +141,18 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 		}
 
 		if (resources.containsKey(resource)) {
+			String normalizedResource = servletPath;
 
 			// Check if a welcome file was explicitly requested.
 			if ((getRequestRelativeURI(request) + "/").startsWith(servletPath + "/")) {
-				String normalizedResource = stripWelcomeFilePrefix(servletContext, servletPath);
+				normalizedResource = stripWelcomeFilePrefix(servletContext, servletPath);
+			}
 
-				if (!servletPath.equals(normalizedResource)) {
-
-					// If so, redirect back to parent folder.
-					String uri = request.getContextPath() + normalizedResource;
-					String queryString = request.getQueryString();
-					redirectPermanent(response, uri + ((queryString != null) ? "?" + queryString : ""));
-					return true;
-				}
+			if (!request.getServletPath().equals(normalizedResource)) {
+				String uri = request.getContextPath() + normalizedResource;
+				String queryString = request.getQueryString();
+				redirectPermanent(response, uri + ((queryString != null) ? "?" + queryString : ""));
+				return true;
 			}
 
 			String extension = getExtension(resources.get(resource));

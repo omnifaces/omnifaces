@@ -488,8 +488,6 @@ public final class FacesViews {
 			Map<String, String> collectedViews, String extensionToScan, Set<String> collectedExtensions)
 	{
 		if (!isEmpty(resourcePaths)) {
-			boolean multiViews = isMultiViewsEnabled(servletContext);
-
 			for (String resourcePath : resourcePaths) {
 				if (isDirectory(resourcePath)) {
 					if (canScanDirectory(rootPath, resourcePath)) {
@@ -504,7 +502,8 @@ public final class FacesViews {
 
 					// Store the resource with and without an extension, e.g. store both foo.xhtml and foo
 					collectedViews.put(resource, resourcePath);
-					collectedViews.put(stripExtension(resource) + (multiViews ? "/*" : ""), resourcePath);
+					String extensionlessResource = stripExtension(resource);
+					collectedViews.put(extensionlessResource + (isMultiViewsEnabled(servletContext, extensionlessResource) ? "/*" : ""), resourcePath);
 
 					// Optionally, collect all unique extensions that we have encountered.
 					if (collectedExtensions != null) {
@@ -660,6 +659,22 @@ public final class FacesViews {
 		return getApplicationAttribute(servletContext, MULTIVIEWS_WELCOME_FILE);
 	}
 
+	static boolean isMultiViewsEnabled(ServletContext servletContext, String resource) {
+		Set<String> multiviewsPaths = getApplicationAttribute(servletContext, MULTIVIEWS_PATHS);
+
+		if (multiviewsPaths != null) {
+			String path = resource + "/";
+
+			for (String multiviewsPath : multiviewsPaths) {
+				if (path.startsWith(multiviewsPath)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
 
 	// Utility --------------------------------------------------------------------------------------------------------
 
@@ -699,21 +714,8 @@ public final class FacesViews {
 	 * @return Whether MultiViews feature is enabled on given request.
 	 * @since 2.6
 	 */
-	@SuppressWarnings("unchecked")
 	public static boolean isMultiViewsEnabled(HttpServletRequest request) {
-		Set<String> multiviewsPaths = (Set<String>) request.getServletContext().getAttribute(MULTIVIEWS_PATHS);
-
-		if (multiviewsPaths != null) {
-			String path = request.getServletPath() + "/";
-
-			for (String multiviewsPath : multiviewsPaths) {
-				if (path.startsWith(multiviewsPath)) {
-					return true;
-				}
-			}
-		}
-
-		return false;
+		return isMultiViewsEnabled(request.getServletContext(), request.getServletPath());
 	}
 
 	/**
