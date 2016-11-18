@@ -12,7 +12,6 @@
  */
 package org.omnifaces.facesviews;
 
-import static java.lang.Boolean.TRUE;
 import static java.lang.Boolean.parseBoolean;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
@@ -143,7 +142,6 @@ import org.omnifaces.config.WebXml;
  * @see FacesViewsForwardingFilter
  * @see ExtensionAction
  * @see PathAction
- * @see FacesServletDispatchMethod
  * @see UriExtensionRequestWrapper
  * @see FacesViewsViewHandlerInstaller
  * @see FacesViewsViewHandler
@@ -199,9 +197,10 @@ public final class FacesViews {
 	 * The name of the enum context parameter that determines the method used by FacesViews to invoke the FacesServlet.
 	 * See {@link FacesServletDispatchMethod}.
 	 * @see FacesServletDispatchMethod
-	 * @deprecated This will be determined automatically.
+	 * @deprecated Since 2.6 As this is superfluous since Servlet 3.0.
+	 * It will default to DO_FILTER and automatically use FORWARD when resource is not mapped.
 	 */
-	@Deprecated
+	@Deprecated // TODO: remove in OmniFaces 3.0.
 	public static final String FACES_VIEWS_DISPATCH_METHOD_PARAM_NAME = "org.omnifaces.FACES_VIEWS_DISPATCH_METHOD";
 
 	/**
@@ -713,7 +712,7 @@ public final class FacesViews {
 			multiViewsEnabled = !isEmpty((Set<?>) servletContext.getAttribute(MULTIVIEWS_PATHS));
 		}
 
-		return multiViewsEnabled == TRUE;
+		return multiViewsEnabled;
 	}
 
 	/**

@@ -24,7 +24,10 @@ import javax.servlet.FilterChain;
  * @author Arjan Tijms
  * @see FacesViews
  * @see FacesViewsForwardingFilter
+ * @deprecated Since 2.6 As this is superfluous since Servlet 3.0.
+ * It will default to DO_FILTER and automatically use FORWARD when resource is not mapped.
  */
+@Deprecated // TODO: remove in OmniFaces 3.0.
 public enum FacesServletDispatchMethod {
 
 	/**

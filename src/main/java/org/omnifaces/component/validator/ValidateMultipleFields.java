@@ -313,9 +313,25 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 			}
 		}
 
-		String message = getMessage();
-		String showMessageFor = getShowMessageFor();
+		addErrorMessage(context, inputs, labels, getMessage(), getShowMessageFor());
+	}
 
+	private UIInput findInputComponent(UIComponent parent, String clientId, PropertyKeys property) {
+		UIComponent found = parent.findComponent(clientId);
+
+		if (found == null) {
+			throw new IllegalArgumentException(String.format(
+				ERROR_UNKNOWN_COMPONENT, getClass().getSimpleName(), property, clientId));
+		}
+		else if (!(found instanceof UIInput)) {
+			throw new IllegalArgumentException(String.format(
+				ERROR_INVALID_COMPONENT, getClass().getSimpleName(), property, clientId, found.getClass().getName()));
+		}
+
+		return (UIInput) found;
+	}
+
+	private void addErrorMessage(FacesContext context, List<UIInput> inputs, final StringBuilder labels, String message, String showMessageFor) {
 		if (showMessageFor.equals("@this")) {
 			addError(getClientId(context), message, labels);
 		}
@@ -342,21 +358,6 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 				addError(input.getClientId(context), message, labels);
 			}
 		}
-	}
-
-	private UIInput findInputComponent(UIComponent parent, String clientId, PropertyKeys property) {
-		UIComponent found = parent.findComponent(clientId);
-
-		if (found == null) {
-			throw new IllegalArgumentException(String.format(
-				ERROR_UNKNOWN_COMPONENT, getClass().getSimpleName(), property, clientId));
-		}
-		else if (!(found instanceof UIInput)) {
-			throw new IllegalArgumentException(String.format(
-				ERROR_INVALID_COMPONENT, getClass().getSimpleName(), property, clientId, found.getClass().getName()));
-		}
-
-		return (UIInput) found;
 	}
 
 	// Attribute getters/setters --------------------------------------------------------------------------------------

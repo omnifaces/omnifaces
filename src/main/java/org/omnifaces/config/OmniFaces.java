@@ -34,6 +34,12 @@ public final class OmniFaces {
 	private static final Long STARTUP_TIME = System.currentTimeMillis();
 	private static final String DEFAULT_MESSAGE_BUNDLE = "org.omnifaces.messages";
 
+	// Constructors ---------------------------------------------------------------------------------------------------
+
+	private OmniFaces() {
+		// Hide constructor.
+	}
+
 	// Utility --------------------------------------------------------------------------------------------------------
 
 	/**

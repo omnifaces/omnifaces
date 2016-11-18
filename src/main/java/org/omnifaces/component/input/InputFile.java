@@ -525,28 +525,32 @@ public class InputFile extends HtmlInputFile {
 		}
 
 		for (Part part : parts) {
-			String fileName = getSubmittedFileName(part);
-			String message = null;
-			String param = null;
+			validatePart(context, part, accept, maxsize);
+		}
+	}
 
-			if (accept != null) {
-				String contentType = isEmpty(fileName) ? part.getContentType() : getMimeType(context, fileName);
+	private void validatePart(FacesContext context, Part part, String accept, Long maxsize) {
+		String fileName = getSubmittedFileName(part);
+		String message = null;
+		String param = null;
 
-				if (contentType == null || !contentType.matches(accept.trim().replace("*", ".*").replaceAll("\\s*,\\s*", "|"))) {
-					message = getAcceptMessage();
-					param = accept;
-				}
+		if (accept != null) {
+			String contentType = isEmpty(fileName) ? part.getContentType() : getMimeType(context, fileName);
+
+			if (contentType == null || !contentType.matches(accept.trim().replace("*", ".*").replaceAll("\\s*,\\s*", "|"))) {
+				message = getAcceptMessage();
+				param = accept;
 			}
+		}
 
-			if (message == null && maxsize != null && part.getSize() > maxsize) {
-				message = getMaxsizeMessage();
-				param = formatBytes(maxsize);
-			}
+		if (message == null && maxsize != null && part.getSize() > maxsize) {
+			message = getMaxsizeMessage();
+			param = formatBytes(maxsize);
+		}
 
-			if (message != null) {
-				addError(getClientId(context), message, Components.getLabel(this), fileName, param);
-				setValid(false);
-			}
+		if (message != null) {
+			addError(getClientId(context), message, Components.getLabel(this), fileName, param);
+			setValid(false);
 		}
 	}
 
