@@ -277,16 +277,6 @@
  * </tr>
  *
  * <tr>
- * <td class="colFirst"><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_DISPATCH_METHOD_PARAM_NAME}</code></td>
- * <td>Determines the method used by FacesViews to invoke the FacesServlet.
- * <br>Allowed values are enumerated in {@link org.omnifaces.facesviews.FacesServletDispatchMethod}, which have the following meaning:
- * <br>- <code>DO_FILTER</code>: Use a plain {@link javax.servlet.FilterChain#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse)} to invoke the {@link javax.faces.webapp.FacesServlet}. Using this method necessitates the FacesServlet to be mapped to the (extensionless) requested resource or to everything (/*) when manually mapping.
- * <br>- <code>FORWARD</code>: Use a forward to invoke the {@link javax.faces.webapp.FacesServlet}. Using this method the {@link javax.faces.webapp.FacesServlet} does not have to be mapped to the (extensionless) requested resource or to everything (/*) when manually mapping.
- * <br>Default value: <code>DO_FILTER</code>
- * </td>
- * </tr>
- *
- * <tr>
  * <td class="colFirst"><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_VIEW_HANDLER_MODE_PARAM_NAME}</code></td>
  * <td>Determines how the {@link org.omnifaces.facesviews.FacesViewsViewHandler} should build the action URL that's used in e.g. forms and links.
  * <br>Allowed values are enumerated in {@link org.omnifaces.facesviews.ViewHandlerMode}, which have the following meaning:

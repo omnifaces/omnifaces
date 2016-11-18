@@ -15,6 +15,7 @@ package org.omnifaces.facesviews;
 import static javax.faces.application.ProjectStage.Development;
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static org.omnifaces.facesviews.FacesServletDispatchMethod.DO_FILTER;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_PATH_INFO;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_SERVLET_PATH;
 import static org.omnifaces.facesviews.FacesViews.getExtensionAction;
@@ -93,10 +94,6 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 	public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException, IOException {
 		String servletPath = request.getServletPath();
 
-		if (servletPath.endsWith("/")) {
-			servletPath = servletPath.substring(0, servletPath.length() - 1);
-		}
-
 		if (filterExtensionLess(request, response, chain, servletPath)) {
 			return;
 		}
@@ -122,7 +119,8 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 		ServletContext servletContext = getServletContext();
 		boolean multiViews = isMultiViewsEnabled(request);
 		Map<String, String> resources = getMappedResources(servletContext);
-		String resource = servletPath + (multiViews ? "/*" : "");
+		String normalizedServletPath = servletPath.endsWith("/") ? servletPath.substring(0, servletPath.length() - 1) : servletPath;
+		String resource = normalizedServletPath + (multiViews ? "/*" : "");
 		String pathInfo = coalesce(request.getPathInfo(), (String) request.getAttribute(FACES_VIEWS_ORIGINAL_PATH_INFO));
 
 		if (getApplicationFromFactory().getProjectStage() == Development && !resources.containsKey(resource)) {
@@ -130,7 +128,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 			resources = scanAndStoreViews(servletContext, false);
 		}
 
-		if (!resources.containsKey(resource) && multiViews) {
+		if (multiViews && !resources.containsKey(resource)) {
 			resource = getMultiViewsWelcomeFile(servletContext);
 
 			if (resource != null) {
@@ -141,48 +139,49 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 		}
 
 		if (resources.containsKey(resource)) {
-			String normalizedResource = servletPath;
 
 			// Check if a welcome file was explicitly requested.
-			if ((getRequestRelativeURI(request) + "/").startsWith(servletPath + "/")) {
-				normalizedResource = stripWelcomeFilePrefix(servletContext, servletPath);
+			if ((getRequestRelativeURI(request) + "/").startsWith(normalizedServletPath + "/")) {
+				String normalizedResource = stripWelcomeFilePrefix(servletContext, servletPath);
+
+				if (!servletPath.equals(normalizedResource)) {
+
+					// If so, redirect back to parent folder.
+					String uri = request.getContextPath() + normalizedResource;
+					String queryString = request.getQueryString();
+					redirectPermanent(response, uri + ((queryString != null) ? "?" + queryString : ""));
+					return true;
+				}
 			}
 
-			if (!request.getServletPath().equals(normalizedResource)) {
-				String uri = request.getContextPath() + normalizedResource;
-				String queryString = request.getQueryString();
-				redirectPermanent(response, uri + ((queryString != null) ? "?" + queryString : ""));
+			String servletPathWithExtension = normalizedServletPath + getExtension(resources.get(resource));
+
+			if (dispatchMethod == DO_FILTER && resources.containsKey(servletPathWithExtension)) {
+				// Continue the chain, but make the request appear to be to the resource with an extension.
+				// This assumes that the FacesServlet has been mapped to something that includes the extensionless
+				// request.
+				try {
+					request.setAttribute(FACES_VIEWS_ORIGINAL_SERVLET_PATH, servletPath);
+					request.setAttribute(FACES_VIEWS_ORIGINAL_PATH_INFO, pathInfo);
+					chain.doFilter(new UriExtensionRequestWrapper(request, servletPathWithExtension), response);
+				}
+				finally {
+					request.removeAttribute(FACES_VIEWS_ORIGINAL_SERVLET_PATH);
+					request.removeAttribute(FACES_VIEWS_ORIGINAL_PATH_INFO);
+				}
+
 				return true;
 			}
+			else {
+				// Forward the resource (view) using its original extension, on which the Facelets Servlet
+				// is mapped. Technically it matters most that the Facelets Servlet picks up the
+				// request, and the exact extension or even prefix is perhaps less relevant.
+				RequestDispatcher requestDispatcher = servletContext.getRequestDispatcher(servletPathWithExtension);
 
-			String extension = getExtension(resources.get(resource));
-
-			switch (dispatchMethod) {
-				case DO_FILTER:
-					// Continue the chain, but make the request appear to be to the resource with an extension.
-					// This assumes that the FacesServlet has been mapped to something that includes the extensionless
-					// request.
-					try {
-						request.setAttribute(FACES_VIEWS_ORIGINAL_SERVLET_PATH, servletPath);
-						request.setAttribute(FACES_VIEWS_ORIGINAL_PATH_INFO, pathInfo);
-						chain.doFilter(new UriExtensionRequestWrapper(request, servletPath, extension), response);
-					}
-					finally {
-						request.removeAttribute(FACES_VIEWS_ORIGINAL_SERVLET_PATH);
-						request.removeAttribute(FACES_VIEWS_ORIGINAL_PATH_INFO);
-					}
-
+				if (requestDispatcher != null) {
+					requestDispatcher.forward(request, response);
 					return true;
-				case FORWARD:
-					// Forward the resource (view) using its original extension, on which the Facelets Servlet
-					// is mapped. Technically it matters most that the Facelets Servlet picks up the
-					// request, and the exact extension or even prefix is perhaps less relevant.
-					RequestDispatcher requestDispatcher = servletContext.getRequestDispatcher(servletPath + extension);
-
-					if (requestDispatcher != null) {
-						requestDispatcher.forward(request, response);
-						return true;
-					}
+				}
 			}
 		}
 

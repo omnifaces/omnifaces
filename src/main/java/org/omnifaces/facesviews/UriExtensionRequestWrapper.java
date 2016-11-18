@@ -35,9 +35,9 @@ public class UriExtensionRequestWrapper extends HttpServletRequestWrapper {
 
 	private final String servletPath;
 
-	public UriExtensionRequestWrapper(HttpServletRequest request, String servletPath, String extension) {
+	public UriExtensionRequestWrapper(HttpServletRequest request, String servletPath) {
 		super(request);
-		this.servletPath = servletPath.endsWith(extension) ? servletPath : servletPath + extension;
+		this.servletPath = servletPath;
 	}
 
 	@Override
