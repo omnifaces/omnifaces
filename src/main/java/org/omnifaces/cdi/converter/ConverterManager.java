@@ -78,6 +78,7 @@ import org.omnifaces.application.OmniApplicationFactory;
  *
  * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz
+ * @author Robert Alexandersson
  * @see OmniApplication
  * @see OmniApplicationFactory
  * @since 1.6
@@ -89,8 +90,8 @@ public class ConverterManager {
 
 	@Inject
 	private BeanManager manager;
-	private Map<String, Bean<Converter>> convertersById = new HashMap<>();
-	private Map<Class<?>, Bean<Converter>> convertersByForClass = new HashMap<>();
+	private Map<String, Converter> converterStringMap = new HashMap<>();
+	private Map<Class, Converter> converterClassMap = new HashMap<>();
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -102,21 +103,18 @@ public class ConverterManager {
 	 * @return the converter instance associated with the given converter ID,
 	 * or <code>null</code> if there is none.
 	 */
-	@SuppressWarnings("unchecked")
 	public Converter createConverter(Application application, String converterId) {
-		Bean<Converter> bean = convertersById.get(converterId);
-
-		if (bean == null && !convertersById.containsKey(converterId)) {
-			Converter converter = application.createConverter(converterId);
-
+		Converter converter = converterStringMap.get(converterId);
+		if (converter == null) {
+			converter = application.createConverter(converterId);
 			if (converter != null) {
-				bean = (Bean<Converter>) resolve(manager, converter.getClass());
+				converter = prepareBeanAndInjectDependencies(converter);
+				converterStringMap.put(converterId, converter);
+			}else{
+				throw new IllegalAccessError("Converter was not created");
 			}
-
-			convertersById.put(converterId, bean);
 		}
-
-		return (bean != null) ? getReference(manager, bean) : null;
+		return converter;
 	}
 
 	/**
@@ -127,21 +125,33 @@ public class ConverterManager {
 	 * @return the converter instance associated with the given converter for-class,
 	 * or <code>null</code> if there is none.
 	 */
-	@SuppressWarnings("unchecked")
 	public Converter createConverter(Application application, Class<?> converterForClass) {
-		Bean<Converter> bean = convertersByForClass.get(converterForClass);
-
-		if (bean == null && !convertersByForClass.containsKey(converterForClass)) {
-			Converter converter = application.createConverter(converterForClass);
-
+		Converter converter = converterClassMap.get(converterForClass);
+		if (converter == null) {
+			converter = application.createConverter(converterForClass);
 			if (converter != null) {
-				bean = (Bean<Converter>) resolve(manager, converter.getClass());
+				converter = prepareBeanAndInjectDependencies(converter);
+				converterClassMap.put(converterForClass, converter);
 			}
-
-			convertersByForClass.put(converterForClass, bean);
+			// If converter is null it means a class without converter interface was sent in, throw no exception
 		}
+		return converter;
+	}
 
-		return (bean != null) ? getReference(manager, bean) : null;
+	@SuppressWarnings("unchecked")
+	private Converter prepareBeanAndInjectDependencies(Converter converter) {
+		// Prepares for injection
+		Bean<Converter> bean = (Bean<Converter>) resolve(manager, converter.getClass());
+		// Performs injection
+		if(bean != null) {
+			converter = getReference(manager, bean);
+		} else {
+			// Throw error if the class has an annotation and failed to create a managed bean
+			if (converter.getClass().isAnnotationPresent(FacesConverter.class)) {
+				throw new IllegalAccessError("Converter is not registered as a CDI managed bean "+converter.getClass());
+			}
+		}
+		return converter;
 	}
 
 }

@@ -38,6 +38,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicIntegerArray;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
@@ -174,6 +176,8 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 	// From Hacker's Delight, Chapter 3, Harry S. Warren Jr.
 	return 1 << (Integer.SIZE - Integer.numberOfLeadingZeros(x - 1));
   }
+
+  static final Executor EXECUTOR = Executors.newFixedThreadPool(10);
 
   /** The draining status of the buffers. */
   enum DrainStatus {
@@ -737,7 +741,14 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 	if (node == null) {
 	  return null;
 	}
-	afterCompletion(new ReadTask(node));
+      EXECUTOR.execute(
+              new Runnable() {
+                  @Override
+                  public void run() {
+                      afterCompletion(new ReadTask(node));
+                  }
+              }
+      );
 	return node.getValue();
   }
 
