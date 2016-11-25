@@ -48,7 +48,7 @@ import javax.faces.convert.FacesConverter;
 public class TrimConverter implements Converter {
 
     @Override
-    public String getAsObject(FacesContext context, UIComponent component, String submittedValue) {
+    public Object getAsObject(FacesContext context, UIComponent component, String submittedValue) {
         if (isEmpty(submittedValue)) {
         	return null;
         }
