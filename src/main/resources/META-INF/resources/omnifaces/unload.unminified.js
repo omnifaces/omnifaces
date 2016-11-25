@@ -19,7 +19,7 @@
  * @see org.omnifaces.cdi.ViewScopeManager
  * @since 2.2
  */
-OmniFaces.Unload = (function(Util, window, document) {
+OmniFaces.Unload = (function(Util, navigator, window, document) {
 
 	// "Constant" fields ----------------------------------------------------------------------------------------------
 
@@ -37,8 +37,8 @@ OmniFaces.Unload = (function(Util, window, document) {
 
 	/**
 	 * Initialize the unload event listener on the current document. This will check if XHR is supported and if the
-	 * current document has a JSF form with a view state element. If so, then register the <code>beforeunload</code>
-	 * event to send a synchronous XHR request with the OmniFaces view scope ID and the JSF view state value as
+	 * current document has a JSF form with a view state element. If so, then register the <code>unload</code> event to
+	 * send a beacon or synchronous XHR request with the OmniFaces view scope ID and the JSF view state value as
 	 * parameters. Also register the all JSF <code>submit</code> events to disable the unload event listener.
 	 * @param {string} viewScopeId The OmniFaces view scope ID.
 	 */
@@ -48,27 +48,33 @@ OmniFaces.Unload = (function(Util, window, document) {
 		}
 
 		if (id == null) {
-			Util.addEventListener(window, "beforeunload", function() {
+			var form = getFacesForm();
+
+			if (!form) {
+				if (jsf && jsf.getProjectStage() == "Development" && window.console && console.error) {
+					console.error(ERROR_MISSING_FORM);
+				}
+
+				return;
+			}
+
+			Util.addEventListener(window, window.onbeforeunload ? "unload" : "beforeunload", function() { // If there's no user-defined onbeforeunload handler, let's perform job during beforeunload instead, which is more reliable.
 				if (disabled) {
 					self.reenable(); // Just in case some custom JS explicitly triggered submit event while staying in same DOM.
 					return;
 				}
 
-				var form = getFacesForm();
-
-				if (!form) {
-					if (jsf && jsf.getProjectStage() == "Development" && window.console && console.error) {
-						console.error(ERROR_MISSING_FORM);
-					}
-
-					return;
-				}
-
 				try {
-					var xhr = new XMLHttpRequest();
-					xhr.open("POST", form.action.split(/[?#;]/)[0], false);
-					xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-					xhr.send("omnifaces.event=unload&id=" + id + "&" + VIEW_STATE_PARAM + "=" + encodeURIComponent(form[VIEW_STATE_PARAM].value));
+					var url = form.action.split(/[?#;]/)[0] + "?omnifaces.event=unload&id=" + id + "&" + VIEW_STATE_PARAM + "=" + encodeURIComponent(form[VIEW_STATE_PARAM].value);
+
+					if (navigator.sendBeacon) {
+						navigator.sendBeacon(url); // Synchronous XHR is deprecated during unload event, modern browsers offer Beacon API for this which will basically fire-and-forget the request.
+					}
+					else {
+						var xhr = new XMLHttpRequest();
+						xhr.open("POST", url, false);
+						xhr.send(null);
+					}
 				}
 				catch (e) {
 					// Fail silently. You never know.
@@ -119,4 +125,4 @@ OmniFaces.Unload = (function(Util, window, document) {
 
 	return self;
 
-})(OmniFaces.Util, window, document);
+})(OmniFaces.Util, navigator, window, document);

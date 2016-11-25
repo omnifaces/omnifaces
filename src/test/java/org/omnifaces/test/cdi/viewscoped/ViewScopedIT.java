@@ -101,7 +101,7 @@ public class ViewScopedIT extends OmniFacesIT {
 
 		guardHttp(unload).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals(messages.getText(), "unload init");
+		assertEquals("unload init", messages.getText());
 
 
 		// Navigate then submit then unload.
@@ -115,7 +115,7 @@ public class ViewScopedIT extends OmniFacesIT {
 
 		guardHttp(unload).click();
 		assertNotEquals(previousBean, previousBean = bean.getText());
-		assertEquals(messages.getText(), "unload init");
+		assertEquals("unload init", messages.getText());
 	}
 
 	@Test @InSequence(2)
