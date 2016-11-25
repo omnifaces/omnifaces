@@ -50,7 +50,7 @@ OmniFaces.Unload = (function(Util, window, document) {
 		if (id == null) {
 			Util.addEventListener(window, "beforeunload", function() {
 				if (disabled) {
-					disabled = false; // Just in case some custom JS explicitly triggered submit event while staying in same DOM.
+					self.reenable(); // Just in case some custom JS explicitly triggered submit event while staying in same DOM.
 					return;
 				}
 
@@ -86,10 +86,17 @@ OmniFaces.Unload = (function(Util, window, document) {
 
 	/**
 	 * Disable the unload event listener on the current document.
-	 * It will be re-enabled when the DOM has not changed during the unload event.
+	 * It will automatically be re-enabled when the DOM has not changed during the unload event.
 	 */
 	self.disable = function() {
 		disabled = true;
+	}
+
+	/**
+	 * Re-enable the unload event listener on the current document.
+	 */
+	self.reenable = function() {
+		disabled = false;
 	}
 
 	// Private static functions ---------------------------------------------------------------------------------------
