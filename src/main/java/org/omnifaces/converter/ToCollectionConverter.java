@@ -13,6 +13,7 @@
 package org.omnifaces.converter;
 
 import static java.util.regex.Pattern.quote;
+import static org.omnifaces.util.Faces.createConverter;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isEmpty;
 
@@ -30,6 +31,7 @@ import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 
 import org.omnifaces.el.ExpressionInspector;
+import org.omnifaces.util.Faces;
 import org.omnifaces.util.Reflection;
 
 /**
@@ -46,12 +48,20 @@ import org.omnifaces.util.Reflection;
  * &lt;h:inputText value="#{bean.commaSeparatedValues}" converter="omnifaces.ToCollectionConverter" /&gt;
  * </pre>
  * <p>
- * The default delimiter is comma <code>,</code> and the default collection type is <code>java.util.HashSet</code> for
- * a <code>Set</code> property and <code>java.util.ArrayList</code> for anything else. You can use
- * <code>&lt;o:converter&gt;</code> to specify those attributes.
+ * The default delimiter is comma followed by space <code>, </code> and the default collection type is
+ * <code>java.util.HashSet</code> for a <code>Set</code> property and <code>java.util.ArrayList</code> for anything
+ * else, and the default converter for each item will in <code>getAsString()</code> be determined based on item type and
+ * in <code>getAsObject()</code> be determined based on generic return type of the getter method.
+ * <p>
+ * You can use <code>&lt;o:converter&gt;</code> to specify those attributes. The <code>delimiter</code> must be a
+ * <code>String</code>, the <code>collectionType</code> must be a FQN and the <code>itemConverter</code> can be
+ * anything which is acceptable by {@link Faces#createConverter(Object)}.
  * <pre>
- * &lt;h:inputText value="#{bean.uniqueOrderedSemiColonSeparatedValues}"&gt;
- *     &lt;o:converter converterId="omnifaces.ToCollectionConverter" delimiter=";" collectionType="java.util.LinkedHashSet" &gt;
+ * &lt;h:inputText value="#{bean.uniqueOrderedSemiColonSeparatedNumbers}"&gt;
+ *     &lt;o:converter converterId="omnifaces.ToCollectionConverter"
+ *                     delimiter=";"
+ *                     collectionType="java.util.LinkedHashSet"
+ *                     itemConverter="javax.faces.Integer" &gt;
  * &lt;/h:inputText&gt;
  * </pre>
  *
@@ -67,6 +77,7 @@ public class ToCollectionConverter extends TrimConverter {
 
 	private String delimiter;
 	private String collectionType;
+	private Object itemConverter;
 
 	@Override
 	public Object getAsObject(FacesContext context, UIComponent component, String submittedValue) {
@@ -76,7 +87,7 @@ public class ToCollectionConverter extends TrimConverter {
 
 		String delimiter = coalesce(this.delimiter, DEFAULT_DELIMITER);
 		String collectionType = coalesce(this.collectionType, DEFAULT_COLLECTION_TYPE);
-		Converter converter = null;
+		Converter converter = createConverter(itemConverter);
 		ValueExpression valueExpression = component.getValueExpression("value");
 
 		if (valueExpression != null) {
@@ -91,17 +102,19 @@ public class ToCollectionConverter extends TrimConverter {
 				collectionType = DEFAULT_SET_TYPE;
 			}
 
-			Type[] actualTypeArguments = ((ParameterizedType) getter.getGenericReturnType()).getActualTypeArguments();
+			if (converter == null) {
+				Type[] actualTypeArguments = ((ParameterizedType) getter.getGenericReturnType()).getActualTypeArguments();
 
-			if (actualTypeArguments.length > 0) {
-				Class<?> forClass = (Class<?>) actualTypeArguments[0];
-				converter = context.getApplication().createConverter(forClass);
+				if (actualTypeArguments.length > 0) {
+					Class<?> forClass = (Class<?>) actualTypeArguments[0];
+					converter = context.getApplication().createConverter(forClass);
+				}
 			}
 		}
 
 		Collection<Object> collection = Reflection.instance(collectionType);
 
-		for (String item : submittedValue.split(quote(delimiter))) {
+		for (String item : submittedValue.split(quote(delimiter.trim()))) {
 			Object trimmed = super.getAsObject(context, component, item);
 			collection.add(converter == null ? trimmed : converter.getAsString(context, component, trimmed));
 		}
@@ -118,8 +131,9 @@ public class ToCollectionConverter extends TrimConverter {
 		Application application = context.getApplication();
 		StringBuilder builder = new StringBuilder();
 		String delimiter = coalesce(this.delimiter, DEFAULT_DELIMITER);
+		Converter itemConverter = createConverter(this.itemConverter);
 		Class<?> forClass = null;
-		Converter converter = null;
+		Converter converter = itemConverter;
 		int i = 0;
 
 		for (Object item : (Collection<?>) modelValue) {
@@ -127,7 +141,7 @@ public class ToCollectionConverter extends TrimConverter {
 				builder.append(delimiter);
 			}
 
-			if (item != null && forClass != item.getClass()) {
+			if (itemConverter == null && item != null && forClass != item.getClass()) {
 				forClass = item.getClass();
 				converter = application.createConverter(forClass);
 			}
@@ -144,6 +158,10 @@ public class ToCollectionConverter extends TrimConverter {
 
 	public void setCollectionType(String collectionType) {
 		this.collectionType = collectionType;
+	}
+
+	public void setItemConverter(Object itemConverter) {
+		this.itemConverter = itemConverter;
 	}
 
 }
