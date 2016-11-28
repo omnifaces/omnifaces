@@ -37,6 +37,7 @@ import javax.faces.FactoryFinder;
 import javax.faces.application.Application;
 import javax.faces.application.ApplicationFactory;
 import javax.faces.application.NavigationHandler;
+import javax.faces.application.ProjectStage;
 import javax.faces.application.ViewHandler;
 import javax.faces.component.UIViewParameter;
 import javax.faces.component.UIViewRoot;
@@ -292,6 +293,17 @@ public final class Faces {
 	 */
 	public static String getServerInfo() {
 		return FacesLocal.getServerInfo(getContext());
+	}
+
+	/**
+	 * Returns the project stage. This will return the <code>javax.faces.PROJECT_STAGE</code> context parameter in
+	 * <code>web.xml</code>.
+	 * @return The project stage.
+	 * @see Application#getProjectStage()
+	 * @since 2.6
+	 */
+	public static ProjectStage getProjectStage() {
+		return FacesLocal.getProjectStage(getContext());
 	}
 
 	/**

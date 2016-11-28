@@ -156,6 +156,14 @@ public final class FacesLocal {
 
 	/**
 	 * {@inheritDoc}
+	 * @see Faces#getProjectStage()
+	 */
+	public static ProjectStage getProjectStage(FacesContext context) {
+		return context.getApplication().getProjectStage();
+	}
+
+	/**
+	 * {@inheritDoc}
 	 * @see Faces#isDevelopment()
 	 */
 	public static boolean isDevelopment(FacesContext context) {
