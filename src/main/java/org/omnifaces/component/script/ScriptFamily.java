@@ -49,10 +49,10 @@ public abstract class ScriptFamily extends UIComponentBase {
 		return true;
 	}
 
-	// Helpers --------------------------------------------------------------------------------------------------------
+	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Move the given ScriptFamily component to end of body and returns <code>true</code> if done so. This helper method
+	 * Move this ScriptFamily component to end of body and returns <code>true</code> if done so. This method
 	 * needs to be called from {@link #processEvent(ComponentSystemEvent)} during {@link PostAddToViewEvent} or
 	 * {@link PostRestoreStateEvent}. This has basically the same effect as setting <code>target="body"</code> on a
 	 * component resource.
@@ -60,16 +60,16 @@ public abstract class ScriptFamily extends UIComponentBase {
 	 * @param component The component to be moved to body.
 	 * @return <code>true</code> if the move has taken place.
 	 */
-	protected static boolean moveToBody(ComponentSystemEvent event, ScriptFamily component) {
+	protected boolean moveToBody(ComponentSystemEvent event) {
 		if (!(event instanceof PostAddToViewEvent || event instanceof PostRestoreStateEvent)) {
 			return false;
 		}
 
-		FacesContext context = component.getFacesContext();
+		FacesContext context = getFacesContext();
 		UIViewRoot view = context.getViewRoot();
 
-		if (context.isPostback() ? !view.getComponentResources(context, "body").contains(component) : event instanceof PostAddToViewEvent) {
-			view.addComponentResource(context, component, "body");
+		if (context.isPostback() ? !view.getComponentResources(context, "body").contains(this) : event instanceof PostAddToViewEvent) {
+			view.addComponentResource(context, this, "body");
 			return true;
 		}
 		else {

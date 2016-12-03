@@ -171,11 +171,13 @@ public final class Components {
 
 	/**
 	 * Returns the current UI component from the EL context.
+	 * @param <C> The expected component type.
 	 * @return The current UI component from the EL context.
 	 * @see UIComponent#getCurrentComponent(FacesContext)
 	 */
-	public static UIComponent getCurrentComponent() {
-		return UIComponent.getCurrentComponent(getContext());
+	@SuppressWarnings("unchecked")
+	public static <C extends UIComponent> C getCurrentComponent() {
+		return (C) UIComponent.getCurrentComponent(getContext());
 	}
 
 	/**

@@ -19,6 +19,7 @@ import static javax.faces.component.behavior.ClientBehaviorContext.createClientB
 import static org.omnifaces.cdi.push.SocketChannelManager.ESTIMATED_TOTAL_CHANNELS;
 import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Components.getClosestParent;
+import static org.omnifaces.util.Faces.isRenderResponse;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
@@ -33,6 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.el.ValueExpression;
@@ -40,11 +42,11 @@ import javax.enterprise.event.Observes;
 import javax.faces.FacesException;
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
+import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.component.behavior.ClientBehavior;
 import javax.faces.component.behavior.ClientBehaviorHolder;
 import javax.faces.context.FacesContext;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
 import javax.servlet.ServletContext;
 import javax.websocket.CloseReason.CloseCodes;
@@ -58,14 +60,15 @@ import org.omnifaces.cdi.push.SocketEvent.Opened;
 import org.omnifaces.component.script.OnloadScript;
 import org.omnifaces.util.Beans;
 import org.omnifaces.util.Callback;
+import org.omnifaces.util.Components;
 import org.omnifaces.util.Json;
 import org.omnifaces.util.State;
 
 /**
  * <p>
- * The <code>&lt;o:socket&gt;</code> tag opens an one-way (server to client) web socket based push connection in client
- * side which can be reached from server side via {@link PushContext} interface injected in any CDI/container managed
- * artifact via <code>&#64;</code>{@link Push} annotation.
+ * The <code>&lt;o:socket&gt;</code> is an {@link UIComponent} whith opens an one-way (server to client) web socket
+ * based push connection in client side which can be reached from server side via {@link PushContext} interface injected
+ * in any CDI/container managed artifact via <code>&#64;</code>{@link Push} annotation.
  *
  *
  * <h3 id="configuration"><a href="#configuration">Configuration</a></h3>
@@ -78,7 +81,7 @@ import org.omnifaces.util.State;
  * &lt;/context-param&gt;
  * </pre>
  * <p>
- * It will install the {@link SocketEndpoint}. Lazy initialization of the endpoint via taghandler is unfortunately not
+ * It will install the {@link SocketEndpoint}. Lazy initialization of the endpoint via component is unfortunately not
  * possible across all containers (yet).
  * See also <a href="https://java.net/jira/browse/WEBSOCKET_SPEC-211">WS spec issue 211</a>.
  *
@@ -280,10 +283,11 @@ import org.omnifaces.util.State;
  * </pre>
  * <p>
  * It defaults to <code>true</code> and it's under the covers interpreted as a JavaScript instruction whether to open or
- * close the web socket push connection. If the value is an EL expression and it becomes <code>false</code> during an
- * ajax request, then the push connection will explicitly be closed during oncomplete of that ajax request, even though
- * you did not cover the <code>&lt;o:socket&gt;</code> tag in ajax render/update. So make sure it's tied to at least a
- * view scoped property in case you intend to control it during the view scope.
+ * close the web socket push connection. If the value of the <code>connected</code> or <code>rendered</code> attribute
+ * is an EL expression and it becomes <code>false</code> during an ajax request, then any opened push connection will
+ * explicitly be closed during oncomplete of that ajax request, even though you did not cover the
+ * <code>&lt;o:socket&gt;</code> component in ajax render/update. So make sure the value is tied to at least a view
+ * scoped property in case you intend to control it during the view scope.
  * <p>
  * You can also explicitly set it to <code>false</code> and manually open the push connection in client side by
  * invoking <strong><code>OmniFaces.Push.open(channel)</code></strong>, passing the channel name, for example in an
@@ -664,6 +668,7 @@ public class Socket extends OnloadScript implements ClientBehaviorHolder {
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private final State state = new State(getStateHelper());
+	private Boolean rendered;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -680,10 +685,12 @@ public class Socket extends OnloadScript implements ClientBehaviorHolder {
 			throw new IllegalArgumentException(ERROR_EXPRESSION_DISALLOWED);
 		}
 
-		Object user = binding.getValue(getFacesContext().getELContext());
+		if (PropertyKeys.user.toString().equals(name)) {
+			Object user = binding.getValue(getFacesContext().getELContext());
 
-		if (user != null && !(user instanceof Serializable)) {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_USER, user));
+			if (user != null && !(user instanceof Serializable)) {
+				throw new IllegalArgumentException(String.format(ERROR_INVALID_USER, user));
+			}
 		}
 
 		super.setValueExpression(name, binding);
@@ -701,10 +708,8 @@ public class Socket extends OnloadScript implements ClientBehaviorHolder {
 	 * Only move to body when not nested in a form.
 	 */
 	@Override
-	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
-		if (getClosestParent(this, UIForm.class) == null) {
-			super.processEvent(event);
-		}
+	protected boolean moveToBody(ComponentSystemEvent event) {
+		return (getClosestParent(this, UIForm.class) == null) && super.moveToBody(event);
 	}
 
 	/**
@@ -751,6 +756,8 @@ public class Socket extends OnloadScript implements ClientBehaviorHolder {
 		if (script != null) {
 			context.getResponseWriter().write(script);
 		}
+
+		rendered = super.isRendered();
 	}
 
 	private String getBehaviorScripts() {
@@ -942,7 +949,7 @@ public class Socket extends OnloadScript implements ClientBehaviorHolder {
 	 * @return Whether to (auto)connect the web socket or not.
 	 */
 	public boolean isConnected() {
-		return state.get(PropertyKeys.connected, TRUE);
+		return super.isRendered() && state.<Boolean>get(PropertyKeys.connected, TRUE);
 	}
 
 	/**
@@ -957,6 +964,30 @@ public class Socket extends OnloadScript implements ClientBehaviorHolder {
 		state.put(PropertyKeys.connected, connected);
 	}
 
+	/**
+	 * An override which explicitly returns <code>true</code> once more when the <code>rendered</code> condition gets
+	 * toggled to <code>false</code> while the socket is already in connected state. This gives the component the
+	 * opportunity to render the close script.
+	 */
+	@Override
+	public boolean isRendered() {
+		if (isRenderResponse()) {
+			if (rendered != null) {
+				return rendered;
+			}
+
+			rendered = super.isRendered() && Components.isRendered(getParent());
+
+			if (!rendered && isCurrentlyConnected(getFacesContext(), getChannel())) {
+				rendered = true;
+			}
+
+			return rendered;
+		}
+
+		return super.isRendered();
+	}
+
 	// Helpers --------------------------------------------------------------------------------------------------------
 
 	/**
@@ -964,10 +995,20 @@ public class Socket extends OnloadScript implements ClientBehaviorHolder {
 	 * @param context The involved servlet context.
 	 */
 	public static void registerEndpointIfNecessary(ServletContext context) {
-		if (TRUE.equals(context.getAttribute(Socket.class.getName()))
-			|| !(parseBoolean(context.getInitParameter(PARAM_SOCKET_ENDPOINT_ENABLED))
-				|| parseBoolean(context.getInitParameter(PARAM_ENABLE_SOCKET_ENDPOINT)))) {
+		if (TRUE.equals(context.getAttribute(Socket.class.getName()))) {
 			return;
+		}
+
+		if (!parseBoolean(context.getInitParameter(PARAM_SOCKET_ENDPOINT_ENABLED))) {
+			if (parseBoolean(context.getInitParameter(PARAM_ENABLE_SOCKET_ENDPOINT))) { // TODO: remove in OmniFaces 3.0.
+				Logger.getLogger(Socket.class.getName()).warning(
+					"Context parameter name '" + PARAM_ENABLE_SOCKET_ENDPOINT + "' is deprecated."
+						+ " It has been renamed to '" + PARAM_SOCKET_ENDPOINT_ENABLED + "'."
+						+ " Please update web.xml accordingly.");
+			}
+			else {
+				return;
+			}
 		}
 
 		try {
@@ -986,15 +1027,27 @@ public class Socket extends OnloadScript implements ClientBehaviorHolder {
 	 * <code>true</code> or <code>false</code> if it has switched its <code>connected</code> attribute.
 	 */
 	private static Boolean hasSwitched(FacesContext context, String channel, boolean connected) {
-		Map<String, Boolean> channels = getViewAttribute(context, Socket.class.getName());
+		Boolean previouslyConnected = getConnectedStates(context).put(channel, connected);
+		return (previouslyConnected == null) ? null : (previouslyConnected != connected);
+	}
 
-		if (channels == null) {
-			channels = new HashMap<>(ESTIMATED_TOTAL_CHANNELS);
-			setViewAttribute(context, Socket.class.getName(), channels);
+	/**
+	 * Helper to check whether given channel is currently connected.
+	 */
+	private static boolean isCurrentlyConnected(FacesContext context, String channel) {
+		Boolean currentlyConnected = getConnectedStates(context).get(channel);
+		return (currentlyConnected != null && currentlyConnected);
+	}
+
+	private static Map<String, Boolean> getConnectedStates(FacesContext context) {
+		Map<String, Boolean> connectedStates = getViewAttribute(context, Socket.class.getName());
+
+		if (connectedStates == null) {
+			connectedStates = new HashMap<>(ESTIMATED_TOTAL_CHANNELS);
+			setViewAttribute(context, Socket.class.getName(), connectedStates);
 		}
 
-		Boolean previouslyConnected = channels.put(channel, connected);
-		return (previouslyConnected == null) ? null : (previouslyConnected != connected);
+		return connectedStates;
 	}
 
 }

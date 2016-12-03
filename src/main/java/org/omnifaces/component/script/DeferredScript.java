@@ -83,7 +83,7 @@ public class DeferredScript extends ScriptFamily {
 	 */
 	@Override
 	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
-		if (moveToBody(event, this)) {
+		if (moveToBody(event)) {
 			Hacks.setScriptResourceRendered(getFacesContext(), new ResourceIdentifier(this));
 		}
 	}

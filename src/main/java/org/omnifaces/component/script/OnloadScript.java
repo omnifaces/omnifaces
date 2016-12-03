@@ -80,7 +80,7 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 	 */
 	@Override
 	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
-		moveToBody(event, this);
+		moveToBody(event);
 
 		if (event instanceof PostRestoreStateEvent) {
 			subscribeToViewEvent(PreRenderViewEvent.class, this);
