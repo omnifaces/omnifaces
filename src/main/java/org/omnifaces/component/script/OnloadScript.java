@@ -74,7 +74,7 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Move this component to body using {@link #moveToBody(ComponentSystemEvent, ScriptFamily)}, and if the event is a
+	 * Move this component to body using {@link #moveToBody(ComponentSystemEvent)}, and if the event is a
 	 * {@link PostRestoreStateEvent}, then subscribe this component to {@link PreRenderViewEvent}, which will invoke
 	 * {@link #processEvent(SystemEvent)}.
 	 */

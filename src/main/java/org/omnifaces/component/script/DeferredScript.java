@@ -78,7 +78,7 @@ public class DeferredScript extends ScriptFamily {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Move this component to body using {@link #moveToBody(ComponentSystemEvent, ScriptFamily)}. If successfully moved,
+	 * Move this component to body using {@link #moveToBody(ComponentSystemEvent)}. If successfully moved,
 	 * then set the script resource as rendered, so that JSF won't auto-include it.
 	 */
 	@Override

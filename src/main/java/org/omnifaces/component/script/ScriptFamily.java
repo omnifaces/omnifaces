@@ -57,7 +57,6 @@ public abstract class ScriptFamily extends UIComponentBase {
 	 * {@link PostRestoreStateEvent}. This has basically the same effect as setting <code>target="body"</code> on a
 	 * component resource.
 	 * @param event The involved event, which can be either {@link PostAddToViewEvent} or {@link PostRestoreStateEvent}.
-	 * @param component The component to be moved to body.
 	 * @return <code>true</code> if the move has taken place.
 	 */
 	protected boolean moveToBody(ComponentSystemEvent event) {
