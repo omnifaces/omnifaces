@@ -976,7 +976,7 @@ public class Socket extends OnloadScript implements ClientBehaviorHolder {
 				return rendered;
 			}
 
-			rendered = super.isRendered() && Components.isRendered(getParent());
+			rendered = super.isRendered() && (getParent() != null) && Components.isRendered(getParent());
 
 			if (!rendered && isCurrentlyConnected(getFacesContext(), getChannel())) {
 				rendered = true;
