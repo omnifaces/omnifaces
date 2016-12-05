@@ -105,7 +105,7 @@ OmniFaces.Util = (function(window, document) {
 	 * @param {function} listener The event listener to be added or removed on the given element via given functions.
 	 */
 	function handleEventListener(element, standardFunctionName, msFunctionName, events, listener) {
-		var eventParts = events.trim().split(/\s+/);
+		var eventParts = events.replace(/^\s+|\s+$/g, "").split(/\s+/);
 
 		for (var i = 0; i < eventParts.length; i++) {
 			var event = eventParts[i];
