@@ -39,6 +39,7 @@ import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
 
+import org.omnifaces.component.validator.ValidateMultipleFields;
 import org.omnifaces.util.Callback;
 
 /**
@@ -137,23 +138,34 @@ public class SkipValidators extends TagHandler {
 	 */
 	static class SkipValidatorsEventListener implements SystemEventListener {
 
-		private Map<String, Object> required = new HashMap<>();
+		private Map<String, Object> attributes = new HashMap<>();
 		private Map<String, Validator[]> allValidators = new HashMap<>();
 
 		@Override
 		public boolean isListenerForSource(Object source) {
-			return source instanceof UIInput;
+			return source instanceof UIInput || source instanceof ValidateMultipleFields;
 		}
 
 		@Override
 		public void processEvent(SystemEvent event) throws AbortProcessingException {
-			UIInput input = (UIInput) event.getSource();
+			UIComponent source = (UIComponent) event.getSource();
+
+			if (source instanceof UIInput) {
+				processEventForUIInput(event, (UIInput) source);
+			}
+			else if (source instanceof ValidateMultipleFields) {
+				processEventForValidateMultipleFields(event, (ValidateMultipleFields) source);
+			}
+		}
+
+		private void processEventForUIInput(SystemEvent event, UIInput input) {
 			String clientId = input.getClientId();
 
 			if (event instanceof PreValidateEvent) {
 				ValueExpression requiredExpression = input.getValueExpression("required");
-				required.put(clientId, (requiredExpression != null) ? requiredExpression : input.isRequired());
+				attributes.put(clientId, (requiredExpression != null) ? requiredExpression : input.isRequired());
 				input.setRequired(false);
+
 				Validator[] validators = input.getValidators();
 				allValidators.put(clientId, validators);
 
@@ -162,7 +174,11 @@ public class SkipValidators extends TagHandler {
 				}
 			}
 			else if (event instanceof PostValidateEvent) {
-				Object requiredValue = required.remove(clientId);
+				for (Validator validator : allValidators.remove(clientId)) {
+					input.addValidator(validator);
+				}
+
+				Object requiredValue = attributes.remove(clientId);
 
 				if (requiredValue instanceof ValueExpression) {
 					input.setValueExpression("required", (ValueExpression) requiredValue);
@@ -170,9 +186,25 @@ public class SkipValidators extends TagHandler {
 				else {
 					input.setRequired(TRUE.equals(requiredValue));
 				}
+			}
+		}
 
-				for (Validator validator : allValidators.remove(clientId)) {
-					input.addValidator(validator);
+		private void processEventForValidateMultipleFields(SystemEvent event, ValidateMultipleFields validator) {
+			String clientId = validator.getClientId();
+
+			if (event instanceof PreValidateEvent) {
+				ValueExpression disabledExpression = validator.getValueExpression("disabled");
+				attributes.put(clientId, (disabledExpression != null) ? disabledExpression : validator.isDisabled());
+				validator.setDisabled(true);
+			}
+			else if (event instanceof PostValidateEvent) {
+				Object disabledValue = attributes.remove(clientId);
+
+				if (disabledValue instanceof ValueExpression) {
+					validator.setValueExpression("disabled", (ValueExpression) disabledValue);
+				}
+				else {
+					validator.setDisabled(TRUE.equals(disabledValue));
 				}
 			}
 		}

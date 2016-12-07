@@ -14,8 +14,11 @@ package org.omnifaces.component.validator;
 
 import java.io.IOException;
 
+import javax.faces.application.Application;
 import javax.faces.component.UIComponentBase;
 import javax.faces.context.FacesContext;
+import javax.faces.event.PostValidateEvent;
+import javax.faces.event.PreValidateEvent;
 
 /**
  * Base class which is to be shared between all components of the Validator family.
@@ -60,7 +63,10 @@ public abstract class ValidatorFamily extends UIComponentBase {
 	 */
 	@Override
 	public void processValidators(FacesContext context) {
-		validateComponents(context);
+        Application application = context.getApplication();
+        application.publishEvent(context, PreValidateEvent.class, this);
+        validateComponents(context);
+        application.publishEvent(context, PostValidateEvent.class, this);
 	}
 
 	/**
