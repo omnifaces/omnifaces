@@ -65,7 +65,7 @@ public class SocketPushContext implements PushContext {
 		this.channel = channel;
 		boolean hasSession = isActive(SessionScoped.class);
 		sessionScope = hasSession ? socketChannels.getSessionScope() : EMPTY_SCOPE;
-		viewScope = hasSession && hasContext() ? socketChannels.getViewScope(false) : EMPTY_SCOPE;
+		viewScope = hasSession && hasContext() ? socketChannels.getViewScope(true) : EMPTY_SCOPE;
 		this.socketSessions = socketSessions;
 		this.socketUsers = socketUsers;
 	}

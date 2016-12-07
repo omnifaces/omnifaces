@@ -36,35 +36,26 @@ public class SocketIT extends OmniFacesIT {
 	@FindBy(id="clientOpenedMessages")
 	private WebElement clientOpenedMessages;
 
+	@FindBy(id="applicationScopedServerEventMessage")
+	private WebElement applicationScopedServerEventMessage;
+
+	@FindBy(id="push:applicationScopedServerEvent")
+	private WebElement pushApplicationScopedServerEvent;
+
+	@FindBy(id="sessionScopedUserTargetedMessage")
+	private WebElement sessionScopedUserTargetedMessage;
+
+	@FindBy(id="push:sessionScopedUserTargeted")
+	private WebElement pushSessionScopedUserTargeted;
+
+	@FindBy(id="viewScopedAjaxAwareMessage")
+	private WebElement viewScopedAjaxAwareMessage;
+
+	@FindBy(id="push:viewScopedAjaxAware")
+	private WebElement pushViewScopedAjaxAware;
+
 	@FindBy(id="clientClosedMessages")
 	private WebElement clientClosedMessages;
-
-	@FindBy(id="serverEventMessages")
-	private WebElement serverEventMessages;
-
-	@FindBy(id="applicationScopedMessage")
-	private WebElement applicationScopedMessage;
-
-	@FindBy(id="sessionScopedMessage")
-	private WebElement sessionScopedMessage;
-
-	@FindBy(id="viewScopedMessage")
-	private WebElement viewScopedMessage;
-
-	@FindBy(id="userTargetedMessage")
-	private WebElement userTargetedMessage;
-
-	@FindBy(id="push:applicationScoped")
-	private WebElement pushApplicationScoped;
-
-	@FindBy(id="push:sessionScoped")
-	private WebElement pushSessionScoped;
-
-	@FindBy(id="push:viewScoped")
-	private WebElement pushViewScoped;
-
-	@FindBy(id="push:userTargeted")
-	private WebElement pushUserTargeted;
 
 	@FindBy(id="closeAllSockets")
 	private WebElement closeAllSockets;
@@ -80,31 +71,28 @@ public class SocketIT extends OmniFacesIT {
 	public void test() throws Exception {
 		testOnopen();
 
-		assertEquals(pushApplicationScoped(), "1," + applicationScopedMessage.getText());
-		assertEquals(pushSessionScoped(), "1," + sessionScopedMessage.getText());
-		assertEquals(pushViewScoped(), "1," + viewScopedMessage.getText());
-		assertEquals(pushUserTargeted(), "1," + userTargetedMessage.getText());
+		assertEquals(pushApplicationScopedServerEvent(), "1," + applicationScopedServerEventMessage.getText());
+		assertEquals(pushSessionScopedUserTargeted(), "1," + sessionScopedUserTargetedMessage.getText());
+		assertEquals(pushViewScopedAjaxAware(), "1," + viewScopedAjaxAwareMessage.getText());
 
 		String firstTab = browser.getWindowHandle();
 		openNewTab(newtab);
 		testOnopen();
 
-		assertEquals(pushApplicationScoped(), "2," + applicationScopedMessage.getText());
-		assertEquals(pushSessionScoped(), "2," + sessionScopedMessage.getText());
-		assertEquals(pushViewScoped(), "1," + viewScopedMessage.getText());
-		assertEquals(pushUserTargeted(), "2," + userTargetedMessage.getText());
+		assertEquals(pushApplicationScopedServerEvent(), "2," + applicationScopedServerEventMessage.getText());
+		assertEquals(pushSessionScopedUserTargeted(), "2," + sessionScopedUserTargetedMessage.getText());
+		assertEquals(pushViewScopedAjaxAware(), "1," + viewScopedAjaxAwareMessage.getText());
 
 		// Unfortunately Selenium doesn't (seem to?) support starting a new HTTP session within the same IT, so
 		// application, session and user sockets can't be tested more extensively. If possible somehow, it's expected
-		// that numbers should equal respectively 3, 2, 1, 3 on first session and 3, 1, 1, 3 on second session.
+		// that numbers should equal respectively 3, 2, 1 on first session and 3, 1, 1 on second session.
 
 		testOnclose(firstTab);
 	}
 
 	private void testOnopen() {
-		assertEquals("|serverEvents||applicationScoped||sessionScoped||viewScoped||userTargeted|", clientOpenedMessages.getText());
-		waitGui(browser).withTimeout(3, SECONDS).until().element(serverEventMessages).text()
-			.equalTo("|opened:applicationScoped||opened:sessionScoped||opened:viewScoped||opened:userTargeted|");
+		assertEquals("|applicationScopedServerEvent||sessionScopedUserTargeted||viewScopedAjaxAware|", clientOpenedMessages.getText());
+		waitGui(browser).withTimeout(3, SECONDS).until().element(applicationScopedServerEventMessage).text().equalTo("|opened:sessionScopedUserTargeted||opened:viewScopedAjaxAware|");
 	}
 
 	private void testOnclose(String tabToSwitch) {
@@ -116,41 +104,32 @@ public class SocketIT extends OmniFacesIT {
 
 		guardNoRequest(closeAllSockets).click();
 		String closeMessages = clientClosedMessages.getText();
-		assertTrue(closeMessages.contains("|serverEvents|")); // Closing doesn't happen synchronously, so ordering may be different.
-		assertTrue(closeMessages.contains("|applicationScoped|"));
-		assertTrue(closeMessages.contains("|sessionScoped|"));
-		assertTrue(closeMessages.contains("|viewScoped|"));
-		assertTrue(closeMessages.contains("|userTargeted|"));
+		assertTrue(closeMessages.contains("|applicationScopedServerEvent|")); // Closing doesn't happen synchronously, so ordering may be different.
+		assertTrue(closeMessages.contains("|sessionScopedUserTargeted|"));
+		assertTrue(closeMessages.contains("|viewScopedAjaxAware|"));
 		closeCurrentTabAndSwitchTo(tabToSwitch);
 
 */
 	}
 
-	private String pushApplicationScoped() {
-		guardAjax(pushApplicationScoped).click();
+	private String pushApplicationScopedServerEvent() {
+		guardAjax(pushApplicationScopedServerEvent).click();
 		String message = messages.getText();
-		waitUntilMessages(applicationScopedMessage);
+		waitUntilMessages(applicationScopedServerEventMessage);
 		return message;
 	}
 
-	private String pushSessionScoped() {
-		guardAjax(pushSessionScoped).click();
+	private String pushSessionScopedUserTargeted() {
+		guardAjax(pushSessionScopedUserTargeted).click();
 		String message = messages.getText();
-		waitUntilMessages(sessionScopedMessage);
+		waitUntilMessages(sessionScopedUserTargetedMessage);
 		return message;
 	}
 
-	private String pushViewScoped() {
-		guardAjax(pushViewScoped).click();
+	private String pushViewScopedAjaxAware() {
+		guardAjax(pushViewScopedAjaxAware).click();
 		String message = messages.getText();
-		waitUntilMessages(viewScopedMessage);
-		return message;
-	}
-
-	private String pushUserTargeted() {
-		guardAjax(pushUserTargeted).click();
-		String message = messages.getText();
-		waitUntilMessages(userTargetedMessage);
+		waitUntilMessages(viewScopedAjaxAwareMessage);
 		return message;
 	}
 

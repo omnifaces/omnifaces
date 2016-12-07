@@ -15,54 +15,54 @@ package org.omnifaces.test.push.socket;
 import static java.lang.System.nanoTime;
 import static org.omnifaces.util.Messages.addGlobalInfo;
 
+import java.io.Serializable;
 import java.util.Set;
 import java.util.concurrent.Future;
 
-import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.omnifaces.cdi.Push;
 import org.omnifaces.cdi.PushContext;
+import org.omnifaces.cdi.ViewScoped;
 
 @Named
-@RequestScoped
-public class SocketITBean {
+@ViewScoped
+public class SocketITBean implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	@Inject @Push
-	private PushContext applicationScoped;
+	private PushContext applicationScopedServerEvent;
 
 	@Inject @Push
-	private PushContext sessionScoped;
+	private PushContext sessionScopedUserTargeted;
 
 	@Inject @Push
-	private PushContext viewScoped;
+	private PushContext viewScopedAjaxAware;
 
-	@Inject @Push
-	private PushContext userTargeted;
+	private String ajaxAwareMessage;
 
-	public void pushApplicationScoped() {
+	public void pushApplicationScopedServerEvent() {
 		String timestamp = String.valueOf(nanoTime());
-		Set<Future<Void>> sent = applicationScoped.send(timestamp);
+		Set<Future<Void>> sent = applicationScopedServerEvent.send(timestamp);
 		addGlobalInfo("{0},{1}", sent.size(), timestamp);
 	}
 
-	public void pushSessionScoped() {
+	public void pushSessionScopedUserTargeted(String recipientUser) {
 		String timestamp = String.valueOf(nanoTime());
-		Set<Future<Void>> sent = sessionScoped.send(timestamp);
+		Set<Future<Void>> sent = sessionScopedUserTargeted.send(timestamp, recipientUser);
 		addGlobalInfo("{0},{1}", sent.size(), timestamp);
 	}
 
-	public void pushViewScoped() {
-		String timestamp = String.valueOf(nanoTime());
-		Set<Future<Void>> sent = viewScoped.send(timestamp);
-		addGlobalInfo("{0},{1}", sent.size(), timestamp);
+	public void pushViewScopedAjaxAware() {
+		ajaxAwareMessage = String.valueOf(nanoTime());
+		Set<Future<Void>> sent = viewScopedAjaxAware.send("someAjaxEventName");
+		addGlobalInfo("{0},{1}", sent.size(), ajaxAwareMessage);
 	}
 
-	public void pushUserTargeted(String recipientUser) {
-		String timestamp = String.valueOf(nanoTime());
-		Set<Future<Void>> sent = userTargeted.send(timestamp, recipientUser);
-		addGlobalInfo("{0},{1}", sent.size(), timestamp);
+	public String getAjaxAwareMessage() {
+		return ajaxAwareMessage;
 	}
 
 }

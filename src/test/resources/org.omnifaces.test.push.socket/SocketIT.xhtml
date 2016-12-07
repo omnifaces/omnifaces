@@ -21,46 +21,13 @@
 	xmlns:o="http://omnifaces.org/ui"
 	xmlns:of="http://omnifaces.org/functions"
 >
-	<h:head />
-
-	<h:body>
-		<h:messages id="messages" />	
-		<h:link id="newtab" target="_blank" />
-
-		<div id="clientOpenedMessages" />
-		<div id="serverEventMessages" />
-		<div id="clientClosedMessages" />
-
-		<div id="applicationScopedMessage" />
-		<div id="sessionScopedMessage" />
-		<div id="viewScopedMessage" />
-		<div id="userTargetedMessage" />
-
-		<h:form id="push">
-			<f:ajax onevent="clearMessages" render=":messages">
-				<h:commandButton id="applicationScoped" action="#{socketITBean.pushApplicationScoped}" />
-				<h:commandButton id="sessionScoped" action="#{socketITBean.pushSessionScoped}" />
-				<h:commandButton id="viewScoped" action="#{socketITBean.pushViewScoped}" />
-				<h:commandButton id="userTargeted" action="#{socketITBean.pushUserTargeted('42')}" />
-			</f:ajax>
-		</h:form>
-
-		<h:link id="closeAllSockets" onclick="closeAllSockets();return false;" />
-
-		<o:socket channel="serverEvents" onopen="clientOpened" onmessage="serverEvent" onclose="clientClosed" />
-		<o:socket channel="applicationScoped" scope="application" onopen="clientOpened" onmessage="showMessage" onclose="clientClosed" />
-		<o:socket channel="sessionScoped" scope="session" onopen="clientOpened" onmessage="showMessage" onclose="clientClosed" />
-		<o:socket channel="viewScoped" scope="view" onopen="clientOpened" onmessage="showMessage" onclose="clientClosed" />
-		<o:socket channel="userTargeted" user="42" onopen="clientOpened" onmessage="showMessage" onclose="clientClosed" />
-
+	<h:head>
 		<script>
 			function clearMessages(data) {
 				if (data.status == "begin") {
-					document.getElementById("serverEventMessages").innerHTML = "";
-					document.getElementById("applicationScopedMessage").innerHTML = "";
-					document.getElementById("sessionScopedMessage").innerHTML = "";
-					document.getElementById("viewScopedMessage").innerHTML = "";
-					document.getElementById("userTargetedMessage").innerHTML = "";
+					document.getElementById("applicationScopedServerEventMessage").innerHTML = "";
+					document.getElementById("sessionScopedUserTargetedMessage").innerHTML = "";
+					document.getElementById("viewScopedAjaxAwareMessage").innerHTML = "";
 				}
 			}
 
@@ -68,8 +35,13 @@
 				document.getElementById("clientOpenedMessages").innerHTML += "|" + channel + "|";
 			}
 
-			function serverEvent(message) {
-				document.getElementById("serverEventMessages").innerHTML += "|" + message + "|";
+			function showServerEvent(message, channel) {
+				if (message.indexOf(":") != -1) {
+					document.getElementById("applicationScopedServerEventMessage").innerHTML += "|" + message + "|";
+				}
+				else {
+					showMessage(message, channel);
+				}
 			}
 
 			function showMessage(message, channel) {
@@ -77,16 +49,44 @@
 			}
 
 			function closeAllSockets() {
-				OmniFaces.Push.close("serverEvents");
-				OmniFaces.Push.close("applicationScoped");
-				OmniFaces.Push.close("sessionScoped");
-				OmniFaces.Push.close("viewScoped");
-				OmniFaces.Push.close("userTargeted");
+				OmniFaces.Push.close("applicationScopedServerEvent");
+				OmniFaces.Push.close("sessionScopedUserTargeted");
+				OmniFaces.Push.close("viewScopedAjaxAware");
 			}
 
 			function clientClosed(code, channel) {
 				document.getElementById("clientClosedMessages").innerHTML += "|" + channel + "|";
 			}
 		</script>
+	</h:head>
+
+	<h:body>
+		<h:messages id="messages" />	
+		<h:link id="newtab" target="_blank" />
+
+		<div id="clientOpenedMessages" />
+		<div id="applicationScopedServerEventMessage" />
+		<div id="sessionScopedUserTargetedMessage" />
+		<h:outputText id="viewScopedAjaxAwareMessage" value="#{socketITBean.ajaxAwareMessage}" />
+		<div id="clientClosedMessages" />
+
+		<h:form id="push">
+			<f:ajax onevent="clearMessages" render=":messages">
+				<h:commandButton id="applicationScopedServerEvent" action="#{socketITBean.pushApplicationScopedServerEvent}" />
+				<h:commandButton id="sessionScopedUserTargeted" action="#{socketITBean.pushSessionScopedUserTargeted('42')}" />
+				<h:commandButton id="viewScopedAjaxAware" action="#{socketITBean.pushViewScopedAjaxAware}" />
+			</f:ajax>
+		</h:form>
+
+		<h:link id="closeAllSockets" onclick="closeAllSockets();return false;" />
+
+		<o:socket channel="applicationScopedServerEvent" onopen="clientOpened" onmessage="showServerEvent" onclose="clientClosed" />
+		<o:socket channel="sessionScopedUserTargeted" user="42" onopen="clientOpened" onmessage="showMessage" onclose="clientClosed" />
+
+		<h:form>
+			<o:socket channel="viewScopedAjaxAware" scope="view" onopen="clientOpened" onclose="clientClosed">
+				<f:ajax event="someAjaxEventName" render=":viewScopedAjaxAwareMessage" />
+			</o:socket>
+		</h:form>
 	</h:body>
 </html>

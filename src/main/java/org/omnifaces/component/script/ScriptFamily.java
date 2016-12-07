@@ -12,9 +12,12 @@
  */
 package org.omnifaces.component.script;
 
+import java.io.IOException;
+
 import javax.faces.component.UIComponentBase;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
+import javax.faces.context.ResponseWriter;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.PostAddToViewEvent;
 import javax.faces.event.PostRestoreStateEvent;
@@ -47,6 +50,46 @@ public abstract class ScriptFamily extends UIComponentBase {
 	@Override
 	public boolean getRendersChildren() {
 		return true;
+	}
+
+	/**
+	 * If this component is rendered, then start the <code>&lt;script&gt;</code> element.
+	 */
+	@Override
+	public void encodeBegin(FacesContext context) throws IOException {
+		if (getRendererType() != null) {
+			super.encodeBegin(context);
+			return;
+		}
+
+		pushComponentToEL(context, this);
+
+		if (isRendered()) {
+			ResponseWriter writer = context.getResponseWriter();
+			writer.startElement("script", this);
+			writer.writeAttribute("type", "text/javascript", "type");
+
+			if (getId() != null || !getClientBehaviors().isEmpty()) {
+				writer.writeAttribute("id", getClientId(context), "id");
+			}
+		}
+	}
+
+	/**
+	 * If this component is rendered, then end the <code>&lt;script&gt;</code> element.
+	 */
+	@Override
+	public void encodeEnd(FacesContext context) throws IOException {
+		if (getRendererType() != null) {
+			super.encodeEnd(context);
+			return;
+		}
+
+		if (isRendered()) {
+			context.getResponseWriter().endElement("script");
+		}
+
+		popComponentFromEL(context);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------

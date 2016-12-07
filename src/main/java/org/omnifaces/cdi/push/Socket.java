@@ -16,21 +16,15 @@ import static java.lang.Boolean.TRUE;
 import static java.lang.Boolean.parseBoolean;
 import static java.util.Collections.unmodifiableList;
 import static javax.faces.component.behavior.ClientBehaviorContext.createClientBehaviorContext;
-import static org.omnifaces.cdi.push.SocketChannelManager.ESTIMATED_TOTAL_CHANNELS;
 import static org.omnifaces.util.Beans.getReference;
-import static org.omnifaces.util.Components.getClosestParent;
-import static org.omnifaces.util.Faces.isRenderResponse;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
-import static org.omnifaces.util.FacesLocal.getViewAttribute;
-import static org.omnifaces.util.FacesLocal.setViewAttribute;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -43,11 +37,13 @@ import javax.faces.FacesException;
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponent;
-import javax.faces.component.UIForm;
 import javax.faces.component.behavior.ClientBehavior;
 import javax.faces.component.behavior.ClientBehaviorHolder;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
+import javax.faces.event.ListenerFor;
+import javax.faces.event.PostAddToViewEvent;
 import javax.servlet.ServletContext;
 import javax.websocket.CloseReason.CloseCodes;
 import javax.websocket.server.ServerContainer;
@@ -57,10 +53,9 @@ import org.omnifaces.cdi.Push;
 import org.omnifaces.cdi.PushContext;
 import org.omnifaces.cdi.push.SocketEvent.Closed;
 import org.omnifaces.cdi.push.SocketEvent.Opened;
-import org.omnifaces.component.script.OnloadScript;
+import org.omnifaces.component.script.ScriptFamily;
 import org.omnifaces.util.Beans;
 import org.omnifaces.util.Callback;
-import org.omnifaces.util.Components;
 import org.omnifaces.util.Json;
 import org.omnifaces.util.State;
 
@@ -616,8 +611,9 @@ import org.omnifaces.util.State;
  * @since 2.3
  */
 @FacesComponent(Socket.COMPONENT_TYPE)
+@ListenerFor(systemEventClass=PostAddToViewEvent.class)
 @ResourceDependency(library="omnifaces", name="omnifaces.js", target="head")
-public class Socket extends OnloadScript implements ClientBehaviorHolder {
+public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
@@ -648,8 +644,6 @@ public class Socket extends OnloadScript implements ClientBehaviorHolder {
 			+ " You need to set web.xml context param '" + PARAM_SOCKET_ENDPOINT_ENABLED + "' with value 'true'.";
 
 	private static final String SCRIPT_INIT = "OmniFaces.Push.init('%s','%s',%s,%s,%s);";
-	private static final String SCRIPT_OPEN = "OmniFaces.Push.open('%s');";
-	private static final String SCRIPT_CLOSE = "OmniFaces.Push.close('%s');";
 
 	private static final Collection<String> CONTAINS_EVERYTHING = unmodifiableList(new ArrayList<String>() {
 		private static final long serialVersionUID = 1L;
@@ -668,11 +662,20 @@ public class Socket extends OnloadScript implements ClientBehaviorHolder {
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private final State state = new State(getStateHelper());
-	private Boolean rendered;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
-	/**
+    /**
+     * After adding component to view, subscribe {@link SocketFacesListener} if necessary.
+     */
+    @Override
+    public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
+    	if (event instanceof PostAddToViewEvent) {
+    		SocketFacesListener.subscribeIfNecessary();
+    	}
+    }
+
+    /**
 	 * An override which checks if this isn't been invoked on <code>channel</code> or <code>scope</code> attribute, and
 	 * if the <code>user</code> attribute is <code>Serializable</code>.
 	 * Finally it delegates to the super method.
@@ -705,20 +708,9 @@ public class Socket extends OnloadScript implements ClientBehaviorHolder {
 	}
 
 	/**
-	 * Only move to body when not nested in a form.
-	 */
-	@Override
-	protected boolean moveToBody(ComponentSystemEvent event) {
-		return (getClosestParent(this, UIForm.class) == null) && super.moveToBody(event);
-	}
-
-	/**
 	 * First check if the web socket endpoint is enabled in <code>web.xml</code> and the channel name and scope is
 	 * valid, then register it in {@link SocketChannelManager} and get the channel ID, then render the
-	 * <code>init()</code> script, or if it has just switched the <code>connected</code> attribute, then render either
-	 * the <code>open()</code> script or the <code>close()</code> script. During an ajax request with partial rendering,
-	 * it's added as <code>&lt;eval&gt;</code> by partial response writer, else it's just added as a script component
-	 * with <code>target="body"</code>. Those scripts will in turn hit {@link SocketEndpoint}.
+	 * <code>init()</code> script. This scripts will in turn hit {@link SocketEndpoint}.
 	 * @throws IllegalStateException When the web socket endpoint is not enabled in <code>web.xml</code>.
 	 * @throws IllegalArgumentException When the channel name, scope or user is invalid.
 	 * The channel name may only contain alphanumeric characters, hyphens, underscores and periods.
@@ -732,32 +724,23 @@ public class Socket extends OnloadScript implements ClientBehaviorHolder {
 			throw new IllegalStateException(ERROR_ENDPOINT_NOT_ENABLED);
 		}
 
-		String channel = getChannel();
+        if (SocketFacesListener.register(context, this)) {
+    		String channel = getChannel();
 
-		if (channel == null || !PATTERN_CHANNEL.matcher(channel).matches()) {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_CHANNEL, channel));
-		}
+    		if (channel == null || !PATTERN_CHANNEL.matcher(channel).matches()) {
+    			throw new IllegalArgumentException(String.format(ERROR_INVALID_CHANNEL, channel));
+    		}
 
-		boolean connected = isConnected();
-		Boolean switched = hasSwitched(context, channel, connected);
-		String script = null;
-
-		if (switched == null) {
 			Integer port = getPort();
 			String host = (port != null ? ":" + port : "") + getRequestContextPath(context);
 			String channelId = getReference(SocketChannelManager.class).register(channel, getScope(), getUser());
 			String functions = getOnopen() + "," + getOnmessage() + "," + getOnclose();
-			script = String.format(SCRIPT_INIT, host, channelId, functions, getBehaviorScripts(), connected);
-		}
-		else if (switched) {
-			script = String.format(connected ? SCRIPT_OPEN : SCRIPT_CLOSE, channel);
-		}
+            String behaviors = getBehaviorScripts();
+            boolean connected = isConnected();
 
-		if (script != null) {
-			context.getResponseWriter().write(script);
-		}
-
-		rendered = super.isRendered();
+            String script = String.format(SCRIPT_INIT, host, channelId, functions, behaviors, connected);
+            context.getResponseWriter().write(script);
+        }
 	}
 
 	private String getBehaviorScripts() {
@@ -776,7 +759,7 @@ public class Socket extends OnloadScript implements ClientBehaviorHolder {
 			scripts.append(scripts.length() > 1 ? "," : "").append(event).append(":[");
 
 			for (int i = 0; i < clientBehaviors.size(); i++) {
-				scripts.append(i > 0 ? "," : "").append("function(){");
+				scripts.append(i > 0 ? "," : "").append("function(event){");
 				scripts.append(clientBehaviors.get(i).getScript(createClientBehaviorContext(getFacesContext(), this, event, clientId, null)));
 				scripts.append("}");
 			}
@@ -949,7 +932,7 @@ public class Socket extends OnloadScript implements ClientBehaviorHolder {
 	 * @return Whether to (auto)connect the web socket or not.
 	 */
 	public boolean isConnected() {
-		return super.isRendered() && state.<Boolean>get(PropertyKeys.connected, TRUE);
+		return state.get(PropertyKeys.connected, TRUE);
 	}
 
 	/**
@@ -962,30 +945,6 @@ public class Socket extends OnloadScript implements ClientBehaviorHolder {
 	 */
 	public void setConnected(boolean connected) {
 		state.put(PropertyKeys.connected, connected);
-	}
-
-	/**
-	 * An override which explicitly returns <code>true</code> once more when the <code>rendered</code> condition gets
-	 * toggled to <code>false</code> while the socket is already in connected state. This gives the component the
-	 * opportunity to render the close script.
-	 */
-	@Override
-	public boolean isRendered() {
-		if (isRenderResponse()) {
-			if (rendered != null) {
-				return rendered;
-			}
-
-			rendered = super.isRendered() && (getParent() != null) && Components.isRendered(getParent());
-
-			if (!rendered && isCurrentlyConnected(getFacesContext(), getChannel())) {
-				rendered = true;
-			}
-
-			return rendered;
-		}
-
-		return super.isRendered();
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
@@ -1020,34 +979,6 @@ public class Socket extends OnloadScript implements ClientBehaviorHolder {
 		catch (Exception e) {
 			throw new FacesException(e);
 		}
-	}
-
-	/**
-	 * Helper to remember which channels are opened on the view and returns <code>null</code> if it is new, or
-	 * <code>true</code> or <code>false</code> if it has switched its <code>connected</code> attribute.
-	 */
-	private static Boolean hasSwitched(FacesContext context, String channel, boolean connected) {
-		Boolean previouslyConnected = getConnectedStates(context).put(channel, connected);
-		return (previouslyConnected == null) ? null : (previouslyConnected != connected);
-	}
-
-	/**
-	 * Helper to check whether given channel is currently connected.
-	 */
-	private static boolean isCurrentlyConnected(FacesContext context, String channel) {
-		Boolean currentlyConnected = getConnectedStates(context).get(channel);
-		return (currentlyConnected != null && currentlyConnected);
-	}
-
-	private static Map<String, Boolean> getConnectedStates(FacesContext context) {
-		Map<String, Boolean> connectedStates = getViewAttribute(context, Socket.class.getName());
-
-		if (connectedStates == null) {
-			connectedStates = new HashMap<>(ESTIMATED_TOTAL_CHANNELS);
-			setViewAttribute(context, Socket.class.getName(), connectedStates);
-		}
-
-		return connectedStates;
 	}
 
 }

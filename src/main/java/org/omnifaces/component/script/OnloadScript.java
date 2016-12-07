@@ -150,37 +150,23 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 	}
 
 	/**
-	 * If this component is rendered, and the current request is not an ajax request with partial rendering, then start
-	 * the <code>&lt;script&gt;</code> element.
+	 * If the current request is not an ajax request with partial rendering, then encode begin.
 	 */
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
-		if (!isRendered() || isAjaxRequestWithPartialRendering(context)) {
-			return;
-		}
-
-		pushComponentToEL(context, this);
-		ResponseWriter writer = context.getResponseWriter();
-		writer.startElement("script", this);
-		writer.writeAttribute("type", "text/javascript", "type");
-
-		if (getId() != null || !getClientBehaviors().isEmpty()) {
-			writer.writeAttribute("id", getClientId(context), "id");
+		if (!isAjaxRequestWithPartialRendering(context)) {
+			super.encodeBegin(context);
 		}
 	}
 
 	/**
-	 * If this component is rendered, and the current request is not an ajax request with partial rendering, then end
-	 * the <code>&lt;script&gt;</code> element.
+	 * If the current request is not an ajax request with partial rendering, then encode end.
 	 */
 	@Override
 	public void encodeEnd(FacesContext context) throws IOException {
-		if (!isRendered() || isAjaxRequestWithPartialRendering(context)) {
-			return;
+		if (!isAjaxRequestWithPartialRendering(context)) {
+			super.encodeEnd(context);
 		}
-
-		context.getResponseWriter().endElement("script");
-		popComponentFromEL(context);
 	}
 
 }

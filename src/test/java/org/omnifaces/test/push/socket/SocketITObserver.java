@@ -26,21 +26,21 @@ import org.omnifaces.cdi.push.SocketEvent.Opened;
 public class SocketITObserver {
 
 	@Inject @Push
-	private PushContext serverEvents;
+	private PushContext applicationScopedServerEvent;
 
 	public void onopen(@Observes @Opened SocketEvent event) {
 		String channel = event.getChannel();
 
-		if (!"serverEvents".equals(channel)) { // Comes too late in Payara. Not really relevant anyway.
-			serverEvents.send("opened:" + channel);
+		if (!"applicationScopedServerEvent".equals(channel)) { // Comes too late in Payara. Not really relevant anyway.
+			applicationScopedServerEvent.send("opened:" + channel);
 		}
 	}
 
 	public void onclose(@Observes @Closed SocketEvent event) {
 		String channel = event.getChannel();
 
-		if (!"serverEvents".equals(channel)) { // Comes too late in Payara. Not really relevant anyway.
-			serverEvents.send("closed:" + channel);
+		if (!"applicationScopedServerEvent".equals(channel)) { // Comes too late in Payara. Not really relevant anyway.
+			applicationScopedServerEvent.send("closed:" + channel);
 		}
 	}
 
