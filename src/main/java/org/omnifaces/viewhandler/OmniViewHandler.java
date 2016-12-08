@@ -19,10 +19,11 @@ import static org.omnifaces.taghandler.EnableRestorableView.isRestorableViewRequ
 import static org.omnifaces.util.Components.buildView;
 import static org.omnifaces.util.Faces.responseComplete;
 import static org.omnifaces.util.FacesLocal.getRenderKit;
+import static org.omnifaces.util.FacesLocal.getRequestQueryString;
 import static org.omnifaces.util.FacesLocal.getRequestURI;
 import static org.omnifaces.util.FacesLocal.isDevelopment;
-import static org.omnifaces.util.FacesLocal.isPostback;
 import static org.omnifaces.util.FacesLocal.redirectPermanent;
+import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
 import java.util.Map;
@@ -120,8 +121,8 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 
 	/**
 	 * Create a dummy view, restore only the view root state and then immediately explicitly destroy the view. Or, if
-	 * there is no view root state and the current request is not a postback, then explicitly send a permanent redirect
-	 * to base URI in order to strip off all unload related query parameters.
+	 * there is no view root state and the current request is triggered by a beacon, then explicitly send a permanent
+	 * redirect to base URI in order to strip off all unload related query parameters.
 	 */
 	private UIViewRoot unloadView(FacesContext context, String viewId) {
 		UIViewRoot createdView = createView(context, viewId);
@@ -132,7 +133,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 			context.getApplication().publishEvent(context, PreDestroyViewMapEvent.class, UIViewRoot.class, createdView);
 			Hacks.removeViewState(context, manager, viewId);
 		}
-		else if (!isPostback(context)) {
+		else if (!isEmpty(getRequestQueryString(context))) {
 			redirectPermanent(context, getRequestURI(context));
 		}
 
