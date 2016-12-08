@@ -1016,14 +1016,17 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns whether the current request is a postback.
+	 * Returns whether the current request is a postback. This not only delegates to {@link FacesContext#isPostback()}
+	 * which checks the presence of <code>javax.faces.ViewState</code> request parameter, but this also explicitly
+	 * checks the HTTP request method. So this should exclude GET requests having a <code>javax.faces.ViewState</code>
+	 * request parameter in query string.
 	 * <p>
 	 * This is also available in EL as <code>#{faces.postback}</code>.
 	 * @return <code>true</code> for a postback, <code>false</code> for a non-postback (GET) request.
 	 * @see FacesContext#isPostback()
 	 */
 	public static boolean isPostback() {
-		return getContext().isPostback();
+		return FacesLocal.isPostback(getContext());
 	}
 
 	/**
