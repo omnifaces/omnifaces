@@ -131,12 +131,12 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 			context.setProcessingEvents(true);
 			context.getApplication().publishEvent(context, PreDestroyViewMapEvent.class, UIViewRoot.class, createdView);
 			Hacks.removeViewState(context, manager, viewId);
-			responseComplete();
 		}
 		else if (!isPostback(context)) {
 			redirectPermanent(context, getRequestURI(context));
 		}
 
+		responseComplete();
 		return createdView;
 	}
 
