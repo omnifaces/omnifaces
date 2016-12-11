@@ -802,6 +802,14 @@ public final class FacesLocal {
 
 	/**
 	 * {@inheritDoc}
+	 * @see Faces#isPostback()
+	 */
+	public static boolean isPostback(FacesContext context) {
+		return "POST".equalsIgnoreCase(getRequest(context).getMethod()) && context.isPostback();
+	}
+
+	/**
+	 * {@inheritDoc}
 	 * @see Faces#getRequestParameterMap()
 	 */
 	public static Map<String, String> getRequestParameterMap(FacesContext context) {

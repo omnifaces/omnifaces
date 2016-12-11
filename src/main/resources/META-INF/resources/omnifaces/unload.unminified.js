@@ -65,15 +65,16 @@ OmniFaces.Unload = (function(Util, navigator, window, document) {
 				}
 
 				try {
-					var url = form.action.split(/[?#;]/)[0] + "?omnifaces.event=unload&id=" + id + "&" + VIEW_STATE_PARAM + "=" + encodeURIComponent(form[VIEW_STATE_PARAM].value);
+					var url = form.action.split(/[?#;]/)[0];
+					var query = "omnifaces.event=unload&id=" + id + "&" + VIEW_STATE_PARAM + "=" + encodeURIComponent(form[VIEW_STATE_PARAM].value);
 
 					if (navigator.sendBeacon) {
-						navigator.sendBeacon(url); // Synchronous XHR is deprecated during unload event, modern browsers offer Beacon API for this which will basically fire-and-forget the request.
+						navigator.sendBeacon(url + "?" + query); // Synchronous XHR is deprecated during unload event, modern browsers offer Beacon API for this which will basically fire-and-forget the request.
 					}
 					else {
 						var xhr = new XMLHttpRequest();
 						xhr.open("POST", url, false);
-						xhr.send(null);
+						xhr.send(query);
 					}
 				}
 				catch (e) {

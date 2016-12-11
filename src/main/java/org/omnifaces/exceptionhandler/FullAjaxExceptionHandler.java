@@ -46,6 +46,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ExceptionQueuedEvent;
 import javax.faces.event.PhaseId;
+import javax.faces.lifecycle.Lifecycle;
 import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -533,7 +534,9 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
 		try {
 			context.setCurrentPhaseId(PhaseId.RENDER_RESPONSE);
-			getLifecycle(context).render(context);
+			Lifecycle lifecycle = getLifecycle(context);
+			lifecycle.execute(context);
+			lifecycle.render(context);
 			context.responseComplete();
 		}
 		catch (Exception e) {
