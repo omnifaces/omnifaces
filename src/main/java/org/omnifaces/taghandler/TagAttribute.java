@@ -100,10 +100,11 @@ public class TagAttribute extends TagHandler {
 		}
 
 		if (valueExpressionLocal == null) {
-			ValueExpression valueExpressionParent = variableMapper.resolveVariable(name);
-
-			if (valueExpressionParent != null) {
+			if (variableMapper instanceof DelegatingVariableMapper) {
 				valueExpressionLocal = context.getExpressionFactory().createValueExpression(null, Object.class);
+			}
+			else {
+				valueExpressionLocal = variableMapper.resolveVariable(name);
 			}
 		}
 
