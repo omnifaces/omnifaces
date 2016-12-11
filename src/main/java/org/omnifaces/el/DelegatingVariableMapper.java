@@ -25,27 +25,36 @@ import javax.el.VariableMapper;
  */
 public class DelegatingVariableMapper extends VariableMapper {
 
-	private final VariableMapper variableMapper;
+	private static volatile boolean resolveWrappedVariable;
+	private final VariableMapper wrapped;
 	private Map<String, ValueExpression> variables = new HashMap<>();
 
-	public DelegatingVariableMapper(VariableMapper variableMapper) {
-		this.variableMapper = variableMapper;
+	public DelegatingVariableMapper(VariableMapper wrapped) {
+		this.wrapped = wrapped;
 	}
 
 	@Override
-	public ValueExpression resolveVariable(String variable) {
-		ValueExpression valueExpression = variables.get(variable);
-
-		if (valueExpression == null) {
-			valueExpression = variableMapper.resolveVariable(variable);
+	public ValueExpression resolveVariable(String name) {
+		if (variables.containsKey(name)) {
+			return resolveWrappedVariable ? null : variables.get(name);
 		}
 
-		return valueExpression;
+		return wrapped.resolveVariable(name);
+	}
+
+	public ValueExpression resolveWrappedVariable(String name) {
+		try {
+			resolveWrappedVariable = true;
+			return wrapped.resolveVariable(name);
+		}
+		finally {
+			resolveWrappedVariable = false;
+		}
 	}
 
 	@Override
-	public ValueExpression setVariable(String variable, ValueExpression expression) {
-		return variables.put(variable, expression);
+	public ValueExpression setVariable(String name, ValueExpression expression) {
+		return variables.put(name, expression);
 	}
 
 }

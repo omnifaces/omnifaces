@@ -78,8 +78,6 @@ import org.omnifaces.el.DelegatingVariableMapper;
  */
 public class TagAttribute extends TagHandler {
 
-	private static final String MARKER = TagAttribute.class.getName();
-
 	private final String name;
 	private final javax.faces.view.facelets.TagAttribute defaultValue;
 
@@ -91,52 +89,26 @@ public class TagAttribute extends TagHandler {
 
 	@Override
 	public void apply(FaceletContext context, UIComponent parent) throws IOException {
-		checkAndMarkMapper(context);
-		VariableMapper variableMapper = context.getVariableMapper();
-		ValueExpression valueExpressionLocal = variableMapper.setVariable(name, null);
+		DelegatingVariableMapper variableMapper = getDelegatingVariableMapper(context);
+		ValueExpression valueExpression = variableMapper.resolveWrappedVariable(name);
 
-		if (valueExpressionLocal == null && defaultValue != null) {
-			valueExpressionLocal = defaultValue.getValueExpression(context, Object.class);
+		if (valueExpression == null && defaultValue != null) {
+			valueExpression = defaultValue.getValueExpression(context, Object.class);
 		}
 
-		if (valueExpressionLocal == null) {
-			if (variableMapper instanceof DelegatingVariableMapper) {
-				valueExpressionLocal = context.getExpressionFactory().createValueExpression(null, Object.class);
-			}
-			else {
-				valueExpressionLocal = variableMapper.resolveVariable(name);
-			}
-		}
-
-		variableMapper.setVariable(name, valueExpressionLocal);
+		variableMapper.setVariable(name, valueExpression);
 	}
 
-	private static void checkAndMarkMapper(FaceletContext context) {
-		Integer marker = (Integer) context.getAttribute(MARKER);
-
-		if (marker != null && marker.equals(context.hashCode())) {
-			return; // Already marked.
-		}
-
+	private DelegatingVariableMapper getDelegatingVariableMapper(FaceletContext context) {
 		VariableMapper variableMapper = context.getVariableMapper();
-		ValueExpression valueExpressionParentMarker = variableMapper.resolveVariable(MARKER);
 
-		if (valueExpressionParentMarker == null) { // We're the outer faces tag, or parent didn't mark because it didn't have any attributes set.
-			context.setAttribute(MARKER, context.hashCode());
-			return;
+		if (variableMapper instanceof DelegatingVariableMapper) {
+			return (DelegatingVariableMapper) variableMapper;
 		}
 
-		variableMapper.setVariable(MARKER, null); // If we have our own mapper, this will not affect our parent mapper.
-		ValueExpression valueExpressionParentMarkerCheck = variableMapper.resolveVariable(MARKER);
-
-		if (valueExpressionParentMarkerCheck == null || !valueExpressionParentMarkerCheck.equals(valueExpressionParentMarker)) {
-			// We were able to remove our parent's mapper, so we share it.
-
-			variableMapper.setVariable(MARKER, valueExpressionParentMarker); // First put parent marker back ...
-			context.setVariableMapper(new DelegatingVariableMapper(variableMapper)); // ... then add our own variable mapper.
-		}
-
-		context.setAttribute(MARKER, context.hashCode());
+		DelegatingVariableMapper delegatingVariableMapper = new DelegatingVariableMapper(variableMapper);
+		context.setVariableMapper(delegatingVariableMapper);
+		return delegatingVariableMapper;
 	}
 
 }
