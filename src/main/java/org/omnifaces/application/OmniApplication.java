@@ -19,13 +19,18 @@ import static org.omnifaces.util.Faces.getInitParameter;
 
 import java.util.TimeZone;
 
+import javax.el.ValueExpression;
+
 import javax.faces.FacesException;
 import javax.faces.application.Application;
 import javax.faces.application.ApplicationWrapper;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.DateTimeConverter;
 import javax.faces.validator.Validator;
 
+import org.omnifaces.cdi.component.ComponentManager;
 import org.omnifaces.cdi.converter.ConverterManager;
 import org.omnifaces.cdi.validator.ValidatorManager;
 
@@ -54,18 +59,20 @@ public class OmniApplication extends ApplicationWrapper {
 	private final Application wrapped;
 	private final ConverterManager converterManager;
 	private final ValidatorManager validatorManager;
+	private final ComponentManager componentManager;
 	private final TimeZone dateTimeConverterDefaultTimeZone;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Construct a new OmniFaces application around the given wrapped application.
+     * Construct a new OmniFaces application around the given wrapped application.
 	 * @param wrapped The wrapped application.
 	 */
 	public OmniApplication(Application wrapped) {
 		this.wrapped = wrapped;
 		converterManager = getReference(ConverterManager.class);
 		validatorManager = getReference(ValidatorManager.class);
+		componentManager = getReference(ComponentManager.class);
 		dateTimeConverterDefaultTimeZone =
 			parseBoolean(getInitParameter(DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE_PARAM_NAME))
 				? TimeZone.getDefault()
@@ -119,6 +126,50 @@ public class OmniApplication extends ApplicationWrapper {
 		}
 
 		return super.createValidator(validatorId);
+	}
+
+	@Override
+	public UIComponent createComponent(FacesContext context, String componentType, String rendererType) {
+		UIComponent component = componentManager.createComponent(getWrapped(), context, componentType, rendererType);
+
+		if (component != null) {
+			return component;
+		}
+
+		return super.createComponent(context, componentType, rendererType);
+	}
+
+	@Override
+	public UIComponent createComponent(String componentType) throws FacesException {
+		UIComponent component = componentManager.createComponent(getWrapped(), componentType);
+
+		if (component != null) {
+			return component;
+		}
+
+		return super.createComponent(componentType);
+	}
+
+	@Override
+	public UIComponent createComponent(ValueExpression componentExpression, FacesContext context, String componentType, String rendererType) {
+		UIComponent component = componentManager.createComponent(getWrapped(), componentExpression, context, componentType, rendererType);
+
+		if (component != null) {
+			return component;
+		}
+
+		return super.createComponent(componentExpression, context, componentType, rendererType);
+	}
+
+	@Override
+	public UIComponent createComponent(ValueExpression componentExpression, FacesContext context, String componentType) throws FacesException {
+		UIComponent component = componentManager.createComponent(getWrapped(), componentExpression, context, componentType);
+
+		if (component != null) {
+			return component;
+		}
+
+		return super.createComponent(componentExpression, context, componentType);
 	}
 
 	@Override
