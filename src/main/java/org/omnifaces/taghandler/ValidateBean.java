@@ -35,7 +35,7 @@ import static org.omnifaces.util.Faces.validationFailed;
 import static org.omnifaces.util.FacesLocal.evaluateExpressionGet;
 import static org.omnifaces.util.Messages.createError;
 import static org.omnifaces.util.Reflection.instance;
-import static org.omnifaces.util.Reflection.setProperties;
+import static org.omnifaces.util.Reflection.setPropertiesWithCoercion;
 import static org.omnifaces.util.Reflection.toClass;
 import static org.omnifaces.util.Utils.csvToList;
 import static org.omnifaces.util.Utils.isEmpty;
@@ -297,7 +297,7 @@ public class ValidateBean extends TagHandler {
 			}});
 
 			Object copiedBean = getCopier(context, copier).copy(bean);
-			setProperties(copiedBean, properties);
+			setPropertiesWithCoercion(copiedBean, properties);
 			validate(context, form, copiedBean, groups, true);
 		}};
 
