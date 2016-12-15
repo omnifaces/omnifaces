@@ -24,6 +24,7 @@ import static javax.servlet.RequestDispatcher.FORWARD_REQUEST_URI;
 import static org.omnifaces.util.JNDI.lookup;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.decodeURL;
+import static org.omnifaces.util.Utils.encodeURI;
 import static org.omnifaces.util.Utils.encodeURL;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.startsWithOneOf;
@@ -88,6 +89,7 @@ public final class Servlets {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
+	private static final String CONTENT_DISPOSITION_HEADER = "%s;filename=\"%2$s\"; filename*=UTF-8''%2$s";
 	private static final Set<String> FACES_AJAX_HEADERS = unmodifiableSet("partial/ajax", "partial/process");
 	private static final String FACES_AJAX_REDIRECT_XML = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>"
 		+ "<partial-response><redirect url=\"%s\"></redirect></partial-response>";
@@ -471,6 +473,17 @@ public final class Servlets {
 		response.setHeader("Cache-Control", "no-cache,no-store,must-revalidate");
 		response.setDateHeader("Expires", 0);
 		response.setHeader("Pragma", "no-cache"); // Backwards compatibility for HTTP 1.0.
+	}
+
+	/**
+	 * <p>Format an UTF-8 compatible content disposition header for the given filename and whether it's an attachment.
+	 * @param filename The filename to appear in "Save As" dialogue.
+	 * @param attachment Whether the content should be provided as an attachment or inline.
+	 * @return An UTF-8 compatible content disposition header.
+	 * @since 2.6
+	 */
+	public static String formatContentDispositionHeader(String filename, boolean attachment) {
+		return String.format(CONTENT_DISPOSITION_HEADER, (attachment ? "attachment" : "inline"), encodeURI(filename));
 	}
 
 	// Cookies --------------------------------------------------------------------------------------------------------

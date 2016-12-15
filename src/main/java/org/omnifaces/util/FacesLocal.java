@@ -17,10 +17,10 @@ import static java.util.Collections.unmodifiableList;
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Reflection.toClassOrNull;
+import static org.omnifaces.util.Servlets.formatContentDispositionHeader;
 import static org.omnifaces.util.Servlets.prepareRedirectURL;
 import static org.omnifaces.util.Servlets.toQueryString;
 import static org.omnifaces.util.Utils.coalesce;
-import static org.omnifaces.util.Utils.encodeURI;
 import static org.omnifaces.util.Utils.encodeURL;
 import static org.omnifaces.util.Utils.isAnyEmpty;
 import static org.omnifaces.util.Utils.isEmpty;
@@ -130,7 +130,6 @@ public final class FacesLocal {
 
 	private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
 	private static final int DEFAULT_SENDFILE_BUFFER_SIZE = 10240;
-	private static final String SENDFILE_HEADER = "%s;filename=\"%2$s\"; filename*=UTF-8''%2$s";
 	private static final String ERROR_NO_VIEW = "There is no view.";
 	private static final String[] FACELET_CONTEXT_KEYS = {
 		FaceletContext.FACELET_CONTEXT_KEY, // Compiletime constant, may fail when compiled against EE6 and run on EE7.
@@ -1670,8 +1669,7 @@ public final class FacesLocal {
 		// Prepare the response and set the necessary headers.
 		externalContext.setResponseBufferSize(DEFAULT_SENDFILE_BUFFER_SIZE);
 		externalContext.setResponseContentType(getMimeType(context, filename));
-		externalContext.setResponseHeader("Content-Disposition", String.format(SENDFILE_HEADER,
-			(attachment ? "attachment" : "inline"), encodeURI(filename)));
+		externalContext.setResponseHeader("Content-Disposition", formatContentDispositionHeader(filename, attachment));
 
 		// Not exactly mandatory, but this fixes at least a MSIE quirk: http://support.microsoft.com/kb/316431
 		if (((HttpServletRequest) externalContext.getRequest()).isSecure()) {

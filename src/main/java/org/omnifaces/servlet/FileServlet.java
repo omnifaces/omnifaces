@@ -12,8 +12,8 @@
  */
 package org.omnifaces.servlet;
 
+import static org.omnifaces.util.Servlets.formatContentDispositionHeader;
 import static org.omnifaces.util.Utils.coalesce;
-import static org.omnifaces.util.Utils.encodeURI;
 import static org.omnifaces.util.Utils.encodeURL;
 import static org.omnifaces.util.Utils.startsWithOneOf;
 import static org.omnifaces.util.Utils.stream;
@@ -121,7 +121,6 @@ public abstract class FileServlet extends HttpServlet {
 	private static final long ONE_SECOND_IN_MILLIS = TimeUnit.SECONDS.toMillis(1);
 	private static final String ETAG = "W/\"%s-%s\"";
 	private static final Pattern RANGE_PATTERN = Pattern.compile("^bytes=[0-9]*-[0-9]*(,[0-9]*-[0-9]*)*$");
-	private static final String CONTENT_DISPOSITION_HEADER = "%s;filename=\"%2$s\"; filename*=UTF-8''%2$s";
 	private static final String MULTIPART_BOUNDARY = UUID.randomUUID().toString();
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -368,9 +367,9 @@ public abstract class FileServlet extends HttpServlet {
 	 */
 	private String setContentHeaders(HttpServletRequest request, HttpServletResponse response, Resource resource, List<Range> ranges) {
 		String contentType = getContentType(request, resource.file);
-		String disposition = isAttachment(request, contentType) ? "attachment" : "inline";
-		String filename = encodeURI(getAttachmentName(request, resource.file));
-		response.setHeader("Content-Disposition", String.format(CONTENT_DISPOSITION_HEADER, disposition, filename));
+		String filename = getAttachmentName(request, resource.file);
+		boolean attachment = isAttachment(request, contentType);
+		response.setHeader("Content-Disposition", formatContentDispositionHeader(filename, attachment));
 		response.setHeader("Accept-Ranges", "bytes");
 
 		if (ranges.size() == 1) {
