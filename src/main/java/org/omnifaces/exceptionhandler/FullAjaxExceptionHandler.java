@@ -330,7 +330,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 			types.addAll(defaults);
 		}
 
-		String typesParam = context.getInitParameter(PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING);
+		String typesParam = context.getInitParameter(paramName);
 
 		if (!isEmpty(typesParam)) {
 			for (String typeParam : typesParam.split("\\s*,\\s*")) {
