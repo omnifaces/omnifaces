@@ -189,6 +189,16 @@ public final class BeansLocal {
 
 	/**
 	 * {@inheritDoc}
+	 * @see Beans#destroy(Object)
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> void destroy(BeanManager beanManager, T instance) {
+		Bean<T> bean = (Bean<T>) resolve(beanManager, instance.getClass());
+		bean.destroy(instance, beanManager.createCreationalContext(bean));
+	}
+
+	/**
+	 * {@inheritDoc}
 	 * @see Beans#getAnnotation(Annotated, Class)
 	 */
 	public static <A extends Annotation> A getAnnotation(BeanManager beanManager, Annotated annotated, Class<A> annotationType) {

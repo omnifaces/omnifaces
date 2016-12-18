@@ -18,6 +18,7 @@ import java.util.Map;
 import javax.enterprise.context.ContextNotActiveException;
 import javax.enterprise.context.spi.AlterableContext;
 import javax.enterprise.context.spi.Context;
+import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.Stereotype;
@@ -242,11 +243,11 @@ public final class Beans {
 	 * context.
 	 * @since 2.5
 	 * @see #resolve(Class, Annotation...)
-	 * @see BeanManager#getContext(Class)
-	 * @see AlterableContext#destroy(javax.enterprise.context.spi.Contextual)
+	 * @see BeanManager#createCreationalContext(Contextual)
+	 * @see Contextual#destroy(Object, CreationalContext)
 	 */
 	public static <T> void destroy(T instance) {
-		BeansLocal.destroy(getManager(), instance.getClass());
+		BeansLocal.destroy(getManager(), instance);
 	}
 
 	/**

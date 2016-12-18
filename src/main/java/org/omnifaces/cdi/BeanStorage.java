@@ -21,6 +21,8 @@ import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.PassivationCapable;
 
+import org.omnifaces.util.Beans;
+
 /**
  * CDI bean storage. This class is theoretically reusable for multiple CDI scopes. It's currently however only used by
  * the OmniFaces CDI view scope.
@@ -37,7 +39,7 @@ public class BeanStorage implements Serializable {
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
-	private final ConcurrentMap<String, Bean<?>> beans;
+	private final ConcurrentMap<String, Object> beans;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -59,9 +61,9 @@ public class BeanStorage implements Serializable {
 	 * @return The bean associated with given context and creational context.
 	 */
 	public <T> T createBean(Contextual<T> type, CreationalContext<T> context) {
-		Bean<T> bean = new Bean<>(type, context);
+		T bean = type.create(context);
 		beans.put(((PassivationCapable) type).getId(), bean);
-		return bean.getInstance();
+		return bean;
 	}
 
 	/**
@@ -73,67 +75,18 @@ public class BeanStorage implements Serializable {
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> T getBean(Contextual<T> type, BeanManager manager) {
-		Bean<T> bean = (Bean<T>) beans.get(((PassivationCapable) type).getId());
-
-		if (bean == null) {
-			return null;
-		}
-
-		if (!bean.hasContext()) { // May happen after passivation.
-			bean.setContext(type, manager.createCreationalContext(type));
-		}
-
-		return bean.getInstance();
+		return (T) beans.get(((PassivationCapable) type).getId());
 	}
 
 	/**
 	 * Destroy all beans managed so far.
 	 */
 	public synchronized void destroyBeans() { // Not sure if synchronization is absolutely necessary. Just to be on safe side.
-		for (Bean<?> bean : beans.values()) {
-			bean.destroy();
+		for (Object bean : beans.values()) {
+			Beans.destroy(bean);
 		}
 
 		beans.clear();
-	}
-
-	// Nested classes -------------------------------------------------------------------------------------------------
-
-	/**
-	 * This class represents a bean instance. It merely offers a hook to obtain and destroy the bean instance.
-	 */
-	static final class Bean<T> implements Serializable {
-
-		private static final long serialVersionUID = 42L;
-
-		private transient Contextual<T> type;
-		private transient CreationalContext<T> context;
-		private final T instance;
-
-		public Bean(Contextual<T> type, CreationalContext<T> context) {
-			setContext(type, context);
-			instance = type.create(context);
-		}
-
-		public void setContext(Contextual<T> type, CreationalContext<T> context) {
-			this.type = type;
-			this.context = context;
-		}
-
-		public boolean hasContext() {
-			return type != null && context != null;
-		}
-
-		public T getInstance() {
-			return instance;
-		}
-
-		public void destroy() {
-			if (hasContext()) {
-				type.destroy(instance, context);
-			}
-		}
-
 	}
 
 }
