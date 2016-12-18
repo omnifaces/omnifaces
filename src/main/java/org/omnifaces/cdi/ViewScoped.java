@@ -23,12 +23,16 @@ import java.util.UUID;
 
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.NormalScope;
+import javax.enterprise.util.Nonbinding;
 import javax.faces.component.UIViewRoot;
 
 import org.omnifaces.cdi.viewscope.ViewScopeContext;
 import org.omnifaces.cdi.viewscope.ViewScopeEventListener;
 import org.omnifaces.cdi.viewscope.ViewScopeExtension;
 import org.omnifaces.cdi.viewscope.ViewScopeManager;
+import org.omnifaces.cdi.viewscope.ViewScopeStorage;
+import org.omnifaces.cdi.viewscope.ViewScopeStorageInSession;
+import org.omnifaces.cdi.viewscope.ViewScopeStorageInViewState;
 import org.omnifaces.context.OmniExternalContext;
 import org.omnifaces.context.OmniExternalContextFactory;
 import org.omnifaces.viewhandler.OmniViewHandler;
@@ -57,10 +61,17 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * change, the <code>&#64;PreDestroy</code> annotated method of any standard JSF view scoped beans referenced in the
  * same view as the OmniFaces CDI view scoped bean will also guaranteed be invoked on browser unload.
  * <p>
+ * Since OmniFaces 2.6, this annotation got a new attribute: <code>saveInViewState</code>. When using client side state
+ * saving, this attribute can be set to <code>true</code> in order to force JSF to store whole view scoped bean
+ * instances annotated with this annotation in the JSF view state instead of in the HTTP session. For more detail, see
+ * the {@link #saveInViewState()}.
+ * <p>
  * In a nutshell: if you're on JSF 2.0/2.1, and you can't upgrade to JSF 2.2, and you want the
  * <code>&#64;PreDestroy</code> to be invoked on sesison expire too, then use OmniFaces 1.6+ with this view scope
  * annotation. Or, if you're on JSF 2.2 already, and you want the <code>&#64;PreDestroy</code> to be invoked on browser
- * unload too, then use OmniFaces 2.2+ with this view scope annotation.
+ * unload too, then use OmniFaces 2.2+ with this view scope annotation. Or, if you want to store whole view scoped beans
+ * in the JSF view state when using client side state saving, then use OmniFaces 2.6+ with this view scope annotation
+ * and the <code>saveInViewState</code> attribute set to <code>true</code>.
  * <p>
  * Related JSF issues:
  * <ul>
@@ -85,14 +96,34 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * Please note that the bean <strong>must</strong> implement {@link Serializable}, otherwise the CDI implementation
  * will throw an exception about the bean not being passivation capable.
  * <p>
- * Under the covers, CDI managed beans with this scope are via {@link ViewScopeManager} stored in the session scope by
- * an {@link UUID} based key which is referenced in JSF's own view map as available by {@link UIViewRoot#getViewMap()}.
- * They are not stored in the JSF view map itself as that would be rather expensive in case of client side state saving.
+ * Under the covers, CDI managed beans with this scope are via {@link ViewScopeManager} by default stored in the session
+ * scope by an {@link UUID} based key which is referenced in JSF's own view map as available by
+ * {@link UIViewRoot#getViewMap()}. They are not stored in the JSF view state itself as that would be rather expensive
+ * in case of client side state saving.
+ * <p>
+ * In case you are using client side state saving by having the <code>javax.faces.STATE_SAVING_METHOD</code> context
+ * parameter set to <code>true</code> in <code>web.xml</code>, and explicitly want to store the whole view scoped bean
+ * instance in the JSF view state, then set the annotation's <code>saveInViewState</code> attribute to <code>true</code>.
+ * <pre>
+ * import javax.inject.Named;
+ * import org.omnifaces.cdi.ViewScoped;
+ *
+ * &#64;Named
+ * &#64;ViewScoped(saveInViewState=true)
+ * public class OmniCDIViewScopedBean implements Serializable {}
+ * </pre>
+ * <p>
+ * It's very important that you understand the potential impact when assigning "too much" data (e.g. data for
+ * datatables, etc) to such a bean, and that such beans will in fact <strong>never</strong> expire as they are stored
+ * entirely in the <code>javax.faces.ViewState</code> hidden input field in the HTML page. Moreover, the
+ * <code>&#64;</code>{@link PreDestroy} annotated method on such bean will explicitly <strong>never</strong> be invoked,
+ * even not on an unload as it's quite possible to save or cache the page source and re-execute it at a (much) later
+ * moment. For more detail, see the {@link #saveInViewState()}.
  *
  * <h3>Configuration</h3>
  * <p>
- * By default, the maximum number of active view scopes is hold in a LRU map with a default size equal to the first
- * non-null value of the following context parameters:
+ * By default, the maximum number of active view scopes is hold in a LRU map in HTTP session with a default size equal
+ * to the first non-null value of the following context parameters:
  * <ul>
  * <li>{@value org.omnifaces.cdi.viewscope.ViewScopeManager#PARAM_NAME_MAX_ACTIVE_VIEW_SCOPES} (OmniFaces)</li>
  * <li>{@value org.omnifaces.cdi.viewscope.ViewScopeManager#PARAM_NAME_MOJARRA_NUMBER_OF_VIEWS} (Mojarra-specific)</li>
@@ -101,12 +132,18 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <p>If none of those context parameters are present, then a default size of
  * {@value org.omnifaces.cdi.viewscope.ViewScopeManager#DEFAULT_MAX_ACTIVE_VIEW_SCOPES} will be used. When a view scoped
  * bean is evicted from the LRU map, then its <code>&#64;PreDestroy</code> will also guaranteed to be invoked.
+ * <p>
+ * This setting has no effect when <code>saveInViewState</code> attribute is set to <code>true</code>.
+ *
  *
  * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz
  * @see ViewScopeExtension
  * @see ViewScopeContext
  * @see ViewScopeManager
+ * @see ViewScopeStorage
+ * @see ViewScopeStorageInSession
+ * @see ViewScopeStorageInViewState
  * @see ViewScopeEventListener
  * @see BeanStorage
  * @see OmniViewHandler
@@ -120,5 +157,32 @@ import org.omnifaces.viewhandler.OmniViewHandler;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.TYPE, ElementType.METHOD, ElementType.FIELD})
 public @interface ViewScoped {
-	//
+
+	/**
+	 * <p>
+	 * Sets whether to save the view scoped bean instance in JSF view state instead of in HTTP session. By default,
+	 * concrete view scoped bean instances are saved in HTTP session, also when client side state saving is enabled.
+	 * This means, when the HTTP session expires, then the view scoped bean instances will also implicitly expire and
+	 * be newly recreated upon a request in a new session. This may be undesirable when using client side state saving
+	 * as it's intuitively expected that concrete view scoped beans are also saved in JSF view state.
+	 * <p>
+	 * This setting has however potentially a major impact in the size of the JSF view state, certainly when the view
+	 * scoped bean instance holds "too much" data, such as a collection of entities for a data table. It's therefore
+	 * strongly recommended to use this setting only on a view scoped bean instance which is exclusively used to keep
+	 * track of the form state, such as dynamically controlled <code>disabled</code>, <code>readonly</code> and
+	 * <code>rendered</code> attributes which are controlled by ajax events.
+	 * <p>
+	 * Do note that such beans are per definition undestroyable. They may stick around forever in browser cache. Such
+	 * views and beans do never expire. Therefore, any <code>&#64;</code>{@link PreDestroy} annotated method on such
+	 * bean will never be invoked.
+	 * <p>
+	 * This setting is NOT recommended when using server side state saving. It has basically no effect and it only adds
+	 * unnecessary serialization overhead. The system will therefore throw an {@link IllegalStateException} on such
+	 * condition.
+	 * @return Whether to save the view scoped bean instance in JSF view state instead of in HTTP session.
+	 * @throws IllegalStateException When enabled while not using client side state saving.
+	 * @since 2.6
+	 */
+	@Nonbinding	boolean saveInViewState() default false;
+
 }

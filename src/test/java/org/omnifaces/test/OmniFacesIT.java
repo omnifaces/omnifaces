@@ -91,7 +91,7 @@ public abstract class OmniFacesIT {
 		waitGui(browser).withTimeout(3, SECONDS).until().element(messages).text().not().equalTo("");
 	}
 
-	private void executeScript(String script) {
+	protected void executeScript(String script) {
 		((JavascriptExecutor) browser).executeScript(script);
 	}
 
@@ -212,7 +212,8 @@ public abstract class OmniFacesIT {
 		withFacesViews,
 		withMultiViews,
 		withThreeViewsInSession,
-		withSocket;
+		withSocket,
+		withClientStateSaving;
 	}
 
 }
