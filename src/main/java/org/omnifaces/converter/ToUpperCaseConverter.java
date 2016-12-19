@@ -37,6 +37,7 @@ import javax.faces.convert.FacesConverter;
  * </pre>
  *
  * @author Bauke Scholtz
+ * @see TrimConverter
  * @since 2.6
  */
 @FacesConverter("omnifaces.ToUpperCaseConverter")

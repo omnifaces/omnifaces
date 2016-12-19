@@ -135,6 +135,27 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <p>
  * This setting has no effect when <code>saveInViewState</code> attribute is set to <code>true</code>.
  *
+ * <h3>Using window.onbeforeunload</h3>
+ * <p>
+ * If you have a custom <code>onbeforeunload</code> handler, then it's strongly recommended to use plain vanilla JS
+ * <code>window.onbeforeunload = function</code> instead of e.g. jQuery <code>$(window).on("beforeunload", function)</code>
+ * or DOM <code>window.addEventListener("beforeunload", function)</code> for this. This way the <code>@ViewScoped</code>
+ * unload can detect it and take it into account and continue to work properly. Otherwise the view scoped bean will
+ * still be destroyed in background even when the user cancels and decides to stay in the same page.
+ * <p>
+ * Below is a kickoff example how to properly register it, assuming jQuery is available, and that "stateless" forms
+ * and inputs (for which you don't want to trigger the unsaved data warning) have the class <code>stateless</code> set:
+ * <pre>
+ * $(document).on("change", "form:not(.stateless) :input:not(.stateless)", function() {
+ *     $("body").data("unsavedchanges", true);
+ * });
+ * OmniFaces.Util.addSubmitListener(function() { // This hooks on Mojarra/MyFaces/PrimeFaces ajax submit events too.
+ *     $("body").data("unsavedchanges", false);
+ * });
+ * window.onbeforeunload = function() {
+ *     return $("body").data("unsavedchanges") ? "You have unsaved data. Are you sure you wish to leave this page?" : null;
+ * };
+ * </pre>
  *
  * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz

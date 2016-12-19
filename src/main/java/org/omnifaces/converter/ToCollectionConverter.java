@@ -66,6 +66,7 @@ import org.omnifaces.util.Reflection;
  * </pre>
  *
  * @author Bauke Scholtz
+ * @see TrimConverter
  * @since 2.6
  */
 @FacesConverter("omnifaces.ToCollectionConverter")
