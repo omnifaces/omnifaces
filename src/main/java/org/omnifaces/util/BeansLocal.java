@@ -193,8 +193,13 @@ public final class BeansLocal {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> void destroy(BeanManager beanManager, T instance) {
-		Bean<T> bean = (Bean<T>) resolve(beanManager, instance.getClass());
-		bean.destroy(instance, beanManager.createCreationalContext(bean));
+		if (instance instanceof Class) {
+			destroy(beanManager, (Class<T>) instance, new Annotation[0]);
+		}
+		else {
+			Bean<T> bean = (Bean<T>) resolve(beanManager, instance.getClass());
+			bean.destroy(instance, beanManager.createCreationalContext(bean));
+		}
 	}
 
 	/**
