@@ -31,10 +31,36 @@ import javax.faces.FacesException;
 import javax.faces.el.CompositeComponentExpressionHolder;
 
 /**
+ * <p>
  * This class contains methods that inspect expressions to reveal information about them.
  *
- * @author Arjan Tijms
+ * <h3>Examples</h3>
+ * <p>
+ * Determine the bean instance and the property value behind a {@link ValueExpression}.
+ * <pre>
+ * ValueExpression valueExpression = component.getValueExpression("value");
+ * ValueReference valueReference = ExpressionInspector.getValueReference(context.getELContext(), valueExpression);
+ * Object bean = methodReference.getBase();
+ * Object property = methodReference.getProperty();
+ * </pre>
+ * <p>
+ * Determine the bean instance and the concrete getter {@link Method} behind a {@link ValueExpression}.
+ * <pre>
+ * ValueExpression valueExpression = component.getValueExpression("value");
+ * MethodReference methodReference = ExpressionInspector.getMethodReference(context.getELContext(), valueExpression);
+ * Object bean = methodReference.getBase();
+ * Method method = methodReference.getMethod();
+ * </pre>
+ * <p>
+ * Determine the bean instance and the concrete action {@link Method} behind a {@link MethodExpression}.
+ * <pre>
+ * MethodExpression methodExpression = commandComponent.getActionExpression();
+ * MethodReference methodReference = ExpressionInspector.getMethodReference(context.getELContext(), methodExpression);
+ * Object bean = methodReference.getBase();
+ * Method method = methodReference.getMethod();
+ * </pre>
  *
+ * @author Arjan Tijms
  * @since 1.4
  */
 public final class ExpressionInspector {
@@ -180,8 +206,7 @@ public final class ExpressionInspector {
 	}
 
 	/**
-	 * Types of a value expression
-	 *
+	 * Types of a value expression.
 	 */
 	private enum ValueExpressionType {
 		/** Value expression that refers to a method, e.g. <code>#{foo.bar(1)}</code>. */
@@ -207,9 +232,6 @@ public final class ExpressionInspector {
 	 * without needing to actually invoke it. With the final node found, the EL resolver can capture the
 	 * base and property in case the final node represented a property, or the base, method and the actual
 	 * arguments for said method in case the final repesented a method.
-	 *
-	 * @author arjan
-	 *
 	 */
 	private enum InspectorPass {
 		PASS1_FIND_NEXT_TO_LAST_NODE,
@@ -217,9 +239,7 @@ public final class ExpressionInspector {
 	}
 
 	/**
-	 * Custom ELContext implementation that wraps a given ELContext to be able to provide a custom
-	 * ElResolver.
-	 *
+	 * Custom ELContext implementation that wraps a given ELContext to be able to provide a custom ElResolver.
 	 */
 	static class InspectorElContext extends ELContextWrapper {
 
@@ -276,7 +296,6 @@ public final class ExpressionInspector {
 	/**
 	 * Custom EL Resolver that can be used for inspecting expressions by means of recording the calls
 	 * made on this resolved by the EL implementation.
-	 *
 	 */
 	static class InspectorElResolver extends ELResolverWrapper {
 

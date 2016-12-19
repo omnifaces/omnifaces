@@ -49,7 +49,7 @@ import org.omnifaces.util.Reflection;
  * </pre>
  * <p>
  * The default delimiter is comma followed by space <code>, </code> and the default collection type is
- * <code>java.util.HashSet</code> for a <code>Set</code> property and <code>java.util.ArrayList</code> for anything
+ * <code>java.util.LinkedHashSet</code> for a <code>Set</code> property and <code>java.util.ArrayList</code> for anything
  * else, and the default converter for each item will in <code>getAsString()</code> be determined based on item type and
  * in <code>getAsObject()</code> be determined based on generic return type of the getter method.
  * <p>
@@ -59,9 +59,9 @@ import org.omnifaces.util.Reflection;
  * <pre>
  * &lt;h:inputText value="#{bean.uniqueOrderedSemiColonSeparatedNumbers}"&gt;
  *     &lt;o:converter converterId="omnifaces.ToCollectionConverter"
- *                     delimiter=";"
- *                     collectionType="java.util.LinkedHashSet"
- *                     itemConverter="javax.faces.Integer" &gt;
+ *                  delimiter=";"
+ *                  collectionType="java.util.TreeSet"
+ *                  itemConverter="javax.faces.Integer" &gt;
  * &lt;/h:inputText&gt;
  * </pre>
  *
@@ -72,7 +72,7 @@ import org.omnifaces.util.Reflection;
 public class ToCollectionConverter extends TrimConverter {
 
 	private static final String DEFAULT_DELIMITER = ",";
-	private static final String DEFAULT_SET_TYPE = "java.util.HashSet";
+	private static final String DEFAULT_SET_TYPE = "java.util.LinkedHashSet";
 	private static final String DEFAULT_COLLECTION_TYPE = "java.util.ArrayList";
 
 	private String delimiter;

@@ -25,6 +25,8 @@ import javax.faces.convert.FacesConverter;
  * The <code>omnifaces.ToLowerCaseConverter</code> is intented to convert submitted {@link String} values to lower case
  * based on current {@link Locale}. Additionally, it trims any whitespace from the submitted value. This is useful for
  * among others email address inputs.
+ * <p>
+ * This converter does by design no conversion in <code>getAsString()</code>.
  *
  * <h3>Usage</h3>
  * <p>

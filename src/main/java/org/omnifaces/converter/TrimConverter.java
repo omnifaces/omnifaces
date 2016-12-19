@@ -23,6 +23,8 @@ import javax.faces.convert.FacesConverter;
  * <p>
  * The <code>omnifaces.TrimConverter</code> is intented to trim any whitespace from submitted {@link String} values.
  * This keeps the data store free of whitespace pollution.
+ * <p>
+ * This converter does by design no conversion in <code>getAsString()</code>.
  *
  * <h3>Usage</h3>
  * <p>

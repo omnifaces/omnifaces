@@ -25,6 +25,8 @@ import javax.faces.convert.FacesConverter;
  * The <code>omnifaces.ToUpperCaseConverter</code> is intented to convert submitted {@link String} values to upper case
  * based on current {@link Locale}. Additionally, it trims any whitespace from the submitted value. This is useful for
  * among others zip code inputs.
+ * <p>
+ * This converter does by design no conversion in <code>getAsString()</code>.
  *
  * <h3>Usage</h3>
  * <p>
