@@ -319,6 +319,32 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns whether we're in system test stage. This will be the case when the <code>javax.faces.PROJECT_STAGE</code>
+	 * context parameter in <code>web.xml</code> is set to <code>SystemTest</code>.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.systemTest}</code>.
+	 * @return <code>true</code> if we're in system test stage, otherwise <code>false</code>.
+	 * @see Application#getProjectStage()
+	 * @since 2.6
+	 */
+	public static boolean isSystemTest() {
+		return FacesLocal.isSystemTest(getContext());
+	}
+
+	/**
+	 * Returns whether we're in production stage. This will be the case when the <code>javax.faces.PROJECT_STAGE</code>
+	 * context parameter in <code>web.xml</code> is set to <code>Production</code>.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.production}</code>.
+	 * @return <code>true</code> if we're in production stage, otherwise <code>false</code>.
+	 * @see Application#getProjectStage()
+	 * @since 2.6
+	 */
+	public static boolean isProduction() {
+		return FacesLocal.isProduction(getContext());
+	}
+
+	/**
 	 * Determines and returns the faces servlet mapping used in the current request. If JSF is prefix mapped (e.g.
 	 * <code>/faces/*</code>), then this returns the whole path, with a leading slash (e.g. <code>/faces</code>). If JSF
 	 * is suffix mapped (e.g. <code>*.xhtml</code>), then this returns the whole extension (e.g. <code>.xhtml</code>).

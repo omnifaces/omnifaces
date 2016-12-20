@@ -166,7 +166,23 @@ public final class FacesLocal {
 	 * @see Faces#isDevelopment()
 	 */
 	public static boolean isDevelopment(FacesContext context) {
-		return context.getApplication().getProjectStage() == ProjectStage.Development;
+		return getProjectStage(context) == ProjectStage.Development;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Faces#isSystemTest()
+	 */
+	public static boolean isSystemTest(FacesContext context) {
+		return getProjectStage(context) == ProjectStage.SystemTest;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Faces#isProduction()
+	 */
+	public static boolean isProduction(FacesContext context) {
+		return getProjectStage(context) == ProjectStage.Production;
 	}
 
 	/**
