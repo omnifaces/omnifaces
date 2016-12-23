@@ -31,6 +31,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -841,6 +842,27 @@ public final class FacesLocal {
 
 	/**
 	 * {@inheritDoc}
+	 * @see Faces#getRequestParameter(String, Class)
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T getRequestParameter(FacesContext context, String name, Class<T> type) {
+		String value = getRequestParameter(context, name);
+
+		if (value == null) {
+			return null;
+		}
+
+		Converter converter = createConverter(context, type);
+
+		if (converter == null) {
+			return (T) value;
+		}
+
+		return (T) converter.getAsObject(context, context.getViewRoot(), value);
+	}
+
+	/**
+	 * {@inheritDoc}
 	 * @see Faces#getRequestParameterValuesMap()
 	 */
 	public static Map<String, String[]> getRequestParameterValuesMap(FacesContext context) {
@@ -853,6 +875,33 @@ public final class FacesLocal {
 	 */
 	public static String[] getRequestParameterValues(FacesContext context, String name) {
 		return getRequestParameterValuesMap(context).get(name);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 * @see Faces#getRequestParameterValues(String, Class)
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T[] getRequestParameterValues(FacesContext context, String name, Class<T> type) {
+		String[] values = getRequestParameterValues(context, name);
+
+		if (values == null) {
+			return null;
+		}
+
+		Converter converter = createConverter(context, type);
+
+		if (converter == null) {
+			return (T[]) values;
+		}
+
+		Object convertedValues = Array.newInstance(type, values.length);
+
+		for (int i = 0; i < values.length; i++) {
+			Array.set(convertedValues, i, converter.getAsObject(context, context.getViewRoot(), values[i]));
+		}
+
+		return (T[]) convertedValues;
 	}
 
 	/**

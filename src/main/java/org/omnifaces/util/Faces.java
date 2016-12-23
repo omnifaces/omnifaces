@@ -47,6 +47,7 @@ import javax.faces.context.FacesContextWrapper;
 import javax.faces.context.Flash;
 import javax.faces.context.PartialViewContext;
 import javax.faces.convert.Converter;
+import javax.faces.convert.ConverterException;
 import javax.faces.event.PhaseId;
 import javax.faces.lifecycle.Lifecycle;
 import javax.faces.lifecycle.LifecycleFactory;
@@ -1075,6 +1076,19 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the HTTP request parameter value associated with the given name and implicitly convert it to given type.
+	 * @param name The HTTP request parameter name.
+	 * @return The HTTP request parameter value associated with the given name and implicitly convert it to given type.
+	 * @throws ConverterException When conversion fails.
+	 * @see ExternalContext#getRequestParameterMap()
+	 * @see Faces#createConverter(Class)
+	 * @since 2.6
+	 */
+	public static <T> T getRequestParameter(String name, Class<T> type) {
+		return FacesLocal.getRequestParameter(getContext(), name, type);
+	}
+
+	/**
 	 * Returns the HTTP request parameter values map.
 	 * @return The HTTP request parameter values map.
 	 * @see ExternalContext#getRequestParameterValuesMap()
@@ -1091,6 +1105,19 @@ public final class Faces {
 	 */
 	public static String[] getRequestParameterValues(String name) {
 		return FacesLocal.getRequestParameterValuesMap(getContext()).get(name);
+	}
+
+	/**
+	 * Returns the HTTP request parameter values associated with the given name and implicitly convert it to given type.
+	 * @param name The HTTP request parameter name.
+	 * @return The HTTP request parameter values associated with the given name and implicitly convert it to given type.
+	 * @throws ConverterException When conversion fails.
+	 * @see ExternalContext#getRequestParameterValuesMap()
+	 * @see Faces#createConverter(Class)
+	 * @since 2.6
+	 */
+	public static <T> T[] getRequestParameterValues(String name, Class<T> type) {
+		return FacesLocal.getRequestParameterValues(getContext(), name, type);
 	}
 
 	/**
