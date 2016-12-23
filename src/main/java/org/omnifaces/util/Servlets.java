@@ -13,6 +13,7 @@
 package org.omnifaces.util;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.regex.Pattern.quote;
 import static javax.faces.application.ProjectStage.Development;
@@ -34,6 +35,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -207,6 +209,24 @@ public final class Servlets {
 		}
 
 		return toParameterMap(queryString);
+	}
+
+	/**
+	 * Returns the HTTP request parameter map. Note this method returns the values as a <code>List&lt;String&gt;</code>,
+	 * as opposed to {@link HttpServletRequest#getParameterMap()}, which returns the values as <code>String[]</code>.
+	 * The map entries are not per definition ordered, but the values are.
+	 * @param request The involved HTTP servlet request.
+	 * @return The HTTP request parameter map.
+	 * @since 2.6
+	 */
+	public static Map<String, List<String>> getRequestParameterMap(HttpServletRequest request) {
+		Map<String, List<String>> parameterMap = new HashMap<>(request.getParameterMap().size());
+
+		for (Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
+			parameterMap.put(entry.getKey(), asList(entry.getValue()));
+		}
+
+		return parameterMap;
 	}
 
 	/**
