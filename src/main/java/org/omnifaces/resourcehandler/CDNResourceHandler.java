@@ -31,9 +31,6 @@ import javax.faces.application.ResourceHandler;
  * {@link ResourceDependency} by the JSF implementation and/or component libraries. For example, JSF's own
  * <code>javax.faces:jsf.js</code> resource or PrimeFaces' <code>primefaces:jquery/jquery.js</code> resource could be
  * pointed to a CDN.
- * <p>
- * For non-JSF resources, you can just keep using plain HTML <code>&lt;script&gt;</code> and <code>&lt;link&gt;</code>
- * elements referring the external URL.
  *
  * <h3>Installation</h3>
  * <p>
@@ -50,7 +47,9 @@ import javax.faces.application.ResourceHandler;
  * context parameter has to be provided wherein the CDN resources are been specified as a comma separated string of
  * <code>libraryName:resourceName=http://cdn.example.com/url</code> key=value pairs. The key represents the default
  * JSF resource identifier and the value represents the full CDN URL, including the scheme. The CDN URL is not validated
- * by this resource handler, so you need to make absolutely sure yourself that it is valid. Here's an example:
+ * by this resource handler, so you need to make absolutely sure yourself that it is valid.
+ * <p>
+ * Here is an example configuration:
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_URLS&lt;/param-name&gt;
@@ -77,6 +76,29 @@ import javax.faces.application.ResourceHandler;
  * &lt;script type="text/javascript" src="http://cdn.example.com/somelib/js/script2.js"&gt;&lt;/script&gt;
  * &lt;link type="text/css" rel="stylesheet" href="http://cdn.example.com/otherlib/style.css" /&gt;
  * &lt;img src="http://cdn.example.com/logo.png" /&gt;
+ * </pre>
+ * <p>
+ * Here is a real world example with Bootstrap:
+ * <pre>
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_URLS&lt;/param-name&gt;
+ *     &lt;param-value&gt;
+ *         cdn:bootstrap.css=https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css,
+ *         cdn:bootstrap.js=https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js
+ *     &lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * </pre>
+ * <p>
+ * With the above configuration, the following resources:
+ * <pre>
+ * &lt;h:outputStylesheet library="cdn" name="bootstrap.css" /&gt;
+ * &lt;h:outputScript library="cdn" name="bootstrap.js" /&gt;
+ * </pre>
+ * <p>
+ * Will be rendered as:
+ * <pre>
+ * &lt;link type="text/css" rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" /&gt;
+ * &lt;script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"&gt;&lt;/script&gt;
  * </pre>
  *
  * <h3>Wildcard configuration</h3>
@@ -199,17 +221,14 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 	 * {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_RESOURCES} context parameter.
 	 */
 	@Override
-	public Resource decorateResource(Resource resource) {
-		if (resource == null || (disabledParam != null && parseBoolean(String.valueOf(evaluateExpressionGet(disabledParam))))) {
+	public Resource decorateResource(Resource resource, String resourceName, String libraryName) {
+		if (disabledParam != null && parseBoolean(String.valueOf(evaluateExpressionGet(disabledParam)))) {
 			return resource;
 		}
 
 		String requestPath = null;
 
 		if (cdnResources != null) {
-			String libraryName = resource.getLibraryName();
-			String resourceName = resource.getResourceName();
-
 			requestPath = cdnResources.get(new ResourceIdentifier(libraryName, resourceName));
 
 			if (requestPath == null) {

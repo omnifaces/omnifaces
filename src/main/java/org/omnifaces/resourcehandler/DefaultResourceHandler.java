@@ -49,21 +49,21 @@ public abstract class DefaultResourceHandler extends ResourceHandlerWrapper {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Delegate to {@link #decorateResource(Resource)} with result of {@link #createResource(String)} from the wrapped
-	 * resource handler.
+	 * Delegate to {@link #decorateResource(Resource, String, String)} with result of {@link #createResource(String)}
+	 * from the wrapped resource handler.
 	 * <p>
 	 * Implementors should <strong>not</strong> override this.
 	 */
 	@Override
 	public Resource createResource(String resourceName) {
-		return decorateResource(getWrapped().createResource(resourceName));
+		return decorateResource(getWrapped().createResource(resourceName), resourceName, null);
 	}
 
 	/**
 	 * If library name is not null and it equals {@link #getLibraryName()}, then delegate to
 	 * {@link #createResourceFromLibrary(String, String)} with <code>null</code> as content type, else delegate to
-	 * {@link #decorateResource(Resource)} with result of {@link #createResource(String, String)} from the wrapped
-	 * resource handler.
+	 * {@link #decorateResource(Resource, String, String)} with result of {@link #createResource(String, String)}
+	 * from the wrapped resource handler.
 	 * <p>
 	 * Implementors should <strong>not</strong> override this.
 	 */
@@ -73,14 +73,15 @@ public abstract class DefaultResourceHandler extends ResourceHandlerWrapper {
 			return createResourceFromLibrary(resourceName, null);
 		}
 		else {
-			return decorateResource(getWrapped().createResource(resourceName, libraryName));
+			return decorateResource(getWrapped().createResource(resourceName, libraryName), resourceName, libraryName);
 		}
 	}
 
 	/**
 	 * If library name is not null and it equals {@link #getLibraryName()}, then delegate to
-	 * {@link #createResourceFromLibrary(String, String)}, else delegate to {@link #decorateResource(Resource)} with
-	 * result of {@link #createResource(String, String, String)} from the wrapped resource handler.
+	 * {@link #createResourceFromLibrary(String, String)}, else delegate to
+	 * {@link #decorateResource(Resource, String, String)} with result of
+	 * {@link #createResource(String, String, String)} from the wrapped resource handler.
 	 * <p>
 	 * Implementors should <strong>not</strong> override this.
 	 */
@@ -90,7 +91,7 @@ public abstract class DefaultResourceHandler extends ResourceHandlerWrapper {
 			return createResourceFromLibrary(resourceName, contentType);
 		}
 		else {
-			return decorateResource(getWrapped().createResource(resourceName, libraryName, contentType));
+			return decorateResource(getWrapped().createResource(resourceName, libraryName, contentType), resourceName, libraryName);
 		}
 	}
 
@@ -118,6 +119,20 @@ public abstract class DefaultResourceHandler extends ResourceHandlerWrapper {
 	 */
 	public Resource createResourceFromLibrary(String resourceName, String contentType) {
 		return null;
+	}
+
+	/**
+	 * Decorate the given resource. This will only be called if no library-specific resource has been requested.
+	 * <p>
+	 * The default implementation delegates to {@link #decorateResource(Resource)}.
+	 * @param resource The resource to be decorated.
+	 * @param resourceName The resource name.
+	 * @param libraryName The library name.
+	 * @return The decorated resource.
+	 * @since 2.6
+	 */
+	public Resource decorateResource(Resource resource, String resourceName, String libraryName) {
+		return decorateResource(resource);
 	}
 
 	/**
