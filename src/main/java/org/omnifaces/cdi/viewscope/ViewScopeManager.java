@@ -157,12 +157,7 @@ public class ViewScopeManager {
 		Class<?> beanClass = ((Bean<T>) type).getBeanClass();
 
 		if (beanClass.getAnnotation(ViewScoped.class).saveInViewState()) {
-			FacesContext context = FacesContext.getCurrentInstance();
-
-			if (!context.getApplication().getStateManager().isSavingStateInClient(context)) {
-				throw new IllegalStateException(String.format(ERROR_INVALID_STATE_SAVING, beanClass.getName()));
-			}
-
+			checkStateSavingMethod(beanClass);
 			storage = storageInViewState;
 		}
 
@@ -184,6 +179,14 @@ public class ViewScopeManager {
 		}
 
 		return beanStorage;
+	}
+
+	private void checkStateSavingMethod(Class<?> beanClass) {
+		FacesContext context = FacesContext.getCurrentInstance();
+
+		if (!context.getApplication().getStateManager().isSavingStateInClient(context)) {
+			throw new IllegalStateException(String.format(ERROR_INVALID_STATE_SAVING, beanClass.getName()));
+		}
 	}
 
 	/**

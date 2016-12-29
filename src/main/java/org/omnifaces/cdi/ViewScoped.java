@@ -102,8 +102,22 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * in case of client side state saving.
  * <p>
  * In case you are using client side state saving by having the <code>javax.faces.STATE_SAVING_METHOD</code> context
- * parameter set to <code>true</code> in <code>web.xml</code>, and explicitly want to store the whole view scoped bean
- * instance in the JSF view state, then set the annotation's <code>saveInViewState</code> attribute to <code>true</code>.
+ * parameter set to <code>true</code> along with a valid <code>jsf/ClientSideSecretKey</code> in <code>web.xml</code>
+ * as below,
+ * <pre>
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;javax.faces.STATE_SAVING_METHOD&lt;/param-name&gt;
+ *     &lt;param-value&gt;client&lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * &lt;env-entry&gt;
+ *     &lt;env-entry-name&gt;jsf/ClientSideSecretKey&lt;/env-entry-name&gt;
+ *     &lt;env-entry-type&gt;java.lang.String&lt;/env-entry-type&gt;
+ *     &lt;env-entry-value&gt;&lt;!-- See http://stackoverflow.com/q/35102645/157882 --&gt;&lt;/env-entry-value&gt;
+ * &lt;/env-entry&gt;
+ * </pre>
+ * <p>
+ * And you explicitly want to store the whole view scoped bean instance in the JSF view state, then set the annotation's
+ * <code>saveInViewState</code> attribute to <code>true</code>.
  * <pre>
  * import javax.inject.Named;
  * import org.omnifaces.cdi.ViewScoped;
@@ -113,12 +127,21 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * public class OmniCDIViewScopedBean implements Serializable {}
  * </pre>
  * <p>
- * It's very important that you understand the potential impact when assigning "too much" data (e.g. data for
- * datatables, etc) to such a bean, and that such beans will in fact <strong>never</strong> expire as they are stored
- * entirely in the <code>javax.faces.ViewState</code> hidden input field in the HTML page. Moreover, the
+ * It's very important that you understand that this setting has potentially a major impact in the size of the JSF view
+ * state, certainly when the view scoped bean instance holds "too much" data, such as a collection of entities for a
+ * data table, and that such beans will in fact <strong>never</strong> expire as they are stored entirely in the
+ * <code>javax.faces.ViewState</code> hidden input field in the HTML page. Moreover, the
  * <code>&#64;</code>{@link PreDestroy} annotated method on such bean will explicitly <strong>never</strong> be invoked,
  * even not on an unload as it's quite possible to save or cache the page source and re-execute it at a (much) later
- * moment. For more detail, see the {@link #saveInViewState()}.
+ * moment.
+ * <p>
+ * It's therefore strongly recommended to use this setting only on a view scoped bean instance which is exclusively used
+ * to keep track of the dynamically controlled form state, such as <code>disabled</code>, <code>readonly</code> and
+ * <code>rendered</code> attributes which are controlled by ajax events.
+ * <p>
+ * This setting is NOT recommended when using server side state saving. It has basically no effect and it only adds
+ * unnecessary serialization overhead. The system will therefore throw an {@link IllegalStateException} on such
+ * condition.
  *
  * <h3>Configuration</h3>
  * <p>
@@ -186,20 +209,7 @@ public @interface ViewScoped {
 	 * This means, when the HTTP session expires, then the view scoped bean instances will also implicitly expire and
 	 * be newly recreated upon a request in a new session. This may be undesirable when using client side state saving
 	 * as it's intuitively expected that concrete view scoped beans are also saved in JSF view state.
-	 * <p>
-	 * This setting has however potentially a major impact in the size of the JSF view state, certainly when the view
-	 * scoped bean instance holds "too much" data, such as a collection of entities for a data table. It's therefore
-	 * strongly recommended to use this setting only on a view scoped bean instance which is exclusively used to keep
-	 * track of the form state, such as dynamically controlled <code>disabled</code>, <code>readonly</code> and
-	 * <code>rendered</code> attributes which are controlled by ajax events.
-	 * <p>
-	 * Do note that such beans are per definition undestroyable. They may stick around forever in browser cache. Such
-	 * views and beans do never expire. Therefore, any <code>&#64;</code>{@link PreDestroy} annotated method on such
-	 * bean will never be invoked.
-	 * <p>
-	 * This setting is NOT recommended when using server side state saving. It has basically no effect and it only adds
-	 * unnecessary serialization overhead. The system will therefore throw an {@link IllegalStateException} on such
-	 * condition.
+	 *
 	 * @return Whether to save the view scoped bean instance in JSF view state instead of in HTTP session.
 	 * @throws IllegalStateException When enabled while not using client side state saving.
 	 * @since 2.6
