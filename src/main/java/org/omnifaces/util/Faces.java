@@ -1076,10 +1076,14 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the HTTP request parameter value associated with the given name and implicitly convert it to given type.
+	 * Returns the HTTP request parameter value associated with the given name and implicitly convert it to given type
+	 * using the Faces converter registered by <code>forClass</code> on the given type.
+	 * @param <T> The expected return type.
 	 * @param name The HTTP request parameter name.
+	 * @param type The converter <code>forClass</code> type.
 	 * @return The HTTP request parameter value associated with the given name and implicitly convert it to given type.
 	 * @throws ConverterException When conversion fails.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see ExternalContext#getRequestParameterMap()
 	 * @see Faces#createConverter(Class)
 	 * @since 2.6
@@ -1108,10 +1112,14 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the HTTP request parameter values associated with the given name and implicitly convert it to given type.
+	 * Returns the HTTP request parameter values associated with the given name and implicitly convert it to given type
+	 * using the Faces converter registered by <code>forClass</code> on the given type.
+	 * @param <T> The expected return type.
 	 * @param name The HTTP request parameter name.
+	 * @param type The converter <code>forClass</code> type.
 	 * @return The HTTP request parameter values associated with the given name and implicitly convert it to given type.
 	 * @throws ConverterException When conversion fails.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see ExternalContext#getRequestParameterValuesMap()
 	 * @see Faces#createConverter(Class)
 	 * @since 2.6
