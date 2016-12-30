@@ -73,8 +73,10 @@ public final class CombinedResourceInputStream extends InputStream {
 		}
 
 		streamIterator = streams.iterator();
-		streamIterator.hasNext(); // We assume it to be always true, see also CombinedResource#getInputStream().
-		currentStream = streamIterator.next();
+
+		if (streamIterator.hasNext()) {
+			currentStream = streamIterator.next();
+		}
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
