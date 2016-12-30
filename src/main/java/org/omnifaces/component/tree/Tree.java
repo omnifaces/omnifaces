@@ -231,7 +231,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 		TreeModel model = getModel(PhaseId.ANY_PHASE);
 
 		if (model.isLeaf()) {
-		    return super.visitTree(context, callback);
+			return super.visitTree(context, callback);
 		}
 
 		if (!isVisitable(context)) {

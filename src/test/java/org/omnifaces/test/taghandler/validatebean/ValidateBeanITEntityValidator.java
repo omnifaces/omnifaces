@@ -17,14 +17,14 @@ import javax.validation.ConstraintValidatorContext;
 
 public class ValidateBeanITEntityValidator implements ConstraintValidator<ValidateBeanITEntityConstraint, ValidateBeanITEntity> {
 
-    @Override
-    public void initialize(ValidateBeanITEntityConstraint constraint) {
-        //
-    }
+	@Override
+	public void initialize(ValidateBeanITEntityConstraint constraint) {
+		//
+	}
 
-    @Override
-    public boolean isValid(ValidateBeanITEntity entity, ConstraintValidatorContext context) {
-        return entity.getNumber1() < entity.getNumber2();
-    }
+	@Override
+	public boolean isValid(ValidateBeanITEntity entity, ConstraintValidatorContext context) {
+		return entity.getNumber1() < entity.getNumber2();
+	}
 
 }

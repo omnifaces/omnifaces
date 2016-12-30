@@ -405,7 +405,7 @@ public final class ExpressionInspector {
 		}
 
 		private void checkSubchainStarted(Object base) {
-		  if (pass == InspectorPass.PASS2_FIND_FINAL_NODE && base == null && isAtNextToLastNode()) {
+			if (pass == InspectorPass.PASS2_FIND_FINAL_NODE && base == null && isAtNextToLastNode()) {
 				// If "base" is null it means a new chain is being resolved.
 				// The main expression chain likely has ended with a method that has one or more EL variables
 				// as parameters that now need to be resolved.

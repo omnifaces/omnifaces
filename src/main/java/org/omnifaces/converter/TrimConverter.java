@@ -49,19 +49,19 @@ import javax.faces.convert.FacesConverter;
 @FacesConverter("omnifaces.TrimConverter")
 public class TrimConverter implements Converter {
 
-    @Override
-    public Object getAsObject(FacesContext context, UIComponent component, String submittedValue) {
-        if (isEmpty(submittedValue)) {
-        	return null;
-        }
+	@Override
+	public Object getAsObject(FacesContext context, UIComponent component, String submittedValue) {
+		if (isEmpty(submittedValue)) {
+			return null;
+		}
 
-        String trimmed = submittedValue.trim();
-        return isEmpty(trimmed) ? null : trimmed;
-    }
+		String trimmed = submittedValue.trim();
+		return isEmpty(trimmed) ? null : trimmed;
+	}
 
-    @Override
-    public String getAsString(FacesContext context, UIComponent component, Object modelValue) {
-        return (modelValue == null) ? "" : modelValue.toString();
-    }
+	@Override
+	public String getAsString(FacesContext context, UIComponent component, Object modelValue) {
+		return (modelValue == null) ? "" : modelValue.toString();
+	}
 
 }

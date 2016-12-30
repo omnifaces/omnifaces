@@ -96,12 +96,11 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 	// supports the event for which a behavior is attached.
 	private List<String> containsTrueList = new ArrayList<String>() {
 		private static final long serialVersionUID = 1L;
-			@Override
-	   		public boolean contains(Object o) {
-	   			return true;
-	   		}
-   	};
-
+		@Override
+		public boolean contains(Object o) {
+			return true;
+		}
+	};
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -135,8 +134,8 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 	@Override
 	public Collection<String> getEventNames() {
 		if (isEmpty(getBehaviorEvents())) {
-		   	return containsTrueList;
-	   	}
+			return containsTrueList;
+		}
 
 		return csvToList(getBehaviorEvents());
 	}

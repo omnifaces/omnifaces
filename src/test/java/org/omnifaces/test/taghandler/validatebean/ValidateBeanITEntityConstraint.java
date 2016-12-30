@@ -28,6 +28,6 @@ import javax.validation.Payload;
 @Retention(RUNTIME)
 public @interface ValidateBeanITEntityConstraint {
 	String message() default "invalidEntity";
-    Class<?>[] groups() default {};
-    Class<? extends Payload>[] payload() default {};
+	Class<?>[] groups() default {};
+	Class<? extends Payload>[] payload() default {};
 }

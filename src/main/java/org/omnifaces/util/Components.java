@@ -662,15 +662,15 @@ public final class Components {
 	 * @since 2.2
 	 */
 	public static UIComponent includeCompositeComponent(UIComponent parent, String libraryName, String tagName, String id, Map<String, String> attributes) {
-	    String taglibURI = "http://xmlns.jcp.org/jsf/composite/" + libraryName;
-	    Map<String, Object> attrs = (attributes == null) ? null : new HashMap<String, Object>(attributes);
+		String taglibURI = "http://xmlns.jcp.org/jsf/composite/" + libraryName;
+		Map<String, Object> attrs = (attributes == null) ? null : new HashMap<String, Object>(attributes);
 
-	    FacesContext context = FacesContext.getCurrentInstance();
-	    UIComponent composite = context.getApplication().getViewHandler()
-	    	.getViewDeclarationLanguage(context, context.getViewRoot().getViewId())
-	        .createComponent(context, taglibURI, tagName, attrs);
-	    composite.setId(id);
-	    parent.getChildren().add(composite);
+		FacesContext context = FacesContext.getCurrentInstance();
+		UIComponent composite = context.getApplication().getViewHandler()
+			.getViewDeclarationLanguage(context, context.getViewRoot().getViewId())
+			.createComponent(context, taglibURI, tagName, attrs);
+		composite.setId(id);
+		parent.getChildren().add(composite);
 		return composite;
 	}
 

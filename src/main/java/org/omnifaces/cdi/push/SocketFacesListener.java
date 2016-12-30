@@ -74,22 +74,22 @@ public class SocketFacesListener implements SystemEventListener {
 
 		FacesContext context = FacesContext.getCurrentInstance();
 
-        for (Entry<String, Boolean> entry : getSockets(context).entrySet()) {
-            Socket socket = Components.findComponent(entry.getKey());
-            boolean connected = socket.isRendered() && socket.isConnected();
-            boolean previouslyConnected = entry.setValue(connected);
+		for (Entry<String, Boolean> entry : getSockets(context).entrySet()) {
+			Socket socket = Components.findComponent(entry.getKey());
+			boolean connected = socket.isRendered() && socket.isConnected();
+			boolean previouslyConnected = entry.setValue(connected);
 
-            if (connected != previouslyConnected) {
-                String script = String.format(connected ? SCRIPT_OPEN : SCRIPT_CLOSE, socket.getChannel());
+			if (connected != previouslyConnected) {
+				String script = String.format(connected ? SCRIPT_OPEN : SCRIPT_CLOSE, socket.getChannel());
 
-    			if (isAjaxRequestWithPartialRendering(context)) {
-    				oncomplete(script);
-    			}
-    			else {
-    				addScriptToBody(script);
-    			}
-            }
-        }
+				if (isAjaxRequestWithPartialRendering(context)) {
+					oncomplete(script);
+				}
+				else {
+					addScriptToBody(script);
+				}
+			}
+		}
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
@@ -115,23 +115,23 @@ public class SocketFacesListener implements SystemEventListener {
 	/**
 	 * Register given socket and returns true if it's new.
 	 */
-    static boolean register(FacesContext context, Socket socket) {
-        return getSockets(context).putIfAbsent(socket.getClientId(context), socket.isConnected()) == null;
-    }
+	static boolean register(FacesContext context, Socket socket) {
+		return getSockets(context).putIfAbsent(socket.getClientId(context), socket.isConnected()) == null;
+	}
 
-    /**
+	/**
 	 * Helper to remember which sockets are initialized on the view. The map key represents the client ID and the
 	 * map value represents the last known value of the <code>connected</code> attribute.
 	 */
-    private static Map<String, Boolean> getSockets(FacesContext context) {
-        Map<String, Boolean> sockets = getViewAttribute(context, Socket.class.getName());
+	private static Map<String, Boolean> getSockets(FacesContext context) {
+		Map<String, Boolean> sockets = getViewAttribute(context, Socket.class.getName());
 
-        if (sockets == null) {
-            sockets = new HashMap<>(ESTIMATED_TOTAL_CHANNELS);
-            setViewAttribute(context, Socket.class.getName(), sockets);
-        }
+		if (sockets == null) {
+			sockets = new HashMap<>(ESTIMATED_TOTAL_CHANNELS);
+			setViewAttribute(context, Socket.class.getName(), sockets);
+		}
 
-        return sockets;
-    }
+		return sockets;
+	}
 
 }

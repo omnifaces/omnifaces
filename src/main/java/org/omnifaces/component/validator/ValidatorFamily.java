@@ -63,10 +63,10 @@ public abstract class ValidatorFamily extends UIComponentBase {
 	 */
 	@Override
 	public void processValidators(FacesContext context) {
-        Application application = context.getApplication();
-        application.publishEvent(context, PreValidateEvent.class, this);
-        validateComponents(context);
-        application.publishEvent(context, PostValidateEvent.class, this);
+		Application application = context.getApplication();
+		application.publishEvent(context, PreValidateEvent.class, this);
+		validateComponents(context);
+		application.publishEvent(context, PostValidateEvent.class, this);
 	}
 
 	/**

@@ -69,7 +69,7 @@ public final class Reflection {
 	 */
 	public static void setProperties(Object object, Map<String, Object> propertiesToSet) {
 
-	  try {
+		try {
 			Map<String, PropertyDescriptor> availableProperties = new HashMap<>();
 			for (PropertyDescriptor propertyDescriptor : getBeanInfo(object.getClass()).getPropertyDescriptors()) {
 				availableProperties.put(propertyDescriptor.getName(), propertyDescriptor);

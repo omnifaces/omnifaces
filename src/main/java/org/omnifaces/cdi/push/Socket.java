@@ -665,17 +665,17 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
-    /**
-     * After adding component to view, subscribe {@link SocketFacesListener} if necessary.
-     */
-    @Override
-    public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
-    	if (event instanceof PostAddToViewEvent) {
-    		SocketFacesListener.subscribeIfNecessary();
-    	}
-    }
+	/**
+	 * After adding component to view, subscribe {@link SocketFacesListener} if necessary.
+	 */
+	@Override
+	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
+		if (event instanceof PostAddToViewEvent) {
+			SocketFacesListener.subscribeIfNecessary();
+		}
+	}
 
-    /**
+	/**
 	 * An override which checks if this isn't been invoked on <code>channel</code> or <code>scope</code> attribute, and
 	 * if the <code>user</code> attribute is <code>Serializable</code>.
 	 * Finally it delegates to the super method.
@@ -724,23 +724,23 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 			throw new IllegalStateException(ERROR_ENDPOINT_NOT_ENABLED);
 		}
 
-        if (SocketFacesListener.register(context, this)) {
-    		String channel = getChannel();
+		if (SocketFacesListener.register(context, this)) {
+			String channel = getChannel();
 
-    		if (channel == null || !PATTERN_CHANNEL.matcher(channel).matches()) {
-    			throw new IllegalArgumentException(String.format(ERROR_INVALID_CHANNEL, channel));
-    		}
+			if (channel == null || !PATTERN_CHANNEL.matcher(channel).matches()) {
+				throw new IllegalArgumentException(String.format(ERROR_INVALID_CHANNEL, channel));
+			}
 
 			Integer port = getPort();
 			String host = (port != null ? ":" + port : "") + getRequestContextPath(context);
 			String channelId = getReference(SocketChannelManager.class).register(channel, getScope(), getUser());
 			String functions = getOnopen() + "," + getOnmessage() + "," + getOnclose();
-            String behaviors = getBehaviorScripts();
-            boolean connected = isConnected();
+			String behaviors = getBehaviorScripts();
+			boolean connected = isConnected();
 
-            String script = String.format(SCRIPT_INIT, host, channelId, functions, behaviors, connected);
-            context.getResponseWriter().write(script);
-        }
+			String script = String.format(SCRIPT_INIT, host, channelId, functions, behaviors, connected);
+			context.getResponseWriter().write(script);
+		}
 	}
 
 	private String getBehaviorScripts() {

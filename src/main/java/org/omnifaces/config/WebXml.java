@@ -209,7 +209,7 @@ public enum WebXml {
 		String location = null;
 
 		for (Class<?> cls = exception.getClass(); cls != null && location == null; cls = cls.getSuperclass()) {
-		    location = errorPageLocations.get(cls);
+			location = errorPageLocations.get(cls);
 		}
 
 		return (location == null) ? errorPageLocations.get(null) : location;

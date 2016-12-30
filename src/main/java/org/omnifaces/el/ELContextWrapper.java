@@ -65,7 +65,7 @@ public class ELContextWrapper extends ELContext implements FacesWrapper<ELContex
 
 	@Override
 	public Object getContext(@SuppressWarnings("rawtypes") Class key) {
-	   return getWrapped().getContext(key);
+		return getWrapped().getContext(key);
 	}
 
 	@Override

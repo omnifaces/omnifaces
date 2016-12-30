@@ -24,24 +24,24 @@ import javax.validation.constraints.Size;
 @RequestScoped
 public class ValidateBeanITDefaultBean {
 
-    @Pattern(regexp=".{2,}", message="default")
-    @Size(min=2, groups=ValidateBeanITValidationGroup.class, message="group")
-    private String input;
+	@Pattern(regexp=".{2,}", message="default")
+	@Size(min=2, groups=ValidateBeanITValidationGroup.class, message="group")
+	private String input;
 
-    public void action() {
-        if (isValidationFailed()) {
-            addGlobalWarn("actionValidationFailed");
-        }
-        else {
-            addGlobalInfo("actionSuccess");
-        }
-    }
+	public void action() {
+		if (isValidationFailed()) {
+			addGlobalWarn("actionValidationFailed");
+		}
+		else {
+			addGlobalInfo("actionSuccess");
+		}
+	}
 
-    public String getInput() {
+	public String getInput() {
 		return input;
 	}
 
-    public void setInput(String input) {
+	public void setInput(String input) {
 		this.input = input;
 	}
 

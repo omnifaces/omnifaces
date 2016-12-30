@@ -414,9 +414,7 @@ public final class FacesLocal {
 	 * @see Faces#getViewDeclarationLanguage()
 	 */
 	public static ViewDeclarationLanguage getViewDeclarationLanguage(FacesContext context) {
-		return context.getApplication()
-					  .getViewHandler()
-					  .getViewDeclarationLanguage(context, context.getViewRoot().getViewId());
+		return context.getApplication().getViewHandler().getViewDeclarationLanguage(context, context.getViewRoot().getViewId());
 	}
 
 	/**

@@ -13,5 +13,5 @@
 package org.omnifaces.test.taghandler.validatebean;
 
 public interface ValidateBeanITValidationGroup {
-    //
+	//
 }
