@@ -139,7 +139,7 @@ public class ResetInputAjaxActionListener extends DefaultPhaseListener implement
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private ActionListener wrapped;
+	private transient ActionListener wrapped;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 

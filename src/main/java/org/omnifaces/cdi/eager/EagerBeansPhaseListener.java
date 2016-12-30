@@ -35,21 +35,18 @@ public class EagerBeansPhaseListener extends DefaultPhaseListener {
 
 	private static final long serialVersionUID = -7252366571645029385L;
 
-	private EagerBeansRepository eagerBeansRepository;
+	private boolean hasAnyViewIdBeans;
 
 	public EagerBeansPhaseListener() {
 		super(RESTORE_VIEW);
-		eagerBeansRepository = getReference(EagerBeansRepository.class);
-
-		if (eagerBeansRepository != null && !eagerBeansRepository.hasAnyViewIdBeans()) {
-			eagerBeansRepository = null;
-		}
+		EagerBeansRepository eagerBeansRepository = getReference(EagerBeansRepository.class);
+		hasAnyViewIdBeans = (eagerBeansRepository != null) && eagerBeansRepository.hasAnyViewIdBeans();
 	}
 
 	@Override
 	public void afterPhase(PhaseEvent event) {
-		if (eagerBeansRepository != null) {
-			eagerBeansRepository.instantiateByViewID(getViewId(event.getFacesContext()));
+		if (hasAnyViewIdBeans) {
+			getReference(EagerBeansRepository.class).instantiateByViewID(getViewId(event.getFacesContext()));
 		}
 	}
 

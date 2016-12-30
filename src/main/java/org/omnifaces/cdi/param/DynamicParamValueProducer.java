@@ -14,7 +14,7 @@ package org.omnifaces.cdi.param;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
-import static org.omnifaces.util.BeansLocal.getCurrentInjectionPoint;
+import static org.omnifaces.util.Beans.getCurrentInjectionPoint;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
@@ -27,7 +27,6 @@ import javax.enterprise.context.Dependent;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.Typed;
 import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.inject.spi.PassivationCapable;
 import javax.enterprise.util.AnnotationLiteral;
@@ -54,11 +53,9 @@ public class DynamicParamValueProducer implements Bean<Object>, Serializable, Pa
 
 	private static final long serialVersionUID = 1L;
 
-	private BeanManager beanManager;
 	private Set<Type> types;
 
-	public DynamicParamValueProducer(BeanManager beanManager, Type type) {
-		this.beanManager = beanManager;
+	public DynamicParamValueProducer(Type type) {
 		types = new HashSet<>(asList(type, Object.class));
 	}
 
@@ -74,8 +71,7 @@ public class DynamicParamValueProducer implements Bean<Object>, Serializable, Pa
 
 	@Override
 	public Object create(CreationalContext<Object> creationalContext) {
-		InjectionPoint injectionPoint = getCurrentInjectionPoint(beanManager, creationalContext);
-
+		InjectionPoint injectionPoint = getCurrentInjectionPoint(creationalContext);
 		ParamValue<?> paramValue = new ParamProducer().produce(injectionPoint);
 		return paramValue.getValue();
 	}

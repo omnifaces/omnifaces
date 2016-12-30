@@ -23,7 +23,6 @@ import javax.enterprise.inject.spi.Annotated;
 import javax.enterprise.inject.spi.AnnotatedConstructor;
 import javax.enterprise.inject.spi.AnnotatedField;
 import javax.enterprise.inject.spi.AnnotatedParameter;
-import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessManagedBean;
 
@@ -71,9 +70,9 @@ public class ParamExtension implements Extension {
 		}
 	}
 
-	public void afterBean(@Observes AfterBeanDiscovery afterBeanDiscovery, BeanManager beanManager) {
+	public void afterBean(@Observes AfterBeanDiscovery afterBeanDiscovery) {
 		for (Type type : types) {
-			afterBeanDiscovery.addBean(new DynamicParamValueProducer(beanManager, type));
+			afterBeanDiscovery.addBean(new DynamicParamValueProducer(type));
 		}
 	}
 

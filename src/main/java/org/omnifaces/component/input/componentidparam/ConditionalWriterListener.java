@@ -12,6 +12,9 @@
  */
 package org.omnifaces.component.input.componentidparam;
 
+import static org.omnifaces.util.FacesLocal.getContextAttribute;
+import static org.omnifaces.util.FacesLocal.setContextAttribute;
+
 import java.util.List;
 
 import javax.faces.context.FacesContext;
@@ -35,15 +38,11 @@ public class ConditionalWriterListener implements PhaseListener {
 
 	private static final long serialVersionUID = -5527348022747113123L;
 
-	private final FacesContext facesContext;
 	private final List<String> componentIds;
 	private final List<String> clientIds;
 	private final boolean renderChildren;
 
-	private ResponseWriter responseWriter;
-
-	public ConditionalWriterListener(FacesContext facesContext, List<String> componentIds, List<String> clientIds, boolean renderChildren) {
-		this.facesContext = facesContext;
+	public ConditionalWriterListener(List<String> componentIds, List<String> clientIds, boolean renderChildren) {
 		this.componentIds = componentIds;
 		this.clientIds = clientIds;
 		this.renderChildren = renderChildren;
@@ -56,13 +55,17 @@ public class ConditionalWriterListener implements PhaseListener {
 
 	@Override
 	public void beforePhase(PhaseEvent event) {
-		responseWriter = facesContext.getResponseWriter();
-		facesContext.setResponseWriter(new ConditionalResponseWriter(responseWriter, facesContext, componentIds, clientIds, renderChildren));
+		FacesContext context = event.getFacesContext();
+		ResponseWriter originalWriter = context.getResponseWriter();
+		setContextAttribute(context, this + "_writer", originalWriter);
+		context.setResponseWriter(new ConditionalResponseWriter(originalWriter, context, componentIds, clientIds, renderChildren));
 	}
 
 	@Override
 	public void afterPhase(PhaseEvent event) {
-		facesContext.setResponseWriter(responseWriter);
+		FacesContext context = event.getFacesContext();
+		ResponseWriter originalWriter = getContextAttribute(context, this + "_writer");
+		context.setResponseWriter(originalWriter);
 	}
 
 }

@@ -62,7 +62,7 @@ public class ComponentIdParam extends ViewParam {
 		// and after rendering with one that only renders when the current component has one of the Ids
 		// that we receive from the request here.
 		if (!componentIds.isEmpty() || !clientIds.isEmpty()) {
-			context.getViewRoot().addPhaseListener(new ConditionalWriterListener(context, componentIds, clientIds, renderChildren));
+			context.getViewRoot().addPhaseListener(new ConditionalWriterListener(componentIds, clientIds, renderChildren));
 		}
 	}
 
