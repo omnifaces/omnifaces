@@ -13,6 +13,7 @@
 package org.omnifaces.taghandler;
 
 import static org.omnifaces.taghandler.ImportConstants.toClass;
+import static org.omnifaces.util.Facelets.getStringLiteral;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -82,7 +83,6 @@ public class ImportFunctions extends TagHandler {
 
 	private static final Map<String, Method> FUNCTIONS_CACHE = new ConcurrentHashMap<>();
 
-	private static final String ERROR_INVALID_VAR = "The 'var' attribute may not be an EL expression.";
 	private static final String ERROR_INVALID_FUNCTION = "Type '%s' does not have the function '%s'.";
 
 	// Variables ------------------------------------------------------------------------------------------------------
@@ -98,17 +98,7 @@ public class ImportFunctions extends TagHandler {
 	 */
 	public ImportFunctions(TagConfig config) {
 		super(config);
-		TagAttribute var = getAttribute("var");
-
-		if (var != null) {
-			if (var.isLiteral()) {
-				varValue = var.getValue();
-			}
-			else {
-				throw new IllegalArgumentException(ERROR_INVALID_VAR);
-			}
-		}
-
+		varValue = getStringLiteral(getAttribute("var"), "var");
 		typeAttribute = getRequiredAttribute("type");
 	}
 

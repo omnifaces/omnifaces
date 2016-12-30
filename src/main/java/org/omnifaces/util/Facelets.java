@@ -27,6 +27,8 @@ import javax.faces.view.facelets.TagAttribute;
 @Typed
 public final class Facelets {
 
+	private static final String ERROR_EL_DISALLOWED = "The '%s' attribute may not be an EL expression.";
+
 	private Facelets() {
 		// Hide constructor.
 	}
@@ -39,6 +41,27 @@ public final class Facelets {
 	 */
 	public static String getString(FaceletContext context, TagAttribute tagAttribute) {
 		return tagAttribute != null ? tagAttribute.getValue(context) : null;
+	}
+
+	/**
+	 * Returns the String literal of the given tag attribute.
+	 * @param tagAttribute The tag attribute to retrieve the value from.
+	 * @param name The tag attribute name; this is only used in exception message.
+	 * @return The String literal of the given tag attribute, or null if the tag attribute is null.
+	 * @throws IllegalArgumentException When the attribute is not a literal.
+	 * @since 2.6
+	 */
+	public static String getStringLiteral(TagAttribute tagAttribute, String name) {
+		if (tagAttribute != null) {
+			if (tagAttribute.isLiteral()) {
+				return tagAttribute.getValue();
+			}
+			else {
+				throw new IllegalArgumentException(String.format(ERROR_EL_DISALLOWED,  name));
+			}
+		}
+
+		return null;
 	}
 
 	/**

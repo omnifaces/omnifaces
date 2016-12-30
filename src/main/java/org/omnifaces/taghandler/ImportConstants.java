@@ -13,6 +13,7 @@
 package org.omnifaces.taghandler;
 
 import static java.lang.Math.max;
+import static org.omnifaces.util.Facelets.getStringLiteral;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -78,7 +79,6 @@ public class ImportConstants extends TagHandler {
 
 	private static final Map<String, Map<String, Object>> CONSTANTS_CACHE = new ConcurrentHashMap<>();
 
-	private static final String ERROR_INVALID_VAR = "The 'var' attribute may not be an EL expression.";
 	private static final String ERROR_MISSING_CLASS = "Cannot find type '%s' in classpath.";
 	private static final String ERROR_FIELD_ACCESS = "Cannot access constant field '%s' of type '%s'.";
 	private static final String ERROR_INVALID_CONSTANT = "Type '%s' does not have the constant '%s'.";
@@ -96,17 +96,7 @@ public class ImportConstants extends TagHandler {
 	 */
 	public ImportConstants(TagConfig config) {
 		super(config);
-		TagAttribute var = getAttribute("var");
-
-		if (var != null) {
-			if (var.isLiteral()) {
-				varValue = var.getValue();
-			}
-			else {
-				throw new IllegalArgumentException(ERROR_INVALID_VAR);
-			}
-		}
-
+		varValue = getStringLiteral(getAttribute("var"), "var");
 		typeAttribute = getRequiredAttribute("type");
 	}
 
