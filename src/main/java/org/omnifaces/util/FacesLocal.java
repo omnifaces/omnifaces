@@ -767,7 +767,7 @@ public final class FacesLocal {
 			}
 		}
 
-		return null;
+		throw new IllegalStateException(ERROR_NO_VIEW);
 	}
 
 	/**

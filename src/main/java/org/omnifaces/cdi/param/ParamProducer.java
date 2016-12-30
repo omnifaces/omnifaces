@@ -463,7 +463,7 @@ public class ParamProducer {
 
 
 	private static void addConverterMessage(FacesContext context, UIComponent component, String label, String submittedValue, ConverterException ce, String converterMessage) {
-		FacesMessage message = null;
+		FacesMessage message;
 
 		if (!isEmpty(converterMessage)) {
 			message = createError(converterMessage, submittedValue, label);

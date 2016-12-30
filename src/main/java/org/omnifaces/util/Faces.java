@@ -966,6 +966,7 @@ public final class Faces {
 	 * submit a feature request to OmniFaces in order to add a new utility method which performs exactly this general
 	 * task.</i>
 	 * @return The Facelet context.
+	 * @throws IllegalStateException When the Facelet context is not available.
 	 * @see FaceletContext
 	 * @since 1.1
 	 */
@@ -980,6 +981,7 @@ public final class Faces {
 	 * @param <T> The expected return type.
 	 * @param name The Facelet attribute name.
 	 * @return The Facelet attribute value associated with the given name.
+	 * @throws IllegalStateException When the Facelet context is not available.
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see FaceletContext#getAttribute(String)
 	 * @since 1.1
@@ -994,6 +996,7 @@ public final class Faces {
 	 * file by e.g. an <code>&lt;ui:include&gt;</code>.
 	 * @param name The Facelet attribute name.
 	 * @param value The Facelet attribute value.
+	 * @throws IllegalStateException When the Facelet context is not available.
 	 * @see FaceletContext#setAttribute(String, Object)
 	 * @since 1.1
 	 */

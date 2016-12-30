@@ -212,7 +212,7 @@ public final class Reflection {
 				return (Class<T>) Class.forName(className);
 			}
 			catch (Exception ignore) {
-				ignore = null; // Just continue to IllegalStateException on original ClassNotFoundException.
+				// Just continue to IllegalStateException on original ClassNotFoundException.
 			}
 
 			throw new IllegalStateException(String.format(ERROR_LOAD_CLASS, className), e);

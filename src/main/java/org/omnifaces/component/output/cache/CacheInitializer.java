@@ -66,7 +66,7 @@ public final class CacheInitializer {
 	}
 
 	private static CacheProvider getCacheProvider(ServletContext context) {
-		CacheProvider cacheProvider = null;
+		CacheProvider cacheProvider;
 
 		String cacheProviderName = context.getInitParameter(CACHE_PROVIDER_INIT_PARAM_NAME);
 		if (cacheProviderName != null) {

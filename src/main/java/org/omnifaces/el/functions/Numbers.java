@@ -253,7 +253,8 @@ public final class Numbers {
 		try {
 			DecimalFormat formatter = (DecimalFormat) NumberFormat.getNumberInstance(getLocale());
 			formatter.setParseBigDecimal(true);
-			formatted = (BigDecimal) formatter.parse(String.format(getLocale(), "%." + maxfractions + "f", divided));
+			String format = "%." + maxfractions + "f";
+			formatted = (BigDecimal) formatter.parse(String.format(getLocale(), format, divided));
 		}
 		catch (ParseException e) {
 			throw new IllegalStateException(e);

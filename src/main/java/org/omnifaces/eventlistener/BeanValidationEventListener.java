@@ -91,9 +91,14 @@ public class BeanValidationEventListener implements SystemEventListener {
 	 * Replaces the original value of {@link BeanValidator#getValidationGroups()} with the value from the tag attribute.
 	 */
 	private void handlePreValidate(UIInput component) {
-		final BeanValidator beanValidator = getBeanValidator(component);
-		final String newValidationGroups = disabled ? NoValidationGroup.class.getName() : validationGroups;
-		final String originalValidationGroups = beanValidator.getValidationGroups();
+		BeanValidator beanValidator = getBeanValidator(component);
+
+		if (beanValidator == null) {
+			return;
+		}
+
+		String newValidationGroups = disabled ? NoValidationGroup.class.getName() : validationGroups;
+		String originalValidationGroups = beanValidator.getValidationGroups();
 
 		if (originalValidationGroups != null) {
 			component.getAttributes().put(ATTRIBUTE_ORIGINAL_VALIDATION_GROUPS, originalValidationGroups);
@@ -111,9 +116,12 @@ public class BeanValidationEventListener implements SystemEventListener {
 	 * Restores the original value of {@link BeanValidator#getValidationGroups()}.
 	 */
 	private void handlePostValidate(UIInput component) {
-		final BeanValidator beanValidator = getBeanValidator(component);
-		final String originalValidationGroups = (String) component.getAttributes().remove(ATTRIBUTE_ORIGINAL_VALIDATION_GROUPS);
-		beanValidator.setValidationGroups(originalValidationGroups);
+		BeanValidator beanValidator = getBeanValidator(component);
+
+		if (beanValidator != null) {
+			String originalValidationGroups = (String) component.getAttributes().remove(ATTRIBUTE_ORIGINAL_VALIDATION_GROUPS);
+			beanValidator.setValidationGroups(originalValidationGroups);
+		}
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------

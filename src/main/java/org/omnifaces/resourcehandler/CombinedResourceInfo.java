@@ -119,7 +119,13 @@ public final class CombinedResourceInfo {
 				throw new IllegalStateException(ERROR_EMPTY_RESOURCES);
 			}
 
-			return get(toUniqueId(resourceIdentifiers)).id;
+			String id = toUniqueId(resourceIdentifiers);
+
+			if (!CACHE.containsKey(id)) {
+				CombinedResourceInfo.create(id, resourceIdentifiers);
+			}
+
+			return id;
 		}
 
 	}
@@ -137,11 +143,22 @@ public final class CombinedResourceInfo {
 			Set<ResourceIdentifier> resourceIdentifiers = fromUniqueId(id);
 
 			if (resourceIdentifiers != null) {
-				info = new CombinedResourceInfo(id, Collections.unmodifiableSet(resourceIdentifiers));
-				CACHE.put(id, info);
+				info = create(id, resourceIdentifiers);
 			}
 		}
 
+		return info;
+	}
+
+	/**
+	 * Create new combined resource info identified by given ID in the cache.
+	 * @param id The ID of the combined resource info to be created in the cache.
+	 * @param resourceIdentifiers The set of resource identifiers to create combined resource info for.
+	 * @return New combined resource info identified by given ID.
+	 */
+	private static CombinedResourceInfo create(String id, Set<ResourceIdentifier> resourceIdentifiers) {
+		CombinedResourceInfo info = new CombinedResourceInfo(id, Collections.unmodifiableSet(resourceIdentifiers));
+		CACHE.put(id, info);
 		return info;
 	}
 

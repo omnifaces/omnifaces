@@ -13,6 +13,7 @@
 package org.omnifaces.util.copier;
 
 import static java.lang.String.format;
+import static org.omnifaces.util.Reflection.findMethod;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -38,7 +39,11 @@ public class CloneCopier implements Copier {
 
 		try {
 
-			Method cloneMethod = getMethod(object, "clone");
+			Method cloneMethod = findMethod(object, "clone");
+
+			if (cloneMethod == null) {
+				throw new IllegalStateException();
+			}
 
 			if (!cloneMethod.isAccessible()) {
 				cloneMethod.setAccessible(true);
@@ -50,18 +55,6 @@ public class CloneCopier implements Copier {
 		} catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			throw new IllegalStateException(e);
 		}
-	}
-
-	private Method getMethod(Object object, String name) {
-		for (Class<?> c = object.getClass(); c != null; c = c.getSuperclass()) {
-			for (Method method : c.getDeclaredMethods()) {
-				if (method.getName().equals(name)) {
-					return method;
-				}
-			}
-		}
-
-		return null;
 	}
 
 }

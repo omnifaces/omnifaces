@@ -530,22 +530,21 @@ public final class Utils {
 	 * @since 1.5
 	 */
 	public static <E> List<E> iterableToList(Iterable<E> iterable) {
-
-		List<E> list = null;
-
 		if (iterable instanceof List) {
-			list = (List<E>) iterable;
-		} else if (iterable instanceof Collection) {
-			list = new ArrayList<>((Collection<E>) iterable);
-		} else {
-			list = new ArrayList<>();
+			return (List<E>) iterable;
+		}
+		else if (iterable instanceof Collection) {
+			return new ArrayList<>((Collection<E>) iterable);
+		}
+		else {
+			List<E> list = new ArrayList<>();
 			Iterator<E> iterator = iterable.iterator();
 			while (iterator.hasNext()) {
 				list.add(iterator.next());
 			}
-		}
 
-		return list;
+			return list;
+		}
 	}
 
 	/**

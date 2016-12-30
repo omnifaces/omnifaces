@@ -85,7 +85,7 @@ public final class CombinedResourceInputStream extends InputStream {
 	 */
 	@Override
 	public int read() throws IOException {
-		int read = -1;
+		int read;
 
 		while ((read = currentStream.read()) == -1) {
 			if (streamIterator.hasNext()) {

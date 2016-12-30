@@ -546,11 +546,8 @@ public final class FacesViews {
 	}
 
 	private static boolean canScanResource(String resource, String extensionToScan) {
-		if (extensionToScan == null) {
-			// If no extension has been explicitly defined, we scan all extensions encountered.
-			return true;
-		}
 
+		// If no extension has been explicitly defined, we scan all extensions encountered.
 		return (extensionToScan == null) || resource.endsWith(extensionToScan);
 	}
 
