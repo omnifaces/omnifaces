@@ -69,10 +69,7 @@ public class EagerExtension implements Extension {
 			else if (getAnnotation(beanManager, annotated, SessionScoped.class) != null) {
 				eagerBeans.addSessionScoped(bean);
 			}
-			else if (getAnnotation(beanManager, annotated, ViewScoped.class) != null) {
-				eagerBeans.addByViewId(bean, eager.viewId());
-			}
-			else if (getAnnotation(beanManager, annotated, org.omnifaces.cdi.ViewScoped.class) != null) {
+			else if (getAnnotation(beanManager, annotated, ViewScoped.class) != null || getAnnotation(beanManager, annotated, org.omnifaces.cdi.ViewScoped.class) != null) {
 				eagerBeans.addByViewId(bean, eager.viewId());
 			}
 			else if (getAnnotation(beanManager, annotated, RequestScoped.class) != null) {

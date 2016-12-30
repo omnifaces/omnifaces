@@ -88,7 +88,7 @@ public class ListIndexConverter implements Converter {
 	public String getAsString(FacesContext context, UIComponent component, Object value) {
 		for (int i = 0; i < list.size(); i++) {
 			if (list.get(i).equals(value)) {
-				return i + "";
+				return Integer.toString(i);
 			}
 		}
 

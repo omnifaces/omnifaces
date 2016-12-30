@@ -21,7 +21,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import javax.enterprise.context.ApplicationScoped;
 
@@ -52,8 +51,8 @@ public class SocketUserManager {
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
-	private final ConcurrentMap<String, ConcurrentMap<String, Set<String>>> userChannels = new ConcurrentHashMap<>();
-	private final ConcurrentMap<Serializable, Set<String>> applicationUsers = new ConcurrentHashMap<>(); // An user can have more than one session (multiple browsers, account sharing).
+	private final ConcurrentHashMap<String, ConcurrentHashMap<String, Set<String>>> userChannels = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<Serializable, Set<String>> applicationUsers = new ConcurrentHashMap<>(); // An user can have more than one session (multiple browsers, account sharing).
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -83,7 +82,7 @@ public class SocketUserManager {
 			userChannels.putIfAbsent(userId, new ConcurrentHashMap<String, Set<String>>(ESTIMATED_USER_CHANNELS_PER_APPLICATION));
 		}
 
-		ConcurrentMap<String, Set<String>> channelIds = userChannels.get(userId);
+		ConcurrentHashMap<String, Set<String>> channelIds = userChannels.get(userId);
 
 		if (!channelIds.containsKey(channel)) {
 			channelIds.putIfAbsent(channel, synchronizedSet(new HashSet<String>(ESTIMATED_USER_CHANNELS_PER_SESSION)));
@@ -155,7 +154,7 @@ public class SocketUserManager {
 	 * This should actually be package private, but package private methods in CDI beans are subject to memory leaks.
 	 * @return User specific channels.
 	 */
-	protected ConcurrentMap<String, ConcurrentMap<String, Set<String>>> getUserChannels() {
+	protected ConcurrentHashMap<String, ConcurrentHashMap<String, Set<String>>> getUserChannels() {
 		return userChannels;
 	}
 

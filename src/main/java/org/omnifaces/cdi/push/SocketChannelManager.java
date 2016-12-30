@@ -25,7 +25,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.SessionScoped;
@@ -93,9 +92,9 @@ public class SocketChannelManager implements Serializable {
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
-	private static final ConcurrentMap<String, String> APPLICATION_SCOPE = new ConcurrentHashMap<>(ESTIMATED_CHANNELS_PER_APPLICATION);
-	private final ConcurrentMap<String, String> sessionScope = new ConcurrentHashMap<>(ESTIMATED_CHANNELS_PER_SESSION);
-	private final ConcurrentMap<Serializable, String> sessionUsers = new ConcurrentHashMap<>(ESTIMATED_USERS_PER_SESSION);
+	private static final ConcurrentHashMap<String, String> APPLICATION_SCOPE = new ConcurrentHashMap<>(ESTIMATED_CHANNELS_PER_APPLICATION);
+	private final ConcurrentHashMap<String, String> sessionScope = new ConcurrentHashMap<>(ESTIMATED_CHANNELS_PER_SESSION);
+	private final ConcurrentHashMap<Serializable, String> sessionUsers = new ConcurrentHashMap<>(ESTIMATED_USERS_PER_SESSION);
 
 	@Inject
 	private SocketSessionManager socketSessions;
@@ -134,7 +133,7 @@ public class SocketChannelManager implements Serializable {
 				}
 			}
 
-			((ConcurrentMap<String, String>) targetScope).putIfAbsent(channel, channel + "?" + UUID.randomUUID().toString());
+			((ConcurrentHashMap<String, String>) targetScope).putIfAbsent(channel, channel + "?" + UUID.randomUUID().toString());
 		}
 
 		String channelId = targetScope.get(channel);
@@ -178,7 +177,7 @@ public class SocketChannelManager implements Serializable {
 	protected static class ViewScope implements Serializable {
 
 		private static final long serialVersionUID = 1L;
-		private ConcurrentMap<String, String> viewScope = new ConcurrentHashMap<>(ESTIMATED_CHANNELS_PER_VIEW);
+		private ConcurrentHashMap<String, String> viewScope = new ConcurrentHashMap<>(ESTIMATED_CHANNELS_PER_VIEW);
 
 		/**
 		 * Returns the view scoped channels.
@@ -248,7 +247,7 @@ public class SocketChannelManager implements Serializable {
 
 		// All of below is just in case server restarts with session persistence or failovers/synchronizes to another server.
 		output.writeObject(APPLICATION_SCOPE);
-		Map<String, ConcurrentMap<String, Set<String>>> sessionUserChannels = new HashMap<>(sessionUsers.size());
+		Map<String, ConcurrentHashMap<String, Set<String>>> sessionUserChannels = new HashMap<>(sessionUsers.size());
 
 		for (String userId : sessionUsers.values()) {
 			sessionUserChannels.put(userId, socketUsers.getUserChannels().get(userId));
@@ -263,7 +262,7 @@ public class SocketChannelManager implements Serializable {
 
 		// Below is just in case server restarts with session persistence or failovers/synchronizes from another server.
 		APPLICATION_SCOPE.putAll((Map<String, String>) input.readObject());
-		Map<String, ConcurrentMap<String, Set<String>>> sessionUserChannels = (Map<String, ConcurrentMap<String, Set<String>>>) input.readObject();
+		Map<String, ConcurrentHashMap<String, Set<String>>> sessionUserChannels = (Map<String, ConcurrentHashMap<String, Set<String>>>) input.readObject();
 
 		for (Entry<Serializable, String> sessionUser : sessionUsers.entrySet()) {
 			String userId = sessionUser.getValue();

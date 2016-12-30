@@ -273,7 +273,7 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 
 			ResourceIdentifier id = new ResourceIdentifier(cdnResourceIdAndURL[0]);
 
-			if (id.getName().contains("*") && (!id.getName().equals("*") || !cdnResourceIdAndURL[1].endsWith("/*"))) {
+			if (id.getName().contains("*") && (!"*".equals(id.getName()) || !cdnResourceIdAndURL[1].endsWith("/*"))) {
 				throw new IllegalArgumentException(ERROR_INVALID_WILDCARD);
 			}
 

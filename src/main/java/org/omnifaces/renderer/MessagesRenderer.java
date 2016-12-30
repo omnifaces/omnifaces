@@ -194,7 +194,7 @@ public class MessagesRenderer extends Renderer {
 	protected void encodeEmptyMessages(FacesContext context, OmniMessages component) throws IOException {
 		String id = component.getId();
 
-		if (id != null && !id.equals("javax_faces_developmentstage_messages")) {
+		if (id != null && !"javax_faces_developmentstage_messages".equals(id)) {
 			ResponseWriter writer = context.getResponseWriter();
 			writer.startElement("div", component);
 			writeAttribute(writer, "id", component.getClientId(context));

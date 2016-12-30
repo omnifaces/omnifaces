@@ -24,7 +24,6 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
@@ -68,7 +67,7 @@ public class SocketSessionManager {
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
-	private final ConcurrentMap<String, Collection<Session>> socketSessions = new ConcurrentHashMap<>();
+	private final ConcurrentHashMap<String, Collection<Session>> socketSessions = new ConcurrentHashMap<>();
 
 	@Inject
 	private SocketUserManager socketUsers;

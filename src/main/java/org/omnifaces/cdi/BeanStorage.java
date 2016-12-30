@@ -14,7 +14,6 @@ package org.omnifaces.cdi;
 
 import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;
@@ -39,7 +38,7 @@ public class BeanStorage implements Serializable {
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
-	private final ConcurrentMap<String, Object> beans;
+	private final ConcurrentHashMap<String, Object> beans;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 

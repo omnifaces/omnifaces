@@ -485,21 +485,21 @@ public class ValidateBean extends TagHandler {
 	}
 
 	private static void showMessages(FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, Set<String> clientIds, String labels, String showMessageFor) {
-		if (showMessageFor.equals("@form")) {
+		if ("@form".equals(showMessageFor)) {
 			String formId = form.getClientId(context);
 
 			for (ConstraintViolation<?> violation : violations) {
 				addError(formId, violation.getMessage(), labels);
 			}
 		}
-		else if (showMessageFor.equals("@all")) {
+		else if ("@all".equals(showMessageFor)) {
 			for (String clientId : clientIds) {
 				for (ConstraintViolation<?> violation : violations) {
 					addError(clientId, violation.getMessage(), labels);
 				}
 			}
 		}
-		else if (showMessageFor.equals("@global")) {
+		else if ("@global".equals(showMessageFor)) {
 			for (ConstraintViolation<?> violation : violations) {
 				addGlobalError(violation.getMessage(), labels);
 			}

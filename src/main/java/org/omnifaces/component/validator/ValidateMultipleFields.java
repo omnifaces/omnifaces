@@ -332,22 +332,22 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 	}
 
 	private void addErrorMessage(FacesContext context, List<UIInput> inputs, final StringBuilder labels, String message, String showMessageFor) {
-		if (showMessageFor.equals("@this")) {
+		if ("@this".equals(showMessageFor)) {
 			addError(getClientId(context), message, labels);
 		}
-		else if (showMessageFor.equals("@all")) {
+		else if ("@all".equals(showMessageFor)) {
 			for (UIInput input : inputs) {
 				addError(input.getClientId(context), message, labels);
 			}
 		}
-		else if (showMessageFor.equals("@invalid")) {
+		else if ("@invalid".equals(showMessageFor)) {
 			for (UIInput input : inputs) {
 				if (!input.isValid()) {
 					addError(input.getClientId(context), message, labels);
 				}
 			}
 		}
-		else if (showMessageFor.equals("@global")) {
+		else if ("@global".equals(showMessageFor)) {
 			addGlobalError(message, labels);
 		}
 		else {

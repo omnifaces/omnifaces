@@ -386,7 +386,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 	private static Integer initCacheTTL(String cacheTTLParam) {
 		if (!isDevelopment() && cacheTTLParam != null) {
 			if (isNumber(cacheTTLParam)) {
-				int cacheTTL = Integer.valueOf(cacheTTLParam);
+				int cacheTTL = Integer.parseInt(cacheTTLParam);
 
 				if (cacheTTL > 0) {
 					return cacheTTL;
@@ -531,7 +531,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		}
 
 		private boolean add(UIComponent componentResource, ResourceIdentifier resourceIdentifier) {
-			if (componentResource != null && !componentResource.isRendered()) {
+			if ((componentResource != null && !componentResource.isRendered()) || containsResourceIdentifier(suppressedResources, resourceIdentifier)) {
 				componentResourcesToRemove.add(componentResource);
 				return true;
 			}
@@ -550,10 +550,6 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 					componentResourcesToRemove.add(componentResource);
 				}
 
-				return true;
-			}
-			else if (containsResourceIdentifier(suppressedResources, resourceIdentifier)) {
-				componentResourcesToRemove.add(componentResource);
 				return true;
 			}
 

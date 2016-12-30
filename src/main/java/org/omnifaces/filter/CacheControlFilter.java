@@ -212,7 +212,7 @@ public class CacheControlFilter extends HttpFilter {
 			}
 
 			String[] parts = expiresParam.split("(?=[wdhms])");
-			long number = Long.valueOf(parts[0]);
+			long number = Long.parseLong(parts[0]);
 
 			if (parts.length > 1) {
 				String unit = parts[1];

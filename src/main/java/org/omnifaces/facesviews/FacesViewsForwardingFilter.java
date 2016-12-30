@@ -84,17 +84,9 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 
 	@Override
 	public void doFilter(HttpServletRequest request, HttpServletResponse response, HttpSession session, FilterChain chain) throws ServletException, IOException {
-		if (filterExtensionLess(request, response, chain)) {
-			return;
+		if (!(filterExtensionLess(request, response, chain) || filterExtension(request, response) || filterPublicPath(request, response))) {
+			chain.doFilter(request, response);
 		}
-		else if (filterExtension(request, response)) {
-			return;
-		}
-		else if (filterPublicPath(request, response)) {
-			return;
-		}
-
-		chain.doFilter(request, response);
 	}
 
 	/**

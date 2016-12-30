@@ -73,7 +73,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 
 	@Override
 	public void setFaceletContext(FaceletContext faceletContext) {
-		if (getScope().equals("facelet")) {
+		if ("facelet".equals(getScope())) {
 
 			readOnlyValueExpression = new ReadOnlyValueExpression(UIComponent.class);
 

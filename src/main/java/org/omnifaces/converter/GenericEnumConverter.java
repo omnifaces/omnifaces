@@ -102,7 +102,7 @@ public class GenericEnumConverter implements Converter {
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Object getAsObject(FacesContext context, UIComponent component, String submittedValue) {
-		if (submittedValue == null || submittedValue.isEmpty() || submittedValue.equals("-")) {
+		if (submittedValue == null || submittedValue.isEmpty() || "-".equals(submittedValue)) {
 			return null;
 		}
 
