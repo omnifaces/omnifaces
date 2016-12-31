@@ -59,6 +59,17 @@ public final class ResourcePaths {
 	}
 
 	/**
+	 * Strips the trailing slash(es) from the given resource path if any.
+	 *
+	 * @param resource The resource to strip the trailing slash from.
+	 * @return the resource without the trailing slash, or as-is if it didn't have a trailing slash.
+	 * @since 2.6
+	 */
+	public static String stripTrailingSlash(String resource) {
+		return resource.endsWith("/") ? stripTrailingSlash(resource.substring(0, resource.length() - 1)) : resource;
+	}
+
+	/**
 	 * Strips the extension from a resource if any. This extension is defined as everything after the last occurrence of
 	 * a period, including the period itself. E.g. input "index.xhtml" will return "index".
 	 *

@@ -116,32 +116,41 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 	 */
 	@Override
 	public void processPartial(PhaseId phaseId) {
-		if (phaseId == PhaseId.RENDER_RESPONSE) {
-			String loginURL = WebXml.INSTANCE.getFormLoginPage();
-
-			if (loginURL != null) {
-				FacesContext facesContext = FacesContext.getCurrentInstance();
-				String loginViewId = normalizeViewId(facesContext, loginURL);
-
-				if (loginViewId.equals(getViewId(facesContext))) {
-					String originalURL = getRequestAttribute(facesContext, FORWARD_REQUEST_URI);
-
-					if (originalURL != null) {
-						try {
-							invalidateSession(facesContext); // Prevent server from remembering security constraint fail caused by ajax.
-							facesRedirect(getRequest(facesContext), getResponse(facesContext), originalURL); // This also clears cache.
-						}
-						catch (IOException e) {
-							throw new FacesException(e);
-						}
-
-						return;
-					}
-				}
-			}
+		if (phaseId == PhaseId.RENDER_RESPONSE && redirectToFormLoginPageIfNecessary()) {
+			return;
 		}
 
 		super.processPartial(phaseId);
+	}
+
+	private boolean redirectToFormLoginPageIfNecessary() {
+		String loginURL = WebXml.INSTANCE.getFormLoginPage();
+
+		if (loginURL == null) {
+			return false;
+		}
+
+		FacesContext facesContext = FacesContext.getCurrentInstance();
+		String loginViewId = normalizeViewId(facesContext, loginURL);
+
+		if (!loginViewId.equals(getViewId(facesContext))) {
+			return false;
+		}
+
+		String originalURL = getRequestAttribute(facesContext, FORWARD_REQUEST_URI);
+
+		if (originalURL == null) {
+			return false;
+		}
+
+		try {
+			invalidateSession(facesContext); // Prevent server from remembering security constraint fail caused by ajax.
+			facesRedirect(getRequest(facesContext), getResponse(facesContext), originalURL); // This also clears cache.
+			return true;
+		}
+		catch (IOException e) {
+			throw new FacesException(e);
+		}
 	}
 
 	@Override // Necessary because this is missing in PartialViewContextWrapper (will be fixed in JSF 2.2).

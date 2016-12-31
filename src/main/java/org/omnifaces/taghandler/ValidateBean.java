@@ -487,16 +487,11 @@ public class ValidateBean extends TagHandler {
 	private static void showMessages(FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, Set<String> clientIds, String labels, String showMessageFor) {
 		if ("@form".equals(showMessageFor)) {
 			String formId = form.getClientId(context);
-
-			for (ConstraintViolation<?> violation : violations) {
-				addError(formId, violation.getMessage(), labels);
-			}
+			addErrors(formId, violations, labels);
 		}
 		else if ("@all".equals(showMessageFor)) {
 			for (String clientId : clientIds) {
-				for (ConstraintViolation<?> violation : violations) {
-					addError(clientId, violation.getMessage(), labels);
-				}
+				addErrors(clientId, violations, labels);
 			}
 		}
 		else if ("@global".equals(showMessageFor)) {
@@ -506,10 +501,14 @@ public class ValidateBean extends TagHandler {
 		}
 		else {
 			for (String clientId : showMessageFor.split("\\s+")) {
-				for (ConstraintViolation<?> violation : violations) {
-					addError(clientId, violation.getMessage(), labels);
-				}
+				addErrors(clientId, violations, labels);
 			}
+		}
+	}
+
+	private static void addErrors(String clientId, Set<ConstraintViolation<?>> violations, String labels) {
+		for (ConstraintViolation<?> violation : violations) {
+			addError(clientId, violation.getMessage(), labels);
 		}
 	}
 

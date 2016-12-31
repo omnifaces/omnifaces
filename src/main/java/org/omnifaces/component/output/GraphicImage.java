@@ -247,37 +247,48 @@ public class GraphicImage extends HtmlGraphicImage {
 		Resource resource;
 
 		if (name != null) {
-			String library = (String) getAttributes().get("library");
-			resource = context.getApplication().getResourceHandler().createResource(name, library);
+			resource = createGraphicResourceByName(context, name, dataURI);
 
 			if (resource == null) {
 				return RES_NOT_FOUND;
-			}
-
-			if (dataURI && resource.getContentType().startsWith("image")) {
-				resource = new GraphicResource(resource.getInputStream(), resource.getContentType());
 			}
 		}
 		else {
 			ValueExpression value = getValueExpression("value");
 
-			if (value == null) {
-				throw new IllegalArgumentException(ERROR_MISSING_VALUE);
-			}
-
-			String type = (String) getAttributes().get("type");
-
-			if (dataURI) {
-				resource = new GraphicResource(value.getValue(context.getELContext()), type);
+			if (value != null) {
+				resource = createGraphicResourceByValue(context, value, dataURI);
 			}
 			else {
-				resource = GraphicResource.create(context, value, type, getAttributes().get("lastModified"));
+				throw new IllegalArgumentException(ERROR_MISSING_VALUE);
 			}
 		}
 
 		String fragment = (String) getAttributes().get("fragment");
 		String fragmentString = dataURI || isEmpty(fragment) ? "" : ((fragment.charAt(0) == '#' ? "" : "#") + fragment);
 		return context.getExternalContext().encodeResourceURL(resource.getRequestPath()) + fragmentString;
+	}
+
+	private Resource createGraphicResourceByName(FacesContext context, String name, boolean dataURI) throws IOException {
+		String library = (String) getAttributes().get("library");
+		Resource resource = context.getApplication().getResourceHandler().createResource(name, library);
+
+		if (resource != null && dataURI && resource.getContentType().startsWith("image")) {
+			resource = new GraphicResource(resource.getInputStream(), resource.getContentType());
+		}
+
+		return resource;
+	}
+
+	private Resource createGraphicResourceByValue(FacesContext context, ValueExpression value, boolean dataURI) {
+		String type = (String) getAttributes().get("type");
+
+		if (dataURI) {
+			return new GraphicResource(value.getValue(context.getELContext()), type);
+		}
+		else {
+			return GraphicResource.create(context, value, type, getAttributes().get("lastModified"));
+		}
 	}
 
 	/**

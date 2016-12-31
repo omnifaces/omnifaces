@@ -27,6 +27,7 @@ import javax.faces.event.PostValidateEvent;
 import javax.faces.event.PreValidateEvent;
 
 import org.omnifaces.util.MapWrapper;
+import org.omnifaces.util.Utils;
 
 /**
  * <p>
@@ -130,34 +131,24 @@ public class ViewParam extends UIViewParameter {
 
 				@Override
 				public Object get(Object key) {
-					if ("label".equals(key)) {
-						return getLabel();
-					}
-					else {
-						return super.get(key);
-					}
-				}
+					Object value = super.get(key);
 
-				private Object getLabel() {
-					// First check if our wrapped Map has the label
-					Object label = super.get("label");
-					if (label == null || (label instanceof String && ((String) label).isEmpty())) {
+					if (Utils.isEmpty(value) && "label".equals(key)) {
 
 						// Next check if our outer component has a value expression for the label
 						ValueExpression labelExpression = ViewParam.this.getValueExpression("label");
 						if (labelExpression != null) {
-							label = labelExpression.getValue(getELContext());
+							value = labelExpression.getValue(getELContext());
+						}
+
+						// No explicit label defined, default to "name" (which is in many cases the most sane label anyway).
+						if (value == null) {
+							value = ViewParam.this.getName();
 						}
 					}
 
-					// No explicit label defined, default to "name" (which is in many cases the most sane label anyway).
-					if (label == null) {
-						label = ViewParam.this.getName();
-					}
-
-					return label;
+					return value;
 				}
-
 			};
 		}
 

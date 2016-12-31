@@ -13,6 +13,7 @@
 package org.omnifaces.util;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.logging.Level.FINE;
 import static java.util.regex.Pattern.quote;
@@ -151,6 +152,8 @@ public final class Components {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final Logger logger = Logger.getLogger(Components.class.getName());
+
+	private static final String ATTRIBUTE_LABEL = "label";
 
 	private static final String ERROR_MISSING_PARENT =
 		"Component '%s' must have a parent of type '%s', but it cannot be found.";
@@ -919,32 +922,32 @@ public final class Components {
 	/**
 	 * Returns the value of the <code>label</code> attribute associated with the given UI component if any, else
 	 * the client ID. It never returns null.
-	 * @param input The UI input component for which the label is to be retrieved.
+	 * @param component The UI component for which the label is to be retrieved.
 	 * @return The value of the <code>label</code> attribute associated with the given UI component if any, else
 	 * the client ID.
 	 */
-	public static String getLabel(UIComponent input) {
-		String label = getOptionalLabel(input);
-		return (label != null) ? label : input.getClientId();
+	public static String getLabel(UIComponent component) {
+		String label = getOptionalLabel(component);
+		return (label != null) ? label : component.getClientId();
 	}
 
 	/**
 	 * Returns the value of the <code>label</code> attribute associated with the given UI component if any, else
 	 * null.
-	 * @param input The UI input component for which the label is to be retrieved.
+	 * @param component The UI component for which the label is to be retrieved.
 	 * @return The value of the <code>label</code> attribute associated with the given UI component if any, else
 	 * null.
 	 */
-	public static String getOptionalLabel(final UIComponent input) {
+	public static String getOptionalLabel(final UIComponent component) {
 		final Object[] result = new Object[1];
 
-		new ScopedRunner(getContext()).with("cc", getCompositeComponentParent(input)).invoke(new Callback.Void() {
+		new ScopedRunner(getContext()).with("cc", getCompositeComponentParent(component)).invoke(new Callback.Void() {
 			@Override
 			public void invoke() {
-				Object label = input.getAttributes().get("label");
+				Object label = component.getAttributes().get(ATTRIBUTE_LABEL);
 
 				if (isEmpty(label)) {
-					ValueExpression labelExpression = input.getValueExpression("label");
+					ValueExpression labelExpression = component.getValueExpression(ATTRIBUTE_LABEL);
 
 					if (labelExpression != null) {
 						label = labelExpression.getValue(getELContext());
@@ -956,6 +959,23 @@ public final class Components {
 		});
 
 		return (result[0] != null) ? result[0].toString() : null;
+	}
+
+	/**
+	 * Sets the <code>label</code> attribute of the given UI component with the given value.
+	 * @param component The UI component for which the label is to be set.
+	 * @param label The label to be set on the given UI component.
+	 */
+	public static void setLabel(UIComponent component, Object label) {
+		if (label instanceof ValueExpression) {
+			component.setValueExpression(ATTRIBUTE_LABEL, (ValueExpression) label);
+		}
+		else if (label != null) {
+			component.getAttributes().put(ATTRIBUTE_LABEL, label);
+		}
+		else {
+			component.getAttributes().remove(ATTRIBUTE_LABEL);
+		}
 	}
 
 	/**
@@ -1024,24 +1044,23 @@ public final class Components {
 	 * @since 2.1
 	 */
 	public static List<ParamHolder> getParams(UIComponent component) {
-		if (component.getChildCount() > 0) {
-			List<ParamHolder> params = new ArrayList<>(component.getChildCount());
-
-			for (UIComponent child : component.getChildren()) {
-				if (child instanceof UIParameter) {
-					UIParameter param = (UIParameter) child;
-
-					if (!isEmpty(param.getName()) && !param.isDisable()) {
-						params.add(new SimpleParam(param));
-					}
-				}
-			}
-
-			return Collections.unmodifiableList(params);
-		}
-		else {
+		if (component.getChildCount() == 0) {
 			return Collections.emptyList();
 		}
+
+		List<ParamHolder> params = new ArrayList<>(component.getChildCount());
+
+		for (UIComponent child : component.getChildren()) {
+			if (child instanceof UIParameter) {
+				UIParameter param = (UIParameter) child;
+
+				if (!isEmpty(param.getName()) && !param.isDisable()) {
+					params.add(new SimpleParam(param));
+				}
+			}
+		}
+
+		return Collections.unmodifiableList(params);
 	}
 
 	/**
@@ -1319,18 +1338,8 @@ public final class Components {
 			String behaviorEvent = getRequestParameter("javax.faces.behavior.event");
 
 			if (behaviorEvent != null) {
-				List<ClientBehavior> behaviors = ((ClientBehaviorHolder) component).getClientBehaviors().get(behaviorEvent);
-
-				if (behaviors != null) {
-					for (ClientBehavior behavior : behaviors) {
-						List<BehaviorListener> listeners = getField(BehaviorBase.class, List.class, behavior);
-
-						if (listeners != null) {
-							for (BehaviorListener listener : listeners) {
-								addExpressionStringIfNotNull(getField(listener.getClass(), MethodExpression.class, listener), actions);
-							}
-						}
-					}
+				for (BehaviorListener listener : getBehaviorListeners((ClientBehaviorHolder) component, behaviorEvent)) {
+					addExpressionStringIfNotNull(getField(listener.getClass(), MethodExpression.class, listener), actions);
 				}
 			}
 		}
@@ -1433,27 +1442,25 @@ public final class Components {
 	public static <C extends UIComponent> void validateHasOnlyChildren(UIComponent component, Class<C> childType)
 		throws IllegalStateException
 	{
-		if (!isDevelopment()) {
+		if (!isDevelopment() || component.getChildCount() == 0) {
 			return;
 		}
 
-		if (component.getChildCount() > 0) {
-			StringBuilder childClassNames = new StringBuilder();
+		StringBuilder childClassNames = new StringBuilder();
 
-			for (UIComponent child : component.getChildren()) {
-				if (!childType.isAssignableFrom(child.getClass())) {
-					if (childClassNames.length() > 0) {
-						childClassNames.append(", ");
-					}
-
-					childClassNames.append(child.getClass().getName());
+		for (UIComponent child : component.getChildren()) {
+			if (!childType.isAssignableFrom(child.getClass())) {
+				if (childClassNames.length() > 0) {
+					childClassNames.append(", ");
 				}
-			}
 
-			if (childClassNames.length() > 0) {
-				throw new IllegalStateException(String.format(
-					ERROR_ILLEGAL_CHILDREN, component.getClass().getSimpleName(), childType, childClassNames));
+				childClassNames.append(child.getClass().getName());
 			}
+		}
+
+		if (childClassNames.length() > 0) {
+			throw new IllegalStateException(String.format(
+				ERROR_ILLEGAL_CHILDREN, component.getClass().getSimpleName(), childType, childClassNames));
 		}
 	}
 
@@ -1517,8 +1524,33 @@ public final class Components {
 	}
 
 	/**
+	 * Get all behavior listeners of given behavior event from the given component.
+	 */
+	@SuppressWarnings("unchecked")
+	private static List<BehaviorListener> getBehaviorListeners(ClientBehaviorHolder component, String behaviorEvent) {
+		List<ClientBehavior> behaviors = component.getClientBehaviors().get(behaviorEvent);
+
+		if (behaviors == null) {
+			return emptyList();
+		}
+
+		List<BehaviorListener> allListeners = new ArrayList<>();
+
+		for (ClientBehavior behavior : behaviors) {
+			List<BehaviorListener> listeners = getField(BehaviorBase.class, List.class, behavior);
+
+			if (listeners != null) {
+				allListeners.addAll(listeners);
+			}
+		}
+
+		return allListeners;
+	}
+
+	/**
 	 * Get first matching field of given field type from the given class type and get the value from the given instance.
-	 * (this is a rather specific helper for getActionExpressionsAndListeners() and may not work in other cases).
+	 * (this is a rather specific helper for getBehaviorListeners() and getActionExpressionsAndListeners() and may not
+	 * work in other cases).
 	 */
 	@SuppressWarnings("unchecked")
 	private static <C, F> F getField(Class<? extends C> classType, Class<F> fieldType, C instance) {

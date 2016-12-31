@@ -12,6 +12,8 @@
  */
 package org.omnifaces.validator;
 
+import java.util.Objects;
+
 import javax.faces.component.EditableValueHolder;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
@@ -65,7 +67,7 @@ public abstract class ValueChangeValidator implements Validator {
 			Object newValue = submittedValue;
 			Object oldValue = ((EditableValueHolder) component).getValue();
 
-			if (newValue == null ? oldValue == null : newValue.equals(oldValue)) {
+			if (Objects.equals(newValue, oldValue)) {
 				return;
 			}
 		}

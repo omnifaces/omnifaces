@@ -12,6 +12,8 @@
  */
 package org.omnifaces.converter;
 
+import java.util.Objects;
+
 import javax.faces.component.EditableValueHolder;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
@@ -69,7 +71,7 @@ public abstract class ValueChangeConverter implements Converter {
 			Object oldObjectValue = ((EditableValueHolder) component).getValue();
 			String oldStringValue = getAsString(context, component, oldObjectValue);
 
-			if (newStringValue == null ? oldStringValue == null : newStringValue.equals(oldStringValue)) {
+			if (Objects.equals(newStringValue, oldStringValue)) {
 				return oldObjectValue;
 			}
 		}

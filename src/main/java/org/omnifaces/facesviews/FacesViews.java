@@ -34,6 +34,7 @@ import static org.omnifaces.util.ResourcePaths.isDirectory;
 import static org.omnifaces.util.ResourcePaths.isExtensionless;
 import static org.omnifaces.util.ResourcePaths.stripExtension;
 import static org.omnifaces.util.ResourcePaths.stripPrefixPath;
+import static org.omnifaces.util.ResourcePaths.stripTrailingSlash;
 import static org.omnifaces.util.Servlets.getApplicationAttribute;
 import static org.omnifaces.util.Servlets.getRequestBaseURL;
 import static org.omnifaces.util.Utils.csvToList;
@@ -262,45 +263,50 @@ public final class FacesViews {
 	 * @param servletContext The involved servlet context.
 	 */
 	public static void registerForwardingFilter(ServletContext servletContext) {
-		if (isFacesViewsEnabled(servletContext)) {
+		if (!isFacesViewsEnabled(servletContext)) {
+			return;
+		}
 
-			// Scan our dedicated directory for Faces resources that need to be mapped.
-			Map<String, String> collectedViews = scanAndStoreViews(servletContext, true);
+		// Scan our dedicated directory for Faces resources that need to be mapped.
+		Map<String, String> collectedViews = scanAndStoreViews(servletContext, true);
 
-			if (!collectedViews.isEmpty()) {
-				boolean filterAfterDeclaredFilters = parseBoolean(servletContext.getInitParameter(FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS_PARAM_NAME));
+		if (collectedViews.isEmpty()) {
+			return;
+		}
 
-				// Register a Filter that forwards extensionless requests to an extension mapped request, e.g. /index to /index.xhtml
-				// The FacesServlet doesn't work well with the exact mapping that we use for extensionless URLs.
-				FilterRegistration filterRegistration = servletContext.addFilter(FacesViewsForwardingFilter.class.getName(), FacesViewsForwardingFilter.class);
+		// Register a Filter that forwards extensionless requests to an extension mapped request, e.g. /index to /index.xhtml
+		// The FacesServlet doesn't work well with the exact mapping that we use for extensionless URLs.
+		FilterRegistration filterRegistration = servletContext.addFilter(FacesViewsForwardingFilter.class.getName(), FacesViewsForwardingFilter.class);
 
-				// Register a Facelets resource resolver that resolves requests like /index.xhtml to /WEB-INF/faces-views/index.xhtml
-				// TODO: Migrate ResourceResolver to ResourceHandler.
-				servletContext.setInitParameter(FACELETS_RESOURCE_RESOLVER_PARAM_NAME, FacesViewsResolver.class.getName());
+		// Register a Facelets resource resolver that resolves requests like /index.xhtml to /WEB-INF/faces-views/index.xhtml
+		// TODO: Migrate ResourceResolver to ResourceHandler.
+		servletContext.setInitParameter(FACELETS_RESOURCE_RESOLVER_PARAM_NAME, FacesViewsResolver.class.getName());
 
-				boolean multiViewsWelcomeFiles = isMultiViewsEnabled(servletContext) && !getMappedWelcomeFiles(servletContext).isEmpty();
+		addForwardingFilterMappings(servletContext, collectedViews, filterRegistration);
 
-				if (multiViewsWelcomeFiles) {
-					// When MultiViews is enabled and there are mapped welcome files, we need to filter on /* otherwise path params won't work on root.
-					filterRegistration.addMappingForUrlPatterns(EnumSet.of(REQUEST, FORWARD), filterAfterDeclaredFilters, "/*");
-				}
-				else {
-					// Map the forwarding filter to all the resources we found.
-					for (String mapping : collectedViews.keySet()) {
-						filterRegistration.addMappingForUrlPatterns(EnumSet.of(REQUEST, FORWARD), filterAfterDeclaredFilters, mapping);
-					}
+		// We now need to map the Faces Servlet to the extensions we found,
+		// but at this point in time this Faces Servlet might not be created yet,
+		// so we do this part in the FacesViews#addFacesServletMappings() method below,
+		// which is called from ApplicationListener#contextInitialized() later.
+	}
 
-					// Additionally map the filter to all paths that were scanned and which are also directly accessible.
-					// This is to give the filter an opportunity to block these.
-					for (String path : getPublicRootPaths(servletContext)) {
-						filterRegistration.addMappingForUrlPatterns(null, false, path + "*");
-					}
-				}
+	private static void addForwardingFilterMappings(ServletContext servletContext, Map<String, String> collectedViews, FilterRegistration filterRegistration) {
+		boolean filterAfterDeclaredFilters = parseBoolean(servletContext.getInitParameter(FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS_PARAM_NAME));
 
-				// We now need to map the Faces Servlet to the extensions we found,
-				// but at this point in time this Faces Servlet might not be created yet,
-				// so we do this part in the FacesViews#addFacesServletMappings() method below,
-				// which is called from ApplicationListener#contextInitialized() later.
+		if (hasMultiViewsWelcomeFile(servletContext)) {
+			// When MultiViews is enabled and there are mapped welcome files, we need to filter on /* otherwise path params won't work on root.
+			filterRegistration.addMappingForUrlPatterns(EnumSet.of(REQUEST, FORWARD), filterAfterDeclaredFilters, "/*");
+		}
+		else {
+			// Map the forwarding filter to all the resources we found.
+			for (String mapping : collectedViews.keySet()) {
+				filterRegistration.addMappingForUrlPatterns(EnumSet.of(REQUEST, FORWARD), filterAfterDeclaredFilters, mapping);
+			}
+
+			// Additionally map the filter to all paths that were scanned and which are also directly accessible.
+			// This is to give the filter an opportunity to block these.
+			for (String path : getPublicRootPaths(servletContext)) {
+				filterRegistration.addMappingForUrlPatterns(null, false, path + "*");
 			}
 		}
 	}
@@ -311,29 +317,33 @@ public final class FacesViews {
 	 * @param servletContext The involved servlet context.
 	 */
 	public static void addFacesServletMappings(ServletContext servletContext) {
-		if (isFacesViewsEnabled(servletContext)) {
-			Set<String> encounteredExtensions = getEncounteredExtensions(servletContext);
+		if (!isFacesViewsEnabled(servletContext)) {
+			return;
+		}
 
-			if (!isEmpty(encounteredExtensions)) {
-				Set<String> mappings = new HashSet<>(encounteredExtensions);
-				mappings.addAll(getMappedWelcomeFiles(servletContext));
+		Set<String> encounteredExtensions = getEncounteredExtensions(servletContext);
 
-				if (getFacesServletDispatchMethod(servletContext) == DO_FILTER) {
-					// In order for the DO_FILTER method to work the FacesServlet, in addition the forward filter,
-					// has to be mapped on all extensionless resources.
-					mappings.addAll(filterExtension(getMappedResources(servletContext).keySet()));
-				}
+		if (isEmpty(encounteredExtensions)) {
+			return;
+		}
 
-				ServletRegistration facesServletRegistration = getFacesServletRegistration(servletContext);
+		Set<String> mappings = new HashSet<>(encounteredExtensions);
+		mappings.addAll(getMappedWelcomeFiles(servletContext));
 
-				if (facesServletRegistration != null) {
-					Collection<String> existingMappings = facesServletRegistration.getMappings();
+		if (getFacesServletDispatchMethod(servletContext) == DO_FILTER) {
+			// In order for the DO_FILTER method to work the FacesServlet, in addition the forward filter,
+			// has to be mapped on all extensionless resources.
+			mappings.addAll(filterExtension(getMappedResources(servletContext).keySet()));
+		}
 
-					for (String mapping : mappings) {
-						if (!existingMappings.contains(mapping)) {
-							facesServletRegistration.addMapping(mapping);
-						}
-					}
+		ServletRegistration facesServletRegistration = getFacesServletRegistration(servletContext);
+
+		if (facesServletRegistration != null) {
+			Collection<String> existingMappings = facesServletRegistration.getMappings();
+
+			for (String mapping : mappings) {
+				if (!existingMappings.contains(mapping)) {
+					facesServletRegistration.addMapping(mapping);
 				}
 			}
 		}
@@ -361,23 +371,7 @@ public final class FacesViews {
 	 * @return The views found during scanning, or an empty map if no views encountered.
 	 */
 	static Map<String, String> scanAndStoreViews(ServletContext servletContext, boolean collectExtensions) {
-		Set<String> mappedWelcomeFiles = new HashSet<>();
-
-		for (String welcomeFile : WebXml.INSTANCE.init(servletContext).getWelcomeFiles()) {
-			if (isExtensionless(welcomeFile)) {
-				if (!welcomeFile.startsWith("/")) {
-					welcomeFile = "/" + welcomeFile;
-				}
-
-				if (welcomeFile.endsWith("/")) {
-					welcomeFile = welcomeFile.substring(0, welcomeFile.length() - 1);
-				}
-
-				mappedWelcomeFiles.add(welcomeFile);
-			}
-		}
-
-		servletContext.setAttribute(MAPPED_WELCOME_FILES, unmodifiableSet(mappedWelcomeFiles));
+		scanAndStoreWelcomeFiles(servletContext);
 
 		Map<String, String> collectedViews = new HashMap<>();
 		Set<String> collectedExtensions = new HashSet<>();
@@ -393,19 +387,27 @@ public final class FacesViews {
 			servletContext.setAttribute(REVERSE_MAPPED_RESOURCES, unmodifiableMap(reverse(collectedViews)));
 
 			if (collectExtensions) {
-				servletContext.setAttribute(ENCOUNTERED_EXTENSIONS, unmodifiableSet(collectedExtensions));
-
-				if (!collectedExtensions.isEmpty()) {
-					for (String welcomeFile : getMappedWelcomeFiles(servletContext)) {
-						if (isMultiViewsEnabled(servletContext) && collectedViews.containsKey(welcomeFile + "/*")) {
-							servletContext.setAttribute(MULTIVIEWS_WELCOME_FILE, welcomeFile);
-						}
-					}
-				}
+				storeExtensions(servletContext, collectedViews, collectedExtensions);
 			}
 		}
 
 		return collectedViews;
+	}
+
+	private static void scanAndStoreWelcomeFiles(ServletContext servletContext) {
+		Set<String> mappedWelcomeFiles = new HashSet<>();
+
+		for (String welcomeFile : WebXml.INSTANCE.init(servletContext).getWelcomeFiles()) {
+			if (isExtensionless(welcomeFile)) {
+				if (!welcomeFile.startsWith("/")) {
+					welcomeFile = "/" + welcomeFile;
+				}
+
+				mappedWelcomeFiles.add(stripTrailingSlash(welcomeFile));
+			}
+		}
+
+		servletContext.setAttribute(MAPPED_WELCOME_FILES, unmodifiableSet(mappedWelcomeFiles));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -438,6 +440,18 @@ public final class FacesViews {
 		}
 
 		return rootPaths;
+	}
+
+	private static void storeExtensions(ServletContext servletContext, Map<String, String> collectedViews, Set<String> collectedExtensions) {
+		servletContext.setAttribute(ENCOUNTERED_EXTENSIONS, unmodifiableSet(collectedExtensions));
+
+		if (!collectedExtensions.isEmpty()) {
+			for (String welcomeFile : getMappedWelcomeFiles(servletContext)) {
+				if (isMultiViewsEnabled(servletContext) && collectedViews.containsKey(welcomeFile + "/*")) {
+					servletContext.setAttribute(MULTIVIEWS_WELCOME_FILE, welcomeFile);
+				}
+			}
+		}
 	}
 
 	/**
@@ -482,42 +496,49 @@ public final class FacesViews {
 	private static void scanViews(ServletContext servletContext, String rootPath, Set<String> resourcePaths,
 			Map<String, String> collectedViews, String extensionToScan, Set<String> collectedExtensions)
 	{
-		if (!isEmpty(resourcePaths)) {
-			boolean multiViewsWelcomeFiles = isMultiViewsEnabled(servletContext) && !getMappedWelcomeFiles(servletContext).isEmpty();
+		if (isEmpty(resourcePaths)) {
+			return;
+		}
 
-			for (String resourcePath : resourcePaths) {
-				if (isDirectory(resourcePath)) {
-					if (canScanDirectory(rootPath, resourcePath)) {
-						scanViews(servletContext, rootPath, servletContext.getResourcePaths(resourcePath), collectedViews, extensionToScan, collectedExtensions);
-					}
-				}
-				else if (canScanResource(resourcePath, extensionToScan)) {
+		boolean hasMultiViewsWelcomeFile = hasMultiViewsWelcomeFile(servletContext);
 
-					// Strip the root path from the current path.
-					// E.g. /WEB-INF/faces-views/foo.xhtml will become foo.xhtml if the root path = /WEB-INF/faces-view/
-					String resource = stripPrefixPath(rootPath, resourcePath);
-
-					// Store the resource with and without an extension, e.g. store both foo.xhtml and foo
-					collectedViews.put(resource, resourcePath);
-					String extensionlessResource = stripExtension(resource);
-
-					if (isMultiViewsEnabled(servletContext, extensionlessResource)) {
-						collectedViews.put(extensionlessResource + "/*", resourcePath);
-					}
-					else {
-						if (multiViewsWelcomeFiles) { // This will install forwarding filter on /* and therefore we need to cover / ourselves.
-							collectedViews.put(extensionlessResource + "/", resourcePath);
-						}
-
-						collectedViews.put(extensionlessResource, resourcePath);
-					}
-
-					// Optionally, collect all unique extensions that we have encountered.
-					if (collectedExtensions != null) {
-						collectedExtensions.add("*" + getExtension(resourcePath));
-					}
+		for (String resourcePath : resourcePaths) {
+			if (isDirectory(resourcePath)) {
+				if (canScanDirectory(rootPath, resourcePath)) {
+					scanViews(servletContext, rootPath, servletContext.getResourcePaths(resourcePath), collectedViews, extensionToScan, collectedExtensions);
 				}
 			}
+			else if (canScanResource(resourcePath, extensionToScan)) {
+				scanView(servletContext, rootPath, resourcePath, collectedViews, collectedExtensions, hasMultiViewsWelcomeFile);
+			}
+		}
+	}
+
+	private static void scanView(ServletContext servletContext, String rootPath, String resourcePath,
+			Map<String, String> collectedViews, Set<String> collectedExtensions, boolean hasMultiViewsWelcomeFile)
+	{
+		// Strip the root path from the current path.
+		// E.g. /WEB-INF/faces-views/foo.xhtml will become foo.xhtml if the root path = /WEB-INF/faces-view/
+		String resource = stripPrefixPath(rootPath, resourcePath);
+
+		// Store the resource with and without an extension, e.g. store both foo.xhtml and foo
+		collectedViews.put(resource, resourcePath);
+		String extensionlessResource = stripExtension(resource);
+
+		if (isMultiViewsEnabled(servletContext, extensionlessResource)) {
+			collectedViews.put(extensionlessResource + "/*", resourcePath);
+		}
+		else {
+			if (hasMultiViewsWelcomeFile) { // This will install forwarding filter on /* and therefore we need to cover / ourselves.
+				collectedViews.put(extensionlessResource + "/", resourcePath);
+			}
+
+			collectedViews.put(extensionlessResource, resourcePath);
+		}
+
+		// Optionally, collect all unique extensions that we have encountered.
+		if (collectedExtensions != null) {
+			collectedExtensions.add("*" + getExtension(resourcePath));
 		}
 	}
 
@@ -677,6 +698,10 @@ public final class FacesViews {
 		}
 
 		return false;
+	}
+
+	static boolean hasMultiViewsWelcomeFile(ServletContext servletContext) {
+		return isMultiViewsEnabled(servletContext) && !getMappedWelcomeFiles(servletContext).isEmpty();
 	}
 
 

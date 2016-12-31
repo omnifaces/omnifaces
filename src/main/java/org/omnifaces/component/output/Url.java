@@ -19,6 +19,7 @@ import static org.omnifaces.util.FacesLocal.getBookmarkableURL;
 import static org.omnifaces.util.FacesLocal.getRequestDomainURL;
 import static org.omnifaces.util.FacesLocal.getRequestURI;
 import static org.omnifaces.util.FacesLocal.setRequestAttribute;
+import static org.omnifaces.util.ResourcePaths.stripTrailingSlash;
 import static org.omnifaces.util.Servlets.toQueryString;
 import static org.omnifaces.util.Utils.isEmpty;
 
@@ -178,7 +179,7 @@ public class Url extends OutputFamily {
 				throw new IllegalArgumentException(String.format(ERROR_INVALID_DOMAIN, domain), e);
 			}
 
-			url = normalizedDomain + (normalizedDomain.endsWith("/") ? url.substring(1) : url);
+			url = stripTrailingSlash(normalizedDomain) + url;
 		}
 
 		if (getVar() != null) {

@@ -29,7 +29,9 @@ public class ExtendedSelectItem extends SelectItem {
 	 * <p>Construct a <code>SelectItem</code> with no initialized property
 	 * values.</p>
 	 */
-	public ExtendedSelectItem() {}
+	public ExtendedSelectItem() {
+		//
+	}
 
 	/**
 	 * <p>Construct a <code>SelectItem</code> with property values initialized from the corresponding

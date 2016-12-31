@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
@@ -53,24 +54,30 @@ public final class SelectItemsUtils {
 	private static Object findValueByStringConversion(FacesContext context, UIComponent component, Iterator<SelectItem> items, String value, Converter converter) {
 		while (items.hasNext()) {
 			SelectItem item = items.next();
+
 			if (item instanceof SelectItemGroup) {
-				SelectItem subitems[] = ((SelectItemGroup) item).getSelectItems();
-				if (!isEmpty(subitems)) {
-					Object object = findValueByStringConversion(context, component, new ArrayIterator(subitems), value, converter);
-					if (object != null) {
-						return object;
-					}
+				SelectItem[] groupItems = ((SelectItemGroup) item).getSelectItems();
+				Object object = findValueByStringConversion(context, component, groupItems, value, converter);
+
+				if (object != null) {
+					return object;
 				}
-			} else if (!item.isNoSelectionOption()) {
+			}
+			else if (!item.isNoSelectionOption()) {
 				Object itemValue = item.getValue();
 				String convertedItemValue = converter.getAsString(context, component, itemValue);
-				if (value == null ? convertedItemValue == null : value.equals(convertedItemValue)) {
+
+				if (Objects.equals(value, convertedItemValue)) {
 					return itemValue;
 				}
 			}
 		}
 
 		return null;
+	}
+
+	private static Object findValueByStringConversion(FacesContext context, UIComponent component, SelectItem[] items, String value, Converter converter) {
+		return isEmpty(items) ? null : findValueByStringConversion(context, component, new ArrayIterator(items), value, converter);
 	}
 
 	/**

@@ -37,7 +37,9 @@ public class ELContextWrapper extends ELContext implements FacesWrapper<ELContex
 
 	private ELContext elContext;
 
-	public ELContextWrapper() {}
+	public ELContextWrapper() {
+		//
+	}
 
 	public ELContextWrapper(ELContext elContext) {
 		this.elContext = elContext;

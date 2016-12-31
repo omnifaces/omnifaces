@@ -13,6 +13,7 @@
 package org.omnifaces.converter;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
@@ -60,7 +61,7 @@ public class ListConverter implements Converter {
 	public Object getAsObject(FacesContext context, UIComponent component, String value) {
 		for (Object listValue : list) {
 			String convertedListValue = getAsString(context, component, listValue);
-			if (value == null ? convertedListValue == null : value.equals(convertedListValue)) {
+			if (Objects.equals(value, convertedListValue)) {
 				return listValue;
 			}
 		}

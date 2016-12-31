@@ -47,8 +47,8 @@ public class EagerBeansWebListener implements HttpSessionListener, ServletReques
 		"Could not instantiate eager request scoped beans for request %s. Possibly the CDI request scope is not active."
 			+ " If this is indeed the case, see JavaDoc on org.omnifaces.cdi.Eager on how to remedy this.";
 
-	private static boolean sessionListenerDisabled;
-	private static boolean requestListenerDisabled;
+	private static volatile boolean sessionListenerDisabled;
+	private static volatile boolean requestListenerDisabled;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 

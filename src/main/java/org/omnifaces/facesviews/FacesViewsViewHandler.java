@@ -27,6 +27,7 @@ import static org.omnifaces.util.FacesLocal.getServletContext;
 import static org.omnifaces.util.ResourcePaths.getExtension;
 import static org.omnifaces.util.ResourcePaths.isExtensionless;
 import static org.omnifaces.util.ResourcePaths.stripExtension;
+import static org.omnifaces.util.ResourcePaths.stripTrailingSlash;
 import static org.omnifaces.util.Utils.coalesce;
 
 import java.util.HashSet;
@@ -83,7 +84,7 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 			switch (mode) {
 				case STRIP_EXTENSION_FROM_PARENT:
 					actionURL = removeExtension(servletContext, actionURL, viewId);
-					return actionURL + (pathInfo.isEmpty() ? "" : pathInfo.substring(actionURL.endsWith("/") ? 1 : 0));
+					return pathInfo.isEmpty() ? actionURL : (stripTrailingSlash(actionURL) + pathInfo);
 				case BUILD_WITH_PARENT_QUERY_PARAMETERS:
 					return getRequestContextPath(context) + stripExtension(viewId) + pathInfo + getQueryString(actionURL);
 			}

@@ -192,15 +192,23 @@ public class SocketSessionManager {
 
 			if (sessions != null) {
 				for (Session session : sessions) {
-					if (session.isOpen()) {
-						try {
-							session.close(REASON_EXPIRED);
-						}
-						catch (IOException ignore) {
-							logger.log(FINE, "Ignoring thrown exception; there is nothing more we could do here.", ignore);
-						}
-					}
+					close(session);
 				}
+			}
+		}
+	}
+
+	/**
+	 * Close given web socket session.
+	 * @param session The web socket session to close.
+	 */
+	private void close(Session session) {
+		if (session.isOpen()) {
+			try {
+				session.close(REASON_EXPIRED);
+			}
+			catch (IOException ignore) {
+				logger.log(FINE, "Ignoring thrown exception; there is nothing more we could do here.", ignore);
 			}
 		}
 	}

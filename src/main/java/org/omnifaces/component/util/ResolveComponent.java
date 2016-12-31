@@ -73,7 +73,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 
 	@Override
 	public void setFaceletContext(FaceletContext faceletContext) {
-		if ("facelet".equals(getScope())) {
+		if (DEFAULT_SCOPE.equals(getScope())) {
 
 			readOnlyValueExpression = new ReadOnlyValueExpression(UIComponent.class);
 
@@ -122,7 +122,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 			String scope = getScope();
 
 			switch (scope) { // TODO: refactor "scope" to a reusable enum, together with those of a.o. Cache.
-				case "facelet":
+				case DEFAULT_SCOPE:
 					// Component will be resolved again dynamically when the value expression is evaluated.
 					if (readOnlyValueExpression != null) {
 						readOnlyValueExpression.setCallbackReturning(new ComponentClientIdResolver(component.getClientId()));

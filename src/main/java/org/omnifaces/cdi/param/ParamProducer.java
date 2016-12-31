@@ -16,6 +16,7 @@ import static java.lang.Boolean.parseBoolean;
 import static java.util.Arrays.asList;
 import static javax.faces.validator.BeanValidator.DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME;
 import static org.omnifaces.util.Beans.getQualifier;
+import static org.omnifaces.util.Components.setLabel;
 import static org.omnifaces.util.Faces.createConverter;
 import static org.omnifaces.util.Faces.createValidator;
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
@@ -118,38 +119,33 @@ public class ParamProducer {
 	}
 
 	static Object[] getConvertedValues(FacesContext context, Param param, String label, String[] submittedValues, Type type) {
-		Object[] convertedValues = null;
+		if (submittedValues == null) {
+			return null;
+		}
+
+		Object[] convertedValues = new Object[submittedValues.length];
+		UIComponent component = context.getViewRoot();
+		Object originalLabel = component.getAttributes().get("label");
 		boolean valid = true;
 
-		if (submittedValues != null) {
-			convertedValues = new Object[submittedValues.length];
-			UIComponent component = context.getViewRoot();
-			Object originalLabel = component.getAttributes().get("label");
+		try {
+			setLabel(component, label);
+			Converter converter = getConverter(param, getTargetType(type));
 
-			try {
-				component.getAttributes().put("label", label);
-				Converter converter = getConverter(param, getTargetType(type));
+			for (int i = 0; i < submittedValues.length; i++) {
+				String submittedValue = submittedValues[i];
 
-				for (int i = 0; i < submittedValues.length; i++) {
-					String submittedValue = submittedValues[i];
-
-					try {
-						convertedValues[i] = (converter != null) ? converter.getAsObject(context, component, submittedValue) : submittedValue;
-					}
-					catch (ConverterException e) {
-						valid = false;
-						addConverterMessage(context, component, label, submittedValue, e, getConverterMessage(param));
-					}
+				try {
+					convertedValues[i] = (converter != null) ? converter.getAsObject(context, component, submittedValue) : submittedValue;
+				}
+				catch (ConverterException e) {
+					valid = false;
+					addConverterMessage(context, component, label, submittedValue, e, getConverterMessage(param));
 				}
 			}
-			finally {
-				if (originalLabel == null) {
-					component.getAttributes().remove("label");
-				}
-				else {
-					component.getAttributes().put("label", originalLabel);
-				}
-			}
+		}
+		finally {
+			setLabel(component, originalLabel);
 		}
 
 		if (!valid) {
@@ -166,30 +162,31 @@ public class ParamProducer {
 			return coerceValues(((ParameterizedType) type).getRawType(), values);
 		}
 
+		if (!(type instanceof Class)) {
+			return null;
+		}
+
+		Class<?> cls = (Class<?>) type;
 		Object coercedValue = null;
 
-		if (type instanceof Class) {
-			Class<?> cls = (Class<?>) type;
+		if (values != null) {
+			if (cls.isArray()) {
+				coercedValue = Array.newInstance(cls.getComponentType(), values.length);
 
-			if (values != null) {
-				if (cls.isArray()) {
-					coercedValue = Array.newInstance(cls.getComponentType(), values.length);
-
-					for (int i = 0; i < values.length; i++) {
-						Array.set(coercedValue, i, coerceValues(cls.getComponentType(), values[i]));
-					}
-				}
-				else if (List.class.isAssignableFrom(cls)) {
-					coercedValue = asList(values);
-				}
-				else {
-					coercedValue = values.length == 0 ? null : values[0];
+				for (int i = 0; i < values.length; i++) {
+					Array.set(coercedValue, i, coerceValues(cls.getComponentType(), values[i]));
 				}
 			}
-
-			if (coercedValue == null) {
-				coercedValue = getDefaultValue(cls);
+			else if (List.class.isAssignableFrom(cls)) {
+				coercedValue = asList(values);
 			}
+			else {
+				coercedValue = values.length == 0 ? null : values[0];
+			}
+		}
+
+		if (coercedValue == null) {
+			coercedValue = getDefaultValue(cls);
 		}
 
 		return (V) coercedValue;
@@ -202,7 +199,7 @@ public class ParamProducer {
 		Object originalLabel = component.getAttributes().get("label");
 
 		try {
-			component.getAttributes().put("label", label);
+			setLabel(component, label);
 			valid = validateRequired(context, param, label, convertedValues);
 
 			if (valid) {
@@ -214,12 +211,7 @@ public class ParamProducer {
 			}
 		}
 		finally {
-			if (originalLabel == null) {
-				component.getAttributes().remove("label");
-			}
-			else {
-				component.getAttributes().put("label", originalLabel);
-			}
+			setLabel(component, originalLabel);
 		}
 
 		if (!valid) {
@@ -459,8 +451,6 @@ public class ParamProducer {
 
 		return attributeMap;
 	}
-
-
 
 	private static void addConverterMessage(FacesContext context, UIComponent component, String label, String submittedValue, ConverterException ce, String converterMessage) {
 		FacesMessage message;

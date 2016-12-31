@@ -44,7 +44,9 @@ public class ReadOnlyValueExpression extends ValueExpression {
 		this.expectedType = expectedType;
 	}
 
-	public ReadOnlyValueExpression() {}
+	public ReadOnlyValueExpression() {
+		//
+	}
 
 	@Override
 	public Object getValue(ELContext context) {

@@ -54,6 +54,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.logging.Logger;
@@ -280,7 +281,7 @@ public final class Utils {
 	@SafeVarargs
 	public static <T> boolean isOneOf(T object, T... objects) {
 		for (Object other : objects) {
-			if (object == null ? other == null : object.equals(other)) {
+			if (Objects.equals(object, other)) {
 				return true;
 			}
 		}

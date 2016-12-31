@@ -122,27 +122,24 @@ public final class Reflection {
 			for (PropertyDescriptor property : getBeanInfo(object.getClass()).getPropertyDescriptors()) {
 				Method setter = property.getWriteMethod();
 
-				if (setter == null) {
+				if (setter == null || !propertiesToSet.containsKey(property.getName())) {
 					continue;
 				}
 
-				if (propertiesToSet.containsKey(property.getName())) {
+				Object value = propertiesToSet.get(property.getName());
+				if (value instanceof String && !property.getPropertyType().equals(String.class)) {
 
-					Object value = propertiesToSet.get(property.getName());
-					if (value instanceof String && !property.getPropertyType().equals(String.class)) {
+					// Try to convert Strings to the type expected by the converter
 
-						// Try to convert Strings to the type expected by the converter
-
-						PropertyEditor editor = findEditor(property.getPropertyType());
-						editor.setAsText((String) value);
-						value = editor.getValue();
-					}
-
-					property.getWriteMethod().invoke(object, value);
+					PropertyEditor editor = findEditor(property.getPropertyType());
+					editor.setAsText((String) value);
+					value = editor.getValue();
 				}
 
+				property.getWriteMethod().invoke(object, value);
 			}
-		} catch (Exception e) {
+		}
+		catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
 	}

@@ -32,6 +32,7 @@ import static org.omnifaces.facesviews.FacesViews.stripWelcomeFilePrefix;
 import static org.omnifaces.util.Faces.getApplicationFromFactory;
 import static org.omnifaces.util.ResourcePaths.getExtension;
 import static org.omnifaces.util.ResourcePaths.isExtensionless;
+import static org.omnifaces.util.ResourcePaths.stripTrailingSlash;
 import static org.omnifaces.util.Servlets.getRequestRelativeURI;
 
 import java.io.IOException;
@@ -103,7 +104,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 		ServletContext servletContext = getServletContext();
 		boolean multiViews = isMultiViewsEnabled(request);
 		Map<String, String> resources = getMappedResources(servletContext);
-		String normalizedServletPath = servletPath.endsWith("/") ? servletPath.substring(0, servletPath.length() - 1) : servletPath;
+		String normalizedServletPath = stripTrailingSlash(servletPath);
 		String resource = normalizedServletPath + (multiViews ? "/*" : "");
 
 		if (getApplicationFromFactory().getProjectStage() == Development && !resources.containsKey(resource)) {

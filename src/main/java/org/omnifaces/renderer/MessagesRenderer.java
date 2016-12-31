@@ -60,6 +60,7 @@ public class MessagesRenderer extends Renderer {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
+	private static final String LAYOUT_TABLE = "table";
 	private static final Map<Severity, String> SEVERITY_NAMES = createSeverityNames();
 
 	private static Map<Severity, String> createSeverityNames() {
@@ -103,7 +104,7 @@ public class MessagesRenderer extends Renderer {
 				messages = Arrays.asList(createInfo(message));
 			}
 
-			encodeMessages(context, omniMessages, messages, "table".equals(omniMessages.getLayout()));
+			encodeMessages(context, omniMessages, messages, LAYOUT_TABLE.equals(omniMessages.getLayout()));
 		}
 	}
 

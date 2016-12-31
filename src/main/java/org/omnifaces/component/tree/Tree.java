@@ -386,20 +386,17 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * Returns the tree nodes by finding direct {@link TreeNode} children and collecting them by their level attribute.
 	 * @param phaseId The current phase ID.
 	 * @return The tree nodes.
-	 * @throws IllegalStateException When a direct child component isn't of type {@link TreeNode}, or when there are
-	 * multiple {@link TreeNode} components with the same level.
+	 * @throws IllegalStateException When there are multiple {@link TreeNode} components with the same level.
 	 */
 	private Map<Integer, TreeNode> getNodes(PhaseId phaseId) {
 		if (phaseId == PhaseId.RENDER_RESPONSE || nodes == null) {
 			nodes = new HashMap<>(getChildCount());
 
 			for (UIComponent child : getChildren()) {
-				if (child instanceof TreeNode) {
-					TreeNode node = (TreeNode) child;
+				TreeNode node = (TreeNode) child;
 
-					if (nodes.put(node.getLevel(), node) != null) {
-						throw new IllegalStateException(String.format(ERROR_DUPLICATE_NODE, node.getLevel()));
-					}
+				if (nodes.put(node.getLevel(), node) != null) {
+					throw new IllegalStateException(String.format(ERROR_DUPLICATE_NODE, node.getLevel()));
 				}
 			}
 		}

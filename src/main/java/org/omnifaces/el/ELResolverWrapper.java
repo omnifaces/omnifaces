@@ -35,7 +35,9 @@ public class ELResolverWrapper extends ELResolver implements FacesWrapper<ELReso
 
 	private ELResolver elResolver;
 
-	public ELResolverWrapper() {}
+	public ELResolverWrapper() {
+		//
+	}
 
 	public ELResolverWrapper(ELResolver elResolver) {
 		this.elResolver = elResolver;

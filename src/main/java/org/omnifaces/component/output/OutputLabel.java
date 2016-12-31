@@ -14,6 +14,7 @@ package org.omnifaces.component.output;
 
 import static org.omnifaces.util.Components.findComponentRelatively;
 import static org.omnifaces.util.Components.getOptionalLabel;
+import static org.omnifaces.util.Components.setLabel;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import javax.el.ValueExpression;
@@ -61,11 +62,7 @@ public class OutputLabel extends HtmlOutputLabel {
 				// but check to be sure.
 				if (getOptionalLabel(forComponent) == null) {
 					ValueExpression valueExpression = getValueExpression("value");
-					if (valueExpression != null) {
-						forComponent.setValueExpression("label", valueExpression);
-					} else {
-						forComponent.getAttributes().put("label", getValue());
-					}
+					setLabel(forComponent, valueExpression != null ? valueExpression : getValue());
 				}
 			}
 		}

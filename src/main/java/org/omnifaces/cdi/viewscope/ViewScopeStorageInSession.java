@@ -55,7 +55,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 
 	// Static variables -----------------------------------------------------------------------------------------------
 
-	private static Integer maxActiveViewScopes;
+	private static volatile Integer maxActiveViewScopes;
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
@@ -121,7 +121,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 	 * and re-returned everytime; the faces context is namely not available during class' initialization/construction,
 	 * but only during a post construct.
 	 */
-	private int getMaxActiveViewScopes() {
+	private static int getMaxActiveViewScopes() {
 		if (maxActiveViewScopes != null) {
 			return maxActiveViewScopes;
 		}

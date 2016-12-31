@@ -228,33 +228,37 @@ public class ConditionalResponseWriter extends ResponseWriterWrapper {
 		lastRendered = componentIds.contains(currentComponent.getId()) || clientIds.contains(currentComponent.getClientId());
 
 		if (renderChildren) {
-			// If current component not rendered because of explicit id match, check if parent is rendered.
-			if (!lastRendered) {
-				UIComponent parent = currentComponent.getParent();
-				while (parent != null) {
-					if (renderedIdCache.containsKey(parent.getClientId())) {
-						lastRendered = renderedIdCache.get(parent.getClientId());
-						break;
-					}
-					if (renderedReferenceCache.containsKey(parent)) {
-						lastRendered = renderedReferenceCache.get(parent);
-						break;
-					}
-
-					parent = parent.getParent();
-				}
-			} else {
-				// Explicitly rendered component, remember this by reference, since client-id can change even for components
-				// that aren't in an iterating naming container (e.g. UIData changes its own client-id during iteration)
-				renderedReferenceCache.put(currentComponent, lastRendered);
-			}
-
-			// Also remember client-id, in addition to the component reference since iterating is often implemented by swapping the state and identity
-			// from the same component instance. So components with the same object identity can have different component identities.
-			renderedIdCache.put(currentComponent.getClientId(), lastRendered);
+			checkParents(currentComponent);
 		}
 
 		return lastRendered;
+	}
+
+	private void checkParents(UIComponent component) {
+		// If current component not rendered because of explicit id match, check if parent is rendered.
+		if (!lastRendered) {
+			UIComponent parent = component.getParent();
+			while (parent != null) {
+				if (renderedIdCache.containsKey(parent.getClientId())) {
+					lastRendered = renderedIdCache.get(parent.getClientId());
+					break;
+				}
+				if (renderedReferenceCache.containsKey(parent)) {
+					lastRendered = renderedReferenceCache.get(parent);
+					break;
+				}
+
+				parent = parent.getParent();
+			}
+		} else {
+			// Explicitly rendered component, remember this by reference, since client-id can change even for components
+			// that aren't in an iterating naming container (e.g. UIData changes its own client-id during iteration)
+			renderedReferenceCache.put(component, lastRendered);
+		}
+
+		// Also remember client-id, in addition to the component reference since iterating is often implemented by swapping the state and identity
+		// from the same component instance. So components with the same object identity can have different component identities.
+		renderedIdCache.put(component.getClientId(), lastRendered);
 	}
 
 	@Override
