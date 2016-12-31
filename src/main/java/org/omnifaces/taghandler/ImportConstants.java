@@ -13,6 +13,7 @@
 package org.omnifaces.taghandler;
 
 import static java.lang.Math.max;
+import static java.util.logging.Level.FINE;
 import static org.omnifaces.util.Facelets.getStringLiteral;
 
 import java.io.IOException;
@@ -22,6 +23,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 import javax.faces.component.UIComponent;
 import javax.faces.view.facelets.FaceletContext;
@@ -76,6 +78,8 @@ import org.omnifaces.util.MapWrapper;
 public class ImportConstants extends TagHandler {
 
 	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final Logger logger = Logger.getLogger(ImportConstants.class.getName());
 
 	private static final Map<String, Map<String, Object>> CONSTANTS_CACHE = new ConcurrentHashMap<>();
 
@@ -173,6 +177,7 @@ public class ImportConstants extends TagHandler {
 					return toClass(new StringBuilder(type).replace(i, i + 1, "$").toString());
 				}
 				catch (Exception ignore) {
+					logger.log(FINE, "Ignoring thrown exception; previous exception will be rethrown instead.", ignore);
 					// Just continue to IllegalArgumentException on original ClassNotFoundException.
 				}
 			}

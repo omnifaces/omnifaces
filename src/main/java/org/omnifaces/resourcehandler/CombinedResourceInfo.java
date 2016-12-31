@@ -12,6 +12,7 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static java.util.logging.Level.FINE;
 import static org.omnifaces.util.FacesLocal.getRequestDomainURL;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.serializeURLSafe;
@@ -47,6 +48,7 @@ public final class CombinedResourceInfo {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final Logger logger = Logger.getLogger(CombinedResourceHandler.class.getName());
+
 	private static final Map<String, CombinedResourceInfo> CACHE = new ConcurrentHashMap<>();
 
 	private static final String LOG_RESOURCE_NOT_FOUND = "CombinedResourceHandler: The resource %s cannot be found"
@@ -196,12 +198,13 @@ public final class CombinedResourceInfo {
 				connection = resource.getURL().openConnection();
 			}
 			catch (Exception richFacesDoesNotSupportThis) {
+				logger.log(FINE, "Ignoring thrown exception; this can only be caused by a buggy component library.", richFacesDoesNotSupportThis);
+
 				try {
 					connection = new URL(getRequestDomainURL(context) + resource.getRequestPath()).openConnection();
 				}
 				catch (IOException ignore) {
-					// Can't and shouldn't handle it at this point.
-					// It would be thrown during resource streaming anyway which is a better moment.
+					logger.log(FINE, "Ignoring thrown exception; cannot handle it at this point, it would be thrown during getInputStream() anyway.", ignore);
 					return;
 				}
 			}
@@ -307,9 +310,8 @@ public final class CombinedResourceInfo {
 		try {
 			resourcesId = unserializeURLSafe(id);
 		}
-		catch (IllegalArgumentException e) {
-			// This will occur when the ID has purposefully been manipulated for some reason.
-			// Just return null then so that it will end up in a 404.
+		catch (IllegalArgumentException ignore) {
+			logger.log(FINE, "Ignoring thrown exception; this can only be a hacker attempt, just return null to indicate 404.", ignore);
 			return null;
 		}
 

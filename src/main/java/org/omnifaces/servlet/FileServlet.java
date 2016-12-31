@@ -12,6 +12,7 @@
  */
 package org.omnifaces.servlet;
 
+import static java.util.logging.Level.FINE;
 import static org.omnifaces.util.Servlets.formatContentDispositionHeader;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.encodeURL;
@@ -26,6 +27,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.servlet.ServletContext;
@@ -116,6 +118,7 @@ public abstract class FileServlet extends HttpServlet {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final long serialVersionUID = 1L;
+	private static final Logger logger = Logger.getLogger(FileServlet.class.getName());
 
 	private static final Long DEFAULT_EXPIRE_TIME_IN_SECONDS = TimeUnit.DAYS.toSeconds(30);
 	private static final long ONE_SECOND_IN_MILLIS = TimeUnit.SECONDS.toMillis(1);
@@ -143,6 +146,7 @@ public abstract class FileServlet extends HttpServlet {
 			resource = new Resource(getFile(request));
 		}
 		catch (IllegalArgumentException e) {
+			logger.log(FINE, "Got an IllegalArgumentException from user code; interpreting it as 400 Bad Request.", e);
 			response.sendError(HttpServletResponse.SC_BAD_REQUEST);
 			return;
 		}
@@ -323,6 +327,7 @@ public abstract class FileServlet extends HttpServlet {
 				}
 			}
 			catch (IllegalArgumentException ifRangeHeaderIsInvalid) {
+				logger.log(FINE, "If-Range header is invalid. Let's just return full file then.", ifRangeHeaderIsInvalid);
 				return ranges;
 			}
 		}

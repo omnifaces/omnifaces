@@ -13,8 +13,10 @@
 package org.omnifaces.util.copier;
 
 import static java.util.Arrays.asList;
+import static java.util.logging.Level.FINE;
 
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Copier that copies an object trying a variety of strategies until one succeeds.
@@ -34,6 +36,8 @@ import java.util.List;
  */
 public class MultiStrategyCopier implements Copier {
 
+	private static final Logger logger = Logger.getLogger(MultiStrategyCopier.class.getName());
+
 	private static final List<Copier> COPIERS = asList( // Note: copier instances used here must be thread-safe!
 		new CloneCopier(), new SerializationCopier(), new CopyCtorCopier(), new NewInstanceCopier()
 	);
@@ -46,6 +50,7 @@ public class MultiStrategyCopier implements Copier {
 			try {
 				return copier.copy(object);
 			} catch (Exception ignore) {
+				logger.log(FINE, "Ignoring thrown exception; next copier will be tried and there is a fallback to IllegalStateException.", ignore);
 				continue;
 			}
 

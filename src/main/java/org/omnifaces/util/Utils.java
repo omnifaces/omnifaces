@@ -15,7 +15,9 @@ package org.omnifaces.util;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableMap;
+import static java.util.logging.Level.FINE;
 import static java.util.regex.Pattern.quote;
+import static org.omnifaces.util.Reflection.toClassOrNull;
 import static org.omnifaces.util.Servlets.getSubmittedFileName;
 
 import java.io.ByteArrayInputStream;
@@ -54,6 +56,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
@@ -81,6 +84,8 @@ import javax.xml.bind.DatatypeConverter;
 public final class Utils {
 
 	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final Logger logger = Logger.getLogger(Utils.class.getName());
 
 	private static final int DEFAULT_STREAM_BUFFER_SIZE = 10240;
 	private static final String PATTERN_RFC1123_DATE = "EEE, dd MMM yyyy HH:mm:ss zzz";
@@ -222,7 +227,8 @@ public final class Utils {
 			// Performance tests taught that this approach is in general faster than regex or char-by-char checking.
 			return Long.valueOf(string) != null;
 		}
-		catch (Exception e) {
+		catch (Exception ignore) {
+			logger.log(FINE, "Ignoring thrown exception; the sole intent is to return false instead.", ignore);
 			return false;
 		}
 	}
@@ -239,7 +245,8 @@ public final class Utils {
 			// Performance tests taught that this approach is in general faster than regex or char-by-char checking.
 			return Double.valueOf(string) != null;
 		}
-		catch (Exception e) {
+		catch (Exception ignore) {
+			logger.log(FINE, "Ignoring thrown exception; the sole intent is to return false instead.", ignore);
 			return false;
 		}
 	}
@@ -460,7 +467,8 @@ public final class Utils {
 			output.writeObject(object);
 			return true;
 		}
-		catch (IOException e) {
+		catch (IOException ignore) {
+			logger.log(FINE, "Ignoring thrown exception; the sole intent is to return false instead.", ignore);
 			return false;
 		}
 	}
@@ -632,8 +640,10 @@ public final class Utils {
 	 * @since 1.6
 	 */
 	public static boolean containsByClassName(Collection<?> objects, String className) {
+		Class<?> cls = toClassOrNull(className);
+
 		for (Object object : objects) {
-			if (object.getClass().getName().equals(className)) {
+			if (object.getClass() == cls) {
 				return true;
 			}
 		}

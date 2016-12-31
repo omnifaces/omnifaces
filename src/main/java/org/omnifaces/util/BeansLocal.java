@@ -12,6 +12,8 @@
  */
 package org.omnifaces.util;
 
+import static java.util.logging.Level.FINE;
+
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,6 +21,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.enterprise.context.spi.AlterableContext;
 import javax.enterprise.context.spi.Context;
@@ -47,6 +50,8 @@ import org.omnifaces.cdi.beans.InjectionPointGenerator;
 public final class BeansLocal {
 
 	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final Logger logger = Logger.getLogger(BeansLocal.class.getName());
 
 	private static final String ERROR_NO_ALTERABLE_CONTEXT =
 		"Bean '%s' is put in context '%s' which is not an alterable context.";
@@ -135,6 +140,7 @@ public final class BeansLocal {
 			return beanManager.getContext(scope).isActive();
 		}
 		catch (Exception ignore) {
+			logger.log(FINE, "Ignoring thrown exception; given scope is very unlikely active anyway.", ignore);
 			return false;
 		}
 	}

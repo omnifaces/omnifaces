@@ -12,10 +12,12 @@
  */
 package org.omnifaces.filter;
 
+import static java.util.logging.Level.FINE;
 import static org.omnifaces.util.Exceptions.unwrap;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import javax.el.ELException;
 import javax.faces.FacesException;
@@ -77,6 +79,8 @@ import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
  */
 public class FacesExceptionFilter extends HttpFilter {
 
+	private static final Logger logger = Logger.getLogger(FacesExceptionFilter.class.getName());
+
 	private Class<? extends Throwable>[] exceptionTypesToUnwrap;
 
 	@Override
@@ -92,11 +96,13 @@ public class FacesExceptionFilter extends HttpFilter {
 		try {
 			chain.doFilter(request, response);
 		}
-		catch (FileNotFoundException e) {
+		catch (FileNotFoundException ignore) {
+			logger.log(FINE, "Ignoring thrown exception; this is a Mojarra quirk and it should be interpreted as 404.", ignore);
 			response.sendError(HttpServletResponse.SC_NOT_FOUND, request.getRequestURI());
 		}
-		catch (ServletException e) {
-			throw new ServletException(unwrap(e.getRootCause(), exceptionTypesToUnwrap));
+		catch (ServletException ignore) {
+			logger.log(FINE, "Ignoring thrown exception; this is a wrapper exception and only its root cause is of interest.", ignore);
+			throw new ServletException(unwrap(ignore.getRootCause(), exceptionTypesToUnwrap));
 		}
 	}
 

@@ -15,6 +15,7 @@ package org.omnifaces.util;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static java.util.logging.Level.FINE;
 import static java.util.regex.Pattern.quote;
 import static javax.faces.application.ProjectStage.Development;
 import static javax.faces.application.ProjectStage.PROJECT_STAGE_JNDI_NAME;
@@ -42,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.faces.FactoryFinder;
 import javax.faces.application.Application;
@@ -91,6 +93,8 @@ import org.omnifaces.facesviews.FacesViews;
 public final class Servlets {
 
 	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final Logger logger = Logger.getLogger(Servlets.class.getName());
 
 	private static final String CONTENT_DISPOSITION_HEADER = "%s;filename=\"%2$s\"; filename*=UTF-8''%2$s";
 	private static final Set<String> FACES_AJAX_HEADERS = unmodifiableSet("partial/ajax", "partial/process");
@@ -710,6 +714,7 @@ public final class Servlets {
 				projectStage = lookup(PROJECT_STAGE_JNDI_NAME);
 			}
 			catch (IllegalStateException ignore) {
+				logger.log(FINE, "Ignoring thrown exception; will only happen in buggy containers.", ignore);
 				return false; // May happen in a.o. GlassFish 4.1 during startup.
 			}
 

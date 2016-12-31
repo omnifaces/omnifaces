@@ -14,6 +14,7 @@ package org.omnifaces.util;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static java.util.logging.Level.WARNING;
 import static javax.faces.validator.BeanValidator.VALIDATOR_FACTORY_KEY;
 import static javax.validation.Validation.buildDefaultValidatorFactory;
 import static org.omnifaces.util.Faces.getApplicationAttribute;
@@ -43,8 +44,8 @@ public final class Platform {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	public static final String BEAN_VALIDATION_AVAILABLE = "org.omnifaces.BEAN_VALIDATION_AVAILABLE";
-	private static final Logger logger = Logger.getLogger(Platform.class.getName());
 
+	private static final Logger logger = Logger.getLogger(Platform.class.getName());
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -82,7 +83,7 @@ public final class Platform {
 				beanValidationAvailable = TRUE;
 			} catch (Exception | LinkageError e) {
 				beanValidationAvailable = FALSE;
-				logger.warning("Bean validation not available.");
+				logger.log(WARNING, "Bean validation not available.", e);
 			}
 
 			setApplicationAttribute(BEAN_VALIDATION_AVAILABLE, beanValidationAvailable);

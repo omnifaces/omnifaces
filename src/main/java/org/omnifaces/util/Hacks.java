@@ -20,6 +20,7 @@ import static org.omnifaces.util.FacesLocal.setContextAttribute;
 import static org.omnifaces.util.Reflection.accessField;
 import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Reflection.invokeMethod;
+import static org.omnifaces.util.Reflection.toClassOrNull;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.Serializable;
@@ -97,12 +98,8 @@ public final class Hacks {
 
 	private static boolean initRichFacesInstalled() {
 		for (String richFacesPvcClassName : RICHFACES_PVC_CLASS_NAMES) {
-			try {
-				Class.forName(richFacesPvcClassName);
+			if (toClassOrNull(richFacesPvcClassName) != null) {
 				return true;
-			}
-			catch (ClassNotFoundException ignore) {
-				continue;
 			}
 		}
 

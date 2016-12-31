@@ -14,6 +14,7 @@ package org.omnifaces.util;
 
 import static java.beans.Introspector.getBeanInfo;
 import static java.beans.PropertyEditorManager.findEditor;
+import static java.util.logging.Level.FINE;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -27,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import javax.enterprise.inject.Typed;
 
@@ -39,6 +41,8 @@ import javax.enterprise.inject.Typed;
  */
 @Typed
 public final class Reflection {
+
+	private static final Logger logger = Logger.getLogger(Reflection.class.getName());
 
 	private static final String ERROR_LOAD_CLASS = "Cannot load class '%s'.";
 	private static final String ERROR_CREATE_INSTANCE = "Cannot create instance of class '%s'.";
@@ -212,6 +216,7 @@ public final class Reflection {
 				return (Class<T>) Class.forName(className);
 			}
 			catch (Exception ignore) {
+				logger.log(FINE, "Ignoring thrown exception; previous exception will be rethrown instead.", ignore);
 				// Just continue to IllegalStateException on original ClassNotFoundException.
 			}
 
@@ -233,7 +238,8 @@ public final class Reflection {
 		try {
 			return toClass(className);
 		}
-		catch (Exception e) {
+		catch (Exception ignore) {
+			logger.log(FINE, "Ignoring thrown exception; the sole intent is to return null instead.", ignore);
 			return null;
 		}
 	}

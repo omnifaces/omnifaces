@@ -14,6 +14,7 @@ package org.omnifaces.util;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
+import static java.util.logging.Level.FINE;
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Reflection.toClassOrNull;
@@ -48,6 +49,7 @@ import java.util.Map.Entry;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.el.ELContext;
 import javax.el.ELResolver;
@@ -129,6 +131,8 @@ import org.omnifaces.config.FacesConfigXml;
 public final class FacesLocal {
 
 	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final Logger logger = Logger.getLogger(FacesLocal.class.getName());
 
 	private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
 	private static final int DEFAULT_SENDFILE_BUFFER_SIZE = 10240;
@@ -651,6 +655,7 @@ public final class FacesLocal {
 				return bundle.getString(key);
 			}
 			catch (MissingResourceException ignore) {
+				logger.log(FINE, "Ignoring thrown exception; there is a fallback anyway.", ignore);
 				continue;
 			}
 		}

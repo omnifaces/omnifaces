@@ -14,6 +14,7 @@ package org.omnifaces.util;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
+import static java.util.logging.Level.FINE;
 import static java.util.regex.Pattern.quote;
 import static javax.faces.component.UIComponent.getCompositeComponentParent;
 import static javax.faces.component.visit.VisitContext.createVisitContext;
@@ -46,6 +47,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.el.MethodExpression;
 import javax.el.ValueExpression;
@@ -147,6 +149,8 @@ import org.omnifaces.el.ScopedRunner;
 public final class Components {
 
 	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final Logger logger = Logger.getLogger(Components.class.getName());
 
 	private static final String ERROR_MISSING_PARENT =
 		"Component '%s' must have a parent of type '%s', but it cannot be found.";
@@ -276,18 +280,12 @@ public final class Components {
 		}
 
 		for (UIComponent parent = component; parent != null; parent = parent.getParent()) {
-
-			UIComponent result = null;
 			if (parent instanceof NamingContainer) {
-				try {
-					result = parent.findComponent(clientId);
-				} catch (IllegalArgumentException e) {
-					continue;
-				}
-			}
+				UIComponent result = findComponentIgnoringIAE(parent, clientId);
 
-			if (result != null) {
-				return (C) result;
+				if (result != null) {
+					return (C) result;
+				}
 			}
 		}
 
@@ -316,11 +314,7 @@ public final class Components {
 
 			UIComponent result = null;
 			if (child instanceof NamingContainer) {
-				try {
-					result = child.findComponent(clientId);
-				} catch (IllegalArgumentException e) {
-					continue;
-				}
+				result = findComponentIgnoringIAE(child, clientId);
 			}
 
 			if (result == null) {
@@ -1500,15 +1494,15 @@ public final class Components {
 	}
 
 	/**
-	 * Use {@link UIViewRoot#findComponent(String)} and ignore the potential {@link IllegalArgumentException} by
+	 * Use {@link UIComponent#findComponent(String)} and ignore the potential {@link IllegalArgumentException} by
 	 * returning null instead.
 	 */
-	private static UIComponent findComponentIgnoringIAE(UIViewRoot viewRoot, String clientId) {
+	private static UIComponent findComponentIgnoringIAE(UIComponent parent, String clientId) {
 		try {
-			return viewRoot.findComponent(clientId);
+			return parent.findComponent(clientId);
 		}
 		catch (IllegalArgumentException ignore) {
-			// May occur when view has changed by for example a successful navigation.
+			logger.log(FINE, "Ignoring thrown exception; this may occur when view has changed by for example a successful navigation.", ignore);
 			return null;
 		}
 	}

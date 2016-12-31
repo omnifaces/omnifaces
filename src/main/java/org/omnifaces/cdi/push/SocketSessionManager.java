@@ -13,6 +13,7 @@
 package org.omnifaces.cdi.push;
 
 import static java.util.Collections.emptySet;
+import static java.util.logging.Level.FINE;
 import static javax.websocket.CloseReason.CloseCodes.NORMAL_CLOSURE;
 import static org.omnifaces.cdi.push.SocketEndpoint.PARAM_CHANNEL;
 import static org.omnifaces.util.Beans.getReference;
@@ -54,6 +55,7 @@ public class SocketSessionManager {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final Logger logger = Logger.getLogger(SocketSessionManager.class.getName());
+
 	private static final CloseReason REASON_EXPIRED = new CloseReason(NORMAL_CLOSURE, "Expired");
 	private static final AnnotationLiteral<Opened> SESSION_OPENED = new AnnotationLiteral<Opened>() {
 		private static final long serialVersionUID = 1L;
@@ -195,7 +197,7 @@ public class SocketSessionManager {
 							session.close(REASON_EXPIRED);
 						}
 						catch (IOException ignore) {
-							continue;
+							logger.log(FINE, "Ignoring thrown exception; there is nothing more we could do here.", ignore);
 						}
 					}
 				}

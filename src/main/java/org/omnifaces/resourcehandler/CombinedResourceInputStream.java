@@ -12,6 +12,7 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static java.util.logging.Level.FINE;
 import static org.omnifaces.util.Faces.getRequestDomainURL;
 
 import java.io.ByteArrayInputStream;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.faces.application.Resource;
 
@@ -37,6 +39,8 @@ import org.omnifaces.util.Utils;
 public final class CombinedResourceInputStream extends InputStream {
 
 	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final Logger logger = Logger.getLogger(CombinedResourceHandler.class.getName());
 
 	private static final byte[] CRLF = { '\r', '\n' };
 
@@ -65,6 +69,7 @@ public final class CombinedResourceInputStream extends InputStream {
 				stream = resource.getInputStream();
 			}
 			catch (Exception richFacesDoesNotSupportThis) {
+				logger.log(FINE, "Ignoring thrown exception; this can only be caused by a buggy component library.", richFacesDoesNotSupportThis);
 				stream = new URL(domainURL + resource.getRequestPath()).openStream();
 			}
 

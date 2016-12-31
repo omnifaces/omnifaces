@@ -16,6 +16,7 @@ import static java.lang.reflect.Modifier.isPublic;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.unmodifiableMap;
+import static java.util.logging.Level.FINE;
 import static org.omnifaces.util.Beans.getManager;
 import static org.omnifaces.util.BeansLocal.getReference;
 import static org.omnifaces.util.Faces.getContext;
@@ -39,6 +40,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 import javax.el.ValueExpression;
 import javax.enterprise.inject.Any;
@@ -69,6 +71,8 @@ import org.omnifaces.util.Faces;
 public class GraphicResource extends DynamicResource {
 
 	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final Logger logger = Logger.getLogger(GraphicResource.class.getName());
 
 	private static final String DEFAULT_CONTENT_TYPE = "image";
 	private static final Map<String, String> CONTENT_TYPES_BY_BASE64_HEADER = createContentTypesByBase64Header();
@@ -249,8 +253,9 @@ public class GraphicResource extends DynamicResource {
 			method = methodReference.getMethod();
 			convertedParams = convertToObjects(getContext(), params, method.getParameterTypes());
 		}
-		catch (Exception e) {
-			return null; // Ignore hacker attempts. I'd rather return 400 here, but JSF spec doesn't support it.
+		catch (Exception ignore) {
+			logger.log(FINE, "Ignoring thrown exception; this can only be a hacker attempt.", ignore);
+			return null; // I'd rather return 400 here, but JSF spec doesn't support it.
 		}
 
 		Object content;

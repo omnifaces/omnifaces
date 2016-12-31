@@ -12,9 +12,11 @@
  */
 package org.omnifaces.el;
 
+import static java.util.logging.Level.FINE;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.el.ELContext;
 import javax.el.ELException;
@@ -39,6 +41,7 @@ import javax.faces.validator.ValidatorException;
 public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 
 	private static final long serialVersionUID = 1L;
+	private static final Logger logger = Logger.getLogger(MethodExpressionValueExpressionAdapter.class.getName());
 
 	private static final Set<Class<? extends Throwable>> EXCEPTIONS_TO_UNWRAP = unmodifiableSet(
 		MethodNotFoundException.class, // Needed for proper action listener error handling.
@@ -159,6 +162,8 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 			try {
 				return super.getValue(context, base, property);
 			} catch (PropertyNotFoundException ignore) {
+				logger.log(FINE, "Ignoring thrown exception; there is really no clean way to distinguish a ValueExpression from a MethodExpression.", ignore);
+
 				try {
 					return super.invoke(context, base, property, null, callerProvidedParameters != null ? callerProvidedParameters : EMPTY_PARAMETERS);
 				} catch (MethodNotFoundException e) {

@@ -13,6 +13,7 @@
 package org.omnifaces.cdi.viewscope;
 
 import static java.lang.Boolean.TRUE;
+import static java.util.logging.Level.FINE;
 import static org.omnifaces.util.Ajax.load;
 import static org.omnifaces.util.Ajax.oncomplete;
 import static org.omnifaces.util.BeansLocal.getInstance;
@@ -23,6 +24,7 @@ import static org.omnifaces.util.FacesLocal.getRequestParameter;
 import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
 
 import java.util.UUID;
+import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.spi.Contextual;
@@ -75,6 +77,8 @@ public class ViewScopeManager {
 	public static final int DEFAULT_MAX_ACTIVE_VIEW_SCOPES = 20; // Mojarra's default is 15 and MyFaces' default is 20.
 
 	// Private constants ----------------------------------------------------------------------------------------------
+
+	private static final Logger logger = Logger.getLogger(ViewScopeManager.class.getName());
 
 	private static final ResourceIdentifier SCRIPT_ID = new ResourceIdentifier("omnifaces", "omnifaces.js");
 	private static final String SCRIPT_INIT = "OmniFaces.Unload.init('%s')";
@@ -130,7 +134,8 @@ public class ViewScopeManager {
 				beanStorageId = UUID.fromString(getRequestParameter(context, "id"));
 			}
 			catch (Exception ignore) {
-				return; // Ignore hacker attempts.
+				logger.log(FINE, "Ignoring thrown exception; this can only be a hacker attempt.", ignore);
+				return;
 			}
 		}
 		else if (isAjaxRequestWithPartialRendering(context)) {
