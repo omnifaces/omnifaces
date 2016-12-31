@@ -22,6 +22,7 @@ import javax.faces.context.FacesContext;
 
 import org.omnifaces.component.output.Cache;
 import org.omnifaces.el.ValueExpressionWrapper;
+import org.omnifaces.util.Components;
 
 /**
  * A value expression implementation that caches its main value at the moment it's evaluated and uses
@@ -34,23 +35,24 @@ public class CachingValueExpression extends ValueExpressionWrapper {
 
 	private static final long serialVersionUID = -3172741983469325940L;
 
-	private final String name;
-	private final Cache cache;
+	private final String cacheAttributeName;
+	private final String cacheComponentClientId;
 
-	public CachingValueExpression(String name, ValueExpression valueExpression, Cache cache) {
+	public CachingValueExpression(ValueExpression valueExpression, String cacheAttributeName, String cacheComponentClientId) {
 		super(valueExpression);
-		this.name = name;
-		this.cache = cache;
+		this.cacheAttributeName = cacheAttributeName;
+		this.cacheComponentClientId = cacheComponentClientId;
 	}
 
 	@Override
 	public Object getValue(ELContext elContext) {
+		Cache cache = Components.findComponent(cacheComponentClientId);
 		FacesContext facesContext = getContext(elContext);
 
-		Object value = cache.getCacheAttribute(facesContext, name);
+		Object value = cache.getCacheAttribute(facesContext, cacheAttributeName);
 		if (value == null) {
 			value = super.getValue(elContext);
-			cache.setCacheAttribute(facesContext, name, value);
+			cache.setCacheAttribute(facesContext, cacheAttributeName, value);
 		}
 
 		return value;
@@ -58,12 +60,12 @@ public class CachingValueExpression extends ValueExpressionWrapper {
 
 	@Override
 	public boolean equals(Object object) {
-		return super.equals(object) && Objects.equals(name, ((CachingValueExpression) object).name);
+		return super.equals(object) && Objects.equals(cacheAttributeName, ((CachingValueExpression) object).cacheAttributeName);
 	}
 
 	@Override
 	public int hashCode() {
-		return super.hashCode() + Objects.hashCode(name);
+		return super.hashCode() + Objects.hashCode(cacheAttributeName);
 	}
 
 }

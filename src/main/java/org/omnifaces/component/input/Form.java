@@ -17,6 +17,7 @@ import static javax.servlet.RequestDispatcher.ERROR_REQUEST_URI;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeRequestParams;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeViewParams;
 import static org.omnifaces.component.input.Form.PropertyKeys.useRequestURI;
+import static org.omnifaces.util.Components.getParams;
 import static org.omnifaces.util.FacesLocal.getRequestAttribute;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
 import static org.omnifaces.util.FacesLocal.getRequestURI;
@@ -38,7 +39,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.FacesContextWrapper;
 
 import org.omnifaces.taghandler.IgnoreValidationFailed;
-import org.omnifaces.util.Components;
 import org.omnifaces.util.State;
 
 /**
@@ -168,6 +168,23 @@ public class Form extends HtmlForm {
 		super.encodeBegin(new ActionURLDecorator(context, this));
 	}
 
+	/**
+	 * The actual method we're decorating in order to either include the view parameters into the action URL, or include
+	 * the request parameters into the action URL, or use request URI as action URL. Any <code>&lt;f|o:param&gt;</code>
+	 * nested in the form component will be included in the query string, overriding any existing view or request
+	 * parameters on same name.
+	 */
+	private String getActionURL(FacesContext context, ViewHandler viewHandler, String viewId) {
+		String actionURL = isUseRequestURI() ? getActionURL(context) : viewHandler.getActionURL(context, viewId);
+		String queryString = toQueryString(getParams(this, isUseRequestURI() || isIncludeRequestParams(), isIncludeViewParams()));
+		return isEmpty(queryString) ? actionURL : (actionURL + (actionURL.contains("?") ? "&" : "?") + queryString);
+	}
+
+	private String getActionURL(FacesContext context) {
+		String actionURL = (getRequestAttribute(context, ERROR_REQUEST_URI) != null) ? getRequestContextPath(context) : getRequestURI(context);
+		return actionURL.isEmpty() ? "/" : actionURL;
+	}
+
 	// Getters/setters ------------------------------------------------------------------------------------------------
 
 	/**
@@ -290,7 +307,6 @@ public class Form extends HtmlForm {
 		private final FacesContext facesContext;
 		private final Form form;
 
-
 		public ActionURLDecorator(FacesContext facesContext, Form form) {
 			this.facesContext = facesContext;
 			this.form = form;
@@ -300,7 +316,7 @@ public class Form extends HtmlForm {
 		public Application getApplication() {
 			return new ApplicationWrapper() {
 
-				private final Application application = ActionURLDecorator.super.getApplication();
+				private final Application application = facesContext.getApplication();
 
 				@Override
 				public ViewHandler getViewHandler() {
@@ -308,22 +324,9 @@ public class Form extends HtmlForm {
 
 						private final ViewHandler viewHandler = application.getViewHandler();
 
-						/**
-						 * The actual method we're decorating in order to either include the view parameters into the
-						 * action URL, or include the request parameters into the action URL, or use request URI as
-						 * action URL. Any <code>&lt;f|o:param&gt;</code> nested in the form component will be included
-						 * in the query string, overriding any existing view or request parameters on same name.
-						 */
 						@Override
 						public String getActionURL(FacesContext context, String viewId) {
-							String url = form.isUseRequestURI() ? getActionURL(context) : super.getActionURL(context, viewId);
-							String queryString = toQueryString(Components.getParams(form, form.isUseRequestURI() || form.isIncludeRequestParams(), form.isIncludeViewParams()));
-							return isEmpty(queryString) ? url : url + (url.contains("?") ? "&" : "?") + queryString;
-						}
-
-						private String getActionURL(FacesContext context) {
-							String actionURL = (getRequestAttribute(context, ERROR_REQUEST_URI) != null) ? getRequestContextPath(context) : getRequestURI(context);
-							return actionURL.isEmpty() ? "/" : actionURL;
+							return form.getActionURL(context, viewHandler, viewId);
 						}
 
 						@Override

@@ -94,7 +94,9 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 	 * A mapped resource request without extension is encountered.
 	 * The user setting "dispatchMethod" determines how we handle this.
 	 */
-	private boolean filterExtensionLess(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+	private boolean filterExtensionLess(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+			throws IOException, ServletException
+	{
 		String servletPath = request.getServletPath();
 
 		if (!isExtensionless(servletPath)) {
@@ -122,12 +124,18 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 			}
 		}
 
+		return filterExtensionLess(request, response, chain, resources, resource, normalizedServletPath);
+	}
+
+	private boolean filterExtensionLess(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
+			Map<String, String> resources, String resource, String path) throws IOException, ServletException
+	{
 		if (resources.containsKey(resource)) {
-			if (redirectExtensionLessWelcomeFileToFolderIfNecessary(request, response, normalizedServletPath)) {
+			if (redirectExtensionLessWelcomeFileToFolderIfNecessary(request, response, path)) {
 				return true;
 			}
 
-			String servletPathWithExtension = normalizedServletPath + getExtension(resources.get(resource));
+			String servletPathWithExtension = path + getExtension(resources.get(resource));
 
 			if (dispatchMethod == DO_FILTER && resources.containsKey(servletPathWithExtension)) {
 				filterExtensionLessToExtension(request, response, chain, servletPathWithExtension);

@@ -114,11 +114,16 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
 			return;
 		}
 
+		addValidator(context, (EditableValueHolder) parent);
+	}
+
+	private void addValidator(FaceletContext context, EditableValueHolder parent) {
 		final javax.faces.validator.Validator validator = createInstance(context, this, "validatorId");
 		final DeferredAttributes attributes = collectDeferredAttributes(context, this, validator);
 		final ValueExpression disabled = getValueExpression(context, this, "disabled", Boolean.class);
 		final ValueExpression message = getValueExpression(context, this, "message", String.class);
-		((EditableValueHolder) parent).addValidator(new DeferredValidator() {
+
+		parent.addValidator(new DeferredValidator() {
 			private static final long serialVersionUID = 1L;
 
 			@Override
@@ -132,19 +137,23 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
 						validator.validate(context, component, value);
 					}
 					catch (ValidatorException e) {
-						if (message != null) {
-							String validatorMessage = (String) message.getValue(el);
-
-							if (validatorMessage != null) {
-								String label = getLabel(component);
-								throw new ValidatorException(Messages.create(validatorMessage, label)
-									.detail(validatorMessage, label).error().get(), e.getCause());
-							}
-						}
-
-						throw e;
+						rethrowValidatorException(context, component, message, e);
 					}
 				}
+			}
+
+			private void rethrowValidatorException(FacesContext context, UIComponent component, ValueExpression message, ValidatorException e) {
+				if (message != null) {
+					String validatorMessage = (String) message.getValue(context.getELContext());
+
+					if (validatorMessage != null) {
+						String label = getLabel(component);
+						throw new ValidatorException(Messages.create(validatorMessage, label)
+							.detail(validatorMessage, label).error().get(), e.getCause());
+					}
+				}
+
+				throw e;
 			}
 		});
 	}

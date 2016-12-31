@@ -159,6 +159,7 @@ public final class Reflection {
 	public static Method findMethod(Object base, String methodName, Object... params) {
 
 		List<Method> methods = new ArrayList<>();
+
 		for (Class<?> cls = base.getClass(); cls != null; cls = cls.getSuperclass()) {
 			for (Method method : cls.getDeclaredMethods()) {
 				if (method.getName().equals(methodName) && method.getParameterTypes().length == params.length) {
@@ -167,13 +168,22 @@ public final class Reflection {
 			}
 		}
 
-		if (methods.size() == 1) {
+		if (methods.isEmpty()) {
+			return null;
+		}
+		else if (methods.size() == 1) {
 			return methods.get(0);
 		}
+		else {
+			return closestMatchingMethod(methods, params);  // Overloaded methods were found. Try to find closest match.
+		}
+	}
 
-		for (Method method : methods) { // Overloaded methods were found. Try to get a match
-			boolean match = true;
+	private static Method closestMatchingMethod(List<Method> methods, Object... params) {
+		for (Method method : methods) {
 			Class<?>[] candidateParams = method.getParameterTypes();
+			boolean match = true;
+
 			for (int i = 0; i < params.length; i++) {
 				if (!candidateParams[i].isInstance(params[i])) {
 					match = false;
@@ -181,14 +191,12 @@ public final class Reflection {
 				}
 			}
 
-			// If all candidate parameters were expected and for none of them the actual
-			// parameter was NOT an instance, we have a match
+			// If all candidate parameters were expected and for none of them the actual parameter was NOT an instance, we have a match.
 			if (match) {
 				return method;
 			}
 
-			// Else, at least one parameter was not an instance
-			// Go ahead a test then next methods
+			// Else, at least one parameter was not an instance. Go ahead a test then next methods.
 		}
 
 		return null;

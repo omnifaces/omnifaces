@@ -16,7 +16,6 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static org.omnifaces.util.Beans.getCurrentInjectionPoint;
 
-import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Collections;
@@ -49,9 +48,7 @@ import org.omnifaces.cdi.Param;
  *
  */
 @Typed
-public class DynamicParamValueProducer implements Bean<Object>, Serializable, PassivationCapable {
-
-	private static final long serialVersionUID = 1L;
+public class DynamicParamValueProducer implements Bean<Object>, PassivationCapable {
 
 	private Set<Type> types;
 

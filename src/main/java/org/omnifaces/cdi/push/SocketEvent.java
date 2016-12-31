@@ -86,11 +86,16 @@ public final class SocketEvent implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object other) {
-		return other != null && getClass() == other.getClass()
-			&& Objects.equals(channel, ((SocketEvent) other).channel)
-			&& Objects.equals(user, ((SocketEvent) other).user)
-			&& Objects.equals(code, ((SocketEvent) other).code);
+	public boolean equals(Object object) {
+		if (object == null || getClass() != object.getClass()) {
+			return false;
+		}
+
+		SocketEvent other = (SocketEvent) object;
+
+		return Objects.equals(channel, other.channel)
+			&& Objects.equals(user, other.user)
+			&& Objects.equals(code, other.code);
 	}
 
 	@Override

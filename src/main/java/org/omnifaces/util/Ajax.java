@@ -200,14 +200,18 @@ public final class Ajax {
 				}
 			}
 			else if (column instanceof UIData) { // <p:columns>.
-				String columnId = column.getId();
-				int columnCount = ((UIData) column).getRowCount();
+				updateRowCells((UIData) column, renderIds, tableId, index, separator);
+			}
+		}
+	}
 
-				for (UIComponent cell : column.getChildren()) {
-					for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
-						renderIds.add(String.format("%s%c%d%c%s%c%d%c%s", tableId, separator, index, separator, columnId, separator, columnIndex, separator, cell.getId()));
-					}
-				}
+	private static void updateRowCells(UIData columns, Collection<String> renderIds, String tableId, int index, char separator) {
+		String columnId = columns.getId();
+		int columnCount = columns.getRowCount();
+
+		for (UIComponent cell : columns.getChildren()) {
+			for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+				renderIds.add(String.format("%s%c%d%c%s%c%d%c%s", tableId, separator, index, separator, columnId, separator, columnIndex, separator, cell.getId()));
 			}
 		}
 	}

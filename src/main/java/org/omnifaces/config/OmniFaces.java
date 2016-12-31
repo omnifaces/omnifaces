@@ -20,12 +20,23 @@ import java.util.ResourceBundle;
 
 
 /**
- * Collection of utility methods for OmniFaces internals.
+ * Collection of constants and utility methods for OmniFaces internals.
  *
  * @author Bauke Scholtz
  * @since 2.5
  */
 public final class OmniFaces {
+
+	// Public constants -----------------------------------------------------------------------------------------------
+
+	/** Returns the "omnifaces" resource library name. */
+	public static final String LIBRARY_NAME = "omnifaces";
+
+	/** Returns the "omnifaces.js" main script name. */
+	public static final String SCRIPT_NAME = "omnifaces.js";
+
+	/** Returns the "unload.js" unload script name. */
+	public static final String UNLOAD_SCRIPT_NAME = "unload.js";
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
