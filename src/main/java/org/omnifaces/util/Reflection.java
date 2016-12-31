@@ -168,10 +168,7 @@ public final class Reflection {
 			}
 		}
 
-		if (methods.isEmpty()) {
-			return null;
-		}
-		else if (methods.size() == 1) {
+		if (methods.size() == 1) {
 			return methods.get(0);
 		}
 		else {

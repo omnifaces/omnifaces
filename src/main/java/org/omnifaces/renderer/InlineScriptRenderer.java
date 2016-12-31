@@ -70,7 +70,7 @@ public class InlineScriptRenderer extends InlineResourceRenderer {
 				}
 
 				writer.write(ch);
-				break;
+				return;
 			}
 
 			length++;
@@ -78,7 +78,7 @@ public class InlineScriptRenderer extends InlineResourceRenderer {
 			if (length == END_SCRIPT.length) {
 				writer.write('\\'); // Escape closing script tags which may occur in JS literals.
 				writer.write(END_SCRIPT);
-				break;
+				return;
 			}
 		}
 	}
