@@ -181,17 +181,15 @@ public final class Json {
 					String.format(ERROR_INVALID_GETTER, property.getName(), bean.getClass()), e);
 			}
 
-			if (value == null) {
-				continue;
-			}
+			if (value != null) {
+				if (i++ > 0) {
+					builder.append(',');
+				}
 
-			if (i++ > 0) {
-				builder.append(',');
+				encode(property.getName(), builder);
+				builder.append(':');
+				encode(value, builder);
 			}
-
-			encode(property.getName(), builder);
-			builder.append(':');
-			encode(value, builder);
 		}
 
 		builder.append('}');

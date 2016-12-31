@@ -121,7 +121,7 @@ public class ViewScopeManager {
 	 * @return The CDI view scoped managed bean from the current JSF view scope.
 	 */
 	public <T> T getBean(Contextual<T> type) {
-		return getBeanStorage(type).getBean(type, manager);
+		return getBeanStorage(type).getBean(type);
 	}
 
 	/**

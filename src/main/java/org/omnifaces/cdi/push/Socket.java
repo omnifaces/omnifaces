@@ -623,7 +623,7 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 	/** The boolean context parameter name to register web socket endpoint during startup. */
 	public static final String PARAM_SOCKET_ENDPOINT_ENABLED = "org.omnifaces.SOCKET_ENDPOINT_ENABLED";
 
-	/** Naming convention was wrong. Use {@link #PARAM_SOCKET_ENDPOINT_ENABLED} instead. */
+	/** Naming convention was wrong. Use {@link #PARAM_SOCKET_ENDPOINT_ENABLED} instead. @deprecated */
 	@Deprecated // TODO: remove in 3.0.
 	public static final String PARAM_ENABLE_SOCKET_ENDPOINT = "org.omnifaces.ENABLE_SOCKET_ENDPOINT";
 

@@ -12,6 +12,7 @@
  */
 package org.omnifaces.config;
 
+import static java.util.Collections.emptySet;
 import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.Faces.hasContext;
 import static org.omnifaces.util.Utils.isEmpty;
@@ -266,11 +267,13 @@ public enum WebXml {
 			}
 		}
 
-		return null;
+		return emptySet();
 	}
 
 	private Set<String> findPrefixMatchRoles(String url) {
-		for (String path = url, urlMatch = ""; !path.isEmpty(); path = path.substring(0, path.lastIndexOf('/'))) {
+		String urlMatch = "";
+
+		for (String path = url; !path.isEmpty(); path = path.substring(0, path.lastIndexOf('/'))) {
 			Set<String> roles = null;
 
 			for (Entry<String, Set<String>> entry : securityConstraints.entrySet()) {
@@ -285,7 +288,7 @@ public enum WebXml {
 			}
 		}
 
-		return null;
+		return emptySet();
 	}
 
 	private Set<String> findSuffixMatchRoles(String url) {
@@ -297,7 +300,7 @@ public enum WebXml {
 			}
 		}
 
-		return null;
+		return emptySet();
 	}
 
 	private static boolean isExactMatch(String urlPattern, String url) {
@@ -313,7 +316,7 @@ public enum WebXml {
 	}
 
 	private static boolean isRoleMatch(Set<String> roles, String role) {
-		return roles == null || roles.contains(role) || (role != null && roles.contains("*"));
+		return roles.contains(role) || (role != null && roles.contains("*"));
 	}
 
 	// Getters --------------------------------------------------------------------------------------------------------

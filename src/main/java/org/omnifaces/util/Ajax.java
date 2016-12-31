@@ -249,13 +249,9 @@ public final class Ajax {
 		String tableId = table.getClientId(context);
 		char separator = UINamingContainer.getSeparatorChar(context);
 		Collection<String> renderIds = getContext().getRenderIds();
-		int columnIndex = 0;
+		UIColumn column = findColumn(table, index);
 
-		for (UIComponent column : table.getChildren()) {
-			if (!(column instanceof UIColumn) || columnIndex++ != index) {
-				continue;
-			}
-
+		if (column != null) {
 			for (UIComponent cell : column.getChildren()) {
 				String cellId = cell.getId();
 
@@ -263,9 +259,19 @@ public final class Ajax {
 					renderIds.add(String.format("%s%c%d%c%s", tableId, separator, rowIndex, separator, cellId));
 				}
 			}
-
-			break;
 		}
+	}
+
+	private static UIColumn findColumn(UIData table, int index) {
+		int columnIndex = 0;
+
+		for (UIComponent column : table.getChildren()) {
+			if (column instanceof UIColumn && columnIndex++ == index) {
+				return (UIColumn) column;
+			}
+		}
+
+		return null;
 	}
 
 	/**

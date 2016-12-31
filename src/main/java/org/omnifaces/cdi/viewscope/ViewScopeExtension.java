@@ -14,7 +14,6 @@ package org.omnifaces.cdi.viewscope;
 
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
-import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.Extension;
 
 import org.omnifaces.cdi.ViewScoped;
@@ -37,9 +36,8 @@ public class ViewScopeExtension implements Extension {
 	 * Register a new view scope context, wrapping the given bean manager and view scope manager bean, in the current
 	 * CDI context.
 	 * @param event The after bean discovery event.
-	 * @param manager The bean manager.
 	 */
-	protected void afterBeanDiscovery(@Observes AfterBeanDiscovery event, BeanManager manager) {
+	protected void afterBeanDiscovery(@Observes AfterBeanDiscovery event) {
 		event.addContext(new ViewScopeContext());
 	}
 

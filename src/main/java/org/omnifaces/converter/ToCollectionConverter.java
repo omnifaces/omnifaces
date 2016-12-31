@@ -86,8 +86,6 @@ public class ToCollectionConverter extends TrimConverter {
 			return null;
 		}
 
-		String delimiter = coalesce(this.delimiter, DEFAULT_DELIMITER);
-		String collectionType = coalesce(this.collectionType, DEFAULT_COLLECTION_TYPE);
 		Converter converter = createConverter(itemConverter);
 		ValueExpression valueExpression = component.getValueExpression("value");
 
@@ -99,7 +97,7 @@ public class ToCollectionConverter extends TrimConverter {
 				throw new IllegalArgumentException(valueExpression.getExpressionString() + " does not resolve to Collection.");
 			}
 
-			if (this.collectionType == null && Set.class.isAssignableFrom(returnType)) {
+			if (collectionType == null && Set.class.isAssignableFrom(returnType)) {
 				collectionType = DEFAULT_SET_TYPE;
 			}
 
@@ -113,9 +111,9 @@ public class ToCollectionConverter extends TrimConverter {
 			}
 		}
 
-		Collection<Object> collection = Reflection.instance(collectionType);
+		Collection<Object> collection = Reflection.instance(coalesce(collectionType, DEFAULT_COLLECTION_TYPE));
 
-		for (String item : submittedValue.split(quote(delimiter.trim()))) {
+		for (String item : submittedValue.split(quote(coalesce(this.delimiter, DEFAULT_DELIMITER).trim()))) {
 			Object trimmed = super.getAsObject(context, component, item);
 			collection.add(converter == null ? trimmed : converter.getAsString(context, component, trimmed));
 		}

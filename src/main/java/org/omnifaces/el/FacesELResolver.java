@@ -60,18 +60,15 @@ public class FacesELResolver extends ELResolver {
 
 			String name = method.getName();
 
-			if (!startsWithOneOf(name, "get", "is")) {
-				continue;
+			if (startsWithOneOf(name, "get", "is")) {
+				String property = decapitalize(name.replaceFirst("(get|is)", ""));
+
+				if (startsWithOneOf(property, "response", "session", "flash")) {
+					continue;
+				}
+
+				FACES_PROPERTIES.put(property, method);
 			}
-
-			String property = decapitalize(name.replaceFirst("(get|is)", ""));
-
-			if (startsWithOneOf(property, "response", "session", "flash")) {
-				continue;
-			}
-
-			FACES_PROPERTIES.put(property, method);
-
 		}
 	}
 

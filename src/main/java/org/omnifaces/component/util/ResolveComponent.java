@@ -119,22 +119,19 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 				throw new IllegalArgumentException(format(ERROR_COMPONENT_NOT_FOUND, forValue, getId()));
 			}
 
-			String scope = getScope();
+			String scope = getScope();  // TODO: refactor "scope" to a reusable enum, together with those of a.o. Cache.
 
-			switch (scope) { // TODO: refactor "scope" to a reusable enum, together with those of a.o. Cache.
-				case DEFAULT_SCOPE:
-					// Component will be resolved again dynamically when the value expression is evaluated.
-					if (readOnlyValueExpression != null) {
-						readOnlyValueExpression.setCallbackReturning(new ComponentClientIdResolver(component.getClientId()));
-					}
-					break;
-
-				case "request":
-					setRequestAttribute(getName(), component);
-					break;
-
-				default:
-					throw new IllegalArgumentException(format(ERROR_ILLEGAL_SCOPE, scope));
+			if (DEFAULT_SCOPE.equals(scope)) {
+				// Component will be resolved again dynamically when the value expression is evaluated.
+				if (readOnlyValueExpression != null) {
+					readOnlyValueExpression.setCallbackReturning(new ComponentClientIdResolver(component.getClientId()));
+				}
+			}
+			else if ("request".equals(scope)) {
+				setRequestAttribute(getName(), component);
+			}
+			else {
+				throw new IllegalArgumentException(format(ERROR_ILLEGAL_SCOPE, scope));
 			}
 		}
 	}

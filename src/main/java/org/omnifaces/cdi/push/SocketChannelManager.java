@@ -93,7 +93,7 @@ public class SocketChannelManager implements Serializable {
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	private static final ConcurrentHashMap<String, String> APPLICATION_SCOPE = new ConcurrentHashMap<>(ESTIMATED_CHANNELS_PER_APPLICATION);
-	private final ConcurrentHashMap<String, String> sessionScope = new ConcurrentHashMap<>(ESTIMATED_CHANNELS_PER_SESSION);
+	private final ConcurrentHashMap<String, String> sessionScopedChannels = new ConcurrentHashMap<>(ESTIMATED_CHANNELS_PER_SESSION);
 	private final ConcurrentHashMap<Serializable, String> sessionUsers = new ConcurrentHashMap<>(ESTIMATED_USERS_PER_SESSION);
 
 	@Inject
@@ -117,9 +117,9 @@ public class SocketChannelManager implements Serializable {
 	@SuppressWarnings("unchecked")
 	protected String register(String channel, String scope, Serializable user) {
 		switch (Scope.of(scope, user)) {
-			case APPLICATION: return register(null, channel, APPLICATION_SCOPE, sessionScope, getViewScope(false));
-			case SESSION: return register(user, channel, sessionScope, APPLICATION_SCOPE, getViewScope(false));
-			case VIEW: return register(user, channel, getViewScope(true), APPLICATION_SCOPE, sessionScope);
+			case APPLICATION: return register(null, channel, APPLICATION_SCOPE, sessionScopedChannels, getViewScopedChannels(false));
+			case SESSION: return register(user, channel, sessionScopedChannels, APPLICATION_SCOPE, getViewScopedChannels(false));
+			case VIEW: return register(user, channel, getViewScopedChannels(true), APPLICATION_SCOPE, sessionScopedChannels);
 			default: throw new UnsupportedOperationException();
 		}
 	}
@@ -161,7 +161,7 @@ public class SocketChannelManager implements Serializable {
 			socketUsers.deregister(sessionUser.getKey(), sessionUser.getValue());
 		}
 
-		socketSessions.deregister(sessionScope.values());
+		socketSessions.deregister(sessionScopedChannels.values());
 	}
 
 	// Nested classes -------------------------------------------------------------------------------------------------
@@ -177,14 +177,14 @@ public class SocketChannelManager implements Serializable {
 	protected static class ViewScope implements Serializable {
 
 		private static final long serialVersionUID = 1L;
-		private ConcurrentHashMap<String, String> viewScope = new ConcurrentHashMap<>(ESTIMATED_CHANNELS_PER_VIEW);
+		private ConcurrentHashMap<String, String> channels = new ConcurrentHashMap<>(ESTIMATED_CHANNELS_PER_VIEW);
 
 		/**
 		 * Returns the view scoped channels.
 		 * @return The view scoped channels.
 		 */
-		protected Map<String, String> getViewScope() {
-			return viewScope;
+		protected Map<String, String> getChannels() {
+			return channels;
 		}
 
 		/**
@@ -193,7 +193,7 @@ public class SocketChannelManager implements Serializable {
 		 */
 		@PreDestroy
 		protected void deregisterViewScope() {
-			SocketSessionManager.getInstance().deregister(viewScope.values());
+			SocketSessionManager.getInstance().deregister(channels.values());
 		}
 
 	}
@@ -206,8 +206,8 @@ public class SocketChannelManager implements Serializable {
 	 * This should actually be package private, but package private methods in CDI beans are subject to memory leaks.
 	 * @return Session scope channel IDs.
 	 */
-	protected Map<String, String> getSessionScope() {
-		return sessionScope;
+	protected Map<String, String> getSessionScopedChannels() {
+		return sessionScopedChannels;
 	}
 
 	/**
@@ -217,9 +217,9 @@ public class SocketChannelManager implements Serializable {
 	 * @param create Whether or not to auto-create the entry in JSF view scope.
 	 * @return View scope channel IDs.
 	 */
-	protected Map<String, String> getViewScope(boolean create) {
+	protected Map<String, String> getViewScopedChannels(boolean create) {
 		ViewScope bean = getInstance(ViewScope.class, create);
-		return (bean == null) ? EMPTY_SCOPE : bean.getViewScope();
+		return (bean == null) ? EMPTY_SCOPE : bean.getChannels();
 	}
 
 	/**
@@ -273,7 +273,7 @@ public class SocketChannelManager implements Serializable {
 		// Below awkwardness is because SocketChannelManager can't be injected in SocketSessionManager (CDI session scope
 		// is not necessarily active during WS session). So it can't just ask us for channel IDs and we have to tell it.
 		// And, for application scope IDs we make sure they're re-registered after server restart/failover.
-		socketSessions.register(sessionScope.values());
+		socketSessions.register(sessionScopedChannels.values());
 		socketSessions.register(APPLICATION_SCOPE.values());
 	}
 

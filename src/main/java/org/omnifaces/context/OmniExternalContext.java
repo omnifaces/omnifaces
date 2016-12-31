@@ -12,6 +12,8 @@
  */
 package org.omnifaces.context;
 
+import static java.util.Collections.emptySet;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -122,17 +124,17 @@ public class OmniExternalContext extends ExternalContextWrapper {
 
 		@Override
 		public Set<String> keySet() {
-			return null;
+			return emptySet();
 		}
 
 		@Override
 		public Collection<Object> values() {
-			return null;
+			return emptySet();
 		}
 
 		@Override
 		public Set<java.util.Map.Entry<String, Object>> entrySet() {
-			return null;
+			return emptySet();
 		}
 
 		@Override

@@ -880,31 +880,32 @@ public final class Components {
 
 		UIViewRoot viewRoot = context.getViewRoot();
 		Map<String, String> params = context.getExternalContext().getRequestParameterMap();
-		UIComponent actionSource = null;
 
 		if (context.getPartialViewContext().isAjaxRequest()) {
 			String sourceClientId = params.get("javax.faces.source");
 
 			if (sourceClientId != null) {
-				actionSource = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(sourceClientId));
-			}
-		}
+				UIComponent actionSource = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(sourceClientId));
 
-		if (actionSource == null) {
-			for (String name : params.keySet()) {
-				if (name.startsWith("javax.faces.")) {
-					continue; // Quick skip.
-				}
-
-				actionSource = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(name));
-
-				if (actionSource instanceof UICommand) {
-					break;
+				if (actionSource != null) {
+					return actionSource;
 				}
 			}
 		}
 
-		return actionSource;
+		for (String name : params.keySet()) {
+			if (name.startsWith("javax.faces.")) {
+				continue; // Quick skip.
+			}
+
+			UIComponent actionSource = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(name));
+
+			if (actionSource instanceof UICommand) {
+				return actionSource;
+			}
+		}
+
+		return null;
 	}
 
 	/**

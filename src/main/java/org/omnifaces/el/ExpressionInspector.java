@@ -421,39 +421,34 @@ public final class ExpressionInspector {
 
 		private void recordCall(Object base, Object property) {
 
-			switch (pass) {
-				case PASS1_FIND_NEXT_TO_LAST_NODE:
+			if (pass == InspectorPass.PASS1_FIND_NEXT_TO_LAST_NODE) {
 
-					// In the first "find next to last" pass, we'll be collecting the next to last element
-					// in an expression.
-					// E.g. given the expression a.b().c.d, we'll end up with the base returned by b() and "c" as
-					// the last property.
+				// In the first "find next to last" pass, we'll be collecting the next to last element
+				// in an expression.
+				// E.g. given the expression a.b().c.d, we'll end up with the base returned by b() and "c" as
+				// the last property.
 
-					passOneCallCount++;
-					lastBase = base;
-					lastProperty = property;
+				passOneCallCount++;
+				lastBase = base;
+				lastProperty = property;
+			}
+			else if (pass == InspectorPass.PASS2_FIND_FINAL_NODE) {
 
-					break;
+				// In the second "find final node" pass, we'll collecting the final node
+				// in an expression. We need to take care that we're not actually calling / invoking
+				// that last element as it may have a side-effect that the user doesn't want to happen
+				// twice (like storing something in a DB etc).
 
-				case PASS2_FIND_FINAL_NODE:
+				passTwoCallCount++;
 
-					// In the second "find final node" pass, we'll collecting the final node
-					// in an expression. We need to take care that we're not actually calling / invoking
-					// that last element as it may have a side-effect that the user doesn't want to happen
-					// twice (like storing something in a DB etc).
-
-					passTwoCallCount++;
-
-					if (passTwoCallCount == passOneCallCount && (base != lastBase || !Objects.equals(property, lastProperty))) {
-						// We're at the same call count as the first phase ended with.
-						// If the chain has resolved the same, we should be dealing with the same base and property now
-						// If that is not the case, then throw ISE.
-						throw new IllegalStateException(
-							"First and second pass of resolver at call #" + passTwoCallCount +
-							" resolved to different base or property.");
-					}
-
-					break;
+				if (passTwoCallCount == passOneCallCount && (base != lastBase || !Objects.equals(property, lastProperty))) {
+					// We're at the same call count as the first phase ended with.
+					// If the chain has resolved the same, we should be dealing with the same base and property now
+					// If that is not the case, then throw ISE.
+					throw new IllegalStateException(
+						"First and second pass of resolver at call #" + passTwoCallCount +
+						" resolved to different base or property.");
+				}
 			}
 		}
 

@@ -412,15 +412,13 @@ public final class Servlets {
 
 			Object value = param.getValue();
 
-			if (value == null) {
-				continue;
-			}
+			if (value != null) {
+				if (queryString.length() > 0) {
+					queryString.append("&");
+				}
 
-			if (queryString.length() > 0) {
-				queryString.append("&");
+				queryString.append(encodeURL(param.getName())).append("=").append(encodeURL(value.toString()));
 			}
-
-			queryString.append(encodeURL(param.getName())).append("=").append(encodeURL(value.toString()));
 		}
 
 		return queryString.toString();

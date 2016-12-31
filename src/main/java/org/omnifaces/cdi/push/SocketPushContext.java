@@ -49,8 +49,8 @@ public class SocketPushContext implements PushContext {
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private String channel;
-	private Map<String, String> sessionScope;
-	private Map<String, String> viewScope;
+	private Map<String, String> sessionScopedChannels;
+	private Map<String, String> viewScopedChannels;
 	private SocketSessionManager socketSessions;
 	private SocketUserManager socketUsers;
 
@@ -64,8 +64,8 @@ public class SocketPushContext implements PushContext {
 	SocketPushContext(String channel, SocketChannelManager socketChannels, SocketSessionManager socketSessions, SocketUserManager socketUsers) {
 		this.channel = channel;
 		boolean hasSession = isActive(SessionScoped.class);
-		sessionScope = hasSession ? socketChannels.getSessionScope() : EMPTY_SCOPE;
-		viewScope = hasSession && hasContext() ? socketChannels.getViewScope(true) : EMPTY_SCOPE;
+		sessionScopedChannels = hasSession ? socketChannels.getSessionScopedChannels() : EMPTY_SCOPE;
+		viewScopedChannels = hasSession && hasContext() ? socketChannels.getViewScopedChannels(true) : EMPTY_SCOPE;
 		this.socketSessions = socketSessions;
 		this.socketUsers = socketUsers;
 	}
@@ -74,7 +74,7 @@ public class SocketPushContext implements PushContext {
 
 	@Override
 	public Set<Future<Void>> send(Object message) {
-		return socketSessions.send(getChannelId(channel, sessionScope, viewScope), message);
+		return socketSessions.send(getChannelId(channel, sessionScopedChannels, viewScopedChannels), message);
 	}
 
 	@Override

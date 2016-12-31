@@ -202,10 +202,10 @@ public final class Messages {
 	 */
 	public static final class Message {
 
-		private FacesMessage message;
+		private FacesMessage facesMessage;
 
-		private Message(FacesMessage message) {
-			this.message = message;
+		private Message(FacesMessage facesMessage) {
+			this.facesMessage = facesMessage;
 		}
 
 		/**
@@ -216,7 +216,7 @@ public final class Messages {
 		 * @see FacesMessage#setDetail(String)
 		 */
 		public Message detail(String detail, Object... params) {
-			message.setDetail(resolver.getMessage(detail, params));
+			facesMessage.setDetail(resolver.getMessage(detail, params));
 			return this;
 		}
 
@@ -226,7 +226,7 @@ public final class Messages {
 		 * @see FacesMessage#setSeverity(javax.faces.application.FacesMessage.Severity)
 		 */
 		public Message warn() {
-			message.setSeverity(FacesMessage.SEVERITY_WARN);
+			facesMessage.setSeverity(FacesMessage.SEVERITY_WARN);
 			return this;
 		}
 
@@ -236,7 +236,7 @@ public final class Messages {
 		 * @see FacesMessage#setSeverity(javax.faces.application.FacesMessage.Severity)
 		 */
 		public Message error() {
-			message.setSeverity(FacesMessage.SEVERITY_ERROR);
+			facesMessage.setSeverity(FacesMessage.SEVERITY_ERROR);
 			return this;
 		}
 
@@ -246,7 +246,7 @@ public final class Messages {
 		 * @see FacesMessage#setSeverity(javax.faces.application.FacesMessage.Severity)
 		 */
 		public Message fatal() {
-			message.setSeverity(FacesMessage.SEVERITY_FATAL);
+			facesMessage.setSeverity(FacesMessage.SEVERITY_FATAL);
 			return this;
 		}
 
@@ -266,7 +266,7 @@ public final class Messages {
 		 * @see FacesContext#addMessage(String, FacesMessage)
 		 */
 		public void add(String clientId) {
-			Messages.add(clientId, message);
+			Messages.add(clientId, facesMessage);
 		}
 
 		/**
@@ -274,7 +274,7 @@ public final class Messages {
 		 * @see FacesContext#addMessage(String, FacesMessage)
 		 */
 		public void add() {
-			Messages.addGlobal(message);
+			Messages.addGlobal(facesMessage);
 		}
 
 		/**
@@ -282,7 +282,7 @@ public final class Messages {
 		 * @return The so far built message.
 		 */
 		public FacesMessage get() {
-			return message;
+			return facesMessage;
 		}
 
 	}
