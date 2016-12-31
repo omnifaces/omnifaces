@@ -85,7 +85,7 @@ public class ApplicationListener extends DefaultServletContextListener {
 			GraphicResource.registerGraphicImageBeans();
 			Socket.registerEndpointIfNecessary(servletContext);
 		}
-		catch (Throwable e) {
+		catch (Exception | LinkageError e) {
 			logger.log(SEVERE, ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
 			throw e;
 		}
@@ -96,7 +96,7 @@ public class ApplicationListener extends DefaultServletContextListener {
 			checkJSFAPIAvailable();
 			checkJSF22Compatible();
 		}
-		catch (Throwable e) {
+		catch (Exception | LinkageError e) {
 			logger.severe(""
 				+ "\n████████████████████████████████████████████████████████████████████████████████"
 				+ "\n█░▀░░░░▀█▀░░░░░░▀█░░░░░░▀█▀░░░░░▀█                                             ▐"
@@ -117,7 +117,7 @@ public class ApplicationListener extends DefaultServletContextListener {
 			checkCDI11Compatible();
 			checkCDIImplAvailable();
 		}
-		catch (Throwable e) {
+		catch (Exception | LinkageError e) {
 			logger.severe(""
 				+ "\n████████████████████████████████████████████████████████████████████████████████"
 				+ "\n▌                         ▐█     ▐                                             ▐"

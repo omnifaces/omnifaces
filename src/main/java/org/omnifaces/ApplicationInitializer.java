@@ -55,7 +55,7 @@ public class ApplicationInitializer implements ServletContainerInitializer {
 		try {
 			FacesViews.registerForwardingFilter(servletContext);
 		}
-		catch (Throwable e) {
+		catch (Exception | LinkageError e) {
 			logger.log(SEVERE, ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
 			throw e;
 		}
