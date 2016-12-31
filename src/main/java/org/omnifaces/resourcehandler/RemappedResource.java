@@ -12,6 +12,8 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static org.omnifaces.util.Faces.getApplication;
+
 import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
@@ -28,7 +30,10 @@ import javax.faces.application.ResourceWrapper;
  */
 public class RemappedResource extends ResourceWrapper implements Externalizable {
 
-	private Resource wrapped;
+	private Externalizable externalizableWrappedResource;
+	private transient Resource transientWrappedResource;
+	private String resourceName;
+	private String libraryName;
 	private String requestPath;
 
 	/**
@@ -44,7 +49,15 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
 	 * @param requestPath The remapped request path.
 	 */
 	public RemappedResource(Resource wrapped, String requestPath) {
-		this.wrapped = wrapped;
+		if (wrapped instanceof Externalizable) {
+			externalizableWrappedResource = (Externalizable) wrapped;
+		}
+		else {
+			transientWrappedResource = wrapped;
+			resourceName = wrapped.getResourceName();
+			libraryName = wrapped.getLibraryName();
+		}
+
 		this.requestPath = requestPath;
 	}
 
@@ -53,24 +66,20 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
 		return requestPath;
 	}
 
-	@Override // Necessary because this is missing in ResourceWrapper (will be fixed in JSF 2.2).
-	public String getResourceName() {
-		return getWrapped().getResourceName();
-	}
-
-	@Override // Necessary because this is missing in ResourceWrapper (will be fixed in JSF 2.2).
-	public String getLibraryName() {
-		return getWrapped().getLibraryName();
-	}
-
-	@Override // Necessary because this is missing in ResourceWrapper (will be fixed in JSF 2.2).
-	public String getContentType() {
-		return getWrapped().getContentType();
-	}
-
 	@Override
 	public Resource getWrapped() {
-		return wrapped;
+		return getResource();
+	}
+
+	private Resource getResource() {
+		if (externalizableWrappedResource != null) {
+			return (Resource) externalizableWrappedResource;
+		}
+		else if (transientWrappedResource == null) {
+			transientWrappedResource = getApplication().getResourceHandler().createResource(resourceName, libraryName);
+		}
+
+		return transientWrappedResource;
 	}
 
 	@Override
@@ -84,23 +93,27 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
 		}
 
 		RemappedResource other = (RemappedResource) object;
-		return wrapped.equals(other.wrapped) && requestPath.equals(other.requestPath);
+		return getResource().equals(other.getResource()) && requestPath.equals(other.requestPath);
 	}
 
 	@Override
 	public int hashCode() {
-		return wrapped.hashCode() + requestPath.hashCode();
+		return getResource().hashCode() + requestPath.hashCode();
 	}
 
 	@Override
 	public void readExternal(ObjectInput input) throws IOException, ClassNotFoundException {
-		wrapped = (Resource) input.readObject();
+		externalizableWrappedResource = (Externalizable) input.readObject();
+		resourceName = (String) input.readObject();
+		libraryName = (String) input.readObject();
 		requestPath = (String) input.readObject();
 	}
 
 	@Override
 	public void writeExternal(ObjectOutput output) throws IOException {
-		output.writeObject(wrapped);
+		output.writeObject(externalizableWrappedResource);
+		output.writeObject(resourceName);
+		output.writeObject(libraryName);
 		output.writeObject(requestPath);
 	}
 

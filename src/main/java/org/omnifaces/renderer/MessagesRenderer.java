@@ -19,6 +19,7 @@ import static org.omnifaces.util.Renderers.writeAttributes;
 import static org.omnifaces.util.Renderers.writeText;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.isOneOf;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -194,7 +195,7 @@ public class MessagesRenderer extends Renderer {
 	protected void encodeEmptyMessages(FacesContext context, OmniMessages component) throws IOException {
 		String id = component.getId();
 
-		if (id != null && !"javax_faces_developmentstage_messages".equals(id)) {
+		if (!isOneOf(id, null, "javax_faces_developmentstage_messages")) {
 			ResponseWriter writer = context.getResponseWriter();
 			writer.startElement("div", component);
 			writeAttribute(writer, "id", component.getClientId(context));

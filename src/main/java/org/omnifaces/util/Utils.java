@@ -220,8 +220,7 @@ public final class Utils {
 	public static boolean isNumber(String string) {
 		try {
 			// Performance tests taught that this approach is in general faster than regex or char-by-char checking.
-			Long.parseLong(string);
-			return true;
+			return Long.valueOf(string) != null;
 		}
 		catch (Exception e) {
 			return false;
@@ -238,8 +237,7 @@ public final class Utils {
 	public static boolean isDecimal(String string) {
 		try {
 			// Performance tests taught that this approach is in general faster than regex or char-by-char checking.
-			Double.parseDouble(string);
-			return true;
+			return Double.valueOf(string) != null;
 		}
 		catch (Exception e) {
 			return false;

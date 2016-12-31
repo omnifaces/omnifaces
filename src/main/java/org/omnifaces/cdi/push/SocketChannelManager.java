@@ -247,7 +247,7 @@ public class SocketChannelManager implements Serializable {
 
 		// All of below is just in case server restarts with session persistence or failovers/synchronizes to another server.
 		output.writeObject(APPLICATION_SCOPE);
-		Map<String, ConcurrentHashMap<String, Set<String>>> sessionUserChannels = new HashMap<>(sessionUsers.size());
+		HashMap<String, ConcurrentHashMap<String, Set<String>>> sessionUserChannels = new HashMap<>(sessionUsers.size());
 
 		for (String userId : sessionUsers.values()) {
 			sessionUserChannels.put(userId, socketUsers.getUserChannels().get(userId));

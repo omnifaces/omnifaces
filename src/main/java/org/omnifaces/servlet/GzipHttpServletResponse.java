@@ -12,6 +12,8 @@
  */
 package org.omnifaces.servlet;
 
+import static org.omnifaces.util.Utils.isOneOf;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.Set;
@@ -257,7 +259,7 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 
 				if (contentType != null && mimetypes.contains(contentType.split(";", 2)[0])) {
 					addHeader("Content-Encoding", "gzip");
-					setHeader("Vary", ((vary != null && !vary.equals("*")) ? (vary + ",") : "") + "Accept-Encoding");
+					setHeader("Vary", (!isOneOf(vary, null, "*") ? (vary + ",") : "") + "Accept-Encoding");
 					return new GZIPOutputStream(originalResponse.getOutputStream());
 				}
 			}

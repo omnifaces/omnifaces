@@ -28,6 +28,7 @@ import static org.omnifaces.util.Utils.decodeURL;
 import static org.omnifaces.util.Utils.encodeURI;
 import static org.omnifaces.util.Utils.encodeURL;
 import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.isOneOf;
 import static org.omnifaces.util.Utils.startsWithOneOf;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
@@ -608,7 +609,7 @@ public final class Servlets {
 	{
 		Cookie cookie = new Cookie(name, encodeURL(value));
 
-		if (domain != null && !"localhost".equals(domain)) { // Chrome doesn't like domain:"localhost" on cookies.
+		if (!isOneOf(domain, null, "localhost")) { // Chrome doesn't like domain:"localhost" on cookies.
 			cookie.setDomain(domain);
 		}
 

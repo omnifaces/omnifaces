@@ -24,6 +24,7 @@ import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.encodeURL;
 import static org.omnifaces.util.Utils.isAnyEmpty;
 import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.isOneOf;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -1320,7 +1321,7 @@ public final class FacesLocal {
 		ExternalContext externalContext = context.getExternalContext();
 		Map<String, Object> properties = new HashMap<>();
 
-		if (domain != null && !"localhost".equals(domain)) { // Chrome doesn't like domain:"localhost" on cookies.
+		if (!isOneOf(domain, null, "localhost")) { // Chrome doesn't like domain:"localhost" on cookies.
 			properties.put("domain", domain);
 		}
 

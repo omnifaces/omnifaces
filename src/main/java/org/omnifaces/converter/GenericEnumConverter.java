@@ -15,6 +15,7 @@ package org.omnifaces.converter;
 import static org.omnifaces.util.Faces.getViewAttribute;
 import static org.omnifaces.util.Faces.setViewAttribute;
 import static org.omnifaces.util.Messages.createError;
+import static org.omnifaces.util.Utils.isOneOf;
 
 import javax.faces.component.UIComponent;
 import javax.faces.component.UISelectMany;
@@ -102,7 +103,7 @@ public class GenericEnumConverter implements Converter {
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Object getAsObject(FacesContext context, UIComponent component, String submittedValue) {
-		if (submittedValue == null || submittedValue.isEmpty() || "-".equals(submittedValue)) {
+		if (isOneOf(submittedValue, null, "", "-")) {
 			return null;
 		}
 

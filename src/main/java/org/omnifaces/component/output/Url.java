@@ -165,10 +165,10 @@ public class Url extends OutputFamily {
 		String url = (viewId == null) ? getActionURL(context, params) : getBookmarkableURL(context, viewId, params, false);
 		String domain = getDomain();
 
-		if (domain.equals("//")) {
+		if ("//".equals(domain)) {
 			url = getRequestDomainURL(context).split(":", 2)[1] + url;
 		}
-		else if (!domain.equals("/")) {
+		else if (!"/".equals(domain)) {
 			String normalizedDomain = domain.contains("//") ? domain : ("//") + domain;
 
 			try {
