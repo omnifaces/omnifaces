@@ -254,7 +254,7 @@ public class Form extends HtmlForm {
 	 *
 	 * @author Bauke Scholtz
 	 */
-	static class IgnoreValidationFailedFacesContext extends FacesContextWrapper {
+	private static class IgnoreValidationFailedFacesContext extends FacesContextWrapper {
 
 		private FacesContext wrapped;
 
@@ -285,64 +285,79 @@ public class Form extends HtmlForm {
 	 *
 	 * @author Arjan Tijms
 	 */
-	static class ActionURLDecorator extends FacesContextWrapper {
+	private static class ActionURLDecorator extends FacesContextWrapper {
 
-		private final FacesContext facesContext;
-		private final Form form;
+		private FacesContext wrapped;
+		private Form form;
 
-		public ActionURLDecorator(FacesContext facesContext, Form form) {
-			this.facesContext = facesContext;
+		public ActionURLDecorator(FacesContext wrapped, Form form) {
+			this.wrapped = wrapped;
 			this.form = form;
 		}
 
 		@Override
 		public Application getApplication() {
-			return new ApplicationWrapper() {
-
-				private final Application application = facesContext.getApplication();
-
-				@Override
-				public ViewHandler getViewHandler() {
-					return new ViewHandlerWrapper() {
-
-						private final ViewHandler viewHandler = application.getViewHandler();
-
-						/**
-						 * The actual method we're decorating in order to either include the view parameters into the
-						 * action URL, or include the request parameters into the action URL, or use request URI as
-						 * action URL. Any <code>&lt;f|o:param&gt;</code> nested in the form component will be included
-						 * in the query string, overriding any existing view or request parameters on same name.
-						 */
-						@Override
-						public String getActionURL(FacesContext context, String viewId) {
-							String actionURL = form.isUseRequestURI() ? getActionURL(context) : super.getActionURL(context, viewId);
-							String queryString = toQueryString(getParams(form, form.isUseRequestURI() || form.isIncludeRequestParams(), form.isIncludeViewParams()));
-							return isEmpty(queryString) ? actionURL : (actionURL + (actionURL.contains("?") ? "&" : "?") + queryString);
-						}
-
-						private String getActionURL(FacesContext context) {
-							String actionURL = (getRequestAttribute(context, ERROR_REQUEST_URI) != null) ? getRequestContextPath(context) : getRequestURI(context);
-							return actionURL.isEmpty() ? "/" : actionURL;
-						}
-
-
-						@Override
-						public ViewHandler getWrapped() {
-							return viewHandler;
-						}
-					};
-				}
-
-				@Override
-				public Application getWrapped() {
-					return application;
-				}
-			};
+			return new ActionURLDecoratorApplication(getWrapped().getApplication(), form);
 		}
 
 		@Override
 		public FacesContext getWrapped() {
-			return facesContext;
+			return wrapped;
+		}
+	}
+
+	private static class ActionURLDecoratorApplication extends ApplicationWrapper {
+
+		private Application wrapped;
+		private Form form;
+
+		public ActionURLDecoratorApplication(Application wrapped, Form form) {
+			this.wrapped = wrapped;
+			this.form = form;
+		}
+
+		@Override
+		public ViewHandler getViewHandler() {
+			return new ActionURLDecoratorViewHandler(getWrapped().getViewHandler(), form);
+		}
+
+		@Override
+		public Application getWrapped() {
+			return wrapped;
+		}
+	}
+
+	private static class ActionURLDecoratorViewHandler extends ViewHandlerWrapper {
+
+		private ViewHandler wrapped;
+		private Form form;
+
+		public ActionURLDecoratorViewHandler(ViewHandler wrapped, Form form) {
+			this.wrapped = wrapped;
+			this.form = form;
+		}
+
+		/**
+		 * The actual method we're decorating in order to either include the view parameters into the
+		 * action URL, or include the request parameters into the action URL, or use request URI as
+		 * action URL. Any <code>&lt;f|o:param&gt;</code> nested in the form component will be included
+		 * in the query string, overriding any existing view or request parameters on same name.
+		 */
+		@Override
+		public String getActionURL(FacesContext context, String viewId) {
+			String actionURL = form.isUseRequestURI() ? getActionURL(context) : getWrapped().getActionURL(context, viewId);
+			String queryString = toQueryString(getParams(form, form.isUseRequestURI() || form.isIncludeRequestParams(), form.isIncludeViewParams()));
+			return isEmpty(queryString) ? actionURL : (actionURL + (actionURL.contains("?") ? "&" : "?") + queryString);
+		}
+
+		private String getActionURL(FacesContext context) {
+			String actionURL = (getRequestAttribute(context, ERROR_REQUEST_URI) != null) ? getRequestContextPath(context) : getRequestURI(context);
+			return actionURL.isEmpty() ? "/" : actionURL;
+		}
+
+		@Override
+		public ViewHandler getWrapped() {
+			return wrapped;
 		}
 	}
 

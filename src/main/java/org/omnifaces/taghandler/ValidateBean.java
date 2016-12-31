@@ -217,9 +217,11 @@ public class ValidateBean extends TagHandler {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
+
 	private static final Logger logger = Logger.getLogger(ValidateBean.class.getName());
 
 	private static final String DEFAULT_SHOWMESSAGEFOR = "@form";
+	private static final String VALUE = "value";
 	private static final String ERROR_MISSING_FORM =
 		"o:validateBean must be nested in an UIForm.";
 	private static final String ERROR_INVALID_PARENT =
@@ -269,7 +271,7 @@ public class ValidateBean extends TagHandler {
 	 */
 	@Override
 	public void apply(FaceletContext context, final UIComponent parent) throws IOException {
-		if (getAttribute("value") == null && (!(parent instanceof UICommand || parent instanceof UIInput))) {
+		if (getAttribute(VALUE) == null && (!(parent instanceof UICommand || parent instanceof UIInput))) {
 			throw new IllegalArgumentException(ERROR_INVALID_PARENT);
 		}
 
@@ -279,7 +281,7 @@ public class ValidateBean extends TagHandler {
 			return;
 		}
 
-		value = getValueExpression(context, getAttribute("value"), Object.class);
+		value = getValueExpression(context, getAttribute(VALUE), Object.class);
 		disabled = getBoolean(context, getAttribute("disabled"));
 		method = ValidateMethod.of(getString(context, getAttribute("method")));
 		groups = getString(context, getAttribute("validationGroups"));
@@ -394,7 +396,7 @@ public class ValidateBean extends TagHandler {
 			.ofTypes(EditableValueHolder.class)
 			.withHints(SKIP_UNRENDERED/*, SKIP_ITERATION*/) // SKIP_ITERATION fails in Apache EL (Tomcat 8.0.32 tested) but works in Oracle EL.
 			.invoke(new Callback.WithArgument<UIComponent>() { @Override public void invoke(UIComponent component) {
-				ValueExpression valueExpression = component.getValueExpression("value");
+				ValueExpression valueExpression = component.getValueExpression(VALUE);
 
 				if (valueExpression != null) {
 					ValueReference valueReference = getValueReference(context.getELContext(), valueExpression);
@@ -526,7 +528,7 @@ public class ValidateBean extends TagHandler {
 
 		@Override
 		public void validate(FacesContext context, UIComponent component, Object value) throws ValidatorException {
-			ValueExpression valueExpression = component.getValueExpression("value");
+			ValueExpression valueExpression = component.getValueExpression(VALUE);
 
 			if (valueExpression != null) {
 				ValueReference valueReference = getValueReference(context.getELContext(), valueExpression);

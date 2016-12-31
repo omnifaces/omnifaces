@@ -86,6 +86,7 @@ public class ToCollectionConverter extends TrimConverter {
 			return null;
 		}
 
+		String type = collectionType;
 		Converter converter = createConverter(itemConverter);
 		ValueExpression valueExpression = component.getValueExpression("value");
 
@@ -98,7 +99,7 @@ public class ToCollectionConverter extends TrimConverter {
 			}
 
 			if (collectionType == null && Set.class.isAssignableFrom(returnType)) {
-				collectionType = DEFAULT_SET_TYPE;
+				type = DEFAULT_SET_TYPE;
 			}
 
 			if (converter == null) {
@@ -111,9 +112,9 @@ public class ToCollectionConverter extends TrimConverter {
 			}
 		}
 
-		Collection<Object> collection = Reflection.instance(coalesce(collectionType, DEFAULT_COLLECTION_TYPE));
+		Collection<Object> collection = Reflection.instance(coalesce(type, DEFAULT_COLLECTION_TYPE));
 
-		for (String item : submittedValue.split(quote(coalesce(this.delimiter, DEFAULT_DELIMITER).trim()))) {
+		for (String item : submittedValue.split(quote(coalesce(delimiter, DEFAULT_DELIMITER).trim()))) {
 			Object trimmed = super.getAsObject(context, component, item);
 			collection.add(converter == null ? trimmed : converter.getAsString(context, component, trimmed));
 		}
@@ -129,18 +130,18 @@ public class ToCollectionConverter extends TrimConverter {
 
 		Application application = context.getApplication();
 		StringBuilder builder = new StringBuilder();
-		String delimiter = coalesce(this.delimiter, DEFAULT_DELIMITER);
-		Converter itemConverter = createConverter(this.itemConverter);
+		String specifiedDelimiter = coalesce(delimiter, DEFAULT_DELIMITER);
+		Converter specifiedConverter = createConverter(itemConverter);
 		Class<?> forClass = null;
-		Converter converter = itemConverter;
+		Converter converter = specifiedConverter;
 		int i = 0;
 
 		for (Object item : (Collection<?>) modelValue) {
 			if (i++ > 0) {
-				builder.append(delimiter);
+				builder.append(specifiedDelimiter);
 			}
 
-			if (itemConverter == null && item != null && forClass != item.getClass()) {
+			if (specifiedConverter == null && item != null && forClass != item.getClass()) {
 				forClass = item.getClass();
 				converter = application.createConverter(forClass);
 			}

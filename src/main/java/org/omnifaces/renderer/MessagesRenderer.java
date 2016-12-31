@@ -217,7 +217,7 @@ public class MessagesRenderer extends Renderer {
 			throws IOException
 	{
 		ResponseWriter writer = context.getResponseWriter();
-		writer.startElement(table ? "table" : "ul", component);
+		writer.startElement(table ? LAYOUT_TABLE : "ul", component);
 		writeAttribute(writer, "id", component.getClientId(context));
 		writeAttribute(writer, component, "styleClass", "class");
 		writeAttributes(writer, component, "style", "title", "lang", "dir");
@@ -234,7 +234,7 @@ public class MessagesRenderer extends Renderer {
 			}
 		}
 
-		writer.endElement(table ? "table" : "ul");
+		writer.endElement(table ? LAYOUT_TABLE : "ul");
 	}
 
 	/**
