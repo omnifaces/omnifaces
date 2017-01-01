@@ -262,7 +262,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * to the wrapped faces event.
 	 */
 	@Override
-	public void broadcast(FacesEvent event) throws AbortProcessingException {
+	public void broadcast(FacesEvent event) {
 		if (event instanceof TreeFacesEvent) {
 			final FacesContext context = FacesContext.getCurrentInstance();
 			TreeFacesEvent treeEvent = (TreeFacesEvent) event;

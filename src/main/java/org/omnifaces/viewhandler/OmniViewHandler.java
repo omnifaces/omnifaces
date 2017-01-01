@@ -111,7 +111,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 	}
 
 	@Override
-	public void renderView(FacesContext context, UIViewRoot viewToRender) throws IOException, FacesException {
+	public void renderView(FacesContext context, UIViewRoot viewToRender) throws IOException {
 		if (isDevelopment(context)) {
 			validateComponentTreeStructure(context, viewToRender);
 		}

@@ -361,7 +361,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	 * Any remaining unhandled exceptions will be swallowed. Only the first one is relevant.
 	 */
 	@Override
-	public void handle() throws FacesException {
+	public void handle() {
 		handleAjaxException(getContext());
 		wrapped.handle();
 	}

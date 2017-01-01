@@ -71,7 +71,7 @@ public class RequiredCheckboxValidator implements Validator {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
-	public void validate(FacesContext context, UIComponent component, Object value) throws ValidatorException {
+	public void validate(FacesContext context, UIComponent component, Object value) {
 		if (!(component instanceof UISelectBoolean)) {
 			throw new IllegalArgumentException(String.format(ERROR_WRONG_COMPONENT, component.getClass().getName()));
 		}

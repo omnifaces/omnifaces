@@ -89,9 +89,9 @@ public class ViewScopeContext implements Context {
 
 	/**
 	 * Throws {@link ContextNotActiveException} when {@link #isActive()} returns <code>false</code>.
-	 * @throws ContextNotActiveException
+	 * @throws ContextNotActiveException When context is not active.
 	 */
-	private void checkActive() throws ContextNotActiveException {
+	private void checkActive() {
 		if (!isActive()) {
 			throw new ContextNotActiveException();
 		}

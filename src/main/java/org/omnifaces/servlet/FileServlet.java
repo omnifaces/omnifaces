@@ -20,7 +20,6 @@ import static org.omnifaces.util.Utils.startsWithOneOf;
 import static org.omnifaces.util.Utils.stream;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -396,7 +395,7 @@ public abstract class FileServlet extends HttpServlet {
 	/**
 	 * Write given file to response with given content type and ranges.
 	 */
-	private void writeContent(HttpServletResponse response, Resource resource, List<Range> ranges, String contentType) throws IOException, FileNotFoundException {
+	private void writeContent(HttpServletResponse response, Resource resource, List<Range> ranges, String contentType) throws IOException {
 		ServletOutputStream output = response.getOutputStream();
 
 		if (ranges.size() == 1) {

@@ -21,7 +21,6 @@ import javax.el.ValueExpression;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlOutputLabel;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.PostRestoreStateEvent;
 
@@ -47,7 +46,7 @@ public class OutputLabel extends HtmlOutputLabel {
 		"A component with Id '%s' as specified by the for attribute of the OutputLabel with Id '%s' could not be found.";
 
 	@Override
-	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
+	public void processEvent(ComponentSystemEvent event) {
 		if (event instanceof PostRestoreStateEvent) {
 			String forValue = (String) getAttributes().get("for");
 			if (!isEmpty(forValue)) {

@@ -14,7 +14,6 @@ package org.omnifaces.component.input;
 
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIViewAction;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.FacesEvent;
 
 /**
@@ -69,7 +68,7 @@ public class ViewAction extends UIViewAction {
 	 * {@link #decode(javax.faces.context.FacesContext)}.
 	 */
 	@Override
-	public void broadcast(FacesEvent event) throws AbortProcessingException {
+	public void broadcast(FacesEvent event) {
 		if (super.isRendered()) {
 			super.broadcast(event);
 		}

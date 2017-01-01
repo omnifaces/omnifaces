@@ -104,7 +104,7 @@ public class InvokeActionEventListener extends DefaultPhaseListener implements S
 	 * and/or {@link PostInvokeActionEvent} events and then add them to a set in the current faces context.
 	 */
 	@Override
-	public void processEvent(SystemEvent event) throws AbortProcessingException {
+	public void processEvent(SystemEvent event) {
 		FacesContext context = FacesContext.getCurrentInstance();
 
 		if (!context.isValidationFailed()) {

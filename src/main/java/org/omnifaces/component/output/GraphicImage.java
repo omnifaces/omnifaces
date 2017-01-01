@@ -195,17 +195,6 @@ public class GraphicImage extends HtmlGraphicImage {
 
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.GraphicImage";
 	protected static final Map<String, String> ATTRIBUTE_NAMES = collectAttributeNames();
-	private static Map<String, String> collectAttributeNames() {
-		Map<String, String> attributeNames = new HashMap<>();
-
-		for (PropertyKeys propertyKey : PropertyKeys.values()) {
-			String name = propertyKey.name();
-			attributeNames.put(name, "styleClass".equals(name) ? "class" : propertyKey.toString());
-		}
-
-		return Collections.unmodifiableMap(attributeNames);
-	}
-
 	private static final String ERROR_MISSING_VALUE = "o:graphicImage 'value' attribute is required.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
@@ -298,6 +287,19 @@ public class GraphicImage extends HtmlGraphicImage {
 	@Override
 	public String getAlt() {
 		return coalesce(super.getAlt(), "");
+	}
+
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	private static Map<String, String> collectAttributeNames() {
+		Map<String, String> attributeNames = new HashMap<>();
+
+		for (PropertyKeys propertyKey : PropertyKeys.values()) {
+			String name = propertyKey.name();
+			attributeNames.put(name, "styleClass".equals(name) ? "class" : propertyKey.toString());
+		}
+
+		return Collections.unmodifiableMap(attributeNames);
 	}
 
 }

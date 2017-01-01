@@ -15,7 +15,6 @@ package org.omnifaces.cdi.viewscope;
 import static org.omnifaces.util.Beans.getReference;
 
 import javax.faces.component.UIViewRoot;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.PreDestroyViewMapEvent;
 import javax.faces.event.SystemEvent;
 import javax.faces.event.ViewMapListener;
@@ -45,7 +44,7 @@ public class ViewScopeEventListener implements ViewMapListener {
 	 * {@link ViewScopeManager#preDestroyView()} method.
 	 */
 	@Override
-	public void processEvent(SystemEvent event) throws AbortProcessingException {
+	public void processEvent(SystemEvent event) {
 		if (event instanceof PreDestroyViewMapEvent) {
 			getReference(ViewScopeManager.class).preDestroyView();
 		}

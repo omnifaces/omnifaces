@@ -30,7 +30,7 @@ import javax.faces.event.SystemEventListener;
 public abstract class DefaultViewEventListener implements SystemEventListener {
 
 	@Override
-	public void processEvent(SystemEvent event) throws AbortProcessingException {
+	public void processEvent(SystemEvent event) {
 		// NOOP
 	}
 

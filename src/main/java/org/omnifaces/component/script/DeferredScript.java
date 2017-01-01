@@ -14,7 +14,6 @@ package org.omnifaces.component.script;
 
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.ListenerFor;
 import javax.faces.event.ListenersFor;
@@ -82,7 +81,7 @@ public class DeferredScript extends ScriptFamily {
 	 * then set the script resource as rendered, so that JSF won't auto-include it.
 	 */
 	@Override
-	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
+	public void processEvent(ComponentSystemEvent event) {
 		if (moveToBody(event)) {
 			Hacks.setScriptResourceRendered(getFacesContext(), new ResourceIdentifier(this));
 		}

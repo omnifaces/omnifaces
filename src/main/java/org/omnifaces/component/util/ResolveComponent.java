@@ -23,7 +23,6 @@ import static org.omnifaces.util.Utils.isEmpty;
 
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponent;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.PostRestoreStateEvent;
 import javax.faces.event.PreRenderViewEvent;
@@ -69,6 +68,13 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 		name, scope, /* for */
 	}
 
+	public ResolveComponent() {
+		if (!isPostback()) { // For an initial (GET) request, there's no restore
+								// state event and we use pre-render view
+			subscribeToViewEvent(PreRenderViewEvent.class, this);
+		}
+	}
+
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
@@ -81,25 +87,18 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 		}
 	}
 
-	public ResolveComponent() {
-		if (!isPostback()) { // For an initial (GET) request, there's no restore
-								// state event and we use pre-render view
-			subscribeToViewEvent(PreRenderViewEvent.class, this);
-		}
-	}
-
 	@Override
 	public boolean isListenerForSource(Object source) {
 		return true;
 	}
 
 	@Override
-	public void processEvent(SystemEvent event) throws AbortProcessingException {
+	public void processEvent(SystemEvent event) {
 		doProcess();
 	}
 
 	@Override
-	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
+	public void processEvent(ComponentSystemEvent event) {
 		if (event instanceof PostRestoreStateEvent) { // For a postback we use the post-restore state event.
 			doProcess();
 		}

@@ -22,7 +22,6 @@ import javax.faces.component.FacesComponent;
 import javax.faces.component.UIInput;
 import javax.faces.component.UIViewParameter;
 import javax.faces.context.FacesContext;
-import javax.faces.convert.ConverterException;
 import javax.faces.event.PostValidateEvent;
 import javax.faces.event.PreValidateEvent;
 
@@ -162,7 +161,7 @@ public class ViewParam extends UIViewParameter {
 	 * @since 1.8
 	 */
 	@Override
-	public String getStringValueFromModel(FacesContext context) throws ConverterException {
+	public String getStringValueFromModel(FacesContext context) {
 		ValueExpression ve = getValueExpression("value");
 		Object value = (ve != null) ? ve.getValue(context.getELContext()) : null;
 		return (value != null) ? super.getStringValueFromModel(context) : null;

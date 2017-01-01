@@ -100,7 +100,7 @@ public final class SelectItemsUtils {
 		while (items.hasNext()) {
 			SelectItem item = items.next();
 			if (item instanceof SelectItemGroup) {
-				SelectItem subitems[] = ((SelectItemGroup) item).getSelectItems();
+				SelectItem[] subitems = ((SelectItemGroup) item).getSelectItems();
 				if (!isEmpty(subitems)) {
 					collect(new ArrayIterator(subitems), values);
 				}
@@ -115,12 +115,12 @@ public final class SelectItemsUtils {
 	 */
 	static class ArrayIterator implements Iterator<SelectItem> {
 
-		public ArrayIterator(SelectItem items[]) {
+		private SelectItem[] items;
+		private int index = 0;
+
+		public ArrayIterator(SelectItem[] items) {
 			this.items = items;
 		}
-
-		private SelectItem items[];
-		private int index = 0;
 
 		@Override
 		public boolean hasNext() {
@@ -130,7 +130,7 @@ public final class SelectItemsUtils {
 		@Override
 		public SelectItem next() {
 			if (hasNext()) {
-				return (items[index++]);
+				return items[index++];
 			}
 			else {
 				throw new NoSuchElementException();

@@ -44,7 +44,6 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.component.html.HtmlInputFile;
 import javax.faces.context.FacesContext;
-import javax.faces.convert.ConverterException;
 import javax.servlet.http.Part;
 
 import org.omnifaces.util.Components;
@@ -305,7 +304,7 @@ public class InputFile extends HtmlInputFile {
 	 */
 	@Override
 	@SuppressWarnings("unchecked")
-	protected Object getConvertedValue(FacesContext context, Object submittedValue) throws ConverterException {
+	protected Object getConvertedValue(FacesContext context, Object submittedValue) {
 		if (isMultiple()) {
 			List<Part> convertedParts = new ArrayList<>();
 

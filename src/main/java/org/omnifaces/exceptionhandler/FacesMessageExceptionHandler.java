@@ -80,7 +80,7 @@ public class FacesMessageExceptionHandler extends ExceptionHandlerWrapper {
 	 * Set every exception as a global FATAL faces message.
 	 */
 	@Override
-	public void handle() throws FacesException {
+	public void handle() {
 		for (Iterator<ExceptionQueuedEvent> iter = getUnhandledExceptionQueuedEvents().iterator(); iter.hasNext();) {
 			addGlobal(new FacesMessage(SEVERITY_FATAL, createFatalMessage(iter.next().getContext().getException()), null));
 			iter.remove();

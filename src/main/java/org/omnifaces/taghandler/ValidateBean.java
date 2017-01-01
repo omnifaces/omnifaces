@@ -66,7 +66,6 @@ import javax.faces.event.PostValidateEvent;
 import javax.faces.event.PreValidateEvent;
 import javax.faces.event.SystemEventListener;
 import javax.faces.validator.Validator;
-import javax.faces.validator.ValidatorException;
 import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
@@ -221,7 +220,7 @@ public class ValidateBean extends TagHandler {
 	private static final Logger logger = Logger.getLogger(ValidateBean.class.getName());
 
 	private static final String DEFAULT_SHOWMESSAGEFOR = "@form";
-	private static final String VALUE = "value";
+	private static final String VALUE_ATTRIBUTE = "value";
 	private static final String ERROR_MISSING_FORM =
 		"o:validateBean must be nested in an UIForm.";
 	private static final String ERROR_INVALID_PARENT =
@@ -229,7 +228,7 @@ public class ValidateBean extends TagHandler {
 
 	// Enums ----------------------------------------------------------------------------------------------------------
 
-	private static enum ValidateMethod {
+	private enum ValidateMethod {
 		validateCopy, validateActual;
 
 		public static ValidateMethod of(String name) {
@@ -271,7 +270,7 @@ public class ValidateBean extends TagHandler {
 	 */
 	@Override
 	public void apply(FaceletContext context, final UIComponent parent) throws IOException {
-		if (getAttribute(VALUE) == null && (!(parent instanceof UICommand || parent instanceof UIInput))) {
+		if (getAttribute(VALUE_ATTRIBUTE) == null && (!(parent instanceof UICommand || parent instanceof UIInput))) {
 			throw new IllegalArgumentException(ERROR_INVALID_PARENT);
 		}
 
@@ -281,7 +280,7 @@ public class ValidateBean extends TagHandler {
 			return;
 		}
 
-		value = getValueExpression(context, getAttribute(VALUE), Object.class);
+		value = getValueExpression(context, getAttribute(VALUE_ATTRIBUTE), Object.class);
 		disabled = getBoolean(context, getAttribute("disabled"));
 		method = ValidateMethod.of(getString(context, getAttribute("method")));
 		groups = getString(context, getAttribute("validationGroups"));
@@ -396,7 +395,7 @@ public class ValidateBean extends TagHandler {
 			.ofTypes(EditableValueHolder.class)
 			.withHints(SKIP_UNRENDERED/*, SKIP_ITERATION*/) // SKIP_ITERATION fails in Apache EL (Tomcat 8.0.32 tested) but works in Oracle EL.
 			.invoke(new Callback.WithArgument<UIComponent>() { @Override public void invoke(UIComponent component) {
-				ValueExpression valueExpression = component.getValueExpression(VALUE);
+				ValueExpression valueExpression = component.getValueExpression(VALUE_ATTRIBUTE);
 
 				if (valueExpression != null) {
 					ValueReference valueReference = getValueReference(context.getELContext(), valueExpression);
@@ -527,8 +526,8 @@ public class ValidateBean extends TagHandler {
 		}
 
 		@Override
-		public void validate(FacesContext context, UIComponent component, Object value) throws ValidatorException {
-			ValueExpression valueExpression = component.getValueExpression(VALUE);
+		public void validate(FacesContext context, UIComponent component, Object value) {
+			ValueExpression valueExpression = component.getValueExpression(VALUE_ATTRIBUTE);
 
 			if (valueExpression != null) {
 				ValueReference valueReference = getValueReference(context.getELContext(), valueExpression);

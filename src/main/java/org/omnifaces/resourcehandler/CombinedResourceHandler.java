@@ -37,7 +37,6 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.UIOutput;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.PreRenderViewEvent;
 import javax.faces.event.SystemEvent;
 import javax.faces.event.SystemEventListener;
@@ -306,7 +305,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 	 * </ul>
 	 */
 	@Override
-	public void processEvent(SystemEvent event) throws AbortProcessingException {
+	public void processEvent(SystemEvent event) {
 		if (disabledParam != null && parseBoolean(String.valueOf(evaluateExpressionGet(disabledParam)))) {
 			return;
 		}
@@ -400,6 +399,24 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		}
 	}
 
+	private static void removeComponentResources(FacesContext context, List<UIComponent> componentResourcesToRemove, String target) {
+		UIViewRoot view = context.getViewRoot();
+
+		for (UIComponent resourceToRemove : componentResourcesToRemove) {
+			if (resourceToRemove != null) {
+				UIComponent container = isMyFacesUsed() ? resourceToRemove.getParent() : resourceToRemove;
+
+				// setInView(false) forces JSF to not save dynamic remove action in state.
+				// Otherwise JSF will re-execute dynamic remove during restore view phase.
+				// This is unnecessary as CombinedResourceHandler already takes care of it.
+				// See also https://github.com/omnifaces/omnifaces/issues/135
+				container.setInView(false);
+				view.removeComponentResource(context, resourceToRemove, target);
+				container.setInView(true);
+			}
+		}
+	}
+
 	// Inner classes --------------------------------------------------------------------------------------------------
 
 	/**
@@ -416,14 +433,14 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 		// General stylesheet/script builder --------------------------------------------------------------------------
 
-		private CombinedResourceBuilder stylesheets;
-		private CombinedResourceBuilder scripts;
-		private Map<String, CombinedResourceBuilder> deferredScripts;
+		private Builder stylesheets;
+		private Builder scripts;
+		private Map<String, Builder> deferredScripts;
 		private List<UIComponent> componentResourcesToRemove;
 
 		public CombinedResourceBuilder() {
-			stylesheets = new CombinedResourceBuilder(EXTENSION_CSS, TARGET_HEAD);
-			scripts = new CombinedResourceBuilder(EXTENSION_JS, TARGET_HEAD);
+			stylesheets = new Builder(EXTENSION_CSS, TARGET_HEAD);
+			scripts = new Builder(EXTENSION_JS, TARGET_HEAD);
 			deferredScripts = new LinkedHashMap<>();
 			componentResourcesToRemove = new ArrayList<>();
 		}
@@ -495,10 +512,10 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 		private void addDeferredScript(UIComponent component, ResourceIdentifier id) {
 			String group = (String) component.getAttributes().get("group");
-			CombinedResourceBuilder builder = deferredScripts.get(group);
+			Builder builder = deferredScripts.get(group);
 
 			if (builder == null) {
-				builder = new CombinedResourceBuilder(EXTENSION_JS, TARGET_BODY);
+				builder = new Builder(EXTENSION_JS, TARGET_BODY);
 				deferredScripts.put(group, builder);
 			}
 
@@ -509,21 +526,26 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 			stylesheets.create(context, inlineCSS ? InlineStylesheetRenderer.RENDERER_TYPE : RENDERER_TYPE_CSS);
 			scripts.create(context, inlineJS ? InlineScriptRenderer.RENDERER_TYPE : RENDERER_TYPE_JS);
 
-			for (CombinedResourceBuilder builder : deferredScripts.values()) {
+			for (Builder builder : deferredScripts.values()) {
 				builder.create(context, DeferredScriptRenderer.RENDERER_TYPE);
 			}
 
 			removeComponentResources(context, componentResourcesToRemove, TARGET_HEAD);
 		}
 
-		// Specific stylesheet/script builder -------------------------------------------------------------------------
+	}
+
+	// Specific stylesheet/script builder -----------------------------------------------------------------------------
+
+	private final class Builder {
 
 		private String extension;
 		private String target;
 		private CombinedResourceInfo.Builder infoBuilder;
 		private UIComponent componentResource;
+		private List<UIComponent> componentResourcesToRemove;
 
-		private CombinedResourceBuilder(String extension, String target) {
+		private Builder(String extension, String target) {
 			this.extension = extension;
 			this.target = target;
 			infoBuilder = new CombinedResourceInfo.Builder();
@@ -591,24 +613,6 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 			removeComponentResources(context, componentResourcesToRemove, target);
 		}
 
-	}
-
-	private static void removeComponentResources(FacesContext context, List<UIComponent> componentResourcesToRemove, String target) {
-		UIViewRoot view = context.getViewRoot();
-
-		for (UIComponent resourceToRemove : componentResourcesToRemove) {
-			if (resourceToRemove != null) {
-				UIComponent container = isMyFacesUsed() ? resourceToRemove.getParent() : resourceToRemove;
-
-				// setInView(false) forces JSF to not save dynamic remove action in state.
-				// Otherwise JSF will re-execute dynamic remove during restore view phase.
-				// This is unnecessary as CombinedResourceHandler already takes care of it.
-				// See also https://github.com/omnifaces/omnifaces/issues/135
-				container.setInView(false);
-				view.removeComponentResource(context, resourceToRemove, target);
-				container.setInView(true);
-			}
-		}
 	}
 
 }

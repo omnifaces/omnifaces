@@ -152,7 +152,7 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
 	 * component.
 	 */
 	@Override
-	public void processValueChange(ValueChangeEvent event) throws AbortProcessingException {
+	public void processValueChange(ValueChangeEvent event) {
 		if (isDisabled()) {
 			return;
 		}

@@ -117,19 +117,6 @@ public class GraphicResource extends DynamicResource {
 		"o:graphicImage 'value' attribute must specify valid method parameters."
 			+ " Encountered invalid method parameters '%s'.";
 
-	private static Map<String, String> createContentTypesByBase64Header() {
-		Map<String, String> contentTypesByBase64Header = new HashMap<>();
-		contentTypesByBase64Header.put("/9j/", "image/jpeg");
-		contentTypesByBase64Header.put("iVBORw", "image/png");
-		contentTypesByBase64Header.put("R0lGOD", "image/gif");
-		contentTypesByBase64Header.put("AAABAA", "image/x-icon");
-		contentTypesByBase64Header.put("PD94bW", "image/svg+xml");
-		contentTypesByBase64Header.put("Qk0", "image/bmp");
-		contentTypesByBase64Header.put("SUkqAA", "image/tiff");
-		contentTypesByBase64Header.put("TU0AKg", "image/tiff");
-		return unmodifiableMap(contentTypesByBase64Header);
-	}
-
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private String base64;
@@ -279,6 +266,22 @@ public class GraphicResource extends DynamicResource {
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Create mapping of content types by base64 header.
+	 */
+	private static Map<String, String> createContentTypesByBase64Header() {
+		Map<String, String> contentTypesByBase64Header = new HashMap<>();
+		contentTypesByBase64Header.put("/9j/", "image/jpeg");
+		contentTypesByBase64Header.put("iVBORw", "image/png");
+		contentTypesByBase64Header.put("R0lGOD", "image/gif");
+		contentTypesByBase64Header.put("AAABAA", "image/x-icon");
+		contentTypesByBase64Header.put("PD94bW", "image/svg+xml");
+		contentTypesByBase64Header.put("Qk0", "image/bmp");
+		contentTypesByBase64Header.put("SUkqAA", "image/tiff");
+		contentTypesByBase64Header.put("TU0AKg", "image/tiff");
+		return unmodifiableMap(contentTypesByBase64Header);
+	}
 
 	/**
 	 * Register graphic image scoped beans discovered so far.

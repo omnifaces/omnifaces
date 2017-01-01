@@ -19,7 +19,6 @@ import static org.omnifaces.util.Faces.getInitParameter;
 
 import java.util.TimeZone;
 
-import javax.faces.FacesException;
 import javax.faces.application.Application;
 import javax.faces.application.ApplicationWrapper;
 import javax.faces.convert.Converter;
@@ -111,7 +110,7 @@ public class OmniApplication extends ApplicationWrapper {
 	 * {@link #getWrapped()} which may return the JSF managed {@link Validator} instance.
 	 */
 	@Override
-	public Validator createValidator(String validatorId) throws FacesException {
+	public Validator createValidator(String validatorId) {
 		Validator validator = validatorManager.createValidator(getWrapped(), validatorId);
 
 		if (validator != null) {

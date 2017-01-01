@@ -185,7 +185,7 @@ public class ResetInputAjaxActionListener extends DefaultPhaseListener implement
 	 * would however indicate a bug in the concrete {@link PartialViewContext} implementation which is been used.
 	 */
 	@Override
-	public void processAction(ActionEvent event) throws AbortProcessingException {
+	public void processAction(ActionEvent event) {
 		FacesContext context = FacesContext.getCurrentInstance();
 		PartialViewContext partialViewContext = context.getPartialViewContext();
 

@@ -114,7 +114,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 	}
 
 	@Override
-	public void processEvent(SystemEvent event) throws AbortProcessingException {
+	public void processEvent(SystemEvent event) {
 		if (event instanceof PreRenderViewEvent || event instanceof PostAddToViewEvent) {
 			doProcess();
 		}

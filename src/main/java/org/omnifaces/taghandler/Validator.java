@@ -127,7 +127,7 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
 			private static final long serialVersionUID = 1L;
 
 			@Override
-			public void validate(FacesContext context, UIComponent component, Object value) throws ValidatorException {
+			public void validate(FacesContext context, UIComponent component, Object value) {
 				ELContext el = context.getELContext();
 
 				if (disabled == null || Boolean.FALSE.equals(disabled.getValue(el))) {

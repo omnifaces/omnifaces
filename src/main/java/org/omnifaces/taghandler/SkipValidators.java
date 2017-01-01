@@ -147,7 +147,7 @@ public class SkipValidators extends TagHandler {
 		}
 
 		@Override
-		public void processEvent(SystemEvent event) throws AbortProcessingException {
+		public void processEvent(SystemEvent event) {
 			UIComponent source = (UIComponent) event.getSource();
 
 			if (source instanceof UIInput) {

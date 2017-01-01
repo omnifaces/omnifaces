@@ -12,7 +12,6 @@
  */
 package org.omnifaces.context;
 
-import javax.faces.FacesException;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.ExternalContextFactory;
 
@@ -45,7 +44,7 @@ public class OmniExternalContextFactory extends ExternalContextFactory {
 	 * Returns a new instance of {@link OmniExternalContext} which wraps the original external context.
 	 */
 	@Override
-	public ExternalContext getExternalContext(Object context, Object request, Object response) throws FacesException {
+	public ExternalContext getExternalContext(Object context, Object request, Object response) {
 		return new OmniExternalContext(wrapped.getExternalContext(context, request, response));
 	}
 

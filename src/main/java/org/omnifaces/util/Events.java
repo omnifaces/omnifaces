@@ -241,7 +241,7 @@ public final class Events {
 		component.subscribeToEvent(type, new ComponentSystemEventListener() {
 
 			@Override
-			public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
+			public void processEvent(ComponentSystemEvent event) {
 				unsubscribeFromComponentEvent(component, type, this); // Prevent it from being saved in JSF state.
 				callback.invoke(event);
 			}
@@ -370,7 +370,7 @@ public final class Events {
 		return new DefaultViewEventListener() {
 
 			@Override
-			public void processEvent(SystemEvent event) throws AbortProcessingException {
+			public void processEvent(SystemEvent event) {
 				callback.invoke(event);
 			}
 		};

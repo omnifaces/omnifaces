@@ -99,6 +99,16 @@ public final class Utils {
 	private static final int UNICODE_END_PRINTABLE_ASCII = 0x7f;
 	private static final int UNICODE_BEGIN_PRINTABLE_ASCII = 0x20;
 	private static final Map<Class<?>, Object> PRIMITIVE_DEFAULTS = createPrimitiveDefaults();
+	private static final String ERROR_UNSUPPORTED_ENCODING = "UTF-8 is apparently not supported on this platform.";
+
+	// Constructors ---------------------------------------------------------------------------------------------------
+
+	private Utils() {
+		// Hide constructor.
+	}
+
+	// Initialization -------------------------------------------------------------------------------------------------
+
 	private static Map<Class<?>, Object> createPrimitiveDefaults() {
 		Map<Class<?>, Object> primitiveDefaults = new HashMap<>();
 		primitiveDefaults.put(boolean.class, false);
@@ -110,14 +120,6 @@ public final class Utils {
 		primitiveDefaults.put(float.class, (float) 0);
 		primitiveDefaults.put(double.class, (double) 0);
 		return unmodifiableMap(primitiveDefaults);
-	}
-
-	private static final String ERROR_UNSUPPORTED_ENCODING = "UTF-8 is apparently not supported on this platform.";
-
-	// Constructors ---------------------------------------------------------------------------------------------------
-
-	private Utils() {
-		// Hide constructor.
 	}
 
 	// Lang -----------------------------------------------------------------------------------------------------------

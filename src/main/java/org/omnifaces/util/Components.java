@@ -1305,7 +1305,7 @@ public final class Components {
 		final MethodExpression method = createVoidMethodExpression(expression, AjaxBehaviorEvent.class);
 		behavior.addAjaxBehaviorListener(new AjaxBehaviorListener() {
 			@Override
-			public void processAjaxBehavior(AjaxBehaviorEvent event) throws AbortProcessingException {
+			public void processAjaxBehavior(AjaxBehaviorEvent event) {
 				method.invoke(getELContext(), new Object[] { event });
 			}
 		});

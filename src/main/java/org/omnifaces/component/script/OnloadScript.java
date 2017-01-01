@@ -25,7 +25,6 @@ import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.context.ResponseWriterWrapper;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.ListenerFor;
 import javax.faces.event.ListenersFor;
@@ -79,7 +78,7 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 	 * {@link #processEvent(SystemEvent)}.
 	 */
 	@Override
-	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
+	public void processEvent(ComponentSystemEvent event) {
 		moveToBody(event);
 
 		if (event instanceof PostRestoreStateEvent) {
@@ -100,7 +99,7 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 	 * request with partial rendering, then encode the children as {@link Ajax#oncomplete(String...)}.
 	 */
 	@Override
-	public void processEvent(SystemEvent event) throws AbortProcessingException {
+	public void processEvent(SystemEvent event) {
 		if (!(event instanceof PreRenderViewEvent) || !isRendered()) {
 			return;
 		}

@@ -78,7 +78,7 @@ public class BeanValidationEventListener implements SystemEventListener {
 	 * Handle the {@link PreValidateEvent} and {@link PostValidateEvent}.
 	 */
 	@Override
-	public void processEvent(SystemEvent event) throws AbortProcessingException {
+	public void processEvent(SystemEvent event) {
 		if (event instanceof PreValidateEvent) {
 			handlePreValidate((UIInput) ((ComponentSystemEvent) event).getComponent());
 		}

@@ -25,7 +25,7 @@ import javax.faces.event.SystemEventListener;
 public abstract class DefaultSystemEventListener implements SystemEventListener {
 
 	@Override
-	public void processEvent(SystemEvent event) throws AbortProcessingException {
+	public void processEvent(SystemEvent event) {
 		// NOOP
 	}
 

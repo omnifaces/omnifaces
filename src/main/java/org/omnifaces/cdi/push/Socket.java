@@ -40,7 +40,6 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.behavior.ClientBehavior;
 import javax.faces.component.behavior.ClientBehaviorHolder;
 import javax.faces.context.FacesContext;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.ListenerFor;
 import javax.faces.event.PostAddToViewEvent;
@@ -669,7 +668,7 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 	 * After adding component to view, subscribe {@link SocketFacesListener} if necessary.
 	 */
 	@Override
-	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
+	public void processEvent(ComponentSystemEvent event) {
 		if (event instanceof PostAddToViewEvent) {
 			SocketFacesListener.subscribeIfNecessary();
 		}

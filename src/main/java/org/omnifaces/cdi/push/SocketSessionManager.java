@@ -67,6 +67,8 @@ public class SocketSessionManager {
 		"Tomcat cannot handle concurrent push messages. A push message has been sent only after %s retries."
 			+ " Consider rate limiting sending push messages. For example, once every 500ms.";
 
+	private static volatile SocketSessionManager instance;
+
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	private final ConcurrentHashMap<String, Collection<Session>> socketSessions = new ConcurrentHashMap<>();
@@ -214,8 +216,6 @@ public class SocketSessionManager {
 	}
 
 	// Internal -------------------------------------------------------------------------------------------------------
-
-	private static volatile SocketSessionManager instance;
 
 	/**
 	 * Internal usage only. Awkward workaround for it being unavailable via @Inject in endpoint in Tomcat+Weld/OWB.

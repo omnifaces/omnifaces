@@ -49,7 +49,7 @@ public class FacesViewsViewHandlerInstaller implements SystemEventListener {
 	}
 
 	@Override
-	public void processEvent(SystemEvent event) throws AbortProcessingException {
+	public void processEvent(SystemEvent event) {
 		FacesViews.registerViewHander(getServletContext());
 	}
 
