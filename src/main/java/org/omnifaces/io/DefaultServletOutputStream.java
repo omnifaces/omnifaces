@@ -19,7 +19,7 @@ import javax.servlet.ServletOutputStream;
 
 /**
  * <p>
- * A default servlet output stream.
+ * A default implementation of abstract servlet output stream.
  *
  * @author Bauke Scholtz
  * @since 2.6
@@ -30,6 +30,7 @@ public class DefaultServletOutputStream extends ServletOutputStream {
 
 	/**
 	 * Constructs a default servlet output stream which delegates to given output stream.
+	 * @param output The output stream to let this servlet output stream delegate to.
 	 */
 	public DefaultServletOutputStream(OutputStream output) {
 		this.output = output;

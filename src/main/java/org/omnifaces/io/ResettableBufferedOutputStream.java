@@ -47,7 +47,7 @@ public class ResettableBufferedOutputStream extends OutputStream implements Rese
 	 * Construct a new resettable buffered output stream which forcibly buffers everything until the given threshold
 	 * buffer size, regardless of flush calls and calls. You need to override {@link #createOutputStream(boolean)} when
 	 * using this constructor.
-	 * @param bufferSize The threshold buffer size.
+	 * @param thresholdBufferSize The threshold buffer size.
 	 */
 	public ResettableBufferedOutputStream(int thresholdBufferSize) {
 		this(null, thresholdBufferSize);
@@ -58,7 +58,7 @@ public class ResettableBufferedOutputStream extends OutputStream implements Rese
 	 * everything until the given threshold buffer size, regardless of flush calls. You do not need to override
 	 * {@link #createOutputStream(boolean)} when using this constructor.
 	 * @param output The wrapped output stream .
-	 * @param bufferSize The threshold buffer size.
+	 * @param thresholdBufferSize The threshold buffer size.
 	 */
 	public ResettableBufferedOutputStream(OutputStream output, int thresholdBufferSize) {
 		this.output = output;
