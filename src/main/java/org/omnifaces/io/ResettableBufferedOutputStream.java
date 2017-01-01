@@ -17,8 +17,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 /**
- * This resettable buffered output stream will buffer everything until the given buffer size, regardless of flush calls.
- * Only when the buffer size is exceeded, or when close is called, then the buffer will be actually flushed.
+ * This resettable buffered output stream will buffer everything until the given threshold buffer size, regardless of
+ * flush calls. Only when the specified threshold buffer size is exceeded, or when {@link #close()} is called, then the
+ * buffer will be actually flushed.
  * <p>
  * There is a {@link #reset()} method which enables the developer to reset the buffer, as long as it's not flushed yet,
  * which can be determined by {@link #isResettable()}.
@@ -28,25 +29,41 @@ import java.io.OutputStream;
  */
 public class ResettableBufferedOutputStream extends OutputStream implements ResettableBuffer {
 
+	// Constants --------------------------------------------------------------------------------------------------
+
+	private static final String ERROR_CLOSED = "Stream is already closed.";
+
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private OutputStream output;
 	private ByteArrayOutputStream buffer;
-	private int bufferSize;
+	private int thresholdBufferSize;
 	private int writtenBytes;
+	private boolean closed;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Construct a new resettable buffered output stream which wraps the given output stream and forcibly buffers
-	 * everything until the given buffer size, regardless of flush calls.
-	 * @param output The wrapped output stream .
-	 * @param bufferSize The buffer size.
+	 * Construct a new resettable buffered output stream which forcibly buffers everything until the given threshold
+	 * buffer size, regardless of flush calls and calls. You need to override {@link #createOutputStream(boolean)} when
+	 * using this constructor.
+	 * @param bufferSize The threshold buffer size.
 	 */
-	public ResettableBufferedOutputStream(OutputStream output, int bufferSize) {
+	public ResettableBufferedOutputStream(int thresholdBufferSize) {
+		this(null, thresholdBufferSize);
+	}
+
+	/**
+	 * Construct a new resettable buffered output stream which wraps the given output stream and forcibly buffers
+	 * everything until the given threshold buffer size, regardless of flush calls. You do not need to override
+	 * {@link #createOutputStream(boolean)} when using this constructor.
+	 * @param output The wrapped output stream .
+	 * @param bufferSize The threshold buffer size.
+	 */
+	public ResettableBufferedOutputStream(OutputStream output, int thresholdBufferSize) {
 		this.output = output;
-		this.bufferSize = bufferSize;
-		buffer = new ByteArrayOutputStream(bufferSize);
+		this.thresholdBufferSize = thresholdBufferSize;
+		buffer = new ByteArrayOutputStream(thresholdBufferSize);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -63,13 +80,14 @@ public class ResettableBufferedOutputStream extends OutputStream implements Rese
 
 	@Override
 	public void write(byte[] bytes, int offset, int length) throws IOException {
-		if (buffer != null) {
+		checkClosed();
+
+		if (isResettable()) {
 			writtenBytes += (length - offset);
 
-			if (writtenBytes > bufferSize) {
-				output.write(buffer.toByteArray());
+			if (writtenBytes > thresholdBufferSize) {
+				flushBuffer(true);
 				output.write(bytes, offset, length);
-				buffer = null;
 			}
 			else {
 				buffer.write(bytes, offset, length);
@@ -80,32 +98,84 @@ public class ResettableBufferedOutputStream extends OutputStream implements Rese
 		}
 	}
 
+	private void flushBuffer(boolean thresholdBufferSizeExceeded) throws IOException {
+		if (output == null) {
+			if (thresholdBufferSizeExceeded) {
+				writtenBytes = -1;
+			}
+
+			output = createOutputStream(thresholdBufferSizeExceeded);
+		}
+
+		output.write(buffer.toByteArray());
+		buffer = null;
+	}
+
+	/**
+	 * Returns the custom implementation of the {@link OutputStream}. This will only be called when the specified
+	 * threshold buffer size is exceeded, or when {@link #close()} is called.
+	 * @param thresholdBufferSizeExceeded Whether the threshold buffer size has exceeded.
+	 * @return The custom implementation of the {@link OutputStream}.
+	 * @throws IOException When an I/O error occurs.
+	 */
+	protected OutputStream createOutputStream(boolean thresholdBufferSizeExceeded) throws IOException {
+		throw new UnsupportedOperationException(
+			"You need to either override this method, or use the 2-arg constructor taking OutputStream instead.");
+	}
+
+	/**
+	 * Returns the amount of so far written bytes in the threshold buffer. This will be 0 when the threshold buffer is
+	 * empty and this will be -1 when the threshold has exceeded.
+	 * @return The amount of so far written bytes in the threshold buffer.
+	 */
+	protected int getWrittenBytes() {
+		return writtenBytes;
+	}
+
 	@Override
 	public void reset() {
-		buffer = new ByteArrayOutputStream(bufferSize);
-		writtenBytes = 0;
+		if (isResettable()) {
+			buffer = new ByteArrayOutputStream(thresholdBufferSize);
+			writtenBytes = 0;
+		}
 	}
 
 	@Override
 	public void flush() throws IOException {
-		if (buffer == null) {
+		checkClosed();
+
+		if (!isResettable()) {
 			output.flush();
 		}
 	}
 
 	@Override
 	public void close() throws IOException {
-		if (buffer != null) {
-			output.write(buffer.toByteArray());
-			buffer = null;
+		if (closed) {
+			return;
+		}
+
+		if (isResettable()) {
+			flushBuffer(false);
 		}
 
 		output.close();
+		closed = true;
 	}
 
 	@Override
 	public boolean isResettable() {
 		return buffer != null;
+	}
+
+	/**
+	 * Check if the current stream is closed and if so, then throw IO exception.
+	 * @throws IOException When the current stream is closed.
+	 */
+	private void checkClosed() throws IOException {
+		if (closed) {
+			throw new IOException(ERROR_CLOSED);
+		}
 	}
 
 }

@@ -22,6 +22,8 @@ import java.util.zip.GZIPOutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.omnifaces.io.ResettableBufferedOutputStream;
+
 /**
  * This HTTP servlet response wrapper will GZIP the response when the given threshold has exceeded and the response
  * content type matches one of the given mimetypes.
@@ -157,104 +159,27 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 	 *
 	 * @author Bauke Scholtz
 	 */
-	private class GzipThresholdOutputStream extends OutputStream {
-
-		// Constants --------------------------------------------------------------------------------------------------
-
-		private static final String ERROR_CLOSED = "Stream is already closed.";
-
-		// Properties -------------------------------------------------------------------------------------------------
-
-		private byte[] thresholdBuffer;
-		private int thresholdLength;
-		private OutputStream output;
-		private boolean closed;
+	private class GzipThresholdOutputStream extends ResettableBufferedOutputStream {
 
 		// Constructors -----------------------------------------------------------------------------------------------
 
 		public GzipThresholdOutputStream(int threshold) {
-			thresholdBuffer = new byte[threshold];
+			super(threshold);
 		}
 
 		// Actions ----------------------------------------------------------------------------------------------------
 
-		@Override
-		public void write(int b) throws IOException {
-			write(new byte[] { (byte) b }, 0, 1);
-		}
-
-		@Override
-		public void write(byte[] bytes) throws IOException {
-			write(bytes, 0, bytes.length);
-		}
-
-		@Override
-		public void write(byte[] bytes, int offset, int length) throws IOException {
-			checkClosed();
-
-			if (length == 0) {
-				return;
-			}
-
-			if (output == null) {
-				if ((length - offset) <= (thresholdBuffer.length - thresholdLength)) {
-					System.arraycopy(bytes, offset, thresholdBuffer, thresholdLength, length);
-					thresholdLength += length;
-					return;
-				}
-				else {
-					// Threshold buffer has exceeded. Now use GZIP if possible.
-					output = createGzipOutputStreamIfNecessary(true);
-					output.write(thresholdBuffer, 0, thresholdLength);
-				}
-			}
-
-			output.write(bytes, offset, length);
-		}
-
-		@Override
-		public void flush() throws IOException {
-			checkClosed();
-
-			if (output != null) {
-				output.flush();
-			}
-		}
-
-		@Override
-		public void close() throws IOException {
-			if (closed) {
-				return;
-			}
-
-			if (output == null) {
-				// Threshold buffer hasn't exceeded. Use normal output stream.
-				setContentLength(thresholdLength);
-				output = createGzipOutputStreamIfNecessary(false);
-				output.write(thresholdBuffer, 0, thresholdLength);
-			}
-
-			output.close();
-			closed = true;
-		}
-
-		public void reset() {
-			thresholdLength = 0;
-			output = null;
-		}
-
-		// Helpers ----------------------------------------------------------------------------------------------------
-
 		/**
-		 * Create GZIP output stream if necessary. That is, when the given <code>gzip</code> argument is
+		 * Create GZIP output stream if necessary. That is, when the given <code>doGzip</code> argument is
 		 * <code>true</code>, the current response does not have the <code>Cache-Control: no-transform</code> or
 		 * <code>Content-Range</code> headers, the current response is not committed, the content type is not
 		 * <code>null</code> and the content type matches one of the mimetypes.
 		 */
-		private OutputStream createGzipOutputStreamIfNecessary(boolean gzip) throws IOException {
+		@Override
+		public OutputStream createOutputStream(boolean doGzip) throws IOException {
 			HttpServletResponse originalResponse = (HttpServletResponse) getResponse();
 
-			if (gzip && !noGzip && (closing || !isCommitted())) {
+			if (doGzip && !noGzip && (closing || !isCommitted())) {
 				String contentType = getContentType();
 
 				if (contentType != null && mimetypes.contains(contentType.split(";", 2)[0])) {
@@ -264,21 +189,15 @@ public class GzipHttpServletResponse extends HttpServletResponseOutputWrapper {
 				}
 			}
 
+			if (!doGzip) {
+				setContentLength(getWrittenBytes());
+			}
+
 			if (contentLength > 0) {
 				originalResponse.setHeader("Content-Length", String.valueOf(contentLength));
 			}
 
 			return originalResponse.getOutputStream();
-		}
-
-		/**
-		 * Check if the current stream is closed and if so, then throw IO exception.
-		 * @throws IOException When the current stream is closed.
-		 */
-		private void checkClosed() throws IOException {
-			if (closed) {
-				throw new IOException(ERROR_CLOSED);
-			}
 		}
 
 	}

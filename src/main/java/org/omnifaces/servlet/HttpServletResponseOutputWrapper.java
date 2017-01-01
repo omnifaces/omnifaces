@@ -180,6 +180,4 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 		this.passThrough = passThrough;
 	}
 
-	// Nested classes -------------------------------------------------------------------------------------------------
-
 }
