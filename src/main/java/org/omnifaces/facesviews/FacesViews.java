@@ -215,7 +215,9 @@ public final class FacesViews {
 	 * should strip the extension from the parent view handler's outcome or construct the URL itself and only take the
 	 * query parameters (if any) from the parent.
 	 * @see ViewHandlerMode
+	 * @deprecated Since 2.6 As this is superfluous since Servlet 3.0.
 	 */
+	@Deprecated // TODO: remove in OmniFaces 3.0.
 	public static final String FACES_VIEWS_VIEW_HANDLER_MODE_PARAM_NAME = "org.omnifaces.FACES_VIEWS_VIEW_HANDLER_MODE";
 
 

@@ -19,6 +19,7 @@ import static org.omnifaces.facesviews.FacesViews.getMappedResources;
 import static org.omnifaces.facesviews.FacesViews.getViewHandlerMode;
 import static org.omnifaces.facesviews.FacesViews.isScannedViewsAlwaysExtensionless;
 import static org.omnifaces.facesviews.FacesViews.stripWelcomeFilePrefix;
+import static org.omnifaces.facesviews.ViewHandlerMode.BUILD_WITH_PARENT_QUERY_PARAMETERS;
 import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.FacesLocal.getRequestAttribute;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
@@ -76,17 +77,17 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 		Map<String, String> mappedResources = getMappedResources(servletContext);
 
 		if (mappedResources.containsKey(viewId) && (extensionless || isOriginalViewExtensionless(context))) {
-			String pathInfo = context.getViewRoot().getViewId().equals(viewId) ? coalesce(getRequestPathInfo(context), "") : "";
-
 			// User has requested to always render extensionless, or the requested viewId was mapped and the current
 			// request is extensionless; render the action URL extensionless as well.
 
-			switch (mode) {
-				case STRIP_EXTENSION_FROM_PARENT:
-					actionURL = removeExtension(servletContext, actionURL, viewId);
-					return pathInfo.isEmpty() ? actionURL : (stripTrailingSlash(actionURL) + pathInfo);
-				case BUILD_WITH_PARENT_QUERY_PARAMETERS:
-					return getRequestContextPath(context) + stripExtension(viewId) + pathInfo + getQueryString(actionURL);
+			String pathInfo = context.getViewRoot().getViewId().equals(viewId) ? coalesce(getRequestPathInfo(context), "") : "";
+
+			if (mode == BUILD_WITH_PARENT_QUERY_PARAMETERS) {
+				return getRequestContextPath(context) + stripExtension(viewId) + pathInfo + getQueryString(actionURL);
+			}
+			else {
+				actionURL = removeExtension(servletContext, actionURL, viewId);
+				return pathInfo.isEmpty() ? actionURL : (stripTrailingSlash(actionURL) + pathInfo);
 			}
 		}
 

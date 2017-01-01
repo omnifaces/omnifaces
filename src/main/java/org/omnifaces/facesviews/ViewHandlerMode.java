@@ -21,7 +21,9 @@ package org.omnifaces.facesviews;
  * @since 1.5
  * @see FacesViews
  * @see FacesViewsViewHandler
+ * @deprecated Since 2.6 As this is superfluous since Servlet 3.0.
  */
+@Deprecated // TODO: remove in OmniFaces 3.0.
 public enum ViewHandlerMode {
 
 	/**
