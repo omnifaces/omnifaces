@@ -97,7 +97,7 @@ public class InputFileIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void uploadSingleEmpty() throws IOException {
+	public void uploadSingleEmpty() {
 		guardHttp(uploadSingleSubmit).click();
 		assertEquals("uploadSingle: null", messages.getText());
 	}

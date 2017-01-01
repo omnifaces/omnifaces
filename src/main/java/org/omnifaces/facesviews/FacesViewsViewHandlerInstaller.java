@@ -15,7 +15,6 @@ package org.omnifaces.facesviews;
 import static org.omnifaces.util.Faces.getServletContext;
 
 import javax.faces.application.Application;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.PostConstructApplicationEvent;
 import javax.faces.event.SystemEvent;
 import javax.faces.event.SystemEventListener;

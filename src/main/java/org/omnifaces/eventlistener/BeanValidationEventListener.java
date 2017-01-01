@@ -18,7 +18,6 @@ import java.util.logging.Logger;
 import javax.faces.component.EditableValueHolder;
 import javax.faces.component.UICommand;
 import javax.faces.component.UIInput;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.PostValidateEvent;
 import javax.faces.event.PreValidateEvent;

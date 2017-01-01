@@ -13,7 +13,6 @@
 package org.omnifaces.eventlistener;
 
 import javax.faces.component.UIViewRoot;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.SystemEvent;
 import javax.faces.event.SystemEventListener;
 

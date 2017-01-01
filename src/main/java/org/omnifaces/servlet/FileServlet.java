@@ -72,7 +72,7 @@ import org.omnifaces.util.Servlets;
  *     }
  *
  *     &#64;Override
- *     protected File getFile(HttpServletRequest request) throws IllegalArgumentException {
+ *     protected File getFile(HttpServletRequest request) {
  *         String pathInfo = request.getPathInfo();
  *
  *         if (pathInfo == null || pathInfo.isEmpty() || "/".equals(pathInfo)) {

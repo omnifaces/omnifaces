@@ -78,7 +78,6 @@ import javax.faces.component.visit.VisitResult;
 import javax.faces.context.FacesContext;
 import javax.faces.context.FacesContextWrapper;
 import javax.faces.context.ResponseWriter;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
 import javax.faces.event.AjaxBehaviorEvent;
@@ -1322,7 +1321,6 @@ public final class Components {
 	 * @return A list of all action expressions and listeners associated with given component.
 	 * @since 2.4
 	 */
-	@SuppressWarnings("unchecked")
 	public static List<String> getActionExpressionsAndListeners(UIComponent component) {
 		List<String> actions = new ArrayList<>();
 
@@ -1470,7 +1468,7 @@ public final class Components {
 	 * @param component The component to be validated.
 	 * @throws IllegalStateException When the given component has any children.
 	 */
-	public static void validateHasNoChildren(UIComponent component) throws IllegalStateException {
+	public static void validateHasNoChildren(UIComponent component) {
 		if (!isDevelopment()) {
 			return;
 		}
