@@ -22,6 +22,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpServletResponseWrapper;
 
+import org.omnifaces.io.DefaultServletOutputStream;
 import org.omnifaces.io.ResettableBuffer;
 import org.omnifaces.io.ResettableBufferedOutputStream;
 import org.omnifaces.io.ResettableBufferedWriter;
@@ -86,28 +87,7 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 
 		if (output == null) {
 			buffer = new ResettableBufferedOutputStream(createOutputStream(), getBufferSize());
-			output = new ServletOutputStream() {
-				@Override
-				public void write(int b) throws IOException {
-					((OutputStream) buffer).write(b);
-				}
-				@Override
-				public void write(byte[] bytes) throws IOException {
-					((OutputStream) buffer).write(bytes);
-				}
-				@Override
-				public void write(byte[] bytes, int offset, int length) throws IOException {
-					((OutputStream) buffer).write(bytes, offset, length);
-				}
-				@Override
-				public void flush() throws IOException {
-					((OutputStream) buffer).flush();
-				}
-				@Override
-				public void close() throws IOException {
-					((OutputStream) buffer).close();
-				}
-			};
+			output = new DefaultServletOutputStream((OutputStream) buffer);
 		}
 
 		return output;
@@ -199,5 +179,7 @@ public abstract class HttpServletResponseOutputWrapper extends HttpServletRespon
 	public void setPassThrough(boolean passThrough) {
 		this.passThrough = passThrough;
 	}
+
+	// Nested classes -------------------------------------------------------------------------------------------------
 
 }

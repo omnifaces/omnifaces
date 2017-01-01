@@ -118,9 +118,8 @@ public class ResetInputAjaxActionListener extends DefaultPhaseListener implement
 		@Override
 		public VisitResult visit(VisitContext context, UIComponent target) {
 			FacesContext facesContext = context.getFacesContext();
-			Collection<String> executeIds = facesContext.getPartialViewContext().getExecuteIds();
 
-			if (executeIds.contains(target.getClientId(facesContext))) {
+			if (facesContext.getPartialViewContext().getExecuteIds().contains(target.getClientId(facesContext))) {
 				return VisitResult.REJECT;
 			}
 

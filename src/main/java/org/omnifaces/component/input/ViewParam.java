@@ -124,31 +124,7 @@ public class ViewParam extends UIViewParameter {
 	@Override
 	public Map<String, Object> getAttributes() {
 		if (attributeInterceptMap == null) {
-			attributeInterceptMap = new MapWrapper<String, Object>(super.getAttributes()) {
-
-				private static final long serialVersionUID = -7674000948288609007L;
-
-				@Override
-				public Object get(Object key) {
-					Object value = super.get(key);
-
-					if (Utils.isEmpty(value) && "label".equals(key)) {
-
-						// Next check if our outer component has a value expression for the label
-						ValueExpression labelExpression = ViewParam.this.getValueExpression("label");
-						if (labelExpression != null) {
-							value = labelExpression.getValue(getELContext());
-						}
-
-						// No explicit label defined, default to "name" (which is in many cases the most sane label anyway).
-						if (value == null) {
-							value = ViewParam.this.getName();
-						}
-					}
-
-					return value;
-				}
-			};
+			attributeInterceptMap = new AttributeInterceptMap(super.getAttributes());
 		}
 
 		return attributeInterceptMap;
@@ -202,6 +178,39 @@ public class ViewParam extends UIViewParameter {
 		// The request parameter is ignored on postbacks, however it's already present in the view scoped bean.
 		// So we can safely skip the required validation on postbacks.
 		return !isPostback() && super.isRequired();
+	}
+
+	// Inner classes --------------------------------------------------------------------------------------------------
+
+	private class AttributeInterceptMap extends MapWrapper<String, Object> {
+
+		private static final long serialVersionUID = -7674000948288609007L;
+
+		private AttributeInterceptMap(Map<String, Object> map) {
+			super(map);
+		}
+
+		@Override
+		public Object get(Object key) {
+			Object value = super.get(key);
+
+			if (Utils.isEmpty(value) && "label".equals(key)) {
+
+				// Next check if our outer component has a value expression for the label
+				ValueExpression labelExpression = ViewParam.this.getValueExpression("label");
+				if (labelExpression != null) {
+					value = labelExpression.getValue(getELContext());
+				}
+
+				// No explicit label defined, default to "name" (which is in many cases the most sane label anyway).
+				if (value == null) {
+					value = ViewParam.this.getName();
+				}
+			}
+
+			return value;
+		}
+
 	}
 
 }

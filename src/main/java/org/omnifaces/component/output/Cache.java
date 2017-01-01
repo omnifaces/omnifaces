@@ -179,52 +179,56 @@ public class Cache extends OutputFamily {
 	}
 
 	public Cache() {
-
 		final FacesContext context = FacesContext.getCurrentInstance();
 
 		// Execute the following code in PreRenderView, since at construction time the "useBuffer" and "key" attributes
 		// have not been set, and there is no @PostContruct for UIComponents.
 		subscribeToViewEvent(PRE_RENDER, new Callback.SerializableVoid() {
-
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void invoke() {
-
-				if (!isDisabled() && isUseBuffer() && !hasCachedValue(context)) {
-
-					final BufferedHttpServletResponse bufferedHttpServletResponse = getRequestAttribute(BUFFERED_RESPONSE);
-
-					if (bufferedHttpServletResponse == null) {
-						throw new IllegalStateException(ERROR_NO_BUFFERED_RESPONSE);
-					}
-
-					// Start buffering the response from now on
-					bufferedHttpServletResponse.setPassThrough(false);
-
-					// After the RENDER_RESPONSE phase, copy the area we need to cache from the response buffer
-					// and insert it into our cache
-					subscribeToRequestAfterPhase(RENDER_RESPONSE, new Callback.Void() {
-						@Override
-						public void invoke() {
-							String content = null;
-
-							try {
-								content = getContentFromBuffer(bufferedHttpServletResponse.getBufferAsString());
-							}
-							catch (IOException e) {
-								throw new IllegalStateException(e);
-							}
-
-							if (content != null) {
-								cacheContent(context, content);
-							}
-						}
-
-					});
-				}
+				processPreRenderViewEvent(context);
 			}
 		});
+	}
+
+	private void processPreRenderViewEvent(final FacesContext context) {
+		if (!isDisabled() && isUseBuffer() && !hasCachedValue(context)) {
+
+			final BufferedHttpServletResponse bufferedResponse = getRequestAttribute(BUFFERED_RESPONSE);
+
+			if (bufferedResponse == null) {
+				throw new IllegalStateException(ERROR_NO_BUFFERED_RESPONSE);
+			}
+
+			// Start buffering the response from now on
+			bufferedResponse.setPassThrough(false);
+
+			// After the RENDER_RESPONSE phase, copy the area we need to cache from the response buffer
+			// and insert it into our cache
+			subscribeToRequestAfterPhase(RENDER_RESPONSE, new Callback.Void() {
+				@Override
+				public void invoke() {
+					processPostRenderResponsePhase(context, bufferedResponse);
+				}
+			});
+		}
+	}
+
+	private void processPostRenderResponsePhase(FacesContext context, BufferedHttpServletResponse bufferedResponse) {
+		String content = null;
+
+		try {
+			content = getContentFromBuffer(bufferedResponse.getBufferAsString());
+		}
+		catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
+
+		if (content != null) {
+			cacheContent(context, content);
+		}
 	}
 
 	@Override

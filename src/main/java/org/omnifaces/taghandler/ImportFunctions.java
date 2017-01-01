@@ -82,7 +82,6 @@ public class ImportFunctions extends TagHandler {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final Map<String, Method> FUNCTIONS_CACHE = new ConcurrentHashMap<>();
-
 	private static final String ERROR_INVALID_FUNCTION = "Type '%s' does not have the function '%s'.";
 
 	// Variables ------------------------------------------------------------------------------------------------------
@@ -110,70 +109,84 @@ public class ImportFunctions extends TagHandler {
 	 */
 	@Override
 	public void apply(FaceletContext context, UIComponent parent) throws IOException {
-		final String type = typeAttribute.getValue(context);
-		final Class<?> cls = toClass(type);
-		final String var = (varValue != null) ? varValue : type.substring(type.lastIndexOf('.') + 1);
-		final FunctionMapper originalFunctionMapper = context.getFunctionMapper();
-		context.setFunctionMapper(new FunctionMapper() {
-
-			@Override
-			public Method resolveFunction(String prefix, String name) {
-				if (var.equals(prefix)) {
-					String key = cls + "." + name;
-					Method function = FUNCTIONS_CACHE.get(key);
-
-					if (function == null) {
-						function = findMethod(cls, name);
-
-						if (function == null) {
-							throw new IllegalArgumentException(String.format(ERROR_INVALID_FUNCTION, type, name));
-						}
-
-						FUNCTIONS_CACHE.put(key, function);
-					}
-
-					return function;
-				}
-				else {
-					return originalFunctionMapper.resolveFunction(prefix, name);
-				}
-			}
-		});
+		String type = typeAttribute.getValue(context);
+		String var = (varValue != null) ? varValue : type.substring(type.lastIndexOf('.') + 1);
+		FunctionMapper originalFunctionMapper = context.getFunctionMapper();
+		context.setFunctionMapper(new ImportFunctionsMapper(originalFunctionMapper, var, toClass(type)));
 	}
 
-	/**
-	 * Collect all public static methods of the given name in the given class, sort them by the amount of parameters
-	 * and return the first one.
-	 * @param cls The class to find the method in.
-	 * @param name The method name.
-	 * @return The found method, or <code>null</code> if none is found.
-	 */
-	private static Method findMethod(Class<?> cls, String name) {
-		Set<Method> methods = new TreeSet<>(new Comparator<Method>() {
-			@Override
-			public int compare(Method m1, Method m2) {
-				return Integer.valueOf(m1.getParameterTypes().length).compareTo(m2.getParameterTypes().length);
-			}
-		});
+	// Nested classes -------------------------------------------------------------------------------------------------
 
-		for (Method method : cls.getDeclaredMethods()) {
-			if (method.getName().equals(name) && isPublicStaticNonVoid(method)) {
-				methods.add(method);
+	private static class ImportFunctionsMapper extends FunctionMapper {
+
+		private FunctionMapper originalFunctionMapper;
+		private String var;
+		private Class<?> type;
+
+		private ImportFunctionsMapper(FunctionMapper originalFunctionMapper, String var, Class<?> type) {
+			this.originalFunctionMapper = originalFunctionMapper;
+			this.var = var;
+			this.type = type;
+		}
+
+		@Override
+		public Method resolveFunction(String prefix, String name) {
+			if (var.equals(prefix)) {
+				String key = type + "." + name;
+				Method function = FUNCTIONS_CACHE.get(key);
+
+				if (function == null) {
+					function = findMethod(type, name);
+
+					if (function == null) {
+						throw new IllegalArgumentException(String.format(ERROR_INVALID_FUNCTION, type.getName(), name));
+					}
+
+					FUNCTIONS_CACHE.put(key, function);
+				}
+
+				return function;
+			}
+			else {
+				return originalFunctionMapper.resolveFunction(prefix, name);
 			}
 		}
 
-		return methods.isEmpty() ? null : methods.iterator().next();
-	}
+		/**
+		 * Collect all public static methods of the given name in the given class, sort them by the amount of parameters
+		 * and return the first one.
+		 * @param cls The class to find the method in.
+		 * @param name The method name.
+		 * @return The found method, or <code>null</code> if none is found.
+		 */
+		private static Method findMethod(Class<?> cls, String name) {
+			Set<Method> methods = new TreeSet<>(new Comparator<Method>() {
+				@Override
+				public int compare(Method m1, Method m2) {
+					return Integer.valueOf(m1.getParameterTypes().length).compareTo(m2.getParameterTypes().length);
+				}
+			});
 
-	/**
-	 * Returns whether the given method is an utility method, that is when it is public and static and returns a
-	 * non-void type.
-	 * @param method The method to be checked.
-	 * @return <code>true</code> if the given method is an utility method, otherwise <code>false</code>.
-	 */
-	private static boolean isPublicStaticNonVoid(Method method) {
-		int modifiers = method.getModifiers();
-		return Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers) && method.getReturnType() != void.class;
+			for (Method method : cls.getDeclaredMethods()) {
+				if (method.getName().equals(name) && isPublicStaticNonVoid(method)) {
+					methods.add(method);
+				}
+			}
+
+			return methods.isEmpty() ? null : methods.iterator().next();
+		}
+
+		/**
+		 * Returns whether the given method is an utility method, that is when it is public and static and returns a
+		 * non-void type.
+		 * @param method The method to be checked.
+		 * @return <code>true</code> if the given method is an utility method, otherwise <code>false</code>.
+		 */
+		private static boolean isPublicStaticNonVoid(Method method) {
+			int modifiers = method.getModifiers();
+			return Modifier.isPublic(modifiers) && Modifier.isStatic(modifiers) && method.getReturnType() != void.class;
+		}
+
 	}
 
 }
