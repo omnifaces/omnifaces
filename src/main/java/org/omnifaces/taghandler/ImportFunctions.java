@@ -123,7 +123,7 @@ public class ImportFunctions extends TagHandler {
 		private String var;
 		private Class<?> type;
 
-		private ImportFunctionsMapper(FunctionMapper originalFunctionMapper, String var, Class<?> type) {
+		public ImportFunctionsMapper(FunctionMapper originalFunctionMapper, String var, Class<?> type) {
 			this.originalFunctionMapper = originalFunctionMapper;
 			this.var = var;
 			this.type = type;
