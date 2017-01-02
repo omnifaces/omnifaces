@@ -58,8 +58,7 @@ public class CacheValue extends TagHandler {
 
 		// The original value expression we get inside the Facelets tag
 		ValueExpression valueExpression = value.getValueExpression(ctx, Object.class);
-		String clientId = cacheComponent.getClientId(ctx.getFacesContext());
 
-		ctx.getVariableMapper().setVariable(nameStr, new CachingValueExpression(valueExpression, nameStr, clientId));
+		ctx.getVariableMapper().setVariable(nameStr, new CachingValueExpression(nameStr, valueExpression, cacheComponent));
 	}
 }
