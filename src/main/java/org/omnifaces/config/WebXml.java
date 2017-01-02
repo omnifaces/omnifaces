@@ -249,11 +249,11 @@ public enum WebXml {
 
 		Set<String> roles = findExactMatchRoles(uri);
 
-		if (roles == null) {
+		if (roles.isEmpty()) {
 			roles = findPrefixMatchRoles(uri);
 		}
 
-		if (roles == null) {
+		if (roles.isEmpty()) {
 			roles = findSuffixMatchRoles(uri);
 		}
 
@@ -316,7 +316,7 @@ public enum WebXml {
 	}
 
 	private static boolean isRoleMatch(Set<String> roles, String role) {
-		return roles.contains(role) || (role != null && roles.contains("*"));
+		return roles.isEmpty() || roles.contains(role) || (role != null && roles.contains("*"));
 	}
 
 	// Getters --------------------------------------------------------------------------------------------------------
