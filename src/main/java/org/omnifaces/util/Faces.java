@@ -66,6 +66,7 @@ import javax.servlet.http.Part;
 import org.omnifaces.component.ParamHolder;
 import org.omnifaces.config.FacesConfigXml;
 import org.omnifaces.el.FacesELResolver;
+import org.omnifaces.facesviews.FacesViews;
 
 /**
  * <p>
@@ -1235,13 +1236,15 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the HTTP request path info. If JSF is prefix mapped (e.g. <code>/faces/*</code>), then this returns the
-	 * whole part after the prefix mapping, with a leading slash. If JSF is suffix mapped (e.g. <code>*.xhtml</code>),
-	 * then this returns <code>null</code>.
+	 * Returns the HTTP request path info, taking into account whether FacesViews is used with MultiViews enabled.
+	 * If the resource is prefix mapped (e.g. <code>/faces/*</code>), then this returns the whole part after the prefix
+	 * mapping, with a leading slash. If the resource is suffix mapped (e.g. <code>*.xhtml</code>), then this returns
+	 * <code>null</code>. If MultiViews is enabled, then this returns the part after the mapped view, if any.
 	 * <p>
 	 * This is also available in EL as <code>#{faces.requestPathInfo}</code>.
 	 * @return The HTTP request path info.
 	 * @see ExternalContext#getRequestPathInfo()
+	 * @see FacesViews#FACES_VIEWS_ORIGINAL_PATH_INFO
 	 */
 	public static String getRequestPathInfo() {
 		return FacesLocal.getRequestPathInfo(getContext());
