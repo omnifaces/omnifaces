@@ -12,6 +12,7 @@
  */
 package org.omnifaces.validator;
 
+import static java.lang.String.format;
 import static org.omnifaces.util.Components.getLabel;
 import static org.omnifaces.util.FacesLocal.getMessageBundle;
 import static org.omnifaces.util.Messages.createError;
@@ -73,7 +74,7 @@ public class RequiredCheckboxValidator implements Validator {
 	@Override
 	public void validate(FacesContext context, UIComponent component, Object value) {
 		if (!(component instanceof UISelectBoolean)) {
-			throw new IllegalArgumentException(String.format(ERROR_WRONG_COMPONENT, component.getClass().getName()));
+			throw new IllegalArgumentException(format(ERROR_WRONG_COMPONENT, component.getClass().getName()));
 		}
 
 		if (!Boolean.TRUE.equals(value)) {

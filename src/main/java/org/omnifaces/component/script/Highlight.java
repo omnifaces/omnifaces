@@ -13,6 +13,7 @@
 package org.omnifaces.component.script;
 
 import static java.lang.Boolean.TRUE;
+import static java.lang.String.format;
 import static org.omnifaces.util.Components.getCurrentForm;
 
 import java.io.IOException;
@@ -144,7 +145,7 @@ public class Highlight extends OnloadScript {
 		});
 
 		if (clientIds.length() > 0) {
-			context.getResponseWriter().write(String.format(SCRIPT, clientIds, getStyleClass(), isFocus()));
+			context.getResponseWriter().write(format(SCRIPT, clientIds, getStyleClass(), isFocus()));
 		}
 	}
 

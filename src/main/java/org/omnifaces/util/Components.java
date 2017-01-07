@@ -12,6 +12,7 @@
  */
 package org.omnifaces.util;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
@@ -1168,7 +1169,7 @@ public final class Components {
 		UIForm form = (component instanceof UIForm) ? (UIForm) component : getClosestParent(component, UIForm.class);
 
 		if (form == null) {
-			throw new IllegalArgumentException(String.format(ERROR_MISSING_PARENT, component.getClass(), UIForm.class));
+			throw new IllegalArgumentException(format(ERROR_MISSING_PARENT, component.getClass(), UIForm.class));
 		}
 
 		resetInputs(form);
@@ -1363,7 +1364,7 @@ public final class Components {
 		}
 
 		if (getClosestParent(component, parentType) == null) {
-			throw new IllegalStateException(String.format(
+			throw new IllegalStateException(format(
 				ERROR_MISSING_PARENT, component.getClass().getSimpleName(), parentType));
 		}
 	}
@@ -1383,7 +1384,7 @@ public final class Components {
 		}
 
 		if (!parentType.isInstance(component.getParent())) {
-			throw new IllegalStateException(String.format(
+			throw new IllegalStateException(format(
 				ERROR_MISSING_DIRECT_PARENT, component.getClass().getSimpleName(), parentType));
 		}
 	}
@@ -1404,7 +1405,7 @@ public final class Components {
 		}
 
 		if (getClosestParent(component, parentType) != null) {
-			throw new IllegalStateException(String.format(
+			throw new IllegalStateException(format(
 				ERROR_ILLEGAL_PARENT, component.getClass().getSimpleName(), parentType));
 		}
 	}
@@ -1425,7 +1426,7 @@ public final class Components {
 		}
 
 		if (findComponentsInChildren(component, childType).isEmpty()) {
-			throw new IllegalStateException(String.format(
+			throw new IllegalStateException(format(
 				ERROR_MISSING_CHILD, component.getClass().getSimpleName(), childType));
 		}
 	}
@@ -1458,7 +1459,7 @@ public final class Components {
 		}
 
 		if (childClassNames.length() > 0) {
-			throw new IllegalStateException(String.format(
+			throw new IllegalStateException(format(
 				ERROR_ILLEGAL_CHILDREN, component.getClass().getSimpleName(), childType, childClassNames));
 		}
 	}
@@ -1484,7 +1485,7 @@ public final class Components {
 				childClassNames.append(child.getClass().getName());
 			}
 
-			throw new IllegalStateException(String.format(
+			throw new IllegalStateException(format(
 				ERROR_CHILDREN_DISALLOWED, component.getClass().getSimpleName(), childClassNames));
 		}
 	}

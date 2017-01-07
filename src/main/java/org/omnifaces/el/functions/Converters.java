@@ -12,6 +12,7 @@
  */
 package org.omnifaces.el.functions;
 
+import static java.lang.String.format;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.PrintWriter;
@@ -171,7 +172,7 @@ public final class Converters {
 		}
 
 		if (!array.getClass().isArray()) {
-			throw new IllegalArgumentException(String.format(ERROR_NOT_AN_ARRAY, array.getClass()));
+			throw new IllegalArgumentException(format(ERROR_NOT_AN_ARRAY, array.getClass()));
 		}
 
 		StringBuilder builder = new StringBuilder();
@@ -266,11 +267,11 @@ public final class Converters {
 		}
 
 		if (!array.getClass().isArray()) {
-			throw new IllegalArgumentException(String.format(ERROR_NOT_AN_ARRAY, array.getClass()));
+			throw new IllegalArgumentException(format(ERROR_NOT_AN_ARRAY, array.getClass()));
 		}
 
 		if (fragmentSize < 1) {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_FRAGMENT_SIZE, fragmentSize));
+			throw new IllegalArgumentException(format(ERROR_INVALID_FRAGMENT_SIZE, fragmentSize));
 		}
 
 		int sourceSize = Array.getLength(array);
@@ -301,7 +302,7 @@ public final class Converters {
 		}
 
 		if (fragmentSize < 1) {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_FRAGMENT_SIZE, fragmentSize));
+			throw new IllegalArgumentException(format(ERROR_INVALID_FRAGMENT_SIZE, fragmentSize));
 		}
 
 		int sourceSize = list.size();

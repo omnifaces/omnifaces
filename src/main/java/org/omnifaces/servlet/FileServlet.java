@@ -12,6 +12,7 @@
  */
 package org.omnifaces.servlet;
 
+import static java.lang.String.format;
 import static java.util.logging.Level.FINE;
 import static org.omnifaces.util.Servlets.formatContentDispositionHeader;
 import static org.omnifaces.util.Utils.coalesce;
@@ -471,7 +472,7 @@ public abstract class FileServlet extends HttpServlet {
 				this.file = file;
 				length = file.length();
 				lastModified = file.lastModified();
-				eTag = String.format(ETAG, encodeURL(file.getName()), lastModified);
+				eTag = format(ETAG, encodeURL(file.getName()), lastModified);
 			}
 			else {
 				this.file = null;

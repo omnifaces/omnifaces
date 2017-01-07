@@ -13,6 +13,7 @@
 package org.omnifaces.taghandler;
 
 import static java.lang.Boolean.TRUE;
+import static java.lang.String.format;
 import static org.omnifaces.util.Events.subscribeToRequestComponentEvent;
 import static org.omnifaces.util.Facelets.getValueExpression;
 import static org.omnifaces.util.Faces.getContext;
@@ -195,7 +196,7 @@ public class ViewParamValidationFailed extends TagHandler {
 	@Override
 	public void apply(FaceletContext context, final UIComponent parent) throws IOException {
 		if (!(parent instanceof UIViewRoot || parent instanceof UIViewParameter)) {
-			throw new IllegalStateException(String.format(ERROR_INVALID_PARENT, this, parent.getClass().getName()));
+			throw new IllegalStateException(format(ERROR_INVALID_PARENT, this, parent.getClass().getName()));
 		}
 
 		FacesContext facesContext = context.getFacesContext();
@@ -209,10 +210,10 @@ public class ViewParamValidationFailed extends TagHandler {
 		message = getValueExpression(context, getAttribute("message"), String.class);
 
 		if (sendRedirect == null && sendError == null) {
-			throw new IllegalArgumentException(String.format(ERROR_MISSING_ATTRIBUTE, this));
+			throw new IllegalArgumentException(format(ERROR_MISSING_ATTRIBUTE, this));
 		}
 		else if (sendRedirect != null && sendError != null) {
-			throw new IllegalArgumentException(String.format(ERROR_DOUBLE_ATTRIBUTE, this));
+			throw new IllegalArgumentException(format(ERROR_DOUBLE_ATTRIBUTE, this));
 		}
 
 		subscribeToRequestComponentEvent(parent, PostValidateEvent.class, new Callback.WithArgument<ComponentSystemEvent>() {
@@ -292,7 +293,7 @@ public class ViewParamValidationFailed extends TagHandler {
 
 				if (!HTTP_STATUS_CODE.matcher(evaluatedSendError).matches()) {
 					throw new IllegalArgumentException(
-						String.format(ERROR_INVALID_SENDERROR, sendError, evaluatedSendError));
+						format(ERROR_INVALID_SENDERROR, sendError, evaluatedSendError));
 				}
 
 				responseSendError(context, Integer.valueOf(evaluatedSendError), evaluatedMessage);
@@ -312,7 +313,7 @@ public class ViewParamValidationFailed extends TagHandler {
 		Object value = (expression != null) ? expression.getValue(context) : null;
 
 		if (required && isEmpty(value)) {
-			throw new IllegalArgumentException(String.format(ERROR_REQUIRED_ATTRIBUTE, expression));
+			throw new IllegalArgumentException(format(ERROR_REQUIRED_ATTRIBUTE, expression));
 		}
 
 		return (value != null) ? value.toString() : null;

@@ -12,6 +12,7 @@
  */
 package org.omnifaces.util;
 
+import static java.lang.String.format;
 import static java.util.logging.Level.FINE;
 
 import java.lang.annotation.Annotation;
@@ -183,7 +184,7 @@ public final class BeansLocal {
 		}
 		else {
 			throw new IllegalArgumentException(
-				String.format(ERROR_NO_ALTERABLE_CONTEXT, bean.getBeanClass(), context.getClass()));
+				format(ERROR_NO_ALTERABLE_CONTEXT, bean.getBeanClass(), context.getClass()));
 		}
 	}
 

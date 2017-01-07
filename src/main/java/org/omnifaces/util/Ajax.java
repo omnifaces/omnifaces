@@ -12,6 +12,7 @@
  */
 package org.omnifaces.util;
 
+import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.omnifaces.util.Components.getCurrentComponent;
 import static org.omnifaces.util.Components.getCurrentForm;
@@ -196,7 +197,7 @@ public final class Ajax {
 		for (UIComponent column : table.getChildren()) {
 			if (column instanceof UIColumn) {
 				for (UIComponent cell : column.getChildren()) {
-					renderIds.add(String.format("%s%c%d%c%s", tableId, separator, index, separator, cell.getId()));
+					renderIds.add(format("%s%c%d%c%s", tableId, separator, index, separator, cell.getId()));
 				}
 			}
 			else if (column instanceof UIData) { // <p:columns>.
@@ -211,7 +212,7 @@ public final class Ajax {
 
 		for (UIComponent cell : columns.getChildren()) {
 			for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
-				renderIds.add(String.format("%s%c%d%c%s%c%d%c%s", tableId, separator, index, separator, columnId, separator, columnIndex, separator, cell.getId()));
+				renderIds.add(format("%s%c%d%c%s%c%d%c%s", tableId, separator, index, separator, columnId, separator, columnIndex, separator, cell.getId()));
 			}
 		}
 	}
@@ -256,7 +257,7 @@ public final class Ajax {
 				String cellId = cell.getId();
 
 				for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-					renderIds.add(String.format("%s%c%d%c%s", tableId, separator, rowIndex, separator, cellId));
+					renderIds.add(format("%s%c%d%c%s", tableId, separator, rowIndex, separator, cellId));
 				}
 			}
 		}
@@ -340,7 +341,7 @@ public final class Ajax {
 	 */
 	public static void data(Object... namesValues) {
 		if (namesValues.length % 2 != 0) {
-			throw new IllegalArgumentException(String.format(ERROR_ARGUMENTS_LENGTH, namesValues.length));
+			throw new IllegalArgumentException(format(ERROR_ARGUMENTS_LENGTH, namesValues.length));
 		}
 
 		OmniPartialViewContext context = OmniPartialViewContext.getCurrentInstance();
@@ -348,7 +349,7 @@ public final class Ajax {
 		for (int i = 0; i < namesValues.length; i+= 2) {
 			if (!(namesValues[i] instanceof String)) {
 				String type = (namesValues[i]) != null ? namesValues[i].getClass().getName() : "null";
-				throw new IllegalArgumentException(String.format(ERROR_ARGUMENT_TYPE, type, namesValues[i]));
+				throw new IllegalArgumentException(format(ERROR_ARGUMENT_TYPE, type, namesValues[i]));
 			}
 
 			context.addArgument((String) namesValues[i], namesValues[i + 1]);

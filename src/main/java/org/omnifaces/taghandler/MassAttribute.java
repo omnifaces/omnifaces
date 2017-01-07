@@ -12,6 +12,7 @@
  */
 package org.omnifaces.taghandler;
 
+import static java.lang.String.format;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.IOException;
@@ -121,11 +122,11 @@ public class MassAttribute extends TagHandler {
 				cls = Class.forName(className);
 			}
 			catch (ClassNotFoundException e) {
-				throw new IllegalArgumentException(String.format(ERROR_UNAVAILABLE_TARGET, className), e);
+				throw new IllegalArgumentException(format(ERROR_UNAVAILABLE_TARGET, className), e);
 			}
 
 			if (!UIComponent.class.isAssignableFrom(cls)) {
-				throw new IllegalArgumentException(String.format(ERROR_INVALID_TARGET, cls));
+				throw new IllegalArgumentException(format(ERROR_INVALID_TARGET, cls));
 			}
 
 			targetClass = (Class<UIComponent>) cls;

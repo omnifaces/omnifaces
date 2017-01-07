@@ -14,6 +14,7 @@ package org.omnifaces.component.output;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static java.lang.String.format;
 import static javax.faces.event.PhaseId.RENDER_RESPONSE;
 import static org.omnifaces.component.output.Cache.PropertyKeys.disabled;
 import static org.omnifaces.component.output.Cache.PropertyKeys.key;
@@ -166,7 +167,7 @@ public class Cache extends OutputFamily {
 	public static final String START_CONTENT_MARKER = "<!-- START CACHE FOR %s -->";
 	public static final String END_CONTENT_MARKER = "<!-- END CACHE FOR %s -->";
 
-	private static final String ERROR_NO_BUFFERED_RESPONSE = String.format(
+	private static final String ERROR_NO_BUFFERED_RESPONSE = format(
 		"No buffered response found in request, but 'useBuffer' set to true. Check setting the '%s' context parameter or installing the '%s' filter manually.",
 		CacheInitializer.CACHE_INSTALL_BUFFER_FILTER, OnDemandResponseBufferFilter.class
 	);
@@ -363,11 +364,11 @@ public class Cache extends OutputFamily {
 	}
 
 	private String getStartContentMarker() {
-		return String.format(START_CONTENT_MARKER, getClientId());
+		return format(START_CONTENT_MARKER, getClientId());
 	}
 
 	private String getEndContentMarker() {
-		return String.format(END_CONTENT_MARKER, getClientId());
+		return format(END_CONTENT_MARKER, getClientId());
 	}
 
 	private String getContentFromBuffer(String buffer) {

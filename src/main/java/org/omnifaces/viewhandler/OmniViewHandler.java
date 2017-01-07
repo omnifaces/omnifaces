@@ -12,11 +12,14 @@
  */
 package org.omnifaces.viewhandler;
 
+import static java.lang.String.format;
 import static javax.faces.component.visit.VisitHint.SKIP_ITERATION;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.isUnloadRequest;
 import static org.omnifaces.taghandler.EnableRestorableView.isRestorableView;
 import static org.omnifaces.taghandler.EnableRestorableView.isRestorableViewRequest;
 import static org.omnifaces.util.Components.buildView;
+import static org.omnifaces.util.Components.forEachComponent;
+import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Faces.responseComplete;
 import static org.omnifaces.util.FacesLocal.getRenderKit;
 import static org.omnifaces.util.FacesLocal.getRequestQueryString;
@@ -42,7 +45,6 @@ import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.cdi.viewscope.ViewScopeManager;
 import org.omnifaces.taghandler.EnableRestorableView;
 import org.omnifaces.util.Callback;
-import org.omnifaces.util.Components;
 import org.omnifaces.util.Hacks;
 
 /**
@@ -197,7 +199,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 	}
 
 	private void checkNestedForms(FacesContext context, UIViewRoot view) {
-		Components.forEachComponent(context).fromRoot(view).ofTypes(UIForm.class).withHints(SKIP_ITERATION).invoke(NESTED_FORMS_CHECKER);
+		forEachComponent(context).fromRoot(view).ofTypes(UIForm.class).withHints(SKIP_ITERATION).invoke(NESTED_FORMS_CHECKER);
 	}
 
 	@Override
@@ -210,11 +212,11 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 	private static class NestedFormsChecker implements Callback.WithArgument<UIForm> {
 		@Override
 		public void invoke(UIForm form) {
-			UIForm nestedParent = Components.getClosestParent(form, UIForm.class);
+			UIForm nestedParent = getClosestParent(form, UIForm.class);
 
 			if (nestedParent != null) {
 				throw new IllegalStateException(
-					String.format(ERROR_NESTED_FORM_ENCOUNTERED, form.getClientId(), nestedParent.getClientId()));
+					format(ERROR_NESTED_FORM_ENCOUNTERED, form.getClientId(), nestedParent.getClientId()));
 			}
 		}
 	}

@@ -12,6 +12,7 @@
  */
 package org.omnifaces.converter;
 
+import static java.lang.String.format;
 import static org.omnifaces.util.Faces.getViewAttribute;
 import static org.omnifaces.util.Faces.setViewAttribute;
 import static org.omnifaces.util.Messages.createError;
@@ -92,7 +93,7 @@ public class GenericEnumConverter implements Converter {
 
 		if (modelValue instanceof Enum) {
 			Class<Enum> enumType = ((Enum) modelValue).getDeclaringClass();
-			setViewAttribute(String.format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)), enumType);
+			setViewAttribute(format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)), enumType);
 			return ((Enum) modelValue).name();
 		}
 		else {
@@ -107,7 +108,7 @@ public class GenericEnumConverter implements Converter {
 			return null;
 		}
 
-		Class<Enum> enumType = getViewAttribute(String.format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)));
+		Class<Enum> enumType = getViewAttribute(format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)));
 
 		try {
 			return Enum.valueOf(enumType, submittedValue);

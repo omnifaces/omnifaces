@@ -249,7 +249,7 @@ public final class CombinedResourceInfo {
 	 */
 	@Override
 	public String toString() {
-		return String.format("CombinedResourceInfo[%s,%s]", id, resourceIdentifiers);
+		return format("CombinedResourceInfo[%s,%s]", id, resourceIdentifiers);
 	}
 
 	// Getters --------------------------------------------------------------------------------------------------------

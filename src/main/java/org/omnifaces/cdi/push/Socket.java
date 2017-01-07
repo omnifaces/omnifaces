@@ -14,6 +14,7 @@ package org.omnifaces.cdi.push;
 
 import static java.lang.Boolean.TRUE;
 import static java.lang.Boolean.parseBoolean;
+import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
 import static java.util.logging.Logger.getLogger;
 import static javax.faces.component.behavior.ClientBehaviorContext.createClientBehaviorContext;
@@ -694,7 +695,7 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 			Object user = binding.getValue(getFacesContext().getELContext());
 
 			if (user != null && !(user instanceof Serializable)) {
-				throw new IllegalArgumentException(String.format(ERROR_INVALID_USER, user));
+				throw new IllegalArgumentException(format(ERROR_INVALID_USER, user));
 			}
 		}
 
@@ -730,7 +731,7 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 			String channel = getChannel();
 
 			if (channel == null || !PATTERN_CHANNEL.matcher(channel).matches()) {
-				throw new IllegalArgumentException(String.format(ERROR_INVALID_CHANNEL, channel));
+				throw new IllegalArgumentException(format(ERROR_INVALID_CHANNEL, channel));
 			}
 
 			Integer port = getPort();
@@ -740,7 +741,7 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 			String behaviors = getBehaviorScripts();
 			boolean connected = isConnected();
 
-			String script = String.format(SCRIPT_INIT, host, channelId, functions, behaviors, connected);
+			String script = format(SCRIPT_INIT, host, channelId, functions, behaviors, connected);
 			context.getResponseWriter().write(script);
 		}
 	}

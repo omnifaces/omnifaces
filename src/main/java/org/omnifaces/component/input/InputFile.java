@@ -13,6 +13,7 @@
 package org.omnifaces.component.input;
 
 import static java.lang.Boolean.FALSE;
+import static java.lang.String.format;
 import static java.util.Collections.singleton;
 import static java.util.Collections.unmodifiableList;
 import static org.omnifaces.config.OmniFaces.getMessage;
@@ -391,7 +392,7 @@ public class InputFile extends HtmlInputFile {
 
 		if (maxsize != null) {
 			validateHierarchy();
-			setOnchange(String.format(SCRIPT_ONCHANGE, getMessageComponentClientId(), maxsize, coalesce(getOnchange(), "")));
+			setOnchange(format(SCRIPT_ONCHANGE, getMessageComponentClientId(), maxsize, coalesce(getOnchange(), "")));
 		}
 
 		super.encodeEnd(context);

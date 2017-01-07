@@ -12,6 +12,8 @@
  */
 package org.omnifaces.exceptionhandler;
 
+import static java.lang.String.format;
+import static java.util.logging.Level.SEVERE;
 import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
 import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION_TYPE;
 import static javax.servlet.RequestDispatcher.ERROR_MESSAGE;
@@ -31,7 +33,6 @@ import java.io.IOException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.el.ELException;
@@ -339,7 +340,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 				}
 				catch (ClassNotFoundException e) {
 					throw new IllegalArgumentException(
-						String.format(ERROR_INVALID_EXCEPTION_TYPES_PARAM_CLASS, paramName, typeParam), e);
+						format(ERROR_INVALID_EXCEPTION_TYPES_PARAM_CLASS, paramName, typeParam), e);
 				}
 			}
 		}
@@ -490,7 +491,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	 */
 	protected void logException(FacesContext context, Throwable exception, String location, String message, Object... parameters) {
 		if (!isOneInstanceOf(exception.getClass(), exceptionTypesToIgnoreInLogging)) {
-			logger.log(Level.SEVERE, String.format(message, location), exception);
+			logger.log(SEVERE, format(message, location), exception);
 		}
 	}
 

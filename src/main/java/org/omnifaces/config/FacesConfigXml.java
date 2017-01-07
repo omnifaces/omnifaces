@@ -12,6 +12,8 @@
  */
 package org.omnifaces.config;
 
+import static org.omnifaces.util.Faces.getServletContext;
+import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.parseLocale;
 import static org.omnifaces.util.Xml.createDocument;
 import static org.omnifaces.util.Xml.getNodeList;
@@ -32,8 +34,6 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.omnifaces.util.Faces;
-import org.omnifaces.util.Utils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -101,7 +101,7 @@ public enum FacesConfigXml {
 	 * Perform automatic initialization whereby the servlet context is obtained from the faces context.
 	 */
 	private FacesConfigXml() {
-		ServletContext servletContext = Faces.getServletContext();
+		ServletContext servletContext = getServletContext();
 
 		try {
 			Element facesConfigXml = loadFacesConfigXml(servletContext).getDocumentElement();
@@ -180,7 +180,7 @@ public enum FacesConfigXml {
 		List<Locale> supportedLocales = new ArrayList<>();
 		String defaultLocale = xpath.compile(XPATH_DEFAULT_LOCALE).evaluate(facesConfigXml).trim();
 
-		if (!Utils.isEmpty(defaultLocale)) {
+		if (!isEmpty(defaultLocale)) {
 			supportedLocales.add(parseLocale(defaultLocale));
 		}
 

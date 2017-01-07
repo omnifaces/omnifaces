@@ -22,6 +22,7 @@ import static org.omnifaces.el.ExpressionInspector.getValueReference;
 import static org.omnifaces.util.Components.forEachComponent;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Components.getCurrentForm;
+import static org.omnifaces.util.Components.getLabel;
 import static org.omnifaces.util.Components.hasInvokedSubmit;
 import static org.omnifaces.util.Events.subscribeToRequestAfterPhase;
 import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
@@ -35,6 +36,7 @@ import static org.omnifaces.util.Faces.validationFailed;
 import static org.omnifaces.util.FacesLocal.evaluateExpressionGet;
 import static org.omnifaces.util.Messages.addError;
 import static org.omnifaces.util.Messages.addGlobalError;
+import static org.omnifaces.util.Platform.getBeanValidator;
 import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Reflection.setProperties;
 import static org.omnifaces.util.Reflection.toClass;
@@ -73,8 +75,6 @@ import javax.validation.ConstraintViolation;
 
 import org.omnifaces.eventlistener.BeanValidationEventListener;
 import org.omnifaces.util.Callback;
-import org.omnifaces.util.Components;
-import org.omnifaces.util.Platform;
 import org.omnifaces.util.copier.CloneCopier;
 import org.omnifaces.util.copier.Copier;
 import org.omnifaces.util.copier.CopyCtorCopier;
@@ -455,7 +455,7 @@ public class ValidateBean extends TagHandler {
 			groupClasses.add(toClass(group));
 		}
 
-		Set violationsRaw = Platform.getBeanValidator().validate(bean, groupClasses.toArray(new Class[groupClasses.size()]));
+		Set violationsRaw = getBeanValidator().validate(bean, groupClasses.toArray(new Class[groupClasses.size()]));
 		Set<ConstraintViolation<?>> violations = violationsRaw;
 
 		if (!violations.isEmpty()) {
@@ -472,7 +472,7 @@ public class ValidateBean extends TagHandler {
 							labels.append(", ");
 						}
 
-						labels.append(Components.getLabel(input));
+						labels.append(getLabel(input));
 					}
 				});
 			}

@@ -12,6 +12,7 @@
  */
 package org.omnifaces.taghandler;
 
+import static java.lang.String.format;
 import static org.omnifaces.taghandler.ImportConstants.toClass;
 import static org.omnifaces.util.Facelets.getStringLiteral;
 
@@ -139,7 +140,7 @@ public class ImportFunctions extends TagHandler {
 					function = findMethod(type, name);
 
 					if (function == null) {
-						throw new IllegalArgumentException(String.format(ERROR_INVALID_FUNCTION, type.getName(), name));
+						throw new IllegalArgumentException(format(ERROR_INVALID_FUNCTION, type.getName(), name));
 					}
 
 					FUNCTIONS_CACHE.put(key, function);

@@ -13,6 +13,7 @@
 package org.omnifaces.component.output;
 
 import static java.lang.Boolean.FALSE;
+import static java.lang.String.format;
 import static org.omnifaces.util.Components.getParams;
 import static org.omnifaces.util.Faces.getRequestDomainURL;
 import static org.omnifaces.util.FacesLocal.getBookmarkableURL;
@@ -176,7 +177,7 @@ public class Url extends OutputFamily {
 				new URL(normalizedDomain.startsWith("//") ? ("http:" + normalizedDomain) : normalizedDomain);
 			}
 			catch (MalformedURLException e) {
-				throw new IllegalArgumentException(String.format(ERROR_INVALID_DOMAIN, domain), e);
+				throw new IllegalArgumentException(format(ERROR_INVALID_DOMAIN, domain), e);
 			}
 
 			url = stripTrailingSlash(normalizedDomain) + url;

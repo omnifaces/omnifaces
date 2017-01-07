@@ -14,6 +14,7 @@ package org.omnifaces.component.validator;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static java.lang.String.format;
 import static org.omnifaces.util.Components.getLabel;
 import static org.omnifaces.util.Components.getValue;
 import static org.omnifaces.util.Components.isEditable;
@@ -232,7 +233,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 		String components = getComponents();
 
 		if (components.isEmpty()) {
-			throw new IllegalArgumentException(String.format(
+			throw new IllegalArgumentException(format(
 				ERROR_MISSING_COMPONENTS, getClass().getSimpleName()));
 		}
 
@@ -320,11 +321,11 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 		UIComponent found = parent.findComponent(clientId);
 
 		if (found == null) {
-			throw new IllegalArgumentException(String.format(
+			throw new IllegalArgumentException(format(
 				ERROR_UNKNOWN_COMPONENT, getClass().getSimpleName(), property, clientId));
 		}
 		else if (!(found instanceof UIInput)) {
-			throw new IllegalArgumentException(String.format(
+			throw new IllegalArgumentException(format(
 				ERROR_INVALID_COMPONENT, getClass().getSimpleName(), property, clientId, found.getClass().getName()));
 		}
 

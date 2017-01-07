@@ -12,6 +12,7 @@
  */
 package org.omnifaces.converter;
 
+import static java.lang.String.format;
 import static org.omnifaces.util.Faces.getContextAttribute;
 import static org.omnifaces.util.Faces.setContextAttribute;
 import static org.omnifaces.util.Messages.createError;
@@ -101,7 +102,7 @@ public class SelectItemsIndexConverter implements Converter {
 
 	@Override
 	public String getAsString(FacesContext context, UIComponent component, Object modelValue) {
-		String key = String.format(ATTRIBUTE_SELECT_ITEMS, component.getClientId(context));
+		String key = format(ATTRIBUTE_SELECT_ITEMS, component.getClientId(context));
 		List<Object> selectItemValues = getContextAttribute(key);
 
 		if (selectItemValues == null) {

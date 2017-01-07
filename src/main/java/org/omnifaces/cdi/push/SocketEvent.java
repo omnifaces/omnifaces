@@ -12,6 +12,7 @@
  */
 package org.omnifaces.cdi.push;
 
+import static java.lang.String.format;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -100,7 +101,7 @@ public final class SocketEvent implements Serializable {
 
 	@Override
 	public String toString() {
-		return String.format("SocketEvent[channel=%s, user=%s, closeCode=%s]", channel, user, code);
+		return format("SocketEvent[channel=%s, user=%s, closeCode=%s]", channel, user, code);
 	}
 
 	/**

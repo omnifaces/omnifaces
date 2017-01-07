@@ -12,6 +12,7 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static java.lang.String.format;
 import static java.lang.reflect.Modifier.isPublic;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
@@ -20,6 +21,7 @@ import static java.util.logging.Level.FINE;
 import static org.omnifaces.util.Beans.getManager;
 import static org.omnifaces.util.BeansLocal.getReference;
 import static org.omnifaces.util.Faces.getContext;
+import static org.omnifaces.util.Faces.getExternalContext;
 import static org.omnifaces.util.Servlets.toQueryString;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isEmpty;
@@ -59,7 +61,6 @@ import javax.xml.bind.DatatypeConverter;
 import org.omnifaces.cdi.GraphicImageBean;
 import org.omnifaces.el.ExpressionInspector;
 import org.omnifaces.el.MethodReference;
-import org.omnifaces.util.Faces;
 
 /**
  * <p>
@@ -169,7 +170,7 @@ public class GraphicResource extends DynamicResource {
 			setLastModified(Long.valueOf(lastModified.toString()));
 		}
 		else if (lastModified != null) {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_LASTMODIFIED, lastModified));
+			throw new IllegalArgumentException(format(ERROR_INVALID_LASTMODIFIED, lastModified));
 		}
 	}
 
@@ -192,7 +193,7 @@ public class GraphicResource extends DynamicResource {
 		Method beanMethod = methodReference.getMethod();
 
 		if (beanMethod == null) {
-			throw new IllegalArgumentException(String.format(ERROR_UNKNOWN_METHOD, value.getExpressionString()));
+			throw new IllegalArgumentException(format(ERROR_UNKNOWN_METHOD, value.getExpressionString()));
 		}
 
 		Class<?> beanClass = methodReference.getBase().getClass();
@@ -200,11 +201,11 @@ public class GraphicResource extends DynamicResource {
 
 		if (!ALLOWED_METHODS.containsKey(name)) { // No need to validate everytime when already known.
 			if (!isOneAnnotationPresent(beanClass, REQUIRED_ANNOTATION_TYPES)) {
-				throw new IllegalArgumentException(String.format(ERROR_INVALID_SCOPE, beanClass));
+				throw new IllegalArgumentException(format(ERROR_INVALID_SCOPE, beanClass));
 			}
 
 			if (!isOneOf(beanMethod.getReturnType(), REQUIRED_RETURN_TYPES)) {
-				throw new IllegalArgumentException(String.format(ERROR_INVALID_RETURNTYPE, beanMethod.getReturnType()));
+				throw new IllegalArgumentException(format(ERROR_INVALID_RETURNTYPE, beanMethod.getReturnType()));
 			}
 
 			ALLOWED_METHODS.put(name, new MethodReference(methodReference.getBase(), beanMethod));
@@ -310,7 +311,7 @@ public class GraphicResource extends DynamicResource {
 			}
 
 			if (!registered) {
-				throw new IllegalArgumentException(String.format(ERROR_MISSING_METHOD, beanClass.getName()));
+				throw new IllegalArgumentException(format(ERROR_MISSING_METHOD, beanClass.getName()));
 			}
 		}
 	}
@@ -331,10 +332,10 @@ public class GraphicResource extends DynamicResource {
 			return DEFAULT_CONTENT_TYPE;
 		}
 
-		String contentType = Faces.getExternalContext().getMimeType(resourceName);
+		String contentType = getExternalContext().getMimeType(resourceName);
 
 		if (contentType == null) {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_TYPE, resourceName.split("\\.", 2)[1]));
+			throw new IllegalArgumentException(format(ERROR_INVALID_TYPE, resourceName.split("\\.", 2)[1]));
 		}
 
 		return contentType;
@@ -372,7 +373,7 @@ public class GraphicResource extends DynamicResource {
 			bytes = (byte[]) content;
 		}
 		else {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_RETURNTYPE, content));
+			throw new IllegalArgumentException(format(ERROR_INVALID_RETURNTYPE, content));
 		}
 
 		return DatatypeConverter.printBase64Binary(bytes);
@@ -422,7 +423,7 @@ public class GraphicResource extends DynamicResource {
 
 	private static void validateParamLength(Object[] params, Class<?>[] types) {
 		if (params.length != types.length) {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_PARAMS, Arrays.toString(params)));
+			throw new IllegalArgumentException(format(ERROR_INVALID_PARAMS, Arrays.toString(params)));
 		}
 	}
 

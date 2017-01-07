@@ -12,6 +12,7 @@
  */
 package org.omnifaces.component.output;
 
+import static java.lang.String.format;
 import static org.omnifaces.util.Components.findComponentRelatively;
 import static org.omnifaces.util.Components.getOptionalLabel;
 import static org.omnifaces.util.Components.setLabel;
@@ -53,7 +54,7 @@ public class OutputLabel extends HtmlOutputLabel {
 				UIComponent forComponent = findComponentRelatively(this, forValue);
 
 				if (forComponent == null) {
-					throw new IllegalArgumentException(String.format(ERROR_FOR_COMPONENT_NOT_FOUND, forValue, getId()));
+					throw new IllegalArgumentException(format(ERROR_FOR_COMPONENT_NOT_FOUND, forValue, getId()));
 				}
 
 				// To be sure, check if the target component doesn't have a label already. This

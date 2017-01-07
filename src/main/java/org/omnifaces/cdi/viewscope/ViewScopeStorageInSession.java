@@ -12,6 +12,7 @@
  */
 package org.omnifaces.cdi.viewscope;
 
+import static java.lang.String.format;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.DEFAULT_MAX_ACTIVE_VIEW_SCOPES;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.PARAM_NAME_MAX_ACTIVE_VIEW_SCOPES;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.PARAM_NAME_MOJARRA_NUMBER_OF_VIEWS;
@@ -135,7 +136,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 					return maxActiveViewScopes;
 				}
 				catch (NumberFormatException e) {
-					throw new IllegalArgumentException(String.format(ERROR_MAX_ACTIVE_VIEW_SCOPES, name, value), e);
+					throw new IllegalArgumentException(format(ERROR_MAX_ACTIVE_VIEW_SCOPES, name, value), e);
 				}
 			}
 		}

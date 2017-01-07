@@ -12,12 +12,12 @@
  */
 package org.omnifaces.cdi.push;
 
+import static java.util.logging.Level.SEVERE;
 import static javax.websocket.CloseReason.CloseCodes.GOING_AWAY;
 import static javax.websocket.CloseReason.CloseCodes.VIOLATED_POLICY;
 import static org.omnifaces.cdi.PushContext.URI_PREFIX;
 
 import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.websocket.CloseReason;
@@ -96,7 +96,7 @@ public class SocketEndpoint extends Endpoint {
 		Throwable throwable = (Throwable) session.getUserProperties().remove(Throwable.class.getName());
 
 		if (throwable != null && reason.getCloseCode() != GOING_AWAY) {
-			logger.log(Level.SEVERE, ERROR_EXCEPTION, throwable);
+			logger.log(SEVERE, ERROR_EXCEPTION, throwable);
 		}
 	}
 

@@ -12,6 +12,7 @@
  */
 package org.omnifaces.el.functions;
 
+import static java.lang.String.format;
 import static org.omnifaces.util.Faces.getLocale;
 import static org.omnifaces.util.Utils.parseLocale;
 
@@ -254,7 +255,7 @@ public final class Numbers {
 			DecimalFormat formatter = (DecimalFormat) NumberFormat.getNumberInstance(getLocale());
 			formatter.setParseBigDecimal(true);
 			String format = "%." + maxfractions + "f";
-			formatted = (BigDecimal) formatter.parse(String.format(getLocale(), format, divided));
+			formatted = (BigDecimal) formatter.parse(format(getLocale(), format, divided));
 		}
 		catch (ParseException e) {
 			throw new IllegalStateException(e);

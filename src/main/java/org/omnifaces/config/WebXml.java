@@ -12,7 +12,9 @@
  */
 package org.omnifaces.config;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptySet;
+import static java.util.logging.Level.SEVERE;
 import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.Faces.hasContext;
 import static org.omnifaces.util.Utils.isEmpty;
@@ -33,7 +35,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.faces.context.FacesContext;
@@ -183,7 +184,7 @@ public enum WebXml {
 			}
 			catch (Exception e) {
 				initialized.set(false);
-				logger.log(Level.SEVERE, LOG_INITIALIZATION_ERROR, e);
+				logger.log(SEVERE, LOG_INITIALIZATION_ERROR, e);
 				throw new UnsupportedOperationException(e);
 			}
 		}
@@ -238,7 +239,7 @@ public enum WebXml {
 		checkInitialized();
 
 		if (url.charAt(0) != ('/')) {
-			throw new IllegalArgumentException(String.format(ERROR_URL_MUST_START_WITH_SLASH, url));
+			throw new IllegalArgumentException(format(ERROR_URL_MUST_START_WITH_SLASH, url));
 		}
 
 		String uri = url;

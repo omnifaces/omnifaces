@@ -13,6 +13,7 @@
 package org.omnifaces.taghandler;
 
 import static java.lang.Math.max;
+import static java.lang.String.format;
 import static java.util.logging.Level.FINE;
 import static org.omnifaces.util.Facelets.getStringLiteral;
 
@@ -149,7 +150,7 @@ public class ImportConstants extends TagHandler {
 					constants.put(field.getName(), field.get(null));
 				}
 				catch (Exception e) {
-					throw new IllegalArgumentException(String.format(ERROR_FIELD_ACCESS, type, field.getName()), e);
+					throw new IllegalArgumentException(format(ERROR_FIELD_ACCESS, type, field.getName()), e);
 				}
 			}
 		}
@@ -182,7 +183,7 @@ public class ImportConstants extends TagHandler {
 				}
 			}
 
-			throw new IllegalArgumentException(String.format(ERROR_MISSING_CLASS, type), e);
+			throw new IllegalArgumentException(format(ERROR_MISSING_CLASS, type), e);
 		}
 	}
 
@@ -218,7 +219,7 @@ public class ImportConstants extends TagHandler {
 		@Override
 		public Object get(Object key) {
 			if (!containsKey(key)) {
-				throw new IllegalArgumentException(String.format(ERROR_INVALID_CONSTANT, type, key));
+				throw new IllegalArgumentException(format(ERROR_INVALID_CONSTANT, type, key));
 			}
 
 			return super.get(key);

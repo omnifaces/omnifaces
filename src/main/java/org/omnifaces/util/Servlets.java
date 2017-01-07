@@ -12,6 +12,7 @@
  */
 package org.omnifaces.util;
 
+import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.SECONDS;
@@ -506,7 +507,7 @@ public final class Servlets {
 	 * @since 2.6
 	 */
 	public static String formatContentDispositionHeader(String filename, boolean attachment) {
-		return String.format(CONTENT_DISPOSITION_HEADER, (attachment ? "attachment" : "inline"), encodeURI(filename));
+		return format(CONTENT_DISPOSITION_HEADER, (attachment ? "attachment" : "inline"), encodeURI(filename));
 	}
 
 	// Cookies --------------------------------------------------------------------------------------------------------
@@ -793,7 +794,7 @@ public final class Servlets {
 			encodedParams[i] = encodeURL(paramValues[i]);
 		}
 
-		return String.format(redirectURL, encodedParams);
+		return format(redirectURL, encodedParams);
 	}
 
 }

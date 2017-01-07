@@ -13,6 +13,7 @@
 package org.omnifaces.taghandler;
 
 import static java.lang.Boolean.parseBoolean;
+import static java.lang.String.format;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Components.getLabel;
 import static org.omnifaces.util.Faces.getELContext;
@@ -117,7 +118,7 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
 		}
 
 		if (!(parent instanceof UIInput)) {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_PARENT, parent.getClass().getName()));
+			throw new IllegalArgumentException(format(ERROR_INVALID_PARENT, parent.getClass().getName()));
 		}
 
 		// Get the tag attributes as value expressions instead of the immediately evaluated values. This allows us to

@@ -13,6 +13,7 @@
 package org.omnifaces.cdi.viewscope;
 
 import static java.lang.Boolean.TRUE;
+import static java.lang.String.format;
 import static java.util.logging.Level.FINE;
 import static org.omnifaces.config.OmniFaces.LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.SCRIPT_NAME;
@@ -193,7 +194,7 @@ public class ViewScopeManager {
 		FacesContext context = FacesContext.getCurrentInstance();
 
 		if (!context.getApplication().getStateManager().isSavingStateInClient(context)) {
-			throw new IllegalStateException(String.format(ERROR_INVALID_STATE_SAVING, beanClass.getName()));
+			throw new IllegalStateException(format(ERROR_INVALID_STATE_SAVING, beanClass.getName()));
 		}
 	}
 
@@ -216,7 +217,7 @@ public class ViewScopeManager {
 			}
 		}
 
-		String script = String.format(SCRIPT_INIT, beanStorageId);
+		String script = format(SCRIPT_INIT, beanStorageId);
 
 		if (ajaxRequestWithPartialRendering) {
 			oncomplete(script);

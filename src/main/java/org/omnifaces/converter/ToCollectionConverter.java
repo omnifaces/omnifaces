@@ -14,6 +14,7 @@ package org.omnifaces.converter;
 
 import static java.util.regex.Pattern.quote;
 import static org.omnifaces.util.Faces.createConverter;
+import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isEmpty;
 
@@ -32,7 +33,6 @@ import javax.faces.convert.FacesConverter;
 
 import org.omnifaces.el.ExpressionInspector;
 import org.omnifaces.util.Faces;
-import org.omnifaces.util.Reflection;
 
 /**
  * <p>
@@ -112,7 +112,7 @@ public class ToCollectionConverter extends TrimConverter {
 			}
 		}
 
-		Collection<Object> collection = Reflection.instance(coalesce(type, DEFAULT_COLLECTION_TYPE));
+		Collection<Object> collection = instance(coalesce(type, DEFAULT_COLLECTION_TYPE));
 
 		for (String item : submittedValue.split(quote(coalesce(delimiter, DEFAULT_DELIMITER).trim()))) {
 			Object trimmed = super.getAsObject(context, component, item);

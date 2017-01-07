@@ -14,6 +14,7 @@ package org.omnifaces.util;
 
 import static java.beans.Introspector.getBeanInfo;
 import static java.beans.PropertyEditorManager.findEditor;
+import static java.lang.String.format;
 import static java.util.logging.Level.FINE;
 
 import java.beans.IntrospectionException;
@@ -222,7 +223,7 @@ public final class Reflection {
 				// Just continue to IllegalStateException on original ClassNotFoundException.
 			}
 
-			throw new IllegalStateException(String.format(ERROR_LOAD_CLASS, className), e);
+			throw new IllegalStateException(format(ERROR_LOAD_CLASS, className), e);
 		}
 	}
 
@@ -272,7 +273,7 @@ public final class Reflection {
 			return clazz.newInstance();
 		}
 		catch (Exception e) {
-			throw new IllegalStateException(String.format(ERROR_CREATE_INSTANCE, clazz), e);
+			throw new IllegalStateException(format(ERROR_CREATE_INSTANCE, clazz), e);
 		}
 	}
 
@@ -294,7 +295,7 @@ public final class Reflection {
 			return (T) field.get(instance);
 		}
 		catch (Exception e) {
-			throw new IllegalStateException(String.format(ERROR_ACCESS_FIELD, fieldName, instance.getClass()), e);
+			throw new IllegalStateException(format(ERROR_ACCESS_FIELD, fieldName, instance.getClass()), e);
 		}
 	}
 
@@ -322,7 +323,7 @@ public final class Reflection {
 		}
 		catch (Exception e) {
 			throw new IllegalStateException(
-				String.format(ERROR_INVOKE_METHOD, methodName, instance.getClass(), Arrays.toString(parameters)), e);
+				format(ERROR_INVOKE_METHOD, methodName, instance.getClass(), Arrays.toString(parameters)), e);
 		}
 	}
 

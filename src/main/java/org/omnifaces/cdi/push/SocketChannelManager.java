@@ -12,6 +12,7 @@
  */
 package org.omnifaces.cdi.push;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
 import static org.omnifaces.util.Beans.getInstance;
 
@@ -86,7 +87,7 @@ public class SocketChannelManager implements Serializable {
 				}
 			}
 
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_SCOPE, value));
+			throw new IllegalArgumentException(format(ERROR_INVALID_SCOPE, value));
 		}
 	}
 
@@ -129,7 +130,7 @@ public class SocketChannelManager implements Serializable {
 		if (!targetScope.containsKey(channel)) {
 			for (Map<String, String> otherScope : otherScopes) {
 				if (otherScope.containsKey(channel)) {
-					throw new IllegalArgumentException(String.format(ERROR_DUPLICATE_CHANNEL, channel));
+					throw new IllegalArgumentException(format(ERROR_DUPLICATE_CHANNEL, channel));
 				}
 			}
 

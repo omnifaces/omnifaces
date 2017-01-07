@@ -12,6 +12,7 @@
  */
 package org.omnifaces.taghandler;
 
+import static java.lang.String.format;
 import static org.omnifaces.util.FacesLocal.getFaceletContext;
 
 import java.beans.Introspector;
@@ -89,7 +90,7 @@ final class DeferredTagHandlerHelper {
 			}
 			catch (FacesException e) {
 				throw new IllegalArgumentException(
-					String.format(ERROR_INVALID_ID, tag.getClass().getSimpleName(), instanceId, id), e);
+					format(ERROR_INVALID_ID, tag.getClass().getSimpleName(), instanceId, id), e);
 			}
 
 			if (binding != null) {
@@ -98,7 +99,7 @@ final class DeferredTagHandlerHelper {
 		}
 		else if (instance == null) {
 			throw new IllegalArgumentException(
-				String.format(ERROR_MISSING_ID, tag.getClass().getSimpleName(), instanceId));
+				format(ERROR_MISSING_ID, tag.getClass().getSimpleName(), instanceId));
 		}
 
 		return instance;

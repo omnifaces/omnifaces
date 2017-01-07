@@ -13,6 +13,7 @@
 package org.omnifaces.resourcehandler;
 
 import static java.lang.Boolean.parseBoolean;
+import static java.lang.String.format;
 import static org.omnifaces.util.Events.subscribeToApplicationEvent;
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getInitParameter;
@@ -392,7 +393,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 				}
 			}
 
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_CACHE_TTL_PARAM, cacheTTLParam));
+			throw new IllegalArgumentException(format(ERROR_INVALID_CACHE_TTL_PARAM, cacheTTLParam));
 		}
 		else {
 			return null;

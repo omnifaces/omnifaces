@@ -12,6 +12,7 @@
  */
 package org.omnifaces.filter;
 
+import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.IOException;
@@ -103,7 +104,7 @@ public class CharacterEncodingFilter extends HttpFilter {
 				encoding = Charset.forName(encodingParam);
 			}
 			catch (Exception e) {
-				throw new ServletException(String.format(ERROR_ENCODING, encodingParam), e);
+				throw new ServletException(format(ERROR_ENCODING, encodingParam), e);
 			}
 		}
 	}

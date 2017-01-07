@@ -12,6 +12,7 @@
  */
 package org.omnifaces.filter;
 
+import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.DAYS;
 import static java.util.concurrent.TimeUnit.HOURS;
 import static java.util.concurrent.TimeUnit.MINUTES;
@@ -208,7 +209,7 @@ public class CacheControlFilter extends HttpFilter {
 
 		if (expiresParam != null) {
 			if (!expiresParam.matches("[0-9]{1,9}[wdhms]?")) {
-				throw new ServletException(String.format(ERROR_EXPIRES, expiresParam));
+				throw new ServletException(format(ERROR_EXPIRES, expiresParam));
 			}
 
 			String[] parts = expiresParam.split("(?=[wdhms])");

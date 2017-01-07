@@ -12,6 +12,7 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.faces.application.ResourceHandler.RESOURCE_IDENTIFIER;
 import static org.omnifaces.util.Faces.getMapping;
@@ -93,7 +94,7 @@ public abstract class DynamicResource extends Resource {
 		Map<String, String> responseHeaders = new HashMap<>(RESPONSE_HEADERS_SIZE);
 		responseHeaders.put("Last-Modified", formatRFC1123(new Date(getLastModified())));
 		responseHeaders.put("Expires", formatRFC1123(new Date(System.currentTimeMillis() + Hacks.getDefaultResourceMaxAge())));
-		responseHeaders.put("Etag", String.format("W/\"%d-%d\"", getResourceName().hashCode(), getLastModified()));
+		responseHeaders.put("Etag", format("W/\"%d-%d\"", getResourceName().hashCode(), getLastModified()));
 		responseHeaders.put("Pragma", ""); // Explicitly set empty pragma to prevent some containers from setting it.
 		return responseHeaders;
 	}

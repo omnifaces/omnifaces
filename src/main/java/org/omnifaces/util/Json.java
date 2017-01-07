@@ -12,6 +12,8 @@
  */
 package org.omnifaces.util;
 
+import static java.lang.String.format;
+
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
 import java.beans.Introspector;
@@ -160,7 +162,7 @@ public final class Json {
 		}
 		catch (IntrospectionException e) {
 			throw new IllegalArgumentException(
-				String.format(ERROR_INVALID_BEAN, bean.getClass()), e);
+				format(ERROR_INVALID_BEAN, bean.getClass()), e);
 		}
 
 		builder.append('{');
@@ -178,7 +180,7 @@ public final class Json {
 			}
 			catch (Exception e) {
 				throw new IllegalArgumentException(
-					String.format(ERROR_INVALID_GETTER, property.getName(), bean.getClass()), e);
+					format(ERROR_INVALID_GETTER, property.getName(), bean.getClass()), e);
 			}
 
 			if (value != null) {

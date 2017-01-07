@@ -12,6 +12,7 @@
  */
 package org.omnifaces.filter;
 
+import static java.lang.String.format;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.IOException;
@@ -152,7 +153,7 @@ public class GzipResponseFilter extends HttpFilter {
 
 		if (thresholdParam != null) {
 			if (!thresholdParam.matches("[0-9]{1,4}")) {
-				throw new ServletException(String.format(ERROR_THRESHOLD, thresholdParam));
+				throw new ServletException(format(ERROR_THRESHOLD, thresholdParam));
 			}
 			else {
 				threshold = Integer.valueOf(thresholdParam);

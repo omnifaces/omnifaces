@@ -13,6 +13,7 @@
 package org.omnifaces.facesviews;
 
 import static java.lang.Boolean.parseBoolean;
+import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
 import static java.util.Locale.US;
@@ -662,7 +663,7 @@ public final class FacesViews {
 			return Enum.valueOf(type, value.toUpperCase(US));
 		}
 		catch (Exception e) {
-			throw new IllegalArgumentException(String.format("Value '%s' is not valid for context parameter '%s'", value, name), e);
+			throw new IllegalArgumentException(format("Value '%s' is not valid for context parameter '%s'", value, name), e);
 		}
 	}
 

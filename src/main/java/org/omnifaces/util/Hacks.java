@@ -12,6 +12,7 @@
  */
 package org.omnifaces.util;
 
+import static java.lang.String.format;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getContextAttribute;
 import static org.omnifaces.util.FacesLocal.getInitParameter;
@@ -335,7 +336,7 @@ public final class Hacks {
 						break;
 					}
 					catch (NumberFormatException e) {
-						throw new IllegalArgumentException(String.format(ERROR_MAX_AGE, name, value), e);
+						throw new IllegalArgumentException(format(ERROR_MAX_AGE, name, value), e);
 					}
 				}
 			}

@@ -13,6 +13,8 @@
 package org.omnifaces.component.script;
 
 import static java.lang.Boolean.FALSE;
+import static java.lang.String.format;
+import static org.omnifaces.util.Components.getParams;
 import static org.omnifaces.util.Components.validateHasParent;
 import static org.omnifaces.util.Utils.isEmpty;
 
@@ -31,7 +33,6 @@ import javax.faces.event.ActionEvent;
 import javax.faces.event.PhaseId;
 
 import org.omnifaces.component.ParamHolder;
-import org.omnifaces.util.Components;
 import org.omnifaces.util.Json;
 import org.omnifaces.util.State;
 
@@ -173,7 +174,7 @@ public class CommandScript extends UICommand {
 		}
 
 		if (!PATTERN_NAME.matcher(name).matches()) {
-			throw new IllegalArgumentException(String.format(ERROR_ILLEGAL_NAME, name));
+			throw new IllegalArgumentException(format(ERROR_ILLEGAL_NAME, name));
 		}
 
 		ResponseWriter writer = context.getResponseWriter();
@@ -234,7 +235,7 @@ public class CommandScript extends UICommand {
 	protected void encodeOptions(FacesContext context) throws IOException {
 		ResponseWriter writer = context.getResponseWriter();
 
-		for (ParamHolder param : Components.getParams(this)) {
+		for (ParamHolder param : getParams(this)) {
 			writer.append("o[").append(Json.encode(param.getName())).append("]=")
 				.append(Json.encode(param.getValue())).append(";");
 		}
@@ -299,7 +300,7 @@ public class CommandScript extends UICommand {
 
 				if (found == null) {
 					throw new IllegalArgumentException(
-						String.format(ERROR_UNKNOWN_CLIENTID, relativeClientId, getNamingContainer().getClientId(context)));
+						format(ERROR_UNKNOWN_CLIENTID, relativeClientId, getNamingContainer().getClientId(context)));
 				}
 
 				absoluteClientIds.append(found.getClientId(context));

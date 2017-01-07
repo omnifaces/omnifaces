@@ -12,14 +12,14 @@
  */
 package org.omnifaces.cdi;
 
+import static org.omnifaces.util.Beans.destroy;
+
 import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.PassivationCapable;
-
-import org.omnifaces.util.Beans;
 
 /**
  * CDI bean storage. This class is theoretically reusable for multiple CDI scopes. It's currently however only used by
@@ -80,7 +80,7 @@ public class BeanStorage implements Serializable {
 	 */
 	public synchronized void destroyBeans() { // Not sure if synchronization is absolutely necessary. Just to be on safe side.
 		for (Object bean : beans.values()) {
-			Beans.destroy(bean);
+			destroy(bean);
 		}
 
 		beans.clear();

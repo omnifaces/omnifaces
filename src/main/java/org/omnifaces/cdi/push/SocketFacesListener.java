@@ -12,9 +12,12 @@
  */
 package org.omnifaces.cdi.push;
 
+import static java.lang.String.format;
 import static org.omnifaces.cdi.push.SocketChannelManager.ESTIMATED_TOTAL_CHANNELS;
 import static org.omnifaces.util.Ajax.oncomplete;
 import static org.omnifaces.util.Components.addScriptToBody;
+import static org.omnifaces.util.Components.findComponent;
+import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.FacesLocal.getViewAttribute;
 import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
 import static org.omnifaces.util.FacesLocal.setViewAttribute;
@@ -30,9 +33,6 @@ import javax.faces.event.PostAddToViewEvent;
 import javax.faces.event.PreRenderViewEvent;
 import javax.faces.event.SystemEvent;
 import javax.faces.event.SystemEventListener;
-
-import org.omnifaces.util.Components;
-import org.omnifaces.util.Faces;
 
 /**
  * <p>
@@ -75,12 +75,12 @@ public class SocketFacesListener implements SystemEventListener {
 		FacesContext context = FacesContext.getCurrentInstance();
 
 		for (Entry<String, Boolean> entry : getSockets(context).entrySet()) {
-			Socket socket = Components.findComponent(entry.getKey());
+			Socket socket = findComponent(entry.getKey());
 			boolean connected = socket.isRendered() && socket.isConnected();
 			boolean previouslyConnected = entry.setValue(connected);
 
 			if (connected != previouslyConnected) {
-				String script = String.format(connected ? SCRIPT_OPEN : SCRIPT_CLOSE, socket.getChannel());
+				String script = format(connected ? SCRIPT_OPEN : SCRIPT_CLOSE, socket.getChannel());
 
 				if (isAjaxRequestWithPartialRendering(context)) {
 					oncomplete(script);
@@ -98,7 +98,7 @@ public class SocketFacesListener implements SystemEventListener {
 	 * Subscribe this socket faces listener to the current view if necessary.
 	 */
 	static void subscribeIfNecessary() {
-		UIViewRoot view = Faces.getViewRoot();
+		UIViewRoot view = getViewRoot();
 		List<SystemEventListener> listeners = view.getListenersForEventClass(PostAddToViewEvent.class);
 
 		if (listeners != null) {
