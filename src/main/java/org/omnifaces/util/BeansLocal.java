@@ -85,15 +85,19 @@ public final class BeansLocal {
 	 */
 	public static <T> T getReference(BeanManager beanManager, Class<T> beanClass, Annotation... qualifiers) {
 		Bean<T> bean = resolve(beanManager, beanClass, qualifiers);
-		return (bean != null) ? getReference(beanManager, bean) : null;
+		return (bean != null) ? getReference(beanManager, bean, beanClass) : null;
 	}
 
 	/**
 	 * @see Beans#getReference(Bean)
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T getReference(BeanManager beanManager, Bean<T> bean) {
-		return (T) beanManager.getReference(bean, bean.getBeanClass(), beanManager.createCreationalContext(bean));
+		return getReference(beanManager, bean, bean.getBeanClass());
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T> T getReference(BeanManager beanManager, Bean<T> bean, Class<?> beanClass) {
+		return (T) beanManager.getReference(bean, beanClass, beanManager.createCreationalContext(bean));
 	}
 
 	/**
