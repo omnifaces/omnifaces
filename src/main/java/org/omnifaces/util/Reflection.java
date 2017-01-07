@@ -20,6 +20,7 @@ import static java.util.logging.Level.FINE;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -146,7 +147,8 @@ public final class Reflection {
 	}
 
 	/**
-	 * Finds a method based on the method name, amount of parameters and limited typing.
+	 * Finds a method based on the method name, amount of parameters and limited typing and returns <code>null</code>
+	 * is none is found.
 	 * <p>
 	 * Note that this supports overloading, but a limited one. Given an actual parameter of type Long, this will select
 	 * a method accepting Number when the choice is between Number and a non-compatible type like String. However,
@@ -240,6 +242,23 @@ public final class Reflection {
 	public static <T> Class<T> toClassOrNull(String className) {
 		try {
 			return toClass(className);
+		}
+		catch (Exception ignore) {
+			logger.log(FINE, "Ignoring thrown exception; the sole intent is to return null instead.", ignore);
+			return null;
+		}
+	}
+
+	/**
+	 * Finds a constructor based on the given parameter types and returns <code>null</code> is none is found.
+	 * @param clazz The class object for which the constructor is to be found.
+	 * @param parameterTypes The desired method parameter types.
+	 * @return A constructor if one is found, null otherwise.
+	 * @since 2.6
+	 */
+	public static <T> Constructor<T> findConstructor(Class<T> clazz, Class<?>... parameterTypes) {
+		try {
+			return clazz.getConstructor(parameterTypes);
 		}
 		catch (Exception ignore) {
 			logger.log(FINE, "Ignoring thrown exception; the sole intent is to return null instead.", ignore);
