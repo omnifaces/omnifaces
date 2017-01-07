@@ -14,6 +14,7 @@ package org.omnifaces.cdi.converter;
 
 import static org.omnifaces.util.BeansLocal.getReference;
 import static org.omnifaces.util.BeansLocal.resolve;
+import static org.omnifaces.util.Reflection.findConstructor;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -76,6 +77,13 @@ import org.omnifaces.application.OmniApplicationFactory;
  * which in turn extends a standard converter, then you may with <code>bean-discovery-mode="all"</code> face an
  * {@link AmbiguousResolutionException}. This can be solved by placing {@link Specializes} annotation on the subclass.
  *
+ * <h3>Converters with special Class constructor</h3>
+ * <p>
+ * By default, CDI only instantiates beans via the default constructor. In case a converter for a class is created,
+ * and the returned converter does not have a default constructor, or has a single argument constructor that takes a
+ * {@link Class} instance, then this converter will <strong>not</strong> be made eligible for CDI. This change was added
+ * in OmniFaces 2.6 as per <a href="https://github.com/omnifaces/omnifaces/issues/25">issue 25</a>.
+ *
  * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz
  * @see OmniApplication
@@ -135,13 +143,17 @@ public class ConverterManager {
 			Converter converter = application.createConverter(converterForClass);
 
 			if (converter != null) {
-				bean = (Bean<Converter>) resolve(manager, converter.getClass());
+				Class<? extends Converter> converterClass = converter.getClass();
+
+				if (findConstructor(converterClass) != null && findConstructor(converterClass, Class.class) == null) {
+					bean = (Bean<Converter>) resolve(manager, converterClass);
+				}
 			}
 
 			convertersByForClass.put(converterForClass, bean);
 		}
 
-		return (bean != null) ? getReference(manager, bean) : null;
+		return (bean != null) ? getReference(manager, bean) : application.createConverter(converterForClass);
 	}
 
 }
