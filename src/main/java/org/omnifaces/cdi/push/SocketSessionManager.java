@@ -12,8 +12,10 @@
  */
 package org.omnifaces.cdi.push;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.WARNING;
 import static javax.websocket.CloseReason.CloseCodes.NORMAL_CLOSURE;
 import static org.omnifaces.cdi.push.SocketEndpoint.PARAM_CHANNEL;
 import static org.omnifaces.util.Beans.getReference;
@@ -154,8 +156,8 @@ public class SocketSessionManager {
 			try {
 				results.add(session.getAsyncRemote().sendText(text));
 
-				if (retries > 0) {
-					logger.warning(String.format(WARNING_TOMCAT_WEB_SOCKET_BOMBED, retries));
+				if (retries > 0 && logger.isLoggable(WARNING)) {
+					logger.log(WARNING, format(WARNING_TOMCAT_WEB_SOCKET_BOMBED, retries));
 				}
 			}
 			catch (IllegalStateException e) {

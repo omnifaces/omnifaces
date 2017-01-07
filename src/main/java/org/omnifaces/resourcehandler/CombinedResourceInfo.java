@@ -12,7 +12,9 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static java.lang.String.format;
 import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.WARNING;
 import static org.omnifaces.util.FacesLocal.getRequestDomainURL;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.serializeURLSafe;
@@ -26,7 +28,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.faces.application.Resource;
@@ -186,7 +187,10 @@ public final class CombinedResourceInfo {
 			Resource resource = handler.createResource(resourceIdentifier.getName(), resourceIdentifier.getLibrary());
 
 			if (resource == null) {
-				logger.log(Level.WARNING, String.format(LOG_RESOURCE_NOT_FOUND, resourceIdentifier, id));
+				if (logger.isLoggable(WARNING)) {
+					logger.log(WARNING, format(LOG_RESOURCE_NOT_FOUND, resourceIdentifier, id));
+				}
+
 				resources.clear();
 				return;
 			}

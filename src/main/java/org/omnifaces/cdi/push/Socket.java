@@ -15,6 +15,7 @@ package org.omnifaces.cdi.push;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Boolean.parseBoolean;
 import static java.util.Collections.unmodifiableList;
+import static java.util.logging.Logger.getLogger;
 import static javax.faces.component.behavior.ClientBehaviorContext.createClientBehaviorContext;
 import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
@@ -28,7 +29,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import javax.el.ValueExpression;
@@ -630,6 +630,9 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 
 	private static final Pattern PATTERN_CHANNEL = Pattern.compile("[\\w.-]+");
 
+	private static final String WARNING_PARAM_DEPRECATED = "Context parameter name '" + PARAM_ENABLE_SOCKET_ENDPOINT
+		+ "' is deprecated. It has been renamed to '" + PARAM_SOCKET_ENDPOINT_ENABLED + "'."
+		+ " Please update web.xml accordingly.";
 	private static final String ERROR_EXPRESSION_DISALLOWED =
 		"o:socket 'channel' and 'scope' attributes may not contain an EL expression.";
 	private static final String ERROR_INVALID_USER =
@@ -959,10 +962,7 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 
 		if (!parseBoolean(context.getInitParameter(PARAM_SOCKET_ENDPOINT_ENABLED))) {
 			if (parseBoolean(context.getInitParameter(PARAM_ENABLE_SOCKET_ENDPOINT))) { // TODO: remove in OmniFaces 3.0.
-				Logger.getLogger(Socket.class.getName()).warning(
-					"Context parameter name '" + PARAM_ENABLE_SOCKET_ENDPOINT + "' is deprecated."
-						+ " It has been renamed to '" + PARAM_SOCKET_ENDPOINT_ENABLED + "'."
-						+ " Please update web.xml accordingly.");
+				getLogger(Socket.class.getName()).warning(WARNING_PARAM_DEPRECATED);
 			}
 			else {
 				return;
