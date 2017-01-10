@@ -59,6 +59,7 @@ import org.omnifaces.context.OmniPartialViewContext;
 import org.omnifaces.context.OmniPartialViewContextFactory;
 import org.omnifaces.filter.FacesExceptionFilter;
 import org.omnifaces.util.Exceptions;
+import org.omnifaces.util.Hacks;
 
 /**
  * <p>
@@ -532,6 +533,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 		UIViewRoot viewRoot = viewHandler.createView(context, viewId);
 		context.setViewRoot(viewRoot);
 		context.getPartialViewContext().setRenderAll(true);
+		Hacks.removeResourceDependencyState(context);
 
 		try {
 			context.setCurrentPhaseId(PhaseId.RENDER_RESPONSE);
