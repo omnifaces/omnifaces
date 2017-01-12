@@ -248,7 +248,7 @@ public final class Numbers {
 	private static String formatBase(BigDecimal decimal, int base, Integer fractions, boolean iec, String unit) {
 		int exponent = (int) (Math.log(decimal.longValue()) / Math.log(base));
 		BigDecimal divisor = BigDecimal.valueOf(Math.pow(base, exponent));
-		BigDecimal divided = (divisor.doubleValue() == 0.0) ? divisor : decimal.divide(divisor);
+		BigDecimal divided = (divisor.signum() == 0) ? divisor : decimal.divide(divisor);
 		int maxfractions = (fractions != null) ? fractions : (PRECISION - String.valueOf(divided.longValue()).length());
 		BigDecimal formatted;
 
