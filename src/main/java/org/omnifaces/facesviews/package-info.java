@@ -280,7 +280,7 @@
  * <td class="colFirst"><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS_PARAM_NAME}</code></td>
  * <td>Used to set whether the {@link org.omnifaces.facesviews.FacesViewsForwardingFilter} should match before declared filters (<code>false</code>) or
  * after declared filters (<code>true</code>).
- * <br>Default value: <code>true</code> (the FacesViews forwarding filter is the last in the filter chain)
+ * <br>Default value: <code>false</code> (the FacesViews forwarding filter is the first in the filter chain)
  * </td>
  * </tr>
  *
@@ -312,10 +312,6 @@
  *   &lt;context-param&gt;
  *       &lt;param-name&gt;org.omnifaces.FACES_VIEWS_DISPATCH_METHOD&lt;/param-name&gt;
  *       &lt;param-value&gt;FORWARD&lt;/param-value&gt;
- *   &lt;/context-param&gt;
- *   &lt;context-param&gt;
- *       &lt;param-name&gt;org.omnifaces.FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS&lt;/param-name&gt;
- *       &lt;param-value&gt;false&lt;/param-value&gt;
  *   &lt;/context-param&gt;
  *   &lt;context-param&gt;
  *       &lt;param-name&gt;org.omnifaces.FACES_VIEWS_SCANNED_VIEWS_ALWAYS_EXTENSIONLESS&lt;/param-name&gt;

@@ -615,7 +615,8 @@ public final class FacesViews {
 	// Helpers for FacesViewsViewHandler ------------------------------------------------------------------------------
 
 	static boolean isScannedViewsAlwaysExtensionless(ServletContext servletContext) {
-		return parseBoolean(servletContext.getInitParameter(FACES_VIEWS_SCANNED_VIEWS_EXTENSIONLESS_PARAM_NAME));
+		String alwaysExtensionless = servletContext.getInitParameter(FACES_VIEWS_SCANNED_VIEWS_EXTENSIONLESS_PARAM_NAME);
+		return isEmpty(alwaysExtensionless) || parseBoolean(alwaysExtensionless);
 	}
 
 	static ViewHandlerMode getViewHandlerMode(ServletContext servletContext) {
