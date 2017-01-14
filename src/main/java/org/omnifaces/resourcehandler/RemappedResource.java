@@ -12,28 +12,32 @@
  */
 package org.omnifaces.resourcehandler;
 
-import static org.omnifaces.util.Faces.getApplication;
-
 import java.io.Externalizable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
 
+import javax.faces.FacesException;
 import javax.faces.application.Resource;
-import javax.faces.application.ResourceWrapper;
+import javax.faces.context.FacesContext;
 
 /**
- * This {@link Resource} implementation remaps the given wrapped resource to the given request path.
+ * This {@link Resource} implementation remaps the given resource to the given request path.
  *
  * @author Bauke Scholtz
  * @since 2.1
  */
-public class RemappedResource extends ResourceWrapper implements Externalizable {
+public class RemappedResource extends Resource implements Externalizable {
 
-	private Serializable serializableWrappedResource;
-	private transient Resource transientWrappedResource;
+	private Serializable serializableResource;
+	private transient Resource resource;
 	private String resourceName;
 	private String libraryName;
 	private String requestPath;
@@ -47,20 +51,43 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
 
 	/**
 	 * Constructs a new resource which remaps the given wrapped resource to the given request path.
-	 * @param wrapped The resource to be wrapped.
+	 * @param resource The resource to be remapped.
 	 * @param requestPath The remapped request path.
 	 */
-	public RemappedResource(Resource wrapped, String requestPath) {
-		if (wrapped instanceof Serializable) {
-			serializableWrappedResource = (Serializable) wrapped;
-		}
-		else if (wrapped != null) {
-			transientWrappedResource = wrapped;
-			resourceName = wrapped.getResourceName();
-			libraryName = wrapped.getLibraryName();
+	public RemappedResource(Resource resource, String requestPath) {
+		if (resource instanceof Serializable) {
+			serializableResource = (Serializable) resource;
 		}
 
+		this.resource = resource;
 		this.requestPath = requestPath;
+	}
+
+	/**
+	 * Constructs a new resource which remaps the given requested resource and library name to the given request path.
+	 * @param resourceName The requested resource name.
+	 * @param libraryName The requested library name.
+	 * @param requestPath The remapped request path.
+	 */
+	public RemappedResource(String resourceName, String libraryName, String requestPath) {
+		this.resourceName = resourceName;
+		this.libraryName = libraryName;
+		this.requestPath = requestPath;
+	}
+
+	@Override
+	public String getResourceName() {
+		return (resource != null) ? resource.getResourceName() : resourceName;
+	}
+
+	@Override
+	public String getLibraryName() {
+		return (resource != null) ? resource.getLibraryName() : libraryName;
+	}
+
+	@Override
+	public String getContentType() {
+		return (resource != null) ? resource.getContentType() : null;
 	}
 
 	@Override
@@ -69,19 +96,28 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
 	}
 
 	@Override
-	public Resource getWrapped() {
-		return getResource();
+	public InputStream getInputStream() throws IOException {
+		return (resource != null) ? resource.getInputStream() : getURL().openStream();
 	}
 
-	private Resource getResource() {
-		if (serializableWrappedResource != null) {
-			return (Resource) serializableWrappedResource;
-		}
-		else if (transientWrappedResource == null) {
-			transientWrappedResource = getApplication().getResourceHandler().createResource(resourceName, libraryName);
-		}
+	@Override
+	public Map<String, String> getResponseHeaders() {
+		return (resource != null) ? resource.getResponseHeaders() : Collections.<String, String>emptyMap();
+	}
 
-		return transientWrappedResource;
+	@Override
+	public URL getURL() {
+		try {
+			return (resource != null) ? resource.getURL() : new URL(requestPath);
+		}
+		catch (MalformedURLException e) {
+			throw new FacesException(e);
+		}
+	}
+
+	@Override
+	public boolean userAgentNeedsUpdate(FacesContext context) {
+		return (resource != null) ? resource.userAgentNeedsUpdate(context) : false;
 	}
 
 	@Override
@@ -95,17 +131,18 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
 		}
 
 		RemappedResource other = (RemappedResource) object;
-		return Objects.equals(getResource(), other.getResource()) && requestPath.equals(other.requestPath);
+		return Objects.equals(resource, other.resource) && requestPath.equals(other.requestPath);
 	}
 
 	@Override
 	public int hashCode() {
-		return getResource().hashCode() + requestPath.hashCode();
+		return Objects.hash(resource, requestPath);
 	}
 
 	@Override
 	public void readExternal(ObjectInput input) throws IOException, ClassNotFoundException {
-		serializableWrappedResource = (Serializable) input.readObject();
+		serializableResource = (Serializable) input.readObject();
+		resource = (Resource) serializableResource;
 		resourceName = (String) input.readObject();
 		libraryName = (String) input.readObject();
 		requestPath = (String) input.readObject();
@@ -113,7 +150,7 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
 
 	@Override
 	public void writeExternal(ObjectOutput output) throws IOException {
-		output.writeObject(serializableWrappedResource);
+		output.writeObject(serializableResource);
 		output.writeObject(resourceName);
 		output.writeObject(libraryName);
 		output.writeObject(requestPath);

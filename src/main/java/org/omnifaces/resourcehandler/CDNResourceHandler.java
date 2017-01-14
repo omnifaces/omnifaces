@@ -245,7 +245,7 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 		}
 
 		String evaluatedRequestPath = evaluateExpressionGet(requestPath);
-		return new RemappedResource(resource, evaluatedRequestPath);
+		return new RemappedResource(resourceName, libraryName, evaluatedRequestPath);
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
