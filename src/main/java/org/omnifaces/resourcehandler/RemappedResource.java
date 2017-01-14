@@ -18,6 +18,8 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.Serializable;
+import java.util.Objects;
 
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceWrapper;
@@ -30,7 +32,7 @@ import javax.faces.application.ResourceWrapper;
  */
 public class RemappedResource extends ResourceWrapper implements Externalizable {
 
-	private Externalizable externalizableWrappedResource;
+	private Serializable serializableWrappedResource;
 	private transient Resource transientWrappedResource;
 	private String resourceName;
 	private String libraryName;
@@ -49,10 +51,10 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
 	 * @param requestPath The remapped request path.
 	 */
 	public RemappedResource(Resource wrapped, String requestPath) {
-		if (wrapped instanceof Externalizable) {
-			externalizableWrappedResource = (Externalizable) wrapped;
+		if (wrapped instanceof Serializable) {
+			serializableWrappedResource = (Serializable) wrapped;
 		}
-		else {
+		else if (wrapped != null) {
 			transientWrappedResource = wrapped;
 			resourceName = wrapped.getResourceName();
 			libraryName = wrapped.getLibraryName();
@@ -72,8 +74,8 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
 	}
 
 	private Resource getResource() {
-		if (externalizableWrappedResource != null) {
-			return (Resource) externalizableWrappedResource;
+		if (serializableWrappedResource != null) {
+			return (Resource) serializableWrappedResource;
 		}
 		else if (transientWrappedResource == null) {
 			transientWrappedResource = getApplication().getResourceHandler().createResource(resourceName, libraryName);
@@ -93,7 +95,7 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
 		}
 
 		RemappedResource other = (RemappedResource) object;
-		return getResource().equals(other.getResource()) && requestPath.equals(other.requestPath);
+		return Objects.equals(getResource(), other.getResource()) && requestPath.equals(other.requestPath);
 	}
 
 	@Override
@@ -103,7 +105,7 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
 
 	@Override
 	public void readExternal(ObjectInput input) throws IOException, ClassNotFoundException {
-		externalizableWrappedResource = (Externalizable) input.readObject();
+		serializableWrappedResource = (Serializable) input.readObject();
 		resourceName = (String) input.readObject();
 		libraryName = (String) input.readObject();
 		requestPath = (String) input.readObject();
@@ -111,7 +113,7 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
 
 	@Override
 	public void writeExternal(ObjectOutput output) throws IOException {
-		output.writeObject(externalizableWrappedResource);
+		output.writeObject(serializableWrappedResource);
 		output.writeObject(resourceName);
 		output.writeObject(libraryName);
 		output.writeObject(requestPath);
