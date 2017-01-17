@@ -484,7 +484,7 @@ public enum WebXml {
 
 		for (int i = 0; i < constraints.getLength(); i++) {
 			Node constraint = constraints.item(i);
-			Set<String> roles = null;
+			Set<String> roles = emptySet();
 			NodeList auth = getNodeList(constraint, xpath, XPATH_AUTH_CONSTRAINT);
 
 			if (auth.getLength() > 0) {
@@ -500,13 +500,17 @@ public enum WebXml {
 
 			for (int j = 0; j < urlPatterns.getLength(); j++) {
 				String urlPattern = getTextContent(urlPatterns.item(j));
-				Set<String> otherRoles = securityConstraints.get(urlPattern);
+				Set<String> allRoles = securityConstraints.get(urlPattern);
 
-				if (otherRoles != null) {
-					roles.addAll(otherRoles);
+				if (allRoles != null) {
+					allRoles = new HashSet<>(allRoles);
+					allRoles.addAll(roles);
+				}
+				else {
+					allRoles = roles;
 				}
 
-				securityConstraints.put(urlPattern, unmodifiableSet(roles));
+				securityConstraints.put(urlPattern, unmodifiableSet(allRoles));
 			}
 		}
 
