@@ -14,6 +14,7 @@ package org.omnifaces.config;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.logging.Level.SEVERE;
 import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.Faces.hasContext;
@@ -493,15 +494,19 @@ public enum WebXml {
 				for (int j = 0; j < authRoles.getLength(); j++) {
 					roles.add(getTextContent(authRoles.item(j)));
 				}
-
-				roles = Collections.unmodifiableSet(roles);
 			}
 
 			NodeList urlPatterns = getNodeList(constraint, xpath, XPATH_WEB_RESOURCE_URL_PATTERN);
 
 			for (int j = 0; j < urlPatterns.getLength(); j++) {
 				String urlPattern = getTextContent(urlPatterns.item(j));
-				securityConstraints.put(urlPattern, roles);
+				Set<String> otherRoles = securityConstraints.get(urlPattern);
+
+				if (otherRoles != null) {
+					roles.addAll(otherRoles);
+				}
+
+				securityConstraints.put(urlPattern, unmodifiableSet(roles));
 			}
 		}
 
