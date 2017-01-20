@@ -274,7 +274,7 @@ public class ViewParamValidationFailed extends TagHandler {
 		ELContext elContext = context.getELContext();
 		String evaluatedMessage = evaluate(elContext, message, false);
 
-		if (isEmpty(evaluatedMessage)) {
+		if (evaluatedMessage == null) {
 			evaluatedMessage = defaultMessage;
 		}
 
