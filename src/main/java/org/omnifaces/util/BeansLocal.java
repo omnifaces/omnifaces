@@ -12,7 +12,6 @@
  */
 package org.omnifaces.util;
 
-import static java.lang.String.format;
 import static java.util.logging.Level.FINE;
 
 import java.lang.annotation.Annotation;
@@ -53,9 +52,6 @@ public final class BeansLocal {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final Logger logger = Logger.getLogger(BeansLocal.class.getName());
-
-	private static final String ERROR_NO_ALTERABLE_CONTEXT =
-		"Bean '%s' is put in context '%s' which is not an alterable context.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -190,8 +186,11 @@ public final class BeansLocal {
 			((AlterableContext) context).destroy(bean);
 		}
 		else {
-			throw new IllegalArgumentException(
-				format(ERROR_NO_ALTERABLE_CONTEXT, bean.getBeanClass(), context.getClass()));
+			T instance = context.get(bean);
+
+			if (instance != null) {
+				destroy(beanManager, bean, instance);
+			}
 		}
 	}
 
@@ -200,16 +199,20 @@ public final class BeansLocal {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> void destroy(BeanManager beanManager, T instance) {
-		if (instance instanceof Class) {
+		if (instance instanceof Class) { // Java prefers T over Class<T> when varargs is not specified :(
 			destroy(beanManager, (Class<T>) instance, new Annotation[0]);
-		}
-		else if (instance instanceof Bean) {
-			destroy(beanManager, (Bean<T>) instance);
 		}
 		else {
 			Bean<T> bean = (Bean<T>) resolve(beanManager, instance.getClass());
-			bean.destroy(instance, beanManager.createCreationalContext(bean));
+
+			if (bean != null) {
+				destroy(beanManager, bean, instance);
+			}
 		}
+	}
+
+	private static <T> void destroy(BeanManager beanManager, Bean<T> bean, T instance) {
+		bean.destroy(instance, beanManager.createCreationalContext(bean));
 	}
 
 	/**
