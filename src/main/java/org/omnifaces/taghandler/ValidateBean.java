@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -201,6 +202,24 @@ import org.omnifaces.util.copier.SerializationCopier;
  *     &lt;h:message for="bar" /&gt;
  *     ...
  *     &lt;o:validateBean ... showMessageFor="foo bar" /&gt;
+ * &lt;/h:form&gt;
+ * </pre>
+ * <p>
+ * The faces message can also be shown for components which match {@link ConstraintViolation#getPropertyPath() Property
+ * Path of the ConstraintViolation} using <code>showMessageFor="@violating"</code>, and when no matching component can
+ * be found, the message will fallback to being added with client ID of the parent {@link UIForm}.
+ * <pre>
+ * &lt;h:form id="formId"&gt;
+ *     ...
+ *     &lt;!-- Unmatched messages shown here: --&gt;
+ *     &lt;h:message for="formId" /&gt;
+ *     ...
+ *     &lt;h:inputText id="foo" value="#{bean.product.item}" /&gt;
+ *
+ *     &lt;!-- Messages where ConstraintViolation PropertyPath is "item" are shown here: --&gt;
+ *     &lt;h:message for="foo" /&gt;
+ *     ...
+ *     &lt;o:validateBean ... value="#{bean.product}" showMessageFor="@violating" /&gt;
  * &lt;/h:form&gt;
  * </pre>
  * <p>
@@ -468,10 +487,12 @@ public class ValidateBean extends TagHandler {
 			final StringBuilder labels = new StringBuilder();
 
 			if (!clientIds.isEmpty()) {
+				final boolean invalidate = !showMessageFor.equals("@violating");
 				forEachComponent(context).fromRoot(form).havingIds(clientIds).invoke(new Callback.WithArgument<UIInput>() {
 					@Override
 					public void invoke(UIInput input) {
-						input.setValid(false);
+						if (invalidate)
+							input.setValid(false);
 
 						if (labels.length() > 0) {
 							labels.append(", ");
@@ -504,6 +525,23 @@ public class ValidateBean extends TagHandler {
 			for (ConstraintViolation<?> violation : violations) {
 				addGlobalError(violation.getMessage(), labels);
 			}
+		}
+		else if (showMessageFor.equals("@violating")) {
+			Set<ConstraintViolation<?>> unmatched = new LinkedHashSet<>(violations);
+			for (ConstraintViolation<?> violation : violations) {
+				final String message = violation.getMessage();
+				final boolean[] matched = new boolean[1];
+				forEachInputWithMatchingBase(context, form, violation.getRootBean(), violation.getPropertyPath().toString(), new Callback.WithArgument<UIInput>() { @Override public void invoke(UIInput input) {
+						input.setValid(false);
+						addError(input.getClientId(), message, Components.getLabel(input));
+						matched[0] = true;
+					}
+				});
+				if (matched[0])
+					unmatched.remove(violation);
+			}
+			if (!unmatched.isEmpty() && !showMessageFor.equals(DEFAULT_SHOWMESSAGEFOR))
+				showMessages(context, form, unmatched, clientIds, labels, DEFAULT_SHOWMESSAGEFOR);
 		}
 		else {
 			for (String clientId : showMessageFor.split("\\s+")) {

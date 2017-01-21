@@ -4389,8 +4389,9 @@ public enum Baz {
 				<![CDATA[
 					The identifier for which this validator should show the message. Defaults to "@form" which is the
 					parent <code>UIForm</code>. Other available values are "@all" which will show the message for all
-					invalidated components and "@global" which will show a global message. Any other space separated
-					value will be treated as client ID of UI input component.
+					invalidated components, "@global" which will show a global message, and "@violating" which will
+					match components by ConstraintViolation Property Path. Any other space separated value will be
+					treated as client ID of UI input component.
 				]]>
 			</description>
 			<name>showMessageFor</name>
