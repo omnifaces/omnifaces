@@ -63,6 +63,9 @@ import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
+import javax.faces.component.visit.VisitCallback;
+import javax.faces.component.visit.VisitContext;
+import javax.faces.component.visit.VisitResult;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PostValidateEvent;
 import javax.faces.event.PreValidateEvent;
@@ -312,6 +315,15 @@ public class ValidateBean extends TagHandler {
 		}
 
 		Object bean = (value != null) ? value.getValue(getELContext()) : null;
+
+		if (value != null && bean == null) {
+			final Object[] beans = new Object[1];
+			forEachComponent().fromRoot(form).havingIds(component.getClientId()).invoke(new VisitCallback() { @Override public VisitResult visit(VisitContext context, UIComponent target) {
+				beans[0] = value.getValue(getELContext());
+				return VisitResult.COMPLETE;
+			}});
+			bean = beans[0];
+		}
 
 		if (bean == null) {
 			validateForm(groups, disabled);
