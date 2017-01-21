@@ -282,7 +282,7 @@ public class ValidateBean extends TagHandler {
 	/**
 	 * If the parent component has the <code>value</code> attribute or is an instance of {@link UICommand} or
 	 * {@link UIInput} and is new and we're in the restore view phase of a postback, then delegate to
-	 * {@link #processValidateBean(UIComponent)}.
+	 * {@link #processValidateBean(FacesContext, UIComponent)}.
 	 * @throws IllegalArgumentException When the <code>value</code> attribute is absent and the parent component is not
 	 * an instance of {@link UICommand} or {@link UIInput}.
 	 */
