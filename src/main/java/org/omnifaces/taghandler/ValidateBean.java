@@ -365,7 +365,7 @@ public class ValidateBean extends TagHandler {
 		ValidateBeanCallback collectBeanProperties = new ValidateBeanCallback() { @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
 
-			forEachInputWithMatchingBase(context, form, bean, new Callback.WithArgument<EditableValueHolder>() { @Override public void invoke(EditableValueHolder v) {
+			forEachInputWithMatchingBase(context, form, bean, new Callback.WithArgument<UIInput>() { @Override public void invoke(UIInput v) {
 				addCollectingValidator(v, clientIds, properties);
 			}});
 		}};
@@ -373,7 +373,7 @@ public class ValidateBean extends TagHandler {
 		ValidateBeanCallback checkConstraints = new ValidateBeanCallback() { @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
 
-			forEachInputWithMatchingBase(context, form, bean, new Callback.WithArgument<EditableValueHolder>() { @Override public void invoke(EditableValueHolder v) {
+			forEachInputWithMatchingBase(context, form, bean, new Callback.WithArgument<UIInput>() { @Override public void invoke(UIInput v) {
 				removeCollectingValidator(v);
 			}});
 
@@ -401,7 +401,7 @@ public class ValidateBean extends TagHandler {
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
-	private static void forEachInputWithMatchingBase(final FacesContext context, UIComponent form, final Object base, final Callback.WithArgument<EditableValueHolder> callback) {
+	private static void forEachInputWithMatchingBase(final FacesContext context, UIComponent form, final Object base, final String property, final Callback.WithArgument<UIInput> callback) {
 		forEachComponent(context)
 			.fromRoot(form)
 			.ofTypes(EditableValueHolder.class)
@@ -413,10 +413,15 @@ public class ValidateBean extends TagHandler {
 					ValueReference valueReference = getValueReference(context.getELContext(), valueExpression);
 
 					if (valueReference.getBase().equals(base)) {
-						callback.invoke((EditableValueHolder) component);
+						if (property == null || property.equals(valueReference.getProperty()))
+							callback.invoke((UIInput) component);
 					}
 				}
 			}});
+	}
+
+	private static void forEachInputWithMatchingBase(final FacesContext context, UIComponent form, final Object base, final Callback.WithArgument<UIInput> callback) {
+		forEachInputWithMatchingBase(context, form, base, null, callback);
 	}
 
 	private static void addCollectingValidator(EditableValueHolder valueHolder, Set<String> clientIds, Map<String, Object> properties) {
