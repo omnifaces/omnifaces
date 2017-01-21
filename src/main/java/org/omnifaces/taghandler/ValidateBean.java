@@ -429,10 +429,8 @@ public class ValidateBean extends TagHandler {
 				if (valueExpression != null) {
 					ValueReference valueReference = getValueReference(context.getELContext(), valueExpression);
 
-					if (valueReference.getBase().equals(base)) {
-						if (property == null || property.equals(valueReference.getProperty())) {
-							callback.invoke(input);
-						}
+					if (valueReference.getBase().equals(base) && (property == null || property.equals(valueReference.getProperty()))) {
+						callback.invoke(input);
 					}
 				}
 			}});
@@ -495,15 +493,16 @@ public class ValidateBean extends TagHandler {
 
 		if (!violations.isEmpty()) {
 			context.validationFailed();
+			String showMessagesFor = showMessageFor;
 
 			if ("@violating".equals(showMessageFor)) {
 				violations = invalidateInputsByPropertyPathAndShowMessages(context, form, violations, clientIds);
-				showMessageFor = DEFAULT_SHOWMESSAGEFOR;
+				showMessagesFor = DEFAULT_SHOWMESSAGEFOR;
 			}
 
 			if (!violations.isEmpty()) {
 				String labels = invalidateInputsByClientIdsAndCollectLabels(context, form, clientIds);
-				showMessages(context, form, violations, clientIds, labels, showMessageFor);
+				showMessages(context, form, violations, clientIds, labels, showMessagesFor);
 			}
 
 			if (renderResponseOnFail) {
@@ -546,23 +545,23 @@ public class ValidateBean extends TagHandler {
 		return labels.toString();
 	}
 
-	private static void showMessages(FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, Set<String> clientIds, String labels, String showMessageFor) {
-		if ("@form".equals(showMessageFor)) {
+	private static void showMessages(FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, Set<String> clientIds, String labels, String showMessagesFor) {
+		if ("@form".equals(showMessagesFor)) {
 			String formId = form.getClientId(context);
 			addErrors(formId, violations, labels);
 		}
-		else if ("@all".equals(showMessageFor)) {
+		else if ("@all".equals(showMessagesFor)) {
 			for (String clientId : clientIds) {
 				addErrors(clientId, violations, labels);
 			}
 		}
-		else if ("@global".equals(showMessageFor)) {
+		else if ("@global".equals(showMessagesFor)) {
 			for (ConstraintViolation<?> violation : violations) {
 				addGlobalError(violation.getMessage(), labels);
 			}
 		}
 		else {
-			for (String clientId : showMessageFor.split("\\s+")) {
+			for (String clientId : showMessagesFor.split("\\s+")) {
 				addErrors(clientId, violations, labels);
 			}
 		}
