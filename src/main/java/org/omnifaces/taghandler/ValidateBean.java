@@ -526,14 +526,14 @@ public class ValidateBean extends TagHandler {
 				addGlobalError(violation.getMessage(), labels);
 			}
 		}
-		else if (showMessageFor.equals("@violating")) {
+		else if ("@violating".equals(showMessageFor)) {
 			Set<ConstraintViolation<?>> unmatched = new LinkedHashSet<>(violations);
 			for (ConstraintViolation<?> violation : violations) {
 				final String message = violation.getMessage();
 				final boolean[] matched = new boolean[1];
 				forEachInputWithMatchingBase(context, form, violation.getRootBean(), violation.getPropertyPath().toString(), new Callback.WithArgument<UIInput>() { @Override public void invoke(UIInput input) {
 						input.setValid(false);
-						addError(input.getClientId(), message, Components.getLabel(input));
+						addError(input.getClientId(), message, getLabel(input));
 						matched[0] = true;
 					}
 				});
