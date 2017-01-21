@@ -50,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -204,6 +205,24 @@ import org.omnifaces.util.copier.SerializationCopier;
  * &lt;/h:form&gt;
  * </pre>
  * <p>
+ * The faces message can also be shown for components which match {@link ConstraintViolation#getPropertyPath() Property
+ * Path of the ConstraintViolation} using <code>showMessageFor="@violating"</code>, and when no matching component can
+ * be found, the message will fallback to being added with client ID of the parent {@link UIForm}.
+ * <pre>
+ * &lt;h:form id="formId"&gt;
+ *     ...
+ *     &lt;!-- Unmatched messages shown here: --&gt;
+ *     &lt;h:message for="formId" /&gt;
+ *     ...
+ *     &lt;h:inputText id="foo" value="#{bean.product.item}" /&gt;
+ *
+ *     &lt;!-- Messages where ConstraintViolation PropertyPath is "item" are shown here: --&gt;
+ *     &lt;h:message for="foo" /&gt;
+ *     ...
+ *     &lt;o:validateBean ... value="#{bean.product}" showMessageFor="@violating" /&gt;
+ * &lt;/h:form&gt;
+ * </pre>
+ * <p>
  * The <code>showMessageFor</code> attribute is new since OmniFaces 2.6 and it defaults to <code>@form</code>. The
  * <code>showMessageFor</code> attribute does by design not have any effect when <code>validateMethod="actual"</code>
  * is used.
@@ -353,7 +372,7 @@ public class ValidateBean extends TagHandler {
 		ValidateBeanCallback collectBeanProperties = new ValidateBeanCallback() { @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
 
-			forEachInputWithMatchingBase(context, form, bean, new Callback.WithArgument<EditableValueHolder>() { @Override public void invoke(EditableValueHolder v) {
+			forEachInputWithMatchingBase(context, form, bean, new Callback.WithArgument<UIInput>() { @Override public void invoke(UIInput v) {
 				addCollectingValidator(v, clientIds, properties);
 			}});
 		}};
@@ -361,7 +380,7 @@ public class ValidateBean extends TagHandler {
 		ValidateBeanCallback checkConstraints = new ValidateBeanCallback() { @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
 
-			forEachInputWithMatchingBase(context, form, bean, new Callback.WithArgument<EditableValueHolder>() { @Override public void invoke(EditableValueHolder v) {
+			forEachInputWithMatchingBase(context, form, bean, new Callback.WithArgument<UIInput>() { @Override public void invoke(UIInput v) {
 				removeCollectingValidator(v);
 			}});
 
@@ -389,7 +408,7 @@ public class ValidateBean extends TagHandler {
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
-	private static void forEachInputWithMatchingBase(final FacesContext context, UIComponent form, final Object base, final Callback.WithArgument<EditableValueHolder> callback) {
+	private static void forEachInputWithMatchingBase(final FacesContext context, UIComponent form, final Object base, final String property, final Callback.WithArgument<UIInput> callback) {
 		forEachComponent(context)
 			.fromRoot(form)
 			.ofTypes(EditableValueHolder.class)
@@ -401,10 +420,15 @@ public class ValidateBean extends TagHandler {
 					ValueReference valueReference = getValueReference(context.getELContext(), valueExpression);
 
 					if (valueReference.getBase().equals(base)) {
-						callback.invoke((EditableValueHolder) component);
+						if (property == null || property.equals(valueReference.getProperty()))
+							callback.invoke((UIInput) component);
 					}
 				}
 			}});
+	}
+
+	private static void forEachInputWithMatchingBase(final FacesContext context, UIComponent form, final Object base, final Callback.WithArgument<UIInput> callback) {
+		forEachInputWithMatchingBase(context, form, base, null, callback);
 	}
 
 	private static void addCollectingValidator(EditableValueHolder valueHolder, Set<String> clientIds, Map<String, Object> properties) {
@@ -463,10 +487,12 @@ public class ValidateBean extends TagHandler {
 			final StringBuilder labels = new StringBuilder();
 
 			if (!clientIds.isEmpty()) {
+				final boolean invalidate = !showMessageFor.equals("@violating");
 				forEachComponent(context).fromRoot(form).havingIds(clientIds).invoke(new Callback.WithArgument<UIInput>() {
 					@Override
 					public void invoke(UIInput input) {
-						input.setValid(false);
+						if (invalidate)
+							input.setValid(false);
 
 						if (labels.length() > 0) {
 							labels.append(", ");
@@ -499,6 +525,23 @@ public class ValidateBean extends TagHandler {
 			for (ConstraintViolation<?> violation : violations) {
 				addGlobalError(violation.getMessage(), labels);
 			}
+		}
+		else if ("@violating".equals(showMessageFor)) {
+			Set<ConstraintViolation<?>> unmatched = new LinkedHashSet<>(violations);
+			for (ConstraintViolation<?> violation : violations) {
+				final String message = violation.getMessage();
+				final boolean[] matched = new boolean[1];
+				forEachInputWithMatchingBase(context, form, violation.getRootBean(), violation.getPropertyPath().toString(), new Callback.WithArgument<UIInput>() { @Override public void invoke(UIInput input) {
+						input.setValid(false);
+						addError(input.getClientId(), message, getLabel(input));
+						matched[0] = true;
+					}
+				});
+				if (matched[0])
+					unmatched.remove(violation);
+			}
+			if (!unmatched.isEmpty() && !showMessageFor.equals(DEFAULT_SHOWMESSAGEFOR))
+				showMessages(context, form, unmatched, clientIds, labels, DEFAULT_SHOWMESSAGEFOR);
 		}
 		else {
 			for (String clientId : showMessageFor.split("\\s+")) {
