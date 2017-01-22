@@ -363,7 +363,7 @@ public class ValidateBean extends TagHandler {
 	private void validateActualBean(final UIForm form, final Object bean, final String groups) {
 		ValidateBeanCallback validateActualBean = new ValidateBeanCallback() { @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
-			validate(context, form, bean, groups, new HashSet<String>(0), showMessageFor, false);
+			validate(context, form, bean, bean, groups, new HashSet<String>(0), showMessageFor, false);
 		}};
 
 		subscribeToRequestAfterPhase(UPDATE_MODEL_VALUES, validateActualBean);
@@ -396,7 +396,7 @@ public class ValidateBean extends TagHandler {
 
 			Object copiedBean = getCopier(context, copier).copy(bean);
 			setProperties(copiedBean, properties);
-			validate(context, form, copiedBean, groups, clientIds, showMessageFor, true);
+			validate(context, form, bean, copiedBean, groups, clientIds, showMessageFor, true);
 		}};
 
 		subscribeToRequestBeforePhase(PROCESS_VALIDATIONS, collectBeanProperties);
@@ -481,14 +481,14 @@ public class ValidateBean extends TagHandler {
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private static void validate(final FacesContext context, UIForm form, Object bean, String groups, Set<String> clientIds, String showMessageFor, boolean renderResponseOnFail) {
+	private static void validate(final FacesContext context, UIForm form, Object actualBean, Object validableBean, String groups, Set<String> clientIds, String showMessageFor, boolean renderResponseOnFail) {
 		List<Class> groupClasses = new ArrayList<>();
 
 		for (String group : csvToList(groups)) {
 			groupClasses.add(toClass(group));
 		}
 
-		Set violationsRaw = getBeanValidator().validate(bean, groupClasses.toArray(new Class[groupClasses.size()]));
+		Set violationsRaw = getBeanValidator().validate(validableBean, groupClasses.toArray(new Class[groupClasses.size()]));
 		Set<ConstraintViolation<?>> violations = violationsRaw;
 
 		if (!violations.isEmpty()) {
@@ -496,7 +496,7 @@ public class ValidateBean extends TagHandler {
 			String showMessagesFor = showMessageFor;
 
 			if ("@violating".equals(showMessageFor)) {
-				violations = invalidateInputsByPropertyPathAndShowMessages(context, form, violations, clientIds);
+				violations = invalidateInputsByPropertyPathAndShowMessages(context, form, actualBean, violations, clientIds);
 				showMessagesFor = DEFAULT_SHOWMESSAGEFOR;
 			}
 
@@ -511,11 +511,11 @@ public class ValidateBean extends TagHandler {
 		}
 	}
 
-	private static Set<ConstraintViolation<?>> invalidateInputsByPropertyPathAndShowMessages(final FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, final Set<String> clientIds) {
+	private static Set<ConstraintViolation<?>> invalidateInputsByPropertyPathAndShowMessages(final FacesContext context, UIForm form, Object bean, Set<ConstraintViolation<?>> violations, final Set<String> clientIds) {
 		final Set<ConstraintViolation<?>> remainingViolations = new LinkedHashSet<>(violations);
 
 		for (final ConstraintViolation<?> violation : violations) {
-			forEachInputWithMatchingBase(context, form, violation.getRootBean(), violation.getPropertyPath().toString(), new Callback.WithArgument<UIInput>() { @Override public void invoke(UIInput input) {
+			forEachInputWithMatchingBase(context, form, bean, violation.getPropertyPath().toString(), new Callback.WithArgument<UIInput>() { @Override public void invoke(UIInput input) {
 				input.setValid(false);
 				String clientId = input.getClientId(context);
 				addError(clientId, violation.getMessage(), getLabel(input));
