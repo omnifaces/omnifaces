@@ -83,20 +83,62 @@ public class ValidateBeanIT extends OmniFacesIT {
 	@FindBy(id="validateClassLevelByCopier:command")
 	private WebElement validateClassLevelByCopierCommand;
 
-	@FindBy(id="validateClassLevelWithMessage:number1")
-	private WebElement validateClassLevelWithMessageNumber1;
+	@FindBy(id="validateClassLevelWithMessageForForm:number1")
+	private WebElement validateClassLevelWithMessageForFormNumber1;
 
-	@FindBy(id="validateClassLevelWithMessage:number1Message")
-	private WebElement validateClassLevelWithMessageNumber1Message;
+	@FindBy(id="validateClassLevelWithMessageForForm:number2")
+	private WebElement validateClassLevelWithMessageForFormNumber2;
 
-	@FindBy(id="validateClassLevelWithMessage:number2")
-	private WebElement validateClassLevelWithMessageNumber2;
+	@FindBy(id="validateClassLevelWithMessageForForm:formMessage")
+	private WebElement validateClassLevelWithMessageForFormMessage;
 
-	@FindBy(id="validateClassLevelWithMessage:number2Message")
-	private WebElement validateClassLevelWithMessageNumber2Message;
+	@FindBy(id="validateClassLevelWithMessageForForm:command")
+	private WebElement validateClassLevelWithMessageForFormCommand;
 
-	@FindBy(id="validateClassLevelWithMessage:command")
-	private WebElement validateClassLevelWithMessageCommand;
+	@FindBy(id="validateClassLevelWithMessageForAll:number1")
+	private WebElement validateClassLevelWithMessageForAllNumber1;
+
+	@FindBy(id="validateClassLevelWithMessageForAll:number1Message")
+	private WebElement validateClassLevelWithMessageForAllNumber1Message;
+
+	@FindBy(id="validateClassLevelWithMessageForAll:number2")
+	private WebElement validateClassLevelWithMessageForAllNumber2;
+
+	@FindBy(id="validateClassLevelWithMessageForAll:number2Message")
+	private WebElement validateClassLevelWithMessageForAllNumber2Message;
+
+	@FindBy(id="validateClassLevelWithMessageForAll:command")
+	private WebElement validateClassLevelWithMessageForAllCommand;
+
+	@FindBy(id="validateClassLevelWithMessageForGlobal:number1")
+	private WebElement validateClassLevelWithMessageForGlobalNumber1;
+
+	@FindBy(id="validateClassLevelWithMessageForGlobal:number2")
+	private WebElement validateClassLevelWithMessageForGlobalNumber2;
+
+	@FindBy(id="validateClassLevelWithMessageForGlobal:globalMessage")
+	private WebElement validateClassLevelWithMessageForGlobalMessage;
+
+	@FindBy(id="validateClassLevelWithMessageForGlobal:command")
+	private WebElement validateClassLevelWithMessageForGlobalCommand;
+
+	@FindBy(id="validateClassLevelWithMessageForViolating:number1")
+	private WebElement validateClassLevelWithMessageForViolatingNumber1;
+
+	@FindBy(id="validateClassLevelWithMessageForViolating:number1Message")
+	private WebElement validateClassLevelWithMessageForViolatingNumber1Message;
+
+	@FindBy(id="validateClassLevelWithMessageForViolating:number2")
+	private WebElement validateClassLevelWithMessageForViolatingNumber2;
+
+	@FindBy(id="validateClassLevelWithMessageForViolating:number2Message")
+	private WebElement validateClassLevelWithMessageForViolatingNumber2Message;
+
+	@FindBy(id="validateClassLevelWithMessageForViolating:formMessage")
+	private WebElement validateClassLevelWithMessageForViolatingFormMessage;
+
+	@FindBy(id="validateClassLevelWithMessageForViolating:command")
+	private WebElement validateClassLevelWithMessageForViolatingCommand;
 
 	@Deployment(testable=false)
 	public static WebArchive createDeployment() {
@@ -225,17 +267,57 @@ public class ValidateBeanIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void validateClassLevelWithMessage() {
-		validateClassLevelWithMessageNumber1.sendKeys("2");
-		validateClassLevelWithMessageNumber2.sendKeys("1");
-		guardAjax(validateClassLevelWithMessageCommand).click();
-		assertEquals("invalidEntity", validateClassLevelWithMessageNumber1Message.getText());
-		assertEquals("invalidEntity", validateClassLevelWithMessageNumber2Message.getText());
+	public void validateClassLevelWithMessageForForm() {
+		validateClassLevelWithMessageForFormNumber1.sendKeys("2");
+		validateClassLevelWithMessageForFormNumber2.sendKeys("1");
+		guardAjax(validateClassLevelWithMessageForFormCommand).click();
+		assertEquals("invalidEntity", validateClassLevelWithMessageForFormMessage.getText());
 
-		validateClassLevelWithMessageNumber2.sendKeys("0");
-		guardAjax(validateClassLevelWithMessageCommand).click();
-		assertEquals("", validateClassLevelWithMessageNumber1Message.getText());
-		assertEquals("", validateClassLevelWithMessageNumber2Message.getText());
+		validateClassLevelWithMessageForFormNumber2.sendKeys("0");
+		guardAjax(validateClassLevelWithMessageForFormCommand).click();
+		assertEquals("", validateClassLevelWithMessageForFormMessage.getText());
+	}
+
+	@Test
+	public void validateClassLevelWithMessageForAll() {
+		validateClassLevelWithMessageForAllNumber1.sendKeys("2");
+		validateClassLevelWithMessageForAllNumber2.sendKeys("1");
+		guardAjax(validateClassLevelWithMessageForAllCommand).click();
+		assertEquals("invalidEntity", validateClassLevelWithMessageForAllNumber1Message.getText());
+		assertEquals("invalidEntity", validateClassLevelWithMessageForAllNumber2Message.getText());
+
+		validateClassLevelWithMessageForAllNumber2.sendKeys("0");
+		guardAjax(validateClassLevelWithMessageForAllCommand).click();
+		assertEquals("", validateClassLevelWithMessageForAllNumber1Message.getText());
+		assertEquals("", validateClassLevelWithMessageForAllNumber2Message.getText());
+	}
+
+	@Test
+	public void validateClassLevelWithMessageForGlobal() {
+		validateClassLevelWithMessageForGlobalNumber1.sendKeys("2");
+		validateClassLevelWithMessageForGlobalNumber2.sendKeys("1");
+		guardAjax(validateClassLevelWithMessageForGlobalCommand).click();
+		assertEquals("invalidEntity", validateClassLevelWithMessageForGlobalMessage.getText());
+
+		validateClassLevelWithMessageForGlobalNumber2.sendKeys("0");
+		guardAjax(validateClassLevelWithMessageForGlobalCommand).click();
+		assertEquals("actionSuccess", validateClassLevelWithMessageForGlobalMessage.getText());
+	}
+
+	@Test
+	public void validateClassLevelWithMessageForViolating() {
+		validateClassLevelWithMessageForViolatingNumber1.sendKeys("2");
+		validateClassLevelWithMessageForViolatingNumber2.sendKeys("1");
+		guardAjax(validateClassLevelWithMessageForViolatingCommand).click();
+		assertEquals("invalidEntity", validateClassLevelWithMessageForViolatingNumber1Message.getText());
+		assertEquals("", validateClassLevelWithMessageForViolatingNumber2Message.getText());
+		assertEquals("", validateClassLevelWithMessageForViolatingFormMessage.getText());
+
+		validateClassLevelWithMessageForViolatingNumber2.sendKeys("0");
+		guardAjax(validateClassLevelWithMessageForViolatingCommand).click();
+		assertEquals("", validateClassLevelWithMessageForViolatingNumber1Message.getText());
+		assertEquals("", validateClassLevelWithMessageForViolatingNumber2Message.getText());
+		assertEquals("", validateClassLevelWithMessageForViolatingFormMessage.getText());
 	}
 
 }
