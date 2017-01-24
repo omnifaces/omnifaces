@@ -75,6 +75,8 @@ public class ParamProducer {
 
 	private static final String DEFAULT_REQUIRED_MESSAGE = "{0}: Value is required";
 
+	private static volatile Boolean interpretEmptyStringSubmittedValuesAsNull;
+
 	@SuppressWarnings("unused") // Workaround for OpenWebBeans not properly passing it as produce() method argument.
 	@Inject
 	private InjectionPoint injectionPoint;
@@ -135,6 +137,11 @@ public class ParamProducer {
 			for (int i = 0; i < submittedValues.length; i++) {
 				String submittedValue = submittedValues[i];
 
+				if (submittedValue != null && interpretEmptyStringSubmittedValuesAsNull(context) && submittedValue.isEmpty()) {
+					submittedValue = null;
+					submittedValues[i] = null;
+				}
+
 				try {
 					convertedValues[i] = (converter != null) ? converter.getAsObject(context, component, submittedValue) : submittedValue;
 				}
@@ -154,6 +161,17 @@ public class ParamProducer {
 		}
 
 		return convertedValues;
+	}
+
+	private static boolean interpretEmptyStringSubmittedValuesAsNull(FacesContext context) {
+		if (interpretEmptyStringSubmittedValuesAsNull != null) {
+			return interpretEmptyStringSubmittedValuesAsNull;
+		}
+
+		interpretEmptyStringSubmittedValuesAsNull = parseBoolean(context.getExternalContext()
+			.getInitParameter("javax.faces.INTERPRET_EMPTY_STRING_SUBMITTED_VALUES_AS_NULL"));
+
+		return interpretEmptyStringSubmittedValuesAsNull;
 	}
 
 	@SuppressWarnings("unchecked")
