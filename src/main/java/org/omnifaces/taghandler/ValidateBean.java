@@ -58,7 +58,6 @@ import java.util.logging.Logger;
 import javax.el.ValueExpression;
 import javax.el.ValueReference;
 import javax.faces.FacesException;
-import javax.faces.component.ContextCallback;
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
@@ -335,7 +334,7 @@ public class ValidateBean extends TagHandler {
 		if (value != null) {
 			final Object[] found = new Object[1];
 
-			form.invokeOnComponent(context, component.getClientId(), new ContextCallback() { @Override public void invokeContextCallback(FacesContext context, UIComponent target) {
+			forEachComponent().havingIds(component.getClientId()).invoke(new Callback.WithArgument<UIComponent>() { @Override public void invoke(UIComponent component) {
 				found[0] = value.getValue(getELContext());
 			}});
 
@@ -437,7 +436,7 @@ public class ValidateBean extends TagHandler {
 			}
 
 			if (!violations.isEmpty()) {
-				String labels = invalidateInputsByClientIdsAndCollectLabels(context, form, clientIds);
+				String labels = invalidateInputsByClientIdsAndCollectLabels(context, clientIds);
 				showMessages(context, form, violations, clientIds, labels, showMessagesFor);
 			}
 
@@ -451,19 +450,23 @@ public class ValidateBean extends TagHandler {
 
 	private static void forEachInputWithMatchingBase(final FacesContext context, UIComponent form, final Object base, final String property, final Callback.WithArgument<UIInput> callback) {
 		forEachComponent(context)
-			.fromRoot(form)
-			.ofTypes(UIInput.class)
-			.withHints(SKIP_UNRENDERED/*, SKIP_ITERATION*/) // SKIP_ITERATION fails in Apache EL (Tomcat 8.0.32 tested) but works in Oracle EL.
-			.invoke(new Callback.WithArgument<UIInput>() { @Override public void invoke(UIInput input) {
-				ValueExpression valueExpression = input.getValueExpression(VALUE_ATTRIBUTE);
+			.havingIds(form.getClientId())
+			.invoke(new Callback.WithArgument<UIComponent>() { @Override public void invoke(UIComponent component) {
+				forEachComponent(context)
+					.fromRoot(component)
+					.ofTypes(UIInput.class)
+					.withHints(SKIP_UNRENDERED/*, SKIP_ITERATION*/) // SKIP_ITERATION fails in Apache EL (Tomcat 8.0.32 tested) but works in Oracle EL.
+					.invoke(new Callback.WithArgument<UIInput>() { @Override public void invoke(UIInput input) {
+						ValueExpression valueExpression = input.getValueExpression(VALUE_ATTRIBUTE);
 
-				if (valueExpression != null) {
-					ValueReference valueReference = getValueReference(context.getELContext(), valueExpression);
+						if (valueExpression != null) {
+							ValueReference valueReference = getValueReference(context.getELContext(), valueExpression);
 
-					if (valueReference.getBase().equals(base) && (property == null || property.equals(valueReference.getProperty()))) {
-						callback.invoke(input);
-					}
-				}
+							if (valueReference.getBase().equals(base) && (property == null || property.equals(valueReference.getProperty()))) {
+								callback.invoke(input);
+							}
+						}
+					}});
 			}});
 	}
 
@@ -527,11 +530,11 @@ public class ValidateBean extends TagHandler {
 		return remainingViolations;
 	}
 
-	private static String invalidateInputsByClientIdsAndCollectLabels(final FacesContext context, UIForm form, Set<String> clientIds) {
+	private static String invalidateInputsByClientIdsAndCollectLabels(final FacesContext context, Set<String> clientIds) {
 		final StringBuilder labels = new StringBuilder();
 
 		if (!clientIds.isEmpty()) {
-			forEachComponent(context).fromRoot(form).havingIds(clientIds).invoke(new Callback.WithArgument<UIInput>() { @Override public void invoke(UIInput input) {
+			forEachComponent(context).havingIds(clientIds).invoke(new Callback.WithArgument<UIInput>() { @Override public void invoke(UIInput input) {
 				input.setValid(false);
 
 				if (labels.length() > 0) {
