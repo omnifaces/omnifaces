@@ -58,7 +58,6 @@ import java.util.logging.Logger;
 import javax.el.ValueExpression;
 import javax.el.ValueReference;
 import javax.faces.FacesException;
-import javax.faces.component.ContextCallback;
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
@@ -335,7 +334,7 @@ public class ValidateBean extends TagHandler {
 		if (value != null) {
 			final Object[] found = new Object[1];
 
-			form.invokeOnComponent(context, component.getClientId(), new ContextCallback() { @Override public void invokeContextCallback(FacesContext context, UIComponent target) {
+			forEachComponent().fromRoot(form).invoke(new Callback.WithArgument<UIComponent>() { @Override public void invoke(UIComponent target) {
 				found[0] = value.getValue(getELContext());
 			}});
 
