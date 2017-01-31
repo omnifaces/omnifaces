@@ -13,6 +13,7 @@
 package org.omnifaces.util;
 
 import static java.lang.String.format;
+import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getContextAttribute;
 import static org.omnifaces.util.FacesLocal.getInitParameter;
@@ -65,7 +66,7 @@ public final class Hacks {
 	private static final String RICHFACES_RLF_CLASS_NAME =
 		"org.richfaces.resource.ResourceLibraryFactoryImpl";
 
-	private static final Class<?> PRIMEFACES_DIALOG_CLASS =
+	private static final Class<UIComponent> PRIMEFACES_DIALOG_CLASS =
 		toClassOrNull("org.primefaces.component.dialog.Dialog");
 
 	private static final String MYFACES_PACKAGE_PREFIX = "org.apache.myfaces.";
@@ -471,15 +472,7 @@ public final class Hacks {
 	 * @since 2.6
 	 */
 	public static boolean isNestedInPrimeFacesDialog(UIComponent component) {
-		if (PRIMEFACES_DIALOG_CLASS != null) {
-			for (UIComponent parent = component.getParent(); parent != null; parent = parent.getParent()) {
-				if (PRIMEFACES_DIALOG_CLASS.isAssignableFrom(parent.getClass())) {
-					return true;
-				}
-			}
-		}
-
-		return false;
+		return PRIMEFACES_DIALOG_CLASS != null && getClosestParent(component, PRIMEFACES_DIALOG_CLASS) != null;
 	}
 
 	// Tomcat related -------------------------------------------------------------------------------------------------
