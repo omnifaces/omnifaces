@@ -65,6 +65,9 @@ public final class Hacks {
 	private static final String RICHFACES_RLF_CLASS_NAME =
 		"org.richfaces.resource.ResourceLibraryFactoryImpl";
 
+	private static final Class<?> PRIMEFACES_DIALOG_CLASS =
+		toClassOrNull("org.primefaces.component.dialog.Dialog");
+
 	private static final String MYFACES_PACKAGE_PREFIX = "org.apache.myfaces.";
 	private static final String MYFACES_RENDERED_SCRIPT_RESOURCES_KEY =
 		"org.apache.myfaces.RENDERED_SCRIPT_RESOURCES_SET";
@@ -459,6 +462,24 @@ public final class Hacks {
 	public static boolean isPrimeFacesDynamicResourceRequest(FacesContext context) {
 		Map<String, String> params = context.getExternalContext().getRequestParameterMap();
 		return "primefaces".equals(params.get("ln")) && params.get("pfdrid") != null;
+	}
+
+	/**
+	 * Returns true if the given component is nested in a PrimeFaces dialog.
+	 * @param context The component to be checked.
+	 * @return Whether the given component is nested in a PrimeFaces dialog.
+	 * @since 2.6
+	 */
+	public static boolean isNestedInPrimeFacesDialog(UIComponent component) {
+		if (PRIMEFACES_DIALOG_CLASS != null) {
+			for (UIComponent parent = component.getParent(); parent != null; parent = parent.getParent()) {
+				if (PRIMEFACES_DIALOG_CLASS.isAssignableFrom(parent.getClass())) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	// Tomcat related -------------------------------------------------------------------------------------------------

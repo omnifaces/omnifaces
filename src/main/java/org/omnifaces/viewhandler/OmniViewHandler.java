@@ -214,7 +214,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 		public void invoke(UIForm form) {
 			UIForm nestedParent = getClosestParent(form, UIForm.class);
 
-			if (nestedParent != null) {
+			if (nestedParent != null && !Hacks.isNestedInPrimeFacesDialog(form)) {
 				throw new IllegalStateException(
 					format(ERROR_NESTED_FORM_ENCOUNTERED, form.getClientId(), nestedParent.getClientId()));
 			}
