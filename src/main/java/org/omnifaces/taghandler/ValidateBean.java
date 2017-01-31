@@ -334,7 +334,7 @@ public class ValidateBean extends TagHandler {
 		if (value != null) {
 			final Object[] found = new Object[1];
 
-			forEachComponent().fromRoot(form).invoke(new Callback.WithArgument<UIComponent>() { @Override public void invoke(UIComponent target) {
+			forEachComponent(context).fromRoot(form).invoke(new Callback.WithArgument<UIComponent>() { @Override public void invoke(UIComponent target) {
 				found[0] = value.getValue(getELContext());
 			}});
 
