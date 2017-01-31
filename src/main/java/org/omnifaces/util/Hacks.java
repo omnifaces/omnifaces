@@ -467,7 +467,7 @@ public final class Hacks {
 
 	/**
 	 * Returns true if the given component is nested in a PrimeFaces dialog.
-	 * @param context The component to be checked.
+	 * @param component The component to be checked.
 	 * @return Whether the given component is nested in a PrimeFaces dialog.
 	 * @since 2.6
 	 */
