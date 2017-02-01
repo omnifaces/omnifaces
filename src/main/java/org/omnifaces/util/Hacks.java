@@ -29,6 +29,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -466,13 +467,23 @@ public final class Hacks {
 	}
 
 	/**
-	 * Returns true if the given component is nested in a PrimeFaces dialog.
-	 * @param component The component to be checked.
-	 * @return Whether the given component is nested in a PrimeFaces dialog.
+	 * Returns true if the given components are nested in (same) PrimeFaces dialog.
+	 * @param components The components to be checked.
+	 * @return Whether the given components are nested in (same) PrimeFaces dialog.
 	 * @since 2.6
 	 */
-	public static boolean isNestedInPrimeFacesDialog(UIComponent component) {
-		return PRIMEFACES_DIALOG_CLASS != null && getClosestParent(component, PRIMEFACES_DIALOG_CLASS) != null;
+	public static boolean isNestedInPrimeFacesDialog(UIComponent... components) {
+		if (PRIMEFACES_DIALOG_CLASS == null) {
+			return false;
+		}
+
+		Set<UIComponent> dialogs = new HashSet<>();
+
+		for (UIComponent component : components) {
+			dialogs.add(getClosestParent(component, PRIMEFACES_DIALOG_CLASS));
+		}
+
+		return dialogs.size() == 1 && dialogs.iterator().next() != null;
 	}
 
 	// Tomcat related -------------------------------------------------------------------------------------------------
