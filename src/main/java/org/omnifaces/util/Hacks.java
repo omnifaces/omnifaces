@@ -13,6 +13,7 @@
 package org.omnifaces.util;
 
 import static java.lang.String.format;
+import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getContextAttribute;
 import static org.omnifaces.util.FacesLocal.getInitParameter;
@@ -28,6 +29,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +66,9 @@ public final class Hacks {
 		"org.richfaces.renderkit.ResourceLibraryRenderer";
 	private static final String RICHFACES_RLF_CLASS_NAME =
 		"org.richfaces.resource.ResourceLibraryFactoryImpl";
+
+	private static final Class<UIComponent> PRIMEFACES_DIALOG_CLASS =
+		toClassOrNull("org.primefaces.component.dialog.Dialog");
 
 	private static final String MYFACES_PACKAGE_PREFIX = "org.apache.myfaces.";
 	private static final String MYFACES_RENDERED_SCRIPT_RESOURCES_KEY =
@@ -459,6 +464,26 @@ public final class Hacks {
 	public static boolean isPrimeFacesDynamicResourceRequest(FacesContext context) {
 		Map<String, String> params = context.getExternalContext().getRequestParameterMap();
 		return "primefaces".equals(params.get("ln")) && params.get("pfdrid") != null;
+	}
+
+	/**
+	 * Returns true if the given components are nested in (same) PrimeFaces dialog.
+	 * @param components The components to be checked.
+	 * @return Whether the given components are nested in (same) PrimeFaces dialog.
+	 * @since 2.6
+	 */
+	public static boolean isNestedInPrimeFacesDialog(UIComponent... components) {
+		if (PRIMEFACES_DIALOG_CLASS == null) {
+			return false;
+		}
+
+		Set<UIComponent> dialogs = new HashSet<>();
+
+		for (UIComponent component : components) {
+			dialogs.add(getClosestParent(component, PRIMEFACES_DIALOG_CLASS));
+		}
+
+		return dialogs.size() == 1 && dialogs.iterator().next() != null;
 	}
 
 	// Tomcat related -------------------------------------------------------------------------------------------------

@@ -18,14 +18,13 @@
 	xmlns:f="http://xmlns.jcp.org/jsf/core"
 	xmlns:h="http://xmlns.jcp.org/jsf/html"
 	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:cc="http://xmlns.jcp.org/jsf/composite/components"
 	xmlns:o="http://omnifaces.org/ui"
 	xmlns:of="http://omnifaces.org/functions"
 >
 	<h:head />
 
 	<h:body>
-		<h:messages id="messages" />
-
 		<h:form id="validateByCommand">
 			<h:inputText id="input" value="#{validateBeanITDefaultBean.input}" />
 
@@ -101,7 +100,7 @@
 			<h:inputText id="number2" value="#{validateBeanITClassLevelBean.entity.number2}" />
 
 			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
-				<f:ajax execute="@form" render="formMessage" />
+				<f:ajax execute="@form" render="formMessage :messages" />
 			</h:commandButton>
 
 			<h:message id="formMessage" for="validateClassLevelWithMessageForForm" />
@@ -118,7 +117,7 @@
 			<h:message id="number2Message" for="number2" />
 
 			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
-				<f:ajax execute="@form" render="number1Message number2Message" />
+				<f:ajax execute="@form" render="number1Message number2Message :messages" />
 			</h:commandButton>
 
 			<o:validateBean value="#{validateBeanITClassLevelBean.entity}"
@@ -150,12 +149,32 @@
 			<h:message id="formMessage" for="validateClassLevelWithMessageForViolating" />
 
 			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
-				<f:ajax execute="@form" render="number1Message number2Message" />
+				<f:ajax execute="@form" render="number1Message number2Message formMessage :messages" />
 			</h:commandButton>
 
 			<o:validateBean value="#{validateBeanITClassLevelBean.entity}"
 				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup"
 				showMessageFor="@violating" />
 		</h:form>
+
+		<h:form id="validateClassLevelWithInputEntityComposite">
+			<cc:inputEntity id="composite" value="#{validateBeanITClassLevelBean.entity}" />
+
+			<h:message id="formMessage" for="validateClassLevelWithInputEntityComposite" />
+
+			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+				<f:ajax execute="@form" render="composite:number1Message composite:number2Message formMessage :messages" />
+			</h:commandButton>
+
+			<o:validateBean value="#{validateBeanITClassLevelBean.entity}"
+				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup"
+				showMessageFor="@violating" />
+		</h:form>
+
+		<cc:formEntity id="validateClassLevelWithFormEntityComposite"
+			value="#{validateBeanITClassLevelBean.entity}"
+			action="#{validateBeanITClassLevelBean.action}" />
+
+		<h:messages id="messages" redisplay="false" />
 	</h:body>
 </html>

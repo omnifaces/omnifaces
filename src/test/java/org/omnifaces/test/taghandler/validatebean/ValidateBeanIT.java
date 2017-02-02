@@ -140,6 +140,42 @@ public class ValidateBeanIT extends OmniFacesIT {
 	@FindBy(id="validateClassLevelWithMessageForViolating:command")
 	private WebElement validateClassLevelWithMessageForViolatingCommand;
 
+	@FindBy(id="validateClassLevelWithInputEntityComposite:composite:number1")
+	private WebElement validateClassLevelWithInputEntityCompositeNumber1;
+
+	@FindBy(id="validateClassLevelWithInputEntityComposite:composite:number1Message")
+	private WebElement validateClassLevelWithInputEntityCompositeNumber1Message;
+
+	@FindBy(id="validateClassLevelWithInputEntityComposite:composite:number2")
+	private WebElement validateClassLevelWithInputEntityCompositeNumber2;
+
+	@FindBy(id="validateClassLevelWithInputEntityComposite:composite:number2Message")
+	private WebElement validateClassLevelWithInputEntityCompositeNumber2Message;
+
+	@FindBy(id="validateClassLevelWithInputEntityComposite:formMessage")
+	private WebElement validateClassLevelWithInputEntityCompositeFormMessage;
+
+	@FindBy(id="validateClassLevelWithInputEntityComposite:command")
+	private WebElement validateClassLevelWithInputEntityCompositeCommand;
+
+	@FindBy(id="validateClassLevelWithFormEntityComposite:form:number1")
+	private WebElement validateClassLevelWithFormEntityCompositeNumber1;
+
+	@FindBy(id="validateClassLevelWithFormEntityComposite:form:number1Message")
+	private WebElement validateClassLevelWithFormEntityCompositeNumber1Message;
+
+	@FindBy(id="validateClassLevelWithFormEntityComposite:form:number2")
+	private WebElement validateClassLevelWithFormEntityCompositeNumber2;
+
+	@FindBy(id="validateClassLevelWithFormEntityComposite:form:number2Message")
+	private WebElement validateClassLevelWithFormEntityCompositeNumber2Message;
+
+	@FindBy(id="validateClassLevelWithFormEntityComposite:form:formMessage")
+	private WebElement validateClassLevelWithFormEntityCompositeFormMessage;
+
+	@FindBy(id="validateClassLevelWithFormEntityComposite:form:command")
+	private WebElement validateClassLevelWithFormEntityCompositeCommand;
+
 	@Deployment(testable=false)
 	public static WebArchive createDeployment() {
 		return buildWebArchive(ValidateBeanIT.class)
@@ -312,12 +348,50 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("invalidEntity", validateClassLevelWithMessageForViolatingNumber1Message.getText());
 		assertEquals("", validateClassLevelWithMessageForViolatingNumber2Message.getText());
 		assertEquals("", validateClassLevelWithMessageForViolatingFormMessage.getText());
+		assertEquals("", messages.getText());
 
 		validateClassLevelWithMessageForViolatingNumber2.sendKeys("0");
 		guardAjax(validateClassLevelWithMessageForViolatingCommand).click();
 		assertEquals("", validateClassLevelWithMessageForViolatingNumber1Message.getText());
 		assertEquals("", validateClassLevelWithMessageForViolatingNumber2Message.getText());
 		assertEquals("", validateClassLevelWithMessageForViolatingFormMessage.getText());
+		assertEquals("actionSuccess", messages.getText());
+	}
+
+	@Test
+	public void validateClassLevelWithInputEntityComposite() {
+		validateClassLevelWithInputEntityCompositeNumber1.sendKeys("2");
+		validateClassLevelWithInputEntityCompositeNumber2.sendKeys("1");
+		guardAjax(validateClassLevelWithInputEntityCompositeCommand).click();
+		assertEquals("invalidEntity", validateClassLevelWithInputEntityCompositeNumber1Message.getText());
+		assertEquals("", validateClassLevelWithInputEntityCompositeNumber2Message.getText());
+		assertEquals("", validateClassLevelWithInputEntityCompositeFormMessage.getText());
+		assertEquals("", messages.getText());
+
+		validateClassLevelWithInputEntityCompositeNumber2.sendKeys("0");
+		guardAjax(validateClassLevelWithInputEntityCompositeCommand).click();
+		assertEquals("", validateClassLevelWithInputEntityCompositeNumber1Message.getText());
+		assertEquals("", validateClassLevelWithInputEntityCompositeNumber2Message.getText());
+		assertEquals("", validateClassLevelWithInputEntityCompositeFormMessage.getText());
+		assertEquals("actionSuccess", messages.getText());
+	}
+
+	@Test
+	public void validateClassLevelWithFormEntityComposite() {
+		validateClassLevelWithFormEntityCompositeNumber1.sendKeys("2");
+		validateClassLevelWithFormEntityCompositeNumber2.sendKeys("1");
+		guardAjax(validateClassLevelWithFormEntityCompositeCommand).click();
+		assertEquals("invalidEntity", validateClassLevelWithFormEntityCompositeNumber1Message.getText());
+		assertEquals("", validateClassLevelWithFormEntityCompositeNumber2Message.getText());
+		assertEquals("", validateClassLevelWithFormEntityCompositeFormMessage.getText());
+		assertEquals("", messages.getText());
+
+		validateClassLevelWithFormEntityCompositeNumber2.sendKeys("0");
+		guardAjax(validateClassLevelWithFormEntityCompositeCommand).click();
+		assertEquals("", validateClassLevelWithFormEntityCompositeNumber1Message.getText());
+		assertEquals("", validateClassLevelWithFormEntityCompositeNumber2Message.getText());
+		assertEquals("", validateClassLevelWithFormEntityCompositeFormMessage.getText());
+		assertEquals("actionSuccess", messages.getText());
 	}
 
 }
