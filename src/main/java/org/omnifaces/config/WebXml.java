@@ -14,6 +14,7 @@ package org.omnifaces.config;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
+import static java.util.Collections.unmodifiableSet;
 import static java.util.logging.Level.SEVERE;
 import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.Faces.hasContext;
@@ -483,7 +484,7 @@ public enum WebXml {
 
 		for (int i = 0; i < constraints.getLength(); i++) {
 			Node constraint = constraints.item(i);
-			Set<String> roles = null;
+			Set<String> roles = emptySet();
 			NodeList auth = getNodeList(constraint, xpath, XPATH_AUTH_CONSTRAINT);
 
 			if (auth.getLength() > 0) {
@@ -493,15 +494,23 @@ public enum WebXml {
 				for (int j = 0; j < authRoles.getLength(); j++) {
 					roles.add(getTextContent(authRoles.item(j)));
 				}
-
-				roles = Collections.unmodifiableSet(roles);
 			}
 
 			NodeList urlPatterns = getNodeList(constraint, xpath, XPATH_WEB_RESOURCE_URL_PATTERN);
 
 			for (int j = 0; j < urlPatterns.getLength(); j++) {
 				String urlPattern = getTextContent(urlPatterns.item(j));
-				securityConstraints.put(urlPattern, roles);
+				Set<String> allRoles = securityConstraints.get(urlPattern);
+
+				if (allRoles != null) {
+					allRoles = new HashSet<>(allRoles);
+					allRoles.addAll(roles);
+				}
+				else {
+					allRoles = roles;
+				}
+
+				securityConstraints.put(urlPattern, unmodifiableSet(allRoles));
 			}
 		}
 

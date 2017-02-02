@@ -203,7 +203,8 @@ public abstract class OmniFacesIT {
 		basic,
 		withFullAjaxExceptionHandler,
 		withCombinedResourceHandler,
-		withMessageBundle;
+		withMessageBundle,
+		withCDNResourceHandler;
 	}
 
 	public static enum WebXml {
@@ -213,7 +214,8 @@ public abstract class OmniFacesIT {
 		withMultiViews,
 		withThreeViewsInSession,
 		withSocket,
-		withClientStateSaving;
+		withClientStateSaving,
+		withCDNResources;
 	}
 
 }

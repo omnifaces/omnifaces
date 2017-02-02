@@ -47,7 +47,6 @@ import static org.omnifaces.util.Utils.isEmpty;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -59,7 +58,6 @@ import java.util.logging.Logger;
 import javax.el.ValueExpression;
 import javax.el.ValueReference;
 import javax.faces.FacesException;
-import javax.faces.component.EditableValueHolder;
 import javax.faces.component.UICommand;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
@@ -286,7 +284,7 @@ public class ValidateBean extends TagHandler {
 	/**
 	 * If the parent component has the <code>value</code> attribute or is an instance of {@link UICommand} or
 	 * {@link UIInput} and is new and we're in the restore view phase of a postback, then delegate to
-	 * {@link #processValidateBean(UIComponent)}.
+	 * {@link #processValidateBean(FacesContext, UIComponent)}.
 	 * @throws IllegalArgumentException When the <code>value</code> attribute is absent and the parent component is not
 	 * an instance of {@link UICommand} or {@link UIInput}.
 	 */
@@ -296,7 +294,7 @@ public class ValidateBean extends TagHandler {
 			throw new IllegalArgumentException(ERROR_INVALID_PARENT);
 		}
 
-		FacesContext facesContext = context.getFacesContext();
+		final FacesContext facesContext = context.getFacesContext();
 
 		if (!(isNew(parent) && facesContext.isPostback() && facesContext.getCurrentPhaseId() == RESTORE_VIEW)) {
 			return;
@@ -312,17 +310,18 @@ public class ValidateBean extends TagHandler {
 		// We can't use getCurrentForm() or hasInvokedSubmit() before the component is added to view, because the client ID isn't available.
 		// Hence, we subscribe this check to after phase of restore view.
 		subscribeToRequestAfterPhase(RESTORE_VIEW, new Callback.Void() { @Override public void invoke() {
-			processValidateBean(parent);
+			processValidateBean(facesContext, parent);
 		}});
 	}
 
 	/**
 	 * Check if the given component has participated in submitting the current form or action and if so, then perform
 	 * the bean validation depending on the attributes set.
+	 * @param context The involved faces context.
 	 * @param component The involved component.
 	 * @throws IllegalStateException When the parent form is missing.
 	 */
-	protected void processValidateBean(UIComponent component) {
+	protected void processValidateBean(FacesContext context, UIComponent component) {
 		UIForm form = (component instanceof UIForm) ? ((UIForm) component) : getClosestParent(component, UIForm.class);
 
 		if (form == null) {
@@ -333,7 +332,17 @@ public class ValidateBean extends TagHandler {
 			return;
 		}
 
-		Object bean = (value != null) ? value.getValue(getELContext()) : null;
+		Object bean = null;
+
+		if (value != null) {
+			final Object[] found = new Object[1];
+
+			forEachComponent(context).fromRoot(form).invoke(new Callback.WithArgument<UIComponent>() { @Override public void invoke(UIComponent target) {
+				found[0] = value.getValue(getELContext());
+			}});
+
+			bean = found[0];
+		}
 
 		if (value != null && bean == null) {
 			final Object[] beans = new Object[1];
@@ -345,16 +354,16 @@ public class ValidateBean extends TagHandler {
 		}
 
 		if (bean == null) {
-			validateForm(groups, disabled);
+			validateForm();
 			return;
 		}
 
 		if (!disabled) {
 			if (method == ValidateMethod.validateActual) {
-				validateActualBean(form, bean, groups);
+				validateActualBean(form, bean);
 			}
 			else {
-				validateCopiedBean(form, bean, copier, groups);
+				validateCopiedBean(form, bean);
 			}
 		}
 	}
@@ -362,10 +371,10 @@ public class ValidateBean extends TagHandler {
 	/**
 	 * After update model values phase, validate actual bean. But don't proceed to render response on fail.
 	 */
-	private void validateActualBean(final UIForm form, final Object bean, final String groups) {
+	private void validateActualBean(final UIForm form, final Object bean) {
 		ValidateBeanCallback validateActualBean = new ValidateBeanCallback() { @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
-			validate(context, form, bean, groups, Collections.<String>emptySet(), showMessageFor, false);
+			validate(context, form, bean, bean, new HashSet<String>(0), false);
 		}};
 
 		subscribeToRequestAfterPhase(UPDATE_MODEL_VALUES, validateActualBean);
@@ -377,28 +386,28 @@ public class ValidateBean extends TagHandler {
 	 * After validations phase of current request, create a copy of the bean, set all collected properties there,
 	 * then validate copied bean and proceed to render response on fail.
 	 */
-	private void validateCopiedBean(final UIForm form, final Object bean, final String copier, final String groups) {
+	private void validateCopiedBean(final UIForm form, final Object bean) {
 		final Set<String> clientIds = new HashSet<>();
 		final Map<String, Object> properties = new HashMap<>();
 
 		ValidateBeanCallback collectBeanProperties = new ValidateBeanCallback() { @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
 
-			forEachInputWithMatchingBase(context, form, bean, new Callback.WithArgument<UIInput>() { @Override public void invoke(UIInput v) {
-				addCollectingValidator(v, clientIds, properties);
+			forEachInputWithMatchingBase(context, form, bean, new Callback.WithArgument<UIInput>() { @Override public void invoke(UIInput input) {
+				addCollectingValidator(input, clientIds, properties);
 			}});
 		}};
 
 		ValidateBeanCallback checkConstraints = new ValidateBeanCallback() { @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
 
-			forEachInputWithMatchingBase(context, form, bean, new Callback.WithArgument<UIInput>() { @Override public void invoke(UIInput v) {
-				removeCollectingValidator(v);
+			forEachInputWithMatchingBase(context, form, bean, new Callback.WithArgument<UIInput>() { @Override public void invoke(UIInput input) {
+				removeCollectingValidator(input);
 			}});
 
 			Object copiedBean = getCopier(context, copier).copy(bean);
 			setProperties(copiedBean, properties);
-			validate(context, form, copiedBean, groups, clientIds, showMessageFor, true);
+			validate(context, form, bean, copiedBean, clientIds, true);
 		}};
 
 		subscribeToRequestBeforePhase(PROCESS_VALIDATIONS, collectBeanProperties);
@@ -408,9 +417,9 @@ public class ValidateBean extends TagHandler {
 	/**
 	 * Before validations phase of current request, subscribe the {@link BeanValidationEventListener} to validate the form based on groups.
 	 */
-	private void validateForm(final String validationGroups, final boolean disabled) {
+	private void validateForm() {
 		ValidateBeanCallback validateForm = new ValidateBeanCallback() { @Override public void run() {
-			SystemEventListener listener = new BeanValidationEventListener(validationGroups, disabled);
+			SystemEventListener listener = new BeanValidationEventListener(groups, disabled);
 			subscribeToViewEvent(PreValidateEvent.class, listener);
 			subscribeToViewEvent(PostValidateEvent.class, listener);
 		}};
@@ -418,22 +427,52 @@ public class ValidateBean extends TagHandler {
 		subscribeToRequestBeforePhase(PROCESS_VALIDATIONS, validateForm);
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void validate(FacesContext context, UIForm form, Object actualBean, Object validableBean, Set<String> clientIds, boolean renderResponseOnFail) {
+		List<Class> groupClasses = new ArrayList<>();
+
+		for (String group : csvToList(groups)) {
+			groupClasses.add(toClass(group));
+		}
+
+		Set violationsRaw = getBeanValidator().validate(validableBean, groupClasses.toArray(new Class[groupClasses.size()]));
+		Set<ConstraintViolation<?>> violations = violationsRaw;
+
+		if (!violations.isEmpty()) {
+			context.validationFailed();
+			String showMessagesFor = showMessageFor;
+
+			if ("@violating".equals(showMessageFor)) {
+				violations = invalidateInputsByPropertyPathAndShowMessages(context, form, actualBean, violations, clientIds);
+				showMessagesFor = DEFAULT_SHOWMESSAGEFOR;
+			}
+
+			if (!violations.isEmpty()) {
+				String labels = invalidateInputsByClientIdsAndCollectLabels(context, form, clientIds);
+				showMessages(context, form, violations, clientIds, labels, showMessagesFor);
+			}
+
+			if (renderResponseOnFail) {
+				context.renderResponse();
+			}
+		}
+	}
+
 	// Helpers --------------------------------------------------------------------------------------------------------
 
 	private static void forEachInputWithMatchingBase(final FacesContext context, UIComponent form, final Object base, final String property, final Callback.WithArgument<UIInput> callback) {
 		forEachComponent(context)
 			.fromRoot(form)
-			.ofTypes(EditableValueHolder.class)
+			.ofTypes(UIInput.class)
 			.withHints(SKIP_UNRENDERED/*, SKIP_ITERATION*/) // SKIP_ITERATION fails in Apache EL (Tomcat 8.0.32 tested) but works in Oracle EL.
-			.invoke(new Callback.WithArgument<UIComponent>() { @Override public void invoke(UIComponent component) {
-				ValueExpression valueExpression = component.getValueExpression(VALUE_ATTRIBUTE);
+			.invoke(new Callback.WithArgument<UIInput>() { @Override public void invoke(UIInput input) {
+				ValueExpression valueExpression = input.getValueExpression(VALUE_ATTRIBUTE);
 
 				if (valueExpression != null) {
 					ValueReference valueReference = getValueReference(context.getELContext(), valueExpression);
 
-					if (valueReference.getBase().equals(base)) {
-						if (property == null || property.equals(valueReference.getProperty()))
-							callback.invoke((UIInput) component);
+					if (valueReference.getBase().equals(base) && (property == null || property.equals(valueReference.getProperty()))) {
+						callback.invoke(input);
 					}
 				}
 			}});
@@ -443,14 +482,14 @@ public class ValidateBean extends TagHandler {
 		forEachInputWithMatchingBase(context, form, base, null, callback);
 	}
 
-	private static void addCollectingValidator(EditableValueHolder valueHolder, Set<String> clientIds, Map<String, Object> properties) {
-		valueHolder.addValidator(new CollectingValidator(clientIds, properties));
+	private static void addCollectingValidator(UIInput input, Set<String> clientIds, Map<String, Object> properties) {
+		input.addValidator(new CollectingValidator(clientIds, properties));
 	}
 
-	private static void removeCollectingValidator(EditableValueHolder valueHolder) {
+	private static void removeCollectingValidator(UIInput input) {
 		Validator collectingValidator = null;
 
-		for (Validator validator : valueHolder.getValidators()) {
+		for (Validator validator : input.getValidators()) {
 			if (validator instanceof CollectingValidator) {
 				collectingValidator = validator;
 				break;
@@ -458,7 +497,7 @@ public class ValidateBean extends TagHandler {
 		}
 
 		if (collectingValidator != null) {
-			valueHolder.removeValidator(collectingValidator);
+			input.removeValidator(collectingValidator);
 		}
 	}
 
@@ -483,80 +522,57 @@ public class ValidateBean extends TagHandler {
 		return copier;
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	private static void validate(FacesContext context, UIForm form, Object bean, String groups, Set<String> clientIds, String showMessageFor, boolean renderResponseOnFail) {
-		List<Class> groupClasses = new ArrayList<>();
+	private static Set<ConstraintViolation<?>> invalidateInputsByPropertyPathAndShowMessages(final FacesContext context, UIForm form, Object bean, Set<ConstraintViolation<?>> violations, final Set<String> clientIds) {
+		final Set<ConstraintViolation<?>> remainingViolations = new LinkedHashSet<>(violations);
 
-		for (String group : csvToList(groups)) {
-			groupClasses.add(toClass(group));
+		for (final ConstraintViolation<?> violation : violations) {
+			forEachInputWithMatchingBase(context, form, bean, violation.getPropertyPath().toString(), new Callback.WithArgument<UIInput>() { @Override public void invoke(UIInput input) {
+				input.setValid(false);
+				String clientId = input.getClientId(context);
+				addError(clientId, violation.getMessage(), getLabel(input));
+				clientIds.remove(clientId);
+				remainingViolations.remove(violation);
+			}});
 		}
 
-		Set violationsRaw = getBeanValidator().validate(bean, groupClasses.toArray(new Class[groupClasses.size()]));
-		Set<ConstraintViolation<?>> violations = violationsRaw;
-
-		if (!violations.isEmpty()) {
-			context.validationFailed();
-			final StringBuilder labels = new StringBuilder();
-
-			if (!clientIds.isEmpty()) {
-				final boolean invalidate = !showMessageFor.equals("@violating");
-				forEachComponent(context).fromRoot(form).havingIds(clientIds).invoke(new Callback.WithArgument<UIInput>() {
-					@Override
-					public void invoke(UIInput input) {
-						if (invalidate)
-							input.setValid(false);
-
-						if (labels.length() > 0) {
-							labels.append(", ");
-						}
-
-						labels.append(getLabel(input));
-					}
-				});
-			}
-
-			showMessages(context, form, violations, clientIds, labels.toString(), showMessageFor);
-
-			if (renderResponseOnFail) {
-				context.renderResponse();
-			}
-		}
+		return remainingViolations;
 	}
 
-	private static void showMessages(FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, Set<String> clientIds, String labels, String showMessageFor) {
-		if ("@form".equals(showMessageFor)) {
+	private static String invalidateInputsByClientIdsAndCollectLabels(final FacesContext context, UIForm form, Set<String> clientIds) {
+		final StringBuilder labels = new StringBuilder();
+
+		if (!clientIds.isEmpty()) {
+			forEachComponent(context).fromRoot(form).havingIds(clientIds).invoke(new Callback.WithArgument<UIInput>() { @Override public void invoke(UIInput input) {
+				input.setValid(false);
+
+				if (labels.length() > 0) {
+					labels.append(", ");
+				}
+
+				labels.append(getLabel(input));
+			}});
+		}
+
+		return labels.toString();
+	}
+
+	private static void showMessages(FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, Set<String> clientIds, String labels, String showMessagesFor) {
+		if ("@form".equals(showMessagesFor)) {
 			String formId = form.getClientId(context);
 			addErrors(formId, violations, labels);
 		}
-		else if ("@all".equals(showMessageFor)) {
+		else if ("@all".equals(showMessagesFor)) {
 			for (String clientId : clientIds) {
 				addErrors(clientId, violations, labels);
 			}
 		}
-		else if ("@global".equals(showMessageFor)) {
+		else if ("@global".equals(showMessagesFor)) {
 			for (ConstraintViolation<?> violation : violations) {
 				addGlobalError(violation.getMessage(), labels);
 			}
 		}
-		else if ("@violating".equals(showMessageFor)) {
-			Set<ConstraintViolation<?>> unmatched = new LinkedHashSet<>(violations);
-			for (ConstraintViolation<?> violation : violations) {
-				final String message = violation.getMessage();
-				final boolean[] matched = new boolean[1];
-				forEachInputWithMatchingBase(context, form, violation.getRootBean(), violation.getPropertyPath().toString(), new Callback.WithArgument<UIInput>() { @Override public void invoke(UIInput input) {
-						input.setValid(false);
-						addError(input.getClientId(), message, getLabel(input));
-						matched[0] = true;
-					}
-				});
-				if (matched[0])
-					unmatched.remove(violation);
-			}
-			if (!unmatched.isEmpty() && !showMessageFor.equals(DEFAULT_SHOWMESSAGEFOR))
-				showMessages(context, form, unmatched, clientIds, labels, DEFAULT_SHOWMESSAGEFOR);
-		}
 		else {
-			for (String clientId : showMessageFor.split("\\s+")) {
+			for (String clientId : showMessagesFor.split("\\s+")) {
 				addErrors(clientId, violations, labels);
 			}
 		}

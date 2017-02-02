@@ -557,12 +557,21 @@ public final class Components {
 		 * @param operation the operation to invoke on each component
 		 */
 		public void invoke(final VisitCallback operation) {
-			VisitCallback callback = operation;
-			if (types != null) {
-				callback = new TypesVisitCallback(types, callback);
-			}
+			final VisitContext visitContext = createVisitContext(getFacesContext(), getIds(), getHints());
+			final VisitCallback visitCallback = (types == null) ? operation : new TypesVisitCallback(types, operation);
+			UIViewRoot viewRoot = getFacesContext().getViewRoot();
 
-			getRoot().visitTree(createVisitContext(getContext(), getIds(), getHints()), callback);
+			if (viewRoot.equals(getRoot())) {
+				viewRoot.visitTree(visitContext, visitCallback);
+			}
+			else {
+				forEachComponent().havingIds(getRoot().getClientId()).invoke(new Callback.WithArgument<UIComponent>() {
+					@Override
+					public void invoke(UIComponent root) {
+						root.visitTree(visitContext, visitCallback);
+					}
+				});
+			}
 		}
 
 		protected FacesContext getFacesContext() {

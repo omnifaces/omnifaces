@@ -12,7 +12,6 @@
  */
 package org.omnifaces.util;
 
-import static java.lang.String.format;
 import static java.util.logging.Level.FINE;
 
 import java.lang.annotation.Annotation;
@@ -54,9 +53,6 @@ public final class BeansLocal {
 
 	private static final Logger logger = Logger.getLogger(BeansLocal.class.getName());
 
-	private static final String ERROR_NO_ALTERABLE_CONTEXT =
-		"Bean '%s' is put in context '%s' which is not an alterable context.";
-
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	private BeansLocal() {
@@ -78,7 +74,14 @@ public final class BeansLocal {
 			}
 		}
 
-		return (Bean<T>) beanManager.resolve(beans);
+		Bean<T> bean = (Bean<T>) beanManager.resolve(beans);
+
+		if (bean == null && beanClass.getSuperclass() != Object.class) {
+			return (Bean<T>) resolve(beanManager, beanClass.getSuperclass(), qualifiers);
+		}
+		else {
+			return bean;
+		}
 	}
 
 	/**
@@ -183,8 +186,11 @@ public final class BeansLocal {
 			((AlterableContext) context).destroy(bean);
 		}
 		else {
-			throw new IllegalArgumentException(
-				format(ERROR_NO_ALTERABLE_CONTEXT, bean.getBeanClass(), context.getClass()));
+			T instance = context.get(bean);
+
+			if (instance != null) {
+				destroy(beanManager, bean, instance);
+			}
 		}
 	}
 
@@ -193,13 +199,20 @@ public final class BeansLocal {
 	 */
 	@SuppressWarnings("unchecked")
 	public static <T> void destroy(BeanManager beanManager, T instance) {
-		if (instance instanceof Class) {
+		if (instance instanceof Class) { // Java prefers T over Class<T> when varargs is not specified :(
 			destroy(beanManager, (Class<T>) instance, new Annotation[0]);
 		}
 		else {
 			Bean<T> bean = (Bean<T>) resolve(beanManager, instance.getClass());
-			bean.destroy(instance, beanManager.createCreationalContext(bean));
+
+			if (bean != null) {
+				destroy(beanManager, bean, instance);
+			}
 		}
+	}
+
+	private static <T> void destroy(BeanManager beanManager, Bean<T> bean, T instance) {
+		bean.destroy(instance, beanManager.createCreationalContext(bean));
 	}
 
 	/**
@@ -238,9 +251,8 @@ public final class BeansLocal {
 	 * @see Beans#getAnnotation(Annotated, Class)
 	 */
 	public static InjectionPoint getCurrentInjectionPoint(BeanManager beanManager, CreationalContext<?> creationalContext) {
-		return (InjectionPoint) beanManager.getInjectableReference(
-			resolve(beanManager, InjectionPointGenerator.class).getInjectionPoints().iterator().next(), creationalContext
-		);
+		Bean<InjectionPointGenerator> bean = resolve(beanManager, InjectionPointGenerator.class);
+		return (bean != null) ? (InjectionPoint) beanManager.getInjectableReference(bean.getInjectionPoints().iterator().next(), creationalContext) : null;
 	}
 
 	/**

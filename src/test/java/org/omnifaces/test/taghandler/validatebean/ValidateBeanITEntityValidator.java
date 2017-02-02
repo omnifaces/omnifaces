@@ -24,7 +24,15 @@ public class ValidateBeanITEntityValidator implements ConstraintValidator<Valida
 
 	@Override
 	public boolean isValid(ValidateBeanITEntity entity, ConstraintValidatorContext context) {
-		return entity.getNumber1() < entity.getNumber2();
+		if (entity.getNumber1() < entity.getNumber2()) {
+			return true;
+		}
+
+		// Below lines are only useful when using showMessageFor="@violating", otherwise those can be omitted.
+		context.disableDefaultConstraintViolation();
+        context.buildConstraintViolationWithTemplate(context.getDefaultConstraintMessageTemplate()).addPropertyNode("number1").addConstraintViolation();
+
+        return false;
 	}
 
 }

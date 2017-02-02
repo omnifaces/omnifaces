@@ -58,8 +58,7 @@ public class SimpleParam implements ParamHolder {
 	 * @param converter The converter.
 	 */
 	public SimpleParam(String name, Object value, Converter converter) {
-		this.name = name;
-		this.value = value;
+		this(name, value);
 		this.converter = converter;
 	}
 
@@ -70,7 +69,15 @@ public class SimpleParam implements ParamHolder {
 	 */
 	public SimpleParam(UIParameter param) {
 		name = param.getName();
-		value = param.getValue();
+
+		if (param instanceof ParamHolder) {
+			ParamHolder holder = (ParamHolder) param;
+			value = holder.getLocalValue();
+			converter = holder.getConverter();
+		}
+		else {
+			value = param.getValue();
+		}
 	}
 
 	/**
@@ -79,9 +86,7 @@ public class SimpleParam implements ParamHolder {
 	 * @since 2.2
 	 */
 	public SimpleParam(ParamHolder param) {
-		name = param.getName();
-		value = param.getLocalValue();
-		converter = param.getConverter();
+		this(param.getName(), param.getLocalValue(), param.getConverter());
 	}
 
 	// Getters/setters ------------------------------------------------------------------------------------------------
