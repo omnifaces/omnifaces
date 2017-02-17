@@ -54,7 +54,7 @@ public class FacesELResolver extends ELResolver {
 
 	static {
 		for (Method method : Faces.class.getDeclaredMethods()) {
-			if (method.getParameterCount() > 0 || !isOneInstanceOf(method.getReturnType(), String.class, boolean.class)) {
+			if (method.getParameterTypes().length > 0 || !isOneInstanceOf(method.getReturnType(), String.class, boolean.class)) {
 				continue;
 			}
 
