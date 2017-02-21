@@ -442,12 +442,12 @@ public final class Hacks {
 				}
 
 				Map<Serializable, String> viewScopeIds = accessField(viewCollection, "_viewScopeIds");
+				Map<String, Integer> viewScopeIdCounts = accessField(viewCollection, "_viewScopeIdCounts");
 
-				if (viewScopeIds == null) {
-					return;
+				if (viewScopeIds == null || viewScopeIdCounts == null) {
+					return; // Most likely cached page with client side state saving.
 				}
 
-				Map<String, Integer> viewScopeIdCounts = accessField(viewCollection, "_viewScopeIdCounts");
 				String viewScopeId = viewScopeIds.remove(key);
 				int count = viewScopeIdCounts.get(viewScopeId) - 1;
 
