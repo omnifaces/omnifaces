@@ -750,6 +750,11 @@ public final class Components {
 
 	private static UIComponent addComponentResource(UIComponent resource, String target) {
 		FacesContext context = FacesContext.getCurrentInstance();
+
+		if (resource.getId() == null) {
+			Hacks.setComponentResourceUniqueId(context, resource);
+		}
+
 		context.getViewRoot().addComponentResource(context, resource, target);
 		return resource;
 	}
