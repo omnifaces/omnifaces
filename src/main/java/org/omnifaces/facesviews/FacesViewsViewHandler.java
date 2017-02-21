@@ -87,7 +87,7 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 			}
 			else {
 				actionURL = removeExtension(servletContext, actionURL, viewId);
-				return pathInfo.isEmpty() ? actionURL : (stripTrailingSlash(actionURL) + pathInfo);
+				return pathInfo.isEmpty() ? actionURL : (stripTrailingSlash(actionURL) + pathInfo + getQueryString(actionURL));
 			}
 		}
 
