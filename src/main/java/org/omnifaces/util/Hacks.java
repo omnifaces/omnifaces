@@ -12,6 +12,8 @@
  */
 package org.omnifaces.util;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
@@ -38,6 +40,7 @@ import java.util.Set;
 
 import javax.faces.component.StateHelper;
 import javax.faces.component.UIComponent;
+import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
 import javax.faces.context.PartialViewContext;
 import javax.faces.context.PartialViewContextWrapper;
@@ -86,6 +89,7 @@ public final class Hacks {
 	private static final String[] PARAM_NAMES_RESOURCE_MAX_AGE = {
 		MOJARRA_DEFAULT_RESOURCE_MAX_AGE, MYFACES_DEFAULT_RESOURCE_MAX_AGE
 	};
+    private static final String MYFACES_RESOURCE_DEPENDENCY_UNIQUE_ID = "oam.view.resourceDependencyUniqueId";
 
 	private static final String MOJARRA_SERIALIZED_VIEWS = "com.sun.faces.renderkit.ServerSideStateHelper.LogicalViewMap";
 	private static final String MOJARRA_SERIALIZED_VIEW_KEY = "com.sun.faces.logicalViewMap";
@@ -369,6 +373,29 @@ public final class Hacks {
 		context.getAttributes().values().removeAll(Collections.singleton(true));
  	}
 
+	/**
+	 * Set the unique ID of the component resource, taking into account MyFaces-specific way of generating a
+	 * resource specific unique ID.
+	 * @param context The involved faces context.
+	 * @param resource The involved component resource.
+	 * @since 2.6.1
+	 */
+	public static void setComponentResourceUniqueId(FacesContext context, UIComponent resource) {
+		UIViewRoot view = context.getViewRoot();
+
+		if (isMyFacesUsed()) {
+			view.getAttributes().put(MYFACES_RESOURCE_DEPENDENCY_UNIQUE_ID, TRUE);
+		}
+
+		try {
+			resource.setId(view.createUniqueId(context, null));
+		}
+		finally {
+			if (isMyFacesUsed()) {
+				view.getAttributes().put(MYFACES_RESOURCE_DEPENDENCY_UNIQUE_ID, FALSE);
+			}
+		}
+	}
 
 	//  JSF state saving related --------------------------------------------------------------------------------------
 
@@ -415,12 +442,12 @@ public final class Hacks {
 				}
 
 				Map<Serializable, String> viewScopeIds = accessField(viewCollection, "_viewScopeIds");
+				Map<String, Integer> viewScopeIdCounts = accessField(viewCollection, "_viewScopeIdCounts");
 
-				if (viewScopeIds == null) {
-					return;
+				if (viewScopeIds == null || viewScopeIdCounts == null) {
+					return; // Most likely cached page with client side state saving.
 				}
 
-				Map<String, Integer> viewScopeIdCounts = accessField(viewCollection, "_viewScopeIdCounts");
 				String viewScopeId = viewScopeIds.remove(key);
 				int count = viewScopeIdCounts.get(viewScopeId) - 1;
 
