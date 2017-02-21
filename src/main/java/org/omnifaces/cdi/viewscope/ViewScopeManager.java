@@ -164,8 +164,9 @@ public class ViewScopeManager {
 	private <T> BeanStorage getBeanStorage(Contextual<T> type) {
 		ViewScopeStorage storage = storageInSession;
 		Class<?> beanClass = ((Bean<T>) type).getBeanClass();
+		ViewScoped annotation = beanClass.getAnnotation(ViewScoped.class);
 
-		if (beanClass.getAnnotation(ViewScoped.class).saveInViewState()) {
+		if (annotation != null && annotation.saveInViewState()) { // Can be null when declared on producer method.
 			checkStateSavingMethod(beanClass);
 			storage = storageInViewState;
 		}
