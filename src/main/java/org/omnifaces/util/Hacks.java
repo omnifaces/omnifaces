@@ -12,6 +12,7 @@
  */
 package org.omnifaces.util;
 
+import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
 import static org.omnifaces.util.Components.getClosestParent;
@@ -391,7 +392,7 @@ public final class Hacks {
 		}
 		finally {
 			if (isMyFacesUsed()) {
-				view.getAttributes().remove(MYFACES_RESOURCE_DEPENDENCY_UNIQUE_ID);
+				view.getAttributes().put(MYFACES_RESOURCE_DEPENDENCY_UNIQUE_ID, FALSE);
 			}
 		}
 	}
