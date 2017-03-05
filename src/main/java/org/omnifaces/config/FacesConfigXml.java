@@ -12,7 +12,7 @@
  */
 package org.omnifaces.config;
 
-import static org.omnifaces.util.Faces.getServletContext;
+import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.parseLocale;
 import static org.omnifaces.util.Xml.createDocument;
@@ -98,10 +98,10 @@ public enum FacesConfigXml {
 	// Init -----------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Perform automatic initialization whereby the servlet context is obtained from the faces context.
+	 * Perform automatic initialization whereby the servlet context is obtained from CDI.
 	 */
 	private FacesConfigXml() {
-		ServletContext servletContext = getServletContext();
+		ServletContext servletContext = getReference(ServletContext.class);
 
 		try {
 			Element facesConfigXml = loadFacesConfigXml(servletContext).getDocumentElement();

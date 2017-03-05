@@ -159,6 +159,7 @@ public enum WebXml {
 
 	/**
 	 * Perform automatic initialization whereby the servlet context is obtained from the faces context.
+	 * TODO: obtain it from CDI instead a la FacesConfigXml.
 	 */
 	private void init() {
 		if (!initialized.get() && hasContext()) {
