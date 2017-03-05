@@ -22,10 +22,10 @@ import static org.omnifaces.util.FacesLocal.getViewAttribute;
 import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
 import static org.omnifaces.util.FacesLocal.setViewAttribute;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
@@ -123,11 +123,11 @@ public class SocketFacesListener implements SystemEventListener {
 	 * Helper to remember which sockets are initialized on the view. The map key represents the client ID and the
 	 * map value represents the last known value of the <code>connected</code> attribute.
 	 */
-	private static Map<String, Boolean> getSockets(FacesContext context) {
-		Map<String, Boolean> sockets = getViewAttribute(context, Socket.class.getName());
+	private static ConcurrentMap<String, Boolean> getSockets(FacesContext context) {
+		ConcurrentMap<String, Boolean> sockets = getViewAttribute(context, Socket.class.getName());
 
 		if (sockets == null) {
-			sockets = new HashMap<>(ESTIMATED_TOTAL_CHANNELS);
+			sockets = new ConcurrentHashMap<>(ESTIMATED_TOTAL_CHANNELS);
 			setViewAttribute(context, Socket.class.getName(), sockets);
 		}
 
