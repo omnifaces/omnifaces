@@ -42,6 +42,7 @@ import javax.faces.component.StateHelper;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
+import javax.faces.context.FacesContextWrapper;
 import javax.faces.context.PartialViewContext;
 import javax.faces.context.PartialViewContextWrapper;
 import javax.faces.render.ResponseStateManager;
@@ -235,6 +236,10 @@ public final class Hacks {
 			FacesContext context = FacesContext.getCurrentInstance();
 
 			if (context != null) {
+				while (context instanceof FacesContextWrapper) {
+					context = ((FacesContextWrapper) context).getWrapped();
+				}
+
 				myFacesUsed = context.getClass().getPackage().getName().startsWith(MYFACES_PACKAGE_PREFIX);
 			}
 			else {
