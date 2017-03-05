@@ -646,7 +646,7 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 		"o:socket endpoint is not enabled."
 			+ " You need to set web.xml context param '" + PARAM_SOCKET_ENDPOINT_ENABLED + "' with value 'true'.";
 
-	private static final String SCRIPT_INIT = "OmniFaces.Push.init('%s','%s',%s,%s,%s);";
+	private static final String SCRIPT_INIT = "OmniFaces.Util.addOnloadListener(function(){OmniFaces.Push.init('%s','%s',%s,%s,%s);});";
 
 	private static final Collection<String> CONTAINS_EVERYTHING = unmodifiableList(new ArrayList<String>() {
 		private static final long serialVersionUID = 1L;
