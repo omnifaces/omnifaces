@@ -13,6 +13,8 @@
 package org.omnifaces.config;
 
 import static org.omnifaces.util.Beans.getReference;
+import static org.omnifaces.util.Faces.getServletContext;
+import static org.omnifaces.util.Faces.hasContext;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.parseLocale;
 import static org.omnifaces.util.Xml.createDocument;
@@ -101,7 +103,7 @@ public enum FacesConfigXml {
 	 * Perform automatic initialization whereby the servlet context is obtained from CDI.
 	 */
 	private FacesConfigXml() {
-		ServletContext servletContext = getReference(ServletContext.class);
+		ServletContext servletContext = hasContext() ? getServletContext() : getReference(ServletContext.class);
 
 		try {
 			Element facesConfigXml = loadFacesConfigXml(servletContext).getDocumentElement();
