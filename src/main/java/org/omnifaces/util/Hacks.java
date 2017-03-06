@@ -25,6 +25,7 @@ import static org.omnifaces.util.Reflection.accessField;
 import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Reflection.invokeMethod;
 import static org.omnifaces.util.Reflection.toClassOrNull;
+import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.Serializable;
@@ -449,12 +450,12 @@ public final class Hacks {
 				Map<Serializable, String> viewScopeIds = accessField(viewCollection, "_viewScopeIds");
 				Map<String, Integer> viewScopeIdCounts = accessField(viewCollection, "_viewScopeIdCounts");
 
-				if (viewScopeIds == null || viewScopeIdCounts == null) {
+				if (viewScopeIds == null || viewScopeIdCounts == null || viewScopeIds.get(key) == null) {
 					return; // Most likely cached page with client side state saving.
 				}
 
 				String viewScopeId = viewScopeIds.remove(key);
-				int count = viewScopeIdCounts.get(viewScopeId) - 1;
+				int count = coalesce(viewScopeIdCounts.get(viewScopeId), 1) - 1;
 
 				if (count < 1) {
 					viewScopeIdCounts.remove(viewScopeId);
