@@ -56,7 +56,7 @@ import javax.faces.convert.Converter;
  * @author Bauke Scholtz
  * @since 1.6
  */
-public abstract class ValueChangeConverter implements Converter {
+public abstract class ValueChangeConverter implements Converter<Object> {
 
 	/**
 	 * If the component is an instance of {@link EditableValueHolder} and the string representation of its old object

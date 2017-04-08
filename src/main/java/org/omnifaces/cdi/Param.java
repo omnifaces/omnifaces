@@ -163,6 +163,7 @@ import org.omnifaces.util.Utils;
 @Qualifier
 @Retention(RUNTIME)
 @Target({ METHOD, FIELD, PARAMETER })
+@SuppressWarnings("rawtypes")
 public @interface Param {
 
 	/**

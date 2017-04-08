@@ -138,7 +138,7 @@ public class SkipValidators extends TagHandler {
 	static class SkipValidatorsEventListener implements SystemEventListener {
 
 		private Map<String, Object> attributes = new HashMap<>();
-		private Map<String, Validator[]> allValidators = new HashMap<>();
+		private Map<String, Validator<?>[]> allValidators = new HashMap<>();
 
 		@Override
 		public boolean isListenerForSource(Object source) {
@@ -165,15 +165,15 @@ public class SkipValidators extends TagHandler {
 				attributes.put(clientId, (requiredExpression != null) ? requiredExpression : input.isRequired());
 				input.setRequired(false);
 
-				Validator[] validators = input.getValidators();
+				Validator<?>[] validators = input.getValidators();
 				allValidators.put(clientId, validators);
 
-				for (Validator validator : validators) {
+				for (Validator<?> validator : validators) {
 					input.removeValidator(validator);
 				}
 			}
 			else if (event instanceof PostValidateEvent) {
-				for (Validator validator : allValidators.remove(clientId)) {
+				for (Validator<?> validator : allValidators.remove(clientId)) {
 					input.addValidator(validator);
 				}
 

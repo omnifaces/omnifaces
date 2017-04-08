@@ -265,15 +265,16 @@ public final class FacesLocal {
 	/**
 	 * @see Faces#createConverter(Object)
 	 */
-	public static Converter createConverter(FacesContext context, Object identifier) {
+	@SuppressWarnings("unchecked")
+	public static <T> Converter<T> createConverter(FacesContext context, Object identifier) {
 		if (identifier instanceof String) {
 			return createConverter(context, (String) identifier);
 		}
 		else if (identifier instanceof Class) {
-			return createConverter(context, (Class<?>) identifier);
+			return createConverter(context, (Class<T>) identifier);
 		}
 		else if (identifier instanceof Converter) {
-			return (Converter) identifier;
+			return (Converter<T>) identifier;
 		}
 		else {
 			return null;
@@ -283,8 +284,9 @@ public final class FacesLocal {
 	/**
 	 * @see Faces#createConverter(String)
 	 */
-	public static Converter createConverter(FacesContext context, String identifier) {
-		Converter converter = context.getApplication().createConverter(identifier);
+	@SuppressWarnings("unchecked")
+	public static <T> Converter<T> createConverter(FacesContext context, String identifier) {
+		Converter<T> converter = context.getApplication().createConverter(identifier);
 
 		if (converter == null) {
 			converter = createConverter(context, toClassOrNull(identifier));
@@ -296,9 +298,10 @@ public final class FacesLocal {
 	/**
 	 * @see Faces#createConverter(Class)
 	 */
-	public static Converter createConverter(FacesContext context, Class<?> identifier) {
+	@SuppressWarnings("unchecked")
+	public static <T> Converter<T> createConverter(FacesContext context, Class<?> identifier) {
 		if (Converter.class.isAssignableFrom(identifier)) {
-			return (Converter) instance(identifier);
+			return (Converter<T>) instance(identifier);
 		}
 		else {
 			return context.getApplication().createConverter(identifier);
@@ -308,15 +311,16 @@ public final class FacesLocal {
 	/**
 	 * @see Faces#createValidator(Object)
 	 */
-	public static Validator createValidator(FacesContext context, Object identifier) {
+	@SuppressWarnings("unchecked")
+	public static <T> Validator<T> createValidator(FacesContext context, Object identifier) {
 		if (identifier instanceof String) {
 			return createValidator(context, (String) identifier);
 		}
 		else if (identifier instanceof Class) {
-			return createValidator(context, (Class<?>) identifier);
+			return createValidator(context, (Class<T>) identifier);
 		}
 		else if (identifier instanceof Validator) {
-			return (Validator) identifier;
+			return (Validator<T>) identifier;
 		}
 		else {
 			return null;
@@ -326,8 +330,9 @@ public final class FacesLocal {
 	/**
 	 * @see Faces#createValidator(String)
 	 */
-	public static Validator createValidator(FacesContext context, String identifier) {
-		Validator validator = context.getApplication().createValidator(identifier);
+	@SuppressWarnings("unchecked")
+	public static <T> Validator<T> createValidator(FacesContext context, String identifier) {
+		Validator<T> validator = context.getApplication().createValidator(identifier);
 
 		if (validator == null) {
 			validator = createValidator(context, toClassOrNull(identifier));
@@ -339,10 +344,10 @@ public final class FacesLocal {
 	/**
 	 * @see Faces#createValidator(Class)
 	 */
-	@SuppressWarnings("all")
-	public static Validator createValidator(FacesContext context, Class<?> identifier) {
+	@SuppressWarnings({ "unchecked", "unused" })
+	public static <T> Validator<T> createValidator(FacesContext context, Class<?> identifier) {
 		if (Validator.class.isAssignableFrom(identifier)) {
-			return (Validator) instance(identifier);
+			return (Validator<T>) instance(identifier);
 		}
 		else {
 			return null;
@@ -800,13 +805,13 @@ public final class FacesLocal {
 			return null;
 		}
 
-		Converter converter = createConverter(context, type);
+		Converter<T> converter = createConverter(context, type);
 
 		if (converter == null) {
 			return (T) value;
 		}
 
-		return (T) converter.getAsObject(context, context.getViewRoot(), value);
+		return converter.getAsObject(context, context.getViewRoot(), value);
 	}
 
 	/**
@@ -834,7 +839,7 @@ public final class FacesLocal {
 			return null;
 		}
 
-		Converter converter = createConverter(context, type);
+		Converter<T> converter = createConverter(context, type);
 
 		if (converter == null) {
 			return (T[]) values;
@@ -1339,7 +1344,6 @@ public final class FacesLocal {
 	/**
 	 * @see Faces#getInitParameterMap()
 	 */
-	@SuppressWarnings("unchecked")
 	public static Map<String, String> getInitParameterMap(FacesContext context) {
 		return context.getExternalContext().getInitParameterMap();
 	}

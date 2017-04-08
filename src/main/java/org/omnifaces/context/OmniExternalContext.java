@@ -40,10 +40,6 @@ public class OmniExternalContext extends ExternalContextWrapper {
 
 	private static final Flash DUMMY_FLASH = new DummyFlash();
 
-	// Variables ------------------------------------------------------------------------------------------------------
-
-	private ExternalContext wrapped;
-
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
@@ -51,7 +47,7 @@ public class OmniExternalContext extends ExternalContextWrapper {
 	 * @param wrapped The wrapped external context.
 	 */
 	public OmniExternalContext(ExternalContext wrapped) {
-		this.wrapped = wrapped;
+		super(wrapped);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -63,11 +59,6 @@ public class OmniExternalContext extends ExternalContextWrapper {
 	@Override
 	public Flash getFlash() {
 		return ViewScopeManager.isUnloadRequest(Faces.getContext()) ? DUMMY_FLASH : super.getFlash();
-	}
-
-	@Override
-	public ExternalContext getWrapped() {
-		return wrapped;
 	}
 
 	// Inner classes --------------------------------------------------------------------------------------------------

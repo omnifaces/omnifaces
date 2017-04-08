@@ -16,6 +16,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import javax.servlet.ServletOutputStream;
+import javax.servlet.WriteListener;
 
 /**
  * <p>
@@ -34,6 +35,16 @@ public class DefaultServletOutputStream extends ServletOutputStream {
 	 */
 	public DefaultServletOutputStream(OutputStream output) {
 		this.output = output;
+	}
+
+	@Override
+	public void setWriteListener(WriteListener listener) {
+		// NOOP.
+	}
+
+	@Override
+	public boolean isReady() {
+		return true;
 	}
 
 	@Override

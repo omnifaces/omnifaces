@@ -24,10 +24,6 @@ import javax.faces.context.ExternalContextFactory;
  */
 public class OmniExternalContextFactory extends ExternalContextFactory {
 
-	// Variables ------------------------------------------------------------------------------------------------------
-
-	private ExternalContextFactory wrapped;
-
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
@@ -35,7 +31,7 @@ public class OmniExternalContextFactory extends ExternalContextFactory {
 	 * @param wrapped The wrapped factory.
 	 */
 	public OmniExternalContextFactory(ExternalContextFactory wrapped) {
-		this.wrapped = wrapped;
+		super(wrapped);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -45,15 +41,7 @@ public class OmniExternalContextFactory extends ExternalContextFactory {
 	 */
 	@Override
 	public ExternalContext getExternalContext(Object context, Object request, Object response) {
-		return new OmniExternalContext(wrapped.getExternalContext(context, request, response));
-	}
-
-	/**
-	 * Returns the wrapped factory.
-	 */
-	@Override
-	public ExternalContextFactory getWrapped() {
-		return wrapped;
+		return new OmniExternalContext(getWrapped().getExternalContext(context, request, response));
 	}
 
 }

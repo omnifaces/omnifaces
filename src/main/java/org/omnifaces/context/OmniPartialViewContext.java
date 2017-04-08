@@ -82,7 +82,6 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private PartialViewContext wrapped;
 	private Map<String, Object> arguments;
 	private List<String> callbackScripts;
 	private OmniPartialResponseWriter writer;
@@ -94,7 +93,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 	 * @param wrapped The wrapped partial view context.
 	 */
 	public OmniPartialViewContext(PartialViewContext wrapped) {
-		this.wrapped = wrapped;
+		super(wrapped);
 		setCurrentInstance(this);
 	}
 
@@ -157,11 +156,6 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 	@Override // Necessary because this is missing in PartialViewContextWrapper (will be fixed in JSF 2.2).
 	public void setPartialRequest(boolean partialRequest) {
 		getWrapped().setPartialRequest(partialRequest);
-	}
-
-	@Override
-	public PartialViewContext getWrapped() {
-		return wrapped;
 	}
 
 	/**

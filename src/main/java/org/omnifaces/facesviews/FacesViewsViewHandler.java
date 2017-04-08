@@ -54,12 +54,11 @@ import javax.servlet.ServletContext;
  */
 public class FacesViewsViewHandler extends ViewHandlerWrapper {
 
-	private final ViewHandler wrapped;
 	private final ViewHandlerMode mode;
 	private final boolean extensionless;
 
-	public FacesViewsViewHandler(ViewHandler viewHandler) {
-		wrapped = viewHandler;
+	public FacesViewsViewHandler(ViewHandler wrapped) {
+		super(wrapped);
 		mode = getViewHandlerMode(getServletContext());
 		extensionless = isScannedViewsAlwaysExtensionless(getServletContext());
 	}
@@ -93,11 +92,6 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 
 		// Not a resource we mapped or not a forwarded one, take the version from the parent view handler.
 		return actionURL;
-	}
-
-	@Override
-	public ViewHandler getWrapped() {
-		return wrapped;
 	}
 
 	private static boolean isOriginalViewExtensionless(FacesContext context) {

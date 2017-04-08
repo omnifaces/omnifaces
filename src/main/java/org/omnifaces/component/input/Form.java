@@ -256,10 +256,8 @@ public class Form extends HtmlForm {
 	 */
 	private static class IgnoreValidationFailedFacesContext extends FacesContextWrapper {
 
-		private FacesContext wrapped;
-
 		public IgnoreValidationFailedFacesContext(FacesContext wrapped) {
-			this.wrapped = wrapped;
+			super(wrapped);
 		}
 
 		@Override
@@ -271,12 +269,6 @@ public class Form extends HtmlForm {
 		public void renderResponse() {
 			// NOOP.
 		}
-
-		@Override
-		public FacesContext getWrapped() {
-			return wrapped;
-		}
-
 	}
 
 	/**
@@ -287,11 +279,10 @@ public class Form extends HtmlForm {
 	 */
 	private static class ActionURLDecorator extends FacesContextWrapper {
 
-		private FacesContext wrapped;
 		private Form form;
 
 		public ActionURLDecorator(FacesContext wrapped, Form form) {
-			this.wrapped = wrapped;
+			super(wrapped);
 			this.form = form;
 		}
 
@@ -299,20 +290,14 @@ public class Form extends HtmlForm {
 		public Application getApplication() {
 			return new ActionURLDecoratorApplication(getWrapped().getApplication(), form);
 		}
-
-		@Override
-		public FacesContext getWrapped() {
-			return wrapped;
-		}
 	}
 
 	private static class ActionURLDecoratorApplication extends ApplicationWrapper {
 
-		private Application wrapped;
 		private Form form;
 
 		public ActionURLDecoratorApplication(Application wrapped, Form form) {
-			this.wrapped = wrapped;
+			super(wrapped);
 			this.form = form;
 		}
 
@@ -320,20 +305,14 @@ public class Form extends HtmlForm {
 		public ViewHandler getViewHandler() {
 			return new ActionURLDecoratorViewHandler(getWrapped().getViewHandler(), form);
 		}
-
-		@Override
-		public Application getWrapped() {
-			return wrapped;
-		}
 	}
 
 	private static class ActionURLDecoratorViewHandler extends ViewHandlerWrapper {
 
-		private ViewHandler wrapped;
 		private Form form;
 
 		public ActionURLDecoratorViewHandler(ViewHandler wrapped, Form form) {
-			this.wrapped = wrapped;
+			super(wrapped);
 			this.form = form;
 		}
 
@@ -353,11 +332,6 @@ public class Form extends HtmlForm {
 		private String getActionURL(FacesContext context) {
 			String actionURL = (getRequestAttribute(context, ERROR_REQUEST_URI) != null) ? getRequestContextPath(context) : getRequestURI(context);
 			return actionURL.isEmpty() ? "/" : actionURL;
-		}
-
-		@Override
-		public ViewHandler getWrapped() {
-			return wrapped;
 		}
 	}
 

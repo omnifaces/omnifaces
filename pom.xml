@@ -446,7 +446,7 @@
 		<profile>
 			<id>wildfly</id>
 			<activation>
-				<activeByDefault>true</activeByDefault>
+				<activeByDefault>false</activeByDefault><!-- TODO: put back to 'true' once figured out how to upgrade it to JSF 2.3 via Maven -->
 			</activation>
 			<dependencies>
 				<dependency>

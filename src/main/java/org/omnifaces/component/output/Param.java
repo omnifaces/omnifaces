@@ -12,6 +12,8 @@
  */
 package org.omnifaces.component.output;
 
+import static org.omnifaces.util.FacesLocal.createConverter;
+
 import java.io.IOException;
 import java.io.StringWriter;
 
@@ -55,6 +57,7 @@ import org.omnifaces.component.ParamHolder;
  * @see ParamHolder
  */
 @FacesComponent(Param.COMPONENT_TYPE)
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class Param extends UIParameter implements ParamHolder {
 
 	// Public constants -----------------------------------------------------------------------------------------------
@@ -92,7 +95,7 @@ public class Param extends UIParameter implements ParamHolder {
 	@Override
 	public Object getValue() {
 		FacesContext context = getFacesContext();
-		Converter converter = getConverter();
+		Converter<Object> converter = getConverter();
 		Object value = getLocalValue();
 
 		if (value == null && getChildCount() > 0) {
@@ -114,7 +117,7 @@ public class Param extends UIParameter implements ParamHolder {
 		}
 
 		if (converter == null && value != null) {
-			converter = context.getApplication().createConverter(value.getClass());
+			converter = createConverter(context, value.getClass());
 		}
 
 		if (converter != null) {

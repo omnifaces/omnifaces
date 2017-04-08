@@ -510,13 +510,14 @@ public final class Faces {
 	 * class, then delegate to {@link #createConverter(Class)}. If the given identifier is a concrete converter
 	 * instance, then return it directly.
 	 * If no converter instance can be associated, then return null.
+	 * @param <T> The expected converter type.
 	 * @param identifier The Faces converter object identifier. This can be a string representing the converter ID, or a
 	 * class representing the target type, or a class representing the converter class, or even the converter instance
 	 * itself.
 	 * @return A Faces converter associated with given object identifier.
 	 * @since 2.5
 	 */
-	public static Converter createConverter(Object identifier) {
+	public static <T> Converter<T> createConverter(Object identifier) {
 		return FacesLocal.createConverter(getContext(), identifier);
 	}
 
@@ -525,11 +526,12 @@ public final class Faces {
 	 * converter ID in {@link Application#createConverter(String)}. If that didn't return anything, then try to interpret
 	 * the string identifier as class name and delegate to {@link #createConverter(Class)}.
 	 * If no converter instance can be associated, then return null.
+	 * @param <T> The expected converter type.
 	 * @param identifier The Faces converter string identifier.
 	 * @return A Faces converter associated with given string identifier.
 	 * @since 2.5
 	 */
-	public static Converter createConverter(String identifier) {
+	public static <T> Converter<T> createConverter(String identifier) {
 		return FacesLocal.createConverter(getContext(), identifier);
 	}
 
@@ -538,11 +540,12 @@ public final class Faces {
 	 * assignable to Converter.class, then use that as target type in {@link Application#createConverter(Class)}. If
 	 * the given identifier is assignable to Converter.class, then instantiate it using default constructor.
 	 * If no converter instance can be associated, then return null.
+	 * @param <T> The expected converter type.
 	 * @param identifier The Faces converter class identifier.
 	 * @return A Faces converter associated with given class identifier.
 	 * @since 2.5
 	 */
-	public static Converter createConverter(Class<?> identifier) {
+	public static <T> Converter<T> createConverter(Class<?> identifier) {
 		return FacesLocal.createConverter(getContext(), identifier);
 	}
 
@@ -552,12 +555,13 @@ public final class Faces {
 	 * class, then delegate to {@link #createValidator(Class)}. If the given identifier is a concrete validator
 	 * instance, then return it directly.
 	 * If no validator instance can be associated, then return null.
+	 * @param <T> The expected validator type.
 	 * @param identifier The Faces validator object identifier. This can be a string representing the validator ID, or a
 	 * class representing the validator class, or even the validator instance itself.
 	 * @return A Faces validator associated with given object identifier.
 	 * @since 2.5
 	 */
-	public static Validator createValidator(Object identifier) {
+	public static <T> Validator<T> createValidator(Object identifier) {
 		return FacesLocal.createValidator(getContext(), identifier);
 	}
 
@@ -566,11 +570,12 @@ public final class Faces {
 	 * validator ID in {@link Application#createValidator(String)}. If that didn't return anything, then try to
 	 * interpret the string identifier as class name and delegate to {@link #createValidator(Class)}.
 	 * If no validator instance can be associated, then return null.
+	 * @param <T> The expected validator type.
 	 * @param identifier The Faces validator string identifier.
 	 * @return A Faces validator associated with given string identifier.
 	 * @since 2.5
 	 */
-	public static Validator createValidator(String identifier) {
+	public static <T> Validator<T> createValidator(String identifier) {
 		return FacesLocal.createValidator(getContext(), identifier);
 	}
 
@@ -578,11 +583,12 @@ public final class Faces {
 	 * Creates and returns a Faces validator associated with given class identifier. If the given identifier is
 	 * assignable to Validator.class, then instantiate it using default constructor.
 	 * If no validator instance can be associated, then return null.
+	 * @param <T> The expected validator type.
 	 * @param identifier The Faces validator class identifier.
 	 * @return A Faces validator associated with given class identifier.
 	 * @since 2.5
 	 */
-	public static Validator createValidator(Class<?> identifier) {
+	public static <T> Validator<T> createValidator(Class<?> identifier) {
 		return FacesLocal.createValidator(getContext(), identifier);
 	}
 

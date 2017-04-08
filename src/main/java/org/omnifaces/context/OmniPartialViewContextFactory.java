@@ -25,10 +25,6 @@ import javax.faces.context.PartialViewContextFactory;
  */
 public class OmniPartialViewContextFactory extends PartialViewContextFactory {
 
-	// Variables ------------------------------------------------------------------------------------------------------
-
-	private PartialViewContextFactory wrapped;
-
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
@@ -36,7 +32,7 @@ public class OmniPartialViewContextFactory extends PartialViewContextFactory {
 	 * @param wrapped The wrapped factory.
 	 */
 	public OmniPartialViewContextFactory(PartialViewContextFactory wrapped) {
-		this.wrapped = wrapped;
+		super(wrapped);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -46,15 +42,7 @@ public class OmniPartialViewContextFactory extends PartialViewContextFactory {
 	 */
 	@Override
 	public PartialViewContext getPartialViewContext(FacesContext context) {
-		return new OmniPartialViewContext(wrapped.getPartialViewContext(context));
-	}
-
-	/**
-	 * Returns the wrapped factory.
-	 */
-	@Override
-	public PartialViewContextFactory getWrapped() {
-		return wrapped;
+		return new OmniPartialViewContext(getWrapped().getPartialViewContext(context));
 	}
 
 }

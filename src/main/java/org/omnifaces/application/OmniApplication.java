@@ -46,11 +46,11 @@ import org.omnifaces.cdi.validator.ValidatorManager;
  * @see ValidatorManager
  * @since 1.6
  */
+@SuppressWarnings("rawtypes")
 public class OmniApplication extends ApplicationWrapper {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private final Application wrapped;
 	private final ConverterManager converterManager;
 	private final ValidatorManager validatorManager;
 	private final TimeZone dateTimeConverterDefaultTimeZone;
@@ -62,7 +62,7 @@ public class OmniApplication extends ApplicationWrapper {
 	 * @param wrapped The wrapped application.
 	 */
 	public OmniApplication(Application wrapped) {
-		this.wrapped = wrapped;
+		super(wrapped);
 		converterManager = getReference(ConverterManager.class);
 		validatorManager = getReference(ValidatorManager.class);
 		dateTimeConverterDefaultTimeZone =
@@ -118,11 +118,6 @@ public class OmniApplication extends ApplicationWrapper {
 		}
 
 		return super.createValidator(validatorId);
-	}
-
-	@Override
-	public Application getWrapped() {
-		return wrapped;
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------

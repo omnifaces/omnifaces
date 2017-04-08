@@ -116,14 +116,10 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 		String encoding = context.getExternalContext().getRequestCharacterEncoding();
 		context.getExternalContext().setResponseCharacterEncoding(encoding);
 		final ResponseWriter writer = context.getRenderKit().createResponseWriter(buffer, null, encoding);
-		context.setResponseWriter(new ResponseWriterWrapper() {
+		context.setResponseWriter(new ResponseWriterWrapper(writer) {
 			@Override
 			public void writeText(Object text, String property) throws IOException {
-				writer.write(text.toString()); // So, don't escape HTML.
-			}
-			@Override
-			public ResponseWriter getWrapped() {
-				return writer;
+				getWrapped().write(text.toString()); // So, don't escape HTML.
 			}
 		});
 

@@ -285,7 +285,6 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private ExceptionHandler wrapped;
 	private Class<? extends Throwable>[] exceptionTypesToUnwrap;
 	private Class<? extends Throwable>[] exceptionTypesToIgnoreInLogging;
 
@@ -296,7 +295,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	 * @param wrapped The wrapped exception handler.
 	 */
 	public FullAjaxExceptionHandler(ExceptionHandler wrapped) {
-		this.wrapped = wrapped;
+		super(wrapped);
 		exceptionTypesToUnwrap = getExceptionTypesToUnwrap(getServletContext());
 		exceptionTypesToIgnoreInLogging = getExceptionTypesToIgnoreInLogging(getServletContext());
 	}
@@ -365,7 +364,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	@Override
 	public void handle() {
 		handleAjaxException(getContext());
-		wrapped.handle();
+		getWrapped().handle();
 	}
 
 	private void handleAjaxException(FacesContext context) {
@@ -573,11 +572,6 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 		// TODO: #287: make params available via #{param(Values)}. Request wrapper needed :|
 
 		return normalizeViewId(context, parts[0]);
-	}
-
-	@Override
-	public ExceptionHandler getWrapped() {
-		return wrapped;
 	}
 
 }

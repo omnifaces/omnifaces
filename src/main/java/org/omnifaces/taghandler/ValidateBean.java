@@ -475,9 +475,9 @@ public class ValidateBean extends TagHandler {
 	}
 
 	private static void removeCollectingValidator(UIInput input) {
-		Validator collectingValidator = null;
+		Validator<?> collectingValidator = null;
 
-		for (Validator validator : input.getValidators()) {
+		for (Validator<?> validator : input.getValidators()) {
 			if (validator instanceof CollectingValidator) {
 				collectingValidator = validator;
 				break;
@@ -574,7 +574,7 @@ public class ValidateBean extends TagHandler {
 
 	// Nested classes -------------------------------------------------------------------------------------------------
 
-	public static final class CollectingValidator implements Validator {
+	public static final class CollectingValidator implements Validator<Object> {
 
 		private final Set<String> clientIds;
 		private final Map<String, Object> properties;

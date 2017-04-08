@@ -59,10 +59,6 @@ import javax.faces.event.ExceptionQueuedEvent;
  */
 public class FacesMessageExceptionHandler extends ExceptionHandlerWrapper {
 
-	// Variables ------------------------------------------------------------------------------------------------------
-
-	private ExceptionHandler wrapped;
-
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
@@ -70,7 +66,7 @@ public class FacesMessageExceptionHandler extends ExceptionHandlerWrapper {
 	 * @param wrapped The wrapped exception handler.
 	 */
 	public FacesMessageExceptionHandler(ExceptionHandler wrapped) {
-		this.wrapped = wrapped;
+		super(wrapped);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -85,7 +81,7 @@ public class FacesMessageExceptionHandler extends ExceptionHandlerWrapper {
 			iter.remove();
 		}
 
-		wrapped.handle();
+		getWrapped().handle();
 	}
 
 	/**
@@ -97,11 +93,6 @@ public class FacesMessageExceptionHandler extends ExceptionHandlerWrapper {
 	 */
 	protected String createFatalMessage(Throwable exception) {
 		return exception.toString();
-	}
-
-	@Override
-	public ExceptionHandler getWrapped() {
-		return wrapped;
 	}
 
 }

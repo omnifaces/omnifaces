@@ -37,7 +37,6 @@ import org.omnifaces.component.input.ComponentIdParam;
  */
 public class ConditionalResponseWriter extends ResponseWriterWrapper {
 
-	private final ResponseWriter responseWriter;
 	private final FacesContext facesContext;
 	private final List<String> componentIds;
 	private final List<String> clientIds;
@@ -48,9 +47,8 @@ public class ConditionalResponseWriter extends ResponseWriterWrapper {
 	private Map<String, Boolean> renderedIdCache = new HashMap<>();
 	private Map<UIComponent, Boolean> renderedReferenceCache = new HashMap<>();
 
-	public ConditionalResponseWriter(ResponseWriter responseWriter, FacesContext facesContext, List<String> componentIds, List<String> clientIds,
-			boolean renderChildren) {
-		this.responseWriter = responseWriter;
+	public ConditionalResponseWriter(ResponseWriter responseWriter, FacesContext facesContext, List<String> componentIds, List<String> clientIds, boolean renderChildren) {
+		super(responseWriter);
 		this.facesContext = facesContext;
 		this.componentIds = componentIds;
 		this.clientIds = clientIds;
@@ -262,11 +260,6 @@ public class ConditionalResponseWriter extends ResponseWriterWrapper {
 		// Also remember client-id, in addition to the component reference since iterating is often implemented by swapping the state and identity
 		// from the same component instance. So components with the same object identity can have different component identities.
 		renderedIdCache.put(component.getClientId(), lastRendered);
-	}
-
-	@Override
-	public ResponseWriter getWrapped() {
-		return responseWriter;
 	}
 
 }

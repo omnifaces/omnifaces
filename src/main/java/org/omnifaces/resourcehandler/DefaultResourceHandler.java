@@ -32,10 +32,6 @@ public abstract class DefaultResourceHandler extends ResourceHandlerWrapper {
 
 	public static final String RES_NOT_FOUND = "RES_NOT_FOUND";
 
-	// Properties -----------------------------------------------------------------------------------------------------
-
-	private ResourceHandler wrapped;
-
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
@@ -43,7 +39,7 @@ public abstract class DefaultResourceHandler extends ResourceHandlerWrapper {
 	 * @param wrapped The resource handler to be wrapped.
 	 */
 	public DefaultResourceHandler(ResourceHandler wrapped) {
-		this.wrapped = wrapped;
+		super(wrapped);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -144,11 +140,6 @@ public abstract class DefaultResourceHandler extends ResourceHandlerWrapper {
 	 */
 	public Resource decorateResource(Resource resource) {
 		return resource;
-	}
-
-	@Override
-	public ResourceHandler getWrapped() {
-		return wrapped;
 	}
 
 }
