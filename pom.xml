@@ -11,7 +11,7 @@
 
 	<groupId>org.omnifaces</groupId>
 	<artifactId>omnifaces</artifactId>
-	<version>2.6.2</version>
+	<version>3.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>OmniFaces</name>
@@ -60,8 +60,8 @@
 	<properties>
 
 		<!-- Java versions. -->
-		<javase.version>1.7</javase.version>
-		<javaee.version>7</javaee.version>
+		<javase.version>1.8</javase.version>
+		<javaee.version>7</javaee.version><!-- TODO: update to 8 once available. -->
 		<javadoc.version>1.8</javadoc.version>
 		
 		<!-- Essential Maven defaults. -->
@@ -72,50 +72,55 @@
 		<maven.source.excludeResources>true</maven.source.excludeResources>
 
 		<!-- Test server versions. -->
-		<test.wildfly.version>10.0.0.Final</test.wildfly.version>
-		<test.tomee.version>7.0.1</test.tomee.version>
-		<test.payara.version>4.1.1.163</test.payara.version>
+		<test.wildfly.version>10.1.0.Final</test.wildfly.version> <!-- TODO: update to Java EE 8 compatible versions -->
+		<test.tomee.version>7.0.3</test.tomee.version>
+		<test.payara.version>4.1.1.171.1</test.payara.version>
 	</properties>
 
 	<dependencies>
 
-		<!-- Java EE 7 dependencies. -->
+		<!-- Java EE 8 dependencies. -->
 		<dependency>
 			<groupId>javax.faces</groupId>
 			<artifactId>javax.faces-api</artifactId>
-			<version>2.2</version>
+			<version>2.3</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.enterprise</groupId>
 			<artifactId>cdi-api</artifactId>
-			<version>1.1</version>
+			<version>2.0-PFD2</version><!-- TODO: update to 2.0 final once available. -->
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
-			<version>1.1.0.Final</version>
+			<version>2.0.0.Alpha2</version><!-- TODO: update to 2.0 final once available. -->
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.json</groupId>
+			<artifactId>javax.json-api</artifactId>
+			<version>1.1.0-M1</version><!-- TODO: update to 1.1 final once available. -->
+		</dependency>
+
+		<!-- Java EE 7 dependencies. -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.el</groupId>
+			<artifactId>javax.el-api</artifactId>
+			<version>3.0.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.websocket</groupId>
 			<artifactId>javax.websocket-api</artifactId>
 			<version>1.1</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<!-- Java EE 6 dependencies. -->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>3.0.1</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.el</groupId>
-			<artifactId>el-api</artifactId>
-			<version>2.2</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -153,21 +158,21 @@
 			<dependency>
 				<groupId>org.jboss.arquillian</groupId>
 				<artifactId>arquillian-bom</artifactId>
-				<version>1.1.11.Final</version>
+				<version>1.1.13.Final</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.jboss.arquillian.extension</groupId>
 				<artifactId>arquillian-drone-bom</artifactId>
-				<version>2.0.0.Final</version>
+				<version>2.0.1.Final</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.jboss.arquillian.selenium</groupId>
 				<artifactId>selenium-bom</artifactId>
-				<version>2.53.1</version>
+				<version>3.3.1</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -193,7 +198,7 @@
 			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
-				<version>2.11</version>
+				<version>3.0</version>
 				<configuration>
 					<header>license.txt</header>
 					<excludes>
@@ -217,7 +222,7 @@
 			<plugin>
 				<groupId>com.samaxes.maven</groupId>
 				<artifactId>minify-maven-plugin</artifactId>
-				<version>1.7.4</version>
+				<version>1.7.6</version>
 				<configuration>
 					<webappSourceDir>${basedir}/src/main/resources</webappSourceDir>
 					<webappTargetDir>${project.build.outputDirectory}</webappTargetDir>
@@ -278,7 +283,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.6</version>
+				<version>3.0.2</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -336,7 +341,7 @@
 			<plugin>
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.5</version>
+				<version>1.6.8</version>
 				<extensions>true</extensions>
 				<configuration>
 					<serverId>ossrh</serverId>
@@ -361,7 +366,7 @@
 									<pluginExecutionFilter>
 										<groupId>com.mycila</groupId>
 										<artifactId>license-maven-plugin</artifactId>
-										<versionRange>[2.11,)</versionRange>
+										<versionRange>[3.0,)</versionRange>
 										<goals>
 											<goal>format</goal>
 										</goals>
@@ -376,7 +381,7 @@
 									<pluginExecutionFilter>
 										<groupId>com.samaxes.maven</groupId>
 										<artifactId>minify-maven-plugin</artifactId>
-										<versionRange>[1.7.4,)</versionRange>
+										<versionRange>[1.7.6,)</versionRange>
 										<goals>
 											<goal>minify</goal>
 										</goals>
@@ -396,7 +401,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>2.10</version>
+					<version>3.0.0</version>
 					<executions>
 						<execution>
 							<phase>process-test-classes</phase>
@@ -447,7 +452,7 @@
 				<dependency>
 					<groupId>org.wildfly.arquillian</groupId>
 					<artifactId>wildfly-arquillian-container-managed</artifactId>
-					<version>2.0.0.Final</version>
+					<version>2.0.2.Final</version>
 					<scope>test</scope>
 				</dependency>
 			</dependencies>
