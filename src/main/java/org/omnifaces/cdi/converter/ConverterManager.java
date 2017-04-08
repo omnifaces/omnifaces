@@ -118,7 +118,12 @@ public class ConverterManager {
 			Converter converter = application.createConverter(converterId);
 
 			if (converter != null) {
-				bean = (Bean<Converter>) resolve(manager, converter.getClass());
+				Class<? extends Converter> converterClass = converter.getClass();
+				bean = (Bean<Converter>) resolve(manager, converterClass);
+				
+				if (bean != null && bean.getBeanClass() != converterClass) {
+					bean = null;
+				}
 			}
 
 			convertersById.put(converterId, bean);
