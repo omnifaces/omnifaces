@@ -41,6 +41,7 @@
  * @author Bauke Scholtz
  * @link https://java.net/jira/browse/JAVASERVERFACES_SPEC_PUBLIC-790
  * @since 1.7
+ * @deprecated Since 3.0 as this is already fixed in JSF 2.3.
  */
 OmniFaces.FixViewState = (function(window, document) {
 
