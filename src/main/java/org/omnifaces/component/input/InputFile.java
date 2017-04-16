@@ -38,7 +38,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import javax.faces.application.ResourceDependencies;
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponent;
@@ -244,10 +243,8 @@ import org.omnifaces.util.Utils;
  * @since 2.5
  */
 @FacesComponent(InputFile.COMPONENT_TYPE)
-@ResourceDependencies({
-	@ResourceDependency(library="javax.faces", name="jsf.js", target="head"), // Required for jsf.ajax.request.
-	@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head") // Specifically inputfile.js.
-})
+@ResourceDependency(library="javax.faces", name="jsf.js", target="head") // Required for jsf.ajax.request.
+@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head") // Specifically inputfile.js.
 public class InputFile extends HtmlInputFile {
 
 	// Public constants -----------------------------------------------------------------------------------------------

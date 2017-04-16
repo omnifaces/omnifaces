@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Set;
 
-import javax.faces.application.ResourceDependencies;
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponent;
@@ -78,10 +77,8 @@ import org.omnifaces.util.State;
  * @see ScriptFamily
  */
 @FacesComponent(Highlight.COMPONENT_TYPE)
-@ResourceDependencies({
-	@ResourceDependency(library="javax.faces", name="jsf.js", target="head"), // Required for jsf.ajax.addOnEvent.
-	@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head") // Specifically highlight.js.
-})
+@ResourceDependency(library="javax.faces", name="jsf.js", target="head") // Required for jsf.ajax.addOnEvent.
+@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head") // Specifically highlight.js.
 public class Highlight extends OnloadScript {
 
 	// Public constants -----------------------------------------------------------------------------------------------

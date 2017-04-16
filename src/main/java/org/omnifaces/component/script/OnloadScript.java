@@ -27,7 +27,6 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.context.ResponseWriterWrapper;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.ListenerFor;
-import javax.faces.event.ListenersFor;
 import javax.faces.event.PostAddToViewEvent;
 import javax.faces.event.PostRestoreStateEvent;
 import javax.faces.event.PreRenderViewEvent;
@@ -59,10 +58,8 @@ import org.omnifaces.util.Ajax;
  * @see ScriptFamily
  */
 @FacesComponent(OnloadScript.COMPONENT_TYPE)
-@ListenersFor({
-	@ListenerFor(systemEventClass=PostAddToViewEvent.class),
-	@ListenerFor(systemEventClass=PostRestoreStateEvent.class)
-})
+@ListenerFor(systemEventClass=PostAddToViewEvent.class)
+@ListenerFor(systemEventClass=PostRestoreStateEvent.class)
 public class OnloadScript extends ScriptFamily implements SystemEventListener {
 
 	// Public constants -----------------------------------------------------------------------------------------------

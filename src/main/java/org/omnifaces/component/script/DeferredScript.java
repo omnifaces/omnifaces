@@ -16,7 +16,6 @@ import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.ListenerFor;
-import javax.faces.event.ListenersFor;
 import javax.faces.event.PostAddToViewEvent;
 import javax.faces.event.PostRestoreStateEvent;
 
@@ -53,10 +52,8 @@ import org.omnifaces.util.Hacks;
  */
 @FacesComponent(DeferredScript.COMPONENT_TYPE)
 @ResourceDependency(library="omnifaces", name="omnifaces.js", target="head")
-@ListenersFor({
-	@ListenerFor(systemEventClass=PostAddToViewEvent.class),
-	@ListenerFor(systemEventClass=PostRestoreStateEvent.class)
-})
+@ListenerFor(systemEventClass=PostAddToViewEvent.class)
+@ListenerFor(systemEventClass=PostRestoreStateEvent.class)
 public class DeferredScript extends ScriptFamily {
 
 	// Public constants -----------------------------------------------------------------------------------------------

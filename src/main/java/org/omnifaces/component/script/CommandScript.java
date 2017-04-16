@@ -21,7 +21,6 @@ import static org.omnifaces.util.Utils.isEmpty;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-import javax.faces.application.ResourceDependencies;
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UICommand;
@@ -95,10 +94,8 @@ import org.omnifaces.util.State;
  */
 @Deprecated
 @FacesComponent(CommandScript.COMPONENT_TYPE)
-@ResourceDependencies({
-	@ResourceDependency(library="javax.faces", name="jsf.js", target="head"), // Required for jsf.ajax.request.
-	@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head") // Specifically util.js.
-})
+@ResourceDependency(library="javax.faces", name="jsf.js", target="head") // Required for jsf.ajax.request.
+@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head") // Specifically util.js.
 public class CommandScript extends UICommand {
 
 	// Public constants -----------------------------------------------------------------------------------------------
