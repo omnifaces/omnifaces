@@ -75,7 +75,9 @@ import org.omnifaces.util.MapWrapper;
  * If a constant value doesn't exist, then an <code>IllegalArgumentException</code> will be thrown.
  *
  * @author Bauke Scholtz
+ * @deprecated Since 3.0 as this has been added to JSF 2.3 as <code>f:importConstants</code>.
  */
+@Deprecated
 public class ImportConstants extends TagHandler {
 
 	// Constants ------------------------------------------------------------------------------------------------------
