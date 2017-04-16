@@ -72,7 +72,9 @@ import javax.faces.convert.FacesConverter;
  *
  * @author Bauke Scholtz
  * @since 1.2
+ * @deprecated Since 3.0 as this has been fixed in JSF 2.3 as per https://java.net/jira/browse/JAVASERVERFACES_SPEC_PUBLIC-1422
  */
+@Deprecated
 @FacesConverter(value = "omnifaces.GenericEnumConverter")
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class GenericEnumConverter implements Converter<Enum> {
