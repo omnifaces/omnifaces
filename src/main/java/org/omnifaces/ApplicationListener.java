@@ -29,10 +29,10 @@ import org.omnifaces.cdi.eager.EagerBeansRepository;
 import org.omnifaces.cdi.eager.EagerBeansWebListener;
 import org.omnifaces.cdi.push.Socket;
 import org.omnifaces.component.output.Cache;
-import org.omnifaces.component.output.cache.CacheInitializer;
 import org.omnifaces.eventlistener.DefaultServletContextListener;
 import org.omnifaces.facesviews.FacesViews;
 import org.omnifaces.resourcehandler.GraphicResource;
+import org.omnifaces.util.cache.CacheInitializer;
 
 /**
  * <p>
