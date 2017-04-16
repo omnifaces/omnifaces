@@ -28,6 +28,7 @@ import static org.omnifaces.util.Events.subscribeToViewEvent;
 import static org.omnifaces.util.Faces.getRequestAttribute;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.Writer;
 
@@ -289,7 +290,7 @@ public class Cache extends OutputFamily {
 	 * @return value associated with the named attribute
 	 * @since 1.2
 	 */
-	public Object getCacheAttribute(FacesContext context, String name) {
+	public Serializable getCacheAttribute(FacesContext context, String name) {
 		return getCacheImpl(context).getAttribute(getKeyWithDefault(context), name);
 	}
 
@@ -302,7 +303,7 @@ public class Cache extends OutputFamily {
 	 * @param value the value that is to be stored
 	 * @since 1.2
 	 */
-	public void setCacheAttribute(FacesContext context, String name, Object value) {
+	public void setCacheAttribute(FacesContext context, String name, Serializable value) {
 		getCacheImpl(context).putAttribute(getKeyWithDefault(context), name, value, getTime());
 	}
 

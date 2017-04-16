@@ -15,6 +15,7 @@ package org.omnifaces.util.cache;
 import static java.lang.System.currentTimeMillis;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public abstract class TimeToLiveCache implements Cache {
 	}
 
 	@Override
-	public Object getObject(String key) {
+	public Serializable getObject(String key) {
 		CacheEntry entry = cacheStore.get(key);
 
 		if (entry != null) {
@@ -71,7 +72,7 @@ public abstract class TimeToLiveCache implements Cache {
 	}
 
 	@Override
-	public void putObject(String key, Object value, int timeToLive) {
+	public void putObject(String key, Serializable value, int timeToLive) {
 		CacheEntry entry = cacheStore.get(key);
 
 		if (entry == null || !entry.isValid()) {
@@ -84,7 +85,7 @@ public abstract class TimeToLiveCache implements Cache {
 	}
 
 	@Override
-	public void putAttribute(String key, String name, Object value, int timeToLive) {
+	public void putAttribute(String key, String name, Serializable value, int timeToLive) {
 		CacheEntry entry = cacheStore.get(key);
 
 		if (entry == null || !entry.isValid()) {
@@ -97,7 +98,7 @@ public abstract class TimeToLiveCache implements Cache {
 	}
 
 	@Override
-	public Object getAttribute(String key, String name) {
+	public Serializable getAttribute(String key, String name) {
 		CacheEntry entry = cacheStore.get(key);
 
 		if (entry != null) {

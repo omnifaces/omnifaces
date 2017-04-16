@@ -14,6 +14,7 @@ package org.omnifaces.component.output.cache.el;
 
 import static org.omnifaces.util.Faces.getContext;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import javax.el.ELContext;
@@ -47,9 +48,9 @@ public class CachingValueExpression extends ValueExpressionWrapper {
 	public Object getValue(ELContext elContext) {
 		FacesContext facesContext = getContext(elContext);
 
-		Object value = cache.getCacheAttribute(facesContext, name);
+		Serializable value = cache.getCacheAttribute(facesContext, name);
 		if (value == null) {
-			value = super.getValue(elContext);
+			value = (Serializable) super.getValue(elContext);
 			cache.setCacheAttribute(facesContext, name, value);
 		}
 
