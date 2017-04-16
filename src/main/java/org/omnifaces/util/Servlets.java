@@ -296,45 +296,6 @@ public final class Servlets {
 	}
 
 	/**
-	 * Returns the original HTTP request URI behind this forwarded request, if any.
-	 * This does not include the request query string.
-	 * @param request The involved HTTP servlet request.
-	 * @return The original HTTP request URI behind this forwarded request, if any.
-	 * @since 1.8
-	 * @deprecated Since 2.4. Use {@link #getRequestURI(HttpServletRequest)} instead.
-	 */
-	@Deprecated // TODO: Remove in OmniFaces 3.0.
-	public static String getForwardRequestURI(HttpServletRequest request) {
-		return (String) request.getAttribute(FORWARD_REQUEST_URI);
-	}
-
-	/**
-	 * Returns the original HTTP request query string behind this forwarded request, if any.
-	 * @param request The involved HTTP servlet request.
-	 * @return The original HTTP request query string behind this forwarded request, if any.
-	 * @since 1.8
-	 * @deprecated Since 2.4. Use {@link #getRequestQueryString(HttpServletRequest)} instead.
-	 */
-	@Deprecated // TODO: Remove in OmniFaces 3.0.
-	public static String getForwardRequestQueryString(HttpServletRequest request) {
-		return (String) request.getAttribute(FORWARD_QUERY_STRING);
-	}
-
-	/**
-	 * Returns the original HTTP request URI with query string behind this forwarded request, if any.
-	 * @param request The involved HTTP servlet request.
-	 * @return The original HTTP request URI with query string behind this forwarded request, if any.
-	 * @since 1.8
-	 * @deprecated Since 2.4. Use {@link #getRequestURIWithQueryString(HttpServletRequest)} instead.
-	 */
-	@Deprecated // TODO: Remove in OmniFaces 3.0.
-	public static String getForwardRequestURIWithQueryString(HttpServletRequest request) {
-		String requestURI = getForwardRequestURI(request);
-		String queryString = getForwardRequestQueryString(request);
-		return (queryString == null) ? requestURI : (requestURI + "?" + queryString);
-	}
-
-	/**
 	 * Converts the given request query string to request parameter values map.
 	 * @param queryString The request query string.
 	 * @return The request query string as request parameter values map.

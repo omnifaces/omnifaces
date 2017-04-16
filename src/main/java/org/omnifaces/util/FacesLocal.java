@@ -1011,36 +1011,6 @@ public final class FacesLocal {
 	}
 
 	/**
-	 * @see Faces#getForwardRequestURI()
-	 * @deprecated Since 2.4. This is abstracted away by {@link #getRequestURI(FacesContext)}. Use it instead.
-	 * JSF has as to retrieving request URI no business of knowing if the request is forwarded/rewritten or not.
-	 */
-	@Deprecated // TODO: Remove in OmniFaces 3.0.
-	public static String getForwardRequestURI(FacesContext context) {
-		return Servlets.getForwardRequestURI(getRequest(context));
-	}
-
-	/**
-	 * @see Faces#getForwardRequestQueryString()
-	 * @deprecated Since 2.4. This is abstracted away by {@link #getRequestQueryString(FacesContext)}. Use it instead.
-	 * JSF has as to retrieving request URI no business of knowing if the request is forwarded/rewritten or not.
-	 */
-	@Deprecated // TODO: Remove in OmniFaces 3.0.
-	public static String getForwardRequestQueryString(FacesContext context) {
-		return Servlets.getForwardRequestQueryString(getRequest(context));
-	}
-
-	/**
-	 * @see Faces#getForwardRequestURIWithQueryString()
-	 * @deprecated Since 2.4. This is abstracted away by {@link #getRequestURIWithQueryString(FacesContext)}. Use it instead.
-	 * JSF has as to retrieving request URI no business of knowing if the request is forwarded/rewritten or not.
-	 */
-	@Deprecated // TODO: Remove in OmniFaces 3.0.
-	public static String getForwardRequestURIWithQueryString(FacesContext context) {
-		return Servlets.getForwardRequestURIWithQueryString(getRequest(context));
-	}
-
-	/**
 	 * @see Faces#getRemoteAddr()
 	 */
 	public static String getRemoteAddr(FacesContext context) {

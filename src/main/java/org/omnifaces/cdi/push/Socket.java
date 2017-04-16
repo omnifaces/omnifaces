@@ -16,7 +16,6 @@ import static java.lang.Boolean.TRUE;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
-import static java.util.logging.Logger.getLogger;
 import static javax.faces.component.behavior.ClientBehaviorContext.createClientBehaviorContext;
 import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
@@ -623,17 +622,10 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 	/** The boolean context parameter name to register web socket endpoint during startup. */
 	public static final String PARAM_SOCKET_ENDPOINT_ENABLED = "org.omnifaces.SOCKET_ENDPOINT_ENABLED";
 
-	/** Naming convention was wrong. Use {@link #PARAM_SOCKET_ENDPOINT_ENABLED} instead. @deprecated */
-	@Deprecated // TODO: remove in 3.0.
-	public static final String PARAM_ENABLE_SOCKET_ENDPOINT = "org.omnifaces.ENABLE_SOCKET_ENDPOINT";
-
 	// Private constants ----------------------------------------------------------------------------------------------
 
 	private static final Pattern PATTERN_CHANNEL = Pattern.compile("[\\w.-]+");
 
-	private static final String WARNING_PARAM_DEPRECATED = "Context parameter name '" + PARAM_ENABLE_SOCKET_ENDPOINT
-		+ "' is deprecated. It has been renamed to '" + PARAM_SOCKET_ENDPOINT_ENABLED + "'."
-		+ " Please update web.xml accordingly.";
 	private static final String ERROR_EXPRESSION_DISALLOWED =
 		"o:socket 'channel' and 'scope' attributes may not contain an EL expression.";
 	private static final String ERROR_INVALID_USER =
@@ -962,12 +954,7 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 		}
 
 		if (!parseBoolean(context.getInitParameter(PARAM_SOCKET_ENDPOINT_ENABLED))) {
-			if (parseBoolean(context.getInitParameter(PARAM_ENABLE_SOCKET_ENDPOINT))) { // TODO: remove in OmniFaces 3.0.
-				getLogger(Socket.class.getName()).warning(WARNING_PARAM_DEPRECATED);
-			}
-			else {
-				return;
-			}
+			return;
 		}
 
 		try {

@@ -1380,43 +1380,6 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the original HTTP request URI behind this forwarded request, if any.
-	 * This does not include the request query string.
-	 * @return The original HTTP request URI behind this forwarded request, if any.
-	 * @since 1.8
-	 * @deprecated Since 2.4. This is abstracted away by {@link #getRequestURI()}. Use it instead.
-	 * JSF has as to retrieving request URI no business of knowing if the request is forwarded/rewritten or not.
-	 */
-	@Deprecated // TODO: Remove in OmniFaces 3.0.
-	public static String getForwardRequestURI() {
-		return FacesLocal.getForwardRequestURI(getContext());
-	}
-
-	/**
-	 * Returns the original HTTP request query string behind this forwarded request, if any.
-	 * @return The original HTTP request query string behind this forwarded request, if any.
-	 * @since 1.8
-	 * @deprecated Since 2.4. This is abstracted away by {@link #getRequestQueryString()}. Use it instead.
-	 * JSF has as to retrieving request URI no business of knowing if the request is forwarded/rewritten or not.
-	 */
-	@Deprecated // TODO: Remove in OmniFaces 3.0.
-	public static String getForwardRequestQueryString() {
-		return FacesLocal.getForwardRequestQueryString(getContext());
-	}
-
-	/**
-	 * Returns the original HTTP request URI with query string behind this forwarded request, if any.
-	 * @return The original HTTP request URI with query string behind this forwarded request, if any.
-	 * @since 1.8
-	 * @deprecated Since 2.4. This is abstracted away by {@link #getRequestURIWithQueryString()}. Use it instead.
-	 * JSF has as to retrieving request URI no business of knowing if the request is forwarded/rewritten or not.
-	 */
-	@Deprecated // TODO: Remove in OmniFaces 3.0.
-	public static String getForwardRequestURIWithQueryString() {
-		return FacesLocal.getForwardRequestURIWithQueryString(getContext());
-	}
-
-	/**
 	 * Returns the Internet Protocol (IP) address of the client that sent the request. This will first check the
 	 * <code>X-Forwarded-For</code> request header and if it's present, then return its first IP address, else just
 	 * return {@link HttpServletRequest#getRemoteAddr()} unmodified.

@@ -22,9 +22,7 @@ import static javax.faces.view.facelets.ResourceResolver.FACELETS_RESOURCE_RESOL
 import static javax.servlet.DispatcherType.FORWARD;
 import static javax.servlet.DispatcherType.REQUEST;
 import static org.omnifaces.facesviews.ExtensionAction.REDIRECT_TO_EXTENSIONLESS;
-import static org.omnifaces.facesviews.FacesServletDispatchMethod.DO_FILTER;
 import static org.omnifaces.facesviews.PathAction.SEND_404;
-import static org.omnifaces.facesviews.ViewHandlerMode.STRIP_EXTENSION_FROM_PARENT;
 import static org.omnifaces.util.Faces.getApplicationFromFactory;
 import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.Platform.getFacesServletMappings;
@@ -147,7 +145,6 @@ import org.omnifaces.config.WebXml;
  * @see UriExtensionRequestWrapper
  * @see FacesViewsViewHandlerInstaller
  * @see FacesViewsViewHandler
- * @see ViewHandlerMode
  */
 public final class FacesViews {
 
@@ -196,30 +193,10 @@ public final class FacesViews {
 	public static final String FACES_VIEWS_PATH_ACTION_PARAM_NAME = "org.omnifaces.FACES_VIEWS_PATH_ACTION";
 
 	/**
-	 * The name of the enum context parameter that determines the method used by FacesViews to invoke the FacesServlet.
-	 * See {@link FacesServletDispatchMethod}.
-	 * @see FacesServletDispatchMethod
-	 * @deprecated Since 2.6 As this is superfluous since Servlet 3.0.
-	 * It will default to DO_FILTER and automatically use FORWARD when resource is not mapped.
-	 */
-	@Deprecated // TODO: remove in OmniFaces 3.0.
-	public static final String FACES_VIEWS_DISPATCH_METHOD_PARAM_NAME = "org.omnifaces.FACES_VIEWS_DISPATCH_METHOD";
-
-	/**
 	 * The name of the boolean context parameter via which the user can set whether the
 	 * {@link FacesViewsForwardingFilter} should match before declared filters (false) or after declared filters (true).
 	 */
 	public static final String FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS_PARAM_NAME = "org.omnifaces.FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS";
-
-	/**
-	 * The name of the enum context parameter via which the user can set whether the {@link FacesViewsViewHandler}
-	 * should strip the extension from the parent view handler's outcome or construct the URL itself and only take the
-	 * query parameters (if any) from the parent.
-	 * @see ViewHandlerMode
-	 * @deprecated Since 2.6 As this is superfluous since Servlet 3.0.
-	 */
-	@Deprecated // TODO: remove in OmniFaces 3.0.
-	public static final String FACES_VIEWS_VIEW_HANDLER_MODE_PARAM_NAME = "org.omnifaces.FACES_VIEWS_VIEW_HANDLER_MODE";
 
 
 	// Request attributes ---------------------------------------------------------------------------------------------
@@ -332,12 +309,7 @@ public final class FacesViews {
 
 		Set<String> mappings = new HashSet<>(encounteredExtensions);
 		mappings.addAll(getMappedWelcomeFiles(servletContext));
-
-		if (getFacesServletDispatchMethod(servletContext) == DO_FILTER) {
-			// In order for the DO_FILTER method to work the FacesServlet, in addition the forward filter,
-			// has to be mapped on all extensionless resources.
-			mappings.addAll(filterExtension(getMappedResources(servletContext).keySet()));
-		}
+		mappings.addAll(filterExtension(getMappedResources(servletContext).keySet()));
 
 		ServletRegistration facesServletRegistration = getFacesServletRegistration(servletContext);
 
@@ -586,10 +558,6 @@ public final class FacesViews {
 		return getEnumInitParameter(servletContext, FACES_VIEWS_PATH_ACTION_PARAM_NAME, PathAction.class, SEND_404);
 	}
 
-	static FacesServletDispatchMethod getFacesServletDispatchMethod(ServletContext servletContext) {
-		return getEnumInitParameter(servletContext, FACES_VIEWS_DISPATCH_METHOD_PARAM_NAME, FacesServletDispatchMethod.class, DO_FILTER);
-	}
-
 	static boolean isResourceInPublicPath(ServletContext servletContext, String resource) {
 		for (String path : getPublicRootPaths(servletContext)) {
 			if (resource.startsWith(path)) {
@@ -617,10 +585,6 @@ public final class FacesViews {
 	static boolean isScannedViewsAlwaysExtensionless(ServletContext servletContext) {
 		String alwaysExtensionless = servletContext.getInitParameter(FACES_VIEWS_SCANNED_VIEWS_EXTENSIONLESS_PARAM_NAME);
 		return isEmpty(alwaysExtensionless) || parseBoolean(alwaysExtensionless);
-	}
-
-	static ViewHandlerMode getViewHandlerMode(ServletContext servletContext) {
-		return getEnumInitParameter(servletContext, FACES_VIEWS_VIEW_HANDLER_MODE_PARAM_NAME, ViewHandlerMode.class, STRIP_EXTENSION_FROM_PARENT);
 	}
 
 	@SuppressWarnings("unchecked")
