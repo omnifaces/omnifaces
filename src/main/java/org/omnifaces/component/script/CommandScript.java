@@ -91,7 +91,9 @@ import org.omnifaces.util.State;
  *
  * @author Bauke Scholtz
  * @since 1.3
+ * @deprecated Since 3.0 as this has been added to JSF 2.3 as <code>h:commandScript</code>.
  */
+@Deprecated
 @FacesComponent(CommandScript.COMPONENT_TYPE)
 @ResourceDependencies({
 	@ResourceDependency(library="javax.faces", name="jsf.js", target="head"), // Required for jsf.ajax.request.
