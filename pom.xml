@@ -463,10 +463,6 @@
 						<artifactId>maven-dependency-plugin</artifactId>
 						<executions>
 							<execution>
-								<id>unpack-wildfly</id>
-								<goals>
-									<goal>unpack</goal>
-								</goals>
 								<configuration>
 									<artifactItems>
 										<artifactItem>
@@ -525,7 +521,7 @@
 		<profile>
 			<id>payara</id>
 			<activation>
-				<activeByDefault>true</activeByDefault>
+				<activeByDefault>true</activeByDefault><!-- TODO: remove once figured out how to upgrade WildFly to JSF 2.3 via Maven -->
 			</activation>
 			<dependencies>
 				<dependency>
