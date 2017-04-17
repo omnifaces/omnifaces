@@ -533,21 +533,6 @@ public final class Components {
 		 * Invokes the given operation on the components as specified by the
 		 * query parameters set via this builder.
 		 *
-		 * @param <C> The expected component type.
-		 * @param operation the operation to invoke on each component
-		 * @throws ClassCastException When <code>C</code> is of wrong type.
-		 */
-		@SuppressWarnings("unchecked")
-		public <C extends UIComponent> void invoke(final Callback.ReturningWithArgument<VisitResult, C> operation) {
-			invoke((context, target) -> {
-				return operation.invoke((C) target);
-			});
-		}
-
-		/**
-		 * Invokes the given operation on the components as specified by the
-		 * query parameters set via this builder.
-		 *
 		 * @param operation the operation to invoke on each component
 		 */
 		public void invoke(final VisitCallback operation) {
