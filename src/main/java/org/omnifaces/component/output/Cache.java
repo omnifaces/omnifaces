@@ -180,17 +180,16 @@ public class Cache extends OutputFamily {
 	}
 
 	public Cache() {
-		final FacesContext context = FacesContext.getCurrentInstance();
+		FacesContext context = FacesContext.getCurrentInstance();
 
 		// Execute the following code in PreRenderView, since at construction time the "useBuffer" and "key" attributes
 		// have not been set, and there is no @PostContruct for UIComponents.
 		subscribeToViewEvent(PRE_RENDER, () -> processPreRenderViewEvent(context));
 	}
 
-	private void processPreRenderViewEvent(final FacesContext context) {
+	private void processPreRenderViewEvent(FacesContext context) {
 		if (!isDisabled() && isUseBuffer() && !hasCachedValue(context)) {
-
-			final BufferedHttpServletResponse bufferedResponse = getRequestAttribute(BUFFERED_RESPONSE);
+			BufferedHttpServletResponse bufferedResponse = getRequestAttribute(BUFFERED_RESPONSE);
 
 			if (bufferedResponse == null) {
 				throw new IllegalStateException(ERROR_NO_BUFFERED_RESPONSE);

@@ -1588,11 +1588,10 @@ public final class FacesLocal {
 	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
 	 * redeclare it in the action method. The servletcontainer will handle it.
 	 */
-	private static void sendFile
-		(final FacesContext context, final InputStream input, String filename, final long contentLength, boolean attachment)
-			throws IOException
+	private static void sendFile(FacesContext context, InputStream input, String filename, long contentLength, boolean attachment)
+		throws IOException
 	{
-		sendFile(context, filename, attachment, (output) -> {
+		sendFile(context, filename, attachment, output -> {
 			ExternalContext externalContext = context.getExternalContext();
 
 			// If content length is known, set it. Note that setResponseContentLength() cannot be used as it takes only int.

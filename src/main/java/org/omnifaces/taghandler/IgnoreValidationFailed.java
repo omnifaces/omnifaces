@@ -85,7 +85,7 @@ public class IgnoreValidationFailed extends TagHandler {
 	 * @throws IllegalStateException When the parent component is not an instance of {@link UICommand}.
 	 */
 	@Override
-	public void apply(FaceletContext context, final UIComponent parent) throws IOException {
+	public void apply(FaceletContext context, UIComponent parent) throws IOException {
 		if (!(parent instanceof UICommand)) {
 			throw new IllegalStateException(ERROR_INVALID_PARENT);
 		}

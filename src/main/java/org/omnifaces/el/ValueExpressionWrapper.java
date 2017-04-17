@@ -19,7 +19,7 @@ import javax.faces.FacesWrapper;
 
 public class ValueExpressionWrapper extends ValueExpression implements FacesWrapper<ValueExpression>  {
 
-	private static final long serialVersionUID = -6864367137534689191L;
+	private static final long serialVersionUID = 1L;
 
 	private ValueExpression valueExpression;
 

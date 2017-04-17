@@ -25,7 +25,7 @@ public class ListTreeModel<T> extends AbstractTreeModel<T> {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 275741310298761716L;
+	private static final long serialVersionUID = 1L;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 

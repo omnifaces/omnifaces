@@ -19,7 +19,6 @@ import static org.omnifaces.util.Facelets.getStringLiteral;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -196,12 +195,7 @@ public class ImportFunctions extends TagHandler {
 		 * @return The found method, or <code>null</code> if none is found.
 		 */
 		private static Method findMethod(Class<?> cls, String name) {
-			Set<Method> methods = new TreeSet<>(new Comparator<Method>() {
-				@Override
-				public int compare(Method m1, Method m2) {
-					return Integer.valueOf(m1.getParameterTypes().length).compareTo(m2.getParameterTypes().length);
-				}
-			});
+			Set<Method> methods = new TreeSet<>((Method m1, Method m2) -> Integer.valueOf(m1.getParameterCount()).compareTo(m2.getParameterCount()));
 
 			for (Method method : cls.getDeclaredMethods()) {
 				if (method.getName().equals(name) && isPublicStaticNonVoid(method)) {

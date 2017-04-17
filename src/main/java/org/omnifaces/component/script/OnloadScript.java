@@ -112,7 +112,7 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 		ResponseWriter originalResponseWriter = context.getResponseWriter();
 		String encoding = context.getExternalContext().getRequestCharacterEncoding();
 		context.getExternalContext().setResponseCharacterEncoding(encoding);
-		final ResponseWriter writer = context.getRenderKit().createResponseWriter(buffer, null, encoding);
+		ResponseWriter writer = context.getRenderKit().createResponseWriter(buffer, null, encoding);
 		context.setResponseWriter(new ResponseWriterWrapper(writer) {
 			@Override
 			public void writeText(Object text, String property) throws IOException {

@@ -247,7 +247,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 	listener = builder.listener;
 	pendingNotifications = (listener == DiscardingListener.INSTANCE)
 		? (Queue<Node>) DISCARDING_QUEUE
-		: new ConcurrentLinkedQueue<Node>();
+		: new ConcurrentLinkedQueue<>();
   }
 
   /** Ensures that the object is not null. */
@@ -1517,6 +1517,9 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 	return new SerializationProxy<>(this);
   }
 
+  /**
+   * @param stream
+   */
   private void readObject(ObjectInputStream stream) throws InvalidObjectException {
 	throw new InvalidObjectException("Proxy required");
   }
@@ -1664,7 +1667,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V>
 	public Builder<K, V> weigher(Weigher<? super V> weigher) {
 	  this.weigher = (weigher == Weighers.singleton())
 		  ? Weighers.<K, V>entrySingleton()
-		  : new BoundedEntryWeigher<K, V>(Weighers.asEntryWeigher(weigher));
+		  : new BoundedEntryWeigher<>(Weighers.asEntryWeigher(weigher));
 	  return this;
 	}
 

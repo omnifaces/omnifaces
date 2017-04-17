@@ -139,7 +139,7 @@ public class ImportConstants extends TagHandler {
 	 * @param type The fully qualified name of the type to collect constants for.
 	 * @return Constants of the given type.
 	 */
-	private static Map<String, Object> collectConstants(final String type) {
+	private static Map<String, Object> collectConstants(String type) {
 		Map<String, Object> constants = new LinkedHashMap<>();
 
 		for (Field field : toClass(type).getFields()) {
@@ -176,7 +176,7 @@ public class ImportConstants extends TagHandler {
 	 */
 	private static class ConstantsMap extends MapWrapper<String, Object> {
 
-		private static final long serialVersionUID = -7699617036767530156L;
+		private static final long serialVersionUID = 1L;
 
 		private String type;
 

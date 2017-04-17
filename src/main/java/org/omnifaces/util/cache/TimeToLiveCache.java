@@ -28,7 +28,7 @@ import java.util.Map;
  */
 public abstract class TimeToLiveCache implements Cache {
 
-	private static final long serialVersionUID = 6637500586287606410L;
+	private static final long serialVersionUID = 1L;
 
 	private final Integer defaultTimeToLive;
 	private Map<String, CacheEntry> cacheStore;

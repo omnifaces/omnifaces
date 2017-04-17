@@ -36,7 +36,7 @@ import org.omnifaces.component.input.ComponentIdParam;
  */
 public class ConditionalWriterListener implements PhaseListener {
 
-	private static final long serialVersionUID = -5527348022747113123L;
+	private static final long serialVersionUID = 1L;
 
 	private final List<String> componentIds;
 	private final List<String> clientIds;

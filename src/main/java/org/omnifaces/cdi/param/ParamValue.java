@@ -35,7 +35,7 @@ import org.omnifaces.cdi.Param;
  */
 public class ParamValue<V> implements Serializable {
 
-	private static final long serialVersionUID = 1l;
+	private static final long serialVersionUID = 1L;
 
 	private final String[] submittedValues;
 	private final Param param;

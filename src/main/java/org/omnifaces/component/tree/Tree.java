@@ -206,7 +206,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @param phaseId The current phase ID.
 	 */
 	@Override
-	protected void process(final FacesContext context, final PhaseId phaseId) {
+	protected void process(FacesContext context, PhaseId phaseId) {
 		if (!isRendered()) {
 			return;
 		}
@@ -224,7 +224,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @return The visit result.
 	 */
 	@Override
-	public boolean visitTree(final VisitContext context, final VisitCallback callback) {
+	public boolean visitTree(VisitContext context, VisitCallback callback) {
 		TreeModel model = getModel(PhaseId.ANY_PHASE);
 
 		if (model.isLeaf()) {
@@ -258,9 +258,9 @@ public class Tree extends TreeFamily implements NamingContainer {
 	@Override
 	public void broadcast(FacesEvent event) {
 		if (event instanceof TreeFacesEvent) {
-			final FacesContext context = FacesContext.getCurrentInstance();
+			FacesContext context = FacesContext.getCurrentInstance();
 			TreeFacesEvent treeEvent = (TreeFacesEvent) event;
-			final FacesEvent wrapped = treeEvent.getWrapped();
+			FacesEvent wrapped = treeEvent.getWrapped();
 
 			process(context, treeEvent.getNode(), () -> {
 				UIComponent source = wrapped.getComponent();
@@ -291,8 +291,8 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @see TreeModel#getLevel()
 	 * @see TreeInsertChildren
 	 */
-	protected void processTreeNode(final FacesContext context, final PhaseId phaseId) {
-		processTreeNode(phaseId, (treeNode) -> {
+	protected void processTreeNode(FacesContext context, PhaseId phaseId) {
+		processTreeNode(phaseId, treeNode -> {
 			if (treeNode != null) {
 				treeNode.process(context, phaseId);
 			}
@@ -312,8 +312,8 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @see TreeModel#getLevel()
 	 * @see TreeInsertChildren
 	 */
-	protected boolean visitTreeNode(final VisitContext context, final VisitCallback callback) {
-		return processTreeNode(PhaseId.ANY_PHASE, (treeNode) -> {
+	protected boolean visitTreeNode(VisitContext context, VisitCallback callback) {
+		return processTreeNode(PhaseId.ANY_PHASE, treeNode -> {
 			if (treeNode != null) {
 				return treeNode.visitTree(context, callback);
 			}
@@ -543,7 +543,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 */
 	private static class TreeFacesEvent extends FacesEventWrapper {
 
-		private static final long serialVersionUID = -7751061713837227515L;
+		private static final long serialVersionUID = 1L;
 
 		private TreeModel node;
 

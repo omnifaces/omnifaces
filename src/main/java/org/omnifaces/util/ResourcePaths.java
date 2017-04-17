@@ -38,7 +38,7 @@ public final class ResourcePaths {
 	 *            the resource path to check
 	 * @return true if the resource path represents a directory, false otherwise
 	 */
-	public static boolean isDirectory(final String resourcePath) {
+	public static boolean isDirectory(String resourcePath) {
 		return resourcePath.endsWith("/");
 	}
 
@@ -49,7 +49,7 @@ public final class ResourcePaths {
 	 * @param resource The resource to strip the prefix from.
 	 * @return the resource without the prefix path, or as-is if it didn't start with this prefix.
 	 */
-	public static String stripPrefixPath(final String prefix, final String resource) {
+	public static String stripPrefixPath(String prefix, String resource) {
 		String normalizedResource = resource;
 		if (normalizedResource.startsWith(prefix)) {
 			normalizedResource = normalizedResource.substring(prefix.length() - 1);
@@ -76,7 +76,7 @@ public final class ResourcePaths {
 	 * @param resource The resource to strip the extension from.
 	 * @return the resource without its extension, of as-is if it doesn't have an extension.
 	 */
-	public static String stripExtension(final String resource) {
+	public static String stripExtension(String resource) {
 		String normalizedResource = resource;
 		int lastPeriod = resource.lastIndexOf('.');
 		if (lastPeriod != -1) {
@@ -93,7 +93,7 @@ public final class ResourcePaths {
 	 * @param resource The resource to get the extension from.
 	 * @return the extension of the resource, or null if it doesn't have an extension.
 	 */
-	public static String getExtension(final String resource) {
+	public static String getExtension(String resource) {
 		String extension = null;
 		int lastPeriod = resource.lastIndexOf('.');
 		if (lastPeriod != -1) {
@@ -103,7 +103,7 @@ public final class ResourcePaths {
 		return extension;
 	}
 
-	public static boolean isExtensionless(final String viewId) {
+	public static boolean isExtensionless(String viewId) {
 		return viewId != null && !viewId.contains(".");
 	}
 

@@ -118,10 +118,10 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
 	}
 
 	private void addValidator(FaceletContext context, EditableValueHolder parent) {
-		final javax.faces.validator.Validator<Object> validator = createInstance(context, this, "validatorId");
-		final DeferredAttributes attributes = collectDeferredAttributes(context, this, validator);
-		final ValueExpression disabled = getValueExpression(context, this, "disabled", Boolean.class);
-		final ValueExpression message = getValueExpression(context, this, "message", String.class);
+		javax.faces.validator.Validator<Object> validator = createInstance(context, this, "validatorId");
+		DeferredAttributes attributes = collectDeferredAttributes(context, this, validator);
+		ValueExpression disabled = getValueExpression(context, this, "disabled", Boolean.class);
+		ValueExpression message = getValueExpression(context, this, "message", String.class);
 
 		parent.addValidator(new DeferredValidator() {
 			private static final long serialVersionUID = 1L;

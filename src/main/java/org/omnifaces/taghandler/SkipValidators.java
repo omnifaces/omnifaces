@@ -97,7 +97,7 @@ public class SkipValidators extends TagHandler {
 	 * {@link ClientBehaviorHolder}.
 	 */
 	@Override
-	public void apply(FaceletContext context, final UIComponent parent) throws IOException {
+	public void apply(FaceletContext context, UIComponent parent) throws IOException {
 		if (!(parent instanceof UICommand || parent instanceof ClientBehaviorHolder)) {
 			throw new IllegalStateException(ERROR_INVALID_PARENT);
 		}

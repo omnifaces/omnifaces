@@ -193,7 +193,7 @@ public class ViewParamValidationFailed extends TagHandler {
 	 * missing or simultaneously specified.
 	 */
 	@Override
-	public void apply(FaceletContext context, final UIComponent parent) throws IOException {
+	public void apply(FaceletContext context, UIComponent parent) throws IOException {
 		if (!(parent instanceof UIViewRoot || parent instanceof UIViewParameter)) {
 			throw new IllegalStateException(format(ERROR_INVALID_PARENT, this, parent.getClass().getName()));
 		}
@@ -215,7 +215,7 @@ public class ViewParamValidationFailed extends TagHandler {
 			throw new IllegalArgumentException(format(ERROR_DOUBLE_ATTRIBUTE, this));
 		}
 
-		subscribeToRequestComponentEvent(parent, PostValidateEvent.class, (event) -> processViewParamValidationFailed(event));
+		subscribeToRequestComponentEvent(parent, PostValidateEvent.class, this::processViewParamValidationFailed);
 	}
 
 	/**

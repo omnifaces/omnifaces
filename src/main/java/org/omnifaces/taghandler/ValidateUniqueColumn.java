@@ -108,7 +108,7 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
 	 * change listener on it. If the component is not new, check if there's an {@link UIData} parent.
 	 */
 	@Override
-	public void apply(FaceletContext context, final UIComponent parent) throws IOException {
+	public void apply(FaceletContext context, UIComponent parent) throws IOException {
 		if (!ComponentHandler.isNew(parent)) {
 			if (getClosestParent(parent, UIData.class) == null) {
 				throw new IllegalArgumentException(ERROR_INVALID_PARENT_PARENT);

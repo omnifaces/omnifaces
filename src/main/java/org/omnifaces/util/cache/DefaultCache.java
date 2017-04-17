@@ -31,7 +31,7 @@ import org.omnifaces.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
  */
 public class DefaultCache extends TimeToLiveCache {
 
-	private static final long serialVersionUID = 9043165102510796018L;
+	private static final long serialVersionUID = 1L;
 
 	public DefaultCache(Integer defaultTimeToLive, Integer maxCapacity) {
 		super(defaultTimeToLive);

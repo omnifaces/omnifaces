@@ -23,7 +23,7 @@ import javax.faces.model.SelectItem;
  */
 public class ExtendedSelectItem extends SelectItem {
 
-	private static final long serialVersionUID = -3266902732567582732L;
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * <p>Construct a <code>SelectItem</code> with no initialized property
@@ -42,12 +42,24 @@ public class ExtendedSelectItem extends SelectItem {
 	public ExtendedSelectItem(UISelectItem uiSelectItem) {
 		super(
 			uiSelectItem.getItemValue(),
-			uiSelectItem.getItemLabel() != null ? uiSelectItem.getItemLabel() : uiSelectItem.getItemValue() != null ? uiSelectItem.getItemValue().toString() : null,
+			getItemLabel(uiSelectItem),
 			uiSelectItem.getItemDescription(),
 			uiSelectItem.isItemDisabled(),
 			uiSelectItem.isItemEscaped(),
 			uiSelectItem.isNoSelectionOption()
 		);
+	}
+
+	private static String getItemLabel(UISelectItem uiSelectItem) {
+		if (uiSelectItem.getItemLabel() != null) {
+			return uiSelectItem.getItemLabel();
+		}
+		else if (uiSelectItem.getItemValue() != null) {
+			return uiSelectItem.getItemValue().toString();
+		}
+		else {
+			return null;
+		}
 	}
 
 }

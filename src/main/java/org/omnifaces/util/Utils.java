@@ -838,6 +838,25 @@ public final class Utils {
 			.replace("%7E", "~");
 	}
 
+	/**
+	 * Format given URL with given query string. If given URL is empty, assume <code>/</code> as URL. If given query
+	 * string is empty, return URL right away. If given URL contains a <code>?</code>, prepend query string with
+	 * <code>&amp;</code>, else with <code>?</code>. Finally append query string to URL and return it.
+	 * @param url URL to be formatted with given query string.
+	 * @param queryString Query string to be appended to given URL.
+	 * @return Formatted URL with query string.
+	 * @since 3.0
+	 */
+	public static String formatURLWithQueryString(String url, String queryString) {
+		String normalizedURL = url.isEmpty() ? "/" : url;
+
+		if (isEmpty(queryString)) {
+			return normalizedURL;
+		}
+
+		return normalizedURL + (normalizedURL.contains("?") ? "&" : "?") + queryString;
+	}
+
 	// Escaping/unescaping --------------------------------------------------------------------------------------------
 
 	/**

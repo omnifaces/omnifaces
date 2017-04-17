@@ -33,7 +33,7 @@ import org.omnifaces.el.ValueExpressionWrapper;
  */
 public class CachingValueExpression extends ValueExpressionWrapper {
 
-	private static final long serialVersionUID = -3172741983469325940L;
+	private static final long serialVersionUID = 1L;
 
 	private final String name;
 	private final transient Cache cache;

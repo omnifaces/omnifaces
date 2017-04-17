@@ -393,7 +393,7 @@ public class GraphicResource extends DynamicResource {
 			Converter<Object> converter = createConverter(context, types[i]);
 			strings[i] = (converter != null)
 				? converter.getAsString(context, dummyComponent, value)
-				: (value != null) ? value.toString() : "";
+				: coalesce(value, "").toString();
 		}
 
 		return strings;

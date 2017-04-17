@@ -33,7 +33,7 @@ import org.omnifaces.eventlistener.DefaultPhaseListener;
  */
 public class EagerBeansPhaseListener extends DefaultPhaseListener {
 
-	private static final long serialVersionUID = -7252366571645029385L;
+	private static final long serialVersionUID = 1L;
 
 	private boolean hasAnyViewIdBeans;
 

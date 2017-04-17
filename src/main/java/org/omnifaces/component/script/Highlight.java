@@ -121,7 +121,7 @@ public class Highlight extends OnloadScript {
 			return;
 		}
 
-		final StringBuilder clientIds = new StringBuilder();
+		StringBuilder clientIds = new StringBuilder();
 		form.visitTree(VisitContext.createVisitContext(context, null, VISIT_HINTS), (visitContext, component) -> {
 			if (component instanceof UIInput && !((UIInput) component).isValid()) {
 				if (clientIds.length() > 0) {

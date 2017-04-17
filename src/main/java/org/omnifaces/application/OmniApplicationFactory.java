@@ -66,7 +66,7 @@ public class OmniApplicationFactory extends ApplicationFactory {
 	 * it will be wrapped by a new instance of {@link OmniApplication} and set as the current instance and returned.
 	 * Additionally, it will check if all Application implementations properly extend from ApplicationWrapper.
 	 */
-	private synchronized Application createOmniApplication(final Application application) {
+	private synchronized Application createOmniApplication(Application application) {
 		Application newApplication = application;
 
 		while (!(newApplication instanceof OmniApplication) && newApplication instanceof ApplicationWrapper) {

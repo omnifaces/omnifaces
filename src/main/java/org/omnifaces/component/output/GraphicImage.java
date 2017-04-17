@@ -253,9 +253,14 @@ public class GraphicImage extends HtmlGraphicImage {
 			}
 		}
 
+		String url = context.getExternalContext().encodeResourceURL(resource.getRequestPath());
 		String fragment = (String) getAttributes().get("fragment");
-		String fragmentString = dataURI || isEmpty(fragment) ? "" : ((fragment.charAt(0) == '#' ? "" : "#") + fragment);
-		return context.getExternalContext().encodeResourceURL(resource.getRequestPath()) + fragmentString;
+
+		if (dataURI || isEmpty(fragment)) {
+			return url;
+		}
+
+		return url + (fragment.charAt(0) == '#' ? "" : "#") + fragment;
 	}
 
 	private Resource createGraphicResourceByName(FacesContext context, String name, boolean dataURI) throws IOException {

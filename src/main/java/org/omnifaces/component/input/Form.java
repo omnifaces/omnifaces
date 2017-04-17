@@ -22,7 +22,7 @@ import static org.omnifaces.util.FacesLocal.getRequestAttribute;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
 import static org.omnifaces.util.FacesLocal.getRequestURI;
 import static org.omnifaces.util.Servlets.toQueryString;
-import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.formatURLWithQueryString;
 
 import java.io.IOException;
 
@@ -326,7 +326,7 @@ public class Form extends HtmlForm {
 		public String getActionURL(FacesContext context, String viewId) {
 			String actionURL = form.isUseRequestURI() ? getActionURL(context) : getWrapped().getActionURL(context, viewId);
 			String queryString = toQueryString(getParams(form, form.isUseRequestURI() || form.isIncludeRequestParams(), form.isIncludeViewParams()));
-			return isEmpty(queryString) ? actionURL : (actionURL + (actionURL.contains("?") ? "&" : "?") + queryString);
+			return formatURLWithQueryString(actionURL, queryString);
 		}
 
 		private String getActionURL(FacesContext context) {

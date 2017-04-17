@@ -225,8 +225,8 @@ public final class Events {
 	 * @see UIComponent#subscribeToEvent(Class, ComponentSystemEventListener)
 	 * @see #unsubscribeFromComponentEvent(UIComponent, Class, ComponentSystemEventListener)
 	 */
-	public static void subscribeToRequestComponentEvent(final UIComponent component,
-		final Class<? extends ComponentSystemEvent> type, final Callback.WithArgument<ComponentSystemEvent> callback)
+	public static void subscribeToRequestComponentEvent
+		(UIComponent component, Class<? extends ComponentSystemEvent> type, Callback.WithArgument<ComponentSystemEvent> callback)
 	{
 		component.subscribeToEvent(type, new ComponentSystemEventListener() {
 
@@ -315,7 +315,7 @@ public final class Events {
 	 * @see UIComponent#unsubscribeFromEvent(Class, ComponentSystemEventListener)
 	 */
 	public static void unsubscribeFromComponentEvent
-		(final UIComponent component, final Class<? extends SystemEvent> event, final ComponentSystemEventListener listener)
+		(UIComponent component, Class<? extends SystemEvent> event, ComponentSystemEventListener listener)
 	{
 		PhaseId currentPhaseId = getCurrentPhaseId();
 
@@ -328,15 +328,15 @@ public final class Events {
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
-	private static <A> Callback.WithArgument<A> wrap(final Callback.Void callback) {
-		return (argument) -> callback.invoke();
+	private static <A> Callback.WithArgument<A> wrap(Callback.Void callback) {
+		return argument -> callback.invoke();
 	}
 
-	private static <A> Callback.SerializableWithArgument<A> wrap(final Callback.SerializableVoid callback) {
-		return (argument) -> callback.invoke();
+	private static <A> Callback.SerializableWithArgument<A> wrap(Callback.SerializableVoid callback) {
+		return argument -> callback.invoke();
 	}
 
-	private static SystemEventListener createSystemEventListener(final Callback.SerializableWithArgument<SystemEvent> callback) {
+	private static SystemEventListener createSystemEventListener(Callback.SerializableWithArgument<SystemEvent> callback) {
 		return new DefaultViewEventListener() {
 
 			@Override
@@ -346,7 +346,7 @@ public final class Events {
 		};
 	}
 
-	private static PhaseListener createBeforePhaseListener(PhaseId phaseId, final Callback.WithArgument<PhaseEvent> callback) {
+	private static PhaseListener createBeforePhaseListener(PhaseId phaseId, Callback.WithArgument<PhaseEvent> callback) {
 		return new DefaultPhaseListener(phaseId) {
 
 			private static final long serialVersionUID = 1L;
@@ -358,7 +358,7 @@ public final class Events {
 		};
 	}
 
-	private static PhaseListener createAfterPhaseListener(PhaseId phaseId, final Callback.WithArgument<PhaseEvent> callback) {
+	private static PhaseListener createAfterPhaseListener(PhaseId phaseId, Callback.WithArgument<PhaseEvent> callback) {
 		return new DefaultPhaseListener(phaseId) {
 
 			private static final long serialVersionUID = 1L;

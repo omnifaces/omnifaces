@@ -22,7 +22,7 @@ import static org.omnifaces.util.FacesLocal.getRequestURI;
 import static org.omnifaces.util.FacesLocal.setRequestAttribute;
 import static org.omnifaces.util.ResourcePaths.stripTrailingSlash;
 import static org.omnifaces.util.Servlets.toQueryString;
-import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.formatURLWithQueryString;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -192,10 +192,7 @@ public class Url extends OutputFamily {
 	}
 
 	private static String getActionURL(FacesContext context, Map<String, List<String>> params) {
-		String url = getRequestURI(context);
-		url = url.isEmpty() ? "/" : url;
-		String queryString = toQueryString(params);
-		return isEmpty(queryString) ? url : url + (url.contains("?") ? "&" : "?") + queryString;
+		return formatURLWithQueryString(getRequestURI(context), toQueryString(params));
 	}
 
 	// Attribute getters/setters --------------------------------------------------------------------------------------

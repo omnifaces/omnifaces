@@ -44,7 +44,7 @@ public class PostInvokeActionEvent extends ComponentSystemEvent {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 9193343203389936910L;
+	private static final long serialVersionUID = 1L;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 

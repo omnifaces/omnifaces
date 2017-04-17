@@ -68,23 +68,21 @@ public class ValidateOrder extends ValidateMultipleFields {
 	// Private constants ----------------------------------------------------------------------------------------------
 
 	private enum Type {
-		LT((values) -> {
-			return new ArrayList<>(new TreeSet<>(values)).equals(values);
-		}),
+		LT(values -> new ArrayList<>(new TreeSet<>(values)).equals(values)),
 
-		LTE((values) -> {
+		LTE(values -> {
 			List<Comparable> sortedValues = new ArrayList<>(values);
 			Collections.sort(sortedValues);
 			return sortedValues.equals(values);
 		}),
 
-		GT((values) -> {
+		GT(values -> {
 			List<Comparable> sortedValues = new ArrayList<>(new TreeSet<>(values));
 			Collections.reverse(sortedValues);
 			return sortedValues.equals(values);
 		}),
 
-		GTE((values) -> {
+		GTE(values -> {
 			List<Comparable> sortedValues = new ArrayList<>(values);
 			Collections.sort(sortedValues, Collections.reverseOrder());
 			return sortedValues.equals(values);

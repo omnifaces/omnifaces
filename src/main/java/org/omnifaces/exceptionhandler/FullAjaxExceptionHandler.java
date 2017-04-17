@@ -524,7 +524,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 		externalContext.setResponseCharacterEncoding(characterEncoding);
 	}
 
-	private void renderErrorPageView(FacesContext context, final HttpServletRequest request, String errorPageLocation)
+	private void renderErrorPageView(FacesContext context, HttpServletRequest request, String errorPageLocation)
 		throws IOException
 	{
 		String viewId = getViewIdAndPrepareParamsIfNecessary(context, errorPageLocation);
