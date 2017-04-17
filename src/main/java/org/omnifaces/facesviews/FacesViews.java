@@ -27,10 +27,13 @@ import static org.omnifaces.util.Faces.getApplicationFromFactory;
 import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.Platform.getFacesServletMappings;
 import static org.omnifaces.util.Platform.getFacesServletRegistration;
+import static org.omnifaces.util.ResourcePaths.addLeadingSlashIfNecessary;
+import static org.omnifaces.util.ResourcePaths.addTrailingSlashIfNecessary;
 import static org.omnifaces.util.ResourcePaths.filterExtension;
 import static org.omnifaces.util.ResourcePaths.getExtension;
 import static org.omnifaces.util.ResourcePaths.isDirectory;
 import static org.omnifaces.util.ResourcePaths.isExtensionless;
+import static org.omnifaces.util.ResourcePaths.isRoot;
 import static org.omnifaces.util.ResourcePaths.stripExtension;
 import static org.omnifaces.util.ResourcePaths.stripPrefixPath;
 import static org.omnifaces.util.ResourcePaths.stripTrailingSlash;
@@ -374,11 +377,7 @@ public final class FacesViews {
 
 		for (String welcomeFile : WebXml.INSTANCE.init(servletContext).getWelcomeFiles()) {
 			if (isExtensionless(welcomeFile)) {
-				if (!welcomeFile.startsWith("/")) {
-					welcomeFile = "/" + welcomeFile;
-				}
-
-				mappedWelcomeFiles.add(stripTrailingSlash(welcomeFile));
+				mappedWelcomeFiles.add(addLeadingSlashIfNecessary(stripTrailingSlash(welcomeFile)));
 			}
 		}
 
@@ -443,7 +442,7 @@ public final class FacesViews {
 			for (String[] rootPathAndExtension : getRootPathsAndExtensions(servletContext)) {
 				String rootPath = rootPathAndExtension[0];
 
-				if (!"/".equals(rootPath) && !startsWithOneOf(rootPath, RESTRICTED_DIRECTORIES)) {
+				if (!isRoot(rootPath) && !startsWithOneOf(rootPath, RESTRICTED_DIRECTORIES)) {
 					publicRootPaths.add(rootPath);
 				}
 			}
@@ -518,21 +517,11 @@ public final class FacesViews {
 	}
 
 	private static String normalizeRootPath(String rootPath) {
-		String normalizedPath = rootPath;
-
-		if (!normalizedPath.startsWith("/")) {
-			normalizedPath = "/" + normalizedPath;
-		}
-
-		if (!normalizedPath.endsWith("/")) {
-			normalizedPath = normalizedPath + "/";
-		}
-
-		return normalizedPath;
+		return addLeadingSlashIfNecessary(addTrailingSlashIfNecessary(rootPath));
 	}
 
 	private static boolean canScanDirectory(String rootPath, String directory) {
-		if (!"/".equals(rootPath)) {
+		if (!isRoot(rootPath)) {
 			// If a user has explicitly asked for scanning anything other than /, every sub directory of it can be scanned.
 			return true;
 		}
@@ -656,7 +645,7 @@ public final class FacesViews {
 		Set<String> multiviewsPaths = getApplicationAttribute(servletContext, MULTIVIEWS_PATHS);
 
 		if (multiviewsPaths != null) {
-			String path = resource + "/";
+			String path = addTrailingSlashIfNecessary(resource);
 
 			for (String multiviewsPath : multiviewsPaths) {
 				if (path.startsWith(multiviewsPath)) {
@@ -725,7 +714,7 @@ public final class FacesViews {
 	public static String stripWelcomeFilePrefix(ServletContext servletContext, String resource) {
 		for (String mappedWelcomeFile : getMappedWelcomeFiles(servletContext)) {
 			if (resource.endsWith(mappedWelcomeFile)) {
-				return resource.substring(0, resource.length() - mappedWelcomeFile.length()) + "/";
+				return addTrailingSlashIfNecessary(resource.substring(0, resource.length() - mappedWelcomeFile.length()));
 			}
 		}
 
