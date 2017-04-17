@@ -39,7 +39,6 @@ import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
 
 import org.omnifaces.component.validator.ValidateMultipleFields;
-import org.omnifaces.util.Callback;
 
 /**
  * <p>
@@ -111,9 +110,7 @@ public class SkipValidators extends TagHandler {
 
 		// We can't use hasInvokedSubmit() before the component is added to view, because the client ID isn't available.
 		// Hence, we subscribe this check to after phase of restore view.
-		subscribeToRequestAfterPhase(RESTORE_VIEW, new Callback.Void() { @Override public void invoke() {
-			processSkipValidators(parent);
-		}});
+		subscribeToRequestAfterPhase(RESTORE_VIEW, () -> processSkipValidators(parent));
 	}
 
 	/**

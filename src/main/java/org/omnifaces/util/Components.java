@@ -521,14 +521,11 @@ public final class Components {
 		 * @param operation the operation to invoke on each component
 		 * @throws ClassCastException When <code>C</code> is of wrong type.
 		 */
+		@SuppressWarnings("unchecked")
 		public <C extends UIComponent> void invoke(final Callback.WithArgument<C> operation) {
-			invoke(new VisitCallback() {
-				@Override
-				@SuppressWarnings("unchecked")
-				public VisitResult visit(VisitContext context, UIComponent target) {
-					operation.invoke((C) target);
-					return ACCEPT;
-				}
+			invoke((context, target) -> {
+				operation.invoke((C) target);
+				return ACCEPT;
 			});
 		}
 
@@ -540,13 +537,10 @@ public final class Components {
 		 * @param operation the operation to invoke on each component
 		 * @throws ClassCastException When <code>C</code> is of wrong type.
 		 */
+		@SuppressWarnings("unchecked")
 		public <C extends UIComponent> void invoke(final Callback.ReturningWithArgument<VisitResult, C> operation) {
-			invoke(new VisitCallback() {
-				@Override
-				@SuppressWarnings("unchecked")
-				public VisitResult visit(VisitContext context, UIComponent target) {
-					return operation.invoke((C) target);
-				}
+			invoke((context, target) -> {
+				return operation.invoke((C) target);
 			});
 		}
 
@@ -565,11 +559,8 @@ public final class Components {
 				viewRoot.visitTree(visitContext, visitCallback);
 			}
 			else {
-				forEachComponent().havingIds(getRoot().getClientId()).invoke(new Callback.WithArgument<UIComponent>() {
-					@Override
-					public void invoke(UIComponent root) {
-						root.visitTree(visitContext, visitCallback);
-					}
+				forEachComponent().havingIds(getRoot().getClientId()).invoke((root) -> {
+					root.visitTree(visitContext, visitCallback);
 				});
 			}
 		}
@@ -956,21 +947,18 @@ public final class Components {
 	public static String getOptionalLabel(final UIComponent component) {
 		final Object[] result = new Object[1];
 
-		new ScopedRunner(getContext()).with("cc", getCompositeComponentParent(component)).invoke(new Callback.Void() {
-			@Override
-			public void invoke() {
-				Object label = component.getAttributes().get(ATTRIBUTE_LABEL);
+		new ScopedRunner(getContext()).with("cc", getCompositeComponentParent(component)).invoke(() -> {
+			Object label = component.getAttributes().get(ATTRIBUTE_LABEL);
 
-				if (isEmpty(label)) {
-					ValueExpression labelExpression = component.getValueExpression(ATTRIBUTE_LABEL);
+			if (isEmpty(label)) {
+				ValueExpression labelExpression = component.getValueExpression(ATTRIBUTE_LABEL);
 
-					if (labelExpression != null) {
-						label = labelExpression.getValue(getELContext());
-					}
+				if (labelExpression != null) {
+					label = labelExpression.getValue(getELContext());
 				}
-
-				result[0] = label;
 			}
+
+			result[0] = label;
 		});
 
 		return (result[0] != null) ? result[0].toString() : null;
@@ -1195,12 +1183,7 @@ public final class Components {
 	 * @since 2.5
 	 */
 	public static void resetInputs(UIComponent component) {
-		forEachComponent().fromRoot(component).ofTypes(UIInput.class).invoke(new Callback.WithArgument<UIInput>() {
-			@Override
-			public void invoke(UIInput input) {
-				input.resetValue();
-			}
-		});
+		forEachComponent().fromRoot(component).ofTypes(UIInput.class).<UIInput>invoke((input) -> input.resetValue());
 	}
 
 	// Expressions ----------------------------------------------------------------------------------------------------

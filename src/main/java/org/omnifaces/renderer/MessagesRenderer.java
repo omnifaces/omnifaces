@@ -40,7 +40,6 @@ import javax.faces.render.FacesRenderer;
 import javax.faces.render.Renderer;
 
 import org.omnifaces.component.messages.OmniMessages;
-import org.omnifaces.util.Callback;
 
 /**
  * This renderer is the default renderer of {@link OmniMessages}. It's basically copypasted from Mojarra 2.2,
@@ -134,11 +133,8 @@ public class MessagesRenderer extends Renderer {
 			messages.addAll(context.getMessageList(forComponent.getClientId(context)));
 
 			if (!(forComponent instanceof UIInput)) {
-				forEachComponent(context).fromRoot(forComponent).ofTypes(UIInput.class).invoke(new Callback.WithArgument<UIInput>() {
-					@Override
-					public void invoke(UIInput input) {
-						messages.addAll(context.getMessageList(input.getClientId(context)));
-					}
+				forEachComponent(context).fromRoot(forComponent).ofTypes(UIInput.class).invoke((input) -> {
+					messages.addAll(context.getMessageList(input.getClientId(context)));
 				});
 			}
 		}

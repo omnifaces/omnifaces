@@ -47,7 +47,6 @@ import org.omnifaces.io.ResettableBufferedOutputStream;
 import org.omnifaces.io.ResettableBufferedWriter;
 import org.omnifaces.servlet.BufferedHttpServletResponse;
 import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
-import org.omnifaces.util.Callback;
 import org.omnifaces.util.State;
 import org.omnifaces.util.cache.CacheEntry;
 import org.omnifaces.util.cache.CacheFactory;
@@ -185,14 +184,7 @@ public class Cache extends OutputFamily {
 
 		// Execute the following code in PreRenderView, since at construction time the "useBuffer" and "key" attributes
 		// have not been set, and there is no @PostContruct for UIComponents.
-		subscribeToViewEvent(PRE_RENDER, new Callback.SerializableVoid() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void invoke() {
-				processPreRenderViewEvent(context);
-			}
-		});
+		subscribeToViewEvent(PRE_RENDER, () -> processPreRenderViewEvent(context));
 	}
 
 	private void processPreRenderViewEvent(final FacesContext context) {
@@ -209,12 +201,7 @@ public class Cache extends OutputFamily {
 
 			// After the RENDER_RESPONSE phase, copy the area we need to cache from the response buffer
 			// and insert it into our cache
-			subscribeToRequestAfterPhase(RENDER_RESPONSE, new Callback.Void() {
-				@Override
-				public void invoke() {
-					processPostRenderResponsePhase(context, bufferedResponse);
-				}
-			});
+			subscribeToRequestAfterPhase(RENDER_RESPONSE, () -> processPostRenderResponsePhase(context, bufferedResponse));
 		}
 	}
 

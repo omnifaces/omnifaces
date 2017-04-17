@@ -211,13 +211,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 			return;
 		}
 
-		process(context, getModel(phaseId), new Callback.Returning<Void>() {
-			@Override
-			public Void invoke() {
-				processTreeNode(context, phaseId);
-				return null;
-			}
-		});
+		process(context, getModel(phaseId), () -> processTreeNode(context, phaseId));
 	}
 
 	/**
@@ -238,21 +232,18 @@ public class Tree extends TreeFamily implements NamingContainer {
 			return false;
 		}
 
-		return process(context.getFacesContext(), model, new Callback.Returning<Boolean>() {
-			@Override
-			public Boolean invoke() {
-				VisitResult result = context.invokeVisitCallback(Tree.this, callback);
+		return process(context.getFacesContext(), model, () -> {
+			VisitResult result = context.invokeVisitCallback(Tree.this, callback);
 
-				if (result == VisitResult.COMPLETE) {
-					return true;
-				}
-
-				if (result == VisitResult.ACCEPT && !context.getSubtreeIdsToVisit(Tree.this).isEmpty()) {
-					return visitTreeNode(context, callback);
-				}
-
-				return false;
+			if (result == VisitResult.COMPLETE) {
+				return true;
 			}
+
+			if (result == VisitResult.ACCEPT && !context.getSubtreeIdsToVisit(Tree.this).isEmpty()) {
+				return visitTreeNode(context, callback);
+			}
+
+			return false;
 		});
 	}
 
@@ -268,21 +259,18 @@ public class Tree extends TreeFamily implements NamingContainer {
 			TreeFacesEvent treeEvent = (TreeFacesEvent) event;
 			final FacesEvent wrapped = treeEvent.getWrapped();
 
-			process(context, treeEvent.getNode(), new Callback.Returning<Void>() {
-				@Override
-				public Void invoke() {
-					UIComponent source = wrapped.getComponent();
-					pushComponentToEL(context, getCompositeComponentParent(source));
+			process(context, treeEvent.getNode(), () -> {
+				UIComponent source = wrapped.getComponent();
+				pushComponentToEL(context, getCompositeComponentParent(source));
 
-					try {
-						source.broadcast(wrapped);
-					}
-					finally {
-						popComponentFromEL(context);
-					}
-
-					return null;
+				try {
+					source.broadcast(wrapped);
 				}
+				finally {
+					popComponentFromEL(context);
+				}
+
+				return null;
 			});
 		}
 		else {
@@ -300,16 +288,13 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @see TreeModel#getLevel()
 	 * @see TreeInsertChildren
 	 */
-	protected void processTreeNode(final FacesContext context, final PhaseId phaseId) {
-		processTreeNode(phaseId, new Callback.ReturningWithArgument<Void, TreeNode>() {
-			@Override
-			public Void invoke(TreeNode treeNode) {
-				if (treeNode != null) {
-					treeNode.process(context, phaseId);
-				}
-
-				return null;
+	protected <R> R processTreeNode(final FacesContext context, final PhaseId phaseId) {
+		return processTreeNode(phaseId, (treeNode) -> {
+			if (treeNode != null) {
+				treeNode.process(context, phaseId);
 			}
+
+			return (R) null;
 		});
 	}
 
@@ -325,15 +310,12 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @see TreeInsertChildren
 	 */
 	protected boolean visitTreeNode(final VisitContext context, final VisitCallback callback) {
-		return processTreeNode(PhaseId.ANY_PHASE, new Callback.ReturningWithArgument<Boolean, TreeNode>() {
-			@Override
-			public Boolean invoke(TreeNode treeNode) {
-				if (treeNode != null) {
-					return treeNode.visitTree(context, callback);
-				}
-
-				return false;
+		return processTreeNode(PhaseId.ANY_PHASE, (treeNode) -> {
+			if (treeNode != null) {
+				return treeNode.visitTree(context, callback);
 			}
+
+			return false;
 		});
 	}
 

@@ -42,7 +42,6 @@ import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
 
-import org.omnifaces.util.Callback;
 import org.omnifaces.util.Faces;
 
 /**
@@ -216,12 +215,7 @@ public class ViewParamValidationFailed extends TagHandler {
 			throw new IllegalArgumentException(format(ERROR_DOUBLE_ATTRIBUTE, this));
 		}
 
-		subscribeToRequestComponentEvent(parent, PostValidateEvent.class, new Callback.WithArgument<ComponentSystemEvent>() {
-			@Override
-			public void invoke(ComponentSystemEvent event) {
-				processViewParamValidationFailed(event);
-			}
-		});
+		subscribeToRequestComponentEvent(parent, PostValidateEvent.class, (event) -> processViewParamValidationFailed(event));
 	}
 
 	/**

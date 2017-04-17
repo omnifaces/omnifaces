@@ -40,29 +40,20 @@ import org.omnifaces.eventlistener.DefaultViewEventListener;
  * Some examples:
  * <pre>
  * // Add a callback to the current view which should run during every after phase of the render response on same view.
- * Events.subscribeToViewAfterPhase(PhaseId.RENDER_RESPONSE, new Callback.Void() {
- *    &#64;Override
- *    public void invoke() {
- *        // ...
- *    }
+ * Events.subscribeToViewAfterPhase(PhaseId.RENDER_RESPONSE, () -> {
+ *     // ...
  * });
  * </pre>
  * <pre>
  * // Add a callback to the current request which should run during before phase of the render response on current request.
- * Events.subscribeToRequestBeforePhase(PhaseId.RENDER_RESPONSE, new Callback.Void() {
- *     &#64;Override
- *     public void invoke() {
- *         // ...
- *     }
+ * Events.subscribeToRequestBeforePhase(PhaseId.RENDER_RESPONSE, () -> {
+ *     // ...
  * });
  * </pre>
  * <pre>
  * // Add a callback to the current view which should run during the pre render view event.
- * Events.subscribeToViewEvent(PreRenderViewEvent.class, new Callback.SerializableVoid() {
- *     &#64;Override
- *     public void invoke() {
- *         // ...
- *     }
+ * Events.subscribeToViewEvent(PreRenderViewEvent.class, () -> {
+ *     // ...
  * });
  * </pre>
  * <p>
@@ -332,37 +323,17 @@ public final class Events {
 			throw new IllegalStateException(ERROR_UNSUBSCRIBE_TOO_LATE);
 		}
 
-		subscribeToRequestAfterPhase(currentPhaseId, new Callback.Void() {
-
-			@Override
-			public void invoke() {
-				component.unsubscribeFromEvent(event, listener);
-			}
-		});
+		subscribeToRequestAfterPhase(currentPhaseId, () -> component.unsubscribeFromEvent(event, listener));
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
 	private static <A> Callback.WithArgument<A> wrap(final Callback.Void callback) {
-		return new Callback.WithArgument<A>() {
-
-			@Override
-			public void invoke(A argument) {
-				callback.invoke();
-			}
-		};
+		return (argument) -> callback.invoke();
 	}
 
 	private static <A> Callback.SerializableWithArgument<A> wrap(final Callback.SerializableVoid callback) {
-		return new Callback.SerializableWithArgument<A>() {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void invoke(A argument) {
-				callback.invoke();
-			}
-		};
+		return (argument) -> callback.invoke();
 	}
 
 	private static SystemEventListener createSystemEventListener(final Callback.SerializableWithArgument<SystemEvent> callback) {

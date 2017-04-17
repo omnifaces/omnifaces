@@ -22,10 +22,8 @@ import java.util.Set;
 
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
-import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
-import javax.faces.component.visit.VisitCallback;
 import javax.faces.component.visit.VisitContext;
 import javax.faces.component.visit.VisitHint;
 import javax.faces.component.visit.VisitResult;
@@ -124,21 +122,17 @@ public class Highlight extends OnloadScript {
 		}
 
 		final StringBuilder clientIds = new StringBuilder();
-		form.visitTree(VisitContext.createVisitContext(context, null, VISIT_HINTS), new VisitCallback() {
-
-			@Override
-			public VisitResult visit(VisitContext context, UIComponent component) {
-				if (component instanceof UIInput && !((UIInput) component).isValid()) {
-					if (clientIds.length() > 0) {
-						clientIds.append(',');
-					}
-
-					String clientId = component.getClientId(context.getFacesContext());
-					clientIds.append('"').append(clientId).append('"');
+		form.visitTree(VisitContext.createVisitContext(context, null, VISIT_HINTS), (visitContext, component) -> {
+			if (component instanceof UIInput && !((UIInput) component).isValid()) {
+				if (clientIds.length() > 0) {
+					clientIds.append(',');
 				}
 
-				return VisitResult.ACCEPT;
+				String clientId = component.getClientId(visitContext.getFacesContext());
+				clientIds.append('"').append(clientId).append('"');
 			}
+
+			return VisitResult.ACCEPT;
 		});
 
 		if (clientIds.length() > 0) {

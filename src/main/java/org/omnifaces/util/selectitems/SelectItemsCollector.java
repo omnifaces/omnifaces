@@ -31,7 +31,6 @@ import javax.faces.model.SelectItemGroup;
 
 import org.omnifaces.el.ScopedRunner;
 import org.omnifaces.model.ExtendedSelectItem;
-import org.omnifaces.util.Callback;
 
 /**
  * Collection of utility methods for collecting {@link SelectItem} instances from various sources.
@@ -161,22 +160,19 @@ public final class SelectItemsCollector {
 			}
 
 			// During each iteration, just resolve all attributes again.
-			scopedRunner.invoke(new Callback.Void() {
-				@Override
-				public void invoke() {
-					Object itemValue = getItemValue(attributes, item);
-					Object noSelectionValue = attributes.get("noSelectionValue");
-					boolean itemValueIsNoSelectionValue = noSelectionValue != null && noSelectionValue.equals(itemValue);
+			scopedRunner.invoke(() -> {
+				Object itemValue = getItemValue(attributes, item);
+				Object noSelectionValue = attributes.get("noSelectionValue");
+				boolean itemValueIsNoSelectionValue = noSelectionValue != null && noSelectionValue.equals(itemValue);
 
-					selectItems.add(new SelectItem(
-						itemValue,
-						getItemLabel(attributes, itemValue),
-						getItemDescription(attributes),
-						getBooleanAttribute(attributes, "itemDisabled", false),
-						getBooleanAttribute(attributes, "itemLabelEscaped", true),
-						getBooleanAttribute(attributes, "noSelectionOption", false) || itemValueIsNoSelectionValue
-					));
-				}
+				selectItems.add(new SelectItem(
+					itemValue,
+					getItemLabel(attributes, itemValue),
+					getItemDescription(attributes),
+					getBooleanAttribute(attributes, "itemDisabled", false),
+					getBooleanAttribute(attributes, "itemLabelEscaped", true),
+					getBooleanAttribute(attributes, "noSelectionOption", false) || itemValueIsNoSelectionValue
+				));
 			});
 		}
 

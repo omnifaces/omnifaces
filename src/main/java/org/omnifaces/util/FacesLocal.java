@@ -1592,22 +1592,19 @@ public final class FacesLocal {
 		(final FacesContext context, final InputStream input, String filename, final long contentLength, boolean attachment)
 			throws IOException
 	{
-		sendFile(context, filename, attachment, new Callback.Output() {
-			@Override
-			public void writeTo(OutputStream output) throws IOException {
-				ExternalContext externalContext = context.getExternalContext();
+		sendFile(context, filename, attachment, (output) -> {
+			ExternalContext externalContext = context.getExternalContext();
 
-				// If content length is known, set it. Note that setResponseContentLength() cannot be used as it takes only int.
-				if (contentLength != -1) {
-					externalContext.setResponseHeader("Content-Length", String.valueOf(contentLength));
-				}
+			// If content length is known, set it. Note that setResponseContentLength() cannot be used as it takes only int.
+			if (contentLength != -1) {
+				externalContext.setResponseHeader("Content-Length", String.valueOf(contentLength));
+			}
 
-				long size = Utils.stream(input, output);
+			long size = Utils.stream(input, output);
 
-				// This may be on time for files smaller than the default buffer size, but is otherwise ignored anyway.
-				if (contentLength == -1 && !externalContext.isResponseCommitted()) {
-					externalContext.setResponseHeader("Content-Length", String.valueOf(size));
-				}
+			// This may be on time for files smaller than the default buffer size, but is otherwise ignored anyway.
+			if (contentLength == -1 && !externalContext.isResponseCommitted()) {
+				externalContext.setResponseHeader("Content-Length", String.valueOf(size));
 			}
 		});
 	}
