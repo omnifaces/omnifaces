@@ -40,19 +40,19 @@ import org.omnifaces.eventlistener.DefaultViewEventListener;
  * Some examples:
  * <pre>
  * // Add a callback to the current view which should run during every after phase of the render response on same view.
- * Events.subscribeToViewAfterPhase(PhaseId.RENDER_RESPONSE, () -> {
+ * Events.subscribeToViewAfterPhase(PhaseId.RENDER_RESPONSE, () -&gt; {
  *     // ...
  * });
  * </pre>
  * <pre>
  * // Add a callback to the current request which should run during before phase of the render response on current request.
- * Events.subscribeToRequestBeforePhase(PhaseId.RENDER_RESPONSE, () -> {
+ * Events.subscribeToRequestBeforePhase(PhaseId.RENDER_RESPONSE, () -&gt; {
  *     // ...
  * });
  * </pre>
  * <pre>
  * // Add a callback to the current view which should run during the pre render view event.
- * Events.subscribeToViewEvent(PreRenderViewEvent.class, () -> {
+ * Events.subscribeToViewEvent(PreRenderViewEvent.class, () -&gt; {
  *     // ...
  * });
  * </pre>

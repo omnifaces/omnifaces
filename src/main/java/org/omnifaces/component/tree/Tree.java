@@ -211,7 +211,10 @@ public class Tree extends TreeFamily implements NamingContainer {
 			return;
 		}
 
-		process(context, getModel(phaseId), () -> processTreeNode(context, phaseId));
+		process(context, getModel(phaseId), () -> {
+			processTreeNode(context, phaseId);
+			return null;
+		});
 	}
 
 	/**
@@ -282,20 +285,19 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * If the current model node isn't a leaf (i.e. it has any children), then obtain the {@link TreeNode} associated
 	 * with the level of the current model node. If it isn't null, then process it according to the rules of the given
 	 * phase ID. This method is also called by {@link TreeInsertChildren#process(FacesContext, PhaseId)}.
-	 * @param <R> The expected return type.
 	 * @param context The faces context to work with.
 	 * @param phaseId The current phase ID.
 	 * @see TreeModel#isLeaf()
 	 * @see TreeModel#getLevel()
 	 * @see TreeInsertChildren
 	 */
-	protected <R> R processTreeNode(final FacesContext context, final PhaseId phaseId) {
-		return processTreeNode(phaseId, (treeNode) -> {
+	protected void processTreeNode(final FacesContext context, final PhaseId phaseId) {
+		processTreeNode(phaseId, (treeNode) -> {
 			if (treeNode != null) {
 				treeNode.process(context, phaseId);
 			}
 
-			return (R) null;
+			return null;
 		});
 	}
 
