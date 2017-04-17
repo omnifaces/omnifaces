@@ -282,6 +282,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * If the current model node isn't a leaf (i.e. it has any children), then obtain the {@link TreeNode} associated
 	 * with the level of the current model node. If it isn't null, then process it according to the rules of the given
 	 * phase ID. This method is also called by {@link TreeInsertChildren#process(FacesContext, PhaseId)}.
+	 * @param <R> The expected return type.
 	 * @param context The faces context to work with.
 	 * @param phaseId The current phase ID.
 	 * @see TreeModel#isLeaf()
