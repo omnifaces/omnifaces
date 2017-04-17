@@ -63,7 +63,7 @@
 		<javase.version>1.8</javase.version>
 		<javaee.version>7</javaee.version><!-- TODO: update to 8 once available. -->
 		<javadoc.version>1.8</javadoc.version>
-		
+
 		<!-- Essential Maven defaults. -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -463,6 +463,10 @@
 						<artifactId>maven-dependency-plugin</artifactId>
 						<executions>
 							<execution>
+								<id>unpack-wildfly</id>
+								<goals>
+									<goal>unpack</goal>
+								</goals>
 								<configuration>
 									<artifactItems>
 										<artifactItem>
@@ -520,6 +524,9 @@
 		<!-- Payara integration test profile: mvn verify -P payara -->
 		<profile>
 			<id>payara</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
 			<dependencies>
 				<dependency>
 					<groupId>org.jboss.arquillian.container</groupId>
@@ -542,6 +549,26 @@
 											<artifactId>payara-web</artifactId>
 											<version>${test.payara.version}</version>
 											<type>zip</type>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+							<execution>
+								<id>upgrade-payara-to-jsf23</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.glassfish</groupId>
+											<artifactId>javax.faces</artifactId>
+											<version>2.3.0</version>
+											<type>jar</type>
+											<outputDirectory>${project.build.directory}/payara41/glassfish/modules</outputDirectory>
+											<destFileName>javax.faces.jar</destFileName>
+											<overWrite>true</overWrite>
 										</artifactItem>
 									</artifactItems>
 								</configuration>
