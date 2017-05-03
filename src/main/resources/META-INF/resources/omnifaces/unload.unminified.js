@@ -69,7 +69,8 @@ OmniFaces.Unload = (function(Util, navigator, window, document) {
 					var query = "omnifaces.event=unload&id=" + id + "&" + VIEW_STATE_PARAM + "=" + encodeURIComponent(form[VIEW_STATE_PARAM].value);
 
 					if (navigator.sendBeacon) {
-						navigator.sendBeacon(url + "?" + query); // Synchronous XHR is deprecated during unload event, modern browsers offer Beacon API for this which will basically fire-and-forget the request.
+						// Synchronous XHR is deprecated during unload event, modern browsers offer Beacon API for this which will basically fire-and-forget the request.
+						navigator.sendBeacon(url, new Blob([query], {type: "application/x-www-form-urlencoded" }));
 					}
 					else {
 						var xhr = new XMLHttpRequest();
