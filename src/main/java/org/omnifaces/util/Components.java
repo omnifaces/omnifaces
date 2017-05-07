@@ -39,6 +39,7 @@ import static org.omnifaces.util.Utils.isOneInstanceOf;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.io.UncheckedIOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -591,8 +592,7 @@ public final class Components {
 	 * to the webcontent root.
 	 * @param parent The parent component to include the Facelet file in.
 	 * @param path The (relative) path to the Facelet file.
-	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
-	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @throws IOException Whenever given path cannot be read.
 	 * @see FaceletContext#includeFacelet(UIComponent, String)
 	 * @since 1.5
 	 */
@@ -772,11 +772,11 @@ public final class Components {
 	 * already doesn't have a HTML head nor body.
 	 * @param component The component to capture HTML output for.
 	 * @return The encoded HTML output of the given component.
-	 * @throws IOException Whenever something fails at I/O level. This would be quite unexpected as it happens locally.
+	 * @throws UncheckedIOException Whenever something fails at I/O level. This would be quite unexpected as it happens locally.
 	 * @since 2.2
 	 * @see UIComponent#encodeAll(FacesContext)
 	 */
-	public static String encodeHtml(UIComponent component) throws IOException {
+	public static String encodeHtml(UIComponent component) {
 		FacesContext context = FacesContext.getCurrentInstance();
 		ResponseWriter originalWriter = context.getResponseWriter();
 		StringWriter output = new StringWriter();
@@ -784,6 +784,9 @@ public final class Components {
 
 		try {
 			component.encodeAll(context);
+		}
+		catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
 		finally {
 			if (originalWriter != null) {

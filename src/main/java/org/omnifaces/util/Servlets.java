@@ -35,6 +35,7 @@ import static org.omnifaces.util.Utils.startsWithOneOf;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -712,24 +713,25 @@ public final class Servlets {
 	 * @param response The involved HTTP servlet response.
 	 * @param url The URL to redirect the current response to.
 	 * @param paramValues The request parameter values which you'd like to put URL-encoded in the given URL.
-	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
-	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @throws UncheckedIOException Whenever something fails at I/O level.
 	 * @since 2.0
 	 */
-	public static void facesRedirect
-		(HttpServletRequest request, HttpServletResponse response, String url, String ... paramValues)
-			throws IOException
-	{
+	public static void facesRedirect(HttpServletRequest request, HttpServletResponse response, String url, String ... paramValues) {
 		String redirectURL = prepareRedirectURL(request, url, paramValues);
 
-		if (isFacesAjaxRequest(request)) {
-			setNoCacheHeaders(response);
-			response.setContentType("text/xml");
-			response.setCharacterEncoding(UTF_8.name());
-			response.getWriter().printf(FACES_AJAX_REDIRECT_XML, redirectURL);
+		try {
+			if (isFacesAjaxRequest(request)) {
+				setNoCacheHeaders(response);
+				response.setContentType("text/xml");
+				response.setCharacterEncoding(UTF_8.name());
+				response.getWriter().printf(FACES_AJAX_REDIRECT_XML, redirectURL);
+			}
+			else {
+				response.sendRedirect(redirectURL);
+			}
 		}
-		else {
-			response.sendRedirect(redirectURL);
+		catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
 	}
 

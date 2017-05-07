@@ -29,7 +29,6 @@ import java.util.regex.Pattern;
 
 import javax.el.ELContext;
 import javax.el.ValueExpression;
-import javax.faces.FacesException;
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIViewParameter;
@@ -272,29 +271,24 @@ public class ViewParamValidationFailed extends TagHandler {
 			evaluatedMessage = defaultMessage;
 		}
 
-		try {
-			if (sendRedirect != null) {
-				String evaluatedSendRedirect = evaluate(elContext, sendRedirect, true);
+		if (sendRedirect != null) {
+			String evaluatedSendRedirect = evaluate(elContext, sendRedirect, true);
 
-				if (!isEmpty(evaluatedMessage)) {
-					addFlashGlobalError(evaluatedMessage);
-				}
-
-				redirect(context, evaluatedSendRedirect);
+			if (!isEmpty(evaluatedMessage)) {
+				addFlashGlobalError(evaluatedMessage);
 			}
-			else {
-				String evaluatedSendError = evaluate(elContext, sendError, true);
 
-				if (!HTTP_STATUS_CODE.matcher(evaluatedSendError).matches()) {
-					throw new IllegalArgumentException(
-						format(ERROR_INVALID_SENDERROR, sendError, evaluatedSendError));
-				}
-
-				responseSendError(context, Integer.valueOf(evaluatedSendError), evaluatedMessage);
-			}
+			redirect(context, evaluatedSendRedirect);
 		}
-		catch (IOException e) {
-			throw new FacesException(e);
+		else {
+			String evaluatedSendError = evaluate(elContext, sendError, true);
+
+			if (!HTTP_STATUS_CODE.matcher(evaluatedSendError).matches()) {
+				throw new IllegalArgumentException(
+					format(ERROR_INVALID_SENDERROR, sendError, evaluatedSendError));
+			}
+
+			responseSendError(context, Integer.valueOf(evaluatedSendError), evaluatedMessage);
 		}
 	}
 

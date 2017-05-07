@@ -178,7 +178,7 @@ public final class Callback {
 		/**
 		 * This method should be invoked by the method where you're passing this callback instance to.
 		 * @param output The callback output stream to write to.
-		 * @throws IOException Whenever something fails at I/O level.
+		 * @throws IOException When given output stream cannot be written.
 		 */
 		void writeTo(OutputStream output) throws IOException;
 

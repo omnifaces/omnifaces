@@ -33,6 +33,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -1050,10 +1051,16 @@ public final class FacesLocal {
 	/**
 	 * @see Faces#redirect(String, String...)
 	 */
-	public static void redirect(FacesContext context, String url, String... paramValues) throws IOException {
+	public static void redirect(FacesContext context, String url, String... paramValues) {
 		ExternalContext externalContext = context.getExternalContext();
 		externalContext.getFlash().setRedirect(true); // MyFaces also requires this for a redirect in current request (which is incorrect).
-		externalContext.redirect(prepareRedirectURL(getRequest(context), url, paramValues));
+
+		try {
+			externalContext.redirect(prepareRedirectURL(getRequest(context), url, paramValues));
+		}
+		catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 	/**
@@ -1071,22 +1078,28 @@ public final class FacesLocal {
 	/**
 	 * @see Faces#refresh()
 	 */
-	public static void refresh(FacesContext context) throws IOException {
+	public static void refresh(FacesContext context) {
 		redirect(context, getRequestURI(context));
 	}
 
 	/**
 	 * @see Faces#refreshWithQueryString()
 	 */
-	public static void refreshWithQueryString(FacesContext context) throws IOException {
+	public static void refreshWithQueryString(FacesContext context) {
 		redirect(context, getRequestURIWithQueryString(context));
 	}
 
 	/**
 	 * @see Faces#responseSendError(int, String)
 	 */
-	public static void responseSendError(FacesContext context, int status, String message) throws IOException {
-		context.getExternalContext().responseSendError(status, message);
+	public static void responseSendError(FacesContext context, int status, String message) {
+		try {
+			context.getExternalContext().responseSendError(status, message);
+		}
+		catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+
 		context.responseComplete();
 
 		// Below is a workaround for disappearing FacesContext in WildFly/Undertow. It disappears because Undertow
@@ -1538,27 +1551,21 @@ public final class FacesLocal {
 	/**
 	 * @see Faces#sendFile(byte[], String, boolean)
 	 */
-	public static void sendFile(FacesContext context, byte[] content, String filename, boolean attachment)
-		throws IOException
-	{
+	public static void sendFile(FacesContext context, byte[] content, String filename, boolean attachment) {
 		sendFile(context, new ByteArrayInputStream(content), filename, content.length, attachment);
 	}
 
 	/**
 	 * @see Faces#sendFile(InputStream, String, boolean)
 	 */
-	public static void sendFile(FacesContext context, InputStream content, String filename, boolean attachment)
-		throws IOException
-	{
+	public static void sendFile(FacesContext context, InputStream content, String filename, boolean attachment) {
 		sendFile(context, content, filename, -1, attachment);
 	}
 
 	/**
 	 * @see Faces#sendFile(String, boolean, org.omnifaces.util.Callback.Output)
 	 */
-	public static void sendFile(FacesContext context, String filename, boolean attachment, Callback.Output outputCallback)
-		throws IOException
-	{
+	public static void sendFile(FacesContext context, String filename, boolean attachment, Callback.Output outputCallback) {
 		ExternalContext externalContext = context.getExternalContext();
 
 		// Prepare the response and set the necessary headers.
@@ -1575,6 +1582,9 @@ public final class FacesLocal {
 		try (OutputStream output = externalContext.getResponseOutputStream()) {
 			outputCallback.writeTo(output);
 		}
+		catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 
 		context.responseComplete();
 	}
@@ -1585,12 +1595,9 @@ public final class FacesLocal {
 	 * @param filename The file name which should appear in content disposition header.
 	 * @param contentLength The content length, or -1 if it is unknown.
 	 * @param attachment Whether the file should be provided as attachment, or just inline.
-	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
-	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @throws UncheckedIOException When HTTP response is not available anymore.
 	 */
-	private static void sendFile(FacesContext context, InputStream input, String filename, long contentLength, boolean attachment)
-		throws IOException
-	{
+	private static void sendFile(FacesContext context, InputStream input, String filename, long contentLength, boolean attachment) {
 		sendFile(context, filename, attachment, output -> {
 			ExternalContext externalContext = context.getExternalContext();
 
