@@ -35,6 +35,7 @@ import static org.omnifaces.util.Utils.getDefaultValue;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -249,7 +250,7 @@ public class ParamProducer {
 	}
 
 	private static <V> boolean validateBean(FacesContext context, Param param, String label, V paramValue, InjectionPoint injectionPoint) {
-		if (shouldDoBeanValidation(param)) {
+		if (shouldDoBeanValidation(param, injectionPoint)) {
 			Set<ConstraintViolation<?>> violations = doBeanValidation(paramValue, injectionPoint);
 
 			if (!violations.isEmpty()) {
@@ -363,7 +364,7 @@ public class ParamProducer {
 		return expressionResult.toString();
 	}
 
-	private static boolean shouldDoBeanValidation(Param requestParameter) {
+	private static boolean shouldDoBeanValidation(Param requestParameter, InjectionPoint injectionPoint) {
 
 		// If bean validation is explicitly disabled for this instance, immediately return false
 		if (requestParameter.disableBeanValidation()) {
@@ -372,6 +373,11 @@ public class ParamProducer {
 
 		// Next check if bean validation has been disabled globally, but only if this hasn't been overridden locally
 		if (!requestParameter.overrideGlobalBeanValidationDisabled() && parseBoolean(getInitParameter(DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME))) {
+			return false;
+		}
+
+		// Next check if this is a field injection; other cases are not supported by Validator#validateValue().
+		if (!(injectionPoint.getMember() instanceof Field)) {
 			return false;
 		}
 
