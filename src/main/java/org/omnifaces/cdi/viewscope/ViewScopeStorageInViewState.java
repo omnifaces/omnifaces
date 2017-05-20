@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import javax.enterprise.context.Dependent;
+import javax.faces.component.UIViewRoot;
 
 import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
@@ -47,7 +48,13 @@ public class ViewScopeStorageInViewState implements ViewScopeStorage {
 
 	@Override
 	public void setBeanStorage(UUID beanStorageId, BeanStorage beanStorage) {
-		Map<String, Object> viewState = getViewRoot().getAttributes();
+		UIViewRoot viewRoot = getViewRoot();
+
+		if (!viewRoot.initialStateMarked()) {
+			viewRoot.markInitialState(); // Forces JSF to start recording changes in view state.
+		}
+
+		Map<String, Object> viewState = viewRoot.getAttributes();
 		viewState.put(getClass().getName(), beanStorageId);
 		viewState.put(beanStorageId.toString(), beanStorage);
 	}
