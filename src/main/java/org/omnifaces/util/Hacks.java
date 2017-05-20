@@ -475,11 +475,11 @@ public final class Hacks {
 				serializedViews.remove(context.getAttributes().get(MOJARRA_SERIALIZED_VIEW_KEY));
 			}
 
-            Map<String, Object> activeViewMaps = getSessionAttribute(context, MOJARRA_ACTIVE_VIEW_MAPS);
+			Map<String, Object> activeViewMaps = getSessionAttribute(context, MOJARRA_ACTIVE_VIEW_MAPS);
 
-            if (activeViewMaps != null) {
-                activeViewMaps.remove(context.getViewRoot().getTransientStateHelper().getTransient(MOJARRA_VIEW_MAP_ID));
-            }
+			if (activeViewMaps != null) {
+				activeViewMaps.remove(context.getViewRoot().getTransientStateHelper().getTransient(MOJARRA_VIEW_MAP_ID));
+			}
 		}
 	}
 
