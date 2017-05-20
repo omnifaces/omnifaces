@@ -9,7 +9,7 @@
 
 	<groupId>org.omnifaces</groupId>
 	<artifactId>omnifaces</artifactId>
-	<version>1.14</version>
+	<version>1.14.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>OmniFaces</name>
@@ -95,6 +95,8 @@
 				<configuration>
 					<source>${javase.version}</source>
 					<target>${javase.version}</target>
+					<compilerVersion>${javase.version}</compilerVersion>
+					<fork>true</fork>
 				</configuration>
 			</plugin>
 			
