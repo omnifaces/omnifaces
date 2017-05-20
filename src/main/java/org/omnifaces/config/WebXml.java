@@ -127,6 +127,10 @@ public enum WebXml {
 		"login-config[auth-method='FORM']/form-login-config/form-login-page";
 	private static final String XPATH_FORM_ERROR_PAGE =
 		"login-config[auth-method='FORM']/form-login-config/form-error-page";
+	private static final String XPATH_DEFAULT_FORM_LOGIN_PAGE =
+		"login-config/form-login-config/form-login-page";
+	private static final String XPATH_DEFAULT_FORM_ERROR_PAGE =
+		"login-config/form-login-config/form-error-page";
 	private static final String XPATH_SECURITY_CONSTRAINT =
 		"security-constraint";
 	private static final String XPATH_WEB_RESOURCE_URL_PATTERN =
@@ -465,6 +469,11 @@ public enum WebXml {
 	 */
 	private static String parseFormLoginPage(Element webXml, XPath xpath) throws XPathExpressionException {
 		String formLoginPage = xpath.compile(XPATH_FORM_LOGIN_PAGE).evaluate(webXml).trim();
+
+		if (isEmpty(formLoginPage)) {
+			formLoginPage = xpath.compile(XPATH_DEFAULT_FORM_LOGIN_PAGE).evaluate(webXml).trim();
+		}
+
 		return isEmpty(formLoginPage) ? null : formLoginPage;
 	}
 
@@ -473,6 +482,11 @@ public enum WebXml {
 	 */
 	private static String parseFormErrorPage(Element webXml, XPath xpath) throws XPathExpressionException {
 		String formErrorPage = xpath.compile(XPATH_FORM_ERROR_PAGE).evaluate(webXml).trim();
+
+		if (isEmpty(formErrorPage)) {
+			formErrorPage = xpath.compile(XPATH_DEFAULT_FORM_ERROR_PAGE).evaluate(webXml).trim();
+		}
+
 		return isEmpty(formErrorPage) ? null : formErrorPage;
 	}
 
