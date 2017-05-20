@@ -642,7 +642,7 @@ public final class Utils {
 				return new Locale(language, country);
 			}
 			else {
-				return Locale.forLanguageTag(localeString);
+				throw new UnsupportedOperationException();
 			}
 		}
 	}

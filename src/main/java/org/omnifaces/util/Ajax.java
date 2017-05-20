@@ -12,12 +12,10 @@
  */
 package org.omnifaces.util;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.omnifaces.util.Components.getCurrentComponent;
 import static org.omnifaces.util.Components.getCurrentForm;
 import static org.omnifaces.util.Faces.getApplication;
 import static org.omnifaces.util.Faces.isAjaxRequestWithPartialRendering;
-import static org.omnifaces.util.Utils.close;
 
 import java.beans.Introspector;
 import java.io.IOException;
@@ -286,14 +284,16 @@ public final class Ajax {
 		Scanner scanner = null;
 
 		try {
-			scanner = new Scanner(resource.getInputStream(), UTF_8.name());
+			scanner = new Scanner(resource.getInputStream(), "UTF-8");
 			oncomplete(scanner.useDelimiter("\\A").next());
 		}
 		catch (IOException e) {
 			throw new FacesException(e);
 		}
 		finally {
-			close(scanner);
+			if (scanner != null) {
+				scanner.close();
+			}
 		}
 	}
 

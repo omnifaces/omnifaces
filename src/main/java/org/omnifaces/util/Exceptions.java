@@ -64,7 +64,6 @@ public final class Exceptions {
 	 * @param types The types which need to be unwrapped.
 	 * @return The unwrapped root cause.
 	 */
-	@SafeVarargs
 	public static Throwable unwrap(Throwable exception, Class<? extends Throwable>... types) {
 		Throwable unwrappedException = exception;
 

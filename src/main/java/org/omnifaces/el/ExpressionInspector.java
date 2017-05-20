@@ -5,7 +5,6 @@ import static org.omnifaces.el.functions.Strings.capitalize;
 import static org.omnifaces.util.Reflection.findMethod;
 
 import java.lang.reflect.Method;
-import java.util.Objects;
 
 import javax.el.ELContext;
 import javax.el.ELResolver;
@@ -348,7 +347,7 @@ public final class ExpressionInspector {
 
 					passTwoCallCount++;
 
-					if (passTwoCallCount == passOneCallCount && (base != lastBase || !Objects.equals(property, lastProperty))) {
+					if (passTwoCallCount == passOneCallCount && (base != lastBase || property == null ? lastProperty != null : !property.equals(lastProperty))) {
 						// We're at the same call count as the first phase ended with.
 						// If the chain has resolved the same, we should be dealing with the same base and property now
 						// If that is not the case, then throw ISE.
