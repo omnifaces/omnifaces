@@ -402,7 +402,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>3.0.0</version>
+					<version>3.0.1</version>
 					<executions>
 						<execution>
 							<phase>process-test-classes</phase>
@@ -447,7 +447,7 @@
 		<profile>
 			<id>wildfly</id>
 			<activation>
-				<activeByDefault>false</activeByDefault><!-- TODO: put back to 'true' once figured out how to upgrade it to JSF 2.3 via Maven -->
+				<activeByDefault>true</activeByDefault>
 			</activation>
 			<dependencies>
 				<dependency>
@@ -473,6 +473,65 @@
 											<type>zip</type>
 										</artifactItem>
 									</artifactItems>
+								</configuration>
+							</execution>
+							<execution>
+								<id>unpack-jsf23-for-wildfly</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>unpack</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.glassfish</groupId>
+											<artifactId>javax.faces</artifactId>
+											<version>2.3.0-m09</version> <!-- Fails since m10 due to a bug in WildFly http://stackoverflow.com/q/44076148/157882 -->
+											<type>jar</type>
+											<outputDirectory>${project.build.directory}/jsf23-unpacked</outputDirectory>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-jar-plugin</artifactId>
+						<version>2.6</version> <!-- So we can use finalName, which was removed in 3.0.0 -->
+						<executions>
+							<execution>
+								<id>pack-jsf23-api-for-wildfly</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+								<configuration>
+									<classesDirectory>${project.build.directory}/jsf23-unpacked</classesDirectory>
+									<includes>
+										<include>javax/**</include>
+										<include>META-INF/MANIFEST.MF</include>
+									</includes>
+									<outputDirectory>${project.build.directory}/wildfly-${test.wildfly.version}/modules/system/layers/base/javax/faces/api/main</outputDirectory>
+									<finalName>jboss-jsf-api_2.2_spec</finalName> <!-- Reuse same file name to make our life easier. -->
+									<classifier>2.2.13</classifier>
+								</configuration>
+							</execution>
+							<execution>
+								<id>pack-jsf23-impl-for-wildfly</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>jar</goal>
+								</goals>
+								<configuration>
+									<classesDirectory>${project.build.directory}/jsf23-unpacked</classesDirectory>
+									<includes>
+										<include>com/**</include>
+										<include>META-INF/**</include>
+									</includes>
+									<outputDirectory>${project.build.directory}/wildfly-${test.wildfly.version}/modules/system/layers/base/com/sun/jsf-impl/main</outputDirectory>
+									<finalName>jsf-impl</finalName> <!-- Reuse same file name to make our life easier. -->
+									<classifier>2.2.13.SP1</classifier>
 								</configuration>
 							</execution>
 						</executions>
@@ -522,7 +581,7 @@
 		<profile>
 			<id>payara</id>
 			<activation>
-				<activeByDefault>true</activeByDefault><!-- TODO: remove once figured out how to upgrade WildFly to JSF 2.3 via Maven -->
+				<activeByDefault>false</activeByDefault>
 			</activation>
 			<dependencies>
 				<dependency>
