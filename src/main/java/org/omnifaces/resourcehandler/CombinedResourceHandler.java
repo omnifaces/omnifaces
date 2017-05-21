@@ -498,16 +498,18 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 		private void addStylesheet(FacesContext context, UIComponent component, ResourceIdentifier id) {
 			if (stylesheets.add(component, id)) {
-				Hacks.setStylesheetResourceRendered(context, id); // Prevents future forced additions by libs.
+				context.getApplication().getResourceHandler().markResourceRendered(context, id.getName(), id.getLibrary()); // Prevents future forced additions by libs.
 			}
 		}
 
 		private void addScript(FacesContext context, UIComponent component, ResourceIdentifier id) {
-			if (Hacks.isScriptResourceRendered(context, id)) { // This is true when o:deferredScript is used.
+			ResourceHandler resourceHandler = context.getApplication().getResourceHandler();
+
+			if (resourceHandler.isResourceRendered(context, id.getName(), id.getLibrary())) { // This is true when o:deferredScript is used.
 				componentResourcesToRemove.add(component);
 			}
 			else if (scripts.add(component, id)) {
-				Hacks.setScriptResourceRendered(context, id); // Prevents future forced additions by libs.
+				resourceHandler.markResourceRendered(context, id.getName(), id.getLibrary()); // Prevents future forced additions by libs.
 			}
 		}
 

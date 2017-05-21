@@ -12,6 +12,8 @@
  */
 package org.omnifaces.test.resourcehandler.combinedresourcehandler;
 
+import static javax.faces.application.ResourceHandler.RESOURCE_IDENTIFIER;
+
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Named;
 
@@ -22,7 +24,9 @@ import org.omnifaces.util.Faces;
 public class CombinedResourceHandlerITBean {
 
 	public void rebuild() {
+		Object renderedResources = Faces.getContextAttribute(RESOURCE_IDENTIFIER);
 		Faces.setViewRoot(Faces.getViewId());
+		Faces.setContextAttribute(RESOURCE_IDENTIFIER, renderedResources); // TODO: remove once Mojarra 2.3.1 is released. See #4249
 	}
 
 }

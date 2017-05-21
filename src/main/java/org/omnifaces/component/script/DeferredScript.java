@@ -12,16 +12,19 @@
  */
 package org.omnifaces.component.script;
 
+import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
+import static org.omnifaces.util.Components.getAttribute;
+
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.ListenerFor;
 import javax.faces.event.PostAddToViewEvent;
 import javax.faces.event.PostRestoreStateEvent;
 
 import org.omnifaces.renderer.DeferredScriptRenderer;
-import org.omnifaces.resourcehandler.ResourceIdentifier;
-import org.omnifaces.util.Hacks;
 
 /**
  * <p>
@@ -51,7 +54,7 @@ import org.omnifaces.util.Hacks;
  * @see ScriptFamily
  */
 @FacesComponent(DeferredScript.COMPONENT_TYPE)
-@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head")
+@ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head")
 @ListenerFor(systemEventClass=PostAddToViewEvent.class)
 @ListenerFor(systemEventClass=PostRestoreStateEvent.class)
 public class DeferredScript extends ScriptFamily {
@@ -80,7 +83,8 @@ public class DeferredScript extends ScriptFamily {
 	@Override
 	public void processEvent(ComponentSystemEvent event) {
 		if (moveToBody(event)) {
-			Hacks.setScriptResourceRendered(getFacesContext(), new ResourceIdentifier(this));
+			FacesContext context = event.getFacesContext();
+			context.getApplication().getResourceHandler().markResourceRendered(context, getAttribute(this, "name"), getAttribute(this, "library"));
 		}
 	}
 
