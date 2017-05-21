@@ -30,14 +30,14 @@ package org.omnifaces.util.concurrentlinkedhashmap;
  * @see <a href="https://github.com/ben-manes/concurrentlinkedhashmap">
  *      https://github.com/ben-manes/concurrentlinkedhashmap</a>
  */
-@ThreadSafe
+@FunctionalInterface
 public interface EvictionListener<K, V> {
 
-  /**
-   * A call-back notification that the entry was evicted.
-   *
-   * @param key the entry's key
-   * @param value the entry's value
-   */
-  void onEviction(K key, V value);
+	/**
+	 * A call-back notification that the entry was evicted.
+	 *
+	 * @param key the entry's key
+	 * @param value the entry's value
+	 */
+	void onEviction(K key, V value);
 }
