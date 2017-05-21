@@ -16,6 +16,11 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.String.format;
 import static java.util.Collections.singleton;
 import static java.util.Collections.unmodifiableList;
+import static javax.faces.application.ResourceHandler.JSF_SCRIPT_LIBRARY_NAME;
+import static javax.faces.application.ResourceHandler.JSF_SCRIPT_RESOURCE_NAME;
+import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.config.OmniFaces.getMessage;
 import static org.omnifaces.el.functions.Numbers.formatBytes;
 import static org.omnifaces.util.Ajax.update;
@@ -243,8 +248,8 @@ import org.omnifaces.util.Utils;
  * @since 2.5
  */
 @FacesComponent(InputFile.COMPONENT_TYPE)
-@ResourceDependency(library="javax.faces", name="jsf.js", target="head") // Required for jsf.ajax.request.
-@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head") // Specifically inputfile.js.
+@ResourceDependency(library=JSF_SCRIPT_LIBRARY_NAME, name=JSF_SCRIPT_RESOURCE_NAME, target="head") // Required for jsf.ajax.request.
+@ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head") // Specifically inputfile.js.
 public class InputFile extends HtmlInputFile {
 
 	// Public constants -----------------------------------------------------------------------------------------------
@@ -278,7 +283,7 @@ public class InputFile extends HtmlInputFile {
 	@Override
 	public void decode(FacesContext context) {
 		if ("validationFailed".equals(getRequestParameter(context, "omnifaces.event"))
-			&& getClientId(context).equals(getRequestParameter(context, "javax.faces.source")))
+			&& getClientId(context).equals(getRequestParameter(context, BEHAVIOR_SOURCE_PARAM_NAME)))
 		{
 			String fileName = getRequestParameter(context, "fileName");
 			addError(getClientId(context), getMaxsizeMessage(), Components.getLabel(this), fileName, formatBytes(getMaxsize()));

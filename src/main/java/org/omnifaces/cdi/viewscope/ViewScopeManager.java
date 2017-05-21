@@ -15,9 +15,9 @@ package org.omnifaces.cdi.viewscope;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
 import static java.util.logging.Level.FINE;
-import static org.omnifaces.config.OmniFaces.LIBRARY_NAME;
-import static org.omnifaces.config.OmniFaces.SCRIPT_NAME;
-import static org.omnifaces.config.OmniFaces.UNLOAD_SCRIPT_NAME;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_UNLOAD_SCRIPT_NAME;
 import static org.omnifaces.util.Ajax.load;
 import static org.omnifaces.util.Ajax.oncomplete;
 import static org.omnifaces.util.BeansLocal.getInstance;
@@ -84,7 +84,7 @@ public class ViewScopeManager {
 
 	private static final Logger logger = Logger.getLogger(ViewScopeManager.class.getName());
 
-	private static final ResourceIdentifier SCRIPT_ID = new ResourceIdentifier(LIBRARY_NAME, SCRIPT_NAME);
+	private static final ResourceIdentifier SCRIPT_ID = new ResourceIdentifier(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
 	private static final String SCRIPT_INIT = "OmniFaces.Unload.init('%s')";
 	private static final int DEFAULT_BEANS_PER_VIEW_SCOPE = 3;
 
@@ -208,13 +208,13 @@ public class ViewScopeManager {
 
 		if (!Hacks.isScriptResourceRendered(context, SCRIPT_ID)) {
 			if (ajaxRequestWithPartialRendering) {
-				load(LIBRARY_NAME, UNLOAD_SCRIPT_NAME);
+				load(OMNIFACES_LIBRARY_NAME, OMNIFACES_UNLOAD_SCRIPT_NAME);
 			}
 			else if (context.getCurrentPhaseId() != PhaseId.RENDER_RESPONSE || TRUE.equals(context.getAttributes().get(StateManager.IS_BUILDING_INITIAL_STATE))) {
-				addScriptResourceToHead(LIBRARY_NAME, SCRIPT_NAME);
+				addScriptResourceToHead(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
 			}
 			else {
-				addScriptResourceToBody(LIBRARY_NAME, UNLOAD_SCRIPT_NAME);
+				addScriptResourceToBody(OMNIFACES_LIBRARY_NAME, OMNIFACES_UNLOAD_SCRIPT_NAME);
 			}
 		}
 

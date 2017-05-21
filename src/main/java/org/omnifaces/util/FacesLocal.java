@@ -15,6 +15,7 @@ package org.omnifaces.util;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.logging.Level.FINE;
+import static javax.faces.view.facelets.FaceletContext.FACELET_CONTEXT_KEY;
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Reflection.toClassOrNull;
@@ -138,11 +139,6 @@ public final class FacesLocal {
 	private static final String DEFAULT_MIME_TYPE = "application/octet-stream";
 	private static final int DEFAULT_SENDFILE_BUFFER_SIZE = 10240;
 	private static final String ERROR_NO_VIEW = "There is no view.";
-	private static final String[] FACELET_CONTEXT_KEYS = {
-		FaceletContext.FACELET_CONTEXT_KEY, // Compiletime constant, may fail when compiled against EE6 and run on EE7.
-		"com.sun.faces.facelets.FACELET_CONTEXT", // JSF 2.0/2.1.
-		"javax.faces.FACELET_CONTEXT" // JSF 2.2.
-	};
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -722,14 +718,10 @@ public final class FacesLocal {
 	 * @see Faces#getFaceletContext()
 	 */
 	public static FaceletContext getFaceletContext(FacesContext context) {
-		Map<Object, Object> contextAttributes = context.getAttributes();
+		FaceletContext faceletContext = getContextAttribute(context, FACELET_CONTEXT_KEY);
 
-		for (String key : FACELET_CONTEXT_KEYS) {
-			FaceletContext faceletContext = (FaceletContext) contextAttributes.get(key);
-
-			if (faceletContext != null) {
-				return faceletContext;
-			}
+		if (faceletContext != null) {
+			return faceletContext;
 		}
 
 		throw new IllegalStateException(ERROR_NO_VIEW);

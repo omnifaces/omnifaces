@@ -19,6 +19,8 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.logging.Level.FINE;
 import static java.util.regex.Pattern.quote;
 import static javax.faces.component.UIComponent.getCompositeComponentParent;
+import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
+import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME;
 import static javax.faces.component.visit.VisitContext.createVisitContext;
 import static javax.faces.component.visit.VisitHint.SKIP_ITERATION;
 import static javax.faces.component.visit.VisitResult.ACCEPT;
@@ -871,7 +873,7 @@ public final class Components {
 		Map<String, String> params = context.getExternalContext().getRequestParameterMap();
 
 		if (context.getPartialViewContext().isAjaxRequest()) {
-			String sourceClientId = params.get("javax.faces.source");
+			String sourceClientId = params.get(BEHAVIOR_SOURCE_PARAM_NAME);
 
 			if (sourceClientId != null) {
 				UIComponent actionSource = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(sourceClientId));
@@ -1305,7 +1307,7 @@ public final class Components {
 		}
 
 		if (component instanceof ClientBehaviorHolder) {
-			String behaviorEvent = getRequestParameter("javax.faces.behavior.event");
+			String behaviorEvent = getRequestParameter(BEHAVIOR_EVENT_PARAM_NAME);
 
 			if (behaviorEvent != null) {
 				for (BehaviorListener listener : getBehaviorListeners((ClientBehaviorHolder) component, behaviorEvent)) {

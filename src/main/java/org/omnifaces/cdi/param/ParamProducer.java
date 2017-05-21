@@ -14,6 +14,7 @@ package org.omnifaces.cdi.param;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.util.Arrays.asList;
+import static javax.faces.component.UIInput.EMPTY_STRING_AS_NULL_PARAM_NAME;
 import static javax.faces.validator.BeanValidator.DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME;
 import static org.omnifaces.util.Beans.getQualifier;
 import static org.omnifaces.util.Components.setLabel;
@@ -170,8 +171,7 @@ public class ParamProducer {
 			return interpretEmptyStringSubmittedValuesAsNull;
 		}
 
-		interpretEmptyStringSubmittedValuesAsNull = parseBoolean(context.getExternalContext()
-			.getInitParameter("javax.faces.INTERPRET_EMPTY_STRING_SUBMITTED_VALUES_AS_NULL"));
+		interpretEmptyStringSubmittedValuesAsNull = parseBoolean(context.getExternalContext().getInitParameter(EMPTY_STRING_AS_NULL_PARAM_NAME));
 
 		return interpretEmptyStringSubmittedValuesAsNull;
 	}

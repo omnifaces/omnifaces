@@ -14,6 +14,13 @@ package org.omnifaces.component.script;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.String.format;
+import static javax.faces.application.ResourceHandler.JSF_SCRIPT_LIBRARY_NAME;
+import static javax.faces.application.ResourceHandler.JSF_SCRIPT_RESOURCE_NAME;
+import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME;
+import static javax.faces.event.PhaseId.APPLY_REQUEST_VALUES;
+import static javax.faces.event.PhaseId.INVOKE_APPLICATION;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.util.Components.getParams;
 import static org.omnifaces.util.Components.validateHasParent;
 import static org.omnifaces.util.Utils.isEmpty;
@@ -29,7 +36,6 @@ import javax.faces.component.UIForm;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.event.ActionEvent;
-import javax.faces.event.PhaseId;
 
 import org.omnifaces.component.ParamHolder;
 import org.omnifaces.util.Json;
@@ -94,8 +100,8 @@ import org.omnifaces.util.State;
  */
 @Deprecated
 @FacesComponent(CommandScript.COMPONENT_TYPE)
-@ResourceDependency(library="javax.faces", name="jsf.js", target="head") // Required for jsf.ajax.request.
-@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head") // Specifically util.js.
+@ResourceDependency(library=JSF_SCRIPT_LIBRARY_NAME, name=JSF_SCRIPT_RESOURCE_NAME, target="head") // Required for jsf.ajax.request.
+@ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head") // Specifically util.js.
 public class CommandScript extends UICommand {
 
 	// Public constants -----------------------------------------------------------------------------------------------
@@ -147,11 +153,11 @@ public class CommandScript extends UICommand {
 	 */
 	@Override
 	public void decode(FacesContext context) {
-		String source = context.getExternalContext().getRequestParameterMap().get("javax.faces.source");
+		String source = context.getExternalContext().getRequestParameterMap().get(BEHAVIOR_SOURCE_PARAM_NAME);
 
 		if (getClientId(context).equals(source)) {
 			ActionEvent event = new ActionEvent(this);
-			event.setPhaseId(isImmediate() ? PhaseId.APPLY_REQUEST_VALUES : PhaseId.INVOKE_APPLICATION);
+			event.setPhaseId(isImmediate() ? APPLY_REQUEST_VALUES : INVOKE_APPLICATION);
 			queueEvent(event);
 		}
 	}

@@ -14,6 +14,10 @@ package org.omnifaces.component.script;
 
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
+import static javax.faces.application.ResourceHandler.JSF_SCRIPT_LIBRARY_NAME;
+import static javax.faces.application.ResourceHandler.JSF_SCRIPT_RESOURCE_NAME;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.util.Components.getCurrentForm;
 
 import java.io.IOException;
@@ -75,8 +79,8 @@ import org.omnifaces.util.State;
  * @see ScriptFamily
  */
 @FacesComponent(Highlight.COMPONENT_TYPE)
-@ResourceDependency(library="javax.faces", name="jsf.js", target="head") // Required for jsf.ajax.addOnEvent.
-@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head") // Specifically highlight.js.
+@ResourceDependency(library=JSF_SCRIPT_LIBRARY_NAME, name=JSF_SCRIPT_RESOURCE_NAME, target="head") // Required for jsf.ajax.request.
+@ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head") // Specifically highlight.js.
 public class Highlight extends OnloadScript {
 
 	// Public constants -----------------------------------------------------------------------------------------------

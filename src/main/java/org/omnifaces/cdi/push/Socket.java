@@ -16,6 +16,8 @@ import static java.lang.Boolean.TRUE;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
+import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
+import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME;
 import static javax.faces.component.behavior.ClientBehaviorContext.createClientBehaviorContext;
 import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
@@ -773,11 +775,11 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 			return;
 		}
 
-		if (!getClientId(context).equals(getRequestParameter(context, "javax.faces.source"))) {
+		if (!getClientId(context).equals(getRequestParameter(context, BEHAVIOR_SOURCE_PARAM_NAME))) {
 			return;
 		}
 
-		List<ClientBehavior> behaviors = clientBehaviors.get(getRequestParameter(context, "javax.faces.behavior.event"));
+		List<ClientBehavior> behaviors = clientBehaviors.get(getRequestParameter(context, BEHAVIOR_EVENT_PARAM_NAME));
 
 		if (behaviors == null) {
 			return;
