@@ -12,6 +12,8 @@
  */
 package org.omnifaces.el.functions;
 
+import static org.omnifaces.util.Reflection.toClass;
+
 /**
  * Collection of EL functions for objects.
  *
@@ -36,6 +38,17 @@ public final class Objects {
 	 */
 	public static Object coalesce(Object first, Object second) {
 		return first != null ? first : second;
+	}
+
+	/**
+	 * Returns <code>true</code> if given object is an instance of the class as identified by given class name.
+	 * @param className Fully qualified class name of the class for which a class object needs to be created.
+	 * @param object The object to be checked if it is an instance of the created class object.
+	 * @return <code>true</code> if given object is an instance of the class as identified by given class name.
+	 * @since 3.0
+	 */
+	public static boolean isInstance(String className, Object object) {
+		return object != null && toClass(className).isInstance(object);
 	}
 
 }

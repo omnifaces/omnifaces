@@ -826,6 +826,17 @@
 		<function-signature>java.lang.Object coalesce(java.lang.Object, java.lang.Object)</function-signature>
 	</function>
 
+	<function>
+		<description>
+			<![CDATA[
+				Returns <code>true</code> if given object is an instance of the class as identified by given class name.
+			]]>
+		</description>
+		<function-name>isInstance</function-name>
+		<function-class>org.omnifaces.el.functions.Objects</function-class>
+		<function-signature>boolean isInstance(java.lang.String, java.lang.Object)</function-signature>
+	</function>
+
 	<!-- Components =============================================================================================== -->
 
 	<function>
