@@ -43,7 +43,10 @@ import static org.omnifaces.util.Utils.csvToList;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.reverse;
 import static org.omnifaces.util.Utils.startsWithOneOf;
+import static org.omnifaces.util.Xml.getNodeTextContents;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -63,7 +66,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.omnifaces.ApplicationInitializer;
 import org.omnifaces.ApplicationListener;
 import org.omnifaces.cdi.Param;
-import org.omnifaces.config.WebXml;
 
 /**
  * <p>
@@ -250,6 +252,9 @@ public final class FacesViews {
 			return;
 		}
 
+		// First scan welcome files in web.xml.
+		scanAndStoreWelcomeFiles(servletContext);
+
 		// Scan our dedicated directory for Faces resources that need to be mapped.
 		Map<String, String> collectedViews = scanAndStoreViews(servletContext, true);
 
@@ -349,8 +354,6 @@ public final class FacesViews {
 	 * @return The views found during scanning, or an empty map if no views encountered.
 	 */
 	static Map<String, String> scanAndStoreViews(ServletContext servletContext, boolean collectExtensions) {
-		scanAndStoreWelcomeFiles(servletContext);
-
 		Map<String, String> collectedViews = new HashMap<>();
 		Set<String> collectedExtensions = new HashSet<>();
 
@@ -373,9 +376,18 @@ public final class FacesViews {
 	}
 
 	private static void scanAndStoreWelcomeFiles(ServletContext servletContext) {
+		URL webXml;
+
+		try {
+			webXml = servletContext.getResource("/WEB-INF/web.xml");
+		}
+		catch (MalformedURLException e) {
+			throw new IllegalStateException(e);
+		}
+
 		Set<String> mappedWelcomeFiles = new HashSet<>();
 
-		for (String welcomeFile : WebXml.INSTANCE.init(servletContext).getWelcomeFiles()) {
+		for (String welcomeFile : getNodeTextContents(webXml, "welcome-file-list/welcome-file")) {
 			if (isExtensionless(welcomeFile)) {
 				mappedWelcomeFiles.add(addLeadingSlashIfNecessary(stripTrailingSlash(welcomeFile)));
 			}

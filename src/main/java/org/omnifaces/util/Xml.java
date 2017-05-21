@@ -12,10 +12,13 @@
  */
 package org.omnifaces.util;
 
+import static java.util.Arrays.asList;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -24,6 +27,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
+import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -135,6 +139,30 @@ public final class Xml {
 	 */
 	public static String getTextContent(Node node) {
 		return node.getFirstChild().getNodeValue().trim();
+	}
+
+	/**
+	 * Convenience method to return a list of node text contents for given URL representing XML document matching given
+	 * XPath expression.
+	 * @param url The URL representing XML document.
+	 * @param expression The XPath expression to match node list whose text content has to be collected.
+	 * @return A list of node text contents.
+	 * @since 2.6.3
+	 */
+	public static List<String> getNodeTextContents(URL url, String expression) {
+		try {
+			NodeList nodeList = getNodeList(createDocument(asList(url)).getDocumentElement(), XPathFactory.newInstance().newXPath(), expression);
+			List<String> nodeTextContents = new ArrayList<>(nodeList.getLength());
+
+			for (int i = 0; i < nodeList.getLength(); i++) {
+				nodeTextContents.add(getTextContent(nodeList.item(i)));
+			}
+
+			return nodeTextContents;
+		}
+		catch (IOException | SAXException | XPathExpressionException e) {
+			throw new IllegalArgumentException(e);
+		}
 	}
 
 }

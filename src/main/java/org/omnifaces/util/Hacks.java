@@ -95,6 +95,8 @@ public final class Hacks {
 
 	private static final String MOJARRA_SERIALIZED_VIEWS = "com.sun.faces.renderkit.ServerSideStateHelper.LogicalViewMap";
 	private static final String MOJARRA_SERIALIZED_VIEW_KEY = "com.sun.faces.logicalViewMap";
+	private static final String MOJARRA_ACTIVE_VIEW_MAPS = "com.sun.faces.application.view.activeViewMaps";
+	private static final String MOJARRA_VIEW_MAP_ID = "com.sun.faces.application.view.viewMapId";
 	private static final String MYFACES_SERIALIZED_VIEWS = "org.apache.myfaces.application.viewstate.ServerSideStateCacheImpl.SERIALIZED_VIEW";
 	private static final String MYFACES_VIEW_SCOPE_PROVIDER = "org.apache.myfaces.spi.ViewScopeProvider.INSTANCE";
 
@@ -406,7 +408,7 @@ public final class Hacks {
 	//  JSF state saving related --------------------------------------------------------------------------------------
 
 	/**
-	 * Remove server side JSF view state associated with current request.
+	 * Remove server side JSF view state (and view scoped beans) associated with current request.
 	 * @param context The involved faces context.
 	 * @param manager The involved response state manager.
 	 * @param viewId The view ID of the involved view.
@@ -467,10 +469,16 @@ public final class Hacks {
 			}
 		}
 		else { // Well, let's assume Mojarra.
-			Map<String, Object> views = getSessionAttribute(context, MOJARRA_SERIALIZED_VIEWS);
+			Map<String, Object> serializedViews = getSessionAttribute(context, MOJARRA_SERIALIZED_VIEWS);
 
-			if (views != null) {
-				views.remove(context.getAttributes().get(MOJARRA_SERIALIZED_VIEW_KEY));
+			if (serializedViews != null) {
+				serializedViews.remove(context.getAttributes().get(MOJARRA_SERIALIZED_VIEW_KEY));
+			}
+
+			Map<String, Object> activeViewMaps = getSessionAttribute(context, MOJARRA_ACTIVE_VIEW_MAPS);
+
+			if (activeViewMaps != null) {
+				activeViewMaps.remove(context.getViewRoot().getTransientStateHelper().getTransient(MOJARRA_VIEW_MAP_ID));
 			}
 		}
 	}
