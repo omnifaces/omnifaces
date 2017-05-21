@@ -73,15 +73,10 @@ public final class Hacks {
 		toClassOrNull("org.primefaces.component.dialog.Dialog");
 
 	private static final String MYFACES_PACKAGE_PREFIX = "org.apache.myfaces.";
-	private static final String MYFACES_RENDERED_SCRIPT_RESOURCES_KEY =
-		"org.apache.myfaces.RENDERED_SCRIPT_RESOURCES_SET";
-	private static final String MYFACES_RENDERED_STYLESHEET_RESOURCES_KEY =
-		"org.apache.myfaces.RENDERED_STYLESHEET_RESOURCES_SET";
-	private static final Set<String> MOJARRA_MYFACES_RESOURCE_DEPENDENCY_KEYS =
+	private static final Set<String> MYFACES_RESOURCE_DEPENDENCY_KEYS =
 		unmodifiableSet(
-			"com.sun.faces.PROCESSED_RESOURCE_DEPENDENCIES",
-			MYFACES_RENDERED_SCRIPT_RESOURCES_KEY,
-			MYFACES_RENDERED_STYLESHEET_RESOURCES_KEY);
+			"org.apache.myfaces.RENDERED_SCRIPT_RESOURCES_SET",
+			"org.apache.myfaces.RENDERED_STYLESHEET_RESOURCES_SET");
 	private static final String MOJARRA_DEFAULT_RESOURCE_MAX_AGE = "com.sun.faces.defaultResourceMaxAge";
 	private static final String MYFACES_DEFAULT_RESOURCE_MAX_AGE = "org.apache.myfaces.RESOURCE_MAX_TIME_EXPIRES";
 	private static final long DEFAULT_RESOURCE_MAX_AGE = 604800000L; // 1 week.
@@ -291,10 +286,10 @@ public final class Hacks {
 	 * @param context The involved faces context.
 	 */
 	public static void removeResourceDependencyState(FacesContext context) {
-		// Mojarra and MyFaces remembers processed resource dependencies in a map.
-		context.getAttributes().keySet().removeAll(MOJARRA_MYFACES_RESOURCE_DEPENDENCY_KEYS);
+		// MyFaces remembers processed resource dependencies in a map which it doesn't clear on change of view.
+		context.getAttributes().keySet().removeAll(MYFACES_RESOURCE_DEPENDENCY_KEYS);
 
-		// Mojarra and PrimeFaces puts "namelibrary=true" for every processed resource dependency.
+		// PrimeFaces puts "namelibrary=true" for every processed resource dependency.
 		// NOTE: This may possibly conflict with other keys with value=true. So far tested, this is harmless.
 		context.getAttributes().values().removeAll(Collections.singleton(true));
  	}
