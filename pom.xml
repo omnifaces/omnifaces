@@ -89,19 +89,20 @@
 		<dependency>
 			<groupId>javax.enterprise</groupId>
 			<artifactId>cdi-api</artifactId>
-			<version>2.0-PFD2</version><!-- TODO: update to 2.0 final once available. -->
+			<version>2.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
-			<version>2.0.0.Alpha2</version><!-- TODO: update to 2.0 final once available. -->
+			<version>2.0.0.Beta2</version><!-- TODO: update to 2.0 final once available. -->
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.json</groupId>
 			<artifactId>javax.json-api</artifactId>
-			<version>1.1.0-M1</version><!-- TODO: update to 1.1 final once available. -->
+			<version>1.1.0-M2</version><!-- TODO: update to 1.1 final once available. -->
+			<scope>provided</scope>
 		</dependency>
 
 		<!-- Java EE 7 dependencies. -->
