@@ -7,10 +7,9 @@ cache:
       - "$HOME/.sonar/cache"
 
 # Do integration test on configured servers.
-# NOTE: tomee is outcommented until we can get JSF 2.3 to run on this server.
 env:
    - SERVER=wildfly
-#   - SERVER=tomee
+   - SERVER=tomee
    - SERVER=payara
 script: mvn verify -Dmaven.javadoc.skip=true -P $SERVER
 

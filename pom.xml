@@ -574,11 +574,69 @@
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.apache.tomee</groupId>
+											<artifactId>apache-tomee</artifactId>
+											<version>${test.tomee.version}</version>
+											<type>zip</type>
+											<classifier>webprofile</classifier>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+							<execution>
+								<id>upgrade-tomee-to-jsf23</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.glassfish</groupId>
+											<artifactId>javax.faces</artifactId>
+											<version>2.3.0</version>
+											<type>jar</type>
+											<outputDirectory>${project.build.directory}/apache-tomee-webprofile-${test.tomee.version}/lib</outputDirectory>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>truezip-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<id>remove-tomee-myfaces-files</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>remove</goal>
+								</goals>
+								<configuration>
+									<fileset>
+										<directory>${project.build.directory}/apache-tomee-webprofile-${test.tomee.version}/lib</directory>
+										<includes>
+											<include>myfaces-api-2.2.11.jar</include>
+											<include>myfaces-impl-2.2.11.jar</include>
+										</includes>
+									</fileset>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
 							<systemPropertyVariables>
-								<tomee.version>${test.tomee.version}</tomee.version>
-								<tomee.classifier>webprofile</tomee.classifier>
+								<tomee.dir>${project.build.directory}/apache-tomee-webprofile-${test.tomee.version}</tomee.dir>
 							</systemPropertyVariables>
 						</configuration>
 					</plugin>
