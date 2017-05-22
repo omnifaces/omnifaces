@@ -476,10 +476,10 @@
 								</configuration>
 							</execution>
 							<execution>
-								<id>unpack-jsf23-for-wildfly</id>
+								<id>upgrade-wildfly-to-jsf23</id>
 								<phase>pre-integration-test</phase>
 								<goals>
-									<goal>unpack</goal>
+									<goal>copy</goal>
 								</goals>
 								<configuration>
 									<artifactItems>
@@ -488,7 +488,18 @@
 											<artifactId>javax.faces</artifactId>
 											<version>2.3.0-m09</version> <!-- Fails since m10 due to a bug in WildFly http://stackoverflow.com/q/44076148/157882 -->
 											<type>jar</type>
-											<outputDirectory>${project.build.directory}/jsf23-unpacked</outputDirectory>
+											<outputDirectory>${project.build.directory}/wildfly-${test.wildfly.version}/modules/system/layers/base/javax/faces/api/main</outputDirectory>
+											<destFileName>jboss-jsf-api_2.2_spec-2.2.13.jar</destFileName> <!-- Reuse same file name to make our life easier (no editing of module.xml necessary). -->
+											<overWrite>true</overWrite>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.glassfish</groupId>
+											<artifactId>javax.faces</artifactId>
+											<version>2.3.0-m09</version> <!-- Fails since m10 due to a bug in WildFly http://stackoverflow.com/q/44076148/157882 -->
+											<type>jar</type>
+											<outputDirectory>${project.build.directory}/wildfly-${test.wildfly.version}/modules/system/layers/base/com/sun/jsf-impl/main</outputDirectory>
+											<destFileName>jsf-impl-2.2.13.SP1.jar</destFileName> <!-- Reuse same file name to make our life easier (no editing of module.xml necessary). -->
+											<overWrite>true</overWrite>
 										</artifactItem>
 									</artifactItems>
 								</configuration>
@@ -496,42 +507,40 @@
 						</executions>
 					</plugin>
 					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-jar-plugin</artifactId>
-						<version>2.6</version> <!-- So we can use finalName, which was removed in 3.0.0 -->
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>truezip-maven-plugin</artifactId>
+						<version>1.2</version>
 						<executions>
 							<execution>
-								<id>pack-jsf23-api-for-wildfly</id>
+								<id>repack-wildfly-jsf23-api</id>
 								<phase>pre-integration-test</phase>
 								<goals>
-									<goal>jar</goal>
+									<goal>remove</goal>
 								</goals>
 								<configuration>
-									<classesDirectory>${project.build.directory}/jsf23-unpacked</classesDirectory>
-									<includes>
-										<include>javax/**</include>
-										<include>META-INF/MANIFEST.MF</include>
-									</includes>
-									<outputDirectory>${project.build.directory}/wildfly-${test.wildfly.version}/modules/system/layers/base/javax/faces/api/main</outputDirectory>
-									<finalName>jboss-jsf-api_2.2_spec</finalName> <!-- Reuse same file name to make our life easier. -->
-									<classifier>2.2.13</classifier>
+									<fileset>
+										<directory>${project.build.directory}/wildfly-${test.wildfly.version}/modules/system/layers/base/javax/faces/api/main/jboss-jsf-api_2.2_spec-2.2.13.jar</directory>
+										<excludes>
+											<exclude>javax/**</exclude>
+											<exclude>META-INF/MANIFEST.MF</exclude>
+										</excludes>
+									</fileset>
 								</configuration>
 							</execution>
 							<execution>
-								<id>pack-jsf23-impl-for-wildfly</id>
+								<id>repack-wildfly-jsf23-impl</id>
 								<phase>pre-integration-test</phase>
 								<goals>
-									<goal>jar</goal>
+									<goal>remove</goal>
 								</goals>
 								<configuration>
-									<classesDirectory>${project.build.directory}/jsf23-unpacked</classesDirectory>
-									<includes>
-										<include>com/**</include>
-										<include>META-INF/**</include>
-									</includes>
-									<outputDirectory>${project.build.directory}/wildfly-${test.wildfly.version}/modules/system/layers/base/com/sun/jsf-impl/main</outputDirectory>
-									<finalName>jsf-impl</finalName> <!-- Reuse same file name to make our life easier. -->
-									<classifier>2.2.13.SP1</classifier>
+									<fileset>
+										<directory>${project.build.directory}/wildfly-${test.wildfly.version}/modules/system/layers/base/com/sun/jsf-impl/main/jsf-impl-2.2.13.SP1.jar</directory>
+										<excludes>
+											<exclude>com/**</exclude>
+											<exclude>META-INF/**</exclude>
+										</excludes>
+									</fileset>
 								</configuration>
 							</execution>
 						</executions>
@@ -580,9 +589,6 @@
 		<!-- Payara integration test profile: mvn verify -P payara -->
 		<profile>
 			<id>payara</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-			</activation>
 			<dependencies>
 				<dependency>
 					<groupId>org.jboss.arquillian.container</groupId>
