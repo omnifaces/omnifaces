@@ -42,7 +42,6 @@ import javax.faces.event.PreRenderViewEvent;
 import javax.faces.event.SystemEvent;
 import javax.faces.event.SystemEventListener;
 
-import org.omnifaces.component.output.cache.Cache;
 import org.omnifaces.component.script.DeferredScript;
 import org.omnifaces.renderer.DeferredScriptRenderer;
 import org.omnifaces.renderer.InlineResourceRenderer;
@@ -50,6 +49,7 @@ import org.omnifaces.renderer.InlineScriptRenderer;
 import org.omnifaces.renderer.InlineStylesheetRenderer;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.Hacks;
+import org.omnifaces.util.cache.Cache;
 
 /**
  * <p>
@@ -498,16 +498,18 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 		private void addStylesheet(FacesContext context, UIComponent component, ResourceIdentifier id) {
 			if (stylesheets.add(component, id)) {
-				Hacks.setStylesheetResourceRendered(context, id); // Prevents future forced additions by libs.
+				context.getApplication().getResourceHandler().markResourceRendered(context, id.getName(), id.getLibrary()); // Prevents future forced additions by libs.
 			}
 		}
 
 		private void addScript(FacesContext context, UIComponent component, ResourceIdentifier id) {
-			if (Hacks.isScriptResourceRendered(context, id)) { // This is true when o:deferredScript is used.
+			ResourceHandler resourceHandler = context.getApplication().getResourceHandler();
+
+			if (resourceHandler.isResourceRendered(context, id.getName(), id.getLibrary())) { // This is true when o:deferredScript is used.
 				componentResourcesToRemove.add(component);
 			}
 			else if (scripts.add(component, id)) {
-				Hacks.setScriptResourceRendered(context, id); // Prevents future forced additions by libs.
+				resourceHandler.markResourceRendered(context, id.getName(), id.getLibrary()); // Prevents future forced additions by libs.
 			}
 		}
 

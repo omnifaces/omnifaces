@@ -14,6 +14,7 @@ package org.omnifaces.cdi.param;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.util.Arrays.asList;
+import static javax.faces.component.UIInput.EMPTY_STRING_AS_NULL_PARAM_NAME;
 import static javax.faces.validator.BeanValidator.DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME;
 import static org.omnifaces.util.Beans.getQualifier;
 import static org.omnifaces.util.Components.setLabel;
@@ -72,6 +73,7 @@ import org.omnifaces.cdi.Param;
  * @author Arjan Tijms
  */
 @Dependent
+@SuppressWarnings({"rawtypes", "unchecked"}) // For now.
 public class ParamProducer {
 
 	private static final String DEFAULT_REQUIRED_MESSAGE = "{0}: Value is required";
@@ -169,13 +171,11 @@ public class ParamProducer {
 			return interpretEmptyStringSubmittedValuesAsNull;
 		}
 
-		interpretEmptyStringSubmittedValuesAsNull = parseBoolean(context.getExternalContext()
-			.getInitParameter("javax.faces.INTERPRET_EMPTY_STRING_SUBMITTED_VALUES_AS_NULL"));
+		interpretEmptyStringSubmittedValuesAsNull = parseBoolean(context.getExternalContext().getInitParameter(EMPTY_STRING_AS_NULL_PARAM_NAME));
 
 		return interpretEmptyStringSubmittedValuesAsNull;
 	}
 
-	@SuppressWarnings("unchecked")
 	static <V> V coerceValues(Type type, Object... values) {
 		if (type instanceof ParameterizedType) {
 			return coerceValues(((ParameterizedType) type).getRawType(), values);
@@ -298,7 +298,6 @@ public class ParamProducer {
 		return converter;
 	}
 
-	@SuppressWarnings("unchecked")
 	private static <V> Class<V> getTargetType(Type type) {
 		if (type instanceof Class && ((Class<?>) type).isArray()) {
 			return (Class<V>) ((Class<?>) type).getComponentType();
@@ -385,7 +384,6 @@ public class ParamProducer {
 		return isBeanValidationAvailable();
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private static <V> Set<ConstraintViolation<?>> doBeanValidation(V paramValue, InjectionPoint injectionPoint) {
 
 		Class<?> base = injectionPoint.getBean().getBeanClass();
@@ -412,7 +410,8 @@ public class ParamProducer {
 		List<Validator> validators = new ArrayList<>();
 
 		for (String validatorIdentifier : requestParameter.validators()) {
-			Validator validator = createValidator(evaluateExpressionGet(validatorIdentifier));
+			Object evaluatedValidatorIdentifier = evaluateExpressionGet(validatorIdentifier);
+			Validator validator = createValidator(evaluatedValidatorIdentifier);
 
 			if (validator != null) {
 				validators.add(validator);

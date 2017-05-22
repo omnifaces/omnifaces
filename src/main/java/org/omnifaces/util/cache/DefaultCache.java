@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.omnifaces.component.output.cache;
+package org.omnifaces.util.cache;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -31,7 +31,7 @@ import org.omnifaces.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap;
  */
 public class DefaultCache extends TimeToLiveCache {
 
-	private static final long serialVersionUID = 9043165102510796018L;
+	private static final long serialVersionUID = 1L;
 
 	public DefaultCache(Integer defaultTimeToLive, Integer maxCapacity) {
 		super(defaultTimeToLive);

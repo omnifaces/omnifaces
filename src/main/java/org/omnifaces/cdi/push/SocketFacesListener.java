@@ -33,8 +33,6 @@ import javax.faces.event.PreRenderViewEvent;
 import javax.faces.event.SystemEvent;
 import javax.faces.event.SystemEventListener;
 
-import org.omnifaces.util.Callback;
-
 /**
  * <p>
  * This JSF listener for {@link UIViewRoot} ensures that the necessary JavaScript code to open or close the
@@ -73,10 +71,10 @@ public class SocketFacesListener implements SystemEventListener {
 			return;
 		}
 
-		final FacesContext context = FacesContext.getCurrentInstance();
-		final Map<String, Boolean> sockets = getSockets(context);
+		FacesContext context = FacesContext.getCurrentInstance();
+		Map<String, Boolean> sockets = getSockets(context);
 
-		forEachComponent(context).ofTypes(Socket.class).invoke(new Callback.WithArgument<Socket>() { @Override public void invoke(Socket socket) {
+		forEachComponent(context).ofTypes(Socket.class).<Socket>invoke(socket -> {
 			if (!sockets.containsKey(socket.getChannel())) {
 				return;
 			}
@@ -94,7 +92,7 @@ public class SocketFacesListener implements SystemEventListener {
 					addScriptToBody(script);
 				}
 			}
-		}});
+		});
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------

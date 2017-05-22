@@ -15,12 +15,10 @@ package org.omnifaces.facesviews;
 import static javax.faces.application.ProjectStage.Development;
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
-import static org.omnifaces.facesviews.FacesServletDispatchMethod.DO_FILTER;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_PATH_INFO;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_SERVLET_PATH;
 import static org.omnifaces.facesviews.FacesViews.getExtensionAction;
 import static org.omnifaces.facesviews.FacesViews.getExtensionlessURLWithQuery;
-import static org.omnifaces.facesviews.FacesViews.getFacesServletDispatchMethod;
 import static org.omnifaces.facesviews.FacesViews.getMappedResources;
 import static org.omnifaces.facesviews.FacesViews.getMultiViewsWelcomeFile;
 import static org.omnifaces.facesviews.FacesViews.getPathAction;
@@ -67,7 +65,6 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 
 	private ExtensionAction extensionAction;
 	private PathAction pathAction;
-	private FacesServletDispatchMethod dispatchMethod;
 
 	@Override
 	public void init() throws ServletException {
@@ -76,7 +73,6 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 		try {
 			extensionAction = getExtensionAction(servletContext);
 			pathAction = getPathAction(servletContext);
-			dispatchMethod = getFacesServletDispatchMethod(servletContext);
 		}
 		catch (IllegalStateException e) {
 			throw new ServletException(e);
@@ -137,7 +133,7 @@ public class FacesViewsForwardingFilter extends HttpFilter {
 
 			String servletPathWithExtension = path + getExtension(resources.get(resource));
 
-			if (dispatchMethod == DO_FILTER && resources.containsKey(servletPathWithExtension)) {
+			if (resources.containsKey(servletPathWithExtension)) {
 				filterExtensionLessToExtension(request, response, chain, servletPathWithExtension);
 				return true;
 			}

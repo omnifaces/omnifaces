@@ -19,6 +19,8 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.logging.Level.FINE;
 import static java.util.regex.Pattern.quote;
 import static javax.faces.component.UIComponent.getCompositeComponentParent;
+import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
+import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME;
 import static javax.faces.component.visit.VisitContext.createVisitContext;
 import static javax.faces.component.visit.VisitHint.SKIP_ITERATION;
 import static javax.faces.component.visit.VisitResult.ACCEPT;
@@ -39,6 +41,7 @@ import static org.omnifaces.util.Utils.isOneInstanceOf;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.io.UncheckedIOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -82,7 +85,6 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
 import javax.faces.event.AjaxBehaviorEvent;
-import javax.faces.event.AjaxBehaviorListener;
 import javax.faces.event.BehaviorListener;
 import javax.faces.event.MethodExpressionActionListener;
 import javax.faces.render.RenderKit;
@@ -521,32 +523,11 @@ public final class Components {
 		 * @param operation the operation to invoke on each component
 		 * @throws ClassCastException When <code>C</code> is of wrong type.
 		 */
-		public <C extends UIComponent> void invoke(final Callback.WithArgument<C> operation) {
-			invoke(new VisitCallback() {
-				@Override
-				@SuppressWarnings("unchecked")
-				public VisitResult visit(VisitContext context, UIComponent target) {
-					operation.invoke((C) target);
-					return ACCEPT;
-				}
-			});
-		}
-
-		/**
-		 * Invokes the given operation on the components as specified by the
-		 * query parameters set via this builder.
-		 *
-		 * @param <C> The expected component type.
-		 * @param operation the operation to invoke on each component
-		 * @throws ClassCastException When <code>C</code> is of wrong type.
-		 */
-		public <C extends UIComponent> void invoke(final Callback.ReturningWithArgument<VisitResult, C> operation) {
-			invoke(new VisitCallback() {
-				@Override
-				@SuppressWarnings("unchecked")
-				public VisitResult visit(VisitContext context, UIComponent target) {
-					return operation.invoke((C) target);
-				}
+		@SuppressWarnings("unchecked")
+		public <C extends UIComponent> void invoke(Callback.WithArgument<C> operation) {
+			invoke((context, target) -> {
+				operation.invoke((C) target);
+				return ACCEPT;
 			});
 		}
 
@@ -556,21 +537,15 @@ public final class Components {
 		 *
 		 * @param operation the operation to invoke on each component
 		 */
-		public void invoke(final VisitCallback operation) {
-			final VisitContext visitContext = createVisitContext(getFacesContext(), getIds(), getHints());
-			final VisitCallback visitCallback = (types == null) ? operation : new TypesVisitCallback(types, operation);
-			UIViewRoot viewRoot = getFacesContext().getViewRoot();
+		public void invoke(VisitCallback operation) {
+			VisitContext visitContext = createVisitContext(getFacesContext(), getIds(), getHints());
+			VisitCallback visitCallback = (types == null) ? operation : new TypesVisitCallback(types, operation);
 
-			if (viewRoot.equals(getRoot())) {
-				viewRoot.visitTree(visitContext, visitCallback);
+			if (getFacesContext().getViewRoot().equals(getRoot())) {
+				getRoot().visitTree(visitContext, visitCallback);
 			}
 			else {
-				forEachComponent().havingIds(getRoot().getClientId()).invoke(new Callback.WithArgument<UIComponent>() {
-					@Override
-					public void invoke(UIComponent root) {
-						root.visitTree(visitContext, visitCallback);
-					}
-				});
+				forEachComponent().havingIds(getRoot().getClientId()).invoke(viewRoot -> viewRoot.visitTree(visitContext, visitCallback));
 			}
 		}
 
@@ -619,8 +594,7 @@ public final class Components {
 	 * to the webcontent root.
 	 * @param parent The parent component to include the Facelet file in.
 	 * @param path The (relative) path to the Facelet file.
-	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
-	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @throws IOException Whenever given path cannot be read.
 	 * @see FaceletContext#includeFacelet(UIComponent, String)
 	 * @since 1.5
 	 */
@@ -669,7 +643,7 @@ public final class Components {
 	 */
 	public static UIComponent includeCompositeComponent(UIComponent parent, String libraryName, String tagName, String id, Map<String, String> attributes) {
 		String taglibURI = "http://xmlns.jcp.org/jsf/composite/" + libraryName;
-		Map<String, Object> attrs = (attributes == null) ? null : new HashMap<String, Object>(attributes);
+		Map<String, Object> attrs = (attributes == null) ? null : new HashMap<>(attributes);
 
 		FacesContext context = FacesContext.getCurrentInstance();
 		UIComponent composite = context.getApplication().getViewHandler()
@@ -800,11 +774,11 @@ public final class Components {
 	 * already doesn't have a HTML head nor body.
 	 * @param component The component to capture HTML output for.
 	 * @return The encoded HTML output of the given component.
-	 * @throws IOException Whenever something fails at I/O level. This would be quite unexpected as it happens locally.
+	 * @throws UncheckedIOException Whenever something fails at I/O level. This would be quite unexpected as it happens locally.
 	 * @since 2.2
 	 * @see UIComponent#encodeAll(FacesContext)
 	 */
-	public static String encodeHtml(UIComponent component) throws IOException {
+	public static String encodeHtml(UIComponent component) {
 		FacesContext context = FacesContext.getCurrentInstance();
 		ResponseWriter originalWriter = context.getResponseWriter();
 		StringWriter output = new StringWriter();
@@ -812,6 +786,9 @@ public final class Components {
 
 		try {
 			component.encodeAll(context);
+		}
+		catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
 		finally {
 			if (originalWriter != null) {
@@ -896,7 +873,7 @@ public final class Components {
 		Map<String, String> params = context.getExternalContext().getRequestParameterMap();
 
 		if (context.getPartialViewContext().isAjaxRequest()) {
-			String sourceClientId = params.get("javax.faces.source");
+			String sourceClientId = params.get(BEHAVIOR_SOURCE_PARAM_NAME);
 
 			if (sourceClientId != null) {
 				UIComponent actionSource = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(sourceClientId));
@@ -953,24 +930,21 @@ public final class Components {
 	 * @return The value of the <code>label</code> attribute associated with the given UI component if any, else
 	 * null.
 	 */
-	public static String getOptionalLabel(final UIComponent component) {
-		final Object[] result = new Object[1];
+	public static String getOptionalLabel(UIComponent component) {
+		Object[] result = new Object[1];
 
-		new ScopedRunner(getContext()).with("cc", getCompositeComponentParent(component)).invoke(new Callback.Void() {
-			@Override
-			public void invoke() {
-				Object label = component.getAttributes().get(ATTRIBUTE_LABEL);
+		new ScopedRunner(getContext()).with("cc", getCompositeComponentParent(component)).invoke(() -> {
+			Object label = component.getAttributes().get(ATTRIBUTE_LABEL);
 
-				if (isEmpty(label)) {
-					ValueExpression labelExpression = component.getValueExpression(ATTRIBUTE_LABEL);
+			if (isEmpty(label)) {
+				ValueExpression labelExpression = component.getValueExpression(ATTRIBUTE_LABEL);
 
-					if (labelExpression != null) {
-						label = labelExpression.getValue(getELContext());
-					}
+				if (labelExpression != null) {
+					label = labelExpression.getValue(getELContext());
 				}
-
-				result[0] = label;
 			}
+
+			result[0] = label;
 		});
 
 		return (result[0] != null) ? result[0].toString() : null;
@@ -1125,26 +1099,23 @@ public final class Components {
 	 * @return The {@link UIMessage} component associated with given {@link UIInput} component.
 	 * @since 2.5
 	 */
-	public static UIMessage getMessageComponent(final UIInput input) {
-		final UIMessage[] found = new UIMessage[1];
+	public static UIMessage getMessageComponent(UIInput input) {
+		UIMessage[] found = new UIMessage[1];
 
-		forEachComponent().ofTypes(UIMessage.class).withHints(SKIP_ITERATION).invoke(new VisitCallback() {
-			@Override
-			public VisitResult visit(VisitContext context, UIComponent target) {
-				UIMessage messageComponent = (UIMessage) target;
-				String forValue = messageComponent.getFor();
+		forEachComponent().ofTypes(UIMessage.class).withHints(SKIP_ITERATION).invoke((context, target) -> {
+			UIMessage messageComponent = (UIMessage) target;
+			String forValue = messageComponent.getFor();
 
-				if (!isEmpty(forValue)) {
-					UIComponent forComponent = findComponentRelatively(messageComponent, forValue);
+			if (!isEmpty(forValue)) {
+				UIComponent forComponent = findComponentRelatively(messageComponent, forValue);
 
-					if (input.equals(forComponent)) {
-						found[0] = messageComponent;
-						return VisitResult.COMPLETE;
-					}
+				if (input.equals(forComponent)) {
+					found[0] = messageComponent;
+					return VisitResult.COMPLETE;
 				}
-
-				return VisitResult.ACCEPT;
 			}
+
+			return VisitResult.ACCEPT;
 		});
 
 		return found[0];
@@ -1157,14 +1128,11 @@ public final class Components {
 	 * @since 2.5
 	 */
 	public static UIMessages getMessagesComponent() {
-		final UIMessages[] found = new UIMessages[1];
+		UIMessages[] found = new UIMessages[1];
 
-		forEachComponent().ofTypes(UIMessages.class).withHints(SKIP_ITERATION).invoke(new VisitCallback() {
-			@Override
-			public VisitResult visit(VisitContext context, UIComponent target) {
-				found[0] = (UIMessages) target;
-				return VisitResult.COMPLETE;
-			}
+		forEachComponent().ofTypes(UIMessages.class).withHints(SKIP_ITERATION).invoke((context, target) -> {
+			found[0] = (UIMessages) target;
+			return VisitResult.COMPLETE;
 		});
 
 		return found[0];
@@ -1195,12 +1163,7 @@ public final class Components {
 	 * @since 2.5
 	 */
 	public static void resetInputs(UIComponent component) {
-		forEachComponent().fromRoot(component).ofTypes(UIInput.class).invoke(new Callback.WithArgument<UIInput>() {
-			@Override
-			public void invoke(UIInput input) {
-				input.resetValue();
-			}
-		});
+		forEachComponent().fromRoot(component).ofTypes(UIInput.class).invoke(UIInput::resetValue);
 	}
 
 	// Expressions ----------------------------------------------------------------------------------------------------
@@ -1316,13 +1279,8 @@ public final class Components {
 	public static AjaxBehavior createAjaxBehavior(String expression) {
 		FacesContext context = FacesContext.getCurrentInstance();
 		AjaxBehavior behavior = (AjaxBehavior) context.getApplication().createBehavior(AjaxBehavior.BEHAVIOR_ID);
-		final MethodExpression method = createVoidMethodExpression(expression, AjaxBehaviorEvent.class);
-		behavior.addAjaxBehaviorListener(new AjaxBehaviorListener() {
-			@Override
-			public void processAjaxBehavior(AjaxBehaviorEvent event) {
-				method.invoke(getELContext(), new Object[] { event });
-			}
-		});
+		MethodExpression method = createVoidMethodExpression(expression, AjaxBehaviorEvent.class);
+		behavior.addAjaxBehaviorListener(event -> method.invoke(getELContext(), new Object[] { event }));
 		return behavior;
 	}
 
@@ -1349,7 +1307,7 @@ public final class Components {
 		}
 
 		if (component instanceof ClientBehaviorHolder) {
-			String behaviorEvent = getRequestParameter("javax.faces.behavior.event");
+			String behaviorEvent = getRequestParameter(BEHAVIOR_EVENT_PARAM_NAME);
 
 			if (behaviorEvent != null) {
 				for (BehaviorListener listener : getBehaviorListeners((ClientBehaviorHolder) component, behaviorEvent)) {
@@ -1597,11 +1555,10 @@ public final class Components {
 	 */
 	private static class TemporaryViewFacesContext extends FacesContextWrapper {
 
-		private FacesContext wrapped;
 		private UIViewRoot temporaryView;
 
 		public TemporaryViewFacesContext(FacesContext wrapped, UIViewRoot temporaryView) {
-			this.wrapped = wrapped;
+			super(wrapped);
 			this.temporaryView = temporaryView;
 		}
 
@@ -1613,11 +1570,6 @@ public final class Components {
 		@Override
 		public RenderKit getRenderKit() {
 			return FacesLocal.getRenderKit(this);
-		}
-
-		@Override
-		public FacesContext getWrapped() {
-			return wrapped;
 		}
 
 	}

@@ -12,9 +12,9 @@
  */
 package org.omnifaces.test.cdi.viewscoped;
 
+import static javax.faces.application.ResourceHandler.RESOURCE_IDENTIFIER;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.isUnloadRequest;
 import static org.omnifaces.util.Faces.getContext;
-import static org.omnifaces.util.Faces.getViewId;
 import static org.omnifaces.util.Faces.hasContext;
 import static org.omnifaces.util.Messages.addGlobalInfo;
 
@@ -25,6 +25,7 @@ import javax.annotation.PreDestroy;
 import javax.inject.Named;
 
 import org.omnifaces.cdi.ViewScoped;
+import org.omnifaces.util.Faces;
 
 @Named
 @ViewScoped
@@ -57,9 +58,11 @@ public class ViewScopedITBean implements Serializable {
 		addGlobalInfo("submit ");
 	}
 
-	public String navigate() {
+	public void navigate() {
+		Object renderedResources = Faces.getContextAttribute(RESOURCE_IDENTIFIER);
+		Faces.setViewRoot(Faces.getViewId()); // TODO: replace by return getViewId() once Mojarra 2.3.1 is released. See #4249
+		Faces.setContextAttribute(RESOURCE_IDENTIFIER, renderedResources); // TODO: remove once Mojarra 2.3.1 is released. See #4249
 		addGlobalInfo("navigate ");
-		return getViewId();
 	}
 
 	@PreDestroy

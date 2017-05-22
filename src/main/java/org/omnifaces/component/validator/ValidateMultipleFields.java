@@ -304,7 +304,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 	 * @param inputs The validated input components.
 	 */
 	protected void showMessage(FacesContext context, List<UIInput> inputs) {
-		final StringBuilder labels = new StringBuilder();
+		StringBuilder labels = new StringBuilder();
 
 		for (Iterator<UIInput> iterator = inputs.iterator(); iterator.hasNext();) {
 			labels.append(getLabel(iterator.next()));
@@ -332,7 +332,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 		return (UIInput) found;
 	}
 
-	private void addErrorMessage(FacesContext context, List<UIInput> inputs, final StringBuilder labels, String message, String showMessageFor) {
+	private void addErrorMessage(FacesContext context, List<UIInput> inputs, StringBuilder labels, String message, String showMessageFor) {
 		if ("@this".equals(showMessageFor)) {
 			addError(getClientId(context), message, labels);
 		}

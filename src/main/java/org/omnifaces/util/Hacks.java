@@ -17,10 +17,8 @@ import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
-import static org.omnifaces.util.FacesLocal.getContextAttribute;
 import static org.omnifaces.util.FacesLocal.getInitParameter;
 import static org.omnifaces.util.FacesLocal.getSessionAttribute;
-import static org.omnifaces.util.FacesLocal.setContextAttribute;
 import static org.omnifaces.util.Reflection.accessField;
 import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Reflection.invokeMethod;
@@ -31,7 +29,6 @@ import static org.omnifaces.util.Utils.unmodifiableSet;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -76,15 +73,10 @@ public final class Hacks {
 		toClassOrNull("org.primefaces.component.dialog.Dialog");
 
 	private static final String MYFACES_PACKAGE_PREFIX = "org.apache.myfaces.";
-	private static final String MYFACES_RENDERED_SCRIPT_RESOURCES_KEY =
-		"org.apache.myfaces.RENDERED_SCRIPT_RESOURCES_SET";
-	private static final String MYFACES_RENDERED_STYLESHEET_RESOURCES_KEY =
-		"org.apache.myfaces.RENDERED_STYLESHEET_RESOURCES_SET";
-	private static final Set<String> MOJARRA_MYFACES_RESOURCE_DEPENDENCY_KEYS =
+	private static final Set<String> MYFACES_RESOURCE_DEPENDENCY_KEYS =
 		unmodifiableSet(
-			"com.sun.faces.PROCESSED_RESOURCE_DEPENDENCIES",
-			MYFACES_RENDERED_SCRIPT_RESOURCES_KEY,
-			MYFACES_RENDERED_STYLESHEET_RESOURCES_KEY);
+			"org.apache.myfaces.RENDERED_SCRIPT_RESOURCES_SET",
+			"org.apache.myfaces.RENDERED_STYLESHEET_RESOURCES_SET");
 	private static final String MOJARRA_DEFAULT_RESOURCE_MAX_AGE = "com.sun.faces.defaultResourceMaxAge";
 	private static final String MYFACES_DEFAULT_RESOURCE_MAX_AGE = "org.apache.myfaces.RESOURCE_MAX_TIME_EXPIRES";
 	private static final long DEFAULT_RESOURCE_MAX_AGE = 604800000L; // 1 week.
@@ -256,85 +248,6 @@ public final class Hacks {
 	// JSF resource handling related ----------------------------------------------------------------------------------
 
 	/**
-	 * Set the given script resource as rendered.
-	 * @param context The involved faces context.
-	 * @param id The resource identifier.
-	 * @since 1.8
-	 */
-	public static void setScriptResourceRendered(FacesContext context, ResourceIdentifier id) {
-		setMojarraResourceRendered(context, id);
-
-		if (isMyFacesUsed()) {
-			setMyFacesResourceRendered(context, MYFACES_RENDERED_SCRIPT_RESOURCES_KEY, id);
-		}
-	}
-
-	/**
-	 * Returns whether the given script resource is rendered.
-	 * @param context The involved faces context.
-	 * @param id The resource identifier.
-	 * @return Whether the given script resource is rendered.
-	 * @since 1.8
-	 */
-	public static boolean isScriptResourceRendered(FacesContext context, ResourceIdentifier id) {
-		boolean rendered = isMojarraResourceRendered(context, id);
-
-		if (!rendered && isMyFacesUsed()) {
-			return isMyFacesResourceRendered(context, MYFACES_RENDERED_SCRIPT_RESOURCES_KEY, id);
-		}
-		else {
-			return rendered;
-		}
-	}
-
-	/**
-	 * Set the given stylesheet resource as rendered.
-	 * @param context The involved faces context.
-	 * @param id The resource identifier.
-	 * @since 1.8
-	 */
-	public static void setStylesheetResourceRendered(FacesContext context, ResourceIdentifier id) {
-		setMojarraResourceRendered(context, id);
-
-		if (isMyFacesUsed()) {
-			setMyFacesResourceRendered(context, MYFACES_RENDERED_STYLESHEET_RESOURCES_KEY, id);
-		}
-	}
-
-	private static void setMojarraResourceRendered(FacesContext context, ResourceIdentifier id) {
-		context.getAttributes().put(id.getName() + id.getLibrary(), true);
-	}
-
-	private static boolean isMojarraResourceRendered(FacesContext context, ResourceIdentifier id) {
-		return context.getAttributes().containsKey(id.getName() + id.getLibrary());
-	}
-
-	private static void setMyFacesResourceRendered(FacesContext context, String key, ResourceIdentifier id) {
-		getMyFacesResourceMap(context, key).put(getMyFacesResourceKey(id), true);
-	}
-
-	private static boolean isMyFacesResourceRendered(FacesContext context, String key, ResourceIdentifier id) {
-		return getMyFacesResourceMap(context, key).containsKey(getMyFacesResourceKey(id));
-	}
-
-	private static Map<String, Boolean> getMyFacesResourceMap(FacesContext context, String key) {
-		Map<String, Boolean> map = getContextAttribute(context, key);
-
-		if (map == null) {
-			map = new HashMap<>();
-			setContextAttribute(context, key, map);
-		}
-
-		return map;
-	}
-
-	private static String getMyFacesResourceKey(ResourceIdentifier id) {
-		String library = id.getLibrary();
-		String name = id.getName();
-		return (library != null) ? (library + '/' + name) : name;
-	}
-
-	/**
 	 * Returns the default resource maximum age in milliseconds.
 	 * @return The default resource maximum age in milliseconds.
 	 */
@@ -373,10 +286,10 @@ public final class Hacks {
 	 * @param context The involved faces context.
 	 */
 	public static void removeResourceDependencyState(FacesContext context) {
-		// Mojarra and MyFaces remembers processed resource dependencies in a map.
-		context.getAttributes().keySet().removeAll(MOJARRA_MYFACES_RESOURCE_DEPENDENCY_KEYS);
+		// MyFaces remembers processed resource dependencies in a map which it doesn't clear on change of view.
+		context.getAttributes().keySet().removeAll(MYFACES_RESOURCE_DEPENDENCY_KEYS);
 
-		// Mojarra and PrimeFaces puts "namelibrary=true" for every processed resource dependency.
+		// PrimeFaces puts "namelibrary=true" for every processed resource dependency.
 		// NOTE: This may possibly conflict with other keys with value=true. So far tested, this is harmless.
 		context.getAttributes().values().removeAll(Collections.singleton(true));
  	}

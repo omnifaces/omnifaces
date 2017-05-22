@@ -16,18 +16,14 @@ import static javax.servlet.RequestDispatcher.FORWARD_SERVLET_PATH;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_SERVLET_PATH;
 import static org.omnifaces.facesviews.FacesViews.getFacesServletExtensions;
 import static org.omnifaces.facesviews.FacesViews.getMappedResources;
-import static org.omnifaces.facesviews.FacesViews.getViewHandlerMode;
 import static org.omnifaces.facesviews.FacesViews.isScannedViewsAlwaysExtensionless;
 import static org.omnifaces.facesviews.FacesViews.stripWelcomeFilePrefix;
-import static org.omnifaces.facesviews.ViewHandlerMode.BUILD_WITH_PARENT_QUERY_PARAMETERS;
 import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.FacesLocal.getRequestAttribute;
-import static org.omnifaces.util.FacesLocal.getRequestContextPath;
 import static org.omnifaces.util.FacesLocal.getRequestPathInfo;
 import static org.omnifaces.util.FacesLocal.getServletContext;
 import static org.omnifaces.util.ResourcePaths.getExtension;
 import static org.omnifaces.util.ResourcePaths.isExtensionless;
-import static org.omnifaces.util.ResourcePaths.stripExtension;
 import static org.omnifaces.util.ResourcePaths.stripTrailingSlash;
 import static org.omnifaces.util.Utils.coalesce;
 
@@ -50,17 +46,13 @@ import javax.servlet.ServletContext;
  * @since 1.3
  * @see FacesViews
  * @see FacesViewsViewHandlerInstaller
- * @see ViewHandlerMode
  */
 public class FacesViewsViewHandler extends ViewHandlerWrapper {
 
-	private final ViewHandler wrapped;
-	private final ViewHandlerMode mode;
 	private final boolean extensionless;
 
-	public FacesViewsViewHandler(ViewHandler viewHandler) {
-		wrapped = viewHandler;
-		mode = getViewHandlerMode(getServletContext());
+	public FacesViewsViewHandler(ViewHandler wrapped) {
+		super(wrapped);
 		extensionless = isScannedViewsAlwaysExtensionless(getServletContext());
 	}
 
@@ -79,25 +71,13 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 		if (mappedResources.containsKey(viewId) && (extensionless || isOriginalViewExtensionless(context))) {
 			// User has requested to always render extensionless, or the requested viewId was mapped and the current
 			// request is extensionless; render the action URL extensionless as well.
-
 			String pathInfo = context.getViewRoot().getViewId().equals(viewId) ? coalesce(getRequestPathInfo(context), "") : "";
-
-			if (mode == BUILD_WITH_PARENT_QUERY_PARAMETERS) {
-				return getRequestContextPath(context) + stripExtension(viewId) + pathInfo + getQueryString(actionURL);
-			}
-			else {
-				actionURL = removeExtension(servletContext, actionURL, viewId);
-				return pathInfo.isEmpty() ? actionURL : (stripTrailingSlash(actionURL) + pathInfo + getQueryString(actionURL));
-			}
+			actionURL = removeExtension(servletContext, actionURL, viewId);
+			return pathInfo.isEmpty() ? actionURL : (stripTrailingSlash(actionURL) + pathInfo + getQueryString(actionURL));
 		}
 
 		// Not a resource we mapped or not a forwarded one, take the version from the parent view handler.
 		return actionURL;
-	}
-
-	@Override
-	public ViewHandler getWrapped() {
-		return wrapped;
 	}
 
 	private static boolean isOriginalViewExtensionless(FacesContext context) {

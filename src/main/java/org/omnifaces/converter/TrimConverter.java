@@ -12,6 +12,7 @@
  */
 package org.omnifaces.converter;
 
+import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import javax.faces.component.UIComponent;
@@ -47,10 +48,10 @@ import javax.faces.convert.FacesConverter;
  * @since 2.6
  */
 @FacesConverter("omnifaces.TrimConverter")
-public class TrimConverter implements Converter {
+public class TrimConverter implements Converter<String> {
 
 	@Override
-	public Object getAsObject(FacesContext context, UIComponent component, String submittedValue) {
+	public String getAsObject(FacesContext context, UIComponent component, String submittedValue) {
 		if (isEmpty(submittedValue)) {
 			return null;
 		}
@@ -60,8 +61,8 @@ public class TrimConverter implements Converter {
 	}
 
 	@Override
-	public String getAsString(FacesContext context, UIComponent component, Object modelValue) {
-		return (modelValue == null) ? "" : modelValue.toString();
+	public String getAsString(FacesContext context, UIComponent component, String modelValue) {
+		return coalesce(modelValue, "");
 	}
 
 }

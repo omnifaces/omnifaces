@@ -53,7 +53,7 @@ import javax.faces.model.SelectItem;
  * @author Arjan Tijms
  */
 @FacesConverter("omnifaces.ListConverter")
-public class ListConverter implements Converter {
+public class ListConverter implements Converter<Object> {
 
 	private List<?> list;
 

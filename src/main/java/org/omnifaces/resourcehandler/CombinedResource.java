@@ -22,8 +22,8 @@ import java.io.InputStream;
 import javax.faces.application.Resource;
 import javax.faces.context.FacesContext;
 
-import org.omnifaces.component.output.cache.Cache;
-import org.omnifaces.component.output.cache.CacheFactory;
+import org.omnifaces.util.cache.Cache;
+import org.omnifaces.util.cache.CacheFactory;
 
 /**
  * <p>

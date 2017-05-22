@@ -184,7 +184,7 @@ public class ViewParam extends UIViewParameter {
 
 	private class AttributeInterceptMap extends MapWrapper<String, Object> {
 
-		private static final long serialVersionUID = -7674000948288609007L;
+		private static final long serialVersionUID = 1L;
 
 		private AttributeInterceptMap(Map<String, Object> map) {
 			super(map);

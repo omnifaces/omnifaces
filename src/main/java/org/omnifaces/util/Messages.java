@@ -12,6 +12,7 @@
  */
 package org.omnifaces.util;
 
+import static java.text.MessageFormat.format;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getFlash;
 
@@ -137,14 +138,7 @@ public final class Messages {
 	/**
 	 * This is the default message resolver.
 	 */
-	private static final Resolver DEFAULT_RESOLVER = new Resolver() {
-
-		@Override
-		public String getMessage(String message, Object... params) {
-			return Utils.isEmpty(params) ? message : MessageFormat.format(message, params);
-		}
-
-	};
+	private static final Resolver DEFAULT_RESOLVER = (message, params) -> Utils.isEmpty(params) ? message : format(message, params);
 
 	/**
 	 * Initialize with the default resolver.

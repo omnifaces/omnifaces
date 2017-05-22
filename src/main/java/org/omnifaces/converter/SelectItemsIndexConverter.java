@@ -70,7 +70,7 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
  * @see SelectItemsCollector
  */
 @FacesConverter("omnifaces.SelectItemsIndexConverter")
-public class SelectItemsIndexConverter implements Converter {
+public class SelectItemsIndexConverter implements Converter<Object> {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 

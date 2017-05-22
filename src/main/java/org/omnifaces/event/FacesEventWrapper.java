@@ -32,7 +32,7 @@ public abstract class FacesEventWrapper extends FacesEvent implements FacesWrapp
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = -2455330585230983386L;
+	private static final long serialVersionUID = 1L;
 
 	// Properties -----------------------------------------------------------------------------------------------------
 

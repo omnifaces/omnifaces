@@ -39,7 +39,6 @@ import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
 
 import org.omnifaces.component.validator.ValidateMultipleFields;
-import org.omnifaces.util.Callback;
 
 /**
  * <p>
@@ -98,7 +97,7 @@ public class SkipValidators extends TagHandler {
 	 * {@link ClientBehaviorHolder}.
 	 */
 	@Override
-	public void apply(FaceletContext context, final UIComponent parent) throws IOException {
+	public void apply(FaceletContext context, UIComponent parent) throws IOException {
 		if (!(parent instanceof UICommand || parent instanceof ClientBehaviorHolder)) {
 			throw new IllegalStateException(ERROR_INVALID_PARENT);
 		}
@@ -111,9 +110,7 @@ public class SkipValidators extends TagHandler {
 
 		// We can't use hasInvokedSubmit() before the component is added to view, because the client ID isn't available.
 		// Hence, we subscribe this check to after phase of restore view.
-		subscribeToRequestAfterPhase(RESTORE_VIEW, new Callback.Void() { @Override public void invoke() {
-			processSkipValidators(parent);
-		}});
+		subscribeToRequestAfterPhase(RESTORE_VIEW, () -> processSkipValidators(parent));
 	}
 
 	/**
@@ -138,7 +135,7 @@ public class SkipValidators extends TagHandler {
 	static class SkipValidatorsEventListener implements SystemEventListener {
 
 		private Map<String, Object> attributes = new HashMap<>();
-		private Map<String, Validator[]> allValidators = new HashMap<>();
+		private Map<String, Validator<?>[]> allValidators = new HashMap<>();
 
 		@Override
 		public boolean isListenerForSource(Object source) {
@@ -165,15 +162,15 @@ public class SkipValidators extends TagHandler {
 				attributes.put(clientId, (requiredExpression != null) ? requiredExpression : input.isRequired());
 				input.setRequired(false);
 
-				Validator[] validators = input.getValidators();
+				Validator<?>[] validators = input.getValidators();
 				allValidators.put(clientId, validators);
 
-				for (Validator validator : validators) {
+				for (Validator<?> validator : validators) {
 					input.removeValidator(validator);
 				}
 			}
 			else if (event instanceof PostValidateEvent) {
-				for (Validator validator : allValidators.remove(clientId)) {
+				for (Validator<?> validator : allValidators.remove(clientId)) {
 					input.addValidator(validator);
 				}
 

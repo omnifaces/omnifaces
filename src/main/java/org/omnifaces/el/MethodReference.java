@@ -16,7 +16,6 @@ import static org.omnifaces.util.Utils.coalesce;
 
 import java.lang.reflect.Method;
 
-import javax.el.MethodExpression;
 import javax.el.MethodInfo;
 
 /**
@@ -79,17 +78,6 @@ public class MethodReference extends MethodInfo {
 	 */
 	public boolean isFromMethod() {
 		return fromMethod;
-	}
-
-	/**
-	 * Returns the standard EL {@link MethodInfo} of the {@link MethodExpression} where this {@link MethodReference}
-	 * has been extracted from.
-	 * @return The standard EL {@link MethodInfo}.
-	 * @deprecated Since 2.5 this class already extends from {@link MethodInfo}.
-	 */
-	@Deprecated // TODO: Remove in OmniFaces 3.0.
-	public MethodInfo getMethodInfo() {
-		return this;
 	}
 
 }

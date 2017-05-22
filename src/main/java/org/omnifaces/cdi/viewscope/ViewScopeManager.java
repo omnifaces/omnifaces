@@ -15,9 +15,11 @@ package org.omnifaces.cdi.viewscope;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
 import static java.util.logging.Level.FINE;
-import static org.omnifaces.config.OmniFaces.LIBRARY_NAME;
-import static org.omnifaces.config.OmniFaces.SCRIPT_NAME;
-import static org.omnifaces.config.OmniFaces.UNLOAD_SCRIPT_NAME;
+import static javax.faces.application.StateManager.IS_BUILDING_INITIAL_STATE;
+import static javax.faces.event.PhaseId.RENDER_RESPONSE;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_UNLOAD_SCRIPT_NAME;
 import static org.omnifaces.util.Ajax.load;
 import static org.omnifaces.util.Ajax.oncomplete;
 import static org.omnifaces.util.BeansLocal.getInstance;
@@ -35,15 +37,11 @@ import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
-import javax.faces.application.StateManager;
 import javax.faces.context.FacesContext;
-import javax.faces.event.PhaseId;
 import javax.inject.Inject;
 
 import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
-import org.omnifaces.resourcehandler.ResourceIdentifier;
-import org.omnifaces.util.Hacks;
 
 /**
  * Manages view scoped bean creation and destroy. The creation is initiated by {@link ViewScopeContext} which is
@@ -84,7 +82,6 @@ public class ViewScopeManager {
 
 	private static final Logger logger = Logger.getLogger(ViewScopeManager.class.getName());
 
-	private static final ResourceIdentifier SCRIPT_ID = new ResourceIdentifier(LIBRARY_NAME, SCRIPT_NAME);
 	private static final String SCRIPT_INIT = "OmniFaces.Unload.init('%s')";
 	private static final int DEFAULT_BEANS_PER_VIEW_SCOPE = 3;
 
@@ -143,7 +140,7 @@ public class ViewScopeManager {
 			}
 		}
 		else if (isAjaxRequestWithPartialRendering(context)) {
-			Hacks.setScriptResourceRendered(context, SCRIPT_ID); // Otherwise MyFaces will load a new one during createViewScope() when still in same document (e.g. navigation).
+			context.getApplication().getResourceHandler().markResourceRendered(context, OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME); // Otherwise MyFaces will load a new one during createViewScope() when still in same document (e.g. navigation).
 		}
 
 		if (getInstance(manager, ViewScopeStorageInSession.class, false) != null) { // Avoid unnecessary session creation when accessing storageInSession for nothing.
@@ -206,15 +203,15 @@ public class ViewScopeManager {
 		FacesContext context = FacesContext.getCurrentInstance();
 		boolean ajaxRequestWithPartialRendering = isAjaxRequestWithPartialRendering(context);
 
-		if (!Hacks.isScriptResourceRendered(context, SCRIPT_ID)) {
+		if (!context.getApplication().getResourceHandler().isResourceRendered(context, OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME)) {
 			if (ajaxRequestWithPartialRendering) {
-				load(LIBRARY_NAME, UNLOAD_SCRIPT_NAME);
+				load(OMNIFACES_LIBRARY_NAME, OMNIFACES_UNLOAD_SCRIPT_NAME);
 			}
-			else if (context.getCurrentPhaseId() != PhaseId.RENDER_RESPONSE || TRUE.equals(context.getAttributes().get(StateManager.IS_BUILDING_INITIAL_STATE))) {
-				addScriptResourceToHead(LIBRARY_NAME, SCRIPT_NAME);
+			else if (context.getCurrentPhaseId() != RENDER_RESPONSE || TRUE.equals(context.getAttributes().get(IS_BUILDING_INITIAL_STATE))) {
+				addScriptResourceToHead(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
 			}
 			else {
-				addScriptResourceToBody(LIBRARY_NAME, UNLOAD_SCRIPT_NAME);
+				addScriptResourceToBody(OMNIFACES_LIBRARY_NAME, OMNIFACES_UNLOAD_SCRIPT_NAME);
 			}
 		}
 

@@ -82,26 +82,23 @@ public class TreeNodeItem extends TreeFamily {
 	 */
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" }) // For TreeModel. We don't care about its actual type anyway.
-	protected void process(final FacesContext context, final PhaseId phaseId) {
+	protected void process(FacesContext context, PhaseId phaseId) {
 		if (getChildCount() == 0) {
 			return;
 		}
 
-		process(context, new Callback.ReturningWithArgument<Void, Tree>() {
-			@Override
-			public Void invoke(Tree tree) {
-				if (tree.getCurrentModelNode() != null) {
-					for (TreeModel childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
-						tree.setCurrentModelNode(context, childModelNode);
+		process(context, tree -> {
+			if (tree.getCurrentModelNode() != null) {
+				for (TreeModel childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
+					tree.setCurrentModelNode(context, childModelNode);
 
-						if (isRendered()) {
-							processSuper(context, phaseId);
-						}
+					if (isRendered()) {
+						processSuper(context, phaseId);
 					}
 				}
-
-				return null;
 			}
+
+			return null;
 		});
 	}
 
@@ -114,7 +111,7 @@ public class TreeNodeItem extends TreeFamily {
 	 */
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" }) // For TreeModel. We don't care about its actual type anyway.
-	public boolean visitTree(final VisitContext context, final VisitCallback callback) {
+	public boolean visitTree(VisitContext context, VisitCallback callback) {
 		if (context.getHints().contains(SKIP_ITERATION)) {
 			return super.visitTree(context, callback);
 		}
@@ -123,21 +120,18 @@ public class TreeNodeItem extends TreeFamily {
 			return false;
 		}
 
-		return process(context.getFacesContext(), new Callback.ReturningWithArgument<Boolean, Tree>() {
-			@Override
-			public Boolean invoke(Tree tree) {
-				if (tree.getCurrentModelNode() != null) {
-					for (TreeModel childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
-						tree.setCurrentModelNode(context.getFacesContext(), childModelNode);
+		return process(context.getFacesContext(), tree -> {
+			if (tree.getCurrentModelNode() != null) {
+				for (TreeModel childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
+					tree.setCurrentModelNode(context.getFacesContext(), childModelNode);
 
-						if (TreeNodeItem.super.visitTree(context, callback)) {
-							return true;
-						}
+					if (TreeNodeItem.super.visitTree(context, callback)) {
+						return true;
 					}
 				}
-
-				return false;
 			}
+
+			return false;
 		});
 	}
 

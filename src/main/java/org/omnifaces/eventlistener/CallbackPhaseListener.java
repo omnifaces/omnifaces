@@ -48,7 +48,7 @@ public class CallbackPhaseListener implements PhaseListener {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 3611407485061585042L;
+	private static final long serialVersionUID = 1L;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -58,7 +58,7 @@ public class CallbackPhaseListener implements PhaseListener {
 	}
 
 	@Override
-	public void beforePhase(final PhaseEvent event) {
+	public void beforePhase(PhaseEvent event) {
 		for (PhaseListener phaseListener : getCallbackPhaseListenersForEvent(event)) {
 			phaseListener.beforePhase(event);
 		}

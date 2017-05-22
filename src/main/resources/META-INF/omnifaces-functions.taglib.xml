@@ -16,8 +16,8 @@
 <facelet-taglib
 	xmlns="http://xmlns.jcp.org/xml/ns/javaee"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facelettaglibrary_2_2.xsd"
-	version="2.2"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facelettaglibrary_2_3.xsd"
+	version="2.3"
 >
 	<description>OmniFaces EL functions.</description>
 	<namespace>http://omnifaces.org/functions</namespace>
@@ -824,6 +824,17 @@
 		<function-name>coalesce</function-name>
 		<function-class>org.omnifaces.el.functions.Objects</function-class>
 		<function-signature>java.lang.Object coalesce(java.lang.Object, java.lang.Object)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns <code>true</code> if given object is an instance of the class as identified by given class name.
+			]]>
+		</description>
+		<function-name>isInstance</function-name>
+		<function-class>org.omnifaces.el.functions.Objects</function-class>
+		<function-signature>boolean isInstance(java.lang.String, java.lang.Object)</function-signature>
 	</function>
 
 	<!-- Components =============================================================================================== -->

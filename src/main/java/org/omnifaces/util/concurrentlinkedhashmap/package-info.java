@@ -14,13 +14,6 @@
  * This package contains an implementation of a bounded
  * {@link java.util.concurrent.ConcurrentMap} data structure.
  * <p>
- * {@link org.omnifaces.util.concurrentlinkedhashmap.Weigher} is a simple interface
- * for determining how many units of capacity an entry consumes. Depending on
- * which concrete Weigher class is used, an entry may consume a different amount
- * of space within the cache. The
- * {@link org.omnifaces.util.concurrentlinkedhashmap.Weighers} class provides
- * utility methods for obtaining the most common kinds of implementations.
- * <p>
  * {@link org.omnifaces.util.concurrentlinkedhashmap.EvictionListener} provides the
  * ability to be notified when an entry is evicted from the map. An eviction
  * occurs when the entry was automatically removed due to the map exceeding a
@@ -29,10 +22,7 @@
  * The {@link org.omnifaces.util.concurrentlinkedhashmap.ConcurrentLinkedHashMap}
  * class supplies an efficient, scalable, thread-safe, bounded map. As with the
  * <tt>Java Collections Framework</tt> the "Concurrent" prefix is used to
- * indicate that the map is not governed by a single exclusion lock. The
- * concurrency characteristics are those provided by the
- * {@link java.util.concurrent.ConcurrentHashMap} implementation that is
- * available at runtime.
+ * indicate that the map is not governed by a single exclusion lock.
  *
  * @see <a href="https://github.com/ben-manes/concurrentlinkedhashmap">
  *      https://github.com/ben-manes/concurrentlinkedhashmap</a>

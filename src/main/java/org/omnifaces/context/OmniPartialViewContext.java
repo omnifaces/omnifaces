@@ -82,7 +82,6 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private PartialViewContext wrapped;
 	private Map<String, Object> arguments;
 	private List<String> callbackScripts;
 	private OmniPartialResponseWriter writer;
@@ -94,7 +93,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 	 * @param wrapped The wrapped partial view context.
 	 */
 	public OmniPartialViewContext(PartialViewContext wrapped) {
-		this.wrapped = wrapped;
+		super(wrapped);
 		setCurrentInstance(this);
 	}
 
@@ -144,24 +143,14 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 			return false;
 		}
 
-		try {
-			invalidateSession(facesContext); // Prevent server from remembering security constraint fail caused by ajax.
-			facesRedirect(getRequest(facesContext), getResponse(facesContext), originalURL); // This also clears cache.
-			return true;
-		}
-		catch (IOException e) {
-			throw new FacesException(e);
-		}
+		invalidateSession(facesContext); // Prevent server from remembering security constraint fail caused by ajax.
+		facesRedirect(getRequest(facesContext), getResponse(facesContext), originalURL); // This also clears cache.
+		return true;
 	}
 
 	@Override // Necessary because this is missing in PartialViewContextWrapper (will be fixed in JSF 2.2).
 	public void setPartialRequest(boolean partialRequest) {
 		getWrapped().setPartialRequest(partialRequest);
-	}
-
-	@Override
-	public PartialViewContext getWrapped() {
-		return wrapped;
 	}
 
 	/**

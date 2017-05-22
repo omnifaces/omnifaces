@@ -80,6 +80,7 @@ import org.omnifaces.application.OmniApplicationFactory;
  * @since 1.6
  */
 @ApplicationScoped
+@SuppressWarnings("rawtypes")
 public class ValidatorManager {
 
 	// Dependencies ---------------------------------------------------------------------------------------------------

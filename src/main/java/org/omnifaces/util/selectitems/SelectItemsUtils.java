@@ -47,11 +47,11 @@ public final class SelectItemsUtils {
 	 *
 	 * @return the Object representation of the value where its string representation matches the input value.
 	 */
-	public static Object findValueByStringConversion(FacesContext context, UIComponent component, String value, Converter converter) {
+	public static Object findValueByStringConversion(FacesContext context, UIComponent component, String value, Converter<Object> converter) {
 		return findValueByStringConversion(context, component, SelectItemsCollector.collectFromParent(context, component).iterator(), value, converter);
 	}
 
-	private static Object findValueByStringConversion(FacesContext context, UIComponent component, Iterator<SelectItem> items, String value, Converter converter) {
+	private static Object findValueByStringConversion(FacesContext context, UIComponent component, Iterator<SelectItem> items, String value, Converter<Object> converter) {
 		while (items.hasNext()) {
 			SelectItem item = items.next();
 
@@ -76,7 +76,7 @@ public final class SelectItemsUtils {
 		return null;
 	}
 
-	private static Object findValueByStringConversion(FacesContext context, UIComponent component, SelectItem[] items, String value, Converter converter) {
+	private static Object findValueByStringConversion(FacesContext context, UIComponent component, SelectItem[] items, String value, Converter<Object> converter) {
 		return isEmpty(items) ? null : findValueByStringConversion(context, component, new ArrayIterator(items), value, converter);
 	}
 

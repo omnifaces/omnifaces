@@ -101,7 +101,7 @@ public class EnableRestorableView extends TagHandler {
 	 * @throws IllegalStateException When given parent is not an instance of {@link UIViewRoot}.
 	 */
 	@Override
-	public void apply(FaceletContext context, final UIComponent parent) throws IOException {
+	public void apply(FaceletContext context, UIComponent parent) throws IOException {
 		if (!(parent instanceof UIViewRoot)) {
 			throw new IllegalStateException(
 				format(ERROR_INVALID_PARENT, parent != null ? parent.getClass().getName() : null));

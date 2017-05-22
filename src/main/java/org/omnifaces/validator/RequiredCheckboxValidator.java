@@ -60,7 +60,7 @@ import javax.faces.validator.ValidatorException;
  * @author Bauke Scholtz
  */
 @FacesValidator("omnifaces.RequiredCheckboxValidator")
-public class RequiredCheckboxValidator implements Validator {
+public class RequiredCheckboxValidator implements Validator<Boolean> {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
@@ -72,7 +72,7 @@ public class RequiredCheckboxValidator implements Validator {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
-	public void validate(FacesContext context, UIComponent component, Object value) {
+	public void validate(FacesContext context, UIComponent component, Boolean value) {
 		if (!(component instanceof UISelectBoolean)) {
 			throw new IllegalArgumentException(format(ERROR_WRONG_COMPONENT, component.getClass().getName()));
 		}

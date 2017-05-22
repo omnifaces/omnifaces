@@ -27,7 +27,6 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.context.ResponseWriterWrapper;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.ListenerFor;
-import javax.faces.event.ListenersFor;
 import javax.faces.event.PostAddToViewEvent;
 import javax.faces.event.PostRestoreStateEvent;
 import javax.faces.event.PreRenderViewEvent;
@@ -59,10 +58,8 @@ import org.omnifaces.util.Ajax;
  * @see ScriptFamily
  */
 @FacesComponent(OnloadScript.COMPONENT_TYPE)
-@ListenersFor({
-	@ListenerFor(systemEventClass=PostAddToViewEvent.class),
-	@ListenerFor(systemEventClass=PostRestoreStateEvent.class)
-})
+@ListenerFor(systemEventClass=PostAddToViewEvent.class)
+@ListenerFor(systemEventClass=PostRestoreStateEvent.class)
 public class OnloadScript extends ScriptFamily implements SystemEventListener {
 
 	// Public constants -----------------------------------------------------------------------------------------------
@@ -115,15 +112,11 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 		ResponseWriter originalResponseWriter = context.getResponseWriter();
 		String encoding = context.getExternalContext().getRequestCharacterEncoding();
 		context.getExternalContext().setResponseCharacterEncoding(encoding);
-		final ResponseWriter writer = context.getRenderKit().createResponseWriter(buffer, null, encoding);
-		context.setResponseWriter(new ResponseWriterWrapper() {
+		ResponseWriter writer = context.getRenderKit().createResponseWriter(buffer, null, encoding);
+		context.setResponseWriter(new ResponseWriterWrapper(writer) {
 			@Override
 			public void writeText(Object text, String property) throws IOException {
-				writer.write(text.toString()); // So, don't escape HTML.
-			}
-			@Override
-			public ResponseWriter getWrapped() {
-				return writer;
+				getWrapped().write(text.toString()); // So, don't escape HTML.
 			}
 		});
 

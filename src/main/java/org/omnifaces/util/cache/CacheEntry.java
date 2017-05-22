@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.omnifaces.component.output.cache;
+package org.omnifaces.util.cache;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -20,6 +20,9 @@ import java.util.Map;
 /**
  * Meta data for a value that's stored in a cache. Can be used for cache implementations that don't support both validity
  * and attributes natively. Cache implementations are not required to use this type.
+ * <p>
+ * Since OmniFaces 3.0 the <code>Object value</code> and <code>Map&lt;String, Object&gt; attributes</code> have been reworked to
+ * <code>Serializable value</code> and <code>Map&lt;String, Serializable&gt; attributes</code> in order to explicitly set the expected type.
  *
  * @since 1.1
  * @author Arjan Tijms
@@ -27,13 +30,13 @@ import java.util.Map;
  */
 public class CacheEntry implements Serializable {
 
-	private static final long serialVersionUID = -4602586599152573869L;
+	private static final long serialVersionUID = 1L;
 
-	private Object value;
+	private Serializable value;
 	private Date validTill;
-	private Map<String, Object> attributes;
+	private Map<String, Serializable> attributes;
 
-	public CacheEntry(Object value, Date validTill) {
+	public CacheEntry(Serializable value, Date validTill) {
 		super();
 		this.value = value;
 		this.validTill = validTill;
@@ -44,7 +47,7 @@ public class CacheEntry implements Serializable {
 	 *
 	 * @return The value for which meta data is kept
 	 */
-	public Object getValue() {
+	public Serializable getValue() {
 		return value;
 	}
 
@@ -54,7 +57,7 @@ public class CacheEntry implements Serializable {
 	 * @param value
 	 *            The value for which meta data is kept
 	 */
-	public void setValue(Object value) {
+	public void setValue(Serializable value) {
 		this.value = value;
 	}
 
@@ -99,7 +102,7 @@ public class CacheEntry implements Serializable {
 	 * @return a map of attributes associated with this entry.
 	 * @since 1.2
 	 */
-	public Map<String, Object> getAttributes() {
+	public Map<String, Serializable> getAttributes() {
 		if (attributes == null) {
 			// NOTE: lazy initialization means the map can be created multiple times
 			// in case of concurrent access (likely with application scoped caches on

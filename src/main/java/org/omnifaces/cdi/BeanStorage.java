@@ -33,7 +33,7 @@ public class BeanStorage implements Serializable {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 42L;
+	private static final long serialVersionUID = 1L;
 
 	// Properties -----------------------------------------------------------------------------------------------------
 

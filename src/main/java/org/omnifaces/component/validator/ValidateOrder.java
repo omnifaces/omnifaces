@@ -68,38 +68,24 @@ public class ValidateOrder extends ValidateMultipleFields {
 	// Private constants ----------------------------------------------------------------------------------------------
 
 	private enum Type {
-		LT(new Callback.ReturningWithArgument<Boolean, List<Comparable>>() {
-			@Override
-			public Boolean invoke(List<Comparable> values) {
-				return new ArrayList<>(new TreeSet<>(values)).equals(values);
-			}
+		LT(values -> new ArrayList<>(new TreeSet<>(values)).equals(values)),
+
+		LTE(values -> {
+			List<Comparable> sortedValues = new ArrayList<>(values);
+			Collections.sort(sortedValues);
+			return sortedValues.equals(values);
 		}),
 
-		LTE(new Callback.ReturningWithArgument<Boolean, List<Comparable>>() {
-			@Override
-			public Boolean invoke(List<Comparable> values) {
-				List<Comparable> sortedValues = new ArrayList<>(values);
-				Collections.sort(sortedValues);
-				return sortedValues.equals(values);
-			}
+		GT(values -> {
+			List<Comparable> sortedValues = new ArrayList<>(new TreeSet<>(values));
+			Collections.reverse(sortedValues);
+			return sortedValues.equals(values);
 		}),
 
-		GT(new Callback.ReturningWithArgument<Boolean, List<Comparable>>() {
-			@Override
-			public Boolean invoke(List<Comparable> values) {
-				List<Comparable> sortedValues = new ArrayList<>(new TreeSet<>(values));
-				Collections.reverse(sortedValues);
-				return sortedValues.equals(values);
-			}
-		}),
-
-		GTE(new Callback.ReturningWithArgument<Boolean, List<Comparable>>() {
-			@Override
-			public Boolean invoke(List<Comparable> values) {
-				List<Comparable> sortedValues = new ArrayList<>(values);
-				Collections.sort(sortedValues, Collections.reverseOrder());
-				return sortedValues.equals(values);
-			}
+		GTE(values -> {
+			List<Comparable> sortedValues = new ArrayList<>(values);
+			Collections.sort(sortedValues, Collections.reverseOrder());
+			return sortedValues.equals(values);
 		});
 
 		private Callback.ReturningWithArgument<Boolean, List<Comparable>> callback;

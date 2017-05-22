@@ -29,7 +29,6 @@ import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
 
 import org.omnifaces.component.input.Form;
-import org.omnifaces.util.Callback;
 
 /**
  * <p>
@@ -86,7 +85,7 @@ public class IgnoreValidationFailed extends TagHandler {
 	 * @throws IllegalStateException When the parent component is not an instance of {@link UICommand}.
 	 */
 	@Override
-	public void apply(FaceletContext context, final UIComponent parent) throws IOException {
+	public void apply(FaceletContext context, UIComponent parent) throws IOException {
 		if (!(parent instanceof UICommand)) {
 			throw new IllegalStateException(ERROR_INVALID_PARENT);
 		}
@@ -99,12 +98,7 @@ public class IgnoreValidationFailed extends TagHandler {
 
 		// We can't use hasInvokedSubmit() before the component is added to view, because the client ID isn't available.
 		// Hence, we subscribe this check to after phase of restore view.
-		subscribeToRequestAfterPhase(RESTORE_VIEW, new Callback.Void() {
-			@Override
-			public void invoke() {
-				processIgnoreValidationFailed((UICommand) parent);
-			}
-		});
+		subscribeToRequestAfterPhase(RESTORE_VIEW, () -> processIgnoreValidationFailed((UICommand) parent));
 	}
 
 	/**

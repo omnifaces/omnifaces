@@ -30,13 +30,13 @@ public final class OmniFaces {
 	// Public constants -----------------------------------------------------------------------------------------------
 
 	/** Returns the "omnifaces" resource library name. */
-	public static final String LIBRARY_NAME = "omnifaces";
+	public static final String OMNIFACES_LIBRARY_NAME = "omnifaces";
 
 	/** Returns the "omnifaces.js" main script name. */
-	public static final String SCRIPT_NAME = "omnifaces.js";
+	public static final String OMNIFACES_SCRIPT_NAME = "omnifaces.js";
 
 	/** Returns the "unload.js" unload script name. */
-	public static final String UNLOAD_SCRIPT_NAME = "unload.js";
+	public static final String OMNIFACES_UNLOAD_SCRIPT_NAME = "unload.js";
 
 	// Constants ------------------------------------------------------------------------------------------------------
 

@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
@@ -116,20 +117,20 @@ import org.omnifaces.facesviews.FacesViews;
  * </pre>
  * <pre>
  * // Invalidate the session and send a redirect.
- * public void logout() throws IOException {
+ * public void logout() {
  *     Faces.invalidateSession();
  *     Faces.redirect("login.xhtml"); // Can by the way also be done by return "login?faces-redirect=true" if in action method.
  * }
  * </pre>
  * <pre>
  * // Provide a file as attachment.
- * public void download() throws IOException {
+ * public void download() {
  *     Faces.sendFile(new File("/path/to/file.ext"), true);
  * }
  * </pre>
  * <pre>
  * // Provide a file as attachment via output stream callback.
- * public void download() throws IOException {
+ * public void download() {
  *     Faces.sendFile("file.txt", true, output -&gt; {
  *         try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8))) {
  *             writer.println("Hello world");
@@ -510,13 +511,14 @@ public final class Faces {
 	 * class, then delegate to {@link #createConverter(Class)}. If the given identifier is a concrete converter
 	 * instance, then return it directly.
 	 * If no converter instance can be associated, then return null.
+	 * @param <T> The expected converter type.
 	 * @param identifier The Faces converter object identifier. This can be a string representing the converter ID, or a
 	 * class representing the target type, or a class representing the converter class, or even the converter instance
 	 * itself.
 	 * @return A Faces converter associated with given object identifier.
 	 * @since 2.5
 	 */
-	public static Converter createConverter(Object identifier) {
+	public static <T> Converter<T> createConverter(Object identifier) {
 		return FacesLocal.createConverter(getContext(), identifier);
 	}
 
@@ -525,11 +527,12 @@ public final class Faces {
 	 * converter ID in {@link Application#createConverter(String)}. If that didn't return anything, then try to interpret
 	 * the string identifier as class name and delegate to {@link #createConverter(Class)}.
 	 * If no converter instance can be associated, then return null.
+	 * @param <T> The expected converter type.
 	 * @param identifier The Faces converter string identifier.
 	 * @return A Faces converter associated with given string identifier.
 	 * @since 2.5
 	 */
-	public static Converter createConverter(String identifier) {
+	public static <T> Converter<T> createConverter(String identifier) {
 		return FacesLocal.createConverter(getContext(), identifier);
 	}
 
@@ -538,11 +541,12 @@ public final class Faces {
 	 * assignable to Converter.class, then use that as target type in {@link Application#createConverter(Class)}. If
 	 * the given identifier is assignable to Converter.class, then instantiate it using default constructor.
 	 * If no converter instance can be associated, then return null.
+	 * @param <T> The expected converter type.
 	 * @param identifier The Faces converter class identifier.
 	 * @return A Faces converter associated with given class identifier.
 	 * @since 2.5
 	 */
-	public static Converter createConverter(Class<?> identifier) {
+	public static <T> Converter<T> createConverter(Class<?> identifier) {
 		return FacesLocal.createConverter(getContext(), identifier);
 	}
 
@@ -552,12 +556,13 @@ public final class Faces {
 	 * class, then delegate to {@link #createValidator(Class)}. If the given identifier is a concrete validator
 	 * instance, then return it directly.
 	 * If no validator instance can be associated, then return null.
+	 * @param <T> The expected validator type.
 	 * @param identifier The Faces validator object identifier. This can be a string representing the validator ID, or a
 	 * class representing the validator class, or even the validator instance itself.
 	 * @return A Faces validator associated with given object identifier.
 	 * @since 2.5
 	 */
-	public static Validator createValidator(Object identifier) {
+	public static <T> Validator<T> createValidator(Object identifier) {
 		return FacesLocal.createValidator(getContext(), identifier);
 	}
 
@@ -566,11 +571,12 @@ public final class Faces {
 	 * validator ID in {@link Application#createValidator(String)}. If that didn't return anything, then try to
 	 * interpret the string identifier as class name and delegate to {@link #createValidator(Class)}.
 	 * If no validator instance can be associated, then return null.
+	 * @param <T> The expected validator type.
 	 * @param identifier The Faces validator string identifier.
 	 * @return A Faces validator associated with given string identifier.
 	 * @since 2.5
 	 */
-	public static Validator createValidator(String identifier) {
+	public static <T> Validator<T> createValidator(String identifier) {
 		return FacesLocal.createValidator(getContext(), identifier);
 	}
 
@@ -578,11 +584,12 @@ public final class Faces {
 	 * Creates and returns a Faces validator associated with given class identifier. If the given identifier is
 	 * assignable to Validator.class, then instantiate it using default constructor.
 	 * If no validator instance can be associated, then return null.
+	 * @param <T> The expected validator type.
 	 * @param identifier The Faces validator class identifier.
 	 * @return A Faces validator associated with given class identifier.
 	 * @since 2.5
 	 */
-	public static Validator createValidator(Class<?> identifier) {
+	public static <T> Validator<T> createValidator(Class<?> identifier) {
 		return FacesLocal.createValidator(getContext(), identifier);
 	}
 
@@ -1374,43 +1381,6 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the original HTTP request URI behind this forwarded request, if any.
-	 * This does not include the request query string.
-	 * @return The original HTTP request URI behind this forwarded request, if any.
-	 * @since 1.8
-	 * @deprecated Since 2.4. This is abstracted away by {@link #getRequestURI()}. Use it instead.
-	 * JSF has as to retrieving request URI no business of knowing if the request is forwarded/rewritten or not.
-	 */
-	@Deprecated // TODO: Remove in OmniFaces 3.0.
-	public static String getForwardRequestURI() {
-		return FacesLocal.getForwardRequestURI(getContext());
-	}
-
-	/**
-	 * Returns the original HTTP request query string behind this forwarded request, if any.
-	 * @return The original HTTP request query string behind this forwarded request, if any.
-	 * @since 1.8
-	 * @deprecated Since 2.4. This is abstracted away by {@link #getRequestQueryString()}. Use it instead.
-	 * JSF has as to retrieving request URI no business of knowing if the request is forwarded/rewritten or not.
-	 */
-	@Deprecated // TODO: Remove in OmniFaces 3.0.
-	public static String getForwardRequestQueryString() {
-		return FacesLocal.getForwardRequestQueryString(getContext());
-	}
-
-	/**
-	 * Returns the original HTTP request URI with query string behind this forwarded request, if any.
-	 * @return The original HTTP request URI with query string behind this forwarded request, if any.
-	 * @since 1.8
-	 * @deprecated Since 2.4. This is abstracted away by {@link #getRequestURIWithQueryString()}. Use it instead.
-	 * JSF has as to retrieving request URI no business of knowing if the request is forwarded/rewritten or not.
-	 */
-	@Deprecated // TODO: Remove in OmniFaces 3.0.
-	public static String getForwardRequestURIWithQueryString() {
-		return FacesLocal.getForwardRequestURIWithQueryString(getContext());
-	}
-
-	/**
 	 * Returns the Internet Protocol (IP) address of the client that sent the request. This will first check the
 	 * <code>X-Forwarded-For</code> request header and if it's present, then return its first IP address, else just
 	 * return {@link HttpServletRequest#getRemoteAddr()} unmodified.
@@ -1487,12 +1457,11 @@ public final class Faces {
 	 * </pre>
 	 * @param url The URL to redirect the current response to.
 	 * @param paramValues The request parameter values which you'd like to put URL-encoded in the given URL.
-	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
-	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @throws UncheckedIOException When HTTP response is not available anymore.
 	 * @throws NullPointerException When url is <code>null</code>.
 	 * @see ExternalContext#redirect(String)
 	 */
-	public static void redirect(String url, String... paramValues) throws IOException {
+	public static void redirect(String url, String... paramValues) {
 		FacesLocal.redirect(getContext(), url, paramValues);
 	}
 
@@ -1526,27 +1495,25 @@ public final class Faces {
 	/**
 	 * Refresh the current page by a GET request. This basically sends a temporary (302) redirect to current request
 	 * URI, without query string.
-	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
-	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @throws UncheckedIOException When HTTP response is not available anymore.
 	 * @see ExternalContext#redirect(String)
 	 * @see HttpServletRequest#getRequestURI()
 	 * @since 2.2
 	 */
-	public static void refresh() throws IOException {
+	public static void refresh() {
 		FacesLocal.refresh(getContext());
 	}
 
 	/**
 	 * Refresh the current page by a GET request, maintaining the query string. This basically sends a temporary (302)
 	 * redirect to current request URI, with the current query string.
-	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
-	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @throws UncheckedIOException When HTTP response is not available anymore.
 	 * @see ExternalContext#redirect(String)
 	 * @see HttpServletRequest#getRequestURI()
 	 * @see HttpServletRequest#getQueryString()
 	 * @since 2.2
 	 */
-	public static void refreshWithQueryString() throws IOException {
+	public static void refreshWithQueryString() {
 		FacesLocal.refreshWithQueryString(getContext());
 	}
 
@@ -1559,11 +1526,10 @@ public final class Faces {
 	 * @param status The HTTP response status which is supposed to be in the range 4nn-5nn. You can use the constant
 	 * field values of {@link HttpServletResponse} for this.
 	 * @param message The message which is supposed to be available in the error page.
-	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
-	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @throws UncheckedIOException When HTTP response is not available anymore.
 	 * @see ExternalContext#responseSendError(int, String)
 	 */
-	public static void responseSendError(int status, String message) throws IOException {
+	public static void responseSendError(int status, String message) {
 		FacesLocal.responseSendError(getContext(), status, message);
 	}
 
@@ -1665,8 +1631,7 @@ public final class Faces {
 	 * implementation.
 	 * @return <code>true</code> if the authentication was successful, otherwise <code>false</code>.
 	 * @throws ServletException When the authentication has failed. The caller is responsible for handling it.
-	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
-	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @throws UncheckedIOException When HTTP request or response is not available anymore.
 	 * @see HttpServletRequest#authenticate(HttpServletResponse)
 	 * @since 1.4
 	 */
@@ -2280,8 +2245,8 @@ public final class Faces {
 	 * after successful streaming.
 	 * @param file The file to be sent to the response.
 	 * @param attachment Whether the file should be provided as attachment, or just inline.
-	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
-	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @throws IOException When given file cannot be read.
+	 * @throws UncheckedIOException When HTTP response is not available anymore.
 	 */
 	public static void sendFile(File file, boolean attachment) throws IOException {
 		FacesLocal.sendFile(getContext(), file, attachment);
@@ -2294,10 +2259,9 @@ public final class Faces {
 	 * @param content The file content as byte array.
 	 * @param filename The file name which should appear in content disposition header.
 	 * @param attachment Whether the file should be provided as attachment, or just inline.
-	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
-	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @throws UncheckedIOException When HTTP response is not available anymore.
 	 */
-	public static void sendFile(byte[] content, String filename, boolean attachment) throws IOException {
+	public static void sendFile(byte[] content, String filename, boolean attachment) {
 		FacesLocal.sendFile(getContext(), content, filename, attachment);
 	}
 
@@ -2312,10 +2276,9 @@ public final class Faces {
 	 * @param content The file content as input stream.
 	 * @param filename The file name which should appear in content disposition header.
 	 * @param attachment Whether the file should be provided as attachment, or just inline.
-	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
-	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @throws UncheckedIOException When HTTP response is not available anymore.
 	 */
-	public static void sendFile(InputStream content, String filename, boolean attachment) throws IOException {
+	public static void sendFile(InputStream content, String filename, boolean attachment) {
 		FacesLocal.sendFile(getContext(), content, filename, attachment);
 	}
 
@@ -2329,11 +2292,10 @@ public final class Faces {
 	 * @param filename The file name which should appear in content disposition header.
 	 * @param attachment Whether the file should be provided as attachment, or just inline.
 	 * @param outputCallback The output stream callback to write the file content to.
-	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
-	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @throws UncheckedIOException When HTTP response is not available anymore.
 	 * @since 2.3
 	 */
-	public static void sendFile(String filename, boolean attachment, Callback.Output outputCallback) throws IOException {
+	public static void sendFile(String filename, boolean attachment, Callback.Output outputCallback) {
 		FacesLocal.sendFile(getContext(), filename, attachment, outputCallback);
 	}
 

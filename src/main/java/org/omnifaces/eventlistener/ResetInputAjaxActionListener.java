@@ -12,25 +12,27 @@
  */
 package org.omnifaces.eventlistener;
 
+import static javax.faces.component.visit.VisitContext.ALL_IDS;
 import static javax.faces.component.visit.VisitContext.createVisitContext;
+import static javax.faces.component.visit.VisitHint.SKIP_TRANSIENT;
+import static javax.faces.component.visit.VisitHint.SKIP_UNRENDERED;
+import static javax.faces.component.visit.VisitResult.ACCEPT;
+import static javax.faces.component.visit.VisitResult.REJECT;
+import static javax.faces.event.PhaseId.INVOKE_APPLICATION;
 
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
 
 import javax.faces.component.EditableValueHolder;
-import javax.faces.component.UIComponent;
 import javax.faces.component.visit.VisitCallback;
-import javax.faces.component.visit.VisitContext;
 import javax.faces.component.visit.VisitHint;
-import javax.faces.component.visit.VisitResult;
 import javax.faces.context.FacesContext;
 import javax.faces.context.PartialViewContext;
 import javax.faces.event.ActionEvent;
 import javax.faces.event.ActionListener;
 import javax.faces.event.AjaxBehaviorListener;
 import javax.faces.event.PhaseEvent;
-import javax.faces.event.PhaseId;
 import javax.faces.event.SystemEventListener;
 
 import org.omnifaces.util.Hacks;
@@ -111,28 +113,25 @@ public class ResetInputAjaxActionListener extends DefaultPhaseListener implement
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = -5317382021715077662L;
+	private static final long serialVersionUID = 1L;
 
-	private static final Set<VisitHint> VISIT_HINTS = EnumSet.of(VisitHint.SKIP_TRANSIENT, VisitHint.SKIP_UNRENDERED);
-	private static final VisitCallback VISIT_CALLBACK = new VisitCallback() {
-		@Override
-		public VisitResult visit(VisitContext context, UIComponent target) {
-			FacesContext facesContext = context.getFacesContext();
+	private static final Set<VisitHint> VISIT_HINTS = EnumSet.of(SKIP_TRANSIENT, SKIP_UNRENDERED);
+	private static final VisitCallback VISIT_CALLBACK = (context, target) -> {
+		FacesContext facesContext = context.getFacesContext();
 
-			if (facesContext.getPartialViewContext().getExecuteIds().contains(target.getClientId(facesContext))) {
-				return VisitResult.REJECT;
-			}
-
-			if (target instanceof EditableValueHolder) {
-				((EditableValueHolder) target).resetValue();
-			}
-			else if (context.getIdsToVisit() != VisitContext.ALL_IDS) {
-				// Render ID didn't specifically point an EditableValueHolder. Visit all children as well.
-				target.visitTree(createVisitContext(facesContext, null, context.getHints()), VISIT_CALLBACK);
-			}
-
-			return VisitResult.ACCEPT;
+		if (facesContext.getPartialViewContext().getExecuteIds().contains(target.getClientId(facesContext))) {
+			return REJECT;
 		}
+
+		if (target instanceof EditableValueHolder) {
+			((EditableValueHolder) target).resetValue();
+		}
+		else if (!ALL_IDS.equals(context.getIdsToVisit())) {
+			// Render ID didn't specifically point an EditableValueHolder. Visit all children as well.
+			target.visitTree(createVisitContext(facesContext, null, context.getHints()), ResetInputAjaxActionListener.VISIT_CALLBACK);
+		}
+
+		return ACCEPT;
 	};
 
 	// Variables ------------------------------------------------------------------------------------------------------
@@ -156,7 +155,7 @@ public class ResetInputAjaxActionListener extends DefaultPhaseListener implement
 	 * @param wrapped The wrapped action listener.
 	 */
 	public ResetInputAjaxActionListener(ActionListener wrapped) {
-		super(PhaseId.INVOKE_APPLICATION);
+		super(INVOKE_APPLICATION);
 		this.wrapped = wrapped;
 	}
 

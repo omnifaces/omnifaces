@@ -29,7 +29,6 @@ import java.util.regex.Pattern;
 
 import javax.el.ELContext;
 import javax.el.ValueExpression;
-import javax.faces.FacesException;
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIViewParameter;
@@ -42,7 +41,6 @@ import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
 
-import org.omnifaces.util.Callback;
 import org.omnifaces.util.Faces;
 
 /**
@@ -194,7 +192,7 @@ public class ViewParamValidationFailed extends TagHandler {
 	 * missing or simultaneously specified.
 	 */
 	@Override
-	public void apply(FaceletContext context, final UIComponent parent) throws IOException {
+	public void apply(FaceletContext context, UIComponent parent) throws IOException {
 		if (!(parent instanceof UIViewRoot || parent instanceof UIViewParameter)) {
 			throw new IllegalStateException(format(ERROR_INVALID_PARENT, this, parent.getClass().getName()));
 		}
@@ -216,12 +214,7 @@ public class ViewParamValidationFailed extends TagHandler {
 			throw new IllegalArgumentException(format(ERROR_DOUBLE_ATTRIBUTE, this));
 		}
 
-		subscribeToRequestComponentEvent(parent, PostValidateEvent.class, new Callback.WithArgument<ComponentSystemEvent>() {
-			@Override
-			public void invoke(ComponentSystemEvent event) {
-				processViewParamValidationFailed(event);
-			}
-		});
+		subscribeToRequestComponentEvent(parent, PostValidateEvent.class, this::processViewParamValidationFailed);
 	}
 
 	/**
@@ -278,29 +271,24 @@ public class ViewParamValidationFailed extends TagHandler {
 			evaluatedMessage = defaultMessage;
 		}
 
-		try {
-			if (sendRedirect != null) {
-				String evaluatedSendRedirect = evaluate(elContext, sendRedirect, true);
+		if (sendRedirect != null) {
+			String evaluatedSendRedirect = evaluate(elContext, sendRedirect, true);
 
-				if (!isEmpty(evaluatedMessage)) {
-					addFlashGlobalError(evaluatedMessage);
-				}
-
-				redirect(context, evaluatedSendRedirect);
+			if (!isEmpty(evaluatedMessage)) {
+				addFlashGlobalError(evaluatedMessage);
 			}
-			else {
-				String evaluatedSendError = evaluate(elContext, sendError, true);
 
-				if (!HTTP_STATUS_CODE.matcher(evaluatedSendError).matches()) {
-					throw new IllegalArgumentException(
-						format(ERROR_INVALID_SENDERROR, sendError, evaluatedSendError));
-				}
-
-				responseSendError(context, Integer.valueOf(evaluatedSendError), evaluatedMessage);
-			}
+			redirect(context, evaluatedSendRedirect);
 		}
-		catch (IOException e) {
-			throw new FacesException(e);
+		else {
+			String evaluatedSendError = evaluate(elContext, sendError, true);
+
+			if (!HTTP_STATUS_CODE.matcher(evaluatedSendError).matches()) {
+				throw new IllegalArgumentException(
+					format(ERROR_INVALID_SENDERROR, sendError, evaluatedSendError));
+			}
+
+			responseSendError(context, Integer.valueOf(evaluatedSendError), evaluatedMessage);
 		}
 	}
 

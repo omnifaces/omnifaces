@@ -22,17 +22,18 @@ import static javax.faces.view.facelets.ResourceResolver.FACELETS_RESOURCE_RESOL
 import static javax.servlet.DispatcherType.FORWARD;
 import static javax.servlet.DispatcherType.REQUEST;
 import static org.omnifaces.facesviews.ExtensionAction.REDIRECT_TO_EXTENSIONLESS;
-import static org.omnifaces.facesviews.FacesServletDispatchMethod.DO_FILTER;
 import static org.omnifaces.facesviews.PathAction.SEND_404;
-import static org.omnifaces.facesviews.ViewHandlerMode.STRIP_EXTENSION_FROM_PARENT;
 import static org.omnifaces.util.Faces.getApplicationFromFactory;
 import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.Platform.getFacesServletMappings;
 import static org.omnifaces.util.Platform.getFacesServletRegistration;
+import static org.omnifaces.util.ResourcePaths.addLeadingSlashIfNecessary;
+import static org.omnifaces.util.ResourcePaths.addTrailingSlashIfNecessary;
 import static org.omnifaces.util.ResourcePaths.filterExtension;
 import static org.omnifaces.util.ResourcePaths.getExtension;
 import static org.omnifaces.util.ResourcePaths.isDirectory;
 import static org.omnifaces.util.ResourcePaths.isExtensionless;
+import static org.omnifaces.util.ResourcePaths.isRoot;
 import static org.omnifaces.util.ResourcePaths.stripExtension;
 import static org.omnifaces.util.ResourcePaths.stripPrefixPath;
 import static org.omnifaces.util.ResourcePaths.stripTrailingSlash;
@@ -149,7 +150,6 @@ import org.omnifaces.cdi.Param;
  * @see UriExtensionRequestWrapper
  * @see FacesViewsViewHandlerInstaller
  * @see FacesViewsViewHandler
- * @see ViewHandlerMode
  */
 public final class FacesViews {
 
@@ -198,30 +198,10 @@ public final class FacesViews {
 	public static final String FACES_VIEWS_PATH_ACTION_PARAM_NAME = "org.omnifaces.FACES_VIEWS_PATH_ACTION";
 
 	/**
-	 * The name of the enum context parameter that determines the method used by FacesViews to invoke the FacesServlet.
-	 * See {@link FacesServletDispatchMethod}.
-	 * @see FacesServletDispatchMethod
-	 * @deprecated Since 2.6 As this is superfluous since Servlet 3.0.
-	 * It will default to DO_FILTER and automatically use FORWARD when resource is not mapped.
-	 */
-	@Deprecated // TODO: remove in OmniFaces 3.0.
-	public static final String FACES_VIEWS_DISPATCH_METHOD_PARAM_NAME = "org.omnifaces.FACES_VIEWS_DISPATCH_METHOD";
-
-	/**
 	 * The name of the boolean context parameter via which the user can set whether the
 	 * {@link FacesViewsForwardingFilter} should match before declared filters (false) or after declared filters (true).
 	 */
 	public static final String FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS_PARAM_NAME = "org.omnifaces.FACES_VIEWS_FILTER_AFTER_DECLARED_FILTERS";
-
-	/**
-	 * The name of the enum context parameter via which the user can set whether the {@link FacesViewsViewHandler}
-	 * should strip the extension from the parent view handler's outcome or construct the URL itself and only take the
-	 * query parameters (if any) from the parent.
-	 * @see ViewHandlerMode
-	 * @deprecated Since 2.6 As this is superfluous since Servlet 3.0.
-	 */
-	@Deprecated // TODO: remove in OmniFaces 3.0.
-	public static final String FACES_VIEWS_VIEW_HANDLER_MODE_PARAM_NAME = "org.omnifaces.FACES_VIEWS_VIEW_HANDLER_MODE";
 
 
 	// Request attributes ---------------------------------------------------------------------------------------------
@@ -337,12 +317,7 @@ public final class FacesViews {
 
 		Set<String> mappings = new HashSet<>(encounteredExtensions);
 		mappings.addAll(getMappedWelcomeFiles(servletContext));
-
-		if (getFacesServletDispatchMethod(servletContext) == DO_FILTER) {
-			// In order for the DO_FILTER method to work the FacesServlet, in addition the forward filter,
-			// has to be mapped on all extensionless resources.
-			mappings.addAll(filterExtension(getMappedResources(servletContext).keySet()));
-		}
+		mappings.addAll(filterExtension(getMappedResources(servletContext).keySet()));
 
 		ServletRegistration facesServletRegistration = getFacesServletRegistration(servletContext);
 
@@ -414,11 +389,7 @@ public final class FacesViews {
 
 		for (String welcomeFile : getNodeTextContents(webXml, "welcome-file-list/welcome-file")) {
 			if (isExtensionless(welcomeFile)) {
-				if (!welcomeFile.startsWith("/")) {
-					welcomeFile = "/" + welcomeFile;
-				}
-
-				mappedWelcomeFiles.add(stripTrailingSlash(welcomeFile));
+				mappedWelcomeFiles.add(addLeadingSlashIfNecessary(stripTrailingSlash(welcomeFile)));
 			}
 		}
 
@@ -483,7 +454,7 @@ public final class FacesViews {
 			for (String[] rootPathAndExtension : getRootPathsAndExtensions(servletContext)) {
 				String rootPath = rootPathAndExtension[0];
 
-				if (!"/".equals(rootPath) && !startsWithOneOf(rootPath, RESTRICTED_DIRECTORIES)) {
+				if (!isRoot(rootPath) && !startsWithOneOf(rootPath, RESTRICTED_DIRECTORIES)) {
 					publicRootPaths.add(rootPath);
 				}
 			}
@@ -558,21 +529,11 @@ public final class FacesViews {
 	}
 
 	private static String normalizeRootPath(String rootPath) {
-		String normalizedPath = rootPath;
-
-		if (!normalizedPath.startsWith("/")) {
-			normalizedPath = "/" + normalizedPath;
-		}
-
-		if (!normalizedPath.endsWith("/")) {
-			normalizedPath = normalizedPath + "/";
-		}
-
-		return normalizedPath;
+		return addLeadingSlashIfNecessary(addTrailingSlashIfNecessary(rootPath));
 	}
 
 	private static boolean canScanDirectory(String rootPath, String directory) {
-		if (!"/".equals(rootPath)) {
+		if (!isRoot(rootPath)) {
 			// If a user has explicitly asked for scanning anything other than /, every sub directory of it can be scanned.
 			return true;
 		}
@@ -596,10 +557,6 @@ public final class FacesViews {
 
 	static PathAction getPathAction(ServletContext servletContext) {
 		return getEnumInitParameter(servletContext, FACES_VIEWS_PATH_ACTION_PARAM_NAME, PathAction.class, SEND_404);
-	}
-
-	static FacesServletDispatchMethod getFacesServletDispatchMethod(ServletContext servletContext) {
-		return getEnumInitParameter(servletContext, FACES_VIEWS_DISPATCH_METHOD_PARAM_NAME, FacesServletDispatchMethod.class, DO_FILTER);
 	}
 
 	static boolean isResourceInPublicPath(ServletContext servletContext, String resource) {
@@ -629,10 +586,6 @@ public final class FacesViews {
 	static boolean isScannedViewsAlwaysExtensionless(ServletContext servletContext) {
 		String alwaysExtensionless = servletContext.getInitParameter(FACES_VIEWS_SCANNED_VIEWS_EXTENSIONLESS_PARAM_NAME);
 		return isEmpty(alwaysExtensionless) || parseBoolean(alwaysExtensionless);
-	}
-
-	static ViewHandlerMode getViewHandlerMode(ServletContext servletContext) {
-		return getEnumInitParameter(servletContext, FACES_VIEWS_VIEW_HANDLER_MODE_PARAM_NAME, ViewHandlerMode.class, STRIP_EXTENSION_FROM_PARENT);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -704,7 +657,7 @@ public final class FacesViews {
 		Set<String> multiviewsPaths = getApplicationAttribute(servletContext, MULTIVIEWS_PATHS);
 
 		if (multiviewsPaths != null) {
-			String path = resource + "/";
+			String path = addTrailingSlashIfNecessary(resource);
 
 			for (String multiviewsPath : multiviewsPaths) {
 				if (path.startsWith(multiviewsPath)) {
@@ -773,7 +726,7 @@ public final class FacesViews {
 	public static String stripWelcomeFilePrefix(ServletContext servletContext, String resource) {
 		for (String mappedWelcomeFile : getMappedWelcomeFiles(servletContext)) {
 			if (resource.endsWith(mappedWelcomeFile)) {
-				return resource.substring(0, resource.length() - mappedWelcomeFile.length()) + "/";
+				return addTrailingSlashIfNecessary(resource.substring(0, resource.length() - mappedWelcomeFile.length()));
 			}
 		}
 
