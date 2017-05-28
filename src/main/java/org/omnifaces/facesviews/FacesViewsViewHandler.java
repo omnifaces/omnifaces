@@ -71,9 +71,11 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 		if (mappedResources.containsKey(viewId) && (extensionless || isOriginalViewExtensionless(context))) {
 			// User has requested to always render extensionless, or the requested viewId was mapped and the current
 			// request is extensionless; render the action URL extensionless as well.
+			String[] uriAndQueryString = actionURL.split("\\?", 2);
+			String uri = stripWelcomeFilePrefix(servletContext, removeExtensionIfNecessary(servletContext, uriAndQueryString[0], viewId));
+			String queryString = uriAndQueryString.length > 1 ? ("?" + uriAndQueryString[1]) : "";
 			String pathInfo = context.getViewRoot().getViewId().equals(viewId) ? coalesce(getRequestPathInfo(context), "") : "";
-			actionURL = removeExtension(servletContext, actionURL, viewId);
-			return pathInfo.isEmpty() ? actionURL : (stripTrailingSlash(actionURL) + pathInfo + getQueryString(actionURL));
+			return (pathInfo.isEmpty() ? uri : (stripTrailingSlash(uri) + pathInfo)) + queryString;
 		}
 
 		// Not a resource we mapped or not a forwarded one, take the version from the parent view handler.
@@ -90,7 +92,7 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 		return isExtensionless(originalViewId);
 	}
 
-	private static String removeExtension(ServletContext servletContext, String actionURL, String viewId) {
+	private static String removeExtensionIfNecessary(ServletContext servletContext, String uri, String viewId) {
 		Set<String> extensions = getFacesServletExtensions(servletContext);
 
 		if (!isExtensionless(viewId)) {
@@ -103,20 +105,13 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 			}
 		}
 
-		String resource = actionURL.split("\\?", 2)[0];
-
 		for (String extension : extensions) {
-			if (resource.endsWith(extension)) {
-				return stripWelcomeFilePrefix(servletContext, resource.substring(0, resource.length() - extension.length()));
+			if (uri.endsWith(extension)) {
+				return uri.substring(0, uri.length() - extension.length());
 			}
 		}
 
-		return actionURL;
-	}
-
-	private static String getQueryString(String resource) {
-		int questionMarkPos = resource.indexOf('?');
-		return (questionMarkPos != -1) ? resource.substring(questionMarkPos) : "";
+		return uri;
 	}
 
 }
