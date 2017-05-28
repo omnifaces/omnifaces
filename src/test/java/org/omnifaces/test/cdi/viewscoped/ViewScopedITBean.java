@@ -26,6 +26,7 @@ import javax.inject.Named;
 
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.util.Faces;
+import org.omnifaces.util.Hacks;
 
 @Named
 @ViewScoped
@@ -59,9 +60,24 @@ public class ViewScopedITBean implements Serializable {
 	}
 
 	public void navigate() {
-		Object renderedResources = Faces.getContextAttribute(RESOURCE_IDENTIFIER);
-		Faces.setViewRoot(Faces.getViewId()); // TODO: replace by return getViewId() once Mojarra 2.3.1 is released. See #4249
-		Faces.setContextAttribute(RESOURCE_IDENTIFIER, renderedResources); // TODO: remove once Mojarra 2.3.1 is released. See #4249
+		Object renderedResources;
+
+		if (Hacks.isMyFacesUsed()) {
+			renderedResources = Faces.getViewRoot().getTransientStateHelper().getTransient("org.apache.myfaces.RENDERED_RESOURCES_SET");
+		}
+		else {
+			renderedResources = Faces.getContextAttribute(RESOURCE_IDENTIFIER);
+		}
+
+		Faces.setViewRoot(Faces.getViewId()); // TODO: replace by return getViewId() once renderedResources is fixed by both Mojarra and MyFaces.
+
+		if (Hacks.isMyFacesUsed()) {
+			Faces.getViewRoot().getTransientStateHelper().putTransient("org.apache.myfaces.RENDERED_RESOURCES_SET", renderedResources); // TODO: remove once MyFaces fixes this. See #4120
+		}
+		else {
+			Faces.setContextAttribute(RESOURCE_IDENTIFIER, renderedResources); // TODO: remove once Mojarra 2.3.1 is released. See #4249
+		}
+
 		addGlobalInfo("navigate ");
 	}
 
