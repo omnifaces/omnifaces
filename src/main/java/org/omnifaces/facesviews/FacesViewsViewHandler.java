@@ -81,13 +81,14 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 			// request is extensionless; render the action URL extensionless as well.
 
 			String pathInfo = context.getViewRoot().getViewId().equals(viewId) ? coalesce(getRequestPathInfo(context), "") : "";
+			String queryString = getQueryString(actionURL);
 
 			if (mode == BUILD_WITH_PARENT_QUERY_PARAMETERS) {
-				return getRequestContextPath(context) + stripExtension(viewId) + pathInfo + getQueryString(actionURL);
+				return getRequestContextPath(context) + stripExtension(viewId) + pathInfo + queryString;
 			}
 			else {
 				actionURL = removeExtension(servletContext, actionURL, viewId);
-				return pathInfo.isEmpty() ? actionURL : (stripTrailingSlash(actionURL) + pathInfo + getQueryString(actionURL));
+				return (pathInfo.isEmpty() ? actionURL : (stripTrailingSlash(actionURL) + pathInfo)) + queryString;
 			}
 		}
 
