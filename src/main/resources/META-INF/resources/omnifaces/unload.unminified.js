@@ -75,6 +75,7 @@ OmniFaces.Unload = (function(Util, navigator, window, document) {
 					else {
 						var xhr = new XMLHttpRequest();
 						xhr.open("POST", url, false);
+						xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
 						xhr.send(query);
 					}
 				}
