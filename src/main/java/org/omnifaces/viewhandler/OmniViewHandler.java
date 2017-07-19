@@ -22,6 +22,7 @@ import static org.omnifaces.util.Components.forEachComponent;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Faces.responseComplete;
 import static org.omnifaces.util.FacesLocal.getRenderKit;
+import static org.omnifaces.util.FacesLocal.getRequestHeader;
 import static org.omnifaces.util.FacesLocal.getRequestURI;
 import static org.omnifaces.util.FacesLocal.isDevelopment;
 import static org.omnifaces.util.FacesLocal.redirectPermanent;
@@ -43,7 +44,6 @@ import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.cdi.viewscope.ViewScopeManager;
 import org.omnifaces.taghandler.EnableRestorableView;
 import org.omnifaces.util.Callback;
-import org.omnifaces.util.FacesLocal;
 import org.omnifaces.util.Hacks;
 
 /**
@@ -135,7 +135,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 			context.getApplication().publishEvent(context, PreDestroyViewMapEvent.class, UIViewRoot.class, createdView);
 			Hacks.removeViewState(context, manager, viewId);
 		}
-		else if ("XMLHttpRequest".equals(FacesLocal.getRequestHeader(context, "X-Requested-With"))) {
+		else if ("XMLHttpRequest".equals(getRequestHeader(context, "X-Requested-With"))) {
 			redirectPermanent(context, getRequestURI(context));
 		}
 
