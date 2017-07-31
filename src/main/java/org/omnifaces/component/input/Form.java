@@ -13,6 +13,7 @@
 package org.omnifaces.component.input;
 
 import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 import static javax.servlet.RequestDispatcher.ERROR_REQUEST_URI;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeRequestParams;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeViewParams;
@@ -33,7 +34,6 @@ import javax.faces.application.ViewHandlerWrapper;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UICommand;
 import javax.faces.component.UIForm;
-import javax.faces.component.UIViewParameter;
 import javax.faces.component.html.HtmlForm;
 import javax.faces.context.FacesContext;
 import javax.faces.context.FacesContextWrapper;
@@ -43,57 +43,29 @@ import org.omnifaces.util.State;
 
 /**
  * <p>
- * The <code>&lt;o:form&gt;</code> is a component that extends the standard <code>&lt;h:form&gt;</code> and provides a
- * way to keep view or request parameters in the request URL after a post-back and offers in combination with the
- * <code>&lt;o:ignoreValidationFailed&gt;</code> tag on an {@link UICommand} component the possibility to ignore
- * validation failures so that the invoke action phase will be executed anyway. This component also supports adding
- * query string parameters to the action URL via nested <code>&lt;f:param&gt;</code> and <code>&lt;o:param&gt;</code>.
+ * The <code>&lt;o:form&gt;</code> is a component that extends the standard <code>&lt;h:form&gt;</code> and submits to
+ * exactly the request URI with query string as seen in browser's address bar. Standard JSF <code>&lt;h:form&gt;</code>
+ * submits to the view ID and does not include any query string parameters or path parameters and may therefore fail
+ * in cases when the form is submitted to a request scoped bean which relies on the same initial query string parameters
+ * or path parameters still being present in the request URI. This is particularly useful if you're using FacesViews or
+ * forwarding everything to 1 page.
+ * <p>
+ * Additionally, it offers in combination with the <code>&lt;o:ignoreValidationFailed&gt;</code> tag on an
+ * {@link UICommand} component the possibility to ignore validation failures so that the invoke action phase will be
+ * executed anyway. This component also supports adding query string parameters to the action URL via nested
+ * <code>&lt;f:param&gt;</code> and <code>&lt;o:param&gt;</code>.
  * <p>
  * You can use it the same way as <code>&lt;h:form&gt;</code>, you only need to change <code>h:</code> to
  * <code>o:</code>.
  *
- * <h3>Include View Params</h3>
- * <p>
- * The standard {@link UIForm} doesn't put the original view parameters in the action URL that's used for the post-back.
- * Instead, it relies on those view parameters to be stored in the state associated with the standard
- * {@link UIViewParameter}. Via this state those parameters are invisibly re-applied after every post-back.
- * <p>
- * The disadvantage of this invisible retention of view parameters is that the user doesn't see them anymore in the
- * address bar of the browser that is used to interact with the faces application. Copy-pasting the URL from the address
- * bar or refreshing the page by hitting enter inside the address bar will therefore not always yield the expected
- * results.
- * <p>
- * To solve this, this component offers an attribute <code>includeViewParams="true"</code> that will optionally include
- * all view parameters, in exactly the same way that this can be done for <code>&lt;h:link&gt;</code> and
- * <code>&lt;h:button&gt;</code>.
- * <pre>
- * &lt;o:form includeViewParams="true"&gt;
- * </pre>
- * <p>
- * This setting is ignored when <code>includeRequestParams="true"</code> or <code>useRequestURI="true"</code> is used.
- *
- * <h3>Include Request Params</h3>
- * <p>
- * As an alternative to <code>includeViewParams</code>, you can use <code>includeRequestParams="true"</code> to
- * optionally include the current GET request query string.
- * <pre>
- * &lt;o:form includeRequestParams="true"&gt;
- * </pre>
- * <p>
- * This setting overrides the <code>includeViewParams</code>.
- * This setting is ignored when <code>useRequestURI="true"</code> is used.
- *
  * <h3>Use request URI</h3>
  * <p>
- * As an alternative to <code>includeViewParams</code> and <code>includeRequestParams</code>, you can use
- * <code>useRequestURI="true"</code> to use the current request URI, including with the GET request query string, if
- * any. This is particularly useful if you're using FacesViews or forwarding everything to 1 page. Otherwise, by default
- * the current view ID will be used.
+ * Since version 3.0, this is the default behavior. So just using <code>&lt;o:form&gt;</code> will already submit to the
+ * exact request URI with query string as seen in browser's address bar. In order to turn off this behavior, set
+ * <code>useRequestURI</code> attribute to <code>false</code>.
  * <pre>
- * &lt;o:form useRequestURI="true"&gt;
+ * &lt;o:form useRequestURI="false"&gt;
  * </pre>
- * <p>
- * This setting overrides the <code>includeViewParams</code> and <code>includeRequestParams</code>.
  *
  * <h3>Add query string parameters to action URL</h3>
  * <p>
@@ -106,10 +78,8 @@ import org.omnifaces.util.State;
  * &lt;/o:form&gt;
  * </pre>
  * <p>
- * This can be used in combination with <code>useRequestURI</code>, <code>includeViewParams</code> and
- * <code>includeRequestParams</code>. The <code>&lt;f|o:param&gt;</code> will override any included view or request
- * parameters on the same name. To conditionally add or override, use the <code>disabled</code> attribute of
- * <code>&lt;f|o:param&gt;</code>.
+ * The <code>&lt;f|o:param&gt;</code> will override any included view or request parameters on the same name. To conditionally add
+ * or override, use the <code>disabled</code> attribute of <code>&lt;f|o:param&gt;</code>.
  * <p>
  * The support was added in OmniFaces 2.2.
  *
@@ -118,6 +88,13 @@ import org.omnifaces.util.State;
  * In order to properly use the <code>&lt;o:ignoreValidationFailed&gt;</code> tag on an {@link UICommand} component, its
  * parent <code>&lt;h:form&gt;</code> component has to be replaced by this <code>&lt;o:form&gt;</code> component.
  * See also {@link IgnoreValidationFailed}.
+ *
+ * <h3>Historical note</h3>
+ * <p>
+ * Previously, the <code>&lt;o:form&gt;</code> also supported <code>includeViewParams</code> and <code>includeRequestParams</code>, but
+ * they did after all not have any advantage over the later introduced <code>useRequestURI</code> which has since version 3.0 become the
+ * default behavior. Hence the <code>includeViewParams</code> and <code>includeRequestParams</code> are marked deprecated since 3.0.
+ *
  *
  * @since 1.1
  * @author Arjan Tijms
@@ -131,9 +108,22 @@ public class Form extends HtmlForm {
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.input.Form";
 
 	enum PropertyKeys {
+
+		useRequestURI,
+
+		/**
+		 * Not particularly useful as compared to useRequestURI.
+		 * @deprecated Since 3.0
+		 */
+		@Deprecated
 		includeViewParams,
-		includeRequestParams,
-		useRequestURI
+
+		/**
+		 * Not particularly useful as compared to useRequestURI.
+		 * @deprecated Since 3.0
+		 */
+		@Deprecated
+		includeRequestParams
 	}
 
 	// Variables ------------------------------------------------------------------------------------------------------
@@ -209,12 +199,12 @@ public class Form extends HtmlForm {
 	}
 
 	/**
-	 * Returns whether or not the request URI should be used as form's action URL.
+	 * Returns whether or not the request URI should be used as form's action URL. Defaults to <code>true</code>.
 	 * @return Whether or not the request URI should be used as form's action URL.
 	 * @since 1.6
 	 */
 	public boolean isUseRequestURI() {
-		return state.get(useRequestURI, FALSE);
+		return state.get(useRequestURI, TRUE);
 	}
 
 	/**

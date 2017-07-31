@@ -3651,10 +3651,11 @@ public class ValidateValuesBean implements MultiFieldValidator {
 	<tag>
 		<description>
 			<![CDATA[
-				<strong>Form</strong> is a component that extends the standard <code>UIForm</code> and provides a way to keep view
-				parameters in the request URL after a post-back and offers in combination with the
+				<strong>Form</strong> is a component that extends the standard <code>UIForm</code> and submits by default
+				to current request URI with query string and offers in combination with the
 				<code>&lt;o:ignoreValidationFailed&gt;</code> tag on an <code>UICommand</code> component the possibility to ignore
-				validation failures so that the invoke action phase will be executed anyway.
+				validation failures so that the invoke action phase will be executed anyway. It also supports adding custom
+				query string parameters via a nested <code>&lt;o|h:param&gt;</code>. 
 			 ]]>
 		</description>
 		<tag-name>form</tag-name>
@@ -3673,23 +3674,7 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		</attribute>
 		<attribute>
 			<description>
-				Whether to include view parameters in the action URI.
-			</description>
-			<name>includeViewParams</name>
-			<required>false</required>
-			<type>boolean</type>
-		</attribute>
-		<attribute>
-			<description>
-				Whether to include all URL (GET) request parameters in the action URI. This overrides includeViewParams.
-			</description>
-			<name>includeRequestParams</name>
-			<required>false</required>
-			<type>boolean</type>
-		</attribute>
-		<attribute>
-			<description>
-				Whether to use current request URI with query string as action URI. This overrides includeViewParams and includeRequestParams.
+				Whether to use current request URI with query string as action URI. Defaults to true.
 			</description>
 			<name>useRequestURI</name>
 			<required>false</required>
