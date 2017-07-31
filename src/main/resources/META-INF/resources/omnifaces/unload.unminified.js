@@ -65,7 +65,7 @@ OmniFaces.Unload = (function(Util, navigator, window, document) {
 				}
 
 				try {
-					var url = form.action.split(/[?#;]/)[0];
+					var url = form.action;
 					var query = "omnifaces.event=unload&id=" + id + "&" + VIEW_STATE_PARAM + "=" + encodeURIComponent(form[VIEW_STATE_PARAM].value);
 					var contentType = "application/x-www-form-urlencoded";
 

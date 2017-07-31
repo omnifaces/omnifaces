@@ -22,8 +22,7 @@ import static org.omnifaces.util.Components.forEachComponent;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Faces.responseComplete;
 import static org.omnifaces.util.FacesLocal.getRenderKit;
-import static org.omnifaces.util.FacesLocal.getRequestHeader;
-import static org.omnifaces.util.FacesLocal.getRequestURI;
+import static org.omnifaces.util.FacesLocal.getRequestURIWithQueryString;
 import static org.omnifaces.util.FacesLocal.isDevelopment;
 import static org.omnifaces.util.FacesLocal.redirectPermanent;
 
@@ -121,10 +120,9 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 	}
 
 	/**
-	 * Create a dummy view, restore only the view root state and then immediately explicitly destroy the view. Or, if
-	 * there is no view root state and the current request is triggered by XHR, then explicitly send a permanent
-	 * redirect to base URI. This way authentication frameworks which remember "last requested restricted URL" will
-	 * redirect back to correct (non-unload) URL.
+	 * Create a dummy view, restore only the view root state and then immediately explicitly destroy the view. Or, if there is no view root
+	 * state (which implies that session is expired), then explicitly send a permanent redirect to request URI. This way any authentication
+	 * framework which remember "last requested restricted URL" will redirect back to correct (non-unload) URL after login on a new session.
 	 */
 	private UIViewRoot unloadView(FacesContext context, String viewId) {
 		UIViewRoot createdView = createView(context, viewId);
@@ -134,12 +132,12 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 			context.setProcessingEvents(true);
 			context.getApplication().publishEvent(context, PreDestroyViewMapEvent.class, UIViewRoot.class, createdView);
 			Hacks.removeViewState(context, manager, viewId);
+			responseComplete();
 		}
-		else if ("XMLHttpRequest".equals(getRequestHeader(context, "X-Requested-With"))) {
-			redirectPermanent(context, getRequestURI(context));
+		else {
+			redirectPermanent(context, getRequestURIWithQueryString(context));
 		}
 
-		responseComplete();
 		return createdView;
 	}
 
