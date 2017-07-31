@@ -22,7 +22,6 @@ import static javax.servlet.RequestDispatcher.ERROR_STATUS_CODE;
 import static org.omnifaces.util.Exceptions.unwrap;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getServletContext;
-import static org.omnifaces.util.FacesLocal.getLifecycle;
 import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.normalizeViewId;
 import static org.omnifaces.util.Utils.isEmpty;
@@ -47,7 +46,8 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ExceptionQueuedEvent;
 import javax.faces.event.PhaseId;
-import javax.faces.lifecycle.Lifecycle;
+import javax.faces.event.PreRenderViewEvent;
+import javax.faces.view.ViewDeclarationLanguage;
 import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -535,10 +535,10 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 		Hacks.removeResourceDependencyState(context);
 
 		try {
-			context.setCurrentPhaseId(PhaseId.RENDER_RESPONSE);
-			Lifecycle lifecycle = getLifecycle(context);
-			lifecycle.execute(context);
-			lifecycle.render(context);
+			ViewDeclarationLanguage vdl = viewHandler.getViewDeclarationLanguage(context, viewId);
+			vdl.buildView(context, viewRoot);
+			context.getApplication().publishEvent(context, PreRenderViewEvent.class, viewRoot);
+			vdl.renderView(context, viewRoot);
 			context.responseComplete();
 		}
 		catch (Exception e) {
