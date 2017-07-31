@@ -93,10 +93,8 @@ public class MultiViewsIT extends OmniFacesIT {
 		open("MultiViewsITNonExistingPage/");
 		verify200("MultiViewsIT", "MultiViewsITNonExistingPage/", "MultiViewsITNonExistingPage", "");
 
-		if (!isTomee()) { // MyFaces bugs on this case with NPE in getViewMetadataFacelet() --> resolveURL()
-			open("MultiViewsITNonExistingPage.xhtml");
-			verify404("MultiViewsITNonExistingPage.xhtml");
-		}
+		open("MultiViewsITNonExistingPage.xhtml");
+		verify404("MultiViewsITNonExistingPage.xhtml");
 	}
 
 	private void verify200(String title, String path, String firstPathParam, String secondPathParam) {
