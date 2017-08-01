@@ -3682,6 +3682,14 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		</attribute>
 		<attribute>
 			<description>
+				Whether to send only the form data which actually need to be processed as opposed to the entire form. Defaults to true.
+			</description>
+			<name>partialSubmit</name>
+			<required>false</required>
+			<type>boolean</type>
+		</attribute>
+		<attribute>
+			<description>
 				Flag indicating whether or not this form should prepend its id
 				to its descendent's id during the clientId generation process.
 				If this flag is not set, the default value is true.

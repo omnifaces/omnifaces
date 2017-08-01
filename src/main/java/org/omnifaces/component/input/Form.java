@@ -17,6 +17,7 @@ import static java.lang.Boolean.TRUE;
 import static javax.servlet.RequestDispatcher.ERROR_REQUEST_URI;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeRequestParams;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeViewParams;
+import static org.omnifaces.component.input.Form.PropertyKeys.partialSubmit;
 import static org.omnifaces.component.input.Form.PropertyKeys.useRequestURI;
 import static org.omnifaces.util.Components.getParams;
 import static org.omnifaces.util.FacesLocal.getRequestAttribute;
@@ -26,9 +27,9 @@ import static org.omnifaces.util.Servlets.toQueryString;
 import static org.omnifaces.util.Utils.formatURLWithQueryString;
 
 import java.io.IOException;
-
 import javax.faces.application.Application;
 import javax.faces.application.ApplicationWrapper;
+import javax.faces.application.ResourceDependency;
 import javax.faces.application.ViewHandler;
 import javax.faces.application.ViewHandlerWrapper;
 import javax.faces.component.FacesComponent;
@@ -44,7 +45,7 @@ import org.omnifaces.util.State;
 /**
  * <p>
  * The <code>&lt;o:form&gt;</code> is a component that extends the standard <code>&lt;h:form&gt;</code> and submits to
- * exactly the request URI with query string as seen in browser's address bar. Standard JSF <code>&lt;h:form&gt;</code>
+ * exactly the request URI with query string as seen in browser's address. Standard JSF <code>&lt;h:form&gt;</code>
  * submits to the view ID and does not include any query string parameters or path parameters and may therefore fail
  * in cases when the form is submitted to a request scoped bean which relies on the same initial query string parameters
  * or path parameters still being present in the request URI. This is particularly useful if you're using FacesViews or
@@ -52,19 +53,35 @@ import org.omnifaces.util.State;
  * <p>
  * Additionally, it offers in combination with the <code>&lt;o:ignoreValidationFailed&gt;</code> tag on an
  * {@link UICommand} component the possibility to ignore validation failures so that the invoke action phase will be
- * executed anyway. This component also supports adding query string parameters to the action URL via nested
+ * executed anyway.
+ * <p>
+ * Since version 2.1 this component also supports adding query string parameters to the action URL via nested
  * <code>&lt;f:param&gt;</code> and <code>&lt;o:param&gt;</code>.
+ * <p>
+ * Since version 3.0, it will also during ajax requests automatically send only the form data which actually need to
+ * be processed as opposed to the entire form, based on the <code>execute</code> attribute of any nested
+ * <code>&lt;f:ajax&gt;</code> . This feature is similar to <code>partialSubmit</code> feature of PrimeFaces.
+ * This will reduce the request payload when used in large forms such as editable tables.
  * <p>
  * You can use it the same way as <code>&lt;h:form&gt;</code>, you only need to change <code>h:</code> to
  * <code>o:</code>.
  *
  * <h3>Use request URI</h3>
  * <p>
- * Since version 3.0, this is the default behavior. So just using <code>&lt;o:form&gt;</code> will already submit to the
- * exact request URI with query string as seen in browser's address bar. In order to turn off this behavior, set
- * <code>useRequestURI</code> attribute to <code>false</code>.
+ * This was available since version 1.6, but since version 3.0, this has become enabled by default. So just using
+ * <code>&lt;o:form&gt;</code> will already submit to the exact request URI with query string as seen in browser's
+ * address bar. In order to turn off this behavior, set <code>useRequestURI</code> attribute to <code>false</code>.
  * <pre>
  * &lt;o:form useRequestURI="false"&gt;
+ * </pre>
+ *
+ * <h3>Partial submit</h3>
+ * <p>
+ * This is the default behavior. So just using <code>&lt;o:form&gt;</code> will already send only the form data which
+ * actually need to be processed. In order to turn off this behavior, set <code>partialSubmit</code> attribute to
+ * <code>false</code>.
+ * <pre>
+ * &lt;o:form partialSubmit="false"&gt;
  * </pre>
  *
  * <h3>Add query string parameters to action URL</h3>
@@ -101,6 +118,7 @@ import org.omnifaces.util.State;
  * @author Bauke Scholtz
  */
 @FacesComponent(Form.COMPONENT_TYPE)
+@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head")
 public class Form extends HtmlForm {
 
 	// Constants ------------------------------------------------------------------------------------------------------
@@ -110,6 +128,7 @@ public class Form extends HtmlForm {
 	enum PropertyKeys {
 
 		useRequestURI,
+		partialSubmit,
 
 		/**
 		 * Not particularly useful as compared to useRequestURI.
@@ -155,6 +174,7 @@ public class Form extends HtmlForm {
 
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
+		getPassThroughAttributes().put("data-partialsubmit", String.valueOf(isPartialSubmit()));
 		super.encodeBegin(new ActionURLDecorator(context, this));
 	}
 
@@ -199,8 +219,8 @@ public class Form extends HtmlForm {
 	}
 
 	/**
-	 * Returns whether or not the request URI should be used as form's action URL. Defaults to <code>true</code>.
-	 * @return Whether or not the request URI should be used as form's action URL.
+	 * Returns whether the request URI should be used as form's action URL. Defaults to <code>true</code>.
+	 * @return Whether the request URI should be used as form's action URL.
 	 * @since 1.6
 	 */
 	public boolean isUseRequestURI() {
@@ -208,10 +228,8 @@ public class Form extends HtmlForm {
 	}
 
 	/**
-	 * Set whether or not the request URI should be used as form's action URL.
-	 *
-	 * @param useRequestURI
-	 *            The state of the switch for using request URI.
+	 * Set whether the request URI should be used as form's action URL.
+	 * @param useRequestURI Whether the request URI should be used as form's action URL.
 	 * @since 1.6
 	 */
 	public void setUseRequestURI(boolean useRequestURI) {
@@ -228,12 +246,30 @@ public class Form extends HtmlForm {
 	}
 
 	/**
-	 * Set whether or not the form should ignore validation fail.
-	 * @param ignoreValidationFailed Whether or not the form should ignore validation fail.
+	 * Set whether the form should ignore validation fail.
+	 * @param ignoreValidationFailed Whether the form should ignore validation fail.
 	 * @since 2.1
 	 */
 	public void setIgnoreValidationFailed(boolean ignoreValidationFailed) {
 		this.ignoreValidationFailed = ignoreValidationFailed;
+	}
+
+	/**
+	 * Returns whether to send only the form data which actually need to be processed as opposed to the entire form. Defaults to <code>true</code>.
+	 * @return Whether to send only the form data which actually need to be processed as opposed to the entire form.
+	 * @since 3.0
+	 */
+	public boolean isPartialSubmit() {
+		return state.get(partialSubmit, TRUE);
+	}
+
+	/**
+	 * Set whether to send only the form data which actually need to be processed as opposed to the entire form.
+	 * @param partialSubmit Whether to send only the form data which actually need to be processed as opposed to the entire form.
+	 * @since 3.0
+	 */
+	public void setPartialSubmit(boolean partialSubmit) {
+		state.put(PropertyKeys.partialSubmit, partialSubmit);
 	}
 
 	// Nested classes -------------------------------------------------------------------------------------------------

@@ -243,6 +243,7 @@
 								<jsSourceFile>unload.unminified.js</jsSourceFile>
 								<jsSourceFile>push.unminified.js</jsSourceFile>
 								<jsSourceFile>inputfile.unminified.js</jsSourceFile>
+								<jsSourceFile>form.unminified.js</jsSourceFile>
 							</jsSourceFiles>
 							<jsFinalFile>omnifaces.js</jsFinalFile>
 						</configuration>
