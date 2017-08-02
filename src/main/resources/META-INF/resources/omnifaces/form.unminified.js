@@ -27,16 +27,21 @@ OmniFaces.Form = (function(Util, window) {
 
 			jsf.getViewState = function(form) {
 				var originalViewState = originalGetViewState(form);
-				var execute = this.ajax.request.arguments[2].execute;
 
-				if (!form.attributes["data-partialsubmit"] || !execute || execute.indexOf("@form") != -1 || execute.indexOf("@all") != -1) {
+				if (form.attributes["data-partialsubmit"] != "true") {
+					return originalViewState;
+				}
+
+				var execute = jsf.ajax.request.arguments ? jsf.ajax.request.arguments[2].execute : null;
+
+				if (!execute || execute.indexOf("@form") != -1 || execute.indexOf("@all") != -1) {
 					return originalViewState;
 				}
 
 				var executeIds = [];
 
 				if (execute.indexOf("@none") == -1) {
-					executeIds = execute.replace("@this", this.ajax.request.arguments[0].id).split(" ").map(encodeURIComponent);
+					executeIds = execute.replace("@this", jsf.ajax.request.arguments[0].id).split(" ").map(encodeURIComponent);
 					executeIds.push(encodeURIComponent(form.id));
 				}
 

@@ -174,7 +174,10 @@ public class Form extends HtmlForm {
 
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
-		getPassThroughAttributes().put("data-partialsubmit", String.valueOf(isPartialSubmit()));
+		if (isPartialSubmit()) {
+			getPassThroughAttributes().put("data-partialsubmit", "true");
+		}
+
 		super.encodeBegin(new ActionURLDecorator(context, this));
 	}
 
