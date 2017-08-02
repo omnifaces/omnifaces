@@ -70,23 +70,23 @@
 		<h:outputText id="viewScopedAjaxAwareMessage" value="#{socketITBean.ajaxAwareMessage}" />
 		<div id="clientClosedMessages" />
 
-		<h:form id="push">
+		<o:form id="push">
 			<f:ajax onevent="clearMessages" render=":messages">
 				<h:commandButton id="applicationScopedServerEvent" action="#{socketITBean.pushApplicationScopedServerEvent}" />
 				<h:commandButton id="sessionScopedUserTargeted" action="#{socketITBean.pushSessionScopedUserTargeted('42')}" />
 				<h:commandButton id="viewScopedAjaxAware" action="#{socketITBean.pushViewScopedAjaxAware}" />
 			</f:ajax>
-		</h:form>
+		</o:form>
 
 		<h:link id="closeAllSockets" onclick="closeAllSockets();return false;" />
 
 		<o:socket channel="applicationScopedServerEvent" onopen="clientOpened" onmessage="showServerEvent" onclose="clientClosed" />
 		<o:socket channel="sessionScopedUserTargeted" user="42" onopen="clientOpened" onmessage="showMessage" onclose="clientClosed" />
 
-		<h:form>
+		<o:form>
 			<o:socket channel="viewScopedAjaxAware" scope="view" onopen="clientOpened" onclose="clientClosed">
 				<f:ajax event="someAjaxEventName" render=":viewScopedAjaxAwareMessage" />
 			</o:socket>
-		</h:form>
+		</o:form>
 	</h:body>
 </html>

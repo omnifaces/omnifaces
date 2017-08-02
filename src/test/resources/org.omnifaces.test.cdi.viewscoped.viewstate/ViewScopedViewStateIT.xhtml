@@ -32,16 +32,16 @@
 		<h:button id="unload" />
 		<h:link id="newtab" target="_blank" />
 
-		<h:form id="non-ajax">
+		<o:form id="non-ajax">
 			<h:commandButton id="submit" action="#{viewScopedViewStateITBean.submit}" />
 			<h:commandLink id="navigate" action="#{viewScopedViewStateITBean.navigate}" />
-		</h:form>
+		</o:form>
 
-		<h:form id="ajax">
+		<o:form id="ajax">
 			<f:ajax render=":results">
 				<h:commandButton id="submit" action="#{viewScopedViewStateITBean.submit}" />
 				<h:commandLink id="navigate" action="#{viewScopedViewStateITBean.navigate}" />
 			</f:ajax>
-		</h:form>
+		</o:form>
 	</h:body>
 </html>
