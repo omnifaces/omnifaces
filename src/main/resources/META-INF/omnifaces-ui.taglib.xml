@@ -3690,16 +3690,6 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		</attribute>
 		<attribute>
 			<description>
-				Flag indicating whether or not this form should prepend its id
-				to its descendent's id during the clientId generation process.
-				If this flag is not set, the default value is true.
-			</description>
-			<name>prependId</name>
-			<required>false</required>
-			<type>boolean</type>
-		</attribute>
-		<attribute>
-			<description>
 				Flag indicating whether or not this component should be rendered
 				(during Render Response Phase), or processed on any subsequent
 				form submit. The default value for this property is true.
