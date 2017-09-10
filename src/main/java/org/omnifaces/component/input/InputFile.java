@@ -19,6 +19,7 @@ import static java.util.Collections.unmodifiableList;
 import static javax.faces.application.ResourceHandler.JSF_SCRIPT_LIBRARY_NAME;
 import static javax.faces.application.ResourceHandler.JSF_SCRIPT_RESOURCE_NAME;
 import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.config.OmniFaces.getMessage;
@@ -282,7 +283,7 @@ public class InputFile extends HtmlInputFile {
 	 */
 	@Override
 	public void decode(FacesContext context) {
-		if ("validationFailed".equals(getRequestParameter(context, "omnifaces.event"))
+		if ("validationFailed".equals(getRequestParameter(context, OMNIFACES_EVENT_PARAM_NAME))
 			&& getClientId(context).equals(getRequestParameter(context, BEHAVIOR_SOURCE_PARAM_NAME)))
 		{
 			String fileName = getRequestParameter(context, "fileName");

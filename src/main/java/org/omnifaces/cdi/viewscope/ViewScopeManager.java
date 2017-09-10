@@ -17,6 +17,7 @@ import static java.lang.String.format;
 import static java.util.logging.Level.FINE;
 import static javax.faces.application.StateManager.IS_BUILDING_INITIAL_STATE;
 import static javax.faces.event.PhaseId.RENDER_RESPONSE;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_UNLOAD_SCRIPT_NAME;
@@ -232,7 +233,7 @@ public class ViewScopeManager {
 	 * @since 2.2
 	 */
 	public static boolean isUnloadRequest(FacesContext context) {
-		return "unload".equals(getRequestParameter(context, "omnifaces.event"));
+		return "unload".equals(getRequestParameter(context, OMNIFACES_EVENT_PARAM_NAME));
 	}
 
 }

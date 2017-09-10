@@ -38,6 +38,9 @@ public final class OmniFaces {
 	/** Returns the "unload.js" unload script name. */
 	public static final String OMNIFACES_UNLOAD_SCRIPT_NAME = "unload.js";
 
+	/** Returns the "omnifaces.event" request parameter name. */
+	public static final String OMNIFACES_EVENT_PARAM_NAME = "omnifaces.event";
+
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final String VERSION = OmniFaces.class.getPackage().getSpecificationVersion().replaceAll("-\\d+$", "");
