@@ -20,8 +20,6 @@ import static org.omnifaces.util.Components.forEachComponent;
 import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.FacesLocal.getViewAttribute;
 import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
-import static org.omnifaces.util.FacesLocal.setViewAttribute;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -128,14 +126,7 @@ public class SocketFacesListener implements SystemEventListener {
 	 * and the map value represents the last known value of the <code>connected</code> attribute.
 	 */
 	private static Map<String, Boolean> getSockets(FacesContext context) {
-		Map<String, Boolean> sockets = getViewAttribute(context, Socket.class.getName());
-
-		if (sockets == null) {
-			sockets = new HashMap<>(ESTIMATED_TOTAL_CHANNELS);
-			setViewAttribute(context, Socket.class.getName(), sockets);
-		}
-
-		return sockets;
+		return getViewAttribute(context, Socket.class.getName(), () -> new HashMap<>(ESTIMATED_TOTAL_CHANNELS));
 	}
 
 }
