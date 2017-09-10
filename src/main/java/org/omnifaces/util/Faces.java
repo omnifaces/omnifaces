@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import javax.el.ELContext;
 import javax.el.ELResolver;
@@ -2025,6 +2026,20 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the request scope attribute value associated with the given name, or computes the supplied value if absent.
+	 * @param <T> The expected return type.
+	 * @param name The request scope attribute name.
+	 * @param computeIfAbsent The computed request scope attribute value when absent. Useful if it represents a collection, map or bean.
+	 * @return The request scope attribute value associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see ExternalContext#getRequestMap()
+	 * @since 3.0
+	 */
+	public static <T> T getRequestAttribute(String name, Supplier<T> computeIfAbsent) {
+		return FacesLocal.getRequestAttribute(getContext(), name, computeIfAbsent);
+	}
+
+	/**
 	 * Sets the request scope attribute value associated with the given name.
 	 * @param name The request scope attribute name.
 	 * @param value The request scope attribute value.
@@ -2070,6 +2085,20 @@ public final class Faces {
 	 */
 	public static <T> T getFlashAttribute(String name) {
 		return FacesLocal.getFlashAttribute(getContext(), name);
+	}
+
+	/**
+	 * Returns the flash scope attribute value associated with the given name, or computes the supplied value if absent.
+	 * @param <T> The expected return type.
+	 * @param name The flash scope attribute name.
+	 * @param computeIfAbsent The computed flash scope attribute value when absent. Useful if it represents a collection, map or bean.
+	 * @return The flash scope attribute value associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see ExternalContext#getFlash()
+	 * @since 3.0
+	 */
+	public static <T> T getFlashAttribute(String name, Supplier<T> computeIfAbsent) {
+		return FacesLocal.getFlashAttribute(getContext(), name, computeIfAbsent);
 	}
 
 	/**
@@ -2120,6 +2149,20 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the view scope attribute value associated with the given name, or computes the supplied value if absent.
+	 * @param <T> The expected return type.
+	 * @param name The view scope attribute name.
+	 * @param computeIfAbsent The computed view scope attribute value when absent. Useful if it represents a collection, map or bean.
+	 * @return The view scope attribute value associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see ExternalContext#getViewMap()
+	 * @since 3.0
+	 */
+	public static <T> T getViewAttribute(String name, Supplier<T> computeIfAbsent) {
+		return FacesLocal.getViewAttribute(getContext(), name, computeIfAbsent);
+	}
+
+	/**
 	 * Sets the view scope attribute value associated with the given name.
 	 * @param name The view scope attribute name.
 	 * @param value The view scope attribute value.
@@ -2167,6 +2210,20 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the session scope attribute value associated with the given name, or computes the supplied value if absent.
+	 * @param <T> The expected return type.
+	 * @param name The session scope attribute name.
+	 * @param computeIfAbsent The computed session scope attribute value when absent. Useful if it represents a collection, map or bean.
+	 * @return The session scope attribute value associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see ExternalContext#getSessionMap()
+	 * @since 3.0
+	 */
+	public static <T> T getSessionAttribute(String name, Supplier<T> computeIfAbsent) {
+		return FacesLocal.getSessionAttribute(getContext(), name, computeIfAbsent);
+	}
+
+	/**
 	 * Sets the session scope attribute value associated with the given name.
 	 * @param name The session scope attribute name.
 	 * @param value The session scope attribute value.
@@ -2211,6 +2268,20 @@ public final class Faces {
 	 */
 	public static <T> T getApplicationAttribute(String name) {
 		return FacesLocal.getApplicationAttribute(getContext(), name);
+	}
+
+	/**
+	 * Returns the application scope attribute value associated with the given name, or computes the supplied value if absent.
+	 * @param <T> The expected return type.
+	 * @param name The application scope attribute name.
+	 * @param computeIfAbsent The computed application scope attribute value when absent. Useful if it represents a collection, map or bean.
+	 * @return The application scope attribute value associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see ExternalContext#getApplicationMap()
+	 * @since 3.0
+	 */
+	public static <T> T getApplicationAttribute(String name, Supplier<T> computeIfAbsent) {
+		return FacesLocal.getApplicationAttribute(getContext(), name, computeIfAbsent);
 	}
 
 	/**

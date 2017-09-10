@@ -51,6 +51,7 @@ import java.util.Map.Entry;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.logging.Logger;
 
 import javax.el.ELContext;
@@ -1389,6 +1390,20 @@ public final class FacesLocal {
 	}
 
 	/**
+	 * @see Faces#getRequestAttribute(String, Supplier)
+	 */
+	public static <T> T getRequestAttribute(FacesContext context, String name, Supplier<T> computeIfAbsent) {
+		T value = getRequestAttribute(context, name);
+
+		if (value == null) {
+			value = computeIfAbsent.get();
+			setRequestAttribute(context, name, value);
+		}
+
+		return value;
+	}
+
+	/**
 	 * @see Faces#setRequestAttribute(String, Object)
 	 */
 	public static void setRequestAttribute(FacesContext context, String name, Object value) {
@@ -1418,6 +1433,20 @@ public final class FacesLocal {
 	@SuppressWarnings("unchecked")
 	public static <T> T getFlashAttribute(FacesContext context, String name) {
 		return (T) getFlash(context).get(name);
+	}
+
+	/**
+	 * @see Faces#getFlashAttribute(String, Supplier)
+	 */
+	public static <T> T getFlashAttribute(FacesContext context, String name, Supplier<T> computeIfAbsent) {
+		T value = getFlashAttribute(context, name);
+
+		if (value == null) {
+			value = computeIfAbsent.get();
+			setFlashAttribute(context, name, value);
+		}
+
+		return value;
 	}
 
 	/**
@@ -1453,6 +1482,20 @@ public final class FacesLocal {
 	}
 
 	/**
+	 * @see Faces#getViewAttribute(String, Supplier)
+	 */
+	public static <T> T getViewAttribute(FacesContext context, String name, Supplier<T> computeIfAbsent) {
+		T value = getViewAttribute(context, name);
+
+		if (value == null) {
+			value = computeIfAbsent.get();
+			setViewAttribute(context, name, value);
+		}
+
+		return value;
+	}
+
+	/**
 	 * @see Faces#setViewAttribute(String, Object)
 	 */
 	public static void setViewAttribute(FacesContext context, String name, Object value) {
@@ -1485,6 +1528,20 @@ public final class FacesLocal {
 	}
 
 	/**
+	 * @see Faces#getSessionAttribute(String, Supplier)
+	 */
+	public static <T> T getSessionAttribute(FacesContext context, String name, Supplier<T> computeIfAbsent) {
+		T value = getSessionAttribute(context, name);
+
+		if (value == null) {
+			value = computeIfAbsent.get();
+			setSessionAttribute(context, name, value);
+		}
+
+		return value;
+	}
+
+	/**
 	 * @see Faces#setSessionAttribute(String, Object)
 	 */
 	public static void setSessionAttribute(FacesContext context, String name, Object value) {
@@ -1514,6 +1571,20 @@ public final class FacesLocal {
 	@SuppressWarnings("unchecked")
 	public static <T> T getApplicationAttribute(FacesContext context, String name) {
 		return (T) getApplicationMap(context).get(name);
+	}
+
+	/**
+	 * @see Faces#getApplicationAttribute(String, Supplier)
+	 */
+	public static <T> T getApplicationAttribute(FacesContext context, String name, Supplier<T> computeIfAbsent) {
+		T value = getApplicationAttribute(context, name);
+
+		if (value == null) {
+			value = computeIfAbsent.get();
+			setApplicationAttribute(context, name, value);
+		}
+
+		return value;
 	}
 
 	/**
