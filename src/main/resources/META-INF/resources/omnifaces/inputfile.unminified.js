@@ -49,10 +49,13 @@ OmniFaces.InputFile = (function(window, document) {
 
 				if (window.mojarra) { // Mojarra doesn't add custom params when using iframe transport.
 					originalEnctype = inputFile.form.enctype;
-					inputFile.form.enctype = null;
+					inputFile.form.enctype = "application/x-www-form-urlencoded";
 				}
 
-				inputFile.value = null; // Clear out selected files.
+				// Clear out selected files. Note: inputFile.value = null doesn't work in IE.
+				inputFile.type = "text";
+				inputFile.type = "file";
+
 				jsf.ajax.request(inputFile.id, event, { "omnifaces.event": "validationFailed", fileName: fileName });
 
 				if (originalEnctype) {
