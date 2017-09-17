@@ -74,14 +74,7 @@ public final class BeansLocal {
 			}
 		}
 
-		Bean<T> bean = (Bean<T>) beanManager.resolve(beans);
-
-		if (bean == null && beanClass.getSuperclass() != Object.class) {
-			return (Bean<T>) resolve(beanManager, beanClass.getSuperclass(), qualifiers);
-		}
-		else {
-			return bean;
-		}
+		return (Bean<T>) beanManager.resolve(beans);
 	}
 
 	/**
@@ -201,12 +194,15 @@ public final class BeansLocal {
 	public static <T> void destroy(BeanManager beanManager, T instance) {
 		if (instance instanceof Class) { // Java prefers T over Class<T> when varargs is not specified :(
 			destroy(beanManager, (Class<T>) instance, new Annotation[0]);
+			return;
 		}
-		else {
-			Bean<T> bean = (Bean<T>) resolve(beanManager, instance.getClass());
 
-			if (bean != null) {
+		for (Class<?> beanClass = instance.getClass(); beanClass != Object.class; beanClass = beanClass.getSuperclass()) {
+			Bean<T> bean = (Bean<T>) resolve(beanManager, beanClass);
+
+			if (bean != null && instance.equals(getInstance(beanManager, bean, false))) {
 				destroy(beanManager, bean, instance);
+				return;
 			}
 		}
 	}
