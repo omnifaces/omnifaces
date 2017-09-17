@@ -369,8 +369,8 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	}
 
 	private void handleAjaxException(FacesContext context) {
-		if (context == null || !context.getPartialViewContext().isAjaxRequest()) {
-			return; // Not an ajax request.
+		if (context == null) {
+			return; // Unexpected, most likely buggy JSF implementation or parent exception handler.
 		}
 
 		Iterator<ExceptionQueuedEvent> unhandledExceptionQueuedEvents = getUnhandledExceptionQueuedEvents().iterator();
@@ -385,17 +385,21 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 			return; // Let JSF handle it itself.
 		}
 
-		unhandledExceptionQueuedEvents.remove();
 		exception = findExceptionRootCause(context, exception);
 
 		if (!shouldHandleExceptionRootCause(context, exception)) {
 			return; // A subclass apparently want to do it differently.
 		}
 
+		unhandledExceptionQueuedEvents.remove();
 		String errorPageLocation = findErrorPageLocation(context, exception);
 
 		if (errorPageLocation == null) {
 			throw new IllegalArgumentException(ERROR_DEFAULT_LOCATION_MISSING);
+		}
+
+		if (!context.getPartialViewContext().isAjaxRequest()) {
+			return; // Not an ajax request, let default web.xml error page mechanism do its job.
 		}
 
 		if (!canRenderErrorPageView(context, exception, errorPageLocation)) {
