@@ -61,7 +61,7 @@
 
 		<!-- Java versions. -->
 		<javase.version>1.8</javase.version>
-		<javaee.version>7</javaee.version><!-- TODO: update to 8 once available. -->
+		<javaee.version>8</javaee.version>
 		<javadoc.version>1.8</javadoc.version>
 
 		<!-- Essential Maven defaults. -->
@@ -72,7 +72,7 @@
 		<maven.source.excludeResources>true</maven.source.excludeResources>
 
 		<!-- Test server versions. -->
-		<test.wildfly.version>10.1.0.Final</test.wildfly.version> <!-- TODO: update to Java EE 8 compatible versions -->
+		<test.wildfly.version>11.0.0.CR1</test.wildfly.version> <!-- TODO: update to Java EE 8 compatible versions -->
 		<test.tomee.version>7.0.3</test.tomee.version>
 		<test.payara.version>4.1.1.171.1</test.payara.version>
 	</properties>
@@ -95,7 +95,7 @@
 		<dependency>
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
-			<version>2.0.0.CR3</version><!-- TODO: update to 2.0 final once available. -->
+			<version>2.0.0.Final</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -490,7 +490,7 @@
 										<artifactItem>
 											<groupId>org.glassfish</groupId>
 											<artifactId>javax.faces</artifactId>
-											<version>2.3.0-m09</version> <!-- Fails since m10 due to a bug in WildFly http://stackoverflow.com/q/44076148/157882 -->
+											<version>2.3.2</version>
 											<type>jar</type>
 											<outputDirectory>${project.build.directory}/wildfly-${test.wildfly.version}/modules/system/layers/base/javax/faces/api/main</outputDirectory>
 											<destFileName>jboss-jsf-api_2.2_spec-2.2.13.jar</destFileName> <!-- Reuse same file name to make our life easier (no editing of module.xml necessary). -->
@@ -499,10 +499,10 @@
 										<artifactItem>
 											<groupId>org.glassfish</groupId>
 											<artifactId>javax.faces</artifactId>
-											<version>2.3.0-m09</version> <!-- Fails since m10 due to a bug in WildFly http://stackoverflow.com/q/44076148/157882 -->
+											<version>2.3.2</version>
 											<type>jar</type>
 											<outputDirectory>${project.build.directory}/wildfly-${test.wildfly.version}/modules/system/layers/base/com/sun/jsf-impl/main</outputDirectory>
-											<destFileName>jsf-impl-2.2.13.SP1.jar</destFileName> <!-- Reuse same file name to make our life easier (no editing of module.xml necessary). -->
+											<destFileName>jsf-impl-2.2.13.SP4.jar</destFileName> <!-- Reuse same file name to make our life easier (no editing of module.xml necessary). -->
 											<overWrite>true</overWrite>
 										</artifactItem>
 									</artifactItems>
@@ -539,7 +539,7 @@
 								</goals>
 								<configuration>
 									<fileset>
-										<directory>${project.build.directory}/wildfly-${test.wildfly.version}/modules/system/layers/base/com/sun/jsf-impl/main/jsf-impl-2.2.13.SP1.jar</directory>
+										<directory>${project.build.directory}/wildfly-${test.wildfly.version}/modules/system/layers/base/com/sun/jsf-impl/main/jsf-impl-2.2.13.SP4.jar</directory>
 										<excludes>
 											<exclude>com/**</exclude>
 											<exclude>META-INF/**</exclude>
@@ -703,7 +703,7 @@
 										<artifactItem>
 											<groupId>org.glassfish</groupId>
 											<artifactId>javax.faces</artifactId>
-											<version>2.3.0</version>
+											<version>2.3.2</version>
 											<type>jar</type>
 											<outputDirectory>${project.build.directory}/payara41/glassfish/modules</outputDirectory>
 											<destFileName>javax.faces.jar</destFileName>

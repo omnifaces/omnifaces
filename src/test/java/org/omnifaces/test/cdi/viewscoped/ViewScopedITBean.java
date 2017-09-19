@@ -12,9 +12,9 @@
  */
 package org.omnifaces.test.cdi.viewscoped;
 
-import static javax.faces.application.ResourceHandler.RESOURCE_IDENTIFIER;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.isUnloadRequest;
 import static org.omnifaces.util.Faces.getContext;
+import static org.omnifaces.util.Faces.getViewId;
 import static org.omnifaces.util.Faces.hasContext;
 import static org.omnifaces.util.Messages.addGlobalInfo;
 
@@ -59,26 +59,18 @@ public class ViewScopedITBean implements Serializable {
 		addGlobalInfo("submit ");
 	}
 
-	public void navigate() {
-		Object renderedResources;
-
-		if (Hacks.isMyFacesUsed()) {
-			renderedResources = Faces.getViewRoot().getTransientStateHelper().getTransient("org.apache.myfaces.RENDERED_RESOURCES_SET");
-		}
-		else {
-			renderedResources = Faces.getContextAttribute(RESOURCE_IDENTIFIER);
-		}
-
-		Faces.setViewRoot(Faces.getViewId()); // TODO: replace by return getViewId() once renderedResources is fixed by both Mojarra and MyFaces.
-
-		if (Hacks.isMyFacesUsed()) {
-			Faces.getViewRoot().getTransientStateHelper().putTransient("org.apache.myfaces.RENDERED_RESOURCES_SET", renderedResources); // TODO: remove once MyFaces fixes this. See #4120
-		}
-		else {
-			Faces.setContextAttribute(RESOURCE_IDENTIFIER, renderedResources); // TODO: remove once Mojarra 2.3.1 is released. See #4249
-		}
-
+	public String navigate() {
 		addGlobalInfo("navigate ");
+
+		if (Hacks.isMyFacesUsed()) { // TODO: remove once MyFaces fixes this. See #4120
+			Object renderedResources = Faces.getViewRoot().getTransientStateHelper().getTransient("org.apache.myfaces.RENDERED_RESOURCES_SET");
+			Faces.setViewRoot(Faces.getViewId());
+			Faces.getViewRoot().getTransientStateHelper().putTransient("org.apache.myfaces.RENDERED_RESOURCES_SET", renderedResources);
+			return null;
+		}
+		else {
+			return getViewId();
+		}
 	}
 
 	@PreDestroy
