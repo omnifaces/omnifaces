@@ -72,9 +72,9 @@
 		<maven.source.excludeResources>true</maven.source.excludeResources>
 
 		<!-- Test server versions. -->
-		<test.wildfly.version>11.0.0.CR1</test.wildfly.version> <!-- TODO: update to Java EE 8 compatible versions -->
-		<test.tomee.version>7.0.3</test.tomee.version>
-		<test.payara.version>4.1.1.171.1</test.payara.version>
+		<test.wildfly.version>11.0.0.CR1</test.wildfly.version> <!-- TODO: update to Java EE 8 compatible version -->
+		<test.tomee.version>7.0.3</test.tomee.version> <!-- TODO: update to Java EE 8 compatible version -->
+		<test.payara.version>5.0.0.Alpha1</test.payara.version>
 	</properties>
 
 	<dependencies>
@@ -692,26 +692,6 @@
 									</artifactItems>
 								</configuration>
 							</execution>
-							<execution>
-								<id>upgrade-payara-to-jsf23</id>
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>copy</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>org.glassfish</groupId>
-											<artifactId>javax.faces</artifactId>
-											<version>2.3.2</version>
-											<type>jar</type>
-											<outputDirectory>${project.build.directory}/payara41/glassfish/modules</outputDirectory>
-											<destFileName>javax.faces.jar</destFileName>
-											<overWrite>true</overWrite>
-										</artifactItem>
-									</artifactItems>
-								</configuration>
-							</execution>
 						</executions>
 					</plugin>
 					<plugin>
@@ -719,7 +699,7 @@
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
 							<environmentVariables>
-								<GLASSFISH_HOME>${project.build.directory}/payara41</GLASSFISH_HOME>
+								<GLASSFISH_HOME>${project.build.directory}/payara5</GLASSFISH_HOME>
 							</environmentVariables>
 						</configuration>
 					</plugin>
