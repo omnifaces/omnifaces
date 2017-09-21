@@ -16,6 +16,7 @@ import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Collections.unmodifiableSet;
+import static java.util.Locale.ENGLISH;
 import static java.util.Locale.US;
 import static java.util.regex.Pattern.quote;
 import static javax.faces.view.facelets.ResourceResolver.FACELETS_RESOURCE_RESOLVER_PARAM_NAME;
@@ -46,12 +47,14 @@ import static org.omnifaces.util.Xml.getNodeTextContents;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.Collator;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import javax.faces.application.Application;
 import javax.faces.application.ViewHandler;
@@ -432,7 +435,7 @@ public final class FacesViews {
 		if (rootPaths == null) {
 			rootPaths = new HashSet<>();
 			rootPaths.add(new String[] { WEB_INF_VIEWS, null });
-			Set<String> multiViewsPaths = new HashSet<>();
+			Set<String> multiViewsPaths = new TreeSet<>(Collator.getInstance(ENGLISH)); // Makes sure ! is sorted before /.
 
 			for (String rootPath : csvToList(servletContext.getInitParameter(FACES_VIEWS_SCAN_PATHS_PARAM_NAME))) {
 				boolean multiViews = rootPath.endsWith("/*");
@@ -560,7 +563,7 @@ public final class FacesViews {
 	private static String normalizeRootPath(String rootPath) {
 		String normalizedPath = rootPath;
 
-		if (!normalizedPath.startsWith("/")) {
+		if (!startsWithOneOf(normalizedPath, "/", "!")) {
 			normalizedPath = "/" + normalizedPath;
 		}
 
@@ -705,8 +708,12 @@ public final class FacesViews {
 
 		if (multiviewsPaths != null) {
 			String path = resource + "/";
+			String excludePath = "!" + path;
 
 			for (String multiviewsPath : multiviewsPaths) {
+				if (multiviewsPath.charAt(0) == '!' && excludePath.startsWith(multiviewsPath)) {
+					return false;
+				}
 				if (path.startsWith(multiviewsPath)) {
 					return true;
 				}
