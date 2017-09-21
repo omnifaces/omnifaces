@@ -220,39 +220,62 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 	// Object overrides -----------------------------------------------------------------------------------------------
 
 	@Override
-	@SuppressWarnings("rawtypes")
 	public boolean equals(Object object) {
-		// Basic checks.
 		if (object == this) {
 			return true;
 		}
+
 		if (object == null || object.getClass() != getClass()) {
 			return false;
 		}
 
-		// Property checks.
-		AbstractTreeModel other = (AbstractTreeModel) object;
-		if (data == null ? other.data != null : !data.equals(other.data)) {
-			return false;
+		return equals(getRoot(this), getRoot((AbstractTreeModel<?>) object));
+	}
+
+	private static AbstractTreeModel<?> getRoot(AbstractTreeModel<?> node) {
+		TreeModel<?> root = node;
+
+		while (root.getParent() != null) {
+			root = root.getParent();
 		}
-		if (parent == null ? other.parent != null : !parent.equals(other.parent)) {
-			return false;
+
+		return (AbstractTreeModel<?>) root;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private static boolean equals(AbstractTreeModel thiz, AbstractTreeModel other) {
+		if (thiz == other) {
+			return true;
 		}
-		if (children == null ? other.children != null : !children.equals(other.children)) {
+
+		if (thiz.getChildCount() != other.getChildCount()) {
 			return false;
 		}
 
-		// All passed.
+		if (thiz.data == null ? other.data != null : !thiz.data.equals(other.data)) {
+			return false;
+		}
+
+		if (thiz.children != null) {
+			Iterator<AbstractTreeModel> thisChildren = thiz.children.iterator();
+			Iterator<AbstractTreeModel> otherChildren = other.children.iterator();
+
+			while (thisChildren.hasNext() && otherChildren.hasNext()) {
+				if (!equals(thisChildren.next(), otherChildren.next())) {
+					return false;
+				}
+			}
+		}
+
 		return true;
 	}
 
-	@Override // Eclipse-generated.
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int hashCode = 1;
-		hashCode = prime * hashCode + ((children == null) ? 0 : children.hashCode());
 		hashCode = prime * hashCode + ((data == null) ? 0 : data.hashCode());
-		hashCode = prime * hashCode + ((parent == null) ? 0 : parent.hashCode());
+		hashCode = prime * hashCode + ((children == null) ? 0 : children.hashCode());
 		return hashCode;
 	}
 

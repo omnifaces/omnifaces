@@ -137,8 +137,10 @@
  * <pre>
  *   example.com/page1
  *   example.com/foo/page2
+ *   example.com/page1/foo (will forward to /page1 with dynamic path parameter "foo")
  *   example.com/page1/foo/bar (will forward to /page1 with dynamic path parameters "foo" and "bar")
  *   example.com/foo/page2/bar (will forward to /foo/page2 with dynamic path parameter "bar")
+ *   example.com/foo/page2/bar/baz (will forward to /foo/page2 with dynamic path parameters "bar" and "baz")
  *   example.com/page1.xhtml (will redirect to /page1 by default)
  *   example.com/foo/page2.xhtml (will redirect to /foo/page2 by default)
  * </pre>
@@ -156,7 +158,45 @@
  * </pre>
  *
  * <p>
- * The support for this feature was added in OmniFaces 2.5 and is not available in older versions.
+ * The support for this so-called MultiViews feature which gets triggered when the path pattern is suffixed with
+ * <code>/*</code> was added in OmniFaces 2.5 and is not available in older versions.
+ *
+ * <h4>Example 3:</h4>
+ *
+ * <p>
+ * Consider the following <code>web.xml</code>:
+ *
+ * <pre>
+ *   &lt;context-param&gt;
+ *       &lt;param-name&gt;org.omnifaces.FACES_VIEWS_SCAN_PATHS&lt;/param-name&gt;
+ *       &lt;param-value&gt;/*.xhtml, /foo/*&lt;/param-value&gt;
+ *   &lt;/context-param&gt;
+ * </pre>
+ *
+ * <p>
+ * And this file structure:
+ *
+ * <pre>
+ *   /page1.xhtml
+ *   /foo/page2.xhtml
+ * </pre>
+ *
+ * <p>
+ * This will make the Facelets available via the following URLs
+ * (given a root deployment on domain <code>example.com</code>):
+ *
+ * <pre>
+ *   example.com/page1
+ *   example.com/foo/page2
+ *   example.com/foo/page2/bar (will forward to /foo/page2 with dynamic path parameter "bar")
+ *   example.com/foo/page2/bar/baz (will forward to /foo/page2 with dynamic path parameters "bar" and "baz")
+ *   example.com/page1.xhtml (will redirect to /page1 by default)
+ *   example.com/foo/page2.xhtml (will redirect to /foo/page2 by default)
+ * </pre>
+ *
+ * <p>
+ * Note that on contrary to previous example <code>example.com/page1/foo</code> and <code>example.com/page1/foo/bar</code>
+ * are not available as the MultiViews feature is only enabled on <code>/foo/*</code>.
  *
  *
  * <h3>Welcome files</h3>
@@ -176,6 +216,20 @@
  *        &lt;welcome-file&gt;index&lt;/welcome-file&gt;
  *    &lt;/welcome-file-list&gt;
  * </pre>
+ *
+ * <p>
+ * If you're using the MultiViews feature on a site-wide basis and have a welcome file configured for it, then basically
+ * any request which doesn't match any physical file will end up in that welcome file. In case this is undesirable,
+ * because you're having e.g. a REST API listening on <code>/api/*</code> or a websocket endpoint listening on
+ * <code>/push/*</code>, then you can configure them as an exclude pattern as below:
+ *
+ * <pre>
+ *   &lt;context-param&gt;
+ *       &lt;param-name&gt;org.omnifaces.FACES_VIEWS_SCAN_PATHS&lt;/param-name&gt;
+ *       &lt;param-value&gt;/*.xhtml/*, !/api, !/push&lt;/param-value&gt;
+ *   &lt;/context-param&gt;
+ * </pre>
+ *
  *
  * <h3>Dispatch methods</h3>
  *
