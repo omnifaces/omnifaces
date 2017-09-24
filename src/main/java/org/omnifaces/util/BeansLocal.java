@@ -74,14 +74,7 @@ public final class BeansLocal {
 			}
 		}
 
-		Bean<T> bean = (Bean<T>) beanManager.resolve(beans);
-
-		if (bean == null && beanClass.getSuperclass() != Object.class) {
-			return (Bean<T>) resolve(beanManager, beanClass.getSuperclass(), qualifiers);
-		}
-		else {
-			return bean;
-		}
+		return (Bean<T>) beanManager.resolve(beans);
 	}
 
 	/**
@@ -203,10 +196,13 @@ public final class BeansLocal {
 			destroy(beanManager, (Class<T>) instance, new Annotation[0]);
 		}
 		else {
-			Bean<T> bean = (Bean<T>) resolve(beanManager, instance.getClass());
+			for (Class<?> beanClass = instance.getClass(); beanClass != Object.class; beanClass = beanClass.getSuperclass()) {
+				Bean<T> bean = (Bean<T>) resolve(beanManager, beanClass);
 
-			if (bean != null) {
-				destroy(beanManager, bean, instance);
+				if (bean != null) {
+					destroy(beanManager, bean, instance);
+					return;
+				}
 			}
 		}
 	}
