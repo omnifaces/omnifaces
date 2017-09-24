@@ -43,7 +43,6 @@ import javax.faces.event.PhaseId;
 import org.omnifaces.config.WebXml;
 import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
 import org.omnifaces.util.Ajax;
-import org.omnifaces.util.Hacks;
 import org.omnifaces.util.Json;
 
 /**
@@ -246,20 +245,6 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		if (instance != null) {
 			setCurrentInstance(instance);
 			return instance;
-		}
-
-		// Still not found. Well, maybe RichFaces is installed which doesn't use PartialViewContextWrapper.
-		if (Hacks.isRichFacesInstalled()) {
-			PartialViewContext pvc = Hacks.getRichFacesWrappedPartialViewContext();
-
-			if (pvc != null) {
-				instance = unwrap(pvc);
-
-				if (instance != null) {
-					setCurrentInstance(instance);
-					return instance;
-				}
-			}
 		}
 
 		// Still not found. Well, it's end of story.

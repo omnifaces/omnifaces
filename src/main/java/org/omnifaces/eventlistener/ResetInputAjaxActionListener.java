@@ -35,8 +35,6 @@ import javax.faces.event.AjaxBehaviorListener;
 import javax.faces.event.PhaseEvent;
 import javax.faces.event.SystemEventListener;
 
-import org.omnifaces.util.Hacks;
-
 /**
  * <p>
  * The {@link ResetInputAjaxActionListener} will reset input fields which are not executed during ajax submit, but which
@@ -187,7 +185,7 @@ public class ResetInputAjaxActionListener extends DefaultPhaseListener implement
 		PartialViewContext partialViewContext = context.getPartialViewContext();
 
 		if (partialViewContext.isAjaxRequest()) {
-			Collection<String> renderIds = getRenderIds(partialViewContext);
+			Collection<String> renderIds = partialViewContext.getRenderIds();
 
 			if (!renderIds.isEmpty() && !partialViewContext.getExecuteIds().containsAll(renderIds)) {
 				context.getViewRoot().visitTree(createVisitContext(context, renderIds, VISIT_HINTS), VISIT_CALLBACK);
@@ -197,28 +195,6 @@ public class ResetInputAjaxActionListener extends DefaultPhaseListener implement
 		if (wrapped != null && event != null) {
 			wrapped.processAction(event);
 		}
-	}
-
-	// Helpers --------------------------------------------------------------------------------------------------------
-
-	/**
-	 * Helper method with RichFaces4 hack to return the proper render IDs from the given partial view context.
-	 * @param partialViewContext The partial view context to return the render IDs for.
-	 * @return The render IDs.
-	 */
-	private static Collection<String> getRenderIds(PartialViewContext partialViewContext) {
-		Collection<String> renderIds = partialViewContext.getRenderIds();
-
-		// WARNING: START OF HACK! ------------------------------------------------------------------------------------
-		// HACK for RichFaces4 because its ExtendedPartialViewContextImpl class doesn't return its componentRenderIds
-		// property on getRenderIds() call when the action is executed using a RichFaces-specific command button/link.
-		// See also https://issues.jboss.org/browse/RF-11112
-		if (renderIds.isEmpty() && Hacks.isRichFacesInstalled()) {
-			renderIds = Hacks.getRichFacesRenderIds();
-		}
-		// END OF HACK ------------------------------------------------------------------------------------------------
-
-		return renderIds;
 	}
 
 }

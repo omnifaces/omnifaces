@@ -48,7 +48,6 @@ import org.omnifaces.renderer.InlineResourceRenderer;
 import org.omnifaces.renderer.InlineScriptRenderer;
 import org.omnifaces.renderer.InlineStylesheetRenderer;
 import org.omnifaces.util.Faces;
-import org.omnifaces.util.Hacks;
 import org.omnifaces.util.cache.Cache;
 
 /**
@@ -459,23 +458,6 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 			else if (component instanceof DeferredScript) {
 				addDeferredScript(component, id);
 			}
-
-			// WARNING: START OF HACK! --------------------------------------------------------------------------------
-			// HACK for RichFaces4 because of its non-standard resource library handling. Resources with the extension
-			// ".reslib" have special treatment by RichFaces specific resource library renderer. They represent multiple
-			// resources which are supposed to be dynamically constructed/added with the purpose to keep resource
-			// dependencies in RichFaces components "DRY". So far, it are usually only JS resources.
-			else if (Hacks.isRichFacesResourceLibraryRenderer(rendererType)) {
-				Set<ResourceIdentifier> resourceIdentifiers = Hacks.getRichFacesResourceLibraryResources(id);
-				ResourceHandler handler = context.getApplication().getResourceHandler();
-
-				for (ResourceIdentifier identifier : resourceIdentifiers) {
-					add(context, null, handler.getRendererTypeForResourceName(identifier.getName()), identifier, target);
-				}
-
-				componentResourcesToRemove.add(component);
-			}
-			// --------------------------------------------------------------------------------------------------------
 		}
 
 		private void addCombined(FacesContext context, UIComponent component, String rendererType, ResourceIdentifier id, String target) {

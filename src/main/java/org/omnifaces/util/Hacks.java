@@ -20,17 +20,14 @@ import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getInitParameter;
 import static org.omnifaces.util.FacesLocal.getSessionAttribute;
 import static org.omnifaces.util.Reflection.accessField;
-import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Reflection.invokeMethod;
 import static org.omnifaces.util.Reflection.toClassOrNull;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -41,12 +38,8 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
 import javax.faces.context.FacesContextWrapper;
-import javax.faces.context.PartialViewContext;
-import javax.faces.context.PartialViewContextWrapper;
 import javax.faces.render.ResponseStateManager;
 import javax.websocket.Session;
-
-import org.omnifaces.resourcehandler.ResourceIdentifier;
 
 /**
  * Collection of JSF implementation and/or JSF component library and/or server specific hacks.
@@ -58,16 +51,6 @@ import org.omnifaces.resourcehandler.ResourceIdentifier;
 public final class Hacks {
 
 	// Constants ------------------------------------------------------------------------------------------------------
-
-	private static final Set<String> RICHFACES_PVC_CLASS_NAMES =
-		unmodifiableSet(
-			"org.richfaces.context.ExtendedPartialViewContextImpl", // RichFaces 4.0-4.3.
-			"org.richfaces.context.ExtendedPartialViewContext"); // RichFaces 4.5+.
-	private static final boolean RICHFACES_INSTALLED = initRichFacesInstalled();
-	private static final String RICHFACES_RLR_RENDERER_TYPE =
-		"org.richfaces.renderkit.ResourceLibraryRenderer";
-	private static final String RICHFACES_RLF_CLASS_NAME =
-		"org.richfaces.resource.ResourceLibraryFactoryImpl";
 
 	private static final Class<UIComponent> PRIMEFACES_DIALOG_CLASS =
 		toClassOrNull("org.primefaces.component.dialog.Dialog");
@@ -104,119 +87,6 @@ public final class Hacks {
 
 	private Hacks() {
 		//
-	}
-
-	private static boolean initRichFacesInstalled() {
-		for (String richFacesPvcClassName : RICHFACES_PVC_CLASS_NAMES) {
-			if (toClassOrNull(richFacesPvcClassName) != null) {
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	// RichFaces related ----------------------------------------------------------------------------------------------
-
-	/**
-	 * Returns true if RichFaces 4.x is installed. That is, when the RichFaces 4.0-4.3 specific
-	 * ExtendedPartialViewContextImpl, or RichFaces 4.5+ specific ExtendedPartialViewContext is present in the runtime
-	 * classpath. As this is usually auto-registered, we may safely assume that RichFaces 4.x is installed.
-	 * <p>
-	 * Note that RichFaces 4.4 doesn't exist.
-	 * @return Whether RichFaces 4.x is installed.
-	 */
-	public static boolean isRichFacesInstalled() {
-		return RICHFACES_INSTALLED;
-	}
-
-	/**
-	 * RichFaces 4.0-4.3 ExtendedPartialViewContextImpl does not extend from PartialViewContextWrapper. So a hack wherin
-	 * the exact fully qualified class name needs to be known has to be used to properly extract it from the
-	 * {@link FacesContext#getPartialViewContext()}.
-	 * @return The RichFaces PartialViewContext implementation.
-	 */
-	public static PartialViewContext getRichFacesPartialViewContext() {
-		PartialViewContext context = Ajax.getContext();
-
-		while (!RICHFACES_PVC_CLASS_NAMES.contains(context.getClass().getName())
-			&& context instanceof PartialViewContextWrapper)
-		{
-			context = ((PartialViewContextWrapper) context).getWrapped();
-		}
-
-		if (RICHFACES_PVC_CLASS_NAMES.contains(context.getClass().getName())) {
-			return context;
-		}
-		else {
-			return null;
-		}
-	}
-
-	/**
-	 * RichFaces PartialViewContext implementation does not have the getRenderIds() method properly implemented. So a
-	 * hack wherin the exact name of the private field needs to be known has to be used to properly extract it from the
-	 * RichFaces PartialViewContext implementation.
-	 * @return The render IDs from the RichFaces PartialViewContext implementation.
-	 */
-	public static Collection<String> getRichFacesRenderIds() {
-		PartialViewContext richFacesContext = getRichFacesPartialViewContext();
-
-		if (richFacesContext != null) {
-			Collection<String> renderIds = accessField(richFacesContext, "componentRenderIds");
-
-			if (renderIds != null) {
-				return renderIds;
-			}
-		}
-
-		return Collections.emptyList();
-	}
-
-	/**
-	 * RichFaces 4.0-4.3 ExtendedPartialViewContextImpl does not have any getWrapped() method to return the wrapped
-	 * PartialViewContext. So a reflection hack is necessary to return it from the private field.
-	 * @return The wrapped PartialViewContext from the RichFaces 4.0-4.3 ExtendedPartialViewContextImpl.
-	 */
-	public static PartialViewContext getRichFacesWrappedPartialViewContext() {
-		PartialViewContext richFacesContext = getRichFacesPartialViewContext();
-
-		if (richFacesContext != null) {
-			return accessField(richFacesContext, "wrappedViewContext");
-		}
-
-		return null;
-	}
-
-	/**
-	 * Returns true if the given renderer type is recognizeable as RichFaces resource library renderer.
-	 * @param rendererType The renderer type to be checked.
-	 * @return Whether the given renderer type is recognizeable as RichFaces resource library renderer.
-	 */
-	public static boolean isRichFacesResourceLibraryRenderer(String rendererType) {
-		return RICHFACES_RLR_RENDERER_TYPE.equals(rendererType);
-	}
-
-	/**
-	 * Returns an ordered set of all JSF resource identifiers for the given RichFaces resource library resources.
-	 * @param id The resource identifier of the RichFaces resource library (e.g. org.richfaces:ajax.reslib).
-	 * @return An ordered set of all JSF resource identifiers for the given RichFaces resource library resources.
-	 */
-	@SuppressWarnings("rawtypes")
-	public static Set<ResourceIdentifier> getRichFacesResourceLibraryResources(ResourceIdentifier id) {
-		Object resourceFactory = instance(RICHFACES_RLF_CLASS_NAME);
-		String name = id.getName().split("\\.")[0];
-		Object resourceLibrary = invokeMethod(resourceFactory, "getResourceLibrary", name, id.getLibrary());
-		Iterable resources = invokeMethod(resourceLibrary, "getResources");
-		Set<ResourceIdentifier> resourceIdentifiers = new LinkedHashSet<>();
-
-		for (Object resource : resources) {
-			String libraryName = invokeMethod(resource, "getLibraryName");
-			String resourceName = invokeMethod(resource, "getResourceName");
-			resourceIdentifiers.add(new ResourceIdentifier(libraryName, resourceName));
-		}
-
-		return resourceIdentifiers;
 	}
 
 	// MyFaces related ------------------------------------------------------------------------------------------------
