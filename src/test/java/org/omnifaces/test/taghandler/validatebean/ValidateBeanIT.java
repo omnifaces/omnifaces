@@ -14,7 +14,6 @@ package org.omnifaces.test.taghandler.validatebean;
 
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withMessageBundle;
 
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -55,6 +54,18 @@ public class ValidateBeanIT extends OmniFacesIT {
 
 	@FindBy(id="validateByInput:validateDisabledByInput")
 	private WebElement validateDisabledByInput;
+
+	@FindBy(id="validateDefaultWithMessageForViolating:input")
+	private WebElement validateDefaultWithMessageForViolatingInput;
+
+	@FindBy(id="validateDefaultWithMessageForViolating:inputMessage")
+	private WebElement validateDefaultWithMessageForViolatingInputMessage;
+
+	@FindBy(id="validateDefaultWithMessageForViolating:formMessage")
+	private WebElement validateDefaultWithMessageForViolatingFormMessage;
+
+	@FindBy(id="validateDefaultWithMessageForViolating:command")
+	private WebElement validateDefaultWithMessageForViolatingCommand;
 
 	@FindBy(id="validateClassLevelDefault:number1")
 	private WebElement validateClassLevelDefaultNumber1;
@@ -182,7 +193,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 			.withFacesConfig(withMessageBundle)
 			.createDeployment();
 	}
-
+/*
 	@Test
 	public void validateByCommand() {
 		input.sendKeys("x");
@@ -265,7 +276,20 @@ public class ValidateBeanIT extends OmniFacesIT {
 		triggerOnchange(validateDisabledByInput, messages);
 		assertEquals("actionSuccess", messages.getText());
 	}
+*/
+	@Test
+	public void validateDefaultWithMessageForViolating() {
+		validateDefaultWithMessageForViolatingInput.sendKeys("x");
+		guardAjax(validateDefaultWithMessageForViolatingCommand).click();
+		assertEquals("default", validateDefaultWithMessageForViolatingInputMessage.getText());
+		assertEquals("", validateDefaultWithMessageForViolatingFormMessage.getText()); // Should NOT equal "may not be null" coming from @NotNull unused.
 
+		validateDefaultWithMessageForViolatingInput.clear();
+		validateDefaultWithMessageForViolatingInput.sendKeys("xx");
+		guardAjax(validateDefaultWithMessageForViolatingCommand).click();
+		assertEquals("actionSuccess", messages.getText());
+	}
+/*
 	@Test
 	public void validateClassLevelDefault() {
 		validateClassLevelDefaultNumber1.sendKeys("2");
@@ -393,5 +417,5 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("", validateClassLevelWithFormEntityCompositeFormMessage.getText());
 		assertEquals("actionSuccess", messages.getText());
 	}
-
+*/
 }

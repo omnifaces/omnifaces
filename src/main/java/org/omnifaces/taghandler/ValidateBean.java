@@ -49,7 +49,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -414,20 +413,14 @@ public class ValidateBean extends TagHandler {
 		Set<ConstraintViolation<?>> violations = violationsRaw;
 
 		if (!violations.isEmpty()) {
-			context.validationFailed();
-			String showMessagesFor = showMessageFor;
-
 			if ("@violating".equals(showMessageFor)) {
-				violations = invalidateInputsByPropertyPathAndShowMessages(context, form, actualBean, violations, clientIds);
-				showMessagesFor = DEFAULT_SHOWMESSAGEFOR;
+				invalidateInputsByPropertyPathAndShowMessages(context, form, actualBean, violations, clientIds);
+			}
+			else {
+				invalidateInputsByClientIdsAndShowMessages(context, form, violations, clientIds, showMessageFor);
 			}
 
-			if (!violations.isEmpty()) {
-				String labels = invalidateInputsByClientIdsAndCollectLabels(context, form, clientIds);
-				showMessages(context, form, violations, clientIds, labels, showMessagesFor);
-			}
-
-			if (renderResponseOnFail) {
+			if (context.isValidationFailed() && renderResponseOnFail) {
 				context.renderResponse();
 			}
 		}
@@ -497,23 +490,20 @@ public class ValidateBean extends TagHandler {
 		return copier;
 	}
 
-	private static Set<ConstraintViolation<?>> invalidateInputsByPropertyPathAndShowMessages(FacesContext context, UIForm form, Object bean, Set<ConstraintViolation<?>> violations, Set<String> clientIds) {
-		Set<ConstraintViolation<?>> remainingViolations = new LinkedHashSet<>(violations);
-
+	private static void invalidateInputsByPropertyPathAndShowMessages(FacesContext context, UIForm form, Object bean, Set<ConstraintViolation<?>> violations, Set<String> clientIds) {
 		for (ConstraintViolation<?> violation : violations) {
 			forEachInputWithMatchingBase(context, form, bean, violation.getPropertyPath().toString(), input -> {
+				context.validationFailed();
 				input.setValid(false);
 				String clientId = input.getClientId(context);
 				addError(clientId, violation.getMessage(), getLabel(input));
 				clientIds.remove(clientId);
-				remainingViolations.remove(violation);
 			});
 		}
-
-		return remainingViolations;
 	}
 
-	private static String invalidateInputsByClientIdsAndCollectLabels(FacesContext context, UIForm form, Set<String> clientIds) {
+	private static void invalidateInputsByClientIdsAndShowMessages(FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, Set<String> clientIds, String showMessageFor) {
+		context.validationFailed();
 		StringBuilder labels = new StringBuilder();
 
 		if (!clientIds.isEmpty()) {
@@ -528,7 +518,7 @@ public class ValidateBean extends TagHandler {
 			});
 		}
 
-		return labels.toString();
+		showMessages(context, form, violations, clientIds, labels.toString(), showMessageFor);
 	}
 
 	private static void showMessages(FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, Set<String> clientIds, String labels, String showMessagesFor) {
