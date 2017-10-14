@@ -14,6 +14,7 @@ package org.omnifaces.taghandler;
 
 import static java.lang.Boolean.TRUE;
 import static javax.faces.event.PhaseId.RESTORE_VIEW;
+import static org.omnifaces.util.Components.createValueExpression;
 import static org.omnifaces.util.Components.hasInvokedSubmit;
 import static org.omnifaces.util.Events.subscribeToRequestAfterPhase;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
@@ -159,8 +160,15 @@ public class SkipValidators extends TagHandler {
 
 			if (event instanceof PreValidateEvent) {
 				ValueExpression requiredExpression = input.getValueExpression("required");
-				attributes.put(clientId, (requiredExpression != null) ? requiredExpression : input.isRequired());
-				input.setRequired(false);
+
+				if (requiredExpression != null) {
+					attributes.put(clientId, requiredExpression);
+					input.setValueExpression("required", createValueExpression("#{false}", Boolean.class));
+				}
+				else {
+					attributes.put(clientId, input.isRequired());
+					input.setRequired(false);
+				}
 
 				Validator<?>[] validators = input.getValidators();
 				allValidators.put(clientId, validators);
