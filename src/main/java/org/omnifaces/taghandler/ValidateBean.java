@@ -265,6 +265,7 @@ public class ValidateBean extends TagHandler {
 	private String groups;
 	private String copier;
 	private String showMessageFor;
+	private String showViolatingUnmatchedFor;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -303,6 +304,7 @@ public class ValidateBean extends TagHandler {
 		groups = getString(context, getAttribute("validationGroups"));
 		copier = getString(context, getAttribute("copier"));
 		showMessageFor = coalesce(getString(context, getAttribute("showMessageFor")), DEFAULT_SHOWMESSAGEFOR);
+		showViolatingUnmatchedFor = coalesce(getString(context, getAttribute("showViolatingUnmatchedFor")), DEFAULT_SHOWMESSAGEFOR);
 
 		// We can't use getCurrentForm() or hasInvokedSubmit() before the component is added to view, because the client ID isn't available.
 		// Hence, we subscribe this check to after phase of restore view.
@@ -428,16 +430,16 @@ public class ValidateBean extends TagHandler {
 
 		if (!violations.isEmpty()) {
 			context.validationFailed();
-			String showMessagesFor = showMessageFor;
 
 			if ("@violating".equals(showMessageFor)) {
 				violations = invalidateInputsByPropertyPathAndShowMessages(context, form, actualBean, violations, clientIds);
-				showMessagesFor = DEFAULT_SHOWMESSAGEFOR;
+				if (!violations.isEmpty() && !"@none".equals(showViolatingUnmatchedFor)) {
+					showMessages(context, form, violations, clientIds, null, showViolatingUnmatchedFor);
+				}
 			}
-
-			if (!violations.isEmpty()) {
+			else {
 				String labels = invalidateInputsByClientIdsAndCollectLabels(context, form, clientIds);
-				showMessages(context, form, violations, clientIds, labels, showMessagesFor);
+				showMessages(context, form, violations, clientIds, labels, showMessageFor);
 			}
 
 			if (renderResponseOnFail) {
