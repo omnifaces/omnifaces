@@ -29,7 +29,7 @@
 	<h:head />
 	
 	<h:body>
-		<h:form id="form">
+		<o:form id="form">
 			<h:selectBooleanCheckbox id="toggleRequired" value="#{viewScope.required}">
 				<f:ajax execute="@form" render="@form" />
 				<o:skipValidators />
@@ -43,6 +43,6 @@
 			</h:commandButton>
 
 			<h:outputText id="validationFailed" value="#{facesContext.validationFailed}" />
-		</h:form>
+		</o:form>
 	</h:body>
 </html>
