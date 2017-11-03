@@ -13,6 +13,7 @@
 package org.omnifaces.cdi.push;
 
 import static java.lang.String.format;
+import static javax.faces.component.visit.VisitHint.SKIP_ITERATION;
 import static org.omnifaces.cdi.push.SocketChannelManager.ESTIMATED_TOTAL_CHANNELS;
 import static org.omnifaces.util.Ajax.oncomplete;
 import static org.omnifaces.util.Components.addScriptToBody;
@@ -72,7 +73,7 @@ public class SocketFacesListener implements SystemEventListener {
 		FacesContext context = FacesContext.getCurrentInstance();
 		Map<String, Boolean> sockets = getSockets(context);
 
-		forEachComponent(context).ofTypes(Socket.class).<Socket>invoke(socket -> {
+		forEachComponent(context).ofTypes(Socket.class).withHints(SKIP_ITERATION).<Socket>invoke(socket -> {
 			if (!sockets.containsKey(socket.getChannel())) {
 				return;
 			}
