@@ -225,7 +225,7 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 			return false;
 		}
 
-		return equals(getRoot(this), getRoot((AbstractTreeModel<?>) object));
+		return equals(this, (AbstractTreeModel<?>) object, false) && equals(getRoot(this), getRoot((AbstractTreeModel<?>) object), true);
 	}
 
 	private static AbstractTreeModel<?> getRoot(AbstractTreeModel<?> node) {
@@ -239,26 +239,28 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	private static boolean equals(AbstractTreeModel thiz, AbstractTreeModel other) {
+	private static boolean equals(AbstractTreeModel thiz, AbstractTreeModel other, boolean recurse) {
 		if (thiz == other) {
 			return true;
-		}
-
-		if (thiz.getChildCount() != other.getChildCount()) {
-			return false;
 		}
 
 		if (thiz.data == null ? other.data != null : !thiz.data.equals(other.data)) {
 			return false;
 		}
 
-		if (thiz.children != null) {
-			Iterator<AbstractTreeModel> thisChildren = thiz.children.iterator();
-			Iterator<AbstractTreeModel> otherChildren = other.children.iterator();
+		if (recurse) {
+			if (thiz.getChildCount() != other.getChildCount()) {
+				return false;
+			}
 
-			while (thisChildren.hasNext() && otherChildren.hasNext()) {
-				if (!equals(thisChildren.next(), otherChildren.next())) {
-					return false;
+			if (thiz.children != null) {
+				Iterator<AbstractTreeModel> thisChildren = thiz.children.iterator();
+				Iterator<AbstractTreeModel> otherChildren = other.children.iterator();
+
+				while (thisChildren.hasNext() && otherChildren.hasNext()) {
+					if (!equals(thisChildren.next(), otherChildren.next(), true)) {
+						return false;
+					}
 				}
 			}
 		}
