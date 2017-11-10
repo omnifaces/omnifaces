@@ -399,7 +399,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 		}
 
 		if (!context.getPartialViewContext().isAjaxRequest()) {
-			return; // Not an ajax request, let default web.xml error page mechanism do its job.
+			throw new FacesException(exception); // Not an ajax request, let default web.xml error page mechanism or FacesExceptionFilter do its job.
 		}
 
 		if (!canRenderErrorPageView(context, exception, errorPageLocation)) {
