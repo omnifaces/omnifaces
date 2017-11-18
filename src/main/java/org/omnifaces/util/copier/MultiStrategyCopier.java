@@ -13,7 +13,7 @@
 package org.omnifaces.util.copier;
 
 import static java.util.Arrays.asList;
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -50,7 +50,7 @@ public class MultiStrategyCopier implements Copier {
 			try {
 				return copier.copy(object);
 			} catch (Exception ignore) {
-				logger.log(FINE, "Ignoring thrown exception; next copier will be tried and there is a fallback to IllegalStateException.", ignore);
+				logger.log(FINEST, "Ignoring thrown exception; next copier will be tried and there is a fallback to IllegalStateException.", ignore);
 				continue;
 			}
 

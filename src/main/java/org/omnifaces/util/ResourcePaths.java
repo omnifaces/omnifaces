@@ -95,7 +95,7 @@ public final class ResourcePaths {
 	 * @return <code>true</code> if the resource path is extensionless, false otherwise.
 	 */
 	public static boolean isExtensionless(String resourcePath) {
-		return resourcePath != null && !resourcePath.contains(EXTENSION_SEPARATOR); // TODO: is that nullcheck really necessary?
+		return resourcePath != null && !resourcePath.contains(EXTENSION_SEPARATOR);
 	}
 
 	/**

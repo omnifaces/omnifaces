@@ -497,14 +497,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 		private void addDeferredScript(UIComponent component, ResourceIdentifier id) {
 			String group = (String) component.getAttributes().get("group");
-			Builder builder = deferredScripts.get(group);
-
-			if (builder == null) {
-				builder = new Builder(EXTENSION_JS, TARGET_BODY);
-				deferredScripts.put(group, builder);
-			}
-
-			builder.add(component, id);
+			deferredScripts.computeIfAbsent(group, k -> new Builder(EXTENSION_JS, TARGET_BODY)).add(component, id);
 		}
 
 		public void create(FacesContext context) {

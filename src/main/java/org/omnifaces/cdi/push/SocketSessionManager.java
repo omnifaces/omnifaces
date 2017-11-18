@@ -14,7 +14,7 @@ package org.omnifaces.cdi.push;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 import static java.util.logging.Level.WARNING;
 import static javax.websocket.CloseReason.CloseCodes.NORMAL_CLOSURE;
 import static org.omnifaces.cdi.push.SocketEndpoint.PARAM_CHANNEL;
@@ -212,7 +212,7 @@ public class SocketSessionManager {
 				session.close(REASON_EXPIRED);
 			}
 			catch (IOException ignore) {
-				logger.log(FINE, "Ignoring thrown exception; there is nothing more we could do here.", ignore);
+				logger.log(FINEST, "Ignoring thrown exception; there is nothing more we could do here.", ignore);
 			}
 		}
 	}

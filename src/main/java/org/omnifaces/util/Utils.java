@@ -15,7 +15,7 @@ package org.omnifaces.util;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableMap;
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 import static java.util.regex.Pattern.quote;
 import static org.omnifaces.util.Reflection.toClassOrNull;
 import static org.omnifaces.util.Servlets.getSubmittedFileName;
@@ -231,7 +231,7 @@ public final class Utils {
 			return Long.valueOf(string) != null;
 		}
 		catch (Exception ignore) {
-			logger.log(FINE, "Ignoring thrown exception; the sole intent is to return false instead.", ignore);
+			logger.log(FINEST, "Ignoring thrown exception; the sole intent is to return false instead.", ignore);
 			return false;
 		}
 	}
@@ -249,7 +249,7 @@ public final class Utils {
 			return Double.valueOf(string) != null;
 		}
 		catch (Exception ignore) {
-			logger.log(FINE, "Ignoring thrown exception; the sole intent is to return false instead.", ignore);
+			logger.log(FINEST, "Ignoring thrown exception; the sole intent is to return false instead.", ignore);
 			return false;
 		}
 	}
@@ -471,7 +471,7 @@ public final class Utils {
 			return true;
 		}
 		catch (IOException ignore) {
-			logger.log(FINE, "Ignoring thrown exception; the sole intent is to return false instead.", ignore);
+			logger.log(FINEST, "Ignoring thrown exception; the sole intent is to return false instead.", ignore);
 			return false;
 		}
 	}

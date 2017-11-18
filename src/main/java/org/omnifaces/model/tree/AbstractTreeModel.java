@@ -252,19 +252,17 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 			return false;
 		}
 
-		if (recurse) {
+		if (recurse && thiz.children != null) {
 			if (thiz.getChildCount() != other.getChildCount()) {
 				return false;
 			}
 
-			if (thiz.children != null) {
-				Iterator<AbstractTreeModel> thisChildren = thiz.children.iterator();
-				Iterator<AbstractTreeModel> otherChildren = other.children.iterator();
+			Iterator<AbstractTreeModel> thisChildren = thiz.children.iterator();
+			Iterator<AbstractTreeModel> otherChildren = other.children.iterator();
 
-				while (thisChildren.hasNext() && otherChildren.hasNext()) {
-					if (!equals(thisChildren.next(), otherChildren.next(), true)) {
-						return false;
-					}
+			while (thisChildren.hasNext() && otherChildren.hasNext()) {
+				if (!equals(thisChildren.next(), otherChildren.next(), true)) {
+					return false;
 				}
 			}
 		}

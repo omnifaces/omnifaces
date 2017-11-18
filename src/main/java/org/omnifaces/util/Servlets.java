@@ -16,7 +16,7 @@ import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 import static java.util.regex.Pattern.quote;
 import static javax.faces.application.ProjectStage.Development;
 import static javax.faces.application.ProjectStage.PROJECT_STAGE_JNDI_NAME;
@@ -29,6 +29,7 @@ import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.decodeURL;
 import static org.omnifaces.util.Utils.encodeURI;
 import static org.omnifaces.util.Utils.encodeURL;
+import static org.omnifaces.util.Utils.isAnyEmpty;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isOneOf;
 import static org.omnifaces.util.Utils.startsWithOneOf;
@@ -311,14 +312,7 @@ public final class Servlets {
 				String[] pair = parameter.split(quote("="));
 				String key = decodeURL(pair[0]);
 				String value = (pair.length > 1 && !isEmpty(pair[1])) ? decodeURL(pair[1]) : "";
-				List<String> values = parameterMap.get(key);
-
-				if (values == null) {
-					values = new ArrayList<>(1);
-					parameterMap.put(key, values);
-				}
-
-				values.add(value);
+				addParamToMapIfNecessary(parameterMap, key, value);
 			}
 		}
 
@@ -675,7 +669,7 @@ public final class Servlets {
 				projectStage = lookup(PROJECT_STAGE_JNDI_NAME);
 			}
 			catch (IllegalStateException ignore) {
-				logger.log(FINE, "Ignoring thrown exception; will only happen in buggy containers.", ignore);
+				logger.log(FINEST, "Ignoring thrown exception; will only happen in buggy containers.", ignore);
 				return false; // May happen in a.o. GlassFish 4.1 during startup.
 			}
 
@@ -758,6 +752,17 @@ public final class Servlets {
 		}
 
 		return format(redirectURL, encodedParams);
+	}
+
+	/**
+	 * Helper method to add param to map if necessary. Package-private so that {@link FacesLocal} can also use it.
+	 */
+	static void addParamToMapIfNecessary(Map<String, List<String>> map, String name, Object value) {
+		if (isAnyEmpty(name, value)) {
+			return;
+		}
+
+		map.computeIfAbsent(name, k -> new ArrayList<>(1)).add(value.toString());
 	}
 
 }

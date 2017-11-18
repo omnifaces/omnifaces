@@ -16,7 +16,7 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 import static java.util.regex.Pattern.quote;
 import static javax.faces.component.UIComponent.getCompositeComponentParent;
 import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
@@ -1481,7 +1481,7 @@ public final class Components {
 			return parent.findComponent(clientId);
 		}
 		catch (IllegalArgumentException ignore) {
-			logger.log(FINE, "Ignoring thrown exception; this may occur when view has changed by for example a successful navigation.", ignore);
+			logger.log(FINEST, "Ignoring thrown exception; this may occur when view has changed by for example a successful navigation.", ignore);
 			return null;
 		}
 	}
