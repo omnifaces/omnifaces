@@ -5451,4 +5451,71 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 			<type>boolean</type>
 		</attribute>
 	</tag>
+
+	<tag>
+		<description>
+			<![CDATA[
+				The <code>o:selectItemGroups</code> is an extension of {@link UISelectItems} which allows you to iterate over a nested collection representing groups of select items.
+				This is the {@link UIComponent} counterpart of <code>javax.faces.model.SelectItemGroup</code>.
+				There is no equivalent (yet) in the standard JSF API. Currently the only way to represent {@link SelectItemGroup} in UI is to manually create and populate them in a backing bean which can end up to be quite verbose.
+				<p>
+				Below example assumes a <code>List&lt;Category&gt;</code> as value wherein <code>Category</code> in turn has a <code>List&lt;Product&gt;</code>.
+				<pre>
+&lt;h:selectOneMenu value="#{bean.selectedProduct}" converter="omnifaces.SelectItemsConverter"&gt;
+    &lt;f:selectItem itemValue="#{null}" /&gt;
+    &lt;o:selectItemGroups value="#{bean.categories}" var="category" itemLabel="#{category.name}"&gt;
+        &lt;f:selectItems value="#{category.products}" var="product" itemLabel="#{product.name}" /&gt;
+    &lt;/o:selectItemGroups&gt;
+&lt;/h:selectOneMenu&gt;
+				</pre>
+			]]>
+		</description>
+		<tag-name>selectItemGroups</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.model.SelectItemGroups</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					Any Iterable, Map or array of objects representing select item groups.
+				]]>
+			</description>
+			<name>value</name>
+			<required>true</required>
+			<type>java.lang.Object</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The name of the EL variable which exposes the currently iterated select item group.
+					Defaults to <code>item</code>.
+				]]>
+			</description>
+			<name>var</name>
+			<required>false</required>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The value of the select item group.
+					This will be exposed to any nested UISelectItem(s) children.
+					Defaults to the currently iterated select item group.
+				]]>
+			</description>
+			<name>itemValue</name>
+			<required>false</required>
+			<type>java.lang.Object</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The label of the select item group.
+					Defaults to the String representation of <code>itemValue</code>.
+				]]>
+			</description>
+			<name>itemLabel</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+	</tag>
 </facelet-taglib>
