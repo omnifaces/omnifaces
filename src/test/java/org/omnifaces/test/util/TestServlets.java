@@ -12,6 +12,8 @@
  */
 package org.omnifaces.test.util;
 
+import static org.junit.Assert.assertEquals;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -71,13 +73,8 @@ public class TestServlets {
 			String header = test[0];
 			String expectedFilename = test[1];
 			String actualFilename = Servlets.getSubmittedFileName(new MockPartHeader(header));
-			//assertEquals(expectedFilename, actualFilename);
-			System.out.println(expectedFilename.equals(actualFilename));
+			assertEquals(expectedFilename, actualFilename);
 		}
-	}
-
-	public static void main(String[] args) {
-		new TestServlets().testGetSubmittedFileName();
 	}
 
 	private static class MockPartHeader implements Part {
