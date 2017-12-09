@@ -385,12 +385,12 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 		}
 
 		exception = findExceptionRootCause(context, exception);
+		unhandledExceptionQueuedEvents.remove();
 
 		if (!shouldHandleExceptionRootCause(context, exception)) {
 			return; // A subclass apparently want to do it differently.
 		}
 
-		unhandledExceptionQueuedEvents.remove();
 		String errorPageLocation = findErrorPageLocation(context, exception);
 
 		if (errorPageLocation == null) {
