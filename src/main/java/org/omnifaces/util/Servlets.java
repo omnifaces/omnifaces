@@ -476,7 +476,11 @@ public final class Servlets {
 		}
 
 		if (fileName != null) {
-			return fileName.replace("\\", "").substring(fileName.lastIndexOf('/') + 1); // MSIE fix.
+			if (fileName.matches("^[A-Za-z]:\\\\.*")) {
+				fileName = fileName.substring(fileName.lastIndexOf('\\') + 1); // Fakepath fix.
+			}
+
+			return fileName.substring(fileName.lastIndexOf('/') + 1).replace("\\", ""); // MSIE fix.
 		}
 
 		return null;
@@ -491,30 +495,30 @@ public final class Servlets {
 
 		Map<String, String> map = new HashMap<>();
 		StringBuilder builder = new StringBuilder();
-        boolean quoted = false;
+		boolean quoted = false;
 
 		for (int i = 0; i < header.length(); i++) {
-            char c = header.charAt(i);
-            builder.append(c);
+			char c = header.charAt(i);
+			builder.append(c);
 
-            if (c == '"' && i > 0 && (header.charAt(i - 1) != '\\' || (i > 1 && header.charAt(i - 2) == '\\'))) {
-                quoted = !quoted;
-            }
+			if (c == '"' && i > 0 && (header.charAt(i - 1) != '\\' || (i > 1 && header.charAt(i - 2) == '\\'))) {
+				quoted = !quoted;
+			}
 
-            if ((!quoted && c == ';') || i + 1 == header.length()) {
+			if ((!quoted && c == ';') || i + 1 == header.length()) {
 				String[] entry = builder.toString().replaceAll(";$", "").trim().split("\\s*=\\s*", 2);
 				String name = entry[0].toLowerCase();
-				String value = entry.length == 1 ? "" : entry[1]
-						.replaceAll("^\"|\"$", "") // Trim leading and trailing quotes.
+				String value = entry.length == 1 ? ""
+					: entry[1].replaceAll("^\"|\"$", "") // Trim leading and trailing quotes.
 						.replace("\\\"", "\"") // Unescape quotes.
 						.replaceAll("%\\\\([0-9]{2})", "%$1") // Unescape %xx.
 						.trim();
 				map.put(name, value);
-                builder = new StringBuilder();
-            }
-        }
+				builder = new StringBuilder();
+			}
+		}
 
-	    return unmodifiableMap(map);
+		return unmodifiableMap(map);
 	}
 
 	// HttpServletResponse --------------------------------------------------------------------------------------------
