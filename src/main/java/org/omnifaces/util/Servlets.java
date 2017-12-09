@@ -15,6 +15,8 @@ package org.omnifaces.util;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.unmodifiableMap;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.logging.Level.FINE;
 import static java.util.regex.Pattern.quote;
@@ -35,8 +37,11 @@ import static org.omnifaces.util.Utils.startsWithOneOf;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -44,6 +49,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.faces.FactoryFinder;
@@ -441,20 +447,74 @@ public final class Servlets {
 
 	/**
 	 * Returns the submitted file name of the given part, making sure that any path is stripped off. Some browsers
-	 * are known to incorrectly include the client side path along with it.
+	 * are known to incorrectly include the client side path along with it. Since version 2.6.7, RFC-2231/5987 encoded
+	 * file names are also supported.
 	 * @param part The part of a multipart/form-data request.
 	 * @return The submitted file name of the given part, or null if there is none.
 	 * @since 2.5
 	 */
 	public static String getSubmittedFileName(Part part) {
-		for (String cd : part.getHeader("Content-Disposition").split("\\s*;\\s*")) {
-			if (cd.startsWith("filename")) {
-				String fileName = cd.substring(cd.indexOf('=') + 1).trim().replace("\"", "");
-				return fileName.substring(fileName.lastIndexOf('/') + 1).substring(fileName.lastIndexOf('\\') + 1); // MSIE fix.
+		Map<String, String> entries = headerToMap(part.getHeader("Content-Disposition"));
+		String encodedFileName = entries.get("filename*");
+		String fileName = null;
+
+		if (encodedFileName != null) {
+			String[] parts = encodedFileName.split("'", 3);
+
+			if (parts.length == 3 && !isEmpty(parts[0])) {
+				try {
+					fileName = URLDecoder.decode(parts[2], Charset.forName(parts[0]).name());
+				}
+				catch (IllegalArgumentException | UnsupportedEncodingException ignore) {
+					logger.log(Level.FINEST, "Ignoring thrown exception, falling back to default filename", ignore);
+				}
 			}
 		}
 
+		if (fileName == null) {
+			fileName = entries.get("filename");
+		}
+
+		if (fileName != null) {
+			return fileName.replace("\\", "").substring(fileName.lastIndexOf('/') + 1); // MSIE fix.
+		}
+
 		return null;
+
+	}
+
+	// TODO: Expose public in 3.0.
+	private static Map<String, String> headerToMap(String header) {
+		if (isEmpty(header)) {
+			return emptyMap();
+		}
+
+		Map<String, String> map = new HashMap<>();
+		StringBuilder builder = new StringBuilder();
+        boolean quoted = false;
+
+		for (int i = 0; i < header.length(); i++) {
+            char c = header.charAt(i);
+            builder.append(c);
+
+            if (c == '"' && i > 0 && (header.charAt(i - 1) != '\\' || (i > 1 && header.charAt(i - 2) == '\\'))) {
+                quoted = !quoted;
+            }
+
+            if ((!quoted && c == ';') || i + 1 == header.length()) {
+				String[] entry = builder.toString().replaceAll(";$", "").trim().split("\\s*=\\s*", 2);
+				String name = entry[0].toLowerCase();
+				String value = entry.length == 1 ? "" : entry[1]
+						.replaceAll("^\"|\"$", "") // Trim leading and trailing quotes.
+						.replace("\\\"", "\"") // Unescape quotes.
+						.replaceAll("%\\\\([0-9]{2})", "%$1") // Unescape %xx.
+						.trim();
+				map.put(name, value);
+                builder = new StringBuilder();
+            }
+        }
+
+	    return unmodifiableMap(map);
 	}
 
 	// HttpServletResponse --------------------------------------------------------------------------------------------
