@@ -57,10 +57,13 @@ public class ImplicitNumberConverter extends NumberConverter {
 
 		if (string != null) {
 			DecimalFormat formatter = getFormatter();
-			String symbol = getSymbol(formatter);
 
-			if (symbol != null) {
-				string = string.replace(symbol, "").trim();
+			if (formatter != null) {
+				String symbol = getSymbol(formatter);
+
+				if (symbol != null) {
+					string = string.replace(symbol, "").trim();
+				}
 			}
 		}
 
@@ -73,10 +76,13 @@ public class ImplicitNumberConverter extends NumberConverter {
 
 		if (!isEmpty(string)) {
 			DecimalFormat formatter = getFormatter();
-			String symbol = getSymbol(formatter);
 
-			if (!string.contains(symbol)) {
-				string = PATTERN_NUMBER.matcher(formatter.format(0)).replaceAll(submittedValue);
+			if (formatter != null) {
+				String symbol = getSymbol(formatter);
+
+				if (!string.contains(symbol)) {
+					string = PATTERN_NUMBER.matcher(formatter.format(0)).replaceAll(submittedValue);
+				}
 			}
 		}
 
