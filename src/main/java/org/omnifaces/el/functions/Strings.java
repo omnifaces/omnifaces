@@ -13,6 +13,7 @@
 package org.omnifaces.el.functions;
 
 import static org.omnifaces.util.Faces.getLocale;
+import static org.omnifaces.util.Utils.isEmpty;
 
 import java.text.MessageFormat;
 import java.text.Normalizer;
@@ -97,6 +98,20 @@ public final class Strings {
 			.append(Character.toTitleCase(string.charAt(0)))
 			.append(string.substring(1))
 			.toString();
+	}
+
+	/**
+	 * Parenthesize the given object. This will only wrap the given object in parenthesis when it's not empty or zero.
+	 * @param object The object to be parenthesized.
+	 * @return The parenthesized object.
+	 * @since 3.0
+	 */
+	public static String parenthesize(Object object) {
+		if (isEmpty(object) || (object instanceof Number && ((Number) object).intValue() == 0)) {
+			return null;
+		}
+
+		return format("({0})", object);
 	}
 
 	/**

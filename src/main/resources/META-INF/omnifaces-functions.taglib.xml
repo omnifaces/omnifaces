@@ -63,6 +63,17 @@
 	<function>
 		<description>
 			<![CDATA[
+				Parenthesize the given object. This will only wrap the given object in parenthesis when it's not empty or zero.
+			]]>
+		</description>
+		<function-name>parenthesize</function-name>
+		<function-class>org.omnifaces.el.functions.Strings</function-class>
+		<function-signature>java.lang.String parenthesize(java.lang.Object)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
 				Replace all matches of the given pattern on the given string with the given replacement.
 			]]>
 		</description>
