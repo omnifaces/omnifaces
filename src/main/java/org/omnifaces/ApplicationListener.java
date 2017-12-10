@@ -183,7 +183,7 @@ public class ApplicationListener extends DefaultServletContextListener {
 		}
 	}
 
-	private static void checkCDI11Compatible() { // TODO: Scan for CDI 2.0 javax.enterprise.inject.spi.Prioritized once Java EE 8 is final.
+	private static void checkCDI11Compatible() { // For now, until we really need CDI 2.0 features (scan for javax.enterprise.inject.spi.Prioritized then).
 		try {
 			toClass("javax.enterprise.inject.spi.CDI");
 		}

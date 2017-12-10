@@ -175,25 +175,11 @@ public class EagerBeansRepository {
 		}
 
 		private List<Bean<?>> getByViewId(String viewId) {
-			List<Bean<?>> beans = byViewId.get(viewId);
-
-			if (beans == null) {
-				beans = new ArrayList<>();
-				byViewId.put(viewId, beans);
-			}
-
-			return beans;
+			return byViewId.computeIfAbsent(viewId, k -> new ArrayList<>());
 		}
 
 		private List<Bean<?>> getByRequestURI(String requestURI) {
-			List<Bean<?>> beans = byRequestURI.get(requestURI);
-
-			if (beans == null) {
-				beans = new ArrayList<>();
-				byRequestURI.put(requestURI, beans);
-			}
-
-			return beans;
+			return byRequestURI.computeIfAbsent(requestURI, k -> new ArrayList<>());
 		}
 
 		public boolean isEmpty() {

@@ -17,7 +17,7 @@ import static java.lang.reflect.Modifier.isPublic;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.unmodifiableMap;
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 import static org.omnifaces.util.Beans.getManager;
 import static org.omnifaces.util.BeansLocal.getReference;
 import static org.omnifaces.util.Faces.getContext;
@@ -242,7 +242,7 @@ public class GraphicResource extends DynamicResource {
 			convertedParams = convertToObjects(getContext(), params, method.getParameterTypes());
 		}
 		catch (Exception ignore) {
-			logger.log(FINE, "Ignoring thrown exception; this can only be a hacker attempt.", ignore);
+			logger.log(FINEST, "Ignoring thrown exception; this can only be a hacker attempt.", ignore);
 			return null; // I'd rather return 400 here, but JSF spec doesn't support it.
 		}
 

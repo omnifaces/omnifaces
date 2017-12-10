@@ -14,6 +14,7 @@ package org.omnifaces.taghandler;
 
 import static java.lang.Boolean.TRUE;
 import static javax.faces.event.PhaseId.RESTORE_VIEW;
+import static org.omnifaces.util.Components.createValueExpression;
 import static org.omnifaces.util.Components.hasInvokedSubmit;
 import static org.omnifaces.util.Events.subscribeToRequestAfterPhase;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
@@ -74,6 +75,9 @@ import org.omnifaces.component.validator.ValidateMultipleFields;
 public class SkipValidators extends TagHandler {
 
 	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final String UIINPUT_REQUIRED_PROPERTY = "required";
+	private static final String UIINPUT_DISABLED_PROPERTY = "disabled";
 
 	private static final String ERROR_INVALID_PARENT =
 		"Parent component of o:skipValidators must be an instance of UICommand or ClientBehaviorHolder.";
@@ -158,9 +162,16 @@ public class SkipValidators extends TagHandler {
 			String clientId = input.getClientId();
 
 			if (event instanceof PreValidateEvent) {
-				ValueExpression requiredExpression = input.getValueExpression("required");
-				attributes.put(clientId, (requiredExpression != null) ? requiredExpression : input.isRequired());
-				input.setRequired(false);
+				ValueExpression requiredExpression = input.getValueExpression(UIINPUT_REQUIRED_PROPERTY);
+
+				if (requiredExpression != null) {
+					attributes.put(clientId, requiredExpression);
+					input.setValueExpression(UIINPUT_REQUIRED_PROPERTY, createValueExpression("#{false}", Boolean.class));
+				}
+				else {
+					attributes.put(clientId, input.isRequired());
+					input.setRequired(false);
+				}
 
 				Validator<?>[] validators = input.getValidators();
 				allValidators.put(clientId, validators);
@@ -177,7 +188,7 @@ public class SkipValidators extends TagHandler {
 				Object requiredValue = attributes.remove(clientId);
 
 				if (requiredValue instanceof ValueExpression) {
-					input.setValueExpression("required", (ValueExpression) requiredValue);
+					input.setValueExpression(UIINPUT_REQUIRED_PROPERTY, (ValueExpression) requiredValue);
 				}
 				else {
 					input.setRequired(TRUE.equals(requiredValue));
@@ -189,7 +200,7 @@ public class SkipValidators extends TagHandler {
 			String clientId = validator.getClientId();
 
 			if (event instanceof PreValidateEvent) {
-				ValueExpression disabledExpression = validator.getValueExpression("disabled");
+				ValueExpression disabledExpression = validator.getValueExpression(UIINPUT_DISABLED_PROPERTY);
 				attributes.put(clientId, (disabledExpression != null) ? disabledExpression : validator.isDisabled());
 				validator.setDisabled(true);
 			}
@@ -197,7 +208,7 @@ public class SkipValidators extends TagHandler {
 				Object disabledValue = attributes.remove(clientId);
 
 				if (disabledValue instanceof ValueExpression) {
-					validator.setValueExpression("disabled", (ValueExpression) disabledValue);
+					validator.setValueExpression(UIINPUT_DISABLED_PROPERTY, (ValueExpression) disabledValue);
 				}
 				else {
 					validator.setDisabled(TRUE.equals(disabledValue));

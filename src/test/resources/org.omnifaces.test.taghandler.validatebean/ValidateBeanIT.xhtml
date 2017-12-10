@@ -57,6 +57,17 @@
 			</f:ajax>
 		</o:form>
 
+		<o:form id="validateDefaultWithMessageForViolating">
+			<h:inputText id="input" value="#{validateBeanITDefaultBean.input}" />
+			<h:message id="inputMessage" for="input" />
+			<h:message id="formMessage" for="validateDefaultWithMessageForViolating" />
+
+			<h:commandButton id="command" action="#{validateBeanITDefaultBean.action}">
+				<f:ajax execute="@form" render="inputMessage formMessage :messages" />
+				<o:validateBean value="#{validateBeanITDefaultBean}" showMessageFor="@violating" />
+			</h:commandButton>
+		</o:form>
+
 		<o:form id="validateClassLevelDefault">
 			<h:inputText id="number1" value="#{validateBeanITClassLevelBean.entity.number1}" />
 			<h:inputText id="number2" value="#{validateBeanITClassLevelBean.entity.number2}" />

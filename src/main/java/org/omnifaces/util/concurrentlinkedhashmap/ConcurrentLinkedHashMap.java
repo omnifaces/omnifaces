@@ -820,8 +820,10 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V> imple
 
 	@Override
 	public Set<K> keySet() {
-		final Set<K> ks = keySet;
-		return (ks == null) ? (keySet = new KeySet()) : ks;
+		if (keySet == null) {
+			keySet = new KeySet();
+		}
+		return keySet;
 	}
 
 	/**
@@ -917,14 +919,18 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V> imple
 
 	@Override
 	public Collection<V> values() {
-		final Collection<V> vs = values;
-		return (vs == null) ? (values = new Values()) : vs;
+		if (values == null) {
+			values = new Values();
+		}
+		return values;
 	}
 
 	@Override
 	public Set<Entry<K, V>> entrySet() {
-		final Set<Entry<K, V>> es = entrySet;
-		return (es == null) ? (entrySet = new EntrySet()) : es;
+		if (entrySet == null) {
+			entrySet = new EntrySet();
+		}
+		return entrySet;
 	}
 
 	/**

@@ -14,7 +14,7 @@ package org.omnifaces.cdi.viewscope;
 
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 import static javax.faces.application.StateManager.IS_BUILDING_INITIAL_STATE;
 import static javax.faces.event.PhaseId.RENDER_RESPONSE;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
@@ -136,7 +136,7 @@ public class ViewScopeManager {
 				beanStorageId = UUID.fromString(getRequestParameter(context, "id"));
 			}
 			catch (Exception ignore) {
-				logger.log(FINE, "Ignoring thrown exception; this can only be a hacker attempt.", ignore);
+				logger.log(FINEST, "Ignoring thrown exception; this can only be a hacker attempt.", ignore);
 				return;
 			}
 		}

@@ -24,7 +24,7 @@
 	<h:head />
 
 	<h:body>
-		<o:form id="form">
+		<o:form id="form1">
 			<h:commandButton id="throwDuringInvokeApplication" action="#{fullAjaxExceptionHandlerITBean.throwDuringInvokeApplication}">
 				<f:ajax />
 			</h:commandButton>
@@ -40,6 +40,15 @@
 			<h:panelGroup id="output">
 				 <h:outputText value="#{fullAjaxExceptionHandlerITBean.throwDuringRenderResponse}" rendered="#{facesContext.postback}" />
 			</h:panelGroup>
+
+			<h:commandButton id="throwNonAjaxDuringUpdateModelValues" />
+		</o:form>
+		<o:form id="form2">
+			<h:commandButton id="throwNonAjaxDuringInvokeApplication" action="#{fullAjaxExceptionHandlerITBean.throwDuringInvokeApplication}" />
+		</o:form>
+		<o:form id="form3">
+			<h:commandButton id="throwNonAjaxDuringRenderResponse" />
+			<h:outputText value="#{fullAjaxExceptionHandlerITBean.throwDuringRenderResponse}" rendered="#{facesContext.postback}" />
 		</o:form>
 	</h:body>
 </html>

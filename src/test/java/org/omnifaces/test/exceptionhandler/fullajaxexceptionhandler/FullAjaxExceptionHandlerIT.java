@@ -13,6 +13,7 @@
 package org.omnifaces.test.exceptionhandler.fullajaxexceptionhandler;
 
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
+import static org.jboss.arquillian.graphene.Graphene.guardHttp;
 import static org.junit.Assert.assertTrue;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withFullAjaxExceptionHandler;
 import static org.omnifaces.test.OmniFacesIT.WebXml.withErrorPage;
@@ -29,14 +30,23 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	@FindBy(id="exception")
 	private WebElement exception;
 
-	@FindBy(id="form:throwDuringInvokeApplication")
+	@FindBy(id="form1:throwDuringInvokeApplication")
 	private WebElement throwDuringInvokeApplication;
 
-	@FindBy(id="form:throwDuringUpdateModelValues")
+	@FindBy(id="form1:throwDuringUpdateModelValues")
 	private WebElement throwDuringUpdateModelValues;
 
-	@FindBy(id="form:throwDuringRenderResponse")
+	@FindBy(id="form1:throwDuringRenderResponse")
 	private WebElement throwDuringRenderResponse;
+
+	@FindBy(id="form2:throwNonAjaxDuringInvokeApplication")
+	private WebElement throwNonAjaxDuringInvokeApplication;
+
+	@FindBy(id="form1:throwNonAjaxDuringUpdateModelValues")
+	private WebElement throwNonAjaxDuringUpdateModelValues;
+
+	@FindBy(id="form3:throwNonAjaxDuringRenderResponse")
+	private WebElement throwNonAjaxDuringRenderResponse;
 
 	@Deployment(testable=false)
 	public static WebArchive createDeployment() {
@@ -61,6 +71,24 @@ public class FullAjaxExceptionHandlerIT extends OmniFacesIT {
 	@Test
 	public void throwDuringRenderResponse() {
 		guardAjax(throwDuringRenderResponse).click();
+		assertTrue(exception.getText().contains("throwDuringRenderResponse"));
+	}
+
+	@Test
+	public void throwNonAjaxDuringInvokeApplication() {
+		guardHttp(throwNonAjaxDuringInvokeApplication).click();
+		assertTrue(exception.getText().contains("throwDuringInvokeApplication"));
+	}
+
+	@Test
+	public void throwNonAjaxDuringUpdateModelValues() {
+		guardHttp(throwNonAjaxDuringUpdateModelValues).click();
+		assertTrue(exception.getText().contains("throwDuringUpdateModelValues"));
+	}
+
+	@Test
+	public void throwNonAjaxDuringRenderResponse() {
+		guardHttp(throwNonAjaxDuringRenderResponse).click();
 		assertTrue(exception.getText().contains("throwDuringRenderResponse"));
 	}
 

@@ -12,7 +12,7 @@
  */
 package org.omnifaces.util;
 
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 import java.lang.annotation.Annotation;
 import java.util.Collections;
@@ -134,7 +134,7 @@ public final class BeansLocal {
 			return beanManager.getContext(scope).isActive();
 		}
 		catch (Exception ignore) {
-			logger.log(FINE, "Ignoring thrown exception; given scope is very unlikely active anyway.", ignore);
+			logger.log(FINEST, "Ignoring thrown exception; given scope is very unlikely active anyway.", ignore);
 			return false;
 		}
 	}

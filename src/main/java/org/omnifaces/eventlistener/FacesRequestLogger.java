@@ -44,6 +44,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -139,8 +140,7 @@ public class FacesRequestLogger extends DefaultPhaseListener {
 		}
 
 		try {
-			Map<String, Object> log = getLogDetails(context);
-			logger.log(INFO, getRequest(context).getMethod() + "=" + log);
+			logger.log(INFO, () -> getRequest(context).getMethod() + "=" + getLogDetails(context));
 		}
 		catch (Exception e) {
 			logger.log(SEVERE, "Logging failed", e);
@@ -211,7 +211,7 @@ public class FacesRequestLogger extends DefaultPhaseListener {
 			}
 
 			String[] values = entry.getValue();
-			String value = (values == null) ? null : (values.length == 1) ? values[0] : Arrays.toString(values);
+			String value = (values != null && values.length == 1) ? values[0] : Arrays.toString(values);
 
 			if (value != null && (name.endsWith("assword") || "token".equals(name))) {
 				value = "********"; // Mask passwords and tokens.
@@ -230,16 +230,17 @@ public class FacesRequestLogger extends DefaultPhaseListener {
 	 */
 	protected static Map<String, List<String>> getFacesMessages(FacesContext context) {
 		Map<String, List<String>> facesMessages = new TreeMap<>();
-
-		context.getMessages(null).forEachRemaining(message -> {
-			facesMessages.computeIfAbsent("", v -> new ArrayList<>()).add(message.getSummary());
-		});
-
-		context.getClientIdsWithMessages().forEachRemaining(clientId -> {
-			facesMessages.put(coalesce(clientId, ""), context.getMessageList(clientId).stream().map(FacesMessage::getSummary).collect(toList()));
-		});
-
+		context.getMessages(null).forEachRemaining(collectGlobalMessageSummaries(facesMessages));
+		context.getClientIdsWithMessages().forEachRemaining(collectMessageSummariesByClientId(context, facesMessages));
 		return facesMessages;
+	}
+
+	private static Consumer<? super FacesMessage> collectGlobalMessageSummaries(Map<String, List<String>> facesMessages) {
+		return message -> facesMessages.computeIfAbsent("", v -> new ArrayList<>()).add(message.getSummary());
+	}
+
+	private static Consumer<? super String> collectMessageSummariesByClientId(FacesContext context, Map<String, List<String>> facesMessages) {
+		return clientId -> facesMessages.put(coalesce(clientId, ""), context.getMessageList(clientId).stream().map(FacesMessage::getSummary).collect(toList()));
 	}
 
 	private static PhaseTimer getPhaseTimer(FacesContext context) {

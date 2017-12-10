@@ -15,8 +15,10 @@ package org.omnifaces.util;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.unmodifiableMap;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 import static java.util.regex.Pattern.quote;
 import static javax.faces.application.ProjectStage.Development;
 import static javax.faces.application.ProjectStage.PROJECT_STAGE_JNDI_NAME;
@@ -29,6 +31,7 @@ import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.decodeURL;
 import static org.omnifaces.util.Utils.encodeURI;
 import static org.omnifaces.util.Utils.encodeURL;
+import static org.omnifaces.util.Utils.isAnyEmpty;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isOneOf;
 import static org.omnifaces.util.Utils.startsWithOneOf;
@@ -36,8 +39,11 @@ import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -45,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.faces.FactoryFinder;
@@ -311,14 +318,7 @@ public final class Servlets {
 				String[] pair = parameter.split(quote("="));
 				String key = decodeURL(pair[0]);
 				String value = (pair.length > 1 && !isEmpty(pair[1])) ? decodeURL(pair[1]) : "";
-				List<String> values = parameterMap.get(key);
-
-				if (values == null) {
-					values = new ArrayList<>(1);
-					parameterMap.put(key, values);
-				}
-
-				values.add(value);
+				addParamToMapIfNecessary(parameterMap, key, value);
 			}
 		}
 
@@ -416,20 +416,78 @@ public final class Servlets {
 
 	/**
 	 * Returns the submitted file name of the given part, making sure that any path is stripped off. Some browsers
-	 * are known to incorrectly include the client side path along with it.
+	 * are known to incorrectly include the client side path along with it. Since version 2.6.7, RFC-2231/5987 encoded
+	 * file names are also supported.
 	 * @param part The part of a multipart/form-data request.
 	 * @return The submitted file name of the given part, or null if there is none.
 	 * @since 2.5
 	 */
 	public static String getSubmittedFileName(Part part) {
-		for (String cd : part.getHeader("Content-Disposition").split("\\s*;\\s*")) {
-			if (cd.startsWith("filename")) {
-				String fileName = cd.substring(cd.indexOf('=') + 1).trim().replace("\"", "");
-				return fileName.substring(fileName.lastIndexOf('/') + 1).substring(fileName.lastIndexOf('\\') + 1); // MSIE fix.
+		Map<String, String> entries = headerToMap(part.getHeader("Content-Disposition"));
+		String encodedFileName = entries.get("filename*");
+		String fileName = null;
+
+		if (encodedFileName != null) {
+			String[] parts = encodedFileName.split("'", 3);
+
+			if (parts.length == 3 && !isEmpty(parts[0])) {
+				try {
+					fileName = URLDecoder.decode(parts[2], Charset.forName(parts[0]).name());
+				}
+				catch (IllegalArgumentException | UnsupportedEncodingException ignore) {
+					logger.log(Level.FINEST, "Ignoring thrown exception, falling back to default filename", ignore);
+				}
 			}
 		}
 
+		if (fileName == null) {
+			fileName = entries.get("filename");
+		}
+
+		if (fileName != null) {
+			if (fileName.matches("^[A-Za-z]:\\\\.*")) {
+				fileName = fileName.substring(fileName.lastIndexOf('\\') + 1); // Fakepath fix.
+			}
+
+			return fileName.substring(fileName.lastIndexOf('/') + 1).replace("\\", ""); // MSIE fix.
+		}
+
 		return null;
+
+	}
+
+	// TODO: Expose public in 3.0.
+	private static Map<String, String> headerToMap(String header) {
+		if (isEmpty(header)) {
+			return emptyMap();
+		}
+
+		Map<String, String> map = new HashMap<>();
+		StringBuilder builder = new StringBuilder();
+		boolean quoted = false;
+
+		for (int i = 0; i < header.length(); i++) {
+			char c = header.charAt(i);
+			builder.append(c);
+
+			if (c == '"' && i > 0 && (header.charAt(i - 1) != '\\' || (i > 1 && header.charAt(i - 2) == '\\'))) {
+				quoted = !quoted;
+			}
+
+			if ((!quoted && c == ';') || i + 1 == header.length()) {
+				String[] entry = builder.toString().replaceAll(";$", "").trim().split("\\s*=\\s*", 2);
+				String name = entry[0].toLowerCase();
+				String value = entry.length == 1 ? ""
+					: entry[1].replaceAll("^\"|\"$", "") // Trim leading and trailing quotes.
+						.replace("\\\"", "\"") // Unescape quotes.
+						.replaceAll("%\\\\([0-9]{2})", "%$1") // Unescape %xx.
+						.trim();
+				map.put(name, value);
+				builder = new StringBuilder();
+			}
+		}
+
+		return unmodifiableMap(map);
 	}
 
 	// HttpServletResponse --------------------------------------------------------------------------------------------
@@ -688,7 +746,7 @@ public final class Servlets {
 				projectStage = lookup(PROJECT_STAGE_JNDI_NAME);
 			}
 			catch (IllegalStateException ignore) {
-				logger.log(FINE, "Ignoring thrown exception; will only happen in buggy containers.", ignore);
+				logger.log(FINEST, "Ignoring thrown exception; will only happen in buggy containers.", ignore);
 				return false; // May happen in a.o. GlassFish 4.1 during startup.
 			}
 
@@ -771,6 +829,17 @@ public final class Servlets {
 		}
 
 		return format(redirectURL, encodedParams);
+	}
+
+	/**
+	 * Helper method to add param to map if necessary. Package-private so that {@link FacesLocal} can also use it.
+	 */
+	static void addParamToMapIfNecessary(Map<String, List<String>> map, String name, Object value) {
+		if (isAnyEmpty(name, value)) {
+			return;
+		}
+
+		map.computeIfAbsent(name, k -> new ArrayList<>(1)).add(value.toString());
 	}
 
 }

@@ -14,17 +14,17 @@ package org.omnifaces.util;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 import static javax.faces.view.facelets.FaceletContext.FACELET_CONTEXT_KEY;
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Reflection.toClassOrNull;
+import static org.omnifaces.util.Servlets.addParamToMapIfNecessary;
 import static org.omnifaces.util.Servlets.formatContentDispositionHeader;
 import static org.omnifaces.util.Servlets.prepareRedirectURL;
 import static org.omnifaces.util.Servlets.toQueryString;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.encodeURL;
-import static org.omnifaces.util.Utils.isAnyEmpty;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isOneOf;
 
@@ -502,25 +502,28 @@ public final class FacesLocal {
 	 */
 	public static Locale getLocale(FacesContext context) {
 		Locale locale = null;
-		UIViewRoot viewRoot = context.getViewRoot();
 
-		// Prefer the locale set in the view.
-		if (viewRoot != null) {
-			locale = viewRoot.getLocale();
-		}
+		if (context != null) {
+			UIViewRoot viewRoot = context.getViewRoot();
 
-		// Then the client preferred locale.
-		if (locale == null) {
-			Locale clientLocale = context.getExternalContext().getRequestLocale();
-
-			if (getSupportedLocales(context).contains(clientLocale)) {
-				locale = clientLocale;
+			// Prefer the locale set in the view.
+			if (viewRoot != null) {
+				locale = viewRoot.getLocale();
 			}
-		}
 
-		// Then the JSF default locale.
-		if (locale == null) {
-			locale = context.getApplication().getDefaultLocale();
+			// Then the client preferred locale.
+			if (locale == null) {
+				Locale clientLocale = context.getExternalContext().getRequestLocale();
+
+				if (getSupportedLocales(context).contains(clientLocale)) {
+					locale = clientLocale;
+				}
+			}
+
+			// Then the JSF default locale.
+			if (locale == null) {
+				locale = context.getApplication().getDefaultLocale();
+			}
 		}
 
 		// Finally the system default locale.
@@ -617,7 +620,7 @@ public final class FacesLocal {
 				return bundle.getString(key);
 			}
 			catch (MissingResourceException ignore) {
-				logger.log(FINE, "Ignoring thrown exception; there is a fallback anyway.", ignore);
+				logger.log(FINEST, "Ignoring thrown exception; there is a fallback anyway.", ignore);
 				continue;
 			}
 		}
@@ -696,21 +699,6 @@ public final class FacesLocal {
 		}
 
 		return context.getApplication().getViewHandler().getBookmarkableURL(context, viewId, map, includeViewParams);
-	}
-
-	private static void addParamToMapIfNecessary(Map<String, List<String>> map, String name, Object value) {
-		if (isAnyEmpty(name, value)) {
-			return;
-		}
-
-		List<String> values = map.get(name);
-
-		if (values == null) {
-			values = new ArrayList<>(1);
-			map.put(name, values);
-		}
-
-		values.add(value.toString());
 	}
 
 	// Facelets -------------------------------------------------------------------------------------------------------

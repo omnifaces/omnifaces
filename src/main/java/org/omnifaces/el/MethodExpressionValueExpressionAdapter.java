@@ -12,7 +12,7 @@
  */
 package org.omnifaces.el;
 
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.util.Set;
@@ -162,7 +162,7 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 			try {
 				return super.getValue(context, base, property);
 			} catch (PropertyNotFoundException ignore) {
-				logger.log(FINE, "Ignoring thrown exception; there is really no clean way to distinguish a ValueExpression from a MethodExpression.", ignore);
+				logger.log(FINEST, "Ignoring thrown exception; there is really no clean way to distinguish a ValueExpression from a MethodExpression.", ignore);
 
 				try {
 					return super.invoke(context, base, property, null, callerProvidedParameters != null ? callerProvidedParameters : EMPTY_PARAMETERS);

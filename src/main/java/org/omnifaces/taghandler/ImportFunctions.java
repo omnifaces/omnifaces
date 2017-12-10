@@ -13,7 +13,7 @@
 package org.omnifaces.taghandler;
 
 import static java.lang.String.format;
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 import static org.omnifaces.util.Facelets.getStringLiteral;
 
 import java.io.IOException;
@@ -141,7 +141,7 @@ public class ImportFunctions extends TagHandler {
 					return toClass(new StringBuilder(type).replace(i, i + 1, "$").toString());
 				}
 				catch (Exception ignore) {
-					logger.log(FINE, "Ignoring thrown exception; previous exception will be rethrown instead.", ignore);
+					logger.log(FINEST, "Ignoring thrown exception; previous exception will be rethrown instead.", ignore);
 					// Just continue to IllegalArgumentException on original ClassNotFoundException.
 				}
 			}
