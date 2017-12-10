@@ -402,6 +402,19 @@ public final class Servlets {
 	}
 
 	/**
+	 * Returns <code>true</code> if connection is secure, <code>false</code> otherwise. This method will first check if
+	 * {@link HttpServletRequest#isSecure()} returns <code>true</code>, and if not <code>true</code>, check if the
+	 * <code>X-Forwarded-Proto</code> is present and equals to <code>https</code>.
+	 * @param request The involved HTTP servlet request.
+	 * @return <code>true</code> if connection is secure, <code>false</code> otherwise.
+	 * @see HttpServletRequest#isSecure()
+	 * @since 3.0
+	 */
+	public static boolean isSecure(HttpServletRequest request) {
+		return request.isSecure() || "https".equalsIgnoreCase(request.getHeader("X-Forwarded-Proto"));
+	}
+
+	/**
 	 * Returns the submitted file name of the given part, making sure that any path is stripped off. Some browsers
 	 * are known to incorrectly include the client side path along with it. Since version 2.6.7, RFC-2231/5987 encoded
 	 * file names are also supported.
