@@ -27,6 +27,7 @@ import static org.omnifaces.util.Servlets.toQueryString;
 import static org.omnifaces.util.Utils.formatURLWithQueryString;
 
 import java.io.IOException;
+
 import javax.faces.application.Application;
 import javax.faces.application.ApplicationWrapper;
 import javax.faces.application.ResourceDependency;
@@ -186,7 +187,9 @@ public class Form extends HtmlForm {
 	/**
 	 * Returns whether or not the view parameters should be encoded into the form's action URL.
 	 * @return Whether or not the view parameters should be encoded into the form's action URL.
+	 * @deprecated Since 3.0
 	 */
+	@Deprecated
 	public boolean isIncludeViewParams() {
 		return state.get(includeViewParams, FALSE);
 	}
@@ -196,7 +199,9 @@ public class Form extends HtmlForm {
 	 *
 	 * @param includeViewParams
 	 *            The state of the switch for encoding view parameters
+	 * @deprecated Since 3.0
 	 */
+	@Deprecated
 	public void setIncludeViewParams(boolean includeViewParams) {
 		state.put(PropertyKeys.includeViewParams, includeViewParams);
 	}
@@ -205,7 +210,9 @@ public class Form extends HtmlForm {
 	 * Returns whether or not the request parameters should be encoded into the form's action URL.
 	 * @return Whether or not the request parameters should be encoded into the form's action URL.
 	 * @since 1.5
+	 * @deprecated Since 3.0
 	 */
+	@Deprecated
 	public boolean isIncludeRequestParams() {
 		return state.get(includeRequestParams, FALSE);
 	}
@@ -216,7 +223,9 @@ public class Form extends HtmlForm {
 	 * @param includeRequestParams
 	 *            The state of the switch for encoding request parameters.
 	 * @since 1.5
+	 * @deprecated Since 3.0
 	 */
+	@Deprecated
 	public void setIncludeRequestParams(boolean includeRequestParams) {
 		state.put(PropertyKeys.includeRequestParams, includeRequestParams);
 	}
