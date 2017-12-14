@@ -655,7 +655,7 @@ public final class Servlets {
 
 		cookie.setMaxAge(maxAge);
 		cookie.setHttpOnly(true);
-		cookie.setSecure(request.isSecure());
+		cookie.setSecure(isSecure(request));
 		response.addCookie(cookie);
 	}
 

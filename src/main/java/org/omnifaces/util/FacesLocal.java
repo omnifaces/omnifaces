@@ -21,6 +21,7 @@ import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Reflection.toClassOrNull;
 import static org.omnifaces.util.Servlets.addParamToMapIfNecessary;
 import static org.omnifaces.util.Servlets.formatContentDispositionHeader;
+import static org.omnifaces.util.Servlets.isSecure;
 import static org.omnifaces.util.Servlets.prepareRedirectURL;
 import static org.omnifaces.util.Servlets.toQueryString;
 import static org.omnifaces.util.Utils.coalesce;
@@ -1201,7 +1202,7 @@ public final class FacesLocal {
 
 		properties.put("maxAge", maxAge);
 		properties.put("httpOnly", true);
-		properties.put("secure", ((HttpServletRequest) externalContext.getRequest()).isSecure());
+		properties.put("secure", isSecure((HttpServletRequest) externalContext.getRequest()));
 		externalContext.addResponseCookie(name, encodeURL(value), properties);
 	}
 
@@ -1625,7 +1626,7 @@ public final class FacesLocal {
 		externalContext.setResponseHeader("Content-Disposition", formatContentDispositionHeader(filename, attachment));
 
 		// Not exactly mandatory, but this fixes at least a MSIE quirk: http://support.microsoft.com/kb/316431
-		if (((HttpServletRequest) externalContext.getRequest()).isSecure()) {
+		if (isSecure((HttpServletRequest) externalContext.getRequest())) {
 			externalContext.setResponseHeader("Cache-Control", "public");
 			externalContext.setResponseHeader("Pragma", "public");
 		}
