@@ -15,7 +15,7 @@ package org.omnifaces.util;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableMap;
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 import static java.util.regex.Pattern.quote;
 import static org.omnifaces.util.Reflection.toClassOrNull;
 import static org.omnifaces.util.Servlets.getSubmittedFileName;
@@ -44,6 +44,7 @@ import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -57,8 +58,11 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
@@ -231,7 +235,7 @@ public final class Utils {
 			return Long.valueOf(string) != null;
 		}
 		catch (Exception ignore) {
-			logger.log(FINE, "Ignoring thrown exception; the sole intent is to return false instead.", ignore);
+			logger.log(FINEST, "Ignoring thrown exception; the sole intent is to return false instead.", ignore);
 			return false;
 		}
 	}
@@ -249,7 +253,7 @@ public final class Utils {
 			return Double.valueOf(string) != null;
 		}
 		catch (Exception ignore) {
-			logger.log(FINE, "Ignoring thrown exception; the sole intent is to return false instead.", ignore);
+			logger.log(FINEST, "Ignoring thrown exception; the sole intent is to return false instead.", ignore);
 			return false;
 		}
 	}
@@ -471,7 +475,7 @@ public final class Utils {
 			return true;
 		}
 		catch (IOException ignore) {
-			logger.log(FINE, "Ignoring thrown exception; the sole intent is to return false instead.", ignore);
+			logger.log(FINEST, "Ignoring thrown exception; the sole intent is to return false instead.", ignore);
 			return false;
 		}
 	}
@@ -652,6 +656,100 @@ public final class Utils {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Returns a stream of given object. Supported types are:
+	 * <ul>
+	 * <li>{@link Iterable}
+	 * <li>{@link Map} (returns a stream of entryset)
+	 * <li><code>int[]</code>
+	 * <li><code>long[]</code>
+	 * <li><code>double[]</code>
+	 * <li><code>Object[]</code>
+	 * <li>{@link Stream}
+	 * </ul>
+	 * Anything else is returned as a single-element stream. Null is returned as an empty stream.
+	 *
+	 * @param <T> The expected stream type.
+	 * @param object Any object to get a stream for.
+	 * @return A stream of given object.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @since 3.0
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> Stream<T> stream(Object object) {
+		if (object == null) {
+			return Stream.empty();
+		}
+		if (object instanceof Iterable) {
+			return (Stream<T>) StreamSupport.stream(((Iterable<?>) object).spliterator(), false);
+		}
+		else if (object instanceof Map) {
+			return (Stream<T>) ((Map<?, ?>) object).entrySet().stream();
+		}
+		else if (object instanceof int[]) {
+			return (Stream<T>) Arrays.stream((int[]) object).boxed();
+		}
+		else if (object instanceof long[]) {
+			return (Stream<T>) Arrays.stream((long[]) object).boxed();
+		}
+		else if (object instanceof double[]) {
+			return (Stream<T>) Arrays.stream((double[]) object).boxed();
+		}
+		else if (object instanceof Object[]) {
+			return (Stream<T>) Arrays.stream((Object[]) object);
+		}
+		else if (object instanceof Stream) {
+			return (Stream<T>) object;
+		}
+		else {
+			return (Stream<T>) Stream.of(object);
+		}
+	}
+
+	/**
+	 * Returns a stream of given iterable.
+	 * @param <E> The generic iterable element type.
+	 * @param iterable Any iterable to get a stream for.
+	 * @return A stream of given iterable.
+	 * @since 3.0
+	 */
+	public static <E> Stream<E> stream(Iterable<E> iterable) {
+		return iterable == null ? Stream.empty() : StreamSupport.stream(iterable.spliterator(), false);
+	}
+
+	/**
+	 * Returns a stream of given map.
+	 * @param <K> The generic map key type.
+	 * @param <V> The generic map value type.
+	 * @param map Any map to get a stream for.
+	 * @return A stream of given map.
+	 * @since 3.0
+	 */
+	public static <K, V> Stream<Entry<K, V>> stream(Map<K, V> map) {
+		return map == null ? Stream.empty() : map.entrySet().stream();
+	}
+
+	/**
+	 * Returns a stream of given array.
+	 * @param <T> The generic array item type.
+	 * @param array Any array to get a stream for.
+	 * @return A stream of given array.
+	 * @since 3.0
+	 */
+	public static <T> Stream<T> stream(T[] array) {
+		return array == null ? Stream.empty() : Arrays.stream(array);
+	}
+
+	/**
+	 * Performs an action for each element of given object which is streamed using {@link Utils#stream(Object)}.
+	 * @param object Any streamable object.
+	 * @param action A non-interfering action to perform on each element.
+	 * @since 3.0
+	 */
+	public static void forEach(Object object, Consumer<? super Object> action) {
+		stream(object).forEach(action);
 	}
 
 	// Dates ----------------------------------------------------------------------------------------------------------
@@ -836,6 +934,25 @@ public final class Utils {
 			.replace("%28", "(")
 			.replace("%29", ")")
 			.replace("%7E", "~");
+	}
+
+	/**
+	 * Format given URL with given query string. If given URL is empty, assume <code>/</code> as URL. If given query
+	 * string is empty, return URL right away. If given URL contains a <code>?</code>, prepend query string with
+	 * <code>&amp;</code>, else with <code>?</code>. Finally append query string to URL and return it.
+	 * @param url URL to be formatted with given query string.
+	 * @param queryString Query string to be appended to given URL.
+	 * @return Formatted URL with query string.
+	 * @since 3.0
+	 */
+	public static String formatURLWithQueryString(String url, String queryString) {
+		String normalizedURL = url.isEmpty() ? "/" : url;
+
+		if (isEmpty(queryString)) {
+			return normalizedURL;
+		}
+
+		return normalizedURL + (normalizedURL.contains("?") ? "&" : "?") + queryString;
 	}
 
 	// Escaping/unescaping --------------------------------------------------------------------------------------------

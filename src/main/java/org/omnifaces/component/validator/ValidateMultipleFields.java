@@ -64,6 +64,10 @@ import org.omnifaces.validator.MultiFieldValidator;
  * &lt;h:inputText id="baz" /&gt;
  * </pre>
  * <p>
+ * When a target component is <code>disabled="true"</code>, <code>readonly="true"</code> or <code>rendered="false"</code>,
+ * then the <code>values</code> argument of {@link #validateValues(FacesContext, List, List)}, will instead contain the
+ * initial model value. This is quite useful when you need to validate against an existing model.
+ * <p>
  * By default, in an invalidating case, all of the referenced components will be marked invalid and a faces message will
  * be added on the client ID of this validator component. The default message can be changed by the <code>message</code>
  * attribute. Any "{0}" placeholder in the message will be substituted with a comma separated string of labels of the
@@ -243,10 +247,6 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 		for (String clientId : components.split("\\s+")) {
 			UIInput input = findInputComponent(namingContainerParent, clientId, PropertyKeys.components);
 
-			if (!isEditable(input)) {
-				continue;
-			}
-
 			if (!input.isValid()) {
 				return Collections.emptyList();
 			}
@@ -266,7 +266,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 		List<Object> values = new ArrayList<>(inputs.size());
 
 		for (UIInput input : inputs) {
-			Object value = getValue(input);
+			Object value = isEditable(input) ? getValue(input) : input.getValue();
 
 			if (input instanceof UISelectBoolean && Boolean.FALSE.equals(value)) {
 				value = null;
@@ -304,7 +304,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 	 * @param inputs The validated input components.
 	 */
 	protected void showMessage(FacesContext context, List<UIInput> inputs) {
-		final StringBuilder labels = new StringBuilder();
+		StringBuilder labels = new StringBuilder();
 
 		for (Iterator<UIInput> iterator = inputs.iterator(); iterator.hasNext();) {
 			labels.append(getLabel(iterator.next()));
@@ -332,7 +332,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 		return (UIInput) found;
 	}
 
-	private void addErrorMessage(FacesContext context, List<UIInput> inputs, final StringBuilder labels, String message, String showMessageFor) {
+	private void addErrorMessage(FacesContext context, List<UIInput> inputs, StringBuilder labels, String message, String showMessageFor) {
 		if ("@this".equals(showMessageFor)) {
 			addError(getClientId(context), message, labels);
 		}

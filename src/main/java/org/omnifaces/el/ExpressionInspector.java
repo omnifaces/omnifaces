@@ -12,7 +12,7 @@
  */
 package org.omnifaces.el;
 
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 import static org.omnifaces.el.MethodReference.NO_PARAMS;
 import static org.omnifaces.el.functions.Strings.capitalize;
 import static org.omnifaces.util.Components.createValueExpression;
@@ -185,7 +185,7 @@ public final class ExpressionInspector {
 			methodInfo = methodExpression.getMethodInfo(inspectorElContext); // Oracle EL will return null on methods with arguments.
 		}
 		catch (MethodNotFoundException ignore) {
-			logger.log(FINE, "Ignoring thrown exception; there is really no clean way to distinguish Oracle EL from Apache EL.", ignore);
+			logger.log(FINEST, "Ignoring thrown exception; there is really no clean way to distinguish Oracle EL from Apache EL.", ignore);
 			methodInfo = null; // Apache EL will throw MNFE on methods with arguments.
 		}
 

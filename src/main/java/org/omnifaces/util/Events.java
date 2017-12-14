@@ -40,29 +40,20 @@ import org.omnifaces.eventlistener.DefaultViewEventListener;
  * Some examples:
  * <pre>
  * // Add a callback to the current view which should run during every after phase of the render response on same view.
- * Events.subscribeToViewAfterPhase(PhaseId.RENDER_RESPONSE, new Callback.Void() {
- *    &#64;Override
- *    public void invoke() {
- *        // ...
- *    }
+ * Events.subscribeToViewAfterPhase(PhaseId.RENDER_RESPONSE, () -&gt; {
+ *     // ...
  * });
  * </pre>
  * <pre>
  * // Add a callback to the current request which should run during before phase of the render response on current request.
- * Events.subscribeToRequestBeforePhase(PhaseId.RENDER_RESPONSE, new Callback.Void() {
- *     &#64;Override
- *     public void invoke() {
- *         // ...
- *     }
+ * Events.subscribeToRequestBeforePhase(PhaseId.RENDER_RESPONSE, () -&gt; {
+ *     // ...
  * });
  * </pre>
  * <pre>
  * // Add a callback to the current view which should run during the pre render view event.
- * Events.subscribeToViewEvent(PreRenderViewEvent.class, new Callback.SerializableVoid() {
- *     &#64;Override
- *     public void invoke() {
- *         // ...
- *     }
+ * Events.subscribeToViewEvent(PreRenderViewEvent.class, () -&gt; {
+ *     // ...
  * });
  * </pre>
  * <p>
@@ -234,8 +225,8 @@ public final class Events {
 	 * @see UIComponent#subscribeToEvent(Class, ComponentSystemEventListener)
 	 * @see #unsubscribeFromComponentEvent(UIComponent, Class, ComponentSystemEventListener)
 	 */
-	public static void subscribeToRequestComponentEvent(final UIComponent component,
-		final Class<? extends ComponentSystemEvent> type, final Callback.WithArgument<ComponentSystemEvent> callback)
+	public static void subscribeToRequestComponentEvent
+		(UIComponent component, Class<? extends ComponentSystemEvent> type, Callback.WithArgument<ComponentSystemEvent> callback)
 	{
 		component.subscribeToEvent(type, new ComponentSystemEventListener() {
 
@@ -324,7 +315,7 @@ public final class Events {
 	 * @see UIComponent#unsubscribeFromEvent(Class, ComponentSystemEventListener)
 	 */
 	public static void unsubscribeFromComponentEvent
-		(final UIComponent component, final Class<? extends SystemEvent> event, final ComponentSystemEventListener listener)
+		(UIComponent component, Class<? extends SystemEvent> event, ComponentSystemEventListener listener)
 	{
 		PhaseId currentPhaseId = getCurrentPhaseId();
 
@@ -332,40 +323,20 @@ public final class Events {
 			throw new IllegalStateException(ERROR_UNSUBSCRIBE_TOO_LATE);
 		}
 
-		subscribeToRequestAfterPhase(currentPhaseId, new Callback.Void() {
-
-			@Override
-			public void invoke() {
-				component.unsubscribeFromEvent(event, listener);
-			}
-		});
+		subscribeToRequestAfterPhase(currentPhaseId, () -> component.unsubscribeFromEvent(event, listener));
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
-	private static <A> Callback.WithArgument<A> wrap(final Callback.Void callback) {
-		return new Callback.WithArgument<A>() {
-
-			@Override
-			public void invoke(A argument) {
-				callback.invoke();
-			}
-		};
+	private static <A> Callback.WithArgument<A> wrap(Callback.Void callback) {
+		return argument -> callback.invoke();
 	}
 
-	private static <A> Callback.SerializableWithArgument<A> wrap(final Callback.SerializableVoid callback) {
-		return new Callback.SerializableWithArgument<A>() {
-
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void invoke(A argument) {
-				callback.invoke();
-			}
-		};
+	private static <A> Callback.SerializableWithArgument<A> wrap(Callback.SerializableVoid callback) {
+		return argument -> callback.invoke();
 	}
 
-	private static SystemEventListener createSystemEventListener(final Callback.SerializableWithArgument<SystemEvent> callback) {
+	private static SystemEventListener createSystemEventListener(Callback.SerializableWithArgument<SystemEvent> callback) {
 		return new DefaultViewEventListener() {
 
 			@Override
@@ -375,7 +346,7 @@ public final class Events {
 		};
 	}
 
-	private static PhaseListener createBeforePhaseListener(PhaseId phaseId, final Callback.WithArgument<PhaseEvent> callback) {
+	private static PhaseListener createBeforePhaseListener(PhaseId phaseId, Callback.WithArgument<PhaseEvent> callback) {
 		return new DefaultPhaseListener(phaseId) {
 
 			private static final long serialVersionUID = 1L;
@@ -387,7 +358,7 @@ public final class Events {
 		};
 	}
 
-	private static PhaseListener createAfterPhaseListener(PhaseId phaseId, final Callback.WithArgument<PhaseEvent> callback) {
+	private static PhaseListener createAfterPhaseListener(PhaseId phaseId, Callback.WithArgument<PhaseEvent> callback) {
 		return new DefaultPhaseListener(phaseId) {
 
 			private static final long serialVersionUID = 1L;

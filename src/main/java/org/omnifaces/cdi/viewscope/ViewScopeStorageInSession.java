@@ -47,7 +47,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 42L;
+	private static final long serialVersionUID = 1L;
 	private static final String[] PARAM_NAMES_MAX_ACTIVE_VIEW_SCOPES = {
 		PARAM_NAME_MAX_ACTIVE_VIEW_SCOPES, PARAM_NAME_MOJARRA_NUMBER_OF_VIEWS, PARAM_NAME_MYFACES_NUMBER_OF_VIEWS
 	};
@@ -153,7 +153,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 	 */
 	private static final class BeanStorageEvictionListener implements EvictionListener<UUID, BeanStorage>, Serializable {
 
-		private static final long serialVersionUID = 42L;
+		private static final long serialVersionUID = 1L;
 
 		@Override
 		public void onEviction(UUID id, BeanStorage storage) {

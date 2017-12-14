@@ -15,7 +15,7 @@ package org.omnifaces.util;
 import static java.beans.Introspector.getBeanInfo;
 import static java.beans.PropertyEditorManager.findEditor;
 import static java.lang.String.format;
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -221,7 +221,7 @@ public final class Reflection {
 				return (Class<T>) Class.forName(className);
 			}
 			catch (Exception ignore) {
-				logger.log(FINE, "Ignoring thrown exception; previous exception will be rethrown instead.", ignore);
+				logger.log(FINEST, "Ignoring thrown exception; previous exception will be rethrown instead.", ignore);
 				// Just continue to IllegalStateException on original ClassNotFoundException.
 			}
 
@@ -244,7 +244,7 @@ public final class Reflection {
 			return toClass(className);
 		}
 		catch (Exception ignore) {
-			logger.log(FINE, "Ignoring thrown exception; the sole intent is to return null instead.", ignore);
+			logger.log(FINEST, "Ignoring thrown exception; the sole intent is to return null instead.", ignore);
 			return null;
 		}
 	}
@@ -261,7 +261,7 @@ public final class Reflection {
 			return clazz.getConstructor(parameterTypes);
 		}
 		catch (Exception ignore) {
-			logger.log(FINE, "Ignoring thrown exception; the sole intent is to return null instead.", ignore);
+			logger.log(FINEST, "Ignoring thrown exception; the sole intent is to return null instead.", ignore);
 			return null;
 		}
 	}

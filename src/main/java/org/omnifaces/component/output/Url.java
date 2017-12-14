@@ -18,11 +18,10 @@ import static org.omnifaces.util.Components.getParams;
 import static org.omnifaces.util.Faces.getRequestDomainURL;
 import static org.omnifaces.util.FacesLocal.getBookmarkableURL;
 import static org.omnifaces.util.FacesLocal.getRequestDomainURL;
-import static org.omnifaces.util.FacesLocal.getRequestURI;
 import static org.omnifaces.util.FacesLocal.setRequestAttribute;
 import static org.omnifaces.util.ResourcePaths.stripTrailingSlash;
 import static org.omnifaces.util.Servlets.toQueryString;
-import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.formatURLWithQueryString;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -38,24 +37,27 @@ import org.omnifaces.util.State;
 
 /**
  * <p>
- * The <code>&lt;o:url&gt;</code> is a component which renders the given JSF view ID as a bookmarkable URL with support
- * for exposing it into the request scope by the variable name as specified by the <code>var</code> attribute instead of
- * rendering it.
- * <p>
- * This component also supports adding query string parameters to the URL via nested <code>&lt;f:param&gt;</code> and
- * <code>&lt;o:param&gt;</code>. This can be used in combination with <code>includeViewParams</code> and
- * <code>includeRequestParams</code>. The <code>&lt;f|o:param&gt;</code> will override any included view or request
- * parameters on the same name. To conditionally add or override, use the <code>disabled</code> attribute of
- * <code>&lt;f|o:param&gt;</code>.
+ * The <code>&lt;o:url&gt;</code> is a component which renders the given target URL or JSF view ID as a bookmarkable
+ * URL with support for adding additional query string parameters to the URL via nested <code>&lt;f:param&gt;</code>
+ * and <code>&lt;o:param&gt;</code>, and for exposing it into the request scope by the variable name as specified by
+ * the <code>var</code> attribute instead of rendering it.
  * <p>
  * This component fills the gap caused by absence of JSTL <code>&lt;c:url&gt;</code> in Facelets. This component is
  * useful for generating URLs for usage in e.g. plain HTML <code>&lt;link&gt;</code> elements and JavaScript variables.
  *
+ * <h3>Values</h3>
+ * <p>
+ * You can supply the target URL via either the <code>value</code> attribute or the <code>viewId</code> attribute. When
+ * both are specified, the <code>value</code> attribute takes precedence and the <code>viewId</code> attribute is ignored.
+ * When none are specified, then the <code>viewId</code> will default to the current view ID.
+ * The support for <code>value</code> attribute was added in OmniFaces 3.0.
+ *
  * <h3>Domain</h3>
  * <p>
- * The domain of the URL defaults to the current domain. It is possible to provide a full qualified domain name (FQDN)
- * via the <code>domain</code> attribute which the URL is to be prefixed with. This can be useful if a canonical page
- * shall point to a different domain or a specific subdomain.
+ * When the target URL is specified as <code>viewId</code>, then the domain of the target URL defaults to the current
+ * domain. It is possible to provide a full qualified domain name (FQDN) via the <code>domain</code> attribute which
+ * the URL is to be prefixed with. This can be useful if a canonical page shall point to a different domain or a
+ * specific subdomain.
  * <p>
  * Valid formats and values for <code>domain</code> attribute are:
  * <ul>
@@ -67,15 +69,18 @@ import org.omnifaces.util.State;
  * </ul>
  * <p>
  * The <code>domain</code> value will be validated by {@link URL} and throw an illegal argument exception when invalid.
- * If the value equals <code>/</code>, then the URL becomes domain-relative.
- * If the value equals or starts with <code>//</code>, or does not contain any scheme, then the URL becomes scheme-relative.
+ * If the domain equals <code>/</code>, then the URL becomes domain-relative.
+ * If the domain equals or starts with <code>//</code>, or does not contain any scheme, then the URL becomes scheme-relative.
+ * If the <code>value</code> attribute is specified, then the <code>domain</code> attribute is ignored.
  *
  * <h3>Request and view parameters</h3>
- * <p>You can optionally include all GET request query string parameters or only JSF view parameters in the resulting
- * URL via <code>includeRequestParams="true"</code> or <code>includeViewParams="true"</code>.
+ * <p>
+ * You can add query string parameters to the URL via nested <code>&lt;f:param&gt;</code> and <code>&lt;o:param&gt;</code>.
+ * You can optionally include all GET request query string parameters or only JSF view parameters in the resulting URL via
+ * <code>includeRequestParams="true"</code> or <code>includeViewParams="true"</code>.
  * The <code>includeViewParams</code> is ignored when <code>includeRequestParams="true"</code>.
  * The <code>&lt;f|o:param&gt;</code> will override any included request or view parameters on the same name.
- *
+ * To conditionally add or override, use the <code>disabled</code> attribute of <code>&lt;f|o:param&gt;</code>.
  *
  * <h3>Usage</h3>
  * <p>
@@ -89,6 +94,9 @@ import org.omnifaces.util.State;
  * &lt;p&gt;Scheme-relative URL of current page is: &lt;o:url domain="//" /&gt;&lt;/p&gt;
  * &lt;p&gt;Scheme-relative URL of current page on a different domain is: &lt;o:url domain="sub.example.com" /&gt;&lt;/p&gt;
  * &lt;p&gt;Full URL of current page on a different domain is: &lt;o:url domain="https://sub.example.com" /&gt;&lt;/p&gt;
+ * &lt;p&gt;External URL with encoded parameters appended: &lt;o:url value="https://google.com/search"&gt;
+ *     &lt;o:param name="q" value="#{bean.search}" /&gt;
+ * &lt;/url&gt;&lt;/p&gt;
  * </pre>
  * <pre>
  * &lt;o:url var="_linkCanonical"&gt;
@@ -126,8 +134,9 @@ public class Url extends OutputFamily {
 	private enum PropertyKeys {
 		// Cannot be uppercased. They have to exactly match the attribute names.
 		var,
-		domain,
+		value,
 		viewId,
+		domain,
 		includeViewParams,
 		includeRequestParams;
 	}
@@ -162,25 +171,28 @@ public class Url extends OutputFamily {
 
 	@Override
 	public void encodeEnd(FacesContext context) throws IOException {
-		String viewId = getViewId();
+		String value = getValue();
 		Map<String, List<String>> params = getParams(this, isIncludeRequestParams(), isIncludeViewParams());
-		String url = (viewId == null) ? getActionURL(context, params) : getBookmarkableURL(context, viewId, params, false);
-		String domain = getDomain();
+		String url = (value != null) ? formatURLWithQueryString(value, toQueryString(params)) : getBookmarkableURL(context, getViewId(), params, false);
 
-		if ("//".equals(domain)) {
-			url = getRequestDomainURL(context).split(":", 2)[1] + url;
-		}
-		else if (!"/".equals(domain)) {
-			String normalizedDomain = domain.contains("//") ? domain : ("//") + domain;
+		if (value == null) {
+			String domain = getDomain();
 
-			try {
-				new URL(normalizedDomain.startsWith("//") ? ("http:" + normalizedDomain) : normalizedDomain);
+			if ("//".equals(domain)) {
+				url = getRequestDomainURL(context).split(":", 2)[1] + url;
 			}
-			catch (MalformedURLException e) {
-				throw new IllegalArgumentException(format(ERROR_INVALID_DOMAIN, domain), e);
-			}
+			else if (!"/".equals(domain)) {
+				String normalizedDomain = domain.contains("//") ? domain : ("//") + domain;
 
-			url = stripTrailingSlash(normalizedDomain) + url;
+				try {
+					new URL(normalizedDomain.startsWith("//") ? ("http:" + normalizedDomain) : normalizedDomain);
+				}
+				catch (MalformedURLException e) {
+					throw new IllegalArgumentException(format(ERROR_INVALID_DOMAIN, domain), e);
+				}
+
+				url = stripTrailingSlash(normalizedDomain) + url;
+			}
 		}
 
 		if (getVar() != null) {
@@ -189,13 +201,6 @@ public class Url extends OutputFamily {
 		else {
 			context.getResponseWriter().writeText(url, null);
 		}
-	}
-
-	private static String getActionURL(FacesContext context, Map<String, List<String>> params) {
-		String url = getRequestURI(context);
-		url = url.isEmpty() ? "/" : url;
-		String queryString = toQueryString(params);
-		return isEmpty(queryString) ? url : url + (url.contains("?") ? "&" : "?") + queryString;
 	}
 
 	// Attribute getters/setters --------------------------------------------------------------------------------------
@@ -217,6 +222,38 @@ public class Url extends OutputFamily {
 	}
 
 	/**
+	 * Returns the target URL.
+	 * @return The target URL.
+	 */
+	public String getValue() {
+		return state.get(PropertyKeys.value);
+	}
+
+	/**
+	 * Sets the target URL.
+	 * @param value The target URL.
+	 */
+	public void setValue(String value) {
+		state.put(PropertyKeys.value, value);
+	}
+
+	/**
+	 * Returns the view ID to create URL for. Defaults to current view ID.
+	 * @return The view ID to create URL for.
+	 */
+	public String getViewId() {
+		return state.get(PropertyKeys.viewId, getFacesContext().getViewRoot().getViewId());
+	}
+
+	/**
+	 * Sets the view ID to create URL for.
+	 * @param viewId The view ID to create URL for.
+	 */
+	public void setViewId(String viewId) {
+		state.put(PropertyKeys.viewId, viewId);
+	}
+
+	/**
 	 * Returns the domain of the URL. Defaults to current domain.
 	 * @return The domain of the URL.
 	 */
@@ -230,22 +267,6 @@ public class Url extends OutputFamily {
 	 */
 	public void setDomain(String domain) {
 		state.put(PropertyKeys.domain, domain);
-	}
-
-	/**
-	 * Returns the view ID to create URL for. Defaults to current view ID.
-	 * @return The view ID to create URL for.
-	 */
-	public String getViewId() {
-		return state.get(PropertyKeys.viewId);
-	}
-
-	/**
-	 * Sets the view ID to create URL for.
-	 * @param viewId The view ID to create URL for.
-	 */
-	public void setViewId(String viewId) {
-		state.put(PropertyKeys.viewId, viewId);
 	}
 
 	/**

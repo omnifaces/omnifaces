@@ -42,14 +42,13 @@ import javax.faces.event.PreRenderViewEvent;
 import javax.faces.event.SystemEvent;
 import javax.faces.event.SystemEventListener;
 
-import org.omnifaces.component.output.cache.Cache;
 import org.omnifaces.component.script.DeferredScript;
 import org.omnifaces.renderer.DeferredScriptRenderer;
 import org.omnifaces.renderer.InlineResourceRenderer;
 import org.omnifaces.renderer.InlineScriptRenderer;
 import org.omnifaces.renderer.InlineStylesheetRenderer;
 import org.omnifaces.util.Faces;
-import org.omnifaces.util.Hacks;
+import org.omnifaces.util.cache.Cache;
 
 /**
  * <p>
@@ -459,23 +458,6 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 			else if (component instanceof DeferredScript) {
 				addDeferredScript(component, id);
 			}
-
-			// WARNING: START OF HACK! --------------------------------------------------------------------------------
-			// HACK for RichFaces4 because of its non-standard resource library handling. Resources with the extension
-			// ".reslib" have special treatment by RichFaces specific resource library renderer. They represent multiple
-			// resources which are supposed to be dynamically constructed/added with the purpose to keep resource
-			// dependencies in RichFaces components "DRY". So far, it are usually only JS resources.
-			else if (Hacks.isRichFacesResourceLibraryRenderer(rendererType)) {
-				Set<ResourceIdentifier> resourceIdentifiers = Hacks.getRichFacesResourceLibraryResources(id);
-				ResourceHandler handler = context.getApplication().getResourceHandler();
-
-				for (ResourceIdentifier identifier : resourceIdentifiers) {
-					add(context, null, handler.getRendererTypeForResourceName(identifier.getName()), identifier, target);
-				}
-
-				componentResourcesToRemove.add(component);
-			}
-			// --------------------------------------------------------------------------------------------------------
 		}
 
 		private void addCombined(FacesContext context, UIComponent component, String rendererType, ResourceIdentifier id, String target) {
@@ -498,29 +480,24 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 		private void addStylesheet(FacesContext context, UIComponent component, ResourceIdentifier id) {
 			if (stylesheets.add(component, id)) {
-				Hacks.setStylesheetResourceRendered(context, id); // Prevents future forced additions by libs.
+				context.getApplication().getResourceHandler().markResourceRendered(context, id.getName(), id.getLibrary()); // Prevents future forced additions by libs.
 			}
 		}
 
 		private void addScript(FacesContext context, UIComponent component, ResourceIdentifier id) {
-			if (Hacks.isScriptResourceRendered(context, id)) { // This is true when o:deferredScript is used.
+			ResourceHandler resourceHandler = context.getApplication().getResourceHandler();
+
+			if (resourceHandler.isResourceRendered(context, id.getName(), id.getLibrary())) { // This is true when o:deferredScript is used.
 				componentResourcesToRemove.add(component);
 			}
 			else if (scripts.add(component, id)) {
-				Hacks.setScriptResourceRendered(context, id); // Prevents future forced additions by libs.
+				resourceHandler.markResourceRendered(context, id.getName(), id.getLibrary()); // Prevents future forced additions by libs.
 			}
 		}
 
 		private void addDeferredScript(UIComponent component, ResourceIdentifier id) {
 			String group = (String) component.getAttributes().get("group");
-			Builder builder = deferredScripts.get(group);
-
-			if (builder == null) {
-				builder = new Builder(EXTENSION_JS, TARGET_BODY);
-				deferredScripts.put(group, builder);
-			}
-
-			builder.add(component, id);
+			deferredScripts.computeIfAbsent(group, k -> new Builder(EXTENSION_JS, TARGET_BODY)).add(component, id);
 		}
 
 		public void create(FacesContext context) {

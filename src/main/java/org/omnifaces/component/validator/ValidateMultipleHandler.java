@@ -12,7 +12,7 @@
  */
 package org.omnifaces.component.validator;
 
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 
 import java.util.List;
 import java.util.logging.Logger;
@@ -74,7 +74,7 @@ public class ValidateMultipleHandler extends ComponentHandler {
 			validateMultiple.setValidator(validator);
 		}
 		catch (Exception ignore) { // At least, ClassCastException and PropertyNotFoundException are expected.
-			logger.log(FINE, "Ignoring thrown exception; there is really no clean way to distinguish a ValueExpression from a MethodExpression.", ignore);
+			logger.log(FINEST, "Ignoring thrown exception; there is really no clean way to distinguish a ValueExpression from a MethodExpression.", ignore);
 			MethodExpression validateMethod = attribute.getMethodExpression(context, boolean.class, PARAM_TYPES);
 			validateMultiple.setValidateMethod(validateMethod);
 		}

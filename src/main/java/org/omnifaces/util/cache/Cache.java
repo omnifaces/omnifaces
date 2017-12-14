@@ -10,7 +10,7 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.omnifaces.component.output.cache; // TODO 3.0: migrate to org.omnifaces.util.cache.
+package org.omnifaces.util.cache;
 
 import java.io.Serializable;
 
@@ -42,7 +42,7 @@ public interface Cache extends Serializable {
 	 *            the key under which a value was previously stored
 	 * @return The previously stored value, or null if no such value exists
 	 */
-	Object getObject(String key);
+	Serializable getObject(String key);
 
 	/**
 	 * Stores a value in the cache
@@ -68,7 +68,7 @@ public interface Cache extends Serializable {
 	 *            Whatever method the implementation chooses; after this time is elapsed a call to
 	 *            {@link Cache#get(String)} should return null.
 	 */
-	void putObject(String key, Object value, int timeToLive);
+	void putObject(String key, Serializable value, int timeToLive);
 
 	/**
 	 * Stores a value in the cache
@@ -99,7 +99,7 @@ public interface Cache extends Serializable {
 	 * @return the value associated with the {key, name} hierarchy.
 	 * @since 1.2
 	 */
-	Object getAttribute(String key, String name);
+	Serializable getAttribute(String key, String name);
 
 	/**
 	 * Stores a named attribute in the cache entry identified by the key parameter.
@@ -112,10 +112,10 @@ public interface Cache extends Serializable {
 	 *            value associated with the {key, name} hierarchy.
 	 * @param timeToLive
 	 *            the amount of time in seconds for which the cached value is valid. Only used when there's no first
-	 *            level entry yet. See {@link Cache#putAttribute(String, String, Object, int)}
+	 *            level entry yet.
 	 * @since 1.2
 	 */
-	void putAttribute(String key, String name, Object value, int timeToLive);
+	void putAttribute(String key, String name, Serializable value, int timeToLive);
 
 	/**
 	 * Removes a value from the cache

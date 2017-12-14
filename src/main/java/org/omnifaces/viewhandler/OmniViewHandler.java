@@ -72,10 +72,6 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 	private static final String ERROR_NESTED_FORM_ENCOUNTERED =
 		"Nested form with ID '%s' encountered inside parent form with ID '%s'. This is illegal in HTML.";
 
-	// Properties -----------------------------------------------------------------------------------------------------
-
-	private ViewHandler wrapped;
-
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
@@ -83,7 +79,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 	 * @param wrapped The wrapped view handler.
 	 */
 	public OmniViewHandler(ViewHandler wrapped) {
-		this.wrapped = wrapped;
+		super(wrapped);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -198,11 +194,6 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 
 	private void checkNestedForms(FacesContext context, UIViewRoot view) {
 		forEachComponent(context).fromRoot(view).ofTypes(UIForm.class).withHints(SKIP_ITERATION).invoke(NESTED_FORMS_CHECKER);
-	}
-
-	@Override
-	public ViewHandler getWrapped() {
-		return wrapped;
 	}
 
 	// Inner classes -------------------------------------------------------------------------------------------------

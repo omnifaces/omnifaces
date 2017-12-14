@@ -32,7 +32,7 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 6627109279123441287L;
+	private static final long serialVersionUID = 1L;
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -91,7 +91,7 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 
 	@Override
 	public TreeModel<T> remove() {
-		if (parent != null) {
+		if (!isRoot()) {
 			synchronized (parent.children) {
 				parent.children.remove(this);
 
@@ -128,7 +128,7 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 	 * Recursive helper method for {@link #getNextSibling()}.
 	 */
 	private TreeModel<T> getNextSibling(TreeModel<T> parent, int index) {
-		if (parent == null) {
+		if (isRoot()) {
 			return null;
 		}
 		else if (index < parent.getChildCount()) {
@@ -149,7 +149,7 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 	 * Recursive helper method for {@link #getPreviousSibling()}.
 	 */
 	private TreeModel<T> getPreviousSibling(TreeModel<T> parent, int index) {
-		if (parent == null) {
+		if (isRoot()) {
 			return null;
 		}
 		else if (index >= 0) {
@@ -183,12 +183,16 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 
 	@Override
 	public int getLevel() {
-		return parent == null ? 0 : parent.getLevel() + 1;
+		return isRoot() ? 0 : parent.getLevel() + 1;
 	}
 
 	@Override
 	public String getIndex() {
-		return parent == null ? null : (parent.parent == null ? "" : parent.getIndex() + "_") + index;
+		return isRoot() ? null : parent.getParentIndex() + index;
+	}
+
+	private String getParentIndex() {
+		return isRoot() ? "" : getIndex() + "_";
 	}
 
 	// Checkers -------------------------------------------------------------------------------------------------------
@@ -205,12 +209,12 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 
 	@Override
 	public boolean isFirst() {
-		return parent != null && index == 0;
+		return !isRoot() && index == 0;
 	}
 
 	@Override
 	public boolean isLast() {
-		return parent != null && index + 1 == parent.getChildCount();
+		return !isRoot() && index + 1 == parent.getChildCount();
 	}
 
 	// Object overrides -----------------------------------------------------------------------------------------------
@@ -248,19 +252,17 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 			return false;
 		}
 
-		if (recurse) {
+		if (recurse && thiz.children != null) {
 			if (thiz.getChildCount() != other.getChildCount()) {
 				return false;
 			}
 
-			if (thiz.children != null) {
-				Iterator<AbstractTreeModel> thisChildren = thiz.children.iterator();
-				Iterator<AbstractTreeModel> otherChildren = other.children.iterator();
+			Iterator<AbstractTreeModel> thisChildren = thiz.children.iterator();
+			Iterator<AbstractTreeModel> otherChildren = other.children.iterator();
 
-				while (thisChildren.hasNext() && otherChildren.hasNext()) {
-					if (!equals(thisChildren.next(), otherChildren.next(), true)) {
-						return false;
-					}
+			while (thisChildren.hasNext() && otherChildren.hasNext()) {
+				if (!equals(thisChildren.next(), otherChildren.next(), true)) {
+					return false;
 				}
 			}
 		}

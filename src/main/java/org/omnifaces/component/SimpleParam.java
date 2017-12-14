@@ -24,6 +24,7 @@ import javax.faces.convert.Converter;
  * @author Bauke Scholtz
  * @since 1.7
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class SimpleParam implements ParamHolder {
 
 	// Properties -----------------------------------------------------------------------------------------------------

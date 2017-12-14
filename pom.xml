@@ -11,7 +11,7 @@
 
 	<groupId>org.omnifaces</groupId>
 	<artifactId>omnifaces</artifactId>
-	<version>2.6.7</version>
+	<version>3.0-RC1</version>
 	<packaging>jar</packaging>
 
 	<name>OmniFaces</name>
@@ -60,10 +60,10 @@
 	<properties>
 
 		<!-- Java versions. -->
-		<javase.version>1.7</javase.version>
-		<javaee.version>7</javaee.version>
+		<javase.version>1.8</javase.version>
+		<javaee.version>8</javaee.version>
 		<javadoc.version>1.8</javadoc.version>
-		
+
 		<!-- Essential Maven defaults. -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -72,50 +72,56 @@
 		<maven.source.excludeResources>true</maven.source.excludeResources>
 
 		<!-- Test server versions. -->
-		<test.wildfly.version>10.0.0.Final</test.wildfly.version>
-		<test.tomee.version>7.0.1</test.tomee.version>
-		<test.payara.version>4.1.1.163</test.payara.version>
+		<test.wildfly.version>11.0.0.Final</test.wildfly.version> <!-- TODO: update to Java EE 8 compatible version -->
+		<test.tomee.version>7.0.4</test.tomee.version> <!-- TODO: update to Java EE 8 compatible version -->
+		<test.payara.version>5.0.0.Alpha3</test.payara.version>
 	</properties>
 
 	<dependencies>
 
-		<!-- Java EE 7 dependencies. -->
+		<!-- Java EE 8 dependencies. -->
 		<dependency>
 			<groupId>javax.faces</groupId>
 			<artifactId>javax.faces-api</artifactId>
-			<version>2.2</version>
+			<version>2.3</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.enterprise</groupId>
 			<artifactId>cdi-api</artifactId>
-			<version>1.1</version>
+			<version>2.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
-			<version>1.1.0.Final</version>
+			<version>2.0.0.Final</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.json</groupId>
+			<artifactId>javax.json-api</artifactId>
+			<version>1.1</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Java EE 7 dependencies. -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.el</groupId>
+			<artifactId>javax.el-api</artifactId>
+			<version>3.0.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.websocket</groupId>
 			<artifactId>javax.websocket-api</artifactId>
 			<version>1.1</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<!-- Java EE 6 dependencies. -->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>3.0.1</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.el</groupId>
-			<artifactId>el-api</artifactId>
-			<version>2.2</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -153,21 +159,21 @@
 			<dependency>
 				<groupId>org.jboss.arquillian</groupId>
 				<artifactId>arquillian-bom</artifactId>
-				<version>1.1.11.Final</version>
+				<version>1.1.13.Final</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.jboss.arquillian.extension</groupId>
 				<artifactId>arquillian-drone-bom</artifactId>
-				<version>2.0.0.Final</version>
+				<version>2.0.1.Final</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
 			<dependency>
 				<groupId>org.jboss.arquillian.selenium</groupId>
 				<artifactId>selenium-bom</artifactId>
-				<version>2.53.1</version>
+				<version>3.3.1</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
@@ -193,7 +199,7 @@
 			<plugin>
 				<groupId>com.mycila</groupId>
 				<artifactId>license-maven-plugin</artifactId>
-				<version>2.11</version>
+				<version>3.0</version>
 				<configuration>
 					<header>license.txt</header>
 					<excludes>
@@ -217,7 +223,7 @@
 			<plugin>
 				<groupId>com.samaxes.maven</groupId>
 				<artifactId>minify-maven-plugin</artifactId>
-				<version>1.7.4</version>
+				<version>1.7.6</version>
 				<configuration>
 					<webappSourceDir>${basedir}/src/main/resources</webappSourceDir>
 					<webappTargetDir>${project.build.outputDirectory}</webappTargetDir>
@@ -237,6 +243,7 @@
 								<jsSourceFile>unload.unminified.js</jsSourceFile>
 								<jsSourceFile>push.unminified.js</jsSourceFile>
 								<jsSourceFile>inputfile.unminified.js</jsSourceFile>
+								<jsSourceFile>form.unminified.js</jsSourceFile>
 							</jsSourceFiles>
 							<jsFinalFile>omnifaces.js</jsFinalFile>
 						</configuration>
@@ -278,7 +285,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.6</version>
+				<version>3.0.2</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -328,6 +335,9 @@
 						<goals>
 							<goal>jar</goal>
 						</goals>
+						<configuration>
+							<additionalparam>-Xdoclint:none</additionalparam>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
@@ -336,7 +346,7 @@
 			<plugin>
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.5</version>
+				<version>1.6.8</version>
 				<extensions>true</extensions>
 				<configuration>
 					<serverId>ossrh</serverId>
@@ -361,7 +371,7 @@
 									<pluginExecutionFilter>
 										<groupId>com.mycila</groupId>
 										<artifactId>license-maven-plugin</artifactId>
-										<versionRange>[2.11,)</versionRange>
+										<versionRange>[3.0,)</versionRange>
 										<goals>
 											<goal>format</goal>
 										</goals>
@@ -376,7 +386,7 @@
 									<pluginExecutionFilter>
 										<groupId>com.samaxes.maven</groupId>
 										<artifactId>minify-maven-plugin</artifactId>
-										<versionRange>[1.7.4,)</versionRange>
+										<versionRange>[1.7.6,)</versionRange>
 										<goals>
 											<goal>minify</goal>
 										</goals>
@@ -396,7 +406,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>2.10</version>
+					<version>3.0.1</version>
 					<executions>
 						<execution>
 							<phase>process-test-classes</phase>
@@ -447,7 +457,7 @@
 				<dependency>
 					<groupId>org.wildfly.arquillian</groupId>
 					<artifactId>wildfly-arquillian-container-managed</artifactId>
-					<version>2.0.0.Final</version>
+					<version>2.0.2.Final</version>
 					<scope>test</scope>
 				</dependency>
 			</dependencies>
@@ -467,6 +477,74 @@
 											<type>zip</type>
 										</artifactItem>
 									</artifactItems>
+								</configuration>
+							</execution>
+							<execution>
+								<id>upgrade-wildfly-to-jsf23</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.glassfish</groupId>
+											<artifactId>javax.faces</artifactId>
+											<version>2.3.3</version>
+											<type>jar</type>
+											<outputDirectory>${project.build.directory}/wildfly-${test.wildfly.version}/modules/system/layers/base/javax/faces/api/main</outputDirectory>
+											<destFileName>jboss-jsf-api_2.2_spec-2.2.13.jar</destFileName> <!-- Reuse same file name to make our life easier (no editing of module.xml necessary). -->
+											<overWrite>true</overWrite>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.glassfish</groupId>
+											<artifactId>javax.faces</artifactId>
+											<version>2.3.3</version>
+											<type>jar</type>
+											<outputDirectory>${project.build.directory}/wildfly-${test.wildfly.version}/modules/system/layers/base/com/sun/jsf-impl/main</outputDirectory>
+											<destFileName>jsf-impl-2.2.13.SP4.jar</destFileName> <!-- Reuse same file name to make our life easier (no editing of module.xml necessary). -->
+											<overWrite>true</overWrite>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>truezip-maven-plugin</artifactId>
+						<version>1.2</version>
+						<executions>
+							<execution>
+								<id>repack-wildfly-jsf23-api</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>remove</goal>
+								</goals>
+								<configuration>
+									<fileset>
+										<directory>${project.build.directory}/wildfly-${test.wildfly.version}/modules/system/layers/base/javax/faces/api/main/jboss-jsf-api_2.2_spec-2.2.13.jar</directory>
+										<excludes>
+											<exclude>javax/**</exclude>
+											<exclude>META-INF/MANIFEST.MF</exclude>
+										</excludes>
+									</fileset>
+								</configuration>
+							</execution>
+							<execution>
+								<id>repack-wildfly-jsf23-impl</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>remove</goal>
+								</goals>
+								<configuration>
+									<fileset>
+										<directory>${project.build.directory}/wildfly-${test.wildfly.version}/modules/system/layers/base/com/sun/jsf-impl/main/jsf-impl-2.2.13.SP4.jar</directory>
+										<excludes>
+											<exclude>com/**</exclude>
+											<exclude>META-INF/**</exclude>
+										</excludes>
+									</fileset>
 								</configuration>
 							</execution>
 						</executions>
@@ -500,11 +578,84 @@
 				<plugins>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.apache.tomee</groupId>
+											<artifactId>apache-tomee</artifactId>
+											<version>${test.tomee.version}</version>
+											<type>zip</type>
+											<classifier>webprofile</classifier>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+							<execution>
+								<id>upgrade-tomee-to-jsf23</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.apache.myfaces.core</groupId>
+											<artifactId>myfaces-api</artifactId>
+											<version>2.3.0-beta</version>
+											<type>jar</type>
+											<outputDirectory>${project.build.directory}/apache-tomee-webprofile-${test.tomee.version}/lib</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.apache.myfaces.core</groupId>
+											<artifactId>myfaces-impl</artifactId>
+											<version>2.3.0-beta</version>
+											<type>jar</type>
+											<outputDirectory>${project.build.directory}/apache-tomee-webprofile-${test.tomee.version}/lib</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>commons-codec</groupId>
+											<artifactId>commons-codec</artifactId>
+											<version>1.10</version>
+											<type>jar</type>
+											<outputDirectory>${project.build.directory}/apache-tomee-webprofile-${test.tomee.version}/lib</outputDirectory>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>truezip-maven-plugin</artifactId>
+						<version>1.2</version>
+						<executions>
+							<execution>
+								<id>remove-tomee-jsf22-files</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>remove</goal>
+								</goals>
+								<configuration>
+									<fileset>
+										<directory>${project.build.directory}/apache-tomee-webprofile-${test.tomee.version}/lib</directory>
+										<includes>
+											<include>myfaces-api-2.2.12.jar</include>
+											<include>myfaces-impl-2.2.12.jar</include>
+										</includes>
+									</fileset>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
 							<systemPropertyVariables>
-								<tomee.version>${test.tomee.version}</tomee.version>
-								<tomee.classifier>webprofile</tomee.classifier>
+								<tomee.dir>${project.build.directory}/apache-tomee-webprofile-${test.tomee.version}</tomee.dir>
 							</systemPropertyVariables>
 						</configuration>
 					</plugin>
@@ -548,7 +699,7 @@
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
 							<environmentVariables>
-								<GLASSFISH_HOME>${project.build.directory}/payara41</GLASSFISH_HOME>
+								<GLASSFISH_HOME>${project.build.directory}/payara5</GLASSFISH_HOME>
 							</environmentVariables>
 						</configuration>
 					</plugin>

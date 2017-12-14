@@ -69,10 +69,8 @@ public class FacesViewsIT extends OmniFacesIT {
 		open("FacesViewsITNonExistingPage");
 		verify404("FacesViewsITNonExistingPage");
 
-		if (!isTomee()) { // MyFaces bugs on this case with NPE in getViewMetadataFacelet() --> resolveURL()
-			open("FacesViewsITNonExistingPage.xhtml");
-			verify404("FacesViewsITNonExistingPage.xhtml");
-		}
+		open("FacesViewsITNonExistingPage.xhtml");
+		verify404("FacesViewsITNonExistingPage.xhtml");
 	}
 
 	private void verify200(String title, String path) {

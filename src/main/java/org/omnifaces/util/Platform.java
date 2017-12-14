@@ -16,10 +16,7 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.logging.Level.WARNING;
 import static javax.faces.validator.BeanValidator.VALIDATOR_FACTORY_KEY;
-import static javax.validation.Validation.buildDefaultValidatorFactory;
 import static org.omnifaces.util.Faces.getApplicationAttribute;
-import static org.omnifaces.util.Faces.setApplicationAttribute;
-
 import java.util.Collection;
 import java.util.Collections;
 import java.util.logging.Logger;
@@ -27,6 +24,7 @@ import java.util.logging.Logger;
 import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
+import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
@@ -57,15 +55,7 @@ public final class Platform {
 	// Bean Validation ------------------------------------------------------------------------------------------------
 
 	public static ValidatorFactory getBeanValidatorFactory() {
-
-		ValidatorFactory validatorFactory = getApplicationAttribute(VALIDATOR_FACTORY_KEY);
-
-		if (validatorFactory == null) {
-			validatorFactory = buildDefaultValidatorFactory();
-			setApplicationAttribute(VALIDATOR_FACTORY_KEY, validatorFactory);
-		}
-
-		return validatorFactory;
+		return getApplicationAttribute(VALIDATOR_FACTORY_KEY, Validation::buildDefaultValidatorFactory);
 	}
 
 	public static Validator getBeanValidator() {
@@ -73,23 +63,16 @@ public final class Platform {
 	}
 
 	public static boolean isBeanValidationAvailable() {
-
-		Boolean beanValidationAvailable = getApplicationAttribute(BEAN_VALIDATION_AVAILABLE);
-
-		if (beanValidationAvailable == null) {
+		return getApplicationAttribute(BEAN_VALIDATION_AVAILABLE, () -> {
 			try {
 				Class.forName("javax.validation.Validation");
 				getBeanValidator();
-				beanValidationAvailable = TRUE;
+				return TRUE;
 			} catch (Exception | LinkageError e) {
-				beanValidationAvailable = FALSE;
 				logger.log(WARNING, "Bean validation not available.", e);
+				return FALSE;
 			}
-
-			setApplicationAttribute(BEAN_VALIDATION_AVAILABLE, beanValidationAvailable);
-		}
-
-		return beanValidationAvailable;
+		});
 	}
 
 	/**

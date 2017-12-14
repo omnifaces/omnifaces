@@ -64,7 +64,9 @@ public class TestServlets {
 		{ "form-data; filename*0*=ISO-8859-15''euro-sign%3d%a4; filename*=ISO-8859-1''currency-sign%3d%a4", "currency-sign=¤" },
 		{ "form-data; foobar=x; filename=\"foo.html\"", "foo.html" },
 		{ "form-data; filename=C:\\fakepath\\foo.html", "foo.html" },
-		{ "form-data; filename=\"C:\\fakepath\\foo.html\"", "foo.html" },
+		{ "form-data; filename=\"c:\\fakepath\\foo.html\"", "foo.html" },
+		{ "form-data; filename=c:/fakepath/foo.html", "foo.html" },
+		{ "form-data; filename=\"C:/fakepath/foo.html\"", "foo.html" },
 	};
 
 	@Test
@@ -107,6 +109,11 @@ public class TestServlets {
 
 		@Override
 		public String getName() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public String getSubmittedFileName() {
 			throw new UnsupportedOperationException();
 		}
 

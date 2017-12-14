@@ -64,7 +64,7 @@ public class InvokeActionEventListener extends DefaultPhaseListener implements S
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = -7324254442944700095L;
+	private static final long serialVersionUID = 1L;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 

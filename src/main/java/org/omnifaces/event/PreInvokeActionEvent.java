@@ -44,7 +44,7 @@ public class PreInvokeActionEvent extends ComponentSystemEvent {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 2620719313947908572L;
+	private static final long serialVersionUID = 1L;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 

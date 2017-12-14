@@ -22,10 +22,6 @@ import javax.faces.context.ExceptionHandlerFactory;
  */
 public abstract class DefaultExceptionHandlerFactory extends ExceptionHandlerFactory {
 
-	// Variables ------------------------------------------------------------------------------------------------------
-
-	private ExceptionHandlerFactory wrapped;
-
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
@@ -33,17 +29,7 @@ public abstract class DefaultExceptionHandlerFactory extends ExceptionHandlerFac
 	 * @param wrapped The wrapped exception handler factory.
 	 */
 	public DefaultExceptionHandlerFactory(ExceptionHandlerFactory wrapped) {
-		this.wrapped = wrapped;
-	}
-
-	// Getters --------------------------------------------------------------------------------------------------------
-
-	/**
-	 * Returns the wrapped exception handler factory.
-	 */
-	@Override
-	public ExceptionHandlerFactory getWrapped() {
-		return wrapped;
+		super(wrapped);
 	}
 
 }

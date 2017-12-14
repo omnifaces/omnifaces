@@ -25,6 +25,8 @@ import javax.annotation.PreDestroy;
 import javax.inject.Named;
 
 import org.omnifaces.cdi.ViewScoped;
+import org.omnifaces.util.Faces;
+import org.omnifaces.util.Hacks;
 
 @Named
 @ViewScoped
@@ -59,7 +61,16 @@ public class ViewScopedITBean implements Serializable {
 
 	public String navigate() {
 		addGlobalInfo("navigate ");
-		return getViewId();
+
+		if (Hacks.isMyFacesUsed()) { // TODO: remove once MyFaces fixes this. See #4120
+			Object renderedResources = Faces.getViewRoot().getTransientStateHelper().getTransient("org.apache.myfaces.RENDERED_RESOURCES_SET");
+			Faces.setViewRoot(Faces.getViewId());
+			Faces.getViewRoot().getTransientStateHelper().putTransient("org.apache.myfaces.RENDERED_RESOURCES_SET", renderedResources);
+			return null;
+		}
+		else {
+			return getViewId();
+		}
 	}
 
 	@PreDestroy

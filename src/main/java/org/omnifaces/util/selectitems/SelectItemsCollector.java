@@ -31,7 +31,6 @@ import javax.faces.model.SelectItemGroup;
 
 import org.omnifaces.el.ScopedRunner;
 import org.omnifaces.model.ExtendedSelectItem;
-import org.omnifaces.util.Callback;
 
 /**
  * Collection of utility methods for collecting {@link SelectItem} instances from various sources.
@@ -133,9 +132,8 @@ public final class SelectItemsCollector {
 	 */
 	public static List<SelectItem> collectFromUISelectItemsIterator(FacesContext facesContext, UISelectItems uiSelectItems, Iterable<?> items) {
 
-		final List<SelectItem> selectItems = new ArrayList<>();
-
-		final Map<String, Object> attributes = uiSelectItems.getAttributes();
+		List<SelectItem> selectItems = new ArrayList<>();
+		Map<String, Object> attributes = uiSelectItems.getAttributes();
 		String var = (String) attributes.get("var");
 
 		// Helper class that's used to set the item value in (EL) scope using the name set by "var" during the iteration.
@@ -143,7 +141,7 @@ public final class SelectItemsCollector {
 		// map referring it will resolve to that particular instance.
 		ScopedRunner scopedRunner = new ScopedRunner(facesContext);
 
-		for (final Object item : items) {
+		for (Object item : items) {
 
 			// If the item is already a SelectItem, take it directly.
 			// NOTE: I'm not 100% sure if this is right, since it now allows a collection to consist
@@ -161,22 +159,19 @@ public final class SelectItemsCollector {
 			}
 
 			// During each iteration, just resolve all attributes again.
-			scopedRunner.invoke(new Callback.Void() {
-				@Override
-				public void invoke() {
-					Object itemValue = getItemValue(attributes, item);
-					Object noSelectionValue = attributes.get("noSelectionValue");
-					boolean itemValueIsNoSelectionValue = noSelectionValue != null && noSelectionValue.equals(itemValue);
+			scopedRunner.invoke(() -> {
+				Object itemValue = getItemValue(attributes, item);
+				Object noSelectionValue = attributes.get("noSelectionValue");
+				boolean itemValueIsNoSelectionValue = noSelectionValue != null && noSelectionValue.equals(itemValue);
 
-					selectItems.add(new SelectItem(
-						itemValue,
-						getItemLabel(attributes, itemValue),
-						getItemDescription(attributes),
-						getBooleanAttribute(attributes, "itemDisabled", false),
-						getBooleanAttribute(attributes, "itemLabelEscaped", true),
-						getBooleanAttribute(attributes, "noSelectionOption", false) || itemValueIsNoSelectionValue
-					));
-				}
+				selectItems.add(new SelectItem(
+					itemValue,
+					getItemLabel(attributes, itemValue),
+					getItemDescription(attributes),
+					getBooleanAttribute(attributes, "itemDisabled", false),
+					getBooleanAttribute(attributes, "itemLabelEscaped", true),
+					getBooleanAttribute(attributes, "noSelectionOption", false) || itemValueIsNoSelectionValue
+				));
 			});
 		}
 

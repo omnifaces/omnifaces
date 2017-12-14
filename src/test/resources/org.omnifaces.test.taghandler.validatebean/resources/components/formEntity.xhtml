@@ -26,7 +26,7 @@
 		<cc:attribute name="action" method-signature="void action()" />
 	</cc:interface>
 	<cc:implementation>
-		<h:form id="form">
+		<o:form id="form">
 			<h:inputText id="number1" value="#{cc.attrs.value.number1}" />
 			<h:message id="number1Message" for="number1" />
 			<h:inputText id="number2" value="#{cc.attrs.value.number2}" />
@@ -41,6 +41,6 @@
 			<o:validateBean value="#{cc.attrs.value}"
 				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup"
 				showMessageFor="@violating" />
-		</h:form>
+		</o:form>
 	</cc:implementation>
 </ui:component>

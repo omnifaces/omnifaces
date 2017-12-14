@@ -18,7 +18,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 import static java.util.regex.Pattern.quote;
 import static javax.faces.application.ProjectStage.Development;
 import static javax.faces.application.ProjectStage.PROJECT_STAGE_JNDI_NAME;
@@ -31,12 +31,14 @@ import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.decodeURL;
 import static org.omnifaces.util.Utils.encodeURI;
 import static org.omnifaces.util.Utils.encodeURL;
+import static org.omnifaces.util.Utils.isAnyEmpty;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isOneOf;
 import static org.omnifaces.util.Utils.startsWithOneOf;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -302,45 +304,6 @@ public final class Servlets {
 	}
 
 	/**
-	 * Returns the original HTTP request URI behind this forwarded request, if any.
-	 * This does not include the request query string.
-	 * @param request The involved HTTP servlet request.
-	 * @return The original HTTP request URI behind this forwarded request, if any.
-	 * @since 1.8
-	 * @deprecated Since 2.4. Use {@link #getRequestURI(HttpServletRequest)} instead.
-	 */
-	@Deprecated // TODO: Remove in OmniFaces 3.0.
-	public static String getForwardRequestURI(HttpServletRequest request) {
-		return (String) request.getAttribute(FORWARD_REQUEST_URI);
-	}
-
-	/**
-	 * Returns the original HTTP request query string behind this forwarded request, if any.
-	 * @param request The involved HTTP servlet request.
-	 * @return The original HTTP request query string behind this forwarded request, if any.
-	 * @since 1.8
-	 * @deprecated Since 2.4. Use {@link #getRequestQueryString(HttpServletRequest)} instead.
-	 */
-	@Deprecated // TODO: Remove in OmniFaces 3.0.
-	public static String getForwardRequestQueryString(HttpServletRequest request) {
-		return (String) request.getAttribute(FORWARD_QUERY_STRING);
-	}
-
-	/**
-	 * Returns the original HTTP request URI with query string behind this forwarded request, if any.
-	 * @param request The involved HTTP servlet request.
-	 * @return The original HTTP request URI with query string behind this forwarded request, if any.
-	 * @since 1.8
-	 * @deprecated Since 2.4. Use {@link #getRequestURIWithQueryString(HttpServletRequest)} instead.
-	 */
-	@Deprecated // TODO: Remove in OmniFaces 3.0.
-	public static String getForwardRequestURIWithQueryString(HttpServletRequest request) {
-		String requestURI = getForwardRequestURI(request);
-		String queryString = getForwardRequestQueryString(request);
-		return (queryString == null) ? requestURI : (requestURI + "?" + queryString);
-	}
-
-	/**
 	 * Converts the given request query string to request parameter values map.
 	 * @param queryString The request query string.
 	 * @return The request query string as request parameter values map.
@@ -355,14 +318,7 @@ public final class Servlets {
 				String[] pair = parameter.split(quote("="));
 				String key = decodeURL(pair[0]);
 				String value = (pair.length > 1 && !isEmpty(pair[1])) ? decodeURL(pair[1]) : "";
-				List<String> values = parameterMap.get(key);
-
-				if (values == null) {
-					values = new ArrayList<>(1);
-					parameterMap.put(key, values);
-				}
-
-				values.add(value);
+				addParamToMapIfNecessary(parameterMap, key, value);
 			}
 		}
 
@@ -443,6 +399,19 @@ public final class Servlets {
 	public static String getRemoteAddr(HttpServletRequest request) {
 		String forwardedFor = request.getHeader("X-Forwarded-For");
 		return isEmpty(forwardedFor) ? request.getRemoteAddr() : forwardedFor.split("\\s*,\\s*", 2)[0]; // It's a comma separated string: client,proxy1,proxy2,...
+	}
+
+	/**
+	 * Returns <code>true</code> if connection is secure, <code>false</code> otherwise. This method will first check if
+	 * {@link HttpServletRequest#isSecure()} returns <code>true</code>, and if not <code>true</code>, check if the
+	 * <code>X-Forwarded-Proto</code> is present and equals to <code>https</code>.
+	 * @param request The involved HTTP servlet request.
+	 * @return <code>true</code> if connection is secure, <code>false</code> otherwise.
+	 * @see HttpServletRequest#isSecure()
+	 * @since 3.0
+	 */
+	public static boolean isSecure(HttpServletRequest request) {
+		return request.isSecure() || "https".equalsIgnoreCase(request.getHeader("X-Forwarded-Proto"));
 	}
 
 	/**
@@ -777,7 +746,7 @@ public final class Servlets {
 				projectStage = lookup(PROJECT_STAGE_JNDI_NAME);
 			}
 			catch (IllegalStateException ignore) {
-				logger.log(FINE, "Ignoring thrown exception; will only happen in buggy containers.", ignore);
+				logger.log(FINEST, "Ignoring thrown exception; will only happen in buggy containers.", ignore);
 				return false; // May happen in a.o. GlassFish 4.1 during startup.
 			}
 
@@ -815,24 +784,25 @@ public final class Servlets {
 	 * @param response The involved HTTP servlet response.
 	 * @param url The URL to redirect the current response to.
 	 * @param paramValues The request parameter values which you'd like to put URL-encoded in the given URL.
-	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
-	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @throws UncheckedIOException Whenever something fails at I/O level.
 	 * @since 2.0
 	 */
-	public static void facesRedirect
-		(HttpServletRequest request, HttpServletResponse response, String url, String ... paramValues)
-			throws IOException
-	{
+	public static void facesRedirect(HttpServletRequest request, HttpServletResponse response, String url, String ... paramValues) {
 		String redirectURL = prepareRedirectURL(request, url, paramValues);
 
-		if (isFacesAjaxRequest(request)) {
-			setNoCacheHeaders(response);
-			response.setContentType("text/xml");
-			response.setCharacterEncoding(UTF_8.name());
-			response.getWriter().printf(FACES_AJAX_REDIRECT_XML, redirectURL);
+		try {
+			if (isFacesAjaxRequest(request)) {
+				setNoCacheHeaders(response);
+				response.setContentType("text/xml");
+				response.setCharacterEncoding(UTF_8.name());
+				response.getWriter().printf(FACES_AJAX_REDIRECT_XML, redirectURL);
+			}
+			else {
+				response.sendRedirect(redirectURL);
+			}
 		}
-		else {
-			response.sendRedirect(redirectURL);
+		catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
 	}
 
@@ -859,6 +829,17 @@ public final class Servlets {
 		}
 
 		return format(redirectURL, encodedParams);
+	}
+
+	/**
+	 * Helper method to add param to map if necessary. Package-private so that {@link FacesLocal} can also use it.
+	 */
+	static void addParamToMapIfNecessary(Map<String, List<String>> map, String name, Object value) {
+		if (isAnyEmpty(name, value)) {
+			return;
+		}
+
+		map.computeIfAbsent(name, k -> new ArrayList<>(1)).add(value.toString());
 	}
 
 }

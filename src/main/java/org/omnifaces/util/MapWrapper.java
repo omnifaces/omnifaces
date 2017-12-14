@@ -28,7 +28,7 @@ import java.util.Set;
  */
 public class MapWrapper<K, V> implements Map<K, V>, Serializable {
 
-	private static final long serialVersionUID = -4057606871241504872L;
+	private static final long serialVersionUID = 1L;
 
 	private Map<K, V> map;
 

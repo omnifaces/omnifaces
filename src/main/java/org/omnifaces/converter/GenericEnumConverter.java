@@ -72,38 +72,33 @@ import javax.faces.convert.FacesConverter;
  *
  * @author Bauke Scholtz
  * @since 1.2
+ * @deprecated Since 3.0 as this has been fixed in JSF 2.3 as per https://java.net/jira/browse/JAVASERVERFACES_SPEC_PUBLIC-1422
  */
+@Deprecated
 @FacesConverter(value = "omnifaces.GenericEnumConverter")
-public class GenericEnumConverter implements Converter {
+@SuppressWarnings({ "rawtypes", "unchecked" })
+public class GenericEnumConverter implements Converter<Enum> {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final String ATTRIBUTE_ENUM_TYPE = "GenericEnumConverter.%s";
-	private static final String ERROR_NO_ENUM_TYPE = "Given type ''{0}'' is not an enum.";
 	private static final String ERROR_NO_ENUM_VALUE = "Given value ''{0}'' is not an enum of type ''{1}''.";
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public String getAsString(FacesContext context, UIComponent component, Object modelValue) {
+	public String getAsString(FacesContext context, UIComponent component, Enum modelValue) {
 		if (modelValue == null) {
 			return "-";
 		}
 
-		if (modelValue instanceof Enum) {
-			Class<Enum> enumType = ((Enum) modelValue).getDeclaringClass();
-			setViewAttribute(format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)), enumType);
-			return ((Enum) modelValue).name();
-		}
-		else {
-			throw new ConverterException(createError(ERROR_NO_ENUM_TYPE, modelValue.getClass()));
-		}
+		Class<Enum> enumType = modelValue.getDeclaringClass();
+		setViewAttribute(format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)), enumType);
+		return modelValue.name();
 	}
 
 	@Override
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public Object getAsObject(FacesContext context, UIComponent component, String submittedValue) {
+	public Enum getAsObject(FacesContext context, UIComponent component, String submittedValue) {
 		if (isOneOf(submittedValue, null, "", "-")) {
 			return null;
 		}

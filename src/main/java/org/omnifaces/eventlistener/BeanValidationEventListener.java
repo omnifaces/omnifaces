@@ -131,9 +131,9 @@ public class BeanValidationEventListener implements SystemEventListener {
 	 * Obtain the bean validator instance of the given editable value holder component.
 	 */
 	private static BeanValidator getBeanValidator(EditableValueHolder component) {
-		Validator[] validators = component.getValidators();
+		Validator<?>[] validators = component.getValidators();
 
-		for (Validator validator : validators) {
+		for (Validator<?> validator : validators) {
 			if (validator instanceof BeanValidator) {
 				return (BeanValidator) validator;
 			}

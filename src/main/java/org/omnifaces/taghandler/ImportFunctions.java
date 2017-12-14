@@ -13,17 +13,17 @@
 package org.omnifaces.taghandler;
 
 import static java.lang.String.format;
-import static org.omnifaces.taghandler.ImportConstants.toClass;
+import static java.util.logging.Level.FINEST;
 import static org.omnifaces.util.Facelets.getStringLiteral;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Comparator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 import javax.el.FunctionMapper;
 import javax.faces.component.UIComponent;
@@ -82,7 +82,10 @@ public class ImportFunctions extends TagHandler {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
+	private static final Logger logger = Logger.getLogger(ImportFunctions.class.getName());
+
 	private static final Map<String, Method> FUNCTIONS_CACHE = new ConcurrentHashMap<>();
+	private static final String ERROR_MISSING_CLASS = "Cannot find type '%s' in classpath.";
 	private static final String ERROR_INVALID_FUNCTION = "Type '%s' does not have the function '%s'.";
 
 	// Variables ------------------------------------------------------------------------------------------------------
@@ -114,6 +117,37 @@ public class ImportFunctions extends TagHandler {
 		String var = (varValue != null) ? varValue : type.substring(type.lastIndexOf('.') + 1);
 		FunctionMapper originalFunctionMapper = context.getFunctionMapper();
 		context.setFunctionMapper(new ImportFunctionsMapper(originalFunctionMapper, var, toClass(type)));
+	}
+
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Convert the given type, which should represent a fully qualified name, to a concrete {@link Class} instance.
+	 * @param type The fully qualified name of the class.
+	 * @return The concrete {@link Class} instance.
+	 * @throws IllegalArgumentException When it is missing in the classpath.
+	 */
+	static Class<?> toClass(String type) { // Package-private so that ImportConstants can also use it.
+		try {
+			return Class.forName(type, true, Thread.currentThread().getContextClassLoader());
+		}
+		catch (ClassNotFoundException e) {
+			// Perhaps it's an inner enum which is specified as com.example.SomeClass.SomeEnum.
+			// Let's be lenient on that although the proper type notation should be com.example.SomeClass$SomeEnum.
+			int i = type.lastIndexOf('.');
+
+			if (i > 0) {
+				try {
+					return toClass(new StringBuilder(type).replace(i, i + 1, "$").toString());
+				}
+				catch (Exception ignore) {
+					logger.log(FINEST, "Ignoring thrown exception; previous exception will be rethrown instead.", ignore);
+					// Just continue to IllegalArgumentException on original ClassNotFoundException.
+				}
+			}
+
+			throw new IllegalArgumentException(format(ERROR_MISSING_CLASS, type), e);
+		}
 	}
 
 	// Nested classes -------------------------------------------------------------------------------------------------
@@ -161,12 +195,7 @@ public class ImportFunctions extends TagHandler {
 		 * @return The found method, or <code>null</code> if none is found.
 		 */
 		private static Method findMethod(Class<?> cls, String name) {
-			Set<Method> methods = new TreeSet<>(new Comparator<Method>() {
-				@Override
-				public int compare(Method m1, Method m2) {
-					return Integer.valueOf(m1.getParameterTypes().length).compareTo(m2.getParameterTypes().length);
-				}
-			});
+			Set<Method> methods = new TreeSet<>((Method m1, Method m2) -> Integer.valueOf(m1.getParameterCount()).compareTo(m2.getParameterCount()));
 
 			for (Method method : cls.getDeclaredMethods()) {
 				if (method.getName().equals(name) && isPublicStaticNonVoid(method)) {

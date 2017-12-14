@@ -35,7 +35,7 @@ public interface MultiFieldValidator {
 	 * {@link ValidateMultipleFields} implementation who will call this method.
 	 * @param context The faces context to work with.
 	 * @param components The input components whose values are to be validated.
-	 * @param values The values of the input components to be validated.
+	 * @param values The values of the input components to be validated, in the same order as the components.
 	 * @return <code>true</code> if validation is successful, otherwise <code>false</code> (and thus show the message).
 	 */
 	boolean validateValues(FacesContext context, List<UIInput> components, List<Object> values);

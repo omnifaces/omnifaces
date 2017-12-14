@@ -88,7 +88,7 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
  * @see SelectItemsCollector
  */
 @FacesConverter("omnifaces.SelectItemsConverter")
-public class SelectItemsConverter implements Converter {
+public class SelectItemsConverter implements Converter<Object> {
 
 	@Override
 	public Object getAsObject(FacesContext context, UIComponent component, String value) {

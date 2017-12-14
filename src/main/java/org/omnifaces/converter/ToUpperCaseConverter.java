@@ -44,8 +44,8 @@ import javax.faces.convert.FacesConverter;
 public class ToUpperCaseConverter extends TrimConverter {
 
 	@Override
-	public Object getAsObject(FacesContext context, UIComponent component, String submittedValue) {
-		String trimmed = (String) super.getAsObject(context, component, submittedValue);
+	public String getAsObject(FacesContext context, UIComponent component, String submittedValue) {
+		String trimmed = super.getAsObject(context, component, submittedValue);
 		return (trimmed == null) ? null : trimmed.toUpperCase(getLocale(context));
 	}
 

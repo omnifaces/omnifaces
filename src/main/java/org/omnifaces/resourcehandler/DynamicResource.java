@@ -19,6 +19,7 @@ import static org.omnifaces.util.Faces.getMapping;
 import static org.omnifaces.util.Faces.getRequestContextPath;
 import static org.omnifaces.util.Faces.getRequestDomainURL;
 import static org.omnifaces.util.Faces.isPrefixMapping;
+import static org.omnifaces.util.ResourcePaths.concat;
 import static org.omnifaces.util.Utils.formatRFC1123;
 import static org.omnifaces.util.Utils.parseRFC1123;
 
@@ -70,7 +71,7 @@ public abstract class DynamicResource extends Resource {
 	@Override
 	public String getRequestPath() {
 		String mapping = getMapping();
-		String path = RESOURCE_IDENTIFIER + "/" + getResourceName();
+		String path = concat(RESOURCE_IDENTIFIER, getResourceName());
 		return getRequestContextPath()
 			+ (isPrefixMapping(mapping) ? (mapping + path) : (path + mapping))
 			+ "?ln=" + getLibraryName()

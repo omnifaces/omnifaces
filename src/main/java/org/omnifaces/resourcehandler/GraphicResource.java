@@ -17,11 +17,12 @@ import static java.lang.reflect.Modifier.isPublic;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonMap;
 import static java.util.Collections.unmodifiableMap;
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 import static org.omnifaces.util.Beans.getManager;
 import static org.omnifaces.util.BeansLocal.getReference;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getExternalContext;
+import static org.omnifaces.util.FacesLocal.createConverter;
 import static org.omnifaces.util.Servlets.toQueryString;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isEmpty;
@@ -50,7 +51,6 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.util.AnnotationLiteral;
 import javax.faces.FacesException;
-import javax.faces.application.Application;
 import javax.faces.application.Resource;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIOutput;
@@ -80,7 +80,7 @@ public class GraphicResource extends DynamicResource {
 	private static final Map<String, MethodReference> ALLOWED_METHODS = new ConcurrentHashMap<>();
 	private static final String[] EMPTY_PARAMS = new String[0];
 
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "deprecation" })
 	private static final Class<? extends Annotation>[] REQUIRED_ANNOTATION_TYPES = new Class[] {
 		GraphicImageBean.class,
 		javax.faces.bean.ApplicationScoped.class,
@@ -242,7 +242,7 @@ public class GraphicResource extends DynamicResource {
 			convertedParams = convertToObjects(getContext(), params, method.getParameterTypes());
 		}
 		catch (Exception ignore) {
-			logger.log(FINE, "Ignoring thrown exception; this can only be a hacker attempt.", ignore);
+			logger.log(FINEST, "Ignoring thrown exception; this can only be a hacker attempt.", ignore);
 			return null; // I'd rather return 400 here, but JSF spec doesn't support it.
 		}
 
@@ -386,15 +386,14 @@ public class GraphicResource extends DynamicResource {
 	private static String[] convertToStrings(FacesContext context, Object[] values, Class<?>[] types) {
 		validateParamLength(values, types);
 		String[] strings = new String[values.length];
-		Application application = context.getApplication();
 		UIComponent dummyComponent = new UIOutput();
 
 		for (int i = 0; i < values.length; i++) {
 			Object value = values[i];
-			Converter converter = application.createConverter(types[i]);
+			Converter<Object> converter = createConverter(context, types[i]);
 			strings[i] = (converter != null)
 				? converter.getAsString(context, dummyComponent, value)
-				: (value != null) ? value.toString() : "";
+				: coalesce(value, "").toString();
 		}
 
 		return strings;
@@ -407,12 +406,11 @@ public class GraphicResource extends DynamicResource {
 	private static Object[] convertToObjects(FacesContext context, String[] values, Class<?>[] types) {
 		validateParamLength(values, types);
 		Object[] objects = new Object[values.length];
-		Application application = context.getApplication();
 		UIComponent dummyComponent = new UIOutput();
 
 		for (int i = 0; i < values.length; i++) {
 			String value = isEmpty(values[i]) ? null : values[i];
-			Converter converter = application.createConverter(types[i]);
+			Converter<Object> converter = createConverter(context, types[i]);
 			objects[i] = (converter != null)
 				? converter.getAsObject(context, dummyComponent, value)
 				: value;

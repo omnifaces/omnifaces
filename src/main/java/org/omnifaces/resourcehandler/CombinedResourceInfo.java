@@ -13,7 +13,7 @@
 package org.omnifaces.resourcehandler;
 
 import static java.lang.String.format;
-import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINEST;
 import static java.util.logging.Level.WARNING;
 import static org.omnifaces.util.FacesLocal.getRequestDomainURL;
 import static org.omnifaces.util.Utils.isEmpty;
@@ -202,13 +202,13 @@ public final class CombinedResourceInfo {
 				connection = resource.getURL().openConnection();
 			}
 			catch (Exception richFacesDoesNotSupportThis) {
-				logger.log(FINE, "Ignoring thrown exception; this can only be caused by a buggy component library.", richFacesDoesNotSupportThis);
+				logger.log(FINEST, "Ignoring thrown exception; this can only be caused by a buggy component library.", richFacesDoesNotSupportThis);
 
 				try {
 					connection = new URL(getRequestDomainURL(context) + resource.getRequestPath()).openConnection();
 				}
 				catch (IOException ignore) {
-					logger.log(FINE, "Ignoring thrown exception; cannot handle it at this point, it would be thrown during getInputStream() anyway.", ignore);
+					logger.log(FINEST, "Ignoring thrown exception; cannot handle it at this point, it would be thrown during getInputStream() anyway.", ignore);
 					return;
 				}
 			}
@@ -315,7 +315,7 @@ public final class CombinedResourceInfo {
 			resourcesId = unserializeURLSafe(id);
 		}
 		catch (IllegalArgumentException ignore) {
-			logger.log(FINE, "Ignoring thrown exception; this can only be a hacker attempt, just return null to indicate 404.", ignore);
+			logger.log(FINEST, "Ignoring thrown exception; this can only be a hacker attempt, just return null to indicate 404.", ignore);
 			return null;
 		}
 

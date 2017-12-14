@@ -53,7 +53,7 @@ import javax.faces.validator.Validator;
  * @author Bauke Scholtz
  * @since 1.7
  */
-public abstract class ValueChangeValidator implements Validator {
+public abstract class ValueChangeValidator implements Validator<Object> {
 
 	/**
 	 * If the component is an instance of {@link EditableValueHolder} and its old object value is equal to the

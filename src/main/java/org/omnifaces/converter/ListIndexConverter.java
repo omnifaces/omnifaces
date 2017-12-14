@@ -50,7 +50,7 @@ import javax.faces.model.SelectItem;
  * @author Arjan Tijms
  */
 @FacesConverter("omnifaces.ListIndexConverter")
-public class ListIndexConverter implements Converter {
+public class ListIndexConverter implements Converter<Object> {
 
 	private static final String ERROR_LIST_INDEX =
 			"Could not determine index for value ''{0}'' in component {1}.";

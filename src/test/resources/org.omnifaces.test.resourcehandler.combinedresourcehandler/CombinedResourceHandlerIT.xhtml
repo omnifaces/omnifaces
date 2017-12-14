@@ -42,17 +42,17 @@
 		<div id="deferredInHead" />
 		<div id="deferredInBody" />
 		
-		<h:form id="nonAjax">
+		<o:form id="nonAjax">
 			<h:commandButton id="submit" />
 			<h:commandButton id="rebuild" action="#{combinedResourceHandlerITBean.rebuild}" />
-		</h:form>
+		</o:form>
 
-		<h:form id="ajax">
+		<o:form id="ajax">
 			<f:ajax>
 				<h:commandButton id="submit" />
 				<h:commandButton id="rebuild" action="#{combinedResourceHandlerITBean.rebuild}" />
 			</f:ajax>
-		</h:form>
+		</o:form>
 
 		<h:outputScript name="bodyWithoutTarget.js" />
 	</h:body>

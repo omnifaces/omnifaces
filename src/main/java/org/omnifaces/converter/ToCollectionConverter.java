@@ -70,7 +70,8 @@ import org.omnifaces.util.Faces;
  * @since 2.6
  */
 @FacesConverter("omnifaces.ToCollectionConverter")
-public class ToCollectionConverter extends TrimConverter {
+@SuppressWarnings({"rawtypes", "unchecked"})
+public class ToCollectionConverter implements Converter<Collection> {
 
 	private static final String DEFAULT_DELIMITER = ",";
 	private static final String DEFAULT_SET_TYPE = "java.util.LinkedHashSet";
@@ -81,7 +82,7 @@ public class ToCollectionConverter extends TrimConverter {
 	private Object itemConverter;
 
 	@Override
-	public Object getAsObject(FacesContext context, UIComponent component, String submittedValue) {
+	public Collection getAsObject(FacesContext context, UIComponent component, String submittedValue) {
 		if (isEmpty(submittedValue)) {
 			return null;
 		}
@@ -115,7 +116,7 @@ public class ToCollectionConverter extends TrimConverter {
 		Collection<Object> collection = instance(coalesce(type, DEFAULT_COLLECTION_TYPE));
 
 		for (String item : submittedValue.split(quote(coalesce(delimiter, DEFAULT_DELIMITER).trim()))) {
-			Object trimmed = super.getAsObject(context, component, item);
+			Object trimmed = item.trim();
 			collection.add(converter == null ? trimmed : converter.getAsString(context, component, trimmed));
 		}
 
@@ -123,7 +124,7 @@ public class ToCollectionConverter extends TrimConverter {
 	}
 
 	@Override
-	public String getAsString(FacesContext context, UIComponent component, Object modelValue) {
+	public String getAsString(FacesContext context, UIComponent component, Collection modelValue) {
 		if (isEmpty(modelValue)) {
 			return "";
 		}
@@ -146,7 +147,7 @@ public class ToCollectionConverter extends TrimConverter {
 				converter = application.createConverter(forClass);
 			}
 
-			builder.append(converter == null ? super.getAsString(context, component, item) : converter.getAsString(context, component, item));
+			builder.append(converter == null ? coalesce(item, "") : converter.getAsString(context, component, item));
 		}
 
 		return builder.toString();

@@ -14,19 +14,20 @@ package org.omnifaces.component.script;
 
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
+import static javax.faces.application.ResourceHandler.JSF_SCRIPT_LIBRARY_NAME;
+import static javax.faces.application.ResourceHandler.JSF_SCRIPT_RESOURCE_NAME;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.util.Components.getCurrentForm;
 
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Set;
 
-import javax.faces.application.ResourceDependencies;
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
-import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
-import javax.faces.component.visit.VisitCallback;
 import javax.faces.component.visit.VisitContext;
 import javax.faces.component.visit.VisitHint;
 import javax.faces.component.visit.VisitResult;
@@ -78,10 +79,8 @@ import org.omnifaces.util.State;
  * @see ScriptFamily
  */
 @FacesComponent(Highlight.COMPONENT_TYPE)
-@ResourceDependencies({
-	@ResourceDependency(library="javax.faces", name="jsf.js", target="head"), // Required for jsf.ajax.addOnEvent.
-	@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head") // Specifically highlight.js.
-})
+@ResourceDependency(library=JSF_SCRIPT_LIBRARY_NAME, name=JSF_SCRIPT_RESOURCE_NAME, target="head") // Required for jsf.ajax.request.
+@ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head") // Specifically highlight.js.
 public class Highlight extends OnloadScript {
 
 	// Public constants -----------------------------------------------------------------------------------------------
@@ -126,22 +125,18 @@ public class Highlight extends OnloadScript {
 			return;
 		}
 
-		final StringBuilder clientIds = new StringBuilder();
-		form.visitTree(VisitContext.createVisitContext(context, null, VISIT_HINTS), new VisitCallback() {
-
-			@Override
-			public VisitResult visit(VisitContext context, UIComponent component) {
-				if (component instanceof UIInput && !((UIInput) component).isValid()) {
-					if (clientIds.length() > 0) {
-						clientIds.append(',');
-					}
-
-					String clientId = component.getClientId(context.getFacesContext());
-					clientIds.append('"').append(clientId).append('"');
+		StringBuilder clientIds = new StringBuilder();
+		form.visitTree(VisitContext.createVisitContext(context, null, VISIT_HINTS), (visitContext, component) -> {
+			if (component instanceof UIInput && !((UIInput) component).isValid()) {
+				if (clientIds.length() > 0) {
+					clientIds.append(',');
 				}
 
-				return VisitResult.ACCEPT;
+				String clientId = component.getClientId(visitContext.getFacesContext());
+				clientIds.append('"').append(clientId).append('"');
 			}
+
+			return VisitResult.ACCEPT;
 		});
 
 		if (clientIds.length() > 0) {

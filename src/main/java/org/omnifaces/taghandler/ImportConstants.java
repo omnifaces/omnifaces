@@ -14,7 +14,7 @@ package org.omnifaces.taghandler;
 
 import static java.lang.Math.max;
 import static java.lang.String.format;
-import static java.util.logging.Level.FINE;
+import static org.omnifaces.taghandler.ImportFunctions.toClass;
 import static org.omnifaces.util.Facelets.getStringLiteral;
 
 import java.io.IOException;
@@ -24,7 +24,6 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Logger;
 
 import javax.faces.component.UIComponent;
 import javax.faces.view.facelets.FaceletContext;
@@ -75,16 +74,15 @@ import org.omnifaces.util.MapWrapper;
  * If a constant value doesn't exist, then an <code>IllegalArgumentException</code> will be thrown.
  *
  * @author Bauke Scholtz
+ * @deprecated Since 3.0 as this has been added to JSF 2.3 as <code>f:importConstants</code>.
  */
+@Deprecated
 public class ImportConstants extends TagHandler {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final Logger logger = Logger.getLogger(ImportConstants.class.getName());
-
 	private static final Map<String, Map<String, Object>> CONSTANTS_CACHE = new ConcurrentHashMap<>();
 
-	private static final String ERROR_MISSING_CLASS = "Cannot find type '%s' in classpath.";
 	private static final String ERROR_FIELD_ACCESS = "Cannot access constant field '%s' of type '%s'.";
 	private static final String ERROR_INVALID_CONSTANT = "Type '%s' does not have the constant '%s'.";
 
@@ -141,7 +139,7 @@ public class ImportConstants extends TagHandler {
 	 * @param type The fully qualified name of the type to collect constants for.
 	 * @return Constants of the given type.
 	 */
-	private static Map<String, Object> collectConstants(final String type) {
+	private static Map<String, Object> collectConstants(String type) {
 		Map<String, Object> constants = new LinkedHashMap<>();
 
 		for (Field field : toClass(type).getFields()) {
@@ -156,35 +154,6 @@ public class ImportConstants extends TagHandler {
 		}
 
 		return new ConstantsMap(constants, type);
-	}
-
-	/**
-	 * Convert the given type, which should represent a fully qualified name, to a concrete {@link Class} instance.
-	 * @param type The fully qualified name of the class.
-	 * @return The concrete {@link Class} instance.
-	 * @throws IllegalArgumentException When it is missing in the classpath.
-	 */
-	static Class<?> toClass(String type) { // Package-private so that ImportFunctions can also use it.
-		try {
-			return Class.forName(type, true, Thread.currentThread().getContextClassLoader());
-		}
-		catch (ClassNotFoundException e) {
-			// Perhaps it's an inner enum which is specified as com.example.SomeClass.SomeEnum.
-			// Let's be lenient on that although the proper type notation should be com.example.SomeClass$SomeEnum.
-			int i = type.lastIndexOf('.');
-
-			if (i > 0) {
-				try {
-					return toClass(new StringBuilder(type).replace(i, i + 1, "$").toString());
-				}
-				catch (Exception ignore) {
-					logger.log(FINE, "Ignoring thrown exception; previous exception will be rethrown instead.", ignore);
-					// Just continue to IllegalArgumentException on original ClassNotFoundException.
-				}
-			}
-
-			throw new IllegalArgumentException(format(ERROR_MISSING_CLASS, type), e);
-		}
 	}
 
 	/**
@@ -207,7 +176,7 @@ public class ImportConstants extends TagHandler {
 	 */
 	private static class ConstantsMap extends MapWrapper<String, Object> {
 
-		private static final long serialVersionUID = -7699617036767530156L;
+		private static final long serialVersionUID = 1L;
 
 		private String type;
 

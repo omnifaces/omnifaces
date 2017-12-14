@@ -27,7 +27,7 @@ import javax.faces.event.PhaseListener;
  */
 public abstract class DefaultPhaseListener implements PhaseListener {
 
-	private static final long serialVersionUID = -7252366571645029385L;
+	private static final long serialVersionUID = 1L;
 	private	transient PhaseId phaseId; // PhaseId is not serializable
 
 	public DefaultPhaseListener(PhaseId phaseId) {

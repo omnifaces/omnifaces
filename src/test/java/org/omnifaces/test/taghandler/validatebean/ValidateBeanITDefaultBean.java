@@ -17,6 +17,7 @@ import static org.omnifaces.util.Messages.addGlobalWarn;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Named;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
@@ -27,6 +28,9 @@ public class ValidateBeanITDefaultBean {
 	@Pattern(regexp=".{2,}", message="default")
 	@Size(min=2, groups=ValidateBeanITValidationGroup.class, message="group")
 	private String input;
+
+	@NotNull
+	private String unused; // This one is not referenced in JSF form and should therefore not trigger validation fail on it.
 
 	public void action() {
 		if (isValidationFailed()) {
@@ -42,7 +46,16 @@ public class ValidateBeanITDefaultBean {
 	}
 
 	public void setInput(String input) {
+		System.out.println("ValidateBeanITDefaultBean.setInput() " + input);
 		this.input = input;
+	}
+
+	public String getUnused() {
+		return unused;
+	}
+
+	public void setUnused(String unused) {
+		this.unused = unused;
 	}
 
 }

@@ -107,7 +107,7 @@ public abstract class ScriptFamily extends UIComponentBase {
 			return false;
 		}
 
-		FacesContext context = getFacesContext();
+		FacesContext context = event.getFacesContext();
 		UIViewRoot view = context.getViewRoot();
 
 		if (context.isPostback() ? !view.getComponentResources(context, "body").contains(this) : event instanceof PostAddToViewEvent) {

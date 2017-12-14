@@ -15,8 +15,6 @@ package org.omnifaces.eventlistener;
 import static javax.faces.event.PhaseId.ANY_PHASE;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.FacesLocal.getRequestAttribute;
-import static org.omnifaces.util.FacesLocal.setRequestAttribute;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -48,7 +46,7 @@ public class CallbackPhaseListener implements PhaseListener {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 3611407485061585042L;
+	private static final long serialVersionUID = 1L;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -58,7 +56,7 @@ public class CallbackPhaseListener implements PhaseListener {
 	}
 
 	@Override
-	public void beforePhase(final PhaseEvent event) {
+	public void beforePhase(PhaseEvent event) {
 		for (PhaseListener phaseListener : getCallbackPhaseListenersForEvent(event)) {
 			phaseListener.beforePhase(event);
 		}
@@ -94,14 +92,7 @@ public class CallbackPhaseListener implements PhaseListener {
 	// Helpers --------------------------------------------------------------------------------------------------------
 
 	private static Set<PhaseListener> getCallbackPhaseListeners(FacesContext context, boolean create) {
-		Set<PhaseListener> set = getRequestAttribute(context, CallbackPhaseListener.class.getName());
-
-		if (set == null && create) {
-			set = new HashSet<>(1);
-			setRequestAttribute(context, CallbackPhaseListener.class.getName(), set);
-		}
-
-		return set;
+		return getRequestAttribute(context, CallbackPhaseListener.class.getName(), () -> create ? new HashSet<>(1) : null);
 	}
 
 	private static Set<PhaseListener> getCallbackPhaseListenersForEvent(PhaseEvent event) {

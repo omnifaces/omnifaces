@@ -12,6 +12,11 @@
  */
 package org.omnifaces.el.functions;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
+import java.util.stream.IntStream;
+
 /**
  * <p>
  * Collection of EL functions for array manipulation: <code>of:createArray()</code>, <code>of:createIntegerArray()</code>,
@@ -59,15 +64,13 @@ public final class Arrays {
 	 * @return An integer array which starts at the given integer and ends at the given integer, inclusive
 	 */
 	public static Integer[] createIntegerArray(int begin, int end) {
-		int direction = (begin < end) ? 1 : (begin > end) ? -1 : 0;
-		int size = Math.abs(end - begin) + 1;
-		Integer[] array = new Integer[size];
+		IntStream range = IntStream.rangeClosed(min(begin, end), max(begin, end));
 
-		for (int i = 0; i < size; i++) {
-			array[i] = begin + (i * direction);
+		if (begin > end) {
+			range = range.map(i -> begin + end - i);
 		}
 
-		return array;
+		return range.boxed().toArray(Integer[]::new);
 	}
 
 	/**

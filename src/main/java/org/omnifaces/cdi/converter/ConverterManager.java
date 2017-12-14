@@ -91,6 +91,7 @@ import org.omnifaces.application.OmniApplicationFactory;
  * @since 1.6
  */
 @ApplicationScoped
+@SuppressWarnings("rawtypes")
 public class ConverterManager {
 
 	// Dependencies ---------------------------------------------------------------------------------------------------
@@ -120,7 +121,7 @@ public class ConverterManager {
 			if (converter != null) {
 				Class<? extends Converter> converterClass = converter.getClass();
 				bean = (Bean<Converter>) resolve(manager, converterClass);
-				
+
 				if (bean != null && bean.getBeanClass() != converterClass) {
 					bean = null;
 				}

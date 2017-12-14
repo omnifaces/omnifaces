@@ -97,8 +97,8 @@ public class Converter extends ConverterHandler implements DeferredTagHandler {
 			return;
 		}
 
-		final javax.faces.convert.Converter converter = createInstance(context, this, "converterId");
-		final DeferredAttributes attributes = collectDeferredAttributes(context, this, converter);
+		javax.faces.convert.Converter<Object> converter = createInstance(context, this, "converterId");
+		DeferredAttributes attributes = collectDeferredAttributes(context, this, converter);
 		((ValueHolder) parent).setConverter(new DeferredConverter() {
 			private static final long serialVersionUID = 1L;
 
@@ -144,7 +144,7 @@ public class Converter extends ConverterHandler implements DeferredTagHandler {
 	 *
 	 * @author Bauke Scholtz
 	 */
-	protected abstract static class DeferredConverter implements javax.faces.convert.Converter, Serializable {
+	protected abstract static class DeferredConverter implements javax.faces.convert.Converter<Object>, Serializable {
 		private static final long serialVersionUID = 1L;
 	}
 

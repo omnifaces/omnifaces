@@ -94,4 +94,16 @@ public class ScopedRunner {
 		}
 	}
 
+	/**
+	 * Invokes the callback within the scope of the given variable.
+	 * @param context The involved faces context.
+	 * @param key the key name of the variable
+	 * @param value the value of the variable
+	 * @param callback The callback.
+	 * @since 3.0
+	 */
+	public static void forEach(FacesContext context, String key, Object value, Runnable callback) {
+		new ScopedRunner(context).with(key, value).invoke(callback::run);
+	}
+
 }
