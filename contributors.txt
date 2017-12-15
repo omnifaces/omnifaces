@@ -30,8 +30,8 @@ Marco Janc
 Gerald Turner
 	For his work and ideas on improving <o:validateBean>
 
-Ronald Kuijk
-	For the inspiration for <o:form partialSubmit="true">
+Ronald van Kuijk
+	For his work and inspiration for <o:form partialSubmit="true">
 
 And of course a general thank you to everyone who contributed by creating an issue, pointing out a defect, etc.
 
