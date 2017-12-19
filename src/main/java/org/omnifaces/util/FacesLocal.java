@@ -1000,6 +1000,13 @@ public final class FacesLocal {
 		return Servlets.getRemoteAddr(getRequest(context));
 	}
 
+	/**
+	 * @see Faces#isRequestSecure()
+	 */
+	public static boolean isRequestSecure(FacesContext context) {
+		return Servlets.isSecure(getRequest(context));
+	}
+
 	// HTTP response --------------------------------------------------------------------------------------------------
 
 	/**
