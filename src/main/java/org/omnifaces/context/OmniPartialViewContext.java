@@ -387,6 +387,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		// Delegate actions -------------------------------------------------------------------------------------------
 		// Due to MyFaces broken PartialResponseWriter, which doesn't delegate to getWrapped() method, but instead to
 		// the local variable wrapped, we can't use getWrapped() in our own PartialResponseWriter implementations.
+		// Update 22 Dec 2017: This is still not fixed in MyFaces 2.3.0-beta :(
 
 		@Override
 		public void startDocument() throws IOException {
