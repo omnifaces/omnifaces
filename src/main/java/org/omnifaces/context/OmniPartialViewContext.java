@@ -396,6 +396,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 					// an exception was been thrown during ajax render response. The following calls will gently close
 					// the partial response which Mojarra has left open.
 					// MyFaces never enters reset() method with updating=true, this is handled in endDocument() method.
+					updating = false;
 					wrapped.startError("");
 					wrapped.endError();
 					wrapped.endElement("partial-response"); // Don't use endDocument() as it will flush.
