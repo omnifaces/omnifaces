@@ -414,6 +414,11 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		// the local variable wrapped, we can't use getWrapped() in our own PartialResponseWriter implementations.
 
 		@Override
+		public void startDocument() throws IOException {
+			wrapped.startDocument();
+		}
+
+		@Override
 		public void startError(String errorName) throws IOException {
 			wrapped.startError(errorName);
 		}
