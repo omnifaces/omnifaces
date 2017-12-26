@@ -107,7 +107,7 @@ public final class Strings {
 	 * @since 3.0
 	 */
 	public static String parenthesize(Object object) {
-		if (isEmpty(object) || (object instanceof Number && ((Number) object).intValue() == 0)) {
+		if (isEmpty(object) || "0".equals(object.toString())) {
 			return null;
 		}
 
