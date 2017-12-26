@@ -50,10 +50,8 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <code>unload</code> event is invoked. I.e. when the user navigates away by GET, or closes the browser tab/window.
  * None of the both JSF 2.2 view scope annotations support this. Since OmniFaces 2.2, this CDI view scope annotation
  * will guarantee that the <code>&#64;PreDestroy</code> annotated method is also invoked on browser unload. This trick
- * is done by a synchronous XHR request via an automatically included helper script <code>omnifaces:unload.js</code>.
- * There's however a small caveat: on slow network and/or poor server hardware, there may be a noticeable lag between
- * the enduser action of unloading the page and the desired result. If this is undesireable, then better stick to JSF
- * 2.2's own view scope annotations and accept the postponed destroy.
+ * is done by <code>navigator.sendBeacon</code> via an automatically included helper script <code>omnifaces:unload.js</code>.
+ * For browsers not supporting <code>navigator.sendBeacon</code>, it will fallback to a synchronous XHR request.
  * <p>
  * Since OmniFaces 2.3, the unload has been further improved to also physically remove the associated JSF view state
  * from JSF implementation's internal LRU map in case of server side state saving, hereby further decreasing the risk
@@ -75,9 +73,9 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <p>
  * Related JSF issues:
  * <ul>
- * <li><a href="https://java.net/jira/browse/JAVASERVERFACES-1351">Mojarra issue 1351</a>
- * <li><a href="https://java.net/jira/browse/JAVASERVERFACES-1839">Mojarra issue 1839</a>
- * <li><a href="https://java.net/jira/browse/JAVASERVERFACES_SPEC_PUBLIC-905">JSF spec issue 905</a>
+ * <li><a href="https://github.com/javaserverfaces/mojarra/issues/1355">Mojarra issue 1355</a>
+ * <li><a href="https://github.com/javaserverfaces/mojarra/issues/1843">Mojarra issue 1843</a>
+ * <li><a href="https://github.com/javaee/javaserverfaces-spec/issues/905">JSF spec issue 905</a>
  * </ul>
  *
  * <h3>Usage</h3>
