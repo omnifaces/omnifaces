@@ -15,6 +15,7 @@ package org.omnifaces.eventlistener;
 import static java.lang.System.nanoTime;
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.SEVERE;
+import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static java.util.stream.Collectors.toList;
 import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
 import static javax.faces.event.PhaseId.ANY_PHASE;
@@ -47,6 +48,7 @@ import java.util.TreeMap;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
@@ -55,7 +57,6 @@ import javax.faces.event.PhaseEvent;
 import javax.faces.event.PhaseId;
 import javax.faces.event.PhaseListener;
 
-import org.omnifaces.eventlistener.DefaultPhaseListener;
 import org.omnifaces.util.Components;
 import org.omnifaces.util.Faces;
 
@@ -81,7 +82,7 @@ import org.omnifaces.util.Faces;
  *     <li><code>methods</code>: the action methods, as obtained by {@link Components#getActionExpressionsAndListeners(UIComponent)}</li>
  *     <li><code>validationFailed</code>: whether JSF validation has failed.</li></ul></li>
  * <li><code>params</code>: the HTTP request parameters whereby any parameters whose name matches <code>javax.faces.*</code> are skipped,
- * and whose name matches <code>*assword</code> or <code>token</code> are masked with value <code>********</code>.</li>
+ * and whose name ends with <code>password</code> or <code>token</code> are masked with value <code>********</code>.</li>
  * <li><code>messages</code>: all Faces messages added so far.</li>
  * <li><code>timer</code>: the duration of each phase measured in milliseconds, or -1 if the phase has been skipped, composed of:<ul>
  *     <li><code>0</code>: total time.</li>
@@ -109,6 +110,8 @@ public class FacesRequestLogger extends DefaultPhaseListener {
 	private static final long serialVersionUID = 1L;
 
 	private static final Logger logger = Logger.getLogger(FacesRequestLogger.class.getName());
+
+	private static final Pattern PASSWORD_REQUEST_PARAMETER_PATTERN = Pattern.compile(".*(password|token)$", CASE_INSENSITIVE);
 
 	/**
 	 * Listen on any phase.
@@ -168,7 +171,7 @@ public class FacesRequestLogger extends DefaultPhaseListener {
 	 * @param context The involved faces context.
 	 * @return User details.
 	 */
-	protected static Map<String, Object> getUserDetails(FacesContext context) {
+	protected Map<String, Object> getUserDetails(FacesContext context) {
 		Map<String, Object> userDetails = new LinkedHashMap<>();
 		userDetails.put("ip", getRemoteAddr(context));
 		userDetails.put("login", getRemoteUser(context));
@@ -184,7 +187,7 @@ public class FacesRequestLogger extends DefaultPhaseListener {
 	 * @param context The involved faces context.
 	 * @return Action details.
 	 */
-	protected static Map<String, Object> getActionDetails(FacesContext context) {
+	protected Map<String, Object> getActionDetails(FacesContext context) {
 		UIComponent actionSource = getCurrentActionSource();
 		Map<String, Object> actionDetails = new LinkedHashMap<>();
 		actionDetails.put("source", actionSource != null ? actionSource.getClientId(context) : null);
@@ -199,7 +202,7 @@ public class FacesRequestLogger extends DefaultPhaseListener {
 	 * @param context The involved faces context.
 	 * @return Request parameters.
 	 */
-	protected static Map<String, String> getRequestParameters(FacesContext context) {
+	protected Map<String, String> getRequestParameters(FacesContext context) {
 		Set<Entry<String, String[]>> params = getRequestParameterValuesMap(context).entrySet();
 		Map<String, String> filteredParams = new TreeMap<>();
 
@@ -213,7 +216,7 @@ public class FacesRequestLogger extends DefaultPhaseListener {
 			String[] values = entry.getValue();
 			String value = (values != null && values.length == 1) ? values[0] : Arrays.toString(values);
 
-			if (value != null && (name.endsWith("assword") || "token".equals(name))) {
+			if (value != null && getPasswordRequestParameterPattern(context).matcher(name).matches()) {
 				value = "********"; // Mask passwords and tokens.
 			}
 
@@ -224,11 +227,22 @@ public class FacesRequestLogger extends DefaultPhaseListener {
 	}
 
 	/**
+	 * You can override this if you need to change the default pattern for password based request parameters which will be filtered in
+	 * {@link #getRequestParameters(FacesContext)}.
+	 * The default pattern matches every request parameter name ending with "password" or "token", case insensitive.
+	 * @param context The involved faces context.
+	 * @return Pattern for password request parameters.
+	 */
+	protected Pattern getPasswordRequestParameterPattern(FacesContext context) {
+		return PASSWORD_REQUEST_PARAMETER_PATTERN;
+	}
+
+	/**
 	 * You can override this if you need more fine grained control over logging of faces messages.
 	 * @param context The involved faces context.
 	 * @return Faces messages.
 	 */
-	protected static Map<String, List<String>> getFacesMessages(FacesContext context) {
+	protected Map<String, List<String>> getFacesMessages(FacesContext context) {
 		Map<String, List<String>> facesMessages = new TreeMap<>();
 		context.getMessages(null).forEachRemaining(collectGlobalMessageSummaries(facesMessages));
 		context.getClientIdsWithMessages().forEachRemaining(collectMessageSummariesByClientId(context, facesMessages));

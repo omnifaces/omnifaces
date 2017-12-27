@@ -30,8 +30,7 @@ import org.omnifaces.cdi.Param;
  *
  * @author Arjan Tijms
  *
- * @param <V>
- *            The type of the actual value this class is wrapping.
+ * @param <V> The type of the actual value this class is wrapping.
  */
 public class ParamValue<V> implements Serializable {
 

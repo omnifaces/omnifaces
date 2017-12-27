@@ -79,7 +79,7 @@ import org.omnifaces.util.State;
  * <p>
  * It will install the {@link SocketEndpoint}. Lazy initialization of the endpoint via component is unfortunately not
  * possible across all containers (yet).
- * See also <a href="https://java.net/jira/browse/WEBSOCKET_SPEC-211">WS spec issue 211</a>.
+ * See also <a href="https://github.com/javaee/websocket-spec/issues/211">WS spec issue 211</a>.
  *
  *
  * <h3 id="usage-client"><a href="#usage-client">Usage (client)</a></h3>
@@ -159,7 +159,7 @@ import org.omnifaces.util.State;
  * <code>&lt;p:remoteCommand&gt;</code> or similar. This has among others the advantage of maintaining the JSF view
  * state, the HTTP session and, importantingly, all security constraints on business service methods. Namely, those
  * security constraints are not available during an incoming web socket message per se. See also a.o.
- * <a href="https://java.net/jira/browse/WEBSOCKET_SPEC-238">WS spec issue 238</a>.
+ * <a href="https://github.com/javaee/websocket-spec/issues/238">WS spec issue 238</a>.
  *
  *
  * <h3 id="scopes-and-users"><a href="#scopes-and-users">Scopes and users</a></h3>

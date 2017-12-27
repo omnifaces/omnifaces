@@ -173,33 +173,37 @@ public class Url extends OutputFamily {
 	public void encodeEnd(FacesContext context) throws IOException {
 		String value = getValue();
 		Map<String, List<String>> params = getParams(this, isIncludeRequestParams(), isIncludeViewParams());
-		String url = (value != null) ? formatURLWithQueryString(value, toQueryString(params)) : getBookmarkableURL(context, getViewId(), params, false);
-
-		if (value == null) {
-			String domain = getDomain();
-
-			if ("//".equals(domain)) {
-				url = getRequestDomainURL(context).split(":", 2)[1] + url;
-			}
-			else if (!"/".equals(domain)) {
-				String normalizedDomain = domain.contains("//") ? domain : ("//") + domain;
-
-				try {
-					new URL(normalizedDomain.startsWith("//") ? ("http:" + normalizedDomain) : normalizedDomain);
-				}
-				catch (MalformedURLException e) {
-					throw new IllegalArgumentException(format(ERROR_INVALID_DOMAIN, domain), e);
-				}
-
-				url = stripTrailingSlash(normalizedDomain) + url;
-			}
-		}
+		String url = (value != null) ? formatURLWithQueryString(value, toQueryString(params)) : getBookmarkableURLWithDomain(context, params);
 
 		if (getVar() != null) {
 			setRequestAttribute(context, getVar(), url);
 		}
 		else {
 			context.getResponseWriter().writeText(url, null);
+		}
+	}
+
+	private String getBookmarkableURLWithDomain(FacesContext context, Map<String, List<String>> params) {
+		String url = getBookmarkableURL(context, getViewId(), params, false);
+		String domain = getDomain();
+
+		if ("//".equals(domain)) {
+			return getRequestDomainURL(context).split(":", 2)[1] + url;
+		}
+		else if (!"/".equals(domain)) {
+			String normalizedDomain = domain.contains("//") ? domain : ("//") + domain;
+
+			try {
+				new URL(normalizedDomain.startsWith("//") ? ("http:" + normalizedDomain) : normalizedDomain);
+			}
+			catch (MalformedURLException e) {
+				throw new IllegalArgumentException(format(ERROR_INVALID_DOMAIN, domain), e);
+			}
+
+			return stripTrailingSlash(normalizedDomain) + url;
+		}
+		else {
+			return url;
 		}
 	}
 

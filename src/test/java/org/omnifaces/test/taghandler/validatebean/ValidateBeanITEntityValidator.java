@@ -30,9 +30,9 @@ public class ValidateBeanITEntityValidator implements ConstraintValidator<Valida
 
 		// Below lines are only useful when using showMessageFor="@violating", otherwise those can be omitted.
 		context.disableDefaultConstraintViolation();
-        context.buildConstraintViolationWithTemplate(context.getDefaultConstraintMessageTemplate()).addPropertyNode("number1").addConstraintViolation();
+		context.buildConstraintViolationWithTemplate(context.getDefaultConstraintMessageTemplate()).addPropertyNode("number1").addConstraintViolation();
 
-        return false;
+		return false;
 	}
 
 }

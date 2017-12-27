@@ -1395,6 +1395,18 @@ public final class Faces {
 		return FacesLocal.getRemoteAddr(getContext());
 	}
 
+	/**
+	 * Returns <code>true</code> if connection is secure, <code>false</code> otherwise. This method will first check if
+	 * {@link HttpServletRequest#isSecure()} returns <code>true</code>, and if not <code>true</code>, check if the
+	 * <code>X-Forwarded-Proto</code> is present and equals to <code>https</code>.
+	 * @return <code>true</code> if connection is secure, <code>false</code> otherwise.
+	 * @see HttpServletRequest#isSecure()
+	 * @since 3.0
+	 */
+	public static boolean isRequestSecure() {
+		return FacesLocal.isRequestSecure(getContext());
+	}
+
 	// HTTP response --------------------------------------------------------------------------------------------------
 
 	/**

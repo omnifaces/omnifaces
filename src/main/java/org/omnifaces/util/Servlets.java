@@ -456,8 +456,13 @@ public final class Servlets {
 
 	}
 
-	// TODO: Expose public in 3.0.
-	private static Map<String, String> headerToMap(String header) {
+	/**
+	 * Returns a mapping of given semicolon-separated request header. The returned map is unordered and unmodifiable.
+	 * @param header Any semicolon-separated request header, e.g. <code>Content-Disposition</code>.
+	 * @return A mapping of given semicolon-separated request header.
+	 * @since 3.0
+	 */
+	public static Map<String, String> headerToMap(String header) {
 		if (isEmpty(header)) {
 			return emptyMap();
 		}
@@ -655,7 +660,7 @@ public final class Servlets {
 
 		cookie.setMaxAge(maxAge);
 		cookie.setHttpOnly(true);
-		cookie.setSecure(request.isSecure());
+		cookie.setSecure(isSecure(request));
 		response.addCookie(cookie);
 	}
 
