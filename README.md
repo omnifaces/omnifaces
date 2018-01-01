@@ -1,4 +1,4 @@
-[![Maven](https://maven-badges.herokuapp.com/maven-central/org.omnifaces/omnifaces/badge.svg)](https://maven-badges.herokuapp.com/maven-central/org.omnifaces/omnifaces)
+[![Maven](https://img.shields.io/maven-metadata/v/http/central.maven.org/maven2/org/omnifaces/omnifaces/maven-metadata.xml.svg)](http://central.maven.org/maven2/org/omnifaces/omnifaces/)
 [![Javadoc](http://javadoc.io/badge/org.omnifaces/omnifaces.svg)](http://javadoc.io/doc/org.omnifaces/omnifaces) 
 [![Travis](https://travis-ci.org/omnifaces/omnifaces.svg?branch=develop)](https://travis-ci.org/omnifaces/omnifaces)
 [![Sonar](https://sonarcloud.io/api/badges/gate?key=org.omnifaces:omnifaces:develop)](https://sonarcloud.io/dashboard/index/org.omnifaces:omnifaces:develop)
