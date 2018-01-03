@@ -2167,7 +2167,7 @@ public final class Faces {
 	 * @param computeIfAbsent The computed view scope attribute value when absent. Useful if it represents a collection, map or bean.
 	 * @return The view scope attribute value associated with the given name.
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
-	 * @see ExternalContext#getViewMap()
+	 * @see UIViewroot#getViewMap()
 	 * @since 3.0
 	 */
 	public static <T> T getViewAttribute(String name, Supplier<T> computeIfAbsent) {
