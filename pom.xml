@@ -320,7 +320,7 @@
 					<splitindex>true</splitindex>
 					<doctitle>OmniFaces API documentation</doctitle>
 					<links>
-						<link>https://docs.oracle.com/javaee/${javaee.version}/api/</link>
+						<link>https://javaee.github.io/javaee-spec/javadocs/</link>
 					</links>
 				</configuration>
 				<executions>
