@@ -27,8 +27,7 @@ import org.omnifaces.el.DelegatingVariableMapper;
  * <p>
  * The <code>&lt;o:tagAttribute&gt;</code> is a tag handler that can be used to explicitly declare a tag attribute on
  * a Facelets tag file. This makes sure that any tag attribute with the same name on a parent tag file is cleared out,
- * which does not properly happen in Mojarra. This tag handler is designed to be used only in Mojarra and does not work
- * in MyFaces as it has already internally solved this problem.
+ * which does not properly happen in Mojarra.
  * <p>
  * Consider the following custom tag structure:
  * <pre>
@@ -45,7 +44,7 @@ import org.omnifaces.el.DelegatingVariableMapper;
  * &lt;/my:tag&gt;
  * </pre>
  * <p>
- * then <code>#{id}</code> would evaluate to <code>"foo"</code> instead of <code>null</code>, even when you explicitly
+ * then <code>#{id}</code> of the nested tag would evaluate to <code>"foo"</code> instead of <code>null</code>, even when you explicitly
  * specify the attribute in the <code>*.taglib.xml</code> file.
  * <p>
  * This tag handler is designed to overcome this peculiar problem and unintuitive behavior of nested tagfiles in
@@ -63,18 +62,8 @@ import org.omnifaces.el.DelegatingVariableMapper;
  * &lt;o:tagAttribute name="type" default="text" /&gt;
  * </pre>
  *
- * <h3>MyFaces</h3>
- * <p>
- * MyFaces has already internally solved this problem. Using <code>&lt;o:tagAttribute&gt;</code> in MyFaces will break
- * tag attributes. Do not use it in MyFaces. In case you intend to solely have a default value for a tag attribute,
- * then continue using JSTL for that.
- * <pre>
- * &lt;c:set var="type" value="#{empty type ? 'text' : type}" /&gt;
- * </pre>
- *
  * @author Arjan Tijms.
  * @since 2.1
- * @see DelegatingVariableMapper
  */
 public class TagAttribute extends TagHandler {
 
