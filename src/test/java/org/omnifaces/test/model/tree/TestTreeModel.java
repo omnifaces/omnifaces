@@ -30,6 +30,10 @@ public class TestTreeModel {
 		TreeModel<String> four = three.getParent().getParent().addChild("Four");
 		TreeModel<String> five = four.addChild("Five");
 		assertEquals("[One[Two, Three], Four[Five]]", tree.toString());
+		assertEquals(null, one.getPreviousSibling());
+		assertEquals(four, one.getNextSibling());
+		assertEquals(three, five.getPreviousSibling());
+		assertEquals(null, five.getNextSibling());
 
 		three.remove();
 		assertEquals("[One[Two], Four[Five]]", tree.toString());
