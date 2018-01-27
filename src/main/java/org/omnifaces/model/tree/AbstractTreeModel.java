@@ -128,7 +128,7 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 	 * Recursive helper method for {@link #getNextSibling()}.
 	 */
 	private TreeModel<T> getNextSibling(TreeModel<T> parent, int index) {
-		if (isRoot()) {
+		if (parent == null) {
 			return null;
 		}
 		else if (index < parent.getChildCount()) {
@@ -149,7 +149,7 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 	 * Recursive helper method for {@link #getPreviousSibling()}.
 	 */
 	private TreeModel<T> getPreviousSibling(TreeModel<T> parent, int index) {
-		if (isRoot()) {
+		if (parent == null) {
 			return null;
 		}
 		else if (index >= 0) {
