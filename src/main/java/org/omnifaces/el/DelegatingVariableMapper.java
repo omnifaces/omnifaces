@@ -14,6 +14,7 @@ package org.omnifaces.el;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.el.ValueExpression;
 import javax.el.VariableMapper;
@@ -25,9 +26,8 @@ import javax.el.VariableMapper;
  */
 public class DelegatingVariableMapper extends VariableMapper {
 
-	private static volatile boolean resolveWrappedVariable;
 	private final VariableMapper wrapped;
-	private Map<String, ValueExpression> variables = new HashMap<>();
+	private final Map<String, ValueExpression> variables = new HashMap<>();
 
 	public DelegatingVariableMapper(VariableMapper wrapped) {
 		this.wrapped = wrapped;
@@ -35,21 +35,32 @@ public class DelegatingVariableMapper extends VariableMapper {
 
 	@Override
 	public ValueExpression resolveVariable(String name) {
-		if (variables.containsKey(name)) {
-			return resolveWrappedVariable ? null : variables.get(name);
+		if (name.charAt(0) == '@') {
+			return wrapped.resolveVariable(name.substring(1)); // So we can detect a nested DelegatingVariableMapper in resolveWrappedVariable().
 		}
-
-		return wrapped.resolveVariable(name);
+		else if (!variables.containsKey(name)) {
+			return wrapped.resolveVariable(name);
+		}
+		else {
+			return variables.get(name);
+		}
 	}
 
 	public ValueExpression resolveWrappedVariable(String name) {
-		try {
-			resolveWrappedVariable = true;
-			return wrapped.resolveVariable(name);
+		ValueExpression wrappedVariable = wrapped.resolveVariable(name);
+		ValueExpression globalVariable = variables.get(name);
+
+		if (Objects.equals(wrappedVariable, globalVariable)) {
+			return null; // Will happen when variable isn't defined, so any global variable needs to be cleared out.
 		}
-		finally {
-			resolveWrappedVariable = false;
+
+		ValueExpression parentVariable = wrapped.resolveVariable("@" + name);
+
+		if (Objects.equals(wrappedVariable, parentVariable)) {
+			return null; // Will happen when DelegatingVariableMapper is nested but variable isn't redefined, so it needs to be cleared out.
 		}
+
+		return wrappedVariable;
 	}
 
 	@Override
