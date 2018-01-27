@@ -95,9 +95,9 @@ public class TagAttribute extends TagHandler {
 			return (DelegatingVariableMapper) variableMapper;
 		}
 
-		DelegatingVariableMapper localVariableMapper = new DelegatingVariableMapper(variableMapper);
-		context.setVariableMapper(localVariableMapper);
-		return localVariableMapper;
+		DelegatingVariableMapper delegatingVariableMapper = new DelegatingVariableMapper(variableMapper);
+		context.setVariableMapper(delegatingVariableMapper);
+		return delegatingVariableMapper;
 	}
 
 }
