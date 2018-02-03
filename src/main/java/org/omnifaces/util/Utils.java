@@ -313,6 +313,23 @@ public final class Utils {
 	}
 
 	/**
+	 * Returns <code>true</code> if the given string ends with one of the given suffixes.
+	 * @param string The object to be checked if it ends with one of the given suffixes.
+	 * @param suffixes The argument list of suffixes to be checked
+	 * @return <code>true</code> if the given string ends with one of the given suffixes.
+	 * @since 3.1
+	 */
+	public static boolean endsWithOneOf(String string, String... suffixes) {
+		for (String suffix : suffixes) {
+			if (string.endsWith(suffix)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Returns <code>true</code> if an instance of the given class could also be an instance of one of the given classes.
 	 * @param cls The class to be checked if it could also be an instance of one of the given classes.
 	 * @param classes The argument list of classes to be tested.
