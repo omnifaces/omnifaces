@@ -1948,6 +1948,21 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the application initialization parameter. This returns the <code>&lt;param-value&gt;</code> of a
+	 * <code>&lt;context-param&gt;</code> in <code>web.xml</code> associated with the given
+	 * <code>&lt;param-name&gt;</code>.
+	 * @param name The application initialization parameter name.
+	 * @param defaultValue The default value if there is no application initialization parameter value associated with the given name.
+	 * @return The application initialization parameter value associated with the given name, or <code>defaultValue</code> if
+	 * there is none.
+	 * @see ExternalContext#getInitParameter(String)
+	 * @since 3.1
+	 */
+	public static String getInitParameterOrDefault(String name, String defaultValue) {
+		return FacesLocal.getInitParameterOrDefault(getContext(), name, defaultValue);
+	}
+
+	/**
 	 * Returns the mime type for the given file name. The mime type is determined based on file extension and
 	 * configureable by <code>&lt;mime-mapping&gt;</code> entries in <code>web.xml</code>. When the mime type is
 	 * unknown, then a default of <code>application/octet-stream</code> will be returned.

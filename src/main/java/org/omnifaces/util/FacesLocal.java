@@ -1328,6 +1328,13 @@ public final class FacesLocal {
 	}
 
 	/**
+	 * @see Faces#getInitParameterOrDefault(String)
+	 */
+	public static String getInitParameterOrDefault(FacesContext context, String name, String defaultValue) {
+		return context.getExternalContext().getInitParameterMap().getOrDefault(name, defaultValue);
+	}
+
+	/**
 	 * @see Faces#getMimeType(String)
 	 */
 	public static String getMimeType(FacesContext context, String name) {
