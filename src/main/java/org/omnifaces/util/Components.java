@@ -362,6 +362,19 @@ public final class Components {
 	}
 
 	/**
+	 * Returns a list of UI components matching the given type in children of the currently submitted form.
+	 * The currently submitted form is obtained by {@link #getCurrentForm()}.
+	 * @param <C> The generic component type.
+	 * @param type The type of the UI components to be searched in children of the currently submitted form.
+	 * @return A list of UI components matching the given type in children of the currently submitted form.
+	 * @since 3.1
+	 */
+	public static <C extends UIComponent> List<C> findComponentsInCurrentForm(Class<C> type) {
+		UIForm currentForm = getCurrentForm();
+		return currentForm != null ? findComponentsInChildren(currentForm, type) : emptyList();
+	}
+
+	/**
 	 * Returns from the given component the closest parent of the given parent type, or <code>null</code> if none
 	 * is found.
 	 * @param <C> The generic component type.
