@@ -20,6 +20,7 @@ import static org.omnifaces.util.Components.addScriptToBody;
 import static org.omnifaces.util.Components.forEachComponent;
 import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.FacesLocal.getViewAttribute;
+import static org.omnifaces.util.FacesLocal.isAjaxRequest;
 import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
 import java.util.HashMap;
 import java.util.List;
@@ -72,6 +73,10 @@ public class SocketFacesListener implements SystemEventListener {
 
 		FacesContext context = FacesContext.getCurrentInstance();
 		Map<String, Boolean> sockets = getSockets(context);
+
+		if (!isAjaxRequest(context)) {
+			sockets.clear();
+		}
 
 		forEachComponent(context).ofTypes(Socket.class).withHints(SKIP_ITERATION).<Socket>invoke(socket -> {
 			if (!sockets.containsKey(socket.getChannel())) {
