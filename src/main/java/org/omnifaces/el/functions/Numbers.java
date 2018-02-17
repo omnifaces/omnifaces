@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 OmniFaces
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -278,9 +278,18 @@ public final class Numbers {
 		}
 
 		String separator = (unit == null) ? "" : " ";
-		String unitPrefix = (exponent > 0) ? ((iec ? "K" : "k") + "MGTPE").charAt(exponent - 1) + (iec ? "i" : "") : "";
 		String unitString = (unit == null) ? "" : unit;
-		return formatted + separator + unitPrefix + unitString;
+		return formatted + separator + getUnitPrefix(iec, exponent) + unitString;
+	}
+
+	private static String getUnitPrefix(boolean iec, int exponent) {
+		if (exponent < 1) {
+			return "";
+		}
+
+		char unitPrefix = ((iec ? "K" : "k") + "MGTPE").charAt(exponent - 1);
+		String binaryPrefix = (iec ? "i" : "");
+		return unitPrefix + binaryPrefix;
 	}
 
 }
