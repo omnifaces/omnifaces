@@ -499,25 +499,28 @@ public final class FacesLocal {
 	 */
 	public static Locale getLocale(FacesContext context) {
 		Locale locale = null;
-		UIViewRoot viewRoot = context.getViewRoot();
 
-		// Prefer the locale set in the view.
-		if (viewRoot != null) {
-			locale = viewRoot.getLocale();
-		}
+		if (context != null) {
+			UIViewRoot viewRoot = context.getViewRoot();
 
-		// Then the client preferred locale.
-		if (locale == null) {
-			Locale clientLocale = context.getExternalContext().getRequestLocale();
-
-			if (getSupportedLocales(context).contains(clientLocale)) {
-				locale = clientLocale;
+			// Prefer the locale set in the view.
+			if (viewRoot != null) {
+				locale = viewRoot.getLocale();
 			}
-		}
 
-		// Then the JSF default locale.
-		if (locale == null) {
-			locale = context.getApplication().getDefaultLocale();
+			// Then the client preferred locale.
+			if (locale == null) {
+				Locale clientLocale = context.getExternalContext().getRequestLocale();
+
+				if (getSupportedLocales(context).contains(clientLocale)) {
+					locale = clientLocale;
+				}
+			}
+
+			// Then the JSF default locale.
+			if (locale == null) {
+				locale = context.getApplication().getDefaultLocale();
+			}
 		}
 
 		// Finally the system default locale.
