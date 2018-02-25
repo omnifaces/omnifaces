@@ -496,6 +496,20 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the Faces context attribute value associated with the given name, or computes the supplied value if absent.
+	 * @param <T> The expected return type.
+	 * @param name The Faces context attribute name.
+	 * @param computeIfAbsent The computed Faces context attribute value when absent. Useful if it represents a collection, map or bean.
+	 * @return The Faces context attribute value associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see ExternalContext#getRequestMap()
+	 * @since 3.1
+	 */
+	public static <T> T getContextAttribute(String name, Supplier<T> computeIfAbsent) {
+		return FacesLocal.getRequestAttribute(getContext(), name, computeIfAbsent);
+	}
+
+	/**
 	 * Sets the Faces context attribute value associated with the given name.
 	 * @param name The Faces context attribute name.
 	 * @param value The Faces context attribute value.

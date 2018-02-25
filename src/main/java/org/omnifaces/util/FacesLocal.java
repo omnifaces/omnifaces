@@ -405,8 +405,30 @@ public final class FacesLocal {
 	 * @see Faces#getRenderKit()
 	 */
 	public static RenderKit getRenderKit(FacesContext context) {
+		String renderKitId = null;
 		UIViewRoot view = context.getViewRoot();
-		String renderKitId = (view != null) ? view.getRenderKitId() : context.getApplication().getViewHandler().calculateRenderKitId(context);
+
+		if (view != null) {
+			renderKitId = view.getRenderKitId();
+		}
+
+		if (renderKitId == null) {
+			Application application = context.getApplication();
+			ViewHandler viewHandler = application.getViewHandler();
+
+			if (viewHandler != null) {
+				renderKitId = viewHandler.calculateRenderKitId(context);
+			}
+
+			if (renderKitId == null) {
+				renderKitId = application.getDefaultRenderKitId();
+
+				if (renderKitId == null) {
+					renderKitId = RenderKitFactory.HTML_BASIC_RENDER_KIT;
+				}
+			}
+		}
+
 		return ((RenderKitFactory) FactoryFinder.getFactory(FactoryFinder.RENDER_KIT_FACTORY)).getRenderKit(context, renderKitId);
 	}
 
