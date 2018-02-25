@@ -1350,7 +1350,7 @@ public final class FacesLocal {
 	}
 
 	/**
-	 * @see Faces#getInitParameterOrDefault(String)
+	 * @see Faces#getInitParameterOrDefault(String, String)
 	 */
 	public static String getInitParameterOrDefault(FacesContext context, String name, String defaultValue) {
 		return context.getExternalContext().getInitParameterMap().getOrDefault(name, defaultValue);
