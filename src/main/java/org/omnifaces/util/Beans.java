@@ -101,6 +101,21 @@ public final class Beans {
 	}
 
 	/**
+	 * Returns the CDI managed bean representation of exactly the given bean class, optionally with the given qualifiers.
+	 * This will ignore any subclasses.
+	 * @param <T> The generic CDI managed bean type.
+	 * @param beanClass The CDI managed bean class.
+	 * @param qualifiers The CDI managed bean qualifiers, if any.
+	 * @return The CDI managed bean representation of the given bean class, or <code>null</code> if there is none.
+	 * @see BeanManager#getBeans(java.lang.reflect.Type, Annotation...)
+	 * @see BeanManager#resolve(java.util.Set)
+	 * @since 3.1
+	 */
+	public static <T> Bean<T> resolveExact(Class<T> beanClass, Annotation... qualifiers) {
+		return BeansLocal.resolveExact(getManager(), beanClass, qualifiers);
+	}
+
+	/**
 	 * Returns the CDI managed bean reference (proxy) of the given bean class, optionally with the given qualifiers.
 	 * Note that this actually returns a client proxy and the underlying actual instance is thus always auto-created.
 	 * @param <T> The expected return type.
