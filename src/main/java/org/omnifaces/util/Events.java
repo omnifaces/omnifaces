@@ -29,7 +29,7 @@ import javax.faces.event.SystemEventListener;
 
 import org.omnifaces.eventlistener.CallbackPhaseListener;
 import org.omnifaces.eventlistener.DefaultPhaseListener;
-import org.omnifaces.eventlistener.DefaultViewEventListener;
+import org.omnifaces.eventlistener.DefaultSystemEventListener;
 
 /**
  * <p>
@@ -337,7 +337,7 @@ public final class Events {
 	}
 
 	private static SystemEventListener createSystemEventListener(Callback.SerializableWithArgument<SystemEvent> callback) {
-		return new DefaultViewEventListener() {
+		return new DefaultSystemEventListener() {
 
 			@Override
 			public void processEvent(SystemEvent event) {
