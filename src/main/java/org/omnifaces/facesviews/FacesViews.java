@@ -24,7 +24,6 @@ import static javax.servlet.DispatcherType.FORWARD;
 import static javax.servlet.DispatcherType.REQUEST;
 import static org.omnifaces.facesviews.ExtensionAction.REDIRECT_TO_EXTENSIONLESS;
 import static org.omnifaces.facesviews.PathAction.SEND_404;
-import static org.omnifaces.util.Faces.getApplicationFromFactory;
 import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.Platform.getFacesServletMappings;
 import static org.omnifaces.util.Platform.getFacesServletRegistration;
@@ -68,6 +67,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.omnifaces.ApplicationInitializer;
 import org.omnifaces.ApplicationListener;
+import org.omnifaces.ApplicationProcessor;
 import org.omnifaces.cdi.Param;
 
 /**
@@ -151,7 +151,7 @@ import org.omnifaces.cdi.Param;
  * @see ExtensionAction
  * @see PathAction
  * @see UriExtensionRequestWrapper
- * @see FacesViewsViewHandlerInstaller
+ * @see ApplicationProcessor
  * @see FacesViewsViewHandler
  */
 public final class FacesViews {
@@ -337,12 +337,11 @@ public final class FacesViews {
 
 	/**
 	 * Register a view handler that transforms a view id with extension back to an extensionless one.
-	 * This is invoked by {@link FacesViewsViewHandlerInstaller}, because the {@link Application} has to be available.
+	 * This is invoked by {@link ApplicationProcessor}, because the {@link Application} has to be available.
 	 * @param servletContext The involved servlet context.
 	 */
-	public static void registerViewHander(ServletContext servletContext) {
+	public static void registerViewHander(ServletContext servletContext, Application application) {
 		if (isFacesViewsEnabled(servletContext) && !isEmpty(getEncounteredExtensions(servletContext))) {
-			Application application = getApplicationFromFactory();
 			application.setViewHandler(new FacesViewsViewHandler(application.getViewHandler()));
 		}
 	}

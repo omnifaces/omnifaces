@@ -35,8 +35,7 @@ import org.omnifaces.util.cache.CacheInitializer;
 
 /**
  * <p>
- * OmniFaces application listener. This runs when the servlet context is created and thus after the
- * {@link ApplicationInitializer}.
+ * OmniFaces application listener. This runs when the servlet context is created.
  * This performs the following tasks:
  * <ol>
  * <li>Check if JSF 2.3 is available, otherwise log and fail.
@@ -47,6 +46,8 @@ import org.omnifaces.util.cache.CacheInitializer;
  * <li>Register {@link GraphicImageBean} beans in {@link GraphicResource}.
  * <li>Register {@link Socket} endpoint if necessary.
  * </ol>
+ * <p>
+ * This is invoked <strong>after</strong> {@link ApplicationInitializer} and <strong>before</strong> {@link ApplicationProcessor}.
  *
  * @author Bauke Scholtz
  * @since 2.0

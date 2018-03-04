@@ -13,56 +13,57 @@
 package org.omnifaces;
 
 import static java.util.logging.Level.SEVERE;
+import static org.omnifaces.ApplicationInitializer.ERROR_OMNIFACES_INITIALIZATION_FAIL;
+import static org.omnifaces.util.Faces.getServletContext;
 
-import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.servlet.ServletContainerInitializer;
+import javax.faces.application.Application;
+import javax.faces.event.SystemEvent;
+import javax.faces.event.SystemEventListener;
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import org.omnifaces.config.OmniFaces;
+
+import org.omnifaces.component.search.MessagesKeywordResolver;
 import org.omnifaces.facesviews.FacesViews;
 
 /**
  * <p>
- * OmniFaces application initializer. This runs when the servlet container starts up.
+ * OmniFaces application processor. This runs when the faces application is created.
  * This performs the following tasks:
  * <ol>
- * <li>Log OmniFaces version.
- * <li>Register {@link FacesViews} forwarding filter.
+ * <li>Register the {@link FacesViews} view handler.
+ * <li>Register the {@link MessagesKeywordResolver}.
  * </ol>
  * <p>
- * This is invoked <strong>before</strong> {@link ApplicationListener} and {@link ApplicationProcessor}.
+ * This is invoked <strong>after</strong> {@link ApplicationInitializer} and {@link ApplicationListener}.
  *
  * @author Bauke Scholtz
- * @since 2.0
+ * @since 3.1
  */
-public class ApplicationInitializer implements ServletContainerInitializer {
+public class ApplicationProcessor implements SystemEventListener {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final Logger logger = Logger.getLogger(ApplicationInitializer.class.getName());
-
-	static final String ERROR_OMNIFACES_INITIALIZATION_FAIL =
-		"OmniFaces failed to initialize! Report an issue to OmniFaces.";
+	private static final Logger logger = Logger.getLogger(ApplicationProcessor.class.getName());
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
-	public void onStartup(Set<Class<?>> c, ServletContext servletContext) throws ServletException {
-		logOmniFacesVersion();
+	public boolean isListenerForSource(Object source) {
+		return source instanceof Application;
+	}
 
+	@Override
+	public void processEvent(SystemEvent event) {
 		try {
-			FacesViews.registerForwardingFilter(servletContext);
+			ServletContext servletContext = getServletContext();
+			Application application = (Application) event.getSource();
+			FacesViews.registerViewHander(servletContext, application);
 		}
 		catch (Exception | LinkageError e) {
 			logger.log(SEVERE, ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
 			throw e;
 		}
-	}
-
-	private void logOmniFacesVersion() {
-		logger.info("Using OmniFaces version " + OmniFaces.getVersion());
 	}
 
 }
