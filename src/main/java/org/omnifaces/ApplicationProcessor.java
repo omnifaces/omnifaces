@@ -59,6 +59,7 @@ public class ApplicationProcessor implements SystemEventListener {
 			ServletContext servletContext = getServletContext();
 			Application application = (Application) event.getSource();
 			FacesViews.registerViewHander(servletContext, application);
+			MessagesKeywordResolver.register(application);
 		}
 		catch (Exception | LinkageError e) {
 			logger.log(SEVERE, ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
