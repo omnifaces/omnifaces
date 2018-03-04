@@ -27,6 +27,7 @@ import static org.omnifaces.util.BeansLocal.getInstance;
 import static org.omnifaces.util.Components.addScriptResourceToBody;
 import static org.omnifaces.util.Components.addScriptResourceToHead;
 import static org.omnifaces.util.Components.addScriptToBody;
+import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
 import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
 
@@ -40,6 +41,7 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
@@ -233,7 +235,17 @@ public class ViewScopeManager {
 	 * @since 2.2
 	 */
 	public static boolean isUnloadRequest(FacesContext context) {
-		return "unload".equals(getRequestParameter(context, OMNIFACES_EVENT_PARAM_NAME));
+		return isUnloadRequest(getRequest(context));
+	}
+
+	/**
+	 * Returns <code>true</code> if the given request is triggered by an unload request.
+	 * @param request The involved request.
+	 * @return <code>true</code> if the given request is triggered by an unload request.
+	 * @since 3.1
+	 */
+	public static boolean isUnloadRequest(HttpServletRequest request) {
+		return "unload".equals(request.getParameter(OMNIFACES_EVENT_PARAM_NAME));
 	}
 
 }
