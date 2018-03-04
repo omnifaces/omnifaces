@@ -78,6 +78,15 @@ public final class BeansLocal {
 	}
 
 	/**
+	 * @see Beans#resolve(Class, Annotation...)
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> Bean<T> resolveExact(BeanManager beanManager, Class<T> beanClass, Annotation... qualifiers) {
+		Bean<T> bean = resolve(beanManager, beanClass, qualifiers);
+		return (bean != null) && (bean.getBeanClass() == beanClass) ? bean : null;
+	}
+
+	/**
 	 * @see Beans#getReference(Class, Annotation...)
 	 */
 	public static <T> T getReference(BeanManager beanManager, Class<T> beanClass, Annotation... qualifiers) {

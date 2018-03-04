@@ -47,7 +47,7 @@ import javax.faces.application.ResourceWrapper;
  * By default, the {@link SourceMapResourceHandler} will use <code>*.map</code> pattern to create the source map URL.
  * In other words, it's expected that the source map file is located in exactly the same folder and has the <code>.map</code>
  * extension. In case you need a different pattern, e.g. <code>sourcemaps/*.map</code>, then you can set that via the
- * {@value SourceMapResourceHandler#PARAM_NAME_SOURCE_MAP_PATTERN} context parameter.
+ * {@value org.omnifaces.resourcehandler.SourceMapResourceHandler#PARAM_NAME_SOURCE_MAP_PATTERN} context parameter.
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.SOURCE_MAP_RESOURCE_HANDLER_PATTERN&lt;/param-name&gt;

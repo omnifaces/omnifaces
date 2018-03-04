@@ -26,6 +26,7 @@ import javax.faces.application.Application;
 import javax.faces.component.EditableValueHolder;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
+import javax.faces.validator.FacesValidator;
 import javax.faces.validator.ValidatorException;
 import javax.faces.view.facelets.ComponentHandler;
 import javax.faces.view.facelets.FaceletContext;
@@ -34,6 +35,7 @@ import javax.faces.view.facelets.TagHandlerDelegate;
 import javax.faces.view.facelets.ValidatorConfig;
 import javax.faces.view.facelets.ValidatorHandler;
 
+import org.omnifaces.cdi.validator.ValidatorManager;
 import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredAttributes;
 import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandler;
 import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDelegate;
@@ -70,6 +72,14 @@ import org.omnifaces.util.Messages;
  * &lt;o:validator validatorId="javax.faces.LongRange" minimum="#{item.minimum}" maximum="#{item.maximum}"
  *     message="Please enter between #{item.minimum} and #{item.maximum} characters" /&gt;
  * </pre>
+ *
+ * <h3>JSF 2.3 compatibility</h3>
+ * <p>
+ * The <code>&lt;o:validator&gt;</code> is currently not compatible with validators which are managed via JSF 2.3's
+ * new <code>managed=true</code> attribute set on the {@link FacesValidator} annotation, at least not when using
+ * Mojarra. Internally, the converters are wrapped in another instance which doesn't have the needed setter methods
+ * specified. In order to get them to work with <code>&lt;o:validator&gt;</code>, the <code>managed=true</code>
+ * attribute needs to be removed, so that OmniFaces {@link ValidatorManager} will automatically manage them.
  *
  * @author Bauke Scholtz
  * @see DeferredTagHandlerHelper

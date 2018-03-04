@@ -22,6 +22,7 @@ import javax.faces.application.Application;
 import javax.faces.component.UIComponent;
 import javax.faces.component.ValueHolder;
 import javax.faces.context.FacesContext;
+import javax.faces.convert.FacesConverter;
 import javax.faces.view.facelets.ComponentHandler;
 import javax.faces.view.facelets.ConverterConfig;
 import javax.faces.view.facelets.ConverterHandler;
@@ -29,6 +30,7 @@ import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagAttribute;
 import javax.faces.view.facelets.TagHandlerDelegate;
 
+import org.omnifaces.cdi.converter.ConverterManager;
 import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredAttributes;
 import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandler;
 import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDelegate;
@@ -56,6 +58,14 @@ import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDeleg
  * <a href="http://docs.oracle.com/javaee/7/api/javax/faces/convert/package-summary.html">their javadocs</a>.
  * First go to the javadoc of the class of interest, then go to <code>CONVERTER_ID</code> in its field summary
  * and finally click the Constant Field Values link to see the value.
+ *
+ * <h3>JSF 2.3 compatibility</h3>
+ * <p>
+ * The <code>&lt;o:converter&gt;</code> is currently not compatible with converters which are managed via JSF 2.3's
+ * new <code>managed=true</code> attribute set on the {@link FacesConverter} annotation, at least not when using
+ * Mojarra. Internally, the converters are wrapped in another instance which doesn't have the needed setter methods
+ * specified. In order to get them to work with <code>&lt;o:converter&gt;</code>, the <code>managed=true</code>
+ * attribute needs to be removed, so that OmniFaces {@link ConverterManager} will automatically manage them.
  *
  * @author Bauke Scholtz
  * @see DeferredTagHandlerHelper
