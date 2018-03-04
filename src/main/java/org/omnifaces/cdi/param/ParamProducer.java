@@ -288,7 +288,7 @@ public class ParamProducer {
 	}
 
 	private static Converter getConverter(Param requestParameter, Class<?> targetType) {
-		Class<?> classIdentifier = requestParameter.converterClass() == Converter.class ? targetType : requestParameter.converterClass();
+		Object classIdentifier = requestParameter.converterClass() == Converter.class ? targetType : requestParameter.converterClass();
 		Converter converter = createConverter(coalesce(evaluateExpressionGet(requestParameter.converter()), classIdentifier));
 
 		if (converter != null) {
