@@ -25,6 +25,7 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
@@ -65,8 +66,16 @@ public class SocketSessionManager {
 	private static final AnnotationLiteral<Closed> SESSION_CLOSED = new AnnotationLiteral<Closed>() {
 		private static final long serialVersionUID = 1L;
 	};
+
+	private static final long TOMCAT_WEB_SOCKET_RETRY_TIMEOUT = 10; // Milliseconds.
+	private static final long TOMCAT_WEB_SOCKET_MAX_RETRIES = 100; // So, that's retrying for about 1 second.
 	private static final String WARNING_TOMCAT_WEB_SOCKET_BOMBED =
-		"Tomcat cannot handle concurrent push messages. A push message has been sent only after %s retries."
+		"Tomcat cannot handle concurrent push messages."
+			+ " A push message has been sent only after %s retries of " + TOMCAT_WEB_SOCKET_RETRY_TIMEOUT + "ms apart."
+			+ " Consider rate limiting sending push messages. For example, once every 500ms.";
+	private static final String ERROR_TOMCAT_WEB_SOCKET_BOMBED =
+		"Tomcat cannot handle concurrent push messages."
+			+ " A push message could NOT be sent after %s retries of " + TOMCAT_WEB_SOCKET_RETRY_TIMEOUT + "ms apart."
 			+ " Consider rate limiting sending push messages. For example, once every 500ms.";
 
 	private static volatile SocketSessionManager instance;
@@ -142,7 +151,9 @@ public class SocketSessionManager {
 			String json = Json.encode(message);
 
 			for (Session session : sessions) {
-				send(session, json, results, 0);
+				if (session.isOpen()) {
+					results.add(send(session, json, true));
+				}
 			}
 
 			return results;
@@ -151,26 +162,58 @@ public class SocketSessionManager {
 		return emptySet();
 	}
 
-	private void send(Session session, String text, Set<Future<Void>> results, int retries) {
-		if (session.isOpen()) {
-			try {
-				results.add(session.getAsyncRemote().sendText(text));
-
-				if (retries > 0 && logger.isLoggable(WARNING)) {
-					logger.log(WARNING, format(WARNING_TOMCAT_WEB_SOCKET_BOMBED, retries));
-				}
-			}
-			catch (IllegalStateException e) {
-				if (Hacks.isTomcatWebSocketBombed(session, e)) {
-					synchronized (session) {
-						send(session, text, results, retries + 1);
-					}
+	private Future<Void> send(Session session, String text, boolean retrySendTomcatWebSocket) {
+		try {
+			return session.getAsyncRemote().sendText(text);
+		}
+		catch (IllegalStateException e) {
+			if (Hacks.isTomcatWebSocketBombed(session, e)) {
+				if (retrySendTomcatWebSocket) {
+					return CompletableFuture.supplyAsync(() -> retrySendTomcatWebSocket(session, text));
 				}
 				else {
-					throw e;
+					return null;
 				}
 			}
+			else {
+				throw e;
+			}
 		}
+	}
+
+	private Void retrySendTomcatWebSocket(Session session, String text) {
+		int retries = 0;
+		Exception cause = null;
+
+		while (++retries < TOMCAT_WEB_SOCKET_MAX_RETRIES) {
+			try {
+				Thread.sleep(TOMCAT_WEB_SOCKET_RETRY_TIMEOUT);
+
+				if (!session.isOpen()) {
+					cause = new IllegalStateException("Too bad, session is now closed");
+					break;
+				}
+
+				Future<Void> result = send(session, text, false);
+
+				if (result == null) {
+					continue;
+				}
+
+				if (logger.isLoggable(WARNING)) {
+					logger.log(WARNING, format(WARNING_TOMCAT_WEB_SOCKET_BOMBED, retries));
+				}
+
+				return result.get();
+			}
+			catch (InterruptedException | ExecutionException e) {
+				Thread.currentThread().interrupt();
+				cause = e;
+				break;
+			}
+		}
+
+		throw new UnsupportedOperationException(format(ERROR_TOMCAT_WEB_SOCKET_BOMBED, retries), cause);
 	}
 
 	/**
