@@ -6,6 +6,13 @@ cache:
       - "$HOME/.m2/repository"
       - "$HOME/.sonar/cache"
 
+# Do build on specified branches only.
+branches:
+   only:
+   - 3.x
+   - 2.x
+   - 1.1x
+
 # Do integration test on configured servers.
 env:
    - SERVER=wildfly
@@ -19,7 +26,7 @@ deploy:
    script: mvn deploy -Dmaven.test.skip -s settings.xml
    skip_cleanup: true
    on:
-      branch: develop
+      all_branches: true
       condition: "$SERVER = wildfly"
 
 # Do static analysis on Sonar.
@@ -28,5 +35,5 @@ addons:
       token:
          secure: "FAYeUldpKOWLJ0DkZLH6T1Rey3Agi8YDTpjvjUA1XsisoEaf1Ga1wGWc/za+v8fv78ahu3HUwj+DBs4uwMgTRv9mmbFVoC+0KlWnCk0bo78YNHd31+ZmqzoshDDb1AOjaipc3l8NW9WpE4vqEO4Xmc4bryVBG9HCm+Ox4rqnI7ON65Aiqu7KJUgn0mj/vj1zGKwqWHWVfADgnS2PcriHRemyNv61BYWu1HaAeQDx6UhWGXAnKMXwhZQ6GtG/oiQavsoePrT/nhNaFBY9/j2Fena9flMenIej+PhIVjbXsaGVjAHCqsPg6jWsf5Kb2JI4S8UBWLZaCGMDMxsT9cYouJSBjaQgRTVwM7FrYHzDqNrG8DsNbS4gAIsuGMOqgvoAU9IT0Rm5DK+ho5sRzTKJz+Z/THA84I+9lIwPCw+s4JRcj4Ck7hZbmBociVuI20QM4tHiPlgxn4NnZkHqnyYtK4CtZu9xl9Fe0oRRHj5gMoHavgfdsTLjevp5wTRsA+5EzHcVLXIA8/BBpiL9Ir0+BJcbpljbzKAqGFqK4+h2vJILMwsuvAP04tT+1RKYUSHm7ZtQwKucDpZc5G05t4V3oXqpsoiqS9pkNljOZbwfBvEhA63zzOZnoU6BIe0EhbgP0mONq1OVVlAmfacZI5wTQtvdguw4I6VYkYXc4G580Ls="
       branches:
-         - develop
+         - 3.x
 after_deploy: "mvn sonar:sonar"
