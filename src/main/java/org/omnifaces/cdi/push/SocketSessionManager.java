@@ -185,32 +185,31 @@ public class SocketSessionManager {
 		int retries = 0;
 		Exception cause = null;
 
-		while (++retries < TOMCAT_WEB_SOCKET_MAX_RETRIES) {
-			try {
+		try {
+			while (++retries < TOMCAT_WEB_SOCKET_MAX_RETRIES) {
 				Thread.sleep(TOMCAT_WEB_SOCKET_RETRY_TIMEOUT);
 
 				if (!session.isOpen()) {
-					cause = new IllegalStateException("Too bad, session is now closed");
-					break;
+					throw new IllegalStateException("Too bad, session is now closed");
 				}
 
 				Future<Void> result = send(session, text, false);
 
-				if (result == null) {
-					continue;
-				}
+				if (result != null) {
+					if (logger.isLoggable(WARNING)) {
+						logger.log(WARNING, format(WARNING_TOMCAT_WEB_SOCKET_BOMBED, retries));
+					}
 
-				if (logger.isLoggable(WARNING)) {
-					logger.log(WARNING, format(WARNING_TOMCAT_WEB_SOCKET_BOMBED, retries));
+					return result.get();
 				}
-
-				return result.get();
 			}
-			catch (InterruptedException | ExecutionException e) {
-				Thread.currentThread().interrupt();
-				cause = e;
-				break;
-			}
+		}
+		catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+			cause = e;
+		}
+		catch (Exception e) {
+			cause = e;
 		}
 
 		throw new UnsupportedOperationException(format(ERROR_TOMCAT_WEB_SOCKET_BOMBED, retries), cause);
