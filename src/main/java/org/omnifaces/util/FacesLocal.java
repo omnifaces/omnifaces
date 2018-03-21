@@ -624,7 +624,7 @@ public final class FacesLocal {
 	 * @see Faces#getResourceBundles()
 	 */
 	public static Map<String, ResourceBundle> getResourceBundles(FacesContext context) {
-		Map<String, String> resourceBundles = FacesConfigXml.INSTANCE.getResourceBundles();
+		Map<String, String> resourceBundles = FacesConfigXml.instance().getResourceBundles();
 		Map<String, ResourceBundle> map = new HashMap<>(resourceBundles.size());
 
 		for (String var : resourceBundles.keySet()) {

@@ -463,7 +463,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	 * @since 1.5
 	 */
 	protected String findErrorPageLocation(FacesContext context, Throwable exception) {
-		return WebXml.INSTANCE.findErrorPageLocation(exception);
+		return WebXml.instance().findErrorPageLocation(exception);
 	}
 
 	/**

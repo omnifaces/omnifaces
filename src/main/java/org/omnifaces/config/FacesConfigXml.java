@@ -12,39 +12,15 @@
  */
 package org.omnifaces.config;
 
-import static org.omnifaces.util.Beans.getReference;
-import static org.omnifaces.util.Faces.getServletContext;
-import static org.omnifaces.util.Faces.hasContext;
-import static org.omnifaces.util.Utils.isEmpty;
-import static org.omnifaces.util.Utils.parseLocale;
-import static org.omnifaces.util.Xml.createDocument;
-import static org.omnifaces.util.Xml.getNodeList;
-import static org.omnifaces.util.Xml.getTextContent;
-
-import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import javax.faces.application.Application;
-import javax.servlet.ServletContext;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathExpressionException;
-import javax.xml.xpath.XPathFactory;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  * <p>
- * This configuration enum parses the <code>/WEB-INF/faces-config.xml</code> and all
+ * This configuration interface parses the <code>/WEB-INF/faces-config.xml</code> and all
  * <code>/META-INF/faces-config.xml</code> files found in the classpath and offers methods to obtain information from
  * them which is not available by the standard JSF API.
  *
@@ -53,67 +29,53 @@ import org.xml.sax.SAXException;
  * Some examples:
  * <pre>
  * // Get a mapping of all &lt;resource-bundle&gt; vars and base names.
- * Map&lt;String, String&gt; resourceBundles = FacesConfigXml.INSTANCE.getResourceBundles();
+ * Map&lt;String, String&gt; resourceBundles = FacesConfigXml.instance().getResourceBundles();
  * </pre>
  * <pre>
  * // Get an ordered list of all &lt;supported-locale&gt; values with &lt;default-locale&gt; as first item.
- * List&lt;Locale&gt; supportedLocales = FacesConfigXml.INSTANCE.getSupportedLocales();
+ * List&lt;Locale&gt; supportedLocales = FacesConfigXml.instance().getSupportedLocales();
+ * </pre>
+ * <p>
+ * Since OmniFaces 3.1, you can if necessary even inject it.
+ * <pre>
+ * &#64;Inject
+ * private FacesConfigXml facesConfigXml;
  * </pre>
  *
  * @author Bauke Scholtz
  * @author Michele Mariotti
  * @since 2.1
+ * @see FacesConfigXmlSingleton
  */
-public enum FacesConfigXml {
+public interface FacesConfigXml {
 
 	// Enum singleton -------------------------------------------------------------------------------------------------
 
 	/**
 	 * Returns the lazily loaded enum singleton instance.
+	 * @deprecated Since 3.1; Use {@link #instance()} instead.
 	 */
-	INSTANCE;
+	@Deprecated
+	public static final FacesConfigXml INSTANCE = new FacesConfigXml() {
 
-	// Private constants ----------------------------------------------------------------------------------------------
+		@Override
+		public Map<String, String> getResourceBundles() {
+			return FacesConfigXml.instance().getResourceBundles();
+		}
 
-	private static final String APP_FACES_CONFIG_XML =
-		"/WEB-INF/faces-config.xml";
-	private static final String LIB_FACES_CONFIG_XML =
-		"META-INF/faces-config.xml";
-	private static final String XPATH_RESOURCE_BUNDLE =
-		"application/resource-bundle";
-	private static final String XPATH_DEFAULT_LOCALE =
-		"application/locale-config/default-locale";
-	private static final String XPATH_SUPPORTED_LOCALE =
-		"application/locale-config/supported-locale";
-	private static final String XPATH_VAR =
-		"var";
-	private static final String XPATH_BASE_NAME =
-		"base-name";
-	private static final String ERROR_INITIALIZATION_FAIL =
-		"FacesConfigXml failed to initialize. Perhaps your faces-config.xml contains a typo?";
-
-	// Properties -----------------------------------------------------------------------------------------------------
-
-	private Map<String, String> resourceBundles;
-	private List<Locale> supportedLocales;
-
-	// Init -----------------------------------------------------------------------------------------------------------
+		@Override
+		public List<Locale> getSupportedLocales() {
+			return FacesConfigXml.instance().getSupportedLocales();
+		}
+	};
 
 	/**
-	 * Perform automatic initialization whereby the servlet context is obtained from CDI.
+	 * Returns the lazily loaded enum singleton instance.
+	 * @return The lazily loaded enum singleton instance.
+	 * @since 3.1
 	 */
-	private FacesConfigXml() {
-		ServletContext servletContext = hasContext() ? getServletContext() : getReference(ServletContext.class);
-
-		try {
-			Element facesConfigXml = loadFacesConfigXml(servletContext).getDocumentElement();
-			XPath xpath = XPathFactory.newInstance().newXPath();
-			resourceBundles = parseResourceBundles(facesConfigXml, xpath);
-			supportedLocales = parseSupportedLocales(facesConfigXml, xpath);
-		}
-		catch (Exception e) {
-			throw new IllegalStateException(ERROR_INITIALIZATION_FAIL, e);
-		}
+	public static FacesConfigXml instance() {
+		return FacesConfigXmlSingleton.INSTANCE;
 	}
 
 	// Getters --------------------------------------------------------------------------------------------------------
@@ -122,9 +84,7 @@ public enum FacesConfigXml {
 	 * Returns a mapping of all resource bundle base names by var.
 	 * @return A mapping of all resource bundle base names by var.
 	 */
-	public Map<String, String> getResourceBundles() {
-		return resourceBundles;
-	}
+	public Map<String, String> getResourceBundles();
 
 	/**
 	 * Returns an ordered list of all supported locales on this application, with the default locale as the first
@@ -135,68 +95,6 @@ public enum FacesConfigXml {
 	 * @see Application#getSupportedLocales()
 	 * @since 2.2
 	 */
-	public List<Locale> getSupportedLocales() {
-		return supportedLocales;
-	}
-
-	// Helpers --------------------------------------------------------------------------------------------------------
-
-	/**
-	 * Load, merge and return all <code>faces-config.xml</code> files found in the classpath
-	 * into a single {@link Document}.
-	 */
-	private static Document loadFacesConfigXml(ServletContext context) throws IOException, SAXException {
-		List<URL> facesConfigURLs = new ArrayList<>();
-		facesConfigURLs.add(context.getResource(APP_FACES_CONFIG_XML));
-		facesConfigURLs.addAll(Collections.list(Thread.currentThread().getContextClassLoader().getResources(LIB_FACES_CONFIG_XML)));
-		return createDocument(facesConfigURLs);
-	}
-
-	/**
-	 * Create and return a mapping of all resource bundle base names by var found in the given document.
-	 * @throws XPathExpressionException
-	 */
-	private static Map<String, String> parseResourceBundles(Element facesConfigXml, XPath xpath) throws XPathExpressionException {
-		Map<String, String> resourceBundles = new LinkedHashMap<>();
-		NodeList resourceBundleNodes = getNodeList(facesConfigXml, xpath, XPATH_RESOURCE_BUNDLE);
-
-		for (int i = 0; i < resourceBundleNodes.getLength(); i++) {
-			Node node = resourceBundleNodes.item(i);
-
-			String var = xpath.compile(XPATH_VAR).evaluate(node).trim();
-			String baseName = xpath.compile(XPATH_BASE_NAME).evaluate(node).trim();
-
-			if (!resourceBundles.containsKey(var)) {
-				resourceBundles.put(var, baseName);
-			}
-		}
-
-		return Collections.unmodifiableMap(resourceBundles);
-	}
-
-	/**
-	 * Create and return a list of default locale and all supported locales in same order as in the given document.
-	 * @throws XPathExpressionException
-	 */
-	private static List<Locale> parseSupportedLocales(Element facesConfigXml, XPath xpath) throws XPathExpressionException {
-		List<Locale> supportedLocales = new ArrayList<>();
-		String defaultLocale = xpath.compile(XPATH_DEFAULT_LOCALE).evaluate(facesConfigXml).trim();
-
-		if (!isEmpty(defaultLocale)) {
-			supportedLocales.add(parseLocale(defaultLocale));
-		}
-
-		NodeList supportedLocaleNodes = getNodeList(facesConfigXml, xpath, XPATH_SUPPORTED_LOCALE);
-
-		for (int i = 0; i < supportedLocaleNodes.getLength(); i++) {
-			Locale supportedLocale = parseLocale(getTextContent(supportedLocaleNodes.item(i)));
-
-			if (!supportedLocales.contains(supportedLocale)) {
-				supportedLocales.add(supportedLocale);
-			}
-		}
-
-		return Collections.unmodifiableList(supportedLocales);
-	}
+	public List<Locale> getSupportedLocales();
 
 }

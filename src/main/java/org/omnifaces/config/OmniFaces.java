@@ -16,6 +16,7 @@ import static java.util.ResourceBundle.getBundle;
 import static org.omnifaces.util.Faces.getLocale;
 import static org.omnifaces.util.Faces.getMessageBundle;
 
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 
@@ -43,7 +44,7 @@ public final class OmniFaces {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String VERSION = OmniFaces.class.getPackage().getSpecificationVersion().replaceAll("-\\d+$", "");
+	private static final String VERSION = Optional.ofNullable(OmniFaces.class.getPackage().getSpecificationVersion()).map(v -> v.replaceAll("-\\d+$", "")).orElse("DEVELOPMENT");
 	private static final boolean SNAPSHOT = VERSION.contains("-"); // -SNAPSHOT, -RCx
 	private static final Long STARTUP_TIME = System.currentTimeMillis();
 	private static final String DEFAULT_MESSAGE_BUNDLE = "org.omnifaces.messages";

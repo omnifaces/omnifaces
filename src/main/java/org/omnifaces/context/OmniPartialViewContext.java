@@ -123,7 +123,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 	}
 
 	private boolean redirectToFormLoginPageIfNecessary() {
-		String loginURL = WebXml.INSTANCE.getFormLoginPage();
+		String loginURL = WebXml.instance().getFormLoginPage();
 
 		if (loginURL == null) {
 			return false;
