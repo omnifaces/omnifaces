@@ -91,7 +91,7 @@ public abstract class ValidatorFamily extends UIComponentBase {
 	 * Validate our own component hierarchy.
 	 * @throws IllegalStateException When component hierarchy is wrong.
 	 */
-	protected abstract void validateHierarchy() throws IllegalStateException;
+	protected abstract void validateHierarchy();
 
 	/**
 	 * Perform the actual validation.

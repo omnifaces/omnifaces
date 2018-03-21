@@ -1341,9 +1341,7 @@ public final class Components {
 	 * @param parentType The parent type to be checked.
 	 * @throws IllegalStateException When the given component doesn't have any parent of the given type.
 	 */
-	public static <C extends UIComponent> void validateHasParent(UIComponent component, Class<C> parentType)
-		throws IllegalStateException
-	{
+	public static <C extends UIComponent> void validateHasParent(UIComponent component, Class<C> parentType) {
 		if (!isDevelopment()) {
 			return;
 		}
@@ -1382,9 +1380,7 @@ public final class Components {
 	 * @throws IllegalStateException When the given component does have a parent of the given type.
 	 * @since 2.5
 	 */
-	public static <C extends UIComponent> void validateHasNoParent(UIComponent component, Class<C> parentType)
-		throws IllegalStateException
-	{
+	public static <C extends UIComponent> void validateHasNoParent(UIComponent component, Class<C> parentType) {
 		if (!isDevelopment()) {
 			return;
 		}
@@ -1403,9 +1399,7 @@ public final class Components {
 	 * @throws IllegalStateException When the given component doesn't have any children of the given type.
 	 * @since 2.5
 	 */
-	public static <C extends UIComponent> void validateHasChild(UIComponent component, Class<C> childType)
-		throws IllegalStateException
-	{
+	public static <C extends UIComponent> void validateHasChild(UIComponent component, Class<C> childType) {
 		if (!isDevelopment()) {
 			return;
 		}
@@ -1424,9 +1418,7 @@ public final class Components {
 	 * @throws IllegalStateException When the given component has children of a different type.
 	 * @since 2.5
 	 */
-	public static <C extends UIComponent> void validateHasOnlyChildren(UIComponent component, Class<C> childType)
-		throws IllegalStateException
-	{
+	public static <C extends UIComponent> void validateHasOnlyChildren(UIComponent component, Class<C> childType) {
 		if (!isDevelopment() || component.getChildCount() == 0) {
 			return;
 		}

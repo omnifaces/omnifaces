@@ -202,7 +202,7 @@ public abstract class FileServlet extends HttpServlet {
 	 * @throws IllegalArgumentException When the request is mangled in such way that it's not recognizable as a valid
 	 * file request. The servlet will then return a HTTP 400 error.
 	 */
-	protected abstract File getFile(HttpServletRequest request) throws IllegalArgumentException;
+	protected abstract File getFile(HttpServletRequest request);
 
 	/**
 	 * Handles the case when the file is not found.
