@@ -28,9 +28,9 @@ import javax.faces.convert.Converter;
  * <p>
  * This converter offers you a template to do it transparently. To use it, just change your converters from:
  * <pre>
- * public class YourConverter implements Converter {
+ * public class YourConverter implements Converter&lt;YourEntity&gt; {
  *
- *     public Object getAsObject(FacesContext context, UIComponent component, String submittedValue) {
+ *     public YourEntity getAsObject(FacesContext context, UIComponent component, String submittedValue) {
  *         // ...
  *     }
  *
@@ -39,9 +39,9 @@ import javax.faces.convert.Converter;
  * </pre>
  * <p>to
  * <pre>
- * public class YourConverter extends ValueChangeConverter {
+ * public class YourConverter extends ValueChangeConverter&lt;YourEntity&gt; {
  *
- *     public Object getAsChangedObject(FacesContext context, UIComponent component, String submittedValue) {
+ *     public YourEntity getAsChangedObject(FacesContext context, UIComponent component, String submittedValue) {
  *         // ...
  *     }
  *
@@ -56,19 +56,21 @@ import javax.faces.convert.Converter;
  * @author Bauke Scholtz
  * @since 1.6
  */
-public abstract class ValueChangeConverter implements Converter<Object> {
+public abstract class ValueChangeConverter<T> implements Converter<T> {
 
 	/**
 	 * If the component is an instance of {@link EditableValueHolder} and the string representation of its old object
 	 * value is equal to the submitted value, then immediately return its old object value unchanged. Otherwise, invoke
 	 * {@link #getAsChangedObject(FacesContext, UIComponent, String)} which may in turn do the necessary possibly
 	 * expensive DAO operations.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 */
 	@Override
-	public Object getAsObject(FacesContext context, UIComponent component, String submittedValue) {
+	@SuppressWarnings("unchecked")
+	public T getAsObject(FacesContext context, UIComponent component, String submittedValue) {
 		if (component instanceof EditableValueHolder) {
 			String newStringValue = submittedValue;
-			Object oldObjectValue = ((EditableValueHolder) component).getValue();
+			T oldObjectValue = (T) ((EditableValueHolder) component).getValue();
 			String oldStringValue = getAsString(context, component, oldObjectValue);
 
 			if (Objects.equals(newStringValue, oldStringValue)) {
@@ -88,6 +90,6 @@ public abstract class ValueChangeConverter implements Converter<Object> {
 	 * @return The converted value, exactly like as when you use {@link #getAsObject(FacesContext, UIComponent, String)}
 	 * the usual way.
 	 */
-	public abstract Object getAsChangedObject(FacesContext context, UIComponent component, String submittedValue);
+	public abstract T getAsChangedObject(FacesContext context, UIComponent component, String submittedValue);
 
 }
