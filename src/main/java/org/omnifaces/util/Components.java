@@ -1359,9 +1359,7 @@ public final class Components {
 	 * @param parentType The parent type to be checked.
 	 * @throws IllegalStateException When the given component doesn't have a direct parent of the given type.
 	 */
-	public static <C extends UIComponent> void validateHasDirectParent(UIComponent component, Class<C> parentType)
-		throws IllegalStateException
-	{
+	public static <C extends UIComponent> void validateHasDirectParent(UIComponent component, Class<C> parentType) {
 		if (!isDevelopment()) {
 			return;
 		}
