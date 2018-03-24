@@ -12,8 +12,11 @@
  */
 package org.omnifaces.util;
 
+import static java.util.logging.Level.FINE;
+
 import java.lang.annotation.Annotation;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.enterprise.context.ContextNotActiveException;
 import javax.enterprise.context.spi.AlterableContext;
@@ -28,6 +31,8 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.CDI;
 import javax.enterprise.inject.spi.InjectionPoint;
+
+import org.omnifaces.taghandler.ImportConstants;
 
 /**
  * <p>
@@ -69,6 +74,8 @@ import javax.enterprise.inject.spi.InjectionPoint;
 @Typed
 public final class Beans {
 
+	private static final Logger logger = Logger.getLogger(Beans.class.getName());
+
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	private Beans() {
@@ -84,7 +91,13 @@ public final class Beans {
 	 * @see CDI#getBeanManager()
 	 */
 	public static BeanManager getManager() {
-		return CDI.current().getBeanManager();
+		try {
+			return CDI.current().getBeanManager();
+		}
+		catch (Exception | LinkageError e) {
+			logger.log(FINE, "Cannot get BeanManager from CDI.current(); falling back to JNDI.", e);
+			return JNDI.lookup("java:comp/BeanManager");
+		}
 	}
 
 	/**
