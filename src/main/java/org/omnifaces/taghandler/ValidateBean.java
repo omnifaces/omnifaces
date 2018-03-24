@@ -414,7 +414,10 @@ public class ValidateBean extends TagHandler {
 
 		if (!violations.isEmpty()) {
 			if ("@violating".equals(showMessageFor)) {
-				invalidateInputsByPropertyPathAndShowMessages(context, form, actualBean, violations, clientIds);
+				invalidateInputsByPropertyPathAndShowMessages(context, form, actualBean, violations);
+			}
+			else if (showMessageFor.charAt(0) != '@') {
+				invalidateInputsByShowMessageForAndShowMessages(context, form, violations, showMessageFor);
 			}
 			else {
 				invalidateInputsByClientIdsAndShowMessages(context, form, violations, clientIds, showMessageFor);
@@ -490,19 +493,32 @@ public class ValidateBean extends TagHandler {
 		return copier;
 	}
 
-	private static void invalidateInputsByPropertyPathAndShowMessages(FacesContext context, UIForm form, Object bean, Set<ConstraintViolation<?>> violations, Set<String> clientIds) {
+	private static void invalidateInputsByPropertyPathAndShowMessages(FacesContext context, UIForm form, Object bean, Set<ConstraintViolation<?>> violations) {
 		for (ConstraintViolation<?> violation : violations) {
 			forEachInputWithMatchingBase(context, form, bean, violation.getPropertyPath().toString(), input -> {
 				context.validationFailed();
 				input.setValid(false);
 				String clientId = input.getClientId(context);
 				addError(clientId, violation.getMessage(), getLabel(input));
-				clientIds.remove(clientId);
 			});
 		}
 	}
 
-	private static void invalidateInputsByClientIdsAndShowMessages(FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, Set<String> clientIds, String showMessageFor) {
+	private static void invalidateInputsByShowMessageForAndShowMessages(FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, String showMessageFor) {
+		for (String forId : showMessageFor.split("\\s+")) {
+			UIComponent component = form.findComponent(forId);
+			context.validationFailed();
+
+			if (component instanceof UIInput) {
+				((UIInput) component).setValid(false);
+			}
+
+			String clientId = component.getClientId(context);
+			addErrors(clientId, violations, getLabel(component));
+		}
+	}
+
+	private static void invalidateInputsByClientIdsAndShowMessages(final FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, Set<String> clientIds, String showMessageFor) {
 		context.validationFailed();
 		StringBuilder labels = new StringBuilder();
 
