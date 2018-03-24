@@ -85,6 +85,10 @@ public class SelectItemsIndexConverter implements Converter {
 
 	@Override
 	public Object getAsObject(FacesContext context, UIComponent component, String submittedValue) {
+		if (isEmpty(submittedValue)) {
+			return null; // Work around for MyFaces 2.0.x bug.
+		}
+
 		List<Object> selectItemValues = SelectItemsUtils.collectAllValuesFromSelectItems(context, component);
 
 		try {
