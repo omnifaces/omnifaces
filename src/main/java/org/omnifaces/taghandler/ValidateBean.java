@@ -427,7 +427,6 @@ public class ValidateBean extends TagHandler {
 		Set<ConstraintViolation<?>> violations = violationsRaw;
 
 		if (!violations.isEmpty()) {
-			context.validationFailed();
 			String showMessagesFor = showMessageFor;
 
 			if ("@violating".equals(showMessageFor)) {
@@ -436,11 +435,15 @@ public class ValidateBean extends TagHandler {
 			}
 
 			if (!violations.isEmpty()) {
-				String labels = invalidateInputsByClientIdsAndCollectLabels(context, form, clientIds);
-				showMessages(context, form, violations, clientIds, labels, showMessagesFor);
+				if (showMessagesFor.charAt(0) != '@') {
+					invalidateInputsByShowMessageForAndShowMessages(context, form, violations, showMessagesFor);
+				}
+				else {
+					invalidateInputsByClientIdsAndShowMessages(context, form, violations, clientIds, showMessagesFor);
+				}
 			}
 
-			if (renderResponseOnFail) {
+			if (context.isValidationFailed() && renderResponseOnFail) {
 				context.renderResponse();
 			}
 		}
@@ -515,6 +518,7 @@ public class ValidateBean extends TagHandler {
 
 		for (final ConstraintViolation<?> violation : violations) {
 			forEachInputWithMatchingBase(context, form, bean, violation.getPropertyPath().toString(), new Callback.WithArgument<UIInput>() { @Override public void invoke(UIInput input) {
+				context.validationFailed();
 				input.setValid(false);
 				String clientId = input.getClientId(context);
 				addError(clientId, violation.getMessage(), getLabel(input));
@@ -526,7 +530,22 @@ public class ValidateBean extends TagHandler {
 		return remainingViolations;
 	}
 
-	private static String invalidateInputsByClientIdsAndCollectLabels(final FacesContext context, UIForm form, Set<String> clientIds) {
+	private static void invalidateInputsByShowMessageForAndShowMessages(FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, String showMessageFor) {
+		for (String forId : showMessageFor.split("\\s+")) {
+			UIComponent component = form.findComponent(forId);
+			context.validationFailed();
+
+			if (component instanceof UIInput) {
+				((UIInput) component).setValid(false);
+			}
+
+			String clientId = component.getClientId(context);
+			addErrors(clientId, violations, getLabel(component));
+		}
+	}
+
+	private static void invalidateInputsByClientIdsAndShowMessages(final FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, Set<String> clientIds, String showMessageFor) {
+		context.validationFailed();
 		final StringBuilder labels = new StringBuilder();
 
 		if (!clientIds.isEmpty()) {
@@ -541,7 +560,7 @@ public class ValidateBean extends TagHandler {
 			}});
 		}
 
-		return labels.toString();
+		showMessages(context, form, violations, clientIds, labels.toString(), showMessageFor);
 	}
 
 	private static void showMessages(FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, Set<String> clientIds, String labels, String showMessagesFor) {
