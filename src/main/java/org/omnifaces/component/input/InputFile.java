@@ -22,6 +22,7 @@ import static org.omnifaces.util.Ajax.update;
 import static org.omnifaces.util.Components.getMessageComponent;
 import static org.omnifaces.util.Components.getMessagesComponent;
 import static org.omnifaces.util.Components.validateHasParent;
+import static org.omnifaces.util.Faces.getLocale;
 import static org.omnifaces.util.Faces.isDevelopment;
 import static org.omnifaces.util.Faces.isRenderResponse;
 import static org.omnifaces.util.FacesLocal.getMimeType;
@@ -535,7 +536,7 @@ public class InputFile extends HtmlInputFile {
 		String param = null;
 
 		if (accept != null) {
-			String contentType = isEmpty(fileName) ? part.getContentType() : getMimeType(context, fileName);
+			String contentType = isEmpty(fileName) ? part.getContentType() : getMimeType(context, fileName.toLowerCase(getLocale()));
 
 			if (contentType == null || !contentType.matches(accept.trim().replace("*", ".*").replaceAll("\\s*,\\s*", "|"))) {
 				message = getAcceptMessage();
