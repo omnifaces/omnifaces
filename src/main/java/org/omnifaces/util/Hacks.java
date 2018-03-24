@@ -429,7 +429,7 @@ public final class Hacks {
 			}
 
 			Object stateCache = invokeMethod(manager, "getStateCache", context);
-			Integer stateId = invokeMethod(stateCache, "getServerStateId", context, state);
+			Object stateId = invokeMethod(stateCache, "getServerStateId", context, state);
 			Serializable key = invokeMethod(invokeMethod(stateCache, "getSessionViewStorageFactory"), "createSerializedViewKey", context, viewId, stateId);
 
 			List<Serializable> keys = accessField(viewCollection, "_keys");
