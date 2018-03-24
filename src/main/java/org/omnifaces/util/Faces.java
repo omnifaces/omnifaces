@@ -1662,7 +1662,7 @@ public final class Faces {
 	 * @see HttpServletRequest#authenticate(HttpServletResponse)
 	 * @since 1.4
 	 */
-	public static boolean authenticate() throws ServletException, IOException {
+	public static boolean authenticate() throws ServletException {
 		return FacesLocal.authenticate(getContext());
 	}
 

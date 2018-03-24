@@ -1165,8 +1165,13 @@ public final class FacesLocal {
 	/**
 	 * @see Faces#authenticate()
 	 */
-	public static boolean authenticate(FacesContext context) throws ServletException, IOException {
-		return getRequest(context).authenticate(getResponse(context));
+	public static boolean authenticate(FacesContext context) throws ServletException {
+		try {
+			return getRequest(context).authenticate(getResponse(context));
+		}
+		catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 	/**
