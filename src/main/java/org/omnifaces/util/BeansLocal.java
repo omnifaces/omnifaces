@@ -78,9 +78,8 @@ public final class BeansLocal {
 	}
 
 	/**
-	 * @see Beans#resolve(Class, Annotation...)
+	 * @see Beans#resolveExact(Class, Annotation...)
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> Bean<T> resolveExact(BeanManager beanManager, Class<T> beanClass, Annotation... qualifiers) {
 		Bean<T> bean = resolve(beanManager, beanClass, qualifiers);
 		return (bean != null) && (bean.getBeanClass() == beanClass) ? bean : null;

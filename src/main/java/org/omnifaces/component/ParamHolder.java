@@ -25,6 +25,7 @@ import org.omnifaces.util.Faces;
  * converted to {@link String}. This is used in among others the {@link Faces#getBookmarkableURL(String, java.util.Collection, boolean)}.
  *
  * @author Bauke Scholtz
+ * @param <T> The type of the value.
  * @since 1.7
  */
 public interface ParamHolder<T> extends ValueHolder {

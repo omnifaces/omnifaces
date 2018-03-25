@@ -1045,19 +1045,19 @@ public final class Components {
 	 * disabled.
 	 * @since 2.1
 	 */
-	public static List<ParamHolder> getParams(UIComponent component) {
+	public static List<ParamHolder<?>> getParams(UIComponent component) {
 		if (component.getChildCount() == 0) {
 			return Collections.emptyList();
 		}
 
-		List<ParamHolder> params = new ArrayList<>(component.getChildCount());
+		List<ParamHolder<?>> params = new ArrayList<>(component.getChildCount());
 
 		for (UIComponent child : component.getChildren()) {
 			if (child instanceof UIParameter) {
 				UIParameter param = (UIParameter) child;
 
 				if (!isEmpty(param.getName()) && !param.isDisable()) {
-					params.add(new SimpleParam(param));
+					params.add(new SimpleParam<>(param));
 				}
 			}
 		}
@@ -1092,7 +1092,7 @@ public final class Components {
 			params = new LinkedHashMap<>(0);
 		}
 
-		for (ParamHolder param : getParams(component)) {
+		for (ParamHolder<?> param : getParams(component)) {
 			Object value = param.getValue();
 
 			if (isEmpty(value)) {

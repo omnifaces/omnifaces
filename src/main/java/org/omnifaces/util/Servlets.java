@@ -365,10 +365,10 @@ public final class Servlets {
 	 * @return The parameter values list as request query string.
 	 * @since 2.2
 	 */
-	public static String toQueryString(List<ParamHolder> params) {
+	public static String toQueryString(List<ParamHolder<?>> params) {
 		StringBuilder queryString = new StringBuilder();
 
-		for (ParamHolder param : params) {
+		for (ParamHolder<?> param : params) {
 			if (isEmpty(param.getName())) {
 				continue;
 			}

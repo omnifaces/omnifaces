@@ -331,6 +331,7 @@ public final class FacesViews {
 	 * Register a view handler that transforms a view id with extension back to an extensionless one.
 	 * This is invoked by {@link ApplicationProcessor}, because the {@link Application} has to be available.
 	 * @param servletContext The involved servlet context.
+	 * @param application The involved faces application.
 	 */
 	public static void registerViewHander(ServletContext servletContext, Application application) {
 		if (isFacesViewsEnabled(servletContext) && !isEmpty(getEncounteredExtensions(servletContext))) {
