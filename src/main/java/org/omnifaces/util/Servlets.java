@@ -365,7 +365,7 @@ public final class Servlets {
 	 * @return The parameter values list as request query string.
 	 * @since 2.2
 	 */
-	public static String toQueryString(List<ParamHolder<?>> params) {
+	public static String toQueryString(List<? extends ParamHolder<?>> params) {
 		StringBuilder queryString = new StringBuilder();
 
 		for (ParamHolder<?> param : params) {
@@ -373,14 +373,14 @@ public final class Servlets {
 				continue;
 			}
 
-			Object value = param.getValue();
+			String value = param.getValue();
 
 			if (value != null) {
 				if (queryString.length() > 0) {
 					queryString.append("&");
 				}
 
-				queryString.append(encodeURL(param.getName())).append("=").append(encodeURL(value.toString()));
+				queryString.append(encodeURL(param.getName())).append("=").append(encodeURL(value));
 			}
 		}
 

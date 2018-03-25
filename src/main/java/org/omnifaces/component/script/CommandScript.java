@@ -240,7 +240,7 @@ public class CommandScript extends UICommand {
 	protected void encodeOptions(FacesContext context) throws IOException {
 		ResponseWriter writer = context.getResponseWriter();
 
-		for (ParamHolder<?> param : getParams(this)) {
+		for (ParamHolder<Object> param : getParams(this)) {
 			writer.append("o[").append(Json.encode(param.getName())).append("]=")
 				.append(Json.encode(param.getValue())).append(";");
 		}
