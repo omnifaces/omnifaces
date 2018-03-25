@@ -21,13 +21,13 @@ import org.omnifaces.util.Faces;
 /**
  * This interface represents a (request) parameter holder which extends {@link ValueHolder} with {@link #getName()}
  * method to obtain the parameter name associated with the parameter value and changes the {@link #getLocalValue()}
- * method to return the original, unconverted value and changes the {@link #getValue()} method to return the converted
- * value. This is used in among others the {@link Faces#getBookmarkableURL(String, java.util.Collection, boolean)}.
+ * method to return the original, unconverted value and changes the {@link #getValue()} method to return the value
+ * converted to {@link String}. This is used in among others the {@link Faces#getBookmarkableURL(String, java.util.Collection, boolean)}.
  *
  * @author Bauke Scholtz
  * @since 1.7
  */
-public interface ParamHolder extends ValueHolder {
+public interface ParamHolder<T> extends ValueHolder {
 
 	/**
 	 * Returns the name of the parameter.
@@ -40,17 +40,24 @@ public interface ParamHolder extends ValueHolder {
 	 * @return The original, unconverted value of the parameter.
 	 */
 	@Override
-	Object getLocalValue();
+	T getLocalValue();
 
 	/**
-	 * Returns the converted value of the parameter. If the converter is set, or if any converter is available by
+	 * Returns the converter, if any.
+	 * @return The converter, if any.
+	 */
+	@Override
+	Converter<T> getConverter();
+
+	/**
+	 * Returns the value of the parameter as {@link String}. If the converter is set, or if any converter is available by
 	 * {@link Application#createConverter(Class)}, passing the value's class, then return the result of
 	 * {@link Converter#getAsString(javax.faces.context.FacesContext, javax.faces.component.UIComponent, Object)},
-	 * otherwise return the original value of the parameter.
-	 * @return The converted value of the parameter, or the original value if the converter is not available.
+	 * otherwise return the {@link Object#toString()} of the value.
+	 * @return The value of the parameter as {@link String}.
 	 * @see Converter#getAsString(javax.faces.context.FacesContext, javax.faces.component.UIComponent, Object)
 	 */
 	@Override
-	Object getValue();
+	String getValue();
 
 }

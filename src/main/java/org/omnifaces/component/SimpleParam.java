@@ -22,16 +22,16 @@ import javax.faces.convert.Converter;
  * to convert the object value to string.
  *
  * @author Bauke Scholtz
+ * @param <T> The type of the value.
  * @since 1.7
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
-public class SimpleParam implements ParamHolder {
+public class SimpleParam<T> implements ParamHolder<T> {
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
 	private String name;
-	private Object value;
-	private Converter converter;
+	private T value;
+	private Converter<T> converter;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -47,7 +47,7 @@ public class SimpleParam implements ParamHolder {
 	 * @param name The parameter name.
 	 * @param value The parameter value.
 	 */
-	public SimpleParam(String name, Object value) {
+	public SimpleParam(String name, T value) {
 		this.name = name;
 		this.value = value;
 	}
@@ -58,7 +58,7 @@ public class SimpleParam implements ParamHolder {
 	 * @param value The parameter value.
 	 * @param converter The converter.
 	 */
-	public SimpleParam(String name, Object value, Converter converter) {
+	public SimpleParam(String name, T value, Converter<T> converter) {
 		this(name, value);
 		this.converter = converter;
 	}
@@ -66,18 +66,20 @@ public class SimpleParam implements ParamHolder {
 	/**
 	 * Construct a simple param with name and value of given {@link UIParameter} component.
 	 * @param param The {@link UIParameter} to copy.
+	 * @throws ClassCastException When actual parameter value is not <code>T</code>.
 	 * @since 2.2
 	 */
+	@SuppressWarnings("unchecked")
 	public SimpleParam(UIParameter param) {
 		name = param.getName();
 
 		if (param instanceof ParamHolder) {
-			ParamHolder holder = (ParamHolder) param;
+			ParamHolder<T> holder = (ParamHolder<T>) param;
 			value = holder.getLocalValue();
 			converter = holder.getConverter();
 		}
 		else {
-			value = param.getValue();
+			value = (T) param.getValue();
 		}
 	}
 
@@ -86,7 +88,7 @@ public class SimpleParam implements ParamHolder {
 	 * @param param The {@link ParamHolder} to copy.
 	 * @since 2.2
 	 */
-	public SimpleParam(ParamHolder param) {
+	public SimpleParam(ParamHolder<T> param) {
 		this(param.getName(), param.getLocalValue(), param.getConverter());
 	}
 
@@ -106,12 +108,13 @@ public class SimpleParam implements ParamHolder {
 	}
 
 	@Override
-	public Object getLocalValue() {
+	public T getLocalValue() {
 		return value;
 	}
 
 	@Override
-	public Object getValue() {
+	@SuppressWarnings("unchecked") // Application#createConverter()
+	public String getValue() {
 		FacesContext context = FacesContext.getCurrentInstance();
 
 		if (converter == null && value != null) {
@@ -125,21 +128,26 @@ public class SimpleParam implements ParamHolder {
 			return converter.getAsString(context, component, value);
 		}
 		else {
-			return value;
+			return value != null ? value.toString() : null;
 		}
 	}
 
+	/**
+	 * @throws ClassCastException When actual value is not <code>T</code>.
+	 */
 	@Override
+	@SuppressWarnings("unchecked")
 	public void setValue(Object value) {
-		this.value = value;
+		this.value = (T) value;
 	}
 
 	@Override
-	public Converter getConverter() {
+	public Converter<T> getConverter() {
 		return converter;
 	}
 
 	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void setConverter(Converter converter) {
 		this.converter = converter;
 	}
