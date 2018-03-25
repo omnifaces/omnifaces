@@ -45,12 +45,24 @@ public class FacesViewsIT extends OmniFacesIT {
 	}
 
 	@Test
-	public void test() {
+	public void testWelcomeFile() {
 		verify200("FacesViewsIT", "");
 
 		guardHttp(formSubmit).click();
 		verify200("FacesViewsIT", "");
 
+		open("FacesViewsIT.xhtml");
+		verify200("FacesViewsIT", "");
+
+		guardHttp(formSubmit).click();
+		verify200("FacesViewsIT", "");
+
+		open("FacesViewsIT/");
+		verify404("FacesViewsIT/");
+	}
+
+	@Test
+	public void testOtherPage() {
 		open("FacesViewsITOtherPage");
 		verify200("FacesViewsITOtherPage", "FacesViewsITOtherPage");
 
@@ -65,6 +77,30 @@ public class FacesViewsIT extends OmniFacesIT {
 
 		open("FacesViewsITOtherPage/");
 		verify404("FacesViewsITOtherPage/");
+	}
+
+	@Test
+	public void testFolderWithPeriod() {
+		open("folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
+		verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
+
+		guardHttp(formSubmit).click();
+		verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
+
+		open("folder.with.period/FacesViewsITOtherPageInFolderWithPeriod.xhtml");
+		verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
+
+		guardHttp(formSubmit).click();
+		verify200("FacesViewsITOtherPageInFolderWithPeriod", "folder.with.period/FacesViewsITOtherPageInFolderWithPeriod");
+
+		open("folder.with.period/FacesViewsITOtherPageInFolderWithPeriod/");
+		verify404("folder.with.period/FacesViewsITOtherPageInFolderWithPeriod/");
+	}
+
+	@Test
+	public void testNonExistingPage() {
+		open("FacesViewsITNonExistingPage");
+		verify404("FacesViewsITNonExistingPage");
 
 		open("FacesViewsITNonExistingPage");
 		verify404("FacesViewsITNonExistingPage");

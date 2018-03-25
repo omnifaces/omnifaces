@@ -103,8 +103,13 @@ public final class ResourcePaths {
 		return extension;
 	}
 
-	public static boolean isExtensionless(final String viewId) {
-		return viewId != null && !viewId.contains(".");
+	/**
+	 * Checks if given resource path is extensionless.
+	 * @param resourcePath The resource path to check.
+	 * @return <code>true</code> if the resource path is extensionless, false otherwise.
+	 */
+	public static boolean isExtensionless(String resourcePath) {
+		return resourcePath != null && !resourcePath.substring(resourcePath.lastIndexOf('/') + 1).contains(".");
 	}
 
 	/**
