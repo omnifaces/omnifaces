@@ -32,8 +32,6 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.CDI;
 import javax.enterprise.inject.spi.InjectionPoint;
 
-import org.omnifaces.taghandler.ImportConstants;
-
 /**
  * <p>
  * Collection of utility methods for the CDI API that are mainly shortcuts for obtaining stuff from the

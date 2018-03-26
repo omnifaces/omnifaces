@@ -46,7 +46,6 @@ public class ValidateBeanITDefaultBean {
 	}
 
 	public void setInput(String input) {
-		System.out.println("ValidateBeanITDefaultBean.setInput() " + input);
 		this.input = input;
 	}
 

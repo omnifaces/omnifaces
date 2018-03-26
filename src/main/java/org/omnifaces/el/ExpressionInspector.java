@@ -260,6 +260,11 @@ public final class ExpressionInspector {
 			return inspectorElResolver;
 		}
 
+		@Override
+		public Object convertToType(Object value, Class<?> type) {
+			return value;
+		}
+
 		public InspectorPass getPass() {
 			return inspectorElResolver.getPass();
 		}
@@ -338,11 +343,7 @@ public final class ExpressionInspector {
 				lastProperty = (property instanceof FinalBaseHolder) ? ((FinalBaseHolder) property).getBase() : property;
 
 				context.setPropertyResolved(true);
-
-				// Normally, we'd return ValueExpressionType.PROPERTY here, but this causes trouble with EL coercion.
-				// TODO: When on EL 3.0, implement InspectorELContext#convertToType() to always return original value,
-				// so we can "nicely" return ValueExpressionType.PROPERTY here.
-				return null;
+				return ValueExpressionType.PROPERTY;
 			}
 
 			checkSubchainStarted(base);
