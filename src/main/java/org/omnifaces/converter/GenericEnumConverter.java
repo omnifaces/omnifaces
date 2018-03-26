@@ -70,11 +70,27 @@ import javax.faces.convert.FacesConverter;
  * <p><strong>See also</strong>:
  * <br><a href="http://stackoverflow.com/q/3822058/157882">Use enum in &lt;h:selectManyCheckbox&gt;</a>
  *
+ * <h3>JSF 2.3</h3>
+ * <p>
+ * This converter is not necessary anymore since JSF 2.3 thanks to the fixes in
+ * <a href="https://github.com/javaee/javaserverfaces-spec/issues/1422">issue 1422</a>.
+ * <pre>
+ * &lt;h:selectManyCheckbox value="#{bean.selectedEnums}"&gt;
+ *     &lt;f:selectItems value="#{bean.availableEnums}" /&gt;
+ * &lt;/h:selectManyCheckbox&gt;
+ * </pre>
+ * <p>
+ * However, when you're having a valueless input component, then this converter may be still useful.
+ * <pre>
+ * &lt;h:selectManyCheckbox converter="omnifaces.GenericEnumConverter"&gt;
+ *     &lt;f:selectItems value="#{bean.availableEnums}" /&gt;
+ * &lt;/h:selectManyCheckbox&gt;
+ * </pre>
+ *
+ *
  * @author Bauke Scholtz
  * @since 1.2
- * @deprecated Since 3.0 as this has been fixed in JSF 2.3 as per https://github.com/javaee/javaserverfaces-spec/issues/1422
  */
-@Deprecated
 @FacesConverter(value = "omnifaces.GenericEnumConverter")
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class GenericEnumConverter implements Converter<Enum> {
