@@ -41,7 +41,7 @@ import org.omnifaces.util.Components;
  * {@link UIMessages} components within the current {@link UIForm}. This is particularly useful when you have a relatively large form and
  * would like to Ajax-update only the message components when submitting the form.
  * <pre>
- * &lt;form id="form"&gt;
+ * &lt;h:form id="form"&gt;
  *     &lt;h:inputText id="input1" ... /&gt;
  *     &lt;h:message id="m_input1" for="input1" /&gt;
  *     &lt;h:inputText id="input2" ... /&gt;
