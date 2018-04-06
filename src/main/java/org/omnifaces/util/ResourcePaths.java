@@ -74,8 +74,7 @@ public final class ResourcePaths {
 	 * @return The resource path without its extension, of as-is if it doesn't have an extension.
 	 */
 	public static String stripExtension(String resourcePath) {
-		int lastPeriod = resourcePath.lastIndexOf(EXTENSION_SEPARATOR);
-		return (lastPeriod != -1) ? resourcePath.substring(0, lastPeriod) : resourcePath;
+		return isExtensionless(resourcePath) ? resourcePath : resourcePath.substring(0, resourcePath.lastIndexOf(EXTENSION_SEPARATOR));
 	}
 
 	/**
@@ -85,8 +84,7 @@ public final class ResourcePaths {
 	 * @return the extension of the resource path, or null if it doesn't have an extension.
 	 */
 	public static String getExtension(String resourcePath) {
-		int lastPeriod = resourcePath.lastIndexOf(EXTENSION_SEPARATOR);
-		return (lastPeriod != -1) ? resourcePath.substring(lastPeriod) : null;
+		return isExtensionless(resourcePath) ? null : resourcePath.substring(resourcePath.lastIndexOf(EXTENSION_SEPARATOR));
 	}
 
 	/**
