@@ -63,6 +63,12 @@ import org.omnifaces.util.Components;
  * This keyword resolver is already registered by OmniFaces own <code>faces-config.xml</code> and thus gets auto-initialized when the
  * OmniFaces JAR is bundled in a web application, so end-users do not need to register this keyword resolver explicitly themselves.
  *
+ * <h3>Compatibility</h3>
+ * <p>
+ * This keyword resolver is only compatible with <code>&lt;f:ajax&gt;</code> of Mojarra 2.3.4 or newer.
+ * This keyword resolver is not compatible with <code>&lt;p:ajax&gt;</code> of PrimeFaces 6.x.
+ * It's only compatible with a PrimeFaces version designed specifically for JSF 2.3.
+ *
  * @author Bauke Scholtz
  * @since 3.1
  */
