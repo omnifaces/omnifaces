@@ -117,7 +117,7 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 			originalViewId = getRequestAttribute(context, FACES_VIEWS_ORIGINAL_SERVLET_PATH);
 		}
 
-		return isExtensionless(originalViewId);
+		return originalViewId != null && isExtensionless(originalViewId);
 	}
 
 	private static String removeExtensionIfNecessary(ServletContext servletContext, String uri, String viewId) {
