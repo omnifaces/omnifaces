@@ -73,10 +73,14 @@ import org.omnifaces.util.MapWrapper;
  * runtime (no, not compiletime as that's just not possible in EL) check during retrieving the constant value.
  * If a constant value doesn't exist, then an <code>IllegalArgumentException</code> will be thrown.
  *
+ * <h3>JSF 2.3</h3>
+ * <p>
+ * JSF 2.3 also offers a <code>&lt;f:importConstants&gt;</code>, however it requires being placed in
+ * <code>&lt;f:metadata&gt;</code> which may not be appropriate when you intend to import constants only from
+ * a include, tagfile or a composite component.
+ *
  * @author Bauke Scholtz
- * @deprecated Since 3.0 as this has been added to JSF 2.3 as <code>f:importConstants</code>.
  */
-@Deprecated
 public class ImportConstants extends TagHandler {
 
 	// Constants ------------------------------------------------------------------------------------------------------
