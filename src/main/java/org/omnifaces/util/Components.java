@@ -1040,17 +1040,18 @@ public final class Components {
 	 * Returns an unmodifiable list with all child {@link UIParameter} components (<code>&lt;f|o:param&gt;</code>) of
 	 * the given parent component as a list of {@link ParamHolder} instances. Those with <code>disabled=true</code> and
 	 * an empty name are skipped.
+	 * @param <T> The type of the param value.
 	 * @param component The parent component to retrieve all child {@link UIParameter} components from.
 	 * @return An unmodifiable list with all child {@link UIParameter} components having a non-empty name and not
 	 * disabled.
 	 * @since 2.1
 	 */
-	public static List<ParamHolder<Object>> getParams(UIComponent component) {
+	public static <T> List<ParamHolder<T>> getParams(UIComponent component) {
 		if (component.getChildCount() == 0) {
 			return Collections.emptyList();
 		}
 
-		List<ParamHolder<Object>> params = new ArrayList<>(component.getChildCount());
+		List<ParamHolder<T>> params = new ArrayList<>(component.getChildCount());
 
 		for (UIComponent child : component.getChildren()) {
 			if (child instanceof UIParameter) {
