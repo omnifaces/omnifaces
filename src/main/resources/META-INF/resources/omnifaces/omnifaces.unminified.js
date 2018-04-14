@@ -15,4 +15,12 @@
  * 
  * @author Bauke Scholtz
  */
-var OmniFaces = OmniFaces || {};
+var OmniFaces = OmniFaces || {
+	
+	// "Constant" fields ----------------------------------------------------------------------------------------------
+
+	EVENT: "omnifaces.event",
+	VIEW_STATE_PARAM: "javax.faces.ViewState",
+	CLIENT_WINDOW_PARAM: "javax.faces.ClientWindow"
+	
+};

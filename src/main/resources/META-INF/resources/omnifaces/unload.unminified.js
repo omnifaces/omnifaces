@@ -23,7 +23,6 @@ OmniFaces.Unload = (function(Util, navigator, window, document) {
 
 	// "Constant" fields ----------------------------------------------------------------------------------------------
 
-	var VIEW_STATE_PARAM = "javax.faces.ViewState";
 	var ERROR_MISSING_FORM = "OmniFaces @ViewScoped: cannot find a JSF form in the document."
 		+ " Unload will not work. Either add a JSF form, or use @RequestScoped instead.";
 
@@ -48,7 +47,7 @@ OmniFaces.Unload = (function(Util, navigator, window, document) {
 		}
 
 		if (id == null) {
-			var form = getFacesForm();
+			var form = Util.getFacesForm();
 
 			if (!form) {
 				if (window.jsf && jsf.getProjectStage() == "Development" && window.console && console.error) {
@@ -66,7 +65,7 @@ OmniFaces.Unload = (function(Util, navigator, window, document) {
 
 				try {
 					var url = form.action;
-					var query = "omnifaces.event=unload&id=" + id + "&" + VIEW_STATE_PARAM + "=" + encodeURIComponent(form[VIEW_STATE_PARAM].value);
+					var query = OmniFaces.EVENT + "=unload&id=" + id + "&" + OmniFaces.VIEW_STATE_PARAM + "=" + encodeURIComponent(form[OmniFaces.VIEW_STATE_PARAM].value);
 					var contentType = "application/x-www-form-urlencoded";
 
 					if (navigator.sendBeacon) {
@@ -108,22 +107,6 @@ OmniFaces.Unload = (function(Util, navigator, window, document) {
 	 */
 	self.reenable = function() {
 		disabled = false;
-	}
-
-	// Private static functions ---------------------------------------------------------------------------------------
-
-	/**
-	 * Get the first JSF form containing view state param from the current document.
-	 * @return {HTMLFormElement} The first JSF form of the current document.
-	 */
-	function getFacesForm() {
-		for (var i = 0; i < document.forms.length; i++) {
-			if (document.forms[i][VIEW_STATE_PARAM]) {
-				return document.forms[i];
-			}
-		}
-
-		return null;
 	}
 
 	// Expose self to public ------------------------------------------------------------------------------------------
