@@ -54,7 +54,7 @@ import org.omnifaces.util.State;
  * The "hash query string" is the part in URL after the <code>#</code> which could be formatted in the same format
  * as a regular request query string (the part in URL after the <code>?</code>). An example:
  * <pre>
- * http://example.com/page.xhtml#foo=baz&bar=kaz
+ * http://example.com/page.xhtml#foo=baz&amp;bar=kaz
  * </pre>
  * <p>
  * This specific part of the URL (also called hash fragment identifier) is by default not sent to the server. This
