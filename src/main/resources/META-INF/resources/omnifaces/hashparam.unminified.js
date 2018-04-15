@@ -45,7 +45,7 @@ OmniFaces.HashParam = (function(Util, window, document) {
 				return;
 			}
 
-			var params = { clientId: clientId, hash: window.location.hash.substring(1) };
+			var params = { execute: clientId, hash: window.location.hash.substring(1) };
 			params[OmniFaces.EVENT] = "setHashParamValues";
 			jsf.ajax.request(form, null, params);
 		}
