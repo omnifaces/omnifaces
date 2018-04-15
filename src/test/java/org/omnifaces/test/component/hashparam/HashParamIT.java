@@ -53,10 +53,39 @@ public class HashParamIT extends OmniFacesIT {
 		long hashLoadTimestamp = Long.valueOf(this.hashLoadTimestamp.getText());
 		assertTrue("Hash param is set later", hashLoadTimestamp > pageLoadTimestamp);
 
+		foo.sendKeys("");
+		bar.sendKeys("bar");
+		guardAjax(submit).click();
+		assertTrue(browser.getCurrentUrl() + " ends with #bar=bar (and thus not #&bar=bar)", browser.getCurrentUrl().endsWith("#bar=bar"));
+
+		foo.clear();
+		bar.clear();
+		foo.sendKeys("foo");
+		bar.sendKeys("");
+		guardAjax(submit).click();
+		assertTrue(browser.getCurrentUrl() + " ends with #foo=foo", browser.getCurrentUrl().endsWith("#foo=foo"));
+
+		foo.clear();
+		bar.clear();
+		foo.sendKeys("foo");
+		bar.sendKeys("bar");
+		guardAjax(submit).click();
+		assertTrue(browser.getCurrentUrl() + " ends with #foo=foo&bar=bar", browser.getCurrentUrl().endsWith("#foo=foo&bar=bar"));
+
+		foo.clear();
+		bar.clear();
 		foo.sendKeys("def");
 		bar.sendKeys("def");
 		guardAjax(submit).click();
 		assertTrue(browser.getCurrentUrl() + " ends with #foo=def (and thus not #foo=def&bar=def)", browser.getCurrentUrl().endsWith("#foo=def"));
+
+		foo.clear();
+		bar.clear();
+		foo.sendKeys("");
+		bar.sendKeys("");
+		guardAjax(submit).click();
+		//assertTrue(browser.getCurrentUrl() + " ends with no hash param", browser.getCurrentUrl().endsWith("#foo=def"));
+		System.out.println("=====> " + browser.getCurrentUrl());
 	}
 
 }

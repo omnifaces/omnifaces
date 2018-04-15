@@ -114,7 +114,7 @@ OmniFaces.Util = (function(window, document) {
 	 * @param {string} value The value of the parameter to update. If it is falsey, then it will be removed.
 	 */
 	self.updateParameter = function(query, name, value) {
-		var re = new RegExp("([#?&])?" + name + "=.*?(&|$)", "i");
+		var re = new RegExp("(^|[?&#])" + name + "=.*?([&#]|$)", "i");
 
 		if (value) {
 			var parameter = name + "=" + encodeURIComponent(value);
@@ -133,6 +133,10 @@ OmniFaces.Util = (function(window, document) {
 			query = query.replace(re, "$2");
 		}
 
+		if (query.charAt(0) == "&") {
+			query = query.substring(1);
+		}
+		
 		return query;
 	}
 
