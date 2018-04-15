@@ -17,7 +17,6 @@ import static org.jboss.arquillian.graphene.Graphene.guardNoRequest;
 import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import static org.jboss.shrinkwrap.api.ShrinkWrap.create;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withMessageBundle;
-import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOf;
 
 import java.io.File;
 import java.net.URL;
@@ -80,7 +79,7 @@ public abstract class OmniFacesIT {
 	protected void triggerOnchange(WebElement input, WebElement messages) {
 		clearMessages(messages);
 		executeScript("document.getElementById('" + input.getAttribute("id") + "').onchange();");
-		waitUntilMessages(messages);
+		waitUntilTextContent(messages);
 	}
 
 	/**
@@ -89,15 +88,11 @@ public abstract class OmniFacesIT {
 	protected void guardAjaxUpload(WebElement submit, WebElement messages) {
 		clearMessages(messages);
 		submit.click();
-		waitUntilMessages(messages);
+		waitUntilTextContent(messages);
 	}
 
-	protected void waitUntilVisible(WebElement element) {
-		waitGui(browser).withTimeout(3, SECONDS).until(visibilityOf(element));
-	}
-
-	protected void waitUntilMessages(WebElement messages) {
-		waitGui(browser).withTimeout(3, SECONDS).until().element(messages).text().not().equalTo("");
+	protected void waitUntilTextContent(WebElement element) {
+		waitGui(browser).withTimeout(3, SECONDS).until().element(element).text().not().equalTo("");
 	}
 
 	protected void executeScript(String script) {

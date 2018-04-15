@@ -23,7 +23,7 @@
 	xmlns:of="http://omnifaces.org/functions"
 >
 	<f:metadata>
-		<o:hashParam name="foo" value="#{hashParamITBean.foo}" render="result" />
+		<o:hashParam name="foo" value="#{hashParamITBean.foo}" render="hashLoadTimestamp" />
 		<o:hashParam name="bar" value="#{hashParamITBean.bar}" default="def" />
 	</f:metadata>
 
@@ -31,7 +31,7 @@
 
 	<h:body>
     	<h:outputText id="pageLoadTimestamp" value="#{now.time}" />
-		<h:panelGroup id="result"><h:outputText id="hashLoadTimestamp" value="#{now.time}" rendered="#{not empty hashParamITBean.foo}" /></h:panelGroup>
+		<h:panelGroup id="hashLoadTimestamp"><h:outputText value="#{now.time}" rendered="#{not empty hashParamITBean.foo}" /></h:panelGroup>
 
     	<o:form id="form">
     		<h:inputText id="foo" value="#{hashParamITBean.foo}" />

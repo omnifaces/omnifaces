@@ -47,7 +47,7 @@ public class HashParamIT extends OmniFacesIT {
 	@Test
 	public void testHashParam() {
 		openWithHashString("foo=baz&bar=kaz");
-		waitUntilVisible(this.hashLoadTimestamp); // TODO: should not have been necessary.
+		waitUntilTextContent(this.hashLoadTimestamp); // TODO: should not have been necessary.
 
 		long pageLoadTimestamp = Long.valueOf(this.pageLoadTimestamp.getText());
 		long hashLoadTimestamp = Long.valueOf(this.hashLoadTimestamp.getText());
