@@ -15,7 +15,6 @@ package org.omnifaces.component.input;
 import static java.lang.String.format;
 import static javax.faces.application.ResourceHandler.JSF_SCRIPT_LIBRARY_NAME;
 import static javax.faces.application.ResourceHandler.JSF_SCRIPT_RESOURCE_NAME;
-import static javax.faces.context.PartialViewContext.PARTIAL_EXECUTE_PARAM_NAME;
 import static javax.faces.event.PhaseId.RENDER_RESPONSE;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
@@ -43,6 +42,7 @@ import javax.faces.component.UIViewParameter;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 
+import org.omnifaces.util.Ajax;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.State;
 
@@ -167,7 +167,7 @@ public class HashParam extends UIViewParameter {
 	 */
 	@Override
 	public void processDecodes(FacesContext context) {
-		if (isHashParamRequest(context) && getClientId(context).equals(getRequestParameter(context, PARTIAL_EXECUTE_PARAM_NAME))) {
+		if (isHashParamRequest(context) && Ajax.getContext().getExecuteIds().contains(getClientId(context))) {
 			String hashString = getRequestParameter(context, "hash");
 			Map<String, List<String>> hashParams = toParameterMap(hashString);
 
