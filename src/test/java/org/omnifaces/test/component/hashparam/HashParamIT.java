@@ -84,8 +84,7 @@ public class HashParamIT extends OmniFacesIT {
 		foo.sendKeys("");
 		bar.sendKeys("");
 		guardAjax(submit).click();
-		//assertTrue(browser.getCurrentUrl() + " ends with no hash param", browser.getCurrentUrl().endsWith("#foo=def"));
-		System.out.println("=====> " + browser.getCurrentUrl());
+		assertTrue(browser.getCurrentUrl() + " ends with no hash param", !browser.getCurrentUrl().contains("#"));
 	}
 
 }
