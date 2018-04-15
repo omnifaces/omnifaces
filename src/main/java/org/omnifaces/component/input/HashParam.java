@@ -15,7 +15,6 @@ package org.omnifaces.component.input;
 import static java.lang.String.format;
 import static javax.faces.application.ResourceHandler.JSF_SCRIPT_LIBRARY_NAME;
 import static javax.faces.application.ResourceHandler.JSF_SCRIPT_RESOURCE_NAME;
-import static javax.faces.component.UIViewRoot.METADATA_FACET_NAME;
 import static javax.faces.event.PhaseId.RENDER_RESPONSE;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
@@ -24,50 +23,102 @@ import static org.omnifaces.util.Ajax.oncomplete;
 import static org.omnifaces.util.Ajax.update;
 import static org.omnifaces.util.Components.addScriptResourceToHead;
 import static org.omnifaces.util.Components.addScriptToBody;
-import static org.omnifaces.util.Components.findComponentsInChildren;
 import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
 import static org.omnifaces.util.Faces.getRequestMap;
-import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.Faces.isAjaxRequestWithPartialRendering;
 import static org.omnifaces.util.Faces.isPostback;
 import static org.omnifaces.util.Faces.renderResponse;
+import static org.omnifaces.util.FacesLocal.getHashParameters;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
 import static org.omnifaces.util.Servlets.toParameterMap;
-import static org.omnifaces.util.Utils.encodeURL;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import javax.faces.component.FacesComponent;
+import javax.faces.component.UIForm;
 import javax.faces.component.UIViewParameter;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 
+import org.omnifaces.util.Faces;
 import org.omnifaces.util.State;
 
 /**
  * <p>
  * The <code>&lt;o:hashParam&gt;</code> is a component that extends the standard <code>&lt;f:viewParam&gt;</code>
- * with support for setting hash parameter values in bean and reflecting changed bean values in hash parameter.
+ * with support for setting hash query parameter values in bean and automatically reflecting updated model values in
+ * hash query string.
+ * <p>
+ * The "hash query string" is the part in URL after the <code>#</code> which could be formatted in the same format
+ * as a regular request query string (the part in URL after the <code>?</code>). An example:
+ * <pre>
+ * http://example.com/page.xhtml#foo=baz&bar=kaz
+ * </pre>
+ * <p>
+ * This specific part of the URL (also called hash fragment identifier) is by default not sent to the server. This
+ * component will on page load send it anyway and on every ajax request update the hash query string in client side
+ * when the model value has changed in server side.
  *
  * <h3>Usage</h3>
  * <p>
- * In <code>&lt;f:metadata&gt;</code>:
+ * It's very similar to the <code>&lt;o:viewParam&gt;</code>.
  * <pre>
- * &lt;o:hashParam name="foo" value="#{bean.foo}" /&gt;
+ * &lt;f:metadata&gt;
+ *     &lt;o:hashParam name="foo" value="#{bean.foo}" /&gt;
+ *     &lt;o:hashParam name="bar" value="#{bean.bar}" /&gt;
+ * &lt;/f:metadata&gt;
  * </pre>
- *
- * TODO: elaborate javadoc
+ * <p>
+ * This only requires that the JSF page has at least one {@link UIForm} component, such as <code>&lt;h:form&gt;</code>
+ * or <code>&lt;o:form&gt;</code>, otherwise the <code>&lt;o:hashParam&gt;</code> won't be able to fire the ajax
+ * request which sets the with hash query parameter values in bean. In such case an error will be printed to JS console
+ * when the project stage is <code>Development</code>.
+ * <p>
+ * You can use the <code>render</code> attribute to declare which components should be updated when a hash parameter
+ * value is present.
+ * <pre>
+ * &lt;f:metadata&gt;
+ *     &lt;o:hashParam name="foo" value="#{bean.foo}" render="fooResult" /&gt;
+ *     &lt;o:hashParam name="bar" value="#{bean.bar}" /&gt;
+ * &lt;/f:metadata&gt;
+ * ...
+ * &lt;h:body&gt;
+ *     ...
+ *     &lt;h:panelGroup id="fooResult"&gt;
+ *         ...
+ *     &lt;/h:panelGroup&gt;
+ *     ...
+ * &lt;/h:body&gt;
+ * </pre>
+ * <p>
+ * You can use the <code>default</code> attribute to declare a non-null value which should be interpreted as the default
+ * value. In other words, when the current model value matches the default value, then the hash parameter will be
+ * removed.
+ * <pre>
+ * &lt;f:metadata&gt;
+ *     &lt;o:hashParam name="foo" value="#{bean.foo}" /&gt;
+ *     &lt;o:hashParam name="bar" value="#{bean.bar}" default="kaz" /&gt;
+ * &lt;/f:metadata&gt;
+ * </pre>
+ * <p>
+ * When <code>#{bean.foo}</code> is <code>"baz"</code> and <code>#{bean.bar}</code> is <code>"kaz"</code> or empty,
+ * then the reflected hash query string will become <code>http://example.com/page.xhtml#foo=baz</code>.
+ * If <code>#{bean.bar}</code> is any other value, then it will appear in the hash query string.
  *
  * @author Bauke Scholtz
  * @since 3.2
+ * @see Faces#getHashParameters()
+ * @see Faces#getHashParameterMap()
+ * @see Faces#getHashQueryString()
  */
 @FacesComponent(HashParam.COMPONENT_TYPE)
 public class HashParam extends UIViewParameter {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
+	/** The component type, which is {@value org.omnifaces.component.input.HashParam#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.input.HashParam";
 
 	// Private constants ----------------------------------------------------------------------------------------------
@@ -86,8 +137,11 @@ public class HashParam extends UIViewParameter {
 
 	// Init -----------------------------------------------------------------------------------------------------------
 
+	/**
+	 * The constructor instructs JSF to register all scripts during the render response phase if necessary.
+	 */
 	public HashParam() {
-		subscribeToRequestBeforePhase(RENDER_RESPONSE, this::registerScriptsIfNecessary); // PreRenderViewEvent didn't work flawlessly with MyFaces? TODO: investigate
+		subscribeToRequestBeforePhase(RENDER_RESPONSE, this::registerScriptsIfNecessary);
 	}
 
 	private void registerScriptsIfNecessary() {
@@ -101,7 +155,7 @@ public class HashParam extends UIViewParameter {
 			}
 		}
 		else if (isAjaxRequestWithPartialRendering()) {
-			oncomplete(format(SCRIPT_UPDATE, getName(), getRenderedValue()));
+			oncomplete(format(SCRIPT_UPDATE, getName(), getRenderedValue(getFacesContext())));
 		}
 	}
 
@@ -112,15 +166,15 @@ public class HashParam extends UIViewParameter {
 	 */
 	@Override
 	public void processDecodes(FacesContext context) {
-		if (isPostback() && isHashParamRequest(context) && getClientId(context).equals(getRequestParameter(context, "clientId"))) {
+		if (isHashParamRequest(context) && getClientId(context).equals(getRequestParameter(context, "clientId"))) {
 			String hashString = getRequestParameter(context, "hash");
 			Map<String, List<String>> hashParams = toParameterMap(hashString);
 
-			for (HashParam hashParam : getHashParams()) {
+			for (HashParam hashParam : getHashParameters(context)) {
 				List<String> values = hashParams.get(hashParam.getName());
 
 				if (values != null) {
-					decode(context, values.get(0));
+					hashParam.decode(context, values.get(0));
 				}
 			}
 
@@ -128,17 +182,18 @@ public class HashParam extends UIViewParameter {
 		}
 	}
 
-	private void decode(FacesContext context, String value) {
-		setSubmittedValue(value);
+	private void decode(FacesContext context, String submittedValue) {
+		setSubmittedValue(submittedValue);
 		validate(context);
 
 		if (!context.isValidationFailed()) {
 			super.updateModel(context);
-			String render = getRender();
+		}
 
-			if (render != null) {
-				update(render.split("\\s+"));
-			}
+		String render = getRender();
+
+		if (render != null) {
+			update(render.split("\\s+"));
 		}
 	}
 
@@ -158,8 +213,13 @@ public class HashParam extends UIViewParameter {
 		// NOOP.
 	}
 
+	/**
+	 * Convert the value to string using any converter and ensure that an empty string is returned when the resulting
+	 * string is null or represents the default value.
+	 * @return The rendered value.
+	 */
 	@SuppressWarnings("unchecked")
-	protected String getRenderedValue() {
+	public String getRenderedValue(FacesContext context) {
 		Object value = getValue();
 		Converter<Object> converter = getConverter();
 
@@ -167,7 +227,7 @@ public class HashParam extends UIViewParameter {
 			value = null;
 		}
 		else if (converter != null) {
-			value = converter.getAsString(getFacesContext(), this, value);
+			value = converter.getAsString(context, this, value);
 		}
 
 		return (value == null) ? "" : value.toString();
@@ -215,37 +275,7 @@ public class HashParam extends UIViewParameter {
 	 * @return <code>true</code> if the current request is triggered by a hash param request.
 	 */
 	public static boolean isHashParamRequest(FacesContext context) {
-		return "setHashParamValues".equals(getRequestParameter(context, OMNIFACES_EVENT_PARAM_NAME));
-	}
-
-	/**
-	 * Returns the current hash string based on all HashParam instances in metadata.
-	 * @return The current hash string based on all HashParam instances in metadata.
-	 */
-	public static String getHashString() {
-		StringBuilder hashString = new StringBuilder();
-
-		for (HashParam param : getHashParams()) {
-			if (isEmpty(param.getName())) {
-				continue;
-			}
-
-			String value = param.getRenderedValue();
-
-			if (value != null && !value.isEmpty()) {
-				if (hashString.length() > 0) {
-					hashString.append("&");
-				}
-
-				hashString.append(encodeURL(param.getName())).append("=").append(encodeURL(value.toString()));
-			}
-		}
-
-		return hashString.toString();
-	}
-
-	private static List<HashParam> getHashParams() {
-		return findComponentsInChildren(getViewRoot().getFacet(METADATA_FACET_NAME), HashParam.class); // TODO: filter rendered=false?
+		return context.isPostback() && "setHashParamValues".equals(getRequestParameter(context, OMNIFACES_EVENT_PARAM_NAME));
 	}
 
 }

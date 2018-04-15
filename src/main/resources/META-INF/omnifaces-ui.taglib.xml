@@ -2419,24 +2419,71 @@ public class ValidateValuesBean implements MultiFieldValidator {
 			<required>false</required>
 			<type>javax.faces.component.UIComponent</type>
 		</attribute>
-		<attribute>
-			<description>
-				<![CDATA[
-					If present, this attribute refers to the value of one of the exposed
-					attached objects within the composite component inside
-					of which this tag is nested.
-				]]>
-			</description>
-			<name>for</name>
-			<required>false</required>
-			<type>java.lang.String</type>
-		</attribute>
 	</tag>
 	
 	<tag>
 		<description>
 				<![CDATA[
-					TBD
+<p>
+The <code>&lt;o:hashParam&gt;</code> is a component that extends the standard <code>&lt;f:viewParam&gt;</code>
+with support for setting hash query parameter values in bean and automatically reflecting updated model values in
+hash query string.
+<p>
+The "hash query string" is the part in URL after the <code>#</code> which could be formatted in the same format
+as a regular request query string (the part in URL after the <code>?</code>). An example:
+<pre>
+http://example.com/page.xhtml#foo=baz&bar=kaz
+</pre>
+<p>
+This specific part of the URL (also called hash fragment identifier) is by default not sent to the server. This
+component will on page load send it anyway and on every ajax request update the hash query string in client side
+when the model value has changed in server side.
+ *
+<h3>Usage</h3>
+<p>
+It's very similar to the <code>&lt;o:viewParam&gt;</code>.
+<pre>
+&lt;f:metadata&gt;
+    &lt;o:hashParam name="foo" value="#{bean.foo}" /&gt;
+    &lt;o:hashParam name="bar" value="#{bean.bar}" /&gt;
+&lt;/f:metadata&gt;
+</pre>
+<p>
+This only requires that the JSF page has at least one {@link UIForm} component, such as <code>&lt;h:form&gt;</code>
+or <code>&lt;o:form&gt;</code>, otherwise the <code>&lt;o:hashParam&gt;</code> won't be able to fire the ajax
+request which sets the with hash query parameter values in bean. In such case an error will be printed to JS console
+when the project stage is <code>Development</code>.
+<p>
+You can use the <code>render</code> attribute to declare which components should be updated when a hash parameter
+value is present.
+<pre>
+&lt;f:metadata&gt;
+    &lt;o:hashParam name="foo" value="#{bean.foo}" render="fooResult" /&gt;
+    &lt;o:hashParam name="bar" value="#{bean.bar}" /&gt;
+&lt;/f:metadata&gt;
+...
+&lt;h:body&gt;
+    ...
+    &lt;h:panelGroup id="fooResult"&gt;
+        ...
+    &lt;/h:panelGroup&gt;
+    ...
+&lt;/h:body&gt;
+</pre>
+<p>
+You can use the <code>default</code> attribute to declare a non-null value which should be interpreted as the default
+value. In other words, when the current model value matches the default value, then the hash parameter will be
+removed.
+<pre>
+&lt;f:metadata&gt;
+    &lt;o:hashParam name="foo" value="#{bean.foo}" /&gt;
+    &lt;o:hashParam name="bar" value="#{bean.bar}" default="kaz" /&gt;
+&lt;/f:metadata&gt;
+</pre>
+<p>
+When <code>#{bean.foo}</code> is <code>"baz"</code> and <code>#{bean.bar}</code> is <code>"kaz"</code> or empty,
+then the reflected hash query string will become <code>http://example.com/page.xhtml#foo=baz</code>.
+If <code>#{bean.bar}</code> is any other value, then it will appear in the hash query string.
 				]]>
 		</description>
 		<tag-name>hashParam</tag-name>
@@ -2561,10 +2608,20 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-					The default value to be used when actual value of the hash parameter is <code>null</code> or empty.
+					The default value of the hash parameter. When the model value matches the default value, then the hash parameter will be hidden.
 				]]>
 			</description>
 			<name>default</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					A space separated string of client IDs to update after the hash param has been set in bean on page load.
+				]]>
+			</description>
+			<name>render</name>
 			<required>false</required>
 			<type>java.lang.String</type>
 		</attribute>
@@ -2611,18 +2668,6 @@ public class ValidateValuesBean implements MultiFieldValidator {
 			<name>binding</name>
 			<required>false</required>
 			<type>javax.faces.component.UIComponent</type>
-		</attribute>
-		<attribute>
-			<description>
-				<![CDATA[
-					If present, this attribute refers to the value of one of the exposed
-					attached objects within the composite component inside
-					of which this tag is nested.
-				]]>
-			</description>
-			<name>for</name>
-			<required>false</required>
-			<type>java.lang.String</type>
 		</attribute>
 	</tag>
 	

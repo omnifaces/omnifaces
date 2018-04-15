@@ -66,6 +66,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
 import org.omnifaces.component.ParamHolder;
+import org.omnifaces.component.input.HashParam;
 import org.omnifaces.config.FacesConfigXml;
 import org.omnifaces.el.FacesELResolver;
 import org.omnifaces.facesviews.FacesViews;
@@ -653,12 +654,13 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the ID of the current view root with view parameters.
+	 * Returns the ID of the current view root with view and hash parameters.
 	 * <p>
 	 * This is also available in EL as <code>#{faces.viewIdWithParameters}</code>.
-	 * @return The ID of the current view root with view parameters.
+	 * @return The ID of the current view root with view and hash parameters.
 	 * @see UIViewRoot#getViewId()
 	 * @see ViewMetadata#getViewParameters(UIViewRoot)
+	 * @see Faces#getHashParameters()
 	 * @since 2.5
 	 */
 	public static String getViewIdWithParameters() {
@@ -740,6 +742,38 @@ public final class Faces {
 	 */
 	public static Map<String, List<String>> getViewParameterMap() {
 		return FacesLocal.getViewParameterMap(getContext());
+	}
+
+	/**
+	 * Returns the hash parameters of the current view, or an empty collection if there is no view.
+	 * @return The hash parameters of the current view, or an empty collection if there is no view.
+	 * @see HashParam
+	 * @since 3.2
+	 */
+	public static Collection<HashParam> getHashParameters() {
+		return FacesLocal.getHashParameters(getContext());
+	}
+
+	/**
+	 * Returns the hash parameters of the current view as a parameter map, or an empty map if there is no view.
+	 * @return The hash parameters of the current view as a parameter map, or an empty map if there is no view.
+	 * @see HashParam
+	 * @since 3.2
+	 */
+	public static Map<String, List<String>> getHashParameterMap() {
+		return FacesLocal.getHashParameterMap(getContext());
+	}
+
+	/**
+	 * Returns the hash query string of the current view, or <code>null</code> if there is none.
+	 * This is the part after the <code>#</code> in the request URL as the enduser sees in browser address bar.
+	 * This works only if the hash parameters are via <code>&lt;o:hashParam&gt;</code> registered in the view.
+	 * @return The hash query string of the current view, or <code>null</code> if there is none.
+	 * @see HashParam
+	 * @since 3.2
+	 */
+	public static String getHashQueryString() {
+		return FacesLocal.getHashQueryString(getContext());
 	}
 
 	/**

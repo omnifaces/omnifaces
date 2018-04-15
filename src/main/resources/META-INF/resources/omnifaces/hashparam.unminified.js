@@ -17,12 +17,12 @@
  * @see org.omnifaces.component.input.HashParam
  * @since 3.2
  */
-OmniFaces.HashParam = (function(Util, window) {
+OmniFaces.HashParam = (function(Util, window, document) {
 
 	// "Constant" fields ----------------------------------------------------------------------------------------------
 
 	var ERROR_MISSING_FORM = "OmniFaces HashParam: cannot find a JSF form in the document."
-		+ " Updating hash parameter will not work. Either add a JSF form, or use ViewParam instead.";
+		+ " Setting hash parameter in bean will not work. Either add a JSF form, or use ViewParam instead.";
 
 	// Private static fields ------------------------------------------------------------------------------------------
 
@@ -35,7 +35,6 @@ OmniFaces.HashParam = (function(Util, window) {
 	 */
 	self.init = function(clientId) {
 		if (!!window.location.hash) {
-			
 			var form = Util.getFacesForm();
 			
 			if (!form) {
@@ -58,17 +57,25 @@ OmniFaces.HashParam = (function(Util, window) {
 	 * @param {string} value The value of the parameter to update. If it is falsey, then it will be removed.
 	 */
 	self.update = function(name, value) {
-		var hash = window.location.hash;
+		var hashString = window.location.hash;
 
-		if (!!hash && hash.charAt(0) == '#') {
-			hash = hash.substring(1);
+		if (!!hashString && hashString.charAt(0) == '#') {
+			hashString = hashString.substring(1);
 		}
 
-		window.location.hash = Util.updateParameter(hash, name, value);
+		hashString = Util.updateParameter(hashString, name, value);
+
+		if (window.history && window.history.pushState) {
+			var url = window.location.href.split(/#/, 2)[0] + (hashString ? "#" : "") + hashString;
+			history.pushState(null, document.title, url);
+		}
+		else {
+			window.location.hash = hashString;
+		}
 	}
 
 	// Expose self to public ------------------------------------------------------------------------------------------
 
 	return self;
 
-})(OmniFaces.Util, window);
+})(OmniFaces.Util, window, document);
