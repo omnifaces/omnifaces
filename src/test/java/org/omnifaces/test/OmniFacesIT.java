@@ -17,6 +17,7 @@ import static org.jboss.arquillian.graphene.Graphene.guardNoRequest;
 import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import static org.jboss.shrinkwrap.api.ShrinkWrap.create;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withMessageBundle;
+import static org.openqa.selenium.support.ui.ExpectedConditions.visibilityOf;
 
 import java.io.File;
 import java.net.URL;
@@ -64,6 +65,10 @@ public abstract class OmniFacesIT {
 		return newTab;
 	}
 
+	protected void openWithHashString(String hashString) {
+		open(getClass().getSimpleName() + ".xhtml?" + System.currentTimeMillis() + "#" + hashString); // Query string trick is necessary because Selenium driver may not forcibly reload page.
+	}
+
 	protected void closeCurrentTabAndSwitchTo(String tabToSwitch) {
 		browser.close();
 		browser.switchTo().window(tabToSwitch);
@@ -85,6 +90,10 @@ public abstract class OmniFacesIT {
 		clearMessages(messages);
 		submit.click();
 		waitUntilMessages(messages);
+	}
+
+	protected void waitUntilVisible(WebElement element) {
+		waitGui(browser).withTimeout(3, SECONDS).until(visibilityOf(element));
 	}
 
 	protected void waitUntilMessages(WebElement messages) {
