@@ -41,7 +41,6 @@ import static org.omnifaces.util.Servlets.getApplicationAttribute;
 import static org.omnifaces.util.Servlets.getRequestBaseURL;
 import static org.omnifaces.util.Utils.csvToList;
 import static org.omnifaces.util.Utils.isEmpty;
-import static org.omnifaces.util.Utils.reverse;
 import static org.omnifaces.util.Utils.startsWithOneOf;
 import static org.omnifaces.util.Xml.getNodeTextContents;
 
@@ -53,6 +52,7 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -68,6 +68,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.omnifaces.ApplicationInitializer;
 import org.omnifaces.ApplicationListener;
 import org.omnifaces.cdi.Param;
+import org.omnifaces.util.ResourcePaths;
 
 /**
  * <p>
@@ -340,6 +341,7 @@ public final class FacesViews {
 
 		Set<String> mappings = new HashSet<>(encounteredExtensions);
 		mappings.addAll(getMappedWelcomeFiles(servletContext));
+		mappings.addAll(filterExtension(getMappedResources(servletContext).keySet()));
 
 		if (getFacesServletDispatchMethod(servletContext) == DO_FILTER) {
 			// In order for the DO_FILTER method to work the FacesServlet, in addition the forward filter,
@@ -393,7 +395,13 @@ public final class FacesViews {
 
 		if (!collectedViews.isEmpty()) {
 			servletContext.setAttribute(MAPPED_RESOURCES, unmodifiableMap(collectedViews));
-			servletContext.setAttribute(REVERSE_MAPPED_RESOURCES, unmodifiableMap(reverse(collectedViews)));
+			Map<String, String> reverseMappedResources = new HashMap<>();
+			for (Entry<String, String> collectedView : collectedViews.entrySet()) {
+				if (ResourcePaths.isExtensionless(collectedView.getKey())) {
+					reverseMappedResources.put(collectedView.getKey(), collectedView.getValue());
+				}
+			}
+			servletContext.setAttribute(REVERSE_MAPPED_RESOURCES, unmodifiableMap(reverseMappedResources));
 
 			if (collectExtensions) {
 				storeExtensions(servletContext, collectedViews, collectedExtensions);

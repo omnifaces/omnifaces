@@ -66,9 +66,15 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 
 	@Override
 	public String deriveViewId(FacesContext context, String viewId) {
-		Map<String, String> mappedResources = getMappedResources(getServletContext(context));
-		String physicalViewId = mappedResources.get(viewId);
-		return physicalViewId != null ? physicalViewId : super.deriveViewId(context, viewId);
+		if (isExtensionless(viewId)) {
+			String physicalViewId = getMappedResources(getServletContext()).get(viewId);
+
+			if (physicalViewId != null) {
+				return viewId + getExtension(physicalViewId);
+			}
+		}
+
+		return super.deriveViewId(context, viewId);
 	}
 
 	@Override
