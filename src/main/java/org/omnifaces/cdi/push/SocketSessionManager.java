@@ -192,7 +192,7 @@ public class SocketSessionManager {
 	 */
 	protected void deregister(Iterable<String> channelIds) {
 		for (String channelId : channelIds) {
-			Collection<Session> sessions = socketSessions.get(channelId);
+			Collection<Session> sessions = socketSessions.remove(channelId);
 
 			if (sessions != null) {
 				for (Session session : sessions) {
