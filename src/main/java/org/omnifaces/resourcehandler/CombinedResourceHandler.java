@@ -560,12 +560,13 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 			}
 			else if (!containsResourceIdentifier(excludedResources, resourceIdentifier)) {
 				infoBuilder.add(resourceIdentifier);
+				boolean deferredScript = (componentResource instanceof DeferredScript);
 
-				if (this.componentResource == null) {
+				if (this.componentResource == null && (deferredScript || componentResource.getAttributes().containsKey("target"))) {
 					this.componentResource = componentResource;
 				}
 				else {
-					if (componentResource instanceof DeferredScript) {
+					if (deferredScript) {
 						mergeAttribute(this.componentResource, componentResource, "onbegin");
 						mergeAttribute(this.componentResource, componentResource, "onsuccess");
 						mergeAttribute(this.componentResource, componentResource, "onerror");

@@ -12,14 +12,18 @@
  */
 package org.omnifaces.test.resourcehandler.combinedresourcehandler;
 
-import javax.enterprise.context.RequestScoped;
+import java.io.Serializable;
+
 import javax.inject.Named;
 
+import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.util.Faces;
 
 @Named
-@RequestScoped
-public class CombinedResourceHandlerITBean {
+@ViewScoped // @RequestScoped was been sufficient, this is however explicitly @ViewScoped in order to also test #457.
+public class CombinedResourceHandlerITBean implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
 	public void rebuild() {
 		Faces.setViewRoot(Faces.getViewId());
