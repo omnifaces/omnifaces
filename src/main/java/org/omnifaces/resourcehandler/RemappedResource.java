@@ -26,6 +26,7 @@ import java.util.Objects;
 
 import javax.faces.FacesException;
 import javax.faces.application.Resource;
+import javax.faces.application.ResourceWrapper;
 import javax.faces.context.FacesContext;
 
 /**
@@ -34,7 +35,7 @@ import javax.faces.context.FacesContext;
  * @author Bauke Scholtz
  * @since 2.1
  */
-public class RemappedResource extends Resource implements Externalizable {
+public class RemappedResource extends ResourceWrapper implements Externalizable {
 
 	private Serializable serializableResource;
 	private transient Resource resource;
@@ -73,6 +74,11 @@ public class RemappedResource extends Resource implements Externalizable {
 		this.resourceName = resourceName;
 		this.libraryName = libraryName;
 		this.requestPath = requestPath;
+	}
+
+	@Override
+	public Resource getWrapped() {
+		return resource;
 	}
 
 	@Override
