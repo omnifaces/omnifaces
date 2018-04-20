@@ -573,7 +573,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 				infoBuilder.add(resourceIdentifier);
 				boolean deferredScript = (componentResource instanceof DeferredScript);
 
-				if (this.componentResource == null && (deferredScript || componentResource.getAttributes().containsKey("target"))) {
+				if (this.componentResource == null && (deferredScript || (componentResource != null && componentResource.getAttributes().containsKey("target")))) {
 					this.componentResource = componentResource;
 				}
 				else {
