@@ -26,6 +26,7 @@ import java.util.Objects;
 
 import javax.faces.FacesException;
 import javax.faces.application.Resource;
+import javax.faces.application.ResourceWrapper;
 import javax.faces.context.FacesContext;
 
 /**
@@ -34,7 +35,7 @@ import javax.faces.context.FacesContext;
  * @author Bauke Scholtz
  * @since 2.1
  */
-public class RemappedResource extends Resource implements Externalizable {
+public class RemappedResource extends ResourceWrapper implements Externalizable {
 
 	private Serializable serializableResource;
 	private transient Resource resource;
@@ -43,7 +44,7 @@ public class RemappedResource extends Resource implements Externalizable {
 	private String requestPath;
 
 	/**
-	 * Do not use this constructor.
+	 * Do not use this constructor. It's merely there for {@link Externalizable}.
 	 */
 	public RemappedResource() {
 		// Keep default c'tor alive for Externalizable.
@@ -76,18 +77,26 @@ public class RemappedResource extends Resource implements Externalizable {
 	}
 
 	@Override
+	public Resource getWrapped() {
+		return resource;
+	}
+
+	@Override
 	public String getResourceName() {
-		return (resource != null) ? resource.getResourceName() : resourceName;
+		Resource wrapped = getWrapped();
+		return (wrapped != null) ? wrapped.getResourceName() : resourceName;
 	}
 
 	@Override
 	public String getLibraryName() {
-		return (resource != null) ? resource.getLibraryName() : libraryName;
+		Resource wrapped = getWrapped();
+		return (wrapped != null) ? wrapped.getLibraryName() : libraryName;
 	}
 
 	@Override
 	public String getContentType() {
-		return (resource != null) ? resource.getContentType() : null;
+		Resource wrapped = getWrapped();
+		return (wrapped != null) ? wrapped.getContentType() : null;
 	}
 
 	@Override
@@ -97,18 +106,21 @@ public class RemappedResource extends Resource implements Externalizable {
 
 	@Override
 	public InputStream getInputStream() throws IOException {
-		return (resource != null) ? resource.getInputStream() : getURL().openStream();
+		Resource wrapped = getWrapped();
+		return (wrapped != null) ? wrapped.getInputStream() : getURL().openStream();
 	}
 
 	@Override
 	public Map<String, String> getResponseHeaders() {
-		return (resource != null) ? resource.getResponseHeaders() : Collections.<String, String>emptyMap();
+		Resource wrapped = getWrapped();
+		return (wrapped != null) ? wrapped.getResponseHeaders() : Collections.<String, String>emptyMap();
 	}
 
 	@Override
 	public URL getURL() {
 		try {
-			return (resource != null) ? resource.getURL() : new URL(requestPath);
+			Resource wrapped = getWrapped();
+			return (wrapped != null) ? wrapped.getURL() : new URL(requestPath);
 		}
 		catch (MalformedURLException e) {
 			throw new FacesException(e);
@@ -117,7 +129,8 @@ public class RemappedResource extends Resource implements Externalizable {
 
 	@Override
 	public boolean userAgentNeedsUpdate(FacesContext context) {
-		return (resource != null) ? resource.userAgentNeedsUpdate(context) : false;
+		Resource wrapped = getWrapped();
+		return (wrapped != null) ? wrapped.userAgentNeedsUpdate(context) : false;
 	}
 
 	@Override
@@ -131,12 +144,14 @@ public class RemappedResource extends Resource implements Externalizable {
 		}
 
 		RemappedResource other = (RemappedResource) object;
-		return Objects.equals(resource, other.resource) && requestPath.equals(other.requestPath);
+		Resource wrapped = getWrapped();
+		return Objects.equals(wrapped, other.getWrapped()) && requestPath.equals(other.requestPath);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(resource, requestPath);
+		Resource wrapped = getWrapped();
+		return Objects.hash(wrapped, requestPath);
 	}
 
 	@Override
