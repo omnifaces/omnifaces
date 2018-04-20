@@ -204,6 +204,16 @@ import org.omnifaces.util.Hacks;
  * {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_RESOURCES}, then those CDN resources will
  * automatically be added to the set of excluded resources.
  *
+ * <h3>CDNResource</h3>
+ * <p>
+ * Since 2.7, if you have configured a custom {@link ResourceHandler} which automatically uploads the resources to a
+ * CDN host, including the combined resources, and you want to be able to have a fallback to local host URL when the
+ * CDN host is unreachable, then you can let your custom {@link ResourceHandler} return a {@link CDNResource} which
+ * wraps the original resource and the CDN URL. The combined resource handler will make sure that the appropriate
+ * <code>onerror</code> attributes are added to the component resources which initiates the fallback resource in case
+ * the CDN request errors out.
+ *
+ *
  * @author Bauke Scholtz
  * @author Stephan Rauh {@literal <www.beyondjava.net>}
  *
@@ -215,6 +225,7 @@ import org.omnifaces.util.Hacks;
  * @see InlineScriptRenderer
  * @see InlineStylesheetRenderer
  * @see InlineResourceRenderer
+ * @see CDNResource
  */
 public class CombinedResourceHandler extends DefaultResourceHandler implements SystemEventListener {
 
@@ -603,11 +614,26 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 					context.getViewRoot().addComponentResource(context, componentResource, target);
 				}
 
+				String resourceName = infoBuilder.create() + extension;
 				componentResource.getAttributes().put("library", LIBRARY_NAME);
-				componentResource.getAttributes().put("name", infoBuilder.create() + extension);
+				componentResource.getAttributes().put("name", resourceName);
 				componentResource.setRendererType(rendererType);
+				Resource resource = context.getApplication().getResourceHandler().createResource(resourceName, LIBRARY_NAME);
 
-				if (RENDERER_TYPE_JS.equals(rendererType)) {
+				if (resource instanceof CDNResource) {
+					String fallback = ((CDNResource) resource).getLocalRequestPath();
+
+					if (RENDERER_TYPE_JS.equals(rendererType)) {
+						componentResource.getPassThroughAttributes().put("onerror", "document.write('<script src=\"" + fallback + "\"></script>')");
+					}
+					else if (RENDERER_TYPE_CSS.equals(rendererType)) {
+						componentResource.getPassThroughAttributes().put("onerror", "this.onerror=null;this.href='" + fallback + "'");
+					}
+					else if (DeferredScriptRenderer.RENDERER_TYPE.equals(rendererType)) {
+						componentResource.getAttributes().put("onerror", "document.write('<script src=\"" + fallback + "\"></script>')");
+					}
+				}
+				else if (RENDERER_TYPE_JS.equals(rendererType)) {
 					componentResource.getPassThroughAttributes().put("crossorigin", "anonymous");
 				}
 			}
