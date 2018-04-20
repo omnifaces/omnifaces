@@ -630,7 +630,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 						componentResource.getPassThroughAttributes().put("onerror", "this.onerror=null;this.href='" + fallback + "'");
 					}
 					else if (DeferredScriptRenderer.RENDERER_TYPE.equals(rendererType)) {
-						componentResource.getAttributes().put("onerror", "document.write('<script src=\"" + fallback + "\"></script>')");
+						componentResource.getAttributes().put("onerror", "document.write('<script src=\"" + fallback + "\"><\\/script>')");
 					}
 				}
 				else if (RENDERER_TYPE_JS.equals(rendererType)) {
