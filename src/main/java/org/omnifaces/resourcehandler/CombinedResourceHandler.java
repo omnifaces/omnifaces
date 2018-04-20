@@ -415,17 +415,15 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		UIViewRoot view = context.getViewRoot();
 
 		for (UIComponent resourceToRemove : componentResourcesToRemove) {
-			if (resourceToRemove != null) {
-				UIComponent container = isMyFacesUsed() ? resourceToRemove.getParent() : resourceToRemove;
+			UIComponent container = isMyFacesUsed() ? resourceToRemove.getParent() : resourceToRemove;
 
-				// setInView(false) forces JSF to not save dynamic remove action in state.
-				// Otherwise JSF will re-execute dynamic remove during restore view phase.
-				// This is unnecessary as CombinedResourceHandler already takes care of it.
-				// See also https://github.com/omnifaces/omnifaces/issues/135
-				container.setInView(false);
-				view.removeComponentResource(context, resourceToRemove, target);
-				container.setInView(true);
-			}
+			// setInView(false) forces JSF to not save dynamic remove action in state.
+			// Otherwise JSF will re-execute dynamic remove during restore view phase.
+			// This is unnecessary as CombinedResourceHandler already takes care of it.
+			// See also https://github.com/omnifaces/omnifaces/issues/135
+			container.setInView(false);
+			view.removeComponentResource(context, resourceToRemove, target);
+			container.setInView(true);
 		}
 	}
 
@@ -565,7 +563,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		}
 
 		private boolean add(UIComponent componentResource, ResourceIdentifier resourceIdentifier) {
-			if ((componentResource != null && !componentResource.isRendered()) || containsResourceIdentifier(suppressedResources, resourceIdentifier)) {
+			if (!componentResource.isRendered() || containsResourceIdentifier(suppressedResources, resourceIdentifier)) {
 				componentResourcesToRemove.add(componentResource);
 				return true;
 			}
