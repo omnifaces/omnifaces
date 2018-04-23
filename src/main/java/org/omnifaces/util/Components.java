@@ -180,6 +180,7 @@ public final class Components {
 	 * Returns the current UI component from the EL context.
 	 * @param <C> The expected component type.
 	 * @return The current UI component from the EL context.
+	 * @throws ClassCastException When <code>C</code> is of wrong type.
 	 * @see UIComponent#getCurrentComponent(FacesContext)
 	 */
 	@SuppressWarnings("unchecked")
@@ -885,21 +886,34 @@ public final class Components {
 	 * @return The source of the currently invoked action.
 	 * @since 2.4
 	 */
-	public static UIComponent getCurrentActionSource() {
+	@SuppressWarnings("unchecked")
+	public static <C extends UIComponent> C getCurrentActionSource() {
 		FacesContext context = FacesContext.getCurrentInstance();
 
 		if (!context.isPostback()) {
 			return null;
 		}
 
-		UIViewRoot viewRoot = context.getViewRoot();
+		UIComponent actionSource = getCurrentActionSource(context, context.getViewRoot());
+
+		if (actionSource == null) { // Can happen when prependId="false" is set on form. Hopefully it will be deprecated one day.
+			actionSource = getCurrentActionSource(context, getCurrentForm());
+		}
+
+		return (C) actionSource;
+	}
+
+	/**
+	 * Helper method for {@link #getCurrentActionSource()}.
+	 */
+	private static UIComponent getCurrentActionSource(FacesContext context, UIComponent parent) {
 		Map<String, String> params = context.getExternalContext().getRequestParameterMap();
 
 		if (context.getPartialViewContext().isAjaxRequest()) {
 			String sourceClientId = params.get("javax.faces.source");
 
 			if (sourceClientId != null) {
-				UIComponent actionSource = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(sourceClientId));
+				UIComponent actionSource = findComponentIgnoringIAE(parent, stripIterationIndexFromClientId(sourceClientId));
 
 				if (actionSource != null) {
 					return actionSource;
@@ -912,7 +926,7 @@ public final class Components {
 				continue; // Quick skip.
 			}
 
-			UIComponent actionSource = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(name));
+			UIComponent actionSource = findComponentIgnoringIAE(parent, stripIterationIndexFromClientId(name));
 
 			if (actionSource instanceof UICommand) {
 				return actionSource;
