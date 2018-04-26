@@ -371,7 +371,7 @@ public final class FacesViews {
 		if (!collectedViews.isEmpty()) {
 			servletContext.setAttribute(MAPPED_RESOURCES, unmodifiableMap(collectedViews));
 			servletContext.setAttribute(REVERSE_MAPPED_RESOURCES, unmodifiableMap(collectedViews.entrySet().stream()
-				.filter(e -> isExtensionless(e.getKey())).collect(Collectors.toMap(Entry::getValue, Entry::getKey))));
+				.filter(e -> isExtensionless(e.getKey())).collect(Collectors.toMap(Entry::getValue, Entry::getKey, (l, r) -> l))));
 
 			if (collectExtensions) {
 				storeExtensions(servletContext, collectedViews, collectedExtensions);
