@@ -27,11 +27,14 @@ import static org.omnifaces.util.BeansLocal.getInstance;
 import static org.omnifaces.util.Components.addScriptResourceToBody;
 import static org.omnifaces.util.Components.addScriptResourceToHead;
 import static org.omnifaces.util.Components.addScriptToBody;
+import static org.omnifaces.util.Faces.getViewId;
+import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
 import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
 
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -88,8 +91,13 @@ public class ViewScopeManager {
 	private static final String SCRIPT_INIT = "OmniFaces.Unload.init('%s')";
 	private static final int DEFAULT_BEANS_PER_VIEW_SCOPE = 3;
 
+	private static final String WARNING_UNSUPPORTED_STATE_SAVING = "@ViewScoped %s"
+			+ " requires non-stateless views in order to be able to properly destroy the bean."
+			+ " The current view %s is stateless and this may cause memory leaks."
+			+ " Consider subclassing the bean with @javax.faces.view.ViewScoped annotation.";
+
 	private static final String ERROR_INVALID_STATE_SAVING = "@ViewScoped(saveInViewState=true) %s"
-		+ " requires web.xml context parameter 'javax.faces.STATE_SAVING_METHOD' being set to 'client'.";
+			+ " requires web.xml context parameter 'javax.faces.STATE_SAVING_METHOD' being set to 'client'.";
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
@@ -177,7 +185,12 @@ public class ViewScopeManager {
 			beanStorageId = UUID.randomUUID();
 
 			if (storage instanceof ViewScopeStorageInSession) {
-				registerUnloadScript(beanStorageId);
+				if (getViewRoot().isTransient()) {
+					logger.log(Level.WARNING, format(WARNING_UNSUPPORTED_STATE_SAVING, beanClass.getName(), getViewId()));
+				}
+				else {
+					registerUnloadScript(beanStorageId);
+				}
 			}
 		}
 
