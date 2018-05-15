@@ -317,7 +317,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 	 */
 	@Override
 	public void processEvent(SystemEvent event) {
-		if (disabledParam != null && parseBoolean(String.valueOf(evaluateExpressionGet(disabledParam)))) {
+		if (disabledParam != null && parseBoolean(String.valueOf((Object) evaluateExpressionGet(disabledParam)))) {
 			return;
 		}
 
