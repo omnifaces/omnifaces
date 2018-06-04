@@ -15,15 +15,21 @@ package org.omnifaces.util;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.util.logging.Level.WARNING;
+import static java.util.stream.Collectors.toMap;
 import static javax.faces.validator.BeanValidator.VALIDATOR_FACTORY_KEY;
 import static org.omnifaces.util.Faces.getApplicationAttribute;
+
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
+import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -60,6 +66,42 @@ public final class Platform {
 
 	public static Validator getBeanValidator() {
 		return getBeanValidatorFactory().getValidator();
+	}
+
+	/**
+	 * Validate given bean on given group classes
+	 * and return constraint violation messages mapped by property path.
+	 * @param bean Bean to be validated.
+	 * @param groups Bean validation groups, if any.
+	 * @return Constraint violation messages mapped by property path.
+	 * @since 2.7
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static Map<String, String> validateBean(Object bean, Class<?>... groups) {
+		Set violationsRaw = getBeanValidator().validate(bean, groups);
+		Set<ConstraintViolation<?>> violations = violationsRaw;
+		return mapViolationMessagesByPropertyPath(violations);
+	}
+
+	/**
+	 * Validate given value as if it were a property of the given bean type
+	 * and return constraint violation messages mapped by property path.
+	 * @param beanType Type of target bean.
+	 * @param propertyName Name of property on target bean.
+	 * @param value Value to be validated.
+	 * @param groups Bean validation groups, if any.
+	 * @return Constraint violation messages mapped by property path.
+	 * @since 2.7
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static Map<String, String> validateBeanProperty(Class<?> beanType, String propertyName, Object value, Class<?>... groups) {
+		Set violationsRaw = getBeanValidator().validateValue(beanType, propertyName, value, groups);
+		Set<ConstraintViolation<?>> violations = violationsRaw;
+		return mapViolationMessagesByPropertyPath(violations);
+	}
+
+	private static Map<String, String> mapViolationMessagesByPropertyPath(Set<ConstraintViolation<?>> violations) {
+		return violations.stream().collect(toMap(violation -> violation.getPropertyPath().toString(), violation -> violation.getMessage(), (l, r) -> l, LinkedHashMap::new));
 	}
 
 	public static boolean isBeanValidationAvailable() {

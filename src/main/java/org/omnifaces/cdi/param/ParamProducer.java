@@ -27,8 +27,8 @@ import static org.omnifaces.util.FacesLocal.getMessageBundle;
 import static org.omnifaces.util.FacesLocal.getRequestParameterValues;
 import static org.omnifaces.util.FacesLocal.getRequestPathInfo;
 import static org.omnifaces.util.Messages.createError;
-import static org.omnifaces.util.Platform.getBeanValidator;
 import static org.omnifaces.util.Platform.isBeanValidationAvailable;
+import static org.omnifaces.util.Platform.validateBeanProperty;
 import static org.omnifaces.util.Reflection.setPropertiesWithCoercion;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.containsByClassName;
@@ -45,7 +45,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
-import java.util.Set;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
@@ -62,7 +61,6 @@ import javax.faces.validator.RequiredValidator;
 import javax.faces.validator.Validator;
 import javax.faces.validator.ValidatorException;
 import javax.inject.Inject;
-import javax.validation.ConstraintViolation;
 
 import org.omnifaces.cdi.Param;
 
@@ -251,11 +249,11 @@ public class ParamProducer {
 
 	private static <V> boolean validateBean(FacesContext context, Param param, String label, V paramValue, InjectionPoint injectionPoint) {
 		if (shouldDoBeanValidation(param, injectionPoint)) {
-			Set<ConstraintViolation<?>> violations = doBeanValidation(paramValue, injectionPoint);
+			Map<String, String> violations = doBeanValidation(paramValue, injectionPoint);
 
 			if (!violations.isEmpty()) {
-				for (ConstraintViolation<?> violation : violations) {
-					context.addMessage(context.getViewRoot().getClientId(context), createError(violation.getMessage(), label));
+				for (String message : violations.values()) {
+					context.addMessage(context.getViewRoot().getClientId(context), createError(message, label));
 				}
 
 				return false;
@@ -384,7 +382,7 @@ public class ParamProducer {
 		return isBeanValidationAvailable();
 	}
 
-	private static <V> Set<ConstraintViolation<?>> doBeanValidation(V paramValue, InjectionPoint injectionPoint) {
+	private static <V> Map<String, String> doBeanValidation(V paramValue, InjectionPoint injectionPoint) {
 
 		Class<?> base = injectionPoint.getBean().getBeanClass();
 		String property = injectionPoint.getMember().getName();
@@ -402,7 +400,7 @@ public class ParamProducer {
 			}
 		}
 
-		return (Set) getBeanValidator().validateValue(base, property, valueToValidate);
+		return validateBeanProperty(base, property, valueToValidate);
 	}
 
 	private static List<Validator> getValidators(Param requestParameter) {
