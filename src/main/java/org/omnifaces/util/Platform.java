@@ -12,17 +12,17 @@
  */
 package org.omnifaces.util;
 
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
 import static java.util.logging.Level.WARNING;
 import static javax.faces.validator.BeanValidator.VALIDATOR_FACTORY_KEY;
 import static javax.validation.Validation.buildDefaultValidatorFactory;
 import static org.omnifaces.util.Faces.getApplicationAttribute;
+import static org.omnifaces.util.Faces.getLocale;
 import static org.omnifaces.util.Faces.setApplicationAttribute;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -31,6 +31,7 @@ import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 import javax.validation.ConstraintViolation;
+import javax.validation.MessageInterpolator;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
@@ -60,6 +61,34 @@ public final class Platform {
 
 	// Bean Validation ------------------------------------------------------------------------------------------------
 
+	/**
+	 * Returns <code>true</code> if Bean Validation is available. This is remembered in the application scope.
+	 * @return <code>true</code> if Bean Validation is available.
+	 */
+	public static boolean isBeanValidationAvailable() {
+		Boolean beanValidationAvailable = getApplicationAttribute(BEAN_VALIDATION_AVAILABLE);
+
+		if (beanValidationAvailable == null) {
+			try {
+				Class.forName("javax.validation.Validation");
+				getBeanValidator();
+				beanValidationAvailable = true;
+			}
+			catch (Exception | LinkageError e) {
+				beanValidationAvailable = false;
+				logger.log(WARNING, "Bean validation not available.", e);
+			}
+
+			setApplicationAttribute(BEAN_VALIDATION_AVAILABLE, beanValidationAvailable);
+		}
+
+		return beanValidationAvailable;
+	}
+
+	/**
+	 * Returns the default bean validator factory. This is remembered in the application scope.
+	 * @return The default bean validator factory.
+	 */
 	public static ValidatorFactory getBeanValidatorFactory() {
 
 		ValidatorFactory validatorFactory = getApplicationAttribute(VALIDATOR_FACTORY_KEY);
@@ -72,8 +101,16 @@ public final class Platform {
 		return validatorFactory;
 	}
 
+	/**
+	 * Returns the bean validator which is aware of the JSF locale.
+	 * @return The bean validator which is aware of the JSF locale.
+	 * @see Faces#getLocale()
+	 */
 	public static Validator getBeanValidator() {
-		return getBeanValidatorFactory().getValidator();
+		ValidatorFactory validatorFactory = getBeanValidatorFactory();
+        return validatorFactory.usingContext()
+        	.messageInterpolator(new FacesLocaleAwareMessageInterpolator(validatorFactory.getMessageInterpolator()))
+        	.getValidator();
 	}
 
 	/**
@@ -116,25 +153,27 @@ public final class Platform {
 		return violationMessagesByPropertyPath;
 	}
 
-	public static boolean isBeanValidationAvailable() {
+    private static class FacesLocaleAwareMessageInterpolator implements MessageInterpolator {
 
-		Boolean beanValidationAvailable = getApplicationAttribute(BEAN_VALIDATION_AVAILABLE);
+        private MessageInterpolator wrapped;
 
-		if (beanValidationAvailable == null) {
-			try {
-				Class.forName("javax.validation.Validation");
-				getBeanValidator();
-				beanValidationAvailable = TRUE;
-			} catch (Exception | LinkageError e) {
-				beanValidationAvailable = FALSE;
-				logger.log(WARNING, "Bean validation not available.", e);
-			}
+        public FacesLocaleAwareMessageInterpolator(MessageInterpolator wrapped) {
+            this.wrapped = wrapped;
+        }
 
-			setApplicationAttribute(BEAN_VALIDATION_AVAILABLE, beanValidationAvailable);
-		}
+        @Override
+		public String interpolate(String message, MessageInterpolator.Context context) {
+            return wrapped.interpolate(message, context, getLocale());
+        }
 
-		return beanValidationAvailable;
-	}
+        @Override
+		public String interpolate(String message, MessageInterpolator.Context context, Locale locale) {
+            return wrapped.interpolate(message, context, locale);
+        }
+    }
+
+
+	// FacesServlet ---------------------------------------------------------------------------------------------------
 
 	/**
 	 * Returns the {@link ServletRegistration} associated with the {@link FacesServlet}.
