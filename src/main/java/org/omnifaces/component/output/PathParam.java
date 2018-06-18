@@ -45,8 +45,8 @@ import org.omnifaces.facesviews.FacesViews;
  * In the following example the link to the multi view page will be rendered with two path parameters:
  * <pre>
  * &lt;h:link value="Link" outcome="multiview-supported-path"&gt;
- *     &lt;o:pathParam&gt; value="first" &lt;/o:pathParam&gt;
- *     &lt;o:pathParam&gt; value="second" &lt;/o:pathParam&gt;
+ *     &lt;o:pathParam value="first" /&gt;
+ *     &lt;o:pathParam value="second" /&gt;
  * &lt;/h:link&gt;
  * </pre>
  * The code above will be rendered as: 
