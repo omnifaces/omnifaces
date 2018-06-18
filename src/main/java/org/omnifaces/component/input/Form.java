@@ -20,9 +20,11 @@ import static org.omnifaces.component.input.Form.PropertyKeys.includeViewParams;
 import static org.omnifaces.component.input.Form.PropertyKeys.partialSubmit;
 import static org.omnifaces.component.input.Form.PropertyKeys.useRequestURI;
 import static org.omnifaces.util.Components.getParams;
+import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestAttribute;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
 import static org.omnifaces.util.FacesLocal.getRequestURI;
+import static org.omnifaces.util.Servlets.isRequestProxied;
 import static org.omnifaces.util.Servlets.toQueryString;
 import static org.omnifaces.util.Utils.formatURLWithQueryString;
 
@@ -359,10 +361,11 @@ public class Form extends HtmlForm {
 		 * action URL, or include the request parameters into the action URL, or use request URI as
 		 * action URL. Any <code>&lt;f|o:param&gt;</code> nested in the form component will be included
 		 * in the query string, overriding any existing view or request parameters on same name.
+                 * If the request is proxied then the wrapped instance will supply the action URL instead.
 		 */
 		@Override
 		public String getActionURL(FacesContext context, String viewId) {
-			String actionURL = form.isUseRequestURI() ? getActionURL(context) : getWrapped().getActionURL(context, viewId);
+                        String actionURL = form.isUseRequestURI() && !isRequestProxied(getRequest(context)) ? getActionURL(context) : getWrapped().getActionURL(context, viewId);
 			String queryString = toQueryString(getParams(form, form.isUseRequestURI() || form.isIncludeRequestParams(), form.isIncludeViewParams()));
 			return formatURLWithQueryString(actionURL, queryString);
 		}

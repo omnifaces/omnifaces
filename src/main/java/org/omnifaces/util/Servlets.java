@@ -16,6 +16,7 @@ import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.list;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.logging.Level.FINEST;
@@ -46,6 +47,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -823,6 +825,11 @@ public final class Servlets {
 		response.setHeader("Location", url);
                 response.setHeader("Connection", "close");
 	}
+        
+        public static boolean isRequestProxied(HttpServletRequest request) {
+                List<String> headers = list(request.getHeaderNames());
+                return headers.contains("Forwarded") || headers.contains("X-Forwarded-For");
+        }
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
