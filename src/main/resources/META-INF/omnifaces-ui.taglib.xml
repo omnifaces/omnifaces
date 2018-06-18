@@ -5769,4 +5769,100 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 			<type>java.lang.String</type>
 		</attribute>
 	</tag>
+        
+        <tag>
+                <description>
+                <![CDATA[
+                        <strong>The <code>PathParam</code> is a component that extends the OmniFaces <code>Param</code> to support 
+                        <code>MultiViews</code> feature of <code>FacesViews</code>.</strong> It is done by rendering the supplied parameters 
+                        of such components as <code>&lt;h:link&gt;</code> and <code>&lt;h:button&gt;</code> among others as path parameters and not as 
+                        query parameters as otherwise will be produced by <code>&lt;o:param&gt;</code> and <code>&lt;f:param&gt;</code> tags. 
+                        <p>
+                        The component has built-in support for a <code>Converter</code> to convert the supplied value to string by usual means via 
+                        the <code>converter</code> attribute of the tag, or the nested <code>&lt;f:converter&gt;</code> tag, or just automatically 
+                        if a converter is already registered for the target class via <code>@FacesConverter(forClass)</code>.
+                        <p>
+                        This component doesn't support returning encoded output of its children as parameter value in case no value is present.
+                        This feature is provided by <code>Param</code> component instead.
+                        <p>
+                        Also, the name attribute must not be specified for this component as it already evaluates to a predefined one.
+                        <p>
+                        This component is used to create bookmarkable URLs via standard outcome target components that take into account
+                        <code>&lt;o:pathParam&gt;</code> tags nested in the components. The path parameters will be rendered 
+                        in the order they were declared for a view id that is defined as a multi view and if the view was
+                        not defined as a multi view then they won't be rendered at all. Additionally, declaring path parameters
+                        for a non-multi view will be logged as a warning and a faces warning message will be added for any
+                        stage different from <code>Production</code>.
+                        <p>
+                        In the following example the link to the multi view page will be rendered with two path parameters:
+                        <pre>
+&lt;o:link value="Link" outcome="multiview-supported-path"&gt;
+    &lt;o:pathParam&gt; value="first" &lt;/o:pathParam&gt;
+    &lt;o:pathParam&gt; value="second" &lt;/o:pathParam&gt;
+&lt;/o:link&gt;
+                        </pre>
+                        The code above will be rendered as: 
+                        <code>&lt;a id="..." name="..." href="/context-path/multiview-supported-path/first/second"&gt;Link&lt;/a&gt;</code>.
+                        The path parameters will be available via <code>@Inject @Param(pathIndex=0) private String first;</code> and
+                        <code>@Inject @Param(pathIndex=1) private String second;</code> the usual way.
+                ]]>
+                </description>
+                <tag-name>pathParam</tag-name>
+                <component>
+                        <component-type>org.omnifaces.component.output.PathParam</component-type>
+                </component>
+        
+                <attribute>
+                        <description>
+                        <![CDATA[
+                                The component identifier for this component. This value must be unique within the closest parent
+                                component that is a naming container.
+                        ]]>
+                        </description>
+                        <name>id</name>
+                        <required>false</required>
+                        <type>java.lang.String</type>
+                </attribute>
+                <attribute>
+                        <description>
+                        <![CDATA[
+                                The <code>ValueExpression</code> linking this component to a property in a backing bean.
+                        ]]>
+                        </description>
+                        <name>binding</name>
+                        <required>false</required>
+                        <type>javax.faces.component.UIComponent</type>
+                </attribute>
+
+                <attribute>
+                        <description>
+                        <![CDATA[
+                                Converter instance registered with this component.
+                        ]]>
+                        </description>
+                        <name>converter</name>
+                        <required>false</required>
+                        <type>javax.faces.convert.Converter</type>
+                </attribute>
+                <attribute>
+                        <description>
+                        <![CDATA[
+                                Flag enabling or disabling the inclusion of the parameter.
+                        ]]>
+                        </description>
+                        <name>disable</name>
+                        <required>false</required>
+                        <type>boolean</type>
+                </attribute>
+                <attribute>
+                        <description>
+                        <![CDATA[
+                                Value of the parameter to be set.
+                        ]]>
+                        </description>
+                        <name>value</name>
+                        <required>false</required>
+                        <type>java.lang.Object</type>
+                </attribute>
+        </tag>
 </facelet-taglib>
