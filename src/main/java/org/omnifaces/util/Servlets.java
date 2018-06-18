@@ -67,6 +67,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 import javax.servlet.http.Part;
 
 import org.omnifaces.component.ParamHolder;
@@ -809,6 +810,18 @@ public final class Servlets {
 		catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}
+	}
+        
+        /**
+         * Helper method to send a permanent (301) redirect to the given URL.
+         * 
+         * @param response The involved HTTP servlet response.
+         * @param url The URL to permanently redirect the current response to.
+         */
+	public static void redirectPermanent(HttpServletResponse response, String url) {
+		response.setStatus(SC_MOVED_PERMANENTLY);
+		response.setHeader("Location", url);
+                response.setHeader("Connection", "close");
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
