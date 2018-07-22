@@ -2696,6 +2696,15 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
 					<p>
 					Only when you set <code>immediate="true"</code>, then it will behave the same as the standard
 					<code>&lt;f:viewAction&gt;</code>.
+					<h3>Messaging</h3>
+					<p>
+					You can use the <code>message</code> attribute to add a global flash warning message.
+					<pre>
+					&lt;o:viewAction ... message="Please use a valid link from within the site" /&gt;
+					</pre>
+					<p>
+					Note that the message will only be shown when the redirect has actually taken place. The support was added in
+					OmniFaces 3.2.
  				]]>
 		</description>
 		<tag-name>viewAction</tag-name>
@@ -2776,6 +2785,16 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
 			<name>immediate</name>
 			<required>false</required>
 			<type>boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The message to send along with the redirect, if any.
+				]]>
+			</description>
+			<name>message</name>
+			<required>false</required>
+			<type>java.lang.String</type>
 		</attribute>
 	</tag>
 	
