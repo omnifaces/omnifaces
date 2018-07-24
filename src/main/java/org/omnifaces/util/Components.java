@@ -873,6 +873,7 @@ public final class Components {
 	 * Returns the source of the currently invoked action, or <code>null</code> if there is none, which may happen when
 	 * the current request is not a postback request at all, or when the view has been changed by for example a
 	 * successful navigation. If the latter is the case, you'd better invoke this method before navigation.
+	 * @param <C> The expected component type.
 	 * @return The source of the currently invoked action.
 	 * @since 2.4
 	 */
