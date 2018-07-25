@@ -91,7 +91,7 @@ public class TagAttribute extends TagHandler {
 				valueExpression = defaultValue.getValueExpression(context, Object.class);
 			}
 			else if ("id".equals(name)) {
-				valueExpression = createValueExpression("#{'j_ido" + this.tagId + "'}", Object.class);
+				valueExpression = createValueExpression("#{'j_ido" + context.generateUniqueId(this.tagId) + "'}", String.class);
 			}
 		}
 
