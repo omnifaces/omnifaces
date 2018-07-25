@@ -63,7 +63,7 @@ import org.omnifaces.el.DelegatingVariableMapper;
  * <pre>
  * &lt;o:tagAttribute name="type" default="text" /&gt;
  * </pre>
- * Since OmniFaces 2.7/3.2 there is a special case for for a <code>&lt;o:tagAttribute name="id"&gt;</code> without
+ * Since OmniFaces 2.7/3.2 there is a special case for a <code>&lt;o:tagAttribute name="id"&gt;</code> without
  * a default value: it will autogenerate an unique ID in the form of <code>j_ido[tagId]</code> where <code>[tagId]</code>
  * is the <code>&lt;o:tagAttribute&gt;</code> tag's own unique ID.
  *
@@ -91,7 +91,7 @@ public class TagAttribute extends TagHandler {
 				valueExpression = defaultValue.getValueExpression(context, Object.class);
 			}
 			else if ("id".equals(name)) {
-				valueExpression = createValueExpression("#{'j_ido" + this.tagId + "'}", Object.class);
+				valueExpression = createValueExpression("#{'j_ido" + context.generateUniqueId(this.tagId) + "'}", String.class);
 			}
 		}
 
