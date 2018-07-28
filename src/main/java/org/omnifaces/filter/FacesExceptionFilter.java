@@ -115,23 +115,30 @@ public class FacesExceptionFilter extends HttpFilter {
 			throws ServletException, IOException
 	{
 		try {
-			try {
-				chain.doFilter(request, response);
-			}
-			catch (FileNotFoundException ignore) {
-				logger.log(FINEST, "Ignoring thrown exception; this is a Mojarra quirk and it should be interpreted as 404.", ignore);
-				response.sendError(HttpServletResponse.SC_NOT_FOUND, request.getRequestURI());
-			}
-			catch (ServletException ignore) {
-				logger.log(FINEST, "Ignoring thrown exception; this is a wrapper exception and only its root cause is of interest.", ignore);
-				throw new ServletException(unwrap(ignore.getRootCause(), exceptionTypesToUnwrap));
-			}
+			doFilter(request, response, chain);
 		}
 		catch (Throwable exception) {
 			request.setAttribute(EXCEPTION_UUID, UUID.randomUUID().toString());
 			String location = WebXml.instance().findErrorPageLocation(exception);
 			logException(request, exception, location, LOG_EXCEPTION_HANDLED, location);
 			throw exception;
+		}
+	}
+
+	private void doFilter
+		(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+			throws IOException, ServletException
+	{
+		try {
+			chain.doFilter(request, response);
+		}
+		catch (FileNotFoundException ignore) {
+			logger.log(FINEST, "Ignoring thrown exception; this is a JSF quirk and it should be interpreted as 404.", ignore);
+			response.sendError(HttpServletResponse.SC_NOT_FOUND, request.getRequestURI());
+		}
+		catch (ServletException ignore) {
+			logger.log(FINEST, "Ignoring thrown exception; this is a wrapper exception and only its root cause is of interest.", ignore);
+			throw new ServletException(unwrap(ignore.getRootCause(), exceptionTypesToUnwrap));
 		}
 	}
 
