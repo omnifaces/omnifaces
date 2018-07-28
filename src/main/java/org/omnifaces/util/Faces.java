@@ -1448,7 +1448,7 @@ public final class Faces {
 	 * <p>
 	 * This is also available in EL as <code>#{faces.userAgent}</code>.
 	 * @return The User-Agent string of the client.
-	 * @see HttpServletRequest#getHeader(String).
+	 * @see HttpServletRequest#getHeader(String)
 	 * @since 3.2
 	 */
 	public static String getUserAgent() {

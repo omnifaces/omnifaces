@@ -405,7 +405,7 @@ public final class Servlets {
 	 * Returns the User-Agent string of the client.
 	 * @param request The involved HTTP servlet request.
 	 * @return The User-Agent string of the client.
-	 * @see HttpServletRequest#getHeader(String).
+	 * @see HttpServletRequest#getHeader(String)
 	 * @since 3.2
 	 */
 	public static String getUserAgent(HttpServletRequest request) {
