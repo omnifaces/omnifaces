@@ -402,6 +402,17 @@ public final class Servlets {
 	}
 
 	/**
+	 * Returns the User-Agent string of the client.
+	 * @param request The involved HTTP servlet request.
+	 * @return The User-Agent string of the client.
+	 * @see HttpServletRequest#getHeader(String).
+	 * @since 3.2
+	 */
+	public static String getUserAgent(HttpServletRequest request) {
+		return request.getHeader("User-Agent");
+	}
+
+	/**
 	 * Returns <code>true</code> if connection is secure, <code>false</code> otherwise. This method will first check if
 	 * {@link HttpServletRequest#isSecure()} returns <code>true</code>, and if not <code>true</code>, check if the
 	 * <code>X-Forwarded-Proto</code> is present and equals to <code>https</code>.

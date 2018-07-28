@@ -1072,6 +1072,13 @@ public final class FacesLocal {
 	}
 
 	/**
+	 * @see Faces#getUserAgent()
+	 */
+	public static String getUserAgent(FacesContext context) {
+		return Servlets.getUserAgent(getRequest(context));
+	}
+
+	/**
 	 * @see Faces#isRequestSecure()
 	 */
 	public static boolean isRequestSecure(FacesContext context) {
