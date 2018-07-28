@@ -61,7 +61,7 @@ import org.omnifaces.util.State;
  * <p>
  * Since version 3.0, it will also during ajax requests automatically send only the form data which actually need to
  * be processed as opposed to the entire form, based on the <code>execute</code> attribute of any nested
- * <code>&lt;f:ajax&gt;</code> . This feature is similar to <code>partialSubmit</code> feature of PrimeFaces.
+ * <code>&lt;f:ajax&gt;</code>. This feature is similar to <code>partialSubmit</code> feature of PrimeFaces.
  * This will reduce the request payload when used in large forms such as editable tables.
  * <p>
  * You can use it the same way as <code>&lt;h:form&gt;</code>, you only need to change <code>h:</code> to
@@ -76,11 +76,20 @@ import org.omnifaces.util.State;
  * &lt;o:form useRequestURI="false"&gt;
  * </pre>
  *
+ * <h3>Include request params</h3>
+ * <p>
+ * When you want to include request parameters only instead of the entire request URI with query string, set the
+ * <code>includeRequestParams</code> attribute to <code>true</code>. This will implicitly set <code>useRequestURI</code>
+ * attribute to <code>false</code>.
+ * <pre>
+ * &lt;o:form includeRequestParams="true"&gt;
+ * </pre>
+ *
  * <h3>Partial submit</h3>
  * <p>
- * This is the default behavior. So just using <code>&lt;o:form&gt;</code> will already send only the form data which
- * actually need to be processed. In order to turn off this behavior, set <code>partialSubmit</code> attribute to
- * <code>false</code>.
+ * This is the default behavior. So just using <code>&lt;o:form&gt;</code> will already cause the
+ * <code>&lt;f:ajax&gt;</code> to send only the form data which actually need to be processed. In order to turn off this
+ * behavior, set <code>partialSubmit</code> attribute to <code>false</code>.
  * <pre>
  * &lt;o:form partialSubmit="false"&gt;
  * </pre>
@@ -109,9 +118,9 @@ import org.omnifaces.util.State;
  *
  * <h3>Historical note</h3>
  * <p>
- * Previously, the <code>&lt;o:form&gt;</code> also supported <code>includeViewParams</code> and <code>includeRequestParams</code>, but
- * they did after all not have any advantage over the later introduced <code>useRequestURI</code> which has since version 3.0 become the
- * default behavior. Hence the <code>includeViewParams</code> and <code>includeRequestParams</code> are marked deprecated since 3.0.
+ * Previously, the <code>&lt;o:form&gt;</code> also supported <code>includeViewParams</code>, but
+ * this did after all not have any advantage over the later introduced <code>useRequestURI</code> and
+ * <code>includeRequestParams</code>. Hence the <code>includeViewParams</code> is marked deprecated since 3.0.
  *
  *
  * @since 1.1
@@ -129,21 +138,15 @@ public class Form extends HtmlForm {
 	enum PropertyKeys {
 
 		useRequestURI,
+		includeRequestParams,
 		partialSubmit,
 
 		/**
-		 * Not particularly useful as compared to useRequestURI.
+		 * Not particularly useful as compared to useRequestURI and includeRequestParams.
 		 * @deprecated Since 3.0
 		 */
 		@Deprecated
 		includeViewParams,
-
-		/**
-		 * Not particularly useful as compared to useRequestURI.
-		 * @deprecated Since 3.0
-		 */
-		@Deprecated
-		includeRequestParams
 	}
 
 	// Variables ------------------------------------------------------------------------------------------------------
@@ -186,6 +189,7 @@ public class Form extends HtmlForm {
 
 	/**
 	 * Returns whether or not the view parameters should be encoded into the form's action URL.
+	 * This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
 	 * @return Whether or not the view parameters should be encoded into the form's action URL.
 	 * @deprecated Since 3.0
 	 */
@@ -196,9 +200,8 @@ public class Form extends HtmlForm {
 
 	/**
 	 * Set whether or not the view parameters should be encoded into the form's action URL.
-	 *
-	 * @param includeViewParams
-	 *            The state of the switch for encoding view parameters
+	 * This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
+	 * @param includeViewParams Whether or not the view parameters should be encoded into the form's action URL.
 	 * @deprecated Since 3.0
 	 */
 	@Deprecated
@@ -210,28 +213,23 @@ public class Form extends HtmlForm {
 	 * Returns whether or not the request parameters should be encoded into the form's action URL.
 	 * @return Whether or not the request parameters should be encoded into the form's action URL.
 	 * @since 1.5
-	 * @deprecated Since 3.0
 	 */
-	@Deprecated
 	public boolean isIncludeRequestParams() {
 		return state.get(includeRequestParams, FALSE);
 	}
 
 	/**
 	 * Set whether or not the request parameters should be encoded into the form's action URL.
-	 *
-	 * @param includeRequestParams
-	 *            The state of the switch for encoding request parameters.
+	 * @param includeRequestParams Whether or not the request parameters should be encoded into the form's action URL.
 	 * @since 1.5
-	 * @deprecated Since 3.0
 	 */
-	@Deprecated
 	public void setIncludeRequestParams(boolean includeRequestParams) {
 		state.put(PropertyKeys.includeRequestParams, includeRequestParams);
 	}
 
 	/**
 	 * Returns whether the request URI should be used as form's action URL. Defaults to <code>true</code>.
+	 * This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
 	 * @return Whether the request URI should be used as form's action URL.
 	 * @since 1.6
 	 */
@@ -241,6 +239,7 @@ public class Form extends HtmlForm {
 
 	/**
 	 * Set whether the request URI should be used as form's action URL.
+	 * This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
 	 * @param useRequestURI Whether the request URI should be used as form's action URL.
 	 * @since 1.6
 	 */
@@ -362,7 +361,7 @@ public class Form extends HtmlForm {
 		 */
 		@Override
 		public String getActionURL(FacesContext context, String viewId) {
-			String actionURL = form.isUseRequestURI() ? getActionURL(context) : getWrapped().getActionURL(context, viewId);
+			String actionURL = form.isUseRequestURI() && !form.isIncludeRequestParams() ? getActionURL(context) : getWrapped().getActionURL(context, viewId);
 			String queryString = toQueryString(getParams(form, form.isUseRequestURI() || form.isIncludeRequestParams(), form.isIncludeViewParams()));
 			return formatURLWithQueryString(actionURL, queryString);
 		}

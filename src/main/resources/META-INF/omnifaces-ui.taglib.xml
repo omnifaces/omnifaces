@@ -3944,9 +3944,25 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
 		</attribute>
 		<attribute>
 			<description>
-				Whether to use current request URI with query string as action URI. Defaults to true.
+				<![CDATA[
+					Whether to use current request URI with query string as action URI. 
+					Defaults to true.
+					This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
+				]]>
 			</description>
 			<name>useRequestURI</name>
+			<required>false</required>
+			<type>boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Whether to include request query string parameters in the URL.
+					Defaults to false.
+					When this setting is set to <code>true</code>, <code>useRequestURI</code> is ignored.
+				]]>
+			</description>
+			<name>includeRequestParams</name>
 			<required>false</required>
 			<type>boolean</type>
 		</attribute>
