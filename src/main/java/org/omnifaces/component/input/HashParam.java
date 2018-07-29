@@ -64,8 +64,9 @@ import org.omnifaces.util.State;
  * </pre>
  * <p>
  * This specific part of the URL (also called hash fragment identifier) is by default not sent to the server. This
- * component will on page load send it anyway and on every ajax request update the hash query string in client side
- * when the model value has changed in server side.
+ * component will on page load and on every <code>window.onhashchange</code> event send it anyway so that the JSF model
+ * gets updated, and on every JSF ajax request update the hash query string in client side when the JSF model value has
+ * changed.
  *
  * <h3>Usage</h3>
  * <p>
@@ -99,6 +100,9 @@ import org.omnifaces.util.State;
  * &lt;/h:body&gt;
  * </pre>
  * <p>
+ * In case you need to invoke a bean method before rendering, e.g. to preload the rendered contents based on new hash
+ * param values, then you can observe the {@link HashChangeEvent}. See the "Events" section for an usage example.
+ * <p>
  * You can use the <code>default</code> attribute to declare a non-null value which should be interpreted as the default
  * value. In other words, when the current model value matches the default value, then the hash parameter will be
  * removed.
@@ -125,6 +129,9 @@ import org.omnifaces.util.State;
  *     // ...
  * }
  * </pre>
+ * <p>
+ * This is useful in case you want to preload the model for whatever is rendered by
+ * <code>&lt;o:hashParam rendered&gt;</code>.
  *
  * @author Bauke Scholtz
  * @since 3.2
