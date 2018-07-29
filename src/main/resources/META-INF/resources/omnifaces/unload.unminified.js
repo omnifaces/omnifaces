@@ -50,7 +50,7 @@ OmniFaces.Unload = (function(Util, navigator, window, document) {
 			var form = Util.getFacesForm();
 
 			if (!form) {
-				if (window.jsf && jsf.getProjectStage() == "Development" && window.console && console.error) {
+				if ((!window.jsf || jsf.getProjectStage() == "Development") && window.console && console.error) {
 					console.error(ERROR_MISSING_FORM);
 				}
 
