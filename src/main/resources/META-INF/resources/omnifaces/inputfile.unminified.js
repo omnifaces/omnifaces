@@ -55,8 +55,10 @@ OmniFaces.InputFile = (function(window, document) {
 				// Clear out selected files. Note: inputFile.value = null doesn't work in IE.
 				inputFile.type = "text";
 				inputFile.type = "file";
-
-				jsf.ajax.request(inputFile.id, event, { "omnifaces.event": "validationFailed", fileName: fileName });
+				
+				var params = { fileName: fileName };
+				params[OmniFaces.EVENT] = "validationFailed";
+				jsf.ajax.request(inputFile.id, event, params);
 
 				if (originalEnctype) {
 					inputFile.form.enctype = originalEnctype;

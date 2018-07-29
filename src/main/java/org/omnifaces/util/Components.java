@@ -182,6 +182,7 @@ public final class Components {
 	 * Returns the current UI component from the EL context.
 	 * @param <C> The expected component type.
 	 * @return The current UI component from the EL context.
+	 * @throws ClassCastException When <code>C</code> is of wrong type.
 	 * @see UIComponent#getCurrentComponent(FacesContext)
 	 */
 	@SuppressWarnings("unchecked")
@@ -716,7 +717,7 @@ public final class Components {
 
 	private static UIComponent addScriptResource(String libraryName, String resourceName, String target) {
 		FacesContext context = FacesContext.getCurrentInstance();
-		String id = libraryName + "_" + resourceName.replaceAll("\\W+", "_");
+		String id = (libraryName != null ? (libraryName.replaceAll("\\W+", "_") + "_") : "") + resourceName.replaceAll("\\W+", "_");
 
 		for (UIComponent existingResource : context.getViewRoot().getComponentResources(context, target)) {
 			if (id.equals(existingResource.getId())) {
@@ -872,24 +873,38 @@ public final class Components {
 	 * Returns the source of the currently invoked action, or <code>null</code> if there is none, which may happen when
 	 * the current request is not a postback request at all, or when the view has been changed by for example a
 	 * successful navigation. If the latter is the case, you'd better invoke this method before navigation.
+	 * @param <C> The expected component type.
 	 * @return The source of the currently invoked action.
 	 * @since 2.4
 	 */
-	public static UIComponent getCurrentActionSource() {
+	@SuppressWarnings("unchecked")
+	public static <C extends UIComponent> C getCurrentActionSource() {
 		FacesContext context = FacesContext.getCurrentInstance();
 
 		if (!context.isPostback()) {
 			return null;
 		}
 
-		UIViewRoot viewRoot = context.getViewRoot();
+		UIComponent actionSource = getCurrentActionSource(context, context.getViewRoot());
+
+		if (actionSource == null) { // Can happen when prependId="false" is set on form. Hopefully it will be deprecated one day.
+			actionSource = getCurrentActionSource(context, getCurrentForm());
+		}
+
+		return (C) actionSource;
+	}
+
+	/**
+	 * Helper method for {@link #getCurrentActionSource()}.
+	 */
+	private static UIComponent getCurrentActionSource(FacesContext context, UIComponent parent) {
 		Map<String, String> params = context.getExternalContext().getRequestParameterMap();
 
 		if (context.getPartialViewContext().isAjaxRequest()) {
 			String sourceClientId = params.get(BEHAVIOR_SOURCE_PARAM_NAME);
 
 			if (sourceClientId != null) {
-				UIComponent actionSource = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(sourceClientId));
+				UIComponent actionSource = findComponentIgnoringIAE(parent, stripIterationIndexFromClientId(sourceClientId));
 
 				if (actionSource != null) {
 					return actionSource;
@@ -902,7 +917,7 @@ public final class Components {
 				continue; // Quick skip.
 			}
 
-			UIComponent actionSource = findComponentIgnoringIAE(viewRoot, stripIterationIndexFromClientId(name));
+			UIComponent actionSource = findComponentIgnoringIAE(parent, stripIterationIndexFromClientId(name));
 
 			if (actionSource instanceof UICommand) {
 				return actionSource;
@@ -1040,17 +1055,18 @@ public final class Components {
 	 * Returns an unmodifiable list with all child {@link UIParameter} components (<code>&lt;f|o:param&gt;</code>) of
 	 * the given parent component as a list of {@link ParamHolder} instances. Those with <code>disabled=true</code> and
 	 * an empty name are skipped.
+	 * @param <T> The type of the param value.
 	 * @param component The parent component to retrieve all child {@link UIParameter} components from.
 	 * @return An unmodifiable list with all child {@link UIParameter} components having a non-empty name and not
 	 * disabled.
 	 * @since 2.1
 	 */
-	public static List<ParamHolder<Object>> getParams(UIComponent component) {
+	public static <T> List<ParamHolder<T>> getParams(UIComponent component) {
 		if (component.getChildCount() == 0) {
 			return Collections.emptyList();
 		}
 
-		List<ParamHolder<Object>> params = new ArrayList<>(component.getChildCount());
+		List<ParamHolder<T>> params = new ArrayList<>(component.getChildCount());
 
 		for (UIComponent child : component.getChildren()) {
 			if (child instanceof UIParameter) {

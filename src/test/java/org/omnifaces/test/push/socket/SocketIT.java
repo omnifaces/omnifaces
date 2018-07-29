@@ -115,21 +115,21 @@ public class SocketIT extends OmniFacesIT {
 	private String pushApplicationScopedServerEvent() {
 		guardAjax(pushApplicationScopedServerEvent).click();
 		String message = messages.getText();
-		waitUntilMessages(applicationScopedServerEventMessage);
+		waitUntilTextContent(applicationScopedServerEventMessage);
 		return message;
 	}
 
 	private String pushSessionScopedUserTargeted() {
 		guardAjax(pushSessionScopedUserTargeted).click();
 		String message = messages.getText();
-		waitUntilMessages(sessionScopedUserTargetedMessage);
+		waitUntilTextContent(sessionScopedUserTargetedMessage);
 		return message;
 	}
 
 	private String pushViewScopedAjaxAware() {
 		guardAjax(pushViewScopedAjaxAware).click();
 		String message = messages.getText();
-		waitUntilMessages(viewScopedAjaxAwareMessage);
+		waitUntilTextContent(viewScopedAjaxAwareMessage);
 		return message;
 	}
 

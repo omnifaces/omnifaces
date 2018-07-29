@@ -15,8 +15,11 @@ package org.omnifaces.util;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.logging.Level.FINEST;
+import static javax.faces.component.UIViewRoot.METADATA_FACET_NAME;
 import static javax.faces.view.facelets.FaceletContext.FACELET_CONTEXT_KEY;
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
+import static org.omnifaces.util.Components.findComponentsInChildren;
+import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Reflection.toClassOrNull;
 import static org.omnifaces.util.Servlets.addParamToMapIfNecessary;
@@ -87,6 +90,7 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
 
 import org.omnifaces.component.ParamHolder;
+import org.omnifaces.component.input.HashParam;
 import org.omnifaces.config.FacesConfigXml;
 
 /**
@@ -383,7 +387,8 @@ public final class FacesLocal {
 	public static String getViewIdWithParameters(FacesContext context) {
 		String viewId = coalesce(getViewId(context), "");
 		String viewParameters = toQueryString(getViewParameterMap(context));
-		return (viewParameters == null) ? viewId : (viewId + "?" + viewParameters);
+		String hashParameters = getHashQueryString(context);
+		return ((viewParameters == null) ? viewId : (viewId + "?" + viewParameters)) + ((hashParameters == null) ? "" : ("#" + hashParameters));
 	}
 
 	/**
@@ -482,6 +487,50 @@ public final class FacesLocal {
 		}
 
 		return parameterMap;
+	}
+
+	/**
+	 * @see Faces#getHashParameters()
+	 */
+	public static Collection<HashParam> getHashParameters(FacesContext context) {
+		UIViewRoot viewRoot = context.getViewRoot();
+		return (viewRoot != null) ? findComponentsInChildren(getViewRoot().getFacet(METADATA_FACET_NAME), HashParam.class) : Collections.<HashParam>emptyList();
+	}
+
+	/**
+	 * @see Faces#getHashParameterMap()
+	 */
+	public static Map<String, List<String>> getHashParameterMap(FacesContext context) {
+		Collection<HashParam> hashParameters = getHashParameters(context);
+
+		if (hashParameters.isEmpty()) {
+			return new LinkedHashMap<>(0);
+		}
+
+		Map<String, List<String>> parameterMap = new LinkedHashMap<>(hashParameters.size());
+
+		for (HashParam hashParameter : hashParameters) {
+			if (isEmpty(hashParameter.getName())) {
+				continue;
+			}
+
+			String value = hashParameter.getRenderedValue(context);
+
+			if (!isEmpty(value)) {
+				// <o:hashParam> doesn't support multiple values anyway, so having multiple <o:hashParam> on the
+				// same request parameter shouldn't end up in repeated parameters in action URL.
+				parameterMap.put(hashParameter.getName(), asList(value));
+			}
+		}
+
+		return parameterMap;
+	}
+
+	/**
+	 * See {@link Faces#getHashQueryString()}
+	 */
+	public static String getHashQueryString(FacesContext context) {
+		return toQueryString(getHashParameterMap(context));
 	}
 
 	/**
@@ -1020,6 +1069,13 @@ public final class FacesLocal {
 	 */
 	public static String getRemoteAddr(FacesContext context) {
 		return Servlets.getRemoteAddr(getRequest(context));
+	}
+
+	/**
+	 * @see Faces#getUserAgent()
+	 */
+	public static String getUserAgent(FacesContext context) {
+		return Servlets.getUserAgent(getRequest(context));
 	}
 
 	/**

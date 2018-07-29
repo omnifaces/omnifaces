@@ -45,8 +45,8 @@ OmniFaces.Form = (function(Util, window) {
 					executeIds.push(encodeURIComponent(form.id));
 				}
 
-				executeIds.push("javax.faces.ViewState");
-				executeIds.push("javax.faces.ClientWindow");
+				executeIds.push(OmniFaces.VIEW_STATE_PARAM);
+				executeIds.push(OmniFaces.CLIENT_WINDOW_PARAM);
 
 				var partialViewState = [];
 

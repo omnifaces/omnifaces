@@ -12,18 +12,25 @@
  */
 package org.omnifaces.util;
 
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
 import static java.util.logging.Level.WARNING;
+import static java.util.stream.Collectors.toMap;
 import static javax.faces.validator.BeanValidator.VALIDATOR_FACTORY_KEY;
 import static org.omnifaces.util.Faces.getApplicationAttribute;
+import static org.omnifaces.util.Faces.getLocale;
+
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.faces.webapp.FacesServlet;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
+import javax.validation.ConstraintViolation;
+import javax.validation.MessageInterpolator;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
@@ -54,26 +61,101 @@ public final class Platform {
 
 	// Bean Validation ------------------------------------------------------------------------------------------------
 
-	public static ValidatorFactory getBeanValidatorFactory() {
-		return getApplicationAttribute(VALIDATOR_FACTORY_KEY, Validation::buildDefaultValidatorFactory);
-	}
-
-	public static Validator getBeanValidator() {
-		return getBeanValidatorFactory().getValidator();
-	}
-
+	/**
+	 * Returns <code>true</code> if Bean Validation is available. This is remembered in the application scope.
+	 * @return <code>true</code> if Bean Validation is available.
+	 */
 	public static boolean isBeanValidationAvailable() {
 		return getApplicationAttribute(BEAN_VALIDATION_AVAILABLE, () -> {
 			try {
 				Class.forName("javax.validation.Validation");
 				getBeanValidator();
-				return TRUE;
-			} catch (Exception | LinkageError e) {
+				return true;
+			}
+			catch (Exception | LinkageError e) {
 				logger.log(WARNING, "Bean validation not available.", e);
-				return FALSE;
+				return false;
 			}
 		});
 	}
+
+	/**
+	 * Returns the default bean validator factory. This is remembered in the application scope.
+	 * @return The default bean validator factory.
+	 */
+	public static ValidatorFactory getBeanValidatorFactory() {
+		return getApplicationAttribute(VALIDATOR_FACTORY_KEY, Validation::buildDefaultValidatorFactory);
+	}
+
+	/**
+	 * Returns the bean validator which is aware of the JSF locale.
+	 * @return The bean validator which is aware of the JSF locale.
+	 * @see Faces#getLocale()
+	 */
+	public static Validator getBeanValidator() {
+		ValidatorFactory validatorFactory = getBeanValidatorFactory();
+        return validatorFactory.usingContext()
+        	.messageInterpolator(new FacesLocaleAwareMessageInterpolator(validatorFactory.getMessageInterpolator()))
+        	.getValidator();
+	}
+
+	/**
+	 * Validate given bean on given group classes
+	 * and return constraint violation messages mapped by property path.
+	 * @param bean Bean to be validated.
+	 * @param groups Bean validation groups, if any.
+	 * @return Constraint violation messages mapped by property path.
+	 * @since 2.7
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static Map<String, String> validateBean(Object bean, Class<?>... groups) {
+		Set violationsRaw = getBeanValidator().validate(bean, groups);
+		Set<ConstraintViolation<?>> violations = violationsRaw;
+		return mapViolationMessagesByPropertyPath(violations);
+	}
+
+	/**
+	 * Validate given value as if it were a property of the given bean type
+	 * and return constraint violation messages mapped by property path.
+	 * @param beanType Type of target bean.
+	 * @param propertyName Name of property on target bean.
+	 * @param value Value to be validated.
+	 * @param groups Bean validation groups, if any.
+	 * @return Constraint violation messages mapped by property path.
+	 * @since 2.7
+	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public static Map<String, String> validateBeanProperty(Class<?> beanType, String propertyName, Object value, Class<?>... groups) {
+		Set violationsRaw = getBeanValidator().validateValue(beanType, propertyName, value, groups);
+		Set<ConstraintViolation<?>> violations = violationsRaw;
+		return mapViolationMessagesByPropertyPath(violations);
+	}
+
+	private static Map<String, String> mapViolationMessagesByPropertyPath(Set<ConstraintViolation<?>> violations) {
+		return violations.stream().collect(toMap(violation -> violation.getPropertyPath().toString(), violation -> violation.getMessage(), (l, r) -> l, LinkedHashMap::new));
+	}
+
+    private static class FacesLocaleAwareMessageInterpolator implements MessageInterpolator {
+
+        private MessageInterpolator wrapped;
+
+        public FacesLocaleAwareMessageInterpolator(MessageInterpolator wrapped) {
+            this.wrapped = wrapped;
+        }
+
+        @Override
+		public String interpolate(String message, MessageInterpolator.Context context) {
+            return wrapped.interpolate(message, context, getLocale());
+        }
+
+        @Override
+		public String interpolate(String message, MessageInterpolator.Context context, Locale locale) {
+            return wrapped.interpolate(message, context, locale);
+        }
+    }
+
+
+	// FacesServlet ---------------------------------------------------------------------------------------------------
 
 	/**
 	 * Returns the {@link ServletRegistration} associated with the {@link FacesServlet}.

@@ -36,7 +36,6 @@ import static org.omnifaces.util.Faces.validationFailed;
 import static org.omnifaces.util.FacesLocal.evaluateExpressionGet;
 import static org.omnifaces.util.Messages.addError;
 import static org.omnifaces.util.Messages.addGlobalError;
-import static org.omnifaces.util.Platform.getBeanValidator;
 import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Reflection.setProperties;
 import static org.omnifaces.util.Reflection.toClass;
@@ -51,6 +50,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -69,10 +69,10 @@ import javax.faces.validator.Validator;
 import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
-import javax.validation.ConstraintViolation;
 
 import org.omnifaces.eventlistener.BeanValidationEventListener;
 import org.omnifaces.util.Callback;
+import org.omnifaces.util.Platform;
 import org.omnifaces.util.copier.CloneCopier;
 import org.omnifaces.util.copier.Copier;
 import org.omnifaces.util.copier.CopyCtorCopier;
@@ -202,7 +202,7 @@ import org.omnifaces.util.copier.SerializationCopier;
  * &lt;/h:form&gt;
  * </pre>
  * <p>
- * The faces message can also be shown for components which match {@link ConstraintViolation#getPropertyPath() Property
+ * The faces message can also be shown for components which match {@link javax.validation.ConstraintViolation#getPropertyPath() Property
  * Path of the ConstraintViolation} using <code>showMessageFor="@violating"</code>, and when no matching component can
  * be found, the message will fallback to being added with client ID of the parent {@link UIForm}.
  * <pre>
@@ -401,7 +401,7 @@ public class ValidateBean extends TagHandler {
 		subscribeToRequestBeforePhase(PROCESS_VALIDATIONS, validateForm);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "rawtypes" })
 	private void validate(FacesContext context, UIForm form, Object actualBean, Object validableBean, Set<String> clientIds, boolean renderResponseOnFail) {
 		List<Class> groupClasses = new ArrayList<>();
 
@@ -409,8 +409,7 @@ public class ValidateBean extends TagHandler {
 			groupClasses.add(toClass(group));
 		}
 
-		Set violationsRaw = getBeanValidator().validate(validableBean, groupClasses.toArray(new Class[groupClasses.size()]));
-		Set<ConstraintViolation<?>> violations = violationsRaw;
+		Map<String, String> violations = Platform.validateBean(validableBean, groupClasses.toArray(new Class[groupClasses.size()]));
 
 		if (!violations.isEmpty()) {
 			if ("@violating".equals(showMessageFor)) {
@@ -493,18 +492,18 @@ public class ValidateBean extends TagHandler {
 		return copier;
 	}
 
-	private static void invalidateInputsByPropertyPathAndShowMessages(FacesContext context, UIForm form, Object bean, Set<ConstraintViolation<?>> violations) {
-		for (ConstraintViolation<?> violation : violations) {
-			forEachInputWithMatchingBase(context, form, bean, violation.getPropertyPath().toString(), input -> {
+	private static void invalidateInputsByPropertyPathAndShowMessages(FacesContext context, UIForm form, Object bean, Map<String, String> violations) {
+		for (Entry<String, String> violation : violations.entrySet()) {
+			forEachInputWithMatchingBase(context, form, bean, violation.getKey(), input -> {
 				context.validationFailed();
 				input.setValid(false);
 				String clientId = input.getClientId(context);
-				addError(clientId, violation.getMessage(), getLabel(input));
+				addError(clientId, violation.getValue(), getLabel(input));
 			});
 		}
 	}
 
-	private static void invalidateInputsByShowMessageForAndShowMessages(FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, String showMessageFor) {
+	private static void invalidateInputsByShowMessageForAndShowMessages(FacesContext context, UIForm form, Map<String, String> violations, String showMessageFor) {
 		for (String forId : showMessageFor.split("\\s+")) {
 			UIComponent component = form.findComponent(forId);
 			context.validationFailed();
@@ -518,7 +517,7 @@ public class ValidateBean extends TagHandler {
 		}
 	}
 
-	private static void invalidateInputsByClientIdsAndShowMessages(final FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, Set<String> clientIds, String showMessageFor) {
+	private static void invalidateInputsByClientIdsAndShowMessages(final FacesContext context, UIForm form, Map<String, String> violations, Set<String> clientIds, String showMessageFor) {
 		context.validationFailed();
 		StringBuilder labels = new StringBuilder();
 
@@ -537,7 +536,7 @@ public class ValidateBean extends TagHandler {
 		showMessages(context, form, violations, clientIds, labels.toString(), showMessageFor);
 	}
 
-	private static void showMessages(FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, Set<String> clientIds, String labels, String showMessagesFor) {
+	private static void showMessages(FacesContext context, UIForm form, Map<String, String> violations, Set<String> clientIds, String labels, String showMessagesFor) {
 		if ("@form".equals(showMessagesFor)) {
 			String formId = form.getClientId(context);
 			addErrors(formId, violations, labels);
@@ -548,8 +547,8 @@ public class ValidateBean extends TagHandler {
 			}
 		}
 		else if ("@global".equals(showMessagesFor)) {
-			for (ConstraintViolation<?> violation : violations) {
-				addGlobalError(violation.getMessage(), labels);
+			for (String message : violations.values()) {
+				addGlobalError(message, labels);
 			}
 		}
 		else {
@@ -559,9 +558,9 @@ public class ValidateBean extends TagHandler {
 		}
 	}
 
-	private static void addErrors(String clientId, Set<ConstraintViolation<?>> violations, String labels) {
-		for (ConstraintViolation<?> violation : violations) {
-			addError(clientId, violation.getMessage(), labels);
+	private static void addErrors(String clientId, Map<String, String> violations, String labels) {
+		for (String message : violations.values()) {
+			addError(clientId, message, labels);
 		}
 	}
 

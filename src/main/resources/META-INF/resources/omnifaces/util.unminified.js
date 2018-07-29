@@ -92,6 +92,53 @@ OmniFaces.Util = (function(window, document) {
 	self.resolveFunction = function(fn) {
 		return (typeof fn !== "function") && (fn = window[fn] || function(){}), fn;
 	}
+	
+	/**
+	 * Get the first JSF form containing view state param from the current document.
+	 * @return {HTMLFormElement} The first JSF form of the current document.
+	 */
+	self.getFacesForm = function() {
+		for (var i = 0; i < document.forms.length; i++) {
+			if (document.forms[i]["javax.faces.ViewState"]) {
+				return document.forms[i];
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Update a parameter in given query string in application/x-www-url-encoded format.
+	 * @param {string} query The query string.
+	 * @param {string} name The name of the parameter to update. If it doesn't exist, then it will be added.
+	 * @param {string} value The value of the parameter to update. If it is falsey, then it will be removed.
+	 */
+	self.updateParameter = function(query, name, value) {
+		var re = new RegExp("(^|[?&#])" + name + "=.*?([&#]|$)", "i");
+
+		if (value) {
+			var parameter = name + "=" + encodeURIComponent(value);
+
+			if (!query) {
+				query = parameter;
+			}
+			else if (query.match(re)) {
+				query = query.replace(re, "$1" + parameter + "$2");
+			}
+			else {
+				query += "&" + parameter;
+			}
+		}
+		else {
+			query = query.replace(re, "$2");
+		}
+
+		if (query.charAt(0) == "&") {
+			query = query.substring(1);
+		}
+		
+		return query;
+	}
 
 	// Private static functions ---------------------------------------------------------------------------------------
 

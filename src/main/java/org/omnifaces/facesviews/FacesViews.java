@@ -19,6 +19,7 @@ import static java.util.Collections.unmodifiableSet;
 import static java.util.Locale.ENGLISH;
 import static java.util.Locale.US;
 import static java.util.regex.Pattern.quote;
+import static java.util.stream.Collectors.toMap;
 import static javax.faces.view.facelets.ResourceResolver.FACELETS_RESOURCE_RESOLVER_PARAM_NAME;
 import static javax.servlet.DispatcherType.FORWARD;
 import static javax.servlet.DispatcherType.REQUEST;
@@ -55,7 +56,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import javax.faces.application.Application;
 import javax.faces.application.ViewHandler;
@@ -371,7 +371,7 @@ public final class FacesViews {
 		if (!collectedViews.isEmpty()) {
 			servletContext.setAttribute(MAPPED_RESOURCES, unmodifiableMap(collectedViews));
 			servletContext.setAttribute(REVERSE_MAPPED_RESOURCES, unmodifiableMap(collectedViews.entrySet().stream()
-				.filter(e -> isExtensionless(e.getKey())).collect(Collectors.toMap(Entry::getValue, Entry::getKey))));
+				.filter(e -> isExtensionless(e.getKey())).collect(toMap(Entry::getValue, Entry::getKey, (l, r) -> l))));
 
 			if (collectExtensions) {
 				storeExtensions(servletContext, collectedViews, collectedExtensions);

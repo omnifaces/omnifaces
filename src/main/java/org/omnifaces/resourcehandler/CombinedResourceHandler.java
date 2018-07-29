@@ -203,6 +203,16 @@ import org.omnifaces.util.cache.Cache;
  * {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_RESOURCES}, then those CDN resources will
  * automatically be added to the set of excluded resources.
  *
+ * <h3>CDNResource</h3>
+ * <p>
+ * Since 2.7, if you have configured a custom {@link ResourceHandler} which automatically uploads the resources to a
+ * CDN host, including the combined resources, and you want to be able to have a fallback to local host URL when the
+ * CDN host is unreachable, then you can let your custom {@link ResourceHandler} return a {@link CDNResource} which
+ * wraps the original resource and the CDN URL. The combined resource handler will make sure that the appropriate
+ * <code>onerror</code> attributes are added to the component resources which initiates the fallback resource in case
+ * the CDN request errors out.
+ *
+ *
  * @author Bauke Scholtz
  * @author Stephan Rauh {@literal <www.beyondjava.net>}
  *
@@ -214,6 +224,7 @@ import org.omnifaces.util.cache.Cache;
  * @see InlineScriptRenderer
  * @see InlineStylesheetRenderer
  * @see InlineResourceRenderer
+ * @see CDNResource
  */
 public class CombinedResourceHandler extends DefaultResourceHandler implements SystemEventListener {
 
@@ -306,7 +317,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 	 */
 	@Override
 	public void processEvent(SystemEvent event) {
-		if (disabledParam != null && parseBoolean(String.valueOf(evaluateExpressionGet(disabledParam)))) {
+		if (disabledParam != null && parseBoolean(String.valueOf((Object) evaluateExpressionGet(disabledParam)))) {
 			return;
 		}
 
@@ -537,12 +548,13 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 			}
 			else if (!containsResourceIdentifier(excludedResources, resourceIdentifier)) {
 				infoBuilder.add(resourceIdentifier);
+				boolean deferredScript = (componentResource instanceof DeferredScript);
 
-				if (this.componentResource == null) {
+				if (this.componentResource == null && (deferredScript || (componentResource != null && componentResource.getAttributes().containsKey("target")))) {
 					this.componentResource = componentResource;
 				}
 				else {
-					if (componentResource instanceof DeferredScript) {
+					if (deferredScript) {
 						mergeAttribute(this.componentResource, componentResource, "onbegin");
 						mergeAttribute(this.componentResource, componentResource, "onsuccess");
 						mergeAttribute(this.componentResource, componentResource, "onerror");
@@ -579,11 +591,26 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 					context.getViewRoot().addComponentResource(context, componentResource, target);
 				}
 
+				String resourceName = infoBuilder.create() + extension;
 				componentResource.getAttributes().put("library", LIBRARY_NAME);
-				componentResource.getAttributes().put("name", infoBuilder.create() + extension);
+				componentResource.getAttributes().put("name", resourceName);
 				componentResource.setRendererType(rendererType);
+				Resource resource = context.getApplication().getResourceHandler().createResource(resourceName, LIBRARY_NAME);
 
-				if (RENDERER_TYPE_JS.equals(rendererType)) {
+				if (resource instanceof CDNResource) {
+					String fallback = ((CDNResource) resource).getLocalRequestPath();
+
+					if (RENDERER_TYPE_JS.equals(rendererType)) {
+						componentResource.getPassThroughAttributes().put("onerror", "document.write('<script src=\"" + fallback + "\"></script>')");
+					}
+					else if (RENDERER_TYPE_CSS.equals(rendererType)) {
+						componentResource.getPassThroughAttributes().put("onerror", "this.onerror=null;this.href='" + fallback + "'");
+					}
+					else if (DeferredScriptRenderer.RENDERER_TYPE.equals(rendererType)) {
+						componentResource.getAttributes().put("onerror", "document.write('<script src=\"" + fallback + "\"><\\/script>')");
+					}
+				}
+				else if (RENDERER_TYPE_JS.equals(rendererType)) {
 					componentResource.getPassThroughAttributes().put("crossorigin", "anonymous");
 				}
 			}

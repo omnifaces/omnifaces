@@ -22,9 +22,14 @@ import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.FacesLocal.getViewAttribute;
 import static org.omnifaces.util.FacesLocal.isAjaxRequest;
 import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
+
+import java.io.Serializable;
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Objects;
 
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
@@ -72,7 +77,7 @@ public class SocketFacesListener implements SystemEventListener {
 		}
 
 		FacesContext context = FacesContext.getCurrentInstance();
-		Map<String, Boolean> sockets = getSockets(context);
+		Map<String, Entry<Serializable, Boolean>> sockets = getSockets(context);
 
 		if (!isAjaxRequest(context)) {
 			sockets.clear();
@@ -84,7 +89,7 @@ public class SocketFacesListener implements SystemEventListener {
 			}
 
 			boolean connected = socket.isRendered() && socket.isConnected();
-			boolean previouslyConnected = sockets.put(socket.getChannel(), connected);
+			boolean previouslyConnected = sockets.get(socket.getChannel()).setValue(connected);
 
 			if (connected != previouslyConnected) {
 				String script = format(connected ? SCRIPT_OPEN : SCRIPT_CLOSE, socket.getChannel());
@@ -124,14 +129,21 @@ public class SocketFacesListener implements SystemEventListener {
 	 * <code>socket.isRendered()</code> returns <code>false</code>, so this check is not done here.
 	 */
 	static boolean register(FacesContext context, Socket socket) {
-		return getSockets(context).put(socket.getChannel(), socket.isConnected()) == null;
+		Entry<Serializable, Boolean> currentlyConnectedUser = new AbstractMap.SimpleEntry<>(socket.getUser(), socket.isConnected());
+		Entry<Serializable, Boolean> previouslyConnectedUser = getSockets(context).put(socket.getChannel(), currentlyConnectedUser);
+
+		if (previouslyConnectedUser != null && !Objects.equals(previouslyConnectedUser.getKey(), socket.getUser())) {
+			SocketChannelManager.getInstance().switchUser(socket.getChannel(), socket.getScope(), previouslyConnectedUser.getKey(), socket.getUser());
+		}
+
+		return previouslyConnectedUser == null;
 	}
 
 	/**
 	 * Helper to remember which sockets are initialized on the view. The map key represents the <code>channel</code>
-	 * and the map value represents the last known value of the <code>connected</code> attribute.
+	 * and the map value represents the last known value of the <code>user</code> and <code>connected</code> attributes.
 	 */
-	private static Map<String, Boolean> getSockets(FacesContext context) {
+	private static Map<String, Entry<Serializable, Boolean>> getSockets(FacesContext context) {
 		return getViewAttribute(context, Socket.class.getName(), () -> new HashMap<>(ESTIMATED_TOTAL_CHANNELS));
 	}
 

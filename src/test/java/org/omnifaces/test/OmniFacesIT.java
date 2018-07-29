@@ -64,6 +64,10 @@ public abstract class OmniFacesIT {
 		return newTab;
 	}
 
+	protected void openWithHashString(String hashString) {
+		open(getClass().getSimpleName() + ".xhtml?" + System.currentTimeMillis() + "#" + hashString); // Query string trick is necessary because Selenium driver may not forcibly reload page.
+	}
+
 	protected void closeCurrentTabAndSwitchTo(String tabToSwitch) {
 		browser.close();
 		browser.switchTo().window(tabToSwitch);
@@ -75,7 +79,7 @@ public abstract class OmniFacesIT {
 	protected void triggerOnchange(WebElement input, WebElement messages) {
 		clearMessages(messages);
 		executeScript("document.getElementById('" + input.getAttribute("id") + "').onchange();");
-		waitUntilMessages(messages);
+		waitUntilTextContent(messages);
 	}
 
 	/**
@@ -84,11 +88,11 @@ public abstract class OmniFacesIT {
 	protected void guardAjaxUpload(WebElement submit, WebElement messages) {
 		clearMessages(messages);
 		submit.click();
-		waitUntilMessages(messages);
+		waitUntilTextContent(messages);
 	}
 
-	protected void waitUntilMessages(WebElement messages) {
-		waitGui(browser).withTimeout(3, SECONDS).until().element(messages).text().not().equalTo("");
+	protected void waitUntilTextContent(WebElement element) {
+		waitGui(browser).withTimeout(3, SECONDS).until().element(element).text().not().equalTo("");
 	}
 
 	protected void executeScript(String script) {

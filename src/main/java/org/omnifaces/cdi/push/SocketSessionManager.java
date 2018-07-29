@@ -60,13 +60,6 @@ public class SocketSessionManager {
 	private static final Logger logger = Logger.getLogger(SocketSessionManager.class.getName());
 
 	private static final CloseReason REASON_EXPIRED = new CloseReason(NORMAL_CLOSURE, "Expired");
-	private static final AnnotationLiteral<Opened> SESSION_OPENED = new AnnotationLiteral<Opened>() {
-		private static final long serialVersionUID = 1L;
-	};
-	private static final AnnotationLiteral<Closed> SESSION_CLOSED = new AnnotationLiteral<Closed>() {
-		private static final long serialVersionUID = 1L;
-	};
-
 	private static final long TOMCAT_WEB_SOCKET_RETRY_TIMEOUT = 10; // Milliseconds.
 	private static final long TOMCAT_WEB_SOCKET_MAX_RETRIES = 100; // So, that's retrying for about 1 second.
 	private static final String WARNING_TOMCAT_WEB_SOCKET_BOMBED =
@@ -127,7 +120,7 @@ public class SocketSessionManager {
 				session.getUserProperties().put("user", user);
 			}
 
-			fireEvent(session, null, SESSION_OPENED);
+			fireEvent(session, null, Opened.LITERAL);
 			return true;
 		}
 
@@ -224,7 +217,7 @@ public class SocketSessionManager {
 		Collection<Session> sessions = socketSessions.get(getChannelId(session));
 
 		if (sessions != null && sessions.remove(session)) {
-			fireEvent(session, reason, SESSION_CLOSED);
+			fireEvent(session, reason, Closed.LITERAL);
 		}
 	}
 
@@ -234,7 +227,7 @@ public class SocketSessionManager {
 	 */
 	protected void deregister(Iterable<String> channelIds) {
 		for (String channelId : channelIds) {
-			Collection<Session> sessions = socketSessions.get(channelId);
+			Collection<Session> sessions = socketSessions.remove(channelId);
 
 			if (sessions != null) {
 				for (Session session : sessions) {
@@ -284,7 +277,7 @@ public class SocketSessionManager {
 
 	private static void fireEvent(Session session, CloseReason reason, AnnotationLiteral<?> qualifier) {
 		Serializable user = (Serializable) session.getUserProperties().get("user");
-		Beans.fireEvent(new SocketEvent(getChannel(session), user, (reason != null) ? reason.getCloseCode() : null), qualifier);
+		Beans.fireEvent(new SocketEvent(getChannel(session), user, null, (reason != null) ? reason.getCloseCode() : null), qualifier);
 	}
 
 }

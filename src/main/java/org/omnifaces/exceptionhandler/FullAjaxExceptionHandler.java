@@ -22,16 +22,21 @@ import static javax.servlet.RequestDispatcher.ERROR_STATUS_CODE;
 import static org.omnifaces.util.Exceptions.unwrap;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getServletContext;
+import static org.omnifaces.util.FacesLocal.getRemoteAddr;
 import static org.omnifaces.util.FacesLocal.getRequest;
+import static org.omnifaces.util.FacesLocal.getRequestAttribute;
 import static org.omnifaces.util.FacesLocal.normalizeViewId;
+import static org.omnifaces.util.FacesLocal.setRequestAttribute;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isOneInstanceOf;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.IOException;
+import java.util.Formatter;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.UUID;
 import java.util.logging.Logger;
 
 import javax.el.ELException;
@@ -118,6 +123,7 @@ import org.omnifaces.util.Hacks;
  *     &lt;li&gt;Status code: #{requestScope['javax.servlet.error.status_code']}&lt;/li&gt;
  *     &lt;li&gt;Exception type: #{requestScope['javax.servlet.error.exception_type']}&lt;/li&gt;
  *     &lt;li&gt;Exception message: #{requestScope['javax.servlet.error.message']}&lt;/li&gt;
+ *     &lt;li&gt;Exception UUID: #{requestScope['org.omnifaces.exception_uuid']}&lt;/li&gt;
  *     &lt;li&gt;Stack trace:
  *         &lt;pre&gt;#{of:printStackTrace(requestScope['javax.servlet.error.exception'])}&lt;/pre&gt;
  *     &lt;/li&gt;
@@ -168,6 +174,8 @@ import org.omnifaces.util.Hacks;
  * &lt;/context-param&gt;
  * </pre>
  * <p>
+ * This context parameter will also be read and used by {@link FacesExceptionFilter}.
+ * <p>
  * This context parameter will <strong>not</strong> suppress standard JSF and/or container builtin logging. This will
  * only suppress <code>org.omnifaces.exceptionhandler.FullAjaxExceptionHandler</code> logging. So chances are that
  * standard JSF and/or container will still log it. This may need to be configured separately.
@@ -210,11 +218,20 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 		"org.omnifaces.EXCEPTION_TYPES_TO_UNWRAP";
 
 	/**
-	 * The context parameter name to specify exception types to ignore in logging by {@link FullAjaxExceptionHandler}.
+	 * The context parameter name to specify exception types to ignore in logging by both {@link FullAjaxExceptionHandler}
+	 * and {@link FacesExceptionFilter}.
 	 * @since 2.5
 	 */
 	public static final String PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING =
 		"org.omnifaces.EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING";
+
+	/**
+	 * The request attribute name of the UUID of the thrown exception which is logged by both {@link FullAjaxExceptionHandler}
+	 * and {@link FacesExceptionFilter}.
+	 * @since 3.2
+	 */
+	public static final String EXCEPTION_UUID =
+		"org.omnifaces.exception_uuid";
 
 	/**
 	 * This is used in {@link FullAjaxExceptionHandler#logException(FacesContext, Throwable, String, LogReason)}.
@@ -319,7 +336,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	 * @return Exception types to ignore in logging.
 	 * @since 2.5
 	 */
-	private static Class<? extends Throwable>[] getExceptionTypesToIgnoreInLogging(ServletContext context) {
+	public static Class<? extends Throwable>[] getExceptionTypesToIgnoreInLogging(ServletContext context) {
 		return parseExceptionTypesParam(context, PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING, null);
 	}
 
@@ -477,7 +494,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	 * @since 2.4
 	 */
 	protected void logException(FacesContext context, Throwable exception, String location, LogReason reason) {
-		logException(context, exception, location, reason.getMessage());
+		logException(context, exception, location, reason.getMessage(), location);
 	}
 
 	/**
@@ -486,20 +503,24 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	 * The default implementation logs through <code>java.util.logging</code> as SEVERE when the thrown exception is
 	 * not an instance of any type specified in context parameter
 	 * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING}.
+	 * Since version 3.2, the log message will be prepended with the UUID and IP address.
+	 * The UUID is available in EL by <code>#{requestScope['org.omnifaces.exception_uuid']}</code>.
 	 * @param context The involved faces context.
 	 * @param exception The exception to log.
 	 * @param location The error page location.
 	 * @param message The log message.
-	 * @param parameters The log message parameters, if any.
+	 * @param parameters The log message parameters, if any. They are formatted using {@link Formatter}.
 	 * @since 1.6
 	 */
 	protected void logException(FacesContext context, Throwable exception, String location, String message, Object... parameters) {
 		if (!isOneInstanceOf(exception.getClass(), exceptionTypesToIgnoreInLogging)) {
-			logger.log(SEVERE, format(message, location), exception);
+			logger.log(SEVERE, format("[%s][%s] %s", getRequestAttribute(context, EXCEPTION_UUID), getRemoteAddr(context), format(message, parameters)), exception);
 		}
 	}
 
 	private boolean canRenderErrorPageView(FacesContext context, Throwable exception, String errorPageLocation) {
+		setRequestAttribute(context, EXCEPTION_UUID, UUID.randomUUID().toString());
+
 		if (context.getCurrentPhaseId() != PhaseId.RENDER_RESPONSE) {
 			logException(context, exception, errorPageLocation, LogReason.EXCEPTION_HANDLED);
 			return true;

@@ -19,7 +19,6 @@ import static java.util.Collections.unmodifiableList;
 import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
 import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME;
 import static javax.faces.component.behavior.ClientBehaviorContext.createClientBehaviorContext;
-import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
@@ -54,6 +53,7 @@ import org.omnifaces.cdi.Push;
 import org.omnifaces.cdi.PushContext;
 import org.omnifaces.cdi.push.SocketEvent.Closed;
 import org.omnifaces.cdi.push.SocketEvent.Opened;
+import org.omnifaces.cdi.push.SocketEvent.Switched;
 import org.omnifaces.component.script.ScriptFamily;
 import org.omnifaces.util.Beans;
 import org.omnifaces.util.Callback;
@@ -212,6 +212,11 @@ import org.omnifaces.util.State;
  * which is in turn poor security practice). If in such case a session scoped socket is reused, undefined behavior may
  * occur when user-targeted push message is sent. It may target previously logged-in user only. This can be solved by
  * setting the scope to <code>view</code>, but better is to fix the logout to invalidate the HTTP session altogether.
+ * <p>
+ * When the <code>user</code> attribute is an EL expression and it changes during an ajax request, then the socket
+ * user will be actually switched, even though you did not cover the <code>&lt;o:socket&gt;</code> component in any ajax
+ * render/update. So make sure the value is tied to at least a view scoped property in case you intend to control it
+ * during the view scope.
  * <p>
  * In the server side, the push message can be targeted to the user specified in the <code>user</code> attribute via
  * <strong>{@link PushContext#send(Object, Serializable)}</strong>. The push message can be sent by all users and the
@@ -380,7 +385,9 @@ import org.omnifaces.util.State;
  * <h3 id="events-server"><a href="#events-server">Events (server)</a></h3>
  * <p>
  * When a web socket has been opened, a new CDI <strong>{@link SocketEvent}</strong> will be fired with
- * <strong><code>&#64;</code>{@link Opened}</strong> qualifier. When a web socket has been closed, a new CDI
+ * <strong><code>&#64;</code>{@link Opened}</strong> qualifier. When the <code>user</code> attribute of the
+ * <code>&lt;o:socket&gt;</code> changes, a new CDI <strong>{@link SocketEvent}</strong> will be fired with
+ * <strong><code>&#64;</code>{@link Switched}</strong> qualifier. When a web socket has been closed, a new CDI
  * {@link SocketEvent} will be fired with <strong><code>&#64;</code>{@link Closed}</strong> qualifier. They can only be
  * observed and collected in an application scoped CDI bean as below. Observing in a request/view/session scoped CDI
  * bean is not possible as there's no means of a HTTP request anywhere at that moment.
@@ -393,6 +400,13 @@ import org.omnifaces.util.State;
  *         Long userId = event.getUser(); // Returns &lt;o:socket user&gt;, if any.
  *         // Do your thing with it. E.g. collecting them in a concurrent/synchronized collection.
  *         // Do note that a single person can open multiple sockets on same channel/user.
+ *     }
+ *
+ *     public void onSwitch(&#64;Observes &#64;Switched SocketEvent event) {
+ *         String channel = event.getChannel(); // Returns &lt;o:socket channel&gt;.
+ *         Long currentUserId = event.getUser(); // Returns current &lt;o:socket user&gt;, if any.
+ *         Long previousUserId = event.getPreviousUser(); // Returns previous &lt;o:socket user&gt;, if any.
+ *         // Do your thing with it. E.g. updating in a concurrent/synchronized collection.
  *     }
  *
  *     public void onClose(&#64;Observes &#64;Closed SocketEvent event) {
@@ -730,7 +744,7 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 
 			Integer port = getPort();
 			String host = (port != null ? ":" + port : "") + getRequestContextPath(context);
-			String channelId = getReference(SocketChannelManager.class).register(channel, getScope(), getUser());
+			String channelId = SocketChannelManager.getInstance().register(channel, getScope(), getUser());
 			String functions = getOnopen() + "," + getOnmessage() + "," + getOnclose();
 			String behaviors = getBehaviorScripts();
 			boolean connected = isConnected();
