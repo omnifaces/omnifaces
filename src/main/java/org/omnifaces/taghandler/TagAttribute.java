@@ -92,6 +92,8 @@ public class TagAttribute extends TagHandler {
 			}
 			else if ("id".equals(name)) {
 				valueExpression = createValueExpression("#{'j_ido" + context.generateUniqueId(this.tagId) + "'}", String.class);
+				variableMapper.setWrappedVariable(name, valueExpression);
+				return;
 			}
 		}
 
