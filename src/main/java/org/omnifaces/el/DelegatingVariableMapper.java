@@ -68,4 +68,8 @@ public class DelegatingVariableMapper extends VariableMapper {
 		return variables.put(name, expression);
 	}
 
+	public ValueExpression setWrappedVariable(String name, ValueExpression expression) {
+		return wrapped.setVariable(name, expression);
+	}
+
 }
