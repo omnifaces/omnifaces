@@ -12,6 +12,7 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static java.util.stream.Collectors.toList;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
 import static org.omnifaces.util.Faces.getMapping;
@@ -22,7 +23,11 @@ import static org.omnifaces.util.Utils.stream;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map.Entry;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
@@ -30,6 +35,7 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.webapp.FacesServlet;
 
+import org.omnifaces.util.FacesLocal;
 import org.omnifaces.util.Hacks;
 
 /**
@@ -106,13 +112,27 @@ import org.omnifaces.util.Hacks;
  * <p>
  * Otherwise the combined resource handler will still produce mapped URLs. In essence, the one which is later
  * registered wraps the previously registered one.
+ * This resource handler handle only harmless resources.
+ * Blacklist could be adapted by add context-param to web.xml (or fragment), this is the common JSF configuration parameter
+ * <p>
+ *     <code>
+ *         &lt;context-param&gt;<br/>
+ *         &lt;param-name&gt;javax.faces.RESOURCE_EXCLUDES&lt;/param-name&gt;<br/>
+ *         &lt;param-value&gt;.class .jsp .jspx .properties .xhtml .groovy&lt;/param-value&gt;<br/>
+ *         &lt;/context-param&gt;
+ *      </code>
+ * </p>
  *
  * @author Bauke Scholtz
+ * @author Eugen Fischer
  * @since 1.4
  * @see RemappedResource
  * @see DefaultResourceHandler
  */
 public class UnmappedResourceHandler extends DefaultResourceHandler {
+
+
+	private final static List<Pattern> EXCLUDE_RESOURCES = initExclusionPatterns();
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -120,7 +140,7 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 	 * Creates a new instance of this unmapped resource handler which wraps the given resource handler.
 	 * @param wrapped The resource handler to be wrapped.
 	 */
-	public UnmappedResourceHandler(ResourceHandler wrapped) {
+	public UnmappedResourceHandler(final ResourceHandler wrapped) {
 		super(wrapped);
 	}
 
@@ -130,60 +150,66 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 	 * If the given resource is not <code>null</code>, then decorate it as an unmapped resource.
 	 */
 	@Override
-	public Resource decorateResource(Resource resource) {
-		if (resource == null) {
-			return resource;
+	public Resource decorateResource(final Resource resource) {
+		if (resource == null ) {
+			return null;
 		}
 
-		String path = resource.getRequestPath();
+		final String path = resource.getRequestPath();
 		return isResourceRequest(path) ? new RemappedResource(resource, unmapRequestPath(path)) : resource;
 	}
 
 	@Override
-	public boolean isResourceRequest(FacesContext context) {
+	public boolean isResourceRequest(final FacesContext context) {
 		return isResourceRequest(getRequestURI(context)) || super.isResourceRequest(context);
 	}
 
 	@Override
-	public void handleResourceRequest(FacesContext context) throws IOException {
-		Resource resource = createResource(context);
+	public void handleResourceRequest(final FacesContext context) throws IOException {
+		final String requestURI = FacesLocal.getRequestURI(context);
+		if(isNotExcluded(requestURI)) {
 
-		if (resource == null) {
-			super.handleResourceRequest(context);
-			return;
+			final Resource resource = createResource(context);
+
+			if (resource == null) {
+				super.handleResourceRequest(context);
+				return;
+			}
+
+			final ExternalContext externalContext = context.getExternalContext();
+
+			if (!resource.userAgentNeedsUpdate(context)) {
+				externalContext.setResponseStatus(SC_NOT_MODIFIED);
+				return;
+			}
+
+			final InputStream inputStream = resource.getInputStream();
+
+			if (inputStream == null) {
+				externalContext.setResponseStatus(SC_NOT_FOUND);
+				return;
+			}
+
+			externalContext.setResponseContentType(resource.getContentType());
+
+			for (final Entry<String, String> header : resource.getResponseHeaders().entrySet()) {
+				externalContext.setResponseHeader(header.getKey(), header.getValue());
+			}
+
+			stream(inputStream, externalContext.getResponseOutputStream());
+		}else{
+			getWrapped().handleResourceRequest(context);
 		}
-
-		ExternalContext externalContext = context.getExternalContext();
-
-		if (!resource.userAgentNeedsUpdate(context)) {
-			externalContext.setResponseStatus(SC_NOT_MODIFIED);
-			return;
-		}
-
-		InputStream inputStream = resource.getInputStream();
-
-		if (inputStream == null) {
-			externalContext.setResponseStatus(SC_NOT_FOUND);
-			return;
-		}
-
-		externalContext.setResponseContentType(resource.getContentType());
-
-		for (Entry<String, String> header : resource.getResponseHeaders().entrySet()) {
-			externalContext.setResponseHeader(header.getKey(), header.getValue());
-		}
-
-		stream(inputStream, externalContext.getResponseOutputStream());
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
-	private static boolean isResourceRequest(String path) {
-		return path.startsWith(getRequestContextPath() + RESOURCE_IDENTIFIER);
+	private static boolean isResourceRequest(final String path) {
+		return path.startsWith(getRequestContextPath() + RESOURCE_IDENTIFIER) && isNotExcluded(path);
 	}
 
-	private static String unmapRequestPath(String path) {
-		String mapping = getMapping();
+	private static String unmapRequestPath(final String path) {
+		final String mapping = getMapping();
 
 		if (isPrefixMapping(mapping)) {
 			return path.replaceFirst(mapping, "");
@@ -199,20 +225,53 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 		}
 	}
 
-	private static Resource createResource(FacesContext context) {
+	private static Resource createResource(final FacesContext context) {
 		if (Hacks.isPrimeFacesDynamicResourceRequest(context)) {
 			return null;
 		}
 
-		String pathInfo = context.getExternalContext().getRequestPathInfo();
-		String resourceName = (pathInfo != null) ? pathInfo.substring(1) : "";
+		final String pathInfo = context.getExternalContext().getRequestPathInfo();
+		final String resourceName = (pathInfo != null) ? pathInfo.substring(1) : "";
 
 		if (resourceName.isEmpty()) {
 			return null;
 		}
 
-		String libraryName = context.getExternalContext().getRequestParameterMap().get("ln");
+		final String libraryName = context.getExternalContext().getRequestParameterMap().get("ln");
 		return context.getApplication().getResourceHandler().createResource(resourceName, libraryName);
 	}
+	
+	private static boolean isNotExcluded(final String resourceId) {
+		for (final Pattern pattern : EXCLUDE_RESOURCES) {
+			if (pattern.matcher(resourceId).matches()) {
+				return false;
+			}
+		}
+		return true;
+	}
 
+	private static List<Pattern> initExclusionPatterns() {
+		return configuredExclusions().stream().map(pattern -> Pattern.compile(".*\\" + pattern)).collect(toList());
+	}
+
+	/**
+	 * Lookup web.xml context-param {@link javax.faces.application.ResourceHandler#RESOURCE_EXCLUDES_PARAM_NAME}.<br/>
+	 * If exists use as space separated configuration list,<br/>
+	 * otherwise fallback to {@link javax.faces.application.ResourceHandler#RESOURCE_EXCLUDES_DEFAULT_VALUE}
+	 */
+	private static List<String> configuredExclusions() {
+		final String exclusions = Optional
+				.ofNullable(getContextParameter())
+				.orElseGet(() -> ResourceHandler.RESOURCE_EXCLUDES_DEFAULT_VALUE);
+		return Arrays.asList(exclusions.split(" "));
+	}
+
+	private static String getContextParameter() {
+		final String parameterValue = FacesContext.getCurrentInstance().getExternalContext()
+				.getInitParameter(ResourceHandler.RESOURCE_EXCLUDES_PARAM_NAME);
+		if(null == parameterValue ||parameterValue.isEmpty() ){
+			return null;
+		}
+		return parameterValue;
+	}
 }
