@@ -209,12 +209,14 @@ import org.omnifaces.util.Utils;
  * </pre>
  *
  * <h4>File size validation</h4>
- * <p>
+ * <p style="text-align:justify">
  * The <code>maxsize</code> attribute can be set with the maximum file size in bytes which will be validated on each
- * selected file in the client side if the client supports HTML5 File API. This only requires that there is a
- * <code>&lt;h:message&gt;</code> or <code>&lt;h:messages&gt;</code> component and that it has its <code>id</code> set.
+ * selected file in the client side if the client supports HTML5 File API.<br/>
+ * This only requires <code>&lt;h:message&gt;</code> or <code>&lt;h:messages&gt;</code> component with defined <code>id</code>.
+ * Component <b>id</b> <code>&lt;h:message id="mySelfDefinedId"&gt;</code> is mandatory otherwise validation message could not be updated!
  * Namely, the client side validation will on fail trigger JSF via an ajax request to render the faces message. Noted
  * should be that the file(s) will <strong>not</strong> be sent, hereby saving network bandwidth.
+ * </p>
  * <pre>
  * &lt;h:form enctype="multipart/form-data"&gt;
  *     &lt;o:inputFile id="file" value="#{bean.file}" maxsize="#{10 * 1024 * 1024}" /&gt; &lt;!-- 10MiB --&gt;
