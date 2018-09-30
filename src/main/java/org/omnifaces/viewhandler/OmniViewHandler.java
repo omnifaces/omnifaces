@@ -120,9 +120,8 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 	}
 
 	/**
-	 * Create a dummy view, restore only the view root state and then immediately explicitly destroy the view. Or, if there is no view root
-	 * state (which implies that session is expired), then explicitly send a permanent redirect to request URI. This way any authentication
-	 * framework which remember "last requested restricted URL" will redirect back to correct (non-unload) URL after login on a new session.
+	 * Create a dummy view, restore only the view root state and, if present, then immediately explicitly destroy the
+	 * view state. Finally mark the response complete so that JSF doesn't attempt to create beans and render the view.
 	 */
 	private UIViewRoot unloadView(FacesContext context, String viewId) {
 		UIViewRoot createdView = createView(context, viewId);
@@ -132,12 +131,9 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 			context.setProcessingEvents(true);
 			context.getApplication().publishEvent(context, PreDestroyViewMapEvent.class, UIViewRoot.class, createdView);
 			Hacks.removeViewState(context, manager, viewId);
-			responseComplete();
-		}
-		else {
-			redirectPermanent(context, getRequestURIWithQueryString(context));
 		}
 
+		responseComplete();
 		return createdView;
 	}
 
