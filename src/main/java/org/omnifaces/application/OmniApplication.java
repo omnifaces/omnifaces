@@ -16,6 +16,7 @@ import static java.lang.Boolean.parseBoolean;
 import static javax.faces.convert.Converter.DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE_PARAM_NAME;
 import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Faces.getInitParameter;
+import static org.omnifaces.util.Utils.getDefaultValue;
 
 import java.util.TimeZone;
 
@@ -95,14 +96,15 @@ public class OmniApplication extends ApplicationWrapper {
 	 */
 	@Override
 	public Converter createConverter(Class<?> forClass) {
-		Converter converter = converterManager.createConverter(getWrapped(), forClass);
+		Class<?> converterForClass = forClass.isPrimitive() ? getDefaultValue(forClass).getClass() : forClass;
+		Converter converter = converterManager.createConverter(getWrapped(), converterForClass);
 
 		if (converter != null) {
 			setDefaultPropertiesIfNecessary(converter);
 			return converter;
 		}
 
-		return super.createConverter(forClass);
+		return super.createConverter(converterForClass);
 	}
 
 	/**
