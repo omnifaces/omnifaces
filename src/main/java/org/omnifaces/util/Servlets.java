@@ -749,6 +749,17 @@ public final class Servlets {
 	}
 
 	/**
+	 * Returns <code>true</code> if the given HTTP servlet request is an ajax request. I.e. the request has a
+	 * <code>X-Requested-With</code> header with the value of <code>XMLHttpRequest</code>.
+	 * @param request The involved HTTP servlet request.
+	 * @return <code>true</code> if the given HTTP servlet request is a ajax request.
+	 * @since 2.7.1
+	 */
+	public static boolean isAjaxRequest(HttpServletRequest request) {
+		return "XMLHttpRequest".equals(request.getHeader("X-Requested-With"));
+	}
+
+	/**
 	 * Returns <code>true</code> if the given HTTP servlet request is a JSF resource request. I.e. this request will
 	 * trigger the JSF {@link ResourceHandler} for among others CSS/JS/image resources.
 	 * @param request The involved HTTP servlet request.
