@@ -898,6 +898,10 @@ public final class Components {
 	 * Helper method for {@link #getCurrentActionSource()}.
 	 */
 	private static UIComponent getCurrentActionSource(FacesContext context, UIComponent parent) {
+		if (parent == null) {
+			return null;
+		}
+
 		Map<String, String> params = context.getExternalContext().getRequestParameterMap();
 
 		if (context.getPartialViewContext().isAjaxRequest()) {
