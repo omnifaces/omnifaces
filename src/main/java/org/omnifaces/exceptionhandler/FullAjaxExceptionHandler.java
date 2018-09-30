@@ -563,6 +563,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 			ViewDeclarationLanguage vdl = viewHandler.getViewDeclarationLanguage(context, viewId);
 			vdl.buildView(context, viewRoot);
 			context.getApplication().publishEvent(context, PreRenderViewEvent.class, viewRoot);
+			context.getAttributes().put("facelets.ContentType", "text/xml"); // Work around for Mojarra 2.3.5 bug reported as #4484.
 			vdl.renderView(context, viewRoot);
 			context.responseComplete();
 		}
