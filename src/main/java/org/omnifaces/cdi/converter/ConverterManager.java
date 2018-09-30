@@ -15,6 +15,7 @@ package org.omnifaces.cdi.converter;
 import static org.omnifaces.util.BeansLocal.getReference;
 import static org.omnifaces.util.BeansLocal.resolve;
 import static org.omnifaces.util.Reflection.findConstructor;
+import static org.omnifaces.util.Utils.getDefaultValue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -120,7 +121,7 @@ public class ConverterManager {
 			if (converter != null) {
 				Class<? extends Converter> converterClass = converter.getClass();
 				bean = (Bean<Converter>) resolve(manager, converterClass);
-				
+
 				if (bean != null && bean.getBeanClass() != converterClass) {
 					bean = null;
 				}
@@ -142,10 +143,11 @@ public class ConverterManager {
 	 */
 	@SuppressWarnings("unchecked")
 	public Converter createConverter(Application application, Class<?> converterForClass) {
-		Bean<Converter> bean = convertersByForClass.get(converterForClass);
+		Class<?> forClass = converterForClass.isPrimitive() ? getDefaultValue(converterForClass).getClass() : converterForClass;
+		Bean<Converter> bean = convertersByForClass.get(forClass);
 
-		if (bean == null && !convertersByForClass.containsKey(converterForClass)) {
-			Converter converter = application.createConverter(converterForClass);
+		if (bean == null && !convertersByForClass.containsKey(forClass)) {
+			Converter converter = application.createConverter(forClass);
 
 			if (converter != null) {
 				Class<? extends Converter> converterClass = converter.getClass();
@@ -155,10 +157,10 @@ public class ConverterManager {
 				}
 			}
 
-			convertersByForClass.put(converterForClass, bean);
+			convertersByForClass.put(forClass, bean);
 		}
 
-		return (bean != null) ? getReference(manager, bean) : application.createConverter(converterForClass);
+		return (bean != null) ? getReference(manager, bean) : application.createConverter(forClass);
 	}
 
 }
