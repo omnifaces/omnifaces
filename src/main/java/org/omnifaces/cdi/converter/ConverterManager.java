@@ -15,6 +15,7 @@ package org.omnifaces.cdi.converter;
 import static org.omnifaces.util.BeansLocal.getReference;
 import static org.omnifaces.util.BeansLocal.resolveExact;
 import static org.omnifaces.util.Reflection.findConstructor;
+import static org.omnifaces.util.Utils.getDefaultValue;
 
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
@@ -149,20 +150,21 @@ public class ConverterManager {
 	 * or <code>null</code> if there is none.
 	 */
 	public Converter createConverter(Application application, Class<?> converterForClass) {
-		Bean<Converter> bean = convertersByForClass.get(converterForClass);
+		Class<?> forClass = converterForClass.isPrimitive() ? getDefaultValue(converterForClass).getClass() : converterForClass;
+		Bean<Converter> bean = convertersByForClass.get(forClass);
 
-		if (bean == null && !convertersByForClass.containsKey(converterForClass)) {
-			Converter converter = application.createConverter(converterForClass);
+		if (bean == null && !convertersByForClass.containsKey(forClass)) {
+			Converter converter = application.createConverter(forClass);
 
 			if (converter != null) {
 				Class<? extends Converter> converterClass = converter.getClass();
 
 				if (findConstructor(converterClass) != null && findConstructor(converterClass, Class.class) == null) {
-					bean = resolve(converterClass, "", converterForClass);
+					bean = resolve(converterClass, "", forClass);
 				}
 			}
 
-			convertersByForClass.put(converterForClass, bean);
+			convertersByForClass.put(forClass, bean);
 		}
 
 		return (bean != null) ? getReference(manager, bean) : null;
