@@ -22,9 +22,11 @@ import static org.omnifaces.util.Components.forEachComponent;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Faces.responseComplete;
 import static org.omnifaces.util.FacesLocal.getRenderKit;
+import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestURIWithQueryString;
 import static org.omnifaces.util.FacesLocal.isDevelopment;
 import static org.omnifaces.util.FacesLocal.redirectPermanent;
+import static org.omnifaces.util.Servlets.isAjaxRequest;
 
 import java.io.IOException;
 import java.util.Map;
@@ -43,7 +45,9 @@ import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.cdi.viewscope.ViewScopeManager;
 import org.omnifaces.taghandler.EnableRestorableView;
 import org.omnifaces.util.Callback;
+import org.omnifaces.util.FacesLocal;
 import org.omnifaces.util.Hacks;
+import org.omnifaces.util.Servlets;
 
 /**
  * OmniFaces view handler.
@@ -116,9 +120,11 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 	}
 
 	/**
-	 * Create a dummy view, restore only the view root state and then immediately explicitly destroy the view. Or, if there is no view root
-	 * state (which implies that session is expired), then explicitly send a permanent redirect to request URI. This way any authentication
-	 * framework which remember "last requested restricted URL" will redirect back to correct (non-unload) URL after login on a new session.
+	 * Create a dummy view, restore only the view root state and, if present, then immediately explicitly destroy the
+	 * view state. Or, if there is no view root state (which implies that session is expired), and if the request is
+	 * fired by synchronous XHR request (legacy browsers) instead of beacon (modern browsers), then explicitly send a
+	 * permanent redirect to the original request URI. This way any authentication framework which remember "last 
+	 * requested restricted URL" will redirect back to correct (non-unload) URL after login on a new session.
 	 */
 	private UIViewRoot unloadView(FacesContext context, String viewId) {
 		UIViewRoot createdView = createView(context, viewId);
@@ -128,12 +134,12 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 			context.setProcessingEvents(true);
 			context.getApplication().publishEvent(context, PreDestroyViewMapEvent.class, UIViewRoot.class, createdView);
 			Hacks.removeViewState(context, manager, viewId);
-			responseComplete();
 		}
-		else {
+		else if (isAjaxRequest(getRequest(context))) {
 			redirectPermanent(context, getRequestURIWithQueryString(context));
 		}
 
+		responseComplete();
 		return createdView;
 	}
 
