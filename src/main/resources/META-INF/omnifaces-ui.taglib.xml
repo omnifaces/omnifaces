@@ -48,14 +48,14 @@
 				<pre>
 &lt;o:tree value="#{bean.treeModel}" var="item" varNode="node"&gt;
   &lt;o:treeNode&gt;
-    &lt;ul&gt;
-      &lt;o:treeNodeItem&gt;
-        &lt;li&gt;
-          #{node.index} #{item.someProperty}
-          &lt;o:treeInsertChildren /&gt;
-        &lt;/li&gt;
-      &lt;/o:treeNodeItem&gt;
-    &lt;/ul&gt;
+	&lt;ul&gt;
+	  &lt;o:treeNodeItem&gt;
+		&lt;li&gt;
+		  #{node.index} #{item.someProperty}
+		  &lt;o:treeInsertChildren /&gt;
+		&lt;/li&gt;
+	  &lt;/o:treeNodeItem&gt;
+	&lt;/ul&gt;
   &lt;/o:treeNode&gt;
 &lt;/o:tree&gt;
 				</pre>
@@ -1775,7 +1775,7 @@ public class ValidateValuesBean implements MultiFieldValidator {
 
 	<tag>
 		<description>
-			<![CDATA[
+				<![CDATA[
 				The <code>&lt;o:inputFile&gt;</code> is a component that extends the standard <code>&lt;h:inputFile&gt;</code> and
 				adds support for <code>multiple</code>, <code>directory</code>, <code>accept</code> and <code>maxsize</code>
 				attributes, along with built-in server side validation on <code>accept</code> and <code>maxsize</code> attributes.
@@ -2420,7 +2420,7 @@ public class ValidateValuesBean implements MultiFieldValidator {
 			<type>javax.faces.component.UIComponent</type>
 		</attribute>
 	</tag>
-	
+
 	<tag>
 		<description>
 				<![CDATA[
@@ -2485,7 +2485,7 @@ When <code>#{bean.foo}</code> is <code>"baz"</code> and <code>#{bean.bar}</code>
 then the reflected hash query string will become <code>http://example.com/page.xhtml#foo=baz</code>.
 If <code>#{bean.bar}</code> is any other value, then it will appear in the hash query string.
 				]]>
-		</description>
+			</description>
 		<tag-name>hashParam</tag-name>
 		<component>
 			<component-type>org.omnifaces.component.input.HashParam</component-type>
@@ -5802,6 +5802,21 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 			<name>itemLabel</name>
 			<required>false</required>
 			<type>java.lang.String</type>
+		</attribute>
+	</tag>
+	<tag>
+		<tag-name>attribute</tag-name>
+		<handler-class>org.omnifaces.taghandler.AttributeHandler</handler-class>
+		<attribute>
+			<name>name</name>
+			<required>true</required>			
+		</attribute>
+		<attribute>
+			<name>value</name>
+			<required>true</required>			
+		</attribute>
+		<attribute>
+			<name>applied</name>			
 		</attribute>
 	</tag>
 </facelet-taglib>
