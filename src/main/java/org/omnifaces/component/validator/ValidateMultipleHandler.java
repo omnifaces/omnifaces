@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,7 +12,10 @@
  */
 package org.omnifaces.component.validator;
 
+import static java.util.logging.Level.FINEST;
+
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.el.MethodExpression;
 import javax.el.ValueExpression;
@@ -35,6 +38,8 @@ import org.omnifaces.validator.MultiFieldValidator;
 public class ValidateMultipleHandler extends ComponentHandler {
 
 	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final Logger logger = Logger.getLogger(ValidateMultipleHandler.class.getName());
 
 	private static final Class<?>[] PARAM_TYPES = { FacesContext.class, List.class, List.class };
 
@@ -63,12 +68,13 @@ public class ValidateMultipleHandler extends ComponentHandler {
 		ValidateMultiple validateMultiple = (ValidateMultiple) component;
 		TagAttribute attribute = getRequiredAttribute("validator");
 
-		try { // Yes, this try-catch is ugly, but there's really no clean way to distinguish a VE from a ME.
+		try {
 			ValueExpression valueExpression = attribute.getValueExpression(context, MultiFieldValidator.class);
 			MultiFieldValidator validator = (MultiFieldValidator) valueExpression.getValue(context);
 			validateMultiple.setValidator(validator);
 		}
-		catch (Exception e) { // At least, ClassCastException and PropertyNotFoundException are expected.
+		catch (Exception ignore) { // At least, ClassCastException and PropertyNotFoundException are expected.
+			logger.log(FINEST, "Ignoring thrown exception; there is really no clean way to distinguish a ValueExpression from a MethodExpression.", ignore);
 			MethodExpression validateMethod = attribute.getMethodExpression(context, boolean.class, PARAM_TYPES);
 			validateMultiple.setValidateMethod(validateMethod);
 		}

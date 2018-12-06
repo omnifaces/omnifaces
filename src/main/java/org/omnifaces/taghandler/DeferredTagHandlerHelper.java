@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  */
 package org.omnifaces.taghandler;
 
+import static java.lang.String.format;
 import static org.omnifaces.util.FacesLocal.getFaceletContext;
 
 import java.beans.Introspector;
@@ -89,7 +90,7 @@ final class DeferredTagHandlerHelper {
 			}
 			catch (FacesException e) {
 				throw new IllegalArgumentException(
-					String.format(ERROR_INVALID_ID, tag.getClass().getSimpleName(), instanceId, id), e);
+					format(ERROR_INVALID_ID, tag.getClass().getSimpleName(), instanceId, id), e);
 			}
 
 			if (binding != null) {
@@ -98,7 +99,7 @@ final class DeferredTagHandlerHelper {
 		}
 		else if (instance == null) {
 			throw new IllegalArgumentException(
-				String.format(ERROR_MISSING_ID, tag.getClass().getSimpleName(), instanceId));
+				format(ERROR_MISSING_ID, tag.getClass().getSimpleName(), instanceId));
 		}
 
 		return instance;
@@ -120,22 +121,17 @@ final class DeferredTagHandlerHelper {
 		try {
 			for (PropertyDescriptor property : Introspector.getBeanInfo(instance.getClass()).getPropertyDescriptors()) {
 				Method setter = property.getWriteMethod();
+				ValueExpression valueExpression = getValueExpression(context, tag, property.getName(), property.getPropertyType());
 
-				if (setter == null) {
+				if (setter == null || valueExpression == null) {
 					continue;
 				}
 
-				ValueExpression ve = getValueExpression(context, tag, property.getName(), property.getPropertyType());
-
-				if (ve == null) {
-					continue;
-				}
-
-				if (ve.isLiteralText()) {
-					setter.invoke(instance, ve.getValue(context));
+				if (valueExpression.isLiteralText()) {
+					setter.invoke(instance, valueExpression.getValue(context));
 				}
 				else {
-					attributes.add(setter, ve);
+					attributes.add(setter, valueExpression);
 				}
 			}
 		}

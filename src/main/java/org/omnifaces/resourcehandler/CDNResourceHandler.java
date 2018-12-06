@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static java.lang.Boolean.parseBoolean;
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Utils.isEmpty;
@@ -25,9 +26,11 @@ import javax.faces.application.ResourceHandler;
 
 /**
  * <p>
- * This {@link ResourceHandler} implementation allows the developer to provide CDN URLs instead of the default local
- * URLs for JSF resources as provided by <code>&lt;h:outputScript&gt;</code>, <code>&lt;h:outputStylesheet&gt;</code>
- * and <code>&lt;h:graphicImage&gt;</code>.
+ * This {@link ResourceHandler} implementation allows the developer to provide external (CDN) URLs instead of the
+ * default local URLs for JSF resources. This also works on auto-included resources provided as
+ * {@link ResourceDependency} by the JSF implementation and/or component libraries. For example, JSF's own
+ * <code>javax.faces:jsf.js</code> resource or PrimeFaces' <code>primefaces:jquery/jquery.js</code> resource could be
+ * pointed to a CDN.
  *
  * <h3>Installation</h3>
  * <p>
@@ -44,7 +47,9 @@ import javax.faces.application.ResourceHandler;
  * context parameter has to be provided wherein the CDN resources are been specified as a comma separated string of
  * <code>libraryName:resourceName=http://cdn.example.com/url</code> key=value pairs. The key represents the default
  * JSF resource identifier and the value represents the full CDN URL, including the scheme. The CDN URL is not validated
- * by this resource handler, so you need to make absolutely sure yourself that it is valid. Here's an example:
+ * by this resource handler, so you need to make absolutely sure yourself that it is valid.
+ * <p>
+ * Here is an example configuration:
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_URLS&lt;/param-name&gt;
@@ -52,7 +57,7 @@ import javax.faces.application.ResourceHandler;
  *         js/script1.js=http://cdn.example.com/js/script1.js,
  *         somelib:js/script2.js=http://cdn.example.com/somelib/js/script2.js,
  *         otherlib:style.css=http://cdn.example.com/otherlib/style.css,
- *         images/logo.png=http://cdn.example.com/logo.png
+ *         somelib:images/logo.png=http://cdn.example.com/somelib/logo.png
  *     &lt;/param-value&gt;
  * &lt;/context-param&gt;
  * </pre>
@@ -62,7 +67,7 @@ import javax.faces.application.ResourceHandler;
  * &lt;h:outputScript name="js/script1.js" /&gt;
  * &lt;h:outputScript library="somelib" name="js/script2.js" /&gt;
  * &lt;h:outputStylesheet library="otherlib" name="style.css" /&gt;
- * &lt;h:graphicImage name="images/logo.png" /&gt;
+ * &lt;h:graphicImage library="somelib" name="images/logo.png" /&gt;
  * </pre>
  * <p>
  * Will be rendered as:
@@ -73,11 +78,27 @@ import javax.faces.application.ResourceHandler;
  * &lt;img src="http://cdn.example.com/logo.png" /&gt;
  * </pre>
  * <p>
- * Note that you can also use this on resources provided as {@link ResourceDependency} by the JSF implementation and/or
- * component libraries. For example, JSF's own <code>javax.faces:jsf.js</code> resource which is been used by
- * <code>&lt;f:ajax&gt;</code> can be provided by a CDN URL using the following syntax:
+ * Here is a real world example with Bootstrap:
  * <pre>
- * javax.faces:jsf.js=http://cdn.example.com/jsf.js
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_URLS&lt;/param-name&gt;
+ *     &lt;param-value&gt;
+ *         cdn:bootstrap.css=https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css,
+ *         cdn:bootstrap.js=https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js
+ *     &lt;/param-value&gt;
+ * &lt;/context-param&gt;
+ * </pre>
+ * <p>
+ * With the above configuration, the following resources:
+ * <pre>
+ * &lt;h:outputStylesheet library="cdn" name="bootstrap.css" /&gt;
+ * &lt;h:outputScript library="cdn" name="bootstrap.js" /&gt;
+ * </pre>
+ * <p>
+ * Will be rendered as:
+ * <pre>
+ * &lt;link type="text/css" rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" /&gt;
+ * &lt;script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"&gt;&lt;/script&gt;
  * </pre>
  *
  * <h3>Wildcard configuration</h3>
@@ -200,17 +221,14 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 	 * {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_RESOURCES} context parameter.
 	 */
 	@Override
-	public Resource decorateResource(Resource resource) {
-		if (resource == null || (disabledParam != null && Boolean.valueOf(String.valueOf(evaluateExpressionGet(disabledParam))))) {
+	public Resource decorateResource(Resource resource, String resourceName, String libraryName) {
+		if (disabledParam != null && parseBoolean(String.valueOf(evaluateExpressionGet(disabledParam)))) {
 			return resource;
 		}
 
 		String requestPath = null;
 
 		if (cdnResources != null) {
-			String libraryName = resource.getLibraryName();
-			String resourceName = resource.getResourceName();
-
 			requestPath = cdnResources.get(new ResourceIdentifier(libraryName, resourceName));
 
 			if (requestPath == null) {
@@ -227,7 +245,7 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 		}
 
 		String evaluatedRequestPath = evaluateExpressionGet(requestPath);
-		return new RemappedResource(resource, evaluatedRequestPath);
+		return new RemappedResource(resourceName, libraryName, evaluatedRequestPath);
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
@@ -255,7 +273,7 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 
 			ResourceIdentifier id = new ResourceIdentifier(cdnResourceIdAndURL[0]);
 
-			if (id.getName().contains("*") && (!id.getName().equals("*") || !cdnResourceIdAndURL[1].endsWith("/*"))) {
+			if (id.getName().contains("*") && (!"*".equals(id.getName()) || !cdnResourceIdAndURL[1].endsWith("/*"))) {
 				throw new IllegalArgumentException(ERROR_INVALID_WILDCARD);
 			}
 

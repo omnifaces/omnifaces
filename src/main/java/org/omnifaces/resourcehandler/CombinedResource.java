@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -22,8 +22,8 @@ import java.io.InputStream;
 import javax.faces.application.Resource;
 import javax.faces.context.FacesContext;
 
-import org.omnifaces.component.output.cache.Cache;
-import org.omnifaces.component.output.cache.CacheFactory;
+import org.omnifaces.util.cache.Cache;
+import org.omnifaces.util.cache.CacheFactory;
 
 /**
  * <p>

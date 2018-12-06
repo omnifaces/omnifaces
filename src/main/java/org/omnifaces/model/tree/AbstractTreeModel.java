@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -32,7 +32,7 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 6627109279123441287L;
+	private static final long serialVersionUID = 1L;
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -91,7 +91,7 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 
 	@Override
 	public TreeModel<T> remove() {
-		if (parent != null) {
+		if (!isRoot()) {
 			synchronized (parent.children) {
 				parent.children.remove(this);
 
@@ -183,12 +183,16 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 
 	@Override
 	public int getLevel() {
-		return parent == null ? 0 : parent.getLevel() + 1;
+		return isRoot() ? 0 : parent.getLevel() + 1;
 	}
 
 	@Override
 	public String getIndex() {
-		return parent == null ? null : (parent.parent == null ? "" : parent.getIndex() + "_") + index;
+		return isRoot() ? null : parent.getParentIndex() + index;
+	}
+
+	private String getParentIndex() {
+		return isRoot() ? "" : getIndex() + "_";
 	}
 
 	// Checkers -------------------------------------------------------------------------------------------------------
@@ -205,50 +209,73 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 
 	@Override
 	public boolean isFirst() {
-		return parent != null && index == 0;
+		return !isRoot() && index == 0;
 	}
 
 	@Override
 	public boolean isLast() {
-		return parent != null && index + 1 == parent.getChildCount();
+		return !isRoot() && index + 1 == parent.getChildCount();
 	}
 
 	// Object overrides -----------------------------------------------------------------------------------------------
 
 	@Override
-	@SuppressWarnings("rawtypes")
 	public boolean equals(Object object) {
-		// Basic checks.
 		if (object == this) {
 			return true;
 		}
+
 		if (object == null || object.getClass() != getClass()) {
 			return false;
 		}
 
-		// Property checks.
-		AbstractTreeModel other = (AbstractTreeModel) object;
-		if (data == null ? other.data != null : !data.equals(other.data)) {
-			return false;
+		return equals(this, (AbstractTreeModel<?>) object, false) && equals(getRoot(this), getRoot((AbstractTreeModel<?>) object), true);
+	}
+
+	private static AbstractTreeModel<?> getRoot(AbstractTreeModel<?> node) {
+		TreeModel<?> root = node;
+
+		while (root.getParent() != null) {
+			root = root.getParent();
 		}
-		if (parent == null ? other.parent != null : !parent.equals(other.parent)) {
-			return false;
+
+		return (AbstractTreeModel<?>) root;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private static boolean equals(AbstractTreeModel thiz, AbstractTreeModel other, boolean recurse) {
+		if (thiz == other) {
+			return true;
 		}
-		if (children == null ? other.children != null : !children.equals(other.children)) {
+
+		if (thiz.data == null ? other.data != null : !thiz.data.equals(other.data)) {
 			return false;
 		}
 
-		// All passed.
+		if (recurse && thiz.children != null) {
+			if (thiz.getChildCount() != other.getChildCount()) {
+				return false;
+			}
+
+			Iterator<AbstractTreeModel> thisChildren = thiz.children.iterator();
+			Iterator<AbstractTreeModel> otherChildren = other.children.iterator();
+
+			while (thisChildren.hasNext() && otherChildren.hasNext()) {
+				if (!equals(thisChildren.next(), otherChildren.next(), true)) {
+					return false;
+				}
+			}
+		}
+
 		return true;
 	}
 
-	@Override // Eclipse-generated.
+	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int hashCode = 1;
-		hashCode = prime * hashCode + ((children == null) ? 0 : children.hashCode());
 		hashCode = prime * hashCode + ((data == null) ? 0 : data.hashCode());
-		hashCode = prime * hashCode + ((parent == null) ? 0 : parent.hashCode());
+		hashCode = prime * hashCode + ((children == null) ? 0 : children.hashCode());
 		return hashCode;
 	}
 

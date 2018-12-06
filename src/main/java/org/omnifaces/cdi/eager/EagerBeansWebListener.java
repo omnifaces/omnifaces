@@ -1,22 +1,19 @@
 /*
- * Copyright 2014 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  */
 package org.omnifaces.cdi.eager;
 
 import static java.lang.String.format;
-import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
 import static org.omnifaces.util.Servlets.getRequestRelativeURIWithoutPathParameters;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -24,20 +21,20 @@ import java.util.logging.Logger;
 
 import javax.servlet.ServletRequestEvent;
 import javax.servlet.ServletRequestListener;
-import javax.servlet.annotation.WebListener;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 
 /**
  * <p>
- * A web listener that instantiates eager session and request scoped beans.
+ * A web listener that instantiates eager session beans and request/view beans by request URI. This is auto-registered
+ * by {@link EagerBeansRepository#instantiateApplicationScopedAndRegisterListenerIfNecessary(javax.servlet.ServletContext)}
+ * when any eager session beans or request/view beans by request URI are available.
  *
  * @since 2.0
  * @author Arjan Tijms
  *
  */
-@WebListener
 public class EagerBeansWebListener implements HttpSessionListener, ServletRequestListener {
 
 	// Constants ------------------------------------------------------------------------------------------------------
@@ -50,18 +47,22 @@ public class EagerBeansWebListener implements HttpSessionListener, ServletReques
 		"Could not instantiate eager request scoped beans for request %s. Possibly the CDI request scope is not active."
 			+ " If this is indeed the case, see JavaDoc on org.omnifaces.cdi.Eager on how to remedy this.";
 
-	private static boolean disabled;
+	private static volatile boolean sessionListenerDisabled;
+	private static volatile boolean requestListenerDisabled;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	static void disable() {
-		disabled = true;
+		sessionListenerDisabled = true;
+		requestListenerDisabled = true;
 	}
 
 	@Override
 	public void sessionCreated(HttpSessionEvent event) {
-		if (!disabled) {
-			EagerBeansRepository.getInstance().instantiateSessionScoped();
+		if (!sessionListenerDisabled) {
+			if (!EagerBeansRepository.getInstance().instantiateSessionScoped()) {
+				sessionListenerDisabled = true;
+			}
 		}
 		else {
 			// Record a "session created" marker manually. HttpSession#isNew() not entirely accurate for our purpose.
@@ -71,14 +72,16 @@ public class EagerBeansWebListener implements HttpSessionListener, ServletReques
 
 	@Override
 	public void requestInitialized(ServletRequestEvent event) {
-		if (!disabled) {
+		if (!requestListenerDisabled) {
 			String uri = getRequestRelativeURIWithoutPathParameters((HttpServletRequest) event.getServletRequest());
 
 			try {
-				EagerBeansRepository.getInstance().instantiateByRequestURI(uri);
+				if (!EagerBeansRepository.getInstance().instantiateByRequestURI(uri)) {
+					requestListenerDisabled = true;
+				}
 			}
 			catch (Exception e) {
-				logger.log(SEVERE, format(POSSIBLY_REQUEST_SCOPE_NOT_ACTIVE, uri), e);
+				logger.log(WARNING, format(POSSIBLY_REQUEST_SCOPE_NOT_ACTIVE, uri), e);
 			}
 		}
 	}

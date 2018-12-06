@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,13 +12,15 @@
  */
 package org.omnifaces;
 
+import static java.util.logging.Level.SEVERE;
+
 import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.facesviews.FacesViews;
 
 /**
@@ -27,8 +29,10 @@ import org.omnifaces.facesviews.FacesViews;
  * This performs the following tasks:
  * <ol>
  * <li>Log OmniFaces version.
- * <li>Register {@link FacesViews} filter.
+ * <li>Register {@link FacesViews} forwarding filter.
  * </ol>
+ * <p>
+ * This is invoked <strong>before</strong> {@link ApplicationListener} and {@link ApplicationProcessor}.
  *
  * @author Bauke Scholtz
  * @since 2.0
@@ -39,16 +43,26 @@ public class ApplicationInitializer implements ServletContainerInitializer {
 
 	private static final Logger logger = Logger.getLogger(ApplicationInitializer.class.getName());
 
+	static final String ERROR_OMNIFACES_INITIALIZATION_FAIL =
+		"OmniFaces failed to initialize! Report an issue to OmniFaces.";
+
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
 	public void onStartup(Set<Class<?>> c, ServletContext servletContext) throws ServletException {
 		logOmniFacesVersion();
-		FacesViews.registerFilter(servletContext);
+
+		try {
+			FacesViews.registerForwardingFilter(servletContext);
+		}
+		catch (Exception | LinkageError e) {
+			logger.log(SEVERE, ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
+			throw e;
+		}
 	}
 
 	private void logOmniFacesVersion() {
-		logger.info("Using OmniFaces version " + getClass().getPackage().getSpecificationVersion());
+		logger.info("Using OmniFaces version " + OmniFaces.getVersion());
 	}
 
 }

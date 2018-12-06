@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -11,6 +11,8 @@
  * specific language governing permissions and limitations under the License.
  */
 package org.omnifaces.component.input;
+
+import static java.lang.Boolean.parseBoolean;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -60,7 +62,7 @@ public class ComponentIdParam extends ViewParam {
 		// and after rendering with one that only renders when the current component has one of the Ids
 		// that we receive from the request here.
 		if (!componentIds.isEmpty() || !clientIds.isEmpty()) {
-			context.getViewRoot().addPhaseListener(new ConditionalWriterListener(context, componentIds, clientIds, renderChildren));
+			context.getViewRoot().addPhaseListener(new ConditionalWriterListener(componentIds, clientIds, renderChildren));
 		}
 	}
 
@@ -103,11 +105,7 @@ public class ComponentIdParam extends ViewParam {
 	 */
 	private boolean getBooleanAttribute(PropertyKeys propertyKey) {
 		String attribute = (String) getAttributes().get(propertyKey.name());
-		if (attribute == null) {
-			return true;
-		}
-
-		return Boolean.valueOf(attribute);
+		return attribute == null || parseBoolean(attribute);
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -37,7 +37,6 @@ import org.omnifaces.component.input.ComponentIdParam;
  */
 public class ConditionalResponseWriter extends ResponseWriterWrapper {
 
-	private final ResponseWriter responseWriter;
 	private final FacesContext facesContext;
 	private final List<String> componentIds;
 	private final List<String> clientIds;
@@ -48,9 +47,8 @@ public class ConditionalResponseWriter extends ResponseWriterWrapper {
 	private Map<String, Boolean> renderedIdCache = new HashMap<>();
 	private Map<UIComponent, Boolean> renderedReferenceCache = new HashMap<>();
 
-	public ConditionalResponseWriter(ResponseWriter responseWriter, FacesContext facesContext, List<String> componentIds, List<String> clientIds,
-			boolean renderChildren) {
-		this.responseWriter = responseWriter;
+	public ConditionalResponseWriter(ResponseWriter responseWriter, FacesContext facesContext, List<String> componentIds, List<String> clientIds, boolean renderChildren) {
+		super(responseWriter);
 		this.facesContext = facesContext;
 		this.componentIds = componentIds;
 		this.clientIds = clientIds;
@@ -228,38 +226,40 @@ public class ConditionalResponseWriter extends ResponseWriterWrapper {
 		lastRendered = componentIds.contains(currentComponent.getId()) || clientIds.contains(currentComponent.getClientId());
 
 		if (renderChildren) {
-			// If current component not rendered because of explicit id match, check if parent is rendered.
-			if (!lastRendered) {
-				UIComponent parent = currentComponent.getParent();
-				while (parent != null) {
-					if (renderedIdCache.containsKey(parent.getClientId())) {
-						lastRendered = renderedIdCache.get(parent.getClientId());
-						break;
-					}
-					if (renderedReferenceCache.containsKey(parent)) {
-						lastRendered = renderedReferenceCache.get(parent);
-						break;
-					}
-
-					parent = parent.getParent();
-				}
-			} else {
-				// Explicitly rendered component, remember this by reference, since client-id can change even for components
-				// that aren't in an iterating naming container (e.g. UIData changes its own client-id during iteration)
-				renderedReferenceCache.put(currentComponent, lastRendered);
-			}
-
-			// Also remember client-id, in addition to the component reference since iterating is often implemented by swapping the state and identity
-			// from the same component instance. So components with the same object identity can have different component identities.
-			renderedIdCache.put(currentComponent.getClientId(), lastRendered);
+			checkParents(currentComponent);
 		}
 
 		return lastRendered;
 	}
 
-	@Override
-	public ResponseWriter getWrapped() {
-		return responseWriter;
+	private void checkParents(UIComponent component) {
+		// If current component not rendered because of explicit id match, check if parent is rendered.
+		if (!lastRendered) {
+			boolean found = false;
+
+			for (UIComponent parent = component.getParent(); parent != null; parent = parent.getParent()) {
+				if (renderedIdCache.containsKey(parent.getClientId())) {
+					lastRendered = renderedIdCache.get(parent.getClientId());
+					found = true;
+				}
+				else if (renderedReferenceCache.containsKey(parent)) {
+					lastRendered = renderedReferenceCache.get(parent);
+					found = true;
+				}
+
+				if (found) {
+					break;
+				}
+			}
+		} else {
+			// Explicitly rendered component, remember this by reference, since client-id can change even for components
+			// that aren't in an iterating naming container (e.g. UIData changes its own client-id during iteration)
+			renderedReferenceCache.put(component, lastRendered);
+		}
+
+		// Also remember client-id, in addition to the component reference since iterating is often implemented by swapping the state and identity
+		// from the same component instance. So components with the same object identity can have different component identities.
+		renderedIdCache.put(component.getClientId(), lastRendered);
 	}
 
 }

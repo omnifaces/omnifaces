@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -26,7 +26,7 @@ public class SortedTreeModel<T> extends AbstractTreeModel<T> implements Comparab
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 8694627466999765186L;
+	private static final long serialVersionUID = 1L;
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -55,10 +55,17 @@ public class SortedTreeModel<T> extends AbstractTreeModel<T> implements Comparab
 	@Override
 	@SuppressWarnings("unchecked")
 	public int compareTo(T object) {
+		if (getData() == null) {
+			return -1;
+		}
+
 		SortedTreeModel<T> other = (SortedTreeModel<T>) object;
-		return (getData() == null) ? -1
-			: (other == null || other.getData() == null) ? 1
-			: ((Comparable<T>) getData()).compareTo(other.getData());
+
+		if (other == null || other.getData() == null) {
+			return 1;
+		}
+
+		return ((Comparable<T>) getData()).compareTo(other.getData());
 	}
 
 }

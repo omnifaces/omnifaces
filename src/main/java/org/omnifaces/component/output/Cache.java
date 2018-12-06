@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -14,6 +14,7 @@ package org.omnifaces.component.output;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static java.lang.String.format;
 import static javax.faces.event.PhaseId.RENDER_RESPONSE;
 import static org.omnifaces.component.output.Cache.PropertyKeys.disabled;
 import static org.omnifaces.component.output.Cache.PropertyKeys.key;
@@ -27,6 +28,7 @@ import static org.omnifaces.util.Events.subscribeToViewEvent;
 import static org.omnifaces.util.Faces.getRequestAttribute;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.Writer;
 
@@ -37,13 +39,23 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.event.PreRenderViewEvent;
 import javax.faces.event.SystemEvent;
 
-import org.omnifaces.component.output.cache.CacheFactory;
-import org.omnifaces.component.output.cache.CacheInitializer;
 import org.omnifaces.component.output.cache.el.CacheValue;
+import org.omnifaces.component.output.cache.el.CachingValueExpression;
 import org.omnifaces.filter.OnDemandResponseBufferFilter;
+import org.omnifaces.io.ResettableBuffer;
+import org.omnifaces.io.ResettableBufferedOutputStream;
+import org.omnifaces.io.ResettableBufferedWriter;
 import org.omnifaces.servlet.BufferedHttpServletResponse;
-import org.omnifaces.util.Callback;
+import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
 import org.omnifaces.util.State;
+import org.omnifaces.util.cache.CacheEntry;
+import org.omnifaces.util.cache.CacheFactory;
+import org.omnifaces.util.cache.CacheInitializer;
+import org.omnifaces.util.cache.CacheInstancePerScopeProvider;
+import org.omnifaces.util.cache.CacheProvider;
+import org.omnifaces.util.cache.DefaultCache;
+import org.omnifaces.util.cache.DefaultCacheProvider;
+import org.omnifaces.util.cache.TimeToLiveCache;
 
 /**
  * <p>
@@ -61,7 +73,7 @@ import org.omnifaces.util.State;
  * removed following a least recently used policy (LRU).
  * <p>
  * Via a cache provider mechanism an alternative cache implementation can be configured in web.xml. The default
- * cache is based on <a href="http://code.google.com/p/concurrentlinkedhashmap">http://code.google.com/p/concurrentlinkedhashmap</a>.
+ * cache is based on <a href="https://github.com/ben-manes/concurrentlinkedhashmap">https://github.com/ben-manes/concurrentlinkedhashmap</a>.
  *
  * <h3>Setting a custom caching provider</h3>
  * <p>
@@ -127,7 +139,24 @@ import org.omnifaces.util.State;
  *
  * @since 1.1
  * @author Arjan Tijms
+ * @see org.omnifaces.util.cache.Cache
+ * @see CacheEntry
+ * @see CacheFactory
+ * @see CacheInitializer
+ * @see CacheInstancePerScopeProvider
+ * @see CacheProvider
+ * @see DefaultCache
+ * @see DefaultCacheProvider
+ * @see TimeToLiveCache
  * @see CacheValue
+ * @see CachingValueExpression
+ * @see OnDemandResponseBufferFilter
+ * @see BufferedHttpServletResponse
+ * @see HttpServletResponseOutputWrapper
+ * @see ResettableBuffer
+ * @see ResettableBufferedOutputStream
+ * @see ResettableBufferedWriter
+ * @see OutputFamily
  */
 @FacesComponent(Cache.COMPONENT_TYPE)
 public class Cache extends OutputFamily {
@@ -138,7 +167,7 @@ public class Cache extends OutputFamily {
 	public static final String START_CONTENT_MARKER = "<!-- START CACHE FOR %s -->";
 	public static final String END_CONTENT_MARKER = "<!-- END CACHE FOR %s -->";
 
-	private static final String ERROR_NO_BUFFERED_RESPONSE = String.format(
+	private static final String ERROR_NO_BUFFERED_RESPONSE = format(
 		"No buffered response found in request, but 'useBuffer' set to true. Check setting the '%s' context parameter or installing the '%s' filter manually.",
 		CacheInitializer.CACHE_INSTALL_BUFFER_FILTER, OnDemandResponseBufferFilter.class
 	);
@@ -151,52 +180,43 @@ public class Cache extends OutputFamily {
 	}
 
 	public Cache() {
-
-		final FacesContext context = FacesContext.getCurrentInstance();
+		FacesContext context = FacesContext.getCurrentInstance();
 
 		// Execute the following code in PreRenderView, since at construction time the "useBuffer" and "key" attributes
 		// have not been set, and there is no @PostContruct for UIComponents.
-		subscribeToViewEvent(PRE_RENDER, new Callback.SerializableVoid() {
+		subscribeToViewEvent(PRE_RENDER, () -> processPreRenderViewEvent(context));
+	}
 
-			private static final long serialVersionUID = 1L;
+	private void processPreRenderViewEvent(FacesContext context) {
+		if (!isDisabled() && isUseBuffer() && !hasCachedValue(context)) {
+			BufferedHttpServletResponse bufferedResponse = getRequestAttribute(BUFFERED_RESPONSE);
 
-			@Override
-			public void invoke() {
-
-				if (!isDisabled() && isUseBuffer() && !hasCachedValue(context)) {
-
-					final BufferedHttpServletResponse bufferedHttpServletResponse = getRequestAttribute(BUFFERED_RESPONSE);
-
-					if (bufferedHttpServletResponse == null) {
-						throw new IllegalStateException(ERROR_NO_BUFFERED_RESPONSE);
-					}
-
-					// Start buffering the response from now on
-					bufferedHttpServletResponse.setPassThrough(false);
-
-					// After the RENDER_RESPONSE phase, copy the area we need to cache from the response buffer
-					// and insert it into our cache
-					subscribeToRequestAfterPhase(RENDER_RESPONSE, new Callback.Void() {
-						@Override
-						public void invoke() {
-							String content = null;
-
-							try {
-								content = getContentFromBuffer(bufferedHttpServletResponse.getBufferAsString());
-							}
-							catch (IOException e) {
-								throw new IllegalStateException(e);
-							}
-
-							if (content != null) {
-								cacheContent(context, content);
-							}
-						}
-
-					});
-				}
+			if (bufferedResponse == null) {
+				throw new IllegalStateException(ERROR_NO_BUFFERED_RESPONSE);
 			}
-		});
+
+			// Start buffering the response from now on
+			bufferedResponse.setPassThrough(false);
+
+			// After the RENDER_RESPONSE phase, copy the area we need to cache from the response buffer
+			// and insert it into our cache
+			subscribeToRequestAfterPhase(RENDER_RESPONSE, () -> processPostRenderResponsePhase(context, bufferedResponse));
+		}
+	}
+
+	private void processPostRenderResponsePhase(FacesContext context, BufferedHttpServletResponse bufferedResponse) {
+		String content = null;
+
+		try {
+			content = getContentFromBuffer(bufferedResponse.getBufferAsString());
+		}
+		catch (IOException e) {
+			throw new IllegalStateException(e);
+		}
+
+		if (content != null) {
+			cacheContent(context, content);
+		}
 	}
 
 	@Override
@@ -210,7 +230,7 @@ public class Cache extends OutputFamily {
 		String key = getKeyWithDefault(context);
 
 		ResponseWriter responseWriter = context.getResponseWriter();
-		org.omnifaces.component.output.cache.Cache scopedCache = getCacheImpl(context);
+		org.omnifaces.util.cache.Cache scopedCache = getCacheImpl(context);
 
 		if (isReset()) {
 			scopedCache.remove(key);
@@ -256,7 +276,7 @@ public class Cache extends OutputFamily {
 	 * @return value associated with the named attribute
 	 * @since 1.2
 	 */
-	public Object getCacheAttribute(FacesContext context, String name) {
+	public Serializable getCacheAttribute(FacesContext context, String name) {
 		return getCacheImpl(context).getAttribute(getKeyWithDefault(context), name);
 	}
 
@@ -269,7 +289,7 @@ public class Cache extends OutputFamily {
 	 * @param value the value that is to be stored
 	 * @since 1.2
 	 */
-	public void setCacheAttribute(FacesContext context, String name, Object value) {
+	public void setCacheAttribute(FacesContext context, String name, Serializable value) {
 		getCacheImpl(context).putAttribute(getKeyWithDefault(context), name, value, getTime());
 	}
 
@@ -287,7 +307,7 @@ public class Cache extends OutputFamily {
 		cacheContent(context, CacheFactory.getCache(context, getScope()), getKeyWithDefault(context), content);
 	}
 
-	private void cacheContent(FacesContext context, org.omnifaces.component.output.cache.Cache scopedCache, String key, String content) {
+	private void cacheContent(FacesContext context, org.omnifaces.util.cache.Cache scopedCache, String key, String content) {
 		int time = getTime();
 		if (time > 0) {
 			scopedCache.put(key, content, time);
@@ -308,7 +328,7 @@ public class Cache extends OutputFamily {
 		return key;
 	}
 
-	private org.omnifaces.component.output.cache.Cache getCacheImpl(FacesContext context) {
+	private org.omnifaces.util.cache.Cache getCacheImpl(FacesContext context) {
 		return CacheFactory.getCache(context, getScope());
 	}
 
@@ -331,11 +351,11 @@ public class Cache extends OutputFamily {
 	}
 
 	private String getStartContentMarker() {
-		return String.format(START_CONTENT_MARKER, getClientId());
+		return format(START_CONTENT_MARKER, getClientId());
 	}
 
 	private String getEndContentMarker() {
-		return String.format(END_CONTENT_MARKER, getClientId());
+		return format(END_CONTENT_MARKER, getClientId());
 	}
 
 	private String getContentFromBuffer(String buffer) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -14,9 +14,8 @@ package org.omnifaces.cdi.param;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
-import static org.omnifaces.util.BeansLocal.getCurrentInjectionPoint;
+import static org.omnifaces.util.Beans.getCurrentInjectionPoint;
 
-import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Collections;
@@ -25,8 +24,8 @@ import java.util.Set;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.Typed;
 import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.enterprise.inject.spi.PassivationCapable;
 import javax.enterprise.util.AnnotationLiteral;
@@ -38,31 +37,28 @@ import org.omnifaces.cdi.Param;
 /**
  * Dynamic CDI producer used to work around CDI's restriction to create true generic producers.
  * <p>
- * This dynamic producer calls through to the "real" producer for {@link Param}
+ * This dynamic producer calls through to the "real" producer for <code>&#64;</code>{@link Param}
  * annotated injection points.
  *
  * @see ParamExtension
- * @see RequestParameterProducer
+ * @see ParamProducer
  *
  * @since 2.0
  * @author Arjan Tijms
  *
  */
-public class DynamicParamValueProducer implements Bean<Object>, Serializable, PassivationCapable {
+@Typed
+public class DynamicParamValueProducer implements Bean<Object>, PassivationCapable {
 
-	private static final long serialVersionUID = 1L;
-
-	private BeanManager beanManager;
 	private Set<Type> types;
 
-	public DynamicParamValueProducer(BeanManager beanManager, Type type) {
-		this.beanManager = beanManager;
+	public DynamicParamValueProducer(Type type) {
 		types = new HashSet<>(asList(type, Object.class));
 	}
 
 	@Override
 	public Class<?> getBeanClass() {
-		return RequestParameterProducer.class;
+		return ParamProducer.class;
 	}
 
 	@Override
@@ -72,9 +68,8 @@ public class DynamicParamValueProducer implements Bean<Object>, Serializable, Pa
 
 	@Override
 	public Object create(CreationalContext<Object> creationalContext) {
-		InjectionPoint injectionPoint = getCurrentInjectionPoint(beanManager, creationalContext);
-
-		ParamValue<?> paramValue = new RequestParameterProducer().produce(injectionPoint);
+		InjectionPoint injectionPoint = getCurrentInjectionPoint(creationalContext);
+		ParamValue<?> paramValue = new ParamProducer().produce(injectionPoint);
 		return paramValue.getValue();
 	}
 
@@ -134,6 +129,11 @@ public class DynamicParamValueProducer implements Bean<Object>, Serializable, Pa
 		@Override
 		public String name() {
 			return "";
+		}
+
+		@Override
+		public int pathIndex() {
+			return -1;
 		}
 
 		@Override

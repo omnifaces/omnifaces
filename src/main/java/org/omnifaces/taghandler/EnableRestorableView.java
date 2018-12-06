@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -13,7 +13,9 @@
 package org.omnifaces.taghandler;
 
 import static java.lang.Boolean.TRUE;
+import static java.lang.String.format;
 import static org.omnifaces.util.Faces.setApplicationAttribute;
+import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 
 import java.io.IOException;
 
@@ -27,7 +29,7 @@ import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
 
-import org.omnifaces.viewhandler.RestorableViewHandler;
+import org.omnifaces.viewhandler.OmniViewHandler;
 
 /**
  * <p>
@@ -70,7 +72,7 @@ import org.omnifaces.viewhandler.RestorableViewHandler;
  *
  * @author Bauke Scholtz
  * @since 1.3
- * @see RestorableViewHandler
+ * @see OmniViewHandler
  */
 public class EnableRestorableView extends TagHandler {
 
@@ -95,14 +97,14 @@ public class EnableRestorableView extends TagHandler {
 
 	/**
 	 * Enable the current view to be restorable. This basically sets a specific view attribute which the
-	 * {@link RestorableViewHandler} could intercept on.
-	 * @throws IllegalArgumentException When given parent is not an instance of {@link UIViewRoot}.
+	 * {@link OmniViewHandler} could intercept on.
+	 * @throws IllegalStateException When given parent is not an instance of {@link UIViewRoot}.
 	 */
 	@Override
-	public void apply(FaceletContext context, final UIComponent parent) throws IOException {
+	public void apply(FaceletContext context, UIComponent parent) throws IOException {
 		if (!(parent instanceof UIViewRoot)) {
-			throw new IllegalArgumentException(
-				String.format(ERROR_INVALID_PARENT, parent != null ? parent.getClass().getName() : null));
+			throw new IllegalStateException(
+				format(ERROR_INVALID_PARENT, parent != null ? parent.getClass().getName() : null));
 		}
 
 		if (!ComponentHandler.isNew(parent)) {
@@ -110,6 +112,29 @@ public class EnableRestorableView extends TagHandler {
 		}
 
 		parent.getAttributes().put(EnableRestorableView.class.getName(), TRUE);
+	}
+
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns true if given view is null, and this is a postback, and {@link EnableRestorableView} has been activated.
+	 * @param context The involved faces context.
+	 * @param view The involved view.
+	 * @return true if given view is null, and this is a postback, and {@link EnableRestorableView} has been activated.
+	 */
+	public static boolean isRestorableViewRequest(FacesContext context, UIViewRoot view) {
+		return view == null
+			&& context.isPostback()
+			&& TRUE.equals(getApplicationAttribute(context, EnableRestorableView.class.getName()));
+	}
+
+	/**
+	 * Returns true if given view indeed contains {@link EnableRestorableView}.
+	 * @param view The involved view.
+	 * @return true if given view indeed contains {@link EnableRestorableView}.
+	 */
+	public static boolean isRestorableView(UIViewRoot view) {
+		return TRUE.equals(view.getAttributes().get(EnableRestorableView.class.getName()));
 	}
 
 }

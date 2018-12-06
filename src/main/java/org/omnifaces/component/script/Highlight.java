@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -13,19 +13,21 @@
 package org.omnifaces.component.script;
 
 import static java.lang.Boolean.TRUE;
+import static java.lang.String.format;
+import static javax.faces.application.ResourceHandler.JSF_SCRIPT_LIBRARY_NAME;
+import static javax.faces.application.ResourceHandler.JSF_SCRIPT_RESOURCE_NAME;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.util.Components.getCurrentForm;
 
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.Set;
 
-import javax.faces.application.ResourceDependencies;
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
-import javax.faces.component.UIComponent;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
-import javax.faces.component.visit.VisitCallback;
 import javax.faces.component.visit.VisitContext;
 import javax.faces.component.visit.VisitHint;
 import javax.faces.component.visit.VisitResult;
@@ -68,15 +70,17 @@ import org.omnifaces.util.State;
  * <pre>
  * &lt;o:highlight styleClass="invalid" focus="false" /&gt;
  * </pre>
+ * <p>
+ * Since version 2.5, the error style class will be removed from the input element and its associated label when the
+ * enduser starts using the input element.
  *
  * @author Bauke Scholtz
  * @see OnloadScript
+ * @see ScriptFamily
  */
 @FacesComponent(Highlight.COMPONENT_TYPE)
-@ResourceDependencies({
-	@ResourceDependency(library="javax.faces", name="jsf.js", target="head"), // Required for jsf.ajax.addOnEvent.
-	@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head") // Specifically highlight.js.
-})
+@ResourceDependency(library=JSF_SCRIPT_LIBRARY_NAME, name=JSF_SCRIPT_RESOURCE_NAME, target="head") // Required for jsf.ajax.request.
+@ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head") // Specifically highlight.js.
 public class Highlight extends OnloadScript {
 
 	// Public constants -----------------------------------------------------------------------------------------------
@@ -89,7 +93,7 @@ public class Highlight extends OnloadScript {
 	private static final Set<VisitHint> VISIT_HINTS = EnumSet.of(VisitHint.SKIP_UNRENDERED);
 	private static final String DEFAULT_STYLECLASS = "error";
 	private static final Boolean DEFAULT_FOCUS = TRUE;
-	private static final String SCRIPT = "OmniFaces.Highlight.addErrorClass([%s], '%s', %s);";
+	private static final String SCRIPT = "OmniFaces.Highlight.apply([%s], '%s', %s);";
 
 	private enum PropertyKeys {
 		// Cannot be uppercased. They have to exactly match the attribute names.
@@ -121,26 +125,22 @@ public class Highlight extends OnloadScript {
 			return;
 		}
 
-		final StringBuilder clientIds = new StringBuilder();
-		form.visitTree(VisitContext.createVisitContext(context, null, VISIT_HINTS), new VisitCallback() {
-
-			@Override
-			public VisitResult visit(VisitContext context, UIComponent component) {
-				if (component instanceof UIInput && !((UIInput) component).isValid()) {
-					if (clientIds.length() > 0) {
-						clientIds.append(',');
-					}
-
-					String clientId = component.getClientId(context.getFacesContext());
-					clientIds.append('"').append(clientId).append('"');
+		StringBuilder clientIds = new StringBuilder();
+		form.visitTree(VisitContext.createVisitContext(context, null, VISIT_HINTS), (visitContext, component) -> {
+			if (component instanceof UIInput && !((UIInput) component).isValid()) {
+				if (clientIds.length() > 0) {
+					clientIds.append(',');
 				}
 
-				return VisitResult.ACCEPT;
+				String clientId = component.getClientId(visitContext.getFacesContext());
+				clientIds.append('"').append(clientId).append('"');
 			}
+
+			return VisitResult.ACCEPT;
 		});
 
 		if (clientIds.length() > 0) {
-			context.getResponseWriter().write(String.format(SCRIPT, clientIds, getStyleClass(), isFocus()));
+			context.getResponseWriter().write(format(SCRIPT, clientIds, getStyleClass(), isFocus()));
 		}
 	}
 

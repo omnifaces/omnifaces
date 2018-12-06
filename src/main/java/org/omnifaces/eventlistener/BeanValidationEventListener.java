@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,13 +12,14 @@
  */
 package org.omnifaces.eventlistener;
 
-import java.util.logging.Level;
+import static java.lang.String.format;
+import static java.util.logging.Level.FINER;
+
 import java.util.logging.Logger;
 
 import javax.faces.component.EditableValueHolder;
 import javax.faces.component.UICommand;
 import javax.faces.component.UIInput;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.PostValidateEvent;
 import javax.faces.event.PreValidateEvent;
@@ -78,7 +79,7 @@ public class BeanValidationEventListener implements SystemEventListener {
 	 * Handle the {@link PreValidateEvent} and {@link PostValidateEvent}.
 	 */
 	@Override
-	public void processEvent(SystemEvent event) throws AbortProcessingException {
+	public void processEvent(SystemEvent event) {
 		if (event instanceof PreValidateEvent) {
 			handlePreValidate((UIInput) ((ComponentSystemEvent) event).getComponent());
 		}
@@ -91,9 +92,14 @@ public class BeanValidationEventListener implements SystemEventListener {
 	 * Replaces the original value of {@link BeanValidator#getValidationGroups()} with the value from the tag attribute.
 	 */
 	private void handlePreValidate(UIInput component) {
-		final BeanValidator beanValidator = getBeanValidator(component);
-		final String newValidationGroups = disabled ? NoValidationGroup.class.getName() : validationGroups;
-		final String originalValidationGroups = beanValidator.getValidationGroups();
+		BeanValidator beanValidator = getBeanValidator(component);
+
+		if (beanValidator == null) {
+			return;
+		}
+
+		String newValidationGroups = disabled ? NoValidationGroup.class.getName() : validationGroups;
+		String originalValidationGroups = beanValidator.getValidationGroups();
 
 		if (originalValidationGroups != null) {
 			component.getAttributes().put(ATTRIBUTE_ORIGINAL_VALIDATION_GROUPS, originalValidationGroups);
@@ -101,8 +107,8 @@ public class BeanValidationEventListener implements SystemEventListener {
 
 		beanValidator.setValidationGroups(newValidationGroups);
 
-		if (LOGGER.isLoggable(Level.FINER)) {
-			LOGGER.finer(String.format(LOG_VALIDATION_GROUPS_OVERRIDDEN,
+		if (LOGGER.isLoggable(FINER)) {
+			LOGGER.finer(format(LOG_VALIDATION_GROUPS_OVERRIDDEN,
 				component.getClientId(), originalValidationGroups, newValidationGroups));
 		}
 	}
@@ -111,9 +117,12 @@ public class BeanValidationEventListener implements SystemEventListener {
 	 * Restores the original value of {@link BeanValidator#getValidationGroups()}.
 	 */
 	private void handlePostValidate(UIInput component) {
-		final BeanValidator beanValidator = getBeanValidator(component);
-		final String originalValidationGroups = (String) component.getAttributes().remove(ATTRIBUTE_ORIGINAL_VALIDATION_GROUPS);
-		beanValidator.setValidationGroups(originalValidationGroups);
+		BeanValidator beanValidator = getBeanValidator(component);
+
+		if (beanValidator != null) {
+			String originalValidationGroups = (String) component.getAttributes().remove(ATTRIBUTE_ORIGINAL_VALIDATION_GROUPS);
+			beanValidator.setValidationGroups(originalValidationGroups);
+		}
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
@@ -122,9 +131,9 @@ public class BeanValidationEventListener implements SystemEventListener {
 	 * Obtain the bean validator instance of the given editable value holder component.
 	 */
 	private static BeanValidator getBeanValidator(EditableValueHolder component) {
-		Validator[] validators = component.getValidators();
+		Validator<?>[] validators = component.getValidators();
 
-		for (Validator validator : validators) {
+		for (Validator<?> validator : validators) {
 			if (validator instanceof BeanValidator) {
 				return (BeanValidator) validator;
 			}

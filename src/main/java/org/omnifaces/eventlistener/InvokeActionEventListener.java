@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -24,7 +24,6 @@ import javax.faces.component.UIForm;
 import javax.faces.component.UIInput;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.PhaseEvent;
 import javax.faces.event.PhaseId;
 import javax.faces.event.PostValidateEvent;
@@ -48,7 +47,7 @@ import org.omnifaces.event.PreInvokeActionEvent;
  * the concrete functional requirement for which a <code>&lt;f:event type="preRenderView"&gt;</code> workaround is often
  * been used in JSF 2.0 and 2.1.
  * <p>
- * This event is not only supported on {@link UIViewRoot}, but it is also supported on {@link UIForm}, {@link UIInput}
+ * This event is supported on any {@link UIComponent}, including {@link UIViewRoot}, {@link UIForm}, {@link UIInput} and
  * {@link UICommand} components. This thus also provides the possibility to invoke multiple action listeners on a single
  * {@link UIInput} and {@link UICommand} component on an easy manner.
  * <p>
@@ -65,7 +64,7 @@ public class InvokeActionEventListener extends DefaultPhaseListener implements S
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = -7324254442944700095L;
+	private static final long serialVersionUID = 1L;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -83,15 +82,19 @@ public class InvokeActionEventListener extends DefaultPhaseListener implements S
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns <code>true</code> only when the given source is an instance of {@link UIViewRoot}, {@link UIForm},
-	 * {@link UIInput} or {@link UICommand}.
+	 * Returns <code>true</code> only when the given source is an {@link UIComponent} which has listeners for
+	 * {@link PreInvokeActionEvent} or {@link PostInvokeActionEvent}.
 	 */
 	@Override
 	public boolean isListenerForSource(Object source) {
-		return source instanceof UIViewRoot
-			|| source instanceof UIForm
-			|| source instanceof UIInput
-			|| source instanceof UICommand;
+		if (!(source instanceof UIComponent)) {
+			return false;
+		}
+
+		UIComponent component = (UIComponent) source;
+
+		return !isEmpty(component.getListenersForEventClass(PreInvokeActionEvent.class))
+			|| !isEmpty(component.getListenersForEventClass(PostInvokeActionEvent.class));
 	}
 
 	/**
@@ -100,7 +103,7 @@ public class InvokeActionEventListener extends DefaultPhaseListener implements S
 	 * and/or {@link PostInvokeActionEvent} events and then add them to a set in the current faces context.
 	 */
 	@Override
-	public void processEvent(SystemEvent event) throws AbortProcessingException {
+	public void processEvent(SystemEvent event) {
 		FacesContext context = FacesContext.getCurrentInstance();
 
 		if (!context.isValidationFailed()) {

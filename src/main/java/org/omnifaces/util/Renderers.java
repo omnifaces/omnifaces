@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import javax.faces.component.UIComponent;
+import javax.faces.component.behavior.ClientBehaviorHolder;
 import javax.faces.context.ResponseWriter;
 import javax.faces.render.Renderer;
 
@@ -29,6 +30,14 @@ import javax.faces.render.Renderer;
  * @since 1.5
  */
 public final class Renderers {
+
+	// Constants --------------------------------------------------------------------------------------------------
+
+	/** Renderer type of standard JSF stylesheet component resource. */
+	public static final String RENDERER_TYPE_CSS = "javax.faces.resource.Stylesheet";
+
+	/** Renderer type of standard JSF script component resource. */
+	public static final String RENDERER_TYPE_JS = "javax.faces.resource.Script";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -171,6 +180,23 @@ public final class Renderers {
 			String name = entry.getKey();
 			String html = entry.getValue();
 			writeAttribute(writer, html, getAttribute(component, name), name);
+		}
+	}
+
+	/**
+	 * Write ID of component if necessary. That is, when it's explicitly set or the component has client behaviors.
+	 * @param writer The involved response writer.
+	 * @param component The associated UI component.
+	 * @throws IOException When an I/O error occurs.
+	 * @see ResponseWriter#writeAttribute(String, Object, String)
+	 * @since 2.5
+	 */
+	public static void writeIdAttributeIfNecessary(ResponseWriter writer, UIComponent component) throws IOException {
+		if (component.getId() != null
+			|| (component instanceof ClientBehaviorHolder
+				&& !((ClientBehaviorHolder) component).getClientBehaviors().isEmpty()))
+		{
+			writeAttribute(writer, "id", component.getClientId());
 		}
 	}
 

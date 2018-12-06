@@ -1,27 +1,24 @@
 /*
- * Copyright 2013 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  */
 package org.omnifaces.cdi;
 
+import static org.omnifaces.util.Beans.destroy;
+
 import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.PassivationCapable;
 
 /**
@@ -36,11 +33,11 @@ public class BeanStorage implements Serializable {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final long serialVersionUID = 42L;
+	private static final long serialVersionUID = 1L;
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
-	private final ConcurrentMap<String, Bean<?>> beans;
+	private final ConcurrentHashMap<String, Object> beans;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -62,81 +59,31 @@ public class BeanStorage implements Serializable {
 	 * @return The bean associated with given context and creational context.
 	 */
 	public <T> T createBean(Contextual<T> type, CreationalContext<T> context) {
-		Bean<T> bean = new Bean<>(type, context);
+		T bean = type.create(context);
 		beans.put(((PassivationCapable) type).getId(), bean);
-		return bean.getInstance();
+		return bean;
 	}
 
 	/**
 	 * Returns the bean associated with the given context, or <code>null</code> if there is none.
 	 * @param <T> The generic bean type.
 	 * @param type The contextual type of the CDI managed bean.
-	 * @param manager The bean manager used to create the creational context, if necessary.
 	 * @return The bean associated with the given context, or <code>null</code> if there is none.
 	 */
 	@SuppressWarnings("unchecked")
-	public <T> T getBean(Contextual<T> type, BeanManager manager) {
-		Bean<T> bean = (Bean<T>) beans.get(((PassivationCapable) type).getId());
-
-		if (bean == null) {
-			return null;
-		}
-
-		if (!bean.hasContext()) { // May happen after passivation.
-			bean.setContext(type, manager.createCreationalContext(type));
-		}
-
-		return bean.getInstance();
+	public <T> T getBean(Contextual<T> type) {
+		return (T) beans.get(((PassivationCapable) type).getId());
 	}
 
 	/**
 	 * Destroy all beans managed so far.
 	 */
 	public synchronized void destroyBeans() { // Not sure if synchronization is absolutely necessary. Just to be on safe side.
-		for (Bean<?> bean : beans.values()) {
-			bean.destroy();
+		for (Object bean : beans.values()) {
+			destroy(bean);
 		}
 
 		beans.clear();
-	}
-
-	// Nested classes -------------------------------------------------------------------------------------------------
-
-	/**
-	 * This class represents a bean instance. It merely offers a hook to obtain and destroy the bean instance.
-	 */
-	static class Bean<T> implements Serializable {
-
-		private static final long serialVersionUID = 42L;
-
-		private transient Contextual<T> type;
-		private transient CreationalContext<T> context;
-		private final T instance;
-
-		public Bean(Contextual<T> type, CreationalContext<T> context) {
-			setContext(type, context);
-			instance = type.create(context);
-		}
-
-		public void setContext(Contextual<T> type, CreationalContext<T> context) {
-			this.type = type;
-			this.context = context;
-		}
-
-		public boolean hasContext() {
-			return type != null && context != null;
-		}
-
-		public T getInstance() {
-			return instance;
-		}
-
-		public void destroy() {
-			if (hasContext()) {
-				type.destroy(instance, context);
-			}
-		}
-
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,8 +12,10 @@
  */
 package org.omnifaces.component.output;
 
+import static java.lang.Boolean.parseBoolean;
 import static org.omnifaces.resourcehandler.DefaultResourceHandler.RES_NOT_FOUND;
 import static org.omnifaces.util.Renderers.writeAttributes;
+import static org.omnifaces.util.Renderers.writeIdAttributeIfNecessary;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isEmpty;
 
@@ -32,6 +34,9 @@ import javax.faces.component.html.HtmlGraphicImage;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 
+import org.omnifaces.cdi.GraphicImageBean;
+import org.omnifaces.el.ExpressionInspector;
+import org.omnifaces.el.MethodReference;
 import org.omnifaces.resourcehandler.DefaultResourceHandler;
 import org.omnifaces.resourcehandler.DynamicResource;
 import org.omnifaces.resourcehandler.GraphicResource;
@@ -62,10 +67,10 @@ import org.omnifaces.util.Faces;
  * <h3>Image streaming</h3>
  * <p>
  * When not rendered as data URI, the {@link InputStream} or <code>byte[]</code> property <strong>must</strong> point to
- * a <em>stateless</em> <code>@ApplicationScoped</code> bean (both JSF and CDI scopes are supported). The property will
- * namely be evaluated at the moment the browser requests the image content based on the URL as specified in HTML
- * <code>&lt;img src&gt;</code>, which is usually a different request than the one which rendered the JSF page.
- * E.g.
+ * a <em>stateless</em> <code>&#64;</code>{@link GraphicImageBean} or <code>@Named @ApplicationScoped</code> bean
+ * (both JSF and CDI application scopes are supported). The property will namely be evaluated at the moment the browser
+ * requests the image content based on the URL as specified in HTML <code>&lt;img src&gt;</code>, which is usually a
+ * different request than the one which rendered the JSF page. E.g.
  * <pre>
  * &#64;Named
  * &#64;RequestScoped
@@ -88,14 +93,13 @@ import org.omnifaces.util.Faces;
  * }
  * </pre>
  * <pre>
- * &#64;Named
- * &#64;ApplicationScoped
- * public class ImageStreamer {
+ * &#64;GraphicImageBean
+ * public class Images {
  *
  *     &#64;Inject
  *     private ImageService service;
  *
- *     public byte[] getById(Long id) {
+ *     public byte[] get(Long id) {
  *         return service.getContent(id);
  *     }
  *
@@ -103,7 +107,7 @@ import org.omnifaces.util.Faces;
  * </pre>
  * <pre>
  * &lt;ui:repeat value="#{bean.images}" var="image"&gt;
- *     &lt;o:graphicImage value="#{imageStreamer.getById(image.id)}" /&gt;
+ *     &lt;o:graphicImage value="#{images.get(image.id)}" /&gt;
  * &lt;/ui:repeat&gt;
  * </pre>
  * <p>
@@ -125,9 +129,13 @@ import org.omnifaces.util.Faces;
  * timestamp in milliseconds.
  * <pre>
  * &lt;ui:repeat value="#{bean.images}" var="image"&gt;
- *     &lt;o:graphicImage value="#{imageStreamer.getById(image.id)}" lastModified="#{image.lastModified}" /&gt;
+ *     &lt;o:graphicImage value="#{images.get(image.id)}" lastModified="#{image.lastModified}" /&gt;
  * &lt;/ui:repeat&gt;
  * </pre>
+ * <p>
+ * When unspecified, then the "default resource maximum age" as set in either the Mojarra specific context parameter
+ * <code>com.sun.faces.defaultResourceMaxAge</code> or MyFaces specific context parameter
+ * <code>org.apache.myfaces.RESOURCE_MAX_TIME_EXPIRES</code> will be used, else a default of 1 week will be assumed.
  *
  * <h3>Image types</h3>
  * <p>
@@ -138,7 +146,7 @@ import org.omnifaces.util.Faces;
  * explicitly specify the image type via the <code>type</code> attribute which must represent a valid file extension.
  * E.g.
  * <pre>
- * &lt;o:graphicImage value="#{imageStreamer.getById(image.id)}" type="svg" /&gt;
+ * &lt;o:graphicImage value="#{images.get(image.id)}" type="svg" /&gt;
  * </pre>
  * <p>
  * The content type will be resolved via {@link Faces#getMimeType(String)}. You can add unrecognized ones as
@@ -157,7 +165,7 @@ import org.omnifaces.util.Faces;
  * (beware of <a href="http://caniuse.com/#feat=svg-fragment">browser support</a>).
  * E.g.
  * <pre>
- * &lt;o:graphicImage value="#{imageStreamer.getById(image.id)}" type="svg" fragment="svgView(viewBox(0,50,200,200))" /&gt;
+ * &lt;o:graphicImage value="#{images.get(image.id)}" type="svg" fragment="svgView(viewBox(0,50,200,200))" /&gt;
  * </pre>
  *
  * <h3>Design notes</h3>
@@ -172,10 +180,13 @@ import org.omnifaces.util.Faces;
  *
  * @author Bauke Scholtz
  * @since 2.0
+ * @see GraphicImageBean
  * @see GraphicResource
  * @see DynamicResource
  * @see GraphicResourceHandler
  * @see DefaultResourceHandler
+ * @see ExpressionInspector
+ * @see MethodReference
  */
 @FacesComponent(GraphicImage.COMPONENT_TYPE)
 public class GraphicImage extends HtmlGraphicImage {
@@ -183,18 +194,7 @@ public class GraphicImage extends HtmlGraphicImage {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.GraphicImage";
-	public static final Map<String, String> ATTRIBUTE_NAMES = collectAttributeNames();
-	private static Map<String, String> collectAttributeNames() {
-		Map<String, String> attributeNames = new HashMap<>();
-
-		for (PropertyKeys propertyKey : PropertyKeys.values()) {
-			String name = propertyKey.name();
-			attributeNames.put(name, "styleClass".equals(name) ? "class" : propertyKey.toString());
-		}
-
-		return Collections.unmodifiableMap(attributeNames);
-	}
-
+	protected static final Map<String, String> ATTRIBUTE_NAMES = collectAttributeNames();
 	private static final String ERROR_MISSING_VALUE = "o:graphicImage 'value' attribute is required.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
@@ -212,6 +212,7 @@ public class GraphicImage extends HtmlGraphicImage {
 	public void encodeBegin(FacesContext context) throws IOException {
 		ResponseWriter writer = context.getResponseWriter();
 		writer.startElement("img", this);
+		writeIdAttributeIfNecessary(writer, this);
 		writer.writeAttribute("src", getSrc(context), "value"); // writeURIAttribute kills URL fragment identifiers.
 		writeAttributes(writer, this, GraphicImage.ATTRIBUTE_NAMES);
 	}
@@ -230,42 +231,58 @@ public class GraphicImage extends HtmlGraphicImage {
 	 */
 	protected String getSrc(FacesContext context) throws IOException {
 		String name = (String) getAttributes().get("name");
-		boolean dataURI = Boolean.valueOf(String.valueOf(getAttributes().get("dataURI")));
+		boolean dataURI = parseBoolean(String.valueOf(getAttributes().get("dataURI")));
 
 		Resource resource;
 
 		if (name != null) {
-			String library = (String) getAttributes().get("library");
-			resource = context.getApplication().getResourceHandler().createResource(name, library);
+			resource = createGraphicResourceByName(context, name, dataURI);
 
 			if (resource == null) {
 				return RES_NOT_FOUND;
-			}
-
-			if (dataURI && resource.getContentType().startsWith("image")) {
-				resource = new GraphicResource(resource.getInputStream(), resource.getContentType());
 			}
 		}
 		else {
 			ValueExpression value = getValueExpression("value");
 
-			if (value == null) {
-				throw new IllegalArgumentException(ERROR_MISSING_VALUE);
-			}
-
-			String type = (String) getAttributes().get("type");
-
-			if (dataURI) {
-				resource = new GraphicResource(value.getValue(context.getELContext()), type);
+			if (value != null) {
+				resource = createGraphicResourceByValue(context, value, dataURI);
 			}
 			else {
-				resource = GraphicResource.create(context, value, type, getAttributes().get("lastModified"));
+				throw new IllegalArgumentException(ERROR_MISSING_VALUE);
 			}
 		}
 
+		String url = context.getExternalContext().encodeResourceURL(resource.getRequestPath());
 		String fragment = (String) getAttributes().get("fragment");
-		String fragmentString = dataURI || isEmpty(fragment) ? "" : ((fragment.charAt(0) == '#' ? "" : "#") + fragment);
-		return context.getExternalContext().encodeResourceURL(resource.getRequestPath()) + fragmentString;
+
+		if (dataURI || isEmpty(fragment)) {
+			return url;
+		}
+
+		return url + (fragment.charAt(0) == '#' ? "" : "#") + fragment;
+	}
+
+	private Resource createGraphicResourceByName(FacesContext context, String name, boolean dataURI) throws IOException {
+		String library = (String) getAttributes().get("library");
+		Resource resource = context.getApplication().getResourceHandler().createResource(name, library);
+
+		if (resource != null && dataURI && resource.getContentType().startsWith("image")) {
+			resource = new GraphicResource(resource.getInputStream(), resource.getContentType());
+		}
+
+		return resource;
+	}
+
+	private Resource createGraphicResourceByValue(FacesContext context, ValueExpression value, boolean dataURI) {
+		String type = (String) getAttributes().get("type");
+
+		if (dataURI) {
+			return new GraphicResource(value.getValue(context.getELContext()), type);
+		}
+		else {
+			return GraphicResource.create(context, value, type, getAttributes().get("lastModified"));
+		}
 	}
 
 	/**
@@ -275,6 +292,19 @@ public class GraphicImage extends HtmlGraphicImage {
 	@Override
 	public String getAlt() {
 		return coalesce(super.getAlt(), "");
+	}
+
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	private static Map<String, String> collectAttributeNames() {
+		Map<String, String> attributeNames = new HashMap<>();
+
+		for (PropertyKeys propertyKey : PropertyKeys.values()) {
+			String name = propertyKey.name();
+			attributeNames.put(name, "styleClass".equals(name) ? "class" : propertyKey.toString());
+		}
+
+		return Collections.unmodifiableMap(attributeNames);
 	}
 
 }

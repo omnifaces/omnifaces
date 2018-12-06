@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,10 +12,16 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.String.format;
 import static org.omnifaces.util.Events.subscribeToApplicationEvent;
 import static org.omnifaces.util.Faces.evaluateExpressionGet;
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Faces.isDevelopment;
+import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
+import static org.omnifaces.util.Hacks.isMyFacesUsed;
+import static org.omnifaces.util.Renderers.RENDERER_TYPE_CSS;
+import static org.omnifaces.util.Renderers.RENDERER_TYPE_JS;
 import static org.omnifaces.util.Utils.isNumber;
 
 import java.util.ArrayList;
@@ -32,18 +38,17 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.UIOutput;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.PreRenderViewEvent;
 import javax.faces.event.SystemEvent;
 import javax.faces.event.SystemEventListener;
 
-import org.omnifaces.component.output.cache.Cache;
 import org.omnifaces.component.script.DeferredScript;
 import org.omnifaces.renderer.DeferredScriptRenderer;
+import org.omnifaces.renderer.InlineResourceRenderer;
 import org.omnifaces.renderer.InlineScriptRenderer;
 import org.omnifaces.renderer.InlineStylesheetRenderer;
 import org.omnifaces.util.Faces;
-import org.omnifaces.util.Hacks;
+import org.omnifaces.util.cache.Cache;
 
 /**
  * <p>
@@ -95,9 +100,17 @@ import org.omnifaces.util.Hacks;
  *
  * <h3>Caching</h3>
  * <p>
- * Optionally you can activate server-side caching of the combined resource content by specifying the context parameter
- * <code>{@value org.omnifaces.resourcehandler.CombinedResourceHandler#PARAM_NAME_CACHE_TTL}</code> while the JSF
- * project stage is <strong>not</strong> set to <code>Development</code> as per {@link Faces#isDevelopment()}.
+ * Optionally you can activate server-side caching of the combined resource content by specifying the below context
+ * parameter in <code>web.xml</code> with the amount of seconds to cache the combined resource content.
+ * <pre>
+ * &lt;context-param&gt;
+ *     &lt;param-name&gt;org.omnifaces.COMBINED_RESOURCE_HANDLER_CACHE_TTL&lt;/param-name&gt;
+ *     &lt;param-value&gt;3628800&lt;/param-value&gt; &lt;!-- 6 weeks --&gt;
+ * &lt;/context-param&gt;
+ * </pre>
+ * <p>
+ * This is only considered when the JSF project stage is <strong>not</strong> set to <code>Development</code> as per
+ * {@link Faces#isDevelopment()}.
  * <p>
  * This can speed up the initial page load considerably. In general, subsequent page loads are served from the browser
  * cache, so caching doesn't make a difference on postbacks, but only on initial requests. The combined resource content
@@ -190,6 +203,16 @@ import org.omnifaces.util.Hacks;
  * {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_RESOURCES}, then those CDN resources will
  * automatically be added to the set of excluded resources.
  *
+ * <h3>CDNResource</h3>
+ * <p>
+ * Since 2.7, if you have configured a custom {@link ResourceHandler} which automatically uploads the resources to a
+ * CDN host, including the combined resources, and you want to be able to have a fallback to local host URL when the
+ * CDN host is unreachable, then you can let your custom {@link ResourceHandler} return a {@link CDNResource} which
+ * wraps the original resource and the CDN URL. The combined resource handler will make sure that the appropriate
+ * <code>onerror</code> attributes are added to the component resources which initiates the fallback resource in case
+ * the CDN request errors out.
+ *
+ *
  * @author Bauke Scholtz
  * @author Stephan Rauh {@literal <www.beyondjava.net>}
  *
@@ -198,6 +221,10 @@ import org.omnifaces.util.Hacks;
  * @see CombinedResourceInputStream
  * @see DynamicResource
  * @see DefaultResourceHandler
+ * @see InlineScriptRenderer
+ * @see InlineStylesheetRenderer
+ * @see InlineResourceRenderer
+ * @see CDNResource
  */
 public class CombinedResourceHandler extends DefaultResourceHandler implements SystemEventListener {
 
@@ -262,8 +289,8 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		excludedResources.addAll(initCDNResources());
 		suppressedResources = initResources(PARAM_NAME_SUPPRESSED_RESOURCES);
 		excludedResources.addAll(suppressedResources);
-		inlineCSS = Boolean.valueOf(getInitParameter(PARAM_NAME_INLINE_CSS));
-		inlineJS = Boolean.valueOf(getInitParameter(PARAM_NAME_INLINE_JS));
+		inlineCSS = parseBoolean(getInitParameter(PARAM_NAME_INLINE_CSS));
+		inlineJS = parseBoolean(getInitParameter(PARAM_NAME_INLINE_JS));
 		cacheTTL = initCacheTTL(getInitParameter(PARAM_NAME_CACHE_TTL));
 		subscribeToApplicationEvent(PreRenderViewEvent.class, this);
 	}
@@ -289,8 +316,8 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 	 * </ul>
 	 */
 	@Override
-	public void processEvent(SystemEvent event) throws AbortProcessingException {
-		if (disabledParam != null && Boolean.valueOf(String.valueOf(evaluateExpressionGet(disabledParam)))) {
+	public void processEvent(SystemEvent event) {
+		if (disabledParam != null && parseBoolean(String.valueOf((Object) evaluateExpressionGet(disabledParam)))) {
 			return;
 		}
 
@@ -369,17 +396,35 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 	private static Integer initCacheTTL(String cacheTTLParam) {
 		if (!isDevelopment() && cacheTTLParam != null) {
 			if (isNumber(cacheTTLParam)) {
-				int cacheTTL = Integer.valueOf(cacheTTLParam);
+				int cacheTTL = Integer.parseInt(cacheTTLParam);
 
 				if (cacheTTL > 0) {
 					return cacheTTL;
 				}
 			}
 
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_CACHE_TTL_PARAM, cacheTTLParam));
+			throw new IllegalArgumentException(format(ERROR_INVALID_CACHE_TTL_PARAM, cacheTTLParam));
 		}
 		else {
 			return null;
+		}
+	}
+
+	private static void removeComponentResources(FacesContext context, List<UIComponent> componentResourcesToRemove, String target) {
+		UIViewRoot view = context.getViewRoot();
+
+		for (UIComponent resourceToRemove : componentResourcesToRemove) {
+			if (resourceToRemove != null) {
+				UIComponent container = isMyFacesUsed() ? resourceToRemove.getParent() : resourceToRemove;
+
+				// setInView(false) forces JSF to not save dynamic remove action in state.
+				// Otherwise JSF will re-execute dynamic remove during restore view phase.
+				// This is unnecessary as CombinedResourceHandler already takes care of it.
+				// See also https://github.com/omnifaces/omnifaces/issues/135
+				container.setInView(false);
+				view.removeComponentResource(context, resourceToRemove, target);
+				container.setInView(true);
+			}
 		}
 	}
 
@@ -394,21 +439,19 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 		// Constants --------------------------------------------------------------------------------------------------
 
-		private static final String RENDERER_TYPE_CSS = "javax.faces.resource.Stylesheet";
-		private static final String RENDERER_TYPE_JS = "javax.faces.resource.Script";
 		private static final String EXTENSION_CSS = ".css";
 		private static final String EXTENSION_JS = ".js";
 
 		// General stylesheet/script builder --------------------------------------------------------------------------
 
-		private CombinedResourceBuilder stylesheets;
-		private CombinedResourceBuilder scripts;
-		private Map<String, CombinedResourceBuilder> deferredScripts;
+		private Builder stylesheets;
+		private Builder scripts;
+		private Map<String, Builder> deferredScripts;
 		private List<UIComponent> componentResourcesToRemove;
 
 		public CombinedResourceBuilder() {
-			stylesheets = new CombinedResourceBuilder(EXTENSION_CSS, TARGET_HEAD);
-			scripts = new CombinedResourceBuilder(EXTENSION_JS, TARGET_HEAD);
+			stylesheets = new Builder(EXTENSION_CSS, TARGET_HEAD);
+			scripts = new Builder(EXTENSION_JS, TARGET_HEAD);
 			deferredScripts = new LinkedHashMap<>();
 			componentResourcesToRemove = new ArrayList<>();
 		}
@@ -426,85 +469,72 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 			else if (component instanceof DeferredScript) {
 				addDeferredScript(component, id);
 			}
-
-			// WARNING: START OF HACK! --------------------------------------------------------------------------------
-			// HACK for RichFaces4 because of its non-standard resource library handling. Resources with the extension
-			// ".reslib" have special treatment by RichFaces specific resource library renderer. They represent multiple
-			// resources which are supposed to be dynamically constructed/added with the purpose to keep resource
-			// dependencies in RichFaces components "DRY". So far, it are usually only JS resources.
-			else if (Hacks.isRichFacesResourceLibraryRenderer(rendererType)) {
-				Set<ResourceIdentifier> resourceIdentifiers = Hacks.getRichFacesResourceLibraryResources(id);
-				ResourceHandler handler = context.getApplication().getResourceHandler();
-
-				for (ResourceIdentifier identifier : resourceIdentifiers) {
-					add(context, null, handler.getRendererTypeForResourceName(identifier.getName()), identifier, target);
-				}
-
-				componentResourcesToRemove.add(component);
-			}
-			// --------------------------------------------------------------------------------------------------------
 		}
 
 		private void addCombined(FacesContext context, UIComponent component, String rendererType, ResourceIdentifier id, String target) {
 			String[] resourcePathParts = id.getName().split("\\.", 2)[0].split("/");
 			String resourceId = resourcePathParts[resourcePathParts.length - 1];
 			CombinedResourceInfo info = CombinedResourceInfo.get(resourceId);
+			boolean added = false;
 
 			if (info != null) {
 				for (ResourceIdentifier combinedId : info.getResourceIdentifiers()) {
-					add(context, null, rendererType, combinedId, target);
+					add(context, added ? null : component, rendererType, combinedId, target);
+					added = true;
 				}
 			}
 
-			componentResourcesToRemove.add(component);
+			if (!added) {
+				componentResourcesToRemove.add(component);
+			}
 		}
 
 		private void addStylesheet(FacesContext context, UIComponent component, ResourceIdentifier id) {
 			if (stylesheets.add(component, id)) {
-				Hacks.setStylesheetResourceRendered(context, id); // Prevents future forced additions by libs.
+				context.getApplication().getResourceHandler().markResourceRendered(context, id.getName(), id.getLibrary()); // Prevents future forced additions by libs.
 			}
 		}
 
 		private void addScript(FacesContext context, UIComponent component, ResourceIdentifier id) {
-			if (Hacks.isScriptResourceRendered(context, id)) { // This is true when o:deferredScript is used.
+			ResourceHandler resourceHandler = context.getApplication().getResourceHandler();
+
+			if (resourceHandler.isResourceRendered(context, id.getName(), id.getLibrary())) { // This is true when o:deferredScript is used.
 				componentResourcesToRemove.add(component);
 			}
 			else if (scripts.add(component, id)) {
-				Hacks.setScriptResourceRendered(context, id); // Prevents future forced additions by libs.
+				resourceHandler.markResourceRendered(context, id.getName(), id.getLibrary()); // Prevents future forced additions by libs.
 			}
 		}
 
 		private void addDeferredScript(UIComponent component, ResourceIdentifier id) {
 			String group = (String) component.getAttributes().get("group");
-			CombinedResourceBuilder builder = deferredScripts.get(group);
-
-			if (builder == null) {
-				builder = new CombinedResourceBuilder(EXTENSION_JS, TARGET_BODY);
-				deferredScripts.put(group, builder);
-			}
-
-			builder.add(component, id);
+			deferredScripts.computeIfAbsent(group, k -> new Builder(EXTENSION_JS, TARGET_BODY)).add(component, id);
 		}
 
 		public void create(FacesContext context) {
 			stylesheets.create(context, inlineCSS ? InlineStylesheetRenderer.RENDERER_TYPE : RENDERER_TYPE_CSS);
 			scripts.create(context, inlineJS ? InlineScriptRenderer.RENDERER_TYPE : RENDERER_TYPE_JS);
 
-			for (CombinedResourceBuilder builder : deferredScripts.values()) {
+			for (Builder builder : deferredScripts.values()) {
 				builder.create(context, DeferredScriptRenderer.RENDERER_TYPE);
 			}
 
 			removeComponentResources(context, componentResourcesToRemove, TARGET_HEAD);
 		}
 
-		// Specific stylesheet/script builder -------------------------------------------------------------------------
+	}
+
+	// Specific stylesheet/script builder -----------------------------------------------------------------------------
+
+	private final class Builder {
 
 		private String extension;
 		private String target;
 		private CombinedResourceInfo.Builder infoBuilder;
 		private UIComponent componentResource;
+		private List<UIComponent> componentResourcesToRemove;
 
-		private CombinedResourceBuilder(String extension, String target) {
+		private Builder(String extension, String target) {
 			this.extension = extension;
 			this.target = target;
 			infoBuilder = new CombinedResourceInfo.Builder();
@@ -512,18 +542,19 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		}
 
 		private boolean add(UIComponent componentResource, ResourceIdentifier resourceIdentifier) {
-			if (componentResource != null && !componentResource.isRendered()) {
+			if ((componentResource != null && !componentResource.isRendered()) || containsResourceIdentifier(suppressedResources, resourceIdentifier)) {
 				componentResourcesToRemove.add(componentResource);
 				return true;
 			}
-			else if (excludedResources.isEmpty() || !excludedResources.contains(resourceIdentifier)) {
+			else if (!containsResourceIdentifier(excludedResources, resourceIdentifier)) {
 				infoBuilder.add(resourceIdentifier);
+				boolean deferredScript = (componentResource instanceof DeferredScript);
 
-				if (this.componentResource == null) {
+				if (this.componentResource == null && (deferredScript || (componentResource != null && componentResource.getAttributes().containsKey("target")))) {
 					this.componentResource = componentResource;
 				}
 				else {
-					if (componentResource instanceof DeferredScript) {
+					if (deferredScript) {
 						mergeAttribute(this.componentResource, componentResource, "onbegin");
 						mergeAttribute(this.componentResource, componentResource, "onsuccess");
 						mergeAttribute(this.componentResource, componentResource, "onerror");
@@ -533,12 +564,12 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 				return true;
 			}
-			else if (suppressedResources.contains(resourceIdentifier)) {
-				componentResourcesToRemove.add(componentResource);
-				return true;
-			}
 
 			return false;
+		}
+
+		private boolean containsResourceIdentifier(Set<ResourceIdentifier> ids, ResourceIdentifier id) {
+			return !ids.isEmpty() && (ids.contains(id) || ids.contains(new ResourceIdentifier(id.getLibrary(), "*")));
 		}
 
 		private void mergeAttribute(UIComponent originalComponent, UIComponent newComponent, String name) {
@@ -554,30 +585,39 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		}
 
 		private void create(FacesContext context, String rendererType) {
-			if (!infoBuilder.isEmpty()) {
+			if (!infoBuilder.isEmpty() && !isAjaxRequestWithPartialRendering(context)) { // #273, #301
 				if (componentResource == null) {
 					componentResource = new UIOutput();
 					context.getViewRoot().addComponentResource(context, componentResource, target);
 				}
 
+				String resourceName = infoBuilder.create() + extension;
 				componentResource.getAttributes().put("library", LIBRARY_NAME);
-				componentResource.getAttributes().put("name", infoBuilder.create() + extension);
+				componentResource.getAttributes().put("name", resourceName);
 				componentResource.setRendererType(rendererType);
+				Resource resource = context.getApplication().getResourceHandler().createResource(resourceName, LIBRARY_NAME);
+
+				if (resource instanceof CDNResource) {
+					String fallback = ((CDNResource) resource).getLocalRequestPath();
+
+					if (RENDERER_TYPE_JS.equals(rendererType)) {
+						componentResource.getPassThroughAttributes().put("onerror", "document.write('<script src=\"" + fallback + "\"></script>')");
+					}
+					else if (RENDERER_TYPE_CSS.equals(rendererType)) {
+						componentResource.getPassThroughAttributes().put("onerror", "this.onerror=null;this.href='" + fallback + "'");
+					}
+					else if (DeferredScriptRenderer.RENDERER_TYPE.equals(rendererType)) {
+						componentResource.getAttributes().put("onerror", "document.write('<script src=\"" + fallback + "\"><\\/script>')");
+					}
+				}
+				else if (RENDERER_TYPE_JS.equals(rendererType)) {
+					componentResource.getPassThroughAttributes().put("crossorigin", "anonymous");
+				}
 			}
 
 			removeComponentResources(context, componentResourcesToRemove, target);
 		}
 
-	}
-
-	private static void removeComponentResources(FacesContext context, List<UIComponent> componentResourcesToRemove, String target) {
-		UIViewRoot view = context.getViewRoot();
-
-		for (UIComponent resourceToRemove : componentResourcesToRemove) {
-			if (resourceToRemove != null) {
-				view.removeComponentResource(context, resourceToRemove, target);
-			}
-		}
 	}
 
 }

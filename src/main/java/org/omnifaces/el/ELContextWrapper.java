@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -37,7 +37,9 @@ public class ELContextWrapper extends ELContext implements FacesWrapper<ELContex
 
 	private ELContext elContext;
 
-	public ELContextWrapper() {}
+	public ELContextWrapper() {
+		//
+	}
 
 	public ELContextWrapper(ELContext elContext) {
 		this.elContext = elContext;
@@ -65,7 +67,7 @@ public class ELContextWrapper extends ELContext implements FacesWrapper<ELContex
 
 	@Override
 	public Object getContext(@SuppressWarnings("rawtypes") Class key) {
-	   return getWrapped().getContext(key);
+		return getWrapped().getContext(key);
 	}
 
 	@Override

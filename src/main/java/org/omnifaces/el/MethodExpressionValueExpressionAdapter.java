@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,10 +12,11 @@
  */
 package org.omnifaces.el;
 
+import static java.util.logging.Level.FINEST;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
-import java.lang.reflect.Method;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.el.ELContext;
 import javax.el.ELException;
@@ -40,6 +41,7 @@ import javax.faces.validator.ValidatorException;
 public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 
 	private static final long serialVersionUID = 1L;
+	private static final Logger logger = Logger.getLogger(MethodExpressionValueExpressionAdapter.class.getName());
 
 	private static final Set<Class<? extends Throwable>> EXCEPTIONS_TO_UNWRAP = unmodifiableSet(
 		MethodNotFoundException.class, // Needed for proper action listener error handling.
@@ -70,10 +72,7 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 
 	@Override
 	public MethodInfo getMethodInfo(ELContext context) {
-
-		Method method = ExpressionInspector.getMethodReference(context, valueExpression).getMethod();
-
-		return new MethodInfo(method.getName(), method.getReturnType(), method.getParameterTypes());
+		return ExpressionInspector.getMethodReference(context, valueExpression);
 	}
 
 	@Override
@@ -163,7 +162,8 @@ public class MethodExpressionValueExpressionAdapter extends MethodExpression {
 			try {
 				return super.getValue(context, base, property);
 			} catch (PropertyNotFoundException ignore) {
-				ignore = null; // We're not interested in it.
+				logger.log(FINEST, "Ignoring thrown exception; there is really no clean way to distinguish a ValueExpression from a MethodExpression.", ignore);
+
 				try {
 					return super.invoke(context, base, property, null, callerProvidedParameters != null ? callerProvidedParameters : EMPTY_PARAMETERS);
 				} catch (MethodNotFoundException e) {

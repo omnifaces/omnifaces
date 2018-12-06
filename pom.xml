@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
 >
 	<modelVersion>4.0.0</modelVersion>
@@ -9,18 +11,30 @@
 
 	<groupId>org.omnifaces</groupId>
 	<artifactId>omnifaces</artifactId>
-	<version>2.2-SNAPSHOT</version>
+	<version>3.2</version>
 	<packaging>jar</packaging>
-	
+
 	<name>OmniFaces</name>
 	<description>JSF 2.2+ utility library</description>
-	
 	<url>http://omnifaces.org</url>
 	<organization>
 		<name>OmniFaces</name>
 		<url>http://omnifaces.org</url>
 	</organization>
 	<inceptionYear>2012</inceptionYear>
+
+	<developers>
+		<developer>
+			<id>balusc</id>
+			<name>Bauke Scholtz</name>
+			<email>balusc@gmail.com</email>
+		</developer>
+		<developer>
+			<id>arjan.tijms</id>
+			<name>Arjan Tijms</name>
+			<email>arjan.tijms@gmail.com</email>
+		</developer>
+	</developers>
 
 	<licenses>
 		<license>
@@ -30,6 +44,12 @@
 		</license>
 	</licenses>
 
+	<scm>
+		<url>https://github.com/omnifaces/omnifaces</url>
+		<connection>scm:git:git://github.com/omnifaces/omnifaces.git</connection>
+		<developerConnection>scm:git:git@github.com:omnifaces/omnifaces.git</developerConnection>
+	</scm>
+
 	<distributionManagement>
 		<snapshotRepository>
 			<id>ossrh</id>
@@ -37,100 +57,230 @@
 		</snapshotRepository>
 	</distributionManagement>
 
-	<scm>
-		<url>https://github.com/omnifaces/omnifaces</url>
-		<connection>scm:git:git://github.com/omnifaces/omnifaces.git</connection>
-		<developerConnection>scm:git:git@github.com:omnifaces/omnifaces.git</developerConnection>
-	</scm>
-
 	<properties>
+
+		<!-- Java versions. -->
+		<javase.version>1.8</javase.version>
+		<javaee.version>8</javaee.version>
+		<javadoc.version>1.8</javadoc.version>
+
+		<!-- Essential Maven defaults. -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<javase.version>1.7</javase.version>
+		<maven.compiler.source>${javase.version}</maven.compiler.source>
+		<maven.compiler.target>${javase.version}</maven.compiler.target>
+		<maven.source.excludeResources>true</maven.source.excludeResources>
+
+		<!-- Test server versions. -->
+		<test.wildfly.version>12.0.0.Final</test.wildfly.version>
+		<test.tomee.version>7.0.4</test.tomee.version> <!-- TODO: update to Java EE 8 compatible version -->
+		<test.payara.version>5.Beta2</test.payara.version>
 	</properties>
 
-	<developers>
-		<developer>
-			<id>balusc</id>
-			<name>Bauke Scholtz</name>
-			<email>balusc@gmail.com</email>
-		</developer>
-
-		<developer>
-			<id>arjan.tijms</id>
-			<name>Arjan Tijms</name>
-			<email>arjan.tijms@gmail.com</email>
-		</developer>
-	</developers>
-
 	<dependencies>
-	
-		<!-- Java EE 7 dependencies -->
+
+		<!-- Java EE 8 dependencies. -->
 		<dependency>
 			<groupId>javax.faces</groupId>
 			<artifactId>javax.faces-api</artifactId>
-			<version>2.2</version>
+			<version>2.3</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.enterprise</groupId>
 			<artifactId>cdi-api</artifactId>
-			<version>1.1</version>
-			<scope>provided</scope>
-		</dependency>
-		
-		<!-- Java EE 6 dependencies -->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>3.0.1</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>javax.el</groupId>
-			<artifactId>el-api</artifactId>
-			<version>2.2</version>
+			<version>2.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
-			<version>1.0.0.GA</version>
+			<version>2.0.0.Final</version>
 			<scope>provided</scope>
+		</dependency>
+
+		<!-- Java EE 7 dependencies. -->
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>javax.servlet-api</artifactId>
+			<version>3.1.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.el</groupId>
+			<artifactId>javax.el-api</artifactId>
+			<version>3.0.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.websocket</groupId>
+			<artifactId>javax.websocket-api</artifactId>
+			<version>1.1</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Test dependencies.	-->
+		<dependency>
+			<groupId>javax</groupId>
+			<artifactId>javaee-web-api</artifactId>
+			<version>${javaee.version}.0</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.arquillian.junit</groupId>
+			<artifactId>arquillian-junit-container</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.arquillian.graphene</groupId>
+			<artifactId>graphene-webdriver</artifactId>
+			<version>2.1.0.Final</version>
+			<type>pom</type>
+			<scope>test</scope>
 		</dependency>
 	</dependencies>
 
-	<build>
+	<dependencyManagement>
+		<dependencies>
 
-		<!-- We know we don't want *.jsfdia, git knows we don't want them, now let's tell Maven as well -->
+			<!-- Test dependencies.	-->
+			<dependency>
+				<groupId>org.jboss.arquillian</groupId>
+				<artifactId>arquillian-bom</artifactId>
+				<version>1.1.13.Final</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.arquillian.extension</groupId>
+				<artifactId>arquillian-drone-bom</artifactId>
+				<version>2.0.1.Final</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.jboss.arquillian.selenium</groupId>
+				<artifactId>selenium-bom</artifactId>
+				<version>3.3.1</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+	<build>
 		<resources>
+
+			<!-- Exclude unminified JavaScript files (and Eclipse's jsfdia) from resources. -->
 			<resource>
 				<directory>src/main/resources</directory>
 				<excludes>
+					<exclude>**/*.unminified.js</exclude>
 					<exclude>**/*.jsfdia</exclude>
 				</excludes>
-				<filtering>false</filtering>
 			</resource>
 		</resources>
-	
+
 		<plugins>
-		
-			<!-- Set the Java compiler versions -->
+
+			<!-- Add missing license headers to source files. -->
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.2</version>
+				<groupId>com.mycila</groupId>
+				<artifactId>license-maven-plugin</artifactId>
+				<version>3.0</version>
 				<configuration>
-					<source>${javase.version}</source>
-					<target>${javase.version}</target>
+					<header>license.txt</header>
+					<excludes>
+						<exclude>*.*</exclude>
+					</excludes>
+					<mapping>
+						<java>SLASHSTAR_STYLE</java>
+					</mapping>
 				</configuration>
+				<executions>
+					<execution>
+						<phase>process-sources</phase>
+						<goals>
+							<goal>format</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
-			
-			<!-- Configure the jar with the binaries -->
+
+			<!-- Configure the JavaScript minifier. -->
+			<plugin>
+				<groupId>com.samaxes.maven</groupId>
+				<artifactId>minify-maven-plugin</artifactId>
+				<version>1.7.6</version>
+				<configuration>
+					<webappSourceDir>${basedir}/src/main/resources</webappSourceDir>
+					<webappTargetDir>${project.build.outputDirectory}</webappTargetDir>
+					<jsSourceDir>META-INF/resources/omnifaces</jsSourceDir>
+					<nosuffix>true</nosuffix>
+					<jsEngine>CLOSURE</jsEngine>
+				</configuration>
+				<executions>
+					<execution>
+						<id>minify-omnifaces</id>
+						<configuration>
+							<jsSourceFiles>
+								<jsSourceFile>omnifaces.unminified.js</jsSourceFile>
+								<jsSourceFile>util.unminified.js</jsSourceFile>
+								<jsSourceFile>highlight.unminified.js</jsSourceFile>
+								<jsSourceFile>deferredscript.unminified.js</jsSourceFile>
+								<jsSourceFile>unload.unminified.js</jsSourceFile>
+								<jsSourceFile>push.unminified.js</jsSourceFile>
+								<jsSourceFile>inputfile.unminified.js</jsSourceFile>
+								<jsSourceFile>form.unminified.js</jsSourceFile>
+								<jsSourceFile>hashparam.unminified.js</jsSourceFile>
+							</jsSourceFiles>
+							<jsFinalFile>omnifaces.js</jsFinalFile>
+						</configuration>
+						<goals>
+							<goal>minify</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>minify-fixviewstate</id>
+						<configuration>
+							<jsSourceFiles>
+								<jsSourceFile>omnifaces.unminified.js</jsSourceFile>
+								<jsSourceFile>fixviewstate.unminified.js</jsSourceFile>
+							</jsSourceFiles>
+							<jsFinalFile>fixviewstate.js</jsFinalFile>
+						</configuration>
+						<goals>
+							<goal>minify</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>minify-unload</id>
+						<configuration>
+							<jsSourceFiles>
+								<jsSourceFile>omnifaces.unminified.js</jsSourceFile>
+								<jsSourceFile>util.unminified.js</jsSourceFile>
+								<jsSourceFile>unload.unminified.js</jsSourceFile>
+							</jsSourceFiles>
+							<jsFinalFile>unload.js</jsFinalFile>
+						</configuration>
+						<goals>
+							<goal>minify</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Configure the jar with the binaries. -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.5</version>
+				<version>3.0.2</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -145,11 +295,11 @@
 				</configuration>
 			</plugin>
 
-			<!-- Configure the jar with the sources (or rather, convince Maven that we want sources at all) -->
+			<!-- Configure the jar with the sources. -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>2.4</version>
+				<version>3.0.1</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -160,18 +310,18 @@
 				</executions>
 			</plugin>
 
-			<!-- Configure the jar with the javadoc (or rather, convince Maven that we want javadoc at all) -->
+			<!-- Configure the jar with the javadoc. -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>2.10.1</version>
+				<version>3.0.0</version>
 				<configuration>
-					<javadocVersion>1.8</javadocVersion>
+					<javadocVersion>${javadoc.version}</javadocVersion>
 					<notimestamp>true</notimestamp>
 					<splitindex>true</splitindex>
 					<doctitle>OmniFaces API documentation</doctitle>
 					<links>
-						<link>https://docs.oracle.com/javaee/7/api/</link>
+						<link>https://javaee.github.io/javaee-spec/javadocs/</link>
 					</links>
 				</configuration>
 				<executions>
@@ -180,19 +330,18 @@
 						<goals>
 							<goal>jar</goal>
 						</goals>
+						<configuration>
+							<additionalparam>-Xdoclint:none</additionalparam>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
-			
-			<!-- Deploying is done via sonatype's Nexus  
-			
-				 Snapshot deploy: mvn clean deploy
-				 Release deploy: mvn clean deploy -P release
-			-->
+
+			<!-- Configure snapshot deployment to Sonatype. -->
 			<plugin>
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>nexus-staging-maven-plugin</artifactId>
-				<version>1.6.5</version>
+				<version>1.6.8</version>
 				<extensions>true</extensions>
 				<configuration>
 					<serverId>ossrh</serverId>
@@ -200,20 +349,302 @@
 					<autoReleaseAfterClose>true</autoReleaseAfterClose>
 				</configuration>
 			</plugin>
-			
 		</plugins>
+
+		<pluginManagement>
+			<plugins>
+
+				<!-- Make sure Eclipse itself also runs license format and JavaScript minifier during build. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>com.mycila</groupId>
+										<artifactId>license-maven-plugin</artifactId>
+										<versionRange>[3.0,)</versionRange>
+										<goals>
+											<goal>format</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute>
+											<runOnConfiguration>true</runOnConfiguration>
+										</execute>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>com.samaxes.maven</groupId>
+										<artifactId>minify-maven-plugin</artifactId>
+										<versionRange>[1.7.6,)</versionRange>
+										<goals>
+											<goal>minify</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute>
+											<runOnConfiguration>true</runOnConfiguration>
+										</execute>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+
+				<!-- Global configuration for integration test profiles. -->
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<version>3.0.2</version>
+					<executions>
+						<execution>
+							<phase>process-test-classes</phase>
+							<goals>
+								<goal>unpack</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<outputDirectory>${project.build.directory}</outputDirectory>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-failsafe-plugin</artifactId>
+					<version>2.20.1</version>
+					<executions>
+						<execution>
+							<goals>
+								<goal>integration-test</goal>
+								<goal>verify</goal>
+							</goals>
+						</execution>
+					</executions>
+					<configuration>
+						<systemPropertyVariables>
+							<profile.id>${project.activeProfiles[0].id}</profile.id>
+							<omnifaces.jar>${project.build.directory}/${project.build.finalName}.jar</omnifaces.jar>
+						</systemPropertyVariables>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 
 	<profiles>
+		<!-- NOTE: If Eclipse+M2E shows "Plugin execution not covered by lifecycle configuration" error in one of -->
+		<!-- below sections, then you need to add a default lifecycle mapping as instructed in M2E documentation: -->
+		<!-- https://www.eclipse.org/m2e/documentation/m2e-execution-not-covered.html#common-problems -->
+
+		<!-- WildFly integration test profile: mvn verify -P wildfly -->
+		<profile>
+			<id>wildfly</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>org.wildfly.arquillian</groupId>
+					<artifactId>wildfly-arquillian-container-managed</artifactId>
+					<version>2.1.0.Final</version>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.wildfly</groupId>
+											<artifactId>wildfly-dist</artifactId>
+											<version>${test.wildfly.version}</version>
+											<type>zip</type>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<systemPropertyVariables>
+								<jboss.home>${project.build.directory}/wildfly-${test.wildfly.version}</jboss.home>
+								<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
+							</systemPropertyVariables>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!-- TomEE integration test profile: mvn verify -P tomee -->
+		<profile>
+			<id>tomee</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.apache.tomee</groupId>
+					<artifactId>arquillian-tomee-remote</artifactId>
+					<version>${test.tomee.version}</version>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.apache.tomee</groupId>
+											<artifactId>apache-tomee</artifactId>
+											<version>${test.tomee.version}</version>
+											<type>zip</type>
+											<classifier>webprofile</classifier>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+							<execution>
+								<id>upgrade-tomee-to-jsf23</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.apache.myfaces.core</groupId>
+											<artifactId>myfaces-api</artifactId>
+											<version>2.3.0-beta</version>
+											<type>jar</type>
+											<outputDirectory>${project.build.directory}/apache-tomee-webprofile-${test.tomee.version}/lib</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.apache.myfaces.core</groupId>
+											<artifactId>myfaces-impl</artifactId>
+											<version>2.3.0-beta</version>
+											<type>jar</type>
+											<outputDirectory>${project.build.directory}/apache-tomee-webprofile-${test.tomee.version}/lib</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>commons-codec</groupId>
+											<artifactId>commons-codec</artifactId>
+											<version>1.10</version>
+											<type>jar</type>
+											<outputDirectory>${project.build.directory}/apache-tomee-webprofile-${test.tomee.version}/lib</outputDirectory>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>truezip-maven-plugin</artifactId>
+						<version>1.2</version>
+						<executions>
+							<execution>
+								<id>remove-tomee-jsf22-files</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>remove</goal>
+								</goals>
+								<configuration>
+									<fileset>
+										<directory>${project.build.directory}/apache-tomee-webprofile-${test.tomee.version}/lib</directory>
+										<includes>
+											<include>myfaces-api-2.2.12.jar</include>
+											<include>myfaces-impl-2.2.12.jar</include>
+										</includes>
+									</fileset>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<systemPropertyVariables>
+								<tomee.dir>${project.build.directory}/apache-tomee-webprofile-${test.tomee.version}</tomee.dir>
+							</systemPropertyVariables>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!-- Payara integration test profile: mvn verify -P payara -->
+		<profile>
+			<id>payara</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.jboss.arquillian.container</groupId>
+					<artifactId>arquillian-glassfish-managed-3.1</artifactId>
+					<version>1.0.2</version>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>fish.payara.distributions</groupId>
+											<artifactId>payara-web</artifactId>
+											<version>${test.payara.version}</version>
+											<type>zip</type>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<environmentVariables>
+								<GLASSFISH_HOME>${project.build.directory}/payara5</GLASSFISH_HOME>
+							</environmentVariables>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!-- Release deploy: mvn clean deploy -P release -->
 		<profile>
 			<id>release</id>
 			<build>
 				<plugins>
-					<!-- Signing with GPG is a requirement for a release deployment (to Maven central) -->
+
+					<!-- Signing with GPG is a requirement for a release deployment to Maven central. -->
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.5</version>
+						<version>1.6</version>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>

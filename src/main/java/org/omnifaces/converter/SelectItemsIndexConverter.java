@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  */
 package org.omnifaces.converter;
 
+import static java.lang.String.format;
 import static org.omnifaces.util.Faces.getContextAttribute;
 import static org.omnifaces.util.Faces.setContextAttribute;
 import static org.omnifaces.util.Messages.createError;
@@ -69,7 +70,7 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
  * @see SelectItemsCollector
  */
 @FacesConverter("omnifaces.SelectItemsIndexConverter")
-public class SelectItemsIndexConverter implements Converter {
+public class SelectItemsIndexConverter implements Converter<Object> {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
@@ -84,6 +85,10 @@ public class SelectItemsIndexConverter implements Converter {
 
 	@Override
 	public Object getAsObject(FacesContext context, UIComponent component, String submittedValue) {
+		if (isEmpty(submittedValue)) {
+			return null; // Work around for MyFaces 2.0.x bug.
+		}
+
 		List<Object> selectItemValues = SelectItemsUtils.collectAllValuesFromSelectItems(context, component);
 
 		try {
@@ -101,7 +106,7 @@ public class SelectItemsIndexConverter implements Converter {
 
 	@Override
 	public String getAsString(FacesContext context, UIComponent component, Object modelValue) {
-		String key = String.format(ATTRIBUTE_SELECT_ITEMS, component.getClientId(context));
+		String key = format(ATTRIBUTE_SELECT_ITEMS, component.getClientId(context));
 		List<Object> selectItemValues = getContextAttribute(key);
 
 		if (selectItemValues == null) {

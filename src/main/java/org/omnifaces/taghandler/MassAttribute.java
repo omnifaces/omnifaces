@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  */
 package org.omnifaces.taghandler;
 
+import static java.lang.String.format;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.IOException;
@@ -121,11 +122,11 @@ public class MassAttribute extends TagHandler {
 				cls = Class.forName(className);
 			}
 			catch (ClassNotFoundException e) {
-				throw new IllegalArgumentException(String.format(ERROR_UNAVAILABLE_TARGET, className), e);
+				throw new IllegalArgumentException(format(ERROR_UNAVAILABLE_TARGET, className), e);
 			}
 
 			if (!UIComponent.class.isAssignableFrom(cls)) {
-				throw new IllegalArgumentException(String.format(ERROR_INVALID_TARGET, cls));
+				throw new IllegalArgumentException(format(ERROR_INVALID_TARGET, cls));
 			}
 
 			targetClass = (Class<UIComponent>) cls;

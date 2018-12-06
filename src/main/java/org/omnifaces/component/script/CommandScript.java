@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,6 +12,16 @@
  */
 package org.omnifaces.component.script;
 
+import static java.lang.Boolean.FALSE;
+import static java.lang.String.format;
+import static javax.faces.application.ResourceHandler.JSF_SCRIPT_LIBRARY_NAME;
+import static javax.faces.application.ResourceHandler.JSF_SCRIPT_RESOURCE_NAME;
+import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME;
+import static javax.faces.event.PhaseId.APPLY_REQUEST_VALUES;
+import static javax.faces.event.PhaseId.INVOKE_APPLICATION;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
+import static org.omnifaces.util.Components.getParams;
 import static org.omnifaces.util.Components.validateHasParent;
 import static org.omnifaces.util.Utils.isEmpty;
 
@@ -26,10 +36,8 @@ import javax.faces.component.UIForm;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.event.ActionEvent;
-import javax.faces.event.PhaseId;
 
 import org.omnifaces.component.ParamHolder;
-import org.omnifaces.util.Components;
 import org.omnifaces.util.Json;
 import org.omnifaces.util.State;
 
@@ -88,9 +96,12 @@ import org.omnifaces.util.State;
  *
  * @author Bauke Scholtz
  * @since 1.3
+ * @deprecated Since 3.0 as this has been added to JSF 2.3 as <code>h:commandScript</code>.
  */
+@Deprecated
 @FacesComponent(CommandScript.COMPONENT_TYPE)
-@ResourceDependency(library="javax.faces", name="jsf.js", target="head")
+@ResourceDependency(library=JSF_SCRIPT_LIBRARY_NAME, name=JSF_SCRIPT_RESOURCE_NAME, target="head") // Required for jsf.ajax.request.
+@ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head") // Specifically util.js.
 public class CommandScript extends UICommand {
 
 	// Public constants -----------------------------------------------------------------------------------------------
@@ -99,7 +110,7 @@ public class CommandScript extends UICommand {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
-	private static final Pattern PATTERN_NAME = Pattern.compile("[$a-z_][$\\w]*", Pattern.CASE_INSENSITIVE);
+	private static final Pattern PATTERN_NAME = Pattern.compile("[$a-z_](\\.?[$\\w])*", Pattern.CASE_INSENSITIVE);
 
 	private static final String ERROR_MISSING_NAME =
 		"o:commandScript 'name' attribute must be specified.";
@@ -111,7 +122,7 @@ public class CommandScript extends UICommand {
 
 	private enum PropertyKeys {
 		// Cannot be uppercased. They have to exactly match the attribute names.
-		name, execute, render, onbegin, oncomplete;
+		name, execute, render, onbegin, oncomplete, autorun;
 	}
 
 	// Variables ------------------------------------------------------------------------------------------------------
@@ -142,11 +153,11 @@ public class CommandScript extends UICommand {
 	 */
 	@Override
 	public void decode(FacesContext context) {
-		String source = context.getExternalContext().getRequestParameterMap().get("javax.faces.source");
+		String source = context.getExternalContext().getRequestParameterMap().get(BEHAVIOR_SOURCE_PARAM_NAME);
 
 		if (getClientId(context).equals(source)) {
 			ActionEvent event = new ActionEvent(this);
-			event.setPhaseId(isImmediate() ? PhaseId.APPLY_REQUEST_VALUES : PhaseId.INVOKE_APPLICATION);
+			event.setPhaseId(isImmediate() ? APPLY_REQUEST_VALUES : INVOKE_APPLICATION);
 			queueEvent(event);
 		}
 	}
@@ -154,8 +165,9 @@ public class CommandScript extends UICommand {
 	/**
 	 * Write a <code>&lt;span&gt;&lt;script&gt;</code> with therein the script function which allows the end-user to
 	 * execute a JSF ajax request by a just script function call <code>functionName()</code> in the JavaScript context.
-	 * @throws IllegalArgumentException When there is no parent form, or when the <code>name</code> attribute is
-	 * missing, or when the <code>name</code> attribute does not represent a valid script function name.
+	 * @throws IllegalStateException When there is no parent form.
+	 * @throws IllegalArgumentException When the <code>name</code> attribute is missing, or when the <code>name</code>
+	 * attribute does not represent a valid script function name.
 	 */
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
@@ -167,7 +179,7 @@ public class CommandScript extends UICommand {
 		}
 
 		if (!PATTERN_NAME.matcher(name).matches()) {
-			throw new IllegalArgumentException(String.format(ERROR_ILLEGAL_NAME, name));
+			throw new IllegalArgumentException(format(ERROR_ILLEGAL_NAME, name));
 		}
 
 		ResponseWriter writer = context.getResponseWriter();
@@ -204,9 +216,18 @@ public class CommandScript extends UICommand {
 	 */
 	protected void encodeFunction(FacesContext context, String name) throws IOException {
 		ResponseWriter writer = context.getResponseWriter();
-		writer.append("var ").append(name).append('=').append("function(o){var o=(typeof o==='object')&&o?o:{};");
+
+		if (!name.contains(".")) {
+			writer.append("var ");
+		}
+
+		writer.append(name).append('=').append("function(o){var o=(typeof o==='object')&&o?o:{};");
 		encodeOptions(context);
 		writer.append("jsf.ajax.request('").append(getClientId(context)).append("',null,o)}");
+
+		if (isAutorun()) {
+			writer.append(";OmniFaces.Util.addOnloadListener(").append(name).append(")");
+		}
 	}
 
 	/**
@@ -219,7 +240,7 @@ public class CommandScript extends UICommand {
 	protected void encodeOptions(FacesContext context) throws IOException {
 		ResponseWriter writer = context.getResponseWriter();
 
-		for (ParamHolder param : Components.getParams(this)) {
+		for (ParamHolder<Object> param : getParams(this)) {
 			writer.append("o[").append(Json.encode(param.getName())).append("]=")
 				.append(Json.encode(param.getValue())).append(";");
 		}
@@ -284,7 +305,7 @@ public class CommandScript extends UICommand {
 
 				if (found == null) {
 					throw new IllegalArgumentException(
-						String.format(ERROR_UNKNOWN_CLIENTID, relativeClientId, getNamingContainer().getClientId(context)));
+						format(ERROR_UNKNOWN_CLIENTID, relativeClientId, getNamingContainer().getClientId(context)));
 				}
 
 				absoluteClientIds.append(found.getClientId(context));
@@ -374,6 +395,24 @@ public class CommandScript extends UICommand {
 	 */
 	public void setOncomplete(String oncomplete) {
 		state.put(PropertyKeys.oncomplete, oncomplete);
+	}
+
+	/**
+	 * Returns whether the command script should automatically run inline during page load.
+	 * @return Whether the command script should automatically run inline during page load.
+	 * @since 2.2
+	 */
+	public boolean isAutorun() {
+		return state.get(PropertyKeys.autorun, FALSE);
+	}
+
+	/**
+	 * Sets whether the command script should automatically run inline during page load.
+	 * @param autorun Whether the command script should automatically run inline during page load.
+	 * @since 2.2
+	 */
+	public void setAutorun(boolean autorun) {
+		state.put(PropertyKeys.autorun, autorun);
 	}
 
 }

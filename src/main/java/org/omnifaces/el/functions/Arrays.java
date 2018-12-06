@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,10 +12,15 @@
  */
 package org.omnifaces.el.functions;
 
+import static java.lang.Math.max;
+import static java.lang.Math.min;
+
+import java.util.stream.IntStream;
+
 /**
  * <p>
  * Collection of EL functions for array manipulation: <code>of:createArray()</code>, <code>of:createIntegerArray()</code>,
- * and <code>of:contains()</code>.
+ * <code>of:contains()</code> and <code>of:reverseArray()</code>.
  *
  * @author Bauke Scholtz
  */
@@ -50,24 +55,22 @@ public final class Arrays {
 	}
 
 	/**
-	 * Creates and an integer array which starts at the given integer and ends at the given integer, inclusive. This is
-	 * useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows an integer range to
-	 * represent days and years. If the begin is greater than end, then the array will be decremental. If the begin
-	 * equals end, then the array will contain only one item.
+	 * Creates and returns an integer array which starts at the given integer and ends at the given integer, inclusive.
+	 * This is useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows an integer
+	 * range to represent days and years. If the begin is greater than end, then the array will be decremental. If the
+	 * begin equals end, then the array will contain only one item.
 	 * @param begin The begin integer.
 	 * @param end The end integer.
 	 * @return An integer array which starts at the given integer and ends at the given integer, inclusive
 	 */
 	public static Integer[] createIntegerArray(int begin, int end) {
-		int direction = (begin < end) ? 1 : (begin > end) ? -1 : 0;
-		int size = Math.abs(end - begin) + 1;
-		Integer[] array = new Integer[size];
+		IntStream range = IntStream.rangeClosed(min(begin, end), max(begin, end));
 
-		for (int i = 0; i < size; i++) {
-			array[i] = begin + (i * direction);
+		if (begin > end) {
+			range = range.map(i -> begin + end - i);
 		}
 
-		return array;
+		return range.boxed().toArray(Integer[]::new);
 	}
 
 	/**
@@ -91,6 +94,27 @@ public final class Arrays {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Returns a copy of the array with items in reversed order.
+	 * @param array The array to reverse.
+	 * @return A copy of the array with items in reversed order.
+	 * @since 2.4
+	 */
+	public static Object[] reverseArray(Object[] array) {
+		if (array == null) {
+			return null;
+		}
+
+		int length = array.length;
+		Object[] reversed = new Object[length];
+
+		for (int i = 0; i < length; i++) {
+			reversed[i] = array[length - 1 - i];
+		}
+
+		return reversed;
 	}
 
 }

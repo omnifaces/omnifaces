@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -14,6 +14,7 @@ package org.omnifaces.component.output.cache.el;
 
 import static org.omnifaces.util.Faces.getContext;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 import javax.el.ELContext;
@@ -32,10 +33,10 @@ import org.omnifaces.el.ValueExpressionWrapper;
  */
 public class CachingValueExpression extends ValueExpressionWrapper {
 
-	private static final long serialVersionUID = -3172741983469325940L;
+	private static final long serialVersionUID = 1L;
 
 	private final String name;
-	private final Cache cache;
+	private final transient Cache cache;
 
 	public CachingValueExpression(String name, ValueExpression valueExpression, Cache cache) {
 		super(valueExpression);
@@ -47,9 +48,9 @@ public class CachingValueExpression extends ValueExpressionWrapper {
 	public Object getValue(ELContext elContext) {
 		FacesContext facesContext = getContext(elContext);
 
-		Object value = cache.getCacheAttribute(facesContext, name);
+		Serializable value = cache.getCacheAttribute(facesContext, name);
 		if (value == null) {
-			value = super.getValue(elContext);
+			value = (Serializable) super.getValue(elContext);
 			cache.setCacheAttribute(facesContext, name, value);
 		}
 

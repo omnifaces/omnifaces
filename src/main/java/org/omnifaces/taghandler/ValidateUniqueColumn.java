@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,6 +12,8 @@
  */
 package org.omnifaces.taghandler;
 
+import static java.lang.Boolean.parseBoolean;
+import static java.lang.String.format;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Components.getLabel;
 import static org.omnifaces.util.Faces.getELContext;
@@ -27,7 +29,6 @@ import javax.faces.component.visit.VisitCallback;
 import javax.faces.component.visit.VisitContext;
 import javax.faces.component.visit.VisitResult;
 import javax.faces.context.FacesContext;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ValueChangeEvent;
 import javax.faces.event.ValueChangeListener;
 import javax.faces.view.facelets.ComponentHandler;
@@ -107,7 +108,7 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
 	 * change listener on it. If the component is not new, check if there's an {@link UIData} parent.
 	 */
 	@Override
-	public void apply(FaceletContext context, final UIComponent parent) throws IOException {
+	public void apply(FaceletContext context, UIComponent parent) throws IOException {
 		if (!ComponentHandler.isNew(parent)) {
 			if (getClosestParent(parent, UIData.class) == null) {
 				throw new IllegalArgumentException(ERROR_INVALID_PARENT_PARENT);
@@ -117,7 +118,7 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
 		}
 
 		if (!(parent instanceof UIInput)) {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_PARENT, parent.getClass().getName()));
+			throw new IllegalArgumentException(format(ERROR_INVALID_PARENT, parent.getClass().getName()));
 		}
 
 		// Get the tag attributes as value expressions instead of the immediately evaluated values. This allows us to
@@ -151,7 +152,7 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
 	 * component.
 	 */
 	@Override
-	public void processValueChange(ValueChangeEvent event) throws AbortProcessingException {
+	public void processValueChange(ValueChangeEvent event) {
 		if (isDisabled()) {
 			return;
 		}
@@ -198,7 +199,7 @@ public class ValidateUniqueColumn extends TagHandler implements ValueChangeListe
 		}
 
 		if (disabled.isLiteralText()) {
-			return Boolean.valueOf(disabled.getExpressionString());
+			return parseBoolean(disabled.getExpressionString());
 		}
 
 		return getValue(disabled, false);

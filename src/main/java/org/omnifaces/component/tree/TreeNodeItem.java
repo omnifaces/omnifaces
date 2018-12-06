@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -14,6 +14,7 @@ package org.omnifaces.component.tree;
 
 import static javax.faces.component.visit.VisitHint.SKIP_ITERATION;
 import static org.omnifaces.util.Components.getClosestParent;
+import static org.omnifaces.util.Components.validateHasNoParent;
 import static org.omnifaces.util.Components.validateHasParent;
 
 import java.io.IOException;
@@ -50,25 +51,17 @@ public class TreeNodeItem extends TreeFamily {
 	/** The standard component type. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.tree.TreeNodeItem";
 
-	// Private constants ----------------------------------------------------------------------------------------------
-
-	private static final String ERROR_NESTING_DISALLOWED =
-		"Nesting TreeNodeItem components is disallowed. Use TreeNode instead to markup specific levels.";
-
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Validate the component hierarchy.
-	 * @throws IllegalArgumentException When there is no parent of type {@link Tree}, or when this component is nested
-	 * in another {@link TreeNodeItem}.
+	 * @throws IllegalStateException When there is no parent of type {@link TreeNode}, or when this component is
+	 * nested in another {@link TreeNodeItem}.
 	 */
 	@Override
 	protected void validateHierarchy() {
-		validateHasParent(this, Tree.class);
-
-		if (getClosestParent(this, TreeNodeItem.class) != null) {
-			throw new IllegalArgumentException(ERROR_NESTING_DISALLOWED);
-		}
+		validateHasParent(this, TreeNode.class);
+		validateHasNoParent(this, TreeNodeItem.class);
 	}
 
 	/**
@@ -89,26 +82,23 @@ public class TreeNodeItem extends TreeFamily {
 	 */
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" }) // For TreeModel. We don't care about its actual type anyway.
-	protected void process(final FacesContext context, final PhaseId phaseId) {
+	protected void process(FacesContext context, PhaseId phaseId) {
 		if (getChildCount() == 0) {
 			return;
 		}
 
-		process(context, new Callback.ReturningWithArgument<Void, Tree>() {
-			@Override
-			public Void invoke(Tree tree) {
-				if (tree.getCurrentModelNode() != null) {
-					for (TreeModel childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
-						tree.setCurrentModelNode(context, childModelNode);
+		process(context, tree -> {
+			if (tree.getCurrentModelNode() != null) {
+				for (TreeModel childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
+					tree.setCurrentModelNode(context, childModelNode);
 
-						if (isRendered()) {
-							processSuper(context, phaseId);
-						}
+					if (isRendered()) {
+						processSuper(context, phaseId);
 					}
 				}
-
-				return null;
 			}
+
+			return null;
 		});
 	}
 
@@ -121,7 +111,7 @@ public class TreeNodeItem extends TreeFamily {
 	 */
 	@Override
 	@SuppressWarnings({ "rawtypes", "unchecked" }) // For TreeModel. We don't care about its actual type anyway.
-	public boolean visitTree(final VisitContext context, final VisitCallback callback) {
+	public boolean visitTree(VisitContext context, VisitCallback callback) {
 		if (context.getHints().contains(SKIP_ITERATION)) {
 			return super.visitTree(context, callback);
 		}
@@ -130,21 +120,18 @@ public class TreeNodeItem extends TreeFamily {
 			return false;
 		}
 
-		return process(context.getFacesContext(), new Callback.ReturningWithArgument<Boolean, Tree>() {
-			@Override
-			public Boolean invoke(Tree tree) {
-				if (tree.getCurrentModelNode() != null) {
-					for (TreeModel childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
-						tree.setCurrentModelNode(context.getFacesContext(), childModelNode);
+		return process(context.getFacesContext(), tree -> {
+			if (tree.getCurrentModelNode() != null) {
+				for (TreeModel childModelNode : (Iterable<TreeModel>) tree.getCurrentModelNode()) {
+					tree.setCurrentModelNode(context.getFacesContext(), childModelNode);
 
-						if (TreeNodeItem.super.visitTree(context, callback)) {
-							return true;
-						}
+					if (TreeNodeItem.super.visitTree(context, callback)) {
+						return true;
 					}
 				}
-
-				return false;
 			}
+
+			return false;
 		});
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -14,6 +14,7 @@ package org.omnifaces.component.script;
 
 import static org.omnifaces.util.Ajax.oncomplete;
 import static org.omnifaces.util.Events.subscribeToViewEvent;
+import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -22,13 +23,10 @@ import javax.faces.FacesException;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
-import javax.faces.context.PartialViewContext;
 import javax.faces.context.ResponseWriter;
 import javax.faces.context.ResponseWriterWrapper;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.ListenerFor;
-import javax.faces.event.ListenersFor;
 import javax.faces.event.PostAddToViewEvent;
 import javax.faces.event.PostRestoreStateEvent;
 import javax.faces.event.PreRenderViewEvent;
@@ -57,12 +55,11 @@ import org.omnifaces.util.Ajax;
  * is that the <code>&lt;o:onloadScript&gt;</code> is also executed on every ajax request.
  *
  * @author Bauke Scholtz
+ * @see ScriptFamily
  */
 @FacesComponent(OnloadScript.COMPONENT_TYPE)
-@ListenersFor({
-	@ListenerFor(systemEventClass=PostAddToViewEvent.class),
-	@ListenerFor(systemEventClass=PostRestoreStateEvent.class)
-})
+@ListenerFor(systemEventClass=PostAddToViewEvent.class)
+@ListenerFor(systemEventClass=PostRestoreStateEvent.class)
 public class OnloadScript extends ScriptFamily implements SystemEventListener {
 
 	// Public constants -----------------------------------------------------------------------------------------------
@@ -73,13 +70,13 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Move this component to body using {@link #moveToBody(ComponentSystemEvent, ScriptFamily)}, and if the event is a
+	 * Move this component to body using {@link #moveToBody(ComponentSystemEvent)}, and if the event is a
 	 * {@link PostRestoreStateEvent}, then subscribe this component to {@link PreRenderViewEvent}, which will invoke
 	 * {@link #processEvent(SystemEvent)}.
 	 */
 	@Override
-	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
-		moveToBody(event, this);
+	public void processEvent(ComponentSystemEvent event) {
+		moveToBody(event);
 
 		if (event instanceof PostRestoreStateEvent) {
 			subscribeToViewEvent(PreRenderViewEvent.class, this);
@@ -99,7 +96,7 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 	 * request with partial rendering, then encode the children as {@link Ajax#oncomplete(String...)}.
 	 */
 	@Override
-	public void processEvent(SystemEvent event) throws AbortProcessingException {
+	public void processEvent(SystemEvent event) {
 		if (!(event instanceof PreRenderViewEvent) || !isRendered()) {
 			return;
 		}
@@ -115,15 +112,11 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 		ResponseWriter originalResponseWriter = context.getResponseWriter();
 		String encoding = context.getExternalContext().getRequestCharacterEncoding();
 		context.getExternalContext().setResponseCharacterEncoding(encoding);
-		final ResponseWriter writer = context.getRenderKit().createResponseWriter(buffer, null, encoding);
-		context.setResponseWriter(new ResponseWriterWrapper() {
+		ResponseWriter writer = context.getRenderKit().createResponseWriter(buffer, null, encoding);
+		context.setResponseWriter(new ResponseWriterWrapper(writer) {
 			@Override
 			public void writeText(Object text, String property) throws IOException {
-				writer.write(text.toString()); // So, don't escape HTML.
-			}
-			@Override
-			public ResponseWriter getWrapped() {
-				return writer;
+				getWrapped().write(text.toString()); // So, don't escape HTML.
 			}
 		});
 
@@ -149,38 +142,23 @@ public class OnloadScript extends ScriptFamily implements SystemEventListener {
 	}
 
 	/**
-	 * If this component is rendered, and the current request is not an ajax request with partial rendering, then start
-	 * the <code>&lt;script&gt;</code> element.
+	 * If the current request is not an ajax request with partial rendering, then encode begin.
 	 */
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
-		if (!isRendered() || isAjaxRequestWithPartialRendering(context)) {
-			return;
+		if (!isAjaxRequestWithPartialRendering(context)) {
+			super.encodeBegin(context);
 		}
-
-		pushComponentToEL(context, this);
-		ResponseWriter writer = context.getResponseWriter();
-		writer.startElement("script", this);
-		writer.writeAttribute("type", "text/javascript", "type");
 	}
 
 	/**
-	 * If this component is rendered, and the current request is not an ajax request with partial rendering, then end
-	 * the <code>&lt;script&gt;</code> element.
+	 * If the current request is not an ajax request with partial rendering, then encode end.
 	 */
 	@Override
 	public void encodeEnd(FacesContext context) throws IOException {
-		if (!isRendered() || isAjaxRequestWithPartialRendering(context)) {
-			return;
+		if (!isAjaxRequestWithPartialRendering(context)) {
+			super.encodeEnd(context);
 		}
-
-		context.getResponseWriter().endElement("script");
-		popComponentFromEL(context);
-	}
-
-	private boolean isAjaxRequestWithPartialRendering(FacesContext context) {
-		PartialViewContext pvc = context.getPartialViewContext();
-		return pvc.isAjaxRequest() && !pvc.isRenderAll();
 	}
 
 }

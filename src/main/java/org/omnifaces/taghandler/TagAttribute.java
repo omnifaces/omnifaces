@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -11,6 +11,8 @@
  * specific language governing permissions and limitations under the License.
  */
 package org.omnifaces.taghandler;
+
+import static org.omnifaces.util.Components.createValueExpression;
 
 import java.io.IOException;
 
@@ -27,7 +29,7 @@ import org.omnifaces.el.DelegatingVariableMapper;
  * <p>
  * The <code>&lt;o:tagAttribute&gt;</code> is a tag handler that can be used to explicitly declare a tag attribute on
  * a Facelets tag file. This makes sure that any tag attribute with the same name on a parent tag file is cleared out,
- * and provides a way to set the default value.
+ * which does not properly happen in Mojarra.
  * <p>
  * Consider the following custom tag structure:
  * <pre>
@@ -44,10 +46,11 @@ import org.omnifaces.el.DelegatingVariableMapper;
  * &lt;/my:tag&gt;
  * </pre>
  * <p>
- * then <code>#{id}</code> would evaluate to <code>"foo"</code> instead of <code>null</code>, even when you explicitly
+ * then <code>#{id}</code> of the nested tag would evaluate to <code>"foo"</code> instead of <code>null</code>, even when you explicitly
  * specify the attribute in the <code>*.taglib.xml</code> file.
  * <p>
- * This tag handler is designed to overcome this peculiar problem and unintuitive behavior of nested tagfiles.
+ * This tag handler is designed to overcome this peculiar problem and unintuitive behavior of nested tagfiles in
+ * Mojarra.
  *
  * <h3>Usage</h3>
  * <p>
@@ -55,13 +58,19 @@ import org.omnifaces.el.DelegatingVariableMapper;
  * <pre>
  * &lt;o:tagAttribute name="id" /&gt;
  * </pre>
+ * <p>
+ * You can optionally provide a default value.
+ * <pre>
+ * &lt;o:tagAttribute name="type" default="text" /&gt;
+ * </pre>
+ * Since OmniFaces 2.7/3.2 there is a special case for a <code>&lt;o:tagAttribute name="id"&gt;</code> without
+ * a default value: it will autogenerate an unique ID in the form of <code>j_ido[tagId]</code> where <code>[tagId]</code>
+ * is the <code>&lt;o:tagAttribute&gt;</code> tag's own unique ID.
  *
  * @author Arjan Tijms.
  * @since 2.1
  */
 public class TagAttribute extends TagHandler {
-
-	private static final String MARKER = TagAttribute.class.getName();
 
 	private final String name;
 	private final javax.faces.view.facelets.TagAttribute defaultValue;
@@ -74,51 +83,31 @@ public class TagAttribute extends TagHandler {
 
 	@Override
 	public void apply(FaceletContext context, UIComponent parent) throws IOException {
-		checkAndMarkMapper(context);
-		VariableMapper variableMapper = context.getVariableMapper();
-		ValueExpression valueExpressionLocal = variableMapper.setVariable(name, null);
+		DelegatingVariableMapper variableMapper = getDelegatingVariableMapper(context);
+		ValueExpression valueExpression = variableMapper.resolveWrappedVariable(name);
 
-		if (valueExpressionLocal == null && defaultValue != null) {
-			valueExpressionLocal = defaultValue.getValueExpression(context, Object.class);
-		}
-
-		if (valueExpressionLocal == null) {
-			ValueExpression valueExpressionParent = variableMapper.resolveVariable(name);
-
-			if (valueExpressionParent != null) {
-				valueExpressionLocal = context.getExpressionFactory().createValueExpression(null, Object.class);
+		if (valueExpression == null) {
+			if (defaultValue != null) {
+				valueExpression = defaultValue.getValueExpression(context, Object.class);
+			}
+			else if ("id".equals(name)) {
+				valueExpression = createValueExpression("#{'j_ido" + context.generateUniqueId(this.tagId) + "'}", String.class);
 			}
 		}
 
-		variableMapper.setVariable(name, valueExpressionLocal);
+		variableMapper.setVariable(name, valueExpression);
 	}
 
-	private static void checkAndMarkMapper(FaceletContext context) {
-		Integer marker = (Integer) context.getAttribute(MARKER);
-
-		if (marker != null && marker.equals(context.hashCode())) {
-			return; // Already marked.
-		}
-
+	private DelegatingVariableMapper getDelegatingVariableMapper(FaceletContext context) {
 		VariableMapper variableMapper = context.getVariableMapper();
-		ValueExpression valueExpressionParentMarker = variableMapper.resolveVariable(MARKER);
 
-		if (valueExpressionParentMarker == null) { // We're the outer faces tag, or parent didn't mark because it didn't have any attributes set.
-			context.setAttribute(MARKER, context.hashCode());
-			return;
+		if (variableMapper instanceof DelegatingVariableMapper) {
+			return (DelegatingVariableMapper) variableMapper;
 		}
 
-		variableMapper.setVariable(MARKER, null); // If we have our own mapper, this will not affect our parent mapper.
-		ValueExpression valueExpressionParentMarkerCheck = variableMapper.resolveVariable(MARKER);
-
-		if (valueExpressionParentMarkerCheck == null || !valueExpressionParentMarkerCheck.equals(valueExpressionParentMarker)) {
-			// We were able to remove our parent's mapper, so we share it.
-
-			variableMapper.setVariable(MARKER, valueExpressionParentMarker); // First put parent marker back ...
-			context.setVariableMapper(new DelegatingVariableMapper(variableMapper)); // ... then add our own variable mapper.
-		}
-
-		context.setAttribute(MARKER, context.hashCode());
+		DelegatingVariableMapper delegatingVariableMapper = new DelegatingVariableMapper(variableMapper);
+		context.setVariableMapper(delegatingVariableMapper);
+		return delegatingVariableMapper;
 	}
 
 }

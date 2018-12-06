@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -23,13 +23,15 @@ import javax.faces.model.SelectItem;
  */
 public class ExtendedSelectItem extends SelectItem {
 
-	private static final long serialVersionUID = -3266902732567582732L;
+	private static final long serialVersionUID = 1L;
 
 	/**
 	 * <p>Construct a <code>SelectItem</code> with no initialized property
 	 * values.</p>
 	 */
-	public ExtendedSelectItem() {}
+	public ExtendedSelectItem() {
+		//
+	}
 
 	/**
 	 * <p>Construct a <code>SelectItem</code> with property values initialized from the corresponding
@@ -40,12 +42,24 @@ public class ExtendedSelectItem extends SelectItem {
 	public ExtendedSelectItem(UISelectItem uiSelectItem) {
 		super(
 			uiSelectItem.getItemValue(),
-			uiSelectItem.getItemLabel() != null? uiSelectItem.getItemLabel() : uiSelectItem.getItemValue().toString(),
+			getItemLabel(uiSelectItem),
 			uiSelectItem.getItemDescription(),
 			uiSelectItem.isItemDisabled(),
 			uiSelectItem.isItemEscaped(),
 			uiSelectItem.isNoSelectionOption()
 		);
+	}
+
+	private static String getItemLabel(UISelectItem uiSelectItem) {
+		if (uiSelectItem.getItemLabel() != null) {
+			return uiSelectItem.getItemLabel();
+		}
+		else if (uiSelectItem.getItemValue() != null) {
+			return uiSelectItem.getItemValue().toString();
+		}
+		else {
+			return null;
+		}
 	}
 
 }

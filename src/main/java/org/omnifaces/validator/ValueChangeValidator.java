@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -11,6 +11,8 @@
  * specific language governing permissions and limitations under the License.
  */
 package org.omnifaces.validator;
+
+import java.util.Objects;
 
 import javax.faces.component.EditableValueHolder;
 import javax.faces.component.UIComponent;
@@ -26,9 +28,9 @@ import javax.faces.validator.Validator;
  * <p>
  * This validator offers you a template to do it transparently. To use it, just change your validators from:
  * <pre>
- * public class YourValidator implements Validator {
+ * public class YourValidator implements Validator&lt;YourEntity&gt; {
  *
- *     public void validate(FacesContext context, UIComponent component, Object submittedValue) {
+ *     public void validate(FacesContext context, UIComponent component, YourEntity submittedValue) {
  *         // ...
  *     }
  *
@@ -36,9 +38,9 @@ import javax.faces.validator.Validator;
  * </pre>
  * <p>to
  * <pre>
- * public class YourValidator extends ValueChangeValidator {
+ * public class YourValidator extends ValueChangeValidator&lt;YourEntity&gt; {
  *
- *     public void validateChangedObject(FacesContext context, UIComponent component, Object submittedValue) {
+ *     public void validateChangedObject(FacesContext context, UIComponent component, YourEntity submittedValue) {
  *         // ...
  *     }
  *
@@ -51,7 +53,7 @@ import javax.faces.validator.Validator;
  * @author Bauke Scholtz
  * @since 1.7
  */
-public abstract class ValueChangeValidator implements Validator {
+public abstract class ValueChangeValidator<T> implements Validator<T> {
 
 	/**
 	 * If the component is an instance of {@link EditableValueHolder} and its old object value is equal to the
@@ -60,12 +62,13 @@ public abstract class ValueChangeValidator implements Validator {
 	 * expensive DAO operations.
 	 */
 	@Override
-	public void validate(FacesContext context, UIComponent component, Object submittedValue) {
+	@SuppressWarnings("unchecked")
+	public void validate(FacesContext context, UIComponent component, T submittedValue) {
 		if (component instanceof EditableValueHolder) {
-			Object newValue = submittedValue;
-			Object oldValue = ((EditableValueHolder) component).getValue();
+			T newValue = submittedValue;
+			T oldValue = (T) ((EditableValueHolder) component).getValue();
 
-			if (newValue == null ? oldValue == null : newValue.equals(oldValue)) {
+			if (Objects.equals(newValue, oldValue)) {
 				return;
 			}
 		}
@@ -80,6 +83,6 @@ public abstract class ValueChangeValidator implements Validator {
 	 * @param component The involved UI component.
 	 * @param submittedValue The submitted value.
 	 */
-	public abstract void validateChangedObject(FacesContext context, UIComponent component, Object submittedValue);
+	public abstract void validateChangedObject(FacesContext context, UIComponent component, T submittedValue);
 
 }

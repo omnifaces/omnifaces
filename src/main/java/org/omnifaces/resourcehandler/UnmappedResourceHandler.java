@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -15,7 +15,9 @@ package org.omnifaces.resourcehandler;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
 import static org.omnifaces.util.Faces.getMapping;
+import static org.omnifaces.util.Faces.getRequestContextPath;
 import static org.omnifaces.util.Faces.isPrefixMapping;
+import static org.omnifaces.util.FacesLocal.getRequestURI;
 import static org.omnifaces.util.Utils.stream;
 
 import java.io.IOException;
@@ -80,10 +82,11 @@ import org.omnifaces.util.Hacks;
  * </pre>
  * <p>
  * And the {@link FacesServlet} needs to have an additional mapping <code>/javax.faces.resource/*</code> in
- * <code>web.xml</code>. For example, assuming that you've already a mapping on <code>*.xhtml</code>:
+ * <code>web.xml</code>. You can just add it as a new <code>&lt;url-pattern&gt;</code> entry to the existing mapping
+ * of the {@link FacesServlet}. For example, assuming that you've already a mapping on <code>*.xhtml</code>:
  * <pre>
  * &lt;servlet-mapping&gt;
- *     &lt;servlet-name&gt;facesServlet&lt;/servlet-name&gt;
+ *     ...
  *     &lt;url-pattern&gt;*.xhtml&lt;/url-pattern&gt;
  *     &lt;url-pattern&gt;/javax.faces.resource/*&lt;/url-pattern&gt;
  * &lt;/servlet-mapping&gt;
@@ -132,17 +135,13 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 			return resource;
 		}
 
-		String unmappedRequestPath = unmapRequestPath(resource.getRequestPath());
-		return new RemappedResource(resource, unmappedRequestPath);
+		String path = resource.getRequestPath();
+		return isResourceRequest(path) ? new RemappedResource(resource, unmapRequestPath(path)) : resource;
 	}
 
-	/**
-	 * Returns <code>true</code> if {@link ExternalContext#getRequestServletPath()} equals
-	 * {@link ResourceHandler#RESOURCE_IDENTIFIER}.
-	 */
 	@Override
 	public boolean isResourceRequest(FacesContext context) {
-		return RESOURCE_IDENTIFIER.equals(context.getExternalContext().getRequestServletPath());
+		return isResourceRequest(getRequestURI(context)) || super.isResourceRequest(context);
 	}
 
 	@Override
@@ -179,6 +178,10 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
+	private static boolean isResourceRequest(String path) {
+		return path.startsWith(getRequestContextPath() + RESOURCE_IDENTIFIER);
+	}
+
 	private static String unmapRequestPath(String path) {
 		String mapping = getMapping();
 
@@ -188,8 +191,11 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 		else if (path.contains("?")) {
 			return path.replace(mapping + "?", "?");
 		}
-		else {
+		else if (path.endsWith(mapping)) {
 			return path.substring(0, path.length() - mapping.length());
+		}
+		else {
+			return path;
 		}
 	}
 

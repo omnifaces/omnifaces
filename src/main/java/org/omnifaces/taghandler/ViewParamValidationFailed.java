@@ -1,21 +1,19 @@
 /*
- * Copyright 2014 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  */
 package org.omnifaces.taghandler;
 
 import static java.lang.Boolean.TRUE;
+import static java.lang.String.format;
 import static org.omnifaces.util.Events.subscribeToRequestComponentEvent;
 import static org.omnifaces.util.Facelets.getValueExpression;
 import static org.omnifaces.util.Faces.getContext;
@@ -31,7 +29,6 @@ import java.util.regex.Pattern;
 
 import javax.el.ELContext;
 import javax.el.ValueExpression;
-import javax.faces.FacesException;
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIViewParameter;
@@ -44,7 +41,6 @@ import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
 
-import org.omnifaces.util.Callback;
 import org.omnifaces.util.Faces;
 
 /**
@@ -189,15 +185,16 @@ public class ViewParamValidationFailed extends TagHandler {
 	 * current request is <strong>not</strong> a postback, and <strong>not</strong> in render response, and all required
 	 * attributes are set, then subscribe the parent component to the {@link PostValidateEvent}. This will invoke the
 	 * {@link #processViewParamValidationFailed(ComponentSystemEvent)} method after validation.
-	 * @throws IllegalArgumentException When the parent component is not an instance of {@link UIViewRoot} or
+	 * @throws IllegalStateException When the parent component is not an instance of {@link UIViewRoot} or
 	 * {@link UIViewParameter}, or when there's already another <code>&lt;o:viewParamValidationFailed&gt;</code> tag
-	 * registered on the same parent, or when both <code>sendRedirect</code> and <code>sendError</code> attributes are
+	 * registered on the same parent.
+	 * @throws IllegalArgumentException When both <code>sendRedirect</code> and <code>sendError</code> attributes are
 	 * missing or simultaneously specified.
 	 */
 	@Override
-	public void apply(FaceletContext context, final UIComponent parent) throws IOException {
+	public void apply(FaceletContext context, UIComponent parent) throws IOException {
 		if (!(parent instanceof UIViewRoot || parent instanceof UIViewParameter)) {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_PARENT, this, parent.getClass().getName()));
+			throw new IllegalStateException(format(ERROR_INVALID_PARENT, this, parent.getClass().getName()));
 		}
 
 		FacesContext facesContext = context.getFacesContext();
@@ -211,18 +208,13 @@ public class ViewParamValidationFailed extends TagHandler {
 		message = getValueExpression(context, getAttribute("message"), String.class);
 
 		if (sendRedirect == null && sendError == null) {
-			throw new IllegalArgumentException(String.format(ERROR_MISSING_ATTRIBUTE, this));
+			throw new IllegalArgumentException(format(ERROR_MISSING_ATTRIBUTE, this));
 		}
 		else if (sendRedirect != null && sendError != null) {
-			throw new IllegalArgumentException(String.format(ERROR_DOUBLE_ATTRIBUTE, this));
+			throw new IllegalArgumentException(format(ERROR_DOUBLE_ATTRIBUTE, this));
 		}
 
-		subscribeToRequestComponentEvent(parent, PostValidateEvent.class, new Callback.WithArgument<ComponentSystemEvent>() {
-			@Override
-			public void invoke(ComponentSystemEvent event) {
-				processViewParamValidationFailed(event);
-			}
-		});
+		subscribeToRequestComponentEvent(parent, PostValidateEvent.class, this::processViewParamValidationFailed);
 	}
 
 	/**
@@ -275,33 +267,28 @@ public class ViewParamValidationFailed extends TagHandler {
 		ELContext elContext = context.getELContext();
 		String evaluatedMessage = evaluate(elContext, message, false);
 
-		if (isEmpty(evaluatedMessage)) {
+		if (evaluatedMessage == null) {
 			evaluatedMessage = defaultMessage;
 		}
 
-		try {
-			if (sendRedirect != null) {
-				String evaluatedSendRedirect = evaluate(elContext, sendRedirect, true);
+		if (sendRedirect != null) {
+			String evaluatedSendRedirect = evaluate(elContext, sendRedirect, true);
 
-				if (!isEmpty(evaluatedMessage)) {
-					addFlashGlobalError(evaluatedMessage);
-				}
-
-				redirect(context, evaluatedSendRedirect);
+			if (!isEmpty(evaluatedMessage)) {
+				addFlashGlobalError(evaluatedMessage);
 			}
-			else {
-				String evaluatedSendError = evaluate(elContext, sendError, true);
 
-				if (!HTTP_STATUS_CODE.matcher(evaluatedSendError).matches()) {
-					throw new IllegalArgumentException(
-						String.format(ERROR_INVALID_SENDERROR, sendError, evaluatedSendError));
-				}
-
-				responseSendError(context, Integer.valueOf(evaluatedSendError), evaluatedMessage);
-			}
+			redirect(context, evaluatedSendRedirect);
 		}
-		catch (IOException e) {
-			throw new FacesException(e);
+		else {
+			String evaluatedSendError = evaluate(elContext, sendError, true);
+
+			if (!HTTP_STATUS_CODE.matcher(evaluatedSendError).matches()) {
+				throw new IllegalArgumentException(
+					format(ERROR_INVALID_SENDERROR, sendError, evaluatedSendError));
+			}
+
+			responseSendError(context, Integer.valueOf(evaluatedSendError), evaluatedMessage);
 		}
 	}
 
@@ -314,7 +301,7 @@ public class ViewParamValidationFailed extends TagHandler {
 		Object value = (expression != null) ? expression.getValue(context) : null;
 
 		if (required && isEmpty(value)) {
-			throw new IllegalArgumentException(String.format(ERROR_REQUIRED_ATTRIBUTE, expression));
+			throw new IllegalArgumentException(format(ERROR_REQUIRED_ATTRIBUTE, expression));
 		}
 
 		return (value != null) ? value.toString() : null;

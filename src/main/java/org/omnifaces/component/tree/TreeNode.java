@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,7 +12,9 @@
  */
 package org.omnifaces.component.tree;
 
+import static org.omnifaces.util.Components.validateHasChild;
 import static org.omnifaces.util.Components.validateHasDirectParent;
+import static org.omnifaces.util.Components.validateHasNoParent;
 
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponent;
@@ -59,11 +61,14 @@ public class TreeNode extends TreeFamily {
 
 	/**
 	 * Validate the component hierarchy.
-	 * @throws IllegalArgumentException When the direct parent component isn't of type {@link Tree}.
+	 * @throws IllegalStateException When the direct parent component isn't of type {@link Tree}, or when this
+	 * component is nested in another {@link TreeNode}, or when there aren't any children of type {@link TreeNodeItem}.
 	 */
 	@Override
 	protected void validateHierarchy() {
 		validateHasDirectParent(this, Tree.class);
+		validateHasNoParent(this, TreeNode.class);
+		validateHasChild(this, TreeNodeItem.class);
 	}
 
 	/**

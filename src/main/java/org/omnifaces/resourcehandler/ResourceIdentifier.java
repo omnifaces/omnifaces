@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -37,8 +37,7 @@ public class ResourceIdentifier {
 	 */
 	public ResourceIdentifier(String resourceIdentifier) {
 		String[] parts = resourceIdentifier.split(":");
-		library = (parts.length > 1) ? parts[0] : null;
-		name = parts[parts.length -1 ];
+		setLibraryAndName((parts.length > 1) ? parts[0] : null, parts[parts.length - 1]);
 	}
 
 	/**
@@ -47,8 +46,7 @@ public class ResourceIdentifier {
 	 */
 	public ResourceIdentifier(UIComponent componentResource) {
 		Map<String, Object> attributes = componentResource.getAttributes();
-		library = (String) attributes.get("library");
-		name = (String) attributes.get("name");
+		setLibraryAndName((String) attributes.get("library"), (String) attributes.get("name"));
 	}
 
 	/**
@@ -57,8 +55,12 @@ public class ResourceIdentifier {
 	 * @param name The resource name.
 	 */
 	public ResourceIdentifier(String library, String name) {
+		setLibraryAndName(library, name);
+	}
+
+	private void setLibraryAndName(String library, String name) {
 		this.library = library;
-		this.name = name;
+		this.name = (name != null) ? name.split("[?#;]", 2)[0] : null; // Split gets rid of query string and path fragment.
 	}
 
 	// Getters --------------------------------------------------------------------------------------------------------

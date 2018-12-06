@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -32,34 +32,26 @@ public class ReadOnlyValueExpression extends ValueExpression {
 
 	private static final long serialVersionUID = 1L;
 
-	private Callback.ReturningWithArgument<Object, ELContext> callbackWithArgument;
-	private Callback.SerializableReturning<Object> callbackReturning;
+	private Callback.SerializableReturning<Object> callback;
 	private Class<?> expectedType;
 
-	public ReadOnlyValueExpression(Class<?> expectedType, Callback.SerializableReturning<Object> callbackReturning) {
+	public ReadOnlyValueExpression(Class<?> expectedType, Callback.SerializableReturning<Object> callback) {
 		this(expectedType);
-		this.callbackReturning = callbackReturning;
-	}
-
-	public ReadOnlyValueExpression(Class<?> expectedType, Callback.ReturningWithArgument<Object, ELContext> callbackWithArgument) {
-		this(expectedType);
-		this.callbackWithArgument = callbackWithArgument;
+		this.callback = callback;
 	}
 
 	public ReadOnlyValueExpression(Class<?> expectedType) {
 		this.expectedType = expectedType;
 	}
 
-	public ReadOnlyValueExpression() {}
+	public ReadOnlyValueExpression() {
+		//
+	}
 
 	@Override
 	public Object getValue(ELContext context) {
-		if (callbackReturning != null) {
-			return callbackReturning.invoke();
-		}
-
-		if (callbackWithArgument != null) {
-			return callbackWithArgument.invoke(context);
+		if (callback != null) {
+			return callback.invoke();
 		}
 
 		return null;
@@ -126,34 +118,12 @@ public class ReadOnlyValueExpression extends ValueExpression {
 
 	/**
 	 * Returns the functional interface that will be called when the value expression is resolved
-	 * and which receives the proper ELContext.
-	 *
-	 * @return the functional interface that will be called when the value expression is resolved
-	 * @since 2.1
-	 */
-	public Callback.ReturningWithArgument<Object, ELContext> getCallbackWithArgument() {
-		return callbackWithArgument;
-	}
-
-	/**
-	 * Sets the functional interface that will be called when the value expression is resolved and
-	 * which receives the proper ELContext.
-	 *
-	 * @param callbackWithArgument functional interface returning what the value expression will return
-	 * @since 2.1
-	 */
-	public void setCallbackWithArgument(Callback.ReturningWithArgument<Object, ELContext> callbackWithArgument) {
-		this.callbackWithArgument = callbackWithArgument;
-	}
-
-	/**
-	 * Returns the functional interface that will be called when the value expression is resolved
 	 *
 	 * @return the functional interface that will be called when the value expression is resolved
 	 * @since 2.1
 	 */
 	public Callback.SerializableReturning<Object> getCallbackReturning() {
-		return callbackReturning;
+		return callback;
 	}
 
 	/**
@@ -163,7 +133,7 @@ public class ReadOnlyValueExpression extends ValueExpression {
 	 * @since 2.1
 	 */
 	public void setCallbackReturning(Callback.SerializableReturning<Object> callbackReturning) {
-		this.callbackReturning = callbackReturning;
+		this.callback = callbackReturning;
 	}
 
 }

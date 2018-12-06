@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,6 +12,8 @@
  */
 package org.omnifaces.util;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.io.Serializable;
 
 /**
@@ -28,6 +30,7 @@ public final class Callback {
 	 *
 	 * @author Bauke Scholtz
 	 */
+	@FunctionalInterface
 	public interface Void {
 
 		/**
@@ -43,6 +46,7 @@ public final class Callback {
 	 * @author Bauke Scholtz
 	 * @since 2.1
 	 */
+	@FunctionalInterface
 	public interface SerializableVoid extends Serializable {
 
 		/**
@@ -58,6 +62,7 @@ public final class Callback {
 	 * @author Bauke Scholtz
 	 * @param <R> The return type.
 	 */
+	@FunctionalInterface
 	public interface Returning<R> {
 
 		/**
@@ -75,6 +80,7 @@ public final class Callback {
 	 * @param <R> The return type.
 	 * @since 2.1
 	 */
+	@FunctionalInterface
 	public interface SerializableReturning<R> extends Serializable {
 
 		/**
@@ -91,6 +97,7 @@ public final class Callback {
 	 * @author Bauke Scholtz
 	 * @param <A> The argument type.
 	 */
+	@FunctionalInterface
 	public interface WithArgument<A> {
 
 		/**
@@ -108,6 +115,7 @@ public final class Callback {
 	 * @param <A> The argument type.
 	 * @since 2.1
 	 */
+	@FunctionalInterface
 	public interface SerializableWithArgument<A> extends Serializable {
 
 		/**
@@ -125,6 +133,7 @@ public final class Callback {
 	 * @param <R> The return type.
 	 * @param <A> The argument type.
 	 */
+	@FunctionalInterface
 	public interface ReturningWithArgument<R, A> {
 
 		/**
@@ -144,6 +153,7 @@ public final class Callback {
 	 * @param <A> The argument type.
 	 * @since 2.1
 	 */
+	@FunctionalInterface
 	public interface SerializableReturningWithArgument<R, A> extends Serializable {
 
 		/**
@@ -152,6 +162,25 @@ public final class Callback {
 		 * @return The callback result.
 		 */
 		R invoke(A a);
+
+	}
+
+
+	/**
+	 * Use this if you need an output stream callback.
+	 *
+	 * @author Bauke Scholtz
+	 * @since 2.3
+	 */
+	@FunctionalInterface
+	public interface Output {
+
+		/**
+		 * This method should be invoked by the method where you're passing this callback instance to.
+		 * @param output The callback output stream to write to.
+		 * @throws IOException When given output stream cannot be written.
+		 */
+		void writeTo(OutputStream output) throws IOException;
 
 	}
 

@@ -1,17 +1,14 @@
 /*
- * Copyright 2013 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  */
 package org.omnifaces.application;
 
@@ -31,7 +28,6 @@ public class OmniApplicationFactory extends ApplicationFactory {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private final ApplicationFactory wrapped;
 	private volatile Application application;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
@@ -41,7 +37,7 @@ public class OmniApplicationFactory extends ApplicationFactory {
 	 * @param wrapped The wrapped factory.
 	 */
 	public OmniApplicationFactory(ApplicationFactory wrapped) {
-		this.wrapped = wrapped;
+		super(wrapped);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -51,7 +47,7 @@ public class OmniApplicationFactory extends ApplicationFactory {
 	 */
 	@Override
 	public Application getApplication() {
-		return (application == null) ? createOmniApplication(wrapped.getApplication()) : application;
+		return (application == null) ? createOmniApplication(getWrapped().getApplication()) : application;
 	}
 
 	/**
@@ -60,15 +56,7 @@ public class OmniApplicationFactory extends ApplicationFactory {
 	 */
 	@Override
 	public void setApplication(Application application) {
-		wrapped.setApplication(createOmniApplication(application));
-	}
-
-	/**
-	 * Returns the wrapped factory.
-	 */
-	@Override
-	public ApplicationFactory getWrapped() {
-		return wrapped;
+		getWrapped().setApplication(createOmniApplication(application));
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
@@ -78,7 +66,7 @@ public class OmniApplicationFactory extends ApplicationFactory {
 	 * it will be wrapped by a new instance of {@link OmniApplication} and set as the current instance and returned.
 	 * Additionally, it will check if all Application implementations properly extend from ApplicationWrapper.
 	 */
-	private synchronized Application createOmniApplication(final Application application) {
+	private synchronized Application createOmniApplication(Application application) {
 		Application newApplication = application;
 
 		while (!(newApplication instanceof OmniApplication) && newApplication instanceof ApplicationWrapper) {

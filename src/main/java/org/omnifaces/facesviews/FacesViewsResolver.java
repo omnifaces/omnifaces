@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -28,8 +28,9 @@ import javax.faces.view.facelets.ResourceResolver;
  * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
  *
  * @author Arjan Tijms
- *
+ * @see FacesViews
  */
+@SuppressWarnings("deprecation")
 public class FacesViewsResolver extends ResourceResolver {
 
 	private final ResourceResolver resourceResolver;
@@ -40,13 +41,12 @@ public class FacesViewsResolver extends ResourceResolver {
 
 	@Override
 	public URL resolveUrl(String path) {
-
 		URL resource = resourceResolver.resolveUrl(getMappedPath(path));
 
 		if (resource == null && isDevelopment()) {
-			// If "resource" is null it means it wasn't found. Check if the resource was dynamically added by
-			// scanning the faces-views location(s) again.
-			scanAndStoreViews(getServletContext());
+			// If resource is null it means it wasn't found.
+			// Check if the resource was dynamically added by scanning the faces-views location(s) again.
+			scanAndStoreViews(getServletContext(), false);
 			resource = resourceResolver.resolveUrl(getMappedPath(path));
 		}
 

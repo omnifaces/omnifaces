@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -14,7 +14,6 @@ package org.omnifaces.component.util;
 
 import static java.lang.String.format;
 import static org.omnifaces.component.util.MoveComponent.Destination.ADD_LAST;
-import static org.omnifaces.component.util.MoveComponent.Destination.BEHAVIOR;
 import static org.omnifaces.component.util.MoveComponent.PropertyKeys.behaviorDefaultEvent;
 import static org.omnifaces.component.util.MoveComponent.PropertyKeys.behaviorEvents;
 import static org.omnifaces.component.util.MoveComponent.PropertyKeys.destination;
@@ -34,7 +33,6 @@ import javax.faces.component.UIComponent;
 import javax.faces.component.UIViewRoot;
 import javax.faces.component.behavior.ClientBehavior;
 import javax.faces.component.behavior.ClientBehaviorHolder;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.PostAddToViewEvent;
 import javax.faces.event.PreRenderViewEvent;
 import javax.faces.event.SystemEvent;
@@ -63,6 +61,7 @@ import org.omnifaces.util.State;
  *
  * @since 2.0
  * @author Arjan Tijms
+ * @see UtilFamily
  */
 @FacesComponent(MoveComponent.COMPONENT_TYPE)
 public class MoveComponent extends UtilFamily implements SystemEventListener, ClientBehaviorHolder {
@@ -96,23 +95,16 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 	// supports the event for which a behavior is attached.
 	private List<String> containsTrueList = new ArrayList<String>() {
 		private static final long serialVersionUID = 1L;
-			@Override
-	   		public boolean contains(Object o) {
-	   			return true;
-	   		}
-   	};
-
+		@Override
+		public boolean contains(Object o) {
+			return true;
+		}
+	};
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	public MoveComponent() {
-		if (!isPostback()) {
-			subscribeToViewEvent(PreRenderViewEvent.class, this);
-		} else {
-			// Behaviors added during the PreRenderViewEvent aren't properly restored, so we add them again
-			// in the PostAddToViewEvent during a postback.
-			subscribeToViewEvent(PostAddToViewEvent.class, this);
-		}
+		subscribeToViewEvent(isPostback() ? PostAddToViewEvent.class : PreRenderViewEvent.class, this);
 	}
 
 	@Override
@@ -121,8 +113,8 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 	}
 
 	@Override
-	public void processEvent(SystemEvent event) throws AbortProcessingException {
-		if (event instanceof PreRenderViewEvent || (event instanceof PostAddToViewEvent && getDestination() == BEHAVIOR)) {
+	public void processEvent(SystemEvent event) {
+		if (event instanceof PreRenderViewEvent || event instanceof PostAddToViewEvent) {
 			doProcess();
 		}
 	}
@@ -141,8 +133,8 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 	@Override
 	public Collection<String> getEventNames() {
 		if (isEmpty(getBehaviorEvents())) {
-		   	return containsTrueList;
-	   	}
+			return containsTrueList;
+		}
 
 		return csvToList(getBehaviorEvents());
 	}

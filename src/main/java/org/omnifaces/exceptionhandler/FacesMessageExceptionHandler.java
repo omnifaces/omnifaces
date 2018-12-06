@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,15 +12,16 @@
  */
 package org.omnifaces.exceptionhandler;
 
+import static javax.faces.application.FacesMessage.SEVERITY_FATAL;
+import static org.omnifaces.util.Messages.addGlobal;
+
 import java.util.Iterator;
 
-import javax.faces.FacesException;
+import javax.faces.application.FacesMessage;
 import javax.faces.context.ExceptionHandler;
 import javax.faces.context.ExceptionHandlerWrapper;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ExceptionQueuedEvent;
-
-import org.omnifaces.util.Messages;
 
 /**
  * <p>
@@ -53,13 +54,10 @@ import org.omnifaces.util.Messages;
  *
  * @author Bauke Scholtz
  * @see FacesMessageExceptionHandlerFactory
+ * @see DefaultExceptionHandlerFactory
  * @since 1.8
  */
 public class FacesMessageExceptionHandler extends ExceptionHandlerWrapper {
-
-	// Variables ------------------------------------------------------------------------------------------------------
-
-	private ExceptionHandler wrapped;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -68,7 +66,7 @@ public class FacesMessageExceptionHandler extends ExceptionHandlerWrapper {
 	 * @param wrapped The wrapped exception handler.
 	 */
 	public FacesMessageExceptionHandler(ExceptionHandler wrapped) {
-		this.wrapped = wrapped;
+		super(wrapped);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -77,13 +75,13 @@ public class FacesMessageExceptionHandler extends ExceptionHandlerWrapper {
 	 * Set every exception as a global FATAL faces message.
 	 */
 	@Override
-	public void handle() throws FacesException {
+	public void handle() {
 		for (Iterator<ExceptionQueuedEvent> iter = getUnhandledExceptionQueuedEvents().iterator(); iter.hasNext();) {
-			Messages.create(createFatalMessage(iter.next().getContext().getException())).fatal().add();
+			addGlobal(new FacesMessage(SEVERITY_FATAL, createFatalMessage(iter.next().getContext().getException()), null));
 			iter.remove();
 		}
 
-		wrapped.handle();
+		getWrapped().handle();
 	}
 
 	/**
@@ -95,11 +93,6 @@ public class FacesMessageExceptionHandler extends ExceptionHandlerWrapper {
 	 */
 	protected String createFatalMessage(Throwable exception) {
 		return exception.toString();
-	}
-
-	@Override
-	public ExceptionHandler getWrapped() {
-		return wrapped;
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -10,23 +10,68 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-var OmniFaces = OmniFaces || {};
-
 /**
  * Highlight/focus.
  * 
  * @author Bauke Scholtz
  * @see org.omnifaces.component.script.Highlight
  */
-OmniFaces.Highlight = {
+OmniFaces.Highlight = (function(Util, document) {
+
+	// "Constant" fields ----------------------------------------------------------------------------------------------
+
+	var DATA_HIGHLIGHT_CLASS = "data-omnifaces-highlight-class";
+	var DATA_HIGHLIGHT_LABEL = "data-omnifaces-highlight-label";
+
+	// Private static fields ------------------------------------------------------------------------------------------
+
+	var labelsByFor;
+	var self = {};
+
+	// Public static functions ----------------------------------------------------------------------------------------
 
 	/**
-	 * Add the given error style class to all input elements of the given client IDs and their associated labels.
-	 * If doFocus is <code>true</code>, then also set the focus on the first input element. All non-existing input 
-	 * elements are ignored.
+	 * Apply the highlight. Add the given error style class to all input elements of the given client IDs and their
+	 * associated labels. If doFocus is <code>true</code>, then also set the focus on the first input element. All
+	 * non-existing input elements are ignored.
+	 * @param {string[]} clientIds Array of client IDs of elements to highlight.
+	 * @param {string} styleClass CSS style class to be set on the elements and the associated label elements.
+	 * @param {boolean} doFocus Whether or not to put focus on the first highlighted element.
 	 */
-	addErrorClass: function(clientIds, styleClass, doFocus) {
-		var labels = document.getElementsByTagName('LABEL');
+	self.apply = function(clientIds, styleClass, doFocus) {
+		labelsByFor = getLabelsByFor();
+
+		for (var i = 0; i < clientIds.length; i++) {
+			var input = getElementByIdOrName(clientIds[i]);
+
+			if (input) {
+				input.className += " " + styleClass;
+				input.setAttribute(DATA_HIGHLIGHT_CLASS, styleClass);
+				var label = labelsByFor[input.id];
+
+				if (label) {
+					label.className += " " + styleClass;
+					input.setAttribute(DATA_HIGHLIGHT_LABEL, true);
+				}
+
+				if (doFocus) {
+					input.focus();
+					doFocus = false;
+				}
+
+				Util.addEventListener(input, "click input", removeHighlight);
+			}
+		}
+	}
+
+	// Private static functions ---------------------------------------------------------------------------------------
+
+	/**
+	 * Return a mapping of all <code>label</code> elements keyed by their <code>for</code> attribute.
+	 * @return {Object} A mapping of all <code>label</code> elements keyed by their <code>for</code> attribute.
+	 */
+	function getLabelsByFor() {
+		var labels = document.getElementsByTagName("LABEL");
 		var labelsByFor = {};
 
 		for ( var i = 0; i < labels.length; i++) {
@@ -37,32 +82,54 @@ OmniFaces.Highlight = {
 				labelsByFor[htmlFor] = label;
 			}
 		}
-		
-		for (var i = 0; i < clientIds.length; i++) {
-			var clientId = clientIds[i];
-			var element = document.getElementById(clientId);
 
-			if (!element) {
-				var elements = document.getElementsByName(clientId); // #21
+		return labelsByFor;
+	}
 
-				if (elements && elements.length) {
-					element = elements[0];
-				}
+	/**
+	 * Returns an element by ID or name.
+	 * @param {string} Client ID.
+	 * @return {HTMLElement} HTML element identified by given client ID. 
+	 */
+	function getElementByIdOrName(clientId) {
+		var element = document.getElementById(clientId);
+
+		if (!element) {
+			var elements = document.getElementsByName(clientId); // #21
+
+			if (elements && elements.length) {
+				element = elements[0];
 			}
+		}
 
-			if (element) {
-				element.className += ' ' + styleClass;
-				var label = labelsByFor[element.id];
+		return element;
+	}
 
-				if (label) {
-					label.className += ' ' + styleClass;
-				}
+	/**
+	 * Remove the highlight. Remove the error style class from involved input element and its associated label.
+	 * @param {Event} The input event.
+	 */
+	function removeHighlight() {
+		var input = this;
+		Util.removeEventListener(input, "click input", removeHighlight);
+		var styleClass = input.getAttribute(DATA_HIGHLIGHT_CLASS);
 
-				if (doFocus) {
-					element.focus();
-					doFocus = false;
-				}
+		if (styleClass) {
+			input.removeAttribute(DATA_HIGHLIGHT_CLASS);
+			var regex = new RegExp(" " + styleClass, "g");
+			input.className = input.className.replace(regex, "");
+			var label = input.getAttribute(DATA_HIGHLIGHT_LABEL);
+
+			if (label) {
+				input.removeAttribute(DATA_HIGHLIGHT_LABEL);
+				label = labelsByFor[input.id];
+				label.className = label.className.replace(regex, "");
 			}
 		}
 	}
-};
+
+	// Expose self to public ------------------------------------------------------------------------------------------
+
+	return self;
+
+})(OmniFaces.Util, document);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -23,7 +23,6 @@ import static org.omnifaces.util.Utils.isEmpty;
 
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponent;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.PostRestoreStateEvent;
 import javax.faces.event.PreRenderViewEvent;
@@ -32,6 +31,7 @@ import javax.faces.event.SystemEventListener;
 import javax.faces.view.facelets.FaceletContext;
 
 import org.omnifaces.el.ReadOnlyValueExpression;
+import org.omnifaces.taghandler.ComponentExtraHandler;
 import org.omnifaces.util.Callback.SerializableReturning;
 import org.omnifaces.util.Components;
 import org.omnifaces.util.State;
@@ -43,6 +43,9 @@ import org.omnifaces.util.State;
  *
  * @since 2.0
  * @author Arjan Tijms
+ * @see FaceletContextConsumer
+ * @see ComponentExtraHandler
+ * @see UtilFamily
  */
 @FacesComponent(ResolveComponent.COMPONENT_TYPE)
 public class ResolveComponent extends UtilFamily implements FaceletContextConsumer, SystemEventListener {
@@ -65,22 +68,22 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 		name, scope, /* for */
 	}
 
-	// Actions --------------------------------------------------------------------------------------------------------
-
-	@Override
-	public void setFaceletContext(FaceletContext faceletContext) {
-		if (getScope().equals("facelet")) {
-
-			readOnlyValueExpression = new ReadOnlyValueExpression(UIComponent.class);
-
-			faceletContext.getVariableMapper().setVariable(getName(), readOnlyValueExpression);
-		}
-	}
-
 	public ResolveComponent() {
 		if (!isPostback()) { // For an initial (GET) request, there's no restore
 								// state event and we use pre-render view
 			subscribeToViewEvent(PreRenderViewEvent.class, this);
+		}
+	}
+
+	// Actions --------------------------------------------------------------------------------------------------------
+
+	@Override
+	public void setFaceletContext(FaceletContext faceletContext) {
+		if (DEFAULT_SCOPE.equals(getScope())) {
+
+			readOnlyValueExpression = new ReadOnlyValueExpression(UIComponent.class);
+
+			faceletContext.getVariableMapper().setVariable(getName(), readOnlyValueExpression);
 		}
 	}
 
@@ -90,12 +93,12 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 	}
 
 	@Override
-	public void processEvent(SystemEvent event) throws AbortProcessingException {
+	public void processEvent(SystemEvent event) {
 		doProcess();
 	}
 
 	@Override
-	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
+	public void processEvent(ComponentSystemEvent event) {
 		if (event instanceof PostRestoreStateEvent) { // For a postback we use the post-restore state event.
 			doProcess();
 		}
@@ -115,22 +118,19 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 				throw new IllegalArgumentException(format(ERROR_COMPONENT_NOT_FOUND, forValue, getId()));
 			}
 
-			String scope = getScope();
+			String scope = getScope();  // TODO: refactor "scope" to a reusable enum, together with those of a.o. Cache.
 
-			switch (scope) { // TODO: refactor "scope" to a reusable enum, together with those of a.o. Cache.
-				case "facelet":
-					// Component will be resolved again dynamically when the value expression is evaluated.
-					if (readOnlyValueExpression != null) {
-						readOnlyValueExpression.setCallbackReturning(new ComponentClientIdResolver(component.getClientId()));
-					}
-					break;
-
-				case "request":
-					setRequestAttribute(getName(), component);
-					break;
-
-				default:
-					throw new IllegalArgumentException(format(ERROR_ILLEGAL_SCOPE, scope));
+			if (DEFAULT_SCOPE.equals(scope)) {
+				// Component will be resolved again dynamically when the value expression is evaluated.
+				if (readOnlyValueExpression != null) {
+					readOnlyValueExpression.setCallbackReturning(new ComponentClientIdResolver(component.getClientId()));
+				}
+			}
+			else if ("request".equals(scope)) {
+				setRequestAttribute(getName(), component);
+			}
+			else {
+				throw new IllegalArgumentException(format(ERROR_ILLEGAL_SCOPE, scope));
 			}
 		}
 	}

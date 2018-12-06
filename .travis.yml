@@ -1,0 +1,40 @@
+language: java
+jdk:
+   - oraclejdk8
+cache:
+   directories:
+      - "$HOME/.m2/repository"
+      - "$HOME/.sonar/cache"
+
+# Do build on specified branches only.
+branches:
+   only:
+   - 3.x
+   - 2.x
+   - 1.1x
+
+# Do integration test on configured servers.
+env:
+   - SERVER=wildfly
+   - SERVER=tomee
+   - SERVER=payara
+script: mvn verify -Dmaven.javadoc.skip=true -P $SERVER
+
+# Do snapshot deployment.
+deploy:
+   provider: script
+   script: mvn deploy -Dmaven.test.skip -s settings.xml
+   skip_cleanup: true
+   on:
+      all_branches: true
+      condition: "$SERVER = wildfly"
+
+# Do static analysis on Sonar.
+addons:
+   sonarcloud:
+      organization: balusc-github
+      token:
+         secure: "xEW0f7e/UMlDFo6HKnDtLNChckCcgOoLkDrARFTbbIRZdbk0QTDrU9ZDNQyp5eLv2AzjBsFm9ZXYgH8ItCdoulRmT56gK+4UsMVnB8t4N3NRtSY44OAavODv+xm1n+BnMxbFBIZDyqbJeLI0pJDPhoHEH8Y4BPT9TE9w0KdouqZF8Mv1YkOeiQIgJBYgD9GMbvYtMn4Xjk9DgivRj3hqE/G4CwlyVnUJckBnjj4opi8HBZ5Jfl/Uh57lqsHjS/wZCvP1fLVondOwSHLruEZhirhMxT4vLIyudp8X8bwxQaD3+Af0X9oGTfHm9lIoHFdrzvtiUb7Iik7T4j9WtijbMp06KaxZsF5bMY69Z3KLzGwM8B3aVKjzEbZVWuhcFjp1w6M1XE/aN5fTP/S6aQ0y3l/Pt/vNHHBFDnEhzAQ/bIYyBr0Bpti9cGzFhISKPt1eEWZgz2Peq7JuRZAlaPp7crCBfpd7r3MwCfDUTCOGT2epQg/CpSZ5JLNW3RO401UDbzNgwSNPETWcPxZjAwyv8QEVty+hbXnsL9uAh231fc1PpoF7bnFb7eMJ6emqQKRMIbOh+Gp2zoSbSPtrBJ3C9XsH+oG6lM16KYls54wovq33/iAB6JlYCK1JUj3nGnGOlLutv0A8IwqGrA4IGLFihVQ8zQV1XSVylL52o4G2jTk="
+      branches:
+         - 3.x
+after_deploy: "mvn sonar:sonar"

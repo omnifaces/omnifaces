@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,17 +12,19 @@
  */
 package org.omnifaces.el;
 
+import static org.omnifaces.util.Utils.coalesce;
+
 import java.lang.reflect.Method;
 
-import javax.el.MethodExpression;
 import javax.el.MethodInfo;
 
 /**
  * This encapsulates information about an EL method expression.
  *
  * @since 1.4
+ * @since 2.5 also extends MethodInfo
  */
-public class MethodReference {
+public class MethodReference extends MethodInfo {
 
 	public static final Object[] NO_PARAMS = new Object[0];
 
@@ -30,19 +32,17 @@ public class MethodReference {
 	private Method method;
 	private Object[] actualParameters;
 	private boolean fromMethod;
-	private MethodInfo methodInfo;
 
 	public MethodReference(Object base, Method method) {
+		super(method.getName(), method.getReturnType(), method.getParameterTypes());
 		this.base = base;
 		this.method = method;
 	}
 
 	public MethodReference(Object base, Method method, Object[] actualParameters, boolean fromMethod) {
-		this.base = base;
-		this.method = method;
-		this.actualParameters = (actualParameters != null) ? actualParameters : NO_PARAMS;
+		this(base, method);
+		this.actualParameters = coalesce(actualParameters, NO_PARAMS);
 		this.fromMethod = fromMethod;
-		methodInfo =  new MethodInfo(method.getName(), method.getReturnType(), method.getParameterTypes());
 	}
 
 	/**
@@ -78,15 +78,6 @@ public class MethodReference {
 	 */
 	public boolean isFromMethod() {
 		return fromMethod;
-	}
-
-	/**
-	 * Returns the standard EL {@link MethodInfo} of the {@link MethodExpression} where this {@link MethodReference}
-	 * has been extracted from.
-	 * @return The standard EL {@link MethodInfo}.
-	 */
-	public MethodInfo getMethodInfo() {
-		return methodInfo;
 	}
 
 }

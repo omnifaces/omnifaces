@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,15 +12,16 @@
  */
 package org.omnifaces.component.output;
 
+import static java.lang.String.format;
 import static org.omnifaces.util.Components.findComponentRelatively;
 import static org.omnifaces.util.Components.getOptionalLabel;
+import static org.omnifaces.util.Components.setLabel;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import javax.el.ValueExpression;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlOutputLabel;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.PostRestoreStateEvent;
 
@@ -46,14 +47,14 @@ public class OutputLabel extends HtmlOutputLabel {
 		"A component with Id '%s' as specified by the for attribute of the OutputLabel with Id '%s' could not be found.";
 
 	@Override
-	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
+	public void processEvent(ComponentSystemEvent event) {
 		if (event instanceof PostRestoreStateEvent) {
 			String forValue = (String) getAttributes().get("for");
 			if (!isEmpty(forValue)) {
 				UIComponent forComponent = findComponentRelatively(this, forValue);
 
 				if (forComponent == null) {
-					throw new IllegalArgumentException(String.format(ERROR_FOR_COMPONENT_NOT_FOUND, forValue, getId()));
+					throw new IllegalArgumentException(format(ERROR_FOR_COMPONENT_NOT_FOUND, forValue, getId()));
 				}
 
 				// To be sure, check if the target component doesn't have a label already. This
@@ -61,11 +62,7 @@ public class OutputLabel extends HtmlOutputLabel {
 				// but check to be sure.
 				if (getOptionalLabel(forComponent) == null) {
 					ValueExpression valueExpression = getValueExpression("value");
-					if (valueExpression != null) {
-						forComponent.setValueExpression("label", valueExpression);
-					} else {
-						forComponent.getAttributes().put("label", getValue());
-					}
+					setLabel(forComponent, valueExpression != null ? valueExpression : getValue());
 				}
 			}
 		}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -13,23 +13,30 @@
 package org.omnifaces.component.input;
 
 import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
+import static javax.servlet.RequestDispatcher.ERROR_REQUEST_URI;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeRequestParams;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeViewParams;
+import static org.omnifaces.component.input.Form.PropertyKeys.partialSubmit;
 import static org.omnifaces.component.input.Form.PropertyKeys.useRequestURI;
-import static org.omnifaces.util.FacesLocal.getRequestQueryStringMap;
-import static org.omnifaces.util.FacesLocal.getRequestURIWithQueryString;
-import static org.omnifaces.util.FacesLocal.getViewParameterMap;
+import static org.omnifaces.util.Components.getParams;
+import static org.omnifaces.util.FacesLocal.getRequestAttribute;
+import static org.omnifaces.util.FacesLocal.getRequestContextPath;
+import static org.omnifaces.util.FacesLocal.getRequestURI;
+import static org.omnifaces.util.Servlets.toQueryString;
+import static org.omnifaces.util.Utils.formatURLWithQueryString;
 
 import java.io.IOException;
 
 import javax.faces.application.Application;
 import javax.faces.application.ApplicationWrapper;
+import javax.faces.application.ResourceDependency;
 import javax.faces.application.ViewHandler;
 import javax.faces.application.ViewHandlerWrapper;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UICommand;
 import javax.faces.component.UIForm;
-import javax.faces.component.UIViewParameter;
+import javax.faces.component.html.HtmlForm;
 import javax.faces.context.FacesContext;
 import javax.faces.context.FacesContextWrapper;
 
@@ -38,47 +45,70 @@ import org.omnifaces.util.State;
 
 /**
  * <p>
- * The <code>&lt;o:form&gt;</code> is a component that extends the standard <code>&lt;h:form&gt;</code> and provides a
- * way to keep view or request parameters in the request URL after a post-back and offers in combination with the
- * <code>&lt;o:ignoreValidationFailed&gt;</code> tag on an {@link UICommand} component the possibility to ignore
- * validation failures so that the invoke action phase will be executed anyway.
+ * The <code>&lt;o:form&gt;</code> is a component that extends the standard <code>&lt;h:form&gt;</code> and submits to
+ * exactly the request URI with query string as seen in browser's address. Standard JSF <code>&lt;h:form&gt;</code>
+ * submits to the view ID and does not include any query string parameters or path parameters and may therefore fail
+ * in cases when the form is submitted to a request scoped bean which relies on the same initial query string parameters
+ * or path parameters still being present in the request URI. This is particularly useful if you're using FacesViews or
+ * forwarding everything to 1 page.
+ * <p>
+ * Additionally, it offers in combination with the <code>&lt;o:ignoreValidationFailed&gt;</code> tag on an
+ * {@link UICommand} component the possibility to ignore validation failures so that the invoke action phase will be
+ * executed anyway.
+ * <p>
+ * Since version 2.1 this component also supports adding query string parameters to the action URL via nested
+ * <code>&lt;f:param&gt;</code> and <code>&lt;o:param&gt;</code>.
+ * <p>
+ * Since version 3.0, it will also during ajax requests automatically send only the form data which actually need to
+ * be processed as opposed to the entire form, based on the <code>execute</code> attribute of any nested
+ * <code>&lt;f:ajax&gt;</code>. This feature is similar to <code>partialSubmit</code> feature of PrimeFaces.
+ * This will reduce the request payload when used in large forms such as editable tables.
  * <p>
  * You can use it the same way as <code>&lt;h:form&gt;</code>, you only need to change <code>h:</code> to
  * <code>o:</code>.
  *
- * <h3>Include View Params</h3>
- * <p>
- * The standard {@link UIForm} doesn't put the original view parameters in the action URL that's used for the post-back.
- * Instead, it relies on those view parameters to be stored in the state associated with the standard
- * {@link UIViewParameter}. Via this state those parameters are invisibly re-applied after every post-back.
- * <p>
- * The disadvantage of this invisible retention of view parameters is that the user doesn't see them anymore in the
- * address bar of the browser that is used to interact with the faces application. Copy-pasting the URL from the address
- * bar or refreshing the page by hitting enter inside the address bar will therefore not always yield the expected
- * results.
- * <p>
- * To solve this, this component offers an attribute <code>includeViewParams="true"</code> that will optionally include
- * all view parameters, in exactly the same way that this can be done for <code>&lt;h:link&gt;</code> and
- * <code>&lt;h:button&gt;</code>.
- * <p>
- * This setting is ignored when <code>includeRequestParams="true"</code> or <code>useRequestURI="true"</code> is used.
- *
- * <h3>Include Request Params</h3>
- * <p>
- * As an alternative to <code>includeViewParams</code>, you can use <code>includeRequestParams="true"</code> to
- * optionally include the current GET request query string.
- * <p>
- * This setting overrides the <code>includeViewParams</code>.
- * This setting is ignored when <code>useRequestURI="true"</code> is used.
- *
  * <h3>Use request URI</h3>
  * <p>
- * As an alternative to <code>includeViewParams</code> and <code>includeRequestParams</code>, you can use
- * <code>useRequestURI="true"</code> to use the current request URI, including with the GET request query string, if
- * any. This is particularly useful if you're using FacesViews or forwarding everything to 1 page. Otherwise, by default
- * the current view ID will be used.
+ * This was available since version 1.6, but since version 3.0, this has become enabled by default. So just using
+ * <code>&lt;o:form&gt;</code> will already submit to the exact request URI with query string as seen in browser's
+ * address bar. In order to turn off this behavior, set <code>useRequestURI</code> attribute to <code>false</code>.
+ * <pre>
+ * &lt;o:form useRequestURI="false"&gt;
+ * </pre>
+ *
+ * <h3>Include request params</h3>
  * <p>
- * This setting overrides the <code>includeViewParams</code> and <code>includeRequestParams</code>.
+ * When you want to include request parameters only instead of the entire request URI with query string, set the
+ * <code>includeRequestParams</code> attribute to <code>true</code>. This will implicitly set <code>useRequestURI</code>
+ * attribute to <code>false</code>.
+ * <pre>
+ * &lt;o:form includeRequestParams="true"&gt;
+ * </pre>
+ *
+ * <h3>Partial submit</h3>
+ * <p>
+ * This is the default behavior. So just using <code>&lt;o:form&gt;</code> will already cause the
+ * <code>&lt;f:ajax&gt;</code> to send only the form data which actually need to be processed. In order to turn off this
+ * behavior, set <code>partialSubmit</code> attribute to <code>false</code>.
+ * <pre>
+ * &lt;o:form partialSubmit="false"&gt;
+ * </pre>
+ *
+ * <h3>Add query string parameters to action URL</h3>
+ * <p>
+ * The standard {@link UIForm} doesn't support adding query string parameters to the action URL. This component offers
+ * this possibility via nested <code>&lt;f:param&gt;</code> and <code>&lt;o:param&gt;</code>.
+ * <pre>
+ * &lt;o:form&gt;
+ *     &lt;f:param name="somename" value="somevalue" /&gt;
+ *     ...
+ * &lt;/o:form&gt;
+ * </pre>
+ * <p>
+ * The <code>&lt;f|o:param&gt;</code> will override any included view or request parameters on the same name. To conditionally add
+ * or override, use the <code>disabled</code> attribute of <code>&lt;f|o:param&gt;</code>.
+ * <p>
+ * The support was added in OmniFaces 2.2.
  *
  * <h3>Ignore Validation Failed</h3>
  * <p>
@@ -86,21 +116,37 @@ import org.omnifaces.util.State;
  * parent <code>&lt;h:form&gt;</code> component has to be replaced by this <code>&lt;o:form&gt;</code> component.
  * See also {@link IgnoreValidationFailed}.
  *
+ * <h3>Historical note</h3>
+ * <p>
+ * Previously, the <code>&lt;o:form&gt;</code> also supported <code>includeViewParams</code>, but
+ * this did after all not have any advantage over the later introduced <code>useRequestURI</code> and
+ * <code>includeRequestParams</code>. Hence the <code>includeViewParams</code> is marked deprecated since 3.0.
+ *
+ *
  * @since 1.1
  * @author Arjan Tijms
  * @author Bauke Scholtz
  */
 @FacesComponent(Form.COMPONENT_TYPE)
-public class Form extends UIForm {
+@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head")
+public class Form extends HtmlForm {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.input.Form";
 
 	enum PropertyKeys {
-		includeViewParams,
+
+		useRequestURI,
 		includeRequestParams,
-		useRequestURI
+		partialSubmit,
+
+		/**
+		 * Not particularly useful as compared to useRequestURI and includeRequestParams.
+		 * @deprecated Since 3.0
+		 */
+		@Deprecated
+		includeViewParams,
 	}
 
 	// Variables ------------------------------------------------------------------------------------------------------
@@ -132,37 +178,33 @@ public class Form extends UIForm {
 
 	@Override
 	public void encodeBegin(FacesContext context) throws IOException {
-		if (isUseRequestURI()) {
-			super.encodeBegin(new ActionURLDecorator(context, useRequestURI));
+		if (isPartialSubmit()) {
+			getPassThroughAttributes().put("data-partialsubmit", "true");
 		}
-		else if (isIncludeRequestParams()) {
-			super.encodeBegin(new ActionURLDecorator(context, includeRequestParams));
-		}
-		else if (isIncludeViewParams()) {
-			super.encodeBegin(new ActionURLDecorator(context, includeViewParams));
-		}
-		else {
-			super.encodeBegin(context);
-		}
-	}
 
+		super.encodeBegin(new ActionURLDecorator(context, this));
+	}
 
 	// Getters/setters ------------------------------------------------------------------------------------------------
 
 	/**
 	 * Returns whether or not the view parameters should be encoded into the form's action URL.
+	 * This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
 	 * @return Whether or not the view parameters should be encoded into the form's action URL.
+	 * @deprecated Since 3.0
 	 */
+	@Deprecated
 	public boolean isIncludeViewParams() {
 		return state.get(includeViewParams, FALSE);
 	}
 
 	/**
 	 * Set whether or not the view parameters should be encoded into the form's action URL.
-	 *
-	 * @param includeViewParams
-	 *            The state of the switch for encoding view parameters
+	 * This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
+	 * @param includeViewParams Whether or not the view parameters should be encoded into the form's action URL.
+	 * @deprecated Since 3.0
 	 */
+	@Deprecated
 	public void setIncludeViewParams(boolean includeViewParams) {
 		state.put(PropertyKeys.includeViewParams, includeViewParams);
 	}
@@ -178,9 +220,7 @@ public class Form extends UIForm {
 
 	/**
 	 * Set whether or not the request parameters should be encoded into the form's action URL.
-	 *
-	 * @param includeRequestParams
-	 *            The state of the switch for encoding request parameters.
+	 * @param includeRequestParams Whether or not the request parameters should be encoded into the form's action URL.
 	 * @since 1.5
 	 */
 	public void setIncludeRequestParams(boolean includeRequestParams) {
@@ -188,19 +228,19 @@ public class Form extends UIForm {
 	}
 
 	/**
-	 * Returns whether or not the request URI should be used as form's action URL.
-	 * @return Whether or not the request URI should be used as form's action URL.
+	 * Returns whether the request URI should be used as form's action URL. Defaults to <code>true</code>.
+	 * This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
+	 * @return Whether the request URI should be used as form's action URL.
 	 * @since 1.6
 	 */
 	public boolean isUseRequestURI() {
-		return state.get(useRequestURI, FALSE);
+		return state.get(useRequestURI, TRUE);
 	}
 
 	/**
-	 * Set whether or not the request URI should be used as form's action URL.
-	 *
-	 * @param useRequestURI
-	 *            The state of the switch for using request URI.
+	 * Set whether the request URI should be used as form's action URL.
+	 * This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
+	 * @param useRequestURI Whether the request URI should be used as form's action URL.
 	 * @since 1.6
 	 */
 	public void setUseRequestURI(boolean useRequestURI) {
@@ -217,12 +257,30 @@ public class Form extends UIForm {
 	}
 
 	/**
-	 * Set whether or not the form should ignore validation fail.
-	 * @param ignoreValidationFailed Whether or not the form should ignore validation fail.
+	 * Set whether the form should ignore validation fail.
+	 * @param ignoreValidationFailed Whether the form should ignore validation fail.
 	 * @since 2.1
 	 */
 	public void setIgnoreValidationFailed(boolean ignoreValidationFailed) {
 		this.ignoreValidationFailed = ignoreValidationFailed;
+	}
+
+	/**
+	 * Returns whether to send only the form data which actually need to be processed as opposed to the entire form. Defaults to <code>true</code>.
+	 * @return Whether to send only the form data which actually need to be processed as opposed to the entire form.
+	 * @since 3.0
+	 */
+	public boolean isPartialSubmit() {
+		return state.get(partialSubmit, TRUE);
+	}
+
+	/**
+	 * Set whether to send only the form data which actually need to be processed as opposed to the entire form.
+	 * @param partialSubmit Whether to send only the form data which actually need to be processed as opposed to the entire form.
+	 * @since 3.0
+	 */
+	public void setPartialSubmit(boolean partialSubmit) {
+		state.put(PropertyKeys.partialSubmit, partialSubmit);
 	}
 
 	// Nested classes -------------------------------------------------------------------------------------------------
@@ -233,12 +291,10 @@ public class Form extends UIForm {
 	 *
 	 * @author Bauke Scholtz
 	 */
-	static class IgnoreValidationFailedFacesContext extends FacesContextWrapper {
-
-		private FacesContext wrapped;
+	private static class IgnoreValidationFailedFacesContext extends FacesContextWrapper {
 
 		public IgnoreValidationFailedFacesContext(FacesContext wrapped) {
-			this.wrapped = wrapped;
+			super(wrapped);
 		}
 
 		@Override
@@ -250,12 +306,6 @@ public class Form extends UIForm {
 		public void renderResponse() {
 			// NOOP.
 		}
-
-		@Override
-		public FacesContext getWrapped() {
-			return wrapped;
-		}
-
 	}
 
 	/**
@@ -264,69 +314,61 @@ public class Form extends UIForm {
 	 *
 	 * @author Arjan Tijms
 	 */
-	static class ActionURLDecorator extends FacesContextWrapper {
+	private static class ActionURLDecorator extends FacesContextWrapper {
 
-		private final FacesContext facesContext;
-		private final PropertyKeys type;
+		private Form form;
 
-
-		public ActionURLDecorator(FacesContext facesContext, PropertyKeys type) {
-			this.facesContext = facesContext;
-			this.type = type;
+		public ActionURLDecorator(FacesContext wrapped, Form form) {
+			super(wrapped);
+			this.form = form;
 		}
 
 		@Override
 		public Application getApplication() {
-			return new ApplicationWrapper() {
+			return new ActionURLDecoratorApplication(getWrapped().getApplication(), form);
+		}
+	}
 
-				private final Application application = ActionURLDecorator.super.getApplication();
+	private static class ActionURLDecoratorApplication extends ApplicationWrapper {
 
-				@Override
-				public ViewHandler getViewHandler() {
-					return new ViewHandlerWrapper() {
+		private Form form;
 
-						private final ViewHandler viewHandler = application.getViewHandler();
-
-						/**
-						 * The actual method we're decorating in order to either include the view parameters into the
-						 * action URL, or include the request parameters into the action URL, or use request URI as
-						 * action URL.
-						 */
-						@Override
-						public String getActionURL(FacesContext context, String viewId) {
-							if (type == useRequestURI) {
-								return getRequestURIWithQueryString(context);
-							}
-							else if (type == includeRequestParams) {
-								return context.getExternalContext().encodeBookmarkableURL(
-									super.getActionURL(context, viewId), getRequestQueryStringMap(context));
-							}
-							else if (type == includeViewParams) {
-								return context.getExternalContext().encodeBookmarkableURL(
-									super.getActionURL(context, viewId), getViewParameterMap(context));
-							}
-							else {
-								return super.getActionURL(context, viewId);
-							}
-						}
-
-						@Override
-						public ViewHandler getWrapped() {
-							return viewHandler;
-						}
-					};
-				}
-
-				@Override
-				public Application getWrapped() {
-					return application;
-				}
-			};
+		public ActionURLDecoratorApplication(Application wrapped, Form form) {
+			super(wrapped);
+			this.form = form;
 		}
 
 		@Override
-		public FacesContext getWrapped() {
-			return facesContext;
+		public ViewHandler getViewHandler() {
+			return new ActionURLDecoratorViewHandler(getWrapped().getViewHandler(), form);
+		}
+	}
+
+	private static class ActionURLDecoratorViewHandler extends ViewHandlerWrapper {
+
+		private Form form;
+
+		public ActionURLDecoratorViewHandler(ViewHandler wrapped, Form form) {
+			super(wrapped);
+			this.form = form;
+		}
+
+		/**
+		 * The actual method we're decorating in order to either include the view parameters into the
+		 * action URL, or include the request parameters into the action URL, or use request URI as
+		 * action URL. Any <code>&lt;f|o:param&gt;</code> nested in the form component will be included
+		 * in the query string, overriding any existing view or request parameters on same name.
+		 */
+		@Override
+		public String getActionURL(FacesContext context, String viewId) {
+			String actionURL = form.isUseRequestURI() && !form.isIncludeRequestParams() ? getActionURL(context) : getWrapped().getActionURL(context, viewId);
+			String queryString = toQueryString(getParams(form, form.isUseRequestURI() || form.isIncludeRequestParams(), form.isIncludeViewParams()));
+			return formatURLWithQueryString(actionURL, queryString);
+		}
+
+		private String getActionURL(FacesContext context) {
+			String actionURL = (getRequestAttribute(context, ERROR_REQUEST_URI) != null) ? getRequestContextPath(context) : getRequestURI(context);
+			return actionURL.isEmpty() ? "/" : actionURL;
 		}
 	}
 

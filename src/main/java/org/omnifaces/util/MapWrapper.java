@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -28,7 +28,7 @@ import java.util.Set;
  */
 public class MapWrapper<K, V> implements Map<K, V>, Serializable {
 
-	private static final long serialVersionUID = -4057606871241504872L;
+	private static final long serialVersionUID = 1L;
 
 	private Map<K, V> map;
 

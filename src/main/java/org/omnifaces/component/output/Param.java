@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -11,6 +11,8 @@
  * specific language governing permissions and limitations under the License.
  */
 package org.omnifaces.component.output;
+
+import static org.omnifaces.util.FacesLocal.createConverter;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -51,10 +53,12 @@ import org.omnifaces.component.ParamHolder;
  * <p>will result in the link being actually encoded as output format parameter value.
  *
  * @author Bauke Scholtz
+ * @param <T> The type of the value.
  * @since 1.4
+ * @see ParamHolder
  */
 @FacesComponent(Param.COMPONENT_TYPE)
-public class Param extends UIParameter implements ParamHolder {
+public class Param<T> extends UIParameter implements ParamHolder<T> {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
@@ -69,29 +73,36 @@ public class Param extends UIParameter implements ParamHolder {
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
-	private Converter localConverter;
+	private Converter<T> localConverter;
 
 	// Attribute getters/setters --------------------------------------------------------------------------------------
 
 	@Override
-	public Converter getConverter() {
-		return localConverter != null ? localConverter : (Converter) getStateHelper().eval(PropertyKeys.converter);
+	@SuppressWarnings("unchecked")
+	public Converter<T> getConverter() {
+		return localConverter != null ? localConverter : (Converter<T>) getStateHelper().eval(PropertyKeys.converter);
 	}
 
 	@Override
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void setConverter(Converter converter) {
 		localConverter = converter;
 	}
 
+	/**
+	 * @throws ClassCastException When actual value is not <code>T</code>.
+	 */
 	@Override
-	public Object getLocalValue() {
-		return super.getValue();
+	@SuppressWarnings("unchecked")
+	public T getLocalValue() {
+		return (T) super.getValue();
 	}
 
 	@Override
-	public Object getValue() {
+	@SuppressWarnings("unchecked")
+	public String getValue() {
 		FacesContext context = getFacesContext();
-		Converter converter = getConverter();
+		Converter<T> converter = getConverter();
 		Object value = getLocalValue();
 
 		if (value == null && getChildCount() > 0) {
@@ -113,14 +124,14 @@ public class Param extends UIParameter implements ParamHolder {
 		}
 
 		if (converter == null && value != null) {
-			converter = context.getApplication().createConverter(value.getClass());
+			converter = createConverter(context, value.getClass());
 		}
 
 		if (converter != null) {
-			return converter.getAsString(context, this, value);
+			return converter.getAsString(context, this, (T) value);
 		}
 		else {
-			return value;
+			return value != null ? value.toString() : null;
 		}
 	}
 

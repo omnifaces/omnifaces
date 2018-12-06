@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -22,11 +22,11 @@ import javax.faces.component.FacesComponent;
 import javax.faces.component.UIInput;
 import javax.faces.component.UIViewParameter;
 import javax.faces.context.FacesContext;
-import javax.faces.convert.ConverterException;
 import javax.faces.event.PostValidateEvent;
 import javax.faces.event.PreValidateEvent;
 
 import org.omnifaces.util.MapWrapper;
+import org.omnifaces.util.Utils;
 
 /**
  * <p>
@@ -61,10 +61,17 @@ import org.omnifaces.util.MapWrapper;
  *
  * <h3>Support bean validation and triggering validate events on null value</h3>
  * <p>
- * The standard {@link UIViewParameter} implementation uses an internal "is required" check when the submitted value is
- * <code>null</code>, hereby completely bypassing the standard {@link UIInput} validation, including any bean
- * validation annotations and even the {@link PreValidateEvent} and {@link PostValidateEvent} events. This is not
- * desired. The workaround was added in OmniFaces 2.0.
+ * The standard {@link UIViewParameter} implementation uses in JSF 2.0-2.2 an internal "is required" check when the
+ * submitted value is <code>null</code>, hereby completely bypassing the standard {@link UIInput} validation, including
+ * any bean validation annotations and even the {@link PreValidateEvent} and {@link PostValidateEvent} events. This is
+ * not desired. The workaround was added in OmniFaces 2.0. In JSF 2.3, this has been fixed and has only effect when
+ * <code>javax.faces.INTERPRET_EMPTY_STRING_SUBMITTED_VALUES_AS_NULL</code> context param is set to <code>true</code>.
+ *
+ * <h3>Default value when no parameter is set</h3>
+ * <p>
+ * The <code>&lt;o:viewParam&gt;</code> also supports providing a default value via the new <code>default</code>
+ * attribute. When the parameter is not available, then the value specified in <code>default</code> attribute will be
+ * set in the model instead. The support was added in OmniFaces 2.2.
  *
  * <h3>Usage</h3>
  * <p>
@@ -80,27 +87,16 @@ import org.omnifaces.util.MapWrapper;
 @FacesComponent(ViewParam.COMPONENT_TYPE)
 public class ViewParam extends UIViewParameter {
 
+	// Public constants -----------------------------------------------------------------------------------------------
+
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.input.ViewParam";
+
+	// Variables ------------------------------------------------------------------------------------------------------
 
 	private String submittedValue;
 	private Map<String, Object> attributeInterceptMap;
 
-	@Override
-	public void setSubmittedValue(Object submittedValue) {
-		this.submittedValue = (String) submittedValue;
-	}
-
-	@Override
-	public String getSubmittedValue() {
-		return submittedValue;
-	}
-
-	@Override
-	public boolean isRequired() {
-		// The request parameter is ignored on postbacks, however it's already present in the view scoped bean.
-		// So we can safely skip the required validation on postbacks.
-		return !isPostback() && super.isRequired();
-	}
+	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
 	public void processDecodes(FacesContext context) {
@@ -113,6 +109,10 @@ public class ViewParam extends UIViewParameter {
 	@Override
 	public void processValidators(FacesContext context) {
 		if (!context.isPostback()) {
+			if (isEmpty(getSubmittedValue())) {
+				setSubmittedValue(getDefault());
+			}
+
 			if (getSubmittedValue() == null) {
 				setSubmittedValue(""); // Workaround for it never triggering the (bean) validation when unspecified.
 			}
@@ -124,41 +124,7 @@ public class ViewParam extends UIViewParameter {
 	@Override
 	public Map<String, Object> getAttributes() {
 		if (attributeInterceptMap == null) {
-			attributeInterceptMap = new MapWrapper<String, Object>(super.getAttributes()) {
-
-				private static final long serialVersionUID = -7674000948288609007L;
-
-				@Override
-				public Object get(Object key) {
-					if ("label".equals(key)) {
-						return getLabel();
-					}
-					else {
-						return super.get(key);
-					}
-				}
-
-				private Object getLabel() {
-					// First check if our wrapped Map has the label
-					Object label = super.get("label");
-					if (label == null || (label instanceof String && ((String) label).isEmpty())) {
-
-						// Next check if our outer component has a value expression for the label
-						ValueExpression labelExpression = ViewParam.this.getValueExpression("label");
-						if (labelExpression != null) {
-							label = labelExpression.getValue(getELContext());
-						}
-					}
-
-					// No explicit label defined, default to "name" (which is in many cases the most sane label anyway).
-					if (label == null) {
-						label = ViewParam.this.getName();
-					}
-
-					return label;
-				}
-
-			};
+			attributeInterceptMap = new AttributeInterceptMap(super.getAttributes());
 		}
 
 		return attributeInterceptMap;
@@ -171,10 +137,80 @@ public class ViewParam extends UIViewParameter {
 	 * @since 1.8
 	 */
 	@Override
-	public String getStringValueFromModel(FacesContext context) throws ConverterException {
+	public String getStringValueFromModel(FacesContext context) {
 		ValueExpression ve = getValueExpression("value");
 		Object value = (ve != null) ? ve.getValue(context.getELContext()) : null;
 		return (value != null) ? super.getStringValueFromModel(context) : null;
+	}
+
+	// Attribute getters/setters --------------------------------------------------------------------------------------
+
+	@Override
+	public String getSubmittedValue() {
+		return submittedValue;
+	}
+
+	@Override
+	public void setSubmittedValue(Object submittedValue) {
+		this.submittedValue = (String) submittedValue; // Don't delegate to statehelper to keep it stateless.
+	}
+
+	/**
+	 * Returns the default value in case the actual request parameter is <code>null</code> or empty.
+	 * @return The default value in case the actual request parameter is <code>null</code> or empty.
+	 * @since 2.2
+	 */
+	public String getDefault() {
+		return (String) getStateHelper().eval("default");
+	}
+
+	/**
+	 * Sets the default value in case the actual request parameter is <code>null</code> or empty.
+	 * @param defaultValue The default value in case the actual request parameter is <code>null</code> or empty.
+	 * @since 2.2
+	 */
+	public void setDefault(String defaultValue) {
+		getStateHelper().put("default", defaultValue);
+	}
+
+	@Override
+	public boolean isRequired() {
+		// The request parameter is ignored on postbacks, however it's already present in the view scoped bean.
+		// So we can safely skip the required validation on postbacks.
+		return !isPostback() && super.isRequired();
+	}
+
+	// Inner classes --------------------------------------------------------------------------------------------------
+
+	private class AttributeInterceptMap extends MapWrapper<String, Object> {
+
+		private static final long serialVersionUID = 1L;
+
+		private AttributeInterceptMap(Map<String, Object> map) {
+			super(map);
+		}
+
+		@Override
+		public Object get(Object key) {
+			Object value = super.get(key);
+
+			if (Utils.isEmpty(value) && "label".equals(key)) {
+
+				// Next check if our outer component has a value expression for the label
+				ValueExpression labelExpression = ViewParam.this.getValueExpression("label");
+				if (labelExpression != null) {
+					value = labelExpression.getValue(getELContext());
+				}
+
+				// No explicit label defined, default to "name" (which is in many cases the most sane label anyway).
+				if (value == null) {
+					value = ViewParam.this.getName();
+				}
+			}
+
+			return value;
+		}
+
 	}
 
 }

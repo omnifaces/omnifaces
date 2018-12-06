@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -14,13 +14,20 @@ package org.omnifaces.util;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.unmodifiableMap;
+import static java.util.logging.Level.FINEST;
 import static java.util.regex.Pattern.quote;
+import static org.omnifaces.util.Reflection.toClassOrNull;
+import static org.omnifaces.util.Servlets.getSubmittedFileName;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
@@ -29,11 +36,15 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -44,12 +55,19 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.function.Consumer;
+import java.util.logging.Logger;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
+import javax.servlet.http.Part;
 import javax.xml.bind.DatatypeConverter;
 
 /**
@@ -72,16 +90,19 @@ public final class Utils {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
+	private static final Logger logger = Logger.getLogger(Utils.class.getName());
+
 	private static final int DEFAULT_STREAM_BUFFER_SIZE = 10240;
 	private static final String PATTERN_RFC1123_DATE = "EEE, dd MMM yyyy HH:mm:ss zzz";
 	private static final TimeZone TIMEZONE_GMT = TimeZone.getTimeZone("GMT");
+	private static final Pattern PATTERN_ISO639_ISO3166_LOCALE = Pattern.compile("[a-z]{2,3}(_[A-Z]{2})?");
 	private static final int BASE64_SEGMENT_LENGTH = 4;
 	private static final int UNICODE_3_BYTES = 0xfff;
 	private static final int UNICODE_2_BYTES = 0xff;
 	private static final int UNICODE_1_BYTE = 0xf;
 	private static final int UNICODE_END_PRINTABLE_ASCII = 0x7f;
 	private static final int UNICODE_BEGIN_PRINTABLE_ASCII = 0x20;
-
+	private static final Map<Class<?>, Object> PRIMITIVE_DEFAULTS = createPrimitiveDefaults();
 	private static final String ERROR_UNSUPPORTED_ENCODING = "UTF-8 is apparently not supported on this platform.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
@@ -90,11 +111,25 @@ public final class Utils {
 		// Hide constructor.
 	}
 
+	// Initialization -------------------------------------------------------------------------------------------------
+
+	private static Map<Class<?>, Object> createPrimitiveDefaults() {
+		Map<Class<?>, Object> primitiveDefaults = new HashMap<>();
+		primitiveDefaults.put(boolean.class, false);
+		primitiveDefaults.put(byte.class, (byte) 0);
+		primitiveDefaults.put(short.class, (short) 0);
+		primitiveDefaults.put(char.class, (char) 0);
+		primitiveDefaults.put(int.class, 0);
+		primitiveDefaults.put(long.class, (long) 0);
+		primitiveDefaults.put(float.class, (float) 0);
+		primitiveDefaults.put(double.class, (double) 0);
+		return unmodifiableMap(primitiveDefaults);
+	}
+
 	// Lang -----------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Returns <code>true</code> if the given string is null or is empty.
-	 *
 	 * @param string The string to be checked on emptiness.
 	 * @return <code>true</code> if the given string is null or is empty.
 	 */
@@ -103,18 +138,7 @@ public final class Utils {
 	}
 
 	/**
-	 * Returns <code>true</code> if the given array is null or is empty.
-	 *
-	 * @param array The array to be checked on emptiness.
-	 * @return <code>true</code> if the given array is null or is empty.
-	 */
-	public static boolean isEmpty(Object[] array) {
-		return array == null || array.length == 0;
-	}
-
-	/**
 	 * Returns <code>true</code> if the given collection is null or is empty.
-	 *
 	 * @param collection The collection to be checked on emptiness.
 	 * @return <code>true</code> if the given collection is null or is empty.
 	 */
@@ -124,7 +148,6 @@ public final class Utils {
 
 	/**
 	 * Returns <code>true</code> if the given map is null or is empty.
-	 *
 	 * @param map The map to be checked on emptiness.
 	 * @return <code>true</code> if the given map is null or is empty.
 	 */
@@ -133,23 +156,35 @@ public final class Utils {
 	}
 
 	/**
-	 * Returns <code>true</code> if the given value is null or is empty. Types of String, Collection, Map and Array are
-	 * recognized. If none is recognized, then examine the emptiness of the toString() representation instead.
+	 * Returns <code>true</code> if the given part is null or is empty.
+	 * @param part The part to be checked on emptiness.
+	 * @return <code>true</code> if the given part is null or is empty.
+	 * @since 2.6
+	 */
+	public static boolean isEmpty(Part part) {
+		return part == null || (isEmpty(getSubmittedFileName(part)) && part.getSize() <= 0);
+	}
+
+	/**
+	 * Returns <code>true</code> if the given object is null or an empty array or has an empty toString() result.
 	 * @param value The value to be checked on emptiness.
-	 * @return <code>true</code> if the given value is null or is empty.
+	 * @return <code>true</code> if the given object is null or an empty array or has an empty toString() result.
 	 */
 	public static boolean isEmpty(Object value) {
 		if (value == null) {
 			return true;
 		}
 		else if (value instanceof String) {
-			return ((String) value).isEmpty();
+			return isEmpty((String) value);
 		}
-		else if (value instanceof Collection<?>) {
-			return ((Collection<?>) value).isEmpty();
+		else if (value instanceof Collection) {
+			return isEmpty((Collection<?>) value);
 		}
-		else if (value instanceof Map<?, ?>) {
-			return ((Map<?, ?>) value).isEmpty();
+		else if (value instanceof Map) {
+			return isEmpty((Map<?, ?>) value);
+		}
+		else if (value instanceof Part) {
+			return isEmpty((Part) value);
 		}
 		else if (value.getClass().isArray()) {
 			return Array.getLength(value) == 0;
@@ -161,7 +196,6 @@ public final class Utils {
 
 	/**
 	 * Returns <code>true</code> if at least one value is empty.
-	 *
 	 * @param values the values to be checked on emptiness
 	 * @return <code>true</code> if any value is empty and <code>false</code> if no values are empty
 	 * @since 1.8
@@ -180,7 +214,6 @@ public final class Utils {
 	 * Returns <code>true</code> if the given string is null or is empty or contains whitespace only. In addition to
 	 * {@link #isEmpty(String)}, this thus also returns <code>true</code> when <code>string.trim().isEmpty()</code>
 	 * returns <code>true</code>.
-	 *
 	 * @param string The string to be checked on blankness.
 	 * @return True if the given string is null or is empty or contains whitespace only.
 	 * @since 1.5
@@ -199,10 +232,10 @@ public final class Utils {
 	public static boolean isNumber(String string) {
 		try {
 			// Performance tests taught that this approach is in general faster than regex or char-by-char checking.
-			Long.parseLong(string);
-			return true;
+			return Long.valueOf(string) != null;
 		}
-		catch (Exception e) {
+		catch (Exception ignore) {
+			logger.log(FINEST, "Ignoring thrown exception; the sole intent is to return false instead.", ignore);
 			return false;
 		}
 	}
@@ -217,10 +250,10 @@ public final class Utils {
 	public static boolean isDecimal(String string) {
 		try {
 			// Performance tests taught that this approach is in general faster than regex or char-by-char checking.
-			Double.parseDouble(string);
-			return true;
+			return Double.valueOf(string) != null;
 		}
-		catch (Exception e) {
+		catch (Exception ignore) {
+			logger.log(FINEST, "Ignoring thrown exception; the sole intent is to return false instead.", ignore);
 			return false;
 		}
 	}
@@ -254,7 +287,7 @@ public final class Utils {
 	@SafeVarargs
 	public static <T> boolean isOneOf(T object, T... objects) {
 		for (Object other : objects) {
-			if (object == null ? other == null : object.equals(other)) {
+			if (Objects.equals(object, other)) {
 				return true;
 			}
 		}
@@ -272,6 +305,23 @@ public final class Utils {
 	public static boolean startsWithOneOf(String string, String... prefixes) {
 		for (String prefix : prefixes) {
 			if (string.startsWith(prefix)) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Returns <code>true</code> if the given string ends with one of the given suffixes.
+	 * @param string The object to be checked if it ends with one of the given suffixes.
+	 * @param suffixes The argument list of suffixes to be checked
+	 * @return <code>true</code> if the given string ends with one of the given suffixes.
+	 * @since 3.1
+	 */
+	public static boolean endsWithOneOf(String string, String... suffixes) {
+		for (String suffix : suffixes) {
+			if (string.endsWith(suffix)) {
 				return true;
 			}
 		}
@@ -314,12 +364,23 @@ public final class Utils {
 		return false;
 	}
 
+	/**
+	 * Returns the default value of the given class, covering primitives.
+	 * E.g. if given class is <code>int.class</code>, then it will return <code>0</code>. Autoboxing will do the rest.
+	 * Non-primitives and <code>void.class</code> will return <code>null</code>.
+	 * @param cls The class to obtain the default value for.
+	 * @return The default value of the given class, covering primitives.
+	 * @since 2.4
+	 */
+	public static Object getDefaultValue(Class<?> cls) {
+		return cls.isPrimitive() ? PRIMITIVE_DEFAULTS.get(cls) : null;
+	}
 
 	// I/O ------------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Stream the given input to the given output via a directly allocated NIO {@link ByteBuffer}.
-	 * Both the input and output streams will implicitly be closed after streaming,
+	 * Stream the given input to the given output via NIO {@link Channels} and a directly allocated NIO
+	 * {@link ByteBuffer}. Both the input and output streams will implicitly be closed after streaming,
 	 * regardless of whether an exception is been thrown or not.
 	 * @param input The input stream.
 	 * @param output The output stream.
@@ -336,6 +397,48 @@ public final class Utils {
 			while (inputChannel.read(buffer) != -1) {
 				buffer.flip();
 				size += outputChannel.write(buffer);
+				buffer.clear();
+			}
+
+			return size;
+		}
+	}
+
+	/**
+	 * Stream a specified range of the given file to the given output via NIO {@link Channels} and a directly allocated
+	 * NIO {@link ByteBuffer}. The output stream will only implicitly be closed after streaming when the specified range
+	 * represents the whole file, regardless of whether an exception is been thrown or not.
+	 * @param file The file.
+	 * @param output The output stream.
+	 * @param start The start position (offset).
+	 * @param length The (intented) length of written bytes.
+	 * @return The (actual) length of the written bytes. This may be smaller when the given length is too large.
+	 * @throws IOException When an I/O error occurs.
+	 * @since 2.2
+	 */
+	public static long stream(File file, OutputStream output, long start, long length) throws IOException {
+		if (start == 0 && length >= file.length()) {
+			return stream(new FileInputStream(file), output);
+		}
+
+		try (FileChannel fileChannel = (FileChannel) Files.newByteChannel(file.toPath(), StandardOpenOption.READ)) {
+			WritableByteChannel outputChannel = Channels.newChannel(output);
+			ByteBuffer buffer = ByteBuffer.allocateDirect(DEFAULT_STREAM_BUFFER_SIZE);
+			long size = 0;
+
+			while (fileChannel.read(buffer, start + size) != -1) {
+				buffer.flip();
+
+				if (size + buffer.limit() > length) {
+					buffer.limit((int) (length - size));
+				}
+
+				size += outputChannel.write(buffer);
+
+				if (size >= length) {
+					break;
+				}
+
 				buffer.clear();
 			}
 
@@ -375,6 +478,38 @@ public final class Utils {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Returns <code>true</code> if the given object is serializable.
+	 * @param object The object to be tested.
+	 * @return <code>true</code> if the given object is serializable.
+	 * @since 2.4
+	 */
+	public static boolean isSerializable(Object object) {
+		try (ObjectOutputStream output = new ObjectOutputStream(new NullOutputStream())) {
+			output.writeObject(object);
+			return true;
+		}
+		catch (IOException ignore) {
+			logger.log(FINEST, "Ignoring thrown exception; the sole intent is to return false instead.", ignore);
+			return false;
+		}
+	}
+
+	private static final class NullOutputStream extends OutputStream {
+		@Override
+		public void write(int b) throws IOException {
+			// NOOP.
+		}
+		@Override
+		public void write(byte[] b) throws IOException {
+			// NOOP.
+		}
+		@Override
+		public void write(byte[] b, int off, int len) throws IOException {
+			// NOOP.
+		}
 	}
 
 	// Collections ----------------------------------------------------------------------------------------------------
@@ -425,22 +560,21 @@ public final class Utils {
 	 * @since 1.5
 	 */
 	public static <E> List<E> iterableToList(Iterable<E> iterable) {
-
-		List<E> list = null;
-
 		if (iterable instanceof List) {
-			list = (List<E>) iterable;
-		} else if (iterable instanceof Collection) {
-			list = new ArrayList<>((Collection<E>) iterable);
-		} else {
-			list = new ArrayList<>();
+			return (List<E>) iterable;
+		}
+		else if (iterable instanceof Collection) {
+			return new ArrayList<>((Collection<E>) iterable);
+		}
+		else {
+			List<E> list = new ArrayList<>();
 			Iterator<E> iterator = iterable.iterator();
 			while (iterator.hasNext()) {
 				list.add(iterator.next());
 			}
-		}
 
-		return list;
+			return list;
+		}
 	}
 
 	/**
@@ -530,13 +664,109 @@ public final class Utils {
 	 * @since 1.6
 	 */
 	public static boolean containsByClassName(Collection<?> objects, String className) {
+		Class<?> cls = toClassOrNull(className);
+
 		for (Object object : objects) {
-			if (object.getClass().getName().equals(className)) {
+			if (object.getClass() == cls) {
 				return true;
 			}
 		}
 
 		return false;
+	}
+
+	/**
+	 * Returns a stream of given object. Supported types are:
+	 * <ul>
+	 * <li>{@link Iterable}
+	 * <li>{@link Map} (returns a stream of entryset)
+	 * <li><code>int[]</code>
+	 * <li><code>long[]</code>
+	 * <li><code>double[]</code>
+	 * <li><code>Object[]</code>
+	 * <li>{@link Stream}
+	 * </ul>
+	 * Anything else is returned as a single-element stream. Null is returned as an empty stream.
+	 *
+	 * @param <T> The expected stream type.
+	 * @param object Any object to get a stream for.
+	 * @return A stream of given object.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @since 3.0
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> Stream<T> stream(Object object) {
+		if (object == null) {
+			return Stream.empty();
+		}
+		if (object instanceof Iterable) {
+			return (Stream<T>) StreamSupport.stream(((Iterable<?>) object).spliterator(), false);
+		}
+		else if (object instanceof Map) {
+			return (Stream<T>) ((Map<?, ?>) object).entrySet().stream();
+		}
+		else if (object instanceof int[]) {
+			return (Stream<T>) Arrays.stream((int[]) object).boxed();
+		}
+		else if (object instanceof long[]) {
+			return (Stream<T>) Arrays.stream((long[]) object).boxed();
+		}
+		else if (object instanceof double[]) {
+			return (Stream<T>) Arrays.stream((double[]) object).boxed();
+		}
+		else if (object instanceof Object[]) {
+			return (Stream<T>) Arrays.stream((Object[]) object);
+		}
+		else if (object instanceof Stream) {
+			return (Stream<T>) object;
+		}
+		else {
+			return (Stream<T>) Stream.of(object);
+		}
+	}
+
+	/**
+	 * Returns a stream of given iterable.
+	 * @param <E> The generic iterable element type.
+	 * @param iterable Any iterable to get a stream for.
+	 * @return A stream of given iterable.
+	 * @since 3.0
+	 */
+	public static <E> Stream<E> stream(Iterable<E> iterable) {
+		return iterable == null ? Stream.empty() : StreamSupport.stream(iterable.spliterator(), false);
+	}
+
+	/**
+	 * Returns a stream of given map.
+	 * @param <K> The generic map key type.
+	 * @param <V> The generic map value type.
+	 * @param map Any map to get a stream for.
+	 * @return A stream of given map.
+	 * @since 3.0
+	 */
+	public static <K, V> Stream<Entry<K, V>> stream(Map<K, V> map) {
+		return map == null ? Stream.empty() : map.entrySet().stream();
+	}
+
+	/**
+	 * Returns a stream of given array.
+	 * @param <T> The generic array item type.
+	 * @param array Any array to get a stream for.
+	 * @return A stream of given array.
+	 * @since 3.0
+	 */
+	public static <T> Stream<T> stream(T[] array) {
+		return array == null ? Stream.empty() : Arrays.stream(array);
+	}
+
+	/**
+	 * Performs an action for each element of given object which is streamed using {@link Utils#stream(Object)}.
+	 * @param object Any streamable object.
+	 * @param action A non-interfering action to perform on each element.
+	 * @since 3.0
+	 */
+	public static void forEach(Object object, Consumer<? super Object> action) {
+		stream(object).forEach(action);
 	}
 
 	// Dates ----------------------------------------------------------------------------------------------------------
@@ -564,6 +794,41 @@ public final class Utils {
 	public static Date parseRFC1123(String string) throws ParseException {
 		SimpleDateFormat sdf = new SimpleDateFormat(PATTERN_RFC1123_DATE, Locale.US);
 		return sdf.parse(string);
+	}
+
+	// Locale ---------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Parses the given object representing the locale to a {@link Locale} object.
+	 * If it is <code>null</code>, then return <code>null</code>.
+	 * Else if it is already an instance of <code>Locale</code>, then just return it.
+	 * Else if it is in pattern ISO 639 alpha-2/3, optionally followed by "_" and ISO 3166-1 alpha-2 country code, then
+	 * split the language/country and construct a new <code>Locale</code> with it.
+	 * Else parse it via {@link Locale#forLanguageTag(String)} and return it.
+	 * @param locale The object representing the locale.
+	 * @return The parsed <code>Locale</code>.
+	 * @since 2.3
+	 */
+	public static Locale parseLocale(Object locale) {
+		if (locale == null) {
+			return null;
+		}
+		else if (locale instanceof Locale) {
+			return (Locale) locale;
+		}
+		else {
+			String localeString = locale.toString();
+
+			if (PATTERN_ISO639_ISO3166_LOCALE.matcher(localeString).matches()) {
+				String[] languageAndCountry = localeString.split("_");
+				String language = languageAndCountry[0];
+				String country = languageAndCountry.length > 1 ? languageAndCountry[1] : "";
+				return new Locale(language, country);
+			}
+			else {
+				return Locale.forLanguageTag(localeString);
+			}
+		}
 	}
 
 	// Encoding/decoding ----------------------------------------------------------------------------------------------
@@ -662,6 +927,49 @@ public final class Utils {
 		catch (UnsupportedEncodingException e) {
 			throw new UnsupportedOperationException(ERROR_UNSUPPORTED_ENCODING, e);
 		}
+	}
+
+	/**
+	 * URI-encode the given string using UTF-8. URIs (paths and filenames) have different encoding rules as compared to
+	 * URL query string parameters. {@link URLEncoder} is actually only for www (HTML) form based query string parameter
+	 * values (as used when a webbrowser submits a HTML form). URI encoding has a lot in common with URL encoding, but
+	 * the space has to be %20 and some chars doesn't necessarily need to be encoded.
+	 * @param string The string to be URI-encoded using UTF-8.
+	 * @return The given string, URI-encoded using UTF-8, or <code>null</code> if <code>null</code> was given.
+	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
+	 * @since 2.4
+	 */
+	public static String encodeURI(String string) {
+		if (string == null) {
+			return null;
+		}
+
+		return encodeURL(string)
+			.replace("+", "%20")
+			.replace("%21", "!")
+			.replace("%27", "'")
+			.replace("%28", "(")
+			.replace("%29", ")")
+			.replace("%7E", "~");
+	}
+
+	/**
+	 * Format given URL with given query string. If given URL is empty, assume <code>/</code> as URL. If given query
+	 * string is empty, return URL right away. If given URL contains a <code>?</code>, prepend query string with
+	 * <code>&amp;</code>, else with <code>?</code>. Finally append query string to URL and return it.
+	 * @param url URL to be formatted with given query string.
+	 * @param queryString Query string to be appended to given URL.
+	 * @return Formatted URL with query string.
+	 * @since 3.0
+	 */
+	public static String formatURLWithQueryString(String url, String queryString) {
+		String normalizedURL = url.isEmpty() ? "/" : url;
+
+		if (isEmpty(queryString)) {
+			return normalizedURL;
+		}
+
+		return normalizedURL + (normalizedURL.contains("?") ? "&" : "?") + queryString;
 	}
 
 	// Escaping/unescaping --------------------------------------------------------------------------------------------

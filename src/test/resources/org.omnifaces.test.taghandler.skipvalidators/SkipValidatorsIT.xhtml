@@ -1,0 +1,48 @@
+<!--
+
+    Copyright 2018 OmniFaces
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+    the License. You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+    an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+    specific language governing permissions and limitations under the License.
+
+-->
+<!DOCTYPE html>
+<html lang="en"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:o="http://omnifaces.org/ui"
+>
+	<f:metadata>
+		<f:viewAction>
+			<f:setPropertyActionListener target="#{viewScope.required}" value="#{true}" />
+		</f:viewAction>
+	</f:metadata>
+	
+	<h:head />
+	
+	<h:body>
+		<o:form id="form">
+			<h:selectBooleanCheckbox id="toggleRequired" value="#{viewScope.required}">
+				<f:ajax execute="@form" render="@form" />
+				<o:skipValidators />
+			</h:selectBooleanCheckbox>
+
+			<h:inputText id="input" required="#{viewScope.required}" requiredMessage="required!" />
+			<h:message id="message" for="input" />
+
+			<h:commandButton id="submit">
+				<f:ajax execute="@form" render="@form" />
+			</h:commandButton>
+
+			<h:outputText id="validationFailed" value="#{facesContext.validationFailed}" />
+		</o:form>
+	</h:body>
+</html>

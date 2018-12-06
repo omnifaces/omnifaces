@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -29,7 +29,6 @@ import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
 
 import org.omnifaces.component.input.Form;
-import org.omnifaces.util.Callback;
 
 /**
  * <p>
@@ -83,12 +82,12 @@ public class IgnoreValidationFailed extends TagHandler {
 	/**
 	 * If the parent component is an instance of {@link UICommand} and is new and we're in the restore view phase of
 	 * a postback, then delegate to {@link #processIgnoreValidationFailed(UICommand)}.
-	 * @throws IllegalArgumentException When the parent component is not an instance of {@link UICommand}.
+	 * @throws IllegalStateException When the parent component is not an instance of {@link UICommand}.
 	 */
 	@Override
-	public void apply(FaceletContext context, final UIComponent parent) throws IOException {
+	public void apply(FaceletContext context, UIComponent parent) throws IOException {
 		if (!(parent instanceof UICommand)) {
-			throw new IllegalArgumentException(ERROR_INVALID_PARENT);
+			throw new IllegalStateException(ERROR_INVALID_PARENT);
 		}
 
 		FacesContext facesContext = context.getFacesContext();
@@ -99,19 +98,14 @@ public class IgnoreValidationFailed extends TagHandler {
 
 		// We can't use hasInvokedSubmit() before the component is added to view, because the client ID isn't available.
 		// Hence, we subscribe this check to after phase of restore view.
-		subscribeToRequestAfterPhase(RESTORE_VIEW, new Callback.Void() {
-			@Override
-			public void invoke() {
-				processIgnoreValidationFailed((UICommand) parent);
-			}
-		});
+		subscribeToRequestAfterPhase(RESTORE_VIEW, () -> processIgnoreValidationFailed((UICommand) parent));
 	}
 
 	/**
 	 * Check if the given command component has been invoked during the current request and if so, then instruct the
 	 * parent <code>&lt;o:form&gt;</code> to ignore the validation.
 	 * @param command The command component.
-	 * @throws IllegalArgumentException When the given command component is not inside a <code>&lt;o:form&gt;</code>.
+	 * @throws IllegalStateException When the given command component is not inside a <code>&lt;o:form&gt;</code>.
 	 */
 	protected void processIgnoreValidationFailed(UICommand command) {
 		if (!hasInvokedSubmit(command)) {
@@ -121,7 +115,7 @@ public class IgnoreValidationFailed extends TagHandler {
 		Form form = getClosestParent(command, Form.class);
 
 		if (form == null) {
-			throw new IllegalArgumentException(ERROR_INVALID_FORM);
+			throw new IllegalStateException(ERROR_INVALID_FORM);
 		}
 
 		form.setIgnoreValidationFailed(true);

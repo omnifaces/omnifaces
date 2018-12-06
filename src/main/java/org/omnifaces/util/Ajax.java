@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,15 +12,23 @@
  */
 package org.omnifaces.util;
 
+import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.omnifaces.util.Components.getCurrentComponent;
 import static org.omnifaces.util.Components.getCurrentForm;
+import static org.omnifaces.util.Faces.getApplication;
+import static org.omnifaces.util.Faces.isAjaxRequestWithPartialRendering;
 
 import java.beans.Introspector;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Scanner;
 
+import javax.faces.FacesException;
+import javax.faces.application.Resource;
 import javax.faces.component.UIColumn;
 import javax.faces.component.UIComponent;
 import javax.faces.component.UIData;
@@ -37,17 +45,40 @@ import org.omnifaces.context.OmniPartialViewContextFactory;
  * {@link OmniPartialViewContext} instance.
  * <p>
  * This utility class allows an easy way of programmaticaly (from inside a managed bean method) specifying new client
- * IDs which should be ajax-updated, also {@link UIData} rows or columns on specific index, specifying callback scripts
- * which should be executed on complete of the ajax response and adding arguments to the JavaScript scope. The added
- * arguments are during the "on complete" phase as a JSON object available by <code>OmniFaces.Ajax.data</code> in
- * JavaScript context.
+ * IDs which should be ajax-updated via {@link #update(String...)}, also {@link UIData} rows or columns on specific
+ * index via {@link #updateRow(UIData, int)} and {@link #updateColumn(UIData, int)}, specifying callback scripts which
+ * should be executed on complete of the ajax response via {@link #oncomplete(String...)}, and loading new JavaScript
+ * resources on complete of the ajax response via {@link #load(String, String)}.
  * <p>
- * The JSON object is been encoded by {@link Json#encode(Object)} which supports standard Java types {@link Boolean},
- * {@link Number}, {@link CharSequence} and {@link Date} arrays, {@link Collection}s and {@link Map}s of them and as
- * last resort it will use the {@link Introspector} to examine it as a Javabean and encode it like a {@link Map}.
+ * It also supports adding arguments to the JavaScript scope via {@link #data(String, Object)}, {@link #data(Map)} and
+ * {@link #data(Object...)}. The added arguments are during the "on complete" phase as a JSON object available by
+ * <code>OmniFaces.Ajax.data</code> in JavaScript context. The JSON object is encoded by {@link Json#encode(Object)}
+ * which supports standard Java types {@link Boolean}, {@link Number}, {@link CharSequence} and {@link Date} arrays,
+ * {@link Collection}s and {@link Map}s of them and as last resort it will use the {@link Introspector} to examine it
+ * as a Javabean and encode it like a {@link Map}.
  * <p>
  * Note that {@link #updateRow(UIData, int)} and {@link #updateColumn(UIData, int)} can only update cell content when
  * it has been wrapped in some container component with a fixed ID.
+ *
+ * <h3>Usage</h3>
+ * <p>
+ * Some examples:
+ * <pre>
+ * // Update specific component on complete of ajax.
+ * Ajax.update("formId:someId");
+ * </pre>
+ * <pre>
+ * // Load script resource on complete of ajax.
+ * Ajax.load("libraryName", "js/resourceName.js");
+ * </pre>
+ * <pre>
+ * // Add variables to JavaScript scope.
+ * Ajax.data("foo", foo); // It will be available as OmniFaces.Ajax.data.foo in JavaScript.
+ * </pre>
+ * <pre>
+ * // Execute script on complete of ajax.
+ * Ajax.oncomplete("alert(OmniFaces.Ajax.data.foo)");
+ * </pre>
  *
  * @author Bauke Scholtz
  * @since 1.2
@@ -59,6 +90,11 @@ public final class Ajax {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
+	private static final String ERROR_NO_SCRIPT_RESOURCE =
+		"";
+	private static final String ERROR_NO_PARTIAL_RENDERING =
+		"The current request is not an ajax request with partial rendering."
+			+ " Use Components#addScriptXxx() methods instead.";
 	private static final String ERROR_ARGUMENTS_LENGTH =
 		"The arguments length must be even. Encountered %d items.";
 	private static final String ERROR_ARGUMENT_TYPE =
@@ -103,17 +139,17 @@ public final class Ajax {
 			if (clientId.charAt(0) != '@') {
 				renderIds.add(clientId);
 			}
-			else if (clientId.equals("@all")) {
+			else if ("@all".equals(clientId)) {
 				context.setRenderAll(true);
 			}
-			else if (clientId.equals("@form")) {
+			else if ("@form".equals(clientId)) {
 				UIComponent currentForm = getCurrentForm();
 
 				if (currentForm != null) {
 					renderIds.add(currentForm.getClientId());
 				}
 			}
-			else if (clientId.equals("@this")) {
+			else if ("@this".equals(clientId)) {
 				UIComponent currentComponent = getCurrentComponent();
 
 				if (currentComponent != null) {
@@ -145,13 +181,7 @@ public final class Ajax {
 	 * @since 1.3
 	 */
 	public static void updateRow(UIData table, int index) {
-		if (index < 0 || table.getRowCount() < 1 || table.getChildCount() == 0) {
-			return;
-		}
-
-		int rowCount = (table.getRows() == 0) ? table.getRowCount() : table.getRows();
-
-		if (index >= rowCount) {
+		if (index < 0 || table.getRowCount() < 1 || index >= table.getRowCount() || table.getChildCount() == 0) {
 			return;
 		}
 
@@ -165,12 +195,24 @@ public final class Ajax {
 		Collection<String> renderIds = getContext().getRenderIds();
 
 		for (UIComponent column : table.getChildren()) {
-			if (!(column instanceof UIColumn)) {
-				continue;
+			if (column instanceof UIColumn) {
+				for (UIComponent cell : column.getChildren()) {
+					renderIds.add(format("%s%c%d%c%s", tableId, separator, index, separator, cell.getId()));
+				}
 			}
+			else if (column instanceof UIData) { // <p:columns>.
+				updateRowCells((UIData) column, renderIds, tableId, index, separator);
+			}
+		}
+	}
 
-			for (UIComponent cell : column.getChildren()) {
-				renderIds.add(String.format("%s%c%d%c%s", tableId, separator, index, separator, cell.getId()));
+	private static void updateRowCells(UIData columns, Collection<String> renderIds, String tableId, int index, char separator) {
+		String columnId = columns.getId();
+		int columnCount = columns.getRowCount();
+
+		for (UIComponent cell : columns.getChildren()) {
+			for (int columnIndex = 0; columnIndex < columnCount; columnIndex++) {
+				renderIds.add(format("%s%c%d%c%s%c%d%c%s", tableId, separator, index, separator, columnId, separator, columnIndex, separator, cell.getId()));
 			}
 		}
 	}
@@ -208,31 +250,69 @@ public final class Ajax {
 		String tableId = table.getClientId(context);
 		char separator = UINamingContainer.getSeparatorChar(context);
 		Collection<String> renderIds = getContext().getRenderIds();
-		int columnIndex = 0;
+		UIColumn column = findColumn(table, index);
 
-		for (UIComponent column : table.getChildren()) {
-			if (!(column instanceof UIColumn) || columnIndex++ != index) {
-				continue;
-			}
-
+		if (column != null) {
 			for (UIComponent cell : column.getChildren()) {
 				String cellId = cell.getId();
 
 				for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
-					renderIds.add(String.format("%s%c%d%c%s", tableId, separator, rowIndex, separator, cellId));
+					renderIds.add(format("%s%c%d%c%s", tableId, separator, rowIndex, separator, cellId));
 				}
 			}
+		}
+	}
 
-			break;
+	private static UIColumn findColumn(UIData table, int index) {
+		int columnIndex = 0;
+
+		for (UIComponent column : table.getChildren()) {
+			if (column instanceof UIColumn && columnIndex++ == index) {
+				return (UIColumn) column;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Load given script resource on complete of the current ajax response. Basically, it loads the script resource as
+	 * a {@link String} and then delegates it to {@link #oncomplete(String...)}.
+	 * @param libraryName Library name of the JavaScript resource.
+	 * @param resourceName Resource name of the JavaScript resource.
+	 * @throws IllegalArgumentException When given script resource cannot be found.
+	 * @throws IllegalStateException When current request is not an ajax request with partial rendering. You should use
+	 * either {@link Components#addScriptResourceToBody(String, String)}
+	 * or {@link Components#addScriptResourceToHead(String, String)} instead.
+	 * @since 2.3
+	 */
+	public static void load(String libraryName, String resourceName) {
+		Resource resource = getApplication().getResourceHandler().createResource(resourceName, libraryName);
+
+		if (resource == null) {
+			throw new IllegalArgumentException(ERROR_NO_SCRIPT_RESOURCE);
+		}
+
+		try (Scanner scanner = new Scanner(resource.getInputStream(), UTF_8.name())) {
+			oncomplete(scanner.useDelimiter("\\A").next());
+		}
+		catch (IOException e) {
+			throw new FacesException(e);
 		}
 	}
 
 	/**
 	 * Execute the given scripts on complete of the current ajax response.
 	 * @param scripts The scripts to be executed.
+	 * @throws IllegalStateException When current request is not an ajax request with partial rendering. You should use
+	 * {@link Components#addScriptToBody(String)} instead.
 	 * @see OmniPartialViewContext#addCallbackScript(String)
 	 */
 	public static void oncomplete(String... scripts) {
+		if (!isAjaxRequestWithPartialRendering()) {
+			throw new IllegalStateException(ERROR_NO_PARTIAL_RENDERING);
+		}
+
 		OmniPartialViewContext context = OmniPartialViewContext.getCurrentInstance();
 
 		for (String script : scripts) {
@@ -261,7 +341,7 @@ public final class Ajax {
 	 */
 	public static void data(Object... namesValues) {
 		if (namesValues.length % 2 != 0) {
-			throw new IllegalArgumentException(String.format(ERROR_ARGUMENTS_LENGTH, namesValues.length));
+			throw new IllegalArgumentException(format(ERROR_ARGUMENTS_LENGTH, namesValues.length));
 		}
 
 		OmniPartialViewContext context = OmniPartialViewContext.getCurrentInstance();
@@ -269,7 +349,7 @@ public final class Ajax {
 		for (int i = 0; i < namesValues.length; i+= 2) {
 			if (!(namesValues[i] instanceof String)) {
 				String type = (namesValues[i]) != null ? namesValues[i].getClass().getName() : "null";
-				throw new IllegalArgumentException(String.format(ERROR_ARGUMENT_TYPE, type, namesValues[i]));
+				throw new IllegalArgumentException(format(ERROR_ARGUMENT_TYPE, type, namesValues[i]));
 			}
 
 			context.addArgument((String) namesValues[i], namesValues[i + 1]);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -14,6 +14,7 @@ package org.omnifaces.el;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.el.ValueExpression;
 import javax.el.VariableMapper;
@@ -25,27 +26,46 @@ import javax.el.VariableMapper;
  */
 public class DelegatingVariableMapper extends VariableMapper {
 
-	private final VariableMapper variableMapper;
-	private Map<String, ValueExpression> variables = new HashMap<>();
+	private final VariableMapper wrapped;
+	private final Map<String, ValueExpression> variables = new HashMap<>();
 
-	public DelegatingVariableMapper(VariableMapper variableMapper) {
-		this.variableMapper = variableMapper;
+	public DelegatingVariableMapper(VariableMapper wrapped) {
+		this.wrapped = wrapped;
 	}
 
 	@Override
-	public ValueExpression resolveVariable(String variable) {
-		ValueExpression valueExpression = variables.get(variable);
+	public ValueExpression resolveVariable(String name) {
+		if (name.charAt(0) == '@') {
+			return wrapped.resolveVariable(name.substring(1)); // So we can detect a nested DelegatingVariableMapper in resolveWrappedVariable().
+		}
+		else if (!variables.containsKey(name)) {
+			return wrapped.resolveVariable(name);
+		}
+		else {
+			return variables.get(name);
+		}
+	}
 
-		if (valueExpression == null) {
-			valueExpression = variableMapper.resolveVariable(variable);
+	public ValueExpression resolveWrappedVariable(String name) {
+		ValueExpression wrappedVariable = wrapped.resolveVariable(name);
+		ValueExpression globalVariable = variables.get(name);
+
+		if (Objects.equals(wrappedVariable, globalVariable)) {
+			return null; // Will happen when variable isn't defined, so any global variable needs to be cleared out.
 		}
 
-		return valueExpression;
+		ValueExpression parentVariable = wrapped.resolveVariable("@" + name);
+
+		if (Objects.equals(wrappedVariable, parentVariable)) {
+			return null; // Will happen when DelegatingVariableMapper is nested but variable isn't redefined, so it needs to be cleared out.
+		}
+
+		return wrappedVariable;
 	}
 
 	@Override
-	public ValueExpression setVariable(String variable, ValueExpression expression) {
-		return variables.put(variable, expression);
+	public ValueExpression setVariable(String name, ValueExpression expression) {
+		return variables.put(name, expression);
 	}
 
 }

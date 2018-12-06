@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -15,7 +15,6 @@ package org.omnifaces.cdi;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.lang.annotation.Retention;
@@ -28,8 +27,8 @@ import org.omnifaces.cdi.cookie.RequestCookieProducer;
 
 /**
  * <p>
- * The CDI annotation {@link Cookie} allows you to inject a HTTP request cookie value from the current JSF context in
- * a CDI managed bean. It's basically like
+ * The CDI annotation <code>&#64;</code>{@link Cookie} allows you to inject a HTTP request cookie value from the current
+ * JSF context in a CDI managed bean. It's basically like
  * <code>&#64;ManagedProperty("#{cookie.cookieName.value}") private String cookieName;</code>
  * in a "plain old" JSF managed bean.
  * <p>
@@ -56,7 +55,7 @@ import org.omnifaces.cdi.cookie.RequestCookieProducer;
  */
 @Qualifier
 @Retention(RUNTIME)
-@Target({ TYPE, METHOD, FIELD, PARAMETER })
+@Target({ METHOD, FIELD, PARAMETER })
 public @interface Cookie {
 
 	/**

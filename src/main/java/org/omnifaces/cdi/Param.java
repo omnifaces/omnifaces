@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -15,12 +15,12 @@ package org.omnifaces.cdi;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 import java.beans.PropertyEditor;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.enterprise.util.Nonbinding;
@@ -34,31 +34,74 @@ import javax.inject.Qualifier;
 import org.omnifaces.cdi.param.Attribute;
 import org.omnifaces.cdi.param.DynamicParamValueProducer;
 import org.omnifaces.cdi.param.ParamExtension;
+import org.omnifaces.cdi.param.ParamProducer;
 import org.omnifaces.cdi.param.ParamValue;
-import org.omnifaces.cdi.param.RequestParameterProducer;
 import org.omnifaces.util.Utils;
 
 /**
  * <p>
- * The CDI annotation {@link Param} allows you to inject, convert and validate a HTTP request parameter in a CDI managed
- * bean. It's basically like <code>&lt;f:viewParam&gt;</code>, but with the major difference that the injected HTTP
- * request parameter is directly available during {@link PostConstruct}, allowing a much easier way of processing
+ * The CDI annotation <code>&#64;</code>{@link Param} allows you to inject, convert and validate a HTTP request or path
+ * parameter in a CDI managed bean.
+ * <p>
+ * For HTTP request parameters it's basically like <code>&lt;f:viewParam&gt;</code>, but with the major difference that
+ * the injected parameter is directly available during {@link PostConstruct}, allowing a much easier way of processing
  * without the need for a <code>&lt;f:event type="preRenderView"&gt;</code> or <code>&lt;f:viewAction&gt;</code> in the
  * view.
+ *
+ * <h3>Usage</h3>
+ *
+ * <h4>Request parameters</h4>
  * <p>
- * By default the name of the request parameter is taken from the name of the variable into which injection takes place.
  * The example below injects the request parameter with name <code>foo</code>.
  * <pre>
  * &#64;Inject &#64;Param
  * private String foo;
  * </pre>
  * <p>
- * The name can be optionally specified via the <code>name</code> attribute.
- * The example below injects the request parameter with name <code>foo</code> into a variable named <code>bar</code>.
+ * By default the name of the request parameter is taken from the name of the variable into which injection takes place.
+ * The name can be optionally specified via the <code>name</code> attribute. The example below injects the request
+ * parameter with name <code>foo</code> into a variable named <code>bar</code>.
  * <pre>
  * &#64;Inject &#64;Param(name="foo")
  * private String bar;
  * </pre>
+ * <p>
+ * The <code>name</code> attribute is only mandatory when using constructor injection as there is no information about
+ * constructor parameter names. The example below injects the request parameter with name <code>foo</code> as a
+ * constructor parameter.
+ * <pre>
+ * &#64;Inject
+ * public Bean(&#64;Param(name="foo") String foo) {
+ *     // ...
+ * }
+ * </pre>
+ *
+ * <h4>Multi-valued request parameters</h4>
+ * <p>
+ * Multi-valued parameters are also supported by specifying a {@link List} or array type. The support was added in
+ * OmniFaces 2.4.
+ * <pre>
+ * &#64;Inject &#64;Param(name="foo")
+ * private List&lt;String&gt; foos;
+ *
+ * &#64;Inject &#64;Param(name="bar")
+ * private String[] bars;
+ * </pre>
+ *
+ * <h4>Path parameters</h4>
+ * <p>
+ * Path parameters can be injected by specifying the <code>pathIndex</code> attribute representing the zero-based index
+ * of the path parameter. The support was added in OmniFaces 2.5. On an example request
+ * <code>http://example.com/mypage/firstname.lastname</code>, which is mapped to <code>/mypage.xhtml</code>, the below
+ * example injects the path parameter <code>firstname.lastname</code>.
+ * <pre>
+ * &#64;Inject &#64;Param(pathIndex=0)
+ * private String user;
+ * </pre>
+ * <p>
+ * This takes precedence over the <code>name</code> attribute.
+ *
+ * <h3>Conversion and validation</h3>
  * <p>
  * Standard types for which JSF already has a build in converter like {@link String}, {@link Long}, {@link Boolean}, etc
  * or for which there's already a converter registered via <code>forClass</code>, can be injected without explicitly
@@ -75,6 +118,19 @@ import org.omnifaces.util.Utils;
  * private User user;
  * </pre>
  * <p>
+ * This also works on multi-valued parameters.
+ * <pre>
+ * &#64;Inject &#64;Param(name="user", converter="userConverter")
+ * private List&lt;User&gt; users;
+ * </pre>
+ * <p>
+ * This also works on path parameters. The following is an example of the injection of path parameter <code>user</code>
+ * following a request such as <code>http://example.com/mypage/42</code>:
+ * <pre>
+ * &#64;Inject &#64;Param(pathIndex=0, converter="userConverter", validator="priviledgedUser")
+ * private User user;
+ * </pre>
+ * <p>
  * Note that the <code>converter</code> and <code>validator</code> attributes can be specified in 3 ways:
  * <ul>
  * <li>A string value representing the converter/validator ID like so <code>converter="userConverter"</code>.
@@ -83,8 +139,8 @@ import org.omnifaces.util.Utils;
  * </ul>
  * <p>
  * In case the converted parameter value is not serializable, while the managed bean is serializable, you could inject
- * it into a field of type {@link ParamValue}, with <code>V</code> the actual type of the converted request parameter.
- * Deserialization in this case works by converting from the original request parameter again.
+ * it into a field of type {@link ParamValue}, with <code>V</code> the actual type of the converted parameter.
+ * Deserialization in this case works by converting from the original parameter again.
  * <pre>
  * &#64;Inject &#64;Param(converter="someIdToInputStreamConverter")
  * private ParamValue&lt;InputStream&gt; content; // Extreme example :) Be careful with resource leaking.
@@ -100,13 +156,14 @@ import org.omnifaces.util.Utils;
  * @see ParamValue
  * @see Attribute
  * @see ParamExtension
- * @see RequestParameterProducer
+ * @see ParamProducer
  * @see DynamicParamValueProducer
  *
  */
 @Qualifier
 @Retention(RUNTIME)
-@Target({ TYPE, METHOD, FIELD, PARAMETER })
+@Target({ METHOD, FIELD, PARAMETER })
+@SuppressWarnings("rawtypes")
 public @interface Param {
 
 	/**
@@ -117,14 +174,24 @@ public @interface Param {
 	@Nonbinding	String name() default "";
 
 	/**
-	 * (Optional) the label used to refer to the request parameter. If not specified the name of the request parameter.
+	 * (Optional) The index of the path parameter. If specified the parameter will be extracted from the request path
+	 * info on the given index instead of as request parameter. The first path parameter has an index of <code>0</code>.
+	 * This takes precedence over <code>name</code> attribute.
 	 *
-	 * @return The label used to refer the request parameter, defaults to the name of the request parameter.
+	 * @return The index of the path parameter.
+	 * @since 2.5
+	 */
+	@Nonbinding	int pathIndex() default -1;
+
+	/**
+	 * (Optional) the label used to refer to the parameter.
+	 *
+	 * @return The label used to refer the parameter, defaults to the <code>name</code> attribute.
 	 */
 	@Nonbinding	String label() default "";
 
 	/**
-	 * (Optional/Required) The converter to be used for converting the request parameter to the type that is to be injected.
+	 * (Optional/Required) The converter to be used for converting the parameter to the type that is to be injected.
 	 * Optional if the target type is String, otherwise required.
 	 * <p>
 	 * A converter can be specified in 3 ways:
@@ -137,21 +204,21 @@ public @interface Param {
 	 * <p>
 	 * If this attribute is specified in addition to {@link Param#converterClass()}, this attribute takes precedence.
 	 *
-	 * @return The converter used to convert the request parameter to model value.
+	 * @return The converter used to convert the parameter to model value.
 	 */
 	@Nonbinding String converter() default "";
 
 	/**
-	 * (Optional) Flag indicating if this request parameter is required (must be present) or not. The required check is done
+	 * (Optional) Flag indicating if this parameter is required (must be present) or not. The required check is done
 	 * after conversion and before validation. A value is said to be not present if it turns out to be empty according to
 	 * the semantics of {@link Utils#isEmpty(Object)}.
 	 *
-	 * @return Whether the absence of the request parameter should cause a validation error.
+	 * @return Whether the absence of the parameter should cause a validation error.
 	 */
 	@Nonbinding boolean required() default false;
 
 	/**
-	 * (Optional) The validators to be used for validating the (converted) request parameter.
+	 * (Optional) The validators to be used for validating the (converted) parameter.
 	 *
 	 * <p>
 	 * A validator can be specified in 3 ways:
@@ -166,23 +233,23 @@ public @interface Param {
 	 * attributes will be added to the final collection of validators. The validators from this attribute will however
 	 * be called first.
 	 *
-	 * @return The validators used to validate the (converted) request parameter.
+	 * @return The validators used to validate the (converted) parameter.
 	 */
 	@Nonbinding String[] validators() default {};
 
 	/**
-	 * (Optional) Class of the converter to be used for converting the request parameter to the type that is to be injected.
+	 * (Optional) Class of the converter to be used for converting the parameter to the type that is to be injected.
 	 * This is ignored when {@link #converter()} is specified.
 	 *
-	 * @return The converter class used to convert the request parameter to model value.
+	 * @return The converter class used to convert the parameter to model value.
 	 */
 	@Nonbinding Class<? extends Converter> converterClass() default Converter.class;
 
 	/**
-	 * (Optional) Class of one ore more validators to be used for validating the (converted) request parameter.
+	 * (Optional) Class of one ore more validators to be used for validating the (converted) parameter.
 	 * These will run <i>after</i> the ones specified in {@link #validators()}.
 	 *
-	 * @return The validator classes used to validate the (converted) request parameter.
+	 * @return The validator classes used to validate the (converted) parameter.
 	 */
 	@Nonbinding Class<? extends Validator>[] validatorClasses() default {};
 

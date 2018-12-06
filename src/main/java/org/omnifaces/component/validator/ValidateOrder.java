@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  */
 package org.omnifaces.component.validator;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
 
 import java.util.ArrayList;
@@ -67,38 +68,24 @@ public class ValidateOrder extends ValidateMultipleFields {
 	// Private constants ----------------------------------------------------------------------------------------------
 
 	private enum Type {
-		LT(new Callback.ReturningWithArgument<Boolean, List<Comparable>>() {
-			@Override
-			public Boolean invoke(List<Comparable> values) {
-				return new ArrayList<>(new TreeSet<>(values)).equals(values);
-			}
+		LT(values -> new ArrayList<>(new TreeSet<>(values)).equals(values)),
+
+		LTE(values -> {
+			List<Comparable> sortedValues = new ArrayList<>(values);
+			Collections.sort(sortedValues);
+			return sortedValues.equals(values);
 		}),
 
-		LTE(new Callback.ReturningWithArgument<Boolean, List<Comparable>>() {
-			@Override
-			public Boolean invoke(List<Comparable> values) {
-				List<Comparable> sortedValues = new ArrayList<>(values);
-				Collections.sort(sortedValues);
-				return sortedValues.equals(values);
-			}
+		GT(values -> {
+			List<Comparable> sortedValues = new ArrayList<>(new TreeSet<>(values));
+			Collections.reverse(sortedValues);
+			return sortedValues.equals(values);
 		}),
 
-		GT(new Callback.ReturningWithArgument<Boolean, List<Comparable>>() {
-			@Override
-			public Boolean invoke(List<Comparable> values) {
-				List<Comparable> sortedValues = new ArrayList<>(new TreeSet<>(values));
-				Collections.reverse(sortedValues);
-				return sortedValues.equals(values);
-			}
-		}),
-
-		GTE(new Callback.ReturningWithArgument<Boolean, List<Comparable>>() {
-			@Override
-			public Boolean invoke(List<Comparable> values) {
-				List<Comparable> sortedValues = new ArrayList<>(values);
-				Collections.sort(sortedValues, Collections.reverseOrder());
-				return sortedValues.equals(values);
-			}
+		GTE(values -> {
+			List<Comparable> sortedValues = new ArrayList<>(values);
+			Collections.sort(sortedValues, Collections.reverseOrder());
+			return sortedValues.equals(values);
 		});
 
 		private Callback.ReturningWithArgument<Boolean, List<Comparable>> callback;
@@ -162,7 +149,7 @@ public class ValidateOrder extends ValidateMultipleFields {
 			Type.valueOf(type.toUpperCase());
 		}
 		catch (IllegalArgumentException e) {
-			throw new IllegalArgumentException(String.format(ERROR_INVALID_TYPE, type), e);
+			throw new IllegalArgumentException(format(ERROR_INVALID_TYPE, type), e);
 		}
 
 		state.put(PropertyKeys.type, type);

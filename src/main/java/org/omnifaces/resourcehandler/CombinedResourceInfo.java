@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,6 +12,9 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static java.lang.String.format;
+import static java.util.logging.Level.FINEST;
+import static java.util.logging.Level.WARNING;
 import static org.omnifaces.util.FacesLocal.getRequestDomainURL;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.serializeURLSafe;
@@ -25,7 +28,6 @@ import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.faces.application.Resource;
@@ -47,6 +49,7 @@ public final class CombinedResourceInfo {
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final Logger logger = Logger.getLogger(CombinedResourceHandler.class.getName());
+
 	private static final Map<String, CombinedResourceInfo> CACHE = new ConcurrentHashMap<>();
 
 	private static final String LOG_RESOURCE_NOT_FOUND = "CombinedResourceHandler: The resource %s cannot be found"
@@ -119,7 +122,13 @@ public final class CombinedResourceInfo {
 				throw new IllegalStateException(ERROR_EMPTY_RESOURCES);
 			}
 
-			return get(toUniqueId(resourceIdentifiers)).id;
+			String id = toUniqueId(resourceIdentifiers);
+
+			if (!CACHE.containsKey(id)) {
+				CombinedResourceInfo.create(id, resourceIdentifiers);
+			}
+
+			return id;
 		}
 
 	}
@@ -137,11 +146,22 @@ public final class CombinedResourceInfo {
 			Set<ResourceIdentifier> resourceIdentifiers = fromUniqueId(id);
 
 			if (resourceIdentifiers != null) {
-				info = new CombinedResourceInfo(id, Collections.unmodifiableSet(resourceIdentifiers));
-				CACHE.put(id, info);
+				info = create(id, resourceIdentifiers);
 			}
 		}
 
+		return info;
+	}
+
+	/**
+	 * Create new combined resource info identified by given ID in the cache.
+	 * @param id The ID of the combined resource info to be created in the cache.
+	 * @param resourceIdentifiers The set of resource identifiers to create combined resource info for.
+	 * @return New combined resource info identified by given ID.
+	 */
+	private static CombinedResourceInfo create(String id, Set<ResourceIdentifier> resourceIdentifiers) {
+		CombinedResourceInfo info = new CombinedResourceInfo(id, Collections.unmodifiableSet(resourceIdentifiers));
+		CACHE.put(id, info);
 		return info;
 	}
 
@@ -167,7 +187,10 @@ public final class CombinedResourceInfo {
 			Resource resource = handler.createResource(resourceIdentifier.getName(), resourceIdentifier.getLibrary());
 
 			if (resource == null) {
-				logger.log(Level.WARNING, String.format(LOG_RESOURCE_NOT_FOUND, resourceIdentifier, id));
+				if (logger.isLoggable(WARNING)) {
+					logger.log(WARNING, format(LOG_RESOURCE_NOT_FOUND, resourceIdentifier, id));
+				}
+
 				resources.clear();
 				return;
 			}
@@ -179,12 +202,13 @@ public final class CombinedResourceInfo {
 				connection = resource.getURL().openConnection();
 			}
 			catch (Exception richFacesDoesNotSupportThis) {
+				logger.log(FINEST, "Ignoring thrown exception; this can only be caused by a buggy component library.", richFacesDoesNotSupportThis);
+
 				try {
 					connection = new URL(getRequestDomainURL(context) + resource.getRequestPath()).openConnection();
 				}
 				catch (IOException ignore) {
-					// Can't and shouldn't handle it at this point.
-					// It would be thrown during resource streaming anyway which is a better moment.
+					logger.log(FINEST, "Ignoring thrown exception; cannot handle it at this point, it would be thrown during getInputStream() anyway.", ignore);
 					return;
 				}
 			}
@@ -225,7 +249,7 @@ public final class CombinedResourceInfo {
 	 */
 	@Override
 	public String toString() {
-		return String.format("CombinedResourceInfo[%s,%s]", id, resourceIdentifiers);
+		return format("CombinedResourceInfo[%s,%s]", id, resourceIdentifiers);
 	}
 
 	// Getters --------------------------------------------------------------------------------------------------------
@@ -290,9 +314,8 @@ public final class CombinedResourceInfo {
 		try {
 			resourcesId = unserializeURLSafe(id);
 		}
-		catch (IllegalArgumentException e) {
-			// This will occur when the ID has purposefully been manipulated for some reason.
-			// Just return null then so that it will end up in a 404.
+		catch (IllegalArgumentException ignore) {
+			logger.log(FINEST, "Ignoring thrown exception; this can only be a hacker attempt, just return null to indicate 404.", ignore);
 			return null;
 		}
 

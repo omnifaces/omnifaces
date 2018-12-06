@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -14,38 +14,93 @@ package org.omnifaces.resourcehandler;
 
 import java.io.Externalizable;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
+import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Objects;
 
+import javax.faces.FacesException;
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceWrapper;
+import javax.faces.context.FacesContext;
 
 /**
- * This {@link Resource} implementation remaps the given wrapped resource to the given request path.
+ * This {@link Resource} implementation remaps the given resource to the given request path.
  *
  * @author Bauke Scholtz
  * @since 2.1
  */
 public class RemappedResource extends ResourceWrapper implements Externalizable {
 
-	private Resource wrapped;
+	private Serializable serializableResource;
+	private transient Resource resource;
+	private String resourceName;
+	private String libraryName;
 	private String requestPath;
 
 	/**
-	 * Do not use this constructor.
+	 * Do not use this constructor. It's merely there for {@link Externalizable}.
 	 */
+	@SuppressWarnings("deprecation")
 	public RemappedResource() {
 		// Keep default c'tor alive for Externalizable.
 	}
 
 	/**
 	 * Constructs a new resource which remaps the given wrapped resource to the given request path.
-	 * @param wrapped The resource to be wrapped.
+	 * @param resource The resource to be remapped.
 	 * @param requestPath The remapped request path.
 	 */
-	public RemappedResource(Resource wrapped, String requestPath) {
-		this.wrapped = wrapped;
+	public RemappedResource(Resource resource, String requestPath) {
+		super(resource);
+
+		if (resource instanceof Serializable) {
+			serializableResource = (Serializable) resource;
+		}
+
+		this.resource = resource;
 		this.requestPath = requestPath;
+	}
+
+	/**
+	 * Constructs a new resource which remaps the given requested resource and library name to the given request path.
+	 * @param resourceName The requested resource name.
+	 * @param libraryName The requested library name.
+	 * @param requestPath The remapped request path.
+	 */
+	public RemappedResource(String resourceName, String libraryName, String requestPath) {
+		super(null);
+		this.resourceName = resourceName;
+		this.libraryName = libraryName;
+		this.requestPath = requestPath;
+	}
+
+	@Override
+	public Resource getWrapped() {
+		return resource;
+	}
+
+	@Override
+	public String getResourceName() {
+		Resource wrapped = getWrapped();
+		return (wrapped != null) ? wrapped.getResourceName() : resourceName;
+	}
+
+	@Override
+	public String getLibraryName() {
+		Resource wrapped = getWrapped();
+		return (wrapped != null) ? wrapped.getLibraryName() : libraryName;
+	}
+
+	@Override
+	public String getContentType() {
+		Resource wrapped = getWrapped();
+		return (wrapped != null) ? wrapped.getContentType() : null;
 	}
 
 	@Override
@@ -53,24 +108,33 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
 		return requestPath;
 	}
 
-	@Override // Necessary because this is missing in ResourceWrapper (will be fixed in JSF 2.2).
-	public String getResourceName() {
-		return getWrapped().getResourceName();
-	}
-
-	@Override // Necessary because this is missing in ResourceWrapper (will be fixed in JSF 2.2).
-	public String getLibraryName() {
-		return getWrapped().getLibraryName();
-	}
-
-	@Override // Necessary because this is missing in ResourceWrapper (will be fixed in JSF 2.2).
-	public String getContentType() {
-		return getWrapped().getContentType();
+	@Override
+	public InputStream getInputStream() throws IOException {
+		Resource wrapped = getWrapped();
+		return (wrapped != null) ? wrapped.getInputStream() : getURL().openStream();
 	}
 
 	@Override
-	public Resource getWrapped() {
-		return wrapped;
+	public Map<String, String> getResponseHeaders() {
+		Resource wrapped = getWrapped();
+		return (wrapped != null) ? wrapped.getResponseHeaders() : Collections.<String, String>emptyMap();
+	}
+
+	@Override
+	public URL getURL() {
+		try {
+			Resource wrapped = getWrapped();
+			return (wrapped != null) ? wrapped.getURL() : new URL(requestPath);
+		}
+		catch (MalformedURLException e) {
+			throw new FacesException(e);
+		}
+	}
+
+	@Override
+	public boolean userAgentNeedsUpdate(FacesContext context) {
+		Resource wrapped = getWrapped();
+		return (wrapped != null) ? wrapped.userAgentNeedsUpdate(context) : false;
 	}
 
 	@Override
@@ -84,23 +148,30 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
 		}
 
 		RemappedResource other = (RemappedResource) object;
-		return wrapped.equals(other.wrapped) && requestPath.equals(other.requestPath);
+		Resource wrapped = getWrapped();
+		return Objects.equals(wrapped, other.getWrapped()) && requestPath.equals(other.requestPath);
 	}
 
 	@Override
 	public int hashCode() {
-		return wrapped.hashCode() + requestPath.hashCode();
+		Resource wrapped = getWrapped();
+		return Objects.hash(wrapped, requestPath);
 	}
 
 	@Override
 	public void readExternal(ObjectInput input) throws IOException, ClassNotFoundException {
-		wrapped = (Resource) input.readObject();
+		serializableResource = (Serializable) input.readObject();
+		resource = (Resource) serializableResource;
+		resourceName = (String) input.readObject();
+		libraryName = (String) input.readObject();
 		requestPath = (String) input.readObject();
 	}
 
 	@Override
 	public void writeExternal(ObjectOutput output) throws IOException {
-		output.writeObject(wrapped);
+		output.writeObject(serializableResource);
+		output.writeObject(resourceName);
+		output.writeObject(libraryName);
 		output.writeObject(requestPath);
 	}
 

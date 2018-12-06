@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -14,8 +14,11 @@ package org.omnifaces.component.validator;
 
 import java.io.IOException;
 
+import javax.faces.application.Application;
 import javax.faces.component.UIComponentBase;
 import javax.faces.context.FacesContext;
+import javax.faces.event.PostValidateEvent;
+import javax.faces.event.PreValidateEvent;
 
 /**
  * Base class which is to be shared between all components of the Validator family.
@@ -60,7 +63,10 @@ public abstract class ValidatorFamily extends UIComponentBase {
 	 */
 	@Override
 	public void processValidators(FacesContext context) {
+		Application application = context.getApplication();
+		application.publishEvent(context, PreValidateEvent.class, this);
 		validateComponents(context);
+		application.publishEvent(context, PostValidateEvent.class, this);
 	}
 
 	/**
@@ -83,9 +89,9 @@ public abstract class ValidatorFamily extends UIComponentBase {
 
 	/**
 	 * Validate our own component hierarchy.
-	 * @throws IllegalArgumentException When component hierarchy is wrong.
+	 * @throws IllegalStateException When component hierarchy is wrong.
 	 */
-	protected abstract void validateHierarchy() throws IllegalArgumentException;
+	protected abstract void validateHierarchy();
 
 	/**
 	 * Perform the actual validation.

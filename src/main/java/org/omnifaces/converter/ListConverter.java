@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -13,6 +13,7 @@
 package org.omnifaces.converter;
 
 import java.util.List;
+import java.util.Objects;
 
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
@@ -52,7 +53,7 @@ import javax.faces.model.SelectItem;
  * @author Arjan Tijms
  */
 @FacesConverter("omnifaces.ListConverter")
-public class ListConverter implements Converter {
+public class ListConverter implements Converter<Object> {
 
 	private List<?> list;
 
@@ -60,7 +61,7 @@ public class ListConverter implements Converter {
 	public Object getAsObject(FacesContext context, UIComponent component, String value) {
 		for (Object listValue : list) {
 			String convertedListValue = getAsString(context, component, listValue);
-			if (value == null ? convertedListValue == null : value.equals(convertedListValue)) {
+			if (Objects.equals(value, convertedListValue)) {
 				return listValue;
 			}
 		}

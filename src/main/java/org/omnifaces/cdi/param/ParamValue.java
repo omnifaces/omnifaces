@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,48 +12,55 @@
  */
 package org.omnifaces.cdi.param;
 
-import java.io.Serializable;
+import static org.omnifaces.cdi.param.ParamProducer.coerceValues;
+import static org.omnifaces.cdi.param.ParamProducer.getConvertedValues;
+import static org.omnifaces.util.Faces.getContext;
+import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.isSerializable;
 
-import javax.faces.context.FacesContext;
-import javax.faces.convert.Converter;
+import java.io.Serializable;
+import java.lang.reflect.Type;
 
 import org.omnifaces.cdi.Param;
 
 /**
- * The type that's injected via the {@link Param} qualifier.
+ * The type that's injected via the <code>&#64;</code>{@link Param} qualifier.
  * <p>
  * This acts as a wrapper for the actual value that is retrieved from the request and optionally converted.
  *
  * @author Arjan Tijms
  *
- * @param <V>
- *            The type of the actual value this class is wrapping.
+ * @param <V> The type of the actual value this class is wrapping.
  */
 public class ParamValue<V> implements Serializable {
 
-	private static final long serialVersionUID = 1l;
+	private static final long serialVersionUID = 1L;
 
-	private final String submittedValue;
-	private final Param requestParameter;
-	private final Class<?> targetType;
+	private final String[] submittedValues;
+	private final Param param;
+	private final Type type;
 
 	private transient V value;
-	private boolean valueSet;
+	private transient boolean valueSet;
 
-	private V serializableValue;
 	private boolean valueIsSerializable;
+	private V serializableValue;
 
-	public ParamValue(String submittedValue, Param requestParameter, Class<?> targetType, V value) {
-		this.submittedValue = submittedValue;
-		this.requestParameter = requestParameter;
-		this.targetType = targetType;
+	public ParamValue(String[] submittedValues, Param param, Type type, V value) {
+		this.submittedValues = submittedValues;
+		this.param = param;
+		this.type = type;
+		setValue(value);
+
+		if (isSerializable(value)) {
+			valueIsSerializable = true;
+			serializableValue = value;
+		}
+	}
+
+	private void setValue(V value) {
 		this.value = value;
 		valueSet = true;
-
-		if (value instanceof Serializable) {
-			serializableValue = value;
-			valueIsSerializable = true;
-		}
 	}
 
 	/**
@@ -69,39 +76,27 @@ public class ParamValue<V> implements Serializable {
 	public V getValue() {
 
 		if (!valueSet) {
-			// If the value has not been set this instance has recently been de-serialized
+			// If the value has not been set this instance has recently been de-serialized.
 
 			if (valueIsSerializable) {
-				// The original value was serializable and will thus have been been de-serialized too
-				value = serializableValue;
-			} else {
-
-				// The original value was NOT serializable so we need to generate it from the raw
-				// submitted value again.
-
-				// A converter may not be serializable either, so we obtain a new instance as well.
-				// TODO: Maybe test if converter is serializable and if so keep a reference
-				Converter converter = RequestParameterProducer.getConverter(requestParameter, targetType);
-
-				Object convertedValue;
-				if (converter != null) {
-					FacesContext context = FacesContext.getCurrentInstance();
-					convertedValue = converter.getAsObject(context, context.getViewRoot(), submittedValue);
-				} else {
-					convertedValue = submittedValue;
-				}
-
-				value = (V) convertedValue;
+				// The original value was serializable and will thus have been been de-serialized too.
+				setValue(serializableValue);
 			}
-
-			valueSet = true;
+			else {
+				// The original value was NOT serializable so we need to generate it from the raw submitted value again.
+				setValue((V) coerceValues(type, getConvertedValues(getContext(), param, "param", submittedValues, type)));
+			}
 		}
 
 		return value;
 	}
 
 	public String getSubmittedValue() {
-		return submittedValue;
+		return isEmpty(submittedValues) ? null : submittedValues[0];
+	}
+
+	public String[] getSubmittedValues() {
+		return submittedValues;
 	}
 
 }

@@ -1,23 +1,21 @@
 /*
- * Copyright 2014 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  */
 package org.omnifaces.cdi;
 
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
@@ -25,12 +23,13 @@ import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.util.Nonbinding;
+import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 import javax.faces.webapp.FacesServlet;
-import javax.servlet.ServletRequestListener;
-import javax.servlet.http.HttpSessionListener;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
-import org.omnifaces.cdi.eager.EagerBeansFilter;
 import org.omnifaces.cdi.eager.EagerBeansPhaseListener;
 import org.omnifaces.cdi.eager.EagerBeansRepository;
 import org.omnifaces.cdi.eager.EagerBeansWebListener;
@@ -38,7 +37,7 @@ import org.omnifaces.cdi.eager.EagerExtension;
 
 /**
  * <p>
- * The CDI annotation {@link Eager} specifies that a scoped bean is to be eagerly instantiated.
+ * The CDI annotation <code>&#64;</code>{@link Eager} specifies that a scoped bean is to be eagerly instantiated.
  * <p>
  * JSF's own native managed beans are being deprecated in favor of CDI managed beans. One feature that those native JSF
  * managed beans had that's not directly available for CDI managed beans is the ability to eagerly instantiate
@@ -52,6 +51,8 @@ import org.omnifaces.cdi.eager.EagerExtension;
  * In case of <code>@RequestScoped</code> and <code>@ViewScoped</code> beans instantiation happens per request URI / view
  * and an extra attribute is required for specifying this.
  *
+ * <h3>Supported scopes</h3>
+ *
  * <p>
  * Currently supported scopes:
  * <ol>
@@ -61,6 +62,8 @@ import org.omnifaces.cdi.eager.EagerExtension;
  * <li> CDI {@link SessionScoped}
  * <li> CDI {@link ApplicationScoped}
  * </ol>
+ *
+ * <h3>Usage</h3>
  *
  * <p>
  * E.g.
@@ -77,7 +80,7 @@ import org.omnifaces.cdi.eager.EagerExtension;
  * }
  * </pre>
  * <p>
- * <em>Note: you can also use the stereotype {@link Startup} for this instead.</em>
+ * <em>Note: you can also use the stereotype <code>&#64;</code>{@link Startup} for this instead.</em>
  * <p>
  * The following bean will be instantiated whenever a session is created:
  * <pre>
@@ -109,45 +112,18 @@ import org.omnifaces.cdi.eager.EagerExtension;
  * }
  * </pre>
  *
- * <h3> Compatibility </h3>
+ * <h3><code>FacesContext</code> in <code>&#64;PostConstruct</code></h3>
  *
  * <p>
- * In some (older) containers, most notably GlassFish 3, the CDI request scope is not available in a {@link ServletRequestListener}
- * (this is actually not spec complicant, as CDI demands this scope to be active then, but it is what it is).
+ * When using <code>&#64;Eager</code> or <code>&#64;Eager(requestURI)</code>, be aware that the {@link FacesContext} is
+ * <strong>not</strong> available in the <code>&#64;PostConstruct</code>. Reason is, the {@link FacesServlet} isn't
+ * invoked yet at the moment <code>&#64;Eager</code> bean is constructed. Only in <code>&#64;Eager(viewId)</code>, the
+ * {@link FacesContext} is available in the <code>&#64;PostConstruct</code>.
  * <p>
- * Additionally in some containers, most notably GlassFish 3 again, instantiating session scoped beans from a {@link HttpSessionListener}
- * will corrupt "something" in the container. The instantiating of the beans will succeed, but if the session is later accessed an
- * exception like the following will be thrown:
- *
- * <pre>
- * java.lang.IllegalArgumentException: Should never reach here
- *     at org.apache.catalina.connector.SessionTracker.track(SessionTracker.java:168)
- *     at org.apache.catalina.connector.Request.doGetSession(Request.java:2939)
- *     at org.apache.catalina.connector.Request.getSession(Request.java:2583)
- *     at org.apache.catalina.connector.RequestFacade.getSession(RequestFacade.java:920)
- *     at javax.servlet.http.HttpServletRequestWrapper.getSession(HttpServletRequestWrapper.java:259)
- *     at com.sun.faces.context.ExternalContextImpl.getSession(ExternalContextImpl.java:155)
- *     at javax.faces.context.ExternalContextWrapper.getSession(ExternalContextWrapper.java:396)
- *     at javax.faces.context.ExternalContextWrapper.getSession(ExternalContextWrapper.java:396)
- *     ...
- * </pre>
- *
- * If any or both of those problems occur, a filter needs to be installed instead in <code>web.xml</code> as follows:
- *
- * <pre>
- * &lt;filter&gt;
- *     &lt;filter-name&gt;eagerBeansFilter&lt;/filter-name&gt;
- *     &lt;filter-class&gt;org.omnifaces.cdi.eager.EagerBeansFilter&lt;/filter-class&gt;
- * &lt;/filter&gt;
- * &lt;filter-mapping&gt;
- * &lt;filter-name&gt;eagerBeansFilter&lt;/filter-name&gt;
- *     &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
- * &lt;/filter-mapping&gt;
- *</pre>
- *
- * <p>
- * Note that the {@link EagerBeansFilter} will automatically disable the {@link EagerBeansWebListener}.
- *
+ * In case you need information from {@link HttpServletRequest}, {@link HttpSession} and/or {@link ServletContext}, then
+ * you can just <code>&#64;Inject</code> it right away. Also, all other CDI managed beans are available the usual way
+ * via <code>&#64;Inject</code>, as long as they do also not depend on {@link FacesContext} in their
+ * <code>&#64;PostConstruct</code>.
  *
  * @since 1.8
  * @author Arjan Tijms
@@ -155,9 +131,9 @@ import org.omnifaces.cdi.eager.EagerExtension;
  * @see EagerBeansRepository
  * @see EagerBeansPhaseListener
  * @see EagerBeansWebListener
- * @see EagerBeansFilter
  *
  */
+@Documented
 @Retention(RUNTIME)
 @Target(TYPE)
 public @interface Eager {

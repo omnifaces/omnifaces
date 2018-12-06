@@ -19,11 +19,20 @@ Juliano Marques
 	For the work on the <o:validateMultiple> tag.
 
 Michele Mariotti
-	For the work on FacesConfigXml utility class.
+	For the work on FacesConfigXml utility class and the <o:skipValidators> tag.
 
 Stephan Rauh
 	For his idea and code to cache combined resources.
-	
+
+Marco Janc
+	For the inspiration for <o:url> tag.
+
+Gerald Turner
+	For his work and ideas on improving <o:validateBean>
+
+Ronald van Kuijk
+	For his work and inspiration for <o:form partialSubmit="true">
+
 And of course a general thank you to everyone who contributed by creating an issue, pointing out a defect, etc.
 
 If you think anyone else who is not in the list should be there, please create an issue for this at 

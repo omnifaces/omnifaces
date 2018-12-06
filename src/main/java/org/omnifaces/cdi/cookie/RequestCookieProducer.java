@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -15,6 +15,7 @@ package org.omnifaces.cdi.cookie;
 import static org.omnifaces.util.Beans.getQualifier;
 import static org.omnifaces.util.Faces.getRequestCookie;
 
+import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
@@ -23,12 +24,12 @@ import org.omnifaces.cdi.Cookie;
 
 /**
  * <p>
- * Producer for injecting a JSF request cookie as defined by the {@link Cookie} annotation.
+ * Producer for injecting a JSF request cookie as defined by the <code>&#64;</code>{@link Cookie} annotation.
  *
  * @since 2.1
  * @author Bauke Scholtz
- * @see RequestCookieProducer
  */
+@Dependent
 public class RequestCookieProducer {
 
 	@SuppressWarnings("unused") // Workaround for OpenWebBeans not properly passing it as produce() method argument.

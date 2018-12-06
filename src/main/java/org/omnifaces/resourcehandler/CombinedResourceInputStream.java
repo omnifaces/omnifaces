@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static java.util.logging.Level.FINEST;
 import static org.omnifaces.util.Faces.getRequestDomainURL;
 
 import java.io.ByteArrayInputStream;
@@ -22,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.faces.application.Resource;
 
@@ -37,6 +39,8 @@ import org.omnifaces.util.Utils;
 public final class CombinedResourceInputStream extends InputStream {
 
 	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final Logger logger = Logger.getLogger(CombinedResourceHandler.class.getName());
 
 	private static final byte[] CRLF = { '\r', '\n' };
 
@@ -65,6 +69,7 @@ public final class CombinedResourceInputStream extends InputStream {
 				stream = resource.getInputStream();
 			}
 			catch (Exception richFacesDoesNotSupportThis) {
+				logger.log(FINEST, "Ignoring thrown exception; this can only be caused by a buggy component library.", richFacesDoesNotSupportThis);
 				stream = new URL(domainURL + resource.getRequestPath()).openStream();
 			}
 
@@ -73,8 +78,10 @@ public final class CombinedResourceInputStream extends InputStream {
 		}
 
 		streamIterator = streams.iterator();
-		streamIterator.hasNext(); // We assume it to be always true, see also CombinedResource#getInputStream().
-		currentStream = streamIterator.next();
+
+		if (streamIterator.hasNext()) {
+			currentStream = streamIterator.next();
+		}
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -85,7 +92,7 @@ public final class CombinedResourceInputStream extends InputStream {
 	 */
 	@Override
 	public int read() throws IOException {
-		int read = -1;
+		int read;
 
 		while ((read = currentStream.read()) == -1) {
 			if (streamIterator.hasNext()) {

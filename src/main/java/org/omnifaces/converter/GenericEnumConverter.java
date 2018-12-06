@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,9 +12,11 @@
  */
 package org.omnifaces.converter;
 
+import static java.lang.String.format;
 import static org.omnifaces.util.Faces.getViewAttribute;
 import static org.omnifaces.util.Faces.setViewAttribute;
 import static org.omnifaces.util.Messages.createError;
+import static org.omnifaces.util.Utils.isOneOf;
 
 import javax.faces.component.UIComponent;
 import javax.faces.component.UISelectMany;
@@ -68,45 +70,56 @@ import javax.faces.convert.FacesConverter;
  * <p><strong>See also</strong>:
  * <br><a href="http://stackoverflow.com/q/3822058/157882">Use enum in &lt;h:selectManyCheckbox&gt;</a>
  *
+ * <h3>JSF 2.3</h3>
+ * <p>
+ * This converter is not necessary anymore since JSF 2.3 thanks to the fixes in
+ * <a href="https://github.com/javaee/javaserverfaces-spec/issues/1422">issue 1422</a>.
+ * <pre>
+ * &lt;h:selectManyCheckbox value="#{bean.selectedEnums}"&gt;
+ *     &lt;f:selectItems value="#{bean.availableEnums}" /&gt;
+ * &lt;/h:selectManyCheckbox&gt;
+ * </pre>
+ * <p>
+ * However, when you're having a valueless input component, then this converter may be still useful.
+ * <pre>
+ * &lt;h:selectManyCheckbox converter="omnifaces.GenericEnumConverter"&gt;
+ *     &lt;f:selectItems value="#{bean.availableEnums}" /&gt;
+ * &lt;/h:selectManyCheckbox&gt;
+ * </pre>
+ *
+ *
  * @author Bauke Scholtz
  * @since 1.2
  */
 @FacesConverter(value = "omnifaces.GenericEnumConverter")
-public class GenericEnumConverter implements Converter {
+@SuppressWarnings({ "rawtypes", "unchecked" })
+public class GenericEnumConverter implements Converter<Enum> {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final String ATTRIBUTE_ENUM_TYPE = "GenericEnumConverter.%s";
-	private static final String ERROR_NO_ENUM_TYPE = "Given type ''{0}'' is not an enum.";
 	private static final String ERROR_NO_ENUM_VALUE = "Given value ''{0}'' is not an enum of type ''{1}''.";
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public String getAsString(FacesContext context, UIComponent component, Object modelValue) {
+	public String getAsString(FacesContext context, UIComponent component, Enum modelValue) {
 		if (modelValue == null) {
 			return "-";
 		}
 
-		if (modelValue instanceof Enum) {
-			Class<Enum> enumType = ((Enum) modelValue).getDeclaringClass();
-			setViewAttribute(String.format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)), enumType);
-			return ((Enum) modelValue).name();
-		}
-		else {
-			throw new ConverterException(createError(ERROR_NO_ENUM_TYPE, modelValue.getClass()));
-		}
+		Class<Enum> enumType = modelValue.getDeclaringClass();
+		setViewAttribute(format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)), enumType);
+		return modelValue.name();
 	}
 
 	@Override
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public Object getAsObject(FacesContext context, UIComponent component, String submittedValue) {
-		if (submittedValue == null || submittedValue.isEmpty() || submittedValue.equals("-")) {
+	public Enum getAsObject(FacesContext context, UIComponent component, String submittedValue) {
+		if (isOneOf(submittedValue, null, "", "-")) {
 			return null;
 		}
 
-		Class<Enum> enumType = getViewAttribute(String.format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)));
+		Class<Enum> enumType = getViewAttribute(format(ATTRIBUTE_ENUM_TYPE, component.getClientId(context)));
 
 		try {
 			return Enum.valueOf(enumType, submittedValue);

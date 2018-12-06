@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,18 +12,19 @@
  */
 package org.omnifaces.component.script;
 
+import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
+import static org.omnifaces.util.Components.getAttribute;
+
 import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
-import javax.faces.event.AbortProcessingException;
+import javax.faces.context.FacesContext;
 import javax.faces.event.ComponentSystemEvent;
 import javax.faces.event.ListenerFor;
-import javax.faces.event.ListenersFor;
 import javax.faces.event.PostAddToViewEvent;
 import javax.faces.event.PostRestoreStateEvent;
 
 import org.omnifaces.renderer.DeferredScriptRenderer;
-import org.omnifaces.resourcehandler.ResourceIdentifier;
-import org.omnifaces.util.Hacks;
 
 /**
  * <p>
@@ -50,13 +51,12 @@ import org.omnifaces.util.Hacks;
  * @author Bauke Scholtz
  * @since 1.8
  * @see DeferredScriptRenderer
+ * @see ScriptFamily
  */
 @FacesComponent(DeferredScript.COMPONENT_TYPE)
-@ResourceDependency(library="omnifaces", name="omnifaces.js", target="head")
-@ListenersFor({
-	@ListenerFor(systemEventClass=PostAddToViewEvent.class),
-	@ListenerFor(systemEventClass=PostRestoreStateEvent.class)
-})
+@ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head")
+@ListenerFor(systemEventClass=PostAddToViewEvent.class)
+@ListenerFor(systemEventClass=PostRestoreStateEvent.class)
 public class DeferredScript extends ScriptFamily {
 
 	// Public constants -----------------------------------------------------------------------------------------------
@@ -77,13 +77,14 @@ public class DeferredScript extends ScriptFamily {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Move this component to body using {@link #moveToBody(ComponentSystemEvent, ScriptFamily)}. If successfully moved,
+	 * Move this component to body using {@link #moveToBody(ComponentSystemEvent)}. If successfully moved,
 	 * then set the script resource as rendered, so that JSF won't auto-include it.
 	 */
 	@Override
-	public void processEvent(ComponentSystemEvent event) throws AbortProcessingException {
-		if (moveToBody(event, this)) {
-			Hacks.setScriptResourceRendered(getFacesContext(), new ResourceIdentifier(this));
+	public void processEvent(ComponentSystemEvent event) {
+		if (moveToBody(event)) {
+			FacesContext context = event.getFacesContext();
+			context.getApplication().getResourceHandler().markResourceRendered(context, getAttribute(this, "name"), getAttribute(this, "library"));
 		}
 	}
 

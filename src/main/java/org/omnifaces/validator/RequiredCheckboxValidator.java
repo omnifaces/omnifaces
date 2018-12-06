@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  */
 package org.omnifaces.validator;
 
+import static java.lang.String.format;
 import static org.omnifaces.util.Components.getLabel;
 import static org.omnifaces.util.FacesLocal.getMessageBundle;
 import static org.omnifaces.util.Messages.createError;
@@ -59,7 +60,7 @@ import javax.faces.validator.ValidatorException;
  * @author Bauke Scholtz
  */
 @FacesValidator("omnifaces.RequiredCheckboxValidator")
-public class RequiredCheckboxValidator implements Validator {
+public class RequiredCheckboxValidator implements Validator<Boolean> {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
@@ -71,9 +72,9 @@ public class RequiredCheckboxValidator implements Validator {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	@Override
-	public void validate(FacesContext context, UIComponent component, Object value) throws ValidatorException {
+	public void validate(FacesContext context, UIComponent component, Boolean value) {
 		if (!(component instanceof UISelectBoolean)) {
-			throw new IllegalArgumentException(String.format(ERROR_WRONG_COMPONENT, component.getClass().getName()));
+			throw new IllegalArgumentException(format(ERROR_WRONG_COMPONENT, component.getClass().getName()));
 		}
 
 		if (!Boolean.TRUE.equals(value)) {

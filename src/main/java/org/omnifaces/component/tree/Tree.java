@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,7 +12,10 @@
  */
 package org.omnifaces.component.tree;
 
-import static org.omnifaces.util.Components.getClosestParent;
+import static java.lang.String.format;
+import static org.omnifaces.util.Components.validateHasChild;
+import static org.omnifaces.util.Components.validateHasNoParent;
+import static org.omnifaces.util.Components.validateHasOnlyChildren;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,7 +29,6 @@ import javax.faces.component.visit.VisitCallback;
 import javax.faces.component.visit.VisitContext;
 import javax.faces.component.visit.VisitResult;
 import javax.faces.context.FacesContext;
-import javax.faces.event.AbortProcessingException;
 import javax.faces.event.FacesEvent;
 import javax.faces.event.PhaseId;
 
@@ -51,9 +53,15 @@ import org.omnifaces.util.State;
  * attribute. The node itself is exposed as a request attribute under the key specified by the <code>varNode</code>
  * attribute.
  * <p>
- * Only children of type {@link TreeNode} are allowed and processed by this component.
+ * The <code>&lt;o:tree&gt;</code> tag supports only child tags of type <code>&lt;o:treeNode&gt;</code>, representing
+ * parent tree nodes. There can be multiple <code>&lt;o:treeNode&gt;</code> tags, each representing a separate parent
+ * tree node level, so that different markup could be declared for each tree node level, if necessary. The
+ * <code>&lt;o:treeNode&gt;</code> tag in turn supports child tag <code>&lt;o:treeNodeItem&gt;</code> which represents
+ * each child of the current parent tree node. The <code>&lt;o:treeNodeItem&gt;</code> in turn supports child tag
+ * <code>&lt;o:treeInsertChildren&gt;</code> which represents the insertion point of the grand children.
  * <p>
- * Here is a basic usage example:
+ * Here is a basic usage example where each parent tree node level is treated the same way via a single
+ * <code>&lt;o:treeNode&gt;</code>:
  * <pre>
  * &lt;o:tree value="#{bean.treeModel}" var="item" varNode="node"&gt;
  *     &lt;o:treeNode&gt;
@@ -71,30 +79,30 @@ import org.omnifaces.util.State;
  *
  * <h3>treeNode</h3>
  * <p>
- * The <code>&lt;o:treeNode&gt;</code> is an {@link UIComponent} that represents a single tree node within a parent
- * {@link Tree} component. Within this component, the <code>var</code> attribute of the parent {@link Tree}
- * component will expose the tree node. Each of its children is processed by {@link TreeNodeItem}.
+ * The <code>&lt;o:treeNode&gt;</code> represents the parent tree node. Within this component, the <code>var</code>
+ * attribute of the <code>&lt;o:tree&gt;</code> will expose the parent tree node. Each of its children is processed by
+ * <code>&lt;o:treeNodeItem&gt;</code> on which the <code>var</code> attribute of the <code>&lt;o:tree&gt;</code> in
+ * turn exposes each child of the parent tree node.
  * <p>
- * The <code>level</code> attribute can be used to specify for which tree node level as obtained by
- * {@link TreeModel#getLevel()} this component should render the children by {@link TreeNodeItem}. The root tree node
- * has level 0.
+ * The optional <code>level</code> attribute can be used to specify for which tree node level as obtained by
+ * {@link TreeModel#getLevel()} the <code>&lt;o:treeNode&gt;</code> should be rendered. The root tree node has level 0.
+ * If the <code>level</code> attribute is unspecified, then the <code>&lt;o:treeNode&gt;</code> will be rendered for any
+ * tree node level which hasn't already a <code>&lt;o:treeNode level="x"&gt;</code> specified.
  *
  * <h3>treeNodeItem</h3>
  * <p>
- * The <code>&lt;o:treeNodeItem&gt;</code> is an {@link UIComponent} that represents a single child tree node within a
- * parent {@link TreeNode} component. Within this component, the <code>var</code> attribute of the parent {@link Tree}
- * component will expose the child tree node.
+ * The <code>&lt;o:treeNodeItem&gt;</code> represents the child item of the parent tree note as represented by
+ * <code>&lt;o:treeNode&gt;</code>. Within this component, the <code>var</code> attribute of the parent
+ * <code>&lt;o:tree&gt;</code> component will expose the child tree node.
  * <p>
- * This component allows a child component of type {@link TreeInsertChildren} which indicates the place to insert
- * the children of the current child tree node recursively by a {@link TreeNode} component associated with the
- * children's level in the same parent {@link Tree} component.
+ * Within <code>&lt;o:treeNodeItem&gt;</code> you can use <code>&lt;o:treeInsertChildren&gt;</code> to declare the
+ * place where to recursively render the <code>&lt;o:treeNode&gt;</code> whereby the current child item is in turn
+ * interpreted as a parent tree node (i.e. where you'd like to insert the grand-children).
  *
  * <h3>treeInsertChildren</h3>
  * <p>
- * The <code>&lt;o:treeInsertChildren&gt;</code> is an {@link UIComponent} that represents the insertion point for the
- * children of a parent tree node which is represented by {@link TreeNodeItem}.
- * <p>
- * This component does not allow any children.
+ * The <code>&lt;o:treeInsertChildren&gt;</code> represents the insertion point for the grand children. This is in turn
+ * further interpreted as <code>&lt;o:treeNode&gt;</code>.
  *
  * @author Bauke Scholtz
  * @see TreeNode
@@ -121,12 +129,6 @@ public class Tree extends TreeFamily implements NamingContainer {
 		"A value expression is disallowed on 'var' and 'varNode' attributes of Tree.";
 	private static final String ERROR_INVALID_MODEL =
 		"Tree accepts only model of type TreeModel. Encountered model of type '%s'.";
-	private static final String ERROR_NESTING_DISALLOWED =
-		"Nesting Tree components is disallowed. Use TreeNode instead to markup specific levels.";
-	private static final String ERROR_NO_CHILDREN =
-		"Tree must have children of type TreeNode. Currently none are encountered.";
-	private static final String ERROR_INVALID_CHILD =
-		"Tree accepts only children of type TreeNode. Encountered child of type '%s'.";
 	private static final String ERROR_DUPLICATE_NODE =
 		"TreeNode with level '%s' is already declared. Choose a different level or remove it.";
 
@@ -138,7 +140,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	// Variables ------------------------------------------------------------------------------------------------------
 
 	private final State state = new State(getStateHelper());
-	private TreeModel model;
+	private TreeModel currentModel;
 	private Map<Integer, TreeNode> nodes;
 	private TreeModel currentModelNode;
 
@@ -188,18 +190,14 @@ public class Tree extends TreeFamily implements NamingContainer {
 
 	/**
 	 * Validate the component hierarchy.
-	 * @throws IllegalArgumentException When this component is nested in another {@link Tree}, or when there aren't any
+	 * @throws IllegalStateException When this component is nested in another {@link Tree}, or when there aren't any
 	 * children of type {@link TreeNode}.
 	 */
 	@Override
 	protected void validateHierarchy() {
-		if (getClosestParent(this, Tree.class) != null) {
-			throw new IllegalArgumentException(ERROR_NESTING_DISALLOWED);
-		}
-
-		if (getChildCount() == 0) {
-			throw new IllegalArgumentException(ERROR_NO_CHILDREN);
-		}
+		validateHasNoParent(this, Tree.class);
+		validateHasChild(this, TreeNode.class);
+		validateHasOnlyChildren(this, TreeNode.class);
 	}
 
 	/**
@@ -208,17 +206,14 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @param phaseId The current phase ID.
 	 */
 	@Override
-	protected void process(final FacesContext context, final PhaseId phaseId) {
+	protected void process(FacesContext context, PhaseId phaseId) {
 		if (!isRendered()) {
 			return;
 		}
 
-		process(context, getModel(phaseId), new Callback.Returning<Void>() {
-			@Override
-			public Void invoke() {
-				processTreeNode(context, phaseId);
-				return null;
-			}
+		process(context, getModel(phaseId), () -> {
+			processTreeNode(context, phaseId);
+			return null;
 		});
 	}
 
@@ -229,26 +224,29 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @return The visit result.
 	 */
 	@Override
-	public boolean visitTree(final VisitContext context, final VisitCallback callback) {
+	public boolean visitTree(VisitContext context, VisitCallback callback) {
+		TreeModel model = getModel(PhaseId.ANY_PHASE);
+
+		if (model.isLeaf()) {
+			return super.visitTree(context, callback);
+		}
+
 		if (!isVisitable(context)) {
 			return false;
 		}
 
-		return process(context.getFacesContext(), getModel(PhaseId.ANY_PHASE), new Callback.Returning<Boolean>() {
-			@Override
-			public Boolean invoke() {
-				VisitResult result = context.invokeVisitCallback(Tree.this, callback);
+		return process(context.getFacesContext(), model, () -> {
+			VisitResult result = context.invokeVisitCallback(Tree.this, callback);
 
-				if (result == VisitResult.COMPLETE) {
-					return true;
-				}
-
-				if (result == VisitResult.ACCEPT && !context.getSubtreeIdsToVisit(Tree.this).isEmpty()) {
-					return visitTreeNode(context, callback);
-				}
-
-				return false;
+			if (result == VisitResult.COMPLETE) {
+				return true;
 			}
+
+			if (result == VisitResult.ACCEPT && !context.getSubtreeIdsToVisit(Tree.this).isEmpty()) {
+				return visitTreeNode(context, callback);
+			}
+
+			return false;
 		});
 	}
 
@@ -258,18 +256,24 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * to the wrapped faces event.
 	 */
 	@Override
-	public void broadcast(FacesEvent event) throws AbortProcessingException {
+	public void broadcast(FacesEvent event) {
 		if (event instanceof TreeFacesEvent) {
 			FacesContext context = FacesContext.getCurrentInstance();
 			TreeFacesEvent treeEvent = (TreeFacesEvent) event;
-			final FacesEvent wrapped = treeEvent.getWrapped();
+			FacesEvent wrapped = treeEvent.getWrapped();
 
-			process(context, treeEvent.getNode(), new Callback.Returning<Void>() {
-				@Override
-				public Void invoke() {
-					wrapped.getComponent().broadcast(wrapped);
-					return null;
+			process(context, treeEvent.getNode(), () -> {
+				UIComponent source = wrapped.getComponent();
+				pushComponentToEL(context, getCompositeComponentParent(source));
+
+				try {
+					source.broadcast(wrapped);
 				}
+				finally {
+					popComponentFromEL(context);
+				}
+
+				return null;
 			});
 		}
 		else {
@@ -287,16 +291,13 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @see TreeModel#getLevel()
 	 * @see TreeInsertChildren
 	 */
-	protected void processTreeNode(final FacesContext context, final PhaseId phaseId) {
-		processTreeNode(phaseId, new Callback.ReturningWithArgument<Void, TreeNode>() {
-			@Override
-			public Void invoke(TreeNode treeNode) {
-				if (treeNode != null) {
-					treeNode.process(context, phaseId);
-				}
-
-				return null;
+	protected void processTreeNode(FacesContext context, PhaseId phaseId) {
+		processTreeNode(phaseId, treeNode -> {
+			if (treeNode != null) {
+				treeNode.process(context, phaseId);
 			}
+
+			return null;
 		});
 	}
 
@@ -311,16 +312,13 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @see TreeModel#getLevel()
 	 * @see TreeInsertChildren
 	 */
-	protected boolean visitTreeNode(final VisitContext context, final VisitCallback callback) {
-		return processTreeNode(PhaseId.ANY_PHASE, new Callback.ReturningWithArgument<Boolean, TreeNode>() {
-			@Override
-			public Boolean invoke(TreeNode treeNode) {
-				if (treeNode != null) {
-					return treeNode.visitTree(context, callback);
-				}
-
-				return false;
+	protected boolean visitTreeNode(VisitContext context, VisitCallback callback) {
+		return processTreeNode(PhaseId.ANY_PHASE, treeNode -> {
+			if (treeNode != null) {
+				return treeNode.visitTree(context, callback);
 			}
+
+			return false;
 		});
 	}
 
@@ -373,23 +371,17 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * Returns the tree nodes by finding direct {@link TreeNode} children and collecting them by their level attribute.
 	 * @param phaseId The current phase ID.
 	 * @return The tree nodes.
-	 * @throws IllegalArgumentException When a direct child component isn't of type {@link TreeNode}, or when there are
-	 * multiple {@link TreeNode} components with the same level.
+	 * @throws IllegalStateException When there are multiple {@link TreeNode} components with the same level.
 	 */
 	private Map<Integer, TreeNode> getNodes(PhaseId phaseId) {
 		if (phaseId == PhaseId.RENDER_RESPONSE || nodes == null) {
 			nodes = new HashMap<>(getChildCount());
 
 			for (UIComponent child : getChildren()) {
-				if (child instanceof TreeNode) {
-					TreeNode node = (TreeNode) child;
+				TreeNode node = (TreeNode) child;
 
-					if (nodes.put(node.getLevel(), node) != null) {
-						throw new IllegalArgumentException(String.format(ERROR_DUPLICATE_NODE, node.getLevel()));
-					}
-				}
-				else {
-					throw new IllegalArgumentException(String.format(ERROR_INVALID_CHILD, child.getClass().getName()));
+				if (nodes.put(node.getLevel(), node) != null) {
+					throw new IllegalStateException(format(ERROR_DUPLICATE_NODE, node.getLevel()));
 				}
 			}
 		}
@@ -404,21 +396,21 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @throws IllegalArgumentException When the <code>value</code> isn't of type {@link TreeModel}.
 	 */
 	private TreeModel getModel(PhaseId phaseId) {
-		if (phaseId == PhaseId.RENDER_RESPONSE || model == null) {
+		if (phaseId == PhaseId.RENDER_RESPONSE || currentModel == null) {
 			Object value = getValue();
 
 			if (value == null) {
-				model = new ListTreeModel();
+				currentModel = new ListTreeModel();
 			}
 			else if (value instanceof TreeModel) {
-				model = (TreeModel) value;
+				currentModel = (TreeModel) value;
 			}
 			else {
-				throw new IllegalArgumentException(String.format(ERROR_INVALID_MODEL, value.getClass().getName()));
+				throw new IllegalArgumentException(format(ERROR_INVALID_MODEL, value.getClass().getName()));
 			}
 		}
 
-		return model;
+		return currentModel;
 	}
 
 	/**
@@ -551,7 +543,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 */
 	private static class TreeFacesEvent extends FacesEventWrapper {
 
-		private static final long serialVersionUID = -7751061713837227515L;
+		private static final long serialVersionUID = 1L;
 
 		private TreeModel node;
 

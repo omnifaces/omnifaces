@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -13,6 +13,7 @@
 package org.omnifaces.el.functions;
 
 import static org.omnifaces.util.Faces.getLocale;
+import static org.omnifaces.util.Utils.isEmpty;
 
 import java.text.MessageFormat;
 import java.text.Normalizer;
@@ -100,6 +101,20 @@ public final class Strings {
 	}
 
 	/**
+	 * Parenthesize the given object. This will only wrap the given object in parenthesis when it's not empty or zero.
+	 * @param object The object to be parenthesized.
+	 * @return The parenthesized object.
+	 * @since 3.0
+	 */
+	public static String parenthesize(Object object) {
+		if (isEmpty(object) || "0".equals(object.toString())) {
+			return null;
+		}
+
+		return format("({0})", object);
+	}
+
+	/**
 	 * Replace all matches of the given pattern on the given string with the given replacement.
 	 * @param value The string to be replaced.
 	 * @param pattern The regular expression pattern to be tested.
@@ -173,9 +188,9 @@ public final class Strings {
 	}
 
 	/**
-	 * Format the given string with 1 parameter. The locale is obtained by {@link Faces#getLocale()}. Design notice:
-	 * There are five formatX() methods, each taking 1 to 5 format parameters because EL functions do not support
-	 * varargs methods nor overloaded function names.
+	 * Format the given string with 1 parameter using {@link MessageFormat} API. The locale is obtained by
+	 * {@link Faces#getLocale()}. Design notice: There are five formatX() methods, each taking 1 to 5 format parameters
+	 * because EL functions do not support varargs methods nor overloaded function names.
 	 * @param pattern The format pattern.
 	 * @param param1 The first parameter.
 	 * @return The formatted string.
@@ -186,9 +201,9 @@ public final class Strings {
 	}
 
 	/**
-	 * Format the given string with 2 parameters. The locale is obtained by {@link Faces#getLocale()}. Design notice:
-	 * There are five formatX() methods, each taking 1 to 5 format parameters because EL functions do not support
-	 * varargs methods nor overloaded function names.
+	 * Format the given string with 2 parameters using {@link MessageFormat} API. The locale is obtained by
+	 * {@link Faces#getLocale()}. Design notice: There are five formatX() methods, each taking 1 to 5 format parameters
+	 * because EL functions do not support varargs methods nor overloaded function names.
 	 * @param pattern The format pattern.
 	 * @param param1 The first parameter.
 	 * @param param2 The second parameter.
@@ -200,9 +215,9 @@ public final class Strings {
 	}
 
 	/**
-	 * Format the given string with 3 parameters. The locale is obtained by {@link Faces#getLocale()}. Design notice:
-	 * There are five formatX() methods, each taking 1 to 5 format parameters because EL functions do not support
-	 * varargs methods nor overloaded function names.
+	 * Format the given string with 3 parameters using {@link MessageFormat} API. The locale is obtained by
+	 * {@link Faces#getLocale()}. Design notice: There are five formatX() methods, each taking 1 to 5 format parameters
+	 * because EL functions do not support varargs methods nor overloaded function names.
 	 * @param pattern The format pattern.
 	 * @param param1 The first parameter.
 	 * @param param2 The second parameter.
@@ -215,9 +230,9 @@ public final class Strings {
 	}
 
 	/**
-	 * Format the given string with 4 parameters. The locale is obtained by {@link Faces#getLocale()}. Design notice:
-	 * There are five formatX() methods, each taking 1 to 5 format parameters because EL functions do not support
-	 * varargs methods nor overloaded function names.
+	 * Format the given string with 4 parameters using {@link MessageFormat} API. The locale is obtained by
+	 * {@link Faces#getLocale()}. Design notice: There are five formatX() methods, each taking 1 to 5 format parameters
+	 * because EL functions do not support varargs methods nor overloaded function names.
 	 * @param pattern The format pattern.
 	 * @param param1 The first parameter.
 	 * @param param2 The second parameter.
@@ -231,9 +246,9 @@ public final class Strings {
 	}
 
 	/**
-	 * Format the given string with 5 parameters. The locale is obtained by {@link Faces#getLocale()}. Design notice:
-	 * There are five formatX() methods, each taking 1 to 5 format parameters because EL functions do not support
-	 * varargs methods nor overloaded function names.
+	 * Format the given string with 5 parameters using {@link MessageFormat} API. The locale is obtained by
+	 * {@link Faces#getLocale()}. Design notice: There are five formatX() methods, each taking 1 to 5 format parameters
+	 * because EL functions do not support varargs methods nor overloaded function names.
 	 * @param pattern The format pattern.
 	 * @param param1 The first parameter.
 	 * @param param2 The second parameter.

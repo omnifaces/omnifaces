@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -35,7 +35,7 @@ public class GraphicResourceHandler extends DefaultResourceHandler {
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
-	 * Creates a new instance of this combined resource handler which wraps the given resource handler.
+	 * Creates a new instance of this graphic resource handler which wraps the given resource handler.
 	 * @param wrapped The resource handler to be wrapped.
 	 */
 	public GraphicResourceHandler(ResourceHandler wrapped) {

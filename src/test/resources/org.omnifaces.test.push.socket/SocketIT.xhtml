@@ -1,0 +1,92 @@
+<!--
+
+    Copyright 2018 OmniFaces
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+    the License. You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+    an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+    specific language governing permissions and limitations under the License.
+
+-->
+<!DOCTYPE html>
+<html lang="en"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:o="http://omnifaces.org/ui"
+	xmlns:of="http://omnifaces.org/functions"
+>
+	<h:head>
+		<script>
+			function clearMessages(data) {
+				if (data.status == "begin") {
+					document.getElementById("applicationScopedServerEventMessage").innerHTML = "";
+					document.getElementById("sessionScopedUserTargetedMessage").innerHTML = "";
+					document.getElementById("viewScopedAjaxAwareMessage").innerHTML = "";
+				}
+			}
+
+			function clientOpened(channel) {
+				document.getElementById("clientOpenedMessages").innerHTML += "|" + channel + "|";
+			}
+
+			function showServerEvent(message, channel) {
+				if (message.indexOf(":") != -1) {
+					document.getElementById("applicationScopedServerEventMessage").innerHTML += "|" + message + "|";
+				}
+				else {
+					showMessage(message, channel);
+				}
+			}
+
+			function showMessage(message, channel) {
+				document.getElementById(channel + "Message").innerHTML = message;
+			}
+
+			function closeAllSockets() {
+				OmniFaces.Push.close("applicationScopedServerEvent");
+				OmniFaces.Push.close("sessionScopedUserTargeted");
+				OmniFaces.Push.close("viewScopedAjaxAware");
+			}
+
+			function clientClosed(code, channel) {
+				document.getElementById("clientClosedMessages").innerHTML += "|" + channel + "|";
+			}
+		</script>
+	</h:head>
+
+	<h:body>
+		<h:messages id="messages" />	
+		<h:link id="newtab" target="_blank" />
+
+		<div id="clientOpenedMessages" />
+		<div id="applicationScopedServerEventMessage" />
+		<div id="sessionScopedUserTargetedMessage" />
+		<h:outputText id="viewScopedAjaxAwareMessage" value="#{socketITBean.ajaxAwareMessage}" />
+		<div id="clientClosedMessages" />
+
+		<o:form id="push">
+			<f:ajax onevent="clearMessages" render=":messages">
+				<h:commandButton id="applicationScopedServerEvent" action="#{socketITBean.pushApplicationScopedServerEvent}" />
+				<h:commandButton id="sessionScopedUserTargeted" action="#{socketITBean.pushSessionScopedUserTargeted('42')}" />
+				<h:commandButton id="viewScopedAjaxAware" action="#{socketITBean.pushViewScopedAjaxAware}" />
+			</f:ajax>
+		</o:form>
+
+		<h:link id="closeAllSockets" onclick="closeAllSockets();return false;" />
+
+		<o:socket channel="applicationScopedServerEvent" onopen="clientOpened" onmessage="showServerEvent" onclose="clientClosed" />
+		<o:socket channel="sessionScopedUserTargeted" user="42" onopen="clientOpened" onmessage="showMessage" onclose="clientClosed" />
+
+		<o:form>
+			<o:socket channel="viewScopedAjaxAware" scope="view" onopen="clientOpened" onclose="clientClosed">
+				<f:ajax event="someAjaxEventName" render=":viewScopedAjaxAwareMessage" />
+			</o:socket>
+		</o:form>
+	</h:body>
+</html>

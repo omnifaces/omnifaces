@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -55,23 +55,30 @@ public class InlineScriptRenderer extends InlineResourceRenderer {
 			writer.write(c);
 
 			if (c == '<') {
-				int ch, length = 0;
+				escapeEndScriptIfNecessary(reader, writer);
+			}
+		}
+	}
 
-				for (ch = reader.read(); ch != -1 && length < END_SCRIPT.length && Character.toLowerCase(ch) == END_SCRIPT[length]; ch = reader.read()) {
-					length++;
-				}
+	private void escapeEndScriptIfNecessary(Reader reader, ResponseWriter writer) throws IOException {
+		int length = 0;
 
-				if (length == END_SCRIPT.length) {
-					writer.write('\\'); // Escape closing script tags which may occur in JS literals.
-				}
-
+		for (int ch = reader.read(); ch != -1; ch = reader.read()) {
+			if (Character.toLowerCase(ch) != END_SCRIPT[length]) {
 				if (length > 0) {
 					writer.write(END_SCRIPT, 0, length);
 				}
 
-				if (ch != -1) {
-					writer.write(ch);
-				}
+				writer.write(ch);
+				return;
+			}
+
+			length++;
+
+			if (length == END_SCRIPT.length) {
+				writer.write('\\'); // Escape closing script tags which may occur in JS literals.
+				writer.write(END_SCRIPT);
+				return;
 			}
 		}
 	}

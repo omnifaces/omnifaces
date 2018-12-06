@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -35,7 +35,9 @@ public class ELResolverWrapper extends ELResolver implements FacesWrapper<ELReso
 
 	private ELResolver elResolver;
 
-	public ELResolverWrapper() {}
+	public ELResolverWrapper() {
+		//
+	}
 
 	public ELResolverWrapper(ELResolver elResolver) {
 		this.elResolver = elResolver;

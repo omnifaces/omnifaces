@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -15,6 +15,7 @@ package org.omnifaces.validator;
 import static javax.validation.Validation.byDefaultProvider;
 import static org.omnifaces.util.Components.getCurrentComponent;
 import static org.omnifaces.util.Components.getLabel;
+import static org.omnifaces.util.Faces.getLocale;
 import static org.omnifaces.util.Faces.hasContext;
 
 import java.util.Locale;
@@ -72,7 +73,7 @@ public class JsfLabelMessageInterpolator implements MessageInterpolator {
 
 	@Override
 	public String interpolate(String messageTemplate, Context context) {
-		return wrapped.interpolate(messageTemplate, context);
+		return interpolate(messageTemplate, context, hasContext() ? getLocale() : Locale.getDefault());
 	}
 
 	@Override

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -88,7 +88,7 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
  * @see SelectItemsCollector
  */
 @FacesConverter("omnifaces.SelectItemsConverter")
-public class SelectItemsConverter implements Converter {
+public class SelectItemsConverter implements Converter<Object> {
 
 	@Override
 	public Object getAsObject(FacesContext context, UIComponent component, String value) {

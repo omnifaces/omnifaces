@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  */
 package org.omnifaces.filter;
 
+import static java.lang.String.format;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.IOException;
@@ -27,6 +28,9 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.omnifaces.io.ResettableBuffer;
+import org.omnifaces.io.ResettableBufferedOutputStream;
+import org.omnifaces.io.ResettableBufferedWriter;
 import org.omnifaces.servlet.GzipHttpServletResponse;
 import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
 
@@ -111,6 +115,10 @@ import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
  * @since 1.1
  * @see GzipHttpServletResponse
  * @see HttpServletResponseOutputWrapper
+ * @see ResettableBuffer
+ * @see ResettableBufferedOutputStream
+ * @see ResettableBufferedWriter
+ * @see HttpFilter
  */
 public class GzipResponseFilter extends HttpFilter {
 
@@ -145,7 +153,7 @@ public class GzipResponseFilter extends HttpFilter {
 
 		if (thresholdParam != null) {
 			if (!thresholdParam.matches("[0-9]{1,4}")) {
-				throw new ServletException(String.format(ERROR_THRESHOLD, thresholdParam));
+				throw new ServletException(format(ERROR_THRESHOLD, thresholdParam));
 			}
 			else {
 				threshold = Integer.valueOf(thresholdParam);

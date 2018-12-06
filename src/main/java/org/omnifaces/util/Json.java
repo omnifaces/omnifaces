@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -11,6 +11,8 @@
  * specific language governing permissions and limitations under the License.
  */
 package org.omnifaces.util;
+
+import static java.lang.String.format;
 
 import java.beans.BeanInfo;
 import java.beans.IntrospectionException;
@@ -85,6 +87,9 @@ public final class Json {
 		else if (object instanceof Map<?, ?>) {
 			encodeMap((Map<?, ?>) object, builder);
 		}
+		else if (object instanceof Class<?>) {
+			encode(((Class<?>) object).getName(), builder);
+		}
 		else {
 			encodeBean(object, builder);
 		}
@@ -157,7 +162,7 @@ public final class Json {
 		}
 		catch (IntrospectionException e) {
 			throw new IllegalArgumentException(
-				String.format(ERROR_INVALID_BEAN, bean.getClass()), e);
+				format(ERROR_INVALID_BEAN, bean.getClass()), e);
 		}
 
 		builder.append('{');
@@ -175,20 +180,18 @@ public final class Json {
 			}
 			catch (Exception e) {
 				throw new IllegalArgumentException(
-					String.format(ERROR_INVALID_GETTER, property.getName(), bean.getClass()), e);
+					format(ERROR_INVALID_GETTER, property.getName(), bean.getClass()), e);
 			}
 
-			if (value == null) {
-				continue;
-			}
+			if (value != null) {
+				if (i++ > 0) {
+					builder.append(',');
+				}
 
-			if (i++ > 0) {
-				builder.append(',');
+				encode(property.getName(), builder);
+				builder.append(':');
+				encode(value, builder);
 			}
-
-			encode(property.getName(), builder);
-			builder.append(':');
-			encode(value, builder);
 		}
 
 		builder.append('}');

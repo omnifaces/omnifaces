@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
@@ -27,15 +28,18 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import javax.el.ELContext;
 import javax.el.ELResolver;
 import javax.el.ExpressionFactory;
 import javax.el.ValueExpression;
+import javax.faces.FacesException;
 import javax.faces.FactoryFinder;
 import javax.faces.application.Application;
 import javax.faces.application.ApplicationFactory;
 import javax.faces.application.NavigationHandler;
+import javax.faces.application.ProjectStage;
 import javax.faces.application.ViewHandler;
 import javax.faces.component.UIViewParameter;
 import javax.faces.component.UIViewRoot;
@@ -44,7 +48,13 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.FacesContextWrapper;
 import javax.faces.context.Flash;
 import javax.faces.context.PartialViewContext;
+import javax.faces.convert.Converter;
+import javax.faces.convert.ConverterException;
 import javax.faces.event.PhaseId;
+import javax.faces.lifecycle.Lifecycle;
+import javax.faces.lifecycle.LifecycleFactory;
+import javax.faces.render.RenderKit;
+import javax.faces.validator.Validator;
 import javax.faces.view.ViewDeclarationLanguage;
 import javax.faces.view.ViewMetadata;
 import javax.faces.view.facelets.FaceletContext;
@@ -53,8 +63,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
 import org.omnifaces.component.ParamHolder;
+import org.omnifaces.component.input.HashParam;
+import org.omnifaces.config.FacesConfigXml;
+import org.omnifaces.el.FacesELResolver;
+import org.omnifaces.facesviews.FacesViews;
 
 /**
  * <p>
@@ -104,15 +119,25 @@ import org.omnifaces.component.ParamHolder;
  * </pre>
  * <pre>
  * // Invalidate the session and send a redirect.
- * public void logout() throws IOException {
+ * public void logout() {
  *     Faces.invalidateSession();
  *     Faces.redirect("login.xhtml"); // Can by the way also be done by return "login?faces-redirect=true" if in action method.
  * }
  * </pre>
  * <pre>
  * // Provide a file as attachment.
- * public void download() throws IOException {
+ * public void download() {
  *     Faces.sendFile(new File("/path/to/file.ext"), true);
+ * }
+ * </pre>
+ * <pre>
+ * // Provide a file as attachment via output stream callback.
+ * public void download() {
+ *     Faces.sendFile("file.txt", true, output -&gt; {
+ *         try (PrintWriter writer = new PrintWriter(new OutputStreamWriter(output, StandardCharsets.UTF_8))) {
+ *             writer.println("Hello world");
+ *         }
+ *     });
  * }
  * </pre>
  *
@@ -127,10 +152,26 @@ import org.omnifaces.component.ParamHolder;
  * {@link FacesLocal} obtains the {@link FacesContext} from the current thread by
  * {@link FacesContext#getCurrentInstance()}. This job is up to the caller.
  *
+ * <h3>#{faces} in EL</h3>
+ * <p>
+ * Since OmniFaces 2.6,
+ * all methods of {@link Faces} utility class which start with "get" or "is", and take no parameters, and return
+ * either <code>String</code> or <code>boolean</code>, and are not related to response nor to session or flash (for
+ * which already implicit EL objects <code>#{session}</code> and <code>#{flash}</code> exist), will be available as
+ * properties of the implicit object <code>#{faces}</code>. Examples are:
+ * <pre>
+ * #{faces.development}
+ * #{faces.serverInfo}
+ * #{faces.ajaxRequest}
+ * #{faces.requestBaseURL}
+ * #{faces.requestURLWithQueryString}
+ * </pre>
+ *
  * @author Arjan Tijms
  * @author Bauke Scholtz
  * @see FacesLocal
  * @see Servlets
+ * @see FacesELResolver
  */
 public final class Faces {
 
@@ -237,6 +278,8 @@ public final class Faces {
 
 	/**
 	 * Returns the implementation information of currently loaded JSF implementation. E.g. "Mojarra 2.1.7-FCS".
+	 * <p>
+	 * This is also available in EL as <code>#{faces.implInfo}</code>.
 	 * @return The implementation information of currently loaded JSF implementation.
 	 * @see Package#getImplementationTitle()
 	 * @see Package#getImplementationVersion()
@@ -248,6 +291,8 @@ public final class Faces {
 
 	/**
 	 * Returns the server information of currently running application server implementation.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.serverInfo}</code>.
 	 * @return The server information of currently running application server implementation.
 	 * @see ServletContext#getServerInfo()
 	 */
@@ -256,8 +301,21 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the project stage. This will return the <code>javax.faces.PROJECT_STAGE</code> context parameter in
+	 * <code>web.xml</code>.
+	 * @return The project stage.
+	 * @see Application#getProjectStage()
+	 * @since 2.6
+	 */
+	public static ProjectStage getProjectStage() {
+		return FacesLocal.getProjectStage(getContext());
+	}
+
+	/**
 	 * Returns whether we're in development stage. This will be the case when the <code>javax.faces.PROJECT_STAGE</code>
 	 * context parameter in <code>web.xml</code> is set to <code>Development</code>.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.development}</code>.
 	 * @return <code>true</code> if we're in development stage, otherwise <code>false</code>.
 	 * @see Application#getProjectStage()
 	 */
@@ -266,9 +324,37 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns whether we're in system test stage. This will be the case when the <code>javax.faces.PROJECT_STAGE</code>
+	 * context parameter in <code>web.xml</code> is set to <code>SystemTest</code>.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.systemTest}</code>.
+	 * @return <code>true</code> if we're in system test stage, otherwise <code>false</code>.
+	 * @see Application#getProjectStage()
+	 * @since 2.6
+	 */
+	public static boolean isSystemTest() {
+		return FacesLocal.isSystemTest(getContext());
+	}
+
+	/**
+	 * Returns whether we're in production stage. This will be the case when the <code>javax.faces.PROJECT_STAGE</code>
+	 * context parameter in <code>web.xml</code> is set to <code>Production</code>.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.production}</code>.
+	 * @return <code>true</code> if we're in production stage, otherwise <code>false</code>.
+	 * @see Application#getProjectStage()
+	 * @since 2.6
+	 */
+	public static boolean isProduction() {
+		return FacesLocal.isProduction(getContext());
+	}
+
+	/**
 	 * Determines and returns the faces servlet mapping used in the current request. If JSF is prefix mapped (e.g.
 	 * <code>/faces/*</code>), then this returns the whole path, with a leading slash (e.g. <code>/faces</code>). If JSF
 	 * is suffix mapped (e.g. <code>*.xhtml</code>), then this returns the whole extension (e.g. <code>.xhtml</code>).
+	 * <p>
+	 * This is also available in EL as <code>#{faces.mapping}</code>.
 	 * @return The faces servlet mapping (without the wildcard).
 	 * @see #getRequestPathInfo()
 	 * @see #getRequestServletPath()
@@ -281,6 +367,8 @@ public final class Faces {
 	 * Returns whether the faces servlet mapping used in the current request is a prefix mapping.
 	 * @return <code>true</code> if the faces servlet mapping used in the current request is a prefix mapping, otherwise
 	 * <code>false</code>.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.prefixMapping}</code>.
 	 * @see #getMapping()
 	 * @see #isPrefixMapping(String)
 	 */
@@ -322,6 +410,8 @@ public final class Faces {
 
 	/**
 	 * Returns whether the validations phase of the current request has failed.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.validationFailed}</code>.
 	 * @return <code>true</code> if the validations phase of the current request has failed, otherwise
 	 * <code>false</code>.
 	 * @see FacesContext#isValidationFailed()
@@ -407,6 +497,20 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the Faces context attribute value associated with the given name, or computes the supplied value if absent.
+	 * @param <T> The expected return type.
+	 * @param name The Faces context attribute name.
+	 * @param computeIfAbsent The computed Faces context attribute value when absent. Useful if it represents a collection, map or bean.
+	 * @return The Faces context attribute value associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see ExternalContext#getRequestMap()
+	 * @since 3.1
+	 */
+	public static <T> T getContextAttribute(String name, Supplier<T> computeIfAbsent) {
+		return FacesLocal.getRequestAttribute(getContext(), name, computeIfAbsent);
+	}
+
+	/**
 	 * Sets the Faces context attribute value associated with the given name.
 	 * @param name The Faces context attribute name.
 	 * @param value The Faces context attribute value.
@@ -415,6 +519,104 @@ public final class Faces {
 	 */
 	public static void setContextAttribute(String name, Object value) {
 		FacesLocal.setContextAttribute(getContext(), name, value);
+	}
+
+	/**
+	 * Creates and returns a Faces converter associated with given object identifier. If the given identifier is an
+	 * instance of string, then delegate to {@link #createConverter(String)}. If the given identifier is an instance of
+	 * class, then delegate to {@link #createConverter(Class)}. If the given identifier is a concrete converter
+	 * instance, then return it directly.
+	 * If no converter instance can be associated, then return null.
+	 * @param <T> The expected converter type.
+	 * @param identifier The Faces converter object identifier. This can be a string representing the converter ID, or a
+	 * class representing the target type, or a class representing the converter class, or even the converter instance
+	 * itself.
+	 * @return A Faces converter associated with given object identifier.
+	 * @since 2.5
+	 */
+	public static <T> Converter<T> createConverter(Object identifier) {
+		return FacesLocal.createConverter(getContext(), identifier);
+	}
+
+	/**
+	 * Creates and returns a Faces converter associated with given string identifier. First use the identifier as
+	 * converter ID in {@link Application#createConverter(String)}. If that didn't return anything, then try to interpret
+	 * the string identifier as class name and delegate to {@link #createConverter(Class)}.
+	 * If no converter instance can be associated, then return null.
+	 * @param <T> The expected converter type.
+	 * @param identifier The Faces converter string identifier.
+	 * @return A Faces converter associated with given string identifier.
+	 * @since 2.5
+	 */
+	public static <T> Converter<T> createConverter(String identifier) {
+		return FacesLocal.createConverter(getContext(), identifier);
+	}
+
+	/**
+	 * Creates and returns a Faces converter associated with given class identifier. If the given identifier is not
+	 * assignable to Converter.class, then use that as target type in {@link Application#createConverter(Class)}. If
+	 * the given identifier is assignable to Converter.class, then instantiate it using default constructor.
+	 * If no converter instance can be associated, then return null.
+	 * @param <T> The expected converter type.
+	 * @param identifier The Faces converter class identifier.
+	 * @return A Faces converter associated with given class identifier.
+	 * @since 2.5
+	 */
+	public static <T> Converter<T> createConverter(Class<?> identifier) {
+		return FacesLocal.createConverter(getContext(), identifier);
+	}
+
+	/**
+	 * Creates and returns a Faces validator associated with given object identifier. If the given identifier is an
+	 * instance of string, then delegate to {@link #createValidator(String)}. If the given identifier is an instance of
+	 * class, then delegate to {@link #createValidator(Class)}. If the given identifier is a concrete validator
+	 * instance, then return it directly.
+	 * If no validator instance can be associated, then return null.
+	 * @param <T> The expected validator type.
+	 * @param identifier The Faces validator object identifier. This can be a string representing the validator ID, or a
+	 * class representing the validator class, or even the validator instance itself.
+	 * @return A Faces validator associated with given object identifier.
+	 * @since 2.5
+	 */
+	public static <T> Validator<T> createValidator(Object identifier) {
+		return FacesLocal.createValidator(getContext(), identifier);
+	}
+
+	/**
+	 * Creates and returns a Faces validator associated with given string identifier. First use the identifier as
+	 * validator ID in {@link Application#createValidator(String)}. If that didn't return anything, then try to
+	 * interpret the string identifier as class name and delegate to {@link #createValidator(Class)}.
+	 * If no validator instance can be associated, then return null.
+	 * @param <T> The expected validator type.
+	 * @param identifier The Faces validator string identifier.
+	 * @return A Faces validator associated with given string identifier.
+	 * @since 2.5
+	 */
+	public static <T> Validator<T> createValidator(String identifier) {
+		return FacesLocal.createValidator(getContext(), identifier);
+	}
+
+	/**
+	 * Creates and returns a Faces validator associated with given class identifier. If the given identifier is
+	 * assignable to Validator.class, then instantiate it using default constructor.
+	 * If no validator instance can be associated, then return null.
+	 * @param <T> The expected validator type.
+	 * @param identifier The Faces validator class identifier.
+	 * @return A Faces validator associated with given class identifier.
+	 * @since 2.5
+	 */
+	public static <T> Validator<T> createValidator(Class<?> identifier) {
+		return FacesLocal.createValidator(getContext(), identifier);
+	}
+
+	/**
+	 * Returns The {@link Lifecycle} associated with current Faces application.
+	 * @return The {@link Lifecycle} associated with current Faces application.
+	 * @see LifecycleFactory#getLifecycle(String)
+	 * @since 2.5
+	 */
+	public static Lifecycle getLifecycle() {
+		return FacesLocal.getLifecycle(getContext());
 	}
 
 	// JSF views ------------------------------------------------------------------------------------------------------
@@ -442,11 +644,40 @@ public final class Faces {
 
 	/**
 	 * Returns the ID of the current view root, or <code>null</code> if there is no view.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.viewId}</code>, although <code>#{view.viewId}</code> could be used.
 	 * @return The ID of the current view root, or <code>null</code> if there is no view.
 	 * @see UIViewRoot#getViewId()
 	 */
 	public static String getViewId() {
 		return FacesLocal.getViewId(getContext());
+	}
+
+	/**
+	 * Returns the ID of the current view root with view and hash parameters.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.viewIdWithParameters}</code>.
+	 * @return The ID of the current view root with view and hash parameters.
+	 * @see UIViewRoot#getViewId()
+	 * @see ViewMetadata#getViewParameters(UIViewRoot)
+	 * @see Faces#getHashParameters()
+	 * @since 2.5
+	 */
+	public static String getViewIdWithParameters() {
+		return FacesLocal.getViewIdWithParameters(getContext());
+	}
+
+	/**
+	 * Returns the base name of the current view, without extension, or <code>null</code> if there is no view.
+	 * E.g. if the view ID is <code>/path/to/some.xhtml</code>, then this will return <code>some</code>.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.viewName}</code>.
+	 * @return The base name of the current view, without extension, or <code>null</code> if there is no view.
+	 * @see UIViewRoot#getViewId()
+	 * @since 2.3
+	 */
+	public static String getViewName() {
+		return FacesLocal.getViewName(getContext());
 	}
 
 	/**
@@ -460,6 +691,22 @@ public final class Faces {
 	 */
 	public static ViewDeclarationLanguage getViewDeclarationLanguage() {
 		return FacesLocal.getViewDeclarationLanguage(getContext());
+	}
+
+	/**
+	 * Returns the {@link RenderKit} associated with the "current" view ID or view handler.
+	 * <p>
+	 * The current view ID is the view ID that's set for the view root that's associated with the current faces context.
+	 * Or if there is none, then the current view handler will be assumed, which is the view handler that's associated
+	 * with the requested view.
+	 *
+	 * @return The {@link RenderKit} associated with the "current" view ID or view handler.
+	 * @since 2.2
+	 * @see UIViewRoot#getRenderKitId()
+	 * @see ViewHandler#calculateRenderKitId(FacesContext)
+	 */
+	public static RenderKit getRenderKit() {
+		return FacesLocal.getRenderKit(getContext());
 	}
 
 	/**
@@ -495,6 +742,38 @@ public final class Faces {
 	 */
 	public static Map<String, List<String>> getViewParameterMap() {
 		return FacesLocal.getViewParameterMap(getContext());
+	}
+
+	/**
+	 * Returns the hash parameters of the current view, or an empty collection if there is no view.
+	 * @return The hash parameters of the current view, or an empty collection if there is no view.
+	 * @see HashParam
+	 * @since 3.2
+	 */
+	public static Collection<HashParam> getHashParameters() {
+		return FacesLocal.getHashParameters(getContext());
+	}
+
+	/**
+	 * Returns the hash parameters of the current view as a parameter map, or an empty map if there is no view.
+	 * @return The hash parameters of the current view as a parameter map, or an empty map if there is no view.
+	 * @see HashParam
+	 * @since 3.2
+	 */
+	public static Map<String, List<String>> getHashParameterMap() {
+		return FacesLocal.getHashParameterMap(getContext());
+	}
+
+	/**
+	 * Returns the hash query string of the current view, or <code>null</code> if there is none.
+	 * This is the part after the <code>#</code> in the request URL as the enduser sees in browser address bar.
+	 * This works only if the hash parameters are via <code>&lt;o:hashParam&gt;</code> registered in the view.
+	 * @return The hash query string of the current view, or <code>null</code> if there is none.
+	 * @see HashParam
+	 * @since 3.2
+	 */
+	public static String getHashQueryString() {
+		return FacesLocal.getHashQueryString(getContext());
 	}
 
 	/**
@@ -571,9 +850,10 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns a list of all supported locales on this application, with the default locale as the first item, if any.
-	 * This will return an empty list if there are no locales definied in <code>faces-config.xml</code>.
-	 * @return A list of all supported locales on this application, with the default locale as the first item, if any.
+	 * Returns an unordered list of all supported locales on this application, with the default locale as the first
+	 * item, if any. This will return an empty list if there are no locales definied in <code>faces-config.xml</code>.
+	 * @return An unordered list of all supported locales on this application, with the default locale as the first
+	 * item, if any. If you need an ordered list, use {@link FacesConfigXml#getSupportedLocales()} instead.
 	 * @see Application#getDefaultLocale()
 	 * @see Application#getSupportedLocales()
 	 */
@@ -712,7 +992,7 @@ public final class Faces {
 	 * @see ViewHandler#getBookmarkableURL(FacesContext, String, Map, boolean)
 	 * @since 1.7
 	 */
-	public static String getBookmarkableURL(Collection<? extends ParamHolder> params, boolean includeViewParams) {
+	public static String getBookmarkableURL(Collection<? extends ParamHolder<?>> params, boolean includeViewParams) {
 		return FacesLocal.getBookmarkableURL(getContext(), params, includeViewParams);
 	}
 
@@ -730,7 +1010,7 @@ public final class Faces {
 	 * @see ViewHandler#getBookmarkableURL(FacesContext, String, Map, boolean)
 	 * @since 1.7
 	 */
-	public static String getBookmarkableURL(String viewId, Collection<? extends ParamHolder> params, boolean includeViewParams) {
+	public static String getBookmarkableURL(String viewId, Collection<? extends ParamHolder<?>> params, boolean includeViewParams) {
 		return FacesLocal.getBookmarkableURL(getContext(), viewId, params, includeViewParams);
 	}
 
@@ -743,6 +1023,7 @@ public final class Faces {
 	 * submit a feature request to OmniFaces in order to add a new utility method which performs exactly this general
 	 * task.</i>
 	 * @return The Facelet context.
+	 * @throws IllegalStateException When the Facelet context is not available.
 	 * @see FaceletContext
 	 * @since 1.1
 	 */
@@ -757,6 +1038,7 @@ public final class Faces {
 	 * @param <T> The expected return type.
 	 * @param name The Facelet attribute name.
 	 * @return The Facelet attribute value associated with the given name.
+	 * @throws IllegalStateException When the Facelet context is not available.
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see FaceletContext#getAttribute(String)
 	 * @since 1.1
@@ -771,6 +1053,7 @@ public final class Faces {
 	 * file by e.g. an <code>&lt;ui:include&gt;</code>.
 	 * @param name The Facelet attribute name.
 	 * @param value The Facelet attribute value.
+	 * @throws IllegalStateException When the Facelet context is not available.
 	 * @see FaceletContext#setAttribute(String, Object)
 	 * @since 1.1
 	 */
@@ -795,6 +1078,8 @@ public final class Faces {
 
 	/**
 	 * Returns whether the current request is an ajax request.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.ajaxRequest}</code>.
 	 * @return <code>true</code> for an ajax request, <code>false</code> for a non-ajax (synchronous) request.
 	 * @see PartialViewContext#isAjaxRequest()
 	 */
@@ -803,12 +1088,32 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns whether the current request is a postback.
+	 * Returns whether the current request is an ajax request with partial rendering. That is, when it's an ajax request
+	 * without <code>render="@all"</code>.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.ajaxRequestWithPartialRendering}</code>.
+	 * @return <code>true</code> for an ajax request with partial rendering, <code>false</code> an ajax request with
+	 * <code>render="@all"</code> or a non-ajax (synchronous) request.
+	 * @see PartialViewContext#isAjaxRequest()
+	 * @see PartialViewContext#isRenderAll()
+	 * @since 2.3
+	 */
+	public static boolean isAjaxRequestWithPartialRendering() {
+		return FacesLocal.isAjaxRequestWithPartialRendering(getContext());
+	}
+
+	/**
+	 * Returns whether the current request is a postback. This not only delegates to {@link FacesContext#isPostback()}
+	 * which checks the presence of <code>javax.faces.ViewState</code> request parameter, but this also explicitly
+	 * checks the HTTP request method. So this should exclude GET requests having a <code>javax.faces.ViewState</code>
+	 * request parameter in query string.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.postback}</code>.
 	 * @return <code>true</code> for a postback, <code>false</code> for a non-postback (GET) request.
 	 * @see FacesContext#isPostback()
 	 */
 	public static boolean isPostback() {
-		return getContext().isPostback();
+		return FacesLocal.isPostback(getContext());
 	}
 
 	/**
@@ -831,6 +1136,23 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the HTTP request parameter value associated with the given name and implicitly convert it to given type
+	 * using the Faces converter registered by <code>forClass</code> on the given type.
+	 * @param <T> The expected return type.
+	 * @param name The HTTP request parameter name.
+	 * @param type The converter <code>forClass</code> type.
+	 * @return The HTTP request parameter value associated with the given name and implicitly convert it to given type.
+	 * @throws ConverterException When conversion fails.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see ExternalContext#getRequestParameterMap()
+	 * @see Faces#createConverter(Class)
+	 * @since 2.6
+	 */
+	public static <T> T getRequestParameter(String name, Class<T> type) {
+		return FacesLocal.getRequestParameter(getContext(), name, type);
+	}
+
+	/**
 	 * Returns the HTTP request parameter values map.
 	 * @return The HTTP request parameter values map.
 	 * @see ExternalContext#getRequestParameterValuesMap()
@@ -847,6 +1169,63 @@ public final class Faces {
 	 */
 	public static String[] getRequestParameterValues(String name) {
 		return FacesLocal.getRequestParameterValuesMap(getContext()).get(name);
+	}
+
+	/**
+	 * Returns the HTTP request parameter values associated with the given name and implicitly convert it to given type
+	 * using the Faces converter registered by <code>forClass</code> on the given type.
+	 * @param <T> The expected return type.
+	 * @param name The HTTP request parameter name.
+	 * @param type The converter <code>forClass</code> type.
+	 * @return The HTTP request parameter values associated with the given name and implicitly convert it to given type.
+	 * @throws ConverterException When conversion fails.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see ExternalContext#getRequestParameterValuesMap()
+	 * @see Faces#createConverter(Class)
+	 * @since 2.6
+	 */
+	public static <T> T[] getRequestParameterValues(String name, Class<T> type) {
+		return FacesLocal.getRequestParameterValues(getContext(), name, type);
+	}
+
+	/**
+	 * Returns all HTTP request parts, provided that request is of type <code>multipart/form-data</code>. If there are
+	 * no parts, an empty collection is returned.
+	 * @return all HTTP request parts.
+	 * @throws FacesException Whenever something fails at servlet or I/O level. The caller should preferably not catch
+	 * it, but just let it go. The servletcontainer will handle it.
+	 * @see HttpServletRequest#getParts()
+	 * @since 2.5
+	 */
+	public static Collection<Part> getRequestParts() {
+		return FacesLocal.getRequestParts(getContext());
+	}
+
+	/**
+	 * Returns the HTTP request part associated with the given name, else return null.
+	 * @param name The HTTP request part name.
+	 * @return The HTTP request part associated with the given name.
+	 * @throws FacesException Whenever something fails at servlet or I/O level. The caller should preferably not catch
+	 * it, but just let it go. The servletcontainer will handle it.
+	 * @see HttpServletRequest#getPart(String)
+	 * @since 2.5
+	 */
+	public static Part getRequestPart(String name) {
+		return FacesLocal.getRequestPart(getContext(), name);
+	}
+
+	/**
+	 * Returns all HTTP request parts associated with the given name, provided that request is of type
+	 * <code>multipart/form-data</code>. If there are no parts, an empty collection is returned.
+	 * @param name The HTTP request part name.
+	 * @return All HTTP request parts associated with the given name.
+	 * @throws FacesException Whenever something fails at servlet or I/O level. The caller should preferably not catch
+	 * it, but just let it go. The servletcontainer will handle it.
+	 * @see HttpServletRequest#getParts()
+	 * @since 2.5
+	 */
+	public static Collection<Part> getRequestParts(String name) {
+		return FacesLocal.getRequestParts(getContext(), name);
 	}
 
 	/**
@@ -890,6 +1269,8 @@ public final class Faces {
 	/**
 	 * Returns the HTTP request context path. It's the webapp context name, with a leading slash. If the webapp runs
 	 * on context root, then it returns an empty string.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.requestContextPath}</code>.
 	 * @return The HTTP request context path.
 	 * @see ExternalContext#getRequestContextPath()
 	 */
@@ -901,6 +1282,8 @@ public final class Faces {
 	 * Returns the HTTP request servlet path. If JSF is prefix mapped (e.g. <code>/faces/*</code>), then this returns
 	 * the whole prefix mapping (e.g. <code>/faces</code>). If JSF is suffix mapped (e.g. <code>*.xhtml</code>), then
 	 * this returns the whole part after the context path, with a leading slash.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.requestServletPath}</code>.
 	 * @return The HTTP request servlet path.
 	 * @see ExternalContext#getRequestServletPath()
 	 */
@@ -909,11 +1292,15 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the HTTP request path info. If JSF is prefix mapped (e.g. <code>/faces/*</code>), then this returns the
-	 * whole part after the prefix mapping, with a leading slash. If JSF is suffix mapped (e.g. <code>*.xhtml</code>),
-	 * then this returns <code>null</code>.
+	 * Returns the HTTP request path info, taking into account whether FacesViews is used with MultiViews enabled.
+	 * If the resource is prefix mapped (e.g. <code>/faces/*</code>), then this returns the whole part after the prefix
+	 * mapping, with a leading slash. If the resource is suffix mapped (e.g. <code>*.xhtml</code>), then this returns
+	 * <code>null</code>. If MultiViews is enabled, then this returns the part after the mapped view, if any.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.requestPathInfo}</code>.
 	 * @return The HTTP request path info.
 	 * @see ExternalContext#getRequestPathInfo()
+	 * @see FacesViews#FACES_VIEWS_ORIGINAL_PATH_INFO
 	 */
 	public static String getRequestPathInfo() {
 		return FacesLocal.getRequestPathInfo(getContext());
@@ -923,6 +1310,8 @@ public final class Faces {
 	 * Returns the HTTP request hostname. This is the entire domain, without any scheme and slashes. Noted should be
 	 * that this value is extracted from the request URL, not from {@link HttpServletRequest#getServerName()} as its
 	 * outcome can be influenced by proxies.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.requestHostName}</code>.
 	 * @return The HTTP request hostname.
 	 * @throws IllegalArgumentException When the URL is malformed. This is however unexpected as the request would
 	 * otherwise not have hit the server at all.
@@ -936,6 +1325,8 @@ public final class Faces {
 	/**
 	 * Returns the HTTP request base URL. This is the URL from the scheme, domain until with context path, including
 	 * the trailing slash. This is the value you could use in HTML <code>&lt;base&gt;</code> tag.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.requestBaseURL}</code>.
 	 * @return The HTTP request base URL.
 	 * @see HttpServletRequest#getRequestURL()
 	 * @see HttpServletRequest#getRequestURI()
@@ -947,6 +1338,8 @@ public final class Faces {
 
 	/**
 	 * Returns the HTTP request domain URL. This is the URL with the scheme and domain, without any trailing slash.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.requestDomainURL}</code>.
 	 * @return The HTTP request domain URL.
 	 * @see HttpServletRequest#getRequestURL()
 	 * @see HttpServletRequest#getRequestURI()
@@ -959,6 +1352,8 @@ public final class Faces {
 	/**
 	 * Returns the HTTP request URL. This is the full request URL as the enduser sees in browser address bar. This does
 	 * not include the request query string.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.requestURL}</code>.
 	 * @return The HTTP request URL.
 	 * @see HttpServletRequest#getRequestURL()
 	 * @since 1.1
@@ -970,6 +1365,8 @@ public final class Faces {
 	/**
 	 * Returns the HTTP request URI. This is the part after the domain in the request URL, including the leading slash.
 	 * This does not include the request query string.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.requestURI}</code>.
 	 * @return The HTTP request URI.
 	 * @see HttpServletRequest#getRequestURI()
 	 * @since 1.1
@@ -981,6 +1378,8 @@ public final class Faces {
 	/**
 	 * Returns the HTTP request query string. This is the part after the <code>?</code> in the request URL as the
 	 * enduser sees in browser address bar.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.requestQueryString}</code>.
 	 * @return The HTTP request query string.
 	 * @see HttpServletRequest#getQueryString()
 	 * @since 1.1
@@ -992,7 +1391,7 @@ public final class Faces {
 	/**
 	 * Returns the HTTP request query string as parameter values map. Note this method returns <strong>only</strong>
 	 * the request URL (GET) parameters, as opposed to {@link #getRequestParameterValuesMap()}, which contains both
-	 * the request URL (GET) parameters and and the request body (POST) parameters. This is ready for usage in among
+	 * the request URL (GET) parameters and the request body (POST) parameters. This is ready for usage in among
 	 * others {@link ViewHandler#getBookmarkableURL(FacesContext, String, Map, boolean)}.
 	 * @return The HTTP request query string as parameter values map.
 	 * @see HttpServletRequest#getQueryString()
@@ -1005,6 +1404,8 @@ public final class Faces {
 	/**
 	 * Returns the HTTP request URL with query string. This is the full request URL with query string as the enduser
 	 * sees in browser address bar.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.requestURLWithQueryString}</code>.
 	 * @return The HTTP request URL with query string.
 	 * @see HttpServletRequest#getRequestURL()
 	 * @see HttpServletRequest#getQueryString()
@@ -1017,6 +1418,8 @@ public final class Faces {
 	/**
 	 * Returns the HTTP request URI with query string. This is the part after the domain in the request URL, including
 	 * the leading slash and the request query string.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.requestURIWithQueryString}</code>.
 	 * @return The HTTP request URI with query string.
 	 * @see HttpServletRequest#getRequestURI()
 	 * @see HttpServletRequest#getQueryString()
@@ -1027,43 +1430,41 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the original HTTP request URI behind this forwarded request, if any.
-	 * This does not include the request query string.
-	 * @return The original HTTP request URI behind this forwarded request, if any.
-	 * @since 1.8
-	 */
-	public static String getForwardRequestURI() {
-		return FacesLocal.getForwardRequestURI(getContext());
-	}
-
-	/**
-	 * Returns the original HTTP request query string behind this forwarded request, if any.
-	 * @return The original HTTP request query string behind this forwarded request, if any.
-	 * @since 1.8
-	 */
-	public static String getForwardRequestQueryString() {
-		return FacesLocal.getForwardRequestQueryString(getContext());
-	}
-
-	/**
-	 * Returns the original HTTP request URI with query string behind this forwarded request, if any.
-	 * @return The original HTTP request URI with query string behind this forwarded request, if any.
-	 * @since 1.8
-	 */
-	public static String getForwardRequestURIWithQueryString() {
-		return FacesLocal.getForwardRequestURIWithQueryString(getContext());
-	}
-
-	/**
 	 * Returns the Internet Protocol (IP) address of the client that sent the request. This will first check the
 	 * <code>X-Forwarded-For</code> request header and if it's present, then return its first IP address, else just
 	 * return {@link HttpServletRequest#getRemoteAddr()} unmodified.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.remoteAddr}</code>.
 	 * @return The IP address of the client.
 	 * @see HttpServletRequest#getRemoteAddr()
 	 * @since 1.2
 	 */
 	public static String getRemoteAddr() {
 		return FacesLocal.getRemoteAddr(getContext());
+	}
+
+	/**
+	 * Returns the User-Agent string of the client.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.userAgent}</code>.
+	 * @return The User-Agent string of the client.
+	 * @see HttpServletRequest#getHeader(String)
+	 * @since 3.2
+	 */
+	public static String getUserAgent() {
+		return FacesLocal.getUserAgent(getContext());
+	}
+
+	/**
+	 * Returns <code>true</code> if connection is secure, <code>false</code> otherwise. This method will first check if
+	 * {@link HttpServletRequest#isSecure()} returns <code>true</code>, and if not <code>true</code>, check if the
+	 * <code>X-Forwarded-Proto</code> is present and equals to <code>https</code>.
+	 * @return <code>true</code> if connection is secure, <code>false</code> otherwise.
+	 * @see HttpServletRequest#isSecure()
+	 * @since 3.0
+	 */
+	public static boolean isRequestSecure() {
+		return FacesLocal.isRequestSecure(getContext());
 	}
 
 	// HTTP response --------------------------------------------------------------------------------------------------
@@ -1127,17 +1528,13 @@ public final class Faces {
 	 * <pre>
 	 * Faces.redirect("other.xhtml?foo=%s&amp;bar=%s", foo, bar);
 	 * </pre>
-	 * <p>
-	 * This method implicitly also calls {@link Flash#setRedirect(boolean)} with <code>true</code> so that any flash
-	 * scoped attributes will survive the redirect.
 	 * @param url The URL to redirect the current response to.
 	 * @param paramValues The request parameter values which you'd like to put URL-encoded in the given URL.
-	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
-	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @throws UncheckedIOException When HTTP response is not available anymore.
 	 * @throws NullPointerException When url is <code>null</code>.
 	 * @see ExternalContext#redirect(String)
 	 */
-	public static void redirect(String url, String... paramValues) throws IOException {
+	public static void redirect(String url, String... paramValues) {
 		FacesLocal.redirect(getContext(), url, paramValues);
 	}
 
@@ -1156,9 +1553,6 @@ public final class Faces {
 	 * Faces.redirectPermanent("other.xhtml?foo=%s&amp;bar=%s", foo, bar);
 	 * </pre>
 	 * <p>
-	 * This method implicitly also calls {@link Flash#setRedirect(boolean)} with <code>true</code> so that any flash
-	 * scoped attributes will survive the redirect.
-	 * <p>
 	 * This method does by design not work on ajax requests. It is not possible to return a "permanent redirect" via
 	 * JSF ajax XML response.
 	 * @param url The URL to redirect the current response to.
@@ -1172,6 +1566,31 @@ public final class Faces {
 	}
 
 	/**
+	 * Refresh the current page by a GET request. This basically sends a temporary (302) redirect to current request
+	 * URI, without query string.
+	 * @throws UncheckedIOException When HTTP response is not available anymore.
+	 * @see ExternalContext#redirect(String)
+	 * @see HttpServletRequest#getRequestURI()
+	 * @since 2.2
+	 */
+	public static void refresh() {
+		FacesLocal.refresh(getContext());
+	}
+
+	/**
+	 * Refresh the current page by a GET request, maintaining the query string. This basically sends a temporary (302)
+	 * redirect to current request URI, with the current query string.
+	 * @throws UncheckedIOException When HTTP response is not available anymore.
+	 * @see ExternalContext#redirect(String)
+	 * @see HttpServletRequest#getRequestURI()
+	 * @see HttpServletRequest#getQueryString()
+	 * @since 2.2
+	 */
+	public static void refreshWithQueryString() {
+		FacesLocal.refreshWithQueryString(getContext());
+	}
+
+	/**
 	 * Sends a HTTP response error with the given status and message. This will end up in either a custom
 	 * <code>&lt;error-page&gt;</code> whose <code>&lt;error-code&gt;</code> matches the given status, or in a servlet
 	 * container specific default error page if there is none. The message will be available in the error page as a
@@ -1180,11 +1599,10 @@ public final class Faces {
 	 * @param status The HTTP response status which is supposed to be in the range 4nn-5nn. You can use the constant
 	 * field values of {@link HttpServletResponse} for this.
 	 * @param message The message which is supposed to be available in the error page.
-	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
-	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @throws UncheckedIOException When HTTP response is not available anymore.
 	 * @see ExternalContext#responseSendError(int, String)
 	 */
-	public static void responseSendError(int status, String message) throws IOException {
+	public static void responseSendError(int status, String message) {
 		FacesLocal.responseSendError(getContext(), status, message);
 	}
 
@@ -1235,6 +1653,8 @@ public final class Faces {
 	 * Returns <code>true</code> if we're currently in the render response phase. This explicitly checks the current
 	 * phase ID instead of {@link FacesContext#getRenderResponse()} as the latter may unexpectedly return false during
 	 * a GET request when <code>&lt;f:viewParam&gt;</code> is been used.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.renderResponse}</code>.
 	 * @return <code>true</code> if we're currently in the render response phase.
 	 * @see FacesContext#getCurrentPhaseId()
 	 * @since 1.4
@@ -1284,12 +1704,11 @@ public final class Faces {
 	 * implementation.
 	 * @return <code>true</code> if the authentication was successful, otherwise <code>false</code>.
 	 * @throws ServletException When the authentication has failed. The caller is responsible for handling it.
-	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
-	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @throws UncheckedIOException When HTTP request or response is not available anymore.
 	 * @see HttpServletRequest#authenticate(HttpServletResponse)
 	 * @since 1.4
 	 */
-	public static boolean authenticate() throws ServletException, IOException {
+	public static boolean authenticate() throws ServletException {
 		return FacesLocal.authenticate(getContext());
 	}
 
@@ -1309,6 +1728,8 @@ public final class Faces {
 
 	/**
 	 * Returns the name of the logged-in user for container managed FORM based authentication, if any.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.remoteUser}</code>.
 	 * @return The name of the logged-in user for container managed FORM based authentication, if any.
 	 * @see ExternalContext#getRemoteUser()
 	 */
@@ -1341,10 +1762,11 @@ public final class Faces {
 	}
 
 	/**
-	 * Add a cookie with given name, value and maxage to the HTTP response. The cookie value will implicitly be
-	 * URL-encoded with UTF-8 so that any special characters can be stored in the cookie. The cookie will implicitly
-	 * be set to secure when the current request is secure (i.e. when the current request is a HTTPS request). The
-	 * cookie will implicitly be set in the domain and path of the current request URL.
+	 * Add a cookie with given name, value and maxage to the HTTP response.
+	 * The cookie value will implicitly be URL-encoded with UTF-8 so that any special characters can be stored.
+	 * The cookie will implicitly be set in the domain and path of the current request URL.
+	 * The cookie will implicitly be set to HttpOnly as JavaScript is not supposed to manipulate server-created cookies.
+	 * The cookie will implicitly be set to secure when the current request is a HTTPS request.
 	 * @param name The cookie name.
 	 * @param value The cookie value.
 	 * @param maxAge The maximum age of the cookie, in seconds. If this is <code>0</code>, then the cookie will be
@@ -1360,10 +1782,11 @@ public final class Faces {
 	}
 
 	/**
-	 * Add a cookie with given name, value, path and maxage to the HTTP response. The cookie value will implicitly be
-	 * URL-encoded with UTF-8 so that any special characters can be stored in the cookie. The cookie will implicitly
-	 * be set to secure when the current request is secure (i.e. when the current request is a HTTPS request). The
-	 * cookie will implicitly be set in the domain of the current request URL.
+	 * Add a cookie with given name, value, path and maxage to the HTTP response.
+	 * The cookie value will implicitly be URL-encoded with UTF-8 so that any special characters can be stored.
+	 * The cookie will implicitly be set in the domain of the current request URL.
+	 * The cookie will implicitly be set to HttpOnly as JavaScript is not supposed to manipulate server-created cookies.
+	 * The cookie will implicitly be set to secure when the current request is a HTTPS request.
 	 * @param name The cookie name.
 	 * @param value The cookie value.
 	 * @param path The cookie path. If this is <code>/</code>, then the cookie is available in all pages of the webapp.
@@ -1380,9 +1803,10 @@ public final class Faces {
 	}
 
 	/**
-	 * Add a cookie with given name, value, domain, path and maxage to the HTTP response. The cookie value will
-	 * implicitly be URL-encoded with UTF-8 so that any special characters can be stored in the cookie. The cookie will
-	 * implicitly be set to secure when the current request is secure (i.e. when the current request is a HTTPS request).
+	 * Add a cookie with given name, value, domain, path and maxage to the HTTP response.
+	 * The cookie value will implicitly be URL-encoded with UTF-8 so that any special characters can be stored.
+	 * The cookie will implicitly be set to HttpOnly as JavaScript is not supposed to manipulate server-created cookies.
+	 * The cookie will implicitly be set to secure when the current request is a HTTPS request.
 	 * @param name The cookie name.
 	 * @param value The cookie value.
 	 * @param domain The cookie domain. You can use <code>.example.com</code> (with a leading period) if you'd like the
@@ -1584,6 +2008,21 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the application initialization parameter. This returns the <code>&lt;param-value&gt;</code> of a
+	 * <code>&lt;context-param&gt;</code> in <code>web.xml</code> associated with the given
+	 * <code>&lt;param-name&gt;</code>.
+	 * @param name The application initialization parameter name.
+	 * @param defaultValue The default value if there is no application initialization parameter value associated with the given name.
+	 * @return The application initialization parameter value associated with the given name, or <code>defaultValue</code> if
+	 * there is none.
+	 * @see ExternalContext#getInitParameter(String)
+	 * @since 3.1
+	 */
+	public static String getInitParameterOrDefault(String name, String defaultValue) {
+		return FacesLocal.getInitParameterOrDefault(getContext(), name, defaultValue);
+	}
+
+	/**
 	 * Returns the mime type for the given file name. The mime type is determined based on file extension and
 	 * configureable by <code>&lt;mime-mapping&gt;</code> entries in <code>web.xml</code>. When the mime type is
 	 * unknown, then a default of <code>application/octet-stream</code> will be returned.
@@ -1674,6 +2113,20 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the request scope attribute value associated with the given name, or computes the supplied value if absent.
+	 * @param <T> The expected return type.
+	 * @param name The request scope attribute name.
+	 * @param computeIfAbsent The computed request scope attribute value when absent. Useful if it represents a collection, map or bean.
+	 * @return The request scope attribute value associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see ExternalContext#getRequestMap()
+	 * @since 3.0
+	 */
+	public static <T> T getRequestAttribute(String name, Supplier<T> computeIfAbsent) {
+		return FacesLocal.getRequestAttribute(getContext(), name, computeIfAbsent);
+	}
+
+	/**
 	 * Sets the request scope attribute value associated with the given name.
 	 * @param name The request scope attribute name.
 	 * @param value The request scope attribute value.
@@ -1719,6 +2172,20 @@ public final class Faces {
 	 */
 	public static <T> T getFlashAttribute(String name) {
 		return FacesLocal.getFlashAttribute(getContext(), name);
+	}
+
+	/**
+	 * Returns the flash scope attribute value associated with the given name, or computes the supplied value if absent.
+	 * @param <T> The expected return type.
+	 * @param name The flash scope attribute name.
+	 * @param computeIfAbsent The computed flash scope attribute value when absent. Useful if it represents a collection, map or bean.
+	 * @return The flash scope attribute value associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see ExternalContext#getFlash()
+	 * @since 3.0
+	 */
+	public static <T> T getFlashAttribute(String name, Supplier<T> computeIfAbsent) {
+		return FacesLocal.getFlashAttribute(getContext(), name, computeIfAbsent);
 	}
 
 	/**
@@ -1769,6 +2236,20 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the view scope attribute value associated with the given name, or computes the supplied value if absent.
+	 * @param <T> The expected return type.
+	 * @param name The view scope attribute name.
+	 * @param computeIfAbsent The computed view scope attribute value when absent. Useful if it represents a collection, map or bean.
+	 * @return The view scope attribute value associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see UIViewRoot#getViewMap()
+	 * @since 3.0
+	 */
+	public static <T> T getViewAttribute(String name, Supplier<T> computeIfAbsent) {
+		return FacesLocal.getViewAttribute(getContext(), name, computeIfAbsent);
+	}
+
+	/**
 	 * Sets the view scope attribute value associated with the given name.
 	 * @param name The view scope attribute name.
 	 * @param value The view scope attribute value.
@@ -1813,6 +2294,20 @@ public final class Faces {
 	 */
 	public static <T> T getSessionAttribute(String name) {
 		return FacesLocal.getSessionAttribute(getContext(), name);
+	}
+
+	/**
+	 * Returns the session scope attribute value associated with the given name, or computes the supplied value if absent.
+	 * @param <T> The expected return type.
+	 * @param name The session scope attribute name.
+	 * @param computeIfAbsent The computed session scope attribute value when absent. Useful if it represents a collection, map or bean.
+	 * @return The session scope attribute value associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see ExternalContext#getSessionMap()
+	 * @since 3.0
+	 */
+	public static <T> T getSessionAttribute(String name, Supplier<T> computeIfAbsent) {
+		return FacesLocal.getSessionAttribute(getContext(), name, computeIfAbsent);
 	}
 
 	/**
@@ -1863,6 +2358,20 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the application scope attribute value associated with the given name, or computes the supplied value if absent.
+	 * @param <T> The expected return type.
+	 * @param name The application scope attribute name.
+	 * @param computeIfAbsent The computed application scope attribute value when absent. Useful if it represents a collection, map or bean.
+	 * @return The application scope attribute value associated with the given name.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see ExternalContext#getApplicationMap()
+	 * @since 3.0
+	 */
+	public static <T> T getApplicationAttribute(String name, Supplier<T> computeIfAbsent) {
+		return FacesLocal.getApplicationAttribute(getContext(), name, computeIfAbsent);
+	}
+
+	/**
 	 * Sets the application scope attribute value associated with the given name.
 	 * @param name The application scope attribute name.
 	 * @param value The application scope attribute value.
@@ -1894,8 +2403,8 @@ public final class Faces {
 	 * after successful streaming.
 	 * @param file The file to be sent to the response.
 	 * @param attachment Whether the file should be provided as attachment, or just inline.
-	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
-	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @throws IOException When given file cannot be read.
+	 * @throws UncheckedIOException When HTTP response is not available anymore.
 	 */
 	public static void sendFile(File file, boolean attachment) throws IOException {
 		FacesLocal.sendFile(getContext(), file, attachment);
@@ -1908,10 +2417,9 @@ public final class Faces {
 	 * @param content The file content as byte array.
 	 * @param filename The file name which should appear in content disposition header.
 	 * @param attachment Whether the file should be provided as attachment, or just inline.
-	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
-	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @throws UncheckedIOException When HTTP response is not available anymore.
 	 */
-	public static void sendFile(byte[] content, String filename, boolean attachment) throws IOException {
+	public static void sendFile(byte[] content, String filename, boolean attachment) {
 		FacesLocal.sendFile(getContext(), content, filename, attachment);
 	}
 
@@ -1926,11 +2434,27 @@ public final class Faces {
 	 * @param content The file content as input stream.
 	 * @param filename The file name which should appear in content disposition header.
 	 * @param attachment Whether the file should be provided as attachment, or just inline.
-	 * @throws IOException Whenever something fails at I/O level. The caller should preferably not catch it, but just
-	 * redeclare it in the action method. The servletcontainer will handle it.
+	 * @throws UncheckedIOException When HTTP response is not available anymore.
 	 */
-	public static void sendFile(InputStream content, String filename, boolean attachment) throws IOException {
+	public static void sendFile(InputStream content, String filename, boolean attachment) {
 		FacesLocal.sendFile(getContext(), content, filename, attachment);
+	}
+
+	/**
+	 * Send a file to the response whose content is provided via given output stream callback. The content type will be
+	 * determined based on file name. The content length will not be set because that would require buffering the entire
+	 * file in memory or temp disk. The client may receive a download of an unknown length and thus the download
+	 * progress may be unknown to the client. If this is undesirable, write to a temp file instead and then use
+	 * {@link Faces#sendFile(File, boolean)}. The {@link FacesContext#responseComplete()} will implicitly be called
+	 * after successful streaming.
+	 * @param filename The file name which should appear in content disposition header.
+	 * @param attachment Whether the file should be provided as attachment, or just inline.
+	 * @param outputCallback The output stream callback to write the file content to.
+	 * @throws UncheckedIOException When HTTP response is not available anymore.
+	 * @since 2.3
+	 */
+	public static void sendFile(String filename, boolean attachment, Callback.Output outputCallback) {
+		FacesLocal.sendFile(getContext(), filename, attachment, outputCallback);
 	}
 
 }

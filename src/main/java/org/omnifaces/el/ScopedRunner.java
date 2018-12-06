@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -92,6 +92,18 @@ public class ScopedRunner {
 		} finally {
 			previousVariables.clear();
 		}
+	}
+
+	/**
+	 * Invokes the callback within the scope of the given variable.
+	 * @param context The involved faces context.
+	 * @param key the key name of the variable
+	 * @param value the value of the variable
+	 * @param callback The callback.
+	 * @since 3.0
+	 */
+	public static void forEach(FacesContext context, String key, Object value, Runnable callback) {
+		new ScopedRunner(context).with(key, value).invoke(callback::run);
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  */
 package org.omnifaces.cdi.beans;
 
+import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
 
@@ -22,11 +23,16 @@ import org.omnifaces.util.Beans;
  * {@link Beans#getCurrentInjectionPoint(javax.enterprise.context.spi.CreationalContext)}.
  * <p>
  * The actual injectionPoint being injected is not used.
- * 
+ *
  * @author Arjan Tijms
  * @since 2.0
  */
+@Dependent
 public class InjectionPointGenerator {
+
+	// TODO: this is a workaround originally for older OWB versions, but while OWB is fixed, newer Weld versions
+	// are now broken. It seems this needs to be fixed in CDI 2.0.
+	// See https://issues.jboss.org/browse/CDI-610
 
 	@Inject
 	private InjectionPoint injectionPoint;

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -23,34 +23,31 @@ import javax.servlet.http.HttpServletRequestWrapper;
  * prefix (path) or suffix (extension) mapping was used. If the request is neither
  * (in effect, an "exact and extensionless mapping), JSF will get confused and not
  * be able to derive view IDs etc correctly.
+ * <p>
+ * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
  *
  * @author Arjan Tijms
  * @since 1.4
+ * @see FacesViews
+ * @see FacesViewsForwardingFilter
  */
 public class UriExtensionRequestWrapper extends HttpServletRequestWrapper {
 
-	private final String extension;
+	private final String servletPath;
 
-	public UriExtensionRequestWrapper(HttpServletRequest request, String extension) {
+	public UriExtensionRequestWrapper(HttpServletRequest request, String servletPath) {
 		super(request);
-		this.extension = extension;
+		this.servletPath = servletPath;
 	}
 
 	@Override
 	public String getServletPath() {
-
-		String servletPath = super.getServletPath();
-		if (servletPath.endsWith(extension)) {
-			return servletPath;
-		}
-
-		return servletPath + extension;
+		return servletPath;
 	}
 
 	@Override
 	public String getPathInfo() {
-		// Since we simulate that the request mapped to an extension and not to a prefix path, there
-		// can be no path info.
+		// Since we simulate that the request is mapped to an extension and not to a prefix path, there can be no path info.
 		return null;
 	}
 

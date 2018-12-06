@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,12 +12,14 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static javax.faces.application.ResourceHandler.RESOURCE_IDENTIFIER;
 import static org.omnifaces.util.Faces.getMapping;
 import static org.omnifaces.util.Faces.getRequestContextPath;
 import static org.omnifaces.util.Faces.getRequestDomainURL;
 import static org.omnifaces.util.Faces.isPrefixMapping;
+import static org.omnifaces.util.ResourcePaths.concat;
 import static org.omnifaces.util.Utils.formatRFC1123;
 import static org.omnifaces.util.Utils.parseRFC1123;
 
@@ -69,7 +71,7 @@ public abstract class DynamicResource extends Resource {
 	@Override
 	public String getRequestPath() {
 		String mapping = getMapping();
-		String path = RESOURCE_IDENTIFIER + "/" + getResourceName();
+		String path = concat(RESOURCE_IDENTIFIER, getResourceName());
 		return getRequestContextPath()
 			+ (isPrefixMapping(mapping) ? (mapping + path) : (path + mapping))
 			+ "?ln=" + getLibraryName()
@@ -79,7 +81,7 @@ public abstract class DynamicResource extends Resource {
 	@Override
 	public URL getURL() {
 		try {
-			// Yes, this returns a HTTP URL, not a classpath URL. There's no other way anyway as dynamic resources are not present in classpath..
+			// Yes, this returns a HTTP URL, not a classpath URL. There's no other way anyway as dynamic resources are not present in classpath.
 			return new URL(getRequestDomainURL() + getRequestPath());
 		}
 		catch (MalformedURLException e) {
@@ -93,7 +95,7 @@ public abstract class DynamicResource extends Resource {
 		Map<String, String> responseHeaders = new HashMap<>(RESPONSE_HEADERS_SIZE);
 		responseHeaders.put("Last-Modified", formatRFC1123(new Date(getLastModified())));
 		responseHeaders.put("Expires", formatRFC1123(new Date(System.currentTimeMillis() + Hacks.getDefaultResourceMaxAge())));
-		responseHeaders.put("Etag", String.format("W/\"%d-%d\"", getResourceName().hashCode(), getLastModified()));
+		responseHeaders.put("Etag", format("W/\"%d-%d\"", getResourceName().hashCode(), getLastModified()));
 		responseHeaders.put("Pragma", ""); // Explicitly set empty pragma to prevent some containers from setting it.
 		return responseHeaders;
 	}

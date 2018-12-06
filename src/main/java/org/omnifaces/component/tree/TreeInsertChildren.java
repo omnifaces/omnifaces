@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -46,7 +46,7 @@ public class TreeInsertChildren extends TreeFamily {
 
 	/**
 	 * Validate the component hierarchy.
-	 * @throws IllegalArgumentException When there is no parent of type {@link TreeNodeItem}, or when there are any
+	 * @throws IllegalStateException When there is no parent of type {@link TreeNodeItem}, or when there are any
 	 * children.
 	 */
 	@Override

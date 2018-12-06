@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,13 +12,14 @@
  */
 package org.omnifaces.renderer;
 
-import static org.omnifaces.util.Components.findComponentsInChildren;
+import static org.omnifaces.util.Components.forEachComponent;
 import static org.omnifaces.util.Messages.createInfo;
 import static org.omnifaces.util.Renderers.writeAttribute;
 import static org.omnifaces.util.Renderers.writeAttributes;
 import static org.omnifaces.util.Renderers.writeText;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.isOneOf;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -42,8 +43,8 @@ import org.omnifaces.component.messages.OmniMessages;
 
 /**
  * This renderer is the default renderer of {@link OmniMessages}. It's basically copypasted from Mojarra 2.2,
- * including the fix of tooltip rendering as described in <a href="http://java.net/jira/browse/JAVASERVERFACES-2160">
- * issue 2160</a>, and afterwards slightly rewritten, refactored and enhanced to take the new features into account.
+ * including the fix of tooltip rendering as described in <a href="https://github.com/javaserverfaces/mojarra/issues/2164">
+ * issue 2164</a>, and afterwards slightly rewritten, refactored and enhanced to take the new features into account.
  *
  * @author Bauke Scholtz
  * @since 1.5
@@ -58,6 +59,7 @@ public class MessagesRenderer extends Renderer {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
+	private static final String LAYOUT_TABLE = "table";
 	private static final Map<Severity, String> SEVERITY_NAMES = createSeverityNames();
 
 	private static Map<Severity, String> createSeverityNames() {
@@ -101,7 +103,7 @@ public class MessagesRenderer extends Renderer {
 				messages = Arrays.asList(createInfo(message));
 			}
 
-			encodeMessages(context, omniMessages, messages, "table".equals(omniMessages.getLayout()));
+			encodeMessages(context, omniMessages, messages, LAYOUT_TABLE.equals(omniMessages.getLayout()));
 		}
 	}
 
@@ -131,9 +133,8 @@ public class MessagesRenderer extends Renderer {
 			messages.addAll(context.getMessageList(forComponent.getClientId(context)));
 
 			if (!(forComponent instanceof UIInput)) {
-				for (UIInput child : findComponentsInChildren(forComponent, UIInput.class)) {
-					messages.addAll(context.getMessageList(child.getClientId(context)));
-				}
+				forEachComponent(context).fromRoot(forComponent).ofTypes(UIInput.class)
+					.invoke(input -> messages.addAll(context.getMessageList(input.getClientId(context))));
 			}
 		}
 
@@ -190,7 +191,7 @@ public class MessagesRenderer extends Renderer {
 	protected void encodeEmptyMessages(FacesContext context, OmniMessages component) throws IOException {
 		String id = component.getId();
 
-		if (id != null && !id.equals("javax_faces_developmentstage_messages")) {
+		if (!isOneOf(id, null, "javax_faces_developmentstage_messages")) {
 			ResponseWriter writer = context.getResponseWriter();
 			writer.startElement("div", component);
 			writeAttribute(writer, "id", component.getClientId(context));
@@ -211,24 +212,19 @@ public class MessagesRenderer extends Renderer {
 			throws IOException
 	{
 		ResponseWriter writer = context.getResponseWriter();
-		writer.startElement(table ? "table" : "ul", component);
+		writer.startElement(table ? LAYOUT_TABLE : "ul", component);
 		writeAttribute(writer, "id", component.getClientId(context));
 		writeAttribute(writer, component, "styleClass", "class");
 		writeAttributes(writer, component, "style", "title", "lang", "dir");
 
-		boolean showSummary = component.isShowSummary();
-		boolean showDetail = component.isShowDetail();
-		boolean escape = component.isEscape();
-		boolean tooltip = component.isTooltip() && isEmpty(component.getTitle());
-
 		for (FacesMessage message : messages) {
 			if (!message.isRendered() || component.isRedisplay()) {
-				encodeMessage(context, component, message, table, showSummary, showDetail, escape, tooltip);
+				encodeMessage(context, component, message, table);
 				message.rendered();
 			}
 		}
 
-		writer.endElement(table ? "table" : "ul");
+		writer.endElement(table ? LAYOUT_TABLE : "ul");
 	}
 
 	/**
@@ -237,17 +233,9 @@ public class MessagesRenderer extends Renderer {
 	 * @param component The messages component.
 	 * @param message The queued faces message.
 	 * @param table Whether to render the messages as a HTML table or a HTML list.
-	 * @param showSummary Whether to show summary.
-	 * @param showDetail Whether to show detail.
-	 * @param escape Whether to HTML-escape message.
-	 * @param tooltip Whether to show tooltip.
 	 * @throws IOException When an I/O error occurs.
 	 */
-	protected void encodeMessage
-		(FacesContext context, OmniMessages component, FacesMessage message, boolean table,
-				boolean showSummary, boolean showDetail, boolean escape, boolean tooltip)
-			throws IOException
-	{
+	protected void encodeMessage(FacesContext context, OmniMessages component, FacesMessage message, boolean table) throws IOException {
 		ResponseWriter writer = context.getResponseWriter();
 		writer.startElement(table ? "tr" : "li", component);
 		String severityName = SEVERITY_NAMES.get(message.getSeverity());
@@ -261,20 +249,20 @@ public class MessagesRenderer extends Renderer {
 		String summary = coalesce(message.getSummary(), "");
 		String detail = coalesce(message.getDetail(), summary);
 
-		if (tooltip) {
+		if (component.isTooltip() && isEmpty(component.getTitle())) {
 			writeAttribute(writer, "title", detail);
 		}
 
-		if (showSummary) {
-			writeText(writer, component, summary, escape);
+		if (component.isShowSummary()) {
+			writeText(writer, component, summary, component.isEscape());
 
-			if (showDetail) {
+			if (component.isShowDetail()) {
 				writer.write(" ");
 			}
 		}
 
-		if (showDetail) {
-			writeText(writer, component, detail, escape);
+		if (component.isShowDetail()) {
+			writeText(writer, component, detail, component.isEscape());
 		}
 
 		if (table) {

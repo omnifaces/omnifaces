@@ -1,21 +1,18 @@
 /*
- * Copyright 2013 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  */
 package org.omnifaces.cdi.viewscope;
 
-import static org.omnifaces.util.BeansLocal.getReference;
+import static org.omnifaces.util.Beans.getReference;
 
 import java.lang.annotation.Annotation;
 
@@ -23,15 +20,14 @@ import javax.enterprise.context.ContextNotActiveException;
 import javax.enterprise.context.spi.Context;
 import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
 
 import org.omnifaces.cdi.ViewScoped;
 
 /**
- * Provide a context for the {@link ViewScoped} annotation wherein beans are managed by {@link ViewScopeManager}.
+ * Provide a context for the <code>&#64;</code>{@link ViewScoped} annotation wherein beans are managed by
+ * {@link ViewScopeManager}.
  *
  * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz
@@ -43,21 +39,7 @@ public class ViewScopeContext implements Context {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private BeanManager manager;
-	private Bean<ViewScopeManager> bean;
 	private ViewScopeManager viewScopeManager;
-
-	// Constructors ---------------------------------------------------------------------------------------------------
-
-	/**
-	 * Construct a new view scope context.
-	 * @param manager The bean manager.
-	 * @param bean The view scope manager bean.
-	 */
-	public ViewScopeContext(BeanManager manager, Bean<ViewScopeManager> bean) {
-		this.manager = manager;
-		this.bean = bean;
-	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -99,7 +81,7 @@ public class ViewScopeContext implements Context {
 	 */
 	private boolean isInitialized() {
 		if (viewScopeManager == null) {
-			viewScopeManager = getReference(manager, bean);
+			viewScopeManager = getReference(ViewScopeManager.class);
 		}
 
 		return viewScopeManager != null;
@@ -107,9 +89,9 @@ public class ViewScopeContext implements Context {
 
 	/**
 	 * Throws {@link ContextNotActiveException} when {@link #isActive()} returns <code>false</code>.
-	 * @throws ContextNotActiveException
+	 * @throws ContextNotActiveException When context is not active.
 	 */
-	private void checkActive() throws ContextNotActiveException {
+	private void checkActive() {
 		if (!isActive()) {
 			throw new ContextNotActiveException();
 		}

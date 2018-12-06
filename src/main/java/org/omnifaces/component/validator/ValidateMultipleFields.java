@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -14,21 +14,19 @@ package org.omnifaces.component.validator;
 
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static java.util.ResourceBundle.getBundle;
+import static java.lang.String.format;
 import static org.omnifaces.util.Components.getLabel;
 import static org.omnifaces.util.Components.getValue;
 import static org.omnifaces.util.Components.isEditable;
 import static org.omnifaces.util.Components.validateHasNoChildren;
 import static org.omnifaces.util.Components.validateHasParent;
-import static org.omnifaces.util.Faces.getLocale;
-import static org.omnifaces.util.Faces.getMessageBundle;
 import static org.omnifaces.util.Messages.addError;
+import static org.omnifaces.util.Messages.addGlobalError;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ResourceBundle;
 
 import javax.faces.component.FacesComponent;
 import javax.faces.component.UIComponent;
@@ -37,8 +35,7 @@ import javax.faces.component.UIInput;
 import javax.faces.component.UISelectBoolean;
 import javax.faces.context.FacesContext;
 
-import org.omnifaces.el.ScopedRunner;
-import org.omnifaces.util.Callback;
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.util.State;
 import org.omnifaces.validator.MultiFieldValidator;
 
@@ -66,6 +63,10 @@ import org.omnifaces.validator.MultiFieldValidator;
  * &lt;h:inputText id="bar" /&gt;
  * &lt;h:inputText id="baz" /&gt;
  * </pre>
+ * <p>
+ * When a target component is <code>disabled="true"</code>, <code>readonly="true"</code> or <code>rendered="false"</code>,
+ * then the <code>values</code> argument of {@link #validateValues(FacesContext, List, List)}, will instead contain the
+ * initial model value. This is quite useful when you need to validate against an existing model.
  * <p>
  * By default, in an invalidating case, all of the referenced components will be marked invalid and a faces message will
  * be added on the client ID of this validator component. The default message can be changed by the <code>message</code>
@@ -107,6 +108,11 @@ import org.omnifaces.validator.MultiFieldValidator;
  * &lt;o:validateMultipleFields components="foo bar baz" message="This is wrong!" showMessageFor="@invalid" /&gt;
  * </pre>
  * <p>
+ * The faces message can also be shown as global message using <code>showMessageFor="@global"</code>.
+ * <pre>
+ * &lt;o:validateMultipleFields components="foo bar baz" message="This is wrong!" showMessageFor="@global" /&gt;
+ * </pre>
+ * <p>
  * The faces message can also be shown for specific components referenced by a space separated collection of their
  * client IDs in <code>showMessageFor</code> attribute.
  * <pre>
@@ -137,7 +143,6 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
-	private static final String DEFAULT_MESSAGE_BUNDLE = "org.omnifaces.component.validator.messages";
 	private static final String DEFAULT_SHOWMESSAGEFOR = "@this";
 	private static final Boolean DEFAULT_INVALIDATEALL = TRUE;
 	private static final Boolean DEFAULT_DISABLED = FALSE;
@@ -169,14 +174,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 	 * The default constructor sets the default message and sets the renderer type to <code>null</code>.
 	 */
 	public ValidateMultipleFields() {
-		String componentType = getClass().getAnnotation(FacesComponent.class).value();
-		ResourceBundle messageBundle = getMessageBundle();
-
-		if (messageBundle == null || !messageBundle.containsKey(componentType)) {
-			messageBundle = getBundle(DEFAULT_MESSAGE_BUNDLE, getLocale());
-		}
-
-		defaultMessage = messageBundle.getString(componentType);
+		defaultMessage = OmniFaces.getMessage(getClass().getAnnotation(FacesComponent.class).value());
 		setRendererType(null);
 	}
 
@@ -184,10 +182,10 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 
 	/**
 	 * Validate our component hierarchy.
-	 * @throws IllegalArgumentException When there is no parent of type {@link UIForm}, or when there are any children.
+	 * @throws IllegalStateException When there is no parent of type {@link UIForm}, or when there are any children.
 	 */
 	@Override
-	protected void validateHierarchy() throws IllegalArgumentException {
+	protected void validateHierarchy() {
 		validateHasParent(this, UIForm.class);
 		validateHasNoChildren(this);
 	}
@@ -223,6 +221,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 			validationFailed = true;
 			context.validationFailed();
 			showMessage(context, inputs);
+			context.renderResponse();
 		}
 	}
 
@@ -238,7 +237,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 		String components = getComponents();
 
 		if (components.isEmpty()) {
-			throw new IllegalArgumentException(String.format(
+			throw new IllegalArgumentException(format(
 				ERROR_MISSING_COMPONENTS, getClass().getSimpleName()));
 		}
 
@@ -247,10 +246,6 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 
 		for (String clientId : components.split("\\s+")) {
 			UIInput input = findInputComponent(namingContainerParent, clientId, PropertyKeys.components);
-
-			if (!isEditable(input)) {
-				continue;
-			}
 
 			if (!input.isValid()) {
 				return Collections.emptyList();
@@ -271,7 +266,7 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 		List<Object> values = new ArrayList<>(inputs.size());
 
 		for (UIInput input : inputs) {
-			Object value = getValue(input);
+			Object value = isEditable(input) ? getValue(input) : input.getValue();
 
 			if (input instanceof UISelectBoolean && Boolean.FALSE.equals(value)) {
 				value = null;
@@ -309,40 +304,52 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 	 * @param inputs The validated input components.
 	 */
 	protected void showMessage(FacesContext context, List<UIInput> inputs) {
-		final StringBuilder labels = new StringBuilder();
+		StringBuilder labels = new StringBuilder();
 
 		for (Iterator<UIInput> iterator = inputs.iterator(); iterator.hasNext();) {
-			final UIInput input = iterator.next();
-
-			new ScopedRunner(context).with("cc", UIComponent.getCompositeComponentParent(input)).invoke(new Callback.Void() { // TODO: check if this can't better be placed in Components#getLabel().
-				@Override
-				public void invoke() {
-					labels.append(getLabel(input));
-				}
-			});
+			labels.append(getLabel(iterator.next()));
 
 			if (iterator.hasNext()) {
 				labels.append(", ");
 			}
 		}
 
-		String message = getMessage();
-		String showMessageFor = getShowMessageFor();
+		addErrorMessage(context, inputs, labels, getMessage(), getShowMessageFor());
+	}
 
-		if (showMessageFor.equals("@this")) {
+	private UIInput findInputComponent(UIComponent parent, String clientId, PropertyKeys property) {
+		UIComponent found = parent.findComponent(clientId);
+
+		if (found == null) {
+			throw new IllegalArgumentException(format(
+				ERROR_UNKNOWN_COMPONENT, getClass().getSimpleName(), property, clientId));
+		}
+		else if (!(found instanceof UIInput)) {
+			throw new IllegalArgumentException(format(
+				ERROR_INVALID_COMPONENT, getClass().getSimpleName(), property, clientId, found.getClass().getName()));
+		}
+
+		return (UIInput) found;
+	}
+
+	private void addErrorMessage(FacesContext context, List<UIInput> inputs, StringBuilder labels, String message, String showMessageFor) {
+		if ("@this".equals(showMessageFor)) {
 			addError(getClientId(context), message, labels);
 		}
-		else if (showMessageFor.equals("@all")) {
+		else if ("@all".equals(showMessageFor)) {
 			for (UIInput input : inputs) {
 				addError(input.getClientId(context), message, labels);
 			}
 		}
-		else if (showMessageFor.equals("@invalid")) {
+		else if ("@invalid".equals(showMessageFor)) {
 			for (UIInput input : inputs) {
 				if (!input.isValid()) {
 					addError(input.getClientId(context), message, labels);
 				}
 			}
+		}
+		else if ("@global".equals(showMessageFor)) {
+			addGlobalError(message, labels);
 		}
 		else {
 			UIComponent namingContainerParent = getNamingContainer();
@@ -352,21 +359,6 @@ public abstract class ValidateMultipleFields extends ValidatorFamily implements 
 				addError(input.getClientId(context), message, labels);
 			}
 		}
-	}
-
-	private UIInput findInputComponent(UIComponent parent, String clientId, PropertyKeys property) {
-		UIComponent found = parent.findComponent(clientId);
-
-		if (found == null) {
-			throw new IllegalArgumentException(String.format(
-				ERROR_UNKNOWN_COMPONENT, getClass().getSimpleName(), property, clientId));
-		}
-		else if (!(found instanceof UIInput)) {
-			throw new IllegalArgumentException(String.format(
-				ERROR_INVALID_COMPONENT, getClass().getSimpleName(), property, clientId, found.getClass().getName()));
-		}
-
-		return (UIInput) found;
 	}
 
 	// Attribute getters/setters --------------------------------------------------------------------------------------

@@ -1,24 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-   Copyright 2012 OmniFaces.
 
-   Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
-   the License. You may obtain a copy of the License at
+    Copyright 2018 OmniFaces
 
-	   http://www.apache.org/licenses/LICENSE-2.0
+    Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+    the License. You may obtain a copy of the License at
 
-   Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
-   an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
-   specific language governing permissions and limitations under the License.
- -->
-<facelet-taglib id="of"
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+    an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+    specific language governing permissions and limitations under the License.
+
+-->
+<facelet-taglib
 	xmlns="http://xmlns.jcp.org/xml/ns/javaee"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facelettaglibrary_2_2.xsd"
-	version="2.2"
+	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facelettaglibrary_2_3.xsd"
+	version="2.3"
 >
 	<description>OmniFaces EL functions.</description>
 	<namespace>http://omnifaces.org/functions</namespace>
+	<short-name>of</short-name>
 
 	<!-- Strings ================================================================================================== -->
 
@@ -55,6 +58,17 @@
 		<function-name>capitalize</function-name>
 		<function-class>org.omnifaces.el.functions.Strings</function-class>
 		<function-signature>java.lang.String capitalize(java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Parenthesize the given object. This will only wrap the given object in parenthesis when it's not empty or zero.
+			]]>
+		</description>
+		<function-name>parenthesize</function-name>
+		<function-class>org.omnifaces.el.functions.Strings</function-class>
+		<function-signature>java.lang.String parenthesize(java.lang.Object)</function-signature>
 	</function>
 
 	<function>
@@ -125,7 +139,7 @@
 	<function>
 		<description>
 			<![CDATA[
-				Format the given string with 1 parameter.
+				Format the given string with 1 parameter using <code>javax.text.MessageFormat</code> API.
 				Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
 				functions does not support varargs methods nor overloaded function names.
 			]]>
@@ -138,7 +152,7 @@
 	<function>
 		<description>
 			<![CDATA[
-				Format the given string with 2 parameters.
+				Format the given string with 2 parameters using <code>javax.text.MessageFormat</code> API.
 				Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
 				functions does not support varargs methods nor overloaded function names.
 			]]>
@@ -151,7 +165,7 @@
 	<function>
 		<description>
 			<![CDATA[
-				Format the given string with 3 parameters.
+				Format the given string with 3 parameters using <code>javax.text.MessageFormat</code> API.
 				Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
 				functions does not support varargs methods nor overloaded function names.
 			]]>
@@ -164,7 +178,7 @@
 	<function>
 		<description>
 			<![CDATA[
-				Format the given string with 4 parameters.
+				Format the given string with 4 parameters using <code>javax.text.MessageFormat</code> API.
 				Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
 				functions does not support varargs methods nor overloaded function names.
 			]]>
@@ -177,7 +191,7 @@
 	<function>
 		<description>
 			<![CDATA[
-				Format the given string with 5 parameters.
+				Format the given string with 5 parameters using <code>javax.text.MessageFormat</code> API.
 				Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
 				functions does not support varargs methods nor overloaded function names.
 			]]>
@@ -205,7 +219,7 @@
 	<function>
 		<description>
 			<![CDATA[
-				Creates and an integer array which starts at the given integer and ends at the given integer, inclusive. This is
+				Creates and returns an integer array which starts at the given integer and ends at the given integer, inclusive. This is
 				useful if you want to for example populate a <code>&lt;f:selectItems&gt;</code> which shows an integer range to
 				represent days and years.
 			]]>
@@ -227,6 +241,17 @@
 		<function-name>contains</function-name>
 		<function-class>org.omnifaces.el.functions.Arrays</function-class>
 		<function-signature>boolean contains(java.lang.Object[], java.lang.Object)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns a copy of the array with items in reversed order.
+			]]>
+		</description>
+		<function-name>reverseArray</function-name>
+		<function-class>org.omnifaces.el.functions.Arrays</function-class>
+		<function-signature>java.lang.Object[] reverseArray(java.lang.Object[])</function-signature>
 	</function>
 
 	<!-- Converters =============================================================================================== -->
@@ -698,15 +723,29 @@
 	<function>
 		<description>
 			<![CDATA[
-				Format the given number in the locale-default pattern. This is useful when you want to format numbers in for 
+				Format the given number in the default pattern of the default locale. This is useful when you want to format numbers in for 
 				example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select
-				item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The format locale will be set to
+				item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The default locale is
 				the one as obtained by <code>Faces#getLocale()</code>.
 			]]>
 		</description>
 		<function-name>formatNumberDefault</function-name>
 		<function-class>org.omnifaces.el.functions.Numbers</function-class>
 		<function-signature>java.lang.String formatNumberDefault(java.lang.Number)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Format the given number in the default pattern of the given locale. This is useful when you want to format numbers in for 
+				example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code> attribute of select
+				item, or wherever you can't use the <code>&lt;f:convertNumber&gt;</code> tag. The given
+				locale can be a {@link Locale} object or a string representation.
+			]]>
+		</description>
+		<function-name>formatNumberDefaultForLocale</function-name>
+		<function-class>org.omnifaces.el.functions.Numbers</function-class>
+		<function-signature>java.lang.String formatNumberDefaultForLocale(java.lang.Number, java.lang.Object)</function-signature>
 	</function>
 
 	<function>
@@ -723,6 +762,68 @@
 		<function-signature>java.lang.String formatPercent(java.lang.Number)</function-signature>
 	</function>
 
+	<function>
+		<description>
+			<![CDATA[
+				Format the given number to nearest 10<sup>n</sup> (rounded to thousands), immediately suffixed (without space)
+				with metric unit (k, M, G, T, P or E), rounding half up with a precision of 3 digits, whereafter
+				trailing zeroes in fraction part are stripped. Numbers lower than thousand are not affected.
+				For example (with English locale):
+				<ul>
+					<li>999.999 will appear as 999.999
+					<li>1000 will appear as 1k
+					<li>1004 will appear as 1k
+					<li>1005 will appear as 1.01k
+					<li>1594 will appear as 1.59k
+					<li>1595 will appear as 1.6k
+					<li>9000 will appear as 9k
+					<li>9900 will appear as 9.9k
+					<li>9994 will appear as 9.99k
+					<li>9995 will appear as 10k
+					<li>99990 will appear as 100k
+					<li>9994999 will appear as 9.99M
+					<li>9995000 will appear as 10M
+				</ul>
+				The format locale will be set to the one as obtained by <code>Faces#getLocale()</code>.
+				If the value is <code>null</code>, <code>NaN</code> or infinity, then this will return <code>null</code>.
+			]]>
+		</description>
+		<function-name>formatThousands</function-name>
+		<function-class>org.omnifaces.el.functions.Numbers</function-class>
+		<function-signature>java.lang.String formatThousands(java.lang.Number)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Format the given number to nearest 10<sup>n</sup> (rounded to thousands), suffixed with a space, the metric unit
+				prefix (k, M, G, T, P or E) and the given unit, rounding half up with a precision of 3 digits, whereafter
+				trailing zeroes in fraction part are stripped.
+				For example (with English locale and unit <code>B</code>):
+				<ul>
+				<li>999 will appear as 999 B
+				<li>1000 will appear as 1 kB
+				<li>1004 will appear as 1 kB
+				<li>1005 will appear as 1.01 kB
+				<li>1594 will appear as 1.59 kB
+				<li>1595 will appear as 1.6 kB
+				<li>9000 will appear as 9 kB
+				<li>9900 will appear as 9.9 kB
+				<li>9994 will appear as 9.99 kB
+				<li>9995 will appear as 10 kB
+				<li>99990 will appear as 100 kB
+				<li>9994999 will appear as 9.99 MB
+				<li>9995000 will appear as 10 MB
+				</ul>
+				The format locale will be set to the one as obtained by <code>Faces#getLocale()</code>.
+				If the value is <code>null</code>, <code>NaN</code> or infinity, then this will return <code>null</code>.
+			]]>
+		</description>
+		<function-name>formatThousandsUnit</function-name>
+		<function-class>org.omnifaces.el.functions.Numbers</function-class>
+		<function-signature>java.lang.String formatThousandsUnit(java.lang.Number, java.lang.String)</function-signature>
+	</function>
+
 	<!-- Objects ================================================================================================== -->
 
 	<function>
@@ -735,10 +836,20 @@
 		<function-class>org.omnifaces.el.functions.Objects</function-class>
 		<function-signature>java.lang.Object coalesce(java.lang.Object, java.lang.Object)</function-signature>
 	</function>
-	
-	
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns <code>true</code> if given object is an instance of the class as identified by given class name.
+			]]>
+		</description>
+		<function-name>isInstance</function-name>
+		<function-class>org.omnifaces.el.functions.Objects</function-class>
+		<function-signature>boolean isInstance(java.lang.String, java.lang.Object)</function-signature>
+	</function>
+
 	<!-- Components =============================================================================================== -->
-	
+
 	<function>
 		<description>
 			<![CDATA[
@@ -752,9 +863,69 @@
 		<function-signature>java.lang.Object evalAttribute(javax.faces.component.UIComponent, java.lang.String)</function-signature>
 	</function>
 
+	<function>
+		<description>
+			<![CDATA[
+				Returns <code>@GraphicImageBean</code> URL based on given expression string.
+				The expression string must be a quoted string. Any nested quotes can be escaped with backslash.
+				<p>
+				Usage example:
+				<pre>
+&lt;a href="#{of:graphicImageURL('images.full(product.imageId)')}"&gt;
+    &lt;o:graphicImage value="#{images.thumb(product.imageId)}" /&gt;
+&lt;/a&gt;
+				</pre>
+			]]>
+		</description>
+		<function-name>graphicImageURL</function-name>
+		<function-class>org.omnifaces.el.functions.Components</function-class>
+		<function-signature>java.lang.String graphicImageURL(java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns <code>@GraphicImageBean</code> URL based on given expression string and image type.
+				The expression string must be a quoted string. Any nested quotes can be escaped with backslash.
+				The image type is represented as file extension. E.g. "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc.
+				<p>
+				Usage example:
+				<pre>
+&lt;a href="#{of:graphicImageURLWithType('images.full(product.imageId)', 'png')}"&gt;
+    &lt;o:graphicImage value="#{images.thumb(product.imageId)}" type="png" /&gt;
+&lt;/a&gt;
+				</pre>
+			]]>
+		</description>
+		<function-name>graphicImageURLWithType</function-name>
+		<function-class>org.omnifaces.el.functions.Components</function-class>
+		<function-signature>java.lang.String graphicImageURLWithType(java.lang.String, java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
+				Returns <code>@GraphicImageBean</code> URL based on given expression string, image type and last modified.
+				The expression string must be a quoted string. Any nested quotes can be escaped with backslash.
+				The image type is represented as file extension. E.g. "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc.
+				The "last modified" timestamp can be either a <code>java.lang.Long</code>, <code>java.util.Date</code>, 
+				or <code>java.lang.String</code> which is parseable as <code>java.lang.Long</code>.
+				<p>
+				Usage example:
+				<pre>
+&lt;a href="#{of:graphicImageURLWithTypeAndLastModified('images.full(product.imageId)', 'png', product.lastModified)}"&gt;
+    &lt;o:graphicImage value="#{images.thumb(product.imageId)}" type="png" lastModified="#{product.lastModified}" /&gt;
+&lt;/a&gt;
+				</pre>
+			]]>
+		</description>
+		<function-name>graphicImageURLWithTypeAndLastModified</function-name>
+		<function-class>org.omnifaces.el.functions.Components</function-class>
+		<function-signature>java.lang.String graphicImageURLWithTypeAndLastModified(java.lang.String, java.lang.String, java.lang.Object)</function-signature>
+	</function>
 
 	<!-- Faces (request URL/header shortcuts) ===================================================================== -->
-	
+
 	<function>
 		<description>
 			<![CDATA[

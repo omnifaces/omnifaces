@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,11 +12,16 @@
  */
 package org.omnifaces.util;
 
+import static java.util.logging.Level.FINE;
+
 import java.lang.annotation.Annotation;
 import java.util.Map;
+import java.util.logging.Logger;
 
+import javax.enterprise.context.ContextNotActiveException;
 import javax.enterprise.context.spi.AlterableContext;
 import javax.enterprise.context.spi.Context;
+import javax.enterprise.context.spi.Contextual;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.Stereotype;
@@ -24,6 +29,7 @@ import javax.enterprise.inject.Typed;
 import javax.enterprise.inject.spi.Annotated;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.CDI;
 import javax.enterprise.inject.spi.InjectionPoint;
 
 /**
@@ -37,35 +43,36 @@ import javax.enterprise.inject.spi.InjectionPoint;
  * <pre>
  * // Get the CDI managed bean reference (proxy) of the given bean class.
  * SomeBean someBean = Beans.getReference(SomeBean.class);
- *
+ * </pre>
+ * <pre>
  * // Get the CDI managed bean instance (actual) of the given bean class.
  * SomeBean someBean = Beans.getInstance(SomeBean.class);
- *
+ * </pre>
+ * <pre>
+ * // Check if CDI session scope is active in current context.
+ * Beans.isActive(SessionScope.class);
+ * </pre>
+ * <pre>
  * // Get all currently active CDI managed bean instances in the session scope.
  * Map&lt;Object, String&gt; activeSessionScopedBeans = Beans.getActiveInstances(SessionScope.class);
- *
+ * </pre>
+ * <pre>
  * // Destroy any currently active CDI managed bean instance of given bean class.
  * Beans.destroy(SomeBean.class);
  * </pre>
- * <p>
- * The "native" CDI way would otherwise look like this:
  * <pre>
- * // Get the CDI managed bean reference (proxy) of the given bean class.
- * Set&lt;Bean&lt;?&gt;&gt; beans = beanManager.getBeans(SomeBean.class);
- * Bean&lt;SomeBean&gt; bean = (Bean&lt;SomeBean&gt;) beanManager.resolve(beans);
- * CreationalContext&lt;SomeBean&gt; context = beanManager.createCreationalContext(bean);
- * SomeBean someBean = (SomeBean) beanManager.getReference(bean, SomeBean.class, context);
+ * // Fire a CDI event.
+ * Beans.fireEvent(someEvent);
  * </pre>
  * <p>
- * If you need a dependency-free way of obtaining the CDI managed bean reference (e.g. when you want to write code which
- * should also run on Tomcat), use {@link org.omnifaces.config.BeanManager} enum instead.
  *
  * @author Bauke Scholtz
  * @since 1.6.1
- * @see BeansLocal
  */
 @Typed
 public final class Beans {
+
+	private static final Logger logger = Logger.getLogger(Beans.class.getName());
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -79,35 +86,59 @@ public final class Beans {
 	 * Returns the CDI bean manager.
 	 * @return The CDI bean manager.
 	 * @since 2.0
-	 * @see org.omnifaces.config.BeanManager#get()
+	 * @see CDI#getBeanManager()
 	 */
 	public static BeanManager getManager() {
-		return org.omnifaces.config.BeanManager.INSTANCE.get();
+		try {
+			return CDI.current().getBeanManager();
+		}
+		catch (Exception | LinkageError e) {
+			logger.log(FINE, "Cannot get BeanManager from CDI.current(); falling back to JNDI.", e);
+			return JNDI.lookup("java:comp/BeanManager");
+		}
 	}
 
 	/**
-	 * Returns the CDI managed bean representation of the given bean class.
+	 * Returns the CDI managed bean representation of the given bean class, optionally with the given qualifiers.
 	 * @param <T> The generic CDI managed bean type.
 	 * @param beanClass The CDI managed bean class.
+	 * @param qualifiers The CDI managed bean qualifiers, if any.
 	 * @return The CDI managed bean representation of the given bean class, or <code>null</code> if there is none.
-	 * @see BeanManager#getBeans(String)
+	 * @see BeanManager#getBeans(java.lang.reflect.Type, Annotation...)
 	 * @see BeanManager#resolve(java.util.Set)
 	 */
-	public static <T> Bean<T> resolve(Class<T> beanClass) {
-		return BeansLocal.resolve(getManager(), beanClass);
+	public static <T> Bean<T> resolve(Class<T> beanClass, Annotation... qualifiers) {
+		return BeansLocal.resolve(getManager(), beanClass, qualifiers);
 	}
 
 	/**
-	 * Returns the CDI managed bean reference (proxy) of the given bean class.
+	 * Returns the CDI managed bean representation of exactly the given bean class, optionally with the given qualifiers.
+	 * This will ignore any subclasses.
+	 * @param <T> The generic CDI managed bean type.
+	 * @param beanClass The CDI managed bean class.
+	 * @param qualifiers The CDI managed bean qualifiers, if any.
+	 * @return The CDI managed bean representation of the given bean class, or <code>null</code> if there is none.
+	 * @see BeanManager#getBeans(java.lang.reflect.Type, Annotation...)
+	 * @see BeanManager#resolve(java.util.Set)
+	 * @since 3.1
+	 */
+	public static <T> Bean<T> resolveExact(Class<T> beanClass, Annotation... qualifiers) {
+		return BeansLocal.resolveExact(getManager(), beanClass, qualifiers);
+	}
+
+	/**
+	 * Returns the CDI managed bean reference (proxy) of the given bean class, optionally with the given qualifiers.
 	 * Note that this actually returns a client proxy and the underlying actual instance is thus always auto-created.
 	 * @param <T> The expected return type.
 	 * @param beanClass The CDI managed bean class.
+	 * @param qualifiers The CDI managed bean qualifiers, if any.
 	 * @return The CDI managed bean reference (proxy) of the given class, or <code>null</code> if there is none.
-	 * @see #resolve(Class)
+	 * @see #resolve(Class, Annotation...)
 	 * @see #getReference(Bean)
+	 * @see #resolve(Class, Annotation...)
 	 */
-	public static <T> T getReference(Class<T> beanClass) {
-		return BeansLocal.getReference(getManager(), beanClass);
+	public static <T> T getReference(Class<T> beanClass, Annotation... qualifiers) {
+		return BeansLocal.getReference(getManager(), beanClass, qualifiers);
 	}
 
 	/**
@@ -124,32 +155,35 @@ public final class Beans {
 	}
 
 	/**
-	 * Returns the CDI managed bean instance (actual) of the given bean class and creates one if one doesn't exist.
+	 * Returns the CDI managed bean instance (actual) of the given bean class, optionally with the given qualifiers,
+	 * and creates one if one doesn't exist.
 	 * @param <T> The expected return type.
 	 * @param beanClass The CDI managed bean class.
-	 * @return The CDI managed bean instance (actual) of the given bean class, or <code>null</code> if there is none.
+	 * @param qualifiers The CDI managed bean qualifiers, if any.
+	 * @return The CDI managed bean instance (actual) of the given bean class.
 	 * @since 1.8
-	 * @see #getInstance(Class, boolean)
+	 * @see #getInstance(Class, boolean, Annotation...)
 	 */
-	public static <T> T getInstance(Class<T> beanClass) {
-		return BeansLocal.getInstance(getManager(), beanClass);
+	public static <T> T getInstance(Class<T> beanClass, Annotation... qualifiers) {
+		return BeansLocal.getInstance(getManager(), beanClass, qualifiers);
 	}
 
 	/**
-	 * Returns the CDI managed bean instance (actual) of the given bean class and creates one if one doesn't exist and
-	 * <code>create</code> argument is <code>true</code>, otherwise don't create one and return <code>null</code> if
-	 * there's no current instance.
+	 * Returns the CDI managed bean instance (actual) of the given bean class, optionally with the given qualifiers,
+	 * and creates one if one doesn't exist and <code>create</code> argument is <code>true</code>, otherwise don't
+	 * create one and return <code>null</code> if there's no current instance.
 	 * @param <T> The expected return type.
 	 * @param beanClass The CDI managed bean class.
 	 * @param create Whether to create create CDI managed bean instance if one doesn't exist.
+	 * @param qualifiers The CDI managed bean qualifiers, if any.
 	 * @return The CDI managed bean instance (actual) of the given bean class, or <code>null</code> if there is none
 	 * and/or the <code>create</code> argument is <code>false</code>.
 	 * @since 1.7
-	 * @see #resolve(Class)
+	 * @see #resolve(Class, Annotation...)
 	 * @see #getInstance(Bean, boolean)
 	 */
-	public static <T> T getInstance(Class<T> beanClass, boolean create) {
-		return BeansLocal.getInstance(getManager(), beanClass, create);
+	public static <T> T getInstance(Class<T> beanClass, boolean create, Annotation... qualifiers) {
+		return BeansLocal.getInstance(getManager(), beanClass, create, qualifiers);
 	}
 
 	/**
@@ -171,13 +205,27 @@ public final class Beans {
 	}
 
 	/**
+	 * Returns <code>true</code> when the given CDI managed bean scope is active. I.e., all beans therein can be
+	 * accessed without facing {@link ContextNotActiveException}.
+	 * @param <S> The generic CDI managed bean scope type.
+	 * @param scope The CDI managed bean scope, e.g. <code>SessionScoped.class</code>.
+	 * @return <code>true</code> when the given CDI managed bean scope is active.
+	 * @since 2.3
+	 * @see BeanManager#getContext(Class)
+	 * @see Context#isActive()
+	 */
+	public static <S extends Annotation> boolean isActive(Class<S> scope) {
+		return BeansLocal.isActive(getManager(), scope);
+	}
+
+	/**
 	 * Returns all active CDI managed bean instances in the given CDI managed bean scope. The map key represents
 	 * the active CDI managed bean instance and the map value represents the CDI managed bean name, if any.
 	 * @param <S> The generic CDI managed bean scope type.
 	 * @param scope The CDI managed bean scope, e.g. <code>RequestScoped.class</code>.
 	 * @return All active CDI managed bean instances in the given CDI managed bean scope.
 	 * @since 1.7
-	 * @see BeanManager#getBeans(String)
+	 * @see BeanManager#getBeans(java.lang.reflect.Type, Annotation...)
 	 * @see BeanManager#getContext(Class)
 	 * @see Context#get(javax.enterprise.context.spi.Contextual)
 	 */
@@ -186,15 +234,17 @@ public final class Beans {
 	}
 
 	/**
-	 * Destroy the currently active instance of the given CDI managed bean class.
+	 * Destroy the currently active instance of the given CDI managed bean class, optionally with the given qualifiers.
 	 * @param <T> The generic CDI managed bean type.
 	 * @param beanClass The CDI managed bean class.
+	 * @param qualifiers The CDI managed bean qualifiers, if any.
 	 * @since 2.0
-	 * @see #resolve(Class)
-	 * @see #destroy(Bean)
+	 * @see #resolve(Class, Annotation...)
+	 * @see BeanManager#getContext(Class)
+	 * @see AlterableContext#destroy(javax.enterprise.context.spi.Contextual)
 	 */
-	public static <T> void destroy(Class<T> beanClass) {
-		BeansLocal.destroy(getManager(), beanClass);
+	public static <T> void destroy(Class<T> beanClass, Annotation... qualifiers) {
+		BeansLocal.destroy(getManager(), beanClass, qualifiers);
 	}
 
 	/**
@@ -209,6 +259,21 @@ public final class Beans {
 	 */
 	public static <T> void destroy(Bean<T> bean) {
 		BeansLocal.destroy(getManager(), bean);
+	}
+
+	/**
+	 * Destroy the currently active instance of the given CDI managed bean instance.
+	 * @param <T> The generic CDI managed bean type.
+	 * @param instance The CDI managed bean instance.
+	 * @throws IllegalArgumentException When the given CDI managed bean type is actually not put in an alterable
+	 * context.
+	 * @since 2.5
+	 * @see #resolve(Class, Annotation...)
+	 * @see BeanManager#createCreationalContext(Contextual)
+	 * @see Contextual#destroy(Object, CreationalContext)
+	 */
+	public static <T> void destroy(T instance) {
+		BeansLocal.destroy(getManager(), instance);
 	}
 
 	/**
@@ -257,6 +322,17 @@ public final class Beans {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Fires the given CDI event, optionally with the given qualifiers.
+	 * @param event The event object.
+	 * @param qualifiers The event qualifiers, if any.
+	 * @since 2.3
+	 * @see BeanManager#fireEvent(Object, Annotation...)
+	 */
+	public static void fireEvent(Object event, Annotation... qualifiers) {
+		BeansLocal.fireEvent(getManager(), event, qualifiers);
 	}
 
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -360,14 +360,7 @@ public final class Dates {
 	 */
 	public static Map<String, Integer> getShortMonths() {
 		Locale locale = getLocale();
-		Map<String, Integer> shortMonths = SHORT_MONTHS_CACHE.get(locale);
-
-		if (shortMonths == null) {
-			shortMonths = mapMonths(DateFormatSymbols.getInstance(locale).getShortMonths());
-			SHORT_MONTHS_CACHE.put(locale, shortMonths);
-		}
-
-		return shortMonths;
+		return SHORT_MONTHS_CACHE.computeIfAbsent(locale, k -> mapMonths(DateFormatSymbols.getInstance(locale).getShortMonths()));
 	}
 
 	/**
@@ -395,14 +388,7 @@ public final class Dates {
 	 */
 	public static Map<String, Integer> getDaysOfWeek() {
 		Locale locale = getLocale();
-		Map<String, Integer> daysOfWeek = DAYS_OF_WEEK_CACHE.get(locale);
-
-		if (daysOfWeek == null) {
-			daysOfWeek = mapDaysOfWeek(DateFormatSymbols.getInstance(locale).getWeekdays());
-			DAYS_OF_WEEK_CACHE.put(locale, daysOfWeek);
-		}
-
-		return daysOfWeek;
+		return DAYS_OF_WEEK_CACHE.computeIfAbsent(locale, k -> mapDaysOfWeek(DateFormatSymbols.getInstance(locale).getWeekdays()));
 	}
 
 	/**
@@ -415,14 +401,7 @@ public final class Dates {
 	 */
 	public static Map<String, Integer> getShortDaysOfWeek() {
 		Locale locale = getLocale();
-		Map<String, Integer> shortDaysOfWeek = SHORT_DAYS_OF_WEEK_CACHE.get(locale);
-
-		if (shortDaysOfWeek == null) {
-			shortDaysOfWeek = mapDaysOfWeek(DateFormatSymbols.getInstance(locale).getShortWeekdays());
-			SHORT_DAYS_OF_WEEK_CACHE.put(locale, shortDaysOfWeek);
-		}
-
-		return shortDaysOfWeek;
+		return SHORT_DAYS_OF_WEEK_CACHE.computeIfAbsent(locale, k -> mapDaysOfWeek(DateFormatSymbols.getInstance(locale).getShortWeekdays()));
 	}
 
 	/**

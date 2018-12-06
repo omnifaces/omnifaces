@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,6 +12,7 @@
  */
 package org.omnifaces.util;
 
+import static java.text.MessageFormat.format;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getFlash;
 
@@ -86,7 +87,7 @@ import org.omnifaces.cdi.Startup;
  *         if (bundle.containsKey(message)) {
  *             message = bundle.getString(message);
  *         }
- *         return MessageFormat.format(message, params);
+ *         return params.length &gt; 0 ? MessageFormat.format(message, params) : message;
  *     }
  * });
  * </pre>
@@ -137,14 +138,7 @@ public final class Messages {
 	/**
 	 * This is the default message resolver.
 	 */
-	private static final Resolver DEFAULT_RESOLVER = new Resolver() {
-
-		@Override
-		public String getMessage(String message, Object... params) {
-			return MessageFormat.format(message, params);
-		}
-
-	};
+	private static final Resolver DEFAULT_RESOLVER = (message, params) -> Utils.isEmpty(params) ? message : format(message, params);
 
 	/**
 	 * Initialize with the default resolver.
@@ -202,10 +196,10 @@ public final class Messages {
 	 */
 	public static final class Message {
 
-		private FacesMessage message;
+		private FacesMessage facesMessage;
 
-		private Message(FacesMessage message) {
-			this.message = message;
+		private Message(FacesMessage facesMessage) {
+			this.facesMessage = facesMessage;
 		}
 
 		/**
@@ -216,7 +210,7 @@ public final class Messages {
 		 * @see FacesMessage#setDetail(String)
 		 */
 		public Message detail(String detail, Object... params) {
-			message.setDetail(resolver.getMessage(detail, params));
+			facesMessage.setDetail(resolver.getMessage(detail, params));
 			return this;
 		}
 
@@ -226,7 +220,7 @@ public final class Messages {
 		 * @see FacesMessage#setSeverity(javax.faces.application.FacesMessage.Severity)
 		 */
 		public Message warn() {
-			message.setSeverity(FacesMessage.SEVERITY_WARN);
+			facesMessage.setSeverity(FacesMessage.SEVERITY_WARN);
 			return this;
 		}
 
@@ -236,7 +230,7 @@ public final class Messages {
 		 * @see FacesMessage#setSeverity(javax.faces.application.FacesMessage.Severity)
 		 */
 		public Message error() {
-			message.setSeverity(FacesMessage.SEVERITY_ERROR);
+			facesMessage.setSeverity(FacesMessage.SEVERITY_ERROR);
 			return this;
 		}
 
@@ -246,7 +240,7 @@ public final class Messages {
 		 * @see FacesMessage#setSeverity(javax.faces.application.FacesMessage.Severity)
 		 */
 		public Message fatal() {
-			message.setSeverity(FacesMessage.SEVERITY_FATAL);
+			facesMessage.setSeverity(FacesMessage.SEVERITY_FATAL);
 			return this;
 		}
 
@@ -266,7 +260,7 @@ public final class Messages {
 		 * @see FacesContext#addMessage(String, FacesMessage)
 		 */
 		public void add(String clientId) {
-			Messages.add(clientId, message);
+			Messages.add(clientId, facesMessage);
 		}
 
 		/**
@@ -274,7 +268,7 @@ public final class Messages {
 		 * @see FacesContext#addMessage(String, FacesMessage)
 		 */
 		public void add() {
-			Messages.addGlobal(message);
+			Messages.addGlobal(facesMessage);
 		}
 
 		/**
@@ -282,7 +276,7 @@ public final class Messages {
 		 * @return The so far built message.
 		 */
 		public FacesMessage get() {
-			return message;
+			return facesMessage;
 		}
 
 	}
@@ -638,6 +632,39 @@ public final class Messages {
 	 */
 	public static void addFlashGlobalFatal(String message, Object... params) {
 		addFlashGlobal(createFatal(message, params));
+	}
+
+	// Shortcuts - check messages -------------------------------------------------------------------------------------
+
+	/**
+	 * Returns <code>true</code> if there are no faces messages, otherwise <code>false</code>.
+	 * @return <code>true</code> if there are no faces messages, otherwise <code>false</code>.
+	 * @see FacesContext#getMessageList()
+	 * @since 2.2
+	 */
+	public static boolean isEmpty() {
+		return getContext().getMessageList().isEmpty();
+	}
+
+	/**
+	 * Returns <code>true</code> if there are no faces messages for the given client ID, otherwise <code>false</code>.
+	 * @return <code>true</code> if there are no faces messages for the given client ID, otherwise <code>false</code>.
+	 * @param clientId The client ID to check the messages for.
+	 * @see FacesContext#getMessageList(String)
+	 * @since 2.2
+	 */
+	public static boolean isEmpty(String clientId) {
+		return getContext().getMessageList(clientId).isEmpty();
+	}
+
+	/**
+	 * Returns <code>true</code> if there are no global faces messages, otherwise <code>false</code>.
+	 * @return <code>true</code> if there are no global faces messages, otherwise <code>false</code>.
+	 * @see FacesContext#getMessageList(String)
+	 * @since 2.2
+	 */
+	public static boolean isGlobalEmpty() {
+		return isEmpty(null);
 	}
 
 }

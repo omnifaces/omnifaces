@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,13 +12,19 @@
  */
 package org.omnifaces.context;
 
+import static java.lang.String.format;
+import static javax.servlet.RequestDispatcher.FORWARD_REQUEST_URI;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.responseReset;
 import static org.omnifaces.util.Faces.setContextAttribute;
 import static org.omnifaces.util.FacesLocal.getContextAttribute;
+import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestAttribute;
+import static org.omnifaces.util.FacesLocal.getResponse;
 import static org.omnifaces.util.FacesLocal.getViewId;
+import static org.omnifaces.util.FacesLocal.invalidateSession;
 import static org.omnifaces.util.FacesLocal.normalizeViewId;
+import static org.omnifaces.util.Servlets.facesRedirect;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -32,11 +38,11 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.PartialResponseWriter;
 import javax.faces.context.PartialViewContext;
 import javax.faces.context.PartialViewContextWrapper;
+import javax.faces.event.PhaseId;
 
 import org.omnifaces.config.WebXml;
 import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
 import org.omnifaces.util.Ajax;
-import org.omnifaces.util.Hacks;
 import org.omnifaces.util.Json;
 
 /**
@@ -61,6 +67,10 @@ import org.omnifaces.util.Json;
  * @author Bauke Scholtz
  * @since 1.2
  * @see OmniPartialViewContextFactory
+ * @see FullAjaxExceptionHandler
+ * @see WebXml
+ * @see Ajax
+ * @see Json
  */
 public class OmniPartialViewContext extends PartialViewContextWrapper {
 
@@ -71,7 +81,6 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private PartialViewContext wrapped;
 	private Map<String, Object> arguments;
 	private List<String> callbackScripts;
 	private OmniPartialResponseWriter writer;
@@ -83,7 +92,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 	 * @param wrapped The wrapped partial view context.
 	 */
 	public OmniPartialViewContext(PartialViewContext wrapped) {
-		this.wrapped = wrapped;
+		super(wrapped);
 		setCurrentInstance(this);
 	}
 
@@ -98,14 +107,49 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		return writer;
 	}
 
+	/**
+	 * An override which checks if the web.xml security constraint has been triggered during this ajax request
+	 * (which can happen when the session has been timed out) and if so, then perform a redirect to the originally
+	 * requested page. Otherwise the enduser ends up with an ajax response containing only the new view state
+	 * without any form of visual feedback.
+	 */
+	@Override
+	public void processPartial(PhaseId phaseId) {
+		if (phaseId == PhaseId.RENDER_RESPONSE && redirectToFormLoginPageIfNecessary()) {
+			return;
+		}
+
+		super.processPartial(phaseId);
+	}
+
+	private boolean redirectToFormLoginPageIfNecessary() {
+		String loginURL = WebXml.instance().getFormLoginPage();
+
+		if (loginURL == null) {
+			return false;
+		}
+
+		FacesContext facesContext = FacesContext.getCurrentInstance();
+		String loginViewId = normalizeViewId(facesContext, loginURL);
+
+		if (!loginViewId.equals(getViewId(facesContext))) {
+			return false;
+		}
+
+		String originalURL = getRequestAttribute(facesContext, FORWARD_REQUEST_URI);
+
+		if (originalURL == null) {
+			return false;
+		}
+
+		invalidateSession(facesContext); // Prevent server from remembering security constraint fail caused by ajax.
+		facesRedirect(getRequest(facesContext), getResponse(facesContext), originalURL); // This also clears cache.
+		return true;
+	}
+
 	@Override // Necessary because this is missing in PartialViewContextWrapper (will be fixed in JSF 2.2).
 	public void setPartialRequest(boolean partialRequest) {
 		getWrapped().setPartialRequest(partialRequest);
-	}
-
-	@Override
-	public PartialViewContext getWrapped() {
-		return wrapped;
 	}
 
 	/**
@@ -203,20 +247,6 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 			return instance;
 		}
 
-		// Still not found. Well, maybe RichFaces is installed which doesn't use PartialViewContextWrapper.
-		if (Hacks.isRichFacesInstalled()) {
-			PartialViewContext pvc = Hacks.getRichFacesWrappedPartialViewContext();
-
-			if (pvc != null) {
-				instance = unwrap(pvc);
-
-				if (instance != null) {
-					setCurrentInstance(instance);
-					return instance;
-				}
-			}
-		}
-
 		// Still not found. Well, it's end of story.
 		throw new IllegalStateException(ERROR_NO_OMNI_PVC);
 	}
@@ -267,31 +297,6 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		// Overridden actions -----------------------------------------------------------------------------------------
 
 		/**
-		 * An override which checks if the web.xml security constraint has been triggered during this ajax request
-		 * (which can happen when the session has been timed out) and if so, then perform a redirect to the originally
-		 * requested page. Otherwise the enduser ends up with an ajax response containing only the new view state
-		 * without any form of visual feedback.
-		 */
-		@Override
-		public void startDocument() throws IOException {
-			wrapped.startDocument();
-			String loginURL = WebXml.INSTANCE.getFormLoginPage();
-
-			if (loginURL != null) {
-				FacesContext facesContext = FacesContext.getCurrentInstance();
-				String loginViewId = normalizeViewId(facesContext, loginURL);
-
-				if (loginViewId.equals(getViewId(facesContext))) {
-					String originalURL = getRequestAttribute(facesContext, "javax.servlet.forward.request_uri");
-
-					if (originalURL != null) {
-						redirect(originalURL);
-					}
-				}
-			}
-		}
-
-		/**
 		 * An override which remembers if we're updating or not.
 		 * @see #endDocument()
 		 * @see #reset()
@@ -332,7 +337,7 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 			else {
 				if (context.arguments != null) {
 					startEval();
-					write(String.format(AJAX_DATA, Json.encode(context.arguments)));
+					write(format(AJAX_DATA, Json.encode(context.arguments)));
 					endEval();
 				}
 
@@ -358,14 +363,17 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		 */
 		public void reset() {
 			try {
+				wrapped.flush(); // Note: this doesn't actually flush to writer, but clears internal state.
+
 				if (updating) {
 					// If reset() method is entered with updating=true, then it means that Mojarra is used and that
 					// an exception was been thrown during ajax render response. The following calls will gently close
 					// the partial response which Mojarra has left open.
 					// MyFaces never enters reset() method with updating=true, this is handled in endDocument() method.
-					endCDATA();
-					endUpdate();
-					wrapped.endDocument();
+					updating = false;
+					wrapped.startError("");
+					wrapped.endError();
+					wrapped.endElement("partial-response"); // Don't use endDocument() as it will flush.
 				}
 			}
 			catch (IOException e) {
@@ -379,6 +387,12 @@ public class OmniPartialViewContext extends PartialViewContextWrapper {
 		// Delegate actions -------------------------------------------------------------------------------------------
 		// Due to MyFaces broken PartialResponseWriter, which doesn't delegate to getWrapped() method, but instead to
 		// the local variable wrapped, we can't use getWrapped() in our own PartialResponseWriter implementations.
+		// Update 22 Dec 2017: This is still not fixed in MyFaces 2.3.0-beta :(
+
+		@Override
+		public void startDocument() throws IOException {
+			wrapped.startDocument();
+		}
 
 		@Override
 		public void startError(String errorName) throws IOException {

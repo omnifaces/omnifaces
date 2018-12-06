@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -50,7 +50,10 @@ import javax.faces.model.SelectItem;
  * @author Arjan Tijms
  */
 @FacesConverter("omnifaces.ListIndexConverter")
-public class ListIndexConverter implements Converter {
+public class ListIndexConverter implements Converter<Object> {
+
+	private static final String ERROR_LIST_INDEX =
+			"Could not determine index for value ''{0}'' in component {1}.";
 
 	private static final String ERROR_LIST_INDEX_BOUNDS =
 			"Index {0} for value {1} in component {2} is out of bounds.";
@@ -62,7 +65,16 @@ public class ListIndexConverter implements Converter {
 
 	@Override
 	public Object getAsObject(FacesContext context, UIComponent component, String value) {
-		int index = Integer.valueOf(value);
+		int index;
+
+		try {
+			index = Integer.valueOf(value);
+		}
+		catch (NumberFormatException e) {
+			throw new ConverterException(
+				createError(ERROR_LIST_INDEX, value, component.getClientId(context)), e);
+		}
+
 		if (index < 0 || index >= list.size()) {
 			throw new ConverterException(
 				createError(ERROR_LIST_INDEX_BOUNDS, index, value, component.getClientId(context))
@@ -76,7 +88,7 @@ public class ListIndexConverter implements Converter {
 	public String getAsString(FacesContext context, UIComponent component, Object value) {
 		for (int i = 0; i < list.size(); i++) {
 			if (list.get(i).equals(value)) {
-				return i + "";
+				return Integer.toString(i);
 			}
 		}
 

@@ -1,26 +1,24 @@
 /*
- * Copyright 2013 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
+ * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations under the License.
  */
 package org.omnifaces.application;
 
+import static java.lang.Boolean.parseBoolean;
 import static javax.faces.convert.Converter.DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE_PARAM_NAME;
+import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Faces.getInitParameter;
 
 import java.util.TimeZone;
 
-import javax.faces.FacesException;
 import javax.faces.application.Application;
 import javax.faces.application.ApplicationWrapper;
 import javax.faces.convert.Converter;
@@ -29,7 +27,6 @@ import javax.faces.validator.Validator;
 
 import org.omnifaces.cdi.converter.ConverterManager;
 import org.omnifaces.cdi.validator.ValidatorManager;
-import org.omnifaces.config.BeanManager;
 
 /**
  * <p>
@@ -49,11 +46,11 @@ import org.omnifaces.config.BeanManager;
  * @see ValidatorManager
  * @since 1.6
  */
+@SuppressWarnings("rawtypes")
 public class OmniApplication extends ApplicationWrapper {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private final Application wrapped;
 	private final ConverterManager converterManager;
 	private final ValidatorManager validatorManager;
 	private final TimeZone dateTimeConverterDefaultTimeZone;
@@ -65,11 +62,11 @@ public class OmniApplication extends ApplicationWrapper {
 	 * @param wrapped The wrapped application.
 	 */
 	public OmniApplication(Application wrapped) {
-		this.wrapped = wrapped;
-		converterManager = BeanManager.INSTANCE.getReference(ConverterManager.class);
-		validatorManager = BeanManager.INSTANCE.getReference(ValidatorManager.class);
+		super(wrapped);
+		converterManager = getReference(ConverterManager.class);
+		validatorManager = getReference(ValidatorManager.class);
 		dateTimeConverterDefaultTimeZone =
-			Boolean.valueOf(getInitParameter(DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE_PARAM_NAME))
+			parseBoolean(getInitParameter(DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE_PARAM_NAME))
 				? TimeZone.getDefault()
 				: null;
 	}
@@ -113,7 +110,7 @@ public class OmniApplication extends ApplicationWrapper {
 	 * {@link #getWrapped()} which may return the JSF managed {@link Validator} instance.
 	 */
 	@Override
-	public Validator createValidator(String validatorId) throws FacesException {
+	public Validator createValidator(String validatorId) {
 		Validator validator = validatorManager.createValidator(getWrapped(), validatorId);
 
 		if (validator != null) {
@@ -121,11 +118,6 @@ public class OmniApplication extends ApplicationWrapper {
 		}
 
 		return super.createValidator(validatorId);
-	}
-
-	@Override
-	public Application getWrapped() {
-		return wrapped;
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------

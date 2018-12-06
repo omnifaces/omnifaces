@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -11,6 +11,8 @@
  * specific language governing permissions and limitations under the License.
  */
 package org.omnifaces.component.tree;
+
+import static org.omnifaces.util.FacesLocal.isDevelopment;
 
 import java.io.IOException;
 
@@ -60,12 +62,10 @@ public abstract class TreeFamily extends UIComponentBase {
 	}
 
 	/**
-	 * Calls {@link #validateHierarchy()} and then {@link #process(FacesContext, PhaseId)} with
-	 * {@link PhaseId#APPLY_REQUEST_VALUES}.
+	 * Calls {@link #process(FacesContext, PhaseId)} with {@link PhaseId#APPLY_REQUEST_VALUES}.
 	 */
 	@Override
 	public void processDecodes(FacesContext context) {
-		validateHierarchy();
 		process(context, PhaseId.APPLY_REQUEST_VALUES);
 	}
 
@@ -86,22 +86,25 @@ public abstract class TreeFamily extends UIComponentBase {
 	}
 
 	/**
-	 * Calls {@link #validateHierarchy()} and then {@link #process(FacesContext, PhaseId)} with
-	 * {@link PhaseId#RENDER_RESPONSE}.
+	 * Calls {@link #validateHierarchy()} when project stage is <code>Development</code> and then
+	 * calls {@link #process(FacesContext, PhaseId)} with {@link PhaseId#RENDER_RESPONSE}.
 	 */
 	@Override
 	public void encodeChildren(FacesContext context) throws IOException {
-		validateHierarchy();
+		if (isDevelopment(context)) {
+			validateHierarchy();
+		}
+
 		process(context, PhaseId.RENDER_RESPONSE);
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Validate the component hierarchy.
-	 * @throws IllegalArgumentException When component hierarchy is wrong.
+	 * Validate the component hierarchy. This should only be called when project stage is <code>Development</code>.
+	 * @throws IllegalStateException When component hierarchy is wrong.
 	 */
-	protected abstract void validateHierarchy() throws IllegalArgumentException;
+	protected abstract void validateHierarchy();
 
 	/**
 	 * Process the component according to the rules of the given phase ID.

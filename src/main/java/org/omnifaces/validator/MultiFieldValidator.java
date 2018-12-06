@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -35,7 +35,7 @@ public interface MultiFieldValidator {
 	 * {@link ValidateMultipleFields} implementation who will call this method.
 	 * @param context The faces context to work with.
 	 * @param components The input components whose values are to be validated.
-	 * @param values The values of the input components to be validated.
+	 * @param values The values of the input components to be validated, in the same order as the components.
 	 * @return <code>true</code> if validation is successful, otherwise <code>false</code> (and thus show the message).
 	 */
 	boolean validateValues(FacesContext context, List<UIInput> components, List<Object> values);

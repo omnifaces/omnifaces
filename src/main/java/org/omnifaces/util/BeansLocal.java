@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 OmniFaces.
+ * Copyright 2018 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -12,6 +12,8 @@
  */
 package org.omnifaces.util;
 
+import static java.util.logging.Level.FINEST;
+
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,6 +21,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.enterprise.context.spi.AlterableContext;
 import javax.enterprise.context.spi.Context;
@@ -48,8 +51,7 @@ public final class BeansLocal {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String ERROR_NO_ALTERABLE_CONTEXT =
-		"Bean '%s' is put in context '%s' which is not an alterable context.";
+	private static final Logger logger = Logger.getLogger(BeansLocal.class.getName());
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -60,12 +62,11 @@ public final class BeansLocal {
 	// Utility --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * {@inheritDoc}
-	 * @see Beans#resolve(Class)
+	 * @see Beans#resolve(Class, Annotation...)
 	 */
 	@SuppressWarnings("unchecked")
-	public static <T> Bean<T> resolve(BeanManager beanManager, Class<T> beanClass) {
-		Set<Bean<?>> beans = beanManager.getBeans(beanClass);
+	public static <T> Bean<T> resolve(BeanManager beanManager, Class<T> beanClass, Annotation... qualifiers) {
+		Set<Bean<?>> beans = beanManager.getBeans(beanClass, qualifiers);
 
 		for (Bean<?> bean : beans) {
 			if (bean.getBeanClass() == beanClass) {
@@ -77,42 +78,49 @@ public final class BeansLocal {
 	}
 
 	/**
-	 * {@inheritDoc}
-	 * @see Beans#getReference(Class)
+	 * @see Beans#resolveExact(Class, Annotation...)
 	 */
-	public static <T> T getReference(BeanManager beanManager, Class<T> beanClass) {
-		Bean<T> bean = resolve(beanManager, beanClass);
-		return (bean != null) ? getReference(beanManager, bean) : null;
+	public static <T> Bean<T> resolveExact(BeanManager beanManager, Class<T> beanClass, Annotation... qualifiers) {
+		Bean<T> bean = resolve(beanManager, beanClass, qualifiers);
+		return (bean != null) && (bean.getBeanClass() == beanClass) ? bean : null;
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * @see Beans#getReference(Class, Annotation...)
+	 */
+	public static <T> T getReference(BeanManager beanManager, Class<T> beanClass, Annotation... qualifiers) {
+		Bean<T> bean = resolve(beanManager, beanClass, qualifiers);
+		return (bean != null) ? getReference(beanManager, bean, beanClass) : null;
+	}
+
+	/**
 	 * @see Beans#getReference(Bean)
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T getReference(BeanManager beanManager, Bean<T> bean) {
-		return (T) beanManager.getReference(bean, bean.getBeanClass(), beanManager.createCreationalContext(bean));
+		return getReference(beanManager, bean, bean.getBeanClass());
+	}
+
+	@SuppressWarnings("unchecked")
+	private static <T> T getReference(BeanManager beanManager, Bean<T> bean, Class<?> beanClass) {
+		return (T) beanManager.getReference(bean, beanClass, beanManager.createCreationalContext(bean));
 	}
 
 	/**
-	 * {@inheritDoc}
-	 * @see Beans#getInstance(Class)
+	 * @see Beans#getInstance(Class, Annotation...)
 	 */
-	public static <T> T getInstance(BeanManager beanManager, Class<T> beanClass) {
-		return getInstance(beanManager, beanClass, true);
+	public static <T> T getInstance(BeanManager beanManager, Class<T> beanClass, Annotation... qualifiers) {
+		return getInstance(beanManager, beanClass, true, qualifiers);
 	}
 
 	/**
-	 * {@inheritDoc}
-	 * @see Beans#getInstance(Class, boolean)
+	 * @see Beans#getInstance(Class, boolean, Annotation...)
 	 */
-	public static <T> T getInstance(BeanManager beanManager, Class<T> beanClass, boolean create) {
-		Bean<T> bean = resolve(beanManager, beanClass);
+	public static <T> T getInstance(BeanManager beanManager, Class<T> beanClass, boolean create, Annotation... qualifiers) {
+		Bean<T> bean = resolve(beanManager, beanClass, qualifiers);
 		return (bean != null) ? getInstance(beanManager, bean, create) : null;
 	}
 
 	/**
-	 * {@inheritDoc}
 	 * @see Beans#getInstance(Bean, boolean)
 	 */
 	public static <T> T getInstance(BeanManager beanManager, Bean<T> bean, boolean create) {
@@ -127,7 +135,19 @@ public final class BeansLocal {
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * @see Beans#isActive(Class)
+	 */
+	public static <S extends Annotation> boolean isActive(BeanManager beanManager, Class<S> scope) {
+		try {
+			return beanManager.getContext(scope).isActive();
+		}
+		catch (Exception ignore) {
+			logger.log(FINEST, "Ignoring thrown exception; given scope is very unlikely active anyway.", ignore);
+			return false;
+		}
+	}
+
+	/**
 	 * @see Beans#getActiveInstances(Class)
 	 */
 	public static <S extends Annotation> Map<Object, String> getActiveInstances(BeanManager beanManager, Class<S> scope) {
@@ -147,11 +167,10 @@ public final class BeansLocal {
 	}
 
 	/**
-	 * {@inheritDoc}
-	 * @see Beans#destroy(Class)
+	 * @see Beans#destroy(Class, Annotation...)
 	 */
-	public static <T> void destroy(BeanManager beanManager, Class<T> beanClass) {
-		Bean<T> bean = resolve(beanManager, beanClass);
+	public static <T> void destroy(BeanManager beanManager, Class<T> beanClass, Annotation... qualifiers) {
+		Bean<T> bean = resolve(beanManager, beanClass, qualifiers);
 
 		if (bean != null) {
 			destroy(beanManager, bean);
@@ -159,7 +178,6 @@ public final class BeansLocal {
 	}
 
 	/**
-	 * {@inheritDoc}
 	 * @see Beans#destroy(Bean)
 	 */
 	public static <T> void destroy(BeanManager beanManager, Bean<T> bean) {
@@ -169,13 +187,39 @@ public final class BeansLocal {
 			((AlterableContext) context).destroy(bean);
 		}
 		else {
-			throw new IllegalArgumentException(
-				String.format(ERROR_NO_ALTERABLE_CONTEXT, bean.getBeanClass(), context.getClass()));
+			T instance = context.get(bean);
+
+			if (instance != null) {
+				destroy(beanManager, bean, instance);
+			}
 		}
 	}
 
 	/**
-	 * {@inheritDoc}
+	 * @see Beans#destroy(Object)
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> void destroy(BeanManager beanManager, T instance) {
+		if (instance instanceof Class) { // Java prefers T over Class<T> when varargs is not specified :(
+			destroy(beanManager, (Class<T>) instance, new Annotation[0]);
+		}
+		else {
+			for (Class<?> beanClass = instance.getClass(); beanClass != Object.class; beanClass = beanClass.getSuperclass()) {
+				Bean<T> bean = (Bean<T>) resolve(beanManager, beanClass);
+
+				if (bean != null) {
+					destroy(beanManager, bean, instance);
+					return;
+				}
+			}
+		}
+	}
+
+	private static <T> void destroy(BeanManager beanManager, Bean<T> bean, T instance) {
+		bean.destroy(instance, beanManager.createCreationalContext(bean));
+	}
+
+	/**
 	 * @see Beans#getAnnotation(Annotated, Class)
 	 */
 	public static <A extends Annotation> A getAnnotation(BeanManager beanManager, Annotated annotated, Class<A> annotationType) {
@@ -208,13 +252,18 @@ public final class BeansLocal {
 	}
 
 	/**
-	 * {@inheritDoc}
 	 * @see Beans#getAnnotation(Annotated, Class)
 	 */
 	public static InjectionPoint getCurrentInjectionPoint(BeanManager beanManager, CreationalContext<?> creationalContext) {
-		return (InjectionPoint) beanManager.getInjectableReference(
-			resolve(beanManager, InjectionPointGenerator.class).getInjectionPoints().iterator().next(), creationalContext
-		);
+		Bean<InjectionPointGenerator> bean = resolve(beanManager, InjectionPointGenerator.class);
+		return (bean != null) ? (InjectionPoint) beanManager.getInjectableReference(bean.getInjectionPoints().iterator().next(), creationalContext) : null;
+	}
+
+	/**
+	 * @see Beans#fireEvent(Object, Annotation...)
+	 */
+	public static void fireEvent(BeanManager beanManager, Object event, Annotation... qualifiers) {
+		beanManager.fireEvent(event, qualifiers);
 	}
 
 }
