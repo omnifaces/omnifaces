@@ -13,12 +13,12 @@
 package org.omnifaces.cdi.contextparam;
 
 import static org.omnifaces.util.Beans.getQualifier;
-import static org.omnifaces.util.Faces.getInitParameter;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
+import javax.servlet.ServletContext;
 
 import org.omnifaces.cdi.ContextParam;
 
@@ -36,12 +36,15 @@ public class ContextParamProducer {
 	@Inject
 	private InjectionPoint injectionPoint;
 
+	@Inject
+	private ServletContext servletContext;
+
 	@Produces
 	@ContextParam
 	public String produce(InjectionPoint injectionPoint) {
 		ContextParam param = getQualifier(injectionPoint, ContextParam.class);
 		String name = param.name().isEmpty() ? injectionPoint.getMember().getName() : param.name();
-		return getInitParameter(name);
+		return servletContext.getInitParameter(name);
 	}
 
 }

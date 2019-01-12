@@ -13,12 +13,13 @@
 package org.omnifaces.cdi.cookie;
 
 import static org.omnifaces.util.Beans.getQualifier;
-import static org.omnifaces.util.Faces.getRequestCookie;
+import static org.omnifaces.util.Servlets.getRequestCookie;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 
 import org.omnifaces.cdi.Cookie;
 
@@ -36,12 +37,15 @@ public class RequestCookieProducer {
 	@Inject
 	private InjectionPoint injectionPoint;
 
+	@Inject
+	private HttpServletRequest request;
+	
 	@Produces
 	@Cookie
 	public String produce(InjectionPoint injectionPoint) {
 		Cookie cookie = getQualifier(injectionPoint, Cookie.class);
 		String name = cookie.name().isEmpty() ? injectionPoint.getMember().getName() : cookie.name();
-		return getRequestCookie(name);
+		return getRequestCookie(request, name);
 	}
 
 }
