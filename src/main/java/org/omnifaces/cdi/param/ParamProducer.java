@@ -36,7 +36,9 @@ import static org.omnifaces.util.Utils.getDefaultValue;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Executable;
 import java.lang.reflect.Field;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -48,6 +50,7 @@ import java.util.ResourceBundle;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
+import javax.enterprise.inject.spi.AnnotatedParameter;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.faces.application.Application;
 import javax.faces.application.FacesMessage;
@@ -313,7 +316,15 @@ public class ParamProducer {
 		String name = requestParameter.name();
 
 		if (isEmpty(name)) {
+			if (injectionPoint.getAnnotated() instanceof AnnotatedParameter) {
+				AnnotatedParameter annotatedParameter = (AnnotatedParameter) injectionPoint.getAnnotated();
+				if (annotatedParameter.getJavaParameter().isNamePresent()) {
+					return annotatedParameter.getJavaParameter().getName();
+				}
+			}
+
 			name = injectionPoint.getMember().getName();
+
 		} else {
 			name = evaluateExpressionAsString(name);
 		}
