@@ -187,6 +187,22 @@
 			</resource>
 		</resources>
 
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<excludes>
+					<exclude>arquillian.xml</exclude>
+				</excludes>
+			</testResource>
+			<testResource>
+				<directory>src/test/resources</directory>
+				<includes>
+					<include>arquillian.xml</include>
+				</includes>
+				<filtering>true</filtering>
+			</testResource>
+		</testResources>
+
 		<plugins>
 
 			<!-- Add missing license headers to source files. -->
@@ -481,7 +497,6 @@
 						<artifactId>maven-failsafe-plugin</artifactId>
 						<configuration>
 							<systemPropertyVariables>
-								<jboss.home>${project.build.directory}/wildfly-${test.wildfly.version}</jboss.home>
 								<java.util.logging.manager>org.jboss.logmanager.LogManager</java.util.logging.manager>
 							</systemPropertyVariables>
 						</configuration>

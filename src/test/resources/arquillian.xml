@@ -21,6 +21,7 @@
 	<container qualifier="wildfly-managed" default="true">
 		<configuration>
 			<property name="serverConfig">standalone-ee8.xml</property>
+			<property name="jbossHome">${project.build.directory}/wildfly-${test.wildfly.version}</property>
 		</configuration>
 	</container>
 	<extension qualifier="webdriver">
