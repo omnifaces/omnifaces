@@ -1,3 +1,4 @@
 org.omnifaces.cdi.viewscope.ViewScopeExtension
 org.omnifaces.cdi.eager.EagerExtension
 org.omnifaces.cdi.param.ParamExtension
+org.omnifaces.cdi.jsparam.JSParamExtension

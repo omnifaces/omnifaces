@@ -78,7 +78,17 @@
 	</properties>
 
 	<dependencies>
-
+		<!-- Apache Commons dependencies. -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.8.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-collections4</artifactId>
+			<version>4.3</version>
+		</dependency>
 		<!-- Java EE 8 dependencies. -->
 		<dependency>
 			<groupId>javax.faces</groupId>
