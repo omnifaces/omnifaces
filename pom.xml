@@ -89,6 +89,14 @@
 			<artifactId>commons-collections4</artifactId>
 			<version>4.3</version>
 		</dependency>
+
+		<!-- Other external dependencies. -->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.9.8</version>
+		</dependency>
+
 		<!-- Java EE 8 dependencies. -->
 		<dependency>
 			<groupId>javax.faces</groupId>
