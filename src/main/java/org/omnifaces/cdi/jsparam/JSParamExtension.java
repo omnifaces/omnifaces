@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Set;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.InjectionException;
 import javax.enterprise.inject.spi.AnnotatedField;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.InjectionPoint;
@@ -29,12 +28,10 @@ import javax.faces.component.html.HtmlBody;
 import javax.faces.component.html.HtmlCommandScript;
 import javax.faces.component.html.HtmlForm;
 import javax.faces.component.html.HtmlInputHidden;
-import javax.faces.event.AbortProcessingException;
-import javax.faces.event.ActionEvent;
-import javax.faces.event.ActionListener;
 import org.apache.commons.collections4.IteratorUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.omnifaces.cdi.JSParam;
 import org.omnifaces.util.Components;
@@ -56,9 +53,13 @@ import org.omnifaces.util.Faces;
  * @author Adam Waldenberg, Ejwa Software/Hosting
  */
 public class JSParamExtension implements Extension {
-	private static final int GENERATED_ID_NUM_CHARACTERS = 8;
+		private static final int GENERATED_ID_NUM_CHARACTERS = 8;
 	private static final String JSPARAM_FORM_NAME = JSParam.class.getName().toLowerCase().replace('.', '-');
 	private static final String ASSIGNMENT_TEMPLATE = "document.getElementById('%s:%s').value = %s;";
+	private static final String STRINGIFY_TEMPLATE = "JSON.stringify(clone(%s))";
+	private static final String CLONE_FUNCTION = "function clone(n){if(null===n||!(n instanceof Object))return n;"
+	                                             + "var t={};for(var c in n)n[c]instanceof Function||n[c]"
+	                                             + "instanceof Object||(t[c]=n[c]);return t}";
 
 	private HtmlBody getDocumentBody() {
 		for (UIComponent c : Faces.getViewRoot().getChildren()) {
@@ -102,14 +103,28 @@ public class JSParamExtension implements Extension {
 
 		if (field.equals(lastField)) {
 			final List<String> scripts = new ArrayList<>();
+			final MutableBoolean containsComplexType = new MutableBoolean(false);
 
-			fields.forEach(f -> {
-				final String javascript = f.getAnnotation(JSParam.class).value();
+			fields.forEach((Field f) -> {
+				final String value = f.getAnnotation(JSParam.class).value();
+				final String javascript;
+
+				if (f.getType() != Integer.class && f.getType() != int.class
+					&& f.getType() != String.class) {
+					containsComplexType.setTrue();
+					javascript = String.format(STRINGIFY_TEMPLATE, value);
+				} else {
+					javascript = value;
+				}
 
 				scripts.add(String.format(ASSIGNMENT_TEMPLATE,
 					JSPARAM_FORM_NAME, f.getName(), javascript)
 				);
 			});
+
+			if (containsComplexType.isTrue()) {
+				scripts.add(CLONE_FUNCTION);
+			}
 
 			Components.addScriptToBody(StringUtils.join(scripts, "\n"));
 		}
@@ -157,35 +172,5 @@ public class JSParamExtension implements Extension {
 				});
 			}
 		});
-	}
-
-	public static class JSParamActionListener implements ActionListener {
-		public JSParamActionListener() { /* Left blank on purpose */ }
-		
-		@Override
-		public void processAction(ActionEvent event) throws AbortProcessingException {
-			Components.getCurrentForm().getChildren().forEach(component -> {
-				final Object o = Components.getCurrentForm().getAttributes().get("instance");
-
-				if (component instanceof HtmlInputHidden) {
-					final HtmlInputHidden input = (HtmlInputHidden) component;
-					final String value = Faces.getRequestParameter(input.getClientId());
-					final AnnotatedField field = (AnnotatedField) input.getAttributes().get("field");
-					final Class<?> baseType = field.getJavaMember().getType();
-
-					field.getJavaMember().setAccessible(true);
-
-					try {
-						if (baseType == Integer.class || baseType == int.class) {
-							field.getJavaMember().setInt(o, Integer.parseInt(value));
-						} else {
-							field.getJavaMember().set(o, value);
-						}
-					} catch (IllegalAccessException | IllegalArgumentException ex) {
-						throw new InjectionException(ex);
-					}
-				}
-			});
-		}
 	}
 }
