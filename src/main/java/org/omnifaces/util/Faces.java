@@ -1492,7 +1492,7 @@ public final class Faces {
 	 * @throws NullPointerException When url is <code>null</code>.
 	 * @see ExternalContext#redirect(String)
 	 */
-	public static void redirect(String url, String... paramValues) throws IOException {
+	public static void redirect(String url, Object... paramValues) throws IOException {
 		FacesLocal.redirect(getContext(), url, paramValues);
 	}
 
@@ -1519,7 +1519,7 @@ public final class Faces {
 	 * @see ExternalContext#setResponseStatus(int)
 	 * @see ExternalContext#setResponseHeader(String, String)
 	 */
-	public static void redirectPermanent(String url, String... paramValues) {
+	public static void redirectPermanent(String url, Object... paramValues) {
 		FacesLocal.redirectPermanent(getContext(), url, paramValues);
 	}
 
