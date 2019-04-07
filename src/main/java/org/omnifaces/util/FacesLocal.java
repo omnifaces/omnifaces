@@ -1116,9 +1116,9 @@ public final class FacesLocal {
 	}
 
 	/**
-	 * @see Faces#redirect(String, String...)
+	 * @see Faces#redirect(String, Object...)
 	 */
-	public static void redirect(FacesContext context, String url, String... paramValues) {
+	public static void redirect(FacesContext context, String url, Object... paramValues) {
 		ExternalContext externalContext = context.getExternalContext();
 		externalContext.getFlash().setRedirect(true); // MyFaces also requires this for a redirect in current request (which is incorrect).
 
@@ -1131,9 +1131,9 @@ public final class FacesLocal {
 	}
 
 	/**
-	 * @see Faces#redirectPermanent(String, String...)
+	 * @see Faces#redirectPermanent(String, Object...)
 	 */
-	public static void redirectPermanent(FacesContext context, String url, String... paramValues) {
+	public static void redirectPermanent(FacesContext context, String url, Object... paramValues) {
 		ExternalContext externalContext = context.getExternalContext();
 		externalContext.getFlash().setRedirect(true); // MyFaces also requires this for a redirect in current request (which is incorrect).
 		externalContext.setResponseStatus(SC_MOVED_PERMANENTLY);

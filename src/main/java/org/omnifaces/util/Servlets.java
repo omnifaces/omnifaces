@@ -827,7 +827,7 @@ public final class Servlets {
 	/**
 	 * Helper method to prepare redirect URL. Package-private so that {@link FacesLocal} can also use it.
 	 */
-	static String prepareRedirectURL(HttpServletRequest request, String url, String... paramValues) {
+	static String prepareRedirectURL(HttpServletRequest request, String url, Object... paramValues) {
 		String redirectURL = url;
 
 		if (!startsWithOneOf(url, "http://", "https://", "/")) {
@@ -841,7 +841,8 @@ public final class Servlets {
 		Object[] encodedParams = new Object[paramValues.length];
 
 		for (int i = 0; i < paramValues.length; i++) {
-			encodedParams[i] = encodeURL(paramValues[i]);
+			Object paramValue = paramValues[i];
+			encodedParams[i] = (paramValue instanceof String) ? encodeURL((String) paramValue) : paramValue;
 		}
 
 		return format(redirectURL, encodedParams);

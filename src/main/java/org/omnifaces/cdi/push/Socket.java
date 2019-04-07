@@ -123,6 +123,9 @@ import org.omnifaces.util.State;
  * auto-reconnect at increasing intervals when the connection is closed/aborted as result of e.g. a network error or
  * server restart. It will not auto-reconnect when the very first connection attempt already fails. The web socket will
  * be implicitly closed once the document is unloaded (e.g. navigating away, close of browser window/tab, etc).
+ * <p>
+ * In order to successfully reconnect after a server restart, or when switching to a new server node, you need to ensure
+ * that session persistence is enabled on the server.
  *
  *
  * <h3 id="usage-server"><a href="#usage-server">Usage (server)</a></h3>
@@ -574,6 +577,81 @@ import org.omnifaces.util.State;
  * <p>
  * Note that OmniFaces own {@link Callback} interfaces are insuitable as it is not allowed to use WAR (front end)
  * frameworks and libraries like JSF and OmniFaces in EAR/EJB (back end) side.
+ *
+ *
+ * <h3 id="cluster"><a href="#cluster">Cluster design hints</a></h3>
+ * <p>
+ * In case your web application is deployed to a server cluster with multiple nodes, and the push event could be
+ * triggered in a different node than where the client is connected to, then it won't reach the socket. One solution is
+ * to activate and configure a JMS topic in the server configuration, trigger the push event via JMS instead of CDI,
+ * and use a JMS listener (a message driven bean, MDB) to delegate the push event to CDI.</p>
+ * <p>
+ * Below is an example extending on the above given EJB example.
+ * <pre>
+ * &#64;Singleton
+ * &#64;TransactionAttribute(NOT_SUPPORTED)
+ * public class PushManager {
+ *
+ *     &#64;Resource(lookup = "java:/jms/topic/push")
+ *     private Topic jmsTopic;
+ *
+ *     &#64;Inject
+ *     private JMSContext jmsContext;
+ *
+ *     public void fireEvent(PushEvent pushEvent) {
+ *         try {
+ *             Message jmsMessage = jmsContext.createMessage();
+ *             jmsMessage.setStringProperty("message", pushEvent.getMessage());
+ *             jmsContext.createProducer().send(jmsTopic, jmsMessage);
+ *         }
+ *         catch (Exception e) {
+ *             // Handle.
+ *         }
+ *     }
+ * }
+ * </pre>
+ * <pre>
+ * &#64;MessageDriven(activationConfig = {
+ *     &#64;ActivationConfigProperty(propertyName = "destination", propertyValue = "java:/jms/topic/push")
+ * })
+ * public class PushListener implements MessageListener {
+ *
+ *     &#64;Inject
+ *     private BeanManager beanManager;
+ *
+ *     &#64;Override
+ *     public void onMessage(Message jmsMessage) {
+ *         try {
+ *             String message = jmsMessage.getStringProperty("message");
+ *             beanManager.fireEvent(new PushEvent(message));
+ *         }
+ *         catch (Exception e) {
+ *             // Handle.
+ *         }
+ *     }
+ * }
+ * </pre>
+ * <p>
+ * Then, in your EJB, instead of using <code>BeanManager#fireEvent()</code> to fire the CDI event,
+ * <pre>
+ * &#64;Inject
+ * private BeanManager beanManager;
+ *
+ * public void onSomeEntityChange(Entity entity) {
+ *     beanManager.fireEvent(new PushEvent(entity.getSomeProperty()));
+ * }
+ * </pre>
+ * <p>
+ * use the newly created <code>PushManager#fireEvent()</code> to fire the JMS event from one server node of the cluster,
+ * which in turn will fire the CDI event in all server nodes of the cluster.
+ * <pre>
+ * &#64;Inject
+ * private PushManager pushManager;
+ *
+ * public void onSomeEntityChange(Entity entity) {
+ *     pushManager.fireEvent(new PushEvent(entity.getSomeProperty()));
+ * }
+ * </pre>
  *
  *
  * <h3 id="ui"><a href="#ui">UI update design hints</a></h3>

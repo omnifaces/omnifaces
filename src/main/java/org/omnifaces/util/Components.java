@@ -657,7 +657,7 @@ public final class Components {
 	 */
 	public static UIComponent includeCompositeComponent(UIComponent parent, String libraryName, String tagName, String id, Map<String, String> attributes) {
 		String taglibURI = "http://xmlns.jcp.org/jsf/composite/" + libraryName;
-		Map<String, Object> attrs = (attributes == null) ? null : new HashMap<>(attributes);
+		Map<String, Object> attrs = (attributes == null) ? null : new HashMap<String, Object>(attributes);
 
 		FacesContext context = FacesContext.getCurrentInstance();
 		UIComponent composite = context.getApplication().getViewHandler()
