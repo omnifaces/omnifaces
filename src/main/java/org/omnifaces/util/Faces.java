@@ -1811,6 +1811,7 @@ public final class Faces {
 	 * @param value The cookie value.
 	 * @param domain The cookie domain. You can use <code>.example.com</code> (with a leading period) if you'd like the
 	 * cookie to be available to all subdomains of the domain. Note that you cannot set it to a different domain.
+	 * Defaults to {@link #getRequestHostname()} when <code>null</code>.
 	 * @param path The cookie path. If this is <code>/</code>, then the cookie is available in all pages of the webapp.
 	 * If this is <code>/somespecificpath</code>, then the cookie is only available in pages under the specified path.
 	 * @param maxAge The maximum age of the cookie, in seconds. If this is <code>0</code>, then the cookie will be
@@ -1823,6 +1824,30 @@ public final class Faces {
 	 */
 	public static void addResponseCookie(String name, String value, String domain, String path, int maxAge) {
 		FacesLocal.addResponseCookie(getContext(), name, value, domain, path, maxAge);
+	}
+
+	/**
+	 * Add a cookie with given name, value, domain, path, maxage and HttpOnly flag to the HTTP response.
+	 * The cookie value will implicitly be URL-encoded with UTF-8 so that any special characters can be stored.
+	 * The cookie will implicitly be set to secure when the current request is a HTTPS request.
+	 * @param name The cookie name.
+	 * @param value The cookie value.
+	 * @param domain The cookie domain. You can use <code>.example.com</code> (with a leading period) if you'd like the
+	 * cookie to be available to all subdomains of the domain. Note that you cannot set it to a different domain.
+	 * Defaults to {@link #getRequestHostname()} when <code>null</code>.
+	 * @param path The cookie path. If this is <code>/</code>, then the cookie is available in all pages of the webapp.
+	 * If this is <code>/somespecificpath</code>, then the cookie is only available in pages under the specified path.
+	 * @param maxAge The maximum age of the cookie, in seconds. If this is <code>0</code>, then the cookie will be
+	 * removed. Note that the name and path must be exactly the same as it was when the cookie was created. If this is
+	 * <code>-1</code> then the cookie will become a session cookie and thus live as long as the established HTTP
+	 * session.
+	 * @param httpOnly When set to true, then JavaScript is not allowed to manipulate the cookie.
+	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
+	 * @see ExternalContext#addResponseCookie(String, String, Map)
+	 * @since 3.3
+	 */
+	public static void addResponseCookie(String name, String value, String domain, String path, int maxAge, boolean httpOnly) {
+		FacesLocal.addResponseCookie(getContext(), name, value, domain, path, maxAge, httpOnly);
 	}
 
 	/**

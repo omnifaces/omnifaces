@@ -30,7 +30,6 @@ import static org.omnifaces.util.Servlets.toQueryString;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.encodeURL;
 import static org.omnifaces.util.Utils.isEmpty;
-import static org.omnifaces.util.Utils.isOneOf;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -1265,25 +1264,32 @@ public final class FacesLocal {
 	 * @see Faces#addResponseCookie(String, String, int)
 	 */
 	public static void addResponseCookie(FacesContext context, String name, String value, int maxAge) {
-		addResponseCookie(context, name, value, getRequestHostname(context), null, maxAge);
+		addResponseCookie(context, name, value, null, null, maxAge);
 	}
 
 	/**
 	 * @see Faces#addResponseCookie(String, String, String, int)
 	 */
 	public static void addResponseCookie(FacesContext context, String name, String value, String path, int maxAge) {
-		addResponseCookie(context, name, value, getRequestHostname(context), path, maxAge);
+		addResponseCookie(context, name, value, null, path, maxAge, true);
 	}
 
 	/**
 	 * @see Faces#addResponseCookie(String, String, String, String, int)
 	 */
 	public static void addResponseCookie(FacesContext context, String name, String value, String domain, String path, int maxAge) {
+		addResponseCookie(context, name, value, domain, path, maxAge, true);
+	}
+
+	/**
+	 * @see Faces#addResponseCookie(String, String, String, String, int, boolean)
+	 */
+	public static void addResponseCookie(FacesContext context, String name, String value, String domain, String path, int maxAge, boolean httpOnly) {
 		ExternalContext externalContext = context.getExternalContext();
 		Map<String, Object> properties = new HashMap<>();
 
-		if (!isOneOf(domain, null, "localhost")) { // Chrome doesn't like domain:"localhost" on cookies.
-			properties.put("domain", domain);
+		if (!"localhost".equals(domain)) { // Chrome doesn't like domain:"localhost" on cookies.
+			properties.put("domain", (domain == null) ? getRequestHostname(context) : domain);
 		}
 
 		if (path != null) {
@@ -1291,7 +1297,7 @@ public final class FacesLocal {
 		}
 
 		properties.put("maxAge", maxAge);
-		properties.put("httpOnly", true);
+		properties.put("httpOnly", httpOnly);
 		properties.put("secure", isSecure((HttpServletRequest) externalContext.getRequest()));
 		externalContext.addResponseCookie(name, encodeURL(value), properties);
 	}
