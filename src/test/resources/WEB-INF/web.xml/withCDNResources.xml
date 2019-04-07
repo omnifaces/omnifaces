@@ -26,6 +26,10 @@
 			cdn:jquery.js=http://code.jquery.com/jquery-2.2.4.min.js
 		</param-value>
 	</context-param>
+	<context-param>
+		<param-name>org.omnifaces.CDN_RESOURCE_HANDLER_DISABLED</param-name>
+		<param-value>#{facesContext.application.projectStage eq 'Development'}</param-value>
+	</context-param>
 
 	<servlet>
 		<servlet-name>facesServlet</servlet-name>
