@@ -125,4 +125,10 @@ public interface Cache extends Serializable {
 	 */
 	void remove(String key);
 
+	/**
+	 * Clears the entire cache
+	 * @sinc 3.3
+	 */
+	void clear();
+
 }

@@ -117,6 +117,11 @@ public abstract class TimeToLiveCache implements Cache {
 		cacheStore.remove(key);
 	}
 
+	@Override
+	public void clear() {
+		cacheStore.clear();
+	}
+
 	protected void setCacheStore(Map<String, CacheEntry> cacheStore) {
 		this.cacheStore = cacheStore;
 	}
