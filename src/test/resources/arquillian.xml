@@ -18,11 +18,6 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://jboss.org/schema/arquillian http://jboss.org/schema/arquillian/arquillian_1_0.xsd"
 >
-	<container qualifier="wildfly-managed" default="true">
-		<configuration>
-			<property name="serverConfig">standalone-ee8.xml</property>
-		</configuration>
-	</container>
 	<extension qualifier="webdriver">
 		<property name="browser">htmlUnit</property>
 	</extension>
