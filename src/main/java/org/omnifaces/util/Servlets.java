@@ -86,7 +86,7 @@ import org.omnifaces.facesviews.FacesViews;
  * <li>The {@link #facesRedirect(HttpServletRequest, HttpServletResponse, String, String...)} which is capable
  * of distinguishing JSF ajax requests from regular requests and altering the redirect logic on it, exactly like as
  * {@link ExternalContext#redirect(String)} does. In other words, this method behaves exactly the same as
- * {@link Faces#redirect(String, String...)}.
+ * {@link Faces#redirect(String, Object...)}.
  * <li>The {@link #isFacesDevelopment(ServletContext)} which is capable of checking if the current JSF application
  * configuration is set to development project stage.
  * </ul>
@@ -793,7 +793,7 @@ public final class Servlets {
 
 	/**
 	 * Sends a temporary (302) JSF redirect to the given URL, supporting JSF ajax requests. This does exactly the same
-	 * as {@link Faces#redirect(String, String...)}, but without the need for a {@link FacesContext}. The major
+	 * as {@link Faces#redirect(String, Object...)}, but without the need for a {@link FacesContext}. The major
 	 * advantage is that you can perform the job inside a servlet filter or even a plain vanilla servlet, where the
 	 * {@link FacesContext} is normally not available. This method also recognizes JSF ajax requests which requires a
 	 * special XML response in order to successfully perform the redirect.

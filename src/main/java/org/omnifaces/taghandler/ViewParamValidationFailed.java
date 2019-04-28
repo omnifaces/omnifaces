@@ -55,7 +55,7 @@ import org.omnifaces.util.Faces;
  * parameter has already handled the validation error via its own <code>&lt;o:viewParamValidationFailed&gt;</code>,
  * it will be applied when there's a general validation error as per {@link FacesContext#isValidationFailed()}.
  * <p>
- * When the <code>sendRedirect</code> attribute is set, a call to {@link Faces#redirect(String, String...)} is made
+ * When the <code>sendRedirect</code> attribute is set, a call to {@link Faces#redirect(String, Object...)} is made
  * internally to send the redirect. So, the same rules as to scheme and leading slash apply here.
  * When the <code>sendError</code> attribute is set, a call to {@link Faces#responseSendError(int, String)} is made
  * internally to send the error. You can therefore customize HTTP error pages via <code>&lt;error-page&gt;</code>
