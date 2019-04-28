@@ -127,7 +127,7 @@ public interface Cache extends Serializable {
 
 	/**
 	 * Clears the entire cache
-	 * @sinc 3.3
+	 * @since 3.3
 	 */
 	void clear();
 

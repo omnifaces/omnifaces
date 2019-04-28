@@ -79,7 +79,7 @@ import org.omnifaces.facesviews.FacesViews;
  * <p>
  * Next to those oneliner delegate calls, there are also some helpful methods which eliminates multiline boilerplate
  * code, such as {@link #getLocale()} which returns sane fallback values, a more convenient
- * {@link #redirect(String, String...)} which automatically prepends the context path when the path does not start with
+ * {@link #redirect(String, Object...)} which automatically prepends the context path when the path does not start with
  * <code>/</code> and offers support for URL encoding of request parameters supplied by varargs argument, and several
  * useful {@link #sendFile(File, boolean)} methods which allows you to provide a {@link File}, <code>byte[]</code> or
  * {@link InputStream} as a download to the client.
@@ -1718,7 +1718,7 @@ public final class Faces {
 	 * which will implicitly also remove the user principal. Just invoke {@link #invalidateSession()} instead. Note
 	 * that the user principal is still present in the response of the current request, it's therefore recommend to
 	 * send a redirect after {@link #logout()} or {@link #invalidateSession()}. You can use
-	 * {@link #redirect(String, String...)} for this.
+	 * {@link #redirect(String, Object...)} for this.
 	 * @throws ServletException When the logout has failed.
 	 * @see HttpServletRequest#logout()
 	 */
