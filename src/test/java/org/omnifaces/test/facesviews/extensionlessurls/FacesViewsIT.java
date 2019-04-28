@@ -105,8 +105,10 @@ public class FacesViewsIT extends OmniFacesIT {
 		open("FacesViewsITNonExistingPage");
 		verify404("FacesViewsITNonExistingPage");
 
-		open("FacesViewsITNonExistingPage.xhtml");
-		verify404("FacesViewsITNonExistingPage.xhtml");
+		if (!isTomee()) { // MyFaces throws NPE on this and thus incorrectly returns 500 instead of 404.
+			open("FacesViewsITNonExistingPage.xhtml");
+			verify404("FacesViewsITNonExistingPage.xhtml");
+		}
 	}
 
 	private void verify200(String title, String path) {
