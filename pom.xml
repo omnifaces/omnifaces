@@ -72,9 +72,9 @@
 		<maven.source.excludeResources>true</maven.source.excludeResources>
 
 		<!-- Test server versions. -->
-		<test.wildfly.version>12.0.0.Final</test.wildfly.version>
-		<test.tomee.version>7.0.4</test.tomee.version> <!-- TODO: update to Java EE 8 compatible version -->
-		<test.payara.version>5.Beta2</test.payara.version>
+		<test.wildfly.version>16.0.0.Final</test.wildfly.version>
+		<test.tomee.version>8.0.0-M2</test.tomee.version>
+		<test.payara.version>5.191</test.payara.version>
 	</properties>
 
 	<dependencies>
@@ -280,7 +280,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.0.2</version>
+				<version>3.1.1</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -314,7 +314,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.0.0</version>
+				<version>3.1.0</version>
 				<configuration>
 					<javadocVersion>${javadoc.version}</javadocVersion>
 					<notimestamp>true</notimestamp>
@@ -401,7 +401,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>3.0.2</version>
+					<version>3.1.1</version>
 					<executions>
 						<execution>
 							<phase>process-test-classes</phase>
@@ -417,7 +417,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-failsafe-plugin</artifactId>
-					<version>2.20.1</version>
+					<version>2.22.1</version>
 					<executions>
 						<execution>
 							<goals>
@@ -452,7 +452,7 @@
 				<dependency>
 					<groupId>org.wildfly.arquillian</groupId>
 					<artifactId>wildfly-arquillian-container-managed</artifactId>
-					<version>2.1.0.Final</version>
+					<version>2.2.0.Final</version>
 					<scope>test</scope>
 				</dependency>
 			</dependencies>
@@ -518,61 +518,6 @@
 											<classifier>webprofile</classifier>
 										</artifactItem>
 									</artifactItems>
-								</configuration>
-							</execution>
-							<execution>
-								<id>upgrade-tomee-to-jsf23</id>
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>copy</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>org.apache.myfaces.core</groupId>
-											<artifactId>myfaces-api</artifactId>
-											<version>2.3.0-beta</version>
-											<type>jar</type>
-											<outputDirectory>${project.build.directory}/apache-tomee-webprofile-${test.tomee.version}/lib</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>org.apache.myfaces.core</groupId>
-											<artifactId>myfaces-impl</artifactId>
-											<version>2.3.0-beta</version>
-											<type>jar</type>
-											<outputDirectory>${project.build.directory}/apache-tomee-webprofile-${test.tomee.version}/lib</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>commons-codec</groupId>
-											<artifactId>commons-codec</artifactId>
-											<version>1.10</version>
-											<type>jar</type>
-											<outputDirectory>${project.build.directory}/apache-tomee-webprofile-${test.tomee.version}/lib</outputDirectory>
-										</artifactItem>
-									</artifactItems>
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.codehaus.mojo</groupId>
-						<artifactId>truezip-maven-plugin</artifactId>
-						<version>1.2</version>
-						<executions>
-							<execution>
-								<id>remove-tomee-jsf22-files</id>
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>remove</goal>
-								</goals>
-								<configuration>
-									<fileset>
-										<directory>${project.build.directory}/apache-tomee-webprofile-${test.tomee.version}/lib</directory>
-										<includes>
-											<include>myfaces-api-2.2.12.jar</include>
-											<include>myfaces-impl-2.2.12.jar</include>
-										</includes>
-									</fileset>
 								</configuration>
 							</execution>
 						</executions>
