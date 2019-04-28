@@ -30,11 +30,7 @@
 		<param-name>org.omnifaces.CDN_RESOURCE_HANDLER_DISABLED</param-name>
 		<param-value>#{facesContext.application.projectStage eq 'Development'}</param-value>
 	</context-param>
-<<<<<<< HEAD
-	
-=======
 
->>>>>>> refs/heads/2.x
 	<servlet>
 		<servlet-name>facesServlet</servlet-name>
 		<servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
