@@ -90,7 +90,7 @@ OmniFaces.Push = (function(Util, window) {
 			socket.onclose = function(event) {
 				if (!socket
 					|| (event.code == 1000 && event.reason == REASON_EXPIRED)
-					|| (event.code == 1008 || event.reason == REASON_UNKNOWN_CHANNEL) // Older IE versions incorrectly return 1005 instead of 1008, hence the fallback check on the message.
+					|| (event.code == 1008 || (event.code == 1005 && event.reason == REASON_UNKNOWN_CHANNEL)) // Older IE versions incorrectly return 1005 instead of 1008, hence the extra check on the message.
 					|| (reconnectAttempts == null)
 					|| (reconnectAttempts >= MAX_RECONNECT_ATTEMPTS))
 				{
