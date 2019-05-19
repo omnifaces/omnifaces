@@ -75,9 +75,9 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <p>
  * Related JSF issues:
  * <ul>
- * <li><a href="https://java.net/jira/browse/JAVASERVERFACES-1351">Mojarra issue 1351</a>
- * <li><a href="https://java.net/jira/browse/JAVASERVERFACES-1839">Mojarra issue 1839</a>
- * <li><a href="https://java.net/jira/browse/JAVASERVERFACES_SPEC_PUBLIC-905">JSF spec issue 905</a>
+ * <li><a href="https://github.com/eclipse-ee4j/mojarra/issues/1355">Mojarra issue 1355</a>
+ * <li><a href="https://github.com/eclipse-ee4j/mojarra/issues/1843">Mojarra issue 1843</a>
+ * <li><a href="https://github.com/javaee/javaserverfaces-spec/issues/905">JSF spec issue 905</a>
  * </ul>
  *
  * <h3>Usage</h3>

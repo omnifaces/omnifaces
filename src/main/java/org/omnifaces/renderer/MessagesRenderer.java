@@ -44,8 +44,8 @@ import org.omnifaces.util.Callback;
 
 /**
  * This renderer is the default renderer of {@link OmniMessages}. It's basically copypasted from Mojarra 2.2,
- * including the fix of tooltip rendering as described in <a href="http://java.net/jira/browse/JAVASERVERFACES-2160">
- * issue 2160</a>, and afterwards slightly rewritten, refactored and enhanced to take the new features into account.
+ * including the fix of tooltip rendering as described in <a href="https://github.com/eclipse-ee4j/mojarra/issues/2164">
+ * issue 2164</a>, and afterwards slightly rewritten, refactored and enhanced to take the new features into account.
  *
  * @author Bauke Scholtz
  * @since 1.5

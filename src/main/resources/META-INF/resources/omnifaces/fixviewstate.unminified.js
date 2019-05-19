@@ -39,7 +39,7 @@
  * necessary for MyFaces as they have internally already fixed it for long in their jsf.js.
  * 
  * @author Bauke Scholtz
- * @link https://java.net/jira/browse/JAVASERVERFACES_SPEC_PUBLIC-790
+ * @link https://github.com/javaee/javaserverfaces-spec/issues/790
  * @since 1.7
  */
 OmniFaces.FixViewState = (function(window, document) {

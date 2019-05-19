@@ -92,7 +92,7 @@ import javax.faces.render.RenderKitWrapper;
  * Note that <code>&lt;f:ajax&gt;</code> of Mojarra 2.0.0-2.1.13 explicitly checks for
  * <code>&lt;input type="text"&gt;</code> and ignores other types while preparing request parameters for ajax submit,
  * resulting in <code>null</code> values in managed bean after an ajax submit. This has been reported as
- * <a href="http://java.net/jira/browse/JAVASERVERFACES-2532">Mojarra issue 2532</a> and is fixed in Mojarra 2.1.14.
+ * <a href="https://github.com/eclipse-ee4j/mojarra/issues/2536">Mojarra issue 2536</a> and is fixed in Mojarra 2.1.14.
  * This problem is thus completely unrelated to <code>Html5RenderKit</code>.
  *
  * <h3>JSF 2.2 notice</h3>

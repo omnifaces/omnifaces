@@ -103,7 +103,7 @@ import org.omnifaces.util.Hacks;
  * ended up to be too clumsy.
  *
  * <p><strong>See also</strong>:
- * <br><a href="http://java.net/jira/browse/JAVASERVERFACES_SPEC_PUBLIC-1060">JSF spec issue 1060</a>
+ * <br><a href="https://github.com/javaee/javaserverfaces-spec/issues/1060">JSF spec issue 1060</a>
  *
  * @author Bauke Scholtz
  */
