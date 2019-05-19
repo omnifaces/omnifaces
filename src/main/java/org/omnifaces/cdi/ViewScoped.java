@@ -73,8 +73,8 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <p>
  * Related JSF issues:
  * <ul>
- * <li><a href="https://github.com/javaserverfaces/mojarra/issues/1355">Mojarra issue 1355</a>
- * <li><a href="https://github.com/javaserverfaces/mojarra/issues/1843">Mojarra issue 1843</a>
+ * <li><a href="https://github.com/eclipse-ee4j/mojarra/issues/1355">Mojarra issue 1355</a>
+ * <li><a href="https://github.com/eclipse-ee4j/mojarra/issues/1843">Mojarra issue 1843</a>
  * <li><a href="https://github.com/javaee/javaserverfaces-spec/issues/905">JSF spec issue 905</a>
  * </ul>
  *
@@ -177,6 +177,30 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  *     return $("body").data("unsavedchanges") ? "You have unsaved data. Are you sure you wish to leave this page?" : null;
  * };
  * </pre>
+ *
+ * <h3>Using download links</h3>
+ * <p>
+ * If you have a synchronous download link as in <code>&lt;a href="/path/to/file.ext"&gt;</code>, then the unload will
+ * also be triggered. For HTML5-capable browsers it's sufficient to add the <code>download</code> attribute representing
+ * the file name you'd like to use in the client specific "Save As" dialogue.
+ * <pre>
+ * &lt;a href="/path/to/file.ext" download="file.ext"&gt;download&lt;/a&gt;
+ * </pre>
+ * <p>
+ * When this attribute is present, then the browser won't anymore trigger the unload event. In case your target browser
+ * does not <a href="https://caniuse.com/#feat=download">support</a> it, then you'd need to explicitly disable the
+ * OmniFaces unload event as follows:
+ * <pre>
+ * &lt;a href="/path/to/file.ext" onclick="OmniFaces.Unload.disable();"&gt;download&lt;/a&gt;
+ * </pre>
+ * <p>
+ * An alternative is to explicitly open the download in a new tab/window. Decent browsers, even these not supporting the
+ * <code>download</code> attribute, will usually automatically close the newly opened tab/window when a response with
+ * <code>Content-Disposition: attachment</code> is received.
+ * <pre>
+ * &lt;a href="/path/to/file.ext" target="_blank"&gt;download&lt;/a&gt;
+ * </pre>
+ *
  *
  * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz

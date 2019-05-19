@@ -79,7 +79,7 @@ import org.omnifaces.util.State;
  * <p>
  * It will install the {@link SocketEndpoint}. Lazy initialization of the endpoint via component is unfortunately not
  * possible across all containers (yet).
- * See also <a href="https://github.com/javaee/websocket-spec/issues/211">WS spec issue 211</a>.
+ * See also <a href="https://github.com/eclipse-ee4j/websocket-api/issues/211">WS spec issue 211</a>.
  *
  *
  * <h3 id="usage-client"><a href="#usage-client">Usage (client)</a></h3>
