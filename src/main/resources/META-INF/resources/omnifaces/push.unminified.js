@@ -44,10 +44,13 @@ OmniFaces.Push = (function(Util, window) {
 	 * @param {string} channel The name of the web socket channel.
 	 * @param {function} onopen The function to be invoked when the web socket is opened.
 	 * @param {function} onmessage The function to be invoked when a message is received.
-	 * @param {function} onclose The function to be invoked when the web socket is closed.
+	 * @param {function} onerror The function to be invoked when a connection error has occurred and the web socket will
+	 * attempt to reconnect.
+	 * @param {function} onclose The function to be invoked when the web socket is closed and will not anymore attempt
+	 * to reconnect.
 	 * @param {Object} behaviors Client behavior functions to be invoked when specific message is received.
 	 */
-	function Socket(url, channel, onopen, onmessage, onclose, behaviors) {
+	function Socket(url, channel, onopen, onmessage, onerror, onclose, behaviors) {
 
 		// Private fields -----------------------------------------------------------------------------------------
 
@@ -97,6 +100,7 @@ OmniFaces.Push = (function(Util, window) {
 					onclose(event.code, channel, event);
 				}
 				else {
+					onerror(event.code, channel, event);
 					setTimeout(self.open, RECONNECT_INTERVAL * reconnectAttempts++);
 				}
 			}
@@ -133,17 +137,22 @@ OmniFaces.Push = (function(Util, window) {
 	 * @param {function} onmessage The JavaScript event handler function that is invoked when a message is received from
 	 * the server. The function will be invoked with three arguments: the push message, the channel name and the raw
 	 * <code>MessageEvent</code> itself.
-	 * @param {function} onclose The JavaScript event handler function that is invoked when the web socket is closed.
-	 * The function will be invoked with three arguments: the close reason code, the channel name and the raw
-	 * <code>CloseEvent</code> itself. Note that this will also be invoked on errors and that you can inspect the
-	 * close reason code if an error occurred and which one (i.e. when the code is not 1000). See also
-	 * <a href="http://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and
-	 * <a href="http://docs.oracle.com/javaee/7/api/javax/websocket/CloseReason.CloseCodes.html">CloseCodes</a> API
-	 * for an elaborate list.
+	 * @param {function} onerror The JavaScript event handler function that is invoked when a connection error has
+	 * occurred and the web socket will attempt to reconnect. The function will be invoked with three arguments: the
+	 * error reason code, the channel name and the raw <code>CloseEvent</code> itself. Note that this will not be
+	 * invoked on final close of the web socket, even when the final close is caused by an error. See also
+	 * <a href="http://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and {@link CloseCodes} API
+	 * for an elaborate list of all close codes.
+	 * @param {function} onclose The function to be invoked when the web socket is closed and will not anymore attempt
+	 * to reconnect. The function will be invoked with three arguments: the close reason code, the channel name
+	 * and the raw <code>CloseEvent</code> itself. Note that this will also be invoked when the close is caused by an
+	 * error and that you can inspect the close reason code if an actual connection error occurred and which one (i.e.
+	 * when the code is not 1000 or 1008). See also <a href="http://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455
+	 * section 7.4.1</a> and {@link CloseCodes} API for an elaborate list of all close codes.
 	 * @param {Object} behaviors Client behavior functions to be invoked when specific message is received.
 	 * @param {boolean} autoconnect Whether or not to immediately open the socket. Defaults to <code>false</code>.
 	 */
-	self.init = function(host, uri, onopen, onmessage, onclose, behaviors, autoconnect) {
+	self.init = function(host, uri, onopen, onmessage, onerror, onclose, behaviors, autoconnect) {
 		onclose = Util.resolveFunction(onclose);
 		var channel = uri.split(/\?/)[0];
 
@@ -153,7 +162,7 @@ OmniFaces.Push = (function(Util, window) {
 		}
 
 		if (!sockets[channel]) {
-			sockets[channel] = new Socket(getBaseURL(host) + uri, channel, Util.resolveFunction(onopen), Util.resolveFunction(onmessage), onclose, behaviors);
+			sockets[channel] = new Socket(getBaseURL(host) + uri, channel, Util.resolveFunction(onopen), Util.resolveFunction(onmessage), Util.resolveFunction(onerror), onclose, behaviors);
 		}
 
 		if (autoconnect) {
