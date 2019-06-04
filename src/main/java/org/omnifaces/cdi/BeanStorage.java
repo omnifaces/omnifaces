@@ -68,7 +68,7 @@ public class BeanStorage implements Serializable {
 	 */
 	public <T> T createBean(Contextual<T> type, CreationalContext<T> context) {
 		T bean = type.create(context);
-		if(passivationCapable) {
+		if (passivationCapable) {
 			beans.put(((PassivationCapable) type).getId(), bean);
 		} else {
 			beans.put(type.getClass().getName(), bean);
@@ -84,7 +84,7 @@ public class BeanStorage implements Serializable {
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> T getBean(Contextual<T> type) {
-		if(passivationCapable) {
+		if (passivationCapable) {
 			return (T) beans.get(((PassivationCapable) type).getId());
 		} else {
 			return (T) beans.get(type.getClass().getName());

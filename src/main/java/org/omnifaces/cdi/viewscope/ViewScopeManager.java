@@ -72,15 +72,15 @@ public class ViewScopeManager {
 
 	/** OmniFaces specific context parameter name of maximum active view scopes in session. */
 	public static final String PARAM_NAME_MAX_ACTIVE_VIEW_SCOPES =
-		"org.omnifaces.VIEW_SCOPE_MANAGER_MAX_ACTIVE_VIEW_SCOPES";
+			"org.omnifaces.VIEW_SCOPE_MANAGER_MAX_ACTIVE_VIEW_SCOPES";
 
 	/** Mojarra specific context parameter name of maximum number of logical views in session. */
 	public static final String PARAM_NAME_MOJARRA_NUMBER_OF_VIEWS =
-		"com.sun.faces.numberOfLogicalViews";
+			"com.sun.faces.numberOfLogicalViews";
 
 	/** MyFaces specific context parameter name of maximum number of views in session. */
 	public static final String PARAM_NAME_MYFACES_NUMBER_OF_VIEWS =
-		"org.apache.myfaces.NUMBER_OF_VIEWS_IN_SESSION";
+			"org.apache.myfaces.NUMBER_OF_VIEWS_IN_SESSION";
 
 	/** OmniFaces specific context parameter name to configure view scope bean passivation support. */
 	public static final String PARAM_NAME_VIEW_SCOPE_PASSIVATION_CAPABLE =
