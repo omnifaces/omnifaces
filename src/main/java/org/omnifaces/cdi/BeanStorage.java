@@ -39,8 +39,6 @@ public class BeanStorage implements Serializable {
 
 	private final ConcurrentHashMap<String, Object> beans;
 
-	private final Boolean passivationCapable;
-
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	/**
@@ -49,13 +47,8 @@ public class BeanStorage implements Serializable {
 	 */
 	public BeanStorage(int initialCapacity) {
 		beans = new ConcurrentHashMap<>(initialCapacity);
-		passivationCapable = true;
 	}
 
-	public BeanStorage(int initialCapacity, Boolean passivationCapable) {
-		beans = new ConcurrentHashMap<>(initialCapacity);
-		this.passivationCapable = passivationCapable;
-	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -68,7 +61,7 @@ public class BeanStorage implements Serializable {
 	 */
 	public <T> T createBean(Contextual<T> type, CreationalContext<T> context) {
 		T bean = type.create(context);
-		if (passivationCapable) {
+		if (type instanceof PassivationCapable) {
 			beans.put(((PassivationCapable) type).getId(), bean);
 		} else {
 			beans.put(type.getClass().getName(), bean);
@@ -84,7 +77,7 @@ public class BeanStorage implements Serializable {
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> T getBean(Contextual<T> type) {
-		if (passivationCapable) {
+		if (type instanceof PassivationCapable) {
 			return (T) beans.get(((PassivationCapable) type).getId());
 		} else {
 			return (T) beans.get(type.getClass().getName());

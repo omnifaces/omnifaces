@@ -82,10 +82,6 @@ public class ViewScopeManager {
 	public static final String PARAM_NAME_MYFACES_NUMBER_OF_VIEWS =
 			"org.apache.myfaces.NUMBER_OF_VIEWS_IN_SESSION";
 
-	/** OmniFaces specific context parameter name to configure view scope bean passivation support. */
-	public static final String PARAM_NAME_VIEW_SCOPE_PASSIVATION_CAPABLE =
-			"org.omnifaces.VIEW_SCOPE_PASSIVATION_CAPABLE";
-
 	/** Default value of maximum active view scopes in session. */
 	public static final int DEFAULT_MAX_ACTIVE_VIEW_SCOPES = 20; // Mojarra's default is 15 and MyFaces' default is 20.
 
@@ -202,8 +198,7 @@ public class ViewScopeManager {
 		BeanStorage beanStorage = storage.getBeanStorage(beanStorageId);
 
 		if (beanStorage == null) {
-			Boolean passivationCapable = Boolean.valueOf(FacesLocal.getInitParameterOrDefault(FacesContext.getCurrentInstance(), PARAM_NAME_VIEW_SCOPE_PASSIVATION_CAPABLE, "true"));
-			beanStorage = new BeanStorage(DEFAULT_BEANS_PER_VIEW_SCOPE, passivationCapable);
+			beanStorage = new BeanStorage(DEFAULT_BEANS_PER_VIEW_SCOPE);
 			storage.setBeanStorage(beanStorageId, beanStorage);
 		}
 
