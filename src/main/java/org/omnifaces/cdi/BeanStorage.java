@@ -60,7 +60,7 @@ public class BeanStorage implements Serializable {
 	 */
 	public <T> T createBean(Contextual<T> type, CreationalContext<T> context) {
 		T bean = type.create(context);
-		beans.put(((PassivationCapable) type).getId(), bean);
+		beans.put(getBeanId(type), bean);
 		return bean;
 	}
 
@@ -72,7 +72,14 @@ public class BeanStorage implements Serializable {
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> T getBean(Contextual<T> type) {
-		return (T) beans.get(((PassivationCapable) type).getId());
+		return (T) beans.get(getBeanId(type));
+	}
+
+	/**
+	 * Returns the bean identifier of the given type.
+	 */
+	private String getBeanId(Contextual<?> type) {
+		return (type instanceof PassivationCapable) ? ((PassivationCapable) type).getId() : type.getClass().getName();
 	}
 
 	/**
