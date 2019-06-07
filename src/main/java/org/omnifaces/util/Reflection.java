@@ -164,8 +164,14 @@ public final class Reflection {
 		List<Method> methods = new ArrayList<>();
 
 		for (Class<?> cls = base.getClass(); cls != null; cls = cls.getSuperclass()) {
-			for (Method method : cls.getDeclaredMethods()) {
+			search: for (Method method : cls.getDeclaredMethods()) {
 				if (method.getName().equals(methodName) && method.getParameterTypes().length == params.length) {
+					for (Method added : methods) {
+						if (Arrays.equals(added.getParameterTypes(), method.getParameterTypes())) {
+							continue search; // Ignore overridden method from superclass.
+						}
+					}
+
 					methods.add(method);
 				}
 			}
@@ -181,11 +187,19 @@ public final class Reflection {
 
 	private static Method closestMatchingMethod(List<Method> methods, Object... params) {
 		for (Method method : methods) {
-			Class<?>[] candidateParams = method.getParameterTypes();
+			Class<?>[] candidateParamTypes = method.getParameterTypes();
 			boolean match = true;
 
 			for (int i = 0; i < params.length; i++) {
-				if (!candidateParams[i].isInstance(params[i])) {
+				Object param = params[i];
+				Class<?> paramType = param != null ? param.getClass() : null;
+				Class<?> candidateParamType = candidateParamTypes[i];
+
+				if (paramType != null && candidateParamType.isPrimitive()) {
+					paramType = getPrimitiveType(paramType);
+				}
+
+				if (paramType == null ? !candidateParamType.isPrimitive() : !candidateParamType.isAssignableFrom(paramType)) {
 					match = false;
 					break;
 				}
@@ -200,6 +214,23 @@ public final class Reflection {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Returns the primitive type of the given type, if any.
+	 */
+	private static Class<?> getPrimitiveType(Class<?> type)
+	{
+		return type.isPrimitive() ? type
+			: type == Boolean.class ? boolean.class
+			: type == Byte.class ? byte.class
+			: type == Short.class ? int.class
+			: type == Character.class ? char.class
+			: type == Integer.class ? int.class
+			: type == Long.class ? long.class
+			: type == Float.class ? float.class
+			: type == Double.class ? double.class
+			: null;
 	}
 
 	/**
