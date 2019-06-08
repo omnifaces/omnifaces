@@ -18,7 +18,6 @@ import static org.omnifaces.util.Faces.getServletContext;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import javax.faces.application.Application;
 import javax.faces.application.ResourceHandler;
@@ -48,8 +47,6 @@ import org.omnifaces.facesviews.FacesViews;
 public class ApplicationProcessor implements SystemEventListener {
 
 	// Constants ------------------------------------------------------------------------------------------------------
-
-	private static final Logger logger = Logger.getLogger(ApplicationProcessor.class.getName());
 
 	private static final String ERROR_DUPLICATE_RESOURCE_HANDLER =
 		"Resource handler %s is duplicated."
