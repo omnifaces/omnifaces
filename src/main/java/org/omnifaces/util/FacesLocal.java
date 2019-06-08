@@ -21,6 +21,7 @@ import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 import static org.omnifaces.util.Components.findComponentsInChildren;
 import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.Beans.getReference;
+import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Reflection.toClassOrNull;
 import static org.omnifaces.util.Servlets.addParamToMapIfNecessary;
 import static org.omnifaces.util.Servlets.formatContentDispositionHeader;
@@ -72,10 +73,12 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
 import javax.faces.context.PartialViewContext;
 import javax.faces.convert.Converter;
+import javax.faces.convert.FacesConverter;
 import javax.faces.event.PhaseId;
 import javax.faces.lifecycle.Lifecycle;
 import javax.faces.render.RenderKit;
 import javax.faces.render.RenderKitFactory;
+import javax.faces.validator.FacesValidator;
 import javax.faces.validator.Validator;
 import javax.faces.view.ViewDeclarationLanguage;
 import javax.faces.view.ViewMetadata;
@@ -303,7 +306,14 @@ public final class FacesLocal {
 	@SuppressWarnings("unchecked")
 	public static <T> Converter<T> createConverter(FacesContext context, Class<?> identifier) {
 		if (Converter.class.isAssignableFrom(identifier)) {
-			return (Converter<T>) getReference(identifier);
+			FacesConverter annotation = identifier.getAnnotation(FacesConverter.class);
+
+			if (annotation != null) {
+				return (Converter<T>) getReference(identifier, annotation);
+			}
+			else {
+				return (Converter<T>) instance(identifier);
+			}
 		}
 		else {
 			return context.getApplication().createConverter(identifier);
@@ -349,7 +359,14 @@ public final class FacesLocal {
 	@SuppressWarnings({ "unchecked", "unused" })
 	public static <T> Validator<T> createValidator(FacesContext context, Class<?> identifier) {
 		if (Validator.class.isAssignableFrom(identifier)) {
-			return (Validator<T>) getReference(identifier);
+			FacesValidator annotation = identifier.getAnnotation(FacesValidator.class);
+
+			if (annotation != null) {
+				return (Validator<T>) getReference(identifier, annotation);
+			}
+			else {
+				return (Validator<T>) instance(identifier);
+			}
 		}
 		else {
 			return null;
