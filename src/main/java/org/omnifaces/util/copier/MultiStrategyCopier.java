@@ -49,9 +49,9 @@ public class MultiStrategyCopier implements Copier {
 
 			try {
 				return copier.copy(object);
-			} catch (Exception ignore) {
+			}
+			catch (Exception ignore) {
 				logger.log(FINE, "Ignoring thrown exception; next copier will be tried and there is a fallback to IllegalStateException.", ignore);
-				continue;
 			}
 
 		}
