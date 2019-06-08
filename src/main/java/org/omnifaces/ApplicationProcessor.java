@@ -13,7 +13,6 @@
 package org.omnifaces;
 
 import static java.lang.String.format;
-import static java.util.logging.Level.SEVERE;
 import static org.omnifaces.ApplicationInitializer.ERROR_OMNIFACES_INITIALIZATION_FAIL;
 import static org.omnifaces.util.Faces.getServletContext;
 
@@ -74,8 +73,7 @@ public class ApplicationProcessor implements SystemEventListener {
 			MessagesKeywordResolver.register(application);
 		}
 		catch (Exception | LinkageError e) {
-			logger.log(SEVERE, ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
-			throw e;
+			throw new IllegalStateException(ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
 		}
 	}
 

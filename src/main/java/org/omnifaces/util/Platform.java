@@ -132,7 +132,7 @@ public final class Platform {
 	}
 
 	private static Map<String, String> mapViolationMessagesByPropertyPath(Set<ConstraintViolation<?>> violations) {
-		return violations.stream().collect(toMap(violation -> violation.getPropertyPath().toString(), violation -> violation.getMessage(), (l, r) -> l, LinkedHashMap::new));
+		return violations.stream().collect(toMap(violation -> violation.getPropertyPath().toString(), ConstraintViolation::getMessage, (l, r) -> l, LinkedHashMap::new));
 	}
 
     private static class FacesLocaleAwareMessageInterpolator implements MessageInterpolator {
