@@ -154,7 +154,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 	private boolean restoreViewRootState(FacesContext context, ResponseStateManager manager, UIViewRoot view) {
 		Object state = manager.getState(context, view.getViewId());
 
-		if (state == null || !(state instanceof Object[]) || ((Object[]) state).length < 2) {
+		if (!(state instanceof Object[]) || ((Object[]) state).length < 2) {
 			return false;
 		}
 

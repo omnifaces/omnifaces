@@ -366,6 +366,11 @@ public final class Reflection {
 	public static <T> T invokeMethod(Object instance, String methodName, Object... parameters) {
 		try {
 			Method method = findMethod(instance, methodName, parameters);
+
+			if (method == null) {
+				throw new NoSuchMethodException();
+			}
+
 			method.setAccessible(true);
 			return (T) method.invoke(instance, parameters);
 		}

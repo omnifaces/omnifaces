@@ -90,7 +90,7 @@ public class CacheEntry implements Serializable {
 	 * @return true if this entry is still valid, false otherwise.
 	 */
 	public boolean isValid() {
-		return validTill == null ? true : new Date().before(validTill);
+		return validTill == null || new Date().before(validTill);
 	}
 
 	/**
