@@ -73,7 +73,7 @@ public final class Facelets {
 	 * @return The boolean value of the given tag attribute, or false if the tag attribute is null.
 	 */
 	public static boolean getBoolean(FaceletContext context, TagAttribute tagAttribute) {
-		return tagAttribute != null ? tagAttribute.getBoolean(context) : false;
+		return tagAttribute != null && tagAttribute.getBoolean(context);
 	}
 
 	/**

@@ -130,7 +130,7 @@ public class RemappedResource extends ResourceWrapper implements Externalizable 
 	@Override
 	public boolean userAgentNeedsUpdate(FacesContext context) {
 		Resource wrapped = getWrapped();
-		return (wrapped != null) ? wrapped.userAgentNeedsUpdate(context) : false;
+		return (wrapped != null) && wrapped.userAgentNeedsUpdate(context);
 	}
 
 	@Override

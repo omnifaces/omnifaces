@@ -88,7 +88,7 @@ public class CallbackPhaseListener implements PhaseListener {
 	 */
 	public static boolean remove(PhaseListener phaseListener) {
 		Set<PhaseListener> phaseListeners = getCallbackPhaseListeners(getContext(), false);
-		return phaseListeners == null ? false : phaseListeners.remove(phaseListener);
+		return phaseListeners != null && phaseListeners.remove(phaseListener);
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------

@@ -12,7 +12,6 @@
  */
 package org.omnifaces;
 
-import static java.util.logging.Level.SEVERE;
 import static org.omnifaces.ApplicationInitializer.ERROR_OMNIFACES_INITIALIZATION_FAIL;
 import static org.omnifaces.util.Reflection.toClass;
 
@@ -86,8 +85,7 @@ public class ApplicationListener extends DefaultServletContextListener {
 			Socket.registerEndpointIfNecessary(servletContext);
 		}
 		catch (Exception | LinkageError e) {
-			logger.log(SEVERE, ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
-			throw e;
+			throw new IllegalStateException(ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
 		}
 	}
 
