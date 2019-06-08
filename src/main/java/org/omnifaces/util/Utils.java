@@ -102,7 +102,8 @@ public final class Utils {
 	private static final int UNICODE_1_BYTE = 0xf;
 	private static final int UNICODE_END_PRINTABLE_ASCII = 0x7f;
 	private static final int UNICODE_BEGIN_PRINTABLE_ASCII = 0x20;
-	private static final Map<Class<?>, Object> PRIMITIVE_DEFAULTS = createPrimitiveDefaults();
+	private static final Map<Class<?>, Object> PRIMITIVE_DEFAULTS = collectPrimitiveDefaults();
+	private static final Map<Class<?>, Class<?>> PRIMITIVE_TYPES = collectPrimitiveTypes();
 	private static final String ERROR_UNSUPPORTED_ENCODING = "UTF-8 is apparently not supported on this platform.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
@@ -113,7 +114,7 @@ public final class Utils {
 
 	// Initialization -------------------------------------------------------------------------------------------------
 
-	private static Map<Class<?>, Object> createPrimitiveDefaults() {
+	private static Map<Class<?>, Object> collectPrimitiveDefaults() {
 		Map<Class<?>, Object> primitiveDefaults = new HashMap<>();
 		primitiveDefaults.put(boolean.class, false);
 		primitiveDefaults.put(byte.class, (byte) 0);
@@ -124,6 +125,19 @@ public final class Utils {
 		primitiveDefaults.put(float.class, (float) 0);
 		primitiveDefaults.put(double.class, (double) 0);
 		return unmodifiableMap(primitiveDefaults);
+	}
+
+	private static Map<Class<?>, Class<?>> collectPrimitiveTypes() {
+		Map<Class<?>, Class<?>> primitiveTypes = new HashMap<>();
+		primitiveTypes.put(Boolean.class, boolean.class);
+		primitiveTypes.put(Byte.class, byte.class);
+		primitiveTypes.put(Short.class, short.class);
+		primitiveTypes.put(Character.class, char.class);
+		primitiveTypes.put(Integer.class, int.class);
+		primitiveTypes.put(Long.class, long.class);
+		primitiveTypes.put(Float.class, float.class);
+		primitiveTypes.put(Double.class, double.class);
+		return unmodifiableMap(primitiveTypes);
 	}
 
 	// Lang -----------------------------------------------------------------------------------------------------------
@@ -374,6 +388,18 @@ public final class Utils {
 	 */
 	public static Object getDefaultValue(Class<?> cls) {
 		return cls.isPrimitive() ? PRIMITIVE_DEFAULTS.get(cls) : null;
+	}
+
+	/**
+	 * Returns the primitive type of the given class, if any.
+	 * E.g. if given class is <code>Integer.class</code>, then it will return <code>int.class</code>.
+	 * Non-primitives and <code>void.class</code> will return <code>null</code>.
+	 * @param cls The class to obtain the primitive type for.
+	 * @return The primitive type of the given class, if any.
+	 * @since 2.7.2
+	 */
+	public static Class<?> getPrimitiveType(Class<?> cls) {
+		return cls.isPrimitive() ? cls : PRIMITIVE_TYPES.get(cls);
 	}
 
 	// I/O ------------------------------------------------------------------------------------------------------------

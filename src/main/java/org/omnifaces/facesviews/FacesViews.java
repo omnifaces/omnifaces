@@ -236,8 +236,8 @@ public final class FacesViews {
 	private static final String MAPPED_WELCOME_FILES = "org.omnifaces.facesviews.mapped_welcome_files";
 	private static final String MULTIVIEWS_WELCOME_FILE = "org.omnifaces.facesviews.multiviews_welcome_file";
 
-	private static volatile Boolean facesViewsEnabled;
-	private static volatile Boolean multiViewsEnabled;
+	private static Boolean facesViewsEnabled;
+	private static Boolean multiViewsEnabled;
 
 	private FacesViews() {
 		//

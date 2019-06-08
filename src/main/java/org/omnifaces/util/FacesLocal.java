@@ -692,7 +692,6 @@ public final class FacesLocal {
 			}
 			catch (MissingResourceException ignore) {
 				logger.log(FINEST, "Ignoring thrown exception; there is a fallback anyway.", ignore);
-				continue;
 			}
 		}
 

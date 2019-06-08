@@ -48,7 +48,7 @@ public final class CombinedResourceInfo {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final Logger logger = Logger.getLogger(CombinedResourceHandler.class.getName());
+	private static final Logger logger = Logger.getLogger(CombinedResourceInfo.class.getName());
 
 	private static final Map<String, CombinedResourceInfo> CACHE = new ConcurrentHashMap<>();
 
@@ -228,9 +228,7 @@ public final class CombinedResourceInfo {
 	 */
 	@Override
 	public boolean equals(Object other) {
-		return (other instanceof CombinedResourceInfo)
-			? ((CombinedResourceInfo) other).id.equals(id)
-			: false;
+		return (other instanceof CombinedResourceInfo) && ((CombinedResourceInfo) other).id.equals(id);
 	}
 
 	/**

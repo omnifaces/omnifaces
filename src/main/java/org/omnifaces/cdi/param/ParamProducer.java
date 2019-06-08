@@ -76,7 +76,7 @@ public class ParamProducer {
 
 	private static final String DEFAULT_REQUIRED_MESSAGE = "{0}: Value is required";
 
-	private static volatile Boolean interpretEmptyStringSubmittedValuesAsNull;
+	private static Boolean interpretEmptyStringSubmittedValuesAsNull;
 
 	@SuppressWarnings("unused") // Workaround for OpenWebBeans not properly passing it as produce() method argument.
 	@Inject

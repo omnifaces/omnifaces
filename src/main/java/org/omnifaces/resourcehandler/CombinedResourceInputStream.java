@@ -40,7 +40,7 @@ public final class CombinedResourceInputStream extends InputStream {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final Logger logger = Logger.getLogger(CombinedResourceHandler.class.getName());
+	private static final Logger logger = Logger.getLogger(CombinedResourceInputStream.class.getName());
 
 	private static final byte[] CRLF = { '\r', '\n' };
 
@@ -95,6 +95,26 @@ public final class CombinedResourceInputStream extends InputStream {
 		int read;
 
 		while ((read = currentStream.read()) == -1) {
+			if (streamIterator.hasNext()) {
+				currentStream = streamIterator.next();
+			}
+			else {
+				break;
+			}
+		}
+
+		return read;
+	}
+
+	/**
+	 * For each resource, read until its {@link InputStream#read()} returns <code>-1</code> and then iterate to the
+	 * {@link InputStream} of the next resource, if any available, else return <code>-1</code>.
+	 */
+	@Override
+	public int read(byte[] b, int offset, int length) throws IOException {
+		int read;
+
+		while ((read = currentStream.read(b, offset, length)) == -1) {
 			if (streamIterator.hasNext()) {
 				currentStream = streamIterator.next();
 			}

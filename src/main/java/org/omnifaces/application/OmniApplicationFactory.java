@@ -28,7 +28,7 @@ public class OmniApplicationFactory extends ApplicationFactory {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private volatile Application application;
+	private Application application;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 

@@ -56,7 +56,7 @@ public class ViewScopeStorageInSession implements ViewScopeStorage, Serializable
 
 	// Static variables -----------------------------------------------------------------------------------------------
 
-	private static volatile Integer maxActiveViewScopes;
+	private static Integer maxActiveViewScopes;
 
 	// Variables ------------------------------------------------------------------------------------------------------
 

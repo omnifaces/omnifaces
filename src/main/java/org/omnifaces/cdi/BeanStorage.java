@@ -37,7 +37,7 @@ public class BeanStorage implements Serializable {
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
-	private final ConcurrentHashMap<String, Object> beans;
+	private final ConcurrentHashMap<String, Serializable> beans;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -57,10 +57,11 @@ public class BeanStorage implements Serializable {
 	 * @param type The contextual type of the CDI managed bean.
 	 * @param context The context to create the bean in.
 	 * @return The bean associated with given context and creational context.
+	 * @throws ClassCastException When the bean doesn't implement serializable.
 	 */
 	public <T> T createBean(Contextual<T> type, CreationalContext<T> context) {
 		T bean = type.create(context);
-		beans.put(getBeanId(type), bean);
+		beans.put(getBeanId(type), (Serializable) bean);
 		return bean;
 	}
 
@@ -78,7 +79,7 @@ public class BeanStorage implements Serializable {
 	/**
 	 * Returns the bean identifier of the given type.
 	 */
-	private String getBeanId(Contextual<?> type) {
+	private static String getBeanId(Contextual<?> type) {
 		return (type instanceof PassivationCapable) ? ((PassivationCapable) type).getId() : type.getClass().getName();
 	}
 

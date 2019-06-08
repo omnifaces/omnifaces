@@ -16,6 +16,7 @@ import static java.beans.Introspector.getBeanInfo;
 import static java.beans.PropertyEditorManager.findEditor;
 import static java.lang.String.format;
 import static java.util.logging.Level.FINEST;
+import static org.omnifaces.util.Utils.getPrimitiveType;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -164,14 +165,8 @@ public final class Reflection {
 		List<Method> methods = new ArrayList<>();
 
 		for (Class<?> cls = base.getClass(); cls != null; cls = cls.getSuperclass()) {
-			search: for (Method method : cls.getDeclaredMethods()) {
-				if (method.getName().equals(methodName) && method.getParameterTypes().length == params.length) {
-					for (Method added : methods) {
-						if (Arrays.equals(added.getParameterTypes(), method.getParameterTypes())) {
-							continue search; // Ignore overridden method from superclass.
-						}
-					}
-
+			for (Method method : cls.getDeclaredMethods()) {
+				if (method.getName().equals(methodName) && method.getParameterTypes().length == params.length && isNotOverridden(methods, method)) {
 					methods.add(method);
 				}
 			}
@@ -185,21 +180,23 @@ public final class Reflection {
 		}
 	}
 
+	private static boolean isNotOverridden(List<Method> methodsWithSameName, Method method) {
+		for (Method methodWithSameName : methodsWithSameName) {
+			if (Arrays.equals(methodWithSameName.getParameterTypes(), method.getParameterTypes())) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	private static Method closestMatchingMethod(List<Method> methods, Object... params) {
 		for (Method method : methods) {
 			Class<?>[] candidateParamTypes = method.getParameterTypes();
 			boolean match = true;
 
 			for (int i = 0; i < params.length; i++) {
-				Object param = params[i];
-				Class<?> paramType = param != null ? param.getClass() : null;
-				Class<?> candidateParamType = candidateParamTypes[i];
-
-				if (paramType != null && candidateParamType.isPrimitive()) {
-					paramType = getPrimitiveType(paramType);
-				}
-
-				if (paramType == null ? !candidateParamType.isPrimitive() : !candidateParamType.isAssignableFrom(paramType)) {
+				if (!isAssignable(params[i], candidateParamTypes[i])) {
 					match = false;
 					break;
 				}
@@ -217,20 +214,21 @@ public final class Reflection {
 	}
 
 	/**
-	 * Returns the primitive type of the given type, if any.
+	 * Returns true if given source is assignable to target type, taking into account autoboxing.
+	 * Java returns namely false on int.class.isAssignableFrom(Integer.class).
+	 * @param source The source to be checked.
+	 * @param targetType The target type to be checked.
+	 * @return True if the given source is assignable to the given target type.
+	 * @since 2.7.2
 	 */
-	private static Class<?> getPrimitiveType(Class<?> type)
-	{
-		return type.isPrimitive() ? type
-			: type == Boolean.class ? boolean.class
-			: type == Byte.class ? byte.class
-			: type == Short.class ? int.class
-			: type == Character.class ? char.class
-			: type == Integer.class ? int.class
-			: type == Long.class ? long.class
-			: type == Float.class ? float.class
-			: type == Double.class ? double.class
-			: null;
+	public static boolean isAssignable(Object source, Class<?> targetType) {
+		Class<?> sourceType = source != null ? source.getClass() : null;
+
+		if (sourceType != null && targetType.isPrimitive()) {
+			sourceType = getPrimitiveType(sourceType);
+		}
+
+		return (sourceType == null) ? !targetType.isPrimitive() : targetType.isAssignableFrom(sourceType);
 	}
 
 	/**

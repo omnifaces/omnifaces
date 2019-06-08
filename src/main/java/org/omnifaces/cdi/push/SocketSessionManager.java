@@ -71,7 +71,7 @@ public class SocketSessionManager {
 			+ " A push message could NOT be sent after %s retries of " + TOMCAT_WEB_SOCKET_RETRY_TIMEOUT + "ms apart."
 			+ " Consider rate limiting sending push messages. For example, once every 500ms.";
 
-	private static volatile SocketSessionManager instance;
+	private static SocketSessionManager instance;
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
