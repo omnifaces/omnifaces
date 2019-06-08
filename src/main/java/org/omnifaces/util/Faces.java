@@ -536,7 +536,7 @@ public final class Faces {
 	/**
 	 * Creates and returns a Faces converter associated with given class identifier. If the given identifier is not
 	 * assignable to Converter.class, then use that as target type in {@link Application#createConverter(Class)}. If
-	 * the given identifier is assignable to Converter.class, then instantiate it using default constructor.
+	 * the given identifier is assignable to Converter.class, then instantiate it using CDI.
 	 * If no converter instance can be associated, then return null.
 	 * @param identifier The Faces converter class identifier.
 	 * @return A Faces converter associated with given class identifier.
@@ -576,7 +576,7 @@ public final class Faces {
 
 	/**
 	 * Creates and returns a Faces validator associated with given class identifier. If the given identifier is
-	 * assignable to Validator.class, then instantiate it using default constructor.
+	 * assignable to Validator.class, then instantiate it using CDI.
 	 * If no validator instance can be associated, then return null.
 	 * @param identifier The Faces validator class identifier.
 	 * @return A Faces validator associated with given class identifier.

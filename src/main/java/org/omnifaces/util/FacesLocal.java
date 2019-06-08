@@ -16,7 +16,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.logging.Level.FINE;
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
-import static org.omnifaces.util.Reflection.instance;
+import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Reflection.toClassOrNull;
 import static org.omnifaces.util.Servlets.formatContentDispositionHeader;
 import static org.omnifaces.util.Servlets.prepareRedirectURL;
@@ -298,7 +298,7 @@ public final class FacesLocal {
 	 */
 	public static Converter createConverter(FacesContext context, Class<?> identifier) {
 		if (Converter.class.isAssignableFrom(identifier)) {
-			return (Converter) instance(identifier);
+			return (Converter) getReference(identifier);
 		}
 		else {
 			return context.getApplication().createConverter(identifier);
@@ -342,7 +342,7 @@ public final class FacesLocal {
 	@SuppressWarnings("all")
 	public static Validator createValidator(FacesContext context, Class<?> identifier) {
 		if (Validator.class.isAssignableFrom(identifier)) {
-			return (Validator) instance(identifier);
+			return (Validator) getReference(identifier);
 		}
 		else {
 			return null;
