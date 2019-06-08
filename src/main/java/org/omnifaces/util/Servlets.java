@@ -803,7 +803,7 @@ public final class Servlets {
 	 * @throws UncheckedIOException Whenever something fails at I/O level.
 	 * @since 2.0
 	 */
-	public static void facesRedirect(HttpServletRequest request, HttpServletResponse response, String url, String ... paramValues) {
+	public static void facesRedirect(HttpServletRequest request, HttpServletResponse response, String url, Object... paramValues) {
 		String redirectURL = prepareRedirectURL(request, url, paramValues);
 
 		try {
