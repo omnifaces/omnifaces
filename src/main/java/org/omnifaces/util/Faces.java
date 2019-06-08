@@ -48,10 +48,12 @@ import javax.faces.context.Flash;
 import javax.faces.context.PartialViewContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
+import javax.faces.convert.FacesConverter;
 import javax.faces.event.PhaseId;
 import javax.faces.lifecycle.Lifecycle;
 import javax.faces.lifecycle.LifecycleFactory;
 import javax.faces.render.RenderKit;
+import javax.faces.validator.FacesValidator;
 import javax.faces.validator.Validator;
 import javax.faces.view.ViewDeclarationLanguage;
 import javax.faces.view.ViewMetadata;
@@ -536,7 +538,8 @@ public final class Faces {
 	/**
 	 * Creates and returns a Faces converter associated with given class identifier. If the given identifier is not
 	 * assignable to Converter.class, then use that as target type in {@link Application#createConverter(Class)}. If
-	 * the given identifier is assignable to Converter.class, then instantiate it using CDI.
+	 * the given identifier is assignable to Converter.class, and the {@link FacesConverter} annotation is present,
+	 * then instantiate it using CDI, else instantiate it using default constructor.
 	 * If no converter instance can be associated, then return null.
 	 * @param identifier The Faces converter class identifier.
 	 * @return A Faces converter associated with given class identifier.
@@ -576,7 +579,8 @@ public final class Faces {
 
 	/**
 	 * Creates and returns a Faces validator associated with given class identifier. If the given identifier is
-	 * assignable to Validator.class, then instantiate it using CDI.
+	 * assignable to Validator.class, and the {@link FacesValidator} annotation is present, then instantiate it using
+	 * CDI, else instantiate it using default constructor.
 	 * If no validator instance can be associated, then return null.
 	 * @param identifier The Faces validator class identifier.
 	 * @return A Faces validator associated with given class identifier.
