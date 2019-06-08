@@ -820,7 +820,7 @@ public final class Servlets {
 	 * @since 2.0
 	 */
 	public static void facesRedirect
-		(HttpServletRequest request, HttpServletResponse response, String url, String ... paramValues)
+		(HttpServletRequest request, HttpServletResponse response, String url, Object... paramValues)
 			throws IOException
 	{
 		String redirectURL = prepareRedirectURL(request, url, paramValues);
