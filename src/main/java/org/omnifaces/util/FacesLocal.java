@@ -20,7 +20,7 @@ import static javax.faces.view.facelets.FaceletContext.FACELET_CONTEXT_KEY;
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 import static org.omnifaces.util.Components.findComponentsInChildren;
 import static org.omnifaces.util.Faces.getViewRoot;
-import static org.omnifaces.util.Reflection.instance;
+import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Reflection.toClassOrNull;
 import static org.omnifaces.util.Servlets.addParamToMapIfNecessary;
 import static org.omnifaces.util.Servlets.formatContentDispositionHeader;
@@ -303,7 +303,7 @@ public final class FacesLocal {
 	@SuppressWarnings("unchecked")
 	public static <T> Converter<T> createConverter(FacesContext context, Class<?> identifier) {
 		if (Converter.class.isAssignableFrom(identifier)) {
-			return (Converter<T>) instance(identifier);
+			return (Converter<T>) getReference(identifier);
 		}
 		else {
 			return context.getApplication().createConverter(identifier);
@@ -349,7 +349,7 @@ public final class FacesLocal {
 	@SuppressWarnings({ "unchecked", "unused" })
 	public static <T> Validator<T> createValidator(FacesContext context, Class<?> identifier) {
 		if (Validator.class.isAssignableFrom(identifier)) {
-			return (Validator<T>) instance(identifier);
+			return (Validator<T>) getReference(identifier);
 		}
 		else {
 			return null;
