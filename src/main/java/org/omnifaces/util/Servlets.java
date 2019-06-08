@@ -110,7 +110,7 @@ public final class Servlets {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private static volatile Boolean facesDevelopment;
+	private static Boolean facesDevelopment;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 

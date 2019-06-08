@@ -61,7 +61,7 @@ public enum BeanManager {
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
-	private volatile Object beanManager;
+	private Object beanManager;
 	private Method getBeans;
 	private Method resolve;
 	private Method createCreationalContext;
