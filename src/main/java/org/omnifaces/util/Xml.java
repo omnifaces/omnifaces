@@ -21,6 +21,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -69,7 +70,7 @@ public final class Xml {
 
 	/**
 	 * Creates an instance of {@link DocumentBuilder} which doesn't validate, nor is namespace aware nor expands entity
-	 * references (to keep it as lenient as possible).
+	 * references and disables external entity processing (to keep it as lenient and secure as possible).
 	 * @return A lenient instance of {@link DocumentBuilder}.
 	 */
 	public static DocumentBuilder createDocumentBuilder() {
@@ -79,6 +80,7 @@ public final class Xml {
 		factory.setExpandEntityReferences(false);
 
 		try {
+			factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
 			return factory.newDocumentBuilder();
 		}
 		catch (ParserConfigurationException e) {
