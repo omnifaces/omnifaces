@@ -13,10 +13,7 @@
 package org.omnifaces.util.copier;
 
 import static java.lang.String.format;
-import static org.omnifaces.util.Reflection.findMethod;
-
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import static org.omnifaces.util.Reflection.invokeMethod;
 
 /**
  * Copier that copies an object using the {@link Cloneable} facility.
@@ -37,24 +34,7 @@ public class CloneCopier implements Copier {
 			throw new IllegalStateException(format(ERROR_CANT_CLONE, object.getClass()));
 		}
 
-		try {
-
-			Method cloneMethod = findMethod(object, "clone");
-
-			if (cloneMethod == null) {
-				throw new IllegalStateException();
-			}
-
-			if (!cloneMethod.isAccessible()) {
-				cloneMethod.setAccessible(true);
-			}
-
-			return cloneMethod.invoke(object);
-
-
-		} catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			throw new IllegalStateException(e);
-		}
+		return invokeMethod(object, "clone");
 	}
 
 }
