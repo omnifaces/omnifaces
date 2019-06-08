@@ -83,7 +83,7 @@ import org.omnifaces.facesviews.FacesViews;
  * ajax request.
  * <li>The {@link #isFacesResourceRequest(HttpServletRequest)} which is capable of checking if the current request is a
  * JSF resource request.
- * <li>The {@link #facesRedirect(HttpServletRequest, HttpServletResponse, String, String...)} which is capable
+ * <li>The {@link #facesRedirect(HttpServletRequest, HttpServletResponse, String, Object...)} which is capable
  * of distinguishing JSF ajax requests from regular requests and altering the redirect logic on it, exactly like as
  * {@link ExternalContext#redirect(String)} does. In other words, this method behaves exactly the same as
  * {@link Faces#redirect(String, Object...)}.
