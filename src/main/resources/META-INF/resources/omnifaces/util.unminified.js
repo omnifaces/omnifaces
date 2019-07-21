@@ -93,6 +93,51 @@ OmniFaces.Util = (function(window, document) {
 		return (typeof fn !== "function") && (fn = window[fn] || function(){}), fn;
 	}
 
+	/**
+	 * Load a script.
+	 * @param {string} url Required; The URL of the script.
+	 * @param {function} begin Optional; Function to invoke before deferred script is loaded.
+	 * @param {function} success Optional; Function to invoke after deferred script is successfully loaded.
+	 * @param {function} error Optional; Function to invoke when loading of deferred script failed.
+	 * @param {function} complete Optional; Function to invoke after deferred script is loaded, regardless of its success/error outcome.
+	 */
+	self.loadScript = function(url, begin, success, error, complete) {
+		var beginFunction = self.resolveFunction(begin);
+		var successFunction = self.resolveFunction(success);
+		var errorFunction = self.resolveFunction(error);
+		var completeFunction = self.resolveFunction(complete);
+
+		var script = document.createElement("script");
+		var head = document.head || document.documentElement;
+
+		script.async = true;
+		script.src = url;
+		script.setAttribute("crossorigin", "anonymous");
+
+		script.onerror = function() {
+			errorFunction();
+		}
+
+		script.onload = script.onreadystatechange = function(_, abort) {
+			if (abort || !script.readyState || /loaded|complete/.test(script.readyState)) {
+				script.onload = script.onreadystatechange = null; // IE memory leak fix.
+
+				if (abort) {
+					script.onerror();
+				}
+				else {
+					successFunction();
+				}
+
+				script = null;
+				completeFunction();
+			}
+		}
+
+		beginFunction();
+		head.insertBefore(script, null); // IE6 has trouble with appendChild.
+	}
+
 	// Private static functions ---------------------------------------------------------------------------------------
 
 	/**
