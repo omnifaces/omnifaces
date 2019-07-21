@@ -607,7 +607,14 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 						componentResource.getPassThroughAttributes().put("onerror", "this.onerror=null;this.href='" + fallback + "'");
 					}
 					else if (DeferredScriptRenderer.RENDERER_TYPE.equals(rendererType)) {
-						componentResource.getAttributes().put("onerror", "document.write('<script src=\"" + fallback + "\"><\\/script>')");
+						String callbacks = "";
+						String onsuccess = (String) componentResource.getAttributes().get("onsuccess");
+
+						if (onsuccess != null) {
+							callbacks = ",null,function(){" + onsuccess + "}";
+						}
+
+						componentResource.getAttributes().put("onerror", "OmniFaces.Util.loadScript('" + fallback + "'" + callbacks + ")");
 					}
 				}
 				else if (RENDERER_TYPE_JS.equals(rendererType)) {

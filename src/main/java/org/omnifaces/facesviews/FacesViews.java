@@ -20,6 +20,7 @@ import static java.util.Locale.ENGLISH;
 import static java.util.Locale.US;
 import static java.util.regex.Pattern.quote;
 import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 import static javax.faces.view.facelets.ResourceResolver.FACELETS_RESOURCE_RESOLVER_PARAM_NAME;
 import static javax.servlet.DispatcherType.FORWARD;
 import static javax.servlet.DispatcherType.REQUEST;
@@ -232,6 +233,7 @@ public final class FacesViews {
 	private static final String FACES_SERVLET_EXTENSIONS = "org.omnifaces.facesviews.faces_servlet_extensions";
 	private static final String MAPPED_RESOURCES = "org.omnifaces.facesviews.mapped_resources";
 	private static final String REVERSE_MAPPED_RESOURCES = "org.omnifaces.facesviews.reverse_mapped_resources";
+	private static final String MULTIVIEWS_RESOURCES = "org.omnifaces.facesviews.multiviews_resources";
 	private static final String ENCOUNTERED_EXTENSIONS = "org.omnifaces.facesviews.encountered_extensions";
 	private static final String MAPPED_WELCOME_FILES = "org.omnifaces.facesviews.mapped_welcome_files";
 	private static final String MULTIVIEWS_WELCOME_FILE = "org.omnifaces.facesviews.multiviews_welcome_file";
@@ -372,6 +374,8 @@ public final class FacesViews {
 			servletContext.setAttribute(MAPPED_RESOURCES, unmodifiableMap(collectedViews));
 			servletContext.setAttribute(REVERSE_MAPPED_RESOURCES, unmodifiableMap(collectedViews.entrySet().stream()
 				.filter(e -> isExtensionless(e.getKey())).collect(toMap(Entry::getValue, Entry::getKey, (l, r) -> l))));
+			servletContext.setAttribute(MULTIVIEWS_RESOURCES, unmodifiableSet(collectedViews.keySet().stream()
+				.filter(k -> k.endsWith("/*")).map(v -> v.substring(0, v.length() - 2)).collect(toSet())));
 
 			if (collectExtensions) {
 				storeExtensions(servletContext, collectedViews, collectedExtensions);
@@ -516,8 +520,9 @@ public final class FacesViews {
 		// Store the resource with and without an extension, e.g. store both foo.xhtml and foo
 		collectedViews.put(resource, resourcePath);
 		String extensionlessResource = stripExtension(resource);
+		String extensionlessResourcePath = stripExtension(resourcePath);
 
-		if (isMultiViewsEnabled(servletContext, extensionlessResource)) {
+		if (isMultiViewsResource(servletContext, extensionlessResourcePath)) {
 			collectedViews.put(extensionlessResource + "/*", resourcePath);
 		}
 		else {
@@ -552,6 +557,30 @@ public final class FacesViews {
 
 		// If no extension has been explicitly defined, we scan all extensions encountered.
 		return (extensionToScan == null) || resource.endsWith(extensionToScan);
+	}
+
+	private static boolean isMultiViewsResource(ServletContext servletContext, String resource) {
+		Set<String> multiviewsPaths = getApplicationAttribute(servletContext, MULTIVIEWS_PATHS);
+
+		if (multiviewsPaths != null) {
+			String path = resource + "/";
+			String excludePath = "!" + path;
+
+			for (String multiviewsPath : multiviewsPaths) {
+				if (multiviewsPath.charAt(0) == '!' && excludePath.startsWith(multiviewsPath)) {
+					return false;
+				}
+				if (path.startsWith(multiviewsPath)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	private static boolean hasMultiViewsWelcomeFile(ServletContext servletContext) {
+		return isMultiViewsEnabled(servletContext) && !getMappedWelcomeFiles(servletContext).isEmpty();
 	}
 
 
@@ -647,6 +676,10 @@ public final class FacesViews {
 		return getApplicationAttribute(servletContext, REVERSE_MAPPED_RESOURCES);
 	}
 
+	static Set<String> getMultiViewsResources(ServletContext servletContext) {
+		return getApplicationAttribute(servletContext, MULTIVIEWS_RESOURCES);
+	}
+
 	static Set<String> getEncounteredExtensions(ServletContext servletContext) {
 		return getApplicationAttribute(servletContext, ENCOUNTERED_EXTENSIONS);
 	}
@@ -657,30 +690,6 @@ public final class FacesViews {
 
 	static String getMultiViewsWelcomeFile(ServletContext servletContext) {
 		return getApplicationAttribute(servletContext, MULTIVIEWS_WELCOME_FILE);
-	}
-
-	static boolean isMultiViewsEnabled(ServletContext servletContext, String resource) {
-		Set<String> multiviewsPaths = getApplicationAttribute(servletContext, MULTIVIEWS_PATHS);
-
-		if (multiviewsPaths != null) {
-			String path = addTrailingSlashIfNecessary(resource);
-			String excludePath = "!" + path;
-
-			for (String multiviewsPath : multiviewsPaths) {
-				if (multiviewsPath.charAt(0) == '!' && excludePath.startsWith(multiviewsPath)) {
-					return false;
-				}
-				if (path.startsWith(multiviewsPath)) {
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
-	static boolean hasMultiViewsWelcomeFile(ServletContext servletContext) {
-		return isMultiViewsEnabled(servletContext) && !getMappedWelcomeFiles(servletContext).isEmpty();
 	}
 
 
@@ -723,7 +732,10 @@ public final class FacesViews {
 	 * @since 2.6
 	 */
 	public static boolean isMultiViewsEnabled(HttpServletRequest request) {
-		return isMultiViewsEnabled(request.getServletContext(), request.getServletPath());
+		ServletContext servletContext = request.getServletContext();
+		Set<String> multiViewsResources = getMultiViewsResources(servletContext);
+		return (multiViewsResources != null && multiViewsResources.contains(request.getServletPath()))
+			|| getMultiViewsWelcomeFile(servletContext) != null;
 	}
 
 	/**
