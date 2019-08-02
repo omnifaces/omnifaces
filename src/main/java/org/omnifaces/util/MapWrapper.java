@@ -110,6 +110,11 @@ public class MapWrapper<K, V> implements Map<K, V>, Serializable {
 		return getWrapped().values();
 	}
 
+	@Override
+	public String toString() {
+		return getWrapped().toString();
+	}
+
 	public Map<K, V> getWrapped() {
 		return map;
 	}
