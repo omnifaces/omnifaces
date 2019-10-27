@@ -138,6 +138,28 @@ import org.omnifaces.util.Utils;
  * <li>An EL expression returning the concrete converter/validator instance like so <code>converter="#{converterBean}"</code>.
  * </ul>
  * <p>
+ * Instead of <code>converter</code> or <code>validator</code> you can also use <code>converterClass</code> or
+ * <code>validatorClass</code>:
+ * <pre>
+ * &#64;Inject &#64;Param(converterClass=UserConverter.class, validatorClass=PriviledgedUser.class)
+ * private User user;
+ * </pre>
+ * <p>
+ * Note that this is <strong>ignored</strong> when <code>converter</code> or <code>validator</code> is also specified.
+ * <p>
+ * In case you want to specify converter or validator attributes, then you can use <code>converterAttributes</code> or
+ * <code>validatorAttributes</code> respectively. They accept an array of {@link Attribute} arguments whose value
+ * can be a string literal or an EL expression such as <code>value = "#{bean.property}"</code>.
+ * <pre>
+ * &#64;Inject &#64;Param(
+ *     converterClass = DateTimeConverter.class,
+ *     converterAttributes = { &#64;Attribute(name = "pattern", value = "yyyyMMdd") },
+ *     converterMessage = "{1}: \"{0}\" is not the date format we had in mind! Please use the format yyyyMMdd.")
+ * private Date date;
+ * </pre>
+ * <p>
+ * Yes, you can use <code>converterMessage</code> and <code>validatorMessage</code> to customize the error message.
+ * <p>
  * In case the converted parameter value is not serializable, while the managed bean is serializable, you could inject
  * it into a field of type {@link ParamValue}, with <code>V</code> the actual type of the converted parameter.
  * Deserialization in this case works by converting from the original parameter again.
