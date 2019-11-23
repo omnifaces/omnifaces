@@ -195,6 +195,7 @@ public class MessagesRenderer extends Renderer {
 			ResponseWriter writer = context.getResponseWriter();
 			writer.startElement("div", component);
 			writeAttribute(writer, "id", component.getClientId(context));
+			writeAttribute(writer, component, "styleClass", "class");
 			writer.endElement("div");
 		}
 	}

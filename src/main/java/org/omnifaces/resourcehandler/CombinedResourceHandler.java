@@ -264,6 +264,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 	private static final String TARGET_HEAD = "head";
 	private static final String TARGET_BODY = "body";
+	private static final String COMPONENT_ADDED = "javax.faces.component.UIComponentBase.ADDED";
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -588,7 +589,14 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 			if (!infoBuilder.isEmpty() && !isAjaxRequestWithPartialRendering(context)) { // #273, #301
 				if (componentResource == null) {
 					componentResource = new UIOutput();
+
+					// Manually setting ADDED attribute forces Mojarra to not track dynamic add action in state.
+					// Otherwise Mojarra will log during development stage a confusing warning message that component cannot be found.
+					// This is unnecessary as CombinedResourceHandler already takes care of this all.
+					// See also https://github.com/omnifaces/omnifaces/issues/527
+					componentResource.getAttributes().put(COMPONENT_ADDED, true);
 					context.getViewRoot().addComponentResource(context, componentResource, target);
+					componentResource.getAttributes().remove(COMPONENT_ADDED);
 				}
 
 				String resourceName = infoBuilder.create() + extension;

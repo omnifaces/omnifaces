@@ -57,7 +57,8 @@ OmniFaces.Unload = (function(Util, navigator, window, document) {
 				return;
 			}
 
-			Util.addEventListener(window, window.onbeforeunload ? "unload" : "beforeunload", function() { // If there's no user-defined onbeforeunload handler, let's perform job during beforeunload instead, which is more reliable.
+			var unloadEvent = ("onpagehide" in window) ? "pagehide" : ("onbeforeunload" in window && !window.onbeforeunload) ? "beforeunload" : "unload";
+			Util.addEventListener(window, unloadEvent, function() {
 				if (disabled) {
 					self.reenable(); // Just in case some custom JS explicitly triggered submit event while staying in same DOM.
 					return;
