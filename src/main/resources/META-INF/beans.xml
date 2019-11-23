@@ -21,10 +21,8 @@
 >
 	<scan>
 		<exclude name="org.omnifaces.application.**" />
-		<exclude name="org.omnifaces.component.**" />
 		<exclude name="org.omnifaces.config.**" />
 		<exclude name="org.omnifaces.context.**" />
-		<exclude name="org.omnifaces.converter.**" />
 		<exclude name="org.omnifaces.el.**" />
 		<exclude name="org.omnifaces.event.**" />
 		<exclude name="org.omnifaces.eventlistener.**" />
@@ -33,13 +31,11 @@
 		<exclude name="org.omnifaces.filter.**" />
 		<exclude name="org.omnifaces.io.**" />
 		<exclude name="org.omnifaces.model.**" />
-		<exclude name="org.omnifaces.renderer.**" />
 		<exclude name="org.omnifaces.renderkit.**" />
 		<exclude name="org.omnifaces.resourcehandler.**" />
 		<exclude name="org.omnifaces.servlet.**" />
 		<exclude name="org.omnifaces.taghandler.**" />
 		<exclude name="org.omnifaces.util.**" />
-		<exclude name="org.omnifaces.validator.**" />
 		<exclude name="org.omnifaces.viewhandler.**" />
 	</scan>
 </beans>
