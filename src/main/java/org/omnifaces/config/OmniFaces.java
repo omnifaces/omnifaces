@@ -41,7 +41,7 @@ public final class OmniFaces {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String VERSION = OmniFaces.class.getPackage() == null ? "UNKNOWN" : coalesce(OmniFaces.class.getPackage().getImplementationVersion(), "DEV-SNAPSHOT");
+	private static final String VERSION = coalesce(OmniFaces.class.getPackage().getImplementationVersion(), "DEV-SNAPSHOT");
 	private static final boolean SNAPSHOT = VERSION.contains("-"); // -SNAPSHOT, -RCx
 	private static final Long STARTUP_TIME = System.currentTimeMillis();
 	private static final String DEFAULT_MESSAGE_BUNDLE = "org.omnifaces.messages";
