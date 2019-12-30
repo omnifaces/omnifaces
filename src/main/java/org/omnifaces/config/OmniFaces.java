@@ -12,10 +12,10 @@
  */
 package org.omnifaces.config;
 
-import static java.util.Optional.ofNullable;
 import static java.util.ResourceBundle.getBundle;
 import static org.omnifaces.util.Faces.getLocale;
 import static org.omnifaces.util.Faces.getMessageBundle;
+import static org.omnifaces.util.Utils.coalesce;
 
 import java.util.ResourceBundle;
 
@@ -44,7 +44,7 @@ public final class OmniFaces {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String VERSION = ofNullable(ofNullable(OmniFaces.class.getPackage()).map(Package::getImplementationVersion).orElse("UNKNOWN")).orElse("DEV-SNAPSHOT");
+	private static final String VERSION = coalesce(OmniFaces.class.getPackage().getImplementationVersion(), "DEV-SNAPSHOT");
 	private static final boolean SNAPSHOT = VERSION.contains("-"); // -SNAPSHOT, -RCx
 	private static final Long STARTUP_TIME = System.currentTimeMillis();
 	private static final String DEFAULT_MESSAGE_BUNDLE = "org.omnifaces.messages";
@@ -63,7 +63,6 @@ public final class OmniFaces {
 	 * Release versions will return version in format <code>3.4.2</code>.
 	 * Snapshot versions will return version in format <code>3.4.2-SNAPSHOT</code>.
 	 * Local development versions (because MANIFEST.MF entry is missing) will return version in format <code>DEV-SNAPSHOT</code>.
-	 * Unknown versions (because package is missing) will return version in format <code>UNKNOWN</code>.
 	 * @return OmniFaces version.
 	 */
 	public static String getVersion() {
