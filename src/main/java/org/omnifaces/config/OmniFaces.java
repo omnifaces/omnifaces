@@ -60,7 +60,6 @@ public final class OmniFaces {
 	 * Release versions will return version in format <code>2.7.4</code>.
 	 * Snapshot versions will return version in format <code>2.7.4-SNAPSHOT</code>.
 	 * Local development versions (because MANIFEST.MF entry is missing) will return version in format <code>DEV-SNAPSHOT</code>.
-	 * Unknown versions (because package is missing) will return version in format <code>UNKNOWN</code>.
 	 * @return OmniFaces version.
 	 */
 	public static String getVersion() {
