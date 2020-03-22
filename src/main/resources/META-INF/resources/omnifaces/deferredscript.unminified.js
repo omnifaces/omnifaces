@@ -64,7 +64,7 @@ OmniFaces.DeferredScript = (function(Util, document) {
 			loadDeferredScript(index + 1);
 		};
 
-		Util.loadScript(deferredScript.url, deferredScript.begin, deferredScript.success, deferredScript.error, completeFunction);
+		Util.loadScript(deferredScript.url, null, deferredScript.begin, deferredScript.success, deferredScript.error, completeFunction);
 	}
 
 	// Expose self to public ------------------------------------------------------------------------------------------

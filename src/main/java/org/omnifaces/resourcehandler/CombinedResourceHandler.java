@@ -22,6 +22,7 @@ import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
 import static org.omnifaces.util.Hacks.isMyFacesUsed;
 import static org.omnifaces.util.Renderers.RENDERER_TYPE_CSS;
 import static org.omnifaces.util.Renderers.RENDERER_TYPE_JS;
+import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isNumber;
 
 import java.util.ArrayList;
@@ -159,6 +160,13 @@ import org.omnifaces.util.cache.Cache;
  * are removed from the cache if they are older than this parameter indicates (and regenerated if newly requested).
  * The default value is 0 (i.e. not cached). For global cache settings refer {@link Cache} javadoc.
  * </td></tr>
+ * <tr><td class="colFirst">
+ * <code>{@value org.omnifaces.resourcehandler.CombinedResourceHandler#PARAM_NAME_CROSSORIGIN}</code>
+ * </td><td>
+ * Set the desired value of <code>crossorigin</code> attribute of combined script resources. Supported values are
+ * specified in <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin">MDN</a>.
+ * The default value is <code>anonymous</code> (i.e. no cookies are transferred at all).
+ * </td></tr>
  * </table>
  * <p>
  * Here, the "resource identifier" is the unique combination of library name and resource name, separated by a colon,
@@ -257,6 +265,10 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 	public static final String PARAM_NAME_CACHE_TTL =
 		"org.omnifaces.COMBINED_RESOURCE_HANDLER_CACHE_TTL";
 
+	/** The context parameter name to specify 'crossorigin' attribute of combined JS resources. @since 3.5 */
+	public static final String PARAM_NAME_CROSSORIGIN =
+		"org.omnifaces.COMBINED_RESOURCE_HANDLER_CROSSORIGIN";
+
 	private static final String ERROR_INVALID_CACHE_TTL_PARAM =
 		"Context parameter '" + PARAM_NAME_CACHE_TTL + "' is in invalid syntax."
 			+ " It must represent a valid time in seconds between 0 and " + Integer.MAX_VALUE + "."
@@ -265,6 +277,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 	private static final String TARGET_HEAD = "head";
 	private static final String TARGET_BODY = "body";
 	private static final String COMPONENT_ADDED = "javax.faces.component.UIComponentBase.ADDED";
+	private static final String DEFAULT_CROSSORIGIN = "anonymous";
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -274,6 +287,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 	private boolean inlineCSS;
 	private boolean inlineJS;
 	private Integer cacheTTL;
+	private String crossorigin;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -293,6 +307,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		inlineCSS = parseBoolean(getInitParameter(PARAM_NAME_INLINE_CSS));
 		inlineJS = parseBoolean(getInitParameter(PARAM_NAME_INLINE_JS));
 		cacheTTL = initCacheTTL(getInitParameter(PARAM_NAME_CACHE_TTL));
+		crossorigin = coalesce(getInitParameter(PARAM_NAME_CROSSORIGIN), DEFAULT_CROSSORIGIN);
 		subscribeToApplicationEvent(PreRenderViewEvent.class, this);
 	}
 
@@ -622,11 +637,11 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 							callbacks = ",null,function(){" + onsuccess + "}";
 						}
 
-						componentResource.getAttributes().put("onerror", "OmniFaces.Util.loadScript('" + fallback + "'" + callbacks + ")");
+						componentResource.getAttributes().put("onerror", "OmniFaces.Util.loadScript('" + fallback + "', '" + crossorigin + "'" + callbacks + ")");
 					}
 				}
 				else if (RENDERER_TYPE_JS.equals(rendererType)) {
-					componentResource.getPassThroughAttributes().put("crossorigin", "anonymous");
+					componentResource.getPassThroughAttributes().put("crossorigin", crossorigin);
 				}
 			}
 
