@@ -177,6 +177,17 @@ public final class Strings {
 	}
 
 	/**
+	 * URI-encode the given string using UTF-8. This is useful for cases where you need to embed path parameters in URLs.
+	 * @param string The string to be URI-encoded.
+	 * @return The URI-encoded string.
+	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
+	 * @since 3.5
+	 */
+	public static String encodeURI(String string) {
+		return Utils.encodeURI(string);
+	}
+
+	/**
 	 * Escapes the given string according the JavaScript code rules. This escapes among others the special characters,
 	 * the whitespace, the quotes and the unicode characters. Useful whenever you want to use a Java string variable as
 	 * a JavaScript string variable.
