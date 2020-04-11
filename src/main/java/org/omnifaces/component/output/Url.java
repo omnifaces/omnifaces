@@ -45,14 +45,14 @@ import org.omnifaces.util.State;
  * This component fills the gap caused by absence of JSTL <code>&lt;c:url&gt;</code> in Facelets. This component is
  * useful for generating URLs for usage in e.g. plain HTML <code>&lt;link&gt;</code> elements and JavaScript variables.
  *
- * <h3>Values</h3>
+ * <h2>Values</h2>
  * <p>
  * You can supply the target URL via either the <code>value</code> attribute or the <code>viewId</code> attribute. When
  * both are specified, the <code>value</code> attribute takes precedence and the <code>viewId</code> attribute is ignored.
  * When none are specified, then the <code>viewId</code> will default to the current view ID.
  * The support for <code>value</code> attribute was added in OmniFaces 3.0.
  *
- * <h3>Domain</h3>
+ * <h2>Domain</h2>
  * <p>
  * When the target URL is specified as <code>viewId</code>, then the domain of the target URL defaults to the current
  * domain. It is possible to provide a full qualified domain name (FQDN) via the <code>domain</code> attribute which
@@ -73,7 +73,7 @@ import org.omnifaces.util.State;
  * If the domain equals or starts with <code>//</code>, or does not contain any scheme, then the URL becomes scheme-relative.
  * If the <code>value</code> attribute is specified, then the <code>domain</code> attribute is ignored.
  *
- * <h3>Request and view parameters</h3>
+ * <h2>Request and view parameters</h2>
  * <p>
  * You can add query string parameters to the URL via nested <code>&lt;f:param&gt;</code> and <code>&lt;o:param&gt;</code>.
  * You can optionally include all GET request query string parameters or only JSF view parameters in the resulting URL via
@@ -82,7 +82,7 @@ import org.omnifaces.util.State;
  * The <code>&lt;f|o:param&gt;</code> will override any included request or view parameters on the same name.
  * To conditionally add or override, use the <code>disabled</code> attribute of <code>&lt;f|o:param&gt;</code>.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * Some examples:
  * <pre>

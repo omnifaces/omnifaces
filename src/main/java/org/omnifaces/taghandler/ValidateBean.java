@@ -94,7 +94,7 @@ import org.omnifaces.util.copier.SerializationCopier;
  * The standard <code>&lt;f:validateBean&gt;</code> also, despite its name, does not actually have any facilities to
  * validate a bean at all.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * Some examples
  *
@@ -122,7 +122,7 @@ import org.omnifaces.util.copier.SerializationCopier;
  * &lt;o:validateBean value="#{bean.product}" validationGroups="com.example.MyGroup" /&gt;
  * </pre>
  *
- * <h3>Class level validation details</h3>
+ * <h2>Class level validation details</h2>
  * <p>
  * In order to validate a bean at the class level, all values from input components should first be actually set on that bean
  * and only thereafter should the bean be validated. This however does not play well with the JSF approach where a model
@@ -157,7 +157,7 @@ import org.omnifaces.util.copier.SerializationCopier;
  * You would need an additional check for {@link FacesContext#isValidationFailed()} in the action method to see if it
  * has failed or not.
  *
- * <h3>Faces messages</h3>
+ * <h2>Faces messages</h2>
  * <p>
  * By default, the faces message is added with client ID of the parent {@link UIForm}.
  * <pre>

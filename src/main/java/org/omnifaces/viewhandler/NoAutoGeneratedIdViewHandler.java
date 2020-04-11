@@ -58,7 +58,7 @@ import org.omnifaces.util.Utils;
  * This is considered bad practice. See also
  * <a href="https://stackoverflow.com/a/7416770/157882">UIForm with prependId=“false” breaks &lt;f:ajax render&gt;</a>.
  *
- * <h3>Installation</h3>
+ * <h2>Installation</h2>
  * <p>
  * Register it as <code>&lt;view-handler&gt;</code> in <code>faces-config.xml</code>.
  * <pre>

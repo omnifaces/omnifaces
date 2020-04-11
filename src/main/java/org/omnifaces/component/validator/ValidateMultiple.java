@@ -59,7 +59,7 @@ import org.omnifaces.validator.MultiFieldValidator;
  * }
  * </pre>
  *
- * <h3>Design notice</h3>
+ * <h2>Design notice</h2>
  * <p>
  * Note that this validator does <strong>not</strong> throw {@link ValidatorException}, but returns a boolean! Message
  * handling and invalidation job is up to the {@link ValidateMultipleFields} implementation who will call this method.

@@ -77,7 +77,7 @@ import org.omnifaces.util.State;
  * &lt;/o:tree&gt;
  * </pre>
  *
- * <h3>treeNode</h3>
+ * <h2>treeNode</h2>
  * <p>
  * The <code>&lt;o:treeNode&gt;</code> represents the parent tree node. Within this component, the <code>var</code>
  * attribute of the <code>&lt;o:tree&gt;</code> will expose the parent tree node. Each of its children is processed by
@@ -89,7 +89,7 @@ import org.omnifaces.util.State;
  * If the <code>level</code> attribute is unspecified, then the <code>&lt;o:treeNode&gt;</code> will be rendered for any
  * tree node level which hasn't already a <code>&lt;o:treeNode level="x"&gt;</code> specified.
  *
- * <h3>treeNodeItem</h3>
+ * <h2>treeNodeItem</h2>
  * <p>
  * The <code>&lt;o:treeNodeItem&gt;</code> represents the child item of the parent tree note as represented by
  * <code>&lt;o:treeNode&gt;</code>. Within this component, the <code>var</code> attribute of the parent
@@ -99,7 +99,7 @@ import org.omnifaces.util.State;
  * place where to recursively render the <code>&lt;o:treeNode&gt;</code> whereby the current child item is in turn
  * interpreted as a parent tree node (i.e. where you'd like to insert the grand-children).
  *
- * <h3>treeInsertChildren</h3>
+ * <h2>treeInsertChildren</h2>
  * <p>
  * The <code>&lt;o:treeInsertChildren&gt;</code> represents the insertion point for the grand children. This is in turn
  * further interpreted as <code>&lt;o:treeNode&gt;</code>.

@@ -65,7 +65,7 @@ import org.omnifaces.application.OmniApplicationFactory;
  * The {@link ConverterManager} provides access to all {@link FacesConverter} annotated {@link Converter} instances
  * which are made eligible for CDI.
  *
- * <h3>bean-discovery-mode</h3>
+ * <h2>bean-discovery-mode</h2>
  * <p>
  * In Java EE 7's CDI 1.1, when having a CDI 1.1 compatible <code>beans.xml</code>, by default only classes with an
  * explicit CDI managed bean scope annotation will be registered for dependency injection support. In order to cover
@@ -74,20 +74,20 @@ import org.omnifaces.application.OmniApplicationFactory;
  * <a href="http://stackoverflow.com/q/29458023/157882">oversight</a>. If you want to keep the default of
  * <code>bean-discovery-mode="annotated"</code>, then you need to add {@link Dependent} annotation to the converter class.
  *
- * <h3>AmbiguousResolutionException</h3>
+ * <h2>AmbiguousResolutionException</h2>
  * <p>
  * In case you have a {@link FacesConverter} annotated class extending another {@link FacesConverter} annotated class
  * which in turn extends a standard converter, then you may with <code>bean-discovery-mode="all"</code> face an
  * {@link AmbiguousResolutionException}. This can be solved by placing {@link Specializes} annotation on the subclass.
  *
- * <h3>Converters with special Class constructor</h3>
+ * <h2>Converters with special Class constructor</h2>
  * <p>
  * By default, CDI only instantiates beans via the default constructor. In case a converter for a class is created,
  * and the returned converter does not have a default constructor, or has a single argument constructor that takes a
  * {@link Class} instance, then this converter will <strong>not</strong> be made eligible for CDI. This change was added
  * in OmniFaces 2.6 as per <a href="https://github.com/omnifaces/omnifaces/issues/25">issue 25</a>.
  *
- * <h3>JSF 2.3 compatibility</h3>
+ * <h2>JSF 2.3 compatibility</h2>
  * <p>
  * OmniFaces 3.0 continued to work fine with regard to managed converters which are initially developed for JSF 2.2.
  * However, JSF 2.3 introduced two new features for converters: parameterized converters and managed converters.

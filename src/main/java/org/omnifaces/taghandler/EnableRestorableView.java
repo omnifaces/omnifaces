@@ -45,7 +45,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * scoped bean. You <em>can</em> use it with a view scoped bean, but then you should add a <code>@PostConstruct</code>
  * which checks if the request is a postback and then fill the missing bean properties based on request parameters.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * To enable the restorable view, just add the <code>&lt;enableRestorableView&gt;</code> to the view metadata.
  * <pre>
@@ -54,7 +54,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * &lt;/f:metadata&gt;
  * </pre>
  *
- * <h3>Mojarra's new stateless mode</h3>
+ * <h2>Mojarra's new stateless mode</h2>
  * <p>
  * Since Mojarra 2.1.19, about 2 months after OmniFaces introduced the <code>&lt;o:enableRestorableView&gt;</code>,
  * it's possible to enable a stateless mode on the view by simply setting its <code>transient</code> attribute to

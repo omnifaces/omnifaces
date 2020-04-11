@@ -52,7 +52,7 @@ import org.omnifaces.el.DelegatingVariableMapper;
  * This tag handler is designed to overcome this peculiar problem and unintuitive behavior of nested tagfiles in
  * Mojarra.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * Just declare the attribute name in top of the tagfile as below.
  * <pre>

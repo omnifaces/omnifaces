@@ -39,7 +39,7 @@ import jakarta.validation.MessageInterpolator;
  * validation message. That functionality is already provided by JSF itself via the
  * <code>jakarta.faces.validator.BeanValidator.MESSAGE</code> key in any resource bundle known to JSF.
  *
- * <h3>Installation</h3>
+ * <h2>Installation</h2>
  * <p>
  * Create a <code>/META-INF/validation.xml</code> file in WAR with the following contents:
  *
@@ -54,7 +54,7 @@ import jakarta.validation.MessageInterpolator;
  * &lt;/validation-config&gt;
  * </pre>
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>As an example, the customization of <code>@Size</code> in <code>ValidationMessages.properties</code>:
  * <pre>
  * jakarta.validation.constraints.Size.message = The size of {jsf.label} must be between {min} and {max} characters

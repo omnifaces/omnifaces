@@ -45,7 +45,7 @@ import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
  * servlet container independent way of configuring GZIP compression and also allows enabling GZIP compression anyway
  * on 3rd party hosts where you have no control over servlet container configuration.
  *
- * <h3>Installation</h3>
+ * <h2>Installation</h2>
  * <p>
  * To get it to run, map this filter on the desired <code>&lt;url-pattern&gt;</code> or maybe even on the
  * <code>&lt;servlet-name&gt;</code> of the <code>FacesServlet</code>. A <code>Filter</code> is by default dispatched
@@ -80,7 +80,7 @@ import org.omnifaces.servlet.HttpServletResponseOutputWrapper;
  * &lt;/filter-mapping&gt;
  * </pre>
  *
- * <h3>Configuration (optional)</h3>
+ * <h2>Configuration (optional)</h2>
  * <p>
  * This filter supports two initialization parameters which needs to be placed in <code>&lt;filter&gt;</code> element
  * as follows:

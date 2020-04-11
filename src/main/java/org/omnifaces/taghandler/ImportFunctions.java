@@ -39,7 +39,7 @@ import jakarta.faces.view.facelets.TagHandler;
  * register them in <code>.taglib.xml</code> file. The functions are those <code>public static</code> methods with a
  * <strong>non</strong>-<code>void</code> return type.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * For example:
  * <pre>
@@ -54,7 +54,7 @@ import jakarta.faces.view.facelets.TagHandler;
  * <p>
  * The resolved functions are by reference stored in the cache to improve retrieving performance.
  *
- * <h3>Precaution as to multiple functions with exactly the same method name</h3>
+ * <h2>Precaution as to multiple functions with exactly the same method name</h2>
  * <p>
  * EL functions does <strong>not</strong> support method overloading. It's therefore <strong>not</strong> possible to
  * provide overloaded methods like {@link Math#abs(int)}, {@link Math#abs(long)}, {@link Math#abs(float)} and
@@ -66,7 +66,7 @@ import jakarta.faces.view.facelets.TagHandler;
  * would be picked up) and should not be relied upon. So if you absolutely need to differentiate functions in such case,
  * give them each a different name.
  *
- * <h3>Design notes</h3>
+ * <h2>Design notes</h2>
  * <p>
  * Note that the colon <code>:</code> operator to invoke the method is as required by EL functions spec. It's by
  * design not easily possible to change it to the period <code>.</code> operator. Also note that in case of

@@ -23,7 +23,7 @@ import jakarta.servlet.ServletException;
  * Collection of general utility methods with respect to working with exceptions. So far there's only an unwrapper and
  * a type checker.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * Some examples:
  * <pre>

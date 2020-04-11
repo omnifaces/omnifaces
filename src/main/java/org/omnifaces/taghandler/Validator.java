@@ -50,7 +50,7 @@ import org.omnifaces.util.Messages;
  * iterating component, and that they can be set on a custom validator without needing to explicitly register it in a
  * tagfile.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * When you specify for example the standard <code>&lt;f:validateLongRange&gt;</code> by
  * <code>validatorId="jakarta.faces.LongRange"</code>, then you'll be able to use all its attributes such as
@@ -73,7 +73,7 @@ import org.omnifaces.util.Messages;
  *     message="Please enter between #{item.minimum} and #{item.maximum} characters" /&gt;
  * </pre>
  *
- * <h3>JSF 2.3 compatibility</h3>
+ * <h2>JSF 2.3 compatibility</h2>
  * <p>
  * The <code>&lt;o:validator&gt;</code> is currently not compatible with validators which are managed via JSF 2.3's
  * new <code>managed=true</code> attribute set on the {@link FacesValidator} annotation, at least not when using

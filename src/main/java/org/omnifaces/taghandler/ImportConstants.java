@@ -39,7 +39,7 @@ import org.omnifaces.util.MapWrapper;
  * values of the given fully qualified name of a type in the request scope. The constant field values are those public
  * static final fields. This works for classes, interfaces and enums.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * For example:
  * <pre>
@@ -73,7 +73,7 @@ import org.omnifaces.util.MapWrapper;
  * runtime (no, not compiletime as that's just not possible in EL) check during retrieving the constant value.
  * If a constant value doesn't exist, then an <code>IllegalArgumentException</code> will be thrown.
  *
- * <h3>JSF 2.3</h3>
+ * <h2>JSF 2.3</h2>
  * <p>
  * JSF 2.3 also offers a <code>&lt;f:importConstants&gt;</code>, however it requires being placed in
  * <code>&lt;f:metadata&gt;</code> which may not be appropriate when you intend to import constants only from

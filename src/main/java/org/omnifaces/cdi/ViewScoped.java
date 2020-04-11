@@ -78,7 +78,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <li><a href="https://github.com/javaee/javaserverfaces-spec/issues/905">JSF spec issue 905</a>
  * </ul>
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * Just use it the usual way as all other CDI scopes. Watch out with IDE autocomplete on import that you don't
  * accidentally import standard JSF's own one.
@@ -141,7 +141,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * unnecessary serialization overhead. The system will therefore throw an {@link IllegalStateException} on such
  * condition.
  *
- * <h3>Configuration</h3>
+ * <h2>Configuration</h2>
  * <p>
  * By default, the maximum number of active view scopes is hold in a LRU map in HTTP session with a default size equal
  * to the first non-null value of the following context parameters:
@@ -156,7 +156,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <p>
  * This setting has no effect when <code>saveInViewState</code> attribute is set to <code>true</code>.
  *
- * <h3>Using window.onbeforeunload</h3>
+ * <h2>Using window.onbeforeunload</h2>
  * <p>
  * If you have a custom <code>onbeforeunload</code> handler, then it's strongly recommended to use plain vanilla JS
  * <code>window.onbeforeunload = function</code> instead of e.g. jQuery <code>$(window).on("beforeunload", function)</code>
@@ -178,7 +178,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * };
  * </pre>
  *
- * <h3>Using download links</h3>
+ * <h2>Using download links</h2>
  * <p>
  * If you have a synchronous download link as in <code>&lt;a href="/path/to/file.ext"&gt;</code>, then the unload will
  * also be triggered. For HTML5-capable browsers it's sufficient to add the <code>download</code> attribute representing

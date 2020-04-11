@@ -35,7 +35,7 @@ import jakarta.faces.view.facelets.TagHandler;
  * already a value expression <code>#{...}</code> as attribute value, then it won't be overridden. This is a technical
  * limitation specifically for boolean attributes as they don't default to <code>null</code>.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * For example, the following setup
  * <pre>

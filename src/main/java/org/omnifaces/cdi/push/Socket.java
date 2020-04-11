@@ -67,7 +67,7 @@ import org.omnifaces.util.State;
  * in any CDI/container managed artifact via <code>&#64;</code>{@link Push} annotation.
  *
  *
- * <h3 id="configuration"><a href="#configuration">Configuration</a></h3>
+ * <h2 id="configuration"><a href="#configuration">Configuration</a></h2>
  * <p>
  * First enable the web socket endpoint by below boolean context parameter in <code>web.xml</code>:
  * <pre>
@@ -82,7 +82,7 @@ import org.omnifaces.util.State;
  * See also <a href="https://github.com/eclipse-ee4j/websocket-api/issues/211">WS spec issue 211</a>.
  *
  *
- * <h3 id="usage-client"><a href="#usage-client">Usage (client)</a></h3>
+ * <h2 id="usage-client"><a href="#usage-client">Usage (client)</a></h2>
  * <p>
  * Declare <strong><code>&lt;o:socket&gt;</code></strong> tag in the JSF view with at least a
  * <strong><code>channel</code></strong> name and an <strong><code>onmessage</code></strong> JavaScript listener
@@ -128,7 +128,7 @@ import org.omnifaces.util.State;
  * that session persistence is enabled on the server.
  *
  *
- * <h3 id="usage-server"><a href="#usage-server">Usage (server)</a></h3>
+ * <h2 id="usage-server"><a href="#usage-server">Usage (server)</a></h2>
  * <p>
  * In WAR side, you can inject <strong>{@link PushContext}</strong> via <strong><code>&#64;</code>{@link Push}</strong>
  * annotation on the given channel name in any CDI/container managed artifact such as <code>@Named</code>,
@@ -165,7 +165,7 @@ import org.omnifaces.util.State;
  * <a href="https://github.com/javaee/websocket-spec/issues/238">WS spec issue 238</a>.
  *
  *
- * <h3 id="scopes-and-users"><a href="#scopes-and-users">Scopes and users</a></h3>
+ * <h2 id="scopes-and-users"><a href="#scopes-and-users">Scopes and users</a></h2>
  * <p>
  * By default the web socket is <code>application</code> scoped, i.e. any view/session throughout the web application
  * having the same web socket channel open will receive the same push message. The push message can be sent by all users
@@ -245,7 +245,7 @@ import org.omnifaces.util.State;
  * </pre>
  *
  *
- * <h3 id="channels"><a href="#channels">Channel design hints</a></h3>
+ * <h2 id="channels"><a href="#channels">Channel design hints</a></h2>
  * <p>
  * You can declare multiple push channels on different scopes with or without user target throughout the application.
  * Be however aware that the same channel name can easily be reused across multiple views, even if it's view scoped.
@@ -278,7 +278,7 @@ import org.omnifaces.util.State;
  * </pre>
  *
  *
- * <h3 id="connecting"><a href="#connecting">Conditionally connecting</a></h3>
+ * <h2 id="connecting"><a href="#connecting">Conditionally connecting</a></h2>
  * <p>
  * You can use the optional <strong><code>connected</code></strong> attribute to control whether to auto-connect the web
  * socket or not.
@@ -322,7 +322,7 @@ import org.omnifaces.util.State;
  * associated JSF view state in the server side can't be notified if a socket is manually opened in client side.
  *
  *
- * <h3 id="events-client"><a href="#events-client">Events (client)</a></h3>
+ * <h2 id="events-client"><a href="#events-client">Events (client)</a></h2>
  * <p>
  * The optional <strong><code>onopen</code></strong> JavaScript listener function can be used to listen on open of a web
  * socket in client side. This will be invoked on the very first connection attempt, regardless of whether it will be
@@ -419,7 +419,7 @@ import org.omnifaces.util.State;
  * submitting any form in it would throw <code>ViewExpiredException</code> anyway.
  *
  *
- * <h3 id="events-server"><a href="#events-server">Events (server)</a></h3>
+ * <h2 id="events-server"><a href="#events-server">Events (server)</a></h2>
  * <p>
  * When a web socket has been opened, a new CDI <strong>{@link SocketEvent}</strong> will be fired with
  * <strong><code>&#64;</code>{@link Opened}</strong> qualifier. When the <code>user</code> attribute of the
@@ -460,7 +460,7 @@ import org.omnifaces.util.State;
  * logged in" (or out) when a session scoped socket is opened (or closed).
  *
  *
- * <h3 id="security"><a href="#security">Security considerations</a></h3>
+ * <h2 id="security"><a href="#security">Security considerations</a></h2>
  * <p>
  * If the socket is declared in a page which is only restricted to logged-in users with a specific role, then you may
  * want to add the URL of the push handshake request URL to the set of restricted URLs.
@@ -507,7 +507,7 @@ import org.omnifaces.util.State;
  * reachable from server end even when the session or view associated with the page in client side is expired.
  *
  *
- * <h3 id="ejb"><a href="#ejb">EJB design hints</a></h3>
+ * <h2 id="ejb"><a href="#ejb">EJB design hints</a></h2>
  * <p>
  * In case you'd like to trigger a push from EAR/EJB side to an application scoped push socket, then you could make use
  * of CDI events. First create a custom bean class representing the push event something like <code>PushEvent</code>
@@ -613,7 +613,7 @@ import org.omnifaces.util.State;
  * frameworks and libraries like JSF and OmniFaces in EAR/EJB (back end) side.
  *
  *
- * <h3 id="cluster"><a href="#cluster">Cluster design hints</a></h3>
+ * <h2 id="cluster"><a href="#cluster">Cluster design hints</a></h2>
  * <p>
  * In case your web application is deployed to a server cluster with multiple nodes, and the push event could be
  * triggered in a different node than where the client is connected to, then it won't reach the socket. One solution is
@@ -688,7 +688,7 @@ import org.omnifaces.util.State;
  * </pre>
  *
  *
- * <h3 id="ui"><a href="#ui">UI update design hints</a></h3>
+ * <h2 id="ui"><a href="#ui">UI update design hints</a></h2>
  * <p>
  * In case you'd like to perform complex UI updates, then easiest would be to put <code>&lt;f:ajax&gt;</code> inside
  * <code>&lt;o:socket&gt;</code>. The support was added in OmniFaces 2.6. Here's an example:

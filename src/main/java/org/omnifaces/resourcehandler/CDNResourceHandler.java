@@ -32,7 +32,7 @@ import jakarta.faces.application.ResourceHandler;
  * <code>javax.faces:jsf.js</code> resource or PrimeFaces' <code>primefaces:jquery/jquery.js</code> resource could be
  * pointed to a CDN.
  *
- * <h3>Installation</h3>
+ * <h2>Installation</h2>
  * <p>
  * To get it to run, this handler needs be registered as follows in <code>faces-config.xml</code>:
  * <pre>
@@ -41,7 +41,7 @@ import jakarta.faces.application.ResourceHandler;
  * &lt;/application&gt;
  * </pre>
  *
- * <h3>Standard configuration</h3>
+ * <h2>Standard configuration</h2>
  * <p>
  * To configure the CDN URLs, a {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_RESOURCES}
  * context parameter has to be provided wherein the CDN resources are been specified as a comma separated string of
@@ -101,7 +101,7 @@ import jakarta.faces.application.ResourceHandler;
  * &lt;script type="text/javascript" src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"&gt;&lt;/script&gt;
  * </pre>
  *
- * <h3>Wildcard configuration</h3>
+ * <h2>Wildcard configuration</h2>
  * <p>
  * You can also use the wildcard syntax to map every single resource of a specific library to a common CDN URL. To
  * achieve that, just use <code>*</code> as the sole resource name and make sure that the CDN URL ends with
@@ -124,7 +124,7 @@ import jakarta.faces.application.ResourceHandler;
  * &lt;script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"&gt;&lt;/script&gt;
  * </pre>
  *
- * <h3>EL expressions</h3>
+ * <h2>EL expressions</h2>
  * <p>The CDN resource handler supports evaluating EL expessions in the CDN URL. Here's an example:</p>
  * <pre>
  * &lt;context-param&gt;
@@ -134,7 +134,7 @@ import jakarta.faces.application.ResourceHandler;
  * </pre>
  * <p>The EL expression is resolved on a per-request basis.</p>
  *
- * <h3>Conditionally disable CDN resource handler</h3>
+ * <h2>Conditionally disable CDN resource handler</h2>
  * <p>
  * If you'd like to supply a context parameter which conditionally disables the CDN resource handler, then set the
  * context parameter {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_DISABLED} accordingly.
@@ -156,7 +156,7 @@ import jakarta.faces.application.ResourceHandler;
  * </pre>
  * <p>The EL expression is resolved on a per-request basis.</p>
  *
- * <h3>CombinedResourceHandler</h3>
+ * <h2>CombinedResourceHandler</h2>
  * <p>
  * If you're also using the {@link CombinedResourceHandler}, then you need to understand that CDN resources can
  * simply not be combined, as that would defeat the CDN purpose. The {@link CombinedResourceHandler} will therefore

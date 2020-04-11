@@ -86,7 +86,7 @@ import org.omnifaces.facesviews.FacesViews;
  * useful {@link #sendFile(File, boolean)} methods which allows you to provide a {@link File}, <code>byte[]</code> or
  * {@link InputStream} as a download to the client.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * Some examples:
  * <pre>
@@ -143,7 +143,7 @@ import org.omnifaces.facesviews.FacesViews;
  * }
  * </pre>
  *
- * <h3>FacesLocal</h3>
+ * <h2>FacesLocal</h2>
  * <p>
  * Note that there's normally a minor overhead in obtaining the thread local {@link FacesContext}. In case client code
  * needs to call methods in this class multiple times it's expected that performance will be slightly better if instead
@@ -154,7 +154,7 @@ import org.omnifaces.facesviews.FacesViews;
  * {@link FacesLocal} obtains the {@link FacesContext} from the current thread by
  * {@link FacesContext#getCurrentInstance()}. This job is up to the caller.
  *
- * <h3>#{faces} in EL</h3>
+ * <h2>#{faces} in EL</h2>
  * <p>
  * Since OmniFaces 2.6,
  * all methods of {@link Faces} utility class which start with "get" or "is", and take no parameters, and return

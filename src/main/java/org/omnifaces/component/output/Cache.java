@@ -75,7 +75,7 @@ import org.omnifaces.util.cache.TimeToLiveCache;
  * Via a cache provider mechanism an alternative cache implementation can be configured in web.xml. The default
  * cache is based on <a href="https://github.com/ben-manes/concurrentlinkedhashmap">https://github.com/ben-manes/concurrentlinkedhashmap</a>.
  *
- * <h3>Setting a custom caching provider</h3>
+ * <h2>Setting a custom caching provider</h2>
  * <p>
  * A custom caching provider can be set by using the <code>org.omnifaces.CACHE_PROVIDER</code> context
  * parameter in web.xml to point to an implementation of <code>org.omnifaces.component.output.cache.CacheProvider</code>.
@@ -90,14 +90,14 @@ import org.omnifaces.util.cache.TimeToLiveCache;
  * The default provider, <code>org.omnifaces.component.output.cache.DefaultCacheProvider</code> can be used as an
  * example.
  *
- * <h3>Global settings</h3>
+ * <h2>Global settings</h2>
  * <p>
  * For the default provider, the maximum capacity and the default time to live can be specified for the
  * supported scopes "session" and "application". If the maximum capacity is reached, an entry will be
  * evicted following a least recently used policy. The default time to live specifies for how long
  * entries are considered to be valid. A value for the <code>time</code> attribute on this component
  * will override this global default time to live. The following context parameters can be used in web.xml:
- * <table summary="All available context parameters">
+ * <table><caption>All available context parameters</caption>
  * <tr><td class="colFirst">
  * <code>org.omnifaces.CACHE_SETTING_APPLICATION_MAX_CAPACITY</code>
  * </td><td>

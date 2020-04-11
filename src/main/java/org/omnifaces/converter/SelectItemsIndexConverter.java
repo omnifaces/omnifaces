@@ -35,7 +35,7 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
  * automatically converts based on the position (index) of the selected item in the list instead of the
  * {@link #toString()} of the selected item.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * This converter is available by converter ID <code>omnifaces.SelectItemsIndexConverter</code>. Just specify it in the
  * <code>converter</code> attribute of the selection component holding <code>&lt;f:selectItems&gt;</code>.
@@ -45,7 +45,7 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
  * &lt;/h:selectOneMenu&gt;
  * </pre>
  *
- * <h3>Pros and cons as compared to {@link SelectItemsConverter}</h3>
+ * <h2>Pros and cons as compared to {@link SelectItemsConverter}</h2>
  * <p>
  * This converter has the following advantages over {@link SelectItemsConverter}:
  * <ul>

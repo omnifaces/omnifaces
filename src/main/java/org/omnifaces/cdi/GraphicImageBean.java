@@ -61,7 +61,7 @@ import org.omnifaces.resourcehandler.GraphicResourceHandler;
  * endusers to invoke any public method returning a <code>byte[]</code> or <code>InputStream</code> on the bean by just
  * a HTTP GET request.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * You can use <code>#{of:graphicImageURL()}</code> EL functions to generate URLs referring the
  * <code>&#64;GraphicImageBean</code> bean, optionally with the image <code>type</code> and <code>lastModified</code>

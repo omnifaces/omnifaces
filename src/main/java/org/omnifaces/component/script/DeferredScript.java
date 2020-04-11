@@ -37,7 +37,7 @@ import org.omnifaces.renderer.DeferredScriptRenderer;
  * This will give bonus points with among others the Google PageSpeed tool, on the contrary to placing the script at
  * bottom of body, or using <code>defer="true"</code> or even <code>async="true"</code>.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * Just use it the same way as a <code>&lt;h:outputScript&gt;</code>, with a <code>library</code> and <code>name</code>.
  * <pre>

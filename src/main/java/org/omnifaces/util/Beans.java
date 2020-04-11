@@ -37,7 +37,7 @@ import jakarta.enterprise.inject.spi.InjectionPoint;
  * Collection of utility methods for the CDI API that are mainly shortcuts for obtaining stuff from the
  * {@link BeanManager}.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * Some examples:
  * <pre>

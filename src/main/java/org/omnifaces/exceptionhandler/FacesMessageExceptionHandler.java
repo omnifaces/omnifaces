@@ -27,7 +27,7 @@ import jakarta.faces.event.ExceptionQueuedEvent;
  * <p>
  * The {@link FacesMessageExceptionHandler} will add every exception as a global FATAL faces message.
  *
- * <h3>Installation</h3>
+ * <h2>Installation</h2>
  * <p>
  * This handler must be registered by a factory as follows in <code>faces-config.xml</code> in order to get it to run:
  * <pre>
@@ -36,7 +36,7 @@ import jakarta.faces.event.ExceptionQueuedEvent;
  * &lt;/factory&gt;
  * </pre>
  *
- * <h3>Note</h3>
+ * <h2>Note</h2>
  * <p>
  * It's your own responsibility to make sure that the faces messages are being shown. Make sure that there's a
  * <code>&lt;h:messages&gt;</code> or any equivalent component (OmniFaces, PrimeFaces, etc) is present in the view and
@@ -44,7 +44,7 @@ import jakarta.faces.event.ExceptionQueuedEvent;
  * make sure that you don't have bugs in rendering of your views. This exception handler is not capable of handling
  * exceptions during render response. It will fail silently.
  *
- * <h3>Customizing <code>FacesMessageExceptionHandler</code></h3>
+ * <h2>Customizing <code>FacesMessageExceptionHandler</code></h2>
  * <p>
  * If more fine grained control of creating the FATAL faces message is desired, then the developer can opt to extend
  * this {@link FacesMessageExceptionHandler} and override the following method:

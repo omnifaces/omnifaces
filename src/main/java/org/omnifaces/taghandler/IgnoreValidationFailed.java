@@ -37,7 +37,7 @@ import org.omnifaces.component.input.Form;
  * parent {@link UIForm} must be an <code>&lt;o:form&gt;</code>. When executing an ajax action, make sure that the
  * parent {@link UIForm} is also included in the <code>&lt;f:ajax execute&gt;</code>.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * For example:
  * <pre>

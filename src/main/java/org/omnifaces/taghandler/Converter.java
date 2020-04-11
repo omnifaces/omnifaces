@@ -44,7 +44,7 @@ import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDeleg
  * iterating component, and that they can be set on a custom converter without needing to explicitly register it in a
  * tagfile.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * When you specify for example the standard <code>&lt;f:convertDateTime&gt;</code> by
  * <code>converterId="jakarta.faces.DateTime"</code>, then you'll be able to use all its attributes such as
@@ -59,7 +59,7 @@ import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDeleg
  * First go to the javadoc of the class of interest, then go to <code>CONVERTER_ID</code> in its field summary
  * and finally click the Constant Field Values link to see the value.
  *
- * <h3>JSF 2.3 compatibility</h3>
+ * <h2>JSF 2.3 compatibility</h2>
  * <p>
  * The <code>&lt;o:converter&gt;</code> is currently not compatible with converters which are managed via JSF 2.3's
  * new <code>managed=true</code> attribute set on the {@link FacesConverter} annotation, at least not when using

@@ -60,7 +60,7 @@ import org.omnifaces.context.OmniPartialViewContextFactory;
  * Note that {@link #updateRow(UIData, int)} and {@link #updateColumn(UIData, int)} can only update cell content when
  * it has been wrapped in some container component with a fixed ID.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * Some examples:
  * <pre>

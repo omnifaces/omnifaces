@@ -55,7 +55,7 @@ import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
  * {@link #logException(HttpServletRequest, Throwable, String, String, Object...)} method. The UUID is in turn available
  * in EL by <code>#{requestScope['org.omnifaces.exception_uuid']}</code>.
  *
- * <h3>Installation</h3>
+ * <h2>Installation</h2>
  * <p>
  * To get it to run, map this filter on an <code>&lt;url-pattern&gt;</code> of <code>/*</code> in <code>web.xml</code>.
  * <pre>
@@ -68,19 +68,18 @@ import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
  *     &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
  * &lt;/filter-mapping&gt;
  * </pre>
- * <p>
  *
- * <h3>Error pages</h3>
+ * <h2>Error pages</h2>
  * <p>
  * Please refer the "Error pages" section of the {@link FullAjaxExceptionHandler} javadoc for recommended error page
  * configuration.
  *
- * <h3>Configuration</h3>
+ * <h2>Configuration</h2>
  * <p>
  * Please refer the "Configuration" section of the {@link FullAjaxExceptionHandler} javadoc for available context
  * parameters.
  *
- * <h3>Customizing <code>FacesExceptionFilter</code></h3>
+ * <h2>Customizing <code>FacesExceptionFilter</code></h2>
  * <p>
  * If more fine grained control is desired for logging the exception, then the developer can opt to extend this
  * {@link FacesExceptionFilter} and override one or more of the following protected methods:

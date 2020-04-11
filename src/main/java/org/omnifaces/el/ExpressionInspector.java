@@ -36,7 +36,7 @@ import jakarta.faces.el.CompositeComponentExpressionHolder;
  * <p>
  * This class contains methods that inspect expressions to reveal information about them.
  *
- * <h3>Examples</h3>
+ * <h2>Examples</h2>
  * <p>
  * Determine the bean instance and the property value behind a {@link ValueExpression}.
  * <pre>

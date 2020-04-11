@@ -24,7 +24,7 @@ import jakarta.faces.application.Application;
  * <code>/META-INF/faces-config.xml</code> files found in the classpath and offers methods to obtain information from
  * them which is not available by the standard JSF API.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * Some examples:
  * <pre>

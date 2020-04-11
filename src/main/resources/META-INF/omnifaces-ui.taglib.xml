@@ -648,7 +648,7 @@ input.error, select.error, textarea.error {
 				components have been filled out. The default message is
 				<blockquote>{0}: Please fill out all of those fields</blockquote>
 				<hr>
-				<h3>General usage of all multiple field validators</h3>
+				<h2>General usage of all multiple field validators</h2>
 				<p>
 				This validator must be placed inside the same <code>UIForm</code> as the <code>UIInput</code> components
 				in question. The <code>UIInput</code> components must be referenced by a space separated collection of
@@ -2439,7 +2439,7 @@ This specific part of the URL (also called hash fragment identifier) is by defau
 component will on page load send it anyway and on every ajax request update the hash query string in client side
 when the model value has changed in server side.
  *
-<h3>Usage</h3>
+<h2>Usage</h2>
 <p>
 It's very similar to the <code>&lt;o:viewParam&gt;</code>.
 <pre>
@@ -2696,7 +2696,7 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
 					<p>
 					Only when you set <code>immediate="true"</code>, then it will behave the same as the standard
 					<code>&lt;f:viewAction&gt;</code>.
-					<h3>Messaging</h3>
+					<h2>Messaging</h2>
 					<p>
 					You can use the <code>message</code> attribute to add a global flash warning message.
 					<pre>
@@ -4204,7 +4204,7 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
 		   		<a href="https://github.com/ben-manes/concurrentlinkedhashmap">https://github.com/ben-manes/concurrentlinkedhashmap</a> in case
 		   		a maximum cache capacity is set, or on a plain ConcurrentMap if no capacity is set.
 		   		<hr>
-				<h3>Setting a custom caching provider</h3>
+				<h2>Setting a custom caching provider</h2>
 				<p>A custom caching provider can be set by using the <code>org.omnifaces.CACHE_PROVIDER</code> context
 				parameter in web.xml to point to an implementation of <code>org.omnifaces.component.output.cache.CacheProvider</code>.
 				For example:
@@ -4218,7 +4218,7 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
 				The default provider, <code>org.omnifaces.component.output.cache.DefaultCacheProvider</code> can be used as an
 				example.
 				<hr>
-				<h3>Global settings</h3>
+				<h2>Global settings</h2>
 				<p>For the default provider, the maximum capacity and the default time to live can be specified for the
 				supported scopes "session" and "application". If the maximum capacity is reached, an entry will be
 				evicted following a least recently used policy. The default time to live specifies for how long
@@ -4833,7 +4833,7 @@ public enum Baz {
 				error, so you can customize HTTP error pages via <code>&lt;error-page&gt;</code> entries in <code>web.xml</code>,
 				otherwise the server-default one will be displayed instead.
 				 *
-				<h3>f:viewParam required="true" fail</h3>
+				<h2>f:viewParam required="true" fail</h2>
 				<p>
 				As a precaution, the <code>&lt;f:viewParam required="true"&gt;</code> has in current Mojarra and MyFaces releases
 				(as of now, Mojarra 2.2.7 and MyFaces 2.2.4) a design error. When the parameter is not specified in the query string,
@@ -4843,7 +4843,7 @@ public enum Baz {
 				<code>&lt;o:viewParamValidationFailed&gt;</code> is actually relying on. This is fixed in
 				<code>&lt;o:viewParam</code>.
 				 *
-				<h3>Examples</h3>
+				<h2>Examples</h2>
 				<p>
 				With the example below, when at least one view param is absent, then the client will be returned a HTTP 400 error.
 				<pre>
@@ -4884,7 +4884,7 @@ public enum Baz {
 				applied in the same order as they are declared in the view. So, with the example above, the one nested in
 				<code>&lt;f|o:viewParam&gt;</code> takes precedence over the one nested in <code>&lt;f:metadata&gt;</code>.
 				 *
-				<h3>Messaging</h3>
+				<h2>Messaging</h2>
 				<p>
 				By default, the first occurring faces message on the parent component will be copied, or when there is none, then
 				the first occurring global faces message will be copied. When <code>sendRedirect</code> is used, then it will be set
@@ -4898,7 +4898,7 @@ public enum Baz {
 				&lt;o:viewParamValidationFailed sendError="401" message="Authentication failed. You need to login." /&gt;
 				</pre>
 				 *
-				<h3>Design notes</h3>
+				<h2>Design notes</h2>
 				<p>
 				You can technically nest multiple <code>&lt;o:viewParamValidationFailed&gt;</code> inside the same parent, but this
 				is not the documented approach and the behavior is unspecified.

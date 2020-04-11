@@ -53,7 +53,7 @@ import org.omnifaces.util.Servlets;
  * download, and by download accelerators to be able to request smaller parts simultaneously. This servlet is ideal when
  * you have large files like media files placed outside the web application and you can't use the default servlet.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * Just extend this class and override the {@link #getFile(HttpServletRequest)} method to return the desired file. If
  * you want to trigger a HTTP 400 "Bad Request" error, simply throw {@link IllegalArgumentException}. If you want to
@@ -91,7 +91,7 @@ import org.omnifaces.util.Servlets;
  * &lt;video src="#{request.contextPath}/media/video.mp4" controls="controls" /&gt;
  * </pre>
  *
- * <h3>Customizing <code>FileServlet</code></h3>
+ * <h2>Customizing <code>FileServlet</code></h2>
  * <p>
  * If more fine grained control is desired for handling "file not found" error, determining the cache expire time, the
  * content type, whether the file should be supplied as an attachment and the attachment's file name, then the developer

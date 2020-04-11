@@ -32,7 +32,7 @@ import jakarta.faces.model.SelectItem;
  * expensive service/DAO operations. This converter automatically converts based on the {@link #toString()} of the
  * selected item.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * This converter is available by converter ID <code>omnifaces.ListConverter</code> and should be used in combination
  * with <code>&lt;o:converter&gt;</code> in order to be able to pass the {@link List} source to it, which it can use
@@ -44,7 +44,7 @@ import jakarta.faces.model.SelectItem;
  * &lt;/p:pickList&gt;
  * </pre>
  *
- * <h3>Make sure that your entity has a good <code>toString()</code> implementation</h3>
+ * <h2>Make sure that your entity has a good <code>toString()</code> implementation</h2>
  * <p>
  * For detail, refer the javadoc of {@link SelectItemsConverter} and substitute "<code>SelectItemsConverter</code>" by
  * "<code>ListConverter</code>" and "<code>SelectItemsIndexConverter</code>" by "<code>ListIndexConverter</code>".

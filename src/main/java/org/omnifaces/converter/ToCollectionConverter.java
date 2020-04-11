@@ -40,7 +40,7 @@ import org.omnifaces.util.Faces;
  * collection based on a delimiter. Additionally, it trims any whitespace around each delimited submitted value. This is
  * useful for among others comma separated value inputs.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * This converter is available by converter ID <code>omnifaces.ToCollectionConverter</code>. Just specify it in the
  * <code>converter</code> attribute of the component referring the <code>Collection</code> property. For example:

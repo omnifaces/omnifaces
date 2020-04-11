@@ -35,7 +35,7 @@ import jakarta.servlet.http.HttpSession;
  * building/restoring the view, which will implicitly set the request body character encoding to the server-default
  * value, which is not UTF-8 per se.
  *
- * <h3>Installation</h3>
+ * <h2>Installation</h2>
  * <p>
  * To get this filter to run, map it as follows in <code>web.xml</code>:
  * <pre>
@@ -49,7 +49,7 @@ import jakarta.servlet.http.HttpSession;
  * &lt;/filter-mapping&gt;
  * </pre>
  *
- * <h3>Configuration (optional)</h3>
+ * <h2>Configuration (optional)</h2>
  * <p>As JSF2/Facelets uses by default UTF-8 everywhere, the default charset is also set to UTF-8. When really
  * necessary for some reason, then it can be overridden by specifying the <code>encoding</code> initialization
  * parameter in the <code>&lt;filter&gt;</code> element as follows:

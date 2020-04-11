@@ -28,7 +28,7 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
  * possibly expensive service/DAO operations. This converter automatically converts based on the {@link #toString()}
  * of the selected item.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * This converter is available by converter ID <code>omnifaces.SelectItemsConverter</code>. Just specify it in the
  * <code>converter</code> attribute of the selection component holding <code>&lt;f:selectItems&gt;</code>.
@@ -38,7 +38,7 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
  * &lt;/h:selectOneMenu&gt;
  * </pre>
  *
- * <h3>Make sure that your entity has a good <code>toString()</code> implementation</h3>
+ * <h2>Make sure that your entity has a good <code>toString()</code> implementation</h2>
  * <p>
  * The base converter uses by default the <code>toString()</code> method of the entity to uniquely identify
  * the instance during the conversion. This is sufficient if your (abstract base) entity has a
@@ -55,7 +55,7 @@ import org.omnifaces.util.selectitems.SelectItemsUtils;
  * to set the right entity back in the model. Please note that this problem is in turn unrelated to the
  * <code>SelectItemsConverter</code>, you would have faced the same problem when using any other converter.
  *
- * <h3>If your entity can't have a good <code>toString()</code> implementation</h3>
+ * <h2>If your entity can't have a good <code>toString()</code> implementation</h2>
  * <p>
  * However, if the entity doesn't have a <code>toString()</code> implementation (and thus relies on the default
  * <code>fqn@hashcode</code> implementation), or the existing implementation doesn't necessarily uniquely

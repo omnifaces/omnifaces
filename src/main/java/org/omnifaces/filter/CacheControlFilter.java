@@ -78,7 +78,7 @@ import org.omnifaces.util.Servlets;
  * <p>
  * It would not make sense to control their cache-related headers with this filter as they would be overridden anyway.
  *
- * <h3>Configuration</h3>
+ * <h2>Configuration</h2>
  * <p>
  * This filter supports the <code>expires</code> initialization parameter which must be a number between 0 and 999999999
  * with optionally the 'w', 'd', 'h', 'm' or 's' suffix standing for respectively 'week', 'day', 'hour', 'minute' and
@@ -142,7 +142,7 @@ import org.omnifaces.util.Servlets;
  * &lt;/filter-mapping&gt;
  * </pre>
  *
- * <h3>Actual headers</h3>
+ * <h2>Actual headers</h2>
  * <p>If the <code>expires</code> init param is set with a value which represents a time larger than 0 seconds, then the
  * following headers will be set:
  * <ul>
@@ -157,7 +157,7 @@ import org.omnifaces.util.Servlets;
  * <li><code>Pragma: no-cache</code></li>
  * </ul>
  *
- * <h3>JSF development stage</h3>
+ * <h2>JSF development stage</h2>
  * <p>To speed up development, caching by this filter is <strong>disabled</strong> when JSF project stage is set to
  * <code>Development</code> as per {@link Servlets#isFacesDevelopment(jakarta.servlet.ServletContext)}.
  *

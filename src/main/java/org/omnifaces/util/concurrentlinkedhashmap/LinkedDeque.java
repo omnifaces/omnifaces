@@ -25,7 +25,7 @@ import java.util.NoSuchElementException;
  * thread-safe; in the absence of external synchronization, they do not support
  * concurrent access by multiple threads. Null elements are prohibited.
  * <p>
- * Most <tt>LinkedDeque</tt> operations run in constant time by assuming that
+ * Most <code>LinkedDeque</code> operations run in constant time by assuming that
  * the {@link Linked} parameter is associated with the deque instance. Any usage
  * that violates this assumption will result in non-deterministic behavior.
  * <p>
@@ -433,7 +433,7 @@ final class LinkedDeque<E extends Linked<E>> extends AbstractCollection<E> imple
 		}
 
 		/**
-		 * Retrieves the next element to traverse to or <tt>null</tt> if there are
+		 * Retrieves the next element to traverse to or <code>null</code> if there are
 		 * no more elements.
 		 */
 		abstract E computeNext();
@@ -446,20 +446,20 @@ final class LinkedDeque<E extends Linked<E>> extends AbstractCollection<E> imple
 interface Linked<T extends Linked<T>> {
 
 	/**
-	 * Retrieves the previous element or <tt>null</tt> if either the element is
+	 * Retrieves the previous element or <code>null</code> if either the element is
 	 * unlinked or the first element on the deque.
 	 */
 	T getPrevious();
 
-	/** Sets the previous element or <tt>null</tt> if there is no link. */
+	/** Sets the previous element or <code>null</code> if there is no link. */
 	void setPrevious(T prev);
 
 	/**
-	 * Retrieves the next element or <tt>null</tt> if either the element is
+	 * Retrieves the next element or <code>null</code> if either the element is
 	 * unlinked or the last element on the deque.
 	 */
 	T getNext();
 
-	/** Sets the next element or <tt>null</tt> if there is no link. */
+	/** Sets the next element or <code>null</code> if there is no link. */
 	void setNext(T next);
 }

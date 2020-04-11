@@ -26,7 +26,7 @@ import org.omnifaces.util.State;
  * The <code>&lt;o:messages&gt;</code> is a component that extends the standard <code>&lt;h:messages&gt;</code> with
  * the following new features:
  *
- * <h3>Multiple <code>for</code> components</h3>
+ * <h2>Multiple <code>for</code> components</h2>
  * <p>
  * Possibility to specify multiple client IDs space separated in the <code>for</code> attribute. The example below
  * would only display messages for <code>input1</code> and <code>input3</code>:
@@ -68,7 +68,7 @@ import org.omnifaces.util.State;
  * &lt;/h:form&gt;
  * </pre>
  *
- * <h3>Displaying single message</h3>
+ * <h2>Displaying single message</h2>
  * <p>
  * Show a single custom message whenever the component has received any faces message. This is particularly useful
  * when you want to display a global message in case any of the in <code>for</code> specified components has a faces
@@ -82,14 +82,14 @@ import org.omnifaces.util.State;
  * &lt;/h:form&gt;
  * </pre>
  *
- * <h3>HTML escaping</h3>
+ * <h2>HTML escaping</h2>
  * <p>Control HTML escaping by the new <code>escape</code> attribute.
  * <pre>
  * &lt;o:messages escape="false" /&gt;
  * </pre>
  * <p>Beware of potential XSS attack holes when user-controlled input is redisplayed through messages!
  *
- * <h3>Iteration markup control</h3>
+ * <h2>Iteration markup control</h2>
  * <p>Control iteration markup fully by the new <code>var</code> attribute which sets the current {@link FacesMessage}
  * in the request scope and disables the default table/list rendering. For example,
  * <pre>
@@ -106,7 +106,7 @@ import org.omnifaces.util.State;
  * and <code>escape</code> attributes have in this case no effect. With a single message, there's no point of
  * iteration. As to escaping, just use <code>&lt;h:outputText escape="false"&gt;</code> the usual way.
  *
- * <h3>Design notice</h3>
+ * <h2>Design notice</h2>
  * <p>The component class is named <code>OmniMessages</code> instead of <code>Messages</code> to avoid
  * confusion with the {@link Messages} utility class.
  *

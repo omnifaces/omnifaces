@@ -67,7 +67,7 @@ import org.omnifaces.util.State;
  * You can use it the same way as <code>&lt;h:form&gt;</code>, you only need to change <code>h:</code> to
  * <code>o:</code>.
  *
- * <h3>Use request URI</h3>
+ * <h2>Use request URI</h2>
  * <p>
  * This was available since version 1.6, but since version 3.0, this has become enabled by default. So just using
  * <code>&lt;o:form&gt;</code> will already submit to the exact request URI with query string as seen in browser's
@@ -76,7 +76,7 @@ import org.omnifaces.util.State;
  * &lt;o:form useRequestURI="false"&gt;
  * </pre>
  *
- * <h3>Include request params</h3>
+ * <h2>Include request params</h2>
  * <p>
  * When you want to include request parameters only instead of the entire request URI with query string, set the
  * <code>includeRequestParams</code> attribute to <code>true</code>. This will implicitly set <code>useRequestURI</code>
@@ -85,7 +85,7 @@ import org.omnifaces.util.State;
  * &lt;o:form includeRequestParams="true"&gt;
  * </pre>
  *
- * <h3>Partial submit</h3>
+ * <h2>Partial submit</h2>
  * <p>
  * This is the default behavior. So just using <code>&lt;o:form&gt;</code> will already cause the
  * <code>&lt;f:ajax&gt;</code> to send only the form data which actually need to be processed. In order to turn off this
@@ -94,7 +94,7 @@ import org.omnifaces.util.State;
  * &lt;o:form partialSubmit="false"&gt;
  * </pre>
  *
- * <h3>Add query string parameters to action URL</h3>
+ * <h2>Add query string parameters to action URL</h2>
  * <p>
  * The standard {@link UIForm} doesn't support adding query string parameters to the action URL. This component offers
  * this possibility via nested <code>&lt;f:param&gt;</code> and <code>&lt;o:param&gt;</code>.
@@ -110,13 +110,13 @@ import org.omnifaces.util.State;
  * <p>
  * The support was added in OmniFaces 2.2.
  *
- * <h3>Ignore Validation Failed</h3>
+ * <h2>Ignore Validation Failed</h2>
  * <p>
  * In order to properly use the <code>&lt;o:ignoreValidationFailed&gt;</code> tag on an {@link UICommand} component, its
  * parent <code>&lt;h:form&gt;</code> component has to be replaced by this <code>&lt;o:form&gt;</code> component.
  * See also {@link IgnoreValidationFailed}.
  *
- * <h3>Historical note</h3>
+ * <h2>Historical note</h2>
  * <p>
  * Previously, the <code>&lt;o:form&gt;</code> also supported <code>includeViewParams</code>, but
  * this did after all not have any advantage over the later introduced <code>useRequestURI</code> and

@@ -120,7 +120,7 @@ import org.omnifaces.config.FacesConfigXml;
  * ExternalContext externalContext = facesContext.getExternalContext();
  * </pre>
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * Some examples (for the full list, check the API documentation):
  * <pre>

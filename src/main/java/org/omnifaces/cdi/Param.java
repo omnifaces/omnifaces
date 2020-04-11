@@ -48,9 +48,9 @@ import org.omnifaces.util.Utils;
  * without the need for a <code>&lt;f:event type="preRenderView"&gt;</code> or <code>&lt;f:viewAction&gt;</code> in the
  * view.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  *
- * <h4>Request parameters</h4>
+ * <h3>Request parameters</h3>
  * <p>
  * The example below injects the request parameter with name <code>foo</code>.
  * <pre>
@@ -76,7 +76,7 @@ import org.omnifaces.util.Utils;
  * }
  * </pre>
  *
- * <h4>Multi-valued request parameters</h4>
+ * <h3>Multi-valued request parameters</h3>
  * <p>
  * Multi-valued parameters are also supported by specifying a {@link List} or array type. The support was added in
  * OmniFaces 2.4.
@@ -88,7 +88,7 @@ import org.omnifaces.util.Utils;
  * private String[] bars;
  * </pre>
  *
- * <h4>Path parameters</h4>
+ * <h3>Path parameters</h3>
  * <p>
  * Path parameters can be injected by specifying the <code>pathIndex</code> attribute representing the zero-based index
  * of the path parameter. The support was added in OmniFaces 2.5. On an example request
@@ -101,7 +101,7 @@ import org.omnifaces.util.Utils;
  * <p>
  * This takes precedence over the <code>name</code> attribute.
  *
- * <h3>Conversion and validation</h3>
+ * <h2>Conversion and validation</h2>
  * <p>
  * Standard types for which JSF already has a build in converter like {@link String}, {@link Long}, {@link Boolean}, etc
  * or for which there's already a converter registered via <code>forClass</code>, can be injected without explicitly

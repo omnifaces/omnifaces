@@ -77,7 +77,7 @@ import org.omnifaces.util.Hacks;
  * exceptions during ajax requests are handled the same way as exceptions during synchronous requests, which is
  * utilizing the standard Servlet API <code>&lt;error-page&gt;</code> mechanisms in <code>web.xml</code>.
  *
- * <h3>Installation</h3>
+ * <h2>Installation</h2>
  * <p>
  * This handler must be registered by a factory as follows in <code>faces-config.xml</code> in order to get it to run:
  * <pre>
@@ -86,7 +86,7 @@ import org.omnifaces.util.Hacks;
  * &lt;/factory&gt;
  * </pre>
  *
- * <h3>Error pages</h3>
+ * <h2>Error pages</h2>
  * <p>
  * This exception handler will parse the <code>web.xml</code> and <code>web-fragment.xml</code> files to find the error
  * page locations of the HTTP error code <code>500</code> and all declared specific exception types. Those locations
@@ -134,13 +134,13 @@ import org.omnifaces.util.Hacks;
  * large enough so that the so far rendered response until the occurrence of the exception fits in there and can
  * therefore safely be resetted.
  *
- * <h3>Error in error page itself</h3>
+ * <h2>Error in error page itself</h2>
  * <p>
  * When the rendering of the error page failed due to a bug in the error page itself, and the response can still be
  * resetted, then the {@link FullAjaxExceptionHandler} will display a hardcoded error message in "plain text" informing
  * the developer about the double mistake.
  *
- * <h3>Normal requests</h3>
+ * <h2>Normal requests</h2>
  * <p>
  * Note that the {@link FullAjaxExceptionHandler} does not deal with normal (non-ajax) requests at all. To properly
  * handle JSF and EL exceptions on normal requests as well, you need an additional {@link FacesExceptionFilter}. This
@@ -148,7 +148,7 @@ import org.omnifaces.util.Hacks;
  * {@link ServletException} further to the container (the container will namely use the first root cause of
  * {@link ServletException} to match an error page by exception in web.xml).
  *
- * <h3>Configuration</h3>
+ * <h2>Configuration</h2>
  * <p>
  * By default only {@link FacesException} and {@link ELException} are unwrapped. You can supply a context parameter
  * {@value org.omnifaces.exceptionhandler.FullAjaxExceptionHandler#PARAM_NAME_EXCEPTION_TYPES_TO_UNWRAP} to specify
@@ -180,7 +180,7 @@ import org.omnifaces.util.Hacks;
  * only suppress <code>org.omnifaces.exceptionhandler.FullAjaxExceptionHandler</code> logging. So chances are that
  * standard JSF and/or container will still log it. This may need to be configured separately.
  *
- * <h3>Customizing <code>FullAjaxExceptionHandler</code></h3>
+ * <h2>Customizing <code>FullAjaxExceptionHandler</code></h2>
  * <p>
  * If more fine grained control is desired for determining the root cause of the caught exception, or whether it should
  * be handled, or determining the error page, or logging the exception, then the developer can opt to extend this

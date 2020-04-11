@@ -72,7 +72,7 @@ import org.omnifaces.util.Hacks;
  * This has in turn the advantage that you don't need to modify the background image or font face URLs in CSS files from
  * 3rd party libraries such as Twitter Bootstrap, FontAwesome, etcetera.
  *
- * <h3>Installation</h3>
+ * <h2>Installation</h2>
  * <p>
  * To get it to run, this handler needs be registered as follows in <code>faces-config.xml</code>:
  * <pre>
@@ -92,7 +92,7 @@ import org.omnifaces.util.Hacks;
  * &lt;/servlet-mapping&gt;
  * </pre>
  *
- * <h3>CombinedResourceHandler</h3>
+ * <h2>CombinedResourceHandler</h2>
  * <p>
  * If you're also using the {@link CombinedResourceHandler} or any other custom resource handler, then you need to
  * ensure that this is in <code>faces-config.xml</code> declared <strong>before</strong> the

@@ -24,7 +24,7 @@ import jakarta.servlet.ServletContext;
  * found in the classpath and offers methods to obtain information from them which is not available by the standard
  * Servlet API.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * Some examples:
  * <pre>

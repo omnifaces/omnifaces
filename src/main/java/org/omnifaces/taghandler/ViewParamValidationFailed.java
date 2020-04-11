@@ -59,7 +59,7 @@ import org.omnifaces.util.Faces;
  * internally to send the error. You can therefore customize HTTP error pages via <code>&lt;error-page&gt;</code>
  * entries in <code>web.xml</code>. Otherwise the server-default one will be displayed instead.
  *
- * <h3>&lt;f:viewParam required="true"&gt; fail</h3>
+ * <h2>&lt;f:viewParam required="true"&gt; fail</h2>
  * <p>
  * As a precaution; be aware that <code>&lt;f:viewParam required="true"&gt;</code> has a design error in current
  * Mojarra and MyFaces releases (as of now, Mojarra 2.2.7 and MyFaces 2.2.4). When the parameter is not specified in
@@ -69,7 +69,7 @@ import org.omnifaces.util.Faces;
  * the <code>&lt;o:viewParamValidationFailed&gt;</code> is actually relying on. This is fixed in
  * <code>&lt;o:viewParam&gt;</code>.
  *
- * <h3>Examples</h3>
+ * <h2>Examples</h2>
  * <p>
  * In the example below the client will be presented an HTTP 400 error when at least one view param is absent.
  * <pre>
@@ -111,7 +111,7 @@ import org.omnifaces.util.Faces;
  * applied in the same order as they are declared in the view. So, with the example above, the one nested in
  * <code>&lt;f|o:viewParam&gt;</code> takes precedence over the one nested in <code>&lt;f:metadata&gt;</code>.
  *
- * <h3>Messaging</h3>
+ * <h2>Messaging</h2>
  * <p>
  * By default, the first occurring faces message on the parent component will be copied, or when there is none then the
  * first occurring global faces message will be copied. When <code>sendRedirect</code> is used, it will be set
@@ -131,7 +131,7 @@ import org.omnifaces.util.Faces;
  * can use it in combination with any kind of conversion/validation on <code>&lt;f|o:viewParam&gt;</code>, even bean
  * validation.
  *
- * <h3>Design notes</h3>
+ * <h2>Design notes</h2>
  * <p>
  * You can technically nest multiple <code>&lt;o:viewParamValidationFailed&gt;</code> inside the same parent, but this
  * is not the documented approach and only the first one would be used.

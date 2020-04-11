@@ -29,7 +29,7 @@ import jakarta.faces.model.SelectItem;
  * based on the position (index) of the selected item in the list instead of the {@link #toString()} of the selected
  * item.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * This converter is available by converter ID <code>omnifaces.ListIndexConverter</code> and should be used in
  * combination with <code>&lt;o:converter&gt;</code> in order to be able to pass the {@link List} source to it, which it
@@ -41,7 +41,7 @@ import jakarta.faces.model.SelectItem;
  * &lt;/p:pickList&gt;
  * </pre>
  *
- * <h3>Pros and cons as compared to {@link ListConverter}</h3>
+ * <h2>Pros and cons as compared to {@link ListConverter}</h2>
  * <p>
  * For detail, refer the javadoc of {@link SelectItemsIndexConverter} and substitute
  * "<code>SelectItemsIndexConverter</code>" by "<code>ListIndexConverter</code>" and "<code>SelectItemsConverter</code>"

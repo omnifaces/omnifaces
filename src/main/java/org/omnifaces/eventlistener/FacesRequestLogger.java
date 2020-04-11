@@ -93,7 +93,7 @@ import org.omnifaces.util.Faces;
  *     <li><code>5</code>: duration of {@link PhaseId#INVOKE_APPLICATION}.</li>
  *     <li><code>6</code>: duration of {@link PhaseId#RENDER_RESPONSE}.</li></ul></li></ul>
  *
- * <h3>Installation</h3>
+ * <h2>Installation</h2>
  * <p>
  * Register it as <code>&lt;phase-listener&gt;</code> in <code>faces-config.xml</code>.
  * <pre>

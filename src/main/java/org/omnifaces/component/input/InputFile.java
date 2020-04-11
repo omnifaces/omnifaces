@@ -66,13 +66,13 @@ import org.omnifaces.util.Utils;
  * Additionally, it makes sure that the value of HTML file input element is never rendered. The standard
  * <code>&lt;h:inputFile&gt;</code> renders <code>Part#toString()</code> to it which is unnecessary.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * You can use it the same way as <code>&lt;h:inputFile&gt;</code>, you only need to change <code>h:</code> into
  * <code>o:</code> to get the extra support for <code>multiple</code>, <code>directory</code> and <code>accept</code>
  * attributes. Here's are some usage examples.
  *
- * <h4>Single file selection</h4>
+ * <h3>Single file selection</h3>
  * <p>
  * It is basically not different from <code>&lt;h:inputFile&gt;</code>. You might as good use it instead.
  * <pre>
@@ -99,7 +99,7 @@ import org.omnifaces.util.Utils;
  * name to make sure that any path is stripped off. Some browsers are known to incorrectly include the client side path
  * or even a fake path along with the file name.
  *
- * <h4>Multiple file selection</h4>
+ * <h3>Multiple file selection</h3>
  * <p>
  * The <code>multiple</code> attribute can be set to <code>true</code> to enable multiple file selection.
  * With this setting the enduser can use control/command/shift keys to select multiple files.
@@ -125,7 +125,7 @@ import org.omnifaces.util.Utils;
  * }
  * </pre>
  *
- * <h4>Folder selection</h4>
+ * <h3>Folder selection</h3>
  * <p>
  * The <code>directory</code> attribute can be set to <code>true</code> to enable folder selection. This implicitly also
  * sets <code>multiple</code> attribute to <code>true</code> and renders an additional <code>webkitdirectory</code>
@@ -154,7 +154,7 @@ import org.omnifaces.util.Utils;
  * <p>
  * Do note that this does not send physical folders, but only files contained in those folders.
  *
- * <h4>Media type filtering</h4>
+ * <h3>Media type filtering</h3>
  * <p>
  * The <code>accept</code> attribute can be set with a comma separated string of media types of files to filter in
  * browse dialog. An overview of all registered media types can be found at
@@ -208,7 +208,7 @@ import org.omnifaces.util.Utils;
  * org.omnifaces.component.input.InputFile.accept = File {1} is unacceptable!
  * </pre>
  *
- * <h4>File size validation</h4>
+ * <h3>File size validation</h3>
  * <p>
  * The <code>maxsize</code> attribute can be set with the maximum file size in bytes which will be validated on each
  * selected file in the client side if the client supports HTML5 File API. This only requires that there is a

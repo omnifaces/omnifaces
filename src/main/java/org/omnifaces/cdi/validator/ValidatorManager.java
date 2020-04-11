@@ -61,7 +61,7 @@ import org.omnifaces.application.OmniApplicationFactory;
  * <p>
  * The {@link ValidatorManager} provides access to all {@link FacesValidator} annotated {@link Validator} instances which are made eligible for CDI.
  *
- * <h3>bean-discovery-mode</h3>
+ * <h2>bean-discovery-mode</h2>
  * <p>
  * In Java EE 7's CDI 1.1, when having a CDI 1.1 compatible <code>beans.xml</code>, by default only classes with an
  * explicit CDI managed bean scope annotation will be registered for dependency injection support. In order to cover
@@ -70,13 +70,13 @@ import org.omnifaces.application.OmniApplicationFactory;
  * <a href="http://stackoverflow.com/q/29458023/157882">oversight</a>. If you want to keep the default of
  * <code>bean-discovery-mode="annotated"</code>, then you need to add {@link Dependent} annotation to the validator class.
  *
- * <h3>AmbiguousResolutionException</h3>
+ * <h2>AmbiguousResolutionException</h2>
  * <p>
  * In case you have a {@link FacesValidator} annotated class extending another {@link FacesValidator} annotated class
  * which in turn extends a standard validator, then you may with <code>bean-discovery-mode="all"</code> face an
  * {@link AmbiguousResolutionException}. This can be solved by placing {@link Specializes} annotation on the subclass.
  *
- * <h3>JSF 2.3 compatibility</h3>
+ * <h2>JSF 2.3 compatibility</h2>
  * <p>
  * OmniFaces 3.0 continued to work fine with regard to managed validators which are initially developed for JSF 2.2.
  * However, JSF 2.3 introduced two new features for validators: parameterized validators and managed validators.

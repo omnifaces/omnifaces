@@ -54,7 +54,7 @@ import org.omnifaces.util.State;
  * Only when you set <code>immediate="true"</code>, then it will behave the same as the standard
  * <code>&lt;f:viewAction&gt;</code>.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * You can use it the same way as <code>&lt;f:viewAction&gt;</code>, you only need to change <code>f:</code> to
  * <code>o:</code>.
@@ -62,7 +62,7 @@ import org.omnifaces.util.State;
  * &lt;o:viewAction action="otherpage" if="#{bean.property eq null}" /&gt;
  * </pre>
  *
- * <h3>Messaging</h3>
+ * <h2>Messaging</h2>
  * <p>
  * You can use the <code>message</code> attribute to add a global flash warning message.
  * <pre>

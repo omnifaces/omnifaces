@@ -68,7 +68,7 @@ import org.omnifaces.util.State;
  * gets updated, and on every JSF ajax request update the hash query string in client side when the JSF model value has
  * changed.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * It's very similar to the <code>&lt;o:viewParam&gt;</code>.
  * <pre>
@@ -117,7 +117,7 @@ import org.omnifaces.util.State;
  * then the reflected hash query string will become <code>http://example.com/page.xhtml#foo=baz</code>.
  * If <code>#{bean.bar}</code> is any other value, then it will appear in the hash query string.
  *
- * <h3>Events</h3>
+ * <h2>Events</h2>
  * <p>
  * When the hash query string is changed by the client side, e.g. by following a <code>#foo=baz&amp;bar=kaz</code> link,
  * or by manually manipulating the URL, then a CDI {@link HashChangeEvent} will be fired which can be observed in any

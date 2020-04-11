@@ -101,7 +101,7 @@ import org.omnifaces.el.ScopedRunner;
  * traversal/lookup methods, there are several {@link UIForm} and {@link UIInput} related methods which makes it easier
  * to deal with forms and inputs.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * Some examples:
  * <pre>

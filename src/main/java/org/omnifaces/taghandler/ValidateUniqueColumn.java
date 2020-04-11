@@ -47,7 +47,7 @@ import jakarta.faces.view.facelets.TagHandler;
  * The default message is
  * <blockquote>{0}: Please fill out an unique value for the entire column. Duplicate found in row {1}</blockquote>
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * Usage example:
  * <pre>

@@ -49,7 +49,7 @@ import org.omnifaces.util.Faces;
  * with support for referencing an {@link InputStream} or <code>byte[]</code> property in the <code>value</code>
  * attribute, optionally as a data URI.
  *
- * <h3>Data URI</h3>
+ * <h2>Data URI</h2>
  * <p>
  * Set <code>dataURI</code> attribute to true in order to render image in
  * <a href="http://en.wikipedia.org/wiki/Data_URI_scheme">data URI format</a>.
@@ -64,7 +64,7 @@ import org.omnifaces.util.Faces;
  * any opportunity to cache the images for reuse, ~10KB would typically be the max even less so if there are more such
  * images on the same page.
  *
- * <h3>Image streaming</h3>
+ * <h2>Image streaming</h2>
  * <p>
  * When not rendered as data URI, the {@link InputStream} or <code>byte[]</code> property <strong>must</strong> point to
  * a <em>stateless</em> <code>&#64;</code>{@link GraphicImageBean} or <code>@Named @ApplicationScoped</code> bean
@@ -121,7 +121,7 @@ import org.omnifaces.util.Faces;
  * supported. In case you need to supply a custom object as argument for some reason, you need to explicitly register
  * a converter for it yourself via <code>&#64;FacesConverter(forClass)</code>.
  *
- * <h3>Caching</h3>
+ * <h2>Caching</h2>
  * <p>
  * In case your "image" entity supports it, you can also supply the "last modified" property which will be used in the
  * <code>ETag</code> and <code>Last-Modified</code> headers and in <code>If-Modified-Since</code> checks, hereby
@@ -137,7 +137,7 @@ import org.omnifaces.util.Faces;
  * <code>com.sun.faces.defaultResourceMaxAge</code> or MyFaces specific context parameter
  * <code>org.apache.myfaces.RESOURCE_MAX_TIME_EXPIRES</code> will be used, else a default of 1 week will be assumed.
  *
- * <h3>Image types</h3>
+ * <h2>Image types</h2>
  * <p>
  * When rendered as data URI, the content type will be guessed based on content header. So far, JPEG, PNG, GIF, ICO,
  * SVG, BMP and TIFF are recognized. If the content header is unrecognized, or when the image is rendered as regular
@@ -158,7 +158,7 @@ import org.omnifaces.util.Faces;
  * &lt;/mime-mapping&gt;
  * </pre>
  *
- * <h3>SVG view modes</h3>
+ * <h2>SVG view modes</h2>
  * <p>
  * When serving a SVG image, you can use <code>fragment</code> attribute to trigger
  * <a href="http://www.w3.org/TR/SVG/linking.html#LinksIntoSVG">SVG view modes</a>
@@ -168,7 +168,7 @@ import org.omnifaces.util.Faces;
  * &lt;o:graphicImage value="#{images.get(image.id)}" type="svg" fragment="svgView(viewBox(0,50,200,200))" /&gt;
  * </pre>
  *
- * <h3>Design notes</h3>
+ * <h2>Design notes</h2>
  * <p>
  * The bean class name and method name will end up in the image source URL. Although this is technically harmless and
  * not tamperable by hackers, you might want to choose a "sensible" class and method name for this purpose.

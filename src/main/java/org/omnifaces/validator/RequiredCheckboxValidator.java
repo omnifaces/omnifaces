@@ -42,7 +42,7 @@ import jakarta.faces.validator.ValidatorException;
  * <code>&lt;h:selectBooleanCheckbox&gt;</code> is fairly pointless. It would always pass the validation and thus never
  * display the desired required message in case of an unticked checkbox.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * This validator is available by validator ID <code>omnifaces.RequiredCheckboxValidator</code>. Just specify it as
  * <code>&lt;f:validator&gt;</code> of the boolean selection component:

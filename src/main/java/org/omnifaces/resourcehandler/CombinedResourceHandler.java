@@ -59,7 +59,7 @@ import org.omnifaces.util.cache.Cache;
  * considerably. Optionally, the combined resource files can be cached on the server during non-development stage,
  * giving your application another boost (at the expense of some heap memory on the server side).
  *
- * <h3>Installation</h3>
+ * <h2>Installation</h2>
  * <p>
  * To get it to run, this handler needs be registered as follows in <code>faces-config.xml</code>:
  * <pre>
@@ -68,7 +68,7 @@ import org.omnifaces.util.cache.Cache;
  * &lt;/application&gt;
  * </pre>
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * Noted should be that the <code>target</code> attribute of <code>&lt;h:outputStylesheet&gt;</code> already defaults to
  * <code>"head"</code> but the one of <code>&lt;h:outputScript&gt;</code> not. So if you have placed this inside the
@@ -99,7 +99,7 @@ import org.omnifaces.util.cache.Cache;
  * time of the newest individual resource in minutes, so that the browser will always be forced to request the latest
  * version whenever one of the individual resources has changed.
  *
- * <h3>Caching</h3>
+ * <h2>Caching</h2>
  * <p>
  * Optionally you can activate server-side caching of the combined resource content by specifying the below context
  * parameter in <code>web.xml</code> with the amount of seconds to cache the combined resource content.
@@ -120,10 +120,10 @@ import org.omnifaces.util.cache.Cache;
  * allocated and freed for each request that can't be served from the browser cache, so chances are you won't notice the
  * memory penalty of caching.
  *
- * <h3>Configuration</h3>
+ * <h2>Configuration</h2>
  * <p>
  * The following context parameters are available:
- * <table summary="All available context parameters">
+ * <table><caption>All available context parameters</caption>
  * <tr><td class="colFirst">
  * <code>{@value org.omnifaces.resourcehandler.CombinedResourceHandler#PARAM_NAME_EXCLUDED_RESOURCES}</code>
  * </td><td>
@@ -183,7 +183,7 @@ import org.omnifaces.util.cache.Cache;
  * will use an internal workaround to get it to work anyway, but this involves firing a HTTP request for every resource.
  * The impact should however be relatively negligible as this is performed on localhost.
  *
- * <h3>Conditionally disable combined resource handler</h3>
+ * <h2>Conditionally disable combined resource handler</h2>
  * <p>
  * If you'd like to supply a context parameter which conditionally disables the combined resource handler, then set the
  * context parameter {@value org.omnifaces.resourcehandler.CombinedResourceHandler#PARAM_NAME_DISABLED} accordingly.
@@ -205,13 +205,13 @@ import org.omnifaces.util.cache.Cache;
  * </pre>
  * <p>The EL expression is resolved on a per-request basis.</p>
  *
- * <h3>CDNResourceHandler</h3>
+ * <h2>CDNResourceHandler</h2>
  * <p>
  * If you're also using the {@link CDNResourceHandler} or, at least, have configured its context parameter
  * {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_RESOURCES}, then those CDN resources will
  * automatically be added to the set of excluded resources.
  *
- * <h3>CDNResource</h3>
+ * <h2>CDNResource</h2>
  * <p>
  * Since 2.7, if you have configured a custom {@link ResourceHandler} which automatically uploads the resources to a
  * CDN host, including the combined resources, and you want to be able to have a fallback to local host URL when the

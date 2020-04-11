@@ -44,7 +44,7 @@ import org.omnifaces.validator.MultiFieldValidator;
  * constructor with the default message. The implementors have to override the
  * {@link #validateValues(FacesContext, List, List)} method to perform the actual validation.
  * <hr>
- * <h3>General usage of all multiple field validators</h3>
+ * <h2>General usage of all multiple field validators</h2>
  * <p>
  * This validator must be placed inside the same <code>UIForm</code> as the <code>UIInput</code> components in question.
  * The <code>UIInput</code> components must be referenced by a space separated collection of their client IDs in the

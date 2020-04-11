@@ -30,7 +30,7 @@ import jakarta.faces.convert.NumberConverter;
  * This converter won't output the percent or currency symbols, that's up to the UI. This converter will implicitly
  * infer percent or currency symbols on submitted value when absent, just to prevent an unnecessary conversion error.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * This converter is available by converter ID <code>omnifaces.ImplicitNumberConverter</code>. Just specify it as
  * <code>&lt;o:converter&gt;</code> nested in the component referring the <code>Number</code> property. For example:

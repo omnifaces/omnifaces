@@ -37,7 +37,7 @@ import org.omnifaces.cdi.Startup;
  * <p>
  * Collection of utility methods for the JSF API with respect to working with {@link FacesMessage}.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * Some examples:
  * <pre>
@@ -77,7 +77,7 @@ import org.omnifaces.cdi.Startup;
  * return "items?faces-redirect=true";
  * </pre>
  *
- * <h3>Message resolver</h3>
+ * <h2>Message resolver</h2>
  * <p>
  * It also offers the possibility to set a custom message resolver so that you can control the way how messages are been
  * resolved. You can for example supply an implementation wherein the message is been treated as for example a resource
@@ -101,7 +101,7 @@ import org.omnifaces.cdi.Startup;
  * {@link ServletContainerInitializer} in custom JAR, or a {@link ApplicationScoped} bean, or an eagerly initialized
  * {@link Startup} bean.
  *
- * <h3>Design notice</h3>
+ * <h2>Design notice</h2>
  * <p>
  * Note that all of those shortcut methods by design only sets the message summary and ignores the message detail (it
  * is not possible to offer varargs to parameterize <em>both</em> the summary and the detail). The message summary is

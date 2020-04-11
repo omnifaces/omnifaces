@@ -47,12 +47,12 @@ import java.util.concurrent.locks.ReentrantLock;
  * concurrency for updates, and a maximum capacity to bound the map by. This
  * implementation differs from {@link ConcurrentHashMap} in that it maintains a
  * page replacement algorithm that is used to evict an entry when the map has
- * exceeded its capacity. Unlike the <tt>Java Collections Framework</tt>, this
+ * exceeded its capacity. Unlike the <code>Java Collections Framework</code>, this
  * map does not have a publicly visible constructor and instances are created
  * through a {@link Builder}.
  * <p>
- * An entry is evicted from the map when the <tt>weighted capacity</tt> exceeds
- * its <tt>maximum weighted capacity</tt> threshold.
+ * An entry is evicted from the map when the <code>weighted capacity</code> exceeds
+ * its <code>maximum weighted capacity</code> threshold.
  * <p>
  * An {@link EvictionListener} may be supplied for notification when an entry
  * is evicted from the map. This listener is invoked on a caller's thread and
@@ -63,7 +63,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * operation asynchronously, such as by submitting a task to an
  * {@link java.util.concurrent.ExecutorService}.
  * <p>
- * The <tt>concurrency level</tt> determines the number of threads that can
+ * The <code>concurrency level</code> determines the number of threads that can
  * concurrently modify the table. Using a significantly higher or lower value
  * than needed can waste space or lead to thread contention, but an estimate
  * within an order of magnitude of the ideal value does not usually have a
@@ -75,7 +75,7 @@ import java.util.concurrent.locks.ReentrantLock;
  * interfaces.
  * <p>
  * Like {@link java.util.Hashtable} but unlike {@link HashMap}, this class
- * does <em>not</em> allow <tt>null</tt> to be used as a key or value. Unlike
+ * does <em>not</em> allow <code>null</code> to be used as a key or value. Unlike
  * {@link java.util.LinkedHashMap}, this class does <em>not</em> provide
  * predictable iteration order. A snapshot of the keys and entries may be
  * obtained in ascending and descending order of retention.
@@ -447,8 +447,8 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V> imple
 	}
 
 	/**
-	 * Attempts to transition the node from the <tt>alive</tt> state to the
-	 * <tt>retired</tt> state.
+	 * Attempts to transition the node from the <code>alive</code> state to the
+	 * <code>retired</code> state.
 	 *
 	 * @param node the entry in the page replacement policy
 	 * @param expect the expected weighted value
@@ -463,8 +463,8 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V> imple
 	}
 
 	/**
-	 * Atomically transitions the node from the <tt>alive</tt> state to the
-	 * <tt>retired</tt> state, if a valid transition.
+	 * Atomically transitions the node from the <code>alive</code> state to the
+	 * <code>retired</code> state, if a valid transition.
 	 *
 	 * @param node the entry in the page replacement policy
 	 */
@@ -482,8 +482,8 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V> imple
 	}
 
 	/**
-	 * Atomically transitions the node to the <tt>dead</tt> state and decrements
-	 * the <tt>weightedSize</tt>.
+	 * Atomically transitions the node to the <code>dead</code> state and decrements
+	 * the <code>weightedSize</code>.
 	 *
 	 * @param node the entry in the page replacement policy
 	 */
@@ -1144,7 +1144,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V> imple
 			this.next = next;
 		}
 
-		/** Retrieves the value held by the current <tt>WeightedValue</tt>. */
+		/** Retrieves the value held by the current <code>WeightedValue</code>. */
 		V getValue() {
 			return get().value;
 		}
@@ -1475,7 +1475,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V> imple
 		}
 
 		/**
-		 * Specifies the initial capacity of the hash table (default <tt>16</tt>).
+		 * Specifies the initial capacity of the hash table (default <code>16</code>).
 		 * This is the number of key-value pairs that the hash table can hold
 		 * before a resize operation is required.
 		 *
@@ -1506,7 +1506,7 @@ public final class ConcurrentLinkedHashMap<K, V> extends AbstractMap<K, V> imple
 		/**
 		 * Specifies the estimated number of concurrently updating threads. The
 		 * implementation performs internal sizing to try to accommodate this many
-		 * threads (default <tt>16</tt>).
+		 * threads (default <code>16</code>).
 		 *
 		 * @param concurrencyLevel the estimated number of concurrently updating
 		 * threads

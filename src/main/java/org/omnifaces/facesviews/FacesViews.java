@@ -81,14 +81,14 @@ import org.omnifaces.cdi.Param;
  * others <code>&lt;h:form&gt;</code>, <code>&lt;h:link&gt;</code>, <code>&lt;h:button&gt;</code> and all extended tags,
  * will also be extensionless. And, URLs with an extension will be 301-redirected to the extensionless one.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  *
- * <h4>Zero configuration</h4>
+ * <h3>Zero configuration</h3>
  * <p>
  * Put Facelets source files into <code>/WEB-INF/faces-views</code> directory. All Facelets files in this special
  * directory will be automatically scanned as extensionless URLs.
  *
- * <h4>Minimal configuration</h4>
+ * <h3>Minimal configuration</h3>
  * <p>
  * Below is the minimal <code>web.xml</code> configuration to make all Facelets source files found in the root folder
  * and all subdirectories of the public web content (excluding <code>/WEB-INF</code>, <code>/META-INF</code> and
@@ -106,7 +106,7 @@ import org.omnifaces.cdi.Param;
  * instead. In case you want to scan <em>all</em> files in the directory <code>/foo</code>, then use path pattern of
  * <code>/foo</code>. You can specify multiple values separated by a comma.
  *
- * <h4>MultiViews configuration</h4>
+ * <h3>MultiViews configuration</h3>
  * <p>
  * Enabling MultiViews is a matter of suffixing the path pattern with <code>/*</code>. The support was added in
  * OmniFaces 2.5. Below is the <code>web.xml</code> configuration which extends the above minimal configuration with
@@ -130,12 +130,12 @@ import org.omnifaces.cdi.Param;
  * private String baz;
  * </pre>
  *
- * <h4>Advanced configuration</h4>
+ * <h3>Advanced configuration</h3>
  * <p>
  * See <a href="package-summary.html">package documentation</a> for configuration settings as to mapping, filtering
  * and forwarding behavior.
  *
- * <h3>PrettyFaces</h3>
+ * <h2>PrettyFaces</h2>
  * <p>
  * Note that there is some overlap between this feature and <a href="http://ocpsoft.org/prettyfaces">PrettyFaces</a>.
  * The difference is that FacesViews has a focus on zero- or very minimal config, where PrettyFaces has a focus on very

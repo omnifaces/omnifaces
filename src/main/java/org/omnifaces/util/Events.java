@@ -35,7 +35,7 @@ import org.omnifaces.eventlistener.DefaultSystemEventListener;
  * <p>
  * Collection of utility methods for the JSF API with respect to working with system and phase events.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * Some examples:
  * <pre>

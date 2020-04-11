@@ -39,7 +39,7 @@ import org.omnifaces.el.ScopedRunner;
  * only way to represent {@link SelectItemGroup} in UI is to manually create and populate them in a backing bean which
  * can end up to be quite verbose.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * Below example assumes a <code>List&lt;Category&gt;</code> as value wherein <code>Category</code> in turn has a
  * <code>List&lt;Product&gt;</code>.

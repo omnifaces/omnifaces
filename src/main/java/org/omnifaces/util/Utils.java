@@ -74,7 +74,7 @@ import jakarta.servlet.http.Part;
  * <p>
  * Collection of general utility methods that do not fit in one of the more specific classes.
  *
- * <h3>This class is not listed in showcase! Should I use it?</h3>
+ * <h2>This class is not listed in showcase! Should I use it?</h2>
  * <p>
  * This class is indeed intented for internal usage only. We won't add methods here on user request. We only add methods
  * here once we encounter non-DRY code in OmniFaces codebase. The methods may be renamed/changed without notice.

@@ -28,7 +28,7 @@ import jakarta.faces.convert.FacesConverter;
  * <p>
  * This converter does by design no conversion in <code>getAsString()</code>.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * This converter is available by converter ID <code>omnifaces.ToLowerCaseConverter</code>. Just specify it in the
  * <code>converter</code> attribute of the component referring the <code>String</code> property. For example:

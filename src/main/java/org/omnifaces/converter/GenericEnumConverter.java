@@ -56,7 +56,7 @@ import jakarta.faces.convert.FacesConverter;
  * <code>List&lt;E&gt;</code> property, may be a bit clumsy. This generic enum converter is intended to remove the need
  * to create a new enum converter every time.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * This converter is available by converter ID <code>omnifaces.GenericEnumConverter</code>. Just specify it in the
  * <code>converter</code> attribute of the multi-selection component holding <code>&lt;f:selectItems&gt;</code>.
@@ -70,7 +70,7 @@ import jakarta.faces.convert.FacesConverter;
  * <p><strong>See also</strong>:
  * <br><a href="http://stackoverflow.com/q/3822058/157882">Use enum in &lt;h:selectManyCheckbox&gt;</a>
  *
- * <h3>JSF 2.3</h3>
+ * <h2>JSF 2.3</h2>
  * <p>
  * This converter is not necessary anymore since JSF 2.3 thanks to the fixes in
  * <a href="https://github.com/javaee/javaserverfaces-spec/issues/1422">issue 1422</a>.

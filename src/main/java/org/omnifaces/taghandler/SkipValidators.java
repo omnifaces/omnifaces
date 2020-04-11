@@ -48,7 +48,7 @@ import org.omnifaces.component.validator.ValidateMultipleFields;
  * {@link UICommand} or {@link ClientBehaviorHolder} component (client behavior holder components are those components
  * supporting <code>&lt;f:ajax&gt;</code>).
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * For example, when adding a new row to the data table, you'd like to not immediately validate all empty rows.
  * <pre>

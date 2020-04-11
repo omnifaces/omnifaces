@@ -51,7 +51,7 @@ import org.omnifaces.cdi.eager.EagerExtension;
  * In case of <code>@RequestScoped</code> and <code>@ViewScoped</code> beans instantiation happens per request URI / view
  * and an extra attribute is required for specifying this.
  *
- * <h3>Supported scopes</h3>
+ * <h2>Supported scopes</h2>
  *
  * <p>
  * Currently supported scopes:
@@ -63,7 +63,7 @@ import org.omnifaces.cdi.eager.EagerExtension;
  * <li> CDI {@link ApplicationScoped}
  * </ol>
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  *
  * <p>
  * E.g.
@@ -112,7 +112,7 @@ import org.omnifaces.cdi.eager.EagerExtension;
  * }
  * </pre>
  *
- * <h3><code>FacesContext</code> in <code>&#64;PostConstruct</code></h3>
+ * <h2><code>FacesContext</code> in <code>&#64;PostConstruct</code></h2>
  *
  * <p>
  * When using <code>&#64;Eager</code> or <code>&#64;Eager(requestURI)</code>, be aware that the {@link FacesContext} is

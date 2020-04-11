@@ -14,7 +14,7 @@
  * <p>
  * This package contains the classes for the OmniFaces FacesViews feature.
  *
- * <h3>Introduction</h3>
+ * <h2>Introduction</h2>
  *
  * <p>
  * FacesViews is a feature where a special dedicated directory (<code>/WEB-INF/faces-views</code>), or optionally one or
@@ -36,7 +36,7 @@
  * can be used as an alternative to declaring the {@link jakarta.faces.webapp.FacesServlet} in <code>web.xml</code> for
  * the <code>.xhtml</code> to <code>.xhtml</code> mapping.
  *
- * <h4>Example 1:</h4>
+ * <h3>Example 1:</h3>
  *
  * <p>
  * Consider the following file structure and assume no further configuration has been done:
@@ -71,7 +71,7 @@
  * can be changed (see below), so that these views are either directly available (no redirect) or are not available at
  * all.
  *
- * <h4>Example 2:</h4>
+ * <h3>Example 2:</h3>
  *
  * <p>
  * Consider the following <code>web.xml</code>:
@@ -110,7 +110,7 @@
  * extension (<code>.xhtml</code>). Finally, although a <code>web.xml</code> was used, there does not need to be a
  * mapping for the <code>FacesServlet</code> in it.
  *
- * <h4>Example 3:</h4>
+ * <h3>Example 3:</h3>
  *
  * <p>
  * Consider the following <code>web.xml</code>:
@@ -161,7 +161,7 @@
  * The support for this so-called MultiViews feature which gets triggered when the path pattern is suffixed with
  * <code>/*</code> was added in OmniFaces 2.5 and is not available in older versions.
  *
- * <h4>Example 3:</h4>
+ * <h3>Example 3:</h3>
  *
  * <p>
  * Consider the following <code>web.xml</code>:
@@ -199,7 +199,7 @@
  * are not available as the MultiViews feature is only enabled on <code>/foo/*</code>.
  *
  *
- * <h3>Welcome files</h3>
+ * <h2>Welcome files</h2>
  *
  * <p>
  * If a <code>&lt;welcome-file&gt;</code> is defined in <code>web.xml</code> that's scanned by FacesViews
@@ -231,7 +231,7 @@
  * </pre>
  *
  *
- * <h3>Dispatch methods</h3>
+ * <h2>Dispatch methods</h2>
  *
  * <p>
  * JSF normally inspects the request URI to derive a logical view id from it. It assumes the FacesServlet is either
@@ -268,12 +268,12 @@
  * The configuration options below provide more details about the dispatch methods and the filter position which can be
  * used for tweaking FacesViews for interoperability with other filters.
  *
- * <h3>Configuration</h3>
+ * <h2>Configuration</h2>
  *
  * <p>
  * The following context parameters are available.
  *
- * <table summary="All available context parameters" border="1" cellspacing="0">
+ * <table border="1"><caption>All available context parameters</caption>
  *
  * <tr>
  * <td class="colFirst"><code>{@value org.omnifaces.facesviews.FacesViews#FACES_VIEWS_ENABLED_PARAM_NAME}</code></td>
