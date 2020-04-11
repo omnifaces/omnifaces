@@ -55,7 +55,7 @@ import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDeleg
  * </pre>
  * <p>
  * The converter ID of all standard JSF converters can be found in
- * <a href="http://docs.oracle.com/javaee/7/api/javax/faces/convert/package-summary.html">their javadocs</a>.
+ * <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/faces/convert/package-summary.html">their javadocs</a>.
  * First go to the javadoc of the class of interest, then go to <code>CONVERTER_ID</code> in its field summary
  * and finally click the Constant Field Values link to see the value.
  *

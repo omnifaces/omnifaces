@@ -52,7 +52,7 @@ import org.omnifaces.util.Faces;
  * <h3>Data URI</h3>
  * <p>
  * Set <code>dataURI</code> attribute to true in order to render image in
- * <a href="http://en.wikipedia.org/wiki/Data_URI_scheme">data URI format</a>.
+ * <a href="https://en.wikipedia.org/wiki/Data_URI_scheme">data URI format</a>.
  * <pre>
  * &lt;o:graphicImage name="icon.png" dataURI="true" /&gt; &lt;!-- JSF resource as data URI --&gt;
  * &lt;o:graphicImage value="#{bean.icon}" dataURI="true" /&gt; &lt;!-- byte[]/InputStream property as data URI --&gt;
@@ -161,8 +161,8 @@ import org.omnifaces.util.Faces;
  * <h3>SVG view modes</h3>
  * <p>
  * When serving a SVG image, you can use <code>fragment</code> attribute to trigger
- * <a href="http://www.w3.org/TR/SVG/linking.html#LinksIntoSVG">SVG view modes</a>
- * (beware of <a href="http://caniuse.com/#feat=svg-fragment">browser support</a>).
+ * <a href="https://www.w3.org/TR/SVG/linking.html#LinksIntoSVG">SVG view modes</a>
+ * (beware of <a href="https://caniuse.com/#feat=svg-fragment">browser support</a>).
  * E.g.
  * <pre>
  * &lt;o:graphicImage value="#{images.get(image.id)}" type="svg" fragment="svgView(viewBox(0,50,200,200))" /&gt;

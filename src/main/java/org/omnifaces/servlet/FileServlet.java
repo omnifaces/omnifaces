@@ -42,7 +42,7 @@ import org.omnifaces.util.Servlets;
 
 /**
  * <p>
- * The well known "<a href="http://balusc.omnifaces.org/2009/02/fileservlet-supporting-resume-and.html">BalusC FileServlet</a>",
+ * The well known "<a href="https://balusc.omnifaces.org/2009/02/fileservlet-supporting-resume-and.html">BalusC FileServlet</a>",
  * as an abstract template, slightly refactored, rewritten and modernized with a.o. fast NIO stuff instead of legacy
  * RandomAccessFile. GZIP support is stripped off as that can be done application wide via {@link GzipResponseFilter}.
  * <p>
@@ -106,8 +106,8 @@ import org.omnifaces.util.Servlets;
  *
  * <p><strong>See also</strong>:
  * <ul>
- * <li><a href="http://stackoverflow.com/q/13588149/157882">How to stream audio/video files such as MP3, MP4, AVI, etc using a Servlet</a>
- * <li><a href="http://stackoverflow.com/a/29991447/157882">Abstract template for a static resource servlet</a>
+ * <li><a href="https://stackoverflow.com/q/13588149/157882">How to stream audio/video files such as MP3, MP4, AVI, etc using a Servlet</a>
+ * <li><a href="https://stackoverflow.com/a/29991447/157882">Abstract template for a static resource servlet</a>
  * </ul>
  *
  * @author Bauke Scholtz

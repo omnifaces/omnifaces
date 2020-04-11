@@ -205,8 +205,8 @@
  * If a <code>&lt;welcome-file&gt;</code> is defined in <code>web.xml</code> that's scanned by FacesViews
  * <strong>AND</strong> <code>REDIRECT_TO_EXTENSIONLESS</code> is used (which is the default, see below), it's necessary
  * to define an extensionless welcome file to prevent a request to <code>/</code> being redirected to
- * <code>/[welcome file]</code>. E.g. without this <code>http://example.com</code> will redirect to say
- * <code>http://example.com/index</code>.
+ * <code>/[welcome file]</code>. E.g. without this <code>https://example.com</code> will redirect to say
+ * <code>https://example.com/index</code>.
  *
  * <p>
  * For example:

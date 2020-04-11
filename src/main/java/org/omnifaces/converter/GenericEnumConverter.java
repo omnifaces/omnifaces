@@ -68,7 +68,7 @@ import javax.faces.convert.FacesConverter;
  * </pre>
  *
  * <p><strong>See also</strong>:
- * <br><a href="http://stackoverflow.com/q/3822058/157882">Use enum in &lt;h:selectManyCheckbox&gt;</a>
+ * <br><a href="https://stackoverflow.com/q/3822058/157882">Use enum in &lt;h:selectManyCheckbox&gt;</a>
  *
  * <h3>JSF 2.3</h3>
  * <p>

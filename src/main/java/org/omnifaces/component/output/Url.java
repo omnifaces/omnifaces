@@ -61,7 +61,7 @@ import org.omnifaces.util.State;
  * <p>
  * Valid formats and values for <code>domain</code> attribute are:
  * <ul>
- * <li><code>&lt;o:url domain="http://example.com" /&gt;</code></li>
+ * <li><code>&lt;o:url domain="https://example.com" /&gt;</code></li>
  * <li><code>&lt;o:url domain="//example.com" /&gt;</code></li>
  * <li><code>&lt;o:url domain="example.com" /&gt;</code></li>
  * <li><code>&lt;o:url domain="/" /&gt;</code></li>

@@ -145,7 +145,7 @@ public class ApplicationListener extends DefaultServletContextListener {
 				+ "\n█░░▐█▌░░█░░░██░░░█░░██░░░█░░░██░░█ 3. Switch to a CDI capable environment.     ▐"
 				+ "\n█░░▐█▌░░█░░░██░░░█░░██░░░█░░░██░░█                                             ▐"
 				+ "\n█░░▐█▌░░█░░░██░░░█░░░░░░▄█░░▄▄▄▄▄█ For additional instructions, check          ▐"
-				+ "\n█░░▐█▌░░█░░░██░░░█░░░░████░░░░░░░█ http://omnifaces.org/cdi                    ▐"
+				+ "\n█░░▐█▌░░█░░░██░░░█░░░░████░░░░░░░█ https://omnifaces.org/cdi                   ▐"
 				+ "\n█░░░█░░░█▄░░░░░░▄█░░░░████▄░░░░░▄█                                             ▐"
 				+ "\n████████████████████████████████████████████████████████████████████████████████"
 			);
