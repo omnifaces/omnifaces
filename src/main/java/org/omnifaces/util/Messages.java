@@ -13,10 +13,13 @@
 package org.omnifaces.util;
 
 import static java.text.MessageFormat.format;
+import static java.util.stream.Collectors.toSet;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getFlash;
+import static org.omnifaces.util.Utils.stream;
 
 import java.text.MessageFormat;
+import java.util.Iterator;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.faces.application.FacesMessage;
@@ -665,6 +668,164 @@ public final class Messages {
 	 */
 	public static boolean isGlobalEmpty() {
 		return isEmpty(null);
+	}
+
+	// Shortcuts - clear messages -------------------------------------------------------------------------------------
+
+	/**
+	 * Clears faces messages of the given severity associated with the given client IDs.
+	 * @param severity The severity to clear faces message for. If this is null, then all severities are matched.
+	 * @param clientIds The client IDs to clear faces messages for. If this is null or empty, then all faces messages
+	 * are cleared. If this contains null, then all global faces messages are cleared.
+	 * @return <code>true</code> if at least one faces message of the given severity associated with the given client
+	 * IDs was cleared.
+	 * @see FacesContext#getMessages()
+	 * @see FacesContext#getMessages(String)
+	 * @since 3.5
+	 */
+	public static boolean clear(FacesMessage.Severity severity, String... clientIds) {
+		if (Utils.isEmpty(clientIds)) {
+			return clear(getContext().getMessages(), severity);
+		}
+		else {
+			return stream(clientIds).map(clientId -> clear(getContext().getMessages(clientId), severity)).collect(toSet()).contains(true);
+		}
+	}
+
+	private static boolean clear(Iterator<FacesMessage> iterator, FacesMessage.Severity severity) {
+		boolean atLeastOneCleared = false;
+
+		while (iterator.hasNext()) {
+			FacesMessage facesMessage = iterator.next();
+
+			if (severity == null || severity.equals(facesMessage.getSeverity())) {
+				iterator.remove();
+				atLeastOneCleared = true;
+			}
+		}
+
+		return atLeastOneCleared;
+	}
+
+	/**
+	 * Clears faces messages associated with the given client IDs.
+	 * @param clientIds The client IDs to clear faces messages for. If this is empty, then all faces messages are
+	 * cleared. If this contains null, then all global faces messages are cleared.
+	 * @return <code>true</code> if at least one faces message associated with the given client IDs was cleared.
+	 * @see #clear(javax.faces.application.FacesMessage.Severity, String...)
+	 * @since 3.5
+	 */
+	public static boolean clear(String... clientIds) {
+		return clear(null, clientIds);
+	}
+
+	/**
+	 * Clears INFO faces messages associated with the given client IDs.
+	 * @param clientIds The client IDs to clear INFO faces messages for. If this is empty, then all INFO faces messages
+	 * are cleared. If this contains null, then all global INFO faces messages are cleared.
+	 * @return <code>true</code> if at least one INFO faces message associated with the given client IDs was cleared.
+	 * @see #clear(javax.faces.application.FacesMessage.Severity, String...)
+	 * @since 3.5
+	 */
+	public static boolean clearInfo(String... clientIds) {
+		return clear(FacesMessage.SEVERITY_INFO, clientIds);
+	}
+
+	/**
+	 * Clears WARN faces messages associated with the given client IDs.
+	 * @param clientIds The client IDs to clear WARN faces messages for. If this is empty, then all WARN faces messages
+	 * are cleared. If this contains null, then all global WARN faces messages are cleared.
+	 * @return <code>true</code> if at least one WARN faces message associated with the given client IDs was cleared.
+	 * @see #clear(javax.faces.application.FacesMessage.Severity, String...)
+	 * @since 3.5
+	 */
+	public static boolean clearWarn(String... clientIds) {
+		return clear(FacesMessage.SEVERITY_WARN, clientIds);
+	}
+
+	/**
+	 * Clears ERROR faces messages associated with the given client IDs.
+	 * @param clientIds The client IDs to clear ERROR faces messages for. If this is empty, then all ERROR faces
+	 * messages are cleared. If this contains null, then all global ERROR faces messages are cleared.
+	 * @return <code>true</code> if at least one ERROR faces message associated with the given client IDs was cleared.
+	 * @see #clear(javax.faces.application.FacesMessage.Severity, String...)
+	 * @since 3.5
+	 */
+	public static boolean clearError(String... clientIds) {
+		return clear(FacesMessage.SEVERITY_ERROR, clientIds);
+	}
+
+	/**
+	 * Clears FATAL faces messages associated with the given client IDs.
+	 * @param clientIds The client IDs to clear FATAL faces messages for. If this is empty, then all FATAL face
+	 * messages are cleared. If this contains null, then all global FATAL faces messages are cleared.
+	 * @return <code>true</code> if at least one FATAL faces message associated with the given client IDs was cleared.
+	 * @see #clear(javax.faces.application.FacesMessage.Severity, String...)
+	 * @since 3.5
+	 */
+	public static boolean clearFatal(String... clientIds) {
+		return clear(FacesMessage.SEVERITY_FATAL, clientIds);
+	}
+
+	/**
+	 * Clears global faces messages of given severity.
+	 * @param severity The severity of the faces message. If this is null, then all severities are matched.
+	 * @return <code>true</code> if at least one global faces message of given severity was cleared.
+	 * @see #clear(javax.faces.application.FacesMessage.Severity, String...)
+	 * @since 3.5
+	 */
+	public static boolean clearGlobal(FacesMessage.Severity severity) {
+		return clear(severity, (String) null);
+	}
+
+	/**
+	 * Clears global faces messages of all severities.
+	 * @return <code>true</code> if at least one global faces message was cleared.
+	 * @see #clear(javax.faces.application.FacesMessage.Severity, String...)
+	 * @since 3.5
+	 */
+	public static boolean clearGlobal() {
+		return clear((FacesMessage.Severity) null, (String) null);
+	}
+
+	/**
+	 * Clears global INFO faces messages.
+	 * @return <code>true</code> if at least one global INFO faces message was cleared.
+	 * @see #clearInfo(String...)
+	 * @since 3.5
+	 */
+	public static boolean clearGlobalInfo() {
+		return clearInfo((String) null);
+	}
+
+	/**
+	 * Clears global WARN faces messages.
+	 * @return <code>true</code> if at least one global WARN faces message was cleared.
+	 * @see #clearWarn(String...)
+	 * @since 3.5
+	 */
+	public static boolean clearGlobalWarn() {
+		return clearWarn((String) null);
+	}
+
+	/**
+	 * Clears global ERROR faces messages.
+	 * @return <code>true</code> if at least one global ERROR faces message was cleared.
+	 * @see #clearError(String...)
+	 * @since 3.5
+	 */
+	public static boolean clearGlobalError() {
+		return clearError((String) null);
+	}
+
+	/**
+	 * Clears global FATAL faces messages.
+	 * @return <code>true</code> if at least one global FATAL faces message was cleared.
+	 * @see #clearFatal(String...)
+	 * @since 3.5
+	 */
+	public static boolean clearGlobalFatal() {
+		return clearFatal((String) null);
 	}
 
 }
