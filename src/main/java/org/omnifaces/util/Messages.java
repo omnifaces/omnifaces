@@ -42,7 +42,7 @@ import org.omnifaces.cdi.Startup;
  * Some examples:
  * <pre>
  * // In a validator.
- * throw new ValidatorException(Messages.createError("Invalid input."));
+ * Messages.throwValidatorException("Invalid input.");
  * </pre>
  * <pre>
  * // In a validator, as extra message on another component.
@@ -61,7 +61,7 @@ import org.omnifaces.cdi.Startup;
  * There is also a builder which also allows you to set the message detail. Some examples:
  * <pre>
  * // In a validator.
- * throw new ValidatorException(Messages.create("Invalid input.").detail("Value {0} is not expected.", value).get());
+ * Messages.create("Invalid input.").detail("Value {0} is not expected.", value).throwValidatorException();
  * </pre>
  * <pre>
  * // In a validator, as extra message on another component.
@@ -282,6 +282,24 @@ public final class Messages {
 			return facesMessage;
 		}
 
+		/**
+		 * Throws the so far built message as a {@link ConverterException}.
+		 * @throws The so far built message as a {@link ConverterException}.
+		 * @since 3.5
+		 */
+		public void throwConverterException() throws ConverterException {
+			throw new ConverterException(facesMessage);
+		}
+
+		/**
+		 * Throws the so far built message as a {@link ValidatorException}.
+		 * @throws The so far built message as a {@link ValidatorException}.
+		 * @since 3.5
+		 */
+		public void throwValidatorException() throws ValidatorException {
+			throw new ValidatorException(facesMessage);
+		}
+
 	}
 
 	// Shortcuts - create message -------------------------------------------------------------------------------------
@@ -343,6 +361,36 @@ public final class Messages {
 	 */
 	public static FacesMessage createFatal(String message, Object... params) {
 		return create(FacesMessage.SEVERITY_FATAL, message, params);
+	}
+
+	// Shortcuts - throw validator/converter exception ----------------------------------------------------------------
+
+	/**
+	 * Throw a {@link ConverterException} with an ERROR faces message with the given message body which is formatted
+	 * with the given parameters.
+	 * @param message The message body.
+	 * @param params The message format parameters, if any.
+	 * @throws A {@link ConverterException} with an ERROR faces message with the given message body which is formatted
+	 * with the given parameters.
+	 * @see #createError(String, Object...)
+	 * @since 3.5
+	 */
+	public void throwConverterException(String message, Object... params) throws ConverterException {
+		throw new ConverterException(createError(message, params));
+	}
+
+	/**
+	 * Throw a {@link ValidatorException} with an ERROR faces message with the given message body which is formatted
+	 * with the given parameters.
+	 * @param message The message body.
+	 * @param params The message format parameters, if any.
+	 * @throws A {@link ValidatorException} with an ERROR faces message with the given message body which is formatted
+	 * with the given parameters.
+	 * @see #createError(String, Object...)
+	 * @since 3.5
+	 */
+	public void throwValidatorException(String message, Object... params) throws ValidatorException {
+		throw new ValidatorException(createError(message, params));
 	}
 
 	// Shortcuts - add message ----------------------------------------------------------------------------------------
