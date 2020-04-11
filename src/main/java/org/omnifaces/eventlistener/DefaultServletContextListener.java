@@ -12,8 +12,8 @@
  */
 package org.omnifaces.eventlistener;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.ServletContextListener;
 
 /**
  * Default implementation for the SystemEventListener interface.

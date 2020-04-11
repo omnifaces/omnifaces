@@ -28,12 +28,12 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
-import javax.faces.component.FacesComponent;
-import javax.faces.component.UIComponent;
-import javax.faces.component.UIForm;
-import javax.faces.component.UIInput;
-import javax.faces.component.UISelectBoolean;
-import javax.faces.context.FacesContext;
+import jakarta.faces.component.FacesComponent;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.UIForm;
+import jakarta.faces.component.UIInput;
+import jakarta.faces.component.UISelectBoolean;
+import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.config.OmniFaces;
 import org.omnifaces.util.State;

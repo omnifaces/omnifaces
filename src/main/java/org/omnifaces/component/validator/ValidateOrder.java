@@ -20,9 +20,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
 
-import javax.faces.component.FacesComponent;
-import javax.faces.component.UIInput;
-import javax.faces.context.FacesContext;
+import jakarta.faces.component.FacesComponent;
+import jakarta.faces.component.UIInput;
+import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.util.Callback;
 import org.omnifaces.util.State;

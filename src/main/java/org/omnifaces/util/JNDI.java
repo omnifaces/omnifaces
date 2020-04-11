@@ -14,11 +14,12 @@ package org.omnifaces.util;
 
 import static org.omnifaces.util.Exceptions.is;
 
-import javax.annotation.Resource;
-import javax.faces.application.ProjectStage;
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
+
+import jakarta.annotation.Resource;
+import jakarta.faces.application.ProjectStage;
 
 /**
  * <p>

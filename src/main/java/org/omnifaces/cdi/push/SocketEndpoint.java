@@ -12,18 +12,18 @@
  */
 package org.omnifaces.cdi.push;
 
+import static jakarta.websocket.CloseReason.CloseCodes.GOING_AWAY;
+import static jakarta.websocket.CloseReason.CloseCodes.VIOLATED_POLICY;
 import static java.util.logging.Level.SEVERE;
-import static javax.websocket.CloseReason.CloseCodes.GOING_AWAY;
-import static javax.websocket.CloseReason.CloseCodes.VIOLATED_POLICY;
 import static org.omnifaces.cdi.PushContext.URI_PREFIX;
 
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import javax.websocket.CloseReason;
-import javax.websocket.Endpoint;
-import javax.websocket.EndpointConfig;
-import javax.websocket.Session;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.Endpoint;
+import jakarta.websocket.EndpointConfig;
+import jakarta.websocket.Session;
 
 /**
  * <p>

@@ -16,13 +16,13 @@ import static org.omnifaces.util.Components.validateHasNoChildren;
 
 import java.io.IOException;
 
-import javax.faces.FacesException;
-import javax.faces.component.FacesComponent;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.faces.FacesException;
+import jakarta.faces.component.FacesComponent;
+import jakarta.faces.context.ExternalContext;
+import jakarta.faces.context.FacesContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.omnifaces.io.ResettableBuffer;
 import org.omnifaces.io.ResettableBufferedOutputStream;

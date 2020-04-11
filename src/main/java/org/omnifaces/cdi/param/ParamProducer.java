@@ -12,10 +12,10 @@
  */
 package org.omnifaces.cdi.param;
 
+import static jakarta.faces.component.UIInput.EMPTY_STRING_AS_NULL_PARAM_NAME;
+import static jakarta.faces.validator.BeanValidator.DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME;
 import static java.lang.Boolean.parseBoolean;
 import static java.util.Arrays.asList;
-import static javax.faces.component.UIInput.EMPTY_STRING_AS_NULL_PARAM_NAME;
-import static javax.faces.validator.BeanValidator.DISABLE_DEFAULT_BEAN_VALIDATOR_PARAM_NAME;
 import static org.omnifaces.util.Beans.getQualifier;
 import static org.omnifaces.util.Components.setLabel;
 import static org.omnifaces.util.Faces.createConverter;
@@ -46,21 +46,21 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
 
-import javax.enterprise.context.Dependent;
-import javax.enterprise.inject.Produces;
-import javax.enterprise.inject.spi.InjectionPoint;
-import javax.faces.application.Application;
-import javax.faces.application.FacesMessage;
-import javax.faces.component.UIComponent;
-import javax.faces.component.UIInput;
-import javax.faces.context.FacesContext;
-import javax.faces.convert.Converter;
-import javax.faces.convert.ConverterException;
-import javax.faces.validator.BeanValidator;
-import javax.faces.validator.RequiredValidator;
-import javax.faces.validator.Validator;
-import javax.faces.validator.ValidatorException;
-import javax.inject.Inject;
+import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.inject.Produces;
+import jakarta.enterprise.inject.spi.InjectionPoint;
+import jakarta.faces.application.Application;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.UIInput;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.convert.Converter;
+import jakarta.faces.convert.ConverterException;
+import jakarta.faces.validator.BeanValidator;
+import jakarta.faces.validator.RequiredValidator;
+import jakarta.faces.validator.Validator;
+import jakarta.faces.validator.ValidatorException;
+import jakarta.inject.Inject;
 
 import org.omnifaces.cdi.Param;
 

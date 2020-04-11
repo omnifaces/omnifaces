@@ -12,9 +12,9 @@
  */
 package org.omnifaces.taghandler;
 
-import javax.faces.view.facelets.ComponentConfig;
-import javax.faces.view.facelets.ComponentHandler;
-import javax.faces.view.facelets.FaceletContext;
+import jakarta.faces.view.facelets.ComponentConfig;
+import jakarta.faces.view.facelets.ComponentHandler;
+import jakarta.faces.view.facelets.FaceletContext;
 
 import org.omnifaces.component.util.FaceletContextConsumer;
 

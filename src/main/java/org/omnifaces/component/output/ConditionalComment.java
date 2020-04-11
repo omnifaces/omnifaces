@@ -16,9 +16,9 @@ import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
 
-import javax.faces.component.FacesComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.context.ResponseWriter;
+import jakarta.faces.component.FacesComponent;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.context.ResponseWriter;
 
 import org.omnifaces.util.State;
 
@@ -40,7 +40,7 @@ import org.omnifaces.util.State;
  * &amp;lt;![endif]--&gt;
  * </pre>
  * <p>
- * Also, if <code>javax.faces.FACELETS_SKIP_COMMENTS</code> context param is
+ * Also, if <code>jakarta.faces.FACELETS_SKIP_COMMENTS</code> context param is
  * set to <code>true</code> then it will even not be rendered at all. You would need to workaround this with an ugly
  * <code>&lt;h:outputText escape="false"&gt;</code>.
  * <pre>

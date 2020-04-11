@@ -26,13 +26,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.el.ValueExpression;
-import javax.faces.application.Application;
-import javax.faces.application.Resource;
-import javax.faces.component.FacesComponent;
-import javax.faces.component.html.HtmlGraphicImage;
-import javax.faces.context.FacesContext;
-import javax.faces.context.ResponseWriter;
+import jakarta.el.ValueExpression;
+import jakarta.faces.application.Application;
+import jakarta.faces.application.Resource;
+import jakarta.faces.component.FacesComponent;
+import jakarta.faces.component.html.HtmlGraphicImage;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.context.ResponseWriter;
 
 import org.omnifaces.cdi.GraphicImageBean;
 import org.omnifaces.el.ExpressionInspector;

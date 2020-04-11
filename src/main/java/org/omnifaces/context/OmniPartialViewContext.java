@@ -12,8 +12,8 @@
  */
 package org.omnifaces.context;
 
+import static jakarta.servlet.RequestDispatcher.FORWARD_REQUEST_URI;
 import static java.lang.String.format;
-import static javax.servlet.RequestDispatcher.FORWARD_REQUEST_URI;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.responseReset;
 import static org.omnifaces.util.Faces.setContextAttribute;
@@ -32,13 +32,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.faces.FacesException;
-import javax.faces.application.ViewExpiredException;
-import javax.faces.context.FacesContext;
-import javax.faces.context.PartialResponseWriter;
-import javax.faces.context.PartialViewContext;
-import javax.faces.context.PartialViewContextWrapper;
-import javax.faces.event.PhaseId;
+import jakarta.faces.FacesException;
+import jakarta.faces.application.ViewExpiredException;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.context.PartialResponseWriter;
+import jakarta.faces.context.PartialViewContext;
+import jakarta.faces.context.PartialViewContextWrapper;
+import jakarta.faces.event.PhaseId;
 
 import org.omnifaces.config.WebXml;
 import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;

@@ -12,10 +12,10 @@
  */
 package org.omnifaces.component.output;
 
+import static jakarta.faces.event.PhaseId.RENDER_RESPONSE;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
-import static javax.faces.event.PhaseId.RENDER_RESPONSE;
 import static org.omnifaces.component.output.Cache.PropertyKeys.disabled;
 import static org.omnifaces.component.output.Cache.PropertyKeys.key;
 import static org.omnifaces.component.output.Cache.PropertyKeys.reset;
@@ -32,12 +32,12 @@ import java.io.Serializable;
 import java.io.StringWriter;
 import java.io.Writer;
 
-import javax.faces.component.FacesComponent;
-import javax.faces.component.visit.VisitContext;
-import javax.faces.context.FacesContext;
-import javax.faces.context.ResponseWriter;
-import javax.faces.event.PreRenderViewEvent;
-import javax.faces.event.SystemEvent;
+import jakarta.faces.component.FacesComponent;
+import jakarta.faces.component.visit.VisitContext;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.context.ResponseWriter;
+import jakarta.faces.event.PreRenderViewEvent;
+import jakarta.faces.event.SystemEvent;
 
 import org.omnifaces.component.output.cache.el.CacheValue;
 import org.omnifaces.component.output.cache.el.CachingValueExpression;

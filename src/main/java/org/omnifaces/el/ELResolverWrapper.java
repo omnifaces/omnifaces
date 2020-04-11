@@ -15,9 +15,9 @@ package org.omnifaces.el;
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 
-import javax.el.ELContext;
-import javax.el.ELResolver;
-import javax.faces.FacesWrapper;
+import jakarta.el.ELContext;
+import jakarta.el.ELResolver;
+import jakarta.faces.FacesWrapper;
 
 /**
  * <p>Provides a simple implementation of {@link ELResolver} that can

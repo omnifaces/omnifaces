@@ -21,10 +21,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.util.UUID;
 
-import javax.annotation.PreDestroy;
-import javax.enterprise.context.NormalScope;
-import javax.enterprise.util.Nonbinding;
-import javax.faces.component.UIViewRoot;
+import jakarta.annotation.PreDestroy;
+import jakarta.enterprise.context.NormalScope;
+import jakarta.enterprise.util.Nonbinding;
+import jakarta.faces.component.UIViewRoot;
 
 import org.omnifaces.cdi.viewscope.ViewScopeContext;
 import org.omnifaces.cdi.viewscope.ViewScopeEventListener;
@@ -83,7 +83,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * Just use it the usual way as all other CDI scopes. Watch out with IDE autocomplete on import that you don't
  * accidentally import standard JSF's own one.
  * <pre>
- * import javax.inject.Named;
+ * import jakarta.inject.Named;
  * import org.omnifaces.cdi.ViewScoped;
  *
  * &#64;Named
@@ -99,12 +99,12 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * {@link UIViewRoot#getViewMap()}. They are not stored in the JSF view state itself as that would be rather expensive
  * in case of client side state saving.
  * <p>
- * In case you are using client side state saving by having the <code>javax.faces.STATE_SAVING_METHOD</code> context
+ * In case you are using client side state saving by having the <code>jakarta.faces.STATE_SAVING_METHOD</code> context
  * parameter set to <code>true</code> along with a valid <code>jsf/ClientSideSecretKey</code> in <code>web.xml</code>
  * as below,
  * <pre>
  * &lt;context-param&gt;
- *     &lt;param-name&gt;javax.faces.STATE_SAVING_METHOD&lt;/param-name&gt;
+ *     &lt;param-name&gt;jakarta.faces.STATE_SAVING_METHOD&lt;/param-name&gt;
  *     &lt;param-value&gt;client&lt;/param-value&gt;
  * &lt;/context-param&gt;
  * &lt;env-entry&gt;
@@ -117,7 +117,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * And you explicitly want to store the whole view scoped bean instance in the JSF view state, then set the annotation's
  * <code>saveInViewState</code> attribute to <code>true</code>.
  * <pre>
- * import javax.inject.Named;
+ * import jakarta.inject.Named;
  * import org.omnifaces.cdi.ViewScoped;
  *
  * &#64;Named
@@ -128,7 +128,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * It's very important that you understand that this setting has potentially a major impact in the size of the JSF view
  * state, certainly when the view scoped bean instance holds "too much" data, such as a collection of entities for a
  * data table, and that such beans will in fact <strong>never</strong> expire as they are stored entirely in the
- * <code>javax.faces.ViewState</code> hidden input field in the HTML page. Moreover, the
+ * <code>jakarta.faces.ViewState</code> hidden input field in the HTML page. Moreover, the
  * <code>&#64;</code>{@link PreDestroy} annotated method on such bean will explicitly <strong>never</strong> be invoked,
  * even not on an unload as it's quite possible to save or cache the page source and re-execute it at a (much) later
  * moment.

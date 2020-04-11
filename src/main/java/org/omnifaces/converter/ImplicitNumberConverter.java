@@ -20,10 +20,10 @@ import java.text.NumberFormat;
 import java.util.Currency;
 import java.util.regex.Pattern;
 
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.convert.FacesConverter;
-import javax.faces.convert.NumberConverter;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.convert.FacesConverter;
+import jakarta.faces.convert.NumberConverter;
 
 /**
  * <p>

@@ -38,6 +38,7 @@ import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,18 +46,17 @@ import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
-import javax.el.ValueExpression;
-import javax.enterprise.inject.Any;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.util.AnnotationLiteral;
-import javax.faces.FacesException;
-import javax.faces.application.Resource;
-import javax.faces.component.UIComponent;
-import javax.faces.component.UIOutput;
-import javax.faces.context.FacesContext;
-import javax.faces.convert.Converter;
-import javax.xml.bind.DatatypeConverter;
+import jakarta.el.ValueExpression;
+import jakarta.enterprise.inject.Any;
+import jakarta.enterprise.inject.spi.Bean;
+import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.util.AnnotationLiteral;
+import jakarta.faces.FacesException;
+import jakarta.faces.application.Resource;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.UIOutput;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.convert.Converter;
 
 import org.omnifaces.cdi.GraphicImageBean;
 import org.omnifaces.el.ExpressionInspector;
@@ -83,8 +83,8 @@ public class GraphicResource extends DynamicResource {
 	@SuppressWarnings({ "unchecked", "deprecation" })
 	private static final Class<? extends Annotation>[] REQUIRED_ANNOTATION_TYPES = new Class[] {
 		GraphicImageBean.class,
-		javax.faces.bean.ApplicationScoped.class,
-		javax.enterprise.context.ApplicationScoped.class
+		jakarta.faces.bean.ApplicationScoped.class,
+		jakarta.enterprise.context.ApplicationScoped.class
 	};
 
 	@SuppressWarnings("unchecked")
@@ -93,7 +93,7 @@ public class GraphicResource extends DynamicResource {
 		byte[].class
 	};
 
-	private static final AnnotationLiteral<Any> ANY = new AnnotationLiteral<Any>() {
+	private static final AnnotationLiteral<Any> ANY = new AnnotationLiteral<>() {
 		private static final long serialVersionUID = 1L;
 	};
 
@@ -376,7 +376,7 @@ public class GraphicResource extends DynamicResource {
 			throw new IllegalArgumentException(format(ERROR_INVALID_RETURNTYPE, content));
 		}
 
-		return DatatypeConverter.printBase64Binary(bytes);
+		return Base64.getEncoder().encodeToString(bytes);
 	}
 
 	/**

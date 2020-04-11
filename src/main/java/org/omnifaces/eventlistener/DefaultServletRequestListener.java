@@ -12,8 +12,8 @@
  */
 package org.omnifaces.eventlistener;
 
-import javax.servlet.ServletRequestEvent;
-import javax.servlet.ServletRequestListener;
+import jakarta.servlet.ServletRequestEvent;
+import jakarta.servlet.ServletRequestListener;
 
 
 /**

@@ -16,10 +16,10 @@ import static org.omnifaces.util.Components.validateHasChild;
 import static org.omnifaces.util.Components.validateHasDirectParent;
 import static org.omnifaces.util.Components.validateHasNoParent;
 
-import javax.faces.component.FacesComponent;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.event.PhaseId;
+import jakarta.faces.component.FacesComponent;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.PhaseId;
 
 import org.omnifaces.model.tree.TreeModel;
 import org.omnifaces.util.State;

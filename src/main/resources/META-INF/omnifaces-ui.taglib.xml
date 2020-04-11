@@ -95,7 +95,7 @@
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -176,7 +176,7 @@
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -236,7 +236,7 @@
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 	</tag>
 
@@ -281,7 +281,7 @@
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 	</tag>
 
@@ -350,7 +350,7 @@
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -465,7 +465,7 @@
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 	</tag>
 
@@ -541,7 +541,7 @@ input.error, select.error, textarea.error {
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -576,7 +576,7 @@ input.error, select.error, textarea.error {
   &lt;link rel="stylesheet" href="ie6-ie7.css" /&gt;
 &lt;![endif]--&gt;
 				</pre>
-				<p>However, Facelets renders them HTML-escaped and if <code>javax.faces.FACELETS_SKIP_COMMENTS</code> context param is
+				<p>However, Facelets renders them HTML-escaped and if <code>jakarta.faces.FACELETS_SKIP_COMMENTS</code> context param is
 				set to <code>true</code> then it will even not be rendered at all. You would need to workaround this with an ugly
 				<code>&lt;h:outputText escape="false"&gt;</code>.
 				<pre>
@@ -626,7 +626,7 @@ input.error, select.error, textarea.error {
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -762,7 +762,7 @@ input.error, select.error, textarea.error {
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -865,7 +865,7 @@ input.error, select.error, textarea.error {
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -968,7 +968,7 @@ input.error, select.error, textarea.error {
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -1061,7 +1061,7 @@ input.error, select.error, textarea.error {
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -1154,7 +1154,7 @@ input.error, select.error, textarea.error {
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -1247,7 +1247,7 @@ input.error, select.error, textarea.error {
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -1340,7 +1340,7 @@ input.error, select.error, textarea.error {
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -1444,7 +1444,7 @@ input.error, select.error, textarea.error {
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -1573,7 +1573,7 @@ public class ValidateValuesBean implements MultiFieldValidator {
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -1648,11 +1648,11 @@ public class ValidateValuesBean implements MultiFieldValidator {
 				</pre>
 				<p>Note that not all available attributes are listed. This depends on the validator you're specifying.
 				When you specify for example the standard <code>&lt;f:validateLongRange&gt;</code> by
-				<code>validatorId="javax.faces.LongRange"</code>, then you'll be able to use all its attributes such as
+				<code>validatorId="jakarta.faces.LongRange"</code>, then you'll be able to use all its attributes such as
 				<code>minimum</code> and <code>maximum</code> as per its documentation, but then with the possibility to supply
 				request based value expressions.
 				<pre>
-&lt;o:validator validatorId="javax.faces.LongRange" minimum="#{item.minimum}" maximum="#{item.maximum}" /&gt;
+&lt;o:validator validatorId="jakarta.faces.LongRange" minimum="#{item.minimum}" maximum="#{item.maximum}" /&gt;
 				</pre>
 			]]>
 		</description>
@@ -1664,13 +1664,13 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-					A ValueExpression that evaluates to an object that implements the javax.faces.validator.Validator
+					A ValueExpression that evaluates to an object that implements the jakarta.faces.validator.Validator
 					interface.
 				]]>
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.validator.Validator</type>
+			<type>jakarta.faces.validator.Validator</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -1726,11 +1726,11 @@ public class ValidateValuesBean implements MultiFieldValidator {
 				build time basis. This allows the developer to change the attributes on a per request basis.
 				<p>
 				When you specify for example the standard <code>&lt;f:convertDateTime&gt;</code> by
-				<code>converterId="javax.faces.DateTime"</code>, then you'll be able to use all its attribuces such as
+				<code>converterId="jakarta.faces.DateTime"</code>, then you'll be able to use all its attribuces such as
 				<code>pattern</code> and <code>locale</code> as per its documentation, but then with the possibility to supply
 				request based value expressions.
 				<pre>
-&lt;o:converter converterId="javax.faces.DateTime" pattern="#{item.pattern}" locale="#{item.locale}" /&gt;
+&lt;o:converter converterId="jakarta.faces.DateTime" pattern="#{item.pattern}" locale="#{item.locale}" /&gt;
 				</pre>
 			]]>
 		</description>
@@ -1742,13 +1742,13 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<attribute>
 			<description>
 				<![CDATA[
-					A ValueExpression that evaluates to an object that implements the javax.faces.convert.Converter
+					A ValueExpression that evaluates to an object that implements the jakarta.faces.convert.Converter
 					interface.
 				]]>
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.convert.Converter</type>
+			<type>jakarta.faces.convert.Converter</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -1817,13 +1817,13 @@ public class ValidateValuesBean implements MultiFieldValidator {
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 		<attribute>
 			<description>
 				<![CDATA[
 					The <code>ValueExpression</code> to store the uploaded file(s) in. 
-					For single file selection, it must refer a <code>javax.servlet.http.Part</code> property. 
+					For single file selection, it must refer a <code>jakarta.servlet.http.Part</code> property. 
 					For multiple file selection, it must a <code>java.util.List&lt;Part&gt;</code> property.
 				]]>
 			</description>
@@ -1902,7 +1902,7 @@ public class ValidateValuesBean implements MultiFieldValidator {
 			</description>
 			<name>converter</name>
 			<required>false</required>
-			<type>javax.faces.convert.Converter</type>
+			<type>jakarta.faces.convert.Converter</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -2269,7 +2269,7 @@ public class ValidateValuesBean implements MultiFieldValidator {
 				]]></description>
 			<name>converter</name>
 			<required>false</required>
-			<type>javax.faces.convert.Converter</type>
+			<type>jakarta.faces.convert.Converter</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -2334,8 +2334,8 @@ public class ValidateValuesBean implements MultiFieldValidator {
 			</description>
 			<name>validator</name>
 			<required>false</required>
-			<method-signature>void validate(javax.faces.context.FacesContext,
-				javax.faces.component.UIComponent, java.lang.Object)
+			<method-signature>void validate(jakarta.faces.context.FacesContext,
+				jakarta.faces.component.UIComponent, java.lang.Object)
 			</method-signature>
 		</attribute>
 		<attribute>
@@ -2394,7 +2394,7 @@ public class ValidateValuesBean implements MultiFieldValidator {
 			<name>valueChangeListener</name>
 			<required>false</required>
 			<method-signature>void
-				valueChange(javax.faces.event.ValueChangeEvent)
+				valueChange(jakarta.faces.event.ValueChangeEvent)
 			</method-signature>
 		</attribute>
 		<attribute>
@@ -2417,7 +2417,7 @@ public class ValidateValuesBean implements MultiFieldValidator {
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 	</tag>
 	
@@ -2509,7 +2509,7 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
 				]]></description>
 			<name>converter</name>
 			<required>false</required>
-			<type>javax.faces.convert.Converter</type>
+			<type>jakarta.faces.convert.Converter</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -2574,8 +2574,8 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
 			</description>
 			<name>validator</name>
 			<required>false</required>
-			<method-signature>void validate(javax.faces.context.FacesContext,
-				javax.faces.component.UIComponent, java.lang.Object)
+			<method-signature>void validate(jakarta.faces.context.FacesContext,
+				jakarta.faces.component.UIComponent, java.lang.Object)
 			</method-signature>
 		</attribute>
 		<attribute>
@@ -2644,7 +2644,7 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
 			<name>valueChangeListener</name>
 			<required>false</required>
 			<method-signature>void
-				valueChange(javax.faces.event.ValueChangeEvent)
+				valueChange(jakarta.faces.event.ValueChangeEvent)
 			</method-signature>
 		</attribute>
 		<attribute>
@@ -2667,7 +2667,7 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 	</tag>
 	
@@ -2737,7 +2737,7 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
 			</description>
 			<name>actionListener</name>
 			<required>false</required>
-			<method-signature>void actionListener(javax.faces.event.ActionEvent)
+			<method-signature>void actionListener(jakarta.faces.event.ActionEvent)
 			</method-signature>
 		</attribute>
 		<attribute>
@@ -3104,7 +3104,7 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 	</tag>
 
@@ -3126,7 +3126,7 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
 			</description>
 			<name>converter</name>
 			<required>false</required>
-			<type>javax.faces.convert.Converter</type>
+			<type>jakarta.faces.convert.Converter</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -3227,7 +3227,7 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 	</tag>
 
@@ -3251,7 +3251,7 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
 			</description>
 			<name>converter</name>
 			<required>false</required>
-			<type>javax.faces.convert.Converter</type>
+			<type>jakarta.faces.convert.Converter</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -3482,7 +3482,7 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 	</tag>
 
@@ -3529,7 +3529,7 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -3843,7 +3843,7 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -4183,7 +4183,7 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 	</tag>
 
@@ -4585,7 +4585,7 @@ public enum Baz {
 				per-<code>UICommand</code> or <code>UIInput</code> component basis. Usage example:
 				<pre>
 &lt;h:commandButton&gt;
-	&lt;o:validateBean groups="javax.validation.groups.Default,com.example.MyGroup"/&gt;
+	&lt;o:validateBean groups="jakarta.validation.groups.Default,com.example.MyGroup"/&gt;
 &lt;/h:commandButton&gt;
 				</pre>
 			]]>
@@ -4767,7 +4767,7 @@ public enum Baz {
 				To target a specific component (super)class, use the <code>target</code> attribute. The example below skips labels
 				(as that would otherwise fail in the example below because they don't have a <code>valid</code> property):
 				<pre>
-&lt;o:massAttribute name="styleClass" value="#{component.valid ? '' : 'error'}" target="javax.faces.component.UIInput"&gt;
+&lt;o:massAttribute name="styleClass" value="#{component.valid ? '' : 'error'}" target="jakarta.faces.component.UIInput"&gt;
 	&lt;h:outputLabel for="input1" /&gt;
 	&lt;h:inputText id="input1" /&gt;
 	&lt;h:outputLabel for="input2" /&gt;
@@ -4807,7 +4807,7 @@ public enum Baz {
 			<description>
 				<![CDATA[
 					The FQN (fully qualified name) of the specific <code>UIComponent</code> (super)class for which the
-					attribute should be set. For example, <code>javax.faces.component.UIInput</code> which has the
+					attribute should be set. For example, <code>jakarta.faces.component.UIInput</code> which has the
 					<code>valid</code> property.
 				]]>
 			</description>
@@ -5030,7 +5030,7 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -5121,7 +5121,7 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 			</description>
 			<name>actionListener</name>
 			<required>false</required>
-			<method-signature>void actionListener(javax.faces.event.ActionEvent)
+			<method-signature>void actionListener(jakarta.faces.event.ActionEvent)
 			</method-signature>
 		</attribute>
 		<attribute>
@@ -5187,7 +5187,7 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -5217,7 +5217,7 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 			</description>
 			<name>converter</name>
 			<required>false</required>
-			<type>javax.faces.convert.Converter</type>
+			<type>jakarta.faces.convert.Converter</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -5343,7 +5343,7 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 		<attribute>
 			<description>
@@ -5759,7 +5759,7 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 		<description>
 			<![CDATA[
 				The <code>o:selectItemGroups</code> is an extension of {@link UISelectItems} which allows you to iterate over a nested collection representing groups of select items.
-				This is the {@link UIComponent} counterpart of <code>javax.faces.model.SelectItemGroup</code>.
+				This is the {@link UIComponent} counterpart of <code>jakarta.faces.model.SelectItemGroup</code>.
 				There is no equivalent (yet) in the standard JSF API. Currently the only way to represent {@link SelectItemGroup} in UI is to manually create and populate them in a backing bean which can end up to be quite verbose.
 				<p>
 				Below example assumes a <code>List&lt;Category&gt;</code> as value wherein <code>Category</code> in turn has a <code>List&lt;Product&gt;</code>.

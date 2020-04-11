@@ -12,11 +12,11 @@
  */
 package org.omnifaces.event;
 
-import javax.faces.FacesWrapper;
-import javax.faces.component.UIComponent;
-import javax.faces.event.FacesEvent;
-import javax.faces.event.FacesListener;
-import javax.faces.event.PhaseId;
+import jakarta.faces.FacesWrapper;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.event.FacesEvent;
+import jakarta.faces.event.FacesListener;
+import jakarta.faces.event.PhaseId;
 
 /**
  * Provides a simple implementation of {@link FacesEvent} that can be sub-classed by developers wishing to provide

@@ -12,12 +12,12 @@
  */
 package org.omnifaces.taghandler;
 
+import static jakarta.faces.component.visit.VisitHint.SKIP_UNRENDERED;
+import static jakarta.faces.event.PhaseId.PROCESS_VALIDATIONS;
+import static jakarta.faces.event.PhaseId.RESTORE_VIEW;
+import static jakarta.faces.event.PhaseId.UPDATE_MODEL_VALUES;
+import static jakarta.faces.view.facelets.ComponentHandler.isNew;
 import static java.util.logging.Level.SEVERE;
-import static javax.faces.component.visit.VisitHint.SKIP_UNRENDERED;
-import static javax.faces.event.PhaseId.PROCESS_VALIDATIONS;
-import static javax.faces.event.PhaseId.RESTORE_VIEW;
-import static javax.faces.event.PhaseId.UPDATE_MODEL_VALUES;
-import static javax.faces.view.facelets.ComponentHandler.isNew;
 import static org.omnifaces.el.ExpressionInspector.getValueReference;
 import static org.omnifaces.util.Components.forEachComponent;
 import static org.omnifaces.util.Components.getClosestParent;
@@ -54,21 +54,21 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.el.ValueExpression;
-import javax.el.ValueReference;
-import javax.faces.FacesException;
-import javax.faces.component.UICommand;
-import javax.faces.component.UIComponent;
-import javax.faces.component.UIForm;
-import javax.faces.component.UIInput;
-import javax.faces.context.FacesContext;
-import javax.faces.event.PostValidateEvent;
-import javax.faces.event.PreValidateEvent;
-import javax.faces.event.SystemEventListener;
-import javax.faces.validator.Validator;
-import javax.faces.view.facelets.FaceletContext;
-import javax.faces.view.facelets.TagConfig;
-import javax.faces.view.facelets.TagHandler;
+import jakarta.el.ValueExpression;
+import jakarta.el.ValueReference;
+import jakarta.faces.FacesException;
+import jakarta.faces.component.UICommand;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.UIForm;
+import jakarta.faces.component.UIInput;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.PostValidateEvent;
+import jakarta.faces.event.PreValidateEvent;
+import jakarta.faces.event.SystemEventListener;
+import jakarta.faces.validator.Validator;
+import jakarta.faces.view.facelets.FaceletContext;
+import jakarta.faces.view.facelets.TagConfig;
+import jakarta.faces.view.facelets.TagHandler;
 
 import org.omnifaces.eventlistener.BeanValidationEventListener;
 import org.omnifaces.util.Callback;
@@ -102,7 +102,7 @@ import org.omnifaces.util.copier.SerializationCopier;
  * <b>Control bean validation per component</b>
  * <pre>
  * &lt;h:commandButton value="submit" action="#{bean.submit}"&gt;
- *     &lt;o:validateBean validationGroups="javax.validation.groups.Default,com.example.MyGroup" /&gt;
+ *     &lt;o:validateBean validationGroups="jakarta.validation.groups.Default,com.example.MyGroup" /&gt;
  * &lt;/h:commandButton&gt;
  * </pre>
  * <pre>
@@ -202,7 +202,7 @@ import org.omnifaces.util.copier.SerializationCopier;
  * &lt;/h:form&gt;
  * </pre>
  * <p>
- * The faces message can also be shown for components which match {@link javax.validation.ConstraintViolation#getPropertyPath() Property
+ * The faces message can also be shown for components which match {@link jakarta.validation.ConstraintViolation#getPropertyPath() Property
  * Path of the ConstraintViolation} using <code>showMessageFor="@violating"</code>, and when no matching component can
  * be found, the message will fallback to being added with client ID of the parent {@link UIForm}.
  * <pre>

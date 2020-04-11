@@ -28,10 +28,10 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.annotation.PreDestroy;
-import javax.enterprise.context.SessionScoped;
-import javax.faces.view.ViewScoped;
-import javax.inject.Inject;
+import jakarta.annotation.PreDestroy;
+import jakarta.enterprise.context.SessionScoped;
+import jakarta.faces.view.ViewScoped;
+import jakarta.inject.Inject;
 
 import org.omnifaces.cdi.push.SocketEvent.Switched;
 import org.omnifaces.util.Beans;

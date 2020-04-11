@@ -14,7 +14,7 @@ package org.omnifaces.util;
 
 import java.io.Serializable;
 
-import javax.faces.component.StateHelper;
+import jakarta.faces.component.StateHelper;
 
 /**
  * Helper class for StateHelper that uses generic type-inference to make code that uses the StateHelper slightly less verbose.

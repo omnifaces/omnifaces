@@ -12,9 +12,9 @@
  */
 package org.omnifaces.facesviews;
 
-import static javax.faces.application.ProjectStage.Development;
-import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static jakarta.faces.application.ProjectStage.Development;
+import static jakarta.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
+import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_PATH_INFO;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_SERVLET_PATH;
 import static org.omnifaces.facesviews.FacesViews.getExtensionAction;
@@ -36,13 +36,13 @@ import static org.omnifaces.util.Servlets.getRequestRelativeURI;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.servlet.FilterChain;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import org.omnifaces.filter.HttpFilter;
 

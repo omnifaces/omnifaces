@@ -12,8 +12,8 @@
  */
 package org.omnifaces.eventlistener;
 
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
+import jakarta.servlet.http.HttpSessionEvent;
+import jakarta.servlet.http.HttpSessionListener;
 
 /**
  * Default implementation for the HttpSessionListener interface.

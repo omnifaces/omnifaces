@@ -21,14 +21,14 @@ import static org.omnifaces.util.Faces.isPostback;
 import static org.omnifaces.util.Faces.setRequestAttribute;
 import static org.omnifaces.util.Utils.isEmpty;
 
-import javax.faces.component.FacesComponent;
-import javax.faces.component.UIComponent;
-import javax.faces.event.ComponentSystemEvent;
-import javax.faces.event.PostRestoreStateEvent;
-import javax.faces.event.PreRenderViewEvent;
-import javax.faces.event.SystemEvent;
-import javax.faces.event.SystemEventListener;
-import javax.faces.view.facelets.FaceletContext;
+import jakarta.faces.component.FacesComponent;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.event.ComponentSystemEvent;
+import jakarta.faces.event.PostRestoreStateEvent;
+import jakarta.faces.event.PreRenderViewEvent;
+import jakarta.faces.event.SystemEvent;
+import jakarta.faces.event.SystemEventListener;
+import jakarta.faces.view.facelets.FaceletContext;
 
 import org.omnifaces.el.ReadOnlyValueExpression;
 import org.omnifaces.taghandler.ComponentExtraHandler;

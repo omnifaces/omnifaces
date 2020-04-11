@@ -19,7 +19,7 @@ import static org.omnifaces.util.Faces.isDevelopment;
 
 import java.net.URL;
 
-import javax.faces.view.facelets.ResourceResolver;
+import jakarta.faces.view.facelets.ResourceResolver;
 
 /**
  * Facelets resource resolver that resolves mapped resources (views) to the folders from which

@@ -24,12 +24,12 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Set;
 
-import javax.el.ValueExpression;
-import javax.faces.application.Application;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.convert.Converter;
-import javax.faces.convert.FacesConverter;
+import jakarta.el.ValueExpression;
+import jakarta.faces.application.Application;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.convert.Converter;
+import jakarta.faces.convert.FacesConverter;
 
 import org.omnifaces.el.ExpressionInspector;
 import org.omnifaces.util.Faces;
@@ -61,7 +61,7 @@ import org.omnifaces.util.Faces;
  *     &lt;o:converter converterId="omnifaces.ToCollectionConverter"
  *                  delimiter=";"
  *                  collectionType="java.util.TreeSet"
- *                  itemConverter="javax.faces.Integer" &gt;
+ *                  itemConverter="jakarta.faces.Integer" &gt;
  * &lt;/h:inputText&gt;
  * </pre>
  *

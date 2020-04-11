@@ -20,20 +20,20 @@ import static org.omnifaces.util.Components.getLabel;
 import java.io.IOException;
 import java.io.Serializable;
 
-import javax.el.ELContext;
-import javax.el.ValueExpression;
-import javax.faces.application.Application;
-import javax.faces.component.EditableValueHolder;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.validator.FacesValidator;
-import javax.faces.validator.ValidatorException;
-import javax.faces.view.facelets.ComponentHandler;
-import javax.faces.view.facelets.FaceletContext;
-import javax.faces.view.facelets.TagAttribute;
-import javax.faces.view.facelets.TagHandlerDelegate;
-import javax.faces.view.facelets.ValidatorConfig;
-import javax.faces.view.facelets.ValidatorHandler;
+import jakarta.el.ELContext;
+import jakarta.el.ValueExpression;
+import jakarta.faces.application.Application;
+import jakarta.faces.component.EditableValueHolder;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.validator.FacesValidator;
+import jakarta.faces.validator.ValidatorException;
+import jakarta.faces.view.facelets.ComponentHandler;
+import jakarta.faces.view.facelets.FaceletContext;
+import jakarta.faces.view.facelets.TagAttribute;
+import jakarta.faces.view.facelets.TagHandlerDelegate;
+import jakarta.faces.view.facelets.ValidatorConfig;
+import jakarta.faces.view.facelets.ValidatorHandler;
 
 import org.omnifaces.cdi.validator.ValidatorManager;
 import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredAttributes;
@@ -53,11 +53,11 @@ import org.omnifaces.util.Messages;
  * <h3>Usage</h3>
  * <p>
  * When you specify for example the standard <code>&lt;f:validateLongRange&gt;</code> by
- * <code>validatorId="javax.faces.LongRange"</code>, then you'll be able to use all its attributes such as
+ * <code>validatorId="jakarta.faces.LongRange"</code>, then you'll be able to use all its attributes such as
  * <code>minimum</code> and <code>maximum</code> as per its documentation, but then with the possibility to supply
  * deferred value expressions.
  * <pre>
- * &lt;o:validator validatorId="javax.faces.LongRange" minimum="#{item.minimum}" maximum="#{item.maximum}" /&gt;
+ * &lt;o:validator validatorId="jakarta.faces.LongRange" minimum="#{item.minimum}" maximum="#{item.maximum}" /&gt;
  * </pre>
  * <p>
  * The validator ID of all standard JSF validators can be found in
@@ -69,7 +69,7 @@ import org.omnifaces.util.Messages;
  * attribute. Any "{0}" placeholder in the message will be substituted with the label of the referenced input component.
  * Note that this attribute is ignored when the parent component has already <code>validatorMessage</code> specified.
  * <pre>
- * &lt;o:validator validatorId="javax.faces.LongRange" minimum="#{item.minimum}" maximum="#{item.maximum}"
+ * &lt;o:validator validatorId="jakarta.faces.LongRange" minimum="#{item.minimum}" maximum="#{item.maximum}"
  *     message="Please enter between #{item.minimum} and #{item.maximum} characters" /&gt;
  * </pre>
  *
@@ -99,7 +99,7 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Create a {@link javax.faces.validator.Validator} based on the <code>binding</code> and/or
+	 * Create a {@link jakarta.faces.validator.Validator} based on the <code>binding</code> and/or
 	 * <code>validatorId</code> attributes as per the standard JSF <code>&lt;f:validator&gt;</code> implementation and
 	 * collect the render time attributes. Then create an anonymous <code>Validator</code> implementation which wraps
 	 * the created <code>Validator</code> and delegates the methods to it after setting the render time attributes only
@@ -128,7 +128,7 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
 	}
 
 	private void addValidator(FaceletContext context, EditableValueHolder parent) {
-		javax.faces.validator.Validator<Object> validator = createInstance(context, this, "validatorId");
+		jakarta.faces.validator.Validator<Object> validator = createInstance(context, this, "validatorId");
 		DeferredAttributes attributes = collectDeferredAttributes(context, this, validator);
 		ValueExpression disabled = getValueExpression(context, this, "disabled", Boolean.class);
 		ValueExpression message = getValueExpression(context, this, "message", String.class);
@@ -196,7 +196,7 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
 	 *
 	 * @author Bauke Scholtz
 	 */
-	protected abstract static class DeferredValidator implements javax.faces.validator.Validator<Object>, Serializable {
+	protected abstract static class DeferredValidator implements jakarta.faces.validator.Validator<Object>, Serializable {
 		private static final long serialVersionUID = 1L;
 	}
 

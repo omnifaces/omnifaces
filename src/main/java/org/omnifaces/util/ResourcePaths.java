@@ -17,7 +17,7 @@ import static java.util.stream.Collectors.toSet;
 
 import java.util.Set;
 
-import javax.servlet.ServletContext;
+import jakarta.servlet.ServletContext;
 
 /**
  * Utility class for working with (Servlet) resource paths, providing methods to handle their prefixes, slashes, extensions etc.

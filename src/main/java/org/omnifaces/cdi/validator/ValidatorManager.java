@@ -19,22 +19,22 @@ import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.Dependent;
-import javax.enterprise.inject.AmbiguousResolutionException;
-import javax.enterprise.inject.Specializes;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.faces.application.Application;
-import javax.faces.application.NavigationHandler;
-import javax.faces.application.ResourceHandler;
-import javax.faces.convert.Converter;
-import javax.faces.event.ActionListener;
-import javax.faces.event.PhaseListener;
-import javax.faces.event.SystemEventListener;
-import javax.faces.validator.FacesValidator;
-import javax.faces.validator.Validator;
-import javax.inject.Inject;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.inject.AmbiguousResolutionException;
+import jakarta.enterprise.inject.Specializes;
+import jakarta.enterprise.inject.spi.Bean;
+import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.faces.application.Application;
+import jakarta.faces.application.NavigationHandler;
+import jakarta.faces.application.ResourceHandler;
+import jakarta.faces.convert.Converter;
+import jakarta.faces.event.ActionListener;
+import jakarta.faces.event.PhaseListener;
+import jakarta.faces.event.SystemEventListener;
+import jakarta.faces.validator.FacesValidator;
+import jakarta.faces.validator.Validator;
+import jakarta.inject.Inject;
 
 import org.omnifaces.application.OmniApplication;
 import org.omnifaces.application.OmniApplicationFactory;
@@ -48,7 +48,7 @@ import org.omnifaces.application.OmniApplicationFactory;
  * and hence you won't be able to make use of {@link Application#createValidator(String)} on it.
  * <p>
  * Initially, this should be solved in JSF 2.2 which comes with new support for dependency injection in among others all
- * <code>javax.faces.*.*Factory</code>, {@link NavigationHandler}, {@link ResourceHandler},
+ * <code>jakarta.faces.*.*Factory</code>, {@link NavigationHandler}, {@link ResourceHandler},
  * {@link ActionListener}, {@link PhaseListener} and {@link SystemEventListener} instances.
  * The {@link Converter} and {@link Validator} were initially also among them, but they broke a TCK test and were at the
  * last moment removed from dependency injection support.

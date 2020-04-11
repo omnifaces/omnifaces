@@ -12,8 +12,8 @@
  */
 package org.omnifaces.resourcehandler;
 
-import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
-import static javax.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
+import static jakarta.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static jakarta.servlet.http.HttpServletResponse.SC_NOT_MODIFIED;
 import static org.omnifaces.util.Faces.getMapping;
 import static org.omnifaces.util.Faces.getRequestContextPath;
 import static org.omnifaces.util.Faces.isPrefixMapping;
@@ -24,22 +24,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map.Entry;
 
-import javax.faces.application.Resource;
-import javax.faces.application.ResourceHandler;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-import javax.faces.webapp.FacesServlet;
+import jakarta.faces.application.Resource;
+import jakarta.faces.application.ResourceHandler;
+import jakarta.faces.context.ExternalContext;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.webapp.FacesServlet;
 
 import org.omnifaces.util.Hacks;
 
 /**
  * <p>
  * This {@link ResourceHandler} implementation allows the developer to map JSF resources on an URL pattern of
- * <code>/javax.faces.resource/*</code> (basically, the value of {@link ResourceHandler#RESOURCE_IDENTIFIER}) without
+ * <code>/jakarta.faces.resource/*</code> (basically, the value of {@link ResourceHandler#RESOURCE_IDENTIFIER}) without
  * the need for an additional {@link FacesServlet} prefix or suffix URL pattern in the default produced resource URLs,
- * such as <code>/javax.faces.resource/faces/css/style.css</code> or
- * <code>/javax.faces.resource/css/style.css.xhtml</code>. This resource handler will produce unmapped URLs like
- * <code>/javax.faces.resource/css/style.css</code>. This has the major advantage that the developer don't need the
+ * such as <code>/jakarta.faces.resource/faces/css/style.css</code> or
+ * <code>/jakarta.faces.resource/css/style.css.xhtml</code>. This resource handler will produce unmapped URLs like
+ * <code>/jakarta.faces.resource/css/style.css</code>. This has the major advantage that the developer don't need the
  * <code>#{resource}</code> EL expression anymore in order to properly reference relative URLs to images in CSS files.
  * <p>
  * So, given the following folder structure,
@@ -81,14 +81,14 @@ import org.omnifaces.util.Hacks;
  * &lt;/application&gt;
  * </pre>
  * <p>
- * And the {@link FacesServlet} needs to have an additional mapping <code>/javax.faces.resource/*</code> in
+ * And the {@link FacesServlet} needs to have an additional mapping <code>/jakarta.faces.resource/*</code> in
  * <code>web.xml</code>. You can just add it as a new <code>&lt;url-pattern&gt;</code> entry to the existing mapping
  * of the {@link FacesServlet}. For example, assuming that you've already a mapping on <code>*.xhtml</code>:
  * <pre>
  * &lt;servlet-mapping&gt;
  *     ...
  *     &lt;url-pattern&gt;*.xhtml&lt;/url-pattern&gt;
- *     &lt;url-pattern&gt;/javax.faces.resource/*&lt;/url-pattern&gt;
+ *     &lt;url-pattern&gt;/jakarta.faces.resource/*&lt;/url-pattern&gt;
  * &lt;/servlet-mapping&gt;
  * </pre>
  *

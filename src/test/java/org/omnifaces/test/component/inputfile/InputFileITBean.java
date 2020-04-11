@@ -17,9 +17,9 @@ import static org.omnifaces.util.Servlets.getSubmittedFileName;
 
 import java.util.List;
 
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Named;
-import javax.servlet.http.Part;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Named;
+import jakarta.servlet.http.Part;
 
 @Named
 @RequestScoped

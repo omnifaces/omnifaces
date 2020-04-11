@@ -20,9 +20,9 @@ import static org.omnifaces.util.Utils.isEmpty;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.faces.application.Resource;
-import javax.faces.application.ResourceDependency;
-import javax.faces.application.ResourceHandler;
+import jakarta.faces.application.Resource;
+import jakarta.faces.application.ResourceDependency;
+import jakarta.faces.application.ResourceHandler;
 
 /**
  * <p>

@@ -12,7 +12,7 @@
  */
 package org.omnifaces.validator;
 
-import static javax.validation.Validation.byDefaultProvider;
+import static jakarta.validation.Validation.byDefaultProvider;
 import static org.omnifaces.util.Components.getCurrentComponent;
 import static org.omnifaces.util.Components.getLabel;
 import static org.omnifaces.util.Faces.getLocale;
@@ -20,14 +20,14 @@ import static org.omnifaces.util.Faces.hasContext;
 
 import java.util.Locale;
 
-import javax.validation.MessageInterpolator;
+import jakarta.validation.MessageInterpolator;
 
 
 /**
  * <p>
  * Unlike native JSF validation error messages, in a bean validation message by default the label of the component where
  * a validation constraint violation originated from can not be displayed in the middle of a message. Using the
- * <code>javax.faces.validator.BeanValidator.MESSAGE</code> bundle key such label can be put in front or behind the
+ * <code>jakarta.faces.validator.BeanValidator.MESSAGE</code> bundle key such label can be put in front or behind the
  * message, but that's it. With this {@link JsfLabelMessageInterpolator} a label can appear in the middle of a message,
  * by using the special placeholder <code>{jsf.label}</code> in bean validation messages.
  * <p>
@@ -37,7 +37,7 @@ import javax.validation.MessageInterpolator;
  * <p>
  * This message interpolator is <strong>not</strong> needed for putting a component label before or after a bean
  * validation message. That functionality is already provided by JSF itself via the
- * <code>javax.faces.validator.BeanValidator.MESSAGE</code> key in any resource bundle known to JSF.
+ * <code>jakarta.faces.validator.BeanValidator.MESSAGE</code> key in any resource bundle known to JSF.
  *
  * <h3>Installation</h3>
  * <p>
@@ -57,7 +57,7 @@ import javax.validation.MessageInterpolator;
  * <h3>Usage</h3>
  * <p>As an example, the customization of <code>@Size</code> in <code>ValidationMessages.properties</code>:
  * <pre>
- * javax.validation.constraints.Size.message = The size of {jsf.label} must be between {min} and {max} characters
+ * jakarta.validation.constraints.Size.message = The size of {jsf.label} must be between {min} and {max} characters
  * </pre>
  *
  * @author Arjan Tijms

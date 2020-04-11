@@ -19,8 +19,8 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Stereotype;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Stereotype;
 
 /**
  * <p>
@@ -35,7 +35,7 @@ import javax.enterprise.inject.Stereotype;
  * <p>
  * In effect, this annotation does exactly the same as:
  * <pre>
- * import javax.enterprise.context.ApplicationScoped;
+ * import jakarta.enterprise.context.ApplicationScoped;
  * import org.omnifaces.cdi.Eager;
  *
  * &#64;Eager

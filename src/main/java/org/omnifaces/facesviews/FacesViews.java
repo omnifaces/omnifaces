@@ -12,6 +12,9 @@
  */
 package org.omnifaces.facesviews;
 
+import static jakarta.faces.view.facelets.ResourceResolver.FACELETS_RESOURCE_RESOLVER_PARAM_NAME;
+import static jakarta.servlet.DispatcherType.FORWARD;
+import static jakarta.servlet.DispatcherType.REQUEST;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableMap;
@@ -21,9 +24,6 @@ import static java.util.Locale.US;
 import static java.util.regex.Pattern.quote;
 import static java.util.stream.Collectors.toMap;
 import static java.util.stream.Collectors.toSet;
-import static javax.faces.view.facelets.ResourceResolver.FACELETS_RESOURCE_RESOLVER_PARAM_NAME;
-import static javax.servlet.DispatcherType.FORWARD;
-import static javax.servlet.DispatcherType.REQUEST;
 import static org.omnifaces.facesviews.ExtensionAction.REDIRECT_TO_EXTENSIONLESS;
 import static org.omnifaces.facesviews.PathAction.SEND_404;
 import static org.omnifaces.util.Faces.getServletContext;
@@ -58,14 +58,14 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.faces.application.Application;
-import javax.faces.application.ViewHandler;
-import javax.faces.context.FacesContext;
-import javax.faces.webapp.FacesServlet;
-import javax.servlet.FilterRegistration;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.faces.application.Application;
+import jakarta.faces.application.ViewHandler;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.webapp.FacesServlet;
+import jakarta.servlet.FilterRegistration;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletRegistration;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.omnifaces.ApplicationInitializer;
 import org.omnifaces.ApplicationListener;

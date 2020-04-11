@@ -14,11 +14,11 @@ package org.omnifaces.cdi.contextparam;
 
 import static org.omnifaces.util.Beans.getQualifier;
 
-import javax.enterprise.context.Dependent;
-import javax.enterprise.inject.Produces;
-import javax.enterprise.inject.spi.InjectionPoint;
-import javax.inject.Inject;
-import javax.servlet.ServletContext;
+import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.inject.Produces;
+import jakarta.enterprise.inject.spi.InjectionPoint;
+import jakarta.inject.Inject;
+import jakarta.servlet.ServletContext;
 
 import org.omnifaces.cdi.ContextParam;
 

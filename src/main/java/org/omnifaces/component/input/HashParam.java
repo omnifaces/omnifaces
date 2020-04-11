@@ -12,12 +12,12 @@
  */
 package org.omnifaces.component.input;
 
+import static jakarta.faces.application.ResourceHandler.JSF_SCRIPT_LIBRARY_NAME;
+import static jakarta.faces.application.ResourceHandler.JSF_SCRIPT_RESOURCE_NAME;
+import static jakarta.faces.application.StateManager.IS_BUILDING_INITIAL_STATE;
+import static jakarta.faces.event.PhaseId.RENDER_RESPONSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
-import static javax.faces.application.ResourceHandler.JSF_SCRIPT_LIBRARY_NAME;
-import static javax.faces.application.ResourceHandler.JSF_SCRIPT_RESOURCE_NAME;
-import static javax.faces.application.StateManager.IS_BUILDING_INITIAL_STATE;
-import static javax.faces.event.PhaseId.RENDER_RESPONSE;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
@@ -40,11 +40,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.faces.component.FacesComponent;
-import javax.faces.component.UIForm;
-import javax.faces.component.UIViewParameter;
-import javax.faces.context.FacesContext;
-import javax.faces.convert.Converter;
+import jakarta.faces.component.FacesComponent;
+import jakarta.faces.component.UIForm;
+import jakarta.faces.component.UIViewParameter;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.convert.Converter;
 
 import org.omnifaces.event.HashChangeEvent;
 import org.omnifaces.util.Ajax;

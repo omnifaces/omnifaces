@@ -12,7 +12,7 @@
  */
 package org.omnifaces.facesviews;
 
-import static javax.servlet.RequestDispatcher.FORWARD_SERVLET_PATH;
+import static jakarta.servlet.RequestDispatcher.FORWARD_SERVLET_PATH;
 import static org.omnifaces.facesviews.FacesViews.FACES_VIEWS_ORIGINAL_SERVLET_PATH;
 import static org.omnifaces.facesviews.FacesViews.getFacesServletExtensions;
 import static org.omnifaces.facesviews.FacesViews.getMappedResources;
@@ -31,14 +31,14 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.faces.application.Application;
-import javax.faces.application.ViewHandler;
-import javax.faces.application.ViewHandlerWrapper;
-import javax.faces.context.FacesContext;
-import javax.faces.event.PostConstructApplicationEvent;
-import javax.servlet.Filter;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextListener;
+import jakarta.faces.application.Application;
+import jakarta.faces.application.ViewHandler;
+import jakarta.faces.application.ViewHandlerWrapper;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.PostConstructApplicationEvent;
+import jakarta.servlet.Filter;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextListener;
 
 import org.omnifaces.ApplicationProcessor;
 
@@ -52,7 +52,7 @@ import org.omnifaces.ApplicationProcessor;
  * which isn't the case before Faces initialization has been done.
  * <p>
  * Additionally, the view handler needs to be set BEFORE the first faces request is processed. Putting
- * the view handler setting code in a {@link Filter#init(javax.servlet.FilterConfig)} method only works
+ * the view handler setting code in a {@link Filter#init(jakarta.servlet.FilterConfig)} method only works
  * when all init methods are called during startup, OR when the filter filters every request.
  * <p>
  * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.

@@ -45,6 +45,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -67,8 +68,7 @@ import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
-import javax.servlet.http.Part;
-import javax.xml.bind.DatatypeConverter;
+import jakarta.servlet.http.Part;
 
 /**
  * <p>
@@ -878,8 +878,8 @@ public final class Utils {
 			InputStream raw = new ByteArrayInputStream(string.getBytes(UTF_8));
 			ByteArrayOutputStream deflated = new ByteArrayOutputStream();
 			stream(raw, new DeflaterOutputStream(deflated, new Deflater(Deflater.BEST_COMPRESSION)));
-			String base64 = DatatypeConverter.printBase64Binary(deflated.toByteArray());
-			return base64.replace('+', '-').replace('/', '_').replace("=", "");
+			String base64 = Base64.getUrlEncoder().encodeToString(deflated.toByteArray());
+			return base64.replace("=", "");
 		}
 		catch (IOException e) {
 			// This will occur when ZLIB and/or UTF-8 are not supported, but this is not to be expected these days.
@@ -901,8 +901,8 @@ public final class Utils {
 		}
 
 		try {
-			String base64 = string.replace('-', '+').replace('_', '/') + "===".substring(0, string.length() % BASE64_SEGMENT_LENGTH);
-			InputStream deflated = new ByteArrayInputStream(DatatypeConverter.parseBase64Binary(base64));
+			String base64 = string + "===".substring(0, string.length() % BASE64_SEGMENT_LENGTH);
+			InputStream deflated = new ByteArrayInputStream(Base64.getUrlDecoder().decode(base64));
 			return new String(toByteArray(new InflaterInputStream(deflated)), UTF_8);
 		}
 		catch (UnsupportedEncodingException e) {

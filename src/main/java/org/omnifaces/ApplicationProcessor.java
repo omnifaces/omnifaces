@@ -19,12 +19,12 @@ import static org.omnifaces.util.Faces.getServletContext;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.faces.application.Application;
-import javax.faces.application.ResourceHandler;
-import javax.faces.application.ResourceHandlerWrapper;
-import javax.faces.event.SystemEvent;
-import javax.faces.event.SystemEventListener;
-import javax.servlet.ServletContext;
+import jakarta.faces.application.Application;
+import jakarta.faces.application.ResourceHandler;
+import jakarta.faces.application.ResourceHandlerWrapper;
+import jakarta.faces.event.SystemEvent;
+import jakarta.faces.event.SystemEventListener;
+import jakarta.servlet.ServletContext;
 
 import org.omnifaces.component.search.MessagesKeywordResolver;
 import org.omnifaces.facesviews.FacesViews;

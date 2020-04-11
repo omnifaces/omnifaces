@@ -18,17 +18,17 @@ import static org.omnifaces.taghandler.DeferredTagHandlerHelper.createInstance;
 import java.io.IOException;
 import java.io.Serializable;
 
-import javax.faces.application.Application;
-import javax.faces.component.UIComponent;
-import javax.faces.component.ValueHolder;
-import javax.faces.context.FacesContext;
-import javax.faces.convert.FacesConverter;
-import javax.faces.view.facelets.ComponentHandler;
-import javax.faces.view.facelets.ConverterConfig;
-import javax.faces.view.facelets.ConverterHandler;
-import javax.faces.view.facelets.FaceletContext;
-import javax.faces.view.facelets.TagAttribute;
-import javax.faces.view.facelets.TagHandlerDelegate;
+import jakarta.faces.application.Application;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.ValueHolder;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.convert.FacesConverter;
+import jakarta.faces.view.facelets.ComponentHandler;
+import jakarta.faces.view.facelets.ConverterConfig;
+import jakarta.faces.view.facelets.ConverterHandler;
+import jakarta.faces.view.facelets.FaceletContext;
+import jakarta.faces.view.facelets.TagAttribute;
+import jakarta.faces.view.facelets.TagHandlerDelegate;
 
 import org.omnifaces.cdi.converter.ConverterManager;
 import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredAttributes;
@@ -47,11 +47,11 @@ import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDeleg
  * <h3>Usage</h3>
  * <p>
  * When you specify for example the standard <code>&lt;f:convertDateTime&gt;</code> by
- * <code>converterId="javax.faces.DateTime"</code>, then you'll be able to use all its attributes such as
+ * <code>converterId="jakarta.faces.DateTime"</code>, then you'll be able to use all its attributes such as
  * <code>pattern</code> and <code>locale</code> as per its documentation, but then with the possibility to supply
  * deferred value expressions.
  * <pre>
- * &lt;o:converter converterId="javax.faces.DateTime" pattern="#{item.pattern}" locale="#{item.locale}" /&gt;
+ * &lt;o:converter converterId="jakarta.faces.DateTime" pattern="#{item.pattern}" locale="#{item.locale}" /&gt;
  * </pre>
  * <p>
  * The converter ID of all standard JSF converters can be found in
@@ -85,7 +85,7 @@ public class Converter extends ConverterHandler implements DeferredTagHandler {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Create a {@link javax.faces.convert.Converter} based on the <code>binding</code> and/or <code>converterId</code>
+	 * Create a {@link jakarta.faces.convert.Converter} based on the <code>binding</code> and/or <code>converterId</code>
 	 * attributes as per the standard JSF <code>&lt;f:converter&gt;</code> implementation and collect the render time
 	 * attributes. Then create an anonymous <code>Converter</code> implementation which wraps the created
 	 * <code>Converter</code> and delegates the methods to it after setting the render time attributes. Finally set the
@@ -107,7 +107,7 @@ public class Converter extends ConverterHandler implements DeferredTagHandler {
 			return;
 		}
 
-		javax.faces.convert.Converter<Object> converter = createInstance(context, this, "converterId");
+		jakarta.faces.convert.Converter<Object> converter = createInstance(context, this, "converterId");
 		DeferredAttributes attributes = collectDeferredAttributes(context, this, converter);
 		((ValueHolder) parent).setConverter(new DeferredConverter() {
 			private static final long serialVersionUID = 1L;
@@ -154,7 +154,7 @@ public class Converter extends ConverterHandler implements DeferredTagHandler {
 	 *
 	 * @author Bauke Scholtz
 	 */
-	protected abstract static class DeferredConverter implements javax.faces.convert.Converter<Object>, Serializable {
+	protected abstract static class DeferredConverter implements jakarta.faces.convert.Converter<Object>, Serializable {
 		private static final long serialVersionUID = 1L;
 	}
 

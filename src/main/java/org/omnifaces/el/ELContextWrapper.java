@@ -14,12 +14,12 @@ package org.omnifaces.el;
 
 import java.util.Locale;
 
-import javax.el.ELContext;
-import javax.el.ELResolver;
-import javax.el.FunctionMapper;
-import javax.el.VariableMapper;
-import javax.faces.FacesWrapper;
-import javax.faces.application.ViewHandler;
+import jakarta.el.ELContext;
+import jakarta.el.ELResolver;
+import jakarta.el.FunctionMapper;
+import jakarta.el.VariableMapper;
+import jakarta.faces.FacesWrapper;
+import jakarta.faces.application.ViewHandler;
 
 /**
  * <p>Provides a simple implementation of {@link ELContext} that can

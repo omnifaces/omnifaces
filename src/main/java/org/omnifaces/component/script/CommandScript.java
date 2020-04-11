@@ -12,13 +12,13 @@
  */
 package org.omnifaces.component.script;
 
+import static jakarta.faces.application.ResourceHandler.JSF_SCRIPT_LIBRARY_NAME;
+import static jakarta.faces.application.ResourceHandler.JSF_SCRIPT_RESOURCE_NAME;
+import static jakarta.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME;
+import static jakarta.faces.event.PhaseId.APPLY_REQUEST_VALUES;
+import static jakarta.faces.event.PhaseId.INVOKE_APPLICATION;
 import static java.lang.Boolean.FALSE;
 import static java.lang.String.format;
-import static javax.faces.application.ResourceHandler.JSF_SCRIPT_LIBRARY_NAME;
-import static javax.faces.application.ResourceHandler.JSF_SCRIPT_RESOURCE_NAME;
-import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME;
-import static javax.faces.event.PhaseId.APPLY_REQUEST_VALUES;
-import static javax.faces.event.PhaseId.INVOKE_APPLICATION;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.util.Components.getParams;
@@ -28,14 +28,14 @@ import static org.omnifaces.util.Utils.isEmpty;
 import java.io.IOException;
 import java.util.regex.Pattern;
 
-import javax.faces.application.ResourceDependency;
-import javax.faces.component.FacesComponent;
-import javax.faces.component.UICommand;
-import javax.faces.component.UIComponent;
-import javax.faces.component.UIForm;
-import javax.faces.context.FacesContext;
-import javax.faces.context.ResponseWriter;
-import javax.faces.event.ActionEvent;
+import jakarta.faces.application.ResourceDependency;
+import jakarta.faces.component.FacesComponent;
+import jakarta.faces.component.UICommand;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.UIForm;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.context.ResponseWriter;
+import jakarta.faces.event.ActionEvent;
 
 import org.omnifaces.component.ParamHolder;
 import org.omnifaces.util.Json;
@@ -205,7 +205,7 @@ public class CommandScript extends UICommand {
 	 * });
 	 * </pre>
 	 * The first argument <code>clientId</code> is the client ID of the current component which will ultimately be sent
-	 * as <code>javax.faces.source</code> request parameter, so that the {@link #decode(FacesContext)} can properly
+	 * as <code>jakarta.faces.source</code> request parameter, so that the {@link #decode(FacesContext)} can properly
 	 * intercept on it. The second argument is the event type, which is irrelevant here. The third argument is a JS
 	 * object which holds the jsf.ajax.request options, such as additional request parameters from
 	 * <code>&lt;f:param&gt;</code>, the values of <code>execute</code> and <code>render</code> attributes and the
@@ -245,7 +245,7 @@ public class CommandScript extends UICommand {
 				.append(Json.encode(param.getValue())).append(";");
 		}
 
-		writer.append("o['javax.faces.behavior.event']='action';");
+		writer.append("o['jakarta.faces.behavior.event']='action';");
 		writer.append("o.execute='").append(resolveClientIds(context, getExecute())).append("';");
 		writer.append("o.render='").append(resolveClientIds(context, getRender())).append("';");
 		encodeOneventOption(context, getOnbegin(), getOncomplete());

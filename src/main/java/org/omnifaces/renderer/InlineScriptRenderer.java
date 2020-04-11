@@ -15,10 +15,10 @@ package org.omnifaces.renderer;
 import java.io.IOException;
 import java.io.Reader;
 
-import javax.faces.component.UIComponent;
-import javax.faces.component.UIOutput;
-import javax.faces.context.ResponseWriter;
-import javax.faces.render.FacesRenderer;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.UIOutput;
+import jakarta.faces.context.ResponseWriter;
+import jakarta.faces.render.FacesRenderer;
 
 import org.omnifaces.resourcehandler.CombinedResourceHandler;
 

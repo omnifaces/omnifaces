@@ -30,10 +30,11 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
+
+import jakarta.servlet.ServletContext;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

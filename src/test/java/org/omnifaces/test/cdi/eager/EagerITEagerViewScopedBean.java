@@ -17,8 +17,8 @@ import static java.lang.System.nanoTime;
 import java.io.Serializable;
 
 import javax.annotation.PostConstruct;
-import javax.faces.view.ViewScoped;
-import javax.inject.Named;
+import jakarta.faces.view.ViewScoped;
+import jakarta.inject.Named;
 
 import org.omnifaces.cdi.Eager;
 

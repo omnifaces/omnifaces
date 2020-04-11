@@ -12,16 +12,16 @@
  */
 package org.omnifaces.exceptionhandler;
 
-import static javax.faces.application.FacesMessage.SEVERITY_FATAL;
+import static jakarta.faces.application.FacesMessage.SEVERITY_FATAL;
 import static org.omnifaces.util.Messages.addGlobal;
 
 import java.util.Iterator;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.context.ExceptionHandler;
-import javax.faces.context.ExceptionHandlerWrapper;
-import javax.faces.context.FacesContext;
-import javax.faces.event.ExceptionQueuedEvent;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.ExceptionHandler;
+import jakarta.faces.context.ExceptionHandlerWrapper;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.ExceptionQueuedEvent;
 
 /**
  * <p>
@@ -86,7 +86,7 @@ public class FacesMessageExceptionHandler extends ExceptionHandlerWrapper {
 
 	/**
 	 * Create fatal message based on given exception which will in turn be passed to
-	 * {@link FacesContext#addMessage(String, javax.faces.application.FacesMessage)}.
+	 * {@link FacesContext#addMessage(String, jakarta.faces.application.FacesMessage)}.
 	 * The default implementation returns {@link Throwable#toString()}.
 	 * @param exception The exception to create fatal message for.
 	 * @return The fatal message created based on the given exception.

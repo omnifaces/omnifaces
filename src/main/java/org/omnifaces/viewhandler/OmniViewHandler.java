@@ -12,8 +12,8 @@
  */
 package org.omnifaces.viewhandler;
 
+import static jakarta.faces.component.visit.VisitHint.SKIP_ITERATION;
 import static java.lang.String.format;
-import static javax.faces.component.visit.VisitHint.SKIP_ITERATION;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.isUnloadRequest;
 import static org.omnifaces.taghandler.EnableRestorableView.isRestorableView;
 import static org.omnifaces.taghandler.EnableRestorableView.isRestorableViewRequest;
@@ -31,15 +31,15 @@ import static org.omnifaces.util.FacesLocal.redirectPermanent;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.faces.FacesException;
-import javax.faces.application.ViewExpiredException;
-import javax.faces.application.ViewHandler;
-import javax.faces.application.ViewHandlerWrapper;
-import javax.faces.component.UIForm;
-import javax.faces.component.UIViewRoot;
-import javax.faces.context.FacesContext;
-import javax.faces.event.PreDestroyViewMapEvent;
-import javax.faces.render.ResponseStateManager;
+import jakarta.faces.FacesException;
+import jakarta.faces.application.ViewExpiredException;
+import jakarta.faces.application.ViewHandler;
+import jakarta.faces.application.ViewHandlerWrapper;
+import jakarta.faces.component.UIForm;
+import jakarta.faces.component.UIViewRoot;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.PreDestroyViewMapEvent;
+import jakarta.faces.render.ResponseStateManager;
 
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.cdi.viewscope.ViewScopeManager;

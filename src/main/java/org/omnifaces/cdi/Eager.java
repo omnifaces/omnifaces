@@ -19,16 +19,16 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.RequestScoped;
-import javax.enterprise.context.SessionScoped;
-import javax.enterprise.util.Nonbinding;
-import javax.faces.context.FacesContext;
-import javax.faces.event.PhaseId;
-import javax.faces.webapp.FacesServlet;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.enterprise.context.SessionScoped;
+import jakarta.enterprise.util.Nonbinding;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.PhaseId;
+import jakarta.faces.webapp.FacesServlet;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import org.omnifaces.cdi.eager.EagerBeansPhaseListener;
 import org.omnifaces.cdi.eager.EagerBeansRepository;
@@ -57,7 +57,7 @@ import org.omnifaces.cdi.eager.EagerExtension;
  * Currently supported scopes:
  * <ol>
  * <li> CDI {@link RequestScoped}
- * <li> CDI {@link javax.faces.view.ViewScoped}
+ * <li> CDI {@link jakarta.faces.view.ViewScoped}
  * <li> OmniFaces {@link ViewScoped}
  * <li> CDI {@link SessionScoped}
  * <li> CDI {@link ApplicationScoped}

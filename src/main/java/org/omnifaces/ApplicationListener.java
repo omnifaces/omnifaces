@@ -17,9 +17,9 @@ import static org.omnifaces.util.Reflection.toClass;
 
 import java.util.logging.Logger;
 
-import javax.servlet.ServletContext;
-import javax.servlet.ServletContextEvent;
-import javax.servlet.annotation.WebListener;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
+import jakarta.servlet.annotation.WebListener;
 
 import org.omnifaces.cdi.Eager;
 import org.omnifaces.cdi.GraphicImageBean;
@@ -157,7 +157,7 @@ public class ApplicationListener extends DefaultServletContextListener {
 
 	private static void checkJSFAPIAvailable() {
 		try {
-			toClass("javax.faces.webapp.FacesServlet");
+			toClass("jakarta.faces.webapp.FacesServlet");
 		}
 		catch (Exception | LinkageError e) {
 			throw new IllegalStateException(ERROR_JSF_API_UNAVAILABLE, e);
@@ -166,7 +166,7 @@ public class ApplicationListener extends DefaultServletContextListener {
 
 	private static void checkJSF23Compatible() {
 		try {
-			toClass("javax.faces.annotation.FacesConfig");
+			toClass("jakarta.faces.annotation.FacesConfig");
 		}
 		catch (Exception | LinkageError e) {
 			throw new IllegalStateException(ERROR_JSF_API_INCOMPATIBLE, e);
@@ -175,16 +175,16 @@ public class ApplicationListener extends DefaultServletContextListener {
 
 	private static void checkCDIAPIAvailable() {
 		try {
-			toClass("javax.enterprise.inject.spi.BeanManager");
+			toClass("jakarta.enterprise.inject.spi.BeanManager");
 		}
 		catch (Exception | LinkageError e) {
 			throw new IllegalStateException(ERROR_CDI_API_UNAVAILABLE, e);
 		}
 	}
 
-	private static void checkCDI11Compatible() { // For now, until we really need CDI 2.0 features (scan for javax.enterprise.inject.spi.Prioritized then).
+	private static void checkCDI11Compatible() { // For now, until we really need CDI 2.0 features (scan for jakarta.enterprise.inject.spi.Prioritized then).
 		try {
-			toClass("javax.enterprise.inject.spi.CDI");
+			toClass("jakarta.enterprise.inject.spi.CDI");
 		}
 		catch (Exception | LinkageError e) {
 			throw new IllegalStateException(ERROR_CDI_API_INCOMPATIBLE, e);

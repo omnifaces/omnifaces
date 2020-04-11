@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.faces.application.Resource;
+import jakarta.faces.application.Resource;
 
 import org.omnifaces.util.Utils;
 

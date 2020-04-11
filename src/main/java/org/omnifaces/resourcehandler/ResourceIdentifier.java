@@ -14,7 +14,7 @@ package org.omnifaces.resourcehandler;
 
 import java.util.Map;
 
-import javax.faces.component.UIComponent;
+import jakarta.faces.component.UIComponent;
 
 /**
  * Convenience class to represent a resource identifier.

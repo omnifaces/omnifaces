@@ -15,11 +15,11 @@ package org.omnifaces.component.output;
 import java.io.IOException;
 import java.io.StringWriter;
 
-import javax.el.ValueExpression;
-import javax.faces.component.FacesComponent;
-import javax.faces.component.html.HtmlOutputFormat;
-import javax.faces.context.FacesContext;
-import javax.faces.context.ResponseWriter;
+import jakarta.el.ValueExpression;
+import jakarta.faces.component.FacesComponent;
+import jakarta.faces.component.html.HtmlOutputFormat;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.context.ResponseWriter;
 
 import org.omnifaces.util.State;
 

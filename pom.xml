@@ -11,11 +11,11 @@
 
 	<groupId>org.omnifaces</groupId>
 	<artifactId>omnifaces</artifactId>
-	<version>3.5-SNAPSHOT</version>
+	<version>4.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<name>OmniFaces</name>
-	<description>JSF 2.2+ utility library</description>
+	<description>Jakarta Faces 2.3+ utility library</description>
 	<url>http://omnifaces.org</url>
 	<organization>
 		<name>OmniFaces</name>
@@ -60,9 +60,8 @@
 	<properties>
 
 		<!-- Java versions. -->
-		<javase.version>1.8</javase.version>
-		<javaee.version>8</javaee.version>
-		<javadoc.version>1.8</javadoc.version>
+		<javase.version>11</javase.version>
+		<jakartaee.version>9.0.0-RC1</jakartaee.version>
 
 		<!-- Essential Maven defaults. -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -72,58 +71,56 @@
 		<maven.source.excludeResources>true</maven.source.excludeResources>
 
 		<!-- Test server versions. -->
-		<test.wildfly.version>16.0.0.Final</test.wildfly.version>
-		<test.tomee.version>8.0.0-M2</test.tomee.version>
-		<test.payara.version>5.191</test.payara.version>
+		<test.wildfly.version>19.0.0.Final</test.wildfly.version> <!-- TODO: JEE9 compatible version -->
+		<test.tomee.version>8.0.1</test.tomee.version> <!-- TODO: JEE9 compatible version -->
+		<test.payara.version>5.201</test.payara.version> <!-- TODO: JEE9 compatible version -->
 	</properties>
 
 	<dependencies>
 
-		<!-- Java EE 8 dependencies. -->
+		<!-- Jakarta EE 9 dependencies. -->
 		<dependency>
-			<groupId>javax.faces</groupId>
-			<artifactId>javax.faces-api</artifactId>
-			<version>2.3</version>
+			<groupId>jakarta.faces</groupId>
+			<artifactId>jakarta.faces-api</artifactId>
+			<version>3.0.0-RC1</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>javax.enterprise</groupId>
-			<artifactId>cdi-api</artifactId>
-			<version>2.0</version>
+			<groupId>jakarta.enterprise</groupId>
+			<artifactId>jakarta.enterprise.cdi-api</artifactId>
+			<version>3.0.0-M2</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>javax.validation</groupId>
-			<artifactId>validation-api</artifactId>
-			<version>2.0.0.Final</version>
-			<scope>provided</scope>
-		</dependency>
-
-		<!-- Java EE 7 dependencies. -->
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>3.1.0</version>
+			<groupId>jakarta.validation</groupId>
+			<artifactId>jakarta.validation-api</artifactId>
+			<version>3.0.0-M1</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>javax.el</groupId>
-			<artifactId>javax.el-api</artifactId>
-			<version>3.0.0</version>
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
+			<version>5.0.0-M1</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>javax.websocket</groupId>
-			<artifactId>javax.websocket-api</artifactId>
-			<version>1.1</version>
+			<groupId>jakarta.el</groupId>
+			<artifactId>jakarta.el-api</artifactId>
+			<version>4.0.0.M1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.websocket</groupId>
+			<artifactId>jakarta.websocket-api</artifactId>
+			<version>2.0.0-M1</version>
 			<scope>provided</scope>
 		</dependency>
 
 		<!-- Test dependencies.	-->
 		<dependency>
-			<groupId>javax</groupId>
-			<artifactId>javaee-web-api</artifactId>
-			<version>${javaee.version}.0</version>
+			<groupId>jakarta.platform</groupId>
+			<artifactId>jakarta.jakartaee-web-api</artifactId>
+			<version>${jakartaee.version}</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -280,7 +277,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.1.1</version>
+				<version>3.2.0</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -299,7 +296,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>3.0.1</version>
+				<version>3.2.1</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -314,9 +311,9 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.1.0</version>
+				<version>3.2.0</version>
 				<configuration>
-					<javadocVersion>${javadoc.version}</javadocVersion>
+					<javadocVersion>${javase.version}</javadocVersion>
 					<notimestamp>true</notimestamp>
 					<splitindex>true</splitindex>
 					<doctitle>OmniFaces API documentation</doctitle>
@@ -401,7 +398,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>3.1.1</version>
+					<version>3.1.2</version>
 					<executions>
 						<execution>
 							<phase>process-test-classes</phase>
@@ -417,7 +414,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-failsafe-plugin</artifactId>
-					<version>2.22.1</version>
+					<version>2.22.2</version>
 					<executions>
 						<execution>
 							<goals>

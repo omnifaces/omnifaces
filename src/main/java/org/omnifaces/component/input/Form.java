@@ -12,9 +12,9 @@
  */
 package org.omnifaces.component.input;
 
+import static jakarta.servlet.RequestDispatcher.ERROR_REQUEST_URI;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
-import static javax.servlet.RequestDispatcher.ERROR_REQUEST_URI;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeRequestParams;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeViewParams;
 import static org.omnifaces.component.input.Form.PropertyKeys.partialSubmit;
@@ -28,17 +28,17 @@ import static org.omnifaces.util.Utils.formatURLWithQueryString;
 
 import java.io.IOException;
 
-import javax.faces.application.Application;
-import javax.faces.application.ApplicationWrapper;
-import javax.faces.application.ResourceDependency;
-import javax.faces.application.ViewHandler;
-import javax.faces.application.ViewHandlerWrapper;
-import javax.faces.component.FacesComponent;
-import javax.faces.component.UICommand;
-import javax.faces.component.UIForm;
-import javax.faces.component.html.HtmlForm;
-import javax.faces.context.FacesContext;
-import javax.faces.context.FacesContextWrapper;
+import jakarta.faces.application.Application;
+import jakarta.faces.application.ApplicationWrapper;
+import jakarta.faces.application.ResourceDependency;
+import jakarta.faces.application.ViewHandler;
+import jakarta.faces.application.ViewHandlerWrapper;
+import jakarta.faces.component.FacesComponent;
+import jakarta.faces.component.UICommand;
+import jakarta.faces.component.UIForm;
+import jakarta.faces.component.html.HtmlForm;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.context.FacesContextWrapper;
 
 import org.omnifaces.taghandler.IgnoreValidationFailed;
 import org.omnifaces.util.State;

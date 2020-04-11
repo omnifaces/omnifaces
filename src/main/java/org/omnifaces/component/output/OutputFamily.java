@@ -12,7 +12,7 @@
  */
 package org.omnifaces.component.output;
 
-import javax.faces.component.UIComponentBase;
+import jakarta.faces.component.UIComponentBase;
 
 /**
  * Base class which is to be shared between all components of the Output family.

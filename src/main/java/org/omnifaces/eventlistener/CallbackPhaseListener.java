@@ -12,17 +12,18 @@
  */
 package org.omnifaces.eventlistener;
 
-import static javax.faces.event.PhaseId.ANY_PHASE;
+import static jakarta.faces.event.PhaseId.ANY_PHASE;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.FacesLocal.getRequestAttribute;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
-import javax.faces.context.FacesContext;
-import javax.faces.event.PhaseEvent;
-import javax.faces.event.PhaseId;
-import javax.faces.event.PhaseListener;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.PhaseEvent;
+import jakarta.faces.event.PhaseId;
+import jakarta.faces.event.PhaseListener;
 
 /**
  * <p>

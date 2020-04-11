@@ -14,11 +14,11 @@ package org.omnifaces.component.validator;
 
 import java.io.IOException;
 
-import javax.faces.application.Application;
-import javax.faces.component.UIComponentBase;
-import javax.faces.context.FacesContext;
-import javax.faces.event.PostValidateEvent;
-import javax.faces.event.PreValidateEvent;
+import jakarta.faces.application.Application;
+import jakarta.faces.component.UIComponentBase;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.PostValidateEvent;
+import jakarta.faces.event.PreValidateEvent;
 
 /**
  * Base class which is to be shared between all components of the Validator family.

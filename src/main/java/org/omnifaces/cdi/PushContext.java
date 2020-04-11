@@ -19,7 +19,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import javax.websocket.RemoteEndpoint.Async;
+import jakarta.websocket.RemoteEndpoint.Async;
 
 import org.omnifaces.cdi.push.Socket;
 import org.omnifaces.util.Json;

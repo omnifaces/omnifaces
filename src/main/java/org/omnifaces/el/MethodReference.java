@@ -16,7 +16,7 @@ import static org.omnifaces.util.Utils.coalesce;
 
 import java.lang.reflect.Method;
 
-import javax.el.MethodInfo;
+import jakarta.el.MethodInfo;
 
 /**
  * This encapsulates information about an EL method expression.

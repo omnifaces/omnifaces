@@ -14,9 +14,9 @@ package org.omnifaces.util;
 
 import static org.omnifaces.util.Utils.isOneInstanceOf;
 
-import javax.el.ELException;
-import javax.faces.FacesException;
-import javax.servlet.ServletException;
+import jakarta.el.ELException;
+import jakarta.faces.FacesException;
+import jakarta.servlet.ServletException;
 
 /**
  * <p>

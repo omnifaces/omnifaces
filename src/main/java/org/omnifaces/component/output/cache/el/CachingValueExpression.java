@@ -17,9 +17,9 @@ import static org.omnifaces.util.Faces.getContext;
 import java.io.Serializable;
 import java.util.Objects;
 
-import javax.el.ELContext;
-import javax.el.ValueExpression;
-import javax.faces.context.FacesContext;
+import jakarta.el.ELContext;
+import jakarta.el.ValueExpression;
+import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.component.output.Cache;
 import org.omnifaces.el.ValueExpressionWrapper;

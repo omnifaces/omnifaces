@@ -18,12 +18,12 @@ import static org.omnifaces.util.Components.getOptionalLabel;
 import static org.omnifaces.util.Components.setLabel;
 import static org.omnifaces.util.Utils.isEmpty;
 
-import javax.el.ValueExpression;
-import javax.faces.component.FacesComponent;
-import javax.faces.component.UIComponent;
-import javax.faces.component.html.HtmlOutputLabel;
-import javax.faces.event.ComponentSystemEvent;
-import javax.faces.event.PostRestoreStateEvent;
+import jakarta.el.ValueExpression;
+import jakarta.faces.component.FacesComponent;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.html.HtmlOutputLabel;
+import jakarta.faces.event.ComponentSystemEvent;
+import jakarta.faces.event.PostRestoreStateEvent;
 
 /**
  * <p>

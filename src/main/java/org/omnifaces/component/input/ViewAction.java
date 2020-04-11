@@ -17,14 +17,14 @@ import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
 
-import javax.faces.component.FacesComponent;
-import javax.faces.component.UIViewAction;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.ExternalContextWrapper;
-import javax.faces.context.FacesContext;
-import javax.faces.context.FacesContextWrapper;
-import javax.faces.event.ActionEvent;
-import javax.faces.event.FacesEvent;
+import jakarta.faces.component.FacesComponent;
+import jakarta.faces.component.UIViewAction;
+import jakarta.faces.context.ExternalContext;
+import jakarta.faces.context.ExternalContextWrapper;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.context.FacesContextWrapper;
+import jakarta.faces.event.ActionEvent;
+import jakarta.faces.event.FacesEvent;
 
 import org.omnifaces.util.State;
 
@@ -95,7 +95,7 @@ public class ViewAction extends UIViewAction {
 	/**
 	 * Only broadcast the action event when {@link UIViewAction#isRendered()} returns <code>true</code>. The default
 	 * implementation will always broadcast. The {@link UIViewAction#isRendered()} is by default only considered during
-	 * {@link #decode(javax.faces.context.FacesContext)}.
+	 * {@link #decode(jakarta.faces.context.FacesContext)}.
 	 * <p>
 	 * If the action event performs any redirect, then add any {@link #getMessage()} as a global flash warning message.
 	 */

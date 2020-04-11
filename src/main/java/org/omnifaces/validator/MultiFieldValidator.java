@@ -14,9 +14,9 @@ package org.omnifaces.validator;
 
 import java.util.List;
 
-import javax.faces.component.UIInput;
-import javax.faces.context.FacesContext;
-import javax.faces.validator.ValidatorException;
+import jakarta.faces.component.UIInput;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.validator.ValidatorException;
 
 import org.omnifaces.component.validator.ValidateMultipleFields;
 

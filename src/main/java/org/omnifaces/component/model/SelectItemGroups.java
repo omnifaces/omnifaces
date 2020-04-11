@@ -21,13 +21,13 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import javax.el.ValueExpression;
-import javax.faces.component.FacesComponent;
-import javax.faces.component.UIComponent;
-import javax.faces.component.UISelectItem;
-import javax.faces.component.UISelectItems;
-import javax.faces.model.SelectItem;
-import javax.faces.model.SelectItemGroup;
+import jakarta.el.ValueExpression;
+import jakarta.faces.component.FacesComponent;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.UISelectItem;
+import jakarta.faces.component.UISelectItems;
+import jakarta.faces.model.SelectItem;
+import jakarta.faces.model.SelectItemGroup;
 
 import org.omnifaces.el.ScopedRunner;
 
@@ -35,7 +35,7 @@ import org.omnifaces.el.ScopedRunner;
  * <p>
  * The <code>o:selectItemGroups</code> is an extension of {@link UISelectItems} which allows you to iterate over a
  * nested collection representing groups of select items. This is basically the {@link UIComponent} counterpart of
- * <code>javax.faces.model.SelectItemGroup</code>. There is no equivalent (yet) in the standard JSF API. Currently the
+ * <code>jakarta.faces.model.SelectItemGroup</code>. There is no equivalent (yet) in the standard JSF API. Currently the
  * only way to represent {@link SelectItemGroup} in UI is to manually create and populate them in a backing bean which
  * can end up to be quite verbose.
  *

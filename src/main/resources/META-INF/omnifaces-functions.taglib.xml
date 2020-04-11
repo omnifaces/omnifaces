@@ -300,7 +300,7 @@
 		</description>
 		<function-name>iterableToModel</function-name>
 		<function-class>org.omnifaces.el.functions.Converters</function-class>
-		<function-signature>javax.faces.model.DataModel iterableToModel(java.lang.Iterable)</function-signature>
+		<function-signature>jakarta.faces.model.DataModel iterableToModel(java.lang.Iterable)</function-signature>
 	</function>
 
 	<function>
@@ -871,7 +871,7 @@
 		</description>
 		<function-name>evalAttribute</function-name>
 		<function-class>org.omnifaces.el.functions.Components</function-class>
-		<function-signature>java.lang.Object evalAttribute(javax.faces.component.UIComponent, java.lang.String)</function-signature>
+		<function-signature>java.lang.Object evalAttribute(jakarta.faces.component.UIComponent, java.lang.String)</function-signature>
 	</function>
 
 	<function>

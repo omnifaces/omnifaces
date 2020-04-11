@@ -18,19 +18,19 @@ import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import javax.enterprise.context.ContextNotActiveException;
-import javax.enterprise.context.spi.AlterableContext;
-import javax.enterprise.context.spi.Context;
-import javax.enterprise.context.spi.Contextual;
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.Produces;
-import javax.enterprise.inject.Stereotype;
-import javax.enterprise.inject.Typed;
-import javax.enterprise.inject.spi.Annotated;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.CDI;
-import javax.enterprise.inject.spi.InjectionPoint;
+import jakarta.enterprise.context.ContextNotActiveException;
+import jakarta.enterprise.context.spi.AlterableContext;
+import jakarta.enterprise.context.spi.Context;
+import jakarta.enterprise.context.spi.Contextual;
+import jakarta.enterprise.context.spi.CreationalContext;
+import jakarta.enterprise.inject.Produces;
+import jakarta.enterprise.inject.Stereotype;
+import jakarta.enterprise.inject.Typed;
+import jakarta.enterprise.inject.spi.Annotated;
+import jakarta.enterprise.inject.spi.Bean;
+import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.enterprise.inject.spi.CDI;
+import jakarta.enterprise.inject.spi.InjectionPoint;
 
 /**
  * <p>
@@ -147,8 +147,8 @@ public final class Beans {
 	 * @param <T> The expected return type.
 	 * @param bean The CDI managed bean representation.
 	 * @return The CDI managed bean reference (proxy) of the given bean, or <code>null</code> if there is none.
-	 * @see BeanManager#createCreationalContext(javax.enterprise.context.spi.Contextual)
-	 * @see BeanManager#getReference(Bean, java.lang.reflect.Type, javax.enterprise.context.spi.CreationalContext)
+	 * @see BeanManager#createCreationalContext(jakarta.enterprise.context.spi.Contextual)
+	 * @see BeanManager#getReference(Bean, java.lang.reflect.Type, jakarta.enterprise.context.spi.CreationalContext)
 	 */
 	public static <T> T getReference(Bean<T> bean) {
 		return BeansLocal.getReference(getManager(), bean);
@@ -197,8 +197,8 @@ public final class Beans {
 	 * the <code>create</code> argument is <code>false</code>.
 	 * @since 1.7
 	 * @see BeanManager#getContext(Class)
-	 * @see BeanManager#createCreationalContext(javax.enterprise.context.spi.Contextual)
-	 * @see Context#get(javax.enterprise.context.spi.Contextual, javax.enterprise.context.spi.CreationalContext)
+	 * @see BeanManager#createCreationalContext(jakarta.enterprise.context.spi.Contextual)
+	 * @see Context#get(jakarta.enterprise.context.spi.Contextual, jakarta.enterprise.context.spi.CreationalContext)
 	 */
 	public static <T> T getInstance(Bean<T> bean, boolean create) {
 		return BeansLocal.getInstance(getManager(), bean, create);
@@ -227,7 +227,7 @@ public final class Beans {
 	 * @since 1.7
 	 * @see BeanManager#getBeans(java.lang.reflect.Type, Annotation...)
 	 * @see BeanManager#getContext(Class)
-	 * @see Context#get(javax.enterprise.context.spi.Contextual)
+	 * @see Context#get(jakarta.enterprise.context.spi.Contextual)
 	 */
 	public static <S extends Annotation> Map<Object, String> getActiveInstances(Class<S> scope) {
 		return BeansLocal.getActiveInstances(getManager(), scope);
@@ -241,7 +241,7 @@ public final class Beans {
 	 * @since 2.0
 	 * @see #resolve(Class, Annotation...)
 	 * @see BeanManager#getContext(Class)
-	 * @see AlterableContext#destroy(javax.enterprise.context.spi.Contextual)
+	 * @see AlterableContext#destroy(jakarta.enterprise.context.spi.Contextual)
 	 */
 	public static <T> void destroy(Class<T> beanClass, Annotation... qualifiers) {
 		BeansLocal.destroy(getManager(), beanClass, qualifiers);
@@ -255,7 +255,7 @@ public final class Beans {
 	 * context.
 	 * @since 2.0
 	 * @see BeanManager#getContext(Class)
-	 * @see AlterableContext#destroy(javax.enterprise.context.spi.Contextual)
+	 * @see AlterableContext#destroy(jakarta.enterprise.context.spi.Contextual)
 	 */
 	public static <T> void destroy(Bean<T> bean) {
 		BeansLocal.destroy(getManager(), bean);
@@ -299,7 +299,7 @@ public final class Beans {
 	 * of said method.
 	 *
 	 * @param creationalContext a {@link CreationalContext} used to manage objects with a
-	 *        {@link javax.enterprise.context.Dependent} scope
+	 *        {@link jakarta.enterprise.context.Dependent} scope
 	 * @return the current injection point when called from a context where injection is taking place (e.g. from a producer)
 	 */
 	public static InjectionPoint getCurrentInjectionPoint(CreationalContext<?> creationalContext) {

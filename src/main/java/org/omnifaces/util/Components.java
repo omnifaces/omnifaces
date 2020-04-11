@@ -12,18 +12,18 @@
  */
 package org.omnifaces.util;
 
+import static jakarta.faces.component.UIComponent.getCompositeComponentParent;
+import static jakarta.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
+import static jakarta.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME;
+import static jakarta.faces.component.visit.VisitContext.createVisitContext;
+import static jakarta.faces.component.visit.VisitHint.SKIP_ITERATION;
+import static jakarta.faces.component.visit.VisitResult.ACCEPT;
 import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.logging.Level.FINEST;
 import static java.util.regex.Pattern.quote;
-import static javax.faces.component.UIComponent.getCompositeComponentParent;
-import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
-import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME;
-import static javax.faces.component.visit.VisitContext.createVisitContext;
-import static javax.faces.component.visit.VisitHint.SKIP_ITERATION;
-import static javax.faces.component.visit.VisitResult.ACCEPT;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getELContext;
 import static org.omnifaces.util.Faces.getFaceletContext;
@@ -54,42 +54,42 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.el.MethodExpression;
-import javax.el.ValueExpression;
-import javax.faces.application.ViewHandler;
-import javax.faces.component.ActionSource2;
-import javax.faces.component.EditableValueHolder;
-import javax.faces.component.NamingContainer;
-import javax.faces.component.UICommand;
-import javax.faces.component.UIComponent;
-import javax.faces.component.UIComponentBase;
-import javax.faces.component.UIForm;
-import javax.faces.component.UIInput;
-import javax.faces.component.UIMessage;
-import javax.faces.component.UIMessages;
-import javax.faces.component.UINamingContainer;
-import javax.faces.component.UIOutput;
-import javax.faces.component.UIParameter;
-import javax.faces.component.UIViewRoot;
-import javax.faces.component.behavior.AjaxBehavior;
-import javax.faces.component.behavior.BehaviorBase;
-import javax.faces.component.behavior.ClientBehavior;
-import javax.faces.component.behavior.ClientBehaviorHolder;
-import javax.faces.component.visit.VisitCallback;
-import javax.faces.component.visit.VisitContext;
-import javax.faces.component.visit.VisitHint;
-import javax.faces.component.visit.VisitResult;
-import javax.faces.context.FacesContext;
-import javax.faces.context.FacesContextWrapper;
-import javax.faces.context.ResponseWriter;
-import javax.faces.event.ActionEvent;
-import javax.faces.event.ActionListener;
-import javax.faces.event.AjaxBehaviorEvent;
-import javax.faces.event.BehaviorListener;
-import javax.faces.event.MethodExpressionActionListener;
-import javax.faces.render.RenderKit;
-import javax.faces.view.ViewDeclarationLanguage;
-import javax.faces.view.facelets.FaceletContext;
+import jakarta.el.MethodExpression;
+import jakarta.el.ValueExpression;
+import jakarta.faces.application.ViewHandler;
+import jakarta.faces.component.ActionSource2;
+import jakarta.faces.component.EditableValueHolder;
+import jakarta.faces.component.NamingContainer;
+import jakarta.faces.component.UICommand;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.UIComponentBase;
+import jakarta.faces.component.UIForm;
+import jakarta.faces.component.UIInput;
+import jakarta.faces.component.UIMessage;
+import jakarta.faces.component.UIMessages;
+import jakarta.faces.component.UINamingContainer;
+import jakarta.faces.component.UIOutput;
+import jakarta.faces.component.UIParameter;
+import jakarta.faces.component.UIViewRoot;
+import jakarta.faces.component.behavior.AjaxBehavior;
+import jakarta.faces.component.behavior.BehaviorBase;
+import jakarta.faces.component.behavior.ClientBehavior;
+import jakarta.faces.component.behavior.ClientBehaviorHolder;
+import jakarta.faces.component.visit.VisitCallback;
+import jakarta.faces.component.visit.VisitContext;
+import jakarta.faces.component.visit.VisitHint;
+import jakarta.faces.component.visit.VisitResult;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.context.FacesContextWrapper;
+import jakarta.faces.context.ResponseWriter;
+import jakarta.faces.event.ActionEvent;
+import jakarta.faces.event.ActionListener;
+import jakarta.faces.event.AjaxBehaviorEvent;
+import jakarta.faces.event.BehaviorListener;
+import jakarta.faces.event.MethodExpressionActionListener;
+import jakarta.faces.render.RenderKit;
+import jakarta.faces.view.ViewDeclarationLanguage;
+import jakarta.faces.view.facelets.FaceletContext;
 
 import org.omnifaces.component.ParamHolder;
 import org.omnifaces.component.SimpleParam;
@@ -836,7 +836,7 @@ public final class Components {
 		// The current implementation just walks through the request parameter map instead.
 
 		for (String name : context.getExternalContext().getRequestParameterMap().keySet()) {
-			if (name.startsWith("javax.faces.")) {
+			if (name.startsWith("jakarta.faces.")) {
 				continue; // Quick skip.
 			}
 
@@ -917,7 +917,7 @@ public final class Components {
 		}
 
 		for (String name : params.keySet()) {
-			if (name.startsWith("javax.faces.")) {
+			if (name.startsWith("jakarta.faces.")) {
 				continue; // Quick skip.
 			}
 
@@ -1285,7 +1285,7 @@ public final class Components {
 	 * </ul>
 	 * @param expression The EL expression to create an action listener method expression for.
 	 * @return The created action listener method expression, ready to be used as
-	 * {@link UICommand#addActionListener(javax.faces.event.ActionListener)}.
+	 * {@link UICommand#addActionListener(jakarta.faces.event.ActionListener)}.
 	 */
 	public static MethodExpressionActionListener createActionListenerMethodExpression(String expression) {
 		return new MethodExpressionActionListener(createVoidMethodExpression(expression, ActionEvent.class));

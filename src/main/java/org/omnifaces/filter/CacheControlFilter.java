@@ -22,11 +22,11 @@ import static org.omnifaces.util.Servlets.setCacheHeaders;
 
 import java.io.IOException;
 
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 import org.omnifaces.util.Servlets;
 
@@ -37,7 +37,7 @@ import org.omnifaces.util.Servlets;
  * <p>
  * By default, when no initialization parameters are specified, the filter will instruct the client (generally, the
  * webbrowser) to <strong>not</strong> cache the response. This is recommended on dynamic pages with stateful forms with
- * a <code>javax.faces.ViewState</code> hidden field. If such a page were cached, and the enduser navigates to it by
+ * a <code>jakarta.faces.ViewState</code> hidden field. If such a page were cached, and the enduser navigates to it by
  * webbrowser's back button, and then re-submits it, then the enduser would face a
  * <a href="http://stackoverflow.com/a/3642969/157882"><code>ViewExpiredException</code></a>.
  * <p>
@@ -159,7 +159,7 @@ import org.omnifaces.util.Servlets;
  *
  * <h3>JSF development stage</h3>
  * <p>To speed up development, caching by this filter is <strong>disabled</strong> when JSF project stage is set to
- * <code>Development</code> as per {@link Servlets#isFacesDevelopment(javax.servlet.ServletContext)}.
+ * <code>Development</code> as per {@link Servlets#isFacesDevelopment(jakarta.servlet.ServletContext)}.
  *
  * @author Bauke Scholtz
  * @since 1.7

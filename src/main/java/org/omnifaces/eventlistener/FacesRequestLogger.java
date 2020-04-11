@@ -12,16 +12,16 @@
  */
 package org.omnifaces.eventlistener;
 
+import static jakarta.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
+import static jakarta.faces.event.PhaseId.ANY_PHASE;
+import static jakarta.faces.event.PhaseId.RENDER_RESPONSE;
+import static jakarta.faces.event.PhaseId.RESTORE_VIEW;
+import static jakarta.faces.render.ResponseStateManager.VIEW_STATE_PARAM;
 import static java.lang.System.nanoTime;
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.SEVERE;
 import static java.util.regex.Pattern.CASE_INSENSITIVE;
 import static java.util.stream.Collectors.toList;
-import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
-import static javax.faces.event.PhaseId.ANY_PHASE;
-import static javax.faces.event.PhaseId.RENDER_RESPONSE;
-import static javax.faces.event.PhaseId.RESTORE_VIEW;
-import static javax.faces.render.ResponseStateManager.VIEW_STATE_PARAM;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
 import static org.omnifaces.util.Components.getActionExpressionsAndListeners;
 import static org.omnifaces.util.Components.getCurrentActionSource;
@@ -50,12 +50,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
-import javax.faces.application.FacesMessage;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.event.PhaseEvent;
-import javax.faces.event.PhaseId;
-import javax.faces.event.PhaseListener;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.PhaseEvent;
+import jakarta.faces.event.PhaseId;
+import jakarta.faces.event.PhaseListener;
 
 import org.omnifaces.util.Components;
 import org.omnifaces.util.Faces;
@@ -81,7 +81,7 @@ import org.omnifaces.util.Faces;
  *     <li><code>event</code>: the action event name, if any.</li>
  *     <li><code>methods</code>: the action methods, as obtained by {@link Components#getActionExpressionsAndListeners(UIComponent)}</li>
  *     <li><code>validationFailed</code>: whether JSF validation has failed.</li></ul></li>
- * <li><code>params</code>: the HTTP request parameters whereby any parameters whose name matches <code>javax.faces.*</code> are skipped,
+ * <li><code>params</code>: the HTTP request parameters whereby any parameters whose name matches <code>jakarta.faces.*</code> are skipped,
  * and whose name ends with <code>password</code> or <code>token</code> are masked with value <code>********</code>.</li>
  * <li><code>messages</code>: all Faces messages added so far.</li>
  * <li><code>timer</code>: the duration of each phase measured in milliseconds, or -1 if the phase has been skipped, composed of:<ul>
@@ -209,7 +209,7 @@ public class FacesRequestLogger extends DefaultPhaseListener {
 		for (Entry<String, String[]> entry : params) {
 			String name = entry.getKey();
 
-			if (name.startsWith("javax.faces.")) {
+			if (name.startsWith("jakarta.faces.")) {
 				continue; // JSF internal stuff is not interesting.
 			}
 

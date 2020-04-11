@@ -19,16 +19,16 @@ import static org.omnifaces.util.Servlets.getRequestRelativeURIWithoutPathParame
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
-import javax.servlet.ServletRequestEvent;
-import javax.servlet.ServletRequestListener;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSessionEvent;
-import javax.servlet.http.HttpSessionListener;
+import jakarta.servlet.ServletRequestEvent;
+import jakarta.servlet.ServletRequestListener;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSessionEvent;
+import jakarta.servlet.http.HttpSessionListener;
 
 /**
  * <p>
  * A web listener that instantiates eager session beans and request/view beans by request URI. This is auto-registered
- * by {@link EagerBeansRepository#instantiateApplicationScopedAndRegisterListenerIfNecessary(javax.servlet.ServletContext)}
+ * by {@link EagerBeansRepository#instantiateApplicationScopedAndRegisterListenerIfNecessary(jakarta.servlet.ServletContext)}
  * when any eager session beans or request/view beans by request URI are available.
  *
  * @since 2.0

@@ -12,10 +12,10 @@
  */
 package org.omnifaces.el;
 
-import javax.el.ELContext;
-import javax.el.ValueExpression;
-import javax.el.ValueReference;
-import javax.faces.FacesWrapper;
+import jakarta.el.ELContext;
+import jakarta.el.ValueExpression;
+import jakarta.el.ValueReference;
+import jakarta.faces.FacesWrapper;
 
 public class ValueExpressionWrapper extends ValueExpression implements FacesWrapper<ValueExpression>  {
 

@@ -20,7 +20,7 @@ var OmniFaces = OmniFaces || {
 	// "Constant" fields ----------------------------------------------------------------------------------------------
 
 	EVENT: "omnifaces.event",
-	VIEW_STATE_PARAM: "javax.faces.ViewState",
-	CLIENT_WINDOW_PARAM: "javax.faces.ClientWindow"
+	VIEW_STATE_PARAM: "jakarta.faces.ViewState",
+	CLIENT_WINDOW_PARAM: "jakarta.faces.ClientWindow"
 	
 };

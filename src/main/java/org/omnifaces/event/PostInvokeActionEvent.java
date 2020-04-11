@@ -12,14 +12,14 @@
  */
 package org.omnifaces.event;
 
-import javax.faces.component.UICommand;
-import javax.faces.component.UIComponent;
-import javax.faces.component.UIForm;
-import javax.faces.component.UIInput;
-import javax.faces.component.UIViewRoot;
-import javax.faces.event.ComponentSystemEvent;
-import javax.faces.event.NamedEvent;
-import javax.faces.event.PhaseId;
+import jakarta.faces.component.UICommand;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.UIForm;
+import jakarta.faces.component.UIInput;
+import jakarta.faces.component.UIViewRoot;
+import jakarta.faces.event.ComponentSystemEvent;
+import jakarta.faces.event.NamedEvent;
+import jakarta.faces.event.PhaseId;
 
 import org.omnifaces.eventlistener.InvokeActionEventListener;
 

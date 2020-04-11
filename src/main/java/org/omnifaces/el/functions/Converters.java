@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.faces.model.DataModel;
+import jakarta.faces.model.DataModel;
 
 import org.omnifaces.model.IterableDataModel;
 import org.omnifaces.util.Json;

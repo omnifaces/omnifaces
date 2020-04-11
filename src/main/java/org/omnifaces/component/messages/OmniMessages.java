@@ -12,10 +12,10 @@
  */
 package org.omnifaces.component.messages;
 
-import javax.el.ValueExpression;
-import javax.faces.application.FacesMessage;
-import javax.faces.component.FacesComponent;
-import javax.faces.component.html.HtmlMessages;
+import jakarta.el.ValueExpression;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.component.FacesComponent;
+import jakarta.faces.component.html.HtmlMessages;
 
 import org.omnifaces.renderer.MessagesRenderer;
 import org.omnifaces.util.Messages;

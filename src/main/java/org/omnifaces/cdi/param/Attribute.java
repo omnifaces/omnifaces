@@ -17,8 +17,8 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
-import javax.faces.convert.Converter;
-import javax.faces.validator.Validator;
+import jakarta.faces.convert.Converter;
+import jakarta.faces.validator.Validator;
 
 /**
  * Attribute for a {@link Converter} or {@link Validator} that is applied to a value retrieved from an HTTP request and

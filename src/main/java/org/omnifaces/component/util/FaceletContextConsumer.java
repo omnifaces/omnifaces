@@ -12,7 +12,7 @@
  */
 package org.omnifaces.component.util;
 
-import javax.faces.view.facelets.FaceletContext;
+import jakarta.faces.view.facelets.FaceletContext;
 
 import org.omnifaces.taghandler.ComponentExtraHandler;
 

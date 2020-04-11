@@ -12,8 +12,8 @@
  */
 package org.omnifaces.eventlistener;
 
-import javax.faces.event.SystemEvent;
-import javax.faces.event.SystemEventListener;
+import jakarta.faces.event.SystemEvent;
+import jakarta.faces.event.SystemEventListener;
 
 /**
  * Default implementation for the SystemEventListener interface.

@@ -18,13 +18,13 @@ import static org.omnifaces.util.Faces.setViewAttribute;
 import static org.omnifaces.util.Messages.createError;
 import static org.omnifaces.util.Utils.isOneOf;
 
-import javax.faces.component.UIComponent;
-import javax.faces.component.UISelectMany;
-import javax.faces.context.FacesContext;
-import javax.faces.convert.Converter;
-import javax.faces.convert.ConverterException;
-import javax.faces.convert.EnumConverter;
-import javax.faces.convert.FacesConverter;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.UISelectMany;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.convert.Converter;
+import jakarta.faces.convert.ConverterException;
+import jakarta.faces.convert.EnumConverter;
+import jakarta.faces.convert.FacesConverter;
 
 /**
  * <p>

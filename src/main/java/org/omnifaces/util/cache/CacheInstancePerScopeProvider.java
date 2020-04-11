@@ -14,7 +14,7 @@ package org.omnifaces.util.cache;
 
 import java.util.Map;
 
-import javax.faces.context.FacesContext;
+import jakarta.faces.context.FacesContext;
 
 /**
  * Base class for Cache providers where for each scope a new instance of the cache is created if for that scope no instance

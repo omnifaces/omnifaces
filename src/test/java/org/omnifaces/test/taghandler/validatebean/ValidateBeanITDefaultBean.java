@@ -15,11 +15,11 @@ import static org.omnifaces.util.Faces.isValidationFailed;
 import static org.omnifaces.util.Messages.addGlobalInfo;
 import static org.omnifaces.util.Messages.addGlobalWarn;
 
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Named;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Named;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 @Named
 @RequestScoped

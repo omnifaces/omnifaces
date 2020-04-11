@@ -21,9 +21,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.Date;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Stereotype;
-import javax.inject.Named;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Stereotype;
+import jakarta.inject.Named;
 
 import org.omnifaces.component.output.GraphicImage;
 import org.omnifaces.el.ExpressionInspector;

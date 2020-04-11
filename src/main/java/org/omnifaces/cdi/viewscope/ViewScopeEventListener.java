@@ -14,10 +14,10 @@ package org.omnifaces.cdi.viewscope;
 
 import static org.omnifaces.util.Beans.getReference;
 
-import javax.faces.component.UIViewRoot;
-import javax.faces.event.PreDestroyViewMapEvent;
-import javax.faces.event.SystemEvent;
-import javax.faces.event.ViewMapListener;
+import jakarta.faces.component.UIViewRoot;
+import jakarta.faces.event.PreDestroyViewMapEvent;
+import jakarta.faces.event.SystemEvent;
+import jakarta.faces.event.ViewMapListener;
 
 /**
  * Listener for JSF view scope destroy events so that view scope manager can be notified.

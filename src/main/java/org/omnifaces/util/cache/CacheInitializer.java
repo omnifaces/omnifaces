@@ -19,9 +19,9 @@ import static org.omnifaces.util.Platform.getFacesServletRegistration;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.servlet.FilterRegistration;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration;
+import jakarta.servlet.FilterRegistration;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletRegistration;
 
 import org.omnifaces.ApplicationListener;
 import org.omnifaces.filter.OnDemandResponseBufferFilter;

@@ -15,11 +15,11 @@ package org.omnifaces.component;
 import java.util.Iterator;
 import java.util.Map;
 
-import javax.faces.component.EditableValueHolder;
-import javax.faces.component.StateHelper;
-import javax.faces.component.UIComponent;
-import javax.faces.component.UIComponentBase;
-import javax.faces.context.FacesContext;
+import jakarta.faces.component.EditableValueHolder;
+import jakarta.faces.component.StateHelper;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.UIComponentBase;
+import jakarta.faces.context.FacesContext;
 
 /**
  * Helper class to save and restore state of an {@link EditableValueHolder}.

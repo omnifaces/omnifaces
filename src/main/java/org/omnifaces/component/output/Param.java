@@ -17,13 +17,13 @@ import static org.omnifaces.util.FacesLocal.createConverter;
 import java.io.IOException;
 import java.io.StringWriter;
 
-import javax.faces.FacesException;
-import javax.faces.component.FacesComponent;
-import javax.faces.component.UIParameter;
-import javax.faces.component.ValueHolder;
-import javax.faces.context.FacesContext;
-import javax.faces.context.ResponseWriter;
-import javax.faces.convert.Converter;
+import jakarta.faces.FacesException;
+import jakarta.faces.component.FacesComponent;
+import jakarta.faces.component.UIParameter;
+import jakarta.faces.component.ValueHolder;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.context.ResponseWriter;
+import jakarta.faces.convert.Converter;
 
 import org.omnifaces.component.ParamHolder;
 

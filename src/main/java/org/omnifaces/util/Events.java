@@ -16,16 +16,16 @@ import static org.omnifaces.util.Faces.getApplication;
 import static org.omnifaces.util.Faces.getCurrentPhaseId;
 import static org.omnifaces.util.Faces.getViewRoot;
 
-import javax.faces.application.Application;
-import javax.faces.component.UIComponent;
-import javax.faces.component.UIViewRoot;
-import javax.faces.event.ComponentSystemEvent;
-import javax.faces.event.ComponentSystemEventListener;
-import javax.faces.event.PhaseEvent;
-import javax.faces.event.PhaseId;
-import javax.faces.event.PhaseListener;
-import javax.faces.event.SystemEvent;
-import javax.faces.event.SystemEventListener;
+import jakarta.faces.application.Application;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.UIViewRoot;
+import jakarta.faces.event.ComponentSystemEvent;
+import jakarta.faces.event.ComponentSystemEventListener;
+import jakarta.faces.event.PhaseEvent;
+import jakarta.faces.event.PhaseId;
+import jakarta.faces.event.PhaseListener;
+import jakarta.faces.event.SystemEvent;
+import jakarta.faces.event.SystemEventListener;
 
 import org.omnifaces.eventlistener.CallbackPhaseListener;
 import org.omnifaces.eventlistener.DefaultPhaseListener;
@@ -301,7 +301,7 @@ public final class Events {
 	/**
 	 * Unsubscribe the given event listener on the given event from the given component. Normally, you would use
 	 * {@link UIComponent#unsubscribeFromEvent(Class, ComponentSystemEventListener)} for this, but this wouldn't work
-	 * when executed inside {@link ComponentSystemEventListener#processEvent(javax.faces.event.ComponentSystemEvent)},
+	 * when executed inside {@link ComponentSystemEventListener#processEvent(jakarta.faces.event.ComponentSystemEvent)},
 	 * as it would otherwise end up in a <code>ConcurrentModificationException</code> while JSF is iterating over all
 	 * system event listeners. The trick is to perform the unsubscribe during the after phase of the current request
 	 * phase {@link #subscribeToRequestAfterPhase(PhaseId, org.omnifaces.util.Callback.Void)}.

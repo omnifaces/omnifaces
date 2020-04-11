@@ -12,9 +12,9 @@
  */
 package org.omnifaces.context;
 
-import javax.faces.context.FacesContext;
-import javax.faces.context.PartialViewContext;
-import javax.faces.context.PartialViewContextFactory;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.context.PartialViewContext;
+import jakarta.faces.context.PartialViewContextFactory;
 
 /**
  * This partial view context factory takes care that the {@link OmniPartialViewContext} is properly initialized.

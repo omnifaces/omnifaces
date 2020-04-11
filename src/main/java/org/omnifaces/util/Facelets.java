@@ -14,10 +14,10 @@ package org.omnifaces.util;
 
 import static java.lang.String.format;
 
-import javax.el.ValueExpression;
-import javax.enterprise.inject.Typed;
-import javax.faces.view.facelets.FaceletContext;
-import javax.faces.view.facelets.TagAttribute;
+import jakarta.el.ValueExpression;
+import jakarta.enterprise.inject.Typed;
+import jakarta.faces.view.facelets.FaceletContext;
+import jakarta.faces.view.facelets.TagAttribute;
 
 /**
  * <p>

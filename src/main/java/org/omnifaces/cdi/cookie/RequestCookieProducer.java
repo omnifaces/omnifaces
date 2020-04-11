@@ -15,11 +15,11 @@ package org.omnifaces.cdi.cookie;
 import static org.omnifaces.util.Beans.getQualifier;
 import static org.omnifaces.util.Servlets.getRequestCookie;
 
-import javax.enterprise.context.Dependent;
-import javax.enterprise.inject.Produces;
-import javax.enterprise.inject.spi.InjectionPoint;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.inject.Produces;
+import jakarta.enterprise.inject.spi.InjectionPoint;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.omnifaces.cdi.Cookie;
 

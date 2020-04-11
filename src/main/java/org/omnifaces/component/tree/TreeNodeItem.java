@@ -12,19 +12,19 @@
  */
 package org.omnifaces.component.tree;
 
-import static javax.faces.component.visit.VisitHint.SKIP_ITERATION;
+import static jakarta.faces.component.visit.VisitHint.SKIP_ITERATION;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Components.validateHasNoParent;
 import static org.omnifaces.util.Components.validateHasParent;
 
 import java.io.IOException;
 
-import javax.faces.component.FacesComponent;
-import javax.faces.component.UIComponent;
-import javax.faces.component.visit.VisitCallback;
-import javax.faces.component.visit.VisitContext;
-import javax.faces.context.FacesContext;
-import javax.faces.event.PhaseId;
+import jakarta.faces.component.FacesComponent;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.visit.VisitCallback;
+import jakarta.faces.component.visit.VisitContext;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.PhaseId;
 
 import org.omnifaces.model.tree.TreeModel;
 import org.omnifaces.util.Callback;

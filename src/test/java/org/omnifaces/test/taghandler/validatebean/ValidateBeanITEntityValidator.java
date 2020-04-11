@@ -12,8 +12,8 @@
  */
 package org.omnifaces.test.taghandler.validatebean;
 
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 
 public class ValidateBeanITEntityValidator implements ConstraintValidator<ValidateBeanITEntityConstraint, ValidateBeanITEntity> {
 

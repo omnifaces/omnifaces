@@ -18,10 +18,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import javax.faces.model.DataModel;
-import javax.faces.model.DataModelEvent;
-import javax.faces.model.DataModelListener;
-import javax.faces.model.ListDataModel;
+import jakarta.faces.model.DataModel;
+import jakarta.faces.model.DataModelEvent;
+import jakarta.faces.model.DataModelListener;
+import jakarta.faces.model.ListDataModel;
 
 /**
  * <strong>IterableDataModel</strong> is an implementation of {@link DataModel} that wraps an <code>Iterable</code>.

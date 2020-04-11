@@ -12,13 +12,13 @@
  */
 package org.omnifaces.exceptionhandler;
 
+import static jakarta.servlet.RequestDispatcher.ERROR_EXCEPTION;
+import static jakarta.servlet.RequestDispatcher.ERROR_EXCEPTION_TYPE;
+import static jakarta.servlet.RequestDispatcher.ERROR_MESSAGE;
+import static jakarta.servlet.RequestDispatcher.ERROR_REQUEST_URI;
+import static jakarta.servlet.RequestDispatcher.ERROR_STATUS_CODE;
 import static java.lang.String.format;
 import static java.util.logging.Level.SEVERE;
-import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION;
-import static javax.servlet.RequestDispatcher.ERROR_EXCEPTION_TYPE;
-import static javax.servlet.RequestDispatcher.ERROR_MESSAGE;
-import static javax.servlet.RequestDispatcher.ERROR_REQUEST_URI;
-import static javax.servlet.RequestDispatcher.ERROR_STATUS_CODE;
 import static org.omnifaces.util.Exceptions.unwrap;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getServletContext;
@@ -39,25 +39,25 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Logger;
 
-import javax.el.ELException;
-import javax.faces.FacesException;
-import javax.faces.application.ViewHandler;
-import javax.faces.component.UIViewRoot;
-import javax.faces.context.ExceptionHandler;
-import javax.faces.context.ExceptionHandlerFactory;
-import javax.faces.context.ExceptionHandlerWrapper;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-import javax.faces.event.AbortProcessingException;
-import javax.faces.event.ExceptionQueuedEvent;
-import javax.faces.event.PhaseId;
-import javax.faces.event.PreRenderViewEvent;
-import javax.faces.view.ViewDeclarationLanguage;
-import javax.faces.webapp.FacesServlet;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import jakarta.el.ELException;
+import jakarta.faces.FacesException;
+import jakarta.faces.application.ViewHandler;
+import jakarta.faces.component.UIViewRoot;
+import jakarta.faces.context.ExceptionHandler;
+import jakarta.faces.context.ExceptionHandlerFactory;
+import jakarta.faces.context.ExceptionHandlerWrapper;
+import jakarta.faces.context.ExternalContext;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.AbortProcessingException;
+import jakarta.faces.event.ExceptionQueuedEvent;
+import jakarta.faces.event.PhaseId;
+import jakarta.faces.event.PreRenderViewEvent;
+import jakarta.faces.view.ViewDeclarationLanguage;
+import jakarta.faces.webapp.FacesServlet;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.omnifaces.config.WebXml;
 import org.omnifaces.context.OmniPartialViewContext;
@@ -94,7 +94,7 @@ import org.omnifaces.util.Hacks;
  * mapping it on <code>*.xhtml</code> should eliminate confusion about virtual URLs). E.g.
  * <pre>
  * &lt;error-page&gt;
- *     &lt;exception-type&gt;javax.faces.application.ViewExpiredException&lt;/exception-type&gt;
+ *     &lt;exception-type&gt;jakarta.faces.application.ViewExpiredException&lt;/exception-type&gt;
  *     &lt;location&gt;/WEB-INF/errorpages/expired.xhtml&lt;/location&gt;
  * &lt;/error-page&gt;
  * </pre>
@@ -118,19 +118,19 @@ import org.omnifaces.util.Hacks;
  *     &lt;li&gt;Date/time: #{of:formatDate(now, 'yyyy-MM-dd HH:mm:ss')}&lt;/li&gt;
  *     &lt;li&gt;User agent: #{header['user-agent']}&lt;/li&gt;
  *     &lt;li&gt;User IP: #{request.remoteAddr}&lt;/li&gt;
- *     &lt;li&gt;Request URI: #{requestScope['javax.servlet.error.request_uri']}&lt;/li&gt;
+ *     &lt;li&gt;Request URI: #{requestScope['jakarta.servlet.error.request_uri']}&lt;/li&gt;
  *     &lt;li&gt;Ajax request: #{facesContext.partialViewContext.ajaxRequest ? 'Yes' : 'No'}&lt;/li&gt;
- *     &lt;li&gt;Status code: #{requestScope['javax.servlet.error.status_code']}&lt;/li&gt;
- *     &lt;li&gt;Exception type: #{requestScope['javax.servlet.error.exception_type']}&lt;/li&gt;
- *     &lt;li&gt;Exception message: #{requestScope['javax.servlet.error.message']}&lt;/li&gt;
+ *     &lt;li&gt;Status code: #{requestScope['jakarta.servlet.error.status_code']}&lt;/li&gt;
+ *     &lt;li&gt;Exception type: #{requestScope['jakarta.servlet.error.exception_type']}&lt;/li&gt;
+ *     &lt;li&gt;Exception message: #{requestScope['jakarta.servlet.error.message']}&lt;/li&gt;
  *     &lt;li&gt;Exception UUID: #{requestScope['org.omnifaces.exception_uuid']}&lt;/li&gt;
  *     &lt;li&gt;Stack trace:
- *         &lt;pre&gt;#{of:printStackTrace(requestScope['javax.servlet.error.exception'])}&lt;/pre&gt;
+ *         &lt;pre&gt;#{of:printStackTrace(requestScope['jakarta.servlet.error.exception'])}&lt;/pre&gt;
  *     &lt;/li&gt;
  * &lt;/ul&gt;
  * </pre>
  * <p>
- * Exceptions during render response can only be handled when the <code>javax.faces.FACELETS_BUFFER_SIZE</code> is
+ * Exceptions during render response can only be handled when the <code>jakarta.faces.FACELETS_BUFFER_SIZE</code> is
  * large enough so that the so far rendered response until the occurrence of the exception fits in there and can
  * therefore safely be resetted.
  *
@@ -170,7 +170,7 @@ import org.omnifaces.util.Hacks;
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.EXCEPTION_TYPES_TO_IGNORE_IN_LOGGING&lt;/param-name&gt;
- *     &lt;param-value&gt;javax.faces.application.ViewExpiredException&lt;/param-value&gt;
+ *     &lt;param-value&gt;jakarta.faces.application.ViewExpiredException&lt;/param-value&gt;
  * &lt;/context-param&gt;
  * </pre>
  * <p>
@@ -288,12 +288,12 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	private static final String LOG_RENDER_EXCEPTION_UNHANDLED =
 		"FullAjaxExceptionHandler: An exception occurred during rendering JSF ajax response."
 			+ " Error page '%s' CANNOT be shown as response is already committed."
-			+ " Consider increasing 'javax.faces.FACELETS_BUFFER_SIZE' if it really needs to be handled.";
+			+ " Consider increasing 'jakarta.faces.FACELETS_BUFFER_SIZE' if it really needs to be handled.";
 	private static final String LOG_ERROR_PAGE_ERROR =
 		"FullAjaxExceptionHandler: Well, another exception occurred during rendering error page '%s'."
 			+ " Trying to render a hardcoded error page now.";
 	private static final String ERROR_PAGE_ERROR =
-		"<?xml version='1.0' encoding='UTF-8'?><partial-response id='error'><changes><update id='javax.faces.ViewRoot'>"
+		"<?xml version='1.0' encoding='UTF-8'?><partial-response id='error'><changes><update id='jakarta.faces.ViewRoot'>"
 			+ "<![CDATA[<html lang='en'><head><title>Error in error</title></head><body><section><h2>Oops!</h2>"
 			+ "<p>A problem occurred during processing the ajax request. Subsequently, another problem occurred during"
 			+ " processing the error page which should inform you about that problem.</p><p>If you are the responsible"

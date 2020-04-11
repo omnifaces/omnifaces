@@ -12,29 +12,30 @@
  */
 package org.omnifaces.viewhandler;
 
+import static jakarta.faces.component.UINamingContainer.getSeparatorChar;
+import static jakarta.faces.component.UIViewRoot.UNIQUE_ID_PREFIX;
 import static java.lang.Boolean.FALSE;
 import static java.lang.String.format;
-import static javax.faces.component.UINamingContainer.getSeparatorChar;
-import static javax.faces.component.UIViewRoot.UNIQUE_ID_PREFIX;
 import static org.omnifaces.util.Components.findComponentRelatively;
 import static org.omnifaces.util.Components.getCurrentComponent;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.FacesLocal.isDevelopment;
+
 import java.io.IOException;
 import java.io.Writer;
 import java.util.logging.Logger;
 
-import javax.faces.application.Application;
-import javax.faces.application.ProjectStage;
-import javax.faces.application.ViewHandler;
-import javax.faces.application.ViewHandlerWrapper;
-import javax.faces.component.UIComponent;
-import javax.faces.component.UIViewRoot;
-import javax.faces.context.FacesContext;
-import javax.faces.context.FacesContextWrapper;
-import javax.faces.context.ResponseWriter;
-import javax.faces.context.ResponseWriterWrapper;
+import jakarta.faces.application.Application;
+import jakarta.faces.application.ProjectStage;
+import jakarta.faces.application.ViewHandler;
+import jakarta.faces.application.ViewHandlerWrapper;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.UIViewRoot;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.context.FacesContextWrapper;
+import jakarta.faces.context.ResponseWriter;
+import jakarta.faces.context.ResponseWriterWrapper;
 
 import org.omnifaces.util.Utils;
 

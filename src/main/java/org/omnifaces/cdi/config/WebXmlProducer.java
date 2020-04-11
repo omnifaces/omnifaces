@@ -12,8 +12,8 @@
  */
 package org.omnifaces.cdi.config;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Produces;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.inject.Produces;
 
 import org.omnifaces.config.WebXml;
 

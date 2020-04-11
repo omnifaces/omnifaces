@@ -12,9 +12,9 @@
  */
 package org.omnifaces.component;
 
-import javax.faces.component.UIParameter;
-import javax.faces.context.FacesContext;
-import javax.faces.convert.Converter;
+import jakarta.faces.component.UIParameter;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.convert.Converter;
 
 /**
  * This class provides a basic and default implementation of the {@link ParamHolder} interface. Ultimately, this class

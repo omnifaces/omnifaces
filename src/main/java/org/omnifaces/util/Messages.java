@@ -21,15 +21,15 @@ import static org.omnifaces.util.Utils.stream;
 import java.text.MessageFormat;
 import java.util.Iterator;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
-import javax.faces.context.Flash;
-import javax.faces.convert.ConverterException;
-import javax.faces.validator.ValidatorException;
-import javax.servlet.ServletContainerInitializer;
-import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.context.Flash;
+import jakarta.faces.convert.ConverterException;
+import jakarta.faces.validator.ValidatorException;
+import jakarta.servlet.ServletContainerInitializer;
+import jakarta.servlet.ServletContextListener;
+import jakarta.servlet.annotation.WebListener;
 
 import org.omnifaces.cdi.Startup;
 
@@ -220,7 +220,7 @@ public final class Messages {
 		/**
 		 * Set the severity of the current message to WARN. Note: it defaults to INFO already.
 		 * @return The current {@link Message} instance for further building.
-		 * @see FacesMessage#setSeverity(javax.faces.application.FacesMessage.Severity)
+		 * @see FacesMessage#setSeverity(jakarta.faces.application.FacesMessage.Severity)
 		 */
 		public Message warn() {
 			facesMessage.setSeverity(FacesMessage.SEVERITY_WARN);
@@ -230,7 +230,7 @@ public final class Messages {
 		/**
 		 * Set the severity of the current message to ERROR. Note: it defaults to INFO already.
 		 * @return The current {@link Message} instance for further building.
-		 * @see FacesMessage#setSeverity(javax.faces.application.FacesMessage.Severity)
+		 * @see FacesMessage#setSeverity(jakarta.faces.application.FacesMessage.Severity)
 		 */
 		public Message error() {
 			facesMessage.setSeverity(FacesMessage.SEVERITY_ERROR);
@@ -240,7 +240,7 @@ public final class Messages {
 		/**
 		 * Set the severity of the current message to FATAL. Note: it defaults to INFO already.
 		 * @return The current {@link Message} instance for further building.
-		 * @see FacesMessage#setSeverity(javax.faces.application.FacesMessage.Severity)
+		 * @see FacesMessage#setSeverity(jakarta.faces.application.FacesMessage.Severity)
 		 */
 		public Message fatal() {
 			facesMessage.setSeverity(FacesMessage.SEVERITY_FATAL);
@@ -324,7 +324,7 @@ public final class Messages {
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
 	 * @return A new INFO faces message with the given message body which is formatted with the given parameters.
-	 * @see #create(javax.faces.application.FacesMessage.Severity, String, Object...)
+	 * @see #create(jakarta.faces.application.FacesMessage.Severity, String, Object...)
 	 */
 	public static FacesMessage createInfo(String message, Object... params) {
 		return create(FacesMessage.SEVERITY_INFO, message, params);
@@ -335,7 +335,7 @@ public final class Messages {
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
 	 * @return A new WARN faces message with the given message body which is formatted with the given parameters.
-	 * @see #create(javax.faces.application.FacesMessage.Severity, String, Object...)
+	 * @see #create(jakarta.faces.application.FacesMessage.Severity, String, Object...)
 	 */
 	public static FacesMessage createWarn(String message, Object... params) {
 		return create(FacesMessage.SEVERITY_WARN, message, params);
@@ -346,7 +346,7 @@ public final class Messages {
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
 	 * @return A new ERROR faces message with the given message body which is formatted with the given parameters.
-	 * @see #create(javax.faces.application.FacesMessage.Severity, String, Object...)
+	 * @see #create(jakarta.faces.application.FacesMessage.Severity, String, Object...)
 	 */
 	public static FacesMessage createError(String message, Object... params) {
 		return create(FacesMessage.SEVERITY_ERROR, message, params);
@@ -357,7 +357,7 @@ public final class Messages {
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
 	 * @return A new FATAL faces message with the given message body which is formatted with the given parameters.
-	 * @see #create(javax.faces.application.FacesMessage.Severity, String, Object...)
+	 * @see #create(jakarta.faces.application.FacesMessage.Severity, String, Object...)
 	 */
 	public static FacesMessage createFatal(String message, Object... params) {
 		return create(FacesMessage.SEVERITY_FATAL, message, params);
@@ -413,7 +413,7 @@ public final class Messages {
 	 * @param severity The severity of the faces message.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #create(javax.faces.application.FacesMessage.Severity, String, Object...)
+	 * @see #create(jakarta.faces.application.FacesMessage.Severity, String, Object...)
 	 * @see #add(String, FacesMessage)
 	 */
 	public static void add(FacesMessage.Severity severity, String clientId, String message, Object... params) {
@@ -489,7 +489,7 @@ public final class Messages {
 	 * @param severity The severity of the global faces message.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #create(javax.faces.application.FacesMessage.Severity, String, Object...)
+	 * @see #create(jakarta.faces.application.FacesMessage.Severity, String, Object...)
 	 * @see #addGlobal(FacesMessage)
 	 */
 	public static void addGlobal(FacesMessage.Severity severity, String message, Object... params) {
@@ -566,7 +566,7 @@ public final class Messages {
 	 * @param severity The severity of the faces message.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @see #create(javax.faces.application.FacesMessage.Severity, String, Object...)
+	 * @see #create(jakarta.faces.application.FacesMessage.Severity, String, Object...)
 	 * @see #addFlash(String, FacesMessage)
 	 */
 	public static void addFlash(FacesMessage.Severity severity, String clientId, String message, Object... params) {
@@ -760,7 +760,7 @@ public final class Messages {
 	 * @param clientIds The client IDs to clear faces messages for. If this is empty, then all faces messages are
 	 * cleared. If this contains null, then all global faces messages are cleared.
 	 * @return <code>true</code> if at least one faces message associated with the given client IDs was cleared.
-	 * @see #clear(javax.faces.application.FacesMessage.Severity, String...)
+	 * @see #clear(jakarta.faces.application.FacesMessage.Severity, String...)
 	 * @since 3.5
 	 */
 	public static boolean clear(String... clientIds) {
@@ -772,7 +772,7 @@ public final class Messages {
 	 * @param clientIds The client IDs to clear INFO faces messages for. If this is empty, then all INFO faces messages
 	 * are cleared. If this contains null, then all global INFO faces messages are cleared.
 	 * @return <code>true</code> if at least one INFO faces message associated with the given client IDs was cleared.
-	 * @see #clear(javax.faces.application.FacesMessage.Severity, String...)
+	 * @see #clear(jakarta.faces.application.FacesMessage.Severity, String...)
 	 * @since 3.5
 	 */
 	public static boolean clearInfo(String... clientIds) {
@@ -784,7 +784,7 @@ public final class Messages {
 	 * @param clientIds The client IDs to clear WARN faces messages for. If this is empty, then all WARN faces messages
 	 * are cleared. If this contains null, then all global WARN faces messages are cleared.
 	 * @return <code>true</code> if at least one WARN faces message associated with the given client IDs was cleared.
-	 * @see #clear(javax.faces.application.FacesMessage.Severity, String...)
+	 * @see #clear(jakarta.faces.application.FacesMessage.Severity, String...)
 	 * @since 3.5
 	 */
 	public static boolean clearWarn(String... clientIds) {
@@ -796,7 +796,7 @@ public final class Messages {
 	 * @param clientIds The client IDs to clear ERROR faces messages for. If this is empty, then all ERROR faces
 	 * messages are cleared. If this contains null, then all global ERROR faces messages are cleared.
 	 * @return <code>true</code> if at least one ERROR faces message associated with the given client IDs was cleared.
-	 * @see #clear(javax.faces.application.FacesMessage.Severity, String...)
+	 * @see #clear(jakarta.faces.application.FacesMessage.Severity, String...)
 	 * @since 3.5
 	 */
 	public static boolean clearError(String... clientIds) {
@@ -808,7 +808,7 @@ public final class Messages {
 	 * @param clientIds The client IDs to clear FATAL faces messages for. If this is empty, then all FATAL face
 	 * messages are cleared. If this contains null, then all global FATAL faces messages are cleared.
 	 * @return <code>true</code> if at least one FATAL faces message associated with the given client IDs was cleared.
-	 * @see #clear(javax.faces.application.FacesMessage.Severity, String...)
+	 * @see #clear(jakarta.faces.application.FacesMessage.Severity, String...)
 	 * @since 3.5
 	 */
 	public static boolean clearFatal(String... clientIds) {
@@ -819,7 +819,7 @@ public final class Messages {
 	 * Clears global faces messages of given severity.
 	 * @param severity The severity of the faces message. If this is null, then all severities are matched.
 	 * @return <code>true</code> if at least one global faces message of given severity was cleared.
-	 * @see #clear(javax.faces.application.FacesMessage.Severity, String...)
+	 * @see #clear(jakarta.faces.application.FacesMessage.Severity, String...)
 	 * @since 3.5
 	 */
 	public static boolean clearGlobal(FacesMessage.Severity severity) {
@@ -829,7 +829,7 @@ public final class Messages {
 	/**
 	 * Clears global faces messages of all severities.
 	 * @return <code>true</code> if at least one global faces message was cleared.
-	 * @see #clear(javax.faces.application.FacesMessage.Severity, String...)
+	 * @see #clear(jakarta.faces.application.FacesMessage.Severity, String...)
 	 * @since 3.5
 	 */
 	public static boolean clearGlobal() {

@@ -12,9 +12,9 @@
  */
 package org.omnifaces.el;
 
-import javax.el.ELContext;
-import javax.el.PropertyNotWritableException;
-import javax.el.ValueExpression;
+import jakarta.el.ELContext;
+import jakarta.el.PropertyNotWritableException;
+import jakarta.el.ValueExpression;
 
 import org.omnifaces.util.Callback;
 

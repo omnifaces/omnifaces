@@ -15,8 +15,8 @@ package org.omnifaces.resourcehandler;
 import static org.omnifaces.util.Faces.getRequestParameter;
 import static org.omnifaces.util.Faces.getRequestParameterValues;
 
-import javax.faces.application.Resource;
-import javax.faces.application.ResourceHandler;
+import jakarta.faces.application.Resource;
+import jakarta.faces.application.ResourceHandler;
 
 /**
  * <p>

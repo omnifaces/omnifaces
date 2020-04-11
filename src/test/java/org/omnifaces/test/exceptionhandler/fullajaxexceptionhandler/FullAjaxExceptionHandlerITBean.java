@@ -12,8 +12,8 @@
  */
 package org.omnifaces.test.exceptionhandler.fullajaxexceptionhandler;
 
-import javax.enterprise.context.RequestScoped;
-import javax.inject.Named;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.inject.Named;
 
 @Named
 @RequestScoped

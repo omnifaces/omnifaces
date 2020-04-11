@@ -14,13 +14,13 @@ package org.omnifaces.component.script;
 
 import java.io.IOException;
 
-import javax.faces.component.UIComponentBase;
-import javax.faces.component.UIViewRoot;
-import javax.faces.context.FacesContext;
-import javax.faces.context.ResponseWriter;
-import javax.faces.event.ComponentSystemEvent;
-import javax.faces.event.PostAddToViewEvent;
-import javax.faces.event.PostRestoreStateEvent;
+import jakarta.faces.component.UIComponentBase;
+import jakarta.faces.component.UIViewRoot;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.context.ResponseWriter;
+import jakarta.faces.event.ComponentSystemEvent;
+import jakarta.faces.event.PostAddToViewEvent;
+import jakarta.faces.event.PostRestoreStateEvent;
 
 /**
  * Base class which is to be shared between all components of the Script family.

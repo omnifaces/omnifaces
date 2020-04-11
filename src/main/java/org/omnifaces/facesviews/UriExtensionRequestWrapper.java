@@ -12,8 +12,8 @@
  */
 package org.omnifaces.facesviews;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequestWrapper;
 
 /**
  * This wraps a request to an extensionless JSF view and provides an extension for

@@ -17,8 +17,8 @@ import static org.omnifaces.util.Faces.getViewRoot;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.enterprise.context.Dependent;
-import javax.faces.component.UIViewRoot;
+import jakarta.enterprise.context.Dependent;
+import jakarta.faces.component.UIViewRoot;
 
 import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;

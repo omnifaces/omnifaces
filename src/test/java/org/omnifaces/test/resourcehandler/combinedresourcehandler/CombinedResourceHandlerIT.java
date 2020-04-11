@@ -116,8 +116,8 @@ public class CombinedResourceHandlerIT extends OmniFacesIT {
 
 	private void verifyElements() {
 		assertEquals(2, combinedResources.size());
-		assertEquals(HEAD_COMBINED_RESOURCE_NAME, combinedResources.get(0).getAttribute("src").split("(.*/javax.faces.resource/)|(\\.js\\.xhtml.*)")[1]);
-		assertEquals(DEFERRED_COMBINED_RESOURCE_NAME, combinedResources.get(1).getAttribute("src").split("(.*/javax.faces.resource/)|(\\.js\\.xhtml.*)")[1]);
+		assertEquals(HEAD_COMBINED_RESOURCE_NAME, combinedResources.get(0).getAttribute("src").split("(.*/jakarta.faces.resource/)|(\\.js\\.xhtml.*)")[1]);
+		assertEquals(DEFERRED_COMBINED_RESOURCE_NAME, combinedResources.get(1).getAttribute("src").split("(.*/jakarta.faces.resource/)|(\\.js\\.xhtml.*)")[1]);
 		assertEquals("1,bodyWithTargetBody", bodyWithTargetBody.getText());
 		assertEquals("2,headWithoutTarget", headWithoutTarget.getText());
 		assertEquals("3,headWithTarget", headWithTarget.getText());

@@ -17,13 +17,13 @@ import static org.omnifaces.util.Faces.isPostback;
 
 import java.util.Map;
 
-import javax.el.ValueExpression;
-import javax.faces.component.FacesComponent;
-import javax.faces.component.UIInput;
-import javax.faces.component.UIViewParameter;
-import javax.faces.context.FacesContext;
-import javax.faces.event.PostValidateEvent;
-import javax.faces.event.PreValidateEvent;
+import jakarta.el.ValueExpression;
+import jakarta.faces.component.FacesComponent;
+import jakarta.faces.component.UIInput;
+import jakarta.faces.component.UIViewParameter;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.PostValidateEvent;
+import jakarta.faces.event.PreValidateEvent;
 
 import org.omnifaces.util.MapWrapper;
 import org.omnifaces.util.Utils;
@@ -65,7 +65,7 @@ import org.omnifaces.util.Utils;
  * submitted value is <code>null</code>, hereby completely bypassing the standard {@link UIInput} validation, including
  * any bean validation annotations and even the {@link PreValidateEvent} and {@link PostValidateEvent} events. This is
  * not desired. The workaround was added in OmniFaces 2.0. In JSF 2.3, this has been fixed and has only effect when
- * <code>javax.faces.INTERPRET_EMPTY_STRING_SUBMITTED_VALUES_AS_NULL</code> context param is set to <code>true</code>.
+ * <code>jakarta.faces.INTERPRET_EMPTY_STRING_SUBMITTED_VALUES_AS_NULL</code> context param is set to <code>true</code>.
  *
  * <h3>Default value when no parameter is set</h3>
  * <p>

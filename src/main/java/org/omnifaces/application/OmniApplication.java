@@ -12,19 +12,19 @@
  */
 package org.omnifaces.application;
 
+import static jakarta.faces.convert.Converter.DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE_PARAM_NAME;
 import static java.lang.Boolean.parseBoolean;
-import static javax.faces.convert.Converter.DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE_PARAM_NAME;
 import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Utils.getDefaultValue;
 
 import java.util.TimeZone;
 
-import javax.faces.application.Application;
-import javax.faces.application.ApplicationWrapper;
-import javax.faces.convert.Converter;
-import javax.faces.convert.DateTimeConverter;
-import javax.faces.validator.Validator;
+import jakarta.faces.application.Application;
+import jakarta.faces.application.ApplicationWrapper;
+import jakarta.faces.convert.Converter;
+import jakarta.faces.convert.DateTimeConverter;
+import jakarta.faces.validator.Validator;
 
 import org.omnifaces.cdi.converter.ConverterManager;
 import org.omnifaces.cdi.validator.ValidatorManager;

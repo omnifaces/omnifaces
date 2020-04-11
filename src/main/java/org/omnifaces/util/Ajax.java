@@ -27,14 +27,14 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
 
-import javax.faces.FacesException;
-import javax.faces.application.Resource;
-import javax.faces.component.UIColumn;
-import javax.faces.component.UIComponent;
-import javax.faces.component.UIData;
-import javax.faces.component.UINamingContainer;
-import javax.faces.context.FacesContext;
-import javax.faces.context.PartialViewContext;
+import jakarta.faces.FacesException;
+import jakarta.faces.application.Resource;
+import jakarta.faces.component.UIColumn;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.UIData;
+import jakarta.faces.component.UINamingContainer;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.context.PartialViewContext;
 
 import org.omnifaces.context.OmniPartialViewContext;
 import org.omnifaces.context.OmniPartialViewContextFactory;

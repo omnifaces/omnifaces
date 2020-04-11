@@ -16,9 +16,9 @@ import static org.omnifaces.util.Utils.isEmpty;
 
 import java.util.List;
 
-import javax.faces.component.FacesComponent;
-import javax.faces.component.UIInput;
-import javax.faces.context.FacesContext;
+import jakarta.faces.component.FacesComponent;
+import jakarta.faces.component.UIInput;
+import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.validator.MultiFieldValidator;
 

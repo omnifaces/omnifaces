@@ -17,16 +17,16 @@ import static java.util.logging.Level.FINER;
 
 import java.util.logging.Logger;
 
-import javax.faces.component.EditableValueHolder;
-import javax.faces.component.UICommand;
-import javax.faces.component.UIInput;
-import javax.faces.event.ComponentSystemEvent;
-import javax.faces.event.PostValidateEvent;
-import javax.faces.event.PreValidateEvent;
-import javax.faces.event.SystemEvent;
-import javax.faces.event.SystemEventListener;
-import javax.faces.validator.BeanValidator;
-import javax.faces.validator.Validator;
+import jakarta.faces.component.EditableValueHolder;
+import jakarta.faces.component.UICommand;
+import jakarta.faces.component.UIInput;
+import jakarta.faces.event.ComponentSystemEvent;
+import jakarta.faces.event.PostValidateEvent;
+import jakarta.faces.event.PreValidateEvent;
+import jakarta.faces.event.SystemEvent;
+import jakarta.faces.event.SystemEventListener;
+import jakarta.faces.validator.BeanValidator;
+import jakarta.faces.validator.Validator;
 
 /**
  * Overrides {@link BeanValidator#setValidationGroups(String)} for all components in the current view. This allows to
@@ -68,7 +68,7 @@ public class BeanValidationEventListener implements SystemEventListener {
 	// Actions --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Only listens to {@link UIInput} components which have a {@link javax.faces.validator.BeanValidator} assigned.
+	 * Only listens to {@link UIInput} components which have a {@link jakarta.faces.validator.BeanValidator} assigned.
 	 */
 	@Override
 	public boolean isListenerForSource(Object source) {

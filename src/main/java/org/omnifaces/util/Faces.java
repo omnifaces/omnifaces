@@ -12,7 +12,7 @@
  */
 package org.omnifaces.util;
 
-import static javax.faces.FactoryFinder.APPLICATION_FACTORY;
+import static jakarta.faces.FactoryFinder.APPLICATION_FACTORY;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,42 +30,42 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import javax.el.ELContext;
-import javax.el.ELResolver;
-import javax.el.ExpressionFactory;
-import javax.el.ValueExpression;
-import javax.faces.FacesException;
-import javax.faces.FactoryFinder;
-import javax.faces.application.Application;
-import javax.faces.application.ApplicationFactory;
-import javax.faces.application.NavigationHandler;
-import javax.faces.application.ProjectStage;
-import javax.faces.application.ViewHandler;
-import javax.faces.component.UIViewParameter;
-import javax.faces.component.UIViewRoot;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-import javax.faces.context.FacesContextWrapper;
-import javax.faces.context.Flash;
-import javax.faces.context.PartialViewContext;
-import javax.faces.convert.Converter;
-import javax.faces.convert.ConverterException;
-import javax.faces.convert.FacesConverter;
-import javax.faces.event.PhaseId;
-import javax.faces.lifecycle.Lifecycle;
-import javax.faces.lifecycle.LifecycleFactory;
-import javax.faces.render.RenderKit;
-import javax.faces.validator.FacesValidator;
-import javax.faces.validator.Validator;
-import javax.faces.view.ViewDeclarationLanguage;
-import javax.faces.view.ViewMetadata;
-import javax.faces.view.facelets.FaceletContext;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.servlet.http.Part;
+import jakarta.el.ELContext;
+import jakarta.el.ELResolver;
+import jakarta.el.ExpressionFactory;
+import jakarta.el.ValueExpression;
+import jakarta.faces.FacesException;
+import jakarta.faces.FactoryFinder;
+import jakarta.faces.application.Application;
+import jakarta.faces.application.ApplicationFactory;
+import jakarta.faces.application.NavigationHandler;
+import jakarta.faces.application.ProjectStage;
+import jakarta.faces.application.ViewHandler;
+import jakarta.faces.component.UIViewParameter;
+import jakarta.faces.component.UIViewRoot;
+import jakarta.faces.context.ExternalContext;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.context.FacesContextWrapper;
+import jakarta.faces.context.Flash;
+import jakarta.faces.context.PartialViewContext;
+import jakarta.faces.convert.Converter;
+import jakarta.faces.convert.ConverterException;
+import jakarta.faces.convert.FacesConverter;
+import jakarta.faces.event.PhaseId;
+import jakarta.faces.lifecycle.Lifecycle;
+import jakarta.faces.lifecycle.LifecycleFactory;
+import jakarta.faces.render.RenderKit;
+import jakarta.faces.validator.FacesValidator;
+import jakarta.faces.validator.Validator;
+import jakarta.faces.view.ViewDeclarationLanguage;
+import jakarta.faces.view.ViewMetadata;
+import jakarta.faces.view.facelets.FaceletContext;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.Part;
 
 import org.omnifaces.component.ParamHolder;
 import org.omnifaces.component.input.HashParam;
@@ -303,7 +303,7 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the project stage. This will return the <code>javax.faces.PROJECT_STAGE</code> context parameter in
+	 * Returns the project stage. This will return the <code>jakarta.faces.PROJECT_STAGE</code> context parameter in
 	 * <code>web.xml</code>.
 	 * @return The project stage.
 	 * @see Application#getProjectStage()
@@ -314,7 +314,7 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns whether we're in development stage. This will be the case when the <code>javax.faces.PROJECT_STAGE</code>
+	 * Returns whether we're in development stage. This will be the case when the <code>jakarta.faces.PROJECT_STAGE</code>
 	 * context parameter in <code>web.xml</code> is set to <code>Development</code>.
 	 * <p>
 	 * This is also available in EL as <code>#{faces.development}</code>.
@@ -326,7 +326,7 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns whether we're in system test stage. This will be the case when the <code>javax.faces.PROJECT_STAGE</code>
+	 * Returns whether we're in system test stage. This will be the case when the <code>jakarta.faces.PROJECT_STAGE</code>
 	 * context parameter in <code>web.xml</code> is set to <code>SystemTest</code>.
 	 * <p>
 	 * This is also available in EL as <code>#{faces.systemTest}</code>.
@@ -339,7 +339,7 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns whether we're in production stage. This will be the case when the <code>javax.faces.PROJECT_STAGE</code>
+	 * Returns whether we're in production stage. This will be the case when the <code>jakarta.faces.PROJECT_STAGE</code>
 	 * context parameter in <code>web.xml</code> is set to <code>Production</code>.
 	 * <p>
 	 * This is also available in EL as <code>#{faces.production}</code>.
@@ -1108,8 +1108,8 @@ public final class Faces {
 
 	/**
 	 * Returns whether the current request is a postback. This not only delegates to {@link FacesContext#isPostback()}
-	 * which checks the presence of <code>javax.faces.ViewState</code> request parameter, but this also explicitly
-	 * checks the HTTP request method. So this should exclude GET requests having a <code>javax.faces.ViewState</code>
+	 * which checks the presence of <code>jakarta.faces.ViewState</code> request parameter, but this also explicitly
+	 * checks the HTTP request method. So this should exclude GET requests having a <code>jakarta.faces.ViewState</code>
 	 * request parameter in query string.
 	 * <p>
 	 * This is also available in EL as <code>#{faces.postback}</code>.
@@ -1487,7 +1487,7 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the HTTP response buffer size. If Facelets is used and the <code>javax.faces.FACELETS_BUFFER_SIZE</code>
+	 * Returns the HTTP response buffer size. If Facelets is used and the <code>jakarta.faces.FACELETS_BUFFER_SIZE</code>
 	 * context parameter is been set, then it's the context parameter value which will be returned. Otherwise it
 	 * returns the implementation independent default value, which is 1024 in Mojarra.
 	 * @return The HTTP response buffer size.
@@ -1598,7 +1598,7 @@ public final class Faces {
 	 * Sends a HTTP response error with the given status and message. This will end up in either a custom
 	 * <code>&lt;error-page&gt;</code> whose <code>&lt;error-code&gt;</code> matches the given status, or in a servlet
 	 * container specific default error page if there is none. The message will be available in the error page as a
-	 * request attribute with name <code>javax.servlet.error.message</code>. The {@link FacesContext#responseComplete()}
+	 * request attribute with name <code>jakarta.servlet.error.message</code>. The {@link FacesContext#responseComplete()}
 	 * will implicitly be called after sending the error.
 	 * @param status The HTTP response status which is supposed to be in the range 4nn-5nn. You can use the constant
 	 * field values of {@link HttpServletResponse} for this.

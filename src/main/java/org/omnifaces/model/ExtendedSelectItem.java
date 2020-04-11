@@ -12,8 +12,8 @@
  */
 package org.omnifaces.model;
 
-import javax.faces.component.UISelectItem;
-import javax.faces.model.SelectItem;
+import jakarta.faces.component.UISelectItem;
+import jakarta.faces.model.SelectItem;
 
 /**
  * This class extends the default {@link SelectItem} with several convenience methods.

@@ -12,7 +12,7 @@
  */
 package org.omnifaces.exceptionhandler;
 
-import javax.faces.context.ExceptionHandlerFactory;
+import jakarta.faces.context.ExceptionHandlerFactory;
 
 /**
  * Default implementation for {@link ExceptionHandlerFactory}, saving boilerplate to get hold of wrapped one.

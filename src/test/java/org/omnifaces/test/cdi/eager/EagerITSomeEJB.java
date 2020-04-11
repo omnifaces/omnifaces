@@ -12,7 +12,7 @@
  */
 package org.omnifaces.test.cdi.eager;
 
-import javax.ejb.Stateless;
+import jakarta.ejb.Stateless;
 
 @Stateless
 public class EagerITSomeEJB {

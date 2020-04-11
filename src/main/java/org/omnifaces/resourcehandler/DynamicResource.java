@@ -12,9 +12,9 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static jakarta.faces.application.ResourceHandler.RESOURCE_IDENTIFIER;
 import static java.lang.String.format;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static javax.faces.application.ResourceHandler.RESOURCE_IDENTIFIER;
 import static org.omnifaces.util.Faces.getMapping;
 import static org.omnifaces.util.Faces.getRequestContextPath;
 import static org.omnifaces.util.Faces.getRequestDomainURL;
@@ -30,8 +30,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.faces.application.Resource;
-import javax.faces.context.FacesContext;
+import jakarta.faces.application.Resource;
+import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.util.Hacks;
 

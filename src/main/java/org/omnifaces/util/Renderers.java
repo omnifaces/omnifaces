@@ -18,10 +18,10 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.faces.component.UIComponent;
-import javax.faces.component.behavior.ClientBehaviorHolder;
-import javax.faces.context.ResponseWriter;
-import javax.faces.render.Renderer;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.behavior.ClientBehaviorHolder;
+import jakarta.faces.context.ResponseWriter;
+import jakarta.faces.render.Renderer;
 
 /**
  * Collection of utility methods for the JSF API with respect to working with {@link Renderer}.
@@ -34,10 +34,10 @@ public final class Renderers {
 	// Constants --------------------------------------------------------------------------------------------------
 
 	/** Renderer type of standard JSF stylesheet component resource. */
-	public static final String RENDERER_TYPE_CSS = "javax.faces.resource.Stylesheet";
+	public static final String RENDERER_TYPE_CSS = "jakarta.faces.resource.Stylesheet";
 
 	/** Renderer type of standard JSF script component resource. */
-	public static final String RENDERER_TYPE_JS = "javax.faces.resource.Script";
+	public static final String RENDERER_TYPE_JS = "jakarta.faces.resource.Script";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 

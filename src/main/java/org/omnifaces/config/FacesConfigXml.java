@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.faces.application.Application;
+import jakarta.faces.application.Application;
 
 /**
  * <p>

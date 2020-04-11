@@ -12,6 +12,12 @@
  */
 package org.omnifaces.util;
 
+import static jakarta.faces.application.ProjectStage.Development;
+import static jakarta.faces.application.ProjectStage.PROJECT_STAGE_JNDI_NAME;
+import static jakarta.faces.application.ProjectStage.PROJECT_STAGE_PARAM_NAME;
+import static jakarta.servlet.RequestDispatcher.ERROR_REQUEST_URI;
+import static jakarta.servlet.RequestDispatcher.FORWARD_QUERY_STRING;
+import static jakarta.servlet.RequestDispatcher.FORWARD_REQUEST_URI;
 import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
@@ -20,12 +26,6 @@ import static java.util.Collections.unmodifiableMap;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.logging.Level.FINEST;
 import static java.util.regex.Pattern.quote;
-import static javax.faces.application.ProjectStage.Development;
-import static javax.faces.application.ProjectStage.PROJECT_STAGE_JNDI_NAME;
-import static javax.faces.application.ProjectStage.PROJECT_STAGE_PARAM_NAME;
-import static javax.servlet.RequestDispatcher.ERROR_REQUEST_URI;
-import static javax.servlet.RequestDispatcher.FORWARD_QUERY_STRING;
-import static javax.servlet.RequestDispatcher.FORWARD_REQUEST_URI;
 import static org.omnifaces.util.JNDI.lookup;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.decodeURL;
@@ -54,20 +54,20 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.faces.FactoryFinder;
-import javax.faces.application.Application;
-import javax.faces.application.ResourceHandler;
-import javax.faces.context.ExternalContext;
-import javax.faces.context.FacesContext;
-import javax.faces.lifecycle.Lifecycle;
-import javax.faces.lifecycle.LifecycleFactory;
-import javax.faces.webapp.FacesServlet;
-import javax.servlet.RequestDispatcher;
-import javax.servlet.ServletContext;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
+import jakarta.faces.FactoryFinder;
+import jakarta.faces.application.Application;
+import jakarta.faces.application.ResourceHandler;
+import jakarta.faces.context.ExternalContext;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.lifecycle.Lifecycle;
+import jakarta.faces.lifecycle.LifecycleFactory;
+import jakarta.faces.webapp.FacesServlet;
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 
 import org.omnifaces.component.ParamHolder;
 import org.omnifaces.facesviews.FacesViews;
@@ -747,7 +747,7 @@ public final class Servlets {
 
 	/**
 	 * Returns <code>true</code> if we're in JSF development stage. This will be the case when the
-	 * <code>javax.faces.PROJECT_STAGE</code> context parameter in <code>web.xml</code> is set to
+	 * <code>jakarta.faces.PROJECT_STAGE</code> context parameter in <code>web.xml</code> is set to
 	 * <code>Development</code>.
 	 * @param context The involved servlet context.
 	 * @return <code>true</code> if we're in development stage, otherwise <code>false</code>.

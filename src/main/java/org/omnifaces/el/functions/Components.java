@@ -17,9 +17,9 @@ import static org.omnifaces.util.Faces.getELContext;
 
 import java.util.Date;
 
-import javax.el.ValueExpression;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
+import jakarta.el.ValueExpression;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.cdi.GraphicImageBean;
 import org.omnifaces.component.output.GraphicImage;

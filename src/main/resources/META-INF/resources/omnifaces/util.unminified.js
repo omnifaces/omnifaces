@@ -99,7 +99,7 @@ OmniFaces.Util = (function(window, document) {
 	 */
 	self.getFacesForm = function() {
 		for (var i = 0; i < document.forms.length; i++) {
-			if (document.forms[i]["javax.faces.ViewState"]) {
+			if (document.forms[i]["jakarta.faces.ViewState"]) {
 				return document.forms[i];
 			}
 		}

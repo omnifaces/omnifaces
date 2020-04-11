@@ -18,12 +18,12 @@ import static org.omnifaces.util.Utils.isEmpty;
 import java.io.IOException;
 import java.util.Map;
 
-import javax.faces.application.Resource;
-import javax.faces.component.UIComponent;
-import javax.faces.context.FacesContext;
-import javax.faces.context.ResponseWriter;
-import javax.faces.render.FacesRenderer;
-import javax.faces.render.Renderer;
+import jakarta.faces.application.Resource;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.context.ResponseWriter;
+import jakarta.faces.render.FacesRenderer;
+import jakarta.faces.render.Renderer;
 
 import org.omnifaces.component.script.DeferredScript;
 import org.omnifaces.component.script.ScriptFamily;

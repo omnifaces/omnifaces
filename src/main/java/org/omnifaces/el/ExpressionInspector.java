@@ -22,15 +22,15 @@ import java.lang.reflect.Method;
 import java.util.Objects;
 import java.util.logging.Logger;
 
-import javax.el.ELContext;
-import javax.el.ELResolver;
-import javax.el.MethodExpression;
-import javax.el.MethodInfo;
-import javax.el.MethodNotFoundException;
-import javax.el.ValueExpression;
-import javax.el.ValueReference;
-import javax.faces.FacesException;
-import javax.faces.el.CompositeComponentExpressionHolder;
+import jakarta.el.ELContext;
+import jakarta.el.ELResolver;
+import jakarta.el.MethodExpression;
+import jakarta.el.MethodInfo;
+import jakarta.el.MethodNotFoundException;
+import jakarta.el.ValueExpression;
+import jakarta.el.ValueReference;
+import jakarta.faces.FacesException;
+import jakarta.faces.el.CompositeComponentExpressionHolder;
 
 /**
  * <p>

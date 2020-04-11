@@ -22,14 +22,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
-import javax.enterprise.util.Nonbinding;
-import javax.faces.context.FacesContext;
-import javax.faces.convert.Converter;
-import javax.faces.validator.BeanValidator;
-import javax.faces.validator.RequiredValidator;
-import javax.faces.validator.Validator;
-import javax.inject.Qualifier;
+import jakarta.annotation.PostConstruct;
+import jakarta.enterprise.util.Nonbinding;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.convert.Converter;
+import jakarta.faces.validator.BeanValidator;
+import jakarta.faces.validator.RequiredValidator;
+import jakarta.faces.validator.Validator;
+import jakarta.inject.Qualifier;
 
 import org.omnifaces.cdi.param.Attribute;
 import org.omnifaces.cdi.param.DynamicParamValueProducer;
@@ -219,7 +219,7 @@ public @interface Param {
 	 * A converter can be specified in 3 ways:
 	 * <ol>
 	 * <li>A string value representing the <em>converter-id</em> as used by {@link
-	 * javax.faces.application.Application#createConverter(String)}
+	 * jakarta.faces.application.Application#createConverter(String)}
 	 * <li>An EL expression that resolves to a String representing the <em>converter-id</em>
 	 * <li>An EL expression that resolves to a {@link Converter} instance.
 	 * </ol>
@@ -246,7 +246,7 @@ public @interface Param {
 	 * A validator can be specified in 3 ways:
 	 * <ol>
 	 * <li>A string value representing the <em>validator-id</em> as used by {@link
-	 * javax.faces.application.Application#createValidator(String)}
+	 * jakarta.faces.application.Application#createValidator(String)}
 	 * <li>An EL expression that resolves to a String representing the <em>validator-id</em>
 	 * <li>An EL expression that resolves to a {@link Validator} instance.
 	 * </ol>

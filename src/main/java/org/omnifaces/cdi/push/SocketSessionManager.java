@@ -12,11 +12,11 @@
  */
 package org.omnifaces.cdi.push;
 
+import static jakarta.websocket.CloseReason.CloseCodes.NORMAL_CLOSURE;
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.logging.Level.FINEST;
 import static java.util.logging.Level.WARNING;
-import static javax.websocket.CloseReason.CloseCodes.NORMAL_CLOSURE;
 import static org.omnifaces.cdi.push.SocketEndpoint.PARAM_CHANNEL;
 import static org.omnifaces.util.Beans.getReference;
 
@@ -32,11 +32,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.util.AnnotationLiteral;
-import javax.inject.Inject;
-import javax.websocket.CloseReason;
-import javax.websocket.Session;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.util.AnnotationLiteral;
+import jakarta.inject.Inject;
+import jakarta.websocket.CloseReason;
+import jakarta.websocket.Session;
 
 import org.omnifaces.cdi.push.SocketEvent.Closed;
 import org.omnifaces.cdi.push.SocketEvent.Opened;

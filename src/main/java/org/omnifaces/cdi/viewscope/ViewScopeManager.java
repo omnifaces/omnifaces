@@ -12,11 +12,11 @@
  */
 package org.omnifaces.cdi.viewscope;
 
+import static jakarta.faces.application.StateManager.IS_BUILDING_INITIAL_STATE;
+import static jakarta.faces.event.PhaseId.RENDER_RESPONSE;
 import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
 import static java.util.logging.Level.FINEST;
-import static javax.faces.application.StateManager.IS_BUILDING_INITIAL_STATE;
-import static javax.faces.event.PhaseId.RENDER_RESPONSE;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
@@ -37,14 +37,14 @@ import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.spi.Contextual;
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.faces.context.FacesContext;
-import javax.inject.Inject;
-import javax.servlet.http.HttpServletRequest;
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.spi.Contextual;
+import jakarta.enterprise.context.spi.CreationalContext;
+import jakarta.enterprise.inject.spi.Bean;
+import jakarta.enterprise.inject.spi.BeanManager;
+import jakarta.faces.context.FacesContext;
+import jakarta.inject.Inject;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.omnifaces.cdi.BeanStorage;
 import org.omnifaces.cdi.ViewScoped;
@@ -94,10 +94,10 @@ public class ViewScopeManager {
 	private static final String WARNING_UNSUPPORTED_STATE_SAVING = "@ViewScoped %s"
 			+ " requires non-stateless views in order to be able to properly destroy the bean."
 			+ " The current view %s is stateless and this may cause memory leaks."
-			+ " Consider subclassing the bean with @javax.faces.view.ViewScoped annotation.";
+			+ " Consider subclassing the bean with @jakarta.faces.view.ViewScoped annotation.";
 
 	private static final String ERROR_INVALID_STATE_SAVING = "@ViewScoped(saveInViewState=true) %s"
-			+ " requires web.xml context parameter 'javax.faces.STATE_SAVING_METHOD' being set to 'client'.";
+			+ " requires web.xml context parameter 'jakarta.faces.STATE_SAVING_METHOD' being set to 'client'.";
 
 	// Variables ------------------------------------------------------------------------------------------------------
 

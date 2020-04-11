@@ -33,7 +33,7 @@
  * <p>
  * Scanning is done automatically and thus no further configuration is needed. The feature is compatible with
  * applications that don't have <code>web.xml</code> or <code>faces-config.xml</code> configuration files. As such, it
- * can be used as an alternative to declaring the {@link javax.faces.webapp.FacesServlet} in <code>web.xml</code> for
+ * can be used as an alternative to declaring the {@link jakarta.faces.webapp.FacesServlet} in <code>web.xml</code> for
  * the <code>.xhtml</code> to <code>.xhtml</code> mapping.
  *
  * <h4>Example 1:</h4>
@@ -61,7 +61,7 @@
  *
  * <p>
  * Note that although the directory outside <code>/WEB-INF/faces-views</code> is not scanned, the
- * {@link javax.faces.webapp.FacesServlet} <em>is</em> mapped on all extensions found in
+ * {@link jakarta.faces.webapp.FacesServlet} <em>is</em> mapped on all extensions found in
  * <code>/WEB-INF/faces-views</code>, so this will also affect files outside this directory. In the above example
  * <code>normal.xhtml</code> is thus also available via the <code>.xhtml</code> extension, since the whole FacesServlet
  * is mapped on this.

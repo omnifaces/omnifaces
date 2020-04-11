@@ -14,7 +14,7 @@ package org.omnifaces.test.resourcehandler.combinedresourcehandler;
 
 import java.io.Serializable;
 
-import javax.inject.Named;
+import jakarta.inject.Named;
 
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.util.Faces;

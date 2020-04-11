@@ -14,10 +14,10 @@ package org.omnifaces.cdi.push;
 
 import static org.omnifaces.util.Beans.getQualifier;
 
-import javax.enterprise.context.Dependent;
-import javax.enterprise.inject.Produces;
-import javax.enterprise.inject.spi.InjectionPoint;
-import javax.inject.Inject;
+import jakarta.enterprise.context.Dependent;
+import jakarta.enterprise.inject.Produces;
+import jakarta.enterprise.inject.spi.InjectionPoint;
+import jakarta.inject.Inject;
 
 import org.omnifaces.cdi.Push;
 import org.omnifaces.cdi.PushContext;

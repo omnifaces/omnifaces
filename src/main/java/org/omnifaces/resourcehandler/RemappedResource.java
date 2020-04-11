@@ -24,10 +24,10 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.faces.FacesException;
-import javax.faces.application.Resource;
-import javax.faces.application.ResourceWrapper;
-import javax.faces.context.FacesContext;
+import jakarta.faces.FacesException;
+import jakarta.faces.application.Resource;
+import jakarta.faces.application.ResourceWrapper;
+import jakarta.faces.context.FacesContext;
 
 /**
  * This {@link Resource} implementation remaps the given resource to the given request path.

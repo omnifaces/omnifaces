@@ -17,9 +17,9 @@ import static org.omnifaces.util.Beans.destroy;
 import java.io.Serializable;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.enterprise.context.spi.Contextual;
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.PassivationCapable;
+import jakarta.enterprise.context.spi.Contextual;
+import jakarta.enterprise.context.spi.CreationalContext;
+import jakarta.enterprise.inject.spi.PassivationCapable;
 
 /**
  * CDI bean storage. This class is theoretically reusable for multiple CDI scopes. It's currently however only used by

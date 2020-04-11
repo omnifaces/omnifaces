@@ -12,28 +12,28 @@
  */
 package org.omnifaces.eventlistener;
 
-import static javax.faces.component.visit.VisitContext.ALL_IDS;
-import static javax.faces.component.visit.VisitContext.createVisitContext;
-import static javax.faces.component.visit.VisitHint.SKIP_TRANSIENT;
-import static javax.faces.component.visit.VisitHint.SKIP_UNRENDERED;
-import static javax.faces.component.visit.VisitResult.ACCEPT;
-import static javax.faces.component.visit.VisitResult.REJECT;
-import static javax.faces.event.PhaseId.INVOKE_APPLICATION;
+import static jakarta.faces.component.visit.VisitContext.ALL_IDS;
+import static jakarta.faces.component.visit.VisitContext.createVisitContext;
+import static jakarta.faces.component.visit.VisitHint.SKIP_TRANSIENT;
+import static jakarta.faces.component.visit.VisitHint.SKIP_UNRENDERED;
+import static jakarta.faces.component.visit.VisitResult.ACCEPT;
+import static jakarta.faces.component.visit.VisitResult.REJECT;
+import static jakarta.faces.event.PhaseId.INVOKE_APPLICATION;
 
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
 
-import javax.faces.component.EditableValueHolder;
-import javax.faces.component.visit.VisitCallback;
-import javax.faces.component.visit.VisitHint;
-import javax.faces.context.FacesContext;
-import javax.faces.context.PartialViewContext;
-import javax.faces.event.ActionEvent;
-import javax.faces.event.ActionListener;
-import javax.faces.event.AjaxBehaviorListener;
-import javax.faces.event.PhaseEvent;
-import javax.faces.event.SystemEventListener;
+import jakarta.faces.component.EditableValueHolder;
+import jakarta.faces.component.visit.VisitCallback;
+import jakarta.faces.component.visit.VisitHint;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.context.PartialViewContext;
+import jakarta.faces.event.ActionEvent;
+import jakarta.faces.event.ActionListener;
+import jakarta.faces.event.AjaxBehaviorListener;
+import jakarta.faces.event.PhaseEvent;
+import jakarta.faces.event.SystemEventListener;
 
 /**
  * <p>

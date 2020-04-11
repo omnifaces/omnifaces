@@ -14,7 +14,7 @@ package org.omnifaces.util.cache;
 
 import java.util.Map;
 
-import javax.faces.context.FacesContext;
+import jakarta.faces.context.FacesContext;
 
 /**
  * A provider for a specific {@link Cache} implementation. Via this plug-in construct, the OmniFaces Cache component can

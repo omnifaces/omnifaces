@@ -12,9 +12,9 @@
  */
 package org.omnifaces.util;
 
+import static jakarta.faces.validator.BeanValidator.VALIDATOR_FACTORY_KEY;
 import static java.util.logging.Level.WARNING;
 import static java.util.stream.Collectors.toMap;
-import static javax.faces.validator.BeanValidator.VALIDATOR_FACTORY_KEY;
 import static org.omnifaces.util.Faces.getApplicationAttribute;
 import static org.omnifaces.util.Faces.getLocale;
 
@@ -26,14 +26,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import javax.faces.webapp.FacesServlet;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletRegistration;
-import javax.validation.ConstraintViolation;
-import javax.validation.MessageInterpolator;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
+import jakarta.faces.webapp.FacesServlet;
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletRegistration;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.MessageInterpolator;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 
 /**
  * This class provides access to (Java EE 6) platform services from the view point of JSF.
@@ -68,7 +68,7 @@ public final class Platform {
 	public static boolean isBeanValidationAvailable() {
 		return getApplicationAttribute(BEAN_VALIDATION_AVAILABLE, () -> {
 			try {
-				Class.forName("javax.validation.Validation");
+				Class.forName("jakarta.validation.Validation");
 				getBeanValidator();
 				return true;
 			}

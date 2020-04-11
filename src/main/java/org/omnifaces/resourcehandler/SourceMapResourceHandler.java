@@ -17,9 +17,10 @@ import static org.omnifaces.util.Utils.endsWithOneOf;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import javax.faces.application.Resource;
-import javax.faces.application.ResourceHandler;
-import javax.faces.application.ResourceWrapper;
+
+import jakarta.faces.application.Resource;
+import jakarta.faces.application.ResourceHandler;
+import jakarta.faces.application.ResourceWrapper;
 
 /**
  * <p>

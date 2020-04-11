@@ -14,8 +14,8 @@ package org.omnifaces.resourcehandler;
 
 import java.io.Externalizable;
 
-import javax.faces.application.Resource;
-import javax.faces.application.ResourceHandler;
+import jakarta.faces.application.Resource;
+import jakarta.faces.application.ResourceHandler;
 
 /**
  * This {@link Resource} implementation can be used as a marker class to signal the custom {@link ResourceHandler}

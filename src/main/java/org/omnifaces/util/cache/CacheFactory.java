@@ -12,8 +12,8 @@
  */
 package org.omnifaces.util.cache;
 
-import javax.faces.context.FacesContext;
-import javax.servlet.ServletContext;
+import jakarta.faces.context.FacesContext;
+import jakarta.servlet.ServletContext;
 
 /**
  * Factory used to obtain {@link Cache} instance and to register the {@link CacheProvider} that is used to obtain that.

@@ -52,10 +52,10 @@ public class ViewScopedViewStateIT extends OmniFacesIT {
 	@FindBy(id="ajax:navigate")
 	private WebElement ajaxNavigate;
 
-	@FindBy(css="#non-ajax > [name='javax.faces.ViewState']")
+	@FindBy(css="#non-ajax > [name='jakarta.faces.ViewState']")
 	private WebElement nonAjaxViewState;
 
-	@FindBy(css="#ajax > [name='javax.faces.ViewState']")
+	@FindBy(css="#ajax > [name='jakarta.faces.ViewState']")
 	private WebElement ajaxViewState;
 
 	@Deployment(testable=false)
@@ -194,7 +194,7 @@ public class ViewScopedViewStateIT extends OmniFacesIT {
 		assertNotEquals(secondBean, firstBean);
 		assertNotEquals(secondViewState, firstViewState);
 
-		executeScript("document.querySelectorAll(\"#ajax > [name='javax.faces.ViewState']\")[0].value='" + firstViewState + "'");
+		executeScript("document.querySelectorAll(\"#ajax > [name='jakarta.faces.ViewState']\")[0].value='" + firstViewState + "'");
 		guardAjax(ajaxSubmit).click();
 		assertEquals(firstBean, bean.getText());
 		assertEquals("submit", messages.getText());
@@ -202,7 +202,7 @@ public class ViewScopedViewStateIT extends OmniFacesIT {
 
 		// Close second tab, copy view state from second tab into first tab and re-execute via non-ajax.
 		closeCurrentTabAndSwitchTo(firstTab);
-		executeScript("document.querySelectorAll(\"#non-ajax > [name='javax.faces.ViewState']\")[0].value='" + secondViewState + "'");
+		executeScript("document.querySelectorAll(\"#non-ajax > [name='jakarta.faces.ViewState']\")[0].value='" + secondViewState + "'");
 		guardHttp(nonAjaxSubmit).click();
 		assertEquals(secondBean, bean.getText());
 		assertEquals("submit", messages.getText());

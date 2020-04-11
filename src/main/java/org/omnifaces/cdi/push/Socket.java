@@ -12,13 +12,13 @@
  */
 package org.omnifaces.cdi.push;
 
+import static jakarta.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
+import static jakarta.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME;
+import static jakarta.faces.component.behavior.ClientBehaviorContext.createClientBehaviorContext;
 import static java.lang.Boolean.TRUE;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.String.format;
 import static java.util.Collections.unmodifiableList;
-import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
-import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME;
-import static javax.faces.component.behavior.ClientBehaviorContext.createClientBehaviorContext;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
@@ -32,22 +32,22 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Pattern;
 
-import javax.el.ValueExpression;
-import javax.enterprise.event.Observes;
-import javax.faces.FacesException;
-import javax.faces.application.ResourceDependency;
-import javax.faces.component.FacesComponent;
-import javax.faces.component.UIComponent;
-import javax.faces.component.behavior.ClientBehavior;
-import javax.faces.component.behavior.ClientBehaviorHolder;
-import javax.faces.context.FacesContext;
-import javax.faces.event.ComponentSystemEvent;
-import javax.faces.event.ListenerFor;
-import javax.faces.event.PostAddToViewEvent;
-import javax.servlet.ServletContext;
-import javax.websocket.CloseReason.CloseCodes;
-import javax.websocket.server.ServerContainer;
-import javax.websocket.server.ServerEndpointConfig;
+import jakarta.el.ValueExpression;
+import jakarta.enterprise.event.Observes;
+import jakarta.faces.FacesException;
+import jakarta.faces.application.ResourceDependency;
+import jakarta.faces.component.FacesComponent;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.behavior.ClientBehavior;
+import jakarta.faces.component.behavior.ClientBehaviorHolder;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.ComponentSystemEvent;
+import jakarta.faces.event.ListenerFor;
+import jakarta.faces.event.PostAddToViewEvent;
+import jakarta.servlet.ServletContext;
+import jakarta.websocket.CloseReason.CloseCodes;
+import jakarta.websocket.server.ServerContainer;
+import jakarta.websocket.server.ServerEndpointConfig;
 
 import org.omnifaces.cdi.Push;
 import org.omnifaces.cdi.PushContext;
@@ -527,7 +527,7 @@ import org.omnifaces.util.State;
  * }
  * </pre>
  * <p>
- * Then use {@link javax.enterprise.inject.spi.BeanManager#fireEvent(Object, java.lang.annotation.Annotation...)} to
+ * Then use {@link jakarta.enterprise.inject.spi.BeanManager#fireEvent(Object, java.lang.annotation.Annotation...)} to
  * fire the CDI event.
  * <pre>
  * &#64;Inject

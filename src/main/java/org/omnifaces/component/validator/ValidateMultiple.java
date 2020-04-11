@@ -14,12 +14,12 @@ package org.omnifaces.component.validator;
 
 import java.util.List;
 
-import javax.el.ELContext;
-import javax.el.MethodExpression;
-import javax.faces.component.FacesComponent;
-import javax.faces.component.UIInput;
-import javax.faces.context.FacesContext;
-import javax.faces.validator.ValidatorException;
+import jakarta.el.ELContext;
+import jakarta.el.MethodExpression;
+import jakarta.faces.component.FacesComponent;
+import jakarta.faces.component.UIInput;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.validator.ValidatorException;
 
 import org.omnifaces.validator.MultiFieldValidator;
 

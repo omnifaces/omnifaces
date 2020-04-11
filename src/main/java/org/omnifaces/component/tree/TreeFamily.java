@@ -16,10 +16,10 @@ import static org.omnifaces.util.FacesLocal.isDevelopment;
 
 import java.io.IOException;
 
-import javax.faces.FacesException;
-import javax.faces.component.UIComponentBase;
-import javax.faces.context.FacesContext;
-import javax.faces.event.PhaseId;
+import jakarta.faces.FacesException;
+import jakarta.faces.component.UIComponentBase;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.PhaseId;
 
 /**
  * Base class which is to be shared between all components of the Tree family.

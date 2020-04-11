@@ -16,12 +16,12 @@ import static org.omnifaces.util.Components.createValueExpression;
 
 import java.io.IOException;
 
-import javax.el.ValueExpression;
-import javax.el.VariableMapper;
-import javax.faces.component.UIComponent;
-import javax.faces.view.facelets.FaceletContext;
-import javax.faces.view.facelets.TagConfig;
-import javax.faces.view.facelets.TagHandler;
+import jakarta.el.ValueExpression;
+import jakarta.el.VariableMapper;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.view.facelets.FaceletContext;
+import jakarta.faces.view.facelets.TagConfig;
+import jakarta.faces.view.facelets.TagHandler;
 
 import org.omnifaces.el.DelegatingVariableMapper;
 
@@ -73,7 +73,7 @@ import org.omnifaces.el.DelegatingVariableMapper;
 public class TagAttribute extends TagHandler {
 
 	private final String name;
-	private final javax.faces.view.facelets.TagAttribute defaultValue;
+	private final jakarta.faces.view.facelets.TagAttribute defaultValue;
 
 	public TagAttribute(TagConfig config) {
 		super(config);

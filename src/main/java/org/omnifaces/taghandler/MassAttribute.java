@@ -20,12 +20,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import javax.faces.component.UIComponent;
-import javax.faces.view.facelets.ComponentHandler;
-import javax.faces.view.facelets.FaceletContext;
-import javax.faces.view.facelets.TagAttribute;
-import javax.faces.view.facelets.TagConfig;
-import javax.faces.view.facelets.TagHandler;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.view.facelets.ComponentHandler;
+import jakarta.faces.view.facelets.FaceletContext;
+import jakarta.faces.view.facelets.TagAttribute;
+import jakarta.faces.view.facelets.TagConfig;
+import jakarta.faces.view.facelets.TagHandler;
 
 /**
  * <p>
@@ -66,7 +66,7 @@ import javax.faces.view.facelets.TagHandler;
  * To target a specific component (super)class, use the <code>target</code> attribute. The example below skips labels
  * (as that would otherwise fail in the example below because they don't have the <code>valid</code> property):
  * <pre>
- * &lt;o:massAttribute name="styleClass" value="#{component.valid ? '' : 'error'}" target="javax.faces.component.UIInput"&gt;
+ * &lt;o:massAttribute name="styleClass" value="#{component.valid ? '' : 'error'}" target="jakarta.faces.component.UIInput"&gt;
  *     &lt;h:outputLabel for="input1" /&gt;
  *     &lt;h:inputText id="input1" /&gt;
  *     &lt;h:outputLabel for="input2" /&gt;

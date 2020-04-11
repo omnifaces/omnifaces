@@ -12,9 +12,9 @@
  */
 package org.omnifaces.component;
 
-import javax.faces.application.Application;
-import javax.faces.component.ValueHolder;
-import javax.faces.convert.Converter;
+import jakarta.faces.application.Application;
+import jakarta.faces.component.ValueHolder;
+import jakarta.faces.convert.Converter;
 
 import org.omnifaces.util.Faces;
 
@@ -53,10 +53,10 @@ public interface ParamHolder<T> extends ValueHolder {
 	/**
 	 * Returns the value of the parameter as {@link String}. If the converter is set, or if any converter is available by
 	 * {@link Application#createConverter(Class)}, passing the value's class, then return the result of
-	 * {@link Converter#getAsString(javax.faces.context.FacesContext, javax.faces.component.UIComponent, Object)},
+	 * {@link Converter#getAsString(jakarta.faces.context.FacesContext, jakarta.faces.component.UIComponent, Object)},
 	 * otherwise return the {@link Object#toString()} of the value.
 	 * @return The value of the parameter as {@link String}.
-	 * @see Converter#getAsString(javax.faces.context.FacesContext, javax.faces.component.UIComponent, Object)
+	 * @see Converter#getAsString(jakarta.faces.context.FacesContext, jakarta.faces.component.UIComponent, Object)
 	 */
 	@Override
 	String getValue();

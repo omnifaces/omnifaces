@@ -33,15 +33,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.faces.application.Resource;
-import javax.faces.application.ResourceHandler;
-import javax.faces.component.UIComponent;
-import javax.faces.component.UIOutput;
-import javax.faces.component.UIViewRoot;
-import javax.faces.context.FacesContext;
-import javax.faces.event.PreRenderViewEvent;
-import javax.faces.event.SystemEvent;
-import javax.faces.event.SystemEventListener;
+import jakarta.faces.application.Resource;
+import jakarta.faces.application.ResourceHandler;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.UIOutput;
+import jakarta.faces.component.UIViewRoot;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.event.PreRenderViewEvent;
+import jakarta.faces.event.SystemEvent;
+import jakarta.faces.event.SystemEventListener;
 
 import org.omnifaces.component.script.DeferredScript;
 import org.omnifaces.renderer.DeferredScriptRenderer;
@@ -276,7 +276,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 	private static final String TARGET_HEAD = "head";
 	private static final String TARGET_BODY = "body";
-	private static final String COMPONENT_ADDED = "javax.faces.component.UIComponentBase.ADDED";
+	private static final String COMPONENT_ADDED = "jakarta.faces.component.UIComponentBase.ADDED";
 	private static final String DEFAULT_CROSSORIGIN = "anonymous";
 
 	// Properties -----------------------------------------------------------------------------------------------------
