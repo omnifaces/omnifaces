@@ -195,7 +195,12 @@ public final class Faces {
 	 * @see FacesContext#getCurrentInstance()
 	 */
 	public static FacesContext getContext() {
-		return FacesContext.getCurrentInstance();
+		try {
+			return FacesContext.getCurrentInstance();
+		}
+		catch (NoClassDefFoundError canHappenWhenInvokedWithoutImpl) {
+			return null;
+		}
 	}
 
 	/**
