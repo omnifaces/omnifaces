@@ -284,7 +284,7 @@ public final class Messages {
 
 		/**
 		 * Throws the so far built message as a {@link ConverterException}.
-		 * @throws The so far built message as a {@link ConverterException}.
+		 * @throws ConverterException
 		 * @since 3.5
 		 */
 		public void throwConverterException() throws ConverterException {
@@ -293,7 +293,7 @@ public final class Messages {
 
 		/**
 		 * Throws the so far built message as a {@link ValidatorException}.
-		 * @throws The so far built message as a {@link ValidatorException}.
+		 * @throws ValidatorException
 		 * @since 3.5
 		 */
 		public void throwValidatorException() throws ValidatorException {
@@ -370,7 +370,7 @@ public final class Messages {
 	 * with the given parameters.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @throws A {@link ConverterException} with an ERROR faces message with the given message body which is formatted
+	 * @throws ConverterException
 	 * with the given parameters.
 	 * @see #createError(String, Object...)
 	 * @since 3.5
@@ -384,7 +384,7 @@ public final class Messages {
 	 * with the given parameters.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @throws A {@link ValidatorException} with an ERROR faces message with the given message body which is formatted
+	 * @throws ValidatorException
 	 * with the given parameters.
 	 * @see #createError(String, Object...)
 	 * @since 3.5
