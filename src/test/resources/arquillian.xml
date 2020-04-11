@@ -21,4 +21,11 @@
 	<extension qualifier="webdriver">
 		<property name="browser">htmlUnit</property>
 	</extension>
+
+	<container qualifier="tomcat">
+		<configuration>
+			<property name="user">arquillian</property>
+			<property name="pass">arquillian</property>
+		</configuration>
+	</container>
 </arquillian>
