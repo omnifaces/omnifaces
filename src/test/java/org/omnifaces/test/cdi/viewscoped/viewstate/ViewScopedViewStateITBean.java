@@ -21,8 +21,8 @@ import static org.omnifaces.util.Messages.addGlobalInfo;
 import java.io.Serializable;
 import java.util.UUID;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import jakarta.inject.Named;
 
 import org.omnifaces.cdi.ViewScoped;

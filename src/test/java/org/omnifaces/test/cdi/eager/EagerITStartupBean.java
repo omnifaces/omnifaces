@@ -12,7 +12,7 @@
  */
 package org.omnifaces.test.cdi.eager;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import jakarta.inject.Inject;
 import jakarta.inject.Named;
 

@@ -14,7 +14,7 @@ package org.omnifaces.test.cdi.eager;
 
 import static java.lang.System.nanoTime;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Named;
 

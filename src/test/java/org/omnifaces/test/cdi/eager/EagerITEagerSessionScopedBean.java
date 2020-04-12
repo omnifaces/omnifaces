@@ -16,7 +16,7 @@ import static java.lang.System.nanoTime;
 
 import java.io.Serializable;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Named;
 

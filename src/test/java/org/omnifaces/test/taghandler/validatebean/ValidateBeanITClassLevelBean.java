@@ -16,7 +16,7 @@ import static org.omnifaces.util.Faces.isValidationFailed;
 import static org.omnifaces.util.Messages.addGlobalInfo;
 import static org.omnifaces.util.Messages.addGlobalWarn;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Named;
 
