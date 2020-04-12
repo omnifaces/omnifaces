@@ -16,7 +16,6 @@ import static jakarta.servlet.RequestDispatcher.ERROR_REQUEST_URI;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static org.omnifaces.component.input.Form.PropertyKeys.includeRequestParams;
-import static org.omnifaces.component.input.Form.PropertyKeys.includeViewParams;
 import static org.omnifaces.component.input.Form.PropertyKeys.partialSubmit;
 import static org.omnifaces.component.input.Form.PropertyKeys.useRequestURI;
 import static org.omnifaces.util.Components.getParams;
@@ -116,12 +115,6 @@ import org.omnifaces.util.State;
  * parent <code>&lt;h:form&gt;</code> component has to be replaced by this <code>&lt;o:form&gt;</code> component.
  * See also {@link IgnoreValidationFailed}.
  *
- * <h2>Historical note</h2>
- * <p>
- * Previously, the <code>&lt;o:form&gt;</code> also supported <code>includeViewParams</code>, but
- * this did after all not have any advantage over the later introduced <code>useRequestURI</code> and
- * <code>includeRequestParams</code>. Hence the <code>includeViewParams</code> is marked deprecated since 3.0.
- *
  *
  * @since 1.1
  * @author Arjan Tijms
@@ -140,13 +133,6 @@ public class Form extends HtmlForm {
 		useRequestURI,
 		includeRequestParams,
 		partialSubmit,
-
-		/**
-		 * Not particularly useful as compared to useRequestURI and includeRequestParams.
-		 * @deprecated Since 3.0
-		 */
-		@Deprecated
-		includeViewParams,
 	}
 
 	// Variables ------------------------------------------------------------------------------------------------------
@@ -186,28 +172,6 @@ public class Form extends HtmlForm {
 	}
 
 	// Getters/setters ------------------------------------------------------------------------------------------------
-
-	/**
-	 * Returns whether or not the view parameters should be encoded into the form's action URL.
-	 * This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
-	 * @return Whether or not the view parameters should be encoded into the form's action URL.
-	 * @deprecated Since 3.0
-	 */
-	@Deprecated
-	public boolean isIncludeViewParams() {
-		return state.get(includeViewParams, FALSE);
-	}
-
-	/**
-	 * Set whether or not the view parameters should be encoded into the form's action URL.
-	 * This setting is ignored when <code>includeRequestParams</code> is set to <code>true</code>.
-	 * @param includeViewParams Whether or not the view parameters should be encoded into the form's action URL.
-	 * @deprecated Since 3.0
-	 */
-	@Deprecated
-	public void setIncludeViewParams(boolean includeViewParams) {
-		state.put(PropertyKeys.includeViewParams, includeViewParams);
-	}
 
 	/**
 	 * Returns whether or not the request parameters should be encoded into the form's action URL.
@@ -362,7 +326,7 @@ public class Form extends HtmlForm {
 		@Override
 		public String getActionURL(FacesContext context, String viewId) {
 			String actionURL = form.isUseRequestURI() && !form.isIncludeRequestParams() ? getActionURL(context) : getWrapped().getActionURL(context, viewId);
-			String queryString = toQueryString(getParams(form, form.isUseRequestURI() || form.isIncludeRequestParams(), form.isIncludeViewParams()));
+			String queryString = toQueryString(getParams(form, form.isUseRequestURI() || form.isIncludeRequestParams(), false));
 			return formatURLWithQueryString(actionURL, queryString);
 		}
 

@@ -53,28 +53,10 @@ public interface FacesConfigXml {
 
 	/**
 	 * Returns the lazily loaded enum singleton instance.
-	 * @deprecated Since 3.1; Use {@link #instance()} instead.
-	 */
-	@Deprecated
-	public static final FacesConfigXml INSTANCE = new FacesConfigXml() {
-
-		@Override
-		public Map<String, String> getResourceBundles() {
-			return FacesConfigXml.instance().getResourceBundles();
-		}
-
-		@Override
-		public List<Locale> getSupportedLocales() {
-			return FacesConfigXml.instance().getSupportedLocales();
-		}
-	};
-
-	/**
-	 * Returns the lazily loaded enum singleton instance.
 	 * @return The lazily loaded enum singleton instance.
 	 * @since 3.1
 	 */
-	public static FacesConfigXml instance() {
+	static FacesConfigXml instance() {
 		return FacesConfigXmlSingleton.INSTANCE;
 	}
 
@@ -84,7 +66,7 @@ public interface FacesConfigXml {
 	 * Returns a mapping of all resource bundle base names by var.
 	 * @return A mapping of all resource bundle base names by var.
 	 */
-	public Map<String, String> getResourceBundles();
+	Map<String, String> getResourceBundles();
 
 	/**
 	 * Returns an ordered list of all supported locales on this application, with the default locale as the first
@@ -95,6 +77,6 @@ public interface FacesConfigXml {
 	 * @see Application#getSupportedLocales()
 	 * @since 2.2
 	 */
-	public List<Locale> getSupportedLocales();
+	List<Locale> getSupportedLocales();
 
 }

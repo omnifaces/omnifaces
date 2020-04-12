@@ -258,19 +258,6 @@
 						</goals>
 					</execution>
 					<execution>
-						<id>minify-fixviewstate</id>
-						<configuration>
-							<jsSourceFiles>
-								<jsSourceFile>omnifaces.unminified.js</jsSourceFile>
-								<jsSourceFile>fixviewstate.unminified.js</jsSourceFile>
-							</jsSourceFiles>
-							<jsFinalFile>fixviewstate.js</jsFinalFile>
-						</configuration>
-						<goals>
-							<goal>minify</goal>
-						</goals>
-					</execution>
-					<execution>
 						<id>minify-unload</id>
 						<configuration>
 							<jsSourceFiles>

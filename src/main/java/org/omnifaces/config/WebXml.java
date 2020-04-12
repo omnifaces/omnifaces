@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import jakarta.servlet.ServletContext;
-
 /**
  * <p>
  * This configuration interface parses the <code>/WEB-INF/web.xml</code> and all <code>/META-INF/web-fragment</code> files
@@ -62,71 +60,10 @@ public interface WebXml {
 
 	/**
 	 * Returns the lazily loaded enum singleton instance.
-	 * @deprecated Since 3.1; Use {@link #instance()} instead.
-	 */
-	@Deprecated
-	public static final WebXml INSTANCE = new WebXml() {
-
-		@Override
-		public String findErrorPageLocation(Throwable exception) {
-			return WebXmlSingleton.INSTANCE.findErrorPageLocation(exception);
-		}
-
-		@Override
-		public boolean isAccessAllowed(String url, String role) {
-			return WebXmlSingleton.INSTANCE.isAccessAllowed(url, role);
-		}
-
-		@Override
-		public List<String> getWelcomeFiles() {
-			return WebXmlSingleton.INSTANCE.getWelcomeFiles();
-		}
-
-		@Override
-		public Map<Class<Throwable>, String> getErrorPageLocations() {
-			return WebXmlSingleton.INSTANCE.getErrorPageLocations();
-		}
-
-		@Override
-		public String getFormLoginPage() {
-			return WebXmlSingleton.INSTANCE.getFormLoginPage();
-		}
-
-		@Override
-		public String getFormErrorPage() {
-			return WebXmlSingleton.INSTANCE.getFormLoginPage();
-		}
-
-		@Override
-		public Map<String, Set<String>> getSecurityConstraints() {
-			return WebXmlSingleton.INSTANCE.getSecurityConstraints();
-		}
-
-		@Override
-		public int getSessionTimeout() {
-			return WebXmlSingleton.INSTANCE.getSessionTimeout();
-		}
-	};
-
-	/**
-	 * Returns the lazily loaded enum singleton instance.
 	 * @return The lazily loaded enum singleton instance.
 	 * @since 3.1
 	 */
-	public static WebXml instance() {
-		return WebXmlSingleton.INSTANCE;
-	}
-
-	// Init -----------------------------------------------------------------------------------------------------------
-
-	/**
-	 * Perform manual initialization with the given servlet context, if not null and not already initialized yet.
-	 * @param servletContext The servlet context to obtain the web.xml from.
-	 * @return The current {@link WebXml} instance, initialized and all.
-	 * @deprecated Since 3.1; Use {@link #instance()} instead. It will fall back to CDI to obtain the servlet context.
-	 */
-	@Deprecated
-	public default WebXml init(ServletContext servletContext) {
+	static WebXml instance() {
 		return WebXmlSingleton.INSTANCE;
 	}
 
@@ -144,7 +81,7 @@ public interface WebXml {
 	 * @param exception The exception to find the error page location for.
 	 * @return The right error page location for the given exception.
 	 */
-	public String findErrorPageLocation(Throwable exception);
+	String findErrorPageLocation(Throwable exception);
 
 	/**
 	 * Returns <code>true</code> if access to the given URL is allowed for the given role. URL patterns are matched as
@@ -164,7 +101,7 @@ public interface WebXml {
 	 * @throws IllegalArgumentException If given URL does not start with '/'.
 	 * @since 1.4
 	 */
-	public boolean isAccessAllowed(String url, String role);
+	boolean isAccessAllowed(String url, String role);
 
 	// Getters --------------------------------------------------------------------------------------------------------
 
@@ -173,27 +110,27 @@ public interface WebXml {
 	 * @return A list of all welcome files.
 	 * @since 1.4
 	 */
-	public List<String> getWelcomeFiles();
+	List<String> getWelcomeFiles();
 
 	/**
 	 * Returns a mapping of all error page locations by exception type. The default location is identified by
 	 * <code>null</code> key.
 	 * @return A mapping of all error page locations by exception type.
 	 */
-	public Map<Class<Throwable>, String> getErrorPageLocations();
+	Map<Class<Throwable>, String> getErrorPageLocations();
 
 	/**
 	 * Returns the location of the FORM authentication login page, or <code>null</code> if it is not defined.
 	 * @return The location of the FORM authentication login page, or <code>null</code> if it is not defined.
 	 */
-	public String getFormLoginPage();
+	String getFormLoginPage();
 
 	/**
 	 * Returns the location of the FORM authentication error page, or <code>null</code> if it is not defined.
 	 * @return The location of the FORM authentication error page, or <code>null</code> if it is not defined.
 	 * @since 1.8
 	 */
-	public String getFormErrorPage();
+	String getFormErrorPage();
 
 	/**
 	 * Returns a mapping of all security constraint URL patterns and the associated roles in the declared order. If the
@@ -203,13 +140,13 @@ public interface WebXml {
 	 * @return A mapping of all security constraint URL patterns and the associated roles in the declared order.
 	 * @since 1.4
 	 */
-	public Map<String, Set<String>> getSecurityConstraints();
+	Map<String, Set<String>> getSecurityConstraints();
 
 	/**
 	 * Returns the configured session timeout in minutes, or <code>-1</code> if it is not defined.
 	 * @return The configured session timeout in minutes, or <code>-1</code> if it is not defined.
 	 * @since 1.7
 	 */
-	public int getSessionTimeout();
+	int getSessionTimeout();
 
 }
