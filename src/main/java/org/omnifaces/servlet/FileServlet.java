@@ -1,10 +1,10 @@
 /*
- * Copyright 2019 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -42,7 +42,7 @@ import org.omnifaces.util.Servlets;
 
 /**
  * <p>
- * The well known "<a href="http://balusc.omnifaces.org/2009/02/fileservlet-supporting-resume-and.html">BalusC FileServlet</a>",
+ * The well known "<a href="https://balusc.omnifaces.org/2009/02/fileservlet-supporting-resume-and.html">BalusC FileServlet</a>",
  * as an abstract template, slightly refactored, rewritten and modernized with a.o. fast NIO stuff instead of legacy
  * RandomAccessFile. GZIP support is stripped off as that can be done application wide via {@link GzipResponseFilter}.
  * <p>
@@ -106,8 +106,8 @@ import org.omnifaces.util.Servlets;
  *
  * <p><strong>See also</strong>:
  * <ul>
- * <li><a href="http://stackoverflow.com/q/13588149/157882">How to stream audio/video files such as MP3, MP4, AVI, etc using a Servlet</a>
- * <li><a href="http://stackoverflow.com/a/29991447/157882">Abstract template for a static resource servlet</a>
+ * <li><a href="https://stackoverflow.com/q/13588149/157882">How to stream audio/video files such as MP3, MP4, AVI, etc using a Servlet</a>
+ * <li><a href="https://stackoverflow.com/a/29991447/157882">Abstract template for a static resource servlet</a>
  * </ul>
  *
  * @author Bauke Scholtz
@@ -327,7 +327,7 @@ public abstract class FileServlet extends HttpServlet {
 				}
 			}
 			catch (IllegalArgumentException ifRangeHeaderIsInvalid) {
-				logger.log(FINE, "If-Range header is invalid. Let's just return full file then.", ifRangeHeaderIsInvalid);
+				logger.log(FINE, "If-Range header is invalid. Just return full file then.", ifRangeHeaderIsInvalid);
 				return ranges;
 			}
 		}

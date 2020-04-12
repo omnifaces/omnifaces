@@ -1,10 +1,10 @@
 /*
- * Copyright 2019 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -110,7 +110,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * &lt;env-entry&gt;
  *     &lt;env-entry-name&gt;jsf/ClientSideSecretKey&lt;/env-entry-name&gt;
  *     &lt;env-entry-type&gt;java.lang.String&lt;/env-entry-type&gt;
- *     &lt;env-entry-value&gt;&lt;!-- See http://stackoverflow.com/q/35102645/157882 --&gt;&lt;/env-entry-value&gt;
+ *     &lt;env-entry-value&gt;&lt;!-- See https://stackoverflow.com/q/35102645/157882 --&gt;&lt;/env-entry-value&gt;
  * &lt;/env-entry&gt;
  * </pre>
  * <p>

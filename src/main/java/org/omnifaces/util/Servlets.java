@@ -1,10 +1,10 @@
 /*
- * Copyright 2019 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -145,12 +145,19 @@ public final class Servlets {
 	 * Returns the HTTP request domain URL. This is the URL with the scheme and domain, without any trailing slash.
 	 * @param request The involved HTTP servlet request.
 	 * @return The HTTP request domain URL.
+	 * @throws IllegalArgumentException When the URL is malformed. This is however unexpected as the request would
+	 * otherwise not have hit the server at all.
 	 * @see HttpServletRequest#getRequestURL()
-	 * @see HttpServletRequest#getRequestURI()
 	 */
 	public static String getRequestDomainURL(HttpServletRequest request) {
-		String url = request.getRequestURL().toString();
-		return url.substring(0, url.length() - request.getRequestURI().length());
+		try {
+			URL url = new URL(request.getRequestURL().toString());
+			String fullURL = url.toString();
+			return fullURL.substring(0, fullURL.length() - url.getPath().length());
+		}
+		catch (MalformedURLException e) {
+			throw new IllegalArgumentException(e);
+		}
 	}
 
 	/**

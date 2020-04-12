@@ -1,10 +1,10 @@
 /*
- * Copyright 2019 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -92,7 +92,7 @@ import org.omnifaces.util.Utils;
  * <p>
  * Path parameters can be injected by specifying the <code>pathIndex</code> attribute representing the zero-based index
  * of the path parameter. The support was added in OmniFaces 2.5. On an example request
- * <code>http://example.com/mypage/firstname.lastname</code>, which is mapped to <code>/mypage.xhtml</code>, the below
+ * <code>https://example.com/mypage/firstname.lastname</code>, which is mapped to <code>/mypage.xhtml</code>, the below
  * example injects the path parameter <code>firstname.lastname</code>.
  * <pre>
  * &#64;Inject &#64;Param(pathIndex=0)
@@ -112,7 +112,7 @@ import org.omnifaces.util.Utils;
  * </pre>
  * <p>
  * Other types do need a converter. The following is an example of the injection of request parameter <code>user</code>
- * following a request such as <code>http://example.com/mypage?user=42</code>:
+ * following a request such as <code>https://example.com/mypage?user=42</code>:
  * <pre>
  * &#64;Inject &#64;Param(converter="userConverter", validator="priviledgedUser")
  * private User user;
@@ -125,7 +125,7 @@ import org.omnifaces.util.Utils;
  * </pre>
  * <p>
  * This also works on path parameters. The following is an example of the injection of path parameter <code>user</code>
- * following a request such as <code>http://example.com/mypage/42</code>:
+ * following a request such as <code>https://example.com/mypage/42</code>:
  * <pre>
  * &#64;Inject &#64;Param(pathIndex=0, converter="userConverter", validator="priviledgedUser")
  * private User user;

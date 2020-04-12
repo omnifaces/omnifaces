@@ -1,10 +1,10 @@
 /*
- * Copyright 2019 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -13,10 +13,13 @@
 package org.omnifaces.util;
 
 import static java.text.MessageFormat.format;
+import static java.util.stream.Collectors.toSet;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getFlash;
+import static org.omnifaces.util.Utils.stream;
 
 import java.text.MessageFormat;
+import java.util.Iterator;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.faces.application.FacesMessage;
@@ -39,7 +42,7 @@ import org.omnifaces.cdi.Startup;
  * Some examples:
  * <pre>
  * // In a validator.
- * throw new ValidatorException(Messages.createError("Invalid input."));
+ * Messages.throwValidatorException("Invalid input.");
  * </pre>
  * <pre>
  * // In a validator, as extra message on another component.
@@ -58,7 +61,7 @@ import org.omnifaces.cdi.Startup;
  * There is also a builder which also allows you to set the message detail. Some examples:
  * <pre>
  * // In a validator.
- * throw new ValidatorException(Messages.create("Invalid input.").detail("Value {0} is not expected.", value).get());
+ * Messages.create("Invalid input.").detail("Value {0} is not expected.", value).throwValidatorException();
  * </pre>
  * <pre>
  * // In a validator, as extra message on another component.
@@ -279,6 +282,24 @@ public final class Messages {
 			return facesMessage;
 		}
 
+		/**
+		 * Throws the so far built message as a {@link ConverterException}.
+		 * @throws ConverterException
+		 * @since 3.5
+		 */
+		public void throwConverterException() {
+			throw new ConverterException(facesMessage);
+		}
+
+		/**
+		 * Throws the so far built message as a {@link ValidatorException}.
+		 * @throws ValidatorException
+		 * @since 3.5
+		 */
+		public void throwValidatorException() {
+			throw new ValidatorException(facesMessage);
+		}
+
 	}
 
 	// Shortcuts - create message -------------------------------------------------------------------------------------
@@ -340,6 +361,36 @@ public final class Messages {
 	 */
 	public static FacesMessage createFatal(String message, Object... params) {
 		return create(FacesMessage.SEVERITY_FATAL, message, params);
+	}
+
+	// Shortcuts - throw validator/converter exception ----------------------------------------------------------------
+
+	/**
+	 * Throw a {@link ConverterException} with an ERROR faces message with the given message body which is formatted
+	 * with the given parameters.
+	 * @param message The message body.
+	 * @param params The message format parameters, if any.
+	 * @throws ConverterException
+	 * with the given parameters.
+	 * @see #createError(String, Object...)
+	 * @since 3.5
+	 */
+	public void throwConverterException(String message, Object... params) {
+		throw new ConverterException(createError(message, params));
+	}
+
+	/**
+	 * Throw a {@link ValidatorException} with an ERROR faces message with the given message body which is formatted
+	 * with the given parameters.
+	 * @param message The message body.
+	 * @param params The message format parameters, if any.
+	 * @throws ValidatorException
+	 * with the given parameters.
+	 * @see #createError(String, Object...)
+	 * @since 3.5
+	 */
+	public void throwValidatorException(String message, Object... params) {
+		throw new ValidatorException(createError(message, params));
 	}
 
 	// Shortcuts - add message ----------------------------------------------------------------------------------------
@@ -665,6 +716,164 @@ public final class Messages {
 	 */
 	public static boolean isGlobalEmpty() {
 		return isEmpty(null);
+	}
+
+	// Shortcuts - clear messages -------------------------------------------------------------------------------------
+
+	/**
+	 * Clears faces messages of the given severity associated with the given client IDs.
+	 * @param severity The severity to clear faces message for. If this is null, then all severities are matched.
+	 * @param clientIds The client IDs to clear faces messages for. If this is null or empty, then all faces messages
+	 * are cleared. If this contains null, then all global faces messages are cleared.
+	 * @return <code>true</code> if at least one faces message of the given severity associated with the given client
+	 * IDs was cleared.
+	 * @see FacesContext#getMessages()
+	 * @see FacesContext#getMessages(String)
+	 * @since 3.5
+	 */
+	public static boolean clear(FacesMessage.Severity severity, String... clientIds) {
+		if (Utils.isEmpty(clientIds)) {
+			return clear(getContext().getMessages(), severity);
+		}
+		else {
+			return stream(clientIds).map(clientId -> clear(getContext().getMessages(clientId), severity)).collect(toSet()).contains(true);
+		}
+	}
+
+	private static boolean clear(Iterator<FacesMessage> iterator, FacesMessage.Severity severity) {
+		boolean atLeastOneCleared = false;
+
+		while (iterator.hasNext()) {
+			FacesMessage facesMessage = iterator.next();
+
+			if (severity == null || severity.equals(facesMessage.getSeverity())) {
+				iterator.remove();
+				atLeastOneCleared = true;
+			}
+		}
+
+		return atLeastOneCleared;
+	}
+
+	/**
+	 * Clears faces messages associated with the given client IDs.
+	 * @param clientIds The client IDs to clear faces messages for. If this is empty, then all faces messages are
+	 * cleared. If this contains null, then all global faces messages are cleared.
+	 * @return <code>true</code> if at least one faces message associated with the given client IDs was cleared.
+	 * @see #clear(javax.faces.application.FacesMessage.Severity, String...)
+	 * @since 3.5
+	 */
+	public static boolean clear(String... clientIds) {
+		return clear(null, clientIds);
+	}
+
+	/**
+	 * Clears INFO faces messages associated with the given client IDs.
+	 * @param clientIds The client IDs to clear INFO faces messages for. If this is empty, then all INFO faces messages
+	 * are cleared. If this contains null, then all global INFO faces messages are cleared.
+	 * @return <code>true</code> if at least one INFO faces message associated with the given client IDs was cleared.
+	 * @see #clear(javax.faces.application.FacesMessage.Severity, String...)
+	 * @since 3.5
+	 */
+	public static boolean clearInfo(String... clientIds) {
+		return clear(FacesMessage.SEVERITY_INFO, clientIds);
+	}
+
+	/**
+	 * Clears WARN faces messages associated with the given client IDs.
+	 * @param clientIds The client IDs to clear WARN faces messages for. If this is empty, then all WARN faces messages
+	 * are cleared. If this contains null, then all global WARN faces messages are cleared.
+	 * @return <code>true</code> if at least one WARN faces message associated with the given client IDs was cleared.
+	 * @see #clear(javax.faces.application.FacesMessage.Severity, String...)
+	 * @since 3.5
+	 */
+	public static boolean clearWarn(String... clientIds) {
+		return clear(FacesMessage.SEVERITY_WARN, clientIds);
+	}
+
+	/**
+	 * Clears ERROR faces messages associated with the given client IDs.
+	 * @param clientIds The client IDs to clear ERROR faces messages for. If this is empty, then all ERROR faces
+	 * messages are cleared. If this contains null, then all global ERROR faces messages are cleared.
+	 * @return <code>true</code> if at least one ERROR faces message associated with the given client IDs was cleared.
+	 * @see #clear(javax.faces.application.FacesMessage.Severity, String...)
+	 * @since 3.5
+	 */
+	public static boolean clearError(String... clientIds) {
+		return clear(FacesMessage.SEVERITY_ERROR, clientIds);
+	}
+
+	/**
+	 * Clears FATAL faces messages associated with the given client IDs.
+	 * @param clientIds The client IDs to clear FATAL faces messages for. If this is empty, then all FATAL face
+	 * messages are cleared. If this contains null, then all global FATAL faces messages are cleared.
+	 * @return <code>true</code> if at least one FATAL faces message associated with the given client IDs was cleared.
+	 * @see #clear(javax.faces.application.FacesMessage.Severity, String...)
+	 * @since 3.5
+	 */
+	public static boolean clearFatal(String... clientIds) {
+		return clear(FacesMessage.SEVERITY_FATAL, clientIds);
+	}
+
+	/**
+	 * Clears global faces messages of given severity.
+	 * @param severity The severity of the faces message. If this is null, then all severities are matched.
+	 * @return <code>true</code> if at least one global faces message of given severity was cleared.
+	 * @see #clear(javax.faces.application.FacesMessage.Severity, String...)
+	 * @since 3.5
+	 */
+	public static boolean clearGlobal(FacesMessage.Severity severity) {
+		return clear(severity, (String) null);
+	}
+
+	/**
+	 * Clears global faces messages of all severities.
+	 * @return <code>true</code> if at least one global faces message was cleared.
+	 * @see #clear(javax.faces.application.FacesMessage.Severity, String...)
+	 * @since 3.5
+	 */
+	public static boolean clearGlobal() {
+		return clear((FacesMessage.Severity) null, (String) null);
+	}
+
+	/**
+	 * Clears global INFO faces messages.
+	 * @return <code>true</code> if at least one global INFO faces message was cleared.
+	 * @see #clearInfo(String...)
+	 * @since 3.5
+	 */
+	public static boolean clearGlobalInfo() {
+		return clearInfo((String) null);
+	}
+
+	/**
+	 * Clears global WARN faces messages.
+	 * @return <code>true</code> if at least one global WARN faces message was cleared.
+	 * @see #clearWarn(String...)
+	 * @since 3.5
+	 */
+	public static boolean clearGlobalWarn() {
+		return clearWarn((String) null);
+	}
+
+	/**
+	 * Clears global ERROR faces messages.
+	 * @return <code>true</code> if at least one global ERROR faces message was cleared.
+	 * @see #clearError(String...)
+	 * @since 3.5
+	 */
+	public static boolean clearGlobalError() {
+		return clearError((String) null);
+	}
+
+	/**
+	 * Clears global FATAL faces messages.
+	 * @return <code>true</code> if at least one global FATAL faces message was cleared.
+	 * @see #clearFatal(String...)
+	 * @since 3.5
+	 */
+	public static boolean clearGlobalFatal() {
+		return clearFatal((String) null);
 	}
 
 }

@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright 2019 OmniFaces
+    Copyright 2020 OmniFaces
 
     Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
     the License. You may obtain a copy of the License at
 
-        http://www.apache.org/licenses/LICENSE-2.0
+        https://www.apache.org/licenses/LICENSE-2.0
 
     Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
     an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -2432,7 +2432,7 @@ hash query string.
 The "hash query string" is the part in URL after the <code>#</code> which could be formatted in the same format
 as a regular request query string (the part in URL after the <code>?</code>). An example:
 <pre>
-http://example.com/page.xhtml#foo=baz&bar=kaz
+https://example.com/page.xhtml#foo=baz&bar=kaz
 </pre>
 <p>
 This specific part of the URL (also called hash fragment identifier) is by default not sent to the server. This
@@ -2482,7 +2482,7 @@ removed.
 </pre>
 <p>
 When <code>#{bean.foo}</code> is <code>"baz"</code> and <code>#{bean.bar}</code> is <code>"kaz"</code> or empty,
-then the reflected hash query string will become <code>http://example.com/page.xhtml#foo=baz</code>.
+then the reflected hash query string will become <code>https://example.com/page.xhtml#foo=baz</code>.
 If <code>#{bean.bar}</code> is any other value, then it will appear in the hash query string.
 				]]>
 		</description>
@@ -3881,7 +3881,7 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
 			<description>
 				<![CDATA[
 					The domain of the URL.
-					Valid formats are: <code>http://example.com</code>, <code>//example.com</code>, <code>example.com</code>, <code>/</code> and <code>//</code>.
+					Valid formats are: <code>https://example.com</code>, <code>//example.com</code>, <code>example.com</code>, <code>/</code> and <code>//</code>.
 					If the value equals <code>/</code>, then the URL becomes domain-relative.
 					If the value equals <code>//</code>, then the URL becomes scheme-relative.
 					Defaults to current domain.
@@ -5712,7 +5712,7 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 					socket will attempt to reconnect. The function will be invoked with three arguments: the error reason code, the
 					channel name and the raw <code>CloseEvent</code> itself. Note that this will not be invoked on final close of the
 					web socket, even when the final close is caused by an error. See also
-					<a href="http://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and
+					<a href="https://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and
 					<a href="https://javaee.github.io/javaee-spec/javadocs/javax/websocket/CloseReason.CloseCodes.html">CloseCodes</a>
 					API for an elaborate list of all close codes.
 				]]>
@@ -5729,7 +5729,7 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 					and the raw <code>CloseEvent</code> itself. Note that this will also be invoked when the close is caused by an
 					error and that you can inspect the close reason code if an actual connection error occurred and which one (i.e.
 					when the code is not 1000 or 1008). See also
-					<a href="http://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and
+					<a href="https://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and
 					<a href="https://javaee.github.io/javaee-spec/javadocs/javax/websocket/CloseReason.CloseCodes.html">CloseCodes</a>
 					API for an elaborate list of all close codes.
 				]]>

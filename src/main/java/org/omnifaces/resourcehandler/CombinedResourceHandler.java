@@ -1,10 +1,10 @@
 /*
- * Copyright 2019 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -22,6 +22,7 @@ import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
 import static org.omnifaces.util.Hacks.isMyFacesUsed;
 import static org.omnifaces.util.Renderers.RENDERER_TYPE_CSS;
 import static org.omnifaces.util.Renderers.RENDERER_TYPE_JS;
+import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isNumber;
 
 import java.util.ArrayList;
@@ -159,6 +160,13 @@ import org.omnifaces.util.cache.Cache;
  * are removed from the cache if they are older than this parameter indicates (and regenerated if newly requested).
  * The default value is 0 (i.e. not cached). For global cache settings refer {@link Cache} javadoc.
  * </td></tr>
+ * <tr><td class="colFirst">
+ * <code>{@value org.omnifaces.resourcehandler.CombinedResourceHandler#PARAM_NAME_CROSSORIGIN}</code>
+ * </td><td>
+ * Set the desired value of <code>crossorigin</code> attribute of combined script resources. Supported values are
+ * specified in <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin">MDN</a>.
+ * The default value is <code>anonymous</code> (i.e. no cookies are transferred at all).
+ * </td></tr>
  * </table>
  * <p>
  * Here, the "resource identifier" is the unique combination of library name and resource name, separated by a colon,
@@ -257,6 +265,10 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 	public static final String PARAM_NAME_CACHE_TTL =
 		"org.omnifaces.COMBINED_RESOURCE_HANDLER_CACHE_TTL";
 
+	/** The context parameter name to specify 'crossorigin' attribute of combined JS resources. @since 3.5 */
+	public static final String PARAM_NAME_CROSSORIGIN =
+		"org.omnifaces.COMBINED_RESOURCE_HANDLER_CROSSORIGIN";
+
 	private static final String ERROR_INVALID_CACHE_TTL_PARAM =
 		"Context parameter '" + PARAM_NAME_CACHE_TTL + "' is in invalid syntax."
 			+ " It must represent a valid time in seconds between 0 and " + Integer.MAX_VALUE + "."
@@ -265,6 +277,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 	private static final String TARGET_HEAD = "head";
 	private static final String TARGET_BODY = "body";
 	private static final String COMPONENT_ADDED = "javax.faces.component.UIComponentBase.ADDED";
+	private static final String DEFAULT_CROSSORIGIN = "anonymous";
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
@@ -274,6 +287,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 	private boolean inlineCSS;
 	private boolean inlineJS;
 	private Integer cacheTTL;
+	private String crossorigin;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -293,6 +307,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		inlineCSS = parseBoolean(getInitParameter(PARAM_NAME_INLINE_CSS));
 		inlineJS = parseBoolean(getInitParameter(PARAM_NAME_INLINE_JS));
 		cacheTTL = initCacheTTL(getInitParameter(PARAM_NAME_CACHE_TTL));
+		crossorigin = coalesce(getInitParameter(PARAM_NAME_CROSSORIGIN), DEFAULT_CROSSORIGIN);
 		subscribeToApplicationEvent(PreRenderViewEvent.class, this);
 	}
 
@@ -451,8 +466,8 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		private List<UIComponent> componentResourcesToRemove;
 
 		public CombinedResourceBuilder() {
-			stylesheets = new Builder(EXTENSION_CSS, TARGET_HEAD);
-			scripts = new Builder(EXTENSION_JS, TARGET_HEAD);
+			stylesheets = new Builder(EXTENSION_CSS, TARGET_HEAD, inlineCSS ? InlineStylesheetRenderer.RENDERER_TYPE : RENDERER_TYPE_CSS);
+			scripts = new Builder(EXTENSION_JS, TARGET_HEAD, inlineJS ? InlineScriptRenderer.RENDERER_TYPE : RENDERER_TYPE_JS);
 			deferredScripts = new LinkedHashMap<>();
 			componentResourcesToRemove = new ArrayList<>();
 		}
@@ -509,15 +524,15 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 		private void addDeferredScript(UIComponent component, ResourceIdentifier id) {
 			String group = (String) component.getAttributes().get("group");
-			deferredScripts.computeIfAbsent(group, k -> new Builder(EXTENSION_JS, TARGET_BODY)).add(component, id);
+			deferredScripts.computeIfAbsent(group, k -> new Builder(EXTENSION_JS, TARGET_BODY, DeferredScriptRenderer.RENDERER_TYPE)).add(component, id);
 		}
 
 		public void create(FacesContext context) {
-			stylesheets.create(context, inlineCSS ? InlineStylesheetRenderer.RENDERER_TYPE : RENDERER_TYPE_CSS);
-			scripts.create(context, inlineJS ? InlineScriptRenderer.RENDERER_TYPE : RENDERER_TYPE_JS);
+			stylesheets.create(context);
+			scripts.create(context);
 
 			for (Builder builder : deferredScripts.values()) {
-				builder.create(context, DeferredScriptRenderer.RENDERER_TYPE);
+				builder.create(context);
 			}
 
 			removeComponentResources(context, componentResourcesToRemove, TARGET_HEAD);
@@ -529,15 +544,17 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 	private final class Builder {
 
-		private String extension;
-		private String target;
-		private CombinedResourceInfo.Builder infoBuilder;
+		private final String extension;
+		private final String target;
+		private final String rendererType;
+		private final CombinedResourceInfo.Builder infoBuilder;
+		private final List<UIComponent> componentResourcesToRemove;
 		private UIComponent componentResource;
-		private List<UIComponent> componentResourcesToRemove;
 
-		private Builder(String extension, String target) {
+		private Builder(String extension, String target, String rendererType) {
 			this.extension = extension;
 			this.target = target;
+			this.rendererType = rendererType;
 			infoBuilder = new CombinedResourceInfo.Builder();
 			componentResourcesToRemove = new ArrayList<>();
 		}
@@ -585,7 +602,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 			return (attribute == null) ? "" : attribute.trim();
 		}
 
-		private void create(FacesContext context, String rendererType) {
+		private void create(FacesContext context) {
 			if (!infoBuilder.isEmpty() && !isAjaxRequestWithPartialRendering(context)) { // #273, #301
 				if (componentResource == null) {
 					componentResource = new UIOutput();
@@ -606,33 +623,36 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 				Resource resource = context.getApplication().getResourceHandler().createResource(resourceName, LIBRARY_NAME);
 
 				if (resource instanceof CDNResource) {
-					String fallback = ((CDNResource) resource).getLocalRequestPath();
-
-					if (RENDERER_TYPE_JS.equals(rendererType)) {
-						componentResource.getPassThroughAttributes().put("onerror", "document.write('<script src=\"" + fallback + "\"></script>')");
-					}
-					else if (RENDERER_TYPE_CSS.equals(rendererType)) {
-						componentResource.getPassThroughAttributes().put("onerror", "this.onerror=null;this.href='" + fallback + "'");
-					}
-					else if (DeferredScriptRenderer.RENDERER_TYPE.equals(rendererType)) {
-						String callbacks = "";
-						String onsuccess = (String) componentResource.getAttributes().get("onsuccess");
-
-						if (onsuccess != null) {
-							callbacks = ",null,function(){" + onsuccess + "}";
-						}
-
-						componentResource.getAttributes().put("onerror", "OmniFaces.Util.loadScript('" + fallback + "'" + callbacks + ")");
-					}
+					setFallbackURL((CDNResource) resource);
 				}
 				else if (RENDERER_TYPE_JS.equals(rendererType)) {
-					componentResource.getPassThroughAttributes().put("crossorigin", "anonymous");
+					componentResource.getPassThroughAttributes().put("crossorigin", crossorigin);
 				}
 			}
 
 			removeComponentResources(context, componentResourcesToRemove, target);
 		}
 
+		private void setFallbackURL(CDNResource cdnResource) {
+			String fallbackURL = cdnResource.getLocalRequestPath();
+
+			if (RENDERER_TYPE_JS.equals(rendererType)) {
+				componentResource.getPassThroughAttributes().put("onerror", "document.write('<script src=\"" + fallbackURL + "\"></script>')");
+			}
+			else if (RENDERER_TYPE_CSS.equals(rendererType)) {
+				componentResource.getPassThroughAttributes().put("onerror", "this.onerror=null;this.href='" + fallbackURL + "'");
+			}
+			else if (DeferredScriptRenderer.RENDERER_TYPE.equals(rendererType)) {
+				String callbacks = "";
+				String onsuccess = (String) componentResource.getAttributes().get("onsuccess");
+
+				if (onsuccess != null) {
+					callbacks = ",null,function(){" + onsuccess + "}";
+				}
+
+				componentResource.getAttributes().put("onerror", "OmniFaces.Util.loadScript('" + fallbackURL + "', '" + crossorigin + "'" + callbacks + ")");
+			}
+		}
 	}
 
 }

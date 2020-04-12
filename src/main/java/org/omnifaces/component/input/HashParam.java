@@ -1,10 +1,10 @@
 /*
- * Copyright 2019 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -60,7 +60,7 @@ import org.omnifaces.util.State;
  * The "hash query string" is the part in URL after the <code>#</code> which could be formatted in the same format
  * as a regular request query string (the part in URL after the <code>?</code>). An example:
  * <pre>
- * http://example.com/page.xhtml#foo=baz&amp;bar=kaz
+ * https://example.com/page.xhtml#foo=baz&amp;bar=kaz
  * </pre>
  * <p>
  * This specific part of the URL (also called hash fragment identifier) is by default not sent to the server. This
@@ -114,7 +114,7 @@ import org.omnifaces.util.State;
  * </pre>
  * <p>
  * When <code>#{bean.foo}</code> is <code>"baz"</code> and <code>#{bean.bar}</code> is <code>"kaz"</code> or empty,
- * then the reflected hash query string will become <code>http://example.com/page.xhtml#foo=baz</code>.
+ * then the reflected hash query string will become <code>https://example.com/page.xhtml#foo=baz</code>.
  * If <code>#{bean.bar}</code> is any other value, then it will appear in the hash query string.
  *
  * <h3>Events</h3>

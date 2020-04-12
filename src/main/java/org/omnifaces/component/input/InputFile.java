@@ -1,10 +1,10 @@
 /*
- * Copyright 2019 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -158,7 +158,7 @@ import org.omnifaces.util.Utils;
  * <p>
  * The <code>accept</code> attribute can be set with a comma separated string of media types of files to filter in
  * browse dialog. An overview of all registered media types can be found at
- * <a href="http://www.iana.org/assignments/media-types">IANA</a>.
+ * <a href="https://www.iana.org/assignments/media-types">IANA</a>.
  * <pre>
  * &lt;h:form enctype="multipart/form-data"&gt;
  *     &lt;o:inputFile id="file" value="#{bean.losslessImageFile}" accept="image/png,image/gif" /&gt;
@@ -378,7 +378,7 @@ public class InputFile extends HtmlInputFile {
 		Map<String, Object> passThroughAttributes = getPassThroughAttributes();
 
 		if (isMultiple()) {
-			passThroughAttributes.put("multiple", true); // http://caniuse.com/#feat=input-file-multiple
+			passThroughAttributes.put("multiple", true); // https://caniuse.com/#feat=input-file-multiple
 		}
 
 		if (isDirectory()) {
@@ -389,7 +389,7 @@ public class InputFile extends HtmlInputFile {
 		String accept = getAccept();
 
 		if (accept != null) {
-			passThroughAttributes.put("accept", accept); // http://caniuse.com/#feat=input-file-accept
+			passThroughAttributes.put("accept", accept); // https://caniuse.com/#feat=input-file-accept
 		}
 
 		Long maxsize = getMaxsize();

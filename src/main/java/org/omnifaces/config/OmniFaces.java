@@ -1,10 +1,10 @@
 /*
- * Copyright 2019 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -15,8 +15,8 @@ package org.omnifaces.config;
 import static java.util.ResourceBundle.getBundle;
 import static org.omnifaces.util.Faces.getLocale;
 import static org.omnifaces.util.Faces.getMessageBundle;
+import static org.omnifaces.util.Utils.coalesce;
 
-import java.util.Optional;
 import java.util.ResourceBundle;
 
 
@@ -44,7 +44,7 @@ public final class OmniFaces {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final String VERSION = Optional.ofNullable(OmniFaces.class.getPackage().getSpecificationVersion()).map(v -> v.replaceAll("-\\d+$", "")).orElse("DEVELOPMENT");
+	private static final String VERSION = coalesce(OmniFaces.class.getPackage().getImplementationVersion(), "DEV-SNAPSHOT");
 	private static final boolean SNAPSHOT = VERSION.contains("-"); // -SNAPSHOT, -RCx
 	private static final Long STARTUP_TIME = System.currentTimeMillis();
 	private static final String DEFAULT_MESSAGE_BUNDLE = "org.omnifaces.messages";
@@ -58,7 +58,11 @@ public final class OmniFaces {
 	// Utility --------------------------------------------------------------------------------------------------------
 
 	/**
-	 * Returns OmniFaces version. E.g. <code>2.5</code> or <code>2.5-SNAPSHOT</code>.
+	 * Returns OmniFaces version.
+	 * This is extracted from Implementation-Version field of /META-INF/MANIFEST.MF file of omnifaces.jar file.
+	 * Release versions will return version in format <code>3.4.2</code>.
+	 * Snapshot versions will return version in format <code>3.4.2-SNAPSHOT</code>.
+	 * Local development versions (because MANIFEST.MF entry is missing) will return version in format <code>DEV-SNAPSHOT</code>.
 	 * @return OmniFaces version.
 	 */
 	public static String getVersion() {

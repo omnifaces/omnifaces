@@ -1,10 +1,10 @@
 /*
- * Copyright 2019 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -118,7 +118,7 @@ import org.omnifaces.cdi.Param;
  * &lt;/context-param&gt;
  * </pre>
  * <p>
- * On an example URL of <code>http://example.com/context/foo/bar/baz</code> when neither <code>/foo/bar/baz.xhtml</code>
+ * On an example URL of <code>https://example.com/context/foo/bar/baz</code> when neither <code>/foo/bar/baz.xhtml</code>
  * nor <code>/foo/bar.xhtml</code> exist, but <code>/foo.xhtml</code> does exist, then the request will forward to
  * <code>/foo.xhtml</code> and make the values <code>bar</code> and <code>baz</code> available as injectable path
  * parameters via <code>&#64;</code>{@link Param} in the managed bean associated with <code>/foo.xhtml</code>.
@@ -607,7 +607,7 @@ public final class FacesViews {
 	/**
 	 * Obtains the full request URL from the given request and the given resource complete with the query string,
 	 * but with the extension (if any) cut out.
-	 * E.g. <code>http://localhost/foo/bar.xhtml?kaz=1</code> becomes <code>http://localhost/foo/bar?kaz=1</code>
+	 * E.g. <code>https://example.com/foo/bar.xhtml?kaz=1</code> becomes <code>https://example.com/foo/bar?kaz=1</code>
 	 */
 	static String getExtensionlessURLWithQuery(HttpServletRequest request, String resource) {
 		String queryString = (request.getQueryString() == null) ? "" : ("?" + request.getQueryString());
