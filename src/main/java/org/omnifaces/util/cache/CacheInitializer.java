@@ -15,6 +15,7 @@ package org.omnifaces.util.cache;
 import static java.lang.Boolean.parseBoolean;
 import static java.util.Collections.list;
 import static org.omnifaces.util.Platform.getFacesServletRegistration;
+import static org.omnifaces.util.Reflection.instance;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -69,22 +70,13 @@ public final class CacheInitializer {
 
 		String cacheProviderName = context.getInitParameter(CACHE_PROVIDER_INIT_PARAM_NAME);
 		if (cacheProviderName != null) {
-			cacheProvider = createInstance(cacheProviderName);
+			cacheProvider = instance(cacheProviderName);
 			CacheFactory.setCacheProvider(cacheProvider, context);
 		} else {
 			cacheProvider = CacheFactory.getDefaultCacheProvider();
 		}
 
 		return cacheProvider;
-	}
-
-	private static CacheProvider createInstance(String cacheProviderName) {
-		try {
-			return (CacheProvider) Class.forName(cacheProviderName).newInstance();
-		}
-		catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
-			throw new IllegalArgumentException(e);
-		}
 	}
 
 	private static Map<String, String> getCacheSetting(ServletContext context) {

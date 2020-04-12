@@ -318,7 +318,7 @@ public final class Reflection {
 	 */
 	public static <T> T instance(Class<T> clazz) {
 		try {
-			return clazz.newInstance();
+			return clazz.getDeclaredConstructor().newInstance();
 		}
 		catch (Exception e) {
 			throw new IllegalStateException(format(ERROR_CREATE_INSTANCE, clazz), e);

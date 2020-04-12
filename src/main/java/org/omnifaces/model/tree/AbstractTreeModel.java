@@ -12,6 +12,8 @@
  */
 package org.omnifaces.model.tree;
 
+import static org.omnifaces.util.Reflection.instance;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -60,15 +62,7 @@ public abstract class AbstractTreeModel<T> implements TreeModel<T> {
 	@Override
 	@SuppressWarnings("unchecked")
 	public TreeModel<T> addChild(T data) {
-		AbstractTreeModel<T> child;
-
-		try {
-			child = getClass().newInstance();
-		}
-		catch (Exception e) {
-			throw new UnsupportedOperationException(e);
-		}
-
+		AbstractTreeModel<T> child = instance(getClass());
 		child.data = data;
 		return addChildNode(child);
 	}

@@ -12,11 +12,13 @@
  */
 package org.omnifaces.util.copier;
 
+import static org.omnifaces.util.Reflection.instance;
+
 /**
  * Copier that doesn't actually copy an object fully, but just returns a new instance of the same type.
  * <p>
  * The object that is to be copied has to implement a public default constructor.
- * 
+ *
  * @since 2.0
  * @author Arjan Tijms
  *
@@ -26,10 +28,11 @@ public class NewInstanceCopier implements Copier {
 	@Override
 	public Object copy(Object object) {
 		try {
-			return object.getClass().newInstance();
-		} catch (InstantiationException | IllegalAccessException e) {
+			return instance(object.getClass());
+		}
+		catch (Exception e) {
 			throw new IllegalStateException(e);
 		}
 	}
-	
+
 }
