@@ -11,11 +11,7 @@
 
 	<groupId>org.omnifaces</groupId>
 	<artifactId>omnifaces</artifactId>
-<<<<<<< HEAD
 	<version>3.5.1-SNAPSHOT</version>
-=======
-	<version>3.5</version>
->>>>>>> refs/heads/master
 	<packaging>jar</packaging>
 
 	<name>OmniFaces</name>
