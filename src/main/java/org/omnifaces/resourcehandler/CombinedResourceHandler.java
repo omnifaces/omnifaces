@@ -466,8 +466,8 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		private List<UIComponent> componentResourcesToRemove;
 
 		public CombinedResourceBuilder() {
-			stylesheets = new Builder(EXTENSION_CSS, TARGET_HEAD);
-			scripts = new Builder(EXTENSION_JS, TARGET_HEAD);
+			stylesheets = new Builder(EXTENSION_CSS, TARGET_HEAD, inlineCSS ? InlineStylesheetRenderer.RENDERER_TYPE : RENDERER_TYPE_CSS);
+			scripts = new Builder(EXTENSION_JS, TARGET_HEAD, inlineJS ? InlineScriptRenderer.RENDERER_TYPE : RENDERER_TYPE_JS);
 			deferredScripts = new LinkedHashMap<>();
 			componentResourcesToRemove = new ArrayList<>();
 		}
@@ -524,15 +524,15 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 		private void addDeferredScript(UIComponent component, ResourceIdentifier id) {
 			String group = (String) component.getAttributes().get("group");
-			deferredScripts.computeIfAbsent(group, k -> new Builder(EXTENSION_JS, TARGET_BODY)).add(component, id);
+			deferredScripts.computeIfAbsent(group, k -> new Builder(EXTENSION_JS, TARGET_BODY, DeferredScriptRenderer.RENDERER_TYPE)).add(component, id);
 		}
 
 		public void create(FacesContext context) {
-			stylesheets.create(context, inlineCSS ? InlineStylesheetRenderer.RENDERER_TYPE : RENDERER_TYPE_CSS);
-			scripts.create(context, inlineJS ? InlineScriptRenderer.RENDERER_TYPE : RENDERER_TYPE_JS);
+			stylesheets.create(context);
+			scripts.create(context);
 
 			for (Builder builder : deferredScripts.values()) {
-				builder.create(context, DeferredScriptRenderer.RENDERER_TYPE);
+				builder.create(context);
 			}
 
 			removeComponentResources(context, componentResourcesToRemove, TARGET_HEAD);
@@ -544,15 +544,17 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 
 	private final class Builder {
 
-		private String extension;
-		private String target;
-		private CombinedResourceInfo.Builder infoBuilder;
+		private final String extension;
+		private final String target;
+		private final String rendererType;
+		private final CombinedResourceInfo.Builder infoBuilder;
+		private final List<UIComponent> componentResourcesToRemove;
 		private UIComponent componentResource;
-		private List<UIComponent> componentResourcesToRemove;
 
-		private Builder(String extension, String target) {
+		private Builder(String extension, String target, String rendererType) {
 			this.extension = extension;
 			this.target = target;
+			this.rendererType = rendererType;
 			infoBuilder = new CombinedResourceInfo.Builder();
 			componentResourcesToRemove = new ArrayList<>();
 		}
@@ -600,7 +602,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 			return (attribute == null) ? "" : attribute.trim();
 		}
 
-		private void create(FacesContext context, String rendererType) {
+		private void create(FacesContext context) {
 			if (!infoBuilder.isEmpty() && !isAjaxRequestWithPartialRendering(context)) { // #273, #301
 				if (componentResource == null) {
 					componentResource = new UIOutput();
@@ -621,24 +623,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 				Resource resource = context.getApplication().getResourceHandler().createResource(resourceName, LIBRARY_NAME);
 
 				if (resource instanceof CDNResource) {
-					String fallback = ((CDNResource) resource).getLocalRequestPath();
-
-					if (RENDERER_TYPE_JS.equals(rendererType)) {
-						componentResource.getPassThroughAttributes().put("onerror", "document.write('<script src=\"" + fallback + "\"></script>')");
-					}
-					else if (RENDERER_TYPE_CSS.equals(rendererType)) {
-						componentResource.getPassThroughAttributes().put("onerror", "this.onerror=null;this.href='" + fallback + "'");
-					}
-					else if (DeferredScriptRenderer.RENDERER_TYPE.equals(rendererType)) {
-						String callbacks = "";
-						String onsuccess = (String) componentResource.getAttributes().get("onsuccess");
-
-						if (onsuccess != null) {
-							callbacks = ",null,function(){" + onsuccess + "}";
-						}
-
-						componentResource.getAttributes().put("onerror", "OmniFaces.Util.loadScript('" + fallback + "', '" + crossorigin + "'" + callbacks + ")");
-					}
+					setFallbackURL((CDNResource) resource);
 				}
 				else if (RENDERER_TYPE_JS.equals(rendererType)) {
 					componentResource.getPassThroughAttributes().put("crossorigin", crossorigin);
@@ -648,6 +633,26 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 			removeComponentResources(context, componentResourcesToRemove, target);
 		}
 
+		private void setFallbackURL(CDNResource cdnResource) {
+			String fallbackURL = cdnResource.getLocalRequestPath();
+
+			if (RENDERER_TYPE_JS.equals(rendererType)) {
+				componentResource.getPassThroughAttributes().put("onerror", "document.write('<script src=\"" + fallbackURL + "\"></script>')");
+			}
+			else if (RENDERER_TYPE_CSS.equals(rendererType)) {
+				componentResource.getPassThroughAttributes().put("onerror", "this.onerror=null;this.href='" + fallbackURL + "'");
+			}
+			else if (DeferredScriptRenderer.RENDERER_TYPE.equals(rendererType)) {
+				String callbacks = "";
+				String onsuccess = (String) componentResource.getAttributes().get("onsuccess");
+
+				if (onsuccess != null) {
+					callbacks = ",null,function(){" + onsuccess + "}";
+				}
+
+				componentResource.getAttributes().put("onerror", "OmniFaces.Util.loadScript('" + fallbackURL + "', '" + crossorigin + "'" + callbacks + ")");
+			}
+		}
 	}
 
 }

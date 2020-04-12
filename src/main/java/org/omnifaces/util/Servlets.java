@@ -145,12 +145,19 @@ public final class Servlets {
 	 * Returns the HTTP request domain URL. This is the URL with the scheme and domain, without any trailing slash.
 	 * @param request The involved HTTP servlet request.
 	 * @return The HTTP request domain URL.
+	 * @throws IllegalArgumentException When the URL is malformed. This is however unexpected as the request would
+	 * otherwise not have hit the server at all.
 	 * @see HttpServletRequest#getRequestURL()
-	 * @see HttpServletRequest#getRequestURI()
 	 */
 	public static String getRequestDomainURL(HttpServletRequest request) {
-		String url = request.getRequestURL().toString();
-		return url.substring(0, url.length() - request.getRequestURI().length());
+		try {
+			URL url = new URL(request.getRequestURL().toString());
+			String fullURL = url.toString();
+			return fullURL.substring(0, fullURL.length() - url.getPath().length());
+		}
+		catch (MalformedURLException e) {
+			throw new IllegalArgumentException(e);
+		}
 	}
 
 	/**

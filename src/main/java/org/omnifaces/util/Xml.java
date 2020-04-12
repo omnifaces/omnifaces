@@ -75,6 +75,8 @@ public final class Xml {
 	 */
 	public static DocumentBuilder createDocumentBuilder() {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
+		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
 		factory.setValidating(false);
 		factory.setNamespaceAware(false);
 		factory.setExpandEntityReferences(false);

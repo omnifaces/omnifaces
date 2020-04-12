@@ -327,7 +327,7 @@ public abstract class FileServlet extends HttpServlet {
 				}
 			}
 			catch (IllegalArgumentException ifRangeHeaderIsInvalid) {
-				logger.log(FINE, "If-Range header is invalid. Let's just return full file then.", ifRangeHeaderIsInvalid);
+				logger.log(FINE, "If-Range header is invalid. Just return full file then.", ifRangeHeaderIsInvalid);
 				return ranges;
 			}
 		}
