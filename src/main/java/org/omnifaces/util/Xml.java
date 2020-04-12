@@ -12,7 +12,9 @@
  */
 package org.omnifaces.util;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.logging.Level.FINE;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,6 +22,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -43,6 +46,8 @@ import org.xml.sax.SAXException;
  * @since 2.1
  */
 public final class Xml {
+
+	private static final Logger logger = Logger.getLogger(Xml.class.getName());
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -75,18 +80,27 @@ public final class Xml {
 	 */
 	public static DocumentBuilder createDocumentBuilder() {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_DTD, "");
-		factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
 		factory.setValidating(false);
 		factory.setNamespaceAware(false);
 		factory.setExpandEntityReferences(false);
 
 		try {
 			factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+			unsetAttributeIgnoringIAE(factory, XMLConstants.ACCESS_EXTERNAL_DTD);
+			unsetAttributeIgnoringIAE(factory, XMLConstants.ACCESS_EXTERNAL_SCHEMA);
 			return factory.newDocumentBuilder();
 		}
 		catch (ParserConfigurationException e) {
 			throw new UnsupportedOperationException(e);
+		}
+	}
+
+	private static void unsetAttributeIgnoringIAE(DocumentBuilderFactory factory, String name) {
+		try {
+			factory.setAttribute(name, "");
+		}
+		catch (IllegalArgumentException e) {
+			logger.log(FINE, format("Cannot unset attribute '%s'; falling back to default.", name), e);
 		}
 	}
 
