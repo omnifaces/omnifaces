@@ -42,8 +42,8 @@ import org.omnifaces.application.OmniApplicationFactory;
 /**
  * <p>
  * The <code>@FacesValidator</code> is by default not eligible for dependency injection by <code>@Inject</code> nor <code>@EJB</code>.
- * There is a <a href="http://balusc.omnifaces.org/2011/09/communication-in-jsf-20.html#GettingAnEJBInFacesConverterAndFacesValidator">workaround</a>
- * for EJB, but this is nasty and doesn't work out for CDI. <a href="http://stackoverflow.com/q/7572335/157882">Another way</a>
+ * There is a <a href="https://balusc.omnifaces.org/2011/09/communication-in-jsf-20.html#GettingAnEJBInFacesConverterAndFacesValidator">workaround</a>
+ * for EJB, but this is nasty and doesn't work out for CDI. <a href="https://stackoverflow.com/q/7572335/157882">Another way</a>
  * would be to make it a JSF or CDI managed bean, however this doesn't register the validator instance into the JSF application context,
  * and hence you won't be able to make use of {@link Application#createValidator(String)} on it.
  * <p>
@@ -54,7 +54,7 @@ import org.omnifaces.application.OmniApplicationFactory;
  * last moment removed from dependency injection support.
  * <p>
  * The support is expected to come back in JSF 2.3, but we just can't wait any longer.
- * <a href="http://myfaces.apache.org/extensions/cdi/">MyFaces CODI</a> has support for it,
+ * <a href="https://myfaces.apache.org/extensions/cdi/">MyFaces CODI</a> has support for it,
  * but it requires an additional <code>@Advanced</code> annotation.
  * OmniFaces solves this by implicitly making all {@link FacesValidator} instances eligible for dependency injection
  * <strong>without any further modification</strong>.
@@ -67,7 +67,7 @@ import org.omnifaces.application.OmniApplicationFactory;
  * explicit CDI managed bean scope annotation will be registered for dependency injection support. In order to cover
  * {@link FacesValidator} annotated classes as well, you need to explicitly set <code>bean-discovery-mode="all"</code>
  * attribute in <code>beans.xml</code>. This was not necessary in Mojarra versions older than 2.2.9 due to an
- * <a href="http://stackoverflow.com/q/29458023/157882">oversight</a>. If you want to keep the default of
+ * <a href="https://stackoverflow.com/q/29458023/157882">oversight</a>. If you want to keep the default of
  * <code>bean-discovery-mode="annotated"</code>, then you need to add {@link Dependent} annotation to the validator class.
  *
  * <h2>AmbiguousResolutionException</h2>

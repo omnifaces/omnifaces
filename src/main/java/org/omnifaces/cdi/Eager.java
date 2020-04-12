@@ -99,7 +99,7 @@ import org.omnifaces.cdi.eager.EagerExtension;
  * <p>
  * The following bean will be instantiated whenever the URI <code>/components/cache</code> (relatively to the
  * application root) is requested, i.e. when an app is deployed to <code>/myapp</code> at localhost this will correspond to
- * a URL like <code>http://localhost:8080/myapp/components/cache</code>:
+ * a URL like <code>https://example.com/myapp/components/cache</code>:
  * <pre>
  * &#64;Eager(requestURI = "/components/cache")
  * &#64;RequestScoped

@@ -504,15 +504,10 @@ public final class Components {
 		 * @return the intermediate builder object to continue the builder chain
 		 */
 		public ForEach withHints(VisitHint... hints) {
-
 			if (hints.length > 0) {
 				EnumSet<VisitHint> hintsSet = EnumSet.noneOf(hints[0].getDeclaringClass());
-				for (VisitHint hint : hints) {
-					hintsSet.add(hint);
-				}
-
+				Collections.addAll(hintsSet, hints);
 				this.hints = hintsSet;
-
 			}
 			return this;
 		}

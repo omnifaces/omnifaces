@@ -92,7 +92,7 @@ import org.omnifaces.util.Utils;
  * <p>
  * Path parameters can be injected by specifying the <code>pathIndex</code> attribute representing the zero-based index
  * of the path parameter. The support was added in OmniFaces 2.5. On an example request
- * <code>http://example.com/mypage/firstname.lastname</code>, which is mapped to <code>/mypage.xhtml</code>, the below
+ * <code>https://example.com/mypage/firstname.lastname</code>, which is mapped to <code>/mypage.xhtml</code>, the below
  * example injects the path parameter <code>firstname.lastname</code>.
  * <pre>
  * &#64;Inject &#64;Param(pathIndex=0)
@@ -112,7 +112,7 @@ import org.omnifaces.util.Utils;
  * </pre>
  * <p>
  * Other types do need a converter. The following is an example of the injection of request parameter <code>user</code>
- * following a request such as <code>http://example.com/mypage?user=42</code>:
+ * following a request such as <code>https://example.com/mypage?user=42</code>:
  * <pre>
  * &#64;Inject &#64;Param(converter="userConverter", validator="priviledgedUser")
  * private User user;
@@ -125,7 +125,7 @@ import org.omnifaces.util.Utils;
  * </pre>
  * <p>
  * This also works on path parameters. The following is an example of the injection of path parameter <code>user</code>
- * following a request such as <code>http://example.com/mypage/42</code>:
+ * following a request such as <code>https://example.com/mypage/42</code>:
  * <pre>
  * &#64;Inject &#64;Param(pathIndex=0, converter="userConverter", validator="priviledgedUser")
  * private User user;

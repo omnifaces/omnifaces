@@ -110,7 +110,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * &lt;env-entry&gt;
  *     &lt;env-entry-name&gt;jsf/ClientSideSecretKey&lt;/env-entry-name&gt;
  *     &lt;env-entry-type&gt;java.lang.String&lt;/env-entry-type&gt;
- *     &lt;env-entry-value&gt;&lt;!-- See http://stackoverflow.com/q/35102645/157882 --&gt;&lt;/env-entry-value&gt;
+ *     &lt;env-entry-value&gt;&lt;!-- See https://stackoverflow.com/q/35102645/157882 --&gt;&lt;/env-entry-value&gt;
  * &lt;/env-entry&gt;
  * </pre>
  * <p>

@@ -45,7 +45,7 @@ import jakarta.faces.application.ResourceHandler;
  * <p>
  * To configure the CDN URLs, a {@value org.omnifaces.resourcehandler.CDNResourceHandler#PARAM_NAME_CDN_RESOURCES}
  * context parameter has to be provided wherein the CDN resources are been specified as a comma separated string of
- * <code>libraryName:resourceName=http://cdn.example.com/url</code> key=value pairs. The key represents the default
+ * <code>libraryName:resourceName=https://cdn.example.com/url</code> key=value pairs. The key represents the default
  * JSF resource identifier and the value represents the full CDN URL, including the scheme. The CDN URL is not validated
  * by this resource handler, so you need to make absolutely sure yourself that it is valid.
  * <p>
@@ -54,10 +54,10 @@ import jakarta.faces.application.ResourceHandler;
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_URLS&lt;/param-name&gt;
  *     &lt;param-value&gt;
- *         js/script1.js=http://cdn.example.com/js/script1.js,
- *         somelib:js/script2.js=http://cdn.example.com/somelib/js/script2.js,
- *         otherlib:style.css=http://cdn.example.com/otherlib/style.css,
- *         somelib:images/logo.png=http://cdn.example.com/somelib/logo.png
+ *         js/script1.js=https://cdn.example.com/js/script1.js,
+ *         somelib:js/script2.js=https://cdn.example.com/somelib/js/script2.js,
+ *         otherlib:style.css=https://cdn.example.com/otherlib/style.css,
+ *         somelib:images/logo.png=https://cdn.example.com/somelib/logo.png
  *     &lt;/param-value&gt;
  * &lt;/context-param&gt;
  * </pre>
@@ -72,10 +72,10 @@ import jakarta.faces.application.ResourceHandler;
  * <p>
  * Will be rendered as:
  * <pre>
- * &lt;script type="text/javascript" src="http://cdn.example.com/js/script1.js"&gt;&lt;/script&gt;
- * &lt;script type="text/javascript" src="http://cdn.example.com/somelib/js/script2.js"&gt;&lt;/script&gt;
- * &lt;link type="text/css" rel="stylesheet" href="http://cdn.example.com/otherlib/style.css" /&gt;
- * &lt;img src="http://cdn.example.com/logo.png" /&gt;
+ * &lt;script type="text/javascript" src="https://cdn.example.com/js/script1.js"&gt;&lt;/script&gt;
+ * &lt;script type="text/javascript" src="https://cdn.example.com/somelib/js/script2.js"&gt;&lt;/script&gt;
+ * &lt;link type="text/css" rel="stylesheet" href="https://cdn.example.com/otherlib/style.css" /&gt;
+ * &lt;img src="https://cdn.example.com/logo.png" /&gt;
  * </pre>
  * <p>
  * Here is a real world example with Bootstrap:
@@ -109,7 +109,7 @@ import jakarta.faces.application.ResourceHandler;
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_URLS&lt;/param-name&gt;
- *     &lt;param-value&gt;jquery-cdn:*=http://code.jquery.com/*&lt;/param-value&gt;
+ *     &lt;param-value&gt;jquery-cdn:*=https://code.jquery.com/*&lt;/param-value&gt;
  * &lt;/context-param&gt;
  * </pre>
  * With the above configuration, the following resources:
@@ -120,8 +120,8 @@ import jakarta.faces.application.ResourceHandler;
  * <p>
  * Will be rendered as:
  * <pre>
- * &lt;script type="text/javascript" src="http://code.jquery.com/jquery-1.9.1.js"&gt;&lt;/script&gt;
- * &lt;script type="text/javascript" src="http://code.jquery.com/ui/1.10.3/jquery-ui.js"&gt;&lt;/script&gt;
+ * &lt;script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.js"&gt;&lt;/script&gt;
+ * &lt;script type="text/javascript" src="https://code.jquery.com/ui/1.10.3/jquery-ui.js"&gt;&lt;/script&gt;
  * </pre>
  *
  * <h2>EL expressions</h2>
@@ -129,7 +129,7 @@ import jakarta.faces.application.ResourceHandler;
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.CDN_RESOURCE_HANDLER_URLS&lt;/param-name&gt;
- *     &lt;param-value&gt;jquery-cdn:*=http://#{settings.jqueryCDN}/*&lt;/param-value&gt;
+ *     &lt;param-value&gt;jquery-cdn:*=https://#{settings.jqueryCDN}/*&lt;/param-value&gt;
  * &lt;/context-param&gt;
  * </pre>
  * <p>The EL expression is resolved on a per-request basis.</p>
@@ -185,7 +185,7 @@ public class CDNResourceHandler extends DefaultResourceHandler {
 	private static final String ERROR_INVALID_WILDCARD =
 		"Context parameter '" + PARAM_NAME_CDN_RESOURCES + "' is in invalid syntax."
 			+ " Wildcard can only represent entire resource name '*' and URL suffix '/*' as in"
-			+ " 'libraryName:*=http://cdn.example.com/*'.";
+			+ " 'libraryName:*=https://cdn.example.com/*'.";
 
 	// Properties -----------------------------------------------------------------------------------------------------
 

@@ -61,7 +61,7 @@ import org.omnifaces.util.Messages;
  * </pre>
  * <p>
  * The validator ID of all standard JSF validators can be found in
- * <a href="http://docs.oracle.com/javaee/7/api/javax/faces/validator/package-summary.html">their javadocs</a>.
+ * <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/faces/validator/package-summary.html">their javadocs</a>.
  * First go to the javadoc of the class of interest, then go to <code>VALIDATOR_ID</code> in its field summary
  * and finally click the Constant Field Values link to see the value.
  * <p>

@@ -39,7 +39,7 @@ import org.omnifaces.util.Servlets;
  * webbrowser) to <strong>not</strong> cache the response. This is recommended on dynamic pages with stateful forms with
  * a <code>jakarta.faces.ViewState</code> hidden field. If such a page were cached, and the enduser navigates to it by
  * webbrowser's back button, and then re-submits it, then the enduser would face a
- * <a href="http://stackoverflow.com/a/3642969/157882"><code>ViewExpiredException</code></a>.
+ * <a href="https://stackoverflow.com/a/3642969/157882"><code>ViewExpiredException</code></a>.
  * <p>
  * However, on stateless resources, caching the response would be beneficial. Set the expire time to the same time as
  * you'd like to use as refresh interval of the resource, which can be 10 seconds (to avoid F5-madness on resources
@@ -67,7 +67,7 @@ import org.omnifaces.util.Servlets;
  * <p>
  * <strong>Important notice</strong>: this filter automatically skips JSF resources, such as the ones served by
  * <code>&lt;h:outputScript&gt;</code>, <code>&lt;h:outputStylesheet&gt;</code>, <code>@ResourceDependency</code>, etc.
- * Their cache-related headers are namely <a href="http://stackoverflow.com/q/15057932/157882">already</a> controlled
+ * Their cache-related headers are namely <a href="https://stackoverflow.com/q/15057932/157882">already</a> controlled
  * by the <code>ResourceHandler</code> implementation. In Mojarra and MyFaces, the default expiration time is 1 week
  * (604800000 milliseconds), which can be configured by a <code>web.xml</code> context parameter with the following name and
  * a value in milliseconds, e.g. <code>3628800000</code> for 6 weeks:

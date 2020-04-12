@@ -43,8 +43,8 @@ import org.omnifaces.application.OmniApplicationFactory;
 /**
  * <p>
  * The <code>@FacesConverter</code> is by default not eligible for dependency injection by <code>@Inject</code> nor <code>@EJB</code>.
- * There is a <a href="http://balusc.omnifaces.org/2011/09/communication-in-jsf-20.html#GettingAnEJBInFacesConverterAndFacesValidator">workaround</a>
- * for EJB, but this is nasty and doesn't work out for CDI. <a href="http://stackoverflow.com/q/7531449/157882">Another way</a>
+ * There is a <a href="https://balusc.omnifaces.org/2011/09/communication-in-jsf-20.html#GettingAnEJBInFacesConverterAndFacesValidator">workaround</a>
+ * for EJB, but this is nasty and doesn't work out for CDI. <a href="https://stackoverflow.com/q/7531449/157882">Another way</a>
  * would be to make it a JSF or CDI managed bean, however this doesn't register the converter instance into the JSF application context,
  * and hence you won't be able to make use of {@link Application#createConverter(String)} on it. Further it also breaks
  * the power of <code>forClass</code> attribute, i.e. you can't register a JSF converter for a specific type anymore and
@@ -57,7 +57,7 @@ import org.omnifaces.application.OmniApplicationFactory;
  * last moment removed from dependency injection support.
  * <p>
  * The support is expected to come back in JSF 2.3, but we just can't wait any longer.
- * <a href="http://myfaces.apache.org/extensions/cdi/">MyFaces CODI</a> has support for it,
+ * <a href="https://myfaces.apache.org/extensions/cdi/">MyFaces CODI</a> has support for it,
  * but it requires an additional <code>@Advanced</code> annotation.
  * OmniFaces solves this by implicitly making all {@link FacesConverter} instances eligible for dependency injection
  * <strong>without any further modification</strong>.
@@ -71,7 +71,7 @@ import org.omnifaces.application.OmniApplicationFactory;
  * explicit CDI managed bean scope annotation will be registered for dependency injection support. In order to cover
  * {@link FacesConverter} annotated classes as well, you need to explicitly set <code>bean-discovery-mode="all"</code>
  * attribute in <code>beans.xml</code>. This was not necessary in Mojarra versions older than 2.2.9 due to an
- * <a href="http://stackoverflow.com/q/29458023/157882">oversight</a>. If you want to keep the default of
+ * <a href="https://stackoverflow.com/q/29458023/157882">oversight</a>. If you want to keep the default of
  * <code>bean-discovery-mode="annotated"</code>, then you need to add {@link Dependent} annotation to the converter class.
  *
  * <h2>AmbiguousResolutionException</h2>

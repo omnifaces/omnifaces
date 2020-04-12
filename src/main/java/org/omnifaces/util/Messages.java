@@ -287,7 +287,7 @@ public final class Messages {
 		 * @throws ConverterException
 		 * @since 3.5
 		 */
-		public void throwConverterException() throws ConverterException {
+		public void throwConverterException() {
 			throw new ConverterException(facesMessage);
 		}
 
@@ -296,7 +296,7 @@ public final class Messages {
 		 * @throws ValidatorException
 		 * @since 3.5
 		 */
-		public void throwValidatorException() throws ValidatorException {
+		public void throwValidatorException() {
 			throw new ValidatorException(facesMessage);
 		}
 
@@ -375,7 +375,7 @@ public final class Messages {
 	 * @see #createError(String, Object...)
 	 * @since 3.5
 	 */
-	public void throwConverterException(String message, Object... params) throws ConverterException {
+	public void throwConverterException(String message, Object... params) {
 		throw new ConverterException(createError(message, params));
 	}
 
@@ -389,7 +389,7 @@ public final class Messages {
 	 * @see #createError(String, Object...)
 	 * @since 3.5
 	 */
-	public void throwValidatorException(String message, Object... params) throws ValidatorException {
+	public void throwValidatorException(String message, Object... params) {
 		throw new ValidatorException(createError(message, params));
 	}
 
