@@ -18,6 +18,8 @@ import java.util.Map;
 
 import javax.faces.application.Application;
 
+import org.omnifaces.cdi.config.FacesConfigXmlProducer;
+
 /**
  * <p>
  * This configuration interface parses the <code>/WEB-INF/faces-config.xml</code> and all
@@ -46,6 +48,7 @@ import javax.faces.application.Application;
  * @author Michele Mariotti
  * @since 2.1
  * @see FacesConfigXmlSingleton
+ * @see FacesConfigXmlProducer
  */
 public interface FacesConfigXml {
 

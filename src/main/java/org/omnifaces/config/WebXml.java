@@ -18,6 +18,8 @@ import java.util.Set;
 
 import javax.servlet.ServletContext;
 
+import org.omnifaces.cdi.config.WebXmlProducer;
+
 /**
  * <p>
  * This configuration interface parses the <code>/WEB-INF/web.xml</code> and all <code>/META-INF/web-fragment</code> files
@@ -51,10 +53,17 @@ import javax.servlet.ServletContext;
  * // Get web.xml configured session timeout (in seconds).
  * int sessionTimeout = WebXml.instance().getSessionTimeout();
  * </pre>
+ * <p>
+ * Since OmniFaces 3.1, you can if necessary even inject it.
+ * <pre>
+ * &#64;Inject
+ * private WebXml webXml;
+ * </pre>
  *
  * @author Bauke Scholtz
  * @since 1.2
  * @see WebXmlSingleton
+ * @see WebXmlProducer
  */
 public interface WebXml {
 
