@@ -40,7 +40,7 @@ import org.omnifaces.util.cache.CacheInitializer;
  * <li>Check if JSF 2.3 is available, otherwise log and fail.
  * <li>Check if CDI 1.1 is available, otherwise log and fail.
  * <li>Load {@link Cache} provider and register its filter if necessary.
- * <li>Instantiate {@link Eager} application scoed beans and register {@link EagerBeansWebListener} if necessary.
+ * <li>Instantiate {@link Eager} application scoped beans and register {@link EagerBeansWebListener} if necessary.
  * <li>Add {@link FacesViews} mappings to FacesServlet if necessary.
  * <li>Register {@link GraphicImageBean} beans in {@link GraphicResource}.
  * <li>Register {@link Socket} endpoint if necessary.
