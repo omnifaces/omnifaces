@@ -31,6 +31,7 @@ import jakarta.enterprise.inject.spi.BeanManager;
 import jakarta.inject.Inject;
 import jakarta.servlet.ServletContext;
 
+import org.omnifaces.util.BeansLocal;
 import org.omnifaces.util.Utils;
 
 /**
@@ -132,7 +133,7 @@ public class EagerBeansRepository {
 		}
 
 		for (Bean<?> bean : beans) {
-			beanManager.getReference(bean, bean.getBeanClass(), beanManager.createCreationalContext(bean)).toString();
+			BeansLocal.getInstance(beanManager, bean, true).toString();
 		}
 
 		return true;

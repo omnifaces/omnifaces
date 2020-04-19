@@ -54,29 +54,4 @@
 		<external-context-factory>org.omnifaces.context.OmniExternalContextFactory</external-context-factory>
 		<partial-view-context-factory>org.omnifaces.context.OmniPartialViewContextFactory</partial-view-context-factory>
 	</factory>
-
-	<managed-bean eager="true">
-		<description>
-			<![CDATA[
-				This makes an instance of <code>java.util.Date</code> as startup datetime available by 
-				<code>#{startup}</code>.
-			]]>
-		</description>
-		<managed-bean-name>startup</managed-bean-name>
-		<managed-bean-class>java.util.Date</managed-bean-class>
-		<managed-bean-scope>application</managed-bean-scope>
-	</managed-bean>
-
-	<managed-bean>
-		<description>
-			<![CDATA[
-				This makes an instance of <code>java.util.Date</code> as current datetime available by
-				<code>#{now}</code>.
-			]]>
-		</description>
-		<managed-bean-name>now</managed-bean-name>
-		<managed-bean-class>java.util.Date</managed-bean-class>
-		<managed-bean-scope>request</managed-bean-scope>
-	</managed-bean>
-
 </faces-config>

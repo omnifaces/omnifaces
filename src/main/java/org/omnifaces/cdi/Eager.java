@@ -12,6 +12,7 @@
  */
 package org.omnifaces.cdi;
 
+import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -135,7 +136,7 @@ import org.omnifaces.cdi.eager.EagerExtension;
  */
 @Documented
 @Retention(RUNTIME)
-@Target(TYPE)
+@Target({ TYPE, METHOD })
 public @interface Eager {
 
 	/**
