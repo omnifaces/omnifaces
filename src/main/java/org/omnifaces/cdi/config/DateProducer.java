@@ -23,18 +23,24 @@ import org.omnifaces.cdi.Eager;
 
 /**
  * <p>
- * Producer for <code>#{startup}</code> and <code>#{now}</code>
+ * Producer for <code>#{startup}</code> and <code>#{now}</code>.
  *
  * @author Bauke Scholtz
  * @since 3.5.1
  */
 public class DateProducer {
 
+	/**
+	 * This makes an instance of <code>java.util.Date</code> as startup datetime available by <code>#{startup}</code>.
+	 */
 	@Produces @Named @ApplicationScoped @Eager
 	public Date getStartup() {
 		return new Date();
 	}
 
+	/**
+	 * This makes an instance of <code>java.util.Date</code> as current datetime available by <code>#{now}</code>.
+	 */
 	@Produces @Named @RequestScoped
 	public Date getNow() {
 		return new Date();
