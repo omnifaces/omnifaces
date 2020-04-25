@@ -12,6 +12,8 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
+
 import javax.faces.application.Resource;
 import javax.faces.application.ResourceHandler;
 
@@ -25,7 +27,6 @@ import org.omnifaces.config.OmniFaces;
  */
 public class OmniVersionResourceHandler extends DefaultResourceHandler {
 
-	private static final String LIBRARY_NAME = "omnifaces";
 	private final String version;
 
 	public OmniVersionResourceHandler(ResourceHandler wrapped) {
@@ -35,7 +36,7 @@ public class OmniVersionResourceHandler extends DefaultResourceHandler {
 
 	@Override
 	public Resource decorateResource(Resource resource) {
-		if (resource == null || !LIBRARY_NAME.equals(resource.getLibraryName())) {
+		if (resource == null || !OMNIFACES_LIBRARY_NAME.equals(resource.getLibraryName())) {
 			return resource;
 		}
 
