@@ -403,11 +403,12 @@
 				format dates in for example the <code>title</code> attribute of an UI component, or the
 				<code>itemLabel</code> attribute of select item, or wherever you can't use the
 				<code>&lt;f:convertDateTime&gt;</code> tag.
+				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
 			]]>
 		</description>
 		<function-name>formatDate</function-name>
 		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.lang.String formatDate(java.util.Date, java.lang.String)</function-signature>
+		<function-signature>java.lang.String formatDate(java.lang.Object, java.lang.String)</function-signature>
 	</function>
 
 	<function>
@@ -416,165 +417,180 @@
 				Format the given date in the given pattern with given timezone. This is useful when you want to format
 				dates in for example the <code>title</code> attribute of an UI component, or the <code>itemLabel</code>
 				attribute of select item, or wherever you can't use the <code>&lt;f:convertDateTime&gt;</code> tag.
+				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
 			]]>
 		</description>
 		<function-name>formatDateWithTimezone</function-name>
 		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.lang.String formatDateWithTimezone(java.util.Date, java.lang.String, java.lang.Object)</function-signature>
+		<function-signature>java.lang.String formatDateWithTimezone(java.lang.Object, java.lang.String, java.lang.Object)</function-signature>
 	</function>
 
 	<function>
 		<description>
 			<![CDATA[
 				Returns a new date instance which is a sum of the given date and the given amount of years. The years can be negative.
+				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
 			]]>
 		</description>
 		<function-name>addYears</function-name>
 		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.util.Date addYears(java.util.Date, int)</function-signature>
+		<function-signature>java.lang.Object addYears(java.lang.Object, int)</function-signature>
 	</function>
 
 	<function>
 		<description>
 			<![CDATA[
 				Returns a new date instance which is a sum of the given date and the given amount of months. The months can be negative.
+				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
 			]]>
 		</description>
 		<function-name>addMonths</function-name>
 		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.util.Date addMonths(java.util.Date, int)</function-signature>
+		<function-signature>java.lang.Object addMonths(java.lang.Object, int)</function-signature>
 	</function>
 
 	<function>
 		<description>
 			<![CDATA[
 				Returns a new date instance which is a sum of the given date and the given amount of weeks. The weeks can be negative.
+				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
 			]]>
 		</description>
 		<function-name>addWeeks</function-name>
 		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.util.Date addWeeks(java.util.Date, int)</function-signature>
+		<function-signature>java.lang.Object addWeeks(java.lang.Object, int)</function-signature>
 	</function>
 
 	<function>
 		<description>
 			<![CDATA[
 				Returns a new date instance which is a sum of the given date and the given amount of days. The days can be negative.
+				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
 			]]>
 		</description>
 		<function-name>addDays</function-name>
 		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.util.Date addDays(java.util.Date, int)</function-signature>
+		<function-signature>java.lang.Object addDays(java.lang.Object, int)</function-signature>
 	</function>
 
 	<function>
 		<description>
 			<![CDATA[
 				Returns a new date instance which is a sum of the given date and the given amount of hours. The hours can be negative.
+				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
 			]]>
 		</description>
 		<function-name>addHours</function-name>
 		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.util.Date addHours(java.util.Date, int)</function-signature>
+		<function-signature>java.lang.Object addHours(java.lang.Object, int)</function-signature>
 	</function>
 
 	<function>
 		<description>
 			<![CDATA[
 				Returns a new date instance which is a sum of the given date and the given amount of minutes. The minutes can be negative.
+				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
 			]]>
 		</description>
 		<function-name>addMinutes</function-name>
 		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.util.Date addMinutes(java.util.Date, int)</function-signature>
+		<function-signature>java.lang.Object addMinutes(java.lang.Object, int)</function-signature>
 	</function>
 
 	<function>
 		<description>
 			<![CDATA[
 				Returns a new date instance which is a sum of the given date and the given amount of seconds. The seconds can be negative.
+				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
 			]]>
 		</description>
 		<function-name>addSeconds</function-name>
 		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>java.util.Date addSeconds(java.util.Date, int)</function-signature>
+		<function-signature>java.lang.Object addSeconds(java.lang.Object, int)</function-signature>
 	</function>
 
 	<function>
 		<description>
 			<![CDATA[
 				Returns the amount of years between two given dates. This will be negative when the end date is before the start date.
+				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
 			]]>
 		</description>
 		<function-name>yearsBetween</function-name>
 		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>int yearsBetween(java.util.Date, java.util.Date)</function-signature>
+		<function-signature>int yearsBetween(java.lang.Object, java.lang.Object)</function-signature>
 	</function>
 
 	<function>
 		<description>
 			<![CDATA[
 				Returns the amount of months between two given dates. This will be negative when the end date is before the start date.
+				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
 			]]>
 		</description>
 		<function-name>monthsBetween</function-name>
 		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>int monthsBetween(java.util.Date, java.util.Date)</function-signature>
+		<function-signature>int monthsBetween(java.lang.Object, java.lang.Object)</function-signature>
 	</function>
 
 	<function>
 		<description>
 			<![CDATA[
 				Returns the amount of weeks between two given dates. This will be negative when the end date is before the start date.
+				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
 			]]>
 		</description>
 		<function-name>weeksBetween</function-name>
 		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>int weeksBetween(java.util.Date, java.util.Date)</function-signature>
+		<function-signature>int weeksBetween(java.lang.Object, java.lang.Object)</function-signature>
 	</function>
 
 	<function>
 		<description>
 			<![CDATA[
 				Returns the amount of days between two given dates. This will be negative when the end date is before the start date.
+				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
 			]]>
 		</description>
 		<function-name>daysBetween</function-name>
 		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>int daysBetween(java.util.Date, java.util.Date)</function-signature>
+		<function-signature>int daysBetween(java.lang.Object, java.lang.Object)</function-signature>
 	</function>
 
 	<function>
 		<description>
 			<![CDATA[
 				Returns the amount of hours between two given dates. This will be negative when the end date is before the start date.
+				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
 			]]>
 		</description>
 		<function-name>hoursBetween</function-name>
 		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>int hoursBetween(java.util.Date, java.util.Date)</function-signature>
+		<function-signature>int hoursBetween(java.lang.Object, java.lang.Object)</function-signature>
 	</function>
 
 	<function>
 		<description>
 			<![CDATA[
 				Returns the amount of minutes between two given dates. This will be negative when the end date is before the start date.
+				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
 			]]>
 		</description>
 		<function-name>minutesBetween</function-name>
 		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>int minutesBetween(java.util.Date, java.util.Date)</function-signature>
+		<function-signature>int minutesBetween(java.lang.Object, java.lang.Object)</function-signature>
 	</function>
 
 	<function>
 		<description>
 			<![CDATA[
 				Returns the amount of seconds between two given dates. This will be negative when the end date is before the start date.
+				<code>java.util.Date</code>, <code>java.util.Calendar</code> and <code>java.time.Temporal</code> are supported.
 			]]>
 		</description>
 		<function-name>secondsBetween</function-name>
 		<function-class>org.omnifaces.el.functions.Dates</function-class>
-		<function-signature>int secondsBetween(java.util.Date, java.util.Date)</function-signature>
+		<function-signature>int secondsBetween(java.lang.Object, java.lang.Object)</function-signature>
 	</function>
 
 	<function>
