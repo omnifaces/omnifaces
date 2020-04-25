@@ -12,6 +12,7 @@
  */
 package org.omnifaces.cdi.config;
 
+import java.time.Instant;
 import java.util.Date;
 
 import jakarta.enterprise.context.ApplicationScoped;
@@ -24,6 +25,11 @@ import org.omnifaces.cdi.Eager;
 /**
  * <p>
  * Producer for <code>#{startup}</code> and <code>#{now}</code>.
+ * <p>
+ * Since 4.0 it produces by default {@link Instant} whereas it previously produced {@link Date}.
+ * <p>
+ * Historical note: since 1.0 these were registered as beans in faces-config.xml. Since 3.5.1 these were migrated to
+ * CDI producers, because the CDI implementation being used may emit warnings on them not being proxyable.
  *
  * @author Bauke Scholtz
  * @since 3.5.1
@@ -31,19 +37,19 @@ import org.omnifaces.cdi.Eager;
 public class DateProducer {
 
 	/**
-	 * This makes an instance of <code>java.util.Date</code> as startup datetime available by <code>#{startup}</code>.
+	 * This makes an instance of {@link Instant} as startup datetime available by <code>#{startup}</code>.
 	 */
 	@Produces @Named @ApplicationScoped @Eager
-	public Date getStartup() {
-		return new Date();
+	public Instant getStartup() {
+		return Instant.now();
 	}
 
 	/**
-	 * This makes an instance of <code>java.util.Date</code> as current datetime available by <code>#{now}</code>.
+	 * This makes an instance of {@link Instant} as current datetime available by <code>#{now}</code>.
 	 */
 	@Produces @Named @RequestScoped
-	public Date getNow() {
-		return new Date();
+	public Instant getNow() {
+		return Instant.now();
 	}
 
 }
