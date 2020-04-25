@@ -17,6 +17,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.logging.Level.FINEST;
 import static java.util.regex.Pattern.quote;
+import static org.omnifaces.util.FacesLocal.getRequestDomainURL;
 import static org.omnifaces.util.Reflection.toClassOrNull;
 import static org.omnifaces.util.Servlets.getSubmittedFileName;
 
@@ -34,6 +35,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
@@ -82,6 +85,8 @@ import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
+import javax.faces.application.Resource;
+import javax.faces.context.FacesContext;
 import javax.servlet.http.Part;
 import javax.xml.bind.DatatypeConverter;
 
@@ -1308,6 +1313,32 @@ public final class Utils {
 			default:
 				builder.append(c);
 				break;
+		}
+	}
+
+	// Resources ------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns connection to given resource, taking into account possibly buggy component libraries.
+	 * @param context The involved faces context.
+	 * @param resource The resource to obtain connection from.
+	 * @return Connection to given resource.
+	 * @since 3.6
+	 */
+	public static URLConnection openConnection(FacesContext context, Resource resource) {
+		try {
+			return resource.getURL().openConnection();
+		}
+		catch (Exception richFacesDoesNotSupportThis) {
+			logger.log(FINEST, "Ignoring thrown exception; this can only be caused by a buggy component library.", richFacesDoesNotSupportThis);
+
+			try {
+				return new URL(getRequestDomainURL(context) + resource.getRequestPath()).openConnection();
+			}
+			catch (IOException ignore) {
+				logger.log(FINEST, "Ignoring thrown exception; cannot handle it at this point, it would be thrown during getInputStream() anyway.", ignore);
+				return null;
+			}
 		}
 	}
 

@@ -18,9 +18,9 @@ import static java.util.logging.Level.FINEST;
 import static javax.faces.component.UIViewRoot.METADATA_FACET_NAME;
 import static javax.faces.view.facelets.FaceletContext.FACELET_CONTEXT_KEY;
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
+import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Components.findComponentsInChildren;
 import static org.omnifaces.util.Faces.getViewRoot;
-import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Reflection.toClassOrNull;
 import static org.omnifaces.util.Servlets.addParamToMapIfNecessary;
@@ -65,6 +65,7 @@ import javax.faces.FacesException;
 import javax.faces.FactoryFinder;
 import javax.faces.application.Application;
 import javax.faces.application.ProjectStage;
+import javax.faces.application.Resource;
 import javax.faces.application.ViewHandler;
 import javax.faces.component.UIViewParameter;
 import javax.faces.component.UIViewRoot;
@@ -94,6 +95,7 @@ import javax.servlet.http.Part;
 import org.omnifaces.component.ParamHolder;
 import org.omnifaces.component.input.HashParam;
 import org.omnifaces.config.FacesConfigXml;
+import org.omnifaces.resourcehandler.ResourceIdentifier;
 
 /**
  * <p>
@@ -371,6 +373,27 @@ public final class FacesLocal {
 		else {
 			return null;
 		}
+	}
+
+	/**
+	 * @see Faces#createResource(String)
+	 */
+	public static Resource createResource(FacesContext context, String resourceName) {
+		return context.getApplication().getResourceHandler().createResource(resourceName);
+	}
+
+	/**
+	 * @see Faces#createResource(String, String)
+	 */
+	public static Resource createResource(FacesContext context, String libraryName, String resourceName) {
+		return context.getApplication().getResourceHandler().createResource(resourceName, libraryName);
+	}
+
+	/**
+	 * @see Faces#createResource(ResourceIdentifier)
+	 */
+	public static Resource createResource(FacesContext context, ResourceIdentifier resourceIdentifier) {
+		return context.getApplication().getResourceHandler().createResource(resourceIdentifier.getName(), resourceIdentifier.getLibrary());
 	}
 
 	/**

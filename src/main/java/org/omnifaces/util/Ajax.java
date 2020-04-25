@@ -16,7 +16,7 @@ import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.omnifaces.util.Components.getCurrentComponent;
 import static org.omnifaces.util.Components.getCurrentForm;
-import static org.omnifaces.util.Faces.getApplication;
+import static org.omnifaces.util.Faces.createResource;
 import static org.omnifaces.util.Faces.isAjaxRequestWithPartialRendering;
 
 import java.beans.Introspector;
@@ -287,7 +287,7 @@ public final class Ajax {
 	 * @since 2.3
 	 */
 	public static void load(String libraryName, String resourceName) {
-		Resource resource = getApplication().getResourceHandler().createResource(resourceName, libraryName);
+		Resource resource = createResource(libraryName, resourceName);
 
 		if (resource == null) {
 			throw new IllegalArgumentException(ERROR_NO_SCRIPT_RESOURCE);

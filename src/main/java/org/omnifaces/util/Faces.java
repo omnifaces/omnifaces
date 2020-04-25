@@ -40,6 +40,8 @@ import javax.faces.application.Application;
 import javax.faces.application.ApplicationFactory;
 import javax.faces.application.NavigationHandler;
 import javax.faces.application.ProjectStage;
+import javax.faces.application.Resource;
+import javax.faces.application.ResourceHandler;
 import javax.faces.application.ViewHandler;
 import javax.faces.component.UIViewParameter;
 import javax.faces.component.UIViewRoot;
@@ -72,6 +74,7 @@ import org.omnifaces.component.input.HashParam;
 import org.omnifaces.config.FacesConfigXml;
 import org.omnifaces.el.FacesELResolver;
 import org.omnifaces.facesviews.FacesViews;
+import org.omnifaces.resourcehandler.ResourceIdentifier;
 
 /**
  * <p>
@@ -611,6 +614,43 @@ public final class Faces {
 	 */
 	public static <T> Validator<T> createValidator(Class<?> identifier) {
 		return FacesLocal.createValidator(getContext(), identifier);
+	}
+
+	/**
+	 * Creates and returns a Faces resource associated with given resource name.
+	 * If no resource can be allocated, then return null.
+	 * @param resourceName The resource name.
+	 * @return A Faces resource associated with given resource name.
+	 * @see ResourceHandler#createResource(String)
+	 * @since 3.6
+	 */
+	public static Resource createResource(String resourceName) {
+		return FacesLocal.createResource(getContext(), resourceName);
+	}
+
+	/**
+	 * Creates and returns a Faces resource associated with given library name and resource name.
+	 * If no resource can be allocated, then return null.
+	 * @param libraryName The library name.
+	 * @param resourceName The resource name.
+	 * @return A Faces resource associated with given library name and resource name.
+	 * @see ResourceHandler#createResource(String, String)
+	 * @since 3.6
+	 */
+	public static Resource createResource(String libraryName, String resourceName) {
+		return FacesLocal.createResource(getContext(), libraryName, resourceName);
+	}
+
+	/**
+	 * Creates and returns a Faces resource associated with given resource identifier.
+	 * If no resource can be allocated, then return null.
+	 * @param resourceIdentifier The resource identifier.
+	 * @return A Faces resource associated with given resource identifier.
+	 * @see ResourceHandler#createResource(String, String)
+	 * @since 3.6
+	 */
+	public static Resource createResource(ResourceIdentifier resourceIdentifier) {
+		return FacesLocal.createResource(getContext(), resourceIdentifier);
 	}
 
 	/**

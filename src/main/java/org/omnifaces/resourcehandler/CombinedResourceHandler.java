@@ -49,6 +49,7 @@ import org.omnifaces.renderer.InlineResourceRenderer;
 import org.omnifaces.renderer.InlineScriptRenderer;
 import org.omnifaces.renderer.InlineStylesheetRenderer;
 import org.omnifaces.util.Faces;
+import org.omnifaces.util.FacesLocal;
 import org.omnifaces.util.cache.Cache;
 
 /**
@@ -620,7 +621,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 				componentResource.getAttributes().put("library", LIBRARY_NAME);
 				componentResource.getAttributes().put("name", resourceName);
 				componentResource.setRendererType(rendererType);
-				Resource resource = context.getApplication().getResourceHandler().createResource(resourceName, LIBRARY_NAME);
+				Resource resource = FacesLocal.createResource(context, LIBRARY_NAME, resourceName);
 
 				if (resource instanceof CDNResource) {
 					setFallbackURL((CDNResource) resource);

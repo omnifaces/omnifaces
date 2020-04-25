@@ -12,6 +12,8 @@
  */
 package org.omnifaces.renderer;
 
+import static org.omnifaces.util.FacesLocal.createResource;
+
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -53,7 +55,7 @@ public abstract class InlineResourceRenderer extends Renderer {
 		ResponseWriter writer = context.getResponseWriter();
 		String name = (String) component.getAttributes().get("name");
 		String library = (String) component.getAttributes().get("library");
-		Resource resource = context.getApplication().getResourceHandler().createResource(name, library);
+		Resource resource = createResource(context, library, name);
 
 		startElement(writer, component);
 
