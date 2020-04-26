@@ -292,7 +292,7 @@ public abstract class WebAppManifest {
 	/**
 	 * To be used in {@link WebAppManifest#getIcons()}.
 	 */
-	protected static class ImageResource {
+	protected static final class ImageResource {
 
 		private String src;
 		private String sizes;
@@ -343,15 +343,32 @@ public abstract class WebAppManifest {
 		}
 
 		@Override
+		public boolean equals(Object object) {
+			// Basic checks.
+			if (object == this) {
+				return true;
+			}
+			if (object == null || object.getClass() != getClass()) {
+				return false;
+			}
+
+			// Property checks.
+			ImageResource other = (ImageResource) object;
+			return Objects.equals(src, other.src)
+				&& Objects.equals(sizes, other.sizes)
+				&& Objects.equals(type, other.type);
+		}
+
+		@Override
 		public int hashCode() {
-			return Objects.hash(src, sizes);
+			return Objects.hash(src, sizes, type);
 		}
 	}
 
 	/**
 	 * To be used in {@link ImageResource#of(String, Size...)}.
 	 */
-	protected static class Size {
+	protected static final class Size {
 
 		/** 16x16 */
 		public static final Size SIZE_16 = Size.of(16);
@@ -440,15 +457,30 @@ public abstract class WebAppManifest {
 		}
 
 		@Override
+		public boolean equals(Object object) {
+			// Basic checks.
+			if (object == this) {
+				return true;
+			}
+			if (object == null || object.getClass() != getClass()) {
+				return false;
+			}
+
+			// Property checks.
+			Size other = (Size) object;
+			return Objects.equals(value, other.value);
+		}
+
+		@Override
 		public int hashCode() {
-			return value.hashCode();
+			return Objects.hash(value);
 		}
 	}
 
 	/**
 	 * To be used in {@link WebAppManifest#getRelatedApplications()}
 	 */
-	protected static class RelatedApplication {
+	protected static final class RelatedApplication {
 
 		private Platform platform;
 		private String url;
@@ -497,8 +529,25 @@ public abstract class WebAppManifest {
 		}
 
 		@Override
+		public boolean equals(Object object) {
+			// Basic checks.
+			if (object == this) {
+				return true;
+			}
+			if (object == null || object.getClass() != getClass()) {
+				return false;
+			}
+
+			// Property checks.
+			RelatedApplication other = (RelatedApplication) object;
+			return Objects.equals(platform, other.platform)
+				&& Objects.equals(url, other.url)
+				&& Objects.equals(id, other.id);
+		}
+
+		@Override
 		public int hashCode() {
-			return Objects.hash(platform, url);
+			return Objects.hash(platform, url, id);
 		}
 	}
 
