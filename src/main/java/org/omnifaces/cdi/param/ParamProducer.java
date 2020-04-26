@@ -315,7 +315,7 @@ public class ParamProducer {
 
 		if (isEmpty(name)) {
 			if (injectionPoint.getAnnotated() instanceof AnnotatedParameter) {
-				AnnotatedParameter annotatedParameter = (AnnotatedParameter) injectionPoint.getAnnotated();
+				AnnotatedParameter<?> annotatedParameter = (AnnotatedParameter<?>) injectionPoint.getAnnotated();
 				Parameter javaParameter = annotatedParameter.getJavaParameter();
 
 				if (javaParameter.isNamePresent()) {

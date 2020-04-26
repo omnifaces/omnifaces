@@ -25,7 +25,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 /**
  * A simple JSON encoder.
@@ -71,7 +71,7 @@ public final class Json {
 	 * @return The JSON-encoded representation of the given object.
 	 * @throws IllegalArgumentException When the given object or one of its properties cannot be inspected as a bean.
 	 */
-	public static String encode(Object object, Function<String, String> propertyNameFormatter) {
+	public static String encode(Object object, UnaryOperator<String> propertyNameFormatter) {
 		StringBuilder builder = new StringBuilder();
 		encode(object, builder, propertyNameFormatter);
 		return builder.toString();
@@ -80,7 +80,7 @@ public final class Json {
 	/**
 	 * Method allowing tail recursion (prevents potential stack overflow on deeply nested structures).
 	 */
-	private static void encode(Object object, StringBuilder builder, Function<String, String> propertyNameFormatter) {
+	private static void encode(Object object, StringBuilder builder, UnaryOperator<String> propertyNameFormatter) {
 		if (object == null) {
 			builder.append("null");
 		}
@@ -123,7 +123,7 @@ public final class Json {
 	/**
 	 * Encode a Java collection as JS array.
 	 */
-	private static void encodeCollection(Collection<?> collection, StringBuilder builder, Function<String, String> propertyNameFormatter) {
+	private static void encodeCollection(Collection<?> collection, StringBuilder builder, UnaryOperator<String> propertyNameFormatter) {
 		builder.append('[');
 		int i = 0;
 
@@ -141,7 +141,7 @@ public final class Json {
 	/**
 	 * Encode a Java array as JS array.
 	 */
-	private static void encodeArray(Object array, StringBuilder builder, Function<String, String> propertyNameFormatter) {
+	private static void encodeArray(Object array, StringBuilder builder, UnaryOperator<String> propertyNameFormatter) {
 		builder.append('[');
 		int length = Array.getLength(array);
 
@@ -159,7 +159,7 @@ public final class Json {
 	/**
 	 * Encode a Java map as JS object.
 	 */
-	private static void encodeMap(Map<?, ?> map, StringBuilder builder, Function<String, String> propertyNameFormatter) {
+	private static void encodeMap(Map<?, ?> map, StringBuilder builder, UnaryOperator<String> propertyNameFormatter) {
 		builder.append('{');
 		int i = 0;
 
@@ -179,7 +179,7 @@ public final class Json {
 	/**
 	 * Encode a Java bean as JS object.
 	 */
-	private static void encodeBean(Object bean, StringBuilder builder, Function<String, String> propertyNameFormatter) {
+	private static void encodeBean(Object bean, StringBuilder builder, UnaryOperator<String> propertyNameFormatter) {
 		BeanInfo beanInfo;
 
 		try {
@@ -225,7 +225,7 @@ public final class Json {
 	/**
 	 * Encode a Java String as JS object property name.
 	 */
-	private static void encodePropertyName(String string, StringBuilder builder, Function<String, String> propertyNameFormatter)
+	private static void encodePropertyName(String string, StringBuilder builder, UnaryOperator<String> propertyNameFormatter)
 	{
 		encodeString(propertyNameFormatter == null ? string : propertyNameFormatter.apply(string), builder);
 	}

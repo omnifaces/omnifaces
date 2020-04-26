@@ -13,6 +13,7 @@
 package org.omnifaces.resourcehandler;
 
 import static java.util.Arrays.stream;
+import static java.util.Collections.emptySet;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
 import static org.omnifaces.util.FacesLocal.createResource;
@@ -251,12 +252,12 @@ public abstract class WebAppManifest {
 	}
 
 	/**
-	 * Returns a collection of categories where your web application supposedly belongs to. The default implementation returns <code>null</code>.
+	 * Returns a collection of categories where your web application supposedly belongs to. The default implementation returns an empty set.
 	 * @return A collection of categories where your web application supposedly belongs to.
 	 * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/categories">https://developer.mozilla.org/en-US/docs/Web/Manifest/categories</a>
 	 */
 	public Collection<Category> getCategories() {
-		return null;
+		return emptySet();
 	}
 
 	/**
@@ -269,21 +270,21 @@ public abstract class WebAppManifest {
 	}
 
 	/**
-	 * Returns a collection of related (native) applications that provide similar/equivalent functionality as your web application. The default implementation returns <code>null</code>.
+	 * Returns a collection of related (native) applications that provide similar/equivalent functionality as your web application. The default implementation returns an empty set.
 	 * @return A collection of related (native) applications that provide similar/equivalent functionality as your web application.
 	 * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/related_applications">https://developer.mozilla.org/en-US/docs/Web/Manifest/related_applications</a>
 	 */
 	public Collection<RelatedApplication> getRelatedApplications() {
-		return null;
+		return emptySet();
 	}
 
 	/**
-	 * Returns whether the applications listed in {@link #getRelatedApplications()} should be preferred over the web application. The default implementation returns <code>null</code>.
+	 * Returns whether the applications listed in {@link #getRelatedApplications()} should be preferred over the web application. The default implementation returns <code>false</code>.
 	 * @return Whether the applications listed in {@link #getRelatedApplications()} should be preferred over the web application.
 	 * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/prefer_related_applications">https://developer.mozilla.org/en-US/docs/Web/Manifest/prefer_related_applications</a>
 	 */
-	public Boolean isPreferRelatedApplications() {
-		return null;
+	public boolean isPreferRelatedApplications() {
+		return false;
 	}
 
 
@@ -307,14 +308,14 @@ public abstract class WebAppManifest {
 				throw new IllegalArgumentException("Cannot find resource '" + resourceIdentifier + "'");
 			}
 
-			String src = resource.getRequestPath();
+			String requestPath = resource.getRequestPath();
 			URLConnection connection = openConnection(context, resource);
 
 			if (connection != null) {
-				src = formatURLWithQueryString(src, "v=" + connection.getLastModified());
+				requestPath = formatURLWithQueryString(requestPath, "v=" + connection.getLastModified());
 			}
 
-			this.src = src;
+			this.src = requestPath;
 			this.sizes = stream(sizes).map(Size::getValue).distinct().collect(joining(" "));
 			this.type = resource.getContentType();
 		}
