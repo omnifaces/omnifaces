@@ -17,7 +17,6 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.logging.Level.FINEST;
 import static javax.faces.component.UIViewRoot.METADATA_FACET_NAME;
 import static javax.faces.view.facelets.FaceletContext.FACELET_CONTEXT_KEY;
-import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Components.findComponentsInChildren;
 import static org.omnifaces.util.Faces.getViewRoot;
@@ -1172,11 +1171,8 @@ public final class FacesLocal {
 	 * @see Faces#redirectPermanent(String, Object...)
 	 */
 	public static void redirectPermanent(FacesContext context, String url, Object... paramValues) {
-		ExternalContext externalContext = context.getExternalContext();
-		externalContext.getFlash().setRedirect(true); // MyFaces also requires this for a redirect in current request (which is incorrect).
-		externalContext.setResponseStatus(SC_MOVED_PERMANENTLY);
-		externalContext.setResponseHeader("Location", prepareRedirectURL(getRequest(context), url, paramValues));
-		externalContext.setResponseHeader("Connection", "close");
+		context.getExternalContext().getFlash().setRedirect(true); // MyFaces also requires this for a redirect in current request (which is incorrect).
+		Servlets.redirectPermanent(getResponse(context), prepareRedirectURL(getRequest(context), url, paramValues));
 		context.responseComplete();
 	}
 

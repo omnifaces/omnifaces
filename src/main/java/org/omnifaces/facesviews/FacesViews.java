@@ -71,6 +71,7 @@ import org.omnifaces.ApplicationInitializer;
 import org.omnifaces.ApplicationListener;
 import org.omnifaces.ApplicationProcessor;
 import org.omnifaces.cdi.Param;
+import org.omnifaces.component.output.PathParam;
 
 /**
  * <p>
@@ -155,6 +156,7 @@ import org.omnifaces.cdi.Param;
  * @see UriExtensionRequestWrapper
  * @see ApplicationProcessor
  * @see FacesViewsViewHandler
+ * @see PathParam
  */
 public final class FacesViews {
 
@@ -732,9 +734,19 @@ public final class FacesViews {
 	 * @since 2.6
 	 */
 	public static boolean isMultiViewsEnabled(HttpServletRequest request) {
-		ServletContext servletContext = request.getServletContext();
+		return isMultiViewsEnabled(request.getServletContext(), request.getServletPath());
+	}
+
+	/**
+	 * Returns whether MultiViews feature is enabled on the given resource.
+	 * @param servletContext The involved servlet context.
+	 * @param resource The resource.
+	 * @return Whether MultiViews feature is enabled on the given resource.
+	 * @since 3.6
+	 */
+	public static boolean isMultiViewsEnabled(ServletContext servletContext, String resource) {
 		Set<String> multiViewsResources = getMultiViewsResources(servletContext);
-		return (multiViewsResources != null && multiViewsResources.contains(request.getServletPath()))
+		return (multiViewsResources != null && multiViewsResources.contains(resource))
 			|| getMultiViewsWelcomeFile(servletContext) != null;
 	}
 

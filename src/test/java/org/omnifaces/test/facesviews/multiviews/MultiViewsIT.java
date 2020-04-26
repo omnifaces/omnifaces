@@ -37,6 +37,9 @@ public class MultiViewsIT extends OmniFacesIT {
 	@FindBy(id="form:submit")
 	private WebElement formSubmit;
 
+	@FindBy(id="link")
+	private WebElement link;
+
 	@Deployment(testable=false)
 	public static WebArchive createDeployment() {
 		return buildWebArchive(MultiViewsIT.class)
@@ -63,6 +66,9 @@ public class MultiViewsIT extends OmniFacesIT {
 		guardHttp(formSubmit).click();
 		verify200("MultiViewsIT", "foo/42/bar/", "foo", "42");
 
+		guardHttp(link).click();
+		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
+
 		open("MultiViewsITOtherPage");
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage", "", "");
 
@@ -87,6 +93,9 @@ public class MultiViewsIT extends OmniFacesIT {
 		guardHttp(formSubmit).click();
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/foo/42/bar/", "foo", "42");
 
+		guardHttp(link).click();
+		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
+
 		open("MultiViewsITNonExistingPage");
 		verify200("MultiViewsIT", "MultiViewsITNonExistingPage", "MultiViewsITNonExistingPage", "");
 
@@ -105,6 +114,7 @@ public class MultiViewsIT extends OmniFacesIT {
 		assertEquals(firstPathParam, firstPathParamAsString.getText());
 		assertEquals(secondPathParam, secondPathParamAsInteger.getText());
 		assertEquals("/MultiViewsIT/" + path, stripJsessionid(form.getAttribute("action")));
+		assertEquals(baseURL + "MultiViewsITOtherPage/pathParam/471", stripJsessionid(link.getAttribute("href")));
 	}
 
 	private void verify404(String path) {
