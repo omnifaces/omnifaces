@@ -66,12 +66,20 @@ import org.omnifaces.util.Utils;
  * private String bar;
  * </pre>
  * <p>
- * The <code>name</code> attribute is only mandatory when using constructor injection as there is no information about
- * constructor parameter names. The example below injects the request parameter with name <code>foo</code> as a
- * constructor parameter.
+ * The <code>name</code> attribute is only mandatory when using constructor injection in OmniFaces 3.5 or older as there
+ * is no information about constructor parameter names. The example below injects the request parameter with name
+ * <code>foo</code> as a constructor parameter.
  * <pre>
  * &#64;Inject
  * public Bean(&#64;Param(name="foo") String foo) {
+ *     // ...
+ * }
+ * </pre>
+ * <p>
+ * Since OmniFaces 3.6 it is not necessary anymore.
+ * <pre>
+ * &#64;Inject
+ * public Bean(&#64;Param String foo) {
  *     // ...
  * }
  * </pre>
