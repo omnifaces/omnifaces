@@ -87,7 +87,7 @@ public class ParamExtension implements Extension {
 				return; // Skip ParamValue as it is already handled by RequestParameterProducer.
 			}
 
-			if (annotated.isAnnotationPresent(Inject.class)) {
+			if (annotated.isAnnotationPresent(Inject.class) || (annotated instanceof AnnotatedParameter && ((AnnotatedParameter<?>) annotated).getDeclaringCallable().isAnnotationPresent(Inject.class))) {
 				paramsWithInject.add(type);
 			}
 			else if (annotated instanceof AnnotatedField) {
