@@ -950,30 +950,29 @@ public final class Utils {
 			return (((LocalTime) date).atDate(LocalDate.now())).atZone(zone);
 		}
 		else if (date instanceof Temporal) {
-			return toZonedDateTime((Temporal) date, zone);
+			return fromTemporalToZonedDateTime((Temporal) date, zone);
 		}
 		else {
 			throw new IllegalArgumentException(ERROR_UNSUPPORTED_DATE);
 		}
 	}
 
-	private static ZonedDateTime toZonedDateTime(Temporal temporal, ZoneId zone) {
+	private static ZonedDateTime fromTemporalToZonedDateTime(Temporal temporal, ZoneId zone) {
 		if (temporal.isSupported(ChronoField.INSTANT_SECONDS)) {
 			long epoch = temporal.getLong(ChronoField.INSTANT_SECONDS);
 			long nano = temporal.getLong(ChronoField.NANO_OF_SECOND);
 			return ZonedDateTime.ofInstant(Instant.ofEpochSecond(epoch, nano), zone);
 		}
-		else {
-			LocalDateTime now = LocalDate.now().atStartOfDay();
-			int year = temporal.isSupported(ChronoField.YEAR) ? temporal.get(ChronoField.YEAR) : now.getYear();
-			int month = temporal.isSupported(ChronoField.MONTH_OF_YEAR) ? temporal.get(ChronoField.MONTH_OF_YEAR) : now.getMonth().getValue();
-			int day = temporal.isSupported(ChronoField.DAY_OF_MONTH) ? temporal.get(ChronoField.DAY_OF_MONTH) : now.getDayOfMonth();
-			int hour = temporal.isSupported(ChronoField.HOUR_OF_DAY) ? temporal.get(ChronoField.HOUR_OF_DAY) : now.getHour();
-			int minute = temporal.isSupported(ChronoField.MINUTE_OF_HOUR) ? temporal.get(ChronoField.MINUTE_OF_HOUR) : now.getMinute();
-			int second = temporal.isSupported(ChronoField.SECOND_OF_MINUTE) ? temporal.get(ChronoField.SECOND_OF_MINUTE) : now.getSecond();
-			int nano = temporal.isSupported(ChronoField.NANO_OF_SECOND) ? temporal.get(ChronoField.NANO_OF_SECOND) : now.getNano();
-			return ZonedDateTime.of(year, month, day, hour, minute, second, nano, zone);
-		}
+
+		LocalDateTime now = LocalDate.now().atStartOfDay();
+		int year = temporal.isSupported(ChronoField.YEAR) ? temporal.get(ChronoField.YEAR) : now.getYear();
+		int month = temporal.isSupported(ChronoField.MONTH_OF_YEAR) ? temporal.get(ChronoField.MONTH_OF_YEAR) : now.getMonth().getValue();
+		int day = temporal.isSupported(ChronoField.DAY_OF_MONTH) ? temporal.get(ChronoField.DAY_OF_MONTH) : now.getDayOfMonth();
+		int hour = temporal.isSupported(ChronoField.HOUR_OF_DAY) ? temporal.get(ChronoField.HOUR_OF_DAY) : now.getHour();
+		int minute = temporal.isSupported(ChronoField.MINUTE_OF_HOUR) ? temporal.get(ChronoField.MINUTE_OF_HOUR) : now.getMinute();
+		int second = temporal.isSupported(ChronoField.SECOND_OF_MINUTE) ? temporal.get(ChronoField.SECOND_OF_MINUTE) : now.getSecond();
+		int nano = temporal.isSupported(ChronoField.NANO_OF_SECOND) ? temporal.get(ChronoField.NANO_OF_SECOND) : now.getNano();
+		return ZonedDateTime.of(year, month, day, hour, minute, second, nano, zone);
 	}
 
 	/**
@@ -1048,7 +1047,12 @@ public final class Utils {
 		).findFirst();
 
 		try {
-			return (T) converter.get().invoke(null, zonedDateTime);
+			if (converter.isPresent()) {
+				return (T) converter.get().invoke(null, zonedDateTime);
+			}
+			else {
+				throw new NoSuchMethodException();
+			}
 		}
 		catch (Exception e) {
 			throw new IllegalArgumentException(ERROR_UNSUPPORTED_DATE, e);
