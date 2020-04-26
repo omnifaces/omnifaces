@@ -25,7 +25,6 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -364,9 +363,6 @@ public final class Reflection {
 	public static <T> T modifyField(Object instance, Field field, T value) {
 		try {
 			field.setAccessible(true);
-			Field modifiers = Field.class.getDeclaredField("modifiers");
-			modifiers.setAccessible(true);
-			modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
 			Object oldValue = field.get(instance);
 			field.set(instance, value);
 			return (T) oldValue;
