@@ -121,7 +121,7 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 			String uri = stripWelcomeFilePrefix(servletContext, removeExtensionIfNecessary(servletContext, uriAndRest[0], viewId));
 			String rest = uriAndRest.length > 1 ? uriAndRest[1] : "";
 			String pathInfo = context.getViewRoot().getViewId().equals(viewId) ? coalesce(getRequestPathInfo(context), "") : "";
-			return stripTrailingSlash(uri) + pathInfo + rest;
+			return (pathInfo.isEmpty() ? uri : (stripTrailingSlash(uri) + pathInfo)) + rest;
 		}
 
 		// Not a resource we mapped or not a forwarded one, take the version from the parent view handler.
