@@ -25,6 +25,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -50,6 +51,7 @@ public final class Reflection {
 	private static final String ERROR_LOAD_CLASS = "Cannot load class '%s'.";
 	private static final String ERROR_CREATE_INSTANCE = "Cannot create instance of class '%s'.";
 	private static final String ERROR_ACCESS_FIELD = "Cannot access field '%s' of class '%s'.";
+	private static final String ERROR_MODIFY_FIELD = "Cannot modify field '%s' of class '%s' with value %s.";
 	private static final String ERROR_INVOKE_METHOD = "Cannot invoke method '%s' of class '%s' with arguments %s.";
 
 	private Reflection() {
@@ -344,6 +346,33 @@ public final class Reflection {
 		}
 		catch (Exception e) {
 			throw new IllegalStateException(format(ERROR_ACCESS_FIELD, fieldName, instance.getClass()), e);
+		}
+	}
+
+	/**
+	 * Modifies the value of the given field of the given instance with the given value.
+	 * @param <T> The field type.
+	 * @param instance The instance to access the given field on.
+	 * @param field The field to be accessed on the given instance.
+	 * @param value The new value of the given field of the given instance.
+	 * @return The old value of the given field of the given instance.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @throws IllegalStateException If the field cannot be modified.
+	 * @since 3.6
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T modifyField(Object instance, Field field, T value) {
+		try {
+			field.setAccessible(true);
+			Field modifiers = Field.class.getDeclaredField("modifiers");
+			modifiers.setAccessible(true);
+			modifiers.setInt(field, field.getModifiers() & ~Modifier.FINAL);
+			Object oldValue = field.get(instance);
+			field.set(instance, value);
+			return (T) oldValue;
+		}
+		catch (Exception e) {
+			throw new IllegalStateException(format(ERROR_MODIFY_FIELD, field != null ? field.getName() : null, instance != null ? instance.getClass() : null, value), e);
 		}
 	}
 

@@ -13,7 +13,6 @@
 package org.omnifaces.test.facesviews.multiviews;
 
 import javax.enterprise.context.RequestScoped;
-import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.omnifaces.cdi.Param;
@@ -22,10 +21,10 @@ import org.omnifaces.cdi.Param;
 @RequestScoped
 public class MultiViewsITBean {
 
-	@Inject @Param(pathIndex=0, disableBeanValidation=true) // disableBeanValidation is a work around for buggy BVal in TomEE 8.0.0-M2
+	@Param(pathIndex=0, disableBeanValidation=true) // disableBeanValidation is a work around for buggy BVal in TomEE 8.0.0-M2
 	private String firstPathParamAsString;
 
-	@Inject @Param(pathIndex=1, disableBeanValidation=true) // disableBeanValidation is a work around for buggy BVal in TomEE 8.0.0-M2
+	@Param(pathIndex=1, disableBeanValidation=true) // disableBeanValidation is a work around for buggy BVal in TomEE 8.0.0-M2
 	private Integer secondPathParamAsInteger;
 
 	public String getFirstPathParamAsString() {
