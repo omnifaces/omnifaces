@@ -16,6 +16,7 @@ import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.list;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.logging.Level.FINEST;
@@ -26,6 +27,7 @@ import static javax.faces.application.ProjectStage.PROJECT_STAGE_PARAM_NAME;
 import static javax.servlet.RequestDispatcher.ERROR_REQUEST_URI;
 import static javax.servlet.RequestDispatcher.FORWARD_QUERY_STRING;
 import static javax.servlet.RequestDispatcher.FORWARD_REQUEST_URI;
+import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 import static org.omnifaces.util.JNDI.lookup;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.decodeURL;
@@ -45,6 +47,7 @@ import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -840,6 +843,23 @@ public final class Servlets {
 			throw new UncheckedIOException(e);
 		}
 	}
+        
+        /**
+         * Helper method to send a permanent (301) redirect to the given URL.
+         * 
+         * @param response The involved HTTP servlet response.
+         * @param url The URL to permanently redirect the current response to.
+         */
+	public static void redirectPermanent(HttpServletResponse response, String url) {
+		response.setStatus(SC_MOVED_PERMANENTLY);
+		response.setHeader("Location", url);
+                response.setHeader("Connection", "close");
+	}
+        
+        public static boolean isRequestProxied(HttpServletRequest request) {
+                List<String> headers = list(request.getHeaderNames());
+                return headers.contains("Forwarded") || headers.contains("X-Forwarded-For");
+        }
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
