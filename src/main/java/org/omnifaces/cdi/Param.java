@@ -76,7 +76,8 @@ import org.omnifaces.util.Utils;
  * }
  * </pre>
  * <p>
- * Since OmniFaces 3.6 it is not necessary anymore.
+ * Since OmniFaces 3.6 it is not necessary anymore if the parameter has a name according to the class file as per
+ * <a href="https://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Parameter.html#isNamePresent--"><code>Parameter#isNamePresent()</code></a>.
  * <pre>
  * &#64;Inject
  * public Bean(&#64;Param String foo) {
