@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -12,7 +12,9 @@
  */
 package org.omnifaces.util;
 
+import static java.lang.String.format;
 import static java.util.Arrays.asList;
+import static java.util.logging.Level.FINE;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +22,9 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
+import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -42,6 +46,8 @@ import org.xml.sax.SAXException;
  * @since 2.1
  */
 public final class Xml {
+
+	private static final Logger logger = Logger.getLogger(Xml.class.getName());
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -69,7 +75,7 @@ public final class Xml {
 
 	/**
 	 * Creates an instance of {@link DocumentBuilder} which doesn't validate, nor is namespace aware nor expands entity
-	 * references (to keep it as lenient as possible).
+	 * references and disables external entity processing (to keep it as lenient and secure as possible).
 	 * @return A lenient instance of {@link DocumentBuilder}.
 	 */
 	public static DocumentBuilder createDocumentBuilder() {
@@ -79,10 +85,22 @@ public final class Xml {
 		factory.setExpandEntityReferences(false);
 
 		try {
+			factory.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+			unsetAttributeIgnoringIAE(factory, XMLConstants.ACCESS_EXTERNAL_DTD);
+			unsetAttributeIgnoringIAE(factory, XMLConstants.ACCESS_EXTERNAL_SCHEMA);
 			return factory.newDocumentBuilder();
 		}
 		catch (ParserConfigurationException e) {
 			throw new UnsupportedOperationException(e);
+		}
+	}
+
+	private static void unsetAttributeIgnoringIAE(DocumentBuilderFactory factory, String name) {
+		try {
+			factory.setAttribute(name, "");
+		}
+		catch (IllegalArgumentException e) {
+			logger.log(FINE, format("Cannot unset attribute '%s'; falling back to default.", name), e);
 		}
 	}
 

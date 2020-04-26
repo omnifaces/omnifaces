@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -37,6 +37,7 @@ import static org.omnifaces.util.Utils.isEmpty;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -48,6 +49,7 @@ import java.util.ResourceBundle;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Produces;
+import javax.enterprise.inject.spi.AnnotatedParameter;
 import javax.enterprise.inject.spi.InjectionPoint;
 import javax.faces.application.Application;
 import javax.faces.application.FacesMessage;
@@ -76,7 +78,7 @@ public class ParamProducer {
 
 	private static final String DEFAULT_REQUIRED_MESSAGE = "{0}: Value is required";
 
-	private static volatile Boolean interpretEmptyStringSubmittedValuesAsNull;
+	private static Boolean interpretEmptyStringSubmittedValuesAsNull;
 
 	@SuppressWarnings("unused") // Workaround for OpenWebBeans not properly passing it as produce() method argument.
 	@Inject
@@ -309,12 +311,21 @@ public class ParamProducer {
 	}
 
 	private static String getName(Param requestParameter, InjectionPoint injectionPoint) {
-
 		String name = requestParameter.name();
 
 		if (isEmpty(name)) {
+			if (injectionPoint.getAnnotated() instanceof AnnotatedParameter) {
+				AnnotatedParameter annotatedParameter = (AnnotatedParameter) injectionPoint.getAnnotated();
+				Parameter javaParameter = annotatedParameter.getJavaParameter();
+
+				if (javaParameter.isNamePresent()) {
+					return javaParameter.getName();
+				}
+			}
+
 			name = injectionPoint.getMember().getName();
-		} else {
+		}
+		else {
 			name = evaluateExpressionAsString(name);
 		}
 
@@ -322,12 +333,12 @@ public class ParamProducer {
 	}
 
 	private static String getLabel(Param requestParameter, InjectionPoint injectionPoint) {
-
 		String label = requestParameter.label();
 
 		if (isEmpty(label)) {
 			label = getName(requestParameter, injectionPoint);
-		} else {
+		}
+		else {
 			label = evaluateExpressionAsString(label);
 		}
 
@@ -347,7 +358,6 @@ public class ParamProducer {
 	}
 
 	private static String evaluateExpressionAsString(String expression) {
-
 		if (isEmpty(expression)) {
 			return expression;
 		}
@@ -383,7 +393,6 @@ public class ParamProducer {
 	}
 
 	private static <V> Map<String, String> doBeanValidation(V paramValue, InjectionPoint injectionPoint) {
-
 		Class<?> base = injectionPoint.getBean().getBeanClass();
 		String property = injectionPoint.getMember().getName();
 		Type type = injectionPoint.getType();
@@ -404,7 +413,6 @@ public class ParamProducer {
 	}
 
 	private static List<Validator> getValidators(Param requestParameter) {
-
 		List<Validator> validators = new ArrayList<>();
 
 		for (String validatorIdentifier : requestParameter.validators()) {
@@ -425,8 +433,8 @@ public class ParamProducer {
 		}
 
 		// Process the default validators
-
 		Application application = getApplication();
+
 		for (Entry<String, String> validatorEntry :	application.getDefaultValidatorInfo().entrySet()) {
 
 			String validatorID = validatorEntry.getKey();
@@ -442,6 +450,7 @@ public class ParamProducer {
 		// Set the attributes on all instantiated validators. We don't distinguish here
 		// which attribute should go to which validator.
 		Map<String, Object> validatorAttributes = getValidatorAttributes(requestParameter);
+
 		for (Validator validator : validators) {
 			setPropertiesWithCoercion(validator, validatorAttributes);
 		}
@@ -450,7 +459,6 @@ public class ParamProducer {
 	}
 
 	private static Map<String, Object> getConverterAttributes(Param requestParameter) {
-
 		Map<String, Object> attributeMap = new HashMap<>();
 
 		Attribute[] attributes = requestParameter.converterAttributes();
@@ -462,7 +470,6 @@ public class ParamProducer {
 	}
 
 	private static Map<String, Object> getValidatorAttributes(Param requestParameter) {
-
 		Map<String, Object> attributeMap = new HashMap<>();
 
 		Attribute[] attributes = requestParameter.validatorAttributes();
@@ -478,8 +485,10 @@ public class ParamProducer {
 
 		if (!isEmpty(converterMessage)) {
 			message = createError(converterMessage, submittedValue, label);
-		} else {
+		}
+		else {
 			message = ce.getFacesMessage();
+
 			if (message == null) {
 				// If the converter didn't add a FacesMessage, set a generic one.
 				message = createError("Conversion failed for {0} because: {1}", submittedValue, ce.getMessage());
@@ -495,11 +504,13 @@ public class ParamProducer {
 
 		if (!isEmpty(requiredMessage)) {
 			message = createError(requiredMessage, null, label);
-		} else {
+		}
+		else {
 			// (Ab)use RequiredValidator to get the same message that all required attributes are using.
 			try {
 				new RequiredValidator().validate(context, component, null);
-			} catch (ValidatorException ve) {
+			}
+			catch (ValidatorException ve) {
 				message = ve.getFacesMessage();
 			}
 
@@ -515,12 +526,12 @@ public class ParamProducer {
 	}
 
 	private static void addValidatorMessages(FacesContext context, UIComponent component, String label, String submittedValue, ValidatorException ve, String validatorMessage) {
-
 		String clientId = component.getClientId(context);
 
 		if (!isEmpty(validatorMessage)) {
 			context.addMessage(clientId, createError(validatorMessage, submittedValue, label));
-		} else {
+		}
+		else {
 			for (FacesMessage facesMessage : getFacesMessages(ve)) {
 				context.addMessage(clientId, facesMessage);
 			}
@@ -529,9 +540,11 @@ public class ParamProducer {
 
 	private static List<FacesMessage> getFacesMessages(ValidatorException ve) {
 		List<FacesMessage> facesMessages = new ArrayList<>();
+
 		if (ve.getFacesMessages() != null) {
 			facesMessages.addAll(ve.getFacesMessages());
-		} else if (ve.getFacesMessage() != null) {
+		}
+		else if (ve.getFacesMessage() != null) {
 			facesMessages.add(ve.getFacesMessage());
 		}
 

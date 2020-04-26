@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -138,6 +138,52 @@ OmniFaces.Util = (function(window, document) {
 		}
 		
 		return query;
+	}
+
+	/**
+	 * Load a script.
+	 * @param {string} url Required; The URL of the script.
+	 * @param {string} crossorigin Optional; The crossorigin of the script. Defaults to "anonymous".
+	 * @param {function} begin Optional; Function to invoke before deferred script is loaded.
+	 * @param {function} success Optional; Function to invoke after deferred script is successfully loaded.
+	 * @param {function} error Optional; Function to invoke when loading of deferred script failed.
+	 * @param {function} complete Optional; Function to invoke after deferred script is loaded, regardless of its success/error outcome.
+	 */
+	self.loadScript = function(url, crossorigin, begin, success, error, complete) {
+		var beginFunction = self.resolveFunction(begin);
+		var successFunction = self.resolveFunction(success);
+		var errorFunction = self.resolveFunction(error);
+		var completeFunction = self.resolveFunction(complete);
+
+		var script = document.createElement("script");
+		var head = document.head || document.documentElement;
+
+		script.async = true;
+		script.src = url;
+		script.setAttribute("crossorigin", crossorigin || "anonymous");
+
+		script.onerror = function() {
+			errorFunction();
+		}
+
+		script.onload = script.onreadystatechange = function(_, abort) {
+			if (abort || !script.readyState || /loaded|complete/.test(script.readyState)) {
+				script.onload = script.onreadystatechange = null; // IE memory leak fix.
+
+				if (abort) {
+					script.onerror();
+				}
+				else {
+					successFunction();
+				}
+
+				script = null;
+				completeFunction();
+			}
+		}
+
+		beginFunction();
+		head.insertBefore(script, null); // IE6 has trouble with appendChild.
 	}
 
 	// Private static functions ---------------------------------------------------------------------------------------

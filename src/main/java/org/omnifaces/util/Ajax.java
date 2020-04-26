@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -16,7 +16,7 @@ import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.omnifaces.util.Components.getCurrentComponent;
 import static org.omnifaces.util.Components.getCurrentForm;
-import static org.omnifaces.util.Faces.getApplication;
+import static org.omnifaces.util.Faces.createResource;
 import static org.omnifaces.util.Faces.isAjaxRequestWithPartialRendering;
 
 import java.beans.Introspector;
@@ -287,7 +287,7 @@ public final class Ajax {
 	 * @since 2.3
 	 */
 	public static void load(String libraryName, String resourceName) {
-		Resource resource = getApplication().getResourceHandler().createResource(resourceName, libraryName);
+		Resource resource = createResource(libraryName, resourceName);
 
 		if (resource == null) {
 			throw new IllegalArgumentException(ERROR_NO_SCRIPT_RESOURCE);

@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -15,13 +15,12 @@ package org.omnifaces.resourcehandler;
 import static java.lang.String.format;
 import static java.util.logging.Level.FINEST;
 import static java.util.logging.Level.WARNING;
-import static org.omnifaces.util.FacesLocal.getRequestDomainURL;
+import static org.omnifaces.util.FacesLocal.createResource;
 import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.openConnection;
 import static org.omnifaces.util.Utils.serializeURLSafe;
 import static org.omnifaces.util.Utils.unserializeURLSafe;
 
-import java.io.IOException;
-import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -31,7 +30,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import javax.faces.application.Resource;
-import javax.faces.application.ResourceHandler;
 import javax.faces.context.FacesContext;
 
 import org.omnifaces.el.functions.Converters;
@@ -48,7 +46,7 @@ public final class CombinedResourceInfo {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final Logger logger = Logger.getLogger(CombinedResourceHandler.class.getName());
+	private static final Logger logger = Logger.getLogger(CombinedResourceInfo.class.getName());
 
 	private static final Map<String, CombinedResourceInfo> CACHE = new ConcurrentHashMap<>();
 
@@ -178,13 +176,12 @@ public final class CombinedResourceInfo {
 		}
 
 		FacesContext context = FacesContext.getCurrentInstance();
-		ResourceHandler handler = context.getApplication().getResourceHandler();
 		resources = new LinkedHashSet<>();
 		contentLength = 0;
 		lastModified = 0;
 
 		for (ResourceIdentifier resourceIdentifier : resourceIdentifiers) {
-			Resource resource = handler.createResource(resourceIdentifier.getName(), resourceIdentifier.getLibrary());
+			Resource resource = createResource(context, resourceIdentifier.getLibrary(), resourceIdentifier.getName());
 
 			if (resource == null) {
 				if (logger.isLoggable(WARNING)) {
@@ -196,21 +193,10 @@ public final class CombinedResourceInfo {
 			}
 
 			resources.add(resource);
-			URLConnection connection;
+			URLConnection connection = openConnection(context, resource);
 
-			try {
-				connection = resource.getURL().openConnection();
-			}
-			catch (Exception richFacesDoesNotSupportThis) {
-				logger.log(FINEST, "Ignoring thrown exception; this can only be caused by a buggy component library.", richFacesDoesNotSupportThis);
-
-				try {
-					connection = new URL(getRequestDomainURL(context) + resource.getRequestPath()).openConnection();
-				}
-				catch (IOException ignore) {
-					logger.log(FINEST, "Ignoring thrown exception; cannot handle it at this point, it would be thrown during getInputStream() anyway.", ignore);
-					return;
-				}
+			if (connection == null) {
+				return;
 			}
 
 			contentLength += connection.getContentLength();
@@ -228,9 +214,7 @@ public final class CombinedResourceInfo {
 	 */
 	@Override
 	public boolean equals(Object other) {
-		return (other instanceof CombinedResourceInfo)
-			? ((CombinedResourceInfo) other).id.equals(id)
-			: false;
+		return (other instanceof CombinedResourceInfo) && ((CombinedResourceInfo) other).id.equals(id);
 	}
 
 	/**

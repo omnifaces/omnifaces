@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -70,8 +70,7 @@ import javax.servlet.http.HttpSession;
  * <code>&lt;f:view encoding&gt;</code>, which also already defaults to UTF-8 by the way.
  *
  * <p><strong>See also</strong>:
- * <br><a href="http://code.google.com/p/primefaces/issues/detail?id=2223">PrimeFaces issue 2223</a>
- * <br><a href="http://stackoverflow.com/q/9634230/157882">Unicode input retrieved via PrimeFaces input components become corrupted</a>
+ * <br><a href="https://stackoverflow.com/q/9634230/157882">Unicode input retrieved via PrimeFaces input components become corrupted</a>
  *
  * @author Bauke Scholtz
  * @since 1.2

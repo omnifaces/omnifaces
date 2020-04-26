@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -19,7 +19,6 @@ import static java.util.Collections.unmodifiableList;
 import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_EVENT_PARAM_NAME;
 import static javax.faces.component.behavior.ClientBehaviorContext.BEHAVIOR_SOURCE_PARAM_NAME;
 import static javax.faces.component.behavior.ClientBehaviorContext.createClientBehaviorContext;
-import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.FacesLocal.getApplicationAttribute;
 import static org.omnifaces.util.FacesLocal.getRequestContextPath;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
@@ -54,6 +53,7 @@ import org.omnifaces.cdi.Push;
 import org.omnifaces.cdi.PushContext;
 import org.omnifaces.cdi.push.SocketEvent.Closed;
 import org.omnifaces.cdi.push.SocketEvent.Opened;
+import org.omnifaces.cdi.push.SocketEvent.Switched;
 import org.omnifaces.component.script.ScriptFamily;
 import org.omnifaces.util.Beans;
 import org.omnifaces.util.Callback;
@@ -79,7 +79,7 @@ import org.omnifaces.util.State;
  * <p>
  * It will install the {@link SocketEndpoint}. Lazy initialization of the endpoint via component is unfortunately not
  * possible across all containers (yet).
- * See also <a href="https://github.com/javaee/websocket-spec/issues/211">WS spec issue 211</a>.
+ * See also <a href="https://github.com/eclipse-ee4j/websocket-api/issues/211">WS spec issue 211</a>.
  *
  *
  * <h3 id="usage-client"><a href="#usage-client">Usage (client)</a></h3>
@@ -123,6 +123,9 @@ import org.omnifaces.util.State;
  * auto-reconnect at increasing intervals when the connection is closed/aborted as result of e.g. a network error or
  * server restart. It will not auto-reconnect when the very first connection attempt already fails. The web socket will
  * be implicitly closed once the document is unloaded (e.g. navigating away, close of browser window/tab, etc).
+ * <p>
+ * In order to successfully reconnect after a server restart, or when switching to a new server node, you need to ensure
+ * that session persistence is enabled on the server.
  *
  *
  * <h3 id="usage-server"><a href="#usage-server">Usage (server)</a></h3>
@@ -212,6 +215,11 @@ import org.omnifaces.util.State;
  * which is in turn poor security practice). If in such case a session scoped socket is reused, undefined behavior may
  * occur when user-targeted push message is sent. It may target previously logged-in user only. This can be solved by
  * setting the scope to <code>view</code>, but better is to fix the logout to invalidate the HTTP session altogether.
+ * <p>
+ * When the <code>user</code> attribute is an EL expression and it changes during an ajax request, then the socket
+ * user will be actually switched, even though you did not cover the <code>&lt;o:socket&gt;</code> component in any ajax
+ * render/update. So make sure the value is tied to at least a view scoped property in case you intend to control it
+ * during the view scope.
  * <p>
  * In the server side, the push message can be targeted to the user specified in the <code>user</code> attribute via
  * <strong>{@link PushContext#send(Object, Serializable)}</strong>. The push message can be sent by all users and the
@@ -334,11 +342,45 @@ import org.omnifaces.util.State;
  * <li><code>channel</code>: the channel name, useful in case you intend to have a global listener.</li>
  * </ul>
  * <p>
+ * The optional <strong><code>onerror</code></strong> JavaScript listener function can be used to listen on a connection
+ * error whereby the web socket will attempt to reconnect. This will be invoked when the web socket can make an
+ * auto-reconnect attempt on a broken connection after the first successful connection. This will be <em>not</em>
+ * invoked when the very first connection attempt fails, or the server has returned close reason code <code>1000</code>
+ * (normal closure) or <code>1008</code> (policy violated), or the maximum reconnect attempts has exceeded. Instead,
+ * the <code>onclose</code> will be invoked.
+ * <pre>
+ * &lt;o:socket ... onerror="socketErrorListener" /&gt;
+ * </pre>
+ * <pre>
+ * function socketErrorListener(code, channel, event) {
+ *     if (code == 1001) {
+ *         // Server has returned an unexpected response code. E.g. 503, because it's shutting down.
+ *     } else if (code == 1006) {
+ *         // Server is not reachable anymore. I.e. it's not anymore listening on TCP/IP requests.
+ *     } else {
+ *         // Any other reason which is usually not -1, 1000 or 1008, as the onclose will be invoked instead.
+ *     }
+ *
+ *     // In any case, the web socket will attempt to reconnect. This function will be invoked again.
+ *     // Once the web socket gives up reconnecting, the onclose will finally be invoked.
+ * }
+ * </pre>
+ * <p>
+ * The <code>onerror</code> JavaScript listener function will be invoked with three arguments:
+ * <ul>
+ * <li><code>code</code>: the close reason code as integer. See also
+ * <a href="https://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and {@link CloseCodes} API for
+ * an elaborate list of all close codes.</li>
+ * <li><code>channel</code>: the channel name, useful in case you intend to have a global listener.</li>
+ * <li><code>event</code>: the raw <a href="https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent"><code>
+ * CloseEvent</code></a> instance, useful in case you intend to inspect it.</li>
+ * </ul>
+ * <p>
  * The optional <strong><code>onclose</code></strong> JavaScript listener function can be used to listen on (ab)normal
  * close of a web socket. This will be invoked when the very first connection attempt fails, or the server has returned
  * close reason code <code>1000</code> (normal closure) or <code>1008</code> (policy violated), or the maximum reconnect
- * attempts has exceeded. This will not be invoked when the web socket can make an auto-reconnect attempt on a broken
- * connection after the first successful connection.
+ * attempts has exceeded. This will <em>not</em> be invoked when the web socket can make an auto-reconnect attempt on a
+ * broken connection after the first successful connection. Instead, the <code>onerror</code> will be invoked.
  * <pre>
  * &lt;o:socket ... onclose="socketCloseListener" /&gt;
  * </pre>
@@ -357,10 +399,10 @@ import org.omnifaces.util.State;
  * The <code>onclose</code> JavaScript listener function will be invoked with three arguments:
  * <ul>
  * <li><code>code</code>: the close reason code as integer. If this is <code>-1</code>, then the web socket
- * is simply not <a href="http://caniuse.com/websockets">supported</a> by the client. If this is <code>1000</code>,
- * then it was normally closed. Else if this is not <code>1000</code>, then there may be an error. See also
- * <a href="http://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and {@link CloseCodes} API for
- * an elaborate list of all close codes.</li>
+ * is simply not <a href="https://caniuse.com/websockets">supported</a> by the client. If this is <code>1000</code>,
+ * then it was normally closed due to an expired session or view. Else if this is not <code>1000</code>, then there may
+ * be an error. See also <a href="https://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and
+ * {@link CloseCodes} API for an elaborate list of all close codes.</li>
  * <li><code>channel</code>: the channel name, useful in case you intend to have a global listener.</li>
  * <li><code>event</code>: the raw <a href="https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent"><code>
  * CloseEvent</code></a> instance, useful in case you intend to inspect it.</li>
@@ -380,7 +422,9 @@ import org.omnifaces.util.State;
  * <h3 id="events-server"><a href="#events-server">Events (server)</a></h3>
  * <p>
  * When a web socket has been opened, a new CDI <strong>{@link SocketEvent}</strong> will be fired with
- * <strong><code>&#64;</code>{@link Opened}</strong> qualifier. When a web socket has been closed, a new CDI
+ * <strong><code>&#64;</code>{@link Opened}</strong> qualifier. When the <code>user</code> attribute of the
+ * <code>&lt;o:socket&gt;</code> changes, a new CDI <strong>{@link SocketEvent}</strong> will be fired with
+ * <strong><code>&#64;</code>{@link Switched}</strong> qualifier. When a web socket has been closed, a new CDI
  * {@link SocketEvent} will be fired with <strong><code>&#64;</code>{@link Closed}</strong> qualifier. They can only be
  * observed and collected in an application scoped CDI bean as below. Observing in a request/view/session scoped CDI
  * bean is not possible as there's no means of a HTTP request anywhere at that moment.
@@ -393,6 +437,13 @@ import org.omnifaces.util.State;
  *         Long userId = event.getUser(); // Returns &lt;o:socket user&gt;, if any.
  *         // Do your thing with it. E.g. collecting them in a concurrent/synchronized collection.
  *         // Do note that a single person can open multiple sockets on same channel/user.
+ *     }
+ *
+ *     public void onSwitch(&#64;Observes &#64;Switched SocketEvent event) {
+ *         String channel = event.getChannel(); // Returns &lt;o:socket channel&gt;.
+ *         Long currentUserId = event.getUser(); // Returns current &lt;o:socket user&gt;, if any.
+ *         Long previousUserId = event.getPreviousUser(); // Returns previous &lt;o:socket user&gt;, if any.
+ *         // Do your thing with it. E.g. updating in a concurrent/synchronized collection.
  *     }
  *
  *     public void onClose(&#64;Observes &#64;Closed SocketEvent event) {
@@ -562,6 +613,81 @@ import org.omnifaces.util.State;
  * frameworks and libraries like JSF and OmniFaces in EAR/EJB (back end) side.
  *
  *
+ * <h3 id="cluster"><a href="#cluster">Cluster design hints</a></h3>
+ * <p>
+ * In case your web application is deployed to a server cluster with multiple nodes, and the push event could be
+ * triggered in a different node than where the client is connected to, then it won't reach the socket. One solution is
+ * to activate and configure a JMS topic in the server configuration, trigger the push event via JMS instead of CDI,
+ * and use a JMS listener (a message driven bean, MDB) to delegate the push event to CDI.</p>
+ * <p>
+ * Below is an example extending on the above given EJB example.
+ * <pre>
+ * &#64;Singleton
+ * &#64;TransactionAttribute(NOT_SUPPORTED)
+ * public class PushManager {
+ *
+ *     &#64;Resource(lookup = "java:/jms/topic/push")
+ *     private Topic jmsTopic;
+ *
+ *     &#64;Inject
+ *     private JMSContext jmsContext;
+ *
+ *     public void fireEvent(PushEvent pushEvent) {
+ *         try {
+ *             Message jmsMessage = jmsContext.createMessage();
+ *             jmsMessage.setStringProperty("message", pushEvent.getMessage());
+ *             jmsContext.createProducer().send(jmsTopic, jmsMessage);
+ *         }
+ *         catch (Exception e) {
+ *             // Handle.
+ *         }
+ *     }
+ * }
+ * </pre>
+ * <pre>
+ * &#64;MessageDriven(activationConfig = {
+ *     &#64;ActivationConfigProperty(propertyName = "destination", propertyValue = "java:/jms/topic/push")
+ * })
+ * public class PushListener implements MessageListener {
+ *
+ *     &#64;Inject
+ *     private BeanManager beanManager;
+ *
+ *     &#64;Override
+ *     public void onMessage(Message jmsMessage) {
+ *         try {
+ *             String message = jmsMessage.getStringProperty("message");
+ *             beanManager.fireEvent(new PushEvent(message));
+ *         }
+ *         catch (Exception e) {
+ *             // Handle.
+ *         }
+ *     }
+ * }
+ * </pre>
+ * <p>
+ * Then, in your EJB, instead of using <code>BeanManager#fireEvent()</code> to fire the CDI event,
+ * <pre>
+ * &#64;Inject
+ * private BeanManager beanManager;
+ *
+ * public void onSomeEntityChange(Entity entity) {
+ *     beanManager.fireEvent(new PushEvent(entity.getSomeProperty()));
+ * }
+ * </pre>
+ * <p>
+ * use the newly created <code>PushManager#fireEvent()</code> to fire the JMS event from one server node of the cluster,
+ * which in turn will fire the CDI event in all server nodes of the cluster.
+ * <pre>
+ * &#64;Inject
+ * private PushManager pushManager;
+ *
+ * public void onSomeEntityChange(Entity entity) {
+ *     pushManager.fireEvent(new PushEvent(entity.getSomeProperty()));
+ * }
+ * </pre>
+ *
+ *
  * <h3 id="ui"><a href="#ui">UI update design hints</a></h3>
  * <p>
  * In case you'd like to perform complex UI updates, then easiest would be to put <code>&lt;f:ajax&gt;</code> inside
@@ -653,7 +779,7 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 
 	private enum PropertyKeys {
 		// Cannot be uppercased. They have to exactly match the attribute names.
-		port, channel, scope, user, onopen, onmessage, onclose, connected;
+		port, channel, scope, user, onopen, onmessage, onerror, onclose, connected;
 	}
 
 	// Variables ------------------------------------------------------------------------------------------------------
@@ -730,8 +856,8 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 
 			Integer port = getPort();
 			String host = (port != null ? ":" + port : "") + getRequestContextPath(context);
-			String channelId = getReference(SocketChannelManager.class).register(channel, getScope(), getUser());
-			String functions = getOnopen() + "," + getOnmessage() + "," + getOnclose();
+			String channelId = SocketChannelManager.getInstance().register(channel, getScope(), getUser());
+			String functions = getOnopen() + "," + getOnmessage() + "," + getOnerror() + "," + getOnclose();
 			String behaviors = getBehaviorScripts();
 			boolean connected = isConnected();
 
@@ -904,20 +1030,47 @@ public class Socket extends ScriptFamily implements ClientBehaviorHolder {
 	}
 
 	/**
-	 * Returns the JavaScript event handler function that is invoked when the web socket is closed.
-	 * @return The JavaScript event handler function that is invoked when the web socket is closed.
+	 * Returns the JavaScript event handler function that is invoked when a connection error has occurred and the web
+	 * socket will attempt to reconnect.
+	 * @return The JavaScript event handler function that is invoked when a connection error has occurred and the web
+	 * socket will attempt to reconnect.
+	 * @since 3.4
+	 */
+	public String getOnerror() {
+		return state.get(PropertyKeys.onerror);
+	}
+
+	/**
+	 * Sets the JavaScript event handler function that is invoked when a connection error has occurred and the web
+	 * socket will attempt to reconnect. The function will be invoked with three arguments: the error reason code, the
+	 * channel name and the raw <code>CloseEvent</code> itself. Note that this will not be invoked on final close of the
+	 * web socket, even when the final close is caused by an error. See also
+	 * <a href="https://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and {@link CloseCodes} API
+	 * for an elaborate list of all close codes.
+	 * @param onerror The JavaScript event handler function that is invoked when a reconnection error has occurred.
+	 * @since 3.4
+	 */
+	public void setOnerror(String onerror) {
+		state.put(PropertyKeys.onerror, onerror);
+	}
+
+	/**
+	 * Returns the JavaScript event handler function that is invoked when the web socket is closed and will not anymore
+	 * attempt to reconnect.
+	 * @return The JavaScript event handler function that is invoked when the web socket is closed and will not anymore
+	 * attempt to reconnect.
 	 */
 	public String getOnclose() {
 		return state.get(PropertyKeys.onclose);
 	}
 
 	/**
-	 * Sets the JavaScript event handler function that is invoked when the web socket is closed.
-	 * The function will be invoked with three arguments: the close reason code, the channel name and the raw
-	 * <code>CloseEvent</code> itself. Note that this will also be invoked on errors and that you can inspect the close
-	 * reason code if an error occurred and which one (i.e. when the code is not 1000). See also
-	 * <a href="http://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and {@link CloseCodes} API
-	 * for an elaborate list of all close codes.
+	 * Sets the JavaScript event handler function that is invoked when the web socket is closed and will not anymore
+	 * attempt to reconnect. The function will be invoked with three arguments: the close reason code, the channel name
+	 * and the raw <code>CloseEvent</code> itself. Note that this will also be invoked when the close is caused by an
+	 * error and that you can inspect the close reason code if an actual connection error occurred and which one (i.e.
+	 * when the code is not 1000 or 1008). See also <a href="https://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455
+	 * section 7.4.1</a> and {@link CloseCodes} API for an elaborate list of all close codes.
 	 * @param onclose The JavaScript event handler function that is invoked when the web socket is closed.
 	 */
 	public void setOnclose(String onclose) {

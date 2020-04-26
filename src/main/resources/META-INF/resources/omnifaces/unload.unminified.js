@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -50,14 +50,15 @@ OmniFaces.Unload = (function(Util, navigator, window, document) {
 			var form = Util.getFacesForm();
 
 			if (!form) {
-				if (window.jsf && jsf.getProjectStage() == "Development" && window.console && console.error) {
+				if ((!window.jsf || jsf.getProjectStage() == "Development") && window.console && console.error) {
 					console.error(ERROR_MISSING_FORM);
 				}
 
 				return;
 			}
 
-			Util.addEventListener(window, window.onbeforeunload ? "unload" : "beforeunload", function() { // If there's no user-defined onbeforeunload handler, let's perform job during beforeunload instead, which is more reliable.
+			var unloadEvent = ("onpagehide" in window) ? "pagehide" : ("onbeforeunload" in window && !window.onbeforeunload) ? "beforeunload" : "unload";
+			Util.addEventListener(window, unloadEvent, function() {
 				if (disabled) {
 					self.reenable(); // Just in case some custom JS explicitly triggered submit event while staying in same DOM.
 					return;

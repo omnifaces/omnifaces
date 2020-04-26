@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -26,29 +26,31 @@ OmniFaces.HashParam = (function(Util, window, document) {
 
 	// Private static fields ------------------------------------------------------------------------------------------
 
+	var id;
+	var updating;
 	var self = {};
 
 	// Public static functions ----------------------------------------------------------------------------------------
 
 	/**
-	 * On page load, 
+	 * On page load, send any hash parameters to the bean.
 	 */
-	self.init = function(clientId) {
-		if (!!window.location.hash) {
-			var form = Util.getFacesForm();
-			
-			if (!form) {
-				if (window.jsf && jsf.getProjectStage() == "Development" && window.console && console.error) {
-					console.error(ERROR_MISSING_FORM);
-				}
+	self.init = function(hashParamId) {
+		id = hashParamId;
 
-				return;
+		if (!Util.getFacesForm()) {
+			if ((!window.jsf || jsf.getProjectStage() == "Development") && window.console && console.error) {
+				console.error(ERROR_MISSING_FORM);
 			}
-
-			var params = { execute: clientId, hash: window.location.hash.substring(1) };
-			params[OmniFaces.EVENT] = "setHashParamValues";
-			jsf.ajax.request(form, null, params);
+			
+			return;
 		}
+		
+		if (!!window.location.hash) {
+			setHashParamValues();
+		}
+		
+		Util.addEventListener(window, "hashchange", setHashParamValues);
 	}
 
 	/**
@@ -57,20 +59,35 @@ OmniFaces.HashParam = (function(Util, window, document) {
 	 * @param {string} value The value of the parameter to update. If it is falsey, then it will be removed.
 	 */
 	self.update = function(name, value) {
-		var hashString = window.location.hash;
+		updating = true;
+		var oldHashQueryString = window.location.hash;
 
-		if (!!hashString && hashString.charAt(0) == '#') {
-			hashString = hashString.substring(1);
+		if (!!oldHashQueryString && oldHashQueryString.charAt(0) == '#') {
+			oldHashQueryString = oldHashQueryString.substring(1);
 		}
 
-		hashString = Util.updateParameter(hashString, name, value);
+		var newHashQueryString = Util.updateParameter(oldHashQueryString, name, value);
 
-		if (window.history && window.history.pushState) {
-			var url = window.location.href.split(/#/, 2)[0] + (hashString ? "#" : "") + hashString;
-			history.pushState(null, document.title, url);
+		if (newHashQueryString != oldHashQueryString) {
+			if (window.history && window.history.pushState) {
+				var url = window.location.href.split(/#/, 2)[0] + (newHashQueryString ? "#" : "") + newHashQueryString;
+				history.pushState(null, document.title, url);
+			}
+			else {
+				window.location.hash = newHashQueryString;
+			}
 		}
-		else {
-			window.location.hash = hashString;
+
+		updating = false;
+	}
+
+	// Private static functions ---------------------------------------------------------------------------------------
+
+	function setHashParamValues() {
+		if (!updating) {
+			var params = { execute: id, hash: window.location.hash.substring(1) };
+			params[OmniFaces.EVENT] = "setHashParamValues";
+			jsf.ajax.request(Util.getFacesForm(), null, params);
 		}
 	}
 

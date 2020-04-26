@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -158,7 +158,7 @@ import org.omnifaces.util.Utils;
  * <p>
  * The <code>accept</code> attribute can be set with a comma separated string of media types of files to filter in
  * browse dialog. An overview of all registered media types can be found at
- * <a href="http://www.iana.org/assignments/media-types">IANA</a>.
+ * <a href="https://www.iana.org/assignments/media-types">IANA</a>.
  * <pre>
  * &lt;h:form enctype="multipart/form-data"&gt;
  *     &lt;o:inputFile id="file" value="#{bean.losslessImageFile}" accept="image/png,image/gif" /&gt;
@@ -211,10 +211,17 @@ import org.omnifaces.util.Utils;
  * <h4>File size validation</h4>
  * <p>
  * The <code>maxsize</code> attribute can be set with the maximum file size in bytes which will be validated on each
- * selected file in the client side if the client supports HTML5 File API. This only requires that there is a
+ * selected file in the client side if the client supports HTML5 File API. This validation will be performed by custom
+ * JavaScript in client side instead of by JSF in server side. This only requires that there is a
  * <code>&lt;h:message&gt;</code> or <code>&lt;h:messages&gt;</code> component and that it has its <code>id</code> set.
- * Namely, the client side validation will on fail trigger JSF via an ajax request to render the faces message. Noted
- * should be that the file(s) will <strong>not</strong> be sent, hereby saving network bandwidth.
+ * <pre>
+ * &lt;o:inputFile id="file" ... /&gt;
+ * &lt;h:message id="messageForFile" for="file" /&gt; &lt;!-- This must have 'id' attribute set! --&gt;
+ * </pre>
+ * <p>
+ * This way the client side can trigger JSF via an ajax request to update the message component with the client side
+ * validation message. Noted should be that the file(s) will <strong>not</strong> be sent, hereby saving network
+ * bandwidth.
  * <pre>
  * &lt;h:form enctype="multipart/form-data"&gt;
  *     &lt;o:inputFile id="file" value="#{bean.file}" maxsize="#{10 * 1024 * 1024}" /&gt; &lt;!-- 10MiB --&gt;
@@ -378,7 +385,7 @@ public class InputFile extends HtmlInputFile {
 		Map<String, Object> passThroughAttributes = getPassThroughAttributes();
 
 		if (isMultiple()) {
-			passThroughAttributes.put("multiple", true); // http://caniuse.com/#feat=input-file-multiple
+			passThroughAttributes.put("multiple", true); // https://caniuse.com/#feat=input-file-multiple
 		}
 
 		if (isDirectory()) {
@@ -389,7 +396,7 @@ public class InputFile extends HtmlInputFile {
 		String accept = getAccept();
 
 		if (accept != null) {
-			passThroughAttributes.put("accept", accept); // http://caniuse.com/#feat=input-file-accept
+			passThroughAttributes.put("accept", accept); // https://caniuse.com/#feat=input-file-accept
 		}
 
 		Long maxsize = getMaxsize();

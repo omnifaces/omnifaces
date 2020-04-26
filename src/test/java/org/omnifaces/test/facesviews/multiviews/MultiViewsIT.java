@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -93,8 +93,10 @@ public class MultiViewsIT extends OmniFacesIT {
 		open("MultiViewsITNonExistingPage/");
 		verify200("MultiViewsIT", "MultiViewsITNonExistingPage/", "MultiViewsITNonExistingPage", "");
 
-		open("MultiViewsITNonExistingPage.xhtml");
-		verify404("MultiViewsITNonExistingPage.xhtml");
+		if (!isTomee()) { // MyFaces throws NPE on this and thus incorrectly returns 500 instead of 404.
+			open("MultiViewsITNonExistingPage.xhtml");
+			verify404("MultiViewsITNonExistingPage.xhtml");
+		}
 	}
 
 	private void verify200(String title, String path, String firstPathParam, String secondPathParam) {

@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -205,8 +205,8 @@
  * If a <code>&lt;welcome-file&gt;</code> is defined in <code>web.xml</code> that's scanned by FacesViews
  * <strong>AND</strong> <code>REDIRECT_TO_EXTENSIONLESS</code> is used (which is the default, see below), it's necessary
  * to define an extensionless welcome file to prevent a request to <code>/</code> being redirected to
- * <code>/[welcome file]</code>. E.g. without this <code>http://example.com</code> will redirect to say
- * <code>http://example.com/index</code>.
+ * <code>/[welcome file]</code>. E.g. without this <code>https://example.com</code> will redirect to say
+ * <code>https://example.com/index</code>.
  *
  * <p>
  * For example:

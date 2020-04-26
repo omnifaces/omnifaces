@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -40,6 +40,8 @@ import javax.faces.application.Application;
 import javax.faces.application.ApplicationFactory;
 import javax.faces.application.NavigationHandler;
 import javax.faces.application.ProjectStage;
+import javax.faces.application.Resource;
+import javax.faces.application.ResourceHandler;
 import javax.faces.application.ViewHandler;
 import javax.faces.component.UIViewParameter;
 import javax.faces.component.UIViewRoot;
@@ -50,10 +52,12 @@ import javax.faces.context.Flash;
 import javax.faces.context.PartialViewContext;
 import javax.faces.convert.Converter;
 import javax.faces.convert.ConverterException;
+import javax.faces.convert.FacesConverter;
 import javax.faces.event.PhaseId;
 import javax.faces.lifecycle.Lifecycle;
 import javax.faces.lifecycle.LifecycleFactory;
 import javax.faces.render.RenderKit;
+import javax.faces.validator.FacesValidator;
 import javax.faces.validator.Validator;
 import javax.faces.view.ViewDeclarationLanguage;
 import javax.faces.view.ViewMetadata;
@@ -70,6 +74,7 @@ import org.omnifaces.component.input.HashParam;
 import org.omnifaces.config.FacesConfigXml;
 import org.omnifaces.el.FacesELResolver;
 import org.omnifaces.facesviews.FacesViews;
+import org.omnifaces.resourcehandler.ResourceIdentifier;
 
 /**
  * <p>
@@ -79,7 +84,7 @@ import org.omnifaces.facesviews.FacesViews;
  * <p>
  * Next to those oneliner delegate calls, there are also some helpful methods which eliminates multiline boilerplate
  * code, such as {@link #getLocale()} which returns sane fallback values, a more convenient
- * {@link #redirect(String, String...)} which automatically prepends the context path when the path does not start with
+ * {@link #redirect(String, Object...)} which automatically prepends the context path when the path does not start with
  * <code>/</code> and offers support for URL encoding of request parameters supplied by varargs argument, and several
  * useful {@link #sendFile(File, boolean)} methods which allows you to provide a {@link File}, <code>byte[]</code> or
  * {@link InputStream} as a download to the client.
@@ -555,7 +560,8 @@ public final class Faces {
 	/**
 	 * Creates and returns a Faces converter associated with given class identifier. If the given identifier is not
 	 * assignable to Converter.class, then use that as target type in {@link Application#createConverter(Class)}. If
-	 * the given identifier is assignable to Converter.class, then instantiate it using default constructor.
+	 * the given identifier is assignable to Converter.class, and the {@link FacesConverter} annotation is present,
+	 * then instantiate it using CDI, else instantiate it using default constructor.
 	 * If no converter instance can be associated, then return null.
 	 * @param <T> The expected converter type.
 	 * @param identifier The Faces converter class identifier.
@@ -598,7 +604,8 @@ public final class Faces {
 
 	/**
 	 * Creates and returns a Faces validator associated with given class identifier. If the given identifier is
-	 * assignable to Validator.class, then instantiate it using default constructor.
+	 * assignable to Validator.class, and the {@link FacesValidator} annotation is present, then instantiate it using
+	 * CDI, else instantiate it using default constructor.
 	 * If no validator instance can be associated, then return null.
 	 * @param <T> The expected validator type.
 	 * @param identifier The Faces validator class identifier.
@@ -607,6 +614,43 @@ public final class Faces {
 	 */
 	public static <T> Validator<T> createValidator(Class<?> identifier) {
 		return FacesLocal.createValidator(getContext(), identifier);
+	}
+
+	/**
+	 * Creates and returns a Faces resource associated with given resource name.
+	 * If no resource can be allocated, then return null.
+	 * @param resourceName The resource name.
+	 * @return A Faces resource associated with given resource name.
+	 * @see ResourceHandler#createResource(String)
+	 * @since 3.6
+	 */
+	public static Resource createResource(String resourceName) {
+		return FacesLocal.createResource(getContext(), resourceName);
+	}
+
+	/**
+	 * Creates and returns a Faces resource associated with given library name and resource name.
+	 * If no resource can be allocated, then return null.
+	 * @param libraryName The library name.
+	 * @param resourceName The resource name.
+	 * @return A Faces resource associated with given library name and resource name.
+	 * @see ResourceHandler#createResource(String, String)
+	 * @since 3.6
+	 */
+	public static Resource createResource(String libraryName, String resourceName) {
+		return FacesLocal.createResource(getContext(), libraryName, resourceName);
+	}
+
+	/**
+	 * Creates and returns a Faces resource associated with given resource identifier.
+	 * If no resource can be allocated, then return null.
+	 * @param resourceIdentifier The resource identifier.
+	 * @return A Faces resource associated with given resource identifier.
+	 * @see ResourceHandler#createResource(String, String)
+	 * @since 3.6
+	 */
+	public static Resource createResource(ResourceIdentifier resourceIdentifier) {
+		return FacesLocal.createResource(getContext(), resourceIdentifier);
 	}
 
 	/**
@@ -1444,6 +1488,18 @@ public final class Faces {
 	}
 
 	/**
+	 * Returns the User-Agent string of the client.
+	 * <p>
+	 * This is also available in EL as <code>#{faces.userAgent}</code>.
+	 * @return The User-Agent string of the client.
+	 * @see HttpServletRequest#getHeader(String)
+	 * @since 3.2
+	 */
+	public static String getUserAgent() {
+		return FacesLocal.getUserAgent(getContext());
+	}
+
+	/**
 	 * Returns <code>true</code> if connection is secure, <code>false</code> otherwise. This method will first check if
 	 * {@link HttpServletRequest#isSecure()} returns <code>true</code>, and if not <code>true</code>, check if the
 	 * <code>X-Forwarded-Proto</code> is present and equals to <code>https</code>.
@@ -1522,7 +1578,7 @@ public final class Faces {
 	 * @throws NullPointerException When url is <code>null</code>.
 	 * @see ExternalContext#redirect(String)
 	 */
-	public static void redirect(String url, String... paramValues) {
+	public static void redirect(String url, Object... paramValues) {
 		FacesLocal.redirect(getContext(), url, paramValues);
 	}
 
@@ -1549,7 +1605,7 @@ public final class Faces {
 	 * @see ExternalContext#setResponseStatus(int)
 	 * @see ExternalContext#setResponseHeader(String, String)
 	 */
-	public static void redirectPermanent(String url, String... paramValues) {
+	public static void redirectPermanent(String url, Object... paramValues) {
 		FacesLocal.redirectPermanent(getContext(), url, paramValues);
 	}
 
@@ -1706,7 +1762,7 @@ public final class Faces {
 	 * which will implicitly also remove the user principal. Just invoke {@link #invalidateSession()} instead. Note
 	 * that the user principal is still present in the response of the current request, it's therefore recommend to
 	 * send a redirect after {@link #logout()} or {@link #invalidateSession()}. You can use
-	 * {@link #redirect(String, String...)} for this.
+	 * {@link #redirect(String, Object...)} for this.
 	 * @throws ServletException When the logout has failed.
 	 * @see HttpServletRequest#logout()
 	 */
@@ -1799,6 +1855,7 @@ public final class Faces {
 	 * @param value The cookie value.
 	 * @param domain The cookie domain. You can use <code>.example.com</code> (with a leading period) if you'd like the
 	 * cookie to be available to all subdomains of the domain. Note that you cannot set it to a different domain.
+	 * Defaults to {@link #getRequestHostname()} when <code>null</code>.
 	 * @param path The cookie path. If this is <code>/</code>, then the cookie is available in all pages of the webapp.
 	 * If this is <code>/somespecificpath</code>, then the cookie is only available in pages under the specified path.
 	 * @param maxAge The maximum age of the cookie, in seconds. If this is <code>0</code>, then the cookie will be
@@ -1811,6 +1868,30 @@ public final class Faces {
 	 */
 	public static void addResponseCookie(String name, String value, String domain, String path, int maxAge) {
 		FacesLocal.addResponseCookie(getContext(), name, value, domain, path, maxAge);
+	}
+
+	/**
+	 * Add a cookie with given name, value, domain, path, maxage and HttpOnly flag to the HTTP response.
+	 * The cookie value will implicitly be URL-encoded with UTF-8 so that any special characters can be stored.
+	 * The cookie will implicitly be set to secure when the current request is a HTTPS request.
+	 * @param name The cookie name.
+	 * @param value The cookie value.
+	 * @param domain The cookie domain. You can use <code>.example.com</code> (with a leading period) if you'd like the
+	 * cookie to be available to all subdomains of the domain. Note that you cannot set it to a different domain.
+	 * Defaults to {@link #getRequestHostname()} when <code>null</code>.
+	 * @param path The cookie path. If this is <code>/</code>, then the cookie is available in all pages of the webapp.
+	 * If this is <code>/somespecificpath</code>, then the cookie is only available in pages under the specified path.
+	 * @param maxAge The maximum age of the cookie, in seconds. If this is <code>0</code>, then the cookie will be
+	 * removed. Note that the name and path must be exactly the same as it was when the cookie was created. If this is
+	 * <code>-1</code> then the cookie will become a session cookie and thus live as long as the established HTTP
+	 * session.
+	 * @param httpOnly When set to true, then JavaScript is not allowed to manipulate the cookie.
+	 * @throws UnsupportedOperationException When this platform does not support UTF-8.
+	 * @see ExternalContext#addResponseCookie(String, String, Map)
+	 * @since 3.3
+	 */
+	public static void addResponseCookie(String name, String value, String domain, String path, int maxAge, boolean httpOnly) {
+		FacesLocal.addResponseCookie(getContext(), name, value, domain, path, maxAge, httpOnly);
 	}
 
 	/**

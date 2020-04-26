@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -88,10 +88,10 @@ import org.omnifaces.facesviews.FacesViews;
  * ajax request.
  * <li>The {@link #isFacesResourceRequest(HttpServletRequest)} which is capable of checking if the current request is a
  * JSF resource request.
- * <li>The {@link #facesRedirect(HttpServletRequest, HttpServletResponse, String, String...)} which is capable
+ * <li>The {@link #facesRedirect(HttpServletRequest, HttpServletResponse, String, Object...)} which is capable
  * of distinguishing JSF ajax requests from regular requests and altering the redirect logic on it, exactly like as
  * {@link ExternalContext#redirect(String)} does. In other words, this method behaves exactly the same as
- * {@link Faces#redirect(String, String...)}.
+ * {@link Faces#redirect(String, Object...)}.
  * <li>The {@link #isFacesDevelopment(ServletContext)} which is capable of checking if the current JSF application
  * configuration is set to development project stage.
  * </ul>
@@ -115,7 +115,7 @@ public final class Servlets {
 
 	// Variables ------------------------------------------------------------------------------------------------------
 
-	private static volatile Boolean facesDevelopment;
+	private static Boolean facesDevelopment;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -148,12 +148,19 @@ public final class Servlets {
 	 * Returns the HTTP request domain URL. This is the URL with the scheme and domain, without any trailing slash.
 	 * @param request The involved HTTP servlet request.
 	 * @return The HTTP request domain URL.
+	 * @throws IllegalArgumentException When the URL is malformed. This is however unexpected as the request would
+	 * otherwise not have hit the server at all.
 	 * @see HttpServletRequest#getRequestURL()
-	 * @see HttpServletRequest#getRequestURI()
 	 */
 	public static String getRequestDomainURL(HttpServletRequest request) {
-		String url = request.getRequestURL().toString();
-		return url.substring(0, url.length() - request.getRequestURI().length());
+		try {
+			URL url = new URL(request.getRequestURL().toString());
+			String fullURL = url.toString();
+			return fullURL.substring(0, fullURL.length() - url.getPath().length());
+		}
+		catch (MalformedURLException e) {
+			throw new IllegalArgumentException(e);
+		}
 	}
 
 	/**
@@ -392,16 +399,39 @@ public final class Servlets {
 
 	/**
 	 * Returns the Internet Protocol (IP) address of the client that sent the request. This will first check the
-	 * <code>X-Forwarded-For</code> request header and if it's present, then return its first IP address, else just
-	 * return {@link HttpServletRequest#getRemoteAddr()} unmodified.
+	 * <code>Forwarded</code> and <code>X-Forwarded-For</code> request headers and if any is present, then return its
+	 * first IP address, else just return {@link HttpServletRequest#getRemoteAddr()} unmodified.
 	 * @param request The involved HTTP servlet request.
 	 * @return The IP address of the client.
 	 * @see HttpServletRequest#getRemoteAddr()
 	 * @since 2.3
 	 */
 	public static String getRemoteAddr(HttpServletRequest request) {
-		String forwardedFor = request.getHeader("X-Forwarded-For");
+		String forwardedFor = coalesce(request.getHeader("Forwarded"), request.getHeader("X-Forwarded-For"));
 		return isEmpty(forwardedFor) ? request.getRemoteAddr() : forwardedFor.split("\\s*,\\s*", 2)[0]; // It's a comma separated string: client,proxy1,proxy2,...
+	}
+
+	/**
+	 * Returns <code>true</code> if request is proxied, <code>false</code> otherwise. In other words, returns
+	 * <code>true</code> when either <code>Forwarded</code> or <code>X-Forwarded-For</code> request headers is present.
+	 * @param request The involved HTTP servlet request.
+	 * @return <code>true</code> if request is proxied, <code>false</code> otherwise.
+	 * @see HttpServletRequest#getHeader(String)
+	 * @since 3.6
+	 */
+	public static boolean isProxied(HttpServletRequest request) {
+		return !isEmpty(coalesce(request.getHeader("Forwarded"), request.getHeader("X-Forwarded-For")));
+	}
+
+	/**
+	 * Returns the User-Agent string of the client.
+	 * @param request The involved HTTP servlet request.
+	 * @return The User-Agent string of the client.
+	 * @see HttpServletRequest#getHeader(String)
+	 * @since 3.2
+	 */
+	public static String getUserAgent(HttpServletRequest request) {
+		return request.getHeader("User-Agent");
 	}
 
 	/**
@@ -770,7 +800,7 @@ public final class Servlets {
 
 	/**
 	 * Sends a temporary (302) JSF redirect to the given URL, supporting JSF ajax requests. This does exactly the same
-	 * as {@link Faces#redirect(String, String...)}, but without the need for a {@link FacesContext}. The major
+	 * as {@link Faces#redirect(String, Object...)}, but without the need for a {@link FacesContext}. The major
 	 * advantage is that you can perform the job inside a servlet filter or even a plain vanilla servlet, where the
 	 * {@link FacesContext} is normally not available. This method also recognizes JSF ajax requests which requires a
 	 * special XML response in order to successfully perform the redirect.
@@ -795,7 +825,7 @@ public final class Servlets {
 	 * @throws UncheckedIOException Whenever something fails at I/O level.
 	 * @since 2.0
 	 */
-	public static void facesRedirect(HttpServletRequest request, HttpServletResponse response, String url, String ... paramValues) {
+	public static void facesRedirect(HttpServletRequest request, HttpServletResponse response, String url, Object... paramValues) {
 		String redirectURL = prepareRedirectURL(request, url, paramValues);
 
 		try {
@@ -836,7 +866,7 @@ public final class Servlets {
 	/**
 	 * Helper method to prepare redirect URL. Package-private so that {@link FacesLocal} can also use it.
 	 */
-	static String prepareRedirectURL(HttpServletRequest request, String url, String... paramValues) {
+	static String prepareRedirectURL(HttpServletRequest request, String url, Object... paramValues) {
 		String redirectURL = url;
 
 		if (!startsWithOneOf(url, "http://", "https://", "/")) {
@@ -850,7 +880,8 @@ public final class Servlets {
 		Object[] encodedParams = new Object[paramValues.length];
 
 		for (int i = 0; i < paramValues.length; i++) {
-			encodedParams[i] = encodeURL(paramValues[i]);
+			Object paramValue = paramValues[i];
+			encodedParams[i] = (paramValue instanceof String) ? encodeURL((String) paramValue) : paramValue;
 		}
 
 		return format(redirectURL, encodedParams);

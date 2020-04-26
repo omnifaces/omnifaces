@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -23,7 +23,9 @@ import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Faces.responseComplete;
 import static org.omnifaces.util.FacesLocal.getRenderKit;
 import static org.omnifaces.util.FacesLocal.getRequestURIWithQueryString;
+import static org.omnifaces.util.FacesLocal.isAjaxRequest;
 import static org.omnifaces.util.FacesLocal.isDevelopment;
+import static org.omnifaces.util.FacesLocal.isSessionNew;
 import static org.omnifaces.util.FacesLocal.redirectPermanent;
 
 import java.io.IOException;
@@ -112,13 +114,18 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 			validateComponentTreeStructure(context, viewToRender);
 		}
 
+		if (isAjaxRequest(context)) {
+			context.getAttributes().put("facelets.ContentType", "text/xml"); // Work around for nasty Mojarra 2.3.4+ bug reported as #4484.
+		}
+
 		super.renderView(context, viewToRender);
 	}
 
 	/**
-	 * Create a dummy view, restore only the view root state and then immediately explicitly destroy the view. Or, if there is no view root
-	 * state (which implies that session is expired), then explicitly send a permanent redirect to request URI. This way any authentication
-	 * framework which remember "last requested restricted URL" will redirect back to correct (non-unload) URL after login on a new session.
+	 * Create a dummy view, restore only the view root state and, if present, then immediately explicitly destroy the
+	 * view state. Or, if the session is new (during an unload request, it implies it had expired), then explicitly send
+	 * a permanent redirect to the original request URI. This way any authentication framework which remembers the "last
+	 * requested restricted URL" will redirect back to correct (non-unload) URL after login on a new session.
 	 */
 	private UIViewRoot unloadView(FacesContext context, String viewId) {
 		UIViewRoot createdView = createView(context, viewId);
@@ -128,12 +135,12 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 			context.setProcessingEvents(true);
 			context.getApplication().publishEvent(context, PreDestroyViewMapEvent.class, UIViewRoot.class, createdView);
 			Hacks.removeViewState(context, manager, viewId);
-			responseComplete();
 		}
-		else {
+		else if (isSessionNew(context)) {
 			redirectPermanent(context, getRequestURIWithQueryString(context));
 		}
 
+		responseComplete();
 		return createdView;
 	}
 
@@ -147,7 +154,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 	private boolean restoreViewRootState(FacesContext context, ResponseStateManager manager, UIViewRoot view) {
 		Object state = manager.getState(context, view.getViewId());
 
-		if (state == null || !(state instanceof Object[]) || ((Object[]) state).length < 2) {
+		if (!(state instanceof Object[]) || ((Object[]) state).length < 2) {
 			return false;
 		}
 

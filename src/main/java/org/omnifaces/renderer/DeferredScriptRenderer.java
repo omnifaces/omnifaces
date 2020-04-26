@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -13,6 +13,7 @@
 package org.omnifaces.renderer;
 
 import static org.omnifaces.resourcehandler.DefaultResourceHandler.RES_NOT_FOUND;
+import static org.omnifaces.util.FacesLocal.createResource;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
@@ -56,7 +57,7 @@ public class DeferredScriptRenderer extends Renderer {
 		Map<String, Object> attributes = component.getAttributes();
 		String library = (String) attributes.get("library");
 		String name = (String) attributes.get("name");
-		Resource resource = context.getApplication().getResourceHandler().createResource(name, library);
+		Resource resource = createResource(context, library, name);
 
 		ResponseWriter writer = context.getResponseWriter();
 		writer.startElement("script", component);

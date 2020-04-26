@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -15,9 +15,9 @@ package org.omnifaces.config;
 import static java.lang.String.format;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
-import static org.omnifaces.util.Beans.getReference;
-import static org.omnifaces.util.Faces.getServletContext;
-import static org.omnifaces.util.Faces.hasContext;
+import static org.omnifaces.util.BeansLocal.getInstance;
+import static org.omnifaces.util.BeansLocal.isActive;
+import static org.omnifaces.util.BeansLocal.resolve;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isNumber;
 import static org.omnifaces.util.Xml.createDocument;
@@ -36,11 +36,18 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.spi.Context;
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
 import javax.servlet.ServletContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.omnifaces.util.Beans;
+import org.omnifaces.util.Faces;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -117,8 +124,7 @@ enum WebXmlSingleton implements WebXml {
 	 */
 	private WebXmlSingleton() {
 		try {
-			ServletContext servletContext = hasContext() ? getServletContext() : getReference(ServletContext.class);
-			Element webXml = loadWebXml(servletContext).getDocumentElement();
+			Element webXml = loadWebXml(getServletContext()).getDocumentElement();
 			XPath xpath = XPathFactory.newInstance().newXPath();
 			welcomeFiles = parseWelcomeFiles(webXml, xpath);
 			errorPageLocations = parseErrorPageLocations(webXml, xpath);
@@ -129,6 +135,25 @@ enum WebXmlSingleton implements WebXml {
 		}
 		catch (Exception e) {
 			throw new IllegalStateException(ERROR_INITIALIZATION_FAIL, e);
+		}
+	}
+
+	private static ServletContext getServletContext() {
+		if (Faces.hasContext()) {
+			return Faces.getServletContext();
+		}
+
+		BeanManager beanManager = Beans.getManager();
+
+		if (isActive(beanManager, RequestScoped.class)) {
+			return getInstance(beanManager, ServletContext.class);
+		}
+		else {
+			// #522 For some reason Weld by default searches for the ServletContext in the request scope.
+			// But this won't work during e.g. startup. So we need to explicitly search in application scope.
+			Bean<ServletContext> bean = resolve(beanManager, ServletContext.class);
+			Context context = beanManager.getContext(ApplicationScoped.class);
+			return context.get(bean, beanManager.createCreationalContext(bean));
 		}
 	}
 

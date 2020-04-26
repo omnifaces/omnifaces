@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -16,6 +16,7 @@ import static java.lang.Boolean.parseBoolean;
 import static javax.faces.convert.Converter.DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE_PARAM_NAME;
 import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Faces.getInitParameter;
+import static org.omnifaces.util.Utils.getDefaultValue;
 
 import java.util.TimeZone;
 
@@ -95,14 +96,15 @@ public class OmniApplication extends ApplicationWrapper {
 	 */
 	@Override
 	public Converter createConverter(Class<?> forClass) {
-		Converter converter = converterManager.createConverter(getWrapped(), forClass);
+		Class<?> converterForClass = forClass.isPrimitive() ? getDefaultValue(forClass).getClass() : forClass;
+		Converter converter = converterManager.createConverter(getWrapped(), converterForClass);
 
 		if (converter != null) {
 			setDefaultPropertiesIfNecessary(converter);
 			return converter;
 		}
 
-		return super.createConverter(forClass);
+		return super.createConverter(converterForClass);
 	}
 
 	/**

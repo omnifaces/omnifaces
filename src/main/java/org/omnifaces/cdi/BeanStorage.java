@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -37,7 +37,7 @@ public class BeanStorage implements Serializable {
 
 	// Properties -----------------------------------------------------------------------------------------------------
 
-	private final ConcurrentHashMap<String, Object> beans;
+	private final ConcurrentHashMap<String, Serializable> beans;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -57,10 +57,11 @@ public class BeanStorage implements Serializable {
 	 * @param type The contextual type of the CDI managed bean.
 	 * @param context The context to create the bean in.
 	 * @return The bean associated with given context and creational context.
+	 * @throws ClassCastException When the bean doesn't implement serializable.
 	 */
 	public <T> T createBean(Contextual<T> type, CreationalContext<T> context) {
 		T bean = type.create(context);
-		beans.put(((PassivationCapable) type).getId(), bean);
+		beans.put(getBeanId(type), (Serializable) bean);
 		return bean;
 	}
 
@@ -72,7 +73,14 @@ public class BeanStorage implements Serializable {
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> T getBean(Contextual<T> type) {
-		return (T) beans.get(((PassivationCapable) type).getId());
+		return (T) beans.get(getBeanId(type));
+	}
+
+	/**
+	 * Returns the bean identifier of the given type.
+	 */
+	private static String getBeanId(Contextual<?> type) {
+		return (type instanceof PassivationCapable) ? ((PassivationCapable) type).getId() : type.getClass().getName();
 	}
 
 	/**

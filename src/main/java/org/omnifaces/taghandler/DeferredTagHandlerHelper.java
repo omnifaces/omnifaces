@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -14,10 +14,12 @@ package org.omnifaces.taghandler;
 
 import static java.lang.String.format;
 import static org.omnifaces.util.FacesLocal.getFaceletContext;
+import static org.omnifaces.util.Reflection.invokeMethod;
 
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.IOException;
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -191,22 +193,24 @@ final class DeferredTagHandlerHelper {
 	 *
 	 * @author Bauke Scholtz
 	 */
-	static final class DeferredAttributes {
+	static final class DeferredAttributes implements Serializable {
 
-		private Map<Method, ValueExpression> attributes;
+		private static final long serialVersionUID = 1L;
+
+		private Map<String, ValueExpression> attributes;
 
 		private DeferredAttributes() {
 			attributes = new HashMap<>();
 		}
 
 		private void add(Method setter, ValueExpression valueExpression) {
-			attributes.put(setter, valueExpression);
+			attributes.put(setter.getName(), valueExpression);
 		}
 
 		public void invokeSetters(ELContext elContext, Object object) {
-			for (Entry<Method, ValueExpression> entry : attributes.entrySet()) {
+			for (Entry<String, ValueExpression> entry : attributes.entrySet()) {
 				try {
-					entry.getKey().invoke(object, entry.getValue().getValue(elContext));
+					invokeMethod(object, entry.getKey(), entry.getValue().getValue(elContext));
 				}
 				catch (Exception e) {
 					throw new FacesException(e);

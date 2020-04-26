@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -30,6 +30,7 @@ import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.webapp.FacesServlet;
 
+import org.omnifaces.util.FacesLocal;
 import org.omnifaces.util.Hacks;
 
 /**
@@ -212,7 +213,7 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 		}
 
 		String libraryName = context.getExternalContext().getRequestParameterMap().get("ln");
-		return context.getApplication().getResourceHandler().createResource(resourceName, libraryName);
+		return FacesLocal.createResource(context, libraryName, resourceName);
 	}
 
 }

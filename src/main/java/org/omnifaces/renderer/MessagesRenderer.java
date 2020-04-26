@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -43,7 +43,7 @@ import org.omnifaces.component.messages.OmniMessages;
 
 /**
  * This renderer is the default renderer of {@link OmniMessages}. It's basically copypasted from Mojarra 2.2,
- * including the fix of tooltip rendering as described in <a href="https://github.com/javaserverfaces/mojarra/issues/2164">
+ * including the fix of tooltip rendering as described in <a href="https://github.com/eclipse-ee4j/mojarra/issues/2164">
  * issue 2164</a>, and afterwards slightly rewritten, refactored and enhanced to take the new features into account.
  *
  * @author Bauke Scholtz
@@ -195,6 +195,7 @@ public class MessagesRenderer extends Renderer {
 			ResponseWriter writer = context.getResponseWriter();
 			writer.startElement("div", component);
 			writeAttribute(writer, "id", component.getClientId(context));
+			writeAttribute(writer, component, "styleClass", "class");
 			writer.endElement("div");
 		}
 	}

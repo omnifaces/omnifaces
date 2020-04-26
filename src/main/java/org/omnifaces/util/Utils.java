@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -17,6 +17,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.logging.Level.FINEST;
 import static java.util.regex.Pattern.quote;
+import static org.omnifaces.util.FacesLocal.getRequestDomainURL;
 import static org.omnifaces.util.Reflection.toClassOrNull;
 import static org.omnifaces.util.Servlets.getSubmittedFileName;
 
@@ -32,6 +33,10 @@ import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
@@ -43,8 +48,20 @@ import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoField;
+import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -56,6 +73,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.function.Consumer;
@@ -67,6 +85,8 @@ import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
+import javax.faces.application.Resource;
+import javax.faces.context.FacesContext;
 import javax.servlet.http.Part;
 import javax.xml.bind.DatatypeConverter;
 
@@ -102,8 +122,11 @@ public final class Utils {
 	private static final int UNICODE_1_BYTE = 0xf;
 	private static final int UNICODE_END_PRINTABLE_ASCII = 0x7f;
 	private static final int UNICODE_BEGIN_PRINTABLE_ASCII = 0x20;
-	private static final Map<Class<?>, Object> PRIMITIVE_DEFAULTS = createPrimitiveDefaults();
+	private static final Map<Class<?>, Object> PRIMITIVE_DEFAULTS = collectPrimitiveDefaults();
+	private static final Map<Class<?>, Class<?>> PRIMITIVE_TYPES = collectPrimitiveTypes();
 	private static final String ERROR_UNSUPPORTED_ENCODING = "UTF-8 is apparently not supported on this platform.";
+	private static final String ERROR_UNSUPPORTED_DATE = "Only java.util.Date, java.util.Calendar and java.time.Temporal are supported.";
+	private static final String ERROR_UNSUPPORTED_TIMEZONE = "Only java.lang.String, java.util.TimeZone and java.time.ZoneId are supported.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -113,7 +136,7 @@ public final class Utils {
 
 	// Initialization -------------------------------------------------------------------------------------------------
 
-	private static Map<Class<?>, Object> createPrimitiveDefaults() {
+	private static Map<Class<?>, Object> collectPrimitiveDefaults() {
 		Map<Class<?>, Object> primitiveDefaults = new HashMap<>();
 		primitiveDefaults.put(boolean.class, false);
 		primitiveDefaults.put(byte.class, (byte) 0);
@@ -124,6 +147,19 @@ public final class Utils {
 		primitiveDefaults.put(float.class, (float) 0);
 		primitiveDefaults.put(double.class, (double) 0);
 		return unmodifiableMap(primitiveDefaults);
+	}
+
+	private static Map<Class<?>, Class<?>> collectPrimitiveTypes() {
+		Map<Class<?>, Class<?>> primitiveTypes = new HashMap<>();
+		primitiveTypes.put(Boolean.class, boolean.class);
+		primitiveTypes.put(Byte.class, byte.class);
+		primitiveTypes.put(Short.class, short.class);
+		primitiveTypes.put(Character.class, char.class);
+		primitiveTypes.put(Integer.class, int.class);
+		primitiveTypes.put(Long.class, long.class);
+		primitiveTypes.put(Float.class, float.class);
+		primitiveTypes.put(Double.class, double.class);
+		return unmodifiableMap(primitiveTypes);
 	}
 
 	// Lang -----------------------------------------------------------------------------------------------------------
@@ -374,6 +410,18 @@ public final class Utils {
 	 */
 	public static Object getDefaultValue(Class<?> cls) {
 		return cls.isPrimitive() ? PRIMITIVE_DEFAULTS.get(cls) : null;
+	}
+
+	/**
+	 * Returns the primitive type of the given class, if any.
+	 * E.g. if given class is <code>Integer.class</code>, then it will return <code>int.class</code>.
+	 * Non-primitives and <code>void.class</code> will return <code>null</code>.
+	 * @param cls The class to obtain the primitive type for.
+	 * @return The primitive type of the given class, if any.
+	 * @since 2.7.2
+	 */
+	public static Class<?> getPrimitiveType(Class<?> cls) {
+		return cls.isPrimitive() ? cls : PRIMITIVE_TYPES.get(cls);
 	}
 
 	// I/O ------------------------------------------------------------------------------------------------------------
@@ -796,6 +844,211 @@ public final class Utils {
 		return sdf.parse(string);
 	}
 
+	/**
+	 * Obtain {@link ZoneId} from <code>D</code>.
+	 * When <code>D</code> is {@code null} or {@link Date}, then return {@link ZoneId#systemDefault()}.
+	 * When <code>D</code> is {@link Calendar}, then return {@link TimeZone#toZoneId()} of {@link Calendar#getTimeZone()}
+	 * When <code>D</code> is {@link Temporal} and supports {@link ChronoField#OFFSET_SECONDS}, then return {@link ZoneId#from(java.time.temporal.TemporalAccessor)}.
+	 * When <code>D</code> is {@link Temporal} and supports {@link ChronoField#CLOCK_HOUR_OF_DAY}, then return {@link ZoneId#systemDefault()}.
+	 * When <code>D</code> is {@link Temporal} and supports neither, then return {@link ZoneOffset#UTC}.
+	 * @param <D> The date type, can be {@code null}, {@link Date}, {@link Calendar} or {@link Temporal}.
+	 * @throws IllegalArgumentException When date is not {@link Date}, {@link Calendar} or {@link Temporal}.
+	 * @since 3.6
+	 */
+	public static <D> ZoneId getZoneId(D date) {
+		if (date == null || date instanceof Date) {
+			return ZoneId.systemDefault();
+		}
+		else if (date instanceof Calendar) {
+			return ((Calendar) date).getTimeZone().toZoneId();
+		}
+		else if (date instanceof Temporal) {
+			Temporal temporal = (Temporal) date;
+
+			if (temporal.isSupported(ChronoField.OFFSET_SECONDS)) {
+				return ZoneId.from((Temporal) date);
+			}
+			else if (temporal.isSupported(ChronoField.CLOCK_HOUR_OF_DAY)) {
+				return ZoneId.systemDefault();
+			}
+			else {
+				return ZoneOffset.UTC;
+			}
+		}
+		else {
+			throw new IllegalArgumentException(ERROR_UNSUPPORTED_DATE);
+		}
+	}
+
+	/**
+	 * Convert <code>Z</code> to {@link ZoneId}.
+	 * When <code>Z</code> is {@code null}, then return {@link ZoneId#systemDefault()}.
+	 * When <code>Z</code> is {@link ZoneId}, then return it.
+	 * When <code>Z</code> is {@link TimeZone}, then return {@link TimeZone#toZoneId()}.
+	 * When <code>Z</code> is {@link String}, then return {@link ZoneId#of(String)}.
+	 * @param <Z> The timezone type, can be {@code null}, {@link String}, {@link TimeZone} or {@link ZoneId}.
+	 * @throws IllegalArgumentException When <code>Z</code> is not {@code null}, {@link ZoneId}, {@link TimeZone} or {@link String}.
+	 * @since 3.6
+	 */
+	public static <Z> ZoneId toZoneId(Z timezone) {
+		if (timezone == null) {
+			return ZoneId.systemDefault();
+		}
+		else if (timezone instanceof ZoneId) {
+			return (ZoneId) timezone;
+		}
+		else if (timezone instanceof TimeZone) {
+			return ((TimeZone) timezone).toZoneId();
+		}
+		else if (timezone instanceof String) {
+			return ZoneId.of((String) timezone);
+		}
+		else {
+			throw new IllegalArgumentException(ERROR_UNSUPPORTED_TIMEZONE);
+		}
+	}
+
+	/**
+	 * Convert <code>D</code> to {@link ZonedDateTime}.
+	 * This method is guaranteed repeatable when combined with {@link #fromZonedDateTime(ZonedDateTime, Class)}.
+	 * @param <D> The date type, can be {@link Date}, {@link Calendar} or {@link Temporal}.
+	 * @throws IllegalArgumentException When date is not {@link Date}, {@link Calendar} or {@link Temporal}.
+	 * @since 3.6
+	 */
+	public static <D> ZonedDateTime toZonedDateTime(D date) {
+		if (date == null) {
+			return null;
+		}
+
+		ZoneId zone = getZoneId(date);
+
+		if (date instanceof java.util.Date) {
+			return ZonedDateTime.ofInstant(Instant.ofEpochMilli(((java.util.Date) date).getTime()), zone);
+		}
+		else if (date instanceof Calendar) {
+			return ((Calendar) date).toInstant().atZone(zone);
+		}
+		else if (date instanceof Instant) {
+			return ((Instant) date).atZone(zone);
+		}
+		else if (date instanceof ZonedDateTime) {
+			return (ZonedDateTime) date;
+		}
+		else if (date instanceof OffsetDateTime) {
+			return ((OffsetDateTime) date).toZonedDateTime();
+		}
+		else if (date instanceof LocalDateTime) {
+			return ((LocalDateTime) date).atZone(zone);
+		}
+		else if (date instanceof LocalDate) {
+			return ((LocalDate) date).atStartOfDay(zone);
+		}
+		else if (date instanceof OffsetTime) {
+			return ((OffsetTime) date).atDate(LocalDate.now()).toZonedDateTime();
+		}
+		else if (date instanceof LocalTime) {
+			return (((LocalTime) date).atDate(LocalDate.now())).atZone(zone);
+		}
+		else if (date instanceof Temporal) {
+			Temporal temporal = (Temporal) date;
+
+			if (temporal.isSupported(ChronoField.INSTANT_SECONDS)) {
+				long epoch = temporal.getLong(ChronoField.INSTANT_SECONDS);
+				long nano = temporal.getLong(ChronoField.NANO_OF_SECOND);
+				return ZonedDateTime.ofInstant(Instant.ofEpochSecond(epoch, nano), zone);
+			}
+			else {
+				LocalDateTime now = LocalDate.now().atStartOfDay();
+				int year = temporal.isSupported(ChronoField.YEAR) ? temporal.get(ChronoField.YEAR) : now.getYear();
+				int month = temporal.isSupported(ChronoField.MONTH_OF_YEAR) ? temporal.get(ChronoField.MONTH_OF_YEAR) : now.getMonth().getValue();
+				int day = temporal.isSupported(ChronoField.DAY_OF_MONTH) ? temporal.get(ChronoField.DAY_OF_MONTH) : now.getDayOfMonth();
+				int hour = temporal.isSupported(ChronoField.HOUR_OF_DAY) ? temporal.get(ChronoField.HOUR_OF_DAY) : now.getHour();
+				int minute = temporal.isSupported(ChronoField.MINUTE_OF_HOUR) ? temporal.get(ChronoField.MINUTE_OF_HOUR) : now.getMinute();
+				int second = temporal.isSupported(ChronoField.SECOND_OF_MINUTE) ? temporal.get(ChronoField.SECOND_OF_MINUTE) : now.getSecond();
+				int nano = temporal.isSupported(ChronoField.NANO_OF_SECOND) ? temporal.get(ChronoField.NANO_OF_SECOND) : now.getNano();
+				return ZonedDateTime.of(year, month, day, hour, minute, second, nano, zone);
+			}
+		}
+		else {
+			throw new IllegalArgumentException(ERROR_UNSUPPORTED_DATE);
+		}
+	}
+
+	/**
+	 * Convert {@link ZonedDateTime} to <code>D</code>.
+	 * This method is guaranteed repeatable when combined with {@link #toZonedDateTime(Object)}.
+	 * @param <D> The date type, can be {@link Date}, {@link Calendar} or {@link Temporal} or any of its subclasses.
+	 * @throws NullPointerException When type is <code>null</code>.
+	 * @throws IllegalArgumentException When type is not {@link Date}, {@link Calendar} or {@link Temporal} or any of its subclasses.
+	 * @since 3.6
+	 */
+	@SuppressWarnings("unchecked")
+	public static <D> D fromZonedDateTime(ZonedDateTime zonedDateTime, Class<?> type) {
+		if (zonedDateTime == null) {
+			return null;
+		}
+		else if (java.sql.Timestamp.class.isAssignableFrom(type)) {
+			return (D) new java.sql.Timestamp(zonedDateTime.toInstant().toEpochMilli());
+		}
+		else if (java.sql.Date.class.isAssignableFrom(type)) {
+			return (D) new java.sql.Date(zonedDateTime.toInstant().toEpochMilli());
+		}
+		else if (java.sql.Time.class.isAssignableFrom(type)) {
+			return (D) new java.sql.Time(zonedDateTime.toInstant().toEpochMilli());
+		}
+		else if (java.util.Date.class.isAssignableFrom(type)) {
+			return (D) java.util.Date.from(zonedDateTime.toInstant());
+		}
+		else if (Calendar.class.isAssignableFrom(type)) {
+			Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone(zonedDateTime.getZone()));
+			calendar.setTime(java.util.Date.from(zonedDateTime.toInstant()));
+			return (D) calendar;
+		}
+		else if (type == Instant.class) {
+			return (D) zonedDateTime.toInstant();
+		}
+		else if (type == ZonedDateTime.class) {
+			return (D) zonedDateTime;
+		}
+		else if (type == OffsetDateTime.class) {
+			return (D) zonedDateTime.toOffsetDateTime();
+		}
+		else if (type == LocalDateTime.class) {
+			return (D) zonedDateTime.toLocalDateTime();
+		}
+		else if (type == LocalDate.class) {
+			return (D) zonedDateTime.toLocalDate();
+		}
+		else if (type == OffsetTime.class) {
+			return (D) zonedDateTime.toOffsetDateTime().toOffsetTime();
+		}
+		else if (type == LocalTime.class) {
+			return (D) zonedDateTime.toLocalDateTime().toLocalTime();
+		}
+		else if (Temporal.class.isAssignableFrom(type)) {
+			// Basically finds public static method in D which takes 1 argument of Temporal.class and returns D.
+			// This matches Temporal#from(TemporalAccessor) methods of all known Temporal subclasses listed above.
+			// There might be custom implementations supporting this as well although this is undocumented.
+			// We just try our best :)
+			Optional<Method> converter = stream(type.getMethods()).filter(method
+				-> Modifier.isPublic(method.getModifiers()) && Modifier.isStatic(method.getModifiers())
+				&& method.getParameterCount() == 1 && method.getParameterTypes()[0].isAssignableFrom(Temporal.class)
+				&& type.isAssignableFrom(method.getReturnType())
+			).findFirst();
+
+			if (converter.isPresent()) {
+				try {
+					return (D) converter.get().invoke(null, zonedDateTime);
+				}
+				catch (Exception ignore) {
+					logger.log(FINEST, "Ignoring thrown exception; there is nothing more we could do here.", ignore);
+				}
+			}
+		}
+
+		throw new IllegalArgumentException(ERROR_UNSUPPORTED_DATE);
+	}
+
 	// Locale ---------------------------------------------------------------------------------------------------------
 
 	/**
@@ -1060,6 +1313,32 @@ public final class Utils {
 			default:
 				builder.append(c);
 				break;
+		}
+	}
+
+	// Resources ------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns connection to given resource, taking into account possibly buggy component libraries.
+	 * @param context The involved faces context.
+	 * @param resource The resource to obtain connection from.
+	 * @return Connection to given resource.
+	 * @since 3.6
+	 */
+	public static URLConnection openConnection(FacesContext context, Resource resource) {
+		try {
+			return resource.getURL().openConnection();
+		}
+		catch (Exception richFacesDoesNotSupportThis) {
+			logger.log(FINEST, "Ignoring thrown exception; this can only be caused by a buggy component library.", richFacesDoesNotSupportThis);
+
+			try {
+				return new URL(getRequestDomainURL(context) + resource.getRequestPath()).openConnection();
+			}
+			catch (IOException ignore) {
+				logger.log(FINEST, "Ignoring thrown exception; cannot handle it at this point, it would be thrown during getInputStream() anyway.", ignore);
+				return null;
+			}
 		}
 	}
 

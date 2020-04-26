@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -18,6 +18,7 @@ import static java.util.logging.Level.FINEST;
 import static javax.faces.component.UIViewRoot.METADATA_FACET_NAME;
 import static javax.faces.view.facelets.FaceletContext.FACELET_CONTEXT_KEY;
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
+import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Components.findComponentsInChildren;
 import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.Reflection.instance;
@@ -30,7 +31,6 @@ import static org.omnifaces.util.Servlets.toQueryString;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.encodeURL;
 import static org.omnifaces.util.Utils.isEmpty;
-import static org.omnifaces.util.Utils.isOneOf;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -65,6 +65,7 @@ import javax.faces.FacesException;
 import javax.faces.FactoryFinder;
 import javax.faces.application.Application;
 import javax.faces.application.ProjectStage;
+import javax.faces.application.Resource;
 import javax.faces.application.ViewHandler;
 import javax.faces.component.UIViewParameter;
 import javax.faces.component.UIViewRoot;
@@ -73,10 +74,12 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
 import javax.faces.context.PartialViewContext;
 import javax.faces.convert.Converter;
+import javax.faces.convert.FacesConverter;
 import javax.faces.event.PhaseId;
 import javax.faces.lifecycle.Lifecycle;
 import javax.faces.render.RenderKit;
 import javax.faces.render.RenderKitFactory;
+import javax.faces.validator.FacesValidator;
 import javax.faces.validator.Validator;
 import javax.faces.view.ViewDeclarationLanguage;
 import javax.faces.view.ViewMetadata;
@@ -92,6 +95,7 @@ import javax.servlet.http.Part;
 import org.omnifaces.component.ParamHolder;
 import org.omnifaces.component.input.HashParam;
 import org.omnifaces.config.FacesConfigXml;
+import org.omnifaces.resourcehandler.ResourceIdentifier;
 
 /**
  * <p>
@@ -304,7 +308,14 @@ public final class FacesLocal {
 	@SuppressWarnings("unchecked")
 	public static <T> Converter<T> createConverter(FacesContext context, Class<?> identifier) {
 		if (Converter.class.isAssignableFrom(identifier)) {
-			return (Converter<T>) instance(identifier);
+			FacesConverter annotation = identifier.getAnnotation(FacesConverter.class);
+
+			if (annotation != null) {
+				return (Converter<T>) getReference(identifier, annotation);
+			}
+			else {
+				return (Converter<T>) instance(identifier);
+			}
 		}
 		else {
 			return context.getApplication().createConverter(identifier);
@@ -350,11 +361,39 @@ public final class FacesLocal {
 	@SuppressWarnings({ "unchecked", "unused" })
 	public static <T> Validator<T> createValidator(FacesContext context, Class<?> identifier) {
 		if (Validator.class.isAssignableFrom(identifier)) {
-			return (Validator<T>) instance(identifier);
+			FacesValidator annotation = identifier.getAnnotation(FacesValidator.class);
+
+			if (annotation != null) {
+				return (Validator<T>) getReference(identifier, annotation);
+			}
+			else {
+				return (Validator<T>) instance(identifier);
+			}
 		}
 		else {
 			return null;
 		}
+	}
+
+	/**
+	 * @see Faces#createResource(String)
+	 */
+	public static Resource createResource(FacesContext context, String resourceName) {
+		return context.getApplication().getResourceHandler().createResource(resourceName);
+	}
+
+	/**
+	 * @see Faces#createResource(String, String)
+	 */
+	public static Resource createResource(FacesContext context, String libraryName, String resourceName) {
+		return context.getApplication().getResourceHandler().createResource(resourceName, libraryName);
+	}
+
+	/**
+	 * @see Faces#createResource(ResourceIdentifier)
+	 */
+	public static Resource createResource(FacesContext context, ResourceIdentifier resourceIdentifier) {
+		return context.getApplication().getResourceHandler().createResource(resourceIdentifier.getName(), resourceIdentifier.getLibrary());
 	}
 
 	/**
@@ -693,7 +732,6 @@ public final class FacesLocal {
 			}
 			catch (MissingResourceException ignore) {
 				logger.log(FINEST, "Ignoring thrown exception; there is a fallback anyway.", ignore);
-				continue;
 			}
 		}
 
@@ -1072,6 +1110,13 @@ public final class FacesLocal {
 	}
 
 	/**
+	 * @see Faces#getUserAgent()
+	 */
+	public static String getUserAgent(FacesContext context) {
+		return Servlets.getUserAgent(getRequest(context));
+	}
+
+	/**
 	 * @see Faces#isRequestSecure()
 	 */
 	public static boolean isRequestSecure(FacesContext context) {
@@ -1109,9 +1154,9 @@ public final class FacesLocal {
 	}
 
 	/**
-	 * @see Faces#redirect(String, String...)
+	 * @see Faces#redirect(String, Object...)
 	 */
-	public static void redirect(FacesContext context, String url, String... paramValues) {
+	public static void redirect(FacesContext context, String url, Object... paramValues) {
 		ExternalContext externalContext = context.getExternalContext();
 		externalContext.getFlash().setRedirect(true); // MyFaces also requires this for a redirect in current request (which is incorrect).
 
@@ -1124,9 +1169,9 @@ public final class FacesLocal {
 	}
 
 	/**
-	 * @see Faces#redirectPermanent(String, String...)
+	 * @see Faces#redirectPermanent(String, Object...)
 	 */
-	public static void redirectPermanent(FacesContext context, String url, String... paramValues) {
+	public static void redirectPermanent(FacesContext context, String url, Object... paramValues) {
 		ExternalContext externalContext = context.getExternalContext();
 		externalContext.getFlash().setRedirect(true); // MyFaces also requires this for a redirect in current request (which is incorrect).
 		externalContext.setResponseStatus(SC_MOVED_PERMANENTLY);
@@ -1258,25 +1303,32 @@ public final class FacesLocal {
 	 * @see Faces#addResponseCookie(String, String, int)
 	 */
 	public static void addResponseCookie(FacesContext context, String name, String value, int maxAge) {
-		addResponseCookie(context, name, value, getRequestHostname(context), null, maxAge);
+		addResponseCookie(context, name, value, null, null, maxAge);
 	}
 
 	/**
 	 * @see Faces#addResponseCookie(String, String, String, int)
 	 */
 	public static void addResponseCookie(FacesContext context, String name, String value, String path, int maxAge) {
-		addResponseCookie(context, name, value, getRequestHostname(context), path, maxAge);
+		addResponseCookie(context, name, value, null, path, maxAge, true);
 	}
 
 	/**
 	 * @see Faces#addResponseCookie(String, String, String, String, int)
 	 */
 	public static void addResponseCookie(FacesContext context, String name, String value, String domain, String path, int maxAge) {
+		addResponseCookie(context, name, value, domain, path, maxAge, true);
+	}
+
+	/**
+	 * @see Faces#addResponseCookie(String, String, String, String, int, boolean)
+	 */
+	public static void addResponseCookie(FacesContext context, String name, String value, String domain, String path, int maxAge, boolean httpOnly) {
 		ExternalContext externalContext = context.getExternalContext();
 		Map<String, Object> properties = new HashMap<>();
 
-		if (!isOneOf(domain, null, "localhost")) { // Chrome doesn't like domain:"localhost" on cookies.
-			properties.put("domain", domain);
+		if (!"localhost".equals(domain)) { // Chrome doesn't like domain:"localhost" on cookies.
+			properties.put("domain", (domain == null) ? getRequestHostname(context) : domain);
 		}
 
 		if (path != null) {
@@ -1284,7 +1336,7 @@ public final class FacesLocal {
 		}
 
 		properties.put("maxAge", maxAge);
-		properties.put("httpOnly", true);
+		properties.put("httpOnly", httpOnly);
 		properties.put("secure", isSecure((HttpServletRequest) externalContext.getRequest()));
 		externalContext.addResponseCookie(name, encodeURL(value), properties);
 	}

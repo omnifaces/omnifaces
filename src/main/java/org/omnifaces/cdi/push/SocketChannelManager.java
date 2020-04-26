@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -14,7 +14,8 @@ package org.omnifaces.cdi.push;
 
 import static java.lang.String.format;
 import static java.util.Collections.emptyMap;
-import static org.omnifaces.util.Beans.getInstance;
+import static org.omnifaces.util.Beans.fireEvent;
+import static org.omnifaces.util.Beans.getReference;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -31,6 +32,9 @@ import javax.annotation.PreDestroy;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.view.ViewScoped;
 import javax.inject.Inject;
+
+import org.omnifaces.cdi.push.SocketEvent.Switched;
+import org.omnifaces.util.Beans;
 
 /**
  * <p>
@@ -140,8 +144,7 @@ public class SocketChannelManager implements Serializable {
 		String channelId = targetScope.get(channel);
 
 		if (user != null) {
-			if (!sessionUsers.containsKey(user)) {
-				sessionUsers.putIfAbsent(user, UUID.randomUUID().toString());
+			if (!sessionUsers.containsKey(user) && sessionUsers.putIfAbsent(user, UUID.randomUUID().toString()) == null) {
 				socketUsers.register(user, sessionUsers.get(user));
 			}
 
@@ -150,6 +153,22 @@ public class SocketChannelManager implements Serializable {
 
 		socketSessions.register(channelId);
 		return channelId;
+	}
+
+	/**
+	 * Switch the user on the given channel on the given scope from the given old user to the given new user.
+	 */
+	protected void switchUser(String channel, String scope, Serializable oldUser, Serializable newUser) {
+		if (oldUser != null) {
+			String userId = sessionUsers.remove(oldUser);
+
+			if (userId != null) {
+				socketUsers.deregister(oldUser, userId);
+			}
+		}
+
+		register(channel, scope, newUser);
+		fireEvent(new SocketEvent(channel, newUser, oldUser, null), Switched.LITERAL);
 	}
 
 	/**
@@ -219,8 +238,15 @@ public class SocketChannelManager implements Serializable {
 	 * @return View scope channel IDs.
 	 */
 	protected Map<String, String> getViewScopedChannels(boolean create) {
-		ViewScope bean = getInstance(ViewScope.class, create);
+		ViewScope bean = Beans.getInstance(ViewScope.class, create);
 		return (bean == null) ? EMPTY_SCOPE : bean.getChannels();
+	}
+
+	/**
+	 * Internal usage only. Awkward workaround for it being unavailable via @Inject in JSF components and listeners.
+	 */
+	static SocketChannelManager getInstance() {
+		return getReference(SocketChannelManager.class);
 	}
 
 	/**

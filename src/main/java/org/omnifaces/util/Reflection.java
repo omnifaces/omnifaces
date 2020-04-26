@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -16,6 +16,7 @@ import static java.beans.Introspector.getBeanInfo;
 import static java.beans.PropertyEditorManager.findEditor;
 import static java.lang.String.format;
 import static java.util.logging.Level.FINEST;
+import static org.omnifaces.util.Utils.getPrimitiveType;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
@@ -165,7 +166,7 @@ public final class Reflection {
 
 		for (Class<?> cls = base.getClass(); cls != null; cls = cls.getSuperclass()) {
 			for (Method method : cls.getDeclaredMethods()) {
-				if (method.getName().equals(methodName) && method.getParameterTypes().length == params.length) {
+				if (method.getName().equals(methodName) && method.getParameterTypes().length == params.length && isNotOverridden(methods, method)) {
 					methods.add(method);
 				}
 			}
@@ -179,13 +180,23 @@ public final class Reflection {
 		}
 	}
 
+	private static boolean isNotOverridden(List<Method> methodsWithSameName, Method method) {
+		for (Method methodWithSameName : methodsWithSameName) {
+			if (Arrays.equals(methodWithSameName.getParameterTypes(), method.getParameterTypes())) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	private static Method closestMatchingMethod(List<Method> methods, Object... params) {
 		for (Method method : methods) {
-			Class<?>[] candidateParams = method.getParameterTypes();
+			Class<?>[] candidateParamTypes = method.getParameterTypes();
 			boolean match = true;
 
 			for (int i = 0; i < params.length; i++) {
-				if (!candidateParams[i].isInstance(params[i])) {
+				if (!isAssignable(params[i], candidateParamTypes[i])) {
 					match = false;
 					break;
 				}
@@ -200,6 +211,24 @@ public final class Reflection {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Returns true if given source is assignable to target type, taking into account autoboxing.
+	 * Java returns namely false on int.class.isAssignableFrom(Integer.class).
+	 * @param source The source to be checked.
+	 * @param targetType The target type to be checked.
+	 * @return True if the given source is assignable to the given target type.
+	 * @since 2.7.2
+	 */
+	public static boolean isAssignable(Object source, Class<?> targetType) {
+		Class<?> sourceType = source != null ? source.getClass() : null;
+
+		if (sourceType != null && targetType.isPrimitive()) {
+			sourceType = getPrimitiveType(sourceType);
+		}
+
+		return (sourceType == null) ? !targetType.isPrimitive() : targetType.isAssignableFrom(sourceType);
 	}
 
 	/**
@@ -337,6 +366,11 @@ public final class Reflection {
 	public static <T> T invokeMethod(Object instance, String methodName, Object... parameters) {
 		try {
 			Method method = findMethod(instance, methodName, parameters);
+
+			if (method == null) {
+				throw new NoSuchMethodException();
+			}
+
 			method.setAccessible(true);
 			return (T) method.invoke(instance, parameters);
 		}

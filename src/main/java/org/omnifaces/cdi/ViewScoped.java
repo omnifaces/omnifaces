@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -73,8 +73,8 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <p>
  * Related JSF issues:
  * <ul>
- * <li><a href="https://github.com/javaserverfaces/mojarra/issues/1355">Mojarra issue 1355</a>
- * <li><a href="https://github.com/javaserverfaces/mojarra/issues/1843">Mojarra issue 1843</a>
+ * <li><a href="https://github.com/eclipse-ee4j/mojarra/issues/1355">Mojarra issue 1355</a>
+ * <li><a href="https://github.com/eclipse-ee4j/mojarra/issues/1843">Mojarra issue 1843</a>
  * <li><a href="https://github.com/javaee/javaserverfaces-spec/issues/905">JSF spec issue 905</a>
  * </ul>
  *
@@ -110,7 +110,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * &lt;env-entry&gt;
  *     &lt;env-entry-name&gt;jsf/ClientSideSecretKey&lt;/env-entry-name&gt;
  *     &lt;env-entry-type&gt;java.lang.String&lt;/env-entry-type&gt;
- *     &lt;env-entry-value&gt;&lt;!-- See http://stackoverflow.com/q/35102645/157882 --&gt;&lt;/env-entry-value&gt;
+ *     &lt;env-entry-value&gt;&lt;!-- See https://stackoverflow.com/q/35102645/157882 --&gt;&lt;/env-entry-value&gt;
  * &lt;/env-entry&gt;
  * </pre>
  * <p>
@@ -177,6 +177,30 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  *     return $("body").data("unsavedchanges") ? "You have unsaved data. Are you sure you wish to leave this page?" : null;
  * };
  * </pre>
+ *
+ * <h3>Using download links</h3>
+ * <p>
+ * If you have a synchronous download link as in <code>&lt;a href="/path/to/file.ext"&gt;</code>, then the unload will
+ * also be triggered. For HTML5-capable browsers it's sufficient to add the <code>download</code> attribute representing
+ * the file name you'd like to use in the client specific "Save As" dialogue.
+ * <pre>
+ * &lt;a href="/path/to/file.ext" download="file.ext"&gt;download&lt;/a&gt;
+ * </pre>
+ * <p>
+ * When this attribute is present, then the browser won't anymore trigger the unload event. In case your target browser
+ * does not <a href="https://caniuse.com/#feat=download">support</a> it, then you'd need to explicitly disable the
+ * OmniFaces unload event as follows:
+ * <pre>
+ * &lt;a href="/path/to/file.ext" onclick="OmniFaces.Unload.disable();"&gt;download&lt;/a&gt;
+ * </pre>
+ * <p>
+ * An alternative is to explicitly open the download in a new tab/window. Decent browsers, even these not supporting the
+ * <code>download</code> attribute, will usually automatically close the newly opened tab/window when a response with
+ * <code>Content-Disposition: attachment</code> is received.
+ * <pre>
+ * &lt;a href="/path/to/file.ext" target="_blank"&gt;download&lt;/a&gt;
+ * </pre>
+ *
  *
  * @author Radu Creanga {@literal <rdcrng@gmail.com>}
  * @author Bauke Scholtz

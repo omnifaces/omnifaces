@@ -1,10 +1,10 @@
 /*
- * Copyright 2018 OmniFaces
+ * Copyright 2020 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
@@ -40,7 +40,7 @@ public final class CombinedResourceInputStream extends InputStream {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
-	private static final Logger logger = Logger.getLogger(CombinedResourceHandler.class.getName());
+	private static final Logger logger = Logger.getLogger(CombinedResourceInputStream.class.getName());
 
 	private static final byte[] CRLF = { '\r', '\n' };
 
@@ -95,6 +95,26 @@ public final class CombinedResourceInputStream extends InputStream {
 		int read;
 
 		while ((read = currentStream.read()) == -1) {
+			if (streamIterator.hasNext()) {
+				currentStream = streamIterator.next();
+			}
+			else {
+				break;
+			}
+		}
+
+		return read;
+	}
+
+	/**
+	 * For each resource, read until its {@link InputStream#read()} returns <code>-1</code> and then iterate to the
+	 * {@link InputStream} of the next resource, if any available, else return <code>-1</code>.
+	 */
+	@Override
+	public int read(byte[] b, int offset, int length) throws IOException {
+		int read;
+
+		while ((read = currentStream.read(b, offset, length)) == -1) {
 			if (streamIterator.hasNext()) {
 				currentStream = streamIterator.next();
 			}
