@@ -396,16 +396,28 @@ public final class Servlets {
 
 	/**
 	 * Returns the Internet Protocol (IP) address of the client that sent the request. This will first check the
-	 * <code>X-Forwarded-For</code> request header and if it's present, then return its first IP address, else just
-	 * return {@link HttpServletRequest#getRemoteAddr()} unmodified.
+	 * <code>Forwarded</code> and <code>X-Forwarded-For</code> request headers and if any is present, then return its
+	 * first IP address, else just return {@link HttpServletRequest#getRemoteAddr()} unmodified.
 	 * @param request The involved HTTP servlet request.
 	 * @return The IP address of the client.
 	 * @see HttpServletRequest#getRemoteAddr()
 	 * @since 2.3
 	 */
 	public static String getRemoteAddr(HttpServletRequest request) {
-		String forwardedFor = request.getHeader("X-Forwarded-For");
+		String forwardedFor = coalesce(request.getHeader("Forwarded"), request.getHeader("X-Forwarded-For"));
 		return isEmpty(forwardedFor) ? request.getRemoteAddr() : forwardedFor.split("\\s*,\\s*", 2)[0]; // It's a comma separated string: client,proxy1,proxy2,...
+	}
+
+	/**
+	 * Returns <code>true</code> if request is proxied, <code>false</code> otherwise. In other words, returns
+	 * <code>true</code> when either <code>Forwarded</code> or <code>X-Forwarded-For</code> request headers is present.
+	 * @param request The involved HTTP servlet request.
+	 * @return <code>true</code> if request is proxied, <code>false</code> otherwise.
+	 * @see HttpServletRequest#getHeader(String)
+	 * @since 3.6
+	 */
+	public static boolean isProxied(HttpServletRequest request) {
+		return !isEmpty(coalesce(request.getHeader("Forwarded"), request.getHeader("X-Forwarded-For")));
 	}
 
 	/**
