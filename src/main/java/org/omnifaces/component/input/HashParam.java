@@ -40,7 +40,6 @@ import java.util.Map;
 import java.util.Objects;
 
 import javax.faces.component.FacesComponent;
-import javax.faces.component.UIForm;
 import javax.faces.component.UIViewParameter;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
@@ -75,11 +74,6 @@ import org.omnifaces.util.State;
  *     &lt;o:hashParam name="bar" value="#{bean.bar}" /&gt;
  * &lt;/f:metadata&gt;
  * </pre>
- * <p>
- * This only requires that the JSF page has at least one {@link UIForm} component, such as <code>&lt;h:form&gt;</code>
- * or <code>&lt;o:form&gt;</code>, otherwise the <code>&lt;o:hashParam&gt;</code> won't be able to fire the ajax
- * request which sets the hash query parameter values in bean. In such case an error will be printed to JS console
- * when the project stage is <code>Development</code>.
  * <p>
  * You can use the <code>render</code> attribute to declare which components should be updated when a hash parameter
  * value is present.
