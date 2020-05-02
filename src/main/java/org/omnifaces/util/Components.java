@@ -770,8 +770,7 @@ public final class Components {
 	 * @param script JavaScript code which is to be executed as an inline script.
 	 * @since 3.6
 	 */
-	public static void addScript(String script)
-	{
+	public static void addScript(String script) {
 		if (isAjaxRequestWithPartialRendering()) {
 			oncomplete(script);
 		}
@@ -794,8 +793,7 @@ public final class Components {
 	 * @param resourceName Resource name of the JavaScript resource.
 	 * @since 3.6
 	 */
-	public static void addScriptResource(String libraryName, String resourceName)
-	{
+	public static void addScriptResource(String libraryName, String resourceName) {
 		addScriptResource(libraryName, resourceName, null);
 	}
 
@@ -818,8 +816,7 @@ public final class Components {
 	 * optimized script for that.
 	 * @since 3.6
 	 */
-	public static void addScriptResource(String libraryName, String resourceName, String fallbackBodyResourceName)
-	{
+	public static void addScriptResource(String libraryName, String resourceName, String fallbackBodyResourceName) {
 		FacesContext context = FacesContext.getCurrentInstance();
 		boolean ajaxRequestWithPartialRendering = isAjaxRequestWithPartialRendering(context);
 

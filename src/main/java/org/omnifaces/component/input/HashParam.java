@@ -19,19 +19,19 @@ import static javax.faces.event.PhaseId.RENDER_RESPONSE;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
+import static org.omnifaces.util.Ajax.isExecuted;
 import static org.omnifaces.util.Ajax.oncomplete;
 import static org.omnifaces.util.Ajax.update;
 import static org.omnifaces.util.Beans.fireEvent;
 import static org.omnifaces.util.Components.addScript;
 import static org.omnifaces.util.Components.addScriptResource;
 import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
-import static org.omnifaces.util.Faces.getHashQueryString;
-import static org.omnifaces.util.Faces.getRequestMap;
-import static org.omnifaces.util.Faces.isAjaxRequestWithPartialRendering;
-import static org.omnifaces.util.Faces.isPostback;
-import static org.omnifaces.util.Faces.renderResponse;
 import static org.omnifaces.util.FacesLocal.getHashParameters;
+import static org.omnifaces.util.FacesLocal.getHashQueryString;
+import static org.omnifaces.util.FacesLocal.getRequestMap;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
+import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
+import static org.omnifaces.util.FacesLocal.isPostback;
 import static org.omnifaces.util.Servlets.toParameterMap;
 
 import java.util.List;
@@ -45,7 +45,6 @@ import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 
 import org.omnifaces.event.HashChangeEvent;
-import org.omnifaces.util.Ajax;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.State;
 
@@ -170,19 +169,21 @@ public class HashParam extends UIViewParameter {
 	}
 
 	private void registerScriptsIfNecessary() {
-		if (!isHashParamRequest(getFacesContext())) {
+		FacesContext context = getFacesContext();
+
+		if (!isHashParamRequest(context)) {
 			// @ResourceDependency bugs in Mojarra with NPE on createMetadataView because UIViewRoot is null (this component is part of f:metadata), so we have to add them this way.
 			addScriptResource(JSF_SCRIPT_LIBRARY_NAME, JSF_SCRIPT_RESOURCE_NAME); // Required for jsf.ajax.request.
 			addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME); // Specifically hashparam.js.
 
-			if (!isPostback()) {
-				if (getRequestMap().put(getClass().getName(), Boolean.TRUE) == null) { // Just init only once for first encountered HashParam.
+			if (!isPostback(context)) {
+				if (getRequestMap(context).put(getClass().getName(), Boolean.TRUE) == null) { // Just init only once for first encountered HashParam.
 					addScript(format(SCRIPT_INIT, getClientId()));
 				}
 			}
 			else {
-				if (isAjaxRequestWithPartialRendering() && !isHashParamRequest(getFacesContext())) {
-					oncomplete(format(SCRIPT_UPDATE, getName(), getRenderedValue(getFacesContext()))); // Update hash string based on JSF model if necessary.
+				if (isAjaxRequestWithPartialRendering(context) && !isHashParamRequest(context)) {
+					oncomplete(format(SCRIPT_UPDATE, getName(), getRenderedValue(context))); // Update hash string based on JSF model if necessary.
 				}
 			}
 		}
@@ -195,8 +196,8 @@ public class HashParam extends UIViewParameter {
 	 */
 	@Override
 	public void processDecodes(FacesContext context) {
-		if (isHashParamRequest(context) && Ajax.getContext().getExecuteIds().contains(getClientId(context))) {
-			String oldHashQueryString = getHashQueryString();
+		if (isHashParamRequest(context) && isExecuted(getClientId(context))) {
+			String oldHashQueryString = getHashQueryString(context);
 			Map<String, List<String>> hashParams = toParameterMap(getRequestParameter(context, "hash"));
 
 			for (HashParam hashParam : getHashParameters(context)) {
@@ -204,13 +205,13 @@ public class HashParam extends UIViewParameter {
 				hashParam.decodeImmediately(context, values != null ? values.get(0) : "");
 			}
 
-			String newHashQueryString = getHashQueryString();
+			String newHashQueryString = getHashQueryString(context);
 
 			if (!Objects.equals(oldHashQueryString, newHashQueryString)) {
 				fireEvent(new HashChangeEvent(context, oldHashQueryString, newHashQueryString));
 			}
 
-			renderResponse();
+			context.renderResponse();
 		}
 	}
 

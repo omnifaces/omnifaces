@@ -369,4 +369,14 @@ public final class Ajax {
 		}
 	}
 
+	/**
+	 * Returns <code>true</code> if the given client ID was executed in the current ajax request.
+	 * @param clientId The client ID to be checked.
+	 * @return <code>true</code> if the given client ID was executed in the current ajax request.
+	 * @since 3.6
+	 */
+	public static boolean isExecuted(String clientId) {
+		return getContext().getExecuteIds().contains(clientId);
+	}
+
 }
