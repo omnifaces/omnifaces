@@ -73,7 +73,7 @@
 
 		<!-- Test server versions. -->
 		<test.wildfly.version>16.0.0.Final</test.wildfly.version>
-		<test.tomee.version>8.0.0-M2</test.tomee.version>
+		<test.tomee.version>8.0.1</test.tomee.version>
 		<test.payara.version>5.191</test.payara.version>
 	</properties>
 

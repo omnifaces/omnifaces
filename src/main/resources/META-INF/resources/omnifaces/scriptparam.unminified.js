@@ -44,11 +44,13 @@ OmniFaces.ScriptParam = (function(Util, window, document) {
 			return;
 		}
 		
+		var params = {};
+
 		for (var clientId in scripts) {
-			scripts[clientId] = JSON.stringify(clone(scripts[clientId]));
+			params[clientId] = JSON.stringify(clone(scripts[clientId]));
 		}
 
-		var params = { execute: scriptParamId, params: scripts };
+		params["execute"] = scriptParamId;
 		params[OmniFaces.EVENT] = "setScriptParamValues";
 		jsf.ajax.request(form, null, params);
 	}
