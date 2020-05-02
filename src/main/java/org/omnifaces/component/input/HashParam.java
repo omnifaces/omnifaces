@@ -23,6 +23,7 @@ import static org.omnifaces.util.Ajax.isExecuted;
 import static org.omnifaces.util.Ajax.oncomplete;
 import static org.omnifaces.util.Ajax.update;
 import static org.omnifaces.util.Beans.fireEvent;
+import static org.omnifaces.util.Components.addFormIfNecessary;
 import static org.omnifaces.util.Components.addScript;
 import static org.omnifaces.util.Components.addScriptResource;
 import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
@@ -172,6 +173,8 @@ public class HashParam extends UIViewParameter {
 		FacesContext context = getFacesContext();
 
 		if (!isHashParamRequest(context)) {
+			addFormIfNecessary(); // Required by jsf.ajax.request.
+
 			// @ResourceDependency bugs in Mojarra with NPE on createMetadataView because UIViewRoot is null (this component is part of f:metadata), so we have to add them this way.
 			addScriptResource(JSF_SCRIPT_LIBRARY_NAME, JSF_SCRIPT_RESOURCE_NAME); // Required for jsf.ajax.request.
 			addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME); // Specifically hashparam.js.

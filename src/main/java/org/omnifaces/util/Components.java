@@ -58,6 +58,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -83,6 +84,7 @@ import javax.faces.component.behavior.AjaxBehavior;
 import javax.faces.component.behavior.BehaviorBase;
 import javax.faces.component.behavior.ClientBehavior;
 import javax.faces.component.behavior.ClientBehaviorHolder;
+import javax.faces.component.html.HtmlBody;
 import javax.faces.component.visit.VisitCallback;
 import javax.faces.component.visit.VisitContext;
 import javax.faces.component.visit.VisitHint;
@@ -101,6 +103,8 @@ import javax.faces.view.facelets.FaceletContext;
 
 import org.omnifaces.component.ParamHolder;
 import org.omnifaces.component.SimpleParam;
+import org.omnifaces.component.input.Form;
+import org.omnifaces.config.OmniFaces;
 import org.omnifaces.el.ScopedRunner;
 
 /**
@@ -1258,6 +1262,43 @@ public final class Components {
 	 */
 	public static void resetInputs(UIComponent component) {
 		forEachComponent().fromRoot(component).ofTypes(UIInput.class).invoke(UIInput::resetValue);
+	}
+
+	/**
+	 * Add an {@link UIForm} to the current view if absent.
+	 * This might be needed for scripts which rely on JSF view state identifier and/or on functioning of jsf.ajax.request().
+	 * @since 3.6
+	 */
+	public static void addFormIfNecessary() {
+		FacesContext context = FacesContext.getCurrentInstance();
+
+		if (isAjaxRequestWithPartialRendering(context)) {
+			return; // It's impossible to have this condition without an UIForm in first place.
+		}
+
+		UIViewRoot viewRoot = context.getViewRoot();
+
+		if (viewRoot == null || viewRoot.getChildCount() == 0) {
+			return; // Empty view. Nothing to do against. The client should probably find a better moment to invoke this.
+		}
+
+		VisitCallback visitCallback = (visitContext, target) -> (target instanceof UIForm) ? VisitResult.COMPLETE : VisitResult.ACCEPT;
+		boolean formFound = viewRoot.visitTree(createVisitContext(context, null, EnumSet.of(VisitHint.SKIP_ITERATION)), visitCallback);
+
+		if (formFound) {
+			return; // UIForm present. No need to add a new one.
+		}
+
+		Optional<UIComponent> body = viewRoot.getChildren().stream().filter(HtmlBody.class::isInstance).findFirst();
+
+		if (!body.isPresent()) {
+			return; // No <h:body> present. Not possible to add a new UIForm then.
+		}
+
+		Form form = new Form();
+		form.setId(OmniFaces.OMNIFACES_DYNAMIC_FORM_ID);
+		form.getAttributes().put("style", "display:none"); // Just to be on the safe side. There might be CSS which puts visible style such as margin/padding/border on any <form> for some reason.
+		body.get().getChildren().add(form);
 	}
 
 	// Expressions ----------------------------------------------------------------------------------------------------

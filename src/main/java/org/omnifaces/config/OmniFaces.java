@@ -39,6 +39,9 @@ public final class OmniFaces {
 	/** Returns the "omnifaces.event" request parameter name. */
 	public static final String OMNIFACES_EVENT_PARAM_NAME = "omnifaces.event";
 
+	/** Returns the "omnifaces_form" ID of dynamic form. */
+	public static final String OMNIFACES_DYNAMIC_FORM_ID = "omnifaces_form";
+
 	// Constants ------------------------------------------------------------------------------------------------------
 
 	private static final String VERSION = coalesce(OmniFaces.class.getPackage().getImplementationVersion(), "DEV-SNAPSHOT");
