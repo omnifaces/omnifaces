@@ -43,7 +43,6 @@ import static org.omnifaces.util.FacesLocal.getViewParameterMap;
 import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
 import static org.omnifaces.util.FacesLocal.normalizeViewId;
 import static org.omnifaces.util.Renderers.RENDERER_TYPE_JS;
-import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isOneInstanceOf;
 
@@ -794,41 +793,17 @@ public final class Components {
 	 * @since 3.6
 	 */
 	public static void addScriptResource(String libraryName, String resourceName) {
-		addScriptResource(libraryName, resourceName, null);
-	}
-
-	/**
-	 * Add given JavaScript resource to the current view. This will first check if the resource isn't already rendered
-	 * as per {@link ResourceHandler#isResourceRendered(FacesContext, String, String)}. If not, then continue as below:
-	 * <ul>
-	 * <li>When the current request is a {@link Faces#isAjaxRequestWithPartialRendering()}, then it will delegate to
-	 * {@link Ajax#load(String, String)}.</li>
-	 * <li>Else when the <code>&lt;h:head&gt;</code> has not yet been rendered, then add given JavaScript resource to
-	 * head.</li>
-	 * <li>Else add given JavaScript resource to end of the <code>&lt;h:body&gt;</code>, whereby the given optional
-	 * fallback body resource name is preferred.</li>
-	 * </ul>
-	 * @param libraryName Library name of the JavaScript resource.
-	 * @param resourceName Resource name of the JavaScript resource.
-	 * @param fallbackBodyResourceName Optionally, the fallback body resource name of the JavaScript resource. This will
-	 * be used when the script cannot be added to the head, because it has already been rendered. It will then be added
-	 * to the body instead. As this is less efficient, you have the opportunity to specify the resource name of a more
-	 * optimized script for that.
-	 * @since 3.6
-	 */
-	public static void addScriptResource(String libraryName, String resourceName, String fallbackBodyResourceName) {
 		FacesContext context = FacesContext.getCurrentInstance();
-		boolean ajaxRequestWithPartialRendering = isAjaxRequestWithPartialRendering(context);
 
 		if (!context.getApplication().getResourceHandler().isResourceRendered(context, resourceName, libraryName)) {
-			if (ajaxRequestWithPartialRendering) {
-				load(libraryName, coalesce(fallbackBodyResourceName, resourceName));
+			if (isAjaxRequestWithPartialRendering(context)) {
+				load(libraryName, resourceName);
 			}
 			else if (context.getCurrentPhaseId() != RENDER_RESPONSE || TRUE.equals(context.getAttributes().get(IS_BUILDING_INITIAL_STATE))) {
 				addScriptResourceToHead(libraryName, resourceName);
 			}
 			else {
-				addScriptResourceToBody(libraryName, coalesce(fallbackBodyResourceName, resourceName));
+				addScriptResourceToBody(libraryName, resourceName);
 			}
 		}
 	}

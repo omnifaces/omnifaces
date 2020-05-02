@@ -36,9 +36,6 @@ public final class OmniFaces {
 	/** Returns the "omnifaces.js" main script name. */
 	public static final String OMNIFACES_SCRIPT_NAME = "omnifaces.js";
 
-	/** Returns the "unload.js" unload script name. */
-	public static final String OMNIFACES_UNLOAD_SCRIPT_NAME = "unload.js";
-
 	/** Returns the "omnifaces.event" request parameter name. */
 	public static final String OMNIFACES_EVENT_PARAM_NAME = "omnifaces.event";
 

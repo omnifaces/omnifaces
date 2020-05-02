@@ -17,7 +17,6 @@ import static java.util.logging.Level.FINEST;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
-import static org.omnifaces.config.OmniFaces.OMNIFACES_UNLOAD_SCRIPT_NAME;
 import static org.omnifaces.util.BeansLocal.getInstance;
 import static org.omnifaces.util.Components.addScript;
 import static org.omnifaces.util.Components.addScriptResource;
@@ -210,7 +209,7 @@ public class ViewScopeManager {
 	 * Register unload script.
 	 */
 	private static void registerUnloadScript(UUID beanStorageId) {
-		addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME, OMNIFACES_UNLOAD_SCRIPT_NAME);
+		addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME);
 		addScript(format(SCRIPT_INIT, beanStorageId));
 	}
 
