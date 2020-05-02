@@ -2424,7 +2424,90 @@ public class ValidateValuesBean implements MultiFieldValidator {
 	<tag>
 		<description>
 				<![CDATA[
-					TBD
+<p>
+The <code>&lt;o:scriptParam&gt;</code> is a component that extends the standard <code>&lt;f:viewParam&gt;</code>
+with support for setting results of client-side evaluated JavaScript code in bean.
+
+<h3>Usage</h3>
+<p>
+It's similar to the <code>&lt;f:viewParam&gt;</code>.
+<pre>
+&lt;f:metadata&gt;
+    &lt;o:scriptParam script="new Date().getTimezoneOffset()" value="#{bean.clientTimeZoneOffset}" /&gt;
+    &lt;o:scriptParam script="window.screen.width" value="#{bean.clientScreenWidth}" /&gt;
+    &lt;o:scriptParam script="someFunctionName()" value="#{bean.resultOfSomeFunctionName}" /&gt;
+&lt;/f:metadata&gt;
+</pre>
+<p>
+You can use the <code>render</code> attribute to declare which components should be updated when a script parameter
+has been set.
+<pre>
+&lt;f:metadata&gt;
+    &lt;o:scriptParam script="foo()" value="#{bean.resultOfFoo}" render="fooResult" /&gt;
+&lt;/f:metadata&gt;
+...
+&lt;h:body&gt;
+    ...
+    &lt;h:panelGroup id="fooResult"&gt;
+        &lt;ui:fragment rendered="#{not empty bean.resultOfFoo}"&gt;
+            The result of foo() script is: #{bean.resultOfFoo}
+        &lt;/ui:fragment&gt;
+    &lt;/h:panelGroup&gt;
+    ...
+&lt;/h:body&gt;
+</pre>
+<p>
+Note that as it extends from the standard <code>&lt;f:viewParam&gt;</code>, its built-in conversion and validation
+functionality is also supported on this component. So, the following is also possible:
+<pre>
+&lt;f:metadata&gt;
+    &lt;o:scriptParam script="window.navigator" value="#{bean.clientNavigator}" /&gt;
+&lt;/f:metadata&gt;
+</pre>
+With a <code>clientNavigator</code> being an instance of <code>javax.json.JsonObject</code>:
+<pre>
+private JsonObject clientNavigator;
+</pre>
+And this converter:
+<pre>
+package com.example;
+
+import java.io.StringReader;
+import javax.faces.component.UIComponent;
+import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
+import javax.faces.convert.ConverterException;
+import javax.faces.convert.FacesConverter;
+import javax.json.Json;
+import javax.json.JsonObject;
+
+&#64;FacesConverter(forClass = JsonObject.class)
+public class JsobObjectConverter implements Converter&lt;JsonObject&gt; {
+
+    &#64;Override
+    public String getAsString(FacesContext context, UIComponent component, JsonObject modelValue) {
+        if (modelValue == null) {
+            return "";
+        }
+
+        return modelValue.toString();
+    }
+
+    &#64;Override
+    public JsonObject getAsObject(FacesContext context, UIComponent component, String submittedValue) {
+        if (submittedValue == null || submittedValue.isEmpty()) {
+            return null;
+        }
+
+        try {
+            return Json.createReader(new StringReader(submittedValue)).readObject();
+        }
+        catch (Exception e) {
+            throw new ConverterException("Not a valid JSON object", e);
+        }
+    }
+}
+</pre>
 				]]>
 		</description>
 		<tag-name>scriptParam</tag-name>
@@ -2580,7 +2663,6 @@ https://example.com/page.xhtml#foo=baz&bar=kaz
 This specific part of the URL (also called hash fragment identifier) is by default not sent to the server. This
 component will on page load send it anyway and on every ajax request update the hash query string in client side
 when the model value has changed in server side.
- *
 <h3>Usage</h3>
 <p>
 It's very similar to the <code>&lt;o:viewParam&gt;</code>.

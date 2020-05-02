@@ -30,7 +30,7 @@
 	<h:head />
 
 	<h:body>
-    	<h:outputText id="pageLoadTimestamp" value="#{now.time}" />
+		<h:outputText id="pageLoadTimestamp" value="#{now.time}" />
 		<h:panelGroup id="scriptLoadTimestamp"><h:outputText value="#{now.time}" rendered="#{not empty scriptParamITBean.clientTimeZoneOffset}" /></h:panelGroup>
 		
 		<h:outputText id="clientTimeZoneOffset" value="#{scriptParamITBean.clientTimeZoneOffset}" />
