@@ -12,11 +12,9 @@
  */
 package org.omnifaces.component.input;
 
-import static java.lang.Boolean.TRUE;
 import static java.lang.String.format;
 import static javax.faces.application.ResourceHandler.JSF_SCRIPT_LIBRARY_NAME;
 import static javax.faces.application.ResourceHandler.JSF_SCRIPT_RESOURCE_NAME;
-import static javax.faces.application.StateManager.IS_BUILDING_INITIAL_STATE;
 import static javax.faces.event.PhaseId.RENDER_RESPONSE;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
@@ -24,8 +22,8 @@ import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.util.Ajax.oncomplete;
 import static org.omnifaces.util.Ajax.update;
 import static org.omnifaces.util.Beans.fireEvent;
-import static org.omnifaces.util.Components.addScriptResourceToHead;
-import static org.omnifaces.util.Components.addScriptToBody;
+import static org.omnifaces.util.Components.addScript;
+import static org.omnifaces.util.Components.addScriptResource;
 import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
 import static org.omnifaces.util.Faces.getHashQueryString;
 import static org.omnifaces.util.Faces.getRequestMap;
@@ -80,7 +78,7 @@ import org.omnifaces.util.State;
  * <p>
  * This only requires that the JSF page has at least one {@link UIForm} component, such as <code>&lt;h:form&gt;</code>
  * or <code>&lt;o:form&gt;</code>, otherwise the <code>&lt;o:hashParam&gt;</code> won't be able to fire the ajax
- * request which sets the with hash query parameter values in bean. In such case an error will be printed to JS console
+ * request which sets the hash query parameter values in bean. In such case an error will be printed to JS console
  * when the project stage is <code>Development</code>.
  * <p>
  * You can use the <code>render</code> attribute to declare which components should be updated when a hash parameter
@@ -131,7 +129,7 @@ import org.omnifaces.util.State;
  * </pre>
  * <p>
  * This is useful in case you want to preload the model for whatever is rendered by
- * <code>&lt;o:hashParam rendered&gt;</code>.
+ * <code>&lt;o:hashParam render&gt;</code>.
  *
  * @author Bauke Scholtz
  * @since 3.2
@@ -172,23 +170,21 @@ public class HashParam extends UIViewParameter {
 	}
 
 	private void registerScriptsIfNecessary() {
-		if (TRUE.equals(getFacesContext().getAttributes().get(IS_BUILDING_INITIAL_STATE))) {
-			// @ResourceDependency bugs in Mojarra with NPE on createMetadataView because UIViewRoot is null (this component is part of f:metadata).
-			addScriptResourceToHead(JSF_SCRIPT_LIBRARY_NAME, JSF_SCRIPT_RESOURCE_NAME); // Required for jsf.ajax.request.
-			addScriptResourceToHead(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME); // Specifically hashparam.js.
-		}
+		if (!isHashParamRequest(getFacesContext())) {
+			// @ResourceDependency bugs in Mojarra with NPE on createMetadataView because UIViewRoot is null (this component is part of f:metadata), so we have to add them this way.
+			addScriptResource(JSF_SCRIPT_LIBRARY_NAME, JSF_SCRIPT_RESOURCE_NAME); // Required for jsf.ajax.request.
+			addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME); // Specifically hashparam.js.
 
-		if (!isPostback()) {
-			if (getRequestMap().put(getClass().getName(), Boolean.TRUE) == null) {
-				addScriptToBody(format(SCRIPT_INIT, getClientId())); // Just init only once for first encountered HashParam.
+			if (!isPostback()) {
+				if (getRequestMap().put(getClass().getName(), Boolean.TRUE) == null) { // Just init only once for first encountered HashParam.
+					addScript(format(SCRIPT_INIT, getClientId()));
+				}
 			}
-		}
-		else {
-			if (isAjaxRequestWithPartialRendering() && !isHashParamRequest(getFacesContext())) {
-				oncomplete(format(SCRIPT_UPDATE, getName(), getRenderedValue(getFacesContext()))); // Update hash string based on JSF model if necessary.
+			else {
+				if (isAjaxRequestWithPartialRendering() && !isHashParamRequest(getFacesContext())) {
+					oncomplete(format(SCRIPT_UPDATE, getName(), getRenderedValue(getFacesContext()))); // Update hash string based on JSF model if necessary.
+				}
 			}
-
-			setValid(true); // Don't leave HashParam in an invalid state for next postback as it would block processing of regular forms.
 		}
 	}
 
@@ -224,6 +220,9 @@ public class HashParam extends UIViewParameter {
 
 		if (isValid()) {
 			super.updateModel(context);
+		}
+		else {
+			setValid(true); // Don't leave HashParam in an invalid state for next postback as it would block processing of regular forms.
 		}
 
 		String render = getRender();
