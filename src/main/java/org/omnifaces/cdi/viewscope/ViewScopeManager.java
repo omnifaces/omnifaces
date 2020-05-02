@@ -151,7 +151,7 @@ public class ViewScopeManager {
 			}
 		}
 		else if (isAjaxRequestWithPartialRendering(context)) {
-			context.getApplication().getResourceHandler().markResourceRendered(context, OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME); // Otherwise MyFaces will load a new one during createViewScope() when still in same document (e.g. navigation).
+			context.getApplication().getResourceHandler().markResourceRendered(context, OMNIFACES_SCRIPT_NAME, OMNIFACES_LIBRARY_NAME); // Otherwise MyFaces will load a new one during createViewScope() when still in same document (e.g. navigation).
 		}
 
 		if (getInstance(manager, ViewScopeStorageInSession.class, false) != null) { // Avoid unnecessary session creation when accessing storageInSession for nothing.
@@ -219,7 +219,7 @@ public class ViewScopeManager {
 		FacesContext context = FacesContext.getCurrentInstance();
 		boolean ajaxRequestWithPartialRendering = isAjaxRequestWithPartialRendering(context);
 
-		if (!context.getApplication().getResourceHandler().isResourceRendered(context, OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME)) {
+		if (!context.getApplication().getResourceHandler().isResourceRendered(context, OMNIFACES_SCRIPT_NAME, OMNIFACES_LIBRARY_NAME)) {
 			if (ajaxRequestWithPartialRendering) {
 				load(OMNIFACES_LIBRARY_NAME, OMNIFACES_UNLOAD_SCRIPT_NAME);
 			}
