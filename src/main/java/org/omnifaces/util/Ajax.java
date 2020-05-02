@@ -282,8 +282,7 @@ public final class Ajax {
 	 * @param resourceName Resource name of the JavaScript resource.
 	 * @throws IllegalArgumentException When given script resource cannot be found.
 	 * @throws IllegalStateException When current request is not an ajax request with partial rendering. You should use
-	 * either {@link Components#addScriptResourceToBody(String, String)}
-	 * or {@link Components#addScriptResourceToHead(String, String)} instead.
+	 * {@link Components#addScriptResource(String, String)} instead.
 	 * @since 2.3
 	 */
 	public static void load(String libraryName, String resourceName) {
@@ -305,7 +304,7 @@ public final class Ajax {
 	 * Execute the given scripts on complete of the current ajax response.
 	 * @param scripts The scripts to be executed.
 	 * @throws IllegalStateException When current request is not an ajax request with partial rendering. You should use
-	 * {@link Components#addScriptToBody(String)} instead.
+	 * {@link Components#addScript(String)} instead.
 	 * @see OmniPartialViewContext#addCallbackScript(String)
 	 */
 	public static void oncomplete(String... scripts) {
