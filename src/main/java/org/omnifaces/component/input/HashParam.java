@@ -13,26 +13,10 @@
 package org.omnifaces.component.input;
 
 import static java.lang.String.format;
-import static javax.faces.application.ResourceHandler.JSF_SCRIPT_LIBRARY_NAME;
-import static javax.faces.application.ResourceHandler.JSF_SCRIPT_RESOURCE_NAME;
-import static javax.faces.event.PhaseId.RENDER_RESPONSE;
-import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;
-import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
-import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
-import static org.omnifaces.util.Ajax.isExecuted;
-import static org.omnifaces.util.Ajax.oncomplete;
-import static org.omnifaces.util.Ajax.update;
 import static org.omnifaces.util.Beans.fireEvent;
-import static org.omnifaces.util.Components.addFormIfNecessary;
-import static org.omnifaces.util.Components.addScript;
-import static org.omnifaces.util.Components.addScriptResource;
-import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
 import static org.omnifaces.util.FacesLocal.getHashParameters;
 import static org.omnifaces.util.FacesLocal.getHashQueryString;
-import static org.omnifaces.util.FacesLocal.getRequestMap;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
-import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
-import static org.omnifaces.util.FacesLocal.isPostback;
 import static org.omnifaces.util.Servlets.toParameterMap;
 
 import java.util.List;
@@ -40,13 +24,11 @@ import java.util.Map;
 import java.util.Objects;
 
 import javax.faces.component.FacesComponent;
-import javax.faces.component.UIViewParameter;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
 
 import org.omnifaces.event.HashChangeEvent;
 import org.omnifaces.util.Faces;
-import org.omnifaces.util.State;
 
 /**
  * <p>
@@ -108,6 +90,9 @@ import org.omnifaces.util.State;
  * When <code>#{bean.foo}</code> is <code>"baz"</code> and <code>#{bean.bar}</code> is <code>"kaz"</code> or empty,
  * then the reflected hash query string will become <code>https://example.com/page.xhtml#foo=baz</code>.
  * If <code>#{bean.bar}</code> is any other value, then it will appear in the hash query string.
+ * <p>
+ * Note that as it extends from the standard <code>&lt;f:viewParam&gt;</code>, its built-in conversion and validation
+ * functionality is also supported on this component.
  *
  * <h3>Events</h3>
  * <p>
@@ -133,12 +118,15 @@ import org.omnifaces.util.State;
  * @see HashChangeEvent
  */
 @FacesComponent(HashParam.COMPONENT_TYPE)
-public class HashParam extends UIViewParameter {
+public class HashParam extends OnloadParam {
 
 	// Public constants -----------------------------------------------------------------------------------------------
 
 	/** The component type, which is {@value org.omnifaces.component.input.HashParam#COMPONENT_TYPE}. */
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.input.HashParam";
+
+	/** The omnifaces event value, which is {@value org.omnifaces.component.input.HashParam#EVENT_VALUE}. */
+	public static final String EVENT_VALUE = "setHashParamValues";
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
@@ -146,104 +134,45 @@ public class HashParam extends UIViewParameter {
 	private static final String SCRIPT_UPDATE = "OmniFaces.HashParam.update('%s', '%s')";
 
 	private enum PropertyKeys {
-		DEFAULT, RENDER;
+		DEFAULT;
 		@Override public String toString() { return name().toLowerCase(); }
 	}
 
-	// Variables ------------------------------------------------------------------------------------------------------
-
-	private final State state = new State(getStateHelper());
-
 	// Init -----------------------------------------------------------------------------------------------------------
 
-	/**
-	 * The constructor instructs JSF to register all scripts during the render response phase if necessary.
-	 */
-	public HashParam() {
-		subscribeToRequestBeforePhase(RENDER_RESPONSE, this::registerScriptsIfNecessary);
+	@Override
+	protected String getInitScript(FacesContext context) {
+		return format(SCRIPT_INIT, getClientId(context));
 	}
 
-	private void registerScriptsIfNecessary() {
-		FacesContext context = getFacesContext();
 
-		if (!isHashParamRequest(context)) {
-			addFormIfNecessary(); // Required by jsf.ajax.request.
-
-			// @ResourceDependency bugs in Mojarra with NPE on createMetadataView because UIViewRoot is null (this component is part of f:metadata), so we have to add them this way.
-			addScriptResource(JSF_SCRIPT_LIBRARY_NAME, JSF_SCRIPT_RESOURCE_NAME); // Required for jsf.ajax.request.
-			addScriptResource(OMNIFACES_LIBRARY_NAME, OMNIFACES_SCRIPT_NAME); // Specifically hashparam.js.
-
-			if (!isPostback(context)) {
-				if (getRequestMap(context).put(getClass().getName(), Boolean.TRUE) == null) { // Just init only once for first encountered HashParam.
-					addScript(format(SCRIPT_INIT, getClientId()));
-				}
-			}
-			else {
-				if (isAjaxRequestWithPartialRendering(context) && !isHashParamRequest(context)) {
-					oncomplete(format(SCRIPT_UPDATE, getName(), getRenderedValue(context))); // Update hash string based on JSF model if necessary.
-				}
-			}
-		}
+	@Override
+	protected String getUpdateScript(FacesContext context) {
+		return format(SCRIPT_UPDATE, getName(), getRenderedValue(context));
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
-	/**
-	 * If this is invoked during a hashparam postback, then decode as if immediate=true to save lifecycle overhead.
-	 */
 	@Override
-	public void processDecodes(FacesContext context) {
-		if (isHashParamRequest(context) && isExecuted(getClientId(context))) {
-			String oldHashQueryString = getHashQueryString(context);
-			Map<String, List<String>> hashParams = toParameterMap(getRequestParameter(context, "hash"));
-
-			for (HashParam hashParam : getHashParameters(context)) {
-				List<String> values = hashParams.get(hashParam.getName());
-				hashParam.decodeImmediately(context, values != null ? values.get(0) : "");
-			}
-
-			String newHashQueryString = getHashQueryString(context);
-
-			if (!Objects.equals(oldHashQueryString, newHashQueryString)) {
-				fireEvent(new HashChangeEvent(context, oldHashQueryString, newHashQueryString));
-			}
-
-			context.renderResponse();
-		}
+	protected String getEventValue(FacesContext context) {
+		return EVENT_VALUE;
 	}
 
-	private void decodeImmediately(FacesContext context, String submittedValue) {
-		setSubmittedValue(submittedValue);
-		validate(context);
-
-		if (isValid()) {
-			super.updateModel(context);
-		}
-		else {
-			setValid(true); // Don't leave HashParam in an invalid state for next postback as it would block processing of regular forms.
-		}
-
-		String render = getRender();
-
-		if (render != null) {
-			update(render.split("\\s+"));
-		}
-	}
-
-	/**
-	 * This override which does effectively nothing prevents JSF from performing validation during non-hashparam postbacks.
-	 */
 	@Override
-	public void processValidators(FacesContext context) {
-		// NOOP.
-	}
+	protected void decodeAll(FacesContext context) {
+		String oldHashQueryString = getHashQueryString(context);
+		Map<String, List<String>> hashParams = toParameterMap(getRequestParameter(context, "hash"));
 
-	/**
-	 * This override which does effectively nothing prevents JSF from performing update during non-hashparam postbacks.
-	 */
-	@Override
-	public void updateModel(FacesContext context) {
-		// NOOP.
+		for (HashParam hashParam : getHashParameters(context)) {
+			List<String> values = hashParams.get(hashParam.getName());
+			hashParam.decodeImmediately(context, values != null ? values.get(0) : "");
+		}
+
+		String newHashQueryString = getHashQueryString(context);
+
+		if (!Objects.equals(oldHashQueryString, newHashQueryString)) {
+			fireEvent(new HashChangeEvent(context, oldHashQueryString, newHashQueryString));
+		}
 	}
 
 	/**
@@ -288,22 +217,6 @@ public class HashParam extends UIViewParameter {
 		state.put(PropertyKeys.DEFAULT, defaultValue);
 	}
 
-	/**
-	 * Returns a space separated string of client IDs to update on ajax response.
-	 * @return A space separated string of client IDs to update on ajax response.
-	 */
-	public String getRender() {
-		return state.get(PropertyKeys.RENDER, "@none");
-	}
-
-	/**
-	 * Sets a space separated string of client IDs to update on ajax response.
-	 * @param render A space separated string of client IDs to update on ajax response.
-	 */
-	public void setRender(String render) {
-		state.put(PropertyKeys.RENDER, render);
-	}
-
 	// Helpers --------------------------------------------------------------------------------------------------------
 
 	/**
@@ -314,7 +227,7 @@ public class HashParam extends UIViewParameter {
 	 * @return <code>true</code> if the current request is triggered by a hash param request.
 	 */
 	public static boolean isHashParamRequest(FacesContext context) {
-		return context.isPostback() && "setHashParamValues".equals(getRequestParameter(context, OMNIFACES_EVENT_PARAM_NAME));
+		return isOnloadParamRequest(context, EVENT_VALUE);
 	}
 
 }

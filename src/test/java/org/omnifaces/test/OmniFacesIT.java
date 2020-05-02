@@ -95,8 +95,9 @@ public abstract class OmniFacesIT {
 		waitGui(browser).withTimeout(3, SECONDS).until().element(element).text().not().equalTo("");
 	}
 
-	protected void executeScript(String script) {
-		((JavascriptExecutor) browser).executeScript(script);
+	@SuppressWarnings("unchecked")
+	protected <T> T executeScript(String script) {
+		return (T) ((JavascriptExecutor) browser).executeScript(script);
 	}
 
 	private void clearMessages(WebElement messages) {

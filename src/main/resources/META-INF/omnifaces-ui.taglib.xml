@@ -2424,6 +2424,148 @@ public class ValidateValuesBean implements MultiFieldValidator {
 	<tag>
 		<description>
 				<![CDATA[
+					TBD
+				]]>
+		</description>
+		<tag-name>scriptParam</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.input.ScriptParam</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The script to be evaluated.
+				]]>
+			</description>
+			<name>script</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Converter instance registered with this component.
+				]]></description>
+			<name>converter</name>
+			<required>false</required>
+			<type>javax.faces.convert.Converter</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					A ValueExpression enabled attribute that, if present, will be
+					used as the text of the converter message, replacing any message
+					that comes from the converter.
+				]]>
+			</description>
+			<name>converterMessage</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be
+					unique within the closest parent component that is a naming
+					container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating that the user is required to provide a submitted
+					value for this input component. This component extends the behavior of
+					this by only making this required for a non-faces request.
+				]]>
+			</description>
+			<name>required</name>
+			<required>false</required>
+			<type>boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					A ValueExpression enabled attribute that, if present, will be
+					used as the text of the validation message for the "required"
+					facility, if the "required" facility is used.
+				]]>
+			</description>
+			<name>requiredMessage</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					MethodExpression representing a validator method that will be
+					called
+					during Process Validations to perform correctness checks on the
+					value of this component. The expression must evaluate to a
+					public
+					method that takes FacesContext, UIComponent, and Object
+					parameters,
+					with a return type of void.
+				]]>
+			</description>
+			<name>validator</name>
+			<required>false</required>
+			<method-signature>void validate(javax.faces.context.FacesContext,
+				javax.faces.component.UIComponent, java.lang.Object)
+			</method-signature>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					A ValueExpression enabled attribute that, if present, will be
+					used as the text of the validator message, replacing any
+					message that comes from the validator.
+				]]>
+			</description>
+			<name>validatorMessage</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					A ValueExpression to which the value representing the evaluated result of the script, as
+					determined by the script attribute, is bound.
+				]]>
+			</description>
+			<name>value</name>
+			<required>false</required>
+			<type>java.lang.Object</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					A space separated string of client IDs to update after the script param has been set in bean on page load.
+				]]>
+			</description>
+			<name>render</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The ValueExpression linking this component to a property in a
+					backing bean
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+	</tag>
+	
+	<tag>
+		<description>
+				<![CDATA[
 <p>
 The <code>&lt;o:hashParam&gt;</code> is a component that extends the standard <code>&lt;f:viewParam&gt;</code>
 with support for setting hash query parameter values in bean and automatically reflecting updated model values in

@@ -71,6 +71,7 @@ import javax.servlet.http.Part;
 
 import org.omnifaces.component.ParamHolder;
 import org.omnifaces.component.input.HashParam;
+import org.omnifaces.component.input.ScriptParam;
 import org.omnifaces.config.FacesConfigXml;
 import org.omnifaces.el.FacesELResolver;
 import org.omnifaces.facesviews.FacesViews;
@@ -818,6 +819,16 @@ public final class Faces {
 	 */
 	public static String getHashQueryString() {
 		return FacesLocal.getHashQueryString(getContext());
+	}
+
+	/**
+	 * Returns the script parameters of the current view, or an empty collection if there is no view.
+	 * @return The script parameters of the current view, or an empty collection if there is no view.
+	 * @see ScriptParam
+	 * @since 3.6
+	 */
+	public static Collection<ScriptParam> getScriptParameters() {
+		return FacesLocal.getScriptParameters(getContext());
 	}
 
 	/**

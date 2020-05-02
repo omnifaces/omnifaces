@@ -93,6 +93,7 @@ import javax.servlet.http.Part;
 
 import org.omnifaces.component.ParamHolder;
 import org.omnifaces.component.input.HashParam;
+import org.omnifaces.component.input.ScriptParam;
 import org.omnifaces.config.FacesConfigXml;
 import org.omnifaces.resourcehandler.ResourceIdentifier;
 
@@ -569,6 +570,14 @@ public final class FacesLocal {
 	 */
 	public static String getHashQueryString(FacesContext context) {
 		return toQueryString(getHashParameterMap(context));
+	}
+
+	/**
+	 * @see Faces#getScriptParameters()
+	 */
+	public static Collection<ScriptParam> getScriptParameters(FacesContext context) {
+		UIViewRoot viewRoot = context.getViewRoot();
+		return (viewRoot != null) ? findComponentsInChildren(getViewRoot().getFacet(METADATA_FACET_NAME), ScriptParam.class) : Collections.<ScriptParam>emptyList();
 	}
 
 	/**
