@@ -11,18 +11,13 @@
  * specific language governing permissions and limitations under the License.
  */
 /**
- * Hash param handling.
+ * Script param handling.
  * 
  * @author Bauke Scholtz
  * @see org.omnifaces.component.input.ScriptParam
- * @since 3.
+ * @since 3.6
  */
 OmniFaces.ScriptParam = (function(Util, window, document) {
-
-	// "Constant" fields ----------------------------------------------------------------------------------------------
-
-	var ERROR_MISSING_FORM = "OmniFaces ScriptParam: cannot find a JSF form in the document."
-		+ " Setting script parameters in bean will not work.";
 
 	// Private static fields ------------------------------------------------------------------------------------------
 
@@ -37,10 +32,6 @@ OmniFaces.ScriptParam = (function(Util, window, document) {
 		var form = Util.getFacesForm();
 
 		if (!form) {
-			if ((!window.jsf || jsf.getProjectStage() == "Development") && window.console && console.error) {
-				console.error(ERROR_MISSING_FORM);
-			}
-			
 			return;
 		}
 		

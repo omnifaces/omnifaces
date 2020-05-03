@@ -18,6 +18,10 @@
  */
 OmniFaces.Util = (function(window, document) {
 
+	// "Constant" fields ----------------------------------------------------------------------------------------------
+
+	var ERROR_MISSING_FORM = "OmniFaces: Cannot find a JSF form in the document. Please add one.";
+
 	// Private static fields ------------------------------------------------------------------------------------------
 
 	var self = {};
@@ -99,9 +103,13 @@ OmniFaces.Util = (function(window, document) {
 	 */
 	self.getFacesForm = function() {
 		for (var i = 0; i < document.forms.length; i++) {
-			if (document.forms[i]["javax.faces.ViewState"]) {
+			if (document.forms[i][OmniFaces.VIEW_STATE_PARAM]) {
 				return document.forms[i];
 			}
+		}
+
+		if ((!window.jsf || jsf.getProjectStage() == "Development") && window.console && console.error) {
+			console.error(ERROR_MISSING_FORM);
 		}
 
 		return null;

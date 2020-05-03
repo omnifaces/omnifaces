@@ -32,7 +32,8 @@ OmniFaces.Form = (function(Util, window) {
 					return originalViewState;
 				}
 
-				var execute = jsf.ajax.request.arguments ? jsf.ajax.request.arguments[2].execute : null;
+				var params = jsf.ajax.request.arguments;
+				var execute = params ? params[2].execute : null;
 
 				if (!execute || execute.indexOf("@form") != -1 || execute.indexOf("@all") != -1) {
 					return originalViewState;
@@ -41,7 +42,7 @@ OmniFaces.Form = (function(Util, window) {
 				var executeIds = [];
 
 				if (execute.indexOf("@none") == -1) {
-					executeIds = execute.replace("@this", jsf.ajax.request.arguments[0].id).split(" ").map(encodeURIComponent);
+					executeIds = execute.replace("@this", params[0].id).split(" ").map(encodeURIComponent);
 					executeIds.push(encodeURIComponent(form.id));
 				}
 
