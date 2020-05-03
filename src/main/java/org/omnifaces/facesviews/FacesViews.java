@@ -739,7 +739,7 @@ public final class FacesViews {
 	 */
 	public static boolean isMultiViewsEnabled(ServletContext servletContext) {
 		if (multiViewsEnabled == null) {
-			multiViewsEnabled = !getMultiViewsPaths(servletContext).isEmpty();
+			multiViewsEnabled = !isEmpty(getMultiViewsPaths(servletContext));
 		}
 
 		return multiViewsEnabled;
