@@ -21,7 +21,7 @@
 >
 	<context-param>
 		<param-name>org.omnifaces.FACES_VIEWS_SCAN_PATHS</param-name>
-		<param-value>/*.xhtml</param-value>
+		<param-value>/*.xhtml,!/excludedfolder</param-value>
 	</context-param>
 
 	<servlet>

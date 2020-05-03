@@ -68,7 +68,10 @@ public class MultiViewsIT extends OmniFacesIT {
 
 		guardHttp(link).click();
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
+	}
 
+	@Test
+	public void testOtherPage() {
 		open("MultiViewsITOtherPage");
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage", "", "");
 
@@ -95,7 +98,10 @@ public class MultiViewsIT extends OmniFacesIT {
 
 		guardHttp(link).click();
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
+	}
 
+	@Test
+	public void testNonExistingPage() {
 		open("MultiViewsITNonExistingPage");
 		verify200("MultiViewsIT", "MultiViewsITNonExistingPage", "MultiViewsITNonExistingPage", "");
 
@@ -106,6 +112,30 @@ public class MultiViewsIT extends OmniFacesIT {
 			open("MultiViewsITNonExistingPage.xhtml");
 			verify404("MultiViewsITNonExistingPage.xhtml");
 		}
+	}
+
+	@Test
+	public void testExcludedFolder() {
+		open("excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml");
+		verify200("MultiViewsITOtherPageInExcludedFolder", "excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml", "", "");
+
+		open("excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml/foo/42");
+		verify404("excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml/foo/42");
+
+		open("excludedfolder/MultiViewsITOtherPageInExcludedFolder");
+		verify404("excludedfolder/MultiViewsITOtherPageInExcludedFolder");
+
+		open("excludedfolder/MultiViewsITOtherPageInExcludedFolder/");
+		verify404("excludedfolder/MultiViewsITOtherPageInExcludedFolder/");
+
+		open("excludedfolder/MultiViewsITOtherPageInExcludedFolder/foo/42");
+		verify404("excludedfolder/MultiViewsITOtherPageInExcludedFolder/foo/42");
+
+		open("excludedfolder/");
+		verify404("excludedfolder/");
+
+		open("excludedfolder/foo/42");
+		verify404("excludedfolder/foo/42");
 	}
 
 	private void verify200(String title, String path, String firstPathParam, String secondPathParam) {

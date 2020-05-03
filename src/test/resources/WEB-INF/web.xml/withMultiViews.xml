@@ -21,7 +21,7 @@
 >
 	<context-param>
 		<param-name>org.omnifaces.FACES_VIEWS_SCAN_PATHS</param-name>
-		<param-value>/*.xhtml/*</param-value>
+		<param-value>/*.xhtml/*,!/excludedfolder</param-value>
 	</context-param>
 
 	<servlet>
@@ -37,6 +37,11 @@
 	<welcome-file-list>
 		<welcome-file>MultiViewsIT</welcome-file>
 	</welcome-file-list>
+
+	<error-page>
+		<error-code>403</error-code>
+		<location>/WEB-INF/404.xhtml</location> <!-- We don't want to show 403 on disabled directory listings -->
+	</error-page>
 
 	<error-page>
 		<error-code>404</error-code>
