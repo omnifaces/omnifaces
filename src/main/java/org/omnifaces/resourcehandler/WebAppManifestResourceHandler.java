@@ -133,6 +133,7 @@ import org.omnifaces.util.Json;
  *
  * @author Bauke Scholtz
  * @since 3.6
+ * @see WebAppManifest
  * @see <a href="https://www.w3.org/TR/appmanifest">https://www.w3.org/TR/appmanifest</a>
  * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest">https://developer.mozilla.org/en-US/docs/Web/Manifest</a>
  */

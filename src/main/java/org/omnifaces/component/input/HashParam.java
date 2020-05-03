@@ -112,10 +112,11 @@ import org.omnifaces.util.Faces;
  *
  * @author Bauke Scholtz
  * @since 3.2
+ * @see OnloadParam
+ * @see HashChangeEvent
  * @see Faces#getHashParameters()
  * @see Faces#getHashParameterMap()
  * @see Faces#getHashQueryString()
- * @see HashChangeEvent
  */
 @FacesComponent(HashParam.COMPONENT_TYPE)
 public class HashParam extends OnloadParam {
