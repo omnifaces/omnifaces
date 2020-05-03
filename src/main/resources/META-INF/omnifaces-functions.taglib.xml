@@ -150,7 +150,7 @@
 	<function>
 		<description>
 			<![CDATA[
-				Format the given string with 1 parameter using <code>javax.text.MessageFormat</code> API.
+				Format the given string with 1 parameter using <code>java.text.MessageFormat</code> API.
 				Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
 				functions does not support varargs methods nor overloaded function names.
 			]]>
@@ -163,7 +163,7 @@
 	<function>
 		<description>
 			<![CDATA[
-				Format the given string with 2 parameters using <code>javax.text.MessageFormat</code> API.
+				Format the given string with 2 parameters using <code>java.text.MessageFormat</code> API.
 				Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
 				functions does not support varargs methods nor overloaded function names.
 			]]>
@@ -176,7 +176,7 @@
 	<function>
 		<description>
 			<![CDATA[
-				Format the given string with 3 parameters using <code>javax.text.MessageFormat</code> API.
+				Format the given string with 3 parameters using <code>java.text.MessageFormat</code> API.
 				Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
 				functions does not support varargs methods nor overloaded function names.
 			]]>
@@ -189,7 +189,7 @@
 	<function>
 		<description>
 			<![CDATA[
-				Format the given string with 4 parameters using <code>javax.text.MessageFormat</code> API.
+				Format the given string with 4 parameters using <code>java.text.MessageFormat</code> API.
 				Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
 				functions does not support varargs methods nor overloaded function names.
 			]]>
@@ -202,7 +202,7 @@
 	<function>
 		<description>
 			<![CDATA[
-				Format the given string with 5 parameters using <code>javax.text.MessageFormat</code> API.
+				Format the given string with 5 parameters using <code>java.text.MessageFormat</code> API.
 				Design notice: There are five formatX() functions, each taking 1 to 5 format parameters because EL
 				functions does not support varargs methods nor overloaded function names.
 			]]>

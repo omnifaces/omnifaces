@@ -13,6 +13,7 @@
 package org.omnifaces.renderer;
 
 import static org.omnifaces.resourcehandler.DefaultResourceHandler.RES_NOT_FOUND;
+import static org.omnifaces.util.FacesLocal.createResource;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.IOException;
@@ -56,7 +57,7 @@ public class DeferredScriptRenderer extends Renderer {
 		Map<String, Object> attributes = component.getAttributes();
 		String library = (String) attributes.get("library");
 		String name = (String) attributes.get("name");
-		Resource resource = context.getApplication().getResourceHandler().createResource(name, library);
+		Resource resource = createResource(context, library, name);
 
 		ResponseWriter writer = context.getResponseWriter();
 		writer.startElement("script", component);

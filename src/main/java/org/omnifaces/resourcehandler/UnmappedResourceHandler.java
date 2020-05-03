@@ -30,6 +30,7 @@ import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.webapp.FacesServlet;
 
+import org.omnifaces.util.FacesLocal;
 import org.omnifaces.util.Hacks;
 
 /**
@@ -212,7 +213,7 @@ public class UnmappedResourceHandler extends DefaultResourceHandler {
 		}
 
 		String libraryName = context.getExternalContext().getRequestParameterMap().get("ln");
-		return context.getApplication().getResourceHandler().createResource(resourceName, libraryName);
+		return FacesLocal.createResource(context, libraryName, resourceName);
 	}
 
 }

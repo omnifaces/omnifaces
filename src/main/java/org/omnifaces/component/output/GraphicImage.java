@@ -14,6 +14,7 @@ package org.omnifaces.component.output;
 
 import static java.lang.Boolean.parseBoolean;
 import static org.omnifaces.resourcehandler.DefaultResourceHandler.RES_NOT_FOUND;
+import static org.omnifaces.util.FacesLocal.createResource;
 import static org.omnifaces.util.Renderers.writeAttributes;
 import static org.omnifaces.util.Renderers.writeIdAttributeIfNecessary;
 import static org.omnifaces.util.Utils.coalesce;
@@ -265,7 +266,7 @@ public class GraphicImage extends HtmlGraphicImage {
 
 	private Resource createGraphicResourceByName(FacesContext context, String name, boolean dataURI) throws IOException {
 		String library = (String) getAttributes().get("library");
-		Resource resource = context.getApplication().getResourceHandler().createResource(name, library);
+		Resource resource = createResource(context, library, name);
 
 		if (resource != null && dataURI && resource.getContentType().startsWith("image")) {
 			resource = new GraphicResource(resource.getInputStream(), resource.getContentType());

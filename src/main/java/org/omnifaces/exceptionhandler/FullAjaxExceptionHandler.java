@@ -157,7 +157,7 @@ import org.omnifaces.util.Hacks;
  * <pre>
  * &lt;context-param&gt;
  *     &lt;param-name&gt;org.omnifaces.EXCEPTION_TYPES_TO_UNWRAP&lt;/param-name&gt;
- *     &lt;param-value&gt;javax.ejb.EJBException,javax.persistence.RollbackException&lt;/param-value&gt;
+ *     &lt;param-value&gt;jakarta.ejb.EJBException,jakarta.persistence.RollbackException&lt;/param-value&gt;
  * &lt;/context-param&gt;
  * </pre>
  * <p>

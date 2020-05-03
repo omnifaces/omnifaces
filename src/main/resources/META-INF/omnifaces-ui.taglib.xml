@@ -2425,6 +2425,231 @@ public class ValidateValuesBean implements MultiFieldValidator {
 		<description>
 				<![CDATA[
 <p>
+The <code>&lt;o:scriptParam&gt;</code> is a component that extends the standard <code>&lt;f:viewParam&gt;</code>
+with support for setting results of client-side evaluated JavaScript code in bean.
+
+<h2>Usage</h2>
+<p>
+It's similar to the <code>&lt;f:viewParam&gt;</code>.
+<pre>
+&lt;f:metadata&gt;
+    &lt;o:scriptParam script="new Date().getTimezoneOffset()" value="#{bean.clientTimeZoneOffset}" /&gt;
+    &lt;o:scriptParam script="window.screen.width" value="#{bean.clientScreenWidth}" /&gt;
+    &lt;o:scriptParam script="someFunctionName()" value="#{bean.resultOfSomeFunctionName}" /&gt;
+&lt;/f:metadata&gt;
+</pre>
+<p>
+You can use the <code>render</code> attribute to declare which components should be updated when a script parameter
+has been set.
+<pre>
+&lt;f:metadata&gt;
+    &lt;o:scriptParam script="foo()" value="#{bean.resultOfFoo}" render="fooResult" /&gt;
+&lt;/f:metadata&gt;
+...
+&lt;h:body&gt;
+    ...
+    &lt;h:panelGroup id="fooResult"&gt;
+        &lt;ui:fragment rendered="#{not empty bean.resultOfFoo}"&gt;
+            The result of foo() script is: #{bean.resultOfFoo}
+        &lt;/ui:fragment&gt;
+    &lt;/h:panelGroup&gt;
+    ...
+&lt;/h:body&gt;
+</pre>
+<p>
+Note that as it extends from the standard <code>&lt;f:viewParam&gt;</code>, its built-in conversion and validation
+functionality is also supported on this component. So, the following is also possible:
+<pre>
+&lt;f:metadata&gt;
+    &lt;o:scriptParam script="window.navigator" value="#{bean.clientNavigator}" /&gt;
+&lt;/f:metadata&gt;
+</pre>
+With a <code>clientNavigator</code> being an instance of <code>jakarta.json.JsonObject</code>:
+<pre>
+private JsonObject clientNavigator;
+</pre>
+And this converter:
+<pre>
+package com.example;
+
+import java.io.StringReader;
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.convert.Converter;
+import jakarta.faces.convert.ConverterException;
+import jakarta.faces.convert.FacesConverter;
+import jakarta.json.Json;
+import jakarta.json.JsonObject;
+
+&#64;FacesConverter(forClass = JsonObject.class)
+public class JsobObjectConverter implements Converter&lt;JsonObject&gt; {
+
+    &#64;Override
+    public String getAsString(FacesContext context, UIComponent component, JsonObject modelValue) {
+        if (modelValue == null) {
+            return "";
+        }
+
+        return modelValue.toString();
+    }
+
+    &#64;Override
+    public JsonObject getAsObject(FacesContext context, UIComponent component, String submittedValue) {
+        if (submittedValue == null || submittedValue.isEmpty()) {
+            return null;
+        }
+
+        try {
+            return Json.createReader(new StringReader(submittedValue)).readObject();
+        }
+        catch (Exception e) {
+            throw new ConverterException("Not a valid JSON object", e);
+        }
+    }
+}
+</pre>
+				]]>
+		</description>
+		<tag-name>scriptParam</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.input.ScriptParam</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The script to be evaluated.
+				]]>
+			</description>
+			<name>script</name>
+			<required>true</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Converter instance registered with this component.
+				]]></description>
+			<name>converter</name>
+			<required>false</required>
+			<type>jakarta.faces.convert.Converter</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					A ValueExpression enabled attribute that, if present, will be
+					used as the text of the converter message, replacing any message
+					that comes from the converter.
+				]]>
+			</description>
+			<name>converterMessage</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be
+					unique within the closest parent component that is a naming
+					container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating that the user is required to provide a submitted
+					value for this input component. This component extends the behavior of
+					this by only making this required for a non-faces request.
+				]]>
+			</description>
+			<name>required</name>
+			<required>false</required>
+			<type>boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					A ValueExpression enabled attribute that, if present, will be
+					used as the text of the validation message for the "required"
+					facility, if the "required" facility is used.
+				]]>
+			</description>
+			<name>requiredMessage</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					MethodExpression representing a validator method that will be
+					called
+					during Process Validations to perform correctness checks on the
+					value of this component. The expression must evaluate to a
+					public
+					method that takes FacesContext, UIComponent, and Object
+					parameters,
+					with a return type of void.
+				]]>
+			</description>
+			<name>validator</name>
+			<required>false</required>
+			<method-signature>void validate(jakarta.faces.context.FacesContext,
+				jakarta.faces.component.UIComponent, java.lang.Object)
+			</method-signature>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					A ValueExpression enabled attribute that, if present, will be
+					used as the text of the validator message, replacing any
+					message that comes from the validator.
+				]]>
+			</description>
+			<name>validatorMessage</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					A ValueExpression to which the value representing the evaluated result of the script, as
+					determined by the script attribute, is bound.
+				]]>
+			</description>
+			<name>value</name>
+			<required>false</required>
+			<type>java.lang.Object</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					A space separated string of client IDs to update after the script param has been set in bean on page load.
+				]]>
+			</description>
+			<name>render</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The ValueExpression linking this component to a property in a
+					backing bean
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>jakarta.faces.component.UIComponent</type>
+		</attribute>
+	</tag>
+	
+	<tag>
+		<description>
+				<![CDATA[
+<p>
 The <code>&lt;o:hashParam&gt;</code> is a component that extends the standard <code>&lt;f:viewParam&gt;</code>
 with support for setting hash query parameter values in bean and automatically reflecting updated model values in
 hash query string.

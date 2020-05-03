@@ -50,8 +50,8 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <code>unload</code> event is invoked. I.e. when the user navigates away by GET, or closes the browser tab/window.
  * None of the both JSF 2.2 view scope annotations support this. Since OmniFaces 2.2, this CDI view scope annotation
  * will guarantee that the <code>&#64;PreDestroy</code> annotated method is also invoked on browser unload. This trick
- * is done by <code>navigator.sendBeacon</code> via an automatically included helper script <code>omnifaces:unload.js</code>.
- * For browsers not supporting <code>navigator.sendBeacon</code>, it will fallback to a synchronous XHR request.
+ * is done by <code>navigator.sendBeacon</code>. For browsers not supporting <code>navigator.sendBeacon</code>, it will
+ * fallback to a synchronous XHR request.
  * <p>
  * Since OmniFaces 2.3, the unload has been further improved to also physically remove the associated JSF view state
  * from JSF implementation's internal LRU map in case of server side state saving, hereby further decreasing the risk

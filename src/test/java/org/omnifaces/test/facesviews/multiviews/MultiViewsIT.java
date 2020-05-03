@@ -37,6 +37,9 @@ public class MultiViewsIT extends OmniFacesIT {
 	@FindBy(id="form:submit")
 	private WebElement formSubmit;
 
+	@FindBy(id="link")
+	private WebElement link;
+
 	@Deployment(testable=false)
 	public static WebArchive createDeployment() {
 		return buildWebArchive(MultiViewsIT.class)
@@ -63,6 +66,12 @@ public class MultiViewsIT extends OmniFacesIT {
 		guardHttp(formSubmit).click();
 		verify200("MultiViewsIT", "foo/42/bar/", "foo", "42");
 
+		guardHttp(link).click();
+		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
+	}
+
+	@Test
+	public void testOtherPage() {
 		open("MultiViewsITOtherPage");
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage", "", "");
 
@@ -87,6 +96,12 @@ public class MultiViewsIT extends OmniFacesIT {
 		guardHttp(formSubmit).click();
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/foo/42/bar/", "foo", "42");
 
+		guardHttp(link).click();
+		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/pathParam/471", "pathParam", "471");
+	}
+
+	@Test
+	public void testNonExistingPage() {
 		open("MultiViewsITNonExistingPage");
 		verify200("MultiViewsIT", "MultiViewsITNonExistingPage", "MultiViewsITNonExistingPage", "");
 
@@ -99,12 +114,37 @@ public class MultiViewsIT extends OmniFacesIT {
 		}
 	}
 
+	@Test
+	public void testExcludedFolder() {
+		open("excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml");
+		verify200("MultiViewsITOtherPageInExcludedFolder", "excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml", "", "");
+
+		open("excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml/foo/42");
+		verify404("excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml/foo/42");
+
+		open("excludedfolder/MultiViewsITOtherPageInExcludedFolder");
+		verify404("excludedfolder/MultiViewsITOtherPageInExcludedFolder");
+
+		open("excludedfolder/MultiViewsITOtherPageInExcludedFolder/");
+		verify404("excludedfolder/MultiViewsITOtherPageInExcludedFolder/");
+
+		open("excludedfolder/MultiViewsITOtherPageInExcludedFolder/foo/42");
+		verify404("excludedfolder/MultiViewsITOtherPageInExcludedFolder/foo/42");
+
+		open("excludedfolder/");
+		verify404("excludedfolder/");
+
+		open("excludedfolder/foo/42");
+		verify404("excludedfolder/foo/42");
+	}
+
 	private void verify200(String title, String path, String firstPathParam, String secondPathParam) {
 		assertEquals(title, browser.getTitle());
 		assertEquals(baseURL + path, stripJsessionid(browser.getCurrentUrl()));
 		assertEquals(firstPathParam, firstPathParamAsString.getText());
 		assertEquals(secondPathParam, secondPathParamAsInteger.getText());
 		assertEquals("/MultiViewsIT/" + path, stripJsessionid(form.getAttribute("action")));
+		assertEquals(baseURL + "MultiViewsITOtherPage/pathParam/471", stripJsessionid(link.getAttribute("href")));
 	}
 
 	private void verify404(String path) {

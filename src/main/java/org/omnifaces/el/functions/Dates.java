@@ -52,7 +52,7 @@ import org.omnifaces.util.Faces;
  * <code>of:getMonth()</code>, <code>of:getShortMonth()</code>, <code>of:getDayOfWeek()</code> and <code>of:getShortDayOfWeek()</code>.
  * <p>
  * Historical note: before OmniFaces 3.6, these functions accepted <code>java.util.Date</code> and <code>java.util.TimeZone</code> only.
- * Since OmniFaces 3.6, these functions <em>also<em> accept <code>java.time.Temporal</code> and <code>java.time.ZoneId</code>.
+ * Since OmniFaces 3.6, these functions <em>also</em> accept <code>java.time.Temporal</code> and <code>java.time.ZoneId</code>.
  *
  * @author Bauke Scholtz
  */
@@ -84,7 +84,7 @@ public final class Dates {
 	 * @return The date which is formatted in the given pattern.
 	 * @throws NullPointerException When the pattern is <code>null</code>.
 	 * @throws IllegalArgumentException When date is not {@link Date}, {@link Calendar} or {@link Temporal}.
-	 * @see #formatDateWithTimezone(Date, String, Object)
+	 * @see #formatDateWithTimezone(Object, String, Object)
 	 */
 	public static <D> String formatDate(D date, String pattern) {
 		return formatDateWithTimezone(date, pattern, getZoneId(date));

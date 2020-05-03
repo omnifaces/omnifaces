@@ -16,7 +16,7 @@ import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.omnifaces.util.Components.getCurrentComponent;
 import static org.omnifaces.util.Components.getCurrentForm;
-import static org.omnifaces.util.Faces.getApplication;
+import static org.omnifaces.util.Faces.createResource;
 import static org.omnifaces.util.Faces.isAjaxRequestWithPartialRendering;
 
 import java.beans.Introspector;
@@ -282,12 +282,11 @@ public final class Ajax {
 	 * @param resourceName Resource name of the JavaScript resource.
 	 * @throws IllegalArgumentException When given script resource cannot be found.
 	 * @throws IllegalStateException When current request is not an ajax request with partial rendering. You should use
-	 * either {@link Components#addScriptResourceToBody(String, String)}
-	 * or {@link Components#addScriptResourceToHead(String, String)} instead.
+	 * {@link Components#addScriptResource(String, String)} instead.
 	 * @since 2.3
 	 */
 	public static void load(String libraryName, String resourceName) {
-		Resource resource = getApplication().getResourceHandler().createResource(resourceName, libraryName);
+		Resource resource = createResource(libraryName, resourceName);
 
 		if (resource == null) {
 			throw new IllegalArgumentException(ERROR_NO_SCRIPT_RESOURCE);
@@ -305,7 +304,7 @@ public final class Ajax {
 	 * Execute the given scripts on complete of the current ajax response.
 	 * @param scripts The scripts to be executed.
 	 * @throws IllegalStateException When current request is not an ajax request with partial rendering. You should use
-	 * {@link Components#addScriptToBody(String)} instead.
+	 * {@link Components#addScript(String)} instead.
 	 * @see OmniPartialViewContext#addCallbackScript(String)
 	 */
 	public static void oncomplete(String... scripts) {
@@ -368,6 +367,16 @@ public final class Ajax {
 		for (Entry<String, Object> entry : data.entrySet()) {
 			context.addArgument(entry.getKey(), entry.getValue());
 		}
+	}
+
+	/**
+	 * Returns <code>true</code> if the given client ID was executed in the current ajax request.
+	 * @param clientId The client ID to be checked.
+	 * @return <code>true</code> if the given client ID was executed in the current ajax request.
+	 * @since 3.6
+	 */
+	public static boolean isExecuted(String clientId) {
+		return getContext().getExecuteIds().contains(clientId);
 	}
 
 }

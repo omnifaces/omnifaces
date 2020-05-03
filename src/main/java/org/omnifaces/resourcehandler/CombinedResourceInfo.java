@@ -15,13 +15,12 @@ package org.omnifaces.resourcehandler;
 import static java.lang.String.format;
 import static java.util.logging.Level.FINEST;
 import static java.util.logging.Level.WARNING;
-import static org.omnifaces.util.FacesLocal.getRequestDomainURL;
+import static org.omnifaces.util.FacesLocal.createResource;
 import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Utils.openConnection;
 import static org.omnifaces.util.Utils.serializeURLSafe;
 import static org.omnifaces.util.Utils.unserializeURLSafe;
 
-import java.io.IOException;
-import java.net.URL;
 import java.net.URLConnection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
@@ -31,7 +30,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import jakarta.faces.application.Resource;
-import jakarta.faces.application.ResourceHandler;
 import jakarta.faces.context.FacesContext;
 
 import org.omnifaces.el.functions.Converters;
@@ -178,13 +176,12 @@ public final class CombinedResourceInfo {
 		}
 
 		FacesContext context = FacesContext.getCurrentInstance();
-		ResourceHandler handler = context.getApplication().getResourceHandler();
 		resources = new LinkedHashSet<>();
 		contentLength = 0;
 		lastModified = 0;
 
 		for (ResourceIdentifier resourceIdentifier : resourceIdentifiers) {
-			Resource resource = handler.createResource(resourceIdentifier.getName(), resourceIdentifier.getLibrary());
+			Resource resource = createResource(context, resourceIdentifier.getLibrary(), resourceIdentifier.getName());
 
 			if (resource == null) {
 				if (logger.isLoggable(WARNING)) {
@@ -196,21 +193,10 @@ public final class CombinedResourceInfo {
 			}
 
 			resources.add(resource);
-			URLConnection connection;
+			URLConnection connection = openConnection(context, resource);
 
-			try {
-				connection = resource.getURL().openConnection();
-			}
-			catch (Exception richFacesDoesNotSupportThis) {
-				logger.log(FINEST, "Ignoring thrown exception; this can only be caused by a buggy component library.", richFacesDoesNotSupportThis);
-
-				try {
-					connection = new URL(getRequestDomainURL(context) + resource.getRequestPath()).openConnection();
-				}
-				catch (IOException ignore) {
-					logger.log(FINEST, "Ignoring thrown exception; cannot handle it at this point, it would be thrown during getInputStream() anyway.", ignore);
-					return;
-				}
+			if (connection == null) {
+				return;
 			}
 
 			contentLength += connection.getContentLength();

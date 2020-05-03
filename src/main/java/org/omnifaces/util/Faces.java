@@ -40,6 +40,8 @@ import jakarta.faces.application.Application;
 import jakarta.faces.application.ApplicationFactory;
 import jakarta.faces.application.NavigationHandler;
 import jakarta.faces.application.ProjectStage;
+import jakarta.faces.application.Resource;
+import jakarta.faces.application.ResourceHandler;
 import jakarta.faces.application.ViewHandler;
 import jakarta.faces.component.UIViewParameter;
 import jakarta.faces.component.UIViewRoot;
@@ -69,9 +71,11 @@ import jakarta.servlet.http.Part;
 
 import org.omnifaces.component.ParamHolder;
 import org.omnifaces.component.input.HashParam;
+import org.omnifaces.component.input.ScriptParam;
 import org.omnifaces.config.FacesConfigXml;
 import org.omnifaces.el.FacesELResolver;
 import org.omnifaces.facesviews.FacesViews;
+import org.omnifaces.resourcehandler.ResourceIdentifier;
 
 /**
  * <p>
@@ -619,6 +623,43 @@ public final class Faces {
 	}
 
 	/**
+	 * Creates and returns a Faces resource associated with given resource name.
+	 * If no resource can be allocated, then return null.
+	 * @param resourceName The resource name.
+	 * @return A Faces resource associated with given resource name.
+	 * @see ResourceHandler#createResource(String)
+	 * @since 3.6
+	 */
+	public static Resource createResource(String resourceName) {
+		return FacesLocal.createResource(getContext(), resourceName);
+	}
+
+	/**
+	 * Creates and returns a Faces resource associated with given library name and resource name.
+	 * If no resource can be allocated, then return null.
+	 * @param libraryName The library name.
+	 * @param resourceName The resource name.
+	 * @return A Faces resource associated with given library name and resource name.
+	 * @see ResourceHandler#createResource(String, String)
+	 * @since 3.6
+	 */
+	public static Resource createResource(String libraryName, String resourceName) {
+		return FacesLocal.createResource(getContext(), libraryName, resourceName);
+	}
+
+	/**
+	 * Creates and returns a Faces resource associated with given resource identifier.
+	 * If no resource can be allocated, then return null.
+	 * @param resourceIdentifier The resource identifier.
+	 * @return A Faces resource associated with given resource identifier.
+	 * @see ResourceHandler#createResource(String, String)
+	 * @since 3.6
+	 */
+	public static Resource createResource(ResourceIdentifier resourceIdentifier) {
+		return FacesLocal.createResource(getContext(), resourceIdentifier);
+	}
+
+	/**
 	 * Returns The {@link Lifecycle} associated with current Faces application.
 	 * @return The {@link Lifecycle} associated with current Faces application.
 	 * @see LifecycleFactory#getLifecycle(String)
@@ -783,6 +824,16 @@ public final class Faces {
 	 */
 	public static String getHashQueryString() {
 		return FacesLocal.getHashQueryString(getContext());
+	}
+
+	/**
+	 * Returns the script parameters of the current view, or an empty collection if there is no view.
+	 * @return The script parameters of the current view, or an empty collection if there is no view.
+	 * @see ScriptParam
+	 * @since 3.6
+	 */
+	public static Collection<ScriptParam> getScriptParameters() {
+		return FacesLocal.getScriptParameters(getContext());
 	}
 
 	/**

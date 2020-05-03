@@ -21,11 +21,6 @@
  */
 OmniFaces.Unload = (function(Util, navigator, window, document) {
 
-	// "Constant" fields ----------------------------------------------------------------------------------------------
-
-	var ERROR_MISSING_FORM = "OmniFaces @ViewScoped: cannot find a JSF form in the document."
-		+ " Unload will not work. Either add a JSF form, or use @RequestScoped instead.";
-
 	// Private static fields ------------------------------------------------------------------------------------------
 
 	var id;
@@ -50,10 +45,6 @@ OmniFaces.Unload = (function(Util, navigator, window, document) {
 			var form = Util.getFacesForm();
 
 			if (!form) {
-				if ((!window.jsf || jsf.getProjectStage() == "Development") && window.console && console.error) {
-					console.error(ERROR_MISSING_FORM);
-				}
-
 				return;
 			}
 

@@ -257,20 +257,6 @@
 							<goal>minify</goal>
 						</goals>
 					</execution>
-					<execution>
-						<id>minify-unload</id>
-						<configuration>
-							<jsSourceFiles>
-								<jsSourceFile>omnifaces.unminified.js</jsSourceFile>
-								<jsSourceFile>util.unminified.js</jsSourceFile>
-								<jsSourceFile>unload.unminified.js</jsSourceFile>
-							</jsSourceFiles>
-							<jsFinalFile>unload.js</jsFinalFile>
-						</configuration>
-						<goals>
-							<goal>minify</goal>
-						</goals>
-					</execution>
 				</executions>
 			</plugin>
 

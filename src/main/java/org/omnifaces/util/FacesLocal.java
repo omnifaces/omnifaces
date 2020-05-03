@@ -14,7 +14,6 @@ package org.omnifaces.util;
 
 import static jakarta.faces.component.UIViewRoot.METADATA_FACET_NAME;
 import static jakarta.faces.view.facelets.FaceletContext.FACELET_CONTEXT_KEY;
-import static jakarta.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.logging.Level.FINEST;
@@ -65,6 +64,7 @@ import jakarta.faces.FacesException;
 import jakarta.faces.FactoryFinder;
 import jakarta.faces.application.Application;
 import jakarta.faces.application.ProjectStage;
+import jakarta.faces.application.Resource;
 import jakarta.faces.application.ViewHandler;
 import jakarta.faces.component.UIViewParameter;
 import jakarta.faces.component.UIViewRoot;
@@ -93,7 +93,9 @@ import jakarta.servlet.http.Part;
 
 import org.omnifaces.component.ParamHolder;
 import org.omnifaces.component.input.HashParam;
+import org.omnifaces.component.input.ScriptParam;
 import org.omnifaces.config.FacesConfigXml;
+import org.omnifaces.resourcehandler.ResourceIdentifier;
 
 /**
  * <p>
@@ -374,6 +376,27 @@ public final class FacesLocal {
 	}
 
 	/**
+	 * @see Faces#createResource(String)
+	 */
+	public static Resource createResource(FacesContext context, String resourceName) {
+		return context.getApplication().getResourceHandler().createResource(resourceName);
+	}
+
+	/**
+	 * @see Faces#createResource(String, String)
+	 */
+	public static Resource createResource(FacesContext context, String libraryName, String resourceName) {
+		return context.getApplication().getResourceHandler().createResource(resourceName, libraryName);
+	}
+
+	/**
+	 * @see Faces#createResource(ResourceIdentifier)
+	 */
+	public static Resource createResource(FacesContext context, ResourceIdentifier resourceIdentifier) {
+		return context.getApplication().getResourceHandler().createResource(resourceIdentifier.getName(), resourceIdentifier.getLibrary());
+	}
+
+	/**
 	 * @see Faces#getLifecycle()
 	 */
 	public static Lifecycle getLifecycle(FacesContext context) {
@@ -547,6 +570,14 @@ public final class FacesLocal {
 	 */
 	public static String getHashQueryString(FacesContext context) {
 		return toQueryString(getHashParameterMap(context));
+	}
+
+	/**
+	 * @see Faces#getScriptParameters()
+	 */
+	public static Collection<ScriptParam> getScriptParameters(FacesContext context) {
+		UIViewRoot viewRoot = context.getViewRoot();
+		return (viewRoot != null) ? findComponentsInChildren(getViewRoot().getFacet(METADATA_FACET_NAME), ScriptParam.class) : Collections.<ScriptParam>emptyList();
 	}
 
 	/**
@@ -1149,11 +1180,8 @@ public final class FacesLocal {
 	 * @see Faces#redirectPermanent(String, Object...)
 	 */
 	public static void redirectPermanent(FacesContext context, String url, Object... paramValues) {
-		ExternalContext externalContext = context.getExternalContext();
-		externalContext.getFlash().setRedirect(true); // MyFaces also requires this for a redirect in current request (which is incorrect).
-		externalContext.setResponseStatus(SC_MOVED_PERMANENTLY);
-		externalContext.setResponseHeader("Location", prepareRedirectURL(getRequest(context), url, paramValues));
-		externalContext.setResponseHeader("Connection", "close");
+		context.getExternalContext().getFlash().setRedirect(true); // MyFaces also requires this for a redirect in current request (which is incorrect).
+		Servlets.redirectPermanent(getResponse(context), prepareRedirectURL(getRequest(context), url, paramValues));
 		context.responseComplete();
 	}
 

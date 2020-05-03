@@ -29,7 +29,7 @@ import org.openqa.selenium.support.FindBy;
 
 public class CombinedResourceHandlerIT extends OmniFacesIT {
 
-	private static final String HEAD_COMBINED_RESOURCE_NAME = serializeURLSafe("omnifaces:omnifaces.js|javax.faces:jsf.js|headWithTarget.js|bodyWithTargetHead.js");
+	private static final String HEAD_COMBINED_RESOURCE_NAME = serializeURLSafe("omnifaces:omnifaces.js|jakarta.faces:jsf.js|headWithTarget.js|bodyWithTargetHead.js");
 	private static final String DEFERRED_COMBINED_RESOURCE_NAME = serializeURLSafe("deferredInHead.js|deferredInBody.js");
 
 	@FindBy(css="script[crossorigin=anonymous]")

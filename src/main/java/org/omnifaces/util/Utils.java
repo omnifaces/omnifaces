@@ -17,6 +17,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.logging.Level.FINEST;
 import static java.util.regex.Pattern.quote;
+import static org.omnifaces.util.FacesLocal.getRequestDomainURL;
 import static org.omnifaces.util.Reflection.toClassOrNull;
 import static org.omnifaces.util.Servlets.getSubmittedFileName;
 
@@ -34,6 +35,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
@@ -83,6 +86,8 @@ import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
+import jakarta.faces.application.Resource;
+import jakarta.faces.context.FacesContext;
 import jakarta.servlet.http.Part;
 
 /**
@@ -945,28 +950,29 @@ public final class Utils {
 			return (((LocalTime) date).atDate(LocalDate.now())).atZone(zone);
 		}
 		else if (date instanceof Temporal) {
-			Temporal temporal = (Temporal) date;
-
-			if (temporal.isSupported(ChronoField.INSTANT_SECONDS)) {
-				long epoch = temporal.getLong(ChronoField.INSTANT_SECONDS);
-				long nano = temporal.getLong(ChronoField.NANO_OF_SECOND);
-				return ZonedDateTime.ofInstant(Instant.ofEpochSecond(epoch, nano), zone);
-			}
-			else {
-				LocalDateTime now = LocalDate.now().atStartOfDay();
-				int year = temporal.isSupported(ChronoField.YEAR) ? temporal.get(ChronoField.YEAR) : now.getYear();
-				int month = temporal.isSupported(ChronoField.MONTH_OF_YEAR) ? temporal.get(ChronoField.MONTH_OF_YEAR) : now.getMonth().getValue();
-				int day = temporal.isSupported(ChronoField.DAY_OF_MONTH) ? temporal.get(ChronoField.DAY_OF_MONTH) : now.getDayOfMonth();
-				int hour = temporal.isSupported(ChronoField.HOUR_OF_DAY) ? temporal.get(ChronoField.HOUR_OF_DAY) : now.getHour();
-				int minute = temporal.isSupported(ChronoField.MINUTE_OF_HOUR) ? temporal.get(ChronoField.MINUTE_OF_HOUR) : now.getMinute();
-				int second = temporal.isSupported(ChronoField.SECOND_OF_MINUTE) ? temporal.get(ChronoField.SECOND_OF_MINUTE) : now.getSecond();
-				int nano = temporal.isSupported(ChronoField.NANO_OF_SECOND) ? temporal.get(ChronoField.NANO_OF_SECOND) : now.getNano();
-				return ZonedDateTime.of(year, month, day, hour, minute, second, nano, zone);
-			}
+			return fromTemporalToZonedDateTime((Temporal) date, zone);
 		}
 		else {
 			throw new IllegalArgumentException(ERROR_UNSUPPORTED_DATE);
 		}
+	}
+
+	private static ZonedDateTime fromTemporalToZonedDateTime(Temporal temporal, ZoneId zone) {
+		if (temporal.isSupported(ChronoField.INSTANT_SECONDS)) {
+			long epoch = temporal.getLong(ChronoField.INSTANT_SECONDS);
+			long nano = temporal.getLong(ChronoField.NANO_OF_SECOND);
+			return ZonedDateTime.ofInstant(Instant.ofEpochSecond(epoch, nano), zone);
+		}
+
+		LocalDateTime now = LocalDate.now().atStartOfDay();
+		int year = temporal.isSupported(ChronoField.YEAR) ? temporal.get(ChronoField.YEAR) : now.getYear();
+		int month = temporal.isSupported(ChronoField.MONTH_OF_YEAR) ? temporal.get(ChronoField.MONTH_OF_YEAR) : now.getMonth().getValue();
+		int day = temporal.isSupported(ChronoField.DAY_OF_MONTH) ? temporal.get(ChronoField.DAY_OF_MONTH) : now.getDayOfMonth();
+		int hour = temporal.isSupported(ChronoField.HOUR_OF_DAY) ? temporal.get(ChronoField.HOUR_OF_DAY) : now.getHour();
+		int minute = temporal.isSupported(ChronoField.MINUTE_OF_HOUR) ? temporal.get(ChronoField.MINUTE_OF_HOUR) : now.getMinute();
+		int second = temporal.isSupported(ChronoField.SECOND_OF_MINUTE) ? temporal.get(ChronoField.SECOND_OF_MINUTE) : now.getSecond();
+		int nano = temporal.isSupported(ChronoField.NANO_OF_SECOND) ? temporal.get(ChronoField.NANO_OF_SECOND) : now.getNano();
+		return ZonedDateTime.of(year, month, day, hour, minute, second, nano, zone);
 	}
 
 	/**
@@ -1021,27 +1027,36 @@ public final class Utils {
 			return (D) zonedDateTime.toLocalDateTime().toLocalTime();
 		}
 		else if (Temporal.class.isAssignableFrom(type)) {
-			// Basically finds public static method in D which takes 1 argument of Temporal.class and returns D.
-			// This matches Temporal#from(TemporalAccessor) methods of all known Temporal subclasses listed above.
-			// There might be custom implementations supporting this as well although this is undocumented.
-			// We just try our best :)
-			Optional<Method> converter = stream(type.getMethods()).filter(method
-				-> Modifier.isPublic(method.getModifiers()) && Modifier.isStatic(method.getModifiers())
-				&& method.getParameterCount() == 1 && method.getParameterTypes()[0].isAssignableFrom(Temporal.class)
-				&& type.isAssignableFrom(method.getReturnType())
-			).findFirst();
+			return fromZonedDateTimeToTemporal(zonedDateTime, type);
+		}
+		else {
+			throw new IllegalArgumentException(ERROR_UNSUPPORTED_DATE);
+		}
+	}
 
+	@SuppressWarnings("unchecked")
+	private static <T extends Temporal> T fromZonedDateTimeToTemporal(ZonedDateTime zonedDateTime, Class<?> type) {
+		// Basically finds public static method in T which takes 1 argument of Temporal.class and returns T.
+		// This matches Temporal#from(TemporalAccessor) methods of all known Temporal subclasses listed above.
+		// There might be custom implementations supporting this as well although this is undocumented.
+		// We just try our best :)
+		Optional<Method> converter = stream(type.getMethods()).filter(method
+			-> Modifier.isPublic(method.getModifiers()) && Modifier.isStatic(method.getModifiers())
+			&& method.getParameterCount() == 1 && method.getParameterTypes()[0].isAssignableFrom(Temporal.class)
+			&& type.isAssignableFrom(method.getReturnType())
+		).findFirst();
+
+		try {
 			if (converter.isPresent()) {
-				try {
-					return (D) converter.get().invoke(null, zonedDateTime);
-				}
-				catch (Exception ignore) {
-					logger.log(FINEST, "Ignoring thrown exception; there is nothing more we could do here.", ignore);
-				}
+				return (T) converter.get().invoke(null, zonedDateTime);
+			}
+			else {
+				throw new NoSuchMethodException();
 			}
 		}
-
-		throw new IllegalArgumentException(ERROR_UNSUPPORTED_DATE);
+		catch (Exception e) {
+			throw new IllegalArgumentException(ERROR_UNSUPPORTED_DATE, e);
+		}
 	}
 
 	// Locale ---------------------------------------------------------------------------------------------------------
@@ -1308,6 +1323,32 @@ public final class Utils {
 			default:
 				builder.append(c);
 				break;
+		}
+	}
+
+	// Resources ------------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns connection to given resource, taking into account possibly buggy component libraries.
+	 * @param context The involved faces context.
+	 * @param resource The resource to obtain connection from.
+	 * @return Connection to given resource.
+	 * @since 3.6
+	 */
+	public static URLConnection openConnection(FacesContext context, Resource resource) {
+		try {
+			return resource.getURL().openConnection();
+		}
+		catch (Exception richFacesDoesNotSupportThis) {
+			logger.log(FINEST, "Ignoring thrown exception; this can only be caused by a buggy component library.", richFacesDoesNotSupportThis);
+
+			try {
+				return new URL(getRequestDomainURL(context) + resource.getRequestPath()).openConnection();
+			}
+			catch (IOException ignore) {
+				logger.log(FINEST, "Ignoring thrown exception; cannot handle it at this point, it would be thrown during getInputStream() anyway.", ignore);
+				return null;
+			}
 		}
 	}
 

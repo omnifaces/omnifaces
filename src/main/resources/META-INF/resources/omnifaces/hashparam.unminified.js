@@ -19,11 +19,6 @@
  */
 OmniFaces.HashParam = (function(Util, window, document) {
 
-	// "Constant" fields ----------------------------------------------------------------------------------------------
-
-	var ERROR_MISSING_FORM = "OmniFaces HashParam: cannot find a JSF form in the document."
-		+ " Setting hash parameter in bean will not work. Either add a JSF form, or use ViewParam instead.";
-
 	// Private static fields ------------------------------------------------------------------------------------------
 
 	var id;
@@ -39,13 +34,9 @@ OmniFaces.HashParam = (function(Util, window, document) {
 		id = hashParamId;
 
 		if (!Util.getFacesForm()) {
-			if ((!window.jsf || jsf.getProjectStage() == "Development") && window.console && console.error) {
-				console.error(ERROR_MISSING_FORM);
-			}
-			
 			return;
 		}
-		
+
 		if (!!window.location.hash) {
 			setHashParamValues();
 		}
@@ -60,7 +51,8 @@ OmniFaces.HashParam = (function(Util, window, document) {
 	 */
 	self.update = function(name, value) {
 		updating = true;
-		var oldHashQueryString = window.location.hash;
+		var location = window.location;
+		var oldHashQueryString = location.hash;
 
 		if (!!oldHashQueryString && oldHashQueryString.charAt(0) == '#') {
 			oldHashQueryString = oldHashQueryString.substring(1);
@@ -69,12 +61,13 @@ OmniFaces.HashParam = (function(Util, window, document) {
 		var newHashQueryString = Util.updateParameter(oldHashQueryString, name, value);
 
 		if (newHashQueryString != oldHashQueryString) {
-			if (window.history && window.history.pushState) {
-				var url = window.location.href.split(/#/, 2)[0] + (newHashQueryString ? "#" : "") + newHashQueryString;
+			var history = window.history;
+			if (history && history.pushState) {
+				var url = location.href.split(/#/, 2)[0] + (newHashQueryString ? "#" : "") + newHashQueryString;
 				history.pushState(null, document.title, url);
 			}
 			else {
-				window.location.hash = newHashQueryString;
+				location.hash = newHashQueryString;
 			}
 		}
 

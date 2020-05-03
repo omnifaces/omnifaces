@@ -15,13 +15,11 @@ package org.omnifaces.cdi.push;
 import static jakarta.faces.component.visit.VisitHint.SKIP_ITERATION;
 import static java.lang.String.format;
 import static org.omnifaces.cdi.push.SocketChannelManager.ESTIMATED_TOTAL_CHANNELS;
-import static org.omnifaces.util.Ajax.oncomplete;
-import static org.omnifaces.util.Components.addScriptToBody;
+import static org.omnifaces.util.Components.addScript;
 import static org.omnifaces.util.Components.forEachComponent;
 import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.FacesLocal.getViewAttribute;
 import static org.omnifaces.util.FacesLocal.isAjaxRequest;
-import static org.omnifaces.util.FacesLocal.isAjaxRequestWithPartialRendering;
 
 import java.io.Serializable;
 import java.util.AbstractMap;
@@ -92,14 +90,7 @@ public class SocketFacesListener implements SystemEventListener {
 			boolean previouslyConnected = sockets.get(socket.getChannel()).setValue(connected);
 
 			if (connected != previouslyConnected) {
-				String script = format(connected ? SCRIPT_OPEN : SCRIPT_CLOSE, socket.getChannel());
-
-				if (isAjaxRequestWithPartialRendering(context)) {
-					oncomplete(script);
-				}
-				else {
-					addScriptToBody(script);
-				}
+				addScript(format(connected ? SCRIPT_OPEN : SCRIPT_CLOSE, socket.getChannel()));
 			}
 		});
 	}

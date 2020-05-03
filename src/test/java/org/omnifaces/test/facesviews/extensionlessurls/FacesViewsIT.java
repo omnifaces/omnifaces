@@ -111,6 +111,18 @@ public class FacesViewsIT extends OmniFacesIT {
 		}
 	}
 
+	@Test
+	public void testExcludedFolder() {
+		open("excludedfolder/FacesViewsITOtherPageInExcludedFolder.xhtml");
+		verify200("FacesViewsITOtherPageInExcludedFolder", "excludedfolder/FacesViewsITOtherPageInExcludedFolder.xhtml");
+
+		open("excludedfolder/FacesViewsITOtherPageInExcludedFolder");
+		verify404("excludedfolder/FacesViewsITOtherPageInExcludedFolder");
+
+		open("excludedfolder/FacesViewsITOtherPageInExcludedFolder/");
+		verify404("excludedfolder/FacesViewsITOtherPageInExcludedFolder/");
+	}
+
 	private void verify200(String title, String path) {
 		assertEquals(title, browser.getTitle());
 		assertEquals(baseURL + path, stripJsessionid(browser.getCurrentUrl()));

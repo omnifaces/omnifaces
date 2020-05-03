@@ -49,6 +49,7 @@ import org.omnifaces.renderer.InlineResourceRenderer;
 import org.omnifaces.renderer.InlineScriptRenderer;
 import org.omnifaces.renderer.InlineStylesheetRenderer;
 import org.omnifaces.util.Faces;
+import org.omnifaces.util.FacesLocal;
 import org.omnifaces.util.cache.Cache;
 
 /**
@@ -129,7 +130,7 @@ import org.omnifaces.util.cache.Cache;
  * </td><td>
  * Comma separated string of resource identifiers of <code>&lt;h:head&gt;</code> resources which needs to be excluded
  * from combining. For example:
- * <br><code>&lt;param-value&gt;primefaces:primefaces.css, javax.faces:jsf.js&lt;/param-value&gt;</code>
+ * <br><code>&lt;param-value&gt;primefaces:primefaces.css, jakarta.faces:jsf.js&lt;/param-value&gt;</code>
  * <br>Any combined resource will be included <i>after</i> any of those excluded resources.
  * </td></tr>
  * <tr><td class="colFirst">
@@ -620,7 +621,7 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 				componentResource.getAttributes().put("library", LIBRARY_NAME);
 				componentResource.getAttributes().put("name", resourceName);
 				componentResource.setRendererType(rendererType);
-				Resource resource = context.getApplication().getResourceHandler().createResource(resourceName, LIBRARY_NAME);
+				Resource resource = FacesLocal.createResource(context, LIBRARY_NAME, resourceName);
 
 				if (resource instanceof CDNResource) {
 					setFallbackURL((CDNResource) resource);

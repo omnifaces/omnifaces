@@ -29,7 +29,7 @@ import jakarta.faces.application.ResourceHandler;
  * This {@link ResourceHandler} implementation allows the developer to provide external (CDN) URLs instead of the
  * default local URLs for JSF resources. This also works on auto-included resources provided as
  * {@link ResourceDependency} by the JSF implementation and/or component libraries. For example, JSF's own
- * <code>javax.faces:jsf.js</code> resource or PrimeFaces' <code>primefaces:jquery/jquery.js</code> resource could be
+ * <code>jakarta.faces:jsf.js</code> resource or PrimeFaces' <code>primefaces:jquery/jquery.js</code> resource could be
  * pointed to a CDN.
  *
  * <h2>Installation</h2>

@@ -24,7 +24,6 @@
 		<exclude name="org.omnifaces.config.**" />
 		<exclude name="org.omnifaces.context.**" />
 		<exclude name="org.omnifaces.el.**" />
-		<exclude name="org.omnifaces.event.**" />
 		<exclude name="org.omnifaces.eventlistener.**" />
 		<exclude name="org.omnifaces.exceptionhandler.**" />
 		<exclude name="org.omnifaces.facesviews.**" />
