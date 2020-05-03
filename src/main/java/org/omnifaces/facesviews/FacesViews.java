@@ -763,9 +763,13 @@ public final class FacesViews {
 	 * @since 3.6
 	 */
 	public static boolean isMultiViewsEnabled(ServletContext servletContext, String resource) {
+		if (!isMultiViewsEnabled(servletContext)) {
+			return false;
+		}
+
 		Set<String> excludedPaths = getExcludedPaths(servletContext);
 
-		if (excludedPaths != null && !excludedPaths.isEmpty()) {
+		if (!isEmpty(excludedPaths)) {
 			String path = resource + "/";
 
 			if (excludedPaths.stream().anyMatch(excludedPath -> path.startsWith(excludedPath))) {
