@@ -13,11 +13,20 @@
 package org.omnifaces.component.input;
 
 import static java.lang.String.format;
+import static org.omnifaces.el.ExpressionInspector.getValueReference;
 import static org.omnifaces.util.FacesLocal.getRequestParameter;
 import static org.omnifaces.util.FacesLocal.getScriptParameters;
+import static org.omnifaces.util.Reflection.invokeMethods;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.el.ValueExpression;
 import javax.faces.component.FacesComponent;
 import javax.faces.context.FacesContext;
+
+import org.omnifaces.cdi.PostScriptParam;
+import org.omnifaces.util.Faces;
 
 /**
  * <p>
@@ -105,8 +114,23 @@ import javax.faces.context.FacesContext;
  * }
  * </pre>
  *
+ * <h3>Events</h3>
+ * <p>
+ * When the script params have been set, then any method with the {@link PostScriptParam} annotation will be fired:
+ * <pre>
+ * &#64;PostScriptParam
+ * public void initScriptParams() {
+ *     // ...
+ * }
+ * </pre>
+ * <p>
+ * This is useful in case you want to preload the model for whatever is rendered by
+ * <code>&lt;o:scriptParam render&gt;</code>.
+ *
  * @author Bauke Scholtz
  * @since 3.6
+ * @see Faces#getScriptParameters()
+ * @see PostScriptParam
  */
 @FacesComponent(ScriptParam.COMPONENT_TYPE)
 public class ScriptParam extends OnloadParam {
@@ -152,9 +176,20 @@ public class ScriptParam extends OnloadParam {
 
 	@Override
 	protected void decodeAll(FacesContext context) {
+		Set<Object> beans = new HashSet<>();
+
 		for (ScriptParam scriptParam : getScriptParameters(context)) {
 			String value = getRequestParameter(context, scriptParam.getClientId());
 			scriptParam.decodeImmediately(context, value);
+			ValueExpression valueExpression = scriptParam.getValueExpression("value");
+
+			if (valueExpression != null) {
+				beans.add(getValueReference(context.getELContext(), valueExpression).getBase());
+			}
+		}
+
+		for (Object bean : beans) {
+			invokeMethods(bean, PostScriptParam.class);
 		}
 	}
 

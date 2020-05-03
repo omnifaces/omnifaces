@@ -21,6 +21,7 @@ import static org.omnifaces.util.Utils.getPrimitiveType;
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -213,6 +214,28 @@ public final class Reflection {
 
 		return null;
 	}
+	/**
+	 * Finds methods having the given annotation.
+	 * @param base The object in which the methods are to be found.
+	 * @param annotation Annotation of the method to be found.
+	 * @return List of matching methods.
+	 * @since 3.6
+	 */
+	public static <A extends Annotation> List<Method> findMethods(Object base, Class<A> annotation) {
+
+		List<Method> methods = new ArrayList<>();
+
+		for (Class<?> cls = base.getClass(); cls != null; cls = cls.getSuperclass()) {
+			for (Method method : cls.getDeclaredMethods()) {
+				if (method.isAnnotationPresent(annotation) && isNotOverridden(methods, method)) {
+					methods.add(method);
+				}
+			}
+		}
+
+		return methods;
+	}
+
 
 	/**
 	 * Returns true if given source is assignable to target type, taking into account autoboxing.
@@ -387,7 +410,6 @@ public final class Reflection {
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @since 2.5
 	 */
-	@SuppressWarnings("unchecked")
 	public static <T> T invokeMethod(Object instance, String methodName, Object... parameters) {
 		try {
 			Method method = findMethod(instance, methodName, parameters);
@@ -396,12 +418,51 @@ public final class Reflection {
 				throw new NoSuchMethodException();
 			}
 
+			return invokeMethod(instance, method, parameters);
+		}
+		catch (Exception e) {
+			throw new IllegalStateException(format(ERROR_INVOKE_METHOD, methodName, instance != null ? instance.getClass() : null, Arrays.toString(parameters)), e);
+		}
+	}
+
+	/**
+	 * Invoke given method of the given instance with the given parameters and return the result.
+	 * @param <T> The expected return type.
+	 * @param instance The instance to invoke the given method on.
+	 * @param method The method to be invoked on the given instance.
+	 * @param parameters The method parameters, if any.
+	 * @return The result of the method invocation, if any.
+	 * @throws IllegalStateException If the method cannot be invoked.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @since 3.6
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T invokeMethod(Object instance, Method method, Object... parameters) {
+		try {
 			method.setAccessible(true);
 			return (T) method.invoke(instance, parameters);
 		}
 		catch (Exception e) {
-			throw new IllegalStateException(
-				format(ERROR_INVOKE_METHOD, methodName, instance.getClass(), Arrays.toString(parameters)), e);
+			throw new IllegalStateException(format(ERROR_INVOKE_METHOD, method != null ? method.getName() : null, instance != null ? instance.getClass() : null, Arrays.toString(parameters)), e);
+		}
+	}
+
+	/**
+	 * Invoke methods of the given instance having the given annotation.
+	 * @param instance The instance to invoke the methods having the given annotation on.
+	 * @param annotation Annotation of the methods to be invoked.
+	 * @throws IllegalStateException If the method cannot be invoked.
+	 * @since 3.6
+	 */
+	public static <A extends Annotation> void invokeMethods(Object instance, Class<A> annotation) {
+		for (Method method : findMethods(instance, annotation)) {
+			try {
+				invokeMethod(instance, method);
+			}
+			catch (Exception e) {
+				throw new IllegalStateException(
+					format(ERROR_INVOKE_METHOD, method.getName(), instance.getClass(), "[]"), e);
+			}
 		}
 	}
 

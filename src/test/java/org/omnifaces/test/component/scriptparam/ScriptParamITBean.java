@@ -17,6 +17,7 @@ import java.io.Serializable;
 import javax.inject.Named;
 import javax.json.JsonObject;
 
+import org.omnifaces.cdi.PostScriptParam;
 import org.omnifaces.cdi.ViewScoped;
 
 @Named
@@ -27,6 +28,12 @@ public class ScriptParamITBean implements Serializable {
 
 	private Integer clientTimeZoneOffset;
 	private JsonObject navigator;
+	private boolean postScriptParamInvoked;
+
+	@PostScriptParam
+	public void initScriptParams() {
+		postScriptParamInvoked = true;
+	}
 
 	public Integer getClientTimeZoneOffset() {
 		return clientTimeZoneOffset;
@@ -42,6 +49,10 @@ public class ScriptParamITBean implements Serializable {
 
 	public void setNavigator(JsonObject navigator) {
 		this.navigator = navigator;
+	}
+
+	public boolean isPostScriptParamInvoked() {
+		return postScriptParamInvoked;
 	}
 
 }
