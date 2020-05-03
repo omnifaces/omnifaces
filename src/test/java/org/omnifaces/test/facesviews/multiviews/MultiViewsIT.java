@@ -62,7 +62,10 @@ public class MultiViewsIT extends OmniFacesIT {
 
 		guardHttp(formSubmit).click();
 		verify200("MultiViewsIT", "foo/42/bar/", "foo", "42");
+	}
 
+	@Test
+	public void testOtherPage() {
 		open("MultiViewsITOtherPage");
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage", "", "");
 
@@ -86,17 +89,44 @@ public class MultiViewsIT extends OmniFacesIT {
 
 		guardHttp(formSubmit).click();
 		verify200("MultiViewsITOtherPage", "MultiViewsITOtherPage/foo/42/bar/", "foo", "42");
+	}
 
+	@Test
+	public void testNonExistingPage() {
 		open("MultiViewsITNonExistingPage");
 		verify200("MultiViewsIT", "MultiViewsITNonExistingPage", "MultiViewsITNonExistingPage", "");
 
 		open("MultiViewsITNonExistingPage/");
 		verify200("MultiViewsIT", "MultiViewsITNonExistingPage/", "MultiViewsITNonExistingPage", "");
 
-		if (!isTomee()) { // MyFaces bugs on this case with NPE in getViewMetadataFacelet() --> resolveURL()
+		if (!isTomee()) { // MyFaces throws NPE on this and thus incorrectly returns 500 instead of 404.
 			open("MultiViewsITNonExistingPage.xhtml");
 			verify404("MultiViewsITNonExistingPage.xhtml");
 		}
+	}
+
+	@Test
+	public void testExcludedFolder() {
+		open("excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml");
+		verify200("MultiViewsITOtherPageInExcludedFolder", "excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml", "", "");
+
+		open("excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml/foo/42");
+		verify404("excludedfolder/MultiViewsITOtherPageInExcludedFolder.xhtml/foo/42");
+
+		open("excludedfolder/MultiViewsITOtherPageInExcludedFolder");
+		verify404("excludedfolder/MultiViewsITOtherPageInExcludedFolder");
+
+		open("excludedfolder/MultiViewsITOtherPageInExcludedFolder/");
+		verify404("excludedfolder/MultiViewsITOtherPageInExcludedFolder/");
+
+		open("excludedfolder/MultiViewsITOtherPageInExcludedFolder/foo/42");
+		verify404("excludedfolder/MultiViewsITOtherPageInExcludedFolder/foo/42");
+
+		open("excludedfolder/");
+		verify404("excludedfolder/");
+
+		open("excludedfolder/foo/42");
+		verify404("excludedfolder/foo/42");
 	}
 
 	private void verify200(String title, String path, String firstPathParam, String secondPathParam) {

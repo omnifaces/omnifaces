@@ -105,10 +105,22 @@ public class FacesViewsIT extends OmniFacesIT {
 		open("FacesViewsITNonExistingPage");
 		verify404("FacesViewsITNonExistingPage");
 
-		if (!isTomee()) { // MyFaces bugs on this case with NPE in getViewMetadataFacelet() --> resolveURL()
+		if (!isTomee()) { // MyFaces throws NPE on this and thus incorrectly returns 500 instead of 404.
 			open("FacesViewsITNonExistingPage.xhtml");
 			verify404("FacesViewsITNonExistingPage.xhtml");
 		}
+	}
+
+	@Test
+	public void testExcludedFolder() {
+		open("excludedfolder/FacesViewsITOtherPageInExcludedFolder.xhtml");
+		verify200("FacesViewsITOtherPageInExcludedFolder", "excludedfolder/FacesViewsITOtherPageInExcludedFolder.xhtml");
+
+		open("excludedfolder/FacesViewsITOtherPageInExcludedFolder");
+		verify404("excludedfolder/FacesViewsITOtherPageInExcludedFolder");
+
+		open("excludedfolder/FacesViewsITOtherPageInExcludedFolder/");
+		verify404("excludedfolder/FacesViewsITOtherPageInExcludedFolder/");
 	}
 
 	private void verify200(String title, String path) {
