@@ -2222,6 +2222,143 @@ public class ValidateValuesBean implements MultiFieldValidator {
 
 	<tag>
 		<description>
+			<![CDATA[
+				The <code>&lt;o:inputHidden&gt;</code> is a component that extends the standard <code>&lt;h:inputHidden&gt;</code>
+				and changes the behavior to immediately convert, validate and update during apply request values phase, regardless of
+				any conversion/validation errors on other <code>UIInput</code> components within the same form. The standard
+				<code>&lt;h:inputHidden&gt;</code> follows the same lifecycle as other <code>UIInput</code> components which is in
+				the end unintuive as hidden input fields are usually under control of the developer.
+			]]>
+		</description>
+		<tag-name>inputHidden</tag-name>
+		<component>
+			<component-type>org.omnifaces.component.input.InputHidden</component-type>
+		</component>
+		<attribute>
+			<description>
+				<![CDATA[
+					The component identifier for this component. This value must be unique within the closest parent
+					component that is a naming container.
+				]]>
+			</description>
+			<name>id</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					Flag indicating whether or not this component should be rendered (during Render Response Phase), or
+					processed on any subsequent form submit. The default value for this property is true.
+				]]>
+			</description>
+			<name>rendered</name>
+			<required>false</required>
+			<type>boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+					The <code>ValueExpression</code> linking this component to a property in a backing bean.
+				]]>
+			</description>
+			<name>binding</name>
+			<required>false</required>
+			<type>javax.faces.component.UIComponent</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[The current value of this component.]]>
+			</description>
+			<name>value</name>
+			<required>false</required>
+			<type>java.lang.Object</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[Converter instance	registered with	this component.]]>
+			</description>
+			<name>converter</name>
+			<required>false</required>
+			<type>javax.faces.convert.Converter</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[A ValueExpression enabled attribute that, if present, will	be
+				used as	the	text of	the	converter message, replacing any message
+				that comes from	the	converter.]]>
+			</description>
+			<name>converterMessage</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[Flag indicating that this component's value must be
+				converted and validated	immediately	(that is, during
+				Apply Request Values phase), rather	than waiting
+				until Process Validations phase.]]>
+			</description>
+			<name>immediate</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[Flag indicating that the user is required to provide a	submitted
+				value for this input component.]]>
+			</description>
+			<name>required</name>
+			<required>false</required>
+			<type>java.lang.Boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[A ValueExpression enabled attribute that, if present, will	be
+				used as	the	text of	the	validation message for the "required"
+				facility, if the "required"	facility is	used.]]>
+			</description>
+			<name>requiredMessage</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[MethodExpression representing a validator method that will	be called
+				during Process Validations to perform correctness checks on	the
+				value of this component.  The expression must evaluate to a	public
+				method that	takes FacesContext,	UIComponent, and Object	parameters,
+				with a return type of void.]]>
+			</description>
+			<name>validator</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
+				
+				MethodExpression representing a	value change listener method
+				that will be notified when a new value has been	set	for	this
+				input component.  The expression must evaluate to a	public
+				method that	takes a	<code>ValueChangeEvent</code> parameter,
+				with a return type of void,	<span class="changed_added_2_0">or
+				to a public	method that	takes no arguments with	a return type
+				of void.  In the latter	case, the method has no	way	of easily
+				knowing	what the new value is, but this	can	be useful in cases
+				where a	notification is	needed that	"this value
+				changed".</span>
+				
+				]]>
+			</description>
+			<name>valueChangeListener</name>
+			<required>false</required>
+			<type>java.lang.String</type>
+		</attribute>
+	</tag>
+
+	<tag>
+		<description>
 				<![CDATA[
 					<strong>ViewParameter</strong> is a component that extends the standard <code>UIViewParameter</code> and provides a
 					stateless mode of operation and fixes the issue wherein null model values are converted to empty string parameters
