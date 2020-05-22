@@ -129,8 +129,9 @@ import org.omnifaces.util.Faces;
  *
  * @author Bauke Scholtz
  * @since 3.6
- * @see Faces#getScriptParameters()
+ * @see OnloadParam
  * @see PostScriptParam
+ * @see Faces#getScriptParameters()
  */
 @FacesComponent(ScriptParam.COMPONENT_TYPE)
 public class ScriptParam extends OnloadParam {

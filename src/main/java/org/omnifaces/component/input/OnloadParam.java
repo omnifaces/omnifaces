@@ -155,7 +155,7 @@ public abstract class OnloadParam extends UIViewParameter {
 		validate(context);
 
 		if (isValid()) {
-			super.updateModel(context);
+			updateModel(context);
 		}
 		else {
 			setValid(true); // Don't leave OnloadParam in an invalid state for next postback as it would block processing of regular forms.
@@ -180,7 +180,7 @@ public abstract class OnloadParam extends UIViewParameter {
 	 * This override which does effectively nothing prevents JSF from performing update during non-onloadparam postbacks.
 	 */
 	@Override
-	public void updateModel(FacesContext context) {
+	public void processUpdates(FacesContext context) {
 		// NOOP.
 	}
 
