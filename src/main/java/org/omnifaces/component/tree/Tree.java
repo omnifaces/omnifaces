@@ -226,14 +226,14 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 */
 	@Override
 	public boolean visitTree(VisitContext context, VisitCallback callback) {
+		if (!isVisitable(context)) {
+			return false;
+		}
+
 		TreeModel model = getModel(PhaseId.ANY_PHASE);
 
 		if (model.isLeaf()) {
 			return super.visitTree(context, callback);
-		}
-
-		if (!isVisitable(context)) {
-			return false;
 		}
 
 		return process(context.getFacesContext(), model, () -> {
@@ -249,6 +249,11 @@ public class Tree extends TreeFamily implements NamingContainer {
 
 			return false;
 		});
+	}
+
+	@Override
+	protected boolean isVisitable(VisitContext context) {
+		return super.isVisitable(context) && !context.getHints().contains(VisitHint.SKIP_ITERATION);
 	}
 
 	/**
