@@ -72,6 +72,7 @@ enum WebXmlSingleton implements WebXml {
 	// Private constants ----------------------------------------------------------------------------------------------
 
 	private static final String WEB_XML = "/WEB-INF/web.xml";
+	private static final String WEB_QUARKUS_XML = "/META-INF/web.xml";
 	private static final String WEB_FRAGMENT_XML = "META-INF/web-fragment.xml";
 
 	private static final String XPATH_WELCOME_FILE =
@@ -294,7 +295,13 @@ enum WebXmlSingleton implements WebXml {
 	 */
 	private static Document loadWebXml(ServletContext context) throws IOException, SAXException {
 		List<URL> webXmlURLs = new ArrayList<>();
-		webXmlURLs.add(context.getResource(WEB_XML));
+		URL webXml = context.getResource(WEB_XML);
+		if (webXml == null) {
+			webXml = context.getResource(WEB_QUARKUS_XML);
+		}
+		if (webXml != null) {
+			webXmlURLs.add(webXml);
+		}
 		webXmlURLs.addAll(Collections.list(Thread.currentThread().getContextClassLoader().getResources(WEB_FRAGMENT_XML)));
 		return createDocument(webXmlURLs);
 	}
