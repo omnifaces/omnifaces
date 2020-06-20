@@ -53,7 +53,10 @@ OmniFaces.Util = (function(window, document) {
 	 * @param {function} listener The function to be invoked during window load event.
 	 */
 	self.addOnloadListener = function(listener) {
-		if (document.readyState === "complete") {
+		if (window.jQuery) {
+			jQuery(listener);
+		}
+		else if (document.readyState === "complete") {
 			setTimeout(listener);
 		}
 		else if (window.addEventListener || window.attachEvent) {
@@ -190,8 +193,10 @@ OmniFaces.Util = (function(window, document) {
 			}
 		}
 
-		beginFunction();
-		head.insertBefore(script, null); // IE6 has trouble with appendChild.
+		self.addOnloadListener(function() {
+			beginFunction();
+			head.insertBefore(script, null); // IE6 has trouble with appendChild.
+		});
 	}
 
 	// Private static functions ---------------------------------------------------------------------------------------
