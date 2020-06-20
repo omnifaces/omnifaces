@@ -276,6 +276,20 @@ public final class Strings {
 	}
 
 	/**
+	 * Remove XML tags from a string and return only plain text.
+	 * 
+	 * @param text Text with XML tags
+	 * @return The string without XML tags
+	 */
+	public static String stripTags(String text) {
+		if (text == null || text.isEmpty()) {
+			return "";
+		}
+
+		return text.replaceAll("\\<.*?\\>", "").replaceAll("\\s+", " ").trim();
+	}
+
+	/**
 	 * The main string format method taking varargs.
 	 */
 	private static String format(String pattern, Object... params) {
