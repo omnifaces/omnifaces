@@ -18,6 +18,15 @@ import org.junit.Test;
 import org.omnifaces.el.functions.Strings;
 
 public class TestStrings {
+
+	@Test
+	public void testPrettyURL() {
+		String textWithDiacritics = "TO͇̹ͅNȳ̳ TH̘Ë͖́̉ ͠P̯͍̭O̚N̐Y̡ H̸̡̪̯ͨ͊̽̅̾̎Ȩ̬̩̾͛ͪ̈́̀́͘ ̶̧̨̱̹̭̯ͧ̾ͬC̷̙̲̝͖ͭ̏ͥͮ͟Oͮ͏̮̪̝͍M̲̖͊̒ͪͩͬ̚̚͜Ȇ̴̟̟͙̞ͩ͌͝S̨̥̫͎̭ͯ̿̔̀ͅ";
+		String expectedText = "tony-the-pony-he-comes";
+
+        assertEquals(expectedText, Strings.prettyURL(textWithDiacritics));
+	}
+
     @Test
     public void testStripTags() {
         String textWithTags = "<div><p>Text with <strong>lots</strong> of "
@@ -28,4 +37,5 @@ public class TestStrings {
 
         assertEquals(expectedText, Strings.stripTags(textWithTags));
     }
+
 }
