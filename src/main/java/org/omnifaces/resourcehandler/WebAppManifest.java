@@ -122,7 +122,7 @@ public abstract class WebAppManifest {
 	}
 
 	/**
-	 * Enumeration of related application platforms.
+	 * Enumeration of related application platforms, to be used in {@link RelatedApplication#of(Platform, String)}.
 	 * @see <a href="https://github.com/w3c/manifest/wiki/Platforms">https://github.com/w3c/manifest/wiki/Platforms</a>
 	 */
 	protected enum Platform {
