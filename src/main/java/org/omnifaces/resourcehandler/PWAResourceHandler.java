@@ -425,7 +425,7 @@ public class PWAResourceHandler extends DefaultResourceHandler {
 			return null;
 		}
 
-		return resource.getRequestPath().replaceAll("([?&])v=.*?([&#]|$)", "$2");
+		return resource.getRequestPath().replaceAll("([?&])v=.*?([&#]|$)", "$2"); // Strips the v= parameter indicating the cache bust version.
 	}
 
 }
