@@ -30,9 +30,9 @@ var offlineResource = $offlineResource;
  * Add all cacheable resources.
  */
 self.addEventListener("install", function(event) {
-    event.waitUntil(caches.open(cacheName).then(function(event) {
-   		return event.addAll(cacheableResources);
-    }));
+	event.waitUntil(caches.open(cacheName).then(function(event) {
+		return event.addAll(cacheableResources);
+	}));
 });
 
 /**
