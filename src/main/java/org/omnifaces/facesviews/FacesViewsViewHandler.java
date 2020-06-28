@@ -120,7 +120,7 @@ public class FacesViewsViewHandler extends ViewHandlerWrapper {
 			String[] uriAndRest = actionURL.split("(?=[?#;])", 2);
 			String uri = stripWelcomeFilePrefix(servletContext, removeExtensionIfNecessary(servletContext, uriAndRest[0], viewId));
 			String rest = uriAndRest.length > 1 ? uriAndRest[1] : "";
-			String pathInfo = context.getViewRoot().getViewId().equals(viewId) ? coalesce(getRequestPathInfo(context), "") : "";
+			String pathInfo = context.getViewRoot() != null && context.getViewRoot().getViewId().equals(viewId) ? coalesce(getRequestPathInfo(context), "") : "";
 			return (pathInfo.isEmpty() ? uri : (stripTrailingSlash(uri) + pathInfo)) + rest;
 		}
 

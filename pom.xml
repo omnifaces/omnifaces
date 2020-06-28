@@ -253,6 +253,7 @@
 								<jsSourceFile>form.unminified.js</jsSourceFile>
 								<jsSourceFile>hashparam.unminified.js</jsSourceFile>
 								<jsSourceFile>scriptparam.unminified.js</jsSourceFile>
+								<jsSourceFile>sw-register.unminified.js</jsSourceFile>
 							</jsSourceFiles>
 							<jsFinalFile>omnifaces.js</jsFinalFile>
 						</configuration>
@@ -268,6 +269,18 @@
 								<jsSourceFile>fixviewstate.unminified.js</jsSourceFile>
 							</jsSourceFiles>
 							<jsFinalFile>fixviewstate.js</jsFinalFile>
+						</configuration>
+						<goals>
+							<goal>minify</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>minify-sw</id>
+						<configuration>
+							<jsSourceFiles>
+								<jsSourceFile>sw.unminified.js</jsSourceFile>
+							</jsSourceFiles>
+							<jsFinalFile>sw.js</jsFinalFile>
 						</configuration>
 						<goals>
 							<goal>minify</goal>
