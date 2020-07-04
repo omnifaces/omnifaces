@@ -48,7 +48,7 @@ import org.omnifaces.cdi.config.WebXmlProducer;
  * boolean accessAllowed = WebXml.instance().isAccessAllowed("/admin.xhtml", "admin");
  * </pre>
  * <pre>
- * // Get web.xml configured session timeout (in seconds).
+ * // Get web.xml configured session timeout (in minutes).
  * int sessionTimeout = WebXml.instance().getSessionTimeout();
  * </pre>
  * <p>

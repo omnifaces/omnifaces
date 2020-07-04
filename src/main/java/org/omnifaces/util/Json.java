@@ -70,6 +70,7 @@ public final class Json {
 	 * adjusted.
 	 * @return The JSON-encoded representation of the given object.
 	 * @throws IllegalArgumentException When the given object or one of its properties cannot be inspected as a bean.
+	 * @since 3.6
 	 */
 	public static String encode(Object object, UnaryOperator<String> propertyNameFormatter) {
 		StringBuilder builder = new StringBuilder();

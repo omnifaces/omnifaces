@@ -212,6 +212,17 @@
 		<function-signature>java.lang.String format5(java.lang.String, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object, java.lang.Object)</function-signature>
 	</function>
 
+	<function>
+		<description>
+			<![CDATA[
+				Remove XML tags from a given text and return plain text.
+			]]>
+		</description>
+		<function-name>stripTags</function-name>
+		<function-class>org.omnifaces.el.functions.Strings</function-class>
+		<function-signature>java.lang.String stripTags(java.lang.String)</function-signature>
+	</function>
+
 	<!-- Arrays =================================================================================================== -->
 
 	<function>

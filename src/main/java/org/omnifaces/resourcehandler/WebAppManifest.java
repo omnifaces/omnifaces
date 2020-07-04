@@ -16,7 +16,9 @@ import static java.util.Arrays.stream;
 import static java.util.Collections.emptySet;
 import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toSet;
 import static org.omnifaces.util.FacesLocal.createResource;
+import static org.omnifaces.util.ResourcePaths.addLeadingSlashIfNecessary;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.formatURLWithQueryString;
 import static org.omnifaces.util.Utils.openConnection;
@@ -25,19 +27,23 @@ import java.net.URLConnection;
 import java.util.Collection;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 
 import jakarta.faces.application.Resource;
+import jakarta.faces.application.ViewHandler;
 import jakarta.faces.context.FacesContext;
 
+import org.omnifaces.config.WebXml;
 import org.omnifaces.util.Faces;
+import org.omnifaces.util.FacesLocal;
 
 /**
  * <p>
- * Please refer to {@link WebAppManifestResourceHandler} for usage instructions.
+ * Please refer to {@link PWAResourceHandler} for usage instructions.
  *
  * @author Bauke Scholtz
  * @since 3.6
- * @see WebAppManifestResourceHandler
+ * @see PWAResourceHandler
  */
 public abstract class WebAppManifest {
 
@@ -122,7 +128,7 @@ public abstract class WebAppManifest {
 	}
 
 	/**
-	 * Enumeration of related application platforms.
+	 * Enumeration of related application platforms, to be used in {@link RelatedApplication#of(Platform, String)}.
 	 * @see <a href="https://github.com/w3c/manifest/wiki/Platforms">https://github.com/w3c/manifest/wiki/Platforms</a>
 	 */
 	protected enum Platform {
@@ -139,6 +145,11 @@ public abstract class WebAppManifest {
 			return value;
 		}
 	}
+
+
+	// Properties -----------------------------------------------------------------------------------------------------
+
+	private Collection<String> cacheableViewIds;
 
 
 	// Required -------------------------------------------------------------------------------------------------------
@@ -201,6 +212,41 @@ public abstract class WebAppManifest {
 	 */
 	public String getStartUrl() {
 		return Faces.getRequestBaseURL();
+	}
+
+	/**
+	 * Returns a collection of JSF view IDs which should be cached via the service worker so that they are available offline.
+	 * The default implementation returns JSF view IDs derived from {@link WebXml#getWelcomeFiles()}.
+	 * If this method returns an empty collection, then no service worker will be generated.
+	 * @return A collection of JSF view IDs which should be cached via the service worker so that they are available offline.
+	 * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Offline_Service_workers">https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Offline_Service_workers</a>
+	 * @since 3.7
+	 */
+	protected Collection<String> getCacheableViewIds() {
+		if (cacheableViewIds == null) {
+			FacesContext context = Faces.getContext();
+			String contextPath = FacesLocal.getRequestContextPath(context);
+
+			Set<String> welcomeFileURLs = WebXml.instance().getWelcomeFiles().stream().map(welcomeFile -> contextPath + addLeadingSlashIfNecessary(welcomeFile)).collect(toSet());
+			welcomeFileURLs.add(contextPath + "/");
+
+			ViewHandler viewHandler = context.getApplication().getViewHandler();
+			cacheableViewIds = viewHandler.getViews(context, "/").filter(viewId -> welcomeFileURLs.contains(viewHandler.getActionURL(context, viewId))).collect(toSet());
+		}
+
+		return cacheableViewIds;
+	}
+
+	/**
+	 * Returns the JSF view ID which should represent the "You're offline!" error page.
+	 * The default implementation returns <code>null</code>, meaning that there is no such one.
+	 * If {@link #getCacheableViewIds()} returns an empty collection, then this method will be ignored.
+	 * @return the JSF view ID which should represent the "You're offline!" error page.
+	 * @see <a href="https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Offline_Service_workers">https://developer.mozilla.org/en-US/docs/Web/Progressive_web_apps/Offline_Service_workers</a>
+	 * @since 3.7
+	 */
+	protected String getOfflineViewId() {
+		return null;
 	}
 
 

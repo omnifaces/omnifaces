@@ -18,6 +18,7 @@ import static org.omnifaces.util.Utils.isEmpty;
 import java.text.MessageFormat;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
+import java.util.regex.Pattern;
 
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.Utils;
@@ -32,6 +33,13 @@ import org.omnifaces.util.Utils;
  * @author Bauke Scholtz
  */
 public final class Strings {
+
+	// Constants ------------------------------------------------------------------------------------------------------
+
+	private static final Pattern PATTERN_DIACRITICAL_MARKS = Pattern.compile("\\p{InCombiningDiacriticalMarks}+");
+	private static final Pattern PATTERN_NON_ALPHANUMERIC_CHARS = Pattern.compile("[^\\p{Alnum}]+");
+	private static final Pattern PATTERN_XML_TAGS = Pattern.compile("\\<.*?\\>");
+	private static final Pattern PATTERN_MULTIPLE_SPACES = Pattern.compile("\\s\\s+");
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -160,9 +168,11 @@ public final class Strings {
 			return null;
 		}
 
-		return Normalizer.normalize(string.toLowerCase(), Form.NFD)
-			.replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
-			.replaceAll("[^\\p{Alnum}]+", "-");
+		String normalized = Normalizer.normalize(string.toLowerCase(), Form.NFD);
+		String withoutDiacriticalMarks = PATTERN_DIACRITICAL_MARKS.matcher(normalized).replaceAll("");
+		String hyphenizated = PATTERN_NON_ALPHANUMERIC_CHARS.matcher(withoutDiacriticalMarks).replaceAll("-");
+
+		return hyphenizated;
 	}
 
 	/**
@@ -196,6 +206,23 @@ public final class Strings {
 	 */
 	public static String escapeJS(String string) {
 		return Utils.escapeJS(string, true);
+	}
+
+	/**
+	 * Remove XML tags from a string and return only plain text.
+	 * @param string The string with XML tags.
+	 * @return The string without XML tags.
+	 * @since 3.7
+	 */
+	public static String stripTags(String string) {
+		if (string == null || string.isEmpty()) {
+			return string;
+		}
+
+		String withoutTags = PATTERN_XML_TAGS.matcher(string).replaceAll("");
+		String whitespaceCollapsed = PATTERN_MULTIPLE_SPACES.matcher(withoutTags).replaceAll(" ").trim();
+
+		return whitespaceCollapsed;
 	}
 
 	/**
