@@ -676,53 +676,53 @@ public final class Components {
 	}
 
 	/**
-	 * Add given JavaScript code as inline script to end of body of the current view.
-	 * Note: this doesn't have any effect during ajax postbacks. Rather use {@link Ajax#oncomplete(String...)} instead.
-	 * @param script JavaScript code to be added as inline script to end of body of the current view.
-	 * @return The created script component.
-	 * @since 2.2
+	 * Add given JavaScript code to the current view which is to be executed as an inline script when the rendering is
+	 * completed. When the current request is {@link Faces#isAjaxRequestWithPartialRendering()}, then it will delegate
+	 * to {@link Ajax#oncomplete(String...)}, else it will add given JavaScript code as inline script to end of body.
+	 * @param script JavaScript code which is to be executed as an inline script.
+	 * @since 3.6
 	 */
-	public static UIComponent addScriptToBody(String script) {
-		UIOutput outputScript = createScriptResource();
-		UIOutput content = new UIOutput();
-		content.setValue(script);
-		outputScript.getChildren().add(content);
-		return addComponentResource(outputScript, "body");
+	public static void addScript(String script) {
+		if (isAjaxRequestWithPartialRendering()) {
+			oncomplete(script);
+		}
+		else {
+			UIOutput outputScript = createScriptResource();
+			UIOutput content = new UIOutput();
+			content.setValue(script);
+			outputScript.getChildren().add(content);
+			addComponentResource(outputScript, "body");
+		}
 	}
 
 	/**
-	 * Add given JavaScript resource to end of body of the current view.
-	 * Note: this doesn't have any effect during non-@all ajax postbacks. Rather use {@link Ajax#load(String, String)} instead.
+	 * Add given JavaScript resource to the current view. This will first check if the resource isn't already rendered
+	 * as per {@link ResourceHandler#isResourceRendered(FacesContext, String, String)}. If not, then continue as below:
+	 * <ul>
+	 * <li>When the current request is a {@link Faces#isAjaxRequestWithPartialRendering()}, then it will delegate to
+	 * {@link Ajax#load(String, String)}.</li>
+	 * <li>Else when the <code>&lt;h:head&gt;</code> has not yet been rendered, then add given JavaScript resource to
+	 * head.</li>
+	 * <li>Else add given JavaScript resource to end of the <code>&lt;h:body&gt;</code>.</li>
+	 * </ul>
 	 * @param libraryName Library name of the JavaScript resource.
 	 * @param resourceName Resource name of the JavaScript resource.
-	 * @return The created script component resource.
-	 * @since 2.2
-	 * @deprecated since 3.6, use {@link #addScriptResource(String, String)} instead as this will automatically detect
-	 * already-added resources, non-@all ajax postbacks and rendering state and pick the most optimal approach to add
-	 * the JavaScript resource.
+	 * @since 3.6
 	 */
-	@Deprecated
-	public static UIComponent addScriptResourceToBody(String libraryName, String resourceName) {
-		return addScriptResourceToTarget(libraryName, resourceName, "body");
-	}
+	public static void addScriptResource(String libraryName, String resourceName) {
+		FacesContext context = FacesContext.getCurrentInstance();
 
-	/**
-	 * Add given JavaScript resource to end of head of the current view.
-	 * Note: this doesn't have any effect during non-@all ajax postbacks, nor during render response phase when the
-	 * <code>&lt;h:head&gt;</code> has already been encoded. During non-@all ajax postbacks, rather use
-	 * {@link Ajax#load(String, String)} instead, or during render response, rather use
-	 * {@link #addScriptResourceToBody(String, String)} instead.
-	 * @param libraryName Library name of the JavaScript resource.
-	 * @param resourceName Resource name of the JavaScript resource.
-	 * @return The created script component resource.
-	 * @since 2.2
-	 * @deprecated since 3.6, use {@link #addScriptResource(String, String)} instead as this will automatically detect
-	 * already-added resources, non-@all ajax postbacks and rendering state and pick the most optimal approach to add
-	 * the JavaScript resource.
-	 */
-	@Deprecated
-	public static UIComponent addScriptResourceToHead(String libraryName, String resourceName) {
-		return addScriptResourceToTarget(libraryName, resourceName, "head");
+		if (!context.getApplication().getResourceHandler().isResourceRendered(context, resourceName, libraryName)) {
+			if (isAjaxRequestWithPartialRendering(context)) {
+				load(libraryName, resourceName);
+			}
+			else if (context.getCurrentPhaseId() != RENDER_RESPONSE || TRUE.equals(context.getAttributes().get(IS_BUILDING_INITIAL_STATE))) {
+				addScriptResourceToTarget(libraryName, resourceName, "head");
+			}
+			else {
+				addScriptResourceToTarget(libraryName, resourceName, "body");
+			}
+		}
 	}
 
 	private static UIOutput createScriptResource() {
@@ -761,52 +761,6 @@ public final class Components {
 
 		context.getViewRoot().addComponentResource(context, resource, target);
 		return resource;
-	}
-
-	/**
-	 * Add given JavaScript code to the current view which is to be executed as an inline script when the rendering is
-	 * completed. When the current request is {@link Faces#isAjaxRequestWithPartialRendering()}, then it will delegate
-	 * to {@link Ajax#oncomplete(String...)}, else it will add given JavaScript code as inline script to end of body.
-	 * @param script JavaScript code which is to be executed as an inline script.
-	 * @since 3.6
-	 */
-	public static void addScript(String script) {
-		if (isAjaxRequestWithPartialRendering()) {
-			oncomplete(script);
-		}
-		else {
-			addScriptToBody(script);
-		}
-	}
-
-	/**
-	 * Add given JavaScript resource to the current view. This will first check if the resource isn't already rendered
-	 * as per {@link ResourceHandler#isResourceRendered(FacesContext, String, String)}. If not, then continue as below:
-	 * <ul>
-	 * <li>When the current request is a {@link Faces#isAjaxRequestWithPartialRendering()}, then it will delegate to
-	 * {@link Ajax#load(String, String)}.</li>
-	 * <li>Else when the <code>&lt;h:head&gt;</code> has not yet been rendered, then add given JavaScript resource to
-	 * head.</li>
-	 * <li>Else add given JavaScript resource to end of the <code>&lt;h:body&gt;</code>.</li>
-	 * </ul>
-	 * @param libraryName Library name of the JavaScript resource.
-	 * @param resourceName Resource name of the JavaScript resource.
-	 * @since 3.6
-	 */
-	public static void addScriptResource(String libraryName, String resourceName) {
-		FacesContext context = FacesContext.getCurrentInstance();
-
-		if (!context.getApplication().getResourceHandler().isResourceRendered(context, resourceName, libraryName)) {
-			if (isAjaxRequestWithPartialRendering(context)) {
-				load(libraryName, resourceName);
-			}
-			else if (context.getCurrentPhaseId() != RENDER_RESPONSE || TRUE.equals(context.getAttributes().get(IS_BUILDING_INITIAL_STATE))) {
-				addScriptResourceToHead(libraryName, resourceName);
-			}
-			else {
-				addScriptResourceToBody(libraryName, resourceName);
-			}
-		}
 	}
 
 	// Building / rendering -------------------------------------------------------------------------------------------
