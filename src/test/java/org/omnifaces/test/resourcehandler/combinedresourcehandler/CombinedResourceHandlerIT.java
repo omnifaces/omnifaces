@@ -12,8 +12,10 @@
  */
 package org.omnifaces.test.resourcehandler.combinedresourcehandler;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.jboss.arquillian.graphene.Graphene.guardHttp;
+import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import static org.junit.Assert.assertEquals;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withCombinedResourceHandler;
 import static org.omnifaces.util.Utils.serializeURLSafe;
@@ -115,6 +117,8 @@ public class CombinedResourceHandlerIT extends OmniFacesIT {
 	}
 
 	private void verifyElements() {
+		waitGui(browser).withTimeout(3, SECONDS).until().element(deferredInBody).text().not().equalTo(""); // Wait until last o:deferredScript is finished.
+
 		assertEquals(2, combinedResources.size());
 		assertEquals(HEAD_COMBINED_RESOURCE_NAME, combinedResources.get(0).getAttribute("src").split("(.*/javax.faces.resource/)|(\\.js\\.xhtml.*)")[1]);
 		assertEquals(DEFERRED_COMBINED_RESOURCE_NAME, combinedResources.get(1).getAttribute("src").split("(.*/javax.faces.resource/)|(\\.js\\.xhtml.*)")[1]);
