@@ -12,6 +12,7 @@
  */
 package org.omnifaces.taghandler;
 
+import static java.text.MessageFormat.format;
 import static java.util.logging.Level.SEVERE;
 import static javax.faces.component.visit.VisitHint.SKIP_UNRENDERED;
 import static javax.faces.event.PhaseId.PROCESS_VALIDATIONS;
@@ -31,6 +32,7 @@ import static org.omnifaces.util.Facelets.getBoolean;
 import static org.omnifaces.util.Facelets.getString;
 import static org.omnifaces.util.Facelets.getValueExpression;
 import static org.omnifaces.util.Faces.getELContext;
+import static org.omnifaces.util.Faces.getMessageBundle;
 import static org.omnifaces.util.Faces.renderResponse;
 import static org.omnifaces.util.Faces.validationFailed;
 import static org.omnifaces.util.FacesLocal.evaluateExpressionGet;
@@ -52,6 +54,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -66,6 +69,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.PostValidateEvent;
 import javax.faces.event.PreValidateEvent;
 import javax.faces.event.SystemEventListener;
+import javax.faces.validator.BeanValidator;
 import javax.faces.validator.Validator;
 import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagConfig;
@@ -520,7 +524,7 @@ public class ValidateBean extends TagHandler {
 				context.validationFailed();
 				input.setValid(false);
 				String clientId = input.getClientId(context);
-				addError(clientId, violation.getValue(), getLabel(input));
+				addError(clientId, formatMessage(violation.getValue(), getLabel(input)));
 				clientIds.remove(clientId);
 				remainingViolations.remove(violation.getKey());
 			}});
@@ -574,7 +578,7 @@ public class ValidateBean extends TagHandler {
 		}
 		else if ("@global".equals(showMessagesFor)) {
 			for (String message : violations.values()) {
-				addGlobalError(message, labels);
+				addGlobalError(formatMessage(message, labels));
 			}
 		}
 		else {
@@ -586,8 +590,24 @@ public class ValidateBean extends TagHandler {
 
 	private static void addErrors(String clientId, Map<String, String> violations, String labels) {
 		for (String message : violations.values()) {
-			addError(clientId, message, labels);
+			addError(clientId, formatMessage(message, labels));
 		}
+	}
+
+	private static String formatMessage(String message, String label) {
+		if (!isEmpty(label)) {
+			ResourceBundle messageBundle = getMessageBundle();
+
+			if (messageBundle != null) {
+				String pattern = messageBundle.getString(BeanValidator.MESSAGE_ID);
+
+				if (pattern != null) {
+					return format(pattern, message, label);
+				}
+			}
+		}
+
+		return message;
 	}
 
 	// Nested classes -------------------------------------------------------------------------------------------------
