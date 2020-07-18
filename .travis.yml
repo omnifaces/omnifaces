@@ -9,15 +9,18 @@ cache:
 # Do build on specified branches only.
 branches:
    only:
+   - 4.x
    - 3.x
    - 2.x
    - 1.1x
 
 # Do integration test on configured servers.
 env:
-   - SERVER=wildfly
-   - SERVER=tomee
-   - SERVER=payara
+   - SERVER=glassfish
+#  - SERVER=tomcat
+#  - SERVER=wildfly
+#  - SERVER=tomee
+#  - SERVER=payara
 script: mvn verify -Dmaven.javadoc.skip=true -P $SERVER
 
 # Do snapshot deployment.
@@ -27,7 +30,7 @@ deploy:
    skip_cleanup: true
    on:
       all_branches: true
-      condition: "$SERVER = wildfly"
+      condition: "$SERVER = glassfish"
 
 # Do static analysis on Sonar.
 addons:

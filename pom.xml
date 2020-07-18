@@ -60,7 +60,7 @@
 	<properties>
 
 		<!-- Java versions. -->
-		<javase.version>11</javase.version>
+		<javase.version>1.8</javase.version> <!-- Unfortunately, JEE9 has switched back from Java 11 to Java 1.8 during the step from 9.0.0-RC1 to 9.0.0-RC2 -->
 		<jakartaee.version>9</jakartaee.version>
 
 		<!-- Essential Maven defaults. -->
@@ -71,7 +71,8 @@
 		<maven.source.excludeResources>true</maven.source.excludeResources>
 
 		<!-- Test server versions. -->
-		<test.tomcat.version>10.0.0-M4</test.tomcat.version>
+		<test.glassfish.version>6.0.0-M1</test.glassfish.version>
+		<test.tomcat.version>10.0.0-M4</test.tomcat.version> <!-- TODO: weld-servlet-shaded 4.x -->
 		<test.wildfly.version>19.0.0.Final</test.wildfly.version> <!-- TODO: JEE9 compatible version -->
 		<test.tomee.version>8.0.1</test.tomee.version> <!-- TODO: JEE9 compatible version -->
 		<test.payara.version>5.201</test.payara.version> <!-- TODO: JEE9 compatible version -->
@@ -89,19 +90,19 @@
 		<dependency>
 			<groupId>jakarta.enterprise</groupId>
 			<artifactId>jakarta.enterprise.cdi-api</artifactId>
-			<version>3.0.0-M2</version>
+			<version>3.0.0-M3</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.validation</groupId>
 			<artifactId>jakarta.validation-api</artifactId>
-			<version>3.0.0-M1</version>
+			<version>3.0.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>jakarta.servlet</groupId>
 			<artifactId>jakarta.servlet-api</artifactId>
-			<version>5.0.0-M1</version>
+			<version>5.0.0-M2</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -113,7 +114,7 @@
 		<dependency>
 			<groupId>jakarta.websocket</groupId>
 			<artifactId>jakarta.websocket-api</artifactId>
-			<version>2.0.0-M1</version>
+			<version>2.0.0-RC1</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -121,7 +122,7 @@
 		<dependency>
 			<groupId>jakarta.platform</groupId>
 			<artifactId>jakarta.jakartaee-web-api</artifactId>
-			<version>9.0.0-RC1</version>
+			<version>9.0.0-RC2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -442,12 +443,82 @@
 		<!-- below sections, then you need to add a default lifecycle mapping as instructed in M2E documentation: -->
 		<!-- https://www.eclipse.org/m2e/documentation/m2e-execution-not-covered.html#common-problems -->
 
-		<!-- Tomcat integration test profile: mvn verify -P tomcat -->
+		<!-- GlassFish integration test profile: mvn verify -P glassfish -->
 		<profile>
-			<id>tomcat</id>
+			<id>glassfish</id>
 			<activation>
 				<activeByDefault>true</activeByDefault>
 			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>org.jboss.arquillian.container</groupId>
+					<artifactId>arquillian-glassfish-managed-6</artifactId>
+					<version>1.0.0.Alpha1</version>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.glassfish.main.distributions</groupId>
+											<artifactId>glassfish</artifactId>
+											<version>${test.glassfish.version}</version>
+											<type>zip</type>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-resources-plugin</artifactId>
+						<version>3.1.0</version>
+						<executions>
+							<execution>
+								<id>update-internal-api</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${project.build.directory}/glassfish6/glassfish/modules</outputDirectory>
+									<resources>
+										<resource>
+											<directory>${project.basedir}/src/test/resources/glassfish</directory>
+											<includes>
+												<include>internal-api.jar</include> <!-- Patched version with correct OSGI version in MANIFEST.MF -->
+											</includes>
+										</resource>
+									</resources>
+									<overwrite>true</overwrite>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<environmentVariables>
+								<GLASSFISH_HOME>${project.build.directory}/glassfish6</GLASSFISH_HOME>
+							</environmentVariables>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!-- Tomcat integration test profile: mvn verify -P tomcat -->
+		<profile>
+			<id>tomcat</id>
 			<dependencies>
 				<dependency>
 					<groupId>org.jboss.arquillian.container</groupId>
@@ -504,7 +575,7 @@
 										<artifactItem>
 											<groupId>org.jboss.weld.servlet</groupId>
 											<artifactId>weld-servlet-shaded</artifactId>
-											<version>???</version>
+											<version>4.x</version>
 											<type>jar</type>
 											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
 										</artifactItem>
