@@ -30,8 +30,8 @@
 	<h:head />
 
 	<h:body>
-		<h:outputText id="pageLoadTimestamp" value="#{now.time}" />
-		<h:panelGroup id="scriptLoadTimestamp"><h:outputText value="#{now.time}" rendered="#{scriptParamITBean.postScriptParamInvoked}" /></h:panelGroup>
+		<h:outputText id="pageLoadTimestamp" value="#{now.toEpochMilli()}" />
+		<h:panelGroup id="scriptLoadTimestamp"><h:outputText value="#{now.toEpochMilli()}" rendered="#{scriptParamITBean.postScriptParamInvoked}" /></h:panelGroup>
 		
 		<h:outputText id="clientTimeZoneOffset" value="#{scriptParamITBean.clientTimeZoneOffset}" />
 		<h:outputText id="appName" value="#{scriptParamITBean.navigator.getString('appName')}" />
