@@ -26,7 +26,7 @@
 
 	<h:body>
 		<o:form id="validateByCommand">
-			<h:inputText id="input" value="#{validateBeanITDefaultBean.input}" />
+			<h:inputText id="input" label="inputLabel" value="#{validateBeanITDefaultBean.input}" />
 
 			<f:ajax execute="@form" render=":messages">
 				<h:commandButton id="validateDefaultByCommand" action="#{validateBeanITDefaultBean.action}" />
@@ -44,21 +44,21 @@
 
 		<o:form id="validateByInput" partialSubmit="false"> <!-- TODO: fails in MyFaces on second onchange request. -->
 			<f:ajax execute="@this" listener="#{validateBeanITDefaultBean.action()}" render=":messages">
-				<h:inputText id="validateDefaultByInput" value="#{validateBeanITDefaultBean.input}" />
-				<h:inputText id="validateGroupByInput" value="#{validateBeanITDefaultBean.input}">
+				<h:inputText id="validateDefaultByInput" label="validateDefaultByInputLabel" value="#{validateBeanITDefaultBean.input}" />
+				<h:inputText id="validateGroupByInput" label="validateGroupByInputLabel" value="#{validateBeanITDefaultBean.input}">
 					<o:validateBean validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup" />
 				</h:inputText>
-				<h:inputText id="validateDefaultAndGroupByInput" value="#{validateBeanITDefaultBean.input}">
+				<h:inputText id="validateDefaultAndGroupByInput" label="validateDefaultAndGroupByInputLabel" value="#{validateBeanITDefaultBean.input}">
 					<o:validateBean validationGroups="jakarta.validation.groups.Default,org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup" />
 				</h:inputText>
-				<h:inputText id="validateDisabledByInput" value="#{validateBeanITDefaultBean.input}">
+				<h:inputText id="validateDisabledByInput" label="validateDisabledByInputLabel" value="#{validateBeanITDefaultBean.input}">
 					<o:validateBean disabled="true" />
 				</h:inputText>
 			</f:ajax>
 		</o:form>
 
 		<o:form id="validateDefaultWithMessageForViolating">
-			<h:inputText id="input" value="#{validateBeanITDefaultBean.input}" />
+			<h:inputText id="input" label="inputLabel" value="#{validateBeanITDefaultBean.input}" />
 			<h:message id="inputMessage" for="input" />
 			<h:message id="formMessage" for="validateDefaultWithMessageForViolating" />
 
@@ -69,8 +69,8 @@
 		</o:form>
 
 		<o:form id="validateClassLevelDefault">
-			<h:inputText id="number1" value="#{validateBeanITClassLevelBean.entity.number1}" />
-			<h:inputText id="number2" value="#{validateBeanITClassLevelBean.entity.number2}" />
+			<h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
+			<h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
 
 			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
 				<f:ajax execute="@form" render=":messages" />
@@ -81,8 +81,8 @@
 		</o:form>
 
 		<o:form id="validateClassLevelActual">
-			<h:inputText id="number1" value="#{validateBeanITClassLevelBean.entity.number1}" />
-			<h:inputText id="number2" value="#{validateBeanITClassLevelBean.entity.number2}" />
+			<h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
+			<h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
 
 			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
 				<f:ajax execute="@form" render=":messages" />
@@ -94,8 +94,8 @@
 		</o:form>
 
 		<o:form id="validateClassLevelByCopier">
-			<h:inputText id="number1" value="#{validateBeanITClassLevelBean.entity.number1}" />
-			<h:inputText id="number2" value="#{validateBeanITClassLevelBean.entity.number2}" />
+			<h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
+			<h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
 
 			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
 				<f:ajax execute="@form" render=":messages" />
@@ -107,8 +107,8 @@
 		</o:form>
 
 		<o:form id="validateClassLevelWithMessageForForm">
-			<h:inputText id="number1" value="#{validateBeanITClassLevelBean.entity.number1}" />
-			<h:inputText id="number2" value="#{validateBeanITClassLevelBean.entity.number2}" />
+			<h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
+			<h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
 
 			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
 				<f:ajax execute="@form" render="formMessage :messages" />
@@ -122,9 +122,9 @@
 		</o:form>
 
 		<o:form id="validateClassLevelWithMessageForAll">
-			<h:inputText id="number1" value="#{validateBeanITClassLevelBean.entity.number1}" />
+			<h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
 			<h:message id="number1Message" for="number1" />
-			<h:inputText id="number2" value="#{validateBeanITClassLevelBean.entity.number2}" />
+			<h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
 			<h:message id="number2Message" for="number2" />
 
 			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
@@ -137,8 +137,8 @@
 		</o:form>
 
 		<o:form id="validateClassLevelWithMessageForGlobal">
-			<h:inputText id="number1" value="#{validateBeanITClassLevelBean.entity.number1}" />
-			<h:inputText id="number2" value="#{validateBeanITClassLevelBean.entity.number2}" />
+			<h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
+			<h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
 
 			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
 				<f:ajax execute="@form" render="globalMessage" />
@@ -152,9 +152,9 @@
 		</o:form>
 
 		<o:form id="validateClassLevelWithMessageForViolating">
-			<h:inputText id="number1" value="#{validateBeanITClassLevelBean.entity.number1}" />
+			<h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
 			<h:message id="number1Message" for="number1" />
-			<h:inputText id="number2" value="#{validateBeanITClassLevelBean.entity.number2}" />
+			<h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
 			<h:message id="number2Message" for="number2" />
 
 			<h:message id="formMessage" for="validateClassLevelWithMessageForViolating" />

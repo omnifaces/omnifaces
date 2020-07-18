@@ -22,7 +22,7 @@
  * @see PWAResourceHandler
  * @see <a href="https://css-tricks.com/serviceworker-for-offline/">https://css-tricks.com/serviceworker-for-offline/</a>
  */
-var cacheName = "omnifaces.3.7"; // Should be bumped every time this sw.unminified.js logic is changed.
+var cacheName = "omnifaces.3.7.1"; // Should be bumped every time this sw.unminified.js logic is changed.
 var cacheableResources = $cacheableResources;
 var offlineResource = $offlineResource;
 
@@ -70,32 +70,35 @@ self.addEventListener("fetch", function(event) {
 	}
 
 	if (method == "GET") {
-		event.respondWith(caches.match(url).then(function(cached) {
-			return fetch(request).then(fetchedFromNetwork, unableToResolve).catch(unableToResolve);
+		var navigated = event.request.mode == "navigate";
+		var resource = url.indexOf("/javax.faces.resource/") > -1;
 
-			function fetchedFromNetwork(response) {
-				sendOnlineEvent();
+		if (navigated || resource) {
+			event.respondWith(caches.match(url).then(function(cached) {
+				var fetched = fetch(request).then(fetchedFromNetwork, unableToResolve).catch(unableToResolve);
+				return navigated ? fetched : (cached || fetched);
 
-				var cachedResponse = response.clone();
-
-				caches.open(cacheName).then(function add(cache) {
-					cache.put(url, cachedResponse);
-				});
-				
-				return response;
-			}
-			
-			function unableToResolve(error) {
-				sendOfflineEvent(error);
-
-				if (offlineResource && url.indexOf("/javax.faces.resource/") == -1) {
-					return caches.match(offlineResource);
+				function fetchedFromNetwork(response) {
+					if (navigated) {
+						sendOnlineEvent();
+					}
+					
+					return response;
 				}
-				else {
+				
+				function unableToResolve(error) {
+					if (navigated) {
+						sendOfflineEvent(error);
+						
+						if (offlineResource) {
+							return caches.match(offlineResource);
+						}
+					}
+					
 					return cached;
 				}
-			}
-		}));
+			}));
+		}
 	}
 	else if (method == "POST") { // Do not cache! Merely check if online or offline. This works with JSF because its POST requests are by default postback.
 		fetch(url).then(sendOnlineEvent, sendOfflineEvent).catch(sendOfflineEvent);
