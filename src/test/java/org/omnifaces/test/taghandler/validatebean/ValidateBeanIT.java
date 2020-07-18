@@ -14,6 +14,7 @@ package org.omnifaces.test.taghandler.validatebean;
 
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withMessageBundle;
 
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -193,12 +194,12 @@ public class ValidateBeanIT extends OmniFacesIT {
 			.withFacesConfig(withMessageBundle)
 			.createDeployment();
 	}
-/*
+
 	@Test
 	public void validateByCommand() {
 		input.sendKeys("x");
 		guardAjax(validateDefaultByCommand).click();
-		assertEquals("default", messages.getText());
+		assertEquals("inputLabel: default", messages.getText());
 
 		input.clear();
 		input.sendKeys("xx");
@@ -208,7 +209,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		input.clear();
 		input.sendKeys("x");
 		guardAjax(validateGroupByCommand).click();
-		assertEquals("group", messages.getText());
+		assertEquals("inputLabel: group", messages.getText());
 
 		input.clear();
 		input.sendKeys("xx");
@@ -219,7 +220,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		input.sendKeys("x");
 		guardAjax(validateDefaultAndGroupByCommand).click();
 		String message = messages.getText();
-		assertTrue(message.contains("default") && message.contains("group")); // It's unordered.
+		assertTrue(message.contains("inputLabel: default") && message.contains("inputLabel: group")); // It's unordered.
 
 		input.clear();
 		input.sendKeys("xx");
@@ -241,7 +242,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 	public void validateByInput() {
 		validateDefaultByInput.sendKeys("x");
 		triggerOnchange(validateDefaultByInput, messages);
-		assertEquals("default", messages.getText());
+		assertEquals("validateDefaultByInputLabel: default", messages.getText());
 
 		validateDefaultByInput.clear();
 		validateDefaultByInput.sendKeys("xx");
@@ -250,7 +251,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 
 		validateGroupByInput.sendKeys("x");
 		triggerOnchange(validateGroupByInput, messages);
-		assertEquals("group", messages.getText());
+		assertEquals("validateGroupByInputLabel: group", messages.getText());
 
 		validateGroupByInput.clear();
 		validateGroupByInput.sendKeys("xx");
@@ -260,7 +261,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		validateDefaultAndGroupByInput.sendKeys("x");
 		triggerOnchange(validateDefaultAndGroupByInput, messages);
 		String message = messages.getText();
-		assertTrue(message.contains("default") && message.contains("group")); // It's unordered.
+		assertTrue(message.contains("validateDefaultAndGroupByInputLabel: default") && message.contains("validateDefaultAndGroupByInputLabel: group")); // It's unordered.
 
 		validateDefaultAndGroupByInput.clear();
 		validateDefaultAndGroupByInput.sendKeys("xx");
@@ -276,12 +277,12 @@ public class ValidateBeanIT extends OmniFacesIT {
 		triggerOnchange(validateDisabledByInput, messages);
 		assertEquals("actionSuccess", messages.getText());
 	}
-*/
+
 	@Test
 	public void validateDefaultWithMessageForViolating() {
 		validateDefaultWithMessageForViolatingInput.sendKeys("x");
 		guardAjax(validateDefaultWithMessageForViolatingCommand).click();
-		assertEquals("default", validateDefaultWithMessageForViolatingInputMessage.getText());
+		assertEquals("inputLabel: default", validateDefaultWithMessageForViolatingInputMessage.getText());
 		assertEquals("", validateDefaultWithMessageForViolatingFormMessage.getText()); // Should NOT equal "may not be null" coming from @NotNull unused.
 
 		validateDefaultWithMessageForViolatingInput.clear();
@@ -289,13 +290,13 @@ public class ValidateBeanIT extends OmniFacesIT {
 		guardAjax(validateDefaultWithMessageForViolatingCommand).click();
 		assertEquals("actionSuccess", messages.getText());
 	}
-/*
+
 	@Test
 	public void validateClassLevelDefault() {
 		validateClassLevelDefaultNumber1.sendKeys("2");
 		validateClassLevelDefaultNumber2.sendKeys("1");
 		guardAjax(validateClassLevelDefaultCommand).click();
-		assertEquals("invalidEntity", messages.getText());
+		assertEquals("number1Label, number2Label: invalidEntity", messages.getText());
 
 		validateClassLevelDefaultNumber2.sendKeys("0");
 		guardAjax(validateClassLevelDefaultCommand).click();
@@ -319,7 +320,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		validateClassLevelByCopierNumber1.sendKeys("2");
 		validateClassLevelByCopierNumber2.sendKeys("1");
 		guardAjax(validateClassLevelByCopierCommand).click();
-		assertEquals("invalidEntity", messages.getText());
+		assertEquals("number1Label, number2Label: invalidEntity", messages.getText());
 
 		validateClassLevelByCopierNumber2.sendKeys("0");
 		guardAjax(validateClassLevelByCopierCommand).click();
@@ -331,7 +332,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		validateClassLevelWithMessageForFormNumber1.sendKeys("2");
 		validateClassLevelWithMessageForFormNumber2.sendKeys("1");
 		guardAjax(validateClassLevelWithMessageForFormCommand).click();
-		assertEquals("invalidEntity", validateClassLevelWithMessageForFormMessage.getText());
+		assertEquals("number1Label, number2Label: invalidEntity", validateClassLevelWithMessageForFormMessage.getText());
 
 		validateClassLevelWithMessageForFormNumber2.sendKeys("0");
 		guardAjax(validateClassLevelWithMessageForFormCommand).click();
@@ -343,8 +344,8 @@ public class ValidateBeanIT extends OmniFacesIT {
 		validateClassLevelWithMessageForAllNumber1.sendKeys("2");
 		validateClassLevelWithMessageForAllNumber2.sendKeys("1");
 		guardAjax(validateClassLevelWithMessageForAllCommand).click();
-		assertEquals("invalidEntity", validateClassLevelWithMessageForAllNumber1Message.getText());
-		assertEquals("invalidEntity", validateClassLevelWithMessageForAllNumber2Message.getText());
+		assertEquals("number1Label, number2Label: invalidEntity", validateClassLevelWithMessageForAllNumber1Message.getText());
+		assertEquals("number1Label, number2Label: invalidEntity", validateClassLevelWithMessageForAllNumber2Message.getText());
 
 		validateClassLevelWithMessageForAllNumber2.sendKeys("0");
 		guardAjax(validateClassLevelWithMessageForAllCommand).click();
@@ -357,7 +358,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		validateClassLevelWithMessageForGlobalNumber1.sendKeys("2");
 		validateClassLevelWithMessageForGlobalNumber2.sendKeys("1");
 		guardAjax(validateClassLevelWithMessageForGlobalCommand).click();
-		assertEquals("invalidEntity", validateClassLevelWithMessageForGlobalMessage.getText());
+		assertEquals("number1Label, number2Label: invalidEntity", validateClassLevelWithMessageForGlobalMessage.getText());
 
 		validateClassLevelWithMessageForGlobalNumber2.sendKeys("0");
 		guardAjax(validateClassLevelWithMessageForGlobalCommand).click();
@@ -369,7 +370,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		validateClassLevelWithMessageForViolatingNumber1.sendKeys("2");
 		validateClassLevelWithMessageForViolatingNumber2.sendKeys("1");
 		guardAjax(validateClassLevelWithMessageForViolatingCommand).click();
-		assertEquals("invalidEntity", validateClassLevelWithMessageForViolatingNumber1Message.getText());
+		assertEquals("number1Label: invalidEntity", validateClassLevelWithMessageForViolatingNumber1Message.getText());
 		assertEquals("", validateClassLevelWithMessageForViolatingNumber2Message.getText());
 		assertEquals("", validateClassLevelWithMessageForViolatingFormMessage.getText());
 		assertEquals("", messages.getText());
@@ -387,7 +388,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		validateClassLevelWithInputEntityCompositeNumber1.sendKeys("2");
 		validateClassLevelWithInputEntityCompositeNumber2.sendKeys("1");
 		guardAjax(validateClassLevelWithInputEntityCompositeCommand).click();
-		assertEquals("invalidEntity", validateClassLevelWithInputEntityCompositeNumber1Message.getText());
+		assertEquals("number1Label: invalidEntity", validateClassLevelWithInputEntityCompositeNumber1Message.getText());
 		assertEquals("", validateClassLevelWithInputEntityCompositeNumber2Message.getText());
 		assertEquals("", validateClassLevelWithInputEntityCompositeFormMessage.getText());
 		assertEquals("", messages.getText());
@@ -405,7 +406,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		validateClassLevelWithFormEntityCompositeNumber1.sendKeys("2");
 		validateClassLevelWithFormEntityCompositeNumber2.sendKeys("1");
 		guardAjax(validateClassLevelWithFormEntityCompositeCommand).click();
-		assertEquals("invalidEntity", validateClassLevelWithFormEntityCompositeNumber1Message.getText());
+		assertEquals("number1Label: invalidEntity", validateClassLevelWithFormEntityCompositeNumber1Message.getText());
 		assertEquals("", validateClassLevelWithFormEntityCompositeNumber2Message.getText());
 		assertEquals("", validateClassLevelWithFormEntityCompositeFormMessage.getText());
 		assertEquals("", messages.getText());
@@ -417,5 +418,5 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("", validateClassLevelWithFormEntityCompositeFormMessage.getText());
 		assertEquals("actionSuccess", messages.getText());
 	}
-*/
+
 }
