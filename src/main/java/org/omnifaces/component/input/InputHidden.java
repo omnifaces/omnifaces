@@ -42,7 +42,7 @@ import jakarta.faces.context.FacesContext;
  * would only move the conversion/validation into the apply request values phase. The model still won't be updated on
  * time.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * You can use it the same way as <code>&lt;h:inputHidden&gt;</code>, you only need to change <code>h:</code> into
  * <code>o:</code> to get the "immediate v2.0" behavior.
