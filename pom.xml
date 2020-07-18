@@ -78,6 +78,14 @@
 		<test.payara.version>5.201</test.payara.version> <!-- TODO: JEE9 compatible version -->
 	</properties>
 
+	<repositories>
+		<repository>
+			<id>jakarta-staging</id>
+			<snapshots />
+			<url>https://jakarta.oss.sonatype.org/content/repositories/staging</url> <!-- Currently only used for jersey-bom:pom:3.0.0-M4 which is required by GlassFish 6.0.0.M1 -->
+		</repository>
+	</repositories>
+
 	<dependencies>
 
 		<!-- Jakarta EE 9 dependencies. -->
