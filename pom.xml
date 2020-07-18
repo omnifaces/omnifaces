@@ -11,7 +11,7 @@
 
 	<groupId>org.omnifaces</groupId>
 	<artifactId>omnifaces</artifactId>
-	<version>4.0-SNAPSHOT</version>
+	<version>4.0-M1</version>
 	<packaging>jar</packaging>
 
 	<name>OmniFaces</name>
