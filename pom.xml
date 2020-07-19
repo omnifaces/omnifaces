@@ -82,7 +82,7 @@
 		<repository>
 			<id>jakarta-staging</id>
 			<snapshots />
-			<url>https://jakarta.oss.sonatype.org/content/repositories/staging</url> <!-- Currently only used for jersey-bom:pom:3.0.0-M4 which is required by GlassFish 6.0.0.M1 -->
+			<url>https://jakarta.oss.sonatype.org/content/repositories/staging</url> <!-- Currently only used for jersey-bom:pom:3.0.0-M4 which is required by GlassFish 6.0.0.M1 and the updated jakarta-faces-3.0.0-RC3 -->
 		</repository>
 	</repositories>
 
@@ -483,6 +483,26 @@
 									</artifactItems>
 								</configuration>
 							</execution>
+							<execution>
+								<id>upgrade-jsf-in-glassfish</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.glassfish</groupId>
+											<artifactId>jakarta.faces</artifactId>
+											<version>3.0.0-RC3</version>
+											<type>jar</type>
+											<outputDirectory>${project.build.directory}/glassfish6/glassfish/modules</outputDirectory>
+											<destFileName>jakarta.faces.jar</destFileName>
+											<overWrite>true</overWrite>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
 						</executions>
 					</plugin>
 					<plugin>
@@ -497,7 +517,6 @@
 									<goal>copy-resources</goal>
 								</goals>
 								<configuration>
-									<outputDirectory>${project.build.directory}/glassfish6/glassfish/modules</outputDirectory>
 									<resources>
 										<resource>
 											<directory>${project.basedir}/src/test/resources/glassfish</directory>
@@ -506,6 +525,7 @@
 											</includes>
 										</resource>
 									</resources>
+									<outputDirectory>${project.build.directory}/glassfish6/glassfish/modules</outputDirectory>
 									<overwrite>true</overwrite>
 								</configuration>
 							</execution>
