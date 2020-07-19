@@ -128,7 +128,7 @@ public abstract class WebAppManifest {
 	}
 
 	/**
-	 * Enumeration of related application platforms, to be used in {@link RelatedApplication#of(Platform, String)}.
+	 * Enumeration of related application platforms, to be used in {@link RelatedApplication#getPlatform()}.
 	 * @see <a href="https://github.com/w3c/manifest/wiki/Platforms">https://github.com/w3c/manifest/wiki/Platforms</a>
 	 */
 	protected enum Platform {
@@ -413,7 +413,7 @@ public abstract class WebAppManifest {
 	}
 
 	/**
-	 * To be used in {@link ImageResource#of(String, Size...)}.
+	 * To be used in {@link ImageResource#getSizes()}.
 	 */
 	protected static final class Size {
 
