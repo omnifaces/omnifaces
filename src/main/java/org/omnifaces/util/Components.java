@@ -29,6 +29,7 @@ import static java.util.logging.Level.FINEST;
 import static java.util.regex.Pattern.quote;
 import static org.omnifaces.util.Ajax.load;
 import static org.omnifaces.util.Ajax.oncomplete;
+import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getELContext;
 import static org.omnifaces.util.Faces.getFaceletContext;
@@ -716,7 +717,10 @@ public final class Components {
 			if (isAjaxRequestWithPartialRendering(context)) {
 				load(libraryName, resourceName);
 			}
-			else if (context.getCurrentPhaseId() != RENDER_RESPONSE || TRUE.equals(context.getAttributes().get(IS_BUILDING_INITIAL_STATE))) {
+			else if (context.getCurrentPhaseId() != RENDER_RESPONSE) {
+				subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptResourceToTarget(libraryName, resourceName, "head"));
+			}
+			else if (TRUE.equals(context.getAttributes().get(IS_BUILDING_INITIAL_STATE))) {
 				addScriptResourceToTarget(libraryName, resourceName, "head");
 			}
 			else {
