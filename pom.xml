@@ -88,29 +88,11 @@
 
 	<dependencies>
 
-		<!-- Jakarta EE 9 dependencies. -->
+		<!-- Required Jakarta EE 9 dependencies. -->
 		<dependency>
 			<groupId>jakarta.faces</groupId>
 			<artifactId>jakarta.faces-api</artifactId>
 			<version>3.0.0-RC1</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>jakarta.enterprise</groupId>
-			<artifactId>jakarta.enterprise.cdi-api</artifactId>
-			<version>3.0.0-M3</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>jakarta.validation</groupId>
-			<artifactId>jakarta.validation-api</artifactId>
-			<version>3.0.0</version>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>jakarta.servlet</groupId>
-			<artifactId>jakarta.servlet-api</artifactId>
-			<version>5.0.0-M2</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
@@ -120,9 +102,29 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
+			<groupId>jakarta.servlet</groupId>
+			<artifactId>jakarta.servlet-api</artifactId>
+			<version>5.0.0-M2</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.enterprise</groupId>
+			<artifactId>jakarta.enterprise.cdi-api</artifactId>
+			<version>3.0.0-M3</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
 			<groupId>jakarta.websocket</groupId>
 			<artifactId>jakarta.websocket-api</artifactId>
 			<version>2.0.0-RC1</version>
+			<scope>provided</scope>
+		</dependency>
+
+		<!-- Optional Jakarta EE 9 dependencies. -->
+		<dependency>
+			<groupId>jakarta.validation</groupId>
+			<artifactId>jakarta.validation-api</artifactId>
+			<version>3.0.0</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -328,9 +330,7 @@
 					<splitindex>true</splitindex>
 					<doctitle>OmniFaces API documentation</doctitle>
 					<links>
-						<!-- TODO: this is not yet available. 
 						<link>https://jakarta.ee/specifications/platform/${jakartaee.version}/apidocs/</link>
-						 -->
 					</links>
 				</configuration>
 				<executions>
@@ -502,7 +502,7 @@
 										<resource>
 											<directory>${project.basedir}/src/test/resources/glassfish</directory>
 											<includes>
-												<include>internal-api.jar</include> <!-- Patched version with correct OSGI version in MANIFEST.MF -->
+												<include>internal-api.jar</include> <!-- Patched version with correct OSGI version in MANIFEST.MF, else it will fail when executing with a Java Agent. -->
 											</includes>
 										</resource>
 									</resources>
