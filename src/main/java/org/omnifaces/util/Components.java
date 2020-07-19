@@ -29,6 +29,7 @@ import static javax.faces.component.visit.VisitResult.ACCEPT;
 import static javax.faces.event.PhaseId.RENDER_RESPONSE;
 import static org.omnifaces.util.Ajax.load;
 import static org.omnifaces.util.Ajax.oncomplete;
+import static org.omnifaces.util.Events.subscribeToRequestBeforePhase;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getELContext;
 import static org.omnifaces.util.Faces.getFaceletContext;
@@ -803,7 +804,10 @@ public final class Components {
 			if (isAjaxRequestWithPartialRendering(context)) {
 				load(libraryName, resourceName);
 			}
-			else if (context.getCurrentPhaseId() != RENDER_RESPONSE || TRUE.equals(context.getAttributes().get(IS_BUILDING_INITIAL_STATE))) {
+			else if (context.getCurrentPhaseId() != RENDER_RESPONSE) {
+				subscribeToRequestBeforePhase(RENDER_RESPONSE, () -> addScriptResourceToHead(libraryName, resourceName));
+			}
+			else if (TRUE.equals(context.getAttributes().get(IS_BUILDING_INITIAL_STATE))) {
 				addScriptResourceToHead(libraryName, resourceName);
 			}
 			else {
