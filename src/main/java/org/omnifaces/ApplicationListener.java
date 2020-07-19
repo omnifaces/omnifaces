@@ -37,8 +37,8 @@ import org.omnifaces.util.cache.CacheInitializer;
  * OmniFaces application listener. This runs when the servlet context is created.
  * This performs the following tasks:
  * <ol>
- * <li>Check if JSF 2.3 is available, otherwise log and fail.
- * <li>Check if CDI 1.1 is available, otherwise log and fail.
+ * <li>Check if JSF 3.0 is available, otherwise log and fail.
+ * <li>Check if CDI 3.0 is available, otherwise log and fail.
  * <li>Load {@link Cache} provider and register its filter if necessary.
  * <li>Instantiate {@link Eager} application scoped beans and register {@link EagerBeansWebListener} if necessary.
  * <li>Add {@link FacesViews} mappings to FacesServlet if necessary.
@@ -60,12 +60,8 @@ public class ApplicationListener extends DefaultServletContextListener {
 
 	private static final String ERROR_JSF_API_UNAVAILABLE =
 		"JSF API is not available in this environment.";
-	private static final String ERROR_JSF_API_INCOMPATIBLE =
-		"JSF API of this environment is not JSF 2.3 compatible.";
 	private static final String ERROR_CDI_API_UNAVAILABLE =
 		"CDI API is not available in this environment.";
-	private static final String ERROR_CDI_API_INCOMPATIBLE =
-		"CDI API of this environment is not CDI 1.1 compatible.";
 	private static final String ERROR_CDI_IMPL_UNAVAILABLE =
 		"CDI BeanManager instance is not available in this environment.";
 
@@ -73,8 +69,8 @@ public class ApplicationListener extends DefaultServletContextListener {
 
 	@Override
 	public void contextInitialized(ServletContextEvent event) {
-		checkJSF23Available();
-		checkCDI11Available();
+		checkJSFAvailable();
+		checkCDIAvailable();
 
 		try {
 			ServletContext servletContext = event.getServletContext();
@@ -89,10 +85,10 @@ public class ApplicationListener extends DefaultServletContextListener {
 		}
 	}
 
-	private void checkJSF23Available() {
+	private void checkJSFAvailable() {
 		try {
 			checkJSFAPIAvailable();
-			checkJSF23Compatible();
+			// No need to explicitly check version here because the jakarta.* one is already guaranteed to be minimally 3.0.
 		}
 		catch (Exception | LinkageError e) {
 			logger.severe(""
@@ -100,19 +96,19 @@ public class ApplicationListener extends DefaultServletContextListener {
 				+ "\n█░▀░░░░▀█▀░░░░░░▀█░░░░░░▀█▀░░░░░▀█                                             ▐"
 				+ "\n█░░▐█▌░░█░░░██░░░█░░██░░░█░░░██░░█ OmniFaces failed to initialize!             ▐"
 				+ "\n█░░▐█▌░░█░░░██░░░█░░██░░░█░░░██░░█                                             ▐"
-				+ "\n█░░▐█▌░░█░░░██░░░█░░░░░░▄█░░▄▄▄▄▄█ OmniFaces 3.x requires JSF 2.3,             ▐"
+				+ "\n█░░▐█▌░░█░░░██░░░█░░░░░░▄█░░▄▄▄▄▄█ OmniFaces 4.x requires JSF 3.0,             ▐"
 				+ "\n█░░▐█▌░░█░░░██░░░█░░░░████░░░░░░░█ but none was found on this environment.     ▐"
-				+ "\n█░░░█░░░█▄░░░░░░▄█░░░░████▄░░░░░▄█ Downgrade to OmniFaces 2.x or 1.1x.         ▐"
+				+ "\n█░░░█░░░█▄░░░░░░▄█░░░░████▄░░░░░▄█ Downgrade to OmniFaces 2.x or 1.x.          ▐"
 				+ "\n████████████████████████████████████████████████████████████████████████████████"
 			);
 			throw e;
 		}
  	}
 
-	private void checkCDI11Available() {
+	private void checkCDIAvailable() {
 		try {
 			checkCDIAPIAvailable();
-			checkCDI11Compatible();
+			// No need to explicitly check version here because the jakarta.* one is already guaranteed to be minimally 3.0.
 			checkCDIImplAvailable();
 		}
 		catch (Exception | LinkageError e) {
@@ -124,11 +120,11 @@ public class ApplicationListener extends DefaultServletContextListener {
 				+ "\n▌   ▐█░██▓            ▓▓░░░▓▌    ▐ This OmniFaces version requires CDI,        ▐"
 				+ "\n▌   ▐█▌░▓██          █▓░░░░▓     ▐ but none was found on this environment.     ▐"
 				+ "\n▌    ▓█▌░░▓█▄███████▄███▓░▓█     ▐                                             ▐"
-				+ "\n▌    ▓██▌░▓██░░░░░░░░░░▓█░▓▌     ▐ OmniFaces 3.x requires a minimum of JSF 2.3.▐"
-				+ "\n▌     ▓█████░░░░░░░░░░░░▓██      ▐ Since this JSF version, the JSF managed bean▐"
-				+ "\n▌     ▓██▓░░░░░░░░░░░░░░░▓█      ▐ facility @ManagedBean is DEPRECATED in      ▐"
-				+ "\n▌     ▐█▓░░░░░░█▓░░▓█░░░░▓█▌     ▐ in favour of CDI and CDI has become a       ▐"
-				+ "\n▌     ▓█▌░▓█▓▓██▓░█▓▓▓▓▓░▓█▌     ▐ REQUIRED dependency for JSF 2.3.            ▐"
+				+ "\n▌    ▓██▌░▓██░░░░░░░░░░▓█░▓▌     ▐ OmniFaces 4.x requires a minimum of JSF 3.0.▐"
+				+ "\n▌     ▓█████░░░░░░░░░░░░▓██      ▐ Since JSF 2.3, the JSF managed bean facility▐"
+				+ "\n▌     ▓██▓░░░░░░░░░░░░░░░▓█      ▐ @ManagedBean is DEPRECATED in favour of CDI ▐"
+				+ "\n▌     ▐█▓░░░░░░█▓░░▓█░░░░▓█▌     ▐ and CDI has become a REQUIRED dependency for▐"
+				+ "\n▌     ▓█▌░▓█▓▓██▓░█▓▓▓▓▓░▓█▌     ▐ JSF.                                        ▐"
 				+ "\n▌     ▓▓░▓██████▓░▓███▓▓▌░█▓     ▐                                             ▐"
 				+ "\n▌    ▐▓▓░█▄▐▓▌█▓░░▓█▐▓▌▄▓░██     ▐                                             ▐"
 				+ "\n▌    ▓█▓░▓█▄▄▄█▓░░▓█▄▄▄█▓░██▌    ▐                                             ▐"
@@ -140,7 +136,7 @@ public class ApplicationListener extends DefaultServletContextListener {
 				+ "\n▌  ▐█▌░░░░░░░░▀░░░░░░▀░░░░░░█▓▌  ▐                                             ▐"
 				+ "\n▌  ▓█░░░░░░░░░░░░░░░░░░░░░░░██▓  ▐                                             ▐"
 				+ "\n▌  ▓█░░░░░░░░░░░░░░░░░░░░░░░▓█▓  ▐ You have 3 options:                         ▐"
-				+ "\n██████████████████████████████████ 1. Downgrade to OmniFaces 1.x.              ▐"
+				+ "\n██████████████████████████████████ 1. Downgrade to CDI-less OmniFaces 1.x.     ▐"
 				+ "\n█░▀░░░░▀█▀░░░░░░▀█░░░░░░▀█▀░░░░░▀█ 2. Install CDI in this environment.         ▐"
 				+ "\n█░░▐█▌░░█░░░██░░░█░░██░░░█░░░██░░█ 3. Switch to a CDI capable environment.     ▐"
 				+ "\n█░░▐█▌░░█░░░██░░░█░░██░░░█░░░██░░█                                             ▐"
@@ -164,30 +160,12 @@ public class ApplicationListener extends DefaultServletContextListener {
 		}
 	}
 
-	private static void checkJSF23Compatible() {
-		try {
-			toClass("jakarta.faces.annotation.FacesConfig");
-		}
-		catch (Exception | LinkageError e) {
-			throw new IllegalStateException(ERROR_JSF_API_INCOMPATIBLE, e);
-		}
-	}
-
 	private static void checkCDIAPIAvailable() {
 		try {
 			toClass("jakarta.enterprise.inject.spi.BeanManager");
 		}
 		catch (Exception | LinkageError e) {
 			throw new IllegalStateException(ERROR_CDI_API_UNAVAILABLE, e);
-		}
-	}
-
-	private static void checkCDI11Compatible() { // For now, until we really need CDI 2.0 features (scan for jakarta.enterprise.inject.spi.Prioritized then).
-		try {
-			toClass("jakarta.enterprise.inject.spi.CDI");
-		}
-		catch (Exception | LinkageError e) {
-			throw new IllegalStateException(ERROR_CDI_API_INCOMPATIBLE, e);
 		}
 	}
 
