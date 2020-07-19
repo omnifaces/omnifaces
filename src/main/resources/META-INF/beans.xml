@@ -18,7 +18,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/beans_2_0.xsd"
 	version="2.0" bean-discovery-mode="all"
->
+> <!-- TODO: Migrate to CDI 3.0 XSD once available. -->
 	<scan>
 		<exclude name="org.omnifaces.application.**" />
 		<exclude name="org.omnifaces.config.**" />
