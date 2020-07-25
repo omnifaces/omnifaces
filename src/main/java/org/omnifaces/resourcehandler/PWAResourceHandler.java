@@ -164,19 +164,19 @@ import org.omnifaces.util.Json;
  * welcome files from <code>web.xml</code> as cacheable resources which are also available offline. You can override
  * the welcome files with {@link WebAppManifest#getCacheableViewIds()}. E.g.
  * <pre>
- *     &#64;Override
- *     public Collection&lt;String&gt; getCacheableViewIds() {
- *         return Arrays.asList("/index.xhtml", "/contact.xhtml", "/support.xhtml");
- *     }
+ * &#64;Override
+ * public Collection&lt;String&gt; getCacheableViewIds() {
+ *     return Arrays.asList("/index.xhtml", "/contact.xhtml", "/support.xhtml");
+ * }
  * </pre>
  * <p>
  * In case you want to show a custom page as "You are offline!" error page, then you can specify it by overriding
  * the {@link WebAppManifest#getOfflineViewId()}.
  * <pre>
- *     &#64;Override
- *     public String getOfflineViewId() {
- *         return "/offline.xhtml";
- *     }
+ * &#64;Override
+ * public String getOfflineViewId() {
+ *     return "/offline.xhtml";
+ * }
  * </pre>
  * <p>
  * Whereby the <code>offline.xhtml</code> should contain something like this:
