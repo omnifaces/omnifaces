@@ -74,7 +74,7 @@
 		<test.glassfish.version>6.0.0-M1</test.glassfish.version>
 		<test.tomcat.version>10.0.0-M4</test.tomcat.version> <!-- TODO: weld-servlet-shaded 4.x -->
 		<test.wildfly.version>19.0.0.Final</test.wildfly.version> <!-- TODO: JEE9 compatible version -->
-		<test.tomee.version>8.0.1</test.tomee.version> <!-- TODO: JEE9 compatible version -->
+		<test.tomee.version>9.0.0-M1</test.tomee.version> <!-- TODO: JEE9 compatible version which supports jakarta.ee XML namespace (M1 unfortunately doesn't support it yet -->
 		<test.payara.version>5.201</test.payara.version> <!-- TODO: JEE9 compatible version -->
 	</properties>
 
@@ -706,7 +706,7 @@
 				<dependency>
 					<groupId>org.apache.tomee</groupId>
 					<artifactId>arquillian-tomee-remote</artifactId>
-					<version>${test.tomee.version}</version>
+					<version>8.0.3</version> <!-- TODO: TomEE 9 compatible version. The 8.0.3 seems to work fine with TomEE 9 wrt deploy but not wrt cleanup. -->
 					<scope>test</scope>
 				</dependency>
 			</dependencies>
@@ -720,7 +720,7 @@
 								<configuration>
 									<artifactItems>
 										<artifactItem>
-											<groupId>org.apache.tomee</groupId>
+											<groupId>org.apache.tomee.jakarta</groupId>
 											<artifactId>apache-tomee</artifactId>
 											<version>${test.tomee.version}</version>
 											<type>zip</type>
