@@ -30,8 +30,8 @@
 	<h:head />
 
 	<h:body>
-    	<h:outputText id="pageLoadTimestamp" value="#{now.toEpochMilli()}" />
-		<h:panelGroup id="hashLoadTimestamp"><h:outputText value="#{now.toEpochMilli()}" rendered="#{not empty hashParamITBean.foo}" /></h:panelGroup>
+    	<h:outputText id="pageLoadTimestamp" value="#{now.time}" />
+		<h:panelGroup id="hashLoadTimestamp"><h:outputText value="#{now.time}" rendered="#{not empty hashParamITBean.foo}" /></h:panelGroup>
 
     	<o:form id="form">
     		<h:inputText id="foo" value="#{hashParamITBean.foo}" />
