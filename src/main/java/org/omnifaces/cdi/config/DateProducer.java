@@ -26,7 +26,7 @@ import org.omnifaces.cdi.Eager;
  * Producer for <code>#{startup}</code> and <code>#{now}</code>.
  *
  * @author Bauke Scholtz
- * @since 3.5.1
+ * @since 3.6
  */
 public class DateProducer {
 
