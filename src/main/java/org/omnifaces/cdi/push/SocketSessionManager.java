@@ -136,12 +136,11 @@ public class SocketSessionManager {
 	 * with given channel identifier. The returned futures will return <code>null</code> on {@link Future#get()} if the
 	 * message was successfully delivered and otherwise throw {@link ExecutionException}.
 	 */
-	protected Set<Future<Void>> send(String channelId, Object message) {
+	protected Set<Future<Void>> send(String channelId, String message) {
 		Collection<Session> sessions = (channelId != null) ? socketSessions.get(channelId) : null;
 
 		if (sessions != null && !sessions.isEmpty()) {
 			Set<Future<Void>> results = new HashSet<>(sessions.size());
-			String json = Json.encode(message);
 
 			for (Session session : sessions) {
 				if (session.isOpen()) {
