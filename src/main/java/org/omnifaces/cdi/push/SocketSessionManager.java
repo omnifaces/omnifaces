@@ -41,7 +41,6 @@ import org.omnifaces.cdi.push.SocketEvent.Closed;
 import org.omnifaces.cdi.push.SocketEvent.Opened;
 import org.omnifaces.util.Beans;
 import org.omnifaces.util.Hacks;
-import org.omnifaces.util.Json;
 
 /**
  * <p>
@@ -126,23 +125,21 @@ public class SocketSessionManager {
 	}
 
 	/**
-	 * Encode the given message object as JSON and send it to all open web socket sessions associated with given web
-	 * socket channel identifier.
+	 * Send the given message to all open web socket sessions associated with given web socket channel identifier.
 	 * @param channelId The web socket channel identifier.
-	 * @param message The push message object.
+	 * @param message The push message string.
 	 * @return The results of the send operation. If it returns an empty set, then there was no open session associated
 	 * with given channel identifier. The returned futures will return <code>null</code> on {@link Future#get()} if the
 	 * message was successfully delivered and otherwise throw {@link ExecutionException}.
 	 */
-	protected Set<Future<Void>> send(String channelId, Object message) {
+	protected Set<Future<Void>> send(String channelId, String message) {
 		Collection<Session> sessions = (channelId != null) ? socketSessions.get(channelId) : null;
 
 		if (sessions != null && !sessions.isEmpty()) {
 			Set<Future<Void>> results = new HashSet<>(sessions.size());
-			String json = Json.encode(message);
 
 			for (Session session : sessions) {
-				send(session, json, results, 0);
+				send(session, message, results, 0);
 			}
 
 			return results;
