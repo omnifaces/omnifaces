@@ -85,13 +85,16 @@ public class SocketPushContext implements PushContext {
 	@Override
 	public <S extends Serializable> Map<S, Set<Future<Void>>> send(Object message, Collection<S> users) {
 		Map<S, Set<Future<Void>>> resultsByUser = new HashMap<>(users.size());
-
+		
+		//move json creation for avoiding create json string n-times about the collection size
+		String json = Json.encode(message);
+		
 		for (S user : users) {
 			Set<String> channelIds = socketUsers.getChannelIds(user, channel);
 			Set<Future<Void>> results = new HashSet<>(channelIds.size());
 
 			for (String channelId : channelIds) {
-				results.addAll(socketSessions.send(channelId, message));
+				results.addAll(socketSessions.send(channelId, json));
 			}
 
 			resultsByUser.put(user, results);
