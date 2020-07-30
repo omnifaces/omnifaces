@@ -30,6 +30,7 @@ import javax.enterprise.context.SessionScoped;
 
 import org.omnifaces.cdi.Push;
 import org.omnifaces.cdi.PushContext;
+import org.omnifaces.util.Json;
 
 /**
  * <p>
@@ -74,7 +75,8 @@ public class SocketPushContext implements PushContext {
 
 	@Override
 	public Set<Future<Void>> send(Object message) {
-		return socketSessions.send(getChannelId(channel, sessionScopedChannels, viewScopedChannels), message);
+		String json = Json.encode(message);
+		return socketSessions.send(getChannelId(channel, sessionScopedChannels, viewScopedChannels), json);
 	}
 
 	@Override

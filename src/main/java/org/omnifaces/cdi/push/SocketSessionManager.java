@@ -144,7 +144,7 @@ public class SocketSessionManager {
 
 			for (Session session : sessions) {
 				if (session.isOpen()) {
-					results.add(send(session, json, true));
+					results.add(send(session, message, true));
 				}
 			}
 
