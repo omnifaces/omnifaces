@@ -12,8 +12,6 @@
  */
 package org.omnifaces.cdi.viewscope;
 
-import static jakarta.faces.application.StateManager.IS_BUILDING_INITIAL_STATE;
-import static jakarta.faces.event.PhaseId.RENDER_RESPONSE;
 import static java.lang.String.format;
 import static java.util.logging.Level.FINEST;
 import static org.omnifaces.config.OmniFaces.OMNIFACES_EVENT_PARAM_NAME;

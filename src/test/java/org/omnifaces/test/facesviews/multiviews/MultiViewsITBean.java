@@ -13,7 +13,6 @@
 package org.omnifaces.test.facesviews.multiviews;
 
 import jakarta.enterprise.context.RequestScoped;
-import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import org.omnifaces.cdi.Param;
