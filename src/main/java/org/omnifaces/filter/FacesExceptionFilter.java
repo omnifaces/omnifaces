@@ -119,7 +119,8 @@ public class FacesExceptionFilter extends HttpFilter {
 		}
 		catch (Throwable exception) {
 			request.setAttribute(EXCEPTION_UUID, UUID.randomUUID().toString());
-			String location = WebXml.instance().findErrorPageLocation(exception);
+			Throwable cause = exception instanceof ServletException ? exception.getCause() : exception;
+			String location = WebXml.instance().findErrorPageLocation(cause);
 			logException(request, exception, location, LOG_EXCEPTION_HANDLED, location);
 			throw exception;
 		}
