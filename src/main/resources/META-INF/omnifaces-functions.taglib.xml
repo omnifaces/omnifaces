@@ -137,6 +137,17 @@
 	<function>
 		<description>
 			<![CDATA[
+				Base64-encode the given string using UTF-8. This is useful for cases where you need to create data URLs.
+			]]>
+		</description>
+		<function-name>encodeBase64</function-name>
+		<function-class>org.omnifaces.el.functions.Strings</function-class>
+		<function-signature>java.lang.String encodeBase64(java.lang.String)</function-signature>
+	</function>
+
+	<function>
+		<description>
+			<![CDATA[
 				Escapes the given string according the JavaScript code rules. This escapes among others the special
 				characters, the whitespace, the quotes and the unicode characters. Useful whenever you want to use a
 				Java string variable as a JavaScript string variable.

@@ -12,12 +12,14 @@
  */
 package org.omnifaces.el.functions;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.omnifaces.util.Faces.getLocale;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.text.MessageFormat;
 import java.text.Normalizer;
 import java.text.Normalizer.Form;
+import java.util.Base64;
 import java.util.regex.Pattern;
 
 import org.omnifaces.util.Faces;
@@ -26,7 +28,8 @@ import org.omnifaces.util.Utils;
 /**
  * <p>
  * Collection of EL functions for string manipulation: <code>of:abbreviate()</code>, <code>of:capitalize()</code>, <code>of:concat()</code>,
- * <code>of:prettyURL()</code>, <code>of:encodeURL()</code>, <code>of:escapeJS()</code>,  <code>of:stripTags()</code> and <code>of:formatX()</code>.
+ * <code>of:prettyURL()</code>, <code>of:encodeURL()</code>, <code>of:encodeURI()</code>, <code>of:encodeBase64()</code>,
+ * <code>of:escapeJS()</code>,  <code>of:stripTags()</code> and <code>of:formatX()</code>.
  * <p>
  * Instead of <code>of:formatX()</code>, you can also use <code>&lt;o:outputFormat&gt;</code>.
  *
@@ -195,6 +198,20 @@ public final class Strings {
 	 */
 	public static String encodeURI(String string) {
 		return Utils.encodeURI(string);
+	}
+
+	/**
+	 * Base64-encode the given string. This is useful for cases where you need to create data URLs.
+	 * @param string The string to be Base64-encoded.
+	 * @return The Base64-encoded string.
+	 * @since 3.8
+	 */
+	public static String encodeBase64(String string) {
+		if (string == null) {
+			return null;
+		}
+
+		return Base64.getEncoder().encodeToString(string.getBytes(UTF_8));
 	}
 
 	/**
