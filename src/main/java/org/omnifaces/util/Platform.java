@@ -12,20 +12,12 @@
  */
 package org.omnifaces.util;
 
-import static java.util.stream.Collectors.toMap;
-
 import java.util.Collection;
 import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
 
 import jakarta.faces.webapp.FacesServlet;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletRegistration;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
 
 /**
  * This class provides access to (Java EE 6) platform services from the view point of JSF.
@@ -42,79 +34,6 @@ public final class Platform {
 
 	private Platform() {
 		// Hide constructor.
-	}
-
-
-	// Bean Validation ------------------------------------------------------------------------------------------------
-
-	/**
-	 * Returns <code>true</code> if Bean Validation is available. This is remembered in the application scope.
-	 * @return <code>true</code> if Bean Validation is available.
-	 * @deprecated Since 3.8. Bean Validation utilities are migrated to {@link Validators}.
-	 * Use {@link Validators#isBeanValidationAvailable()} instead.
-	 */
-	@Deprecated
-	public static boolean isBeanValidationAvailable() {
-		return Validators.isBeanValidationAvailable();
-	}
-
-	/**
-	 * Returns the default bean validator factory. This is remembered in the application scope.
-	 * @return The default bean validator factory.
-	 * @deprecated Since 3.8. Bean Validation utilities are migrated to {@link Validators}.
-	 * Use {@link Validators#getBeanValidatorFactory()} instead.
-	 */
-	@Deprecated
-	public static ValidatorFactory getBeanValidatorFactory() {
-		return Validators.getBeanValidatorFactory();
-	}
-
-	/**
-	 * Returns the bean validator which is aware of the JSF locale.
-	 * @return The bean validator which is aware of the JSF locale.
-	 * @see Faces#getLocale()
-	 * @deprecated Since 3.8. Bean Validation utilities are migrated to {@link Validators}.
-	 * Use {@link Validators#getBeanValidator()} instead.
-	 */
-	@Deprecated
-	public static Validator getBeanValidator() {
-		return Validators.getBeanValidator();
-	}
-
-	/**
-	 * Validate given bean on given group classes
-	 * and return constraint violation messages mapped by property path.
-	 * @param bean Bean to be validated.
-	 * @param groups Bean validation groups, if any.
-	 * @return Constraint violation messages mapped by property path.
-	 * @since 2.7
-	 * @deprecated Since 3.8. This method should have returned actual constraint violations instead of abstracting them.
-	 * Use {@link Validators#validateBean(Object, Class...)} instead.
-	 */
-	@Deprecated
-	public static Map<String, String> validateBean(Object bean, Class<?>... groups) {
-		return mapViolationMessagesByPropertyPath(Validators.validateBean(bean, groups));
-	}
-
-	/**
-	 * Validate given value as if it were a property of the given bean type
-	 * and return constraint violation messages mapped by property path.
-	 * @param beanType Type of target bean.
-	 * @param propertyName Name of property on target bean.
-	 * @param value Value to be validated.
-	 * @param groups Bean validation groups, if any.
-	 * @return Constraint violation messages mapped by property path.
-	 * @since 2.7
-	 * @deprecated Since 3.8. This method should have returned actual constraint violations instead of abstracting them.
-	 * Use {@link Validators#validateBeanProperty(Class, String, Object, Class...)} instead.
-	 */
-	@Deprecated
-	public static Map<String, String> validateBeanProperty(Class<?> beanType, String propertyName, Object value, Class<?>... groups) {
-		return mapViolationMessagesByPropertyPath(Validators.validateBeanProperty(beanType, propertyName, value, groups));
-	}
-
-	private static Map<String, String> mapViolationMessagesByPropertyPath(Set<ConstraintViolation<?>> violations) {
-		return violations.stream().collect(toMap(violation -> violation.getPropertyPath().toString(), ConstraintViolation::getMessage, (l, r) -> l, LinkedHashMap::new));
 	}
 
 
