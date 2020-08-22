@@ -71,7 +71,7 @@ self.addEventListener("fetch", function(event) {
 
 	if (method == "GET") {
 		var navigated = event.request.mode == "navigate";
-		var resource = url.indexOf("/javax.faces.resource/") > -1;
+		var resource = url.indexOf("/jakarta.faces.resource/") > -1;
 
 		if (navigated || resource) {
 			event.respondWith(caches.match(url).then(function(cached) {
