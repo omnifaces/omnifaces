@@ -18,6 +18,7 @@ import static jakarta.faces.event.PhaseId.RESTORE_VIEW;
 import static jakarta.faces.event.PhaseId.UPDATE_MODEL_VALUES;
 import static jakarta.faces.view.facelets.ComponentHandler.isNew;
 import static java.text.MessageFormat.format;
+import static java.util.Collections.singleton;
 import static java.util.logging.Level.SEVERE;
 import static org.omnifaces.el.ExpressionInspector.getValueReference;
 import static org.omnifaces.util.Components.forEachComponent;
@@ -38,12 +39,16 @@ import static org.omnifaces.util.Faces.validationFailed;
 import static org.omnifaces.util.FacesLocal.evaluateExpressionGet;
 import static org.omnifaces.util.Messages.addError;
 import static org.omnifaces.util.Messages.addGlobalError;
+import static org.omnifaces.util.Reflection.getBaseBeanPropertyPaths;
 import static org.omnifaces.util.Reflection.instance;
-import static org.omnifaces.util.Reflection.setProperties;
+import static org.omnifaces.util.Reflection.setBeanProperties;
 import static org.omnifaces.util.Reflection.toClass;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.csvToList;
 import static org.omnifaces.util.Utils.isEmpty;
+import static org.omnifaces.util.Validators.getPropertyNodes;
+import static org.omnifaces.util.Validators.resolveViolatedBase;
+import static org.omnifaces.util.Validators.validateBean;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -52,7 +57,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -73,10 +77,12 @@ import jakarta.faces.validator.Validator;
 import jakarta.faces.view.facelets.FaceletContext;
 import jakarta.faces.view.facelets.TagConfig;
 import jakarta.faces.view.facelets.TagHandler;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Path.Node;
 
 import org.omnifaces.eventlistener.BeanValidationEventListener;
 import org.omnifaces.util.Callback;
-import org.omnifaces.util.Platform;
+import org.omnifaces.util.Reflection.PropertyPath;
 import org.omnifaces.util.copier.CloneCopier;
 import org.omnifaces.util.copier.Copier;
 import org.omnifaces.util.copier.CopyCtorCopier;
@@ -125,6 +131,26 @@ import org.omnifaces.util.copier.SerializationCopier;
  *
  * &lt;o:validateBean value="#{bean.product}" validationGroups="com.example.MyGroup" /&gt;
  * </pre>
+ *
+ * <p>
+ * <b>Since OmniFaces 3.8, nested properties are also suppored with <code>@jakarta.validation.Valid</code> cascade</b>
+ * <pre>
+ * &lt;h:inputText value="#{bean.product.item}" /&gt;
+ * &lt;h:inputText value="#{bean.product.order}" /&gt;
+ *
+ * &lt;o:validateBean value="#{bean}" validationGroups="com.example.MyGroup" /&gt;
+ * </pre>
+ * <p>
+ * Whereby the <code>product</code> property looks like this:</p>
+ * <pre>
+ * &#64;Valid
+ * private Product product;
+ * </pre>
+ *
+ * <p>
+ * When using <code>&lt;o:validateBean method="validateCopy" /&gt;</code> (which is the default), then only beans, lists,
+ * maps and arrays are considered as nested properties and the copied bean will be autopopulated with defaults. If this
+ * fails, then consider creating a custom copier as instructed in next section.
  *
  * <h2>Class level validation details</h2>
  * <p>
@@ -230,6 +256,7 @@ import org.omnifaces.util.copier.SerializationCopier;
  *
  * @author Bauke Scholtz
  * @author Arjan Tijms
+ * @author Andre Wachsmuth
  * @see BeanValidationEventListener
  */
 public class ValidateBean extends TagHandler {
@@ -366,26 +393,27 @@ public class ValidateBean extends TagHandler {
 	}
 
 	/**
-	 * Before validations phase of current request, collect all bean properties.
+	 * Before validations phase of current request, collect all client IDs and bean properties.
 	 *
 	 * After validations phase of current request, create a copy of the bean, set all collected properties there,
 	 * then validate copied bean and proceed to render response on fail.
 	 */
 	private void validateCopiedBean(UIForm form, Object bean) {
-		Set<String> clientIds = new HashSet<>();
-		Map<String, Object> properties = new HashMap<>();
+		Set<String> collectedClientIds = new HashSet<>();
+		Map<PropertyPath, Object> collectedProperties = new HashMap<>();
+		Map<Object, PropertyPath> knownBaseProperties = getBaseBeanPropertyPaths(bean);
 
 		ValidateBeanCallback collectBeanProperties = new ValidateBeanCallback() { @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
-			forEachInputWithMatchingBase(context, form, bean, input -> addCollectingValidator(input, clientIds, properties));
+			forEachInputWithMatchingBase(context, form, knownBaseProperties.keySet(), input -> addCollectingValidator(input, collectedClientIds, collectedProperties, knownBaseProperties));
 		}};
 
 		ValidateBeanCallback checkConstraints = new ValidateBeanCallback() { @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
-			forEachInputWithMatchingBase(context, form, bean, ValidateBean::removeCollectingValidator);
+			forEachInputWithMatchingBase(context, form, knownBaseProperties.keySet(), ValidateBean::removeCollectingValidator);
 			Object copiedBean = getCopier(context, copier).copy(bean);
-			setProperties(copiedBean, properties);
-			validate(context, form, bean, copiedBean, clientIds, true);
+			setBeanProperties(copiedBean, collectedProperties);
+			validate(context, form, bean, copiedBean, collectedClientIds, true);
 		}};
 
 		subscribeToRequestBeforePhase(PROCESS_VALIDATIONS, collectBeanProperties);
@@ -413,7 +441,7 @@ public class ValidateBean extends TagHandler {
 			groupClasses.add(toClass(group));
 		}
 
-		Map<String, String> violations = Platform.validateBean(validableBean, groupClasses.toArray(new Class[groupClasses.size()]));
+		Set<ConstraintViolation<?>> violations = validateBean(validableBean, groupClasses.toArray(new Class[groupClasses.size()]));
 
 		if (!violations.isEmpty()) {
 			if ("@violating".equals(showMessageFor)) {
@@ -434,7 +462,7 @@ public class ValidateBean extends TagHandler {
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
-	private static void forEachInputWithMatchingBase(FacesContext context, UIComponent form, Object base, String property, Callback.WithArgument<UIInput> callback) {
+	private static void forEachInputWithMatchingBase(FacesContext context, UIComponent form, Set<Object> bases, String property, Callback.WithArgument<UIInput> callback) {
 		forEachComponent(context)
 			.fromRoot(form)
 			.ofTypes(UIInput.class)
@@ -445,19 +473,19 @@ public class ValidateBean extends TagHandler {
 				if (valueExpression != null) {
 					ValueReference valueReference = getValueReference(context.getELContext(), valueExpression);
 
-					if (valueReference.getBase().equals(base) && (property == null || property.equals(valueReference.getProperty()))) {
+					if (bases.contains(valueReference.getBase()) && (property == null || property.equals(valueReference.getProperty()))) {
 						callback.invoke(input);
 					}
 				}
 			});
 	}
 
-	private static void forEachInputWithMatchingBase(FacesContext context, UIComponent form, Object base, Callback.WithArgument<UIInput> callback) {
-		forEachInputWithMatchingBase(context, form, base, null, callback);
+	private static void forEachInputWithMatchingBase(FacesContext context, UIComponent form, Set<Object> bases, Callback.WithArgument<UIInput> callback) {
+		forEachInputWithMatchingBase(context, form, bases, null, callback);
 	}
 
-	private static void addCollectingValidator(UIInput input, Set<String> clientIds, Map<String, Object> properties) {
-		input.addValidator(new CollectingValidator(clientIds, properties));
+	private static void addCollectingValidator(UIInput input, Set<String> collectedClientIds, Map<PropertyPath, Object> collectedProperties, Map<Object, PropertyPath> knownBaseProperties) {
+		input.addValidator(new CollectingValidator(collectedClientIds, collectedProperties, knownBaseProperties));
 	}
 
 	private static void removeCollectingValidator(UIInput input) {
@@ -496,18 +524,34 @@ public class ValidateBean extends TagHandler {
 		return copier;
 	}
 
-	private static void invalidateInputsByPropertyPathAndShowMessages(FacesContext context, UIForm form, Object bean, Map<String, String> violations) {
-		for (Entry<String, String> violation : violations.entrySet()) {
-			forEachInputWithMatchingBase(context, form, bean, violation.getKey(), input -> {
+	private static void invalidateInputsByPropertyPathAndShowMessages(FacesContext context, UIForm form, Object bean, Set<ConstraintViolation<?>> violations) {
+		for (ConstraintViolation<?> violation : violations) {
+			List<Node> propertyNodes = getPropertyNodes(violation);
+			Object base = getBase(bean, violation, propertyNodes);
+			String property = propertyNodes.get(propertyNodes.size() - 1).getName();
+
+			forEachInputWithMatchingBase(context, form, singleton(base), property, input -> {
 				context.validationFailed();
 				input.setValid(false);
 				String clientId = input.getClientId(context);
-				addError(clientId, formatMessage(violation.getValue(), getLabel(input)));
+				addError(clientId, formatMessage(violation.getMessage(), getLabel(input)));
 			});
 		}
 	}
 
-	private static void invalidateInputsByShowMessageForAndShowMessages(FacesContext context, UIForm form, Map<String, String> violations, String showMessageFor) {
+	private static Object getBase(Object bean, ConstraintViolation<?> violation, List<Node> propertyNodes) {
+		if (propertyNodes.size() == 1) { // If violation is on root bean, just use the actual bean.
+			return bean;
+		}
+		else if (violation.getRootBean() == bean) { // If actual bean was validated, we can just read the value from the violation directly.
+			return violation.getInvalidValue();
+		}
+		else { // When the copied bean was validated, we need to resolve the violated base from the copied bean.
+			return resolveViolatedBase(bean, violation);
+		}
+	}
+
+	private static void invalidateInputsByShowMessageForAndShowMessages(FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, String showMessageFor) {
 		for (String forId : showMessageFor.split("\\s+")) {
 			UIComponent component = form.findComponent(forId);
 			context.validationFailed();
@@ -521,7 +565,7 @@ public class ValidateBean extends TagHandler {
 		}
 	}
 
-	private static void invalidateInputsByClientIdsAndShowMessages(final FacesContext context, UIForm form, Map<String, String> violations, Set<String> clientIds, String showMessageFor) {
+	private static void invalidateInputsByClientIdsAndShowMessages(final FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, Set<String> clientIds, String showMessageFor) {
 		context.validationFailed();
 		StringBuilder labels = new StringBuilder();
 
@@ -540,7 +584,7 @@ public class ValidateBean extends TagHandler {
 		showMessages(context, form, violations, clientIds, labels.toString(), showMessageFor);
 	}
 
-	private static void showMessages(FacesContext context, UIForm form, Map<String, String> violations, Set<String> clientIds, String labels, String showMessagesFor) {
+	private static void showMessages(FacesContext context, UIForm form, Set<ConstraintViolation<?>> violations, Set<String> clientIds, String labels, String showMessagesFor) {
 		if ("@form".equals(showMessagesFor)) {
 			String formId = form.getClientId(context);
 			addErrors(formId, violations, labels);
@@ -551,8 +595,8 @@ public class ValidateBean extends TagHandler {
 			}
 		}
 		else if ("@global".equals(showMessagesFor)) {
-			for (String message : violations.values()) {
-				addGlobalError(formatMessage(message, labels));
+			for (ConstraintViolation<?> violation : violations) {
+				addGlobalError(formatMessage(violation.getMessage(), labels));
 			}
 		}
 		else {
@@ -562,9 +606,9 @@ public class ValidateBean extends TagHandler {
 		}
 	}
 
-	private static void addErrors(String clientId, Map<String, String> violations, String labels) {
-		for (String message : violations.values()) {
-			addError(clientId, formatMessage(message, labels));
+	private static void addErrors(String clientId, Set<ConstraintViolation<?>> violations, String labels) {
+		for (ConstraintViolation<?> violation : violations) {
+			addError(clientId, formatMessage(violation.getMessage(), labels));
 		}
 	}
 
@@ -588,22 +632,28 @@ public class ValidateBean extends TagHandler {
 
 	public static final class CollectingValidator implements Validator<Object> {
 
-		private final Set<String> clientIds;
-		private final Map<String, Object> properties;
+		private final Set<String> collectedClientIds;
+		private final Map<PropertyPath, Object> collectedProperties;
+		private final Map<Object, PropertyPath> knownBaseProperties;
 
-		public CollectingValidator(Set<String> clientIds, Map<String, Object> properties) {
-			this.clientIds = clientIds;
-			this.properties = properties;
+		public CollectingValidator(Set<String> collectedClientIds, Map<PropertyPath, Object> collectedProperties, Map<Object, PropertyPath> knownBaseProperties) {
+			this.collectedClientIds = collectedClientIds;
+			this.collectedProperties = collectedProperties;
+			this.knownBaseProperties = knownBaseProperties;
 		}
 
 		@Override
+		@SuppressWarnings("unchecked")
 		public void validate(FacesContext context, UIComponent component, Object value) {
 			ValueExpression valueExpression = component.getValueExpression(VALUE_ATTRIBUTE);
 
 			if (valueExpression != null) {
+				collectedClientIds.add(component.getClientId(context));
 				ValueReference valueReference = getValueReference(context.getELContext(), valueExpression);
-				clientIds.add(component.getClientId(context));
-				properties.put(valueReference.getProperty().toString(), value);
+				Comparable<? extends Serializable> property = (Comparable<? extends Serializable>) valueReference.getProperty();
+				PropertyPath basePath = knownBaseProperties.get(valueReference.getBase());
+				PropertyPath path = (basePath != null) ? basePath.with(property) : PropertyPath.of(property);
+				collectedProperties.put(path, value);
 			}
 		}
 	}

@@ -12,26 +12,18 @@
  */
 package org.omnifaces.util;
 
-import static jakarta.faces.validator.BeanValidator.VALIDATOR_FACTORY_KEY;
-import static java.util.logging.Level.WARNING;
 import static java.util.stream.Collectors.toMap;
-import static org.omnifaces.util.Faces.getApplicationAttribute;
-import static org.omnifaces.util.Faces.getLocale;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import jakarta.faces.webapp.FacesServlet;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletRegistration;
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.MessageInterpolator;
-import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
 
@@ -46,12 +38,6 @@ import jakarta.validation.ValidatorFactory;
  */
 public final class Platform {
 
-	// Constants ------------------------------------------------------------------------------------------------------
-
-	public static final String BEAN_VALIDATION_AVAILABLE = "org.omnifaces.BEAN_VALIDATION_AVAILABLE";
-
-	private static final Logger logger = Logger.getLogger(Platform.class.getName());
-
 	// Constructors ---------------------------------------------------------------------------------------------------
 
 	private Platform() {
@@ -64,39 +50,35 @@ public final class Platform {
 	/**
 	 * Returns <code>true</code> if Bean Validation is available. This is remembered in the application scope.
 	 * @return <code>true</code> if Bean Validation is available.
+	 * @deprecated Since 3.8. Bean Validation utilities are migrated to {@link Validators}.
+	 * Use {@link Validators#isBeanValidationAvailable()} instead.
 	 */
+	@Deprecated
 	public static boolean isBeanValidationAvailable() {
-		return getApplicationAttribute(BEAN_VALIDATION_AVAILABLE, () -> {
-			try {
-				Class.forName("jakarta.validation.Validation");
-				getBeanValidator();
-				return true;
-			}
-			catch (Exception | LinkageError e) {
-				logger.log(WARNING, "Bean validation not available.", e);
-				return false;
-			}
-		});
+		return Validators.isBeanValidationAvailable();
 	}
 
 	/**
 	 * Returns the default bean validator factory. This is remembered in the application scope.
 	 * @return The default bean validator factory.
+	 * @deprecated Since 3.8. Bean Validation utilities are migrated to {@link Validators}.
+	 * Use {@link Validators#getBeanValidatorFactory()} instead.
 	 */
+	@Deprecated
 	public static ValidatorFactory getBeanValidatorFactory() {
-		return getApplicationAttribute(VALIDATOR_FACTORY_KEY, Validation::buildDefaultValidatorFactory);
+		return Validators.getBeanValidatorFactory();
 	}
 
 	/**
 	 * Returns the bean validator which is aware of the JSF locale.
 	 * @return The bean validator which is aware of the JSF locale.
 	 * @see Faces#getLocale()
+	 * @deprecated Since 3.8. Bean Validation utilities are migrated to {@link Validators}.
+	 * Use {@link Validators#getBeanValidator()} instead.
 	 */
+	@Deprecated
 	public static Validator getBeanValidator() {
-		ValidatorFactory validatorFactory = getBeanValidatorFactory();
-        return validatorFactory.usingContext()
-        	.messageInterpolator(new FacesLocaleAwareMessageInterpolator(validatorFactory.getMessageInterpolator()))
-        	.getValidator();
+		return Validators.getBeanValidator();
 	}
 
 	/**
@@ -106,12 +88,12 @@ public final class Platform {
 	 * @param groups Bean validation groups, if any.
 	 * @return Constraint violation messages mapped by property path.
 	 * @since 2.7
+	 * @deprecated Since 3.8. This method should have returned actual constraint violations instead of abstracting them.
+	 * Use {@link Validators#validateBean(Object, Class...)} instead.
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Deprecated
 	public static Map<String, String> validateBean(Object bean, Class<?>... groups) {
-		Set violationsRaw = getBeanValidator().validate(bean, groups);
-		Set<ConstraintViolation<?>> violations = violationsRaw;
-		return mapViolationMessagesByPropertyPath(violations);
+		return mapViolationMessagesByPropertyPath(Validators.validateBean(bean, groups));
 	}
 
 	/**
@@ -123,36 +105,17 @@ public final class Platform {
 	 * @param groups Bean validation groups, if any.
 	 * @return Constraint violation messages mapped by property path.
 	 * @since 2.7
+	 * @deprecated Since 3.8. This method should have returned actual constraint violations instead of abstracting them.
+	 * Use {@link Validators#validateBeanProperty(Class, String, Object, Class...)} instead.
 	 */
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Deprecated
 	public static Map<String, String> validateBeanProperty(Class<?> beanType, String propertyName, Object value, Class<?>... groups) {
-		Set violationsRaw = getBeanValidator().validateValue(beanType, propertyName, value, groups);
-		Set<ConstraintViolation<?>> violations = violationsRaw;
-		return mapViolationMessagesByPropertyPath(violations);
+		return mapViolationMessagesByPropertyPath(Validators.validateBeanProperty(beanType, propertyName, value, groups));
 	}
 
 	private static Map<String, String> mapViolationMessagesByPropertyPath(Set<ConstraintViolation<?>> violations) {
 		return violations.stream().collect(toMap(violation -> violation.getPropertyPath().toString(), ConstraintViolation::getMessage, (l, r) -> l, LinkedHashMap::new));
 	}
-
-    private static class FacesLocaleAwareMessageInterpolator implements MessageInterpolator {
-
-        private MessageInterpolator wrapped;
-
-        public FacesLocaleAwareMessageInterpolator(MessageInterpolator wrapped) {
-            this.wrapped = wrapped;
-        }
-
-        @Override
-		public String interpolate(String message, MessageInterpolator.Context context) {
-            return wrapped.interpolate(message, context, getLocale());
-        }
-
-        @Override
-		public String interpolate(String message, MessageInterpolator.Context context, Locale locale) {
-            return wrapped.interpolate(message, context, locale);
-        }
-    }
 
 
 	// FacesServlet ---------------------------------------------------------------------------------------------------

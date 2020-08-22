@@ -12,36 +12,54 @@
  */
 package org.omnifaces.util;
 
-import static java.beans.Introspector.getBeanInfo;
 import static java.beans.PropertyEditorManager.findEditor;
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
+import static java.util.Collections.unmodifiableList;
+import static java.util.Comparator.reverseOrder;
+import static java.util.Objects.requireNonNull;
+import static java.util.function.Function.identity;
 import static java.util.logging.Level.FINEST;
 import static org.omnifaces.util.Utils.getPrimitiveType;
+import static org.omnifaces.util.Utils.isOneInstanceOf;
 
 import java.beans.IntrospectionException;
+import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.beans.PropertyEditor;
+import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 import jakarta.enterprise.inject.Typed;
 
 /**
  * Collection of utility methods for working with reflection.
  *
- * @since 2.0
  * @author Arjan Tijms
- *
+ * @author Bauke Scholtz
+ * @author Andre Wachsmuth
+ * @since 2.0
  */
 @Typed
 public final class Reflection {
@@ -54,53 +72,169 @@ public final class Reflection {
 	private static final String ERROR_MODIFY_FIELD = "Cannot modify field '%s' of class '%s' with value %s.";
 	private static final String ERROR_INVOKE_METHOD = "Cannot invoke method '%s' of class '%s' with arguments %s.";
 
+
+	// Nested classes -------------------------------------------------------------------------------------------------
+
+	/**
+	 * This class represents a property path. This is intended to be immutable.
+	 * This is primarily used in {@link Reflection#getBaseBeanPropertyPaths(Object)} and {@link Reflection#setBeanProperties(Object, Map)}.
+	 *
+	 * @author Bauke Scholtz
+	 * @since 3.8
+	 */
+	public static final class PropertyPath implements Comparable<PropertyPath>, Serializable {
+
+		private static final long serialVersionUID = 1L;
+
+		private final List<Comparable<? extends Serializable>> nodes;
+
+		private PropertyPath(List<Comparable<? extends Serializable>> nodes) {
+			this.nodes = nodes;
+		}
+
+		/**
+		 * Create a new property path composed of given nodes.
+		 * @param nodes Nodes of property path.
+		 * @return A new property path composed of given nodes.
+		 * @throws NullPointerException When one of the nodes is null.
+		 * @throws IllegalArgumentException When one of the nodes is actually not an instance of Serializable.
+		 */
+		@SafeVarargs
+		public static PropertyPath of(Comparable<? extends Serializable>... nodes) {
+			for (Comparable<? extends Serializable> node : nodes) {
+				requireNonNull(node, "node");
+
+				if (!(node instanceof Serializable)) {
+					throw new IllegalArgumentException("Node " + node + " (" + node.getClass() + ") must be an instance of Serializable."); // For @SafeVarargs.
+				}
+			}
+
+			return new PropertyPath(asList(nodes));
+		}
+
+		/**
+		 * Create a new property path composed of the nodes of the current property path with the given node added.
+		 * E.g. if the current property path is "person" and the given node is "name", then this returns a new property
+		 * path representing "person.name". Or, if the current property path is "list" and the given node is "0", then
+		 * this returns a new property path representing "list[0]". Or, if the current property path is "persons[0]"
+		 * and the given node is "name", then this returns a new property path representing "persons[0].name"
+		 * @param node Node to extend the current property path with.
+		 * @return A new property path composed of the nodes of the current property path added with the given node.
+		 * @throws NullPointerException When node is null.
+		 */
+		public PropertyPath with(Comparable<? extends Serializable> node) {
+			requireNonNull(node, "node");
+			List<Comparable<? extends Serializable>> nodes = new ArrayList<>(this.nodes);
+			nodes.add(node);
+			return new PropertyPath(unmodifiableList(nodes));
+		}
+
+		@Override
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		public int compareTo(PropertyPath other) {
+			if (this.nodes.size() != other.nodes.size()) {
+				return this.nodes.size() < other.nodes.size() ? -1 : 1;
+			}
+
+			for (int index = 0; index < this.nodes.size(); index++) {
+				Comparable thisNode = this.nodes.get(index);
+				Comparable otherNode = other.nodes.get(index);
+
+				if (!(thisNode.getClass().isInstance(otherNode) && otherNode.getClass().isInstance(thisNode))) {
+					thisNode = thisNode.toString();
+					otherNode = otherNode.toString();
+				}
+
+				int compare = thisNode.compareTo(otherNode);
+
+				if (compare != 0) {
+					return compare;
+				}
+			}
+
+			return 0;
+		}
+
+		@Override
+		public boolean equals(Object object) {
+			return object == this || (object instanceof PropertyPath && ((PropertyPath) object).nodes.equals(this.nodes));
+		}
+
+		@Override
+		public int hashCode() {
+			return nodes.hashCode();
+		}
+
+		/**
+		 * Returns the property path as string, conform the EL rules.
+		 */
+		@Override
+		public String toString() {
+			StringBuilder stringBuilder = new StringBuilder();
+
+			for (Comparable<?> node : nodes) {
+				if (node instanceof String) {
+					if (stringBuilder.length() > 0) {
+						stringBuilder.append('.');
+					}
+
+					stringBuilder.append(node);
+				}
+				else {
+					stringBuilder.append('[').append(node).append(']');
+				}
+			}
+
+			return stringBuilder.toString();
+		}
+	}
+
+	// Constructors ---------------------------------------------------------------------------------------------------
+
 	private Reflection() {
 		// Hide constructor.
 	}
 
+
+	// Beans ----------------------------------------------------------------------------------------------------------
+
 	/**
-	 * Sets a collection of properties of a given object to the values associated with those properties.
+	 * Sets a collection of properties of a given bean to the values associated with those properties.
 	 * <p>
 	 * In the map that represents these properties, each key represents the name of the property, with the value
 	 * associated with that key being the value that is set for the property.
 	 * <p>
 	 * E.g. map entry key = foo, value = "bar", which "bar" an instance of String, will conceptually result in the
-	 * following call: <code>object.setFoo("string");</code>
+	 * following call: <code>bean.setFoo("string");</code>
 	 *
 	 * <p>
 	 * NOTE: This particular method assumes that there's a write method for each property in the map with the right
 	 * type. No specific checking is done whether this is indeed the case.
 	 *
-	 * @param object
-	 *            the object on which properties will be set
+	 * <p>
+	 * If you need to set nested properties recursively as well, use {@link #setBeanProperties(Object, Map)} instead.
+	 *
+	 * @param bean
+	 *            the bean on which properties will be set
 	 * @param propertiesToSet
-	 *            the map containing properties and their values to be set on the object
+	 *            the map containing properties and their values to be set on the bean
 	 */
-	public static void setProperties(Object object, Map<String, Object> propertiesToSet) {
+	public static void setProperties(Object bean, Map<String, Object> propertiesToSet) {
+		Map<String, PropertyDescriptor> availableProperties = getPropertyDescriptors(bean.getClass());
 
-		try {
-			Map<String, PropertyDescriptor> availableProperties = new HashMap<>();
-			for (PropertyDescriptor propertyDescriptor : getBeanInfo(object.getClass()).getPropertyDescriptors()) {
-				availableProperties.put(propertyDescriptor.getName(), propertyDescriptor);
-			}
-
-			for (Entry<String, Object> propertyToSet : propertiesToSet.entrySet()) {
-				availableProperties.get(propertyToSet.getKey()).getWriteMethod().invoke(object, propertyToSet.getValue());
-			}
-
-		} catch (IntrospectionException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-			throw new IllegalStateException(e);
+		for (Entry<String, Object> propertyToSet : propertiesToSet.entrySet()) {
+			setBeanProperty(bean, propertyToSet.getValue(), availableProperties.get(propertyToSet.getKey()));
 		}
 	}
 
 	/**
-	 * Sets a collection of properties of a given object to the (optionally coerced) values associated with those properties.
+	 * Sets a collection of properties of a given bean to the (optionally coerced) values associated with those properties.
 	 * <p>
 	 * In the map that represents these properties, each key represents the name of the property, with the value
 	 * associated with that key being the value that is set for the property.
 	 * <p>
 	 * E.g. map entry key = foo, value = "bar", which "bar" an instance of String, will conceptually result in the
-	 * following call: <code>object.setFoo("string");</code>
+	 * following call: <code>bean.setFoo("string");</code>
 	 *
 	 * <p>
 	 * NOTE 1: In case the value is a String, and the target type is not String, the standard property editor mechanism
@@ -108,46 +242,297 @@ public final class Reflection {
 	 *
 	 * <p>
 	 * Note 2: This method operates somewhat as the reverse of {@link Reflection#setProperties(Object, Map)}. Here only
-	 * the available writable properties of the object are matched against the map with properties to set. Properties
-	 * in the map for which there isn't a corresponding writable property on the object are ignored.
+	 * the available writable properties of the bean are matched against the map with properties to set. Properties
+	 * in the map for which there isn't a corresponding writable property on the bean are ignored.
 	 *
 	 * <p>
-	 * Following the above two notes, use this method when attempting to set properties on an object in a lenient best effort
+	 * Following the above two notes, use this method when attempting to set properties on an bean in a lenient best effort
 	 * basis. Use {@link Reflection#setProperties(Object, Map)} when all properties need to be set with the exact type as the value
 	 * appears in the map.
 	 *
 	 *
-	 * @param object
-	 *            the object on which properties will be set
+	 * @param bean
+	 *            the bean on which properties will be set
 	 * @param propertiesToSet
 	 *            the map containing properties and their values to be set on the object
 	 */
-	public static void setPropertiesWithCoercion(Object object, Map<String, Object> propertiesToSet) {
-		try {
-			for (PropertyDescriptor property : getBeanInfo(object.getClass()).getPropertyDescriptors()) {
-				Method setter = property.getWriteMethod();
+	public static void setPropertiesWithCoercion(Object bean, Map<String, Object> propertiesToSet) {
+		for (PropertyDescriptor property : getPropertyDescriptors(bean.getClass()).values()) {
+			Method setter = property.getWriteMethod();
 
-				if (setter == null || !propertiesToSet.containsKey(property.getName())) {
-					continue;
-				}
+			if (setter == null || !propertiesToSet.containsKey(property.getName())) {
+				continue;
+			}
 
-				Object value = propertiesToSet.get(property.getName());
-				if (value instanceof String && !property.getPropertyType().equals(String.class)) {
+			Object value = propertiesToSet.get(property.getName());
 
+			if (value instanceof String && !property.getPropertyType().equals(String.class)) {
+				try {
 					// Try to convert Strings to the type expected by the converter
-
 					PropertyEditor editor = findEditor(property.getPropertyType());
 					editor.setAsText((String) value);
 					value = editor.getValue();
 				}
+				catch (Exception e) {
+					throw new IllegalStateException(e);
+				}
+			}
 
-				property.getWriteMethod().invoke(object, value);
+			setBeanProperty(bean, value, property);
+		}
+	}
+
+	/**
+	 * Recursively set given properties on given bean.
+	 * It will automatically prepopulate nested lists, maps, arrays and beans where necessary.
+	 * @param bean Bean to recursively set properties on.
+	 * @param properties Properties to recursively set on bean. The map key represents the property path and the map value represents the property value.
+	 * @since 3.8
+	 */
+	public static void setBeanProperties(Object bean, Map<PropertyPath, Object> properties) {
+		Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors = new HashMap<>();
+		Map<PropertyPath, Object> sortedProperties = new TreeMap<>(reverseOrder()); // Reverse order ensures that e.g. "list[4].property" comes before e.g. "list[0].property", so that the code knows how many items to prepopulate.
+		sortedProperties.putAll(properties);
+
+		for (Entry<PropertyPath, Object> entry : sortedProperties.entrySet()) {
+			PropertyPath path = entry.getKey();
+
+			if (!path.nodes.isEmpty()) {
+				Object base = getBase(bean, path, cachedDescriptors);
+				setProperty(base, path.nodes.get(path.nodes.size() - 1), entry.getValue(), cachedDescriptors);
 			}
 		}
-		catch (Exception e) {
+	}
+
+	private static Object getBase(Object bean, PropertyPath path, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors) {
+		Object base = bean;
+
+		for (int index = 0; index < path.nodes.size() - 1; index++) {
+			Comparable<?> node = path.nodes.get(index);
+
+			if (base instanceof List) {
+				base = ((List<?>) base).get((Integer) node);
+			}
+			else if (base instanceof Map) {
+				base = ((Map<?, ?>) base).get(node);
+			}
+			else if (base.getClass().isArray()) {
+				base = Array.get(base, (Integer) node);
+			}
+			else {
+				base = getBeanProperty(base, (String) node, cachedDescriptors, path.nodes.get(index + 1));
+			}
+		}
+
+		return base;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private static void setProperty(Object base, Comparable<?> property, Object value, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors) {
+		if (base == null) {
+			return;
+		}
+
+		if (base instanceof List) {
+			((List) base).set((Integer) property, value);
+		}
+		else if (base instanceof Map) {
+			((Map) base).put(property, value);
+		}
+		else if (base.getClass().isArray()) {
+			Array.set(base, (Integer) property, value);
+		}
+		else {
+			setBeanProperty(base, value, getPropertyDescriptor(base.getClass(), (String) property, cachedDescriptors));
+		}
+	}
+
+	private static void setBeanProperty(Object bean, Object value, PropertyDescriptor propertyDescriptor) {
+		try {
+			propertyDescriptor.getWriteMethod().invoke(bean, value);
+		}
+		catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
 			throw new IllegalStateException(e);
 		}
 	}
+
+	/**
+	 * Obtain given property from given bean.
+	 * @param bean Bean to obtain property from.
+	 * @param property Property name.
+	 * @return Value of given property of given bean.
+	 * @since 3.8
+	 */
+	public static Object getBeanProperty(Object bean, String property) {
+		return getBeanProperty(bean, property, new HashMap<>(), null);
+	}
+
+	private static Object getBeanProperty(Object bean, PropertyDescriptor propertyDescriptor) {
+		try {
+			return propertyDescriptor.getReadMethod().invoke(bean);
+		}
+		catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	private static Object getBeanProperty(Object bean, String property, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Comparable<?> nextPropertyNode) {
+		PropertyDescriptor propertyDescriptor = getPropertyDescriptor(bean.getClass(), property, cachedDescriptors);
+		Object value = getBeanProperty(bean, propertyDescriptor);
+
+		if (value == null && nextPropertyNode != null) {
+			value = setBeanPropertyWithDefaultValue(bean, propertyDescriptor, nextPropertyNode);
+		}
+
+		return value;
+	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private static Object setBeanPropertyWithDefaultValue(Object bean, PropertyDescriptor propertyDescriptor, Comparable<?> nextPropertyNode) {
+		Class<?> type = propertyDescriptor.getPropertyType();
+		Object value;
+
+		if (List.class.isAssignableFrom(type)) {
+			value = new ArrayList<>();
+			Class<?> elementType = (Class<?>) ((ParameterizedType) propertyDescriptor.getReadMethod().getGenericReturnType()).getActualTypeArguments()[0];
+			Integer size = ((Integer) nextPropertyNode) + 1;
+
+			for (int index = 0; index < size; index++) {
+				((List) value).add(isNeedsFurtherRecursion(elementType) ? instance(elementType) : null);
+			}
+		}
+		else if (Map.class.isAssignableFrom(type)) {
+			value = new LinkedHashMap<>();
+		}
+		else if (type.isArray()) {
+			Integer length = ((Integer) nextPropertyNode) + 1;
+			value = Array.newInstance(type.getComponentType(), length);
+
+			for (int index = 0; index < length; index++) {
+				Array.set(value, index, isNeedsFurtherRecursion(type.getComponentType()) ? instance(type.getComponentType()) : null);
+			}
+		}
+		else {
+			value = instance(type);
+		}
+
+		if (propertyDescriptor.getWriteMethod() != null) {
+			setBeanProperty(bean, value, propertyDescriptor);
+		}
+		else {
+			modifyField(bean, propertyDescriptor.getName(), value);
+		}
+
+		return value;
+	}
+
+	private static Map<String, PropertyDescriptor> getPropertyDescriptors(Class<?> type, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors) {
+		return cachedDescriptors.computeIfAbsent(type, Reflection::getPropertyDescriptors);
+	}
+
+	private static Map<String, PropertyDescriptor> getPropertyDescriptors(Class<?> type) {
+		try {
+			return stream(Introspector.getBeanInfo(type).getPropertyDescriptors()).collect(Collectors.toMap(PropertyDescriptor::getName, identity()));
+		}
+		catch (IntrospectionException e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	private static PropertyDescriptor getPropertyDescriptor(Class<?> type, String property, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors) {
+		return getPropertyDescriptors(type, cachedDescriptors).get(property);
+	}
+
+	/**
+	 * Recursively collect all base bean property paths from the given bean which resolve to non-null bases. A "base" is
+	 * represented by the bean itself and all of its nested lists, maps, arrays and beans. This does not include the
+	 * non-nested properties of any base. E.g. "person.address.street" will return a map with actual instances of
+	 * "person" and "person.address" as keys. Note that the "street" is not included as it does not represent a base.
+	 * @param bean The given bean.
+	 * @return All base bean property paths which resolve to non-null values, mapped by the base.
+	 * @since 3.8
+	 */
+	public static Map<Object, PropertyPath> getBaseBeanPropertyPaths(Object bean) {
+		Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors = new HashMap<>();
+		Map<Object, PropertyPath> collectedBasePropertyPaths = new IdentityHashMap<>();
+		PropertyPath basePath = PropertyPath.of();
+		collectedBasePropertyPaths.put(bean, basePath);
+		collectBasePropertyPaths(bean, basePath, cachedDescriptors, collectedBasePropertyPaths);
+		return collectedBasePropertyPaths;
+	}
+
+	private static void collectBasePropertyPaths(Object base, PropertyPath basePath, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths) {
+		if (base == null) {
+			return;
+		}
+		else if (base instanceof List) {
+			collectBasePropertyPathsFromList((List<?>) base, basePath, cachedDescriptors, collectedBasePropertyPaths);
+		}
+		else if (base instanceof Map) {
+			collectBasePropertyPathsFromMap((Map<?, ?>) base, basePath, cachedDescriptors, collectedBasePropertyPaths);
+		}
+		else if (base.getClass().isArray()) {
+			collectBasePropertyPathsFromArray((Object[]) base, basePath, cachedDescriptors, collectedBasePropertyPaths);
+		}
+		else {
+			collectBasePropertyPathsFromBean(base, basePath, cachedDescriptors, collectedBasePropertyPaths);
+		}
+	}
+
+	private static void collectBasePropertyPathsFromList(List<?> list, PropertyPath basePath, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths) {
+		for (int index = 0; index < list.size(); index++) {
+			collectBasePropertyPath(list.get(index), basePath, cachedDescriptors, collectedBasePropertyPaths, index);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private static void collectBasePropertyPathsFromMap(Map<?, ?> map, PropertyPath basePath, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths) {
+		for (Entry<?, ?> entry : map.entrySet()) {
+			Object key = entry.getKey();
+
+			if (key instanceof Comparable && key instanceof Serializable) {
+				collectBasePropertyPath(entry.getValue(), basePath, cachedDescriptors, collectedBasePropertyPaths, (Comparable<? extends Serializable>) key);
+			}
+		}
+	}
+
+	private static void collectBasePropertyPathsFromArray(Object[] array, PropertyPath basePath, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths) {
+		for (int index = 0; index < array.length; index++) {
+			collectBasePropertyPath(array[index], basePath, cachedDescriptors, collectedBasePropertyPaths, index);
+		}
+	}
+
+	private static void collectBasePropertyPathsFromBean(Object bean, PropertyPath basePath, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths) {
+		for (PropertyDescriptor propertyDescriptor : getPropertyDescriptors(bean.getClass(), cachedDescriptors).values()) {
+			collectBasePropertyPath(getBeanProperty(bean, propertyDescriptor), basePath, cachedDescriptors, collectedBasePropertyPaths, propertyDescriptor.getName());
+		}
+	}
+
+	private static void collectBasePropertyPath(Object value, PropertyPath basePath, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths, Comparable<? extends Serializable> property) {
+		if (value != null && isNeedsFurtherRecursion(value.getClass()) && !collectedBasePropertyPaths.containsKey(value)) {
+			PropertyPath path = basePath.with(property);
+			collectedBasePropertyPaths.put(value, path);
+			collectBasePropertyPaths(value, path, cachedDescriptors, collectedBasePropertyPaths);
+		}
+	}
+
+	private static boolean isNeedsFurtherRecursion(Class<?> type) {
+		if (type.isPrimitive()) {
+			return false; // These don't have properties anyway.
+		}
+		else if (isOneInstanceOf(type, Type.class, Boolean.class, Number.class, CharSequence.class, Enum.class, Date.class, Temporal.class)) {
+			return false; // Don't recurse common property types which are guaranteed not beans.
+		}
+		else if (Iterable.class.isAssignableFrom(type) && !isOneInstanceOf(type, List.class, Map.class)) {
+			return false; // We only support iterating List and Map for now.
+		}
+		else {
+			return true;
+		}
+	}
+
+
+	// Methods --------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Finds a method based on the method name, amount of parameters and limited typing and returns <code>null</code>
@@ -236,6 +621,8 @@ public final class Reflection {
 		return methods;
 	}
 
+
+	// Classes --------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Returns true if given source is assignable to target type, taking into account autoboxing.
@@ -349,6 +736,9 @@ public final class Reflection {
 		}
 	}
 
+
+	// Fields ---------------------------------------------------------------------------------------------------------
+
 	/**
 	 * Returns the value of the field of the given instance on the given field name.
 	 * @param <T> The expected return type.
@@ -368,6 +758,26 @@ public final class Reflection {
 		}
 		catch (Exception e) {
 			throw new IllegalStateException(format(ERROR_ACCESS_FIELD, fieldName, instance.getClass()), e);
+		}
+	}
+
+	/**
+	 * Modifies the value of the given field of the given instance with the given value.
+	 * @param <T> The field type.
+	 * @param instance The instance to access the given field on.
+	 * @param field The field to be accessed on the given instance.
+	 * @param value The new value of the given field of the given instance.
+	 * @return The old value of the given field of the given instance.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @throws IllegalStateException If the field cannot be modified.
+	 * @since 3.8
+	 */
+	public static <T> T modifyField(Object instance, String fieldName, T value) {
+		try {
+			return modifyField(instance, instance.getClass().getDeclaredField(fieldName), value);
+		}
+		catch (NoSuchFieldException e) {
+			throw new IllegalStateException(format(ERROR_MODIFY_FIELD, fieldName, instance != null ? instance.getClass() : null, value), e);
 		}
 	}
 

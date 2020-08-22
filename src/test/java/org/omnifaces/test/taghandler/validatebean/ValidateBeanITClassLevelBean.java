@@ -19,11 +19,13 @@ import static org.omnifaces.util.Messages.addGlobalWarn;
 import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Named;
+import jakarta.validation.Valid;
 
 @Named
 @RequestScoped
 public class ValidateBeanITClassLevelBean {
 
+	@Valid
 	private ValidateBeanITEntity entity;
 
 	@PostConstruct

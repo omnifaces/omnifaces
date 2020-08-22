@@ -168,6 +168,57 @@
 				showMessageFor="@violating" />
 		</o:form>
 
+		<o:form id="validateClassLevelActualWithMessageForViolating">
+			<h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
+			<h:message id="number1Message" for="number1" />
+			<h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
+			<h:message id="number2Message" for="number2" />
+
+			<h:message id="formMessage" for="validateClassLevelActualWithMessageForViolating" />
+
+			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+				<f:ajax execute="@form" render="number1Message number2Message formMessage :messages" />
+			</h:commandButton>
+
+			<o:validateBean value="#{validateBeanITClassLevelBean.entity}"
+				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup"
+				showMessageFor="@violating" method="validateActual" />
+		</o:form>
+
+		<o:form id="validateNestedClassLevelWithMessageForViolating">
+			<h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
+			<h:message id="number1Message" for="number1" />
+			<h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
+			<h:message id="number2Message" for="number2" />
+
+			<h:message id="formMessage" for="validateNestedClassLevelWithMessageForViolating" />
+
+			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+				<f:ajax execute="@form" render="number1Message number2Message formMessage :messages" />
+			</h:commandButton>
+
+			<o:validateBean value="#{validateBeanITClassLevelBean}"
+				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup"
+				showMessageFor="@violating" />
+		</o:form>
+
+		<o:form id="validateNestedClassLevelActualWithMessageForViolating">
+			<h:inputText id="number1" label="number1Label" value="#{validateBeanITClassLevelBean.entity.number1}" />
+			<h:message id="number1Message" for="number1" />
+			<h:inputText id="number2" label="number2Label" value="#{validateBeanITClassLevelBean.entity.number2}" />
+			<h:message id="number2Message" for="number2" />
+
+			<h:message id="formMessage" for="validateNestedClassLevelActualWithMessageForViolating" />
+
+			<h:commandButton id="command" action="#{validateBeanITClassLevelBean.action}">
+				<f:ajax execute="@form" render="number1Message number2Message formMessage :messages" />
+			</h:commandButton>
+
+			<o:validateBean value="#{validateBeanITClassLevelBean}"
+				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup"
+				showMessageFor="@violating" method="validateActual" />
+		</o:form>
+
 		<o:form id="validateClassLevelWithInputEntityComposite">
 			<cc:inputEntity id="composite" value="#{validateBeanITClassLevelBean.entity}" />
 

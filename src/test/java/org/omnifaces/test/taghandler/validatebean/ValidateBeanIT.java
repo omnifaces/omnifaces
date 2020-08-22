@@ -152,6 +152,60 @@ public class ValidateBeanIT extends OmniFacesIT {
 	@FindBy(id="validateClassLevelWithMessageForViolating:command")
 	private WebElement validateClassLevelWithMessageForViolatingCommand;
 
+	@FindBy(id="validateClassLevelActualWithMessageForViolating:number1")
+	private WebElement validateClassLevelActualWithMessageForViolatingNumber1;
+
+	@FindBy(id="validateClassLevelActualWithMessageForViolating:number1Message")
+	private WebElement validateClassLevelActualWithMessageForViolatingNumber1Message;
+
+	@FindBy(id="validateClassLevelActualWithMessageForViolating:number2")
+	private WebElement validateClassLevelActualWithMessageForViolatingNumber2;
+
+	@FindBy(id="validateClassLevelActualWithMessageForViolating:number2Message")
+	private WebElement validateClassLevelActualWithMessageForViolatingNumber2Message;
+
+	@FindBy(id="validateClassLevelActualWithMessageForViolating:formMessage")
+	private WebElement validateClassLevelActualWithMessageForViolatingFormMessage;
+
+	@FindBy(id="validateClassLevelActualWithMessageForViolating:command")
+	private WebElement validateClassLevelActualWithMessageForViolatingCommand;
+
+	@FindBy(id="validateNestedClassLevelWithMessageForViolating:number1")
+	private WebElement validateNestedClassLevelWithMessageForViolatingNumber1;
+
+	@FindBy(id="validateNestedClassLevelWithMessageForViolating:number1Message")
+	private WebElement validateNestedClassLevelWithMessageForViolatingNumber1Message;
+
+	@FindBy(id="validateNestedClassLevelWithMessageForViolating:number2")
+	private WebElement validateNestedClassLevelWithMessageForViolatingNumber2;
+
+	@FindBy(id="validateNestedClassLevelWithMessageForViolating:number2Message")
+	private WebElement validateNestedClassLevelWithMessageForViolatingNumber2Message;
+
+	@FindBy(id="validateNestedClassLevelWithMessageForViolating:formMessage")
+	private WebElement validateNestedClassLevelWithMessageForViolatingFormMessage;
+
+	@FindBy(id="validateNestedClassLevelWithMessageForViolating:command")
+	private WebElement validateNestedClassLevelWithMessageForViolatingCommand;
+
+	@FindBy(id="validateNestedClassLevelActualWithMessageForViolating:number1")
+	private WebElement validateNestedClassLevelActualWithMessageForViolatingNumber1;
+
+	@FindBy(id="validateNestedClassLevelActualWithMessageForViolating:number1Message")
+	private WebElement validateNestedClassLevelActualWithMessageForViolatingNumber1Message;
+
+	@FindBy(id="validateNestedClassLevelActualWithMessageForViolating:number2")
+	private WebElement validateNestedClassLevelActualWithMessageForViolatingNumber2;
+
+	@FindBy(id="validateNestedClassLevelActualWithMessageForViolating:number2Message")
+	private WebElement validateNestedClassLevelActualWithMessageForViolatingNumber2Message;
+
+	@FindBy(id="validateNestedClassLevelActualWithMessageForViolating:formMessage")
+	private WebElement validateNestedClassLevelActualWithMessageForViolatingFormMessage;
+
+	@FindBy(id="validateNestedClassLevelActualWithMessageForViolating:command")
+	private WebElement validateNestedClassLevelActualWithMessageForViolatingCommand;
+
 	@FindBy(id="validateClassLevelWithInputEntityComposite:composite:number1")
 	private WebElement validateClassLevelWithInputEntityCompositeNumber1;
 
@@ -380,6 +434,60 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("", validateClassLevelWithMessageForViolatingNumber1Message.getText());
 		assertEquals("", validateClassLevelWithMessageForViolatingNumber2Message.getText());
 		assertEquals("", validateClassLevelWithMessageForViolatingFormMessage.getText());
+		assertEquals("actionSuccess", messages.getText());
+	}
+
+	@Test
+	public void validateClassLevelActualWithMessageForViolating() {
+		validateClassLevelActualWithMessageForViolatingNumber1.sendKeys("2");
+		validateClassLevelActualWithMessageForViolatingNumber2.sendKeys("1");
+		guardAjax(validateClassLevelActualWithMessageForViolatingCommand).click();
+		assertEquals("number1Label: invalidEntity", validateClassLevelActualWithMessageForViolatingNumber1Message.getText());
+		assertEquals("", validateClassLevelActualWithMessageForViolatingNumber2Message.getText());
+		assertEquals("", validateClassLevelActualWithMessageForViolatingFormMessage.getText());
+		assertEquals("actionValidationFailed", messages.getText());
+
+		validateClassLevelActualWithMessageForViolatingNumber2.sendKeys("0");
+		guardAjax(validateClassLevelActualWithMessageForViolatingCommand).click();
+		assertEquals("", validateClassLevelActualWithMessageForViolatingNumber1Message.getText());
+		assertEquals("", validateClassLevelActualWithMessageForViolatingNumber2Message.getText());
+		assertEquals("", validateClassLevelActualWithMessageForViolatingFormMessage.getText());
+		assertEquals("actionSuccess", messages.getText());
+	}
+
+	@Test
+	public void validateNestedClassLevelWithMessageForViolating() {
+		validateNestedClassLevelWithMessageForViolatingNumber1.sendKeys("2");
+		validateNestedClassLevelWithMessageForViolatingNumber2.sendKeys("1");
+		guardAjax(validateNestedClassLevelWithMessageForViolatingCommand).click();
+		assertEquals("number1Label: invalidEntity", validateNestedClassLevelWithMessageForViolatingNumber1Message.getText());
+		assertEquals("", validateNestedClassLevelWithMessageForViolatingNumber2Message.getText());
+		assertEquals("", validateNestedClassLevelWithMessageForViolatingFormMessage.getText());
+		assertEquals("", messages.getText());
+
+		validateNestedClassLevelWithMessageForViolatingNumber2.sendKeys("0");
+		guardAjax(validateNestedClassLevelWithMessageForViolatingCommand).click();
+		assertEquals("", validateNestedClassLevelWithMessageForViolatingNumber1Message.getText());
+		assertEquals("", validateNestedClassLevelWithMessageForViolatingNumber2Message.getText());
+		assertEquals("", validateNestedClassLevelWithMessageForViolatingFormMessage.getText());
+		assertEquals("actionSuccess", messages.getText());
+	}
+
+	@Test
+	public void validateNestedClassLevelActualWithMessageForViolating() {
+		validateNestedClassLevelActualWithMessageForViolatingNumber1.sendKeys("2");
+		validateNestedClassLevelActualWithMessageForViolatingNumber2.sendKeys("1");
+		guardAjax(validateNestedClassLevelActualWithMessageForViolatingCommand).click();
+		assertEquals("number1Label: invalidEntity", validateNestedClassLevelActualWithMessageForViolatingNumber1Message.getText());
+		assertEquals("", validateNestedClassLevelActualWithMessageForViolatingNumber2Message.getText());
+		assertEquals("", validateNestedClassLevelActualWithMessageForViolatingFormMessage.getText());
+		assertEquals("actionValidationFailed", messages.getText());
+
+		validateNestedClassLevelActualWithMessageForViolatingNumber2.sendKeys("0");
+		guardAjax(validateNestedClassLevelActualWithMessageForViolatingCommand).click();
+		assertEquals("", validateNestedClassLevelActualWithMessageForViolatingNumber1Message.getText());
+		assertEquals("", validateNestedClassLevelActualWithMessageForViolatingNumber2Message.getText());
+		assertEquals("", validateNestedClassLevelActualWithMessageForViolatingFormMessage.getText());
 		assertEquals("actionSuccess", messages.getText());
 	}
 
