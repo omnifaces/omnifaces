@@ -138,8 +138,6 @@ public final class Validators {
 	 * @return Violated base from given bean based on given violation.
 	 */
 	public static Object resolveViolatedBase(Object bean, ConstraintViolation<?> violation) {
-		List<Node> propertyNodes = getPropertyNodes(violation);
-
 		try {
 			Object base = bean;
 
@@ -169,7 +167,7 @@ public final class Validators {
 			return base;
 		}
 		catch (Exception e) {
-			String propertyPath = propertyNodes.stream().map(Node::toString).collect(joining("."));
+			String propertyPath = getPropertyNodes(violation).stream().map(Node::toString).collect(joining("."));
 			logger.log(WARNING, format(ERROR_RESOLVE_BASE, propertyPath, bean == null ? "null" : bean.getClass()), e);
 			return violation.getInvalidValue(); // Fall back.
 		}
