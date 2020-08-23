@@ -151,7 +151,7 @@ public final class Validators {
 
 				switch (kind) {
 					case BEAN:
-						if (node.getIndex() != null || node.getKey() != null || node.getName() != null) { // In Apache BVal this is assumed to be the base itself.
+						if (node.getIndex() != null || node.getKey() != null || node.getName() != null) { // In Apache BVal these can be all null, this is then assumed to be the base itself.
 							base = resolveProperty(base, node);
 						}
 						break;

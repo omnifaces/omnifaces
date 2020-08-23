@@ -386,7 +386,7 @@ public class ValidateBean extends TagHandler {
 	private void validateActualBean(UIForm form, Object bean) {
 		ValidateBeanCallback validateActualBean = new ValidateBeanCallback() { @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
-			validate(context, form, bean, bean, new HashSet<String>(0), false);
+			validate(context, form, bean, unwrapIfNecessary(bean), new HashSet<String>(0), false);
 		}};
 
 		subscribeToRequestAfterPhase(UPDATE_MODEL_VALUES, validateActualBean);

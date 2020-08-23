@@ -505,10 +505,6 @@ public class ValidateBeanIT extends OmniFacesIT {
 
 	@Test
 	public void validateNestedClassLevelActualWithMessageForViolating() {
-		if (isTomee()) {
-			return; // Doesn't work with BVal. TODO: investigate.
-		}
-
 		validateNestedClassLevelActualWithMessageForViolatingNumber1.sendKeys("2");
 		validateNestedClassLevelActualWithMessageForViolatingNumber2.sendKeys("1");
 		guardAjax(validateNestedClassLevelActualWithMessageForViolatingCommand).click();
