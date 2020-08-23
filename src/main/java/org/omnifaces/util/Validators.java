@@ -151,9 +151,17 @@ public final class Validators {
 
 				switch (kind) {
 					case BEAN:
-					case PROPERTY:
+						if (node.getIndex() != null || node.getKey() != null || node.getName() != null) { // In Apache BVal this is assumed to be the base itself.
+							base = resolveProperty(base, node);
+						}
+						break;
+
 					case CONTAINER_ELEMENT: // List, Map, Array, etc
-						if (iterator.hasNext() || (node.getIndex() != null || node.getKey() != null) || kind != ElementKind.PROPERTY) { // PROPERTY may not be the last one.
+						base = resolveProperty(base, node);
+						break;
+
+					case PROPERTY:
+						if (iterator.hasNext() || (node.getIndex() != null || node.getKey() != null)) { // PROPERTY may not be the last one unless contained in a CONTAINER_ELEMENT (which has index or key).
 							base = resolveProperty(base, node);
 						}
 						break;
