@@ -16,19 +16,26 @@ import static org.omnifaces.util.Faces.isValidationFailed;
 import static org.omnifaces.util.Messages.addGlobalInfo;
 import static org.omnifaces.util.Messages.addGlobalWarn;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Named;
+import javax.validation.Valid;
 
 @Named
 @RequestScoped
-public class ValidateBeanITClassLevelBean {
+public class ValidateBeanITNestedListClassLevelBean {
 
-	private ValidateBeanITEntity entity;
+	@Valid
+	private List<ValidateBeanITEntity> entities;
 
 	@PostConstruct
 	public void init() {
-		entity = new ValidateBeanITEntity();
+		entities = new ArrayList<>();
+		entities.add(new ValidateBeanITEntity());
+		entities.add(new ValidateBeanITEntity());
 	}
 
 	public void action() {
@@ -40,8 +47,8 @@ public class ValidateBeanITClassLevelBean {
 		}
 	}
 
-	public ValidateBeanITEntity getEntity() {
-		return entity;
+	public List<ValidateBeanITEntity> getEntities() {
+		return entities;
 	}
 
 }

@@ -527,7 +527,7 @@ public class ValidateBean extends TagHandler {
 	private static void invalidateInputsByPropertyPathAndShowMessages(FacesContext context, UIForm form, Object bean, Set<ConstraintViolation<?>> violations) {
 		for (ConstraintViolation<?> violation : violations) {
 			List<Node> propertyNodes = getPropertyNodes(violation);
-			Object base = getBase(bean, violation, propertyNodes);
+			Object base = resolveViolatedBase(bean, violation);
 			String property = propertyNodes.get(propertyNodes.size() - 1).getName();
 
 			forEachInputWithMatchingBase(context, form, singleton(base), property, input -> {
@@ -536,18 +536,6 @@ public class ValidateBean extends TagHandler {
 				String clientId = input.getClientId(context);
 				addError(clientId, formatMessage(violation.getMessage(), getLabel(input)));
 			});
-		}
-	}
-
-	private static Object getBase(Object bean, ConstraintViolation<?> violation, List<Node> propertyNodes) {
-		if (propertyNodes.size() == 1) { // If violation is on root bean, just use the actual bean.
-			return bean;
-		}
-		else if (violation.getRootBean() == bean) { // If actual bean was validated, we can just read the value from the violation directly.
-			return violation.getInvalidValue();
-		}
-		else { // When the copied bean was validated, we need to resolve the violated base from the copied bean.
-			return resolveViolatedBase(bean, violation);
 		}
 	}
 

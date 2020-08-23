@@ -153,7 +153,7 @@ public final class Validators {
 					case BEAN:
 					case PROPERTY:
 					case CONTAINER_ELEMENT: // List, Map, Array, etc
-						if (iterator.hasNext() || kind != ElementKind.PROPERTY) { // PROPERTY may not be the last one.
+						if (iterator.hasNext() || (node.getIndex() != null || node.getKey() != null) || kind != ElementKind.PROPERTY) { // PROPERTY may not be the last one.
 							base = resolveProperty(base, node);
 						}
 						break;
@@ -169,7 +169,7 @@ public final class Validators {
 		catch (Exception e) {
 			String propertyPath = getPropertyNodes(violation).stream().map(Node::toString).collect(joining("."));
 			logger.log(WARNING, format(ERROR_RESOLVE_BASE, propertyPath, bean == null ? "null" : bean.getClass()), e);
-			return violation.getInvalidValue(); // Fall back.
+			return violation.getLeafBean(); // Fall back.
 		}
 	}
 

@@ -19,11 +19,13 @@ import static org.omnifaces.util.Messages.addGlobalWarn;
 import javax.annotation.PostConstruct;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Named;
+import javax.validation.Valid;
 
 @Named
 @RequestScoped
-public class ValidateBeanITClassLevelBean {
+public class ValidateBeanITNestedClassLevelBean {
 
+	@Valid
 	private ValidateBeanITEntity entity;
 
 	@PostConstruct
