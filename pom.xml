@@ -72,9 +72,9 @@
 		<maven.source.excludeResources>true</maven.source.excludeResources>
 
 		<!-- Test server versions. -->
-		<test.wildfly.version>16.0.0.Final</test.wildfly.version>
-		<test.tomee.version>8.0.1</test.tomee.version>
-		<test.payara.version>5.191</test.payara.version>
+		<test.wildfly.version>20.0.1.Final</test.wildfly.version>
+		<test.tomee.version>8.0.4</test.tomee.version>
+		<test.payara.version>5.2020.4</test.payara.version>
 	</properties>
 
 	<dependencies>
@@ -293,7 +293,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
-				<version>3.1.1</version>
+				<version>3.2.0</version>
 				<configuration>
 					<archive>
 						<manifest>
@@ -312,7 +312,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>3.0.1</version>
+				<version>3.2.1</version>
 				<executions>
 					<execution>
 						<id>attach-sources</id>
@@ -327,7 +327,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.1.0</version>
+				<version>3.2.0</version>
 				<configuration>
 					<javadocVersion>${javadoc.version}</javadocVersion>
 					<notimestamp>true</notimestamp>
@@ -414,7 +414,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-dependency-plugin</artifactId>
-					<version>3.1.1</version>
+					<version>3.1.2</version>
 					<executions>
 						<execution>
 							<phase>process-test-classes</phase>
