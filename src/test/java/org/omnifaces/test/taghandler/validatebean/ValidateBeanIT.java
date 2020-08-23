@@ -487,10 +487,6 @@ public class ValidateBeanIT extends OmniFacesIT {
 
 	@Test
 	public void validateNestedClassLevelWithMessageForViolating() {
-		if (isTomee()) {
-			return; // Doesn't work with BVal. TODO: investigate.
-		}
-
 		validateNestedClassLevelWithMessageForViolatingNumber1.sendKeys("2");
 		validateNestedClassLevelWithMessageForViolatingNumber2.sendKeys("1");
 		guardAjax(validateNestedClassLevelWithMessageForViolatingCommand).click();
@@ -531,10 +527,6 @@ public class ValidateBeanIT extends OmniFacesIT {
 
 	@Test
 	public void validateNestedListClassLevelWithMessageForViolating() {
-		if (isTomee()) {
-			return; // Doesn't work with BVal. TODO: investigate.
-		}
-
 		validateNestedListClassLevelWithMessageForViolatingList0Number1.sendKeys("2");
 		validateNestedListClassLevelWithMessageForViolatingList0Number2.sendKeys("1");
 		validateNestedListClassLevelWithMessageForViolatingList1Number1.sendKeys("2");
@@ -560,10 +552,6 @@ public class ValidateBeanIT extends OmniFacesIT {
 
 	@Test
 	public void validateNestedListClassLevelWithMessagesForViolating() {
-		if (isTomee()) {
-			return; // Doesn't work with BVal. TODO: investigate.
-		}
-
 		validateNestedListClassLevelWithMessageForViolatingList0Number1.sendKeys("1"); // So custom property path is not set in ValidateBeanITEntityValidator.
 		validateNestedListClassLevelWithMessageForViolatingList0Number2.sendKeys("1");
 		validateNestedListClassLevelWithMessageForViolatingList1Number1.sendKeys("1"); // So custom property path is not set in ValidateBeanITEntityValidator.

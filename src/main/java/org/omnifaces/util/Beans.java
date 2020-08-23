@@ -13,10 +13,13 @@
 package org.omnifaces.util;
 
 import static java.util.logging.Level.FINE;
+import static java.util.regex.Pattern.CASE_INSENSITIVE;
+import static org.omnifaces.util.Reflection.toClassOrNull;
 
 import java.lang.annotation.Annotation;
 import java.util.Map;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.enterprise.context.ContextNotActiveException;
 import javax.enterprise.context.spi.AlterableContext;
@@ -73,6 +76,16 @@ import javax.enterprise.inject.spi.InjectionPoint;
 public final class Beans {
 
 	private static final Logger logger = Logger.getLogger(Beans.class.getName());
+
+	private static final String[] PROXY_INTERFACE_NAMES = {
+		"org.jboss.weld.proxy.WeldClientProxy",
+		"org.apache.webbeans.proxy.OwbNormalScopeProxy"
+	};
+
+	// Both Weld and OWB generate proxy class names as "BeanClassName[...]$$[...]Proxy[...]" with a "$$" and "Proxy" in it.
+	// Hopefully unknown CDI proxy implementations follow the same de-facto standard.
+	private static final Pattern PATTERN_GENERATED_PROXY_CLASS_NAME = Pattern.compile("(.+)\\$\\$(.*)Proxy(.*)", CASE_INSENSITIVE);
+
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -202,6 +215,39 @@ public final class Beans {
 	 */
 	public static <T> T getInstance(Bean<T> bean, boolean create) {
 		return BeansLocal.getInstance(getManager(), bean, create);
+	}
+
+	/**
+	 * Returns <code>true</code> if given object is actually a CDI proxy.
+	 * @param object The object to be checked.
+	 * @return <code>true</code> if given object is actually a CDI proxy.
+	 * @since 3.8
+	 */
+	public static <T> boolean isProxy(T object) {
+		if (object == null) {
+			return false;
+		}
+
+		for (String proxyInterfaceName : PROXY_INTERFACE_NAMES) {
+			Class<?> proxyInterface = toClassOrNull(proxyInterfaceName);
+
+			if (proxyInterface != null) {
+				return proxyInterface.isInstance(object);
+			}
+		}
+
+		// Fall back for unknown CDI proxy implementations.
+		return PATTERN_GENERATED_PROXY_CLASS_NAME.matcher(object.getClass().getSimpleName()).matches();
+	}
+
+	/**
+	 * Returns the actual instance of the given object if it is actually a CDI proxy as per {@link Beans#isProxy(Object)}.
+	 * @param object The object to be unwrapped.
+	 * @return The actual instance of the given object if it is actually a CDI proxy as per {@link Beans#isProxy(Object)}.
+	 * @since 3.8
+	 */
+	public static <T> T unwrapIfNecessary(T object) {
+		return BeansLocal.unwrapIfNecessary(getManager(), object);
 	}
 
 	/**

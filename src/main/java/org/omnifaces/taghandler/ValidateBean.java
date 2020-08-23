@@ -21,6 +21,7 @@ import static javax.faces.event.PhaseId.RESTORE_VIEW;
 import static javax.faces.event.PhaseId.UPDATE_MODEL_VALUES;
 import static javax.faces.view.facelets.ComponentHandler.isNew;
 import static org.omnifaces.el.ExpressionInspector.getValueReference;
+import static org.omnifaces.util.Beans.unwrapIfNecessary;
 import static org.omnifaces.util.Components.forEachComponent;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Components.getCurrentForm;
@@ -410,7 +411,7 @@ public class ValidateBean extends TagHandler {
 		ValidateBeanCallback checkConstraints = new ValidateBeanCallback() { @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
 			forEachInputWithMatchingBase(context, form, knownBaseProperties.keySet(), ValidateBean::removeCollectingValidator);
-			Object copiedBean = getCopier(context, copier).copy(bean);
+			Object copiedBean = getCopier(context, copier).copy(unwrapIfNecessary(bean));
 			setBeanProperties(copiedBean, collectedProperties);
 			validate(context, form, bean, copiedBean, collectedClientIds, true);
 		}};
