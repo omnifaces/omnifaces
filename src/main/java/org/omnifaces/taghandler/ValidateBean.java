@@ -46,8 +46,8 @@ import static org.omnifaces.util.Reflection.toClass;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.csvToList;
 import static org.omnifaces.util.Utils.isEmpty;
-import static org.omnifaces.util.Validators.getPropertyNodes;
 import static org.omnifaces.util.Validators.resolveViolatedBase;
+import static org.omnifaces.util.Validators.resolveViolatedProperty;
 import static org.omnifaces.util.Validators.validateBean;
 
 import java.io.IOException;
@@ -78,7 +78,6 @@ import javax.faces.view.facelets.FaceletContext;
 import javax.faces.view.facelets.TagConfig;
 import javax.faces.view.facelets.TagHandler;
 import javax.validation.ConstraintViolation;
-import javax.validation.Path.Node;
 
 import org.omnifaces.eventlistener.BeanValidationEventListener;
 import org.omnifaces.util.Callback;
@@ -526,9 +525,8 @@ public class ValidateBean extends TagHandler {
 
 	private static void invalidateInputsByPropertyPathAndShowMessages(FacesContext context, UIForm form, Object bean, Set<ConstraintViolation<?>> violations) {
 		for (ConstraintViolation<?> violation : violations) {
-			List<Node> propertyNodes = getPropertyNodes(violation);
 			Object base = resolveViolatedBase(bean, violation);
-			String property = propertyNodes.get(propertyNodes.size() - 1).getName();
+			String property = resolveViolatedProperty(bean, violation);
 
 			forEachInputWithMatchingBase(context, form, singleton(base), property, input -> {
 				context.validationFailed();
