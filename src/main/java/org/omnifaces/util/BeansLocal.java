@@ -13,6 +13,7 @@
 package org.omnifaces.util;
 
 import static java.util.logging.Level.FINEST;
+import static org.omnifaces.util.Beans.isProxy;
 
 import java.lang.annotation.Annotation;
 import java.util.Collections;
@@ -132,6 +133,22 @@ public final class BeansLocal {
 		else {
 			return context.get(bean);
 		}
+	}
+
+	/**
+	 * @see Beans#unwrapIfNecessary(Object)
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T unwrapIfNecessary(BeanManager beanManager, T object) {
+		if (object == null) {
+			return null;
+		}
+
+		if (!isProxy(object)) {
+			return object;
+		}
+
+		return (T) getInstance(beanManager, object.getClass().getSuperclass());
 	}
 
 	/**

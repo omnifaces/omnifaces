@@ -73,9 +73,9 @@
 		<!-- Test server versions. -->
 		<test.glassfish.version>6.0.0-M1</test.glassfish.version>
 		<test.tomcat.version>10.0.0-M4</test.tomcat.version> <!-- TODO: weld-servlet-shaded 4.x -->
-		<test.wildfly.version>19.0.0.Final</test.wildfly.version> <!-- TODO: JEE9 compatible version -->
+		<test.wildfly.version>20.0.1.Final</test.wildfly.version> <!-- TODO: JEE9 compatible version -->
 		<test.tomee.version>9.0.0-M1</test.tomee.version> <!-- TODO: JEE9 compatible version which supports jakarta.ee XML namespace (M1 unfortunately doesn't support it yet -->
-		<test.payara.version>5.201</test.payara.version> <!-- TODO: JEE9 compatible version -->
+		<test.payara.version>5.2020.4</test.payara.version> <!-- TODO: JEE9 compatible version -->
 	</properties>
 
 	<repositories>

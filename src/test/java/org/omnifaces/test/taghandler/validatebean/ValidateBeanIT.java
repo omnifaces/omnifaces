@@ -206,6 +206,36 @@ public class ValidateBeanIT extends OmniFacesIT {
 	@FindBy(id="validateNestedClassLevelActualWithMessageForViolating:command")
 	private WebElement validateNestedClassLevelActualWithMessageForViolatingCommand;
 
+	@FindBy(id="validateNestedListClassLevelWithMessageForViolating:list:0:number1")
+	private WebElement validateNestedListClassLevelWithMessageForViolatingList0Number1;
+
+	@FindBy(id="validateNestedListClassLevelWithMessageForViolating:list:0:number1Message")
+	private WebElement validateNestedListClassLevelWithMessageForViolatingList0Number1Message;
+
+	@FindBy(id="validateNestedListClassLevelWithMessageForViolating:list:0:number2")
+	private WebElement validateNestedListClassLevelWithMessageForViolatingList0Number2;
+
+	@FindBy(id="validateNestedListClassLevelWithMessageForViolating:list:0:number2Message")
+	private WebElement validateNestedListClassLevelWithMessageForViolatingList0Number2Message;
+
+	@FindBy(id="validateNestedListClassLevelWithMessageForViolating:list:1:number1")
+	private WebElement validateNestedListClassLevelWithMessageForViolatingList1Number1;
+
+	@FindBy(id="validateNestedListClassLevelWithMessageForViolating:list:1:number1Message")
+	private WebElement validateNestedListClassLevelWithMessageForViolatingList1Number1Message;
+
+	@FindBy(id="validateNestedListClassLevelWithMessageForViolating:list:1:number2")
+	private WebElement validateNestedListClassLevelWithMessageForViolatingList1Number2;
+
+	@FindBy(id="validateNestedListClassLevelWithMessageForViolating:list:1:number2Message")
+	private WebElement validateNestedListClassLevelWithMessageForViolatingList1Number2Message;
+
+	@FindBy(id="validateNestedListClassLevelWithMessageForViolating:formMessage")
+	private WebElement validateNestedListClassLevelWithMessageForViolatingFormMessage;
+
+	@FindBy(id="validateNestedListClassLevelWithMessageForViolating:command")
+	private WebElement validateNestedListClassLevelWithMessageForViolatingCommand;
+
 	@FindBy(id="validateClassLevelWithInputEntityComposite:composite:number1")
 	private WebElement validateClassLevelWithInputEntityCompositeNumber1;
 
@@ -352,7 +382,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		guardAjax(validateClassLevelDefaultCommand).click();
 		assertEquals("number1Label, number2Label: invalidEntity", messages.getText());
 
-		validateClassLevelDefaultNumber2.sendKeys("0");
+		validateClassLevelDefaultNumber2.sendKeys("0"); // So it becomes 10
 		guardAjax(validateClassLevelDefaultCommand).click();
 		assertEquals("actionSuccess", messages.getText());
 	}
@@ -364,7 +394,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		guardAjax(validateClassLevelActualCommand).click();
 		assertEquals("invalidEntity actionValidationFailed", messages.getText());
 
-		validateClassLevelActualNumber2.sendKeys("0");
+		validateClassLevelActualNumber2.sendKeys("0"); // So it becomes 10
 		guardAjax(validateClassLevelActualCommand).click();
 		assertEquals("actionSuccess", messages.getText());
 	}
@@ -376,7 +406,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		guardAjax(validateClassLevelByCopierCommand).click();
 		assertEquals("number1Label, number2Label: invalidEntity", messages.getText());
 
-		validateClassLevelByCopierNumber2.sendKeys("0");
+		validateClassLevelByCopierNumber2.sendKeys("0"); // So it becomes 10
 		guardAjax(validateClassLevelByCopierCommand).click();
 		assertEquals("actionSuccess", messages.getText());
 	}
@@ -388,7 +418,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		guardAjax(validateClassLevelWithMessageForFormCommand).click();
 		assertEquals("number1Label, number2Label: invalidEntity", validateClassLevelWithMessageForFormMessage.getText());
 
-		validateClassLevelWithMessageForFormNumber2.sendKeys("0");
+		validateClassLevelWithMessageForFormNumber2.sendKeys("0"); // So it becomes 10
 		guardAjax(validateClassLevelWithMessageForFormCommand).click();
 		assertEquals("", validateClassLevelWithMessageForFormMessage.getText());
 	}
@@ -401,7 +431,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("number1Label, number2Label: invalidEntity", validateClassLevelWithMessageForAllNumber1Message.getText());
 		assertEquals("number1Label, number2Label: invalidEntity", validateClassLevelWithMessageForAllNumber2Message.getText());
 
-		validateClassLevelWithMessageForAllNumber2.sendKeys("0");
+		validateClassLevelWithMessageForAllNumber2.sendKeys("0"); // So it becomes 10
 		guardAjax(validateClassLevelWithMessageForAllCommand).click();
 		assertEquals("", validateClassLevelWithMessageForAllNumber1Message.getText());
 		assertEquals("", validateClassLevelWithMessageForAllNumber2Message.getText());
@@ -414,7 +444,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		guardAjax(validateClassLevelWithMessageForGlobalCommand).click();
 		assertEquals("number1Label, number2Label: invalidEntity", validateClassLevelWithMessageForGlobalMessage.getText());
 
-		validateClassLevelWithMessageForGlobalNumber2.sendKeys("0");
+		validateClassLevelWithMessageForGlobalNumber2.sendKeys("0"); // So it becomes 10
 		guardAjax(validateClassLevelWithMessageForGlobalCommand).click();
 		assertEquals("actionSuccess", validateClassLevelWithMessageForGlobalMessage.getText());
 	}
@@ -429,7 +459,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("", validateClassLevelWithMessageForViolatingFormMessage.getText());
 		assertEquals("", messages.getText());
 
-		validateClassLevelWithMessageForViolatingNumber2.sendKeys("0");
+		validateClassLevelWithMessageForViolatingNumber2.sendKeys("0"); // So it becomes 10
 		guardAjax(validateClassLevelWithMessageForViolatingCommand).click();
 		assertEquals("", validateClassLevelWithMessageForViolatingNumber1Message.getText());
 		assertEquals("", validateClassLevelWithMessageForViolatingNumber2Message.getText());
@@ -447,7 +477,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("", validateClassLevelActualWithMessageForViolatingFormMessage.getText());
 		assertEquals("actionValidationFailed", messages.getText());
 
-		validateClassLevelActualWithMessageForViolatingNumber2.sendKeys("0");
+		validateClassLevelActualWithMessageForViolatingNumber2.sendKeys("0"); // So it becomes 10
 		guardAjax(validateClassLevelActualWithMessageForViolatingCommand).click();
 		assertEquals("", validateClassLevelActualWithMessageForViolatingNumber1Message.getText());
 		assertEquals("", validateClassLevelActualWithMessageForViolatingNumber2Message.getText());
@@ -465,7 +495,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("", validateNestedClassLevelWithMessageForViolatingFormMessage.getText());
 		assertEquals("", messages.getText());
 
-		validateNestedClassLevelWithMessageForViolatingNumber2.sendKeys("0");
+		validateNestedClassLevelWithMessageForViolatingNumber2.sendKeys("0"); // So it becomes 10
 		guardAjax(validateNestedClassLevelWithMessageForViolatingCommand).click();
 		assertEquals("", validateNestedClassLevelWithMessageForViolatingNumber1Message.getText());
 		assertEquals("", validateNestedClassLevelWithMessageForViolatingNumber2Message.getText());
@@ -483,11 +513,61 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("", validateNestedClassLevelActualWithMessageForViolatingFormMessage.getText());
 		assertEquals("actionValidationFailed", messages.getText());
 
-		validateNestedClassLevelActualWithMessageForViolatingNumber2.sendKeys("0");
+		validateNestedClassLevelActualWithMessageForViolatingNumber2.sendKeys("0"); // So it becomes 10
 		guardAjax(validateNestedClassLevelActualWithMessageForViolatingCommand).click();
 		assertEquals("", validateNestedClassLevelActualWithMessageForViolatingNumber1Message.getText());
 		assertEquals("", validateNestedClassLevelActualWithMessageForViolatingNumber2Message.getText());
 		assertEquals("", validateNestedClassLevelActualWithMessageForViolatingFormMessage.getText());
+		assertEquals("actionSuccess", messages.getText());
+	}
+
+	@Test
+	public void validateNestedListClassLevelWithMessageForViolating() {
+		validateNestedListClassLevelWithMessageForViolatingList0Number1.sendKeys("2");
+		validateNestedListClassLevelWithMessageForViolatingList0Number2.sendKeys("1");
+		validateNestedListClassLevelWithMessageForViolatingList1Number1.sendKeys("2");
+		validateNestedListClassLevelWithMessageForViolatingList1Number2.sendKeys("1");
+		guardAjax(validateNestedListClassLevelWithMessageForViolatingCommand).click();
+		assertEquals("number1Label: invalidEntity", validateNestedListClassLevelWithMessageForViolatingList0Number1Message.getText());
+		assertEquals("", validateNestedListClassLevelWithMessageForViolatingList0Number2Message.getText());
+		assertEquals("number1Label: invalidEntity", validateNestedListClassLevelWithMessageForViolatingList1Number1Message.getText());
+		assertEquals("", validateNestedListClassLevelWithMessageForViolatingList0Number2Message.getText());
+		assertEquals("", validateNestedListClassLevelWithMessageForViolatingFormMessage.getText());
+		assertEquals("", messages.getText());
+
+		validateNestedListClassLevelWithMessageForViolatingList0Number2.sendKeys("0"); // So it becomes 10
+		validateNestedListClassLevelWithMessageForViolatingList1Number2.sendKeys("0"); // So it becomes 10
+		guardAjax(validateNestedListClassLevelWithMessageForViolatingCommand).click();
+		assertEquals("", validateNestedListClassLevelWithMessageForViolatingList0Number1Message.getText());
+		assertEquals("", validateNestedListClassLevelWithMessageForViolatingList0Number2Message.getText());
+		assertEquals("", validateNestedListClassLevelWithMessageForViolatingList1Number1Message.getText());
+		assertEquals("", validateNestedListClassLevelWithMessageForViolatingList1Number2Message.getText());
+		assertEquals("", validateNestedListClassLevelWithMessageForViolatingFormMessage.getText());
+		assertEquals("actionSuccess", messages.getText());
+	}
+
+	@Test
+	public void validateNestedListClassLevelWithMessagesForViolating() {
+		validateNestedListClassLevelWithMessageForViolatingList0Number1.sendKeys("1"); // So custom property path is not set in ValidateBeanITEntityValidator.
+		validateNestedListClassLevelWithMessageForViolatingList0Number2.sendKeys("1");
+		validateNestedListClassLevelWithMessageForViolatingList1Number1.sendKeys("1"); // So custom property path is not set in ValidateBeanITEntityValidator.
+		validateNestedListClassLevelWithMessageForViolatingList1Number2.sendKeys("1");
+		guardAjax(validateNestedListClassLevelWithMessageForViolatingCommand).click();
+		assertEquals("number1Label: invalidEntity", validateNestedListClassLevelWithMessageForViolatingList0Number1Message.getText());
+		assertEquals("number2Label: invalidEntity", validateNestedListClassLevelWithMessageForViolatingList0Number2Message.getText());
+		assertEquals("number1Label: invalidEntity", validateNestedListClassLevelWithMessageForViolatingList1Number1Message.getText());
+		assertEquals("number2Label: invalidEntity", validateNestedListClassLevelWithMessageForViolatingList0Number2Message.getText());
+		assertEquals("", validateNestedListClassLevelWithMessageForViolatingFormMessage.getText());
+		assertEquals("", messages.getText());
+
+		validateNestedListClassLevelWithMessageForViolatingList0Number2.sendKeys("0"); // So it becomes 10
+		validateNestedListClassLevelWithMessageForViolatingList1Number2.sendKeys("0"); // So it becomes 10
+		guardAjax(validateNestedListClassLevelWithMessageForViolatingCommand).click();
+		assertEquals("", validateNestedListClassLevelWithMessageForViolatingList0Number1Message.getText());
+		assertEquals("", validateNestedListClassLevelWithMessageForViolatingList0Number2Message.getText());
+		assertEquals("", validateNestedListClassLevelWithMessageForViolatingList1Number1Message.getText());
+		assertEquals("", validateNestedListClassLevelWithMessageForViolatingList1Number2Message.getText());
+		assertEquals("", validateNestedListClassLevelWithMessageForViolatingFormMessage.getText());
 		assertEquals("actionSuccess", messages.getText());
 	}
 
@@ -501,7 +581,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("", validateClassLevelWithInputEntityCompositeFormMessage.getText());
 		assertEquals("", messages.getText());
 
-		validateClassLevelWithInputEntityCompositeNumber2.sendKeys("0");
+		validateClassLevelWithInputEntityCompositeNumber2.sendKeys("0"); // So it becomes 10
 		guardAjax(validateClassLevelWithInputEntityCompositeCommand).click();
 		assertEquals("", validateClassLevelWithInputEntityCompositeNumber1Message.getText());
 		assertEquals("", validateClassLevelWithInputEntityCompositeNumber2Message.getText());
@@ -519,7 +599,7 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("", validateClassLevelWithFormEntityCompositeFormMessage.getText());
 		assertEquals("", messages.getText());
 
-		validateClassLevelWithFormEntityCompositeNumber2.sendKeys("0");
+		validateClassLevelWithFormEntityCompositeNumber2.sendKeys("0"); // So it becomes 10
 		guardAjax(validateClassLevelWithFormEntityCompositeCommand).click();
 		assertEquals("", validateClassLevelWithFormEntityCompositeNumber1Message.getText());
 		assertEquals("", validateClassLevelWithFormEntityCompositeNumber2Message.getText());

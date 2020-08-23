@@ -21,6 +21,7 @@ import static java.text.MessageFormat.format;
 import static java.util.Collections.singleton;
 import static java.util.logging.Level.SEVERE;
 import static org.omnifaces.el.ExpressionInspector.getValueReference;
+import static org.omnifaces.util.Beans.unwrapIfNecessary;
 import static org.omnifaces.util.Components.forEachComponent;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Components.getCurrentForm;
@@ -46,8 +47,8 @@ import static org.omnifaces.util.Reflection.toClass;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.csvToList;
 import static org.omnifaces.util.Utils.isEmpty;
-import static org.omnifaces.util.Validators.getPropertyNodes;
 import static org.omnifaces.util.Validators.resolveViolatedBase;
+import static org.omnifaces.util.Validators.resolveViolatedProperty;
 import static org.omnifaces.util.Validators.validateBean;
 
 import java.io.IOException;
@@ -78,7 +79,6 @@ import jakarta.faces.view.facelets.FaceletContext;
 import jakarta.faces.view.facelets.TagConfig;
 import jakarta.faces.view.facelets.TagHandler;
 import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Path.Node;
 
 import org.omnifaces.eventlistener.BeanValidationEventListener;
 import org.omnifaces.util.Callback;
@@ -386,7 +386,7 @@ public class ValidateBean extends TagHandler {
 	private void validateActualBean(UIForm form, Object bean) {
 		ValidateBeanCallback validateActualBean = new ValidateBeanCallback() { @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
-			validate(context, form, bean, bean, new HashSet<String>(0), false);
+			validate(context, form, bean, unwrapIfNecessary(bean), new HashSet<String>(0), false);
 		}};
 
 		subscribeToRequestAfterPhase(UPDATE_MODEL_VALUES, validateActualBean);
@@ -411,7 +411,7 @@ public class ValidateBean extends TagHandler {
 		ValidateBeanCallback checkConstraints = new ValidateBeanCallback() { @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
 			forEachInputWithMatchingBase(context, form, knownBaseProperties.keySet(), ValidateBean::removeCollectingValidator);
-			Object copiedBean = getCopier(context, copier).copy(bean);
+			Object copiedBean = getCopier(context, copier).copy(unwrapIfNecessary(bean));
 			setBeanProperties(copiedBean, collectedProperties);
 			validate(context, form, bean, copiedBean, collectedClientIds, true);
 		}};
@@ -526,9 +526,8 @@ public class ValidateBean extends TagHandler {
 
 	private static void invalidateInputsByPropertyPathAndShowMessages(FacesContext context, UIForm form, Object bean, Set<ConstraintViolation<?>> violations) {
 		for (ConstraintViolation<?> violation : violations) {
-			List<Node> propertyNodes = getPropertyNodes(violation);
-			Object base = getBase(bean, violation, propertyNodes);
-			String property = propertyNodes.get(propertyNodes.size() - 1).getName();
+			Object base = resolveViolatedBase(bean, violation);
+			String property = resolveViolatedProperty(bean, violation);
 
 			forEachInputWithMatchingBase(context, form, singleton(base), property, input -> {
 				context.validationFailed();
@@ -536,18 +535,6 @@ public class ValidateBean extends TagHandler {
 				String clientId = input.getClientId(context);
 				addError(clientId, formatMessage(violation.getMessage(), getLabel(input)));
 			});
-		}
-	}
-
-	private static Object getBase(Object bean, ConstraintViolation<?> violation, List<Node> propertyNodes) {
-		if (propertyNodes.size() == 1) { // If violation is on root bean, just use the actual bean.
-			return bean;
-		}
-		else if (violation.getRootBean() == bean) { // If actual bean was validated, we can just read the value from the violation directly.
-			return violation.getInvalidValue();
-		}
-		else { // When the copied bean was validated, we need to resolve the violated base from the copied bean.
-			return resolveViolatedBase(bean, violation);
 		}
 	}
 
