@@ -25,6 +25,7 @@ import javax.annotation.PreDestroy;
 import javax.enterprise.context.NormalScope;
 import javax.enterprise.util.Nonbinding;
 import javax.faces.component.UIViewRoot;
+import javax.faces.context.FacesContext;
 
 import org.omnifaces.cdi.viewscope.ViewScopeContext;
 import org.omnifaces.cdi.viewscope.ViewScopeEventListener;
@@ -199,6 +200,24 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <code>Content-Disposition: attachment</code> is received.
  * <pre>
  * &lt;a href="/path/to/file.ext" target="_blank"&gt;download&lt;/a&gt;
+ * </pre>
+ *
+ * <h3>Detecting unload requests</h3>
+ * <p>
+ * When the unload request has hit your servlet filter or authentication mechanism or whatever global listener/observer,
+ * and you would like to be able to detect them, so that you can exclude them from the logic, then you can use
+ * {@link ViewScopeManager#isUnloadRequest(javax.servlet.http.HttpServletRequest)} or
+ * {@link ViewScopeManager#isUnloadRequest(javax.faces.context.FacesContext)}, depending on whether the
+ * {@link FacesContext} is available in the current context. You should always ensure that the flow just continues for
+ * them, else the unload requests won't be able to do their work of explicitly destroying the bean and state.
+ * <p>
+ * Here is an example assuming that you're in a servlet filter:
+ * <pre>
+ * if (!ViewScopeManager.isUnloadRequest(request)) {
+ *     // Do actual job here.
+ * }
+ *
+ * chain.doFilter(request, response); // Ensure that this just continues!
  * </pre>
  *
  *
