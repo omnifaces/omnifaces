@@ -26,5 +26,19 @@
 	<h:body>
 		<h:outputText id="facesConverterITConverter" value="test" converter="facesConverterITConverter" />
 		<h:outputText id="facesConverterITManagedConverter" value="test" converter="facesConverterITManagedConverter" />
+		<h:outputText id="facesConverterITExtendedConverter" value="test" converter="facesConverterITExtendedConverter" />
+		<h:outputText id="facesConverterITExtendedManagedConverter" value="test" converter="facesConverterITExtendedManagedConverter" />
+
+		<h:outputText id="facesConverterITConverterResourceDependency" />
+		<h:outputText id="facesConverterITManagedConverterResourceDependency" />
+		<h:outputText id="facesConverterITExtendedConverterResourceDependency" />
+		<h:outputText id="facesConverterITExtendedManagedConverterResourceDependency" />
+
+		<h:outputText id="loaded" />
+
+		<script>
+			// This ensures that any resource dependency scripts are finished because they're also only executed on "load" event.
+			window.addEventListener("load", function() { document.getElementById("loaded").innerHTML = "true" });
+		</script>
 	</h:body>
 </html>

@@ -12,20 +12,21 @@
  */
 package org.omnifaces.test.cdi.facesconverter;
 
+import javax.faces.application.ResourceDependency;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
-import javax.faces.convert.Converter;
+import javax.faces.convert.FacesConverter;
+import javax.inject.Inject;
 
-public abstract class FacesConverterITBaseConverter implements Converter<Object> {
+@FacesConverter(value = "facesConverterITExtendedManagedConverter", managed = true) // JSF 2.3-managed
+@ResourceDependency(library = "omnifaces.test", name = "facesConverterITExtendedManagedConverterResourceDependency.js", target = "head")
+public class FacesConverterITExtendedManagedConverter extends FacesConverterITBaseConverter {
+
+	@Inject
+	private FacesConverterITSomeEJB ejb;
 
 	@Override
 	public String getAsString(FacesContext context, UIComponent component, Object value) {
-		return "";
+		return ejb == null ? "null" : ejb.getClass().getSimpleName();
 	}
-
-	@Override
-	public String getAsObject(FacesContext context, UIComponent component, String value) {
-		return null;
-	}
-
 }

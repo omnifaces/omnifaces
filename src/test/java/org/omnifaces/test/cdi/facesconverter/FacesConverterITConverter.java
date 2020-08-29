@@ -13,20 +13,28 @@
 package org.omnifaces.test.cdi.facesconverter;
 
 import javax.enterprise.context.Dependent;
+import javax.faces.application.ResourceDependency;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
+import javax.faces.convert.Converter;
 import javax.faces.convert.FacesConverter;
 import javax.inject.Inject;
 
 @Dependent // OmniFaces-managed
 @FacesConverter(value = "facesConverterITConverter")
-public class FacesConverterITConverter extends FacesConverterITBaseConverter {
+@ResourceDependency(library = "omnifaces.test", name = "facesConverterITConverterResourceDependency.js", target = "head")
+public class FacesConverterITConverter implements Converter<Object> {
 
 	@Inject
 	private FacesConverterITSomeEJB ejb;
 
 	@Override
-	public String getAsString(FacesContext context, UIComponent component, String value) {
-		return ejb.getClass().getSimpleName();
+	public String getAsString(FacesContext context, UIComponent component, Object value) {
+		return ejb == null ? "null" : ejb.getClass().getSimpleName();
+	}
+
+	@Override
+	public String getAsObject(FacesContext context, UIComponent component, String value) {
+		return null;
 	}
 }
