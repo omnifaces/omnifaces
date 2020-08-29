@@ -12,18 +12,12 @@
  */
 package org.omnifaces.application;
 
-import static java.lang.Boolean.parseBoolean;
-import static javax.faces.convert.Converter.DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE_PARAM_NAME;
 import static org.omnifaces.util.Beans.getReference;
-import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Utils.getDefaultValue;
-
-import java.util.TimeZone;
 
 import javax.faces.application.Application;
 import javax.faces.application.ApplicationWrapper;
 import javax.faces.convert.Converter;
-import javax.faces.convert.DateTimeConverter;
 import javax.faces.validator.Validator;
 
 import org.omnifaces.cdi.converter.ConverterManager;
@@ -54,7 +48,6 @@ public class OmniApplication extends ApplicationWrapper {
 
 	private final ConverterManager converterManager;
 	private final ValidatorManager validatorManager;
-	private final TimeZone dateTimeConverterDefaultTimeZone;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -66,10 +59,6 @@ public class OmniApplication extends ApplicationWrapper {
 		super(wrapped);
 		converterManager = getReference(ConverterManager.class);
 		validatorManager = getReference(ValidatorManager.class);
-		dateTimeConverterDefaultTimeZone =
-			parseBoolean(getInitParameter(DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE_PARAM_NAME))
-				? TimeZone.getDefault()
-				: null;
 	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
@@ -80,14 +69,7 @@ public class OmniApplication extends ApplicationWrapper {
 	 */
 	@Override
 	public Converter createConverter(String converterId) {
-		Converter converter = converterManager.createConverter(getWrapped(), converterId);
-
-		if (converter != null) {
-			setDefaultPropertiesIfNecessary(converter);
-			return converter;
-		}
-
-		return super.createConverter(converterId);
+		return converterManager.createConverter(getWrapped(), converterId);
 	}
 
 	/**
@@ -97,14 +79,7 @@ public class OmniApplication extends ApplicationWrapper {
 	@Override
 	public Converter createConverter(Class<?> forClass) {
 		Class<?> converterForClass = forClass.isPrimitive() ? getDefaultValue(forClass).getClass() : forClass;
-		Converter converter = converterManager.createConverter(getWrapped(), converterForClass);
-
-		if (converter != null) {
-			setDefaultPropertiesIfNecessary(converter);
-			return converter;
-		}
-
-		return super.createConverter(converterForClass);
+		return converterManager.createConverter(getWrapped(), converterForClass);
 	}
 
 	/**
@@ -113,21 +88,7 @@ public class OmniApplication extends ApplicationWrapper {
 	 */
 	@Override
 	public Validator createValidator(String validatorId) {
-		Validator validator = validatorManager.createValidator(getWrapped(), validatorId);
-
-		if (validator != null) {
-			return validator;
-		}
-
-		return super.createValidator(validatorId);
-	}
-
-	// Helpers --------------------------------------------------------------------------------------------------------
-
-	private void setDefaultPropertiesIfNecessary(Converter converter) {
-		if (converter instanceof DateTimeConverter && dateTimeConverterDefaultTimeZone != null) {
-			((DateTimeConverter) converter).setTimeZone(dateTimeConverterDefaultTimeZone);
-		}
+		return validatorManager.createValidator(getWrapped(), validatorId);
 	}
 
 }

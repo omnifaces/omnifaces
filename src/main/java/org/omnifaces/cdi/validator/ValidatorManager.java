@@ -113,19 +113,35 @@ public class ValidatorManager {
 	 * or <code>null</code> if there is none.
 	 */
 	public Validator createValidator(Application application, String validatorId) {
+		Validator validator = application.createValidator(validatorId);
 		Bean<Validator> bean = validatorsById.get(validatorId);
 
 		if (bean == null && !validatorsById.containsKey(validatorId)) {
-			Validator validator = application.createValidator(validatorId);
 
-			if (validator != null) {
+			if (isUnmanaged(validator)) {
 				bean = resolve(validator.getClass(), validatorId);
 			}
 
 			validatorsById.put(validatorId, bean);
 		}
 
-		return (bean != null) ? getReference(manager, bean) : null;
+		return (bean != null) ? getReference(manager, bean) : validator;
+	}
+
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	private boolean isUnmanaged(Validator validator) {
+		if (validator == null) {
+			return false;
+		}
+
+		FacesValidator annotation = validator.getClass().getAnnotation(FacesValidator.class);
+
+		if (annotation == null) {
+			return false;
+		}
+
+		return !annotation.managed();
 	}
 
 	@SuppressWarnings("unchecked")
