@@ -12,14 +12,19 @@
  */
 package org.omnifaces.cdi.converter;
 
+import static jakarta.faces.convert.Converter.DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE_PARAM_NAME;
+import static java.lang.Boolean.parseBoolean;
 import static org.omnifaces.util.BeansLocal.getReference;
 import static org.omnifaces.util.BeansLocal.resolveExact;
+import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Reflection.findConstructor;
 
 import java.lang.annotation.Annotation;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.Dependent;
 import jakarta.enterprise.inject.AmbiguousResolutionException;
@@ -30,6 +35,7 @@ import jakarta.faces.application.Application;
 import jakarta.faces.application.NavigationHandler;
 import jakarta.faces.application.ResourceHandler;
 import jakarta.faces.convert.Converter;
+import jakarta.faces.convert.DateTimeConverter;
 import jakarta.faces.convert.FacesConverter;
 import jakarta.faces.event.ActionListener;
 import jakarta.faces.event.PhaseListener;
@@ -113,6 +119,17 @@ public class ConverterManager {
 	private BeanManager manager;
 	private Map<String, Bean<Converter>> convertersById = new HashMap<>();
 	private Map<Class<?>, Bean<Converter>> convertersByForClass = new HashMap<>();
+	private TimeZone dateTimeConverterDefaultTimeZone;
+
+	// Init -----------------------------------------------------------------------------------------------------------
+
+	@PostConstruct
+	public void init() {
+		dateTimeConverterDefaultTimeZone =
+			parseBoolean(getInitParameter(DATETIMECONVERTER_DEFAULT_TIMEZONE_IS_SYSTEM_TIMEZONE_PARAM_NAME))
+				? TimeZone.getDefault()
+				: null;
+	}
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
@@ -125,19 +142,27 @@ public class ConverterManager {
 	 * or <code>null</code> if there is none.
 	 */
 	public Converter createConverter(Application application, String converterId) {
+		Converter converter = application.createConverter(converterId);
 		Bean<Converter> bean = convertersById.get(converterId);
 
 		if (bean == null && !convertersById.containsKey(converterId)) {
-			Converter converter = application.createConverter(converterId);
 
-			if (converter != null) {
+			if (isUnmanaged(converter)) {
 				bean = resolve(converter.getClass(), converterId, Object.class);
 			}
 
 			convertersById.put(converterId, bean);
 		}
 
-		return (bean != null) ? getReference(manager, bean) : null;
+		if (bean != null) {
+			converter = getReference(manager, bean);
+
+			if (converter != null) {
+				setDefaultPropertiesIfNecessary(converter);
+			}
+		}
+
+		return converter;
 	}
 
 	/**
@@ -149,12 +174,12 @@ public class ConverterManager {
 	 * or <code>null</code> if there is none.
 	 */
 	public Converter createConverter(Application application, Class<?> converterForClass) {
+		Converter converter = application.createConverter(converterForClass);
 		Bean<Converter> bean = convertersByForClass.get(converterForClass);
 
 		if (bean == null && !convertersByForClass.containsKey(converterForClass)) {
-			Converter converter = application.createConverter(converterForClass);
 
-			if (converter != null) {
+			if (isUnmanaged(converter)) {
 				Class<? extends Converter> converterClass = converter.getClass();
 
 				if (findConstructor(converterClass) != null && findConstructor(converterClass, Class.class) == null) {
@@ -165,7 +190,31 @@ public class ConverterManager {
 			convertersByForClass.put(converterForClass, bean);
 		}
 
-		return (bean != null) ? getReference(manager, bean) : null;
+		if (bean != null) {
+			converter = getReference(manager, bean);
+
+			if (converter != null) {
+				setDefaultPropertiesIfNecessary(converter);
+			}
+		}
+
+		return converter;
+	}
+
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	private boolean isUnmanaged(Converter converter) {
+		if (converter == null) {
+			return false;
+		}
+
+		FacesConverter annotation = converter.getClass().getAnnotation(FacesConverter.class);
+
+		if (annotation == null) {
+			return false;
+		}
+
+		return !annotation.managed();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -206,6 +255,12 @@ public class ConverterManager {
 		}
 
 		return bean;
+	}
+
+	private void setDefaultPropertiesIfNecessary(Converter converter) {
+		if (converter instanceof DateTimeConverter && dateTimeConverterDefaultTimeZone != null) {
+			((DateTimeConverter) converter).setTimeZone(dateTimeConverterDefaultTimeZone);
+		}
 	}
 
 }

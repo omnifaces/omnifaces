@@ -10,22 +10,20 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.omnifaces.test.cdi.facesconverter;
+package org.omnifaces.test.taghandler.validatebean;
 
-import jakarta.faces.component.UIComponent;
-import jakarta.faces.context.FacesContext;
-import jakarta.faces.convert.Converter;
+import java.util.ArrayList;
+import java.util.List;
 
-public abstract class FacesConverterITBaseConverter implements Converter<Object> {
+import jakarta.validation.Valid;
 
-	@Override
-	public String getAsString(FacesContext context, UIComponent component, Object value) {
-		return "";
-	}
+public class ValidateBeanITNestedEntity {
 
-	@Override
-	public String getAsObject(FacesContext context, UIComponent component, String value) {
-		return null;
+	@Valid
+	private List<ValidateBeanITEntity> entities = new ArrayList<>();
+
+	public List<ValidateBeanITEntity> getEntities() {
+		return entities;
 	}
 
 }

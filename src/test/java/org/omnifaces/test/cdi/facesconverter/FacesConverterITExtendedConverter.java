@@ -16,14 +16,13 @@ import jakarta.enterprise.context.Dependent;
 import jakarta.faces.application.ResourceDependency;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.context.FacesContext;
-import jakarta.faces.convert.Converter;
 import jakarta.faces.convert.FacesConverter;
 import jakarta.inject.Inject;
 
 @Dependent // OmniFaces-managed
-@FacesConverter(value = "facesConverterITConverter")
-@ResourceDependency(library = "omnifaces.test", name = "facesConverterITConverterResourceDependency.js", target = "head")
-public class FacesConverterITConverter implements Converter<Object> {
+@FacesConverter(value = "facesConverterITExtendedConverter")
+@ResourceDependency(library = "omnifaces.test", name = "facesConverterITExtendedConverterResourceDependency.js", target = "head")
+public class FacesConverterITExtendedConverter extends FacesConverterITBaseConverter {
 
 	@Inject
 	private FacesConverterITSomeEJB ejb;
@@ -31,10 +30,5 @@ public class FacesConverterITConverter implements Converter<Object> {
 	@Override
 	public String getAsString(FacesContext context, UIComponent component, Object value) {
 		return ejb == null ? "null" : ejb.getClass().getSimpleName();
-	}
-
-	@Override
-	public String getAsObject(FacesContext context, UIComponent component, String value) {
-		return null;
 	}
 }

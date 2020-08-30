@@ -17,6 +17,7 @@ import static org.jboss.arquillian.graphene.Graphene.guardNoRequest;
 import static org.jboss.arquillian.graphene.Graphene.waitGui;
 import static org.jboss.shrinkwrap.api.ShrinkWrap.create;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withMessageBundle;
+import static org.omnifaces.util.Utils.isOneOf;
 
 import java.io.File;
 import java.net.URL;
@@ -110,6 +111,10 @@ public abstract class OmniFacesIT {
 
 	protected static boolean isTomee() {
 		return "tomee".equals(System.getProperty("profile.id"));
+	}
+
+	protected static boolean isMojarra() {
+		return isOneOf(System.getProperty("profile.id"), "glassfish", "wildfly", "payara");
 	}
 
 	protected static <T extends OmniFacesIT> WebArchive createWebArchive(Class<T> testClass) {

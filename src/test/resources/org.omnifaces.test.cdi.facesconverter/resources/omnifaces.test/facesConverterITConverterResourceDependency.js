@@ -10,22 +10,6 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.omnifaces.test.cdi.facesconverter;
-
-import jakarta.faces.component.UIComponent;
-import jakarta.faces.context.FacesContext;
-import jakarta.faces.convert.Converter;
-
-public abstract class FacesConverterITBaseConverter implements Converter<Object> {
-
-	@Override
-	public String getAsString(FacesContext context, UIComponent component, Object value) {
-		return "";
-	}
-
-	@Override
-	public String getAsObject(FacesContext context, UIComponent component, String value) {
-		return null;
-	}
-
-}
+window.addEventListener("load", function() {
+	document.getElementById("facesConverterITConverterResourceDependency").innerHTML = "facesConverterITConverterResourceDependency";
+});

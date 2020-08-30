@@ -12,20 +12,9 @@
  */
 package org.omnifaces.test.cdi.facesconverter;
 
-import jakarta.faces.component.UIComponent;
-import jakarta.faces.context.FacesContext;
-import jakarta.faces.convert.Converter;
+import jakarta.faces.annotation.FacesConfig;
+import jakarta.faces.annotation.FacesConfig.Version;
 
-public abstract class FacesConverterITBaseConverter implements Converter<Object> {
-
-	@Override
-	public String getAsString(FacesContext context, UIComponent component, Object value) {
-		return "";
-	}
-
-	@Override
-	public String getAsObject(FacesContext context, UIComponent component, String value) {
-		return null;
-	}
-
+@FacesConfig(version = Version.JSF_2_3) // Else JSF 2.3-native @FacesConverter(managed=true) won't work in Mojarra.
+public class FacesConverterITConfig {
 }
