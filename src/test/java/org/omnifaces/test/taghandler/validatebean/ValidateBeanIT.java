@@ -236,6 +236,36 @@ public class ValidateBeanIT extends OmniFacesIT {
 	@FindBy(id="validateNestedListClassLevelWithMessageForViolating:command")
 	private WebElement validateNestedListClassLevelWithMessageForViolatingCommand;
 
+	@FindBy(id="validateNestedListClassLevelActualWithMessageForViolating:list:0:number1")
+	private WebElement validateNestedListClassLevelActualWithMessageForViolatingList0Number1;
+
+	@FindBy(id="validateNestedListClassLevelActualWithMessageForViolating:list:0:number1Message")
+	private WebElement validateNestedListClassLevelActualWithMessageForViolatingList0Number1Message;
+
+	@FindBy(id="validateNestedListClassLevelActualWithMessageForViolating:list:0:number2")
+	private WebElement validateNestedListClassLevelActualWithMessageForViolatingList0Number2;
+
+	@FindBy(id="validateNestedListClassLevelActualWithMessageForViolating:list:0:number2Message")
+	private WebElement validateNestedListClassLevelActualWithMessageForViolatingList0Number2Message;
+
+	@FindBy(id="validateNestedListClassLevelActualWithMessageForViolating:list:1:number1")
+	private WebElement validateNestedListClassLevelActualWithMessageForViolatingList1Number1;
+
+	@FindBy(id="validateNestedListClassLevelActualWithMessageForViolating:list:1:number1Message")
+	private WebElement validateNestedListClassLevelActualWithMessageForViolatingList1Number1Message;
+
+	@FindBy(id="validateNestedListClassLevelActualWithMessageForViolating:list:1:number2")
+	private WebElement validateNestedListClassLevelActualWithMessageForViolatingList1Number2;
+
+	@FindBy(id="validateNestedListClassLevelActualWithMessageForViolating:list:1:number2Message")
+	private WebElement validateNestedListClassLevelActualWithMessageForViolatingList1Number2Message;
+
+	@FindBy(id="validateNestedListClassLevelActualWithMessageForViolating:formMessage")
+	private WebElement validateNestedListClassLevelActualWithMessageForViolatingFormMessage;
+
+	@FindBy(id="validateNestedListClassLevelActualWithMessageForViolating:command")
+	private WebElement validateNestedListClassLevelActualWithMessageForViolatingCommand;
+
 	@FindBy(id="validateClassLevelWithInputEntityComposite:composite:number1")
 	private WebElement validateClassLevelWithInputEntityCompositeNumber1;
 
@@ -568,6 +598,56 @@ public class ValidateBeanIT extends OmniFacesIT {
 		assertEquals("", validateNestedListClassLevelWithMessageForViolatingList1Number1Message.getText());
 		assertEquals("", validateNestedListClassLevelWithMessageForViolatingList1Number2Message.getText());
 		assertEquals("", validateNestedListClassLevelWithMessageForViolatingFormMessage.getText());
+		assertEquals("actionSuccess", messages.getText());
+	}
+
+	@Test
+	public void validateNestedListClassLevelActualWithMessageForViolating() {
+		validateNestedListClassLevelActualWithMessageForViolatingList0Number1.sendKeys("2");
+		validateNestedListClassLevelActualWithMessageForViolatingList0Number2.sendKeys("1");
+		validateNestedListClassLevelActualWithMessageForViolatingList1Number1.sendKeys("2");
+		validateNestedListClassLevelActualWithMessageForViolatingList1Number2.sendKeys("1");
+		guardAjax(validateNestedListClassLevelActualWithMessageForViolatingCommand).click();
+		assertEquals("number1Label: invalidEntity", validateNestedListClassLevelActualWithMessageForViolatingList0Number1Message.getText());
+		assertEquals("", validateNestedListClassLevelActualWithMessageForViolatingList0Number2Message.getText());
+		assertEquals("number1Label: invalidEntity", validateNestedListClassLevelActualWithMessageForViolatingList1Number1Message.getText());
+		assertEquals("", validateNestedListClassLevelActualWithMessageForViolatingList0Number2Message.getText());
+		assertEquals("", validateNestedListClassLevelActualWithMessageForViolatingFormMessage.getText());
+		assertEquals("actionValidationFailed", messages.getText());
+
+		validateNestedListClassLevelActualWithMessageForViolatingList0Number2.sendKeys("0"); // So it becomes 10
+		validateNestedListClassLevelActualWithMessageForViolatingList1Number2.sendKeys("0"); // So it becomes 10
+		guardAjax(validateNestedListClassLevelActualWithMessageForViolatingCommand).click();
+		assertEquals("", validateNestedListClassLevelActualWithMessageForViolatingList0Number1Message.getText());
+		assertEquals("", validateNestedListClassLevelActualWithMessageForViolatingList0Number2Message.getText());
+		assertEquals("", validateNestedListClassLevelActualWithMessageForViolatingList1Number1Message.getText());
+		assertEquals("", validateNestedListClassLevelActualWithMessageForViolatingList1Number2Message.getText());
+		assertEquals("", validateNestedListClassLevelActualWithMessageForViolatingFormMessage.getText());
+		assertEquals("actionSuccess", messages.getText());
+	}
+
+	@Test
+	public void validateNestedListClassLevelActualWithMessagesForViolating() {
+		validateNestedListClassLevelActualWithMessageForViolatingList0Number1.sendKeys("1"); // So custom property path is not set in ValidateBeanITEntityValidator.
+		validateNestedListClassLevelActualWithMessageForViolatingList0Number2.sendKeys("1");
+		validateNestedListClassLevelActualWithMessageForViolatingList1Number1.sendKeys("1"); // So custom property path is not set in ValidateBeanITEntityValidator.
+		validateNestedListClassLevelActualWithMessageForViolatingList1Number2.sendKeys("1");
+		guardAjax(validateNestedListClassLevelActualWithMessageForViolatingCommand).click();
+		assertEquals("number1Label: invalidEntity", validateNestedListClassLevelActualWithMessageForViolatingList0Number1Message.getText());
+		assertEquals("number2Label: invalidEntity", validateNestedListClassLevelActualWithMessageForViolatingList0Number2Message.getText());
+		assertEquals("number1Label: invalidEntity", validateNestedListClassLevelActualWithMessageForViolatingList1Number1Message.getText());
+		assertEquals("number2Label: invalidEntity", validateNestedListClassLevelActualWithMessageForViolatingList0Number2Message.getText());
+		assertEquals("", validateNestedListClassLevelActualWithMessageForViolatingFormMessage.getText());
+		assertEquals("actionValidationFailed", messages.getText());
+
+		validateNestedListClassLevelActualWithMessageForViolatingList0Number2.sendKeys("0"); // So it becomes 10
+		validateNestedListClassLevelActualWithMessageForViolatingList1Number2.sendKeys("0"); // So it becomes 10
+		guardAjax(validateNestedListClassLevelActualWithMessageForViolatingCommand).click();
+		assertEquals("", validateNestedListClassLevelActualWithMessageForViolatingList0Number1Message.getText());
+		assertEquals("", validateNestedListClassLevelActualWithMessageForViolatingList0Number2Message.getText());
+		assertEquals("", validateNestedListClassLevelActualWithMessageForViolatingList1Number1Message.getText());
+		assertEquals("", validateNestedListClassLevelActualWithMessageForViolatingList1Number2Message.getText());
+		assertEquals("", validateNestedListClassLevelActualWithMessageForViolatingFormMessage.getText());
 		assertEquals("actionSuccess", messages.getText());
 	}
 
