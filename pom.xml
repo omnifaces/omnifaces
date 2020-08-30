@@ -119,7 +119,7 @@
 			<scope>provided</scope>
 		</dependency>
 
-		<!-- Test dependencies.	-->
+		<!-- Test dependencies. -->
 		<dependency>
 			<groupId>javax</groupId>
 			<artifactId>javaee-web-api</artifactId>
@@ -155,7 +155,7 @@
 	<dependencyManagement>
 		<dependencies>
 
-			<!-- Test dependencies.	-->
+			<!-- Test dependencies. -->
 			<dependency>
 				<groupId>org.jboss.arquillian</groupId>
 				<artifactId>arquillian-bom</artifactId>

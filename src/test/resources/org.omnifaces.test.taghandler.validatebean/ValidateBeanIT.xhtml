@@ -257,6 +257,48 @@
 				showMessageFor="@violating" method="validateActual" />
 		</o:form>
 
+		<o:form id="validateDoubleNestedListClassLevelWithMessageForViolating">
+			<ui:repeat id="nested" value="#{validateBeanITDoubleNestedListClassLevelBean.nestedEntities}" var="nestedEntity">
+				<ui:repeat id="list" value="#{nestedEntity.entities}" var="entity">
+					<h:inputText id="number1" label="number1Label" value="#{entity.number1}" />
+					<h:message id="number1Message" for="number1" />
+					<h:inputText id="number2" label="number2Label" value="#{entity.number2}" />
+					<h:message id="number2Message" for="number2" />
+				</ui:repeat>
+			</ui:repeat>
+
+			<h:message id="formMessage" for="validateDoubleNestedListClassLevelWithMessageForViolating" />
+
+			<h:commandButton id="command" action="#{validateBeanITDoubleNestedListClassLevelBean.action}">
+				<f:ajax execute="@form" render="@messages :messages" />
+			</h:commandButton>
+
+			<o:validateBean value="#{validateBeanITDoubleNestedListClassLevelBean}"
+				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup"
+				showMessageFor="@violating" />
+		</o:form>
+
+		<o:form id="validateDoubleNestedListClassLevelActualWithMessageForViolating">
+			<ui:repeat id="nested" value="#{validateBeanITDoubleNestedListClassLevelBean.nestedEntities}" var="nestedEntity">
+				<ui:repeat id="list" value="#{nestedEntity.entities}" var="entity">
+					<h:inputText id="number1" label="number1Label" value="#{entity.number1}" />
+					<h:message id="number1Message" for="number1" />
+					<h:inputText id="number2" label="number2Label" value="#{entity.number2}" />
+					<h:message id="number2Message" for="number2" />
+				</ui:repeat>
+			</ui:repeat>
+
+			<h:message id="formMessage" for="validateDoubleNestedListClassLevelActualWithMessageForViolating" />
+
+			<h:commandButton id="command" action="#{validateBeanITDoubleNestedListClassLevelBean.action}">
+				<f:ajax execute="@form" render="@messages :messages" />
+			</h:commandButton>
+
+			<o:validateBean value="#{validateBeanITDoubleNestedListClassLevelBean}"
+				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup"
+				showMessageFor="@violating" method="validateActual" />
+		</o:form>
+
 		<o:form id="validateClassLevelWithInputEntityComposite">
 			<cc:inputEntity id="composite" value="#{validateBeanITClassLevelBean.entity}" />
 

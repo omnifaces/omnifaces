@@ -148,21 +148,22 @@ public final class Validators {
 
 				Node node = iterator.next();
 				ElementKind kind = node.getKind();
+				boolean last = !iterator.hasNext();
 
 				switch (kind) {
 					case BEAN:
 						if (node.getIndex() != null || node.getKey() != null || node.getName() != null) { // In Apache BVal these can be all null, this is then assumed to be the base itself.
-							base = resolveProperty(base, node);
+							base = resolveProperty(base, node, last);
 						}
 						break;
 
 					case CONTAINER_ELEMENT: // List, Map, Array, etc
-						base = resolveProperty(base, node);
+						base = resolveProperty(base, node, last);
 						break;
 
 					case PROPERTY:
-						if (iterator.hasNext() || (node.getIndex() != null || node.getKey() != null)) { // PROPERTY may not be the last one unless contained in a CONTAINER_ELEMENT (which has index or key).
-							base = resolveProperty(base, node);
+						if (!last || (node.getIndex() != null || node.getKey() != null)) { // PROPERTY may not be the last one unless contained in a CONTAINER_ELEMENT (which has index or key).
+							base = resolveProperty(base, node, last);
 						}
 						break;
 
@@ -203,15 +204,24 @@ public final class Validators {
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
-	private static Object resolveProperty(Object base, Node node) {
+	private static Object resolveProperty(Object base, Node node, boolean last) {
+		Object value;
+
 		if (node.getIndex() != null) {
-			return accessIndex(base, node);
+			value = accessIndex(base, node);
 		}
-		if (node.getKey() != null) {
-			return accessKey(base, node);
+		else if (node.getKey() != null) {
+			value = accessKey(base, node);
 		}
-		else if (node.getName() != null) {
-			return getBeanProperty(base, node.getName());
+		else {
+			value = base;
+		}
+
+		if (node.getName() != null && !last) {
+			return getBeanProperty(value, node.getName());
+		}
+		else if (node.getIndex() != null || node.getKey() != null) {
+			return value;
 		}
 		else {
 			throw new UnsupportedOperationException(format(ERROR_RESOLVE_BASE, node, base.getClass()));

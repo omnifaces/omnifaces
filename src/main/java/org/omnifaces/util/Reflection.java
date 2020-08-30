@@ -22,6 +22,7 @@ import static java.util.Objects.requireNonNull;
 import static java.util.function.Function.identity;
 import static java.util.logging.Level.FINEST;
 import static org.omnifaces.util.Utils.getPrimitiveType;
+import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isOneInstanceOf;
 
 import java.beans.IntrospectionException;
@@ -380,7 +381,7 @@ public final class Reflection {
 		PropertyDescriptor propertyDescriptor = getPropertyDescriptor(bean.getClass(), property, cachedDescriptors);
 		Object value = getBeanProperty(bean, propertyDescriptor);
 
-		if (value == null && nextPropertyNode != null) {
+		if (isEmpty(value) && nextPropertyNode != null) {
 			value = setBeanPropertyWithDefaultValue(bean, propertyDescriptor, nextPropertyNode);
 		}
 
