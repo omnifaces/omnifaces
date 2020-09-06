@@ -45,6 +45,10 @@ import org.omnifaces.cdi.Startup;
  * Messages.throwValidatorException("Invalid input.");
  * </pre>
  * <pre>
+ * // In a converter.
+ * throw Messages.asConverterException("Unknown input.");
+ * </pre>
+ * <pre>
  * // In a validator, as extra message on another component.
  * Messages.addError("someFormId:someInputId", "This is also invalid.");
  * </pre>
@@ -283,12 +287,30 @@ public final class Messages {
 		}
 
 		/**
+		 * Returns the so far built message as a {@link ConverterException}.
+		 * @return The so far built message as a {@link ConverterException}.
+		 * @since 3.8
+		 */
+		public ConverterException asConverterException() {
+			return new ConverterException(facesMessage);
+		}
+
+		/**
+		 * Returns the so far built message as a {@link ValidatorException}.
+		 * @return The so far built message as a {@link ValidatorException}.
+		 * @since 3.8
+		 */
+		public ValidatorException asValidatorException() {
+			return new ValidatorException(facesMessage);
+		}
+
+		/**
 		 * Throws the so far built message as a {@link ConverterException}.
 		 * @throws ConverterException
 		 * @since 3.5
 		 */
 		public void throwConverterException() {
-			throw new ConverterException(facesMessage);
+			throw asConverterException();
 		}
 
 		/**
@@ -297,7 +319,7 @@ public final class Messages {
 		 * @since 3.5
 		 */
 		public void throwValidatorException() {
-			throw new ValidatorException(facesMessage);
+			throw asValidatorException();
 		}
 
 	}
@@ -363,7 +385,33 @@ public final class Messages {
 		return create(FacesMessage.SEVERITY_FATAL, message, params);
 	}
 
-	// Shortcuts - throw validator/converter exception ----------------------------------------------------------------
+	// Shortcuts - as validator/converter exception -------------------------------------------------------------------
+
+	/**
+	 * Returns a {@link ConverterException} with an ERROR faces message with the given message body which is formatted
+	 * with the given parameters.
+	 * @param message The message body.
+	 * @param params The message format parameters, if any.
+	 * @returns ConverterException
+	 * @see #createError(String, Object...)
+	 * @since 3.8
+	 */
+	public static ConverterException asConverterException(String message, Object... params) {
+		return new ConverterException(createError(message, params));
+	}
+
+	/**
+	 * Returns a {@link ValidatorException} with an ERROR faces message with the given message body which is formatted
+	 * with the given parameters.
+	 * @param message The message body.
+	 * @param params The message format parameters, if any.
+	 * @returns ValidatorException
+	 * @see #createError(String, Object...)
+	 * @since 3.8
+	 */
+	public static ValidatorException asValidatorException(String message, Object... params) {
+		return new ValidatorException(createError(message, params));
+	}
 
 	/**
 	 * Throw a {@link ConverterException} with an ERROR faces message with the given message body which is formatted
@@ -371,12 +419,11 @@ public final class Messages {
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
 	 * @throws ConverterException
-	 * with the given parameters.
-	 * @see #createError(String, Object...)
+	 * @see {@link #asConverterException(String, Object...)}
 	 * @since 3.5
 	 */
 	public static void throwConverterException(String message, Object... params) {
-		throw new ConverterException(createError(message, params));
+		throw asConverterException(message, params);
 	}
 
 	/**
@@ -385,12 +432,11 @@ public final class Messages {
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
 	 * @throws ValidatorException
-	 * with the given parameters.
-	 * @see #createError(String, Object...)
+	 * @see {@link #asValidatorException(String, Object...)}
 	 * @since 3.5
 	 */
 	public static void throwValidatorException(String message, Object... params) {
-		throw new ValidatorException(createError(message, params));
+		throw asValidatorException(message, params);
 	}
 
 	// Shortcuts - add message ----------------------------------------------------------------------------------------
