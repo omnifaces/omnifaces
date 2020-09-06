@@ -392,7 +392,7 @@ public final class Messages {
 	 * with the given parameters.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @returns ConverterException
+	 * @return ConverterException
 	 * @see #createError(String, Object...)
 	 * @since 3.8
 	 */
@@ -405,7 +405,7 @@ public final class Messages {
 	 * with the given parameters.
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
-	 * @returns ValidatorException
+	 * @return ValidatorException
 	 * @see #createError(String, Object...)
 	 * @since 3.8
 	 */
@@ -419,7 +419,7 @@ public final class Messages {
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
 	 * @throws ConverterException
-	 * @see {@link #asConverterException(String, Object...)}
+	 * @see #asConverterException(String, Object...)
 	 * @since 3.5
 	 */
 	public static void throwConverterException(String message, Object... params) {
@@ -432,7 +432,7 @@ public final class Messages {
 	 * @param message The message body.
 	 * @param params The message format parameters, if any.
 	 * @throws ValidatorException
-	 * @see {@link #asValidatorException(String, Object...)}
+	 * @see #asValidatorException(String, Object...)
 	 * @since 3.5
 	 */
 	public static void throwValidatorException(String message, Object... params) {
