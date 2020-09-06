@@ -375,7 +375,7 @@ public final class Messages {
 	 * @see #createError(String, Object...)
 	 * @since 3.5
 	 */
-	public void throwConverterException(String message, Object... params) {
+	public static void throwConverterException(String message, Object... params) {
 		throw new ConverterException(createError(message, params));
 	}
 
@@ -389,7 +389,7 @@ public final class Messages {
 	 * @see #createError(String, Object...)
 	 * @since 3.5
 	 */
-	public void throwValidatorException(String message, Object... params) {
+	public static void throwValidatorException(String message, Object... params) {
 		throw new ValidatorException(createError(message, params));
 	}
 
