@@ -65,6 +65,10 @@ public abstract class OmniFacesIT {
 		return newTab;
 	}
 
+	protected void openWithQueryString(String queryString) {
+		open(getClass().getSimpleName() + ".xhtml?" + queryString);
+	}
+
 	protected void openWithHashString(String hashString) {
 		open(getClass().getSimpleName() + ".xhtml?" + System.currentTimeMillis() + "#" + hashString); // Query string trick is necessary because Selenium driver may not forcibly reload page.
 	}
@@ -225,7 +229,8 @@ public abstract class OmniFacesIT {
 		withThreeViewsInSession,
 		withSocket,
 		withClientStateSaving,
-		withCDNResources;
+		withCDNResources,
+		withInterpretEmptyStringSubmittedValuesAsNull;
 	}
 
 }

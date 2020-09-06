@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
@@ -529,9 +530,11 @@ public final class Utils {
 	}
 
 	/**
-	 * Returns <code>true</code> if the given object is serializable.
+	 * Returns <code>true</code> if the given object is guaranteed to be serializable. This does that by checking
+	 * whether {@link ObjectOutputStream#writeObject(Object)} on the given object doesn't throw an exception
+	 * rather than checking if the given object is an instance of {@link Serializable}.
 	 * @param object The object to be tested.
-	 * @return <code>true</code> if the given object is serializable.
+	 * @return <code>true</code> if the given object is guaranteed to be serializable.
 	 * @since 2.4
 	 */
 	public static boolean isSerializable(Object object) {

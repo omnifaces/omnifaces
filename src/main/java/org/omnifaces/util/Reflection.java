@@ -763,12 +763,12 @@ public final class Reflection {
 	}
 
 	/**
-	 * Modifies the value of the given field of the given instance with the given value.
+	 * Modifies the value of the field of the given instance on the given field name with the given value.
 	 * @param <T> The field type.
 	 * @param instance The instance to access the given field on.
-	 * @param field The field to be accessed on the given instance.
-	 * @param value The new value of the given field of the given instance.
-	 * @return The old value of the given field of the given instance.
+	 * @param fieldName The name of the field to be accessed on the given instance.
+	 * @param value The new value of the field of the given instance on the given field name.
+	 * @return The old value of the field of the given instance on the given field name.
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @throws IllegalStateException If the field cannot be modified.
 	 * @since 3.8
