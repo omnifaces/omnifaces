@@ -169,6 +169,7 @@ public final class Components {
 	private static final Logger logger = Logger.getLogger(Components.class.getName());
 
 	private static final String ATTRIBUTE_LABEL = "label";
+	private static final String ATTRIBUTE_VALUE = "value";
 
 	private static final String ERROR_MISSING_PARENT =
 		"Component '%s' must have a parent of type '%s', but it cannot be found.";
@@ -1110,6 +1111,54 @@ public final class Components {
 	 */
 	public static boolean hasSubmittedValue(EditableValueHolder component) {
 		return !Utils.isEmpty(component.getSubmittedValue());
+	}
+
+	/**
+	 * Returns the expected type of the "value" attribute of the given component. This is useful in among others a
+	 * "generic entity converter".
+	 * @param <T> The expected type of the expected type of the "value" attribute of the given component.
+	 * @param component The component to obtain the expected type of the "value" attribute for.
+	 * @return The expected type of the "value" attribute of the given component, or <code>null</code> when there is no such value.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @since 3.8
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> Class<T> getExpectedValueType(UIComponent component) {
+		ValueExpression valueExpression = component.getValueExpression(ATTRIBUTE_VALUE);
+
+		if (valueExpression != null) {
+			return getExpectedType(valueExpression);
+		}
+		else {
+			Object value = component.getAttributes().get(ATTRIBUTE_VALUE);
+
+			if (value != null) {
+				return (Class<T>) value.getClass();
+			}
+
+			return null;
+		}
+	}
+
+	/**
+	 * Returns the expected type of the given value expression. This first inspects if the
+	 * {@link ValueExpression#getExpectedType()} returns a specific type, i.e. not <code>java.lang.Object</code>, and
+	 * then returns it, else it inspects the actual type of the property behind the expression string.
+	 * @param <T> The expected type of the expected type of the given value expression.
+	 * @param valueExpression The value expression to obtain the expected type for.
+	 * @return The expected type of the given value expression.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @since 3.8
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> Class<T> getExpectedType(ValueExpression valueExpression) {
+		Class<?> expectedType = valueExpression.getExpectedType();
+
+		if (expectedType == Object.class) {
+			expectedType = valueExpression.getType(getELContext());
+		}
+
+		return (Class<T>) expectedType;
 	}
 
 	/**
