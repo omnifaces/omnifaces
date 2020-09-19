@@ -74,7 +74,7 @@
 		<test.glassfish.version>6.0.0-M1</test.glassfish.version>
 		<test.tomcat.version>10.0.0-M8</test.tomcat.version>
 		<test.wildfly.version>20.0.1.Final</test.wildfly.version> <!-- TODO: JEE9 compatible version -->
-		<test.tomee.version>9.0.0-M1</test.tomee.version> <!-- TODO: JEE9 compatible version which supports jakarta.ee XML namespace (M1 unfortunately doesn't support it yet -->
+		<test.tomee.version>9.0.0-M2</test.tomee.version> <!-- TODO: JEE9 compatible version which supports jakarta.ee XML namespace (M2 unfortunately doesn't support it yet, it still throws jakarta.xml.bind.UnmarshalException: unexpected element (uri:"https://jakarta.ee/xml/ns/jakartaee", local:"web-fragment")) -->
 		<test.payara.version>5.2020.4</test.payara.version> <!-- TODO: JEE9 compatible version -->
 	</properties>
 
