@@ -17,7 +17,7 @@ branches:
 # Do integration test on configured servers.
 env:
    - SERVER=glassfish
-#  - SERVER=tomcat
+   - SERVER=tomcat
 #  - SERVER=wildfly
 #  - SERVER=tomee
 #  - SERVER=payara

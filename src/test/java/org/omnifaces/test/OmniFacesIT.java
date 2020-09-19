@@ -118,7 +118,7 @@ public abstract class OmniFacesIT {
 	}
 
 	protected static boolean isMojarra() {
-		return isOneOf(System.getProperty("profile.id"), "glassfish", "wildfly", "payara");
+		return isOneOf(System.getProperty("profile.id"), "glassfish", "wildfly", "payara", "tomcat");
 	}
 
 	protected static <T extends OmniFacesIT> WebArchive createWebArchive(Class<T> testClass) {
