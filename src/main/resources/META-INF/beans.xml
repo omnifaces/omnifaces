@@ -14,11 +14,11 @@
 
 -->
 <beans
-	xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+	xmlns="https://jakarta.ee/xml/ns/jakartaee"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/beans_2_0.xsd"
-	version="2.0" bean-discovery-mode="all"
-> <!-- TODO: Migrate to CDI 3.0 XSD once available. -->
+	xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/beans_3_0.xsd"
+	version="3.0" bean-discovery-mode="all"
+>
 	<scan>
 		<exclude name="org.omnifaces.application.**" />
 		<exclude name="org.omnifaces.config.**" />
