@@ -13,12 +13,13 @@
 package org.omnifaces.taghandler;
 
 import static org.omnifaces.taghandler.DeferredTagHandlerHelper.collectDeferredAttributes;
-import static org.omnifaces.taghandler.DeferredTagHandlerHelper.createInstance;
+import static org.omnifaces.taghandler.DeferredTagHandlerHelper.getValueExpression;
 
 import java.io.IOException;
 import java.io.Serializable;
 
-import jakarta.faces.application.Application;
+import jakarta.el.ELContext;
+import jakarta.el.ValueExpression;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.component.ValueHolder;
 import jakarta.faces.context.FacesContext;
@@ -96,40 +97,24 @@ public class Converter extends ConverterHandler implements DeferredTagHandler {
 	 */
 	@Override
 	public void apply(FaceletContext context, UIComponent parent) throws IOException {
-		if (!ComponentHandler.isNew(parent) && UIComponent.getCompositeComponentParent(parent) == null) {
+		boolean insideCompositeComponent = UIComponent.getCompositeComponentParent(parent) != null;
+
+		if (!ComponentHandler.isNew(parent) && !insideCompositeComponent) {
 			// If it's not new nor inside a composite component, we're finished.
 			return;
 		}
 
-		if (!(parent instanceof ValueHolder)) {
-			// It's likely a composite component. TagHandlerDelegate will pickup it and pass the target component back.
+		if (!(parent instanceof ValueHolder) || (insideCompositeComponent && getAttribute("for") == null)) {
+			// It's inside a composite component and not reattached. TagHandlerDelegate will pickup it and pass the target component back if necessary.
 			super.apply(context, parent);
 			return;
 		}
 
-		jakarta.faces.convert.Converter<Object> converter = createInstance(context, this, "converterId");
+		ValueExpression binding = getValueExpression(context, this, "binding", Object.class);
+		ValueExpression id = getValueExpression(context, this, "converterId", String.class);
+		jakarta.faces.convert.Converter<Object> converter = createInstance(context.getFacesContext(), context, binding, id);
 		DeferredAttributes attributes = collectDeferredAttributes(context, this, converter);
-		((ValueHolder) parent).setConverter(new DeferredConverter() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public Object getAsObject(FacesContext context, UIComponent component, String value) {
-				attributes.invokeSetters(context.getELContext(), converter);
-				return converter.getAsObject(context, component, value);
-			}
-
-			@Override
-			public String getAsString(FacesContext context, UIComponent component, Object value) {
-				attributes.invokeSetters(context.getELContext(), converter);
-				return converter.getAsString(context, component, value);
-			}
-		});
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T> T create(Application application, String id) {
-		return (T) application.createConverter(id);
+		((ValueHolder) parent).setConverter(new DeferredConverter(converter, binding, id, attributes));
 	}
 
 	@Override
@@ -147,6 +132,13 @@ public class Converter extends ConverterHandler implements DeferredTagHandler {
 		return false; // This attribute isn't supported on converters anyway.
 	}
 
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	@SuppressWarnings("unchecked")
+	private static jakarta.faces.convert.Converter<Object> createInstance(FacesContext facesContext, ELContext elContext, ValueExpression binding, ValueExpression id) {
+		return DeferredTagHandlerHelper.createInstance(elContext, binding, id, facesContext.getApplication()::createConverter, "converter");
+	}
+
 	// Nested classes -------------------------------------------------------------------------------------------------
 
 	/**
@@ -154,8 +146,42 @@ public class Converter extends ConverterHandler implements DeferredTagHandler {
 	 *
 	 * @author Bauke Scholtz
 	 */
-	protected abstract static class DeferredConverter implements jakarta.faces.convert.Converter<Object>, Serializable {
+	protected static class DeferredConverter implements jakarta.faces.convert.Converter<Object>, Serializable {
 		private static final long serialVersionUID = 1L;
+
+		private transient jakarta.faces.convert.Converter<Object> converter;
+		private final ValueExpression binding;
+		private final ValueExpression id;
+		private final DeferredAttributes attributes;
+
+		public DeferredConverter(jakarta.faces.convert.Converter<Object> converter, ValueExpression binding, ValueExpression id, DeferredAttributes attributes) {
+			this.converter = converter;
+			this.binding = binding;
+			this.id = id;
+			this.attributes = attributes;
+		}
+
+		@Override
+		public Object getAsObject(FacesContext context, UIComponent component, String value) {
+			jakarta.faces.convert.Converter<Object> converter = getConverter(context);
+			attributes.invokeSetters(context.getELContext(), converter);
+			return converter.getAsObject(context, component, value);
+		}
+
+		@Override
+		public String getAsString(FacesContext context, UIComponent component, Object value) {
+			jakarta.faces.convert.Converter<Object> converter = getConverter(context);
+			attributes.invokeSetters(context.getELContext(), converter);
+			return converter.getAsString(context, component, value);
+		}
+
+		private jakarta.faces.convert.Converter<Object> getConverter(FacesContext context) {
+			if (converter == null) {
+				converter = Converter.createInstance(context, context.getELContext(), binding, id);
+			}
+
+			return converter;
+		}
 	}
 
 }
