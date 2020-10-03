@@ -24,6 +24,7 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Function;
 
 import javax.el.ELContext;
 import javax.el.ValueExpression;
@@ -38,8 +39,6 @@ import javax.faces.view.facelets.MetaRuleset;
 import javax.faces.view.facelets.TagAttribute;
 import javax.faces.view.facelets.TagHandlerDelegate;
 import javax.faces.view.facelets.ValidatorHandler;
-
-import org.omnifaces.util.Callback;
 
 /**
  * Helper class for OmniFaces {@link Converter} and {@link Validator}. It can't be an abstract class as they have to
@@ -80,7 +79,7 @@ final class DeferredTagHandlerHelper {
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 */
 	@SuppressWarnings("unchecked")
-	static <T> T createInstance(ELContext context, ValueExpression binding, ValueExpression id, Callback.ReturningWithArgument<T, String> factory, String name) {
+	static <T> T createInstance(ELContext context, ValueExpression binding, ValueExpression id, Function<String, T> factory, String name) {
 		T instance = null;
 
 		if (binding != null) {
@@ -89,7 +88,7 @@ final class DeferredTagHandlerHelper {
 
 		if (id != null) {
 			try {
-				instance = factory.invoke((String) id.getValue(context));
+				instance = factory.apply((String) id.getValue(context));
 			}
 			catch (FacesException e) {
 				throw new IllegalArgumentException(
