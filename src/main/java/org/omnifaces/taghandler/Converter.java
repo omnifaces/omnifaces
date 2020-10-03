@@ -13,12 +13,13 @@
 package org.omnifaces.taghandler;
 
 import static org.omnifaces.taghandler.DeferredTagHandlerHelper.collectDeferredAttributes;
-import static org.omnifaces.taghandler.DeferredTagHandlerHelper.createInstance;
+import static org.omnifaces.taghandler.DeferredTagHandlerHelper.getValueExpression;
 
 import java.io.IOException;
 import java.io.Serializable;
 
-import javax.faces.application.Application;
+import javax.el.ELContext;
+import javax.el.ValueExpression;
 import javax.faces.component.UIComponent;
 import javax.faces.component.ValueHolder;
 import javax.faces.context.FacesContext;
@@ -32,6 +33,7 @@ import javax.faces.view.facelets.TagHandlerDelegate;
 import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredAttributes;
 import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandler;
 import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDelegate;
+import org.omnifaces.util.Callback;
 
 /**
  * <p>
@@ -86,40 +88,24 @@ public class Converter extends ConverterHandler implements DeferredTagHandler {
 	 */
 	@Override
 	public void apply(FaceletContext context, UIComponent parent) throws IOException {
-		if (!ComponentHandler.isNew(parent) && UIComponent.getCompositeComponentParent(parent) == null) {
+		boolean insideCompositeComponent = UIComponent.getCompositeComponentParent(parent) != null;
+
+		if (!ComponentHandler.isNew(parent) && !insideCompositeComponent) {
 			// If it's not new nor inside a composite component, we're finished.
 			return;
 		}
 
-		if (!(parent instanceof ValueHolder)) {
-			// It's likely a composite component. TagHandlerDelegate will pickup it and pass the target component back.
+		if (!(parent instanceof ValueHolder) || (insideCompositeComponent && getAttribute("for") == null)) {
+			// It's inside a composite component and not reattached. TagHandlerDelegate will pickup it and pass the target component back if necessary.
 			super.apply(context, parent);
 			return;
 		}
 
-		final javax.faces.convert.Converter converter = createInstance(context, this, "converterId");
-		final DeferredAttributes attributes = collectDeferredAttributes(context, this, converter);
-		((ValueHolder) parent).setConverter(new DeferredConverter() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public Object getAsObject(FacesContext context, UIComponent component, String value) {
-				attributes.invokeSetters(context.getELContext(), converter);
-				return converter.getAsObject(context, component, value);
-			}
-
-			@Override
-			public String getAsString(FacesContext context, UIComponent component, Object value) {
-				attributes.invokeSetters(context.getELContext(), converter);
-				return converter.getAsString(context, component, value);
-			}
-		});
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T> T create(Application application, String id) {
-		return (T) application.createConverter(id);
+		ValueExpression binding = getValueExpression(context, this, "binding", Object.class);
+		ValueExpression id = getValueExpression(context, this, "converterId", String.class);
+		javax.faces.convert.Converter converter = createInstance(context.getFacesContext(), context, binding, id);
+		DeferredAttributes attributes = collectDeferredAttributes(context, this, converter);
+		((ValueHolder) parent).setConverter(new DeferredConverter(converter, binding, id, attributes));
 	}
 
 	@Override
@@ -137,6 +123,17 @@ public class Converter extends ConverterHandler implements DeferredTagHandler {
 		return false; // This attribute isn't supported on converters anyway.
 	}
 
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	private static javax.faces.convert.Converter createInstance(final FacesContext facesContext, ELContext elContext, ValueExpression binding, ValueExpression id) {
+		return DeferredTagHandlerHelper.createInstance(elContext, binding, id, new Callback.ReturningWithArgument<javax.faces.convert.Converter, String>() {
+			@Override
+			public javax.faces.convert.Converter invoke(String converterId) {
+				return facesContext.getApplication().createConverter(converterId);
+			}
+		}, "converter");
+	}
+
 	// Nested classes -------------------------------------------------------------------------------------------------
 
 	/**
@@ -144,8 +141,42 @@ public class Converter extends ConverterHandler implements DeferredTagHandler {
 	 *
 	 * @author Bauke Scholtz
 	 */
-	protected abstract static class DeferredConverter implements javax.faces.convert.Converter, Serializable {
+	protected static class DeferredConverter implements javax.faces.convert.Converter, Serializable {
 		private static final long serialVersionUID = 1L;
+
+		private transient javax.faces.convert.Converter converter;
+		private final ValueExpression binding;
+		private final ValueExpression id;
+		private final DeferredAttributes attributes;
+
+		public DeferredConverter(javax.faces.convert.Converter converter, ValueExpression binding, ValueExpression id, DeferredAttributes attributes) {
+			this.converter = converter;
+			this.binding = binding;
+			this.id = id;
+			this.attributes = attributes;
+		}
+
+		@Override
+		public Object getAsObject(FacesContext context, UIComponent component, String value) {
+			javax.faces.convert.Converter converter = getConverter(context);
+			attributes.invokeSetters(context.getELContext(), converter);
+			return converter.getAsObject(context, component, value);
+		}
+
+		@Override
+		public String getAsString(FacesContext context, UIComponent component, Object value) {
+			javax.faces.convert.Converter converter = getConverter(context);
+			attributes.invokeSetters(context.getELContext(), converter);
+			return converter.getAsString(context, component, value);
+		}
+
+		private javax.faces.convert.Converter getConverter(FacesContext context) {
+			if (converter == null) {
+				converter = Converter.createInstance(context, context.getELContext(), binding, id);
+			}
+
+			return converter;
+		}
 	}
 
 }
