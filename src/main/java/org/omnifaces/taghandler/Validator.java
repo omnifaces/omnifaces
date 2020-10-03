@@ -13,7 +13,6 @@
 package org.omnifaces.taghandler;
 
 import static org.omnifaces.taghandler.DeferredTagHandlerHelper.collectDeferredAttributes;
-import static org.omnifaces.taghandler.DeferredTagHandlerHelper.createInstance;
 import static org.omnifaces.taghandler.DeferredTagHandlerHelper.getValueExpression;
 import static org.omnifaces.util.Components.getLabel;
 
@@ -22,7 +21,6 @@ import java.io.Serializable;
 
 import javax.el.ELContext;
 import javax.el.ValueExpression;
-import javax.faces.application.Application;
 import javax.faces.component.EditableValueHolder;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
@@ -124,54 +122,13 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
 			return;
 		}
 
-		addValidator(context, (EditableValueHolder) parent);
-	}
-
-	private void addValidator(FaceletContext context, EditableValueHolder parent) {
-		javax.faces.validator.Validator<Object> validator = createInstance(context, this, "validatorId");
-		DeferredAttributes attributes = collectDeferredAttributes(context, this, validator);
+		ValueExpression binding = getValueExpression(context, this, "binding", Object.class);
+		ValueExpression id = getValueExpression(context, this, "validatorId", String.class);
 		ValueExpression disabled = getValueExpression(context, this, "disabled", Boolean.class);
 		ValueExpression message = getValueExpression(context, this, "message", String.class);
-
-		parent.addValidator(new DeferredValidator() {
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			public void validate(FacesContext context, UIComponent component, Object value) {
-				ELContext el = context.getELContext();
-
-				if (disabled == null || Boolean.FALSE.equals(disabled.getValue(el))) {
-					attributes.invokeSetters(el, validator);
-
-					try {
-						validator.validate(context, component, value);
-					}
-					catch (ValidatorException e) {
-						rethrowValidatorException(context, component, message, e);
-					}
-				}
-			}
-
-			private void rethrowValidatorException(FacesContext context, UIComponent component, ValueExpression message, ValidatorException e) {
-				if (message != null) {
-					String validatorMessage = (String) message.getValue(context.getELContext());
-
-					if (validatorMessage != null) {
-						String label = getLabel(component);
-						throw new ValidatorException(Messages.create(validatorMessage, label)
-							.detail(validatorMessage, label).error().get(), e.getCause());
-					}
-				}
-
-				throw e;
-			}
-		});
-	}
-
-	@Override
-	@SuppressWarnings("unchecked")
-	public <T> T create(Application application, String id) {
-		return (T) application.createValidator(id);
+		javax.faces.validator.Validator<Object> validator = createInstance(context.getFacesContext(), context, binding, id);
+		DeferredAttributes attributes = collectDeferredAttributes(context, this, validator);
+		((EditableValueHolder) parent).addValidator(new DeferredValidator(validator, binding, id, disabled, message, attributes));
 	}
 
 	@Override
@@ -189,6 +146,13 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
 		return false; // Let the deferred validator handle it.
 	}
 
+	// Helpers --------------------------------------------------------------------------------------------------------
+
+	@SuppressWarnings("unchecked")
+	private static javax.faces.validator.Validator<Object> createInstance(FacesContext facesContext, ELContext elContext, ValueExpression binding, ValueExpression id) {
+		return DeferredTagHandlerHelper.createInstance(elContext, binding, id, facesContext.getApplication()::createValidator, "validator");
+	}
+
 	// Nested classes -------------------------------------------------------------------------------------------------
 
 	/**
@@ -196,8 +160,63 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
 	 *
 	 * @author Bauke Scholtz
 	 */
-	protected abstract static class DeferredValidator implements javax.faces.validator.Validator<Object>, Serializable {
+	protected static class DeferredValidator implements javax.faces.validator.Validator<Object>, Serializable {
 		private static final long serialVersionUID = 1L;
+
+		private transient javax.faces.validator.Validator<Object> validator;
+		private final ValueExpression binding;
+		private final ValueExpression id;
+		private final ValueExpression disabled;
+		private final ValueExpression message;
+		private final DeferredAttributes attributes;
+
+		public DeferredValidator(javax.faces.validator.Validator<Object> validator, ValueExpression binding, ValueExpression id, ValueExpression disabled, ValueExpression message, DeferredAttributes attributes) {
+			this.validator = validator;
+			this.binding = binding;
+			this.id = id;
+			this.disabled = disabled;
+			this.message = message;
+			this.attributes = attributes;
+		}
+
+		@Override
+		public void validate(FacesContext context, UIComponent component, Object value) {
+			ELContext el = context.getELContext();
+
+			if (disabled == null || Boolean.FALSE.equals(disabled.getValue(el))) {
+				javax.faces.validator.Validator<Object> validator = getValidator(context);
+				attributes.invokeSetters(el, validator);
+
+				try {
+					validator.validate(context, component, value);
+				}
+				catch (ValidatorException e) {
+					rethrowValidatorException(context, component, message, e);
+				}
+			}
+		}
+
+		private javax.faces.validator.Validator<Object> getValidator(FacesContext context) {
+			if (validator == null) {
+				validator = Validator.createInstance(context, context.getELContext(), binding, id);
+			}
+
+			return validator;
+		}
+
+		private void rethrowValidatorException(FacesContext context, UIComponent component, ValueExpression message, ValidatorException e) {
+			if (message != null) {
+				String validatorMessage = (String) message.getValue(context.getELContext());
+
+				if (validatorMessage != null) {
+					String label = getLabel(component);
+					throw new ValidatorException(Messages.create(validatorMessage, label)
+						.detail(validatorMessage, label).error().get(), e.getCause());
+				}
+			}
+
+			throw e;
+		}
 	}
 
 }

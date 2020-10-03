@@ -28,7 +28,6 @@ import java.util.Map.Entry;
 import javax.el.ELContext;
 import javax.el.ValueExpression;
 import javax.faces.FacesException;
-import javax.faces.application.Application;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.view.AttachedObjectHandler;
@@ -39,6 +38,8 @@ import javax.faces.view.facelets.MetaRuleset;
 import javax.faces.view.facelets.TagAttribute;
 import javax.faces.view.facelets.TagHandlerDelegate;
 import javax.faces.view.facelets.ValidatorHandler;
+
+import org.omnifaces.util.Callback;
 
 /**
  * Helper class for OmniFaces {@link Converter} and {@link Validator}. It can't be an abstract class as they have to
@@ -51,9 +52,9 @@ final class DeferredTagHandlerHelper {
 	// Private constants ----------------------------------------------------------------------------------------------
 
 	private static final String ERROR_MISSING_ID =
-		"%s '%s' or 'binding' attribute must be specified.";
+		"o:%1$s '%1$sId' or 'binding' attribute must be specified.";
 	private static final String ERROR_INVALID_ID =
-		"%s '%s' attribute must refer an valid %1$s ID. The %1$s ID '%s' cannot be found.";
+		"o:%1$s '%1$sId' attribute must refer an valid %1$s ID. The %1$s ID '%2$s' cannot be found.";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -68,18 +69,18 @@ final class DeferredTagHandlerHelper {
 
 	/**
 	 * Create the tag instance based on the <code>binding</code> and/or <code>instanceId</code> attribute.
-	 * @param context The involved facelet context.
-	 * @param tag The involved tag handler.
-	 * @param instanceId The attribute name representing the instance ID.
+	 * @param context The involved EL context.
+	 * @param binding The involved binding attribute.
+	 * @param id The involved id attribute.
+	 * @param factory The factory to obtain the instance by id.
+	 * @param name The name of the deferred tag, solely for error reporting.
 	 * @return The created instance.
 	 * @throws IllegalArgumentException If the <code>validatorId</code> attribute is invalid or missing while the
 	 * <code>binding</code> attribute is also missing.
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 */
 	@SuppressWarnings("unchecked")
-	static <T> T createInstance(FaceletContext context, DeferredTagHandler tag, String instanceId) {
-		ValueExpression binding = getValueExpression(context, tag, "binding", Object.class);
-		ValueExpression id = getValueExpression(context, tag, instanceId, String.class);
+	static <T> T createInstance(ELContext context, ValueExpression binding, ValueExpression id, Callback.ReturningWithArgument<T, String> factory, String name) {
 		T instance = null;
 
 		if (binding != null) {
@@ -88,11 +89,11 @@ final class DeferredTagHandlerHelper {
 
 		if (id != null) {
 			try {
-				instance = tag.create(context.getFacesContext().getApplication(), (String) id.getValue(context));
+				instance = factory.invoke((String) id.getValue(context));
 			}
 			catch (FacesException e) {
 				throw new IllegalArgumentException(
-					format(ERROR_INVALID_ID, tag.getClass().getSimpleName(), instanceId, id), e);
+					format(ERROR_INVALID_ID, name, id), e);
 			}
 
 			if (binding != null) {
@@ -101,7 +102,7 @@ final class DeferredTagHandlerHelper {
 		}
 		else if (instance == null) {
 			throw new IllegalArgumentException(
-				format(ERROR_MISSING_ID, tag.getClass().getSimpleName(), instanceId));
+				format(ERROR_MISSING_ID, name));
 		}
 
 		return instance;
@@ -176,16 +177,6 @@ final class DeferredTagHandlerHelper {
 		 * @return The tag attribute associated with given attribute name.
 		 */
 		TagAttribute getTagAttribute(String name);
-
-		/**
-		 * Create the concrete {@link Converter} or {@link Validator}.
-		 * @param <T> The expected return type.
-		 * @param application The involved faces application.
-		 * @param id The converter or validator ID.
-		 * @return The concrete {@link Converter} or {@link Validator}.
-		 */
-		<T> T create(Application application, String id);
-
 	}
 
 	/**
