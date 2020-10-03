@@ -18,6 +18,7 @@ import static org.omnifaces.util.Components.validateHasNoParent;
 import static org.omnifaces.util.Components.validateHasParent;
 
 import java.io.IOException;
+import java.util.function.Function;
 
 import jakarta.faces.component.FacesComponent;
 import jakarta.faces.component.UIComponent;
@@ -27,7 +28,6 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.PhaseId;
 
 import org.omnifaces.model.tree.TreeModel;
-import org.omnifaces.util.Callback;
 
 /**
  * <p>
@@ -144,12 +144,12 @@ public class TreeNodeItem extends TreeFamily {
 	 * @return The callback result.
 	 */
 	@SuppressWarnings("rawtypes") // For TreeModel. We don't care about its actual type anyway.
-	private <R> R process(FacesContext context, Callback.ReturningWithArgument<R, Tree> callback) {
+	private <R> R process(FacesContext context, Function<Tree, R> callback) {
 		Tree tree = getClosestParent(this, Tree.class);
 		TreeModel originalModelNode = tree.getCurrentModelNode();
 
 		try {
-			return callback.invoke(tree);
+			return callback.apply(tree);
 		}
 		finally {
 			tree.setCurrentModelNode(context, originalModelNode);

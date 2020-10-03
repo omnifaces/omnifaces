@@ -60,6 +60,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import jakarta.el.ValueExpression;
@@ -81,7 +82,6 @@ import jakarta.faces.view.facelets.TagHandler;
 import jakarta.validation.ConstraintViolation;
 
 import org.omnifaces.eventlistener.BeanValidationEventListener;
-import org.omnifaces.util.Callback;
 import org.omnifaces.util.Reflection.PropertyPath;
 import org.omnifaces.util.copier.CloneCopier;
 import org.omnifaces.util.copier.Copier;
@@ -384,7 +384,7 @@ public class ValidateBean extends TagHandler {
 	 * After update model values phase, validate actual bean. But don't proceed to render response on fail.
 	 */
 	private void validateActualBean(UIForm form, Object bean) {
-		ValidateBeanCallback validateActualBean = new ValidateBeanCallback() { @Override public void run() {
+		ValidateBeanCallback validateActualBean = new ValidateBeanCallback() { @Override public void invoke() {
 			FacesContext context = FacesContext.getCurrentInstance();
 			validate(context, form, bean, unwrapIfNecessary(bean), new HashSet<String>(0), false);
 		}};
@@ -403,12 +403,12 @@ public class ValidateBean extends TagHandler {
 		Map<PropertyPath, Object> collectedProperties = new HashMap<>();
 		Map<Object, PropertyPath> knownBaseProperties = getBaseBeanPropertyPaths(bean);
 
-		ValidateBeanCallback collectBeanProperties = new ValidateBeanCallback() { @Override public void run() {
+		ValidateBeanCallback collectBeanProperties = new ValidateBeanCallback() { @Override public void invoke() {
 			FacesContext context = FacesContext.getCurrentInstance();
 			forEachInputWithMatchingBase(context, form, knownBaseProperties.keySet(), input -> addCollectingValidator(input, collectedClientIds, collectedProperties, knownBaseProperties));
 		}};
 
-		ValidateBeanCallback checkConstraints = new ValidateBeanCallback() { @Override public void run() {
+		ValidateBeanCallback checkConstraints = new ValidateBeanCallback() { @Override public void invoke() {
 			FacesContext context = FacesContext.getCurrentInstance();
 			forEachInputWithMatchingBase(context, form, knownBaseProperties.keySet(), ValidateBean::removeCollectingValidator);
 			Object copiedBean = getCopier(context, copier).copy(unwrapIfNecessary(bean));
@@ -424,7 +424,7 @@ public class ValidateBean extends TagHandler {
 	 * Before validations phase of current request, subscribe the {@link BeanValidationEventListener} to validate the form based on groups.
 	 */
 	private void validateForm() {
-		ValidateBeanCallback validateForm = new ValidateBeanCallback() { @Override public void run() {
+		ValidateBeanCallback validateForm = new ValidateBeanCallback() { @Override public void invoke() {
 			SystemEventListener listener = new BeanValidationEventListener(groups, disabled);
 			subscribeToViewEvent(PreValidateEvent.class, listener);
 			subscribeToViewEvent(PostValidateEvent.class, listener);
@@ -462,7 +462,7 @@ public class ValidateBean extends TagHandler {
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
-	private static void forEachInputWithMatchingBase(FacesContext context, UIComponent form, Set<Object> bases, String property, Callback.WithArgument<UIInput> callback) {
+	private static void forEachInputWithMatchingBase(FacesContext context, UIComponent form, Set<Object> bases, String property, Consumer<UIInput> callback) {
 		forEachComponent(context)
 			.fromRoot(form)
 			.ofTypes(UIInput.class)
@@ -474,13 +474,13 @@ public class ValidateBean extends TagHandler {
 					ValueReference valueReference = getValueReference(context.getELContext(), valueExpression);
 
 					if (bases.contains(valueReference.getBase()) && (property == null || property.equals(valueReference.getProperty()))) {
-						callback.invoke(input);
+						callback.accept(input);
 					}
 				}
 			});
 	}
 
-	private static void forEachInputWithMatchingBase(FacesContext context, UIComponent form, Set<Object> bases, Callback.WithArgument<UIInput> callback) {
+	private static void forEachInputWithMatchingBase(FacesContext context, UIComponent form, Set<Object> bases, Consumer<UIInput> callback) {
 		forEachInputWithMatchingBase(context, form, bases, null, callback);
 	}
 
@@ -647,12 +647,12 @@ public class ValidateBean extends TagHandler {
 
 	// Callbacks ------------------------------------------------------------------------------------------------------
 
-	private abstract static class ValidateBeanCallback implements Callback.Void {
+	private abstract static class ValidateBeanCallback implements Runnable {
 
 		@Override
-		public void invoke() {
+		public void run() {
 			try {
-				run();
+				invoke();
 			}
 			catch (Exception e) {
 				// Explicitly log since exceptions in PhaseListeners will be largely swallowed and ignored by JSF runtime.
@@ -667,7 +667,7 @@ public class ValidateBean extends TagHandler {
 
 		}
 
-		public abstract void run();
+		public abstract void invoke();
 	}
 
 }

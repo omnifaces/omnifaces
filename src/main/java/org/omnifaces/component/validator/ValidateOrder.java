@@ -19,12 +19,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.TreeSet;
+import java.util.function.Function;
 
 import jakarta.faces.component.FacesComponent;
 import jakarta.faces.component.UIInput;
 import jakarta.faces.context.FacesContext;
 
-import org.omnifaces.util.Callback;
 import org.omnifaces.util.State;
 import org.omnifaces.validator.MultiFieldValidator;
 
@@ -88,14 +88,14 @@ public class ValidateOrder extends ValidateMultipleFields {
 			return sortedValues.equals(values);
 		});
 
-		private Callback.ReturningWithArgument<Boolean, List<Comparable>> callback;
+		private Function<List<Comparable>, Boolean> callback;
 
-		private Type(Callback.ReturningWithArgument<Boolean, List<Comparable>> callback) {
+		private Type(Function<List<Comparable>, Boolean> callback) {
 			this.callback = callback;
 		}
 
 		public boolean validateOrder(List<Comparable> values) {
-			return callback.invoke(values);
+			return callback.apply(values);
 		}
 	}
 

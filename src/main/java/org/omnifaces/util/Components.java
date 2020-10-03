@@ -61,6 +61,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.logging.Logger;
 
 import jakarta.el.MethodExpression;
@@ -547,9 +548,9 @@ public final class Components {
 		 * @throws ClassCastException When <code>C</code> is of wrong type.
 		 */
 		@SuppressWarnings("unchecked")
-		public <C extends UIComponent> void invoke(Callback.WithArgument<C> operation) {
+		public <C extends UIComponent> void invoke(Consumer<C> operation) {
 			invoke((context, target) -> {
-				operation.invoke((C) target);
+				operation.accept((C) target);
 				return ACCEPT;
 			});
 		}

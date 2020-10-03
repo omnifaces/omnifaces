@@ -15,6 +15,9 @@ package org.omnifaces.util;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Serializable;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 /**
  * Collection of callback interfaces. Useful in (mini) visitor and strategy patterns.
@@ -29,7 +32,9 @@ public final class Callback {
 	 * Use this if you need a void callback.
 	 *
 	 * @author Bauke Scholtz
+	 * @deprecated Since 4.0. Use {@link Runnable} instead.
 	 */
+	@Deprecated
 	@FunctionalInterface
 	public interface Void {
 
@@ -61,7 +66,9 @@ public final class Callback {
 	 *
 	 * @author Bauke Scholtz
 	 * @param <R> The return type.
+	 * @deprecated Since 4.0. Use {@link Supplier} instead.
 	 */
+	@Deprecated
 	@FunctionalInterface
 	public interface Returning<R> {
 
@@ -96,7 +103,9 @@ public final class Callback {
 	 *
 	 * @author Bauke Scholtz
 	 * @param <A> The argument type.
+	 * @deprecated Since 4.0. Use {@link Consumer} instead.
 	 */
+	@Deprecated
 	@FunctionalInterface
 	public interface WithArgument<A> {
 
@@ -132,7 +141,9 @@ public final class Callback {
 	 * @author Bauke Scholtz
 	 * @param <R> The return type.
 	 * @param <A> The argument type.
+	 * @deprecated Since 4.0. Use {@link Function} instead.
 	 */
+	@Deprecated
 	@FunctionalInterface
 	public interface ReturningWithArgument<R, A> {
 

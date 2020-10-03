@@ -19,6 +19,8 @@ import static org.omnifaces.util.Components.validateHasOnlyChildren;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import jakarta.el.ValueExpression;
 import jakarta.faces.component.FacesComponent;
@@ -39,7 +41,6 @@ import org.omnifaces.model.tree.AbstractTreeModel;
 import org.omnifaces.model.tree.ListTreeModel;
 import org.omnifaces.model.tree.SortedTreeModel;
 import org.omnifaces.model.tree.TreeModel;
-import org.omnifaces.util.Callback;
 import org.omnifaces.util.State;
 
 /**
@@ -336,14 +337,14 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @param callback The callback to be invoked.
 	 * @return The callback result.
 	 */
-	private <R> R process(FacesContext context, TreeModel node, Callback.Returning<R> callback) {
+	private <R> R process(FacesContext context, TreeModel node, Supplier<R> callback) {
 		Object[] originalVars = captureOriginalVars(context);
 		TreeModel originalModelNode = currentModelNode;
 		pushComponentToEL(context, null);
 
 		try {
 			setCurrentModelNode(context, node);
-			return callback.invoke();
+			return callback.get();
 		}
 		finally {
 			popComponentFromEL(context);
@@ -359,7 +360,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 	 * @param callback The callback to be invoked.
 	 * @return The callback result.
 	 */
-	private <R> R processTreeNode(PhaseId phaseId, Callback.ReturningWithArgument<R, TreeNode> callback) {
+	private <R> R processTreeNode(PhaseId phaseId, Function<TreeNode, R> callback) {
 		TreeNode treeNode = null;
 
 		if (!currentModelNode.isLeaf()) {
@@ -370,7 +371,7 @@ public class Tree extends TreeFamily implements NamingContainer {
 			}
 		}
 
-		return callback.invoke(treeNode);
+		return callback.apply(treeNode);
 	}
 
 	/**

@@ -16,6 +16,8 @@ import static org.omnifaces.util.Faces.getApplication;
 import static org.omnifaces.util.Faces.getCurrentPhaseId;
 import static org.omnifaces.util.Faces.getViewRoot;
 
+import java.util.function.Consumer;
+
 import jakarta.faces.application.Application;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.component.UIViewRoot;
@@ -173,7 +175,7 @@ public final class Events {
 	 * @since 2.0
 	 * @see #addViewPhaseListener(PhaseListener)
 	 */
-	public static void subscribeToViewBeforePhase(PhaseId phaseId, Callback.Void callback) {
+	public static void subscribeToViewBeforePhase(PhaseId phaseId, Runnable callback) {
 		addViewPhaseListener(createBeforePhaseListener(phaseId, Events.<PhaseEvent>wrap(callback)));
 	}
 
@@ -184,7 +186,7 @@ public final class Events {
 	 * @since 2.0
 	 * @see #addViewPhaseListener(PhaseListener)
 	 */
-	public static void subscribeToViewBeforePhase(PhaseId phaseId, Callback.WithArgument<PhaseEvent> callback) {
+	public static void subscribeToViewBeforePhase(PhaseId phaseId, Consumer<PhaseEvent> callback) {
 		addViewPhaseListener(createBeforePhaseListener(phaseId, callback));
 	}
 
@@ -195,7 +197,7 @@ public final class Events {
 	 * @since 2.0
 	 * @see #addViewPhaseListener(PhaseListener)
 	 */
-	public static void subscribeToViewAfterPhase(PhaseId phaseId, Callback.Void callback) {
+	public static void subscribeToViewAfterPhase(PhaseId phaseId, Runnable callback) {
 		addViewPhaseListener(createAfterPhaseListener(phaseId, Events.<PhaseEvent>wrap(callback)));
 	}
 
@@ -206,7 +208,7 @@ public final class Events {
 	 * @since 2.0
 	 * @see #addViewPhaseListener(PhaseListener)
 	 */
-	public static void subscribeToViewAfterPhase(PhaseId phaseId, Callback.WithArgument<PhaseEvent> callback) {
+	public static void subscribeToViewAfterPhase(PhaseId phaseId, Consumer<PhaseEvent> callback) {
 		addViewPhaseListener(createAfterPhaseListener(phaseId, callback));
 	}
 
@@ -226,14 +228,14 @@ public final class Events {
 	 * @see #unsubscribeFromComponentEvent(UIComponent, Class, ComponentSystemEventListener)
 	 */
 	public static void subscribeToRequestComponentEvent
-		(UIComponent component, Class<? extends ComponentSystemEvent> type, Callback.WithArgument<ComponentSystemEvent> callback)
+		(UIComponent component, Class<? extends ComponentSystemEvent> type, Consumer<ComponentSystemEvent> callback)
 	{
 		component.subscribeToEvent(type, new ComponentSystemEventListener() {
 
 			@Override
 			public void processEvent(ComponentSystemEvent event) {
 				unsubscribeFromComponentEvent(component, type, this); // Prevent it from being saved in JSF state.
-				callback.invoke(event);
+				callback.accept(event);
 			}
 		});
 	}
@@ -259,7 +261,7 @@ public final class Events {
 	 * @since 2.0
 	 * @see #addRequestPhaseListener(PhaseListener)
 	 */
-	public static void subscribeToRequestBeforePhase(PhaseId phaseId, Callback.Void callback) {
+	public static void subscribeToRequestBeforePhase(PhaseId phaseId, Runnable callback) {
 		addRequestPhaseListener(createBeforePhaseListener(phaseId, Events.<PhaseEvent>wrap(callback)));
 	}
 
@@ -270,7 +272,7 @@ public final class Events {
 	 * @since 2.0
 	 * @see #addRequestPhaseListener(PhaseListener)
 	 */
-	public static void subscribeToRequestBeforePhase(PhaseId phaseId, Callback.WithArgument<PhaseEvent> callback) {
+	public static void subscribeToRequestBeforePhase(PhaseId phaseId, Consumer<PhaseEvent> callback) {
 		addRequestPhaseListener(createBeforePhaseListener(phaseId, callback));
 	}
 
@@ -281,7 +283,7 @@ public final class Events {
 	 * @since 2.0
 	 * @see #addRequestPhaseListener(PhaseListener)
 	 */
-	public static void subscribeToRequestAfterPhase(PhaseId phaseId, Callback.Void callback) {
+	public static void subscribeToRequestAfterPhase(PhaseId phaseId, Runnable callback) {
 		addRequestPhaseListener(createAfterPhaseListener(phaseId, Events.<PhaseEvent>wrap(callback)));
 	}
 
@@ -292,7 +294,7 @@ public final class Events {
 	 * @since 2.0
 	 * @see #addRequestPhaseListener(PhaseListener)
 	 */
-	public static void subscribeToRequestAfterPhase(PhaseId phaseId, Callback.WithArgument<PhaseEvent> callback) {
+	public static void subscribeToRequestAfterPhase(PhaseId phaseId, Consumer<PhaseEvent> callback) {
 		addRequestPhaseListener(createAfterPhaseListener(phaseId, callback));
 	}
 
@@ -328,8 +330,8 @@ public final class Events {
 
 	// Helpers --------------------------------------------------------------------------------------------------------
 
-	private static <A> Callback.WithArgument<A> wrap(Callback.Void callback) {
-		return argument -> callback.invoke();
+	private static <A> Consumer<A> wrap(Runnable callback) {
+		return argument -> callback.run();
 	}
 
 	private static <A> Callback.SerializableWithArgument<A> wrap(Callback.SerializableVoid callback) {
@@ -346,26 +348,26 @@ public final class Events {
 		};
 	}
 
-	private static PhaseListener createBeforePhaseListener(PhaseId phaseId, Callback.WithArgument<PhaseEvent> callback) {
+	private static PhaseListener createBeforePhaseListener(PhaseId phaseId, Consumer<PhaseEvent> callback) {
 		return new DefaultPhaseListener(phaseId) {
 
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void beforePhase(PhaseEvent event) {
-				callback.invoke(event);
+				callback.accept(event);
 			}
 		};
 	}
 
-	private static PhaseListener createAfterPhaseListener(PhaseId phaseId, Callback.WithArgument<PhaseEvent> callback) {
+	private static PhaseListener createAfterPhaseListener(PhaseId phaseId, Consumer<PhaseEvent> callback) {
 		return new DefaultPhaseListener(phaseId) {
 
 			private static final long serialVersionUID = 1L;
 
 			@Override
 			public void afterPhase(PhaseEvent event) {
-				callback.invoke(event);
+				callback.accept(event);
 			}
 		};
 	}

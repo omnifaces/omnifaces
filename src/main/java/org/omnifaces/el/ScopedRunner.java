@@ -17,8 +17,6 @@ import java.util.Map;
 
 import jakarta.faces.context.FacesContext;
 
-import org.omnifaces.util.Callback;
-
 /**
  * This class helps in letting code run within its own scope. Such scope is defined by specific variables being
  * available to EL within it. The request scope is used to store the variables.
@@ -57,10 +55,10 @@ public class ScopedRunner {
 	 * Invokes the callback within the scope of the variables being given in the constructor.
 	 * @param callback The callback.
 	 */
-	public void invoke(Callback.Void callback) {
+	public void invoke(Runnable callback) {
 		try {
 			setNewScope();
-			callback.invoke();
+			callback.run();
 		} finally {
 			restorePreviousScope();
 		}

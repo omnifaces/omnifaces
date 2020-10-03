@@ -30,6 +30,7 @@ import static org.omnifaces.util.FacesLocal.redirectPermanent;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import jakarta.faces.FacesException;
 import jakarta.faces.application.ViewExpiredException;
@@ -44,7 +45,6 @@ import jakarta.faces.render.ResponseStateManager;
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.cdi.viewscope.ViewScopeManager;
 import org.omnifaces.taghandler.EnableRestorableView;
-import org.omnifaces.util.Callback;
 import org.omnifaces.util.Hacks;
 
 /**
@@ -205,9 +205,9 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 
 	// Inner classes -------------------------------------------------------------------------------------------------
 
-	private static class NestedFormsChecker implements Callback.WithArgument<UIForm> {
+	private static class NestedFormsChecker implements Consumer<UIForm> {
 		@Override
-		public void invoke(UIForm form) {
+		public void accept(UIForm form) {
 			UIForm nestedParent = getClosestParent(form, UIForm.class);
 
 			if (nestedParent != null && (!Hacks.isNestedInPrimeFacesDialog(form) || Hacks.isNestedInPrimeFacesDialog(form, nestedParent))) {
