@@ -116,8 +116,8 @@ public class ToCollectionConverter implements Converter<Collection> {
 		Collection<Object> collection = instance(coalesce(type, DEFAULT_COLLECTION_TYPE));
 
 		for (String item : submittedValue.split(quote(coalesce(delimiter, DEFAULT_DELIMITER).trim()))) {
-			Object trimmed = item.trim();
-			collection.add(converter == null ? trimmed : converter.getAsString(context, component, trimmed));
+			String trimmed = item.trim();
+			collection.add(converter == null ? trimmed : converter.getAsObject(context, component, trimmed));
 		}
 
 		return collection;

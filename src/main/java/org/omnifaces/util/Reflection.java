@@ -41,6 +41,7 @@ import java.lang.reflect.Type;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
@@ -521,7 +522,7 @@ public final class Reflection {
 		if (type.isPrimitive()) {
 			return false; // These don't have properties anyway.
 		}
-		else if (isOneInstanceOf(type, Type.class, Boolean.class, Number.class, CharSequence.class, Enum.class, Date.class, Temporal.class)) {
+		else if (isOneInstanceOf(type, Type.class, Boolean.class, Number.class, CharSequence.class, Enum.class, Calendar.class, Date.class, Temporal.class)) {
 			return false; // Don't recurse common property types which are guaranteed not beans.
 		}
 		else if (Iterable.class.isAssignableFrom(type) && !isOneInstanceOf(type, List.class, Map.class)) {
