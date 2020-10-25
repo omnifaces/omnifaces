@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
@@ -2478,9 +2479,9 @@ public final class Faces {
 	// File download --------------------------------------------------------------------------------------------------
 
 	/**
-	 * Send the given file to the response. The content type will be determined based on file name. The content length
-	 * will be set to the length of the file. The {@link FacesContext#responseComplete()} will implicitly be called
-	 * after successful streaming.
+	 * Send the given file to the response. The file name will be derived from {@link File#getName()}. The content type
+	 * will be determined based on file name. The content length will be set to the length of the file. The
+	 * {@link FacesContext#responseComplete()} will implicitly be called after successful streaming.
 	 * @param file The file to be sent to the response.
 	 * @param attachment Whether the file should be provided as attachment, or just inline.
 	 * @throws IOException When given file cannot be read.
@@ -2488,6 +2489,51 @@ public final class Faces {
 	 */
 	public static void sendFile(File file, boolean attachment) throws IOException {
 		FacesLocal.sendFile(getContext(), file, attachment);
+	}
+
+	/**
+	 * Send the given file to the response. The content type will be determined based on file name. The content length
+	 * will be set to the length of the file. The {@link FacesContext#responseComplete()} will implicitly be called
+	 * after successful streaming.
+	 * @param file The file to be sent to the response.
+	 * @param filename The file name which should appear in content disposition header.
+	 * @param attachment Whether the file should be provided as attachment, or just inline.
+	 * @throws IOException When given file cannot be read.
+	 * @throws UncheckedIOException When HTTP response is not available anymore.
+	 * @since 3.9
+	 */
+	public static void sendFile(File file, String filename, boolean attachment) throws IOException {
+		FacesLocal.sendFile(getContext(), file, filename, attachment);
+	}
+
+	/**
+	 * Send the given path as a file to the response. The file will be derived from {@link Path#toFile()} and then the
+	 * file name will be derived from {@link File#getName()}. The content type will be determined based on file name.
+	 * The content length will be set to the length of the file. The {@link FacesContext#responseComplete()} will
+	 * implicitly be called after successful streaming.
+	 * @param path The path to be sent as a file to the response.
+	 * @param attachment Whether the file should be provided as attachment, or just inline.
+	 * @throws IOException When given file cannot be read.
+	 * @throws UncheckedIOException When HTTP response is not available anymore.
+	 * @since 3.9
+	 */
+	public static void sendFile(Path path, boolean attachment) throws IOException {
+		FacesLocal.sendFile(getContext(), path, attachment);
+	}
+
+	/**
+	 * Send the given path as a file to the response. The file will be derived from {@link Path#toFile()}. The content
+	 * type will be determined based on file name. The content length will be set to the length of the file. The
+	 * {@link FacesContext#responseComplete()} will implicitly be called after successful streaming.
+	 * @param path The path to be sent as a file to the response.
+	 * @param filename The file name which should appear in content disposition header.
+	 * @param attachment Whether the file should be provided as attachment, or just inline.
+	 * @throws IOException When given file cannot be read.
+	 * @throws UncheckedIOException When HTTP response is not available anymore.
+	 * @since 3.9
+	 */
+	public static void sendFile(Path path, String filename, boolean attachment) throws IOException {
+		FacesLocal.sendFile(getContext(), path, filename, attachment);
 	}
 
 	/**
