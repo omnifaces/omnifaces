@@ -41,6 +41,7 @@ import java.io.UncheckedIOException;
 import java.lang.reflect.Array;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -1745,6 +1746,27 @@ public final class FacesLocal {
 	 */
 	public static void sendFile(FacesContext context, File file, boolean attachment) throws IOException {
 		sendFile(context, new FileInputStream(file), file.getName(), file.length(), attachment);
+	}
+
+	/**
+	 * @see Faces#sendFile(File, String, boolean)
+	 */
+	public static void sendFile(FacesContext context, File file, String filename, boolean attachment) throws IOException {
+		sendFile(context, new FileInputStream(file), filename, file.length(), attachment);
+	}
+
+	/**
+	 * @see Faces#sendFile(Path, boolean)
+	 */
+	public static void sendFile(FacesContext context, Path path, boolean attachment) throws IOException {
+		sendFile(context, path.toFile(), attachment);
+	}
+
+	/**
+	 * @see Faces#sendFile(Path, String, boolean)
+	 */
+	public static void sendFile(FacesContext context, Path path, String filename, boolean attachment) throws IOException {
+		sendFile(context, path.toFile(), filename, attachment);
 	}
 
 	/**
