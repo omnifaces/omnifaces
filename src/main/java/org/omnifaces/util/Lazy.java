@@ -43,8 +43,7 @@ public final class Lazy<TT> {
     private final Lock lock = new ReentrantLock();
 
     /**
-     *
-     * @return underlying object, initialize within Tenant Control when necessary
+     * @return underlying object, initialize when necessary
      */
     public TT get() {
         boolean localInitialized = this.initialized;
