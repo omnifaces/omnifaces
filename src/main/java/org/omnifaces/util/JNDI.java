@@ -33,6 +33,7 @@ import javax.naming.NamingException;
  * @since 1.6
  */
 public final class JNDI {
+        public static final String ENV_ENTRY_PREFIX = "java:comp/env/";
 
 	private JNDI() {
 		// Hide constructor.
@@ -82,7 +83,7 @@ public final class JNDI {
 	 * @since 1.6
 	 */
 	public static <T> T getEnvEntry(String name) {
-		return lookup("java:comp/env/" + name);
+		return lookup(ENV_ENTRY_PREFIX + name);
 	}
 
 	/**

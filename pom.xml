@@ -98,6 +98,12 @@
 			<version>2.0.0.Final</version>
 			<scope>provided</scope>
 		</dependency>
+                <dependency>
+                    <groupId>javax.ejb</groupId>
+                    <artifactId>ejb-api</artifactId>
+                    <version>3.0</version>
+                    <scope>provided</scope>
+		</dependency>
 
 		<!-- Java EE 7 dependencies. -->
 		<dependency>
@@ -118,6 +124,14 @@
 			<version>1.1</version>
 			<scope>provided</scope>
 		</dependency>
+
+                <!-- misc dependencies -->
+                <dependency>
+                    <groupId>org.projectlombok</groupId>
+                    <artifactId>lombok</artifactId>
+                    <version>1.18.12</version>
+                    <scope>provided</scope>
+                </dependency>
 
 		<!-- Test dependencies. -->
 		<dependency>
@@ -336,6 +350,7 @@
 					<links>
 						<link>https://javaee.github.io/javaee-spec/javadocs/</link>
 					</links>
+                                        <doclint>none</doclint>
 				</configuration>
 				<executions>
 					<execution>
