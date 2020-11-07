@@ -12,6 +12,8 @@
  */
 package org.omnifaces.component.script;
 
+import static org.omnifaces.util.Renderers.writeAttribute;
+
 import java.io.IOException;
 
 import javax.faces.component.UIComponentBase;
@@ -66,12 +68,16 @@ public abstract class ScriptFamily extends UIComponentBase {
 
 		if (isRendered()) {
 			ResponseWriter writer = context.getResponseWriter();
-			writer.startElement("script", this);
-			writer.writeAttribute("type", "text/javascript", "type");
 
 			if (getId() != null || !getClientBehaviors().isEmpty()) {
-				writer.writeAttribute("id", getClientId(context), "id");
+				writer.startElement("input", this);
+				writeAttribute(writer, "type", "hidden");
+				writeAttribute(writer, "id", getClientId(context));
+				writer.endElement("input");
 			}
+
+			writer.startElement("script", this);
+			writeAttribute(writer, "type", "text/javascript");
 		}
 	}
 
