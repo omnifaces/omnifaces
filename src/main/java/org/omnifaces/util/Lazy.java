@@ -33,6 +33,7 @@ import lombok.RequiredArgsConstructor;
  * target="_blank">Example Code (GitHub)</a>
  *
  * @author lprimak
+ * @since 3.9
  * @param <TT> type of object
  */
 @RequiredArgsConstructor

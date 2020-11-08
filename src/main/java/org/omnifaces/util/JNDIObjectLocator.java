@@ -57,6 +57,7 @@ import static org.omnifaces.util.JNDI.ENV_ENTRY_PREFIX;
  * <a href="https://github.com/flowlogix/flowlogix/blob/master/jakarta-ee/jee-examples/src/main/java/com/flowlogix/examples/JndiExample.java"
  * target="_blank">Example Code (GitHub)</a>
  *
+ * @since 3.9
  * @author Lenny Primak
  */
 @Builder(toBuilder = true)
