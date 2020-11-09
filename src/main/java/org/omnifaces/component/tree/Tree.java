@@ -32,6 +32,8 @@ import javax.faces.component.visit.VisitResult;
 import javax.faces.context.FacesContext;
 import javax.faces.event.FacesEvent;
 import javax.faces.event.PhaseId;
+import javax.faces.event.PostValidateEvent;
+import javax.faces.event.PreValidateEvent;
 
 import org.omnifaces.component.EditableValueHolderStateHelper;
 import org.omnifaces.event.FacesEventWrapper;
@@ -212,8 +214,19 @@ public class Tree extends TreeFamily implements NamingContainer {
 			return;
 		}
 
+		final boolean processValidations = (phaseId == PhaseId.PROCESS_VALIDATIONS);
+
 		process(context, getModel(phaseId), () -> {
+			if (processValidations) {
+		        context.getApplication().publishEvent(context, PreValidateEvent.class, this);
+			}
+
 			processTreeNode(context, phaseId);
+
+			if (processValidations) {
+		        context.getApplication().publishEvent(context, PostValidateEvent.class, this);
+			}
+
 			return null;
 		});
 	}
