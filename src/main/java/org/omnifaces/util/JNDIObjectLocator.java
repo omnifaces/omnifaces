@@ -27,6 +27,7 @@ import static org.omnifaces.util.Utils.coalesce;
 
 import java.io.Serializable;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -80,7 +81,8 @@ public class JNDIObjectLocator implements Serializable {
 	/**
 	 * The builder of the {@link JNDIObjectLocator}.
 	 */
-	public static class JNDIObjectLocatorBuilder {
+	public static class JNDIObjectLocatorBuilder implements Serializable {
+                private static final long serialVersionUID = 1L;
 
 		private Map<String, String> environment;
 		private String namespace;
@@ -238,14 +240,15 @@ public class JNDIObjectLocator implements Serializable {
 	private final transient Lazy<InitialContext> initialContext;
 	private final transient Lock initialContextLock;
 	private final transient Map<Class<?>, Entry<String, Boolean>> jndiNameAndRemoteFlagCache;
-	private final transient Map<String, Object> jndiObjectCache;
+	private final transient Lazy<Map<String, Object>> jndiObjectCache;
 
+        @SuppressWarnings("unchecked")
 	private JNDIObjectLocator(JNDIObjectLocatorBuilder builder) {
 		this.builder = builder;
 		initialContext = new Lazy<>(this::createInitialContext);
 		initialContextLock = new ReentrantLock();
 		jndiNameAndRemoteFlagCache = new ConcurrentHashMap<>();
-		jndiObjectCache = builder.noCaching ? null : new ConcurrentHashMap<>();
+                jndiObjectCache = new Lazy<>(() -> builder.noCaching ? Collections.EMPTY_MAP : new ConcurrentHashMap<>());
 	}
 
 	/**
@@ -269,7 +272,8 @@ public class JNDIObjectLocator implements Serializable {
 	 */
 	public <T> T getObject(Class<T> beanClass) {
 		Entry<String, Boolean> jndiNameAndRemoteFlag = jndiNameAndRemoteFlagCache.computeIfAbsent(beanClass, this::computeJNDINameAndRemoteFlag);
-		return getJNDIObject(jndiNameAndRemoteFlag.getKey(), jndiNameAndRemoteFlag.getValue() && !builder.cacheRemote);
+		return getJNDIObject(prependNamespaceIfNecessary(jndiNameAndRemoteFlag.getKey()),
+                        jndiNameAndRemoteFlag.getValue() && !builder.cacheRemote);
 	}
 
 	/**
@@ -299,9 +303,13 @@ public class JNDIObjectLocator implements Serializable {
 	 */
 	public void clearCache() {
 		if (jndiObjectCache != null) {
-			jndiObjectCache.clear();
+                        jndiObjectCache.get().clear();
 		}
 	}
+
+        Map<String, Object> getJndiObjectCache() {
+            return jndiObjectCache.get();
+        }
 
 	private InitialContext createInitialContext() {
 		try {
@@ -321,19 +329,17 @@ public class JNDIObjectLocator implements Serializable {
 		return new SimpleEntry<>(guessJNDIName(beanClass), isRemoteEJB(beanClass));
 	}
 
-	private String prependNamespaceIfNecessary(String jndiName) {
+	public String prependNamespaceIfNecessary(String jndiName) {
 		return jndiName.startsWith(JNDI_NAMESPACE_PREFIX) ? jndiName : (builder.namespace + "/" + jndiName);
 	}
 
 	@SuppressWarnings("unchecked")
 	private <T> T getJNDIObject(String jndiName, boolean noCaching) {
-		String lookupName = prependNamespaceIfNecessary(jndiName);
-
 		if (noCaching || builder.noCaching) {
-			return this.lookup(lookupName);
+			return this.lookup(jndiName);
 		}
 		else {
-			return (T) jndiObjectCache.computeIfAbsent(lookupName, this::lookup);
+			return (T) jndiObjectCache.get().computeIfAbsent(jndiName, this::lookup);
 		}
 	}
 
