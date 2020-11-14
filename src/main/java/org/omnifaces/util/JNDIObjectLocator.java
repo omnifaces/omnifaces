@@ -15,7 +15,6 @@ package org.omnifaces.util;
 
 import static java.util.Collections.emptyMap;
 import static java.util.Objects.requireNonNull;
-import static org.omnifaces.util.Beans.isRemoteEJB;
 import static org.omnifaces.util.Exceptions.is;
 import static org.omnifaces.util.JNDI.JNDI_NAMESPACE_APPLICATION;
 import static org.omnifaces.util.JNDI.JNDI_NAMESPACE_GLOBAL;
@@ -26,11 +25,10 @@ import static org.omnifaces.util.JNDI.guessJNDIName;
 import static org.omnifaces.util.Utils.coalesce;
 
 import java.io.Serializable;
-import java.util.AbstractMap.SimpleEntry;
+import java.lang.annotation.Annotation;
 import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -38,6 +36,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
+import static org.omnifaces.util.Beans.isAnnotationPresent;
+import static org.omnifaces.util.Reflection.toClassOrNull;
 
 /**
  * JNDIObjectLocator is used to centralize JNDI lookups. It minimizes the overhead of JNDI lookups by caching the objects it looks up.
@@ -239,16 +239,16 @@ public class JNDIObjectLocator implements Serializable {
 	private final JNDIObjectLocatorBuilder builder;
 	private final transient Lazy<InitialContext> initialContext;
 	private final transient Lock initialContextLock;
-	private final transient Map<Class<?>, Entry<String, Boolean>> jndiNameAndRemoteFlagCache;
 	private final transient Lazy<Map<String, Object>> jndiObjectCache;
+        private final transient Lazy<Class<? extends Annotation>> remoteAnnotation;
 
         @SuppressWarnings("unchecked")
 	private JNDIObjectLocator(JNDIObjectLocatorBuilder builder) {
 		this.builder = builder;
 		initialContext = new Lazy<>(this::createInitialContext);
 		initialContextLock = new ReentrantLock();
-		jndiNameAndRemoteFlagCache = new ConcurrentHashMap<>();
                 jndiObjectCache = new Lazy<>(() -> builder.noCaching ? Collections.EMPTY_MAP : new ConcurrentHashMap<>());
+                remoteAnnotation = new Lazy<>(() -> toClassOrNull("javax.ejb.Remote"));
 	}
 
 	/**
@@ -271,9 +271,8 @@ public class JNDIObjectLocator implements Serializable {
 	 * @return Resulting object, or <code>null</code> if there is none.
 	 */
 	public <T> T getObject(Class<T> beanClass) {
-		Entry<String, Boolean> jndiNameAndRemoteFlag = jndiNameAndRemoteFlagCache.computeIfAbsent(beanClass, this::computeJNDINameAndRemoteFlag);
-		return getJNDIObject(prependNamespaceIfNecessary(jndiNameAndRemoteFlag.getKey()),
-                        jndiNameAndRemoteFlag.getValue() && !builder.cacheRemote);
+		return getJNDIObject(prependNamespaceIfNecessary(guessJNDIName(beanClass)),
+                        isAnnotationPresent(beanClass, remoteAnnotation.get()) && !builder.cacheRemote);
 	}
 
 	/**
@@ -302,9 +301,7 @@ public class JNDIObjectLocator implements Serializable {
 	 * Clears object cache.
 	 */
 	public void clearCache() {
-		if (jndiObjectCache != null) {
-                        jndiObjectCache.get().clear();
-		}
+                jndiObjectCache.get().clear();
 	}
 
         Map<String, Object> getJndiObjectCache() {
@@ -323,10 +320,6 @@ public class JNDIObjectLocator implements Serializable {
 		catch (NamingException e) {
 			throw new IllegalStateException(e);
 		}
-	}
-
-	private Entry<String, Boolean> computeJNDINameAndRemoteFlag(Class<?> beanClass) {
-		return new SimpleEntry<>(guessJNDIName(beanClass), isRemoteEJB(beanClass));
 	}
 
 	public String prependNamespaceIfNecessary(String jndiName) {
