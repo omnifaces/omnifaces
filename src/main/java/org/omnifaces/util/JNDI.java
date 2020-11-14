@@ -14,6 +14,8 @@ package org.omnifaces.util;
 
 import static org.omnifaces.util.Exceptions.is;
 
+import java.util.regex.Pattern;
+
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
@@ -34,6 +36,47 @@ import jakarta.faces.application.ProjectStage;
  * @since 1.6
  */
 public final class JNDI {
+
+	/**
+	 * JNDI namespace prefix, including the colon: <code>java:</code>
+	 * @since 3.9
+	 */
+	public static final String JNDI_NAMESPACE_PREFIX = "java:";
+
+	/**
+	 * JNDI namespace to lookup components: <code>java:comp</code>
+	 * @since 3.9
+	 */
+	public static final String JNDI_NAMESPACE_COMPONENT = JNDI_NAMESPACE_PREFIX + "comp";
+
+	/**
+	 * JNDI namespace to lookup all enterprise beans: <code>java:global</code>
+	 * @since 3.9
+	 */
+	public static final String JNDI_NAMESPACE_GLOBAL = JNDI_NAMESPACE_PREFIX + "global";
+
+	/**
+	 * JNDI namespace to lookup local enterprise beans within the same module: <code>java:module</code>
+	 * @since 3.9
+	 */
+	public static final String JNDI_NAMESPACE_MODULE = JNDI_NAMESPACE_PREFIX + "module";
+
+	/**
+	 * JNDI namespace to lookup local enterprise beans within the same application: <code>java:app</code>
+	 * @since 3.9
+	 */
+	public static final String JNDI_NAMESPACE_APPLICATION = JNDI_NAMESPACE_PREFIX + "app";
+
+	/**
+	 * JNDI name prefix for environment entries: <code>java:comp/env</code>
+	 * @since 3.9
+	 */
+	public static final String JNDI_NAME_PREFIX_ENV_ENTRY = JNDI_NAMESPACE_COMPONENT + "/env";
+
+	/**
+	 * Pattern for local or remote suffix in EJB interface name.
+	 */
+	private static final Pattern PATTERN_EJB_INTERFACE_SUFFIX = Pattern.compile("(LOCAL|REMOTE)$", Pattern.CASE_INSENSITIVE);
 
 	private JNDI() {
 		// Hide constructor.
@@ -83,7 +126,7 @@ public final class JNDI {
 	 * @since 1.6
 	 */
 	public static <T> T getEnvEntry(String name) {
-		return lookup("java:comp/env/" + name);
+		return lookup(JNDI_NAME_PREFIX_ENV_ENTRY + "/" + name);
 	}
 
 	/**
@@ -120,6 +163,19 @@ public final class JNDI {
 		} catch (NamingException e) {
 			throw new IllegalStateException(e);
 		}
+	}
+
+	/**
+	 * Guess JNDI name of given bean class, which can be a local or remote EJB.
+	 * @param beanClass The bean class to guess JNDI name for.
+	 * @return The guessed JNDI name of the given bean class.
+	 * @since 3.9
+	 */
+	public static String guessJNDIName(Class<?> beanClass) {
+		// Support naming convention that strips Local/Remote from the
+		// end of an interface class to try to determine the actual bean name,
+		// to avoid @EJB(beanName="myBeanName"), and just use plain old @EJB.
+		return PATTERN_EJB_INTERFACE_SUFFIX.matcher(beanClass.getSimpleName()).replaceFirst("") + "!" + beanClass.getName();
 	}
 
 }
