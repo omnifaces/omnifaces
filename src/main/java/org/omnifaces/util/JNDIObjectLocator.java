@@ -69,6 +69,8 @@ public class JNDIObjectLocator implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	private static final Map<Class<?>, Entry<String, Boolean>> JNDI_NAME_AND_REMOTE_FLAG_CACHE = new ConcurrentHashMap<>();
+
 	/**
 	 * Returns the builder of the {@link JNDIObjectLocator}.
 	 * @return The builder of the {@link JNDIObjectLocator}.
@@ -237,14 +239,12 @@ public class JNDIObjectLocator implements Serializable {
 	private final JNDIObjectLocatorBuilder builder;
 	private final transient Lazy<InitialContext> initialContext;
 	private final transient Lock initialContextLock;
-	private final transient Map<Class<?>, Entry<String, Boolean>> jndiNameAndRemoteFlagCache;
 	private final transient Map<String, Object> jndiObjectCache;
 
 	private JNDIObjectLocator(JNDIObjectLocatorBuilder builder) {
 		this.builder = builder;
 		initialContext = new Lazy<>(this::createInitialContext);
 		initialContextLock = new ReentrantLock();
-		jndiNameAndRemoteFlagCache = new ConcurrentHashMap<>();
 		jndiObjectCache = builder.noCaching ? null : new ConcurrentHashMap<>();
 	}
 
@@ -268,7 +268,7 @@ public class JNDIObjectLocator implements Serializable {
 	 * @return Resulting object, or <code>null</code> if there is none.
 	 */
 	public <T> T getObject(Class<T> beanClass) {
-		Entry<String, Boolean> jndiNameAndRemoteFlag = jndiNameAndRemoteFlagCache.computeIfAbsent(beanClass, this::computeJNDINameAndRemoteFlag);
+		Entry<String, Boolean> jndiNameAndRemoteFlag = JNDI_NAME_AND_REMOTE_FLAG_CACHE.computeIfAbsent(beanClass, this::computeJNDINameAndRemoteFlag);
 		return getJNDIObject(jndiNameAndRemoteFlag.getKey(), jndiNameAndRemoteFlag.getValue() && !builder.cacheRemote);
 	}
 
