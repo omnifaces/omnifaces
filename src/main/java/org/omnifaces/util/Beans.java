@@ -381,4 +381,15 @@ public final class Beans {
 		BeansLocal.fireEvent(getManager(), event, qualifiers);
 	}
 
+	/**
+	 * Returns whether given bean class is a remote EJB. That is, when the <code>javax.ejb.Remote</code> annotation is present on the given type.
+	 * @param beanClass The bean class.
+	 * @return Whether given bean class is a remote EJB.
+	 * @since 3.9
+	 */
+	public static boolean isRemoteEJB(Class<?> beanClass) {
+		Class<? extends Annotation> remoteAnnotation = toClassOrNull("javax.ejb.Remote");
+		return remoteAnnotation != null && beanClass.isAnnotationPresent(remoteAnnotation);
+	}
+
 }
