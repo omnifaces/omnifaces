@@ -160,6 +160,11 @@ public class JNDIObjectLocator implements Serializable {
  		return fieldName.startsWith(JNDI_NAMESPACE_PREFIX) ? fieldName : (namespace + "/" + fieldName);
  	}
 
+        /**
+         * This should be used in unit tests only
+         *
+         * @return JNDI cache
+         */
 	Map<String, Object> getJNDIObjectCache() {
 		return jndiObjectCache.get();
 	}
