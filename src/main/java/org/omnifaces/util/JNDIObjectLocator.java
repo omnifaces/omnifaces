@@ -14,11 +14,13 @@
 package org.omnifaces.util;
 
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.unmodifiableMap;
 import static java.util.Objects.requireNonNull;
 import static org.omnifaces.util.Exceptions.is;
 import static org.omnifaces.util.JNDI.JNDI_NAMESPACE_APPLICATION;
 import static org.omnifaces.util.JNDI.JNDI_NAMESPACE_GLOBAL;
 import static org.omnifaces.util.JNDI.JNDI_NAMESPACE_MODULE;
+import static org.omnifaces.util.JNDI.JNDI_NAMESPACE_PREFIX;
 import static org.omnifaces.util.JNDI.JNDI_NAME_PREFIX_ENV_ENTRY;
 import static org.omnifaces.util.JNDI.guessJNDIName;
 import static org.omnifaces.util.Reflection.toClassOrNull;
@@ -78,15 +80,13 @@ public class JNDIObjectLocator implements Serializable {
 	/**
 	 * The builder of the {@link JNDIObjectLocator}.
 	 */
-	public static class JNDIObjectLocatorBuilder implements Serializable {
-
-		private static final long serialVersionUID = 1L;
+	public static class JNDIObjectLocatorBuilder {
 
 		private Map<String, String> environment;
 		private String namespace;
 		private Boolean noCaching;
 		private Boolean cacheRemote;
-		private transient JNDIObjectLocator build;
+		private boolean build;
 
 		/**
 		 * Specifies the environment to be passed into {@link InitialContext}. The default is <code>null</code>.
@@ -98,7 +98,7 @@ public class JNDIObjectLocator implements Serializable {
 		public JNDIObjectLocatorBuilder environment(Map<String, String> environment) {
 			requireNonNull(environment, "environment");
 
-			if (build != null || this.environment != null) {
+			if (build || this.environment != null) {
 				throw new IllegalStateException();
 			}
 
@@ -122,7 +122,7 @@ public class JNDIObjectLocator implements Serializable {
 				environment = new Hashtable<>();
 			}
 
-			if (build != null || environment.put(key, value) != null) {
+			if (build || environment.put(key, value) != null) {
 				throw new IllegalStateException();
 			}
 
@@ -160,7 +160,7 @@ public class JNDIObjectLocator implements Serializable {
 		public JNDIObjectLocatorBuilder namespace(String namespace) {
 			requireNonNull(namespace, "namespace");
 
-			if (build != null || this.namespace != null) {
+			if (build || this.namespace != null) {
 				throw new IllegalStateException();
 			}
 
@@ -192,7 +192,7 @@ public class JNDIObjectLocator implements Serializable {
 		 * @throws IllegalStateException When noCaching is already set in this builder or when this builder is already build.
 		 */
 		public JNDIObjectLocatorBuilder noCaching() {
-			if (build != null || noCaching != null) {
+			if (build || noCaching != null) {
 				throw new IllegalStateException();
 			}
 
@@ -206,7 +206,7 @@ public class JNDIObjectLocator implements Serializable {
 		 * @throws IllegalStateException When cacheRemote is already set in this builder or when this builder is already build.
 		 */
 		public JNDIObjectLocatorBuilder cacheRemote() {
-			if (build != null || cacheRemote != null) {
+			if (build || cacheRemote != null) {
 				throw new IllegalStateException();
 			}
 
@@ -220,31 +220,39 @@ public class JNDIObjectLocator implements Serializable {
 		 * @throws IllegalStateException When this builder is already build.
 		 */
 		public JNDIObjectLocator build() {
-			if (build != null) {
+			if (build) {
 				throw new IllegalStateException();
 			}
 
-			environment = coalesce(environment, emptyMap());
+			environment = unmodifiableMap(coalesce(environment, emptyMap()));
 			namespace = coalesce(namespace, JNDI_NAMESPACE_MODULE);
 			noCaching = coalesce(noCaching, Boolean.FALSE);
 			cacheRemote = coalesce(cacheRemote, Boolean.FALSE);
-			build = new JNDIObjectLocator(this);
+			build = true;
 
-			return build;
+			return new JNDIObjectLocator(environment, namespace, noCaching, cacheRemote);
 		}
 	}
 
-	private final JNDIObjectLocatorBuilder builder;
+	private final Map<String, String> environment;
+	private final String namespace;
+	private final boolean noCaching;
+	private final boolean cacheRemote;
+
 	private final transient Lazy<InitialContext> initialContext;
 	private final transient Lock initialContextLock;
 	private final transient Lazy<Map<String, Object>> jndiObjectCache;
 	private final transient Lazy<Class<? extends Annotation>> remoteAnnotation;
 
-	private JNDIObjectLocator(JNDIObjectLocatorBuilder builder) {
-		this.builder = builder;
+	private JNDIObjectLocator(Map<String, String> environment, String namespace, boolean noCaching, boolean cacheRemote) {
+		this.environment = environment;
+		this.namespace = namespace;
+		this.noCaching = noCaching;
+		this.cacheRemote = cacheRemote;
+
 		initialContext = new Lazy<>(this::createInitialContext);
 		initialContextLock = new ReentrantLock();
-		jndiObjectCache = new Lazy<>(() -> builder.noCaching ? emptyMap() : new ConcurrentHashMap<>());
+		jndiObjectCache = new Lazy<>(() -> noCaching ? emptyMap() : new ConcurrentHashMap<>());
 		remoteAnnotation = new Lazy<>(() -> toClassOrNull("javax.ejb.Remote"));
 	}
 
@@ -268,9 +276,9 @@ public class JNDIObjectLocator implements Serializable {
 	 * @return Resulting object, or <code>null</code> if there is none.
 	 */
 	public <T> T getObject(Class<T> beanClass) {
-		String jndiName = builder.namespace + "/" + guessJNDIName(beanClass);
+		String jndiName = namespace + "/" + guessJNDIName(beanClass);
 		boolean remote = remoteAnnotation.get() != null && beanClass.isAnnotationPresent(remoteAnnotation.get());
-		return getJNDIObject(jndiName, remote && !builder.cacheRemote);
+		return getJNDIObject(jndiName, remote && !cacheRemote);
 	}
 
 	/**
@@ -302,17 +310,31 @@ public class JNDIObjectLocator implements Serializable {
 		jndiObjectCache.get().clear();
 	}
 
-	Map<String, Object> getJndiObjectCache() {
+	/**
+	 * Utility method used in matching fields to EJB injection points to try to find appropriate JNDI object to use for injection.
+	 * It prepends the given field name with this locator's namespace when the given field name does not already start with {@link JNDI#JNDI_NAMESPACE_PREFIX}.
+	 * @param fieldName The field name to prepend with this locator's name space if necessary.
+	 * @return The given field name, prepended with this locator's name space if necessary.
+	 */
+	public String prependNamespaceIfNecessary(String fieldName) {
+		return fieldName.startsWith(JNDI_NAMESPACE_PREFIX) ? fieldName : (namespace + "/" + fieldName);
+	}
+
+	/**
+	 * This should be used in unit tests only.
+	 * @return Current JNDI cache.
+	 */
+	Map<String, Object> getJNDIObjectCache() {
 		return jndiObjectCache.get();
 	}
 
 	private InitialContext createInitialContext() {
 		try {
-			if (builder.environment.isEmpty()) {
+			if (environment.isEmpty()) {
 				return new InitialContext();
 			}
 			else {
-				return new InitialContext(new Hashtable<>(builder.environment));
+				return new InitialContext(new Hashtable<>(environment));
 			}
 		}
 		catch (NamingException e) {
@@ -322,7 +344,7 @@ public class JNDIObjectLocator implements Serializable {
 
 	@SuppressWarnings("unchecked")
 	private <T> T getJNDIObject(String jndiName, boolean noCaching) {
-		if (noCaching || builder.noCaching) {
+		if (noCaching || this.noCaching) {
 			return this.lookup(jndiName);
 		}
 		else {
@@ -360,7 +382,7 @@ public class JNDIObjectLocator implements Serializable {
 	 * This deals with transient final fields correctly.
 	 */
 	private Object readResolve() {
-		return builder.build();
+		return new JNDIObjectLocator(environment, namespace, noCaching, cacheRemote);
 	}
 
 }
