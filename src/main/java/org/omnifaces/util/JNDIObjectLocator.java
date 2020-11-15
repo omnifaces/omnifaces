@@ -13,21 +13,23 @@
 
 package org.omnifaces.util;
 
+import java.beans.ConstructorProperties;
 import static java.util.Collections.emptyMap;
-import static java.util.Objects.requireNonNull;
 import static org.omnifaces.util.Exceptions.is;
-import static org.omnifaces.util.JNDI.JNDI_NAMESPACE_APPLICATION;
-import static org.omnifaces.util.JNDI.JNDI_NAMESPACE_GLOBAL;
-import static org.omnifaces.util.JNDI.JNDI_NAMESPACE_MODULE;
 import static org.omnifaces.util.JNDI.JNDI_NAME_PREFIX_ENV_ENTRY;
 import static org.omnifaces.util.JNDI.guessJNDIName;
 import static org.omnifaces.util.Reflection.toClassOrNull;
-import static org.omnifaces.util.Utils.coalesce;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Collections;
+import static java.util.Collections.unmodifiableMap;
 import java.util.Hashtable;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -35,6 +37,9 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
+import static org.omnifaces.util.JNDI.JNDI_NAMESPACE_APPLICATION;
+import static org.omnifaces.util.JNDI.JNDI_NAMESPACE_GLOBAL;
+import static org.omnifaces.util.JNDI.JNDI_NAMESPACE_PREFIX;
 
 /**
  * JNDIObjectLocator is used to centralize JNDI lookups. It minimizes the overhead of JNDI lookups by caching the objects it looks up.
@@ -66,187 +71,28 @@ import javax.naming.NamingException;
 public class JNDIObjectLocator implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+        /**
+         * to be passed into InitialContext()
+         */
+        private final Map<String, String> environment;
+        /**
+         * Used in construction of portable JNDI names usually java:module
+         * (default)
+         */
+        private final String namespace;
+        /**
+         * whether to disable cache. Default is false
+         */
+        private final boolean noCaching;
+        /**
+         * whether to cache remote EJBs, usually false
+         */
+        private final boolean cacheRemote;
 
-	/**
-	 * Returns the builder of the {@link JNDIObjectLocator}.
-	 * @return The builder of the {@link JNDIObjectLocator}.
-	 */
-	public static JNDIObjectLocatorBuilder builder() {
-		return new JNDIObjectLocatorBuilder();
-	}
-
-	/**
-	 * The builder of the {@link JNDIObjectLocator}.
-	 */
-	public static class JNDIObjectLocatorBuilder implements Serializable {
-
-		private static final long serialVersionUID = 1L;
-
-		private Map<String, String> environment;
-		private String namespace;
-		private Boolean noCaching;
-		private Boolean cacheRemote;
-		private transient JNDIObjectLocator build;
-
-		/**
-		 * Specifies the environment to be passed into {@link InitialContext}. The default is <code>null</code>.
-		 * @param environment The environment.
-		 * @return This builder.
-		 * @throws NullPointerException When given environment is null.
-		 * @throws IllegalStateException When environment is already set in this builder or when this builder is already build.
-		 */
-		public JNDIObjectLocatorBuilder environment(Map<String, String> environment) {
-			requireNonNull(environment, "environment");
-
-			if (build != null || this.environment != null) {
-				throw new IllegalStateException();
-			}
-
-			this.environment = environment;
-			return this;
-		}
-
-		/**
-		 * Adds an environment property.
-		 * @param key The key of the new environment property.
-		 * @param value The value of the new environment property.
-		 * @return This builder.
-		 * @throws NullPointerException When key or value is null.
-		 * @throws IllegalStateException When environment property is already set in this builder or when this builder is already build.
-		 */
-		public JNDIObjectLocatorBuilder environment(String key, String value) {
-			requireNonNull(key, "key");
-			requireNonNull(value, "value");
-
-			if (environment == null) {
-				environment = new Hashtable<>();
-			}
-
-			if (build != null || environment.put(key, value) != null) {
-				throw new IllegalStateException();
-			}
-
-			return this;
-		}
-
-		/**
-		 * Adds initial host environment property.
-		 * @param initialHost The initial host environment property.
-		 * @return This builder.
-		 * @throws IllegalStateException When initial host is already set in this builder or when this builder is already build.
-		 * @throws NullPointerException When value is null.
-		 */
-		public JNDIObjectLocatorBuilder initialHost(String initialHost) {
-			return environment("org.omg.CORBA.ORBInitialHost", initialHost);
-		}
-
-		/**
-		 * Adds initial port environment property.
-		 * @param initialPort The initial port environment property.
-		 * @return This builder.
-		 * @throws IllegalStateException When initial port is already set in this builder or when this builder is already build.
-		 */
-		public JNDIObjectLocatorBuilder initialPort(int initialPort) {
-			return environment("org.omg.CORBA.ORBInitialPort", Integer.toString(initialPort));
-		}
-
-		/**
-		 * Specifies the default namespace to be used in construction of portable JNDI names. The default is <code>java:module</code>.
-		 * @param namespace The namespace.
-		 * @return This builder.
-		 * @throws IllegalStateException When namespace is already set in this builder or when this builder is already build.
-		 * @throws NullPointerException When given namespace is null.
-		 */
-		public JNDIObjectLocatorBuilder namespace(String namespace) {
-			requireNonNull(namespace, "namespace");
-
-			if (build != null || this.namespace != null) {
-				throw new IllegalStateException();
-			}
-
-			this.namespace = namespace;
-			return this;
-		}
-
-		/**
-		 * Specifies that the default namespace to be used in construction of portable JNDI names must be <code>java:global</code> instead of <code>java:module</code>.
-		 * @return This builder.
-		 * @throws IllegalStateException When namespace is already set in this builder.
-		 */
-		public JNDIObjectLocatorBuilder global() {
-			return namespace(JNDI_NAMESPACE_GLOBAL);
-		}
-
-		/**
-		 * Specifies that the default namespace to be used in construction of portable JNDI names must be <code>java:app</code> instead of <code>java:module</code>.
-		 * @return This builder.
-		 * @throws IllegalStateException When namespace is already set in this builder.
-		 */
-		public JNDIObjectLocatorBuilder app() {
-			return namespace(JNDI_NAMESPACE_APPLICATION);
-		}
-
-		/**
-		 * Specifies to disable cache. The default is <code>false</code>.
-		 * @return This builder.
-		 * @throws IllegalStateException When noCaching is already set in this builder or when this builder is already build.
-		 */
-		public JNDIObjectLocatorBuilder noCaching() {
-			if (build != null || noCaching != null) {
-				throw new IllegalStateException();
-			}
-
-			noCaching = true;
-			return this;
-		}
-
-		/**
-		 * Specifies to cache remote enterprise beans. The default is <code>false</code>.
-		 * @return This builder.
-		 * @throws IllegalStateException When cacheRemote is already set in this builder or when this builder is already build.
-		 */
-		public JNDIObjectLocatorBuilder cacheRemote() {
-			if (build != null || cacheRemote != null) {
-				throw new IllegalStateException();
-			}
-
-			cacheRemote = true;
-			return this;
-		}
-
-		/**
-		 * Builds the {@link JNDIObjectLocator}.
-		 * @return The {@link JNDIObjectLocator}.
-		 * @throws IllegalStateException When this builder is already build.
-		 */
-		public JNDIObjectLocator build() {
-			if (build != null) {
-				throw new IllegalStateException();
-			}
-
-			environment = coalesce(environment, emptyMap());
-			namespace = coalesce(namespace, JNDI_NAMESPACE_MODULE);
-			noCaching = coalesce(noCaching, Boolean.FALSE);
-			cacheRemote = coalesce(cacheRemote, Boolean.FALSE);
-			build = new JNDIObjectLocator(this);
-
-			return build;
-		}
-	}
-
-	private final JNDIObjectLocatorBuilder builder;
 	private final transient Lazy<InitialContext> initialContext;
 	private final transient Lock initialContextLock;
 	private final transient Lazy<Map<String, Object>> jndiObjectCache;
 	private final transient Lazy<Class<? extends Annotation>> remoteAnnotation;
-
-	private JNDIObjectLocator(JNDIObjectLocatorBuilder builder) {
-		this.builder = builder;
-		initialContext = new Lazy<>(this::createInitialContext);
-		initialContextLock = new ReentrantLock();
-		jndiObjectCache = new Lazy<>(() -> builder.noCaching ? emptyMap() : new ConcurrentHashMap<>());
-		remoteAnnotation = new Lazy<>(() -> toClassOrNull("javax.ejb.Remote"));
-	}
 
 	/**
 	 * Same as {@link JNDI#getEnvEntry(String)}, except that this is cached.
@@ -268,9 +114,9 @@ public class JNDIObjectLocator implements Serializable {
 	 * @return Resulting object, or <code>null</code> if there is none.
 	 */
 	public <T> T getObject(Class<T> beanClass) {
-		String jndiName = builder.namespace + "/" + guessJNDIName(beanClass);
+		String jndiName = namespace + "/" + guessJNDIName(beanClass);
 		boolean remote = remoteAnnotation.get() != null && beanClass.isAnnotationPresent(remoteAnnotation.get());
-		return getJNDIObject(jndiName, remote && !builder.cacheRemote);
+		return getJNDIObject(jndiName, remote && !cacheRemote);
 	}
 
 	/**
@@ -302,17 +148,29 @@ public class JNDIObjectLocator implements Serializable {
 		jndiObjectCache.get().clear();
 	}
 
-	Map<String, Object> getJndiObjectCache() {
+        /**
+         * Utility method used in matching fiends to EJB injection points,
+         * it uses this locator's namespace to try to find appropriate JNDI object to use
+         * for injection
+         *
+         * @param fieldName
+         * @return JNDI name for the field
+         */
+        public String prependNamespaceIfNecessary(String fieldName) {
+ 		return fieldName.startsWith(JNDI_NAMESPACE_PREFIX) ? fieldName : (namespace + "/" + fieldName);
+ 	}
+
+	Map<String, Object> getJNDIObjectCache() {
 		return jndiObjectCache.get();
 	}
 
 	private InitialContext createInitialContext() {
 		try {
-			if (builder.environment.isEmpty()) {
+			if (environment.isEmpty()) {
 				return new InitialContext();
 			}
 			else {
-				return new InitialContext(new Hashtable<>(builder.environment));
+				return new InitialContext(new Hashtable<>(environment));
 			}
 		}
 		catch (NamingException e) {
@@ -322,7 +180,7 @@ public class JNDIObjectLocator implements Serializable {
 
 	@SuppressWarnings("unchecked")
 	private <T> T getJNDIObject(String jndiName, boolean noCaching) {
-		if (noCaching || builder.noCaching) {
+		if (noCaching || noCaching) {
 			return this.lookup(jndiName);
 		}
 		else {
@@ -360,7 +218,221 @@ public class JNDIObjectLocator implements Serializable {
 	 * This deals with transient final fields correctly.
 	 */
 	private Object readResolve() {
-		return builder.build();
+		return toBuilder().build();
 	}
 
+        /*
+                The following are derived from de-lomboked builder pattern objects for this class
+        */
+        @ConstructorProperties({"environment", "portableNamePrefix", "noCaching", "cacheRemote"})
+        JNDIObjectLocator(final Map<String, String> environment, final String portableNamePrefix, final boolean noCaching, final boolean cacheRemote) {
+                this.environment = environment;
+                this.namespace = portableNamePrefix;
+                this.noCaching = noCaching;
+                this.cacheRemote = cacheRemote;
+		initialContext = new Lazy<>(this::createInitialContext);
+		initialContextLock = new ReentrantLock();
+		jndiObjectCache = new Lazy<>(() -> this.noCaching ? emptyMap() : new ConcurrentHashMap<>());
+		remoteAnnotation = new Lazy<>(() -> toClassOrNull("javax.ejb.Remote"));
+        }
+
+        public static class JNDIObjectLocatorBuilder {
+                private ArrayList<String> environmentKey;
+                private ArrayList<String> environmentValue;
+                private boolean namespaceSet;
+                private String namespaceValue;
+                private boolean noCaching;
+                private boolean cacheRemote;
+
+                JNDIObjectLocatorBuilder() {
+                }
+
+                /**
+		 * Adds an environment property.
+		 * @param environmentKey The key of the new environment property.
+		 * @param environmentValue The value of the new environment property.
+		 * @return This builder.
+		 * @throws NullPointerException When key or value is null.
+		 * @throws IllegalStateException When environment property is already set in this builder or when this builder is already build.
+		 */
+                public JNDIObjectLocatorBuilder environment(final String environmentKey, final String environmentValue) {
+                        requireNonNull(environmentKey, "key");
+                        requireNonNull(environmentValue, "value");
+                        if (this.environmentKey == null) {
+                                this.environmentKey = new ArrayList<>();
+                                this.environmentValue = new ArrayList<>();
+                        }
+                        this.environmentKey.add(environmentKey);
+                        this.environmentValue.add(environmentValue);
+                        return this;
+                }
+
+        	/**
+		 * Specifies the environment to be passed into {@link InitialContext}. The default is <code>null</code>.
+		 * @param environment The environment.
+		 * @return This builder.
+		 * @throws NullPointerException When given environment is null.
+		 * @throws IllegalStateException When environment is already set in this builder or when this builder is already build.
+		 */
+                public JNDIObjectLocatorBuilder environment(final Map<? extends String, ? extends String> environment) {
+                        if (environment == null) {
+                                throw new NullPointerException("environment cannot be null");
+                        }
+                        if (this.environmentKey == null) {
+                                this.environmentKey = new ArrayList<>();
+                                this.environmentValue = new ArrayList<>();
+                        }
+                        for (final Entry<? extends String, ? extends String> entry : environment.entrySet()) {
+                                this.environmentKey.add(entry.getKey());
+                                this.environmentValue.add(entry.getValue());
+                        }
+                        return this;
+                }
+
+                /**
+                 * Clears all environment
+                 * @return this
+                 */
+                public JNDIObjectLocatorBuilder clearEnvironment() {
+                        if (this.environmentKey != null) {
+                                this.environmentKey.clear();
+                                this.environmentValue.clear();
+                        }
+                        return this;
+                }
+
+                /**
+		 * Adds initial host environment property.
+		 * @param initialHost The initial host environment property.
+		 * @return This builder.
+		 * @throws IllegalStateException When initial host is already set in this builder or when this builder is already build.
+		 * @throws NullPointerException When value is null.
+		 */
+		public JNDIObjectLocatorBuilder initialHost(String initialHost) {
+			return environment("org.omg.CORBA.ORBInitialHost", initialHost);
+		}
+
+		/**
+		 * Adds initial port environment property.
+		 * @param initialPort The initial port environment property.
+		 * @return This builder.
+		 * @throws IllegalStateException When initial port is already set in this builder or when this builder is already build.
+		 */
+		public JNDIObjectLocatorBuilder initialPort(int initialPort) {
+			return environment("org.omg.CORBA.ORBInitialPort", Integer.toString(initialPort));
+		}
+
+                /**
+		 * Specifies the default namespace to be used in construction of portable JNDI names. The default is <code>java:module</code>.
+		 * @param namespace The namespace.
+		 * @return This builder.
+		 * @throws IllegalStateException When namespace is already set in this builder or when this builder is already build.
+		 * @throws NullPointerException When given namespace is null.
+		 */
+                public JNDIObjectLocatorBuilder namespace(final String namespace) {
+                        requireNonNull(namespace, "namespace");
+                        this.namespaceValue = namespace;
+                        namespaceSet = true;
+                        return this;
+                }
+
+		/**
+		 * Specifies that the default namespace to be used in construction of portable JNDI names must be <code>java:global</code> instead of <code>java:module</code>.
+		 * @return This builder.
+		 * @throws IllegalStateException When namespace is already set in this builder.
+		 */
+		public JNDIObjectLocatorBuilder global() {
+			return namespace(JNDI_NAMESPACE_GLOBAL);
+		}
+
+		/**
+		 * Specifies that the default namespace to be used in construction of portable JNDI names must be <code>java:app</code> instead of <code>java:module</code>.
+		 * @return This builder.
+		 * @throws IllegalStateException When namespace is already set in this builder.
+		 */
+		public JNDIObjectLocatorBuilder app() {
+			return namespace(JNDI_NAMESPACE_APPLICATION);
+		}
+
+		/**
+		 * Specifies to disable cache. The default is <code>false</code>.
+		 * @return This builder.
+		 * @throws IllegalStateException When noCaching is already set in this builder or when this builder is already build.
+		 */
+                public JNDIObjectLocatorBuilder noCaching() {
+                        this.noCaching = true;
+                        return this;
+                }
+
+		/**
+		 * Specifies to cache remote enterprise beans. The default is <code>false</code>.
+		 * @return This builder.
+		 * @throws IllegalStateException When cacheRemote is already set in this builder or when this builder is already build.
+		 */
+                public JNDIObjectLocatorBuilder cacheRemote() {
+                        this.cacheRemote = true;
+                        return this;
+                }
+
+                /**
+		 * Builds the {@link JNDIObjectLocator}.
+		 * @return The {@link JNDIObjectLocator}.
+		 * @throws IllegalStateException When this builder is already build.
+		 */
+                public JNDIObjectLocator build() {
+                        Map<String, String> environment;
+                        switch (this.environmentKey == null ? 0 : this.environmentKey.size()) {
+                                case 0:
+                                        environment = Collections.emptyMap();
+                                        break;
+                                case 1:
+                                        environment = Collections.singletonMap(this.environmentKey.get(0), this.environmentValue.get(0));
+                                        break;
+                                default:
+                                        environment = new LinkedHashMap<>(this.environmentKey.size() < 1073741824 ? 1 + this.environmentKey.size() +
+                                                (this.environmentKey.size() - 3) / 3 : Integer.MAX_VALUE);
+                                        for (int ii = 0; ii < this.environmentKey.size(); ii++) {
+                                                environment.put(this.environmentKey.get(ii), this.environmentValue.get(ii));
+                                        }
+                                        environment = unmodifiableMap(environment);
+                        }
+                        String namespaceValue = this.namespaceValue;
+                        if (!this.namespaceSet) {
+                                namespaceValue = JNDI.JNDI_NAMESPACE_MODULE;
+                        }
+                        return new JNDIObjectLocator(environment, namespaceValue, this.noCaching, this.cacheRemote);
+                }
+
+                @Override
+                public String toString() {
+                        return "JNDIObjectLocator.JNDIObjectLocatorBuilder(environment$key=" + this.environmentKey + ", environment$value=" +
+                                this.environmentValue + ", portableNamePrefix$value=" + this.namespaceValue + ", noCaching=" + this.noCaching +
+                                ", cacheRemote=" + this.cacheRemote + ")";
+                }
+        }
+
+        /**
+         *
+         * @return new instance of the builder
+         */
+        public static JNDIObjectLocatorBuilder builder() {
+                return new JNDIObjectLocatorBuilder();
+        }
+
+        /**
+         * @return new builder that's based on this object
+         */
+        public JNDIObjectLocatorBuilder toBuilder() {
+                final JNDIObjectLocatorBuilder builder = new JNDIObjectLocatorBuilder().namespace(this.namespace);
+                if (noCaching) {
+                        builder.noCaching();
+                }
+                if (cacheRemote) {
+                        builder.cacheRemote();
+                }
+                if (this.environment != null) {
+                        builder.environment(this.environment);
+                }
+                return builder;
+        }
 }
