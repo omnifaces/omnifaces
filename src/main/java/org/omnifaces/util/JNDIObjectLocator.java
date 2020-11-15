@@ -19,14 +19,13 @@ import static org.omnifaces.util.Exceptions.is;
 import static org.omnifaces.util.JNDI.JNDI_NAMESPACE_APPLICATION;
 import static org.omnifaces.util.JNDI.JNDI_NAMESPACE_GLOBAL;
 import static org.omnifaces.util.JNDI.JNDI_NAMESPACE_MODULE;
-import static org.omnifaces.util.JNDI.JNDI_NAMESPACE_PREFIX;
 import static org.omnifaces.util.JNDI.JNDI_NAME_PREFIX_ENV_ENTRY;
 import static org.omnifaces.util.JNDI.guessJNDIName;
+import static org.omnifaces.util.Reflection.toClassOrNull;
 import static org.omnifaces.util.Utils.coalesce;
 
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
-import java.util.Collections;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -36,8 +35,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
-import static org.omnifaces.util.Beans.isAnnotationPresent;
-import static org.omnifaces.util.Reflection.toClassOrNull;
 
 /**
  * JNDIObjectLocator is used to centralize JNDI lookups. It minimizes the overhead of JNDI lookups by caching the objects it looks up.
@@ -82,7 +79,8 @@ public class JNDIObjectLocator implements Serializable {
 	 * The builder of the {@link JNDIObjectLocator}.
 	 */
 	public static class JNDIObjectLocatorBuilder implements Serializable {
-                private static final long serialVersionUID = 1L;
+
+		private static final long serialVersionUID = 1L;
 
 		private Map<String, String> environment;
 		private String namespace;
@@ -240,15 +238,14 @@ public class JNDIObjectLocator implements Serializable {
 	private final transient Lazy<InitialContext> initialContext;
 	private final transient Lock initialContextLock;
 	private final transient Lazy<Map<String, Object>> jndiObjectCache;
-        private final transient Lazy<Class<? extends Annotation>> remoteAnnotation;
+	private final transient Lazy<Class<? extends Annotation>> remoteAnnotation;
 
-        @SuppressWarnings("unchecked")
 	private JNDIObjectLocator(JNDIObjectLocatorBuilder builder) {
 		this.builder = builder;
 		initialContext = new Lazy<>(this::createInitialContext);
 		initialContextLock = new ReentrantLock();
-                jndiObjectCache = new Lazy<>(() -> builder.noCaching ? Collections.EMPTY_MAP : new ConcurrentHashMap<>());
-                remoteAnnotation = new Lazy<>(() -> toClassOrNull("javax.ejb.Remote"));
+		jndiObjectCache = new Lazy<>(() -> builder.noCaching ? emptyMap() : new ConcurrentHashMap<>());
+		remoteAnnotation = new Lazy<>(() -> toClassOrNull("javax.ejb.Remote"));
 	}
 
 	/**
@@ -271,8 +268,9 @@ public class JNDIObjectLocator implements Serializable {
 	 * @return Resulting object, or <code>null</code> if there is none.
 	 */
 	public <T> T getObject(Class<T> beanClass) {
-		return getJNDIObject(prependNamespaceIfNecessary(guessJNDIName(beanClass)),
-                        isAnnotationPresent(beanClass, remoteAnnotation.get()) && !builder.cacheRemote);
+		String jndiName = builder.namespace + "/" + guessJNDIName(beanClass);
+		boolean remote = remoteAnnotation.get() != null && beanClass.isAnnotationPresent(remoteAnnotation.get());
+		return getJNDIObject(jndiName, remote && !builder.cacheRemote);
 	}
 
 	/**
@@ -301,12 +299,12 @@ public class JNDIObjectLocator implements Serializable {
 	 * Clears object cache.
 	 */
 	public void clearCache() {
-                jndiObjectCache.get().clear();
+		jndiObjectCache.get().clear();
 	}
 
-        Map<String, Object> getJndiObjectCache() {
-            return jndiObjectCache.get();
-        }
+	Map<String, Object> getJndiObjectCache() {
+		return jndiObjectCache.get();
+	}
 
 	private InitialContext createInitialContext() {
 		try {
@@ -320,10 +318,6 @@ public class JNDIObjectLocator implements Serializable {
 		catch (NamingException e) {
 			throw new IllegalStateException(e);
 		}
-	}
-
-	public String prependNamespaceIfNecessary(String jndiName) {
-		return jndiName.startsWith(JNDI_NAMESPACE_PREFIX) ? jndiName : (builder.namespace + "/" + jndiName);
 	}
 
 	@SuppressWarnings("unchecked")

@@ -170,21 +170,22 @@ public final class JNDI {
 	 * @return The guessed JNDI name of the given bean class.
 	 * @since 3.9
 	 */
-        public static String guessJNDIName(Class<?> beanClass) {
-            return guessJNDIName(beanClass.getName());
-        }
+	public static String guessJNDIName(Class<?> beanClass) {
+		return guessJNDIName(beanClass.getName());
+	}
 
-        /**
-         * @param type fully-qualified name of the class
-         * @return guessed JNDI name
-         * @since 3.9
-         */
-	public static String guessJNDIName(String type) {
-                String lookupname = type.substring(type.lastIndexOf(".") + 1);
-                // Support naming convention that strips Local/Remote from the
+	/**
+	 * Guess JNDI name of given fully-qualified class name.
+	 * @param className The fully-qualified class name to guess JNDI name for.
+	 * @return The guessed JNDI name of the given fully-qualified class name.
+	 * @since 3.9
+	 */
+	public static String guessJNDIName(String className) {
+		String lookupname = className.substring(className.lastIndexOf(".") + 1);
+		// Support naming convention that strips Local/Remote from the
 		// end of an interface class to try to determine the actual bean name,
 		// to avoid @EJB(beanName="myBeanName"), and just use plain old @EJB.
-		return PATTERN_EJB_INTERFACE_SUFFIX.matcher(lookupname).replaceFirst("") + "!" + type;
+		return PATTERN_EJB_INTERFACE_SUFFIX.matcher(lookupname).replaceFirst("") + "!" + className;
 	}
 
 }

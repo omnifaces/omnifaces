@@ -381,14 +381,4 @@ public final class Beans {
 		BeansLocal.fireEvent(getManager(), event, qualifiers);
 	}
 
-	/**
-	 * Returns whether given bean class has the given annotation is present
-	 * @param beanClass The bean class.
-         * @param annotation to check, may be null
-	 * @return annotation is present on the type
-	 * @since 3.9
-	 */
-	public static boolean isAnnotationPresent(Class<?> beanClass, Class<? extends Annotation> annotation) {
-		return annotation != null && beanClass.isAnnotationPresent(annotation);
-	}
 }
