@@ -17,6 +17,9 @@ import java.beans.ConstructorProperties;
 import static java.util.Collections.emptyMap;
 import static org.omnifaces.util.Exceptions.is;
 import static org.omnifaces.util.JNDI.JNDI_NAME_PREFIX_ENV_ENTRY;
+import static org.omnifaces.util.JNDI.JNDI_NAMESPACE_APPLICATION;
+import static org.omnifaces.util.JNDI.JNDI_NAMESPACE_GLOBAL;
+import static org.omnifaces.util.JNDI.JNDI_NAMESPACE_PREFIX;
 import static org.omnifaces.util.JNDI.guessJNDIName;
 import static org.omnifaces.util.Reflection.toClassOrNull;
 
@@ -37,9 +40,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.naming.InitialContext;
 import javax.naming.NameNotFoundException;
 import javax.naming.NamingException;
-import static org.omnifaces.util.JNDI.JNDI_NAMESPACE_APPLICATION;
-import static org.omnifaces.util.JNDI.JNDI_NAMESPACE_GLOBAL;
-import static org.omnifaces.util.JNDI.JNDI_NAMESPACE_PREFIX;
 
 /**
  * JNDIObjectLocator is used to centralize JNDI lookups. It minimizes the overhead of JNDI lookups by caching the objects it looks up.
@@ -185,7 +185,7 @@ public class JNDIObjectLocator implements Serializable {
 
 	@SuppressWarnings("unchecked")
 	private <T> T getJNDIObject(String jndiName, boolean noCaching) {
-		if (noCaching || noCaching) {
+		if (noCaching || this.noCaching) {
 			return this.lookup(jndiName);
 		}
 		else {
@@ -242,8 +242,8 @@ public class JNDIObjectLocator implements Serializable {
         }
 
         public static class JNDIObjectLocatorBuilder {
-                private ArrayList<String> environmentKey;
-                private ArrayList<String> environmentValue;
+                private ArrayList<String> environmentKeys;
+                private ArrayList<String> environmentValues;
                 private boolean namespaceSet;
                 private String namespaceValue;
                 private boolean noCaching;
@@ -258,17 +258,16 @@ public class JNDIObjectLocator implements Serializable {
 		 * @param environmentValue The value of the new environment property.
 		 * @return This builder.
 		 * @throws NullPointerException When key or value is null.
-		 * @throws IllegalStateException When environment property is already set in this builder or when this builder is already build.
 		 */
                 public JNDIObjectLocatorBuilder environment(final String environmentKey, final String environmentValue) {
                         requireNonNull(environmentKey, "key");
                         requireNonNull(environmentValue, "value");
-                        if (this.environmentKey == null) {
-                                this.environmentKey = new ArrayList<>();
-                                this.environmentValue = new ArrayList<>();
+                        if (this.environmentKeys == null) {
+                                this.environmentKeys = new ArrayList<>();
+                                this.environmentValues = new ArrayList<>();
                         }
-                        this.environmentKey.add(environmentKey);
-                        this.environmentValue.add(environmentValue);
+                        this.environmentKeys.add(environmentKey);
+                        this.environmentValues.add(environmentValue);
                         return this;
                 }
 
@@ -277,19 +276,18 @@ public class JNDIObjectLocator implements Serializable {
 		 * @param environment The environment.
 		 * @return This builder.
 		 * @throws NullPointerException When given environment is null.
-		 * @throws IllegalStateException When environment is already set in this builder or when this builder is already build.
 		 */
-                public JNDIObjectLocatorBuilder environment(final Map<? extends String, ? extends String> environment) {
+                public JNDIObjectLocatorBuilder environment(final Map<String, String> environment) {
                         if (environment == null) {
                                 throw new NullPointerException("environment cannot be null");
                         }
-                        if (this.environmentKey == null) {
-                                this.environmentKey = new ArrayList<>();
-                                this.environmentValue = new ArrayList<>();
+                        if (this.environmentKeys == null) {
+                                this.environmentKeys = new ArrayList<>();
+                                this.environmentValues = new ArrayList<>();
                         }
-                        for (final Entry<? extends String, ? extends String> entry : environment.entrySet()) {
-                                this.environmentKey.add(entry.getKey());
-                                this.environmentValue.add(entry.getValue());
+                        for (final Entry<String, String> entry : environment.entrySet()) {
+                                this.environmentKeys.add(entry.getKey());
+                                this.environmentValues.add(entry.getValue());
                         }
                         return this;
                 }
@@ -299,9 +297,9 @@ public class JNDIObjectLocator implements Serializable {
                  * @return this
                  */
                 public JNDIObjectLocatorBuilder clearEnvironment() {
-                        if (this.environmentKey != null) {
-                                this.environmentKey.clear();
-                                this.environmentValue.clear();
+                        if (this.environmentKeys != null) {
+                                this.environmentKeys.clear();
+                                this.environmentValues.clear();
                         }
                         return this;
                 }
@@ -310,10 +308,10 @@ public class JNDIObjectLocator implements Serializable {
 		 * Adds initial host environment property.
 		 * @param initialHost The initial host environment property.
 		 * @return This builder.
-		 * @throws IllegalStateException When initial host is already set in this builder or when this builder is already build.
 		 * @throws NullPointerException When value is null.
 		 */
 		public JNDIObjectLocatorBuilder initialHost(String initialHost) {
+                        requireNonNull(initialHost, "initialHost");
 			return environment("org.omg.CORBA.ORBInitialHost", initialHost);
 		}
 
@@ -321,7 +319,6 @@ public class JNDIObjectLocator implements Serializable {
 		 * Adds initial port environment property.
 		 * @param initialPort The initial port environment property.
 		 * @return This builder.
-		 * @throws IllegalStateException When initial port is already set in this builder or when this builder is already build.
 		 */
 		public JNDIObjectLocatorBuilder initialPort(int initialPort) {
 			return environment("org.omg.CORBA.ORBInitialPort", Integer.toString(initialPort));
@@ -331,7 +328,6 @@ public class JNDIObjectLocator implements Serializable {
 		 * Specifies the default namespace to be used in construction of portable JNDI names. The default is <code>java:module</code>.
 		 * @param namespace The namespace.
 		 * @return This builder.
-		 * @throws IllegalStateException When namespace is already set in this builder or when this builder is already build.
 		 * @throws NullPointerException When given namespace is null.
 		 */
                 public JNDIObjectLocatorBuilder namespace(final String namespace) {
@@ -344,7 +340,6 @@ public class JNDIObjectLocator implements Serializable {
 		/**
 		 * Specifies that the default namespace to be used in construction of portable JNDI names must be <code>java:global</code> instead of <code>java:module</code>.
 		 * @return This builder.
-		 * @throws IllegalStateException When namespace is already set in this builder.
 		 */
 		public JNDIObjectLocatorBuilder global() {
 			return namespace(JNDI_NAMESPACE_GLOBAL);
@@ -353,7 +348,6 @@ public class JNDIObjectLocator implements Serializable {
 		/**
 		 * Specifies that the default namespace to be used in construction of portable JNDI names must be <code>java:app</code> instead of <code>java:module</code>.
 		 * @return This builder.
-		 * @throws IllegalStateException When namespace is already set in this builder.
 		 */
 		public JNDIObjectLocatorBuilder app() {
 			return namespace(JNDI_NAMESPACE_APPLICATION);
@@ -372,7 +366,6 @@ public class JNDIObjectLocator implements Serializable {
 		/**
 		 * Specifies to cache remote enterprise beans. The default is <code>false</code>.
 		 * @return This builder.
-		 * @throws IllegalStateException When cacheRemote is already set in this builder or when this builder is already build.
 		 */
                 public JNDIObjectLocatorBuilder cacheRemote() {
                         this.cacheRemote = true;
@@ -382,22 +375,21 @@ public class JNDIObjectLocator implements Serializable {
                 /**
 		 * Builds the {@link JNDIObjectLocator}.
 		 * @return The {@link JNDIObjectLocator}.
-		 * @throws IllegalStateException When this builder is already build.
 		 */
                 public JNDIObjectLocator build() {
                         Map<String, String> environment;
-                        switch (this.environmentKey == null ? 0 : this.environmentKey.size()) {
+                        switch (this.environmentKeys == null ? 0 : this.environmentKeys.size()) {
                                 case 0:
                                         environment = Collections.emptyMap();
                                         break;
                                 case 1:
-                                        environment = Collections.singletonMap(this.environmentKey.get(0), this.environmentValue.get(0));
+                                        environment = Collections.singletonMap(this.environmentKeys.get(0), this.environmentValues.get(0));
                                         break;
                                 default:
-                                        environment = new LinkedHashMap<>(this.environmentKey.size() < 1073741824 ? 1 + this.environmentKey.size() +
-                                                (this.environmentKey.size() - 3) / 3 : Integer.MAX_VALUE);
-                                        for (int ii = 0; ii < this.environmentKey.size(); ii++) {
-                                                environment.put(this.environmentKey.get(ii), this.environmentValue.get(ii));
+                                        environment = new LinkedHashMap<>(this.environmentKeys.size() < 1073741824 ? 1 + this.environmentKeys.size() +
+                                                (this.environmentKeys.size() - 3) / 3 : Integer.MAX_VALUE);
+                                        for (int ii = 0; ii < this.environmentKeys.size(); ii++) {
+                                                environment.put(this.environmentKeys.get(ii), this.environmentValues.get(ii));
                                         }
                                         environment = unmodifiableMap(environment);
                         }
@@ -410,8 +402,8 @@ public class JNDIObjectLocator implements Serializable {
 
                 @Override
                 public String toString() {
-                        return "JNDIObjectLocator.JNDIObjectLocatorBuilder(environment$key=" + this.environmentKey + ", environment$value=" +
-                                this.environmentValue + ", portableNamePrefix$value=" + this.namespaceValue + ", noCaching=" + this.noCaching +
+                        return "JNDIObjectLocator.JNDIObjectLocatorBuilder(environment$key=" + this.environmentKeys + ", environment$value=" +
+                                this.environmentValues + ", portableNamePrefix$value=" + this.namespaceValue + ", noCaching=" + this.noCaching +
                                 ", cacheRemote=" + this.cacheRemote + ")";
                 }
         }
