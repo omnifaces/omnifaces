@@ -44,6 +44,16 @@ import org.omnifaces.util.Faces;
  *     &lt;exception-handler-factory&gt;org.omnifaces.exceptionhandler.ViewExpiredExceptionHandlerFactory&lt;/exception-handler-factory&gt;
  * &lt;/factory&gt;
  * </pre>
+ * <p>
+ * In case there are multiple excepiton handlers, best is to register this handler as last one in the chain. For example,
+ * when combined with {@link FullAjaxExceptionHandler}, this ordering will prevent the {@link FullAjaxExceptionHandler}
+ * from taking over the handling of the {@link ViewExpiredException}.
+ * <pre>
+ * &lt;factory&gt;
+ *     &lt;exception-handler-factory&gt;org.omnifaces.exceptionhandler.FullAjaxExceptionHandlerFactory&lt;/exception-handler-factory&gt;
+ *     &lt;exception-handler-factory&gt;org.omnifaces.exceptionhandler.ViewExpiredExceptionHandlerFactory&lt;/exception-handler-factory&gt;
+ * &lt;/factory&gt;
+ * </pre>
  *
  * <h3>Note</h3>
  * <p>
