@@ -76,7 +76,7 @@ public final class JNDI {
 	/**
 	 * Pattern for local or remote suffix in EJB interface name.
 	 */
-	private static final Pattern PATTERN_EJB_INTERFACE_SUFFIX = Pattern.compile("(LOCAL|REMOTE)$", Pattern.CASE_INSENSITIVE);
+	public static final Pattern PATTERN_EJB_INTERFACE_SUFFIX = Pattern.compile("(LOCAL|REMOTE)$", Pattern.CASE_INSENSITIVE);
 
 	private JNDI() {
 		// Hide constructor.
@@ -172,10 +172,21 @@ public final class JNDI {
 	 * @since 3.9
 	 */
 	public static String guessJNDIName(Class<?> beanClass) {
+		return guessJNDIName(beanClass.getName());
+	}
+
+	/**
+	 * Guess JNDI name of given fully-qualified class name.
+	 * @param className The fully-qualified class name to guess JNDI name for.
+	 * @return The guessed JNDI name of the given fully-qualified class name.
+	 * @since 3.9
+	 */
+	public static String guessJNDIName(String className) {
+		String lookupname = className.substring(className.lastIndexOf(".") + 1);
 		// Support naming convention that strips Local/Remote from the
 		// end of an interface class to try to determine the actual bean name,
 		// to avoid @EJB(beanName="myBeanName"), and just use plain old @EJB.
-		return PATTERN_EJB_INTERFACE_SUFFIX.matcher(beanClass.getSimpleName()).replaceFirst("") + "!" + beanClass.getName();
+		return PATTERN_EJB_INTERFACE_SUFFIX.matcher(lookupname).replaceFirst("") + "!" + className;
 	}
 
 }
