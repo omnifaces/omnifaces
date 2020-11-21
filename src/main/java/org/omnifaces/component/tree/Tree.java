@@ -219,13 +219,13 @@ public class Tree extends TreeFamily implements NamingContainer {
 			@Override
 			public Void invoke() {
 				if (processValidations) {
-			        context.getApplication().publishEvent(context, PreValidateEvent.class, this);
+			        context.getApplication().publishEvent(context, PreValidateEvent.class, Tree.this);
 				}
 
 				processTreeNode(context, phaseId);
 
 				if (processValidations) {
-			        context.getApplication().publishEvent(context, PostValidateEvent.class, this);
+			        context.getApplication().publishEvent(context, PostValidateEvent.class, Tree.this);
 				}
 
 				return null;
