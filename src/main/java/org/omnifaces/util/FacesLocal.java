@@ -17,6 +17,7 @@ import static java.util.Collections.unmodifiableList;
 import static java.util.logging.Level.FINEST;
 import static javax.faces.component.UIViewRoot.METADATA_FACET_NAME;
 import static javax.faces.view.facelets.FaceletContext.FACELET_CONTEXT_KEY;
+import static org.omnifaces.exceptionhandler.ViewExpiredExceptionHandler.FLASH_ATTRIBUTE_VIEW_EXPIRED;
 import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Components.findComponentsInChildren;
 import static org.omnifaces.util.Faces.getViewRoot;
@@ -1168,6 +1169,7 @@ public final class FacesLocal {
 	public static void redirect(FacesContext context, String url, Object... paramValues) {
 		ExternalContext externalContext = context.getExternalContext();
 		externalContext.getFlash().setRedirect(true); // MyFaces also requires this for a redirect in current request (which is incorrect).
+		externalContext.getFlash().keep(FLASH_ATTRIBUTE_VIEW_EXPIRED);
 
 		try {
 			externalContext.redirect(prepareRedirectURL(getRequest(context), url, paramValues));

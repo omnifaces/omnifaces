@@ -28,6 +28,7 @@ import javax.faces.context.Flash;
 import javax.faces.event.ExceptionQueuedEvent;
 
 import org.omnifaces.util.Exceptions;
+import org.omnifaces.util.Faces;
 
 /**
  * <p>
@@ -54,7 +55,8 @@ import org.omnifaces.util.Exceptions;
  * <p>
  * This approach will not work when the refresh in turn triggers yet another redirect elsewhere in the logic. In case
  * you want to retain the condition for the next request, then you need to ensure that the involved logic explicitly
- * triggers {@link Flash#keep(String)} in order to keep the flash attribute for the subsequent request.
+ * triggers {@link Flash#keep(String)} in order to keep the flash attribute for the subsequent request. In the scope of
+ * OmniFaces, this is already taken care of by {@link Faces#redirect(String, Object...)} and derivates.
  *
  * @author Lenny Primak
  * @see ViewExpiredExceptionHandlerFactory
