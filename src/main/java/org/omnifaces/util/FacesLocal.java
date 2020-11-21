@@ -17,6 +17,7 @@ import static jakarta.faces.view.facelets.FaceletContext.FACELET_CONTEXT_KEY;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
 import static java.util.logging.Level.FINEST;
+import static org.omnifaces.exceptionhandler.ViewExpiredExceptionHandler.FLASH_ATTRIBUTE_VIEW_EXPIRED;
 import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Components.findComponentsInChildren;
 import static org.omnifaces.util.Faces.getViewRoot;
@@ -58,6 +59,12 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
+import org.omnifaces.component.ParamHolder;
+import org.omnifaces.component.input.HashParam;
+import org.omnifaces.component.input.ScriptParam;
+import org.omnifaces.config.FacesConfigXml;
+import org.omnifaces.resourcehandler.ResourceIdentifier;
+
 import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
 import jakarta.el.ValueExpression;
@@ -91,12 +98,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
-
-import org.omnifaces.component.ParamHolder;
-import org.omnifaces.component.input.HashParam;
-import org.omnifaces.component.input.ScriptParam;
-import org.omnifaces.config.FacesConfigXml;
-import org.omnifaces.resourcehandler.ResourceIdentifier;
 
 /**
  * <p>
@@ -1168,6 +1169,7 @@ public final class FacesLocal {
 	public static void redirect(FacesContext context, String url, Object... paramValues) {
 		ExternalContext externalContext = context.getExternalContext();
 		externalContext.getFlash().setRedirect(true); // MyFaces also requires this for a redirect in current request (which is incorrect).
+		externalContext.getFlash().keep(FLASH_ATTRIBUTE_VIEW_EXPIRED);
 
 		try {
 			externalContext.redirect(prepareRedirectURL(getRequest(context), url, paramValues));

@@ -21,6 +21,7 @@ import static org.omnifaces.util.Faces.setFlashAttribute;
 import java.util.Iterator;
 
 import org.omnifaces.util.Exceptions;
+import org.omnifaces.util.Faces;
 
 import jakarta.faces.application.ViewExpiredException;
 import jakarta.faces.context.ExceptionHandler;
@@ -43,6 +44,16 @@ import jakarta.faces.event.ExceptionQueuedEvent;
  *     &lt;exception-handler-factory&gt;org.omnifaces.exceptionhandler.ViewExpiredExceptionHandlerFactory&lt;/exception-handler-factory&gt;
  * &lt;/factory&gt;
  * </pre>
+ * <p>
+ * In case there are multiple excepiton handlers, best is to register this handler as last one in the chain. For example,
+ * when combined with {@link FullAjaxExceptionHandler}, this ordering will prevent the {@link FullAjaxExceptionHandler}
+ * from taking over the handling of the {@link ViewExpiredException}.
+ * <pre>
+ * &lt;factory&gt;
+ *     &lt;exception-handler-factory&gt;org.omnifaces.exceptionhandler.FullAjaxExceptionHandlerFactory&lt;/exception-handler-factory&gt;
+ *     &lt;exception-handler-factory&gt;org.omnifaces.exceptionhandler.ViewExpiredExceptionHandlerFactory&lt;/exception-handler-factory&gt;
+ * &lt;/factory&gt;
+ * </pre>
  *
  * <h3>Note</h3>
  * <p>
@@ -54,7 +65,8 @@ import jakarta.faces.event.ExceptionQueuedEvent;
  * <p>
  * This approach will not work when the refresh in turn triggers yet another redirect elsewhere in the logic. In case
  * you want to retain the condition for the next request, then you need to ensure that the involved logic explicitly
- * triggers {@link Flash#keep(String)} in order to keep the flash attribute for the subsequent request.
+ * triggers {@link Flash#keep(String)} in order to keep the flash attribute for the subsequent request. In the scope of
+ * OmniFaces, this is already taken care of by {@link Faces#redirect(String, Object...)} and derivates.
  *
  * @author Lenny Primak
  * @see ViewExpiredExceptionHandlerFactory
