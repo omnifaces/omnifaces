@@ -218,7 +218,8 @@ public abstract class OmniFacesIT {
 		withFullAjaxExceptionHandler,
 		withCombinedResourceHandler,
 		withMessageBundle,
-		withCDNResourceHandler;
+		withCDNResourceHandler,
+		withViewExpiredExceptionHandler;
 	}
 
 	public static enum WebXml {
