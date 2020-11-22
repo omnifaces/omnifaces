@@ -18,6 +18,10 @@ import static org.omnifaces.util.Faces.getViewRoot;
 
 import java.util.function.Consumer;
 
+import org.omnifaces.eventlistener.CallbackPhaseListener;
+import org.omnifaces.eventlistener.DefaultPhaseListener;
+import org.omnifaces.eventlistener.DefaultSystemEventListener;
+
 import jakarta.faces.application.Application;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.component.UIViewRoot;
@@ -28,10 +32,6 @@ import jakarta.faces.event.PhaseId;
 import jakarta.faces.event.PhaseListener;
 import jakarta.faces.event.SystemEvent;
 import jakarta.faces.event.SystemEventListener;
-
-import org.omnifaces.eventlistener.CallbackPhaseListener;
-import org.omnifaces.eventlistener.DefaultPhaseListener;
-import org.omnifaces.eventlistener.DefaultSystemEventListener;
 
 /**
  * <p>
@@ -306,14 +306,14 @@ public final class Events {
 	 * when executed inside {@link ComponentSystemEventListener#processEvent(jakarta.faces.event.ComponentSystemEvent)},
 	 * as it would otherwise end up in a <code>ConcurrentModificationException</code> while JSF is iterating over all
 	 * system event listeners. The trick is to perform the unsubscribe during the after phase of the current request
-	 * phase {@link #subscribeToRequestAfterPhase(PhaseId, org.omnifaces.util.Callback.Void)}.
+	 * phase {@link #subscribeToRequestAfterPhase(PhaseId, Runnable)}.
 	 * @param component The component to unsubscribe the given event listener from.
 	 * @param event The event associated with the given event listener.
 	 * @param listener The event listener to be unsubscribed from the given component.
 	 * @throws IllegalStateException When this method is invoked during render response phase, because it would be too
 	 * late to remove it from the view state.
 	 * @since 2.1
-	 * @see #subscribeToRequestAfterPhase(PhaseId, org.omnifaces.util.Callback.Void)
+	 * @see #subscribeToRequestAfterPhase(PhaseId, Runnable)
 	 * @see UIComponent#unsubscribeFromEvent(Class, ComponentSystemEventListener)
 	 */
 	public static void unsubscribeFromComponentEvent
