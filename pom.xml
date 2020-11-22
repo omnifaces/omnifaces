@@ -74,8 +74,8 @@
 		<test.glassfish.version>6.0.0-RC2</test.glassfish.version>
 		<test.tomcat.version>10.0.0-M10</test.tomcat.version>
 		<test.tomcat.mojarra.version>3.0.0</test.tomcat.mojarra.version>
-		<test.tomcat.myfaces.version>3.0.0-RC1</test.tomcat.myfaces.version>
-		<test.wildfly.version>20.0.1.Final</test.wildfly.version> <!-- TODO: JEE9 compatible version -->
+		<test.tomcat.myfaces.version>3.0.0-RC1</test.tomcat.myfaces.version> <!-- TODO: JEE9 compatible version (RC1 unfortunately throws IllegalStateException "No Factories configured for this Application" and asks for startup listener to be manually registered)  -->
+		<test.wildfly.version>22.0.0.Alpha1</test.wildfly.version> <!-- TODO: JEE9 compatible version (Alpha1 unfortunately throws NoClassDefFoundError on jakarta.* API) -->
 		<test.tomee.version>9.0.0-M2</test.tomee.version> <!-- TODO: JEE9 compatible version which supports jakarta.ee XML namespace (M2 unfortunately doesn't support it yet, it still throws jakarta.xml.bind.UnmarshalException: unexpected element (uri:"https://jakarta.ee/xml/ns/jakartaee", local:"web-fragment")) -->
 		<test.payara.version>5.2020.4</test.payara.version> <!-- TODO: JEE9 compatible version -->
 	</properties>
@@ -84,7 +84,12 @@
 		<repository>
 			<id>jakarta-staging</id>
 			<snapshots />
-			<url>https://jakarta.oss.sonatype.org/content/repositories/staging</url> <!-- Currently only used for jersey-bom:pom:3.0.0-M4 which is required by GlassFish 6.0.0.M1 and the updated jakarta-faces-3.0.0-RC3 -->
+			<url>https://jakarta.oss.sonatype.org/content/repositories/staging</url> <!-- Currently only used for jersey-bom:pom:3.0.0-M4 which is required by GlassFish 6.0.0-RC2 -->
+		</repository>
+		<repository>
+			<id>redhat-all</id>
+			<snapshots />
+			<url>https://maven.repository.redhat.com/techpreview/all</url> <!-- Currently only used for org.picketbox:picketbox:jar:5.0.3.Final-redhat-00006 which is required by WildFly 22.0.0.Alpha1 -->
 		</repository>
 	</repositories>
 
@@ -881,7 +886,7 @@
 				<dependency>
 					<groupId>org.wildfly.arquillian</groupId>
 					<artifactId>wildfly-arquillian-container-managed</artifactId>
-					<version>2.2.0.Final</version>
+					<version>3.0.1.Final</version>
 					<scope>test</scope>
 				</dependency>
 			</dependencies>
