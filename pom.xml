@@ -73,6 +73,8 @@
 		<!-- Test server versions. -->
 		<test.glassfish.version>6.0.0-RC2</test.glassfish.version>
 		<test.tomcat.version>10.0.0-M10</test.tomcat.version>
+		<test.tomcat.mojarra.version>3.0.0</test.tomcat.mojarra.version>
+		<test.tomcat.myfaces.version>3.0.0-RC1</test.tomcat.myfaces.version>
 		<test.wildfly.version>20.0.1.Final</test.wildfly.version> <!-- TODO: JEE9 compatible version -->
 		<test.tomee.version>9.0.0-M2</test.tomee.version> <!-- TODO: JEE9 compatible version which supports jakarta.ee XML namespace (M2 unfortunately doesn't support it yet, it still throws jakarta.xml.bind.UnmarshalException: unexpected element (uri:"https://jakarta.ee/xml/ns/jakartaee", local:"web-fragment")) -->
 		<test.payara.version>5.2020.4</test.payara.version> <!-- TODO: JEE9 compatible version -->
@@ -498,9 +500,9 @@
 			</build>
 		</profile>
 
-		<!-- Tomcat integration test profile: mvn verify -P tomcat -->
+		<!-- Tomcat-Mojarra integration test profile: mvn verify -P tomcat-mojarra -->
 		<profile>
-			<id>tomcat</id>
+			<id>tomcat-mojarra</id>
 			<dependencies>
 				<dependency>
 					<groupId>org.jboss.arquillian.container</groupId>
@@ -528,7 +530,7 @@
 								</configuration>
 							</execution>
 							<execution>
-								<id>install-jsf-in-tomcat</id>
+								<id>install-mojarra-in-tomcat</id>
 								<phase>pre-integration-test</phase>
 								<goals>
 									<goal>copy</goal>
@@ -538,7 +540,7 @@
 										<artifactItem>
 											<groupId>org.glassfish</groupId>
 											<artifactId>jakarta.faces</artifactId>
-											<version>3.0.0</version>
+											<version>${test.tomcat.mojarra.version}</version>
 											<type>jar</type>
 											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
 										</artifactItem>
@@ -564,7 +566,198 @@
 								</configuration>
 							</execution>
 							<execution>
-								<id>install-el-in-tomcat</id> <!-- This is unexpected, but apparently Apache EL didn't work properly in combination with Mojarra. It spits CNFE on com.sun.el.ExpressionFactoryImpl as if it couldn't find Apache EL. -->
+								<id>install-el-in-tomcat</id> <!-- This is unexpected, but apparently Apache EL didn't work properly in combination with jakarta.el factory. It spits CNFE on com.sun.el.ExpressionFactoryImpl as if it couldn't find Apache EL. -->
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.glassfish</groupId>
+											<artifactId>jakarta.el</artifactId>
+											<version>4.0.0</version>
+											<type>jar</type>
+											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+							<execution>
+								<id>install-bv-in-tomcat</id> <!-- Needed by ValidateBeanIT -->
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>jakarta.validation</groupId>
+											<artifactId>jakarta.validation-api</artifactId>
+											<version>3.0.0</version>
+											<type>jar</type>
+											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.hibernate.validator</groupId>
+											<artifactId>hibernate-validator</artifactId>
+											<version>7.0.0.Alpha6</version>
+											<type>jar</type>
+											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>com.fasterxml</groupId>
+											<artifactId>classmate</artifactId>
+											<version>1.5.1</version>
+											<type>jar</type>
+											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+							<execution>
+								<id>install-jsonp-in-tomcat</id> <!-- Needed by ScriptParamIT -->
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>jakarta.json</groupId>
+											<artifactId>jakarta.json-api</artifactId>
+											<version>2.0.0</version>
+											<type>jar</type>
+											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.glassfish</groupId>
+											<artifactId>jakarta.json</artifactId>
+											<version>2.0.0</version>
+											<type>jar</type>
+											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-resources-plugin</artifactId>
+						<version>3.1.0</version>
+						<executions>
+							<execution>
+								<id>update-tomcat-users</id> <!-- Else Tomcat unexpectedly spits error that Arquillian isn't allowed to manage Tomcat. Most probably org.jboss.arquillian.container:arquillian-tomcat-managed-8 should be uptated to support Tomcat 10 but this isn't available (yet). -->
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>copy-resources</goal>
+								</goals>
+								<configuration>
+									<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/conf</outputDirectory>
+									<resources>
+										<resource>
+											<directory>${project.basedir}/src/test/resources/tomcat</directory>
+											<includes>
+												<include>tomcat-users.xml</include>
+											</includes>
+										</resource>
+									</resources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<systemProperties>
+								<arquillian.launch>tomcat</arquillian.launch>
+							</systemProperties>
+							<environmentVariables>
+								<CATALINA_HOME>${project.build.directory}/apache-tomcat-${test.tomcat.version}</CATALINA_HOME>
+							</environmentVariables>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!-- Tomcat-MyFaces integration test profile: mvn verify -P tomcat-myfaces -->
+		<!-- Not used for now because MyFaces unexpectedly fails with java.lang.IllegalStateException: No Factories configured for this Application. -->
+		<profile>
+			<id>tomcat-myfaces</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.jboss.arquillian.container</groupId>
+					<artifactId>arquillian-tomcat-managed-8</artifactId>
+					<version>1.2.0.Alpha1</version>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-dependency-plugin</artifactId>
+						<executions>
+							<execution>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.apache.tomcat</groupId>
+											<artifactId>tomcat</artifactId>
+											<version>${test.tomcat.version}</version>
+											<type>zip</type>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+							<execution>
+								<id>install-myfaces-in-tomcat</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.apache.myfaces.core</groupId>
+											<artifactId>myfaces-api</artifactId>
+											<version>${test.tomcat.myfaces.version}</version>
+											<type>jar</type>
+											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
+										</artifactItem>
+										<artifactItem>
+											<groupId>org.apache.myfaces.core</groupId>
+											<artifactId>myfaces-impl</artifactId>
+											<version>${test.tomcat.myfaces.version}</version>
+											<type>jar</type>
+											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+							<execution>
+								<id>install-cdi-in-tomcat</id>
+								<phase>pre-integration-test</phase>
+								<goals>
+									<goal>copy</goal>
+								</goals>
+								<configuration>
+									<artifactItems>
+										<artifactItem>
+											<groupId>org.jboss.weld.servlet</groupId>
+											<artifactId>weld-servlet-shaded</artifactId>
+											<version>4.0.0.Beta5</version>
+											<type>jar</type>
+											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
+										</artifactItem>
+									</artifactItems>
+								</configuration>
+							</execution>
+							<execution>
+								<id>install-el-in-tomcat</id> <!-- This is unexpected, but apparently Apache EL didn't work properly in combination with jakarta.el factory. It spits CNFE on com.sun.el.ExpressionFactoryImpl as if it couldn't find Apache EL. -->
 								<phase>pre-integration-test</phase>
 								<goals>
 									<goal>copy</goal>
