@@ -115,6 +115,11 @@ public interface WebXml {
 		public int getSessionTimeout() {
 			return WebXmlSingleton.INSTANCE.getSessionTimeout();
 		}
+
+		@Override
+		public boolean isDistributable() {
+			return WebXmlSingleton.INSTANCE.isDistributable();
+		}
 	};
 
 	/**
@@ -220,5 +225,12 @@ public interface WebXml {
 	 * @since 1.7
 	 */
 	public int getSessionTimeout();
+
+	/**
+	 * Returns whether the distributable flag is set in root <code>web.xml</code>.
+	 * @return Whether the distributable flag is set in root <code>web.xml</code>.
+	 * @since 3.9
+	 */
+	public boolean isDistributable();
 
 }

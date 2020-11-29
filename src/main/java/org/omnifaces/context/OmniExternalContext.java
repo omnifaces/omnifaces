@@ -26,6 +26,7 @@ import javax.faces.context.FlashWrapper;
 
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.cdi.viewscope.ViewScopeManager;
+import org.omnifaces.config.WebXml;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.Hacks;
 
@@ -67,7 +68,7 @@ public class OmniExternalContext extends ExternalContextWrapper {
 
 		Flash flash = super.getFlash();
 
-		if (Faces.isSessionNew() && Hacks.isMojarraUsed()) {
+		if (Faces.isSessionNew() && WebXml.instance().isDistributable() && Hacks.isMojarraUsed()) {
 			return new PatchedFlash(flash);
 		}
 
