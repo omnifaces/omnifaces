@@ -55,6 +55,7 @@ public final class Hacks {
 	private static final Class<UIComponent> PRIMEFACES_DIALOG_CLASS =
 		toClassOrNull("org.primefaces.component.dialog.Dialog");
 
+	private static final String MOJARRA_PACKAGE_PREFIX = "com.sun.faces.";
 	private static final String MYFACES_PACKAGE_PREFIX = "org.apache.myfaces.";
 	private static final Set<String> MYFACES_RESOURCE_DEPENDENCY_KEYS =
 		unmodifiableSet(
@@ -80,6 +81,7 @@ public final class Hacks {
 
 	// Lazy loaded properties (will only be initialized when FacesContext is available) -------------------------------
 
+	private static Boolean mojarraUsed;
 	private static Boolean myFacesUsed;
 	private static Long defaultResourceMaxAge;
 
@@ -89,7 +91,31 @@ public final class Hacks {
 		//
 	}
 
-	// MyFaces related ------------------------------------------------------------------------------------------------
+	// JSF impl related -----------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns true if Mojarra is used. That is, when the FacesContext instance is from the Mojarra specific package.
+	 * @return Whether Mojarra is used.
+	 * @since 3.9
+	 */
+	public static boolean isMojarraUsed() {
+		if (mojarraUsed == null) {
+			FacesContext context = FacesContext.getCurrentInstance();
+
+			if (context != null) {
+				while (context instanceof FacesContextWrapper) {
+					context = ((FacesContextWrapper) context).getWrapped();
+				}
+
+				mojarraUsed = context.getClass().getPackage().getName().startsWith(MOJARRA_PACKAGE_PREFIX);
+			}
+			else {
+				return false;
+			}
+		}
+
+		return mojarraUsed;
+	}
 
 	/**
 	 * Returns true if MyFaces is used. That is, when the FacesContext instance is from the MyFaces specific package.
