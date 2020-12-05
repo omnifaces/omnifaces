@@ -76,7 +76,7 @@
 		<test.tomcat.mojarra.version>3.0.0</test.tomcat.mojarra.version>
 		<test.tomcat.myfaces.version>3.0.0-RC1</test.tomcat.myfaces.version> <!-- TODO: JEE9 compatible version (RC1 unfortunately throws IllegalStateException "No Factories configured for this Application" and asks for startup listener to be manually registered)  -->
 		<test.wildfly.version>22.0.0.Alpha1</test.wildfly.version> <!-- TODO: JEE9 compatible version (Alpha1 unfortunately throws NoClassDefFoundError on jakarta.* API) -->
-		<test.tomee.version>9.0.0-M2</test.tomee.version> <!-- TODO: JEE9 compatible version which supports jakarta.ee XML namespace (M2 unfortunately doesn't support it yet, it still throws jakarta.xml.bind.UnmarshalException: unexpected element (uri:"https://jakarta.ee/xml/ns/jakartaee", local:"web-fragment")) -->
+		<test.tomee.version>9.0.0-M3</test.tomee.version> <!-- TODO: JEE9 compatible version which supports jakarta.ee XML namespace (M3 unfortunately doesn't support it yet, it still throws jakarta.xml.bind.UnmarshalException: unexpected element (uri:"https://jakarta.ee/xml/ns/jakartaee", local:"web-fragment")) -->
 		<test.payara.version>5.2020.4</test.payara.version> <!-- TODO: JEE9 compatible version -->
 	</properties>
 
@@ -931,7 +931,7 @@
 				<dependency>
 					<groupId>org.apache.tomee</groupId>
 					<artifactId>arquillian-tomee-remote</artifactId>
-					<version>8.0.3</version> <!-- TODO: TomEE 9 compatible version. The 8.0.3 seems to work fine with TomEE 9 wrt deploy but not wrt cleanup. -->
+					<version>8.0.5</version> <!-- TODO: TomEE 9 compatible version. The 8.0.3 seems to work fine with TomEE 9 wrt deploy but not wrt cleanup. -->
 					<scope>test</scope>
 				</dependency>
 			</dependencies>
