@@ -13,6 +13,7 @@
 package org.omnifaces.config;
 
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
 import static org.omnifaces.util.BeansLocal.getInstance;
@@ -104,6 +105,8 @@ enum WebXmlSingleton implements WebXml {
 		"auth-constraint/role-name";
 	private static final String XPATH_SESSION_TIMEOUT =
 		"session-config/session-timeout";
+	private static final String XPATH_DISTRIBUTABLE =
+		"boolean(distributable)";
 
 	private static final String ERROR_URL_MUST_START_WITH_SLASH =
 		"URL must start with '/': '%s'";
@@ -118,6 +121,7 @@ enum WebXmlSingleton implements WebXml {
 	private String formErrorPage;
 	private Map<String, Set<String>> securityConstraints;
 	private int sessionTimeout;
+	private boolean distributable;
 
 	// Init -----------------------------------------------------------------------------------------------------------
 
@@ -126,14 +130,17 @@ enum WebXmlSingleton implements WebXml {
 	 */
 	private WebXmlSingleton() {
 		try {
-			Element webXml = loadWebXml(getServletContext()).getDocumentElement();
+			Element allWebXmls = loadAllWebXmls(getServletContext()).getDocumentElement();
 			XPath xpath = XPathFactory.newInstance().newXPath();
-			welcomeFiles = parseWelcomeFiles(webXml, xpath);
-			errorPageLocations = parseErrorPageLocations(webXml, xpath);
-			formLoginPage = parseFormLoginPage(webXml, xpath);
-			formErrorPage = parseFormErrorPage(webXml, xpath);
-			securityConstraints = parseSecurityConstraints(webXml, xpath);
-			sessionTimeout = parseSessionTimeout(webXml, xpath);
+			welcomeFiles = parseWelcomeFiles(allWebXmls, xpath);
+			errorPageLocations = parseErrorPageLocations(allWebXmls, xpath);
+			formLoginPage = parseFormLoginPage(allWebXmls, xpath);
+			formErrorPage = parseFormErrorPage(allWebXmls, xpath);
+			securityConstraints = parseSecurityConstraints(allWebXmls, xpath);
+			sessionTimeout = parseSessionTimeout(allWebXmls, xpath);
+
+			Element rootWebXml = loadRootWebXml(getServletContext()).getDocumentElement();
+			distributable = parseDistributable(rootWebXml, xpath);
 		}
 		catch (Exception e) {
 			throw new IllegalStateException(ERROR_INITIALIZATION_FAIL, e);
@@ -288,27 +295,34 @@ enum WebXmlSingleton implements WebXml {
 		return sessionTimeout;
 	}
 
+	@Override
+	public boolean isDistributable() {
+		return distributable;
+	}
+
 	// Helpers --------------------------------------------------------------------------------------------------------
 
 	/**
 	 * Load, merge and return all <code>web.xml</code> and <code>web-fragment.xml</code> files found in the classpath
 	 * into a single {@link Document}.
 	 */
-	private static Document loadWebXml(ServletContext context) throws IOException, SAXException {
-		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+	private static Document loadAllWebXmls(ServletContext context) throws IOException, SAXException {
 		List<URL> webXmlURLs = new ArrayList<>();
-		URL webXml = context.getResource(WEB_XML);
-
-		if (webXml == null) {
-			webXml = classLoader.getResource(QUARKUS_WEB_XML);
-		}
-
-		if (webXml != null) {
-			webXmlURLs.add(webXml);
-		}
-
-		webXmlURLs.addAll(Collections.list(classLoader.getResources(WEB_FRAGMENT_XML)));
+		webXmlURLs.add(getWebXmlURL(context));
+		webXmlURLs.addAll(Collections.list(Thread.currentThread().getContextClassLoader().getResources(WEB_FRAGMENT_XML)));
 		return createDocument(webXmlURLs);
+	}
+
+	/**
+	 * Load root <code>web.xml</code> file into a single {@link Document}.
+	 */
+	private static Document loadRootWebXml(ServletContext context) throws IOException, SAXException {
+		return createDocument(asList(getWebXmlURL(context)));
+	}
+
+	private static URL getWebXmlURL(ServletContext context) throws IOException {
+		URL webXml = context.getResource(WEB_XML);
+		return webXml != null ? webXml : Thread.currentThread().getContextClassLoader().getResource(QUARKUS_WEB_XML);
 	}
 
 	/**
@@ -434,6 +448,14 @@ enum WebXmlSingleton implements WebXml {
 	private static int parseSessionTimeout(Element webXml, XPath xpath) throws XPathExpressionException {
 		String sessionTimeout = xpath.compile(XPATH_SESSION_TIMEOUT).evaluate(webXml).trim();
 		return isNumber(sessionTimeout) ? Integer.parseInt(sessionTimeout) : -1;
+	}
+
+	/**
+	 * Return the configured distributable flag.
+	 */
+	private static boolean parseDistributable(Element webXml, XPath xpath) throws XPathExpressionException {
+		String distributable = xpath.compile(XPATH_DISTRIBUTABLE).evaluate(webXml).trim();
+		return Boolean.parseBoolean(distributable);
 	}
 
 }

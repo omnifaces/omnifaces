@@ -224,6 +224,7 @@ public abstract class OmniFacesIT {
 
 	public static enum WebXml {
 		basic,
+		distributable,
 		withErrorPage,
 		withFacesViews,
 		withMultiViews,

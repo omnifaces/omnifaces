@@ -15,6 +15,7 @@ package org.omnifaces.test.exceptionhandler.viewexpiredexceptionhandler;
 import static org.jboss.arquillian.graphene.Graphene.guardAjax;
 import static org.junit.Assert.assertTrue;
 import static org.omnifaces.test.OmniFacesIT.FacesConfig.withViewExpiredExceptionHandler;
+import static org.omnifaces.test.OmniFacesIT.WebXml.distributable;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -37,6 +38,7 @@ public class ViewExpiredExceptionHandlerIT extends OmniFacesIT {
 	@Deployment(testable=false)
 	public static WebArchive createDeployment() {
 		return buildWebArchive(ViewExpiredExceptionHandlerIT.class)
+			.withWebXml(distributable) // Should trigger Mojarra issue 4431 (NPE while obtaining flash scope in new session).
 			.withFacesConfig(withViewExpiredExceptionHandler)
 			.createDeployment();
 	}
@@ -55,5 +57,4 @@ public class ViewExpiredExceptionHandlerIT extends OmniFacesIT {
 		guardAjax(submit).click();
 		assertTrue(wasViewExpired.getText().equals("false"));
 	}
-
 }

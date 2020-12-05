@@ -18,14 +18,17 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import org.omnifaces.cdi.ViewScoped;
+import org.omnifaces.cdi.viewscope.ViewScopeManager;
+import org.omnifaces.config.WebXml;
+import org.omnifaces.util.Faces;
+import org.omnifaces.util.Hacks;
+
 import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.ExternalContextWrapper;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.Flash;
-
-import org.omnifaces.cdi.ViewScoped;
-import org.omnifaces.cdi.viewscope.ViewScopeManager;
-import org.omnifaces.util.Faces;
+import jakarta.faces.context.FlashWrapper;
 
 /**
  * This external context takes care that the {@link Flash} will be ignored during an unload request.
@@ -54,14 +57,45 @@ public class OmniExternalContext extends ExternalContextWrapper {
 
 	/**
 	 * If the current request is an unload request from {@link ViewScoped}, then return a dummy flash scope which does
-	 * not modify the flash state, else return the original flash scope.
+	 * not modify the flash state, else if Mojarra is used and session is new, then return a patched flash which work
+	 * arounds Mojarra issue 4431, else return the original flash scope.
 	 */
 	@Override
 	public Flash getFlash() {
-		return ViewScopeManager.isUnloadRequest(Faces.getContext()) ? DUMMY_FLASH : super.getFlash();
+		if (ViewScopeManager.isUnloadRequest(Faces.getContext())) {
+			return DUMMY_FLASH;
+		}
+
+		Flash flash = super.getFlash();
+
+		if (Faces.isSessionNew() && WebXml.instance().isDistributable() && Hacks.isMojarraUsed()) {
+			return new PatchedFlash(flash);
+		}
+
+		return flash;
 	}
 
 	// Inner classes --------------------------------------------------------------------------------------------------
+
+	/**
+	 * Patch for https://github.com/eclipse-ee4j/mojarra/issues/4431.
+	 */
+	private static class PatchedFlash extends FlashWrapper {
+
+		public PatchedFlash(Flash wrapped) {
+			super(wrapped);
+		}
+
+		@Override
+		public Object get(Object key) {
+			try {
+				return super.get(key);
+			}
+			catch (NullPointerException e) {
+				return null;
+			}
+		}
+	}
 
 	/**
 	 * A dummy flash class which does absolutely nothing with regard to the flash scope.

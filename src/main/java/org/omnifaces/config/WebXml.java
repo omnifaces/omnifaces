@@ -158,4 +158,11 @@ public interface WebXml {
 	 */
 	int getSessionTimeout();
 
+	/**
+	 * Returns whether the distributable flag is set in root <code>web.xml</code>.
+	 * @return Whether the distributable flag is set in root <code>web.xml</code>.
+	 * @since 3.9
+	 */
+	boolean isDistributable();
+
 }
