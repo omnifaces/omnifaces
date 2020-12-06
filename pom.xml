@@ -119,14 +119,6 @@
 			<scope>provided</scope>
 		</dependency>
 		
-		<!-- Build dependencies. -->
-		<dependency>
-			<groupId>org.omnifaces</groupId>
-			<artifactId>vdldoc</artifactId>
-			<version>2.1</version>
-			<scope>compile</scope>
-		</dependency>
-
 		<!-- Test dependencies. -->
 		<dependency>
 			<groupId>javax</groupId>
@@ -354,31 +346,6 @@
 						<configuration>
 							<additionalparam>-Xdoclint:none</additionalparam>
 						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<!-- Configure the generation of the vdldoc. -->
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>exec-maven-plugin</artifactId>
-				<version>3.0.0</version>
-				<configuration>
-					<mainClass>org.omnifaces.vdldoc.Main</mainClass>
-					<arguments>
-						<argument>-windowtitle</argument><argument>OmniFaces VDL Documentation - Generated Documentation</argument>
-						<argument>-d</argument><argument>${project.build.directory}/vdldocs</argument>
-						<argument>${project.build.outputDirectory}/META-INF/omnifaces-ui.taglib.xml</argument>
-						<argument>${project.build.outputDirectory}/META-INF/omnifaces-functions.taglib.xml</argument>
-					</arguments>
-				</configuration>
-				<executions>
-					<execution>
-						<id>attach-vdldocs</id>
-						<phase>package</phase>
-						<goals>
-							<goal>java</goal>
-						</goals>
 					</execution>
 				</executions>
 			</plugin>
