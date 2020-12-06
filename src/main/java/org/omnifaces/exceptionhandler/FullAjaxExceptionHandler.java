@@ -341,7 +341,7 @@ public class FullAjaxExceptionHandler extends ExceptionHandlerWrapper {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static Class<? extends Throwable>[] parseExceptionTypesParam(ServletContext context, String paramName, Set<Class<? extends Throwable>> defaults) {
+	static Class<? extends Throwable>[] parseExceptionTypesParam(ServletContext context, String paramName, Set<Class<? extends Throwable>> defaults) {
 		Set<Class<? extends Throwable>> types = new HashSet<>();
 
 		if (defaults != null) {

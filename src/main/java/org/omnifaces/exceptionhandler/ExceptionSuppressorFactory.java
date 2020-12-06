@@ -17,35 +17,35 @@ import jakarta.faces.context.ExceptionHandlerFactory;
 
 /**
  * This exception handler factory needs to be registered as follows in <code>faces-config.xml</code> to get the
- * {@link ViewExpiredExceptionHandler} to run:
+ * {@link ExceptionSuppressor} to run:
  * <pre>
  * &lt;factory&gt;
  *   &lt;exception-handler-factory&gt;
- *     org.omnifaces.exceptionhandler.ViewExpiredExceptionHandlerFactory
+ *     org.omnifaces.exceptionhandler.ExceptionSuppressorFactory
  *   &lt;/exception-handler-factory&gt;
  * &lt;/factory&gt;
  * </pre>
  *
  * @author Lenny Primak
- * @see ViewExpiredExceptionHandler
+ * @see ExceptionSuppressor
  * @since 3.9
  */
-public class ViewExpiredExceptionHandlerFactory extends ExceptionHandlerFactory {
+public class ExceptionSuppressorFactory extends ExceptionHandlerFactory {
 
 	/**
 	 * Construct a new view expired exception handler factory around the given wrapped factory.
 	 * @param wrapped The wrapped factory.
 	 */
-	public ViewExpiredExceptionHandlerFactory(ExceptionHandlerFactory wrapped) {
+	public ExceptionSuppressorFactory(ExceptionHandlerFactory wrapped) {
 		super(wrapped);
 	}
 
 	/**
-	 * Returns a new instance of {@link ViewExpiredExceptionHandler} which wraps the original exception handler.
+	 * Returns a new instance of {@link ExceptionSuppressor} which wraps the original exception handler.
 	 */
 	@Override
 	public ExceptionHandler getExceptionHandler() {
-		return new ViewExpiredExceptionHandler(getWrapped().getExceptionHandler());
+		return new ExceptionSuppressor(getWrapped().getExceptionHandler());
 	}
 
 }

@@ -29,7 +29,7 @@ import jakarta.faces.context.ExceptionHandlerFactory;
  * @author Bauke Scholtz
  * @see FullAjaxExceptionHandler
  */
-public class FullAjaxExceptionHandlerFactory extends DefaultExceptionHandlerFactory {
+public class FullAjaxExceptionHandlerFactory extends ExceptionHandlerFactory {
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
