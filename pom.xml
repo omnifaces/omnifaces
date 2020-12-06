@@ -15,7 +15,7 @@
 	<packaging>jar</packaging>
 
 	<name>OmniFaces</name>
-	<description>Jakarta Faces 2.3+ utility library</description>
+	<description>Jakarta Faces 3.0+ utility library</description>
 	<url>https://omnifaces.org</url>
 	<organization>
 		<name>OmniFaces</name>
