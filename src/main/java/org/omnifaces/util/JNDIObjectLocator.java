@@ -253,7 +253,7 @@ public class JNDIObjectLocator implements Serializable {
 		initialContext = new Lazy<>(this::createInitialContext);
 		initialContextLock = new ReentrantLock();
 		jndiObjectCache = new Lazy<>(() -> noCaching ? emptyMap() : new ConcurrentHashMap<>());
-		remoteAnnotation = new Lazy<>(() -> toClassOrNull("javax.ejb.Remote"));
+		remoteAnnotation = new Lazy<>(() -> toClassOrNull("jakarta.ejb.Remote"));
 	}
 
 	/**
