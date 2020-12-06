@@ -59,12 +59,6 @@ import java.util.Set;
 import java.util.function.Supplier;
 import java.util.logging.Logger;
 
-import org.omnifaces.component.ParamHolder;
-import org.omnifaces.component.input.HashParam;
-import org.omnifaces.component.input.ScriptParam;
-import org.omnifaces.config.FacesConfigXml;
-import org.omnifaces.resourcehandler.ResourceIdentifier;
-
 import jakarta.el.ELContext;
 import jakarta.el.ELResolver;
 import jakarta.el.ValueExpression;
@@ -98,6 +92,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
+
+import org.omnifaces.component.ParamHolder;
+import org.omnifaces.component.input.HashParam;
+import org.omnifaces.component.input.ScriptParam;
+import org.omnifaces.config.FacesConfigXml;
+import org.omnifaces.resourcehandler.ResourceIdentifier;
 
 /**
  * <p>

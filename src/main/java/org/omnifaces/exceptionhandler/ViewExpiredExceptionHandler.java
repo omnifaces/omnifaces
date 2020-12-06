@@ -16,12 +16,12 @@ import static java.lang.Boolean.TRUE;
 import static org.omnifaces.util.Faces.getFlashAttribute;
 import static org.omnifaces.util.FacesLocal.setFlashAttribute;
 
-import org.omnifaces.util.Faces;
-
 import jakarta.faces.application.ViewExpiredException;
 import jakarta.faces.context.ExceptionHandler;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.Flash;
+
+import org.omnifaces.util.Faces;
 
 /**
  * <p>

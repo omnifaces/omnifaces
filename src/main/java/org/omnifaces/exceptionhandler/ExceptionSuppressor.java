@@ -20,13 +20,13 @@ import static org.omnifaces.util.Faces.refreshWithQueryString;
 import java.util.Iterator;
 import java.util.Optional;
 
-import org.omnifaces.util.Exceptions;
-
 import jakarta.faces.context.ExceptionHandler;
 import jakarta.faces.context.ExceptionHandlerWrapper;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.event.ExceptionQueuedEvent;
 import jakarta.servlet.ServletContext;
+
+import org.omnifaces.util.Exceptions;
 
 /**
  * <p>

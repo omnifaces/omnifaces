@@ -17,11 +17,11 @@ import static org.omnifaces.util.Faces.getInitParameter;
 import static org.omnifaces.util.Utils.encodeURL;
 import static org.omnifaces.util.Utils.isBlank;
 
-import org.omnifaces.util.Lazy;
-
 import jakarta.faces.application.Resource;
 import jakarta.faces.application.ResourceHandler;
 import jakarta.faces.application.ResourceWrapper;
+
+import org.omnifaces.util.Lazy;
 
 /**
  * Automatically adds version parameter with query string name <code>v</code> to all resource URLs so, in production mode

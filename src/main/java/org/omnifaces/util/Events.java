@@ -18,10 +18,6 @@ import static org.omnifaces.util.Faces.getViewRoot;
 
 import java.util.function.Consumer;
 
-import org.omnifaces.eventlistener.CallbackPhaseListener;
-import org.omnifaces.eventlistener.DefaultPhaseListener;
-import org.omnifaces.eventlistener.DefaultSystemEventListener;
-
 import jakarta.faces.application.Application;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.component.UIViewRoot;
@@ -32,6 +28,10 @@ import jakarta.faces.event.PhaseId;
 import jakarta.faces.event.PhaseListener;
 import jakarta.faces.event.SystemEvent;
 import jakarta.faces.event.SystemEventListener;
+
+import org.omnifaces.eventlistener.CallbackPhaseListener;
+import org.omnifaces.eventlistener.DefaultPhaseListener;
+import org.omnifaces.eventlistener.DefaultSystemEventListener;
 
 /**
  * <p>

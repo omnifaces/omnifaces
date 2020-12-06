@@ -18,17 +18,17 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import org.omnifaces.cdi.ViewScoped;
-import org.omnifaces.cdi.viewscope.ViewScopeManager;
-import org.omnifaces.config.WebXml;
-import org.omnifaces.util.Faces;
-import org.omnifaces.util.Hacks;
-
 import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.ExternalContextWrapper;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.Flash;
 import jakarta.faces.context.FlashWrapper;
+
+import org.omnifaces.cdi.ViewScoped;
+import org.omnifaces.cdi.viewscope.ViewScopeManager;
+import org.omnifaces.config.WebXml;
+import org.omnifaces.util.Faces;
+import org.omnifaces.util.Hacks;
 
 /**
  * This external context takes care that the {@link Flash} will be ignored during an unload request.
