@@ -139,7 +139,7 @@
 		<dependency>
 			<groupId>org.omnifaces</groupId>
 			<artifactId>vdldoc</artifactId>
-			<version>2.1</version>
+			<version>3.1</version>
 			<scope>compile</scope>
 		</dependency>
 
