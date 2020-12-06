@@ -13,21 +13,14 @@
 package org.omnifaces.exceptionhandler;
 
 import static java.lang.Boolean.TRUE;
-import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getFlashAttribute;
-import static org.omnifaces.util.Faces.refreshWithQueryString;
-import static org.omnifaces.util.Faces.setFlashAttribute;
-
-import java.util.Iterator;
+import static org.omnifaces.util.FacesLocal.setFlashAttribute;
 
 import javax.faces.application.ViewExpiredException;
 import javax.faces.context.ExceptionHandler;
-import javax.faces.context.ExceptionHandlerWrapper;
 import javax.faces.context.FacesContext;
 import javax.faces.context.Flash;
-import javax.faces.event.ExceptionQueuedEvent;
 
-import org.omnifaces.util.Exceptions;
 import org.omnifaces.util.Faces;
 
 /**
@@ -72,7 +65,7 @@ import org.omnifaces.util.Faces;
  * @see ViewExpiredExceptionHandlerFactory
  * @since 3.9
  */
-public class ViewExpiredExceptionHandler extends ExceptionHandlerWrapper {
+public class ViewExpiredExceptionHandler extends ExceptionSuppressor {
 
 	/**
 	 * The flash attribute name of a boolean value indicating that the previous request threw a
@@ -85,47 +78,15 @@ public class ViewExpiredExceptionHandler extends ExceptionHandlerWrapper {
 	 * @param wrapped The wrapped exception handler.
 	 */
 	public ViewExpiredExceptionHandler(ExceptionHandler wrapped) {
-		super(wrapped);
+		super(wrapped, ViewExpiredException.class);
 	}
 
 	/**
-	 * Inspect all {@link #getUnhandledExceptionQueuedEvents()} if any of them is caused by {@link ViewExpiredException}.
-	 * If so, then drain the {@link #getUnhandledExceptionQueuedEvents()}, set the flash attribute and refresh the
-	 * current URL with query string.
+	 * Set the flash attribute {@value org.omnifaces.exceptionhandler.ViewExpiredExceptionHandler#FLASH_ATTRIBUTE_VIEW_EXPIRED}.
 	 */
 	@Override
-	public void handle() {
-		handleViewExpiredException(getContext());
-		getWrapped().handle();
-	}
-
-	private void handleViewExpiredException(FacesContext context) {
-		if (context == null) {
-			return; // Unexpected, most likely buggy JSF implementation or parent exception handler.
-		}
-
-		if (!isCausedByViewExpiredException()) {
-			return;
-		}
-
-		setFlashAttribute(FLASH_ATTRIBUTE_VIEW_EXPIRED, TRUE);
-		refreshWithQueryString();
-
-		for (Iterator<ExceptionQueuedEvent> iter = getUnhandledExceptionQueuedEvents().iterator(); iter.hasNext();) {
-			// Drain out the exceptions.
-			iter.next();
-			iter.remove();
-		}
-	}
-
-	private boolean isCausedByViewExpiredException() {
-		for (Iterator<ExceptionQueuedEvent> iter = getUnhandledExceptionQueuedEvents().iterator(); iter.hasNext();) {
-			if (Exceptions.is(iter.next().getContext().getException(), ViewExpiredException.class)) {
-				return true;
-			}
-		}
-
-		return false;
+	protected void handleSuppressedException(FacesContext context, Throwable suppressedException) {
+		setFlashAttribute(context, FLASH_ATTRIBUTE_VIEW_EXPIRED, TRUE);
 	}
 
 	/**

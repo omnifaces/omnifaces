@@ -18,6 +18,7 @@ import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.Faces.refreshWithQueryString;
 
 import java.util.Iterator;
+import java.util.Optional;
 
 import javax.faces.context.ExceptionHandler;
 import javax.faces.context.ExceptionHandlerWrapper;
@@ -87,8 +88,19 @@ public class ExceptionSuppressor extends ExceptionHandlerWrapper {
 	 * @param wrapped The wrapped exception handler.
 	 */
 	public ExceptionSuppressor(ExceptionHandler wrapped) {
+		this(wrapped, getExceptionTypesToSuppress(getServletContext()));
+	}
+
+	/**
+	 * Construct a new exception suppressor around the given wrapped exception handler and using the given array of
+	 * exception types to suppress.
+	 * @param wrapped The wrapped exception handler.
+	 * @param exceptionTypesToSuppress Array of exception types to suppress.
+	 */
+	@SafeVarargs
+	protected ExceptionSuppressor(ExceptionHandler wrapped, Class<? extends Throwable>... exceptionTypesToSuppress) {
 		super(wrapped);
-		exceptionTypesToSuppress = getExceptionTypesToSuppress(getServletContext());
+		this.exceptionTypesToSuppress = exceptionTypesToSuppress;
 	}
 
 	/**
@@ -117,10 +129,13 @@ public class ExceptionSuppressor extends ExceptionHandlerWrapper {
 			return; // Unexpected, most likely buggy JSF implementation or parent exception handler.
 		}
 
-		if (!isCausedBySuppressedException()) {
+		Optional<Throwable> suppressedException = findSuppressedException();
+
+		if (!suppressedException.isPresent()) {
 			return;
 		}
 
+		handleSuppressedException(context, suppressedException.get());
 		refreshWithQueryString();
 
 		for (Iterator<ExceptionQueuedEvent> iter = getUnhandledExceptionQueuedEvents().iterator(); iter.hasNext();) {
@@ -130,18 +145,28 @@ public class ExceptionSuppressor extends ExceptionHandlerWrapper {
 		}
 	}
 
-	private boolean isCausedBySuppressedException() {
+	/**
+	 * Subclasses can override this method to have finer grained control over what must happen when the given exception
+	 * has been suppressed.
+	 * @param context The involved faces context.
+	 * @param suppressedException The suppressed exception.
+	 */
+	protected void handleSuppressedException(FacesContext context, Throwable suppressedException) {
+		// NOOP.
+	}
+
+	private Optional<Throwable> findSuppressedException() {
 		for (Iterator<ExceptionQueuedEvent> iter = getUnhandledExceptionQueuedEvents().iterator(); iter.hasNext();) {
 			Throwable unhandledException = iter.next().getContext().getException();
 
 			for (Class<? extends Throwable> exceptionTypeToSuppress : exceptionTypesToSuppress) {
 				if (Exceptions.is(unhandledException, exceptionTypeToSuppress)) {
-					return true;
+					return Optional.of(unhandledException);
 				}
 			}
 		}
 
-		return false;
+		return Optional.empty();
 	}
 
 }
