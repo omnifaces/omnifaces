@@ -45,7 +45,7 @@ import org.omnifaces.util.Faces;
  * &lt;/factory&gt;
  * </pre>
  * <p>
- * In case there are multiple excepiton handlers, best is to register this handler as last one in the chain. For example,
+ * In case there are multiple exception handlers, best is to register this handler as last one in the chain. For example,
  * when combined with {@link FullAjaxExceptionHandler}, this ordering will prevent the {@link FullAjaxExceptionHandler}
  * from taking over the handling of the {@link ViewExpiredException}.
  * <pre>
