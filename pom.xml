@@ -366,7 +366,7 @@
 				<configuration>
 					<mainClass>org.omnifaces.vdldoc.Main</mainClass>
 					<arguments>
-						<argument>-windowtitle</argument><argument>"OmniFaces VDL Documentation - Generated Documentation"</argument>
+						<argument>-windowtitle</argument><argument>OmniFaces VDL Documentation - Generated Documentation</argument>
 						<argument>-d</argument><argument>${project.build.directory}/vdldocs</argument>
 						<argument>${project.build.outputDirectory}/META-INF/omnifaces-ui.taglib.xml</argument>
 						<argument>${project.build.outputDirectory}/META-INF/omnifaces-functions.taglib.xml</argument>
