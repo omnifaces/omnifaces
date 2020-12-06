@@ -30,7 +30,7 @@ import javax.faces.context.ExceptionHandlerFactory;
  * @see FacesMessageExceptionHandler
  * @since 1.8
  */
-public class FacesMessageExceptionHandlerFactory extends DefaultExceptionHandlerFactory {
+public class FacesMessageExceptionHandlerFactory extends ExceptionHandlerFactory {
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 

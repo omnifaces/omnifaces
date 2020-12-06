@@ -30,7 +30,7 @@ import javax.faces.context.ExceptionHandlerFactory;
  * @see ExceptionSuppressor
  * @since 3.9
  */
-public class ExceptionSuppressorFactory extends DefaultExceptionHandlerFactory {
+public class ExceptionSuppressorFactory extends ExceptionHandlerFactory {
 
 	/**
 	 * Construct a new view expired exception handler factory around the given wrapped factory.

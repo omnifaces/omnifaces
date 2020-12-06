@@ -19,7 +19,10 @@ import javax.faces.context.ExceptionHandlerFactory;
  *
  * @author Bauke Scholtz
  * @since 2.0
+ * @deprecated Since 3.9 (actually already since 3.0, but overlooked). Technical reason is that the originally intended
+ * wrapper boilerplate was already integrated into JSF 2.3. Just extend from {@link ExceptionHandlerFactory} instead.
  */
+@Deprecated
 public abstract class DefaultExceptionHandlerFactory extends ExceptionHandlerFactory {
 
 	// Constructors ---------------------------------------------------------------------------------------------------
