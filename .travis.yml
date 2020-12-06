@@ -19,7 +19,7 @@ env:
    - SERVER=glassfish
    - SERVER=tomcat-mojarra
 #  - SERVER=tomcat-myfaces
-#  - SERVER=wildfly
+   - SERVER=wildfly
 #  - SERVER=tomee
 #  - SERVER=payara
 script: mvn verify -Dmaven.javadoc.skip=true -P $SERVER
