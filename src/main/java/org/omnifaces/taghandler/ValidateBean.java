@@ -129,16 +129,16 @@ import org.omnifaces.util.copier.SerializationCopier;
  * &lt;h:inputText value="#{bean.product.item}" /&gt;
  * &lt;h:inputText value="#{bean.product.order}" /&gt;
  *
- * &lt;o:validateBean value="#{bean.product}" validationGroups="com.example.MyGroup" /&gt;
+ * &lt;o:validateBean value="#{bean.product}" /&gt;
  * </pre>
  *
  * <p>
- * <b>Since OmniFaces 3.8, nested properties are also suppored with <code>@javax.validation.Valid</code> cascade</b>
+ * <b>Since OmniFaces 3.8, nested properties are also supported with <code>@javax.validation.Valid</code> cascade</b>
  * <pre>
  * &lt;h:inputText value="#{bean.product.item}" /&gt;
  * &lt;h:inputText value="#{bean.product.order}" /&gt;
  *
- * &lt;o:validateBean value="#{bean}" validationGroups="com.example.MyGroup" /&gt;
+ * &lt;o:validateBean value="#{bean}" /&gt;
  * </pre>
  * <p>
  * Whereby the <code>product</code> property looks like this:</p>
@@ -179,7 +179,7 @@ import org.omnifaces.util.copier.SerializationCopier;
  * If the copying strategy is not possible due to technical limitations, then you could set <code>method</code>
  * attribute to <code>"validateActual"</code>.
  * <pre>
- * &lt;o:validateBean value="#{bean.product}" validationGroups="com.example.MyGroup" method="validateActual" /&gt;
+ * &lt;o:validateBean value="#{bean.product}" method="validateActual" /&gt;
  * </pre>
  * <p>
  * This will update the model values and run the validation after update model values phase instead of the validations

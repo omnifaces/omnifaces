@@ -12,7 +12,7 @@
  */
 package org.omnifaces.test.taghandler.validatebean;
 
-@ValidateBeanITEntityConstraint(groups = ValidateBeanITValidationGroup.class)
+@ValidateBeanITEntityConstraint
 public class ValidateBeanITEntity {
 
 	private Integer number1;
