@@ -434,7 +434,9 @@ public final class Reflection {
 
 	private static Map<String, PropertyDescriptor> getPropertyDescriptors(Class<?> type) {
 		try {
-			return stream(Introspector.getBeanInfo(type).getPropertyDescriptors()).collect(Collectors.toMap(PropertyDescriptor::getName, identity()));
+			return stream(Introspector.getBeanInfo(type).getPropertyDescriptors())
+				.filter(propertyDescriptor -> propertyDescriptor.getReadMethod() != null)
+				.collect(Collectors.toMap(PropertyDescriptor::getName, identity()));
 		}
 		catch (IntrospectionException e) {
 			throw new IllegalStateException(e);
