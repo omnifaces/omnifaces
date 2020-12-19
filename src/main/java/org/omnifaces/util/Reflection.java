@@ -21,6 +21,7 @@ import static java.util.Comparator.reverseOrder;
 import static java.util.Objects.requireNonNull;
 import static java.util.function.Function.identity;
 import static java.util.logging.Level.FINEST;
+import static org.omnifaces.util.Beans.unwrapIfNecessary;
 import static org.omnifaces.util.Utils.getPrimitiveType;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isOneInstanceOf;
@@ -50,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -457,66 +459,83 @@ public final class Reflection {
 	 * @since 3.8
 	 */
 	public static Map<Object, PropertyPath> getBaseBeanPropertyPaths(Object bean) {
+		return getBaseBeanPropertyPaths(bean, recursableGetter -> true);
+	}
+
+	/**
+	 * Recursively collect all base bean property paths from the given bean which resolve to non-null bases and are
+	 * recursable. A "base" is represented by the bean itself and all of its nested lists, maps, arrays and beans. This
+	 * does not include the non-nested properties of any base. E.g. "person.address.street" will return a map with
+	 * actual instances of "person" and "person.address" as keys. Note that the "street" is not included as it does not
+	 * represent a base.
+	 * @param bean The given bean.
+	 * @param recursableGetter Whether the given getter method is recursable.
+	 * @return All base bean property paths which resolve to non-null values, mapped by the base.
+	 * @since 3.9
+	 */
+	public static Map<Object, PropertyPath> getBaseBeanPropertyPaths(Object bean, Predicate<Method> recursableGetter) {
 		Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors = new HashMap<>();
 		Map<Object, PropertyPath> collectedBasePropertyPaths = new IdentityHashMap<>();
 		PropertyPath basePath = PropertyPath.of();
 		collectedBasePropertyPaths.put(bean, basePath);
-		collectBasePropertyPaths(bean, basePath, cachedDescriptors, collectedBasePropertyPaths);
+		collectBasePropertyPaths(bean, basePath, recursableGetter, cachedDescriptors, collectedBasePropertyPaths);
 		return collectedBasePropertyPaths;
 	}
 
-	private static void collectBasePropertyPaths(Object base, PropertyPath basePath, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths) {
+	private static void collectBasePropertyPaths(Object base, PropertyPath basePath, Predicate<Method> recursableGetter, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths) {
 		if (base == null) {
 			return;
 		}
 		else if (base instanceof List) {
-			collectBasePropertyPathsFromList((List<?>) base, basePath, cachedDescriptors, collectedBasePropertyPaths);
+			collectBasePropertyPathsFromList((List<?>) base, basePath, recursableGetter, cachedDescriptors, collectedBasePropertyPaths);
 		}
 		else if (base instanceof Map) {
-			collectBasePropertyPathsFromMap((Map<?, ?>) base, basePath, cachedDescriptors, collectedBasePropertyPaths);
+			collectBasePropertyPathsFromMap((Map<?, ?>) base, basePath, recursableGetter, cachedDescriptors, collectedBasePropertyPaths);
 		}
 		else if (base.getClass().isArray()) {
-			collectBasePropertyPathsFromArray((Object[]) base, basePath, cachedDescriptors, collectedBasePropertyPaths);
+			collectBasePropertyPathsFromArray((Object[]) base, basePath, recursableGetter, cachedDescriptors, collectedBasePropertyPaths);
 		}
 		else {
-			collectBasePropertyPathsFromBean(base, basePath, cachedDescriptors, collectedBasePropertyPaths);
+			collectBasePropertyPathsFromBean(unwrapIfNecessary(base), basePath, recursableGetter, cachedDescriptors, collectedBasePropertyPaths);
 		}
 	}
 
-	private static void collectBasePropertyPathsFromList(List<?> list, PropertyPath basePath, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths) {
+	private static void collectBasePropertyPathsFromList(List<?> list, PropertyPath basePath, Predicate<Method> recursableGetter, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths) {
 		for (int index = 0; index < list.size(); index++) {
-			collectBasePropertyPath(list.get(index), basePath, cachedDescriptors, collectedBasePropertyPaths, index);
+			collectBasePropertyPath(list.get(index), recursableGetter, basePath, cachedDescriptors, collectedBasePropertyPaths, index);
 		}
 	}
 
 	@SuppressWarnings("unchecked")
-	private static void collectBasePropertyPathsFromMap(Map<?, ?> map, PropertyPath basePath, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths) {
+	private static void collectBasePropertyPathsFromMap(Map<?, ?> map, PropertyPath basePath, Predicate<Method> recursableGetter, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths) {
 		for (Entry<?, ?> entry : map.entrySet()) {
 			Object key = entry.getKey();
 
 			if (key instanceof Comparable && key instanceof Serializable) {
-				collectBasePropertyPath(entry.getValue(), basePath, cachedDescriptors, collectedBasePropertyPaths, (Comparable<? extends Serializable>) key);
+				collectBasePropertyPath(entry.getValue(), recursableGetter, basePath, cachedDescriptors, collectedBasePropertyPaths, (Comparable<? extends Serializable>) key);
 			}
 		}
 	}
 
-	private static void collectBasePropertyPathsFromArray(Object[] array, PropertyPath basePath, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths) {
+	private static void collectBasePropertyPathsFromArray(Object[] array, PropertyPath basePath, Predicate<Method> recursableGetter, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths) {
 		for (int index = 0; index < array.length; index++) {
-			collectBasePropertyPath(array[index], basePath, cachedDescriptors, collectedBasePropertyPaths, index);
+			collectBasePropertyPath(array[index], recursableGetter, basePath, cachedDescriptors, collectedBasePropertyPaths, index);
 		}
 	}
 
-	private static void collectBasePropertyPathsFromBean(Object bean, PropertyPath basePath, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths) {
+	private static void collectBasePropertyPathsFromBean(Object bean, PropertyPath basePath, Predicate<Method> recursableGetter, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths) {
 		for (PropertyDescriptor propertyDescriptor : getPropertyDescriptors(bean.getClass(), cachedDescriptors).values()) {
-			collectBasePropertyPath(getBeanProperty(bean, propertyDescriptor), basePath, cachedDescriptors, collectedBasePropertyPaths, propertyDescriptor.getName());
+			if (recursableGetter.test(propertyDescriptor.getReadMethod())) {
+				collectBasePropertyPath(getBeanProperty(bean, propertyDescriptor), recursableGetter, basePath, cachedDescriptors, collectedBasePropertyPaths, propertyDescriptor.getName());
+			}
 		}
 	}
 
-	private static void collectBasePropertyPath(Object value, PropertyPath basePath, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths, Comparable<? extends Serializable> property) {
+	private static void collectBasePropertyPath(Object value, Predicate<Method> recursableGetter, PropertyPath basePath, Map<Class<?>, Map<String, PropertyDescriptor>> cachedDescriptors, Map<Object, PropertyPath> collectedBasePropertyPaths, Comparable<? extends Serializable> property) {
 		if (value != null && isNeedsFurtherRecursion(value.getClass()) && !collectedBasePropertyPaths.containsKey(value)) {
 			PropertyPath path = basePath.with(property);
 			collectedBasePropertyPaths.put(value, path);
-			collectBasePropertyPaths(value, path, cachedDescriptors, collectedBasePropertyPaths);
+			collectBasePropertyPaths(value, path, recursableGetter, cachedDescriptors, collectedBasePropertyPaths);
 		}
 	}
 
