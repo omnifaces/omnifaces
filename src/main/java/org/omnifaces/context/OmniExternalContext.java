@@ -26,7 +26,6 @@ import jakarta.faces.context.FlashWrapper;
 
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.cdi.viewscope.ViewScopeManager;
-import org.omnifaces.config.WebXml;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.Hacks;
 
@@ -57,8 +56,8 @@ public class OmniExternalContext extends ExternalContextWrapper {
 
 	/**
 	 * If the current request is an unload request from {@link ViewScoped}, then return a dummy flash scope which does
-	 * not modify the flash state, else if Mojarra is used and web.xml is distributable, then return a patched flash
-	 * which work arounds Mojarra issue 4431, else return the original flash scope.
+	 * not modify the flash state, else if Mojarra is used and session is new, then return a patched flash which work
+	 * arounds Mojarra issue 4431, else return the original flash scope.
 	 */
 	@Override
 	public Flash getFlash() {
@@ -68,7 +67,7 @@ public class OmniExternalContext extends ExternalContextWrapper {
 
 		Flash flash = super.getFlash();
 
-		if (WebXml.instance().isDistributable() && Hacks.isMojarraUsed()) {
+		if (Faces.isSessionNew() && Hacks.isMojarraUsed()) {
 			return new PatchedFlash(flash);
 		}
 

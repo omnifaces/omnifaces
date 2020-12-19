@@ -76,8 +76,7 @@
 				<f:ajax execute="@form" render=":messages" />
 			</h:commandButton>
 
-			<o:validateBean value="#{validateBeanITClassLevelBean.entity}"
-				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup" />
+			<o:validateBean value="#{validateBeanITClassLevelBean.entity}" />
 		</o:form>
 
 		<o:form id="validateClassLevelActual">
@@ -89,7 +88,6 @@
 			</h:commandButton>
 
 			<o:validateBean value="#{validateBeanITClassLevelBean.entity}"
-				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup"
 				method="validateActual" />
 		</o:form>
 
@@ -102,7 +100,6 @@
 			</h:commandButton>
 
 			<o:validateBean value="#{validateBeanITClassLevelBean.entity}"
-				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup"
 				copier="org.omnifaces.test.taghandler.validatebean.ValidateBeanITEntityCopier" />
 		</o:form>
 
@@ -117,7 +114,6 @@
 			<h:message id="formMessage" for="validateClassLevelWithMessageForForm" />
 
 			<o:validateBean value="#{validateBeanITClassLevelBean.entity}"
-				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup"
 				showMessageFor="@form" />
 		</o:form>
 
@@ -132,7 +128,6 @@
 			</h:commandButton>
 
 			<o:validateBean value="#{validateBeanITClassLevelBean.entity}"
-				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup"
 				showMessageFor="@all" />
 		</o:form>
 
@@ -147,7 +142,6 @@
 			<h:messages id="globalMessage" globalOnly="true" />
 
 			<o:validateBean value="#{validateBeanITClassLevelBean.entity}"
-				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup"
 				showMessageFor="@global" />
 		</o:form>
 
@@ -164,7 +158,6 @@
 			</h:commandButton>
 
 			<o:validateBean value="#{validateBeanITClassLevelBean.entity}"
-				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup"
 				showMessageFor="@violating" />
 		</o:form>
 
@@ -181,7 +174,6 @@
 			</h:commandButton>
 
 			<o:validateBean value="#{validateBeanITClassLevelBean.entity}"
-				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup"
 				showMessageFor="@violating" method="validateActual" />
 		</o:form>
 
@@ -198,7 +190,6 @@
 			</h:commandButton>
 
 			<o:validateBean value="#{validateBeanITNestedClassLevelBean}"
-				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup"
 				showMessageFor="@violating" />
 		</o:form>
 
@@ -215,7 +206,6 @@
 			</h:commandButton>
 
 			<o:validateBean value="#{validateBeanITNestedClassLevelBean}"
-				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup"
 				showMessageFor="@violating" method="validateActual" />
 		</o:form>
 
@@ -234,7 +224,6 @@
 			</h:commandButton>
 
 			<o:validateBean value="#{validateBeanITNestedListClassLevelBean}"
-				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup"
 				showMessageFor="@violating" />
 		</o:form>
 
@@ -253,7 +242,6 @@
 			</h:commandButton>
 
 			<o:validateBean value="#{validateBeanITNestedListClassLevelBean}"
-				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup"
 				showMessageFor="@violating" method="validateActual" />
 		</o:form>
 
@@ -274,7 +262,6 @@
 			</h:commandButton>
 
 			<o:validateBean value="#{validateBeanITDoubleNestedListClassLevelBean}"
-				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup"
 				showMessageFor="@violating" />
 		</o:form>
 
@@ -295,7 +282,6 @@
 			</h:commandButton>
 
 			<o:validateBean value="#{validateBeanITDoubleNestedListClassLevelBean}"
-				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup"
 				showMessageFor="@violating" method="validateActual" />
 		</o:form>
 
@@ -309,7 +295,6 @@
 			</h:commandButton>
 
 			<o:validateBean value="#{validateBeanITClassLevelBean.entity}"
-				validationGroups="org.omnifaces.test.taghandler.validatebean.ValidateBeanITValidationGroup"
 				showMessageFor="@violating" />
 		</o:form>
 

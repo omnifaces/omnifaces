@@ -15,7 +15,9 @@ package org.omnifaces.exceptionhandler;
 import static org.omnifaces.exceptionhandler.FullAjaxExceptionHandler.parseExceptionTypesParam;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getServletContext;
+import static org.omnifaces.util.Faces.isResponseComplete;
 import static org.omnifaces.util.Faces.refreshWithQueryString;
+import static org.omnifaces.util.FacesLocal.isResponseCommitted;
 
 import java.util.Iterator;
 import java.util.Optional;
@@ -136,7 +138,10 @@ public class ExceptionSuppressor extends ExceptionHandlerWrapper {
 		}
 
 		handleSuppressedException(context, suppressedException.get());
-		refreshWithQueryString();
+
+		if (!isResponseComplete() && !isResponseCommitted(context)) {
+			refreshWithQueryString();
+		}
 
 		for (Iterator<ExceptionQueuedEvent> iter = getUnhandledExceptionQueuedEvents().iterator(); iter.hasNext();) {
 			// Drain out the exceptions.

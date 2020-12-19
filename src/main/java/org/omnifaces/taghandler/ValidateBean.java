@@ -18,6 +18,7 @@ import static jakarta.faces.event.PhaseId.RESTORE_VIEW;
 import static jakarta.faces.event.PhaseId.UPDATE_MODEL_VALUES;
 import static jakarta.faces.view.facelets.ComponentHandler.isNew;
 import static java.text.MessageFormat.format;
+import static java.util.Arrays.stream;
 import static java.util.Collections.singleton;
 import static java.util.logging.Level.SEVERE;
 import static org.omnifaces.el.ExpressionInspector.getValueReference;
@@ -51,8 +52,13 @@ import static org.omnifaces.util.Validators.resolveViolatedBase;
 import static org.omnifaces.util.Validators.resolveViolatedProperty;
 import static org.omnifaces.util.Validators.validateBean;
 
+import java.beans.Introspector;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.AnnotatedParameterizedType;
+import java.lang.reflect.AnnotatedType;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -80,6 +86,7 @@ import jakarta.faces.view.facelets.FaceletContext;
 import jakarta.faces.view.facelets.TagConfig;
 import jakarta.faces.view.facelets.TagHandler;
 import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Valid;
 
 import org.omnifaces.eventlistener.BeanValidationEventListener;
 import org.omnifaces.util.Reflection.PropertyPath;
@@ -129,16 +136,16 @@ import org.omnifaces.util.copier.SerializationCopier;
  * &lt;h:inputText value="#{bean.product.item}" /&gt;
  * &lt;h:inputText value="#{bean.product.order}" /&gt;
  *
- * &lt;o:validateBean value="#{bean.product}" validationGroups="com.example.MyGroup" /&gt;
+ * &lt;o:validateBean value="#{bean.product}" /&gt;
  * </pre>
  *
  * <p>
- * <b>Since OmniFaces 3.8, nested properties are also suppored with <code>@jakarta.validation.Valid</code> cascade</b>
+ * <b>Since OmniFaces 3.8, nested properties are also supported with <code>@jakarta.validation.Valid</code> cascade</b>
  * <pre>
  * &lt;h:inputText value="#{bean.product.item}" /&gt;
  * &lt;h:inputText value="#{bean.product.order}" /&gt;
  *
- * &lt;o:validateBean value="#{bean}" validationGroups="com.example.MyGroup" /&gt;
+ * &lt;o:validateBean value="#{bean}" /&gt;
  * </pre>
  * <p>
  * Whereby the <code>product</code> property looks like this:</p>
@@ -179,7 +186,7 @@ import org.omnifaces.util.copier.SerializationCopier;
  * If the copying strategy is not possible due to technical limitations, then you could set <code>method</code>
  * attribute to <code>"validateActual"</code>.
  * <pre>
- * &lt;o:validateBean value="#{bean.product}" validationGroups="com.example.MyGroup" method="validateActual" /&gt;
+ * &lt;o:validateBean value="#{bean.product}" method="validateActual" /&gt;
  * </pre>
  * <p>
  * This will update the model values and run the validation after update model values phase instead of the validations
@@ -401,7 +408,7 @@ public class ValidateBean extends TagHandler {
 	private void validateCopiedBean(UIForm form, Object bean) {
 		Set<String> collectedClientIds = new HashSet<>();
 		Map<PropertyPath, Object> collectedProperties = new HashMap<>();
-		Map<Object, PropertyPath> knownBaseProperties = getBaseBeanPropertyPaths(bean);
+		Map<Object, PropertyPath> knownBaseProperties = getBaseBeanPropertyPaths(bean, this::isValidAnnotationPresent);
 
 		ValidateBeanCallback collectBeanProperties = new ValidateBeanCallback() { @Override public void invoke() {
 			FacesContext context = FacesContext.getCurrentInstance();
@@ -418,6 +425,42 @@ public class ValidateBean extends TagHandler {
 
 		subscribeToRequestBeforePhase(PROCESS_VALIDATIONS, collectBeanProperties);
 		subscribeToRequestAfterPhase(PROCESS_VALIDATIONS, checkConstraints);
+	}
+
+	/**
+	 * Returns true if the property associated with given getter method is annotated with {@link Valid}.
+	 */
+	private boolean isValidAnnotationPresent(Method getter) {
+		if (getter.isAnnotationPresent(Valid.class)) {
+			return true;
+		}
+
+		Class<?> beanClass = getter.getDeclaringClass();
+
+		if (beanClass.isAnnotationPresent(Valid.class)) {
+			return true;
+		}
+
+		String propertyName = Introspector.decapitalize(getter.getName().replaceFirst("get", ""));
+		Field property = stream(beanClass.getDeclaredFields()).filter(field -> field.getName().equals(propertyName)).findFirst().orElse(null);
+
+		if (property == null) {
+			return false;
+		}
+
+		if (property.isAnnotationPresent(Valid.class)) {
+			return true;
+		}
+
+		if (property.getAnnotatedType() instanceof AnnotatedParameterizedType) {
+			for (AnnotatedType type : ((AnnotatedParameterizedType) property.getAnnotatedType()).getAnnotatedActualTypeArguments()) {
+				if (type.isAnnotationPresent(Valid.class)) {
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	/**
