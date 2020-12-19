@@ -40,7 +40,10 @@ Adam Waldenberg
 	For his inspiration for <o:scriptParam>
 
 Andre Wachsmuth
-	For his work on improving <o:validataBean> to support nested properties
+	For his work on improving <o:validateBean> to support nested properties
+
+Lenny Primak
+	For his work on ViewExpiredExceptionHandler and ExceptionSuppressor
 
 And of course a general thank you to everyone who contributed by creating an issue, pointing out a defect, etc.
 
