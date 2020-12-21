@@ -264,6 +264,21 @@ public final class FacesLocal {
 		return (T) context.getAttributes().get(name);
 	}
 
+
+	/**
+	 * @see Faces#getContextAttribute(String, Supplier)
+	 */
+	public static <T> T getContextAttribute(FacesContext context, String name, Supplier<T> computeIfAbsent) {
+		T value = getContextAttribute(context, name);
+
+		if (value == null) {
+			value = computeIfAbsent.get();
+			setContextAttribute(context, name, value);
+		}
+
+		return value;
+	}
+
 	/**
 	 * @see Faces#setContextAttribute(String, Object)
 	 */
