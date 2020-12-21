@@ -16,9 +16,6 @@ import static java.lang.String.format;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.unmodifiableSet;
-import static org.omnifaces.util.BeansLocal.getInstance;
-import static org.omnifaces.util.BeansLocal.isActive;
-import static org.omnifaces.util.BeansLocal.resolve;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isNumber;
 import static org.omnifaces.util.Xml.createDocument;
@@ -37,18 +34,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.RequestScoped;
-import javax.enterprise.context.spi.Context;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
 import javax.servlet.ServletContext;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
-import org.omnifaces.util.Beans;
-import org.omnifaces.util.Faces;
+import org.omnifaces.util.Servlets;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -129,7 +120,8 @@ enum WebXmlSingleton implements WebXml {
 	 */
 	private WebXmlSingleton() {
 		try {
-			Element allWebXmls = loadAllWebXmls(getServletContext()).getDocumentElement();
+			ServletContext servletContext = Servlets.getContext();
+			Element allWebXmls = loadAllWebXmls(servletContext).getDocumentElement();
 			XPath xpath = XPathFactory.newInstance().newXPath();
 			welcomeFiles = parseWelcomeFiles(allWebXmls, xpath);
 			errorPageLocations = parseErrorPageLocations(allWebXmls, xpath);
@@ -138,30 +130,11 @@ enum WebXmlSingleton implements WebXml {
 			securityConstraints = parseSecurityConstraints(allWebXmls, xpath);
 			sessionTimeout = parseSessionTimeout(allWebXmls, xpath);
 
-			Element rootWebXml = loadRootWebXml(getServletContext()).getDocumentElement();
+			Element rootWebXml = loadRootWebXml(servletContext).getDocumentElement();
 			distributable = parseDistributable(rootWebXml, xpath);
 		}
 		catch (Exception e) {
 			throw new IllegalStateException(ERROR_INITIALIZATION_FAIL, e);
-		}
-	}
-
-	private static ServletContext getServletContext() {
-		if (Faces.hasContext()) {
-			return Faces.getServletContext();
-		}
-
-		BeanManager beanManager = Beans.getManager();
-
-		if (isActive(beanManager, RequestScoped.class)) {
-			return getInstance(beanManager, ServletContext.class);
-		}
-		else {
-			// #522 For some reason Weld by default searches for the ServletContext in the request scope.
-			// But this won't work during e.g. startup. So we need to explicitly search in application scope.
-			Bean<ServletContext> bean = resolve(beanManager, ServletContext.class);
-			Context context = beanManager.getContext(ApplicationScoped.class);
-			return context.get(bean, beanManager.createCreationalContext(bean));
 		}
 	}
 

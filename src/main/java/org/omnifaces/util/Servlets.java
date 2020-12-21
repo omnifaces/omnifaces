@@ -27,6 +27,9 @@ import static javax.servlet.RequestDispatcher.ERROR_REQUEST_URI;
 import static javax.servlet.RequestDispatcher.FORWARD_QUERY_STRING;
 import static javax.servlet.RequestDispatcher.FORWARD_REQUEST_URI;
 import static javax.servlet.http.HttpServletResponse.SC_MOVED_PERMANENTLY;
+import static org.omnifaces.util.BeansLocal.getInstance;
+import static org.omnifaces.util.BeansLocal.isActive;
+import static org.omnifaces.util.BeansLocal.resolve;
 import static org.omnifaces.util.JNDI.lookup;
 import static org.omnifaces.util.Utils.coalesce;
 import static org.omnifaces.util.Utils.decodeURL;
@@ -55,6 +58,11 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.spi.Context;
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
 import javax.faces.FactoryFinder;
 import javax.faces.application.Application;
 import javax.faces.application.ResourceHandler;
@@ -726,6 +734,34 @@ public final class Servlets {
 	}
 
 	// ServletContext -------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns the servlet context.
+	 * If the JSF context is available, then return it from there.
+	 * Else if the CDI bean manager is available, then return it from there.
+	 * @return The servlet context.
+	 * @since 3.10
+	 * @see Faces#getServletContext()
+	 * @see Beans#getInstance(Bean, boolean)
+	 */
+	public static ServletContext getContext() {
+		if (Faces.hasContext()) {
+			return Faces.getServletContext();
+		}
+
+		BeanManager beanManager = Beans.getManager();
+
+		if (isActive(beanManager, RequestScoped.class)) {
+			return getInstance(beanManager, ServletContext.class);
+		}
+		else {
+			// #522 For some reason Weld by default searches for the ServletContext in the request scope.
+			// But this won't work during e.g. startup. So we need to explicitly search in application scope.
+			Bean<ServletContext> bean = resolve(beanManager, ServletContext.class);
+			Context context = beanManager.getContext(ApplicationScoped.class);
+			return context.get(bean, beanManager.createCreationalContext(bean));
+		}
+	}
 
 	/**
 	 * Returns the application scope attribute value associated with the given name.
