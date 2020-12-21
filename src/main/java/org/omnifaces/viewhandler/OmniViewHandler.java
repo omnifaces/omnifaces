@@ -13,8 +13,10 @@
 package org.omnifaces.viewhandler;
 
 import static java.lang.String.format;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static javax.faces.component.visit.VisitHint.SKIP_ITERATION;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.isUnloadRequest;
+import static org.omnifaces.resourcehandler.SitemapResourceHandler.isSitemapResourceRequest;
 import static org.omnifaces.taghandler.EnableRestorableView.isRestorableView;
 import static org.omnifaces.taghandler.EnableRestorableView.isRestorableViewRequest;
 import static org.omnifaces.util.Components.buildView;
@@ -37,12 +39,14 @@ import javax.faces.application.ViewHandler;
 import javax.faces.application.ViewHandlerWrapper;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIViewRoot;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PreDestroyViewMapEvent;
 import javax.faces.render.ResponseStateManager;
 
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.cdi.viewscope.ViewScopeManager;
+import org.omnifaces.resourcehandler.SitemapResourceHandler;
 import org.omnifaces.taghandler.EnableRestorableView;
 import org.omnifaces.util.Callback;
 import org.omnifaces.util.Hacks;
@@ -58,6 +62,8 @@ import org.omnifaces.util.Hacks;
  * restore the view scoped state instead of building and restoring the entire view.
  * <li>Since 2.5: If project stage is development, then throw an {@link IllegalStateException} when there's a nested
  * {@link UIForm} component.
+ * <li>Since 3.10: If {@link SitemapResourceHandler#isSitemapResourceRequest(FacesContext)} is <code>true</code>, then
+ * replace the HTML response writer with a XML response writer.
  * </ol>
  *
  * @author Bauke Scholtz
@@ -69,6 +75,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 
 	// Constants ------------------------------------------------------------------------------------------------------
 
+	private static final String XML_CONTENT_TYPE = "text/xml";
 	private static final NestedFormsChecker NESTED_FORMS_CHECKER = new NestedFormsChecker();
 
 	private static final String ERROR_NESTED_FORM_ENCOUNTERED =
@@ -115,7 +122,14 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 		}
 
 		if (isAjaxRequest(context)) {
-			context.getAttributes().put("facelets.ContentType", "text/xml"); // Work around for nasty Mojarra 2.3.4+ bug reported as #4484.
+			context.getAttributes().put("facelets.ContentType", XML_CONTENT_TYPE); // Work around for nasty Mojarra 2.3.4+ bug reported as #4484.
+		}
+
+		if (isSitemapResourceRequest(context)) {
+			ExternalContext externalContext = context.getExternalContext();
+			externalContext.setResponseContentType(XML_CONTENT_TYPE);
+			externalContext.setResponseCharacterEncoding(UTF_8.name());
+			context.setResponseWriter(context.getRenderKit().createResponseWriter(externalContext.getResponseOutputWriter(), XML_CONTENT_TYPE, UTF_8.name()));
 		}
 
 		super.renderView(context, viewToRender);

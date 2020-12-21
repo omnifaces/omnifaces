@@ -184,11 +184,14 @@ public class Url extends OutputFamily {
 	}
 
 	private String getBookmarkableURLWithDomain(FacesContext context, Map<String, List<String>> params) {
-		String url = getBookmarkableURL(context, getViewId(), params, false);
+		String uri = getBookmarkableURL(context, getViewId(), params, false);
 		String domain = getDomain();
+		return getBookmarkableURLWithDomain(context, uri, domain, ERROR_INVALID_DOMAIN);
+	}
 
+	static String getBookmarkableURLWithDomain(FacesContext context, String uri, String domain, String errorMessage) {
 		if ("//".equals(domain)) {
-			return getRequestDomainURL(context).split(":", 2)[1] + url;
+			return getRequestDomainURL(context).split(":", 2)[1] + uri;
 		}
 		else if (!"/".equals(domain)) {
 			String normalizedDomain = domain.contains("//") ? domain : ("//") + domain;
@@ -200,10 +203,10 @@ public class Url extends OutputFamily {
 				throw new IllegalArgumentException(format(ERROR_INVALID_DOMAIN, domain), e);
 			}
 
-			return stripTrailingSlash(normalizedDomain) + url;
+			return stripTrailingSlash(normalizedDomain) + uri;
 		}
 		else {
-			return url;
+			return uri;
 		}
 	}
 

@@ -30,6 +30,7 @@ import org.omnifaces.component.output.Cache;
 import org.omnifaces.eventlistener.DefaultServletContextListener;
 import org.omnifaces.facesviews.FacesViews;
 import org.omnifaces.resourcehandler.GraphicResource;
+import org.omnifaces.resourcehandler.SitemapResourceHandler;
 import org.omnifaces.util.cache.CacheInitializer;
 
 /**
@@ -44,6 +45,7 @@ import org.omnifaces.util.cache.CacheInitializer;
  * <li>Add {@link FacesViews} mappings to FacesServlet if necessary.
  * <li>Register {@link GraphicImageBean} beans in {@link GraphicResource}.
  * <li>Register {@link Socket} endpoint if necessary.
+ * <li>Add {@link SitemapResourceHandler} mapping to FacesServlet if necessary.
  * </ol>
  * <p>
  * This is invoked <strong>after</strong> {@link ApplicationInitializer} and <strong>before</strong> {@link ApplicationProcessor}.
@@ -83,6 +85,7 @@ public class ApplicationListener extends DefaultServletContextListener {
 			FacesViews.addFacesServletMappings(servletContext);
 			GraphicResource.registerGraphicImageBeans();
 			Socket.registerEndpointIfNecessary(servletContext);
+			SitemapResourceHandler.addFacesServletMappingIfNecessary(servletContext);
 		}
 		catch (Exception | LinkageError e) {
 			throw new IllegalStateException(ERROR_OMNIFACES_INITIALIZATION_FAIL, e);
