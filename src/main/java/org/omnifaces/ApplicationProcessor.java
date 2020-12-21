@@ -21,12 +21,12 @@ import java.util.Set;
 
 import javax.faces.application.Application;
 import javax.faces.application.ResourceHandler;
-import javax.faces.application.ResourceHandlerWrapper;
 import javax.faces.event.SystemEvent;
 import javax.faces.event.SystemEventListener;
 import javax.servlet.ServletContext;
 
 import org.omnifaces.component.search.MessagesKeywordResolver;
+import org.omnifaces.config.FacesConfigXml;
 import org.omnifaces.facesviews.FacesViews;
 
 /**
@@ -76,18 +76,10 @@ public class ApplicationProcessor implements SystemEventListener {
 
 	private void checkDuplicateResourceHandler(Application application) {
 		Set<Class<? extends ResourceHandler>> allResourceHandlers = new HashSet<>();
-		ResourceHandler resourceHandler = application.getResourceHandler();
 
-		while (resourceHandler != null) {
-			if (!allResourceHandlers.add(resourceHandler.getClass())) {
-				throw new IllegalStateException(format(ERROR_DUPLICATE_RESOURCE_HANDLER, resourceHandler.getClass()));
-			}
-
-			if (resourceHandler instanceof ResourceHandlerWrapper) {
-				resourceHandler = ((ResourceHandlerWrapper) resourceHandler).getWrapped();
-			}
-			else {
-				resourceHandler = null;
+		for (Class<? extends ResourceHandler> resourceHandler : FacesConfigXml.instance().getResourceHandlers()) {
+			if (!allResourceHandlers.add(resourceHandler)) {
+				throw new IllegalStateException(format(ERROR_DUPLICATE_RESOURCE_HANDLER, resourceHandler));
 			}
 		}
 	}
