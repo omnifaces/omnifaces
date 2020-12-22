@@ -130,6 +130,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 			externalContext.setResponseContentType(XML_CONTENT_TYPE);
 			externalContext.setResponseCharacterEncoding(UTF_8.name());
 			context.setResponseWriter(context.getRenderKit().createResponseWriter(externalContext.getResponseOutputWriter(), XML_CONTENT_TYPE, UTF_8.name()));
+			context.getAttributes().put("facelets.ContentType", XML_CONTENT_TYPE); // Work around for MyFaces ignoring the content type set above.
 		}
 
 		super.renderView(context, viewToRender);
