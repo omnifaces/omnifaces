@@ -219,7 +219,8 @@ public abstract class OmniFacesIT {
 		withCombinedResourceHandler,
 		withMessageBundle,
 		withCDNResourceHandler,
-		withViewExpiredExceptionHandler;
+		withViewExpiredExceptionHandler,
+		withSitemapResourceHandler;
 	}
 
 	public static enum WebXml {
