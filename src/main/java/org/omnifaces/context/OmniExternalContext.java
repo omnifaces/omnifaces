@@ -35,6 +35,8 @@ import org.omnifaces.util.Hacks;
  * This external context performs the following tasks:
  * <ol>
  * <li>Since 2.2: Take care that the {@link Flash} will be ignored during an unload request.
+ * <li>Since 3.9: If {@link Faces#isSessionNew()} and {@link Hacks#isMojarraUsed()} then return patched flash which work
+ * arounds Mojarra issue 4431
  * <li>Since 3.10: If {@link SitemapResourceHandler#isSitemapResourceRequest(FacesContext)} is <code>true</code>, then
  * ensure that {@link #encodeActionURL(String)} doesn't append the JSESSIONID string.
  * </ol>
