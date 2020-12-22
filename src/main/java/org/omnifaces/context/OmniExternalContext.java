@@ -26,11 +26,18 @@ import javax.faces.context.FlashWrapper;
 
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.cdi.viewscope.ViewScopeManager;
+import org.omnifaces.resourcehandler.SitemapResourceHandler;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.Hacks;
 
 /**
- * This external context takes care that the {@link Flash} will be ignored during an unload request.
+ * OmniFaces external context.
+ * This external context performs the following tasks:
+ * <ol>
+ * <li>Since 2.2: Take care that the {@link Flash} will be ignored during an unload request.
+ * <li>Since 3.10: If {@link SitemapResourceHandler#isSitemapResourceRequest(FacesContext)} is <code>true</code>, then
+ * ensure that {@link #encodeActionURL(String)} doesn't append the JSESSIONID string.
+ * </ol>
  *
  * @author Bauke Scholtz
  * @since 2.2
@@ -72,6 +79,20 @@ public class OmniExternalContext extends ExternalContextWrapper {
 		}
 
 		return flash;
+	}
+
+	/**
+	 * If {@link SitemapResourceHandler#isSitemapResourceRequest(FacesContext)}, then perform a NOOP, else continue as usual.
+	 * @since 3.10
+	 */
+	@Override
+	public String encodeActionURL(String url) {
+		if (SitemapResourceHandler.isSitemapResourceRequest(Faces.getContext())) {
+			return url;
+		}
+		else {
+			return super.encodeActionURL(url);
+		}
 	}
 
 	// Inner classes --------------------------------------------------------------------------------------------------
