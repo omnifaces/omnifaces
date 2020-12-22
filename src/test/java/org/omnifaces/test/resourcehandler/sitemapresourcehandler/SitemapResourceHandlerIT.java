@@ -30,7 +30,7 @@ import org.omnifaces.test.OmniFacesIT;
 
 public class SitemapResourceHandlerIT extends OmniFacesIT {
 
-	private static final String EXPEXTED_CONTENT_TYPE = "text/xml;charset=UTF-8";
+	private static final String EXPECTED_CONTENT_TYPE = "text/xml;charset=UTF-8";
 	private static final String EXPECTED_XML_PROLOG = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 	private static final String EXPECTED_XML_BODY = ""
 		+ "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">"
@@ -58,7 +58,7 @@ public class SitemapResourceHandlerIT extends OmniFacesIT {
 		try {
 			HttpURLConnection connection = (HttpURLConnection) new URL(baseURL + "sitemap.xml").openConnection();
 			assertEquals("Response code", HttpStatus.SC_OK, connection.getResponseCode());
-			assertEquals("Content type", EXPEXTED_CONTENT_TYPE, connection.getHeaderField("Content-Type"));
+			assertEquals("Content type", EXPECTED_CONTENT_TYPE, connection.getHeaderField("Content-Type"));
 
 			String actualPageSource;
 
@@ -67,12 +67,13 @@ public class SitemapResourceHandlerIT extends OmniFacesIT {
 			}
 
 			String actualXmlProlog = actualPageSource
-				.substring(0, actualPageSource.indexOf("<!--"))
+				.substring(0, actualPageSource.indexOf("<!--")) // That XML comment is the generated license.txt comment.
 				.trim();
 			String actualXmlBody = actualPageSource
 				.substring(actualPageSource.indexOf("-->") + 3)
-				.trim()
-			    .replace("127.0.0.1", "localhost"); // Depends on server used. We don't want to be dependent on that.
+				.replaceAll(">\\s+<", "><") // Get rid of whitespace between tags. This isn't consistent among servers.
+				.replace("127.0.0.1", "localhost") // Depends on server used. We don't want to be dependent on that.
+				.trim();
 
 			assertEquals("XML prolog", EXPECTED_XML_PROLOG, actualXmlProlog);
 			assertEquals("Page source", EXPECTED_XML_BODY, actualXmlBody);
