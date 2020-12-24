@@ -301,6 +301,23 @@ public final class Hacks {
 		}
 	}
 
+	/**
+	 * Returns whether the given stylesheet resource is rendered.
+	 * @param context The involved faces context.
+	 * @param id The resource identifier.
+	 * @since 2.7.10
+	 */
+	public static boolean isStylesheetResourceRendered(FacesContext context, ResourceIdentifier id) {
+		boolean rendered = isMojarraResourceRendered(context, id);
+
+		if (!rendered && isMyFacesUsed()) {
+			return isMyFacesResourceRendered(context, MYFACES_RENDERED_STYLESHEET_RESOURCES_KEY, id);
+		}
+		else {
+			return rendered;
+		}
+	}
+
 	private static void setMojarraResourceRendered(FacesContext context, ResourceIdentifier id) {
 		context.getAttributes().put(id.getName() + id.getLibrary(), true);
 	}
