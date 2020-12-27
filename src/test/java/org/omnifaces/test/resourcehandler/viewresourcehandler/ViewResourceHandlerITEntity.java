@@ -10,16 +10,16 @@
  * an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations under the License.
  */
-package org.omnifaces.test.resourcehandler.sitemapresourcehandler;
+package org.omnifaces.test.resourcehandler.viewresourcehandler;
 
 import java.time.temporal.Temporal;
 
-public class SitemapResourceHandlerITEntity {
+public class ViewResourceHandlerITEntity {
 
 	private Long id;
 	private Temporal lastModified;
 
-	public SitemapResourceHandlerITEntity(Long id, Temporal lastModified) {
+	public ViewResourceHandlerITEntity(Long id, Temporal lastModified) {
 		this.id = id;
 		this.lastModified = lastModified;
 	}

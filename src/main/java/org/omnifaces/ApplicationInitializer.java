@@ -18,6 +18,7 @@ import java.util.logging.Logger;
 import javax.servlet.ServletContainerInitializer;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+
 import org.omnifaces.config.OmniFaces;
 import org.omnifaces.facesviews.FacesViews;
 

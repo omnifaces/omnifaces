@@ -18,7 +18,7 @@
 	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
 	xmlns:o="http://omnifaces.org/ui"
 >
-    <ui:repeat value="#{sitemapResourceHandlerITBean.entities}" var="entity">
+    <ui:repeat value="#{viewResourceHandlerITBean.entities}" var="entity">
         <o:sitemapUrl viewId="/entity.xhtml" lastModified="#{entity.lastModified}" changeFrequency="weekly" priority="1.0">
             <o:param name="id" value="#{entity.id}" />
         </o:sitemapUrl>

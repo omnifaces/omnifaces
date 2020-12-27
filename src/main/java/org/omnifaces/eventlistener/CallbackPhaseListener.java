@@ -15,6 +15,7 @@ package org.omnifaces.eventlistener;
 import static javax.faces.event.PhaseId.ANY_PHASE;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.FacesLocal.getRequestAttribute;
+
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;

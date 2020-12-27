@@ -13,8 +13,8 @@
 package org.omnifaces.component.output;
 
 import static java.lang.String.format;
-import static org.omnifaces.resourcehandler.SitemapResourceHandler.isSitemapResourceHandlerRegistered;
-import static org.omnifaces.resourcehandler.SitemapResourceHandler.isSitemapResourceRequest;
+import static org.omnifaces.resourcehandler.ViewResourceHandler.isViewResourceHandlerRegistered;
+import static org.omnifaces.resourcehandler.ViewResourceHandler.isViewResourceRequest;
 import static org.omnifaces.util.Components.getParams;
 import static org.omnifaces.util.Faces.getRequestDomainURL;
 import static org.omnifaces.util.Faces.isDevelopment;
@@ -36,7 +36,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 
 import org.omnifaces.component.ParamHolder;
-import org.omnifaces.resourcehandler.SitemapResourceHandler;
+import org.omnifaces.resourcehandler.ViewResourceHandler;
 import org.omnifaces.util.State;
 
 /**
@@ -46,7 +46,7 @@ import org.omnifaces.util.State;
  * and <code>&lt;o:param&gt;</code>.
  * <p>
  * This component is largely based off the {@link Url} component behind <code>&lt;o:url&gt;</code>, but then tailored
- * specifically for usage in <code>/sitemap.xml</code> file and the {@link SitemapResourceHandler} must be registered in
+ * specifically for usage in <code>sitemap.xml</code> file. The {@link ViewResourceHandler} must be registered in
  * <code>faces-config.xml</code> in order to get JSF components to run in <code>/sitemap.xml</code>.
  *
  * <h3>Values</h3>
@@ -101,7 +101,7 @@ import org.omnifaces.util.State;
  * @author Bauke Scholtz
  * @since 3.10
  * @see OutputFamily
- * @see SitemapResourceHandler
+ * @see ViewResourceHandler
  */
 @FacesComponent(SitemapUrl.COMPONENT_TYPE)
 public class SitemapUrl extends OutputFamily {
@@ -126,10 +126,10 @@ public class SitemapUrl extends OutputFamily {
 	// Private constants ----------------------------------------------------------------------------------------------
 
 	private static final String ERROR_MISSING_RESOURCE_HANDLER =
-		"The org.omnifaces.resourcehandler.SitemapResourceHandler is missing. You need to add it to faces-config.xml.";
+		"The org.omnifaces.resourcehandler.ViewResourceHandler is missing. You need to add it to faces-config.xml.";
 
 	private static final String ERROR_INVALID_REQUEST =
-		"o:sitemapUrl can only be used in /sitemap.xml file.";
+		"o:sitemapUrl can only be used in a file registered in org.omnifaces.VIEW_RESOURCE_HANDLER_URIS context param.";
 
 	private static final String ERROR_MISSING_VALUE_OR_VIEWID =
 		"o:sitemapUrl 'value' or 'viewId' attribute must be set.";
@@ -155,15 +155,15 @@ public class SitemapUrl extends OutputFamily {
 	/**
 	 * Constructs the {@link SitemapUrl} component.
 	 * @throws IllegalStateException when {@link Application#getProjectStage()} is {@link ProjectStage#Development} and
-	 * the {@link SitemapResourceHandler} is not registered in <code>faces-config.xml</code>, or when the current request
-	 * is not for the {@link SitemapResourceHandler} at all.
+	 * the {@link ViewResourceHandler} is not registered in <code>faces-config.xml</code>, or when the current request
+	 * is not for the {@link ViewResourceHandler} at all.
 	 */
 	public SitemapUrl() {
 		if (isDevelopment()) {
-			if (!isSitemapResourceHandlerRegistered()) {
+			if (!isViewResourceHandlerRegistered()) {
 				throw new IllegalStateException(ERROR_MISSING_RESOURCE_HANDLER);
 			}
-			if (!isSitemapResourceRequest(getFacesContext())) {
+			if (!isViewResourceRequest(getFacesContext())) {
 				throw new IllegalStateException(ERROR_INVALID_REQUEST);
 			}
 		}

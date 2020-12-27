@@ -16,14 +16,16 @@ import static java.lang.String.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static javax.faces.component.visit.VisitHint.SKIP_ITERATION;
 import static org.omnifaces.cdi.viewscope.ViewScopeManager.isUnloadRequest;
-import static org.omnifaces.resourcehandler.SitemapResourceHandler.isSitemapResourceRequest;
+import static org.omnifaces.resourcehandler.ViewResourceHandler.isViewResourceRequest;
 import static org.omnifaces.taghandler.EnableRestorableView.isRestorableView;
 import static org.omnifaces.taghandler.EnableRestorableView.isRestorableViewRequest;
 import static org.omnifaces.util.Components.buildView;
 import static org.omnifaces.util.Components.forEachComponent;
 import static org.omnifaces.util.Components.getClosestParent;
 import static org.omnifaces.util.Faces.responseComplete;
+import static org.omnifaces.util.FacesLocal.getMimeType;
 import static org.omnifaces.util.FacesLocal.getRenderKit;
+import static org.omnifaces.util.FacesLocal.getRequestServletPath;
 import static org.omnifaces.util.FacesLocal.getRequestURIWithQueryString;
 import static org.omnifaces.util.FacesLocal.isAjaxRequest;
 import static org.omnifaces.util.FacesLocal.isDevelopment;
@@ -46,7 +48,7 @@ import javax.faces.render.ResponseStateManager;
 
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.cdi.viewscope.ViewScopeManager;
-import org.omnifaces.resourcehandler.SitemapResourceHandler;
+import org.omnifaces.resourcehandler.ViewResourceHandler;
 import org.omnifaces.taghandler.EnableRestorableView;
 import org.omnifaces.util.Callback;
 import org.omnifaces.util.Hacks;
@@ -62,7 +64,7 @@ import org.omnifaces.util.Hacks;
  * restore the view scoped state instead of building and restoring the entire view.
  * <li>Since 2.5: If project stage is development, then throw an {@link IllegalStateException} when there's a nested
  * {@link UIForm} component.
- * <li>Since 3.10: If {@link SitemapResourceHandler#isSitemapResourceRequest(FacesContext)} is <code>true</code>, then
+ * <li>Since 3.10: If {@link ViewResourceHandler#isViewResourceRequest(FacesContext)} is <code>true</code>, then
  * replace the HTML response writer with a XML response writer.
  * </ol>
  *
@@ -125,12 +127,15 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 			context.getAttributes().put("facelets.ContentType", XML_CONTENT_TYPE); // Work around for nasty Mojarra 2.3.4+ bug reported as #4484.
 		}
 
-		if (isSitemapResourceRequest(context)) {
+		if (isViewResourceRequest(context)) {
+			String contentType = getMimeType(context, getRequestServletPath(context));
+			String characterEncoding = UTF_8.name();
+
 			ExternalContext externalContext = context.getExternalContext();
-			externalContext.setResponseContentType(XML_CONTENT_TYPE);
-			externalContext.setResponseCharacterEncoding(UTF_8.name());
-			context.setResponseWriter(context.getRenderKit().createResponseWriter(externalContext.getResponseOutputWriter(), XML_CONTENT_TYPE, UTF_8.name()));
-			context.getAttributes().put("facelets.ContentType", XML_CONTENT_TYPE); // Work around for MyFaces ignoring the content type set above.
+			externalContext.setResponseContentType(contentType);
+			externalContext.setResponseCharacterEncoding(characterEncoding);
+			context.setResponseWriter(context.getRenderKit().createResponseWriter(externalContext.getResponseOutputWriter(), contentType, characterEncoding));
+			context.getAttributes().put("facelets.ContentType", contentType); // Work around for MyFaces ignoring the content type set above.
 		}
 
 		super.renderView(context, viewToRender);

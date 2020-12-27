@@ -21,6 +21,7 @@ import static org.omnifaces.util.Components.getCurrentComponent;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.FacesLocal.isDevelopment;
+
 import java.io.IOException;
 import java.io.Writer;
 import java.util.logging.Logger;

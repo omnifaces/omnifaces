@@ -20,6 +20,6 @@
 	version="2.3"
 >
 	<application>
-		<resource-handler>org.omnifaces.resourcehandler.SitemapResourceHandler</resource-handler>
+		<resource-handler>org.omnifaces.resourcehandler.ViewResourceHandler</resource-handler>
 	</application>
 </faces-config>

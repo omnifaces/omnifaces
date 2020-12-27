@@ -26,7 +26,7 @@ import javax.faces.context.FlashWrapper;
 
 import org.omnifaces.cdi.ViewScoped;
 import org.omnifaces.cdi.viewscope.ViewScopeManager;
-import org.omnifaces.resourcehandler.SitemapResourceHandler;
+import org.omnifaces.resourcehandler.ViewResourceHandler;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.Hacks;
 
@@ -37,7 +37,7 @@ import org.omnifaces.util.Hacks;
  * <li>Since 2.2: Take care that the {@link Flash} will be ignored during an unload request.
  * <li>Since 3.9: If {@link Faces#isSessionNew()} and {@link Hacks#isMojarraUsed()} then return patched flash which work
  * arounds Mojarra issue 4431
- * <li>Since 3.10: If {@link SitemapResourceHandler#isSitemapResourceRequest(FacesContext)} is <code>true</code>, then
+ * <li>Since 3.10: If {@link ViewResourceHandler#isViewResourceRequest(FacesContext)} is <code>true</code>, then
  * ensure that {@link #encodeActionURL(String)} doesn't append the JSESSIONID string.
  * </ol>
  *
@@ -84,12 +84,12 @@ public class OmniExternalContext extends ExternalContextWrapper {
 	}
 
 	/**
-	 * If {@link SitemapResourceHandler#isSitemapResourceRequest(FacesContext)}, then perform a NOOP, else continue as usual.
+	 * If {@link ViewResourceHandler#isViewResourceRequest(FacesContext)}, then perform a NOOP, else continue as usual.
 	 * @since 3.10
 	 */
 	@Override
 	public String encodeActionURL(String url) {
-		if (SitemapResourceHandler.isSitemapResourceRequest(Faces.getContext())) {
+		if (ViewResourceHandler.isViewResourceRequest(Faces.getContext())) {
 			return url;
 		}
 		else {
