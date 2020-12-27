@@ -334,7 +334,9 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 	 */
 	@Override
 	public void processEvent(SystemEvent event) {
-		if (disabledParam != null && parseBoolean(String.valueOf((Object) evaluateExpressionGet(disabledParam)))) {
+		Object disabled = evaluateExpressionGet(disabledParam);
+
+		if (disabledParam != null && parseBoolean(String.valueOf(disabled))) {
 			return;
 		}
 
@@ -507,8 +509,13 @@ public class CombinedResourceHandler extends DefaultResourceHandler implements S
 		}
 
 		private void addStylesheet(FacesContext context, UIComponent component, ResourceIdentifier id) {
-			if (stylesheets.add(component, id)) {
-				context.getApplication().getResourceHandler().markResourceRendered(context, id.getName(), id.getLibrary()); // Prevents future forced additions by libs.
+			ResourceHandler resourceHandler = context.getApplication().getResourceHandler();
+
+			if (resourceHandler.isResourceRendered(context, id.getName(), id.getLibrary())) {
+				componentResourcesToRemove.add(component);
+			}
+			else if (stylesheets.add(component, id)) {
+				resourceHandler.markResourceRendered(context, id.getName(), id.getLibrary()); // Prevents future forced additions by libs.
 			}
 		}
 
