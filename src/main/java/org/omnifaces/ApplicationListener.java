@@ -85,7 +85,7 @@ public class ApplicationListener extends DefaultServletContextListener {
 			FacesViews.addFacesServletMappings(servletContext);
 			GraphicResource.registerGraphicImageBeans();
 			Socket.registerEndpointIfNecessary(servletContext);
-			ViewResourceHandler.addFacesServletMappingIfNecessary(servletContext);
+			ViewResourceHandler.addFacesServletMappingsIfNecessary(servletContext);
 		}
 		catch (Exception | LinkageError e) {
 			throw new IllegalStateException(ERROR_OMNIFACES_INITIALIZATION_FAIL, e);

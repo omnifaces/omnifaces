@@ -27,6 +27,8 @@ import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 
+import org.omnifaces.ApplicationInitializer;
+
 /**
  * This class provides access to (Java EE 6) platform services from the view point of JSF.
  * <p>
@@ -37,6 +39,9 @@ import javax.validation.ValidatorFactory;
  * @author Arjan Tijms
  */
 public final class Platform {
+
+	private static final String DEFAULT_FACES_SERVLET_MAPPING_KEY = "org.omnifaces.DEFAULT_FACES_SERVLET_MAPPING";
+	private static final String DEFAULT_FACES_SERVLET_MAPPING_VALUE = ".xhtml";
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -148,6 +153,29 @@ public final class Platform {
 	public static Collection<String> getFacesServletMappings(ServletContext servletContext) {
 		ServletRegistration facesServlet = getFacesServletRegistration(servletContext);
 		return (facesServlet != null) ? facesServlet.getMappings() : Collections.<String>emptySet();
+	}
+
+	/**
+	 * Determines and returns the default faces servlet mapping. This will loop over {@link #getFacesServletMappings(ServletContext)}
+	 * and pick the first one starting with <code>*.</code> or ending with <code>/*</code>. If JSF is prefix mapped (e.g.
+	 * <code>/faces/*</code>), then this returns the whole path, with a leading slash (e.g. <code>/faces</code>). If JSF
+	 * is suffix mapped (e.g. <code>*.xhtml</code>), then this returns the whole extension (e.g. <code>.xhtml</code>). If
+	 * none is found, then this falls back to <code>.xhtml</code>. This is for the first time determined in
+	 * {@link ApplicationInitializer} and cached in the {@link ServletContext}.
+	 * @return The default faces servlet mapping (without the wildcard).
+	 * @since 3.10
+	 */
+	public static String getDefaultFacesServletMapping(ServletContext servletContext) {
+		String defaultFacesServletMapping = (String) servletContext.getAttribute(DEFAULT_FACES_SERVLET_MAPPING_KEY);
+
+		if (defaultFacesServletMapping == null) {
+			defaultFacesServletMapping = getFacesServletMappings(servletContext).stream()
+				.filter(mapping -> mapping.startsWith("*.") || mapping.endsWith("/*"))
+				.findFirst().orElse(DEFAULT_FACES_SERVLET_MAPPING_VALUE).replace("*", "");
+			servletContext.setAttribute(DEFAULT_FACES_SERVLET_MAPPING_KEY, defaultFacesServletMapping);
+		}
+
+		return defaultFacesServletMapping;
 	}
 
 }

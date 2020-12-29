@@ -35,10 +35,10 @@ public class ViewResourceHandlerIT extends OmniFacesIT {
 	private static final String EXPECTED_XML_PROLOG = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>";
 	private static final String EXPECTED_XML_BODY = ""
 		+ "<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">"
-			+ "<url><loc>http://localhost:8080/ViewResourceHandlerIT/entity.xml?id=1</loc><lastmod>2020-12-22T19:20:10Z</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
-			+ "<url><loc>http://localhost:8080/ViewResourceHandlerIT/entity.xml?id=2</loc><lastmod>2020-12-22</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
-			+ "<url><loc>http://localhost:8080/ViewResourceHandlerIT/entity.xml?id=3</loc><lastmod>2020-12-22T15:20:10</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
-			+ "<url><loc>http://localhost:8080/ViewResourceHandlerIT/entity.xml?id=4</loc><lastmod>2020-12-22T15:20:10-04:00</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
+			+ "<url><loc>http://localhost:8080/ViewResourceHandlerIT/entity.xhtml?id=1</loc><lastmod>2020-12-22T19:20:10Z</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
+			+ "<url><loc>http://localhost:8080/ViewResourceHandlerIT/entity.xhtml?id=2</loc><lastmod>2020-12-22</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
+			+ "<url><loc>http://localhost:8080/ViewResourceHandlerIT/entity.xhtml?id=3</loc><lastmod>2020-12-22T15:20:10</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
+			+ "<url><loc>http://localhost:8080/ViewResourceHandlerIT/entity.xhtml?id=4</loc><lastmod>2020-12-22T15:20:10-04:00</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>"
 		+ "</urlset>";
 
 	@Deployment(testable=false)

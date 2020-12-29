@@ -22,15 +22,20 @@ import static org.omnifaces.taghandler.EnableRestorableView.isRestorableViewRequ
 import static org.omnifaces.util.Components.buildView;
 import static org.omnifaces.util.Components.forEachComponent;
 import static org.omnifaces.util.Components.getClosestParent;
+import static org.omnifaces.util.Faces.isPrefixMapping;
 import static org.omnifaces.util.Faces.responseComplete;
 import static org.omnifaces.util.FacesLocal.getMimeType;
 import static org.omnifaces.util.FacesLocal.getRenderKit;
+import static org.omnifaces.util.FacesLocal.getRequestContextPath;
 import static org.omnifaces.util.FacesLocal.getRequestServletPath;
 import static org.omnifaces.util.FacesLocal.getRequestURIWithQueryString;
+import static org.omnifaces.util.FacesLocal.getServletContext;
 import static org.omnifaces.util.FacesLocal.isAjaxRequest;
 import static org.omnifaces.util.FacesLocal.isDevelopment;
 import static org.omnifaces.util.FacesLocal.isSessionNew;
 import static org.omnifaces.util.FacesLocal.redirectPermanent;
+import static org.omnifaces.util.Platform.getDefaultFacesServletMapping;
+import static org.omnifaces.util.ResourcePaths.stripExtension;
 
 import java.io.IOException;
 import java.util.Map;
@@ -65,7 +70,8 @@ import org.omnifaces.util.Hacks;
  * <li>Since 2.5: If project stage is development, then throw an {@link IllegalStateException} when there's a nested
  * {@link UIForm} component.
  * <li>Since 3.10: If {@link ViewResourceHandler#isViewResourceRequest(FacesContext)} is <code>true</code>, then
- * replace the HTML response writer with a XML response writer.
+ * replace the HTML response writer with a XML response writer in {@link #renderView(FacesContext, UIViewRoot)}, and
+ * ensure that proper action URL is returned in {@link #getActionURL(FacesContext, String)}.
  * </ol>
  *
  * @author Bauke Scholtz
@@ -139,6 +145,17 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 		}
 
 		super.renderView(context, viewToRender);
+	}
+
+	@Override
+	public String getActionURL(FacesContext context, String viewId) {
+		if (isViewResourceRequest(context)) {
+			String defaultMapping = getDefaultFacesServletMapping(getServletContext(context));
+			return getRequestContextPath(context) + (isPrefixMapping(defaultMapping) ? (defaultMapping + viewId) : (stripExtension(viewId) + defaultMapping));
+		}
+		else {
+			return super.getActionURL(context, viewId);
+		}
 	}
 
 	/**

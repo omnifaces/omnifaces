@@ -97,7 +97,7 @@ public class ViewResourceHandler extends DefaultResourceHandler {
 	 * This is invoked by {@link ApplicationListener}, because the faces servlet registration has to be available for adding new mappings.
 	 * @param servletContext The involved servlet context.
 	 */
-	public static void addFacesServletMappingIfNecessary(ServletContext servletContext) {
+	public static void addFacesServletMappingsIfNecessary(ServletContext servletContext) {
 		if (!isViewResourceHandlerRegistered()) {
 			return;
 		}
