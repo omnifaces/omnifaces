@@ -60,7 +60,7 @@
 	<properties>
 
 		<!-- Java versions. -->
-		<javase.version>1.8</javase.version> <!-- Unfortunately, JEE9 has switched back from Java 11 to Java 1.8 during the step from 9.0.0-RC1 to 9.0.0-RC2 -->
+		<javase.version>11</javase.version>
 		<jakartaee.version>9</jakartaee.version>
 
 		<!-- Essential Maven defaults. -->
