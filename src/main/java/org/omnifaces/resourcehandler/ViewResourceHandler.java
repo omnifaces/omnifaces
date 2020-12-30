@@ -32,7 +32,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletRegistration;
 
 import org.omnifaces.ApplicationListener;
-import org.omnifaces.config.FacesConfigXml;
 import org.omnifaces.util.Faces;
 import org.omnifaces.viewhandler.OmniViewHandler;
 
@@ -93,15 +92,11 @@ public class ViewResourceHandler extends DefaultResourceHandler {
 
 	/**
 	 * This will map the {@link FacesServlet} to the URIs specified in {@value org.omnifaces.resourcehandler.ViewResourceHandler#PARAM_NAME_VIEW_RESOURCES}
-	 * context parameter if the {@link ViewResourceHandler} is registered in <code>faces-config.xml</code>.
+	 * context parameter.
 	 * This is invoked by {@link ApplicationListener}, because the faces servlet registration has to be available for adding new mappings.
 	 * @param servletContext The involved servlet context.
 	 */
 	public static void addFacesServletMappingsIfNecessary(ServletContext servletContext) {
-		if (!isViewResourceHandlerRegistered()) {
-			return;
-		}
-
 		String viewResourcesParam = servletContext.getInitParameter(PARAM_NAME_VIEW_RESOURCES);
 
 		if (isEmpty(viewResourcesParam)) {
@@ -121,14 +116,6 @@ public class ViewResourceHandler extends DefaultResourceHandler {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Returns <code>true</code> if the {@link ViewResourceHandler} is registered in <code>faces-config.xml</code>.
-	 * @return <code>true</code> if the {@link ViewResourceHandler} is registered in <code>faces-config.xml</code>.
-	 */
-	public static boolean isViewResourceHandlerRegistered() {
-		return FacesConfigXml.instance().getResourceHandlers().contains(ViewResourceHandler.class);
 	}
 
 	/**

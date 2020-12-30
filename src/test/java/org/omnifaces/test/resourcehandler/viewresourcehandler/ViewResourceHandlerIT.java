@@ -57,10 +57,6 @@ public class ViewResourceHandlerIT extends OmniFacesIT {
 
 	@Test
 	public void test() {
-		if (isTomee()) {
-			return; // SKIPPING because APP_FACES_CONFIG_XML in FacesConfigXmlSingleton unexpectedly returns null during contextInitialized().
-		}
-
 		try {
 			HttpURLConnection connection = (HttpURLConnection) new URL(baseURL + "sitemap.xml").openConnection();
 			assertEquals("Response code", HttpStatus.SC_OK, connection.getResponseCode());

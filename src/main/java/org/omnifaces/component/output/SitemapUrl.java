@@ -13,7 +13,6 @@
 package org.omnifaces.component.output;
 
 import static java.lang.String.format;
-import static org.omnifaces.resourcehandler.ViewResourceHandler.isViewResourceHandlerRegistered;
 import static org.omnifaces.resourcehandler.ViewResourceHandler.isViewResourceRequest;
 import static org.omnifaces.util.Components.getParams;
 import static org.omnifaces.util.Faces.getRequestDomainURL;
@@ -125,9 +124,6 @@ public class SitemapUrl extends OutputFamily {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
-	private static final String ERROR_MISSING_RESOURCE_HANDLER =
-		"The org.omnifaces.resourcehandler.ViewResourceHandler is missing. You need to add it to faces-config.xml.";
-
 	private static final String ERROR_INVALID_REQUEST =
 		"o:sitemapUrl can only be used in a file registered in org.omnifaces.VIEW_RESOURCE_HANDLER_URIS context param.";
 
@@ -155,17 +151,11 @@ public class SitemapUrl extends OutputFamily {
 	/**
 	 * Constructs the {@link SitemapUrl} component.
 	 * @throws IllegalStateException when {@link Application#getProjectStage()} is {@link ProjectStage#Development} and
-	 * the {@link ViewResourceHandler} is not registered in <code>faces-config.xml</code>, or when the current request
-	 * is not for the {@link ViewResourceHandler} at all.
+	 * the current request is not for the {@link ViewResourceHandler} at all.
 	 */
 	public SitemapUrl() {
-		if (isDevelopment()) {
-			if (!isViewResourceHandlerRegistered()) {
-				throw new IllegalStateException(ERROR_MISSING_RESOURCE_HANDLER);
-			}
-			if (!isViewResourceRequest(getFacesContext())) {
-				throw new IllegalStateException(ERROR_INVALID_REQUEST);
-			}
+		if (isDevelopment() && !isViewResourceRequest(getFacesContext())) {
+			throw new IllegalStateException(ERROR_INVALID_REQUEST);
 		}
 
 		setRendererType(null);
