@@ -76,6 +76,9 @@ public final class Hacks {
 	private static final String MYFACES_SERIALIZED_VIEWS = "org.apache.myfaces.application.viewstate.ServerSideStateCacheImpl.SERIALIZED_VIEW";
 	private static final String MYFACES_VIEW_SCOPE_PROVIDER = "org.apache.myfaces.spi.ViewScopeProvider.INSTANCE";
 
+	private static final String MOJARRA_CACHED_SERVLET_MAPPING_KEY = "com.sun.faces.INVOCATION_PATH";
+	private static final String MYFACES_CACHED_SERVLET_MAPPING_KEY = "org.apache.myfaces.shared.application.DefaultViewHandlerSupport.CACHED_SERVLET_MAPPING";
+
 	private static final String ERROR_MAX_AGE =
 		"The '%s' init param must be a number. Encountered an invalid value of '%s'.";
 
@@ -212,6 +215,16 @@ public final class Hacks {
 				view.getAttributes().put(MYFACES_RESOURCE_DEPENDENCY_UNIQUE_ID, FALSE);
 			}
 		}
+	}
+
+	/**
+	 * Clear the cached faces servlet mapping as interpreted by either Mojarra or MyFaces.
+	 * This is useful if you want to force the impl to recalculate the faces servlet mapping.
+	 * @param context The involved faces context.
+	 * @since 3.10
+	 */
+	public static void clearCachedFacesServletMapping(FacesContext context) {
+		context.getAttributes().remove(isMyFacesUsed() ? MYFACES_CACHED_SERVLET_MAPPING_KEY : MOJARRA_CACHED_SERVLET_MAPPING_KEY);
 	}
 
 	//  JSF state saving related --------------------------------------------------------------------------------------

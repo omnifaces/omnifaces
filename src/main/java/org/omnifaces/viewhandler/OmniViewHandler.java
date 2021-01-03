@@ -26,7 +26,6 @@ import static org.omnifaces.util.Faces.isPrefixMapping;
 import static org.omnifaces.util.Faces.responseComplete;
 import static org.omnifaces.util.FacesLocal.getMimeType;
 import static org.omnifaces.util.FacesLocal.getRenderKit;
-import static org.omnifaces.util.FacesLocal.getRequestContextPath;
 import static org.omnifaces.util.FacesLocal.getRequestServletPath;
 import static org.omnifaces.util.FacesLocal.getRequestURIWithQueryString;
 import static org.omnifaces.util.FacesLocal.getServletContext;
@@ -35,7 +34,6 @@ import static org.omnifaces.util.FacesLocal.isDevelopment;
 import static org.omnifaces.util.FacesLocal.isSessionNew;
 import static org.omnifaces.util.FacesLocal.redirectPermanent;
 import static org.omnifaces.util.Platform.getDefaultFacesServletMapping;
-import static org.omnifaces.util.ResourcePaths.stripExtension;
 
 import java.io.IOException;
 import java.util.Map;
@@ -47,7 +45,9 @@ import javax.faces.application.ViewHandlerWrapper;
 import javax.faces.component.UIForm;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.ExternalContext;
+import javax.faces.context.ExternalContextWrapper;
 import javax.faces.context.FacesContext;
+import javax.faces.context.FacesContextWrapper;
 import javax.faces.event.PreDestroyViewMapEvent;
 import javax.faces.render.ResponseStateManager;
 
@@ -142,6 +142,7 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 			externalContext.setResponseCharacterEncoding(characterEncoding);
 			context.setResponseWriter(context.getRenderKit().createResponseWriter(externalContext.getResponseOutputWriter(), contentType, characterEncoding));
 			context.getAttributes().put("facelets.ContentType", contentType); // Work around for MyFaces ignoring the content type set above.
+			Hacks.clearCachedFacesServletMapping(context);
 		}
 
 		super.renderView(context, viewToRender);
@@ -151,7 +152,25 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 	public String getActionURL(FacesContext context, String viewId) {
 		if (isViewResourceRequest(context)) {
 			String defaultMapping = getDefaultFacesServletMapping(getServletContext(context));
-			return getRequestContextPath(context) + (isPrefixMapping(defaultMapping) ? (defaultMapping + viewId) : (stripExtension(viewId) + defaultMapping));
+			boolean prefixMapping = isPrefixMapping(defaultMapping);
+			final String requestPathInfo = prefixMapping ? defaultMapping : null;
+			final String requestServletPath = getRequestServletPath(context) + (prefixMapping ? "" : defaultMapping);
+
+			return super.getActionURL(new FacesContextWrapper(context) {
+				@Override
+				public ExternalContext getExternalContext() {
+					return new ExternalContextWrapper(super.getExternalContext()) {
+						@Override
+						public String getRequestPathInfo() {
+							return requestPathInfo;
+						}
+						@Override
+						public String getRequestServletPath() {
+							return requestServletPath;
+						}
+					};
+				}
+			}, viewId);
 		}
 		else {
 			return super.getActionURL(context, viewId);
