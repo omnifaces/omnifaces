@@ -12,7 +12,9 @@
  */
 package org.omnifaces.resourcehandler;
 
+import static java.lang.String.format;
 import static org.omnifaces.util.FacesLocal.getContextAttribute;
+import static org.omnifaces.util.FacesLocal.getRequest;
 import static org.omnifaces.util.FacesLocal.getRequestServletPath;
 import static org.omnifaces.util.FacesLocal.getResource;
 import static org.omnifaces.util.Platform.getFacesServletRegistration;
@@ -76,6 +78,9 @@ public class ViewResourceHandler extends DefaultResourceHandler {
 	/** The context parameter name to specify URIs to treat as JSF views. */
 	public static final String PARAM_NAME_VIEW_RESOURCES = "org.omnifaces.VIEW_RESOURCE_HANDLER_URIS";
 
+	private static final String ERROR_MISSING_FORWARD_SLASH = "View resource '%s' must start with a forward slash '/'.";
+	private static final String ERROR_UNKNOWN_VIEW_RESOURCE = "View resource '%s' does not exist.";
+
 	private static final Set<String> VIEW_RESOURCES = new HashSet<>();
 	private static final ViewResource VIEW_RESOURCE = new ViewResource() {
 		@Override
@@ -96,7 +101,7 @@ public class ViewResourceHandler extends DefaultResourceHandler {
 	 * This is invoked by {@link ApplicationListener}, because the faces servlet registration has to be available for adding new mappings.
 	 * @param servletContext The involved servlet context.
 	 */
-	public static void addFacesServletMappingsIfNecessary(ServletContext servletContext) {
+	public static void addFacesServletMappingsIfNecessary(ServletContext servletContext) throws MalformedURLException {
 		String viewResourcesParam = servletContext.getInitParameter(PARAM_NAME_VIEW_RESOURCES);
 
 		if (isEmpty(viewResourcesParam)) {
@@ -109,6 +114,14 @@ public class ViewResourceHandler extends DefaultResourceHandler {
 			Collection<String> existingMappings = facesServletRegistration.getMappings();
 
 			for (String viewResource : viewResourcesParam.split("\\s*,\\s*")) {
+				if (!viewResource.startsWith("/")) {
+					throw new IllegalArgumentException(format(ERROR_MISSING_FORWARD_SLASH, viewResource));
+				}
+
+				if (servletContext.getResource(viewResource) == null) {
+					throw new IllegalArgumentException(format(ERROR_UNKNOWN_VIEW_RESOURCE, viewResource));
+				}
+
 				VIEW_RESOURCES.add(viewResource);
 
 				if (!existingMappings.contains(viewResource)) {
@@ -124,7 +137,7 @@ public class ViewResourceHandler extends DefaultResourceHandler {
 	 * @return <code>true</code> if the current HTTP request is requesting for a view resource managed by this resource handler.
 	 */
 	public static boolean isViewResourceRequest(FacesContext context) {
-		return !VIEW_RESOURCES.isEmpty() && getContextAttribute(context, ViewResourceHandler.class.getName(), () -> VIEW_RESOURCES.contains(getRequestServletPath(context)));
+		return !VIEW_RESOURCES.isEmpty() && getContextAttribute(context, ViewResourceHandler.class.getName(), () -> getRequest(context) != null && VIEW_RESOURCES.contains(getRequest(context).getServletPath()));
 	}
 
 	/**
