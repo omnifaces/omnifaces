@@ -85,6 +85,7 @@ public class OmniExternalContext extends ExternalContextWrapper {
 
 	/**
 	 * If {@link ViewResourceHandler#isViewResourceRequest(FacesContext)}, then perform a NOOP, else continue as usual.
+	 * This way we prevent that JSESSIONID path parameter gets appended for nothing.
 	 * @since 3.10
 	 */
 	@Override
