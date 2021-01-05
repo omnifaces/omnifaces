@@ -71,7 +71,7 @@
 		<maven.source.excludeResources>true</maven.source.excludeResources>
 
 		<!-- Test server versions. -->
-		<test.glassfish.version>6.0.0-RC3</test.glassfish.version>
+		<test.glassfish.version>6.0.0</test.glassfish.version>
 		<test.tomcat.version>10.0.0</test.tomcat.version>
 		<test.tomcat.mojarra.version>3.0.0</test.tomcat.mojarra.version>
 		<test.tomcat.myfaces.version>3.0.0-RC1</test.tomcat.myfaces.version> <!-- TODO: JEE9 compatible version (RC1 unfortunately throws IllegalStateException "No Factories configured for this Application" and asks for startup listener to be manually registered)  -->
@@ -123,7 +123,7 @@
 		<dependency>
 			<groupId>jakarta.websocket</groupId>
 			<artifactId>jakarta.websocket-api</artifactId>
-			<version>2.0.0-RC1</version>
+			<version>2.0.0</version>
 			<scope>provided</scope>
 		</dependency>
 
@@ -139,7 +139,7 @@
 		<dependency>
 			<groupId>jakarta.platform</groupId>
 			<artifactId>jakarta.jakartaee-web-api</artifactId>
-			<version>9.0.0-RC3</version>
+			<version>9.0.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -563,7 +563,7 @@
 										<artifactItem>
 											<groupId>org.jboss.weld.servlet</groupId>
 											<artifactId>weld-servlet-shaded</artifactId>
-											<version>4.0.0.Beta5</version>
+											<version>4.0.0.Final</version>
 											<type>jar</type>
 											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
 										</artifactItem>
@@ -606,7 +606,7 @@
 										<artifactItem>
 											<groupId>org.hibernate.validator</groupId>
 											<artifactId>hibernate-validator</artifactId>
-											<version>7.0.0.Alpha6</version>
+											<version>7.0.0.Final</version>
 											<type>jar</type>
 											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
 										</artifactItem>
@@ -650,7 +650,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-resources-plugin</artifactId>
-						<version>3.1.0</version>
+						<version>3.2.0</version>
 						<executions>
 							<execution>
 								<id>update-tomcat-users</id> <!-- Else Tomcat unexpectedly spits error that Arquillian isn't allowed to manage Tomcat. Most probably org.jboss.arquillian.container:arquillian-tomcat-managed-8 should be uptated to support Tomcat 10 but this isn't available (yet). -->
@@ -754,7 +754,7 @@
 										<artifactItem>
 											<groupId>org.jboss.weld.servlet</groupId>
 											<artifactId>weld-servlet-shaded</artifactId>
-											<version>4.0.0.Beta5</version>
+											<version>4.0.0.Final</version>
 											<type>jar</type>
 											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
 										</artifactItem>
@@ -797,7 +797,7 @@
 										<artifactItem>
 											<groupId>org.hibernate.validator</groupId>
 											<artifactId>hibernate-validator</artifactId>
-											<version>7.0.0.Alpha6</version>
+											<version>7.0.0.Final</version>
 											<type>jar</type>
 											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
 										</artifactItem>
@@ -841,7 +841,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-resources-plugin</artifactId>
-						<version>3.1.0</version>
+						<version>3.2.0</version>
 						<executions>
 							<execution>
 								<id>update-tomcat-users</id> <!-- Else Tomcat unexpectedly spits error that Arquillian isn't allowed to manage Tomcat. Most probably org.jboss.arquillian.container:arquillian-tomcat-managed-8 should be uptated to support Tomcat 10 but this isn't available (yet). -->
