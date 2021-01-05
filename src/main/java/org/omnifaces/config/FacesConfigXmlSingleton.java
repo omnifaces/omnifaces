@@ -12,9 +12,7 @@
  */
 package org.omnifaces.config;
 
-import static org.omnifaces.util.Beans.getReference;
-import static org.omnifaces.util.Faces.getServletContext;
-import static org.omnifaces.util.Faces.hasContext;
+import static org.omnifaces.util.Reflection.toClass;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.parseLocale;
 import static org.omnifaces.util.Xml.createDocument;
@@ -34,8 +32,10 @@ import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import jakarta.faces.application.ResourceHandler;
 import jakarta.servlet.ServletContext;
 
+import org.omnifaces.util.Servlets;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -70,6 +70,8 @@ enum FacesConfigXmlSingleton implements FacesConfigXml {
 		"application/locale-config/default-locale";
 	private static final String XPATH_SUPPORTED_LOCALE =
 		"application/locale-config/supported-locale";
+	private static final String XPATH_RESOURCE_HANDLER =
+		"application/resource-handler";
 	private static final String XPATH_VAR =
 		"var";
 	private static final String XPATH_BASE_NAME =
@@ -81,6 +83,7 @@ enum FacesConfigXmlSingleton implements FacesConfigXml {
 
 	private Map<String, String> resourceBundles;
 	private List<Locale> supportedLocales;
+	private List<Class<? extends ResourceHandler>> resourceHandlers;
 
 	// Init -----------------------------------------------------------------------------------------------------------
 
@@ -89,11 +92,12 @@ enum FacesConfigXmlSingleton implements FacesConfigXml {
 	 */
 	private FacesConfigXmlSingleton() {
 		try {
-			ServletContext servletContext = hasContext() ? getServletContext() : getReference(ServletContext.class);
+			ServletContext servletContext = Servlets.getContext();
 			Element facesConfigXml = loadFacesConfigXml(servletContext).getDocumentElement();
 			XPath xpath = XPathFactory.newInstance().newXPath();
 			resourceBundles = parseResourceBundles(facesConfigXml, xpath);
 			supportedLocales = parseSupportedLocales(facesConfigXml, xpath);
+			resourceHandlers = parseResourceHandlers(facesConfigXml, xpath);
 		}
 		catch (Exception e) {
 			throw new IllegalStateException(ERROR_INITIALIZATION_FAIL, e);
@@ -110,6 +114,11 @@ enum FacesConfigXmlSingleton implements FacesConfigXml {
 	@Override
 	public List<Locale> getSupportedLocales() {
 		return supportedLocales;
+	}
+
+	@Override
+	public List<Class<? extends ResourceHandler>> getResourceHandlers() {
+		return resourceHandlers;
 	}
 
 	// Helpers --------------------------------------------------------------------------------------------------------
@@ -170,6 +179,22 @@ enum FacesConfigXmlSingleton implements FacesConfigXml {
 		}
 
 		return Collections.unmodifiableList(supportedLocales);
+	}
+
+	/**
+	 * Create and return a list of all resource handlers in same order as in the given document.
+	 * @throws XPathExpressionException
+	 */
+	private static List<Class<? extends ResourceHandler>> parseResourceHandlers(Element facesConfigXml, XPath xpath) throws XPathExpressionException {
+		List<Class<? extends ResourceHandler>> resourceHandlers = new ArrayList<>();
+		NodeList resourceHandlerNodes = getNodeList(facesConfigXml, xpath, XPATH_RESOURCE_HANDLER);
+
+		for (int i = 0; i < resourceHandlerNodes.getLength(); i++) {
+			Class<? extends ResourceHandler> resourceHandler = toClass(getTextContent(resourceHandlerNodes.item(i)));
+			resourceHandlers.add(resourceHandler);
+		}
+
+		return Collections.unmodifiableList(resourceHandlers);
 	}
 
 }

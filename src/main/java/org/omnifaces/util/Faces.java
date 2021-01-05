@@ -519,7 +519,7 @@ public final class Faces {
 	 * @since 3.1
 	 */
 	public static <T> T getContextAttribute(String name, Supplier<T> computeIfAbsent) {
-		return FacesLocal.getRequestAttribute(getContext(), name, computeIfAbsent);
+		return FacesLocal.getContextAttribute(getContext(), name, computeIfAbsent);
 	}
 
 	/**

@@ -17,6 +17,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import jakarta.faces.application.Application;
+import jakarta.faces.application.ResourceHandler;
 
 import org.omnifaces.cdi.config.FacesConfigXmlProducer;
 
@@ -81,5 +82,14 @@ public interface FacesConfigXml {
 	 * @since 2.2
 	 */
 	List<Locale> getSupportedLocales();
+
+	/**
+	 * Returns an ordered list of all resource handlers registered on this application. This will return an empty list
+	 * if there are no resource handlers definied in <code>faces-config.xml</code>.
+	 * @return An ordered list of all resource handlers registered on this application.
+	 * @see Application#getResourceHandler()
+	 * @since 3.10
+	 */
+	public List<Class<? extends ResourceHandler>> getResourceHandlers();
 
 }

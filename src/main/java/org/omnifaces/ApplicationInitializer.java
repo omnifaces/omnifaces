@@ -15,12 +15,14 @@ package org.omnifaces;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import jakarta.faces.webapp.FacesServlet;
 import jakarta.servlet.ServletContainerInitializer;
 import jakarta.servlet.ServletContext;
 import jakarta.servlet.ServletException;
 
 import org.omnifaces.config.OmniFaces;
 import org.omnifaces.facesviews.FacesViews;
+import org.omnifaces.util.Platform;
 
 /**
  * <p>
@@ -28,6 +30,7 @@ import org.omnifaces.facesviews.FacesViews;
  * This performs the following tasks:
  * <ol>
  * <li>Log OmniFaces version.
+ * <li>Determine the default {@link FacesServlet} mapping.
  * <li>Register {@link FacesViews} forwarding filter.
  * </ol>
  * <p>
@@ -52,6 +55,7 @@ public class ApplicationInitializer implements ServletContainerInitializer {
 		logOmniFacesVersion();
 
 		try {
+			Platform.getDefaultFacesServletMapping(servletContext);
 			FacesViews.registerForwardingFilter(servletContext);
 		}
 		catch (Exception | LinkageError e) {

@@ -55,6 +55,11 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.RequestScoped;
+import jakarta.enterprise.context.spi.Context;
+import jakarta.enterprise.inject.spi.Bean;
+import jakarta.enterprise.inject.spi.BeanManager;
 import jakarta.faces.FactoryFinder;
 import jakarta.faces.application.Application;
 import jakarta.faces.application.ResourceHandler;
@@ -726,6 +731,34 @@ public final class Servlets {
 	}
 
 	// ServletContext -------------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns the servlet context.
+	 * If the JSF context is available, then return it from there.
+	 * Else if the CDI bean manager is available, then return it from there.
+	 * @return The servlet context.
+	 * @since 3.10
+	 * @see Faces#getServletContext()
+	 * @see Beans#getInstance(Bean, boolean)
+	 */
+	public static ServletContext getContext() {
+		if (Faces.hasContext()) {
+			return Faces.getServletContext();
+		}
+
+		BeanManager beanManager = Beans.getManager();
+
+		if (BeansLocal.isActive(beanManager, RequestScoped.class)) {
+			return BeansLocal.getInstance(beanManager, ServletContext.class);
+		}
+		else {
+			// #522 For some reason Weld by default searches for the ServletContext in the request scope.
+			// But this won't work during e.g. startup. So we need to explicitly search in application scope.
+			Bean<ServletContext> bean = BeansLocal.resolve(beanManager, ServletContext.class);
+			Context context = beanManager.getContext(ApplicationScoped.class);
+			return context.get(bean, beanManager.createCreationalContext(bean));
+		}
+	}
 
 	/**
 	 * Returns the application scope attribute value associated with the given name.

@@ -96,17 +96,32 @@ public final class Exceptions {
 	 * @return <code>true</code> if the given exception or one of its nested causes is an instance of the given type.
 	 */
 	public static <T extends Throwable> boolean is(Throwable exception, Class<T> type) {
+		return extract(exception, type) != null;
+	}
+
+	/**
+	 * Returns the first encountered exception of the given type while cascading into the given exception,
+	 * or <code>null</code> if no such exception is found.
+	 * @param <T> The generic throwable type.
+	 * @param exception The exception to be checked.
+	 * @param type The type to be extracted.
+	 * @return The first encountered exception of the given type while cascading into the given exception,
+	 * or <code>null</code> if no such exception is found.
+	 * @since 3.10
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T extends Throwable> T extract(Throwable exception, Class<T> type) {
 		Throwable unwrappedException = exception;
 
 		while (unwrappedException != null) {
 			if (type.isInstance(unwrappedException)) {
-				return true;
+				return (T) unwrappedException;
 			}
 
 			unwrappedException = unwrappedException.getCause();
 		}
 
-		return false;
+		return null;
 	}
 
 }

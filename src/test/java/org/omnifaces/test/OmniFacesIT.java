@@ -223,7 +223,8 @@ public abstract class OmniFacesIT {
 		withCombinedResourceHandler,
 		withMessageBundle,
 		withCDNResourceHandler,
-		withViewExpiredExceptionHandler;
+		withViewExpiredExceptionHandler,
+		withViewResourceHandler;
 	}
 
 	public static enum WebXml {
@@ -236,7 +237,8 @@ public abstract class OmniFacesIT {
 		withSocket,
 		withClientStateSaving,
 		withCDNResources,
-		withInterpretEmptyStringSubmittedValuesAsNull;
+		withInterpretEmptyStringSubmittedValuesAsNull,
+		withViewResources;
 	}
 
 }
