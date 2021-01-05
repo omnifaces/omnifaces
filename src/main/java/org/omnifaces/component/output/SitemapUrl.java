@@ -352,7 +352,7 @@ public class SitemapUrl extends OutputFamily {
 
 	/**
 	 * Sets the value of the "lastmod" element of the sitemap URL.
-	 * @param lastmod The value of the "lastmod" element of the sitemap URL.
+	 * @param lastModified The value of the "lastmod" element of the sitemap URL.
 	 */
 	public void setLastModified(Temporal lastModified) {
 		state.put(PropertyKeys.lastModified, lastModified);
@@ -368,7 +368,7 @@ public class SitemapUrl extends OutputFamily {
 
 	/**
 	 * Sets the value of the "changefreq" element of the sitemap URL.
-	 * @param changefreq The value of the "changefreq" element of the sitemap URL.
+	 * @param changeFrequency The value of the "changefreq" element of the sitemap URL.
 	 */
 	public void setChangeFrequency(ChangeFrequency changeFrequency) {
 		state.put(PropertyKeys.changeFrequency, changeFrequency);
