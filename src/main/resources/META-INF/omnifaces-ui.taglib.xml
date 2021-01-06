@@ -4322,7 +4322,7 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
 			</description>
 			<name>binding</name>
 			<required>false</required>
-			<type>javax.faces.component.UIComponent</type>
+			<type>jakarta.faces.component.UIComponent</type>
 		</attribute>
 		<attribute>
 			<description>
