@@ -142,38 +142,17 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 			externalContext.setResponseCharacterEncoding(characterEncoding);
 			context.setResponseWriter(context.getRenderKit().createResponseWriter(externalContext.getResponseOutputWriter(), contentType, characterEncoding));
 			context.getAttributes().put("facelets.ContentType", contentType); // Work around for MyFaces ignoring the content type set above.
-			Hacks.clearCachedFacesServletMapping(context);
-		}
 
-		super.renderView(context, viewToRender);
-	}
-
-	@Override
-	public String getActionURL(FacesContext context, String viewId) {
-		if (isViewResourceRequest(context)) {
-			String defaultMapping = getDefaultFacesServletMapping(getServletContext(context));
-			boolean prefixMapping = isPrefixMapping(defaultMapping);
-			final String requestPathInfo = prefixMapping ? defaultMapping : null;
-			final String requestServletPath = getRequestServletPath(context) + (prefixMapping ? "" : defaultMapping);
-
-			return super.getActionURL(new FacesContextWrapper(context) {
-				@Override
-				public ExternalContext getExternalContext() {
-					return new ExternalContextWrapper(super.getExternalContext()) {
-						@Override
-						public String getRequestPathInfo() {
-							return requestPathInfo;
-						}
-						@Override
-						public String getRequestServletPath() {
-							return requestServletPath;
-						}
-					};
-				}
-			}, viewId);
+			try {
+				Hacks.clearCachedFacesServletMapping(context);
+				super.renderView(new RenderViewResourceFacesContext(context), viewToRender);
+			}
+			finally {
+				Hacks.clearCachedFacesServletMapping(context);
+			}
 		}
 		else {
-			return super.getActionURL(context, viewId);
+			super.renderView(context, viewToRender);
 		}
 	}
 
@@ -273,4 +252,49 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 		}
 	}
 
+	private static class RenderViewResourceFacesContext extends FacesContextWrapper {
+
+		private final ExternalContext externalContext;
+
+		private RenderViewResourceFacesContext(FacesContext wrapped) {
+			super(wrapped);
+			String defaultMapping = getDefaultFacesServletMapping(getServletContext(getWrapped()));
+			boolean prefixMapping = isPrefixMapping(defaultMapping);
+			String requestPathInfo = prefixMapping ? defaultMapping : null;
+			String requestServletPath = getRequestServletPath(getWrapped()) + (prefixMapping ? "" : defaultMapping);
+			this.externalContext = new RenderViewResourceExternalContext(getWrapped().getExternalContext(), requestPathInfo, requestServletPath);
+		}
+
+		@Override
+		public ExternalContext getExternalContext() {
+			return externalContext;
+		}
+	}
+
+	private static class RenderViewResourceExternalContext extends ExternalContextWrapper {
+
+		private final String requestPathInfo;
+		private final String requestServletPath;
+
+		private RenderViewResourceExternalContext(ExternalContext wrapped, String requestPathInfo, String requestServletPath) {
+			super(wrapped);
+			this.requestPathInfo = requestPathInfo;
+			this.requestServletPath = requestServletPath;
+		}
+
+		@Override
+		public String getRequestPathInfo() {
+			return requestPathInfo;
+		}
+
+		@Override
+		public String getRequestServletPath() {
+			return requestServletPath;
+		}
+
+		@Override
+		public String encodeActionURL(String url) {
+			return super.encodeActionURL(url).replaceAll(";jsessionid=[^&?#]*", "");
+		}
+	}
 }

@@ -24,6 +24,8 @@ import static org.omnifaces.util.Utils.formatURLWithQueryString;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.Temporal;
 import java.util.List;
@@ -231,6 +233,7 @@ public class SitemapUrl extends OutputFamily {
 
 	/**
 	 * Renders the <code>&lt;lastmod&gt;</code> child element with the value of {@link #getLastModified()}, if any.
+	 * It may only encode formats specified in https://www.w3.org/TR/NOTE-datetime
 	 * @param context The involved faces context.
 	 * @throws IOException When an I/O error occurs.
 	 */
@@ -238,8 +241,12 @@ public class SitemapUrl extends OutputFamily {
 		Temporal lastModified = getLastModified();
 
 		if (lastModified != null) {
+			if (lastModified instanceof LocalDateTime) {
+				lastModified = ((LocalDateTime) lastModified).atZone(ZoneId.systemDefault()); // Time zone is required by spec.
+			}
+
 			if (lastModified instanceof ZonedDateTime) {
-				lastModified = ((ZonedDateTime) lastModified).toOffsetDateTime(); // Sitemap "lastmod" doesn't seem to accept zone names in string representation even though it says to be ISO-8601 compliant.
+				lastModified = ((ZonedDateTime) lastModified).toOffsetDateTime(); // Time zone names are not supported by spec.
 			}
 
 			ResponseWriter writer = context.getResponseWriter();
@@ -352,7 +359,7 @@ public class SitemapUrl extends OutputFamily {
 
 	/**
 	 * Sets the value of the "lastmod" element of the sitemap URL.
-	 * @param lastmod The value of the "lastmod" element of the sitemap URL.
+	 * @param lastModified The value of the "lastmod" element of the sitemap URL.
 	 */
 	public void setLastModified(Temporal lastModified) {
 		state.put(PropertyKeys.lastModified, lastModified);
@@ -368,7 +375,7 @@ public class SitemapUrl extends OutputFamily {
 
 	/**
 	 * Sets the value of the "changefreq" element of the sitemap URL.
-	 * @param changefreq The value of the "changefreq" element of the sitemap URL.
+	 * @param changeFrequency The value of the "changefreq" element of the sitemap URL.
 	 */
 	public void setChangeFrequency(ChangeFrequency changeFrequency) {
 		state.put(PropertyKeys.changeFrequency, changeFrequency);

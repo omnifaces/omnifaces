@@ -100,6 +100,7 @@ public class ViewResourceHandler extends DefaultResourceHandler {
 	 * context parameter.
 	 * This is invoked by {@link ApplicationListener}, because the faces servlet registration has to be available for adding new mappings.
 	 * @param servletContext The involved servlet context.
+	 * @throws MalformedURLException When one of the URIs specified in context parameter is malformed.
 	 */
 	public static void addFacesServletMappingsIfNecessary(ServletContext servletContext) throws MalformedURLException {
 		String viewResourcesParam = servletContext.getInitParameter(PARAM_NAME_VIEW_RESOURCES);
