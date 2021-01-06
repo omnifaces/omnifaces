@@ -68,7 +68,6 @@ import org.omnifaces.exceptionhandler.FullAjaxExceptionHandler;
  *     &lt;url-pattern&gt;/*&lt;/url-pattern&gt;
  * &lt;/filter-mapping&gt;
  * </pre>
- * <p>
  *
  * <h3>Error pages</h3>
  * <p>

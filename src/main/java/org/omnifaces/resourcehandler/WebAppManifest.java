@@ -370,6 +370,7 @@ public abstract class WebAppManifest {
 		 * Creates image resource of given resource identifier and sizes.
 		 * @param resourceIdentifier The JSF resource identifier. E.g. <code>library:path/name.png</code>
 		 * @param sizes The supported sizes of this image resource.
+		 * @return Image resource of given resource identifier and sizes.
 		 * @throws NullPointerException When resource identifier is null.
 		 * @throws IllegalArgumentException When resource cannot be found.
 		 */
@@ -474,6 +475,7 @@ public abstract class WebAppManifest {
 		/**
 		 * Creates a size having same width and height of given value.
 		 * @param value The value.
+		 * @return A size having same width and height of given value.
 		 * @throws IllegalArgumentException When value is 0 or less.
 		 */
 		public static Size of(int value) {
@@ -487,6 +489,7 @@ public abstract class WebAppManifest {
 		 * Creates a size of given width and height.
 		 * @param width The width.
 		 * @param height The height.
+		 * @return A size of given width and height.
 		 * @throws IllegalArgumentException When width or height is 0 or less.
 		 */
 		public static Size of(int width, int height) {
@@ -546,6 +549,7 @@ public abstract class WebAppManifest {
 		 * Creates a related application of given platform and URL.
 		 * @param platform The platform on which the application can be found.
 		 * @param url The URL at which the application can be found.
+		 * @return A related application of given platform and URL.
 		 * @throws NullPointerException When platform or url is null.
 		 */
 		public static RelatedApplication of(Platform platform, String url) {
@@ -557,6 +561,7 @@ public abstract class WebAppManifest {
 		 * @param platform The platform on which the application can be found.
 		 * @param url The URL at which the application can be found.
 		 * @param id The ID used to represent the application on the specified platform.
+		 * @return A related application of given platform and URL and ID.
 		 * @throws NullPointerException When platform or url is null.
 		 */
 		public static RelatedApplication of(Platform platform, String url, String id) {

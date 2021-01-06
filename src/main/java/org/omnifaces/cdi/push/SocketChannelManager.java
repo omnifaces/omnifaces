@@ -157,6 +157,13 @@ public class SocketChannelManager implements Serializable {
 
 	/**
 	 * Switch the user on the given channel on the given scope from the given old user to the given new user.
+	 * @param channel The web socket channel.
+	 * @param scope The web socket scope. Supported values are <code>application</code>, <code>session</code> and
+	 * <code>view</code>, case insensitive. If <code>null</code>, the default is <code>application</code>.
+	 * @param oldUser The user object representing the old owner of the given channel. If not <code>null</code>, then scope
+	 * may not be <code>application</code>.
+	 * @param newUser The user object representing the new owner of the given channel. If not <code>null</code>, then scope
+	 * may not be <code>application</code>.
 	 */
 	protected void switchUser(String channel, String scope, Serializable oldUser, Serializable newUser) {
 		if (oldUser != null) {

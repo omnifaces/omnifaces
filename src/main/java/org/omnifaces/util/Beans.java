@@ -219,6 +219,7 @@ public final class Beans {
 
 	/**
 	 * Returns <code>true</code> if given object is actually a CDI proxy.
+	 * @param <T> The generic CDI managed bean type.
 	 * @param object The object to be checked.
 	 * @return <code>true</code> if given object is actually a CDI proxy.
 	 * @since 3.8
@@ -242,6 +243,7 @@ public final class Beans {
 
 	/**
 	 * Returns the actual instance of the given object if it is actually a CDI proxy as per {@link Beans#isProxy(Object)}.
+	 * @param <T> The generic CDI managed bean type.
 	 * @param object The object to be unwrapped.
 	 * @return The actual instance of the given object if it is actually a CDI proxy as per {@link Beans#isProxy(Object)}.
 	 * @since 3.8
