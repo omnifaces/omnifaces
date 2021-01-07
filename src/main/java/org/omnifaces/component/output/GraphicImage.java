@@ -12,7 +12,8 @@
  */
 package org.omnifaces.component.output;
 
-import static java.lang.Boolean.parseBoolean;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_LIBRARY_NAME;
+import static org.omnifaces.config.OmniFaces.OMNIFACES_SCRIPT_NAME;
 import static org.omnifaces.resourcehandler.DefaultResourceHandler.RES_NOT_FOUND;
 import static org.omnifaces.util.FacesLocal.createResource;
 import static org.omnifaces.util.Renderers.writeAttributes;
@@ -30,6 +31,7 @@ import java.util.Map;
 import javax.el.ValueExpression;
 import javax.faces.application.Application;
 import javax.faces.application.Resource;
+import javax.faces.application.ResourceDependency;
 import javax.faces.component.FacesComponent;
 import javax.faces.component.html.HtmlGraphicImage;
 import javax.faces.context.FacesContext;
@@ -43,6 +45,7 @@ import org.omnifaces.resourcehandler.DynamicResource;
 import org.omnifaces.resourcehandler.GraphicResource;
 import org.omnifaces.resourcehandler.GraphicResourceHandler;
 import org.omnifaces.util.Faces;
+import org.omnifaces.util.State;
 
 /**
  * <p>
@@ -52,7 +55,7 @@ import org.omnifaces.util.Faces;
  *
  * <h3>Data URI</h3>
  * <p>
- * Set <code>dataURI</code> attribute to true in order to render image in
+ * Set <code>dataURI</code> attribute to <code>true</code> in order to render image in
  * <a href="https://en.wikipedia.org/wiki/Data_URI_scheme">data URI format</a>.
  * <pre>
  * &lt;o:graphicImage name="icon.png" dataURI="true" /&gt; &lt;!-- JSF resource as data URI --&gt;
@@ -169,6 +172,16 @@ import org.omnifaces.util.Faces;
  * &lt;o:graphicImage value="#{images.get(image.id)}" type="svg" fragment="svgView(viewBox(0,50,200,200))" /&gt;
  * </pre>
  *
+ * <h3>Lazy loading</h3>
+ * <p>
+ * Since OmniFaces 3.10, you can set the <code>lazy</code> attribute to <code>true</code> to indicate that the
+ * referenced image should only be loaded when the window is finished loading and the image is visible in the viewport.
+ * <pre>
+ * &lt;o:graphicImage ... lazy="true" /&gt;
+ * </pre>
+ * <p>
+ * This attribute is <strong>ignored</strong> when the <code>dataURI</code> attribute is set to <code>true</code>.
+ *
  * <h3>Design notes</h3>
  * <p>
  * The bean class name and method name will end up in the image source URL. Although this is technically harmless and
@@ -190,6 +203,7 @@ import org.omnifaces.util.Faces;
  * @see MethodReference
  */
 @FacesComponent(GraphicImage.COMPONENT_TYPE)
+@ResourceDependency(library=OMNIFACES_LIBRARY_NAME, name=OMNIFACES_SCRIPT_NAME, target="head") // Specifically graphicimage.js.
 public class GraphicImage extends HtmlGraphicImage {
 
 	// Constants ------------------------------------------------------------------------------------------------------
@@ -197,6 +211,16 @@ public class GraphicImage extends HtmlGraphicImage {
 	public static final String COMPONENT_TYPE = "org.omnifaces.component.output.GraphicImage";
 	protected static final Map<String, String> ATTRIBUTE_NAMES = collectAttributeNames();
 	private static final String ERROR_MISSING_VALUE = "o:graphicImage 'value' attribute is required.";
+
+	private enum PropertyKeys {
+		// Cannot be uppercased. They have to exactly match the attribute names.
+		dataURI,
+		lazy;
+	}
+
+	// Variables ------------------------------------------------------------------------------------------------------
+
+	private final State state = new State(getStateHelper());
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -214,7 +238,19 @@ public class GraphicImage extends HtmlGraphicImage {
 		ResponseWriter writer = context.getResponseWriter();
 		writer.startElement("img", this);
 		writeIdAttributeIfNecessary(writer, this);
-		writer.writeAttribute("src", getSrc(context), "value"); // writeURIAttribute kills URL fragment identifiers.
+
+		String src = getSrc(context);
+		boolean lazy = isLazy() && !isDataURI();
+
+		if (lazy) {
+			writer.writeAttribute("src", "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E", null);
+			writer.writeAttribute("data-src", src, "value");
+			writer.writeAttribute("data-lazy", "true", "lazy");
+		}
+		else {
+			writer.writeAttribute("src", src, "value"); // h:graphicImage uses writeURIAttribute(), but it kills URL fragment identifiers, so we use writeAttribute() instead.
+		}
+
 		writeAttributes(writer, this, GraphicImage.ATTRIBUTE_NAMES);
 	}
 
@@ -232,7 +268,7 @@ public class GraphicImage extends HtmlGraphicImage {
 	 */
 	protected String getSrc(FacesContext context) throws IOException {
 		String name = (String) getAttributes().get("name");
-		boolean dataURI = parseBoolean(String.valueOf(getAttributes().get("dataURI")));
+		boolean dataURI = isDataURI();
 
 		Resource resource;
 
@@ -286,6 +322,8 @@ public class GraphicImage extends HtmlGraphicImage {
 		}
 	}
 
+	// Attribute getters/setters --------------------------------------------------------------------------------------
+
 	/**
 	 * Returns an empty string as default value instead of <code>null</code>, so that the attribute is always rendered,
 	 * as mandated by HTML5.
@@ -295,12 +333,48 @@ public class GraphicImage extends HtmlGraphicImage {
 		return coalesce(super.getAlt(), "");
 	}
 
+	/**
+	 * Returns whether or not to render image in data URI format.
+	 * @return Whether or not to render image in data URI format.
+	 * @since 3.10
+	 */
+	public boolean isDataURI() {
+		return state.get(PropertyKeys.dataURI, false);
+	}
+
+	/**
+	 * Sets whether or not to render image in data URI format.
+	 * @param dataURI Whether or not to render image in data URI format.
+	 * @since 3.10
+	 */
+	public void setDataURI(String dataURI) {
+		state.put(PropertyKeys.dataURI, dataURI);
+	}
+
+	/**
+	 * Returns whether or not to lazily load image.
+	 * @return Whether or not to lazily load image.
+	 * @since 3.10
+	 */
+	public boolean isLazy() {
+		return state.get(PropertyKeys.lazy, false);
+	}
+
+	/**
+	 * Sets whether or not to lazily load image.
+	 * @param multiple Whether or not to lazily load image.
+	 * @since 3.10
+	 */
+	public void setLazy(boolean lazy) {
+		state.put(PropertyKeys.lazy, lazy);
+	}
+
 	// Helpers --------------------------------------------------------------------------------------------------------
 
 	private static Map<String, String> collectAttributeNames() {
 		Map<String, String> attributeNames = new HashMap<>();
 
-		for (PropertyKeys propertyKey : PropertyKeys.values()) {
+		for (HtmlGraphicImage.PropertyKeys propertyKey : HtmlGraphicImage.PropertyKeys.values()) {
 			String name = propertyKey.name();
 			attributeNames.put(name, "styleClass".equals(name) ? "class" : propertyKey.toString());
 		}
