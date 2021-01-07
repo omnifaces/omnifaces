@@ -173,7 +173,7 @@ public class Url extends OutputFamily {
 	public void encodeEnd(FacesContext context) throws IOException {
 		String value = getValue();
 		Map<String, List<String>> params = getParams(this, isIncludeRequestParams(), isIncludeViewParams());
-		String url = (value != null) ? formatURLWithQueryString(value, toQueryString(params)) : getBookmarkableURLWithDomain(context, params);
+		String url = (value != null) ? context.getExternalContext().encodeResourceURL(formatURLWithQueryString(value, toQueryString(params))) : getBookmarkableURLWithDomain(context, params);
 
 		if (getVar() != null) {
 			setRequestAttribute(context, getVar(), url);

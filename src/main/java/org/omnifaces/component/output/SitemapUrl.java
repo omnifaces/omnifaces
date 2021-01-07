@@ -212,7 +212,7 @@ public class SitemapUrl extends OutputFamily {
 		String loc;
 
 		if (value != null) {
-			loc = formatURLWithQueryString(value, toQueryString(params));
+			loc = context.getExternalContext().encodeResourceURL(formatURLWithQueryString(value, toQueryString(params)));
 		}
 		else {
 			String viewId = getViewId();
