@@ -199,7 +199,6 @@ import org.omnifaces.util.Hacks;
  *
  * @author Bauke Scholtz
  * @see FullAjaxExceptionHandlerFactory
- * @see DefaultExceptionHandlerFactory
  * @see OmniPartialViewContext
  * @see OmniPartialViewContextFactory
  * @see WebXml
