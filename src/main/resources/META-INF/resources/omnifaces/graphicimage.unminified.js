@@ -26,6 +26,12 @@ OmniFaces.GraphicImage = (function(Util, window, document) {
 	 * Load lazy images rendered by o:graphicImage.
 	 */
 	function initLazyImages() {
+		var lazyImages = getLazyImages();
+		
+		if (lazyImages.length == 0) {
+			return;
+		}
+
 		if (window.IntersectionObserver) { // https://caniuse.com/?search=IntersectionObserver
 			var lazyImageObserver = new IntersectionObserver(function(entries) {
 				entries.forEach(function(entry) {
@@ -37,7 +43,7 @@ OmniFaces.GraphicImage = (function(Util, window, document) {
 				});
 			});
 
-			getLazyImages().forEach(function(img) {
+			lazyImages.forEach(function(img) {
 				lazyImageObserver.observe(img);
 			});
 		}
