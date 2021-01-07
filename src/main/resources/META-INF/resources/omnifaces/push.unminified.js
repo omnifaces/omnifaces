@@ -70,7 +70,7 @@ OmniFaces.Push = (function(Util, window) {
 
 			socket = new WebSocket(url);
 
-			socket.onopen = function(event) {
+			socket.onopen = function() {
 				if (reconnectAttempts == null) {
 					onopen(channel);
 				}
