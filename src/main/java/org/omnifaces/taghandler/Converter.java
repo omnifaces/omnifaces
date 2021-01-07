@@ -18,6 +18,11 @@ import static org.omnifaces.taghandler.DeferredTagHandlerHelper.getValueExpressi
 import java.io.IOException;
 import java.io.Serializable;
 
+import org.omnifaces.cdi.converter.ConverterManager;
+import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredAttributes;
+import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandler;
+import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDelegate;
+
 import jakarta.el.ELContext;
 import jakarta.el.ValueExpression;
 import jakarta.faces.component.UIComponent;
@@ -30,11 +35,6 @@ import jakarta.faces.view.facelets.ConverterHandler;
 import jakarta.faces.view.facelets.FaceletContext;
 import jakarta.faces.view.facelets.TagAttribute;
 import jakarta.faces.view.facelets.TagHandlerDelegate;
-
-import org.omnifaces.cdi.converter.ConverterManager;
-import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredAttributes;
-import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandler;
-import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDelegate;
 
 /**
  * <p>
@@ -56,7 +56,7 @@ import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDeleg
  * </pre>
  * <p>
  * The converter ID of all standard JSF converters can be found in
- * <a href="https://jakarta.ee/specifications/platform/8/apidocs/javax/faces/convert/package-summary.html">their javadocs</a>.
+ * <a href="https://jakarta.ee/specifications/platform/9/apidocs/jakarta/faces/convert/package-summary.html">their javadocs</a>.
  * First go to the javadoc of the class of interest, then go to <code>CONVERTER_ID</code> in its field summary
  * and finally click the Constant Field Values link to see the value.
  *

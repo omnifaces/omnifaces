@@ -29,6 +29,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.omnifaces.component.messages.OmniMessages;
+
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.application.FacesMessage.Severity;
 import jakarta.faces.component.UIComponent;
@@ -38,8 +40,6 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.ResponseWriter;
 import jakarta.faces.render.FacesRenderer;
 import jakarta.faces.render.Renderer;
-
-import org.omnifaces.component.messages.OmniMessages;
 
 /**
  * This renderer is the default renderer of {@link OmniMessages}. It's basically copypasted from Mojarra 2.2,
@@ -191,7 +191,7 @@ public class MessagesRenderer extends Renderer {
 	protected void encodeEmptyMessages(FacesContext context, OmniMessages component) throws IOException {
 		String id = component.getId();
 
-		if (!isOneOf(id, null, "javax_faces_developmentstage_messages")) {
+		if (!isOneOf(id, null, "jakarta_faces_developmentstage_messages")) {
 			ResponseWriter writer = context.getResponseWriter();
 			writer.startElement("div", component);
 			writeAttribute(writer, "id", component.getClientId(context));
