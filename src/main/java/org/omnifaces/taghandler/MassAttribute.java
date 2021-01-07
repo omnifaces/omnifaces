@@ -13,6 +13,8 @@
 package org.omnifaces.taghandler;
 
 import static java.lang.String.format;
+import static org.omnifaces.util.Utils.csvToList;
+import static org.omnifaces.util.Utils.isOneInstanceOf;
 import static org.omnifaces.util.Utils.unmodifiableSet;
 
 import java.io.IOException;
@@ -75,6 +77,8 @@ import javax.faces.view.facelets.TagHandler;
  *     &lt;h:inputText id="input3" /&gt;
  * &lt;/o:massAttribute&gt;
  * </pre>
+ * <p>
+ * Since OmniFaces 3.10, the <code>target</code> attribute supports a commaseparated string.
  *
  * @author Bauke Scholtz
  * @since 1.8
@@ -94,7 +98,7 @@ public class MassAttribute extends TagHandler {
 
 	private String name;
 	private TagAttribute value;
-	private Class<UIComponent> targetClass;
+	private Class<UIComponent>[] targetClasses;
 
 	// Constructors ---------------------------------------------------------------------------------------------------
 
@@ -115,21 +119,26 @@ public class MassAttribute extends TagHandler {
 		TagAttribute target = getAttribute("target");
 
 		if (target != null) {
-			String className = target.getValue();
-			Class<?> cls = null;
+			List<String> classNames = csvToList(target.getValue());
+			targetClasses = new Class[classNames.size()];
 
-			try {
-				cls = Class.forName(className);
-			}
-			catch (ClassNotFoundException e) {
-				throw new IllegalArgumentException(format(ERROR_UNAVAILABLE_TARGET, className), e);
-			}
+			for (int i = 0; i < classNames.size(); i++) {
+				String className = classNames.get(i);
+				Class<?> cls = null;
 
-			if (!UIComponent.class.isAssignableFrom(cls)) {
-				throw new IllegalArgumentException(format(ERROR_INVALID_TARGET, cls));
-			}
+				try {
+					cls = Class.forName(className);
+				}
+				catch (ClassNotFoundException e) {
+					throw new IllegalArgumentException(format(ERROR_UNAVAILABLE_TARGET, className), e);
+				}
 
-			targetClass = (Class<UIComponent>) cls;
+				if (!UIComponent.class.isAssignableFrom(cls)) {
+					throw new IllegalArgumentException(format(ERROR_INVALID_TARGET, cls));
+				}
+
+				targetClasses[i] = (Class<UIComponent>) cls;
+			}
 		}
 	}
 
@@ -149,7 +158,7 @@ public class MassAttribute extends TagHandler {
 
 	private void applyMassAttribute(FaceletContext context, List<UIComponent> children) {
 		for (UIComponent component : children) {
-			if ((targetClass == null || targetClass.isAssignableFrom(component.getClass())) && component.getValueExpression(name) == null) {
+			if ((targetClasses == null || isOneInstanceOf(component.getClass(), targetClasses)) && component.getValueExpression(name) == null) {
 				Object literalValue = component.getAttributes().get(name);
 
 				if (literalValue == null || literalValue instanceof Boolean) {

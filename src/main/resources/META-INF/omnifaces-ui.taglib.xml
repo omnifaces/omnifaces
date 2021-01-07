@@ -5287,7 +5287,7 @@ public enum Baz {
 				<![CDATA[
 					The FQN (fully qualified name) of the specific <code>UIComponent</code> (super)class for which the
 					attribute should be set. For example, <code>javax.faces.component.UIInput</code> which has the
-					<code>valid</code> property.
+					<code>valid</code> property. Since OmniFaces 3.10, this value can be a comma separated string of FQNs.
 				]]>
 			</description>
 			<name>target</name>
