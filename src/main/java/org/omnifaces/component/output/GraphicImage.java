@@ -360,7 +360,7 @@ public class GraphicImage extends HtmlGraphicImage {
 
 	/**
 	 * Sets whether or not to lazily load image.
-	 * @param multiple Whether or not to lazily load image.
+	 * @param lazy Whether or not to lazily load image.
 	 * @since 3.10
 	 */
 	public void setLazy(boolean lazy) {
