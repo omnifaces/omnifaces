@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 
-    Copyright 2020 OmniFaces
+    Copyright 2021 OmniFaces
 
     Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
     the License. You may obtain a copy of the License at
@@ -3921,6 +3921,18 @@ If <code>#{bean.bar}</code> is any other value, then it will appear in the hash 
 		<attribute>
 			<description>
 				<![CDATA[
+					When set to <code>true</code> then the referenced image will only be loaded when the window is finished
+					loading and the image is visible in the viewport.
+					This attribute is ignored when 'dataURI' attribute is specified.
+				]]>
+			</description>
+			<name>lazy</name>
+			<required>false</required>
+			<type>boolean</type>
+		</attribute>
+		<attribute>
+			<description>
+				<![CDATA[
 					The image type, represented as file extension. E.g. "jpg", "png", "gif", "ico", "svg", "bmp", "tiff", etc.
 					This attribute is ignored when 'name' attribute is specified.
 				]]>
@@ -5288,7 +5300,7 @@ public enum Baz {
 				<![CDATA[
 					The FQN (fully qualified name) of the specific <code>UIComponent</code> (super)class for which the
 					attribute should be set. For example, <code>jakarta.faces.component.UIInput</code> which has the
-					<code>valid</code> property.
+					<code>valid</code> property. Since OmniFaces 3.10, this value can be a comma separated string of FQNs.
 				]]>
 			</description>
 			<name>target</name>
@@ -6193,7 +6205,7 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 					channel name and the raw <code>CloseEvent</code> itself. Note that this will not be invoked on final close of the
 					web socket, even when the final close is caused by an error. See also
 					<a href="https://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and
-					<a href="https://javaee.github.io/javaee-spec/javadocs/javax/websocket/CloseReason.CloseCodes.html">CloseCodes</a>
+					<a href="https://jakarta.ee/specifications/platform/9/apidocs/jakarta/websocket/closereason.closecodes">CloseCodes</a>
 					API for an elaborate list of all close codes.
 				]]>
 			</description>
@@ -6210,7 +6222,7 @@ String name2 = Faces.getRequestParameter("name2"); // value2
 					error and that you can inspect the close reason code if an actual connection error occurred and which one (i.e.
 					when the code is not 1000 or 1008). See also
 					<a href="https://tools.ietf.org/html/rfc6455#section-7.4.1">RFC 6455 section 7.4.1</a> and
-					<a href="https://javaee.github.io/javaee-spec/javadocs/javax/websocket/CloseReason.CloseCodes.html">CloseCodes</a>
+					<a href="https://jakarta.ee/specifications/platform/9/apidocs/jakarta/websocket/closereason.closecodes">CloseCodes</a>
 					API for an elaborate list of all close codes.
 				]]>
 			</description>

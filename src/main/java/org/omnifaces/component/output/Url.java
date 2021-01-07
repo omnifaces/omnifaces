@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 OmniFaces
+ * Copyright 2021 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -173,7 +173,7 @@ public class Url extends OutputFamily {
 	public void encodeEnd(FacesContext context) throws IOException {
 		String value = getValue();
 		Map<String, List<String>> params = getParams(this, isIncludeRequestParams(), isIncludeViewParams());
-		String url = (value != null) ? formatURLWithQueryString(value, toQueryString(params)) : getBookmarkableURLWithDomain(context, params);
+		String url = (value != null) ? context.getExternalContext().encodeResourceURL(formatURLWithQueryString(value, toQueryString(params))) : getBookmarkableURLWithDomain(context, params);
 
 		if (getVar() != null) {
 			setRequestAttribute(context, getVar(), url);

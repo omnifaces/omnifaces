@@ -270,6 +270,7 @@
 								<jsSourceFile>hashparam.unminified.js</jsSourceFile>
 								<jsSourceFile>scriptparam.unminified.js</jsSourceFile>
 								<jsSourceFile>sw-register.unminified.js</jsSourceFile>
+								<jsSourceFile>graphicimage.unminified.js</jsSourceFile>
 							</jsSourceFiles>
 							<jsFinalFile>omnifaces.js</jsFinalFile>
 						</configuration>

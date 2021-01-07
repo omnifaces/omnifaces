@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 OmniFaces
+ * Copyright 2021 OmniFaces
  *
  * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with
  * the License. You may obtain a copy of the License at
@@ -140,8 +140,8 @@ public class OmniViewHandler extends ViewHandlerWrapper {
 			ExternalContext externalContext = context.getExternalContext();
 			externalContext.setResponseContentType(contentType);
 			externalContext.setResponseCharacterEncoding(characterEncoding);
-			context.setResponseWriter(context.getRenderKit().createResponseWriter(externalContext.getResponseOutputWriter(), contentType, characterEncoding));
-			context.getAttributes().put("facelets.ContentType", contentType); // Work around for MyFaces ignoring the content type set above.
+			context.setResponseWriter(context.getRenderKit().createResponseWriter(externalContext.getResponseOutputWriter(), XML_CONTENT_TYPE, characterEncoding));
+			context.getAttributes().put("facelets.ContentType", contentType); // Work around for MyFaces ignoring the setResponseContentType.
 
 			try {
 				Hacks.clearCachedFacesServletMapping(context);
