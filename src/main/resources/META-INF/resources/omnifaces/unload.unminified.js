@@ -19,7 +19,7 @@
  * @see org.omnifaces.cdi.ViewScopeManager
  * @since 2.2
  */
-OmniFaces.Unload = (function(Util, navigator, window, document) {
+OmniFaces.Unload = (function(Util, navigator, window) {
 
 	// Private static fields ------------------------------------------------------------------------------------------
 
@@ -105,4 +105,4 @@ OmniFaces.Unload = (function(Util, navigator, window, document) {
 
 	return self;
 
-})(OmniFaces.Util, navigator, window, document);
+})(OmniFaces.Util, navigator, window);

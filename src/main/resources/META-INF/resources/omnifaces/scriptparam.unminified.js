@@ -17,7 +17,7 @@
  * @see org.omnifaces.component.input.ScriptParam
  * @since 3.6
  */
-OmniFaces.ScriptParam = (function(Util, window, document) {
+OmniFaces.ScriptParam = (function(Util) {
 
 	// Private static fields ------------------------------------------------------------------------------------------
 
@@ -66,4 +66,4 @@ OmniFaces.ScriptParam = (function(Util, window, document) {
 
 	return self;
 
-})(OmniFaces.Util, window, document);
+})(OmniFaces.Util);

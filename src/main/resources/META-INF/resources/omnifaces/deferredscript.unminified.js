@@ -17,7 +17,7 @@
  * @see org.omnifaces.component.script.DeferredScript
  * @since 1.8
  */
-OmniFaces.DeferredScript = (function(Util, document) {
+OmniFaces.DeferredScript = (function(Util) {
 
 	// Private static fields ------------------------------------------------------------------------------------------
 
@@ -71,4 +71,4 @@ OmniFaces.DeferredScript = (function(Util, document) {
 
 	return self;
 
-})(OmniFaces.Util, document);
+})(OmniFaces.Util);

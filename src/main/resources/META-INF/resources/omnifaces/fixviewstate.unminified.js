@@ -135,7 +135,7 @@ OmniFaces.FixViewState = (function(window, document) {
 	}
 
 	if (window.jQuery) { // jQuery ajax API present?
-		jQuery(document).ajaxComplete(function(event, xhr, options) {
+		jQuery(document).ajaxComplete(function(event, xhr) {
 			if (typeof xhr !== "undefined") {
 				self.apply(xhr.responseXML);
 			}
