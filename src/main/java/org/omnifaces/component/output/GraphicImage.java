@@ -238,11 +238,9 @@ public class GraphicImage extends HtmlGraphicImage {
 		ResponseWriter writer = context.getResponseWriter();
 		writer.startElement("img", this);
 		writeIdAttributeIfNecessary(writer, this);
-
 		String src = getSrc(context);
-		boolean lazy = isLazy() && !isDataURI();
 
-		if (lazy) {
+		if (isLazy() && !isDataURI()) {
 			writer.writeAttribute("src", "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E", null);
 			writer.writeAttribute("data-src", src, "value");
 			writer.writeAttribute("data-lazy", "true", "lazy");
