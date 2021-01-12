@@ -16,12 +16,12 @@ branches:
 
 # Do integration test on configured servers.
 env:
-   - SERVER=glassfish
+   - SERVER=wildfly
    - SERVER=tomcat-mojarra
 #  - SERVER=tomcat-myfaces
-   - SERVER=wildfly
 #  - SERVER=tomee
 #  - SERVER=payara
+#  - SERVER=glassfish
 script: mvn verify -Dmaven.javadoc.skip=true -P $SERVER
 
 # Do snapshot deployment.
@@ -31,7 +31,7 @@ deploy:
    skip_cleanup: true
    on:
       all_branches: true
-      condition: "$SERVER = glassfish"
+      condition: "$SERVER = wildfly"
 
 # Do static analysis on Sonar.
 addons:
