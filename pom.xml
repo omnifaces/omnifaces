@@ -333,6 +333,7 @@
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>3.2.0</version>
 				<configuration>
+					<javadocExecutable>${java.home}/bin/javadoc</javadocExecutable>
 					<javadocVersion>${javase.version}</javadocVersion>
 					<notimestamp>true</notimestamp>
 					<splitindex>true</splitindex>
