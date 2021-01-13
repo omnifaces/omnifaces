@@ -18,7 +18,7 @@ branches:
 env:
    - SERVER=wildfly
    - SERVER=tomcat-mojarra
-#  - SERVER=tomcat-myfaces
+   - SERVER=tomcat-myfaces
 #  - SERVER=tomee
 #  - SERVER=payara
 #  - SERVER=glassfish
