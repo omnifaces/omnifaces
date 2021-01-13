@@ -112,7 +112,7 @@ public class MultiViewsIT extends OmniFacesIT {
 			verify200("MultiViewsIT", "MultiViewsITNonExistingPage/", "MultiViewsITNonExistingPage", "");
 		}
 
-		if (!isTomee()) { // MyFaces throws NPE on this and thus incorrectly returns 500 instead of 404.
+		if (!isMyFaces()) { // MyFaces throws NPE on this and thus incorrectly returns 500 instead of 404.
 			open("MultiViewsITNonExistingPage.xhtml");
 			verify404("MultiViewsITNonExistingPage.xhtml");
 		}

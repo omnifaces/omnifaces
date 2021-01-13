@@ -58,11 +58,6 @@ public class SkipValidatorsIT extends OmniFacesIT {
 		assertEquals("", message.getText());
 		assertEquals("false", validationFailed.getText());
 
-		if (isTomee()) {
-			System.out.println("SKIPPING o:skipValidators IT due to some MyFaces bug"); // TODO: investigate.
-			return;
-		}
-
 		guardAjax(toggleRequired).click();
 		assertEquals("", message.getText());
 		assertEquals("false", validationFailed.getText());
