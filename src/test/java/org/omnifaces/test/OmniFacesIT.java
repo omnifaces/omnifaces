@@ -29,6 +29,7 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.openqa.selenium.JavascriptExecutor;
@@ -117,12 +118,12 @@ public abstract class OmniFacesIT {
 		return "wildfly".equals(System.getProperty("profile.id"));
 	}
 
-	protected static boolean isTomee() {
-		return "tomee".equals(System.getProperty("profile.id"));
-	}
-
 	protected static boolean isMojarra() {
 		return isOneOf(System.getProperty("profile.id"), "glassfish", "wildfly", "payara", "tomcat-mojarra");
+	}
+
+	protected static boolean isMyFaces() {
+		return isOneOf(System.getProperty("profile.id"), "tomee", "tomcat-myfaces");
 	}
 
 	protected static <T extends OmniFacesIT> WebArchive createWebArchive(Class<T> testClass) {
@@ -149,6 +150,19 @@ public abstract class OmniFacesIT {
 				.deleteClass(testClass)
 				.addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
 				.addAsLibrary(new File(System.getProperty("omnifaces.jar")));
+
+			if ("tomcat-myfaces".equals(System.getProperty("profile.id"))) {
+				String myFacesVersion = System.getProperty("test.tomcat.myfaces.version");
+				String weldVersion = System.getProperty("test.tomcat.weld.version");
+				String hibernateValidatorVersion = System.getProperty("test.tomcat.hibernate.validator.version");
+
+				archive.addAsLibraries(Maven.resolver().resolve(
+					"org.apache.myfaces.core:myfaces-api:" + myFacesVersion,
+					"org.apache.myfaces.core:myfaces-impl:" + myFacesVersion,
+					"org.jboss.weld.servlet:weld-servlet-shaded:" + weldVersion,
+					"org.hibernate.validator:hibernate-validator:" + hibernateValidatorVersion
+				).withTransitivity().asFile());
+			}
 
 			addWebResources(new File(testClass.getClassLoader().getResource(packageName).getFile()), "");
 		}

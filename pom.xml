@@ -73,8 +73,10 @@
 		<!-- Test server versions. -->
 		<test.wildfly.version>22.0.0.Beta1</test.wildfly.version>
 		<test.tomcat.version>10.0.0</test.tomcat.version>
+		<test.tomcat.weld.version>4.0.0.Final</test.tomcat.weld.version>
+		<test.tomcat.hibernate.validator.version>7.0.0.Final</test.tomcat.hibernate.validator.version>
 		<test.tomcat.mojarra.version>3.0.0</test.tomcat.mojarra.version>
-		<test.tomcat.myfaces.version>3.0.0-RC1</test.tomcat.myfaces.version> <!-- TODO: JEE9 compatible version (RC1 unfortunately throws IllegalStateException "No Factories configured for this Application" and asks for startup listener to be manually registered)  -->
+		<test.tomcat.myfaces.version>3.0.0-RC1</test.tomcat.myfaces.version>
 		<test.tomee.version>9.0.0-M3</test.tomee.version> <!-- TODO: JEE9 compatible version which supports jakarta.ee XML namespace (M3 unfortunately doesn't support it yet, it still throws jakarta.xml.bind.UnmarshalException: unexpected element (uri:"https://jakarta.ee/xml/ns/jakartaee", local:"web-fragment")) -->
 		<test.payara.version>5.2020.4</test.payara.version> <!-- TODO: JEE9 compatible version -->
 		<test.glassfish.version>6.0.0</test.glassfish.version> <!-- TODO: Java11 compatible version. -->
@@ -84,12 +86,12 @@
 		<repository>
 			<id>jakarta-staging</id>
 			<snapshots />
-			<url>https://jakarta.oss.sonatype.org/content/repositories/staging</url> <!-- Currently only used for jersey-bom:pom:3.0.0-M4 which is required by GlassFish 6.0.0-RC2 -->
+			<url>https://jakarta.oss.sonatype.org/content/repositories/staging</url> <!-- Currently only used for jersey-bom:pom:3.0.0-M4 which is required by GlassFish 6.0.0 -->
 		</repository>
 		<repository>
 			<id>redhat-all</id>
 			<snapshots />
-			<url>https://maven.repository.redhat.com/techpreview/all</url> <!-- Currently only used for org.picketbox:picketbox:jar:5.0.3.Final-redhat-00006 which is required by WildFly 22.0.0.Alpha1 -->
+			<url>https://maven.repository.redhat.com/techpreview/all</url> <!-- Currently only used for org.picketbox:picketbox:jar:5.0.3.Final-redhat-00006 which is required by WildFly 22.0.0.Beta1 -->
 		</repository>
 	</repositories>
 
@@ -563,7 +565,7 @@
 										<artifactItem>
 											<groupId>org.jboss.weld.servlet</groupId>
 											<artifactId>weld-servlet-shaded</artifactId>
-											<version>4.0.0.Final</version>
+											<version>${test.tomcat.weld.version}</version>
 											<type>jar</type>
 											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
 										</artifactItem>
@@ -606,7 +608,7 @@
 										<artifactItem>
 											<groupId>org.hibernate.validator</groupId>
 											<artifactId>hibernate-validator</artifactId>
-											<version>7.0.0.Final</version>
+											<version>${test.tomcat.hibernate.validator.version}</version>
 											<type>jar</type>
 											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
 										</artifactItem>
@@ -653,7 +655,7 @@
 						<version>3.2.0</version>
 						<executions>
 							<execution>
-								<id>update-tomcat-users</id> <!-- Else Tomcat unexpectedly spits error that Arquillian isn't allowed to manage Tomcat. Most probably org.jboss.arquillian.container:arquillian-tomcat-managed-8 should be uptated to support Tomcat 10 but this isn't available (yet). -->
+								<id>update-tomcat-users</id> <!-- Else Tomcat unexpectedly spits error that Arquillian isn't allowed to manage Tomcat. Most probably org.jboss.arquillian.container:arquillian-tomcat-managed-8 should be updated to support Tomcat 10 but this isn't available (yet). -->
 								<phase>pre-integration-test</phase>
 								<goals>
 									<goal>copy-resources</goal>
@@ -718,49 +720,7 @@
 									</artifactItems>
 								</configuration>
 							</execution>
-							<execution>
-								<id>install-myfaces-in-tomcat</id>
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>copy</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>org.apache.myfaces.core</groupId>
-											<artifactId>myfaces-api</artifactId>
-											<version>${test.tomcat.myfaces.version}</version>
-											<type>jar</type>
-											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>org.apache.myfaces.core</groupId>
-											<artifactId>myfaces-impl</artifactId>
-											<version>${test.tomcat.myfaces.version}</version>
-											<type>jar</type>
-											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
-										</artifactItem>
-									</artifactItems>
-								</configuration>
-							</execution>
-							<execution>
-								<id>install-cdi-in-tomcat</id>
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>copy</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>org.jboss.weld.servlet</groupId>
-											<artifactId>weld-servlet-shaded</artifactId>
-											<version>4.0.0.Final</version>
-											<type>jar</type>
-											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
-										</artifactItem>
-									</artifactItems>
-								</configuration>
-							</execution>
+							<!-- NOTE: MyFaces, CDI and BV are installed via WAR rather than via server. Otherwise MyFaces fails to initialize. And when MyFaces is in WAR, it expects to find CDI and BV over there as well ... See OmniFacesIT#ArchiveBuilder -->
 							<execution>
 								<id>install-el-in-tomcat</id> <!-- This is unexpected, but apparently Apache EL didn't work properly in combination with jakarta.el factory. It spits CNFE on com.sun.el.ExpressionFactoryImpl as if it couldn't find Apache EL. -->
 								<phase>pre-integration-test</phase>
@@ -773,38 +733,6 @@
 											<groupId>org.glassfish</groupId>
 											<artifactId>jakarta.el</artifactId>
 											<version>4.0.0</version>
-											<type>jar</type>
-											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
-										</artifactItem>
-									</artifactItems>
-								</configuration>
-							</execution>
-							<execution>
-								<id>install-bv-in-tomcat</id> <!-- Needed by ValidateBeanIT -->
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>copy</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>jakarta.validation</groupId>
-											<artifactId>jakarta.validation-api</artifactId>
-											<version>3.0.0</version>
-											<type>jar</type>
-											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>org.hibernate.validator</groupId>
-											<artifactId>hibernate-validator</artifactId>
-											<version>7.0.0.Final</version>
-											<type>jar</type>
-											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>com.fasterxml</groupId>
-											<artifactId>classmate</artifactId>
-											<version>1.5.1</version>
 											<type>jar</type>
 											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
 										</artifactItem>
@@ -844,7 +772,7 @@
 						<version>3.2.0</version>
 						<executions>
 							<execution>
-								<id>update-tomcat-users</id> <!-- Else Tomcat unexpectedly spits error that Arquillian isn't allowed to manage Tomcat. Most probably org.jboss.arquillian.container:arquillian-tomcat-managed-8 should be uptated to support Tomcat 10 but this isn't available (yet). -->
+								<id>update-tomcat-users</id> <!-- Else Tomcat unexpectedly spits error that Arquillian isn't allowed to manage Tomcat. Most probably org.jboss.arquillian.container:arquillian-tomcat-managed-8 should be updated to support Tomcat 10 but this isn't available (yet). -->
 								<phase>pre-integration-test</phase>
 								<goals>
 									<goal>copy-resources</goal>
@@ -869,6 +797,9 @@
 						<configuration>
 							<systemProperties>
 								<arquillian.launch>tomcat</arquillian.launch>
+								<test.tomcat.myfaces.version>${test.tomcat.myfaces.version}</test.tomcat.myfaces.version>
+								<test.tomcat.weld.version>${test.tomcat.weld.version}</test.tomcat.weld.version>
+								<test.tomcat.hibernate.validator.version>${test.tomcat.hibernate.validator.version}</test.tomcat.hibernate.validator.version>
 							</systemProperties>
 							<environmentVariables>
 								<CATALINA_HOME>${project.build.directory}/apache-tomcat-${test.tomcat.version}</CATALINA_HOME>
