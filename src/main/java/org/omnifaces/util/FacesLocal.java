@@ -20,7 +20,6 @@ import static javax.faces.view.facelets.FaceletContext.FACELET_CONTEXT_KEY;
 import static org.omnifaces.exceptionhandler.ViewExpiredExceptionHandler.FLASH_ATTRIBUTE_VIEW_EXPIRED;
 import static org.omnifaces.util.Beans.getReference;
 import static org.omnifaces.util.Components.findComponentsInChildren;
-import static org.omnifaces.util.Faces.getViewRoot;
 import static org.omnifaces.util.Reflection.instance;
 import static org.omnifaces.util.Reflection.toClassOrNull;
 import static org.omnifaces.util.Servlets.addParamToMapIfNecessary;
@@ -550,7 +549,7 @@ public final class FacesLocal {
 	 */
 	public static Collection<HashParam> getHashParameters(FacesContext context) {
 		UIViewRoot viewRoot = context.getViewRoot();
-		return (viewRoot != null) ? findComponentsInChildren(getViewRoot().getFacet(METADATA_FACET_NAME), HashParam.class) : Collections.<HashParam>emptyList();
+		return (viewRoot != null) ? findComponentsInChildren(viewRoot.getFacet(METADATA_FACET_NAME), HashParam.class) : Collections.<HashParam>emptyList();
 	}
 
 	/**
@@ -594,7 +593,7 @@ public final class FacesLocal {
 	 */
 	public static Collection<ScriptParam> getScriptParameters(FacesContext context) {
 		UIViewRoot viewRoot = context.getViewRoot();
-		return (viewRoot != null) ? findComponentsInChildren(getViewRoot().getFacet(METADATA_FACET_NAME), ScriptParam.class) : Collections.<ScriptParam>emptyList();
+		return (viewRoot != null) ? findComponentsInChildren(viewRoot.getFacet(METADATA_FACET_NAME), ScriptParam.class) : Collections.<ScriptParam>emptyList();
 	}
 
 	/**
