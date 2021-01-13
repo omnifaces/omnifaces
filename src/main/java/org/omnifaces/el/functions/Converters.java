@@ -349,12 +349,12 @@ public final class Converters {
 	}
 
 	/**
-	 * Convert given object to string using {@link Converter#getAsString(FacesContext, UIComponent, Object) of the
+	 * Convert given object to string using {@link Converter#getAsString(FacesContext, UIComponent, Object)} of the
 	 * converter identified by the given converter ID, invoked with {@link FacesContext#getCurrentInstance()},
 	 * {@link UIComponent#getCurrentComponent(FacesContext)} and given object as arguments.
 	 * @param converterId The converter ID of the desired converter instance.
 	 * @param object The object to be converted to {@link String} by the converter identified by given converter ID.
-	 * @return The result of {@link Converter#getAsString(FacesContext, UIComponent, Object) of the converter
+	 * @return The result of {@link Converter#getAsString(FacesContext, UIComponent, Object)} of the converter
 	 * identified by the given converter ID, invoked with {@link FacesContext#getCurrentInstance()},
 	 * {@link UIComponent#getCurrentComponent(FacesContext)} and given object as arguments.
 	 * @since 3.10
