@@ -44,11 +44,6 @@ public class ScriptParamIT extends OmniFacesIT {
 
 	@Test
 	public void testScriptParam() {
-		if (isMyFaces()) {
-			System.out.println("SKIPPING o:scriptParam IT due to some MyFaces bug"); // TODO: investigate. The viewRoot.getFacet(METADATA_FACET_NAME) is unexpectedly null during decode.
-			return;
-		}
-
 		waitUntilTextContent(this.scriptLoadTimestamp);
 
 		long pageLoadTimestamp = Long.valueOf(this.pageLoadTimestamp.getText());

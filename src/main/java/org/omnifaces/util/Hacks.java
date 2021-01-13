@@ -315,6 +315,23 @@ public final class Hacks {
 		return invokeMethod(component, "getStateHelper");
 	}
 
+	// JSF component related ------------------------------------------------------------------------------------------
+
+	/**
+	 * Returns f:metadata facet from UIViewRoot.
+	 * MyFaces 3.x unexpectedly doesn't use {@link UIViewRoot#METADATA_FACET_NAME} anymore to identify the facet.
+	 * @return f:metadata facet from UIViewRoot.
+	 * @since 4.0
+	 */
+	public static UIComponent getMetadataFacet(UIViewRoot viewRoot) {
+		UIComponent metadataFacet = viewRoot.getFacet(UIViewRoot.METADATA_FACET_NAME);
+
+		if (metadataFacet == null && isMyFacesUsed()) {
+			metadataFacet = viewRoot.getFacet("UIViewRoot_faces_metadata");
+		}
+
+		return metadataFacet;
+	}
 
 	// PrimeFaces related ---------------------------------------------------------------------------------------------
 

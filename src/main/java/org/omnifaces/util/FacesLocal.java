@@ -12,7 +12,6 @@
  */
 package org.omnifaces.util;
 
-import static jakarta.faces.component.UIViewRoot.METADATA_FACET_NAME;
 import static jakarta.faces.view.facelets.FaceletContext.FACELET_CONTEXT_KEY;
 import static java.util.Arrays.asList;
 import static java.util.Collections.unmodifiableList;
@@ -549,7 +548,7 @@ public final class FacesLocal {
 	 */
 	public static Collection<HashParam> getHashParameters(FacesContext context) {
 		UIViewRoot viewRoot = context.getViewRoot();
-		return (viewRoot != null) ? findComponentsInChildren(viewRoot.getFacet(METADATA_FACET_NAME), HashParam.class) : Collections.<HashParam>emptyList();
+		return (viewRoot != null) ? findComponentsInChildren(Hacks.getMetadataFacet(viewRoot), HashParam.class) : Collections.<HashParam>emptyList();
 	}
 
 	/**
@@ -593,7 +592,7 @@ public final class FacesLocal {
 	 */
 	public static Collection<ScriptParam> getScriptParameters(FacesContext context) {
 		UIViewRoot viewRoot = context.getViewRoot();
-		return (viewRoot != null) ? findComponentsInChildren(viewRoot.getFacet(METADATA_FACET_NAME), ScriptParam.class) : Collections.<ScriptParam>emptyList();
+		return (viewRoot != null) ? findComponentsInChildren(Hacks.getMetadataFacet(viewRoot), ScriptParam.class) : Collections.<ScriptParam>emptyList();
 	}
 
 	/**

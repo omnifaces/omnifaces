@@ -46,11 +46,6 @@ public class HashParamIT extends OmniFacesIT {
 
 	@Test
 	public void testHashParam() {
-		if (isMyFaces()) {
-			System.out.println("SKIPPING o:hashParam IT due to some MyFaces bug"); // TODO: investigate. The viewRoot.getFacet(METADATA_FACET_NAME) is unexpectedly null during decode.
-			return;
-		}
-
 		openWithHashString("foo=baz&bar=kaz");
 		waitUntilTextContent(this.hashLoadTimestamp); // TODO: should not have been necessary.
 
