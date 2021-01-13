@@ -416,6 +416,19 @@
 		<function-signature>java.lang.String printStackTrace(java.lang.Throwable)</function-signature>
 	</function>
 
+	<function>
+		<description>
+			<![CDATA[
+				Convert given object to string using <code>Converter#getAsString(FacesContext, UIComponent, Object)</code> of the
+				converter identified by the given converter ID, invoked with <code>FacesContext#getCurrentInstance()</code>,
+				<code>UIComponent#getCurrentComponent(FacesContext)</code> and given object as arguments.
+			]]>
+		</description>
+		<function-name>convert</function-name>
+		<function-class>org.omnifaces.el.functions.Converters</function-class>
+		<function-signature>java.lang.String convert(java.lang.String, java.lang.Object)</function-signature>
+	</function>
+
 	<!-- Dates ==================================================================================================== -->
 
 	<function>

@@ -12,7 +12,9 @@
  */
 package org.omnifaces.el.functions;
 
+import static jakarta.faces.component.UIComponent.getCurrentComponent;
 import static java.lang.String.format;
+import static org.omnifaces.util.FacesLocal.createConverter;
 import static org.omnifaces.util.Utils.isEmpty;
 
 import java.io.PrintWriter;
@@ -26,9 +28,13 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import jakarta.faces.component.UIComponent;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.convert.Converter;
 import jakarta.faces.model.DataModel;
 
 import org.omnifaces.model.IterableDataModel;
+import org.omnifaces.util.Faces;
 import org.omnifaces.util.Json;
 import org.omnifaces.util.Utils;
 
@@ -340,6 +346,22 @@ public final class Converters {
 		StringWriter stringWriter = new StringWriter();
 		exception.printStackTrace(new PrintWriter(stringWriter, true));
 		return stringWriter.toString();
+	}
+
+	/**
+	 * Convert given object to string using {@link Converter#getAsString(FacesContext, UIComponent, Object)} of the
+	 * converter identified by the given converter ID, invoked with {@link FacesContext#getCurrentInstance()},
+	 * {@link UIComponent#getCurrentComponent(FacesContext)} and given object as arguments.
+	 * @param converterId The converter ID of the desired converter instance.
+	 * @param object The object to be converted to {@link String} by the converter identified by given converter ID.
+	 * @return The result of {@link Converter#getAsString(FacesContext, UIComponent, Object)} of the converter
+	 * identified by the given converter ID, invoked with {@link FacesContext#getCurrentInstance()},
+	 * {@link UIComponent#getCurrentComponent(FacesContext)} and given object as arguments.
+	 * @since 3.10
+	 */
+	public static String convert(String converterId, Object object) {
+		FacesContext context = Faces.getContext();
+		return createConverter(context, converterId).getAsString(context, getCurrentComponent(context), object);
 	}
 
 }
