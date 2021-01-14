@@ -29,7 +29,7 @@ import org.omnifaces.util.Faces;
  * by redirecting to the current URL with query string. Additionally, it will set a flash attribute indicating that the
  * {@link ViewExpiredException} was handled by this exception handler.
  *
- * <h3>Installation</h3>
+ * <h2>Installation</h2>
  * <p>
  * This handler must be registered by a factory as follows in <code>faces-config.xml</code> in order to get it to run:
  * <pre>

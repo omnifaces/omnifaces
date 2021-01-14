@@ -50,7 +50,7 @@ import org.omnifaces.util.Exceptions;
  * crashed, etcetera. All which are beyond control of the server and therefore not really interesting to have logged
  * into server logs.
  *
- * <h3>Installation</h3>
+ * <h2>Installation</h2>
  * <p>
  * This handler must be registered by a factory as follows in <code>faces-config.xml</code> in order to get it to run:
  * <pre>

@@ -50,12 +50,12 @@ import org.omnifaces.util.State;
  * specifically for usage in <code>sitemap.xml</code> file. The {@link ViewResourceHandler} must be registered in
  * <code>faces-config.xml</code> in order to get JSF components to run in <code>/sitemap.xml</code>.
  *
- * <h3>Values</h3>
+ * <h2>Values</h2>
  * <p>
  * You can supply the sitemap URL via either the <code>value</code> attribute or the <code>viewId</code> attribute. When
  * both are specified, the <code>value</code> attribute takes precedence and the <code>viewId</code> attribute is ignored.
  *
- * <h3>Domain</h3>
+ * <h2>Domain</h2>
  * <p>
  * When the target URL is specified as <code>viewId</code>, then the domain of the target URL defaults to the current
  * domain. It is possible to provide a full qualified domain name (FQDN) via the <code>domain</code> attribute which
@@ -76,12 +76,12 @@ import org.omnifaces.util.State;
  * If the domain equals or starts with <code>//</code>, or does not contain any scheme, then the URL becomes scheme-relative.
  * If the <code>value</code> attribute is specified, then the <code>domain</code> attribute is ignored.
  *
- * <h3>Request parameters</h3>
+ * <h2>Request parameters</h2>
  * <p>
  * You can add query string parameters to the URL via nested <code>&lt;f:param&gt;</code> and <code>&lt;o:param&gt;</code>.
  * To conditionally add or override, use the <code>disabled</code> attribute of <code>&lt;f|o:param&gt;</code>.
  *
- * <h3>Usage</h3>
+ * <h2>Usage</h2>
  * <p>
  * Usage example of <code>/sitemap.xml</code> as a JSF view:
  * <pre>

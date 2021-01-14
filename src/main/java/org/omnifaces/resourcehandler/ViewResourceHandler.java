@@ -43,7 +43,7 @@ import org.omnifaces.viewhandler.OmniViewHandler;
  * <p>
  * Real world examples are <code>/sitemap.xml</code> and <code>/robots.txt</code>.
  *
- * <h3>Installation</h3>
+ * <h2>Installation</h2>
  * <p>
  * To get it to run, this handler needs be registered as follows in <code>faces-config.xml</code>:
  * <pre>
