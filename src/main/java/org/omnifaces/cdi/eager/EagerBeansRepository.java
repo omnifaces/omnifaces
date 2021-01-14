@@ -62,7 +62,11 @@ public class EagerBeansRepository {
 	private BeanManager beanManager;
 	private EagerBeans eagerBeans;
 
-	public static EagerBeansRepository getInstance() { // Awkward workaround for it being unavailable via @Inject in listeners in Tomcat+OWB and Jetty.
+	/**
+	 * Awkward workaround for it being unavailable via {@link Inject} in listeners in Tomcat+OWB and Jetty.
+	 * @return Current instance of {@link EagerBeansRepository}.
+	 */
+	public static EagerBeansRepository getInstance() {
 		if (instance == null) {
 			instance = getReference(EagerBeansRepository.class);
 		}
@@ -70,10 +74,18 @@ public class EagerBeansRepository {
 		return instance;
 	}
 
+	/**
+	 * Sets the collected eager beans. This is invoked by {@link EagerExtension#load(jakarta.enterprise.inject.spi.AfterDeploymentValidation, BeanManager)}.
+	 * @param eagerBeans The collected eager beans.
+	 */
 	protected void setEagerBeans(EagerBeans eagerBeans) {
 		this.eagerBeans = eagerBeans;
 	}
 
+	/**
+	 * Instantiate application scoped eager beans and register {@link EagerBeansWebListener} if necessary.
+	 * @param servletContext The involved servlet context.
+	 */
 	public static void instantiateApplicationScopedAndRegisterListenerIfNecessary(ServletContext servletContext) {
 		try {
 			if (getInstance() != null && instance.hasAnyApplicationScopedBeans()) { // #318: getInstance() should stay in try block.
@@ -90,32 +102,62 @@ public class EagerBeansRepository {
 		}
 	}
 
+	/**
+	 * Returns <code>true</code> if there are any application scoped eager beans.
+	 * @return <code>true</code> if there are any application scoped eager beans.
+	 */
 	protected boolean hasAnyApplicationScopedBeans() {
 		return eagerBeans != null && !isEmpty(eagerBeans.applicationScoped);
 	}
 
+	/**
+	 * Returns <code>true</code> if there are any session scoped eager beans or eager beans by request URI.
+	 * @return <code>true</code> if there are any session scoped eager beans or eager beans by request URI.
+	 */
 	protected boolean hasAnySessionOrRequestURIBeans() {
 		return eagerBeans != null && (!isEmpty(eagerBeans.sessionScoped) || !isEmpty(eagerBeans.byRequestURI));
 	}
 
+	/**
+	 * Returns <code>true</code> if there are any eager beans by view ID.
+	 * @return <code>true</code> if there are any eager beans by view ID.
+	 */
 	protected boolean hasAnyViewIdBeans() {
 		return eagerBeans != null && !isEmpty(eagerBeans.byViewId);
 	}
 
-	public void instantiateApplicationScoped() {
-		instantiateBeans(eagerBeans.applicationScoped);
+	/**
+	 * Instantiate application scoped eager beans.
+	 * @return <code>true</code> if there were any application scoped eager beans.
+	 */
+	public boolean instantiateApplicationScoped() {
+		return eagerBeans != null && instantiateBeans(eagerBeans.applicationScoped);
 	}
 
+	/**
+	 * Instantiate session scoped eager beans.
+	 * @return <code>true</code> if there were any session scoped eager beans.
+	 */
 	public boolean instantiateSessionScoped() {
 		return eagerBeans != null && instantiateBeans(eagerBeans.sessionScoped);
 	}
 
+	/**
+	 * Instantiate eager beans by request URI.
+	 * @param relativeRequestURI The context-relative request URI;
+	 * @return <code>true</code> if there were any eager beans by request URI.
+	 */
 	public boolean instantiateByRequestURI(String relativeRequestURI) {
 		return eagerBeans != null && instantiateBeans(eagerBeans.byRequestURI, relativeRequestURI);
 	}
 
-	public void instantiateByViewID(String viewId) {
-		instantiateBeans(eagerBeans.byViewId, viewId);
+	/**
+	 * Instantiate eager beans by view ID.
+	 * @param viewId The view ID;
+	 * @return <code>true</code> if there were any eager beans by view URI.
+	 */
+	public boolean instantiateByViewID(String viewId) {
+		return eagerBeans != null && instantiateBeans(eagerBeans.byViewId, viewId);
 	}
 
 	private boolean instantiateBeans(Map<String, List<Bean<?>>> beansByKey, String key) {
@@ -139,7 +181,7 @@ public class EagerBeansRepository {
 		return true;
 	}
 
-	protected static class EagerBeans {
+	static class EagerBeans {
 
 		private List<Bean<?>> applicationScoped = new ArrayList<>();
 		private List<Bean<?>> sessionScoped = new ArrayList<>();
@@ -183,7 +225,7 @@ public class EagerBeansRepository {
 			return byRequestURI.computeIfAbsent(requestURI, k -> new ArrayList<>());
 		}
 
-		public boolean isEmpty() {
+		boolean isEmpty() {
 			return applicationScoped.isEmpty() && sessionScoped.isEmpty() && byViewId.isEmpty() && byRequestURI.isEmpty();
 		}
 

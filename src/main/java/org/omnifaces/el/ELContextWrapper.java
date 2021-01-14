@@ -19,17 +19,15 @@ import jakarta.el.ELResolver;
 import jakarta.el.FunctionMapper;
 import jakarta.el.VariableMapper;
 import jakarta.faces.FacesWrapper;
-import jakarta.faces.application.ViewHandler;
 
 /**
  * <p>Provides a simple implementation of {@link ELContext} that can
  * be sub-classed by developers wishing to provide specialized behavior
  * to an existing {@link ELContext} instance. The default
  * implementation of all methods is to call through to the wrapped
- * {@link ViewHandler}.</p>
+ * {@link ELContext}.</p>
  *
- * <p>Usage: extend this class and override {@link #getWrapped} to
- * return the instance we are wrapping, or provide this instance to the overloaded constructor.</p>
+ * <p>Usage: extend this class and provide the instance we are wrapping to the overloaded constructor.</p>
  *
  * @author Arjan Tijms
  */

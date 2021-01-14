@@ -26,7 +26,7 @@ import jakarta.faces.FacesWrapper;
  * methods is to call through to the wrapped {@link InjectionTarget}.</p>
  *
  * <p>
- * Usage: extend this class and override {@link #getWrapped} to return the instance we are wrapping.
+ * Usage: extend this class and provide the instance we are wrapping to the overloaded constructor.
  *
  * @author Bauke Scholtz
  * @since 3.6
@@ -35,6 +35,10 @@ public class InjectionTargetWrapper<T> implements InjectionTarget<T>, FacesWrapp
 
 	private final InjectionTarget<T> wrapped;
 
+	/**
+	 * Construct a injection target wrapper which wraps the given injection target.
+	 * @param wrapped The injection target to be wrapped.
+	 */
 	public InjectionTargetWrapper(InjectionTarget<T> wrapped) {
 		this.wrapped = wrapped;
 	}

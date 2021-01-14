@@ -59,6 +59,7 @@ public class DateProducer {
 
 	/**
 	 * This makes an instance of {@link Temporal} as startup datetime available by <code>#{startup}</code>.
+	 * @return Startup datetime.
 	 */
 	@Produces @Named @ApplicationScoped @Eager
 	public TemporalDate getStartup() {
@@ -67,6 +68,7 @@ public class DateProducer {
 
 	/**
 	 * This makes an instance of {@link Temporal} as current datetime available by <code>#{now}</code>.
+	 * @return Current datetime.
 	 */
 	@Produces @Named @RequestScoped
 	public TemporalDate getNow() {
@@ -99,6 +101,7 @@ public class DateProducer {
 
 		/**
 		 * Constructs a new proxyable instant which is initialized with given {@link Instant}.
+		 * @param instant Instant to initialize with.
 		 */
 		public TemporalDate(Instant instant) {
 			this.instant = instant;

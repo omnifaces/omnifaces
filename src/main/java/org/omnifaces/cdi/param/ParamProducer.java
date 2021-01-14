@@ -90,6 +90,12 @@ public class ParamProducer {
 	@Inject
 	private InjectionPoint injectionPoint;
 
+	/**
+	 * Returns {@link ParamValue} associated with param name derived from given injection point.
+	 * @param <V> The generic {@link ParamValue} type.
+	 * @param injectionPoint Injection point to derive param name from.
+	 * @return {@link ParamValue} associated with param name derived from given injection point.
+	 */
 	@Produces
 	@Param
 	public <V> ParamValue<V> produce(InjectionPoint injectionPoint) {

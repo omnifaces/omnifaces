@@ -39,7 +39,12 @@ public class RequestCookieProducer {
 
 	@Inject
 	private HttpServletRequest request;
-	
+
+	/**
+	 * Returns cookie value associated with cookie name derived from given injection point.
+	 * @param injectionPoint Injection point to derive cookie name from.
+	 * @return Cookie value associated with cookie name derived from given injection point.
+	 */
 	@Produces
 	@Cookie
 	public String produce(InjectionPoint injectionPoint) {

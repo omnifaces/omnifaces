@@ -30,6 +30,10 @@ public abstract class DefaultPhaseListener implements PhaseListener {
 	private static final long serialVersionUID = 1L;
 	private	transient PhaseId phaseId; // PhaseId is not serializable
 
+	/**
+	 * Construct default phase listener for given phase ID.
+	 * @param phaseId Phase ID to create new default phase listener for.
+	 */
 	public DefaultPhaseListener(PhaseId phaseId) {
 		this.phaseId = phaseId;
 	}
@@ -48,7 +52,7 @@ public abstract class DefaultPhaseListener implements PhaseListener {
 	public void beforePhase(PhaseEvent event) {
 		// NOOP.
 	}
-	
+
 	private void writeObject(ObjectOutputStream out) throws IOException {
 		out.defaultWriteObject();
 		out.writeObject(phaseId.getName());

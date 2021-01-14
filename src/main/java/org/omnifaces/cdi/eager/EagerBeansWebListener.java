@@ -16,7 +16,6 @@ import static java.lang.String.format;
 import static java.util.logging.Level.WARNING;
 import static org.omnifaces.util.Servlets.getRequestRelativeURIWithoutPathParameters;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Logger;
 
 import jakarta.servlet.ServletRequestEvent;
@@ -38,8 +37,6 @@ import jakarta.servlet.http.HttpSessionListener;
 public class EagerBeansWebListener implements HttpSessionListener, ServletRequestListener {
 
 	// Constants ------------------------------------------------------------------------------------------------------
-
-	public static final String SESSION_CREATED = "org.omnifaces.eager.SESSION_CREATED";
 
 	private static final Logger logger = Logger.getLogger(EagerBeansWebListener.class.getName());
 
@@ -63,10 +60,6 @@ public class EagerBeansWebListener implements HttpSessionListener, ServletReques
 			if (!EagerBeansRepository.getInstance().instantiateSessionScoped()) {
 				sessionListenerDisabled = true;
 			}
-		}
-		else {
-			// Record a "session created" marker manually. HttpSession#isNew() not entirely accurate for our purpose.
-			event.getSession().setAttribute(SESSION_CREATED, new AtomicBoolean(true));
 		}
 	}
 

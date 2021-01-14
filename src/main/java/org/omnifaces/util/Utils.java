@@ -855,6 +855,8 @@ public final class Utils {
 	 * When <code>D</code> is {@link Temporal} and supports {@link ChronoField#CLOCK_HOUR_OF_DAY}, then return {@link ZoneId#systemDefault()}.
 	 * When <code>D</code> is {@link Temporal} and supports neither, then return {@link ZoneOffset#UTC}.
 	 * @param <D> The date type, can be {@code null}, {@link Date}, {@link Calendar} or {@link Temporal}.
+	 * @param date The <code>D</code> to obtain {@link ZoneId} from.
+	 * @return {@link ZoneId} obtained from <code>D</code>.
 	 * @throws IllegalArgumentException When date is not {@link Date}, {@link Calendar} or {@link Temporal}.
 	 * @since 3.6
 	 */
@@ -890,6 +892,8 @@ public final class Utils {
 	 * When <code>Z</code> is {@link TimeZone}, then return {@link TimeZone#toZoneId()}.
 	 * When <code>Z</code> is {@link String}, then return {@link ZoneId#of(String)}.
 	 * @param <Z> The timezone type, can be {@code null}, {@link String}, {@link TimeZone} or {@link ZoneId}.
+	 * @param timezone The <code>Z</code> to convert to {@link ZoneId}.
+	 * @return {@link ZoneId} converted from <code>Z</code>.
 	 * @throws IllegalArgumentException When <code>Z</code> is not {@code null}, {@link ZoneId}, {@link TimeZone} or {@link String}.
 	 * @since 3.6
 	 */
@@ -915,6 +919,8 @@ public final class Utils {
 	 * Convert <code>D</code> to {@link ZonedDateTime}.
 	 * This method is guaranteed repeatable when combined with {@link #fromZonedDateTime(ZonedDateTime, Class)}.
 	 * @param <D> The date type, can be {@link Date}, {@link Calendar} or {@link Temporal}.
+	 * @param date The <code>D</code> to convert to {@link ZonedDateTime}.
+	 * @return {@link ZonedDateTime} converted from <code>D</code>.
 	 * @throws IllegalArgumentException When date is not {@link Date}, {@link Calendar} or {@link Temporal}.
 	 * @since 3.6
 	 */
@@ -982,6 +988,9 @@ public final class Utils {
 	 * Convert {@link ZonedDateTime} to <code>D</code>.
 	 * This method is guaranteed repeatable when combined with {@link #toZonedDateTime(Object)}.
 	 * @param <D> The date type, can be {@link Date}, {@link Calendar} or {@link Temporal} or any of its subclasses.
+	 * @param zonedDateTime The {@link ZonedDateTime} to convert to <code>D</code>.
+	 * @param type The type of <code>D</code>.
+	 * @return <code>D</code> converted from {@link ZonedDateTime}.
 	 * @throws NullPointerException When type is <code>null</code>.
 	 * @throws IllegalArgumentException When type is not {@link Date}, {@link Calendar} or {@link Temporal} or any of its subclasses.
 	 * @since 3.6

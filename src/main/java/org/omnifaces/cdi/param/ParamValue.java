@@ -14,7 +14,6 @@ package org.omnifaces.cdi.param;
 
 import static org.omnifaces.cdi.param.ParamProducer.coerceValues;
 import static org.omnifaces.cdi.param.ParamProducer.getConvertedValues;
-import static org.omnifaces.cdi.param.ParamProducer.getTargetType;
 import static org.omnifaces.util.Faces.getContext;
 import static org.omnifaces.util.Utils.isEmpty;
 import static org.omnifaces.util.Utils.isSerializable;
@@ -49,15 +48,6 @@ public class ParamValue<V> implements Serializable {
 
 	private boolean valueIsSerializable;
 	private V serializableValue;
-
-	/**
-	 * @deprecated Since 3.8. This constructor should not have been public (and the class should have been final).
-	 */
-	@Deprecated
-	public ParamValue(String[] submittedValues, Param param, Type type, V value) {
-		this(param, param.name(), param.name(), type, submittedValues, getTargetType(type));
-		setValue(value);
-	}
 
 	/**
 	 * Internal only. This is exclusively used by {@link ParamProducer} for injection.

@@ -63,6 +63,11 @@ public class ParamExtension implements Extension {
 
 	private Set<Type> paramsWithInject = new HashSet<>();
 
+	/**
+	 * Collect fields annotated with {@link Param}.
+	 * @param <T> The generic injection target type.
+	 * @param event The process injection target event.
+	 */
 	public <T> void collectParams(@Observes ProcessInjectionTarget<T> event) {
 		Set<AnnotatedField<?>> paramsWithoutInject = new HashSet<>();
 
@@ -96,12 +101,23 @@ public class ParamExtension implements Extension {
 		}
 	}
 
+	/**
+	 * Process {@link Param} fields annotated with {@link Inject}.
+	 * @param event The after bean discovery event.
+	 */
 	public void processParamsWithInject(@Observes AfterBeanDiscovery event) {
 		for (Type paramWithInject : paramsWithInject) {
 			event.addBean(new DynamicParamValueProducer(paramWithInject));
 		}
 	}
 
+	/**
+	/**
+	 * Process {@link Param} fields without {@link Inject} annotation.
+	 * @param <T> The generic injection target type.
+	 * @param event The process injection target event.
+	 * @param paramsWithoutInject The {@link Param} fields without {@link Inject} annotation.
+	 */
 	public static <T> void processParamsWithoutInject(ProcessInjectionTarget<T> event, Set<AnnotatedField<?>> paramsWithoutInject) {
 		if (!paramsWithoutInject.isEmpty()) {
 			event.setInjectionTarget(new ParamInjectionTarget<>(event.getInjectionTarget(), paramsWithoutInject));
@@ -121,7 +137,7 @@ public class ParamExtension implements Extension {
 		public void inject(T instance, CreationalContext<T> ctx) {
 			for (AnnotatedField<?> paramWithoutInject : paramsWithoutInject) {
 				ParamValue<?> paramValue = new ParamProducer().produce(new ParamInjectionPoint(instance.getClass(), paramWithoutInject));
-				Field field = (Field) paramWithoutInject.getJavaMember();
+				Field field = paramWithoutInject.getJavaMember();
 				modifyField(instance, field, paramValue.getValue());
 			}
 

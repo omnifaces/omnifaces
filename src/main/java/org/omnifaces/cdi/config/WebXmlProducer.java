@@ -27,6 +27,9 @@ import org.omnifaces.config.WebXml;
 @ApplicationScoped
 public class WebXmlProducer {
 
+	/**
+	 * @return {@link WebXml#instance()}.
+	 */
 	@Produces
 	public WebXml produce() {
 		return WebXml.instance();

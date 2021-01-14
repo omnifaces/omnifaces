@@ -660,7 +660,7 @@ public class ValidateBean extends TagHandler {
 
 	// Nested classes -------------------------------------------------------------------------------------------------
 
-	public static final class CollectingValidator implements Validator<Object> {
+	private static final class CollectingValidator implements Validator<Object> {
 
 		private final Set<String> collectedClientIds;
 		private final Map<PropertyPath, Object> collectedProperties;

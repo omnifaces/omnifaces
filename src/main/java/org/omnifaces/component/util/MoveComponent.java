@@ -79,6 +79,9 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 		/* for */ facet, destination, behaviorDefaultEvent, behaviorEvents
 	}
 
+	/**
+	 * Destination of component to be moved by {@link MoveComponent}.
+	 */
 	public enum Destination {
 		BEFORE,
 		ADD_FIRST,
@@ -93,7 +96,7 @@ public class MoveComponent extends UtilFamily implements SystemEventListener, Cl
 
 	// Used to fool over-eager tag handlers that check in advance whether a given component indeed
 	// supports the event for which a behavior is attached.
-	private List<String> containsTrueList = new ArrayList<String>() {
+	private List<String> containsTrueList = new ArrayList<>() {
 		private static final long serialVersionUID = 1L;
 		@Override
 		public boolean contains(Object o) {

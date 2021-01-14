@@ -37,6 +37,9 @@ public class EagerBeansPhaseListener extends DefaultPhaseListener {
 
 	private boolean hasAnyViewIdBeans;
 
+	/**
+	 * Construct eager beans phase listener.
+	 */
 	public EagerBeansPhaseListener() {
 		super(RESTORE_VIEW);
 		EagerBeansRepository eagerBeansRepository = getReference(EagerBeansRepository.class);

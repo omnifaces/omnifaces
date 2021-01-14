@@ -52,6 +52,10 @@ public class DynamicParamValueProducer implements Bean<Object>, PassivationCapab
 
 	private Set<Type> types;
 
+	/**
+	 * Construct dynamic param value producer for given type.
+	 * @param type Type to construct dynamic param value producer for.
+	 */
 	public DynamicParamValueProducer(Type type) {
 		types = new HashSet<>(asList(type, Object.class));
 	}
@@ -118,6 +122,9 @@ public class DynamicParamValueProducer implements Bean<Object>, PassivationCapab
 		return DynamicParamValueProducer.class.getName() + "_" + (types != null ? types.toString() : "");
 	}
 
+	/**
+	 * {@link AnnotationLiteral} for {@link Param}.
+	 */
 	@SuppressWarnings("all")
 	public static class DefaultParamAnnotationLiteral extends AnnotationLiteral<Param> implements Param {
 		private static final long serialVersionUID = 1L;

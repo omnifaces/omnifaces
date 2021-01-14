@@ -27,6 +27,9 @@ import org.omnifaces.config.FacesConfigXml;
 @ApplicationScoped
 public class FacesConfigXmlProducer {
 
+	/**
+	 * @return {@link FacesConfigXml#instance()}.
+	 */
 	@Produces
 	public FacesConfigXml produce() {
 		return FacesConfigXml.instance();

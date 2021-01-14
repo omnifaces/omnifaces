@@ -135,7 +135,7 @@ public class ResolveComponent extends UtilFamily implements FaceletContextConsum
 		}
 	}
 
-	public static class ComponentClientIdResolver implements SerializableReturning<Object> {
+	private static class ComponentClientIdResolver implements SerializableReturning<Object> {
 
 		private static final long serialVersionUID = 1L;
 

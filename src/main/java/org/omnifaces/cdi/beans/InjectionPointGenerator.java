@@ -37,6 +37,10 @@ public class InjectionPointGenerator {
 	@Inject
 	private InjectionPoint injectionPoint;
 
+	/**
+	 * Returns injection point.
+	 * @return Injection point.
+	 */
 	public InjectionPoint getInjectionPoint() {
 		return injectionPoint;
 	}

@@ -39,6 +39,11 @@ public class ContextParamProducer {
 	@Inject
 	private ServletContext servletContext;
 
+	/**
+	 * Returns context parameter value associated with context parameter name derived from given injection point.
+	 * @param injectionPoint Injection point to derive context parameter name from.
+	 * @return Context parameter value associated with context parameter name derived from given injection point.
+	 */
 	@Produces
 	@ContextParam
 	public String produce(InjectionPoint injectionPoint) {

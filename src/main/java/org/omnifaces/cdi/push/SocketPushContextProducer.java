@@ -50,6 +50,11 @@ public class SocketPushContextProducer {
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
+	/**
+	 * Returns {@link PushContext} associated with channel name derived from given injection point.
+	 * @param injectionPoint Injection point to derive channel name from.
+	 * @return {@link PushContext} associated with channel name derived from given injection point.
+	 */
 	@Produces
 	@Push
 	public PushContext produce(InjectionPoint injectionPoint) {

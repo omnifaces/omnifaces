@@ -30,6 +30,7 @@ import jakarta.enterprise.inject.spi.ProcessBean;
 import jakarta.faces.view.ViewScoped;
 
 import org.omnifaces.cdi.Eager;
+import org.omnifaces.cdi.eager.EagerBeansRepository.EagerBeans;
 
 /**
  * CDI extension that collects beans annotated with <code>&#64;</code>{@link Eager}. After deployment
@@ -54,6 +55,12 @@ public class EagerExtension implements Extension {
 
 	// Actions --------------------------------------------------------------------------------------------------------
 
+	/**
+	 * Collect beans annotated with {@link Eager} into {@link EagerBeans}.
+	 * @param <T> The generic bean type.
+	 * @param event The process bean event.
+	 * @param beanManager The involved bean manager.
+	 */
 	public <T> void collect(@Observes ProcessBean<T> event, BeanManager beanManager) {
 
 		Annotated annotated = event.getAnnotated();
@@ -78,7 +85,12 @@ public class EagerExtension implements Extension {
 		}
 	}
 
-	@SuppressWarnings("unused")
+	/**
+	 * Load collected beans annotated with {@link Eager} into {@link EagerBeansRepository} via
+	 * {@link EagerBeansRepository#setEagerBeans(org.omnifaces.cdi.eager.EagerBeansRepository.EagerBeans)}.
+	 * @param event The after deployment validation event.
+	 * @param beanManager The involved bean manager.
+	 */
 	public void load(@Observes AfterDeploymentValidation event, BeanManager beanManager) {
 
 		if (eagerBeans.isEmpty()) {

@@ -26,8 +26,7 @@ import jakarta.faces.FacesWrapper;
  * implementation of all methods is to call through to the wrapped
  * {@link ELResolver}.</p>
  *
- * <p>Usage: extend this class and override {@link #getWrapped} to
- * return the instance we are wrapping, or provide this instance to the overloaded constructor.</p>
+ * <p>Usage: extend this class and provide the instance we are wrapping to the overloaded constructor.</p>
  *
  * @author Arjan Tijms
  */
