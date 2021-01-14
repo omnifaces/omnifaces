@@ -76,9 +76,10 @@
 		<test.weld.version>4.0.0.Final</test.weld.version>
 		<test.hibernateValidator.version>7.0.0.Final</test.hibernateValidator.version>
 		<test.jsonp.version>2.0.0</test.jsonp.version>
+		<test.tyrus.version>2.0.0</test.tyrus.version>
 		<test.mojarra.version>3.0.0</test.mojarra.version>
 		<test.myfaces.version>3.0.0-RC1</test.myfaces.version>
-		<test.piranha.version>21.1.0</test.piranha.version> <!-- TODO: fails with CDI error during startup -->
+		<test.piranha.version>21.1.0</test.piranha.version> <!-- TODO: fails with CDI error during startup: org.jboss.weld.exceptions.DeploymentException: WELD-001414: Bean name is ambiguous. Name csfFLOWDISCOVERYCDIHELPER -->
 		<test.tomee.version>9.0.0-M3</test.tomee.version> <!-- TODO: JEE9 compatible version which supports jakarta.ee XML namespace (M3 unfortunately doesn't support it yet, it still throws jakarta.xml.bind.UnmarshalException: unexpected element (uri:"https://jakarta.ee/xml/ns/jakartaee", local:"web-fragment")) -->
 		<test.payara.version>5.2020.4</test.payara.version> <!-- TODO: JEE9 compatible version -->
 		<test.glassfish.version>6.0.0</test.glassfish.version> <!-- TODO: Java11 compatible version. -->
@@ -690,7 +691,7 @@
 									org.glassfish:jakarta.faces:${test.mojarra.version},
 									org.hibernate.validator:hibernate-validator:${test.hibernateValidator.version},
 									org.glassfish:jakarta.json:${test.jsonp.version},
-									org.glassfish.tyrus:tyrus-core:2.0.0
+									org.glassfish.tyrus:tyrus-core:${test.tyrus.version}
 								</war.libraries>
 							</systemPropertyVariables>
 						</configuration>
