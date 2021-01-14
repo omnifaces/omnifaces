@@ -151,17 +151,10 @@ public abstract class OmniFacesIT {
 				.addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
 				.addAsLibrary(new File(System.getProperty("omnifaces.jar")));
 
-			if ("tomcat-myfaces".equals(System.getProperty("profile.id"))) {
-				String myFacesVersion = System.getProperty("test.tomcat.myfaces.version");
-				String weldVersion = System.getProperty("test.tomcat.weld.version");
-				String hibernateValidatorVersion = System.getProperty("test.tomcat.hibernate.validator.version");
+			String warLibraries = System.getProperty("war.libraries");
 
-				archive.addAsLibraries(Maven.resolver().resolve(
-					"org.apache.myfaces.core:myfaces-api:" + myFacesVersion,
-					"org.apache.myfaces.core:myfaces-impl:" + myFacesVersion,
-					"org.jboss.weld.servlet:weld-servlet-shaded:" + weldVersion,
-					"org.hibernate.validator:hibernate-validator:" + hibernateValidatorVersion
-				).withTransitivity().asFile());
+			if (warLibraries != null) {
+				archive.addAsLibraries(Maven.resolver().resolve(warLibraries.split("\\s*,\\s*")).withTransitivity().asFile());
 			}
 
 			addWebResources(new File(testClass.getClassLoader().getResource(packageName).getFile()), "");

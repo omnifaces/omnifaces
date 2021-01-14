@@ -74,7 +74,8 @@
 		<test.wildfly.version>22.0.0.Beta1</test.wildfly.version>
 		<test.tomcat.version>10.0.0</test.tomcat.version>
 		<test.tomcat.weld.version>4.0.0.Final</test.tomcat.weld.version>
-		<test.tomcat.hibernate.validator.version>7.0.0.Final</test.tomcat.hibernate.validator.version>
+		<test.tomcat.hibernateValidator.version>7.0.0.Final</test.tomcat.hibernateValidator.version>
+		<test.tomcat.jsonp.version>2.0.0</test.tomcat.jsonp.version>
 		<test.tomcat.mojarra.version>3.0.0</test.tomcat.mojarra.version>
 		<test.tomcat.myfaces.version>3.0.0-RC1</test.tomcat.myfaces.version>
 		<test.tomee.version>9.0.0-M3</test.tomee.version> <!-- TODO: JEE9 compatible version which supports jakarta.ee XML namespace (M3 unfortunately doesn't support it yet, it still throws jakarta.xml.bind.UnmarshalException: unexpected element (uri:"https://jakarta.ee/xml/ns/jakartaee", local:"web-fragment")) -->
@@ -536,117 +537,6 @@
 									</artifactItems>
 								</configuration>
 							</execution>
-							<execution>
-								<id>install-mojarra-in-tomcat</id>
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>copy</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>org.glassfish</groupId>
-											<artifactId>jakarta.faces</artifactId>
-											<version>${test.tomcat.mojarra.version}</version>
-											<type>jar</type>
-											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
-										</artifactItem>
-									</artifactItems>
-								</configuration>
-							</execution>
-							<execution>
-								<id>install-cdi-in-tomcat</id>
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>copy</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>org.jboss.weld.servlet</groupId>
-											<artifactId>weld-servlet-shaded</artifactId>
-											<version>${test.tomcat.weld.version}</version>
-											<type>jar</type>
-											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
-										</artifactItem>
-									</artifactItems>
-								</configuration>
-							</execution>
-							<execution>
-								<id>install-el-in-tomcat</id> <!-- This is unexpected, but apparently Apache EL didn't work properly in combination with jakarta.el factory. It spits CNFE on com.sun.el.ExpressionFactoryImpl as if it couldn't find Apache EL. -->
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>copy</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>org.glassfish</groupId>
-											<artifactId>jakarta.el</artifactId>
-											<version>4.0.0</version>
-											<type>jar</type>
-											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
-										</artifactItem>
-									</artifactItems>
-								</configuration>
-							</execution>
-							<execution>
-								<id>install-bv-in-tomcat</id> <!-- Needed by ValidateBeanIT -->
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>copy</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>jakarta.validation</groupId>
-											<artifactId>jakarta.validation-api</artifactId>
-											<version>3.0.0</version>
-											<type>jar</type>
-											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>org.hibernate.validator</groupId>
-											<artifactId>hibernate-validator</artifactId>
-											<version>${test.tomcat.hibernate.validator.version}</version>
-											<type>jar</type>
-											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>com.fasterxml</groupId>
-											<artifactId>classmate</artifactId>
-											<version>1.5.1</version>
-											<type>jar</type>
-											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
-										</artifactItem>
-									</artifactItems>
-								</configuration>
-							</execution>
-							<execution>
-								<id>install-jsonp-in-tomcat</id> <!-- Needed by ScriptParamIT -->
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>copy</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>jakarta.json</groupId>
-											<artifactId>jakarta.json-api</artifactId>
-											<version>2.0.0</version>
-											<type>jar</type>
-											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>org.glassfish</groupId>
-											<artifactId>jakarta.json</artifactId>
-											<version>2.0.0</version>
-											<type>jar</type>
-											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
-										</artifactItem>
-									</artifactItems>
-								</configuration>
-							</execution>
 						</executions>
 					</plugin>
 					<plugin>
@@ -680,6 +570,12 @@
 						<configuration>
 							<systemProperties>
 								<arquillian.launch>tomcat</arquillian.launch>
+								<war.libraries>
+									org.glassfish:jakarta.faces:${test.tomcat.mojarra.version},
+									org.jboss.weld.servlet:weld-servlet-shaded:${test.tomcat.weld.version},
+									org.hibernate.validator:hibernate-validator:${test.tomcat.hibernateValidator.version},
+									org.glassfish:jakarta.json:${test.tomcat.jsonp.version}
+								</war.libraries>
 							</systemProperties>
 							<environmentVariables>
 								<CATALINA_HOME>${project.build.directory}/apache-tomcat-${test.tomcat.version}</CATALINA_HOME>
@@ -720,50 +616,6 @@
 									</artifactItems>
 								</configuration>
 							</execution>
-							<!-- NOTE: MyFaces, CDI and BV are installed via WAR rather than via server. Otherwise MyFaces fails to initialize. And when MyFaces is in WAR, it expects to find CDI and BV over there as well ... See OmniFacesIT#ArchiveBuilder -->
-							<execution>
-								<id>install-el-in-tomcat</id> <!-- This is unexpected, but apparently Apache EL didn't work properly in combination with jakarta.el factory. It spits CNFE on com.sun.el.ExpressionFactoryImpl as if it couldn't find Apache EL. -->
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>copy</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>org.glassfish</groupId>
-											<artifactId>jakarta.el</artifactId>
-											<version>4.0.0</version>
-											<type>jar</type>
-											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
-										</artifactItem>
-									</artifactItems>
-								</configuration>
-							</execution>
-							<execution>
-								<id>install-jsonp-in-tomcat</id> <!-- Needed by ScriptParamIT -->
-								<phase>pre-integration-test</phase>
-								<goals>
-									<goal>copy</goal>
-								</goals>
-								<configuration>
-									<artifactItems>
-										<artifactItem>
-											<groupId>jakarta.json</groupId>
-											<artifactId>jakarta.json-api</artifactId>
-											<version>2.0.0</version>
-											<type>jar</type>
-											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
-										</artifactItem>
-										<artifactItem>
-											<groupId>org.glassfish</groupId>
-											<artifactId>jakarta.json</artifactId>
-											<version>2.0.0</version>
-											<type>jar</type>
-											<outputDirectory>${project.build.directory}/apache-tomcat-${test.tomcat.version}/lib</outputDirectory>
-										</artifactItem>
-									</artifactItems>
-								</configuration>
-							</execution>
 						</executions>
 					</plugin>
 					<plugin>
@@ -797,9 +649,13 @@
 						<configuration>
 							<systemProperties>
 								<arquillian.launch>tomcat</arquillian.launch>
-								<test.tomcat.myfaces.version>${test.tomcat.myfaces.version}</test.tomcat.myfaces.version>
-								<test.tomcat.weld.version>${test.tomcat.weld.version}</test.tomcat.weld.version>
-								<test.tomcat.hibernate.validator.version>${test.tomcat.hibernate.validator.version}</test.tomcat.hibernate.validator.version>
+								<war.libraries>
+									org.apache.myfaces.core:myfaces-api:${test.tomcat.myfaces.version},
+									org.apache.myfaces.core:myfaces-impl:${test.tomcat.myfaces.version},
+									org.jboss.weld.servlet:weld-servlet-shaded:${test.tomcat.weld.version},
+									org.hibernate.validator:hibernate-validator:${test.tomcat.hibernateValidator.version},
+									org.glassfish:jakarta.json:${test.tomcat.jsonp.version}
+								</war.libraries>
 							</systemProperties>
 							<environmentVariables>
 								<CATALINA_HOME>${project.build.directory}/apache-tomcat-${test.tomcat.version}</CATALINA_HOME>
