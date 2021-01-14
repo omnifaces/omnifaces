@@ -67,17 +67,18 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<maven.compiler.source>${javase.version}</maven.compiler.source>
-		<maven.compiler.target>${javase.version}</maven.compiler.target>
+		<maven.compiler.target>15</maven.compiler.target> <!-- Required by Piranha -->
 		<maven.source.excludeResources>true</maven.source.excludeResources>
 
 		<!-- Test server versions. -->
 		<test.wildfly.version>22.0.0.Beta1</test.wildfly.version>
 		<test.tomcat.version>10.0.0</test.tomcat.version>
-		<test.tomcat.weld.version>4.0.0.Final</test.tomcat.weld.version>
-		<test.tomcat.hibernateValidator.version>7.0.0.Final</test.tomcat.hibernateValidator.version>
-		<test.tomcat.jsonp.version>2.0.0</test.tomcat.jsonp.version>
-		<test.tomcat.mojarra.version>3.0.0</test.tomcat.mojarra.version>
-		<test.tomcat.myfaces.version>3.0.0-RC1</test.tomcat.myfaces.version>
+		<test.weld.version>4.0.0.Final</test.weld.version>
+		<test.hibernateValidator.version>7.0.0.Final</test.hibernateValidator.version>
+		<test.jsonp.version>2.0.0</test.jsonp.version>
+		<test.mojarra.version>3.0.0</test.mojarra.version>
+		<test.myfaces.version>3.0.0-RC1</test.myfaces.version>
+		<test.piranha.version>21.1.0</test.piranha.version> <!-- TODO: fails with CDI error during startup -->
 		<test.tomee.version>9.0.0-M3</test.tomee.version> <!-- TODO: JEE9 compatible version which supports jakarta.ee XML namespace (M3 unfortunately doesn't support it yet, it still throws jakarta.xml.bind.UnmarshalException: unexpected element (uri:"https://jakarta.ee/xml/ns/jakartaee", local:"web-fragment")) -->
 		<test.payara.version>5.2020.4</test.payara.version> <!-- TODO: JEE9 compatible version -->
 		<test.glassfish.version>6.0.0</test.glassfish.version> <!-- TODO: Java11 compatible version. -->
@@ -571,10 +572,10 @@
 							<systemProperties>
 								<arquillian.launch>tomcat</arquillian.launch>
 								<war.libraries>
-									org.glassfish:jakarta.faces:${test.tomcat.mojarra.version},
-									org.jboss.weld.servlet:weld-servlet-shaded:${test.tomcat.weld.version},
-									org.hibernate.validator:hibernate-validator:${test.tomcat.hibernateValidator.version},
-									org.glassfish:jakarta.json:${test.tomcat.jsonp.version}
+									org.glassfish:jakarta.faces:${test.mojarra.version},
+									org.jboss.weld.servlet:weld-servlet-shaded:${test.weld.version},
+									org.hibernate.validator:hibernate-validator:${test.hibernateValidator.version},
+									org.glassfish:jakarta.json:${test.jsonp.version}
 								</war.libraries>
 							</systemProperties>
 							<environmentVariables>
@@ -650,16 +651,48 @@
 							<systemProperties>
 								<arquillian.launch>tomcat</arquillian.launch>
 								<war.libraries>
-									org.apache.myfaces.core:myfaces-api:${test.tomcat.myfaces.version},
-									org.apache.myfaces.core:myfaces-impl:${test.tomcat.myfaces.version},
-									org.jboss.weld.servlet:weld-servlet-shaded:${test.tomcat.weld.version},
-									org.hibernate.validator:hibernate-validator:${test.tomcat.hibernateValidator.version},
-									org.glassfish:jakarta.json:${test.tomcat.jsonp.version}
+									org.apache.myfaces.core:myfaces-api:${test.myfaces.version},
+									org.apache.myfaces.core:myfaces-impl:${test.myfaces.version},
+									org.jboss.weld.servlet:weld-servlet-shaded:${test.weld.version},
+									org.hibernate.validator:hibernate-validator:${test.hibernateValidator.version},
+									org.glassfish:jakarta.json:${test.jsonp.version}
 								</war.libraries>
 							</systemProperties>
 							<environmentVariables>
 								<CATALINA_HOME>${project.build.directory}/apache-tomcat-${test.tomcat.version}</CATALINA_HOME>
 							</environmentVariables>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+
+		<!-- Piranha integration test profile: mvn verify -P piranha -->
+		<profile>
+			<id>piranha</id>
+			<dependencies>
+				<dependency>
+					<groupId>cloud.piranha.arquillian</groupId>
+					<artifactId>piranha-arquillian-server</artifactId>
+					<version>${test.piranha.version}</version>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<configuration>
+							<systemPropertyVariables>
+								<javaEEServer>piranha-embedded</javaEEServer>
+								<war.libraries>
+									org.glassfish:jakarta.faces:${test.mojarra.version},
+									org.hibernate.validator:hibernate-validator:${test.hibernateValidator.version},
+									org.glassfish:jakarta.json:${test.jsonp.version},
+									org.glassfish.tyrus:tyrus-core:2.0.0
+								</war.libraries>
+							</systemPropertyVariables>
 						</configuration>
 					</plugin>
 				</plugins>
