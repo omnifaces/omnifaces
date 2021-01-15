@@ -163,16 +163,12 @@ public class Converter extends ConverterHandler implements DeferredTagHandler {
 
 		@Override
 		public Object getAsObject(FacesContext context, UIComponent component, String value) {
-			javax.faces.convert.Converter<Object> converter = getConverter(context);
-			attributes.invokeSetters(context.getELContext(), converter);
-			return converter.getAsObject(context, component, value);
+			return getConverter(context).getAsObject(context, component, value);
 		}
 
 		@Override
 		public String getAsString(FacesContext context, UIComponent component, Object value) {
-			javax.faces.convert.Converter<Object> converter = getConverter(context);
-			attributes.invokeSetters(context.getELContext(), converter);
-			return converter.getAsString(context, component, value);
+			return getConverter(context).getAsString(context, component, value);
 		}
 
 		private javax.faces.convert.Converter<Object> getConverter(FacesContext context) {
@@ -180,6 +176,7 @@ public class Converter extends ConverterHandler implements DeferredTagHandler {
 				converter = Converter.createInstance(context, context.getELContext(), binding, id);
 			}
 
+			attributes.invokeSetters(context.getELContext(), converter);
 			return converter;
 		}
 	}

@@ -181,14 +181,9 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
 
 		@Override
 		public void validate(FacesContext context, UIComponent component, Object value) {
-			ELContext el = context.getELContext();
-
-			if (disabled == null || Boolean.FALSE.equals(disabled.getValue(el))) {
-				javax.faces.validator.Validator<Object> validator = getValidator(context);
-				attributes.invokeSetters(el, validator);
-
+			if (disabled == null || Boolean.FALSE.equals(disabled.getValue(context.getELContext()))) {
 				try {
-					validator.validate(context, component, value);
+					getValidator(context).validate(context, component, value);
 				}
 				catch (ValidatorException e) {
 					rethrowValidatorException(context, component, message, e);
@@ -201,6 +196,7 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
 				validator = Validator.createInstance(context, context.getELContext(), binding, id);
 			}
 
+			attributes.invokeSetters(context.getELContext(), validator);
 			return validator;
 		}
 

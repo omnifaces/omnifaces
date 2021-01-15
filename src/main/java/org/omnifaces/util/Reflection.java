@@ -799,7 +799,7 @@ public final class Reflection {
 		try {
 			return modifyField(instance, instance.getClass().getDeclaredField(fieldName), value);
 		}
-		catch (NoSuchFieldException e) {
+		catch (Exception e) {
 			throw new IllegalStateException(format(ERROR_MODIFY_FIELD, fieldName, instance != null ? instance.getClass() : null, value), e);
 		}
 	}

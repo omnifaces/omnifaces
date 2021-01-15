@@ -110,7 +110,7 @@ public class CommandScript extends UICommand {
 
 	// Private constants ----------------------------------------------------------------------------------------------
 
-	private static final Pattern PATTERN_NAME = Pattern.compile("[$a-z_](\\.?[$\\w])*", Pattern.CASE_INSENSITIVE);
+	private static final Pattern PATTERN_NAME = Pattern.compile("[$a-z_](\\.?[$\\w])*+", Pattern.CASE_INSENSITIVE);
 
 	private static final String ERROR_MISSING_NAME =
 		"o:commandScript 'name' attribute must be specified.";
