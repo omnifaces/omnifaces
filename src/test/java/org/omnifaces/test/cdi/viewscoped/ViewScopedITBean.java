@@ -62,7 +62,7 @@ public class ViewScopedITBean implements Serializable {
 	public String navigate() {
 		addGlobalInfo("navigate ");
 
-		if (Hacks.isMyFacesUsed()) { // TODO: remove once MyFaces fixes this. See #4120
+		if (Hacks.isMyFacesUsed()) { // MyFaces refused to fix this. See #4120
 			Object renderedResources = Faces.getViewRoot().getTransientStateHelper().getTransient("org.apache.myfaces.RENDERED_RESOURCES_SET");
 			Faces.setViewRoot(Faces.getViewId());
 			Faces.getViewRoot().getTransientStateHelper().putTransient("org.apache.myfaces.RENDERED_RESOURCES_SET", renderedResources);
