@@ -34,7 +34,7 @@ public final class Callback {
 	 * @author Bauke Scholtz
 	 * @deprecated Since 4.0. Use {@link Runnable} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "4.0", forRemoval = true)
 	@FunctionalInterface
 	public interface Void {
 
@@ -68,7 +68,7 @@ public final class Callback {
 	 * @param <R> The return type.
 	 * @deprecated Since 4.0. Use {@link Supplier} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "4.0", forRemoval = true)
 	@FunctionalInterface
 	public interface Returning<R> {
 
@@ -105,7 +105,7 @@ public final class Callback {
 	 * @param <A> The argument type.
 	 * @deprecated Since 4.0. Use {@link Consumer} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "4.0", forRemoval = true)
 	@FunctionalInterface
 	public interface WithArgument<A> {
 
@@ -143,7 +143,7 @@ public final class Callback {
 	 * @param <A> The argument type.
 	 * @deprecated Since 4.0. Use {@link Function} instead.
 	 */
-	@Deprecated
+	@Deprecated(since = "4.0", forRemoval = true)
 	@FunctionalInterface
 	public interface ReturningWithArgument<R, A> {
 
