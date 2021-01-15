@@ -49,9 +49,8 @@
 			}
 
 			function closeAllSockets() {
-				OmniFaces.Push.close("applicationScopedServerEvent");
-				OmniFaces.Push.close("sessionScopedUserTargeted");
 				OmniFaces.Push.close("viewScopedAjaxAware");
+				OmniFaces.Push.close("sessionScopedUserTargeted");
 			}
 
 			function clientClosed(code, channel) {

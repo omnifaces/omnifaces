@@ -12,7 +12,6 @@
  */
 package org.omnifaces.facesviews;
 
-import static jakarta.faces.view.facelets.ResourceResolver.FACELETS_RESOURCE_RESOLVER_PARAM_NAME;
 import static jakarta.servlet.DispatcherType.FORWARD;
 import static jakarta.servlet.DispatcherType.REQUEST;
 import static java.lang.Boolean.parseBoolean;
@@ -275,11 +274,6 @@ public final class FacesViews {
 		// Register a Filter that forwards extensionless requests to an extension mapped request, e.g. /index to /index.xhtml
 		// The FacesServlet doesn't work well with the exact mapping that we use for extensionless URLs.
 		FilterRegistration filterRegistration = servletContext.addFilter(FacesViewsForwardingFilter.class.getName(), FacesViewsForwardingFilter.class);
-
-		// Register a Facelets resource resolver that resolves requests like /index.xhtml to special folders like /WEB-INF/faces-views/index.xhtml
-		// TODO: Migrate ResourceResolver to ResourceHandler.
-		servletContext.setInitParameter(FACELETS_RESOURCE_RESOLVER_PARAM_NAME, FacesViewsResolver.class.getName());
-
 		addForwardingFilterMappings(servletContext, collectedViews, filterRegistration);
 
 		// We now need to map the Faces Servlet to the extensions we found,
@@ -343,14 +337,18 @@ public final class FacesViews {
 	}
 
 	/**
-	 * Register a view handler that transforms a view id with extension back to an extensionless one.
+	 * Register {@link FacesViewsResourceHandler} and {@link FacesViewsViewHandler}.
 	 * This is invoked by {@link ApplicationProcessor}, because the {@link Application} has to be available.
 	 * @param servletContext The involved servlet context.
 	 * @param application The involved faces application.
 	 */
-	public static void registerViewHander(ServletContext servletContext, Application application) {
-		if (isFacesViewsEnabled(servletContext) && !isEmpty(getEncounteredExtensions(servletContext))) {
-			application.setViewHandler(new FacesViewsViewHandler(application.getViewHandler()));
+	public static void registerResourceHandlerAndViewHander(ServletContext servletContext, Application application) {
+		if (isFacesViewsEnabled(servletContext)) {
+			application.setResourceHandler(new FacesViewsResourceHandler(application.getResourceHandler()));
+
+			if (!isEmpty(getEncounteredExtensions(servletContext))) {
+				application.setViewHandler(new FacesViewsViewHandler(application.getViewHandler()));
+			}
 		}
 	}
 
