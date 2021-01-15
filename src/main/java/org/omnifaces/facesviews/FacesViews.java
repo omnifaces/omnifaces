@@ -148,7 +148,7 @@ import org.omnifaces.component.output.PathParam;
  * aforementioned <a href="http://ocpsoft.org/prettyfaces">PrettyFaces</a>.
  *
  * @author Arjan Tijms
- * @see FacesViewsResolver
+ * @see FacesViewsResourceHandler
  * @see FacesViewsForwardingFilter
  * @see ExtensionAction
  * @see PathAction
@@ -653,7 +653,7 @@ public final class FacesViews {
 	}
 
 
-	// Helpers for FacesViewsResolver ---------------------------------------------------------------------------------
+	// Helpers for FacesViewsResourceHandler --------------------------------------------------------------------------
 
 	static String getMappedPath(String path) {
 		Map<String, String> mappedResources = getMappedResources(getServletContext());

@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import jakarta.el.ELContext;
@@ -1197,12 +1198,13 @@ public final class Faces {
 	}
 
 	/**
-	 * Returns the HTTP request parameter value associated with the given name and implicitly convert it to given type
+	 * Returns the HTTP request parameter value associated with the given name and implicitly converted to given type
 	 * using the Faces converter registered by <code>forClass</code> on the given type.
+	 * Note that empty strings are already implicitly converted to <code>null</code>.
 	 * @param <T> The expected return type.
 	 * @param name The HTTP request parameter name.
 	 * @param type The converter <code>forClass</code> type.
-	 * @return The HTTP request parameter value associated with the given name and implicitly convert it to given type.
+	 * @return The HTTP request parameter value associated with the given name and implicitly converted to given type.
 	 * @throws ConverterException When conversion fails.
 	 * @throws ClassCastException When <code>T</code> is of wrong type.
 	 * @see ExternalContext#getRequestParameterMap()
@@ -1211,6 +1213,41 @@ public final class Faces {
 	 */
 	public static <T> T getRequestParameter(String name, Class<T> type) {
 		return FacesLocal.getRequestParameter(getContext(), name, type);
+	}
+
+	/**
+	 * Returns the HTTP request parameter value associated with the given name and converted using the given converter.
+	 * Note that empty strings are already implicitly converted to <code>null</code>.
+	 * @param <T> The expected return type.
+	 * @param name The HTTP request parameter name.
+	 * @param converter The converter.
+	 * @return The HTTP request parameter value associated with the given name and converted using the given converter.
+	 * @throws NullPointerException When converter is <code>null</code>.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @see ExternalContext#getRequestParameterMap()
+	 * @since 3.10
+	 */
+	public static <T> T getRequestParameter(String name, Function<String, T> converter) {
+		return FacesLocal.getRequestParameter(getContext(), name, converter);
+	}
+
+	/**
+	 * Returns the HTTP request parameter value associated with the given name and convert it using the given converter,
+	 * or else the supplied value if absent.
+	 * Note that empty strings are already implicitly converted to <code>null</code>.
+	 * @param <T> The expected return type.
+	 * @param name The HTTP request parameter name.
+	 * @param converter The converter.
+	 * @param defaultValue The default request parameter value when absent.
+	 * @return The HTTP request parameter value associated with the given name and convert it using the given converter,
+	 * or else the supplied value if absent.
+	 * @throws ClassCastException When <code>T</code> is of wrong type.
+	 * @throws NullPointerException When converter or supplier is <code>null</code>.
+	 * @see ExternalContext#getRequestParameterMap()
+	 * @since 3.10
+	 */
+	public static <T> T getRequestParameter(String name, Function<String, T> converter, Supplier<T> defaultValue) {
+		return FacesLocal.getRequestParameter(getContext(), name, converter, defaultValue);
 	}
 
 	/**
