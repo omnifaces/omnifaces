@@ -183,12 +183,11 @@ public final class Validators {
 	}
 
 	/**
-	 * Resolve violated property from given bean based on given violation.
-	 * @param bean Bean to resolve violated base on.
-	 * @param violation Constraint violation to resolve violated base from.
-	 * @return Violated property from given bean based on given violation.
+	 * Resolve violated property from given violation.
+	 * @param violation Constraint violation to resolve violated property from.
+	 * @return Violated property from given violation.
 	 */
-	public static String resolveViolatedProperty(Object bean, ConstraintViolation<?> violation) {
+	public static String resolveViolatedProperty(ConstraintViolation<?> violation) {
 		List<Node> propertyNodes = getPropertyNodes(violation);
 		return propertyNodes.get(propertyNodes.size() - 1).getName();
 	}

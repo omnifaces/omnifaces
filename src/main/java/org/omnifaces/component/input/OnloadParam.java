@@ -57,7 +57,7 @@ public abstract class OnloadParam extends UIViewParameter {
 	/**
 	 * The constructor instructs JSF to register all scripts during the render response phase if necessary.
 	 */
-	public OnloadParam() {
+	protected OnloadParam() {
 		subscribeToRequestBeforePhase(RENDER_RESPONSE, this::registerScriptsIfNecessary);
 	}
 

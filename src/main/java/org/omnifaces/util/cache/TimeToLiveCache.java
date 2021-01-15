@@ -33,7 +33,7 @@ public abstract class TimeToLiveCache implements Cache {
 	private final Integer defaultTimeToLive;
 	private Map<String, CacheEntry> cacheStore;
 
-	public TimeToLiveCache(Integer defaultTimeToLive) {
+	protected TimeToLiveCache(Integer defaultTimeToLive) {
 		this.defaultTimeToLive = defaultTimeToLive;
 	}
 

@@ -45,7 +45,7 @@ public abstract class FacesEventWrapper extends FacesEvent implements FacesWrapp
 	 * @param wrapped The faces event to be wrapped.
 	 * @param component The component to broadcast this event for.
 	 */
-	public FacesEventWrapper(FacesEvent wrapped, UIComponent component) {
+	protected FacesEventWrapper(FacesEvent wrapped, UIComponent component) {
 		super(component);
 		this.wrapped = wrapped;
 	}

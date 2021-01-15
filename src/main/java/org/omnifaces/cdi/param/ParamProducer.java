@@ -47,7 +47,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.function.Supplier;
+import java.util.function.BooleanSupplier;
 
 import javax.el.ValueExpression;
 import javax.enterprise.context.Dependent;
@@ -247,7 +247,7 @@ public class ParamProducer {
 		return converter;
 	}
 
-	private static boolean runWithSimulatedLabelAndValueOnViewRoot(FacesContext context, ParamValue paramValue, Supplier<Boolean> callback) {
+	private static boolean runWithSimulatedLabelAndValueOnViewRoot(FacesContext context, ParamValue paramValue, BooleanSupplier callback) {
 		UIComponent component = context.getViewRoot();
 		Object originalLabel = getAttribute(component, LABEL);
 		Object originalValue = getAttribute(component, VALUE);
@@ -255,7 +255,7 @@ public class ParamProducer {
 		try {
 			setAttribute(component, LABEL, paramValue.label);
 			setAttribute(component, VALUE, createValueExpression("#{param['" + paramValue.name + "']}", paramValue.targetType)); // This gives any converter the opportunity to inspect the target type.
-			return callback.get();
+			return callback.getAsBoolean();
 		}
 		finally {
 			setAttribute(component, LABEL, originalLabel);

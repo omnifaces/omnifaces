@@ -39,7 +39,7 @@ public abstract class TreeFamily extends UIComponentBase {
 	 * The base constructor sets the renderer type to <code>null</code> as the components of the Tree family does not
 	 * render anything by themselves.
 	 */
-	public TreeFamily() {
+	protected TreeFamily() {
 		setRendererType(null);
 	}
 

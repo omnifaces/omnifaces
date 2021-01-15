@@ -65,7 +65,7 @@ public class ApplicationProcessor implements SystemEventListener {
 		try {
 			ServletContext servletContext = getServletContext();
 			Application application = (Application) event.getSource();
-			checkDuplicateResourceHandler(application);
+			checkDuplicateResourceHandler();
 			FacesViews.registerResourceHandlerAndViewHander(servletContext, application);
 			MessagesKeywordResolver.register(application);
 		}
@@ -74,7 +74,7 @@ public class ApplicationProcessor implements SystemEventListener {
 		}
 	}
 
-	private void checkDuplicateResourceHandler(Application application) {
+	private void checkDuplicateResourceHandler() {
 		Set<Class<? extends ResourceHandler>> allResourceHandlers = new HashSet<>();
 
 		for (Class<? extends ResourceHandler> resourceHandler : FacesConfigXml.instance().getResourceHandlers()) {

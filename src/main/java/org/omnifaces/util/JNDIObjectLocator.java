@@ -380,7 +380,7 @@ public class JNDIObjectLocator implements Serializable {
 	/**
 	 * This deals with transient final fields correctly.
 	 */
-	private Object readResolve() {
+	protected Object readResolve() {
 		return new JNDIObjectLocator(environment, namespace, noCaching, cacheRemote);
 	}
 

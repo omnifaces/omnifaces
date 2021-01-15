@@ -87,7 +87,7 @@ public class SocketSessionManager {
 	 */
 	protected void register(String channelId) {
 		if (!socketSessions.containsKey(channelId)) {
-			socketSessions.putIfAbsent(channelId, new ConcurrentLinkedQueue<Session>());
+			socketSessions.putIfAbsent(channelId, new ConcurrentLinkedQueue<>());
 		}
 	}
 

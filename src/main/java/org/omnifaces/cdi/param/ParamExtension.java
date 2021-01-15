@@ -121,7 +121,7 @@ public class ParamExtension implements Extension {
 		public void inject(T instance, CreationalContext<T> ctx) {
 			for (AnnotatedField<?> paramWithoutInject : paramsWithoutInject) {
 				ParamValue<?> paramValue = new ParamProducer().produce(new ParamInjectionPoint(instance.getClass(), paramWithoutInject));
-				Field field = (Field) paramWithoutInject.getJavaMember();
+				Field field = paramWithoutInject.getJavaMember();
 				modifyField(instance, field, paramValue.getValue());
 			}
 

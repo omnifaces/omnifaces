@@ -64,7 +64,7 @@ public class SocketUserManager {
 	protected void register(Serializable user, String userId) {
 		synchronized (applicationUsers) {
 			if (!applicationUsers.containsKey(user)) {
-				applicationUsers.putIfAbsent(user, synchronizedSet(new HashSet<String>(ESTIMATED_SESSIONS_PER_USER)));
+				applicationUsers.putIfAbsent(user, synchronizedSet(new HashSet<>(ESTIMATED_SESSIONS_PER_USER)));
 			}
 
 			applicationUsers.get(user).add(userId);
@@ -79,13 +79,13 @@ public class SocketUserManager {
 	 */
 	protected void addChannelId(String userId, String channel, String channelId) {
 		if (!userChannels.containsKey(userId)) {
-			userChannels.putIfAbsent(userId, new ConcurrentHashMap<String, Set<String>>(ESTIMATED_USER_CHANNELS_PER_APPLICATION));
+			userChannels.putIfAbsent(userId, new ConcurrentHashMap<>(ESTIMATED_USER_CHANNELS_PER_APPLICATION));
 		}
 
 		ConcurrentHashMap<String, Set<String>> channelIds = userChannels.get(userId);
 
 		if (!channelIds.containsKey(channel)) {
-			channelIds.putIfAbsent(channel, synchronizedSet(new HashSet<String>(ESTIMATED_USER_CHANNELS_PER_SESSION)));
+			channelIds.putIfAbsent(channel, synchronizedSet(new HashSet<>(ESTIMATED_USER_CHANNELS_PER_SESSION)));
 		}
 
 		channelIds.get(channel).add(channelId);

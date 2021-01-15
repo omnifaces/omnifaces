@@ -393,7 +393,7 @@ public class ValidateBean extends TagHandler {
 	private void validateActualBean(UIForm form, Object bean) {
 		ValidateBeanCallback validateActualBean = new ValidateBeanCallback() { @Override public void run() {
 			FacesContext context = FacesContext.getCurrentInstance();
-			validate(context, form, bean, unwrapIfNecessary(bean), new HashSet<String>(0), false);
+			validate(context, form, bean, unwrapIfNecessary(bean), new HashSet<>(0), false);
 		}};
 
 		subscribeToRequestAfterPhase(UPDATE_MODEL_VALUES, validateActualBean);
@@ -570,7 +570,7 @@ public class ValidateBean extends TagHandler {
 	private static void invalidateInputsByPropertyPathAndShowMessages(FacesContext context, UIForm form, Object bean, Set<ConstraintViolation<?>> violations) {
 		for (ConstraintViolation<?> violation : violations) {
 			Object base = resolveViolatedBase(bean, violation);
-			String property = resolveViolatedProperty(bean, violation);
+			String property = resolveViolatedProperty(violation);
 
 			forEachInputWithMatchingBase(context, form, singleton(base), property, input -> {
 				context.validationFailed();
