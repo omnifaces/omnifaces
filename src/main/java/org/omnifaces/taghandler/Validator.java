@@ -19,12 +19,6 @@ import static org.omnifaces.util.Components.getLabel;
 import java.io.IOException;
 import java.io.Serializable;
 
-import org.omnifaces.cdi.validator.ValidatorManager;
-import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredAttributes;
-import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandler;
-import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDelegate;
-import org.omnifaces.util.Messages;
-
 import jakarta.el.ELContext;
 import jakarta.el.ValueExpression;
 import jakarta.faces.component.EditableValueHolder;
@@ -38,6 +32,12 @@ import jakarta.faces.view.facelets.TagAttribute;
 import jakarta.faces.view.facelets.TagHandlerDelegate;
 import jakarta.faces.view.facelets.ValidatorConfig;
 import jakarta.faces.view.facelets.ValidatorHandler;
+
+import org.omnifaces.cdi.validator.ValidatorManager;
+import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredAttributes;
+import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandler;
+import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDelegate;
+import org.omnifaces.util.Messages;
 
 /**
  * <p>
@@ -181,14 +181,9 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
 
 		@Override
 		public void validate(FacesContext context, UIComponent component, Object value) {
-			ELContext el = context.getELContext();
-
-			if (disabled == null || Boolean.FALSE.equals(disabled.getValue(el))) {
-				jakarta.faces.validator.Validator<Object> validator = getValidator(context);
-				attributes.invokeSetters(el, validator);
-
+			if (disabled == null || Boolean.FALSE.equals(disabled.getValue(context.getELContext()))) {
 				try {
-					validator.validate(context, component, value);
+					getValidator(context).validate(context, component, value);
 				}
 				catch (ValidatorException e) {
 					rethrowValidatorException(context, component, message, e);
@@ -201,6 +196,7 @@ public class Validator extends ValidatorHandler implements DeferredTagHandler {
 				validator = Validator.createInstance(context, context.getELContext(), binding, id);
 			}
 
+			attributes.invokeSetters(context.getELContext(), validator);
 			return validator;
 		}
 

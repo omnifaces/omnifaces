@@ -28,6 +28,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import jakarta.el.ValueExpression;
+import jakarta.faces.application.Application;
+import jakarta.faces.application.Resource;
+import jakarta.faces.application.ResourceDependency;
+import jakarta.faces.component.FacesComponent;
+import jakarta.faces.component.html.HtmlGraphicImage;
+import jakarta.faces.context.FacesContext;
+import jakarta.faces.context.ResponseWriter;
+
 import org.omnifaces.cdi.GraphicImageBean;
 import org.omnifaces.el.ExpressionInspector;
 import org.omnifaces.el.MethodReference;
@@ -37,15 +46,6 @@ import org.omnifaces.resourcehandler.GraphicResource;
 import org.omnifaces.resourcehandler.GraphicResourceHandler;
 import org.omnifaces.util.Faces;
 import org.omnifaces.util.State;
-
-import jakarta.el.ValueExpression;
-import jakarta.faces.application.Application;
-import jakarta.faces.application.Resource;
-import jakarta.faces.application.ResourceDependency;
-import jakarta.faces.component.FacesComponent;
-import jakarta.faces.component.html.HtmlGraphicImage;
-import jakarta.faces.context.FacesContext;
-import jakarta.faces.context.ResponseWriter;
 
 /**
  * <p>

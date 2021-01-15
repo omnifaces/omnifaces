@@ -18,11 +18,6 @@ import static org.omnifaces.taghandler.DeferredTagHandlerHelper.getValueExpressi
 import java.io.IOException;
 import java.io.Serializable;
 
-import org.omnifaces.cdi.converter.ConverterManager;
-import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredAttributes;
-import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandler;
-import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDelegate;
-
 import jakarta.el.ELContext;
 import jakarta.el.ValueExpression;
 import jakarta.faces.component.UIComponent;
@@ -35,6 +30,11 @@ import jakarta.faces.view.facelets.ConverterHandler;
 import jakarta.faces.view.facelets.FaceletContext;
 import jakarta.faces.view.facelets.TagAttribute;
 import jakarta.faces.view.facelets.TagHandlerDelegate;
+
+import org.omnifaces.cdi.converter.ConverterManager;
+import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredAttributes;
+import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandler;
+import org.omnifaces.taghandler.DeferredTagHandlerHelper.DeferredTagHandlerDelegate;
 
 /**
  * <p>
@@ -163,16 +163,12 @@ public class Converter extends ConverterHandler implements DeferredTagHandler {
 
 		@Override
 		public Object getAsObject(FacesContext context, UIComponent component, String value) {
-			jakarta.faces.convert.Converter<Object> converter = getConverter(context);
-			attributes.invokeSetters(context.getELContext(), converter);
-			return converter.getAsObject(context, component, value);
+			return getConverter(context).getAsObject(context, component, value);
 		}
 
 		@Override
 		public String getAsString(FacesContext context, UIComponent component, Object value) {
-			jakarta.faces.convert.Converter<Object> converter = getConverter(context);
-			attributes.invokeSetters(context.getELContext(), converter);
-			return converter.getAsString(context, component, value);
+			return getConverter(context).getAsString(context, component, value);
 		}
 
 		private jakarta.faces.convert.Converter<Object> getConverter(FacesContext context) {
@@ -180,6 +176,7 @@ public class Converter extends ConverterHandler implements DeferredTagHandler {
 				converter = Converter.createInstance(context, context.getELContext(), binding, id);
 			}
 
+			attributes.invokeSetters(context.getELContext(), converter);
 			return converter;
 		}
 	}
