@@ -17,37 +17,38 @@ import static org.omnifaces.facesviews.FacesViews.scanAndStoreViews;
 import static org.omnifaces.util.Faces.getServletContext;
 import static org.omnifaces.util.Faces.isDevelopment;
 
-import java.net.URL;
+import javax.faces.application.ResourceHandler;
+import javax.faces.application.ResourceHandlerWrapper;
+import javax.faces.application.ViewResource;
+import javax.faces.context.FacesContext;
 
-import javax.faces.view.facelets.ResourceResolver;
+import org.omnifaces.ApplicationProcessor;
 
 /**
- * Facelets resource resolver that resolves mapped resources (views) to the folders from which
+ * Facelets resource handler that resolves mapped resources (views) to the folders from which
  * those views were scanned (like the the special auto-scanned faces-views folder).
  * <p>
  * For a guide on FacesViews, please see the <a href="package-summary.html">package summary</a>.
  *
  * @author Arjan Tijms
  * @see FacesViews
+ * @see ApplicationProcessor
  */
-@SuppressWarnings("deprecation")
-public class FacesViewsResolver extends ResourceResolver {
+public class FacesViewsResourceHandler extends ResourceHandlerWrapper {
 
-	private final ResourceResolver resourceResolver;
-
-	public FacesViewsResolver(ResourceResolver resourceResolver) {
-		this.resourceResolver = resourceResolver;
+	public FacesViewsResourceHandler(ResourceHandler wrapped) {
+		super(wrapped);
 	}
 
 	@Override
-	public URL resolveUrl(String path) {
-		URL resource = resourceResolver.resolveUrl(getMappedPath(path));
+	public ViewResource createViewResource(FacesContext context, String path) {
+		ViewResource resource = super.createViewResource(context, getMappedPath(path));
 
 		if (resource == null && isDevelopment()) {
 			// If resource is null it means it wasn't found.
 			// Check if the resource was dynamically added by scanning the faces-views location(s) again.
 			scanAndStoreViews(getServletContext(), false);
-			resource = resourceResolver.resolveUrl(getMappedPath(path));
+			resource = super.createViewResource(context, getMappedPath(path));
 		}
 
 		return resource;
