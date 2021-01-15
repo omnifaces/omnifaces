@@ -69,7 +69,7 @@ public class FacesConverterIT extends OmniFacesIT {
 		}
 
 		assertTrue("EJB is injected in facesConverterITExtendedConverter", facesConverterITExtendedConverter.getText().startsWith("FacesConverterITSomeEJB"));
-		assertTrue("ResourceDependency is injected in facesConverterITExtendedConverter", facesConverterITExtendedConverterResourceDependency.getText().equals("facesConverterITExtendedConverterResourceDependency"));
+		assertEquals("ResourceDependency is injected in facesConverterITExtendedConverter", "facesConverterITExtendedConverterResourceDependency", facesConverterITExtendedConverterResourceDependency.getText());
 		assertTrue("EJB is injected in facesConverterITExtendedManagedConverter", facesConverterITExtendedManagedConverter.getText().startsWith("FacesConverterITSomeEJB"));
 
 		if (!isMojarra()) { // Mojarra bugs on this.
