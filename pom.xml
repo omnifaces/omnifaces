@@ -330,6 +330,7 @@
 					<javadocVersion>${javadoc.version}</javadocVersion>
 					<notimestamp>true</notimestamp>
 					<splitindex>true</splitindex>
+					<doclint>all,-missing</doclint>
 					<doctitle>OmniFaces API documentation</doctitle>
 					<links>
 						<link>https://javaee.github.io/javaee-spec/javadocs/</link>
